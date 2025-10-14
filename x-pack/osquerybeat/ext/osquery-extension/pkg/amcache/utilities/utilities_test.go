@@ -3,13 +3,13 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build windows
+
 package utilities
 
 import (
 	"testing"
 	"www.velocidex.com/golang/regparser"
 )
-
 
 func TestMakeTrimmedString(t *testing.T) {
 	tests := []struct {
@@ -18,18 +18,18 @@ func TestMakeTrimmedString(t *testing.T) {
 		expected string
 	}{
 		{
-			name:  "Test case 1",
-			input: regparser.ValueData{String: "Test string 1\x00\x00", Type: regparser.REG_SZ},
+			name:     "Test case 1",
+			input:    regparser.ValueData{String: "Test string 1\x00\x00", Type: regparser.REG_SZ},
 			expected: "Test string 1",
 		},
 		{
-			name:  "Test case 2",
-			input: regparser.ValueData{String: "Test string 2\x00\x00", Type: regparser.REG_SZ},
+			name:     "Test case 2",
+			input:    regparser.ValueData{String: "Test string 2\x00\x00", Type: regparser.REG_SZ},
 			expected: "Test string 2",
 		},
 		{
-			name:  "Test case 3",
-			input: regparser.ValueData{Uint64: 12345, Type: regparser.REG_DWORD},
+			name:     "Test case 3",
+			input:    regparser.ValueData{Uint64: 12345, Type: regparser.REG_DWORD},
 			expected: "12345",
 		},
 	}

@@ -9,12 +9,13 @@ package utilities
 import (
 	"bytes"
 	"fmt"
-	"io/fs"
-	"log"
-	"strings"
-	"os"
 	"github.com/forensicanalysis/fslib"
 	"github.com/forensicanalysis/fslib/systemfs"
+	"github.com/osquery/osquery-go/plugin/table"
+	"io/fs"
+	"log"
+	"os"
+	"strings"
 	"www.velocidex.com/golang/regparser"
 )
 
@@ -41,23 +42,15 @@ func MakeTrimmedString(vd *regparser.ValueData) string {
 	}
 }
 
-// HiveReader reads a registry hive file and provides access to its regparser.Registry.
-// implements the HiveReader interface.
-type HiveReader struct {
-	FilePath         string
-}
-
 // Registry reads the registry hive file and returns a regparser.Registry object.
-func (hr *HiveReader) Registry() (*regparser.Registry, error) {
-	// TODO: Determine if we should be caching the read between calls
-
+func LoadRegistry(filePath string) (*regparser.Registry, error) {
 	// ensure a path was provided
-	if hr.FilePath == "" {
+	if filePath == "" {
 		return nil, fmt.Errorf("hive file path is empty")
 	}
 
 	// try reading the file directly first, which is faster if it works
-	content, err := os.ReadFile(hr.FilePath)
+	content, err := os.ReadFile(filePath)
 	if err == nil {
 		registry, err := regparser.NewRegistry(bytes.NewReader(content))
 		if err == nil {
@@ -66,19 +59,40 @@ func (hr *HiveReader) Registry() (*regparser.Registry, error) {
 	}
 
 	// fallback to a low level read using fslib
-	sourceFS, err := systemfs.New(); if err != nil {
+	sourceFS, err := systemfs.New()
+	if err != nil {
 		return nil, err
 	}
-	fsPath, err := fslib.ToFSPath(hr.FilePath); if err != nil {
+	fsPath, err := fslib.ToFSPath(filePath)
+	if err != nil {
 		return nil, err
 	}
-	content, err = fs.ReadFile(sourceFS, fsPath); if err != nil {
+	content, err = fs.ReadFile(sourceFS, fsPath)
+	if err != nil {
 		return nil, err
 	}
 
-	registry, err := regparser.NewRegistry(bytes.NewReader(content)); if err != nil {
+	registry, err := regparser.NewRegistry(bytes.NewReader(content))
+	if err != nil {
 		return nil, err
 	}
 
 	return registry, nil
+}
+
+func GetConstraintsFromQueryContext(fieldName string, context table.QueryContext) []string {
+	constraints := make([]string, 0)
+	for name, cList := range context.Constraints {
+		if len(cList.Constraints) > 0 && name == fieldName {
+			for _, c := range cList.Constraints {
+				log.Printf("%s Query constraint: %d %s", fieldName, c.Operator, c.Expression)
+				if c.Operator != table.OperatorEquals {
+					log.Printf("Warning: only '=' operator is supported for %s constraints, skipping %d", fieldName, c.Operator)
+					continue
+				}
+				constraints = append(constraints, c.Expression)
+			}
+		}
+	}
+	return constraints
 }

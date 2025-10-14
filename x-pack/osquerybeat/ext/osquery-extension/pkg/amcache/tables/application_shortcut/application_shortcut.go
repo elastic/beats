@@ -23,7 +23,7 @@ type ApplicationShortcutEntry struct {
 	ShortcutProgramId  string `json:"shortcut_program_id"`
 }
 
-func ApplicationShortcutColumns() []table.ColumnDefinition {
+func Columns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.BigIntColumn("last_write_time"),
 		table.TextColumn("shortcut_path"),
@@ -46,32 +46,31 @@ func (ae *ApplicationShortcutEntry) SetLastWriteTime(t int64) {
 	ae.LastWriteTime = t
 }
 
-type ApplicationShortcutTable struct {
-	Entries []interfaces.Entry
+func GetApplicationShortcutEntriesFromRegistry(registry *regparser.Registry) (map[string][]interfaces.Entry, error) {
+	if registry == nil {
+		return nil, fmt.Errorf("registry is nil")
+	}
+
+	keyName := "Root\\InventoryApplicationShortcut"
+	keyNode := registry.OpenKey(keyName)
+	if keyNode == nil {
+		return nil, fmt.Errorf("error opening key: %s", keyName)
+	}
+
+	applicationEntries := make(map[string][]interfaces.Entry, len(keyNode.Subkeys()))
+	for _, subkey := range keyNode.Subkeys() {
+		ase := &ApplicationShortcutEntry{}
+		interfaces.FillInEntryFromKey(ase, subkey)
+
+		applicationEntries[ase.ShortcutProgramId] = append(applicationEntries[ase.ShortcutProgramId], ase)
+	}
+	return applicationEntries, nil
 }
 
-func (t *ApplicationShortcutTable) AddRow(key *regparser.CM_KEY_NODE) error {
-	ae := &ApplicationShortcutEntry{}
-	interfaces.FillInEntryFromKey(ae, key)
-	t.Entries = append(t.Entries, ae)
-	return nil
-}
-
-func (t *ApplicationShortcutTable) Rows() []interfaces.Entry {
-	return t.Entries
-}
-
-func (t *ApplicationShortcutTable) KeyName() string {
-	return "Root\\InventoryApplicationShortcut"
-}
-
-func GenerateFunc(hiveReader *utilities.HiveReader) table.GenerateFunc {
+func GenerateFunc(state interfaces.GlobalState) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		table := ApplicationShortcutTable{}
-		err := interfaces.BuildTableFromRegistry(&table, hiveReader, ctx, queryContext)
-		if err != nil {
-			return nil, fmt.Errorf("failed to build ApplicationShortcutTable: %w", err)
-		}
-		return interfaces.RowsAsStringMapArray(&table), nil
+		programIds := utilities.GetConstraintsFromQueryContext("shortcut_program_id", queryContext)
+		rows := state.GetApplicationShortcutEntries(programIds...)
+		return interfaces.RowsAsStringMapArray(rows), nil
 	}
 }

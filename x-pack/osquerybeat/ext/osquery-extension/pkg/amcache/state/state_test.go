@@ -4,16 +4,17 @@
 
 //go:build windows
 
-package application_shortcut
+package state
 
 import (
+	"log"
 	"os"
 	"path/filepath"
 	"testing"
 )
 
 func GetTestHivePath() (string, error) {
-	relPath := filepath.Join("..", "..", "testdata", "Amcache.hve")
+	relPath := filepath.Join("..", "testdata", "Amcache.hve")
 	absPath, err := filepath.Abs(relPath)
 	if err != nil {
 		return "", err
@@ -24,12 +25,18 @@ func GetTestHivePath() (string, error) {
 	return absPath, nil
 }
 
-func TestApplicationFile(t *testing.T) {
-	test_hive_path, err := GetTestHivePath()
+func TestGlobalState(t *testing.T) {
+	testHivePath, err := GetTestHivePath()
 	if err != nil {
-		t.Fatalf("Failed to get test hive path: %v", err)
+		t.Fatal("Failed to get test hive path")
 	}
-	if _, err := os.Stat(test_hive_path); os.IsNotExist(err) {
-		t.Fatalf("File does not exist: %s", test_hive_path)
+	SetHivePath(testHivePath)
+
+	instance := GetInstance()
+	if instance == nil {
+		t.Fatal("Expected instance to be initialized")
 	}
+
+	applicationEntries := instance.GetApplicationEntries()
+	log.Printf("Application entries loaded: %d", len(applicationEntries))
 }

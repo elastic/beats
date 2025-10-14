@@ -9,14 +9,15 @@ package application
 import (
 	"context"
 	"fmt"
-	"github.com/osquery/osquery-go/plugin/table"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/interfaces"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/utilities"
+	"github.com/osquery/osquery-go/plugin/table"
 	"www.velocidex.com/golang/regparser"
 )
 
 type ApplicationEntry struct {
-	LastWriteTime      int64 `json:"last_write_time,string"`
+	LastWriteTime      int64  `json:"last_write_time,string"`
 	ProgramId          string `json:"program_id"`
 	ProgramInstanceId  string `json:"program_instance_id"`
 	Name               string `json:"name"`
@@ -38,33 +39,6 @@ type ApplicationEntry struct {
 	MsiInstallDate     string `json:"msi_install_date"`
 	BundleManifestPath string `json:"bundle_manifest_path"`
 	UserSid            string `json:"user_sid"`
-}
-
-func ApplicationColumns() []table.ColumnDefinition {
-	return []table.ColumnDefinition{
-		table.BigIntColumn("last_write_time"),
-		table.TextColumn("name"),
-		table.TextColumn("program_id"),
-		table.TextColumn("program_instance_id"),
-		table.TextColumn("version"),
-		table.TextColumn("publisher"),
-		table.TextColumn("language"),
-		table.TextColumn("install_date"),
-		table.TextColumn("source"),
-		table.TextColumn("root_dir_path"),
-		table.TextColumn("hidden_arp"),
-		table.TextColumn("uninstall_string"),
-		table.TextColumn("registry_key_path"),
-		table.TextColumn("store_app_type"),
-		table.TextColumn("inbox_modern_app"),
-		table.TextColumn("manifest_path"),
-		table.TextColumn("package_full_name"),
-		table.TextColumn("msi_package_code"),
-		table.TextColumn("msi_product_code"),
-		table.TextColumn("msi_install_date"),
-		table.TextColumn("bundle_manifest_path"),
-		table.TextColumn("user_sid"),
-	}
 }
 
 func (ae *ApplicationEntry) FieldMappings() map[string]*string {
@@ -97,32 +71,58 @@ func (ae *ApplicationEntry) SetLastWriteTime(t int64) {
 	ae.LastWriteTime = t
 }
 
-type ApplicationTable struct {
-	Entries []interfaces.Entry
+func GetApplicationEntriesFromRegistry(registry *regparser.Registry) (map[string][]interfaces.Entry, error) {
+	if registry == nil {
+		return nil, fmt.Errorf("registry is nil")
+	}
+
+	keyName := "Root\\InventoryApplication"
+	keyNode := registry.OpenKey(keyName)
+	if keyNode == nil {
+		return nil, fmt.Errorf("error opening key: %s", keyName)
+	}
+
+	applicationEntries := make(map[string][]interfaces.Entry, len(keyNode.Subkeys()))
+	for _, subkey := range keyNode.Subkeys() {
+		ae := &ApplicationEntry{}
+		interfaces.FillInEntryFromKey(ae, subkey)
+
+		applicationEntries[ae.ProgramId] = append(applicationEntries[ae.ProgramId], ae)
+	}
+	return applicationEntries, nil
 }
 
-func (t *ApplicationTable) AddRow(key *regparser.CM_KEY_NODE) error {
-	ae := &ApplicationEntry{}
-	interfaces.FillInEntryFromKey(ae, key)
-	t.Entries = append(t.Entries, ae)
-	return nil
+func Columns() []table.ColumnDefinition {
+	return []table.ColumnDefinition{
+		table.BigIntColumn("last_write_time"),
+		table.TextColumn("name"),
+		table.TextColumn("program_id"),
+		table.TextColumn("program_instance_id"),
+		table.TextColumn("version"),
+		table.TextColumn("publisher"),
+		table.TextColumn("language"),
+		table.TextColumn("install_date"),
+		table.TextColumn("source"),
+		table.TextColumn("root_dir_path"),
+		table.TextColumn("hidden_arp"),
+		table.TextColumn("uninstall_string"),
+		table.TextColumn("registry_key_path"),
+		table.TextColumn("store_app_type"),
+		table.TextColumn("inbox_modern_app"),
+		table.TextColumn("manifest_path"),
+		table.TextColumn("package_full_name"),
+		table.TextColumn("msi_package_code"),
+		table.TextColumn("msi_product_code"),
+		table.TextColumn("msi_install_date"),
+		table.TextColumn("bundle_manifest_path"),
+		table.TextColumn("user_sid"),
+	}
 }
 
-func (t *ApplicationTable) Rows() []interfaces.Entry {
-	return t.Entries
-}
-
-func (t *ApplicationTable) KeyName() string {
-	return "Root\\InventoryApplication"
-}
-
-func GenerateFunc(hiveReader *utilities.HiveReader) table.GenerateFunc {
+func GenerateFunc(state interfaces.GlobalState) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		table := ApplicationTable{}
-		err := interfaces.BuildTableFromRegistry(&table, hiveReader, ctx, queryContext)
-		if err != nil {
-			return nil, fmt.Errorf("failed to build ApplicationTable: %w", err)
-		}
-		return interfaces.RowsAsStringMapArray(&table), nil
+		programIds := utilities.GetConstraintsFromQueryContext("program_id", queryContext)
+		rows := state.GetApplicationEntries(programIds...)
+		return interfaces.RowsAsStringMapArray(rows), nil
 	}
 }

@@ -4,7 +4,7 @@
 
 //go:build windows
 
-package application_shortcut
+package application_file
 
 import (
 	"os"

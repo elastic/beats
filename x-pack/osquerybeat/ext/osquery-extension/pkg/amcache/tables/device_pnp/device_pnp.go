@@ -52,7 +52,7 @@ type DevicePnpEntry struct {
 	LocationPaths           string `json:"location_paths"`
 }
 
-func DevicePnpColumns() []table.ColumnDefinition {
+func Columns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.BigIntColumn("last_write_time"),
 		table.TextColumn("model"),
@@ -133,32 +133,30 @@ func (dpe *DevicePnpEntry) SetLastWriteTime(t int64) {
 	dpe.LastWriteTime = t
 }
 
-type DevicePnpTable struct {
-	Entries []interfaces.Entry
+func GetDevicePnpEntriesFromRegistry(registry *regparser.Registry) (map[string][]interfaces.Entry, error) {
+	if registry == nil {
+		return nil, fmt.Errorf("registry is nil")
+	}
+
+	keyName := "Root\\InventoryDevicePnp"
+	keyNode := registry.OpenKey(keyName)
+	if keyNode == nil {
+		return nil, fmt.Errorf("error opening key: %s", keyName)
+	}
+
+	deviceEntries := make(map[string][]interfaces.Entry, len(keyNode.Subkeys()))
+	for _, subkey := range keyNode.Subkeys() {
+		dpe := &DevicePnpEntry{}
+		interfaces.FillInEntryFromKey(dpe, subkey)
+		deviceEntries[dpe.DriverId] = append(deviceEntries[dpe.DriverId], dpe)
+	}
+	return deviceEntries, nil
 }
 
-func (t *DevicePnpTable) AddRow(key *regparser.CM_KEY_NODE) error {
-	ae := &DevicePnpEntry{}
-	interfaces.FillInEntryFromKey(ae, key)
-	t.Entries = append(t.Entries, ae)
-	return nil
-}
-
-func (t *DevicePnpTable) Rows() []interfaces.Entry {
-	return t.Entries
-}
-
-func (t *DevicePnpTable) KeyName() string {
-	return "Root\\InventoryDevicePnp"
-}
-
-func GenerateFunc(hiveReader *utilities.HiveReader) table.GenerateFunc {
+func GenerateFunc(state interfaces.GlobalState) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		table := DevicePnpTable{}
-		err := interfaces.BuildTableFromRegistry(&table, hiveReader, ctx, queryContext)
-		if err != nil {
-			return nil, fmt.Errorf("failed to build DevicePnpTable: %w", err)
-		}
-		return interfaces.RowsAsStringMapArray(&table), nil
+		driverIds := utilities.GetConstraintsFromQueryContext("driver_id", queryContext)
+		rows := state.GetDevicePnpEntries(driverIds...)
+		return interfaces.RowsAsStringMapArray(rows), nil
 	}
 }

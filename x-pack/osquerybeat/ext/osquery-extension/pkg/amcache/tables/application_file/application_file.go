@@ -9,9 +9,9 @@ package application_file
 import (
 	"context"
 	"fmt"
-	"github.com/osquery/osquery-go/plugin/table"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/interfaces"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/utilities"
+	"github.com/osquery/osquery-go/plugin/table"
 	"www.velocidex.com/golang/regparser"
 )
 
@@ -38,7 +38,7 @@ type ApplicationFileEntry struct {
 	AppxPackageRelativeId string `json:"appx_package_relative_id"`
 }
 
-func ApplicationFileColumns() []table.ColumnDefinition {
+func Columns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.BigIntColumn("last_write_time"),
 		table.TextColumn("name"),
@@ -91,32 +91,30 @@ func (afe *ApplicationFileEntry) SetLastWriteTime(t int64) {
 	afe.LastWriteTime = t
 }
 
-type ApplicationFileTable struct {
-	Entries []interfaces.Entry
+func GetApplicationFileEntriesFromRegistry(registry *regparser.Registry) (map[string][]interfaces.Entry, error) {
+	if registry == nil {
+		return nil, fmt.Errorf("registry is nil")
+	}
+
+	keyName := "Root\\InventoryApplicationFile"
+	keyNode := registry.OpenKey(keyName)
+	if keyNode == nil {
+		return nil, fmt.Errorf("error opening key: %s", keyName)
+	}
+
+	applicationEntries := make(map[string][]interfaces.Entry, len(keyNode.Subkeys()))
+	for _, subkey := range keyNode.Subkeys() {
+		ae := &ApplicationFileEntry{}
+		interfaces.FillInEntryFromKey(ae, subkey)
+		applicationEntries[ae.ProgramId] = append(applicationEntries[ae.ProgramId], ae)
+	}
+	return applicationEntries, nil
 }
 
-func (t *ApplicationFileTable) AddRow(key *regparser.CM_KEY_NODE) error {
-	afe := &ApplicationFileEntry{}
-	interfaces.FillInEntryFromKey(afe, key)
-	t.Entries = append(t.Entries, afe)
-	return nil
-}
-
-func (t *ApplicationFileTable) Rows() []interfaces.Entry {
-	return t.Entries
-}
-
-func (t *ApplicationFileTable) KeyName() string {
-	return "Root\\InventoryApplicationFile"
-}
-
-func GenerateFunc(hiveReader *utilities.HiveReader) table.GenerateFunc {
+func GenerateFunc(state interfaces.GlobalState) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		table := ApplicationFileTable{}
-		err := interfaces.BuildTableFromRegistry(&table, hiveReader, ctx, queryContext)
-		if err != nil {
-			return nil, fmt.Errorf("failed to build ApplicationFileTable: %w", err)
-		}
-		return interfaces.RowsAsStringMapArray(&table), nil
+		programIds := utilities.GetConstraintsFromQueryContext("program_id", queryContext)
+		rows := state.GetApplicationFileEntries(programIds...)
+		return interfaces.RowsAsStringMapArray(rows), nil
 	}
 }

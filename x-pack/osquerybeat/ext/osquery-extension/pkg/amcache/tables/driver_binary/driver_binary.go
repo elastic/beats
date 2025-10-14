@@ -16,28 +16,28 @@ import (
 )
 
 type DriverBinaryEntry struct {
-	LastWriteTime int64  `json:"last_write_time,string"`
-    DriverName string `json:"driver_name"`
-    Inf string `json:"inf"`
-    DriverVersion string `json:"driver_version"`
-    Product string `json:"product"`
-    ProductVersion string `json:"product_version"`
-    WdfVersion string `json:"wdf_version"`
-    DriverCompany string `json:"driver_company"`
-    DriverPackageStrongName string `json:"driver_package_strong_name"`
-    Service string `json:"service"`
-    DriverInBox string `json:"driver_in_box"`
-    DriverSigned string `json:"driver_signed"`
-    DriverIsKernelMode string `json:"driver_is_kernel_mode"`
-    DriverId string `json:"driver_id"`
-    DriverLastWriteTime string `json:"driver_last_write_time"`
-    DriverType string `json:"driver_type"`
-    DriverTimeStamp string `json:"driver_time_stamp"`
-    DriverCheckSum string `json:"driver_check_sum"`
-    ImageSize string `json:"image_size"`
+	LastWriteTime           int64  `json:"last_write_time,string"`
+	DriverName              string `json:"driver_name"`
+	Inf                     string `json:"inf"`
+	DriverVersion           string `json:"driver_version"`
+	Product                 string `json:"product"`
+	ProductVersion          string `json:"product_version"`
+	WdfVersion              string `json:"wdf_version"`
+	DriverCompany           string `json:"driver_company"`
+	DriverPackageStrongName string `json:"driver_package_strong_name"`
+	Service                 string `json:"service"`
+	DriverInBox             string `json:"driver_in_box"`
+	DriverSigned            string `json:"driver_signed"`
+	DriverIsKernelMode      string `json:"driver_is_kernel_mode"`
+	DriverId                string `json:"driver_id"`
+	DriverLastWriteTime     string `json:"driver_last_write_time"`
+	DriverType              string `json:"driver_type"`
+	DriverTimeStamp         string `json:"driver_time_stamp"`
+	DriverCheckSum          string `json:"driver_check_sum"`
+	ImageSize               string `json:"image_size"`
 }
 
-func DriverBinaryColumns() []table.ColumnDefinition {
+func Columns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.BigIntColumn("last_write_time"),
 		table.TextColumn("driver_name"),
@@ -78,32 +78,30 @@ func (ae *DriverBinaryEntry) SetLastWriteTime(t int64) {
 	ae.LastWriteTime = t
 }
 
-type DriverBinaryTable struct {
-	Entries []interfaces.Entry
+func GetDriverBinaryEntriesFromRegistry(registry *regparser.Registry) (map[string][]interfaces.Entry, error) {
+	if registry == nil {
+		return nil, fmt.Errorf("registry is nil")
+	}
+
+	keyName := "Root\\InventoryDriverBinary"
+	keyNode := registry.OpenKey(keyName)
+	if keyNode == nil {
+		return nil, fmt.Errorf("error opening key: %s", keyName)
+	}
+
+	deviceEntries := make(map[string][]interfaces.Entry, len(keyNode.Subkeys()))
+	for _, subkey := range keyNode.Subkeys() {
+		dbe := &DriverBinaryEntry{}
+		interfaces.FillInEntryFromKey(dbe, subkey)
+		deviceEntries[dbe.DriverId] = append(deviceEntries[dbe.DriverId], dbe)
+	}
+	return deviceEntries, nil
 }
 
-func (t *DriverBinaryTable) AddRow(key *regparser.CM_KEY_NODE) error {
-	ae := &DriverBinaryEntry{}
-	interfaces.FillInEntryFromKey(ae, key)
-	t.Entries = append(t.Entries, ae)
-	return nil
-}
-
-func (t *DriverBinaryTable) Rows() []interfaces.Entry {
-	return t.Entries
-}
-
-func (t *DriverBinaryTable) KeyName() string {
-	return "Root\\InventoryDriverBinary"
-}
-
-func GenerateFunc(hiveReader *utilities.HiveReader) table.GenerateFunc {
+func GenerateFunc(state interfaces.GlobalState) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		table := DriverBinaryTable{}
-		err := interfaces.BuildTableFromRegistry(&table, hiveReader, ctx, queryContext)
-		if err != nil {
-			return nil, fmt.Errorf("failed to build DriverBinaryTable: %w", err)
-		}
-		return interfaces.RowsAsStringMapArray(&table), nil
+		driverIds := utilities.GetConstraintsFromQueryContext("driver_id", queryContext)
+		rows := state.GetDriverBinaryEntries(driverIds...)
+		return interfaces.RowsAsStringMapArray(rows), nil
 	}
 }
