@@ -311,7 +311,9 @@ func handleJSON(logger *logp.Logger, cfg *config.C, parsers *[]any) error {
 		}
 
 		if !keysUnderRoot {
-			jsonCfg.SetString("target", -1, "json")
+			if err := jsonCfg.SetString("target", -1, "json"); err != nil {
+				return fmt.Errorf("cannot set 'target' in the ndjson parser: %w", err)
+			}
 		}
 
 		*parsers = append(*parsers, map[string]any{"ndjson": jsonCfg})
