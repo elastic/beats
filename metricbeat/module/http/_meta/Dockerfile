@@ -1,4 +1,4 @@
-FROM golang:1.24.8
+FROM golang:1.24.8-bookworm
 
 COPY test/main.go main.go
 
