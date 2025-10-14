@@ -59,7 +59,7 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 	escfg := defaultOptions
 
 	// check for unsupported config
-	err := checkUnsupportedConfig(output)
+	err := checkUnsupportedConfig(output, logger)
 	if err != nil {
 		return nil, err
 	}
