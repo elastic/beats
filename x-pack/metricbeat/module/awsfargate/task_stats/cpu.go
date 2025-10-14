@@ -5,25 +5,25 @@
 package task_stats
 
 import (
-	"github.com/docker/docker/api/types"
+	dcontainer "github.com/docker/docker/api/types/container"
 
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
 	"github.com/elastic/beats/v7/metricbeat/module/docker/cpu"
 )
 
-func getCPUStats(taskStats types.StatsJSON) cpu.CPUStats {
+func getCPUStats(taskStats dcontainer.StatsResponse) cpu.CPUStats {
 	usage := cpu.CPUUsage{Stat: &docker.Stat{Stats: taskStats}}
 
 	return cpu.CPUStats{
 		TotalUsage:                            usage.Total(),
 		TotalUsageNormalized:                  usage.TotalNormalized(),
-		UsageInKernelmode:                     taskStats.Stats.CPUStats.CPUUsage.UsageInKernelmode,
+		UsageInKernelmode:                     taskStats.CPUStats.CPUUsage.UsageInKernelmode,
 		UsageInKernelmodePercentage:           usage.InKernelMode(),
 		UsageInKernelmodePercentageNormalized: usage.InKernelModeNormalized(),
-		UsageInUsermode:                       taskStats.Stats.CPUStats.CPUUsage.UsageInUsermode,
+		UsageInUsermode:                       taskStats.CPUStats.CPUUsage.UsageInUsermode,
 		UsageInUsermodePercentage:             usage.InUserMode(),
 		UsageInUsermodePercentageNormalized:   usage.InUserModeNormalized(),
-		SystemUsage:                           taskStats.Stats.CPUStats.SystemUsage,
+		SystemUsage:                           taskStats.CPUStats.SystemUsage,
 		SystemUsagePercentage:                 usage.System(),
 		SystemUsagePercentageNormalized:       usage.SystemNormalized(),
 	}
