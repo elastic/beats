@@ -896,6 +896,38 @@ redis_connected_clients{instance="rough-snowflake-web"} 10.0`
 	require.ElementsMatch(t, expected, result)
 }
 
+func TestInvalidContentTypeHeader(t *testing.T) {
+	input := `
+# TYPE process_cpu_total counter
+# HELP process_cpu_total Some help.
+process_cpu_total 4.20072246e+06
+`
+
+	expected := []*MetricFamily{
+		{
+			Name: stringp("process_cpu_total"),
+			Help: stringp("Some help."),
+			Type: "counter",
+			Unit: nil,
+			Metric: []*OpenMetric{
+				{
+					Label: []*labels.Label{},
+					Name:  stringp("process_cpu_total"),
+					Counter: &Counter{
+						Value: float64p(4.20072246e+06),
+					},
+				},
+			},
+		},
+	}
+
+	result, err := ParseMetricFamilies([]byte(input), "invalid/textplain", time.Now(), nil)
+	if err != nil {
+		t.Fatal("ParseMetricFamilies for invalid content type returned an error.")
+	}
+	require.ElementsMatch(t, expected, result)
+}
+
 func TestBlankContentTypeHeader(t *testing.T) {
 	input := `
 # TYPE process_cpu_total counter
