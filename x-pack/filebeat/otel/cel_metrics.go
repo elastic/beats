@@ -149,7 +149,6 @@ func NewOTELCELMetrics(log *logp.Logger,
 				if err != nil {
 					return err
 				}
-				collectedMetrics = GetHttpCountsFromHistogram(input, collectedMetrics)
 				return metricExporter.Export(ctx, collectedMetrics)
 			}
 			flushFuncs = append(flushFuncs, manualExportFunc)

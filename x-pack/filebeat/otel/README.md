@@ -1,6 +1,7 @@
 # Opentelemetry metrics
 
-The CEL input is currently able to export Open Telemetry metrics.
+The CEL input is currently able to export Open Telemetry metrics. The OTEL
+metrics are collected at the total periodic run level as well as per
 The export of OTEL metrics are off by default. The control of OTEL
 exporting is through environment variables.
 
@@ -50,25 +51,25 @@ Exported metrics:
 A program run is single run of the cel program. A periodic run is all the
 program runs for that periodic run.
 
-| name                                       |description|metric type|
-|--------------------------------------------|---|---|
-| input.cel.periodic.run.count               | the number of times a periodic run was started.|Int64Counter|
-| input.cel.periodic.program.started         | a count of the number of times a program was started in a periodic run.|Int64count of the number|
-| input.cel.periodic.program.success         | a count of the number of times a program terminated without an error in a periodic run.|Int64count of the number|
-| input.cel.periodic.batch.generated         | a count of the number of the number of batches generated in a periodic run.|Int64count of the number|
-| input.cel.periodic.batch.published         | a count of the number of the number of batches successfully published in a periodic run.|Int64count of the number|
-| input.cel.periodic.event.generated         | a count of the number of the number of events generated in a periodic run.|Int64count of the number|
-| input.cel.periodic.event.published         | a count of the number of the number of events published in a periodic run.|Int64count of the number|
-| input.cel.periodic.run.duration            | a count of the number of the total duration of time in seconds spent in a periodic run.|Int64count of the number|
-| input.cel.periodic.cel.duration            | a count of the number of the total duration of time in seconds spent processing CEL programs in a periodic run.|Int64count of the number|
-| input.cel.periodic.event.publish.duration  | a count of the number of the total duration of time in seconds publishing events in a periodic run.|Int64count of the number|
-| input.cel.program.run.started.count        | a count of the number of times a program was started.|Int64Counter|
-| input.cel.program.run.success.count        | a count of the number of times a program terminated without error.|Int64Counter|
-| input.cel.program.batch.count              | a count of the number of batches the program has generated.|Int64Counter|
-| input.cel.program.event.count              | a count of the number of events the program has generated.|Int64Counter|
-| input.cel.program.event.published.count    | a count of the number of events the program has published.|Int64Counter|
-| input.cel.program.batch.published.count    | a count of the number of batched the program has published.|Int64Counter|
-| input.cel.program.run.duration             | a count of the number of the total time in seconds spent executing the program.|Int64count of the number|
-| input.cel.program.cel.duration             | a count of the number of the time in seconds spent processing the CEL program.|Int64count of the number|
-| input.cel.program.publish.duration         | a count of the number of the time in seconds spent publishing in the program.|Int64count of the number|
+| name                                       |description| metric type    |
+|--------------------------------------------|---|----------------|
+| input.cel.periodic.run.count               | the number of times a periodic run was started.| Int64Counter   |
+| input.cel.periodic.program.started         | the number of times a program was started in a periodic run.| Int64counter   |
+| input.cel.periodic.program.success         | the number of times a program terminated without an error in a periodic run.| Int64counter   |
+| input.cel.periodic.batch.generated         | the number of the number of batches generated in a periodic run.| Int64counter   |
+| input.cel.periodic.batch.published         | the number of the number of batches successfully published in a periodic run.| Int64counter   |
+| input.cel.periodic.event.generated         | the number of the number of events generated in a periodic run.| Int64counter   |
+| input.cel.periodic.event.published         | the number of the number of events published in a periodic run.| Int64counter   |
+| input.cel.periodic.run.duration            | the total duration of time in seconds spent in a periodic run.| Float64Counter   |
+| input.cel.periodic.cel.duration            | the total duration of time in seconds spent processing CEL programs in a periodic run.| Float64Counter   |
+| input.cel.periodic.event.publish.duration  | the total duration of time in seconds publishing events in a periodic run.| Float64Counter   |
+| input.cel.program.run.started.count        | the number of times a program was started.| Int64Counter   |
+| input.cel.program.run.success.count        | the number of times a program terminated without error.| Int64Counter   |
+| input.cel.program.batch.count              | the number of batches the program has generated.| Int64Counter   |
+| input.cel.program.event.count              | the number of events the program has generated.| Int64Counter   |
+| input.cel.program.event.published.count    | the number of events the program has published.| Int64Counter   |
+| input.cel.program.batch.published.count    | the number of batched the program has published.| Int64Counter   |
+| input.cel.program.run.duration             | the total time in seconds spent executing the program.| Float64Counter   |
+| input.cel.program.cel.duration             | the total time in seconds spent processing the CEL program.| Float64Counter   |
+| input.cel.program.publish.duration         | the total time in seconds spent publishing in the program.| Float64Counter |
 
