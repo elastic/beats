@@ -17,11 +17,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -236,7 +237,26 @@ exporters:
 		"log.file.path",
 	}
 
-	oteltest.AssertMapsEqual(t, receiverDoc, processorDoc, ignoredFields, "expected documents to be equal")
+	assertMapsEqual(t, receiverDoc, processorDoc, ignoredFields, "expected documents to be equal")
+}
+
+func assertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg string) {
+	t.Helper()
+
+	flatM1 := m1.Flatten()
+	flatM2 := m2.Flatten()
+	for _, f := range ignoredFields {
+		hasKeyM1, _ := flatM1.HasKey(f)
+		hasKeyM2, _ := flatM2.HasKey(f)
+
+		if !hasKeyM1 && !hasKeyM2 {
+			assert.Failf(t, msg, "ignored field %q does not exist in either map, please remove it from the ignored fields", f)
+		}
+
+		flatM1.Delete(f)
+		flatM2.Delete(f)
+	}
+	require.Equal(t, "", cmp.Diff(flatM1, flatM2), "expected maps to be equal")
 }
 
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
