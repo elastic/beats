@@ -7,7 +7,6 @@ package browserhistory
 import (
 	"context"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"strings"
 	"testing"
@@ -15,86 +14,679 @@ import (
 	"github.com/osquery/osquery-go/plugin/table"
 )
 
-func TestGetTableRows(t *testing.T) {
-	// Get the absolute path to the testdata directory
+// Expected test data - these values are static and any change indicates test data has been modified
+const (
+	expectedTotalRows   = 49
+	expectedChromeRows  = 5
+	expectedEdgeRows    = 5
+	expectedFirefoxRows = 5
+	expectedSafariRows  = 34 // 17 for Default + 17 for profile1
+)
+
+var expectedBrowserProfiles = map[string][]string{
+	"chrome":  {"Default"},
+	"edge":    {"Default"},
+	"firefox": {"dwpys5gk.default-release"},
+	"safari":  {"Default", "profile1"},
+}
+
+var expectedTimestamps = map[string]map[string][]int64{
+	"chrome": {
+		"Default": {1760089511, 1760089517},
+	},
+	"edge": {
+		"Default": {1760089411, 1760089423},
+	},
+	"firefox": {
+		"dwpys5gk.default-release": {1760089455, 1760089462},
+	},
+	"safari": {
+		"Default":  {1749628922, 1749628924, 1749628925, 1749628926, 1749628931, 1749629032, 1749629099, 1749629104, 1749629105, 1749629150},
+		"profile1": {1749628922, 1749628924, 1749628925, 1749628926, 1749628931, 1749629032, 1749629099, 1749629104, 1749629105, 1749629150},
+	},
+}
+
+// getTestDataDir returns the absolute path to the testdata directory
+func getTestDataDir(t *testing.T) string {
+	t.Helper()
 	testDataDir, err := filepath.Abs("testdata")
 	if err != nil {
 		t.Fatalf("Failed to get absolute path to testdata: %v", err)
 	}
+	return testDataDir
+}
 
-	tests := []struct {
-		name            string
-		constraints     map[string]table.ConstraintList
-		expectedRows    int
-		shouldHaveError bool
-	}{
-		{
-			name: "Glob matches all",
-			constraints: map[string]table.ConstraintList{
-				"custom_data_dir": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorGlob, Expression: filepath.Join(testDataDir, "*")},
-					},
+// getTestLog returns a test logger function
+func getTestLog() func(m string, kvs ...any) {
+	return func(m string, kvs ...any) {}
+}
+
+// getCurrentUserFromTestData queries the test data to get the actual user name
+func getCurrentUserFromTestData(t *testing.T) string {
+	t.Helper()
+	ctx := context.Background()
+	testDataDir := getTestDataDir(t)
+
+	queryContext := table.QueryContext{
+		Constraints: map[string]table.ConstraintList{
+			"custom_data_dir": {
+				Constraints: []table.Constraint{
+					{Operator: table.OperatorGlob, Expression: filepath.Join(testDataDir, "*")},
 				},
 			},
-			expectedRows: 49,
-		},
-		{
-			name: "Like matches chrome",
-			constraints: map[string]table.ConstraintList{
-				"custom_data_dir": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorLike, Expression: filepath.Join(testDataDir, "Google%")},
-					},
-				},
-			},
-			expectedRows: 5,
-		},
-		{
-			name: "Equal matches edge",
-			constraints: map[string]table.ConstraintList{
-				"custom_data_dir": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorLike, Expression: filepath.Join(testDataDir, "Microsoft")},
-					},
-				},
-			},
-			expectedRows: 5,
 		},
 	}
 
+	rows, err := GetTableRows(ctx, queryContext, getTestLog())
+	if err != nil || len(rows) == 0 {
+		t.Fatalf("Failed to get user from test data: %v", err)
+	}
+
+	return rows[0]["user"]
+}
+
+// TestAllRows tests that we get the expected total number of rows
+func TestAllRows(t *testing.T) {
+	ctx := context.Background()
+	testDataDir := getTestDataDir(t)
+
+	queryContext := table.QueryContext{
+		Constraints: map[string]table.ConstraintList{
+			"custom_data_dir": {
+				Constraints: []table.Constraint{
+					{Operator: table.OperatorGlob, Expression: filepath.Join(testDataDir, "*")},
+				},
+			},
+		},
+	}
+
+	rows, err := GetTableRows(ctx, queryContext, getTestLog())
+	if err != nil {
+		t.Fatalf("GetTableRows returned error: %v", err)
+	}
+
+	if len(rows) != expectedTotalRows {
+		t.Errorf("Expected %d total rows, got %d", expectedTotalRows, len(rows))
+	}
+}
+
+// TestChromeFilter tests Chrome browser filtering
+func TestChromeFilter(t *testing.T) {
+	ctx := context.Background()
+	testDataDir := getTestDataDir(t)
+
+	queryContext := table.QueryContext{
+		Constraints: map[string]table.ConstraintList{
+			"custom_data_dir": {
+				Constraints: []table.Constraint{
+					{Operator: table.OperatorLike, Expression: filepath.Join(testDataDir, "Google%")},
+				},
+			},
+		},
+	}
+
+	rows, err := GetTableRows(ctx, queryContext, getTestLog())
+	if err != nil {
+		t.Fatalf("GetTableRows returned error: %v", err)
+	}
+
+	if len(rows) != expectedChromeRows {
+		t.Errorf("Expected %d Chrome rows, got %d", expectedChromeRows, len(rows))
+	}
+
+	for _, row := range rows {
+		browser := strings.ToLower(row["browser"])
+		if !strings.Contains(browser, "chrome") && !strings.Contains(browser, "chromium") {
+			t.Errorf("Expected browser to contain 'chrome' or 'chromium', got: %s", browser)
+		}
+	}
+}
+
+// TestEdgeFilter tests Edge browser filtering
+func TestEdgeFilter(t *testing.T) {
+	ctx := context.Background()
+	testDataDir := getTestDataDir(t)
+
+	queryContext := table.QueryContext{
+		Constraints: map[string]table.ConstraintList{
+			"custom_data_dir": {
+				Constraints: []table.Constraint{
+					{Operator: table.OperatorLike, Expression: filepath.Join(testDataDir, "Microsoft")},
+				},
+			},
+		},
+	}
+
+	rows, err := GetTableRows(ctx, queryContext, getTestLog())
+	if err != nil {
+		t.Fatalf("GetTableRows returned error: %v", err)
+	}
+
+	if len(rows) != expectedEdgeRows {
+		t.Errorf("Expected %d Edge rows, got %d", expectedEdgeRows, len(rows))
+	}
+
+	for _, row := range rows {
+		browser := strings.ToLower(row["browser"])
+		if !strings.Contains(browser, "edge") {
+			t.Errorf("Expected browser to contain 'edge', got: %s", browser)
+		}
+	}
+}
+
+// TestBrowserFiltering tests filtering by browser column
+func TestBrowserFiltering(t *testing.T) {
+	testDataDir := getTestDataDir(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		browser          string
+		expectedCount    int
+		expectedProfiles []string
+	}{
+		{"chrome", expectedChromeRows, expectedBrowserProfiles["chrome"]},
+		{"edge", expectedEdgeRows, expectedBrowserProfiles["edge"]},
+		{"firefox", expectedFirefoxRows, expectedBrowserProfiles["firefox"]},
+		{"safari", expectedSafariRows, expectedBrowserProfiles["safari"]},
+	}
+
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
+		t.Run(tt.browser, func(t *testing.T) {
 			queryContext := table.QueryContext{
-				Constraints: tt.constraints,
+				Constraints: map[string]table.ConstraintList{
+					"custom_data_dir": {
+						Constraints: []table.Constraint{
+							{Operator: table.OperatorGlob, Expression: filepath.Join(testDataDir, "*")},
+						},
+					},
+					"browser": {
+						Constraints: []table.Constraint{
+							{Operator: table.OperatorEquals, Expression: tt.browser},
+						},
+					},
+				},
 			}
 
-			logMessages := []string{}
-			testLog := func(m string, kvs ...any) {
-				logMessages = append(logMessages, m)
-			}
-
-			rows, err := GetTableRows(ctx, queryContext, testLog)
-
-			if tt.shouldHaveError {
-				if err == nil {
-					t.Errorf("Expected error but got none")
-				}
-				return
-			}
-
+			rows, err := GetTableRows(ctx, queryContext, getTestLog())
 			if err != nil {
-				t.Logf("Log messages: %v", logMessages)
 				t.Fatalf("GetTableRows returned error: %v", err)
 			}
 
-			if len(rows) != tt.expectedRows {
-				t.Errorf("Expected at least %d rows, got %d", tt.expectedRows, len(rows))
-				t.Logf("Log messages: %v", logMessages)
-				return
+			if len(rows) != tt.expectedCount {
+				t.Errorf("Expected %d rows for browser %s, got %d", tt.expectedCount, tt.browser, len(rows))
+			}
+
+			// Verify all rows have the correct browser
+			for _, row := range rows {
+				if row["browser"] != tt.browser {
+					t.Errorf("Expected browser %s, got %s", tt.browser, row["browser"])
+				}
+			}
+
+			// Verify expected profiles are present
+			foundProfiles := make(map[string]bool)
+			for _, row := range rows {
+				foundProfiles[row["profile_name"]] = true
+			}
+			for _, expectedProfile := range tt.expectedProfiles {
+				if !foundProfiles[expectedProfile] {
+					t.Errorf("Expected profile %s not found for browser %s", expectedProfile, tt.browser)
+				}
 			}
 		})
+	}
+}
+
+// TestProfileFiltering tests filtering by profile_name column
+func TestProfileFiltering(t *testing.T) {
+	testDataDir := getTestDataDir(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		profile       string
+		expectedCount int
+	}{
+		{"Default", 27},                 // 5 chrome + 5 edge + 17 safari Default
+		{"dwpys5gk.default-release", 5}, // firefox
+		{"profile1", 17},                // safari profile1
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.profile, func(t *testing.T) {
+			queryContext := table.QueryContext{
+				Constraints: map[string]table.ConstraintList{
+					"custom_data_dir": {
+						Constraints: []table.Constraint{
+							{Operator: table.OperatorGlob, Expression: filepath.Join(testDataDir, "*")},
+						},
+					},
+					"profile_name": {
+						Constraints: []table.Constraint{
+							{Operator: table.OperatorEquals, Expression: tt.profile},
+						},
+					},
+				},
+			}
+
+			rows, err := GetTableRows(ctx, queryContext, getTestLog())
+			if err != nil {
+				t.Fatalf("GetTableRows returned error: %v", err)
+			}
+
+			if len(rows) != tt.expectedCount {
+				t.Errorf("Expected %d rows for profile %s, got %d", tt.expectedCount, tt.profile, len(rows))
+			}
+
+			// Verify all rows have the correct profile
+			for _, row := range rows {
+				if row["profile_name"] != tt.profile {
+					t.Errorf("Expected profile_name %s, got %s", tt.profile, row["profile_name"])
+				}
+			}
+		})
+	}
+}
+
+// TestUserFiltering tests filtering by user column (dynamic user name)
+func TestUserFiltering(t *testing.T) {
+	testDataDir := getTestDataDir(t)
+	ctx := context.Background()
+
+	// Get the actual user name from test data (platform-dependent)
+	expectedUser := getCurrentUserFromTestData(t)
+	if expectedUser == "" {
+		t.Skip("there is no user detected for the testdata path")
+	}
+
+	queryContext := table.QueryContext{
+		Constraints: map[string]table.ConstraintList{
+			"custom_data_dir": {
+				Constraints: []table.Constraint{
+					{Operator: table.OperatorGlob, Expression: filepath.Join(testDataDir, "*")},
+				},
+			},
+			"user": {
+				Constraints: []table.Constraint{
+					{Operator: table.OperatorEquals, Expression: expectedUser},
+				},
+			},
+		},
+	}
+
+	rows, err := GetTableRows(ctx, queryContext, getTestLog())
+	if err != nil {
+		t.Fatalf("GetTableRows returned error: %v", err)
+	}
+
+	if len(rows) != expectedTotalRows {
+		t.Errorf("Expected %d rows for user %s, got %d", expectedTotalRows, expectedUser, len(rows))
+	}
+
+	// Verify all rows have the correct user
+	for _, row := range rows {
+		if row["user"] != expectedUser {
+			t.Errorf("Expected user %s, got %s", expectedUser, row["user"])
+		}
+	}
+}
+
+// TestTimestampEquals tests timestamp equality filtering for each browser/profile
+func TestTimestampEquals(t *testing.T) {
+	testDataDir := getTestDataDir(t)
+	ctx := context.Background()
+
+	for browser, profiles := range expectedTimestamps {
+		for profile, timestamps := range profiles {
+			if len(timestamps) == 0 {
+				continue
+			}
+
+			t.Run(browser+"/"+profile, func(t *testing.T) {
+				earliestTime := timestamps[0]
+
+				queryContext := table.QueryContext{
+					Constraints: map[string]table.ConstraintList{
+						"custom_data_dir": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorGlob, Expression: filepath.Join(testDataDir, "*")},
+							},
+						},
+						"browser": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: browser},
+							},
+						},
+						"profile_name": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: profile},
+							},
+						},
+						"timestamp": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: strconv.FormatInt(earliestTime, 10)},
+							},
+						},
+					},
+				}
+
+				rows, err := GetTableRows(ctx, queryContext, getTestLog())
+				if err != nil {
+					t.Fatalf("GetTableRows returned error: %v", err)
+				}
+
+				if len(rows) == 0 {
+					t.Error("Expected at least one row for timestamp equals filter")
+					return
+				}
+
+				// Verify all rows have the exact timestamp
+				for _, row := range rows {
+					if ts, err := strconv.ParseInt(row["timestamp"], 10, 64); err == nil {
+						if ts != earliestTime {
+							t.Errorf("Expected timestamp %d, got %d", earliestTime, ts)
+						}
+					}
+				}
+			})
+		}
+	}
+}
+
+// TestTimestampGreaterThan tests timestamp > filtering for each browser/profile
+func TestTimestampGreaterThan(t *testing.T) {
+	testDataDir := getTestDataDir(t)
+	ctx := context.Background()
+
+	for browser, profiles := range expectedTimestamps {
+		for profile, timestamps := range profiles {
+			if len(timestamps) == 0 {
+				continue
+			}
+
+			t.Run(browser+"/"+profile, func(t *testing.T) {
+				midIdx := len(timestamps) / 2
+				midTime := timestamps[midIdx]
+
+				queryContext := table.QueryContext{
+					Constraints: map[string]table.ConstraintList{
+						"custom_data_dir": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorGlob, Expression: filepath.Join(testDataDir, "*")},
+							},
+						},
+						"browser": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: browser},
+							},
+						},
+						"profile_name": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: profile},
+							},
+						},
+						"timestamp": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorGreaterThan, Expression: strconv.FormatInt(midTime, 10)},
+							},
+						},
+					},
+				}
+
+				rows, err := GetTableRows(ctx, queryContext, getTestLog())
+				if err != nil {
+					t.Fatalf("GetTableRows returned error: %v", err)
+				}
+
+				// Verify all rows have timestamp > midTime
+				for _, row := range rows {
+					if ts, err := strconv.ParseInt(row["timestamp"], 10, 64); err == nil {
+						if ts <= midTime {
+							t.Errorf("Expected timestamp > %d, got %d", midTime, ts)
+						}
+					}
+				}
+			})
+		}
+	}
+}
+
+// TestTimestampLessThan tests timestamp < filtering for each browser/profile
+func TestTimestampLessThan(t *testing.T) {
+	testDataDir := getTestDataDir(t)
+	ctx := context.Background()
+
+	for browser, profiles := range expectedTimestamps {
+		for profile, timestamps := range profiles {
+			if len(timestamps) == 0 {
+				continue
+			}
+
+			t.Run(browser+"/"+profile, func(t *testing.T) {
+				midIdx := len(timestamps) / 2
+				midTime := timestamps[midIdx]
+
+				queryContext := table.QueryContext{
+					Constraints: map[string]table.ConstraintList{
+						"custom_data_dir": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorGlob, Expression: filepath.Join(testDataDir, "*")},
+							},
+						},
+						"browser": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: browser},
+							},
+						},
+						"profile_name": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: profile},
+							},
+						},
+						"timestamp": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorLessThan, Expression: strconv.FormatInt(midTime, 10)},
+							},
+						},
+					},
+				}
+
+				rows, err := GetTableRows(ctx, queryContext, getTestLog())
+				if err != nil {
+					t.Fatalf("GetTableRows returned error: %v", err)
+				}
+
+				// Verify all rows have timestamp < midTime
+				for _, row := range rows {
+					if ts, err := strconv.ParseInt(row["timestamp"], 10, 64); err == nil {
+						if ts >= midTime {
+							t.Errorf("Expected timestamp < %d, got %d", midTime, ts)
+						}
+					}
+				}
+			})
+		}
+	}
+}
+
+// TestTimestampGreaterThanOrEquals tests timestamp >= filtering for each browser/profile
+func TestTimestampGreaterThanOrEquals(t *testing.T) {
+	testDataDir := getTestDataDir(t)
+	ctx := context.Background()
+
+	for browser, profiles := range expectedTimestamps {
+		for profile, timestamps := range profiles {
+			if len(timestamps) == 0 {
+				continue
+			}
+
+			t.Run(browser+"/"+profile, func(t *testing.T) {
+				earliestTime := timestamps[0]
+
+				queryContext := table.QueryContext{
+					Constraints: map[string]table.ConstraintList{
+						"custom_data_dir": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorGlob, Expression: filepath.Join(testDataDir, "*")},
+							},
+						},
+						"browser": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: browser},
+							},
+						},
+						"profile_name": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: profile},
+							},
+						},
+						"timestamp": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorGreaterThanOrEquals, Expression: strconv.FormatInt(earliestTime, 10)},
+							},
+						},
+					},
+				}
+
+				rows, err := GetTableRows(ctx, queryContext, getTestLog())
+				if err != nil {
+					t.Fatalf("GetTableRows returned error: %v", err)
+				}
+
+				// Verify all rows have timestamp >= earliestTime
+				for _, row := range rows {
+					if ts, err := strconv.ParseInt(row["timestamp"], 10, 64); err == nil {
+						if ts < earliestTime {
+							t.Errorf("Expected timestamp >= %d, got %d", earliestTime, ts)
+						}
+					}
+				}
+			})
+		}
+	}
+}
+
+// TestTimestampLessThanOrEquals tests timestamp <= filtering for each browser/profile
+func TestTimestampLessThanOrEquals(t *testing.T) {
+	testDataDir := getTestDataDir(t)
+	ctx := context.Background()
+
+	for browser, profiles := range expectedTimestamps {
+		for profile, timestamps := range profiles {
+			if len(timestamps) == 0 {
+				continue
+			}
+
+			t.Run(browser+"/"+profile, func(t *testing.T) {
+				latestTime := timestamps[len(timestamps)-1]
+
+				queryContext := table.QueryContext{
+					Constraints: map[string]table.ConstraintList{
+						"custom_data_dir": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorGlob, Expression: filepath.Join(testDataDir, "*")},
+							},
+						},
+						"browser": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: browser},
+							},
+						},
+						"profile_name": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: profile},
+							},
+						},
+						"timestamp": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorLessThanOrEquals, Expression: strconv.FormatInt(latestTime, 10)},
+							},
+						},
+					},
+				}
+
+				rows, err := GetTableRows(ctx, queryContext, getTestLog())
+				if err != nil {
+					t.Fatalf("GetTableRows returned error: %v", err)
+				}
+
+				// Verify all rows have timestamp <= latestTime
+				for _, row := range rows {
+					if ts, err := strconv.ParseInt(row["timestamp"], 10, 64); err == nil {
+						if ts > latestTime {
+							t.Errorf("Expected timestamp <= %d, got %d", latestTime, ts)
+						}
+					}
+				}
+			})
+		}
+	}
+}
+
+// TestTimestampRange tests timestamp range filtering (>= AND <=) for each browser/profile
+func TestTimestampRange(t *testing.T) {
+	testDataDir := getTestDataDir(t)
+	ctx := context.Background()
+
+	for browser, profiles := range expectedTimestamps {
+		for profile, timestamps := range profiles {
+			if len(timestamps) <= 1 {
+				continue
+			}
+
+			t.Run(browser+"/"+profile, func(t *testing.T) {
+				earliestTime := timestamps[0]
+				latestTime := timestamps[len(timestamps)-1]
+
+				queryContext := table.QueryContext{
+					Constraints: map[string]table.ConstraintList{
+						"custom_data_dir": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorGlob, Expression: filepath.Join(testDataDir, "*")},
+							},
+						},
+						"browser": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: browser},
+							},
+						},
+						"profile_name": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: profile},
+							},
+						},
+						"timestamp": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorGreaterThanOrEquals, Expression: strconv.FormatInt(earliestTime, 10)},
+								{Operator: table.OperatorLessThanOrEquals, Expression: strconv.FormatInt(latestTime, 10)},
+							},
+						},
+					},
+				}
+
+				rows, err := GetTableRows(ctx, queryContext, getTestLog())
+				if err != nil {
+					t.Fatalf("GetTableRows returned error: %v", err)
+				}
+
+				// Get unique timestamps from rows
+				actualTimestamps := make(map[int64]bool)
+				for _, row := range rows {
+					if ts, err := strconv.ParseInt(row["timestamp"], 10, 64); err == nil {
+						actualTimestamps[ts] = true
+						if ts < earliestTime || ts > latestTime {
+							t.Errorf("Expected timestamp in range [%d, %d], got %d", earliestTime, latestTime, ts)
+						}
+					}
+				}
+
+				// Verify all expected timestamps are present
+				for _, expectedTS := range timestamps {
+					if !actualTimestamps[expectedTS] {
+						t.Errorf("Expected timestamp %d not found in results", expectedTS)
+					}
+				}
+			})
+		}
 	}
 }
 
@@ -173,327 +765,6 @@ func TestTimestampConstraints(t *testing.T) {
 				if constraints[i].Value != expected {
 					t.Errorf("Expected constraint %d to have value %d, got %d", i, expected, constraints[i].Value)
 				}
-			}
-		})
-	}
-}
-
-// TestChromiumTimestampWhere tests Chromium timestamp WHERE clause generation
-func TestChromiumTimestampWhere(t *testing.T) {
-	tests := []struct {
-		name          string
-		constraints   map[string]table.ConstraintList
-		expectedWhere string
-	}{
-		{
-			name:          "no timestamp constraints",
-			constraints:   map[string]table.ConstraintList{},
-			expectedWhere: "",
-		},
-		{
-			name: "equals constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorEquals, Expression: "1609459200"}, // 2021-01-01 00:00:00 UTC
-					},
-				},
-			},
-			expectedWhere: " AND (visits.visit_time >= 13253932800000000 AND visits.visit_time < 13253932801000000)", // Chromium microseconds since 1601 over one-second range
-		},
-		{
-			name: "greater than constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorGreaterThan, Expression: "1609459200"},
-					},
-				},
-			},
-			expectedWhere: " AND (visits.visit_time >= 13253932801000000)",
-		},
-		{
-			name: "less than constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorLessThan, Expression: "1609459200"},
-					},
-				},
-			},
-			expectedWhere: " AND (visits.visit_time < 13253932800000000)",
-		},
-		{
-			name: "greater than or equals constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorGreaterThanOrEquals, Expression: "1609459200"},
-					},
-				},
-			},
-			expectedWhere: " AND (visits.visit_time >= 13253932800000000)",
-		},
-		{
-			name: "less than or equals constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorLessThanOrEquals, Expression: "1609459200"},
-					},
-				},
-			},
-			expectedWhere: " AND (visits.visit_time < 13253932801000000)",
-		},
-		{
-			name: "multiple constraints",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorGreaterThanOrEquals, Expression: "1609459200"},
-						{Operator: table.OperatorLessThan, Expression: "1640995200"}, // 2022-01-01 00:00:00 UTC
-					},
-				},
-			},
-			expectedWhere: " AND (visits.visit_time >= 13253932800000000 AND visits.visit_time < 13285468800000000)",
-		},
-		{
-			name: "zero timestamp",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorEquals, Expression: "0"},
-					},
-				},
-			},
-			expectedWhere: " AND (visits.visit_time >= 0 AND visits.visit_time < 1000000)",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			queryContext := table.QueryContext{
-				Constraints: tt.constraints,
-			}
-
-			whereClause := buildChromiumTimestampWhere(queryContext)
-
-			if whereClause != tt.expectedWhere {
-				t.Errorf("Expected WHERE clause %q, got %q", tt.expectedWhere, whereClause)
-			}
-		})
-	}
-}
-
-// TestFirefoxTimestampWhere tests Firefox timestamp WHERE clause generation
-func TestFirefoxTimestampWhere(t *testing.T) {
-	tests := []struct {
-		name          string
-		constraints   map[string]table.ConstraintList
-		expectedWhere string
-	}{
-		{
-			name:          "no timestamp constraints",
-			constraints:   map[string]table.ConstraintList{},
-			expectedWhere: "",
-		},
-		{
-			name: "equals constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorEquals, Expression: "1609459200"}, // 2021-01-01 00:00:00 UTC
-					},
-				},
-			},
-			expectedWhere: " AND (hv.visit_date >= 1609459200000000 AND hv.visit_date < 1609459201000000)", // Firefox microseconds since 1970 over one-second range
-		},
-		{
-			name: "greater than constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorGreaterThan, Expression: "1609459200"},
-					},
-				},
-			},
-			expectedWhere: " AND (hv.visit_date >= 1609459201000000)",
-		},
-		{
-			name: "less than constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorLessThan, Expression: "1609459200"},
-					},
-				},
-			},
-			expectedWhere: " AND (hv.visit_date < 1609459200000000)",
-		},
-		{
-			name: "greater than or equals constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorGreaterThanOrEquals, Expression: "1609459200"},
-					},
-				},
-			},
-			expectedWhere: " AND (hv.visit_date >= 1609459200000000)",
-		},
-		{
-			name: "less than or equals constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorLessThanOrEquals, Expression: "1609459200"},
-					},
-				},
-			},
-			expectedWhere: " AND (hv.visit_date < 1609459201000000)",
-		},
-		{
-			name: "multiple constraints",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorGreaterThanOrEquals, Expression: "1609459200"},
-						{Operator: table.OperatorLessThan, Expression: "1640995200"}, // 2022-01-01 00:00:00 UTC
-					},
-				},
-			},
-			expectedWhere: " AND (hv.visit_date >= 1609459200000000 AND hv.visit_date < 1640995200000000)",
-		},
-		{
-			name: "zero timestamp",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorEquals, Expression: "0"},
-					},
-				},
-			},
-			expectedWhere: " AND (hv.visit_date >= 0 AND hv.visit_date < 1000000)",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			queryContext := table.QueryContext{
-				Constraints: tt.constraints,
-			}
-
-			whereClause := buildFirefoxTimestampWhere(queryContext)
-
-			if whereClause != tt.expectedWhere {
-				t.Errorf("Expected WHERE clause %q, got %q", tt.expectedWhere, whereClause)
-			}
-		})
-	}
-}
-
-// TestSafariTimestampWhere tests Safari timestamp WHERE clause generation
-func TestSafariTimestampWhere(t *testing.T) {
-	tests := []struct {
-		name          string
-		constraints   map[string]table.ConstraintList
-		expectedWhere string
-	}{
-		{
-			name:          "no timestamp constraints",
-			constraints:   map[string]table.ConstraintList{},
-			expectedWhere: "",
-		},
-		{
-			name: "equals constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorEquals, Expression: "1609459200"}, // 2021-01-01 00:00:00 UTC
-					},
-				},
-			},
-			expectedWhere: " AND (hv.visit_time >= 631152000 AND hv.visit_time < 631152001)", // Safari seconds since 2001 over one-second range
-		},
-		{
-			name: "greater than constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorGreaterThan, Expression: "1609459200"},
-					},
-				},
-			},
-			expectedWhere: " AND (hv.visit_time >= 631152001)",
-		},
-		{
-			name: "less than constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorLessThan, Expression: "1609459200"},
-					},
-				},
-			},
-			expectedWhere: " AND (hv.visit_time < 631152000)",
-		},
-		{
-			name: "greater than or equals constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorGreaterThanOrEquals, Expression: "1609459200"},
-					},
-				},
-			},
-			expectedWhere: " AND (hv.visit_time >= 631152000)",
-		},
-		{
-			name: "less than or equals constraint",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorLessThanOrEquals, Expression: "1609459200"},
-					},
-				},
-			},
-			expectedWhere: " AND (hv.visit_time < 631152001)",
-		},
-		{
-			name: "multiple constraints",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorGreaterThanOrEquals, Expression: "1609459200"},
-						{Operator: table.OperatorLessThan, Expression: "1640995200"}, // 2022-01-01 00:00:00 UTC
-					},
-				},
-			},
-			expectedWhere: " AND (hv.visit_time >= 631152000 AND hv.visit_time < 662688000)",
-		},
-		{
-			name: "zero timestamp",
-			constraints: map[string]table.ConstraintList{
-				"timestamp": {
-					Constraints: []table.Constraint{
-						{Operator: table.OperatorEquals, Expression: "0"},
-					},
-				},
-			},
-			expectedWhere: " AND (hv.visit_time >= 0 AND hv.visit_time < 1)",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			queryContext := table.QueryContext{
-				Constraints: tt.constraints,
-			}
-
-			whereClause := buildSafariTimestampWhere(queryContext)
-
-			if whereClause != tt.expectedWhere {
-				t.Errorf("Expected WHERE clause %q, got %q", tt.expectedWhere, whereClause)
 			}
 		})
 	}
@@ -647,179 +918,4 @@ func TestTimestampConversionEdgeCases(t *testing.T) {
 			t.Errorf("Safari timestamp for year 2000 should be negative, got %d", safariTime)
 		}
 	})
-}
-
-// TestTimestampFiltersPerBrowser tests timestamp filters for each browser type individually
-func TestTimestampFiltersPerBrowser(t *testing.T) {
-	testDataDir, err := filepath.Abs("testdata")
-	if err != nil {
-		t.Fatalf("Failed to get absolute path to testdata: %v", err)
-	}
-
-	ctx := context.Background()
-
-	browserPaths := map[string]string{
-		"chrome":  filepath.Join(testDataDir, "Google"),
-		"edge":    filepath.Join(testDataDir, "Microsoft"),
-		"firefox": filepath.Join(testDataDir, "Mozilla"),
-		"safari":  filepath.Join(testDataDir, "Safari"),
-	}
-
-	for browserName, browserPath := range browserPaths {
-		t.Run(browserName, func(t *testing.T) {
-			// Get all data for this browser first
-			queryContext := table.QueryContext{
-				Constraints: map[string]table.ConstraintList{
-					"custom_data_dir": {
-						Constraints: []table.Constraint{
-							{Operator: table.OperatorEquals, Expression: browserPath},
-						},
-					},
-				},
-			}
-
-			logMessages := []string{}
-			testLog := func(m string, kvs ...any) {
-				logMessages = append(logMessages, m)
-			}
-
-			allRows, err := GetTableRows(ctx, queryContext, testLog)
-			if err != nil {
-				t.Fatalf("GetTableRows failed for %s: %v", browserName, err)
-			}
-
-			if len(allRows) == 0 {
-				t.Skipf("No test data available for %s", browserName)
-			}
-
-			// Extract timestamps for this browser
-			var browserTimestamps []int64
-			timestampMap := make(map[int64]bool)
-
-			for _, row := range allRows {
-				if timestampStr, ok := row["timestamp"]; ok && timestampStr != "" {
-					if timestamp, err := strconv.ParseInt(timestampStr, 10, 64); err == nil && timestamp > 0 {
-						if !timestampMap[timestamp] {
-							timestampMap[timestamp] = true
-							browserTimestamps = append(browserTimestamps, timestamp)
-						}
-					}
-				}
-			}
-
-			if len(browserTimestamps) == 0 {
-				t.Skipf("No valid timestamps found for %s", browserName)
-			}
-
-			// Sort timestamps
-			sort.Slice(browserTimestamps, func(i, j int) bool {
-				return browserTimestamps[i] < browserTimestamps[j]
-			})
-
-			earliestTime := browserTimestamps[0]
-			latestTime := browserTimestamps[len(browserTimestamps)-1]
-
-			t.Logf("%s: Found %d rows with %d unique timestamps, range: %d to %d",
-				browserName, len(allRows), len(browserTimestamps), earliestTime, latestTime)
-
-			// Test equals filter
-			t.Run("equals_filter", func(t *testing.T) {
-				queryContext := table.QueryContext{
-					Constraints: map[string]table.ConstraintList{
-						"custom_data_dir": {
-							Constraints: []table.Constraint{
-								{Operator: table.OperatorEquals, Expression: browserPath},
-							},
-						},
-						"timestamp": {
-							Constraints: []table.Constraint{
-								{Operator: table.OperatorEquals, Expression: strconv.FormatInt(earliestTime, 10)},
-							},
-						},
-					},
-				}
-
-				rows, err := GetTableRows(ctx, queryContext, testLog)
-				if err != nil {
-					t.Fatalf("GetTableRows failed: %v", err)
-				}
-
-				// Verify all rows have the expected timestamp
-				for _, row := range rows {
-					if timestampStr, ok := row["timestamp"]; ok {
-						if timestamp, err := strconv.ParseInt(timestampStr, 10, 64); err == nil {
-							if timestamp != earliestTime {
-								t.Errorf("Expected timestamp %d, got %d", earliestTime, timestamp)
-							}
-						}
-					}
-
-					// Verify all rows are from the expected browser type
-					if browser, ok := row["browser"]; ok {
-						// Each browser type should have its specific identifier
-						switch browserName {
-						case "chrome":
-							if !strings.Contains(strings.ToLower(browser), "chrome") {
-								t.Logf("Chrome browser field: %s", browser) // Log for debugging, might be "chromium" or similar
-							}
-						case "firefox":
-							if !strings.Contains(strings.ToLower(browser), "firefox") {
-								t.Logf("Firefox browser field: %s", browser)
-							}
-						case "safari":
-							if !strings.Contains(strings.ToLower(browser), "safari") {
-								t.Logf("Safari browser field: %s", browser)
-							}
-						}
-					}
-				}
-
-				if len(rows) == 0 {
-					t.Errorf("Expected at least one row with timestamp %d", earliestTime)
-				}
-			})
-
-			// Test range filter if we have multiple timestamps
-			if len(browserTimestamps) > 1 {
-				t.Run("range_filter", func(t *testing.T) {
-					queryContext := table.QueryContext{
-						Constraints: map[string]table.ConstraintList{
-							"custom_data_dir": {
-								Constraints: []table.Constraint{
-									{Operator: table.OperatorEquals, Expression: browserPath},
-								},
-							},
-							"timestamp": {
-								Constraints: []table.Constraint{
-									{Operator: table.OperatorGreaterThanOrEquals, Expression: strconv.FormatInt(earliestTime, 10)},
-									{Operator: table.OperatorLessThanOrEquals, Expression: strconv.FormatInt(latestTime, 10)},
-								},
-							},
-						},
-					}
-
-					rows, err := GetTableRows(ctx, queryContext, testLog)
-					if err != nil {
-						t.Fatalf("GetTableRows failed: %v", err)
-					}
-
-					// Should get all the original rows back since we're using the full range
-					if len(rows) != len(allRows) {
-						t.Errorf("Range filter should return all %d rows, got %d", len(allRows), len(rows))
-					}
-
-					// Verify all rows are within the range
-					for _, row := range rows {
-						if timestampStr, ok := row["timestamp"]; ok {
-							if timestamp, err := strconv.ParseInt(timestampStr, 10, 64); err == nil {
-								if timestamp < earliestTime || timestamp > latestTime {
-									t.Errorf("Timestamp %d outside expected range [%d, %d]", timestamp, earliestTime, latestTime)
-								}
-							}
-						}
-					}
-				})
-			}
-		})
-	}
 }
