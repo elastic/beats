@@ -18,8 +18,12 @@
 package certutil
 
 import (
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
 	"crypto/x509"
 	"encoding/pem"
+	"net"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -82,5 +86,26 @@ func TestCertificates(t *testing.T) {
 			_, err = child.Verify(opts)
 			assert.NoError(t, err, "failed to verify child certificate")
 		})
+	}
+}
+
+func TestGenerateGenericChildCert_dns_cannot_be_empty(t *testing.T) {
+	rootKey, rootCACert, _, err := NewRootCA()
+	require.NoError(t, err, "could not create root CA certificate")
+
+	priv, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+	require.NoError(t, err, "failed to generate EC key")
+
+	tlsCert, _, err := GenerateGenericChildCert(
+		"",
+		[]net.IP{net.ParseIP("127.0.0.1")},
+		priv,
+		&priv.PublicKey,
+		rootKey,
+		rootCACert)
+	require.NoError(t, err, "failed to generate child certificate")
+
+	for _, dns := range tlsCert.Leaf.DNSNames {
+		assert.NotEmpty(t, dns, "DNSNames contains an empty name")
 	}
 }

@@ -186,7 +186,10 @@ func GenerateGenericChildCert(
 		cn = fmt.Sprintf("[%s] %s", cfg.cnPrefix, cn)
 	}
 
-	dnsNames := append(cfg.dnsNames, name)
+	var dnsNames []string
+	if name != "" {
+		dnsNames = append(cfg.dnsNames, name)
+	}
 	notBefore, notAfter := makeNotBeforeAndAfter()
 	certTemplate := &x509.Certificate{
 		DNSNames:     dnsNames,
