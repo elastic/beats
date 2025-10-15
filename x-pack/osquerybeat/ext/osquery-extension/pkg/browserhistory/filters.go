@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/osquery/osquery-go/plugin/table"
@@ -72,7 +73,7 @@ func getTimestampConstraints(queryContext table.QueryContext) []timestampConstra
 		return nil
 	}
 
-	var constraints []timestampConstraint
+	constraints := getDatetimeConstraints(queryContext)
 	for _, c := range clist.Constraints {
 		// Parse and validate timestamp value
 		osqueryTimestamp, err := strconv.ParseInt(c.Expression, 10, 64)
@@ -85,7 +86,26 @@ func getTimestampConstraints(queryContext table.QueryContext) []timestampConstra
 			Value:    osqueryTimestamp,
 		})
 	}
+	return constraints
+}
 
+func getDatetimeConstraints(queryContext table.QueryContext) []timestampConstraint {
+	clist, ok := queryContext.Constraints["datetime"]
+	if !ok || len(clist.Constraints) == 0 {
+		return nil
+	}
+	var constraints []timestampConstraint
+	for _, c := range clist.Constraints {
+		t, err := time.Parse(time.RFC3339, c.Expression)
+		if err != nil {
+			continue
+		}
+
+		constraints = append(constraints, timestampConstraint{
+			Operator: c.Operator,
+			Value:    t.Unix(),
+		})
+	}
 	return constraints
 }
 
