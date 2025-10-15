@@ -26,7 +26,25 @@ type Config struct {
 	ExpirationDuration time.Duration
 }
 
-// GlobalState holds our shared state and its creation time.
+// GlobalState is a shared state object that holds cached Amcache entries.
+// It is needed because loading and parsing the Amcache hive can be slow,
+// so we want to avoid doing it on every query. Instead, we load it once and
+// cache the results for a configurable duration.
+//
+// the amcache hive has multiple tables that can be queried, and when joins
+// are performed, osquery may call the generate function for each table multiple
+// times per query.  This can lead to significant performance issues if the
+// hive is reloaded each time.  By caching the results in a global state object,
+// we can avoid this overhead.
+//
+// The cache is not populated until the first query is made, to avoid
+// unnecessary work if the tables are not used.  Additionally, the cache
+// is refreshed at query time if it has expired. But will not be updated until
+// the next query, even if it is expired.
+//
+// TODO: Make sure that keeping this data in memory is not a problem for osquerybeat
+//       in general
+//
 type GlobalState struct {
 	Config              *Config
 	Application         map[string][]tables.Entry
