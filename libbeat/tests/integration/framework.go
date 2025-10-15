@@ -46,13 +46,9 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-<<<<<<< HEAD
-=======
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
-	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"
->>>>>>> 240cb8905 ([9.1] Sync mock-es library with main (#47089))
 )
 
 type BeatProc struct {
