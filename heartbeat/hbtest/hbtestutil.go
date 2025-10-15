@@ -127,7 +127,7 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 	if err != nil {
 		return 0, err
 	}
-	return uint16(p), nil
+	return uint16(p), nil //nolint:gosec // G115 Conversion from int to unit16 is safe here.
 }
 
 // TLSChecks validates the given x509 cert at the given position.
