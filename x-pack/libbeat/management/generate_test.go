@@ -288,6 +288,165 @@ func findFieldsInProcessors(t *testing.T, configFields map[string]any, cfgMap ma
 	}
 }
 
+func TestMetadataFromDatastreamValues(t *testing.T) {
+	cases := map[string]struct {
+		defaultDataStreamType string
+		expected              *proto.UnitExpectedConfig
+		streamExpected        *proto.Stream
+
+		expectedStreamType string
+		expectedDataset    string
+		expectedNamespace  string
+	}{
+		// defaults test case
+		"default_type": {
+			defaultDataStreamType: "logs",
+
+			expectedStreamType: "logs",
+			expectedDataset:    DefaultDatasetName,
+			expectedNamespace:  DefaultNamespaceName,
+		},
+
+		// type test cases
+		"type_from_expected": {
+			defaultDataStreamType: "logs",
+			expected: &proto.UnitExpectedConfig{
+				DataStream: &proto.DataStream{
+					Type: "expected-metrics",
+				},
+			},
+
+			expectedStreamType: "expected-metrics",
+			expectedDataset:    DefaultDatasetName,
+			expectedNamespace:  DefaultNamespaceName,
+		},
+		"type_from_stream": {
+			defaultDataStreamType: "logs",
+			streamExpected: &proto.Stream{
+				DataStream: &proto.DataStream{
+					Type: "stream-metrics",
+				},
+			},
+
+			expectedStreamType: "stream-metrics",
+			expectedDataset:    DefaultDatasetName,
+			expectedNamespace:  DefaultNamespaceName,
+		},
+		"type_from_both": {
+			defaultDataStreamType: "logs",
+			expected: &proto.UnitExpectedConfig{
+				DataStream: &proto.DataStream{
+					Type: "expected-metrics",
+				},
+			},
+			streamExpected: &proto.Stream{
+				DataStream: &proto.DataStream{
+					Type: "stream-metrics",
+				},
+			},
+
+			expectedStreamType: "expected-metrics",
+			expectedDataset:    DefaultDatasetName,
+			expectedNamespace:  DefaultNamespaceName,
+		},
+
+		// dataset test cases
+		"dataset_from_expected": {
+			defaultDataStreamType: "logs",
+			expected: &proto.UnitExpectedConfig{
+				DataStream: &proto.DataStream{
+					Dataset: "expected-dataset",
+				},
+			},
+
+			expectedStreamType: "logs",
+			expectedDataset:    "expected-dataset",
+			expectedNamespace:  DefaultNamespaceName,
+		},
+		"dataset_from_stream": {
+			defaultDataStreamType: "logs",
+			streamExpected: &proto.Stream{
+				DataStream: &proto.DataStream{
+					Dataset: "stream-dataset",
+				},
+			},
+
+			expectedStreamType: "logs",
+			expectedDataset:    "stream-dataset",
+			expectedNamespace:  DefaultNamespaceName,
+		},
+		"dataset_from_both": {
+			defaultDataStreamType: "logs",
+			expected: &proto.UnitExpectedConfig{
+				DataStream: &proto.DataStream{
+					Dataset: "expected-dataset",
+				},
+			},
+			streamExpected: &proto.Stream{
+				DataStream: &proto.DataStream{
+					Dataset: "stream-dataset",
+				},
+			},
+
+			expectedStreamType: "logs",
+			expectedDataset:    "expected-dataset",
+			expectedNamespace:  DefaultNamespaceName,
+		},
+
+		// namespace test cases
+		"namespace_from_expected": {
+			defaultDataStreamType: "logs",
+			expected: &proto.UnitExpectedConfig{
+				DataStream: &proto.DataStream{
+					Namespace: "expected-namespace",
+				},
+			},
+
+			expectedStreamType: "logs",
+			expectedDataset:    DefaultDatasetName,
+			expectedNamespace:  "expected-namespace",
+		},
+		"namespace_from_stream": {
+			defaultDataStreamType: "logs",
+			streamExpected: &proto.Stream{
+				DataStream: &proto.DataStream{
+					Namespace: "stream-namespace",
+				},
+			},
+
+			expectedStreamType: "logs",
+			expectedDataset:    DefaultDatasetName,
+			expectedNamespace:  "stream-namespace",
+		},
+		"namespace_from_both": {
+			defaultDataStreamType: "logs",
+			expected: &proto.UnitExpectedConfig{
+				DataStream: &proto.DataStream{
+					Namespace: "expected-namespace",
+				},
+			},
+			streamExpected: &proto.Stream{
+				DataStream: &proto.DataStream{
+					Namespace: "stream-namespace",
+				},
+			},
+
+			expectedStreamType: "logs",
+			expectedDataset:    DefaultDatasetName,
+			expectedNamespace:  "expected-namespace",
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			streamType, dataset, namespace := metadataFromDatastreamValues(tc.defaultDataStreamType, tc.expected, tc.streamExpected)
+			require.Equal(t, tc.expectedStreamType, streamType)
+			require.Equal(t, tc.expectedDataset, dataset)
+			require.Equal(t, tc.expectedNamespace, namespace)
+		})
+	}
+}
+
 func buildConfigMap(t *testing.T, unitRaw *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) mapstr.M {
 	reloadCfg, err := generateBeatConfig(unitRaw, agentInfo)
 	require.NoError(t, err, "error in generateBeatConfig")
