@@ -43,6 +43,7 @@ const (
 	TextVersion                  = "0.0.4"
 	OpenMetricsType              = `application/openmetrics-text`
 	ContentTypeTextFormat string = `text/plain; version=` + TextVersion + `; charset=utf-8`
+	textMediaType                = "text/plain"
 )
 
 type Gauge struct {
@@ -481,10 +482,13 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 }
 
 func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
-	parser, err := textparse.New(b, contentType, ContentTypeTextFormat, false, false, false, labels.NewSymbolTable()) // Fallback protocol set to ContentTypeTextFormat
-	if err != nil {
+	// Fallback to text/plain if content type is blank or unrecognized.
+	parser, err := textparse.New(b, contentType, textMediaType, false, false, false, labels.NewSymbolTable())
+	// This check allows to continue where the content type is blank but the parser is non-nil. Returns error on all other cases.
+	if err != nil && !strings.Contains(err.Error(), "non-compliant scrape target sending blank Content-Type, using fallback_scrape_protocol") {
 		return nil, err
 	}
+
 	var (
 		defTime              = timestamp.FromTime(ts)
 		metricFamiliesByName = map[string]*MetricFamily{}
@@ -754,8 +758,6 @@ func GetContentType(h http.Header) string {
 		return ""
 	}
 
-	const textType = "text/plain"
-
 	switch mediatype {
 	case OpenMetricsType:
 		if e, ok := params["encoding"]; ok && e != "delimited" {
@@ -763,7 +765,7 @@ func GetContentType(h http.Header) string {
 		}
 		return OpenMetricsType
 
-	case textType:
+	case textMediaType:
 		if v, ok := params["version"]; ok && v != TextVersion {
 			return ""
 		}
