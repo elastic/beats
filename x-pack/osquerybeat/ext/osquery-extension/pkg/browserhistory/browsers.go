@@ -12,15 +12,7 @@ import (
 
 // getBrowserPath gets the browser path and handles wildcard expansion
 func getBrowserPath(browser string) string {
-	osName := runtime.GOOS
-	switch osName {
-	case "windows", "linux":
-	case "darwin":
-		osName = "macos"
-	default:
-		return ""
-	}
-	if osPaths, exists := pathsByOS[osName]; exists {
+	if osPaths, exists := pathsByOS[runtime.GOOS]; exists {
 		if path, exists := osPaths[browser]; exists {
 			return path
 		}
@@ -43,12 +35,13 @@ var defaultBrowsers = []string{
 	"firefox_beta",
 	"firefox_dev",
 	"firefox_nightly",
+	"onelaunch",
 	"opera",
 	"opera_gx",
 	"safari",
-	"safari_beta",
 	"safari_tech_preview",
 	"vivaldi",
+	"wavebrowser",
 	"yandex",
 }
 
@@ -64,8 +57,8 @@ var pathsByOS = map[string]map[string]string{
 		"edge_beta":     "AppData\\Local\\Microsoft\\Edge Beta",
 		"edge_canary":   "AppData\\Local\\Microsoft\\Edge SxS",
 		"edge_dev":      "AppData\\Local\\Microsoft\\Edge Dev",
-		"firefox":       "AppData\\Roaming\\Mozilla\\Firefox\\Profiles",
-		"firefox_dev":   "AppData\\Roaming\\Firefox Developer Edition\\Profiles",
+		"firefox":       "AppData\\Roaming\\Mozilla\\Firefox",
+		"firefox_dev":   "AppData\\Roaming\\Firefox Developer Edition",
 		"onelaunch":     "AppData\\Local\\OneLaunch",
 		"opera":         "AppData\\Roaming\\Opera Software\\Opera Stable",
 		"opera_gx":      "AppData\\Roaming\\Opera Software\\Opera GX Stable",
@@ -84,9 +77,9 @@ var pathsByOS = map[string]map[string]string{
 		"edge_beta":           "Library/Application Support/Microsoft Edge Beta",
 		"edge_canary":         "Library/Application Support/Microsoft Edge Canary",
 		"edge_dev":            "Library/Application Support/Microsoft Edge Dev",
-		"firefox":             "Library/Application Support/Firefox/Profiles",
-		"firefox_dev":         "Library/Application Support/Firefox Developer Edition/Profiles",
-		"firefox_nightly":     "Library/Application Support/Firefox Nightly/Profiles",
+		"firefox":             "Library/Application Support/Firefox",
+		"firefox_dev":         "Library/Application Support/Firefox Developer Edition",
+		"firefox_nightly":     "Library/Application Support/Firefox Nightly",
 		"opera":               "Library/Application Support/com.operasoftware.Opera",
 		"opera_gx":            "Library/Application Support/com.operasoftware.OperaGX",
 		"safari":              "Library/Safari",
