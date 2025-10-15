@@ -408,10 +408,10 @@ github.com/elastic/gosigar v0.14.3 h1:xwkKwPia+hSfg9GqrCUKYdId102m9qTJIIr7egmK/u
 github.com/elastic/gosigar v0.14.3/go.mod h1:iXRIGg2tLnu7LBdpqzyQfGDEidKCfWcCMS0WKyPWoMs=
 github.com/elastic/mito v1.22.0 h1:DW4RkO+PLwSbKVF5ijYzi0ug+TKzLL+DVJRzbOPbzQ0=
 github.com/elastic/mito v1.22.0/go.mod h1:h1V+8B62+DXsu0TstJkjsTh5ewJIDJlwzxPkP3HBM9s=
-github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.5.0 h1:Mc3Qa3ck/jX+E2wqWdobPHqwJEqhzy4Qr2vsuFMezK8=
-github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.5.0/go.mod h1:8uY2S9yRlMBrd9XhW6eCHtnBSBpFslFjxiDcxRglER8=
 github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6 h1:JVNuBrmOoqLJgp9o68YBMnOrXCzQI3mCppW+suwRSlw=
 github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6/go.mod h1:cXqWcLnmu5y4QveTb2hjk7rgzkHMuZsqeXtbJpNAcu0=
+github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.5.0 h1:Mc3Qa3ck/jX+E2wqWdobPHqwJEqhzy4Qr2vsuFMezK8=
+github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.5.0/go.mod h1:8uY2S9yRlMBrd9XhW6eCHtnBSBpFslFjxiDcxRglER8=
 github.com/elastic/pkcs8 v1.0.0 h1:HhitlUKxhN288kcNcYkjW6/ouvuwJWd9ioxpjnD9jVA=
 github.com/elastic/pkcs8 v1.0.0/go.mod h1:ipsZToJfq1MxclVTwpG7U/bgeDtf+0HkUiOxebk95+0=
 github.com/elastic/sarama v1.19.1-0.20250603175145-7672917f26b6 h1:2COw7kzXkIyS4hKNUl5qw0KolrwncrY4VVNpngVNo8I=
@@ -1138,8 +1138,8 @@ go.opentelemetry.io/collector/otelcol v0.135.0 h1:NkwevsUKjHIIx+TL6gkiotvjKLYeUn
 go.opentelemetry.io/collector/otelcol v0.135.0/go.mod h1:JrRzt/1c2ZdPWlueefk7e2K30UtI2UcwcxV+RiXegXE=
 go.opentelemetry.io/collector/pdata v1.43.0 h1:zVkj2hcjiMLwX+QDDNwb7iTh3LBjNXKv2qPSgj1Rzb4=
 go.opentelemetry.io/collector/pdata v1.43.0/go.mod h1:KsJzdDG9e5BaHlmYr0sqdSEKeEiSfKzoF+rdWU7J//w=
-go.opentelemetry.io/collector/pdata/pprofile v0.135.0 h1:+s7I7Tj28THWRhUeKEv5JnadKCPKLnzouG6x0N25dOQ=
-go.opentelemetry.io/collector/pdata/pprofile v0.135.0/go.mod h1:VuxzZ5XT4cPyHfkSBLQ6YmKbGJ6T3VdG0ec0+yjIF94=
+go.opentelemetry.io/collector/pdata/pprofile v0.137.0 h1:bLVp8p8hpH81eQhhEQBkvLtS00GbnMU+ItNweBJLqZ8=
+go.opentelemetry.io/collector/pdata/pprofile v0.137.0/go.mod h1:QfhMf7NnG+fTuwGGB1mXgcPzcXNxEYSW6CrVouOsF7Q=
 go.opentelemetry.io/collector/pdata/testdata v0.135.0 h1:bp+9wKAifJcoYdS+qTwtgcKPM129wIKLUGAAxKY4lck=
 go.opentelemetry.io/collector/pdata/testdata v0.135.0/go.mod h1:w0gTft2xsn/adYgUGNBhDDjVhKCvvA9fHTKIbh7rx0o=
 go.opentelemetry.io/collector/pdata/xpdata v0.135.0 h1:uEL3Y4rGdaCBA9mh+MVLYhX7Jy3gWKv6se/cX9gVSls=
