@@ -30,6 +30,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestLogFileTimedClosing(t *testing.T) {
@@ -214,6 +215,30 @@ func createTestGzipLogFile(t *testing.T) *os.File {
 	require.NoError(t, err, "could not seek to start of gzip file")
 
 	return f
+}
+
+func TestShouldBeClosedInactiveAndModified(t *testing.T) {
+	file, err := os.CreateTemp(t.TempDir(), t.Name()+"-*")
+	if err != nil {
+		t.Fatalf("cannot create temp file: %s", err)
+	}
+
+	if _, err := file.WriteString("foo"); err != nil {
+		t.Fatalf("cannot write to file: %s", err)
+	}
+
+	f := logFile{
+		log:           logptest.NewTestingLogger(t, ""),
+		file:          newPlainFile(file),
+		closeInactive: time.Second,
+		lastTimeRead:  time.Now().Add(-5 * time.Second),
+	}
+
+	if f.shouldBeClosed() {
+		t.Fatal("souldBeClosed must return false when " +
+			"close.on_state_change.inactive is reached and " +
+			"the file has been modified")
+	}
 }
 
 func readUntilError(reader *logFile) error {

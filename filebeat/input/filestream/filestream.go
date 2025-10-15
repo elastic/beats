@@ -195,18 +195,6 @@ func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 }
 
 func (f *logFile) shouldBeClosed() bool {
-	if f.closeInactive > 0 {
-		if time.Since(f.lastTimeRead) > f.closeInactive {
-			f.isInactive.Store(true)
-			f.log.Debugf("'%s' is inactive", f.file.Name())
-			return true
-		}
-	}
-
-	if !f.closeRemoved && !f.closeRenamed {
-		return false
-	}
-
 	info, statErr := f.file.Stat()
 	if statErr != nil {
 		// return early if the file does not exist anymore and the reader should be closed
@@ -217,6 +205,27 @@ func (f *logFile) shouldBeClosed() bool {
 
 		// If an unexpected error happens we keep the reader open hoping once everything will go back to normal.
 		f.log.Errorf("Unexpected error reading from %s; error: %s", f.file.Name(), statErr)
+		return false
+	}
+
+	if f.closeInactive > 0 {
+		//There can be a sort of race condition where the file is updated,
+		// but [shouldBeClosed] is called before the new events are read,
+		// hence f.lastTimeRead has not been updated yet. If that happens
+		// we might accidentally close the harvester due to inactivity even
+		// though there is new data. If that was the last write to the file
+		// those events could be missed.
+		//
+		// To prevent that from happening, we only consider a file inactive if
+		// it has not changed and the inactive timeout has been reached.
+		if time.Since(f.lastTimeRead) > f.closeInactive && f.offset == info.Size() {
+			f.isInactive.Store(true)
+			f.log.Debugf("'%s' is inactive", f.file.Name())
+			return true
+		}
+	}
+
+	if !f.closeRemoved && !f.closeRenamed {
 		return false
 	}
 
