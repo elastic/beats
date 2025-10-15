@@ -20,6 +20,7 @@ package http
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
