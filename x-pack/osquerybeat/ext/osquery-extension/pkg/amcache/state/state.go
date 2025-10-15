@@ -8,117 +8,113 @@ package state
 
 import (
 	"log"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables/application"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables/application_file"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables/application_shortcut"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables/driver_binary"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables/device_pnp"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/interfaces"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/utilities"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/testdata"
 )
 
-// Expiration duration for the singleton instance.
-const expirationDuration = 3 * time.Minute
+// Expiration duration for the global state.
+const defaultExpirationDuration = 3 * time.Minute
+
+// Default path to the Amcache hive.
+const defaultHivePath = "C:\\Windows\\AppCompat\\Programs\\Amcache.hve"
+
+// Config holds configuration for the GlobalState.
+type Config struct {
+	HivePath           string
+	ExpirationDuration time.Duration
+}
 
 // GlobalState holds our shared state and its creation time.
 type GlobalState struct {
-	application     map[string][]interfaces.Entry
-	applicationFile map[string][]interfaces.Entry
-	applicationShortcut map[string][]interfaces.Entry
-	driverBinary    map[string][]interfaces.Entry
-	devicePnp       map[string][]interfaces.Entry
-	lock            sync.RWMutex
-	creationTime    time.Time
+	Config              *Config
+	Application         map[string][]tables.Entry
+	ApplicationFile     map[string][]tables.Entry
+	ApplicationShortcut map[string][]tables.Entry
+	DriverBinary        map[string][]tables.Entry
+	DevicePnp           map[string][]tables.Entry
+	Lock                sync.RWMutex
+	LastUpdated         time.Time
 }
 
-// Global variables for the instance and a mutex to protect it.
+// Global variables for the gInstance and a mutex to protect it.
 var (
-	instance   *GlobalState = &GlobalState{}
-	instanceMu sync.Mutex
-	hivePath   string = "C:\\Windows\\AppCompat\\Programs\\Amcache.hve"
+	gInstance     *GlobalState = &GlobalState{Config: &Config{HivePath: defaultHivePath, ExpirationDuration: defaultExpirationDuration}}
 )
 
-// GetInstance is the public accessor for the singleton.
+// GetGlobalState is the public accessor for the singleton.
 // It checks for expiration and re-creates the instance if needed.
-func GetInstance() *GlobalState {
-	return instance
+func GetGlobalState() *GlobalState {
+	return gInstance
 }
 
-func (gs *GlobalState) ResetLockHeld() {
-	registry, err := utilities.LoadRegistry(hivePath)
+func (gs *GlobalState) Update() {
+	gs.Lock.Lock()
+	defer gs.Lock.Unlock()
+
+	log.Println("Updating amcache GlobalState")
+
+	// Reload the registry and repopulate all caches.
+	registry, err := tables.LoadRegistry(gs.Config.HivePath)
 	if err != nil {
 		log.Printf("error opening amcache registry: %v", err)
 		return
 	}
-	instance.application, err = application.GetApplicationEntriesFromRegistry(registry)
+	gs.Application, err = tables.GetApplicationEntriesFromRegistry(registry)
 	if err != nil {
 		log.Printf("error getting application entries: %v", err)
 		return
 	}
-	instance.applicationFile, err = application_file.GetApplicationFileEntriesFromRegistry(registry)
+	gs.ApplicationFile, err = tables.GetApplicationFileEntriesFromRegistry(registry)
 	if err != nil {
 		log.Printf("error getting application file entries: %v", err)
 		return
 	}
-	instance.applicationShortcut, err = application_shortcut.GetApplicationShortcutEntriesFromRegistry(registry)
+	gs.ApplicationShortcut, err = tables.GetApplicationShortcutEntriesFromRegistry(registry)
 	if err != nil {
 		log.Printf("error getting application shortcut entries: %v", err)
 		return
 	}
-	instance.driverBinary, err = driver_binary.GetDriverBinaryEntriesFromRegistry(registry)
+	gs.DriverBinary, err = tables.GetDriverBinaryEntriesFromRegistry(registry)
 	if err != nil {
 		log.Printf("error getting driver binary entries: %v", err)
 		return
 	}
-	instance.devicePnp, err = device_pnp.GetDevicePnpEntriesFromRegistry(registry)
+	gs.DevicePnp, err = tables.GetDevicePnpEntriesFromRegistry(registry)
 	if err != nil {
 		log.Printf("error getting device pnp entries: %v", err)
 		return
 	}
-	instance.creationTime = time.Now()
+	gs.LastUpdated = time.Now()
 }
 
-func (gs *GlobalState) ResetIfNeeded() {
-	instanceMu.Lock()
-	defer instanceMu.Unlock()
+func (gs *GlobalState) UpdateIfNeeded() {
+	gs.Lock.RLock()
+	lastUpdated := gs.LastUpdated
+	expirationDuration := gs.Config.ExpirationDuration
+	gs.Lock.RUnlock()
 
-	if gs.IsExpired() {
-		log.Println("GlobalState needs reset, reloading hive from:", hivePath)
-		gs.ResetLockHeld()
+	if time.Since(lastUpdated) > expirationDuration {
+		gs.Update()
 	}
 }
 
-func SetHivePath(path string) {
-	instanceMu.Lock()
-	defer instanceMu.Unlock()
+func (gs *GlobalState) GetApplicationEntries(programId ...string) []tables.Entry {
+	gs.UpdateIfNeeded()
 
-	log.Println("Setting Amcache hive path to:", hivePath)
-	hivePath = path
-	instance.ResetLockHeld()
-}
+	gs.Lock.Lock()
+	defer gs.Lock.Unlock()
 
-func (gs *GlobalState) IsExpired() bool {
-	gs.lock.RLock()
-	defer gs.lock.RUnlock()
-	return time.Since(gs.creationTime) > expirationDuration
-}
-
-func (gs *GlobalState) GetApplicationEntries(programId ...string) []interfaces.Entry {
-	gs.ResetIfNeeded()
-
-	gs.lock.Lock()
-	defer gs.lock.Unlock()
-
-	var entries []interfaces.Entry
+	var entries []tables.Entry
 	if len(programId) == 0 {
-		for _, entry := range gs.application {
+		for _, entry := range gs.Application {
 			entries = append(entries, entry...)
 		}
 	} else {
 		for _, id := range programId {
-			if entry, ok := gs.application[id]; ok {
+			if entry, ok := gs.Application[id]; ok {
 				entries = append(entries, entry...)
 			}
 		}
@@ -126,20 +122,20 @@ func (gs *GlobalState) GetApplicationEntries(programId ...string) []interfaces.E
 	return entries
 }
 
-func (gs *GlobalState) GetApplicationFileEntries(programId ...string) []interfaces.Entry {
-	gs.ResetIfNeeded()
+func (gs *GlobalState) GetApplicationFileEntries(programId ...string) []tables.Entry {
+	gs.UpdateIfNeeded()
 
-	gs.lock.Lock()
-	defer gs.lock.Unlock()
+	gs.Lock.Lock()
+	defer gs.Lock.Unlock()
 
-	var entries []interfaces.Entry
+	var entries []tables.Entry
 	if len(programId) == 0 {
-		for _, entry := range gs.applicationFile {
+		for _, entry := range gs.ApplicationFile {
 			entries = append(entries, entry...)
 		}
 	} else {
 		for _, id := range programId {
-			if entry, ok := gs.applicationFile[id]; ok {
+			if entry, ok := gs.ApplicationFile[id]; ok {
 				entries = append(entries, entry...)
 			}
 		}
@@ -147,18 +143,20 @@ func (gs *GlobalState) GetApplicationFileEntries(programId ...string) []interfac
 	return entries
 }
 
-func (gs *GlobalState) GetApplicationShortcutEntries(programId ...string) []interfaces.Entry {
-	gs.ResetIfNeeded()
-	gs.lock.Lock()
-	defer gs.lock.Unlock()
-	var entries []interfaces.Entry
+func (gs *GlobalState) GetApplicationShortcutEntries(programId ...string) []tables.Entry {
+	gs.UpdateIfNeeded()
+
+	gs.Lock.Lock()
+	defer gs.Lock.Unlock()
+
+	var entries []tables.Entry
 	if len(programId) == 0 {
-		for _, entry := range gs.applicationShortcut {
+		for _, entry := range gs.ApplicationShortcut {
 			entries = append(entries, entry...)
 		}
 	} else {
 		for _, id := range programId {
-			if entry, ok := gs.applicationShortcut[id]; ok {
+			if entry, ok := gs.ApplicationShortcut[id]; ok {
 				entries = append(entries, entry...)
 			}
 		}
@@ -166,18 +164,20 @@ func (gs *GlobalState) GetApplicationShortcutEntries(programId ...string) []inte
 	return entries
 }
 
-func (gs *GlobalState) GetDriverBinaryEntries(driverId ...string) []interfaces.Entry {
-	gs.ResetIfNeeded()
-	gs.lock.Lock()
-	defer gs.lock.Unlock()
-	var entries []interfaces.Entry
+func (gs *GlobalState) GetDriverBinaryEntries(driverId ...string) []tables.Entry {
+	gs.UpdateIfNeeded()
+
+	gs.Lock.Lock()
+	defer gs.Lock.Unlock()
+
+	var entries []tables.Entry
 	if len(driverId) == 0 {
-		for _, entry := range gs.driverBinary {
+		for _, entry := range gs.DriverBinary {
 			entries = append(entries, entry...)
 		}
 	} else {
 		for _, id := range driverId {
-			if entry, ok := gs.driverBinary[id]; ok {
+			if entry, ok := gs.DriverBinary[id]; ok {
 				entries = append(entries, entry...)
 			}
 		}
@@ -185,22 +185,23 @@ func (gs *GlobalState) GetDriverBinaryEntries(driverId ...string) []interfaces.E
 	return entries
 }
 
-func (gs *GlobalState) GetDevicePnpEntries(deviceId ...string) []interfaces.Entry {
-	gs.ResetIfNeeded()
-	gs.lock.Lock()
-	defer gs.lock.Unlock()
-	var entries []interfaces.Entry
+func (gs *GlobalState) GetDevicePnpEntries(deviceId ...string) []tables.Entry {
+	gs.UpdateIfNeeded()
+
+	gs.Lock.Lock()
+	defer gs.Lock.Unlock()
+
+	var entries []tables.Entry
 	if len(deviceId) == 0 {
-		for _, entry := range gs.devicePnp {
+		for _, entry := range gs.DevicePnp {
 			entries = append(entries, entry...)
 		}
 	} else {
 		for _, id := range deviceId {
-			if entry, ok := gs.devicePnp[id]; ok {
+			if entry, ok := gs.DevicePnp[id]; ok {
 				entries = append(entries, entry...)
 			}
 		}
 	}
 	return entries
 }
-

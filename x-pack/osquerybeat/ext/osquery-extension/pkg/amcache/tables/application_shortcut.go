@@ -4,13 +4,11 @@
 
 //go:build windows
 
-package application_shortcut
+package tables
 
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/interfaces"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/utilities"
 	"github.com/osquery/osquery-go/plugin/table"
 	"www.velocidex.com/golang/regparser"
 )
@@ -23,7 +21,7 @@ type ApplicationShortcutEntry struct {
 	ShortcutProgramId  string `json:"shortcut_program_id"`
 }
 
-func Columns() []table.ColumnDefinition {
+func ApplicationShortcutColumns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.BigIntColumn("last_write_time"),
 		table.TextColumn("shortcut_path"),
@@ -46,31 +44,30 @@ func (ae *ApplicationShortcutEntry) SetLastWriteTime(t int64) {
 	ae.LastWriteTime = t
 }
 
-func GetApplicationShortcutEntriesFromRegistry(registry *regparser.Registry) (map[string][]interfaces.Entry, error) {
+func GetApplicationShortcutEntriesFromRegistry(registry *regparser.Registry) (map[string][]Entry, error) {
 	if registry == nil {
 		return nil, fmt.Errorf("registry is nil")
 	}
 
-	keyName := "Root\\InventoryApplicationShortcut"
-	keyNode := registry.OpenKey(keyName)
+	keyNode := registry.OpenKey(applicationShortcutKeyPath)
 	if keyNode == nil {
-		return nil, fmt.Errorf("error opening key: %s", keyName)
+		return nil, fmt.Errorf("error opening key: %s", applicationShortcutKeyPath)
 	}
 
-	applicationEntries := make(map[string][]interfaces.Entry, len(keyNode.Subkeys()))
+	applicationEntries := make(map[string][]Entry, len(keyNode.Subkeys()))
 	for _, subkey := range keyNode.Subkeys() {
 		ase := &ApplicationShortcutEntry{}
-		interfaces.FillInEntryFromKey(ase, subkey)
+		FillInEntryFromKey(ase, subkey)
 
 		applicationEntries[ase.ShortcutProgramId] = append(applicationEntries[ase.ShortcutProgramId], ase)
 	}
 	return applicationEntries, nil
 }
 
-func GenerateFunc(state interfaces.GlobalState) table.GenerateFunc {
+func ApplicationShortcutGenerateFunc(state GlobalStateInterface) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		programIds := utilities.GetConstraintsFromQueryContext("shortcut_program_id", queryContext)
+		programIds := GetConstraintsFromQueryContext("shortcut_program_id", queryContext)
 		rows := state.GetApplicationShortcutEntries(programIds...)
-		return interfaces.RowsAsStringMapArray(rows), nil
+		return RowsAsStringMapArray(rows), nil
 	}
 }

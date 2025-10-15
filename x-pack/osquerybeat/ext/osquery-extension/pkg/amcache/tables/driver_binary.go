@@ -4,13 +4,11 @@
 
 //go:build windows
 
-package driver_binary
+package tables
 
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/interfaces"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/utilities"
 	"github.com/osquery/osquery-go/plugin/table"
 	"www.velocidex.com/golang/regparser"
 )
@@ -37,7 +35,7 @@ type DriverBinaryEntry struct {
 	ImageSize               string `json:"image_size"`
 }
 
-func Columns() []table.ColumnDefinition {
+func DriverBinaryColumns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.BigIntColumn("last_write_time"),
 		table.TextColumn("driver_name"),
@@ -78,30 +76,29 @@ func (ae *DriverBinaryEntry) SetLastWriteTime(t int64) {
 	ae.LastWriteTime = t
 }
 
-func GetDriverBinaryEntriesFromRegistry(registry *regparser.Registry) (map[string][]interfaces.Entry, error) {
+func GetDriverBinaryEntriesFromRegistry(registry *regparser.Registry) (map[string][]Entry, error) {
 	if registry == nil {
 		return nil, fmt.Errorf("registry is nil")
 	}
 
-	keyName := "Root\\InventoryDriverBinary"
-	keyNode := registry.OpenKey(keyName)
+	keyNode := registry.OpenKey(driverBinaryKeyPath)
 	if keyNode == nil {
-		return nil, fmt.Errorf("error opening key: %s", keyName)
+		return nil, fmt.Errorf("error opening key: %s", driverBinaryKeyPath)
 	}
 
-	deviceEntries := make(map[string][]interfaces.Entry, len(keyNode.Subkeys()))
+	deviceEntries := make(map[string][]Entry, len(keyNode.Subkeys()))
 	for _, subkey := range keyNode.Subkeys() {
 		dbe := &DriverBinaryEntry{}
-		interfaces.FillInEntryFromKey(dbe, subkey)
+		FillInEntryFromKey(dbe, subkey)
 		deviceEntries[dbe.DriverId] = append(deviceEntries[dbe.DriverId], dbe)
 	}
 	return deviceEntries, nil
 }
 
-func GenerateFunc(state interfaces.GlobalState) table.GenerateFunc {
+func DriverBinaryGenerateFunc(state GlobalStateInterface) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		driverIds := utilities.GetConstraintsFromQueryContext("driver_id", queryContext)
+		driverIds := GetConstraintsFromQueryContext("driver_id", queryContext)
 		rows := state.GetDriverBinaryEntries(driverIds...)
-		return interfaces.RowsAsStringMapArray(rows), nil
+		return RowsAsStringMapArray(rows), nil
 	}
 }

@@ -4,13 +4,11 @@
 
 //go:build windows
 
-package device_pnp
+package tables
 
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/interfaces"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/utilities"
 	"github.com/osquery/osquery-go/plugin/table"
 	"www.velocidex.com/golang/regparser"
 )
@@ -52,7 +50,7 @@ type DevicePnpEntry struct {
 	LocationPaths           string `json:"location_paths"`
 }
 
-func Columns() []table.ColumnDefinition {
+func DevicePnpColumns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.BigIntColumn("last_write_time"),
 		table.TextColumn("model"),
@@ -133,30 +131,29 @@ func (dpe *DevicePnpEntry) SetLastWriteTime(t int64) {
 	dpe.LastWriteTime = t
 }
 
-func GetDevicePnpEntriesFromRegistry(registry *regparser.Registry) (map[string][]interfaces.Entry, error) {
+func GetDevicePnpEntriesFromRegistry(registry *regparser.Registry) (map[string][]Entry, error) {
 	if registry == nil {
 		return nil, fmt.Errorf("registry is nil")
 	}
 
-	keyName := "Root\\InventoryDevicePnp"
-	keyNode := registry.OpenKey(keyName)
+	keyNode := registry.OpenKey(devicePnpKeyPath)
 	if keyNode == nil {
-		return nil, fmt.Errorf("error opening key: %s", keyName)
+		return nil, fmt.Errorf("error opening key: %s", devicePnpKeyPath)
 	}
 
-	deviceEntries := make(map[string][]interfaces.Entry, len(keyNode.Subkeys()))
+	deviceEntries := make(map[string][]Entry, len(keyNode.Subkeys()))
 	for _, subkey := range keyNode.Subkeys() {
 		dpe := &DevicePnpEntry{}
-		interfaces.FillInEntryFromKey(dpe, subkey)
+		FillInEntryFromKey(dpe, subkey)
 		deviceEntries[dpe.DriverId] = append(deviceEntries[dpe.DriverId], dpe)
 	}
 	return deviceEntries, nil
 }
 
-func GenerateFunc(state interfaces.GlobalState) table.GenerateFunc {
+func DevicePnpGenerateFunc(state GlobalStateInterface) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		driverIds := utilities.GetConstraintsFromQueryContext("driver_id", queryContext)
+		driverIds := GetConstraintsFromQueryContext("driver_id", queryContext)
 		rows := state.GetDevicePnpEntries(driverIds...)
-		return interfaces.RowsAsStringMapArray(rows), nil
+		return RowsAsStringMapArray(rows), nil
 	}
 }
