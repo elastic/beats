@@ -20,7 +20,10 @@ func GetTableRows(ctx context.Context, queryContext table.QueryContext, log func
 
 	results := make([]map[string]string, 0)
 
-	profileFilters := getProfileNameFilters(queryContext)
+	profileFilters := getConstraintFilters(queryContext, "profile_name")
+	userFilters := getConstraintFilters(queryContext, "user")
+	browserFilters := getConstraintFilters(queryContext, "browser")
+	filters := append(profileFilters, append(userFilters, browserFilters...)...)
 	locations, err := getSearchLocations(queryContext, log)
 	if err != nil {
 		return nil, err
@@ -33,7 +36,7 @@ func GetTableRows(ctx context.Context, queryContext table.QueryContext, log func
 			continue
 		}
 		for _, parser := range parsers {
-			visits, err := parser.parse(ctx, queryContext, profileFilters)
+			visits, err := parser.parse(ctx, queryContext, filters)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -66,18 +69,9 @@ func getSearchLocations(queryContext table.QueryContext, log func(m string, kvs 
 		return searchLocations, nil
 	}
 
-	userFilters := getUserFilters(queryContext)
-	userPaths := discoverUsers(userFilters, log)
-
-	browsersFilters := getBrowserFilters(queryContext)
-	browsers := defaultBrowsers
-	if len(browsersFilters) != 0 {
-		browsers = make([]string, len(browsersFilters))
-		copy(browsers, browsersFilters)
-	}
-
+	userPaths := discoverUsers(log)
 	var results []searchLocation
-	for _, browser := range browsers {
+	for _, browser := range defaultBrowsers {
 		for _, userPath := range userPaths {
 			browserBaseDir := getBrowserPath(browser)
 			if browserBaseDir == "" {

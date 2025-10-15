@@ -75,13 +75,13 @@ func inferFirefoxBrowserName(path string) string {
 	return "firefox_custom"
 }
 
-func (parser *firefoxParser) parse(ctx context.Context, queryContext table.QueryContext, profileFilters []string) ([]*visit, error) {
+func (parser *firefoxParser) parse(ctx context.Context, queryContext table.QueryContext, filters []filter) ([]*visit, error) {
 	var (
 		merr   error
 		visits []*visit
 	)
 	for _, profile := range parser.profiles {
-		if len(profileFilters) > 0 && !matchesFilters(profile.name, profileFilters) {
+		if !matchesProfileFilters(profile, filters) {
 			continue
 		}
 		vs, err := parser.parseProfile(ctx, queryContext, profile)

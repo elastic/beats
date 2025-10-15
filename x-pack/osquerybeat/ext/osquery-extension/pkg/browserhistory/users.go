@@ -13,7 +13,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func discoverUsers(userFilters []string, log func(m string, kvs ...any)) []string {
+func discoverUsers(log func(m string, kvs ...any)) []string {
 	var userDirs []string
 	var searchPaths []string
 
@@ -54,12 +54,6 @@ func discoverUsers(userFilters []string, log func(m string, kvs ...any)) []strin
 				username := filepath.Base(match)
 				if isSystemUser(username) {
 					log("skipping system user", "username", username, "path", match)
-					continue
-				}
-
-				// Apply user filters if provided
-				if len(userFilters) > 0 && !matchesFilters(username, userFilters) {
-					log("skipping filtered user", "username", username, "path", match)
 					continue
 				}
 

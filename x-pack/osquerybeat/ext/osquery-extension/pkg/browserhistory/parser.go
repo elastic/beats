@@ -28,7 +28,7 @@ type profile struct {
 }
 
 type historyParser interface {
-	parse(ctx context.Context, queryContext table.QueryContext, profileFilters []string) ([]*visit, error)
+	parse(ctx context.Context, queryContext table.QueryContext, filters []filter) ([]*visit, error)
 }
 
 func initParsers() {

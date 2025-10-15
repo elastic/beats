@@ -15,18 +15,6 @@ import (
 	"github.com/osquery/osquery-go/plugin/table"
 )
 
-func getProfileNameFilters(queryContext table.QueryContext) []string {
-	return getConstraintFilters(queryContext, "profile_name", nil)
-}
-
-func getUserFilters(queryContext table.QueryContext) []string {
-	return getConstraintFilters(queryContext, "user", nil)
-}
-
-func getBrowserFilters(queryContext table.QueryContext) []string {
-	return getConstraintFilters(queryContext, "browser", defaultBrowsers)
-}
-
 func getCustomDataDirFilters(queryContext table.QueryContext) ([]string, error) {
 	clist, ok := queryContext.Constraints["custom_data_dir"]
 	if !ok || len(clist.Constraints) == 0 {
@@ -49,55 +37,25 @@ func getCustomDataDirFilters(queryContext table.QueryContext) ([]string, error) 
 	return results, nil
 }
 
-func getConstraintFilters(queryContext table.QueryContext, fieldName string, validateAgainst []string) []string {
+type filter struct {
+	field string
+	value string
+}
+
+func getConstraintFilters(queryContext table.QueryContext, fieldName string) []filter {
 	clist, ok := queryContext.Constraints[fieldName]
 	if !ok || len(clist.Constraints) == 0 {
 		return nil
 	}
-
-	var results []string
+	var results []filter
 	for _, c := range clist.Constraints {
 		switch c.Operator {
-		case table.OperatorEquals:
-			results = append(results, c.Expression)
+		case table.OperatorEquals, table.OperatorGlob, table.OperatorRegexp:
+			results = append(results, filter{field: fieldName, value: c.Expression})
 		case table.OperatorLike:
 			// Convert SQL LIKE pattern to filepath.Match pattern
 			pattern := strings.ReplaceAll(c.Expression, "%", "*")
-			if validateAgainst != nil {
-				for _, item := range validateAgainst {
-					if matched, _ := filepath.Match(pattern, item); matched {
-						results = append(results, item)
-					}
-				}
-			} else {
-				results = append(results, pattern)
-			}
-		case table.OperatorGlob:
-			if validateAgainst != nil {
-				for _, item := range validateAgainst {
-					if matched, _ := filepath.Match(c.Expression, item); matched {
-						results = append(results, item)
-					}
-				}
-			} else {
-				results = append(results, c.Expression)
-			}
-		case table.OperatorRegexp:
-			// Compile and validate regexp pattern
-			re, err := regexp.Compile(c.Expression)
-			if err != nil {
-				continue
-			}
-			if validateAgainst != nil {
-				for _, item := range validateAgainst {
-					if re.MatchString(item) {
-						results = append(results, item)
-					}
-				}
-			} else {
-				// We store the original expression since we'll need to recompile it later
-				results = append(results, c.Expression)
-			}
+			results = append(results, filter{field: fieldName, value: pattern})
 		}
 	}
 	return results
@@ -131,19 +89,41 @@ func getTimestampConstraints(queryContext table.QueryContext) []timestampConstra
 	return constraints
 }
 
-func matchesFilters(name string, filters []string) bool {
+func matchesProfileFilters(profile *profile, filters []filter) bool {
+	if !matchesFiltersForField("browser", profile.browser, filters) {
+		return false
+	}
+	if !matchesFiltersForField("user", profile.user, filters) {
+		return false
+	}
+	if !matchesFiltersForField("profile_name", profile.name, filters) {
+		return false
+	}
+	return true
+}
+
+func matchesFiltersForField(field, value string, filters []filter) bool {
+	var fieldFilters []filter
 	for _, filter := range filters {
+		if filter.field == field {
+			fieldFilters = append(fieldFilters, filter)
+		}
+	}
+	if len(fieldFilters) == 0 {
+		return true
+	}
+	for _, filter := range fieldFilters {
 		// Check for exact match
-		if name == filter {
+		if value == filter.value {
 			return true
 		}
 		// Check for glob pattern match
-		if matched, _ := filepath.Match(filter, name); matched {
+		if matched, _ := filepath.Match(filter.value, value); matched {
 			return true
 		}
 		// Check for regexp pattern match
-		if re, err := regexp.Compile(filter); err == nil {
-			if re.MatchString(name) {
+		if re, err := regexp.Compile(filter.value); err == nil {
+			if re.MatchString(value) {
 				return true
 			}
 		}
