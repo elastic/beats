@@ -8,7 +8,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -25,7 +24,7 @@ type safariParser struct {
 }
 
 func newSafariParser(location searchLocation, log func(m string, kvs ...any)) historyParser {
-	profiles := getSafariProfiles(location.path, log)
+	profiles := getSafariProfiles(location, log)
 	if len(profiles) > 0 {
 		return &safariParser{
 			location: location,
@@ -34,6 +33,22 @@ func newSafariParser(location searchLocation, log func(m string, kvs ...any)) hi
 		}
 	}
 	return nil
+}
+
+func inferSafariBrowserName(path string) string {
+	normalized := filepath.ToSlash(path)
+	segments := strings.Split(normalized, "/")
+	for _, segment := range segments {
+		segment = strings.TrimSpace(segment)
+		if segment == "" {
+			continue
+		}
+		lower := strings.ToLower(segment)
+		if strings.Contains(lower, "safari") {
+			return strings.ReplaceAll(lower, " ", "_")
+		}
+	}
+	return "safari_custom"
 }
 
 func (parser *safariParser) parse(ctx context.Context, queryContext table.QueryContext, profileFilters []string) ([]*visit, error) {
@@ -101,8 +116,8 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 			domainExpansion sql.NullString
 			visitCount      sql.NullInt64
 			title           sql.NullString
-			visitTime       sql.NullInt64
-			loadSuccessful  sql.NullInt64
+			visitTime       sql.NullFloat64
+			loadSuccessful  sql.NullBool
 			itemID          sql.NullInt64
 			visitID         sql.NullInt64
 		)
@@ -122,14 +137,14 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 			continue
 		}
 
-		entry := newVisit("safari", parser.location, profile, safariTimeToUnix(visitTime.Int64))
+		entry := newVisit("safari", profile, safariTimeToUnix(visitTime.Float64))
 		entry.URL = url.String
 		entry.Title = title.String
 		entry.VisitID = visitID.Int64
 		entry.VisitCount = int(visitCount.Int64)
 		entry.UrlID = itemID.Int64
 		entry.SfDomainExpansion = domainExpansion.String
-		entry.SfLoadSuccessful = func(v int64) bool { return v != 0 }(loadSuccessful.Int64)
+		entry.SfLoadSuccessful = loadSuccessful.Bool
 
 		entries = append(entries, entry)
 	}
@@ -137,63 +152,50 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 	return entries, rows.Err()
 }
 
-func getSafariProfiles(basePath string, log func(m string, kvs ...any)) []*profile {
-	// Modern Safari profiles: /Users/username/Library/Safari/Profiles/ProfileName
-	// Legacy Safari: /Users/username/Library/Safari
-
-	user := extractUserFromPath(basePath, log)
-
+func getSafariProfiles(location searchLocation, log func(m string, kvs ...any)) []*profile {
 	var profiles []*profile
+	user := extractUserFromPath(location.path, log)
 
-	entries, err := os.ReadDir(filepath.Join(basePath, "Profiles"))
-	if err != nil {
-		return nil
-	}
+	// Recursively search for History.db files
+	historyPaths := findFilesRecursively(location.path, "History.db", log)
 
-	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
+	for _, historyPath := range historyPaths {
+		profilePath := filepath.Dir(historyPath)
+		profileName := filepath.Base(profilePath)
+
+		// If the profile name is "Safari", use "Default" instead
+		if profileName == "Safari" {
+			profileName = "Default"
 		}
-		profilePath := filepath.Join(basePath, "Profiles", entry.Name())
-		historyPath := filepath.Join(profilePath, "History.db")
-		if _, err := os.Stat(historyPath); err != nil {
-			return nil
-		}
+
 		log("detected safari History.db file", "path", historyPath)
-		profiles = append(profiles, &profile{
-			name:        entry.Name(),
+
+		profile := &profile{
+			name:        profileName,
+			user:        user,
+			browser:     location.browser,
 			profilePath: profilePath,
 			historyPath: historyPath,
-			searchPath:  basePath,
-			user:        user,
-		})
+		}
+		if location.isCustom {
+			profile.browser = inferSafariBrowserName(profile.profilePath)
+			profile.customDataDir = location.path
+		}
+		profiles = append(profiles, profile)
 	}
-	if len(profiles) > 0 {
-		return profiles
-	}
-	historyPath := filepath.Join(basePath, "History.db")
-	if _, err := os.Stat(historyPath); err != nil {
-		return nil
-	}
-	profiles = append(profiles, &profile{
-		name:        "Default",
-		profilePath: basePath,
-		historyPath: historyPath,
-		searchPath:  basePath,
-		user:        user,
-	})
+
 	return profiles
 }
 
 // Unix timestamps are in seconds since January 1, 1970 UTC
 // Safari timestamps are in seconds since January 1, 2001 UTC (Mac OS X epoch)
-func safariTimeToUnix(time int64) int64 {
+func safariTimeToUnix(time float64) int64 {
 	if time == 0 {
 		return 0
 	}
 
 	const epochOffset = 978307200
-	return time + epochOffset
+	return int64(time + epochOffset)
 }
 
 func unixToSafariTime(unixTime int64) int64 {
@@ -215,18 +217,23 @@ func buildSafariTimestampWhere(queryContext table.QueryContext) string {
 	var conditions []string
 	for _, constraint := range constraints {
 		safariTime := unixToSafariTime(constraint.Value)
+		const secondRange = 1
 
 		switch constraint.Operator {
 		case table.OperatorEquals:
-			conditions = append(conditions, fmt.Sprintf("hv.visit_time = %d", safariTime))
+			lower := safariTime
+			upper := safariTime + secondRange
+			conditions = append(conditions, fmt.Sprintf("hv.visit_time >= %d AND hv.visit_time < %d", lower, upper))
 		case table.OperatorGreaterThan:
-			conditions = append(conditions, fmt.Sprintf("hv.visit_time > %d", safariTime))
+			threshold := safariTime + secondRange
+			conditions = append(conditions, fmt.Sprintf("hv.visit_time >= %d", threshold))
 		case table.OperatorLessThan:
 			conditions = append(conditions, fmt.Sprintf("hv.visit_time < %d", safariTime))
 		case table.OperatorGreaterThanOrEquals:
 			conditions = append(conditions, fmt.Sprintf("hv.visit_time >= %d", safariTime))
 		case table.OperatorLessThanOrEquals:
-			conditions = append(conditions, fmt.Sprintf("hv.visit_time <= %d", safariTime))
+			upper := safariTime + secondRange
+			conditions = append(conditions, fmt.Sprintf("hv.visit_time < %d", upper))
 		}
 	}
 

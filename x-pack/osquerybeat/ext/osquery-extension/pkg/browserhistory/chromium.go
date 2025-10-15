@@ -26,7 +26,7 @@ type chromiumParser struct {
 }
 
 func newChromiumParser(location searchLocation, log func(m string, kvs ...any)) historyParser {
-	profiles := getChromiumProfiles(location.path, log)
+	profiles := getChromiumProfiles(location, log)
 	if len(profiles) > 0 {
 		return &chromiumParser{
 			location: location,
@@ -35,6 +35,22 @@ func newChromiumParser(location searchLocation, log func(m string, kvs ...any)) 
 		}
 	}
 	return nil
+}
+
+func inferChromiumBrowserName(path string) string {
+	normalized := filepath.ToSlash(path)
+	segments := strings.Split(normalized, "/")
+	for i, segment := range segments {
+		segment = strings.TrimSpace(segment)
+		if segment == "" {
+			continue
+		}
+		lower := strings.ToLower(segment)
+		if lower == "user data" && i > 0 {
+			return strings.ReplaceAll(strings.ToLower(segments[i-1]), " ", "_")
+		}
+	}
+	return "chromium_custom"
 }
 
 func (parser *chromiumParser) parse(ctx context.Context, queryContext table.QueryContext, profileFilters []string) ([]*visit, error) {
@@ -141,7 +157,7 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 			continue
 		}
 
-		entry := newVisit("chromium", parser.location, profile, chromiumTimeToUnix(visitTime.Int64))
+		entry := newVisit("chromium", profile, chromiumTimeToUnix(visitTime.Int64))
 		entry.URL = url.String
 		entry.Title = title.String
 		entry.TransitionType = mapChromiumTransitionType(transitionType)
@@ -168,53 +184,41 @@ type localState struct {
 	} `json:"profile"`
 }
 
-func getChromiumProfiles(basePath string, log func(m string, kvs ...any)) []*profile {
+func getChromiumProfiles(location searchLocation, log func(m string, kvs ...any)) []*profile {
 	var profiles []*profile
-	user := extractUserFromPath(basePath, log)
+	user := extractUserFromPath(location.path, log)
 
-	entries, err := os.ReadDir(basePath)
-	if err != nil {
-		return nil
-	}
+	// Recursively search for History files
+	historyPaths := findFilesRecursively(location.path, "History", log)
 
-	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
-		}
+	for _, historyPath := range historyPaths {
+		profilePath := filepath.Dir(historyPath)
+		profileName := filepath.Base(profilePath)
 
-		if entry.Name() == "User Data" {
-			profiles = append(profiles, getChromiumProfiles(filepath.Join(basePath, entry.Name()), log)...)
-			continue
-		}
-
-		profilePath := filepath.Join(basePath, entry.Name())
-		historyPath := filepath.Join(profilePath, "History")
-		if _, err := os.Stat(historyPath); err != nil {
-			continue
-		}
 		log("detected chromium History file", "path", historyPath)
 
 		profile := &profile{
-			name:        entry.Name(),
+			name:        profileName,
 			user:        user,
+			browser:     location.browser,
 			profilePath: profilePath,
 			historyPath: historyPath,
-			searchPath:  basePath,
 		}
 
+		// Try to get a better profile name from Local State if available
 		userDataDir := filepath.Dir(profilePath)
 		localStatePath := filepath.Join(userDataDir, "Local State")
-		data, err := os.ReadFile(localStatePath)
-		if err != nil {
-			profiles = append(profiles, profile)
-			continue
-		}
-
-		var localState localState
-		if err := json.Unmarshal(data, &localState); err == nil {
-			if profileInfo, exists := localState.Profile.InfoCache[entry.Name()]; exists && profileInfo.Name != "" {
-				profile.name = profileInfo.Name
+		if data, err := os.ReadFile(localStatePath); err == nil {
+			var localState localState
+			if err := json.Unmarshal(data, &localState); err == nil {
+				if profileInfo, exists := localState.Profile.InfoCache[profileName]; exists && profileInfo.Name != "" {
+					profile.name = profileInfo.Name
+				}
 			}
+		}
+		if location.isCustom {
+			profile.browser = inferChromiumBrowserName(profile.profilePath)
+			profile.customDataDir = location.path
 		}
 		profiles = append(profiles, profile)
 	}
@@ -372,18 +376,23 @@ func buildChromiumTimestampWhere(queryContext table.QueryContext) string {
 	var conditions []string
 	for _, constraint := range constraints {
 		chromiumTime := unixToChromiumTime(constraint.Value)
+		const microsPerSecond = 1000000
 
 		switch constraint.Operator {
 		case table.OperatorEquals:
-			conditions = append(conditions, fmt.Sprintf("visits.visit_time = %d", chromiumTime))
+			lower := chromiumTime
+			upper := chromiumTime + microsPerSecond
+			conditions = append(conditions, fmt.Sprintf("visits.visit_time >= %d AND visits.visit_time < %d", lower, upper))
 		case table.OperatorGreaterThan:
-			conditions = append(conditions, fmt.Sprintf("visits.visit_time > %d", chromiumTime))
+			threshold := chromiumTime + microsPerSecond
+			conditions = append(conditions, fmt.Sprintf("visits.visit_time >= %d", threshold))
 		case table.OperatorLessThan:
 			conditions = append(conditions, fmt.Sprintf("visits.visit_time < %d", chromiumTime))
 		case table.OperatorGreaterThanOrEquals:
 			conditions = append(conditions, fmt.Sprintf("visits.visit_time >= %d", chromiumTime))
 		case table.OperatorLessThanOrEquals:
-			conditions = append(conditions, fmt.Sprintf("visits.visit_time <= %d", chromiumTime))
+			upper := chromiumTime + microsPerSecond
+			conditions = append(conditions, fmt.Sprintf("visits.visit_time < %d", upper))
 		}
 	}
 

@@ -6,6 +6,8 @@ package browserhistory
 
 import (
 	"context"
+	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/osquery/osquery-go/plugin/table"
@@ -17,11 +19,12 @@ var (
 )
 
 type profile struct {
-	name        string
-	user        string
-	profilePath string
-	historyPath string
-	searchPath  string
+	name          string
+	user          string
+	browser       string
+	profilePath   string
+	historyPath   string
+	customDataDir string
 }
 
 type historyParser interface {
@@ -34,12 +37,38 @@ func initParsers() {
 	newParserFuncs["safari"] = newSafariParser
 }
 
-func getParser(location searchLocation, log func(m string, kvs ...any)) historyParser {
+func getParsers(location searchLocation, log func(m string, kvs ...any)) []historyParser {
+	var parsers []historyParser
 	for parserName, newParser := range newParserFuncs {
 		if parser := newParser(location, log); parser != nil {
 			log("created new parser", "parser", parserName)
-			return parser
+			parsers = append(parsers, parser)
 		}
 	}
-	return nil
+	return parsers
+}
+
+// findFilesRecursively searches for files with a specific name recursively
+func findFilesRecursively(basePath, fileName string, log func(m string, kvs ...any)) []string {
+	var foundFiles []string
+
+	entries, err := os.ReadDir(basePath)
+	if err != nil {
+		return foundFiles
+	}
+
+	for _, entry := range entries {
+		fullPath := filepath.Join(basePath, entry.Name())
+
+		if entry.IsDir() {
+			// Recursively search subdirectories
+			subFiles := findFilesRecursively(fullPath, fileName, log)
+			foundFiles = append(foundFiles, subFiles...)
+		} else if entry.Name() == fileName {
+			// Found the target file
+			foundFiles = append(foundFiles, fullPath)
+		}
+	}
+
+	return foundFiles
 }

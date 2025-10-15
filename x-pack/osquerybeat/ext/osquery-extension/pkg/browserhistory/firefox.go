@@ -29,15 +29,23 @@ type firefoxParser struct {
 func newFirefoxParser(location searchLocation, log func(m string, kvs ...any)) historyParser {
 	var profiles []*profile
 
-	// First, try to parse profiles.ini
-	profilesIniPath := filepath.Join(location.path, "profiles.ini")
-	if file, err := os.Open(profilesIniPath); err == nil {
-		defer file.Close()
-		profiles = getFirefoxProfiles(file, location.path, log)
-		log("parsed profiles from profiles.ini", "count", len(profiles), "path", profilesIniPath)
-	} else {
-		log("profiles.ini not found, trying fallback", "path", profilesIniPath, "error", err)
-		profiles = getFirefoxProfilesFallback(location.path, log)
+	// First, recursively search for profiles.ini files
+	profilesIniPaths := findFilesRecursively(location.path, "profiles.ini", log)
+
+	for _, profilesIniPath := range profilesIniPaths {
+		if file, err := os.Open(profilesIniPath); err == nil {
+			defer file.Close()
+			basePath := filepath.Dir(profilesIniPath)
+			foundProfiles := getFirefoxProfiles(file, basePath, location, log)
+			profiles = append(profiles, foundProfiles...)
+			log("parsed profiles from profiles.ini", "count", len(foundProfiles), "path", profilesIniPath)
+		}
+	}
+
+	// If no profiles.ini found, try fallback method
+	if len(profiles) == 0 {
+		log("no profiles.ini found, trying fallback")
+		profiles = getFirefoxProfilesFallback(location, log)
 	}
 
 	if len(profiles) > 0 {
@@ -49,6 +57,22 @@ func newFirefoxParser(location searchLocation, log func(m string, kvs ...any)) h
 	}
 
 	return nil
+}
+
+func inferFirefoxBrowserName(path string) string {
+	normalized := filepath.ToSlash(path)
+	segments := strings.Split(normalized, "/")
+	for i, segment := range segments {
+		segment = strings.TrimSpace(segment)
+		if segment == "" {
+			continue
+		}
+		lower := strings.ToLower(segment)
+		if lower == "profiles" && i > 0 {
+			return strings.ReplaceAll(strings.ToLower(segments[i-1]), " ", "_")
+		}
+	}
+	return "firefox_custom"
 }
 
 func (parser *firefoxParser) parse(ctx context.Context, queryContext table.QueryContext, profileFilters []string) ([]*visit, error) {
@@ -157,7 +181,7 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 			continue
 		}
 
-		entry := newVisit("firefox", parser.location, profile, firefoxTimeToUnix(visitTime.Int64))
+		entry := newVisit("firefox", profile, firefoxTimeToUnix(visitTime.Int64))
 		entry.URL = url.String
 		entry.Title = title.String
 		entry.TransitionType = mapFirefoxTransitionType(transition)
@@ -177,7 +201,7 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 	return entries, rows.Err()
 }
 
-func getFirefoxProfiles(file io.Reader, basePath string, log func(m string, kvs ...any)) []*profile {
+func getFirefoxProfiles(file io.Reader, basePath string, location searchLocation, log func(m string, kvs ...any)) []*profile {
 	var profiles []*profile
 	scanner := bufio.NewScanner(file)
 	var currentProfile *profile
@@ -202,13 +226,18 @@ func getFirefoxProfiles(file io.Reader, basePath string, log func(m string, kvs 
 					continue
 				}
 				log("detected firefox places.sqlite file", "path", historyPath)
-				profiles = append(profiles, &profile{
+				profile := &profile{
 					name:        currentProfile.name,
 					user:        extractUserFromPath(basePath, log),
+					browser:     location.browser,
 					profilePath: currentProfile.profilePath,
 					historyPath: historyPath,
-					searchPath:  basePath,
-				})
+				}
+				if location.isCustom {
+					profile.browser = inferFirefoxBrowserName(profile.profilePath)
+					profile.customDataDir = location.path
+				}
+				profiles = append(profiles, profile)
 				currentProfile = nil
 			}
 		}
@@ -219,38 +248,35 @@ func getFirefoxProfiles(file io.Reader, basePath string, log func(m string, kvs 
 	return nil
 }
 
-// getFirefoxProfilesFallback scans the Profiles directory for Firefox profiles when profiles.ini is not available
-func getFirefoxProfilesFallback(basePath string, log func(m string, kvs ...any)) []*profile {
+// getFirefoxProfilesFallback recursively searches for places.sqlite files when profiles.ini is not available
+func getFirefoxProfilesFallback(location searchLocation, log func(m string, kvs ...any)) []*profile {
 	var profiles []*profile
+	user := extractUserFromPath(location.path, log)
 
-	// Look for "Profiles" folder and scan its subdirectories
-	profilesDir := filepath.Join(basePath, "Profiles")
-	entries, err := os.ReadDir(profilesDir)
-	if err != nil {
-		log("Profiles directory not found", "path", profilesDir, "error", err)
-		return nil
-	}
+	// Recursively search for places.sqlite files
+	placesPaths := findFilesRecursively(location.path, "places.sqlite", log)
 
-	log("found Profiles directory, scanning subdirectories", "path", profilesDir)
-	for _, entry := range entries {
-		if entry.IsDir() {
-			profilePath := filepath.Join(profilesDir, entry.Name())
-			historyPath := filepath.Join(profilePath, "places.sqlite")
+	for _, placesPath := range placesPaths {
+		profilePath := filepath.Dir(placesPath)
+		profileName := filepath.Base(profilePath)
 
-			if _, err := os.Stat(historyPath); err == nil {
-				log("detected firefox places.sqlite file in fallback", "path", historyPath)
-				profiles = append(profiles, &profile{
-					name:        entry.Name(), // Use directory name as profile name
-					user:        extractUserFromPath(basePath, log),
-					profilePath: profilePath,
-					historyPath: historyPath,
-					searchPath:  basePath,
-				})
-			}
+		log("detected firefox places.sqlite file in fallback", "path", placesPath)
+
+		profile := &profile{
+			name:        profileName,
+			user:        user,
+			browser:     location.browser,
+			profilePath: profilePath,
+			historyPath: placesPath,
 		}
+		if location.isCustom {
+			profile.browser = inferFirefoxBrowserName(profile.profilePath)
+			profile.customDataDir = location.path
+		}
+		profiles = append(profiles, profile)
 	}
 
-	log("fallback profile discovery complete", "count", len(profiles))
+	log("fallback profile discovery complete", "count", len(profiles), "basePath", location.path)
 	return profiles
 }
 
@@ -335,18 +361,23 @@ func buildFirefoxTimestampWhere(queryContext table.QueryContext) string {
 	var conditions []string
 	for _, constraint := range constraints {
 		firefoxTime := unixToFirefoxTime(constraint.Value)
+		const microsPerSecond = 1000000
 
 		switch constraint.Operator {
 		case table.OperatorEquals:
-			conditions = append(conditions, fmt.Sprintf("hv.visit_date = %d", firefoxTime))
+			lower := firefoxTime
+			upper := firefoxTime + microsPerSecond
+			conditions = append(conditions, fmt.Sprintf("hv.visit_date >= %d AND hv.visit_date < %d", lower, upper))
 		case table.OperatorGreaterThan:
-			conditions = append(conditions, fmt.Sprintf("hv.visit_date > %d", firefoxTime))
+			threshold := firefoxTime + microsPerSecond
+			conditions = append(conditions, fmt.Sprintf("hv.visit_date >= %d", threshold))
 		case table.OperatorLessThan:
 			conditions = append(conditions, fmt.Sprintf("hv.visit_date < %d", firefoxTime))
 		case table.OperatorGreaterThanOrEquals:
 			conditions = append(conditions, fmt.Sprintf("hv.visit_date >= %d", firefoxTime))
 		case table.OperatorLessThanOrEquals:
-			conditions = append(conditions, fmt.Sprintf("hv.visit_date <= %d", firefoxTime))
+			upper := firefoxTime + microsPerSecond
+			conditions = append(conditions, fmt.Sprintf("hv.visit_date < %d", upper))
 		}
 	}
 

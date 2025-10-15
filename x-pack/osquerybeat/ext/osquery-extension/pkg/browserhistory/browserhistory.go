@@ -27,23 +27,25 @@ func GetTableRows(ctx context.Context, queryContext table.QueryContext, log func
 	}
 	var merr error
 	for _, location := range locations {
-		parser := getParser(location, log)
-		if parser == nil {
+		parsers := getParsers(location, log)
+		if len(parsers) == 0 {
 			log("no supported parser found for path", "path", location.path)
 			continue
 		}
-		visits, err := parser.parse(ctx, queryContext, profileFilters)
-		if err != nil {
-			merr = multierr.Append(merr, err)
+		for _, parser := range parsers {
+			visits, err := parser.parse(ctx, queryContext, profileFilters)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			if len(visits) == 0 {
+				continue
+			}
+			rows := make([]map[string]string, len(visits))
+			for i, visit := range visits {
+				rows[i] = visit.toMap()
+			}
+			results = append(results, rows...)
 		}
-		if len(visits) == 0 {
-			continue
-		}
-		rows := make([]map[string]string, len(visits))
-		for i, visit := range visits {
-			rows[i] = visit.toMap()
-		}
-		results = append(results, rows...)
 	}
 
 	return results, merr
@@ -107,29 +109,10 @@ func getSearchLocationsFromFilters(queryContext table.QueryContext) ([]searchLoc
 		}
 
 		for _, path := range expandedPaths {
-			// Look for the first path backwards that does not contain Profile, Default, or User Data
-			// and assume it is the browser name, then lowercase and snake case it
-			normalizedPath := filepath.ToSlash(path)
-			parts := strings.Split(normalizedPath, "/")
-
-			var browserName string
-			for i := len(parts) - 1; i >= 0; i-- {
-				part := parts[i]
-				if !strings.Contains(strings.ToLower(part), "profile") &&
-					!strings.Contains(strings.ToLower(part), "default") &&
-					!strings.Contains(strings.ToLower(part), "user data") {
-					browserName = strings.ToLower(strings.ReplaceAll(part, " ", "_"))
-					break
-				}
-			}
-
-			if browserName != "" {
-				results = append(results, searchLocation{
-					browser:  browserName,
-					path:     path,
-					isCustom: true,
-				})
-			}
+			results = append(results, searchLocation{
+				path:     path,
+				isCustom: true,
+			})
 		}
 	}
 	return results, nil

@@ -45,18 +45,16 @@ type visit struct {
 	CustomDataDir string `osquery:"custom_data_dir"`
 }
 
-func newVisit(parser string, location searchLocation, profile *profile, timestamp int64) *visit {
+func newVisit(parser string, profile *profile, timestamp int64) *visit {
 	v := &visit{
-		Timestamp:   timestamp,
-		Datetime:    time.Unix(timestamp, 0).UTC().Format(time.RFC3339),
-		Browser:     location.browser,
-		Parser:      parser,
-		User:        profile.user,
-		ProfileName: profile.name,
-		HistoryPath: profile.historyPath,
-	}
-	if location.isCustom {
-		v.CustomDataDir = location.path
+		Timestamp:     timestamp,
+		Datetime:      time.Unix(timestamp, 0).UTC().Format(time.RFC3339),
+		Browser:       profile.browser,
+		Parser:        parser,
+		User:          profile.user,
+		ProfileName:   profile.name,
+		HistoryPath:   profile.historyPath,
+		CustomDataDir: profile.customDataDir,
 	}
 	return v
 }
