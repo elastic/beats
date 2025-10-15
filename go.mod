@@ -124,7 +124,6 @@ require (
 	go.etcd.io/bbolt v1.4.0
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
-<<<<<<< HEAD
 	golang.org/x/crypto v0.41.0
 	golang.org/x/mod v0.27.0
 	golang.org/x/net v0.43.0
@@ -138,21 +137,6 @@ require (
 	google.golang.org/genproto v0.0.0-20250505200425-f936aa4a68b2 // indirect
 	google.golang.org/grpc v1.75.1
 	google.golang.org/protobuf v1.36.9
-=======
-	golang.org/x/crypto v0.33.0
-	golang.org/x/mod v0.21.0
-	golang.org/x/net v0.35.0
-	golang.org/x/oauth2 v0.24.0
-	golang.org/x/sync v0.11.0
-	golang.org/x/sys v0.31.0
-	golang.org/x/text v0.22.0
-	golang.org/x/time v0.8.0
-	golang.org/x/tools v0.25.0
-	google.golang.org/api v0.214.0
-	google.golang.org/genproto v0.0.0-20241118233622-e639e219e697 // indirect
-	google.golang.org/grpc v1.67.3
-	google.golang.org/protobuf v1.35.2
->>>>>>> 5da0bd169 (Update go-libaudit and remove close/draining code (#43352))
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/gotestsum v1.7.0
