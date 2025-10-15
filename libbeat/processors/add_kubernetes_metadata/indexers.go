@@ -90,9 +90,7 @@ func NewIndexers(configs PluginConfig, metaGen metadata.MetaGen) *Indexers {
 func (i *Indexers) GetIndexes(pod *kubernetes.Pod) []string {
 	var indexes []string
 	for _, indexer := range i.indexers {
-		for _, i := range indexer.GetIndexes(pod) {
-			indexes = append(indexes, i)
-		}
+		indexes = append(indexes, indexer.GetIndexes(pod)...)
 	}
 	return indexes
 }
@@ -101,9 +99,7 @@ func (i *Indexers) GetIndexes(pod *kubernetes.Pod) []string {
 func (i *Indexers) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	var metadata []MetadataIndex
 	for _, indexer := range i.indexers {
-		for _, m := range indexer.GetMetadata(pod) {
-			metadata = append(metadata, m)
-		}
+		metadata = append(metadata, indexer.GetMetadata(pod)...)
 	}
 	return metadata
 }
