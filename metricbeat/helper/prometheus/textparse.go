@@ -481,8 +481,12 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 	// Fallback to text/plain if content type is blank or unrecognized.
 	parser, err := textparse.New(b, contentType, textMediaType, false, false, false, labels.NewSymbolTable())
 	// This check allows to continue where the content type is blank/invalid but the parser is non-nil. Returns error on all other cases.
-	if err != nil && parser == nil {
+	if parser == nil {
 		return nil, err
+	}
+
+	if err != nil {
+		logger.Debugf("Parser created with fallback type. Original error: %v", err)
 	}
 
 	var (
