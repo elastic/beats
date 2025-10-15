@@ -111,7 +111,7 @@ var logInputExclusiveKeys = []string{
 	"tail_files",
 }
 
-// convertConfig convert the Log input configuration to Filestream.
+// convertConfig converts the Log input configuration to Filestream.
 func convertConfig(logger *logp.Logger, cfg *config.C) (*config.C, error) {
 	newCfg := config.NewConfig()
 
