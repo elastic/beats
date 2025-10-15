@@ -168,9 +168,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// Create events based on listMetricDetailTotal from configuration
 	if len(listMetricDetailTotal.metricsWithStats) != 0 {
-		for _, regionName := range m.MetricSet.RegionsList {
+		for _, regionName := range m.RegionsList {
 			m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
-			beatsConfig := m.MetricSet.AwsConfig.Copy()
+			beatsConfig := m.AwsConfig.Copy()
 			beatsConfig.Region = regionName
 			APIClients, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
 			if err != nil {
@@ -192,9 +192,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	// Create events based on namespaceDetailTotal from configuration
-	for _, regionName := range m.MetricSet.RegionsList {
+	for _, regionName := range m.RegionsList {
 		m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
-		beatsConfig := m.MetricSet.AwsConfig.Copy()
+		beatsConfig := m.AwsConfig.Copy()
 		beatsConfig.Region = regionName
 
 		APIClients, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
@@ -420,14 +420,14 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 			}
 
 			if config.ResourceType != "" {
-				resourceTypesWithTags[config.ResourceType] = m.MetricSet.TagsFilter
+				resourceTypesWithTags[config.ResourceType] = m.TagsFilter
 			}
 			continue
 		}
 
 		configPerNamespace := namespaceDetail{
 			names:              config.MetricName,
-			tags:               m.MetricSet.TagsFilter,
+			tags:               m.TagsFilter,
 			statistics:         config.Statistic,
 			resourceTypeFilter: config.ResourceType,
 			dimensions:         cloudwatchDimensions,
@@ -579,7 +579,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 					continue
 				}
 
-				identifierValue := labels[aws.LabelConst.IdentifierValueIdx] + fmt.Sprint("-", valI)
+				identifierValue := labels[aws.LabelConst.AccountIdIdx] + "-" + labels[aws.LabelConst.IdentifierValueIdx] + fmt.Sprint("-", valI)
 				if _, ok := events[identifierValue]; !ok {
 					events[identifierValue] = aws.InitEvent(regionName, labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], metricDataResult.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
 				}
@@ -640,7 +640,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				}
 
 				identifierValue := labels[aws.LabelConst.IdentifierValueIdx]
-				uniqueIdentifierValue := identifierValue + fmt.Sprint("-", valI)
+				uniqueIdentifierValue := labels[aws.LabelConst.AccountIdIdx] + "-" + identifierValue + fmt.Sprint("-", valI)
 
 				// add tags to event based on identifierValue
 				// Check if identifier includes dimensionSeparator (comma in this case),
