@@ -53,8 +53,6 @@ func (gs *GlobalState) Update() {
 	gs.Lock.Lock()
 	defer gs.Lock.Unlock()
 
-	log.Println("Updating amcache GlobalState")
-
 	// Reload the registry and repopulate all caches.
 	registry, err := tables.LoadRegistry(gs.Config.HivePath)
 	if err != nil {

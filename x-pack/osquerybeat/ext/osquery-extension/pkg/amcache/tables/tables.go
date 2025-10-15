@@ -168,7 +168,6 @@ func GetConstraintsFromQueryContext(fieldName string, context table.QueryContext
 	for name, cList := range context.Constraints {
 		if len(cList.Constraints) > 0 && name == fieldName {
 			for _, c := range cList.Constraints {
-				log.Printf("%s Query constraint: %d %s", fieldName, c.Operator, c.Expression)
 				if c.Operator != table.OperatorEquals {
 					log.Printf("Warning: only '=' operator is supported for %s constraints, skipping %d", fieldName, c.Operator)
 					continue
