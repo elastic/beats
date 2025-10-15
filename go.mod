@@ -180,7 +180,6 @@ require (
 	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.22.0
-	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20250603175145-7672917f26b6
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
@@ -237,17 +236,15 @@ require (
 
 require (
 	github.com/apache/arrow/go/v17 v17.0.0
+	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.3.0
 	github.com/otiai10/copy v1.14.1
 	go.opentelemetry.io/collector/client v1.41.0
 	go.opentelemetry.io/collector/component/componenttest v0.135.0
 	go.opentelemetry.io/collector/consumer/consumertest v0.135.0
 	go.opentelemetry.io/collector/processor v1.41.0
-<<<<<<< HEAD
 	go.opentelemetry.io/collector/processor/processorhelper v0.135.0
-=======
 	go.opentelemetry.io/otel/sdk/metric v1.38.0
->>>>>>> 240cb8905 ([9.1] Sync mock-es library with main (#47089))
 	go.uber.org/goleak v1.3.0
 )
 
