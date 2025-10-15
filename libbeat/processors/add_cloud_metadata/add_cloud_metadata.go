@@ -96,8 +96,8 @@ func (r result) String() string {
 }
 
 func (p *addCloudMetadata) init() {
-	p.initOnce.Do(func() {
-		defer close(p.initDone)
+	p.initOnce.Do(func() { // fetch metadata only once
+		defer close(p.initDone) // signal that init() completed
 		result := p.fetchMetadata()
 		if result == nil {
 			p.logger.Info("add_cloud_metadata: hosting provider type not detected.")
