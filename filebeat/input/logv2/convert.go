@@ -307,7 +307,7 @@ func handleJSON(logger *logp.Logger, cfg *config.C, parsers *[]any) error {
 	// need to be converted to Filestream configuration format
 	count, err := jsonCfg.CountField("")
 	if err != nil || count == 0 {
-		return nil
+		return nil //nolint:nilerr // On invalid config nothing and return.
 	}
 
 	keysUnderRoot, err := jsonCfg.Bool("keys_under_root", -1)
