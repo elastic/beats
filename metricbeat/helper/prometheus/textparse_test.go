@@ -934,6 +934,7 @@ process_cpu_total 4200722.46
 		{"plain", "text/plain", false},
 		{"plain_charset", "text/plain; charset=utf-8", false},
 		{"plain_version_0_0_4", "text/plain; version=0.0.4; charset=utf-8", false},
+		{"plain_version_1.0.0", "text/plain; version=1.0.0; charset=utf-8", false},
 		{"json", "application/json", false},
 		{"html", "text/html; charset=utf-8", false},
 		{"empty_content_type", "", false},
