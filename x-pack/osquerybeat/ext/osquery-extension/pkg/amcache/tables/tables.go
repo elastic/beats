@@ -7,14 +7,14 @@
 package tables
 
 import (
-	"log"
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/forensicanalysis/fslib"
 	"github.com/forensicanalysis/fslib/systemfs"
 	"github.com/osquery/osquery-go/plugin/table"
 	"io/fs"
+	"log"
 	"os"
 	"strings"
 	"www.velocidex.com/golang/regparser"

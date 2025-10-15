@@ -9,8 +9,8 @@ package tables
 import (
 	"context"
 	"fmt"
-	"log"
 	"github.com/osquery/osquery-go/plugin/table"
+	"log"
 	"www.velocidex.com/golang/regparser"
 )
 

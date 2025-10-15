@@ -8,9 +8,9 @@ package tables
 
 import (
 	"context"
-	"testing"
-	"github.com/osquery/osquery-go/plugin/table"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/testdata"
+	"github.com/osquery/osquery-go/plugin/table"
+	"testing"
 	"www.velocidex.com/golang/regparser"
 )
 
@@ -41,6 +41,7 @@ func GetFilteredEntries(getEntriesFunc func(*regparser.Registry) (map[string][]E
 }
 
 type MockGlobalState struct{}
+
 func (m *MockGlobalState) GetApplicationEntries(hashes ...string) []Entry {
 	return GetFilteredEntries(GetApplicationEntriesFromRegistry, hashes...)
 }
@@ -56,7 +57,6 @@ func (m *MockGlobalState) GetDriverBinaryEntries(hashes ...string) []Entry {
 func (m *MockGlobalState) GetDevicePnpEntries(hashes ...string) []Entry {
 	return GetFilteredEntries(GetDevicePnpEntriesFromRegistry, hashes...)
 }
-
 
 func TestTables(t *testing.T) {
 	mockState := &MockGlobalState{}
@@ -91,5 +91,3 @@ func TestTables(t *testing.T) {
 		})
 	}
 }
-
-

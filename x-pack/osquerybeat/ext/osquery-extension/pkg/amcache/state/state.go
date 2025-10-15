@@ -40,7 +40,7 @@ type GlobalState struct {
 
 // Global variables for the gInstance and a mutex to protect it.
 var (
-	gInstance     *GlobalState = &GlobalState{Config: &Config{HivePath: defaultHivePath, ExpirationDuration: defaultExpirationDuration}}
+	gInstance *GlobalState = &GlobalState{Config: &Config{HivePath: defaultHivePath, ExpirationDuration: defaultExpirationDuration}}
 )
 
 // GetGlobalState is the public accessor for the singleton.

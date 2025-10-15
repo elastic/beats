@@ -72,7 +72,7 @@ func TestCachingBehavior(t *testing.T) {
 	// Calling the accessor functions again should not cause an update since it has not expired
 	// Additionally they should all return results
 	for _, accessFunc := range accessors {
-		if (len(accessFunc()) == 0) {
+		if len(accessFunc()) == 0 {
 			t.Errorf("Expected accessor function to return results, got 0")
 		}
 	}
@@ -84,7 +84,7 @@ func TestCachingBehavior(t *testing.T) {
 	// Simulate expiration by setting LastUpdated back in time
 	expiredTime := instance.LastUpdated.Add(-instance.Config.ExpirationDuration * 2)
 	instance.LastUpdated = expiredTime
-	
+
 	// Validate that lastUpdated is indeed in the past
 	if !instance.LastUpdated.Before(previousUpdate) {
 		t.Errorf("Expected lastUpdated to be before previousUpdate after manual expiration, got %v", instance.LastUpdated)

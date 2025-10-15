@@ -9,8 +9,8 @@ package testdata
 import (
 	"log"
 	"os"
-	"runtime"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
