@@ -29,6 +29,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -47,8 +48,10 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
 	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/elastic/mock-es/pkg/api"
 )
 
 type BeatProc struct {
@@ -1093,6 +1096,83 @@ func (b *BeatProc) CountFileLines(glob string) int {
 // ConfigFilePath returns the config file path
 func (b *BeatProc) ConfigFilePath() string {
 	return b.configFile
+}
+
+// StartMockES starts mock-es on the specified address.
+// If add is an empty string a random local port is used.
+// The return values are:
+//   - The HTTP server
+//   - The server address in the form http://ip:port
+//   - The mock-es API handler
+//   - The ManualReader for accessing the metrics
+func StartMockES(
+	t *testing.T,
+	addr string,
+	percentDuplicate,
+	percentTooMany,
+	percentNonIndex,
+	percentTooLarge,
+	historyCap uint,
+) (*http.Server, string, *api.APIHandler, *sdkmetric.ManualReader) {
+
+	uid := uuid.Must(uuid.NewV4())
+
+	rdr := sdkmetric.NewManualReader()
+	provider := sdkmetric.NewMeterProvider(
+		sdkmetric.WithReader(rdr),
+	)
+
+	es := api.NewAPIHandler(
+		uid,
+		t.Name(),
+		provider,
+		time.Now().Add(24*time.Hour),
+		0,
+		percentDuplicate,
+		percentTooMany,
+		percentNonIndex,
+		percentTooLarge,
+		historyCap,
+	)
+
+	if addr == "" {
+		addr = "localhost:0"
+	}
+
+	l, err := net.Listen("tcp", addr)
+	if err != nil {
+		if l, err = net.Listen("tcp6", addr); err != nil {
+			t.Fatalf("failed to listen on a port: %v", err)
+		}
+	}
+
+	addr = l.Addr().String()
+	s := http.Server{Handler: es, ReadHeaderTimeout: time.Second}
+	go func() {
+		if err := s.Serve(l); !errors.Is(err, http.ErrServerClosed) {
+			t.Errorf("could not start mock-es server: %s", err)
+		}
+	}()
+
+	serverURL := "http://" + addr
+	// Ensure the Server is up and running before returning
+	require.Eventually(
+		t,
+		func() bool {
+			resp, err := http.Get(serverURL) //nolint:gosec,noctx // It's just a test
+			if err != nil {
+				return false
+			}
+			//nolint: errcheck // We're just draining the body, we can ignore the error
+			io.Copy(io.Discard, resp.Body)
+			resp.Body.Close()
+			return true
+		},
+		time.Second,
+		time.Millisecond,
+		"mock-es server did not start on '%s'", addr)
+
+	return &s, serverURL, es, rdr
 }
 
 // WaitPublishedEvents waits until the desired number of events
