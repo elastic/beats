@@ -344,9 +344,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	reg := b.Monitoring.StatsRegistry().GetOrCreateRegistry("libbeat")
 
-<<<<<<< HEAD
-	err = metricreport.SetupMetrics(b.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion())
-=======
 	err = metricreport.SetupMetricsOptions(metricreport.MetricOptions{
 		Name:           b.Info.Beat,
 		Version:        version.GetDefaultVersion(),
@@ -355,7 +352,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		SystemMetrics:  monitoring.Default.GetOrCreateRegistry("system"),
 		ProcessMetrics: monitoring.Default.GetOrCreateRegistry("beat"),
 	})
->>>>>>> 2d5086e12 ([libbeat] use SetupMetricsOptions instead of SetupMetrics (#46313))
 	if err != nil {
 		return nil, err
 	}
