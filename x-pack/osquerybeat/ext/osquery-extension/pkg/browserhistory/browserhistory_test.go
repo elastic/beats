@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/osquery/osquery-go/plugin/table"
 )
@@ -767,6 +768,126 @@ func TestTimestampConstraints(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+// TestDatetimeFiltering tests filtering using datetime field with RFC3339 format
+func TestDatetimeFiltering(t *testing.T) {
+	testDataDir := getTestDataDir(t)
+	ctx := context.Background()
+
+	for browser, profiles := range expectedTimestamps {
+		for profile, timestamps := range profiles {
+			if len(timestamps) == 0 {
+				continue
+			}
+
+			t.Run(browser+"/"+profile, func(t *testing.T) {
+				// Test equals with RFC3339 format
+				earliestTime := timestamps[0]
+				rfc3339Time := time.Unix(earliestTime, 0).UTC().Format(time.RFC3339)
+
+				queryContext := table.QueryContext{
+					Constraints: map[string]table.ConstraintList{
+						"custom_data_dir": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorGlob, Expression: filepath.Join(testDataDir, "*")},
+							},
+						},
+						"browser": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: browser},
+							},
+						},
+						"profile_name": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: profile},
+							},
+						},
+						"datetime": {
+							Constraints: []table.Constraint{
+								{Operator: table.OperatorEquals, Expression: rfc3339Time},
+							},
+						},
+					},
+				}
+
+				rows, err := GetTableRows(ctx, queryContext, getTestLog())
+				if err != nil {
+					t.Fatalf("GetTableRows returned error: %v", err)
+				}
+
+				if len(rows) == 0 {
+					t.Error("Expected at least one row for datetime equals filter")
+					return
+				}
+
+				// Verify datetime field is present and parseable for all rows
+				for _, row := range rows {
+					// Verify datetime field is present and parseable
+					if dt := row["datetime"]; dt != "" {
+						if _, err := time.Parse(time.RFC3339, dt); err != nil {
+							t.Errorf("Invalid RFC3339 datetime in result: %s", dt)
+						}
+					} else {
+						t.Error("Expected datetime field to be present")
+					}
+				}
+
+				// Test greater than or equals with RFC3339 format (simpler boundary test)
+				if len(timestamps) > 1 {
+					earliestRFC3339 := time.Unix(earliestTime, 0).UTC().Format(time.RFC3339)
+
+					queryContext.Constraints["datetime"] = table.ConstraintList{
+						Constraints: []table.Constraint{
+							{Operator: table.OperatorGreaterThanOrEquals, Expression: earliestRFC3339},
+						},
+					}
+
+					rows, err := GetTableRows(ctx, queryContext, getTestLog())
+					if err != nil {
+						t.Fatalf("GetTableRows returned error for >= filter: %v", err)
+					}
+
+					if len(rows) == 0 {
+						t.Error("Expected at least one row for datetime >= filter")
+					}
+
+					// Verify all returned timestamps are >= earliestTime
+					for _, row := range rows {
+						if ts, err := strconv.ParseInt(row["timestamp"], 10, 64); err == nil {
+							if ts < earliestTime {
+								t.Errorf("Expected timestamp >= %d, got %d", earliestTime, ts)
+							}
+						}
+					}
+				}
+
+				// Test less than or equals with RFC3339 format
+				latestTime := timestamps[len(timestamps)-1]
+				latestRFC3339 := time.Unix(latestTime, 0).UTC().Format(time.RFC3339)
+
+				queryContext.Constraints["datetime"] = table.ConstraintList{
+					Constraints: []table.Constraint{
+						{Operator: table.OperatorLessThanOrEquals, Expression: latestRFC3339},
+					},
+				}
+
+				rows, err = GetTableRows(ctx, queryContext, getTestLog())
+				if err != nil {
+					t.Fatalf("GetTableRows returned error for <= filter: %v", err)
+				}
+
+				// Verify all returned timestamps are <= latestTime
+				for _, row := range rows {
+					if ts, err := strconv.ParseInt(row["timestamp"], 10, 64); err == nil {
+						if ts > latestTime {
+							t.Errorf("Expected timestamp <= %d, got %d", latestTime, ts)
+						}
+					}
+				}
+			})
+		}
 	}
 }
 
