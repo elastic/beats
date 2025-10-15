@@ -488,7 +488,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 
 		}
 
-		return nil, fmt.Errorf("no parser returned for contentType %q (err=%v)", contentType, err)
+		return nil, fmt.Errorf("no parser returned for contentType %q", contentType)
 	}
 
 	var (
