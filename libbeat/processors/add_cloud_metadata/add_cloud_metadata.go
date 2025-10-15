@@ -132,7 +132,7 @@ func (p *addCloudMetadata) String() string {
 	select {
 	case <-p.initDone:
 		// init() completed
-		metadataStr = p.metadata.String()
+		metadataStr = p.getMeta().String()
 	default:
 	}
 	return "add_cloud_metadata=" + metadataStr
