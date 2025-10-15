@@ -301,24 +301,30 @@ func handleJSON(logger *logp.Logger, cfg *config.C, parsers *[]any) error {
 		return nil
 	}
 
+	// If jsonCfg has no elements (it's empty) or if there is any error
+	// trying to read the number of element, return.
+	// Any error here means an malformed config, therefore it does not
+	// need to be converted to Filestream configuration format
 	count, err := jsonCfg.CountField("")
-	if err == nil && count != 0 {
-		keysUnderRoot, err := jsonCfg.Bool("keys_under_root", -1)
-		if err != nil {
-			logger.Warnf(
-				"cannot read 'json.keys_under_root' as boolean: %s, ignoring malformed config entry ",
-				err,
-			)
-		}
-
-		if !keysUnderRoot {
-			if err := jsonCfg.SetString("target", -1, "json"); err != nil {
-				return fmt.Errorf("cannot set 'target' in the ndjson parser: %w", err)
-			}
-		}
-
-		*parsers = append(*parsers, map[string]any{"ndjson": jsonCfg})
+	if err != nil || count == 0 {
+		return nil
 	}
+
+	keysUnderRoot, err := jsonCfg.Bool("keys_under_root", -1)
+	if err != nil {
+		logger.Warnf(
+			"cannot read 'json.keys_under_root' as boolean: %s, ignoring malformed config entry ",
+			err,
+		)
+	}
+
+	if !keysUnderRoot {
+		if err := jsonCfg.SetString("target", -1, "json"); err != nil {
+			return fmt.Errorf("cannot set 'target' in the ndjson parser: %w", err)
+		}
+	}
+
+	*parsers = append(*parsers, map[string]any{"ndjson": jsonCfg})
 
 	return nil
 }
