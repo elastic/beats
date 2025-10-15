@@ -168,7 +168,7 @@ func DefaultGoTestIntegrationArgs(ctx context.Context) GoTestArgs {
 	args := makeGoTestArgs("Integration")
 	args.Tags = append(args.Tags, "integration")
 
-	cmdCtx, cmdCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	cmdCtx, cmdCancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cmdCancel()
 
 	synth := exec.CommandContext(cmdCtx, "npx", "@elastic/synthetics", "-h")
