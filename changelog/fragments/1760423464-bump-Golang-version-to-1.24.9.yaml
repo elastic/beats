@@ -11,7 +11,7 @@
 kind: other
 
 # Change summary; a 80ish characters long description of the change.
-summary: bump Golang version to 1.24.8
+summary: bump Golang version to 1.24.9
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
