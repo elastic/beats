@@ -156,36 +156,6 @@ logging.level: debug
 		"did not find 'mockbeat start running' log again")
 }
 
-<<<<<<< HEAD
-func startMockES(t *testing.T, addr string) (*http.Server, metrics.Registry) {
-	uid := uuid.Must(uuid.NewV4())
-	mr := metrics.NewRegistry()
-	es := api.NewAPIHandler(uid, "foo2", mr, time.Now().Add(24*time.Hour), 0, 0, 0, 0, 0)
-
-	s := http.Server{Addr: addr, Handler: es, ReadHeaderTimeout: time.Second}
-	go func() {
-		if err := s.ListenAndServe(); !errors.Is(http.ErrServerClosed, err) {
-			t.Errorf("could not start mock-es server: %s", err)
-		}
-	}()
-
-	require.Eventually(t, func() bool {
-		resp, err := http.Get("http://" + addr) //nolint:noctx // It's just a test
-		if err != nil {
-			//nolint:errcheck // We're just draining the body, we can ignore the error
-			io.Copy(io.Discard, resp.Body)
-			resp.Body.Close()
-			return false
-		}
-		return true
-	},
-		time.Second, time.Millisecond, "mock-es server did not start on '%s'", addr)
-
-	return &s, mr
-}
-
-=======
->>>>>>> 240cb8905 ([9.1] Sync mock-es library with main (#47089))
 // waitForEventToBePublished waits for at least one event published
 // by inspecting the count for `bulk.create.total` in `mr`. Once
 // the counter is > 1, waitForEventToBePublished returns. If that
