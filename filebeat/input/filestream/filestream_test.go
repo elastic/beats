@@ -223,6 +223,8 @@ func TestShouldBeClosedInactiveAndModified(t *testing.T) {
 		t.Fatalf("cannot create temp file: %s", err)
 	}
 
+	t.Cleanup(func() { file.Close() })
+
 	if _, err := file.WriteString("foo"); err != nil {
 		t.Fatalf("cannot write to file: %s", err)
 	}
