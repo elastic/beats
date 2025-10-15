@@ -49,7 +49,8 @@ type configField struct {
 	kind configType
 }
 
-// inputConvTable conversion table for the log input configuration
+// inputConvTable is a conversion table from the Log input configuration
+// to their Filestream equivalent.
 var inputConvTable = map[string]configField{
 	"backoff":                {fsName: "backoff.init", kind: ConfTypeString},
 	"clean_inactive":         {fsName: "clean_inactive", kind: ConfTypeString},
@@ -229,10 +230,10 @@ func translateField(logger *logp.Logger, cfg, newCfg *config.C, key string, kind
 	return nil
 }
 
-// handleMultilne converts the multiline configuration. There is at least one
+// handleMultiline converts the multiline configuration. There is at least one
 // field in the multiline configuration that cannot be directly copied, so
 // we have to call [translateField].
-func handleMultilne(logger *logp.Logger, cfg *config.C, parsers *[]any) error {
+func handleMultiline(logger *logp.Logger, cfg *config.C, parsers *[]any) error {
 	hasMultiline, err := cfg.Has("multiline", -1)
 	if err != nil {
 		return fmt.Errorf("cannot access 'multiline' field: %w", err)
@@ -255,29 +256,29 @@ func handleMultilne(logger *logp.Logger, cfg *config.C, parsers *[]any) error {
 		return nil
 	}
 
-	// Ensure multiline is not an empty entry
-	if count > 0 {
-		for key, kind := range multilineConvTable {
-			has, err := multilineCfg.Has(key, -1)
-			if err != nil {
-				return fmt.Errorf("cannot read 'multiline.%s': %w", key, err)
-			}
-
-			if !has {
-				continue
-			}
-
-			if err := translateField(logger, multilineCfg, newMultilineCfg, key, kind); err != nil {
-				return err
-			}
-		}
-
-		*parsers = append(*parsers, map[string]any{
-			"multiline": multilineCfg,
-		})
-
+	// Return early if multiline is an empty entry
+	if count == 0 {
 		return nil
 	}
+
+	for key, kind := range multilineConvTable {
+		has, err := multilineCfg.Has(key, -1)
+		if err != nil {
+			return fmt.Errorf("cannot read 'multiline.%s': %w", key, err)
+		}
+
+		if !has {
+			continue
+		}
+
+		if err := translateField(logger, multilineCfg, newMultilineCfg, key, kind); err != nil {
+			return err
+		}
+	}
+
+	*parsers = append(*parsers, map[string]any{
+		"multiline": multilineCfg,
+	})
 
 	return nil
 }
@@ -355,7 +356,7 @@ func copyParsers(cfg, parsersCfg *config.C, offset int) error {
 // and finally copies any other parsers, if any, at the end of the array.
 func handleParsers(logger *logp.Logger, cfg, newCfg *config.C) error {
 	parsers := []any{}
-	if err := handleMultilne(logger, cfg, &parsers); err != nil {
+	if err := handleMultiline(logger, cfg, &parsers); err != nil {
 		return err
 	}
 
