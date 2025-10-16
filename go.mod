@@ -224,7 +224,7 @@ require (
 	go.opentelemetry.io/collector/consumer/consumererror v0.135.0
 	go.opentelemetry.io/collector/exporter/debugexporter v0.135.0
 	go.opentelemetry.io/collector/otelcol v0.135.0
-	go.opentelemetry.io/collector/pdata v1.43.0
+	go.opentelemetry.io/collector/pdata v1.41.0
 	go.opentelemetry.io/collector/receiver v1.41.0
 	go.uber.org/mock v0.5.0
 	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
@@ -457,7 +457,7 @@ require (
 	go.opentelemetry.io/collector/extension/extensionmiddleware v0.135.0 // indirect
 	go.opentelemetry.io/collector/extension/extensiontest v0.135.0 // indirect
 	go.opentelemetry.io/collector/extension/xextension v0.135.0 // indirect
-	go.opentelemetry.io/collector/featuregate v1.43.0 // indirect
+	go.opentelemetry.io/collector/featuregate v1.41.0 // indirect
 	go.opentelemetry.io/collector/internal/fanoutconsumer v0.135.0 // indirect
 	go.opentelemetry.io/collector/internal/telemetry v0.135.0 // indirect
 	go.opentelemetry.io/collector/pdata/pprofile v0.135.0 // indirect
