@@ -244,7 +244,7 @@ func TestHostParser(t *testing.T) {
 		{"localhost/ServerStatus", "http://localhost/ServerStatus?auto=", ""},
 		{"127.0.0.1", "http://127.0.0.1/server-status?auto=", ""},
 		{"https://127.0.0.1", "https://127.0.0.1/server-status?auto=", ""},
-		{"[2001:db8:0:1]:80", "http://[2001:db8:0:1]:80/server-status?auto=", ""},
+		{"[2001:db8::1]:80", "http://[2001:db8::1]:80/server-status?auto=", ""},
 		{"https://admin:secret@127.0.0.1", "https://admin:secret@127.0.0.1/server-status?auto=", ""},
 	}
 
