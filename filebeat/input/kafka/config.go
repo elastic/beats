@@ -209,6 +209,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	k.MetricRegistry = adapter.GetGoMetrics(
 		monitoring.Default,
 		"filebeat.inputs.kafka",
+		logp.NewLogger(""),
 		adapter.Rename("incoming-byte-rate", "bytes_read"),
 		adapter.Rename("outgoing-byte-rate", "bytes_write"),
 		adapter.GoMetricsNilify,

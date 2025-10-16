@@ -703,11 +703,11 @@ func newInputMetrics(name, id string) *inputMetrics {
 		batchPeriod: metrics.NewUniformSample(1024),
 	}
 	out.name.Set(name)
-	_ = adapter.NewGoMetrics(reg, "received_events_count", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "received_events_count", logp.NewLogger(""), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchSize))
-	_ = adapter.NewGoMetrics(reg, "source_lag_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "source_lag_time", logp.NewLogger(""), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sourceLag))
-	_ = adapter.NewGoMetrics(reg, "batch_read_period", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_read_period", logp.NewLogger(""), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchPeriod))
 
 	return out

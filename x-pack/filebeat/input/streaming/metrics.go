@@ -8,6 +8,7 @@ import (
 	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -42,9 +43,11 @@ func newInputMetrics(id string) *inputMetrics {
 		celProcessingTime:   metrics.NewUniformSample(1024),
 		batchProcessingTime: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "cel_processing_time", adapter.Accept).
+
+	logger := logp.NewLogger("")
+	_ = adapter.NewGoMetrics(reg, "cel_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.celProcessingTime))
-	_ = adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
 
 	return out
