@@ -106,11 +106,7 @@ func (i *Indexers) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 
 // Empty returns true if indexers list is empty
 func (i *Indexers) Empty() bool {
-	if len(i.indexers) == 0 {
-		return true
-	}
-
-	return false
+	return len(i.indexers) == 0
 }
 
 // PodNameIndexer implements default indexer based on pod name
