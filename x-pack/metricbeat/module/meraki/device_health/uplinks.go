@@ -110,7 +110,6 @@ func getDeviceUplinks(client *sdk.Client, organizationID string, devices map[Ser
 		doApplianceRequest,
 		onApplianceError,
 		onApplianceSuccess,
-		logger,
 	).GetAllPages()
 
 	if err != nil {
@@ -175,7 +174,6 @@ func getDeviceUplinks(client *sdk.Client, organizationID string, devices map[Ser
 		doCellularRequest,
 		onCellularError,
 		onCellularSuccess,
-		logger,
 	).GetAllPages()
 
 	return err

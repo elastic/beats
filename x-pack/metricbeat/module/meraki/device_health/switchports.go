@@ -87,7 +87,6 @@ func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map
 		doRequest,
 		onError,
 		onSuccess,
-		logger,
 	).GetAllPages()
 
 	return err

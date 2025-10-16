@@ -89,7 +89,6 @@ func getDevices(client OrganizationsClient, organizationID string, logger *logp.
 		doRequest,
 		onError,
 		onSuccess,
-		logger,
 	).GetAllPages()
 
 	return devices, err
@@ -130,7 +129,6 @@ func getDeviceStatuses(client *sdk.Client, organizationID string, devices map[Se
 		doRequest,
 		onError,
 		onSuccess,
-		logger,
 	).GetAllPages()
 
 	return err
@@ -283,7 +281,6 @@ func getDeviceLicenses(client *sdk.Client, organizationID string, devices map[Se
 		doRequest,
 		onError,
 		onSuccess,
-		logger,
 	).GetAllPages()
 
 	return err
