@@ -37,6 +37,7 @@ type Device struct {
 	switchports []*switchport
 }
 
+<<<<<<< HEAD
 func getDevices(client *meraki.Client, organizationID string) (map[Serial]*Device, error) {
 	val, res, err := client.Organizations.GetOrganizationDevices(organizationID, &meraki.GetOrganizationDevicesQueryParams{})
 
@@ -60,26 +61,104 @@ func getDevices(client *meraki.Client, organizationID string) (map[Serial]*Devic
 
 func getDeviceStatuses(client *meraki.Client, organizationID string, devices map[Serial]*Device) error {
 	val, res, err := client.Organizations.GetOrganizationDevicesStatuses(organizationID, &meraki.GetOrganizationDevicesStatusesQueryParams{})
+=======
+type OrganizationsClient interface {
+	GetOrganizationDevices(organizationID string, params *sdk.GetOrganizationDevicesQueryParams) (*sdk.ResponseOrganizationsGetOrganizationDevices, *resty.Response, error)
+}
 
-	if err != nil {
+var _ OrganizationsClient = (*sdk.OrganizationsService)(nil)
+>>>>>>> 9db5eebed ([cisco_meraki_metrics] Add pagination support for `device_health` metricset (#46938))
+
+type OrganizationsServiceWrapper struct {
+	service *sdk.OrganizationsService
+}
+
+func (w *OrganizationsServiceWrapper) GetOrganizationDevices(organizationID string, params *sdk.GetOrganizationDevicesQueryParams) (*sdk.ResponseOrganizationsGetOrganizationDevices, *resty.Response, error) {
+	return w.service.GetOrganizationDevices(organizationID, params)
+}
+
+func getDevices(client OrganizationsClient, organizationID string, logger *logp.Logger) (map[Serial]*Device, error) {
+	devices := make(map[Serial]*Device)
+
+	params := &sdk.GetOrganizationDevicesQueryParams{}
+	setStart := func(s string) { params.StartingAfter = s }
+
+	doRequest := func() (*sdk.ResponseOrganizationsGetOrganizationDevices, *resty.Response, error) {
+		logger.Debugf("calling GetOrganizationDevices with params: %+v", params)
+		return client.GetOrganizationDevices(organizationID, params)
+	}
+
+	onError := func(err error, res *resty.Response) error {
+		if res != nil {
+			return fmt.Errorf("GetOrganizationDevices failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return fmt.Errorf("GetOrganizationDevices failed; %w", err)
+	}
+
+	onSuccess := func(val *sdk.ResponseOrganizationsGetOrganizationDevices) error {
+		if val == nil {
+			return errors.New("GetOrganizationDevices returned nil response")
+		}
+
+		for i := range *val {
+			device := (*val)[i]
+			devices[Serial(device.Serial)] = &Device{
+				details: &device,
+			}
+		}
+		return nil
+	}
+
+	err := meraki.NewPaginator(
+		setStart,
+		doRequest,
+		onError,
+		onSuccess,
+		logger,
+	).GetAllPages()
+
+	return devices, err
+}
+
+func getDeviceStatuses(client *sdk.Client, organizationID string, devices map[Serial]*Device, logger *logp.Logger) error {
+	params := &sdk.GetOrganizationDevicesStatusesQueryParams{}
+	setStart := func(s string) { params.StartingAfter = s }
+
+	doRequest := func() (*sdk.ResponseOrganizationsGetOrganizationDevicesStatuses, *resty.Response, error) {
+		logger.Debugf("calling GetOrganizationDevicesStatuses with params: %+v", params)
+		return client.Organizations.GetOrganizationDevicesStatuses(organizationID, params)
+	}
+
+	onError := func(err error, res *resty.Response) error {
 		if res != nil {
 			return fmt.Errorf("GetOrganizationDevicesStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
 		}
 		return fmt.Errorf("GetOrganizationDevicesStatuses failed; %w", err)
 	}
 
-	if val == nil {
-		return errors.New("GetOrganizationDevicesStatuses returned nil response")
-	}
-
-	for i := range *val {
-		status := (*val)[i]
-		if device, ok := devices[Serial(status.Serial)]; ok {
-			device.status = &status
+	onSuccess := func(val *sdk.ResponseOrganizationsGetOrganizationDevicesStatuses) error {
+		if val == nil {
+			return errors.New("GetOrganizationDevicesStatuses returned nil response")
 		}
+
+		for i := range *val {
+			status := (*val)[i]
+			if device, ok := devices[Serial(status.Serial)]; ok {
+				device.status = &status
+			}
+		}
+		return nil
 	}
 
-	return nil
+	err := meraki.NewPaginator(
+		setStart,
+		doRequest,
+		onError,
+		onSuccess,
+		logger,
+	).GetAllPages()
+
+	return err
 }
 
 func getDevicePerformanceScores(logger *logp.Logger, client *meraki.Client, devices map[Serial]*Device) {
@@ -185,9 +264,22 @@ func getDeviceChannelUtilization(client DeviceService, devices map[Serial]*Devic
 	return nil
 }
 
+<<<<<<< HEAD
 func getDeviceLicenses(client *meraki.Client, organizationID string, devices map[Serial]*Device) error {
 	val, res, err := client.Organizations.GetOrganizationLicenses(organizationID, &meraki.GetOrganizationLicensesQueryParams{})
 	if err != nil {
+=======
+func getDeviceLicenses(client *sdk.Client, organizationID string, devices map[Serial]*Device, logger *logp.Logger) error {
+	params := &sdk.GetOrganizationLicensesQueryParams{}
+	setStart := func(s string) { params.StartingAfter = s }
+
+	doRequest := func() (*sdk.ResponseOrganizationsGetOrganizationLicenses, *resty.Response, error) {
+		logger.Debugf("calling GetOrganizationLicenses with params: %+v", params)
+		return client.Organizations.GetOrganizationLicenses(organizationID, params)
+	}
+
+	onError := func(err error, res *resty.Response) error {
+>>>>>>> 9db5eebed ([cisco_meraki_metrics] Add pagination support for `device_health` metricset (#46938))
 		// Ignore 400 error for per-device licensing not supported
 		if res != nil && res.StatusCode() == 400 && strings.Contains(string(res.Body()), "does not support per-device licensing") {
 			return nil
@@ -203,18 +295,29 @@ func getDeviceLicenses(client *meraki.Client, organizationID string, devices map
 		return fmt.Errorf("GetOrganizationLicenses failed; %w", err)
 	}
 
-	if val == nil {
-		return errors.New("GetOrganizationLicenses returned nil response")
-	}
-
-	for i := range *val {
-		license := (*val)[i]
-		if device, ok := devices[Serial(license.DeviceSerial)]; ok {
-			device.license = &license
+	onSuccess := func(val *sdk.ResponseOrganizationsGetOrganizationLicenses) error {
+		if val == nil {
+			return errors.New("GetOrganizationLicenses returned nil response")
 		}
+
+		for i := range *val {
+			license := (*val)[i]
+			if device, ok := devices[Serial(license.DeviceSerial)]; ok {
+				device.license = &license
+			}
+		}
+		return nil
 	}
 
-	return nil
+	err := meraki.NewPaginator(
+		setStart,
+		doRequest,
+		onError,
+		onSuccess,
+		logger,
+	).GetAllPages()
+
+	return err
 }
 
 func deviceDetailsToMapstr(details *meraki.ResponseItemOrganizationsGetOrganizationDevices) mapstr.M {
