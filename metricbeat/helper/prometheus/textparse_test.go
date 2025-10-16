@@ -895,3 +895,69 @@ redis_connected_clients{instance="rough-snowflake-web"} 10.0`
 	}
 	require.ElementsMatch(t, expected, result)
 }
+
+func TestParseMetricFamiliesContentTypes(t *testing.T) {
+	inputPrometheus := `
+# TYPE process_cpu_total counter
+# HELP process_cpu_total Some help.
+process_cpu_total 4.20072246e+06
+`
+
+	inputOpenMetricsType := `# TYPE process_cpu_total counter
+# HELP process_cpu_total Some help.
+process_cpu_total 4200722.46
+# EOF
+`
+
+	expected := []*MetricFamily{
+		{
+			Name: stringp("process_cpu_total"),
+			Help: stringp("Some help."),
+			Type: "counter",
+			Metric: []*OpenMetric{
+				{
+					Label: []*labels.Label{},
+					Name:  stringp("process_cpu_total"),
+					Counter: &Counter{
+						Value: float64p(4.20072246e+06),
+					},
+				},
+			},
+		},
+	}
+
+	tests := []struct {
+		name        string
+		contentType string
+		wantErr     bool
+	}{
+		{"plain", "text/plain", false},
+		{"plain_charset", "text/plain; charset=utf-8", false},
+		{"plain_version_0_0_4", "text/plain; version=0.0.4; charset=utf-8", false},
+		{"plain_version_1.0.0", "text/plain; version=1.0.0; charset=utf-8", false},
+		{"json", "application/json", false},
+		{"html", "text/html; charset=utf-8", false},
+		{"empty_content_type", "", false},
+		{"openmetrics", "application/openmetrics-text", false},
+		{"octet_stream", "application/octet-stream", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			input := inputPrometheus
+
+			if tt.contentType == OpenMetricsType {
+				input = inputOpenMetricsType
+			}
+
+			result, err := ParseMetricFamilies([]byte(input), tt.contentType, time.Now(), logptest.NewTestingLogger(t, "test"))
+			if tt.wantErr {
+				require.Error(t, err, "expected error for %s", tt.contentType)
+				return
+			}
+
+			require.NoError(t, err, "unexpected error for %s", tt.contentType)
+			require.ElementsMatch(t, expected, result)
+		})
+	}
+}
