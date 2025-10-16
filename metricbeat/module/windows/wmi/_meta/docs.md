@@ -1,19 +1,8 @@
----
-mapped_pages:
-  - https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-metricset-windows-wmi.html
----
-
-# Windows wmi metricset [metricbeat-metricset-windows-wmi]
-
 ::::{warning}
 This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
 ::::
 
-<<<<<<< HEAD
-The `wmi` metricset of the Windows module reads metrics via Windows Management Instrumentation  [(WMI)](https://learn.microsoft.com/en-us/windows/win32/wmisdk/about-wmi), a core management technology in the Windows Operating system.
-=======
 The `wmi` metricset of the Windows module reads metrics via [Windows Management Instrumentation](https://learn.microsoft.com/en-us/windows/win32/wmisdk/about-wmi) (WMI), a core management technology in the Windows Operating system.
->>>>>>> f23a53aba (Wmi fix doc based on feedback (#45068))
 
 By leveraging WMI Query Language (WQL), this metricset allows you to extract detailed system information and metrics to monitor the health and performance of Windows Systems.
 
@@ -33,15 +22,10 @@ Currently, the metricset supports queries with `SELECT`, `FROM` and
 When working with WMI queries, it is the user's responsibility to ensure
 that queries are safe, efficient, and do not cause unintended side
 effects. A notorious example of a problematic WMI class is
-<<<<<<< HEAD
-`Win32_Product`. Read more in [Windows
-Documentation](https://support.microsoft.com/kb/974524).
-=======
 `Win32_Product`. Read more in the related [Windows
 documentation](https://learn.microsoft.com/en-us/troubleshoot/windows-server/admin-development/windows-installer-reconfigured-all-applications#more-information).
 ::::
 
->>>>>>> f23a53aba (Wmi fix doc based on feedback (#45068))
 
 ## WMI Arbitrator and Query Execution
 
@@ -131,7 +115,7 @@ threshold. The default is equal to the module's period. See [WMI Arbitrator and
 Query Execution](#wmi-arbitrator-and-query-execution) for more details.
 
 **`wmi.include_query_class`**
-:   If set to `true` the metricset includes the queried class.
+:   If set to `true` the metricset includes the queried class. 
 This is useful if superclasses are queried. The default value is `false`.
 
 **`wmi.include_queries`**
@@ -226,5 +210,4 @@ This module has been tested on the following platforms:
 
 Other Windows versions and architectures may also work but have not been
 explicitly tested.
-
 
