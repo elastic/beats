@@ -238,7 +238,7 @@ func TestOutputIndex(t *testing.T) {
 	}
 	inStream := map[string]any{}
 	outStream := injectIndexStream(dataStreamType, unit, stream, inStream)
-	require.Equal(t, "synthetics-icmp-default", outStream["index"])
+	require.Equal(t, "synthetics-icmp-example", outStream["index"])
 
 	//test Defaults
 	emptyStream := &proto.Stream{DataStream: &proto.DataStream{}}
