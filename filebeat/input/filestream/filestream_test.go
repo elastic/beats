@@ -237,7 +237,7 @@ func TestShouldBeClosedInactiveAndModified(t *testing.T) {
 	}
 
 	if f.shouldBeClosed() {
-		t.Fatal("souldBeClosed must return false when " +
+		t.Fatal("shouldBeClosed must return false when " +
 			"close.on_state_change.inactive is reached and " +
 			"the file has been modified")
 	}
