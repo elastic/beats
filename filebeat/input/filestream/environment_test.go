@@ -88,8 +88,8 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 			defer f.Close()
 
 			data := buff.Bytes()
-			t.Logf("Debug Logs:%s\n", string(data))
-			t.Logf("Logs written to %s", f.Name())
+			t.Logf("First 1024 bytes of debug Logs:%s\n", string(data[:1024]))
+			t.Logf("Full logs written to %s", f.Name())
 			if _, err := f.Write(data); err != nil {
 				t.Logf("could not write log file for debugging: %s", err)
 			}
