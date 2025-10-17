@@ -105,15 +105,9 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	monitoring.NewInt(reg, "events_pipeline_total").Set(10)
 
 	// simulate a duplicated ID in the local and global namespace.
-<<<<<<< HEAD
-	reg = globalRegistry().NewRegistry(inputID)
+	reg = globalRegistry().GetOrCreateRegistry(inputID)
 	monitoring.NewString(reg, "id").Set(inputID)
 	monitoring.NewString(reg, "input").Set(inputType)
-=======
-	reg = globalRegistry().GetOrCreateRegistry(inputID)
-	monitoring.NewString(reg, MetricKeyID).Set(inputID)
-	monitoring.NewString(reg, MetricKeyInput).Set(inputType)
->>>>>>> bf7a7746c (Remove all remaining NewRegistry method calls (#46018))
 	monitoring.NewBool(reg, "should_be_overwritten").Set(true)
 
 	// =========== Input using new API and legacy, global namespace ===========
@@ -150,13 +144,8 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	defer globalRegistry().Remove("another-registry")
 
 	// another input registry missing required information.
-<<<<<<< HEAD
-	reg = globalRegistry().NewRegistry("yet-another-registry")
-	monitoring.NewString(reg, "id").Set("some-id")
-=======
 	reg = globalRegistry().GetOrCreateRegistry("yet-another-registry")
-	monitoring.NewString(reg, MetricKeyID).Set("some-id")
->>>>>>> bf7a7746c (Remove all remaining NewRegistry method calls (#46018))
+	monitoring.NewString(reg, "id").Set("some-id")
 	monitoring.NewInt(reg, "foo3_total").Set(100)
 	defer globalRegistry().Remove("yet-another-registry")
 
