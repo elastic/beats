@@ -102,9 +102,8 @@ func TestNewReceiver(t *testing.T) {
 					FilterMessageSnippet("add_host_metadata").
 					FilterMessageSnippet("add_cloud_metadata").
 					FilterMessageSnippet("add_docker_metadata").
-					FilterMessageSnippet("add_kubernetes_metadata").
-					Len() == 1
-				assert.True(c, processorsLoaded, "processors not loaded")
+					FilterMessageSnippet("add_kubernetes_metadata")
+				assert.Len(t, processorsLoaded.All(), 1, "processors not loaded")
 				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
 				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
@@ -113,6 +112,14 @@ func TestNewReceiver(t *testing.T) {
 }
 
 func BenchmarkFactory(b *testing.B) {
+	for _, level := range []zapcore.Level{zapcore.InfoLevel, zapcore.DebugLevel} {
+		b.Run(level.String(), func(b *testing.B) {
+			benchmarkFactoryWithLogLevel(b, level)
+		})
+	}
+}
+
+func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
@@ -131,7 +138,7 @@ func BenchmarkFactory(b *testing.B) {
 				"otelconsumer": map[string]any{},
 			},
 			"logging": map[string]any{
-				"level": "info",
+				"level": level.String(),
 				"selectors": []string{
 					"*",
 				},
@@ -144,7 +151,7 @@ func BenchmarkFactory(b *testing.B) {
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		zapcore.Lock(zapcore.AddSync(&zapLogs)),
-		zapcore.InfoLevel)
+		level)
 
 	factory := NewFactory()
 
@@ -420,6 +427,118 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 	return true
 }
 
+<<<<<<< HEAD
+=======
+type logGenerator struct {
+	t           *testing.T
+	tmpDir      string
+	f           *os.File
+	filePattern string
+	sequenceNum int64
+}
+
+func newLogGenerator(t *testing.T, tmpDir string) *logGenerator {
+	return &logGenerator{
+		t:           t,
+		tmpDir:      tmpDir,
+		filePattern: "input-*.log",
+	}
+}
+
+func (g *logGenerator) Start() {
+	f, err := os.CreateTemp(g.tmpDir, g.filePattern)
+	require.NoError(g.t, err)
+	g.f = f
+}
+
+func (g *logGenerator) Stop() {
+	require.NoError(g.t, g.f.Close())
+}
+
+func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
+	id := receivertest.UniqueIDAttrVal(strconv.FormatInt(atomic.AddInt64(&g.sequenceNum, 1), 10))
+
+	_, err := fmt.Fprintln(g.f, `{"id": "`+id+`", "message": "log message"}`)
+	require.NoError(g.t, err, "failed to write log line to file")
+	require.NoError(g.t, g.f.Sync(), "failed to sync log file")
+
+	return []receivertest.UniqueIDAttrVal{id}
+}
+
+// TestConsumeContract tests the ConsumeLogs contract for otelconsumer.
+//
+// The following scenarios are tested:
+// - Always succeed. We expect all data passed to ConsumeLogs to be delivered.
+// - Random non-permanent error. We expect the batch to be retried.
+// - Random permanent error. We expect the batch to be dropped.
+// - Random error. We expect the batch to be retried or dropped based on the error type.
+func TestConsumeContract(t *testing.T) {
+	t.Skip("flaky test, see https://github.com/elastic/beats/issues/46437")
+
+	defer oteltest.VerifyNoLeaks(t)
+
+	tmpDir := t.TempDir()
+	const logsPerTest = 100
+
+	gen := newLogGenerator(t, tmpDir)
+
+	t.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
+
+	cfg := &Config{
+		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
+					{
+						"type":    "filestream",
+						"id":      "filestream-test",
+						"enabled": true,
+						"paths": []string{
+							filepath.Join(tmpDir, "input-*.log"),
+						},
+						"file_identity.native": map[string]any{},
+						"prospector": map[string]any{
+							"scanner": map[string]any{
+								"fingerprint.enabled": false,
+								"check_interval":      "0.1s",
+							},
+						},
+						"parsers": []map[string]any{
+							{
+								"ndjson": map[string]any{
+									"document_id": "id",
+								},
+							},
+						},
+					},
+				},
+			},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
+			},
+			"logging": map[string]any{
+				"level": "debug",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home": tmpDir,
+			"path.logs": tmpDir,
+		},
+	}
+
+	// Run the contract checker. This will trigger test failures if any problems are found.
+	receivertest.CheckConsumeContract(receivertest.CheckConsumeContractParams{
+		T:             t,
+		Factory:       NewFactory(),
+		Signal:        pipeline.SignalLogs,
+		Config:        cfg,
+		Generator:     gen,
+		GenerateCount: logsPerTest,
+	})
+}
+
+>>>>>>> 8879ddadf (fix: add_cloud_metadata: Do not block on String() (#47058))
 func TestReceiverHook(t *testing.T) {
 	cfg := Config{
 		Beatconfig: map[string]any{
