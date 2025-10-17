@@ -526,8 +526,68 @@ func TestFQDNEventSync(t *testing.T) {
 			checkWait.Done()
 		}()
 	}
+<<<<<<< HEAD
 	t.Logf("Waiting for runners to return...")
 	checkWait.Wait()
+=======
+	// Start several goroutines to call the processor in parallel
+	for range processingGoroutineCount {
+		wg.Add(1)
+		go processEvents()
+	}
+
+	// Wait until at least some events have gone through.
+	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		assert.Greater(collect, eventCount.Load(), int32(0))
+	}, time.Second*5, time.Millisecond)
+
+	// we should still have a single data reload since any requests should
+	// use the cache until the FQDN flag changes.
+	assert.Equal(t, int64(1), info.HostInfoRequestCount.Load())
+	assert.Equal(t, int64(0), info.FQDNRequestCount.Load())
+
+	// update
+	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+		"features.fqdn.enabled": true,
+	}))
+	require.NoError(t, err)
+
+	t.Logf("updated FQDN")
+
+	// we should have reloaded the data once
+	// note that with fqdn enabled, we still fetch the host info
+	var previousEventCount = eventCount.Load()
+	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		// Causality: there can be up to processingGoroutineCount pending
+		// increments of eventCount from Run calls that already finished.
+		// To guarantee that at least one run has happened since the
+		// feature flag change, our event count must go up by _more_
+		// than that.
+		assert.Greater(collect, eventCount.Load(), previousEventCount+processingGoroutineCount)
+	}, time.Second*5, time.Millisecond)
+
+	// The FQDN flag has changed to true, there should be an additional host
+	// info request for the FQDN case, as well as an FQDN request.
+	assert.Equal(t, int64(2), info.HostInfoRequestCount.Load())
+	assert.Equal(t, int64(1), info.FQDNRequestCount.Load())
+
+	// update back to the original value
+	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+		"features.fqdn.enabled": false,
+	}))
+	require.NoError(t, err)
+
+	// we should have reloaded the data once more
+	previousEventCount = eventCount.Load()
+	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		assert.Greater(collect, eventCount.Load(), previousEventCount+processingGoroutineCount)
+	}, time.Second*5, time.Millisecond)
+
+	// Both values should be unchanged, including host info requests, because
+	// it can still use the cached value from the original non-FQDN lookup.
+	assert.Equal(t, int64(2), info.HostInfoRequestCount.Load())
+	assert.Equal(t, int64(1), info.FQDNRequestCount.Load())
+>>>>>>> 3dd2c38ef (Fix race in add_host_metadata unit test (#47192))
 }
 
 func TestFQDNLookup(t *testing.T) {
