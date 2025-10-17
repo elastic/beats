@@ -37,7 +37,7 @@ type serverTLSOption struct {
 
 // TestLumberjackConnection tests exporter connections with different TLS settings
 func TestLumberjackConnection(t *testing.T) {
-	const testPassphrase = "do-re-mi-fa-so-la-ti-do"
+	const testPassphrase = "do-re-mi-fa-so-la-ti-do" // #nosec G101
 	caFile := caFilePath(t)
 	invalidCAFile := invalidCAFilePath(t)
 
@@ -243,6 +243,7 @@ func newServerTLSConfig(t *testing.T, option serverTLSOption) *tls.Config {
 		ClientAuth:   option.ClientAuthType,
 		ClientCAs:    certPool,
 		Certificates: []tls.Certificate{serverCerts},
+		MinVersion:   tls.VersionTLS12,
 	}
 }
 
