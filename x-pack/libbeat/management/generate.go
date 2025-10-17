@@ -348,7 +348,7 @@ func metadataFromDatastreamValues(defaultDataStreamType string, expected *proto.
 	if newNamespace := streamExpected.GetDataStream().GetNamespace(); newNamespace != "" {
 		setNamespace = newNamespace
 	}
-	if newNamespace := expected.GetDataStream().GetNamespace(); newNamespace != "" && newNamespace != DefaultDatasetName {
+	if newNamespace := expected.GetDataStream().GetNamespace(); newNamespace != "" && newNamespace != DefaultNamespaceName {
 		setNamespace = newNamespace
 	}
 
