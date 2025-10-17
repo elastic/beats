@@ -45,7 +45,7 @@ func TestCreateProspector(t *testing.T) {
 		for name, test := range testCases {
 			test := test
 			t.Run(name, func(t *testing.T) {
-				c := config{
+				c := Config{
 					IgnoreInactive: ignoreInactiveSettings[test.ignore_inactive_since],
 				}
 				p, _ := newProspector(c, logp.NewNopLogger())
@@ -98,7 +98,7 @@ prospector.scanner.fingerprint.enabled: false
 				c, err := conf.NewConfigWithYAML([]byte(tc.cfgStr), tc.cfgStr)
 				require.NoError(t, err)
 
-				cfg := defaultConfig()
+				cfg := DefaultConfig()
 				err = c.Unpack(&cfg)
 				require.NoError(t, err)
 

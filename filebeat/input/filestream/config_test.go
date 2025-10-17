@@ -33,13 +33,13 @@ import (
 
 func TestConfigValidate(t *testing.T) {
 	t.Run("paths cannot be empty", func(t *testing.T) {
-		c := config{Paths: []string{}}
+		c := Config{Paths: []string{}}
 		err := c.Validate()
 		assert.Error(t, err)
 	})
 
 	t.Run("take_over requires ID", func(t *testing.T) {
-		c := config{
+		c := Config{
 			Paths:    []string{"/foo/bar"},
 			TakeOver: loginp.TakeOverConfig{Enabled: true},
 		}
@@ -48,7 +48,7 @@ func TestConfigValidate(t *testing.T) {
 	})
 
 	t.Run("take_over works with ID set", func(t *testing.T) {
-		c := config{
+		c := Config{
 			Paths:    []string{"/foo/bar"},
 			ID:       "some id",
 			TakeOver: loginp.TakeOverConfig{Enabled: true},
@@ -58,7 +58,7 @@ func TestConfigValidate(t *testing.T) {
 	})
 
 	t.Run("take_over does works with AllowIDDuplication", func(t *testing.T) {
-		c := config{
+		c := Config{
 			Paths:              []string{"/foo/bar"},
 			ID:                 "some id",
 			AllowIDDuplication: true,
@@ -76,7 +76,7 @@ gzip_experimental: true
 file_identity.fingerprint: ~
 `)
 		require.NoError(t, err, "could not create config from string")
-		got := defaultConfig()
+		got := DefaultConfig()
 		err = c.Unpack(&got)
 		require.NoError(t, err, "could not unpack config")
 
@@ -92,7 +92,7 @@ gzip_experimental: true
 file_identity.path: ~
 `)
 		require.NoError(t, err, "could not create config from string")
-		got := defaultConfig()
+		got := DefaultConfig()
 		err = c.Unpack(&got)
 		assert.ErrorContains(t,
 			err,

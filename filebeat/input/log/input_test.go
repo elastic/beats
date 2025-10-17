@@ -99,7 +99,7 @@ _module_name: "module"
 
 func TestInputFileExclude(t *testing.T) {
 	p := Input{
-		config: config{
+		config: Config{
 			ExcludeFiles: []match.Matcher{match.MustCompile(`\.gz$`)},
 		},
 	}
@@ -134,7 +134,7 @@ func TestIsCleanInactive(t *testing.T) {
 	for _, test := range cleanInactiveTests {
 
 		l := Input{
-			config: config{
+			config: Config{
 				CleanInactive: test.cleanInactive,
 			},
 		}
