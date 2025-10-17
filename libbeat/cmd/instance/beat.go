@@ -358,7 +358,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 
 	// Report central management state
-	mgmt := b.Monitoring.StateRegistry().NewRegistry("management")
+	mgmt := b.Monitoring.StateRegistry().GetOrCreateRegistry("management")
 	monitoring.NewBool(mgmt, "enabled").Set(b.Manager.Enabled())
 
 	log.Debug("Initializing output plugins")
@@ -1287,7 +1287,7 @@ func (b *Beat) registerClusterUUIDFetching() {
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
 func (b *Beat) clusterUUIDFetchingCallback() elasticsearch.ConnectCallback {
-	elasticsearchRegistry := b.Monitoring.StateRegistry().NewRegistry("outputs.elasticsearch")
+	elasticsearchRegistry := b.Monitoring.StateRegistry().GetOrCreateRegistry("outputs.elasticsearch")
 	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
 
 	callback := func(esClient *eslegclient.Connection) error {
@@ -1324,7 +1324,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 
 	// Expose monitoring.cluster_uuid in state API
 	if monitoringClusterUUID != "" {
-		monitoringRegistry := b.Monitoring.StateRegistry().NewRegistry("monitoring")
+		monitoringRegistry := b.Monitoring.StateRegistry().GetOrCreateRegistry("monitoring")
 		clusterUUIDRegVar := monitoring.NewString(monitoringRegistry, "cluster_uuid")
 		clusterUUIDRegVar.Set(monitoringClusterUUID)
 	}
