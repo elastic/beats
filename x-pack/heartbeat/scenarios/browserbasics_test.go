@@ -23,6 +23,7 @@ import (
 )
 
 func TestBrowserSummaries(t *testing.T) {
+	t.Skip("Skipping browser summary test until we fixed the CI issues https://github.com/elastic/beats/issues/47159")
 	t.Parallel()
 	scenarioDB.RunTagWithSeparateTwists(t, "browser", StdAttemptTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		all := mtr.Events()
