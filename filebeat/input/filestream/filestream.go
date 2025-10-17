@@ -209,7 +209,7 @@ func (f *logFile) shouldBeClosed() bool {
 	}
 
 	if f.closeInactive > 0 {
-		//There can be a sort of race condition where the file is updated,
+		// There can be a sort of race condition where the file is updated,
 		// but [shouldBeClosed] is called before the new events are read,
 		// hence f.lastTimeRead has not been updated yet. If that happens
 		// we might accidentally close the harvester due to inactivity even
