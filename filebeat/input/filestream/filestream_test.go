@@ -22,6 +22,8 @@ import (
 	"context"
 	"io"
 	"os"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -30,6 +32,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestLogFileTimedClosing(t *testing.T) {
@@ -216,6 +219,32 @@ func createTestGzipLogFile(t *testing.T) *os.File {
 	return f
 }
 
+func TestShouldBeClosedInactiveAndModified(t *testing.T) {
+	file, err := os.CreateTemp(t.TempDir(), t.Name()+"-*")
+	if err != nil {
+		t.Fatalf("cannot create temp file: %s", err)
+	}
+
+	t.Cleanup(func() { file.Close() })
+
+	if _, err := file.WriteString("foo"); err != nil {
+		t.Fatalf("cannot write to file: %s", err)
+	}
+
+	f := logFile{
+		log:           logptest.NewTestingLogger(t, ""),
+		file:          newPlainFile(file),
+		closeInactive: time.Second,
+	}
+	f.lastTimeRead.Store(time.Now().Add(-5 * time.Second).UnixNano())
+
+	if f.shouldBeClosed() {
+		t.Fatal("shouldBeClosed must return false when " +
+			"close.on_state_change.inactive is reached and " +
+			"the file has been modified")
+	}
+}
+
 func readUntilError(reader *logFile) error {
 	buf := make([]byte, 1024)
 	_, err := reader.Read(buf)
@@ -225,3 +254,115 @@ func readUntilError(reader *logFile) error {
 	}
 	return err
 }
+
+/*
+BenchmarkOffsetAndLastTimeRead was used the best approach between atomics
+and mutex to prevent race conditions when reading/writing to
+offset and lastTimeRead.
+
+Here are some results:
+goos: linux
+goarch: amd64
+pkg: github.com/elastic/beats/v7/filebeat/input/filestream
+cpu: 11th Gen Intel(R) Core(TM) i9-11950H @ 2.60GHz
+BenchmarkOffsetAndLastTimeRead/atomic-16                1000000000               0.0000001 ns/op
+BenchmarkOffsetAndLastTimeRead/mutex-16                 1000000000               0.0000002 ns/op
+BenchmarkOffsetAndLastTimeRead/race-16                  1000000000               0.0000001 ns/op
+PASS
+ok      github.com/elastic/beats/v7/filebeat/input/filestream   9.850s
+
+% go test -bench=BenchmarkOffset -benchtime=60s
+goos: linux
+goarch: amd64
+pkg: github.com/elastic/beats/v7/filebeat/input/filestream
+cpu: 11th Gen Intel(R) Core(TM) i9-11950H @ 2.60GHz
+BenchmarkOffsetAndLastTimeRead/atomic-16                1000000000               0.0000002 ns/op
+BenchmarkOffsetAndLastTimeRead/mutex-16                 1000000000               0.0000003 ns/op
+BenchmarkOffsetAndLastTimeRead/race-16                  1000000000               0.0000001 ns/op
+PASS
+ok      github.com/elastic/beats/v7/filebeat/input/filestream   9.723s
+
+% go test -bench=BenchmarkOffset -benchtime=30s
+goos: linux
+goarch: amd64
+pkg: github.com/elastic/beats/v7/filebeat/input/filestream
+cpu: 11th Gen Intel(R) Core(TM) i9-11950H @ 2.60GHz
+BenchmarkOffsetAndLastTimeRead/atomic-16                1000000000               0.0000002 ns/op
+BenchmarkOffsetAndLastTimeRead/mutex-16                 1000000000               0.0000003 ns/op
+BenchmarkOffsetAndLastTimeRead/race-16                  1000000000               0.0000001 ns/op
+PASS
+ok      github.com/elastic/beats/v7/filebeat/input/filestream   9.728s
+*/
+func BenchmarkOffsetAndLastTimeRead(b *testing.B) {
+	a := benchAtomic{}
+	b.Run("atomic", func(b *testing.B) {
+		a.Inc()
+	})
+
+	m := benchMutex{}
+	b.Run("mutex", func(b *testing.B) {
+		m.Inc()
+	})
+
+	r := benchRace{}
+	b.Run("race", func(b *testing.B) {
+		r.Inc()
+	})
+}
+
+type benchAtomic struct {
+	offset       atomic.Int64
+	lastTimeRead atomic.Int64
+}
+
+func (b *benchAtomic) Inc() {
+	b.offset.Add(42)
+	b.lastTimeRead.Store(time.Now().UnixNano())
+}
+
+type benchMutex struct {
+	mutex        sync.Mutex
+	offset       int64
+	lastTimeRead time.Time
+}
+
+func (b *benchMutex) Inc() {
+	b.mutex.Lock()
+	b.offset += 42
+	b.lastTimeRead = time.Now()
+	b.mutex.Unlock()
+}
+
+type benchRace struct {
+	offset       int64
+	lastTimeRead time.Time
+}
+
+func (b *benchRace) Inc() {
+	b.offset += 42
+	b.lastTimeRead = time.Now()
+}
+
+/*
+% go test -bench=BenchmarkFoo -benchtime=60s
+goos: linux
+goarch: amd64
+pkg: github.com/elastic/beats/v7/filebeat/input/filestream
+cpu: 11th Gen Intel(R) Core(TM) i9-11950H @ 2.60GHz
+BenchmarkFoo/atomic-16          1000000000               0.0000003 ns/op
+BenchmarkFoo/mutex-16           1000000000               0.0000003 ns/op
+BenchmarkFoo/race-16            1000000000               0.0000002 ns/op
+PASS
+ok      github.com/elastic/beats/v7/filebeat/input/filestream   9.843s
+
+% go test -bench=BenchmarkFoo -benchtime=30s
+goos: linux
+goarch: amd64
+pkg: github.com/elastic/beats/v7/filebeat/input/filestream
+cpu: 11th Gen Intel(R) Core(TM) i9-11950H @ 2.60GHz
+BenchmarkFoo/atomic-16          1000000000               0.0000002 ns/op
+BenchmarkFoo/mutex-16           1000000000               0.0000002 ns/op
+BenchmarkFoo/race-16            1000000000               0.0000002 ns/op
+PASS
+ok      github.com/elastic/beats/v7/filebeat/input/filestream   9.723s
+*/

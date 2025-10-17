@@ -58,8 +58,11 @@ type logFile struct {
 
 	isInactive atomic.Bool
 
-	offset       int64
-	lastTimeRead time.Time
+	offset atomic.Int64
+	// lastTimeRead stores the last time the file was read as UnixNano time.
+	// UnixNano is used because [time.Duration] is represented as nanoseconds,
+	// so lastTimeRead can be compared directly to closeInactive.
+	lastTimeRead atomic.Int64
 	backoff      backoff.Backoff
 	tg           *unison.TaskGroup
 }
@@ -89,12 +92,13 @@ func newFileReader(
 		closeInactive:      closerConfig.OnStateChange.Inactive,
 		closeRemoved:       closerConfig.OnStateChange.Removed,
 		closeRenamed:       closerConfig.OnStateChange.Renamed,
-		offset:             offset,
-		lastTimeRead:       time.Now(),
 		backoff:            backoff.NewExpBackoff(canceler.Done(), config.Backoff.Init, config.Backoff.Max),
 		readerCtx:          readerCtx,
 		tg:                 tg,
 	}
+
+	l.offset.Store(offset)
+	l.lastTimeRead.Store(time.Now().UnixNano())
 
 	l.startFileMonitoringIfNeeded()
 
@@ -112,8 +116,8 @@ func (f *logFile) Read(buf []byte) (int, error) {
 	for f.readerCtx.Err() == nil {
 		n, err := f.file.Read(buf)
 		if n > 0 {
-			f.offset += int64(n)
-			f.lastTimeRead = time.Now()
+			f.offset.Add(int64(n))
+			f.lastTimeRead.Store(time.Now().UnixNano())
 		}
 		totalN += n
 
@@ -195,18 +199,6 @@ func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 }
 
 func (f *logFile) shouldBeClosed() bool {
-	if f.closeInactive > 0 {
-		if time.Since(f.lastTimeRead) > f.closeInactive {
-			f.isInactive.Store(true)
-			f.log.Debugf("'%s' is inactive", f.file.Name())
-			return true
-		}
-	}
-
-	if !f.closeRemoved && !f.closeRenamed {
-		return false
-	}
-
 	info, statErr := f.file.Stat()
 	if statErr != nil {
 		// return early if the file does not exist anymore and the reader should be closed
@@ -217,6 +209,28 @@ func (f *logFile) shouldBeClosed() bool {
 
 		// If an unexpected error happens we keep the reader open hoping once everything will go back to normal.
 		f.log.Errorf("Unexpected error reading from %s; error: %s", f.file.Name(), statErr)
+		return false
+	}
+
+	if f.closeInactive > 0 {
+		// There can be a sort of race condition where the file is updated,
+		// but [shouldBeClosed] is called before the new events are read,
+		// hence f.lastTimeRead has not been updated yet. If that happens
+		// we might accidentally close the harvester due to inactivity even
+		// though there is new data. If that was the last write to the file
+		// those events could be missed.
+		//
+		// To prevent that from happening, we only consider a file inactive if
+		// it has not changed and the inactive timeout has been reached.
+		delta := time.Now().UnixNano() - f.lastTimeRead.Load()
+		if delta > int64(f.closeInactive) && f.offset.Load() == info.Size() {
+			f.isInactive.Store(true)
+			f.log.Debugf("'%s' is inactive", f.file.Name())
+			return true
+		}
+	}
+
+	if !f.closeRemoved && !f.closeRenamed {
 		return false
 	}
 
@@ -281,8 +295,13 @@ func (f *logFile) handleEOF() error {
 		return statErr
 	}
 
-	if info.Size() < f.offset {
-		f.log.Debugf("File was truncated as offset (%d) > size (%d): %s", f.offset, info.Size(), f.file.Name())
+	if info.Size() < f.offset.Load() {
+		f.log.Debugf(
+			"File was truncated as offset (%d) > size (%d): %s",
+			f.offset.Load(),
+			info.Size(),
+			f.file.Name(),
+		)
 		return ErrFileTruncate
 	}
 
