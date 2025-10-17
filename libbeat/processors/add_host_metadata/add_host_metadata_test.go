@@ -582,7 +582,6 @@ func TestDataReload(t *testing.T) {
 	assert.Equal(t, int64(1), info.HostInfoRequestCount.Load())
 	assert.Equal(t, int64(0), info.FQDNRequestCount.Load())
 
-	var previousEventCount = eventCount.Load()
 	// update
 	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
 		"features.fqdn.enabled": true,
@@ -593,7 +592,13 @@ func TestDataReload(t *testing.T) {
 
 	// we should have reloaded the data once
 	// note that with fqdn enabled, we still fetch the host info
+	var previousEventCount = eventCount.Load()
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		// Causality: there can be up to processingGoroutineCount pending
+		// increments of eventCount from Run calls that already finished.
+		// To guarantee that at least one run has happened since the
+		// feature flag change, our event count must go up by _more_
+		// than that.
 		assert.Greater(collect, eventCount.Load(), previousEventCount+processingGoroutineCount)
 	}, time.Second*5, time.Millisecond)
 
@@ -603,13 +608,13 @@ func TestDataReload(t *testing.T) {
 	assert.Equal(t, int64(1), info.FQDNRequestCount.Load())
 
 	// update back to the original value
-	previousEventCount = eventCount.Load()
 	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
 		"features.fqdn.enabled": false,
 	}))
 	require.NoError(t, err)
 
 	// we should have reloaded the data once more
+	previousEventCount = eventCount.Load()
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		assert.Greater(collect, eventCount.Load(), previousEventCount+processingGoroutineCount)
 	}, time.Second*5, time.Millisecond)
