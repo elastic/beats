@@ -70,7 +70,7 @@ with_go() {
   create_workspace
   retry 5 curl -sL -o "${BIN}/gvm" "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${PLATFORM_TYPE_LOWERCASE}-${GO_ARCH_TYPE}"
   chmod +x "${BIN}/gvm"
-  eval "$(gvm $GO_VERSION)"
+  eval "$(gvm --url=https://go.dev/dl $GO_VERSION)"
   go version
   which go
   local go_path="$(go env GOPATH):$(go env GOPATH)/bin"
