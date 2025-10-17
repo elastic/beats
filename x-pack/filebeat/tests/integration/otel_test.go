@@ -697,9 +697,9 @@ processors:
 
 	require.EventuallyWithT(t, func(collect *assert.CollectT) {
 		out, err := filebeatOTel.ReadStdout()
-		require.NoError(t, err)
-		require.Contains(t, out, expectedExporter)
-		require.Contains(t, out, expectedReceiver)
-		require.Contains(t, out, expectedService)
+		require.NoError(collect, err)
+		require.Contains(collect, out, expectedExporter)
+		require.Contains(collect, out, expectedReceiver)
+		require.Contains(collect, out, expectedService)
 	}, 10*time.Second, 500*time.Millisecond, "failed to get output of inspect command")
 }
