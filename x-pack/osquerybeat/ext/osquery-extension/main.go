@@ -38,6 +38,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/osquery/osquery-go"
 )
 
@@ -45,7 +46,7 @@ var (
 	socket   = flag.String("socket", "", "Path to the extensions UNIX domain socket")
 	timeout  = flag.Int("timeout", 3, "Seconds to wait for autoloaded extensions")
 	interval = flag.Int("interval", 3, "Seconds delay between connectivity checks")
-	_        = flag.Bool("verbose", false, "Verbose logging")
+	verbose  = flag.Bool("verbose", false, "Verbose logging")
 )
 
 func main() {
@@ -74,8 +75,8 @@ func main() {
 		log.Fatalf("Error creating extension: %s\n", err)
 	}
 
-	// Register the tables available for the specific pltaform build
-	RegisterTables(server)
+	// Register the tables available for the specific platform build
+	RegisterTables(server, newLogFunc())
 
 	if err := server.Run(); err != nil {
 		log.Fatal(err)
@@ -103,4 +104,14 @@ func monitorForParent() {
 	for range ticker.C {
 		f()
 	}
+}
+
+func newLogFunc() func(m string, kvs ...any) {
+	if *verbose || os.Getenv("OSQUERY_EXTENSION_VERBOSE") != "" {
+		log, err := logp.NewDevelopmentLogger("osquery-extension")
+		if err == nil {
+			return log.Debugw
+		}
+	}
+	return func(string, ...any) {}
 }

@@ -67,7 +67,7 @@ func BuildExt() error {
 	params := devtools.DefaultBuildArgs()
 	params.InputFiles = []string{"./ext/osquery-extension/."}
 	params.Name = "osquery-extension"
-	params.CGO = false
+	params.CGO = true
 	err := devtools.Build(params)
 	if err != nil {
 		return err
