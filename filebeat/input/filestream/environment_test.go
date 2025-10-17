@@ -27,6 +27,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -487,7 +488,7 @@ func (e *inputTestingEnvironment) waitUntilHarvesterIsDone() {
 	require.Eventually(
 		e.t,
 		func() bool {
-			return e.pipeline.clients[len(e.pipeline.clients)-1].closed
+			return e.pipeline.clients[len(e.pipeline.clients)-1].closed.Load()
 		},
 		time.Second*10,
 		time.Millisecond*10,
@@ -610,7 +611,7 @@ type mockClient struct {
 	publishing []beat.Event
 	published  []beat.Event
 	ackHandler beat.EventListener
-	closed     bool
+	closed     atomic.Bool
 	mtx        sync.Mutex
 	canceler   context.CancelFunc
 }
@@ -653,11 +654,11 @@ func (c *mockClient) Close() error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	if c.closed {
+	if c.closed.Load() {
 		return fmt.Errorf("mock client already closed")
 	}
 
-	c.closed = true
+	c.closed.Store(true)
 	return nil
 }
 
