@@ -53,8 +53,6 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"go.uber.org/zap/zaptest"
 
-	"github.com/elastic/pkcs8"
-
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
@@ -101,7 +99,7 @@ func TestMTLS(t *testing.T) {
 	}
 
 	// get client certificates paths
-	clientCertificate, clientKey := getClientCerts(t, caCert, "")
+	clientCertificate, clientKey := GetClientCerts(t, caCert, "")
 
 	// start test server with given server and root certs
 	certPool := x509.NewCertPool()
@@ -117,11 +115,11 @@ func TestMTLS(t *testing.T) {
 
 	inputConfig := `
 receivers:
-  filebeatreceiver:	
+  filebeatreceiver:
     output:
       elasticsearch:
         hosts: {{ .Host }}
-        ssl: 
+        ssl:
           enabled: true
           certificate_authorities:
             - {{ .CACertificate }}
@@ -175,7 +173,7 @@ func TestKeyPassPhrase(t *testing.T) {
 	}
 
 	// get client certificates paths with key file encrypted in PKCS#8 format
-	clientCertificate, clientKey := getClientCerts(t, caCert, "your-password")
+	clientCertificate, clientKey := GetClientCerts(t, caCert, "your-password")
 
 	// start test server with given server and root certs
 	certPool := x509.NewCertPool()
@@ -191,17 +189,17 @@ func TestKeyPassPhrase(t *testing.T) {
 
 	inputConfig := `
 receivers:
-  filebeatreceiver:	
+  filebeatreceiver:
     output:
       elasticsearch:
         hosts: {{ .Host }}
-        ssl: 
+        ssl:
           enabled: true
           certificate_authorities:
             - {{ .CACertificate }}
           certificate: {{ .ClientCert }}
           key: {{ .ClientKey }}
-          key_passphrase: your-password		  
+          key_passphrase: your-password
 `
 
 	var otelConfigBuffer bytes.Buffer
@@ -262,13 +260,13 @@ func TestCATrustedFingerPrint(t *testing.T) {
 
 	inputConfig := `
 receivers:
-  filebeatreceiver:	
+  filebeatreceiver:
     output:
       elasticsearch:
         hosts: {{ .Host }}
-        ssl: 
+        ssl:
           enabled: true
-          ca_trusted_fingerprint: {{ .CATrustedFingerPrint }} 
+          ca_trusted_fingerprint: {{ .CATrustedFingerPrint }}
 `
 
 	var otelConfigBuffer bytes.Buffer
@@ -440,11 +438,11 @@ func TestVerificationMode(t *testing.T) {
 
 			inputConfig := `
 receivers:
-  filebeatreceiver:	
+  filebeatreceiver:
     output:
       elasticsearch:
         hosts: {{ .Host }}
-        ssl: 
+        ssl:
           enabled: true
           certificate_authorities:
             - {{ .CACertificate }}
@@ -536,7 +534,7 @@ func TestProxyHTTP(t *testing.T) {
 				proxytest.WithRequestLog("https", t.Logf)},
 			inputConfig: `
 receivers:
-  filebeatreceiver:	
+  filebeatreceiver:
     output:
       elasticsearch:
         hosts: {{ .Host }}
@@ -569,7 +567,7 @@ receivers:
 				})},
 			inputConfig: `
 receivers:
-  filebeatreceiver:	
+  filebeatreceiver:
     output:
       elasticsearch:
         hosts: {{ .Host }}
@@ -587,7 +585,7 @@ receivers:
 				proxytest.WithRequestLog("https", t.Logf)},
 			inputConfig: `
 receivers:
-  filebeatreceiver:	
+  filebeatreceiver:
     output:
       elasticsearch:
         hosts: {{ .Host }}
@@ -760,54 +758,6 @@ func mustSendLogs(t *testing.T, exporter exporter.Logs, logs plog.Logs) error {
 	logs.MarkReadOnly()
 	err := exporter.ConsumeLogs(t.Context(), logs)
 	return err
-}
-
-// getClientCerts creates client certificates, writes them to a file and return the path of certificate and key
-// if passphrase is passed, it is used to encrypt the key file
-func getClientCerts(t *testing.T, caCert tls.Certificate, passphrase string) (certificate string, key string) {
-	// create client certificates
-	clientCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "client", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
-	if err != nil {
-		t.Fatalf("could not generate certificates: %s", err)
-	}
-
-	tempDir := t.TempDir()
-	clientCertPath := filepath.Join(tempDir, "client-cert.pem")
-	clientKeyPath := filepath.Join(tempDir, "client-key.pem")
-
-	if passphrase != "" {
-		clientKey, err := pkcs8.MarshalPrivateKey(clientCerts.PrivateKey, []byte(passphrase), pkcs8.DefaultOpts)
-		if err != nil {
-			t.Fatalf("could not marshal private key: %v", err)
-		}
-
-		if err = os.WriteFile(clientKeyPath, pem.EncodeToMemory(&pem.Block{
-			Type:  "ENCRYPTED PRIVATE KEY",
-			Bytes: clientKey,
-		}), 0400); err != nil {
-			t.Fatalf("could not write client key to file")
-		}
-	} else {
-		clientKey, err := x509.MarshalPKCS8PrivateKey(clientCerts.PrivateKey)
-		if err != nil {
-			t.Fatalf("could not marshal private key: %v", err)
-		}
-		if err = os.WriteFile(clientKeyPath, pem.EncodeToMemory(&pem.Block{
-			Type:  "RSA PRIVATE KEY",
-			Bytes: clientKey,
-		}), 0400); err != nil {
-			t.Fatalf("could not write client key to file")
-		}
-	}
-
-	if err = os.WriteFile(clientCertPath, pem.EncodeToMemory(&pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: clientCerts.Leaf.Raw,
-	}), 0400); err != nil {
-		t.Fatalf("could not write client certificate to file")
-	}
-
-	return clientCertPath, clientKeyPath
 }
 
 func getTranslatedConf(t *testing.T, input []byte) *confmap.Conf {
