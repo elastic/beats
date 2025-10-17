@@ -149,7 +149,8 @@ processors:
 	compareOutputFiles(t, fbFilePath, otelFilePath, ignoredFields)
 }
 
-// TestProxyURL verifies that Filebeat OTel mode can send data to Logstash via a SOCKS5 proxy
+// TestProxyURL verifies that Filebeat OTel mode can send data to Logstash via a SOCKS5 proxy.
+// Filebeat otel mode sends events to "logstash" via a socks5-proxy container running on localhost:1080
 func TestProxyURL(t *testing.T) {
 	// ensure the size of events is big enough
 	numEvents := 3
