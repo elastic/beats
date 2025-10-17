@@ -5,16 +5,17 @@
 set -e
 
 function usage() {
-  echo "Usage: $0 [--tags tag1,tag2,...] [package_path] TestName [stress options...]"
+  echo "Usage: $0 [--tags tag1,tag2,...] [--race] [package_path] TestName [stress options...]"
   echo ""
   echo "--tags: Optional comma-separated list of build tags"
+  echo "--race: Enable race detection"
   echo "package_path: Path to the Go package containing the tests."
   echo "TestName: Regular expression to match the test to run, equivalent to -test.run."
   echo "[stress options]: Options to pass to the stress command."
   echo ""
   echo "Examples:"
   echo "  $0 ./libbeat/common/backoff ^TestBackoff$ -p 32"
-  echo "  $0 --tags integration ./libbeat/common/backoff ^TestBackoff$ -p 32"
+  echo "  $0 --tags integration --race ./libbeat/common/backoff ^TestBackoff$ -p 32"
 }
 
 if [[ "$1" == "--help" || "$1" == "-h" ]]; then
@@ -32,6 +33,13 @@ if [[ "$1" == "--tags" ]]; then
   fi
   build_tags="$2"
   shift 2
+fi
+
+# Parse optional --race parameter
+race_flag=""
+if [[ "$1" == "--race" ]]; then
+  race_flag="-race"
+  shift 1
 fi
 
 if [[ $# -lt 2 ]]; then
@@ -54,9 +62,9 @@ stress_options=("${@:3}")
 cd "$test_package_path"
 rm "$test_exec_file" 2>/dev/null || true
 if [[ -n "$build_tags" ]]; then
-  go test -tags "$build_tags" -c -o "./$test_exec_file"
+  go test -tags "$build_tags" $race_flag -c -o "./$test_exec_file"
 else
-  go test -c -o "./$test_exec_file"
+  go test $race_flag -c -o "./$test_exec_file"
 fi
 trap 'rm "./$test_exec_file" 2>/dev/null || true' EXIT INT TERM
 go run golang.org/x/tools/cmd/stress@latest "${stress_options[@]}" "./$test_exec_file" -test.run "$test_regex" -test.v
