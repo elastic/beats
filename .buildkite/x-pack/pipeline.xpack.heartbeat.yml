@@ -26,7 +26,7 @@ env:
 
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
-  ASDF_NODEJS_VERSION: 18.17.1
+  ASDF_NODEJS_VERSION: 22.20.0
 
   # Unit tests
   RACE_DETECTOR: "true"
