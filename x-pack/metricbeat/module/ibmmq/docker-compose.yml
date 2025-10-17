@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   ibmmq:
     image: docker.elastic.co/integrations-ci/beats-ibmmq:${IBMMQ_VERSION:-9.1.5.0-r2-amd64}-1

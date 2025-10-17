@@ -13,19 +13,21 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type statelessInput struct {
 	config     config
 	serviceURL string
+	logger     *logp.Logger
 }
 
 func (statelessInput) Name() string {
 	return "azure-blob-storage-stateless"
 }
 
-func newStatelessInput(config config, url string) *statelessInput {
-	return &statelessInput{config: config, serviceURL: url}
+func newStatelessInput(config config, url string, logger *logp.Logger) *statelessInput {
+	return &statelessInput{config: config, serviceURL: url, logger: logger}
 }
 
 func (in *statelessInput) Test(v2.TestContext) error {

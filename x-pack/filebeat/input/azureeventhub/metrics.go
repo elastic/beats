@@ -10,6 +10,7 @@ import (
 	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -39,7 +40,7 @@ func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetri
 		processorRestarts: monitoring.NewUint(reg, "processor_restarts_total"),
 	}
 	_ = adapter.
-		NewGoMetrics(reg, "processing_time", adapter.Accept).
+		NewGoMetrics(reg, "processing_time", logp.NewLogger(""), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(inputMetrics.processingTime))
 
 	return &inputMetrics

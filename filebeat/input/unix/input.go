@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -127,6 +128,11 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
 		err = ctxerr
 	}
+
+	if err != nil {
+		ctx.UpdateStatus(status.Failed, err.Error())
+	}
+
 	return err
 }
 
@@ -158,9 +164,9 @@ func newInputMetrics(id, path string, log *logp.Logger) *inputMetrics {
 		arrivalPeriod:  metrics.NewUniformSample(1024),
 		processingTime: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "arrival_period", log, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", log, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	out.path.Set(path)

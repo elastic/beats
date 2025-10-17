@@ -93,7 +93,7 @@ type ConnectionSettings struct {
 	Transport httpcommon.HTTPTransportSettings
 
 	// UserAgent can be used to report the agent running mode
-	// to ES via the User Agent string. If running under Agent (fleetmode.Enabled() == true)
+	// to ES via the User Agent string. If running under Agent (management.UnderAgent() == true)
 	// then this string will be appended to the user agent.
 	UserAgent string
 }
@@ -354,7 +354,7 @@ func (conn *Connection) Test(d testing.Driver) {
 				}
 
 				netDialer := transport.NetDialer(conn.Transport.Timeout)
-				tlsDialer := transport.TestTLSDialer(d, netDialer, tls, conn.Transport.Timeout)
+				tlsDialer := transport.TestTLSDialer(d, netDialer, tls, conn.Transport.Timeout, conn.log)
 				_, err = tlsDialer.Dial("tcp", address)
 				d.Fatal("dial up", err)
 			})

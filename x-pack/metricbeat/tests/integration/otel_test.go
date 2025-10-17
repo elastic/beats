@@ -65,7 +65,7 @@ metricbeat:
      processes:
       - '.*'
      metricsets:
-      - cpu		
+      - cpu
 output:
   elasticsearch:
     hosts:
@@ -81,7 +81,7 @@ processors:
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
 http.host: localhost
-http.port: {{.MonitoringPort}}	
+http.port: {{.MonitoringPort}}
 `
 
 	// start metricbeat in otel mode
@@ -137,9 +137,19 @@ http.port: {{.MonitoringPort}}
 		},
 		1*time.Minute, 1*time.Second, "expected at least 1 log for metricbeat and otel receiver")
 
-	otelDoc := otelDocs.Hits.Hits[0]
-	metricbeatDoc := metricbeatDocs.Hits.Hits[0]
-	assertMapstrKeysEqual(t, otelDoc.Source, metricbeatDoc.Source, []string{}, "expected documents keys to be equal")
+	var metricbeatDoc, otelDoc mapstr.M
+	otelDoc = otelDocs.Hits.Hits[0].Source
+	metricbeatDoc = metricbeatDocs.Hits.Hits[0].Source
+	ignoredFields := []string{
+		// only present in beats receivers
+		"agent.otelcol.component.id",
+		"agent.otelcol.component.kind",
+	}
+	assert.Equal(t, "metricbeatreceiver", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
+	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+	assert.NotContains(t, metricbeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in metricbeat log record")
+	assert.NotContains(t, metricbeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in metricbeat log record")
+	assertMapstrKeysEqual(t, otelDoc, metricbeatDoc, ignoredFields, "expected documents keys to be equal")
 	assertMonitoring(t, optionsValue.MonitoringPort)
 }
 
@@ -196,7 +206,7 @@ metricbeat:
      processes:
       - '.*'
      metricsets:
-      - cpu		
+      - cpu
 output:
   elasticsearch:
     hosts:
@@ -214,27 +224,41 @@ processors:
 `
 	expectedExporter := `exporters:
     elasticsearch:
-        batcher:
-            enabled: true
-            max_size: 1600
-            min_size: 0
+        auth:
+            authenticator: beatsauth
         compression: gzip
         compression_params:
             level: 1
         endpoints:
             - http://localhost:9200
-        idle_conn_timeout: 3s
         logs_index: index
         mapping:
             mode: bodymap
+        max_conns_per_host: 1
         password: testing
         retry:
             enabled: true
             initial_interval: 1s
             max_interval: 1m0s
             max_retries: 3
+        sending_queue:
+            batch:
+                flush_timeout: 10s
+                max_size: 1600
+                min_size: 0
+                sizer: items
+            block_on_overflow: true
+            enabled: true
+            num_consumers: 1
+            queue_size: 3200
+            wait_for_result: true
+        user: admin
+extensions:
+    beatsauth:
+        idle_connection_timeout: 3s
+        proxy_disable: false
         timeout: 1m30s
-        user: admin`
+`
 	expectedReceiver := `receivers:
     metricbeatreceiver:
         logging:
@@ -250,8 +274,12 @@ processors:
                   module: system
                   period: 1s
                   processes:
-                    - .*`
+                    - .*
+`
+
 	expectedService := `service:
+    extensions:
+        - beatsauth
     pipelines:
         logs:
             exporters:

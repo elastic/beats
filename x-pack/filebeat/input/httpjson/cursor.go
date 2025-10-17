@@ -54,7 +54,7 @@ func (c *cursor) update(trCtx *transformContext) {
 
 	for k, cfg := range c.cfg {
 		stat := c.status
-		if cfg.mustIgnoreEmptyValue() {
+		if cfg.doNotLogFailure() || cfg.mustIgnoreEmptyValue() {
 			stat = ignoreEmptyValueReporter{stat}
 		}
 		v, _ := cfg.Value.Execute(trCtx, transformable{}, k, cfg.Default, stat, c.log)

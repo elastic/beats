@@ -111,7 +111,7 @@ func (dq *diskQueue) handleProducerWriteRequest(request producerWriteRequest) {
 		// pending list and report success, then dispatch it to the
 		// writer loop if no other requests are outstanding.
 		dq.enqueueWriteFrame(request.frame)
-		dq.observer.AddEvent(int(request.frame.sizeOnDisk()))
+		dq.observer.AddEvent(int(request.frame.sizeOnDisk())) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
 		request.responseChan <- true
 	} else {
 		// The queue is too full. Either add the request to blockedProducers,
@@ -190,7 +190,7 @@ func (dq *diskQueue) handleDeleterLoopResponse(response deleterLoopResponse) {
 			// For the metrics observer, we (can) only report the size of the raw
 			// events, not the segment header, so subtract that here so it doesn't
 			// look like we're deleting more than was added in the first place.
-			removedByteCount += int(dq.segments.acked[i].byteCount - dq.segments.acked[i].headerSize())
+			removedByteCount += int(dq.segments.acked[i].byteCount - dq.segments.acked[i].headerSize()) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
 		}
 	}
 	dq.observer.RemoveEvents(removedEventCount, removedByteCount)
@@ -310,6 +310,9 @@ func (dq *diskQueue) handleShutdown() {
 		dq.handleDeleterLoopResponse(response)
 	}
 	close(dq.deleterLoop.requestChan)
+
+	// signal that we're done closing
+	close(dq.done)
 }
 
 // If the pendingFrames list is nonempty, and there are no outstanding

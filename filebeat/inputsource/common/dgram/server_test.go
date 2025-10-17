@@ -15,20 +15,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package fleetmode
+package dgram
 
-var managementEnabled bool
+import (
+	"errors"
+	"net"
+	"testing"
 
-// SetAgentMode stores if the Beat is running under Elastic Agent.
-// Normally this is called when the command line flags are parsed.
-// This is stored as a package level variable because some components
-// (like filebeat/metricbeat modules) don't have access to the
-// configuration information to determine this on their own.
-func SetAgentMode(enabled bool) {
-	managementEnabled = enabled
-}
+	"github.com/elastic/elastic-agent-libs/logp"
+)
 
-// Enabled returns true if the Beat is running under Elastic Agent.
-func Enabled() bool {
-	return managementEnabled
+func TestListenerRunReturnsErrorWhenConnectionFails(t *testing.T) {
+	l := NewListener(
+		"test family",
+		"not used",
+		nil,
+		func() (net.PacketConn, error) {
+			return nil, errors.New("some error")
+		},
+		&ListenerConfig{},
+		logp.NewNopLogger(),
+	)
+
+	if err := l.Run(t.Context()); err == nil {
+		t.Fatal("expecting an error from Listener.Run")
+	}
 }

@@ -77,6 +77,9 @@ It has the following settings:
 `cleanup_timeout`
 :   (Optional) Time of inactivity to consider we can clean and forget metadata for a container, 60s by default.
 
+`hostfs`
+:   (Optional) Specifies the mount point of the host’s filesystem, which can be used to monitor a host from within a container.
+
 `labels.dedot`
 :   (Optional) Default to be false. If set to true, replace dots in labels with `_`.
 
