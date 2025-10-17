@@ -72,9 +72,14 @@ func TestNewReceiver(t *testing.T) {
 					FilterMessageSnippet("add_host_metadata").
 					FilterMessageSnippet("add_cloud_metadata").
 					FilterMessageSnippet("add_docker_metadata").
+<<<<<<< HEAD
 					FilterMessageSnippet("add_kubernetes_metadata").
 					Len() == 1
 				assert.True(t, processorsLoaded, "processors not loaded")
+=======
+					FilterMessageSnippet("add_kubernetes_metadata")
+				assert.Len(t, processorsLoaded.All(), 1, "processors not loaded")
+>>>>>>> 8879ddadf (fix: add_cloud_metadata: Do not block on String() (#47058))
 				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
 				return assert.Contains(t, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
@@ -83,6 +88,14 @@ func TestNewReceiver(t *testing.T) {
 }
 
 func BenchmarkFactory(b *testing.B) {
+	for _, level := range []zapcore.Level{zapcore.InfoLevel, zapcore.DebugLevel} {
+		b.Run(level.String(), func(b *testing.B) {
+			benchmarkFactoryWithLogLevel(b, level)
+		})
+	}
+}
+
+func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
@@ -100,8 +113,13 @@ func BenchmarkFactory(b *testing.B) {
 			"output": map[string]interface{}{
 				"otelconsumer": map[string]interface{}{},
 			},
+<<<<<<< HEAD
 			"logging": map[string]interface{}{
 				"level": "info",
+=======
+			"logging": map[string]any{
+				"level": level.String(),
+>>>>>>> 8879ddadf (fix: add_cloud_metadata: Do not block on String() (#47058))
 				"selectors": []string{
 					"*",
 				},
@@ -114,7 +132,7 @@ func BenchmarkFactory(b *testing.B) {
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		zapcore.Lock(zapcore.AddSync(&zapLogs)),
-		zapcore.InfoLevel)
+		level)
 
 	factory := NewFactory()
 
@@ -321,7 +339,7 @@ func TestConsumeContract(t *testing.T) {
 
 	gen := newLogGenerator(t, tmpDir)
 
-	os.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
+	t.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
 
 	cfg := &Config{
 		Beatconfig: map[string]interface{}{

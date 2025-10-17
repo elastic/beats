@@ -46,6 +46,7 @@ func init() {
 type addCloudMetadata struct {
 	initOnce sync.Once
 	initData *initData
+	initDone chan struct{}
 	metadata mapstr.M
 	logger   *logp.Logger
 }
@@ -81,7 +82,12 @@ func New(c *cfg.C) (beat.Processor, error) {
 			tlsConfig: tlsConfig,
 			overwrite: config.Overwrite,
 		},
+<<<<<<< HEAD
 		logger: logp.NewLogger("add_cloud_metadata"),
+=======
+		initDone: make(chan struct{}),
+		logger:   log.Named("add_cloud_metadata"),
+>>>>>>> 8879ddadf (fix: add_cloud_metadata: Do not block on String() (#47058))
 	}
 
 	go p.init()
@@ -94,7 +100,8 @@ func (r result) String() string {
 }
 
 func (p *addCloudMetadata) init() {
-	p.initOnce.Do(func() {
+	p.initOnce.Do(func() { // fetch metadata only once
+		defer close(p.initDone) // signal that init() completed
 		result := p.fetchMetadata()
 		if result == nil {
 			p.logger.Info("add_cloud_metadata: hosting provider type not detected.")
@@ -125,7 +132,14 @@ func (p *addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *addCloudMetadata) String() string {
-	return "add_cloud_metadata=" + p.getMeta().String()
+	metadataStr := "<uninitialized>"
+	select {
+	case <-p.initDone:
+		// init() completed
+		metadataStr = p.getMeta().String()
+	default:
+	}
+	return "add_cloud_metadata=" + metadataStr
 }
 
 func (p *addCloudMetadata) addMeta(event *beat.Event, meta mapstr.M) error {
