@@ -49,3 +49,14 @@
       type: long
       description: >
         Number of processes for which the state couldn't be retrieved or is unknown.
+    - name: threads
+      title: Process Threads
+      type: group
+      description: Counts of individual threads on a system.
+      fields:
+        - name: running
+          type: long
+          description: Count of currently running threads.
+        - name: blocked
+          type: long
+          description: Count of threads blocked by I/O.
