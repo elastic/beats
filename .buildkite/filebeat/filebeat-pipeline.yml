@@ -86,8 +86,6 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-<<<<<<< HEAD
-=======
           - "filebeat/build/input-test/**/*"
         plugins:
           - test-collector#v1.10.2:
@@ -95,7 +93,6 @@ steps:
               format: "junit"
               branches: "main"
               debug: true
->>>>>>> f13a0bd03 ([Filebeat/Journald] Fix flakiness from TestDoubleStarCanBeUsed (#46913))
         notify:
           - github_commit_status:
               context: "filebeat: Ubuntu x86_64 Unit Tests"
@@ -317,8 +314,6 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-<<<<<<< HEAD
-=======
           - "filebeat/build/input-test/**/*"
         plugins:
           - test-collector#v1.10.2:
@@ -326,7 +321,6 @@ steps:
               format: "junit"
               branches: "main"
               debug: true
->>>>>>> f13a0bd03 ([Filebeat/Journald] Fix flakiness from TestDoubleStarCanBeUsed (#46913))
         notify:
           - github_commit_status:
               context: "filebeat: Ubuntu arm64 Unit Tests"
