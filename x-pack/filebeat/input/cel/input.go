@@ -51,6 +51,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -176,6 +177,16 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			Value: cfg.Auth.Token.Value,
 		}
 	}
+
+	if cfg.Auth.AWS.IsEnabled() {
+		tr, err := aws.InitializeSingerTransport(*cfg.Auth.AWS, log, client.Transport)
+		if err != nil {
+			log.Errorw("aws auth method: initialize of aws config failed for aws signer", "error", err)
+			return err
+		}
+		client.Transport = tr
+	}
+
 	wantDump := cfg.FailureDump.enabled() && cfg.FailureDump.Filename != ""
 	doCov := cfg.RecordCoverage && log.IsDebug()
 	httpOptions := lib.HTTPOptions{
