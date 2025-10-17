@@ -175,7 +175,7 @@ func IntegTest() {
 func GoIntegTest(ctx context.Context) error {
 	// build integration test binary with otel sub command
 	devtools.BuildSystemTestOTelBinary()
-	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 	// ES_USER must be admin in order for the Go Integration tests to function because they require
 	// indices:data/read/search
 	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
@@ -187,7 +187,7 @@ func GoIntegTest(ctx context.Context) error {
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
 	// build integration test binary with otel sub command
 	devtools.BuildSystemTestOTelBinary()
-	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 	// ES_USER must be admin in order for the Go Integration tests to function because they require
 	// indices:data/read/search
 	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]

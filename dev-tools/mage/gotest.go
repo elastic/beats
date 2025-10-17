@@ -164,15 +164,18 @@ func DefaultGoWindowsTestIntegrationArgs() GoTestArgs {
 
 // DefaultGoTestIntegrationArgs returns a default set of arguments for running
 // all integration tests. We tag integration test files with 'integration'.
-func DefaultGoTestIntegrationArgs() GoTestArgs {
+func DefaultGoTestIntegrationArgs(ctx context.Context) GoTestArgs {
 	args := makeGoTestArgs("Integration")
 	args.Tags = append(args.Tags, "integration")
 
-	synth := exec.Command("npx", "@elastic/synthetics", "-h")
+	cmdCtx, cmdCancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cmdCancel()
+
+	synth := exec.CommandContext(cmdCtx, "npx", "@elastic/synthetics", "-h")
 	if synth.Run() == nil {
 		// Run an empty journey to ensure playwright can be loaded
 		// catches situations like missing playwright deps
-		cmd := exec.Command("sh", "-c", "echo 'step(\"t\", () => { })' | elastic-synthetics --inline")
+		cmd := exec.CommandContext(cmdCtx, "sh", "-c", "echo 'step(\"t\", () => { })' | elastic-synthetics --inline")
 		var out strings.Builder
 		cmd.Stdout = &out
 		cmd.Stderr = &out
@@ -195,8 +198,8 @@ func DefaultGoTestIntegrationArgs() GoTestArgs {
 
 // DefaultGoTestIntegrationFromHostArgs returns a default set of arguments for running
 // all integration tests from the host system (outside the docker network).
-func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
-	args := DefaultGoTestIntegrationArgs()
+func DefaultGoTestIntegrationFromHostArgs(ctx context.Context) GoTestArgs {
+	args := DefaultGoTestIntegrationArgs(ctx)
 	args.Env = WithGoIntegTestHostEnv(args.Env)
 	return args
 }
@@ -204,8 +207,8 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 // FIPSOnlyGoTestIngrationFromHostArgs returns a default set of arguments for running
 // all integration tests from the host system (outside the docker network) along
 // with the GODEBUG=fips140=only arg set.
-func FIPSOnlyGoTestIntegrationFromHostArgs() GoTestArgs {
-	args := DefaultGoTestIntegrationArgs()
+func FIPSOnlyGoTestIntegrationFromHostArgs(ctx context.Context) GoTestArgs {
+	args := DefaultGoTestIntegrationArgs(ctx)
 	args.Tags = append(args.Tags, "requirefips")
 	args.Env = WithGoIntegTestHostEnv(args.Env)
 	args.Env["GODEBUG"] = "fips140=only"
