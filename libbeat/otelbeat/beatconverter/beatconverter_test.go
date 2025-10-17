@@ -488,6 +488,40 @@ service:
 		compareAndAssert(t, expOutput, input)
 	})
 
+	t.Run("test elasticsearch exporter with enabled false", func(t *testing.T) {
+		var supportedInput = `
+receivers:
+  filebeatreceiver:
+    output:
+      elasticsearch:
+        enabled: false
+        hosts: ["https://localhost:9200"]
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+
+		var expectedOutput = `
+receivers:
+  filebeatreceiver:
+    output:
+      otelconsumer: null
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+`
+		input := newFromYamlString(t, supportedInput)
+		err := c.Convert(context.Background(), input)
+		require.NoError(t, err, "error converting beats logstash-output config")
+
+		expOutput := newFromYamlString(t, expectedOutput)
+		compareAndAssert(t, expOutput, input)
+	})
+
 	t.Run("test Logstash failure if host is empty", func(t *testing.T) {
 		var unsupportedOutputConfig = `
 receivers:
