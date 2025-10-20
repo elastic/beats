@@ -15,35 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package testing
+package add_cloud_metadata
 
 import (
-	"net"
 	"testing"
+	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
-// AvailableTCP4Port returns an unused TCP port for 127.0.0.1.
-func AvailableTCP4Port() (uint16, error) {
-	resolved, err := net.ResolveTCPAddr("tcp4", "127.0.0.1:0")
-	if err != nil {
-		return 0, err
-	}
-
-	listener, err := net.ListenTCP("tcp4", resolved)
-	if err != nil {
-		return 0, err
-	}
-	defer listener.Close()
-
-	tcpAddr := uint16(listener.Addr().(*net.TCPAddr).Port)
-
-	return tcpAddr, nil
-}
-
-func MustAvailableTCP4Port(t *testing.T) uint16 {
-	port, err := AvailableTCP4Port()
-	require.NoError(t, err, "failed to get available TCP4 port")
-	return port
+func Test_addCloudMetadata_String(t *testing.T) {
+	const timeout = 100 * time.Millisecond
+	cfg := conf.MustNewConfigFrom(map[string]any{
+		"providers": []string{"openstack"},
+		"host":      "fake:1234",
+		"timeout":   timeout.String(),
+	})
+	p, err := New(cfg, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+	assert.Eventually(t, func() bool { return p.String() == "add_cloud_metadata=<uninitialized>" }, timeout, 10*time.Millisecond)
+	assert.Eventually(t, func() bool { return p.String() == "add_cloud_metadata={}" }, 2*timeout, 10*time.Millisecond)
 }
