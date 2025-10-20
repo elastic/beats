@@ -94,6 +94,12 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			return fmt.Errorf("error fetching thread stats: %w", err)
 		}
 		outMap["threads"] = threads
+
+		fdStats, err := fileDescriptorStats(m.sys)
+		if err != nil {
+			return fmt.Errorf("error fetching file descriptor stats: %w", err)
+		}
+		outMap["fd"] = fdStats
 	}
 	outMap["total"] = len(procList)
 	r.Event(mb.Event{
@@ -134,4 +140,43 @@ func threadStats(sys resolve.Resolver) (mapstr.M, error) {
 		}
 	}
 	return threadData, nil
+}
+
+// fileDescriptorStats returns file descriptor statistics from /proc/sys/fs/file-nr
+// The file contains three values: allocated file handles, unused file handles, and maximum file handles
+func fileDescriptorStats(sys resolve.Resolver) (mapstr.M, error) {
+	fileNrPath := sys.ResolveHostFS("/proc/sys/fs/file-nr")
+	data, err := ioutil.ReadFile(fileNrPath)
+	if err != nil {
+		return nil, fmt.Errorf("error reading procfs file %s: %w", fileNrPath, err)
+	}
+
+	fields := strings.Fields(strings.TrimSpace(string(data)))
+	if len(fields) < 3 {
+		return nil, fmt.Errorf("unexpected format in %s: expected 3 fields, got %d", fileNrPath, len(fields))
+	}
+
+	allocated, err := strconv.ParseInt(fields[0], 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing allocated file descriptors from %s: %w", fileNrPath, err)
+	}
+
+	unused, err := strconv.ParseInt(fields[1], 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing unused file descriptors from %s: %w", fileNrPath, err)
+	}
+
+	maximum, err := strconv.ParseInt(fields[2], 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing maximum file descriptors from %s: %w", fileNrPath, err)
+	}
+
+	fdData := mapstr.M{
+		"allocated": allocated,
+		"unused":    unused,
+		"used":      allocated - unused,
+		"maximum":   maximum,
+	}
+
+	return fdData, nil
 }
