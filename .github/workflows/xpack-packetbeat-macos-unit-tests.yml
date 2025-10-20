@@ -42,14 +42,13 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  unit-tests-push:
+  unit-tests:
     name: Unit tests ${{ matrix.os }}
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       max-parallel: 10
       matrix:
-        os: [macos-13, macos-14]
+        os: [macos-15-intel, macos-15]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
@@ -58,6 +57,7 @@ jobs:
       - uses: ./.github/actions/unit-test
         with:
           beat: ${{ env.BEAT }}
+<<<<<<< HEAD
 
   unit-tests-pr:
     name: Unit tests macos-15
@@ -69,3 +69,5 @@ jobs:
       - uses: ./.github/actions/unit-test
         with:
           beat: ${{ env.BEAT }}
+=======
+>>>>>>> 3a897ae5b (github-actions: macos-13 sunset (#47216))
