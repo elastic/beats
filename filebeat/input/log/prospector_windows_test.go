@@ -77,7 +77,7 @@ func TestMatchFileWindows(t *testing.T) {
 	for _, test := range matchTestsWindows {
 
 		p := Input{
-			config: Config{
+			config: config{
 				Paths:        test.paths,
 				ExcludeFiles: test.excludeFiles,
 			},

@@ -36,7 +36,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type Config struct {
+type config struct {
 	harvester.ForwarderConfig `config:",inline"`
 	LogConfig                 `config:",inline"`
 
@@ -112,8 +112,8 @@ var ValidScanSort = map[string]struct{}{
 	ScanSortFilename: {},
 }
 
-func DefaultConfig() Config {
-	return Config{
+func defaultConfig() config {
+	return config{
 		// Common
 		ForwarderConfig: harvester.ForwarderConfig{
 			Type: cfg.DefaultType,
@@ -150,7 +150,7 @@ func DefaultConfig() Config {
 	}
 }
 
-func (c *Config) Validate() error {
+func (c *config) Validate() error {
 	// DEPRECATED 6.0.0: warning is already outputted on input level
 	if c.InputType != "" {
 		c.Type = c.InputType
@@ -197,14 +197,14 @@ func (c *Config) Validate() error {
 }
 
 // checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
-func (c Config) checkUnsupportedParams(logger *logp.Logger) {
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
 	if c.ScanSort != "" {
 		logger.Warn(cfgwarn.Experimental("scan_sort is used."))
 	}
 }
 
 // resolveRecursiveGlobs expands `**` from the globs in multiple patterns
-func (c *Config) resolveRecursiveGlobs(logger *logp.Logger) error {
+func (c *config) resolveRecursiveGlobs(logger *logp.Logger) error {
 	if !c.RecursiveGlob {
 		logger.Named("input").Debug("recursive glob disabled")
 		return nil
@@ -227,7 +227,7 @@ func (c *Config) resolveRecursiveGlobs(logger *logp.Logger) error {
 }
 
 // normalizeGlobPatterns calls `filepath.Abs` on all the globs from config
-func (c *Config) normalizeGlobPatterns() error {
+func (c *config) normalizeGlobPatterns() error {
 	var paths []string
 	for _, path := range c.Paths {
 		pathAbs, err := filepath.Abs(path)

@@ -29,7 +29,7 @@ import (
 )
 
 func TestCleanOlderError(t *testing.T) {
-	config := Config{
+	config := config{
 		CleanInactive: 10 * time.Hour,
 	}
 
@@ -38,7 +38,7 @@ func TestCleanOlderError(t *testing.T) {
 }
 
 func TestCleanOlderIgnoreOlderError(t *testing.T) {
-	config := Config{
+	config := config{
 		CleanInactive: 10 * time.Hour,
 		IgnoreOlder:   15 * time.Hour,
 	}
@@ -48,7 +48,7 @@ func TestCleanOlderIgnoreOlderError(t *testing.T) {
 }
 
 func TestCleanOlderIgnoreOlderErrorEqual(t *testing.T) {
-	config := Config{
+	config := config{
 		CleanInactive: 10 * time.Hour,
 		IgnoreOlder:   10 * time.Hour,
 	}
@@ -58,8 +58,8 @@ func TestCleanOlderIgnoreOlderErrorEqual(t *testing.T) {
 }
 
 func TestCleanOlderIgnoreOlder(t *testing.T) {
-	config := Config{
-		CleanInactive: 10*time.Hour + DefaultConfig().ScanFrequency + 1*time.Second,
+	config := config{
+		CleanInactive: 10*time.Hour + defaultConfig().ScanFrequency + 1*time.Second,
 		IgnoreOlder:   10 * time.Hour,
 		Paths:         []string{"hello"},
 		ForwarderConfig: harvester.ForwarderConfig{
