@@ -134,15 +134,19 @@ func convertValueToString(fieldValue reflect.Value, flag EncodingFlag) (string, 
 		}
 		return strconv.FormatUint(val, 10), nil
 
-	case reflect.Float32, reflect.Float64:
-		// Use -1 for precision to format the smallest number of digits necessary
-		var bitSize int
-		if fieldValue.Kind() == reflect.Float32 {
-			bitSize = 32
-		} else {
-			bitSize = 64
+	case reflect.Float32:
+		val := fieldValue.Float()
+		if !flag.has(EncodingFlagUseNumbersZeroValues) && val == 0 {
+			return "", nil
 		}
-		return strconv.FormatFloat(fieldValue.Float(), 'f', -1, bitSize), nil
+		// Use -1 for precision to format the smallest number of digits necessary
+		return strconv.FormatFloat(val, 'f', -1, 32), nil
+	case reflect.Float64:
+		val := fieldValue.Float()
+		if !flag.has(EncodingFlagUseNumbersZeroValues) && val == 0 {
+			return "", nil
+		}
+		return strconv.FormatFloat(val, 'f', -1, 64), nil
 
 	// Default: use Sprintf for unsupported types
 	default:
