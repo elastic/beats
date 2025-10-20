@@ -50,33 +50,56 @@ func ToMapstr(m pcommon.Map) mapstr.M {
 //     pcommon.Map.FromRaw(...) will return an "invalid type" error.
 //     To overcome this, we use "reflect" to transform []T into []any.
 func ConvertNonPrimitive[T mapstrOrMap](m T, bodyMap pcommon.Map) {
-	for key, val := range m {
+	convertMap(map[string]any(m), bodyMap)
+}
+
+func convertMap(src map[string]any, dst pcommon.Map) {
+	dst.EnsureCapacity(len(src))
+	for key, val := range src {
 		switch x := val.(type) {
-		case mapstr.M:
-			ConvertNonPrimitive(map[string]any(x), bodyMap.PutEmptyMap(key))
-		case []mapstr.M:
-			s := bodyMap.PutEmptySlice(key)
-			for _, val := range x {
-				ConvertNonPrimitive(map[string]any(val), s.AppendEmpty().SetEmptyMap())
-			}
-		case map[string]any:
-			ConvertNonPrimitive(x, bodyMap.PutEmptyMap(key))
-		case []map[string]any:
-			s := bodyMap.PutEmptySlice(key)
-			for _, val := range x {
-				ConvertNonPrimitive(val, s.AppendEmpty().SetEmptyMap())
-			}
+		case string:
+			dst.PutStr(key, x)
+		case bool:
+			dst.PutBool(key, x)
+		case int, int8, int16, int32, int64:
+			dst.PutInt(key, reflect.ValueOf(x).Int())
+		case uint, uint8, uint16, uint32, uint64:
+			dst.PutInt(key, int64(reflect.ValueOf(x).Uint()))
+		case float32, float64:
+			dst.PutDouble(key, reflect.ValueOf(x).Convert(reflect.TypeOf(float64(0))).Float())
 		case time.Time:
-			bodyMap.PutStr(key, x.UTC().Format("2006-01-02T15:04:05.000Z"))
+			dst.PutStr(key, x.UTC().Format("2006-01-02T15:04:05.000Z"))
 		case common.Time:
-			bodyMap.PutStr(key, time.Time(x).UTC().Format("2006-01-02T15:04:05.000Z"))
+			dst.PutStr(key, time.Time(x).UTC().Format("2006-01-02T15:04:05.000Z"))
+		case mapstr.M:
+			child := dst.PutEmptyMap(key)
+			convertMap(map[string]any(x), child)
+		case map[string]any:
+			child := dst.PutEmptyMap(key)
+			convertMap(x, child)
+		case []mapstr.M:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, val := range x {
+				child := s.AppendEmpty().SetEmptyMap()
+				convertMap(map[string]any(val), child)
+			}
+		case []map[string]any:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, val := range x {
+				child := s.AppendEmpty().SetEmptyMap()
+				convertMap(val, child)
+			}
 		case []time.Time:
-			s := bodyMap.PutEmptySlice(key)
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
 			for _, i := range x {
 				s.AppendEmpty().SetStr(i.UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
 		case []common.Time:
-			s := bodyMap.PutEmptySlice(key)
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
 			for _, i := range x {
 				s.AppendEmpty().SetStr(time.Time(i).UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
@@ -85,43 +108,45 @@ func ConvertNonPrimitive[T mapstrOrMap](m T, bodyMap pcommon.Map) {
 			if err != nil {
 				text = fmt.Appendf(nil, "error converting %T to string: %s", x, err)
 			}
-			bodyMap.PutStr(key, string(text))
+			dst.PutStr(key, string(text))
 		case []bool, []string, []float32, []float64, []int, []int8, []int16, []int32, []int64,
 			[]uint, []uint8, []uint16, []uint32, []uint64:
 			ref := reflect.ValueOf(x)
-			s := bodyMap.PutEmptySlice(key)
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(ref.Len())
 			for i := 0; i < ref.Len(); i++ {
 				s.AppendEmpty().FromRaw(ref.Index(i).Interface())
 			}
-		case nil, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool:
-			bodyMap.PutEmpty(key).FromRaw(x)
 		default:
 			ref := reflect.ValueOf(x)
 			if ref.Kind() == reflect.Struct {
 				var im map[string]any
 				err := marshalUnmarshal(x, &im)
 				if err != nil {
-					bodyMap.PutStr(key, fmt.Sprintf("error encoding struct to map: %s", err))
+					dst.PutStr(key, fmt.Sprintf("error encoding struct to map: %s", err))
 					break
 				}
-				ConvertNonPrimitive(im, bodyMap.PutEmptyMap(key))
+				child := dst.PutEmptyMap(key)
+				convertMap(im, child)
 				break
 			}
 			if ref.Kind() == reflect.Slice || ref.Kind() == reflect.Array {
-				s := bodyMap.PutEmptySlice(key)
+				s := dst.PutEmptySlice(key)
 				for i := 0; i < ref.Len(); i++ {
 					elem := ref.Index(i).Interface()
 					if mi, ok := elem.(map[string]any); ok {
-						ConvertNonPrimitive(mi, s.AppendEmpty().SetEmptyMap())
+						child := s.AppendEmpty().SetEmptyMap()
+						convertMap(mi, child)
 					} else if mi, ok := elem.(mapstr.M); ok {
-						ConvertNonPrimitive(map[string]any(mi), s.AppendEmpty().SetEmptyMap())
+						child := s.AppendEmpty().SetEmptyMap()
+						convertMap(map[string]any(mi), child)
 					} else {
 						s.AppendEmpty().FromRaw(elem)
 					}
 				}
-				break // we figured out the type, so we don't need the unknown type case
+				break
 			}
-			bodyMap.PutStr(key, fmt.Sprintf("unknown type: %T", x))
+			dst.PutStr(key, fmt.Sprintf("unknown type: %T", x))
 		}
 	}
 }
