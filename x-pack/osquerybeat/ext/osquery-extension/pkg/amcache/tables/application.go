@@ -10,7 +10,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/osquery/osquery-go/plugin/table"
-	"log"
 	"www.velocidex.com/golang/regparser"
 )
 
@@ -118,9 +117,6 @@ func ApplicationColumns() []table.ColumnDefinition {
 
 func ApplicationGenerateFunc(state GlobalStateInterface) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		for fieldName, Constraint := range queryContext.Constraints {
-			log.Printf("%s : %v", fieldName, Constraint)
-		}
 		programIds := GetConstraintsFromQueryContext("program_id", queryContext)
 		rows := state.GetApplicationEntries(programIds...)
 		return RowsAsStringMapArray(rows), nil

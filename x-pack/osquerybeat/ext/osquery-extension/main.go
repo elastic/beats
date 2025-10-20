@@ -44,7 +44,7 @@ import (
 var (
 	socket   = flag.String("socket", "", "Path to the extensions UNIX domain socket")
 	timeout  = flag.Int("timeout", 3, "Seconds to wait for autoloaded extensions")
-	interval = flag.Int("interval", 3, "Seconds delay between connectivity checks")
+	interval = flag.Int("interval", 3, "Seconds- delay between connectivity checks")
 	_        = flag.Bool("verbose", false, "Verbose logging")
 )
 
@@ -62,8 +62,6 @@ func main() {
 		time.Second * time.Duration(*interval),
 	)
 
-	go monitorForParent()
-
 	server, err := osquery.NewExtensionManagerServer(
 		"osquery-extension",
 		*socket,
@@ -74,8 +72,12 @@ func main() {
 		log.Fatalf("Error creating extension: %s\n", err)
 	}
 
-	// Register the tables available for the specific pltaform build
+	go monitorForParent(socket)
+
+	// Register the tables available for the specific platform build
 	RegisterTables(server)
+
+	go CreateViews(socket)
 
 	if err := server.Run(); err != nil {
 		log.Fatal(err)
@@ -86,7 +88,7 @@ func main() {
 // because osqueryd is always the process starting the extension, when osqueryd is killed this process should also be cleaned up.
 // sometimes the termination is not clean, causing this process to remain running, which sometimes prevents osqueryd from properly restarting.
 // https://github.com/kolide/launcher/issues/341
-func monitorForParent() {
+func monitorForParent(server *string) {
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
 
@@ -94,6 +96,7 @@ func monitorForParent() {
 		ppid := os.Getppid()
 		if ppid <= 1 {
 			fmt.Fprintln(os.Stderr, "extension process no longer owned by osqueryd, quitting")
+			log.Printf("extension process no longer owned by osqueryd, quitting\n")
 			os.Exit(1)
 		}
 	}

@@ -22,3 +22,11 @@ func RegisterTables(server *osquery.ExtensionManagerServer) {
 	server.RegisterPlugin(table.NewPlugin("amcache_device_pnp", tables.DevicePnpColumns(), tables.DevicePnpGenerateFunc(globalState)))
 	server.RegisterPlugin(table.NewPlugin("amcache_driver_binary", tables.DriverBinaryColumns(), tables.DriverBinaryGenerateFunc(globalState)))
 }
+
+func CreateViews(socket *string) {
+	amcacheView := View{
+		requiredTables: []string{"amcache_application", "amcache_application_file"},
+		createViewQuery: "CREATE VIEW amcache_applications as SELECT * FROM amcache_application_file JOIN amcache_application using (program_id);",
+	}
+	amcacheView.CreateView(socket)
+}

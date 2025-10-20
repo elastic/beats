@@ -18,3 +18,6 @@ func RegisterTables(server *osquery.ExtensionManagerServer) {
 	server.RegisterPlugin(table.NewPlugin("host_groups", tables.HostGroupsColumns(), tables.GetHostGroupsGenerateFunc()))
 	server.RegisterPlugin(table.NewPlugin("host_processes", tables.HostProcessesColumns(), tables.GetHostProcessesGenerateFunc()))
 }
+
+func CreateViews(socket *string) {
+}
