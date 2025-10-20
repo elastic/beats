@@ -264,6 +264,21 @@ func getBeatsAuthExtensionConfig(cfg *config.C) (map[string]any, error) {
 		return nil, err
 	}
 
+	// proxy_url on newConfig is of type *url.URL which is not understood by beatsauth extension
+	// this logic here converts it into string type similar to what a user would set on filebeat config
+	if defaultTransportSettings.Proxy.URL != nil {
+		proxyURL, err := config.NewConfigFrom(map[string]any{
+			"proxy_url": defaultTransportSettings.Proxy.URL.String(),
+		})
+		if err != nil {
+			return nil, fmt.Errorf("error translating proxy_url: %w", err)
+		}
+		err = newConfig.Merge(proxyURL)
+		if err != nil {
+			return nil, fmt.Errorf("error merging proxy_url: %w", err)
+		}
+	}
+
 	var newMap map[string]any
 	err = newConfig.Unpack(&newMap)
 	if err != nil {
