@@ -62,7 +62,7 @@ func main() {
 		time.Second * time.Duration(*interval),
 	)
 
-	go monitorForParent(socket)
+	go monitorForParent()
 
 	server, err := osquery.NewExtensionManagerServer(
 		"osquery-extension",
@@ -89,7 +89,7 @@ func main() {
 // because osqueryd is always the process starting the extension, when osqueryd is killed this process should also be cleaned up.
 // sometimes the termination is not clean, causing this process to remain running, which sometimes prevents osqueryd from properly restarting.
 // https://github.com/kolide/launcher/issues/341
-func monitorForParent(server *string) {
+func monitorForParent() {
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
 
@@ -97,7 +97,6 @@ func monitorForParent(server *string) {
 		ppid := os.Getppid()
 		if ppid <= 1 {
 			fmt.Fprintln(os.Stderr, "extension process no longer owned by osqueryd, quitting")
-			log.Printf("extension process no longer owned by osqueryd, quitting\n")
 			os.Exit(1)
 		}
 	}
