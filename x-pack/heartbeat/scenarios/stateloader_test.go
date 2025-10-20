@@ -18,6 +18,7 @@ const numRuns = 2
 var esIntegTwists = framework.MultiTwist(TwistAddRunFrom, TwistMultiRun(numRuns))
 
 func TestStateContinuity(t *testing.T) {
+	t.Skip("Skipping flaky test https://github.com/elastic/beats/issues/47193")
 	t.Parallel()
 	scenarioDB.RunAllWithATwist(t, esIntegTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		events := mtr.Events()
