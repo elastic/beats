@@ -149,7 +149,7 @@ processors:
 	compareOutputFiles(t, fbFilePath, otelFilePath, ignoredFields)
 }
 
-// TestProxyURL verifies that Filebeat OTel mode can send data to Logstash via a SOCKS5 proxy.
+// TestLogstashExporterProxyURL verifies that Filebeat OTel mode can send data to Logstash via a SOCKS5 proxy.
 // Filebeat otel mode sends events to "logstash" via a socks5-proxy container running on localhost:1080
 func TestLogstashExporterProxyURL(t *testing.T) {
 	// ensure the size of events is big enough
@@ -199,8 +199,8 @@ processors:
 	outOTelFileURL := fmt.Sprintf("%s/%s_otel.json", baseURL, testCaseName)
 
 	// Logstash is outputting to a file inside its container, to access
-	// this file we use Nignx to serve the output folder via HTTP
-	// (see docker-compose.yml for Logstash and Nginx configuraiton).
+	// this file we use Nginx to serve the output folder via HTTP
+	// (see docker-compose.yml for Logstash and Nginx configuration).
 	// Wait to ensure the file can be downloaded via HTTP, the file
 	// being available indicates that Filebeat successfully sent data
 	// to Logstash
