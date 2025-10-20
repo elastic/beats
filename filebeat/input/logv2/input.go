@@ -37,7 +37,7 @@ import (
 const pluginName = "log"
 
 func init() {
-	// Register an input V1, that's used by the log input
+	// Register an input V1, to replace the Log input one.
 	if err := v1.Register(pluginName, newV1Input); err != nil {
 		panic(err)
 	}
@@ -47,10 +47,14 @@ func init() {
 // Filestream input, on any error the boolean value must be ignore and
 // no input started. runAsFilestream also sets the input type accordingly.
 func runAsFilestream(cfg *config.C) (bool, error) {
+	// Global feature flag that forces all Log input instances
+	// to run as Filestream.
 	if features.LogInputRunFilestream() {
 		return true, nil
 	}
 
+	// Only allow to run the Log input as Filestream if Filebeat
+	// is running under Elastic Agent.
 	if !management.UnderAgent() {
 		return false, nil
 	}
@@ -63,7 +67,7 @@ func runAsFilestream(cfg *config.C) (bool, error) {
 	if ok := cfg.HasField("run_as_filestream"); ok {
 		runAsFilestream, err := cfg.Bool("run_as_filestream", -1)
 		if err != nil {
-			return false, fmt.Errorf("newV1Input: cannot parse 'run_as_filestream': %w", err)
+			return false, fmt.Errorf("cannot parse 'run_as_filestream': %w", err)
 		}
 
 		if runAsFilestream {
@@ -78,15 +82,17 @@ func runAsFilestream(cfg *config.C) (bool, error) {
 	return false, nil
 }
 
-// newV1Input creates a new log input
+// newV1Input instantiates the Log input. If 'run_as_filestream' is
+// true, then v2.ErrUnknownInput is returned so the Filestream input
+// can be instantiated.
 func newV1Input(
 	cfg *config.C,
 	outlet channel.Connector,
 	context v1.Context,
 	logger *logp.Logger,
 ) (v1.Input, error) {
-	// Inputs V2 should be tried last, so if this function is run we are
-	// supposed to be running as the Log input. However not to rely on the
+	// Inputs V1 should be tried last, so if this function is run we are
+	// supposed to be running as the Log input. However do not rely on the
 	// factory implementation, also check whether to run as Log or Filestream
 	// inputs.
 	asFilestream, err := runAsFilestream(cfg)
@@ -107,7 +113,11 @@ func newV1Input(
 	return inp, err
 }
 
-// PluginV2 proxies the call to filestream's Plugin function
+// PluginV2 returns a v2.Plugin with a manager that checks whether
+// the config is from a Log input that should run as Filestream.
+// If that is the case the Log input configuration is  converted to
+// Filestream and the Filestream input returned.
+// Otherwise v2.ErrUnknownInput is returned.
 func PluginV2(logger *logp.Logger, store statestore.States) v2.Plugin {
 	// The InputManager for Filestream input is from an internal package, so we
 	// cannot instantiate it directly here. To circumvent that, we instantiate
