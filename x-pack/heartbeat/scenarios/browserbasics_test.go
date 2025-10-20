@@ -9,9 +9,10 @@ package scenarios
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
