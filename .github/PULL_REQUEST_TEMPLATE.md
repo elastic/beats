@@ -42,7 +42,7 @@ List here all the items you have verified BEFORE sending this PR. Please DO NOT 
 - [ ] I have made corresponding changes to the documentation
 - [ ] I have made corresponding change to the default configuration files
 - [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] I have added an entry in `CHANGELOG.next.asciidoc` or `CHANGELOG-developer.next.asciidoc`.
+- [ ] I have added an entry in `./changelog/fragments` using the [changelog tool](https://github.com/elastic/elastic-agent-changelog-tool/blob/main/docs/usage.md).
 
 ## Disruptive User Impact
 
