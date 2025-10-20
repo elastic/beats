@@ -198,14 +198,21 @@ processors:
 	baseURL := "http://localhost:8082"
 	outOTelFileURL := fmt.Sprintf("%s/%s_otel.json", baseURL, testCaseName)
 
-	// wait for logs to be published over HTTP
+	// Logstash is outputting to a file inside its container, to access
+	// this file we use Nignx to serve the output folder via HTTP
+	// (see docker-compose.yml for Logstash and Nginx configuraiton).
+	// Wait to ensure the file can be downloaded via HTTP, the file
+	// being available indicates that Filebeat successfully sent data
+	// to Logstash
 	require.EventuallyWithTf(t,
 		func(ct *assert.CollectT) {
 			for _, url := range []string{outOTelFileURL} {
 				checkURLHasContent(ct, url)
 			}
 		},
-		30*time.Second, 1*time.Second, "expected Nginx to serve json files over HTTP")
+		30*time.Second,
+		1*time.Second,
+		"did not find Logstash output file served via Nginx")
 
 	// download files from Nginx
 	otelFilePath := downloadToTestData(t, outOTelFileURL, fmt.Sprintf("%s_otel.json", testCaseName))
