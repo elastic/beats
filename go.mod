@@ -237,10 +237,13 @@ require (
 require (
 	github.com/apache/arrow/go/v17 v17.0.0
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
+	github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.3.0
 	github.com/otiai10/copy v1.14.1
 	go.opentelemetry.io/collector/client v1.41.0
 	go.opentelemetry.io/collector/component/componenttest v0.135.0
 	go.opentelemetry.io/collector/consumer/consumertest v0.135.0
+	go.opentelemetry.io/collector/processor v1.41.0
+	go.opentelemetry.io/collector/processor/processorhelper v0.135.0
 	go.opentelemetry.io/otel/sdk/metric v1.38.0
 	go.uber.org/goleak v1.3.0
 )
@@ -454,7 +457,6 @@ require (
 	go.opentelemetry.io/collector/pdata/xpdata v0.135.0 // indirect
 	go.opentelemetry.io/collector/pipeline v1.41.0 // indirect
 	go.opentelemetry.io/collector/pipeline/xpipeline v0.135.0 // indirect
-	go.opentelemetry.io/collector/processor v1.41.0 // indirect
 	go.opentelemetry.io/collector/processor/processortest v0.135.0 // indirect
 	go.opentelemetry.io/collector/processor/xprocessor v0.135.0 // indirect
 	go.opentelemetry.io/collector/receiver/receivertest v0.135.0 // indirect

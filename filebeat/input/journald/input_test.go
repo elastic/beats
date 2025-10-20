@@ -468,6 +468,61 @@ func TestPathIsFolder(t *testing.T) {
 	}
 }
 
+func TestDoubleStarCanBeUsed(t *testing.T) {
+	srcDir := decompressAll(t, filepath.Join("testdata", "journal*.journal.gz"))
+	dstDir := t.TempDir()
+
+	srcFiles := []string{}
+	dstFiles := []string{}
+	for i := range 3 {
+		fName := fmt.Sprintf("journal%d.journal", i+1)
+		srcFiles = append(srcFiles, filepath.Join(srcDir, fName))
+		dstFiles = append(dstFiles, filepath.Join(t.TempDir(), fName))
+	}
+
+	// We want to test a glob in the format:
+	// /tmp/TestFoo/*/*
+	// To match files like
+	//   - /tmp/TestFoo/001/journal1.journal
+	//   - /tmp/TestFoo/001/journal2.journal
+	// So we construct the glob from dstDir
+
+	split := strings.Split(dstDir, "/")
+	split = split[:len(split)-1]
+	split = append(split, "*", "*")
+	path := filepath.Join(split...)
+	path = string(filepath.Separator) + path // Add the leading separator
+
+	env := newInputTestingEnvironment(t)
+	cfg := mapstr.M{
+		"paths": []string{path},
+	}
+
+	inp := env.mustCreateInput(cfg)
+	ctx, cancelInput := context.WithCancel(context.Background())
+	t.Cleanup(cancelInput)
+
+	for i := range len(srcFiles) {
+		if err := os.Rename(srcFiles[i], dstFiles[i]); err != nil {
+			t.Fatalf("cannot move file: %s", err)
+		}
+	}
+
+	env.startInput(ctx, inp)
+	// Wait for at least 11 events, this means more than one journal file
+	// has been read and ingested.
+	//
+	// When many small journal files are ingested, the journalctl process
+	// may exit before the input has fully read its stdout, which makes us
+	// discard the last few lines/entries.
+	//
+	// We still correctly track the cursor of events published to the output,
+	// however the cursor returned by journalctl on this set of handcrafted
+	// journal files leads to us skipping some events.
+	// See https://github.com/elastic/beats/issues/46904.
+	env.waitUntilEventsPublished(11)
+}
+
 func decompress(t *testing.T, namegz string) string {
 	return decompressGz(t, t.TempDir(), namegz)
 }

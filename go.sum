@@ -408,6 +408,8 @@ github.com/elastic/mito v1.22.0 h1:DW4RkO+PLwSbKVF5ijYzi0ug+TKzLL+DVJRzbOPbzQ0=
 github.com/elastic/mito v1.22.0/go.mod h1:h1V+8B62+DXsu0TstJkjsTh5ewJIDJlwzxPkP3HBM9s=
 github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6 h1:JVNuBrmOoqLJgp9o68YBMnOrXCzQI3mCppW+suwRSlw=
 github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6/go.mod h1:cXqWcLnmu5y4QveTb2hjk7rgzkHMuZsqeXtbJpNAcu0=
+github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.3.0 h1:0+WK9lHE5HflQFUSghnpBAto7jQItDw5o+uTSGKHMlo=
+github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.3.0/go.mod h1:OdiJntTK9K7urGZ1hwAi2v/Ha3jsBKv8Yu2QLSCn6Yc=
 github.com/elastic/pkcs8 v1.0.0 h1:HhitlUKxhN288kcNcYkjW6/ouvuwJWd9ioxpjnD9jVA=
 github.com/elastic/pkcs8 v1.0.0/go.mod h1:ipsZToJfq1MxclVTwpG7U/bgeDtf+0HkUiOxebk95+0=
 github.com/elastic/sarama v1.19.1-0.20250603175145-7672917f26b6 h1:2COw7kzXkIyS4hKNUl5qw0KolrwncrY4VVNpngVNo8I=
@@ -1144,6 +1146,8 @@ go.opentelemetry.io/collector/pipeline/xpipeline v0.135.0 h1:SstI81OsKdc2t/4XVUO
 go.opentelemetry.io/collector/pipeline/xpipeline v0.135.0/go.mod h1:PHR3zAsx6sYOEYBc0zcNK30szcKd6svY+L+udanXh+U=
 go.opentelemetry.io/collector/processor v1.41.0 h1:LDQyPBP/fl7BujDzShYTywDe4GmOjEOoImeIdMPPFTU=
 go.opentelemetry.io/collector/processor v1.41.0/go.mod h1:NwY+XSP3sDxCVJ8aB9PkP8ahJmp6GAtq1JwyXu9M318=
+go.opentelemetry.io/collector/processor/processorhelper v0.135.0 h1:N9yoAK3gAWIC1WCeIuUo0QxitfJ5DBnx6HgfB3mNgzA=
+go.opentelemetry.io/collector/processor/processorhelper v0.135.0/go.mod h1:NRR2TkqrizlOumQg9Ai4cvtJjprAV2QS/VefrCR+F8w=
 go.opentelemetry.io/collector/processor/processortest v0.135.0 h1:sq5fZVp1RRoKzG10ZdRRKh/LawmyR2iHUudnHkmBaZY=
 go.opentelemetry.io/collector/processor/processortest v0.135.0/go.mod h1:+tmZUAZmR833IgJi0+QOexrtOWTEG/5Oidv8zPUMYOU=
 go.opentelemetry.io/collector/processor/xprocessor v0.135.0 h1:BPxzWElfiLXcL1sUmvNDSRXsYmcopY8ajBpuERm0jx4=
