@@ -23,7 +23,8 @@ type azureInputConfig struct {
 	// EventHubName is the name of the event hub to connect to.
 	EventHubName string `config:"eventhub" validate:"required"`
 	// ConnectionString is the connection string to connect to the event hub.
-	ConnectionString string `config:"connection_string" validate:"required"`
+	// This is required when using Shared Access Key authentication.
+	ConnectionString string `config:"connection_string"`
 	// ConsumerGroup is the name of the consumer group to use.
 	ConsumerGroup string `config:"consumer_group"`
 	// Azure Storage container to store leases and checkpoints
@@ -38,6 +39,26 @@ type azureInputConfig struct {
 	SAContainer string `config:"storage_account_container"`
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
 	OverrideEnvironment string `config:"resource_manager_endpoint"`
+
+	// ---------------------------------------
+	// OAuth2 authentication configuration
+	// ---------------------------------------
+
+	// EventHubNamespace is the fully qualified namespace for the Event Hub.
+	// Required when using OAuth2 authentication (when connection_string is not provided).
+	EventHubNamespace string `config:"eventhub_namespace"`
+	// TenantID is the Azure Active Directory tenant ID.
+	// Required when using OAuth2 authentication (when connection_string is not provided).
+	TenantID string `config:"tenant_id"`
+	// ClientID is the Azure Active Directory application (client) ID.
+	// Required when using OAuth2 authentication (when connection_string is not provided).
+	ClientID string `config:"client_id"`
+	// ClientSecret is the Azure Active Directory application client secret.
+	// Required when using OAuth2 authentication with client credentials flow.
+	ClientSecret string `config:"client_secret"`
+	// AuthorityHost is the Azure Active Directory authority host.
+	// Optional, defaults to Azure Public Cloud.
+	AuthorityHost string `config:"authority_host"`
 	// LegacySanitizeOptions is a list of sanitization options to apply to messages.
 	//
 	// The supported options are:
@@ -125,19 +146,39 @@ func defaultConfig() azureInputConfig {
 func (conf *azureInputConfig) Validate() error {
 	logger := logp.NewLogger("azureeventhub.config")
 
-	connectionStringProperties, err := parseConnectionString(conf.ConnectionString)
-	if err != nil {
-		return fmt.Errorf("invalid connection string: %w", err)
-	}
+	// Determine authentication method based on whether connection_string is provided
+	useOAuth2 := conf.ConnectionString == ""
 
-	// If the connection string contains an entity path, we need to double
-	// check that it matches the event hub name.
-	if connectionStringProperties.EntityPath != nil && *connectionStringProperties.EntityPath != conf.EventHubName {
-		return fmt.Errorf(
-			"invalid config: the entity path (%s) in the connection string does not match event hub name (%s)",
-			*connectionStringProperties.EntityPath,
-			conf.EventHubName,
-		)
+	if useOAuth2 {
+		// Validate OAuth2 configuration
+		if conf.EventHubNamespace == "" {
+			return errors.New("eventhub_namespace is required when connection_string is not provided (OAuth2 authentication)")
+		}
+		if conf.TenantID == "" {
+			return errors.New("tenant_id is required when connection_string is not provided (OAuth2 authentication)")
+		}
+		if conf.ClientID == "" {
+			return errors.New("client_id is required when connection_string is not provided (OAuth2 authentication)")
+		}
+		if conf.ClientSecret == "" {
+			return errors.New("client_secret is required when connection_string is not provided (OAuth2 authentication)")
+		}
+	} else {
+		// Validate connection string configuration
+		connectionStringProperties, err := parseConnectionString(conf.ConnectionString)
+		if err != nil {
+			return fmt.Errorf("invalid connection string: %w", err)
+		}
+
+		// If the connection string contains an entity path, we need to double
+		// check that it matches the event hub name.
+		if connectionStringProperties.EntityPath != nil && *connectionStringProperties.EntityPath != conf.EventHubName {
+			return fmt.Errorf(
+				"invalid config: the entity path (%s) in the connection string does not match event hub name (%s)",
+				*connectionStringProperties.EntityPath,
+				conf.EventHubName,
+			)
+		}
 	}
 
 	if conf.EventHubName == "" {

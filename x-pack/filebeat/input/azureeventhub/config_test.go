@@ -154,3 +154,125 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		assert.ErrorContains(t, err, "invalid config: the entity path (my-event-hub) in the connection string does not match event hub name (not-my-event-hub)")
 	})
 }
+
+func TestOAuth2ConfigValidation(t *testing.T) {
+	tests := []struct {
+		name        string
+		config      azureInputConfig
+		expectError bool
+		errorMsg    string
+	}{
+		{
+			name: "valid oauth2 config (no connection_string)",
+			config: azureInputConfig{
+				EventHubName:       "test-hub",
+				EventHubNamespace:  "test-namespace.servicebus.windows.net",
+				TenantID:           "test-tenant-id",
+				ClientID:           "test-client-id",
+				ClientSecret:       "test-client-secret",
+				SAName:             "test-storage",
+				SAConnectionString: "test-connection-string",
+			},
+			expectError: false,
+		},
+		{
+			name: "oauth2 config missing namespace",
+			config: azureInputConfig{
+				EventHubName:       "test-hub",
+				TenantID:           "test-tenant-id",
+				ClientID:           "test-client-id",
+				ClientSecret:       "test-client-secret",
+				SAName:             "test-storage",
+				SAConnectionString: "test-connection-string",
+			},
+			expectError: true,
+			errorMsg:    "eventhub_namespace is required when connection_string is not provided (OAuth2 authentication)",
+		},
+		{
+			name: "oauth2 config missing tenant_id",
+			config: azureInputConfig{
+				EventHubName:       "test-hub",
+				EventHubNamespace:  "test-namespace.servicebus.windows.net",
+				ClientID:           "test-client-id",
+				ClientSecret:       "test-client-secret",
+				SAName:             "test-storage",
+				SAConnectionString: "test-connection-string",
+			},
+			expectError: true,
+			errorMsg:    "tenant_id is required when connection_string is not provided (OAuth2 authentication)",
+		},
+		{
+			name: "oauth2 config missing client_id",
+			config: azureInputConfig{
+				EventHubName:       "test-hub",
+				EventHubNamespace:  "test-namespace.servicebus.windows.net",
+				TenantID:           "test-tenant-id",
+				ClientSecret:       "test-client-secret",
+				SAName:             "test-storage",
+				SAConnectionString: "test-connection-string",
+			},
+			expectError: true,
+			errorMsg:    "client_id is required when connection_string is not provided (OAuth2 authentication)",
+		},
+		{
+			name: "oauth2 config missing client_secret",
+			config: azureInputConfig{
+				EventHubName:       "test-hub",
+				EventHubNamespace:  "test-namespace.servicebus.windows.net",
+				TenantID:           "test-tenant-id",
+				ClientID:           "test-client-id",
+				SAName:             "test-storage",
+				SAConnectionString: "test-connection-string",
+			},
+			expectError: true,
+			errorMsg:    "client_secret is required when connection_string is not provided (OAuth2 authentication)",
+		},
+		{
+			name: "valid connection_string config",
+			config: azureInputConfig{
+				EventHubName:       "test-hub",
+				ConnectionString:   "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test",
+				SAName:             "test-storage",
+				SAConnectionString: "test-connection-string",
+			},
+			expectError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.config.Validate()
+			if tt.expectError {
+				if err == nil {
+					t.Errorf("expected error but got none")
+					return
+				}
+				if tt.errorMsg != "" && err.Error() != tt.errorMsg {
+					t.Errorf("expected error message %q, got %q", tt.errorMsg, err.Error())
+				}
+			} else {
+				if err != nil {
+					t.Errorf("unexpected error: %v", err)
+				}
+			}
+		})
+	}
+}
+
+func TestGetAzureCloud(t *testing.T) {
+	// Test that the function doesn't panic for different authority hosts
+	testCases := []string{
+		"https://login.microsoftonline.com",
+		"https://login.microsoftonline.us",
+		"https://login.chinacloudapi.cn",
+		"",
+	}
+
+	for _, authorityHost := range testCases {
+		t.Run("authority_host_"+authorityHost, func(t *testing.T) {
+			cloud := getAzureCloud(authorityHost)
+			// Just verify we got a result - we can't easily compare cloud configurations
+			_ = cloud
+		})
+	}
+}

@@ -17,6 +17,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/checkpoints"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/bloberror"
@@ -215,14 +216,26 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	}
 
 	// Create the event hub consumerClient to receive events.
-	consumerClient, err := azeventhubs.NewConsumerClientFromConnectionString(
-		in.config.ConnectionString,
-		eventHubName,
-		in.config.ConsumerGroup,
-		nil,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create consumer client: %w", err)
+	var consumerClient *azeventhubs.ConsumerClient
+
+	// Determine authentication method based on whether connection_string is provided
+	if in.config.ConnectionString == "" {
+		// Use OAuth2 authentication
+		consumerClient, err = createConsumerClientWithOAuth2(in.config, in.log)
+		if err != nil {
+			return fmt.Errorf("failed to create consumer client with OAuth2: %w", err)
+		}
+	} else {
+		// Use connection string authentication (default)
+		consumerClient, err = azeventhubs.NewConsumerClientFromConnectionString(
+			in.config.ConnectionString,
+			eventHubName,
+			in.config.ConsumerGroup,
+			nil,
+		)
+		if err != nil {
+			return fmt.Errorf("failed to create consumer client: %w", err)
+		}
 	}
 	in.consumerClient = consumerClient
 
@@ -658,4 +671,63 @@ func shutdownPartitionResources(ctx context.Context, partitionClient *azeventhub
 	// Closing the pipeline since we're done
 	// processing events for this partition.
 	defer pipelineClient.Close()
+}
+
+// createConsumerClientWithOAuth2 creates a new Event Hub consumer client using OAuth2 authentication.
+func createConsumerClientWithOAuth2(
+	config azureInputConfig,
+	log *logp.Logger,
+) (*azeventhubs.ConsumerClient, error) {
+	log = log.Named("oauth2")
+
+	// Create credential options
+	credentialOptions := &azidentity.ClientSecretCredentialOptions{
+		ClientOptions: azcore.ClientOptions{
+			Cloud: getAzureCloud(config.AuthorityHost),
+		},
+	}
+
+	// Create the credential
+	credential, err := azidentity.NewClientSecretCredential(
+		config.TenantID,
+		config.ClientID,
+		config.ClientSecret,
+		credentialOptions,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create client secret credential: %w", err)
+	}
+
+	// Create the consumer client with OAuth2 authentication
+	consumerClient, err := azeventhubs.NewConsumerClient(
+		config.EventHubNamespace,
+		config.EventHubName,
+		config.ConsumerGroup,
+		credential,
+		nil,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create consumer client with OAuth2: %w", err)
+	}
+
+	log.Infow("successfully created consumer client with OAuth2 authentication",
+		"namespace", config.EventHubNamespace,
+		"eventhub", config.EventHubName,
+		"tenant_id", config.TenantID,
+		"client_id", config.ClientID,
+	)
+
+	return consumerClient, nil
+}
+
+// getAzureCloud returns the appropriate Azure cloud configuration based on the authority host.
+func getAzureCloud(authorityHost string) cloud.Configuration {
+	switch authorityHost {
+	case "https://login.microsoftonline.us":
+		return cloud.AzureGovernment
+	case "https://login.chinacloudapi.cn":
+		return cloud.AzureChina
+	default:
+		return cloud.AzurePublic
+	}
 }

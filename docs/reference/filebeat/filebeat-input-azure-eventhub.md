@@ -13,7 +13,7 @@ Users can make use of the `azure-eventhub` input in order to read messages from 
 
 Users can enable internal logs tracing for this input by setting the environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true`. When enabled, this input will log additional information to the logs. Additional information includes partition ownership, blob lease information, and other internal state.
 
-Example configuration:
+Example configuration using Shared Access Key authentication:
 
 ```yaml
 filebeat.inputs:
@@ -25,6 +25,24 @@ filebeat.inputs:
   storage_account_key: "....."
   storage_account_container: ""
   resource_manager_endpoint: ""
+```
+
+Example configuration using OAuth2 authentication:
+
+```yaml
+filebeat.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "test"
+  # No connection_string provided - automatically uses OAuth2
+  eventhub_namespace: "your-eventhub-namespace.servicebus.windows.net"
+  tenant_id: "your-tenant-id"
+  client_id: "your-client-id"
+  client_secret: "your-client-secret"
+  authority_host: "https://login.microsoftonline.com"
+  storage_account: "azureeph"
+  storage_account_connection_string: "DefaultEndpointsProtocol=https;AccountName=..."
+  storage_account_container: ""
 ```
 
 ## Configuration options [_configuration_options]
@@ -44,9 +62,36 @@ Optional, we recommend using a dedicated consumer group for the azure input. Reu
 
 ## `connection_string` [_connection_string]
 
-The connection string required to communicate with Event Hubs, steps here [https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string).
+The connection string required to communicate with Event Hubs when using Shared Access Key authentication, steps here [https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string).
+
+**Note**: If `connection_string` is not provided, the input will automatically use OAuth2 authentication and require the OAuth2 configuration parameters below.
 
 A Blob Storage account is required in order to store/retrieve/update the offset or state of the eventhub messages. This means that after stopping filebeat it can start back up at the spot that it stopped processing messages.
+
+## `eventhub_namespace` [_eventhub_namespace]
+
+The fully qualified namespace for the Event Hub. Required when `connection_string` is not provided (OAuth2 authentication). Format: `your-eventhub-namespace.servicebus.windows.net`
+
+## `tenant_id` [_tenant_id]
+
+The Azure Active Directory tenant ID. Required when `connection_string` is not provided (OAuth2 authentication).
+
+## `client_id` [_client_id]
+
+The Azure Active Directory application (client) ID. Required when `connection_string` is not provided (OAuth2 authentication).
+
+## `client_secret` [_client_secret]
+
+The Azure Active Directory application client secret. Required when `connection_string` is not provided (OAuth2 authentication).
+
+## `authority_host` [_authority_host]
+
+The Azure Active Directory authority host. Optional when using OAuth2 authentication. Defaults to Azure Public Cloud (`https://login.microsoftonline.com`).
+
+Supported values:
+- `https://login.microsoftonline.com` (Azure Public Cloud - default)
+- `https://login.microsoftonline.us` (Azure Government)
+- `https://login.chinacloudapi.cn` (Azure China)
 
 
 ## `storage_account` [_storage_account]
