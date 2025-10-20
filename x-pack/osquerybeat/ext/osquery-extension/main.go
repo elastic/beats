@@ -44,7 +44,7 @@ import (
 var (
 	socket   = flag.String("socket", "", "Path to the extensions UNIX domain socket")
 	timeout  = flag.Int("timeout", 3, "Seconds to wait for autoloaded extensions")
-	interval = flag.Int("interval", 3, "Seconds- delay between connectivity checks")
+	interval = flag.Int("interval", 3, "Seconds delay between connectivity checks")
 	_        = flag.Bool("verbose", false, "Verbose logging")
 )
 
@@ -62,6 +62,8 @@ func main() {
 		time.Second * time.Duration(*interval),
 	)
 
+	go monitorForParent(socket)
+
 	server, err := osquery.NewExtensionManagerServer(
 		"osquery-extension",
 		*socket,
@@ -72,11 +74,10 @@ func main() {
 		log.Fatalf("Error creating extension: %s\n", err)
 	}
 
-	go monitorForParent(socket)
-
 	// Register the tables available for the specific platform build
 	RegisterTables(server)
 
+	// Create any views required for the specific platform build
 	go CreateViews(socket)
 
 	if err := server.Run(); err != nil {
