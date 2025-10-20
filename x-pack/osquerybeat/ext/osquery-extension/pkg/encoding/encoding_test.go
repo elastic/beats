@@ -16,9 +16,10 @@ func TestEncodingFlagHas(t *testing.T) {
 		expected bool
 	}{
 		{EncodingFlagParseUnexported, EncodingFlagParseUnexported, true},
-		{EncodingFlagParseUnexported, EncodingFlagUseNumbers0Values, false},
-		{EncodingFlagUseNumbers0Values, EncodingFlagUseNumbers0Values, true},
-		{EncodingFlagParseUnexported | EncodingFlagUseNumbers0Values, EncodingFlagParseUnexported, true},
+		{EncodingFlagParseUnexported, EncodingFlagUseNumbersZeroValues, false},
+		{EncodingFlagUseNumbersZeroValues, EncodingFlagUseNumbersZeroValues, true},
+		{EncodingFlagParseUnexported | EncodingFlagUseNumbersZeroValues, EncodingFlagParseUnexported, true},
+		{EncodingFlagParseUnexported | EncodingFlagUseNumbersZeroValues, EncodingFlagUseNumbersZeroValues, true},
 	}
 
 	for _, test := range tests {
@@ -92,8 +93,112 @@ func TestMarshalToMapWithFlags(t *testing.T) {
 			input: &struct {
 				ZeroVal int
 			}{ZeroVal: 0},
-			flags:    EncodingFlagUseNumbers0Values,
+			flags:    EncodingFlagUseNumbersZeroValues,
 			expected: map[string]string{"ZeroVal": "0"},
+			err:      false,
+		},
+		// Test bool type
+		{
+			input: &struct {
+				IsActive bool
+			}{IsActive: true},
+			flags:    0,
+			expected: map[string]string{"IsActive": "1"},
+			err:      false,
+		},
+		{
+			input: &struct {
+				IsActive bool
+			}{IsActive: false},
+			flags:    0,
+			expected: map[string]string{"IsActive": "0"},
+			err:      false,
+		},
+		// Test uint type
+		{
+			input: &struct {
+				Count uint
+			}{Count: 42},
+			flags:    0,
+			expected: map[string]string{"Count": "42"},
+			err:      false,
+		},
+		{
+			input: &struct {
+				Count uint
+			}{Count: 0},
+			flags:    0,
+			expected: map[string]string{"Count": ""},
+			err:      false,
+		},
+		{
+			input: &struct {
+				Count uint
+			}{Count: 0},
+			flags:    EncodingFlagUseNumbersZeroValues,
+			expected: map[string]string{"Count": "0"},
+			err:      false,
+		},
+		// Test float type
+		{
+			input: &struct {
+				Price float64
+			}{Price: 99.99},
+			flags:    0,
+			expected: map[string]string{"Price": "99.99"},
+			err:      false,
+		},
+		{
+			input: &struct {
+				Price float32
+			}{Price: 12.5},
+			flags:    0,
+			expected: map[string]string{"Price": "12.5"},
+			err:      false,
+		},
+		// Test non-pointer struct
+		{
+			input: struct {
+				Name string
+			}{Name: "test"},
+			flags:    0,
+			expected: map[string]string{"Name": "test"},
+			err:      false,
+		},
+		// Test pointer maps
+		{
+			input: &map[string]string{
+				"key1": "value1",
+				"key2": "value2",
+			},
+			flags:    0,
+			expected: map[string]string{"key1": "value1", "key2": "value2"},
+			err:      false,
+		},
+		// Test pointer fields
+		{
+			input: &struct {
+				StrPtr *string
+				IntPtr *int
+			}{
+				StrPtr: stringPtr("hello"),
+				IntPtr: intPtr(123),
+			},
+			flags:    0,
+			expected: map[string]string{"StrPtr": "hello", "IntPtr": "123"},
+			err:      false,
+		},
+		// Test nil pointer fields
+		{
+			input: &struct {
+				StrPtr *string
+				IntPtr *int
+			}{
+				StrPtr: nil,
+				IntPtr: nil,
+			},
+			flags:    0,
+			expected: map[string]string{"StrPtr": "", "IntPtr": ""},
 			err:      false,
 		},
 	}
@@ -108,4 +213,13 @@ func TestMarshalToMapWithFlags(t *testing.T) {
 			t.Errorf("MarshalToMapWithFlags(%v, %v) = %v; expected %v", test.input, test.flags, result, test.expected)
 		}
 	}
+}
+
+// Helper functions for creating pointers
+func stringPtr(s string) *string {
+	return &s
+}
+
+func intPtr(i int) *int {
+	return &i
 }

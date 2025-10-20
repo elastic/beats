@@ -13,8 +13,13 @@ import (
 type EncodingFlag int
 
 const (
+	// EncodingFlagParseUnexported enables parsing of unexported (private) struct fields.
+	// When set, fields that start with lowercase letters will be included in the output.
 	EncodingFlagParseUnexported EncodingFlag = 1 << iota
-	EncodingFlagUseNumbers0Values
+	// EncodingFlagUseNumbersZeroValues forces numeric zero values to be rendered as "0"
+	// instead of empty strings. By default, zero values for int, uint, and float types
+	// are converted to empty strings, but this flag preserves them as "0".
+	EncodingFlagUseNumbersZeroValues
 )
 
 func (f EncodingFlag) has(option EncodingFlag) bool {
@@ -29,11 +34,10 @@ func MarshalToMap(in any) (map[string]string, error) {
 }
 
 func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error) {
-	result := make(map[string]string)
-
 	if in == nil {
 		return nil, fmt.Errorf("input cannot be nil")
 	}
+	result := make(map[string]string)
 
 	v := reflect.ValueOf(in)
 	t := reflect.TypeOf(in)
@@ -96,6 +100,14 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 }
 
 func convertValueToString(fieldValue reflect.Value, flag EncodingFlag) (string, error) {
+	// Handle pointers first
+	if fieldValue.Kind() == reflect.Ptr {
+		if fieldValue.IsNil() {
+			return "", nil
+		}
+		return convertValueToString(fieldValue.Elem(), flag)
+	}
+
 	switch fieldValue.Kind() {
 	case reflect.String:
 		return fieldValue.String(), nil
@@ -110,21 +122,27 @@ func convertValueToString(fieldValue reflect.Value, flag EncodingFlag) (string, 
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		// osquery often expects empty string for 0 values unless necessary
 		val := fieldValue.Int()
-		if !flag.has(EncodingFlagUseNumbers0Values) && val == 0 {
+		if !flag.has(EncodingFlagUseNumbersZeroValues) && val == 0 {
 			return "", nil
 		}
 		return strconv.FormatInt(val, 10), nil
 
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		val := fieldValue.Uint()
-		if !flag.has(EncodingFlagUseNumbers0Values) && val == 0 {
+		if !flag.has(EncodingFlagUseNumbersZeroValues) && val == 0 {
 			return "", nil
 		}
 		return strconv.FormatUint(val, 10), nil
 
 	case reflect.Float32, reflect.Float64:
 		// Use -1 for precision to format the smallest number of digits necessary
-		return strconv.FormatFloat(fieldValue.Float(), 'f', -1, 64), nil
+		var bitSize int
+		if fieldValue.Kind() == reflect.Float32 {
+			bitSize = 32
+		} else {
+			bitSize = 64
+		}
+		return strconv.FormatFloat(fieldValue.Float(), 'f', -1, bitSize), nil
 
 	// Default: use Sprintf for unsupported types
 	default:
