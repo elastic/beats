@@ -23,6 +23,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -58,10 +59,15 @@ type logFile struct {
 
 	isInactive atomic.Bool
 
+	// offsetMutx is a mutex to ensure 'offset' and 'lastTimeRead' are
+	// atomically updated. Atomically updating them prevents issues
+	// detecting when the file is inactive by [shouldBeClosed].
+	offsetMutx   sync.Mutex
 	offset       int64
 	lastTimeRead time.Time
-	backoff      backoff.Backoff
-	tg           *unison.TaskGroup
+
+	backoff backoff.Backoff
+	tg      *unison.TaskGroup
 }
 
 // newFileReader creates a new log instance to read log sources
@@ -112,8 +118,7 @@ func (f *logFile) Read(buf []byte) (int, error) {
 	for f.readerCtx.Err() == nil {
 		n, err := f.file.Read(buf)
 		if n > 0 {
-			f.offset += int64(n)
-			f.lastTimeRead = time.Now()
+			f.updateOffset(n)
 		}
 		totalN += n
 
@@ -218,11 +223,14 @@ func (f *logFile) shouldBeClosed() bool {
 		//
 		// To prevent that from happening, we only consider a file inactive if
 		// it has not changed and the inactive timeout has been reached.
+		f.offsetMutx.Lock()
 		if time.Since(f.lastTimeRead) > f.closeInactive && f.offset == info.Size() {
 			f.isInactive.Store(true)
 			f.log.Debugf("'%s' is inactive", f.file.Name())
+			f.offsetMutx.Unlock()
 			return true
 		}
+		f.offsetMutx.Unlock()
 	}
 
 	if !f.closeRemoved && !f.closeRenamed {
@@ -305,4 +313,12 @@ func (f *logFile) Close() error {
 	_ = f.tg.Stop() // Wait until all resources are released for sure.
 	f.log.Debugf("Closed reader. Path='%s'", f.file.Name())
 	return err
+}
+
+// updateOffset updates the offset and lastTimeRead atomically
+func (f *logFile) updateOffset(delta int) {
+	f.offsetMutx.Lock()
+	f.offset += int64(delta)
+	f.lastTimeRead = time.Now()
+	f.offsetMutx.Unlock()
 }
