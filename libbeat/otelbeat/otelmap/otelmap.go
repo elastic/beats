@@ -49,11 +49,7 @@ func ToMapstr(m pcommon.Map) mapstr.M {
 //     If you attempt to use other slice types (e.g., []string or []int),
 //     pcommon.Map.FromRaw(...) will return an "invalid type" error.
 //     To overcome this, we use "reflect" to transform []T into []any.
-func ConvertNonPrimitive[T mapstrOrMap](m T, bodyMap pcommon.Map) {
-	convertMap(map[string]any(m), bodyMap)
-}
-
-func convertMap(src map[string]any, dst pcommon.Map) {
+func ConvertNonPrimitive[T mapstrOrMap](src T, dst pcommon.Map) {
 	dst.EnsureCapacity(len(src))
 	for key, val := range src {
 		switch x := val.(type) {
@@ -73,23 +69,23 @@ func convertMap(src map[string]any, dst pcommon.Map) {
 			dst.PutStr(key, time.Time(x).UTC().Format("2006-01-02T15:04:05.000Z"))
 		case mapstr.M:
 			child := dst.PutEmptyMap(key)
-			convertMap(map[string]any(x), child)
+			ConvertNonPrimitive(map[string]any(x), child)
 		case map[string]any:
 			child := dst.PutEmptyMap(key)
-			convertMap(x, child)
+			ConvertNonPrimitive(x, child)
 		case []mapstr.M:
 			s := dst.PutEmptySlice(key)
 			s.EnsureCapacity(len(x))
 			for _, val := range x {
 				child := s.AppendEmpty().SetEmptyMap()
-				convertMap(map[string]any(val), child)
+				ConvertNonPrimitive(map[string]any(val), child)
 			}
 		case []map[string]any:
 			s := dst.PutEmptySlice(key)
 			s.EnsureCapacity(len(x))
 			for _, val := range x {
 				child := s.AppendEmpty().SetEmptyMap()
-				convertMap(val, child)
+				ConvertNonPrimitive(val, child)
 			}
 		case []time.Time:
 			s := dst.PutEmptySlice(key)
@@ -109,13 +105,97 @@ func convertMap(src map[string]any, dst pcommon.Map) {
 				text = fmt.Appendf(nil, "error converting %T to string: %s", x, err)
 			}
 			dst.PutStr(key, string(text))
-		case []bool, []string, []float32, []float64, []int, []int8, []int16, []int32, []int64,
-			[]uint, []uint8, []uint16, []uint32, []uint64:
-			ref := reflect.ValueOf(x)
+		// case []bool, []string, []float32, []float64, []int, []int8, []int16, []int32, []int64,
+		// 	[]uint, []uint8, []uint16, []uint32, []uint64:
+		// 	ref := reflect.ValueOf(x)
+		// 	s := dst.PutEmptySlice(key)
+		// 	s.EnsureCapacity(ref.Len())
+		// 	for i := 0; i < ref.Len(); i++ {
+		// 		s.AppendEmpty().FromRaw(ref.Index(i).Interface())
+		// 	}
+		case []string:
 			s := dst.PutEmptySlice(key)
-			s.EnsureCapacity(ref.Len())
-			for i := 0; i < ref.Len(); i++ {
-				s.AppendEmpty().FromRaw(ref.Index(i).Interface())
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetStr(ele)
+			}
+		case []float32:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetDouble(float64(ele))
+			}
+		case []float64:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetDouble(ele)
+			}
+		case []int:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []int8:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []int16:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []int32:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []int64:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []uint:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []uint8:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []uint16:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []uint32:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []uint64:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []bool:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetBool(ele)
 			}
 		default:
 			ref := reflect.ValueOf(x)
@@ -127,7 +207,7 @@ func convertMap(src map[string]any, dst pcommon.Map) {
 					break
 				}
 				child := dst.PutEmptyMap(key)
-				convertMap(im, child)
+				ConvertNonPrimitive(im, child)
 				break
 			}
 			if ref.Kind() == reflect.Slice || ref.Kind() == reflect.Array {
@@ -136,10 +216,10 @@ func convertMap(src map[string]any, dst pcommon.Map) {
 					elem := ref.Index(i).Interface()
 					if mi, ok := elem.(map[string]any); ok {
 						child := s.AppendEmpty().SetEmptyMap()
-						convertMap(mi, child)
+						ConvertNonPrimitive(mi, child)
 					} else if mi, ok := elem.(mapstr.M); ok {
 						child := s.AppendEmpty().SetEmptyMap()
-						convertMap(map[string]any(mi), child)
+						ConvertNonPrimitive(map[string]any(mi), child)
 					} else {
 						s.AppendEmpty().FromRaw(elem)
 					}
