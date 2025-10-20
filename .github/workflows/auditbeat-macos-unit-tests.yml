@@ -46,7 +46,7 @@ jobs:
       matrix:
         # Disabled due to: https://github.com/elastic/beats/issues/43482
         # TODO uncomment for testing or once solved
-        os: [macos-13] #, macos-14]
+        os: [macos-15-intel] #, macos-15]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
