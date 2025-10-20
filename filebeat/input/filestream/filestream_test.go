@@ -235,8 +235,8 @@ func TestShouldBeClosedInactiveAndModified(t *testing.T) {
 		log:           logptest.NewTestingLogger(t, ""),
 		file:          newPlainFile(file),
 		closeInactive: time.Second,
+		lastTimeRead:  time.Now().Add(-5 * time.Second),
 	}
-	f.lastTimeRead.Store(time.Now().Add(-5 * time.Second).UnixNano())
 
 	if f.shouldBeClosed() {
 		t.Fatal("shouldBeClosed must return false when " +
