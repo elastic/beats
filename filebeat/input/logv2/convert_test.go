@@ -198,7 +198,8 @@ parsers:
           "parsers": [
             {
               "ndjson": {
-                "expand_keys": true
+                "expand_keys": true,
+                "target": "json"
               }
             },
             {
@@ -290,7 +291,8 @@ parsers:
             },
             {
               "ndjson": {
-                "expand_keys": true
+                "expand_keys": true,
+                "target": "json"
               }
             },
             {
