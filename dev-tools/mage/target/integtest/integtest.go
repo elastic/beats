@@ -70,7 +70,7 @@ func GoIntegTest(ctx context.Context) error {
 		return err
 	}
 	return runner.Test("goIntegTest", func() error {
-		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
+		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs(ctx))
 	})
 }
 
