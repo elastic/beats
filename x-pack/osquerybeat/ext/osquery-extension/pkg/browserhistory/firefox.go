@@ -44,7 +44,6 @@ func newFirefoxParser(location searchLocation, log func(m string, kvs ...any)) h
 
 	// If no profiles.ini found, try fallback method
 	if len(profiles) == 0 {
-		log("no profiles.ini found, trying fallback")
 		profiles = getFirefoxProfilesFallback(location, log)
 	}
 
@@ -130,7 +129,6 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 		ORDER BY hv.visit_date DESC
 	`, timestampWhere)
 
-	parser.log("executing SQL query", "query", query)
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
 		parser.log("failed to execute query", "error", err)
@@ -275,8 +273,6 @@ func getFirefoxProfilesFallback(location searchLocation, log func(m string, kvs 
 		}
 		profiles = append(profiles, profile)
 	}
-
-	log("fallback profile discovery complete", "count", len(profiles), "basePath", location.path)
 	return profiles
 }
 

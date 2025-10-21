@@ -108,7 +108,6 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 		ORDER BY visits.visit_time DESC
 	`, timestampWhere)
 
-	parser.log("executing SQL query", "query", query)
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
 		parser.log("failed to execute query", "error", err)

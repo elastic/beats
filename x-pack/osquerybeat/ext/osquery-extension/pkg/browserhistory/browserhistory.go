@@ -32,7 +32,6 @@ func GetTableRows(ctx context.Context, queryContext table.QueryContext, log func
 	for _, location := range locations {
 		parsers := getParsers(location, log)
 		if len(parsers) == 0 {
-			log("no supported parser found for path", "path", location.path)
 			continue
 		}
 		for _, parser := range parsers {
@@ -139,7 +138,6 @@ func extractUserFromPath(filePath string, log func(m string, kvs ...any)) string
 	for i, part := range parts {
 		if (part == "Users" || part == "home") && i+1 < len(parts) {
 			user := parts[i+1]
-			log("extracted user", "user", user, "path", filePath)
 			return user
 		}
 	}

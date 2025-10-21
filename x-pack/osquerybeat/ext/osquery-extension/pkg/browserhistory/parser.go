@@ -39,9 +39,8 @@ func initParsers() {
 
 func getParsers(location searchLocation, log func(m string, kvs ...any)) []historyParser {
 	var parsers []historyParser
-	for parserName, newParser := range newParserFuncs {
+	for _, newParser := range newParserFuncs {
 		if parser := newParser(location, log); parser != nil {
-			log("created new parser", "parser", parserName)
 			parsers = append(parsers, parser)
 		}
 	}

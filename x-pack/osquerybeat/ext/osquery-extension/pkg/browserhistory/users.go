@@ -17,8 +17,6 @@ func discoverUsers(log func(m string, kvs ...any)) []string {
 	var userDirs []string
 	var searchPaths []string
 
-	log("discoverUsers called", "os", runtime.GOOS)
-
 	switch runtime.GOOS {
 	case "windows":
 		systemDrive := os.Getenv("SYSTEMDRIVE")
@@ -53,7 +51,6 @@ func discoverUsers(log func(m string, kvs ...any)) []string {
 			if info, err := os.Stat(match); err == nil && info.IsDir() {
 				username := filepath.Base(match)
 				if isSystemUser(username) {
-					log("skipping system user", "username", username, "path", match)
 					continue
 				}
 
