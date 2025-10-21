@@ -157,7 +157,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		// check closed harvester
 		if size, harvesterClosed := w.closedHavester[path]; harvesterClosed {
 			w.log.Infof("===== Harvester %s has been closed, setting size to: %d", path, size)
-			fd.SetSize(size)
+			prevDesc.SetSize(size)
 			delete(w.closedHavester, path)
 		}
 
@@ -178,7 +178,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		// the new size is larger, something was written
 		// compare ingested size, if the file size is larger
 		// than the ingested size, then start a new harvester
-		case prevDesc.Info.Size() < fd.Size():
+		case prevDesc.Size() < fd.Info.Size():
 			e = writeEvent(path, fd)
 			writtenCount++
 
