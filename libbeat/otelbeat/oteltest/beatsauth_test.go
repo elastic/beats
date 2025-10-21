@@ -97,11 +97,7 @@ func TestMTLS(t *testing.T) {
 	}
 
 	// get client certificates paths
-<<<<<<< HEAD
-	clientCertificate, clientKey := getClientCerts(t, caCert)
-=======
 	clientCertificate, clientKey := GetClientCerts(t, caCert, "")
->>>>>>> 55f5403d1 ([OTel] Add TLS test to Logstash Exporter (#47199))
 
 	// start test server with given server and root certs
 	certPool := x509.NewCertPool()
@@ -166,84 +162,6 @@ receivers:
 	assertReceivedLogRecord(t, metricReader)
 }
 
-<<<<<<< HEAD
-=======
-func TestKeyPassPhrase(t *testing.T) {
-
-	// create server certificates
-	serverCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "server", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
-	if err != nil {
-		t.Fatalf("could not generate certificates: %s", err)
-	}
-
-	// get client certificates paths with key file encrypted in PKCS#8 format
-	clientCertificate, clientKey := GetClientCerts(t, caCert, "your-password")
-
-	// start test server with given server and root certs
-	certPool := x509.NewCertPool()
-	certPool.AddCert(caCert.Leaf)
-
-	serverName, metricReader := startTestServer(t, &tls.Config{
-		// NOTE: client certificates are not verified unless ClientAuth is set to RequireAndVerifyClientCert.
-		ClientAuth:   tls.RequireAndVerifyClientCert,
-		ClientCAs:    certPool,
-		Certificates: []tls.Certificate{serverCerts},
-		MinVersion:   tls.VersionTLS12,
-	})
-
-	inputConfig := `
-receivers:
-  filebeatreceiver:
-    output:
-      elasticsearch:
-        hosts: {{ .Host }}
-        ssl:
-          enabled: true
-          certificate_authorities:
-            - {{ .CACertificate }}
-          certificate: {{ .ClientCert }}
-          key: {{ .ClientKey }}
-          key_passphrase: your-password
-`
-
-	var otelConfigBuffer bytes.Buffer
-	require.NoError(t,
-		template.Must(template.New("otelConfig").Parse(inputConfig)).Execute(&otelConfigBuffer,
-			options{
-				Host:          serverName,
-				CACertificate: caFilePath(t),
-				ClientCert:    clientCertificate,
-				ClientKey:     clientKey,
-			}))
-
-	// translate beat to beatreceiver config
-	output := getTranslatedConf(t, otelConfigBuffer.Bytes())
-
-	// get new test exporter
-	exp := newTestESExporter(t, output)
-
-	// get new beats authenticator
-	beatsauth := newAuthenticator(t, beatsauthextension.Config{
-		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
-	})
-
-	// start extension
-	host := extensionsMap{component.NewID(component.MustNewType(beatsAuthName)): beatsauth}
-	err = beatsauth.Start(t.Context(), host)
-	require.NoError(t, err, "could not start extension")
-
-	// start exporter
-	err = exp.Start(t.Context(), host)
-	require.NoError(t, err, "could not start exporter")
-
-	// send logs
-	require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
-
-	// check if data has reached ES
-	assertReceivedLogRecord(t, metricReader)
-}
-
->>>>>>> 55f5403d1 ([OTel] Add TLS test to Logstash Exporter (#47199))
 // tests ca_trusted_fingerprint
 func TestCATrustedFingerPrint(t *testing.T) {
 	// create server certificates
@@ -765,43 +683,6 @@ func mustSendLogs(t *testing.T, exporter exporter.Logs, logs plog.Logs) error {
 	return err
 }
 
-<<<<<<< HEAD
-// getClientCerts creates client certificates, writes them to a file and return the path of certificate and key
-func getClientCerts(t *testing.T, caCert tls.Certificate) (certificate string, key string) {
-	// create client certificates
-	clientCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "client", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
-	if err != nil {
-		t.Fatalf("could not generate certificates: %s", err)
-	}
-
-	clientKey, err := x509.MarshalPKCS8PrivateKey(clientCerts.PrivateKey)
-	if err != nil {
-		t.Fatalf("could not marshal private key: %v", err)
-	}
-
-	tempDir := t.TempDir()
-	clientCertPath := filepath.Join(tempDir, "client-cert.pem")
-	clientKeyPath := filepath.Join(tempDir, "client-key.pem")
-
-	if err = os.WriteFile(clientCertPath, pem.EncodeToMemory(&pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: clientCerts.Leaf.Raw,
-	}), 0o777); err != nil {
-		t.Fatalf("could not write client certificate to file")
-	}
-
-	if err = os.WriteFile(clientKeyPath, pem.EncodeToMemory(&pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: clientKey,
-	}), 0o777); err != nil {
-		t.Fatalf("could not write client key to file")
-	}
-
-	return clientCertPath, clientKeyPath
-}
-
-=======
->>>>>>> 55f5403d1 ([OTel] Add TLS test to Logstash Exporter (#47199))
 func getTranslatedConf(t *testing.T, input []byte) *confmap.Conf {
 	c := beatconverter.Converter{}
 
