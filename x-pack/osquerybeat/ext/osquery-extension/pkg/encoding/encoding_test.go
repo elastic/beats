@@ -15,11 +15,7 @@ func TestEncodingFlagHas(t *testing.T) {
 		option   EncodingFlag
 		expected bool
 	}{
-		{EncodingFlagParseUnexported, EncodingFlagParseUnexported, true},
-		{EncodingFlagParseUnexported, EncodingFlagUseNumbersZeroValues, false},
 		{EncodingFlagUseNumbersZeroValues, EncodingFlagUseNumbersZeroValues, true},
-		{EncodingFlagParseUnexported | EncodingFlagUseNumbersZeroValues, EncodingFlagParseUnexported, true},
-		{EncodingFlagParseUnexported | EncodingFlagUseNumbersZeroValues, EncodingFlagUseNumbersZeroValues, true},
 	}
 
 	for _, test := range tests {
@@ -55,14 +51,6 @@ func TestMarshalToMapWithFlags(t *testing.T) {
 			input:    map[string]any{"key1": "value1", "key2": "value2", "key3": 1},
 			flags:    0,
 			expected: map[string]string{"key1": "value1", "key2": "value2", "key3": "1"},
-			err:      false,
-		},
-		{
-			input: &struct {
-				age int `osquery:"Age"`
-			}{age: 30},
-			flags:    EncodingFlagParseUnexported,
-			expected: map[string]string{"Age": "30"},
 			err:      false,
 		},
 		{

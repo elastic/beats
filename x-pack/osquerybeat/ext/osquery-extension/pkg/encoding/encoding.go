@@ -13,13 +13,10 @@ import (
 type EncodingFlag int
 
 const (
-	// EncodingFlagParseUnexported enables parsing of unexported (private) struct fields.
-	// When set, fields that start with lowercase letters will be included in the output.
-	EncodingFlagParseUnexported EncodingFlag = 1 << iota
 	// EncodingFlagUseNumbersZeroValues forces numeric zero values to be rendered as "0"
 	// instead of empty strings. By default, zero values for int, uint, and float types
 	// are converted to empty strings, but this flag preserves them as "0".
-	EncodingFlagUseNumbersZeroValues
+	EncodingFlagUseNumbersZeroValues EncodingFlag = 1 << iota
 )
 
 func (f EncodingFlag) has(option EncodingFlag) bool {
@@ -76,7 +73,7 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 		fieldValue := v.Field(i)
 		fieldType := t.Field(i)
 
-		if !flags.has(EncodingFlagParseUnexported) && !fieldType.IsExported() {
+		if !fieldType.IsExported() {
 			continue
 		}
 
