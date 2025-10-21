@@ -290,6 +290,8 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 
 	var tg unison.MultiErrGroup
 
+	hg.AddObserver(p.filewatcher.GetChan())
+
 	tg.Go(func() error {
 		p.filewatcher.Run(ctx.Cancelation)
 		return nil

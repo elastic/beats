@@ -79,6 +79,7 @@ type InputManager struct {
 // the source in the persistent state store.
 type Source interface {
 	Name() string
+	Path() string
 }
 
 var errNoInputRunner = errors.New("no input runner available")

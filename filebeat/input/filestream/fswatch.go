@@ -28,7 +28,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/go-concert/unison"
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
@@ -66,11 +65,13 @@ type fileWatcherConfig struct {
 // fileWatcher gets the list of files from a FSWatcher and creates events by
 // comparing the files between its last two runs.
 type fileWatcher struct {
-	cfg     fileWatcherConfig
-	prev    map[string]loginp.FileDescriptor
-	scanner loginp.FSScanner
-	log     *logp.Logger
-	events  chan loginp.FSEvent
+	cfg            fileWatcherConfig
+	prev           map[string]loginp.FileDescriptor
+	scanner        loginp.FSScanner
+	log            *logp.Logger
+	events         chan loginp.FSEvent
+	notifyChan     chan loginp.HavesterFile
+	closedHavester map[string]int64
 }
 
 func newFileWatcher(logger *logp.Logger, paths []string, config fileWatcherConfig, gzipAllowed bool, sendNotChanged bool) (loginp.FSWatcher, error) {
@@ -86,6 +87,9 @@ func newFileWatcher(logger *logp.Logger, paths []string, config fileWatcherConfi
 		prev:    make(map[string]loginp.FileDescriptor, 0),
 		scanner: scanner,
 		events:  make(chan loginp.FSEvent),
+		// New stuff
+		closedHavester: map[string]int64{},
+		notifyChan:     make(chan loginp.HavesterFile, 5), // magic number
 	}, nil
 }
 
@@ -98,17 +102,29 @@ func defaultFileWatcherConfig() fileWatcherConfig {
 	}
 }
 
+func (w *fileWatcher) GetChan() chan loginp.HavesterFile {
+	return w.notifyChan
+}
+
 func (w *fileWatcher) Run(ctx unison.Canceler) {
 	defer close(w.events)
 
 	// run initial scan before starting regular
 	w.watch(ctx)
 
-	_ = timed.Periodic(ctx, w.cfg.Interval, func() error {
-		w.watch(ctx)
-
-		return nil
-	})
+	tick := time.Tick(w.cfg.Interval)
+	for {
+		select {
+		case evt := <-w.notifyChan:
+			w.log.Infof("========== Harvester Closed Path: %s, Size: %d", evt.Path, evt.Size)
+			w.closedHavester[evt.Path] = evt.Size
+		case <-tick:
+			w.watch(ctx)
+		case <-ctx.Done():
+			w.log.Info("==================== Filewatcher context closed")
+			return
+		}
+	}
 }
 
 func (w *fileWatcher) watch(ctx unison.Canceler) {
@@ -127,6 +143,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	newFilesByID := make(map[string]*loginp.FileDescriptor)
 
 	for path, fd := range paths {
+		w.log.Infof("FSWatch scan: [%s, %d]", path, fd.Info.Size())
 		// if the scanner found a new path or an existing path
 		// with a different file, it is a new file
 		prevDesc, ok := w.prev[path]
@@ -137,9 +154,15 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 			continue
 		}
 
+		// check closed harvester
+		if size, harvesterClosed := w.closedHavester[path]; harvesterClosed {
+			w.log.Infof("===== Harvester %s has been closed, setting size to: %d", path, size)
+			fd.SetSize(size)
+			delete(w.closedHavester, path)
+		}
+
 		var e loginp.FSEvent
 		switch {
-
 		// the new size is smaller, the file was truncated
 		case prevDesc.Info.Size() > fd.Info.Size():
 			e = truncateEvent(path, fd)
@@ -153,7 +176,9 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 			}
 
 		// the new size is larger, something was written
-		case prevDesc.Info.Size() < fd.Info.Size():
+		// compare ingested size, if the file size is larger
+		// than the ingested size, then start a new harvester
+		case prevDesc.Info.Size() < fd.Size():
 			e = writeEvent(path, fd)
 			writtenCount++
 

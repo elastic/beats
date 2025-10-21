@@ -68,6 +68,20 @@ type FileDescriptor struct {
 	Fingerprint string
 	// GZIP indicates if the file is compressed with GZIP.
 	GZIP bool
+
+	size int64
+}
+
+func (fd *FileDescriptor) SetSize(s int64) {
+	fd.size = s
+}
+
+func (fd FileDescriptor) Size() int64 {
+	if fd.size != 0 {
+		return fd.size
+	}
+
+	return fd.Info.Size()
 }
 
 // FileID returns a unique file ID
@@ -115,4 +129,6 @@ type FSWatcher interface {
 	Run(unison.Canceler)
 	// Event returns the next event captured by FSWatcher.
 	Event() FSEvent
+
+	GetChan() chan HavesterFile
 }

@@ -114,6 +114,8 @@ type HarvesterGroup interface {
 	Stop(Source)
 	// StopHarvesters cancels all running Harvesters.
 	StopHarvesters() error
+
+	AddObserver(c chan HavesterFile)
 }
 
 type defaultHarvesterGroup struct {
@@ -126,6 +128,22 @@ type defaultHarvesterGroup struct {
 	identifier   *sourceIdentifier
 	tg           *task.Group
 	metrics      *Metrics
+	notifyChan   chan HavesterFile
+}
+
+type HavesterFile struct {
+	Path string
+	Size int64
+}
+
+func (hg *defaultHarvesterGroup) notifyObservers(path string, size int64) {
+	if hg.notifyChan != nil {
+		hg.notifyChan <- HavesterFile{path, size}
+	}
+}
+
+func (hg *defaultHarvesterGroup) AddObserver(c chan HavesterFile) {
+	hg.notifyChan = c
 }
 
 // Start starts the Harvester for a Source if no Harvester is running for the
@@ -235,6 +253,31 @@ func startHarvester(
 		hg.store.UpdateTTL(resource, hg.cleanTimeout)
 		cursor := makeCursor(resource)
 		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
+
+		// ============================== DEBUG ==============================
+		st := struct {
+			Offset int64 `json:"offset" struct:"offset"`
+			EOF    bool  `json:"eof" struct:"eof"`
+		}{}
+
+		if err := cursor.Unpack(&st); err != nil {
+			ctx.Logger.Errorf("cannot unpack cursor at the end of the harvester: %s", err)
+		}
+		ctx.Logger.Infof("========== Harvester '%s'started. Offset: %d", src.Path(), st.Offset)
+
+		// ==================== REAL CODE
+		defer func() {
+			st := struct {
+				Offset int64 `json:"offset" struct:"offset"`
+				EOF    bool  `json:"eof" struct:"eof"`
+			}{}
+
+			if err := cursor.Unpack(&st); err != nil {
+				ctx.Logger.Errorf("cannot unpack cursor at the end of the harvester: %s", err)
+			}
+			ctx.Logger.Infof("========== Harvester '%s' closed. Offset: %d", src.Path(), st.Offset)
+			hg.notifyObservers(src.Path(), st.Offset)
+		}()
 
 		ctx.Logger.Debug("Starting harvester for file")
 		err = hg.harvester.Run(ctx, src, cursor, publisher, metrics)
