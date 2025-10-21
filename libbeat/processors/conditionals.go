@@ -81,6 +81,13 @@ func (r *WhenProcessor) String() string {
 	return fmt.Sprintf("%v, condition=%v", r.p.String(), r.condition.String())
 }
 
+// ClosingWhenProcessor is the same as WhenProcessor but has the Close
+// method.  This is so NewConditionRule can create two types of "when"
+// processors, one with `Close` and one without.  The decision of
+// which to return is determined if the underlying processors require
+// `Close`.  This is useful because some places in the code base
+// (eg. javascript processors) require stateless processors (no Close
+// method).
 type ClosingWhenProcessor struct {
 	WhenProcessor
 }
@@ -205,6 +212,13 @@ func (p *IfThenElseProcessor) String() string {
 	return sb.String()
 }
 
+// ClosingIfThenElseProcessor is the same as IfThenElseProcessor but
+// has the Close method.  This is so NewIfThenElseProcessor can create
+// two types of "if/then/else" processors, one with `Close` and one
+// without.  The decision of which to return is determined if the
+// underlying processors require `Close`.  This is useful because some
+// places in the code base (eg. javascript processors) require
+// stateless processors (no Close method).
 type ClosingIfThenElseProcessor struct {
 	IfThenElseProcessor
 }
