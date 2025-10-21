@@ -30,11 +30,6 @@ import (
 // The string used to specify this queue in beats configurations.
 const QueueType = "mem"
 
-const (
-	minInputQueueSize      = 20
-	maxInputQueueSizeRatio = 0.1
-)
-
 // broker is the main implementation type for the memory queue. An active queue
 // consists of two goroutines: runLoop, which handles all public API requests
 // and owns the buffer state, and ackLoop, which listens for acknowledgments of
@@ -184,13 +179,12 @@ func newQueue(
 	logger *logp.Logger,
 	observer queue.Observer,
 	settings Settings,
-	inputQueueSize int,
+	_ int,
 	encoderFactory queue.EncoderFactory,
 ) *broker {
 	if observer == nil {
 		observer = queue.NewQueueObserver(nil)
 	}
-	chanSize := AdjustInputQueueSize(inputQueueSize, settings.Events)
 
 	// Backwards compatibility: an old way to select synchronous queue
 	// behavior was to set "flush.min_events" to 0 or 1, in which case the
@@ -221,7 +215,7 @@ func newQueue(
 		encoderFactory: encoderFactory,
 
 		// broker API channels
-		pushChan:  make(chan pushRequest, chanSize),
+		pushChan:  make(chan pushRequest),
 		getChan:   make(chan getRequest),
 		closeChan: make(chan bool),
 
@@ -376,18 +370,6 @@ func (l *batchList) reverse() {
 	for !tmp.empty() {
 		l.prepend(tmp.pop())
 	}
-}
-
-// AdjustInputQueueSize decides the size for the input queue.
-func AdjustInputQueueSize(requested, mainQueueSize int) (actual int) {
-	actual = requested
-	if max := int(float64(mainQueueSize) * maxInputQueueSizeRatio); mainQueueSize > 0 && actual > max {
-		actual = max
-	}
-	if actual < minInputQueueSize {
-		actual = minInputQueueSize
-	}
-	return actual
 }
 
 func (b *batch) Count() int {

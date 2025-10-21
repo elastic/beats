@@ -134,17 +134,10 @@ func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 	}
 	select {
 	case st.events <- req:
-		// The events channel is buffered, which means we may successfully
-		// write to it even if the queue is shutting down. To avoid blocking
-		// forever during shutdown, we also have to wait on the queue's
-		// shutdown channel.
-		select {
-		case resp := <-req.resp:
-			return resp, true
-		case <-st.queueClosing:
-			st.events = nil
-			return 0, false
-		}
+		// The events channel is unbuffered and if we successfully send on it the
+		// queue is guaranteed to send a response, so a synchronous read is
+		// safe here.
+		return <-req.resp, true
 	case <-st.done:
 		st.events = nil
 		return 0, false
@@ -162,17 +155,10 @@ func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 	}
 	select {
 	case st.events <- req:
-		// The events channel is buffered, which means we may successfully
-		// write to it even if the queue is shutting down. To avoid blocking
-		// forever during shutdown, we also have to wait on the queue's
-		// shutdown channel.
-		select {
-		case resp := <-req.resp:
-			return resp, true
-		case <-st.queueClosing:
-			st.events = nil
-			return 0, false
-		}
+		// The events channel is unbuffered and if we successfully send on it the
+		// queue is guaranteed to send a response, so a synchronous read is
+		// safe here.
+		return <-req.resp, true
 	case <-st.done:
 		st.events = nil
 		return 0, false
