@@ -314,3 +314,73 @@ func TestBatchFreeEntries(t *testing.T) {
 		require.Nilf(t, testQueue.buf[i].event, "Queue index %v: all events should be nil after calling FreeEntries on both batches")
 	}
 }
+
+func TestProducerShutdown(t *testing.T) {
+	var ackedCount atomic.Int64
+	var publishedCount atomic.Int64
+	testQueue := NewQueue(
+		logp.NewNopLogger(),
+		nil,
+		Settings{
+			Events:        10,
+			MaxGetRequest: 10,
+			FlushTimeout:  0},
+		0,
+		nil)
+
+	producer := testQueue.Producer(
+		queue.ProducerConfig{
+			ACK: func(count int) { ackedCount.Add(int64(count)) },
+		})
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		// Continuously publish events until Publish returns false indicating queue
+		// shutdown.
+		for {
+			_, published := producer.Publish(0)
+			if published {
+				publishedCount.Add(1)
+			} else {
+				return
+			}
+		}
+	}()
+	go func() {
+		defer wg.Done()
+		// Continuously read and acknowledge events from the queue
+		for {
+			batch, err := testQueue.Get(10)
+			if err == nil {
+				batch.Done()
+			} else {
+				return
+			}
+		}
+	}()
+
+	// Wait for at least one message to be accepted by the queue
+	require.Eventually(
+		t,
+		func() bool { return publishedCount.Load() > 0 },
+		200*time.Millisecond,
+		time.Millisecond,
+		"no events were published")
+
+	// Trigger queue shutdown
+	testQueue.Close(false)
+
+	select {
+	case <-testQueue.Done():
+	case <-time.After(5 * time.Second):
+		require.Fail(t, "queue never shut down")
+	}
+	// Wait for helper routines to finish
+	wg.Wait()
+
+	// Wait for the ack loop to finish processing callbacks
+	testQueue.wg.Wait()
+
+	assert.Equal(t, publishedCount.Load(), ackedCount.Load(), "published and acknowledged event counts should match")
+}
