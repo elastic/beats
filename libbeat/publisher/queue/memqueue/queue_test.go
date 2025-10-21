@@ -316,28 +316,40 @@ func TestBatchFreeEntries(t *testing.T) {
 }
 
 func TestProducerShutdown(t *testing.T) {
+	// Test that the number of acknowledgment callbacks exactly matches the
+	// number of published events when many goroutines are publishing during
+	// queue shutdown.
+	//
+	// The numbers here (queue size, number of publisher workers, etc.) are
+	// kind of magic since there's no deterministic way to verify this, but they
+	// were chosen so that, when there _was_ a race in the queue shutdown that
+	// could send an extra acknowledgment
+	// (https://github.com/elastic/beats/issues/47246), this test failed about
+	// 90% of the time.
+	const queueSize = 1000
+	const publishWorkers = 50
 	var ackedCount atomic.Int64
 	var publishedCount atomic.Int64
 	testQueue := NewQueue(
 		logp.NewNopLogger(),
 		nil,
 		Settings{
-			Events:        10,
-			MaxGetRequest: 10,
-			FlushTimeout:  0},
+			Events:        queueSize,
+			MaxGetRequest: queueSize,
+			FlushTimeout:  time.Second},
 		0,
 		nil)
 
-	producer := testQueue.Producer(
-		queue.ProducerConfig{
-			ACK: func(count int) { ackedCount.Add(int64(count)) },
-		})
 	var wg sync.WaitGroup
-	wg.Add(2)
-	go func() {
+	// Start workers to continuously publish events to the queue
+	publishWorker := func() {
 		defer wg.Done()
 		// Continuously publish events until Publish returns false indicating queue
 		// shutdown.
+		producer := testQueue.Producer(
+			queue.ProducerConfig{
+				ACK: func(count int) { ackedCount.Add(int64(count)) },
+			})
 		for {
 			_, published := producer.Publish(0)
 			if published {
@@ -346,12 +358,18 @@ func TestProducerShutdown(t *testing.T) {
 				return
 			}
 		}
-	}()
+	}
+	for range publishWorkers {
+		wg.Add(1)
+		go publishWorker()
+	}
+	// Start a reader to continuously drain the queue and acknowledge the events
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		// Continuously read and acknowledge events from the queue
 		for {
-			batch, err := testQueue.Get(10)
+			batch, err := testQueue.Get(queueSize)
 			if err == nil {
 				batch.Done()
 			} else {
@@ -360,27 +378,29 @@ func TestProducerShutdown(t *testing.T) {
 		}
 	}()
 
-	// Wait for at least one message to be accepted by the queue
+	// Wait for the queue to go through at least one full rotation
 	require.Eventually(
 		t,
-		func() bool { return publishedCount.Load() > 0 },
-		200*time.Millisecond,
+		func() bool { return publishedCount.Load() > queueSize },
+		time.Second,
 		time.Millisecond,
-		"no events were published")
+		"events are not flowing through the queue")
 
 	// Trigger queue shutdown
 	testQueue.Close(false)
 
+	// Wait for queue context to finish
 	select {
 	case <-testQueue.Done():
 	case <-time.After(5 * time.Second):
 		require.Fail(t, "queue never shut down")
 	}
+
 	// Wait for helper routines to finish
 	wg.Wait()
 
 	// Wait for the ack loop to finish processing callbacks
 	testQueue.wg.Wait()
 
-	assert.Equal(t, publishedCount.Load(), ackedCount.Load(), "published and acknowledged event counts should match")
+	require.Equal(t, publishedCount.Load(), ackedCount.Load(), "published and acknowledged event counts should match")
 }
