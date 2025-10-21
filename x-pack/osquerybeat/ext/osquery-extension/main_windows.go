@@ -7,6 +7,8 @@
 package main
 
 import (
+	"log"
+	"os"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/state"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
 	"github.com/osquery/osquery-go"
@@ -24,9 +26,23 @@ func RegisterTables(server *osquery.ExtensionManagerServer) {
 }
 
 func CreateViews(socket *string) {
+	filepath := "C:\\app.log"
+	if _, err := os.Stat(filepath); err == nil {
+		os.Remove(filepath)
+	}
+	file, err := os.OpenFile("C:\\app.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		log.Fatal(err) // Use standard logger (stderr) to report this fatal error
+	}
+	defer file.Close()
+	log.SetOutput(file)
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	log.Println("Starting AMCache view creation")
 	amcacheView := View{
 		requiredTables: []string{"amcache_application", "amcache_application_file"},
 		createViewQuery: "CREATE VIEW amcache_applications as SELECT * FROM amcache_application_file JOIN amcache_application using (program_id);",
 	}
 	amcacheView.CreateView(socket)
+	log.Println("Finished AMCache view creation")
 }

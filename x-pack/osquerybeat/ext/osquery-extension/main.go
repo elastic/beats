@@ -45,11 +45,19 @@ var (
 	socket   = flag.String("socket", "", "Path to the extensions UNIX domain socket")
 	timeout  = flag.Int("timeout", 3, "Seconds to wait for autoloaded extensions")
 	interval = flag.Int("interval", 3, "Seconds delay between connectivity checks")
+	show_version = flag.Bool("show-version", false, "Show version")
 	_        = flag.Bool("verbose", false, "Verbose logging")
 )
 
 func main() {
 	flag.Parse()
+
+	version := "0.0.1"
+	if *show_version {
+		fmt.Println("osquery-extension version", version)
+		os.Exit(0)
+	}
+
 
 	if *socket == "" {
 		log.Fatalln("Missing required --socket argument")
@@ -62,6 +70,8 @@ func main() {
 		time.Second * time.Duration(*interval),
 	)
 
+	serverVersion := osquery.ExtensionVersion(version)
+
 	go monitorForParent()
 
 	server, err := osquery.NewExtensionManagerServer(
@@ -69,6 +79,7 @@ func main() {
 		*socket,
 		serverTimeout,
 		serverPingInterval,
+		serverVersion,
 	)
 	if err != nil {
 		log.Fatalf("Error creating extension: %s\n", err)
