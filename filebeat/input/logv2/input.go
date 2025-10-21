@@ -43,10 +43,16 @@ func init() {
 	}
 }
 
-// runAsFilestream checks whether the configuration should be run as
-// Filestream input, on any error the boolean value must be ignore and
+// runAsFilestream validates cfg as a Log input configuration, if it is
+// valid, then checks whether the configuration should be run as
+// Filestream input. On any error the boolean value must be ignore and
 // no input started. runAsFilestream also sets the input type accordingly.
 func runAsFilestream(cfg *config.C) (bool, error) {
+	// First of all, ensure the Log input configuration is valid.
+	if err := loginput.IsConfigValid(cfg); err != nil {
+		return false, err
+	}
+
 	// Global feature flag that forces all Log input instances
 	// to run as Filestream.
 	if features.LogInputRunFilestream() {
