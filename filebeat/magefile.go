@@ -210,3 +210,11 @@ func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
 }
+
+func PythonLogAsFilestream(ctx context.Context) error {
+	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
+	args := devtools.DefaultPythonTestIntegrationFromHostArgs()
+	args.Env["RUN_AS_FILESTREAM"] = "true"
+	args.Files = []string{"tests/system/test_json.py"}
+	return devtools.PythonIntegTestFromHost(args)
+}
