@@ -66,7 +66,7 @@ type encodedEvent struct {
 	encoding []byte
 }
 
-func newEventEncoderFactory(
+func NewEventEncoderFactory(
 	escapeHTML bool,
 	indexSelector outputs.IndexSelector,
 	pipelineSelector *outil.Selector,

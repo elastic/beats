@@ -145,6 +145,12 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 		}
 	}
 
+	if _, err := output.Child("pipelines", -1); err == nil {
+		otelYAMLCfg["logs_dynamic_pipeline"] = map[string]any{
+			"enabled": true,
+		}
+	}
+
 	// Authentication
 	setIfNotNil(otelYAMLCfg, "user", escfg.Username)                                             // username
 	setIfNotNil(otelYAMLCfg, "password", escfg.Password)                                         // password
@@ -166,8 +172,6 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
 	if cfg.HasField("indices") {
 		return fmt.Errorf("indices is currently not supported: %w", errors.ErrUnsupported)
-	} else if cfg.HasField("pipelines") {
-		return fmt.Errorf("pipelines is currently not supported: %w", errors.ErrUnsupported)
 	} else if cfg.HasField("parameters") {
 		return fmt.Errorf("parameters is currently not supported: %w", errors.ErrUnsupported)
 	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {

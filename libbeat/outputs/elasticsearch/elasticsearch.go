@@ -41,7 +41,7 @@ func makeES(
 ) (outputs.Group, error) {
 	log := beatInfo.Logger.Named(logSelector)
 	esConfig := defaultConfig
-	indexSelector, pipelineSelector, err := buildSelectors(im, beatInfo, cfg)
+	indexSelector, pipelineSelector, err := BuildSelectors(im, beatInfo, cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -88,7 +88,7 @@ func makeES(
 		params = nil
 	}
 
-	encoderFactory := newEventEncoderFactory(
+	encoderFactory := NewEventEncoderFactory(
 		esConfig.EscapeHTML, indexSelector, pipelineSelector)
 
 	clients := make([]outputs.NetworkClient, len(hosts))
@@ -133,7 +133,7 @@ func makeES(
 	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, encoderFactory, beatInfo.Logger, clients)
 }
 
-func buildSelectors(
+func BuildSelectors(
 	im outputs.IndexManager,
 	b beat.Info,
 	cfg *config.C,
