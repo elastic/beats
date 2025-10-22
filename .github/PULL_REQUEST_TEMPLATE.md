@@ -41,7 +41,7 @@ List here all the items you have verified BEFORE sending this PR. Please DO NOT 
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have made corresponding changes to the documentation
 - [ ] I have made corresponding change to the default configuration files
-- [ ] I have added tests that prove my fix is effective or that my feature works. Where relevant, I have used the `stresstest.sh` script to run them under stress conditions and race detector to verify their stability.
+- [ ] I have added tests that prove my fix is effective or that my feature works. Where relevant, I have used the [`stresstest.sh`](https://github.com/elastic/beats/blob/main/script/stresstest.sh) script to run them under stress conditions and race detector to verify their stability.
 - [ ] I have added an entry in `./changelog/fragments` using the [changelog tool](https://github.com/elastic/elastic-agent-changelog-tool/blob/main/docs/usage.md).
 
 ## Disruptive User Impact
