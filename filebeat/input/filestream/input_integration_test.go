@@ -24,6 +24,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -35,6 +36,8 @@ import (
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
+
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
 // test_close_renamed from test_harvester.py
@@ -1160,4 +1163,66 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 
 	cancelInput()
 	env.waitUntilInputStops()
+}
+
+func TestDataAddedAfterCloseInactive(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	logFilePath := filepath.Join(env.t.TempDir(), "log.log")
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("log file path: %s", logFilePath)
+		}
+	})
+
+	// Escape windows path separator
+	logFilePathStr := strings.ReplaceAll(logFilePath, `\`, `\\`)
+
+	integration.WriteLogFile(t, logFilePath, 50, false)
+	stat, err := os.Stat(logFilePath)
+	if err != nil {
+		t.Fatalf("cannot stat log file: %s", err)
+	}
+
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	inp := env.mustCreateInput(map[string]any{
+		"id": id,
+		"paths": []string{
+			logFilePath,
+		},
+		"prospector.scanner.check_interval":    "2s",
+		"close.on_state_change.check_interval": "1s",
+		"close.on_state_change.inactive":       "1s",
+		"backoff.init":                         "3s",
+		"backoff.max":                          "3s",
+	})
+
+	env.startInput(t.Context(), id, inp)
+	env.WaitLogsContains(
+		fmt.Sprintf("'%s' is inactive", logFilePathStr),
+		5*time.Second,
+		"missing 'file is inactive' logs")
+
+	integration.WriteLogFile(t, logFilePath, 5, true)
+
+	env.WaitLogsContains(
+		fmt.Sprintf("File %s has been updated", logFilePathStr),
+		3*time.Second)
+	env.WaitLogsContains("Harvester already running", 2*time.Second)
+	env.WaitLogsContains("Stopped harvester for file", 2*time.Second)
+	env.WaitLogsContains(
+		fmt.Sprintf(
+			"Updating previous state because harvester was closed. '%s': %d",
+			logFilePathStr,
+			stat.Size()),
+		2*time.Second)
+	env.WaitLogsContains(
+		fmt.Sprintf("File %s has been updated", logFilePathStr),
+		1*time.Second)
+	env.WaitLogsContains("Starting harvester for file", 1*time.Second)
+	env.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePathStr),
+		2*time.Second)
+
+	env.waitUntilEventCount(55)
 }

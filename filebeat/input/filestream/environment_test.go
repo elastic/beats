@@ -546,7 +546,13 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 // logContains ensures s is a sub string on any log line.
 // If s is not found, the test fails
 func (e *inputTestingEnvironment) logContains(s string) {
+	e.t.Helper()
 	e.testLogger.LogContains(s)
+}
+
+func (e *inputTestingEnvironment) WaitLogsContains(s string, timeout time.Duration, msgAndArgs ...any) {
+	e.t.Helper()
+	e.testLogger.WaitLogsContains(s, timeout, msgAndArgs...)
 }
 
 var _ statestore.States = (*testInputStore)(nil)

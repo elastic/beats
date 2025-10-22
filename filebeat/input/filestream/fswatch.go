@@ -156,7 +156,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 
 		// check closed harvester
 		if size, harvesterClosed := w.closedHavester[path]; harvesterClosed {
-			w.log.Infof("===== Harvester %s has been closed, setting size to: %d", path, size)
+			w.log.Debugf("Updating previous state because harvester was closed. '%s': %d", path, size)
 			prevDesc.SetSize(size)
 			delete(w.closedHavester, path)
 		}
