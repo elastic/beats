@@ -88,6 +88,9 @@ func New(w io.Writer, verbose bool) *Logger {
 }
 
 func (log *Logger) UpdateWithOsqueryOptions(options osquery.InternalOptionList) {
+	if options == nil {
+		return
+	}
 	log.mu.Lock()
 	defer log.mu.Unlock()
 
