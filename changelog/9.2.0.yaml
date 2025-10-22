@@ -1,5 +1,137 @@
 version: 9.2.0
 entries:
+    - kind: feature
+      summary: TCP and UDP inputs now support multiple pipeline workers configured via `number_of_workers`. Increasing the number of workers improves performance when slow processors are used by decoupling reading from the network connection and publishing.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/45124
+      issue:
+        - https://github.com/elastic/beats/issues/43674
+      impact: ""
+      action: ""
+      timestamp: 1759439212
+    - kind: feature
+      summary: Add beta GZIP file ingestion in filestream.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/45301
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439213
+    - kind: feature
+      summary: Updated the `parse_aws_vpc_flow_log` processor to handle AWS VPC flow log v6, v7, and v8 fields.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/45746
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439214
+    - kind: feature
+      summary: "The following output latency_delta metrics are now included when `logging.metrics` is enabled: `output.latency_delta.{count, max, median, min, p99}`. This only includes data since the last internal metrics was logged."
+      description: ""
+      component: all
+      pr:
+        -  https://github.com/elastic/beats/pull/45749
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439215
+    - kind: feature
+      summary: Add OAuth2 support for Okta provider in Entity Analytics input.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/45753
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439216
+    - kind: feature
+      summary: Add new ETW FIM backend for Windows.
+      description: ""
+      component: auditbeat
+      pr:
+        -  https://github.com/elastic/beats/pull/45887
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439217
+    - kind: feature
+      summary: Improve error reporting for schemeless URLs in HTTP JSON input.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/45953
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439218
+    - kind: feature
+      summary: Add `remaining_executions` global to the CEL input evaluation context.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/46210
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439219
+    - kind: breaking-change
+      summary: Change `aws.cloudwatch.*` field in awscloudwatch input to nested object.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/46357
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439220
+    - kind: bug-fix
+      summary: Make data updates in `add_host_metadata` processor synchronous.
+      description: ""
+      component: all
+      pr:
+        -  https://github.com/elastic/beats/pull/46546
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439221
+    - kind: feature
+      summary: Upgrade osquery version to 5.18.1.
+      description: ""
+      component: osquerybeat
+      pr:
+        -  https://github.com/elastic/beats/pull/46624
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439222
+    - kind: feature
+      summary: Journald input now supports reading from multiple journals, including remote ones.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/46722
+      issue:
+        - https://github.com/elastic/beats/issues/46656
+      impact: ""
+      action: ""
+      timestamp: 1759439223
+    - kind: feature
+      summary: Bump Windows Npcap version to v1.83.
+      description: ""
+      component: packetbeat
+      pr:
+        -  https://github.com/elastic/beats/pull/46809
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439224
     - kind: bug-fix
       summary: Fix defer usage for stopped status reporting.
       description: ""
@@ -74,7 +206,7 @@ entries:
       component: all
       pr:
         - https://github.com/elastic/beats/pull/47034
-      issue: 
+      issue:
         - https://github.com/elastic/beats/issues/46979
       impact: ""
       action: ""
@@ -88,7 +220,7 @@ entries:
       component: metricbeat
       pr:
         - https://github.com/elastic/beats/pull/46938
-      issue: 
+      issue:
         - https://github.com/elastic/integrations/issues/15551
       impact: ""
       action: ""
