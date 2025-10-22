@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/osquery/osquery-go/plugin/table"
 	"go.uber.org/multierr"
@@ -44,7 +45,12 @@ func GetTableRows(ctx context.Context, queryContext table.QueryContext, log func
 			}
 			rows := make([]map[string]string, len(visits))
 			for i, visit := range visits {
-				rows[i] = visit.toMap()
+				mvisit, err := encoding.MarshalToMap(visit)
+				if err != nil {
+					merr = multierr.Append(merr, err)
+					continue
+				}
+				rows[i] = mvisit
 			}
 			results = append(results, rows...)
 		}

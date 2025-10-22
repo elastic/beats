@@ -5,8 +5,6 @@
 package browserhistory
 
 import (
-	"reflect"
-	"strconv"
 	"time"
 )
 
@@ -57,53 +55,4 @@ func newVisit(parser string, profile *profile, timestamp int64) *visit {
 		CustomDataDir: profile.customDataDir,
 	}
 	return v
-}
-
-func (entry *visit) toMap() map[string]string {
-	result := make(map[string]string)
-
-	v := reflect.ValueOf(entry).Elem()
-	t := reflect.TypeOf(entry).Elem()
-
-	for i := 0; i < v.NumField(); i++ {
-		field := v.Field(i)
-		fieldType := t.Field(i)
-
-		// Get the osquery tag name
-		tag := fieldType.Tag.Get("osquery")
-		if tag == "" {
-			continue // Skip fields without osquery tag
-		}
-
-		// Convert field value to string
-		var value string
-		switch field.Kind() {
-		case reflect.String:
-			value = field.String()
-		case reflect.Bool:
-			if field.Bool() {
-				value = "1"
-			} else {
-				value = "0"
-			}
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			if field.Int() == 0 {
-				value = ""
-			} else {
-				value = strconv.FormatInt(field.Int(), 10)
-			}
-		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			if field.Uint() == 0 {
-				value = ""
-			} else {
-				value = strconv.FormatUint(field.Uint(), 10)
-			}
-		default:
-			value = ""
-		}
-
-		result[tag] = value
-	}
-
-	return result
 }
