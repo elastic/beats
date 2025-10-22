@@ -6,6 +6,7 @@ package otelbeat
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -54,12 +55,11 @@ func OTelCmd(beatname string) *cobra.Command {
 				return err
 			}
 
-			// add scheme as prefix
-			cfg := schemeMap[beatname] + ":" + beatCfg
-			if isOtelConfig {
-				cfg = "file:" + beatCfgFile
+			if !isOtelConfig {
+				return errors.New("beats configuration is not supported, please use native otel configuration syntax")
 			}
 
+			cfg := "file:" + beatCfgFile
 			set := getCollectorSettings(cfg)
 			col, err := otelcol.NewCollector(set)
 			if err != nil {
