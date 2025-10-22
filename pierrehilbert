@@ -9,78 +9,15 @@ https://github.com/elastic/beats/compare/v9.1.5\...v9.2.0[View commits]
 
 ==== Breaking changes
 
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
 *Filebeat*
 
-- Add beta GZIP file ingestion in filestream. {pull}45301[45301]
--Change aws.cloudwatch.* field in awscloudwatch input to nested object. {pull}46357[46357]
-- Filestream's `clean_inactive` setting is now validated, if the validation fails, Filebeat exits with an error code. To keep the legacy behavior of not validating set `legacy_clean_inactive: true`. {issue}45601[45601]
-{pull}46373[46373]
-- In Filestream, setting `clean_inactive: 0` now disables `clean_inactive`. To keep the legacy behavior of re-ingesting all files on restart set `legacy_clean_inactive: true`{issue}45601[45601]
-{pull}46373[46373]
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-- Upgrade to osquery 5.18.1 {pull}46624[46624]
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
+- Change `aws.cloudwatch.*` field in awscloudwatch input to nested object. {pull}46357[46357]
 
 ==== Bugfixes
 
 *Affecting all Beats*
 
-- Make data updates in add_host_metadata processor synchronous {pull}46546[46546]
-
-*Auditbeat*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-*Elastic Logging Plugin*
+- Make data updates in `add_host_metadata` processor synchronous. {pull}46546[46546]
 
 ==== Added
 
@@ -92,94 +29,23 @@ https://github.com/elastic/beats/compare/v9.1.5\...v9.2.0[View commits]
 
 - Add new ETW FIM backend for Windows. {pull}45887[45887]
 
-*Auditbeat*
-
-
-
-*Auditbeat*
-
-
 *Filebeat*
 
+- Add beta GZIP file ingestion in filestream. {pull}45301[45301]
 - TCP and UDP inputs now support multiple pipeline workers configured via `number_of_workers`. Increasing the number of workers improves performance when slow processors are used by decoupling reading from the network connection and publishing. {issue}43674[43674] {pull}45124[45124]
 - Updated the `parse_aws_vpc_flow_log` processor to handle AWS VPC flow log v6, v7, and v8 fields. {pull}45746[45746]
 - Add OAuth2 support for Okta provider in Entity Analytics input. {pull}45753[45753]
 - Improve error reporting for schemeless URLs in HTTP JSON input. {pull}45953[45953]
 - Add `remaining_executions` global to the CEL input evaluation context. {pull}46210[46210]
-- Journald input now supports reading from multiple journals, including remote ones {issue}46656[46656] {pull}46722[46722]
-
-*Auditbeat*
-
-
-*Libbeat*
-
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Metricbeat*
-
+- Journald input now supports reading from multiple journals, including remote ones. {issue}46656[46656] {pull}46722[46722]
 
 *Osquerybeat*
 
+- Upgrade osquery version to 5.18.1. {pull}46624[46624]
 
 *Packetbeat*
+
 - Bump Windows Npcap version to v1.83. {pull}46809[46809]
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
-
-
-
-
 
 
 [[release-notes-9.0.0]]
