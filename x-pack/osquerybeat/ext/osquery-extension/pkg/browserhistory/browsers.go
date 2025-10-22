@@ -6,8 +6,6 @@ package browserhistory
 
 import (
 	"runtime"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 // getBrowserPath gets the browser path and handles wildcard expansion

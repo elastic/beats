@@ -9,8 +9,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 func discoverUsers(log func(m string, kvs ...any)) []string {
