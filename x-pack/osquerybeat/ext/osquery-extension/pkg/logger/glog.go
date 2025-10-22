@@ -87,22 +87,22 @@ func New(w io.Writer, verbose bool) *Logger {
 	}
 }
 
-func (log *Logger) UpdateWithOsqueryOptions(options osquery.InternalOptionList) {
+func (l *Logger) UpdateWithOsqueryOptions(options osquery.InternalOptionList) {
 	if options == nil {
 		return
 	}
-	log.mu.Lock()
-	defer log.mu.Unlock()
+	l.mu.Lock()
+	defer l.mu.Unlock()
 
-	if !log.verbose {
+	if !l.verbose {
 		if opt, ok := options["logger_min_status"]; ok && opt != nil {
-			log.minLevel = parseLogLevelOption(*opt)
+			l.minLevel = parseLogLevelOption(*opt)
 		}
 	}
 	if opt, ok := options["log_utc_time"]; ok && opt != nil {
-		log.useUTC = parseUTCOption(*opt)
+		l.useUTC = parseUTCOption(*opt)
 	} else if opt, ok := options["utc"]; ok && opt != nil {
-		log.useUTC = parseUTCOption(*opt)
+		l.useUTC = parseUTCOption(*opt)
 	}
 }
 
