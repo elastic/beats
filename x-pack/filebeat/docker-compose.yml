@@ -58,6 +58,14 @@ services:
       - --addr=:8090
       - --config=/files/config.yaml
 
+  socks5-proxy:
+    image: serjs/go-socks5-proxy:latest
+    container_name: socks5-proxy
+    ports:
+      - "1080:1080"
+    environment:
+      PROXY_USER: elastic
+      PROXY_PASSWORD: changeme
   init-logstash:
     image: busybox:latest
     user: "0:0"
@@ -68,6 +76,7 @@ services:
   logstash:
     depends_on:
       - init-logstash
+      - socks5-proxy
     extends:
       file: ${ES_BEATS}/testing/environments/${STACK_ENVIRONMENT}.yml
       service: logstash

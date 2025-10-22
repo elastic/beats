@@ -3,7 +3,7 @@
 set -euo pipefail
 
 GO_VERSION=$(cat .go-version)
-SETUP_GVM_VERSION="v0.5.1"
+SETUP_GVM_VERSION="v0.6.0"
 PLATFORM_TYPE_LOWERCASE=$(uname | tr '[:upper:]' '[:lower:]')
 
 export BIN=${WORKSPACE:-$PWD}/bin
@@ -70,7 +70,7 @@ with_go() {
   create_workspace
   retry 5 curl -sL -o "${BIN}/gvm" "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${PLATFORM_TYPE_LOWERCASE}-${GO_ARCH_TYPE}"
   chmod +x "${BIN}/gvm"
-  eval "$(gvm --url=https://go.dev/dl $GO_VERSION)"
+  eval "$(gvm $GO_VERSION)"
   go version
   which go
   local go_path="$(go env GOPATH):$(go env GOPATH)/bin"
