@@ -18,6 +18,7 @@
 package processors
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -73,6 +74,10 @@ func NewConditionRule(
 	if cond == nil {
 		return p, nil
 	}
+	if _, ok := p.(Closer); ok {
+		return &ClosingWhenProcessor{WhenProcessor{cond, p}}, nil
+	}
+
 	return &WhenProcessor{cond, p}, nil
 }
 
@@ -86,6 +91,21 @@ func (r *WhenProcessor) Run(event *beat.Event) (*beat.Event, error) {
 
 func (r *WhenProcessor) String() string {
 	return fmt.Sprintf("%v, condition=%v", r.p.String(), r.condition.String())
+}
+
+// ClosingWhenProcessor is the same as WhenProcessor but has the Close
+// method.  This is so NewConditionRule can create two types of "when"
+// processors, one with `Close` and one without.  The decision of
+// which to return is determined if the underlying processors require
+// `Close`.  This is useful because some places in the code base
+// (eg. javascript processors) require stateless processors (no Close
+// method).
+type ClosingWhenProcessor struct {
+	WhenProcessor
+}
+
+func (cwp *ClosingWhenProcessor) Close() error {
+	return Close(cwp.p)
 }
 
 func addCondition(
@@ -123,7 +143,11 @@ type IfThenElseProcessor struct {
 }
 
 // NewIfElseThenProcessor construct a new IfThenElseProcessor.
+<<<<<<< HEAD
 func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
+=======
+func NewIfElseThenProcessor(cfg *config.C, logger *logp.Logger) (beat.Processor, error) {
+>>>>>>> 9da0f31ee (Add close to conditions processors (#46653))
 	var c ifThenElseConfig
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, err
@@ -157,6 +181,25 @@ func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
 		return nil, err
 	}
 
+	closingProcessor := false
+	if ifProcessors != nil {
+		for _, proc := range ifProcessors.List {
+			if _, ok := proc.(Closer); ok {
+				closingProcessor = true
+			}
+		}
+	}
+	if elseProcessors != nil {
+		for _, proc := range elseProcessors.List {
+			if _, ok := proc.(Closer); ok {
+				closingProcessor = true
+			}
+		}
+	}
+
+	if closingProcessor {
+		return &ClosingIfThenElseProcessor{IfThenElseProcessor{cond, ifProcessors, elseProcessors}}, nil
+	}
 	return &IfThenElseProcessor{cond, ifProcessors, elseProcessors}, nil
 }
 
@@ -182,4 +225,26 @@ func (p *IfThenElseProcessor) String() string {
 		sb.WriteString(p.els.String())
 	}
 	return sb.String()
+}
+
+// ClosingIfThenElseProcessor is the same as IfThenElseProcessor but
+// has the Close method.  This is so NewIfThenElseProcessor can create
+// two types of "if/then/else" processors, one with `Close` and one
+// without.  The decision of which to return is determined if the
+// underlying processors require `Close`.  This is useful because some
+// places in the code base (eg. javascript processors) require
+// stateless processors (no Close method).
+type ClosingIfThenElseProcessor struct {
+	IfThenElseProcessor
+}
+
+func (citep *ClosingIfThenElseProcessor) Close() error {
+	var err error
+	for _, proc := range citep.then.List {
+		err = errors.Join(err, Close(proc))
+	}
+	for _, proc := range citep.els.List {
+		err = errors.Join(err, Close(proc))
+	}
+	return err
 }
