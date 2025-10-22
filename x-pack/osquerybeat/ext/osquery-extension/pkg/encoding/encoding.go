@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+
+	"github.com/osquery/osquery-go/plugin/table"
 )
 
 type EncodingFlag int
@@ -94,6 +96,75 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 	}
 
 	return result, nil
+}
+
+func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
+	if in == nil {
+		return nil, fmt.Errorf("input cannot be nil")
+	}
+
+	t := reflect.TypeOf(in)
+
+	var columns []table.ColumnDefinition
+
+	// Handle pointer types by unwrapping to get the underlying type
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
+	if t.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("unsupported type: %s, must be a struct or pointer to struct", t.Kind())
+	}
+
+	for i := 0; i < t.NumField(); i++ {
+		fieldType := t.Field(i)
+
+		if !fieldType.IsExported() {
+			continue
+		}
+
+		key := fieldType.Tag.Get("osquery")
+		switch key {
+		case "-":
+			continue
+		case "":
+			key = fieldType.Name
+		}
+
+		// Determine column type based on Go type
+		var column table.ColumnDefinition
+		fieldKind := fieldType.Type.Kind()
+
+		// Handle pointer types by unwrapping to get the underlying type
+		if fieldKind == reflect.Ptr {
+			fieldKind = fieldType.Type.Elem().Kind()
+		}
+
+		switch fieldKind {
+		case reflect.String:
+			column = table.TextColumn(key)
+
+		case reflect.Bool:
+			column = table.IntegerColumn(key)
+
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32,
+			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32:
+			column = table.IntegerColumn(key)
+
+		case reflect.Int64, reflect.Uint64:
+			column = table.BigIntColumn(key)
+
+		case reflect.Float32, reflect.Float64:
+			column = table.DoubleColumn(key)
+
+		default:
+			return nil, fmt.Errorf("unsupported field type %s for field %s (column %s)", fieldKind, fieldType.Name, key)
+		}
+
+		columns = append(columns, column)
+	}
+
+	return columns, nil
 }
 
 func convertValueToString(fieldValue reflect.Value, flag EncodingFlag) (string, error) {
