@@ -149,6 +149,81 @@ processors:
 	compareOutputFiles(t, fbFilePath, otelFilePath, ignoredFields)
 }
 
+// TestLogstashExporterProxyURL verifies that Filebeat OTel mode can send data to Logstash via a SOCKS5 proxy.
+// Filebeat otel mode sends events to "logstash" via a socks5-proxy container running on localhost:1080
+func TestLogstashExporterProxyURL(t *testing.T) {
+	// ensure the size of events is big enough
+	numEvents := 3
+
+	var beatsCfgFile = `
+filebeat.inputs:
+  - type: filestream
+    id: filestream-input-id
+    enabled: true
+    paths:
+      - %s
+output.logstash:
+  hosts:
+    - "logstash:%s"
+  pipelining: 0
+  worker: 1
+  proxy_url: "socks5://elastic:changeme@localhost:1080"
+queue.mem.flush.timeout: 0s
+processors:
+  - add_host_metadata: ~
+  - add_fields:
+      target: ""
+      fields:
+        testcase: %s
+`
+	testCaseName := uuid.Must(uuid.NewV4()).String()
+	events := generateEvents(numEvents)
+
+	// start filebeat in otel mode
+	fbOTel := integration.NewBeat(
+		t,
+		"filebeat-otel",
+		"../../filebeat.test",
+		"otel",
+	)
+
+	inputFilePath := filepath.Join(fbOTel.TempDir(), "event.json")
+	writeEvents(t, inputFilePath, events)
+
+	fbOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, inputFilePath, "5055", testCaseName))
+	fbOTel.Start()
+	defer fbOTel.Stop()
+
+	// Nginx endpoint URLs
+	baseURL := "http://localhost:8082"
+	outOTelFileURL := fmt.Sprintf("%s/%s_otel.json", baseURL, testCaseName)
+
+	// Logstash is outputting to a file inside its container, to access
+	// this file we use Nginx to serve the output folder via HTTP
+	// (see docker-compose.yml for Logstash and Nginx configuration).
+	// Wait to ensure the file can be downloaded via HTTP, the file
+	// being available indicates that Filebeat successfully sent data
+	// to Logstash
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
+			for _, url := range []string{outOTelFileURL} {
+				checkURLHasContent(ct, url)
+			}
+		},
+		30*time.Second,
+		1*time.Second,
+		"did not find Logstash output file served via Nginx")
+
+	// download files from Nginx
+	otelFilePath := downloadToTestData(t, outOTelFileURL, fmt.Sprintf("%s_otel.json", testCaseName))
+	otelEvents, err := readAllEvents(otelFilePath)
+
+	require.NoError(t, err, "failed to read otel events")
+	require.Equal(t, numEvents, len(otelEvents),
+		"different number of events: sent=%d, get=%d", numEvents, len(otelEvents))
+
+}
+
 func generateEvents(numEvents int) []string {
 	gofakeit.Seed(time.Now().UnixNano())
 
