@@ -290,7 +290,9 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 
 	var tg unison.MultiErrGroup
 
-	hg.AddObserver(p.filewatcher.GetChan())
+	// The harvester needs to notify the FileWatcher
+	// when it closes
+	hg.SetObserver(p.filewatcher.NotifyChan())
 
 	tg.Go(func() error {
 		p.filewatcher.Run(ctx.Cancelation)

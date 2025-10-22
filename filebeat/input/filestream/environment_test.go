@@ -134,7 +134,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 			Cancelation:     ctx,
 			StatusReporter:  nil,
 			MetricsRegistry: reg,
-			Logger:          e.testLogger.Logger,
+			Logger:          e.testLogger.Logger.Named("input.filestream"),
 		}
 		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)

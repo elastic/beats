@@ -114,8 +114,8 @@ type HarvesterGroup interface {
 	Stop(Source)
 	// StopHarvesters cancels all running Harvesters.
 	StopHarvesters() error
-
-	AddObserver(c chan HavesterFile)
+	// SetObserver sets the observer to get notified when a harvester closes
+	SetObserver(c chan HavesterFile)
 }
 
 type defaultHarvesterGroup struct {
@@ -131,18 +131,21 @@ type defaultHarvesterGroup struct {
 	notifyChan   chan HavesterFile
 }
 
+// HavesterFile is used to notify an observer that the harvester for the Path
+// has closed and the amount of data ingested from the file.
 type HavesterFile struct {
 	Path string
 	Size int64
 }
 
-func (hg *defaultHarvesterGroup) notifyObservers(path string, size int64) {
+func (hg *defaultHarvesterGroup) notifyObserver(path string, size int64) {
 	if hg.notifyChan != nil {
 		hg.notifyChan <- HavesterFile{path, size}
 	}
 }
 
-func (hg *defaultHarvesterGroup) AddObserver(c chan HavesterFile) {
+// SetObserver adds and observer to get notified when a harvester closes
+func (hg *defaultHarvesterGroup) SetObserver(c chan HavesterFile) {
 	hg.notifyChan = c
 }
 
@@ -254,29 +257,18 @@ func startHarvester(
 		cursor := makeCursor(resource)
 		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
 
-		// ============================== DEBUG ==============================
-		st := struct {
-			Offset int64 `json:"offset" struct:"offset"`
-			EOF    bool  `json:"eof" struct:"eof"`
-		}{}
-
-		if err := cursor.Unpack(&st); err != nil {
-			ctx.Logger.Errorf("cannot unpack cursor at the end of the harvester: %s", err)
-		}
-		ctx.Logger.Infof("========== Harvester '%s'started. Offset: %d", src.Path(), st.Offset)
-
-		// ==================== REAL CODE
 		defer func() {
+			// The cursor struct used by Filestream, it is defined on:
+			// filebeat/input/filestream/input.go
 			st := struct {
 				Offset int64 `json:"offset" struct:"offset"`
-				EOF    bool  `json:"eof" struct:"eof"`
 			}{}
 
 			if err := cursor.Unpack(&st); err != nil {
 				ctx.Logger.Errorf("cannot unpack cursor at the end of the harvester: %s", err)
 			}
-			ctx.Logger.Infof("========== Harvester '%s' closed. Offset: %d", src.Path(), st.Offset)
-			hg.notifyObservers(src.Path(), st.Offset)
+			hg.notifyObserver(src.Path(), st.Offset)
+			ctx.Logger.Debugf("Harvester for '%s' closed with offset: %d", src.Path(), st.Offset)
 		}()
 
 		ctx.Logger.Debug("Starting harvester for file")

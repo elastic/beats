@@ -32,7 +32,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestLogFileTimedClosing(t *testing.T) {
@@ -219,32 +218,6 @@ func createTestGzipLogFile(t *testing.T) *os.File {
 	return f
 }
 
-func TestShouldBeClosedInactiveAndModified(t *testing.T) {
-	file, err := os.CreateTemp(t.TempDir(), t.Name()+"-*")
-	if err != nil {
-		t.Fatalf("cannot create temp file: %s", err)
-	}
-
-	t.Cleanup(func() { file.Close() })
-
-	if _, err := file.WriteString("foo"); err != nil {
-		t.Fatalf("cannot write to file: %s", err)
-	}
-
-	f := logFile{
-		log:           logptest.NewTestingLogger(t, ""),
-		file:          newPlainFile(file),
-		closeInactive: time.Second,
-		lastTimeRead:  time.Now().Add(-5 * time.Second),
-	}
-
-	if f.shouldBeClosed() {
-		t.Fatal("shouldBeClosed must return false when " +
-			"close.on_state_change.inactive is reached and " +
-			"the file has been modified")
-	}
-}
-
 func readUntilError(reader *logFile) error {
 	buf := make([]byte, 1024)
 	_, err := reader.Read(buf)
@@ -342,27 +315,3 @@ func (b *benchRace) Inc() {
 	b.offset += 42
 	b.lastTimeRead = time.Now()
 }
-
-/*
-% go test -bench=BenchmarkFoo -benchtime=60s
-goos: linux
-goarch: amd64
-pkg: github.com/elastic/beats/v7/filebeat/input/filestream
-cpu: 11th Gen Intel(R) Core(TM) i9-11950H @ 2.60GHz
-BenchmarkFoo/atomic-16          1000000000               0.0000003 ns/op
-BenchmarkFoo/mutex-16           1000000000               0.0000003 ns/op
-BenchmarkFoo/race-16            1000000000               0.0000002 ns/op
-PASS
-ok      github.com/elastic/beats/v7/filebeat/input/filestream   9.843s
-
-% go test -bench=BenchmarkFoo -benchtime=30s
-goos: linux
-goarch: amd64
-pkg: github.com/elastic/beats/v7/filebeat/input/filestream
-cpu: 11th Gen Intel(R) Core(TM) i9-11950H @ 2.60GHz
-BenchmarkFoo/atomic-16          1000000000               0.0000002 ns/op
-BenchmarkFoo/mutex-16           1000000000               0.0000002 ns/op
-BenchmarkFoo/race-16            1000000000               0.0000002 ns/op
-PASS
-ok      github.com/elastic/beats/v7/filebeat/input/filestream   9.723s
-*/

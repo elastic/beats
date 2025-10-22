@@ -637,8 +637,8 @@ func (t *testHarvesterGroup) StopHarvesters() error {
 	return nil
 }
 
-// AddObserver is a no-op
-func (t *testHarvesterGroup) AddObserver(c chan loginp.HavesterFile) {
+// SetObserver is a no-op
+func (t *testHarvesterGroup) SetObserver(c chan loginp.HavesterFile) {
 }
 
 type mockFileWatcher struct {
@@ -693,7 +693,7 @@ func (m *mockFileWatcher) Run(_ unison.Canceler) {}
 
 func (m *mockFileWatcher) GetFiles() map[string]loginp.FileDescriptor { return m.filesOnDisk }
 
-func (m *mockFileWatcher) GetChan() chan loginp.HavesterFile {
+func (m *mockFileWatcher) NotifyChan() chan loginp.HavesterFile {
 	return m.c
 }
 

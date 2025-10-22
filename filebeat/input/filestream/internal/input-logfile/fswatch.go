@@ -72,10 +72,13 @@ type FileDescriptor struct {
 	size int64
 }
 
+// SetSize allows for setting a size that is different than the one in Info
 func (fd *FileDescriptor) SetSize(s int64) {
 	fd.size = s
 }
 
+// Size returns the file size. If [SetSize] has been called with a value other
+// than zero, this size is returned, otherwise Info.Size() is returned.
 func (fd FileDescriptor) Size() int64 {
 	if fd.size != 0 {
 		return fd.size
@@ -129,6 +132,7 @@ type FSWatcher interface {
 	Run(unison.Canceler)
 	// Event returns the next event captured by FSWatcher.
 	Event() FSEvent
-
-	GetChan() chan HavesterFile
+	// NotifyChan returns the channel used to listen for
+	// harvester closing notifications
+	NotifyChan() chan HavesterFile
 }

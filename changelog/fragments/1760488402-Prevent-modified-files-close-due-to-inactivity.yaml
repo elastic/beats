@@ -11,7 +11,8 @@
 kind: bug-fix
 
 # Change summary; a 80ish characters long description of the change.
-summary: "[Filestream] Prevent modified from closing due to inactivity and fix race condition"
+summary: >-
+  [Filestream] ensure harvester always restarts if the file has not been fully ingested.
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.

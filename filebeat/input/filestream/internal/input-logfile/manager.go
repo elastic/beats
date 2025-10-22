@@ -75,8 +75,9 @@ type InputManager struct {
 }
 
 // Source describe a source the input can collect data from.
-// The `Name` method must return an unique name, that will be used to identify
-// the source in the persistent state store.
+// The [Name] method must return an unique name, that will be used to identify
+// the source in the persistent state store. The [Path] method must return
+// the path for the source.
 type Source interface {
 	Name() string
 	Path() string
