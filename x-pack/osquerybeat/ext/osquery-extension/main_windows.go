@@ -7,8 +7,9 @@
 package main
 
 import (
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	"github.com/osquery/osquery-go"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
