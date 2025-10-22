@@ -109,10 +109,8 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 		SELECT 
 			p.url,
 			p.title,
-			p.visit_count,
 			p.hidden,
 			p.frecency,
-			p.typed,
 			p.id as place_id,
 			hv.visit_date,
 			hv.visit_type,
@@ -125,7 +123,7 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 		JOIN moz_historyvisits hv ON p.id = hv.place_id
 		LEFT JOIN moz_historyvisits ref_hv ON hv.from_visit = ref_hv.id
 		LEFT JOIN moz_places ref_p ON ref_hv.place_id = ref_p.id
-		WHERE p.visit_count > 0%s
+		WHERE 1=1%s
 		ORDER BY hv.visit_date DESC
 	`, timestampWhere)
 
@@ -144,10 +142,8 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 		var (
 			url          sql.NullString
 			title        sql.NullString
-			visitCount   sql.NullInt64
 			isHidden     sql.NullInt64
 			ffFrecency   sql.NullInt64
-			typedCount   sql.NullInt64
 			urlID        sql.NullInt64
 			visitTime    sql.NullInt64
 			transition   sql.NullInt64
@@ -161,10 +157,8 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 		err := rows.Scan(
 			&url,
 			&title,
-			&visitCount,
 			&isHidden,
 			&ffFrecency,
-			&typedCount,
 			&urlID,
 			&visitTime,
 			&transition,
@@ -182,12 +176,11 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 		entry := newVisit("firefox", profile, firefoxTimeToUnix(visitTime.Int64))
 		entry.URL = url.String
 		entry.Title = title.String
+		entry.Scheme, entry.Domain = extractSchemeAndDomain(url.String)
 		entry.TransitionType = mapFirefoxTransitionType(transition)
 		entry.ReferringURL = referringURL.String
 		entry.VisitID = visitID.Int64
 		entry.FromVisitID = fromVisitID.Int64
-		entry.VisitCount = int(visitCount.Int64)
-		entry.TypedCount = int(typedCount.Int64)
 		entry.VisitSource = mapFirefoxVisitSource(visitSource)
 		entry.IsHidden = func(v int64) bool { return v != 0 }(isHidden.Int64)
 		entry.UrlID = urlID.Int64

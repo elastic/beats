@@ -86,7 +86,6 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 		SELECT 
 			hi.url,
 			hi.domain_expansion,
-			hi.visit_count,
 			hv.title,
 			hv.visit_time,
 			hv.load_successful,
@@ -113,7 +112,6 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 		var (
 			url             sql.NullString
 			domainExpansion sql.NullString
-			visitCount      sql.NullInt64
 			title           sql.NullString
 			visitTime       sql.NullFloat64
 			loadSuccessful  sql.NullBool
@@ -124,7 +122,6 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 		err := rows.Scan(
 			&url,
 			&domainExpansion,
-			&visitCount,
 			&title,
 			&visitTime,
 			&loadSuccessful,
@@ -139,8 +136,8 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 		entry := newVisit("safari", profile, safariTimeToUnix(visitTime.Float64))
 		entry.URL = url.String
 		entry.Title = title.String
+		entry.Scheme, entry.Domain = extractSchemeAndDomain(url.String)
 		entry.VisitID = visitID.Int64
-		entry.VisitCount = int(visitCount.Int64)
 		entry.UrlID = itemID.Int64
 		entry.SfDomainExpansion = domainExpansion.String
 		entry.SfLoadSuccessful = loadSuccessful.Bool

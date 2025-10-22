@@ -88,8 +88,6 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 		SELECT 
 			urls.url,
 			urls.title,
-			urls.visit_count,
-			urls.typed_count,
 			urls.hidden,
 			urls.id as url_id,
 			visits.visit_time,
@@ -123,8 +121,6 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 		var (
 			url             sql.NullString
 			title           sql.NullString
-			visitCount      sql.NullInt64
-			typedCount      sql.NullInt64
 			isHidden        sql.NullInt64
 			urlID           sql.NullInt64
 			visitTime       sql.NullInt64
@@ -139,8 +135,6 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 		err := rows.Scan(
 			&url,
 			&title,
-			&visitCount,
-			&typedCount,
 			&isHidden,
 			&urlID,
 			&visitTime,
@@ -159,12 +153,11 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 		entry := newVisit("chromium", profile, chromiumTimeToUnix(visitTime.Int64))
 		entry.URL = url.String
 		entry.Title = title.String
+		entry.Scheme, entry.Domain = extractSchemeAndDomain(url.String)
 		entry.TransitionType = mapChromiumTransitionType(transitionType)
 		entry.ReferringURL = referringURL.String
 		entry.VisitID = visitID.Int64
 		entry.FromVisitID = fromVisitID.Int64
-		entry.VisitCount = int(visitCount.Int64)
-		entry.TypedCount = int(typedCount.Int64)
 		entry.VisitSource = mapChromiumVisitSource(visitSource)
 		entry.IsHidden = func(v int64) bool { return v != 0 }(isHidden.Int64)
 		entry.UrlID = urlID.Int64

@@ -7,11 +7,11 @@
 package main
 
 import (
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/browserhistory"
 	"github.com/osquery/osquery-go"
 	"github.com/osquery/osquery-go/plugin/table"
 )
 
 func RegisterTables(server *osquery.ExtensionManagerServer, log func(m string, kvs ...any)) {
-	server.RegisterPlugin(table.NewPlugin("browser_history", tables.BrowserHistoryColumns(), tables.GetBrowserHistoryGenerateFunc(log)))
+	server.RegisterPlugin(table.NewPlugin("browser_history", browserhistory.GetColumns(), browserhistory.GetGenerateFunc(log)))
 }

@@ -16,6 +16,24 @@ import (
 	"go.uber.org/multierr"
 )
 
+func GetColumns() []table.ColumnDefinition {
+	// Generate column definitions automatically from the visit struct using reflection.
+	// This ensures the columns always match the struct definition and prevents drift.
+	columns, err := encoding.GenerateColumnDefinitions(visit{})
+	if err != nil {
+		// This should never happen in practice since we control the struct definition,
+		// but if it does, panic to catch it during development/testing.
+		panic("failed to generate browser_history columns: " + err.Error())
+	}
+	return columns
+}
+
+func GetGenerateFunc(log func(m string, kvs ...any)) table.GenerateFunc {
+	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
+		return GetTableRows(ctx, queryContext, log)
+	}
+}
+
 func GetTableRows(ctx context.Context, queryContext table.QueryContext, log func(m string, kvs ...any)) ([]map[string]string, error) {
 	once.Do(initParsers)
 

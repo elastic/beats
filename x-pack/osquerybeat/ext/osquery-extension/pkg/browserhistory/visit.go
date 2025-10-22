@@ -5,6 +5,7 @@
 package browserhistory
 
 import (
+	"net/url"
 	"time"
 )
 
@@ -12,6 +13,9 @@ type visit struct {
 	// Universal fields (available across all browsers)
 	Timestamp      int64  `osquery:"timestamp"`
 	Datetime       string `osquery:"datetime"`
+	UrlID          int64  `osquery:"url_id"`
+	Scheme         string `osquery:"scheme"`
+	Domain         string `osquery:"domain"`
 	URL            string `osquery:"url"`
 	Title          string `osquery:"title"`
 	Browser        string `osquery:"browser"`
@@ -22,9 +26,6 @@ type visit struct {
 	ReferringURL   string `osquery:"referring_url"`
 	VisitID        int64  `osquery:"visit_id"`
 	FromVisitID    int64  `osquery:"from_visit_id"`
-	UrlID          int64  `osquery:"url_id"`
-	VisitCount     int    `osquery:"visit_count"`
-	TypedCount     int    `osquery:"typed_count"`
 	VisitSource    string `osquery:"visit_source"`
 	IsHidden       bool   `osquery:"is_hidden"`
 	HistoryPath    string `osquery:"history_path"`
@@ -55,4 +56,12 @@ func newVisit(parser string, profile *profile, timestamp int64) *visit {
 		CustomDataDir: profile.customDataDir,
 	}
 	return v
+}
+
+func extractSchemeAndDomain(rawURL string) (string, string) {
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		return "", ""
+	}
+	return parsedURL.Scheme, parsedURL.Hostname()
 }
