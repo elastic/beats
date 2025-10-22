@@ -77,8 +77,8 @@ type azureInputConfig struct {
 	// migration from v1 to v2 (processor v2 only). Default is false.
 	MigrateCheckpoint bool `config:"migrate_checkpoint"`
 	// ProcessorVersion controls the processor version to use.
-	// Possible values are v1 and v2 (processor v2 only). Default is v1.
-	ProcessorVersion string `config:"processor_version"`
+	// Possible values are v1 and v2 (processor v2 only). The default is v2.
+	ProcessorVersion string `config:"processor_version" default:"v2"`
 	// ProcessorUpdateInterval controls how often attempt to claim
 	// partitions (processor v2 only). The default value is 10 seconds.
 	ProcessorUpdateInterval time.Duration `config:"processor_update_interval"`
@@ -103,9 +103,9 @@ type azureInputConfig struct {
 
 func defaultConfig() azureInputConfig {
 	return azureInputConfig{
-		// For this release, we continue to use
-		// the processor v1 as the default.
-		ProcessorVersion: processorV1,
+		// For this release, we use
+		// the processor v2 as the default.
+		ProcessorVersion: processorV2,
 		// Controls how often attempt to claim partitions.
 		ProcessorUpdateInterval: 10 * time.Second,
 		// For backward compatibility with v1,
