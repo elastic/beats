@@ -526,3 +526,5 @@ replace (
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20250616163611-a325b49669a4
 )
+
+replace github.com/elastic/elastic-agent-libs v0.24.1 => github.com/belimawr/elastic-agent-libs v0.2.9-0.20251022192408-3bd26ab3841c
