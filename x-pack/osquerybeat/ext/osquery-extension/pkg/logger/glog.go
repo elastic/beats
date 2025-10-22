@@ -47,6 +47,11 @@ func parseLogLevelOption(opt osquery.InternalOptionInfo) Level {
 	if err != nil {
 		return LevelWarning
 	}
+	if v < 0 {
+		return LevelInfo
+	} else if v > 2 {
+		return LevelError
+	}
 	return Level(v)
 }
 
