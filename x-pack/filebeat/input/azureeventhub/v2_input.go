@@ -189,32 +189,6 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	}
 	in.checkpointStore = checkpointStore
 
-	// There is a mismatch between how the azure-eventhub input and the new
-	// Event Hub SDK expect the event hub name in the connection string.
-	//
-	// The azure-eventhub input was designed to work with the old Event Hub SDK,
-	// which worked using the event hub name in the connection string.
-	//
-	// The new Event Hub SDK expects clients to pass the event hub name as a
-	// parameter, or in the connection string as the entity path.
-	//
-	// We need to handle both cases.
-	eventHubName := in.config.EventHubName
-
-	connectionStringProperties, err := parseConnectionString(in.config.ConnectionString)
-	if err != nil {
-		return fmt.Errorf("failed to parse connection string: %w", err)
-	}
-	if connectionStringProperties.EntityPath != nil {
-		// If the connection string contains an entity path, we need to
-		// set the event hub name to an empty string.
-		//
-		// This is a requirement of the new Event Hub SDK.
-		//
-		// See: https://github.com/Azure/azure-sdk-for-go/blob/4ece3e50652223bba502f2b73e7f297de34a799c/sdk/messaging/azeventhubs/producer_client.go#L304-L306
-		eventHubName = ""
-	}
-
 	// Create the event hub consumerClient to receive events.
 	var consumerClient *azeventhubs.ConsumerClient
 
@@ -227,6 +201,32 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		}
 	} else {
 		// Use connection string authentication (default)
+		// There is a mismatch between how the azure-eventhub input and the new
+		// Event Hub SDK expect the event hub name in the connection string.
+		//
+		// The azure-eventhub input was designed to work with the old Event Hub SDK,
+		// which worked using the event hub name in the connection string.
+		//
+		// The new Event Hub SDK expects clients to pass the event hub name as a
+		// parameter, or in the connection string as the entity path.
+		//
+		// We need to handle both cases.
+		eventHubName := in.config.EventHubName
+
+		connectionStringProperties, err := parseConnectionString(in.config.ConnectionString)
+		if err != nil {
+			return fmt.Errorf("failed to parse connection string: %w", err)
+		}
+		if connectionStringProperties.EntityPath != nil {
+			// If the connection string contains an entity path, we need to
+			// set the event hub name to an empty string.
+			//
+			// This is a requirement of the new Event Hub SDK.
+			//
+			// See: https://github.com/Azure/azure-sdk-for-go/blob/4ece3e50652223bba502f2b73e7f297de34a799c/sdk/messaging/azeventhubs/producer_client.go#L304-L306
+			eventHubName = ""
+		}
+
 		consumerClient, err = azeventhubs.NewConsumerClientFromConnectionString(
 			in.config.ConnectionString,
 			eventHubName,
