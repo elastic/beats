@@ -199,5 +199,5 @@ func (l *Logger) log(level Level, msg string) {
 
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.w.Write([]byte(formatted))
+	_, _ = l.w.Write([]byte(formatted))
 }
