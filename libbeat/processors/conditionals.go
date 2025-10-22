@@ -143,11 +143,7 @@ type IfThenElseProcessor struct {
 }
 
 // NewIfElseThenProcessor construct a new IfThenElseProcessor.
-<<<<<<< HEAD
-func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
-=======
-func NewIfElseThenProcessor(cfg *config.C, logger *logp.Logger) (beat.Processor, error) {
->>>>>>> 9da0f31ee (Add close to conditions processors (#46653))
+func NewIfElseThenProcessor(cfg *config.C) (beat.Processor, error) {
 	var c ifThenElseConfig
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, err
