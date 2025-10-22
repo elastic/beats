@@ -8,34 +8,59 @@ package tables
 
 import (
 	"context"
-	"fmt"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/osquery/osquery-go/plugin/table"
-	"www.velocidex.com/golang/regparser"
 )
 
+// DriverBinaryEntry represents a single entry in the amcache driver binary table.
 type DriverBinaryEntry struct {
-	LastWriteTime           int64  `json:"last_write_time,string"`
-	DriverName              string `json:"driver_name"`
-	Inf                     string `json:"inf"`
-	DriverVersion           string `json:"driver_version"`
-	Product                 string `json:"product"`
-	ProductVersion          string `json:"product_version"`
-	WdfVersion              string `json:"wdf_version"`
-	DriverCompany           string `json:"driver_company"`
-	DriverPackageStrongName string `json:"driver_package_strong_name"`
-	Service                 string `json:"service"`
-	DriverInBox             string `json:"driver_in_box"`
-	DriverSigned            string `json:"driver_signed"`
-	DriverIsKernelMode      string `json:"driver_is_kernel_mode"`
-	DriverId                string `json:"driver_id"`
-	DriverLastWriteTime     string `json:"driver_last_write_time"`
-	DriverType              string `json:"driver_type"`
-	DriverTimeStamp         string `json:"driver_time_stamp"`
-	DriverCheckSum          string `json:"driver_check_sum"`
-	ImageSize               string `json:"image_size"`
+	LastWriteTime           int64  `osquery:"last_write_time"`
+	DriverName              string `osquery:"driver_name"`
+	Inf                     string `osquery:"inf"`
+	DriverVersion           string `osquery:"driver_version"`
+	Product                 string `osquery:"product"`
+	ProductVersion          string `osquery:"product_version"`
+	WdfVersion              string `osquery:"wdf_version"`
+	DriverCompany           string `osquery:"driver_company"`
+	DriverPackageStrongName string `osquery:"driver_package_strong_name"`
+	Service                 string `osquery:"service"`
+	DriverInBox             string `osquery:"driver_in_box"`
+	DriverSigned            string `osquery:"driver_signed"`
+	DriverIsKernelMode      string `osquery:"driver_is_kernel_mode"`
+	DriverId                string `osquery:"driver_id"`
+	DriverLastWriteTime     string `osquery:"driver_last_write_time"`
+	DriverType              string `osquery:"driver_type"`
+	DriverTimeStamp         string `osquery:"driver_time_stamp"`
+	DriverCheckSum          string `osquery:"driver_check_sum"`
+	ImageSize               string `osquery:"image_size"`
 }
 
-func DriverBinaryColumns() []table.ColumnDefinition {
+// FilterColumn returns the name of the column used for filtering entries in the DriverBinaryTable.
+func (dbe *DriverBinaryEntry) FilterValue() string {
+	return dbe.DriverId
+}
+
+// ToMap converts the DriverBinaryEntry to a map[string]string representation.
+func (dbe *DriverBinaryEntry) ToMap() (map[string]string, error) {
+	mapped, err := encoding.MarshalToMap(dbe)
+	return mapped, err
+}
+
+// DriverBinaryTable implements the TableInterface for the amcache driver binary table.
+type DriverBinaryTable struct {}
+
+// Type returns the TableType for the DriverBinaryTable.
+func (dbt *DriverBinaryTable) Type() TableType {
+	return DriverBinaryTableType
+}
+
+// FilterColumn returns the name of the column used for filtering entries in the DriverBinaryTable.
+func (dbt *DriverBinaryTable) FilterColumn() string {
+	return "driver_id"
+}
+
+// Columns returns the column definitions for the DriverBinaryTable.
+func (dbt *DriverBinaryTable) Columns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.BigIntColumn("last_write_time"),
 		table.TextColumn("driver_name"),
@@ -54,51 +79,25 @@ func DriverBinaryColumns() []table.ColumnDefinition {
 	}
 }
 
-func (ae *DriverBinaryEntry) FieldMappings() map[string]*string {
-	return map[string]*string{
-		"DriverName":              &ae.DriverName,
-		"Inf":                     &ae.Inf,
-		"DriverVersion":           &ae.DriverVersion,
-		"Product":                 &ae.Product,
-		"ProductVersion":          &ae.ProductVersion,
-		"WdfVersion":              &ae.WdfVersion,
-		"DriverCompany":           &ae.DriverCompany,
-		"DriverPackageStrongName": &ae.DriverPackageStrongName,
-		"Service":                 &ae.Service,
-		"DriverInBox":             &ae.DriverInBox,
-		"DriverSigned":            &ae.DriverSigned,
-		"DriverIsKernelMode":      &ae.DriverIsKernelMode,
-		"DriverId":                &ae.DriverId,
-	}
+// GetID returns the unique identifier for the DriverBinaryEntry, which is the DriverId.
+func (ae *DriverBinaryEntry) GetID() string {
+	return ae.DriverId
 }
 
-func (ae *DriverBinaryEntry) SetLastWriteTime(t int64) {
-	ae.LastWriteTime = t
-}
-
-func GetDriverBinaryEntriesFromRegistry(registry *regparser.Registry) (map[string][]Entry, error) {
-	if registry == nil {
-		return nil, fmt.Errorf("registry is nil")
-	}
-
-	keyNode := registry.OpenKey(driverBinaryKeyPath)
-	if keyNode == nil {
-		return nil, fmt.Errorf("error opening key: %s", driverBinaryKeyPath)
-	}
-
-	deviceEntries := make(map[string][]Entry, len(keyNode.Subkeys()))
-	for _, subkey := range keyNode.Subkeys() {
-		dbe := &DriverBinaryEntry{}
-		FillInEntryFromKey(dbe, subkey)
-		deviceEntries[dbe.DriverId] = append(deviceEntries[dbe.DriverId], dbe)
-	}
-	return deviceEntries, nil
-}
-
-func DriverBinaryGenerateFunc(state GlobalStateInterface) table.GenerateFunc {
+// GetType returns the TableType for the DriverBinaryEntry.
+func (dbt *DriverBinaryTable) GenerateFunc(state GlobalStateInterface) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		driverIds := GetConstraintsFromQueryContext("driver_id", queryContext)
-		rows := state.GetDriverBinaryEntries(driverIds...)
-		return RowsAsStringMapArray(rows), nil
+		driverIds := GetConstraintsFromQueryContext(dbt.FilterColumn(), queryContext)
+		entries := state.GetCachedEntries(dbt.Type(), driverIds...)
+
+		rows := make([]map[string]string, 0, len(entries))
+		for _, entry := range entries {
+			mapped, err := entry.ToMap()
+			if err != nil {
+				return nil, err
+			}
+			rows = append(rows, mapped)
+		}
+		return rows, nil
 	}
 }

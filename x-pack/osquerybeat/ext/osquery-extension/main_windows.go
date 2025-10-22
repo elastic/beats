@@ -7,8 +7,6 @@
 package main
 
 import (
-	"log"
-	"os"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/state"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
 	"github.com/osquery/osquery-go"
@@ -18,31 +16,23 @@ import (
 func RegisterTables(server *osquery.ExtensionManagerServer) {
 
 	globalState := state.GetGlobalState()
-	server.RegisterPlugin(table.NewPlugin("amcache_application", tables.ApplicationColumns(), tables.ApplicationGenerateFunc(globalState)))
-	server.RegisterPlugin(table.NewPlugin("amcache_application_file", tables.ApplicationFileColumns(), tables.ApplicationFileGenerateFunc(globalState)))
-	server.RegisterPlugin(table.NewPlugin("amcache_application_shortcut", tables.ApplicationShortcutColumns(), tables.ApplicationShortcutGenerateFunc(globalState)))
-	server.RegisterPlugin(table.NewPlugin("amcache_device_pnp", tables.DevicePnpColumns(), tables.DevicePnpGenerateFunc(globalState)))
-	server.RegisterPlugin(table.NewPlugin("amcache_driver_binary", tables.DriverBinaryColumns(), tables.DriverBinaryGenerateFunc(globalState)))
+	applicationTable := &tables.ApplicationTable{}
+	applicationFileTable := &tables.ApplicationFileTable{}
+	applicationShortcutTable := &tables.ApplicationShortcutTable{}
+	devicePnpTable := &tables.DevicePnpTable{}
+	driverBinaryTable := &tables.DriverBinaryTable{}
+
+	server.RegisterPlugin(table.NewPlugin("amcache_application", applicationTable.Columns(), applicationTable.GenerateFunc(globalState)))
+	server.RegisterPlugin(table.NewPlugin("amcache_application_file", applicationFileTable.Columns(), applicationFileTable.GenerateFunc(globalState)))
+	server.RegisterPlugin(table.NewPlugin("amcache_application_shortcut", applicationShortcutTable.Columns(), applicationShortcutTable.GenerateFunc(globalState)))
+	server.RegisterPlugin(table.NewPlugin("amcache_device_pnp", devicePnpTable.Columns(), devicePnpTable.GenerateFunc(globalState)))
+	server.RegisterPlugin(table.NewPlugin("amcache_driver_binary", driverBinaryTable.Columns(), driverBinaryTable.GenerateFunc(globalState)))
 }
 
 func CreateViews(socket *string) {
-	filepath := "C:\\app.log"
-	if _, err := os.Stat(filepath); err == nil {
-		os.Remove(filepath)
-	}
-	file, err := os.OpenFile("C:\\app.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-	if err != nil {
-		log.Fatal(err) // Use standard logger (stderr) to report this fatal error
-	}
-	defer file.Close()
-	log.SetOutput(file)
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-
-	log.Println("Starting AMCache view creation")
-	amcacheView := View{
+	view := View{
 		requiredTables: []string{"amcache_application", "amcache_application_file"},
 		createViewQuery: "CREATE VIEW amcache_applications as SELECT * FROM amcache_application_file JOIN amcache_application using (program_id);",
 	}
-	amcacheView.CreateView(socket)
-	log.Println("Finished AMCache view creation")
+	view.CreateView(socket)
 }

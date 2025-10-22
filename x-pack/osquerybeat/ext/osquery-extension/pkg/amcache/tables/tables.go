@@ -8,117 +8,178 @@ package tables
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
-	"github.com/forensicanalysis/fslib"
-	"github.com/forensicanalysis/fslib/systemfs"
-	"github.com/osquery/osquery-go/plugin/table"
 	"io/fs"
 	"log"
 	"os"
+	"reflect"
 	"strings"
+
+	"github.com/forensicanalysis/fslib"
+	"github.com/forensicanalysis/fslib/systemfs"
+	"github.com/osquery/osquery-go/plugin/table"
 	"www.velocidex.com/golang/regparser"
 )
 
-const applicationKeyPath = "Root\\InventoryApplication"
-const applicationFileKeyPath = "Root\\InventoryApplicationFile"
-const applicationShortcutKeyPath = "Root\\InventoryApplicationShortcut"
-const driverBinaryKeyPath = "Root\\InventoryDriverBinary"
-const devicePnpKeyPath = "Root\\InventoryDevicePnp"
+// TableType represents the different types of Amcache tables.
+type TableType int
+const (
+	ApplicationTableType         TableType = iota // 0
+	ApplicationFileTableType                      // 1
+	ApplicationShortcutTableType                  // 2
+	DriverBinaryTableType                         // 3
+	DevicePnpTableType                            // 4
+)
+
+// AllTableTypes returns a slice of all defined TableTypes.
+func AllTableTypes() []TableType {
+	return []TableType{
+		ApplicationTableType,
+		ApplicationFileTableType,
+		ApplicationShortcutTableType,
+		DriverBinaryTableType,
+		DevicePnpTableType,
+	}
+}
+
+// GetHiveKey returns the registry hive key path associated with the TableType.
+func (tt TableType) GetHiveKey() string {
+	switch tt {
+	case ApplicationTableType:
+		return "Root\\InventoryApplication"
+	case ApplicationFileTableType:
+		return "Root\\InventoryApplicationFile"
+	case ApplicationShortcutTableType:
+		return "Root\\InventoryApplicationShortcut"
+	case DriverBinaryTableType:
+		return "Root\\InventoryDriverBinary"
+	case DevicePnpTableType:
+		return "Root\\InventoryDevicePnp"
+	default:
+		return ""
+	}
+}
+
+// TableInterface defines the methods that each Amcache table must implement.
+type TableInterface interface {
+	Type() TableType
+	Columns() []table.ColumnDefinition
+	GenerateFunc(state GlobalStateInterface) table.GenerateFunc
+	FilterColumn() string
+}
 
 // GlobalState is an interface that defines methods for accessing global Amcache state.
 type GlobalStateInterface interface {
-	GetApplicationEntries(...string) []Entry
-	GetApplicationFileEntries(...string) []Entry
-	GetApplicationShortcutEntries(...string) []Entry
-	GetDriverBinaryEntries(...string) []Entry
-	GetDevicePnpEntries(...string) []Entry
+	GetCachedEntries(tableType TableType, ids ...string) []Entry
 }
 
-// Entry is an interface that all Amcache table entry structs must implement.
-// it is basically a row in a table.
+// Entry defines the methods that each Amcache entry must implement.
 type Entry interface {
-	// SetLastWriteTime sets the last write time for the entry.
-	SetLastWriteTime(int64)
-
-	// FieldMappings returns a map of registry value names to struct field pointers for populating the entry.
-	FieldMappings() map[string]*string
+	FilterValue() string
+	ToMap() (map[string]string, error)
 }
 
-// FillInEntryFromKey takes an Entry, and using the FieldMappings, populates its fields from a registry key.
-func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE) {
-	// The regparser.CM_KEY_NODE has a Values() method that returns a slice of Value structs
-	// Each Value struct has a ValueName() and ValueData() method but are not indexed in a map
-	// so we create a map here for easy lookup
-	subkeyMap := make(map[string]*regparser.ValueData)
-	for _, value := range key.Values() {
-		subkeyMap[value.ValueName()] = value.ValueData()
+// EntryFactory creates a new Entry instance based on the provided TableType.
+func EntryFactory(tableType TableType) Entry {
+	switch tableType {
+	case ApplicationTableType:
+		return &ApplicationEntry{}
+	case ApplicationFileTableType:
+		return &ApplicationFileEntry{}
+	case ApplicationShortcutTableType:
+		return &ApplicationShortcutEntry{}
+	case DriverBinaryTableType:
+		return &DriverBinaryEntry{}
+	case DevicePnpTableType:
+		return &DevicePnpEntry{}
+	default:
+		return nil
 	}
-	// Set FirstRunTime from key timestamp
-	e.SetLastWriteTime(key.LastWriteTime().Unix())
-	// Populate all fields using the mapping
-	for registryKey, fieldPtr := range e.FieldMappings() {
-		vd, ok := subkeyMap[registryKey]
-		if !ok || vd == nil {
-			// Not all fields are present in every entry, so just set to empty string
-			*fieldPtr = ""
+}
+
+// MarshalEntries takes a slice of Entry interfaces and marshals each to a map[string]string.
+func MarshalEntries(entries []Entry) ([]map[string]string, error) {
+	marshalled := make([]map[string]string, 0, len(entries))
+	for _, entry := range entries {
+		mapped, err := entry.ToMap()
+		if err != nil {
+			return nil, err
+		}
+		marshalled = append(marshalled, mapped)
+	}
+	return marshalled, nil
+}
+
+// GetEntriesFromRegistry reads the registry and returns a map of entries for the specified TableType.
+func GetEntriesFromRegistry(tableType TableType, registry *regparser.Registry) (map[string][]Entry, error) {
+	if registry == nil {
+		return nil, fmt.Errorf("registry is nil")
+	}
+
+	keyNode := registry.OpenKey(tableType.GetHiveKey())
+	if keyNode == nil {
+		return nil, fmt.Errorf("error opening key: %s", tableType.GetHiveKey())
+	}
+
+	applicationEntries := make(map[string][]Entry, len(keyNode.Subkeys()))
+	for _, subkey := range keyNode.Subkeys() {
+		ae := EntryFactory(tableType)
+		FillInEntryFromKey(ae, subkey)
+		applicationEntries[ae.FilterValue()] = append(applicationEntries[ae.FilterValue()], ae)
+	}
+	return applicationEntries, nil
+}
+
+// FillInEntryFromKey takes an any, and using the FieldMappings, populates its fields from a registry key.
+func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE) {
+	elem := reflect.ValueOf(e).Elem()
+	if !elem.IsValid() || !elem.CanSet() {
+		log.Println("invalid struct pointer")
+		return
+	}
+
+	for _, value := range key.Values() {
+		if value.ValueName() == "" {
 			continue
 		}
-		*fieldPtr = MakeTrimmedString(vd)
-	}
-}
-
-// ToJson converts an Entry to its JSON string representation.
-func ToJson(e Entry) string {
-	j, err := json.Marshal(e)
-	if err != nil {
-		log.Printf("Error marshalling Entry to JSON: %v", err)
-		return ""
-	}
-	return string(j)
-}
-
-// RowsAsStringMapArray converts a slice of Entry objects to a slice of maps with string keys and values.
-// This is the format osquery expects for table rows.
-func RowsAsStringMapArray(entries []Entry) []map[string]string {
-	res := make([]map[string]string, 0, len(entries))
-	for _, entry := range entries {
-		j, err := json.Marshal(entry)
-		if err != nil {
-			log.Printf("Error marshalling Entry to JSON: %v", err)
-			return nil
+		field := elem.FieldByName(value.ValueName())
+		if !field.IsValid() || !field.CanSet() {
+			continue
 		}
-		row := make(map[string]string)
-		err = json.Unmarshal(j, &row)
-		if err != nil {
-			log.Printf("Error unmarshalling Entry JSON to map: %v", err)
-			return nil
+
+		switch field.Kind() {
+
+		// If the field is an integer type, make sure the registry value is DWORD or QWORD
+		case reflect.Int64, reflect.Int32:
+			switch value.ValueData().Type {
+			case regparser.REG_DWORD, regparser.REG_QWORD:
+				field.SetInt(int64(value.ValueData().Uint64))
+			}
+		// If the field is a string type, handle STRING, DWORD, and QWORD registry value types
+		case reflect.String:
+			switch value.ValueData().Type {
+			case regparser.REG_SZ:
+				field.SetString(strings.TrimRight(value.ValueData().String, "\x00"))
+			case regparser.REG_DWORD, regparser.REG_QWORD:
+				field.SetString(fmt.Sprintf("%d", value.ValueData().Uint64))
+			}
+
+		// If the field is a boolean type, interpret non-zero DWORD/QWORD as true
+		case reflect.Bool:
+			if value.ValueData().Uint64 != 0 {
+				field.SetBool(true)
+			} else {
+				field.SetBool(false)
+			}
+		// Unsupported field type
+		default:
+			log.Printf("Warning: unsupported field type for %s: %s", value.ValueName(), field.Kind())
 		}
-		res = append(res, row)
 	}
-	return res
-}
-
-// MakeTrimmedString trims null characters from the end of a regparser ValueData string
-// and returns it as a regular Go string. If the ValueData is a number, it returns its string representation.
-// Otherwise, it returns a hex representation of the raw data.
-func MakeTrimmedString(vd *regparser.ValueData) string {
-	// regparser strings are null-terminated, and will show the trailing
-	// nulls when marshalled to JSON. Trim them here.
-	// Also, warn if the type is unexpected.
-
-	if vd == nil {
-		return ""
-	}
-
-	switch vd.Type {
-	case regparser.REG_SZ, regparser.REG_EXPAND_SZ:
-		return strings.TrimRight(vd.String, "\x00")
-	case regparser.REG_DWORD, regparser.REG_QWORD:
-		return fmt.Sprintf("%d", vd.Uint64)
-	default:
-		log.Printf("Warning: unexpected type for ValueData: %d", vd.Type)
-		return fmt.Sprintf("%x", vd.Data)
+	// Set LastWriteTime from key timestamp
+	lastWriteTime := elem.FieldByName("LastWriteTime")
+	if lastWriteTime.IsValid() && lastWriteTime.CanSet() {
+		lastWriteTime.SetInt(key.LastWriteTime().Unix())
 	}
 }
 

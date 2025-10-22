@@ -32,8 +32,6 @@ func AreTablesReady(client *osquery.ExtensionManagerClient, tableNames []string)
 }
 
 func (v *View) CreateView(socket *string) error {
-
-	log.Println("Starting CreateView")
 	client, err := osquery.NewClient(*socket, 2*time.Second)
 	if err != nil {
 		return fmt.Errorf("error creating osquery client: %w", err)
@@ -50,23 +48,20 @@ func (v *View) CreateView(socket *string) error {
 		}
 
 		// Check if all required tables are ready
-		log.Println("Checking if required tables are ready")
 		if (!AreTablesReady(client, v.requiredTables)) {
-			log.Println("Required tables not ready yet, retrying...")
 			continue
 		}
-		log.Println("Required tables are ready, creating view")
 
 		// Create the view
-		log.Printf("Creating view with: %s\n", v.createViewQuery)
 		_, err := client.Query(v.createViewQuery)
 		if err != nil {
 			log.Printf("Error creating view %s: %s\n", v.createViewQuery, err)
+			continue
 		} else {
-			log.Println("View created successfully")
+			// Successfully created the view
+			log.Printf("Successfully created view with query: %s\n", v.createViewQuery)
 			break
 		}
 	}
-	log.Println("Finished CreateView")
 	return nil
 }

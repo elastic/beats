@@ -8,85 +8,136 @@ package tables
 
 import (
 	"context"
+	"testing"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/testdata"
 	"github.com/osquery/osquery-go/plugin/table"
-	"testing"
-	"www.velocidex.com/golang/regparser"
 )
 
-func GetFilteredEntries(getEntriesFunc func(*regparser.Registry) (map[string][]Entry, error), hashes ...string) []Entry {
+func GetFilteredEntries(tableType TableType, ids ...string) []Entry {
 	registry, err := LoadRegistry(testdata.GetTestHivePathOrFatal(nil))
 	if err != nil {
 		return nil
 	}
-	entriesMap, err := getEntriesFunc(registry)
+	entriesMap, err := GetEntriesFromRegistry(tableType, registry)
 	if err != nil {
 		return nil
 	}
-	if len(hashes) == 0 {
-		var allEntries []Entry
+
+	result := make([]Entry, 0)
+
+	if len(ids) == 0 {
 		for _, entries := range entriesMap {
-			allEntries = append(allEntries, entries...)
-		}
-		return allEntries
-	} else {
-		var filteredEntries []Entry
-		for _, hash := range hashes {
-			if entries, ok := entriesMap[hash]; ok {
-				filteredEntries = append(filteredEntries, entries...)
+			for _, entry := range entries {
+				result = append(result, entry)
 			}
 		}
-		return filteredEntries
+		return result
 	}
+
+	for _, id := range ids {
+		if entries, ok := entriesMap[id]; ok {
+			for _, entry := range entries {
+				result = append(result, entry)
+			}
+		}
+	}
+	return result
 }
 
 type MockGlobalState struct{}
 
-func (m *MockGlobalState) GetApplicationEntries(hashes ...string) []Entry {
-	return GetFilteredEntries(GetApplicationEntriesFromRegistry, hashes...)
-}
-func (m *MockGlobalState) GetApplicationFileEntries(hashes ...string) []Entry {
-	return GetFilteredEntries(GetApplicationFileEntriesFromRegistry, hashes...)
-}
-func (m *MockGlobalState) GetApplicationShortcutEntries(hashes ...string) []Entry {
-	return GetFilteredEntries(GetApplicationShortcutEntriesFromRegistry, hashes...)
-}
-func (m *MockGlobalState) GetDriverBinaryEntries(hashes ...string) []Entry {
-	return GetFilteredEntries(GetDriverBinaryEntriesFromRegistry, hashes...)
-}
-func (m *MockGlobalState) GetDevicePnpEntries(hashes ...string) []Entry {
-	return GetFilteredEntries(GetDevicePnpEntriesFromRegistry, hashes...)
+func (m *MockGlobalState) GetCachedEntries(tableType TableType, ids ...string) []Entry {
+	return GetFilteredEntries(tableType, ids...)
 }
 
 func TestTables(t *testing.T) {
 	mockState := &MockGlobalState{}
-	generateFuncs := []struct {
+	cases := []struct {
 		name         string
-		generateFunc table.GenerateFunc
-		columns      []table.ColumnDefinition
+		table        TableInterface
 	}{
-		{"amcache_application", ApplicationGenerateFunc(mockState), ApplicationColumns()},
-		{"amcache_application_file", ApplicationFileGenerateFunc(mockState), ApplicationFileColumns()},
-		{"amcache_application_shortcut", ApplicationShortcutGenerateFunc(mockState), ApplicationShortcutColumns()},
-		{"amcache_driver_binary", DriverBinaryGenerateFunc(mockState), DriverBinaryColumns()},
-		{"amcache_device_pnp", DevicePnpGenerateFunc(mockState), DevicePnpColumns()},
+		{"amcache_application", &ApplicationTable{}},
+		{"amcache_application_file", &ApplicationFileTable{}},
+		{"amcache_application_shortcut", &ApplicationShortcutTable{}},
+		{"amcache_driver_binary", &DriverBinaryTable{}},
+		{"amcache_device_pnp", &DevicePnpTable{}},
 	}
 
-	for _, gf := range generateFuncs {
-		t.Run(gf.name, func(t *testing.T) {
-			rows, err := gf.generateFunc(context.Background(), table.QueryContext{})
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			generateFunc := tc.table.GenerateFunc(mockState)
+			rows, err := generateFunc(context.Background(), table.QueryContext{})
 			if err != nil {
-				t.Fatalf("Error generating rows for %s: %v", gf.name, err)
+				t.Fatalf("Error generating rows for %s: %v", tc.name, err)
 			}
 			if len(rows) == 0 {
-				t.Fatalf("No rows returned for %s", gf.name)
+				t.Fatalf("No rows returned for %s", tc.name)
 			}
 			for _, row := range rows {
-				for _, column := range gf.columns {
+				for _, column := range tc.table.Columns() {
 					if _, ok := row[column.Name]; !ok {
 						t.Errorf("Expected column %s in row, but not found", column.Name)
 					}
 				}
+			}
+		})
+	}
+}
+
+func TestFiltering(t *testing.T) {
+
+	mockState := &MockGlobalState{}
+	cases := []struct {
+		name         string
+		table        TableInterface
+	}{
+		{"amcache_application", &ApplicationTable{}},
+		{"amcache_application_file", &ApplicationFileTable{}},
+		{"amcache_application_shortcut", &ApplicationShortcutTable{}},
+		{"amcache_driver_binary", &DriverBinaryTable{}},
+		{"amcache_device_pnp", &DevicePnpTable{}},
+	}
+
+	getQueryContext := func(field string, value string) table.QueryContext {
+		constraint := table.Constraint{
+			Operator:  table.OperatorEquals,
+			Expression: value,
+		}
+		constraintList := table.ConstraintList{
+			Affinity:    table.ColumnTypeText,
+			Constraints: []table.Constraint{constraint},
+		}
+		return table.QueryContext{
+			Constraints: map[string]table.ConstraintList{
+				field: constraintList,
+			},
+		}
+	}
+
+	for _, tc := range cases {
+		t.Run("Filtering "+tc.name, func(t *testing.T) {
+			generateFunc := tc.table.GenerateFunc(mockState)
+			rows, err := generateFunc(context.Background(), table.QueryContext{})
+			if err != nil {
+				t.Fatalf("Error generating rows: %v", err)
+			}
+			if len(rows) == 0 {
+				t.Fatalf("No rows returned for %s", tc.name)
+			}
+			filtered_rows, err := generateFunc(context.Background(), getQueryContext(tc.table.FilterColumn(), rows[0][tc.table.FilterColumn()]))
+			if err != nil {
+				t.Fatalf("Error generating filtered rows: %v", err)
+			}
+			if len(filtered_rows) == 0 {
+				t.Fatalf("No filtered rows returned for %s", tc.name)
+			}
+			for _, row := range filtered_rows {
+				if row[tc.table.FilterColumn()] != rows[0][tc.table.FilterColumn()] {
+					t.Errorf("Filtering failed, expected %s=%s but got %s", tc.table.FilterColumn(), rows[0][tc.table.FilterColumn()], row[tc.table.FilterColumn()])
+				}
+			}
+			if len(filtered_rows) >= len(rows) {
+				t.Errorf("Filtering did not reduce the number of rows for %s", tc.name)
 			}
 		})
 	}

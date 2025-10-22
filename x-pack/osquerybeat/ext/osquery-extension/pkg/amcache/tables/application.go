@@ -8,87 +8,62 @@ package tables
 
 import (
 	"context"
-	"fmt"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/osquery/osquery-go/plugin/table"
-	"www.velocidex.com/golang/regparser"
 )
 
+// ApplicationEntry represents a single entry in the amcache application table.
 type ApplicationEntry struct {
-	LastWriteTime      int64  `json:"last_write_time,string"`
-	ProgramId          string `json:"program_id"`
-	ProgramInstanceId  string `json:"program_instance_id"`
-	Name               string `json:"name"`
-	Version            string `json:"version"`
-	Publisher          string `json:"publisher"`
-	Language           string `json:"language"`
-	InstallDate        string `json:"install_date"`
-	Source             string `json:"source"`
-	RootDirPath        string `json:"root_dir_path"`
-	HiddenArp          string `json:"hidden_arp"`
-	UninstallString    string `json:"uninstall_string"`
-	RegistryKeyPath    string `json:"registry_key_path"`
-	StoreAppType       string `json:"store_app_type"`
-	InboxModernApp     string `json:"inbox_modern_app"`
-	ManifestPath       string `json:"manifest_path"`
-	PackageFullName    string `json:"package_full_name"`
-	MsiPackageCode     string `json:"msi_package_code"`
-	MsiProductCode     string `json:"msi_product_code"`
-	MsiInstallDate     string `json:"msi_install_date"`
-	BundleManifestPath string `json:"bundle_manifest_path"`
-	UserSid            string `json:"user_sid"`
+	LastWriteTime      int64  `osquery:"last_write_time"`
+	ProgramId          string `osquery:"program_id"`
+	ProgramInstanceId  string `osquery:"program_instance_id"`
+	Name               string `osquery:"name"`
+	Version            string `osquery:"version"`
+	Publisher          string `osquery:"publisher"`
+	Language           int64  `osquery:"language"`
+	InstallDate        string `osquery:"install_date"`
+	Source             string `osquery:"source"`
+	RootDirPath        string `osquery:"root_dir_path"`
+	HiddenArp          string `osquery:"hidden_arp"`
+	UninstallString    string `osquery:"uninstall_string"`
+	RegistryKeyPath    string `osquery:"registry_key_path"`
+	StoreAppType       string `osquery:"store_app_type"`
+	InboxModernApp     string `osquery:"inbox_modern_app"`
+	ManifestPath       string `osquery:"manifest_path"`
+	PackageFullName    string `osquery:"package_full_name"`
+	MsiPackageCode     string `osquery:"msi_package_code"`
+	MsiProductCode     string `osquery:"msi_product_code"`
+	MsiInstallDate     string `osquery:"msi_install_date"`
+	BundleManifestPath string `osquery:"bundle_manifest_path"`
+	UserSid            string `osquery:"user_sid"`
 }
 
-func (ae *ApplicationEntry) FieldMappings() map[string]*string {
-	return map[string]*string{
-		"Name":               &ae.Name,
-		"ProgramId":          &ae.ProgramId,
-		"ProgramInstanceId":  &ae.ProgramInstanceId,
-		"Version":            &ae.Version,
-		"Publisher":          &ae.Publisher,
-		"Language":           &ae.Language,
-		"InstallDate":        &ae.InstallDate,
-		"Source":             &ae.Source,
-		"RootDirPath":        &ae.RootDirPath,
-		"HiddenArp":          &ae.HiddenArp,
-		"UninstallString":    &ae.UninstallString,
-		"RegistryKeyPath":    &ae.RegistryKeyPath,
-		"StoreAppType":       &ae.StoreAppType,
-		"InboxModernApp":     &ae.InboxModernApp,
-		"ManifestPath":       &ae.ManifestPath,
-		"PackageFullName":    &ae.PackageFullName,
-		"MsiPackageCode":     &ae.MsiPackageCode,
-		"MsiProductCode":     &ae.MsiProductCode,
-		"MsiInstallDate":     &ae.MsiInstallDate,
-		"BundleManifestPath": &ae.BundleManifestPath,
-		"UserSid":            &ae.UserSid,
-	}
+// FilterValue returns the index value for the ApplicationEntry, which is the ProgramId.
+func (ae *ApplicationEntry) FilterValue() string {
+	return ae.ProgramId
 }
 
-func (ae *ApplicationEntry) SetLastWriteTime(t int64) {
-	ae.LastWriteTime = t
+// ToMap converts the ApplicationEntry to a map[string]string representation.
+func (ae *ApplicationEntry) ToMap() (map[string]string, error) {
+	mapped, err := encoding.MarshalToMap(ae)
+	return mapped, err
 }
 
-func GetApplicationEntriesFromRegistry(registry *regparser.Registry) (map[string][]Entry, error) {
-	if registry == nil {
-		return nil, fmt.Errorf("registry is nil")
-	}
+// ApplicationTable implements the TableInterface for the amcache application table.
+type ApplicationTable struct{}
 
-	keyNode := registry.OpenKey(applicationKeyPath)
-	if keyNode == nil {
-		return nil, fmt.Errorf("error opening key: %s", applicationKeyPath)
-	}
-
-	applicationEntries := make(map[string][]Entry, len(keyNode.Subkeys()))
-	for _, subkey := range keyNode.Subkeys() {
-		ae := &ApplicationEntry{}
-		FillInEntryFromKey(ae, subkey)
-
-		applicationEntries[ae.ProgramId] = append(applicationEntries[ae.ProgramId], ae)
-	}
-	return applicationEntries, nil
+// Type returns the TableType for the ApplicationTable.
+func (at *ApplicationTable) Type() TableType {
+	return ApplicationTableType
 }
 
-func ApplicationColumns() []table.ColumnDefinition {
+// FilterColumn returns the name of the column used for filtering entries in the ApplicationTable.
+func (at *ApplicationTable) FilterColumn() string {
+	return "program_id"
+}
+
+// Columns returns the column definitions for the ApplicationTable.
+func (at *ApplicationTable) Columns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.BigIntColumn("last_write_time"),
 		table.TextColumn("name"),
@@ -115,10 +90,20 @@ func ApplicationColumns() []table.ColumnDefinition {
 	}
 }
 
-func ApplicationGenerateFunc(state GlobalStateInterface) table.GenerateFunc {
+// GenerateFunc generates the data for the ApplicationTable based on the provided GlobalStateInterface.
+func (at *ApplicationTable) GenerateFunc(state GlobalStateInterface) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		programIds := GetConstraintsFromQueryContext("program_id", queryContext)
-		rows := state.GetApplicationEntries(programIds...)
-		return RowsAsStringMapArray(rows), nil
+		programIds := GetConstraintsFromQueryContext(at.FilterColumn(), queryContext)
+		entries := state.GetCachedEntries(at.Type(), programIds...)
+
+		rows := make([]map[string]string, 0, len(entries))
+		for _, entry := range entries {
+			mapped, err := entry.ToMap()
+			if err != nil {
+				return nil, err
+			}
+			rows = append(rows, mapped)
+		}
+		return rows, nil
 	}
 }

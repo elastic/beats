@@ -8,35 +8,62 @@ package tables
 
 import (
 	"context"
-	"fmt"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/osquery/osquery-go/plugin/table"
-	"www.velocidex.com/golang/regparser"
 )
 
+// ApplicationFileEntry represents a single entry in the amcache application file table.
+// located at Root\\InventoryApplicationFile
 type ApplicationFileEntry struct {
-	LastWriteTime         int64  `json:"last_write_time,string"`
-	ProgramId             string `json:"program_id"`
-	FileId                string `json:"file_id"`
-	LowerCaseLongPath     string `json:"lower_case_long_path"`
-	Name                  string `json:"name"`
-	OriginalFileName      string `json:"original_file_name"`
-	Publisher             string `json:"publisher"`
-	Version               string `json:"version"`
-	BinFileVersion        string `json:"bin_file_version"`
-	BinaryType            string `json:"binary_type"`
-	ProductName           string `json:"product_name"`
-	ProductVersion        string `json:"product_version"`
-	LinkDate              string `json:"link_date"`
-	BinProductVersion     string `json:"bin_product_version"`
-	Size                  string `json:"size"`
-	Language              string `json:"language"`
-	Usn                   string `json:"usn"`
-	AppxPackageFullName   string `json:"appx_package_full_name"`
-	IsOsComponent         string `json:"is_os_component"`
-	AppxPackageRelativeId string `json:"appx_package_relative_id"`
+	LastWriteTime         int64  `osquery:"last_write_time"`
+	ProgramId             string `osquery:"program_id"`
+	FileId                string `osquery:"file_id"`
+	LowerCaseLongPath     string `osquery:"lower_case_long_path"`
+	Name                  string `osquery:"name"`
+	OriginalFileName      string `osquery:"original_file_name"`
+	Publisher             string `osquery:"publisher"`
+	Version               string `osquery:"version"`
+	BinFileVersion        string `osquery:"bin_file_version"`
+	BinaryType            string `osquery:"binary_type"`
+	ProductName           string `osquery:"product_name"`
+	ProductVersion        string `osquery:"product_version"`
+	LinkDate              string `osquery:"link_date"`
+	BinProductVersion     string `osquery:"bin_product_version"`
+	Size                  int64  `osquery:"size"`
+	Language              int64  `osquery:"language"`
+	Usn                   int64  `osquery:"usn"`
+	AppxPackageFullName   string `osquery:"appx_package_full_name"`
+	IsOsComponent         string `osquery:"is_os_component"`
+	AppxPackageRelativeId string `osquery:"appx_package_relative_id"`
 }
 
-func ApplicationFileColumns() []table.ColumnDefinition {
+// FilterValue returns the index value for the ApplicationFileEntry, which is the ProgramId.
+// This is used for filtering entries
+func (afe *ApplicationFileEntry) FilterValue() string {
+	return afe.ProgramId
+}
+
+// ToMap converts the ApplicationFileEntry to a map[string]string representation.
+func (afe *ApplicationFileEntry) ToMap() (map[string]string, error) {
+	mapped, err := encoding.MarshalToMap(afe)
+	return mapped, err
+}
+
+// ApplicationFileTable implements the TableInterface for the amcache application file table.
+type ApplicationFileTable struct{}
+
+// Type returns the TableType for the ApplicationFileTable.
+func (aft *ApplicationFileTable) Type() TableType {
+	return ApplicationFileTableType
+}
+
+// FilterColumn returns the name of the column used for filtering entries in the ApplicationFileTable.
+func (aft *ApplicationFileTable) FilterColumn() string {
+	return "program_id"
+}
+
+// Columns returns the osquery column definitions for the amcache application file table
+func (aft *ApplicationFileTable) Columns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.BigIntColumn("last_write_time"),
 		table.TextColumn("name"),
@@ -52,66 +79,29 @@ func ApplicationFileColumns() []table.ColumnDefinition {
 		table.TextColumn("product_version"),
 		table.TextColumn("link_date"),
 		table.TextColumn("bin_product_version"),
-		table.TextColumn("size"),
-		table.TextColumn("language"),
-		table.TextColumn("usn"),
+		table.BigIntColumn("size"),
+		table.BigIntColumn("language"),
+		table.BigIntColumn("usn"),
 		table.TextColumn("appx_package_full_name"),
 		table.TextColumn("is_os_component"),
 		table.TextColumn("appx_package_relative_id"),
 	}
 }
 
-func (afe *ApplicationFileEntry) FieldMappings() map[string]*string {
-	return map[string]*string{
-		"Name":                  &afe.Name,
-		"ProgramId":             &afe.ProgramId,
-		"FileId":                &afe.FileId,
-		"LowerCaseLongPath":     &afe.LowerCaseLongPath,
-		"OriginalFileName":      &afe.OriginalFileName,
-		"Publisher":             &afe.Publisher,
-		"Version":               &afe.Version,
-		"BinFileVersion":        &afe.BinFileVersion,
-		"BinaryType":            &afe.BinaryType,
-		"ProductName":           &afe.ProductName,
-		"ProductVersion":        &afe.ProductVersion,
-		"LinkDate":              &afe.LinkDate,
-		"BinProductVersion":     &afe.BinProductVersion,
-		"Size":                  &afe.Size,
-		"Language":              &afe.Language,
-		"Usn":                   &afe.Usn,
-		"AppxPackageFullName":   &afe.AppxPackageFullName,
-		"IsOsComponent":         &afe.IsOsComponent,
-		"AppxPackageRelativeId": &afe.AppxPackageRelativeId,
-	}
-}
-
-func (afe *ApplicationFileEntry) SetLastWriteTime(t int64) {
-	afe.LastWriteTime = t
-}
-
-func GetApplicationFileEntriesFromRegistry(registry *regparser.Registry) (map[string][]Entry, error) {
-	if registry == nil {
-		return nil, fmt.Errorf("registry is nil")
-	}
-
-	keyNode := registry.OpenKey(applicationFileKeyPath)
-	if keyNode == nil {
-		return nil, fmt.Errorf("error opening key: %s", applicationFileKeyPath)
-	}
-
-	applicationEntries := make(map[string][]Entry, len(keyNode.Subkeys()))
-	for _, subkey := range keyNode.Subkeys() {
-		ae := &ApplicationFileEntry{}
-		FillInEntryFromKey(ae, subkey)
-		applicationEntries[ae.ProgramId] = append(applicationEntries[ae.ProgramId], ae)
-	}
-	return applicationEntries, nil
-}
-
-func ApplicationFileGenerateFunc(state GlobalStateInterface) table.GenerateFunc {
+// GenerateFunc generates the data for the ApplicationFileTable based on the provided GlobalStateInterface.
+func (aft *ApplicationFileTable) GenerateFunc(state GlobalStateInterface) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		programIds := GetConstraintsFromQueryContext("program_id", queryContext)
-		rows := state.GetApplicationFileEntries(programIds...)
-		return RowsAsStringMapArray(rows), nil
+		programIds := GetConstraintsFromQueryContext(aft.FilterColumn(), queryContext)
+		entries := state.GetCachedEntries(aft.Type(), programIds...)
+
+		rows := make([]map[string]string, 0, len(entries))
+		for _, entry := range entries {
+			mapped, err := entry.ToMap()
+			if err != nil {
+				return nil, err
+			}
+			rows = append(rows, mapped)
+		}
+		return rows, nil
 	}
 }

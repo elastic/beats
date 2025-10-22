@@ -43,22 +43,32 @@ type Config struct {
 // the next query, even if it is expired.
 //
 // TODO: Make sure that keeping this data in memory is not a problem for osquerybeat
-//       in general
 //
+//	in general
+
+type CachedTables map[tables.TableType]map[string][]tables.Entry
+
+func NewCachedTables() CachedTables {
+	cachedTables := make(CachedTables)
+	for _, tableType := range tables.AllTableTypes() {
+		cachedTables[tableType] = make(map[string][]tables.Entry)
+	}
+	return cachedTables
+}
+
 type GlobalState struct {
-	Config              *Config
-	Application         map[string][]tables.Entry
-	ApplicationFile     map[string][]tables.Entry
-	ApplicationShortcut map[string][]tables.Entry
-	DriverBinary        map[string][]tables.Entry
-	DevicePnp           map[string][]tables.Entry
-	Lock                sync.RWMutex
-	LastUpdated         time.Time
+	Cache       CachedTables
+	Config      *Config
+	Lock        sync.RWMutex
+	LastUpdated time.Time
 }
 
 // Global variables for the gInstance and a mutex to protect it.
 var (
-	gInstance *GlobalState = &GlobalState{Config: &Config{HivePath: defaultHivePath, ExpirationDuration: defaultExpirationDuration}}
+	gInstance *GlobalState = &GlobalState{
+		Config: &Config{HivePath: defaultHivePath, ExpirationDuration: defaultExpirationDuration},
+		Cache:  NewCachedTables(),
+	}
 )
 
 // GetGlobalState is the public accessor for the singleton.
@@ -67,44 +77,73 @@ func GetGlobalState() *GlobalState {
 	return gInstance
 }
 
+// Update reloads the Amcache hive and repopulates all cached data.
 func (gs *GlobalState) Update() {
 	gs.Lock.Lock()
 	defer gs.Lock.Unlock()
 
-	// Reload the registry and repopulate all caches.
+	// Reload the registry
 	registry, err := tables.LoadRegistry(gs.Config.HivePath)
 	if err != nil {
 		log.Printf("error opening amcache registry: %v", err)
 		return
 	}
-	gs.Application, err = tables.GetApplicationEntriesFromRegistry(registry)
-	if err != nil {
-		log.Printf("error getting application entries: %v", err)
-		return
-	}
-	gs.ApplicationFile, err = tables.GetApplicationFileEntriesFromRegistry(registry)
-	if err != nil {
-		log.Printf("error getting application file entries: %v", err)
-		return
-	}
-	gs.ApplicationShortcut, err = tables.GetApplicationShortcutEntriesFromRegistry(registry)
-	if err != nil {
-		log.Printf("error getting application shortcut entries: %v", err)
-		return
-	}
-	gs.DriverBinary, err = tables.GetDriverBinaryEntriesFromRegistry(registry)
-	if err != nil {
-		log.Printf("error getting driver binary entries: %v", err)
-		return
-	}
-	gs.DevicePnp, err = tables.GetDevicePnpEntriesFromRegistry(registry)
-	if err != nil {
-		log.Printf("error getting device pnp entries: %v", err)
-		return
+
+	// Repopulate all caches.
+	for _, tableType := range tables.AllTableTypes() {
+		// keyPath represents each relevant key in the Amcache hive such as "Root\InventoryApplication"
+		keyPath := tableType.GetHiveKey()
+
+		// Initialize the map for this keyPath
+		gs.Cache[tableType] = make(map[string][]tables.Entry)
+
+		// Get entries for this keyPath from the loaded registry
+		entries, err := tables.GetEntriesFromRegistry(tableType, registry)
+		if err != nil {
+			// Log the error for this key and continue so we don't leave a nil map.
+			log.Printf("error getting %s entries: %v", keyPath, err)
+		}
+		if entries == nil {
+			entries = make(map[string][]tables.Entry)
+		}
+		gs.Cache[tableType] = entries
 	}
 	gs.LastUpdated = time.Now()
 }
 
+// GetMarshalledEntriesForKeyPath retrieves marshalled entries for a given key path and optional entry IDs.
+// it returns a slice of maps, where each map represents an entry/row in the table.
+// keyPath is the Amcache key path such as "Root\InventoryApplication".
+// ids are optional entry IDs to filter the results. If no IDs are provided, all entries for the keyPath are returned.
+// each amcache key has a field that can be used as an ID to filter on, for example ProgramId for Application entries.
+func (gs *GlobalState) GetCachedEntries(tableType tables.TableType, ids ...string) []tables.Entry {
+	gs.Lock.Lock()
+	defer gs.Lock.Unlock()
+
+	result := make([]tables.Entry, 0)
+	cachedTableEntries := gs.Cache[tableType]
+
+	// If no IDs are provided, return all entries for the keyPath
+	if len(ids) == 0 {
+		for _, byId := range cachedTableEntries {
+			for _, entry := range byId {
+				result = append(result, entry)
+			}
+		}
+		return result
+	}
+
+	for _, entryId := range ids {
+		if entries, ok := cachedTableEntries[entryId]; ok {
+			for _, entry := range entries {
+				result = append(result, entry)
+			}
+		}
+	}
+	return result
+}
+
+// UpdateIfNeeded checks if the cache has expired and updates it if necessary.
 func (gs *GlobalState) UpdateIfNeeded() {
 	gs.Lock.RLock()
 	lastUpdated := gs.LastUpdated
@@ -114,109 +153,4 @@ func (gs *GlobalState) UpdateIfNeeded() {
 	if time.Since(lastUpdated) > expirationDuration {
 		gs.Update()
 	}
-}
-
-func (gs *GlobalState) GetApplicationEntries(programId ...string) []tables.Entry {
-	gs.UpdateIfNeeded()
-
-	gs.Lock.Lock()
-	defer gs.Lock.Unlock()
-
-	var entries []tables.Entry
-	if len(programId) == 0 {
-		for _, entry := range gs.Application {
-			entries = append(entries, entry...)
-		}
-	} else {
-		for _, id := range programId {
-			if entry, ok := gs.Application[id]; ok {
-				entries = append(entries, entry...)
-			}
-		}
-	}
-	return entries
-}
-
-func (gs *GlobalState) GetApplicationFileEntries(programId ...string) []tables.Entry {
-	gs.UpdateIfNeeded()
-
-	gs.Lock.Lock()
-	defer gs.Lock.Unlock()
-
-	var entries []tables.Entry
-	if len(programId) == 0 {
-		for _, entry := range gs.ApplicationFile {
-			entries = append(entries, entry...)
-		}
-	} else {
-		for _, id := range programId {
-			if entry, ok := gs.ApplicationFile[id]; ok {
-				entries = append(entries, entry...)
-			}
-		}
-	}
-	return entries
-}
-
-func (gs *GlobalState) GetApplicationShortcutEntries(programId ...string) []tables.Entry {
-	gs.UpdateIfNeeded()
-
-	gs.Lock.Lock()
-	defer gs.Lock.Unlock()
-
-	var entries []tables.Entry
-	if len(programId) == 0 {
-		for _, entry := range gs.ApplicationShortcut {
-			entries = append(entries, entry...)
-		}
-	} else {
-		for _, id := range programId {
-			if entry, ok := gs.ApplicationShortcut[id]; ok {
-				entries = append(entries, entry...)
-			}
-		}
-	}
-	return entries
-}
-
-func (gs *GlobalState) GetDriverBinaryEntries(driverId ...string) []tables.Entry {
-	gs.UpdateIfNeeded()
-
-	gs.Lock.Lock()
-	defer gs.Lock.Unlock()
-
-	var entries []tables.Entry
-	if len(driverId) == 0 {
-		for _, entry := range gs.DriverBinary {
-			entries = append(entries, entry...)
-		}
-	} else {
-		for _, id := range driverId {
-			if entry, ok := gs.DriverBinary[id]; ok {
-				entries = append(entries, entry...)
-			}
-		}
-	}
-	return entries
-}
-
-func (gs *GlobalState) GetDevicePnpEntries(deviceId ...string) []tables.Entry {
-	gs.UpdateIfNeeded()
-
-	gs.Lock.Lock()
-	defer gs.Lock.Unlock()
-
-	var entries []tables.Entry
-	if len(deviceId) == 0 {
-		for _, entry := range gs.DevicePnp {
-			entries = append(entries, entry...)
-		}
-	} else {
-		for _, id := range deviceId {
-			if entry, ok := gs.DevicePnp[id]; ok {
-				entries = append(entries, entry...)
-			}
-		}
-	}
-	return entries
 }

@@ -45,25 +45,13 @@ func TestCachingBehavior(t *testing.T) {
 	// Don't use the global instance for this test
 	instance := &GlobalState{Config: &Config{HivePath: testHivePath, ExpirationDuration: defaultExpirationDuration}}
 
-	// The Global state holds raw pointer to the cached entries as well as accessor functions
-	// Accessing the raw pointers should not trigger an update, but is not available outside this package
-	// Accessing via the accessor functions should trigger an update if expired
-	// We will use both to validate the caching and expiration behavior
-	accessors := []func(...string) []tables.Entry{
-		instance.GetApplicationEntries,
-		instance.GetApplicationFileEntries,
-		instance.GetApplicationShortcutEntries,
-		instance.GetDriverBinaryEntries,
-		instance.GetDevicePnpEntries,
-	}
-
 	// Validate that lastUpdated is zero initially
 	if !instance.LastUpdated.IsZero() {
 		t.Errorf("Expected lastUpdated to be zero initially, got %v", instance.LastUpdated)
 	}
 
 	// Calling any of the accessor functions should cause the cache to update
-	_ = accessors[0]()
+	instance.GetCachedEntries(tables.ApplicationTableType)
 	if instance.LastUpdated.IsZero() {
 		t.Errorf("Expected lastUpdated to be set after accessor call, got %v", instance.LastUpdated)
 	}
@@ -71,8 +59,8 @@ func TestCachingBehavior(t *testing.T) {
 
 	// Calling the accessor functions again should not cause an update since it has not expired
 	// Additionally they should all return results
-	for _, accessFunc := range accessors {
-		if len(accessFunc()) == 0 {
+	for _, tableType := range tables.AllTableTypes() {
+		if len(instance.GetCachedEntries(tableType)) == 0 {
 			t.Errorf("Expected accessor function to return results, got 0")
 		}
 	}
@@ -91,7 +79,7 @@ func TestCachingBehavior(t *testing.T) {
 	}
 
 	// Calling any of the accessor functions should cause the cache to update since it has expired
-	_ = accessors[0]()
+	instance.GetCachedEntries(tables.ApplicationTableType)
 	if !instance.LastUpdated.After(expiredTime) {
 		t.Errorf("Expected lastUpdated to be updated after accessor call since it has expired, got %v", instance.LastUpdated)
 	}

@@ -8,20 +8,46 @@ package tables
 
 import (
 	"context"
-	"fmt"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/osquery/osquery-go/plugin/table"
-	"www.velocidex.com/golang/regparser"
 )
 
+// ApplicationShortcutEntry represents a single entry in the amcache application shortcut table.
+// located at Root\\InventoryApplicationShortcut
 type ApplicationShortcutEntry struct {
-	LastWriteTime      int64  `json:"last_write_time,string"`
-	ShortcutPath       string `json:"shortcut_path"`
-	ShortcutTargetPath string `json:"shortcut_target_path"`
-	ShortcutAumid      string `json:"shortcut_aumid"`
-	ShortcutProgramId  string `json:"shortcut_program_id"`
+	LastWriteTime      int64  `osquery:"last_write_time"`
+	ShortcutPath       string `osquery:"shortcut_path"`
+	ShortcutTargetPath string `osquery:"shortcut_target_path"`
+	ShortcutAumid      string `osquery:"shortcut_aumid"`
+	ShortcutProgramId  string `osquery:"shortcut_program_id"`
 }
 
-func ApplicationShortcutColumns() []table.ColumnDefinition {
+// FilterValue returns the index value for the ApplicationShortcutEntry, which is the ShortcutProgramId.
+func (ase *ApplicationShortcutEntry) FilterValue() string {
+	return ase.ShortcutProgramId
+}
+
+// ToMap converts the ApplicationShortcutEntry to a map[string]string representation.
+func (ase *ApplicationShortcutEntry) ToMap() (map[string]string, error) {
+	mapped, err := encoding.MarshalToMap(ase)
+	return mapped, err
+}
+
+// ApplicationShortcutTable implements the TableInterface for the amcache application shortcut table.
+type ApplicationShortcutTable struct{}
+
+// Type returns the TableType for the ApplicationShortcutTable.
+func (ast *ApplicationShortcutTable) Type() TableType {
+	return ApplicationShortcutTableType
+}
+
+// FilterColumn returns the name of the column used for filtering entries in the ApplicationShortcutTable.
+func (ast *ApplicationShortcutTable) FilterColumn() string {
+	return "shortcut_program_id"
+}
+
+// Columns returns the column definitions for the ApplicationShortcutTable.
+func (ast *ApplicationShortcutTable) Columns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.BigIntColumn("last_write_time"),
 		table.TextColumn("shortcut_path"),
@@ -31,43 +57,20 @@ func ApplicationShortcutColumns() []table.ColumnDefinition {
 	}
 }
 
-func (ae *ApplicationShortcutEntry) FieldMappings() map[string]*string {
-	return map[string]*string{
-		"ShortcutPath":       &ae.ShortcutPath,
-		"ShortcutTargetPath": &ae.ShortcutTargetPath,
-		"ShortcutAumid":      &ae.ShortcutAumid,
-		"ShortcutProgramId":  &ae.ShortcutProgramId,
-	}
-}
-
-func (ae *ApplicationShortcutEntry) SetLastWriteTime(t int64) {
-	ae.LastWriteTime = t
-}
-
-func GetApplicationShortcutEntriesFromRegistry(registry *regparser.Registry) (map[string][]Entry, error) {
-	if registry == nil {
-		return nil, fmt.Errorf("registry is nil")
-	}
-
-	keyNode := registry.OpenKey(applicationShortcutKeyPath)
-	if keyNode == nil {
-		return nil, fmt.Errorf("error opening key: %s", applicationShortcutKeyPath)
-	}
-
-	applicationEntries := make(map[string][]Entry, len(keyNode.Subkeys()))
-	for _, subkey := range keyNode.Subkeys() {
-		ase := &ApplicationShortcutEntry{}
-		FillInEntryFromKey(ase, subkey)
-
-		applicationEntries[ase.ShortcutProgramId] = append(applicationEntries[ase.ShortcutProgramId], ase)
-	}
-	return applicationEntries, nil
-}
-
-func ApplicationShortcutGenerateFunc(state GlobalStateInterface) table.GenerateFunc {
+// GenerateFunc generates the data for the ApplicationShortcutTable based on the provided GlobalStateInterface.
+func (ast *ApplicationShortcutTable) GenerateFunc(state GlobalStateInterface) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		programIds := GetConstraintsFromQueryContext("shortcut_program_id", queryContext)
-		rows := state.GetApplicationShortcutEntries(programIds...)
-		return RowsAsStringMapArray(rows), nil
+		programIds := GetConstraintsFromQueryContext(ast.FilterColumn(), queryContext)
+		entries := state.GetCachedEntries(ast.Type(), programIds...)
+
+		rows := make([]map[string]string, 0, len(entries))
+		for _, entry := range entries {
+			mapped, err := entry.ToMap()
+			if err != nil {
+				return nil, err
+			}
+			rows = append(rows, mapped)
+		}
+		return rows, nil
 	}
 }
