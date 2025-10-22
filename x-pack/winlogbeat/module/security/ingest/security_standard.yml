@@ -3716,6 +3716,10 @@ processors:
           ctx.process.put("args", al);
           ctx.process.put("command_line", ctx.winlog.event_data.CommandLine);
         }
+        def args = ctx?.process.args;
+          if (args != null && args != "") {
+            ctx.process.args_count = ctx.process.args.length;
+        }
         if ((ctx.winlog?.event_data?.TargetUserName != null) &&
             (!ctx.winlog.event_data.TargetUserName.equals("-"))) {
           if (ctx.related == null) {
