@@ -9,7 +9,7 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: feature
+kind: breaking-change
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
@@ -18,7 +18,7 @@ summary: change-azure-eventhub-processor-version
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# description:
+description: This PR is to change Filebeat azure eventhub input to use processor V2 as default instead of V1. Since we've decided to retire processor v1, we plan to set processor v2 as the default option in the next release, and completely remove v1 in the following release.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
@@ -28,7 +28,7 @@ summary: change-azure-eventhub-processor-version
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component:
+component: filebeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
