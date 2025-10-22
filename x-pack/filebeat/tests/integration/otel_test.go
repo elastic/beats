@@ -893,29 +893,87 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 			}
 
 			cfg := `
-filebeat.inputs:
-  - type: filestream
-    id: filestream-input-id
-    enabled: true
-    file_identity.native: ~
-    prospector.scanner.fingerprint.enabled: false
-    paths:
-      - {{.InputFile}}
-output:
-  elasticsearch:
-    hosts:
-      - {{.ESEndpoint}}
-    username: admin
-    password: testing
-    index: {{.Index}}
-    compression_level: 0
-    max_retries: {{.MaxRetries}}
-logging.level: debug
-queue.mem.flush.timeout: 0s
-setup.template.enabled: false
-http.enabled: true
-http.host: localhost
-http.port: {{.MonitoringPort}}
+exporters:
+    elasticsearch:
+        auth:
+            authenticator: beatsauth
+        compression: none
+        endpoints:
+            - {{.ESEndpoint}}
+        logs_index: {{.Index}}
+        mapping:
+            mode: bodymap
+        max_conns_per_host: 1
+        password: testing
+        retry:
+            enabled: true
+            initial_interval: 1s
+            max_interval: 1m0s
+            max_retries: {{.MaxRetries}}
+        sending_queue:
+            batch:
+                flush_timeout: 10s
+                max_size: 1600
+                min_size: 0
+                sizer: items
+            block_on_overflow: true
+            enabled: true
+            num_consumers: 1
+            queue_size: 3200
+            wait_for_result: true
+        user: admin
+extensions:
+    beatsauth:
+        idle_connection_timeout: 3s
+        proxy_disable: false
+        timeout: 1m30s
+receivers:
+    filebeatreceiver:
+        filebeat:
+            inputs:
+                - enabled: true
+                  file_identity:
+                    native: null
+                  id: filestream-input-id
+                  paths:
+                    - '{{.InputFile}}'
+                  prospector:
+                    scanner:
+                        fingerprint:
+                            enabled: false
+                  type: filestream
+        http:
+            enabled: true
+            host: localhost
+            port: {{.MonitoringPort}}
+        logging:
+            level: debug
+        output:
+            otelconsumer: null
+        path:
+            config: .
+            data: ./data
+            home: .
+            logs: ./logs
+        queue:
+            mem:
+                flush:
+                    timeout: 0s
+        setup:
+            template:
+                enabled: false
+service:
+    extensions:
+        - beatsauth
+    pipelines:
+        logs:
+            exporters:
+                - elasticsearch
+            receivers:
+                - filebeatreceiver
+    telemetry:
+        logs:
+            level: DEBUG
 `
 			var configBuffer bytes.Buffer
 			require.NoError(t,
