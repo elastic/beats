@@ -45,7 +45,7 @@ const (
 func parseLogLevelOption(opt osquery.InternalOptionInfo) Level {
 	v, err := strconv.ParseInt(opt.Value, 10, 64)
 	if err != nil {
-		return LevelInfo
+		return LevelWarning
 	}
 	return Level(v)
 }
