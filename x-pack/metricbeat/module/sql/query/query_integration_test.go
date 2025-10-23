@@ -301,7 +301,7 @@ func assertFieldContainsFloat64(field string, limit float64) func(t *testing.T, 
 	return func(t *testing.T, event beat.Event) {
 		value, err := event.GetValue("sql.metrics.hit_ratio")
 		assert.NoError(t, err)
-		require.GreaterOrEqual(t, value.(float64), limit)
+		require.GreaterOrEqual(t, value.(float64), limit) //nolint:errcheck // ignore
 	}
 }
 
