@@ -8,6 +8,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -253,24 +254,24 @@ func getTables(ctx context.Context, client *bigquery.Client, datasetID string, t
 
 // row represents a structure for storing data obtained from a BigQuery standard or detailed cost usage result.
 type row struct {
-	InvoiceMonth       string     `bigquery:"invoice_month"`
-	ProjectId          string     `bigquery:"project_id"`
-	ProjectName        string     `bigquery:"project_name"`
-	BillingAccountId   string     `bigquery:"billing_account_id"`
-	CostType           string     `bigquery:"cost_type"`
-	SkuId              string     `bigquery:"sku_id"`
-	SkuDescription     string     `bigquery:"sku_description"`
-	ServiceId          string     `bigquery:"service_id"`
-	ServiceDescription string     `bigquery:"service_description"`
-	Tags               string     `bigquery:"tags_string"`
-	Labels             string     `bigquery:"labels_string"`
-	UsageStartTime     *time.Time `bigquery:"usage_start_time"`
-	UsageEndTime       *time.Time `bigquery:"usage_end_time"`
-	LocationRegion     string     `bigquery:"location_region"`
-	LocationZone       string     `bigquery:"location_zone"`
-	LocationCountry    string     `bigquery:"location_country"`
-	TotalExact         float64    `bigquery:"total_exact"`
-	EffectivePrice     float64    `bigquery:"effective_price"`
+	InvoiceMonth       string    `bigquery:"invoice_month"`
+	ProjectId          string    `bigquery:"project_id"`
+	ProjectName        string    `bigquery:"project_name"`
+	BillingAccountId   string    `bigquery:"billing_account_id"`
+	CostType           string    `bigquery:"cost_type"`
+	SkuId              string    `bigquery:"sku_id"`
+	SkuDescription     string    `bigquery:"sku_description"`
+	ServiceId          string    `bigquery:"service_id"`
+	ServiceDescription string    `bigquery:"service_description"`
+	Tags               string    `bigquery:"tags_string"`
+	Labels             string    `bigquery:"labels_json"`
+	UsageStartTime     time.Time `bigquery:"usage_start_time"`
+	UsageEndTime       time.Time `bigquery:"usage_end_time"`
+	LocationRegion     string    `bigquery:"location_region"`
+	LocationZone       string    `bigquery:"location_zone"`
+	LocationCountry    string    `bigquery:"location_country"`
+	TotalExact         float64   `bigquery:"total_exact"`
+	EffectivePrice     float64   `bigquery:"effective_price"`
 }
 
 func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, tableMeta tableMeta, month string, costType string) ([]mb.Event, error) {
@@ -354,10 +355,39 @@ func createTags(tagsItem bigquery.Value) []tag {
 	return tagsArray
 }
 
+// convertJSONToMap converts a JSON string of label/tag array to a map.
+// BigQuery TO_JSON_STRING converts ARRAY<STRUCT<key STRING, value STRING>> to JSON like:
+// [{"key":"env","value":"prod"},{"key":"team","value":"backend"}]
+func convertJSONToMap(jsonStr string) map[string]string {
+	result := make(map[string]string)
+
+	if jsonStr == "" || jsonStr == "null" || jsonStr == "[]" {
+		return result
+	}
+
+	var items []struct {
+		Key   string `json:"key"`
+		Value string `json:"value"`
+	}
+
+	if err := json.Unmarshal([]byte(jsonStr), &items); err != nil {
+		return result
+	}
+
+	for _, item := range items {
+		if item.Key != "" {
+			result[item.Key] = item.Value
+		}
+	}
+
+	return result
+}
+
 func createEvents(row row, tableName, projectID string) mb.Event {
 	event := mb.Event{}
 
 	tags := createTags(row.Tags)
+	labels := convertJSONToMap(row.Labels)
 
 	event.MetricSetFields = mapstr.M{
 		"invoice_month":       row.InvoiceMonth,
@@ -371,14 +401,18 @@ func createEvents(row row, tableName, projectID string) mb.Event {
 		"service_id":          row.ServiceId,
 		"service_description": row.ServiceDescription,
 		"tags":                tags,
-		"labels":              row.Labels,
 	}
 
-	if row.UsageStartTime != nil {
-		_, _ = event.MetricSetFields.Put("usage_start_time", row.UsageStartTime.Format(time.RFC3339))
+	if len(labels) > 0 {
+		event.MetricSetFields["labels"] = labels
 	}
-	if row.UsageEndTime != nil {
-		_, _ = event.MetricSetFields.Put("usage_end_time", row.UsageEndTime.Format(time.RFC3339))
+
+	if !row.UsageStartTime.IsZero() {
+		_, _ = event.MetricSetFields.Put("usage_start_time", row.UsageStartTime)
+	}
+
+	if !row.UsageEndTime.IsZero() {
+		_, _ = event.MetricSetFields.Put("usage_end_time", row.UsageEndTime)
 	}
 
 	// Add location fields if available
@@ -421,13 +455,13 @@ func getCurrentDate() string {
 func generateEventID(currentDate string, row row) string {
 	// create eventID using hash of current_date + invoice.month + project.id + project.name
 	// This will prevent more than one billing metric getting collected in the same day.
-	eventID := currentDate + row.InvoiceMonth + row.ProjectId + row.ProjectName + row.SkuId + row.ServiceId + row.Tags
+	eventID := currentDate + row.InvoiceMonth + row.ProjectId + row.ProjectName + row.SkuId + row.ServiceId + row.Tags + row.Labels + row.LocationCountry + row.LocationRegion + row.LocationZone
 	// Add usage times to event ID if available
-	if row.UsageStartTime != nil {
-		eventID += row.UsageStartTime.Format(time.RFC3339)
+	if !row.UsageStartTime.IsZero() {
+		eventID += fmt.Sprintf("%d", row.UsageStartTime.UnixNano())
 	}
-	if row.UsageEndTime != nil {
-		eventID += row.UsageEndTime.Format(time.RFC3339)
+	if !row.UsageEndTime.IsZero() {
+		eventID += fmt.Sprintf("%d", row.UsageEndTime.UnixNano())
 	}
 	h := sha256.New()
 	h.Write([]byte(eventID))
@@ -469,8 +503,8 @@ SELECT
 	    FROM
 	        UNNEST(tags) AS t), ',') AS tags_string,
 	TO_JSON_STRING(labels) AS labels_json,
-	usage_start_time,
-	usage_end_time,
+	TIMESTAMP_MICROS(usage_start_time) as usage_start_time,
+	TIMESTAMP_MICROS(usage_end_time) as usage_end_time,
 	IFNULL(location.region, '') AS location_region,
 	IFNULL(location.zone, '') AS location_zone,
 	IFNULL(location.country, '') AS location_country,
@@ -549,8 +583,8 @@ SELECT
 	    FROM
 	        UNNEST(tags) AS t), ',') AS tags_string,
 	TO_JSON_STRING(labels) AS labels_json,
-	usage_start_time,
-	usage_end_time,
+	TIMESTAMP_MICROS(usage_start_time) as usage_start_time,
+	TIMESTAMP_MICROS(usage_end_time) as usage_end_time,
 	IFNULL(location.region, '') AS location_region,
 	IFNULL(location.zone, '') AS location_zone,
 	IFNULL(location.country, '') AS location_country,
