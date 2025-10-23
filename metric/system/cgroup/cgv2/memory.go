@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/opt"
@@ -142,6 +141,50 @@ type MemoryStat struct {
 	THPFaultAlloc uint64 `json:"thp_fault_alloc" struct:"thp_fault_alloc" orig:"thp_fault_alloc"`
 	// Number of transparent hugepages which were allocated to allow collapsing an existing range of pages.
 	THPCollapseAlloc uint64 `json:"htp_collapse_alloc" struct:"htp_collapse_alloc" orig:"thp_collapse_alloc"`
+}
+
+// Map of file key to setter function
+var keySetters = map[string]func(*MemoryStat, uint64){
+	"anon":                     func(stats *MemoryStat, v uint64) { stats.Anon = opt.Bytes{Bytes: v} },
+	"file":                     func(stats *MemoryStat, v uint64) { stats.File = opt.Bytes{Bytes: v} },
+	"kernel_stack":             func(stats *MemoryStat, v uint64) { stats.KernelStack = opt.Bytes{Bytes: v} },
+	"pagetables":               func(stats *MemoryStat, v uint64) { stats.Pagetables = opt.Bytes{Bytes: v} },
+	"percpu":                   func(stats *MemoryStat, v uint64) { stats.PerCPU = opt.Bytes{Bytes: v} },
+	"sock":                     func(stats *MemoryStat, v uint64) { stats.Sock = opt.Bytes{Bytes: v} },
+	"shmem":                    func(stats *MemoryStat, v uint64) { stats.Shmem = opt.Bytes{Bytes: v} },
+	"file_mapped":              func(stats *MemoryStat, v uint64) { stats.FileMapped = opt.Bytes{Bytes: v} },
+	"file_dirty":               func(stats *MemoryStat, v uint64) { stats.FileDirty = opt.Bytes{Bytes: v} },
+	"file_writeback":           func(stats *MemoryStat, v uint64) { stats.FileWriteback = opt.Bytes{Bytes: v} },
+	"swapcached":               func(stats *MemoryStat, v uint64) { stats.SwapCached = opt.Bytes{Bytes: v} },
+	"anon_thp":                 func(stats *MemoryStat, v uint64) { stats.AnonTHP = opt.Bytes{Bytes: v} },
+	"file_thp":                 func(stats *MemoryStat, v uint64) { stats.FileTHP = opt.Bytes{Bytes: v} },
+	"shmem_thp":                func(stats *MemoryStat, v uint64) { stats.ShmemTHP = opt.Bytes{Bytes: v} },
+	"inactive_anon":            func(stats *MemoryStat, v uint64) { stats.InactiveAnon = opt.Bytes{Bytes: v} },
+	"active_anon":              func(stats *MemoryStat, v uint64) { stats.ActiveAnon = opt.Bytes{Bytes: v} },
+	"inactive_file":            func(stats *MemoryStat, v uint64) { stats.InactiveFile = opt.Bytes{Bytes: v} },
+	"active_file":              func(stats *MemoryStat, v uint64) { stats.ActiveFile = opt.Bytes{Bytes: v} },
+	"unevictable":              func(stats *MemoryStat, v uint64) { stats.Unevictable = opt.Bytes{Bytes: v} },
+	"slab_reclaimable":         func(stats *MemoryStat, v uint64) { stats.SlabReclaimable = opt.Bytes{Bytes: v} },
+	"slab_unreclaimable":       func(stats *MemoryStat, v uint64) { stats.SlabUnreclaimable = opt.Bytes{Bytes: v} },
+	"slab":                     func(stats *MemoryStat, v uint64) { stats.Slab = opt.Bytes{Bytes: v} },
+	"workingset_refault_anon":  func(stats *MemoryStat, v uint64) { stats.WorkingSetRefaultAnon = v },
+	"workingset_refault_file":  func(stats *MemoryStat, v uint64) { stats.WorkingSetRefaultFile = v },
+	"workingset_activate_anon": func(stats *MemoryStat, v uint64) { stats.WorkingSetActivateAnon = v },
+	"workingset_activate_file": func(stats *MemoryStat, v uint64) { stats.WorkingSetActivateFile = v },
+	"workingset_restore_anon":  func(stats *MemoryStat, v uint64) { stats.WorkingSetRestoreAnon = v },
+	"workingset_restore_file":  func(stats *MemoryStat, v uint64) { stats.WorkingSetRestoreFile = v },
+	"workingset_nodereclaim":   func(stats *MemoryStat, v uint64) { stats.WorkingSetNodeReclaim = v },
+	"pgfault":                  func(stats *MemoryStat, v uint64) { stats.PageFaults = v },
+	"pgmajfault":               func(stats *MemoryStat, v uint64) { stats.MajorPageFaults = v },
+	"pgrefill":                 func(stats *MemoryStat, v uint64) { stats.PageRefill = v },
+	"pgscan":                   func(stats *MemoryStat, v uint64) { stats.PageScan = v },
+	"pgsteal":                  func(stats *MemoryStat, v uint64) { stats.PageSteal = v },
+	"pgactivate":               func(stats *MemoryStat, v uint64) { stats.PageActivate = v },
+	"pgdeactivate":             func(stats *MemoryStat, v uint64) { stats.PageDeactivate = v },
+	"pglazyfree":               func(stats *MemoryStat, v uint64) { stats.PageLazyFree = v },
+	"pglazyfreed":              func(stats *MemoryStat, v uint64) { stats.PageLazyFreed = v },
+	"thp_fault_alloc":          func(stats *MemoryStat, v uint64) { stats.THPFaultAlloc = v },
+	"thp_collapse_alloc":       func(stats *MemoryStat, v uint64) { stats.THPCollapseAlloc = v },
 }
 
 // Get fetches memory subsystem metrics for V2 cgroups
@@ -277,43 +320,23 @@ func fillStatStruct(path string) (MemoryStat, error) {
 	}
 
 	stats := MemoryStat{}
-	refValues := reflect.ValueOf(&stats).Elem()
-	refTypes := reflect.TypeOf(stats)
-
 	sc := bufio.NewScanner(bytes.NewReader(raw))
+	var parseErrs error
 	for sc.Scan() {
 		//break apart the lines
 		parts := bytes.SplitN(sc.Bytes(), []byte(" "), 2)
 		if len(parts) != 2 {
 			continue
 		}
-		intVal, err := cgcommon.ParseUint(parts[1])
+		val, err := cgcommon.ParseUint(parts[1])
 		if err != nil {
-			return stats, fmt.Errorf("error parsing value %v: %w", parts[1], err)
+			parseErrs = errors.Join(parseErrs, fmt.Errorf("error parsing value %v: %w", parts[1], err))
+			continue
 		}
-		for i := 0; i < refValues.NumField(); i++ {
-			idxVal := refValues.Field(i)
-			idxType := refTypes.Field(i)
-			tagStr := idxType.Tag.Get("orig")
-			if tagStr == string(parts[0]) {
-				if idxVal.CanSet() {
-					if idxVal.Kind() == reflect.Uint64 {
-						idxVal.SetUint(intVal)
-					} else if idxType.Type == reflect.TypeOf(opt.Bytes{}) {
-						byteVal := opt.Bytes{Bytes: intVal}
-						byteRef := reflect.ValueOf(byteVal)
-						idxVal.Set(byteRef)
-					} else if idxType.Type == reflect.TypeOf(opt.BytesOpt{}) {
-						byteVal := opt.BytesOpt{Bytes: opt.UintWith(intVal)}
-						byteRef := reflect.ValueOf(byteVal)
-						idxVal.Set(byteRef)
-					}
-
-				}
-			}
+		if setter, found := keySetters[string(parts[0])]; found {
+			setter(&stats, val)
 		}
-
 	}
 
-	return stats, nil
+	return stats, parseErrs
 }
