@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html
 sub:
   mito_docs: https://pkg.go.dev/github.com/elastic/mito
-  mito_version: v1.22.0
+  mito_version: v1.23.0
 applies_to:
   stack: ga 8.6.0
 ---
@@ -273,6 +273,8 @@ Additionally, it supports authentication via:
 * OAuth2
 * token authentication {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
 
+As described in Mito's [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) documentation, configuration for Basic Authentication or token authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication or OAuth2 will be used for all requests made from CEL.
+
 Example configurations with authentication:
 
 ```yaml
@@ -342,6 +344,17 @@ The state must contain a `url` string and may contain any object the user wishes
 All objects are stored at runtime, except `cursor`, which has values that are persisted between restarts.
 
 
+## HTTP rate limit handling [_cel_rate_limiting]
+
+CEL evaluations may return a `rate_limit` object as noted in the [Execution](#_execution) section.
+This can either be calculated explicitly in CEL code, or by using the
+[`rate_limit`]({{mito_docs}}@{{mito_version}}/lib#hdr-Rate_Limit-Limit) extension function.
+
+If the `rate_limit` extension is used, calculated rate limits are applied directly to the HTTP client
+used by the CEL input. This includes uses of `rate_limit` that do not return their results from the
+CEL context. {applies_to}`stack: ga 9.3.0`
+
+
 ## CEL input and handling numbers [_cel_input_and_numbers]
 
 Numeric values passed in to and out of a CEL evaluation environment are passed as floating point
@@ -378,6 +391,7 @@ The CEL program that is executed each polling period. This field is required.
 
 `max_executions` is the maximum number of times a CEL program can request to be re-run with a `want_more` field. This is used to ensure that accidental infinite loops do not halt processing. When the execution budget is exceeded, execution will be restarted at the next interval and a warning will be written into the logs. Default: 1000.
 
+The number of executions remaining in the execution budget after the completion of the current evaluation is available within the CEL program by referencing the `remaining_executions` global variable. {applies_to}`stack: ga 9.2.0`
 
 ### `state` [state-cel]
 
@@ -487,6 +501,9 @@ When set to `false`, disables the basic auth configuration. Default: `true`.
 Basic auth settings are disabled if either `enabled` is set to `false` or the `auth.basic` section is missing.
 ::::
 
+::::{note}
+Basic auth settings do not affect requests run with `.do_request()`, as explained in [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP).
+::::
 
 
 ### `auth.basic.user` [_auth_basic_user]
@@ -706,6 +723,9 @@ When set to `false`, disables the token authentication configuration. Default: `
 Token authentication settings are disabled if either `enabled` is set to `false` or the `auth.token` section is missing.
 ::::
 
+::::{note}
+Token authentication settings do not affect requests run with `.do_request()`, as explained in [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP).
+::::
 
 
 ### `auth.token.type` [_auth_token_type]

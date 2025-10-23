@@ -27,6 +27,7 @@ import (
 	"net"
 	"os"
 	"os/user"
+	"path/filepath"
 	"runtime"
 	"runtime/debug"
 	"strconv"
@@ -44,7 +45,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/locks"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
@@ -249,11 +249,12 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			ID:               id,
 			FirstStart:       time.Now(),
 			StartTime:        time.Now(),
-			EphemeralID:      metricreport.EphemeralID(),
+			EphemeralID:      metricreport.EphemeralID(), //nolint:staticcheck //keep behavior for now
 			FIPSDistribution: version.FIPSDistribution,
 		},
 		Fields:   fields,
 		Registry: reload.NewRegistry(),
+		Paths:    paths.New(),
 	}
 
 	return &Beat{Beat: b}, nil
@@ -345,13 +346,20 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	reg := b.Monitoring.StatsRegistry().GetOrCreateRegistry("libbeat")
 
-	err = metricreport.SetupMetrics(b.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion())
+	err = metricreport.SetupMetricsOptions(metricreport.MetricOptions{
+		Name:           b.Info.Beat,
+		Version:        version.GetDefaultVersion(),
+		EphemeralID:    metricreport.EphemeralID().String(), //nolint:staticcheck //keep behavior for now
+		Logger:         b.Info.Logger.Named("metrics"),
+		SystemMetrics:  monitoring.Default.GetOrCreateRegistry("system"),
+		ProcessMetrics: monitoring.Default.GetOrCreateRegistry("beat"),
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	// Report central management state
-	mgmt := b.Monitoring.StateRegistry().NewRegistry("management")
+	mgmt := b.Monitoring.StateRegistry().GetOrCreateRegistry("management")
 	monitoring.NewBool(mgmt, "enabled").Set(b.Manager.Enabled())
 
 	log.Debug("Initializing output plugins")
@@ -419,8 +427,8 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path. This is disabled under elastic-agent.
-	if !fleetmode.Enabled() {
-		bl := locks.New(b.Info)
+	if !management.UnderAgent() {
+		bl := locks.New(b.Info, b.Paths)
 		err := bl.Lock()
 		if err != nil {
 			return err
@@ -684,7 +692,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				loadILM = idxmgmt.LoadModeEnabled
 			}
 
-			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
+			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Paths, b.Config.LifecycleConfig)
 			if err != nil {
 				return fmt.Errorf("error creating index management handler: %w", err)
 			}
@@ -760,10 +768,11 @@ func (b *Beat) configure(settings Settings) error {
 	if err := InitPaths(cfg); err != nil {
 		return err
 	}
+	b.Paths = paths.Paths
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
-	store, err := LoadKeystore(cfg, b.Info.Beat)
+	store, err := LoadKeystore(cfg, b.Info.Beat, b.Paths)
 	if err != nil {
 		return fmt.Errorf("could not initialize the keystore: %w", err)
 	}
@@ -823,9 +832,9 @@ func (b *Beat) configure(settings Settings) error {
 	b.Instrumentation = instrumentation
 
 	// log paths values to help with troubleshooting
-	logger.Infof("%s", paths.Paths.String())
+	logger.Infof("%s", b.Paths.String())
 
-	metaPath := paths.Resolve(paths.Data, "meta.json")
+	metaPath := b.Paths.Resolve(paths.Data, "meta.json")
 	err = b.LoadMeta(metaPath)
 	if err != nil {
 		return err
@@ -952,6 +961,7 @@ func (b *Beat) LoadMeta(metaPath string) error {
 		return fmt.Errorf("meta file failed to open: %w", err)
 	}
 
+	// file exists, read and load the meta data
 	if err == nil {
 		m := meta{}
 		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
@@ -976,31 +986,29 @@ func (b *Beat) LoadMeta(metaPath string) error {
 
 	// file does not exist or ID is invalid or first start time is not defined, let's create a new one
 
-	// write temporary file first
-	tempFile := metaPath + ".new"
-	f, err = os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o600)
+	// write temporary file first, use same dir as destination to avoid invalid cross-device links
+	tmpFile, err := os.CreateTemp(filepath.Dir(metaPath), filepath.Base(metaPath)+".new")
 	if err != nil {
-		return fmt.Errorf("failed to create Beat meta file: %w", err)
+		return fmt.Errorf("failed to create temporary Beat meta file: %w", err)
 	}
 
-	encodeErr := json.NewEncoder(f).Encode(meta{UUID: b.Info.ID, FirstStart: b.Info.FirstStart})
-	err = f.Sync()
+	encodeErr := json.NewEncoder(tmpFile).Encode(meta{UUID: b.Info.ID, FirstStart: b.Info.FirstStart})
+	err = tmpFile.Sync()
 	if err != nil {
-		return fmt.Errorf("Beat meta file failed to write: %w", err)
+		return fmt.Errorf("beat meta file failed to sync data: %w", err)
 	}
 
-	err = f.Close()
+	err = tmpFile.Close()
 	if err != nil {
-		return fmt.Errorf("Beat meta file failed to write: %w", err)
+		return fmt.Errorf("beat meta file failed to close: %w", err)
 	}
 
 	if encodeErr != nil {
-		return fmt.Errorf("Beat meta file failed to write: %w", encodeErr)
+		return fmt.Errorf("beat meta file failed to encode vaules: %w", encodeErr)
 	}
 
 	// move temporary file into final location
-	err = file.SafeFileRotate(metaPath, tempFile)
-	return err
+	return file.SafeFileRotate(metaPath, tmpFile.Name())
 }
 
 func openRegular(filename string) (*os.File, error) {
@@ -1062,7 +1070,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 			return fmt.Errorf("error generating index pattern: %w", err)
 		}
 
-		err = dashboards.ImportDashboards(ctx, b.Info, paths.Resolve(paths.Home, ""),
+		err = dashboards.ImportDashboards(ctx, b.Info, b.Paths.Resolve(paths.Home, ""),
 			kibanaConfig, b.Config.Dashboards, nil, pattern)
 		if err != nil {
 			return fmt.Errorf("error importing Kibana dashboards: %w", err)
@@ -1128,7 +1136,7 @@ func (b *Beat) registerESIndexManagement() error {
 
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *eslegclient.Connection, _ *logp.Logger) error {
-		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
+		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Paths, b.Config.LifecycleConfig)
 		if err != nil {
 			return fmt.Errorf("error creating index management handler: %w", err)
 		}
@@ -1281,7 +1289,7 @@ func (b *Beat) registerClusterUUIDFetching() {
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
 func (b *Beat) clusterUUIDFetchingCallback() elasticsearch.ConnectCallback {
-	elasticsearchRegistry := b.Monitoring.StateRegistry().NewRegistry("outputs.elasticsearch")
+	elasticsearchRegistry := b.Monitoring.StateRegistry().GetOrCreateRegistry("outputs.elasticsearch")
 	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
 
 	callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
@@ -1318,7 +1326,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 
 	// Expose monitoring.cluster_uuid in state API
 	if monitoringClusterUUID != "" {
-		monitoringRegistry := b.Monitoring.StateRegistry().NewRegistry("monitoring")
+		monitoringRegistry := b.Monitoring.StateRegistry().GetOrCreateRegistry("monitoring")
 		clusterUUIDRegVar := monitoring.NewString(monitoringRegistry, "cluster_uuid")
 		clusterUUIDRegVar.Set(monitoringClusterUUID)
 	}
@@ -1375,10 +1383,10 @@ func (b *Beat) logSystemInfo(log *logp.Logger) {
 		"type": b.Info.Beat,
 		"uuid": b.Info.ID,
 		"path": mapstr.M{
-			"config": paths.Resolve(paths.Config, ""),
-			"data":   paths.Resolve(paths.Data, ""),
-			"home":   paths.Resolve(paths.Home, ""),
-			"logs":   paths.Resolve(paths.Logs, ""),
+			"config": b.Paths.Resolve(paths.Config, ""),
+			"data":   b.Paths.Resolve(paths.Data, ""),
+			"home":   b.Paths.Resolve(paths.Home, ""),
+			"logs":   b.Paths.Resolve(paths.Logs, ""),
 		},
 	}
 	log.Infow("Beat info", "beat", beat)

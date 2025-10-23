@@ -20,7 +20,7 @@ env:
 
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
-  ASDF_NODEJS_VERSION: 18.17.1
+  ASDF_NODEJS_VERSION: 22.20.0
   ASDF_PYTHON_VERSION: 3.10.9
 
   # Unit tests
@@ -332,7 +332,7 @@ steps:
       - label: ":ubuntu: Heartbeat: Packaging Linux arm64"
         key: "heartbeat-package-linux-arm"
         env:
-          PLATFORMS: "+all linux/arm64 darwin/arm64"
+          PLATFORMS: "+all linux/arm64 darwin/arm64 windows/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh heartbeat
         retry:

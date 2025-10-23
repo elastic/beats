@@ -37,7 +37,8 @@ func TestBrowserSummaries(t *testing.T) {
 
 		monStatus, _ := lastEvent.GetValue("monitor.status")
 		summaryIface, _ := lastEvent.GetValue("summary")
-		summary := summaryIface.(*jobsummary.JobSummary)
+		summary, ok := summaryIface.(*jobsummary.JobSummary)
+		require.True(t, ok, "expected JobSummary result: %T", summaryIface)
 		require.Equal(t, string(summary.Status), monStatus, "expected summary status and mon status to be equal in event: %v", lastEvent.Fields)
 
 		requireOneSummaryPerAttempt(t, all)

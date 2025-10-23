@@ -24,7 +24,7 @@ env:
 
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
-  ASDF_NODEJS_VERSION: 18.17.1
+  ASDF_NODEJS_VERSION: 22.20.0
 
   # Unit tests
   RACE_DETECTOR: "true"
@@ -337,10 +337,10 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Packaging Linux"
 
-      - label: ":ubuntu: x-pack/heartbeat: Packaging Linux arm64"
+      - label: ":ubuntu: x-pack/heartbeat: Packaging arm64"
         key: "packaging-arm"
         env:
-          PLATFORMS: "+all linux/arm64 darwin/arm64"
+          PLATFORMS: "+all linux/arm64 darwin/arm64 windows/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/heartbeat
         retry:

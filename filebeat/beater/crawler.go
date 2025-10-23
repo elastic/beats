@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type crawler struct {
@@ -41,6 +42,7 @@ type crawler struct {
 	inputReloader   *cfgfile.Reloader
 	once            bool
 	beatDone        chan struct{}
+	beatPaths       *paths.Path
 }
 
 func newCrawler(
@@ -49,6 +51,7 @@ func newCrawler(
 	beatDone chan struct{},
 	once bool,
 	logger *logp.Logger,
+	beatPaths *paths.Path,
 ) (*crawler, error) {
 	return &crawler{
 		log:            logger.Named("crawler"),
@@ -58,6 +61,7 @@ func newCrawler(
 		inputConfigs:   inputConfigs,
 		once:           once,
 		beatDone:       beatDone,
+		beatPaths:      beatPaths,
 	}, nil
 }
 
@@ -80,14 +84,14 @@ func (c *crawler) Start(
 	}
 
 	if configInputs.Enabled() {
-		c.inputReloader = cfgfile.NewReloader(log.Named("input.reloader"), pipeline, configInputs)
+		c.inputReloader = cfgfile.NewReloader(log.Named("input.reloader"), pipeline, configInputs, c.beatPaths)
 		if err := c.inputReloader.Check(c.inputsFactory); err != nil {
 			return fmt.Errorf("creating input reloader failed: %w", err)
 		}
 	}
 
 	if configModules.Enabled() {
-		c.modulesReloader = cfgfile.NewReloader(log.Named("module.reloader"), pipeline, configModules)
+		c.modulesReloader = cfgfile.NewReloader(log.Named("module.reloader"), pipeline, configModules, c.beatPaths)
 		if err := c.modulesReloader.Check(c.modulesFactory); err != nil {
 			return fmt.Errorf("creating module reloader failed: %w", err)
 		}
@@ -113,7 +117,6 @@ func (c *crawler) startInput(
 	pipeline beat.PipelineConnector,
 	config *conf.C,
 ) error {
-
 	if !config.Enabled() {
 		c.log.Infof("input disabled, skipping it")
 		return nil

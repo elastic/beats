@@ -29,11 +29,16 @@ import (
 )
 
 var esCommonOutput = `
+extensions:
+  beatsauth:
+    idle_connection_timeout: 3s
+    proxy_disable: false
+    proxy_url: https://tikugfk.example
+    timeout: 1m30s
 exporters:
   elasticsearch:
     endpoints:
       - https://localhost:9200
-    idle_conn_timeout: 3s
     logs_index: form-otel-exporter
     password: changeme
     retry:
@@ -42,20 +47,29 @@ exporters:
       max_interval: 1m0s
       max_retries: 3
     user: elastic
-    timeout: 1m30s
-    batcher:
+    max_conns_per_host: 1
+    sending_queue:
+      batch:
+        flush_timeout: 10s
+        max_size: 1600
+        min_size: 0
+        sizer: items
+      block_on_overflow: true
       enabled: true
-      max_size: 1600
-      min_size: 0
+      num_consumers: 1
+      queue_size: 3200
+      wait_for_result: true
     mapping:
       mode: bodymap
     compression: gzip
     compression_params:
-      level: 1       
+      level: 1 
+    auth:
+      authenticator: beatsauth  
 `
 
 func TestConverter(t *testing.T) {
-	c := converter{}
+	c := Converter{}
 	t.Run("test converter functionality", func(t *testing.T) {
 		var supportedInput = `
 receivers:
@@ -70,14 +84,14 @@ receivers:
         - type: log
           enabled: true
           paths:
-            - /var/log/*.log	
+            - /var/log/*.log
     output:
       elasticsearch:
         hosts: ["https://localhost:9200"]
         username: elastic
         password: changeme
         index: form-otel-exporter
-
+        proxy_url: https://tikugfk.example
 service:
   pipelines:
     logs:
@@ -97,10 +111,12 @@ receivers:
         - type: log
           enabled: true
           paths:
-            - /var/log/*.log		  
+            - /var/log/*.log
     output:
       otelconsumer: null
 service:
+  extensions:
+    - beatsauth
   pipelines:
     logs:
       exporters:
@@ -128,10 +144,10 @@ receivers:
           enabled: true
           id: filestream-input-id
           paths:
-            - /tmp/flog.log		
+            - /tmp/flog.log
     output:
-      kafka: 
-        enabled: true 
+      kafka:
+        enabled: true
 
 service:
   pipelines:
@@ -173,11 +189,15 @@ service:
         - "filebeatreceiver"
 `
 		var expectedOutput = `
+extensions:
+  beatsauth:
+    idle_connection_timeout: 3s
+    proxy_disable: false
+    timeout: 1m30s
 exporters:
   elasticsearch:
     endpoints:
       - https://es-hostname.elastic.co:443
-    idle_conn_timeout: 3s
     logs_index: form-otel-exporter
     password: password
     retry:
@@ -186,16 +206,25 @@ exporters:
       max_interval: 1m0s
       max_retries: 3
     user: elastic-cloud
-    timeout: 1m30s
-    batcher:
+    max_conns_per_host: 1
+    sending_queue:
+      batch:
+        flush_timeout: 10s
+        max_size: 1600
+        min_size: 0
+        sizer: items
+      block_on_overflow: true
       enabled: true
-      max_size: 1600
-      min_size: 0
+      num_consumers: 1
+      queue_size: 3200
+      wait_for_result: true
     mapping:
-      mode: bodymap   
+      mode: bodymap
     compression: gzip
     compression_params:
-      level: 1    
+      level: 1
+    auth:
+      authenticator: beatsauth  
 receivers:
   filebeatreceiver:
     filebeat:
@@ -204,7 +233,7 @@ receivers:
           id: filestream-input-id
           paths:
             - /tmp/flog.log
-          type: filestream  
+          type: filestream
     output:
       otelconsumer: null
     cloud: null
@@ -212,6 +241,8 @@ receivers:
       kibana:
         host: https://kibana-hostname.elastic.co:443
 service:
+  extensions:
+    - beatsauth
   pipelines:
     logs:
       exporters:
@@ -238,6 +269,7 @@ receivers:
         hosts: ["https://localhost:9200"]
         username: elastic
         password: changeme
+        proxy_url: https://tikugfk.example        
         index: form-otel-exporter
         queue:
           mem:
@@ -261,10 +293,12 @@ receivers:
         events: 3200
         flush:
           min_events: 1600
-          timeout: 10s    	  
+          timeout: 10s
     output:
       otelconsumer: null
 service:
+  extensions:
+    - beatsauth
   pipelines:
     logs:
       exporters:
@@ -281,10 +315,201 @@ service:
 		compareAndAssert(t, expOutput, input)
 
 	})
+
+	t.Run("test logstash exporter", func(t *testing.T) {
+		var supportedInput = `
+receivers:
+  filebeatreceiver:
+    output:
+      logstash:
+        bulk_max_size: 1024
+        backoff:
+          init: 2s
+          max: 2m0s
+        compression_level: 9
+        escape_html: true
+        hosts: ["https://localhost:5044"]
+        index: "filebeat"
+        loadbalance: true
+        max_retries: 2
+        pipelining: 0
+        proxy_url: "socks5://user:password@socks5-proxy:2233"
+        proxy_use_local_resolver: true
+        slow_start: true
+        # timeout: 30s
+        # ttl: 10s
+        workers: 2
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+
+		var expectedOutput = `
+exporters:
+  logstash:
+    bulk_max_size: 1024
+    backoff:
+      init: 2s
+      max: 2m0s
+    compression_level: 9
+    escape_html: true
+    hosts: ["https://localhost:5044"]
+    index: "filebeat"
+    loadbalance: true
+    max_retries: 2
+    pipelining: 0
+    proxy_url: "socks5://user:password@socks5-proxy:2233"
+    proxy_use_local_resolver: true
+    slow_start: true
+    timeout: 30s
+    ttl: 0s
+    worker: 0
+    workers: 2
+receivers:
+  filebeatreceiver:
+    output:
+      otelconsumer: null
+service:
+  pipelines:
+    logs:
+      exporters:
+        - logstash
+      receivers:
+        - filebeatreceiver
+`
+		input := newFromYamlString(t, supportedInput)
+		err := c.Convert(context.Background(), input)
+		require.NoError(t, err, "error converting beats logstash-output config")
+
+		expOutput := newFromYamlString(t, expectedOutput)
+		compareAndAssert(t, expOutput, input)
+	})
+
+	t.Run("logstash config tests queue setting is promoted to global level", func(t *testing.T) {
+		var supportedInput = `
+receivers:
+  filebeatreceiver:
+    output:
+      logstash:
+        hosts: ["https://localhost:5044"]
+        queue:
+          mem:
+            events: 3200
+            flush:
+              min_events: 1600
+              timeout: 10s
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+
+		var expectedOutput = `
+exporters:
+  logstash:
+    bulk_max_size: 2048
+    backoff:
+      init: 1s
+      max: 1m0s
+    compression_level: 3
+    escape_html: false
+    hosts: ["https://localhost:5044"]
+    index: ""
+    loadbalance: false
+    max_retries: 3
+    pipelining: 2
+    proxy_url: ""
+    proxy_use_local_resolver: false
+    slow_start: false
+    timeout: 30s
+    ttl: 0s
+    worker: 0
+    workers: 0
+receivers:
+  filebeatreceiver:
+    queue:
+      mem:
+        events: 3200
+        flush:
+          min_events: 1600
+          timeout: 10s
+    output:
+      otelconsumer: null
+service:
+  pipelines:
+    logs:
+      exporters:
+        - logstash
+      receivers:
+        - filebeatreceiver
+`
+		input := newFromYamlString(t, supportedInput)
+		err := c.Convert(context.Background(), input)
+		require.NoError(t, err, "error converting beats logstash-output config")
+
+		expOutput := newFromYamlString(t, expectedOutput)
+		compareAndAssert(t, expOutput, input)
+	})
+
+	t.Run("test logstash exporter with enabled false", func(t *testing.T) {
+		var supportedInput = `
+receivers:
+  filebeatreceiver:
+    output:
+      logstash:
+        enabled: false
+        hosts: ["https://localhost:5044"]
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+
+		var expectedOutput = `
+receivers:
+  filebeatreceiver:
+    output:
+      otelconsumer: null
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+`
+		input := newFromYamlString(t, supportedInput)
+		err := c.Convert(context.Background(), input)
+		require.NoError(t, err, "error converting beats logstash-output config")
+
+		expOutput := newFromYamlString(t, expectedOutput)
+		compareAndAssert(t, expOutput, input)
+	})
+
+	t.Run("test Logstash failure if host is empty", func(t *testing.T) {
+		var unsupportedOutputConfig = `
+receivers:
+  filebeatreceiver:
+    output:
+      logstash:
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+
+		input := newFromYamlString(t, unsupportedOutputConfig)
+		err := c.Convert(context.Background(), input)
+		require.ErrorContains(t, err, "failed unpacking logstash config: missing required field accessing 'hosts'")
+
+	})
 }
 
 func TestLogLevel(t *testing.T) {
-	c := converter{}
+	c := Converter{}
 	tests := []struct {
 		name          string
 		level         string
@@ -327,7 +552,7 @@ func TestLogLevel(t *testing.T) {
 			supportedInput := fmt.Sprintf(`
       receivers:
         filebeatreceiver:
-          logging: 
+          logging:
             level: %s
           filebeat:
             inputs:
@@ -351,6 +576,206 @@ func TestLogLevel(t *testing.T) {
 
 }
 
+// when presets are configured, `ToOTelConfig` may override certain fields based on preset values
+// such as worker, bulk_max_size, idle_connection_timeout, queue settings etc
+// This test ensures correct values of idle_connection_timeout, which is an http config, is configured on beastauth extension
+// Also tests correct queue config is set under filebeatreceiver
+func TestPresets(t *testing.T) {
+	c := Converter{}
+
+	commonBeatCfg := `
+receivers:
+  filebeatreceiver:
+    output:
+      elasticsearch:
+        hosts:
+          - localhost:9200
+        index: "some-index"
+        username: elastic
+        password: changeme
+        preset: %s
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver  
+`
+
+	commonOTelCfg := `
+extensions:
+  beatsauth:
+    idle_connection_timeout: 3s
+    proxy_disable: false
+    timeout: 1m30s  
+receivers:
+  filebeatreceiver:
+    output:
+      otelconsumer: null    
+exporters:
+  elasticsearch:
+    endpoints:
+      - http://localhost:9200
+    retry:
+      enabled: true
+      initial_interval: 1s
+      max_interval: 1m0s
+      max_retries: 3
+    logs_index: some-index
+    password: changeme
+    user: elastic
+    mapping:
+      mode: bodymap 
+    compression: gzip
+    compression_params:
+      level: 1
+    auth:
+      authenticator: beatsauth
+    sending_queue:
+      batch:
+        max_size: 1600
+        min_size: 0
+        sizer: items
+      block_on_overflow: true
+      enabled: true
+      num_consumers: 1
+      queue_size: 3200
+      wait_for_result: true
+service:
+  extensions:
+    - beatsauth
+  pipelines:
+    logs:
+      exporters:
+        - elasticsearch
+      receivers:
+        - filebeatreceiver      
+`
+
+	tests := []struct {
+		presetName string
+		output     string
+	}{
+		{
+			presetName: "balanced",
+			output: commonOTelCfg + `
+receivers:
+  filebeatreceiver:
+    queue:
+      mem:
+        events: 3200
+        flush:
+          min_events: 1600
+          timeout: 10s            
+extensions:
+  beatsauth:
+    idle_connection_timeout: 3s
+exporters:
+  elasticsearch:
+    sending_queue:
+      batch:
+        flush_timeout: 10s
+        max_size: 1600
+      num_consumers: 1
+      queue_size: 3200
+    max_conns_per_host: 1      
+ `,
+		},
+		{
+			presetName: "throughput",
+			output: commonOTelCfg + `
+receivers:
+  filebeatreceiver:
+    queue:
+      mem:
+        events: 12800
+        flush:
+          min_events: 1600
+          timeout: 5s           
+extensions:
+  beatsauth:
+    idle_connection_timeout: 15s
+exporters:
+  elasticsearch:
+    sending_queue:
+      batch:
+        flush_timeout: 10s
+        max_size: 1600
+      num_consumers: 4
+      queue_size: 12800
+    max_conns_per_host: 4      
+`,
+		},
+		{
+			presetName: "scale",
+			output: `
+receivers:
+  filebeatreceiver:
+    queue:
+      mem:
+        events: 3200
+        flush:
+          min_events: 1600
+          timeout: 20s          
+extensions:
+  beatsauth:
+    idle_connection_timeout: 1s
+exporters:
+  elasticsearch:
+    sending_queue:
+      batch:
+        flush_timeout: 10s
+        max_size: 1600
+      num_consumers: 1
+      queue_size: 3200
+    max_conns_per_host: 1
+    retry:
+      initial_interval: 5s
+      max_interval: 5m0s       
+`,
+		},
+		{
+			presetName: "latency",
+			output: commonOTelCfg + `
+receivers:
+  filebeatreceiver:
+    queue:
+      mem:
+        events: 4100
+        flush:
+          min_events: 2050
+          timeout: 1s          
+extensions:
+  beatsauth:
+    idle_connection_timeout: 1m0s
+exporters:
+  elasticsearch:
+    sending_queue:
+      batch:
+        flush_timeout: 10s
+        max_size: 50
+      num_consumers: 1
+      queue_size: 4100
+    max_conns_per_host: 1
+    retry:
+      initial_interval: 1s
+      max_interval: 1m0s    
+`}}
+
+	commonOTeMap := newFromYamlString(t, commonOTelCfg)
+
+	for _, test := range tests {
+		t.Run("config translation w/"+test.presetName, func(t *testing.T) {
+			cfg := newFromYamlString(t, fmt.Sprintf(commonBeatCfg, test.presetName))
+			err := c.Convert(t.Context(), cfg)
+			require.NoError(t, err, "error converting beats output config")
+			expOutput := newFromYamlString(t, test.output)
+			err = commonOTeMap.Merge(expOutput)
+			require.NoError(t, err)
+			compareAndAssert(t, commonOTeMap, cfg)
+		})
+	}
+
+}
 func newFromYamlString(t *testing.T, input string) *confmap.Conf {
 	t.Helper()
 	var rawConf map[string]any

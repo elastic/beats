@@ -22,7 +22,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/bits"
 	"net"
 	"net/http"
@@ -128,7 +127,7 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 	if err != nil {
 		return 0, err
 	}
-	return uint16(p), nil
+	return uint16(p), nil //nolint:gosec // G115 Conversion from int to unit16 is safe here.
 }
 
 // TLSChecks validates the given x509 cert at the given position.
@@ -277,7 +276,7 @@ func RespondingTCPChecks() validator.Validator {
 func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
 	// Write the certificate to a tempFile. Heartbeat would normally read certs from
 	// disk, not memory, so this little bit of extra work is worthwhile
-	certFile, err := ioutil.TempFile("", "sslcert")
+	certFile, err := os.CreateTemp("", "sslcert")
 	require.NoError(t, err)
 	_, _ = certFile.WriteString(x509util.CertToPEMString(cert))
 	return certFile

@@ -1,0 +1,80 @@
+{
+  "backoff": {
+    "init": "20s",
+    "max": "200s"
+  },
+  "buffer_size": 42000,
+  "clean_inactive": "20h",
+  "clean_removed": false,
+  "close": {
+    "on_state_change": {
+      "inactive": "3h",
+      "removed": false,
+      "renamed": true
+    },
+    "reader": {
+      "after_interval": "42s",
+      "on_eof": true
+    }
+  },
+  "encoding": "utf-8",
+  "exclude_lines": [
+    "foo-exclude"
+  ],
+  "file_identity": {
+    "native": null
+  },
+  "harvester_limit": 10000,
+  "id": "foo",
+  "ignore_inactive": "since_last_start",
+  "ignore_older": "10h",
+  "include_lines": [
+    "foo-include",
+    "bar-include"
+  ],
+  "message_max_bytes": 44000,
+  "parsers": [
+    {
+      "multiline": {
+        "count_lines": 42,
+        "match": "after",
+        "negate": true,
+        "pattern": "reg exp goes here",
+        "type": "pattern"
+      }
+    },
+    {
+      "ndjson": {
+        "add_error_key": true,
+        "document_id": "the_id_key",
+        "expand_keys": true,
+        "ignore_decoding_error": true,
+        "keys_under_root": false,
+        "message_key": "message",
+        "overwrite_keys": true,
+        "target": "json"
+      }
+    }
+  ],
+  "paths": [
+    "/var/log/*.log",
+    "/foo/bar.log"
+  ],
+  "prospector": {
+    "scanner": {
+      "check_interval": "50s",
+      "exclude_files": [
+        "excluded-file glob goes here"
+      ],
+      "fingerprint": {
+        "enabled": false
+      },
+      "recursive_glob": false,
+      "symlinks": true
+    }
+  },
+  "take_over": {
+    "enabled": true
+  },
+  "type": "filestream"
+}

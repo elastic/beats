@@ -141,7 +141,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
-	metrics, reg := newInputMetrics(env.MetricsRegistry)
+	metrics, reg := newInputMetrics(env.MetricsRegistry, env.Logger)
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
@@ -185,7 +185,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		Headers:     cfg.Resource.Headers,
 		MaxBodySize: cfg.Resource.MaxBodySize,
 	}
-	prg, ast, cov, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, httpOptions, patterns, cfg.XSDs, log, trace, wantDump, doCov)
+	prg, ast, cov, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, httpOptions, patterns, cfg.XSDs, log, trace, wantDump, doCov)
 	if err != nil {
 		return err
 	}
@@ -278,7 +278,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			metrics.executions.Add(1)
 			start := i.now().In(time.UTC)
-			state, err = evalWith(ctx, prg, ast, state, start, wantDump)
+			state, err = evalWith(ctx, prg, ast, state, start, wantDump, budget-1)
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
 				var dump dumpError
@@ -680,6 +680,19 @@ func handleResponse(log *logp.Logger, state map[string]interface{}, limiter *rat
 	return true, waitUntil, nil
 }
 
+// handleRateLimit performs two related functions dealing with rate limits. The
+// historical function is to process a rate limit header on return from the CEL
+// context, preventing start of the next evaluation before the wait time has been
+// reached, and the new function which is a call back performed by the lib.Limit
+// rate_limit overload. In the second function, rate limit values are applied
+// directly to the rate.Limit that is shared with the http.Client held by the
+// mito CEL runtime, allowing immediate application of rate limits to the client
+// before CEL evaluation completion. This behaviour is not configurable except
+// by use/non-use of the rate_limit overload.
+//
+// A caveat here is that if a CEL program interacts with two API endpoints that
+// do not share the same overall rate limit budget, there will be confusion if
+// rate_limit is used, so rate limiting is not supported in that situation.
 func handleRateLimit(log *logp.Logger, rateLimit map[string]interface{}, header http.Header, limiter *rate.Limiter) (waitUntil time.Time) {
 	if e, ok := rateLimit["error"]; ok {
 		// The error field should be a string, but we won't quibble here.
@@ -863,7 +876,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	if reg != nil {
-		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg)
+		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg, log)
 	}
 
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
@@ -917,6 +930,7 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings, log *
 		fallthrough
 	case !ok:
 		return []httpcommon.TransportOption{
+			httpcommon.WithLogger(log),
 			httpcommon.WithAPMHTTPInstrumentation(),
 			keepalive,
 		}
@@ -1081,7 +1095,7 @@ func getEnv(allowed []string) map[string]string {
 	return env
 }
 
-func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, httpOptions lib.HTTPOptions, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details, coverage bool) (cel.Program, *cel.Ast, *lib.Coverage, error) {
+func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limit *rate.Limiter, httpOptions lib.HTTPOptions, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details, coverage bool) (cel.Program, *cel.Ast, *lib.Coverage, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
@@ -1103,10 +1117,17 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 		lib.File(mimetypes),
 		lib.MIME(mimetypes),
 		lib.HTTPWithContextOpts(ctx, client, httpOptions),
-		lib.Limit(limitPolicies),
+		lib.LimitWithApply(limitPolicies, func(m map[string]any, h http.Header) map[string]any {
+			waitUntil := handleRateLimit(log, m, h, limit)
+			if !waitUntil.IsZero() {
+				log.Debugw("rate limit waiting", "reset", waitUntil)
+			}
+			return m
+		}),
 		lib.Globals(map[string]interface{}{
-			"useragent": userAgent,
-			"env":       vars,
+			"useragent":            userAgent,
+			"env":                  vars,
+			"remaining_executions": 0, // placeholder
 		}),
 	}
 	if len(patterns) != 0 {
@@ -1155,7 +1176,7 @@ func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, an
 	}
 }
 
-func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time, details bool) (map[string]interface{}, error) {
+func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time, details bool, budget int) (map[string]interface{}, error) {
 	out, det, err := prg.ContextEval(ctx, map[string]interface{}{
 		// Replace global program "now" with current time. This is necessary
 		// as the lib.Time now global is static at program instantiation time
@@ -1167,7 +1188,11 @@ func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[stri
 		// compatibility between CEL programs developed in mito with programs
 		// run in the input.
 		"now": now,
-		root:  state,
+		// remaining_executions allows a program to identify when it is on
+		// or approaching the last available execution to avoid logging
+		// exceeding maximum number of CEL executions failures.
+		"remaining_executions": budget,
+		root:                   state,
 	})
 	if err != nil {
 		err = lib.DecoratedError{AST: ast, Err: err}
@@ -1290,7 +1315,7 @@ type inputMetrics struct {
 	batchProcessingTime metrics.Sample     // histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
 }
 
-func newInputMetrics(reg *monitoring.Registry) (*inputMetrics, *monitoring.Registry) {
+func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) (*inputMetrics, *monitoring.Registry) {
 	out := &inputMetrics{
 		resource:            monitoring.NewString(reg, "resource"),
 		executions:          monitoring.NewUint(reg, "cel_executions"),
@@ -1301,9 +1326,9 @@ func newInputMetrics(reg *monitoring.Registry) (*inputMetrics, *monitoring.Regis
 		celProcessingTime:   metrics.NewUniformSample(1024),
 		batchProcessingTime: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "cel_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "cel_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.celProcessingTime))
-	_ = adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
 
 	return out, reg

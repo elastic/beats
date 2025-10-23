@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-system.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -245,7 +247,7 @@ The following metricsets are available:
 * [memory](/reference/metricbeat/metricbeat-metricset-system-memory.md)
 * [network](/reference/metricbeat/metricbeat-metricset-system-network.md)
 * [network_summary](/reference/metricbeat/metricbeat-metricset-system-network_summary.md)  {applies_to}`stack: beta`
-* [ntp](/reference/metricbeat/metricbeat-metricset-system-ntp.md)  {applies_to}`stack: beta`
+* [ntp](/reference/metricbeat/metricbeat-metricset-system-ntp.md)  {applies_to}`stack: beta 9.2.0`
 * [process](/reference/metricbeat/metricbeat-metricset-system-process.md)
 * [process_summary](/reference/metricbeat/metricbeat-metricset-system-process_summary.md)
 * [raid](/reference/metricbeat/metricbeat-metricset-system-raid.md)

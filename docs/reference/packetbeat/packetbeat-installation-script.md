@@ -2,7 +2,7 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-installation-script.html
 applies_to:
-  stack: ga 9.0.6
+  stack: ga 9.1.0, ga 9.0.6
 ---
 
 # Installation script

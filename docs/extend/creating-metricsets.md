@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/creating-metricsets.html
+applies_to:
+  stack: ga
 ---
 
 # Creating a Metricset [creating-metricsets]
@@ -50,7 +52,7 @@ To create a new metricset:
 After running the mage commands, you’ll find the metricset, along with its generated files, under `module/{{module}}/{metricset}`. This directory contains the following files:
 
 * `\{{metricset}}.go`
-* `_meta/docs.asciidoc`
+* `_meta/docs.md`
 * `_meta/data.json`
 * `_meta/fields.yml`
 

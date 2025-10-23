@@ -25,7 +25,6 @@ import (
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/tracing"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
@@ -295,7 +294,7 @@ func (m *MetricSet) Setup() (err error) {
 					continue
 				}
 				if tracing.IsTraceFSAvailable() != nil {
-					m.log.Warnf("Mounted %s but no kprobes available", mount, err)
+					m.log.Warnf("Mounted %s but no kprobes available: %v", mount, err)
 					mount.unmount()
 					continue
 				}
@@ -499,9 +498,10 @@ func (m *MetricSet) clockSyncLoop(interval time.Duration, done <-chan struct{}) 
 	}
 }
 
-func (m *MetricSet) isKernelFunctionAvailable(name string, tracingFns common.StringSet) bool {
-	if tracingFns.Count() != 0 {
-		return tracingFns.Has(name)
+func (m *MetricSet) isKernelFunctionAvailable(name string, tracingFns map[string]struct{}) bool {
+	if len(tracingFns) != 0 {
+		_, ok := tracingFns[name]
+		return ok
 	}
 	defer m.installer.UninstallInstalled()
 	checkProbe := helper.ProbeDef{
