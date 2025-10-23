@@ -115,7 +115,7 @@ type HarvesterGroup interface {
 	// StopHarvesters cancels all running Harvesters.
 	StopHarvesters() error
 	// SetObserver sets the observer to get notified when a harvester closes
-	SetObserver(c chan HavesterFile)
+	SetObserver(c chan HarvesterFile)
 }
 
 type defaultHarvesterGroup struct {
@@ -128,24 +128,24 @@ type defaultHarvesterGroup struct {
 	identifier   *sourceIdentifier
 	tg           *task.Group
 	metrics      *Metrics
-	notifyChan   chan HavesterFile
+	notifyChan   chan HarvesterFile
 }
 
-// HavesterFile is used to notify an observer that the harvester for the Path
+// HarvesterFile is used to notify an observer that the harvester for the Path
 // has closed and the amount of data ingested from the file.
-type HavesterFile struct {
+type HarvesterFile struct {
 	Path string
 	Size int64
 }
 
 func (hg *defaultHarvesterGroup) notifyObserver(path string, size int64) {
 	if hg.notifyChan != nil {
-		hg.notifyChan <- HavesterFile{path, size}
+		hg.notifyChan <- HarvesterFile{path, size}
 	}
 }
 
-// SetObserver adds and observer to get notified when a harvester closes
-func (hg *defaultHarvesterGroup) SetObserver(c chan HavesterFile) {
+// SetObserver adds an observer to get notified when a harvester closes
+func (hg *defaultHarvesterGroup) SetObserver(c chan HarvesterFile) {
 	hg.notifyChan = c
 }
 

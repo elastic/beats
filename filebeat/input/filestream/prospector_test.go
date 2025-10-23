@@ -638,7 +638,7 @@ func (t *testHarvesterGroup) StopHarvesters() error {
 }
 
 // SetObserver is a no-op
-func (t *testHarvesterGroup) SetObserver(c chan loginp.HavesterFile) {
+func (t *testHarvesterGroup) SetObserver(c chan loginp.HarvesterFile) {
 }
 
 type mockFileWatcher struct {
@@ -649,7 +649,7 @@ type mockFileWatcher struct {
 
 	out chan loginp.FSEvent
 
-	c chan loginp.HavesterFile
+	c chan loginp.HarvesterFile
 }
 
 // newMockFileWatcher creates an FSWatch mock, so you can read
@@ -659,7 +659,7 @@ func newMockFileWatcher(events []loginp.FSEvent, eventCount int) *mockFileWatche
 		events:     events,
 		eventCount: eventCount,
 		out:        make(chan loginp.FSEvent, eventCount),
-		c:          make(chan loginp.HavesterFile),
+		c:          make(chan loginp.HarvesterFile),
 	}
 
 	for _, evt := range events {
@@ -693,7 +693,7 @@ func (m *mockFileWatcher) Run(_ unison.Canceler) {}
 
 func (m *mockFileWatcher) GetFiles() map[string]loginp.FileDescriptor { return m.filesOnDisk }
 
-func (m *mockFileWatcher) NotifyChan() chan loginp.HavesterFile {
+func (m *mockFileWatcher) NotifyChan() chan loginp.HarvesterFile {
 	return m.c
 }
 

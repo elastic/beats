@@ -65,13 +65,13 @@ type fileWatcherConfig struct {
 // fileWatcher gets the list of files from a FSWatcher and creates events by
 // comparing the files between its last two runs.
 type fileWatcher struct {
-	cfg             fileWatcherConfig
-	prev            map[string]loginp.FileDescriptor
-	scanner         loginp.FSScanner
-	log             *logp.Logger
-	events          chan loginp.FSEvent
-	notifyChan      chan loginp.HavesterFile
-	closedHavesters map[string]int64
+	cfg              fileWatcherConfig
+	prev             map[string]loginp.FileDescriptor
+	scanner          loginp.FSScanner
+	log              *logp.Logger
+	events           chan loginp.FSEvent
+	notifyChan       chan loginp.HarvesterFile
+	closedHarvesters map[string]int64
 }
 
 func newFileWatcher(logger *logp.Logger, paths []string, config fileWatcherConfig, gzipAllowed bool, sendNotChanged bool) (loginp.FSWatcher, error) {
@@ -82,13 +82,15 @@ func newFileWatcher(logger *logp.Logger, paths []string, config fileWatcherConfi
 	}
 
 	return &fileWatcher{
-		log:             logger.Named(watcherDebugKey),
-		cfg:             config,
-		prev:            make(map[string]loginp.FileDescriptor, 0),
-		scanner:         scanner,
-		events:          make(chan loginp.FSEvent),
-		closedHavesters: map[string]int64{},
-		notifyChan:      make(chan loginp.HavesterFile, 5), // magic number
+		log:              logger.Named(watcherDebugKey),
+		cfg:              config,
+		prev:             make(map[string]loginp.FileDescriptor, 0),
+		scanner:          scanner,
+		events:           make(chan loginp.FSEvent),
+		closedHarvesters: map[string]int64{},
+		// notifyChan is a buffered channel to prevent the harvester from
+		// blocking while waiting for the fileWatcher.
+		notifyChan: make(chan loginp.HarvesterFile, 5), // magic number
 	}, nil
 }
 
@@ -101,7 +103,7 @@ func defaultFileWatcherConfig() fileWatcherConfig {
 	}
 }
 
-func (w *fileWatcher) NotifyChan() chan loginp.HavesterFile {
+func (w *fileWatcher) NotifyChan() chan loginp.HarvesterFile {
 	return w.notifyChan
 }
 
@@ -116,7 +118,7 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 		select {
 		case evt := <-w.notifyChan:
 			w.log.Debugf("Harvester Closed notification. Path: %s, Size: %d", evt.Path, evt.Size)
-			w.closedHavesters[evt.Path] = evt.Size
+			w.closedHarvesters[evt.Path] = evt.Size
 		case <-tick:
 			w.watch(ctx)
 		case <-ctx.Done():
@@ -173,10 +175,10 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		// (data ingested) when the harvester closes. If we have this data we
 		// update our state to the same as the harvester, therefore starting
 		// a new harvester if needed.
-		if size, harvesterClosed := w.closedHavesters[path]; harvesterClosed {
+		if size, harvesterClosed := w.closedHarvesters[path]; harvesterClosed {
 			w.log.Debugf("Updating previous state because harvester was closed. '%s': %d", path, size)
 			prevDesc.SetSize(size)
-			delete(w.closedHavesters, path)
+			delete(w.closedHarvesters, path)
 		}
 
 		var e loginp.FSEvent

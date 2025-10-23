@@ -134,5 +134,5 @@ type FSWatcher interface {
 	Event() FSEvent
 	// NotifyChan returns the channel used to listen for
 	// harvester closing notifications
-	NotifyChan() chan HavesterFile
+	NotifyChan() chan HarvesterFile
 }
