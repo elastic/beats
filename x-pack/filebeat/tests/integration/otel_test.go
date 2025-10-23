@@ -868,13 +868,6 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 			server := httptest.NewServer(mux)
 			defer server.Close()
 
-			filebeatOTel := integration.NewBeat(
-				t,
-				"filebeat-otel",
-				"../../filebeat.test",
-				"otel",
-			)
-
 			namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 			index := "logs-integration-" + namespace
 
@@ -886,7 +879,7 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 				MonitoringPort int
 			}{
 				Index:          index,
-				InputFile:      filepath.Join(filebeatOTel.TempDir(), "log.log"),
+				InputFile:      filepath.Join(t.TempDir(), "log.log"),
 				ESEndpoint:     server.URL,
 				MaxRetries:     tt.maxRetries,
 				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
@@ -963,13 +956,13 @@ service:
 			require.NoError(t,
 				template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, beatsConfig))
 
-			filebeatOTel.WriteConfigFile(configBuffer.String())
+			oteltest.NewCollector(t, configBuffer.String())
 			writeEventsToLogFile(t, beatsConfig.InputFile, numTestEvents)
-			filebeatOTel.Start()
-			defer filebeatOTel.Stop()
 
 			// Wait for file input to be fully read
-			filebeatOTel.WaitStdErrContains(fmt.Sprintf("End of file reached: %s; Backoff now.", beatsConfig.InputFile), 30*time.Second)
+			// FIXME
+			// filebeatOTel.WaitStdErrContains(fmt.Sprintf("End of file reached: %s; Backoff now.", beatsConfig.InputFile), 30*time.Second)
+			time.Sleep(3 * time.Second)
 
 			// Wait for expected events to be ingested
 			require.EventuallyWithT(t, func(ct *assert.CollectT) {
