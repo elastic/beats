@@ -181,7 +181,7 @@ steps:
         depends_on:
           - agentbeat-package-linux
         env:
-          ASDF_NODEJS_VERSION: 18.17.1
+          ASDF_NODEJS_VERSION: 22.20.0
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
           SNAPSHOT: true
         command: |
