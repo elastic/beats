@@ -56,7 +56,7 @@ func NewCachedTables() CachedTables {
 	return cachedTables
 }
 
-type GlobalState struct {
+type AmcacheGlobalState struct {
 	Cache       CachedTables
 	Config      *Config
 	Lock        sync.RWMutex
@@ -65,20 +65,20 @@ type GlobalState struct {
 
 // Global variables for the gInstance and a mutex to protect it.
 var (
-	gInstance *GlobalState = &GlobalState{
+	gInstance *AmcacheGlobalState = &AmcacheGlobalState{
 		Config: &Config{HivePath: defaultHivePath, ExpirationDuration: defaultExpirationDuration},
 		Cache:  NewCachedTables(),
 	}
 )
 
-// GetGlobalState is the public accessor for the singleton.
+// GetAmcacheGlobalState is the public accessor for the singleton.
 // It checks for expiration and re-creates the instance if needed.
-func GetGlobalState() *GlobalState {
+func GetAmcacheGlobalState() *AmcacheGlobalState {
 	return gInstance
 }
 
 // Update reloads the Amcache hive and repopulates all cached data.
-func (gs *GlobalState) Update() {
+func (gs *AmcacheGlobalState) Update() {
 	gs.Lock.Lock()
 	defer gs.Lock.Unlock()
 
@@ -116,7 +116,7 @@ func (gs *GlobalState) Update() {
 // keyPath is the Amcache key path such as "Root\InventoryApplication".
 // ids are optional entry IDs to filter the results. If no IDs are provided, all entries for the keyPath are returned.
 // each amcache key has a field that can be used as an ID to filter on, for example ProgramId for Application entries.
-func (gs *GlobalState) GetCachedEntries(tableType tables.TableType, ids ...string) []tables.Entry {
+func (gs *AmcacheGlobalState) GetCachedEntries(tableType tables.TableType, ids ...string) []tables.Entry {
 	gs.Lock.Lock()
 	defer gs.Lock.Unlock()
 
@@ -144,7 +144,7 @@ func (gs *GlobalState) GetCachedEntries(tableType tables.TableType, ids ...strin
 }
 
 // UpdateIfNeeded checks if the cache has expired and updates it if necessary.
-func (gs *GlobalState) UpdateIfNeeded() {
+func (gs *AmcacheGlobalState) UpdateIfNeeded() {
 	gs.Lock.RLock()
 	lastUpdated := gs.LastUpdated
 	expirationDuration := gs.Config.ExpirationDuration

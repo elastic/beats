@@ -16,7 +16,7 @@ import (
 func TestGlobalStateConfig(t *testing.T) {
 	testHivePath := testdata.GetTestHivePathOrFatal(t)
 
-	globalInstance := GetGlobalState()
+	globalInstance := GetAmcacheGlobalState()
 	if globalInstance == nil {
 		t.Fatal("Expected globalInstance to be initialized")
 	}
@@ -25,7 +25,7 @@ func TestGlobalStateConfig(t *testing.T) {
 		t.Errorf("Expected default hive path %s, got %s", defaultHivePath, globalInstance.Config.HivePath)
 	}
 
-	testInstance := &GlobalState{Config: &Config{HivePath: testHivePath}}
+	testInstance := &AmcacheGlobalState{Config: &Config{HivePath: testHivePath}}
 	if testInstance.Config.HivePath != testHivePath {
 		t.Errorf("Expected hive path %s, got %s", testHivePath, testInstance.Config.HivePath)
 	}
@@ -34,7 +34,7 @@ func TestGlobalStateConfig(t *testing.T) {
 		t.Error("Expected testInstance and globalInstance to be different instances")
 	}
 
-	if globalInstance != GetGlobalState() {
+	if globalInstance != GetAmcacheGlobalState() {
 		t.Error("Expected GetGlobalState to return the same globalInstance")
 	}
 }
@@ -43,7 +43,7 @@ func TestCachingBehavior(t *testing.T) {
 	testHivePath := testdata.GetTestHivePathOrFatal(t)
 
 	// Don't use the global instance for this test
-	instance := &GlobalState{Config: &Config{HivePath: testHivePath, ExpirationDuration: defaultExpirationDuration}}
+	instance := &AmcacheGlobalState{Config: &Config{HivePath: testHivePath, ExpirationDuration: defaultExpirationDuration}}
 
 	// Validate that lastUpdated is zero initially
 	if !instance.LastUpdated.IsZero() {

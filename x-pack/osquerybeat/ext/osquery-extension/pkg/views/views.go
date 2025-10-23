@@ -2,18 +2,28 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package main
+package views
 
 import (
 	"fmt"
 	"log"
 	"time"
+
 	"github.com/osquery/osquery-go"
 )
 
 type View struct {
 	requiredTables  []string
 	createViewQuery string
+	created         bool
+}
+
+func NewView(requiredTables []string, createViewQuery string) *View {
+	return &View{
+		requiredTables:  requiredTables,
+		createViewQuery: createViewQuery,
+		created:         false,
+	}
 }
 
 // AreTablesReady checks if all required tables are ready in osquery
@@ -31,7 +41,7 @@ func AreTablesReady(client *osquery.ExtensionManagerClient, tableNames []string)
 	return true
 }
 
-func (v *View) CreateView(socket *string) error {
+func CreateViews(socket *string, views []*View) error {
 	client, err := osquery.NewClient(*socket, 2*time.Second)
 	if err != nil {
 		return fmt.Errorf("error creating osquery client: %w", err)
@@ -41,25 +51,32 @@ func (v *View) CreateView(socket *string) error {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
 
+	// Track which views still need to be created
+	pendingViews := make(map[int]bool)
+	for i := range views {
+		pendingViews[i] = true
+	}
+
 	for range ticker.C {
-		// Only try to create the view for 30 seconds
+		// Only try to create views for 30 seconds
 		if time.Since(startTime) > 30*time.Second {
 			return fmt.Errorf("timeout waiting for required tables to be ready")
 		}
 
-		// Check if all required tables are ready
-		if (!AreTablesReady(client, v.requiredTables)) {
-			continue
+		// Try to create each pending view
+		for _, view := range views {
+			if !view.created && AreTablesReady(client, view.requiredTables) {
+				_, err := client.Query(view.createViewQuery)
+				if err != nil {
+					log.Printf("Error creating view %s: %s\n", view.createViewQuery, err)
+					continue
+				}
+				view.created = true
+			}
 		}
 
-		// Create the view
-		_, err := client.Query(v.createViewQuery)
-		if err != nil {
-			log.Printf("Error creating view %s: %s\n", v.createViewQuery, err)
-			continue
-		} else {
-			// Successfully created the view
-			log.Printf("Successfully created view with query: %s\n", v.createViewQuery)
+		// Exit if all views are created
+		if len(pendingViews) == 0 {
 			break
 		}
 	}
