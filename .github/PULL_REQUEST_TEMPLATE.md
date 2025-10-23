@@ -41,8 +41,13 @@ List here all the items you have verified BEFORE sending this PR. Please DO NOT 
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have made corresponding changes to the documentation
 - [ ] I have made corresponding change to the default configuration files
+<<<<<<< HEAD
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] I have added an entry in `CHANGELOG.next.asciidoc` or `CHANGELOG-developer.next.asciidoc`.
+=======
+- [ ] I have added tests that prove my fix is effective or that my feature works. Where relevant, I have used the [`stresstest.sh`](https://github.com/elastic/beats/blob/main/script/stresstest.sh) script to run them under stress conditions and race detector to verify their stability.
+- [ ] I have added an entry in `./changelog/fragments` using the [changelog tool](https://github.com/elastic/elastic-agent-changelog-tool/blob/main/docs/usage.md).
+>>>>>>> 5316421d9 (chore(github): mention stresstest script in pull request template (#47279))
 
 ## Disruptive User Impact
 
