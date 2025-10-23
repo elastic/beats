@@ -117,6 +117,8 @@ func (gs *AmcacheGlobalState) Update() {
 // ids are optional entry IDs to filter the results. If no IDs are provided, all entries for the keyPath are returned.
 // each amcache key has a field that can be used as an ID to filter on, for example ProgramId for Application entries.
 func (gs *AmcacheGlobalState) GetCachedEntries(tableType tables.TableType, ids ...string) []tables.Entry {
+	gs.UpdateIfNeeded()
+
 	gs.Lock.Lock()
 	defer gs.Lock.Unlock()
 

@@ -8,6 +8,8 @@ package tables
 
 import (
 	"context"
+	"log"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/osquery/osquery-go/plugin/table"
 )
@@ -95,7 +97,6 @@ func (at *ApplicationTable) GenerateFunc(state GlobalStateInterface) table.Gener
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
 		programIds := GetConstraintsFromQueryContext(at.FilterColumn(), queryContext)
 		entries := state.GetCachedEntries(at.Type(), programIds...)
-
 		rows := make([]map[string]string, 0, len(entries))
 		for _, entry := range entries {
 			mapped, err := entry.ToMap()
