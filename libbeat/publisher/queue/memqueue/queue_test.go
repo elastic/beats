@@ -18,6 +18,7 @@
 package memqueue
 
 import (
+	"context"
 	"encoding/binary"
 	"flag"
 	"fmt"
@@ -403,4 +404,41 @@ func TestProducerShutdown(t *testing.T) {
 	testQueue.wg.Wait()
 
 	require.Equal(t, publishedCount.Load(), ackedCount.Load(), "published and acknowledged event counts should match")
+}
+
+func BenchmarkProducerThroughput(b *testing.B) {
+	const queueSize = 10000
+	const publishWorkers = 10
+	testQueue := NewQueue(
+		logp.NewNopLogger(),
+		nil,
+		Settings{
+			Events:        queueSize,
+			MaxGetRequest: queueSize,
+			FlushTimeout:  time.Second},
+		0,
+		nil)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	publishWorker := func() {
+		producer := testQueue.Producer(queue.ProducerConfig{})
+		for ctx.Err() == nil {
+			producer.Publish(0)
+		}
+	}
+	for range publishWorkers {
+		go publishWorker()
+	}
+	for b.Loop() {
+		// With a flush timeout of a second, we can confidently expect we'll get
+		// a full batch each time, so each iteration is measuring the time for the
+		// publish workers to fill the queue.
+		batch, err := testQueue.Get(queueSize)
+		if err != nil {
+			b.Fatal("Fetching queue batch should succeed")
+		}
+		batch.Done()
+	}
+	cancel()
+	testQueue.Close(true)
 }
