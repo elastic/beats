@@ -19,6 +19,7 @@ package oteltest
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -54,11 +55,7 @@ service:
 	col := NewCollector(t, cfg)
 	require.NotNil(t, col)
 
-	// TODO: use file exporter or assert debug exporter logs
-	// require.Eventually(t, func() bool {
-	// 	data, err := os.ReadFile(outfile)
-	// 	assert.NoError(t, err)
-	// 	t.Log(string(data))
-	// 	return strings.Contains(string(data), "test message")
-	// }, 30*time.Second, 100*time.Millisecond)
+	require.Eventually(t, func() bool {
+		return col.ObservedLogs().FilterMessageSnippet(`"message": "test message`).Len() == 1
+	}, 30*time.Second, 100*time.Millisecond, "Expected debug log with test message not found")
 }

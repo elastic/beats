@@ -29,7 +29,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter"
 	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/stretchr/testify/assert"
@@ -42,6 +47,8 @@ import (
 
 type Collector struct {
 	collector *otelcol.Collector
+	logger    *logp.Logger
+	observer  *observer.ObservedLogs
 }
 
 func getComponent() (otelcol.Factories, error) {
@@ -85,10 +92,15 @@ func getComponent() (otelcol.Factories, error) {
 
 }
 
-func newCollectorSettings(filename string) otelcol.CollectorSettings {
+func newCollectorSettings(filename string, logger *logp.Logger) otelcol.CollectorSettings {
 	return otelcol.CollectorSettings{
 		// BuildInfo: info,
 		Factories: getComponent,
+		LoggingOptions: []zap.Option{
+			zap.WrapCore(func(c zapcore.Core) zapcore.Core {
+				return logger.Core()
+			}),
+		},
 		ConfigProviderSettings: otelcol.ConfigProviderSettings{
 			ResolverSettings: confmap.ResolverSettings{
 				URIs: []string{filename},
@@ -117,7 +129,8 @@ func NewCollector(tb testing.TB, configYAML string) *Collector {
 		tb.Fatalf("failed to create collector: %v", err)
 	}
 
-	settings := newCollectorSettings("file:" + configFile)
+	logger, observer := logptest.NewTestingLoggerWithObserver(tb, "")
+	settings := newCollectorSettings("file:"+configFile, logger)
 	col, err := otelcol.NewCollector(settings)
 	require.NoError(tb, err)
 
@@ -139,5 +152,9 @@ func NewCollector(tb testing.TB, configYAML string) *Collector {
 		return col.GetState() == otelcol.StateRunning
 	}, 10*time.Second, 10*time.Millisecond, "Collector did not start in time")
 
-	return &Collector{collector: col}
+	return &Collector{collector: col, logger: logger, observer: observer}
+}
+
+func (c *Collector) ObservedLogs() *observer.ObservedLogs {
+	return c.observer
 }
