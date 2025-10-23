@@ -106,9 +106,8 @@ func TestNewReceiver(t *testing.T) {
 					FilterMessageSnippet("add_host_metadata").
 					FilterMessageSnippet("add_cloud_metadata").
 					FilterMessageSnippet("add_docker_metadata").
-					FilterMessageSnippet("add_kubernetes_metadata").
-					Len() == 1
-				assert.True(c, processorsLoaded, "processors not loaded")
+					FilterMessageSnippet("add_kubernetes_metadata")
+				assert.Len(t, processorsLoaded.All(), 1, "processors not loaded")
 				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
 				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
@@ -117,6 +116,14 @@ func TestNewReceiver(t *testing.T) {
 }
 
 func BenchmarkFactory(b *testing.B) {
+	for _, level := range []zapcore.Level{zapcore.InfoLevel, zapcore.DebugLevel} {
+		b.Run(level.String(), func(b *testing.B) {
+			benchmarkFactoryWithLogLevel(b, level)
+		})
+	}
+}
+
+func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
@@ -135,7 +142,7 @@ func BenchmarkFactory(b *testing.B) {
 				"otelconsumer": map[string]any{},
 			},
 			"logging": map[string]any{
-				"level": "info",
+				"level": level.String(),
 				"selectors": []string{
 					"*",
 				},
@@ -148,7 +155,7 @@ func BenchmarkFactory(b *testing.B) {
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		zapcore.Lock(zapcore.AddSync(&zapLogs)),
-		zapcore.InfoLevel)
+		level)
 
 	factory := NewFactory()
 
@@ -530,13 +537,13 @@ func TestConsumeContract(t *testing.T) {
 
 	gen := newLogGenerator(t, tmpDir)
 
-	os.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
+	t.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
 
 	cfg := &Config{
-		Beatconfig: map[string]interface{}{
+		Beatconfig: map[string]any{
 			"queue.mem.flush.timeout": "0s",
-			"filebeat": map[string]interface{}{
-				"inputs": []map[string]interface{}{
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
 					{
 						"type":    "filestream",
 						"id":      "filestream-test",
@@ -544,16 +551,16 @@ func TestConsumeContract(t *testing.T) {
 						"paths": []string{
 							filepath.Join(tmpDir, "input-*.log"),
 						},
-						"file_identity.native": map[string]interface{}{},
-						"prospector": map[string]interface{}{
-							"scanner": map[string]interface{}{
+						"file_identity.native": map[string]any{},
+						"prospector": map[string]any{
+							"scanner": map[string]any{
 								"fingerprint.enabled": false,
 								"check_interval":      "0.1s",
 							},
 						},
-						"parsers": []map[string]interface{}{
+						"parsers": []map[string]any{
 							{
-								"ndjson": map[string]interface{}{
+								"ndjson": map[string]any{
 									"document_id": "id",
 								},
 							},
@@ -561,10 +568,10 @@ func TestConsumeContract(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]interface{}{
-				"otelconsumer": map[string]interface{}{},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
 			},
-			"logging": map[string]interface{}{
+			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
 					"*",
