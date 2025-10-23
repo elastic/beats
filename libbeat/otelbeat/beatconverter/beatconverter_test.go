@@ -659,6 +659,9 @@ exporters:
       queue_size: 3200
       wait_for_result: true
 service:
+  telemetry:
+    metrics:
+      level: none
   extensions:
     - beatsauth
   pipelines:
