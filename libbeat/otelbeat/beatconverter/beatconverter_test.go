@@ -35,6 +35,7 @@ extensions:
     proxy_disable: false
     proxy_url: https://tikugfk.example
     timeout: 1m30s
+  pprof: 
 exporters:
   elasticsearch:
     endpoints:
@@ -117,6 +118,7 @@ receivers:
 service:
   extensions:
     - beatsauth
+    - pprof
   pipelines:
     logs:
       exporters:
@@ -190,6 +192,7 @@ service:
 `
 		var expectedOutput = `
 extensions:
+  pprof:
   beatsauth:
     idle_connection_timeout: 3s
     proxy_disable: false
@@ -243,6 +246,7 @@ receivers:
 service:
   extensions:
     - beatsauth
+    - pprof
   pipelines:
     logs:
       exporters:
@@ -299,6 +303,7 @@ receivers:
 service:
   extensions:
     - beatsauth
+    - pprof
   pipelines:
     logs:
       exporters:
@@ -371,6 +376,8 @@ receivers:
   filebeatreceiver:
     output:
       otelconsumer: null
+extensions:
+  pprof:
 service:
   pipelines:
     logs:
@@ -378,6 +385,8 @@ service:
         - logstash
       receivers:
         - filebeatreceiver
+  extensions:
+    - pprof
 `
 		input := newFromYamlString(t, supportedInput)
 		err := c.Convert(context.Background(), input)
@@ -438,6 +447,8 @@ receivers:
           timeout: 10s
     output:
       otelconsumer: null
+extensions:
+  pprof:
 service:
   pipelines:
     logs:
@@ -445,6 +456,8 @@ service:
         - logstash
       receivers:
         - filebeatreceiver
+  extensions:
+    - pprof
 `
 		input := newFromYamlString(t, supportedInput)
 		err := c.Convert(context.Background(), input)
@@ -474,13 +487,18 @@ receivers:
   filebeatreceiver:
     output:
       otelconsumer: null
+extensions:
+  pprof:
 service:
   pipelines:
     logs:
       receivers:
         - filebeatreceiver
+  extensions:
+    - pprof
 `
 		input := newFromYamlString(t, supportedInput)
+		fmt.Println(input.ToStringMap())
 		err := c.Convert(context.Background(), input)
 		require.NoError(t, err, "error converting beats logstash-output config")
 
@@ -643,6 +661,7 @@ exporters:
 service:
   extensions:
     - beatsauth
+    - pprof
   pipelines:
     logs:
       exporters:

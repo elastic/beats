@@ -189,6 +189,10 @@ func (c Converter) Convert(_ context.Context, conf *confmap.Conf) error {
 		if err != nil {
 			return err
 		}
+
+		if err := injectPprofExtension(conf); err != nil {
+			return fmt.Errorf("error injecting pprof extension: %w", err)
+		}
 	}
 
 	return nil
@@ -286,4 +290,20 @@ func getBeatsAuthExtensionConfig(cfg *config.C) (map[string]any, error) {
 	}
 
 	return newMap, nil
+}
+
+func injectPprofExtension(conf *confmap.Conf) error {
+	extensions, ok := conf.Get("service::extensions").([]any)
+	if !ok {
+		extensions = []any{}
+	}
+	extensions = append(extensions, "pprof")
+	out := map[string]any{
+		"service::extensions": extensions,
+		"extensions": map[string]any{
+			"pprof": nil,
+		},
+	}
+
+	return conf.Merge(confmap.NewFromStringMap(out))
 }
