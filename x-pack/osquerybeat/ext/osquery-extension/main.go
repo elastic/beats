@@ -42,11 +42,11 @@ import (
 )
 
 var (
-	socket   = flag.String("socket", "", "Path to the extensions UNIX domain socket")
-	timeout  = flag.Int("timeout", 3, "Seconds to wait for autoloaded extensions")
-	interval = flag.Int("interval", 3, "Seconds delay between connectivity checks")
+	socket       = flag.String("socket", "", "Path to the extensions UNIX domain socket")
+	timeout      = flag.Int("timeout", 3, "Seconds to wait for autoloaded extensions")
+	interval     = flag.Int("interval", 3, "Seconds delay between connectivity checks")
 	show_version = flag.Bool("show-version", false, "Show version")
-	_        = flag.Bool("verbose", false, "Verbose logging")
+	_            = flag.Bool("verbose", false, "Verbose logging")
 )
 
 func main() {
@@ -54,10 +54,9 @@ func main() {
 
 	version := "0.0.1"
 	if *show_version {
-		fmt.Println("osquery-extension version", version)
+		fmt.Fprintln(os.Stderr, "osquery-extension version", version)
 		os.Exit(0)
 	}
-
 
 	if *socket == "" {
 		log.Fatalln("Missing required --socket argument")

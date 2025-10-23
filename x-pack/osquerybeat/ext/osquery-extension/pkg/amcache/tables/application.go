@@ -8,7 +8,6 @@ package tables
 
 import (
 	"context"
-	"log"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/osquery/osquery-go/plugin/table"

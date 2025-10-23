@@ -20,4 +20,5 @@ func RegisterTables(server *osquery.ExtensionManagerServer) {
 }
 
 func CreateViews(socket *string) {
+	// No views to create on Linux
 }
