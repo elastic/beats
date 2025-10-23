@@ -184,7 +184,7 @@ func (c Converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
 			}
 		}
-		// We're disabling the metrics telemetry for beat receivers for now the default agent also uses the same port.
+		// We're disabling the metrics telemetry for beat receivers for now because the default agent also uses the same port.
 		// If needed we can make this configurable later.
 		out["service::telemetry::metrics::level"] = "none"
 
