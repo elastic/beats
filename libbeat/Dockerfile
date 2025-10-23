@@ -1,4 +1,4 @@
-FROM golang:1.23.10
+FROM golang:1.24.9
 
 RUN \
     apt-get update \
@@ -8,15 +8,19 @@ RUN \
          python3 \
          python3-pip \
          python3-venv \
+         pyenv \
       && rm -rf /var/lib/apt/lists/*
 
 # Use a virtualenv to avoid the PEP668 "externally managed environment" error caused by conflicts
 # with the system Python installation. golang:1.19.10 uses Debian 12 which now enforces PEP668.
+RUN pyenv install 3.9.13
+RUN pyenv local 3.9.13
+
 ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv $VIRTUAL_ENV
+RUN pyenv exec python -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN pip3 install --upgrade pip==20.1.1
+RUN pip3 install --upgrade pip==25.1.1
 
 # Libbeat specific
 RUN mkdir -p /etc/pki/tls/certs

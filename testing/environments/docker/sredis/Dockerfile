@@ -1,5 +1,6 @@
 FROM alpine:edge
 
+RUN apk upgrade --no-cache
 RUN apk add --no-cache stunnel
 
 COPY stunnel.conf /etc/stunnel/stunnel.conf

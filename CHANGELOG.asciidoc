@@ -3,6 +3,32 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.29]]
+=== Beats version 7.17.29
+https://github.com/elastic/beats/compare/v7.17.28\...v7.17.29[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly. {pull}42966
+
+*Metricbeat*
+
+- Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
+- Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update to Go 1.23.10. {pull}44901[44901]
+
+*Metricbeat*
+
+- Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
+
+
 [[release-notes-7.17.28]]
 === Beats version 7.17.28
 https://github.com/elastic/beats/compare/v7.17.27\...v7.17.28[View commits]
