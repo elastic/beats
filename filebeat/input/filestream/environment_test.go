@@ -552,7 +552,7 @@ func (e *inputTestingEnvironment) logContains(s string) {
 
 func (e *inputTestingEnvironment) WaitLogsContains(s string, timeout time.Duration, msgAndArgs ...any) {
 	e.t.Helper()
-	e.testLogger.WaitLogsContains(s, timeout, msgAndArgs...)
+	e.testLogger.WaitLogsContains(e.t, s, timeout, msgAndArgs...)
 }
 
 var _ statestore.States = (*testInputStore)(nil)

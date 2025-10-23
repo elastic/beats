@@ -527,4 +527,4 @@ replace (
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20250616163611-a325b49669a4
 )
 
-replace github.com/elastic/elastic-agent-libs v0.24.1 => github.com/belimawr/elastic-agent-libs v0.2.9-0.20251022192408-3bd26ab3841c
+replace github.com/elastic/elastic-agent-libs v0.24.1 => github.com/belimawr/elastic-agent-libs v0.2.9-0.20251023193939-5cb60ba77b20
