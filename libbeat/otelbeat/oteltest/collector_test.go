@@ -56,6 +56,6 @@ service:
 	require.NotNil(t, col)
 
 	require.Eventually(t, func() bool {
-		return col.ObservedLogs().FilterMessageSnippet(`"message": "test message`).Len() == 1
+		return col.ObservedLogs().FilterMessageSnippet(`"message": "test message"`).Len() == 1
 	}, 30*time.Second, 100*time.Millisecond, "Expected debug log with test message not found")
 }

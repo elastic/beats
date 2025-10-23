@@ -25,6 +25,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter"
@@ -39,6 +40,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
 	"go.opentelemetry.io/collector/confmap/provider/fileprovider"
 	"go.opentelemetry.io/collector/exporter/debugexporter"
@@ -94,7 +96,11 @@ func getComponent() (otelcol.Factories, error) {
 
 func newCollectorSettings(filename string, logger *logp.Logger) otelcol.CollectorSettings {
 	return otelcol.CollectorSettings{
-		// BuildInfo: info,
+		BuildInfo: component.BuildInfo{
+			Command:     "otel",
+			Description: "Test OTel Collector",
+			Version:     version.GetDefaultVersion(),
+		},
 		Factories: getComponent,
 		LoggingOptions: []zap.Option{
 			zap.WrapCore(func(c zapcore.Core) zapcore.Core {
@@ -106,12 +112,7 @@ func newCollectorSettings(filename string, logger *logp.Logger) otelcol.Collecto
 				URIs: []string{filename},
 				ProviderFactories: []confmap.ProviderFactory{
 					fileprovider.NewFactory(),
-					// fbprovider.NewFactory(),
-					// mbprovider.NewFactory(),
 				},
-				// ConverterFactories: []confmap.ConverterFactory{
-				// 	beatconverter.NewFactory(),
-				// },
 			},
 		},
 	}

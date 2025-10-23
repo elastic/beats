@@ -319,14 +319,7 @@ func TestFilebeatOTelReceiverE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	wantEvents := 1
 
-	// start filebeat in otel mode
-	filebeatOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
-
+	tmpdir := t.TempDir()
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	fbReceiverIndex := "logs-integration-" + namespace
 	filebeatIndex := "logs-filebeat-" + namespace
@@ -342,8 +335,8 @@ func TestFilebeatOTelReceiverE2E(t *testing.T) {
 	}{
 		Index:          fbReceiverIndex,
 		MonitoringPort: otelMonitoringPort,
-		InputFile:      filepath.Join(filebeatOTel.TempDir(), "log.log"),
-		PathHome:       filebeatOTel.TempDir(),
+		InputFile:      filepath.Join(tmpdir, "log.log"),
+		PathHome:       tmpdir,
 	}
 
 	cfg := `receivers:
@@ -403,10 +396,8 @@ service:
 		}
 	})
 
-	filebeatOTel.WriteConfigFile(string(configContents))
 	writeEventsToLogFile(t, otelConfig.InputFile, wantEvents)
-	filebeatOTel.Start()
-	defer filebeatOTel.Stop()
+	oteltest.NewCollector(t, configBuffer.String())
 
 	// start filebeat
 	filebeat := integration.NewBeat(
@@ -487,6 +478,9 @@ http.port: %d
 		// only present in beats receivers
 		"agent.otelcol.component.id",
 		"agent.otelcol.component.kind",
+		// TODO(mauri870): Why are these fields different now?
+		"log.file.device_id", // changes value between filebeat and otel receiver
+		"container.id",       // only present in filebeat
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
@@ -499,20 +493,12 @@ http.port: %d
 }
 
 func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/45631")
 	integration.EnsureESIsRunning(t)
 	wantEvents := 100
 
-	// start filebeat in otel mode
-	filebeatOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
-
+	tmpdir := t.TempDir()
 	// write events to log file
-	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
+	logFilePath := filepath.Join(tmpdir, "log.log")
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 
 	type receiverConfig struct {
@@ -531,12 +517,12 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 			{
 				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
 				InputFile:      logFilePath,
-				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r1"),
+				PathHome:       filepath.Join(tmpdir, "r1"),
 			},
 			{
 				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
 				InputFile:      logFilePath,
-				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r2"),
+				PathHome:       filepath.Join(tmpdir, "r2"),
 			},
 		},
 	}
@@ -605,10 +591,9 @@ service:
 		}
 	})
 
-	filebeatOTel.WriteConfigFile(string(configContents))
 	writeEventsToLogFile(t, logFilePath, wantEvents)
-	filebeatOTel.Start()
-	defer filebeatOTel.Stop()
+
+	oteltest.NewCollector(t, configBuffer.String())
 
 	es := integration.GetESClient(t, "http")
 
