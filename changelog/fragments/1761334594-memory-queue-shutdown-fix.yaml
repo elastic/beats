@@ -8,7 +8,7 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: feature
+kind: bug-fix
 
 # Change summary; a 80ish characters long description of the change.
 summary: Fix potential Filebeat panic during memory queue shutdown
