@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"time"
 )
 
 type EncodingFlag int
@@ -144,6 +145,17 @@ func convertValueToString(fieldValue reflect.Value, flag EncodingFlag) (string, 
 			return "", nil
 		}
 		return strconv.FormatFloat(val, 'f', -1, 64), nil
+
+	case reflect.Struct:
+		switch fieldValue.Type() {
+		case reflect.TypeOf(time.Time{}):
+			val := fieldValue.Interface().(time.Time).Unix()
+			if !flag.has(EncodingFlagUseNumbersZeroValues) && val == 0 {
+				return "", nil
+			}
+			return strconv.FormatInt(val, 10), nil
+		}
+		return "", fmt.Errorf("unsupported struct type: %s", fieldValue.Type())
 
 	// Default: use Sprintf for unsupported types
 	default:
