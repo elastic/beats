@@ -18,10 +18,18 @@
 package memqueue
 
 import (
+<<<<<<< HEAD
 	"flag"
 	"fmt"
 	"math"
 	"math/rand"
+=======
+	"context"
+	"encoding/binary"
+	"flag"
+	"fmt"
+	"math/rand/v2"
+>>>>>>> 94eaea921 ([libbeat] Fix a shutdown race in the memory queue (#47248))
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -237,32 +245,6 @@ func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.Queu
 	}
 }
 
-func TestAdjustInputQueueSize(t *testing.T) {
-	t.Run("zero yields default value (main queue size=0)", func(t *testing.T) {
-		assert.Equal(t, minInputQueueSize, AdjustInputQueueSize(0, 0))
-	})
-	t.Run("zero yields default value (main queue size=10)", func(t *testing.T) {
-		assert.Equal(t, minInputQueueSize, AdjustInputQueueSize(0, 10))
-	})
-	t.Run("can't go below min", func(t *testing.T) {
-		assert.Equal(t, minInputQueueSize, AdjustInputQueueSize(1, 0))
-	})
-	t.Run("can set any value within bounds", func(t *testing.T) {
-		for q, mainQueue := minInputQueueSize+1, 4096; q < int(float64(mainQueue)*maxInputQueueSizeRatio); q += 10 {
-			assert.Equal(t, q, AdjustInputQueueSize(q, mainQueue))
-		}
-	})
-	t.Run("can set any value if no upper bound", func(t *testing.T) {
-		for q := minInputQueueSize + 1; q < math.MaxInt32; q *= 2 {
-			assert.Equal(t, q, AdjustInputQueueSize(q, 0))
-		}
-	})
-	t.Run("can't go above upper bound", func(t *testing.T) {
-		mainQueue := 4096
-		assert.Equal(t, int(float64(mainQueue)*maxInputQueueSizeRatio), AdjustInputQueueSize(mainQueue, mainQueue))
-	})
-}
-
 func TestBatchFreeEntries(t *testing.T) {
 	const queueSize = 10
 	const batchSize = 5
@@ -299,4 +281,131 @@ func TestBatchFreeEntries(t *testing.T) {
 	for i := 0; i < queueSize; i++ {
 		require.Nilf(t, testQueue.buf[i].event, "Queue index %v: all events should be nil after calling FreeEntries on both batches")
 	}
+}
+
+func TestProducerShutdown(t *testing.T) {
+	// Test that the number of acknowledgment callbacks exactly matches the
+	// number of published events when many goroutines are publishing during
+	// queue shutdown.
+	//
+	// The numbers here (queue size, number of publisher workers, etc.) are
+	// kind of magic since there's no deterministic way to verify this, but they
+	// were chosen so that, when there _was_ a race in the queue shutdown that
+	// could send an extra acknowledgment
+	// (https://github.com/elastic/beats/issues/47246), this test failed about
+	// 90% of the time.
+	const queueSize = 1000
+	const publishWorkers = 50
+	var ackedCount atomic.Int64
+	var publishedCount atomic.Int64
+	testQueue := NewQueue(
+		logp.NewNopLogger(),
+		nil,
+		Settings{
+			Events:        queueSize,
+			MaxGetRequest: queueSize,
+			FlushTimeout:  time.Second},
+		0,
+		nil)
+
+	var wg sync.WaitGroup
+	// Start workers to continuously publish events to the queue
+	publishWorker := func() {
+		defer wg.Done()
+		// Continuously publish events until Publish returns false indicating queue
+		// shutdown.
+		producer := testQueue.Producer(
+			queue.ProducerConfig{
+				ACK: func(count int) { ackedCount.Add(int64(count)) },
+			})
+		for {
+			_, published := producer.Publish(0)
+			if published {
+				publishedCount.Add(1)
+			} else {
+				return
+			}
+		}
+	}
+	for range publishWorkers {
+		wg.Add(1)
+		go publishWorker()
+	}
+	// Start a reader to continuously drain the queue and acknowledge the events
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		// Continuously read and acknowledge events from the queue
+		for {
+			batch, err := testQueue.Get(queueSize)
+			if err == nil {
+				batch.Done()
+			} else {
+				return
+			}
+		}
+	}()
+
+	// Wait for the queue to go through at least one full rotation
+	require.Eventually(
+		t,
+		func() bool { return publishedCount.Load() > queueSize },
+		time.Second,
+		time.Millisecond,
+		"events are not flowing through the queue")
+
+	// Trigger queue shutdown
+	testQueue.Close(false)
+
+	// Wait for queue context to finish
+	select {
+	case <-testQueue.Done():
+	case <-time.After(5 * time.Second):
+		require.Fail(t, "queue never shut down")
+	}
+
+	// Wait for helper routines to finish
+	wg.Wait()
+
+	// Wait for the ack loop to finish processing callbacks
+	testQueue.wg.Wait()
+
+	require.Equal(t, publishedCount.Load(), ackedCount.Load(), "published and acknowledged event counts should match")
+}
+
+func BenchmarkProducerThroughput(b *testing.B) {
+	const queueSize = 10000
+	const publishWorkers = 10
+	testQueue := NewQueue(
+		logp.NewNopLogger(),
+		nil,
+		Settings{
+			Events:        queueSize,
+			MaxGetRequest: queueSize,
+			FlushTimeout:  time.Second},
+		0,
+		nil)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	publishWorker := func() {
+		producer := testQueue.Producer(queue.ProducerConfig{})
+		for ctx.Err() == nil {
+			producer.Publish(0)
+		}
+	}
+	for range publishWorkers {
+		go publishWorker()
+	}
+	for b.Loop() {
+		// With a flush timeout of a second, we can confidently expect we'll get
+		// a full batch each time, so each iteration is measuring the time for the
+		// publish workers to fill the queue.
+		batch, err := testQueue.Get(queueSize)
+		if err != nil {
+			b.Fatal("Fetching queue batch should succeed")
+		}
+		batch.Done()
+	}
+	cancel()
+	testQueue.Close(true)
 }
