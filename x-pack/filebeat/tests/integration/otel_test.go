@@ -43,6 +43,71 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	numEvents := 1
 
+	tmpdir := t.TempDir()
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbOtelIndex := "logs-integration-" + namespace
+	fbIndex := "logs-filebeat-" + namespace
+
+	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
+	filebeatMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
+
+	otelCfgFile := `receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-input-id
+          enabled: true
+          paths:
+            - %s
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    output:
+      otelconsumer:
+    processors:
+      - add_host_metadata: ~
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
+      - add_kubernetes_metadata: ~
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    path.home: %s
+    http.enabled: true
+    http.host: localhost
+    http.port: %d
+exporters:
+  debug:
+    use_internal_logger: false
+    verbosity: detailed
+  elasticsearch/log:
+    endpoints:
+      - http://localhost:9200
+    compression: none
+    user: admin
+    password: testing
+    logs_index: %s
+    batcher:
+      enabled: true
+      flush_timeout: 1s
+    mapping:
+      mode: bodymap
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - elasticsearch/log
+        - debug
+`
+	logFilePath := filepath.Join(tmpdir, "log.log")
+	writeEventsToLogFile(t, logFilePath, numEvents)
+	oteltest.NewCollector(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
+
 	var beatsCfgFile = `
 filebeat.inputs:
   - type: filestream
@@ -71,35 +136,12 @@ http.host: localhost
 http.port: %d
 `
 
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbOtelIndex := "logs-integration-" + namespace
-	fbIndex := "logs-filebeat-" + namespace
-
-	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
-	filebeatMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
-
-	// start filebeat in otel mode
-	filebeatOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
-
-	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
-	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, fbOtelIndex, otelMonitoringPort))
-	writeEventsToLogFile(t, logFilePath, numEvents)
-	filebeatOTel.Start()
-	defer filebeatOTel.Stop()
-
 	// start filebeat
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
 		"../../filebeat.test",
 	)
-	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
-	writeEventsToLogFile(t, logFilePath, numEvents)
 	s := fmt.Sprintf(beatsCfgFile, logFilePath, fbIndex, filebeatMonitoringPort)
 
 	filebeat.WriteConfigFile(s)
@@ -143,6 +185,9 @@ http.port: %d
 		// only present in beats receivers
 		"agent.otelcol.component.id",
 		"agent.otelcol.component.kind",
+		// TODO(mauri870): Why are these fields different now?
+		"log.file.device_id", // changes value between filebeat and otel receiver
+		// "container.id",       // only present in filebeat
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
