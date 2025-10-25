@@ -178,15 +178,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		}
 	}
 
-	if cfg.Auth.AWS.IsEnabled() {
-		tr, err := aws.InitializeSingerTransport(*cfg.Auth.AWS, log, client.Transport)
-		if err != nil {
-			log.Errorw("aws auth method: initialize of aws config failed for aws signer", "error", err)
-			return err
-		}
-		client.Transport = tr
-	}
-
 	wantDump := cfg.FailureDump.enabled() && cfg.FailureDump.Filename != ""
 	doCov := cfg.RecordCoverage && log.IsDebug()
 	httpOptions := lib.HTTPOptions{
@@ -825,6 +816,15 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 			Password:  cfg.Auth.Digest.Password,
 			NoReuse:   noReuse,
 		}
+	} else if cfg.Auth.AWS.IsEnabled() {
+		// this transport runs after the other ones (the other ones wrap this one); just to be on the safe side.
+		// If any of the other transports add any header, it must happen before the singing.
+		tr, err := aws.InitializeSignerTransport(*cfg.Auth.AWS, log, c.Transport)
+		if err != nil {
+			log.Errorw("initialize of aws config failed for aws signer", "error", err)
+			return nil, nil, err
+		}
+		c.Transport = tr
 	}
 
 	var trace *httplog.LoggingRoundTripper

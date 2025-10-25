@@ -302,14 +302,14 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 	case authCfg.AWS.IsEnabled():
 		client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
 		if err != nil {
-			log.Errorw("aws auth method: creation of initial http client failed", "error", err)
+			log.Errorw("creation of initial http client failed", "error", err)
 			return nil, err
 		}
 
-		log.Debugf("aws auth method: creating signer for region: %s and service: %s", authCfg.AWS.DefaultRegion, authCfg.AWS.ServiceName)
-		tr, err := aws.InitializeSingerTransport(*authCfg.AWS, log, client.Transport)
+		log.Debugf("creating signer for region: %s and service: %s", authCfg.AWS.DefaultRegion, authCfg.AWS.ServiceName)
+		tr, err := aws.InitializeSignerTransport(*authCfg.AWS, log, client.Transport)
 		if err != nil {
-			log.Errorw("aws auth method: initialize of aws config failed for aws signer", "error", err)
+			log.Errorw("initialize of aws config failed for aws signer", "error", err)
 			return nil, err
 		}
 		client.Transport = tr

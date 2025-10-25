@@ -22,19 +22,29 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// SignerInputConfig is the top-level configuration for the input aws auth method,
+// used both in CEL and HTTP JSON inputs. It wraps the [ConfigAWS] inlined.
 type SignerInputConfig struct {
-	Enabled     *bool  `config:"enabled"`
-	ServiceName string `config:"service_name"` // optional
-	ConfigAWS   `config:",inline"`
+	// Enabled indicates whether this auth method is used.
+	// [SignerInputConfig.IsEnabled] implements the logic of the check.
+	Enabled *bool `config:"enabled"`
+
+	// ServiceName can be used to optionally set the AWS service name that AWS V4 signer will sign for.
+	// If not value is set here, the signer will try to infer the service from the url of the request.
+	ServiceName string `config:"service_name"`
+
+	// ConfigAWS is the inline wrapping of the rest of the [ConfigAWS] that can be use in the input config.
+	ConfigAWS `config:",inline"`
 }
 
-// IsEnabled returns true if the `enable` field is set to true in the yaml.
+// IsEnabled returns true if the `enable` field is set to true in the yaml or if it is nil.
 func (c *SignerInputConfig) IsEnabled() bool {
 	return c != nil && (c.Enabled == nil || *c.Enabled)
 }
 
 // SignerTransport implements [http.RoundTripper] interface
 // and sings requests with aws v4 signer before send them to the next roundtripper.
+// If the `serviceName` and `region` are not set, the signer will try to infer them from each request's URL.
 type SignerTransport struct {
 	next        http.RoundTripper
 	credentials aws.CredentialsProvider
@@ -45,16 +55,18 @@ type SignerTransport struct {
 	now         func() time.Time // we don't use [time.Now] directly, so we can mock time in tests.
 }
 
-func InitializeSingerTransport(cfg SignerInputConfig, logger *logp.Logger, nextTransport http.RoundTripper) (*SignerTransport, error) {
+// InitializeSignerTransport initializes first the AWS config using the [InitializeAWSConfig] and the [ConfigAWS] and then,
+// initializes the RoundTripper using the AWS credentials from the previously initialized AWS config.
+func InitializeSignerTransport(cfg SignerInputConfig, logger *logp.Logger, nextTransport http.RoundTripper) (*SignerTransport, error) {
 	awsConfig, err := InitializeAWSConfig(cfg.ConfigAWS, logger)
 	if err != nil {
 		return nil, err
 	}
 
-	return initializeSingerTransport(logger, cfg.ServiceName, cfg.DefaultRegion, awsConfig.Credentials, nextTransport), nil
+	return initializeSignerTransport(logger, cfg.ServiceName, cfg.DefaultRegion, awsConfig.Credentials, nextTransport), nil
 }
 
-func initializeSingerTransport(logger *logp.Logger, defaultServiceName string, defaultRegion string, credentials aws.CredentialsProvider, nextTransport http.RoundTripper) *SignerTransport {
+func initializeSignerTransport(logger *logp.Logger, defaultServiceName string, defaultRegion string, credentials aws.CredentialsProvider, nextTransport http.RoundTripper) *SignerTransport {
 	return &SignerTransport{
 		next:        nextTransport,
 		credentials: credentials,
@@ -79,7 +91,7 @@ func (st *SignerTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 	// resolve service name and region (if they are not configured)
 	serviceName, region, err := st.getServiceAndRegion(req)
 	if err != nil {
-		return nil, fmt.Errorf("error while getting service name and region: [%w]", err)
+		return nil, fmt.Errorf("error while getting service name and region: %w", err)
 	}
 
 	// retrieve credentials
@@ -144,7 +156,7 @@ func (st *SignerTransport) getBody(req *http.Request) (io.ReadCloser, error) {
 	// with *bytes.Buffer, *bytes.Reader or *strings.Reader as body, which gets GetBody initialized.
 	// httpjson: (x-pack/filebeat/input/httpjson/request.go newHTTPRequest)
 	// cel: mito repo (lib/http.go)
-	// We cover the edge case here by reading and coping the body manually.
+	// We cover the edge case here by reading and copying the body manually.
 	bodyBytes, err := io.ReadAll(req.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error while reading request body: [%w]", err)

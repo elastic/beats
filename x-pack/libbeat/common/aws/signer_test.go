@@ -125,7 +125,7 @@ func TestSignerTransportRoundTrip(t *testing.T) {
 				tc.initMockRoundTripper(&m)
 			}
 
-			st := initializeSingerTransport(logger, tc.defaultServiceName, tc.defaultRegion, tc.credentials, &m)
+			st := initializeSignerTransport(logger, tc.defaultServiceName, tc.defaultRegion, tc.credentials, &m)
 			st.now = tc.now
 
 			req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, tc.url, tc.requestBody)
