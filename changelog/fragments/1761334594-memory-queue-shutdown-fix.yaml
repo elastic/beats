@@ -1,4 +1,3 @@
-# REQUIRED
 # Kind can be one of:
 # - breaking-change: a change to previously-documented behavior
 # - deprecation: functionality that is being removed in a later release
@@ -11,35 +10,23 @@
 # - other: does not fit into any of the other categories
 kind: bug-fix
 
-# REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Prevent 3s startup delay when add_cloud_metadata is used with debug logs
+summary: Fix potential Filebeat panic during memory queue shutdown
 
-# REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# description:
+# NOTE: This field will be rendered only for breaking-change and known-issue kinds at the moment.
+#description:
 
-# REQUIRED for breaking-change, deprecation, known-issue
-# impact:
-
-# REQUIRED for breaking-change, deprecation, known-issue
-# action:
-
-# REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: all
+component: filebeat
 
-# AUTOMATED
-# OPTIONAL to manually add other PR URLs
-# PR URL: A link the PR that added the changeset.
+# PR URL; optional; the PR number that added the changeset.
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-# pr: https://github.com/owner/repo/1234
+#pr: https://github.com/owner/repo/1234
 
-# AUTOMATED
-# OPTIONAL to manually add other issue URLs
 # Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
 # If not present is automatically filled by the tooling with the issue linked to the PR number.
-# issue: https://github.com/owner/repo/1234
+#issue: https://github.com/owner/repo/1234
