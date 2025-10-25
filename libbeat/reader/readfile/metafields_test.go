@@ -66,6 +66,8 @@ func TestMetaFields(t *testing.T) {
 					"file": mapstr.M{
 						"path":        path,
 						"fingerprint": "hash",
+						"owner":      "root",
+						"group":     "root",
 					},
 					"offset": offset,
 				},
