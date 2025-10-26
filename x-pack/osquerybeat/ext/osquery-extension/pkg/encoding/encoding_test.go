@@ -27,6 +27,18 @@ func TestEncodingFlagHas(t *testing.T) {
 	}
 }
 
+func stringPtr(s string) *string {
+	return &s
+}
+
+func intPtr(i int) *int {
+	return &i
+}
+
+func timePtr(t time.Time) *time.Time {
+	return &t
+}
+
 func TestMarshalToMapWithFlags(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -36,7 +48,7 @@ func TestMarshalToMapWithFlags(t *testing.T) {
 		err      bool
 	}{
 		{
-			name:    "nil input",
+			name:     "nil input",
 			input:    nil,
 			flags:    0,
 			expected: nil,
@@ -52,7 +64,7 @@ func TestMarshalToMapWithFlags(t *testing.T) {
 			err:      false,
 		},
 		{
-			name: "map input",
+			name:     "map input",
 			input:    map[string]any{"key1": "value1", "key2": "value2", "key3": 1},
 			flags:    0,
 			expected: map[string]string{"key1": "value1", "key2": "value2", "key3": "1"},
@@ -108,7 +120,7 @@ func TestMarshalToMapWithFlags(t *testing.T) {
 			name: "bool type false",
 			input: &struct {
 				IsActive bool
-			}{IsActive: false},	
+			}{IsActive: false},
 			flags:    0,
 			expected: map[string]string{"IsActive": "0"},
 			err:      false,
@@ -214,36 +226,18 @@ func TestMarshalToMapWithFlags(t *testing.T) {
 			name: "time.Time type",
 			input: &struct {
 				Time time.Time `osquery:"time"`
-			}{Time: time.Unix(1719158400, 0)},
+			}{Time: time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)},
 			flags:    0,
-			expected: map[string]string{"time": "1719158400"},
+			expected: map[string]string{"time": "2023-06-15T14:30:00Z"},
 			err:      false,
 		},
 		{
-			name: "time.Time type with custom tag",
+			name: "time.Time",
 			input: &struct {
-				Time time.Time `osquery:"my_time"`
-			}{Time: time.Unix(1719158400, 0)},
+				Time time.Time `osquery:"time" format:"unix"`
+			}{Time: time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)},
 			flags:    0,
-			expected: map[string]string{"my_time": "1719158400"},
-			err:      false,
-		},
-		{
-			name: "time.Time type with zero value and flag",
-			input: &struct {
-				Time time.Time `osquery:"time"`
-			}{Time: time.Unix(0, 0)},
-			flags:    EncodingFlagUseNumbersZeroValues,
-			expected: map[string]string{"time": "0"},
-			err:      false,
-		},
-		{
-			name: "time.Time type with zero value and no flag",
-			input: &struct {
-				Time time.Time `osquery:"time"`
-			}{Time: time.Unix(0, 0)},
-			flags:    0,
-			expected: map[string]string{"time": ""},
+			expected: map[string]string{"time": "1686839400"},
 			err:      false,
 		},
 	}
@@ -261,11 +255,198 @@ func TestMarshalToMapWithFlags(t *testing.T) {
 	}
 }
 
-// Helper functions for creating pointers
-func stringPtr(s string) *string {
-	return &s
+func tagPtr(tag string) *reflect.StructTag {
+	st := reflect.StructTag(tag)
+	return &st
 }
 
-func intPtr(i int) *int {
-	return &i
+func Test_formatTimeWithTagFormat(t *testing.T) {
+	tests := []struct {
+		name string // description of this test case
+		// Named input parameters for target function.
+		fieldValue reflect.Value
+		flag       EncodingFlag
+		tag        *reflect.StructTag
+		want       string
+		wantErr    bool
+	}{
+		{
+			name:       "RFC3339 format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"rfc3339"`),
+			want:       "2023-06-15T14:30:00Z",
+			wantErr:    false,
+		},
+		{
+			name:       "RFC3339Nano format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 123456789, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"rfc3339nano"`),
+			want:       "2023-06-15T14:30:00.123456789Z",
+			wantErr:    false,
+		},
+		{
+			name:       "Unix timestamp format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"unix"`),
+			want:       "1686839400",
+			wantErr:    false,
+		},
+		{
+			name:       "RFC822 format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"rfc822"`),
+			want:       "15 Jun 23 14:30 UTC",
+			wantErr:    false,
+		},
+		{
+			name:       "RFC822Z format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"rfc822z"`),
+			want:       "15 Jun 23 14:30 +0000",
+			wantErr:    false,
+		},
+		{
+			name:       "RFC850 format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"rfc850"`),
+			want:       "Thursday, 15-Jun-23 14:30:00 UTC",
+			wantErr:    false,
+		},
+		{
+			name:       "RFC1123 format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"rfc1123"`),
+			want:       "Thu, 15 Jun 2023 14:30:00 UTC",
+			wantErr:    false,
+		},
+		{
+			name:       "RFC1123Z format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"rfc1123z"`),
+			want:       "Thu, 15 Jun 2023 14:30:00 +0000",
+			wantErr:    false,
+		},
+		{
+			name:       "Kitchen format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"kitchen"`),
+			want:       "Jun 15 14:30:00",
+			wantErr:    false,
+		},
+		{
+			name:       "StampMilli format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 123000000, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"stampmilli"`),
+			want:       "Jun 15 14:30:00.123",
+			wantErr:    false,
+		},
+		{
+			name:       "StampMicro format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 123456000, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"stampmicro"`),
+			want:       "Jun 15 14:30:00.123456",
+			wantErr:    false,
+		},
+		{
+			name:       "StampNano format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 123456789, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"stampnano"`),
+			want:       "Jun 15 14:30:00.123456789",
+			wantErr:    false,
+		},
+		{
+			name:       "Invalid format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"invalid"`),
+			want:       "",
+			wantErr:    true,
+		},
+		{
+			name:       "With timezone",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"rfc3339" tz:"America/New_York"`),
+			want:       "2023-06-15T10:30:00-04:00",
+			wantErr:    false,
+		},
+		{
+			name:       "Invalid timezone",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"rfc3339" tz:"Invalid/Timezone"`),
+			want:       "",
+			wantErr:    true,
+		},
+		{
+			name:       "Zero time with default flags",
+			fieldValue: reflect.ValueOf(time.Time{}),
+			flag:       0,
+			tag:        tagPtr(`format:"rfc3339"`),
+			want:       "",
+			wantErr:    false,
+		},
+		{
+			name:       "Zero time with UseNumbersZeroValues flag",
+			fieldValue: reflect.ValueOf(time.Time{}),
+			flag:       EncodingFlagUseNumbersZeroValues,
+			tag:        tagPtr(`format:"rfc3339"`),
+			want:       "0001-01-01T00:00:00Z",
+			wantErr:    false,
+		},
+		{
+			name:       "With timezone Asia/Tokyo",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"rfc3339" tz:"Asia/Tokyo"`),
+			want:       "2023-06-15T23:30:00+09:00",
+			wantErr:    false,
+		},
+		{
+			name:       "With timezone Europe/London",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"rfc3339" tz:"Europe/London"`),
+			want:       "2023-06-15T15:30:00+01:00",
+			wantErr:    false,
+		},
+		{
+			name:       "With timezone Australia/Sydney",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"rfc3339" tz:"Australia/Sydney"`),
+			want:       "2023-06-16T00:30:00+10:00",
+			wantErr:    false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, gotErr := formatTimeWithTagFormat(tt.fieldValue, tt.flag, tt.tag)
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("Name: %s, formatTimeWithTagFormat() failed: %v", tt.name, gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatalf("Name: %s, formatTimeWithTagFormat() succeeded unexpectedly", tt.name)
+			}
+			// TODO: update the condition below to compare got with tt.want.
+			if got != tt.want {
+				t.Errorf("Name: %s, formatTimeWithTagFormat() = %v, want %v", tt.name, got, tt.want)
+			}
+		})
+	}
 }
