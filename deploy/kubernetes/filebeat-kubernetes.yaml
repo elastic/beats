@@ -112,23 +112,52 @@ metadata:
 data:
   filebeat.yml: |-
     filebeat.inputs:
-    - type: filestream
-      id: kubernetes-container-logs
-      paths:
-        - /var/log/containers/*.log
-      parsers:
-        - container: ~
-      prospector:
-        scanner:
-          fingerprint.enabled: true
-          symlinks: true
-      file_identity.fingerprint: ~
-      processors:
-        - add_kubernetes_metadata:
-            host: ${NODE_NAME}
-            matchers:
-            - logs_path:
-                logs_path: "/var/log/containers/"
+      - type: filestream
+        id: kubernetes-container-logs
+        paths:
+          - /var/log/containers/*.log
+        parsers:
+          - container: ~
+        prospector:
+          scanner:
+            fingerprint.enabled: true
+            symlinks: true
+        file_identity.fingerprint: ~
+        processors:
+          - add_kubernetes_metadata:
+              host: ${NODE_NAME}
+              matchers:
+                - logs_path:
+                    logs_path: "/var/log/containers/"
+          
+          ## To enable collection of rotated pod logs, replace the above `filebeat.inputs` configuration with this.
+          ## WARNING:
+          ##    - enabling rotated pod logs ingestion might cause data re-ingestion, refer to the docs for details: https://www.elastic.co/docs/reference/beats/filebeat/running-on-kubernetes#_kubernetes_deploy_manifests
+          ##    - container metadata isn't available when collecting logs from /var/log/pods/. Refer to add_kubernetes_metadata docs for details: https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_logs_path
+          #- type: filestream
+          #  id: kubernetes-container-logs
+          #  gzip_experimental: true # BETA: enable gzip decompression. Refer to the docs for details: https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-filestream#reading-gzip-files
+          #  parsers:
+          #    - container: ~
+          #  paths:
+          #    - /var/log/pods/*/*/*.log*
+          #  prospector:
+          #    scanner:
+          #      fingerprint.enabled: true
+          #      symlinks: true
+          #  file_identity.fingerprint: ~
+          #  processors:
+          #    - add_kubernetes_metadata:
+          #        host: ${NODE_NAME}
+          #        default_indexers.enabled: false
+          #        default_matchers.enabled: false
+          #        indexers:
+          #          - pod_uid:
+          #        matchers:
+          #          - logs_path:
+          #              logs_path: "/var/log/pods/"
+          #              resource_type: "pod"
+          #
 
     # To enable hints based autodiscover, remove `filebeat.inputs` configuration and uncomment this:
     # filebeat.autodiscover:
@@ -139,8 +168,11 @@ data:
     #      hints.default_config:
     #        type: filestream
     #        id: kubernetes-container-logs-${data.kubernetes.pod.name}-${data.kubernetes.container.id}
+    # #       gzip_experimental: true # BETA: enable gzip decompression. Refer to the docs for details: https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-filestream#reading-gzip-files
     #        paths:
     #        - /var/log/containers/*-${data.kubernetes.container.id}.log
+    # #       - /var/log/pods/${data.kubernetes.namespace}_${data.kubernetes.pod.name}_${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log.* # Uncomment to ingest rotated pod logs. It might cause data re-ingestion, refer to the docs for details: https://www.elastic.co/docs/reference/beats/filebeat/running-on-kubernetes#_kubernetes_deploy_manifests
+    # #       TODO(AndersonQ): update link to anchor to the new docs section.
     #        parsers:
     #        - container: ~
     #        prospector:

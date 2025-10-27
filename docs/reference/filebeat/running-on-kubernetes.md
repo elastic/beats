@@ -48,6 +48,78 @@ By default, Filebeat sends events to an existing Elasticsearch deployment, if pr
   value: changeme
 ```
 
+## Ingesting rotated log files
+
+Filebeat can also ship the rotated logs, including the GZIP-compressed logs. Refer
+to [filestream configuration](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files)
+for more details and to the official [Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
+
+Enable this by enabling decompression of GZIP files and adding the path to the
+rotated logs to the paths monitored by filebeat.
+
+### Which path to add
+
+Kubernetes stores logs on `/var/log/pods` and uses symlinks on `/var/log/containers`
+for active log files. For full details, refer to the official
+[Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
+
+By default, existing deployments monitor only active logs via `/var/log/containers`.
+To add rotated logs, you must change the path to: `/var/log/pods/*/*/*.log*`.
+
+::::{warning}
+Data Duplication: When you modify the path of an existing integration,
+the integration reads all existing files in that directory from the beginning.
+This action causes a one-time re-ingestion of the active log file and all 
+previously rotated logs, which results in duplicate data.
+
+After the initial scan, the integration tracks files normally and will only
+ingest new log data. Subsequent file rotations are handled correctly without
+further data duplication.
+::::
+
+To add the rotated logs on an existing deployment, modify the input to ingest
+from `/var/log/pods`. For new deployments, use `/var/log/pods` directly.
+
+```yaml
+    filebeat.inputs:
+       - type: filestream
+         id: kubernetes-container-logs
+         gzip_experimental: true # BETA: enable gzip decompression. Refer to the docs for details: https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-filestream#reading-gzip-files
+         parsers:
+            - container: ~
+         paths:
+            - /var/log/pods/*/*/*.log*
+         prospector:
+            scanner:
+               fingerprint.enabled: true
+               symlinks: true
+         file_identity.fingerprint: ~
+         processors:
+            - add_kubernetes_metadata: <1>
+                 host: ${NODE_NAME}
+                 default_indexers.enabled: false
+                 default_matchers.enabled: false
+                 indexers:
+                    - pod_uid:
+                 matchers:
+                    - logs_path:
+                         logs_path: "/var/log/pods/"
+                         resource_type: "pod"
+```
+
+1. `add_kubernetes_metadata` needs to be configured to match pod metadata based
+on the new path, `/var/log/pods/`. Pod metadata do not include container 
+metadata. refer to the [add_kubernetes_metadata](https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_logs_path)
+documentation for details.
+
+::::{warning}
+[add_kubernetes_metadata](https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_logs_path)
+adds *pod* metadata, which does not include
+container data (such as `kubernetes.container.name`). If you need container
+metadata, you must consider using autodiscover instead. Refer to the
+[autodiscover documentation](https://www.elastic.co/docs/reference/beats/filebeat/configuration-autodiscover#_kubernetes) for details.
+::::
+
 
 ### Running Filebeat on control plane nodes [_running_filebeat_on_control_plane_nodes]
 
@@ -263,4 +335,4 @@ For the example we're using:
 
 Refer to the official [Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
 
-Filebeat supports reading from rotating log files. However, some log rotation strategies can result in lost or duplicate events when using Filebeat to forward messages. For more information, refer to [Log rotation results in lost or duplicate events](/reference/filebeat/file-log-rotation.md).
+Filebeat supports reading from rotating log files, [including GZIP file](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files). However, some log rotation strategies can result in lost or duplicate events when using Filebeat to forward messages. For more information, refer to [Log rotation results in lost or duplicate events](/reference/filebeat/file-log-rotation.md).

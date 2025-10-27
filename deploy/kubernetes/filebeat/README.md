@@ -7,12 +7,19 @@
 By deploying filebeat as a [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/)
 we ensure we get a running filebeat daemon on each node of the cluster.
 
-Docker logs host folder (`/var/lib/docker/containers`) is mounted on the
-filebeat container. Filebeat will start an input for these files and start
-harvesting them as they appear.
+Kubernetes stores logs on `/var/log/pods` and uses symlinks on `/var/log/containers`
+for active log files. Refer to the official [Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation)
+for more details.
+
+When the directory is mounted on the filebeat container. Filebeat will start an 
+input for these files and start harvesting them as they appear.
 
 Everything is deployed under `kube-system` namespace, you can change that by
 updating YAML manifests under this folder.
+
+Filebeat can also ship rotated logs, including the GZIP-compressed. Refer
+to [Run Filebeat on Kubernetes](https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-filestream#reading-gzip-files)
+for instructions on how to enable this.
 
 ### Settings
 
