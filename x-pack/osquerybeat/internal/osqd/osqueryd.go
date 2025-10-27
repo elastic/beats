@@ -466,6 +466,7 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 	// osquery default is 0 (INFO/DEBUG) but we control that with the verbose flag already
 	if logMinStatus > 0 {
 		flags["logger_min_status"] = logMinStatus
+		flags["disable_logging"] = false
 	}
 
 	if q.isVerbose() {
