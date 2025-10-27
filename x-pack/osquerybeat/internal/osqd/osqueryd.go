@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"go.uber.org/zap/zapcore"
 )
 
 const (
@@ -450,6 +451,20 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 	if q.configRefreshInterval > 0 {
 		flags["config_refresh"] = q.configRefreshInterval
 	}
+
+	// Set the appropriate logger_min_status flag based on osquerybeat log level
+	// Map logp levels to osquery logger_min_status values: 0=INFO, 1=WARNING, 2=ERROR
+	var logMinStatus int
+	level := zapcore.LevelOf(q.log.Core())
+	switch {
+	case level <= zapcore.InfoLevel:
+		logMinStatus = 0 // INFO/DEBUG
+	case level == zapcore.WarnLevel:
+		logMinStatus = 1 // WARNING
+	case level >= zapcore.ErrorLevel:
+		logMinStatus = 2 // ERROR+
+	}
+	flags["logger_min_status"] = logMinStatus
 
 	if q.isVerbose() {
 		flags["verbose"] = true
