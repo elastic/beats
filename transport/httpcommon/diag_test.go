@@ -34,8 +34,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 var ser int64 = 1

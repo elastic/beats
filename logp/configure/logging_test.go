@@ -20,9 +20,10 @@ package configure
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/stretchr/testify/require"
 )
 
 func TestLoggerOutputEnvironment(t *testing.T) {

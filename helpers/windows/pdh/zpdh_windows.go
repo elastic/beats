@@ -67,7 +67,7 @@ var (
 	procPdhExpandCounterPathW       = modpdh.NewProc("PdhExpandCounterPathW")
 	procPdhGetCounterInfoW          = modpdh.NewProc("PdhGetCounterInfoW")
 	procPdhEnumObjectItemsW         = modpdh.NewProc("PdhEnumObjectItemsW")
-	procPdhGetRawCounter          	= modpdh.NewProc("PdhGetRawCounterValue")
+	procPdhGetRawCounter            = modpdh.NewProc("PdhGetRawCounterValue")
 	procPdhGetRawCounterArray       = modpdh.NewProc("PdhGetRawCounterArrayW")
 )
 
@@ -91,13 +91,12 @@ func __PdhGetRawCounter(query PdhCounterHandle, userData uintptr) (errcode error
 	return
 }
 
-
-func _PdhGetRawCounterArray(hCounter PdhCounterHandle, lpdwBufferSize, lpdwBufferCount *uint32, itemBuffer *byte)  (errcode error) {
+func _PdhGetRawCounterArray(hCounter PdhCounterHandle, lpdwBufferSize, lpdwBufferCount *uint32, itemBuffer *byte) (errcode error) {
 	r0, _, _ := syscall.SyscallN(
-		procPdhGetRawCounterArray.Addr(), 
-		uintptr(hCounter), 
-		uintptr(unsafe.Pointer(lpdwBufferSize)), 
-		uintptr(unsafe.Pointer(lpdwBufferCount)), 
+		procPdhGetRawCounterArray.Addr(),
+		uintptr(hCounter),
+		uintptr(unsafe.Pointer(lpdwBufferSize)),
+		uintptr(unsafe.Pointer(lpdwBufferCount)),
 		uintptr(unsafe.Pointer(itemBuffer)))
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)

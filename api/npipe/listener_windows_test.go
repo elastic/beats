@@ -24,9 +24,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 func TestHTTPOverNamedPipe(t *testing.T) {

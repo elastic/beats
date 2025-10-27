@@ -28,9 +28,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/dev-tools/mage/gotool"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+
+	"github.com/elastic/elastic-agent-libs/dev-tools/mage/gotool"
 )
 
 const (

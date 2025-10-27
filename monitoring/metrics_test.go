@@ -144,7 +144,7 @@ func TestSafeVars(t *testing.T) {
 			})
 			wg.Wait()
 		})
-		
+
 		t.Run("NewTimestamp", func(t *testing.T) {
 			reg := NewRegistry()
 			name := "foo"

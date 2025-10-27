@@ -31,7 +31,7 @@ import (
 
 const (
 	// GoImportsImportPath controls the import path used to install goimports.
-	GoImportsImportPath = "golang.org/x/tools/cmd/goimports"
+	GoImportsImportPath = "golang.org/x/tools/cmd/goimports@latest"
 
 	// GoImportsLocalPrefix is a string prefix matching imports that should be
 	// grouped after third-party packages.

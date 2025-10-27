@@ -20,11 +20,12 @@ package logptest
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
 	"go.uber.org/zap/zaptest/observer"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // NewTestingLogger returns a testing suitable logp.Logger.
