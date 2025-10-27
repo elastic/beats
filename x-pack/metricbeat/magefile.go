@@ -52,11 +52,6 @@ func Build() error {
 	return devtools.Build(args)
 }
 
-// BuildOTel builds the Beat binary with OTel sub command
-func BuildOTel() error {
-	return devtools.BuildOTel()
-}
-
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
@@ -123,7 +118,6 @@ func BuildSystemTestBinary() error {
 	args := []string{
 		"test", "-c",
 		"-o", binArgs.Name + ".test",
-		"-tags", "otelbeat",
 	}
 
 	// On Windows 7 32-bit we run out of memory if we enable coverage and DWARF
@@ -249,7 +243,7 @@ func GoIntegTest(ctx context.Context) error {
 
 	if !devtools.IsInIntegTestEnv() {
 		// build integration test binary with otel sub command
-		devtools.BuildSystemTestOTelBinary()
+		devtools.BuildSystemTestBinary()
 		args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 		// ES_USER must be admin in order for the Go Integration tests to function because they require
 		// indices:data/read/search

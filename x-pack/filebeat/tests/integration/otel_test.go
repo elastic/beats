@@ -1034,6 +1034,8 @@ service:
   telemetry:
     logs:
       level: DEBUG
+    metrics:
+      level: none
 `
 			var configBuffer bytes.Buffer
 			require.NoError(t,

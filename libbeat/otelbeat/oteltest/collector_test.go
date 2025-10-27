@@ -51,6 +51,8 @@ service:
   telemetry:
     logs:
       level: DEBUG
+    metrics:
+      level: none
 `
 	col := NewCollector(t, cfg)
 	require.NotNil(t, col)
