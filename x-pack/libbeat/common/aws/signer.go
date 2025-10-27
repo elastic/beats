@@ -97,13 +97,13 @@ func (st *SignerTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 	// retrieve credentials
 	creds, err := st.credentials.Retrieve(req.Context())
 	if err != nil {
-		return nil, fmt.Errorf("error while retrieving credentials: [%w]", err)
+		return nil, fmt.Errorf("error while retrieving credentials: %w", err)
 	}
 
 	// body hash
 	payloadHash, err := st.bodySHA256Hash(req)
 	if err != nil {
-		return nil, fmt.Errorf("error while calculating body hash: [%w]", err)
+		return nil, fmt.Errorf("error while calculating body hash: %w", err)
 	}
 
 	// sign the request
@@ -159,7 +159,7 @@ func (st *SignerTransport) getBody(req *http.Request) (io.ReadCloser, error) {
 	// We cover the edge case here by reading and copying the body manually.
 	bodyBytes, err := io.ReadAll(req.Body)
 	if err != nil {
-		return nil, fmt.Errorf("error while reading request body: [%w]", err)
+		return nil, fmt.Errorf("error while reading request body: %w", err)
 	}
 	if err := req.Body.Close(); err != nil {
 		st.logger.Warnf("error while closing copied body %s", err.Error())
