@@ -43,7 +43,7 @@ func (c *SignerInputConfig) IsEnabled() bool {
 }
 
 // SignerTransport implements [http.RoundTripper] interface
-// and sings requests with aws v4 signer before send them to the next roundtripper.
+// and signs requests with aws v4 signer before send them to the next roundtripper.
 // If the `serviceName` and `region` are not set, the signer will try to infer them from each request's URL.
 type SignerTransport struct {
 	next        http.RoundTripper
@@ -106,7 +106,7 @@ func (st *SignerTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 		return nil, fmt.Errorf("error while calculating body hash: [%w]", err)
 	}
 
-	// sing the request
+	// sign the request
 	err = st.signer.SignHTTP(req.Context(), creds, req, payloadHash, serviceName, region, st.now())
 	if err != nil {
 		return nil, fmt.Errorf("error while signing the request: %w", err)

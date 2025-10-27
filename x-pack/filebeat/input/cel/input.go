@@ -818,10 +818,10 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}
 	} else if cfg.Auth.AWS.IsEnabled() {
 		// this transport runs after the other ones (the other ones wrap this one); just to be on the safe side.
-		// If any of the other transports add any header, it must happen before the singing.
+		// If any of the other transports add any header, it must happen before the signing.
 		tr, err := aws.InitializeSignerTransport(*cfg.Auth.AWS, log, c.Transport)
 		if err != nil {
-			log.Errorw("initialize of aws config failed for aws signer", "error", err)
+			log.Errorw("failed to initialize aws config failed for signer", "error", err)
 			return nil, nil, err
 		}
 		c.Transport = tr

@@ -306,10 +306,10 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 			return nil, err
 		}
 
-		log.Debugf("creating signer for region: %s and service: %s", authCfg.AWS.DefaultRegion, authCfg.AWS.ServiceName)
+		log.Debugw("creating signer", "region", authCfg.AWS.DefaultRegion, "service", authCfg.AWS.ServiceName)
 		tr, err := aws.InitializeSignerTransport(*authCfg.AWS, log, client.Transport)
 		if err != nil {
-			log.Errorw("initialize of aws config failed for aws signer", "error", err)
+			log.Errorw("failed to initialize aws config failed for signer", "error", err)
 			return nil, err
 		}
 		client.Transport = tr
