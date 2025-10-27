@@ -53,6 +53,7 @@ type Collector struct {
 	observer  *observer.ObservedLogs
 }
 
+// New creates and starts a new OTel collector for testing.
 func New(tb testing.TB, configYAML string) *Collector {
 	tb.Helper()
 
@@ -65,6 +66,7 @@ func New(tb testing.TB, configYAML string) *Collector {
 		tb.Fatalf("failed to create collector: %v", err)
 	}
 
+	// TODO(mauri870): this logger is too verbose, change it so it does not log everything to stderr.
 	logger, observer := logptest.NewTestingLoggerWithObserver(tb, "")
 	settings := newCollectorSettings("file:"+configFile, logger)
 	col, err := otelcol.NewCollector(settings)

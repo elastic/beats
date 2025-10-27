@@ -200,7 +200,7 @@ http.port: %d
 	assertMonitoring(t, otelMonitoringPort)
 }
 
-func TestHTTPJSONInputOTel(t *testing.T) {
+func TestFilebeatOTelHTTPJSONInput(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
 	host := integration.GetESURL(t, "http")
