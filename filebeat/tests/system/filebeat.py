@@ -49,9 +49,12 @@ class BaseTest(TestCase):
         self.wait_until(reg.exists)
 
         def parse_entry(entry):
-            extra, sec = entry["timestamp"]
+            key = "timestamp"
+            if log_as_filestream():
+                key = "updated"
+            extra, sec = entry[key]
             nsec = extra & 0xFFFFFFFF
-            entry["timestamp"] = sec + (nsec / 1000000000)
+            entry[key] = sec + (nsec / 1000000000)
             return entry
 
         entries = [parse_entry(entry) for entry in reg.load(filter=filter)]

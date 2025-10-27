@@ -215,6 +215,9 @@ func PythonLogAsFilestream(ctx context.Context) error {
 	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
 	args := devtools.DefaultPythonTestIntegrationFromHostArgs()
 	args.Env["RUN_AS_FILESTREAM"] = "true"
-	args.Files = []string{"tests/system/test_json.py"}
+	args.Files = []string{
+		"tests/system/test_json.py",
+		"tests/system/test_modules.py",
+	}
 	return devtools.PythonIntegTestFromHost(args)
 }

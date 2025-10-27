@@ -9,7 +9,7 @@ import re
 import time
 import unittest
 
-from filebeat import BaseTest
+from filebeat import BaseTest, log_as_filestream
 from parameterized import parameterized
 
 """
@@ -55,21 +55,22 @@ class Test(BaseTest):
         with open(testfile1, 'w') as f:
             f.write("Hello World\n")
 
+        if log_as_filestream():
+            self.wait_until(
+                lambda: self.log_contains(
+                    "close.on_state_change.renamed is enabled and file {} has been renamed".format(testfile1)),
+                max_timeout=15)
+
+        else:
         # Wait until error shows up
-        self.wait_until(
-            lambda: self.log_contains(
-                "Closing because close_renamed is enabled"),
-            max_timeout=15)
+            self.wait_until(
+                lambda: self.log_contains(
+                    "Closing because close_renamed is enabled"),
+                max_timeout=15)
 
         # Let it read the file
         self.wait_until(
             lambda: self.output_has(lines=iterations1 + 1), max_timeout=10)
-
-        # Wait until registry file is created
-        # Because the default flush timeout is 1s, we might have only one message
-        # and need to wait at least 60s
-        self.wait_until(
-            lambda: self.log_contains_count("Registry file updated") >= 1, max_timeout=2)
 
         # Make sure new file was picked up. As it has the same file name,
         # one entry for the new and one for the old should exist
