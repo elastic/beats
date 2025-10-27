@@ -9,10 +9,11 @@ import (
 	"errors"
 	"sync"
 
+	"go.uber.org/zap/zapcore"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"go.uber.org/zap/zapcore"
 )
 
 type osqueryRunner struct {
