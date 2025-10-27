@@ -1,5 +1,5 @@
 owner: elastic
 repo: beats
-rendered_changelog_destination: docs/release-notes/_snippets
-file_type: markdown
+rendered_changelog_destination: changelog
+file_type: asciidoc
 subsections: true
