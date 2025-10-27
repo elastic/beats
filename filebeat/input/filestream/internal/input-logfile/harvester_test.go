@@ -21,6 +21,7 @@ package input_logfile
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -458,7 +459,10 @@ func TestCursorAllEventsPublished(t *testing.T) {
 		}}
 
 	wg.Add(1)
-	testLogger := logptest.NewFileLogger(t)
+	testLogger := logptest.NewFileLogger(
+		t,
+		filepath.Join("..", "..", "..", "../", "build", "integation-tests"),
+	)
 	hg.Start(
 		input.Context{
 			Logger:      testLogger.Logger,

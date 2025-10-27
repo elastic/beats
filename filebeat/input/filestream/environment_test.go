@@ -70,7 +70,10 @@ type registryEntry struct {
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
-	logger := logptest.NewFileLogger(t)
+	logger := logptest.NewFileLogger(
+		t,
+		filepath.Join("..", "..", "build", "integration-tests"),
+	)
 
 	return &inputTestingEnvironment{
 		testLogger: logger,
@@ -121,7 +124,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
 
-		logger := e.testLogger.Logger.Named("metrics-registry")
+		logger := e.testLogger.Named("metrics-registry")
 		reg := inputmon.NewMetricsRegistry(
 			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 		defer inputmon.CancelMetricsRegistry(
@@ -134,7 +137,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 			Cancelation:     ctx,
 			StatusReporter:  nil,
 			MetricsRegistry: reg,
-			Logger:          e.testLogger.Logger.Named("input.filestream"),
+			Logger:          e.testLogger.Named("input.filestream"),
 		}
 		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
@@ -547,7 +550,7 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 // If s is not found, the test fails
 func (e *inputTestingEnvironment) logContains(s string) {
 	e.t.Helper()
-	e.testLogger.LogContains(s)
+	e.testLogger.LogContains(e.t, s)
 }
 
 func (e *inputTestingEnvironment) WaitLogsContains(s string, timeout time.Duration, msgAndArgs ...any) {
