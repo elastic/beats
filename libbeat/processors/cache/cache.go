@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -57,6 +58,7 @@ type cache struct {
 	store  Store
 	cancel context.CancelFunc
 	log    *logp.Logger
+	once   sync.Once
 }
 
 // Resulting processor implements `Close()` to release the cache resources.
@@ -70,37 +72,28 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	id := int(instanceID.Add(1))
 	log = log.Named(name).With("instance_id", id)
 
-	src, cancel, err := getStoreFor(config, log)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get the store for %s: %w", name, err)
-	}
-
-	p := &cache{
+	return &cache{
 		config: config,
-		store:  src,
-		cancel: cancel,
 		log:    log,
-	}
-	p.log.Infow("initialized cache processor", "details", p)
-	return p, nil
+	}, nil
 }
 
 // getStoreFor returns a backing store for the provided configuration,
 // and a context cancellation that releases the cache resource when it
 // is no longer required. The cancellation should be called when the
 // processor is closed.
-func getStoreFor(cfg config, log *logp.Logger) (Store, context.CancelFunc, error) {
+func getStoreFor(cfg config, log *logp.Logger, path *paths.Path) (Store, context.CancelFunc, error) {
 	switch {
 	case cfg.Store.Memory != nil:
 		s, cancel := memStores.get(cfg.Store.Memory.ID, cfg)
 		return s, cancel, nil
 
 	case cfg.Store.File != nil:
-		err := os.MkdirAll(paths.Resolve(paths.Data, "cache_processor"), 0o700)
+		err := os.MkdirAll(path.Resolve(paths.Data, "cache_processor"), 0o700)
 		if err != nil {
 			return nil, noop, fmt.Errorf("cache processor could not create store directory: %w", err)
 		}
-		s, cancel := fileStores.get(cfg.Store.File.ID, cfg, log)
+		s, cancel := fileStores.get(cfg.Store.File.ID, cfg, log, path)
 		return s, cancel, nil
 
 	default:
@@ -133,6 +126,8 @@ type CacheEntry struct {
 
 // Run enriches the given event with the host metadata.
 func (p *cache) Run(event *beat.Event) (*beat.Event, error) {
+	p.SetPaths(paths.Paths) // set default if paths is not initialized
+
 	switch {
 	case p.config.Put != nil:
 		p.log.Debugw("put", "backend_id", p.store, "config", p.config.Put)
@@ -180,6 +175,21 @@ func (p *cache) Run(event *beat.Event) (*beat.Event, error) {
 		// This should never happen, but we don't need to flag it.
 		return event, nil
 	}
+}
+
+func (p *cache) SetPaths(path *paths.Path) {
+	p.once.Do(func() {
+		src, cancel, err := getStoreFor(p.config, p.log, path)
+		if err != nil {
+			p.log.Errorf("error getting store for %s: %v", name, err)
+			return
+		}
+
+		p.store = src
+		p.cancel = cancel
+
+		p.log.Infow("initialized cache processor", "details", p)
+	})
 }
 
 // putFrom takes the configured value from the event and stores it in the cache

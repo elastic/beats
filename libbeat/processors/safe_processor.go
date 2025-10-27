@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var ErrClosed = errors.New("attempt to use a closed processor")
@@ -48,6 +49,18 @@ func (p *SafeProcessor) Close() (err error) {
 	}
 	logp.L().Warnf("tried to close already closed %q processor", p.Processor.String())
 	return nil
+}
+
+// TODO: common
+type setPaths interface {
+	SetPaths(*paths.Path)
+}
+
+func (p *SafeProcessor) SetPaths(paths *paths.Path) {
+	setPather, ok := p.Processor.(setPaths)
+	if ok {
+		setPather.SetPaths(paths)
+	}
 }
 
 // SafeWrap makes sure that the processor handles all the required edge-cases.

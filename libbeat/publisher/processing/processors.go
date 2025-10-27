@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type group struct {
@@ -114,6 +115,20 @@ func (p *group) String() string {
 
 func (p *group) All() []beat.Processor {
 	return p.list
+}
+
+// TODO: move to processors
+type setPaths interface {
+	SetPaths(*paths.Path)
+}
+
+func (p *group) SetPaths(paths *paths.Path) {
+	for _, processor := range p.list {
+		setPather, ok := processor.(setPaths)
+		if ok {
+			setPather.SetPaths(paths)
+		}
+	}
 }
 
 func (p *group) Run(event *beat.Event) (*beat.Event, error) {

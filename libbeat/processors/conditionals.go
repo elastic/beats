@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // NewConditional returns a constructor suitable for registering when conditionals as a plugin.
@@ -46,6 +47,13 @@ func NewConditional(
 type WhenProcessor struct {
 	condition conditions.Condition
 	p         beat.Processor
+}
+
+func (p *WhenProcessor) SetPaths(paths *paths.Path) {
+	setPather, ok := p.p.(setPaths)
+	if ok {
+		setPather.SetPaths(paths)
+	}
 }
 
 // NewConditionRule returns a processor that will execute the provided processor if the condition is true.

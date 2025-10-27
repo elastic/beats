@@ -383,6 +383,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	// setup 8: pipeline processors list
 	if b.processors != nil {
 		// Add the global pipeline as a function processor, so clients cannot close it
+		b.processors.SetPaths(cfg.Paths)
 		processors.add(newProcessor(b.processors.title, b.processors.Run))
 	}
 
