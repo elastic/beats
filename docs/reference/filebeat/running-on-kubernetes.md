@@ -24,8 +24,12 @@ Everything is deployed under the `kube-system` namespace by default. To change t
 
 To download the manifest file, run:
 
-```sh subs=true
+{applies_to}`stack: ga 9.2.0` ```sh subs=true
 curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/kubernetes/filebeat-kubernetes.yaml
+```
+
+{applies_to}`stack: beta 9.2.0` ```sh subs=true
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/kubernetes/filebeat-kubernetes-beta.yaml
 ```
 
 ::::{warning}
@@ -48,6 +52,13 @@ By default, Filebeat sends events to an existing Elasticsearch deployment, if pr
   value: changeme
 ```
 
+### Ingesting rotated log files
+
+test: [Docker images](/reference/filebeat/running-on-docker.md)
+
+Filebeat can ship the rotated logs as well, including the GZIP-compressed. Refer
+to [filestream configuration](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files)
+on how to enable that and to the official [Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
 
 ### Running Filebeat on control plane nodes [_running_filebeat_on_control_plane_nodes]
 
@@ -263,4 +274,4 @@ For the example we're using:
 
 Refer to the official [Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
 
-Filebeat supports reading from rotating log files. However, some log rotation strategies can result in lost or duplicate events when using Filebeat to forward messages. For more information, refer to [Log rotation results in lost or duplicate events](/reference/filebeat/file-log-rotation.md).
+Filebeat supports reading from rotating log files, [including GZIP file](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files). However, some log rotation strategies can result in lost or duplicate events when using Filebeat to forward messages. For more information, refer to [Log rotation results in lost or duplicate events](/reference/filebeat/file-log-rotation.md).
