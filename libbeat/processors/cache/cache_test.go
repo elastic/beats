@@ -23,10 +23,10 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -562,7 +562,6 @@ type testConfig struct {
 }
 
 func TestCache(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors(name))
 	for _, test := range cacheTests {
 		t.Run(test.name, func(t *testing.T) {
 			var processors []beat.Processor
@@ -586,13 +585,7 @@ func TestCache(t *testing.T) {
 					t.Fatalf("processor %d is not an *cache", i)
 				}
 
-				defer func() {
-					err := c.Close()
-					if err != nil {
-						t.Errorf("unexpected error from c.Close(): %v", err)
-					}
-				}()
-
+				t.Cleanup(func() { require.NoError(t, c.Close()) })
 				processors = append(processors, p)
 			}
 
