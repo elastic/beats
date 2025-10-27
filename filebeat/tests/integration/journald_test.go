@@ -53,10 +53,14 @@ func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
 
 	filebeat.WriteConfigFile(yamlCfg)
 	filebeat.Start()
+<<<<<<< HEAD
 	// On a normal execution we run journalclt twice, the first time to read all messages from the
 	// previous boot until 'now' and the second one with the --follow flag that should keep on running.
 	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
 	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+=======
+	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
+>>>>>>> 599d253c0 ([Filebeat/Journald] Use --boot=all (#47324))
 
 	pidLine := filebeat.GetLastLogLine("journalctl started with PID")
 	logEntry := struct{ Message string }{}
@@ -98,10 +102,14 @@ func TestJournaldInputDoesNotDuplicateData(t *testing.T) {
 
 	filebeat.WriteConfigFile(yamlCfg)
 	filebeat.Start()
+<<<<<<< HEAD
 	// On a normal execution we run journalclt twice, the first time to read all messages from the
 	// previous boot until 'now' and the second one with the --follow flag that should keep on running.
 	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
 	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+=======
+	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
+>>>>>>> 599d253c0 ([Filebeat/Journald] Use --boot=all (#47324))
 
 	pidLine := filebeat.GetLastLogLine("journalctl started with PID")
 	logEntry := struct{ Message string }{}

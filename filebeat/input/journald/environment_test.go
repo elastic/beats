@@ -87,6 +87,40 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 
 func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) {
 	e.wg.Add(1)
+<<<<<<< HEAD
+=======
+	t := e.t
+
+	e.inputLogger, e.logBuffer = newInMemoryJSON()
+	e.t.Cleanup(func() {
+		if t.Failed() {
+			folder := filepath.Join("..", "..", "build", "input-test")
+			if err := os.MkdirAll(folder, 0o750); err != nil {
+				t.Logf("cannot create folder for error logs: %s", err)
+				return
+			}
+
+			f, err := os.CreateTemp(folder, "Filebeat-Test-Journald"+"-*")
+			if err != nil {
+				t.Logf("cannot create file for error logs: %s", err)
+				return
+			}
+			defer f.Close()
+			fullLogPath, err := filepath.Abs(f.Name())
+			if err != nil {
+				t.Logf("cannot get full path from log file: %s", err)
+			}
+
+			if _, err := f.Write(e.logBuffer.Bytes()); err != nil {
+				t.Logf("cannot write to file: %s", err)
+				return
+			}
+
+			t.Logf("Test Failed, logs from input at %q", fullLogPath)
+		}
+	})
+
+>>>>>>> 599d253c0 ([Filebeat/Journald] Use --boot=all (#47324))
 	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
 		defer wg.Done()
 		defer func() {
