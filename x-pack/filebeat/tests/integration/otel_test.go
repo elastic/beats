@@ -32,6 +32,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltestcol"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -106,7 +107,7 @@ service:
 `
 	logFilePath := filepath.Join(tmpdir, "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	oteltest.NewCollector(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
+	oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
 
 	var beatsCfgFile = `
 filebeat.inputs:
@@ -313,7 +314,7 @@ service:
 	var configBuffer bytes.Buffer
 	optionsValue.Namespace = otelNamespace
 	require.NoError(t, template.Must(template.New("config").Parse(otelConfigFile)).Execute(&configBuffer, optionsValue))
-	oteltest.NewCollector(t, configBuffer.String())
+	oteltestcol.New(t, configBuffer.String())
 
 	// reset buffer
 	configBuffer.Reset()
@@ -495,7 +496,7 @@ service:
 	})
 
 	writeEventsToLogFile(t, otelConfig.InputFile, wantEvents)
-	oteltest.NewCollector(t, configBuffer.String())
+	oteltestcol.New(t, configBuffer.String())
 
 	// start filebeat
 	filebeat := integration.NewBeat(
@@ -691,7 +692,7 @@ service:
 
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 
-	oteltest.NewCollector(t, configBuffer.String())
+	oteltestcol.New(t, configBuffer.String())
 
 	es := integration.GetESClient(t, "http")
 
@@ -932,7 +933,7 @@ service:
 			require.NoError(t,
 				template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, beatsConfig))
 
-			collector := oteltest.NewCollector(t, configBuffer.String())
+			collector := oteltestcol.New(t, configBuffer.String())
 			writeEventsToLogFile(t, beatsConfig.InputFile, numTestEvents)
 
 			// Wait for file input to be fully read

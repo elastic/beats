@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package oteltest
+package oteltestcol
 
 import (
 	"os"
@@ -33,11 +33,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
@@ -51,6 +51,48 @@ type Collector struct {
 	collector *otelcol.Collector
 	logger    *logp.Logger
 	observer  *observer.ObservedLogs
+}
+
+func New(tb testing.TB, configYAML string) *Collector {
+	tb.Helper()
+
+	configDir := tb.TempDir()
+	configFile := filepath.Join(configDir, "otel.yaml")
+	err := os.WriteFile(configFile, []byte(configYAML), 0644)
+	require.NoError(tb, err)
+
+	if err != nil {
+		tb.Fatalf("failed to create collector: %v", err)
+	}
+
+	logger, observer := logptest.NewTestingLoggerWithObserver(tb, "")
+	settings := newCollectorSettings("file:"+configFile, logger)
+	col, err := otelcol.NewCollector(settings)
+	require.NoError(tb, err)
+
+	var wg sync.WaitGroup
+	tb.Cleanup(func() {
+		col.Shutdown()
+		wg.Wait()
+	})
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		ctx, cancel := signal.NotifyContext(tb.Context(), os.Interrupt)
+		defer cancel()
+		assert.NoError(tb, col.Run(ctx))
+	}()
+
+	require.Eventually(tb, func() bool {
+		return col.GetState() == otelcol.StateRunning
+	}, 10*time.Second, 10*time.Millisecond, "Collector did not start in time")
+
+	return &Collector{collector: col, logger: logger, observer: observer}
+}
+
+func (c *Collector) ObservedLogs() *observer.ObservedLogs {
+	return c.observer
 }
 
 func getComponent() (otelcol.Factories, error) {
@@ -116,46 +158,4 @@ func newCollectorSettings(filename string, logger *logp.Logger) otelcol.Collecto
 			},
 		},
 	}
-}
-
-func NewCollector(tb testing.TB, configYAML string) *Collector {
-	tb.Helper()
-
-	configDir := tb.TempDir()
-	configFile := filepath.Join(configDir, "otel.yaml")
-	err := os.WriteFile(configFile, []byte(configYAML), 0644)
-	require.NoError(tb, err)
-
-	if err != nil {
-		tb.Fatalf("failed to create collector: %v", err)
-	}
-
-	logger, observer := logptest.NewTestingLoggerWithObserver(tb, "")
-	settings := newCollectorSettings("file:"+configFile, logger)
-	col, err := otelcol.NewCollector(settings)
-	require.NoError(tb, err)
-
-	var wg sync.WaitGroup
-	tb.Cleanup(func() {
-		col.Shutdown()
-		wg.Wait()
-	})
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		ctx, cancel := signal.NotifyContext(tb.Context(), os.Interrupt)
-		defer cancel()
-		assert.NoError(tb, col.Run(ctx))
-	}()
-
-	require.Eventually(tb, func() bool {
-		return col.GetState() == otelcol.StateRunning
-	}, 10*time.Second, 10*time.Millisecond, "Collector did not start in time")
-
-	return &Collector{collector: col, logger: logger, observer: observer}
-}
-
-func (c *Collector) ObservedLogs() *observer.ObservedLogs {
-	return c.observer
 }

@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltestcol"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -120,7 +120,7 @@ service:
 		}
 	})
 
-	oteltest.NewCollector(t, configBuffer.String())
+	oteltestcol.New(t, configBuffer.String())
 
 	var beatsCfgFile = `
 metricbeat:
@@ -322,7 +322,7 @@ service:
 		}
 	})
 
-	oteltest.NewCollector(t, configBuffer.String())
+	oteltestcol.New(t, configBuffer.String())
 
 	var beatsCfgFile = `
 metricbeat:
@@ -512,7 +512,7 @@ service:
 		}
 	})
 
-	oteltest.NewCollector(t, string(configContents))
+	oteltestcol.New(t, string(configContents))
 
 	var r0Docs, r1Docs estools.Documents
 	var err error

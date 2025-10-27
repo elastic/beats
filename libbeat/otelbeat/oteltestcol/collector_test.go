@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package oteltest
+package oteltestcol
 
 import (
 	"testing"
@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewCollector(t *testing.T) {
+func TestNew(t *testing.T) {
 	cfg := `receivers:
   filebeatreceiver:
     filebeat:
@@ -32,7 +32,8 @@ func TestNewCollector(t *testing.T) {
         - type: benchmark
           enabled: true
           message: "test message"
-          count: 1 
+          count: 1
+    processors: ~
     output:
       otelconsumer:
     logging:
@@ -54,7 +55,7 @@ service:
     metrics:
       level: none
 `
-	col := NewCollector(t, cfg)
+	col := New(t, cfg)
 	require.NotNil(t, col)
 
 	require.Eventually(t, func() bool {
