@@ -453,18 +453,20 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 	}
 
 	// Set the appropriate logger_min_status flag based on osquerybeat log level
-	// Map logp levels to osquery logger_min_status values: 0=INFO, 1=WARNING, 2=ERROR
+	// Map logp levels to osquery logger_min_status values: 1=WARNING, 2=ERROR
 	var logMinStatus int
 	level := zapcore.LevelOf(q.log.Core())
 	switch {
-	case level <= zapcore.InfoLevel:
-		logMinStatus = 0 // INFO/DEBUG
 	case level == zapcore.WarnLevel:
 		logMinStatus = 1 // WARNING
 	case level >= zapcore.ErrorLevel:
 		logMinStatus = 2 // ERROR+
 	}
-	flags["logger_min_status"] = logMinStatus
+
+	// osquery default is 0 (INFO/DEBUG) but we control that with the verbose flag already
+	if logMinStatus > 0 {
+		flags["logger_min_status"] = logMinStatus
+	}
 
 	if q.isVerbose() {
 		flags["verbose"] = true
