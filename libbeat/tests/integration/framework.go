@@ -955,7 +955,11 @@ func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
 }
 
 func reportErrors(t *testing.T, tempDir string, beatName string) {
+<<<<<<< HEAD
 	var maxlen int64 = 2048
+=======
+	var maxlen int64 = 1024
+>>>>>>> 599d253c0 ([Filebeat/Journald] Use --boot=all (#47324))
 	stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
 	if err != nil {
 		t.Logf("error reading stderr: %s", err)
