@@ -266,55 +266,56 @@ func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
 	msg, err := r.jctl.Next(cancel)
 
 	// Check if the input has been cancelled
-	select {
-	case <-cancel.Done():
+	if cancel.Err() != nil {
 		// The caller is responsible for calling Reader.Close to terminate
 		// journalctl. Cancelling this canceller only means this Next call was
 		// cancelled. Because the input has been cancelled, we ignore the message
 		// and any error it might have returned.
 		return nil, ErrCancelled
-	default:
-		// Two options:
-		//   - Error, journalctl exited with an error, restart it in the same
-		//       mode it was running.
-		//   - No error, skip the default block and go parse the message
-		if err != nil {
-			r.logger.Warnf("reader error: '%s', restarting...", err)
-
-			// Handle backoff
-			//
-			// If the last restart (if any) was more than 5s ago,
-			// recreate the backoff and do not wait.
-			// We recreate the backoff so r.backoff.Last().IsZero()
-			// will return true next time it's called making us to
-			// wait in case jouranlctl crashes in less than 5s.
-			if !r.backoff.Last().IsZero() && time.Since(r.backoff.Last()) > 5*time.Second {
-				r.backoff = backoff.NewExpBackoff(cancel.Done(), 100*time.Millisecond, 2*time.Second)
-			} else {
-				r.backoff.Wait()
-			}
-
-			var extraArgs []string
-			// Corner case: journalctl exited with an error before reading the
-			// 1st message. This means we don't have a cursor and need to restart
-			// it with the initial arguments.
-			if r.cursor == "" {
-				extraArgs = r.extraArgs
-			} else {
-				extraArgs = append(extraArgs, "--after-cursor", r.cursor)
-			}
-
-			if err := r.newJctl(extraArgs...); err != nil {
-				// If we cannot restart journalct, there is nothing we can do.
-				return nil, fmt.Errorf("cannot restart journalctl: %w", err)
-			}
-
-			// Return an empty message and wait for the caller to call us again
-			return nil, ErrRestarting
-		}
 	}
 
-	return msg, nil
+	// Two options:
+	//   - No error, return the message
+	//   - Error, journalctl exited with an error, restart with
+	//     backoff if necessary.
+	if err == nil {
+		return msg, nil
+	}
+	r.logger.Warnf("reader error: '%s', restarting...", err)
+
+	// Handle backoff
+	//
+	// If the last restart (if any) was more than 5s ago,
+	// recreate the backoff and do not wait.
+	// We recreate the backoff so r.backoff.Last().IsZero()
+	// will return true next time it's called making us to
+	// wait in case jouranlctl crashes in less than 5s.
+	if !r.backoff.Last().IsZero() && time.Since(r.backoff.Last()) > 5*time.Second {
+		r.backoff = backoff.NewExpBackoff(cancel.Done(), 100*time.Millisecond, 2*time.Second)
+	} else {
+		r.backoff.Wait()
+	}
+
+	var extraArgs []string
+	// Corner case: journalctl exited with an error before reading the
+	// 1st message. This means we don't have a cursor and need to restart
+	// it with the initial arguments.
+	if r.cursor == "" {
+		extraArgs = r.extraArgs
+	} else {
+		// We have a cursor, set it instead of the other options that select
+		// where in the journal to start reading because they are incompatible
+		// with setting the cursor.
+		extraArgs = []string{"--after-cursor", r.cursor}
+	}
+
+	if err := r.newJctl(extraArgs...); err != nil {
+		// If we cannot restart journalct, there is nothing we can do.
+		return nil, fmt.Errorf("cannot restart journalctl: %w", err)
+	}
+
+	// Return an empty message and wait for the caller to call us again
+	return nil, ErrRestarting
 }
 
 // Next returns the next journal entry. If there is no entry available
