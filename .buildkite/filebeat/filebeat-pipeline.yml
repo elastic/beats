@@ -96,6 +96,7 @@ steps:
         notify:
           - github_commit_status:
               context: "filebeat: Ubuntu x86_64 Unit Tests"
+
       - label: ":ubuntu: Filebeat: Go Integration Tests"
         command: |
           cd filebeat
