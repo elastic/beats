@@ -475,7 +475,18 @@ func TestDoubleStarCanBeUsed(t *testing.T) {
 	}
 
 	env.startInput(ctx, inp)
-	env.waitUntilEventCount(len(srcFiles) * 10)
+	// Wait for at least 11 events, this means more than one journal file
+	// has been read and ingested.
+	//
+	// When many small journal files are ingested, the journalctl process
+	// may exit before the input has fully read its stdout, which makes us
+	// discard the last few lines/entries.
+	//
+	// We still correctly track the cursor of events published to the output,
+	// however the cursor returned by journalctl on this set of handcrafted
+	// journal files leads to us skipping some events.
+	// See https://github.com/elastic/beats/issues/46904.
+	env.waitUntilEventsPublished(11)
 }
 
 func decompress(t *testing.T, namegz string) string {
