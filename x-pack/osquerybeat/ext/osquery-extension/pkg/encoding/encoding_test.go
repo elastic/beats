@@ -35,10 +35,6 @@ func intPtr(i int) *int {
 	return &i
 }
 
-func timePtr(t time.Time) *time.Time {
-	return &t
-}
-
 func TestMarshalToMapWithFlags(t *testing.T) {
 	tests := []struct {
 		name     string
