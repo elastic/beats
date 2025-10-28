@@ -205,7 +205,7 @@ func formatTimeWithTagFormat(fieldValue reflect.Value, flag EncodingFlag, tag *r
 
 	var result string
 	if timeFormat, ok := tag.Lookup("format"); ok {
-		switch timeFormat {
+		switch strings.ToLower(timeFormat) {
 		case "unix":
 			result = strconv.FormatInt(t.Unix(), 10)
 		case "unixnano":
