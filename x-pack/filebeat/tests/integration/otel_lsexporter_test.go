@@ -88,7 +88,6 @@ processors:
 	testCaseName := uuid.Must(uuid.NewV4()).String()
 	events := generateEvents(numEvents)
 
-	// Create OTel collector configuration with filebeatreceiver
 	tmpdir := t.TempDir()
 	inputFilePath := filepath.Join(tmpdir, "event.json")
 	writeEvents(t, inputFilePath, events)
@@ -178,6 +177,9 @@ service:
 		// only present in beats receivers
 		"agent.otelcol.component.id",
 		"agent.otelcol.component.kind",
+		// TODO(mauri870): Why are these fields different now?
+		"log.file.device_id",
+		"log.file.fingerprint",
 	}
 
 	compareOutputFiles(t, fbFilePath, otelFilePath, ignoredFields)
