@@ -443,7 +443,7 @@ func Test_formatTimeWithTagFormat(t *testing.T) {
 			wantErr:    false,
 		},
 		{
-			name:       "Unix microseconds format", 
+			name:       "Unix microseconds format",
 			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
 			flag:       0,
 			tag:        tagPtr(`format:"unixmicro"`),
