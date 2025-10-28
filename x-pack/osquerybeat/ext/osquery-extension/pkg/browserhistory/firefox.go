@@ -105,31 +105,31 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 	defer db.Close()
 
 	// Build timestamp filtering
-	timestampWhere := buildFirefoxTimestampWhere(queryContext)
+	timestampWhere, params := buildFirefoxTimestampWhere(queryContext)
 
-	query := fmt.Sprintf(`
-		SELECT 
-			p.url,
-			p.title,
-			p.hidden,
-			p.frecency,
-			p.id as place_id,
-			hv.visit_date,
-			hv.visit_type,
-			hv.id as visit_id,
-			hv.from_visit,
-			hv.session,
-			hv.source as visit_source,
-			ref_p.url as referring_url
-		FROM moz_places p
-		JOIN moz_historyvisits hv ON p.id = hv.place_id
-		LEFT JOIN moz_historyvisits ref_hv ON hv.from_visit = ref_hv.id
-		LEFT JOIN moz_places ref_p ON ref_hv.place_id = ref_p.id
-		WHERE 1=1%s
-		ORDER BY hv.visit_date DESC
-	`, timestampWhere)
+	query := `
+	       SELECT 
+		       p.url,
+		       p.title,
+		       p.hidden,
+		       p.frecency,
+		       p.id as place_id,
+		       hv.visit_date,
+		       hv.visit_type,
+		       hv.id as visit_id,
+		       hv.from_visit,
+		       hv.session,
+		       hv.source as visit_source,
+		       ref_p.url as referring_url
+	       FROM moz_places p
+	       JOIN moz_historyvisits hv ON p.id = hv.place_id
+	       LEFT JOIN moz_historyvisits ref_hv ON hv.from_visit = ref_hv.id
+	       LEFT JOIN moz_places ref_p ON ref_hv.place_id = ref_p.id
+	       WHERE 1=1` + timestampWhere + `
+	       ORDER BY hv.visit_date DESC
+       `
 
-	rows, err := db.QueryContext(ctx, query)
+	rows, err := db.QueryContext(ctx, query, params...)
 	if err != nil {
 		parser.log.Errorf("failed to execute query: %v", err)
 		return nil, fmt.Errorf("failed to query Firefox history: %w", err)
@@ -343,13 +343,14 @@ func mapFirefoxTransitionType(transitionType sql.NullInt64) string {
 }
 
 // buildFirefoxTimestampWhere creates WHERE clause for Firefox
-func buildFirefoxTimestampWhere(queryContext table.QueryContext) string {
+func buildFirefoxTimestampWhere(queryContext table.QueryContext) (string, []any) {
 	constraints := getTimestampConstraints(queryContext)
 	if len(constraints) == 0 {
-		return ""
+		return "", nil
 	}
 
 	var conditions []string
+	var params []any
 	for _, constraint := range constraints {
 		firefoxTime := unixToFirefoxTime(constraint.Value)
 		const microsPerSecond = 1000000
@@ -358,22 +359,27 @@ func buildFirefoxTimestampWhere(queryContext table.QueryContext) string {
 		case table.OperatorEquals:
 			lower := firefoxTime
 			upper := firefoxTime + microsPerSecond
-			conditions = append(conditions, fmt.Sprintf("hv.visit_date >= %d AND hv.visit_date < %d", lower, upper))
+			conditions = append(conditions, "hv.visit_date >= ? AND hv.visit_date < ?")
+			params = append(params, lower, upper)
 		case table.OperatorGreaterThan:
 			threshold := firefoxTime + microsPerSecond
-			conditions = append(conditions, fmt.Sprintf("hv.visit_date >= %d", threshold))
+			conditions = append(conditions, "hv.visit_date >= ?")
+			params = append(params, threshold)
 		case table.OperatorLessThan:
-			conditions = append(conditions, fmt.Sprintf("hv.visit_date < %d", firefoxTime))
+			conditions = append(conditions, "hv.visit_date < ?")
+			params = append(params, firefoxTime)
 		case table.OperatorGreaterThanOrEquals:
-			conditions = append(conditions, fmt.Sprintf("hv.visit_date >= %d", firefoxTime))
+			conditions = append(conditions, "hv.visit_date >= ?")
+			params = append(params, firefoxTime)
 		case table.OperatorLessThanOrEquals:
 			upper := firefoxTime + microsPerSecond
-			conditions = append(conditions, fmt.Sprintf("hv.visit_date < %d", upper))
+			conditions = append(conditions, "hv.visit_date < ?")
+			params = append(params, upper)
 		}
 	}
 
 	if len(conditions) > 0 {
-		return " AND (" + strings.Join(conditions, " AND ") + ")"
+		return " AND (" + strings.Join(conditions, " AND ") + ")", params
 	}
-	return ""
+	return "", nil
 }

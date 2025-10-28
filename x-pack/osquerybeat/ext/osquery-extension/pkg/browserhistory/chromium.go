@@ -84,31 +84,31 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 	defer db.Close()
 
 	// Build timestamp filtering
-	timestampWhere := buildChromiumTimestampWhere(queryContext)
+	timestampWhere, params := buildChromiumTimestampWhere(queryContext)
 
-	query := fmt.Sprintf(`
-		SELECT 
-			urls.url,
-			urls.title,
-			urls.hidden,
-			urls.id as url_id,
-			visits.visit_time,
-			visits.transition,
-			visits.id as visit_id,
-			visits.from_visit,
-			visits.visit_duration,
-			visit_source.source,
-			ref_urls.url as referring_url
-		FROM urls
-		JOIN visits ON urls.id = visits.url
-		LEFT JOIN visit_source ON visits.id = visit_source.id
-		LEFT JOIN visits ref_visits ON visits.from_visit = ref_visits.id
-		LEFT JOIN urls ref_urls ON ref_visits.url = ref_urls.id
-		WHERE 1=1%s
-		ORDER BY visits.visit_time DESC
-	`, timestampWhere)
+	query := `
+	       SELECT 
+		       urls.url,
+		       urls.title,
+		       urls.hidden,
+		       urls.id as url_id,
+		       visits.visit_time,
+		       visits.transition,
+		       visits.id as visit_id,
+		       visits.from_visit,
+		       visits.visit_duration,
+		       visit_source.source,
+		       ref_urls.url as referring_url
+	       FROM urls
+	       JOIN visits ON urls.id = visits.url
+	       LEFT JOIN visit_source ON visits.id = visit_source.id
+	       LEFT JOIN visits ref_visits ON visits.from_visit = ref_visits.id
+	       LEFT JOIN urls ref_urls ON ref_visits.url = ref_urls.id
+	       WHERE 1=1` + timestampWhere + `
+	       ORDER BY visits.visit_time DESC
+       `
 
-	rows, err := db.QueryContext(ctx, query)
+	rows, err := db.QueryContext(ctx, query, params...)
 	if err != nil {
 		parser.log.Errorf("failed to execute query: %v", err)
 		return nil, fmt.Errorf("failed to query Chromium history: %w", err)
@@ -361,13 +361,14 @@ func mapChromiumVisitSource(source sql.NullInt64) string {
 }
 
 // buildChromiumTimestampWhere creates WHERE clause for Chromium-based browsers
-func buildChromiumTimestampWhere(queryContext table.QueryContext) string {
+func buildChromiumTimestampWhere(queryContext table.QueryContext) (string, []any) {
 	constraints := getTimestampConstraints(queryContext)
 	if len(constraints) == 0 {
-		return ""
+		return "", nil
 	}
 
 	var conditions []string
+	var params []any
 	for _, constraint := range constraints {
 		chromiumTime := unixToChromiumTime(constraint.Value)
 		const microsPerSecond = 1000000
@@ -376,22 +377,27 @@ func buildChromiumTimestampWhere(queryContext table.QueryContext) string {
 		case table.OperatorEquals:
 			lower := chromiumTime
 			upper := chromiumTime + microsPerSecond
-			conditions = append(conditions, fmt.Sprintf("visits.visit_time >= %d AND visits.visit_time < %d", lower, upper))
+			conditions = append(conditions, "visits.visit_time >= ? AND visits.visit_time < ?")
+			params = append(params, lower, upper)
 		case table.OperatorGreaterThan:
 			threshold := chromiumTime + microsPerSecond
-			conditions = append(conditions, fmt.Sprintf("visits.visit_time >= %d", threshold))
+			conditions = append(conditions, "visits.visit_time >= ?")
+			params = append(params, threshold)
 		case table.OperatorLessThan:
-			conditions = append(conditions, fmt.Sprintf("visits.visit_time < %d", chromiumTime))
+			conditions = append(conditions, "visits.visit_time < ?")
+			params = append(params, chromiumTime)
 		case table.OperatorGreaterThanOrEquals:
-			conditions = append(conditions, fmt.Sprintf("visits.visit_time >= %d", chromiumTime))
+			conditions = append(conditions, "visits.visit_time >= ?")
+			params = append(params, chromiumTime)
 		case table.OperatorLessThanOrEquals:
 			upper := chromiumTime + microsPerSecond
-			conditions = append(conditions, fmt.Sprintf("visits.visit_time < %d", upper))
+			conditions = append(conditions, "visits.visit_time < ?")
+			params = append(params, upper)
 		}
 	}
 
 	if len(conditions) > 0 {
-		return " AND (" + strings.Join(conditions, " AND ") + ")"
+		return " AND (" + strings.Join(conditions, " AND ") + ")", params
 	}
-	return ""
+	return "", nil
 }

@@ -742,7 +742,7 @@ func TestGenerateColumnDefinitions_nilInput(t *testing.T) {
 func TestGenerateColumnDefinitions_unexportedFields(t *testing.T) {
 	type testStruct struct {
 		Public    string `osquery:"public"`
-		private   string `osquery:"private"`
+		private   string `osquery:"private"` //nolint:unused -- meaningful for test coverage
 		Exported2 int    `osquery:"exported2"`
 	}
 	expected := []table.ColumnDefinition{

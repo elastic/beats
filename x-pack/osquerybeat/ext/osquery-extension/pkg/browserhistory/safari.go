@@ -82,24 +82,24 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 	defer db.Close()
 
 	// Build timestamp filtering
-	timestampWhere := buildSafariTimestampWhere(queryContext)
+	timestampWhere, params := buildSafariTimestampWhere(queryContext)
 
-	query := fmt.Sprintf(`
-		SELECT 
-			hi.url,
-			hi.domain_expansion,
-			hv.title,
-			hv.visit_time,
-			hv.load_successful,
-			hi.id as item_id,
-			hv.id as visit_id
-		FROM history_items hi
-		LEFT JOIN history_visits hv ON hi.id = hv.history_item
-		WHERE hi.url IS NOT NULL%s
-		ORDER BY hv.visit_time DESC
-	`, timestampWhere)
+	query := `
+	       SELECT 
+		       hi.url,
+		       hi.domain_expansion,
+		       hv.title,
+		       hv.visit_time,
+		       hv.load_successful,
+		       hi.id as item_id,
+		       hv.id as visit_id
+	       FROM history_items hi
+	       LEFT JOIN history_visits hv ON hi.id = hv.history_item
+	       WHERE hi.url IS NOT NULL` + timestampWhere + `
+	       ORDER BY hv.visit_time DESC
+       `
 
-	rows, err := db.QueryContext(ctx, query)
+	rows, err := db.QueryContext(ctx, query, params...)
 	if err != nil {
 		parser.log.Errorf("failed to execute query: %v", err)
 		return nil, fmt.Errorf("failed to query Safari history: %w", err)
@@ -206,13 +206,14 @@ func unixToSafariTime(unixTime int64) int64 {
 }
 
 // buildSafariTimestampWhere creates WHERE clause for Safari
-func buildSafariTimestampWhere(queryContext table.QueryContext) string {
+func buildSafariTimestampWhere(queryContext table.QueryContext) (string, []any) {
 	constraints := getTimestampConstraints(queryContext)
 	if len(constraints) == 0 {
-		return ""
+		return "", nil
 	}
 
 	var conditions []string
+	var params []any
 	for _, constraint := range constraints {
 		safariTime := unixToSafariTime(constraint.Value)
 		const secondRange = 1
@@ -221,22 +222,27 @@ func buildSafariTimestampWhere(queryContext table.QueryContext) string {
 		case table.OperatorEquals:
 			lower := safariTime
 			upper := safariTime + secondRange
-			conditions = append(conditions, fmt.Sprintf("hv.visit_time >= %d AND hv.visit_time < %d", lower, upper))
+			conditions = append(conditions, "hv.visit_time >= ? AND hv.visit_time < ?")
+			params = append(params, lower, upper)
 		case table.OperatorGreaterThan:
 			threshold := safariTime + secondRange
-			conditions = append(conditions, fmt.Sprintf("hv.visit_time >= %d", threshold))
+			conditions = append(conditions, "hv.visit_time >= ?")
+			params = append(params, threshold)
 		case table.OperatorLessThan:
-			conditions = append(conditions, fmt.Sprintf("hv.visit_time < %d", safariTime))
+			conditions = append(conditions, "hv.visit_time < ?")
+			params = append(params, safariTime)
 		case table.OperatorGreaterThanOrEquals:
-			conditions = append(conditions, fmt.Sprintf("hv.visit_time >= %d", safariTime))
+			conditions = append(conditions, "hv.visit_time >= ?")
+			params = append(params, safariTime)
 		case table.OperatorLessThanOrEquals:
 			upper := safariTime + secondRange
-			conditions = append(conditions, fmt.Sprintf("hv.visit_time < %d", upper))
+			conditions = append(conditions, "hv.visit_time < ?")
+			params = append(params, upper)
 		}
 	}
 
 	if len(conditions) > 0 {
-		return " AND (" + strings.Join(conditions, " AND ") + ")"
+		return " AND (" + strings.Join(conditions, " AND ") + ")", params
 	}
-	return ""
+	return "", nil
 }
