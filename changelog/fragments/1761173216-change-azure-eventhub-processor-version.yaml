@@ -24,7 +24,10 @@ description: This PR is to change Filebeat azure eventhub input to use processor
 impact: Users of the Azure Event Hub input who were relying on processor v1 as the default behavior will now automatically use processor v2, which may have different behavior or performance characteristics.
 
 # REQUIRED for breaking-change, deprecation, known-issue
-action: Users who want to continue using processor v1 should explicitly set `processor_version: "v1"` in their configuration. However, v1 will be completely removed in a future release, so users should plan to migrate to v2. Users who were not explicitly specifying a processor version will now use v2 by default and should test their configuration accordingly.
+action: |
+  Users who want to continue using processor v1 should explicitly set `processor_version: v1` in their configuration.
+  However, v1 will be completely removed in a future release, so users should plan to migrate to v2.
+  Users who were not explicitly specifying a processor version will now use v2 by default and should test their configuration accordingly.
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.

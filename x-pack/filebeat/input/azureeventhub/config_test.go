@@ -38,6 +38,7 @@ func TestStorageContainerValidate(t *testing.T) {
 func TestValidate(t *testing.T) {
 	t.Run("Sanitize storage account containers with underscores", func(t *testing.T) {
 		config := defaultConfig()
+		config.ProcessorVersion = "v1"
 		config.ConnectionString = "Endpoint=sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET"
 		config.EventHubName = "event_hub_00"
 		config.SAName = "teststorageaccount"
