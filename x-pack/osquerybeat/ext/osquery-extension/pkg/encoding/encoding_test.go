@@ -762,4 +762,3 @@ func TestGenerateColumnDefinitions_unexportedFields(t *testing.T) {
 		}
 	}
 }
-
