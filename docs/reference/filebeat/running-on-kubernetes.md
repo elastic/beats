@@ -24,15 +24,31 @@ Everything is deployed under the `kube-system` namespace by default. To change t
 
 To download the manifest file, run:
 
-{applies_to}`stack: ga 9.2.0` 
+
+
+::::{tab-set}
+
+:::{tab-item} GA
+
+{applies_to}`stack: ga 9.2.0`
 ```sh subs=true
 curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/kubernetes/filebeat-kubernetes.yaml
 ```
 
-{applies_to}`stack: beta 9.2.0` 
+:::
+
+:::{tab-item} Beta
+
+{applies_to}`stack: beta 9.2.0`
 ```sh subs=true
 curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/kubernetes/filebeat-kubernetes-beta.yaml
 ```
+
+:::
+
+::::
+
+
 
 ::::{warning}
 **If you are using Kubernetes 1.7 or earlier:** Filebeat uses a hostPath volume to persist internal data. It’s located under `/var/lib/filebeat-data`. The manifest uses folder autocreation (`DirectoryOrCreate`), which was introduced in Kubernetes 1.8. You need to remove `type: DirectoryOrCreate` from the manifest, and create the host folder yourself.
