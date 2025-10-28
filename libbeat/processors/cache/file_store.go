@@ -191,9 +191,10 @@ func (c *fileStore) readState() {
 		var e CacheEntry
 		err = dec.Decode(&e)
 		if err != nil {
-			if err != io.EOF {
-				switch err := err.(type) {
-				case *json.SyntaxError:
+			if !errors.Is(err, io.EOF) {
+				var err *json.SyntaxError
+				switch {
+				case errors.As(err, &err):
 					c.log.Errorw("failed to read state element", "error", err, "path", c.path, "offset", err.Offset)
 				default:
 					c.log.Errorw("failed to read state element", "error", err, "path", c.path)
