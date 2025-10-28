@@ -6,7 +6,11 @@
 
 package main
 
-import "github.com/osquery/osquery-go"
+import (
+	"github.com/osquery/osquery-go"
 
-func RegisterTables(server *osquery.ExtensionManagerServer) {
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+)
+
+func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
 }
