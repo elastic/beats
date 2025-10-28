@@ -6,6 +6,7 @@ package browserhistory
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -13,6 +14,8 @@ import (
 	"time"
 
 	"github.com/osquery/osquery-go/plugin/table"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 // Expected test data - these values are static and any change indicates test data has been modified
@@ -57,11 +60,6 @@ func getTestDataDir(t *testing.T) string {
 	return testDataDir
 }
 
-// getTestLog returns a test logger function
-func getTestLog() func(m string, kvs ...any) {
-	return func(m string, kvs ...any) {}
-}
-
 // getCurrentUserFromTestData queries the test data to get the actual user name
 func getCurrentUserFromTestData(t *testing.T) string {
 	t.Helper()
@@ -78,7 +76,7 @@ func getCurrentUserFromTestData(t *testing.T) string {
 		},
 	}
 
-	rows, err := GetTableRows(ctx, queryContext, getTestLog())
+	rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 	if err != nil || len(rows) == 0 {
 		t.Fatalf("Failed to get user from test data: %v", err)
 	}
@@ -101,7 +99,7 @@ func TestAllRows(t *testing.T) {
 		},
 	}
 
-	rows, err := GetTableRows(ctx, queryContext, getTestLog())
+	rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 	if err != nil {
 		t.Fatalf("GetTableRows returned error: %v", err)
 	}
@@ -126,7 +124,7 @@ func TestChromeFilter(t *testing.T) {
 		},
 	}
 
-	rows, err := GetTableRows(ctx, queryContext, getTestLog())
+	rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 	if err != nil {
 		t.Fatalf("GetTableRows returned error: %v", err)
 	}
@@ -158,7 +156,7 @@ func TestEdgeFilter(t *testing.T) {
 		},
 	}
 
-	rows, err := GetTableRows(ctx, queryContext, getTestLog())
+	rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 	if err != nil {
 		t.Fatalf("GetTableRows returned error: %v", err)
 	}
@@ -208,7 +206,7 @@ func TestBrowserFiltering(t *testing.T) {
 				},
 			}
 
-			rows, err := GetTableRows(ctx, queryContext, getTestLog())
+			rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 			if err != nil {
 				t.Fatalf("GetTableRows returned error: %v", err)
 			}
@@ -269,7 +267,7 @@ func TestProfileFiltering(t *testing.T) {
 				},
 			}
 
-			rows, err := GetTableRows(ctx, queryContext, getTestLog())
+			rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 			if err != nil {
 				t.Fatalf("GetTableRows returned error: %v", err)
 			}
@@ -314,7 +312,7 @@ func TestUserFiltering(t *testing.T) {
 		},
 	}
 
-	rows, err := GetTableRows(ctx, queryContext, getTestLog())
+	rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 	if err != nil {
 		t.Fatalf("GetTableRows returned error: %v", err)
 	}
@@ -370,7 +368,7 @@ func TestTimestampEquals(t *testing.T) {
 					},
 				}
 
-				rows, err := GetTableRows(ctx, queryContext, getTestLog())
+				rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 				if err != nil {
 					t.Fatalf("GetTableRows returned error: %v", err)
 				}
@@ -433,7 +431,7 @@ func TestTimestampGreaterThan(t *testing.T) {
 					},
 				}
 
-				rows, err := GetTableRows(ctx, queryContext, getTestLog())
+				rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 				if err != nil {
 					t.Fatalf("GetTableRows returned error: %v", err)
 				}
@@ -491,7 +489,7 @@ func TestTimestampLessThan(t *testing.T) {
 					},
 				}
 
-				rows, err := GetTableRows(ctx, queryContext, getTestLog())
+				rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 				if err != nil {
 					t.Fatalf("GetTableRows returned error: %v", err)
 				}
@@ -548,7 +546,7 @@ func TestTimestampGreaterThanOrEquals(t *testing.T) {
 					},
 				}
 
-				rows, err := GetTableRows(ctx, queryContext, getTestLog())
+				rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 				if err != nil {
 					t.Fatalf("GetTableRows returned error: %v", err)
 				}
@@ -605,7 +603,7 @@ func TestTimestampLessThanOrEquals(t *testing.T) {
 					},
 				}
 
-				rows, err := GetTableRows(ctx, queryContext, getTestLog())
+				rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 				if err != nil {
 					t.Fatalf("GetTableRows returned error: %v", err)
 				}
@@ -664,7 +662,7 @@ func TestTimestampRange(t *testing.T) {
 					},
 				}
 
-				rows, err := GetTableRows(ctx, queryContext, getTestLog())
+				rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 				if err != nil {
 					t.Fatalf("GetTableRows returned error: %v", err)
 				}
@@ -812,7 +810,7 @@ func TestDatetimeFiltering(t *testing.T) {
 					},
 				}
 
-				rows, err := GetTableRows(ctx, queryContext, getTestLog())
+				rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 				if err != nil {
 					t.Fatalf("GetTableRows returned error: %v", err)
 				}
@@ -844,7 +842,7 @@ func TestDatetimeFiltering(t *testing.T) {
 						},
 					}
 
-					rows, err := GetTableRows(ctx, queryContext, getTestLog())
+					rows, err := GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 					if err != nil {
 						t.Fatalf("GetTableRows returned error for >= filter: %v", err)
 					}
@@ -873,7 +871,7 @@ func TestDatetimeFiltering(t *testing.T) {
 					},
 				}
 
-				rows, err = GetTableRows(ctx, queryContext, getTestLog())
+				rows, err = GetTableRows(ctx, queryContext, logger.New(os.Stderr, true))
 				if err != nil {
 					t.Fatalf("GetTableRows returned error for <= filter: %v", err)
 				}

@@ -13,6 +13,8 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 	"go.uber.org/multierr"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 var _ historyParser = &safariParser{}
@@ -20,10 +22,10 @@ var _ historyParser = &safariParser{}
 type safariParser struct {
 	location searchLocation
 	profiles []*profile
-	log      func(m string, kvs ...any)
+	log      *logger.Logger
 }
 
-func newSafariParser(location searchLocation, log func(m string, kvs ...any)) historyParser {
+func newSafariParser(location searchLocation, log *logger.Logger) historyParser {
 	profiles := getSafariProfiles(location, log)
 	if len(profiles) > 0 {
 		return &safariParser{
@@ -74,7 +76,7 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", profile.historyPath)
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
-		parser.log("failed to open database", "error", err)
+		parser.log.Errorf("failed to open database: %v", err)
 		return nil, fmt.Errorf("failed to open Safari history database: %w", err)
 	}
 	defer db.Close()
@@ -99,7 +101,7 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
-		parser.log("failed to execute query", "error", err)
+		parser.log.Errorf("failed to execute query: %v", err)
 		return nil, fmt.Errorf("failed to query Safari history: %w", err)
 	}
 	defer rows.Close()
@@ -129,7 +131,7 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 			&visitID,
 		)
 		if err != nil {
-			parser.log("failed to scan row", "rowNumber", rowCount, "error", err)
+			parser.log.Errorf("failed to scan row %d: %v", rowCount, err)
 			continue
 		}
 
@@ -148,7 +150,7 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 	return entries, rows.Err()
 }
 
-func getSafariProfiles(location searchLocation, log func(m string, kvs ...any)) []*profile {
+func getSafariProfiles(location searchLocation, log *logger.Logger) []*profile {
 	var profiles []*profile
 	user := extractUserFromPath(location.path, log)
 
@@ -164,7 +166,7 @@ func getSafariProfiles(location searchLocation, log func(m string, kvs ...any)) 
 			profileName = "Default"
 		}
 
-		log("detected safari History.db file", "path", historyPath)
+		log.Infof("detected safari History.db file: %s", historyPath)
 
 		profile := &profile{
 			name:        profileName,

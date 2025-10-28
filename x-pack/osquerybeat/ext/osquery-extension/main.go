@@ -33,13 +33,13 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"log"
 	"os"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/osquery/osquery-go"
+	osquerygen "github.com/osquery/osquery-go/gen/osquery"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 var (
@@ -52,18 +52,37 @@ var (
 func main() {
 	flag.Parse()
 
+	// Initialize glog-compatible logger with basic config
+	// Will be reconfigured after connecting to osqueryd
+	log := logger.New(os.Stderr, *verbose)
+
 	if *socket == "" {
-		log.Fatalln("Missing required --socket argument")
+		log.Fatal("Missing required --socket argument")
 	}
 
-	serverTimeout := osquery.ServerTimeout(
-		time.Second * time.Duration(*timeout),
-	)
+	timeoutD := time.Second * time.Duration(*timeout)
+
+	// Wait for the socket to become available
+	if err := waitForSocket(*socket, timeoutD, log); err != nil {
+		log.Fatalf("Socket not available: %s", err)
+	}
+
+	// Create a client to query osqueryd configuration
+	client, err := osquery.NewClient(*socket, timeoutD)
+	if err != nil {
+		log.Warningf("Could not create client to query osqueryd options: %s", err)
+	} else {
+		options := getOsqueryOptions(client, log)
+		client.Close()
+		log.UpdateWithOsqueryOptions(options)
+	}
+
+	serverTimeout := osquery.ServerTimeout(timeoutD)
 	serverPingInterval := osquery.ServerPingInterval(
 		time.Second * time.Duration(*interval),
 	)
 
-	go monitorForParent()
+	go monitorForParent(log)
 
 	server, err := osquery.NewExtensionManagerServer(
 		"osquery-extension",
@@ -72,29 +91,71 @@ func main() {
 		serverPingInterval,
 	)
 	if err != nil {
-		log.Fatalf("Error creating extension: %s\n", err)
+		log.Fatalf("Error creating extension: %s", err)
 	}
 
 	// Register the tables available for the specific platform build
-	RegisterTables(server, newLogFunc())
+	RegisterTables(server, log)
+
+	if *verbose {
+		log.Info("Starting osquery extension server")
+	}
 
 	if err := server.Run(); err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to run extension server: %s", err)
 	}
+}
+
+func getOsqueryOptions(client *osquery.ExtensionManagerClient, log *logger.Logger) osquerygen.InternalOptionList {
+	options, err := client.Options()
+	if err != nil {
+		log.Warningf("Failed to query osqueryd options: %s", err)
+		return nil
+	}
+	return options
+}
+
+// waitForSocket waits for the socket/pipe to become available
+func waitForSocket(socketPath string, timeout time.Duration, log *logger.Logger) error {
+	deadline := time.Now().Add(timeout)
+	retryInterval := 500 * time.Millisecond
+	for time.Now().Before(deadline) {
+		log.Infof("Waiting for socket: %s", socketPath)
+		if socketExists(socketPath) {
+			log.Infof("Socket found: %s", socketPath)
+			return nil
+		}
+
+		remaining := time.Until(deadline)
+		if remaining < retryInterval {
+			retryInterval = remaining
+		}
+		if retryInterval > 0 {
+			time.Sleep(retryInterval)
+		}
+	}
+
+	return os.ErrNotExist
+}
+
+// socketExists checks if a socket/pipe exists
+func socketExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
 }
 
 // continuously monitor for ppid and exit if osqueryd is no longer the parent process.
 // because osqueryd is always the process starting the extension, when osqueryd is killed this process should also be cleaned up.
 // sometimes the termination is not clean, causing this process to remain running, which sometimes prevents osqueryd from properly restarting.
 // https://github.com/kolide/launcher/issues/341
-func monitorForParent() {
+func monitorForParent(log *logger.Logger) {
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
 
 	f := func() {
 		ppid := os.Getppid()
 		if ppid <= 1 {
-			fmt.Fprintln(os.Stderr, "extension process no longer owned by osqueryd, quitting")
+			log.Error("extension process no longer owned by osqueryd, quitting")
 			os.Exit(1)
 		}
 	}
@@ -104,14 +165,4 @@ func monitorForParent() {
 	for range ticker.C {
 		f()
 	}
-}
-
-func newLogFunc() func(m string, kvs ...any) {
-	if *verbose || os.Getenv("OSQUERY_EXTENSION_VERBOSE") != "" {
-		log, err := logp.NewDevelopmentLogger("osquery-extension")
-		if err == nil {
-			return log.Debugw
-		}
-	}
-	return func(string, ...any) {}
 }

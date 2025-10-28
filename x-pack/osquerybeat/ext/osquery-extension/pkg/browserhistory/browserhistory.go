@@ -15,6 +15,7 @@ import (
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 func GetColumns() []table.ColumnDefinition {
@@ -29,13 +30,13 @@ func GetColumns() []table.ColumnDefinition {
 	return columns
 }
 
-func GetGenerateFunc(log func(m string, kvs ...any)) table.GenerateFunc {
+func GetGenerateFunc(log *logger.Logger) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
 		return GetTableRows(ctx, queryContext, log)
 	}
 }
 
-func GetTableRows(ctx context.Context, queryContext table.QueryContext, log func(m string, kvs ...any)) ([]map[string]string, error) {
+func GetTableRows(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]map[string]string, error) {
 	once.Do(initParsers)
 
 	results := make([]map[string]string, 0)
@@ -84,7 +85,7 @@ type searchLocation struct {
 	isCustom bool
 }
 
-func getSearchLocations(queryContext table.QueryContext, log func(m string, kvs ...any)) ([]searchLocation, error) {
+func getSearchLocations(queryContext table.QueryContext, log *logger.Logger) ([]searchLocation, error) {
 	searchLocations, err := getSearchLocationsFromFilters(queryContext)
 	if err != nil {
 		return nil, err
@@ -154,7 +155,7 @@ func expandPattern(pattern string) ([]string, error) {
 }
 
 // extractUserFromPath extracts user information from a file path
-func extractUserFromPath(filePath string, log func(m string, kvs ...any)) string {
+func extractUserFromPath(filePath string, log *logger.Logger) string {
 	// Normalize path separators
 	normalizedPath := filepath.ToSlash(filePath)
 	parts := strings.Split(normalizedPath, "/")
@@ -167,6 +168,6 @@ func extractUserFromPath(filePath string, log func(m string, kvs ...any)) string
 		}
 	}
 
-	log("no user found in path", "path", filePath)
+	log.Infof("no user found in path: %s", filePath)
 	return ""
 }

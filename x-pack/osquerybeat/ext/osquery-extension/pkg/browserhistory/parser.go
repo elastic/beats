@@ -11,10 +11,12 @@ import (
 	"sync"
 
 	"github.com/osquery/osquery-go/plugin/table"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 var (
-	newParserFuncs = map[string]func(location searchLocation, log func(m string, kvs ...any)) historyParser{}
+	newParserFuncs = map[string]func(location searchLocation, log *logger.Logger) historyParser{}
 	once           sync.Once
 )
 
@@ -37,7 +39,7 @@ func initParsers() {
 	newParserFuncs["safari"] = newSafariParser
 }
 
-func getParsers(location searchLocation, log func(m string, kvs ...any)) []historyParser {
+func getParsers(location searchLocation, log *logger.Logger) []historyParser {
 	var parsers []historyParser
 	for _, newParser := range newParserFuncs {
 		if parser := newParser(location, log); parser != nil {
@@ -48,7 +50,7 @@ func getParsers(location searchLocation, log func(m string, kvs ...any)) []histo
 }
 
 // findFilesRecursively searches for files with a specific name recursively
-func findFilesRecursively(basePath, fileName string, log func(m string, kvs ...any)) []string {
+func findFilesRecursively(basePath, fileName string, log *logger.Logger) []string {
 	var foundFiles []string
 
 	entries, err := os.ReadDir(basePath)

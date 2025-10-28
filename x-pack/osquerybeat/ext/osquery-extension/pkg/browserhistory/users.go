@@ -9,9 +9,11 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-func discoverUsers(log func(m string, kvs ...any)) []string {
+func discoverUsers(log *logger.Logger) []string {
 	var userDirs []string
 	var searchPaths []string
 
@@ -41,7 +43,7 @@ func discoverUsers(log func(m string, kvs ...any)) []string {
 	for _, searchPath := range searchPaths {
 		matches, err := filepath.Glob(searchPath)
 		if err != nil {
-			log("glob failed", "searchPath", searchPath, "error", err)
+			log.Warningf("glob failed: %v, searchPath: %s", err, searchPath)
 			continue
 		}
 
@@ -60,7 +62,7 @@ func discoverUsers(log func(m string, kvs ...any)) []string {
 					}
 				}
 				if !found {
-					log("discovered user", "username", username, "fullPath", match)
+					log.Infof("discovered user: %s, fullPath: %s", username, match)
 					userDirs = append(userDirs, match) // Store full path instead of just username
 				}
 			}

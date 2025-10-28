@@ -16,6 +16,8 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 	"go.uber.org/multierr"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 var _ historyParser = &firefoxParser{}
@@ -23,10 +25,10 @@ var _ historyParser = &firefoxParser{}
 type firefoxParser struct {
 	location searchLocation
 	profiles []*profile
-	log      func(m string, kvs ...any)
+	log      *logger.Logger
 }
 
-func newFirefoxParser(location searchLocation, log func(m string, kvs ...any)) historyParser {
+func newFirefoxParser(location searchLocation, log *logger.Logger) historyParser {
 	var profiles []*profile
 
 	// First, recursively search for profiles.ini files
@@ -38,7 +40,7 @@ func newFirefoxParser(location searchLocation, log func(m string, kvs ...any)) h
 			basePath := filepath.Dir(profilesIniPath)
 			foundProfiles := getFirefoxProfiles(file, basePath, location, log)
 			profiles = append(profiles, foundProfiles...)
-			log("parsed profiles from profiles.ini", "count", len(foundProfiles), "path", profilesIniPath)
+			log.Infof("parsed profiles from profiles.ini: %d (path: %s)", len(foundProfiles), profilesIniPath)
 		}
 	}
 
@@ -97,7 +99,7 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", profile.historyPath)
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
-		parser.log("failed to open database", "error", err)
+		parser.log.Errorf("failed to open database: %v", err)
 		return nil, fmt.Errorf("failed to open Firefox history database: %w", err)
 	}
 	defer db.Close()
@@ -129,7 +131,7 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
-		parser.log("failed to execute query", "error", err)
+		parser.log.Errorf("failed to execute query: %v", err)
 		return nil, fmt.Errorf("failed to query Firefox history: %w", err)
 	}
 	defer rows.Close()
@@ -169,7 +171,7 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 			&referringURL,
 		)
 		if err != nil {
-			parser.log("failed to scan row", "rowNumber", rowCount, "error", err)
+			parser.log.Errorf("failed to scan row %d: %v", rowCount, err)
 			continue
 		}
 
@@ -192,7 +194,7 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 	return entries, rows.Err()
 }
 
-func getFirefoxProfiles(file io.Reader, basePath string, location searchLocation, log func(m string, kvs ...any)) []*profile {
+func getFirefoxProfiles(file io.Reader, basePath string, location searchLocation, log *logger.Logger) []*profile {
 	var profiles []*profile
 	scanner := bufio.NewScanner(file)
 	var currentProfile *profile
@@ -216,7 +218,7 @@ func getFirefoxProfiles(file io.Reader, basePath string, location searchLocation
 				if _, err := os.Stat(historyPath); err != nil {
 					continue
 				}
-				log("detected firefox places.sqlite file", "path", historyPath)
+				log.Infof("detected firefox places.sqlite file: %s", historyPath)
 				profile := &profile{
 					name:        currentProfile.name,
 					user:        extractUserFromPath(basePath, log),
@@ -240,7 +242,7 @@ func getFirefoxProfiles(file io.Reader, basePath string, location searchLocation
 }
 
 // getFirefoxProfilesFallback recursively searches for places.sqlite files when profiles.ini is not available
-func getFirefoxProfilesFallback(location searchLocation, log func(m string, kvs ...any)) []*profile {
+func getFirefoxProfilesFallback(location searchLocation, log *logger.Logger) []*profile {
 	var profiles []*profile
 	user := extractUserFromPath(location.path, log)
 
@@ -251,7 +253,7 @@ func getFirefoxProfilesFallback(location searchLocation, log func(m string, kvs 
 		profilePath := filepath.Dir(placesPath)
 		profileName := filepath.Base(profilePath)
 
-		log("detected firefox places.sqlite file in fallback", "path", placesPath)
+		log.Infof("detected firefox places.sqlite file in fallback: %s", placesPath)
 
 		profile := &profile{
 			name:        profileName,

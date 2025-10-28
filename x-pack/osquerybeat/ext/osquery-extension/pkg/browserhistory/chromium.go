@@ -15,6 +15,8 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 	"go.uber.org/multierr"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 var _ historyParser = &chromiumParser{}
@@ -22,10 +24,10 @@ var _ historyParser = &chromiumParser{}
 type chromiumParser struct {
 	location searchLocation
 	profiles []*profile
-	log      func(m string, kvs ...any)
+	log      *logger.Logger
 }
 
-func newChromiumParser(location searchLocation, log func(m string, kvs ...any)) historyParser {
+func newChromiumParser(location searchLocation, log *logger.Logger) historyParser {
 	profiles := getChromiumProfiles(location, log)
 	if len(profiles) > 0 {
 		return &chromiumParser{
@@ -76,7 +78,7 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", profile.historyPath)
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
-		parser.log("failed to open database", "error", err)
+		parser.log.Errorf("failed to open database: %v", err)
 		return nil, fmt.Errorf("failed to open Chromium history database: %w", err)
 	}
 	defer db.Close()
@@ -108,7 +110,7 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
-		parser.log("failed to execute query", "error", err)
+		parser.log.Errorf("failed to execute query: %v", err)
 		return nil, fmt.Errorf("failed to query Chromium history: %w", err)
 	}
 	defer rows.Close()
@@ -146,7 +148,7 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 			&referringURL,
 		)
 		if err != nil {
-			parser.log("failed to scan row", "rowNumber", rowCount, "error", err)
+			parser.log.Errorf("failed to scan row %d: %v", rowCount, err)
 			continue
 		}
 
@@ -176,7 +178,7 @@ type localState struct {
 	} `json:"profile"`
 }
 
-func getChromiumProfiles(location searchLocation, log func(m string, kvs ...any)) []*profile {
+func getChromiumProfiles(location searchLocation, log *logger.Logger) []*profile {
 	var profiles []*profile
 	user := extractUserFromPath(location.path, log)
 
@@ -187,7 +189,7 @@ func getChromiumProfiles(location searchLocation, log func(m string, kvs ...any)
 		profilePath := filepath.Dir(historyPath)
 		profileName := filepath.Base(profilePath)
 
-		log("detected chromium History file", "path", historyPath)
+		log.Infof("detected chromium History file: %s", historyPath)
 
 		profile := &profile{
 			name:        profileName,
