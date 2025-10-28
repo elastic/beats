@@ -8,12 +8,28 @@ package testdata
 
 import (
 	"log"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 )
 
+func GetPredictableTime(seed int64) time.Time {
+	// Create a new source of randomness using the seed
+	r := rand.New(rand.NewSource(seed))
+
+	// Generate random but predictable components for the time
+	year := 2000 + r.Intn(25) // Random year between 2000-2024
+	month := 1 + r.Intn(12)   // Random month 1-12
+	day := 1 + r.Intn(28)     // Random day 1-28 (avoiding month length issues)
+	hour := r.Intn(24)        // Random hour 0-23
+	minute := r.Intn(60)      // Random minute 0-59
+	second := r.Intn(60)      // Random second 0-59
+
+	return time.Date(year, time.Month(month), day, hour, minute, second, 0, time.UTC)
+}
 
 func GetCurrentDirectoryOrFatal(t *testing.T) string {
 	_, currentFile, _, ok := runtime.Caller(0)

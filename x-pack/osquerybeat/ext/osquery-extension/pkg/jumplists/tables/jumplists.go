@@ -18,7 +18,7 @@ import (
 // located at Root\\InventoryApplicationFile
 type JumpListEntry struct {
 	LinkPath         string  `osquery:"link_path"`
-	TargetCreatedTime time.Time `osquery:"target_created_time"`
+	TargetCreatedTime time.Time `osquery:"target_created_time" format:"unix"`
 	TargetModifiedTime time.Time `osquery:"target_modified_time"`
 	TargetAccessedTime time.Time `osquery:"target_accessed_time"`
 	TargetSize         int64  `osquery:"target_size"`

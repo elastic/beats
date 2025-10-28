@@ -9,7 +9,9 @@ package tables_test
 import(
 	"time"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/tables"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/testdata"
 	"testing"
+	"reflect"
 )
 
 func TestJumpListEntry_ToMap(t *testing.T) {
@@ -23,17 +25,17 @@ func TestJumpListEntry_ToMap(t *testing.T) {
 			name: "test_to_map",
 			have: tables.JumpListEntry{
 				LinkPath: "test_value",
-				TargetCreatedTime: time.Now(),
-				TargetModifiedTime: time.Now(),
-				TargetAccessedTime: time.Now(),
+				TargetCreatedTime: testdata.GetPredictableTime(1),
+				TargetModifiedTime: testdata.GetPredictableTime(2),
+				TargetAccessedTime: testdata.GetPredictableTime(3),
 				TargetSize: 100,
 				TargetPath: "test_value",
 			},
 			want: map[string]string{
 				"link_path": "test_value",
-				"target_created_time": "test_value",
-				"target_modified_time": "test_value",
-				"target_accessed_time": "test_value",
+				"target_created_time": testdata.GetPredictableTime(1).Format(time.RFC3339),
+				"target_modified_time": testdata.GetPredictableTime(2).Format(time.RFC3339),
+				"target_accessed_time": testdata.GetPredictableTime(3).Format(time.RFC3339),
 				"target_size": "100",
 				"target_path": "test_value",
 			},
@@ -52,8 +54,7 @@ func TestJumpListEntry_ToMap(t *testing.T) {
 			if tt.wantErr {
 				t.Fatal("ToMap() succeeded unexpectedly")
 			}
-			// TODO: update the condition below to compare got with tt.want.
-			if true {
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ToMap() = %v, want %v", got, tt.want)
 			}
 		})
