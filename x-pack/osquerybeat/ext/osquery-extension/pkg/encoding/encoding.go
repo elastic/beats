@@ -128,7 +128,8 @@ func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
 			continue
 		}
 
-		key := fieldType.Tag.Get("osquery")
+		tag := fieldType.Tag
+		key := tag.Get("osquery")
 		switch key {
 		case "-":
 			continue
@@ -162,8 +163,24 @@ func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
 		case reflect.Float32, reflect.Float64:
 			column = table.DoubleColumn(key)
 
+		case reflect.Struct:
+			// Handle time.Time type
+			switch fieldType.Type {
+			case reflect.TypeOf(time.Time{}):
+				if timeFormat, ok := tag.Lookup("format"); ok {
+					switch strings.ToLower(timeFormat) {
+					case "unix", "unixnano", "unixmilli", "unixmicro":
+						column = table.BigIntColumn(key)
+					default:
+						column = table.TextColumn(key)
+					}
+				} else {
+					column = table.TextColumn(key)
+				}
+			}
 		default:
-			return nil, fmt.Errorf("unsupported field type %s for field %s (column %s)", fieldKind, fieldType.Name, key)
+			// we default to table.TextColumn for unsupported types
+			column = table.TextColumn(key)
 		}
 
 		columns = append(columns, column)

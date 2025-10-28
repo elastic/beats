@@ -11,24 +11,24 @@ import (
 
 type visit struct {
 	// Universal fields (available across all browsers)
-	Timestamp      int64  `osquery:"timestamp"`
-	Datetime       string `osquery:"datetime"`
-	UrlID          int64  `osquery:"url_id"`
-	Scheme         string `osquery:"scheme"`
-	Domain         string `osquery:"domain"`
-	URL            string `osquery:"url"`
-	Title          string `osquery:"title"`
-	Browser        string `osquery:"browser"`
-	Parser         string `osquery:"parser"`
-	User           string `osquery:"user"`
-	ProfileName    string `osquery:"profile_name"`
-	TransitionType string `osquery:"transition_type"`
-	ReferringURL   string `osquery:"referring_url"`
-	VisitID        int64  `osquery:"visit_id"`
-	FromVisitID    int64  `osquery:"from_visit_id"`
-	VisitSource    string `osquery:"visit_source"`
-	IsHidden       bool   `osquery:"is_hidden"`
-	HistoryPath    string `osquery:"history_path"`
+	Timestamp      time.Time `osquery:"timestamp" format:"unix"`
+	Datetime       time.Time `osquery:"datetime" format:"rfc3339" tz:"UTC"`
+	UrlID          int64     `osquery:"url_id"`
+	Scheme         string    `osquery:"scheme"`
+	Domain         string    `osquery:"domain"`
+	URL            string    `osquery:"url"`
+	Title          string    `osquery:"title"`
+	Browser        string    `osquery:"browser"`
+	Parser         string    `osquery:"parser"`
+	User           string    `osquery:"user"`
+	ProfileName    string    `osquery:"profile_name"`
+	TransitionType string    `osquery:"transition_type"`
+	ReferringURL   string    `osquery:"referring_url"`
+	VisitID        int64     `osquery:"visit_id"`
+	FromVisitID    int64     `osquery:"from_visit_id"`
+	VisitSource    string    `osquery:"visit_source"`
+	IsHidden       bool      `osquery:"is_hidden"`
+	HistoryPath    string    `osquery:"history_path"`
 
 	// Chromium-specific fields (Chrome, Edge, Brave, etc.)
 	ChVisitDurationMs int64 `osquery:"ch_visit_duration_ms"` // Only available in Chromium-based browsers
@@ -41,13 +41,14 @@ type visit struct {
 	SfDomainExpansion string `osquery:"sf_domain_expansion"` // Safari domain classification
 	SfLoadSuccessful  bool   `osquery:"sf_load_successful"`  // Whether page loaded successfully
 
-	CustomDataDir string `osquery:"custom_data_dir"`
+	CustomDataDir string `osquery:"custom_data_dir"` // Custom data directory if applicable
 }
 
 func newVisit(parser string, profile *profile, timestamp int64) *visit {
-	v := &visit{
-		Timestamp:     timestamp,
-		Datetime:      time.Unix(timestamp, 0).UTC().Format(time.RFC3339),
+	t := time.Unix(timestamp, 0)
+	return &visit{
+		Timestamp:     t,
+		Datetime:      t,
 		Browser:       profile.browser,
 		Parser:        parser,
 		User:          profile.user,
@@ -55,7 +56,6 @@ func newVisit(parser string, profile *profile, timestamp int64) *visit {
 		HistoryPath:   profile.historyPath,
 		CustomDataDir: profile.customDataDir,
 	}
-	return v
 }
 
 func extractSchemeAndDomain(rawURL string) (string, string) {

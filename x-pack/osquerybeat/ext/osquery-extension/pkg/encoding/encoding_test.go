@@ -631,3 +631,135 @@ func TestGenerateColumnDefinitions(t *testing.T) {
 		})
 	}
 }
+func TestGenerateColumnDefinitions_basic(t *testing.T) {
+	type testStruct struct {
+		Name   string  `osquery:"name"`
+		Active bool    `osquery:"active"`
+		Count  int     `osquery:"count"`
+		Score  float64 `osquery:"score"`
+	}
+	expected := []table.ColumnDefinition{
+		table.TextColumn("name"),
+		table.IntegerColumn("active"),
+		table.IntegerColumn("count"),
+		table.DoubleColumn("score"),
+	}
+	cols, err := GenerateColumnDefinitions(testStruct{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(cols) != len(expected) {
+		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
+	}
+	for i := range cols {
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		}
+	}
+}
+
+func TestGenerateColumnDefinitions_pointerStruct(t *testing.T) {
+	type testStruct struct {
+		Name *string `osquery:"name"`
+	}
+	expected := []table.ColumnDefinition{
+		table.TextColumn("name"),
+	}
+	val := &testStruct{}
+	cols, err := GenerateColumnDefinitions(val)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(cols) != len(expected) {
+		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
+	}
+	for i := range cols {
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		}
+	}
+}
+
+func TestGenerateColumnDefinitions_timeFormats(t *testing.T) {
+	type testStruct struct {
+		CreatedAt time.Time `osquery:"created_at" format:"unix"`
+		UpdatedAt time.Time `osquery:"updated_at"`
+	}
+	expected := []table.ColumnDefinition{
+		table.BigIntColumn("created_at"),
+		table.TextColumn("updated_at"),
+	}
+	cols, err := GenerateColumnDefinitions(testStruct{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(cols) != len(expected) {
+		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
+	}
+	for i := range cols {
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		}
+	}
+}
+
+func TestGenerateColumnDefinitions_skippedFields(t *testing.T) {
+	type testStruct struct {
+		Visible string `osquery:"visible"`
+		Hidden  string `osquery:"-"`
+	}
+	expected := []table.ColumnDefinition{
+		table.TextColumn("visible"),
+	}
+	cols, err := GenerateColumnDefinitions(testStruct{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(cols) != len(expected) {
+		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
+	}
+	for i := range cols {
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		}
+	}
+}
+
+func TestGenerateColumnDefinitions_nonStructInput(t *testing.T) {
+	_, err := GenerateColumnDefinitions("not a struct")
+	if err == nil {
+		t.Error("expected error for non-struct input, got nil")
+	}
+}
+
+func TestGenerateColumnDefinitions_nilInput(t *testing.T) {
+	_, err := GenerateColumnDefinitions(nil)
+	if err == nil {
+		t.Error("expected error for nil input, got nil")
+	}
+}
+
+func TestGenerateColumnDefinitions_unexportedFields(t *testing.T) {
+	type testStruct struct {
+		Public    string `osquery:"public"`
+		private   string `osquery:"private"`
+		Exported2 int    `osquery:"exported2"`
+	}
+	expected := []table.ColumnDefinition{
+		table.TextColumn("public"),
+		table.IntegerColumn("exported2"),
+	}
+	cols, err := GenerateColumnDefinitions(testStruct{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(cols) != len(expected) {
+		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
+	}
+	for i := range cols {
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		}
+	}
+}
+
