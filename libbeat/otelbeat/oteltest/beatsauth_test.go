@@ -97,7 +97,7 @@ func TestMTLS(t *testing.T) {
 	}
 
 	// get client certificates paths
-	clientCertificate, clientKey := getClientCerts(t, caCert)
+	clientCertificate, clientKey := GetClientCerts(t, caCert, "")
 
 	// start test server with given server and root certs
 	certPool := x509.NewCertPool()
@@ -113,11 +113,11 @@ func TestMTLS(t *testing.T) {
 
 	inputConfig := `
 receivers:
-  filebeatreceiver:	
+  filebeatreceiver:
     output:
       elasticsearch:
         hosts: {{ .Host }}
-        ssl: 
+        ssl:
           enabled: true
           certificate_authorities:
             - {{ .CACertificate }}
@@ -183,13 +183,13 @@ func TestCATrustedFingerPrint(t *testing.T) {
 
 	inputConfig := `
 receivers:
-  filebeatreceiver:	
+  filebeatreceiver:
     output:
       elasticsearch:
         hosts: {{ .Host }}
-        ssl: 
+        ssl:
           enabled: true
-          ca_trusted_fingerprint: {{ .CATrustedFingerPrint }} 
+          ca_trusted_fingerprint: {{ .CATrustedFingerPrint }}
 `
 
 	var otelConfigBuffer bytes.Buffer
@@ -361,11 +361,11 @@ func TestVerificationMode(t *testing.T) {
 
 			inputConfig := `
 receivers:
-  filebeatreceiver:	
+  filebeatreceiver:
     output:
       elasticsearch:
         hosts: {{ .Host }}
-        ssl: 
+        ssl:
           enabled: true
           certificate_authorities:
             - {{ .CACertificate }}
@@ -457,7 +457,7 @@ func TestProxyHTTP(t *testing.T) {
 				proxytest.WithRequestLog("https", t.Logf)},
 			inputConfig: `
 receivers:
-  filebeatreceiver:	
+  filebeatreceiver:
     output:
       elasticsearch:
         hosts: {{ .Host }}
@@ -490,7 +490,7 @@ receivers:
 				})},
 			inputConfig: `
 receivers:
-  filebeatreceiver:	
+  filebeatreceiver:
     output:
       elasticsearch:
         hosts: {{ .Host }}
@@ -508,7 +508,7 @@ receivers:
 				proxytest.WithRequestLog("https", t.Logf)},
 			inputConfig: `
 receivers:
-  filebeatreceiver:	
+  filebeatreceiver:
     output:
       elasticsearch:
         hosts: {{ .Host }}
@@ -681,40 +681,6 @@ func mustSendLogs(t *testing.T, exporter exporter.Logs, logs plog.Logs) error {
 	logs.MarkReadOnly()
 	err := exporter.ConsumeLogs(t.Context(), logs)
 	return err
-}
-
-// getClientCerts creates client certificates, writes them to a file and return the path of certificate and key
-func getClientCerts(t *testing.T, caCert tls.Certificate) (certificate string, key string) {
-	// create client certificates
-	clientCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "client", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
-	if err != nil {
-		t.Fatalf("could not generate certificates: %s", err)
-	}
-
-	clientKey, err := x509.MarshalPKCS8PrivateKey(clientCerts.PrivateKey)
-	if err != nil {
-		t.Fatalf("could not marshal private key: %v", err)
-	}
-
-	tempDir := t.TempDir()
-	clientCertPath := filepath.Join(tempDir, "client-cert.pem")
-	clientKeyPath := filepath.Join(tempDir, "client-key.pem")
-
-	if err = os.WriteFile(clientCertPath, pem.EncodeToMemory(&pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: clientCerts.Leaf.Raw,
-	}), 0o777); err != nil {
-		t.Fatalf("could not write client certificate to file")
-	}
-
-	if err = os.WriteFile(clientKeyPath, pem.EncodeToMemory(&pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: clientKey,
-	}), 0o777); err != nil {
-		t.Fatalf("could not write client key to file")
-	}
-
-	return clientCertPath, clientKeyPath
 }
 
 func getTranslatedConf(t *testing.T, input []byte) *confmap.Conf {
