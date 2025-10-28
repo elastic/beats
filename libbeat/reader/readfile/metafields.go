@@ -28,17 +28,19 @@ import (
 // Reader produces lines by reading lines from an io.Reader
 // through a decoder converting the reader it's encoding to utf-8.
 type FileMetaReader struct {
-	reader      reader.Reader
-	path        string
-	fi          file.ExtendedFileInfo
-	fingerprint string
-	offset      int64
+	reader       reader.Reader
+	path         string
+	fi           file.ExtendedFileInfo
+	includeOwner bool
+	includeGroup bool
+	fingerprint  string
+	offset       int64
 }
 
 // New creates a new Encode reader from input reader by applying
 // the given codec.
-func NewFilemeta(r reader.Reader, path string, fi file.ExtendedFileInfo, fingerprint string, offset int64) reader.Reader {
-	return &FileMetaReader{r, path, fi, fingerprint, offset}
+func NewFilemeta(r reader.Reader, path string, fi file.ExtendedFileInfo, includeOwner bool, includeGroup bool, fingerprint string, offset int64) reader.Reader {
+	return &FileMetaReader{r, path, fi, includeOwner, includeGroup, fingerprint, offset}
 }
 
 // Next reads the next line from it's initial io.Reader
@@ -61,7 +63,7 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 		},
 	})
 
-	err = setFileSystemMetadata(r.fi, message.Fields)
+	err = setFileSystemMetadata(r.fi, message.Fields, r.includeOwner, r.includeGroup)
 	if err != nil {
 		return message, fmt.Errorf("failed to set file system metadata: %w", err)
 	}

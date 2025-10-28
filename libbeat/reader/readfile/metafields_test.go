@@ -52,7 +52,7 @@ func TestMetaFields(t *testing.T) {
 	path := "test/path"
 	offset := int64(0)
 
-	in := &FileMetaReader{msgReader(messages), path, createTestFileInfo(), "hash", offset}
+	in := &FileMetaReader{msgReader(messages), path, createTestFileInfo(), true, true, "hash", offset}
 	for {
 		msg, err := in.Next()
 		if errors.Is(err, io.EOF) {
@@ -66,8 +66,6 @@ func TestMetaFields(t *testing.T) {
 					"file": mapstr.M{
 						"path":        path,
 						"fingerprint": "hash",
-						"owner":      "root",
-						"group":     "root",
 					},
 					"offset": offset,
 				},

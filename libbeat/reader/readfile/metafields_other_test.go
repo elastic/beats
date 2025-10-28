@@ -35,7 +35,7 @@ func createTestFileInfo() file.ExtendedFileInfo {
 		name: "filename",
 		size: 42,
 		time: time.Now(),
-		sys:  &syscall.Stat_t{Dev: 17, Ino: 999},
+		sys:  &syscall.Stat_t{Dev: 17, Ino: 999, Uid: 0, Gid: 0},
 	})
 }
 
@@ -52,6 +52,18 @@ func checkFields(t *testing.T, expected, actual mapstr.M) {
 	require.NoError(t, err)
 	require.Equal(t, "999", inode)
 	err = actual.Delete(inodeKey)
+	require.NoError(t, err)
+
+	o, err := actual.GetValue(owner)
+	require.NoError(t, err)
+	require.Equal(t, "root", o)
+	err = actual.Delete(owner)
+	require.NoError(t, err)
+
+	g, err := actual.GetValue(group)
+	require.NoError(t, err)
+	require.Equal(t, "root", g)
+	err = actual.Delete(group)
 	require.NoError(t, err)
 
 	require.Equal(t, expected, actual)
