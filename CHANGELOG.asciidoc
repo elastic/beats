@@ -3,6 +3,46 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.19.6]]
+=== Beats version 8.19.6
+https://github.com/elastic/beats/compare/v8.19.5\...v8.19.6[View commits]
+
+[discrete]
+[[enhancements-8.19.6]]
+==== Enhancements
+
+**Metricbeat**
+
+* Improve the Prometheus helper to handle multiple content types including blank and invalid headers.
+
+
+[discrete]
+[[bug-fixes-8.19.6]]
+==== Bug fixes
+
+
+**All**
+
+* Prevent panic in logstash output when trying to send events while shutting down. https://github.com/elastic/beats/pull/46960[#46960]
+* Prevent panic in replace processor for non-string values. https://github.com/elastic/beats/pull/47009[#47009]
+* Autodiscover now correctly updates Kubernetes metadata on node and pod label changes. https://github.com/elastic/beats/pull/47034[#47034]
+* Prevent 3s startup delay when add_cloud_metadata is used with debug logs.
+* Update elastic-agent-system-metrics to v0.13.3.
+* Allows users to customize their data stream namespace to `generic`.
+* Add support for Kafka 4.0 in the Kafka module. https://github.com/elastic/beats/pull/47284[#47284]
+
+**Filebeat**
+
+* Fix defer usage for stopped status reporting. https://github.com/elastic/beats/pull/46916[#46916]
+
+**Metricbeat**
+
+* Fix missing AWS cloudwatch metrics with linked accounts and same dimensions. https://github.com/elastic/beats/pull/46978[#46978]
+* Add a fix to handle blank content-type headers in HTTP responses for Prometheus. https://github.com/elastic/beats/pull/47027[#47027]
+* Add pagination support to the device health metricset in the meraki module. https://github.com/elastic/beats/pull/46938[#46938]
+
+// end 8.19.6 relnotes
+
 [[release-notes-8.19.5]]
 === Beats version 8.19.5
 https://github.com/elastic/beats/compare/v8.19.4\...v8.19.5[View commits]

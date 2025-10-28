@@ -20,11 +20,11 @@ package http
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -579,7 +579,7 @@ func TestHTTPSx509Auth(t *testing.T) {
 	certReader, err := file.ReadOpen(clientCertPath)
 	require.NoError(t, err)
 
-	clientCertBytes, err := ioutil.ReadAll(certReader)
+	clientCertBytes, err := io.ReadAll(certReader)
 	require.NoError(t, err)
 
 	clientCerts := x509.NewCertPool()
@@ -762,7 +762,12 @@ func httpConnectTunnel(writer http.ResponseWriter, request *http.Request) {
 		http.Error(writer, "Only CONNECT method is supported", http.StatusMethodNotAllowed)
 		return
 	}
-	destConn, err := net.DialTimeout("tcp", request.Host, 10*time.Second)
+
+	dialCtx, dialCancel := context.WithTimeout(request.Context(), 10*time.Second)
+	defer dialCancel()
+
+	dialer := &net.Dialer{}
+	destConn, err := dialer.DialContext(dialCtx, "tcp", request.Host)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusServiceUnavailable)
 		return
