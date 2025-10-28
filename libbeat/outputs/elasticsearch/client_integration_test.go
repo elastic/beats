@@ -430,7 +430,7 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 	return client, client
 }
 
-// setupRoleMapping sets up role mapping for the Kerberos user beats@ELASTIC
+// setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
 func setupRoleMapping(t *testing.T, host string) error {
 	_, client := connectTestEs(t, map[string]interface{}{
 		"hosts":    host,
