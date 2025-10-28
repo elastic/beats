@@ -108,68 +108,6 @@ RUN readlink -f {{ $beatBinary }} | xargs setcap {{ .linux_capabilities }}
 {{- if ne .user "root" }}
 RUN groupadd --gid 1000 {{ .BeatName }}
 RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
-<<<<<<< HEAD
-=======
-{{- end }}
-
-{{- if (and (eq .BeatName "heartbeat") (contains .from "wolfi"))  }}
-USER root
-# Install required dependencies from wolfi repository
-RUN for iter in {1..10}; do \
-        apk update && \
-        apk add --no-interactive --no-progress --no-cache nodejs-22=22.20.0-r0 npm=11.4.2-r1 glib dbus-glib libatk-1.0 \
-        libatk-bridge-2.0 cups-libs libxcomposite libxdamage libxrandr libxkbcommon pango alsa-lib \
-        font-opensans fontconfig gtk icu-data-full libnss mesa font-noto-cjk font-noto-emoji && \
-        exit_code=0 && break || exit_code=$? && echo "apk error: retry $iter in 10s" && sleep 10; \
-    done; \
-    (exit $exit_code)
-
-# Setup synthetics env vars
-ENV ELASTIC_SYNTHETICS_CAPABLE=true
-ENV TZ=UTC
-ENV NPM_CONFIG_PREFIX={{ $beatHome }}/.npm
-ENV PATH="$NPM_CONFIG_PREFIX/bin:$PATH"
-
-RUN echo \
-    $NPM_CONFIG_PREFIX \
-    {{ $beatHome }}/.config \
-    {{ $beatHome }}/.synthetics \
-    {{ $beatHome }}/.npm \
-    {{ $beatHome }}/.cache \
-    | xargs -IDIR sh -c 'mkdir -m 0770 -p DIR && chown -R {{ .user }} DIR'
-
-USER {{ .user }}
-RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1')
-{{- end }}
-
-{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi9-minimal")) }}
-USER root
-
-# Install the deps as needed by the exact version of playwright elastic synthetics uses
-# We don't use npx playwright install-deps because that could pull a newer version
-# Install additional fonts as well
-RUN for iter in {1..10}; do \
-    microdnf -y update && \
-    microdnf -y install fontconfig freetype cairo glib2 gtk3 pango xorg-x11-fonts-misc xorg-x11-fonts-Type1 \
-    at-spi2-atk atk at-spi2-core alsa-lib cups-libs dbus-libs libdrm mesa-libEGL mesa-libgbm nspr nss libX11 \
-    libX11-xcb libxcb libXcomposite libXdamage libXext libXfixes libXrandr libxkbcommon libxshmfence glib2 \
-    dbus-glib libicu mesa-libGL unzip \
-    findutils shadow-utils ca-certificates gawk libcap xz tar -y && \
-    mkdir -p /usr/share/fonts/google-noto && \
-    curl -LO https://noto-website-2.storage.googleapis.com/pkgs/NotoSansCJKjp-hinted.zip && \
-    unzip NotoSansCJKjp-hinted.zip -d /usr/share/fonts/google-noto && \
-    rm -f NotoSansCJKjp-hinted.zip && \
-    microdnf -y remove unzip && \
-    curl -LO https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf && \
-    mv NotoSans-Regular.ttf /usr/share/fonts/google-noto && \
-    curl -LO https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf && \
-    mv NotoColorEmoji.ttf /usr/share/fonts/google-noto && \
-    fc-cache -fv && \
-    microdnf clean all && \
-    exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; \
-done; \
-(exit $exit_code)
->>>>>>> b8f145a29 ([Synthtetics] Upgrade nodejs to active LTS (#47091))
 
 {{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal"))) }}
 ENV NODE_PATH={{ $beatHome }}/.node
@@ -183,13 +121,8 @@ RUN echo \
 
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
-<<<<<<< HEAD
 ENV SUITES_DIR={{ $beatHome }}/suites
-ENV NODE_VERSION=18.20.6
-=======
-ENV TZ=UTC
 ENV NODE_VERSION=22.20.0
->>>>>>> b8f145a29 ([Synthtetics] Upgrade nodejs to active LTS (#47091))
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites
