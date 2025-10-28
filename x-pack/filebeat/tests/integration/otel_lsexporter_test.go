@@ -225,9 +225,12 @@ exporters:
   logstash:
     hosts:
       - "logstash:5055"
-    tls:
-      insecure: true
+    ttl: 0s
     proxy_url: "socks5://elastic:changeme@localhost:1080"
+    proxy_use_local_resolver: false
+    worker: 1
+    workers: 0
+    max_retries: 3
 service:
   pipelines:
     logs:
