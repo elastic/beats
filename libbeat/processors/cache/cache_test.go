@@ -23,7 +23,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -585,7 +584,12 @@ func TestCache(t *testing.T) {
 					t.Fatalf("processor %d is not an *cache", i)
 				}
 
-				t.Cleanup(func() { require.NoError(t, c.Close()) })
+				defer func() {
+					err := c.Close()
+					if err != nil {
+						t.Errorf("unexpected error from c.Close(): %v", err)
+					}
+				}()
 				processors = append(processors, p)
 			}
 

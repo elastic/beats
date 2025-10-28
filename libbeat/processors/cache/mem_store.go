@@ -237,7 +237,7 @@ var _ heap.Interface = (*expiryHeap)(nil)
 type expiryHeap []*CacheEntry
 
 func (h *expiryHeap) pop() *CacheEntry {
-	e, _ := heap.Pop(h).(*CacheEntry)
+	e := heap.Pop(h).(*CacheEntry) //nolint:errcheck // Should never happen, panicing here is preferred
 	e.index = -1
 	return e
 }
@@ -254,7 +254,7 @@ func (h expiryHeap) Swap(i, j int) {
 	h[j].index = j
 }
 func (h *expiryHeap) Push(v any) {
-	e, _ := v.(*CacheEntry)
+	e := v.(*CacheEntry) //nolint:errcheck // Should never happen, panicing here is preferred
 	e.index = len(*h)
 	*h = append(*h, e)
 }
