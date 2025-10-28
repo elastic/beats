@@ -7,11 +7,13 @@
 package main
 
 import (
+	(
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/state"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views"
 	"github.com/osquery/osquery-go"
 	"github.com/osquery/osquery-go/plugin/table"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 func RegisterAmcacheTables(server *osquery.ExtensionManagerServer) {
@@ -28,6 +30,7 @@ func RegisterAmcacheTables(server *osquery.ExtensionManagerServer) {
 	server.RegisterPlugin(table.NewPlugin("amcache_device_pnp", devicePnpTable.Columns(), devicePnpTable.GenerateFunc(amcacheGlobalState)))
 	server.RegisterPlugin(table.NewPlugin("amcache_driver_binary", driverBinaryTable.Columns(), driverBinaryTable.GenerateFunc(amcacheGlobalState)))
 }
+
 
 func RegisterTables(server *osquery.ExtensionManagerServer) {
 	RegisterAmcacheTables(server)
