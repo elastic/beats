@@ -13,6 +13,16 @@ env:
   PLATFORMS_AMD64_FIPS: "+all linux/amd64"
   PLATFORMS_ARM64_FIPS: "+all linux/arm64"
 
+# This section is used to define the plugins that will be used in the pipeline.
+# See https://buildkite.com/docs/pipelines/integrations/plugins/using#using-yaml-anchors-with-plugins
+common:
+  - dockerhub_login_plugin: &dockerhub_login_plugin
+      elastic/vault-docker-login#v0.6.0:
+        secret_path: 'kv/ci-shared/observability-github-secrets/shared/docker/dockerhub/observabilityrobots'
+  - docker_elastic_login_plugin: &docker_elastic_login_plugin
+      elastic/vault-docker-login#v0.6.0:
+        secret_path: 'kv/ci-shared/platform-ingest/elastic_docker_registry'
+
 steps:
   # we use concurrency gates (https://buildkite.com/blog/concurrency-gates)
   # to implement two FIFO queues for DRA-snapshot and DRA-staging
@@ -107,6 +117,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - auditbeat
           - filebeat
@@ -140,6 +153,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - auditbeat
           - filebeat
@@ -171,6 +187,9 @@ steps:
         retry:
           automatic:
             - limit: 1
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         artifact_paths:
           - build/distributions/**/*
 
@@ -192,6 +211,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - x-pack/auditbeat
           - x-pack/filebeat
@@ -215,6 +237,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - x-pack/auditbeat
           - x-pack/filebeat
@@ -240,6 +265,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
 
   - group: Packaging Staging
     key: packaging-staging
@@ -265,6 +293,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - auditbeat
           - filebeat
@@ -299,6 +330,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - auditbeat
           - filebeat
@@ -333,6 +367,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
 
       - label: "STAGING: {{matrix}} Linux/amd64 FIPS"
         env:
@@ -354,6 +391,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - x-pack/auditbeat
           - x-pack/filebeat
@@ -379,6 +419,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - x-pack/auditbeat
           - x-pack/filebeat
@@ -406,6 +449,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
 
   - group: DRA publish
     key: dra
@@ -428,6 +474,8 @@ steps:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        plugins:
+          - *docker_elastic_login_plugin
 
       - label: DRA Staging
         # TODO remove OR clause below (see earlier comment)
@@ -448,6 +496,8 @@ steps:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        plugins:
+          - *docker_elastic_login_plugin
 
   - wait
 
