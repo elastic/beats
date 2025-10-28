@@ -147,18 +147,32 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		sanitizers: sanitizers,
 	}
 
-	containerClient, err := container.NewClientFromConnectionString(
-		in.config.SAConnectionString,
-		in.config.SAContainer,
-		&container.ClientOptions{
-			ClientOptions: azcore.ClientOptions{
-				Cloud: cloud.AzurePublic,
+	// Create the container client
+	var containerClient *container.Client
+
+	// Determine the authentication method for the storage account based on whether SAConnectionString is provided
+	if in.config.SAConnectionString == "" {
+		// Use OAuth2 authentication for storage
+		containerClient, err = createContainerClientWithOAuth2(in.config, in.log)
+		if err != nil {
+			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating blob container client with OAuth2: %s", err.Error()))
+			return fmt.Errorf("failed to create blob container client with OAuth2: %w", err)
+		}
+	} else {
+		// Use connection string authentication (default)
+		containerClient, err = container.NewClientFromConnectionString(
+			in.config.SAConnectionString,
+			in.config.SAContainer,
+			&container.ClientOptions{
+				ClientOptions: azcore.ClientOptions{
+					Cloud: cloud.AzurePublic,
+				},
 			},
-		},
-	)
-	if err != nil {
-		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating blob container client: %s", err.Error()))
-		return fmt.Errorf("failed to create blob container client: %w", err)
+		)
+		if err != nil {
+			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating blob container client: %s", err.Error()))
+			return fmt.Errorf("failed to create blob container client: %w", err)
+		}
 	}
 
 	// The modern event hub SDK does not create the container
@@ -718,6 +732,50 @@ func createConsumerClientWithOAuth2(
 	)
 
 	return consumerClient, nil
+}
+
+// createContainerClientWithOAuth2 creates a new Blob Storage container client using OAuth2 authentication.
+func createContainerClientWithOAuth2(
+	config azureInputConfig,
+	log *logp.Logger,
+) (*container.Client, error) {
+	log = log.Named("oauth2")
+
+	// Build the storage account URL
+	storageAccountURL := fmt.Sprintf("https://%s.blob.core.windows.net", config.SAName)
+
+	// Create credential options
+	credentialOptions := &azidentity.ClientSecretCredentialOptions{
+		ClientOptions: azcore.ClientOptions{
+			Cloud: getAzureCloud(config.AuthorityHost),
+		},
+	}
+
+	// Create the credential
+	credential, err := azidentity.NewClientSecretCredential(
+		config.TenantID,
+		config.ClientID,
+		config.ClientSecret,
+		credentialOptions,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create client secret credential: %w", err)
+	}
+
+	// Create the container client with OAuth2 authentication
+	containerClient, err := container.NewClient(storageAccountURL+"/"+config.SAContainer, credential, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create container client with OAuth2: %w", err)
+	}
+
+	log.Infow("successfully created container client with OAuth2 authentication",
+		"storage_account", config.SAName,
+		"container", config.SAContainer,
+		"tenant_id", config.TenantID,
+		"client_id", config.ClientID,
+	)
+
+	return containerClient, nil
 }
 
 // getAzureCloud returns the appropriate Azure cloud configuration based on the authority host.

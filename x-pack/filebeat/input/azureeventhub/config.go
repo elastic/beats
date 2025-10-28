@@ -236,8 +236,23 @@ func (conf *azureInputConfig) Validate() error {
 			return errors.New("no storage account key configured (config: storage_account_key)")
 		}
 	case processorV2:
-		if conf.SAConnectionString == "" {
-			return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
+		// For processor v2, either connection string or OAuth2 must be configured
+		useOAuth2ForStorage := conf.SAConnectionString == ""
+		if useOAuth2ForStorage {
+			// Validate OAuth2 configuration for storage
+			if conf.TenantID == "" {
+				return errors.New("tenant_id is required when storage_account_connection_string is not provided (OAuth2 authentication)")
+			}
+			if conf.ClientID == "" {
+				return errors.New("client_id is required when storage_account_connection_string is not provided (OAuth2 authentication)")
+			}
+			if conf.ClientSecret == "" {
+				return errors.New("client_secret is required when storage_account_connection_string is not provided (OAuth2 authentication)")
+			}
+		} else {
+			if conf.SAConnectionString == "" {
+				return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
+			}
 		}
 	default:
 		return fmt.Errorf(
