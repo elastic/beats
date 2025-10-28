@@ -24,11 +24,13 @@ Everything is deployed under the `kube-system` namespace by default. To change t
 
 To download the manifest file, run:
 
-{applies_to}`stack: ga 9.2.0` ```sh subs=true
+{applies_to}`stack: ga 9.2.0` 
+```sh subs=true
 curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/kubernetes/filebeat-kubernetes.yaml
 ```
 
-{applies_to}`stack: beta 9.2.0` ```sh subs=true
+{applies_to}`stack: beta 9.2.0` 
+```sh subs=true
 curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/kubernetes/filebeat-kubernetes-beta.yaml
 ```
 
@@ -53,8 +55,6 @@ By default, Filebeat sends events to an existing Elasticsearch deployment, if pr
 ```
 
 ### Ingesting rotated log files
-
-test: [Docker images](/reference/filebeat/running-on-docker.md)
 
 Filebeat can ship the rotated logs as well, including the GZIP-compressed. Refer
 to [filestream configuration](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files)
