@@ -28,7 +28,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// NewTestingLogger returns a testing suitable logp.Logger.
+// NewTestingLogger returns a testing suitable logp.Logger that uses the
+// [testing.T] as the logger output.
 func NewTestingLogger(t testing.TB, selector string, options ...logp.LogOption) *logp.Logger {
 	log := zaptest.NewLogger(t, zaptest.WrapOptions(options...))
 	log = log.Named(selector)
@@ -40,7 +41,8 @@ func NewTestingLogger(t testing.TB, selector string, options ...logp.LogOption) 
 	return logger
 }
 
-// NewTestingLoggerWithObserver returns a testing suitable logp.Logger and an observer
+// NewTestingLoggerWithObserver returns a testing suitable logp.Logger that uses the
+// [testing.T] as the logger output and an observer.
 func NewTestingLoggerWithObserver(t testing.TB, selector string) (*logp.Logger, *observer.ObservedLogs) {
 	observedCore, observedLogs := observer.New(zapcore.DebugLevel)
 	logger := NewTestingLogger(t, selector, zap.WrapCore(func(core zapcore.Core) zapcore.Core {
