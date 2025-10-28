@@ -176,7 +176,7 @@ func NewConnection(s ConnectionSettings, log *logp.Logger) (*Connection, error) 
 
 	esClient := esHTTPClient(httpClient)
 	if s.Kerberos.IsEnabled() {
-		esClient, err = kerberos.NewClient(s.Kerberos, httpClient, s.URL)
+		esClient, err = kerberos.NewClient(s.Kerberos, httpClient)
 		if err != nil {
 			return nil, err
 		}
@@ -227,7 +227,6 @@ func NewClients(cfg *cfg.C, beatname string, log *logp.Logger) ([]Connection, er
 			return nil, err
 		}
 
-		// TODO: use local logger here
 		client, err := NewConnection(ConnectionSettings{
 			URL:              esURL,
 			Beatname:         beatname,

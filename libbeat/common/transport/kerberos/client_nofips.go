@@ -29,7 +29,7 @@ import (
 	"github.com/jcmturner/gokrb5/v8/spnego"
 )
 
-func NewClient(config *Config, httpClient *http.Client, esurl string) (Client, error) {
+func NewClient(config *Config, httpClient *http.Client) (Client, error) {
 	var krbClient *krbclient.Client
 	krbConf, err := krbconfig.Load(config.ConfigPath)
 	if err != nil {
