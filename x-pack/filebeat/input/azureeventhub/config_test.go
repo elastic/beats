@@ -163,78 +163,126 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 		errorMsg    string
 	}{
 		{
-			name: "valid oauth2 config (no connection_string)",
-			config: azureInputConfig{
-				EventHubName:       "test-hub",
-				EventHubNamespace:  "test-namespace.servicebus.windows.net",
-				TenantID:           "test-tenant-id",
-				ClientID:           "test-client-id",
-				ClientSecret:       "test-client-secret",
-				SAName:             "test-storage",
-				SAConnectionString: "test-connection-string",
-			},
+			name: "valid oauth2 config for eventhub (no connection_string)",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.EventHubNamespace = "test-namespace.servicebus.windows.net"
+				c.TenantID = "test-tenant-id"
+				c.ClientID = "test-client-id"
+				c.ClientSecret = "test-client-secret"
+				c.SAName = "test-storage"
+				c.SAConnectionString = "test-connection-string"
+				c.ProcessorVersion = "v2"
+				return c
+			}(),
+			expectError: false,
+		},
+		{
+			name: "valid oauth2 config for only storage account (no storage_account_connection_string)",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
+				c.TenantID = "test-tenant-id"
+				c.ClientID = "test-client-id"
+				c.ClientSecret = "test-client-secret"
+				c.SAName = "test-storage"
+				c.ProcessorVersion = "v2"
+				return c
+			}(),
+			expectError: false,
+		},
+		{
+			name: "valid oauth2 config for both eventhub and storage account (no connection strings)",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.EventHubNamespace = "test-namespace.servicebus.windows.net"
+				c.TenantID = "test-tenant-id"
+				c.ClientID = "test-client-id"
+				c.ClientSecret = "test-client-secret"
+				c.SAName = "test-storage"
+				c.ProcessorVersion = "v2"
+				return c
+			}(),
 			expectError: false,
 		},
 		{
 			name: "oauth2 config missing namespace",
-			config: azureInputConfig{
-				EventHubName:       "test-hub",
-				TenantID:           "test-tenant-id",
-				ClientID:           "test-client-id",
-				ClientSecret:       "test-client-secret",
-				SAName:             "test-storage",
-				SAConnectionString: "test-connection-string",
-			},
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.TenantID = "test-tenant-id"
+				c.ClientID = "test-client-id"
+				c.ClientSecret = "test-client-secret"
+				c.SAName = "test-storage"
+				c.SAConnectionString = "test-connection-string"
+				c.ProcessorVersion = "v2"
+				return c
+			}(),
 			expectError: true,
 			errorMsg:    "eventhub_namespace is required when connection_string is not provided (OAuth2 authentication)",
 		},
 		{
 			name: "oauth2 config missing tenant_id",
-			config: azureInputConfig{
-				EventHubName:       "test-hub",
-				EventHubNamespace:  "test-namespace.servicebus.windows.net",
-				ClientID:           "test-client-id",
-				ClientSecret:       "test-client-secret",
-				SAName:             "test-storage",
-				SAConnectionString: "test-connection-string",
-			},
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.EventHubNamespace = "test-namespace.servicebus.windows.net"
+				c.ClientID = "test-client-id"
+				c.ClientSecret = "test-client-secret"
+				c.SAName = "test-storage"
+				c.SAConnectionString = "test-connection-string"
+				c.ProcessorVersion = "v2"
+				return c
+			}(),
 			expectError: true,
 			errorMsg:    "tenant_id is required when connection_string is not provided (OAuth2 authentication)",
 		},
 		{
 			name: "oauth2 config missing client_id",
-			config: azureInputConfig{
-				EventHubName:       "test-hub",
-				EventHubNamespace:  "test-namespace.servicebus.windows.net",
-				TenantID:           "test-tenant-id",
-				ClientSecret:       "test-client-secret",
-				SAName:             "test-storage",
-				SAConnectionString: "test-connection-string",
-			},
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.EventHubNamespace = "test-namespace.servicebus.windows.net"
+				c.TenantID = "test-tenant-id"
+				c.ClientSecret = "test-client-secret"
+				c.SAName = "test-storage"
+				c.SAConnectionString = "test-connection-string"
+				c.ProcessorVersion = "v2"
+				return c
+			}(),
 			expectError: true,
 			errorMsg:    "client_id is required when connection_string is not provided (OAuth2 authentication)",
 		},
 		{
 			name: "oauth2 config missing client_secret",
-			config: azureInputConfig{
-				EventHubName:       "test-hub",
-				EventHubNamespace:  "test-namespace.servicebus.windows.net",
-				TenantID:           "test-tenant-id",
-				ClientID:           "test-client-id",
-				SAName:             "test-storage",
-				SAConnectionString: "test-connection-string",
-			},
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.EventHubNamespace = "test-namespace.servicebus.windows.net"
+				c.TenantID = "test-tenant-id"
+				c.ClientID = "test-client-id"
+				c.SAName = "test-storage"
+				c.SAConnectionString = "test-connection-string"
+				c.ProcessorVersion = "v2"
+				return c
+			}(),
 			expectError: true,
 			errorMsg:    "client_secret is required when connection_string is not provided (OAuth2 authentication)",
 		},
 		{
 			name: "valid connection_string config",
-			config: azureInputConfig{
-				EventHubName:       "test-hub",
-				ConnectionString:   "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test",
-				SAName:             "test-storage",
-				SAConnectionString: "test-connection-string",
-			},
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
+				c.SAName = "test-storage"
+				c.SAConnectionString = "test-connection-string"
+				c.ProcessorVersion = "v2"
+				return c
+			}(),
 			expectError: false,
 		},
 	}
