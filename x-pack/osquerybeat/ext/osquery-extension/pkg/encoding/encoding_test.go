@@ -426,6 +426,30 @@ func Test_formatTimeWithTagFormat(t *testing.T) {
 			want:       "2023-06-16T00:30:00+10:00",
 			wantErr:    false,
 		},
+		{
+			name:       "Unix milliseconds format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"unixmilli"`),
+			want:       "1686839400000",
+			wantErr:    false,
+		},
+		{
+			name:       "Unix nanoseconds format",
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"unixnano"`),
+			want:       "1686839400000000000",
+			wantErr:    false,
+		},
+		{
+			name:       "Unix microseconds format", 
+			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
+			flag:       0,
+			tag:        tagPtr(`format:"unixmicro"`),
+			want:       "1686839400000000",
+			wantErr:    false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

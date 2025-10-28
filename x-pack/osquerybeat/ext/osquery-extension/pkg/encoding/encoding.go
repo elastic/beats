@@ -208,6 +208,12 @@ func formatTimeWithTagFormat(fieldValue reflect.Value, flag EncodingFlag, tag *r
 		switch timeFormat {
 		case "unix":
 			result = strconv.FormatInt(t.Unix(), 10)
+		case "unixnano":
+			result = strconv.FormatInt(t.UnixNano(), 10)
+		case "unixmilli":
+			result = strconv.FormatInt(t.UnixMilli(), 10)
+		case "unixmicro":
+			result = strconv.FormatInt(t.UnixMicro(), 10)
 		case "rfc3339":
 			result = t.Format(time.RFC3339)
 		case "rfc3339nano":
