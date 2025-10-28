@@ -6,20 +6,12 @@ This osquery extension provides additional custom tables that enhance osquery's 
 
 The extension adds several custom tables to osquery that provide:
 - Browser history analysis across multiple browsers
-- Host filesystem information reading from alternative root paths
-- Process information with enhanced details
-- File analysis with code signing and dependency information (macOS)
-- User and group management information
 
 ## Supported Platforms
 
 | Table | Linux | macOS | Windows |
 |-------|-------|-------|---------|
 | `browser_history` | ✅ | ✅ | ✅ |
-| `host_users` | ✅ | ✅ | ❌ |
-| `host_groups` | ✅ | ✅ | ❌ |
-| `host_processes` | ✅ | ❌ | ❌ |
-| `elastic_file_analysis` | ❌ | ✅ | ❌ |
 
 ---
 
@@ -29,28 +21,6 @@ Each table has detailed documentation in its own file:
 
 ### 1. [browser_history](docs/browser_history.md)
 Query browser history from multiple browsers (Chrome, Edge, Firefox, Safari) with unified schema and advanced filtering capabilities.
-
-**Platforms:** Linux, macOS, Windows
-
-### 2. [host_users](docs/host_users.md)
-Query user information from `/etc/passwd`. Useful for reading user information from alternative filesystem roots (e.g., container inspection, mounted drives).
-
-**Platforms:** Linux, macOS
-
-### 3. [host_groups](docs/host_groups.md)
-Query group information from `/etc/group`. Reads group information from the configured filesystem root.
-
-**Platforms:** Linux, macOS
-
-### 4. [host_processes](docs/host_processes.md)
-Query detailed process information by reading directly from `/proc` filesystem. Provides more control and can read from alternative filesystem roots.
-
-**Platforms:** Linux
-
-### 5. [elastic_file_analysis](docs/elastic_file_analysis.md)
-Perform deep file analysis using native system tools. Provides comprehensive file metadata, code signing information, dependencies, symbols, and strings extraction.
-
-**Platforms:** macOS
 
 ---
 
@@ -79,12 +49,8 @@ The extension is automatically loaded by Osquerybeat. To use it manually with os
 osqueryi --extension /path/to/osquery-extension [--allow-unsafe]
 
 # Verify tables are loaded
-osqueryi> .tables elastic
+osqueryi> .tables
   => browser_history
-  => elastic_file_analysis (macOS only)
-  => host_groups
-  => host_processes (Linux only)
-  => host_users
 
 # Query the tables
 osqueryi> SELECT * FROM browser_history LIMIT 10;
