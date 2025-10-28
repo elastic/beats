@@ -171,6 +171,60 @@ func TestCreateEvents(t *testing.T) {
 		assert.Equal(expected, event)
 	})
 
+	t.Run("standard table - missing usage dates", func(t *testing.T) {
+		row := row{
+			InvoiceMonth:       "202001",
+			ProjectId:          "project-123456",
+			ProjectName:        "My Project 12345",
+			BillingAccountId:   "011702_58A742_BQB4E8",
+			CostType:           "regular",
+			SkuId:              "F449-33EC-A5EF",
+			SkuDescription:     "E2 Instance Ram running in Americas",
+			ServiceId:          "6F81-5844-456A",
+			ServiceDescription: "Compute Engine",
+			Tags:               "tag1:value1,tag2.a.b/c:value2,tag3:",
+			TotalExact:         123.45,
+			LocationRegion:     "us-east-1",
+			Labels:             `[{"key":"abc", "value":"val1"}]`,
+		}
+
+		date := getCurrentDate()
+		id := generateEventID(date, row)
+
+		expected := mb.Event{
+			ID: id,
+			RootFields: mapstr.M{
+				"cloud.provider":     "gcp",
+				"cloud.project.id":   "project-123456",
+				"cloud.project.name": "My Project 12345",
+				"cloud.account.id":   "011702_58A742_BQB4E8",
+			},
+			MetricSetFields: mapstr.M{
+				"invoice_month":       "202001",
+				"project_id":          "project-123456",
+				"project_name":        "My Project 12345",
+				"billing_account_id":  "011702_58A742_BQB4E8",
+				"cost_type":           "regular",
+				"total":               123.45,
+				"sku_id":              "F449-33EC-A5EF",
+				"sku_description":     "E2 Instance Ram running in Americas",
+				"service_id":          "6F81-5844-456A",
+				"service_description": "Compute Engine",
+				"tags": []tag{
+					{Key: "tag1", Value: "value1"},
+					{Key: "tag2.a.b/c", Value: "value2"},
+					{Key: "tag3", Value: ""},
+				},
+				"labels": map[string]string{
+					"abc": "val1",
+				},
+				"location": mapstr.M{"region": "us-east-1"},
+			},
+		}
+		event := createEvents(row, "project-123456.dataset.gcp_billing_export_v1_011702_58A742_BQB4E8", "project-123456")
+		assert.Equal(expected, event)
+	})
+
 	t.Run("detailed table", func(t *testing.T) {
 		row := row{
 			InvoiceMonth:       "202001",
