@@ -18,12 +18,12 @@ type BaseData struct {
 type UsageResponse struct {
 	Object                       string        `json:"object"`
 	Data                         []UsageData   `json:"data"`
-	FtData                       []interface{} `json:"ft_data"`
+	FtData                       []any         `json:"ft_data"`
 	DalleApiData                 []DalleData   `json:"dalle_api_data"`
 	WhisperApiData               []WhisperData `json:"whisper_api_data"`
 	TtsApiData                   []TtsData     `json:"tts_api_data"`
-	AssistantCodeInterpreterData []interface{} `json:"assistant_code_interpreter_data"`
-	RetrievalStorageData         []interface{} `json:"retrieval_storage_data"`
+	AssistantCodeInterpreterData []any         `json:"assistant_code_interpreter_data"`
+	RetrievalStorageData         []any         `json:"retrieval_storage_data"`
 }
 
 type UsageData struct {
