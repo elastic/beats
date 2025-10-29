@@ -93,7 +93,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // 2. Calculates start date using configured lookback days
 // 3. Fetches usage data for each day in the range
 // 4. Reports collected metrics through the mb.ReporterV2
-func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 	endDate := time.Now().UTC().Truncate(time.Hour * 24) // truncate to day as we only collect daily data
 
 	if !m.config.Collection.Realtime {
@@ -105,7 +105,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	startDate := endDate.AddDate(0, 0, -m.config.Collection.LookbackDays)
 
 	m.report = report
-	return m.fetchDateRange(startDate, endDate, m.httpClient)
+	return m.fetchDateRange(ctx, startDate, endDate, m.httpClient)
 }
 
 // fetchDateRange retrieves OpenAI API usage data for each configured API key within a date range.
@@ -116,8 +116,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 // 3. Collects daily usage data
 // 4. Updates state store with latest processed date
 // 5. Handles errors per day without failing entire range
-func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLHTTPClient) error {
-	g, ctx := errgroup.WithContext(context.TODO())
+func (m *MetricSet) fetchDateRange(ctx context.Context, startDate, endDate time.Time, httpClient *RLHTTPClient) error {
+	g, ctx := errgroup.WithContext(ctx)
 
 	for i := range m.config.APIKeys {
 		apiKey := m.config.APIKeys[i]

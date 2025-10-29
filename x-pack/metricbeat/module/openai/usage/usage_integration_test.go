@@ -277,8 +277,8 @@ func TestFetch(t *testing.T) {
 		},
 	}
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL+"/usage", apiKey))
-	events, errs := mbtest.ReportingFetchV2Error(f)
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(server.URL+"/usage", apiKey))
+	events, errs := mbtest.ReportingFetchV2WithContext(f)
 
 	require.Empty(t, errs, "Expected no errors")
 	require.NotEmpty(t, events, "Expected events to be returned")
@@ -297,9 +297,9 @@ func TestData(t *testing.T) {
 	server := initServer(usagePath, apiKey)
 	defer server.Close()
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL+"/usage", apiKey))
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(server.URL+"/usage", apiKey))
 
-	err := mbtest.WriteEventsReporterV2Error(f, t, "")
+	err := mbtest.WriteEventsReporterV2WithContext(f, t, "")
 	require.NoError(t, err, "Writing events should not return an error")
 }
 
