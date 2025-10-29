@@ -40,6 +40,7 @@ func Filebeat() *cmd.BeatsRootCmd {
 	command.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		management.ConfigTransform.SetTransform(filebeatCfg)
 	}
+	addOTelCommand(command)
 	return command
 }
 
