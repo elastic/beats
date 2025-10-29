@@ -10,6 +10,7 @@ import (
 	"github.com/osquery/osquery-go/plugin/table"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hostfs"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 const (
@@ -24,9 +25,10 @@ func HostGroupsColumns() []table.ColumnDefinition {
 	}
 }
 
-func GetHostGroupsGenerateFunc() table.GenerateFunc {
+func GetHostGroupsGenerateFunc(log *logger.Logger) table.GenerateFunc {
 	fn := hostfs.GetPath(groupFile)
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
+		log.Infof("reading group for path: %s", fn)
 		return hostfs.ReadGroup(fn)
 	}
 }
