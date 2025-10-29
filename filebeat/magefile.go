@@ -218,6 +218,8 @@ func PythonLogAsFilestream(ctx context.Context) error {
 	args.Files = []string{
 		"tests/system/test_json.py",
 		"tests/system/test_modules.py",
+		"tests/system/test_multiline.py",
+		"tests/system/test_autodiscover.py",
 	}
 	return devtools.PythonIntegTestFromHost(args)
 }

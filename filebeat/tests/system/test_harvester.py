@@ -62,7 +62,7 @@ class Test(BaseTest):
                 max_timeout=15)
 
         else:
-        # Wait until error shows up
+            # Wait until error shows up
             self.wait_until(
                 lambda: self.log_contains(
                     "Closing because close_renamed is enabled"),

@@ -219,5 +219,6 @@ class LogState:
     def check(self, msg, ignore_case=False, count=1):
         return lambda: self.contains(msg, ignore_case, count)
 
+
 def log_as_filestream():
     return setuptools.distutils.util.strtobool(os.getenv("RUN_AS_FILESTREAM", "False"))

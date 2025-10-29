@@ -16,6 +16,18 @@
       description: >
         The file offset the reported line starts at.
 
+    - name: log.file.device_id
+      type: keyword
+      required: false
+      description: >-
+        device id TODO
+
+    - name: log.file.inode
+      type: long
+      required: false
+      description: >-
+        inode TODO
+
     - name: stream
       type: keyword
       required: false

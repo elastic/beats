@@ -27,6 +27,22 @@ Contains log file lines.
     required: False
 
 
+**`log.file.device_id`**
+:   device id TODO
+
+    type: keyword
+
+    required: False
+
+
+**`log.file.inode`**
+:   inode TODO
+
+    type: long
+
+    required: False
+
+
 **`stream`**
 :   Log stream when reading container logs, can be 'stdout' or 'stderr'
 

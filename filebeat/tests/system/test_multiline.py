@@ -1,4 +1,4 @@
-from filebeat import BaseTest
+from filebeat import BaseTest, log_as_filestream
 import os
 import time
 
@@ -263,13 +263,17 @@ connection <0.23893.109>, channel 3 - soft error:
             file.write(b"  First Line\n")
             file.write(b"  Second Line\n")
 
+        close_timeout_msg = "Closing harvester because close_timeout was reached"
+        if log_as_filestream:
+            close_timeout_msg = "Reader was closed. Closing."
+
         proc = self.start_beat()
 
         # Wait until harvester is closed because of timeout
         # This leads to the partial event above to be sent
         self.wait_until(
             lambda: self.log_contains(
-                "Closing harvester because close_timeout was reached"),
+                close_timeout_msg),
             max_timeout=15)
 
         # Because of the timeout the following two lines should be put together
@@ -289,7 +293,7 @@ connection <0.23893.109>, channel 3 - soft error:
         # close_timeout must have closed the reader exactly twice
         self.wait_until(
             lambda: self.log_contains_count(
-                "Closing harvester because close_timeout was reached") >= 1,
+                close_timeout_msg) >= 1,
             max_timeout=15)
 
         output = self.read_output()
