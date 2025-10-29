@@ -135,6 +135,10 @@ func simulatePipeline(api *esapi.API, pipeline string, docs []json.RawMessage) (
 	}
 	var events []json.RawMessage
 	for _, doc := range response.Docs {
+		if doc.Error != nil {
+			events = append(events, doc.Error)
+			continue
+		}
 		events = append(events, doc.Doc.Source)
 	}
 	return events, nil
@@ -149,7 +153,8 @@ type simulatePipelineResponse struct {
 }
 
 type pipelineIngestedDocument struct {
-	Doc pipelineDocument `json:"doc"`
+	Doc   pipelineDocument `json:"doc"`
+	Error json.RawMessage  `json:"error"`
 }
 
 type pipelineDocument struct {

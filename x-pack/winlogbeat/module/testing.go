@@ -127,6 +127,7 @@ func testIngestPipeline(t *testing.T, pipeline, pattern string, p *params) {
 		"powershell_operational",
 		"routing",
 		"security",
+		"security_standard",
 		"sysmon",
 	}
 	if len(loaded) != len(wantPipelines) {

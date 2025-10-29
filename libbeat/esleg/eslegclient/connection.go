@@ -378,7 +378,7 @@ func (conn *Connection) Request(
 ) (int, []byte, error) {
 
 	url := addToURL(conn.URL, path, pipeline, params)
-	conn.log.Debugf("%s %s %s %v", method, url, pipeline, body)
+	conn.log.Debugf("%s %s %s", method, url, pipeline)
 
 	return conn.RequestURL(method, url, body)
 }

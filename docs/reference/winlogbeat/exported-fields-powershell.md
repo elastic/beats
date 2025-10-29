@@ -177,6 +177,12 @@ Data related to the PowerShell engine.
 
 Data related to the executed script file.
 
+**`powershell.file.script_block_hash`**
+:   A hash of the script to be used in rules.
+
+    type: keyword
+
+
 **`powershell.file.script_block_id`**
 :   Id of the executed script block.
 

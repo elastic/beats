@@ -942,14 +942,14 @@ processors:
           return;
         }
         Long tOpts = Long.decode(ctx.winlog.event_data.TicketOptions);
-        ArrayList tDescs = new ArrayList();
+        TreeSet tDescs = new TreeSet();
         for (entry in params.entrySet()) {
           Long flag = Long.decode(entry.getKey());
           if ((tOpts.longValue() & flag.longValue()) == flag.longValue()) {
             tDescs.add(entry.getValue());
           }
         }
-        if (tDescs.length == 0) {
+        if (tDescs.size() == 0) {
           return;
         }
         ctx.winlog.event_data.put("TicketOptionsDescription", tDescs);
@@ -3308,10 +3308,10 @@ processors:
           }
           if (ctx.group?.id != null) {
             ctx.user.target.group.put("id", ctx.group.id);
-          } 
+          }
           if (ctx.group?.name != null) {
             ctx.user.target.group.put("name", ctx.group.name);
-          } 
+          }
           if (ctx.group?.domain != null) {
             ctx.user.target.group.put("domain", ctx.group.domain);
           }
@@ -3799,7 +3799,11 @@ processors:
       if: |-
         ctx.source?.ip != null &&
         ctx.source.ip != "-"
-
+  - gsub:
+      field: winlog.event_data.SidList
+      pattern: '\s+'
+      replacement: ' '
+      ignore_missing: true
   - script:
       lang: painless
       ignore_failure: false
@@ -4128,14 +4132,15 @@ processors:
 
         void splitSidList(def sids, def params, def ctx) {
           ArrayList al = new ArrayList();
-          def sidList = sids.splitOnToken(" ");
+          def sidsArray = sids.splitOnToken(" ");
+          ArrayList sidList = new ArrayList(Arrays.asList(sidsArray));
           ctx.winlog.event_data.put("SidList", sidList);
           for (def i = 0; i < sidList.length; i++ ) {
             al.add(translateSID(sidList[i].replace("%", "").replace("{", "").replace("}", "").replace(" ",""), params));
           }
           ctx.winlog.event_data.put("SidListDesc", al);
         }
-        
+
         if (ctx.event?.code == null ||
             !["4670", "4817", "4907", "4908"].contains(ctx.event.code)) {
           return;
@@ -4245,4 +4250,7 @@ on_failure:
       value: pipeline_error
   - append:
       field: error.message
-      value: "{{{ _ingest.on_failure_message }}}"
+      value: >-
+        Processor '{{{ _ingest.on_failure_processor_type }}}'
+        {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}'
+        {{/_ingest.on_failure_processor_tag}}failed with message '{{{ _ingest.on_failure_message }}}'
