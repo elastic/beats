@@ -17,13 +17,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter"
 	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest"
 	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/stretchr/testify/assert"
@@ -37,7 +36,6 @@ import (
 
 type Collector struct {
 	collector *otelcol.Collector
-	logger    *logp.Logger
 	observer  *observer.ObservedLogs
 }
 
@@ -55,8 +53,15 @@ func New(tb testing.TB, configYAML string) *Collector {
 	}
 
 	// TODO(mauri870): this logger is too verbose, change it so it does not log everything to stderr.
-	logger, observer := logptest.NewTestingLoggerWithObserver(tb, "")
-	settings := newCollectorSettings("file:"+configFile, logger)
+	zapCore := zapcore.NewCore(
+		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+		&zaptest.Discarder{},
+		zapcore.DebugLevel,
+	)
+	observed, observer := observer.New(zapcore.DebugLevel)
+	core := zapcore.NewTee(zapCore, observed)
+
+	settings := newCollectorSettings("file:"+configFile, core)
 	col, err := otelcol.NewCollector(settings)
 	require.NoError(tb, err)
 
@@ -78,7 +83,7 @@ func New(tb testing.TB, configYAML string) *Collector {
 		return col.GetState() == otelcol.StateRunning
 	}, 10*time.Second, 10*time.Millisecond, "Collector did not start in time")
 
-	return &Collector{collector: col, logger: logger, observer: observer}
+	return &Collector{collector: col, observer: observer}
 }
 
 func (c *Collector) ObservedLogs() *observer.ObservedLogs {
@@ -126,7 +131,7 @@ func getComponent() (otelcol.Factories, error) {
 
 }
 
-func newCollectorSettings(filename string, logger *logp.Logger) otelcol.CollectorSettings {
+func newCollectorSettings(filename string, core zapcore.Core) otelcol.CollectorSettings {
 	return otelcol.CollectorSettings{
 		BuildInfo: component.BuildInfo{
 			Command:     "otel",
@@ -136,7 +141,7 @@ func newCollectorSettings(filename string, logger *logp.Logger) otelcol.Collecto
 		Factories: getComponent,
 		LoggingOptions: []zap.Option{
 			zap.WrapCore(func(c zapcore.Core) zapcore.Core {
-				return logger.Core()
+				return core
 			}),
 		},
 		ConfigProviderSettings: otelcol.ConfigProviderSettings{
