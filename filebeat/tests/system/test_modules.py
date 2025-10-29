@@ -1,4 +1,4 @@
-from filebeat import BaseTest
+from filebeat import BaseTest, log_as_filestream
 from beat.beat import INTEGRATION_TESTS
 import os
 import unittest
@@ -184,6 +184,16 @@ class Test(BaseTest):
                 module=module, fileset=fileset),
             "-M", "*.*.input.close_eof=true",
         ]
+
+        # if the test file contains '.journal', later we will try to remove
+        # the '--once' flag, also it will be running the Journald input,
+        # so there is nothing to be done here.
+        if log_as_filestream() and ".journal" not in test_file:
+            cmd.append("-E")
+            cmd.append("features.log_input_run_as_filestream.enabled=true")
+            cmd.append("-M")
+            cmd.append("{module}.{fileset}.input.id='id{module}-{fileset}'".format(module=module, fileset=fileset))
+            cmd.remove("--once")
         # allow connecting older versions of Elasticsearch
         if os.getenv("TESTING_FILEBEAT_ALLOW_OLDER"):
             cmd.extend(["-E", "output.elasticsearch.allow_older_versions=true"])
@@ -334,7 +344,11 @@ def clean_keys(obj):
     # The create timestamps area always new
     time_keys = ["event.created", "event.ingested"]
     # source path and agent.version can be different for each run
-    other_keys = ["log.file.path", "agent.version"]
+    other_keys = ["log.file.path",
+                  "log.file.inode", # Filestream field
+                  "log.file.device_id", # Filestream field
+                  "log.offset", # Not correctly populated by the log input
+                  "agent.version"]
     # ECS versions change for any ECS release, large or small
     ecs_key = ["ecs.version"]
 
@@ -345,6 +359,11 @@ def clean_keys(obj):
 
     for key in host_keys + time_keys + other_keys + ecs_key:
         delete_key(obj, key)
+
+    if log_as_filestream() and "tags" in obj:
+        obj["tags"].remove("take_over")
+        if len(obj["tags"]) == 0:
+            delete_key(obj, "tags")
 
     # Most logs from syslog need their timestamp removed because it doesn't
     # include a year.

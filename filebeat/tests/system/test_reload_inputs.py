@@ -1,15 +1,20 @@
 import os
-from filebeat import BaseTest
+from filebeat import BaseTest, log_as_filestream
 
 
 inputConfigTemplate = """
 - type: log
+  id: test-id
   allow_deprecated_use: true
   paths:
     - {}
   scan_frequency: 1s
 """
 
+
+starting_msg = "Starting runner: input"
+if log_as_filestream():
+    starting_msg = "Starting runner: filestream"
 
 class Test(BaseTest):
 
@@ -52,8 +57,11 @@ class Test(BaseTest):
             f.write(config)
 
         # Wait until input is stopped
+        stopped_msg = "Runner: 'input [type=log]' has stopped"
+        if log_as_filestream():
+            stopped_msg = "Runner: 'filestream' has stopped"
         self.wait_until(
-            lambda: self.log_contains("Runner: 'input [type=log]' has stopped"),
+            lambda: self.log_contains(stopped_msg),
             max_timeout=15)
 
         # Update both log files, only 1 change should be picked up

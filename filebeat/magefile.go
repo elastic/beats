@@ -220,6 +220,7 @@ func PythonLogAsFilestream(ctx context.Context) error {
 		"tests/system/test_modules.py",
 		"tests/system/test_multiline.py",
 		"tests/system/test_autodiscover.py",
+		"tests/system/test_reload_inputs.py",
 	}
 	return devtools.PythonIntegTestFromHost(args)
 }
