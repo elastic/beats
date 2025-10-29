@@ -48,7 +48,7 @@ func TestCreateProspector(t *testing.T) {
 				c := config{
 					IgnoreInactive: ignoreInactiveSettings[test.ignore_inactive_since],
 				}
-				p, _ := newProspector(c, logp.NewNopLogger())
+				p, _ := newProspector(c, logp.NewNopLogger(), mustSourceIdentifier())
 				fileProspector := p.(*fileProspector)
 				assert.Equal(t, fileProspector.ignoreInactiveSince, ignoreInactiveSettings[test.ignore_inactive_since])
 			})
@@ -102,7 +102,7 @@ prospector.scanner.fingerprint.enabled: false
 				err = c.Unpack(&cfg)
 				require.NoError(t, err)
 
-				_, err = newProspector(cfg, logp.NewNopLogger())
+				_, err = newProspector(cfg, logp.NewNopLogger(), mustSourceIdentifier())
 				if tc.err == "" {
 					require.NoError(t, err)
 					return

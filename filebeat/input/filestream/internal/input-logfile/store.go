@@ -38,10 +38,10 @@ import (
 // from an input.
 type sourceStore struct {
 	// identifier is the sourceIdentifier used to generate IDs fro this store.
-	identifier *sourceIdentifier
+	identifier *SourceIdentifier
 	// identifiersToTakeOver are sourceIdentifier from previous input instances
 	// that this sourceStore will take states over.
-	identifiersToTakeOver []*sourceIdentifier
+	identifiersToTakeOver []*SourceIdentifier
 	// store is the underlying store that encapsulates
 	// the in-memory and persistent store.
 	store *store
@@ -177,8 +177,8 @@ func openStore(log *logp.Logger, statestore statestore.States, prefix string) (*
 // identifiersToTakeOver is optional and can be nil.
 func newSourceStore(
 	s *store,
-	identifier *sourceIdentifier,
-	identifiersToTakeOver []*sourceIdentifier,
+	identifier *SourceIdentifier,
+	identifiersToTakeOver []*SourceIdentifier,
 ) *sourceStore {
 
 	return &sourceStore{

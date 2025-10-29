@@ -125,7 +125,7 @@ type defaultHarvesterGroup struct {
 	cleanTimeout time.Duration
 	store        *store
 	ackCH        *updateChan
-	identifier   *sourceIdentifier
+	identifier   *SourceIdentifier
 	tg           *task.Group
 	metrics      *Metrics
 	notifyChan   chan HarvesterFile

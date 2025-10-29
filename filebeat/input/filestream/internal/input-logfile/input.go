@@ -34,7 +34,7 @@ type managedInput struct {
 	metricsID        string
 	manager          *InputManager
 	ackCH            *updateChan
-	sourceIdentifier *sourceIdentifier
+	sourceIdentifier *SourceIdentifier
 	prospector       Prospector
 	harvester        Harvester
 	cleanTimeout     time.Duration

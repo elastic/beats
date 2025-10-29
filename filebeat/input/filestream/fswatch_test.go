@@ -976,10 +976,28 @@ scanner:
 					Length:  1,
 				},
 			}}
-		_, err = newFileWatcher(logptest.NewTestingLogger(t, ""), paths, cfg, false, false)
+		_, err = newFileWatcher(
+			logptest.NewTestingLogger(t, ""),
+			paths,
+			cfg,
+			false,
+			false,
+			mustPathIdentifier(false),
+			mustSourceIdentifier(),
+		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
+}
+
+func mustSourceIdentifier() *loginp.SourceIdentifier {
+	si, err := loginp.NewSourceIdentifier("filestream", "test-id")
+	if err != nil {
+		// this will never happen
+		panic(err)
+	}
+
+	return si
 }
 
 const benchmarkFileCount = 1000
@@ -1049,7 +1067,15 @@ func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, 
 	err = cfg.Unpack(&tmpCfg)
 	require.NoError(t, err, "cannot unpack file watcher config")
 
-	fw, err := newFileWatcher(logger, paths, tmpCfg.Scaner, false, false)
+	fw, err := newFileWatcher(
+		logger,
+		paths,
+		tmpCfg.Scaner,
+		false,
+		false,
+		mustPathIdentifier(false),
+		mustSourceIdentifier(),
+	)
 	require.NoError(t, err)
 
 	return fw

@@ -72,9 +72,20 @@ type fileWatcher struct {
 	events           chan loginp.FSEvent
 	notifyChan       chan loginp.HarvesterFile
 	closedHarvesters map[string]int64
+	fileIdentifier   fileIdentifier
+	sourceIdentifier *loginp.SourceIdentifier
 }
 
-func newFileWatcher(logger *logp.Logger, paths []string, config fileWatcherConfig, gzipAllowed bool, sendNotChanged bool) (loginp.FSWatcher, error) {
+func newFileWatcher(
+	logger *logp.Logger,
+	paths []string,
+	config fileWatcherConfig,
+	gzipAllowed bool,
+	sendNotChanged bool,
+	fi fileIdentifier,
+	srci *loginp.SourceIdentifier,
+) (loginp.FSWatcher, error) {
+
 	config.SendNotChanged = sendNotChanged
 	scanner, err := newFileScanner(logger, paths, config.Scanner, gzipAllowed)
 	if err != nil {
@@ -90,7 +101,9 @@ func newFileWatcher(logger *logp.Logger, paths []string, config fileWatcherConfi
 		closedHarvesters: map[string]int64{},
 		// notifyChan is a buffered channel to prevent the harvester from
 		// blocking while waiting for the fileWatcher.
-		notifyChan: make(chan loginp.HarvesterFile, 5), // magic number
+		notifyChan:       make(chan loginp.HarvesterFile, 5), // magic number
+		fileIdentifier:   fi,
+		sourceIdentifier: srci,
 	}, nil
 }
 
@@ -271,6 +284,11 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	).Debugf("File scan complete")
 
 	w.prev = paths
+}
+
+func (w *fileWatcher) getFileIdentity(d loginp.FileDescriptor) string {
+	src := w.fileIdentifier.GetSource(loginp.FSEvent{Descriptor: d})
+	return w.sourceIdentifier.ID(src)
 }
 
 func createEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
