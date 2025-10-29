@@ -28,7 +28,7 @@ Contains log file lines.
 
 
 **`log.file.device_id`**
-:   device id TODO
+:   The device ID used for the log file, this is used by the 'native' file identity.
 
     type: keyword
 
@@ -36,7 +36,7 @@ Contains log file lines.
 
 
 **`log.file.inode`**
-:   inode TODO
+:   The inode of the log file, this is used by the 'native' file identity.
 
     type: long
 

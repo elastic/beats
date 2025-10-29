@@ -20,13 +20,15 @@
       type: keyword
       required: false
       description: >-
-        device id TODO
+        The device ID used for the log file, this is used by the
+        'native' file identity.
 
     - name: log.file.inode
       type: long
       required: false
       description: >-
-        inode TODO
+        The inode of the log file, this is used by the 'native' file
+        identity.
 
     - name: stream
       type: keyword
