@@ -264,7 +264,7 @@ connection <0.23893.109>, channel 3 - soft error:
             file.write(b"  Second Line\n")
 
         close_timeout_msg = "Closing harvester because close_timeout was reached"
-        if log_as_filestream:
+        if log_as_filestream():
             close_timeout_msg = "Reader was closed. Closing."
 
         proc = self.start_beat()
