@@ -168,7 +168,9 @@ func (s *stateManager) SaveState(apiKey, dateStr string) error {
 func (s *stateManager) hashKey(apiKey string) string {
 	// Check cache first to avoid recomputing hashes
 	if hashedKey, ok := s.hashCache.Load(apiKey); ok {
-		return hashedKey.(string)
+		if hashedKeyStr, ok := hashedKey.(string); ok {
+			return hashedKeyStr
+		}
 	}
 
 	// Generate SHA-256 hash and hex encode for safe filename usage
