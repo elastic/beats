@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-04-01T14:35:04.7030004Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "scheduled-task-disabled",

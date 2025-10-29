@@ -2,18 +2,22 @@
   {
     "@timestamp": "2020-05-14T07:00:30.8914235Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Engine Lifecycle",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "400",
-      "ingested": "2025-01-15T10:02:22.041691914Z",
+      "ingested": "2025-10-29T18:18:28.904269377Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 13,
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant",
@@ -62,18 +66,22 @@
   {
     "@timestamp": "2020-05-14T07:01:14.3715076Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Engine Lifecycle",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "400",
-      "ingested": "2025-01-15T10:02:22.042381068Z",
+      "ingested": "2025-10-29T18:18:28.904567044Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 13,
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant",
@@ -124,18 +132,22 @@
   {
     "@timestamp": "2020-05-14T11:32:51.9892568Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Engine Lifecycle",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "400",
-      "ingested": "2025-01-15T10:02:22.042395560Z",
+      "ingested": "2025-10-29T18:18:28.904575669Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 13,
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant",
@@ -184,18 +196,22 @@
   {
     "@timestamp": "2020-06-04T07:20:27.7472275Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Engine Lifecycle",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "400",
-      "ingested": "2025-01-15T10:02:22.042402302Z",
+      "ingested": "2025-10-29T18:18:28.904580210Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 9,
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant",

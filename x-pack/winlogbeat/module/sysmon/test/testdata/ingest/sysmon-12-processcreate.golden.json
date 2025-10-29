@@ -2,10 +2,10 @@
   {
     "@timestamp": "2020-10-27T20:00:14.320Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Process Create (rule: ProcessCreate)",
+      "action": "Process creation",
       "category": [
         "process"
       ],

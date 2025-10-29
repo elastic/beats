@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-11-14T21:26:49.4961966Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "exited-process",
@@ -73,7 +73,7 @@
   {
     "@timestamp": "2019-11-14T21:27:46.9609089Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "exited-process",
@@ -144,7 +144,7 @@
   {
     "@timestamp": "2019-11-14T21:28:18.4605129Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "exited-process",

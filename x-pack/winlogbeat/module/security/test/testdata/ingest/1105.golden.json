@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-11-07T16:22:14.8425353Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "auditlog-archieved",

@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-10-22T11:31:58.0398598Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "added-member-to-group",

@@ -2,10 +2,10 @@
   {
     "@timestamp": "2020-05-05T14:57:40.589Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Registry value set (rule: RegistryEvent)",
+      "action": "RegistryEvent (Value Set)",
       "category": [
         "configuration",
         "registry"
@@ -76,10 +76,10 @@
   {
     "@timestamp": "2020-05-05T14:57:44.714Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Registry value set (rule: RegistryEvent)",
+      "action": "RegistryEvent (Value Set)",
       "category": [
         "configuration",
         "registry"
@@ -150,10 +150,10 @@
   {
     "@timestamp": "2020-05-05T14:57:44.714Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Registry value set (rule: RegistryEvent)",
+      "action": "RegistryEvent (Value Set)",
       "category": [
         "configuration",
         "registry"
@@ -224,10 +224,10 @@
   {
     "@timestamp": "2020-05-05T14:57:46.808Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Registry value set (rule: RegistryEvent)",
+      "action": "RegistryEvent (Value Set)",
       "category": [
         "configuration",
         "registry"
@@ -298,10 +298,10 @@
   {
     "@timestamp": "2020-05-05T14:57:46.808Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Registry value set (rule: RegistryEvent)",
+      "action": "RegistryEvent (Value Set)",
       "category": [
         "configuration",
         "registry"
