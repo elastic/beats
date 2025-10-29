@@ -7,8 +7,6 @@
 package tables
 
 import (
-	"context"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/osquery/osquery-go/plugin/table"
 )
 
@@ -37,33 +35,8 @@ type ApplicationFileEntry struct {
 	AppxPackageRelativeId string `osquery:"appx_package_relative_id"`
 }
 
-// FilterValue returns the index value for the ApplicationFileEntry, which is the ProgramId.
-// This is used for filtering entries
-func (afe *ApplicationFileEntry) FilterValue() string {
-	return afe.ProgramId
-}
-
-// ToMap converts the ApplicationFileEntry to a map[string]string representation.
-func (afe *ApplicationFileEntry) ToMap() (map[string]string, error) {
-	mapped, err := encoding.MarshalToMap(afe)
-	return mapped, err
-}
-
-// ApplicationFileTable implements the TableInterface for the amcache application file table.
-type ApplicationFileTable struct{}
-
-// Type returns the TableType for the ApplicationFileTable.
-func (aft *ApplicationFileTable) Type() TableType {
-	return ApplicationFileTableType
-}
-
-// FilterColumn returns the name of the column used for filtering entries in the ApplicationFileTable.
-func (aft *ApplicationFileTable) FilterColumn() string {
-	return "program_id"
-}
-
 // Columns returns the osquery column definitions for the amcache application file table
-func (aft *ApplicationFileTable) Columns() []table.ColumnDefinition {
+func ApplicationFileColumns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.BigIntColumn("last_write_time"),
 		table.TextColumn("name"),
@@ -85,23 +58,5 @@ func (aft *ApplicationFileTable) Columns() []table.ColumnDefinition {
 		table.TextColumn("appx_package_full_name"),
 		table.TextColumn("is_os_component"),
 		table.TextColumn("appx_package_relative_id"),
-	}
-}
-
-// GenerateFunc generates the data for the ApplicationFileTable based on the provided GlobalStateInterface.
-func (aft *ApplicationFileTable) GenerateFunc(state GlobalStateInterface) table.GenerateFunc {
-	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		programIds := GetConstraintsFromQueryContext(aft.FilterColumn(), queryContext)
-		entries := state.GetCachedEntries(aft.Type(), programIds...)
-
-		rows := make([]map[string]string, 0, len(entries))
-		for _, entry := range entries {
-			mapped, err := entry.ToMap()
-			if err != nil {
-				return nil, err
-			}
-			rows = append(rows, mapped)
-		}
-		return rows, nil
 	}
 }

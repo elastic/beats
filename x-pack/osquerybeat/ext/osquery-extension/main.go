@@ -98,7 +98,7 @@ func main() {
 	RegisterTables(server, log)
 
 	// Create any views required for the specific platform build
-	go CreateViews(socket)
+	go CreateViews(socket, log)
 
 	if *verbose {
 		log.Info("Starting osquery extension server")

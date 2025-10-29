@@ -7,6 +7,7 @@
 package tables
 
 import (
+	"context"
 	"bytes"
 	"fmt"
 	"io/fs"
@@ -19,89 +20,24 @@ import (
 	"github.com/forensicanalysis/fslib/systemfs"
 	"github.com/osquery/osquery-go/plugin/table"
 	"www.velocidex.com/golang/regparser"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 )
-
-// TableType represents the different types of Amcache tables.
-type TableType int
-const (
-	ApplicationTableType         TableType = iota // 0
-	ApplicationFileTableType                      // 1
-	ApplicationShortcutTableType                  // 2
-	DriverBinaryTableType                         // 3
-	DevicePnpTableType                            // 4
-)
-
-// AllTableTypes returns a slice of all defined TableTypes.
-func AllTableTypes() []TableType {
-	return []TableType{
-		ApplicationTableType,
-		ApplicationFileTableType,
-		ApplicationShortcutTableType,
-		DriverBinaryTableType,
-		DevicePnpTableType,
-	}
-}
-
-// GetHiveKey returns the registry hive key path associated with the TableType.
-func (tt TableType) GetHiveKey() string {
-	switch tt {
-	case ApplicationTableType:
-		return "Root\\InventoryApplication"
-	case ApplicationFileTableType:
-		return "Root\\InventoryApplicationFile"
-	case ApplicationShortcutTableType:
-		return "Root\\InventoryApplicationShortcut"
-	case DriverBinaryTableType:
-		return "Root\\InventoryDriverBinary"
-	case DevicePnpTableType:
-		return "Root\\InventoryDevicePnp"
-	default:
-		return ""
-	}
-}
-
-// TableInterface defines the methods that each Amcache table must implement.
-type TableInterface interface {
-	Type() TableType
-	Columns() []table.ColumnDefinition
-	GenerateFunc(state GlobalStateInterface) table.GenerateFunc
-	FilterColumn() string
-}
 
 // GlobalState is an interface that defines methods for accessing global Amcache state.
 type GlobalStateInterface interface {
-	GetCachedEntries(tableType TableType, ids ...string) []Entry
+	GetCachedEntries(amcacheTable AmcacheTable, filters []filters.Filter) []Entry
 }
 
 // Entry defines the methods that each Amcache entry must implement.
-type Entry interface {
-	FilterValue() string
-	ToMap() (map[string]string, error)
-}
-
-// EntryFactory creates a new Entry instance based on the provided TableType.
-func EntryFactory(tableType TableType) Entry {
-	switch tableType {
-	case ApplicationTableType:
-		return &ApplicationEntry{}
-	case ApplicationFileTableType:
-		return &ApplicationFileEntry{}
-	case ApplicationShortcutTableType:
-		return &ApplicationShortcutEntry{}
-	case DriverBinaryTableType:
-		return &DriverBinaryEntry{}
-	case DevicePnpTableType:
-		return &DevicePnpEntry{}
-	default:
-		return nil
-	}
-}
+type Entry interface {}
 
 // MarshalEntries takes a slice of Entry interfaces and marshals each to a map[string]string.
 func MarshalEntries(entries []Entry) ([]map[string]string, error) {
 	marshalled := make([]map[string]string, 0, len(entries))
 	for _, entry := range entries {
-		mapped, err := entry.ToMap()
+		mapped, err := encoding.MarshalToMap(entry)
 		if err != nil {
 			return nil, err
 		}
@@ -111,23 +47,24 @@ func MarshalEntries(entries []Entry) ([]map[string]string, error) {
 }
 
 // GetEntriesFromRegistry reads the registry and returns a map of entries for the specified TableType.
-func GetEntriesFromRegistry(tableType TableType, registry *regparser.Registry) (map[string][]Entry, error) {
+func GetEntriesFromRegistry(amcacheTable AmcacheTable, registry *regparser.Registry) ([]Entry, error) {
 	if registry == nil {
 		return nil, fmt.Errorf("registry is nil")
 	}
 
-	keyNode := registry.OpenKey(tableType.GetHiveKey())
+	hiveKey := amcacheTable.GetHiveKey()
+	keyNode := registry.OpenKey(hiveKey)
 	if keyNode == nil {
-		return nil, fmt.Errorf("error opening key: %s", tableType.GetHiveKey())
+		return nil, fmt.Errorf("error opening key: %s", hiveKey)
 	}
 
-	applicationEntries := make(map[string][]Entry, len(keyNode.Subkeys()))
+	entries := make([]Entry, 0, len(keyNode.Subkeys()))
 	for _, subkey := range keyNode.Subkeys() {
-		ae := EntryFactory(tableType)
+		ae := amcacheTable.NewEntry()
 		FillInEntryFromKey(ae, subkey)
-		applicationEntries[ae.FilterValue()] = append(applicationEntries[ae.FilterValue()], ae)
+		entries = append(entries, ae)
 	}
-	return applicationEntries, nil
+	return entries, nil
 }
 
 // FillInEntryFromKey takes an any, and using the FieldMappings, populates its fields from a registry key.
@@ -183,6 +120,94 @@ func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE) {
 	}
 }
 
+type AmcacheTable string
+const (
+	ApplicationTable            AmcacheTable = "amcache_application"
+	ApplicationFileTable        AmcacheTable = "amcache_application_file"
+	ApplicationShortcutTable    AmcacheTable = "amcache_application_shortcut"
+	DriverBinaryTable           AmcacheTable = "amcache_driver_binary"
+	DevicePnpTable              AmcacheTable = "amcache_device_pnp"
+)
+
+// AllAmcacheTables returns a slice of all defined AmcacheTables.
+func AllAmcacheTables() []AmcacheTable {
+	return []AmcacheTable{
+		ApplicationTable,
+		ApplicationFileTable,
+		ApplicationShortcutTable,
+		DriverBinaryTable,
+		DevicePnpTable,
+	}
+}
+
+func (t AmcacheTable) Name() string {
+	return string(t)
+}
+
+// GetHiveKey returns the registry hive key path associated with the AmcacheTable.
+func (t AmcacheTable) GetHiveKey() string {
+	switch t {
+	case ApplicationTable:
+		return "Root\\InventoryApplication"
+	case ApplicationFileTable:
+		return "Root\\InventoryApplicationFile"
+	case ApplicationShortcutTable:
+		return "Root\\InventoryApplicationShortcut"
+	case DriverBinaryTable:
+		return "Root\\InventoryDriverBinary"
+	case DevicePnpTable:
+		return "Root\\InventoryDevicePnp"
+	default:
+		return ""
+	}
+}
+
+func (t AmcacheTable) NewEntry() Entry {
+	switch t {
+	case ApplicationTable:
+		return &ApplicationEntry{}
+	case ApplicationFileTable:
+		return &ApplicationFileEntry{}
+	case ApplicationShortcutTable:
+		return &ApplicationShortcutEntry{}
+	case DriverBinaryTable:
+		return &DriverBinaryEntry{}
+	case DevicePnpTable:
+		return &DevicePnpEntry{}
+	default:
+		return nil
+	}
+}
+
+func (t AmcacheTable) Columns() []table.ColumnDefinition {
+	switch t {
+	case ApplicationTable:
+		return ApplicationColumns()
+	case ApplicationFileTable:
+		return ApplicationFileColumns()
+	case ApplicationShortcutTable:
+		return ApplicationShortcutColumns()
+	case DriverBinaryTable:
+		return DriverBinaryColumns()
+	case DevicePnpTable:
+		return DevicePnpColumns()
+	default:
+		return nil
+	}
+}
+
+func (t AmcacheTable) GenerateFunc(state GlobalStateInterface, log *logger.Logger) table.GenerateFunc {
+	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
+		filters := filters.GetConstraintFilters(queryContext)
+		entries := state.GetCachedEntries(t, filters)
+		marshalled, err := MarshalEntries(entries)
+		if err != nil {
+			return nil, err
+		}
+		return marshalled, nil
+	}
+}
+
 // Registry reads the registry hive file and returns a regparser.Registry object.
 func LoadRegistry(filePath string) (*regparser.Registry, error) {
 	// ensure a path was provided
@@ -219,23 +244,4 @@ func LoadRegistry(filePath string) (*regparser.Registry, error) {
 	}
 
 	return registry, nil
-}
-
-// GetConstraintsFromQueryContext extracts the constraints for a given field from the osquery QueryContext.
-// It returns a slice of strings representing the constraint values.
-// It only supports the '=' operator, and only for the indexed field (program_id, driver_id)
-func GetConstraintsFromQueryContext(fieldName string, context table.QueryContext) []string {
-	constraints := make([]string, 0)
-	for name, cList := range context.Constraints {
-		if len(cList.Constraints) > 0 && name == fieldName {
-			for _, c := range cList.Constraints {
-				if c.Operator != table.OperatorEquals {
-					log.Printf("Warning: only '=' operator is supported for %s constraints, skipping %d", fieldName, c.Operator)
-					continue
-				}
-				constraints = append(constraints, c.Expression)
-			}
-		}
-	}
-	return constraints
 }

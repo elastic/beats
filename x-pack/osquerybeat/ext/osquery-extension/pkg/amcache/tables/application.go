@@ -7,9 +7,6 @@
 package tables
 
 import (
-	"context"
-
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/osquery/osquery-go/plugin/table"
 )
 
@@ -39,32 +36,8 @@ type ApplicationEntry struct {
 	UserSid            string `osquery:"user_sid"`
 }
 
-// FilterValue returns the index value for the ApplicationEntry, which is the ProgramId.
-func (ae *ApplicationEntry) FilterValue() string {
-	return ae.ProgramId
-}
-
-// ToMap converts the ApplicationEntry to a map[string]string representation.
-func (ae *ApplicationEntry) ToMap() (map[string]string, error) {
-	mapped, err := encoding.MarshalToMap(ae)
-	return mapped, err
-}
-
-// ApplicationTable implements the TableInterface for the amcache application table.
-type ApplicationTable struct{}
-
-// Type returns the TableType for the ApplicationTable.
-func (at *ApplicationTable) Type() TableType {
-	return ApplicationTableType
-}
-
-// FilterColumn returns the name of the column used for filtering entries in the ApplicationTable.
-func (at *ApplicationTable) FilterColumn() string {
-	return "program_id"
-}
-
 // Columns returns the column definitions for the ApplicationTable.
-func (at *ApplicationTable) Columns() []table.ColumnDefinition {
+func ApplicationColumns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.BigIntColumn("last_write_time"),
 		table.TextColumn("name"),
@@ -88,22 +61,5 @@ func (at *ApplicationTable) Columns() []table.ColumnDefinition {
 		table.TextColumn("msi_install_date"),
 		table.TextColumn("bundle_manifest_path"),
 		table.TextColumn("user_sid"),
-	}
-}
-
-// GenerateFunc generates the data for the ApplicationTable based on the provided GlobalStateInterface.
-func (at *ApplicationTable) GenerateFunc(state GlobalStateInterface) table.GenerateFunc {
-	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		programIds := GetConstraintsFromQueryContext(at.FilterColumn(), queryContext)
-		entries := state.GetCachedEntries(at.Type(), programIds...)
-		rows := make([]map[string]string, 0, len(entries))
-		for _, entry := range entries {
-			mapped, err := entry.ToMap()
-			if err != nil {
-				return nil, err
-			}
-			rows = append(rows, mapped)
-		}
-		return rows, nil
 	}
 }

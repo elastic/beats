@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/osquery/osquery-go"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 type View struct {
@@ -41,7 +43,7 @@ func AreTablesReady(client *osquery.ExtensionManagerClient, tableNames []string)
 	return true
 }
 
-func CreateViews(socket *string, views []*View) error {
+func CreateViews(socket *string, views []*View, log *logger.Logger) error {
 	client, err := osquery.NewClient(*socket, 2*time.Second)
 	if err != nil {
 		return fmt.Errorf("error creating osquery client: %w", err)
@@ -68,7 +70,7 @@ func CreateViews(socket *string, views []*View) error {
 			if !view.created && AreTablesReady(client, view.requiredTables) {
 				_, err := client.Query(view.createViewQuery)
 				if err != nil {
-					log.Printf("Error creating view %s: %s\n", view.createViewQuery, err)
+					log.Errorf("Error creating view %s: %s\n", view.createViewQuery, err)
 					continue
 				}
 				view.created = true

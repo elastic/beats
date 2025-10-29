@@ -7,8 +7,6 @@
 package tables
 
 import (
-	"context"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/osquery/osquery-go/plugin/table"
 )
 
@@ -35,32 +33,8 @@ type DriverBinaryEntry struct {
 	ImageSize               string `osquery:"image_size"`
 }
 
-// FilterColumn returns the name of the column used for filtering entries in the DriverBinaryTable.
-func (dbe *DriverBinaryEntry) FilterValue() string {
-	return dbe.DriverId
-}
-
-// ToMap converts the DriverBinaryEntry to a map[string]string representation.
-func (dbe *DriverBinaryEntry) ToMap() (map[string]string, error) {
-	mapped, err := encoding.MarshalToMap(dbe)
-	return mapped, err
-}
-
-// DriverBinaryTable implements the TableInterface for the amcache driver binary table.
-type DriverBinaryTable struct {}
-
-// Type returns the TableType for the DriverBinaryTable.
-func (dbt *DriverBinaryTable) Type() TableType {
-	return DriverBinaryTableType
-}
-
-// FilterColumn returns the name of the column used for filtering entries in the DriverBinaryTable.
-func (dbt *DriverBinaryTable) FilterColumn() string {
-	return "driver_id"
-}
-
 // Columns returns the column definitions for the DriverBinaryTable.
-func (dbt *DriverBinaryTable) Columns() []table.ColumnDefinition {
+func DriverBinaryColumns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.BigIntColumn("last_write_time"),
 		table.TextColumn("driver_name"),
@@ -79,25 +53,3 @@ func (dbt *DriverBinaryTable) Columns() []table.ColumnDefinition {
 	}
 }
 
-// GetID returns the unique identifier for the DriverBinaryEntry, which is the DriverId.
-func (ae *DriverBinaryEntry) GetID() string {
-	return ae.DriverId
-}
-
-// GetType returns the TableType for the DriverBinaryEntry.
-func (dbt *DriverBinaryTable) GenerateFunc(state GlobalStateInterface) table.GenerateFunc {
-	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		driverIds := GetConstraintsFromQueryContext(dbt.FilterColumn(), queryContext)
-		entries := state.GetCachedEntries(dbt.Type(), driverIds...)
-
-		rows := make([]map[string]string, 0, len(entries))
-		for _, entry := range entries {
-			mapped, err := entry.ToMap()
-			if err != nil {
-				return nil, err
-			}
-			rows = append(rows, mapped)
-		}
-		return rows, nil
-	}
-}
