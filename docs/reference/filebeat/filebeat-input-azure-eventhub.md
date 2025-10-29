@@ -34,15 +34,15 @@ filebeat.inputs:
 - type: azure-eventhub
   eventhub: "insights-operational-logs"
   consumer_group: "test"
-  # No connection_string provided - automatically uses OAuth2
+  # No connection_string provided - automatically uses OAuth2 for both eventhub and storage account
   eventhub_namespace: "your-eventhub-namespace.servicebus.windows.net"
   tenant_id: "your-tenant-id"
   client_id: "your-client-id"
   client_secret: "your-client-secret"
   authority_host: "https://login.microsoftonline.com"
   storage_account: "azureeph"
-  storage_account_connection_string: "DefaultEndpointsProtocol=https;AccountName=..."
   storage_account_container: ""
+  processor_version: "v2"
 ```
 
 ## Configuration options [_configuration_options]
