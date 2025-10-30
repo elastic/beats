@@ -49,50 +49,61 @@ func ToMapstr(m pcommon.Map) mapstr.M {
 //     If you attempt to use other slice types (e.g., []string or []int),
 //     pcommon.Map.FromRaw(...) will return an "invalid type" error.
 //     To overcome this, we use "reflect" to transform []T into []any.
-func ConvertNonPrimitive[T mapstrOrMap](m T) map[string]any {
-	updates := make(map[string]any, len(m))
-
-	for key, val := range m {
+func ConvertNonPrimitive[T mapstrOrMap](m T) {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	for _, key := range keys {
+		val, ok := m[key]
+		if !ok {
+			// shouldn't happen but be defensive
+			continue
+		}
 		switch x := val.(type) {
 		case mapstr.M:
-			updates[key] = ConvertNonPrimitive(x)
+			ConvertNonPrimitive(x)
+			m[key] = map[string]any(x)
 		case []mapstr.M:
 			s := make([]any, len(x))
 			for i, val := range x {
-				s[i] = ConvertNonPrimitive(val)
+				ConvertNonPrimitive(val)
+				s[i] = map[string]any(val)
 			}
-			updates[key] = s
+			m[key] = s
 		case map[string]any:
-			updates[key] = ConvertNonPrimitive(x)
+			ConvertNonPrimitive(x)
+			m[key] = x
 		case []map[string]any:
 			s := make([]any, len(x))
 			for i := range x {
-				s[i] = ConvertNonPrimitive(x[i])
+				ConvertNonPrimitive(x[i])
+				s[i] = x[i]
 			}
-			updates[key] = s
+			m[key] = s
 		case time.Time:
-			updates[key] = x.UTC().Format("2006-01-02T15:04:05.000Z")
+			m[key] = x.UTC().Format("2006-01-02T15:04:05.000Z")
 		case common.Time:
-			updates[key] = time.Time(x).UTC().Format("2006-01-02T15:04:05.000Z")
+			m[key] = time.Time(x).UTC().Format("2006-01-02T15:04:05.000Z")
 		case []time.Time:
-			s := make([]any, len(x))
-			for i, t := range x {
-				s[i] = t.UTC().Format("2006-01-02T15:04:05.000Z")
+			s := make([]any, 0, len(x))
+			for _, i := range x {
+				s = append(s, i.UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
-			updates[key] = s
+			m[key] = s
 		case []common.Time:
-			s := make([]any, len(x))
-			for i, t := range x {
-				s[i] = time.Time(t).UTC().Format("2006-01-02T15:04:05.000Z")
+			s := make([]any, 0, len(x))
+			for _, i := range x {
+				s = append(s, time.Time(i).UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
-			updates[key] = s
+			m[key] = s
 		case encoding.TextMarshaler:
 			text, err := x.MarshalText()
 			if err != nil {
-				updates[key] = fmt.Sprintf("error converting %T to string: %s", x, err)
+				m[key] = fmt.Sprintf("error converting %T to string: %s", x, err)
 				continue
 			}
-			updates[key] = string(text)
+			m[key] = string(text)
 		case []bool, []string, []float32, []float64, []int, []int8, []int16, []int32, []int64,
 			[]uint, []uint8, []uint16, []uint32, []uint64:
 			ref := reflect.ValueOf(x)
@@ -100,41 +111,41 @@ func ConvertNonPrimitive[T mapstrOrMap](m T) map[string]any {
 			for i := 0; i < ref.Len(); i++ {
 				s[i] = ref.Index(i).Interface()
 			}
-			updates[key] = s
+			m[key] = s
 		case nil, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool:
-			// do nothing
-			updates[key] = x
 		default:
 			ref := reflect.ValueOf(x)
 			if ref.Kind() == reflect.Struct {
 				var im map[string]any
 				err := marshalUnmarshal(x, &im)
 				if err != nil {
-					updates[key] = fmt.Sprintf("error encoding struct to map: %s", err)
+					m[key] = fmt.Sprintf("error encoding struct to map: %s", err)
 					continue
 				}
-				updates[key] = ConvertNonPrimitive(im)
-			} else if ref.Kind() == reflect.Slice || ref.Kind() == reflect.Array {
+				ConvertNonPrimitive(im)
+				m[key] = im
+				break
+			}
+			if ref.Kind() == reflect.Slice || ref.Kind() == reflect.Array {
 				s := make([]any, ref.Len())
 				for i := 0; i < ref.Len(); i++ {
 					elem := ref.Index(i).Interface()
 					if mi, ok := elem.(map[string]any); ok {
-						s[i] = ConvertNonPrimitive(mi)
+						ConvertNonPrimitive(mi)
+						s[i] = mi
 					} else if mi, ok := elem.(mapstr.M); ok {
-						s[i] = ConvertNonPrimitive(mi)
+						ConvertNonPrimitive(mi)
+						s[i] = map[string]any(mi)
 					} else {
 						s[i] = elem
 					}
 				}
-				updates[key] = s
-			} else {
-				updates[key] = fmt.Sprintf("unknown type: %T", x)
+				m[key] = s
+				break // we figured out the type, so we don't need the unknown type case
 			}
+			m[key] = fmt.Sprintf("unknown type: %T", x)
 		}
 	}
-
-	// apply updates after iteration
-	return updates
 }
 
 // marshalUnmarshal converts an interface to a mapstr.M by marshalling to JSON

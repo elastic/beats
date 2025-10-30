@@ -40,9 +40,10 @@ func TestFromMapstrTime(t *testing.T) {
 		origTime, err := time.Parse(time.RFC3339, tc.mapstr_val)
 		assert.NoError(t, err, "Error parsing time")
 		a := mapstr.M{"test": origTime}
-		want := map[string]any{}
+		want := mapstr.M{}
 		want["test"] = tc.pcommon_val
-		assert.Equal(t, want, ConvertNonPrimitive(a))
+		ConvertNonPrimitive(a)
+		assert.Equal(t, want, a)
 	}
 }
 
@@ -58,9 +59,10 @@ func TestFromMapstrCommonTime(t *testing.T) {
 		origTime, err := time.Parse(time.RFC3339, tc.mapstr_val)
 		assert.NoError(t, err, "Error parsing time")
 		a := mapstr.M{"test": common.Time(origTime)}
-		want := map[string]any{}
+		want := mapstr.M{}
 		want["test"] = tc.pcommon_val
-		assert.Equal(t, want, ConvertNonPrimitive(a))
+		ConvertNonPrimitive(a)
+		assert.Equal(t, want, a)
 	}
 }
 
@@ -75,9 +77,10 @@ func TestFromMapstrString(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			a := mapstr.M{"test": tc.mapstr_val}
-			want := map[string]any{}
+			want := mapstr.M{}
 			want["test"] = tc.pcommon_val
-			assert.Equal(t, want, ConvertNonPrimitive(a))
+			ConvertNonPrimitive(a)
+			assert.Equal(t, want, a)
 		})
 	}
 }
@@ -87,13 +90,14 @@ func TestFromMapstrSliceString(t *testing.T) {
 	inputMap := mapstr.M{
 		"slice": inputSlice,
 	}
-	want := map[string]any{}
+	want := mapstr.M{}
 	slice := make([]any, 0)
 	for _, i := range inputSlice {
 		slice = append(slice, i)
 	}
 	want["slice"] = slice
-	assert.Equal(t, want, ConvertNonPrimitive(inputMap))
+	ConvertNonPrimitive(inputMap)
+	assert.Equal(t, want, inputMap)
 }
 
 func TestFromMapstrSliceInt(t *testing.T) {
@@ -101,14 +105,15 @@ func TestFromMapstrSliceInt(t *testing.T) {
 	inputMap := mapstr.M{
 		"slice": inputSlice,
 	}
-	want := map[string]any{}
+	want := mapstr.M{}
 	slice := make([]any, 0)
 	for _, i := range inputSlice {
 		slice = append(slice, i)
 	}
 	want["slice"] = slice
 
-	assert.Equal(t, want, ConvertNonPrimitive(inputMap))
+	ConvertNonPrimitive(inputMap)
+	assert.Equal(t, want, inputMap)
 }
 
 func TestFromMapstrSliceAny(t *testing.T) {
@@ -116,11 +121,12 @@ func TestFromMapstrSliceAny(t *testing.T) {
 	inputMap := mapstr.M{
 		"slice": inputSlice,
 	}
-	want := map[string]any{
+	want := mapstr.M{
 		"slice": inputSlice,
 	}
 
-	assert.Equal(t, want, ConvertNonPrimitive(inputMap))
+	ConvertNonPrimitive(inputMap)
+	assert.Equal(t, want, inputMap)
 }
 
 func TestFromMapstrSliceDouble(t *testing.T) {
@@ -128,14 +134,15 @@ func TestFromMapstrSliceDouble(t *testing.T) {
 	inputMap := mapstr.M{
 		"slice": inputSlice,
 	}
-	want := map[string]any{}
+	want := mapstr.M{}
 	slice := make([]any, 0)
 	for _, i := range inputSlice {
 		slice = append(slice, i)
 	}
 	want["slice"] = slice
 
-	assert.Equal(t, want, ConvertNonPrimitive(inputMap))
+	ConvertNonPrimitive(inputMap)
+	assert.Equal(t, want, inputMap)
 }
 
 func TestFromMapstrBool(t *testing.T) {
@@ -149,9 +156,10 @@ func TestFromMapstrBool(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			a := mapstr.M{"test": tc.mapstr_val}
-			want := map[string]any{}
+			want := mapstr.M{}
 			want["test"] = tc.pcommon_val
-			assert.Equal(t, want, ConvertNonPrimitive(a))
+			ConvertNonPrimitive(a)
+			assert.Equal(t, want, a)
 		})
 	}
 }
@@ -161,14 +169,15 @@ func TestFromMapstrSliceBool(t *testing.T) {
 	inputMap := mapstr.M{
 		"slice": inputSlice,
 	}
-	want := map[string]any{}
+	want := mapstr.M{}
 	slice := make([]any, 0)
 	for _, i := range inputSlice {
 		slice = append(slice, i)
 	}
 	want["slice"] = slice
 
-	assert.Equal(t, want, ConvertNonPrimitive(inputMap))
+	ConvertNonPrimitive(inputMap)
+	assert.Equal(t, want, inputMap)
 }
 
 func TestFromMapstrMapstr(t *testing.T) {
@@ -178,13 +187,14 @@ func TestFromMapstrMapstr(t *testing.T) {
 			"inner_string_slice": []string{"string"},
 		},
 	}
-	want := map[string]any{}
+	want := mapstr.M{}
 	want["inner"] = map[string]any{
 		"inner_int":          42,
 		"inner_string_slice": []any{"string"},
 	}
 
-	assert.Equal(t, want, ConvertNonPrimitive(input))
+	ConvertNonPrimitive(input)
+	assert.Equal(t, want, input)
 }
 
 func TestFromMapstrSliceMapstr(t *testing.T) {
@@ -192,7 +202,7 @@ func TestFromMapstrSliceMapstr(t *testing.T) {
 	inputMap := mapstr.M{
 		"slice": inputSlice,
 	}
-	want := map[string]any{}
+	want := mapstr.M{}
 	want["slice"] = []any{
 		map[string]any{
 			"item": 1,
@@ -205,7 +215,8 @@ func TestFromMapstrSliceMapstr(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, want, ConvertNonPrimitive(inputMap))
+	ConvertNonPrimitive(inputMap)
+	assert.Equal(t, want, inputMap)
 }
 
 func TestFromMapstrSliceTime(t *testing.T) {
@@ -227,11 +238,12 @@ func TestFromMapstrSliceTime(t *testing.T) {
 	inputMap := mapstr.M{
 		"slice": sliceTimes,
 	}
-	want := map[string]any{
+	want := mapstr.M{
 		"slice": sliceTimesStr,
 	}
 
-	assert.Equal(t, want, ConvertNonPrimitive(inputMap))
+	ConvertNonPrimitive(inputMap)
+	assert.Equal(t, want, inputMap)
 }
 
 func TestFromMapstrSliceCommonTime(t *testing.T) {
@@ -253,11 +265,12 @@ func TestFromMapstrSliceCommonTime(t *testing.T) {
 	inputMap := mapstr.M{
 		"slice": sliceTimes,
 	}
-	want := map[string]any{
+	want := mapstr.M{
 		"slice": sliceTimesStr,
 	}
 
-	assert.Equal(t, want, ConvertNonPrimitive(inputMap))
+	ConvertNonPrimitive(inputMap)
+	assert.Equal(t, want, inputMap)
 }
 
 type structWithTextMarshaler struct {
@@ -312,7 +325,7 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 			},
 		},
 	}
-	want := map[string]any{
+	want := mapstr.M{
 		"any_array":  []any{1, "string", 3},
 		"any_slice":  []any{5.1, 6.2},
 		"bool_array": []any{true, false},
@@ -348,7 +361,8 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, want, ConvertNonPrimitive(input))
+	ConvertNonPrimitive(input)
+	assert.Equal(t, want, input)
 }
 
 func TestToMapstr(t *testing.T) {
@@ -386,9 +400,10 @@ func TestUnknownType(t *testing.T) {
 		"unknown_map": map[string]int{"key": 42},
 	}
 
-	expected := map[string]any{
+	expected := mapstr.M{
 		"unknown_map": "unknown type: map[string]int",
 	}
 
-	assert.Equal(t, expected, ConvertNonPrimitive(inputMap))
+	ConvertNonPrimitive(inputMap)
+	assert.Equal(t, expected, inputMap)
 }

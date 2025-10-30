@@ -125,7 +125,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 		}
 
-		beatEvent := event.Content.Fields
+		beatEvent := event.Content.Fields.Clone()
 		if beatEvent == nil {
 			beatEvent = mapstr.M{}
 		}
@@ -155,6 +155,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 		}
 
+		otelmap.ConvertNonPrimitive(beatEvent)
+
 		// if data_stream field is set on beatEvent. Add it to logrecord.Attributes to support dynamic indexing
 		if val, _ := beatEvent.GetValue("data_stream"); val != nil {
 			// If the below sub fields do not exist, it will return empty string.
@@ -170,8 +172,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 
 		}
-
-		if err := logRecord.Body().SetEmptyMap().FromRaw(otelmap.ConvertNonPrimitive(beatEvent)); err != nil {
+		if err := logRecord.Body().SetEmptyMap().FromRaw(map[string]any(beatEvent)); err != nil {
 			out.log.Errorf("received an error while converting map to plog.Log, some fields might be missing: %v", err)
 		}
 	}
