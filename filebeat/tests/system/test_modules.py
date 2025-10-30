@@ -345,9 +345,9 @@ def clean_keys(obj):
     time_keys = ["event.created", "event.ingested"]
     # source path and agent.version can be different for each run
     other_keys = ["log.file.path",
-                  "log.file.inode", # Filestream field
-                  "log.file.device_id", # Filestream field
-                  "log.offset", # Not correctly populated by the log input
+                  "log.file.inode",  # Filestream field
+                  "log.file.device_id",  # Filestream field
+                  "log.offset",  # Not correctly populated by the log input
                   "agent.version"]
     # ECS versions change for any ECS release, large or small
     ecs_key = ["ecs.version"]

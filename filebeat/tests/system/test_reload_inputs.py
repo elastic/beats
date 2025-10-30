@@ -16,6 +16,7 @@ starting_msg = "Starting runner: input"
 if log_as_filestream():
     starting_msg = "Starting runner: filestream"
 
+
 class Test(BaseTest):
 
     def test_reload_same_input(self):
