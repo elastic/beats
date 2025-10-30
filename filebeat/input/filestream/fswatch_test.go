@@ -29,7 +29,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -56,11 +55,9 @@ scanner:
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	logger := logptest.NewTestingLogger(t, "",
-		// only print stacktrace for errors above ErrorLevel.
-		zap.AddStacktrace(zapcore.ErrorLevel+1))
 
-	fw := createWatcherWithConfig(t, logger, paths, cfgStr)
+	logger := logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests"))
+	fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
 
 	go fw.Run(ctx)
 
@@ -79,6 +76,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 5}), // 5 bytes written
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -102,6 +100,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 10}), // +5 bytes appended
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -124,6 +123,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: newBasename, size: 10}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -144,6 +144,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 2}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -164,6 +165,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 2}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -183,6 +185,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 2}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -203,7 +206,8 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		fw := createWatcherWithConfig(t, logptest.NewTestingLogger(t, ""), paths, cfgStr)
+		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
+		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -221,6 +225,7 @@ scanner:
 				Info:        file.ExtendFileInfo(&testFileInfo{name: basename, size: 1024}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -236,7 +241,8 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
-		fw := createWatcherWithConfig(t, logger, paths, cfgStr)
+		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
+		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -253,6 +259,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 1024}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 
 		time := time.Now().Local().Add(time.Hour)
@@ -304,6 +311,7 @@ scanner:
 					Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 5}), // +5 bytes appended
 				},
 			}
+			expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 			requireEqualEvents(t, expEvent, e)
 		})
 	})
@@ -320,7 +328,8 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 		defer cancel()
 
-		fw := createWatcherWithConfig(t, logger, paths, cfgStr)
+		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
+		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -338,6 +347,7 @@ scanner:
 				Info:        file.ExtendFileInfo(&testFileInfo{name: basename, size: 1024}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 
 		// collisions are resolved in the alphabetical order, the first filename wins
@@ -398,6 +408,11 @@ scanner:
 					Info:     file.ExtendFileInfo(&testFileInfo{name: secondBasename, size: 5}), // "line\n"
 				},
 			},
+		}
+
+		// Add the SrcIDs
+		for i := range expectedEvents {
+			expectedEvents[i].SrcID = fw.getFileIdentity(expectedEvents[i].Descriptor)
 		}
 		var actualEvents []loginp.FSEvent
 		actualEvents = append(actualEvents, fw.Event())
@@ -983,15 +998,21 @@ scanner:
 			false,
 			false,
 			mustPathIdentifier(false),
-			mustSourceIdentifier(),
+			mustSourceIdentifier("foo-id"),
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
 }
 
-func mustSourceIdentifier() *loginp.SourceIdentifier {
-	si, err := loginp.NewSourceIdentifier("filestream", "test-id")
+func mustFingerprintIdentifier() fileIdentifier {
+	fi, _ := newFingerprintIdentifier(nil, nil)
+
+	return fi
+}
+
+func mustSourceIdentifier(inputID string) *loginp.SourceIdentifier {
+	si, err := loginp.NewSourceIdentifier("filestream", inputID)
 	if err != nil {
 		// this will never happen
 		panic(err)
@@ -1055,7 +1076,7 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 	}
 }
 
-func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, cfgStr string) loginp.FSWatcher {
+func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, cfgStr string) *fileWatcher {
 	tmpCfg := struct {
 		Scaner fileWatcherConfig `config:"scanner"`
 	}{
@@ -1074,7 +1095,7 @@ func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, 
 		false,
 		false,
 		mustPathIdentifier(false),
-		mustSourceIdentifier(),
+		mustSourceIdentifier("foo-id"),
 	)
 	require.NoError(t, err)
 
@@ -1114,6 +1135,7 @@ func requireEqualEvents(t *testing.T, expected, actual loginp.FSEvent) {
 	require.Equal(t, expected.NewPath, actual.NewPath, "NewPath")
 	require.Equal(t, expected.OldPath, actual.OldPath, "OldPath")
 	require.Equal(t, expected.Op, actual.Op, "Op")
+	require.Equal(t, expected.SrcID, actual.SrcID, "SrcID")
 	requireEqualDescriptors(t, expected.Descriptor, actual.Descriptor)
 }
 

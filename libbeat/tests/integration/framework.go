@@ -117,7 +117,12 @@ type Total struct {
 // `args` will be passed as CLI arguments to the Beat
 func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "beat binary must exists")
-	tempDir := createTempDir(t)
+	rootDir, err := filepath.Abs(filepath.Join("..", "..", "build", "integration-tests"))
+	if err != nil {
+		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
+	}
+
+	tempDir := CreateTempDir(t, rootDir)
 	configFile := filepath.Join(tempDir, beatName+".yml")
 
 	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
@@ -169,7 +174,12 @@ func NewStandardBeat(t *testing.T, beatName, binary string, args ...string) *Bea
 // See `NewBeat` for options and information for the parameters.
 func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "agentbeat binary must exists")
-	tempDir := createTempDir(t)
+	rootDir, err := filepath.Abs("../../build/integration-tests")
+	if err != nil {
+		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
+	}
+
+	tempDir := CreateTempDir(t, rootDir)
 	configFile := filepath.Join(tempDir, beatName+".yml")
 
 	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
@@ -781,20 +791,20 @@ func (b *BeatProc) SetExpectedErrorCode(errorCode int) {
 	b.expectedErrorCode = errorCode
 }
 
-// createTempDir creates a temporary directory that will be
-// removed after the tests passes.
+// CreateTempDir creates a temporary directory that will be
+// removed after the tests passes. The temporary directory is
+// created on rootDir. If rootDir is empty, then os.TempDir() is used.
 //
 // If the test fails, the temporary directory is not removed.
 //
 // If the tests are run with -v, the temporary directory will
 // be logged.
-func createTempDir(t *testing.T) string {
-	rootDir, err := filepath.Abs("../../build/integration-tests")
-	if err != nil {
-		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
+func CreateTempDir(t *testing.T, rootDir string) string {
+	if rootDir == "" {
+		rootDir = os.TempDir()
 	}
-	err = os.MkdirAll(rootDir, 0o750)
-	if err != nil {
+
+	if err := os.MkdirAll(rootDir, 0o750); err != nil {
 		t.Fatalf("error making test dir: %s: %s", rootDir, err)
 	}
 	tempDir, err := os.MkdirTemp(rootDir, strings.ReplaceAll(t.Name(), "/", "-"))

@@ -82,6 +82,9 @@ type fileWatcher struct {
 	closedHarvestersMutex sync.Mutex
 }
 
+// Ensure fileWatcher implements loginp.FSWatcher
+var _ loginp.FSWatcher = &fileWatcher{}
+
 func newFileWatcher(
 	logger *logp.Logger,
 	paths []string,
@@ -90,7 +93,7 @@ func newFileWatcher(
 	sendNotChanged bool,
 	fi fileIdentifier,
 	srci *loginp.SourceIdentifier,
-) (loginp.FSWatcher, error) {
+) (*fileWatcher, error) {
 
 	config.SendNotChanged = sendNotChanged
 	scanner, err := newFileScanner(logger, paths, config.Scanner, gzipAllowed)
@@ -139,10 +142,7 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 		for {
 			select {
 			case evt := <-w.notifyChan:
-				w.log.Debugf("Harvester Closed notification. ID: %s, Size: %d", evt.ID, evt.Size)
-				w.closedHarvestersMutex.Lock()
-				w.closedHarvesters[evt.ID] = evt.Size
-				w.closedHarvestersMutex.Unlock()
+				w.processNotification(evt)
 			case <-ctx.Done():
 				return
 			}
@@ -158,6 +158,13 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 			return
 		}
 	}
+}
+
+func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
+	w.log.Debugf("Harvester Closed notification. ID: %s, Size: %d", evt.ID, evt.Size)
+	w.closedHarvestersMutex.Lock()
+	w.closedHarvesters[evt.ID] = evt.Size
+	w.closedHarvestersMutex.Unlock()
 }
 
 func (w *fileWatcher) watch(ctx unison.Canceler) {
