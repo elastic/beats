@@ -8,6 +8,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/osquery/osquery-go/plugin/table"
 )
 
 func TestEncodingFlagHas(t *testing.T) {
@@ -468,5 +470,295 @@ func Test_formatTimeWithTagFormat(t *testing.T) {
 				t.Errorf("Name: %s, formatTimeWithTagFormat() = %v, want %v", tt.name, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestGenerateColumnDefinitions(t *testing.T) {
+	tests := []struct {
+		name          string
+		input         any
+		expectedCols  []table.ColumnDefinition
+		expectedError bool
+	}{
+		{
+			name: "basic struct with all supported types",
+			input: struct {
+				Name      string  `osquery:"name"`
+				Count     int64   `osquery:"count"`
+				Active    bool    `osquery:"active"`
+				Score     float64 `osquery:"score"`
+				SmallNum  int     `osquery:"small_num"`
+				BigNum    uint64  `osquery:"big_num"`
+				Precision float32 `osquery:"precision"`
+			}{},
+			expectedCols: []table.ColumnDefinition{
+				table.TextColumn("name"),
+				table.BigIntColumn("count"),
+				table.IntegerColumn("active"),
+				table.DoubleColumn("score"),
+				table.IntegerColumn("small_num"),
+				table.BigIntColumn("big_num"),
+				table.DoubleColumn("precision"),
+			},
+			expectedError: false,
+		},
+		{
+			name: "struct with skipped fields",
+			input: struct {
+				Included string `osquery:"included"`
+				Skipped  string `osquery:"-"`
+				NoTag    string
+			}{},
+			expectedCols: []table.ColumnDefinition{
+				table.TextColumn("included"),
+				table.TextColumn("NoTag"), // Fields without osquery tag use field name
+			},
+			expectedError: false,
+		},
+		{
+			name: "struct with pointer fields",
+			input: struct {
+				Name  *string `osquery:"name"`
+				Count *int64  `osquery:"count"`
+			}{},
+			expectedCols: []table.ColumnDefinition{
+				table.TextColumn("name"),
+				table.BigIntColumn("count"),
+			},
+			expectedError: false,
+		},
+		{
+			name:          "nil input",
+			input:         nil,
+			expectedCols:  nil,
+			expectedError: true,
+		},
+		{
+			name:          "non-struct input",
+			input:         "string",
+			expectedCols:  nil,
+			expectedError: true,
+		},
+		{
+			name: "pointer to struct",
+			input: &struct {
+				Field string `osquery:"field"`
+			}{},
+			expectedCols: []table.ColumnDefinition{
+				table.TextColumn("field"),
+			},
+			expectedError: false,
+		},
+		{
+			name: "all integer types",
+			input: struct {
+				I   int    `osquery:"i"`
+				I8  int8   `osquery:"i8"`
+				I16 int16  `osquery:"i16"`
+				I32 int32  `osquery:"i32"`
+				I64 int64  `osquery:"i64"`
+				U   uint   `osquery:"u"`
+				U8  uint8  `osquery:"u8"`
+				U16 uint16 `osquery:"u16"`
+				U32 uint32 `osquery:"u32"`
+				U64 uint64 `osquery:"u64"`
+			}{},
+			expectedCols: []table.ColumnDefinition{
+				table.IntegerColumn("i"),
+				table.IntegerColumn("i8"),
+				table.IntegerColumn("i16"),
+				table.IntegerColumn("i32"),
+				table.BigIntColumn("i64"),
+				table.IntegerColumn("u"),
+				table.IntegerColumn("u8"),
+				table.IntegerColumn("u16"),
+				table.IntegerColumn("u32"),
+				table.BigIntColumn("u64"),
+			},
+			expectedError: false,
+		},
+		{
+			name: "fields without osquery tag use field name",
+			input: struct {
+				CustomName  string `osquery:"custom_name"`
+				DefaultName string
+			}{},
+			expectedCols: []table.ColumnDefinition{
+				table.TextColumn("custom_name"),
+				table.TextColumn("DefaultName"), // No tag, uses field name
+			},
+			expectedError: false,
+		},
+		{
+			name: "mixed exported and unexported fields",
+			input: struct {
+				Public  string `osquery:"public"`
+				private string `osquery:"private"` // will be skipped
+				Another string `osquery:"another"`
+			}{},
+			expectedCols: []table.ColumnDefinition{
+				table.TextColumn("public"),
+				table.TextColumn("another"),
+			},
+			expectedError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cols, err := GenerateColumnDefinitions(tt.input)
+
+			if (err != nil) != tt.expectedError {
+				t.Errorf("GenerateColumnDefinitions() error = %v, expectedError %v", err, tt.expectedError)
+				return
+			}
+
+			if !tt.expectedError {
+				if len(cols) != len(tt.expectedCols) {
+					t.Errorf("GenerateColumnDefinitions() returned %d columns, expected %d", len(cols), len(tt.expectedCols))
+					return
+				}
+
+				for i := range cols {
+					if cols[i].Name != tt.expectedCols[i].Name {
+						t.Errorf("Column %d: name = %s, expected %s", i, cols[i].Name, tt.expectedCols[i].Name)
+					}
+					if cols[i].Type != tt.expectedCols[i].Type {
+						t.Errorf("Column %d (%s): type = %s, expected %s", i, cols[i].Name, cols[i].Type, tt.expectedCols[i].Type)
+					}
+				}
+			}
+		})
+	}
+}
+func TestGenerateColumnDefinitions_basic(t *testing.T) {
+	type testStruct struct {
+		Name   string  `osquery:"name"`
+		Active bool    `osquery:"active"`
+		Count  int     `osquery:"count"`
+		Score  float64 `osquery:"score"`
+	}
+	expected := []table.ColumnDefinition{
+		table.TextColumn("name"),
+		table.IntegerColumn("active"),
+		table.IntegerColumn("count"),
+		table.DoubleColumn("score"),
+	}
+	cols, err := GenerateColumnDefinitions(testStruct{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(cols) != len(expected) {
+		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
+	}
+	for i := range cols {
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		}
+	}
+}
+
+func TestGenerateColumnDefinitions_pointerStruct(t *testing.T) {
+	type testStruct struct {
+		Name *string `osquery:"name"`
+	}
+	expected := []table.ColumnDefinition{
+		table.TextColumn("name"),
+	}
+	val := &testStruct{}
+	cols, err := GenerateColumnDefinitions(val)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(cols) != len(expected) {
+		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
+	}
+	for i := range cols {
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		}
+	}
+}
+
+func TestGenerateColumnDefinitions_timeFormats(t *testing.T) {
+	type testStruct struct {
+		CreatedAt time.Time `osquery:"created_at" format:"unix"`
+		UpdatedAt time.Time `osquery:"updated_at"`
+	}
+	expected := []table.ColumnDefinition{
+		table.BigIntColumn("created_at"),
+		table.TextColumn("updated_at"),
+	}
+	cols, err := GenerateColumnDefinitions(testStruct{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(cols) != len(expected) {
+		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
+	}
+	for i := range cols {
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		}
+	}
+}
+
+func TestGenerateColumnDefinitions_skippedFields(t *testing.T) {
+	type testStruct struct {
+		Visible string `osquery:"visible"`
+		Hidden  string `osquery:"-"`
+	}
+	expected := []table.ColumnDefinition{
+		table.TextColumn("visible"),
+	}
+	cols, err := GenerateColumnDefinitions(testStruct{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(cols) != len(expected) {
+		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
+	}
+	for i := range cols {
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		}
+	}
+}
+
+func TestGenerateColumnDefinitions_nonStructInput(t *testing.T) {
+	_, err := GenerateColumnDefinitions("not a struct")
+	if err == nil {
+		t.Error("expected error for non-struct input, got nil")
+	}
+}
+
+func TestGenerateColumnDefinitions_nilInput(t *testing.T) {
+	_, err := GenerateColumnDefinitions(nil)
+	if err == nil {
+		t.Error("expected error for nil input, got nil")
+	}
+}
+
+func TestGenerateColumnDefinitions_unexportedFields(t *testing.T) {
+	type testStruct struct {
+		Public    string `osquery:"public"`
+		private   string `osquery:"private"` //nolint:unused -- meaningful for test coverage
+		Exported2 int    `osquery:"exported2"`
+	}
+	expected := []table.ColumnDefinition{
+		table.TextColumn("public"),
+		table.IntegerColumn("exported2"),
+	}
+	cols, err := GenerateColumnDefinitions(testStruct{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(cols) != len(expected) {
+		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
+	}
+	for i := range cols {
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		}
 	}
 }
