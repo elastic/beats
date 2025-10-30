@@ -87,13 +87,13 @@ Google Cloud Billing metrics
     type: float
 
 
-**`gcp.billing.usage_start_time`**
+**`gcp.billing.usage_start_time`** {applies_to}`stack: beta 9.2.1`
 :   The start time of the usage period for this billing record.
 
     type: date
 
 
-**`gcp.billing.usage_end_time`**
+**`gcp.billing.usage_end_time`** {applies_to}`stack: beta 9.2.1`
 :   The end time of the usage period for this billing record.
 
     type: date
@@ -117,7 +117,7 @@ Google Cloud Billing metrics
     type: keyword
 
 
-**`gcp.billing.labels`**
+**`gcp.billing.labels`** {applies_to}`stack: beta 9.2.1`
 :   Resource labels as key-value pairs. Labels are user-defined metadata that can be attached to GCP resources.
 
     type: object
