@@ -12,262 +12,184 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
-// TestFileWatcherClosedHarvesterNotification tests the case:
-// - watch runs and sees a new file, it sends a create event
-// - data is added to the file
-// - watch runs and sends a write event
-// - notification with a smaller size is received
-// - scan runs again, uses the size from the notification and sends a write event
-// - closedHarvesters is empty at the end of this scan
-func TestFileWatcherClosedHarvesterNotification(t *testing.T) {
-	dir := integration.CreateTempDir(
-		t,
-		filepath.Join("..", "..", "build", "integration-tests"),
-	)
+func TestFileWatcherNotifications(t *testing.T) {
+	testCases := map[string]func(t *testing.T, fw *fileWatcher, evt loginp.FSEvent, dir, logFilePath string){
+		"Partially ingested file": func(t *testing.T, fw *fileWatcher, evt loginp.FSEvent, dir, logFilePath string) {
+			// Tests the case:
+			//  - watch runs and sees a new file, it sends a create event
+			//  - data is added to the file
+			//  - watch runs and sends a write event
+			//  - notification with a smaller size is received
+			//  - scan runs again, uses the size from the notification and sends a write event
+			//  - closedHarvesters is empty at the end of this scan
 
-	// Create a 3000 bytes file
-	logFilePath := filepath.Join(dir, "log.log")
-	integration.WriteLogFile(t, logFilePath, 50, false)
+			// Write to the file, so we get a write operation
+			integration.WriteLogFile(t, logFilePath, 10, true)
+			fw.watch(t.Context())
+			evt = <-fw.events
+			requireOperation(t, evt, loginp.OpWrite)
 
-	cfg := defaultFileWatcherConfig()
-	fw, err := newFileWatcher(
-		logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests")).Logger,
-		[]string{filepath.Join(dir, "*.log")},
-		cfg,
-		false,
-		false,
-		mustFingerprintIdentifier(),
-		mustSourceIdentifier("foo-id"),
-	)
-	if err != nil {
-		t.Fatalf("cannot create file watcher: %s", err)
-	}
-	// Use a buffered channel so we don't block when writing on the channel
-	fw.events = make(chan loginp.FSEvent, 1)
+			// Check the filewatcher state
+			// Use the path from the event to be consistent with the
+			// fileWatcher implementation
+			stateSize := fw.prev[evt.NewPath].Size()
+			// 50 bytes per line, 60 lines = 3000 bytes
+			if stateSize != 3000 {
+				t.Fatalf(
+					"fileWatcher internal state is different from file size, expecting %d got %d",
+					3000,
+					stateSize)
+			}
 
-	// Scan the file system once
-	fw.watch(t.Context())
-	evt := <-fw.events
-	requireOperation(t, evt, loginp.OpCreate)
+			// Notify the harvester has closed with a smaller size
+			fw.processNotification(loginp.HarvesterStatus{
+				ID:   evt.SrcID,
+				Size: 2500, // anything smaller than the real size
+			})
 
-	// Write to the file again, so we get a write operation
-	integration.WriteLogFile(t, logFilePath, 10, true)
-	fw.watch(t.Context())
-	evt = <-fw.events
-	requireOperation(t, evt, loginp.OpWrite)
+			// Ensure closedHarvester is populated
+			if _, ok := fw.closedHarvesters[evt.SrcID]; !ok {
+				t.Fatal("closed harvester notification did not populate 'closedHarvesters'")
+			}
 
-	// Check the filewatcher state
-	// Use the path from the event to be consistent with the
-	// fileWatcher implementation
-	stateSize := fw.prev[evt.NewPath].Size()
-	// 50 bytes per line, 60 lines = 3000 bytes
-	if stateSize != 3000 {
-		t.Fatalf(
-			"fileWatcher internal state is different from file size, expecting %d got %d",
-			3000,
-			stateSize)
-	}
+			fw.watch(t.Context())
+			evt = <-fw.events
+			// Because of the notification sent with a smaller size than the actual file
+			// we should get a write operation
+			requireOperation(t, evt, loginp.OpWrite)
 
-	// Notify the harvester has closed with a smaller size
-	fw.processNotification(loginp.HarvesterStatus{
-		ID:   evt.SrcID,
-		Size: 2500, // anything smaller than the real size
-	})
+			// And closedHarvesters must be empty
+			l := len(fw.closedHarvesters)
+			if l != 0 {
+				t.Fatalf("expecting 'closedHarvesters' to be empty, got %d items", l)
+			}
+		},
 
-	// Ensure closedHarvester is populated
-	if _, ok := fw.closedHarvesters[evt.SrcID]; !ok {
-		t.Fatal("closed harvester notification did not populate 'closedHarvesters'")
-	}
-	fw.watch(t.Context())
-	evt = <-fw.events
-	// Because of the notification sent with a smaller size than the actual file
-	// we should get a write operation
-	requireOperation(t, evt, loginp.OpWrite)
+		"Fully ingested file": func(t *testing.T, fw *fileWatcher, evt loginp.FSEvent, dir, logFilePath string) {
+			// Tests the default case of a harvester closing after fully
+			// ingesting the file. It also ensure entries in closedHarvesters
+			// are correctly removed.
 
-	// And closedHarvesters must be empty
-	l := len(fw.closedHarvesters)
-	if l != 0 {
-		t.Fatalf("expecting 'closedHarvesters' to be empty, got %d items", l)
-	}
-}
+			// Notify the harvester has closed, file fully ingested
+			fw.processNotification(loginp.HarvesterStatus{
+				ID:   evt.SrcID,
+				Size: 3000,
+			})
 
-// TestFileWatcherClosedHarvesterNotificationFullyIngested tests the default
-// case of a harvester closing after fully ingesting the file. It also ensure
-// entries in closedHarvesters are correctly removed.
-func TestFileWatcherClosedHarvesterNotificationFullyIngested(t *testing.T) {
-	dir := integration.CreateTempDir(
-		t,
-		filepath.Join("..", "..", "build", "integration-tests"),
-	)
+			// Ensure closedHarvester is populated
+			if _, ok := fw.closedHarvesters[evt.SrcID]; !ok {
+				t.Fatal("closed harvester notification did not populate 'closedHarvesters'")
+			}
+			fw.watch(t.Context())
 
-	// Create a 3000 bytes file
-	logFilePath := filepath.Join(dir, "log.log")
-	integration.WriteLogFile(t, logFilePath, 50, false)
+			// The fileWatcher state has not changed, no events should be generated
+			eventsWritten := len(fw.events)
+			if eventsWritten != 0 {
+				t.Fatalf("expecting 0 events generated, got %d", eventsWritten)
+			}
 
-	cfg := defaultFileWatcherConfig()
+			// closedHarvesters must be empty
+			l := len(fw.closedHarvesters)
+			if l != 0 {
+				t.Fatalf("expecting 'closedHarvesters' to be empty, got %d items", l)
+			}
+		},
 
-	fw, err := newFileWatcher(
-		logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests")).Logger,
-		[]string{filepath.Join(dir, "*.log")},
-		cfg,
-		false,
-		false,
-		mustFingerprintIdentifier(),
-		mustSourceIdentifier("foo-id"),
-	)
-	if err != nil {
-		t.Fatalf("cannot create file watcher: %s", err)
-	}
-	// Use a buffered channel so we don't block when writing on the channel
-	fw.events = make(chan loginp.FSEvent, 1)
+		"Removed file": func(t *testing.T, fw *fileWatcher, evt loginp.FSEvent, dir, logFilePath string) {
+			// Notify the harvester has closed, file fully ingested
+			fw.processNotification(loginp.HarvesterStatus{
+				ID:   evt.SrcID,
+				Size: 3000,
+			})
 
-	// Scan the file system once
-	fw.watch(t.Context())
-	evt := <-fw.events
-	requireOperation(t, evt, loginp.OpCreate)
+			// Ensure closedHarvester is populated
+			if _, ok := fw.closedHarvesters[evt.SrcID]; !ok {
+				t.Fatal("closed harvester notification did not populate 'closedHarvesters'")
+			}
 
-	// Notify the harvester has closed, file fully ingested
-	fw.processNotification(loginp.HarvesterStatus{
-		ID:   evt.SrcID,
-		Size: 3000,
-	})
+			// Remove the file
+			if err := os.Remove(logFilePath); err != nil {
+				t.Fatalf("cannot remove log file: %s", err)
+			}
 
-	// Ensure closedHarvester is populated
-	if _, ok := fw.closedHarvesters[evt.SrcID]; !ok {
-		t.Fatal("closed harvester notification did not populate 'closedHarvesters'")
-	}
-	fw.watch(t.Context())
+			// A delete event must be generated
+			fw.watch(t.Context())
+			evt = <-fw.events
+			requireOperation(t, evt, loginp.OpDelete)
 
-	// The fileWatcher state has not changed, no events should be generated
-	eventsWritten := len(fw.events)
-	if eventsWritten != 0 {
-		t.Fatalf("expecting 0 events generated, got %d", eventsWritten)
-	}
+			// closedHarvesters must be empty
+			l := len(fw.closedHarvesters)
+			if l != 0 {
+				t.Fatalf("expecting 'closedHarvesters' to be empty, got %d items", l)
+			}
+		},
 
-	// closedHarvesters must be empty
-	l := len(fw.closedHarvesters)
-	if l != 0 {
-		t.Fatalf("expecting 'closedHarvesters' to be empty, got %d items", l)
-	}
-}
+		"Renamed file": func(t *testing.T, fw *fileWatcher, evt loginp.FSEvent, dir, logFilePath string) {
+			// Notify the harvester has closed, file fully ingested
+			fw.processNotification(loginp.HarvesterStatus{
+				ID:   evt.SrcID,
+				Size: 3000,
+			})
 
-func TestFileWatcherClosedHarvesterNotificationOfRemovedFile(t *testing.T) {
-	dir := integration.CreateTempDir(
-		t,
-		filepath.Join("..", "..", "build", "integration-tests"),
-	)
+			// Ensure closedHarvester is populated
+			if _, ok := fw.closedHarvesters[evt.SrcID]; !ok {
+				t.Fatal("closed harvester notification did not populate 'closedHarvesters'")
+			}
 
-	// Create a 3000 bytes file
-	logFilePath := filepath.Join(dir, "log.log")
-	integration.WriteLogFile(t, logFilePath, 50, false)
+			// Remove the file
+			newPath := filepath.Join(dir, "log1.log")
+			if err := os.Rename(logFilePath, newPath); err != nil {
+				t.Fatalf("cannot rename log file: %s", err)
+			}
 
-	cfg := defaultFileWatcherConfig()
+			// A rename event must be generated
+			fw.watch(t.Context())
+			evt = <-fw.events
+			requireOperation(t, evt, loginp.OpRename)
 
-	fw, err := newFileWatcher(
-		logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests")).Logger,
-		[]string{filepath.Join(dir, "*.log")},
-		cfg,
-		false,
-		false,
-		mustFingerprintIdentifier(),
-		mustSourceIdentifier("foo-id"),
-	)
-	if err != nil {
-		t.Fatalf("cannot create file watcher: %s", err)
-	}
-	// Use a buffered channel so we don't block when writing on the channel
-	fw.events = make(chan loginp.FSEvent, 1)
-
-	// Scan the file system once
-	fw.watch(t.Context())
-	evt := <-fw.events
-	requireOperation(t, evt, loginp.OpCreate)
-
-	// Notify the harvester has closed, file fully ingested
-	fw.processNotification(loginp.HarvesterStatus{
-		ID:   evt.SrcID,
-		Size: 3000,
-	})
-
-	// Ensure closedHarvester is populated
-	if _, ok := fw.closedHarvesters[evt.SrcID]; !ok {
-		t.Fatal("closed harvester notification did not populate 'closedHarvesters'")
+			// closedHarvesters still hold the file's entry
+			if _, ok := fw.closedHarvesters[evt.SrcID]; !ok {
+				t.Fatal("closedHarvesters must still contain the entry for a renamed file/")
+			}
+		},
 	}
 
-	// Remove the file
-	if err := os.Remove(logFilePath); err != nil {
-		t.Fatalf("cannot remove log file: %s", err)
-	}
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			dir := integration.CreateTempDir(
+				t,
+				filepath.Join("..", "..", "build", "integration-tests"),
+			)
 
-	// A delete event must be generated
-	fw.watch(t.Context())
-	evt = <-fw.events
-	requireOperation(t, evt, loginp.OpDelete)
+			// Create a 3000 bytes file
+			logFilePath := filepath.Join(dir, "log.log")
+			integration.WriteLogFile(t, logFilePath, 50, false)
 
-	// closedHarvesters must be empty
-	l := len(fw.closedHarvesters)
-	if l != 0 {
-		t.Fatalf("expecting 'closedHarvesters' to be empty, got %d items", l)
-	}
-}
+			cfg := defaultFileWatcherConfig()
+			fw, err := newFileWatcher(
+				logptest.NewFileLogger(t, filepath.Join(dir, "logger")).Logger,
+				[]string{filepath.Join(dir, "*.log")},
+				cfg,
+				false,
+				false,
+				mustFingerprintIdentifier(),
+				mustSourceIdentifier("foo-id"),
+			)
+			if err != nil {
+				t.Fatalf("cannot create file watcher: %s", err)
+			}
 
-func TestFileWatcherClosedHarvesterNotificationRenamedFile(t *testing.T) {
-	dir := integration.CreateTempDir(
-		t,
-		filepath.Join("..", "..", "build", "integration-tests"),
-	)
+			// Use a buffered channel to prevent blocking when writing/reading
+			fw.events = make(chan loginp.FSEvent, 1)
 
-	// Create a 3000 bytes file
-	logFilePath := filepath.Join(dir, "log.log")
-	integration.WriteLogFile(t, logFilePath, 50, false)
+			// Scan the file system once
+			fw.watch(t.Context())
+			evt := <-fw.events
+			requireOperation(t, evt, loginp.OpCreate)
 
-	cfg := defaultFileWatcherConfig()
-
-	fw, err := newFileWatcher(
-		logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests")).Logger,
-		[]string{filepath.Join(dir, "*.log")},
-		cfg,
-		false,
-		false,
-		mustFingerprintIdentifier(),
-		mustSourceIdentifier("foo-id"),
-	)
-	if err != nil {
-		t.Fatalf("cannot create file watcher: %s", err)
-	}
-	// Use a buffered channel so we don't block when writing on the channel
-	fw.events = make(chan loginp.FSEvent, 1)
-
-	// Scan the file system once
-	fw.watch(t.Context())
-	evt := <-fw.events
-	requireOperation(t, evt, loginp.OpCreate)
-
-	// Notify the harvester has closed, file fully ingested
-	fw.processNotification(loginp.HarvesterStatus{
-		ID:   evt.SrcID,
-		Size: 3000,
-	})
-
-	// Ensure closedHarvester is populated
-	if _, ok := fw.closedHarvesters[evt.SrcID]; !ok {
-		t.Fatal("closed harvester notification did not populate 'closedHarvesters'")
-	}
-
-	// Remove the file
-	newPath := filepath.Join(dir, "log1.log")
-	if err := os.Rename(logFilePath, newPath); err != nil {
-		t.Fatalf("cannot rename log file: %s", err)
-	}
-
-	// A rename event must be generated
-	fw.watch(t.Context())
-	evt = <-fw.events
-	requireOperation(t, evt, loginp.OpRename)
-
-	// closedHarvesters still hold the file's entry
-	if _, ok := fw.closedHarvesters[evt.SrcID]; !ok {
-		t.Fatal("closedHarvesters must still contain the entry for a renamed file/")
+			// Run the test case
+			tc(t, fw, evt, dir, logFilePath)
+		})
 	}
 }
 
