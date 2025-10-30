@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/testdata"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 )
 
 func TestGlobalStateConfig(t *testing.T) {
@@ -51,7 +52,11 @@ func TestCachingBehavior(t *testing.T) {
 	}
 
 	// Calling any of the accessor functions should cause the cache to update
-	instance.GetCachedEntries(tables.ApplicationTableType)
+	filters := []filters.Filter{}
+	entries := instance.GetCachedEntries(tables.ApplicationTable, filters)
+	if len(entries) == 0 {
+		t.Errorf("Expected accessor function to return results, got 0")
+	}
 	if instance.LastUpdated.IsZero() {
 		t.Errorf("Expected lastUpdated to be set after accessor call, got %v", instance.LastUpdated)
 	}
@@ -59,8 +64,8 @@ func TestCachingBehavior(t *testing.T) {
 
 	// Calling the accessor functions again should not cause an update since it has not expired
 	// Additionally they should all return results
-	for _, tableType := range tables.AllTableTypes() {
-		if len(instance.GetCachedEntries(tableType)) == 0 {
+	for _, tableType := range tables.AllAmcacheTables() {
+		if len(instance.GetCachedEntries(tableType, filters)) == 0 {
 			t.Errorf("Expected accessor function to return results, got 0")
 		}
 	}
@@ -79,7 +84,10 @@ func TestCachingBehavior(t *testing.T) {
 	}
 
 	// Calling any of the accessor functions should cause the cache to update since it has expired
-	instance.GetCachedEntries(tables.ApplicationTableType)
+	entries = instance.GetCachedEntries(tables.ApplicationTable, filters)
+	if len(entries) == 0 {
+		t.Errorf("Expected accessor function to return results, got 0")
+	}
 	if !instance.LastUpdated.After(expiredTime) {
 		t.Errorf("Expected lastUpdated to be updated after accessor call since it has expired, got %v", instance.LastUpdated)
 	}
