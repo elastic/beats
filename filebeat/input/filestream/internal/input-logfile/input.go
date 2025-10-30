@@ -30,7 +30,9 @@ import (
 )
 
 type managedInput struct {
-	userID           string
+	// id is the input ID, it is defined by setting 'id'
+	// in the input configuration
+	id               string
 	metricsID        string
 	manager          *InputManager
 	ackCH            *updateChan
@@ -57,6 +59,8 @@ func (inp *managedInput) Run(
 	ctx.UpdateStatus(status.Starting, "")
 	groupStore := inp.manager.getRetainedStore()
 	defer groupStore.Release()
+
+	ctx.Logger = ctx.Logger.With("filestream_id", inp.id)
 
 	// Setup cancellation using a custom cancel context. All workers will be
 	// stopped if one failed badly by returning an error.
@@ -94,7 +98,7 @@ func (inp *managedInput) Run(
 
 	// Notify the manager the input has stopped, currently that is used to
 	// keep track of duplicated IDs
-	inp.manager.StopInput(inp.userID)
+	inp.manager.StopInput(inp.id)
 
 	return nil
 }

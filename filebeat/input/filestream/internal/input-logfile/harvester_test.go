@@ -461,7 +461,7 @@ func TestCursorAllEventsPublished(t *testing.T) {
 	wg.Add(1)
 	testLogger := logptest.NewFileLogger(
 		t,
-		filepath.Join("..", "..", "..", "../", "build", "integation-tests"),
+		filepath.Join("..", "..", "..", "../", "build", "integration-tests"),
 	)
 	hg.Start(
 		input.Context{

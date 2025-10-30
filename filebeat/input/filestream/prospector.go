@@ -282,11 +282,13 @@ func (p *fileProspector) Init(
 //
 //nolint:dupl // Different prospectors have a similar run method
 func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
-	log := ctx.Logger.With("prospector", prospectorDebugKey)
-	log.Debug("Starting prospector")
-	defer log.Debug("Prospector has stopped")
+	p.logger.Debug("Starting prospector")
+	defer p.logger.Debug("Prospector has stopped")
 
-	defer p.stopHarvesterGroup(log, hg)
+	// ctx.Logger has its 'log.logger' set to 'input.filestream'.
+	// Because the harvester is not really part of the prospector,
+	// we use this logger instead of the prospector logger.
+	defer p.stopHarvesterGroup(ctx.Logger, hg)
 
 	var tg unison.MultiErrGroup
 
@@ -310,17 +312,19 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			}
 
 			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
+			p.onFSEvent(loggerWithEvent(p.logger, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
 		}
 		return nil
 	})
 
 	errs := tg.Wait()
 	if len(errs) > 0 {
-		log.Errorf("running prospector failed: %v", errors.Join(errs...))
+		p.logger.Errorf("running prospector failed: %v", errors.Join(errs...))
 	}
 }
 
+// onFSEvent uses 'log' instead of the [fileProspector] logger
+// because 'log' has been enriched with event information
 func (p *fileProspector) onFSEvent(
 	log *logp.Logger,
 	ctx input.Context,
@@ -334,18 +338,30 @@ func (p *fileProspector) onFSEvent(
 	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
 		switch event.Op {
 		case loginp.OpCreate:
-			log.Debugf("A new file %s has been found", event.NewPath)
+			log.Debugw(
+				fmt.Sprintf("A new file %s has been found", event.NewPath),
+				"source_file", event.SrcID,
+			)
 
 			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})
 			if err != nil {
-				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
+				log.Errorw(
+					fmt.Sprintf("Failed to set cursor meta data of entry %s: %v", src.Name(), err),
+					"source_file", event.SrcID,
+				)
 			}
 
 		case loginp.OpWrite:
-			log.Debugf("File %s has been updated", event.NewPath)
+			log.Debugw(
+				fmt.Sprintf("File %s has been updated", event.NewPath),
+				"source_file", event.SrcID,
+			)
 
 		case loginp.OpNotChanged:
-			log.Debugf("File %s has not changed, trying to start new harvester", event.NewPath)
+			log.Debugw(
+				fmt.Sprintf("File %s has not changed, trying to start new harvester", event.NewPath),
+				"source_file", event.SrcID,
+			)
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
@@ -359,7 +375,10 @@ func (p *fileProspector) onFSEvent(
 		group.Start(ctx, src)
 
 	case loginp.OpTruncate:
-		log.Debugf("File %s has been truncated setting offset to 0", event.NewPath)
+		log.Debugw(
+			fmt.Sprintf("File %s has been truncated setting offset to 0", event.NewPath),
+			"source_file", event.SrcID,
+		)
 
 		err := updater.ResetCursor(src, state{Offset: 0})
 		if err != nil {
@@ -368,12 +387,18 @@ func (p *fileProspector) onFSEvent(
 		group.Restart(ctx, src)
 
 	case loginp.OpDelete:
-		log.Debugf("File %s has been removed", event.OldPath)
+		log.Debugw(
+			fmt.Sprintf("File %s has been removed", event.OldPath),
+			"source_file", event.SrcID,
+		)
 
 		p.onRemove(log, event, src, updater, group)
 
 	case loginp.OpRename:
-		log.Debugf("File %s has been renamed to %s", event.OldPath, event.NewPath)
+		log.Debugw(
+			fmt.Sprintf("File %s has been renamed to %s", event.OldPath, event.NewPath),
+			"source_file", event.SrcID,
+		)
 
 		p.onRename(log, ctx, event, src, updater, group)
 

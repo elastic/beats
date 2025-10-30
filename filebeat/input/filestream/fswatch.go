@@ -26,6 +26,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/elastic/go-concert/unison"
@@ -70,10 +71,15 @@ type fileWatcher struct {
 	scanner          loginp.FSScanner
 	log              *logp.Logger
 	events           chan loginp.FSEvent
-	notifyChan       chan loginp.HarvesterFile
-	closedHarvesters map[string]int64
+	notifyChan       chan loginp.HarvesterStatus
 	fileIdentifier   fileIdentifier
 	sourceIdentifier *loginp.SourceIdentifier
+
+	// closedHarvesters is a map of harvester ID to the current
+	// offset of the file
+	closedHarvesters map[string]int64
+	// closedHarvestersMutex controls access to closedHarvesters
+	closedHarvestersMutex sync.Mutex
 }
 
 func newFileWatcher(
@@ -100,8 +106,8 @@ func newFileWatcher(
 		events:           make(chan loginp.FSEvent),
 		closedHarvesters: map[string]int64{},
 		// notifyChan is a buffered channel to prevent the harvester from
-		// blocking while waiting for the fileWatcher.
-		notifyChan:       make(chan loginp.HarvesterFile, 5), // magic number
+		// blocking while waiting for the fileWatcher to read from the channel
+		notifyChan:       make(chan loginp.HarvesterStatus, 5), // magic number
 		fileIdentifier:   fi,
 		sourceIdentifier: srci,
 	}, nil
@@ -116,7 +122,7 @@ func defaultFileWatcherConfig() fileWatcherConfig {
 	}
 }
 
-func (w *fileWatcher) NotifyChan() chan loginp.HarvesterFile {
+func (w *fileWatcher) NotifyChan() chan loginp.HarvesterStatus {
 	return w.notifyChan
 }
 
@@ -126,12 +132,26 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 	// run initial scan before starting regular
 	w.watch(ctx)
 
+	// Read from notifyChan in a separate goroutine becase
+	// there are cases when w.watch can take minutes or even
+	// hours, so we do not want to block the harvesters
+	go func() {
+		for {
+			select {
+			case evt := <-w.notifyChan:
+				w.log.Debugf("Harvester Closed notification. ID: %s, Size: %d", evt.ID, evt.Size)
+				w.closedHarvestersMutex.Lock()
+				w.closedHarvesters[evt.ID] = evt.Size
+				w.closedHarvestersMutex.Unlock()
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
 	tick := time.Tick(w.cfg.Interval)
 	for {
 		select {
-		case evt := <-w.notifyChan:
-			w.log.Debugf("Harvester Closed notification. Path: %s, Size: %d", evt.Path, evt.Size)
-			w.closedHarvesters[evt.Path] = evt.Size
 		case <-tick:
 			w.watch(ctx)
 		case <-ctx.Done():
@@ -156,6 +176,10 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	newFilesByID := make(map[string]*loginp.FileDescriptor)
 
 	for path, fd := range paths {
+		// srcID is the file identity, it is the same value used to identify
+		// the harvester for this file and as registry key
+		srcID := w.getFileIdentity(fd)
+
 		// if the scanner found a new path or an existing path
 		// with a different file, it is a new file
 		prevDesc, ok := w.prev[path]
@@ -188,23 +212,24 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		// (data ingested) when the harvester closes. If we have this data we
 		// update our state to the same as the harvester, therefore starting
 		// a new harvester if needed.
-		if size, harvesterClosed := w.closedHarvesters[path]; harvesterClosed {
-			w.log.Debugf("Updating previous state because harvester was closed. '%s': %d", path, size)
+		w.closedHarvestersMutex.Lock()
+		if size, harvesterClosed := w.closedHarvesters[srcID]; harvesterClosed {
+			w.log.Debugf("Updating previous state because harvester was closed. '%s': %d", srcID, size)
 			prevDesc.SetSize(size)
-			delete(w.closedHarvesters, path)
 		}
+		w.closedHarvestersMutex.Unlock()
 
 		var e loginp.FSEvent
 		switch {
 		// the new size is smaller, the file was truncated
 		case prevDesc.Info.Size() > fd.Info.Size():
-			e = truncateEvent(path, fd)
+			e = truncateEvent(path, fd, srcID)
 			truncatedCount++
 
 		// the size is the same, timestamps are different, the file was touched
 		case prevDesc.Info.Size() == fd.Info.Size() && prevDesc.Info.ModTime() != fd.Info.ModTime():
 			if w.cfg.ResendOnModTime {
-				e = truncateEvent(path, fd)
+				e = truncateEvent(path, fd, srcID)
 				truncatedCount++
 			}
 
@@ -212,14 +237,14 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		// If a harvester for this file was closed recently,
 		// we use its state instead of the one we have cached.
 		case prevDesc.Size() < fd.Info.Size():
-			e = writeEvent(path, fd)
+			e = writeEvent(path, fd, srcID)
 			writtenCount++
 
 		default:
 			// For the delete feature we need to run the harvester for
 			// files that have not changed until they're deleted.
 			if w.cfg.SendNotChanged {
-				e = notChangedEvent(path, fd)
+				e = notChangedEvent(path, fd, srcID)
 			}
 		}
 
@@ -234,6 +259,10 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 
 		// delete from previous state to mark that we've seen the existing file again
 		delete(w.prev, path)
+		// Delete used state from closedHarvesters
+		w.closedHarvestersMutex.Lock()
+		delete(w.closedHarvesters, srcID)
+		w.closedHarvestersMutex.Unlock()
 	}
 
 	// remaining files in the prev map are the ones that are missing
@@ -242,15 +271,20 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		var e loginp.FSEvent
 
 		id := remainingDesc.FileID()
+		srcID := w.getFileIdentity(remainingDesc)
 		if newDesc, renamed := newFilesByID[id]; renamed {
-			e = renamedEvent(remainingPath, newDesc.Filename, *newDesc)
+			e = renamedEvent(remainingPath, newDesc.Filename, *newDesc, srcID)
 			delete(newFilesByName, newDesc.Filename)
 			delete(newFilesByID, id)
 			renamedCount++
 		} else {
-			e = deleteEvent(remainingPath, remainingDesc)
+			e = deleteEvent(remainingPath, remainingDesc, srcID)
 			removedCount++
+			w.closedHarvestersMutex.Lock()
+			delete(w.closedHarvesters, srcID)
+			w.closedHarvestersMutex.Unlock()
 		}
+
 		select {
 		case <-ctx.Done():
 			return
@@ -269,7 +303,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		select {
 		case <-ctx.Done():
 			return
-		case w.events <- createEvent(path, *fd):
+		case w.events <- createEvent(path, *fd, w.getFileIdentity(*fd)):
 			createdCount++
 		}
 	}
@@ -286,33 +320,36 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.prev = paths
 }
 
+// getFileIdentity mimics the same algorithm used by the harvester to generate
+// the file identity to any given file.
+// See 'startHarvester' on internal/input-logfile/harvester.go.
 func (w *fileWatcher) getFileIdentity(d loginp.FileDescriptor) string {
 	src := w.fileIdentifier.GetSource(loginp.FSEvent{Descriptor: d})
 	return w.sourceIdentifier.ID(src)
 }
 
-func createEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: path, Descriptor: fd}
+func createEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
-func writeEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpWrite, OldPath: path, NewPath: path, Descriptor: fd}
+func writeEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpWrite, OldPath: path, NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
-func truncateEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpTruncate, OldPath: path, NewPath: path, Descriptor: fd}
+func truncateEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpTruncate, OldPath: path, NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
-func renamedEvent(oldPath, path string, fd loginp.FileDescriptor) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpRename, OldPath: oldPath, NewPath: path, Descriptor: fd}
+func renamedEvent(oldPath, path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpRename, OldPath: oldPath, NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
-func deleteEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpDelete, OldPath: path, NewPath: "", Descriptor: fd}
+func deleteEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpDelete, OldPath: path, NewPath: "", Descriptor: fd, SrcID: srcID}
 }
 
-func notChangedEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpNotChanged, OldPath: path, NewPath: path, Descriptor: fd}
+func notChangedEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpNotChanged, OldPath: path, NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
 func (w *fileWatcher) Event() loginp.FSEvent {

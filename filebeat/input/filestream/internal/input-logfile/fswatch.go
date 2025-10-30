@@ -113,6 +113,9 @@ type FSEvent struct {
 	Op Operation
 	// Descriptor describes the file in the event.
 	Descriptor FileDescriptor
+	// SrcID is the identifier used to identify the harvester and the
+	// entry in the registry
+	SrcID string
 }
 
 // FSScanner retrieves a list of files from the file system.
@@ -134,5 +137,5 @@ type FSWatcher interface {
 	Event() FSEvent
 	// NotifyChan returns the channel used to listen for
 	// harvester closing notifications
-	NotifyChan() chan HarvesterFile
+	NotifyChan() chan HarvesterStatus
 }

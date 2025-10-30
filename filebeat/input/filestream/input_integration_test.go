@@ -1179,10 +1179,6 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 	logFilePathStr := strings.ReplaceAll(logFilePath, `\`, `\\`)
 
 	integration.WriteLogFile(t, logFilePath, 50, false)
-	stat, err := os.Stat(logFilePath)
-	if err != nil {
-		t.Fatalf("cannot stat log file: %s", err)
-	}
 
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	// The duration used to configure the input need to obey
@@ -1241,10 +1237,7 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 	// Ensure it got notified when the harvester closed and the offset
 	// is correct
 	env.WaitLogsContains(
-		fmt.Sprintf(
-			"Updating previous state because harvester was closed. '%s': %d",
-			logFilePathStr,
-			stat.Size()),
+		"Updating previous state because harvester was closed.",
 		1*time.Second)
 
 	// Ensure the fileWatcher sent an write event

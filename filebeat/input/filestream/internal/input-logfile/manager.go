@@ -76,11 +76,9 @@ type InputManager struct {
 
 // Source describe a source the input can collect data from.
 // The [Name] method must return an unique name, that will be used to identify
-// the source in the persistent state store. The [Path] method must return
-// the path for the source.
+// the source in the persistent state store.
 type Source interface {
 	Name() string
-	Path() string
 }
 
 var errNoInputRunner = errors.New("no input runner available")
@@ -281,7 +279,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	return &managedInput{
 		manager:          cim,
 		ackCH:            cim.ackCH,
-		userID:           settings.ID,
+		id:               settings.ID,
 		prospector:       prospector,
 		harvester:        harvester,
 		sourceIdentifier: srcIdentifier,
