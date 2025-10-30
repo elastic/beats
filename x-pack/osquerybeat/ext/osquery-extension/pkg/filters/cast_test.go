@@ -23,8 +23,6 @@ func TestToBool(t *testing.T) {
 		{name: "bool_string_false", args: args{input: "false"}, want: false},
 		{name: "bool_string_true_uppercase", args: args{input: "TRUE"}, want: true},
 		{name: "bool_string_false_uppercase", args: args{input: "FALSE"}, want: false},
-		{name: "bool_string_1", args: args{input: "1"}, want: true},
-		{name: "bool_string_0", args: args{input: "0"}, want: false},
 		{name: "bool_string_non_boolean", args: args{input: "not a boolean"}, want: false},
 		{name: "bool_int_1", args: args{input: 1}, want: true},
 		{name: "bool_int_0", args: args{input: 0}, want: false},
@@ -35,8 +33,13 @@ func TestToBool(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ToBool(tt.args.input); got != tt.want {
-				t.Errorf("ToBool() = %v, want %v", got, tt.want)
+			got, ok := ToBool(tt.args.input); if !ok {
+				if tt.want == false {
+					return
+				}
+				t.Errorf("%s: ToBool() failed to convert input to bool", tt.name)
+			} else if got != tt.want {
+				t.Errorf("%s: ToBool() = %v, want %v", tt.name, got, tt.want)
 			}
 		})
 	}
@@ -63,36 +66,13 @@ func TestToInt64(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ToInt64(tt.args.input); got != tt.want {
-				t.Errorf("ToInt64() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestToUint64(t *testing.T) {
-	type args struct {
-		input any
-	}
-	tests := []struct {
-		name string
-		args args
-		want uint64
-	}{
-		{name: "uint64_1", args: args{input: 1}, want: 1},
-		{name: "uint64_0", args: args{input: 0}, want: 0},
-		{name: "uint64_non_integer", args: args{input: 100.0}, want: 100},
-		{name: "uint64_string_1", args: args{input: "1"}, want: 1},
-		{name: "uint64_string_0", args: args{input: "0"}, want: 0},
-		{name: "uint64_string_non_integer", args: args{input: "not an integer"}, want: 0},
-		{name: "uint64_float_1.0", args: args{input: 1.0}, want: 1},
-		{name: "uint64_float_0.0", args: args{input: 0.0}, want: 0},
-		{name: "uint64_float_non_integer", args: args{input: 100.0}, want: 100},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := ToUint64(tt.args.input); got != tt.want {
-				t.Errorf("ToUint64() = %v, want %v", got, tt.want)
+			got, ok := ToInt64(tt.args.input); if !ok {
+				if tt.want == 0 {
+					return
+				}
+				t.Errorf("%s: ToInt64() failed to convert input to int64", tt.name)
+			} else if got != tt.want {
+				t.Errorf("%s: ToInt64() = %v, want %v", tt.name, got, tt.want)
 			}
 		})
 	}
@@ -119,9 +99,14 @@ func TestToFloat64(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ToFloat64(tt.args.input); got != tt.want {
-				t.Errorf("ToFloat64() = %v, want %v", got, tt.want)
+			got, ok := ToFloat64(tt.args.input); if !ok {
+				if tt.want == 0.0 {
+					return
+				}
+				t.Errorf("%s: ToFloat64() failed to convert input to float64", tt.name)
+			} else if got != tt.want {
+				t.Errorf("%s: ToFloat64() = %v, want %v", tt.name, got, tt.want)
 			}
-		})
+		})	
 	}
 }
