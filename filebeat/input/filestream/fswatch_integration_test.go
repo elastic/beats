@@ -166,7 +166,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 
 			// closedHarvesters still hold the file's entry
 			if _, ok := fw.closedHarvesters[evt.SrcID]; !ok {
-				t.Fatal("closedHarvesters must still contain the entry for a renamed file/")
+				t.Fatal("closedHarvesters must still contain the entry for a renamed file")
 			}
 		},
 	}
