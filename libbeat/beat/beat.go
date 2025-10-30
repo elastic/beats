@@ -132,7 +132,7 @@ func (beat *Beat) GenerateUserAgent() {
 	unprivileged := beat.userAgentUnprivilegedMode()
 
 	beat.Info.UserAgent = useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),
-		mode, unprivileged)
+		mode, unprivileged, version.FIPSDistribution)
 }
 
 // BeatConfig struct contains the basic configuration of every beat
