@@ -60,3 +60,5 @@
     type: object
     object_type: keyword
     description: Resource labels as key-value pairs. Labels are user-defined metadata that can be attached to GCP resources.
+    version:
+      beta: 9.2.1
