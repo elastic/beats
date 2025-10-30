@@ -137,7 +137,7 @@ type HarvesterStatus struct {
 	// ID is the ID of the harvester
 	ID string
 	// Size is the amount of data ingested, in other words the size of the file
-	//when the harvester closed.
+	// when the harvester closed.
 	Size int64
 }
 
@@ -147,7 +147,7 @@ func (hg *defaultHarvesterGroup) notifyObserver(srcID string, size int64) {
 	}
 }
 
-// SetObserver adds an observer to get notified when a harvester closes
+// SetObserver sets the observer to get notifications when a harvester closes
 func (hg *defaultHarvesterGroup) SetObserver(c chan HarvesterStatus) {
 	hg.notifyChan = c
 }
@@ -266,10 +266,10 @@ func startHarvester(
 			st := struct {
 				Offset int64 `json:"offset" struct:"offset"`
 			}{}
-
 			if err := cursor.Unpack(&st); err != nil {
 				ctx.Logger.Errorf("cannot unpack cursor at the end of the harvester: %s", err)
 			}
+
 			hg.notifyObserver(srcID, st.Offset)
 			ctx.Logger.Debugf("Harvester '%s' closed with offset: %d", srcID, st.Offset)
 		}()

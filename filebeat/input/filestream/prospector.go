@@ -334,34 +334,24 @@ func (p *fileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
+
+	log = log.With("source_file", event.SrcID)
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
 		switch event.Op {
 		case loginp.OpCreate:
-			log.Debugw(
-				fmt.Sprintf("A new file %s has been found", event.NewPath),
-				"source_file", event.SrcID,
-			)
+			log.Debug("A new file %s has been found", event.NewPath)
 
 			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})
 			if err != nil {
-				log.Errorw(
-					fmt.Sprintf("Failed to set cursor meta data of entry %s: %v", src.Name(), err),
-					"source_file", event.SrcID,
-				)
+				log.Error("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
 			}
 
 		case loginp.OpWrite:
-			log.Debugw(
-				fmt.Sprintf("File %s has been updated", event.NewPath),
-				"source_file", event.SrcID,
-			)
+			log.Debug("File %s has been updated", event.NewPath)
 
 		case loginp.OpNotChanged:
-			log.Debugw(
-				fmt.Sprintf("File %s has not changed, trying to start new harvester", event.NewPath),
-				"source_file", event.SrcID,
-			)
+			log.Debug("File %s has not changed, trying to start new harvester", event.NewPath)
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
@@ -375,11 +365,7 @@ func (p *fileProspector) onFSEvent(
 		group.Start(ctx, src)
 
 	case loginp.OpTruncate:
-		log.Debugw(
-			fmt.Sprintf("File %s has been truncated setting offset to 0", event.NewPath),
-			"source_file", event.SrcID,
-		)
-
+		log.Debug("File %s has been truncated setting offset to 0", event.NewPath)
 		err := updater.ResetCursor(src, state{Offset: 0})
 		if err != nil {
 			log.Errorf("resetting cursor on truncated file: %v", err)
@@ -387,19 +373,11 @@ func (p *fileProspector) onFSEvent(
 		group.Restart(ctx, src)
 
 	case loginp.OpDelete:
-		log.Debugw(
-			fmt.Sprintf("File %s has been removed", event.OldPath),
-			"source_file", event.SrcID,
-		)
-
+		log.Debug("File %s has been removed", event.OldPath)
 		p.onRemove(log, event, src, updater, group)
 
 	case loginp.OpRename:
-		log.Debugw(
-			fmt.Sprintf("File %s has been renamed to %s", event.OldPath, event.NewPath),
-			"source_file", event.SrcID,
-		)
-
+		log.Debug("File %s has been renamed to %s", event.OldPath, event.NewPath)
 		p.onRename(log, ctx, event, src, updater, group)
 
 	default:

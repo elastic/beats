@@ -74,10 +74,6 @@ func (f fileSource) Name() string {
 	return f.fileID
 }
 
-func (f fileSource) Path() string {
-	return f.desc.Filename
-}
-
 // newFileIdentifier creates a new state identifier for a log input.
 func newFileIdentifier(ns *conf.Namespace, suffix string, log *logp.Logger) (fileIdentifier, error) {
 	if ns == nil {

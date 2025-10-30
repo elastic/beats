@@ -174,7 +174,7 @@ func NewStandardBeat(t *testing.T, beatName, binary string, args ...string) *Bea
 // See `NewBeat` for options and information for the parameters.
 func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "agentbeat binary must exists")
-	rootDir, err := filepath.Abs("../../build/integration-tests")
+	rootDir, err := filepath.Abs(filepath.Join("..", "..", "build", "integration-tests"))
 	if err != nil {
 		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
 	}

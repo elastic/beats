@@ -161,7 +161,7 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 }
 
 func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
-	w.log.Debugf("Harvester Closed notification. ID: %s, Size: %d", evt.ID, evt.Size)
+	w.log.Debugf("Harvester Closed notification received. ID: %s, Size: %d", evt.ID, evt.Size)
 	w.closedHarvestersMutex.Lock()
 	w.closedHarvesters[evt.ID] = evt.Size
 	w.closedHarvestersMutex.Unlock()
@@ -184,7 +184,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 
 	for path, fd := range paths {
 		// srcID is the file identity, it is the same value used to identify
-		// the harvester for this file and as registry key
+		// the harvester and as registry key for the file's state
 		srcID := w.getFileIdentity(fd)
 
 		// if the scanner found a new path or an existing path

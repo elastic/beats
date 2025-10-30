@@ -41,15 +41,10 @@ const testPluginName = "my_test_plugin"
 
 type testSource struct {
 	name string
-	path string
 }
 
 func (s *testSource) Name() string {
 	return s.name
-}
-
-func (s *testSource) Path() string {
-	return s.path
 }
 
 type noopProspector struct{}
@@ -72,8 +67,8 @@ func TestSourceIdentifier_ID(t *testing.T) {
 	}{
 		"plugin with no user configured ID": {
 			sources: []*testSource{
-				{name: "unique_name"},
-				{name: "another_unique_name"},
+				{"unique_name"},
+				{"another_unique_name"},
 			},
 			expectedSourceIDs: []string{
 				testPluginName + "::.global::unique_name",
@@ -179,7 +174,7 @@ func TestSourceIdentifierNoAccidentalMatches(t *testing.T) {
 		t.Fatalf("cannot create identifier: %v", err)
 	}
 
-	src := &testSource{name: "test"}
+	src := &testSource{"test"}
 	assert.NotEqual(t, noIDIdentifier.ID(src), withIDIdentifier.ID(src))
 	assert.False(t, noIDIdentifier.MatchesInput(withIDIdentifier.ID(src)))
 	assert.False(t, withIDIdentifier.MatchesInput(noIDIdentifier.ID(src)))
