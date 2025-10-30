@@ -46,6 +46,8 @@
     description: The end time of the usage period for this billing record.
   - name: location
     type: group
+    version:
+      beta: 9.2.1
     fields:
       - name: region
         type: keyword
