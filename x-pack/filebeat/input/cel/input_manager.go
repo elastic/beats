@@ -39,11 +39,7 @@ func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, erro
 	if err := cfg.Unpack(&src.cfg); err != nil {
 		return nil, nil, err
 	}
-<<<<<<< HEAD
-=======
 	src.cfg.DataStream = dataStreamName(cfg)
-	src.cfg.checkUnsupportedParams(logger)
->>>>>>> 65e1f2d24 (x-pack/filebeat/input/cel: add data stream identification to status updates (#47229))
 	return []inputcursor.Source{src}, input{}, nil
 }
 
