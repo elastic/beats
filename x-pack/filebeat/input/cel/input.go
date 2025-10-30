@@ -51,6 +51,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -176,6 +177,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			Value: cfg.Auth.Token.Value,
 		}
 	}
+
 	wantDump := cfg.FailureDump.enabled() && cfg.FailureDump.Filename != ""
 	doCov := cfg.RecordCoverage && log.IsDebug()
 	httpOptions := lib.HTTPOptions{
@@ -814,6 +816,15 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 			Password:  cfg.Auth.Digest.Password,
 			NoReuse:   noReuse,
 		}
+	} else if cfg.Auth.AWS.IsEnabled() {
+		// this transport runs after the other ones (the other ones wrap this one); just to be on the safe side.
+		// If any of the other transports add any header, it must happen before the signing.
+		tr, err := aws.InitializeSignerTransport(*cfg.Auth.AWS, log, c.Transport)
+		if err != nil {
+			log.Errorw("failed to initialize aws config failed for signer", "error", err)
+			return nil, nil, err
+		}
+		c.Transport = tr
 	}
 
 	var trace *httplog.LoggingRoundTripper
