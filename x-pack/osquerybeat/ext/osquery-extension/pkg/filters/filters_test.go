@@ -1,7 +1,5 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-
 // or more contributor license agreements. Licensed under the Elastic License;
-
 // you may not use this file except in compliance with the Elastic License.
 
 package filters
@@ -148,7 +146,7 @@ func RunFilterTests(t *testing.T, tests []FilterTestCase) {
 func TestFilter_Equals(t *testing.T) {
 	tests := []FilterTestCase{
 		{
-			name: "1 - StringEquals - True",
+			name: "string_equals_true",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -156,7 +154,7 @@ func TestFilter_Equals(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "2 - StringEquals - False",
+			name: "string_equals_false",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -164,7 +162,7 @@ func TestFilter_Equals(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "3 - IntEquals - True",
+			name: "int_equals_true",
 			entry: MockEntry{
 				IntValue: 100,
 			},
@@ -172,7 +170,7 @@ func TestFilter_Equals(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "4 - IntEquals - False",
+			name: "int_equals_false",
 			entry: MockEntry{
 				IntValue: 100,
 			},
@@ -180,7 +178,7 @@ func TestFilter_Equals(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "5 - FloatEquals - True",
+			name: "float_equals_true",
 			entry: MockEntry{
 				FloatValue: 100.0,
 			},
@@ -188,7 +186,7 @@ func TestFilter_Equals(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "6 - FloatEquals - False",
+			name: "float_equals_false",
 			entry: MockEntry{
 				FloatValue: 100.0,
 			},
@@ -196,7 +194,7 @@ func TestFilter_Equals(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "7 - BoolEquals - True",
+			name: "bool_equals_true",
 			entry: MockEntry{
 				BoolValue: true,
 			},
@@ -204,7 +202,7 @@ func TestFilter_Equals(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "8 - BoolEquals - False",
+			name: "bool_equals_false",
 			entry: MockEntry{
 				BoolValue: true,
 			},
@@ -218,13 +216,13 @@ func TestFilter_Equals(t *testing.T) {
 func TestFilter_GreaterThan(t *testing.T) {
 	tests := []FilterTestCase{
 		{
-			name: "1 - IntGreaterThan - True",
+			name: "int_greater_than_true",
 			entry: MockEntry{
 				IntValue: 100,
 			},
 		},
 		{
-			name: "2 - IntGreaterThan - False",
+			name: "int_greater_than_false",
 			entry: MockEntry{
 				IntValue: 100,
 			},
@@ -232,7 +230,7 @@ func TestFilter_GreaterThan(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "3 - FloatGreaterThan - True",
+			name: "float_greater_than_true",
 			entry: MockEntry{
 				FloatValue: 100.12,
 			},
@@ -240,7 +238,7 @@ func TestFilter_GreaterThan(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "4 - FloatGreaterThan - False",
+			name: "float_greater_than_false",
 			entry: MockEntry{
 				FloatValue: 100.0,
 			},
@@ -248,7 +246,7 @@ func TestFilter_GreaterThan(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "5 - FloatGreaterThan - False",
+			name: "float_greater_than_false",
 			entry: MockEntry{
 				FloatValue: 99.99,
 			},
@@ -256,7 +254,7 @@ func TestFilter_GreaterThan(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "5 - BoolGreaterThan - True",
+			name: "bool_greater_than_true",
 			entry: MockEntry{
 				BoolValue: true,
 			},
@@ -264,7 +262,7 @@ func TestFilter_GreaterThan(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "6 - BoolGreaterThan - False",
+			name: "bool_greater_than_false",
 			entry: MockEntry{
 				BoolValue: true,
 			},
@@ -272,7 +270,7 @@ func TestFilter_GreaterThan(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "7 - StringGreaterThan - false when not a number",
+			name: "string_greater_than_false_when_not_a_number",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -280,7 +278,7 @@ func TestFilter_GreaterThan(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "8 - StringGreaterThan - True",
+			name: "string_greater_than_true",
 			entry: MockEntry{
 				StringValue: "101",
 			},
@@ -294,13 +292,13 @@ func TestFilter_GreaterThan(t *testing.T) {
 func TestFilter_LessThan(t *testing.T) {
 	tests := []FilterTestCase{
 		{
-			name: "1 - IntLessThan - True",
+			name: "int_less_than_true",
 			entry: MockEntry{
 				IntValue: 100,
 			},
 		},
 		{
-			name: "2 - IntLessThan - False",
+			name: "int_less_than_false",
 			entry: MockEntry{
 				IntValue: 100,
 			},
@@ -308,7 +306,7 @@ func TestFilter_LessThan(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "3 - FloatLessThan - True",
+			name: "float_less_than_true",
 			entry: MockEntry{
 				FloatValue: 100.0,
 			},
@@ -316,7 +314,7 @@ func TestFilter_LessThan(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "4 - FloatLessThan - False",
+			name: "float_less_than_false",
 			entry: MockEntry{
 				FloatValue: 100.0,
 			},
@@ -324,7 +322,7 @@ func TestFilter_LessThan(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "5 - FloatLessThan - False",
+			name: "float_less_than_false",
 			entry: MockEntry{
 				FloatValue: 100.0,
 			},
@@ -332,15 +330,15 @@ func TestFilter_LessThan(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "6 - BoolLessThan - True",
+			name: "bool_less_than_true",
 			entry: MockEntry{
 				BoolValue: true,
 			},
 			filter: Filter{ColumnName: "bool_value", Operator: table.OperatorLessThan, Expression: "false"},
-			want: true,
+			want: false,
 		},
 		{
-			name: "7 - BoolLessThan - False",
+			name: "bool_less_than_false",
 			entry: MockEntry{
 				BoolValue: true,
 			},
@@ -348,7 +346,7 @@ func TestFilter_LessThan(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "8 - StringLessThan - false when not a number",
+			name: "string_less_than_false_when_not_a_number",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -356,7 +354,7 @@ func TestFilter_LessThan(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "9 - StringLessThan - True",
+			name: "string_less_than_true",
 			entry: MockEntry{
 				StringValue: "99",
 			},
@@ -370,7 +368,7 @@ func TestFilter_LessThan(t *testing.T) {
 func TestGreaterThanOrEquals(t *testing.T) {
 	tests := []FilterTestCase{
 		{
-			name: "1 - IntGreaterThanOrEquals - True (greater)",
+			name: "int_greater_than_or_equals_true_greater",
 			entry: MockEntry{
 				IntValue: 101,
 			},
@@ -378,7 +376,7 @@ func TestGreaterThanOrEquals(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "2 - IntGreaterThanOrEquals - True (equals)",
+			name: "int_greater_than_or_equals_true_equals",
 			entry: MockEntry{
 				IntValue: 100,
 			},
@@ -386,7 +384,7 @@ func TestGreaterThanOrEquals(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "3 - IntGreaterThanOrEquals - False",
+			name: "int_greater_than_or_equals_false",
 			entry: MockEntry{
 				IntValue: 99,
 			},
@@ -394,7 +392,7 @@ func TestGreaterThanOrEquals(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "4 - FloatGreaterThanOrEquals - True (greater)",
+			name: "float_greater_than_or_equals_true_greater",
 			entry: MockEntry{
 				FloatValue: 100.01,
 			},
@@ -402,7 +400,7 @@ func TestGreaterThanOrEquals(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "5 - FloatGreaterThanOrEquals - True (equals)",
+			name: "float_greater_than_or_equals_true_equals",
 			entry: MockEntry{
 				FloatValue: 100.0,
 			},
@@ -410,7 +408,7 @@ func TestGreaterThanOrEquals(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "6 - FloatGreaterThanOrEquals - False",
+			name: "float_greater_than_or_equals_false",
 			entry: MockEntry{
 				FloatValue: 99.99,
 			},
@@ -424,7 +422,7 @@ func TestGreaterThanOrEquals(t *testing.T) {
 func TestLessThanOrEquals(t *testing.T) {
 	tests := []FilterTestCase{
 		{
-			name: "1 - IntLessThanOrEquals - True (less)",
+			name: "int_less_than_or_equals_true_less",
 			entry: MockEntry{
 				IntValue: 99,
 			},
@@ -432,7 +430,7 @@ func TestLessThanOrEquals(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "2 - IntLessThanOrEquals - True (equals)",
+			name: "int_less_than_or_equals_true_equals",
 			entry: MockEntry{
 				IntValue: 100,
 			},
@@ -440,7 +438,7 @@ func TestLessThanOrEquals(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "3 - IntLessThanOrEquals - False",
+			name: "int_less_than_or_equals_false",
 			entry: MockEntry{
 				IntValue: 101,
 			},
@@ -448,7 +446,7 @@ func TestLessThanOrEquals(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "4 - FloatLessThanOrEquals - True (less)",
+			name: "float_less_than_or_equals_true_less",
 			entry: MockEntry{
 				FloatValue: 99.99,
 			},
@@ -456,7 +454,7 @@ func TestLessThanOrEquals(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "5 - FloatLessThanOrEquals - True (equals)",
+			name: "float_less_than_or_equals_true_equals",
 			entry: MockEntry{
 				FloatValue: 100.0,
 			},
@@ -464,7 +462,7 @@ func TestLessThanOrEquals(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "6 - FloatLessThanOrEquals - False",
+			name: "float_less_than_or_equals_false",
 			entry: MockEntry{
 				FloatValue: 100.01,
 			},
@@ -478,7 +476,7 @@ func TestLessThanOrEquals(t *testing.T) {
 func TestLike(t *testing.T) {
 	tests := []FilterTestCase{
 		{
-			name: "1 - StringLike - True (exact match)",
+			name: "string_like_true_exact_match",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -486,7 +484,7 @@ func TestLike(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "2 - StringLike - True (wildcard prefix)",
+			name: "string_like_true_wildcard_prefix",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -494,7 +492,7 @@ func TestLike(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "3 - StringLike - True (wildcard suffix)",
+			name: "string_like_true_wildcard_suffix",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -502,7 +500,7 @@ func TestLike(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "4 - StringLike - True (wildcard both)",
+			name: "string_like_true_wildcard_both",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -510,7 +508,7 @@ func TestLike(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "5 - StringLike - False",
+			name: "string_like_false",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -518,7 +516,7 @@ func TestLike(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "6 - StringLike - True (single char wildcard)",
+			name: "string_like_true_single_char_wildcard",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -532,7 +530,7 @@ func TestLike(t *testing.T) {
 func TestGlob(t *testing.T) {
 	tests := []FilterTestCase{
 		{
-			name: "1 - StringGlob - True (exact match)",
+			name: "string_glob_true_exact_match",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -540,7 +538,7 @@ func TestGlob(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "2 - StringGlob - True (wildcard)",
+			name: "string_glob_true_wildcard",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -548,7 +546,7 @@ func TestGlob(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "3 - StringGlob - True (question mark)",
+			name: "string_glob_true_question_mark",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -556,7 +554,7 @@ func TestGlob(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "4 - StringGlob - True (character class)",
+			name: "string_glob_true_character_class",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -564,7 +562,7 @@ func TestGlob(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "4 - StringGlob - False (character class)",
+			name: "string_glob_false_character_class",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -572,7 +570,7 @@ func TestGlob(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "5 - StringGlob - False",
+			name: "string_glob_false",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
@@ -580,7 +578,7 @@ func TestGlob(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "6 - StringGlob - True (complex pattern)",
+			name: "string_glob_true_complex_pattern",
 			entry: MockEntry{
 				StringValue: "Mock Entry",
 			},
