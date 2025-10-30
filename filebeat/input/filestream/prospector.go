@@ -366,6 +366,7 @@ func (p *fileProspector) onFSEvent(
 
 	case loginp.OpTruncate:
 		log.Debugf("File %s has been truncated setting offset to 0", event.NewPath)
+
 		err := updater.ResetCursor(src, state{Offset: 0})
 		if err != nil {
 			log.Errorf("resetting cursor on truncated file: %v", err)
@@ -374,10 +375,12 @@ func (p *fileProspector) onFSEvent(
 
 	case loginp.OpDelete:
 		log.Debugf("File %s has been removed", event.OldPath)
+
 		p.onRemove(log, event, src, updater, group)
 
 	case loginp.OpRename:
 		log.Debugf("File %s has been renamed to %s", event.OldPath, event.NewPath)
+
 		p.onRename(log, ctx, event, src, updater, group)
 
 	default:
