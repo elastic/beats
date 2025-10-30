@@ -50,16 +50,7 @@ func ToMapstr(m pcommon.Map) mapstr.M {
 //     pcommon.Map.FromRaw(...) will return an "invalid type" error.
 //     To overcome this, we use "reflect" to transform []T into []any.
 func ConvertNonPrimitive[T mapstrOrMap](m T) {
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-	for _, key := range keys {
-		val, ok := m[key]
-		if !ok {
-			// shouldn't happen but be defensive
-			continue
-		}
+	for key, val := range m {
 		switch x := val.(type) {
 		case mapstr.M:
 			ConvertNonPrimitive(x)
