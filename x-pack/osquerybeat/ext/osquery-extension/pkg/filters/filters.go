@@ -7,12 +7,13 @@ package filters
 import (
 	"fmt"
 	"reflect"
-	"strings"
 	"regexp"
-	"github.com/spf13/cast"
+	"strings"
+
 	"github.com/osquery/osquery-go/plugin/table"
 )
 
+const LimitOperator table.Operator = 73
 
 // Filter represents an osquery constraint
 type Filter struct {
@@ -32,15 +33,18 @@ func (f Filter) equals(entry any) bool {
 	}
 	switch kind {
 	case reflect.String:
-		return f.Expression == field.(string)
+		fieldString, ok := field.(string); if !ok {
+			return false
+		}
+		return f.Expression == fieldString
 	case reflect.Bool:
-		return cast.ToBool(f.Expression) == cast.ToBool(field)
+		return ToBool(f.Expression) == ToBool(field)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return cast.ToInt64(f.Expression) == cast.ToInt64(field)
+		return ToInt64(f.Expression) == ToInt64(field)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return cast.ToUint64(f.Expression) == cast.ToUint64(field)
+		return ToUint64(f.Expression) == ToUint64(field)
 	case reflect.Float64, reflect.Float32:
-		return cast.ToFloat64(f.Expression) == cast.ToFloat64(field)
+		return ToFloat64(f.Expression) == ToFloat64(field)
 	default:
 		return false
 	}
@@ -54,15 +58,21 @@ func (f Filter) lessThan(entry any) bool {
 	}
 	switch kind {
 	case reflect.String:
-		return false
+		fieldString, ok := field.(string); if !ok {
+			return false
+		}
+		return ToInt64(fieldString) < ToInt64(f.Expression)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return cast.ToInt64(field) < cast.ToInt64(f.Expression)
+		return ToInt64(field) < ToInt64(f.Expression)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return cast.ToUint64(field) < cast.ToUint64(f.Expression)
+		return ToUint64(field) < ToUint64(f.Expression)
 	case reflect.Float64, reflect.Float32:
-		return cast.ToFloat64(field) < cast.ToFloat64(f.Expression)
+		return ToFloat64(field) < ToFloat64(f.Expression)
 	case reflect.Bool:
-		return cast.ToInt8(field.(bool)) < cast.ToInt8(cast.ToBool(f.Expression))
+		fieldBool, ok := field.(bool); if !ok {
+			return false
+		}
+		return ToInt64(fieldBool) < ToInt64(ToBool(f.Expression))
 	default:
 		return false
 	}
@@ -76,23 +86,21 @@ func (f Filter) greaterThan(entry any) bool {
 	}
 	switch kind {
 	case reflect.String:
-		castedField, err := cast.ToInt64E(field.(string))
-		if err != nil {
+		fieldString, ok := field.(string); if !ok {
 			return false
 		}
-		castedExpression, err := cast.ToInt64E(f.Expression)
-		if err != nil {
-			return false
-		}
-		return castedField > castedExpression
+		return ToInt64(fieldString) > ToInt64(f.Expression)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return cast.ToInt64(field) > cast.ToInt64(f.Expression)
+		return ToInt64(field) > ToInt64(f.Expression)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return cast.ToUint64(field) > cast.ToUint64(f.Expression)
+		return ToUint64(field) > ToUint64(f.Expression)
 	case reflect.Float64, reflect.Float32:
-		return cast.ToFloat64(field) > cast.ToFloat64(f.Expression)
+		return ToFloat64(field) > ToFloat64(f.Expression)
 	case reflect.Bool:
-		return cast.ToInt8(field.(bool)) > cast.ToInt8(cast.ToBool(f.Expression))
+		fieldBool, ok := field.(bool); if !ok {
+			return false
+		}
+		return ToInt64(fieldBool) > ToInt64(ToBool(f.Expression))
 	default:
 		return false
 	}
@@ -107,10 +115,16 @@ func (f Filter) like(entry any) bool {
 	if kind != reflect.String {
 		return false
 	}
-	pattern := strings.ReplaceAll(f.Expression, "%", "*")
+	pattern := strings.ReplaceAll(f.Expression, "%", ".*")
 	pattern = strings.ReplaceAll(pattern, "_", ".")
 	pattern = "^" + pattern + "$"
-	matched, err := regexp.MatchString(pattern, field.(string))
+	fieldString, ok := field.(string); if !ok {
+		return false
+	}
+	fmt.Println("pattern", pattern)
+	fmt.Println("fieldString", fieldString)
+	matched, err := regexp.MatchString(pattern, fieldString)
+	fmt.Println("matched", matched)
 	if err != nil {
 		return false
 	}
@@ -129,7 +143,10 @@ func (f Filter) glob(entry any) bool {
 	pattern := strings.ReplaceAll(f.Expression, "*", ".*")
 	pattern = strings.ReplaceAll(pattern, "?", ".")
 	pattern = "^" + pattern + "$"
-	matched, err := regexp.MatchString(pattern, field.(string))
+	fieldString, ok := field.(string); if !ok {
+		return false
+	}
+	matched, err := regexp.MatchString(pattern, fieldString)
 	if err != nil {
 		return false
 	}
@@ -153,6 +170,15 @@ func (f Filter) Matches(entry any) bool {
 		return f.like(entry)
 	case table.OperatorGlob:
 		return f.glob(entry)
+	case table.OperatorRegexp:
+		// TODO: implement, conversion is not simple
+		return false
+	case table.OperatorMatch:
+		// TODO: implement? possibly N/A, only works with full text search tables
+		return false
+	case table.OperatorUnique:
+		// TODO: implement
+		return false // TODO: implement
 	default:
 		return false
 	}
@@ -161,13 +187,13 @@ func (f Filter) Matches(entry any) bool {
 // GetConstraintFilters gets the constraints from the query context
 func GetConstraintFilters(queryContext table.QueryContext) []Filter {
 	var results []Filter
-    for columnName, clist := range queryContext.Constraints {
+	for columnName, clist := range queryContext.Constraints {
 		if len(clist.Constraints) == 0 {
 			continue
 		}
 		for _, constraint := range clist.Constraints {
-			if constraint.Operator == 73 {
-				// ignore limit constraint for now, since it is not documented as a valid operator 
+			if constraint.Operator == LimitOperator {
+				// ignore limit constraint for now, since it is not documented as a valid operator
 				// in either osquery documentation or the osquery-go library, but is is passed in the query context.
 				// without knowledge of which records to limit, we should not apply it to the results and allow
 				// osquery to handle it.
