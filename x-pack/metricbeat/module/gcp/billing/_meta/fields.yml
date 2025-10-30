@@ -41,6 +41,8 @@
   - name: usage_start_time
     type: date
     description: The start time of the usage period for this billing record.
+    version:
+      beta: 9.2.1
   - name: usage_end_time
     type: date
     description: The end time of the usage period for this billing record.
