@@ -340,18 +340,18 @@ func (p *fileProspector) onFSEvent(
 	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
 		switch event.Op {
 		case loginp.OpCreate:
-			log.Debug("A new file %s has been found", event.NewPath)
+			log.Debugf("A new file %s has been found", event.NewPath)
 
 			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})
 			if err != nil {
-				log.Error("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
+				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
 			}
 
 		case loginp.OpWrite:
-			log.Debug("File %s has been updated", event.NewPath)
+			log.Debugf("File %s has been updated", event.NewPath)
 
 		case loginp.OpNotChanged:
-			log.Debug("File %s has not changed, trying to start new harvester", event.NewPath)
+			log.Debugf("File %s has not changed, trying to start new harvester", event.NewPath)
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
@@ -365,7 +365,7 @@ func (p *fileProspector) onFSEvent(
 		group.Start(ctx, src)
 
 	case loginp.OpTruncate:
-		log.Debug("File %s has been truncated setting offset to 0", event.NewPath)
+		log.Debugf("File %s has been truncated setting offset to 0", event.NewPath)
 		err := updater.ResetCursor(src, state{Offset: 0})
 		if err != nil {
 			log.Errorf("resetting cursor on truncated file: %v", err)
@@ -373,11 +373,11 @@ func (p *fileProspector) onFSEvent(
 		group.Restart(ctx, src)
 
 	case loginp.OpDelete:
-		log.Debug("File %s has been removed", event.OldPath)
+		log.Debugf("File %s has been removed", event.OldPath)
 		p.onRemove(log, event, src, updater, group)
 
 	case loginp.OpRename:
-		log.Debug("File %s has been renamed to %s", event.OldPath, event.NewPath)
+		log.Debugf("File %s has been renamed to %s", event.OldPath, event.NewPath)
 		p.onRename(log, ctx, event, src, updater, group)
 
 	default:
