@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build integration
-
 package usage
 
 import (
@@ -13,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -289,6 +289,31 @@ func TestFetch(t *testing.T) {
 			require.Equal(t, tt.expected, events[i])
 		})
 	}
+}
+
+func TestMetricSetSetPath(t *testing.T) {
+	const usagePath = "/usage"
+
+	apiKey := time.Now().String()
+	server := initServer(usagePath, apiKey)
+	defer server.Close()
+
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL+usagePath, apiKey))
+	ms, ok := metricSet.(*MetricSet)
+	require.True(t, ok)
+
+	tempDir := t.TempDir()
+	require.NoError(t, ms.SetPath(&paths.Path{
+		Home:   tempDir,
+		Config: tempDir,
+		Data:   tempDir,
+		Logs:   tempDir,
+	}))
+	assert.Contains(t, ms.stateManager.store.Dir, tempDir)
+
+	events, errs := mbtest.ReportingFetchV2Error(metricSet)
+	require.Empty(t, errs)
+	assert.NotEmpty(t, events)
 }
 
 func TestData(t *testing.T) {

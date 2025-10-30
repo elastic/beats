@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Factory creates new Runner instances from configuration objects.
@@ -29,6 +30,7 @@ import (
 type Factory struct {
 	beatInfo   beat.Info
 	monitoring beat.Monitoring
+	paths      *paths.Path
 	options    []Option
 	registry   *mb.Register
 }
@@ -41,11 +43,17 @@ type metricSetWithProcessors interface {
 	Processors() []beat.Processor
 }
 
+// metricSetWithPath is implemented by metricsets that need access to the beat paths.
+type metricSetWithPath interface {
+	SetPath(*paths.Path) error
+}
+
 // NewFactory creates new Reloader instance for the given config
-func NewFactory(beatInfo beat.Info, monitoring beat.Monitoring, registry *mb.Register, options ...Option) cfgfile.RunnerFactory {
+func NewFactory(beatInfo beat.Info, monitoring beat.Monitoring, paths *paths.Path, registry *mb.Register, options ...Option) cfgfile.RunnerFactory {
 	return &Factory{
 		beatInfo:   beatInfo,
 		monitoring: monitoring,
+		paths:      paths,
 		options:    options,
 		registry:   registry,
 	}
@@ -77,6 +85,13 @@ func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 
 		if msWithProcs, ok := metricSet.(metricSetWithProcessors); ok {
 			connector.addProcessors(msWithProcs.Processors())
+		}
+
+		if msWithPath, ok := metricSet.(metricSetWithPath); ok {
+			err = msWithPath.SetPath(r.paths)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		client, err := connector.Connect()
