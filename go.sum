@@ -249,6 +249,8 @@ github.com/aws/smithy-go v1.22.5 h1:P9ATCXPMb2mPjYBgueqJNCA5S9UfktsW0tTxi+a7eqw=
 github.com/aws/smithy-go v1.22.5/go.mod h1:t1ufH5HMublsJYulve2RKmHDC15xu1f26kHCp/HgceI=
 github.com/beevik/ntp v1.4.3 h1:PlbTvE5NNy4QHmA4Mg57n7mcFTmr1W1j3gcK7L1lqho=
 github.com/beevik/ntp v1.4.3/go.mod h1:Unr8Zg+2dRn7d8bHFuehIMSvvUYssHMxW3Q5Nx4RW5Q=
+github.com/belimawr/elastic-agent-libs v0.2.9-0.20251030205416-96f9a7ce89e9 h1:M5+B2NPqXRzfdEQq56iGmbWo6rabGdZF5D3NvF57RN8=
+github.com/belimawr/elastic-agent-libs v0.2.9-0.20251030205416-96f9a7ce89e9/go.mod h1:o/iXtbHYaojpG4BOY7Z3hFMQAgEoqq2owO17JPGpf3A=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/benbjohnson/clock v1.3.0 h1:ip6w0uFQkncKQ979AypyG0ER7mqUSBdKLOgAle/AT8A=
 github.com/benbjohnson/clock v1.3.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
@@ -366,8 +368,6 @@ github.com/elastic/elastic-agent-autodiscover v0.10.0 h1:WJ4zl9uSfk1kHmn2B/0byQB
 github.com/elastic/elastic-agent-autodiscover v0.10.0/go.mod h1:Nf3zh9FcJ9nTTswTwDTUAqXmvQllOrNliM6xmORSxwE=
 github.com/elastic/elastic-agent-client/v7 v7.15.0 h1:nDB7v8TBoNuD6IIzC3z7Q0y+7bMgXoT2DsHfolO2CHE=
 github.com/elastic/elastic-agent-client/v7 v7.15.0/go.mod h1:6h+f9QdIr3GO2ODC0Y8+aEXRwzbA5W4eV4dd/67z7nI=
-github.com/elastic/elastic-agent-libs v0.25.0 h1:DZ/92eIjujrXw7u9CxV58MK04P1fGABpMwqDOKCj/z4=
-github.com/elastic/elastic-agent-libs v0.25.0/go.mod h1:o/iXtbHYaojpG4BOY7Z3hFMQAgEoqq2owO17JPGpf3A=
 github.com/elastic/elastic-agent-system-metrics v0.13.3 h1:VlY3Ezuwi5bPZRsAM97WaJEW78XkXgqmPHcTl1WGMRw=
 github.com/elastic/elastic-agent-system-metrics v0.13.3/go.mod h1:lB8veYWYBlA9eF6TahmPN87G1IEgWlbep7QSqLSW90U=
 github.com/elastic/elastic-transport-go/v8 v8.7.0 h1:OgTneVuXP2uip4BA658Xi6Hfw+PeIOod2rY3GVMGoVE=
