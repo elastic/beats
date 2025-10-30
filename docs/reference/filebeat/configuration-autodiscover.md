@@ -126,7 +126,7 @@ filebeat.autodiscover:
                     - /var/lib/docker/containers/${data.docker.container.id}/*.log
 ```
 
-Here is an example of how a configuration using Kubernetes secrets would look like:
+Here is an example of how a configuration using Kubernetes secrets would look:
 
 ```yaml
 filebeat.autodiscover:
