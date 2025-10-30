@@ -587,16 +587,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// Check we have a remaining execution budget.
 			budget--
 			if budget <= 0 {
-<<<<<<< HEAD
 				log.Warnw("exceeding maximum number of CEL executions", "limit", *cfg.MaxExecutions)
-				env.UpdateStatus(status.Degraded, "exceeding maximum number of CEL executions")
-=======
-				log.Warnw("exceeding maximum number of CEL executions: will continue at next periodic evaluation",
-					"limit", *cfg.MaxExecutions,
-					"next_eval_time", start.Add(cfg.Interval),
-				)
 				health.UpdateStatus(status.Degraded, "exceeding maximum number of CEL executions")
->>>>>>> 65e1f2d24 (x-pack/filebeat/input/cel: add data stream identification to status updates (#47229))
 				return nil
 			}
 		}
