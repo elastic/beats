@@ -9,172 +9,85 @@ import (
 	"strconv"
 )
 
-func ToBool(input any) bool {
+// resolveValue resolves the value of an input interface{} to a reflect.Value.
+func resolveValue(input any) (value reflect.Value, ok bool) {
 	v := reflect.ValueOf(input)
 	for v.IsValid() && (v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface) {
 		if v.IsNil() {
-			return false
+			return reflect.Value{}, false
 		}
 		v = v.Elem()
 	}
 	if !v.IsValid() {
-		return false
+		return reflect.Value{}, false
+	}
+	return v, true
+}
+
+// ToBool converts an input value to a boolean.
+func ToBool(input any) (result bool, ok bool) {
+	v, ok := resolveValue(input); if !ok {
+		return false, false
 	}
 
 	switch v.Kind() {
 	case reflect.Bool:
-		return v.Bool()
+		return v.Bool(), true
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return v.Int() != 0
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		return v.Uint() != 0
+		return v.Int() != 0, true
 	case reflect.Float32, reflect.Float64:
-		return v.Float() != 0
+		return v.Float() != 0, true
 	case reflect.String:
 		s := v.String()
 		if b, err := strconv.ParseBool(s); err == nil {
-			return b
+			return b, true
 		}
-		if i, err := strconv.ParseInt(s, 10, 64); err == nil {
-			return i != 0
-		}
-		if u, err := strconv.ParseUint(s, 10, 64); err == nil {
-			return u != 0
-		}
-		if f, err := strconv.ParseFloat(s, 64); err == nil {
-			return f != 0
-		}
+		return false, false
+	default:
+		return false, false
 	}
-	return false
 }
 
-func ToInt64(input any) int64 {
-	v := reflect.ValueOf(input)
-	for v.IsValid() && (v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface) {
-		if v.IsNil() {
-			return 0
-		}
-		v = v.Elem()
-	}
-	if !v.IsValid() {
-		return 0
+// ToInt64 converts an input value to an int64.
+func ToInt64(input any) (result int64, ok bool) {
+	v, ok := resolveValue(input); if !ok {
+		return 0, false
 	}
 
 	switch v.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return int64(v.Int())
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		return int64(v.Uint())
+		return v.Int(), true
 	case reflect.Float32, reflect.Float64:
-		return int64(v.Float())
-	case reflect.Bool:
-		if v.Bool() {
-			return 1
-		}
-		return 0
+		return int64(v.Float()), true
 	case reflect.String:
 		s := v.String()
 		if i, err := strconv.ParseInt(s, 10, 64); err == nil {
-			return i
+			return i, true
 		}
-		if u, err := strconv.ParseUint(s, 10, 64); err == nil {
-			return int64(u)
-		}
-		if f, err := strconv.ParseFloat(s, 64); err == nil {
-			return int64(f)
-		}
+		return 0, false
+	default:
+		return 0, false
 	}
-	return 0
 }
 
-func ToUint64(input any) uint64 {
-	v := reflect.ValueOf(input)
-	for v.IsValid() && (v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface) {
-		if v.IsNil() {
-			return 0
-		}
-		v = v.Elem()
-	}
-	if !v.IsValid() {
-		return 0
-	}
-
-	switch v.Kind() {
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		return v.Uint()
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		i := v.Int()
-		if i < 0 {
-			return 0
-		}
-		return uint64(i)
-	case reflect.Float32, reflect.Float64:
-		f := v.Float()
-		if f < 0 {
-			return 0
-		}
-		return uint64(f)
-	case reflect.Bool:
-		if v.Bool() {
-			return 1
-		}
-		return 0
-	case reflect.String:
-		s := v.String()
-		if u, err := strconv.ParseUint(s, 10, 64); err == nil {
-			return u
-		}
-		if i, err := strconv.ParseInt(s, 10, 64); err == nil {
-			if i < 0 {
-				return 0
-			}
-			return uint64(i)
-		}
-		if f, err := strconv.ParseFloat(s, 64); err == nil {
-			if f < 0 {
-				return 0
-			}
-			return uint64(f)
-		}
-	}
-	return 0
-}
-
-func ToFloat64(input any) float64 {
-	v := reflect.ValueOf(input)
-	for v.IsValid() && (v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface) {
-		if v.IsNil() {
-			return 0
-		}
-		v = v.Elem()
-	}
-	if !v.IsValid() {
-		return 0
+// ToFloat64 converts an input value to a float64.
+func ToFloat64(input any) (result float64, ok bool) {
+	v, ok := resolveValue(input); if !ok {
+		return 0, false
 	}
 
 	switch v.Kind() {
 	case reflect.Float32, reflect.Float64:
-		return v.Float()
+		return v.Float(), true
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return float64(v.Int())
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		return float64(v.Uint())
-	case reflect.Bool:
-		if v.Bool() {
-			return 1
-		}
-		return 0
+		return float64(v.Int()), true
 	case reflect.String:
 		s := v.String()
 		if f, err := strconv.ParseFloat(s, 64); err == nil {
-			return f
+			return f, true
 		}
-		if i, err := strconv.ParseInt(s, 10, 64); err == nil {
-			return float64(i)
-		}
-		if u, err := strconv.ParseUint(s, 10, 64); err == nil {
-			return float64(u)
-		}
+		return 0, false
+	default:
+		return 0, false
 	}
-	return 0
 }

@@ -38,13 +38,29 @@ func (f Filter) equals(entry any) bool {
 		}
 		return f.Expression == fieldString
 	case reflect.Bool:
-		return ToBool(f.Expression) == ToBool(field)
+		expressionBool, ok := ToBool(f.Expression); if !ok {
+			return false
+		}
+		fieldBool, ok := ToBool(field); if !ok {
+			return false
+		}
+		return expressionBool == fieldBool
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return ToInt64(f.Expression) == ToInt64(field)
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return ToUint64(f.Expression) == ToUint64(field)
+		expressionInt, ok := ToInt64(f.Expression); if !ok {
+			return false
+		}
+		fieldInt, ok := ToInt64(field); if !ok {
+			return false
+		}
+		return expressionInt == fieldInt
 	case reflect.Float64, reflect.Float32:
-		return ToFloat64(f.Expression) == ToFloat64(field)
+		expressionFloat, ok := ToFloat64(f.Expression); if !ok {
+			return false
+		}
+		fieldFloat, ok := ToFloat64(field); if !ok {
+			return false
+		}
+		return expressionFloat == fieldFloat
 	default:
 		return false
 	}
@@ -57,22 +73,30 @@ func (f Filter) lessThan(entry any) bool {
 		return false
 	}
 	switch kind {
-	case reflect.String:
-		fieldString, ok := field.(string); if !ok {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		expressionInt, ok := ToInt64(f.Expression); if !ok {
 			return false
 		}
-		return ToInt64(fieldString) < ToInt64(f.Expression)
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return ToInt64(field) < ToInt64(f.Expression)
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return ToUint64(field) < ToUint64(f.Expression)
+		fieldInt, ok := field.(int64); if !ok {
+			return false
+		}
+		return expressionInt < fieldInt
 	case reflect.Float64, reflect.Float32:
-		return ToFloat64(field) < ToFloat64(f.Expression)
+		expressionFloat, ok := ToFloat64(f.Expression); if !ok {
+			return false
+		}
+		fieldFloat, ok := field.(float64); if !ok {
+			return false
+		}
+		return expressionFloat < fieldFloat
 	case reflect.Bool:
 		fieldBool, ok := field.(bool); if !ok {
 			return false
 		}
-		return ToInt64(fieldBool) < ToInt64(ToBool(f.Expression))
+		expressionBool, ok := ToBool(f.Expression); if !ok {
+			return false
+		}
+		return !fieldBool && expressionBool
 	default:
 		return false
 	}
@@ -85,22 +109,30 @@ func (f Filter) greaterThan(entry any) bool {
 		return false
 	}
 	switch kind {
-	case reflect.String:
-		fieldString, ok := field.(string); if !ok {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		expressionInt, ok := ToInt64(f.Expression); if !ok {
 			return false
 		}
-		return ToInt64(fieldString) > ToInt64(f.Expression)
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return ToInt64(field) > ToInt64(f.Expression)
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return ToUint64(field) > ToUint64(f.Expression)
+		fieldInt, ok := field.(int64); if !ok {
+			return false
+		}
+		return expressionInt > fieldInt
 	case reflect.Float64, reflect.Float32:
-		return ToFloat64(field) > ToFloat64(f.Expression)
+		expressionFloat, ok := ToFloat64(f.Expression); if !ok {
+			return false
+		}
+		fieldFloat, ok := field.(float64); if !ok {
+			return false
+		}
+		return expressionFloat > fieldFloat
 	case reflect.Bool:
 		fieldBool, ok := field.(bool); if !ok {
 			return false
 		}
-		return ToInt64(fieldBool) > ToInt64(ToBool(f.Expression))
+		expressionBool, ok := ToBool(f.Expression); if !ok {
+			return false
+		}
+		return fieldBool && !expressionBool
 	default:
 		return false
 	}
@@ -121,14 +153,11 @@ func (f Filter) like(entry any) bool {
 	fieldString, ok := field.(string); if !ok {
 		return false
 	}
-	fmt.Println("pattern", pattern)
-	fmt.Println("fieldString", fieldString)
 	matched, err := regexp.MatchString(pattern, fieldString)
-	fmt.Println("matched", matched)
-	if err != nil {
+	if err != nil || !matched {
 		return false
 	}
-	return matched
+	return true
 }
 
 // glob checks if the value of the field is a glob pattern
@@ -147,7 +176,7 @@ func (f Filter) glob(entry any) bool {
 		return false
 	}
 	matched, err := regexp.MatchString(pattern, fieldString)
-	if err != nil {
+	if err != nil || !matched {
 		return false
 	}
 	return matched
