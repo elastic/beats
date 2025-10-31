@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -22,7 +23,7 @@ type testProvider struct {
 	createFn func(c *config.C) (v2.Input, error)
 }
 
-func (p *testProvider) Init(grp unison.Group, mode v2.Mode) error {
+func (p *testProvider) Init(grp unison.Group) error {
 	return nil
 }
 
@@ -61,13 +62,13 @@ func (n *testInput) Run(runCtx v2.Context, connector beat.PipelineConnector) err
 }
 
 func newTestProvider(input *testProvider) provider.FactoryFunc {
-	return func(logger *logp.Logger) (provider.Provider, error) {
+	return func(logger *logp.Logger, _ *paths.Path) (provider.Provider, error) {
 		return input, nil
 	}
 }
 
 func newTestErrProvider() provider.FactoryFunc {
-	return func(logger *logp.Logger) (provider.Provider, error) {
+	return func(logger *logp.Logger, _ *paths.Path) (provider.Provider, error) {
 		return nil, errors.New("test error")
 	}
 }
@@ -85,6 +86,7 @@ func TestInputManager_Create(t *testing.T) {
 
 	err = provider.Register("test-err", newTestErrProvider())
 	require.NoError(t, err)
+	path := paths.New()
 
 	t.Run("create-ok", func(t *testing.T) {
 		t.Parallel()
@@ -95,7 +97,7 @@ func TestInputManager_Create(t *testing.T) {
 		c, err := config.NewConfigFrom(&rawConf)
 		require.NoError(t, err)
 
-		plugin := Plugin(logp.L())
+		plugin := Plugin(logp.NewNopLogger(), path)
 		inp, err := plugin.Manager.Create(c)
 		require.NoError(t, err)
 		require.Equal(t, testInputName, inp.Name())
@@ -110,7 +112,7 @@ func TestInputManager_Create(t *testing.T) {
 		c, err := config.NewConfigFrom(&rawConf)
 		require.NoError(t, err)
 
-		plugin := Plugin(logp.L())
+		plugin := Plugin(logp.NewNopLogger(), path)
 		_, err = plugin.Manager.Create(c)
 
 		require.ErrorContains(t, err, "string value is not set accessing 'provider'")
@@ -125,7 +127,7 @@ func TestInputManager_Create(t *testing.T) {
 		c, err := config.NewConfigFrom(&rawConf)
 		require.NoError(t, err)
 
-		plugin := Plugin(logp.L())
+		plugin := Plugin(logp.NewNopLogger(), path)
 		_, err = plugin.Manager.Create(c)
 
 		require.ErrorContains(t, err, ErrProviderUnknown.Error())
@@ -140,7 +142,7 @@ func TestInputManager_Create(t *testing.T) {
 		c, err := config.NewConfigFrom(&rawConf)
 		require.NoError(t, err)
 
-		plugin := Plugin(logp.L())
+		plugin := Plugin(logp.NewNopLogger(), path)
 		_, err = plugin.Manager.Create(c)
 
 		require.ErrorContains(t, err, "test error")

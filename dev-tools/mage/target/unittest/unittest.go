@@ -20,6 +20,7 @@ package unittest
 import (
 	"context"
 	"fmt"
+	"os/exec"
 
 	"github.com/magefile/mage/mg"
 
@@ -50,12 +51,29 @@ func UnitTest() {
 	mg.SerialDeps(GoUnitTest, PythonUnitTest)
 }
 
+// GoFIPSOnlyUnitTest sets GODEBUG=fips140=only when running unit tests
+func GoFIPSOnlyUnitTest() error {
+	ctx := context.Background()
+	mg.SerialCtxDeps(ctx, goTestDeps...)
+
+	fipsArgs := devtools.DefaultGoFIPSOnlyTestArgs()
+	return devtools.GoTest(ctx, fipsArgs)
+}
+
 // GoUnitTest executes the Go unit tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoUnitTest(ctx context.Context) error {
 	mg.SerialCtxDeps(ctx, goTestDeps...)
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
+
+	utArgs := devtools.DefaultGoTestUnitArgs()
+	// If synthetics is installed run synthetics unit tests
+	synth := exec.Command("npx", "@elastic/synthetics", "-h")
+	if synth.Run() == nil {
+		fmt.Printf("npx @elastic/synthetics found, will run with synthetics tags")
+		utArgs.Tags = append(utArgs.Tags, "synthetics")
+	}
+	return devtools.GoTest(ctx, utArgs)
 }
 
 // PythonUnitTest executes the python system tests.

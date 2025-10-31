@@ -20,7 +20,7 @@ package kafka
 import (
 	"fmt"
 
-	"github.com/Shopify/sarama"
+	"github.com/elastic/sarama"
 )
 
 // Version is a kafka version
@@ -31,6 +31,8 @@ var (
 	// We also allow versions to be specified as a prefix, e.g. "1",
 	// understood as referencing the most recent version starting with "1".
 	// truncatedKafkaVersions stores a lookup of the abbreviations we accept.
+
+	//Ref for version mapping - https://kafka.apache.org/downloads
 	truncatedKafkaVersions = map[string]sarama.KafkaVersion{
 		"0.8.2": sarama.V0_8_2_2,
 		"0.8":   sarama.V0_8_2_2,
@@ -57,7 +59,16 @@ var (
 		"2.4": sarama.V2_4_0_0,
 		"2.5": sarama.V2_5_0_0,
 		"2.6": sarama.V2_6_0_0,
+		"2.7": sarama.V2_7_0_0,
+		"2.8": sarama.V2_8_0_0,
 		"2":   sarama.V2_6_0_0,
+
+		"3":   sarama.V3_1_1_0,
+		"3.2": sarama.V3_2_0_0,
+		"3.3": sarama.V3_3_1_0,
+		"3.4": sarama.V3_4_0_0,
+		"3.5": sarama.V3_5_1_0,
+		"3.6": sarama.V3_6_0_0,
 	}
 )
 

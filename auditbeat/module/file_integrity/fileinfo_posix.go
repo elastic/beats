@@ -16,18 +16,19 @@
 // under the License.
 
 //go:build linux || freebsd || openbsd || netbsd || darwin
-// +build linux freebsd openbsd netbsd darwin
 
 package file_integrity
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"os/user"
 	"strconv"
 	"syscall"
 
-	"github.com/joeshaw/multierror"
+	"github.com/pkg/xattr"
 )
 
 // NewMetadata returns a new Metadata object. If an error is returned it is
@@ -60,13 +61,15 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	}
 
 	// Lookup UID and GID
-	var errs multierror.Errors
+	var errs []error
 	owner, err := user.LookupId(strconv.Itoa(int(fileInfo.UID)))
 	if err != nil {
 		errs = append(errs, err)
 	} else {
 		fileInfo.Owner = owner.Username
 	}
+
+	fillExtendedAttributes(fileInfo, path)
 
 	group, err := user.LookupGroupId(strconv.Itoa(int(fileInfo.GID)))
 	if err != nil {
@@ -77,5 +80,37 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	if fileInfo.Origin, err = GetFileOrigin(path); err != nil {
 		errs = append(errs, err)
 	}
-	return fileInfo, errs.Err()
+
+	return fileInfo, errors.Join(errs...)
+}
+
+func fillExtendedAttributes(md *Metadata, path string) {
+	var selinux []byte
+	getExtendedAttributes(path, map[string]*[]byte{
+		"security.selinux":        &selinux,
+		"system.posix_acl_access": &md.POSIXACLAccess,
+	})
+	// The selinux attr may be null terminated. It would be cheaper
+	// to use strings.TrimRight, but absent documentation saying
+	// that there is only ever a final null terminator, take the
+	// guaranteed correct path of terminating at the first found
+	// null byte.
+	selinux, _, _ = bytes.Cut(selinux, []byte{0})
+	md.SELinux = string(selinux)
+}
+
+func getExtendedAttributes(path string, dst map[string]*[]byte) {
+	f, err := os.Open(path)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+
+	for n, d := range dst {
+		att, err := xattr.FGet(f, n)
+		if err != nil {
+			continue
+		}
+		*d = att
+	}
 }

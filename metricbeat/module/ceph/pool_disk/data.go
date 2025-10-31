@@ -50,11 +50,11 @@ type DfRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventsMapping(content []byte) []mapstr.M {
+func eventsMapping(content []byte, logger *logp.Logger) []mapstr.M {
 	var d DfRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		logp.Err("Error: %+v", err)
+		logger.Errorf("Error: %+v", err)
 	}
 
 	events := []mapstr.M{}

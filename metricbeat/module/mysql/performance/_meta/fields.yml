@@ -26,6 +26,9 @@
         - name: 'avg.timer.wait'
           type: long
           description: Average wait time of the summarized events that are timed
+        - name: 'schemaname'
+          type: keyword
+          description: Schema name.
     - name: table_io_waits
       type: group
       description: Records table I/O waits by index

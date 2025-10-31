@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type statefulLogger interface {
@@ -34,9 +33,7 @@ type statelessLogger interface {
 
 // eventAcker handles publisher pipeline ACKs and forwards
 // them to the registrar or directly to the stateless logger.
-func eventACKer(statelessOut statelessLogger, statefulOut statefulLogger) beat.ACKer {
-	log := logp.NewLogger("acker")
-
+func eventACKer(statelessOut statelessLogger, statefulOut statefulLogger) beat.EventListener {
 	return acker.EventPrivateReporter(func(_ int, data []interface{}) {
 		stateless := 0
 		states := make([]file.State, 0, len(data))
@@ -56,12 +53,10 @@ func eventACKer(statelessOut statelessLogger, statefulOut statefulLogger) beat.A
 		}
 
 		if len(states) > 0 {
-			log.Debugw("stateful ack", "count", len(states))
 			statefulOut.Published(states)
 		}
 
 		if stateless > 0 {
-			log.Debugw("stateless ack", "count", stateless)
 			statelessOut.Published(stateless)
 		}
 	})

@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 // https://github.com/Shopify/sarama/blob/master/examples/sasl_scram_client/scram_client.go
 package kafka
 
@@ -23,7 +25,7 @@ import (
 	"crypto/sha512"
 	"hash"
 
-	"github.com/xdg/scram"
+	"github.com/xdg-go/scram"
 )
 
 var SHA256 scram.HashGeneratorFcn = func() hash.Hash { return sha256.New() }
@@ -46,7 +48,7 @@ func (x *XDGSCRAMClient) Begin(userName, password, authzID string) (err error) {
 
 func (x *XDGSCRAMClient) Step(challenge string) (response string, err error) {
 	response, err = x.ClientConversation.Step(challenge)
-	return
+	return response, err
 }
 
 func (x *XDGSCRAMClient) Done() bool {

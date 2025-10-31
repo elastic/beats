@@ -5,11 +5,12 @@
 package cloudfoundry
 
 import (
-	"crypto/sha1"
 	"encoding/base64"
 	"fmt"
+	"strconv"
 	"time"
 
+	"github.com/cespare/xxhash/v2"
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/pkg/errors" //nolint:gomodguard // go-cfclient uses pkg/errors internally, must be upgraded to at least https://github.com/cloudfoundry-community/go-cfclient/commit/0ada4e9452
 
@@ -42,7 +43,7 @@ func newClientCacheWrap(client cfClient, cacheName string, ttl time.Duration, er
 		name = name + "-" + sanitizeCacheName(cacheName)
 	}
 
-	cache, err := persistentcache.New(name, options)
+	cache, err := persistentcache.New(name, options, log)
 	if err != nil {
 		return nil, fmt.Errorf("creating metadata cache: %w", err)
 	}
@@ -142,6 +143,6 @@ func (c *clientCacheWrap) Close() error {
 
 // sanitizeCacheName returns a unique string that can be used safely as part of a file name
 func sanitizeCacheName(name string) string {
-	hash := sha1.Sum([]byte(name))
-	return base64.RawURLEncoding.EncodeToString(hash[:])
+	h := xxhash.Sum64([]byte(name))
+	return base64.RawURLEncoding.EncodeToString([]byte(strconv.FormatUint(h, 10)))
 }

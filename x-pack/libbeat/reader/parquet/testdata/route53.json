@@ -1,0 +1,76 @@
+[
+    {
+        "activity_id": 2,
+        "activity_name": "Response",
+        "answers": [
+            {
+                "class": "IN",
+                "rdata": "127.0.0.62",
+                "type": "A"
+            }
+        ],
+        "category_name": "Network Activity",
+        "category_uid": 4,
+        "class_name": "DNS Activity",
+        "class_uid": 4003,
+        "cloud": {
+            "account_uid": "123456789012",
+            "provider": "AWS",
+            "region": "us-east-1"
+        },
+        "connection_info": {
+            "direction": "Unknown",
+            "direction_id": 0,
+            "protocol_name": "UDP"
+        },
+        "disposition": "No Action",
+        "disposition_id": 16,
+        "dst_endpoint": {
+            "instance_uid": "rslvr-in-0000000000000000",
+            "interface_uid": "rni-0000000000000000"
+        },
+        "metadata": {
+            "product": {
+                "feature": {
+                    "name": "Resolver Query Logs"
+                },
+                "name": "Route 53",
+                "vendor_name": "AWS",
+                "version": "1.100000"
+            },
+            "profiles": [
+                "cloud",
+                "security_control"
+            ],
+            "version": "1.0.0-rc.2"
+        },
+        "query": {
+            "class": "IN",
+            "hostname": "ip-127-0-0-62.alert.firewall.canary.",
+            "type": "A"
+        },
+        "rcode": "NoError",
+        "rcode_id": 0,
+        "severity": "Informational",
+        "severity_id": 1,
+        "src_endpoint": {
+            "instance_uid": null,
+            "ip": "10.200.21.100",
+            "port": 15083,
+            "vpc_uid": "vpc-00000000000000000"
+        },
+        "time": 1665694956000,
+        "type_name": "DNS Activity: Response",
+        "type_uid": 400302,
+        "unmapped": [
+            {
+                "key": "firewall_rule_group_id",
+                "value": "rslvr-frg-000000000000000"
+            },
+            {
+                "key": "firewall_domain_list_id",
+                "value": "rslvr-fdl-0000000000000"
+            }
+        ]
+    }
+]

@@ -8,6 +8,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -17,7 +18,6 @@ import (
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -90,11 +90,9 @@ func stringInSlice(a string, list []string) bool {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The gcp '%s' metricset is beta.", metricsetName)
-
 	m := &MetricSet{
 		BaseMetricSet: base,
-		logger:        logp.NewLogger(metricsetName),
+		logger:        base.Logger().Named(metricsetName),
 	}
 
 	if err := base.Module().UnpackConfig(&m.config); err != nil {
@@ -147,6 +145,20 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 		return fmt.Errorf("getTables failed: %w", err)
 	}
 
+	// Not finding any table is an error state for this metricset.
+	//
+	// It can happen because the user made a mistake in the configuration
+	// file or the service account lacks the needed permissions (the API
+	// does not report any error if the Service Account lacks the required
+	// permission).
+	//
+	// Regardless of the origin, it's a condition that we should
+	// report to the user and give hints for troubleshooting.
+	if len(tableMetas) == 0 {
+		m.logger.Errorf("no tables found in dataset %s with pattern %s; check your settings and see if the service account has permission to list datasets", m.config.DatasetID, m.config.TablePattern)
+		return nil
+	}
+
 	var events []mb.Event
 	for _, tableMeta := range tableMetas {
 		eventsPerQuery, err := m.queryBigQuery(ctx, client, tableMeta, month, m.config.CostType)
@@ -161,7 +173,27 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	for _, event := range events {
 		reporter.Event(event)
 	}
+
 	return nil
+}
+
+const detailedTablePrefix = "gcp_billing_export_resource_v1"
+
+// isDetailedTable checks if the table pattern matches the naming convention for
+// detailed cost usage tables, which includes the term "gcp_billing_export_resource_v1".
+//
+// Standard tables pattern:
+// - "gcp_billing_export_v1_<BILLING_ACCOUNT_ID>"
+// Detailed tables pattern:
+// - "gcp_billing_export_resource_v1_<BILLING_ACCOUNT_ID>"
+//
+// Full table names example:
+// Standard:
+// - "a-project-123456.dataset.gcp_billing_export_v1_011702_58A742_BQB4E8"
+// Detailed:
+// - "a-project-123456.dataset.gcp_billing_export_resource_v1_011702_58A742_BQB4E8"
+func isDetailedTable(tableName string) bool {
+	return strings.Contains(strings.ToLower(tableName), detailedTablePrefix)
 }
 
 func getCurrentMonth() string {
@@ -180,7 +212,7 @@ func getTables(ctx context.Context, client *bigquery.Client, datasetID string, t
 
 	for {
 		dataset, err := dit.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 		if err != nil {
@@ -201,7 +233,7 @@ func getTables(ctx context.Context, client *bigquery.Client, datasetID string, t
 		for {
 			var tableMeta tableMeta
 			table, err := tit.Next()
-			if err == iterator.Done {
+			if errors.Is(err, iterator.Done) {
 				break
 			}
 			if err != nil {
@@ -216,11 +248,34 @@ func getTables(ctx context.Context, client *bigquery.Client, datasetID string, t
 			}
 		}
 	}
+
 	return tables, nil
 }
 
+// row represents a structure for storing data obtained from a BigQuery standard or detailed cost usage result.
+type row struct {
+	InvoiceMonth       string    `bigquery:"invoice_month"`
+	ProjectId          string    `bigquery:"project_id"`
+	ProjectName        string    `bigquery:"project_name"`
+	BillingAccountId   string    `bigquery:"billing_account_id"`
+	CostType           string    `bigquery:"cost_type"`
+	SkuId              string    `bigquery:"sku_id"`
+	SkuDescription     string    `bigquery:"sku_description"`
+	ServiceId          string    `bigquery:"service_id"`
+	ServiceDescription string    `bigquery:"service_description"`
+	Tags               string    `bigquery:"tags_string"`
+	Labels             string    `bigquery:"labels_json"`
+	UsageStartTime     time.Time `bigquery:"usage_start_time"`
+	UsageEndTime       time.Time `bigquery:"usage_end_time"`
+	LocationRegion     string    `bigquery:"location_region"`
+	LocationZone       string    `bigquery:"location_zone"`
+	LocationCountry    string    `bigquery:"location_country"`
+	TotalExact         float64   `bigquery:"total_exact"`
+	EffectivePrice     float64   `bigquery:"effective_price"`
+}
+
 func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, tableMeta tableMeta, month string, costType string) ([]mb.Event, error) {
-	var events []mb.Event
+	events := make([]mb.Event, 0)
 
 	query := generateQuery(tableMeta.tableFullID, month, costType)
 	m.logger.Debug("bigquery query = ", query)
@@ -252,10 +307,15 @@ func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, 
 	}
 
 	it, err := job.Read(ctx)
+	if err != nil {
+		return events, fmt.Errorf("reading from bigquery job failed: %w", err)
+	}
+
 	for {
-		var row []bigquery.Value
+		var row row
+
 		err := it.Next(&row)
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 
@@ -265,34 +325,125 @@ func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, 
 			return events, err
 		}
 
-		if len(row) == 6 {
-			events = append(events, createEvents(row, m.config.ProjectID))
-		}
+		events = append(events, createEvents(row, tableMeta.tableFullID, m.config.ProjectID))
 	}
 	return events, nil
 }
 
-func createEvents(rowItems []bigquery.Value, projectID string) mb.Event {
+// tag represents a BigQuery billing tag.
+type tag struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+// createTags converts a comma-separated string of key-value pairs into an array of tags.
+// It is used to convert the tags string generated by the SQL query.
+// The SQL query generates tags string by concatenating key-value pairs from an array of structs (tags).
+func createTags(tagsItem bigquery.Value) []tag {
+	var tagsArray []tag
+
+	if tags, ok := tagsItem.(string); ok {
+		pairs := strings.Split(tags, ",")
+		for _, pair := range pairs {
+			kv := strings.Split(pair, ":")
+			if len(kv) == 2 {
+				tagsArray = append(tagsArray, tag{Key: kv[0], Value: kv[1]})
+			}
+		}
+	}
+
+	return tagsArray
+}
+
+// convertJSONToMap converts a JSON string of label/tag array to a map.
+// BigQuery TO_JSON_STRING converts ARRAY<STRUCT<key STRING, value STRING>> to JSON like:
+// [{"key":"env","value":"prod"},{"key":"team","value":"backend"}]
+func convertJSONToMap(jsonStr string) map[string]string {
+	result := make(map[string]string)
+
+	if jsonStr == "" || jsonStr == "null" || jsonStr == "[]" {
+		return result
+	}
+
+	var items []struct {
+		Key   string `json:"key"`
+		Value string `json:"value"`
+	}
+
+	if err := json.Unmarshal([]byte(jsonStr), &items); err != nil {
+		return result
+	}
+
+	for _, item := range items {
+		if item.Key != "" {
+			result[item.Key] = item.Value
+		}
+	}
+
+	return result
+}
+
+func createEvents(row row, tableName, projectID string) mb.Event {
 	event := mb.Event{}
+
+	tags := createTags(row.Tags)
+	labels := convertJSONToMap(row.Labels)
+
 	event.MetricSetFields = mapstr.M{
-		"invoice_month":      rowItems[0],
-		"project_id":         rowItems[1],
-		"project_name":       rowItems[2],
-		"billing_account_id": rowItems[3],
-		"cost_type":          rowItems[4],
-		"total":              rowItems[5],
+		"invoice_month":       row.InvoiceMonth,
+		"project_id":          row.ProjectId,
+		"project_name":        row.ProjectName,
+		"billing_account_id":  row.BillingAccountId,
+		"cost_type":           row.CostType,
+		"total":               row.TotalExact,
+		"sku_id":              row.SkuId,
+		"sku_description":     row.SkuDescription,
+		"service_id":          row.ServiceId,
+		"service_description": row.ServiceDescription,
+		"tags":                tags,
+	}
+
+	if len(labels) > 0 {
+		event.MetricSetFields["labels"] = labels
+	}
+
+	if !row.UsageStartTime.IsZero() {
+		_, _ = event.MetricSetFields.Put("usage_start_time", row.UsageStartTime)
+	}
+
+	if !row.UsageEndTime.IsZero() {
+		_, _ = event.MetricSetFields.Put("usage_end_time", row.UsageEndTime)
+	}
+
+	// Add location fields if available
+	locationFields := mapstr.M{}
+	if row.LocationRegion != "" {
+		locationFields["region"] = row.LocationRegion
+	}
+	if row.LocationZone != "" {
+		locationFields["zone"] = row.LocationZone
+	}
+	if row.LocationCountry != "" {
+		locationFields["country"] = row.LocationCountry
+	}
+	if len(locationFields) > 0 {
+		_, _ = event.MetricSetFields.Put("location", locationFields)
+	}
+
+	if isDetailedTable(tableName) {
+		_, _ = event.MetricSetFields.Put("effective_price", row.EffectivePrice)
 	}
 
 	event.RootFields = mapstr.M{
 		"cloud.provider":     "gcp",
 		"cloud.project.id":   projectID,
-		"cloud.project.name": rowItems[2],
-		"cloud.account.id":   rowItems[3],
+		"cloud.project.name": row.ProjectName,
+		"cloud.account.id":   row.BillingAccountId,
 	}
 
 	// create eventID for each current_date + invoice_month + project_id + cost_type
 	currentDate := getCurrentDate()
-	event.ID = generateEventID(currentDate, rowItems)
+	event.ID = generateEventID(currentDate, row)
 	return event
 }
 
@@ -301,10 +452,17 @@ func getCurrentDate() string {
 	return fmt.Sprintf("%04d%02d%02d", currentTime.Year(), int(currentTime.Month()), currentTime.Day())
 }
 
-func generateEventID(currentDate string, rowItems []bigquery.Value) string {
+func generateEventID(currentDate string, row row) string {
 	// create eventID using hash of current_date + invoice.month + project.id + project.name
 	// This will prevent more than one billing metric getting collected in the same day.
-	eventID := currentDate + rowItems[0].(string) + rowItems[1].(string) + rowItems[2].(string)
+	eventID := currentDate + row.InvoiceMonth + row.ProjectId + row.ProjectName + row.SkuId + row.ServiceId + row.Tags + row.Labels + row.LocationCountry + row.LocationRegion + row.LocationZone
+	// Add usage times to event ID if available
+	if !row.UsageStartTime.IsZero() {
+		eventID += fmt.Sprintf("%d", row.UsageStartTime.UnixNano())
+	}
+	if !row.UsageEndTime.IsZero() {
+		eventID += fmt.Sprintf("%d", row.UsageEndTime.UnixNano())
+	}
 	h := sha256.New()
 	h.Write([]byte(eventID))
 	prefix := hex.EncodeToString(h.Sum(nil))
@@ -314,26 +472,170 @@ func generateEventID(currentDate string, rowItems []bigquery.Value) string {
 // generateQuery returns the query to be used by the BigQuery client to retrieve monthly
 // cost types breakdown.
 func generateQuery(tableName, month, costType string) string {
+	if isDetailedTable(tableName) {
+		return createDetailedQuery(tableName, month, costType)
+	}
+
+	return createStandardQuery(tableName, month, costType)
+}
+
+func createStandardQuery(tableName, month, costType string) string {
 	// The table name is user provided, so it may contains special characters.
 	// In order to allow any character in the table identifier, use the Quoted identifier format.
 	// See https://github.com/elastic/beats/issues/26855
 	// NOTE: is not possible to escape backtics (`) in a multiline string
 	escapedTableName := fmt.Sprintf("`%s`", tableName)
+
 	query := fmt.Sprintf(`
 SELECT
-	invoice.month,
-	project.id,
-	project.name,
+	invoice.month AS invoice_month,
+	project.id AS project_id,
+	project.name AS project_name,
 	billing_account_id,
 	cost_type,
-	(SUM(CAST(cost * 1000000 AS int64))
-	+ SUM(IFNULL((SELECT SUM(CAST(c.amount * 1000000 as int64)) FROM UNNEST(credits) c), 0))) / 1000000
-	AS total_exact
-FROM %s
-WHERE project.id IS NOT NULL
-AND invoice.month = '%s'
-AND cost_type = '%s'
-GROUP BY 1, 2, 3, 4, 5
-ORDER BY 1 ASC, 2 ASC, 3 ASC, 4 ASC, 5 ASC;`, escapedTableName, month, costType)
+	IFNULL(sku.id, '') AS sku_id,
+	IFNULL(sku.description, '') AS sku_description,
+	IFNULL(service.id, '') AS service_id,
+	IFNULL(service.description, '') AS service_description,
+	ARRAY_TO_STRING(ARRAY(
+	    SELECT
+	        CONCAT(t.key, ':', t.value)
+	    FROM
+	        UNNEST(tags) AS t), ',') AS tags_string,
+	TO_JSON_STRING(labels) AS labels_json,
+	TIMESTAMP_MICROS(usage_start_time) as usage_start_time,
+	TIMESTAMP_MICROS(usage_end_time) as usage_end_time,
+	IFNULL(location.region, '') AS location_region,
+	IFNULL(location.zone, '') AS location_zone,
+	IFNULL(location.country, '') AS location_country,
+	(SUM(CAST(cost * 1000000 AS int64)) + SUM(IFNULL((
+			SELECT
+				SUM(CAST(c.amount * 1000000 AS int64))
+			FROM
+				UNNEST(credits) c), 0))) / 1000000 AS total_exact
+FROM
+	%s
+WHERE
+	project.id IS NOT NULL
+	AND invoice.month = '%s'
+	AND cost_type = '%s'
+GROUP BY
+	invoice_month,
+	project_id,
+	project_name,
+	billing_account_id,
+	cost_type,
+	sku_id,
+	sku_description,
+	service_id,
+	service_description,
+	tags_string,
+	labels_json,
+	location_region,
+	location_zone,
+	location_country,
+	usage_start_time,
+	usage_end_time
+ORDER BY
+	invoice_month ASC,
+	project_id ASC,
+	project_name ASC,
+	billing_account_id ASC,
+	cost_type ASC,
+	sku_id ASC,
+	sku_description ASC,
+	service_id ASC,
+	service_description ASC,
+	tags_string ASC,
+	labels_json ASC,
+	location_region ASC,
+	location_zone ASC,
+	location_country ASC,
+	usage_start_time ASC,
+	usage_end_time ASC;`,
+		escapedTableName, month, costType)
+
+	return query
+}
+
+func createDetailedQuery(tableName, month, costType string) string {
+	// The table name is user provided, so it may contains special characters.
+	// In order to allow any character in the table identifier, use the Quoted identifier format.
+	// See https://github.com/elastic/beats/issues/26855
+	// NOTE: is not possible to escape backtics (`) in a multiline string
+	escapedTableName := fmt.Sprintf("`%s`", tableName)
+
+	query := fmt.Sprintf(`
+SELECT
+	invoice.month AS invoice_month,
+	project.id AS project_id,
+	project.name AS project_name,
+	billing_account_id,
+	cost_type,
+	IFNULL(sku.id, '') AS sku_id,
+	IFNULL(sku.description, '') AS sku_description,
+	IFNULL(service.id, '') AS service_id,
+	IFNULL(service.description, '') AS service_description,
+	IFNULL(SAFE_CAST(price.effective_price AS float64), 0) AS effective_price,
+	ARRAY_TO_STRING(ARRAY(
+	    SELECT
+	        CONCAT(t.key, ':', t.value)
+	    FROM
+	        UNNEST(tags) AS t), ',') AS tags_string,
+	TO_JSON_STRING(labels) AS labels_json,
+	TIMESTAMP_MICROS(usage_start_time) as usage_start_time,
+	TIMESTAMP_MICROS(usage_end_time) as usage_end_time,
+	IFNULL(location.region, '') AS location_region,
+	IFNULL(location.zone, '') AS location_zone,
+	IFNULL(location.country, '') AS location_country,
+	(SUM(CAST(cost * 1000000 AS int64)) + SUM(IFNULL((
+			SELECT
+				SUM(CAST(c.amount * 1000000 AS int64))
+			FROM
+				UNNEST(credits) c), 0))) / 1000000 AS total_exact
+FROM
+	%s
+WHERE
+	project.id IS NOT NULL
+	AND invoice.month = '%s'
+	AND cost_type = '%s'
+GROUP BY
+	invoice_month,
+	project_id,
+	project_name,
+	billing_account_id,
+	cost_type,
+	sku_id,
+	sku_description,
+	service_id,
+	service_description,
+	effective_price,
+	tags_string,
+	labels_string,
+	location_region,
+	location_zone,
+	location_country,
+	usage_start_time,
+	usage_end_time
+ORDER BY
+	invoice_month ASC,
+	project_id ASC,
+	project_name ASC,
+	billing_account_id ASC,
+	cost_type ASC,
+	sku_id ASC,
+	sku_description ASC,
+	service_id ASC,
+	service_description ASC,
+	effective_price ASC,
+	tags_string ASC,
+	labels_json ASC,
+	location_region ASC,
+	location_zone ASC,
+	location_country ASC,
+	usage_start_time ASC,
+	usage_end_time ASC;`,
+		escapedTableName, month, costType)
+
 	return query
 }

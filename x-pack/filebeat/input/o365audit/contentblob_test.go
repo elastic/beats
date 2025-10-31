@@ -5,10 +5,10 @@
 package o365audit
 
 import (
+	"errors"
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -76,8 +76,9 @@ func TestContentBlob(t *testing.T) {
 	var f fakePoll
 	var store contentStore
 	ctx := apiEnvironment{
-		Logger:   logp.L(),
-		Callback: store.onEvent,
+		status:   noopReporter{},
+		logger:   logp.L(),
+		callback: store.onEvent,
 	}
 	baseCursor := checkpoint{Timestamp: time.Now()}
 	query := ContentBlob("http://test.localhost/", baseCursor, ctx)
@@ -99,7 +100,7 @@ func TestContentBlobResumeToLine(t *testing.T) {
 	var f fakePoll
 	var store contentStore
 	ctx := testConfig()
-	ctx.Callback = store.onEvent
+	ctx.callback = store.onEvent
 	baseCursor := checkpoint{Timestamp: time.Now()}
 	const skip = 3
 	baseCursor.Line = skip
@@ -122,8 +123,9 @@ func TestContentBlobPaged(t *testing.T) {
 	var f fakePoll
 	var store contentStore
 	ctx := apiEnvironment{
-		Logger:   logp.L(),
-		Callback: store.onEvent,
+		status:   noopReporter{},
+		logger:   logp.L(),
+		callback: store.onEvent,
 	}
 	baseCursor := checkpoint{Timestamp: time.Now()}
 	query := ContentBlob("http://test.localhost/", baseCursor, ctx)

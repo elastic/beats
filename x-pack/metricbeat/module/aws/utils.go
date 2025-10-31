@@ -11,12 +11,18 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
+	"github.com/aws/aws-sdk-go-v2/service/apigateway"
+	"github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
+
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
 )
+
+const DefaultApiTimeout = 5 * time.Second
 
 // GetStartTimeEndTime calculates start and end times for queries based on the current time and a duration.
 //
@@ -29,11 +35,24 @@ import (
 // If durations are configured in non-whole minute periods, they are rounded up to the next minute e.g. 90s becomes 120s.
 //
 // If `latency` is configured, the period is shifted back in time by specified duration (before period alignment).
-func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Duration) (time.Time, time.Time) {
+// If endTime of the previous collection period is recorded, then use this endTime as the new startTime. This will guarantee no gap between collection timestamps.
+func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Duration, previousEndTime time.Time) (time.Time, time.Time) {
 	periodInMinutes := (period + time.Second*29).Round(time.Second * 60)
-	endTime := now.Add(latency * -1).Truncate(periodInMinutes)
-	startTime := endTime.Add(periodInMinutes * -1)
+	var startTime, endTime time.Time
+	if !previousEndTime.IsZero() {
+		startTime = previousEndTime
+		endTime = startTime.Add(periodInMinutes)
+	} else {
+		endTime = now.Add(latency * -1).Truncate(periodInMinutes)
+		startTime = endTime.Add(periodInMinutes * -1)
+	}
 	return startTime, endTime
+}
+
+// MetricWithID contains a specific metric, and its account ID information.
+type MetricWithID struct {
+	Metric    types.Metric
+	AccountID string
 }
 
 // GetListMetricsOutput function gets listMetrics results from cloudwatch ~~per namespace~~ for each region.
@@ -41,12 +60,22 @@ func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Durat
 // to obtain statistical data.
 // Note: We are not using Dimensions and MetricName in ListMetricsInput because with that we will have to make one ListMetrics
 // API call per metric name and set of dimensions. This will increase API cost.
-func GetListMetricsOutput(namespace string, regionName string, period time.Duration, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]types.Metric, error) {
-	var metricsTotal []types.Metric
+// IncludeLinkedAccounts is set to true for ListMetrics API to include metrics from source accounts in addition to the
+// monitoring account.
+// OwningAccount works alongside IncludeLinkedAccounts as a filter mechanism to extract metrics specific to a linked account.
+func GetListMetricsOutput(namespace string, regionName string, period time.Duration, includeLinkedAccounts bool,
+	owningAccount string, monitoringAccountID string, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]MetricWithID, error) {
+
+	var metricWithAccountID []MetricWithID
 	var nextToken *string
 
 	listMetricsInput := &cloudwatch.ListMetricsInput{
-		NextToken: nextToken,
+		NextToken:             nextToken,
+		IncludeLinkedAccounts: &includeLinkedAccounts,
+	}
+
+	if owningAccount != "" {
+		listMetricsInput.OwningAccount = &owningAccount
 	}
 
 	// To filter the results to show only metrics that have had data points published
@@ -66,12 +95,66 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(context.TODO())
 		if err != nil {
-			return metricsTotal, fmt.Errorf("error ListMetrics with Paginator, skipping region %s: %w", regionName, err)
+			return metricWithAccountID, fmt.Errorf("error ListMetrics with Paginator, skipping region %s: %w", regionName, err)
 		}
 
-		metricsTotal = append(metricsTotal, page.Metrics...)
+		for i, metric := range page.Metrics {
+			if page.OwningAccounts == nil {
+				// When IncludeLinkedAccounts is set to false, ListMetrics API does not return any OwningAccounts.
+				// Hence, account ID is set to the monitoring account ID
+				metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, monitoringAccountID})
+			} else {
+				metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, page.OwningAccounts[i]})
+			}
+		}
 	}
-	return metricsTotal, nil
+	return metricWithAccountID, nil
+}
+
+// GetAPIGatewayRestAPIOutput function gets results from apigw api.
+// GetRestApis Apigateway API is used to retrieve only the REST API specified info. This returns a map with the names and ids of RestAPIs configured
+// Limit variable defines maximum number of returned results per page. The default value is 25 and the maximum value is 500.
+func GetAPIGatewayRestAPIOutput(svcRestApi *apigateway.Client, limit *int32) (map[string]string, error) {
+	input := &apigateway.GetRestApisInput{}
+	if limit != nil {
+		input = &apigateway.GetRestApisInput{
+			Limit: limit,
+		}
+	}
+	ctx, cancel := getContextWithTimeout(DefaultApiTimeout)
+	defer cancel()
+	result, err := svcRestApi.GetRestApis(ctx, input)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving GetRestApis %w", err)
+	}
+
+	// Iterate and display the APIs
+	infoRestAPImap := make(map[string]string, len(result.Items))
+	for _, api := range result.Items {
+		infoRestAPImap[aws.ToString(api.Name)] = aws.ToString(api.Id)
+	}
+	return infoRestAPImap, nil
+}
+
+// GetAPIGatewayAPIOutput function gets results from apigatewayv2 api.
+// GetApis Apigateway API is used to retrieve the HTTP and WEBSOCKET specified info. This returns a map with the names and ids of relevant APIs configured
+func GetAPIGatewayAPIOutput(svcHttpApi *apigatewayv2.Client) (map[string]string, error) {
+	input := &apigatewayv2.GetApisInput{}
+
+	ctx, cancel := getContextWithTimeout(DefaultApiTimeout)
+	defer cancel()
+	result, err := svcHttpApi.GetApis(ctx, input)
+
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving GetApis %w", err)
+	}
+
+	// Iterate and display the APIs
+	infoAPImap := make(map[string]string, len(result.Items))
+	for _, api := range result.Items {
+		infoAPImap[aws.ToString(api.Name)] = aws.ToString(api.ApiId)
+	}
+	return infoAPImap, nil
 }
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.
@@ -118,6 +201,10 @@ func CheckTimestampInArray(timestamp time.Time, timestampArray []time.Time) (boo
 	return false, -1
 }
 
+func getContextWithTimeout(timeout time.Duration) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), timeout)
+}
+
 // GetResourcesTags function queries AWS resource groupings tagging API
 // to get a resource tag mapping with specific resource type filters
 func GetResourcesTags(svc resourcegroupstaggingapi.GetResourcesAPIClient, resourceTypeFilters []string) (map[string][]resourcegroupstaggingapitypes.Tag, error) {
@@ -132,10 +219,12 @@ func GetResourcesTags(svc resourcegroupstaggingapi.GetResourcesAPIClient, resour
 	}
 
 	paginator := resourcegroupstaggingapi.NewGetResourcesPaginator(svc, getResourcesInput)
+	ctx, cancel := getContextWithTimeout(DefaultApiTimeout)
+	defer cancel()
 	var err error
 	var page *resourcegroupstaggingapi.GetResourcesOutput
 	for paginator.HasMorePages() {
-		if page, err = paginator.NextPage(context.TODO()); err != nil {
+		if page, err = paginator.NextPage(ctx); err != nil {
 			err = fmt.Errorf("error GetResources with Paginator: %w", err)
 			return nil, err
 		}

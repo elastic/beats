@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || openbsd || windows
-// +build darwin freebsd linux openbsd windows
 
 package filesystem
 
@@ -24,11 +23,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -67,7 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		config.IgnoreTypes = fs.DefaultIgnoredTypes(sys)
 	}
 	if len(config.IgnoreTypes) > 0 {
-		logp.Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
+		base.Logger().Infof("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -105,4 +104,33 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 	}
 	return nil
+}
+
+// Diagnostics implmements the DiagnosticSet interface
+func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
+	m.Logger().Infof("got DiagnosticSetup request for system/memory")
+	return []diagnostics.DiagnosticSetup{
+		{
+			Name:        "filesystem-filesystems",
+			Description: "Contents of /proc/filesystems",
+			Filename:    "filesystems",
+			Callback:    m.filesystemsDiag,
+		},
+		{
+			Name:        "filesystem-mounts",
+			Description: "Contents of /proc/mounts",
+			Filename:    "mounts",
+			Callback:    m.mountsDiag,
+		},
+	}
+}
+
+func (m *MetricSet) filesystemsDiag() []byte {
+	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	return diagnostics.GetRawFileOrErrorString(sys, "/proc/filesystems")
+}
+
+func (m *MetricSet) mountsDiag() []byte {
+	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	return diagnostics.GetRawFileOrErrorString(sys, "/proc/mounts")
 }

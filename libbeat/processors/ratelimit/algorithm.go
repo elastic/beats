@@ -20,9 +20,8 @@ package ratelimit
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var registry = make(map[string]constructor, 0)
@@ -46,7 +45,7 @@ type algorithm interface {
 	IsAllowed(uint64) bool
 }
 
-type constructor func(algoConfig) (algorithm, error)
+type constructor func(algoConfig, *logp.Logger) (algorithm, error)
 
 func register(id string, ctor constructor) {
 	registry[id] = ctor
@@ -54,16 +53,16 @@ func register(id string, ctor constructor) {
 
 // factory returns the requested rate limiting algorithm, if one is found. If not found,
 // an error is returned.
-func factory(id string, config algoConfig) (algorithm, error) {
+func factory(id string, config algoConfig, logger *logp.Logger) (algorithm, error) {
 	var ctor constructor
 	var found bool
 	if ctor, found = registry[id]; !found {
 		return nil, fmt.Errorf("rate limiting algorithm '%v' not implemented", id)
 	}
 
-	algorithm, err := ctor(config)
+	algorithm, err := ctor(config, logger)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not construct algorithm")
+		return nil, fmt.Errorf("could not construct algorithm: %w", err)
 	}
 
 	return algorithm, nil

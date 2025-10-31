@@ -54,3 +54,23 @@
   - name: source
     description: Source of document that was indexed
     type: keyword
+  - name: user.realm
+    description: The authentication realm the user was authenticated against
+    example: "default_file"
+    type: keyword
+  - name: user.effective.realm
+    description: The authentication realm the effective user was authenticated against
+    example: "default_file"
+    type: keyword
+  - name: auth.type
+    description: The authentication type used to authenticate the user. One of TOKEN | REALM | API_KEY
+    example: REALM
+    type: keyword
+  - name: apikey.id
+    description: The id of the API key used
+    example: "WzL_kb6VSvOhAq0twPvHOQ"
+    type: keyword
+  - name: apikey.name
+    description: The name of the API key used
+    example: "my-api-key"
+    type: keyword

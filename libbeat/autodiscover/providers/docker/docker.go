@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux || darwin || windows
-// +build linux darwin windows
 
 package docker
 
@@ -26,7 +25,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -70,8 +69,9 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *config.C,
 	keystore keystore.Keystore,
+	logger *logp.Logger,
 ) (autodiscover.Provider, error) {
-	logger := logp.NewLogger("docker")
+	logger = logger.Named("docker")
 
 	errWrap := func(err error) error {
 		return fmt.Errorf("error setting up docker autodiscover provider: %w", err)
@@ -88,7 +88,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil, logger)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -384,7 +384,11 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		e["ports"] = ports
 	}
 	if labels, err := dockerMeta.GetValue("labels"); err == nil {
-		hints := utils.GenerateHints(labels.(mapstr.M), "", d.config.Prefix)
+		hints, incorrecthints := utils.GenerateHints(labels.(mapstr.M), "", d.config.Prefix, true, AllSupportedHints)
+		// We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+		for _, value := range incorrecthints {
+			d.logger.Debugf("provided hint: %s/%s is not in the supported list", d.config.Prefix, value)
+		}
 		e["hints"] = hints
 	}
 	return e

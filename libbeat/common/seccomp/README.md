@@ -71,7 +71,7 @@ Another profiling option is `strace -c`. This will record all system calls used
 by the Beat. Then this list can be used to steer the development of a policy.
 
 ```sh
-sudo strace -c ./metricbeat -strict.perms=false
+sudo strace -c ./metricbeat --strict.perms=false
 % time     seconds  usecs/call     calls    errors syscall
 ------ ----------- ----------- --------- --------- ----------------
  79.75    0.002521          97        26           futex

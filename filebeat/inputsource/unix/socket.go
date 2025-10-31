@@ -18,13 +18,12 @@
 package unix
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/user"
 	"runtime"
 	"strconv"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -36,7 +35,7 @@ func cleanupStaleSocket(path string) error {
 		if os.IsNotExist(err) {
 			return nil
 		}
-		return errors.Wrapf(err, "cannot lstat unix socket file at location %s", path)
+		return fmt.Errorf("cannot lstat unix socket file at location %s: %w", path, err)
 	}
 
 	if runtime.GOOS != "windows" {
@@ -47,16 +46,16 @@ func cleanupStaleSocket(path string) error {
 	}
 
 	if err := os.Remove(path); err != nil {
-		return errors.Wrapf(err, "cannot remove existing unix socket file at location %s", path)
+		return fmt.Errorf("cannot remove existing unix socket file at location %s: %w", path, err)
 	}
 
 	return nil
 }
 
-func setSocketOwnership(path string, group *string) error {
+func setSocketOwnership(path string, group *string, logger *logp.Logger) error {
 	if group != nil {
 		if runtime.GOOS == "windows" {
-			logp.NewLogger("unix").Warn("windows does not support the 'group' configuration option, ignoring")
+			logger.Named("unix").Warn("windows does not support the 'group' configuration option, ignoring")
 			return nil
 		}
 		g, err := user.LookupGroup(*group)

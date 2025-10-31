@@ -18,16 +18,16 @@
 package ratelimit
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strconv"
+	"sync/atomic"
 
+	"github.com/gohugoio/hashstructure"
 	"github.com/jonboulle/clockwork"
-	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -36,7 +36,7 @@ import (
 )
 
 // instanceID is used to assign each instance a unique monitoring namespace.
-var instanceID = atomic.MakeUint32(0)
+var instanceID atomic.Uint32
 
 const processorName = "rate_limit"
 const logName = "processor." + processorName
@@ -58,32 +58,32 @@ type rateLimit struct {
 }
 
 // new constructs a new rate limit processor.
-func new(cfg *c.C) (processors.Processor, error) {
+func new(cfg *c.C, log *logp.Logger) (beat.Processor, error) {
 	var config config
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "could not unpack processor configuration")
+		return nil, fmt.Errorf("could not unpack processor configuration: %w", err)
 	}
 
 	if err := config.setDefaults(); err != nil {
-		return nil, errors.Wrap(err, "could not set default configuration")
+		return nil, fmt.Errorf("could not set default configuration: %w", err)
 	}
 
 	algoConfig := algoConfig{
 		limit:  config.Limit,
 		config: *config.Algorithm.Config(),
 	}
-	algo, err := factory(config.Algorithm.Name(), algoConfig)
+	algo, err := factory(config.Algorithm.Name(), algoConfig, log)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not construct rate limiting algorithm")
+		return nil, fmt.Errorf("could not construct rate limiting algorithm: %w", err)
 	}
 
 	// Logging and metrics (each processor instance has a unique ID).
 	var (
-		id  = int(instanceID.Inc())
-		log = logp.NewLogger(logName).With("instance_id", id)
-		reg = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
+		id  = int(instanceID.Add(1))
+		reg = monitoring.Default.GetOrCreateRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
 	)
 
+	log = log.Named(logName).With("instance_id", id)
 	p := &rateLimit{
 		config:    config,
 		algorithm: algo,
@@ -103,7 +103,7 @@ func new(cfg *c.C) (processors.Processor, error) {
 func (p *rateLimit) Run(event *beat.Event) (*beat.Event, error) {
 	key, err := p.makeKey(event)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not make key")
+		return nil, fmt.Errorf("could not make key: %w", err)
 	}
 
 	if p.algorithm.IsAllowed(key) {
@@ -132,8 +132,8 @@ func (p *rateLimit) makeKey(event *beat.Event) (uint64, error) {
 	for _, field := range p.config.Fields {
 		value, err := event.GetValue(field)
 		if err != nil {
-			if err != mapstr.ErrKeyNotFound {
-				return 0, errors.Wrapf(err, "error getting value of field: %v", field)
+			if !errors.Is(err, mapstr.ErrKeyNotFound) {
+				return 0, fmt.Errorf("error getting value of field '%v': %w", field, err)
 			}
 
 			value = ""

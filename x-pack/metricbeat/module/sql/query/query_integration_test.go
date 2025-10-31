@@ -2,8 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build integration
-// +build integration
+//go:build integration && !requirefips
 
 package query
 
@@ -230,6 +229,10 @@ func TestPostgreSQL(t *testing.T) {
 func TestOracle(t *testing.T) {
 	service := compose.EnsureUp(t, "oracle")
 	host, port, _ := net.SplitHostPort(service.Host())
+
+	// Wait for Oracle to be ready instead of sleeping for 300 seconds
+	waitForOracleConnection(t, host, port)
+
 	cfg := testFetchConfig{
 		config: config{
 			Driver:         "oracle",
@@ -286,9 +289,11 @@ func getConfig(cfg testFetchConfig) map[string]interface{} {
 func assertFieldNotContains(field, s string) func(t *testing.T, event beat.Event) {
 	return func(t *testing.T, event beat.Event) {
 		value, err := event.GetValue(field)
-		assert.NoError(t, err)
-		require.NotEmpty(t, value.(string))
-		require.NotContains(t, value.(string), s)
+		require.NoError(t, err)
+		val, ok := value.(string)
+		require.Truef(t, ok, "value is not a string, it's %T", value)
+		require.NotEmpty(t, val)
+		require.NotContains(t, val, s)
 	}
 }
 
@@ -296,13 +301,14 @@ func assertFieldContainsFloat64(field string, limit float64) func(t *testing.T, 
 	return func(t *testing.T, event beat.Event) {
 		value, err := event.GetValue("sql.metrics.hit_ratio")
 		assert.NoError(t, err)
-		require.GreaterOrEqual(t, value.(float64), limit)
+		require.GreaterOrEqual(t, value.(float64), limit) //nolint:errcheck // ignore
 	}
 }
 
 func GetOracleConnectionDetails(t *testing.T, host string, port string) string {
-	params, err := godror.ParseDSN(GetOracleConnectString(host, port))
-	require.Empty(t, err)
+	connectString := GetOracleConnectString(host, port)
+	params, err := godror.ParseDSN(connectString)
+	require.NoError(t, err, "Failed to parse Oracle DSN: %s", connectString)
 	return params.StringWithPassword()
 }
 
@@ -324,7 +330,7 @@ func GetOracleEnvUsername() string {
 	return username
 }
 
-// GetOracleEnvUsername returns the port of the Oracle server or the value of the environment variable ORACLE_PASSWORD if not empty
+// GetOracleEnvPassword returns the password to use with Oracle testing server or the value of the environment variable ORACLE_PASSWORD if not empty
 func GetOracleEnvPassword() string {
 	password := os.Getenv("ORACLE_PASSWORD")
 	if len(password) == 0 {
@@ -333,11 +339,52 @@ func GetOracleEnvPassword() string {
 	return password
 }
 
+// GetOracleConnectString builds the Oracle connection string with proper format
 func GetOracleConnectString(host string, port string) string {
-	time.Sleep(300 * time.Second)
 	connectString := os.Getenv("ORACLE_CONNECT_STRING")
 	if len(connectString) == 0 {
-		connectString = fmt.Sprintf("%s/%s@%s:%s/%s as sysdba", GetOracleEnvUsername(), GetOracleEnvPassword(), host, port, GetOracleEnvServiceName())
+		// Use the recommended connection string format from godror documentation
+		// Format: oracle://user/password@host:port/service_name
+		connectString = fmt.Sprintf("oracle://%s:%s@%s:%s/%s",
+			GetOracleEnvUsername(),
+			GetOracleEnvPassword(),
+			host,
+			port,
+			GetOracleEnvServiceName())
+
+		// Only add SYSDBA if explicitly using 'sys' user
+		if GetOracleEnvUsername() == "sys" {
+			connectString += "?sysdba=1"
+		}
 	}
 	return connectString
+}
+
+// waitForOracleConnection waits for Oracle service to be ready with exponential backoff
+func waitForOracleConnection(t *testing.T, host, port string) {
+	maxRetries := 30
+	baseDelay := 2 * time.Second
+
+	for i := 0; i < maxRetries; i++ {
+		// First check if the port is open
+		conn, err := net.DialTimeout("tcp", net.JoinHostPort(host, port), 10*time.Second)
+		if err == nil {
+			conn.Close()
+			// Give Oracle a bit more time to fully initialize
+			time.Sleep(90 * time.Second)
+			return
+		}
+
+		// (1<<uint(i)) == 2^i, which doubles the delay at each iteration, then multiply by baseDelay
+		delay := time.Duration(1<<uint(i)) * baseDelay
+		// But don't let the delay get too long; max out at 30 seconds
+		if delay > 30*time.Second {
+			delay = 30 * time.Second
+		}
+
+		t.Logf("Oracle not ready yet (attempt %d/%d), waiting %v: %v", i+1, maxRetries, delay, err)
+		time.Sleep(delay)
+	}
+
+	t.Fatalf("Oracle service did not become ready after %d attempts", maxRetries)
 }

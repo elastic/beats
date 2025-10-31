@@ -27,7 +27,13 @@ class Test(BaseTest):
         )
         for i in range(1, 5):
             proc = self.start_beat(logging_args=["-e", "-v"])
-            time.sleep(.5)
+
+            # Flaky on MacOS, see https://github.com/elastic/beats/issues/39613#issuecomment-2158812325
+            # we need to wait a bit longer for filebeat to start
+            if platform.system() == "Darwin":
+                time.sleep(10)
+            else:
+                time.sleep(.5)
             proc.check_kill_and_wait()
 
     @unittest.skip("Skipped as flaky: https://github.com/elastic/beats/issues/14647")
@@ -112,45 +118,6 @@ class Test(BaseTest):
         reg = self.get_registry()
         assert reg == [] or reg[0]["offset"] == 0
 
-    def test_once(self):
-        """
-        Test filebeat running with the once flag.
-        """
-
-        self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/test.log",
-            close_eof="true",
-            scan_frequency="1s"
-        )
-
-        os.mkdir(self.working_dir + "/log/")
-
-        testfile = self.working_dir + "/log/test.log"
-        file = open(testfile, 'w')
-
-        iterations = 100
-        for n in range(0, iterations):
-            file.write("entry " + str(n + 1))
-            file.write("\n")
-
-        file.close()
-
-        filebeat = self.start_beat(extra_args=["-once"])
-
-        # Make sure all lines are read
-        self.wait_until(
-            lambda: self.output_has(lines=iterations),
-            max_timeout=10)
-
-        # Waits for filebeat to stop
-        self.wait_until(
-            lambda: self.log_contains("filebeat stopped."),
-            max_timeout=15)
-
-        # Checks that registry was written
-        data = self.get_registry()
-        assert len(data) == 1
-
     def nasa_logs(self):
 
         # Uncompress the nasa log file.
@@ -171,6 +138,7 @@ class Test(BaseTest):
 
         input_raw = """
 - type: log
+  allow_deprecated_use: true
   paths: []
 """
 

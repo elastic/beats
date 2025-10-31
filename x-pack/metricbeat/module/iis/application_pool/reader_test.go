@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build windows
-// +build windows
 
 package application_pool
 
@@ -13,12 +12,13 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // TestNewReaderValid should successfully instantiate the reader.
 func TestNewReaderValid(t *testing.T) {
 	var config Config
-	reader, err := newReader(config)
+	reader, err := newReader(config, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 	assert.NotNil(t, reader)
 	assert.NotNil(t, reader.query)
@@ -30,7 +30,7 @@ func TestNewReaderValid(t *testing.T) {
 // TestInitCounters should successfully instantiate the reader counters.
 func TestInitCounters(t *testing.T) {
 	var config Config
-	reader, err := newReader(config)
+	reader, err := newReader(config, logptest.NewTestingLogger(t, ""))
 	assert.NotNil(t, reader)
 	assert.NoError(t, err)
 	// if iis is not enabled, the reader.ApplicationPools is empty

@@ -27,10 +27,12 @@ import (
 // mapping stores the state metrics we want to fetch and will be used by this metricset
 var mapping = &p.MetricsMapping{
 	Metrics: map[string]p.MetricMap{
-		"kube_pod_info":             p.InfoMetric(),
-		"kube_pod_status_phase":     p.LabelMetric("status.phase", "phase", p.OpLowercaseValue()),
-		"kube_pod_status_ready":     p.LabelMetric("status.ready", "condition", p.OpLowercaseValue()),
-		"kube_pod_status_scheduled": p.LabelMetric("status.scheduled", "condition", p.OpLowercaseValue()),
+		"kube_pod_info":              p.InfoMetric(),
+		"kube_pod_status_phase":      p.LabelMetric("status.phase", "phase", p.OpLowercaseValue()),
+		"kube_pod_status_ready":      p.LabelMetric("status.ready", "condition", p.OpLowercaseValue()),
+		"kube_pod_status_scheduled":  p.LabelMetric("status.scheduled", "condition", p.OpLowercaseValue()),
+		"kube_pod_status_reason":     p.LabelMetric("status.reason", "reason", p.OpLowercaseValue()),
+		"kube_pod_status_ready_time": p.Metric("status.ready_time"),
 	},
 
 	Labels: map[string]p.LabelMap{

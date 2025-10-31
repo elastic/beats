@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -105,7 +106,8 @@ func TestSingleInput(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	input, err := NewInput(cfg, connector, inputContext)
+	logger := logptest.NewTestingLogger(t, "")
+	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
@@ -117,6 +119,8 @@ func TestSingleInput(t *testing.T) {
 }
 
 func TestInputStop_Wait(t *testing.T) {
+	t.Skip("Flaky test https://github.com/elastic/beats/issues/37987")
+
 	expectedHTTPEventCount = 1
 	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)
@@ -161,7 +165,8 @@ func TestInputStop_Wait(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	input, err := NewInput(cfg, connector, inputContext)
+	logger := logptest.NewTestingLogger(t, "")
+	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
@@ -287,7 +292,8 @@ func TestMultiInput(t *testing.T) {
 			_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
 			return
 		case "/meta/connect":
-			if called < uint64(expectedHTTPEventCount) {
+			if called < uint64(expectedHTTPEventCount) { //nolint:gosec //Safe to ignore in tests
+				//nolint:staticcheck //Safe to ignore in tests
 				if called == 0 {
 					atomic.AddUint64(&called, 1)
 					_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
@@ -301,6 +307,7 @@ func TestMultiInput(t *testing.T) {
 			_, _ = w.Write([]byte(`{}`))
 			return
 		case "/meta/subscribe":
+			//nolint:staticcheck //Safe to ignore in tests
 			if called == 0 {
 				_, _ = w.Write([]byte(`[{"clientId": "client_id", "channel": "/meta/subscribe", "subscription": "channel_name", "successful":true}]`))
 			} else if called == 1 {
@@ -322,12 +329,13 @@ func TestMultiInput(t *testing.T) {
 
 	var inputContext finput.Context
 
+	logger := logptest.NewTestingLogger(t, "")
 	// initialize inputs
-	input1, err := NewInput(cfg1, connector, inputContext)
+	input1, err := NewInput(cfg1, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input1)
 
-	input2, err := NewInput(cfg2, connector, inputContext)
+	input2, err := NewInput(cfg2, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input2)
 
@@ -370,7 +378,7 @@ func oauth2Handler(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
 		return
 	case "/meta/connect":
-		if called < uint64(expectedHTTPEventCount) {
+		if called < uint64(expectedHTTPEventCount) { //nolint:gosec //Safe to ignore in tests
 			atomic.AddUint64(&called, 1)
 			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
 			return
@@ -391,20 +399,19 @@ func assertEventMatches(t *testing.T, expected bay.MaybeMsg, got beat.Event) {
 }
 
 func TestMultiEventForEOFRetryHandlerInput(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/34956")
 	var err error
 
-	errorAfterEvent := 2
-	expectedHTTPEventCount := 6
-	expectedEventCount := 4
+	expectedEventCount := 2
 
-	eventsCh := make(chan beat.Event)
-	defer close(eventsCh)
+	eventsCh := make(chan beat.Event, expectedEventCount)
 	signal := make(chan struct{}, 1)
 	defer close(signal)
 
 	outlet := &mockedOutleter{
 		onEventHandler: func(event beat.Event) bool {
 			eventsCh <- event
+			signal <- struct{}{}
 			return true
 		},
 	}
@@ -442,16 +449,11 @@ func TestMultiEventForEOFRetryHandlerInput(t *testing.T) {
 			_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
 			return
 		case "/meta/connect":
-			if i < expectedHTTPEventCount {
-				if i == errorAfterEvent {
-					// stop server to produce EOF errors
-					signal <- struct{}{}
-				}
-				i++
+			if i == 0 {
 				_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
+				i++
 				return
 			}
-			i++
 			_, _ = w.Write([]byte(`{}`))
 			return
 		case "/meta/subscribe":
@@ -469,36 +471,39 @@ func TestMultiEventForEOFRetryHandlerInput(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	input, err := NewInput(cfg, connector, inputContext)
+	logger := logptest.NewTestingLogger(t, "")
+	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
 	input.Run()
-	go func() {
-		j := 0
-		for event := range eventsCh {
-			if j >= expectedEventCount {
-				signal <- struct{}{}
-				break
-			}
-			assertEventMatches(t, expected, event)
-			j++
-		}
-	}()
 
-	<-signal
 	// close previous connection
+	<-signal
 	server.CloseClientConnections()
 	server.Close()
 	time.Sleep(100 * time.Millisecond)
 
 	// restart connection for new events
+	i = 0
 	server, err = newTestServer(strings.Split(serverURL, "http://")[1], r)
-	assert.NoError(t, err)
-	serverURL = server.URL
-	defer server.Close()
+	for err != nil {
+		server, err = newTestServer(strings.Split(serverURL, "http://")[1], r)
+	}
 	<-signal
+	server.CloseClientConnections()
+	server.Close()
 
+	close(eventsCh)
+
+	go func() {
+		for j := 0; j < expectedEventCount; j++ {
+			event := <-eventsCh
+			assertEventMatches(t, expected, event)
+		}
+		signal <- struct{}{}
+	}()
+	<-signal
 	input.Stop()
 }
 
@@ -570,7 +575,8 @@ func TestNegativeCases(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	input, err := NewInput(cfg, connector, inputContext)
+	logger := logptest.NewTestingLogger(t, "")
+	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 

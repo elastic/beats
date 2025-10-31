@@ -5,6 +5,7 @@
 package module
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -18,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pmezard/go-difflib/difflib"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
@@ -28,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/winlogbeat/module"
 	"github.com/elastic/beats/v7/x-pack/winlogbeat/module/wintest"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
@@ -50,7 +52,7 @@ func WithFieldFilter(filter []string) Option {
 }
 
 // TestIngestPipeline tests the partial pipeline by reading events from the .json files
-// and processing them the ingest pipeline. Then it compares the results against
+// and processing them through the ingest pipeline. Then it compares the results against
 // a saved golden file. Use -update to regenerate the golden files.
 func TestIngestPipeline(t *testing.T, pipeline, json string, opts ...Option) {
 	var p params
@@ -99,13 +101,15 @@ func testIngestPipeline(t *testing.T, pipeline, pattern string, p *params) {
 		Password:         pass,
 		CompressionLevel: 3,
 		Transport:        httpcommon.HTTPTransportSettings{Timeout: time.Minute},
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("unexpected error making connection: %v", err)
 	}
 	defer conn.Close()
 
-	err = conn.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	err = conn.Connect(ctx)
 	if err != nil {
 		t.Fatalf("unexpected error making connection: %v", err)
 	}
@@ -151,7 +155,6 @@ func testIngestPipeline(t *testing.T, pipeline, pattern string, p *params) {
 			}
 
 			var events []mapstr.M
-			//nolint:errcheck // All the errors returned here are from mapstr.M queries and may be ignored.
 			for i, p := range k.Processed {
 				err = wintest.ErrorMessage(p)
 				if err != nil {
@@ -215,14 +218,8 @@ func assertEqual(t testing.TB, expected, actual interface{}) bool {
 	expJSON, _ := json.MarshalIndent(expected, "", "  ")
 	actJSON, _ := json.MarshalIndent(actual, "", "  ")
 
-	diff, _ := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
-		A:        difflib.SplitLines(string(expJSON)),
-		B:        difflib.SplitLines(string(actJSON)),
-		FromFile: "Expected",
-		ToFile:   "Actual",
-		Context:  1,
-	})
-	t.Errorf("Expected and actual are different:\n%s", diff)
+	t.Errorf("Expected and actual are different:\n%s",
+		cmp.Diff(string(expJSON), string(actJSON)))
 	return false
 }
 
@@ -278,7 +275,7 @@ func normalize(t testing.TB, m mapstr.M) mapstr.M {
 
 func filterEvent(m mapstr.M, ignores []string) mapstr.M {
 	for _, f := range ignores {
-		m.Delete(f) //nolint:errcheck // Deleting a thing that doesn't exist is ok.
+		m.Delete(f)
 	}
 	return m
 }
@@ -295,7 +292,7 @@ func lowercaseGUIDs(m mapstr.M) mapstr.M {
 			continue
 		}
 		if uppercaseGUIDRegex.MatchString(str) {
-			m.Put(k, strings.ToLower(str)) //nolint:errcheck // Can't fail because k has been obtained from m.
+			m.Put(k, strings.ToLower(str))
 		}
 	}
 	return m

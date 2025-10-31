@@ -9,11 +9,20 @@ metadata:
 data:
   filebeat.yml: |-
     filebeat.inputs:
-    - type: container
+    - type: filestream
+      id: kubernetes-container-logs
       paths:
         - /var/log/containers/*.log
+      parsers:
+        - container: ~
+      prospector:
+        scanner:
+          fingerprint.enabled: true
+          symlinks: true
+      file_identity.fingerprint: ~
       processors:
         - add_kubernetes_metadata:
+            #use_kubeadm: true
             host: ${NODE_NAME}
             matchers:
             - logs_path:
@@ -25,10 +34,19 @@ data:
     #    - type: kubernetes
     #      node: ${NODE_NAME}
     #      hints.enabled: true
+    #      #use_kubeadm: true
     #      hints.default_config:
-    #        type: container
+    #        type: filestream
+    #        id: kubernetes-container-logs-${data.kubernetes.pod.name}-${data.kubernetes.container.id}
     #        paths:
-    #          - /var/log/containers/*${data.kubernetes.container.id}.log
+    #        - /var/log/containers/*-${data.kubernetes.container.id}.log
+    #        parsers:
+    #        - container: ~
+    #        prospector:
+    #         scanner:
+    #           fingerprint.enabled: true
+    #           symlinks: true
+    #        file_identity.fingerprint: ~
 
     processors:
       - add_cloud_metadata:
@@ -64,12 +82,12 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: filebeat
-        image: docker.elastic.co/beats/filebeat:8.0.0-SNAPSHOT
+        image: docker.elastic.co/beats/filebeat:8.16.0-SNAPSHOT
         command: [ "sleep" ]
         args: [ "infinity" ]
         env:
         - name: ELASTICSEARCH_HOST
-          value: elasticsearch.default.svc.cluster.local
+          value: elasticsearch
         - name: ELASTICSEARCH_PORT
           value: "9200"
         - name: ELASTICSEARCH_USERNAME

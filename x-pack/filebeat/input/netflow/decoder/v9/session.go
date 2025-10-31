@@ -5,12 +5,14 @@
 package v9
 
 import (
-	"log"
 	"net"
 	"sync"
+	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/atomic"
+	"github.com/elastic/elastic-agent-libs/logp"
+
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
 )
 
@@ -22,7 +24,11 @@ type SessionKey struct {
 }
 
 // MakeSessionKey returns a session key.
-func MakeSessionKey(addr net.Addr, sourceID uint32) SessionKey {
+func MakeSessionKey(addr net.Addr, sourceID uint32, shared bool) SessionKey {
+	if shared {
+		// If templates are shared, do not store the addr.
+		return SessionKey{SourceID: sourceID}
+	}
 	return SessionKey{addr.String(), sourceID}
 }
 
@@ -40,12 +46,12 @@ type SessionState struct {
 	mutex        sync.RWMutex
 	Templates    map[TemplateKey]*TemplateWrapper
 	lastSequence uint32
-	logger       *log.Logger
+	logger       *logp.Logger
 	Delete       atomic.Bool
 }
 
 // NewSession creates a new session.
-func NewSession(logger *log.Logger) *SessionState {
+func NewSession(logger *logp.Logger) *SessionState {
 	return &SessionState{
 		logger:    logger,
 		Templates: make(map[TemplateKey]*TemplateWrapper),
@@ -54,7 +60,7 @@ func NewSession(logger *log.Logger) *SessionState {
 
 // AddTemplate adds the passed template.
 func (s *SessionState) AddTemplate(t *template.Template) {
-	s.logger.Printf("state %p addTemplate %d %p", s, t.ID, t)
+	s.logger.Debugf("state %p addTemplate %d %p", s, t.ID, t)
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	s.Templates[TemplateKey(t.ID)] = &TemplateWrapper{Template: t}
@@ -78,7 +84,7 @@ func (s *SessionState) ExpireTemplates() (alive int, removed int) {
 	var toDelete []TemplateKey
 	s.mutex.RLock()
 	for id, template := range s.Templates {
-		if !template.Delete.CAS(false, true) {
+		if !template.Delete.CompareAndSwap(false, true) {
 			toDelete = append(toDelete, id)
 		}
 	}
@@ -89,7 +95,7 @@ func (s *SessionState) ExpireTemplates() (alive int, removed int) {
 		total = len(s.Templates)
 		for _, id := range toDelete {
 			if template, found := s.Templates[id]; found && template.Delete.Load() {
-				s.logger.Printf("expired template %v", id)
+				s.logger.Debugf("expired template %v", id)
 				delete(s.Templates, id)
 				removed++
 			}
@@ -109,7 +115,7 @@ func (s *SessionState) CheckReset(seqNum uint32) (prev uint32, reset bool) {
 		s.Templates = make(map[TemplateKey]*TemplateWrapper)
 	}
 	s.lastSequence = seqNum
-	return
+	return prev, reset
 }
 
 func isValidSequence(current, next uint32) bool {
@@ -120,15 +126,33 @@ func isValidSequence(current, next uint32) bool {
 type SessionMap struct {
 	mutex    sync.RWMutex
 	Sessions map[SessionKey]*SessionState
-	logger   *log.Logger
+	logger   *logp.Logger
+	metric   config.ActiveSessionsMetric
 }
 
 // NewSessionMap returns a new SessionMap.
-func NewSessionMap(logger *log.Logger) SessionMap {
+func NewSessionMap(logger *logp.Logger, metric config.ActiveSessionsMetric) SessionMap {
 	return SessionMap{
 		logger:   logger,
 		Sessions: make(map[SessionKey]*SessionState),
+		metric:   metric,
 	}
+}
+
+func (m *SessionMap) decreaseActiveSessions() {
+	if m.metric == nil {
+		return
+	}
+
+	m.metric.Dec()
+}
+
+func (m *SessionMap) increaseActiveSessions() {
+	if m.metric == nil {
+		return
+	}
+
+	m.metric.Inc()
 }
 
 // GetOrCreate looks up the given session key and returns an existing session
@@ -145,6 +169,7 @@ func (m *SessionMap) GetOrCreate(key SessionKey) *SessionState {
 		if session, found = m.Sessions[key]; !found {
 			session = NewSession(m.logger)
 			m.Sessions[key] = session
+			m.increaseActiveSessions()
 		}
 		m.mutex.Unlock()
 	}
@@ -159,7 +184,7 @@ func (m *SessionMap) cleanup() (aliveSession int, removedSession int, aliveTempl
 		a, r := session.ExpireTemplates()
 		aliveTemplates += a
 		removedTemplates += r
-		if !session.Delete.CAS(false, true) {
+		if !session.Delete.CompareAndSwap(false, true) {
 			toDelete = append(toDelete, key)
 		}
 	}
@@ -171,6 +196,7 @@ func (m *SessionMap) cleanup() (aliveSession int, removedSession int, aliveTempl
 			if session, found := m.Sessions[key]; found && session.Delete.Load() {
 				delete(m.Sessions, key)
 				removedSession++
+				m.decreaseActiveSessions()
 			}
 		}
 		m.mutex.Unlock()
@@ -191,7 +217,7 @@ func (m *SessionMap) CleanupLoop(interval time.Duration, done <-chan struct{}) {
 		case <-t.C:
 			aliveS, removedS, aliveT, removedT := m.cleanup()
 			if removedS > 0 || removedT > 0 {
-				m.logger.Printf("Expired %d sessions (%d remain) / %d templates (%d remain)", removedS, aliveS, removedT, aliveT)
+				m.logger.Debugf("Expired %d sessions (%d remain) / %d templates (%d remain)", removedS, aliveS, removedT, aliveT)
 			}
 		}
 	}

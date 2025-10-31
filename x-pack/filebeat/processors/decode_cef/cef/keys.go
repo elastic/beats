@@ -90,11 +90,11 @@ var extensionMapping = map[string]mappedField{
 	},
 	"in": {
 		Target: "bytesIn",
-		Type:   IntegerType,
+		Type:   LongType,
 	},
 	"out": {
 		Target: "bytesOut",
-		Type:   IntegerType,
+		Type:   LongType,
 	},
 	"customerExternalID": {
 		Target: "customerExternalID",

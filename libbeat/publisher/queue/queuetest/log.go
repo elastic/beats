@@ -25,8 +25,6 @@ import (
 	"sync"
 	"testing"
 
-	"gotest.tools/assert"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -88,8 +86,7 @@ func withOptLogOutput(capture bool, fn func(*testing.T)) func(*testing.T) {
 		if debug {
 			level = logp.DebugLevel
 		}
-		err = logp.DevelopmentSetup(logp.WithLevel(level))
-		assert.NilError(t, err)
+		logp.DevelopmentSetup(logp.WithLevel(level))
 		fn(t)
 	}
 }

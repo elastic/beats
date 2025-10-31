@@ -24,8 +24,9 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/useragent"
@@ -66,9 +67,12 @@ func (t *valueTpl) Unpack(in string) error {
 			"hmacBase64":          hmacStringBase64,
 			"join":                join,
 			"toJSON":              toJSON,
+			"max":                 max,
+			"min":                 min,
 			"mul":                 mul,
 			"now":                 now,
 			"parseDate":           parseDate,
+			"parseDateInTZ":       parseDateInTZ,
 			"parseDuration":       parseDuration,
 			"parseTimestamp":      parseTimestamp,
 			"parseTimestampMilli": parseTimestampMilli,
@@ -79,6 +83,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"urlEncode":           urlEncode,
 			"userAgent":           userAgentString,
 			"uuid":                uuidString,
+			"terminate":           func(s string) (any, error) { return nil, &errTerminate{s} },
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -91,21 +96,37 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
-func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
+type errTerminate struct {
+	Reason string
+}
+
+func (e *errTerminate) Error() string {
+	if e.Reason != "" {
+		return "terminated template: " + e.Reason
+	}
+	return "terminated template"
+}
+
+func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, stat status.StatusReporter, log *logp.Logger) (val string, err error) {
 	fallback := func(err error) (string, error) {
 		if defaultVal != nil {
-			log.Debugf("template execution: falling back to default value")
-			return defaultVal.Execute(emptyTransformContext(), transformable{}, targetName, nil, log)
+			log.Debugw("template execution: falling back to default value", "target", targetName)
+			return defaultVal.Execute(emptyTransformContext(), transformable{}, targetName, nil, stat, log)
 		}
 		return "", err
 	}
 
 	defer func() {
 		if r := recover(); r != nil {
+			// Let's make this slightly less awful than it currently is.
+			log.Debugw("panicked in template", "target", targetName, "error", r)
 			val, err = fallback(errExecutingTemplate)
 		}
 		if err != nil {
-			log.Debugf("template execution failed: %v", err)
+			if _, ignoreEmpty := stat.(ignoreEmptyValueReporter); !ignoreEmpty || !errors.Is(err, errEmptyTemplateResult) {
+				stat.UpdateStatus(status.Degraded, fmt.Sprintf("failed to execute template %s: %v", targetName, err))
+			}
+			log.Debugw("template execution failed", "target", targetName, "error", err)
 		}
 		tryDebugTemplateValue(targetName, val, log)
 	}()
@@ -125,6 +146,11 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName
 	}
 
 	if err := t.Template.Execute(buf, data); err != nil {
+		var termErr *errTerminate
+		if errors.As(err, &termErr) {
+			log.Debugw("template execution terminated", "target", targetName, "reason", termErr.Reason)
+			return "", nil
+		}
 		return fallback(err)
 	}
 
@@ -140,7 +166,7 @@ func tryDebugTemplateValue(target, val string, log *logp.Logger) {
 	case "Authorization", "Proxy-Authorization":
 		// ignore filtered headers
 	default:
-		log.Debugf("template execution: evaluated template %q", val)
+		log.Debugw("evaluated template", "target", target, "value", val)
 	}
 }
 
@@ -190,6 +216,58 @@ func parseDate(date string, layout ...string) time.Time {
 	}
 
 	return t.UTC()
+}
+
+// parseDateInTZ parses a date string within a specified timezone, returning a time.Time
+// 'tz' is the timezone (offset or IANA name) for parsing
+func parseDateInTZ(date string, tz string, layout ...string) time.Time {
+	var ly string
+	if len(layout) == 0 {
+		ly = defaultTimeLayout
+	} else {
+		ly = layout[0]
+	}
+	if found := predefinedLayouts[ly]; found != "" {
+		ly = found
+	}
+
+	var loc *time.Location
+	// Attempt to parse timezone as offset in various formats
+	for _, format := range []string{"-07", "-0700", "-07:00"} {
+		t, err := time.Parse(format, tz)
+		if err != nil {
+			continue
+		}
+		name, offset := t.Zone()
+		loc = time.FixedZone(name, offset)
+		break
+	}
+
+	// If parsing tz as offset fails, try loading location by name
+	if loc == nil {
+		var err error
+		loc, err = time.LoadLocation(tz)
+		if err != nil {
+			loc = time.UTC // Default to UTC on error
+		}
+	}
+
+	// Using Parse allows us not to worry about the timezone
+	// as the predefined timezone is applied afterwards
+	t, err := time.Parse(ly, date)
+	if err != nil {
+		return time.Time{}
+	}
+
+	// Manually create a new time object with the parsed date components and the desired location
+	// It allows interpreting the parsed time in the specified timezone
+	year, month, day := t.Date()
+	hour, min, sec := t.Clock()
+	nanosec := t.Nanosecond()
+	localTime := time.Date(year, month, day, hour, min, sec, nanosec, loc)
+
+	// Convert the time to UTC to standardize the output
+	return localTime.UTC()
 }
 
 func formatDate(date time.Time, layouttz ...string) string {
@@ -293,6 +371,32 @@ func mul(a, b int64) int64 {
 
 func div(a, b int64) int64 {
 	return a / b
+}
+
+func min(arg1, arg2 reflect.Value) (interface{}, error) {
+	lessThan, err := lt(arg1, arg2)
+	if err != nil {
+		return nil, err
+	}
+
+	// arg1 is < arg2.
+	if lessThan {
+		return arg1.Interface(), nil
+	}
+	return arg2.Interface(), nil
+}
+
+func max(arg1, arg2 reflect.Value) (interface{}, error) {
+	lessThan, err := lt(arg1, arg2)
+	if err != nil {
+		return nil, err
+	}
+
+	// arg1 is < arg2.
+	if lessThan {
+		return arg2.Interface(), nil
+	}
+	return arg1.Interface(), nil
 }
 
 func base64Encode(values ...string) string {
@@ -402,7 +506,7 @@ func hexDecode(enc string) string {
 }
 
 func uuidString() string {
-	uuid, err := uuid.NewRandom()
+	uuid, err := uuid.NewV4()
 	if err != nil {
 		return ""
 	}

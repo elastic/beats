@@ -4,7 +4,6 @@
 
 // skipping tests on windows 32 bit versions, not supported
 //go:build !integration && !windows && !386
-// +build !integration,!windows,!386
 
 package proxy
 
@@ -24,7 +23,7 @@ import (
 func init() {
 	// To be moved to some kind of helper
 	os.Setenv("BEAT_STRICT_PERMS", "false")
-	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
+	mb.Registry.SetSecondarySource(mb.NewLightModulesSource(logp.NewNopLogger(), "../../../module"))
 }
 
 func TestEventMapping(t *testing.T) {

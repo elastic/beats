@@ -69,6 +69,16 @@
                 "time": {
                     "us": 0
                 }
+            },
+            "stats": {
+                "totalSize": 8192,
+                "max": 5000,
+                "nindexes": 1,
+                "size": 36,
+                "count": 1,
+                "avgObjSize": 36,
+                "storageSize": 4096,
+                "totalIndexSize": 4096
             }
         }
     },

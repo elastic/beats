@@ -16,16 +16,15 @@
 // under the License.
 
 //go:build !windows
-// +build !windows
 
 package socket
 
 import (
+	"errors"
 	"os"
 	"strconv"
 	"strings"
 
-	"github.com/joeshaw/multierror"
 	"github.com/prometheus/procfs"
 )
 
@@ -67,7 +66,7 @@ func NewProcTable(mountpoint string) (*ProcTable, error) {
 	}
 
 	p := &ProcTable{fs: fs, privileged: privileged}
-	p.Refresh()
+	_ = p.Refresh()
 	return p, nil
 }
 
@@ -87,10 +86,11 @@ func (t *ProcTable) Refresh() error {
 		return err
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	inodes := map[uint32]*Proc{}
 	cachedProcs := make(map[int]*Proc, len(procs))
-	for _, p := range procs {
+	for _, pi := range procs {
+		p := pi
 		proc := t.procs[p.PID]
 
 		// Cache miss.
@@ -125,7 +125,7 @@ func (t *ProcTable) Refresh() error {
 
 	t.procs = cachedProcs
 	t.inodes = inodes
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func (t *ProcTable) accessibleProcs() ([]procfs.Proc, error) {
@@ -139,7 +139,7 @@ func (t *ProcTable) accessibleProcs() ([]procfs.Proc, error) {
 
 	// Filter out not owned processes
 	k := 0
-	euid := uint32(os.Geteuid())
+	euid := uint64(os.Geteuid())
 	for i := 0; i < len(procs); i++ {
 		p, err := t.fs.Proc(procs[i].PID)
 		if err != nil {
@@ -149,11 +149,8 @@ func (t *ProcTable) accessibleProcs() ([]procfs.Proc, error) {
 		if err != nil {
 			continue
 		}
-		currentEUID, err := strconv.Atoi(status.UIDs[1])
-		if err != nil {
-			continue
-		}
-		if uint32(currentEUID) != euid {
+		currentEUID := status.UIDs[1]
+		if currentEUID != euid {
 			continue
 		}
 		procs[k] = procs[i]

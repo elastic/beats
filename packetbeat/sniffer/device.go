@@ -34,10 +34,10 @@ import (
 
 var deviceAnySupported = runtime.GOOS == "linux"
 
-// ListDevicesNames returns the list of adapters available for sniffing on
-// this computer. If the withDescription parameter is set to true, a human
-// readable version of the adapter name is added. If the withIP parameter
-// is set to true, IP address of the adapter is added.
+// ListDeviceNames returns the list of adapters available for sniffing on this
+// computer. If the withDescription parameter is set to true, a human-readable
+// version of the adapter name is added. If the withIP parameter is set to
+// true, IP address of the adapter is added.
 func ListDeviceNames(withDescription, withIP bool) ([]string, error) {
 	devices, err := pcap.FindAllDevs()
 	if err != nil {
@@ -148,7 +148,7 @@ func resolveDeviceName(name string) (string, error) {
 		return "", fmt.Errorf("invalid device index %d: %w", index, err)
 	}
 
-	logp.Info("Resolved device index %d to device: %s", index, name)
+	logp.L().Named("sniffer").Info("Resolved device index %d to device: %s", index, name)
 	return name, nil
 }
 

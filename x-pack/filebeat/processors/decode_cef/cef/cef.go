@@ -152,6 +152,13 @@ func (e *Event) Unpack(data string, opts ...Option) error {
 
 		// Mark the data type and do the actual conversion.
 		field.Type = mapping.Type
+
+		if settings.removeEmptyValues && field.String == "" {
+			// Drop the key because the value is empty field.
+			delete(e.Extensions, key)
+			continue
+		}
+
 		field.Interface, err = toType(field.String, mapping.Type, &settings)
 		if err != nil {
 			// Drop the key because the field value is invalid.

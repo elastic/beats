@@ -24,8 +24,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -57,7 +58,7 @@ func (u decodeDuration) Run(event *beat.Event) (*beat.Event, error) {
 	}
 	d, err := time.ParseDuration(durationString)
 	if err != nil {
-		return event, nil
+		return event, fmt.Errorf("couldn't parse field '%s' as duration: %w", fieldName, err)
 	}
 	switch u.config.Format {
 	case "milliseconds":
@@ -82,7 +83,7 @@ func (u decodeDuration) String() string {
 	return "decode_duration"
 }
 
-func NewDecodeDuration(c *config.C) (processors.Processor, error) {
+func NewDecodeDuration(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	fc := decodeDurationConfig{}
 	err := c.Unpack(&fc)
 	if err != nil {

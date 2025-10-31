@@ -19,13 +19,13 @@ package jolokia
 
 import (
 	"encoding/json"
+	"fmt"
 	"net"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
+	"github.com/gofrs/uuid/v5"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -123,9 +123,8 @@ func (d *Discovery) Start() {
 	d.instances = make(map[string]*Instance)
 	d.events = make(chan Event)
 	d.stop = make(chan struct{})
-	if d.log == nil {
-		d.log = logp.NewLogger("jolokia")
-	}
+	d.log = d.log.Named("jolokia")
+
 	go d.run()
 }
 
@@ -187,7 +186,7 @@ func matchInterfaceName(name, candidate string) bool {
 func getIPv4Addr(i net.Interface) (net.IP, error) {
 	addrs, err := i.Addrs()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get addresses for "+i.Name)
+		return nil, fmt.Errorf("failed to get addresses for "+i.Name+": %w", err)
 	}
 	for _, a := range addrs {
 		if ip, _, err := net.ParseCIDR(a.String()); err == nil && ip != nil {
@@ -238,7 +237,9 @@ func (d *Discovery) sendProbe(config InterfaceConfig) {
 			if timeout > config.Interval {
 				timeout = config.Interval
 			}
-			conn.SetDeadline(time.Now().Add(timeout))
+			if err := conn.SetDeadline(time.Now().Add(timeout)); err != nil {
+				log.Error(err.Error())
+			}
 
 			if _, err := conn.WriteTo(queryMessage, &discoveryAddress); err != nil {
 				log.Error(err.Error())
@@ -249,6 +250,7 @@ func (d *Discovery) sendProbe(config InterfaceConfig) {
 			for {
 				n, _, err := conn.ReadFrom(b)
 				if err != nil {
+					//nolint:errorlint // false positive
 					if netErr, ok := err.(net.Error); !ok || !netErr.Timeout() {
 						log.Error(err.Error())
 					}

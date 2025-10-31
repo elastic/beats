@@ -20,8 +20,6 @@ package config
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -44,11 +42,12 @@ type config struct {
 type configAppender struct {
 	condition conditions.Condition
 	config    mapstr.M
+	logger    *logp.Logger
 }
 
 // NewConfigAppender creates a configAppender that can append templatized configs into built configs
-func NewConfigAppender(cfg *conf.C) (autodiscover.Appender, error) {
-	cfgwarn.Beta("The config appender is beta")
+func NewConfigAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender, error) {
+	logger.Warn(cfgwarn.Beta("The config appender is beta"))
 
 	config := config{}
 	err := cfg.Unpack(&config)
@@ -59,9 +58,9 @@ func NewConfigAppender(cfg *conf.C) (autodiscover.Appender, error) {
 	var cond conditions.Condition
 
 	if config.ConditionConfig != nil {
-		cond, err = conditions.NewCondition(config.ConditionConfig)
+		cond, err = conditions.NewCondition(config.ConditionConfig, logger)
 		if err != nil {
-			return nil, errors.Wrap(err, "unable to create condition due to error")
+			return nil, fmt.Errorf("unable to create condition due to error: %w", err)
 		}
 	}
 
@@ -69,10 +68,10 @@ func NewConfigAppender(cfg *conf.C) (autodiscover.Appender, error) {
 	cf := mapstr.M{}
 	err = config.Config.Unpack(&cf)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to unpack config due to error")
+		return nil, fmt.Errorf("unable to unpack config due to error: %w", err)
 	}
 
-	return &configAppender{condition: cond, config: cf}, nil
+	return &configAppender{condition: cond, config: cf, logger: logger}, nil
 }
 
 // Append adds configuration into configs built by builds/templates. It applies conditions to filter out
@@ -95,17 +94,17 @@ func (c *configAppender) Append(event bus.Event) {
 			cf := mapstr.M{}
 			err := cfg.Unpack(&cf)
 			if err != nil {
-				logp.Debug("config", "unable to unpack config due to error: %v", err)
+				c.logger.Named("config").Debugf("unable to unpack config due to error: %v", err)
 				continue
 			}
 			err = cfg.Merge(&c.config)
 			if err != nil {
-				logp.Debug("config", "unable to merge configs due to error: %v", err)
+				c.logger.Named("config").Debugf("unable to merge configs due to error: %v", err)
 			}
 		}
 
 		// Apply the template
-		template.ApplyConfigTemplate(event, cfgs)
+		template.ApplyConfigTemplate(event, cfgs, c.logger)
 	}
 
 	// Replace old config with newly appended configs

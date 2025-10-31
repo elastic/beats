@@ -6,6 +6,7 @@ package awss3
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -13,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -29,7 +29,7 @@ type script struct {
 
 // newScriptFromConfig constructs a new Javascript script from the given config
 // object. It loads the sources, compiles them, and validates the entry point.
-func newScriptFromConfig(log *logp.Logger, c *scriptConfig) (*script, error) {
+func newScriptFromConfig(log *logp.Logger, c *scriptConfig, p *paths.Path) (*script, error) {
 	if c == nil {
 		return nil, nil
 	}
@@ -46,9 +46,9 @@ func newScriptFromConfig(log *logp.Logger, c *scriptConfig) (*script, error) {
 		sourceFile = "inline.js"
 		sourceCode = []byte(c.Source)
 	case c.File != "":
-		sourceFile, sourceCode, err = loadSources(c.File)
+		sourceFile, sourceCode, err = loadSources(p, c.File)
 	case len(c.Files) > 0:
-		sourceFile, sourceCode, err = loadSources(c.Files...)
+		sourceFile, sourceCode, err = loadSources(p, c.Files...)
 	}
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func newScriptFromConfig(log *logp.Logger, c *scriptConfig) (*script, error) {
 		return nil, err
 	}
 
-	pool, err := newSessionPool(prog, *c)
+	pool, err := newSessionPool(prog, *c, log)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func newScriptFromConfig(log *logp.Logger, c *scriptConfig) (*script, error) {
 }
 
 // loadSources loads javascript source from files.
-func loadSources(files ...string) (string, []byte, error) {
+func loadSources(p *paths.Path, files ...string) (string, []byte, error) {
 	var sources []string
 	buf := new(bytes.Buffer)
 
@@ -87,18 +87,18 @@ func loadSources(files ...string) (string, []byte, error) {
 
 		f, err := os.Open(path)
 		if err != nil {
-			return errors.Wrapf(err, "failed to open file %v", path)
+			return fmt.Errorf("failed to open file %v: %w", path, err)
 		}
 		defer f.Close()
 
 		if _, err = io.Copy(buf, f); err != nil {
-			return errors.Wrapf(err, "failed to read file %v", path)
+			return fmt.Errorf("failed to read file %v: %w", path, err)
 		}
 		return nil
 	}
 
 	for _, filePath := range files {
-		filePath = paths.Resolve(paths.Config, filePath)
+		filePath = p.Resolve(paths.Config, filePath)
 
 		if hasMeta(filePath) {
 			matches, err := filepath.Glob(filePath)
@@ -112,7 +112,7 @@ func loadSources(files ...string) (string, []byte, error) {
 	}
 
 	if len(sources) == 0 {
-		return "", nil, errors.Errorf("no sources were found in %v",
+		return "", nil, fmt.Errorf("no sources were found in %v",
 			strings.Join(files, ", "))
 	}
 

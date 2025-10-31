@@ -396,7 +396,11 @@
         "log.offset": 1582,
         "message": "Server socket created on IP: '::'.",
         "mysql.thread_id": 0,
-        "service.type": "mysql"
+        "related.ip": [
+            "::"
+        ],
+        "service.type": "mysql",
+        "source.ip": "::"
     },
     {
         "@timestamp": "2019-10-16T17:24:15.000-02:00",
@@ -556,13 +560,72 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.flags": [
-            "multiline"
-        ],
         "log.level": "Note",
         "log.offset": 2317,
-        "message": "Event Scheduler: [root@localhost][test.test_error_log] At line 1 in test.test_error_log\n",
+        "message": "Event Scheduler: [root@localhost][test.test_error_log] At line 1 in test.test_error_log",
         "mysql.thread_id": 12,
         "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2023-03-02T17:00:06.000-02:00",
+        "event.action": [
+            "logon-failed"
+        ],
+        "event.category": [
+            "authentication",
+            "database"
+        ],
+        "event.dataset": "mysql.error",
+        "event.kind": "event",
+        "event.module": "mysql",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "Warning",
+        "log.offset": 2435,
+        "message": "Access denied for user 'sherlock'@'localhost' (using password: NO)",
+        "mysql.thread_id": 200,
+        "related.user": [
+            "sherlock"
+        ],
+        "service.type": "mysql",
+        "user.name": "sherlock"
+    },
+    {
+        "@timestamp": "2023-03-02T17:00:06.000-02:00",
+        "event.action": [
+            "logon-failed"
+        ],
+        "event.category": [
+            "authentication",
+            "database"
+        ],
+        "event.dataset": "mysql.error",
+        "event.kind": "event",
+        "event.module": "mysql",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "Warning",
+        "log.offset": 2536,
+        "message": "Access denied for user 'sherlock'@'10.10.10.10' (using password: NO)",
+        "mysql.thread_id": 200,
+        "related.ip": [
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "sherlock"
+        ],
+        "service.type": "mysql",
+        "source.ip": "10.10.10.10",
+        "user.name": "sherlock"
     }
 ]

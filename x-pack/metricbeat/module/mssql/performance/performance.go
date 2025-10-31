@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package performance
 
 import (
@@ -45,7 +47,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger("mssql.performance").With("host", base.HostData().SanitizedURI)
+	logger := base.Logger().Named("mssql.performance").With("host", base.HostData().SanitizedURI)
 
 	db, err := mssql.NewConnection(base.HostData().URI)
 	if err != nil {
@@ -65,6 +67,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	var err error
 	var rows *sql.Rows
+	var bufferCacheHitRatioValue, bufferCacheHitRatioBaseValue int64
+	bufferCacheHitRatio := "Buffer cache hit ratio"
+	bufferCacheHitRatioBase := "Buffer cache hit ratio base"
 	rows, err = m.db.Query(`SELECT object_name,
        counter_name,
        instance_name,
@@ -78,15 +83,16 @@ WHERE  counter_name = 'SQL Compilations/sec'
         OR counter_name = 'Batch Requests/sec'
         OR ( counter_name = 'Lock Waits/sec'
              AND instance_name = '_Total' )
-        OR ( counter_name IN ( 'Page life expectancy', 
-                  'Buffer cache hit ratio', 
-                  'Target pages', 'Database pages', 
+        OR ( counter_name IN ( 'Page life expectancy',
+                  'Buffer cache hit ratio',
+	          'Buffer cache hit ratio base',
+                  'Target pages', 'Database pages',
                   'Checkpoint pages/sec' )
              AND object_name LIKE '%:Buffer Manager%' )
-        OR ( counter_name IN ( 'Transactions', 
-                  'Logins/sec', 
-                  'Logouts/sec', 
-                  'Connection Reset/sec', 
+        OR ( counter_name IN ( 'Transactions',
+                  'Logins/sec',
+                  'Logouts/sec',
+                  'Connection Reset/sec',
                   'Active Temp Tables' )
              AND object_name LIKE '%:General Statistics%' )`)
 	if err != nil {
@@ -112,11 +118,18 @@ WHERE  counter_name = 'SQL Compilations/sec'
 		row.instanceName = strings.TrimSpace(row.instanceName)
 		row.objectName = strings.TrimSpace(row.objectName)
 
-		if row.counterName == "Buffer cache hit ratio" {
-			mapStr[row.counterName] = fmt.Sprintf("%v", float64(*row.counterValue)/100)
-		} else {
+		switch row.counterName {
+		case bufferCacheHitRatio:
+			bufferCacheHitRatioValue = *row.counterValue
+		case bufferCacheHitRatioBase:
+			bufferCacheHitRatioBaseValue = *row.counterValue
+		default:
 			mapStr[row.counterName] = fmt.Sprintf("%v", *row.counterValue)
 		}
+	}
+
+	if bufferCacheHitRatioBaseValue != 0 {
+		mapStr[bufferCacheHitRatio] = fmt.Sprintf("%f", float64(bufferCacheHitRatioValue)/float64(bufferCacheHitRatioBaseValue))
 	}
 
 	res, err := schema.Apply(mapStr)

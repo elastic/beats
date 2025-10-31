@@ -19,47 +19,55 @@ package api
 
 import (
 	"context"
+	"encoding/base64"
 	"io"
+	"math/rand/v2"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/goleak"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestConfiguration(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	if runtime.GOOS != "windows" {
 		t.Skip("Check for User and Security Descriptor")
 		return
 	}
 	t.Run("when user is set", func(t *testing.T) {
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]any{
 			"host": "unix:///tmp/ok",
 			"user": "admin",
 		})
 
-		_, err := New(nil, cfg)
+		_, err := New(logger, cfg)
 		require.Error(t, err)
 	})
 
 	t.Run("when security descriptor is set", func(t *testing.T) {
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]any{
 			"host":                "unix:///tmp/ok",
 			"security_descriptor": "D:P(A;;GA;;;1234)",
 		})
 
-		_, err := New(nil, cfg)
+		_, err := New(logger, cfg)
 		require.Error(t, err)
 	})
 }
 
 func TestSocket(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
 	if runtime.GOOS == "windows" {
 		t.Skip("Unix Sockets don't work under windows")
 		return
@@ -83,11 +91,11 @@ func TestSocket(t *testing.T) {
 		sockFile := tmpDir + "/test.sock"
 		t.Log(sockFile)
 
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]any{
 			"host": "unix://" + sockFile,
 		})
 
-		s, err := New(nil, cfg)
+		s, err := New(logger, cfg)
 		require.NoError(t, err)
 		attachEchoHelloHandler(t, s)
 		go s.Start()
@@ -101,7 +109,7 @@ func TestSocket(t *testing.T) {
 
 		c := client(sockFile)
 
-		r, err := c.Get("http://unix/echo-hello")
+		r, err := c.Get("http://unix/echo-hello") //nolint:noctx //Safe to not use ctx in test
 		require.NoError(t, err)
 		defer r.Body.Close()
 
@@ -126,11 +134,11 @@ func TestSocket(t *testing.T) {
 		require.NoError(t, err)
 		f.Close()
 
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]any{
 			"host": "unix://" + sockFile,
 		})
 
-		s, err := New(nil, cfg)
+		s, err := New(logger, cfg)
 		require.NoError(t, err)
 		attachEchoHelloHandler(t, s)
 		go s.Start()
@@ -144,7 +152,7 @@ func TestSocket(t *testing.T) {
 
 		c := client(sockFile)
 
-		r, err := c.Get("http://unix/echo-hello")
+		r, err := c.Get("http://unix/echo-hello") //nolint:noctx //Safe to not use ctx in test
 		require.NoError(t, err)
 		defer r.Body.Close()
 
@@ -163,11 +171,11 @@ func TestHTTP(t *testing.T) {
 	// select a random free port.
 	url := "http://localhost:0"
 
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"host": url,
 	})
-
-	s, err := New(nil, cfg)
+	logger := logptest.NewTestingLogger(t, "")
+	s, err := New(logger, cfg)
 	require.NoError(t, err)
 	attachEchoHelloHandler(t, s)
 	go s.Start()
@@ -175,7 +183,7 @@ func TestHTTP(t *testing.T) {
 		require.NoError(t, s.Stop())
 	}()
 
-	r, err := http.Get("http://" + s.l.Addr().String() + "/echo-hello")
+	r, err := http.Get("http://" + s.l.Addr().String() + "/echo-hello") //nolint:noctx //Safe to not use ctx in test
 	require.NoError(t, err)
 	defer r.Body.Close()
 
@@ -194,11 +202,12 @@ func attachEchoHelloHandler(t *testing.T, s *Server) {
 }
 
 func TestAttachHandler(t *testing.T) {
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"host": "http://localhost:0",
 	})
 
-	s, err := New(nil, cfg)
+	logger := logptest.NewTestingLogger(t, "")
+	s, err := New(logger, cfg)
 	require.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodGet, "http://"+s.l.Addr().String()+"/test", nil)
@@ -210,16 +219,91 @@ func TestAttachHandler(t *testing.T) {
 	s.mux.ServeHTTP(resp, req)
 	assert.Equal(t, "test!", resp.Body.String())
 
-	// Handlers are matched in order so the first one will take precedence.
-	err = s.AttachHandler("/test", newTestHandler("NOT test!"))
-	require.NoError(t, err)
+	// Test the handler redirects properly.
+	req = httptest.NewRequest(http.MethodGet, "http://"+s.l.Addr().String()+"/test/", nil)
 	resp = httptest.NewRecorder()
 	s.mux.ServeHTTP(resp, req)
-	assert.Equal(t, "test!", resp.Body.String())
+	assert.Equal(t, http.StatusMovedPermanently, resp.Result().StatusCode)
+}
+
+func TestOrdering(t *testing.T) {
+	monitorSocket := genSocketPath()
+	var monitorHost string
+	if runtime.GOOS == "windows" {
+		monitorHost = "npipe:///" + filepath.Base(monitorSocket)
+	} else {
+		monitorHost = "unix://" + monitorSocket
+	}
+	cfg := config.MustNewConfigFrom(map[string]any{
+		"host": monitorHost,
+	})
+
+	t.Run("NewStartStop", func(t *testing.T) {
+		defer goleak.VerifyNone(t)
+		logger := logptest.NewTestingLogger(t, "")
+		s, err := New(logger, cfg)
+		require.NoError(t, err)
+		s.Start()
+		err = s.Stop()
+		require.NoError(t, err)
+		s.wg.Wait()
+	})
+	t.Run("NewStopStart", func(t *testing.T) {
+		defer goleak.VerifyNone(t)
+		logger := logptest.NewTestingLogger(t, "")
+		s, err := New(logger, cfg)
+		require.NoError(t, err)
+		err = s.Stop()
+		require.NoError(t, err)
+		s.Start()
+		s.wg.Wait()
+	})
+	t.Run("NewStop", func(t *testing.T) {
+		defer goleak.VerifyNone(t)
+		logger := logptest.NewTestingLogger(t, "")
+		s, err := New(logger, cfg)
+		require.NoError(t, err)
+		err = s.Stop()
+		require.NoError(t, err)
+		s.wg.Wait()
+	})
+	t.Run("NewStopStop", func(t *testing.T) {
+		defer goleak.VerifyNone(t)
+		logger := logptest.NewTestingLogger(t, "")
+		s, err := New(logger, cfg)
+		require.NoError(t, err)
+		err = s.Stop()
+		require.NoError(t, err)
+		err = s.Stop()
+		require.NoError(t, err)
+		s.wg.Wait()
+	})
+	t.Run("NewStartStartStop", func(t *testing.T) {
+		defer goleak.VerifyNone(t)
+		logger := logptest.NewTestingLogger(t, "")
+		s, err := New(logger, cfg)
+		require.NoError(t, err)
+		s.Start()
+		s.Start()
+		err = s.Stop()
+		require.NoError(t, err)
+		s.wg.Wait()
+	})
 }
 
 func newTestHandler(response string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = io.WriteString(w, response)
 	})
+}
+
+func genSocketPath() string {
+	randData := make([]byte, 16)
+	for i := range len(randData) {
+		randData[i] = uint8(rand.UintN(255)) //nolint:gosec // 0-255 fits in a uint8
+	}
+	socketName := base64.URLEncoding.EncodeToString(randData) + ".sock"
+	// don't use t.TempDir() because it can be too long
+	socketDir := os.TempDir()
+	return filepath.Join(socketDir, socketName)
 }

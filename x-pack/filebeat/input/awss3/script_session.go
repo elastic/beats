@@ -5,12 +5,12 @@
 package awss3
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
 
 	"github.com/dop251/goja"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -36,9 +36,9 @@ type session struct {
 	timeout   time.Duration
 }
 
-func newSession(p *goja.Program, conf scriptConfig, test bool) (*session, error) {
+func newSession(p *goja.Program, conf scriptConfig, test bool, logger *logp.Logger) (*session, error) {
 	// Create a logger
-	logger := logp.NewLogger(logName)
+	logger = logger.Named(logName)
 
 	// Setup JS runtime.
 	s := &session{
@@ -93,7 +93,7 @@ func (s *session) setParseFunction() error {
 		return errors.New("parse is not a function")
 	}
 	if err := s.vm.ExportTo(parseFunc, &s.parseFunc); err != nil {
-		return errors.Wrap(err, "failed to export parse function")
+		return fmt.Errorf("failed to export parse function: %w", err)
 	}
 	return nil
 }
@@ -109,10 +109,10 @@ func (s *session) registerScriptParams(params map[string]interface{}) error {
 	}
 	var register goja.Callable
 	if err := s.vm.ExportTo(registerFunc, &register); err != nil {
-		return errors.Wrap(err, "failed to export register function")
+		return fmt.Errorf("failed to export register function: %w", err)
 	}
 	if _, err := register(goja.Undefined(), s.vm.ToValue(params)); err != nil {
-		return errors.Wrap(err, "failed to register script_params")
+		return fmt.Errorf("failed to register script_params: %w", err)
 	}
 	s.log.Debug("Registered params with script")
 	return nil
@@ -127,11 +127,11 @@ func (s *session) executeTestFunction() error {
 		}
 		var test goja.Callable
 		if err := s.vm.ExportTo(testFunc, &test); err != nil {
-			return errors.Wrap(err, "failed to export test function")
+			return fmt.Errorf("failed to export test function: %w", err)
 		}
 		_, err := test(goja.Undefined(), nil)
 		if err != nil {
-			return errors.Wrap(err, "failed in test() function")
+			return fmt.Errorf("failed in test() function: %w", err)
 		}
 		s.log.Debugf("Successful test() execution for script.")
 	}
@@ -180,15 +180,15 @@ type sessionPool struct {
 	C   chan *session
 }
 
-func newSessionPool(p *goja.Program, c scriptConfig) (*sessionPool, error) {
-	s, err := newSession(p, c, true)
+func newSessionPool(p *goja.Program, c scriptConfig, logger *logp.Logger) (*sessionPool, error) {
+	s, err := newSession(p, c, true, logger)
 	if err != nil {
 		return nil, err
 	}
 
 	pool := sessionPool{
 		New: func() *session {
-			s, _ := newSession(p, c, false)
+			s, _ := newSession(p, c, false, logger)
 			return s
 		},
 		C: make(chan *session, c.MaxCachedSessions),

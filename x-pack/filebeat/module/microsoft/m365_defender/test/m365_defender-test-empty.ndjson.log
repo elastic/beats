@@ -1,1 +1,2 @@
 {"incidentId":1111,"redirectIncidentId":1107,"incidentName":"Impossible travel activity involving one user","createdTime":"2021-04-12T11:18:28.86Z","lastUpdateTime":"2021-04-12T11:18:30.4033333Z","assignedTo":null,"classification":"Unknown","determination":"NotAvailable","status":"Redirected","severity":"UnSpecified","tags":[],"comments":[],"alerts":[]}
+{"value":[],"note":"THIS MESSAGE SHOULD NOT END UP IN THE EXPECTS JSON FILE."}

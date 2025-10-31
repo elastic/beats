@@ -2,37 +2,43 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package billing
 
 import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
-	"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
-	"github.com/Azure/go-autorest/autorest/date"
-	"github.com/shopspring/decimal"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // TestEventMapping tests that mapping a QueryResult into a list of events is accurate.
 func TestEventMapping(t *testing.T) {
-	logger := logp.NewLogger("TestEventMapping")
+	logger := logptest.NewTestingLogger(t, "TestEventMapping")
 
 	ID := "ID"
-	kind := "legacy"
+	kind := armconsumption.UsageDetailsKindLegacy
 	name := "test"
 	billingAccountId := "123"
-	startDate := date.Time{}
+	startDate := time.Time{}
+	tagName := "team"
+	tagValue := "obs-cloud-monitoring"
 
 	//
 	// Usage Details
 	//
-	var charge = decimal.NewFromFloat(8.123456)
-	var props = consumption.LegacyUsageDetailProperties{
+
+	charge := 8.123456
+	unitPrice := 1.25
+	quantity := 12.5
+
+	var props = armconsumption.LegacyUsageDetailProperties{
 		BillingAccountID:       &billingAccountId,
 		BillingAccountName:     &name,
 		BillingPeriodStartDate: &startDate,
@@ -40,11 +46,16 @@ func TestEventMapping(t *testing.T) {
 		Cost:                   &charge,
 		InvoiceSection:         &name,
 		Product:                &name,
+		UnitPrice:              &unitPrice,
+		Quantity:               &quantity,
 	}
-	var legacy = consumption.LegacyUsageDetail{
-		ID:                          &ID,
-		Kind:                        consumption.Kind(kind),
-		LegacyUsageDetailProperties: &props,
+	var legacy = &armconsumption.LegacyUsageDetail{
+		ID:         &ID,
+		Kind:       &kind,
+		Properties: &props,
+		Tags: map[string]*string{
+			tagName: &tagValue,
+		},
 	}
 
 	//
@@ -61,20 +72,20 @@ func TestEventMapping(t *testing.T) {
 		{forecastCost, forecastUsageDate, "Forecast", "USD"},
 	}
 
-	var forecastQueryResult = costmanagement.QueryResult{
-		QueryProperties: &costmanagement.QueryProperties{
-			Columns: &[]costmanagement.QueryColumn{
+	var forecastQueryResult = armcostmanagement.QueryResult{
+		Properties: &armcostmanagement.QueryProperties{
+			Columns: []*armcostmanagement.QueryColumn{
 				column("Cost", "Number"),
 				column("UsageDate", "Number"),
 				column("CostStatus", "String"),
 				column("Currency", "String"),
 			},
-			Rows: &rows,
+			Rows: rows,
 		},
 	}
 
 	var usage = Usage{
-		UsageDetails: []consumption.BasicUsageDetail{legacy},
+		UsageDetails: []armconsumption.UsageDetailClassification{legacy},
 		Forecasts:    forecastQueryResult,
 	}
 
@@ -98,15 +109,23 @@ func TestEventMapping(t *testing.T) {
 	// Check the results
 	//
 	for _, event := range events {
-		// if is an usage event
 		if ok, _ := event.MetricSetFields.HasKey("department_name"); ok {
+			//
+			// The event is a usage detail
+			//
 			val1, _ := event.MetricSetFields.GetValue("account_name")
 			assert.Equal(t, val1, &name)
 			val2, _ := event.MetricSetFields.GetValue("product")
 			assert.Equal(t, val2, &name)
 			val3, _ := event.MetricSetFields.GetValue("department_name")
 			assert.Equal(t, val3, &name)
+			tags, _ := event.ModuleFields.GetValue("resource.tags")
+			assert.Equal(t, tags, map[string]*string{tagName: &tagValue})
+
 		} else {
+			//
+			// The event is a forecast
+			//
 
 			// Check the actual cost
 			isActual, _ := event.MetricSetFields.HasKey("actual_cost")
@@ -136,10 +155,10 @@ func TestEventMapping(t *testing.T) {
 }
 
 func TestGetEventsFromQueryResult(t *testing.T) {
-	logger := logp.NewLogger("TestGetEventsFromQueryResult")
+	logger := logptest.NewTestingLogger(t, "TestGetEventsFromQueryResult")
 	subscriptionID := "sub"
 
-	columns := []costmanagement.QueryColumn{
+	columns := []*armcostmanagement.QueryColumn{
 		column("Cost", "Number"),
 		column("UsageDate", "Number"),
 		column("CostStatus", "String"),
@@ -147,7 +166,7 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 	}
 
 	t.Run("no columns", func(t *testing.T) {
-		queryResult := costmanagement.QueryResult{}
+		queryResult := armcostmanagement.QueryResult{}
 
 		events, err := getEventsFromQueryResult(queryResult, subscriptionID, logger)
 		assert.Equal(t, []mb.Event{}, events)
@@ -155,16 +174,16 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 	})
 
 	t.Run("wrong number of column", func(t *testing.T) {
-		badColumns := []costmanagement.QueryColumn{
+		badColumns := []*armcostmanagement.QueryColumn{
 			column("Cost", "Number"),
 			column("UsageDate", "Number"),
 			column("CostStatus", "String"),
 			column("Currency", "String"),
 			column("UnexpectedColumn", "String"),
 		}
-		queryResult := costmanagement.QueryResult{
-			QueryProperties: &costmanagement.QueryProperties{
-				Columns: &badColumns,
+		queryResult := armcostmanagement.QueryResult{
+			Properties: &armcostmanagement.QueryProperties{
+				Columns: badColumns,
 				Rows:    nil,
 			},
 		}
@@ -175,9 +194,9 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 	})
 
 	t.Run("no rows", func(t *testing.T) {
-		queryResult := costmanagement.QueryResult{
-			QueryProperties: &costmanagement.QueryProperties{
-				Columns: &columns,
+		queryResult := armcostmanagement.QueryResult{
+			Properties: &armcostmanagement.QueryProperties{
+				Columns: columns,
 				Rows:    nil,
 			},
 		}
@@ -191,10 +210,10 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 		rows := [][]interface{}{
 			{float64(1), float64(2), "Actual", "USD", "UnexpectedValue"},
 		}
-		queryResult := costmanagement.QueryResult{
-			QueryProperties: &costmanagement.QueryProperties{
-				Columns: &columns,
-				Rows:    &rows,
+		queryResult := armcostmanagement.QueryResult{
+			Properties: &armcostmanagement.QueryProperties{
+				Columns: columns,
+				Rows:    rows,
 			},
 		}
 
@@ -211,10 +230,10 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 			{float64(1), float64(20220818), 42, "USD"},       // wrong cost status type
 			{float64(1), float64(20220818), "Actual", 42},    // wrong currency type
 		}
-		queryResult := costmanagement.QueryResult{
-			QueryProperties: &costmanagement.QueryProperties{
-				Columns: &columns,
-				Rows:    &rows,
+		queryResult := armcostmanagement.QueryResult{
+			Properties: &armcostmanagement.QueryProperties{
+				Columns: columns,
+				Rows:    rows,
 			},
 		}
 
@@ -224,6 +243,6 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 	})
 }
 
-func column(name, type_ string) costmanagement.QueryColumn {
-	return costmanagement.QueryColumn{Name: &name, Type: &type_}
+func column(name, type_ string) *armcostmanagement.QueryColumn {
+	return &armcostmanagement.QueryColumn{Name: &name, Type: &type_}
 }

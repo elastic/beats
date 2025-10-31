@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
@@ -63,9 +64,9 @@ func NewLoader(log *logp.Logger, plugins []Plugin, typeField, defaultType string
 }
 
 // Init runs Init on all InputManagers for all plugins known to the loader.
-func (l *Loader) Init(group unison.Group, mode Mode) error {
+func (l *Loader) Init(group unison.Group) error {
 	for _, p := range l.registry {
-		if err := p.Manager.Init(group, mode); err != nil {
+		if err := p.Manager.Init(group); err != nil {
 			return err
 		}
 	}
@@ -77,23 +78,12 @@ func (l *Loader) Init(group unison.Group, mode Mode) error {
 // matching plugin. If a plugin is found, the plugin it's InputManager is used to create
 // the input.
 // Returns a LoadError if the input name can not be read from the config or if
-// the type does not exist. Error values for Ccnfiguration errors do depend on
+// the type does not exist. Error values for Configuration errors do depend on
 // the InputManager.
 func (l *Loader) Configure(cfg *conf.C) (Input, error) {
-	name, err := cfg.String(l.typeField, -1)
+	name, p, err := l.loadFromCfg(cfg)
 	if err != nil {
-		if l.defaultType == "" {
-			return nil, &LoadError{
-				Reason:  ErrNoInputConfigured,
-				Message: fmt.Sprintf("%v setting is missing", l.typeField),
-			}
-		}
-		name = l.defaultType
-	}
-
-	p, exists := l.registry[name]
-	if !exists {
-		return nil, &LoadError{Name: name, Reason: ErrUnknownInput}
+		return nil, err
 	}
 
 	log := l.log.With("input", name, "stability", p.Stability, "deprecated", p.Deprecated)
@@ -107,7 +97,44 @@ func (l *Loader) Configure(cfg *conf.C) (Input, error) {
 		log.Warnf("DEPRECATED: The %v input is deprecated", name)
 	}
 
+	if version.FIPSDistribution && p.ExcludeFromFIPS {
+		return nil, fmt.Errorf("running a FIPS-capable distribution but input [%s] is not FIPS capable", name)
+	}
+
 	return p.Manager.Create(cfg)
+}
+
+func (l *Loader) loadFromCfg(cfg *conf.C) (string, Plugin, error) {
+	name, err := cfg.String(l.typeField, -1)
+	if err != nil {
+		if l.defaultType == "" {
+			return "", Plugin{}, &LoadError{
+				Reason:  ErrNoInputConfigured,
+				Message: fmt.Sprintf("%v setting is missing", l.typeField),
+			}
+		}
+		name = l.defaultType
+	}
+
+	p, exists := l.registry[name]
+	if !exists {
+		return "", Plugin{}, &LoadError{Name: name, Reason: ErrUnknownInput}
+	}
+	return name, p, nil
+}
+
+func (l *Loader) Delete(cfg *conf.C) error {
+	_, p, err := l.loadFromCfg(cfg)
+	if err != nil {
+		return err
+	}
+
+	pp, ok := p.Manager.(interface{ Delete(cfg *conf.C) error })
+	if ok {
+		return pp.Delete(cfg)
+	}
+
+	return nil
 }
 
 // validatePlugins checks if there are multiple plugins with the same name in

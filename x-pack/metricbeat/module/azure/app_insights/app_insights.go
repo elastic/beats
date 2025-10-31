@@ -2,12 +2,13 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package app_insights
 
 import (
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
@@ -54,13 +55,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	client, err := NewClient(config)
+	client, err := NewClient(config, base.Logger())
 	if err != nil {
-		return nil, errors.Wrapf(err, "error initializing the monitor client: module azure - %s metricset", metricsetName)
+		return nil, fmt.Errorf("error initializing the monitor client: module azure - %s metricset: %w", metricsetName, err)
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
-		log:           logp.NewLogger(metricsetName),
+		log:           base.Logger().Named(metricsetName),
 		client:        client,
 	}, nil
 }
@@ -69,7 +70,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	results, err := m.client.GetMetricValues()
 	if err != nil {
-		return errors.Wrap(err, "error retrieving metric values")
+		return fmt.Errorf("error retrieving metric values: %w", err)
 	}
 	events := EventsMapping(results, m.client.Config.ApplicationId, m.client.Config.Namespace)
 	for _, event := range events {

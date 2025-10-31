@@ -41,7 +41,6 @@
                 }
             ],
             "params": {
-                "addLegend": true,
                 "addTooltip": true,
                 "distinctColors": true,
                 "isDonut": false,
@@ -51,7 +50,9 @@
                     "truncate": 100,
                     "values": true
                 },
+                "legendDisplay": "show",
                 "legendPosition": "right",
+                "legendSize": "auto",
                 "palette": {
                     "name": "kibana_palette",
                     "type": "palette"
@@ -62,11 +63,10 @@
             "type": "pie"
         }
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:05.336Z",
     "id": "26877510-9b72-11ea-87e4-49f31ec44891",
-    "migrationVersion": {
-        "visualization": "7.14.0"
-    },
+    "managed": false,
     "references": [
         {
             "id": "324686c0-fefb-11e9-8405-516218e3d268",
@@ -75,6 +75,7 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-08-11T13:19:00.386Z",
-    "version": "WzIzMzAsMl0="
+    "typeMigrationVersion": "8.5.0",
+    "updated_at": "2023-11-10T17:08:05.336Z",
+    "version": "WzI2MCwxXQ=="
 }

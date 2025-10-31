@@ -1,0 +1,172 @@
+{
+    "kibana":{
+      "uuid":"5b2de169-2785-441b-ae8c-186a1936b17d",
+      "name":"Shaunaks-MBP-2",
+      "index":".kibana",
+      "host":"localhost",
+      "transport_address":"localhost:5601",
+      "version":"7.0.0-alpha1",
+      "snapshot":false,
+      "status":"green"
+    },
+    "last_updated":"2018-07-18T00:32:00.948Z",
+    "collection_interval_ms":5000,
+    "process":{
+      "memory":{
+        "heap":{
+          "total_bytes":223391744,
+          "used_bytes":198413592,
+          "size_limit":1501560832
+        },
+        "resident_set_size_bytes":347242496,
+        "array_buffers_bytes": 6472439291,
+        "external_bytes": 953799759
+      },
+      "event_loop_delay":0.25226891040802,
+      "event_loop_utilization": {
+        "active": 629.1224170000005,
+        "idle": 359.23554199999995,
+        "utilization": 0.6365329598160299
+      },
+      "pid":46426,
+      "uptime_ms":1753889
+    },
+    "os":{
+      "load":{
+        "1m":3.50634765625,
+        "5m":3.76904296875,
+        "15m":3.54833984375
+      },
+      "memory":{
+        "total_bytes":17179869184,
+        "free_bytes":31711232,
+        "used_bytes":17148157952
+      },
+      "uptime_ms":2187246000,
+      "cpuacct": {
+        "control_group": "cgroup",
+        "usage_nanos": 56789873
+      },
+      "cgroup_memory": {
+        "current_bytes": 97647654,
+        "swap_current_bytes": 40765796
+      }
+    },
+    "elasticsearch_client": {
+      "protocol": "http",
+      "connected_nodes": 2,
+      "nodes_with_active_sockets": 2,
+      "nodes_with_idle_sockets": 1,
+      "total_active_sockets": 14,
+      "total_idle_sockets": 42,
+      "total_queued_requests": 0,
+      "most_active_node_sockets": 10,
+      "average_active_sockets_per_node": 7,
+      "most_idle_node_sockets": 42,
+      "average_idle_sockets_per_node": 21
+    },
+    "response_times":{
+      "max_ms":0
+    },
+    "requests":{
+      "total":0,
+      "disconnects":0,
+      "status_codes":{
+
+      }
+    },
+    "concurrent_connections":3,
+    "usage":{
+      "kibana":{
+        "index":".kibana",
+        "dashboard":{
+          "total":0
+        },
+        "visualization":{
+          "total":0
+        },
+        "search":{
+          "total":0
+        },
+        "index_pattern":{
+          "total":0
+        },
+        "graph_workspace":{
+          "total":0
+        },
+        "timelion_sheet":{
+          "total":0
+        }
+      },
+      "reporting":{
+        "available":true,
+        "enabled":true,
+        "browser_type":"phantom",
+        "all":0,
+        "csv":{
+          "available":true,
+          "total":0
+        },
+        "printable_pdf":{
+          "available":true,
+          "total":0,
+          "app":{
+            "visualization":0,
+            "dashboard":0
+          },
+          "layout":{
+            "print":0,
+            "preserve_layout":0
+          }
+        },
+        "status":{
+
+        },
+        "last_day":{
+          "all":0,
+          "csv":{
+            "available":true,
+            "total":0
+          },
+          "printable_pdf":{
+            "available":true,
+            "total":0,
+            "app":{
+              "visualization":0,
+              "dashboard":0
+            },
+            "layout":{
+              "print":0,
+              "preserve_layout":0
+            }
+          },
+          "status":{
+
+          }
+        },
+        "last_7_days":{
+          "all":0,
+          "csv":{
+            "available":true,
+            "total":0
+          },
+          "printable_pdf":{
+            "available":true,
+            "total":0,
+            "app":{
+              "visualization":0,
+              "dashboard":0
+            },
+            "layout":{
+              "print":0,
+              "preserve_layout":0
+            }
+          },
+          "status":{
+
+          }
+        }
+      }
+    },
+    "cluster_uuid":"NkfU5AinRnyFnqBD36zhEw"
+  }

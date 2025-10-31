@@ -37,6 +37,8 @@ type fileHandler struct {
 
 	topSpeed bool
 	lastTS   time.Time
+
+	log *logp.Logger
 }
 
 func newFileHandler(file string, topSpeed bool, maxLoopCount int) (*fileHandler, error) {
@@ -44,6 +46,7 @@ func newFileHandler(file string, topSpeed bool, maxLoopCount int) (*fileHandler,
 		file:         file,
 		topSpeed:     topSpeed,
 		maxLoopCount: maxLoopCount,
+		log:          logp.NewLogger("sniffer"),
 	}
 	if err := h.open(); err != nil {
 		return nil, err
@@ -77,7 +80,7 @@ func (h *fileHandler) ReadPacketData() ([]byte, gopacket.CaptureInfo, error) {
 			return data, ci, err
 		}
 
-		logp.Debug("sniffer", "Reopening the file")
+		h.log.Debug("Reopening the file")
 		if err = h.open(); err != nil {
 			return nil, ci, fmt.Errorf("failed to reopen file: %w", err)
 		}
@@ -96,7 +99,7 @@ func (h *fileHandler) ReadPacketData() ([]byte, gopacket.CaptureInfo, error) {
 		if sleep > 0 {
 			time.Sleep(sleep)
 		} else {
-			logp.Warn("Time in pcap went backwards: %d", sleep)
+			h.log.Warnf("Time in pcap went backwards: %d", sleep)
 		}
 	}
 

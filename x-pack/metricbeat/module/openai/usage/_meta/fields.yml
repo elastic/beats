@@ -1,0 +1,156 @@
+- name: usage
+  type: group
+  release: beta
+  description: >
+    OpenAI API usage metrics and statistics
+  fields:
+    # Common base fields at root level
+    - name: organization_id
+      type: keyword
+      description: Organization identifier
+    - name: organization_name
+      type: keyword
+      description: Organization name
+    - name: api_key_id
+      type: keyword
+      description: API key identifier
+    - name: api_key_name
+      type: keyword
+      description: API key name
+    - name: api_key_redacted
+      type: keyword
+      description: Redacted API key
+    - name: api_key_type
+      type: keyword
+      description: Type of API key
+    - name: project_id
+      type: keyword
+      description: Project identifier
+    - name: project_name
+      type: keyword
+      description: Project name
+
+    # Completion/Chat usage data
+    - name: data
+      type: group
+      description: >
+        General usage data metrics
+      fields:
+        - name: requests_total
+          type: long
+          description: Number of requests made
+        - name: operation
+          type: keyword
+          description: Operation type
+        - name: snapshot_id
+          type: keyword
+          description: Snapshot identifier
+        - name: context_tokens_total
+          type: long
+          description: Total number of context tokens used
+        - name: generated_tokens_total
+          type: long
+          description: Total number of generated tokens
+        - name: cached_context_tokens_total
+          type: long
+          description: Total number of cached context tokens
+        - name: email
+          type: keyword
+          description: User email
+        - name: request_type
+          type: keyword
+          description: Type of request
+
+    # DALL-E image generation metrics
+    - name: dalle
+      type: group
+      description: >
+        DALL-E API usage metrics
+      fields:
+        - name: num_images
+          type: long
+          description: Number of images generated
+        - name: requests_total
+          type: long
+          description: Number of requests
+        - name: image_size
+          type: keyword
+          description: Size of generated images
+        - name: operation
+          type: keyword
+          description: Operation type
+        - name: user_id
+          type: keyword
+          description: User identifier
+        - name: model_id
+          type: keyword
+          description: Model identifier
+
+    # Whisper speech-to-text metrics
+    - name: whisper
+      type: group
+      description: >
+        Whisper API usage metrics
+      fields:
+        - name: model_id
+          type: keyword
+          description: Model identifier
+        - name: num_seconds
+          type: long
+          description: Number of seconds processed
+        - name: requests_total
+          type: long
+          description: Number of requests
+        - name: user_id
+          type: keyword
+          description: User identifier
+
+    # Text-to-Speech metrics
+    - name: tts
+      type: group
+      description: >
+        Text-to-Speech API usage metrics
+      fields:
+        - name: model_id
+          type: keyword
+          description: Model identifier
+        - name: num_characters
+          type: long
+          description: Number of characters processed
+        - name: requests_total
+          type: long
+          description: Number of requests
+        - name: user_id
+          type: keyword
+          description: User identifier
+
+    # Additional data types (raw storage)
+    - name: ft_data
+      type: group
+      description: >
+        Fine-tuning data metrics
+      fields:
+        - name: original
+          type: object
+          object_type: keyword
+          description: Raw fine-tuning data
+
+    - name: assistant_code_interpreter
+      type: group
+      description: >
+        Assistant Code Interpreter usage metrics
+      fields:
+        - name: original
+          type: object
+          object_type: keyword
+          description: Raw assistant code interpreter data
+
+    - name: retrieval_storage
+      type: group
+      description: >
+        Retrieval storage usage metrics
+      fields:
+        - name: original
+          type: object
+          object_type: keyword
+          description: Raw retrieval storage data

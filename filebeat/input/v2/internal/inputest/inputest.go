@@ -30,7 +30,7 @@ import (
 // MockInputManager can be used as InputManager replacement in tests that require a new Input Manager.
 // The OnInit and OnConfigure functions are executed if the corresponding methods get called.
 type MockInputManager struct {
-	OnInit      func(v2.Mode) error
+	OnInit      func() error
 	OnConfigure InputConfigurer
 }
 
@@ -47,9 +47,9 @@ type MockInput struct {
 }
 
 // Init returns nil if OnInit is not set. Otherwise the return value of OnInit is returned.
-func (m *MockInputManager) Init(_ unison.Group, mode v2.Mode) error {
+func (m *MockInputManager) Init(_ unison.Group) error {
 	if m.OnInit != nil {
-		return m.OnInit(mode)
+		return m.OnInit()
 	}
 	return nil
 }

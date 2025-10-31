@@ -6,7 +6,6 @@ package add_nomad_metadata
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -15,10 +14,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-)
-
-const (
-	timeout = time.Second * 5
 )
 
 type nomadAnnotator struct {
@@ -39,18 +34,18 @@ func init() {
 }
 
 // New constructs a new add_nomad_metadata processor.
-func New(cfg *conf.C) (processors.Processor, error) {
-	cfgwarn.Experimental("The add_nomad_metadata processor is experimental")
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
+	log.Warn(cfgwarn.Experimental("The add_nomad_metadata processor is experimental"))
 
 	config := defaultNomadAnnotatorConfig()
 
 	err := cfg.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the nomad configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the nomad configuration: %w", err)
 	}
 
 	//Load default indexer configs
-	if config.DefaultIndexers.Enabled == true {
+	if config.DefaultIndexers.Enabled {
 		Indexing.RLock()
 		for key, cfg := range Indexing.GetDefaultIndexerConfigs() {
 			config.Indexers = append(config.Indexers, map[string]conf.C{key: cfg})
@@ -59,7 +54,7 @@ func New(cfg *conf.C) (processors.Processor, error) {
 	}
 
 	//Load default matcher configs
-	if config.DefaultMatchers.Enabled == true {
+	if config.DefaultMatchers.Enabled {
 		Indexing.RLock()
 		for key, cfg := range Indexing.GetDefaultMatcherConfigs() {
 			config.Matchers = append(config.Matchers, map[string]conf.C{key: cfg})
@@ -75,7 +70,7 @@ func New(cfg *conf.C) (processors.Processor, error) {
 	}
 	client, err := nomad.NewClient(clientConfig)
 	if err != nil {
-		logp.Err("nomad: Couldn't create client")
+		log.Error("nomad: Couldn't create client")
 		return nil, err
 	}
 
@@ -85,10 +80,10 @@ func New(cfg *conf.C) (processors.Processor, error) {
 	}
 
 	indexers := NewIndexers(config.Indexers, metaGen)
-	matchers := NewMatchers(config.Matchers)
+	matchers := NewMatchers(config.Matchers, log)
 
-	logp.Debug("nomad", "Using node: %s", config.Node)
-	logp.Debug("nomad", "Initializing watcher")
+	log.Named("nomad").Debugf("Using node: %s", config.Node)
+	log.Named("nomad").Debug("Initializing watcher")
 
 	options := nomad.WatchOptions{
 		SyncTimeout:     config.syncPeriod,
@@ -109,9 +104,9 @@ func New(cfg *conf.C) (processors.Processor, error) {
 		}
 		options.Node = node
 	}
-	watcher, err := nomad.NewWatcher(client, options)
+	watcher, err := nomad.NewWatcher(client, options, log)
 	if err != nil {
-		logp.Err("Error creating watcher %v", err.Error())
+		log.Errorf("Error creating watcher %v", err.Error())
 		return nil, err
 	}
 

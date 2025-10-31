@@ -9,6 +9,50 @@
       type: keyword
       description: >
         Network interface name.
+    - name: in
+      type: group
+      description: >
+        Incoming network stats per second.
+      fields:
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            Incoming bytes per seconds.
+        - name: dropped
+          type: scaled_float
+          description: >
+            Dropped incoming packets per second.
+        - name: errors
+          type: long
+          description: >
+            Errors on incoming packets per second.
+        - name: packets
+          type: long
+          description: >
+            Incoming packets per second.
+    - name: out
+      type: group
+      description: >
+        Outgoing network stats per second.
+      fields:
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            Outgoing bytes per second.
+        - name: dropped
+          type: scaled_float
+          description: >
+            Dropped outgoing packets per second.
+        - name: errors
+          type: long
+          description: >
+            Errors on outgoing packets per second.
+        - name: packets
+          type: long
+          description: >
+            Outgoing packets per second.
     - name: inbound
       type: group
       description: >

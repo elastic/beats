@@ -12,15 +12,20 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 
+	// For provider registration.
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta"
 )
 
 // Name of this input.
 const Name = "entity-analytics"
 
-func Plugin(logger *logp.Logger) v2.Plugin {
+func Plugin(logger *logp.Logger, p *paths.Path) v2.Plugin {
 	return v2.Plugin{
 		Name:      Name,
 		Stability: feature.Experimental,
@@ -28,6 +33,7 @@ func Plugin(logger *logp.Logger) v2.Plugin {
 		Doc:       "Collect identity assets for Entity Analytics",
 		Manager: &manager{
 			logger: logger,
+			path:   p,
 		},
 	}
 }
@@ -36,11 +42,12 @@ func Plugin(logger *logp.Logger) v2.Plugin {
 type manager struct {
 	logger   *logp.Logger
 	provider provider.Provider
+	path     *paths.Path
 }
 
 // Init is not used for this input. It is called before Create and no provider
 // has been configured yet.
-func (m *manager) Init(grp unison.Group, mode v2.Mode) error {
+func (m *manager) Init(grp unison.Group) error {
 	return nil
 }
 
@@ -57,7 +64,7 @@ func (m *manager) Create(cfg *config.C) (v2.Input, error) {
 		return nil, fmt.Errorf("unable to create %s input: %w", Name, err)
 	}
 
-	m.provider, err = factoryFn(m.logger)
+	m.provider, err = factoryFn(m.logger, m.path)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create %s input provider: %w", Name, err)
 	}

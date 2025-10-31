@@ -26,5 +26,20 @@
   #  - include_fields:
   #      fields: ["beat", "metricset", "redis.info.stats"]
 
+  # Redis AUTH username (Redis 6.0+). Empty by default.
+  #username: user
+
   # Redis AUTH password. Empty by default.
-  #password: foobared
+  #password: pass
+
+  # Optional SSL/TLS (Redis 6.0+). By default is false.
+  #ssl.enabled: true
+
+  # List of root certificates for SSL/TLS server verification
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.crt"]
+
+  # Certificate for SSL/TLS client authentication
+  #ssl.certificate: "/etc/pki/client/cert.crt"
+
+  # Client certificate key file
+  #ssl.key: "/etc/pki/client/cert.key"

@@ -89,11 +89,10 @@
         "title": "3. Login Failed Details",
         "version": 1
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:11.460Z",
     "id": "757510b0-a87f-11e9-a422-d144027429da",
-    "migrationVersion": {
-        "search": "7.9.3"
-    },
+    "managed": false,
     "references": [
         {
             "id": "winlogbeat-*",
@@ -112,6 +111,7 @@
         }
     ],
     "type": "search",
-    "updated_at": "2021-08-11T13:18:54.296Z",
-    "version": "WzIxOTksMl0="
+    "typeMigrationVersion": "7.9.3",
+    "updated_at": "2023-11-10T17:08:11.460Z",
+    "version": "WzMxOCwxXQ=="
 }

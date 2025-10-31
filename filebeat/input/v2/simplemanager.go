@@ -19,26 +19,30 @@ package v2
 
 import (
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
+type configureFn func(*conf.C, *logp.Logger) (Input, error)
+
 type simpleInputManager struct {
-	configure func(*conf.C) (Input, error)
+	configure configureFn
+	logger    *logp.Logger
 }
 
 // ConfigureWith creates an InputManager that provides no extra logic and
 // allows each input to fully control event collection and publishing in
 // isolation. The function fn will be called for every input to be configured.
-func ConfigureWith(fn func(*conf.C) (Input, error)) InputManager {
-	return &simpleInputManager{configure: fn}
+func ConfigureWith(fn func(*conf.C, *logp.Logger) (Input, error), logger *logp.Logger) InputManager {
+	return &simpleInputManager{configure: fn, logger: logger}
 }
 
 // Init is required to fulfil the input.InputManager interface.
 // For the kafka input no special initialization is required.
-func (*simpleInputManager) Init(grp unison.Group, m Mode) error { return nil }
+func (*simpleInputManager) Init(grp unison.Group) error { return nil }
 
 // Create builds a new Input instance from the given configuration, or returns
 // an error if the configuration is invalid.
 func (manager *simpleInputManager) Create(cfg *conf.C) (Input, error) {
-	return manager.configure(cfg)
+	return manager.configure(cfg, manager.logger)
 }

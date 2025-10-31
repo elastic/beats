@@ -6,8 +6,7 @@ package stats
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -37,17 +36,17 @@ var (
 func eventMapping(content []byte, r mb.ReporterV2) error {
 	var streaming = make(map[string]interface{})
 	if err := json.Unmarshal(content, &streaming); err != nil {
-		return errors.Wrap(err, "error in streaming server mapping")
+		return fmt.Errorf("error in streaming server mapping: %w", err)
 	}
 
 	fields, err := clientsSchema.Apply(streaming)
 	if err != nil {
-		return errors.Wrap(err, "error parsing Nats streaming server API response")
+		return fmt.Errorf("error parsing Nats streaming server API response: %w", err)
 	}
 
 	moduleFields, err := moduleSchema.Apply(streaming)
 	if err != nil {
-		return errors.Wrap(err, "error applying module schema")
+		return fmt.Errorf("error applying module schema: %w", err)
 	}
 	event := mb.Event{
 		MetricSetFields: fields,

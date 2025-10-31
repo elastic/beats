@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package kubernetes
 
 import (
@@ -22,34 +24,41 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
+
+	interfaces "k8s.io/client-go/kubernetes"
+	caches "k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGenerateHints(t *testing.T) {
 	tests := []struct {
+		name   string
 		event  bus.Event
 		result bus.Event
 	}{
 		// Empty events should return empty hints
 		{
+			name:   "empty",
 			event:  bus.Event{},
 			result: bus.Event{},
 		},
 		// Only kubernetes payload must return only kubernetes as part of the hint
 		{
+			name: "only kubernetes",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"pod": mapstr.M{
@@ -67,6 +76,7 @@ func TestGenerateHints(t *testing.T) {
 		},
 		// Kubernetes payload with container info must be bubbled to top level
 		{
+			name: "kubernetes container info top level",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"container": mapstr.M{
@@ -98,12 +108,14 @@ func TestGenerateHints(t *testing.T) {
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
 		{
+			name: "multiple hints",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.logs/multiline.pattern":    "^test",
 						"co.elastic.logs/json.keys_under_root": "true",
 						"co.elastic.metrics/module":            "prometheus",
+						"co.elastic.metrics/timeoutssssssss":   "5s", //On purpose we added this annotation with typo
 						"co.elastic.metrics/period":            "10s",
 						"co.elastic.metrics.foobar/period":     "15s",
 						"not.to.include":                       "true",
@@ -121,6 +133,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.logs/multiline.pattern":    "^test",
 						"co.elastic.logs/json.keys_under_root": "true",
 						"co.elastic.metrics/module":            "prometheus",
+						"co.elastic.metrics/timeoutssssssss":   "5s",
 						"not.to.include":                       "true",
 						"co.elastic.metrics/period":            "10s",
 						"co.elastic.metrics.foobar/period":     "15s",
@@ -141,8 +154,9 @@ func TestGenerateHints(t *testing.T) {
 						},
 					},
 					"metrics": mapstr.M{
-						"module": "prometheus",
-						"period": "15s",
+						"module":          "prometheus",
+						"period":          "15s",
+						"timeoutssssssss": "5s",
 					},
 				},
 				"container": mapstr.M{
@@ -156,6 +170,7 @@ func TestGenerateHints(t *testing.T) {
 		// Have one set of hints come from the pod and the other come from namespaces
 		// The resultant hints should have a combination of both
 		{
+			name: "hints from Pod and Namespace",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"annotations": getNestedAnnotations(mapstr.M{
@@ -220,12 +235,14 @@ func TestGenerateHints(t *testing.T) {
 		// Have one set of hints come from the pod and the same keys come from namespaces
 		// The resultant hints should honor only pods and not namespace.
 		{
+			name: "pod hints win over namespace",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/module":        "prometheus",
 						"co.elastic.metrics/period":        "10s",
 						"co.elastic.metrics.foobar/period": "15s",
+						"co.elastic.metrics/hosts":         "127.0.0.1:9090",
 						"not.to.include":                   "true",
 					}),
 					"namespace_annotations": getNestedAnnotations(mapstr.M{
@@ -247,6 +264,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.metrics/module":        "prometheus",
 						"co.elastic.metrics/period":        "10s",
 						"co.elastic.metrics.foobar/period": "15s",
+						"co.elastic.metrics/hosts":         "127.0.0.1:9090",
 						"not.to.include":                   "true",
 					}),
 					"namespace_annotations": getNestedAnnotations(mapstr.M{
@@ -264,6 +282,7 @@ func TestGenerateHints(t *testing.T) {
 				"hints": mapstr.M{
 					"metrics": mapstr.M{
 						"module": "prometheus",
+						"hosts":  "127.0.0.1:9090",
 						"period": "15s",
 					},
 				},
@@ -278,6 +297,7 @@ func TestGenerateHints(t *testing.T) {
 		// Have no hints on the pod and have namespace level defaults.
 		// The resultant hints should honor only namespace defaults.
 		{
+			name: "namespace defaults",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"namespace_annotations": getNestedAnnotations(mapstr.M{
@@ -323,13 +343,16 @@ func TestGenerateHints(t *testing.T) {
 	}
 
 	cfg := defaultConfig()
-
+	logger := logptest.NewTestingLogger(t, "")
 	p := pod{
 		config: cfg,
-		logger: logp.NewLogger("kubernetes.pod"),
+		logger: logger.Named("kubernetes.pod"),
 	}
 	for _, test := range tests {
-		assert.Equal(t, p.GenerateHints(test.event), test.result)
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.result, p.GenerateHints(test.event))
+		})
 	}
 }
 
@@ -1928,19 +1951,20 @@ func TestPod_EmitEvent(t *testing.T) {
 
 	client := k8sfake.NewSimpleClientset()
 	addResourceMetadata := metadata.GetDefaultResourceMetadataConfig()
+	logger := logptest.NewTestingLogger(t, "")
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
-			mapper, err := template.NewConfigMapper(nil, nil, nil)
+			mapper, err := template.NewConfigMapper(nil, nil, nil, logger)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewPodMetadataGenerator(conf.NewConfig(), nil, client, nil, nil, addResourceMetadata)
+			metaGen := metadata.NewPodMetadataGenerator(conf.NewConfig(), nil, client, nil, nil, nil, nil, addResourceMetadata)
 			p := &Provider{
 				config:    defaultConfig(),
-				bus:       bus.New(logp.NewLogger("bus"), "test"),
+				bus:       bus.New(logptest.NewTestingLogger(t, "bus"), "test"),
 				templates: mapper,
-				logger:    logp.NewLogger("kubernetes"),
+				logger:    logger.Named("kubernetes"),
 			}
 
 			pub := &publisher{b: p.bus}
@@ -1949,7 +1973,7 @@ func TestPod_EmitEvent(t *testing.T) {
 				config:      defaultConfig(),
 				publishFunc: pub.publish,
 				uuid:        UUID,
-				logger:      logp.NewLogger("kubernetes.pod"),
+				logger:      logger.Named("kubernetes.pod"),
 			}
 
 			p.eventManager = NewMockPodEventerManager(pod)
@@ -1988,6 +2012,11 @@ func TestNamespacePodUpdater(t *testing.T) {
 		}
 	}
 
+	namespace := &kubernetes.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "foo",
+		}}
+
 	cases := map[string]struct {
 		pods     []interface{}
 		expected []interface{}
@@ -2014,14 +2043,19 @@ func TestNamespacePodUpdater(t *testing.T) {
 		t.Run(title, func(t *testing.T) {
 			handler := &mockUpdaterHandler{}
 			store := &mockUpdaterStore{objects: c.pods}
-			updater := kubernetes.NewNamespacePodUpdater(handler.OnUpdate, store, &sync.Mutex{})
-
-			namespace := &kubernetes.Namespace{
+			//We simulate an update on the namespace with the addition of one label
+			namespace1 := &kubernetes.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "foo",
-				},
-			}
-			updater.OnUpdate(namespace)
+					Labels: map[string]string{
+						"beta.kubernetes.io/arch": "arm64",
+					},
+				}}
+
+			watcher := &mockUpdaterWatcher{cachedObject: namespace}
+			updater := kubernetes.NewNamespacePodUpdater(handler.OnUpdate, store, watcher, &sync.Mutex{})
+
+			updater.OnUpdate(namespace1)
 
 			assert.EqualValues(t, c.expected, handler.objects)
 		})
@@ -2040,8 +2074,15 @@ func TestNodePodUpdater(t *testing.T) {
 		}
 	}
 
+	node := &kubernetes.Node{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "foo",
+		},
+	}
+
 	cases := map[string]struct {
-		pods     []interface{}
+		pods []interface{}
+
 		expected []interface{}
 	}{
 		"no pods": {},
@@ -2066,16 +2107,131 @@ func TestNodePodUpdater(t *testing.T) {
 		t.Run(title, func(t *testing.T) {
 			handler := &mockUpdaterHandler{}
 			store := &mockUpdaterStore{objects: c.pods}
-			updater := kubernetes.NewNodePodUpdater(handler.OnUpdate, store, &sync.Mutex{})
 
-			node := &kubernetes.Node{
+			//We simulate an update on the node with the addition of one label
+			node1 := &kubernetes.Node{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "foo",
-				},
-			}
-			updater.OnUpdate(node)
+					Annotations: map[string]string{
+						"beta.kubernetes.io/arch": "arm64",
+					},
+				}}
+
+			watcher := &mockUpdaterWatcher{cachedObject: node}
+			updater := kubernetes.NewNodePodUpdater(handler.OnUpdate, store, watcher, &sync.Mutex{})
+
+			//This is when the update happens.
+			updater.OnUpdate(node1)
 
 			assert.EqualValues(t, c.expected, handler.objects)
+		})
+	}
+}
+
+func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		cfg         mapstr.M
+		expectedNil bool
+		name        string
+		msg         string
+	}{
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": false,
+					"node.enabled":      false,
+				},
+				"hints.enabled": false,
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: true,
+			name:        "add_resource_metadata.namespace and add_resource_metadata.node disabled and hints disabled.",
+			msg:         "Watcher should be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": false,
+					"node.enabled":      false,
+				},
+				"hints.enabled": true,
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata.namespace and add_resource_metadata.node disabled and hints enabled.",
+			msg:         "Watcher should not be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": true,
+					"node.enabled":      true,
+				},
+				"hints.enabled": false,
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata.namespace and add_resource_metadata.node enabled and hints disabled.",
+			msg:         "Watcher should not be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata default and hints default.",
+			msg:         "Watcher should not be nil.",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// #nosec G601
+			config := conf.MustNewConfigFrom(&test.cfg)
+			c := defaultConfig()
+			err = config.Unpack(&c)
+			assert.NoError(t, err)
+
+			eventer, err := NewPodEventer(uuid, config, client, nil, logptest.NewTestingLogger(t, ""))
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			namespaceWatcher := eventer.(*pod).namespaceWatcher
+			nodeWatcher := eventer.(*pod).nodeWatcher
+
+			if test.expectedNil {
+				assert.Equalf(t, nil, namespaceWatcher, "Namespace "+test.msg)
+				assert.Equalf(t, nil, nodeWatcher, "Node "+test.msg)
+			} else {
+				assert.NotEqualf(t, nil, namespaceWatcher, "Namespace "+test.msg)
+				assert.NotEqualf(t, nil, nodeWatcher, "Node "+test.msg)
+			}
 		})
 	}
 }
@@ -2090,6 +2246,40 @@ func (h *mockUpdaterHandler) OnUpdate(obj interface{}) {
 
 type mockUpdaterStore struct {
 	objects []interface{}
+}
+
+var store caches.Store
+var client interfaces.Interface
+var err error
+
+type mockUpdaterWatcher struct {
+	cachedObject runtime.Object
+}
+
+func (s *mockUpdaterWatcher) CachedObject() runtime.Object {
+	return s.cachedObject
+}
+
+func (s *mockUpdaterWatcher) Client() interfaces.Interface {
+	return client
+}
+
+func (s *mockUpdaterWatcher) Start() error {
+	return err
+}
+
+func (s *mockUpdaterWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
+	return nil
+}
+
+func (s *mockUpdaterWatcher) Stop() {
+}
+
+func (s *mockUpdaterWatcher) Store() caches.Store {
+	return store
+}
+
+func (s *mockUpdaterWatcher) AddEventHandler(kubernetes.ResourceEventHandler) {
 }
 
 func (s *mockUpdaterStore) List() []interface{} {

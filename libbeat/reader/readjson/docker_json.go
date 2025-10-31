@@ -20,11 +20,11 @@ package readjson
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"runtime"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -60,13 +60,13 @@ type logLine struct {
 }
 
 // New creates a new reader renaming a field
-func New(r reader.Reader, stream string, partial bool, format string, CRIFlags bool) *DockerJSONReader {
+func New(r reader.Reader, stream string, partial bool, format string, CRIFlags bool, logger *logp.Logger) *DockerJSONReader {
 	reader := DockerJSONReader{
 		stream:   stream,
 		partial:  partial,
 		reader:   r,
 		criflags: CRIFlags,
-		logger:   logp.NewLogger("reader_docker_json"),
+		logger:   logger.Named("reader_docker_json"),
 	}
 
 	switch strings.ToLower(format) {
@@ -87,13 +87,13 @@ func New(r reader.Reader, stream string, partial bool, format string, CRIFlags b
 	return &reader
 }
 
-func NewContainerParser(r reader.Reader, config *ContainerJSONConfig) *DockerJSONReader {
+func NewContainerParser(r reader.Reader, config *ContainerJSONConfig, logger *logp.Logger) *DockerJSONReader {
 	reader := DockerJSONReader{
 		stream:   config.Stream.String(),
 		partial:  true,
 		reader:   r,
 		criflags: true,
-		logger:   logp.NewLogger("parser_container"),
+		logger:   logger.Named("parser_container"),
 	}
 
 	switch config.Format {
@@ -134,7 +134,7 @@ func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) er
 	}
 	ts, err := time.Parse(time.RFC3339Nano, string(log[i]))
 	if err != nil {
-		return errors.Wrap(err, "parsing CRI timestamp")
+		return fmt.Errorf("parsing CRI timestamp: %w", err)
 	}
 	message.Ts = ts
 	i++
@@ -176,13 +176,13 @@ func (p *DockerJSONReader) parseDockerJSONLog(message *reader.Message, msg *logL
 	dec := json.NewDecoder(bytes.NewReader(message.Content))
 
 	if err := dec.Decode(&msg); err != nil {
-		return errors.Wrap(err, "decoding docker JSON")
+		return fmt.Errorf("decoding docker JSON: %w", err)
 	}
 
 	// Parse timestamp
 	ts, err := time.Parse(time.RFC3339, msg.Time)
 	if err != nil {
-		return errors.Wrap(err, "parsing docker timestamp")
+		return fmt.Errorf("parsing docker timestamp: %w", err)
 	}
 	message.Ts = ts
 

@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package helper
 
@@ -33,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestOverNamedpipe(t *testing.T) {
@@ -63,7 +63,7 @@ func TestOverNamedpipe(t *testing.T) {
 			SanitizedURI: "http://npipe/",
 		}
 
-		h, err := NewHTTPFromConfig(cfg, hostData)
+		h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		r, err := h.FetchResponse()
@@ -96,7 +96,7 @@ func TestOverNamedpipe(t *testing.T) {
 			SanitizedURI: "http://npipe/ok",
 		}
 
-		h, err := NewHTTPFromConfig(cfg, hostData)
+		h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		r, err := h.FetchResponse()

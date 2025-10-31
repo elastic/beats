@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package logstash
 
@@ -27,9 +26,14 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/transport/transptest"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport"
+
+	"github.com/stretchr/testify/require"
 )
 
 type testAsyncDriver struct {
@@ -52,14 +56,53 @@ func TestAsyncStructuredEvent(t *testing.T) {
 }
 
 func makeAsyncTestClient(conn *transport.Client) testClientDriver {
-	config := defaultConfig()
+	config := DefaultConfig()
 	config.Timeout = 1 * time.Second
 	config.Pipelining = 3
-	client, err := newAsyncClient(beat.Info{}, conn, outputs.NewNilObserver(), &config)
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		panic(err)
+	}
+	client, err := newAsyncClient(logger, "beat_version", conn, outputs.NewNilObserver(), &config)
 	if err != nil {
 		panic(err)
 	}
 	return newAsyncTestDriver(client)
+}
+
+func TestClientSendCloseDoesNotPanic(t *testing.T) {
+	require.NotPanics(t, func() {
+		for i := 0; i < 10; i++ {
+			testClientSendCloseDoesNotPanic(t)
+		}
+	})
+}
+
+func testClientSendCloseDoesNotPanic(t *testing.T) {
+	server := transptest.NewMockServerTCP(t, 50*time.Millisecond, "", nil)
+	defer server.Close()
+
+	transp, err := server.Connect()
+	require.NoError(t, err)
+	defer transp.Close()
+
+	config := DefaultConfig()
+	logger, err := logp.NewDevelopmentLogger("")
+	require.NoError(t, err)
+
+	asyncClient, err := newAsyncClient(logger, "beat_version", transp, outputs.NewNilObserver(), &config)
+	require.NoError(t, err)
+
+	event := beat.Event{
+		Fields: mapstr.M{
+			"message": "test event",
+		},
+	}
+	batch := outest.NewBatch(event)
+	go func() {
+		_ = asyncClient.Close()
+	}()
+	_ = asyncClient.Publish(t.Context(), batch)
 }
 
 func newAsyncTestDriver(client outputs.NetworkClient) *testAsyncDriver {
@@ -73,6 +116,8 @@ func newAsyncTestDriver(client outputs.NetworkClient) *testAsyncDriver {
 	go func() {
 		defer driver.wg.Done()
 
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
 		for {
 			cmd, ok := <-driver.ch
 			if !ok {
@@ -83,7 +128,7 @@ func newAsyncTestDriver(client outputs.NetworkClient) *testAsyncDriver {
 			case driverCmdQuit:
 				return
 			case driverCmdConnect:
-				driver.client.Connect()
+				driver.client.Connect(ctx)
 			case driverCmdClose:
 				driver.client.Close()
 			case driverCmdPublish:

@@ -3,6 +3,7 @@ Metricbeat system module tests
 """
 import getpass
 import os
+import platform
 import re
 import sys
 import unittest
@@ -36,6 +37,16 @@ SYSTEM_CPU_ALL[metricbeat.P_LINUX] = SYSTEM_CPU[metricbeat.P_LINUX] + ["idle.tic
                                                                        "system.norm.pct", "user.norm.pct",
                                                                        "total.norm.pct", "total.value"]
 
+# metrics from /proc/cpuinfo are platform dependent and only
+# reliably available on Linux x86-like platforms
+
+
+def is_cpuinfo_supported():
+    return platform.machine() in {'i386', 'i686', 'x86_64', 'amd64'}
+
+
+SYSTEM_CORE_CPUINFO_FIELDS = ["model_name", "model_number", "mhz",
+                              "core_id", "physical_id"]
 
 SYSTEM_CORE = {
     metricbeat.P_WIN: ["id", "idle.pct",
@@ -43,9 +54,10 @@ SYSTEM_CORE = {
 }
 SYSTEM_CORE[metricbeat.P_DARWIN] = SYSTEM_CORE[metricbeat.P_WIN] + ["nice.pct"]
 SYSTEM_CORE[metricbeat.P_LINUX] = SYSTEM_CORE[metricbeat.P_DARWIN] + \
-    ["iowait.pct", "irq.pct", "softirq.pct", "steal.pct",
-     "model_name", "model_number", "mhz",
-     "core_id", "physical_id"]
+    ["iowait.pct", "irq.pct", "softirq.pct", "steal.pct"]
+
+if is_cpuinfo_supported():
+    SYSTEM_CORE[metricbeat.P_LINUX].extend(SYSTEM_CORE_CPUINFO_FIELDS)
 
 SYSTEM_CORE_ALL = {
     metricbeat.P_WIN: SYSTEM_CORE[metricbeat.P_WIN] + ["idle.ticks", "system.ticks", "user.ticks",
@@ -111,8 +123,9 @@ SYSTEM_DISK_HOST_FIELDS = ["read.bytes", "write.bytes"]
 # cmdline is also part of the system process fields, but it may not be present
 # for some kernel level processes. fd is also part of the system process, but
 # is not available on all OSes and requires root to read for all processes.
+# num_threads may not be readable for some privileged process on Windows,
 # cgroup is only available on linux.
-SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
+SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state", "io"]
 
 
 class Test(metricbeat.BaseTest):
@@ -186,6 +199,9 @@ class Test(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             core_stats = evt["system"]["core"]
+            if sys.platform == metricbeat.P_LINUX and not is_cpuinfo_supported():
+                for f in SYSTEM_CORE_CPUINFO_FIELDS:
+                    core_stats.pop(f, None)
             self.assert_fields_for_platform(SYSTEM_CORE, core_stats)
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
@@ -209,6 +225,9 @@ class Test(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             core_stats = evt["system"]["core"]
+            if sys.platform == metricbeat.P_LINUX and not is_cpuinfo_supported():
+                for f in SYSTEM_CORE_CPUINFO_FIELDS:
+                    core_stats.pop(f, None)
             self.assert_fields_for_platform(SYSTEM_CORE_ALL, core_stats)
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
@@ -251,13 +270,14 @@ class Test(metricbeat.BaseTest):
             if 'error' not in evt:
                 if "system" in evt:
                     diskio = evt["system"]["diskio"]
+                    self.remove_fields(diskio, ["serial_number"])
                     self.assert_fields_for_platform(SYSTEM_DISKIO, diskio)
                 elif "host" in evt:
                     host_disk = evt["host"]["disk"]
                     self.assertCountEqual(
                         SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|freebsd|openbsd", sys.platform), "os")
     def test_filesystem(self):
         """
         Test system/filesystem output.
@@ -384,9 +404,18 @@ class Test(metricbeat.BaseTest):
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
+        only_errors_encountered = True
 
         for evt in output:
             self.assert_fields_are_documented(evt)
+            if evt.get("error", None) is not None:
+                # Here, we assume that the error is non-fatal and we move forward the test execution.
+                # If the error is non-fatal, the test should pass with assertions.
+                # If the error is fatal, the test should fail.
+                continue
+
+            # we've encoutered an event. Turn off the flag
+            only_errors_encountered = False
 
             summary = evt["system"]["process"]["summary"]
             assert isinstance(summary["total"], int)
@@ -394,6 +423,10 @@ class Test(metricbeat.BaseTest):
             if sys.platform.startswith("windows"):
                 assert isinstance(summary["running"], int)
                 assert isinstance(summary["total"], int)
+
+        # If the flag is true, we've only encountered error (fatal errors)
+        # If the flag is false, we've encoutered events and probably some non-fatal errors.
+        assert not only_errors_encountered
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
@@ -418,8 +451,21 @@ class Test(metricbeat.BaseTest):
         self.assertGreater(len(output), 0)
 
         found_cmdline = False
+        only_errors_encountered = True
         for evt in output:
+            if evt.get("error", None) is not None:
+                # Here, we assume that the error is non-fatal and we move forward the test execution.
+                # If the error is non-fatal, the test should pass with assertions.
+                # If the error is fatal, the test should fail.
+                continue
+
+            # we've encoutered an event. Turn off the flag
+            only_errors_encountered = False
+
             process = evt["system"]["process"]
+            # Not all process will have 'cmdline' due to permission issues,
+            # especially on Windows. Therefore we ensure at least some of
+            # them will have it.
             found_cmdline |= "cmdline" in process
 
             # Remove 'env' prior to checking documented fields because its keys are dynamic.
@@ -430,16 +476,22 @@ class Test(metricbeat.BaseTest):
             process.pop("cgroup", None)
             process.pop("fd", None)
             process.pop("cmdline", None)
+            process.pop("num_threads", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
+        # After iterating over all process, make sure at least one of them had
+        # the 'cmdline' set.
+        self.assertTrue(
+            found_cmdline, "cmdline not found in any process events")
 
-            self.assertTrue(
-                found_cmdline, "cmdline not found in any process events")
+        # If the flag is true, we've only encountered error (fatal errors)
+        # If the flag is false, we've encoutered events and probably some non-fatal errors.
+        assert not only_errors_encountered
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_process_unix(self):
         """
-        Test system/process output for fields specific of unix systems.
+        Test system/process output checking it has got all expected fields specific of unix systems and no extra ones.
         """
 
         self.render_config_template(
@@ -471,7 +523,16 @@ class Test(metricbeat.BaseTest):
         found_fd = False
         found_env = False
         found_cwd = not sys.platform.startswith("linux")
+        only_errors_encountered = True
         for evt in output:
+            if evt.get("error", None) is not None:
+                # Here, we assume that the error is non-fatal and we move forward the test execution.
+                # If the error is non-fatal, the test should pass with assertions.
+                # If the error is fatal, the test should fail.
+                continue
+            # we've encoutered an event. Turn off the flag
+            only_errors_encountered = False
+
             found_cwd |= "working_directory" in evt["process"]
 
             process = evt["system"]["process"]
@@ -486,12 +547,16 @@ class Test(metricbeat.BaseTest):
             process.pop("cgroup", None)
             process.pop("cmdline", None)
             process.pop("fd", None)
+            process.pop("num_threads", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
         if not sys.platform.startswith("darwin"):
             self.assertTrue(found_fd, "fd not found in any process events")
 
+        # If the flag is true, we've only encountered error (fatal errors)
+        # If the flag is false, we've encoutered events and probably some non-fatal errors.
+        assert not only_errors_encountered
         self.assertTrue(found_env, "env not found in any process events")
         self.assertTrue(
             found_cwd, "working_directory not found in any process events")
@@ -516,9 +581,9 @@ class Test(metricbeat.BaseTest):
         output = self.read_output()[0]
 
         assert re.match("(?i)metricbeat.test(.exe)?", output["process.name"])
-        assert re.match("(?i).*metricbeat.test(.exe)? -systemTest",
+        assert re.match("(?i).*metricbeat.test(.exe)? --systemTest",
                         output["system.process.cmdline"])
-        assert re.match("(?i).*metricbeat.test(.exe)? -systemTest",
+        assert re.match("(?i).*metricbeat.test(.exe)? --systemTest",
                         output["process.command_line"])
         assert isinstance(output["system.process.state"], six.string_types)
         assert isinstance(

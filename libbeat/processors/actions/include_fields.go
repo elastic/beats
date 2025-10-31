@@ -18,15 +18,15 @@
 package actions
 
 import (
+	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -41,13 +41,13 @@ func init() {
 			checks.AllowedFields("fields", "when")))
 }
 
-func newIncludeFields(c *conf.C) (processors.Processor, error) {
+func newIncludeFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := struct {
 		Fields []string `config:"fields"`
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the include_fields configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the include_fields configuration: %w", err)
 	}
 
 	/* add read only fields if they are not yet */
@@ -85,7 +85,7 @@ func (f *includeFields) Run(event *beat.Event) (*beat.Event, error) {
 
 	event.Fields = filtered
 	if len(errs) > 0 {
-		return event, fmt.Errorf(strings.Join(errs, ", "))
+		return event, errors.New(strings.Join(errs, ", "))
 	}
 	return event, nil
 }

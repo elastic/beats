@@ -6,22 +6,30 @@ input:
     metrics:
       - namespace: AWS/SQS
         resource_type: sqs
-        statistic: ["Average"]
+        statistic: [ "Maximum" ]
         name:
           - ApproximateAgeOfOldestMessage
+      - namespace: AWS/SQS
+        resource_type: sqs
+        statistic: [ "Average" ]
+        name:
           - ApproximateNumberOfMessagesDelayed
           - ApproximateNumberOfMessagesNotVisible
           - ApproximateNumberOfMessagesVisible
+          - SentMessageSize
+      - namespace: AWS/SQS
+        resource_type: sqs
+        statistic: [ "Sum" ]
+        name:
           - NumberOfMessagesDeleted
+          - NumberOfEmptyReceives
           - NumberOfMessagesReceived
           - NumberOfMessagesSent
-          - NumberOfEmptyReceives
-          - SentMessageSize
 processors:
   - rename:
       ignore_missing: true
       fields:
-        - from: "aws.sqs.metrics.ApproximateAgeOfOldestMessage.avg"
+        - from: "aws.sqs.metrics.ApproximateAgeOfOldestMessage.max"
           to: "aws.sqs.oldest_message_age.sec"
         - from: "aws.sqs.metrics.ApproximateNumberOfMessagesDelayed.avg"
           to: "aws.sqs.messages.delayed"
@@ -29,13 +37,13 @@ processors:
           to: "aws.sqs.messages.not_visible"
         - from: "aws.sqs.metrics.ApproximateNumberOfMessagesVisible.avg"
           to: "aws.sqs.messages.visible"
-        - from: "aws.sqs.metrics.NumberOfMessagesDeleted.avg"
+        - from: "aws.sqs.metrics.NumberOfMessagesDeleted.sum"
           to: "aws.sqs.messages.deleted"
-        - from: "aws.sqs.metrics.NumberOfMessagesReceived.avg"
+        - from: "aws.sqs.metrics.NumberOfMessagesReceived.sum"
           to: "aws.sqs.messages.received"
-        - from: "aws.sqs.metrics.NumberOfMessagesSent.avg"
+        - from: "aws.sqs.metrics.NumberOfMessagesSent.sum"
           to: "aws.sqs.messages.sent"
-        - from: "aws.sqs.metrics.NumberOfEmptyReceives.avg"
+        - from: "aws.sqs.metrics.NumberOfEmptyReceives.sum"
           to: "aws.sqs.empty_receives"
         - from: "aws.sqs.metrics.SentMessageSize.avg"
           to: "aws.sqs.sent_message_size.bytes"

@@ -9,6 +9,8 @@ import (
 	"errors"
 	"sync"
 
+	"go.uber.org/zap/zapcore"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -59,12 +61,15 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 	// lastKnownInputs is used for recovery after "broken pipe" error
 	var lastKnownInputs []config.InputConfig
 
+	logLevel := zapcore.LevelOf(r.log.Core())
+
 	process := func(inputs []config.InputConfig) {
 		lastKnownInputs = inputs
 		newFlags := config.GetOsqueryOptions(inputs)
+		newLogLevel := zapcore.LevelOf(r.log.Core())
 
-		// If Osqueryd is running and flags are different: stop osquery
-		if cn != nil && !osqd.FlagsAreSame(flags, newFlags) {
+		// If Osqueryd is running and flags are different or log level changed: stop osquery
+		if cn != nil && (!osqd.FlagsAreSame(flags, newFlags) || logLevel != newLogLevel) {
 			r.log.Info("Osquery is running and options changed, stop osqueryd")
 
 			// Cancel context
@@ -76,6 +81,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 
 		// Set the flags to use
 		flags = newFlags
+		logLevel = newLogLevel
 
 		// Start osqueryd if not running
 		if cn == nil {

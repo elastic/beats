@@ -22,16 +22,20 @@ package compat
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/gofrs/uuid/v5"
+	"github.com/gohugoio/hashstructure"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -41,6 +45,8 @@ type factory struct {
 	log    *logp.Logger
 	info   beat.Info
 	loader *v2.Loader
+
+	rootInputsRegistry *monitoring.Registry
 }
 
 // runner wraps a v2.Input, starting a go-routine
@@ -49,13 +55,15 @@ type factory struct {
 // On stop the runner triggers the shutdown signal and waits until the input
 // has returned.
 type runner struct {
-	id        string
-	log       *logp.Logger
-	agent     *beat.Info
-	wg        sync.WaitGroup
-	sig       ctxtool.CancelContext
-	input     v2.Input
-	connector beat.PipelineConnector
+	id                 string
+	log                *logp.Logger
+	agent              *beat.Info
+	wg                 sync.WaitGroup
+	sig                ctxtool.CancelContext
+	input              v2.Input
+	connector          beat.PipelineConnector
+	statusReporter     status.StatusReporter
+	rootInputsRegistry *monitoring.Registry
 }
 
 // RunnerFactory creates a cfgfile.RunnerFactory from an input Loader that is
@@ -64,16 +72,31 @@ type runner struct {
 func RunnerFactory(
 	log *logp.Logger,
 	info beat.Info,
+	rootInputsRegistry *monitoring.Registry,
 	loader *v2.Loader,
 ) cfgfile.RunnerFactory {
-	return &factory{log: log, info: info, loader: loader}
+	return &factory{log: log, info: info, rootInputsRegistry: rootInputsRegistry, loader: loader}
 }
 
 func (f *factory) CheckConfig(cfg *conf.C) error {
-	_, err := f.loader.Configure(cfg)
+	// just check the config, therefore to avoid potential side effects (ID duplication)
+	// change the ID.
+	checkCfg, err := f.generateCheckConfig(cfg)
 	if err != nil {
-		return err
+		f.log.Warnw(fmt.Sprintf("input V2 factory.CheckConfig failed to clone config before checking it. Original config will be checked, it might trigger an input duplication warning: %v", err), "original_config", conf.DebugString(cfg, true))
+		checkCfg = cfg
 	}
+	_, err = f.loader.Configure(checkCfg)
+	if err != nil {
+		return fmt.Errorf("runner factory could not check config: %w", err)
+	}
+
+	if err = f.loader.Delete(checkCfg); err != nil {
+		return fmt.Errorf(
+			"runner factory failed to delete an input after config check: %w",
+			err)
+	}
+
 	return nil
 }
 
@@ -92,13 +115,18 @@ func (f *factory) Create(
 	}
 
 	return &runner{
-		id:        id,
-		log:       f.log.Named(input.Name()).With("id", id),
-		agent:     &f.info,
-		sig:       ctxtool.WithCancelContext(context.Background()),
-		input:     input,
-		connector: p,
+		id:                 id,
+		log:                f.log.Named(input.Name()).With("id", id),
+		agent:              &f.info,
+		sig:                ctxtool.WithCancelContext(context.Background()),
+		input:              input,
+		connector:          p,
+		rootInputsRegistry: f.rootInputsRegistry,
 	}, nil
+}
+
+func (r *runner) SetStatusReporter(reported status.StatusReporter) {
+	r.statusReporter = reported
 }
 
 func (r *runner) String() string { return r.input.Name() }
@@ -111,16 +139,28 @@ func (r *runner) Start() {
 	go func() {
 		defer r.wg.Done()
 		log.Infof("Input '%s' starting", name)
-		err := r.input.Run(
-			v2.Context{
-				ID:          r.id,
-				Agent:       *r.agent,
-				Logger:      log,
-				Cancelation: r.sig,
-			},
+
+		reg, pc, cancelMetrics := v2.PrepareInputMetrics(
+			r.id,
+			r.input.Name(),
+			r.rootInputsRegistry,
 			r.connector,
-		)
-		if err != nil {
+			r.log)
+		defer cancelMetrics()
+
+		ctx := v2.Context{
+			ID:              r.id,
+			IDWithoutName:   r.id,
+			Name:            r.input.Name(),
+			Agent:           *r.agent,
+			Cancelation:     r.sig,
+			StatusReporter:  r.statusReporter,
+			MetricsRegistry: reg,
+			Logger:          log,
+		}
+
+		err := r.input.Run(ctx, pc)
+		if err != nil && !errors.Is(err, context.Canceled) {
 			log.Errorf("Input '%s' failed with: %+v", name, err)
 		} else {
 			log.Infof("Input '%s' stopped (goroutine)", name)
@@ -132,8 +172,13 @@ func (r *runner) Stop() {
 	r.sig.Cancel()
 	r.wg.Wait()
 	r.log.Infof("Input '%s' stopped (runner)", r.input.Name())
+	r.statusReporter = nil
 }
 
+// configID extracts or generates an ID for a configuration.
+// If the "id" is present in config and is non-empty, it is returned.
+// If the "id" is absent or empty, the function calculates a hash of the
+// entire configuration and returns it as a hexadecimal string as the ID.
 func configID(config *conf.C) (string, error) {
 	tmp := struct {
 		ID string `config:"id"`
@@ -146,11 +191,46 @@ func configID(config *conf.C) (string, error) {
 	}
 
 	var h map[string]interface{}
-	config.Unpack(&h)
+	err := config.Unpack(&h)
+	if err != nil {
+		return "", fmt.Errorf("could not unpack config into %T: unpack failed: %w",
+			h, err)
+	}
+
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
 		return "", fmt.Errorf("can not compute id from configuration: %w", err)
 	}
 
 	return fmt.Sprintf("%16X", id), nil
+}
+
+func (f *factory) generateCheckConfig(config *conf.C) (*conf.C, error) {
+	// copy the config so it's safe to change it
+	testCfg, err := conf.NewConfigFrom(config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create new config: %w", err)
+	}
+
+	uid, err := uuid.NewV4()
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate check config id: %w", err)
+	}
+
+	finalID := uid.String()
+	// if 'id' is present, use it as a prefix
+	if testCfg.HasField("id") {
+		inputID, err := testCfg.String("id", -1)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get 'id': %w", err)
+		}
+
+		finalID = inputID + "-" + finalID
+	}
+
+	if err := testCfg.SetString("id", -1, finalID); err != nil {
+		return nil, fmt.Errorf("failed to set 'id': %w", err)
+	}
+
+	return testCfg, nil
 }

@@ -1,0 +1,40 @@
+{{ if eq .input "salesforce" }}
+
+id: apex
+type: salesforce
+enabled: true
+{{ if .api_version }}
+version: {{ .api_version }}
+{{ end }}
+auth.oauth2: {{ .authentication | tojson }}
+url: {{ .url }}
+event_monitoring_method:
+  event_log_file:
+    enabled: true
+    interval: {{ .elf_interval }}
+    query:
+      default: SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE {{ if .initial_interval }}LogDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05.000Z0700") ]] AND{{ end }} Interval = '{{ .log_file_interval }}' AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY LogDate ASC NULLS FIRST
+      value: SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = '{{ .log_file_interval }}' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY LogDate ASC NULLS FIRST
+    cursor:
+      field: "CreatedDate"
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - add_fields:
+      target: salesforce
+      fields:
+        instance_url: {{ .url }}
+  - add_locale: ~

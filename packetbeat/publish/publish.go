@@ -18,9 +18,8 @@
 package publish
 
 import (
+	"errors"
 	"net"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -97,7 +96,7 @@ func (p *TransactionPublisher) CreateReporter(
 		return nil, err
 	}
 
-	processors, err := processors.New(meta.Processors)
+	processors, err := processors.New(meta.Processors, nil)
 	if err != nil {
 		return nil, err
 	}

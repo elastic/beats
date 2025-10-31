@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package replstatus
 
 import (
@@ -54,8 +56,8 @@ func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) mapstr.M {
 		}
 
 		result["headroom"] = mapstr.M{
-			"max": int64(oplogInfo.diff) - minLag,
-			"min": int64(oplogInfo.diff) - maxLag,
+			"max": oplogInfo.diff - minLag,
+			"min": oplogInfo.diff - maxLag,
 		}
 	} else {
 		result["lag"] = mapstr.M{

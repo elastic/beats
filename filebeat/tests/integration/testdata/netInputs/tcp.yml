@@ -1,0 +1,23 @@
+filebeat.inputs:
+  - type: tcp
+    id: "tcp-1"
+    host: "{{.addr}}"
+    number_of_workers: 2
+
+output.file:
+    path: ${path.home}
+    filename: "output"
+    rotate_on_startup: false
+
+queue.mem:
+  flush:
+    timeout: 0
+
+http:
+  enabled: true
+  port: 5066
+
+logging:
+  level: debug
+  selectors:
+    - "input.tcp"

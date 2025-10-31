@@ -2,15 +2,19 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package app_insights
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var (
@@ -26,8 +30,9 @@ var (
 )
 
 func TestClient(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	t.Run("return error not valid query", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		client.Config = config
 		m := &MockService{}
 		m.On("GetMetricValues", mock.Anything, mock.Anything).Return(insights.ListMetricsResultsItem{}, errors.New("invalid query"))
@@ -38,7 +43,7 @@ func TestClient(t *testing.T) {
 		m.AssertExpectations(t)
 	})
 	t.Run("return results", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		client.Config = config
 		m := &MockService{}
 		metrics := []insights.MetricsResultsItem{{}, {}}

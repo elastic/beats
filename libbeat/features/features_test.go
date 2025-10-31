@@ -186,3 +186,39 @@ func TestFQDNCallbacks(t *testing.T) {
 	RemoveFQDNOnChangeCallback("cb2")
 	require.Len(t, flags.fqdnCallbacks, 0)
 }
+
+func TestFQDNWHileCallbackBlocked(t *testing.T) {
+	blockChan := make(chan struct{})
+	willBlockChan := make(chan struct{})
+	unblockedChan := make(chan struct{})
+	err := AddFQDNOnChangeCallback(func(new, old bool) {
+		willBlockChan <- struct{}{}
+		t.Logf("callback is currently blocked.")
+		<-blockChan
+		t.Logf("callback is unblocked.")
+
+	}, "test-TestFQDNWHileCallbackBlocked")
+	require.NoError(t, err)
+
+	// Start with FQDN off
+	go func() {
+		err = UpdateFromConfig(config.MustNewConfigFrom(map[string]interface{}{
+			"features.fqdn.enabled": true,
+		}))
+		unblockedChan <- struct{}{}
+	}()
+
+	// callback should be blocking at this point
+	t.Logf("Waiting for callback to block...")
+	<-willBlockChan
+	whileBlocked := FQDN()
+	require.True(t, whileBlocked)
+
+	//now unblock
+	blockChan <- struct{}{}
+	t.Logf("Waiting for callback to unblock...")
+	<-unblockedChan
+	unblocked := FQDN()
+	require.True(t, unblocked)
+
+}

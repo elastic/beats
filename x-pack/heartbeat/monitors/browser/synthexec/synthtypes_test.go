@@ -1,8 +1,7 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-//go:build linux || darwin
-// +build linux darwin
+//go:build linux || darwin || synthetics
 
 package synthexec
 
@@ -17,7 +16,7 @@ import (
 	"github.com/elastic/go-lookslike/testslike"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 
 	"github.com/stretchr/testify/require"
 )
@@ -56,7 +55,32 @@ func TestToMap(t *testing.T) {
 					"package_version": "1.2.3",
 					"nested":          "v1",
 				},
-				"url":           wrappers.URLFields(testUrl),
+				"url":           wraputil.URLFields(testUrl),
+				"truly_at_root": "v2",
+			},
+		},
+		{
+			"root fields with invalid URL",
+			mapstr.M{
+				"type":            JourneyStart,
+				"package_version": "1.2.3",
+				"root_fields": map[string]interface{}{
+					"synthetics": map[string]interface{}{
+						"nested": "v1",
+					},
+					"truly_at_root": "v2",
+				},
+				"url": "https://{example}.com",
+			},
+			mapstr.M{
+				"synthetics": mapstr.M{
+					"type":            JourneyStart,
+					"package_version": "1.2.3",
+					"nested":          "v1",
+				},
+				"url": mapstr.M{
+					"full": "https://{example}.com",
+				},
 				"truly_at_root": "v2",
 			},
 		},

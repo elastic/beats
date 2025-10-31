@@ -27,6 +27,12 @@ type Fetcher interface {
 	// returned, or an error if a failure occurred.
 	Users(ctx context.Context, deltaLink string) ([]*User, string, error)
 
+	// Devices fetches devices from Azure Active Directory. It may take an
+	// optional deltaLink string, which is a URL that can be used to resume
+	// from the last query. A slice of Devices and a new delta link may be
+	// returned, or an error if a failure occurred.
+	Devices(ctx context.Context, deltaLink string) ([]*Device, string, error)
+
 	// SetLogger sets the logger on the Fetcher.
 	SetLogger(logger *logp.Logger)
 }

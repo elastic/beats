@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package add_kubernetes_metadata
 
 import (
@@ -26,7 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -35,13 +37,14 @@ func TestAnnotatorSkipped(t *testing.T) {
 	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"lookup_fields": []string{"kubernetes.pod.name"},
 	})
-	matcher, err := NewFieldMatcher(*cfg)
+	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
+
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	processor := kubernetesAnnotator{
-		log:   logp.NewLogger(selector),
+		log:   logptest.NewTestingLogger(t, selector),
 		cache: newCache(10 * time.Second),
 		matchers: &Matchers{
 			matchers: []Matcher{matcher},
@@ -95,7 +98,7 @@ func TestAnnotatorWithNoKubernetesAvailable(t *testing.T) {
 	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"lookup_fields": []string{"kubernetes.pod.name"},
 	})
-	matcher, err := NewFieldMatcher(*cfg)
+	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

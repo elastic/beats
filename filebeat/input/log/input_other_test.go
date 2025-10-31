@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !windows && !integration
-// +build !windows,!integration
 
 package log
 
@@ -28,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var matchTests = []struct {
@@ -147,13 +146,13 @@ var initStateTests = []struct {
 func TestInit(t *testing.T) {
 	for _, test := range initStateTests {
 		p := Input{
-			logger: logp.NewLogger("harvester"),
+			logger: logptest.NewTestingLogger(t, "harvester"),
 			config: config{
 				Paths: test.paths,
 			},
-			states:              file.NewStates(),
+			states:              file.NewStates(logptest.NewTestingLogger(t, "")),
 			outlet:              inputtest.Outlet{},
-			fileStateIdentifier: &file.MockIdentifier{},
+			fileStateIdentifier: &mockIdentifier{},
 		}
 
 		// Set states to finished
@@ -167,3 +166,8 @@ func TestInit(t *testing.T) {
 		assert.Equal(t, test.count, p.states.Count())
 	}
 }
+
+// mockIdentifier is used for testing
+type mockIdentifier struct{}
+
+func (m *mockIdentifier) GenerateID(s file.State) (string, string) { return s.Id, "mock" }

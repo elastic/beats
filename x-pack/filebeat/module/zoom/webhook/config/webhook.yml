@@ -12,6 +12,11 @@ content_type: "{{ .content_type }}"
 secret: {{ .secret | tojson }}
 ssl: {{ .ssl | tojson }}
 
+{{ if .crc.enabled }}
+crc.provider: zoom
+crc.secret: {{ .crc.secret }}
+{{ end }}
+
 {{ else if eq .input "file" }}
 
 type: log

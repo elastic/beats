@@ -5,6 +5,7 @@ import time
 from xpack_metricbeat import XPackTest, metricbeat
 
 
+@unittest.skip("Flaky test: https://github.com/elastic/beats/issues/34993")
 class Test(XPackTest):
 
     COMPOSE_SERVICES = ['oracle']

@@ -39,7 +39,7 @@ Proposal sizes last/min/max: -3/-999/-1
 package server
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -71,18 +71,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	outputReader, err := zookeeper.RunCommand("srvr", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "srvr command failed")
+		return fmt.Errorf("srvr command failed: %w", err)
 
 	}
 
 	metricsetFields, version, err := parseSrvr(outputReader, m.Logger())
 	if err != nil {
-		return errors.Wrap(err, "error parsing srvr output")
+		return fmt.Errorf("error parsing srvr output: %w", err)
 	}
 
 	serverID, err := zookeeper.ServerID(m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "error obtaining server id")
+		return fmt.Errorf("error obtaining server id: %w", err)
 	}
 
 	event := mb.Event{

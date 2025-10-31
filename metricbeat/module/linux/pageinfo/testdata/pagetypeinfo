@@ -1,0 +1,24 @@
+Page block order: 9
+Pages per block:  512
+
+Free pages count per migrate type at order       0      1      2      3      4      5      6      7      8      9     10
+Node    0, zone      DMA, type    Unmovable      0      0      0      1      1      1      1      1      0      0      0
+Node    0, zone      DMA, type      Movable      0      0      0      0      0      0      0      0      0      1      2
+Node    0, zone      DMA, type  Reclaimable      0      0      0      0      0      0      0      0      0      0      0
+Node    0, zone      DMA, type   HighAtomic      0      0      0      0      0      0      0      0      0      0      0
+Node    0, zone      DMA, type      Isolate      0      0      0      0      0      0      0      0      0      0      0
+Node    0, zone    DMA32, type    Unmovable    475    434    197    179     68     32     16     12     10      0      0
+Node    0, zone    DMA32, type      Movable  12157   6536   1695    225     79     49    379     88     28      1      0
+Node    0, zone    DMA32, type  Reclaimable    191     92    537    141     12      1      1      1      1      0      0
+Node    0, zone    DMA32, type   HighAtomic      0      0      0      0      0      0      0      0      0      0      0
+Node    0, zone    DMA32, type      Isolate      0      0      0      0      0      0      0      0      0      0      0
+Node    0, zone   Normal, type    Unmovable     66    160    177     31     10     10      7      1      0      0      0
+Node    0, zone   Normal, type      Movable     10 >100000  70473   3338    115    109     14     60     55      1      0
+Node    0, zone   Normal, type  Reclaimable    994    603    162     16      1      0      0      0      0      0      0
+Node    0, zone   Normal, type   HighAtomic      0      0      0      0      0      0      0      0      0      0      0
+Node    0, zone   Normal, type      Isolate      0      0      0      0      0      0      0      0      0      0      0
+
+Number of blocks type     Unmovable      Movable  Reclaimable   HighAtomic      Isolate
+Node 0, zone      DMA            3            5            0            0            0
+Node 0, zone    DMA32           29         1405           94            0            0
+Node 0, zone   Normal          841        29689          702            0            0

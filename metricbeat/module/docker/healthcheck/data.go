@@ -21,8 +21,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/docker/docker/api/types"
-	"github.com/pkg/errors"
+	"github.com/docker/docker/api/types/container"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -30,20 +29,19 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventsMapping(r mb.ReporterV2, containers []types.Container, m *MetricSet) {
+func eventsMapping(r mb.ReporterV2, containers []container.Summary, m *MetricSet) {
 	for _, container := range containers {
 		eventMapping(r, &container, m)
 	}
 }
 
-func eventMapping(r mb.ReporterV2, cont *types.Container, m *MetricSet) {
+func eventMapping(r mb.ReporterV2, cont *container.Summary, m *MetricSet) {
 	if !hasHealthCheck(cont.Status) {
 		return
 	}
 
 	container, err := m.dockerClient.ContainerInspect(context.TODO(), cont.ID)
 	if err != nil {
-		errors.Wrapf(err, "Error inspecting container %v", cont.ID)
 		return
 	}
 

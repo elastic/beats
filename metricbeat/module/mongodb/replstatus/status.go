@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package replstatus
 
 import (
@@ -141,7 +143,8 @@ func findLag(members []Member) (minLag int64, maxLag int64, hasSecondary bool) {
 
 	for _, member := range members {
 		memberState := MemberState(member.State)
-		if memberState == SECONDARY {
+		switch memberState {
+		case SECONDARY:
 			hasSecondary = true
 
 			if minOptime > member.OpTime.getTimeStamp() {
@@ -151,7 +154,7 @@ func findLag(members []Member) (minLag int64, maxLag int64, hasSecondary bool) {
 			if member.OpTime.getTimeStamp() > maxOptime {
 				maxOptime = member.OpTime.getTimeStamp()
 			}
-		} else if memberState == PRIMARY {
+		case PRIMARY:
 			primaryOptime = member.OpTime.getTimeStamp()
 		}
 	}

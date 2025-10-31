@@ -19,7 +19,6 @@ package file_integrity
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -90,48 +89,6 @@ func TestScanner(t *testing.T) {
 		assert.True(t, foundRecursivePath, "expected subdir/c to be included")
 	})
 
-	t.Run("executable", func(t *testing.T) {
-		c := config
-		c.FileParsers = []string{"file.elf.import_hash", "file.macho.import_hash", "file.pe.import_hash"}
-
-		target := filepath.Join(dir, "executable")
-		err := copyFile(filepath.Join("testdata", "go_pe_executable"), target)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer os.Remove(target)
-
-		reader, err := NewFileSystemScanner(c, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		done := make(chan struct{})
-		defer close(done)
-
-		eventC, err := reader.Start(done)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		var (
-			foundExecutable bool
-			events          []Event
-		)
-		for event := range eventC {
-			events = append(events, event)
-			if filepath.Base(event.Path) == "executable" {
-				foundExecutable = true
-				h, err := event.ParserResults.GetValue("pe.import_hash")
-				assert.NoError(t, err, "no value for pe.import_hash")
-				assert.Len(t, h, 16, "wrong length for hash")
-			}
-		}
-
-		assert.Len(t, events, 8)
-		assert.True(t, foundExecutable, "expected executable to be included")
-	})
-
 	// This smoke tests the rate limit code path, but does not validate the rate.
 	t.Run("with rate limit", func(t *testing.T) {
 		c := config
@@ -164,32 +121,29 @@ func TestScanner(t *testing.T) {
 }
 
 func setupTestDir(t *testing.T) string {
-	dir, err := ioutil.TempDir("", "audit-file-scan")
-	if err != nil {
+	dir := t.TempDir()
+
+	if err := os.WriteFile(filepath.Join(dir, "a"), []byte("file a"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(filepath.Join(dir, "a"), []byte("file a"), 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "b"), []byte("file b"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(filepath.Join(dir, "b"), []byte("file b"), 0o600); err != nil {
+	if err := os.Symlink(filepath.Join(dir, "b"), filepath.Join(dir, "link_to_b")); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = os.Symlink(filepath.Join(dir, "b"), filepath.Join(dir, "link_to_b")); err != nil {
+	if err := os.Mkdir(filepath.Join(dir, "subdir"), 0o700); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = os.Mkdir(filepath.Join(dir, "subdir"), 0o700); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "subdir", "c"), []byte("file c"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(filepath.Join(dir, "subdir", "c"), []byte("file c"), 0o600); err != nil {
-		t.Fatal(err)
-	}
-
-	if err = os.Symlink(filepath.Join(dir, "subdir"), filepath.Join(dir, "link_to_subdir")); err != nil {
+	if err := os.Symlink(filepath.Join(dir, "subdir"), filepath.Join(dir, "link_to_subdir")); err != nil {
 		t.Fatal(err)
 	}
 

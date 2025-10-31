@@ -18,13 +18,12 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
-	"syscall"
 
-	"github.com/pkg/errors"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 type method func(m string) (string, error)
@@ -60,11 +59,13 @@ func ReadPassword(def string) (string, error) {
 }
 
 func stdin(p string) (string, error) {
+	//nolint:forbidigo // ignore
 	fmt.Print("Enter password: ")
-	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
+	bytePassword, err := term.ReadPassword(int(os.Stdin.Fd()))
 	if err != nil {
-		return "", errors.Wrap(err, "reading password input")
+		return "", fmt.Errorf("reading password input: %w", err)
 	}
+	//nolint:forbidigo // ignore
 	fmt.Println()
 	return string(bytePassword), nil
 }

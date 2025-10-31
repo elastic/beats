@@ -29,6 +29,7 @@ request.transforms:
 
 response.split:
   target: body.value
+  ignore_empty_value: true
   split:
     target: body.evidence
     keep_parent: true

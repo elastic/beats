@@ -48,7 +48,7 @@ type UDP struct {
 }
 
 // NewUDP creates and returns a new UDP.
-func NewUDP(p protos.Protocols, id, device string) (*UDP, error) {
+func NewUDP(p protos.Protocols, id, device string, idx int) (*UDP, error) {
 	portMap, err := buildPortsMap(p.GetAllUDP())
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func NewUDP(p protos.Protocols, id, device string) (*UDP, error) {
 	udp := &UDP{
 		protocols: p,
 		portMap:   portMap,
-		metrics:   newInputMetrics(id, device, portMap),
+		metrics:   newInputMetrics(fmt.Sprintf("%s_%d", id, idx), device, portMap),
 	}
 	logp.Debug("udp", "Port map: %v", portMap)
 
@@ -159,7 +159,7 @@ func newInputMetrics(id, device string, ports map[uint16]protos.Protocol) *input
 		return nil
 	}
 	devID := fmt.Sprintf("%s-udp%s::%s", id, portList(ports), device)
-	reg, unreg := inputmon.NewInputRegistry("udp", devID, nil)
+	reg, unreg := inputmon.NewDeprecatedMetricsRegistry("udp", devID, nil)
 	out := &inputMetrics{
 		unregister:     unreg,
 		device:         monitoring.NewString(reg, "device"),
@@ -168,9 +168,11 @@ func newInputMetrics(id, device string, ports map[uint16]protos.Protocol) *input
 		arrivalPeriod:  metrics.NewUniformSample(1024),
 		processingTime: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
+
+	// TODO: https://github.com/elastic/ingest-dev/issues/6000
+	_ = adapter.NewGoMetrics(reg, "arrival_period", logp.NewLogger(""), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", logp.NewLogger(""), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	out.device.Set(device)

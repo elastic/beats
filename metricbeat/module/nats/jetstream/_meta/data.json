@@ -1,0 +1,42 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "nats.jetstream",
+        "duration": 115000,
+        "module": "nats"
+    },
+    "metricset": {
+        "name": "jetstream",
+        "period": 10000
+    },
+    "nats": {
+        "jetstream": {
+            "category": "stats",
+            "stats": {
+                "accounts": 1,
+                "bytes": 17395590,
+                "config": {
+                    "max_memory": 12427170816,
+                    "max_storage": 752333079552,
+                    "store_dir": "/tmp/nats/jetstream",
+                    "sync_interval": 120000000000
+                },
+                "consumers": 0,
+                "memory": 0,
+                "messages": 102327,
+                "reserved_memory": 0,
+                "reserved_storage": 1073741824,
+                "storage": 17395590,
+                "streams": 1
+            }
+        },
+        "server": {
+            "id": "NBUWPVHICBBDHQZ3OPY2AEAVJVHDOQEVIQND3RLRUMCIZZEKHXHX5GDW",
+            "time": "2025-03-16T15:24:47.293Z"
+        }
+    },
+    "service": {
+        "address": "localhost:60829",
+        "type": "nats"
+    }
+}
