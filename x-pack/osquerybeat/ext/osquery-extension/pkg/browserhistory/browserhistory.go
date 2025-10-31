@@ -51,7 +51,8 @@ func GetTableRows(ctx context.Context, queryContext table.QueryContext, log *log
 	}
 	var merr error
 	for _, location := range locations {
-		parsers := getParsers(location, log)
+		log.Infof("Parsing browser history for location: %v", location)
+		parsers := getParsers(ctx, location, log)
 		if len(parsers) == 0 {
 			continue
 		}
@@ -98,14 +99,12 @@ func getSearchLocations(queryContext table.QueryContext, log *logger.Logger) ([]
 	var results []searchLocation
 	for _, browser := range defaultBrowsers {
 		for _, userPath := range userPaths {
-			browserBaseDir := getBrowserPath(browser)
-			if browserBaseDir == "" {
-				continue
+			for _, browserBaseDir := range getBrowserPaths(browser) {
+				results = append(results, searchLocation{
+					browser: browser,
+					path:    filepath.Join(userPath, browserBaseDir),
+				})
 			}
-			results = append(results, searchLocation{
-				browser: browser,
-				path:    filepath.Join(userPath, browserBaseDir),
-			})
 		}
 	}
 	return results, nil
@@ -165,6 +164,8 @@ func extractUserFromPath(filePath string, log *logger.Logger) string {
 		if (part == "Users" || part == "home") && i+1 < len(parts) {
 			user := parts[i+1]
 			return user
+		} else if part == "root" {
+			return "root"
 		}
 	}
 
