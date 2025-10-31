@@ -33,6 +33,7 @@ import (
 
 func TestNewFileLogger(t *testing.T) {
 	logger := NewFileLogger(t, "")
+	logger.Logger = logger.Named("test-logger")
 	logger.Debug("foo")
 
 	assertLogFormat(t, logger.logFile.Name())
@@ -93,6 +94,7 @@ func assertLogFormat(t *testing.T, path string) {
 		entry := struct {
 			Timestamp string `json:"@timestamp"`
 			LogLevel  string `json:"log.level"`
+			Logger    string `json:"log.logger"`
 			Message   string `json:"message"`
 		}{}
 
@@ -111,6 +113,10 @@ func assertLogFormat(t *testing.T, path string) {
 
 		if entry.Message == "" {
 			t.Error("message cannot be empty")
+		}
+
+		if entry.Logger == "" {
+			t.Error("'log.logger' cannot be empty")
 		}
 	}
 }

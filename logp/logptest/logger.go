@@ -60,7 +60,12 @@ type Logger struct {
 // replacement for a *logp.Logger, or the logger can be accessed via
 // [Logger.Logger]
 func NewFileLogger(t testing.TB, dir string) *Logger {
-	encoderConfig := ecszap.ECSCompatibleEncoderConfig(zapcore.EncoderConfig{})
+	encoderConfig := ecszap.ECSCompatibleEncoderConfig(zapcore.EncoderConfig{
+		// As long as NameKey is NOT EMPTY it will be overridden
+		// by the correct key. So we set it to 'enabled' to make it very
+		// clear this is NOT the final key for the logger name.
+		NameKey: "enabled",
+	})
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	encoder := zapcore.NewJSONEncoder(encoderConfig)
 
