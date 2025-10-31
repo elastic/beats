@@ -99,19 +99,19 @@ Google Cloud Billing metrics
     type: date
 
 
-**`gcp.billing.location.region`**
+**`gcp.billing.location.region`** {applies_to}`stack: beta 9.2.1`
 :   The geographic region where the resource was used (e.g., us-central1, europe-west1).
 
     type: keyword
 
 
-**`gcp.billing.location.zone`**
+**`gcp.billing.location.zone`** {applies_to}`stack: beta 9.2.1`
 :   The specific zone within the region (e.g., us-central1-a).
 
     type: keyword
 
 
-**`gcp.billing.location.country`**
+**`gcp.billing.location.country`** {applies_to}`stack: beta 9.2.1`
 :   The country code for the resource location (e.g., US, GB).
 
     type: keyword

@@ -56,12 +56,18 @@
       - name: region
         type: keyword
         description: The geographic region where the resource was used (e.g., us-central1, europe-west1).
+        version:
+          beta: 9.2.1
       - name: zone
         type: keyword
         description: The specific zone within the region (e.g., us-central1-a).
+        version:
+          beta: 9.2.1
       - name: country
         type: keyword
         description: The country code for the resource location (e.g., US, GB).
+        version:
+          beta: 9.2.1
   - name: labels
     type: object
     object_type: keyword
