@@ -6,27 +6,16 @@
 
 package tables
 
-import (
-	"github.com/osquery/osquery-go/plugin/table"
-)
+import "time"
 
 // ApplicationShortcutEntry represents a single entry in the amcache application shortcut table.
 // located at Root\\InventoryApplicationShortcut
 type ApplicationShortcutEntry struct {
-	LastWriteTime      int64  `osquery:"last_write_time"`
-	ShortcutPath       string `osquery:"shortcut_path"`
-	ShortcutTargetPath string `osquery:"shortcut_target_path"`
-	ShortcutAumid      string `osquery:"shortcut_aumid"`
-	ShortcutProgramId  string `osquery:"shortcut_program_id"`
-}
-
-// Columns returns the column definitions for the ApplicationShortcutTable.
-func ApplicationShortcutColumns() []table.ColumnDefinition {
-	return []table.ColumnDefinition{
-		table.BigIntColumn("last_write_time"),
-		table.TextColumn("shortcut_path"),
-		table.TextColumn("shortcut_target_path"),
-		table.TextColumn("shortcut_aumid"),
-		table.TextColumn("shortcut_program_id"),
-	}
+	Timestamp          time.Time `osquery:"timestamp" format:"unix"`
+	DateTime           time.Time `osquery:"date_time" format:"rfc3339" tz:"UTC"`
+	KeyName            string    `osquery:"key_name"`
+	ShortcutPath       string    `osquery:"shortcut_path"`
+	ShortcutTargetPath string    `osquery:"shortcut_target_path"`
+	ShortcutAumid      string    `osquery:"shortcut_aumid"`
+	ShortcutProgramId  string    `osquery:"shortcut_program_id"`
 }

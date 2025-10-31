@@ -53,7 +53,8 @@ func TestCachingBehavior(t *testing.T) {
 
 	// Calling any of the accessor functions should cause the cache to update
 	filters := []filters.Filter{}
-	entries := instance.GetCachedEntries(tables.ApplicationTable, filters)
+	table := tables.AllAmcacheTables()[0]
+	entries := instance.GetCachedEntries(table, filters)
 	if len(entries) == 0 {
 		t.Errorf("Expected accessor function to return results, got 0")
 	}
@@ -64,8 +65,8 @@ func TestCachingBehavior(t *testing.T) {
 
 	// Calling the accessor functions again should not cause an update since it has not expired
 	// Additionally they should all return results
-	for _, tableType := range tables.AllAmcacheTables() {
-		if len(instance.GetCachedEntries(tableType, filters)) == 0 {
+	for _, table := range tables.AllAmcacheTables() {
+		if len(instance.GetCachedEntries(table, filters)) == 0 {
 			t.Errorf("Expected accessor function to return results, got 0")
 		}
 	}
@@ -84,7 +85,7 @@ func TestCachingBehavior(t *testing.T) {
 	}
 
 	// Calling any of the accessor functions should cause the cache to update since it has expired
-	entries = instance.GetCachedEntries(tables.ApplicationTable, filters)
+	entries = instance.GetCachedEntries(table, filters)
 	if len(entries) == 0 {
 		t.Errorf("Expected accessor function to return results, got 0")
 	}

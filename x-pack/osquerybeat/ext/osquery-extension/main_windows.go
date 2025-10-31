@@ -8,9 +8,7 @@ package main
 
 import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/state"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"	
-	"github.com/osquery/osquery-go/plugin/table"
-
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/browserhistory"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views"
@@ -21,7 +19,7 @@ import (
 func RegisterAmcacheTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
 	amcacheGlobalState := state.GetAmcacheGlobalState()
 	for _, t := range tables.AllAmcacheTables() {
-		server.RegisterPlugin(table.NewPlugin(t.Name(), t.Columns(), t.GenerateFunc(amcacheGlobalState, log)))
+		server.RegisterPlugin(table.NewPlugin(t.Name, t.Columns(), t.GenerateFunc(amcacheGlobalState, log)))
 	}
 }
 

@@ -7,11 +7,11 @@
 package state
 
 import (
-	"fmt"
 	"log"
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/registry"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 )
@@ -48,12 +48,12 @@ type Config struct {
 //
 //	in general
 
-type CachedTables map[tables.AmcacheTable][]tables.Entry
+type CachedTables map[string][]tables.Entry
 
 func NewCachedTables() CachedTables {
 	cachedTables := make(CachedTables)
 	for _, amcacheTable := range tables.AllAmcacheTables() {
-		cachedTables[amcacheTable] = make([]tables.Entry, 0)
+		cachedTables[amcacheTable.Name] = make([]tables.Entry, 0)
 	}
 	return cachedTables
 }
@@ -85,7 +85,7 @@ func (gs *AmcacheGlobalState) Update() {
 	defer gs.Lock.Unlock()
 
 	// Reload the registry
-	registry, err := tables.LoadRegistry(gs.Config.HivePath)
+	regParser, err := registry.LoadRegistry(gs.Config.HivePath)
 	if err != nil {
 		log.Printf("error opening amcache registry: %v", err)
 		return
@@ -94,30 +94,25 @@ func (gs *AmcacheGlobalState) Update() {
 	// Repopulate all caches.
 	for _, amcacheTable := range tables.AllAmcacheTables() {
 		// keyPath represents each relevant key in the Amcache hive such as "Root\InventoryApplication"
-		keyPath := amcacheTable.GetHiveKey()
+		keyPath := amcacheTable.HiveKey
 
 		// Initialize the map for this keyPath
-		gs.Cache[amcacheTable] = make([]tables.Entry, 0)
+		gs.Cache[amcacheTable.Name] = make([]tables.Entry, 0)
 
 		// Get entries for this keyPath from the loaded registry
-		entries, err := tables.GetEntriesFromRegistry(amcacheTable, registry)
+		entries, err := tables.GetEntriesFromRegistry(amcacheTable, regParser)
 		if err != nil {
 			// Log the error for this key and continue so we don't leave a nil map.
 			log.Printf("error getting %s entries: %v", keyPath, err)
 		}
-		if entries == nil {
-			entries = make([]tables.Entry, 0)
+		if entries != nil {
+			gs.Cache[amcacheTable.Name] = append(gs.Cache[amcacheTable.Name], entries...)
 		}
-			gs.Cache[amcacheTable] = entries
 	}
 	gs.LastUpdated = time.Now()
 }
 
-// GetMarshalledEntriesForKeyPath retrieves marshalled entries for a given key path and optional entry IDs.
-// it returns a slice of maps, where each map represents an entry/row in the table.
-// keyPath is the Amcache key path such as "Root\InventoryApplication".
-// ids are optional entry IDs to filter the results. If no IDs are provided, all entries for the keyPath are returned.
-// each amcache key has a field that can be used as an ID to filter on, for example ProgramId for Application entries.
+// GetCachedEntries returns the cached entries for a given Amcache table and filter list.
 func (gs *AmcacheGlobalState) GetCachedEntries(amcacheTable tables.AmcacheTable, filterList []filters.Filter) []tables.Entry {
 	gs.UpdateIfNeeded()
 
@@ -125,9 +120,7 @@ func (gs *AmcacheGlobalState) GetCachedEntries(amcacheTable tables.AmcacheTable,
 	defer gs.Lock.Unlock()
 
 	result := make([]tables.Entry, 0)
-	cachedTableEntries := gs.Cache[amcacheTable]
-	fmt.Println("cachedTableEntries", len(cachedTableEntries))
-	fmt.Println("filterList", filterList)
+	cachedTableEntries := gs.Cache[amcacheTable.Name]
 	if len(filterList) == 0 {
 		result = append(result, cachedTableEntries...)
 		return result
