@@ -27,7 +27,7 @@ type chromiumParser struct {
 	log      *logger.Logger
 }
 
-func newChromiumParser(location searchLocation, log *logger.Logger) historyParser {
+func newChromiumParser(_ context.Context, location searchLocation, log *logger.Logger) historyParser {
 	profiles := getChromiumProfiles(location, log)
 	if len(profiles) > 0 {
 		return &chromiumParser{
