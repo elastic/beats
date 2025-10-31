@@ -1,7 +1,5 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-
 // or more contributor license agreements. Licensed under the Elastic License;
-
 // you may not use this file except in compliance with the Elastic License.
 
 package filters
@@ -33,7 +31,8 @@ func TestToBool(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, ok := ToBool(tt.args.input); if !ok {
+			got, ok := ToBool(tt.args.input)
+			if !ok {
 				if tt.want == false {
 					return
 				}
@@ -66,7 +65,8 @@ func TestToInt64(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, ok := ToInt64(tt.args.input); if !ok {
+			got, ok := ToInt64(tt.args.input)
+			if !ok {
 				if tt.want == 0 {
 					return
 				}
@@ -99,7 +99,8 @@ func TestToFloat64(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, ok := ToFloat64(tt.args.input); if !ok {
+			got, ok := ToFloat64(tt.args.input)
+			if !ok {
 				if tt.want == 0.0 {
 					return
 				}
@@ -107,6 +108,6 @@ func TestToFloat64(t *testing.T) {
 			} else if got != tt.want {
 				t.Errorf("%s: ToFloat64() = %v, want %v", tt.name, got, tt.want)
 			}
-		})	
+		})
 	}
 }

@@ -26,7 +26,8 @@ func resolveValue(input any) (value reflect.Value, ok bool) {
 
 // ToBool converts an input value to a boolean.
 func ToBool(input any) (result bool, ok bool) {
-	v, ok := resolveValue(input); if !ok {
+	v, ok := resolveValue(input)
+	if !ok {
 		return false, false
 	}
 
@@ -50,7 +51,8 @@ func ToBool(input any) (result bool, ok bool) {
 
 // ToInt64 converts an input value to an int64.
 func ToInt64(input any) (result int64, ok bool) {
-	v, ok := resolveValue(input); if !ok {
+	v, ok := resolveValue(input)
+	if !ok {
 		return 0, false
 	}
 
@@ -72,7 +74,8 @@ func ToInt64(input any) (result int64, ok bool) {
 
 // ToFloat64 converts an input value to a float64.
 func ToFloat64(input any) (result float64, ok bool) {
-	v, ok := resolveValue(input); if !ok {
+	v, ok := resolveValue(input)
+	if !ok {
 		return 0, false
 	}
 

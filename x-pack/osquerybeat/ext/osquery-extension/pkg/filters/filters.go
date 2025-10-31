@@ -33,31 +33,38 @@ func (f Filter) equals(entry any) bool {
 	}
 	switch kind {
 	case reflect.String:
-		fieldString, ok := field.(string); if !ok {
+		fieldString, ok := field.(string)
+		if !ok {
 			return false
 		}
 		return f.Expression == fieldString
 	case reflect.Bool:
-		expressionBool, ok := ToBool(f.Expression); if !ok {
+		expressionBool, ok := ToBool(f.Expression)
+		if !ok {
 			return false
 		}
-		fieldBool, ok := ToBool(field); if !ok {
+		fieldBool, ok := ToBool(field)
+		if !ok {
 			return false
 		}
 		return expressionBool == fieldBool
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		expressionInt, ok := ToInt64(f.Expression); if !ok {
+		expressionInt, ok := ToInt64(f.Expression)
+		if !ok {
 			return false
 		}
-		fieldInt, ok := ToInt64(field); if !ok {
+		fieldInt, ok := ToInt64(field)
+		if !ok {
 			return false
 		}
 		return expressionInt == fieldInt
 	case reflect.Float64, reflect.Float32:
-		expressionFloat, ok := ToFloat64(f.Expression); if !ok {
+		expressionFloat, ok := ToFloat64(f.Expression)
+		if !ok {
 			return false
 		}
-		fieldFloat, ok := ToFloat64(field); if !ok {
+		fieldFloat, ok := ToFloat64(field)
+		if !ok {
 			return false
 		}
 		return expressionFloat == fieldFloat
@@ -72,28 +79,37 @@ func (f Filter) lessThan(entry any) bool {
 	if err != nil {
 		return false
 	}
+
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		expressionInt, ok := ToInt64(f.Expression); if !ok {
+		expressionInt, ok := ToInt64(f.Expression)
+		if !ok {
 			return false
 		}
-		fieldInt, ok := field.(int64); if !ok {
+		// Even though the field is an int, it may not cast to an int64, so we need to convert it
+		// to be safe
+		fieldInt, ok := ToInt64(field)
+		if !ok {
 			return false
 		}
-		return expressionInt < fieldInt
+		return fieldInt < expressionInt
 	case reflect.Float64, reflect.Float32:
-		expressionFloat, ok := ToFloat64(f.Expression); if !ok {
+		expressionFloat, ok := ToFloat64(f.Expression)
+		if !ok {
 			return false
 		}
-		fieldFloat, ok := field.(float64); if !ok {
+		fieldFloat, ok := ToFloat64(field)
+		if !ok {
 			return false
 		}
-		return expressionFloat < fieldFloat
+		return fieldFloat < expressionFloat
 	case reflect.Bool:
-		fieldBool, ok := field.(bool); if !ok {
+		fieldBool, ok := field.(bool)
+		if !ok {
 			return false
 		}
-		expressionBool, ok := ToBool(f.Expression); if !ok {
+		expressionBool, ok := ToBool(f.Expression)
+		if !ok {
 			return false
 		}
 		return !fieldBool && expressionBool
@@ -110,26 +126,34 @@ func (f Filter) greaterThan(entry any) bool {
 	}
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		expressionInt, ok := ToInt64(f.Expression); if !ok {
+		expressionInt, ok := ToInt64(f.Expression)
+		if !ok {
 			return false
 		}
-		fieldInt, ok := field.(int64); if !ok {
+		// Even though the field is an int, it may not cast to an int64, so we need to convert it
+		// to be safe
+		fieldInt, ok := ToInt64(field)
+		if !ok {
 			return false
 		}
-		return expressionInt > fieldInt
+		return fieldInt > expressionInt
 	case reflect.Float64, reflect.Float32:
-		expressionFloat, ok := ToFloat64(f.Expression); if !ok {
+		expressionFloat, ok := ToFloat64(f.Expression)
+		if !ok {
 			return false
 		}
-		fieldFloat, ok := field.(float64); if !ok {
+		fieldFloat, ok := ToFloat64(field)
+		if !ok {
 			return false
 		}
-		return expressionFloat > fieldFloat
+		return fieldFloat > expressionFloat
 	case reflect.Bool:
-		fieldBool, ok := field.(bool); if !ok {
+		fieldBool, ok := field.(bool)
+		if !ok {
 			return false
 		}
-		expressionBool, ok := ToBool(f.Expression); if !ok {
+		expressionBool, ok := ToBool(f.Expression)
+		if !ok {
 			return false
 		}
 		return fieldBool && !expressionBool
@@ -150,7 +174,8 @@ func (f Filter) like(entry any) bool {
 	pattern := strings.ReplaceAll(f.Expression, "%", ".*")
 	pattern = strings.ReplaceAll(pattern, "_", ".")
 	pattern = "^" + pattern + "$"
-	fieldString, ok := field.(string); if !ok {
+	fieldString, ok := field.(string)
+	if !ok {
 		return false
 	}
 	matched, err := regexp.MatchString(pattern, fieldString)
@@ -172,7 +197,8 @@ func (f Filter) glob(entry any) bool {
 	pattern := strings.ReplaceAll(f.Expression, "*", ".*")
 	pattern = strings.ReplaceAll(pattern, "?", ".")
 	pattern = "^" + pattern + "$"
-	fieldString, ok := field.(string); if !ok {
+	fieldString, ok := field.(string)
+	if !ok {
 		return false
 	}
 	matched, err := regexp.MatchString(pattern, fieldString)
