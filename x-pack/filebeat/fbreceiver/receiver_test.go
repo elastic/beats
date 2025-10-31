@@ -73,9 +73,10 @@ func TestNewReceiver(t *testing.T) {
 					"*",
 				},
 			},
-			"path.home":    t.TempDir(),
-			"http.enabled": true,
-			"http.host":    monitorHost,
+			"path.home":               t.TempDir(),
+			"http.enabled":            true,
+			"http.host":               monitorHost,
+			"management.otel.enabled": true,
 		},
 	}
 
