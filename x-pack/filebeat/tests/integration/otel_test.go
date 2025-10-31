@@ -460,6 +460,7 @@ func TestFilebeatOTelReceiverE2E(t *testing.T) {
     http.enabled: true
     http.host: localhost
     http.port: {{.MonitoringPort}}
+    management.otel.enabled: true
 exporters:
   debug:
     use_internal_logger: false

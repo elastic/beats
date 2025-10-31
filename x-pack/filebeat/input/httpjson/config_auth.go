@@ -20,15 +20,27 @@ import (
 	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 type authConfig struct {
-	Basic  *basicAuthConfig `config:"basic"`
-	OAuth2 *oAuth2Config    `config:"oauth2"`
+	Basic  *basicAuthConfig       `config:"basic"`
+	OAuth2 *oAuth2Config          `config:"oauth2"`
+	AWS    *aws.SignerInputConfig `config:"aws"`
 }
 
 func (c authConfig) Validate() error {
-	if c.Basic.isEnabled() && c.OAuth2.isEnabled() {
+	var n int
+	if c.Basic.isEnabled() {
+		n++
+	}
+	if c.OAuth2.isEnabled() {
+		n++
+	}
+	if c.AWS.IsEnabled() {
+		n++
+	}
+	if n > 1 {
 		return errors.New("only one kind of auth can be enabled")
 	}
 	return nil

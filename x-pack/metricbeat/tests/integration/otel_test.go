@@ -85,6 +85,7 @@ func TestMetricbeatOTelE2E(t *testing.T) {
     http.enabled: true
     http.host: localhost
     http.port: {{.MonitoringPort}}
+	management.otel.enabled: true
 exporters:
   debug:
     use_internal_logger: false
@@ -276,7 +277,7 @@ func TestMetricbeatOTelReceiverE2E(t *testing.T) {
       selectors:
         - '*'
     queue.mem.flush.timeout: 0s
-    setup.template.enabled: false
+    management.otel.enabled: true
 exporters:
   debug:
     use_internal_logger: false
@@ -468,6 +469,7 @@ func TestMetricbeatOTelMultipleReceiversE2E(t *testing.T) {
         - '*'
     queue.mem.flush.timeout: 0s
     path.home: {{$receiver.PathHome}}
+    management.otel.enabled: true
 {{if $receiver.MonitoringPort}}
     http.enabled: true
     http.host: localhost
