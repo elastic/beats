@@ -42,27 +42,15 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  unit-tests-push:
+  unit-tests:
     name: Unit tests ${{ matrix.os }}
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       max-parallel: 10
       matrix:
-        os: [macos-13, macos-14]
+        os: [macos-15-intel, macos-15]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: ./.github/actions/unit-test
-        with:
-          beat: ${{ env.BEAT }}
-
-  unit-tests-pr:
-    name: Unit tests macos-15
-    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
-    runs-on: [macos-15]
     steps:
       - uses: actions/checkout@v5
 

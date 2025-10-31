@@ -134,17 +134,7 @@ func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 	}
 	select {
 	case st.events <- req:
-		// The events channel is buffered, which means we may successfully
-		// write to it even if the queue is shutting down. To avoid blocking
-		// forever during shutdown, we also have to wait on the queue's
-		// shutdown channel.
-		select {
-		case resp := <-req.resp:
-			return resp, true
-		case <-st.queueClosing:
-			st.events = nil
-			return 0, false
-		}
+		return st.handlePendingResponse(req.resp)
 	case <-st.done:
 		st.events = nil
 		return 0, false
@@ -162,17 +152,7 @@ func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 	}
 	select {
 	case st.events <- req:
-		// The events channel is buffered, which means we may successfully
-		// write to it even if the queue is shutting down. To avoid blocking
-		// forever during shutdown, we also have to wait on the queue's
-		// shutdown channel.
-		select {
-		case resp := <-req.resp:
-			return resp, true
-		case <-st.queueClosing:
-			st.events = nil
-			return 0, false
-		}
+		return st.handlePendingResponse(req.resp)
 	case <-st.done:
 		st.events = nil
 		return 0, false
@@ -180,4 +160,32 @@ func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 		st.log.Debugf("Dropping event, queue is blocked")
 		return 0, false
 	}
+}
+
+func (st *openState) handlePendingResponse(respChan chan queue.EntryID) (queue.EntryID, bool) {
+	// The events channel is buffered, which means we may successfully
+	// write to it even if the queue is shutting down. To avoid blocking
+	// forever during shutdown, we also have to wait on the queue's
+	// shutdown channel.
+	select {
+	case resp := <-respChan:
+		return resp, true
+	case <-st.queueClosing:
+	}
+
+	// Clear the request channel so we can't write to it again
+	st.events = nil
+
+	// Once the queue starts closing, it will not handle any more push
+	// requests, however it may have handled ours before the closing
+	// channel was triggered (and both may have arrived concurrently
+	// at the select statement above). So to know whether our entry was
+	// accepted we also need to check if there's a buffered response in
+	// our channel.
+	select {
+	case resp := <-respChan:
+		return resp, true
+	default:
+	}
+	return 0, false
 }

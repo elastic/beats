@@ -13,12 +13,15 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
+	"time"
 
-	"github.com/dolmen-go/contextio"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
@@ -42,7 +45,23 @@ const (
 	flagDisableTables = "disable_tables"
 )
 
-var defaultDisabledTables = []string{"carves", "curl"}
+var (
+	defaultDisabledTables = []string{"carves", "curl"}
+
+	// osquery uses Google glog format: I0314 15:24:36.123456 12345 file.cpp:123] message
+	// Level (I/W/E) + MMDD + HH:MM:SS.microseconds + thread_id + file:line] message
+	osqueryLogPattern = regexp.MustCompile(`^([IWE])(\d{4})\s+(\d{2}:\d{2}:\d{2}\.\d{6})\s+(\d+)\s+([^:]+):(\d+)\]\s*(.*)$`)
+)
+
+// osqueryLogEntry represents a parsed osquery log entry
+type osqueryLogEntry struct {
+	level      string    // I, W, E
+	timestamp  time.Time // parsed timestamp
+	threadID   int       // thread ID
+	sourceFile string    // source file name
+	sourceLine int       // source line number
+	message    string    // log message
+}
 
 type OSQueryD struct {
 	socketPath string
@@ -192,17 +211,15 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	// Read standard output
 	var wg sync.WaitGroup
 
-	if q.isVerbose() {
-		stdout, err := cmd.StdoutPipe()
-		if err != nil {
-			return err
-		}
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			_ = q.logOSQueryOutput(ctx, stdout)
-		}()
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
 	}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_ = q.logOSQueryOutput(ctx, stdout)
+	}()
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
@@ -221,17 +238,13 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 		q.log.Errorf("osqueryd process failed job assign: %v", err)
 	}
 
-	var (
-		errbuf strings.Builder
-	)
-
-	ctxstderr := contextio.NewReader(ctx, stderr)
-	wait := func() error {
-		if _, cerr := io.Copy(&errbuf, ctxstderr); cerr != nil {
-			return cerr
-		}
-		return cmd.Wait()
-	}
+	// Capture stderr for error messages
+	// Log stderr line-by-line at error level for better visibility
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_ = q.logOSQueryOutput(ctx, stderr)
+	}()
 
 	finished := make(chan error, 1)
 
@@ -239,21 +252,15 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		finished <- wait()
+		finished <- cmd.Wait()
 	}()
 
 	select {
 	case err = <-finished:
 		if err != nil {
-			s := strings.TrimSpace(errbuf.String())
-			if s != "" {
-				err = fmt.Errorf("%s: %w", s, err)
-			}
-		}
-		if err != nil {
-			q.log.Errorf("process exited with error: %v", err)
+			q.log.Errorf("osqueryd process exited with error: %v", err)
 		} else {
-			q.log.Info("process exited")
+			q.log.Info("osqueryd process exited")
 		}
 	case <-ctx.Done():
 		q.log.Debug("kill process group on context done")
@@ -446,6 +453,23 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 		flags["config_refresh"] = q.configRefreshInterval
 	}
 
+	// Set the appropriate logger_min_status flag based on osquerybeat log level
+	// Map logp levels to osquery logger_min_status values: 1=WARNING, 2=ERROR
+	var logMinStatus int
+	level := zapcore.LevelOf(q.log.Core())
+	switch {
+	case level == zapcore.WarnLevel:
+		logMinStatus = 1 // WARNING
+	case level >= zapcore.ErrorLevel:
+		logMinStatus = 2 // ERROR+
+	}
+
+	// osquery default is 0 (INFO/DEBUG) but we control that with the verbose flag already
+	if logMinStatus > 0 {
+		flags["logger_min_status"] = logMinStatus
+		flags["disable_logging"] = false
+	}
+
 	if q.isVerbose() {
 		flags["verbose"] = true
 		flags["disable_logging"] = false
@@ -570,27 +594,129 @@ func (q *OSQueryD) resolveCertsPath(filename string) string {
 	return filepath.Join(q.certsPath, filename)
 }
 
-func (q *OSQueryD) logOSQueryOutput(ctx context.Context, r io.ReadCloser) error {
-	log := q.log.With("ctx", "osqueryd output")
+// parseOsqueryLog parses an osquery log line in glog format
+// Format: I0314 15:24:36.123456 12345 file.cpp:123] message
+func parseOsqueryLog(line string, currentYear int) (*osqueryLogEntry, error) {
+	matches := osqueryLogPattern.FindStringSubmatch(line)
+	if matches == nil || len(matches) != 8 {
+		return nil, fmt.Errorf("line does not match osquery log format")
+	}
 
-	buf := make([]byte, 2048)
-LOOP:
-	for {
-		n, err := r.Read(buf[:])
-		if n > 0 {
-			log.Info(string(buf[:n]))
-		}
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				err = nil
-			}
-			return err
-		}
+	entry := &osqueryLogEntry{
+		level:      matches[1],
+		sourceFile: matches[5],
+		message:    matches[7],
+	}
+
+	// Parse thread ID
+	threadID, err := strconv.Atoi(matches[4])
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse thread ID: %w", err)
+	}
+	entry.threadID = threadID
+
+	// Parse source line
+	sourceLine, err := strconv.Atoi(matches[6])
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse source line: %w", err)
+	}
+	entry.sourceLine = sourceLine
+
+	// Parse timestamp
+	// MMDD format for date
+	monthDay := matches[2]
+	if len(monthDay) != 4 {
+		return nil, fmt.Errorf("invalid month-day format")
+	}
+	month, err := strconv.Atoi(monthDay[:2])
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse month: %w", err)
+	}
+	day, err := strconv.Atoi(monthDay[2:4])
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse day: %w", err)
+	}
+
+	// Parse time: HH:MM:SS.microseconds
+	timeStr := matches[3]
+	t, err := time.Parse("15:04:05.999999", timeStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse time: %w", err)
+	}
+
+	// Construct full timestamp with current year in UTC.
+	// We set the --log_utc_time=true flag in protectedFlags (args.go) to ensure
+	// osqueryd outputs timestamps in UTC rather than local time. This provides
+	// consistent timezone handling across all deployments.
+	entry.timestamp = time.Date(
+		currentYear,
+		time.Month(month),
+		day,
+		t.Hour(),
+		t.Minute(),
+		t.Second(),
+		t.Nanosecond(),
+		time.UTC,
+	)
+
+	return entry, nil
+}
+
+func (q *OSQueryD) logOSQueryOutput(ctx context.Context, r io.ReadCloser) error {
+	scanner := bufio.NewScanner(r)
+	scanner.Buffer(make([]byte, 2048), 64*1024) // 64KB max line size
+
+	currentYear := time.Now().Year()
+
+	log := q.log.With("ctx", "osqueryd")
+
+	for scanner.Scan() {
 		select {
 		case <-ctx.Done():
-			break LOOP
+			return ctx.Err()
 		default:
 		}
+
+		line := scanner.Text()
+		if line == "" {
+			continue
+		}
+
+		// Try to parse structured osquery log format
+		var level, message string
+		entry, err := parseOsqueryLog(line, currentYear)
+		if err != nil {
+			if len(line) > 0 {
+				level = string(line[0])
+			}
+			message = line
+		} else {
+			level = entry.level
+			message = entry.message
+			log = log.With(
+				"osquery.timestamp", entry.timestamp,
+				"osquery.thread_id", entry.threadID,
+				"osquery.source.file", entry.sourceFile,
+				"osquery.source.line", entry.sourceLine,
+			)
+		}
+
+		switch level {
+		case "E":
+			log.Error(message)
+		case "W":
+			log.Warn(message)
+		case "I":
+			log.Info(message)
+		default:
+			log.Debug(message)
+		}
 	}
+
+	if err := scanner.Err(); err != nil {
+		log.Errorf("error reading osqueryd output: %v", err)
+		return err
+	}
+
 	return nil
 }

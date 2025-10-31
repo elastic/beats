@@ -115,6 +115,9 @@ receivers:
     output:
       otelconsumer: null
 service:
+  telemetry:
+    metrics:
+      level: none
   extensions:
     - beatsauth
   pipelines:
@@ -241,6 +244,9 @@ receivers:
       kibana:
         host: https://kibana-hostname.elastic.co:443
 service:
+  telemetry:
+    metrics:
+      level: none
   extensions:
     - beatsauth
   pipelines:
@@ -297,6 +303,9 @@ receivers:
     output:
       otelconsumer: null
 service:
+  telemetry:
+    metrics:
+      level: none
   extensions:
     - beatsauth
   pipelines:
@@ -372,6 +381,9 @@ receivers:
     output:
       otelconsumer: null
 service:
+  telemetry:
+    metrics:
+      level: none
   pipelines:
     logs:
       exporters:
@@ -439,6 +451,9 @@ receivers:
     output:
       otelconsumer: null
 service:
+  telemetry:
+    metrics:
+      level: none
   pipelines:
     logs:
       exporters:
@@ -475,6 +490,9 @@ receivers:
     output:
       otelconsumer: null
 service:
+  telemetry:
+    metrics:
+      level: none
   pipelines:
     logs:
       receivers:
@@ -675,6 +693,9 @@ exporters:
       queue_size: 3200
       wait_for_result: true
 service:
+  telemetry:
+    metrics:
+      level: none
   extensions:
     - beatsauth
   pipelines:
