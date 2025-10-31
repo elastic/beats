@@ -267,7 +267,11 @@ func startHarvester(
 				Offset int64 `json:"offset" struct:"offset"`
 			}{}
 			if err := cursor.Unpack(&st); err != nil {
+				// Unpack should never fail, if it fails either the cursor
+				// structure had a breaking change or our registry is corrupted.
+				// Either way, it is better to not notify the observer.
 				ctx.Logger.Errorf("cannot unpack cursor at the end of the harvester: %s", err)
+				return
 			}
 
 			hg.notifyObserver(srcID, st.Offset)
