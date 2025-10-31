@@ -243,6 +243,7 @@ steps:
         command: |
           cd filebeat
           mage pythonIntegTest
+          mage PythonLogAsFilestream
         retry:
           automatic:
             - limit: 1
