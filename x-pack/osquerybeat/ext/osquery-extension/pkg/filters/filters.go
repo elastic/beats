@@ -72,23 +72,26 @@ func (f Filter) lessThan(entry any) bool {
 	if err != nil {
 		return false
 	}
+
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		expressionInt, ok := ToInt64(f.Expression); if !ok {
 			return false
 		}
-		fieldInt, ok := field.(int64); if !ok {
+		// Even though the field is an int, it may not cast to an int64, so we need to convert it
+		// to be safe
+		fieldInt, ok := ToInt64(field); if !ok {
 			return false
 		}
-		return expressionInt < fieldInt
+		return fieldInt < expressionInt
 	case reflect.Float64, reflect.Float32:
 		expressionFloat, ok := ToFloat64(f.Expression); if !ok {
 			return false
 		}
-		fieldFloat, ok := field.(float64); if !ok {
+		fieldFloat, ok := ToFloat64(field); if !ok {
 			return false
 		}
-		return expressionFloat < fieldFloat
+		return fieldFloat < expressionFloat
 	case reflect.Bool:
 		fieldBool, ok := field.(bool); if !ok {
 			return false
@@ -108,23 +111,27 @@ func (f Filter) greaterThan(entry any) bool {
 	if err != nil {
 		return false
 	}
+	fmt.Println("field", field)
+	fmt.Println("kind", kind)
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		expressionInt, ok := ToInt64(f.Expression); if !ok {
 			return false
 		}
-		fieldInt, ok := field.(int64); if !ok {
+		// Even though the field is an int, it may not cast to an int64, so we need to convert it
+		// to be safe
+		fieldInt, ok := ToInt64(field); if !ok {
 			return false
 		}
-		return expressionInt > fieldInt
+		return fieldInt > expressionInt
 	case reflect.Float64, reflect.Float32:
 		expressionFloat, ok := ToFloat64(f.Expression); if !ok {
 			return false
 		}
-		fieldFloat, ok := field.(float64); if !ok {
+		fieldFloat, ok := ToFloat64(field); if !ok {
 			return false
 		}
-		return expressionFloat > fieldFloat
+		return fieldFloat > expressionFloat
 	case reflect.Bool:
 		fieldBool, ok := field.(bool); if !ok {
 			return false
@@ -265,6 +272,8 @@ func GetValueByOsqueryTag(s any, tagValue string) (any, reflect.Kind, error) {
 			// Found it! Get the Value of this field from the struct instance
 			fieldValue := v.Field(i)
 			// Return the value as a generic interface{}
+			fmt.Println("fieldValue", fieldValue)
+			fmt.Println("fieldValue.Kind()", fieldValue.Kind())
 			return fieldValue.Interface(), fieldValue.Kind(), nil
 		}
 	}

@@ -27,7 +27,7 @@ func getQueryContext(constraints []constraintArgs) table.QueryContext {
 		constraintList, ok := queryContext.Constraints[columnName]
 		if !ok {
 			constraintList = table.ConstraintList{
-				Affinity: table.ColumnTypeText,
+				Affinity:    table.ColumnTypeText,
 				Constraints: []table.Constraint{},
 			}
 		}
@@ -51,7 +51,7 @@ func TestGetConstraintFilters(t *testing.T) {
 		want         []Filter
 	}{
 		{
-			name:       "test_equals",
+			name: "test_equals",
 			queryContext: getQueryContext([]constraintArgs{
 				{
 					columnName: "program_id",
@@ -64,7 +64,7 @@ func TestGetConstraintFilters(t *testing.T) {
 			},
 		},
 		{
-			name:         "test_like",
+			name: "test_like",
 			queryContext: getQueryContext([]constraintArgs{
 				{
 					columnName: "program_id",
@@ -77,7 +77,7 @@ func TestGetConstraintFilters(t *testing.T) {
 			},
 		},
 		{
-			name:         "test_match",
+			name: "test_match",
 			queryContext: getQueryContext([]constraintArgs{
 				{
 					columnName: "program_id",
@@ -90,7 +90,7 @@ func TestGetConstraintFilters(t *testing.T) {
 			},
 		},
 		{
-			name:         "test_multiple_filters",
+			name: "test_multiple_filters",
 			queryContext: getQueryContext([]constraintArgs{
 				{
 					columnName: "program_id",
@@ -119,17 +119,17 @@ func TestGetConstraintFilters(t *testing.T) {
 }
 
 type MockEntry struct {
-	StringValue string `osquery:"string_value"`
-	IntValue int `osquery:"int_value"`
-	FloatValue float64 `osquery:"float_value"`
-	BoolValue bool `osquery:"bool_value"`
+	StringValue string  `osquery:"string_value"`
+	IntValue    int     `osquery:"int_value"`
+	FloatValue  float64 `osquery:"float_value"`
+	BoolValue   bool    `osquery:"bool_value"`
 }
 
 type FilterTestCase struct {
-	name string
-	entry MockEntry
+	name   string
+	entry  MockEntry
 	filter Filter
-	want bool
+	want   bool
 }
 
 func RunFilterTests(t *testing.T, tests []FilterTestCase) {
@@ -151,7 +151,7 @@ func TestFilter_Equals(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorEquals, Expression: "Mock Entry"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "string_equals_false",
@@ -159,7 +159,7 @@ func TestFilter_Equals(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorEquals, Expression: "NOtEquals"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "int_equals_true",
@@ -167,7 +167,7 @@ func TestFilter_Equals(t *testing.T) {
 				IntValue: 100,
 			},
 			filter: Filter{ColumnName: "int_value", Operator: table.OperatorEquals, Expression: "100"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "int_equals_false",
@@ -175,7 +175,7 @@ func TestFilter_Equals(t *testing.T) {
 				IntValue: 100,
 			},
 			filter: Filter{ColumnName: "int_value", Operator: table.OperatorEquals, Expression: "101"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "float_equals_true",
@@ -183,7 +183,7 @@ func TestFilter_Equals(t *testing.T) {
 				FloatValue: 100.0,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorEquals, Expression: "100.0"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "float_equals_false",
@@ -191,7 +191,7 @@ func TestFilter_Equals(t *testing.T) {
 				FloatValue: 100.0,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorEquals, Expression: "100.1"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "bool_equals_true",
@@ -199,7 +199,7 @@ func TestFilter_Equals(t *testing.T) {
 				BoolValue: true,
 			},
 			filter: Filter{ColumnName: "bool_value", Operator: table.OperatorEquals, Expression: "true"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "bool_equals_false",
@@ -207,7 +207,7 @@ func TestFilter_Equals(t *testing.T) {
 				BoolValue: true,
 			},
 			filter: Filter{ColumnName: "bool_value", Operator: table.OperatorEquals, Expression: "false"},
-			want: false,
+			want:   false,
 		},
 	}
 	RunFilterTests(t, tests)
@@ -227,7 +227,7 @@ func TestFilter_GreaterThan(t *testing.T) {
 				IntValue: 100,
 			},
 			filter: Filter{ColumnName: "int_value", Operator: table.OperatorGreaterThan, Expression: "101"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "float_greater_than_true",
@@ -235,7 +235,7 @@ func TestFilter_GreaterThan(t *testing.T) {
 				FloatValue: 100.12,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorGreaterThan, Expression: "100.01"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "float_greater_than_false",
@@ -243,7 +243,7 @@ func TestFilter_GreaterThan(t *testing.T) {
 				FloatValue: 100.0,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorGreaterThan, Expression: "100.0"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "float_greater_than_false",
@@ -251,7 +251,7 @@ func TestFilter_GreaterThan(t *testing.T) {
 				FloatValue: 99.99,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorGreaterThan, Expression: "100.00"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "bool_greater_than_true",
@@ -259,7 +259,7 @@ func TestFilter_GreaterThan(t *testing.T) {
 				BoolValue: true,
 			},
 			filter: Filter{ColumnName: "bool_value", Operator: table.OperatorGreaterThan, Expression: "false"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "bool_greater_than_false",
@@ -267,7 +267,7 @@ func TestFilter_GreaterThan(t *testing.T) {
 				BoolValue: true,
 			},
 			filter: Filter{ColumnName: "bool_value", Operator: table.OperatorGreaterThan, Expression: "true"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "string_greater_than_false_when_not_a_number",
@@ -275,15 +275,15 @@ func TestFilter_GreaterThan(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorGreaterThan, Expression: "Mock Entry"},
-			want: false,
+			want:   false,
 		},
 		{
-			name: "string_greater_than_true",
+			name: "string_greater_than_always_false",
 			entry: MockEntry{
 				StringValue: "101",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorGreaterThan, Expression: "100"},
-			want: true,
+			want:   false,
 		},
 	}
 	RunFilterTests(t, tests)
@@ -303,7 +303,7 @@ func TestFilter_LessThan(t *testing.T) {
 				IntValue: 100,
 			},
 			filter: Filter{ColumnName: "int_value", Operator: table.OperatorLessThan, Expression: "99"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "float_less_than_true",
@@ -311,7 +311,7 @@ func TestFilter_LessThan(t *testing.T) {
 				FloatValue: 100.0,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorLessThan, Expression: "100.01"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "float_less_than_false",
@@ -319,7 +319,7 @@ func TestFilter_LessThan(t *testing.T) {
 				FloatValue: 100.0,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorLessThan, Expression: "100.0"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "float_less_than_false",
@@ -327,7 +327,7 @@ func TestFilter_LessThan(t *testing.T) {
 				FloatValue: 100.0,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorLessThan, Expression: "99.99"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "bool_less_than_true",
@@ -335,7 +335,7 @@ func TestFilter_LessThan(t *testing.T) {
 				BoolValue: true,
 			},
 			filter: Filter{ColumnName: "bool_value", Operator: table.OperatorLessThan, Expression: "false"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "bool_less_than_false",
@@ -343,7 +343,7 @@ func TestFilter_LessThan(t *testing.T) {
 				BoolValue: true,
 			},
 			filter: Filter{ColumnName: "bool_value", Operator: table.OperatorLessThan, Expression: "true"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "string_less_than_false_when_not_a_number",
@@ -351,15 +351,15 @@ func TestFilter_LessThan(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorLessThan, Expression: "Mock Entry"},
-			want: false,
+			want:   false,
 		},
 		{
-			name: "string_less_than_true",
+			name: "string_less_than_always_false",
 			entry: MockEntry{
 				StringValue: "99",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorLessThan, Expression: "100"},
-			want: true,
+			want:   false,
 		},
 	}
 	RunFilterTests(t, tests)
@@ -373,7 +373,7 @@ func TestGreaterThanOrEquals(t *testing.T) {
 				IntValue: 101,
 			},
 			filter: Filter{ColumnName: "int_value", Operator: table.OperatorGreaterThanOrEquals, Expression: "100"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "int_greater_than_or_equals_true_equals",
@@ -381,7 +381,7 @@ func TestGreaterThanOrEquals(t *testing.T) {
 				IntValue: 100,
 			},
 			filter: Filter{ColumnName: "int_value", Operator: table.OperatorGreaterThanOrEquals, Expression: "100"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "int_greater_than_or_equals_false",
@@ -389,7 +389,7 @@ func TestGreaterThanOrEquals(t *testing.T) {
 				IntValue: 99,
 			},
 			filter: Filter{ColumnName: "int_value", Operator: table.OperatorGreaterThanOrEquals, Expression: "100"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "float_greater_than_or_equals_true_greater",
@@ -397,7 +397,7 @@ func TestGreaterThanOrEquals(t *testing.T) {
 				FloatValue: 100.01,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorGreaterThanOrEquals, Expression: "100.0"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "float_greater_than_or_equals_true_equals",
@@ -405,7 +405,7 @@ func TestGreaterThanOrEquals(t *testing.T) {
 				FloatValue: 100.0,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorGreaterThanOrEquals, Expression: "100.0"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "float_greater_than_or_equals_false",
@@ -413,7 +413,7 @@ func TestGreaterThanOrEquals(t *testing.T) {
 				FloatValue: 99.99,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorGreaterThanOrEquals, Expression: "100.0"},
-			want: false,
+			want:   false,
 		},
 	}
 	RunFilterTests(t, tests)
@@ -427,7 +427,7 @@ func TestLessThanOrEquals(t *testing.T) {
 				IntValue: 99,
 			},
 			filter: Filter{ColumnName: "int_value", Operator: table.OperatorLessThanOrEquals, Expression: "100"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "int_less_than_or_equals_true_equals",
@@ -435,7 +435,7 @@ func TestLessThanOrEquals(t *testing.T) {
 				IntValue: 100,
 			},
 			filter: Filter{ColumnName: "int_value", Operator: table.OperatorLessThanOrEquals, Expression: "100"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "int_less_than_or_equals_false",
@@ -443,7 +443,7 @@ func TestLessThanOrEquals(t *testing.T) {
 				IntValue: 101,
 			},
 			filter: Filter{ColumnName: "int_value", Operator: table.OperatorLessThanOrEquals, Expression: "100"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "float_less_than_or_equals_true_less",
@@ -451,7 +451,7 @@ func TestLessThanOrEquals(t *testing.T) {
 				FloatValue: 99.99,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorLessThanOrEquals, Expression: "100.0"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "float_less_than_or_equals_true_equals",
@@ -459,7 +459,7 @@ func TestLessThanOrEquals(t *testing.T) {
 				FloatValue: 100.0,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorLessThanOrEquals, Expression: "100.0"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "float_less_than_or_equals_false",
@@ -467,7 +467,7 @@ func TestLessThanOrEquals(t *testing.T) {
 				FloatValue: 100.01,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorLessThanOrEquals, Expression: "100.0"},
-			want: false,
+			want:   false,
 		},
 	}
 	RunFilterTests(t, tests)
@@ -481,7 +481,7 @@ func TestLike(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorLike, Expression: "Mock Entry"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "string_like_true_wildcard_prefix",
@@ -489,7 +489,7 @@ func TestLike(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorLike, Expression: "%Entry"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "string_like_true_wildcard_suffix",
@@ -497,7 +497,7 @@ func TestLike(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorLike, Expression: "Mock%"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "string_like_true_wildcard_both",
@@ -505,7 +505,7 @@ func TestLike(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorLike, Expression: "%ock Ent%"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "string_like_false",
@@ -513,7 +513,7 @@ func TestLike(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorLike, Expression: "Test%"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "string_like_true_single_char_wildcard",
@@ -521,7 +521,7 @@ func TestLike(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorLike, Expression: "Moc_ Entry"},
-			want: true,
+			want:   true,
 		},
 	}
 	RunFilterTests(t, tests)
@@ -535,7 +535,7 @@ func TestGlob(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorGlob, Expression: "Mock Entry"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "string_glob_true_wildcard",
@@ -543,7 +543,7 @@ func TestGlob(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorGlob, Expression: "Mock*"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "string_glob_true_question_mark",
@@ -551,7 +551,7 @@ func TestGlob(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorGlob, Expression: "Moc? Entry"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "string_glob_true_character_class",
@@ -559,7 +559,7 @@ func TestGlob(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorGlob, Expression: "Moc[ks] Entry"},
-			want: true,
+			want:   true,
 		},
 		{
 			name: "string_glob_false_character_class",
@@ -567,7 +567,7 @@ func TestGlob(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorGlob, Expression: "Moc[s] Entry"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "string_glob_false",
@@ -575,7 +575,7 @@ func TestGlob(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorGlob, Expression: "Test*"},
-			want: false,
+			want:   false,
 		},
 		{
 			name: "string_glob_true_complex_pattern",
@@ -583,7 +583,7 @@ func TestGlob(t *testing.T) {
 				StringValue: "Mock Entry",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorGlob, Expression: "M*k E*y"},
-			want: true,
+			want:   true,
 		},
 	}
 	RunFilterTests(t, tests)
