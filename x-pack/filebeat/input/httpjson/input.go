@@ -201,7 +201,14 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	}
 
 	metrics := newInputMetrics(reg, ctx.Logger)
-	client, err := newHTTPClient(stdCtx, cfg.Auth, cfg.Request, stat, log, reg, nil)
+	// Create a policy to prevent automatic retries on 429 when rate limiting is configured.
+	// The rate limiter handles 429 responses by honoring X-Rate-Limit-Reset headers,
+	// but the default retry policy would retry 429s before the rate limiter can act.
+	var policy *Policy
+	if cfg.Request.RateLimit != nil {
+		policy = newHTTPPolicy(nil, nil, stat, log)
+	}
+	client, err := newHTTPClient(stdCtx, cfg.Auth, cfg.Request, stat, log, reg, policy)
 	if err != nil {
 		stat.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
 		return err

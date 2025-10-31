@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix httpjson input to honor rate limit headers instead of automatically retrying on HTTP 429 responses.
+component: filebeat

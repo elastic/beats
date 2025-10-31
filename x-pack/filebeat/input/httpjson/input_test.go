@@ -73,6 +73,20 @@ var testCases = []struct {
 		expected: []string{`{"hello":"world"}`},
 	},
 	{
+		name:        "request_honors_rate_limit_on_429_without_retries",
+		setupServer: newTestServer(httptest.NewServer),
+		baseConfig: map[string]interface{}{
+			"interval":                     1,
+			"http_method":                  http.MethodGet,
+			"request.rate_limit.limit":     `[[.last_response.header.Get "X-Rate-Limit-Limit"]]`,
+			"request.rate_limit.remaining": `[[.last_response.header.Get "X-Rate-Limit-Remaining"]]`,
+			"request.rate_limit.reset":     `[[.last_response.header.Get "X-Rate-Limit-Reset"]]`,
+			"request.retry.max_attempts":   5,
+		},
+		handler:  rateLimitRetryHandler(),
+		expected: []string{`{"hello":"world","request_count":2}`},
+	},
+	{
 		name:        "request_retries_when_failed",
 		setupServer: newTestServer(httptest.NewServer),
 		baseConfig: map[string]interface{}{
@@ -1765,6 +1779,31 @@ func retryHandler() http.HandlerFunc {
 		// Any 5xx except 501 will result in a retry.
 		w.WriteHeader(500)
 		count += 1
+	}
+}
+
+func rateLimitRetryHandler() http.HandlerFunc {
+	var requestCount int
+	return func(w http.ResponseWriter, r *http.Request) {
+		requestCount++
+		w.Header().Set("content-type", "application/json")
+		// First request returns 429 with a future reset time
+		if requestCount == 1 {
+			w.Header().Set("X-Rate-Limit-Limit", "10")
+			w.Header().Set("X-Rate-Limit-Remaining", "0")
+			// Set reset time 1 second in the future
+			w.Header().Set("X-Rate-Limit-Reset", fmt.Sprint(time.Now().Unix()+1))
+			w.WriteHeader(http.StatusTooManyRequests)
+			_, _ = w.Write([]byte(`{"error":"too many requests"}`))
+			return
+		}
+		// Subsequent requests should succeed
+		// If automatic retries happened, requestCount would be > 2
+		w.Header().Set("X-Rate-Limit-Limit", "10")
+		w.Header().Set("X-Rate-Limit-Remaining", "9")
+		w.Header().Set("X-Rate-Limit-Reset", fmt.Sprint(time.Now().Unix()+3600))
+		w.Header().Set("X-Request-Count", fmt.Sprint(requestCount))
+		fmt.Fprintf(w, `{"hello":"world","request_count":%d}`, requestCount)
 	}
 }
 
