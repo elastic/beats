@@ -37,7 +37,7 @@ For example:
    },
   "event": {
     "dataset": "system.process",
-    "module": process
+    "module": "system"
   },
   .
   .
