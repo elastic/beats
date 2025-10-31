@@ -41,7 +41,7 @@ func newProspector(
 	log *logp.Logger,
 	srci *loginp.SourceIdentifier) (loginp.Prospector, error) {
 
-	logger := log.With("filestream_id", config.ID)
+	logger := log.Named("filestream").With("filestream_id", config.ID)
 	err := checkConfigCompatibility(config)
 	if err != nil {
 		return nil, err
@@ -54,6 +54,7 @@ func newProspector(
 	if err != nil {
 		return nil, fmt.Errorf("error while creating file identifier: %w", err)
 	}
+	logger.Debugf("file identity is set to %s", identifier.Name())
 
 	filewatcher, err := newFileWatcher(
 		logger,
@@ -67,9 +68,6 @@ func newProspector(
 	if err != nil {
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}
-
-	logger = logger.Named("filestream")
-	logger.Debugf("file identity is set to %s", identifier.Name())
 
 	fileprospector := fileProspector{
 		filewatcher:         filewatcher,
