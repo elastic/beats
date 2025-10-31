@@ -31,7 +31,7 @@ var expectedBrowserProfiles = map[string][]string{
 	"chrome":  {"Default"},
 	"edge":    {"Default"},
 	"firefox": {"dwpys5gk.default-release"},
-	"safari":  {"Default", "profile1"},
+	"safari":  {"Default Profile", "profile1"},
 }
 
 var expectedTimestamps = map[string]map[string][]int64{
@@ -45,8 +45,8 @@ var expectedTimestamps = map[string]map[string][]int64{
 		"dwpys5gk.default-release": {1760089455, 1760089462},
 	},
 	"safari": {
-		"Default":  {1749628922, 1749628924, 1749628925, 1749628926, 1749628931, 1749629032, 1749629099, 1749629104, 1749629105, 1749629150},
-		"profile1": {1749628922, 1749628924, 1749628925, 1749628926, 1749628931, 1749629032, 1749629099, 1749629104, 1749629105, 1749629150},
+		"Default Profile": {1749628922, 1749628924, 1749628925, 1749628926, 1749628931, 1749629032, 1749629099, 1749629104, 1749629105, 1749629150},
+		"profile1":        {1749628922, 1749628924, 1749628925, 1749628926, 1749628931, 1749629032, 1749629099, 1749629104, 1749629105, 1749629150},
 	},
 }
 
@@ -245,7 +245,8 @@ func TestProfileFiltering(t *testing.T) {
 		profile       string
 		expectedCount int
 	}{
-		{"Default", 27},                 // 5 chrome + 5 edge + 17 safari Default
+		{"Default Profile", 17},         // 17 safari Default Profile
+		{"Default", 10},                 // 5 chrome + 5 edge
 		{"dwpys5gk.default-release", 5}, // firefox
 		{"profile1", 17},                // safari profile1
 	}
