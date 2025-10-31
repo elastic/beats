@@ -21,6 +21,7 @@ package integration
 
 import (
 	"path/filepath"
+	"slices"
 	"testing"
 	"time"
 
@@ -44,13 +45,13 @@ func TestStandaloneLogInputIgnoresRunAsFilestream(t *testing.T) {
 			"logfile": logfile,
 		},
 		filepath.Join("run_as_filestream"),
-		"happy_path.yml")
+		"run_as_log.yml")
 
 	// Write configuration file and start Filebeat
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
 
-	// Ensure the Filestream input is started
+	// Ensure the Log input is started
 	filebeat.WaitLogsContains(
 		"Log input running as Log input",
 		10*time.Second,
@@ -69,6 +70,94 @@ func TestStandaloneLogInputIgnoresRunAsFilestream(t *testing.T) {
 	}
 }
 
+func TestStandaloneAsFilestreamFeatureFlag(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	eventsCount := 50
+	logfile := filepath.Join(filebeat.TempDir(), "log.log")
+	integration.WriteLogFile(t, logfile, eventsCount, false, "")
+
+	cfg := getConfig(
+		t,
+		map[string]any{
+			"logfile": logfile,
+		},
+		filepath.Join("run_as_filestream"),
+		"run_as_filestream.yml")
+
+	// Write configuration file and start Filebeat
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	// Ensure the Log input is started
+	filebeat.WaitLogsContains(
+		"Log input running as Filestream input",
+		10*time.Second,
+		"Filestream input did not start",
+	)
+
+	events := integration.GetEventsFromFileOutput[BeatEvent](filebeat, eventsCount, true)
+	for i, ev := range events {
+		if ev.Input.Type != "log" {
+			t.Errorf("Event %d expecting type 'log', got %q", i, ev.Input.Type)
+		}
+
+		if !slices.Contains(ev.Tags, "take_over") {
+			t.Errorf("Event %d: 'take_over' tag not present", i)
+		}
+	}
+}
+
+func TestStandaloneAsFilestreamFingerprint(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	eventsCount := 50
+	logfile := filepath.Join(filebeat.TempDir(), "log.log")
+	integration.WriteLogFile(t, logfile, eventsCount, false, "")
+
+	cfg := getConfig(
+		t,
+		map[string]any{
+			"logfile": logfile,
+		},
+		filepath.Join("run_as_filestream"),
+		"fingerprint.yml")
+
+	// Write configuration file and start Filebeat
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	// Ensure the Log input is started
+	filebeat.WaitLogsContains(
+		"Log input running as Filestream input",
+		10*time.Second,
+		"Filestream input did not start",
+	)
+
+	events := integration.GetEventsFromFileOutput[BeatEvent](filebeat, eventsCount, true)
+	for i, ev := range events {
+		if ev.Input.Type != "log" {
+			t.Errorf("Event %d expecting type 'log', got %q", i, ev.Input.Type)
+		}
+
+		if len(ev.Log.File.Fingerprint) == 0 {
+			t.Errorf("Event %d fingerprint cannot be empty", i)
+		}
+
+		if !slices.Contains(ev.Tags, "take_over") {
+			t.Errorf("Event %d: 'take_over' tag not present", i)
+		}
+	}
+}
+
 type BeatEvent struct {
 	Input struct {
 		Type string `json:"type"`
@@ -78,4 +167,5 @@ type BeatEvent struct {
 			Fingerprint string `json:"fingerprint"`
 		} `json:"file"`
 	} `json:"log"`
+	Tags []string `json:"tags"`
 }

@@ -1,8 +1,10 @@
 filebeat.inputs:
   - type: log
     id: test-run-as-filestream
-    run_as_filestream: true
     allow_deprecated_use: true
+    file_identity.fingerprint: ~
+    prospector.scanner:
+      fingerprint.enabled: true
     paths:
       - {{ .logfile }}
 
@@ -18,3 +20,7 @@ logging:
   level: debug
   selectors:
     - "*"
+
+features:
+  log_input_run_as_filestream:
+    enabled: true

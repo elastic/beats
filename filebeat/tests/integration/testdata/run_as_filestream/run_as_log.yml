@@ -1,0 +1,19 @@
+filebeat.inputs:
+  - type: log
+    id: test-run-as-log
+    allow_deprecated_use: true
+    paths:
+      - {{ .logfile }}
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+  rotate_on_startup: false
+
+queue.mem:
+  flush.min_events: 50
+
+logging:
+  level: debug
+  selectors:
+    - "*"
