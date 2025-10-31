@@ -41,10 +41,6 @@ func getQueryContext(constraints []constraintArgs) table.QueryContext {
 }
 
 func TestGetConstraintFilters(t *testing.T) {
-	type args struct {
-		queryContext table.QueryContext
-		columnName   string
-	}
 	tests := []struct {
 		name         string
 		queryContext table.QueryContext
