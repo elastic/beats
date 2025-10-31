@@ -15,26 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !windows
-// +build !windows
+//go:build unix
 
 package instance
 
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"golang.org/x/sys/unix"
 )
 
 func (b *Beat) doReexec() error {
-	pwd, err := os.Getwd()
+	binary, err := os.Executable()
 	if err != nil {
 		return fmt.Errorf("could not get working directory: %w", err)
 	}
 
-	binary := filepath.Join(pwd, os.Args[0])
 	if err := unix.Exec(binary, os.Args, os.Environ()); err != nil {
 		return fmt.Errorf("could not exec '%s', err: %w", binary, err)
 	}

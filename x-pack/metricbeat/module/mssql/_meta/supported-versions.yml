@@ -1,2 +1,2 @@
 variants:
-  - MSSQL_VERSION: 2017-GA-ubuntu
+  - MSSQL_VERSION: 2019-CU28-ubuntu-20.04

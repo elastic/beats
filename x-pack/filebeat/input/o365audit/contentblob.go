@@ -6,12 +6,12 @@ package o365audit
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -53,34 +53,34 @@ func (c contentBlob) OnResponse(response *http.Response) (actions []poll.Action)
 	}
 	var raws []json.RawMessage
 	if err := readJSONBody(response, &raws); err != nil {
-		return append(actions, poll.Terminate(errors.Wrap(err, "reading body failed")))
+		return append(actions, poll.Terminate(fmt.Errorf("reading body failed: %w", err)))
 	}
 	entries := make([]mapstr.M, len(raws))
 	for idx, raw := range raws {
 		var entry mapstr.M
 		if err := json.Unmarshal(raw, &entry); err != nil {
-			return append(actions, poll.Terminate(errors.Wrap(err, "decoding json failed")))
+			return append(actions, poll.Terminate(fmt.Errorf("decoding json failed: %w", err)))
 		}
 		entries[idx] = entry
 		id, _ := getString(entry, "Id")
 		ts, _ := getString(entry, "CreationTime")
-		c.env.Logger.Debugf(" > event %d: created:%s id:%s for %s", idx+1, ts, id, c.cursor)
+		c.env.logger.Debugf(" > event %d: created:%s id:%s for %s", idx+1, ts, id, c.cursor)
 	}
 	if len(entries) > c.skipLines {
 		for _, entry := range entries[:c.skipLines] {
 			id, _ := getString(entry, "Id")
-			c.env.Logger.Debugf("Skipping event %s [%s] for %s", c.cursor, id, c.id)
+			c.env.logger.Debugf("Skipping event %s [%s] for %s", c.cursor, id, c.id)
 		}
 		for idx, entry := range entries[c.skipLines:] {
 			c.cursor = c.cursor.ForNextLine()
-			c.env.Logger.Debugf("Reporting event %s for %s", c.cursor, c.id)
+			c.env.logger.Debugf("Reporting event %s for %s", c.cursor, c.id)
 			actions = append(actions, c.env.Report(raws[idx], entry, c.cursor))
 		}
 		c.skipLines = 0
 	} else {
 		for _, entry := range entries {
 			id, _ := getString(entry, "Id")
-			c.env.Logger.Debugf("Skipping event all %s [%s] for %s", c.cursor, id, c.id)
+			c.env.logger.Debugf("Skipping event all %s [%s] for %s", c.cursor, id, c.id)
 		}
 
 		c.skipLines -= len(entries)
@@ -97,7 +97,7 @@ func (c contentBlob) OnResponse(response *http.Response) (actions []poll.Action)
 func (c contentBlob) handleError(response *http.Response) (actions []poll.Action) {
 	var msg apiError
 	readJSONBody(response, &msg)
-	c.env.Logger.Warnf("Got error %s: %+v", response.Status, msg)
+	c.env.logger.Warnf("Got error %s: %+v", response.Status, msg)
 
 	if _, found := fatalErrors[msg.Error.Code]; found {
 		return []poll.Action{
@@ -107,10 +107,9 @@ func (c contentBlob) handleError(response *http.Response) (actions []poll.Action
 	}
 
 	switch response.StatusCode {
-	case 401: // Authentication error. Renew oauth token and repeat this op.
+	case 401: // Authentication error. Repeat this op.
 		return []poll.Action{
-			poll.RenewToken(),
-			poll.Fetch(withDelay{contentBlob: c, delay: c.env.Config.PollInterval}),
+			poll.Fetch(withDelay{contentBlob: c, delay: c.env.config.PollInterval}),
 		}
 	case 404:
 		return nil
@@ -118,7 +117,7 @@ func (c contentBlob) handleError(response *http.Response) (actions []poll.Action
 	if msg.Error.Code != "" {
 		actions = append(actions, c.env.ReportAPIError(msg))
 	}
-	return append(actions, poll.Fetch(withDelay{contentBlob: c, delay: c.env.Config.ErrorRetryInterval}))
+	return append(actions, poll.Fetch(withDelay{contentBlob: c, delay: c.env.config.ErrorRetryInterval}))
 }
 
 // ContentBlob creates a new contentBlob.

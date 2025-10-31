@@ -49,6 +49,7 @@ func newMultilineWhilePatternReader(
 	separator string,
 	maxBytes int,
 	config *Config,
+	logger *logp.Logger,
 ) (reader.Reader, error) {
 	maxLines := defaultMaxLines
 	if config.MaxLines != nil {
@@ -73,7 +74,7 @@ func newMultilineWhilePatternReader(
 		reader:    r,
 		matcher:   matcherFunc,
 		msgBuffer: newMessageBuffer(maxBytes, maxLines, []byte(separator), config.SkipNewLine),
-		logger:    logp.NewLogger("reader_multiline"),
+		logger:    logger.Named("reader_multiline"),
 		state:     (*whilePatternReader).readFirst,
 	}
 	return pr, nil

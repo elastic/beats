@@ -1,0 +1,9 @@
+description: Entrypoint Pipeline for system/syslog Filebeat module
+processors:
+  - pipeline:
+      if: ctx?.input?.type == "journald"
+      name: '{< IngestPipeline "journald" >}'
+
+  - pipeline:
+      if: ctx?.input?.type == "log"
+      name: '{< IngestPipeline "files" >}'

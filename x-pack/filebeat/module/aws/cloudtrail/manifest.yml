@@ -28,7 +28,6 @@ var:
     default: true
   - name: fips_enabled
   - name: proxy_url
-  - name: max_number_of_messages
   - name: ssl
 
 ingest_pipeline: ingest/pipeline.yml

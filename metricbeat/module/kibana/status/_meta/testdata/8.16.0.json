@@ -1,0 +1,932 @@
+{
+    "name": "kibana",
+    "uuid": "5b2de169-2785-441b-ae8c-186a1936b17d",
+    "version": {
+        "number": "8.16.0",
+        "build_hash": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "build_number": 9007199254740991,
+        "build_snapshot": false,
+        "build_flavor": "traditional",
+        "build_date": "2024-07-16T17:38:42.062Z"
+    },
+    "status": {
+        "overall": {
+            "level": "available",
+            "summary": "All services and plugins are available"
+        },
+        "core": {
+            "elasticsearch": {
+                "level": "available",
+                "summary": "Elasticsearch is available",
+                "meta": {
+                    "warningNodes": [],
+                    "incompatibleNodes": []
+                }
+            },
+            "savedObjects": {
+                "level": "available",
+                "summary": "SavedObjects service has completed migrations and is available",
+                "meta": {
+                    "migratedIndices": {
+                        "migrated": 0,
+                        "skipped": 0,
+                        "patched": 7
+                    }
+                }
+            }
+        },
+        "plugins": {
+            "alerting": {
+                "level": "available",
+                "summary": "Alerting is (probably) ready",
+                "reported": true
+            },
+            "triggersActionsUi": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "transform": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "stackConnectors": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "searchPlayground": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "stackAlerts": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "ruleRegistry": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "cases": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "timelines": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "sessionView": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "kubernetesSecurity": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "threatIntelligence": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "observabilityShared": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "metricsDataAccess": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "logsShared": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "aiops": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "links": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "discover": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "reporting": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "canvas": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "logsExplorer": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "exploratoryView": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "observability": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "slo": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "ml": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "searchInferenceEndpoints": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "observabilityAIAssistantApp": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "elasticAssistant": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "osquery": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "infra": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "upgradeAssistant": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "monitoring": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "logstash": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "uptime": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "synthetics": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "observabilityOnboarding": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "datasetQuality": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "dataQuality": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "observabilityLogsExplorer": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "apm": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "ux": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "indexManagement": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "rollup": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "remoteClusters": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "crossClusterReplication": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "indexLifecycleManagement": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "enterpriseSearch": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "observabilityAiAssistantManagement": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "esql": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "cloudSecurityPosture": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "cloudDefend": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "securitySolution": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "securitySolutionEss": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "discoverEnhanced": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "fleet": {
+                "level": "available",
+                "summary": "Fleet is available",
+                "reported": true
+            },
+            "translations": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "searchConnectors": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "runtimeFields": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "assetsDataAccess": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "monitoringCollection": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "licenseApiGuard": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "fieldsMetadata": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "urlForwarding": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "unifiedHistogram": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "uiActions": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "share": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "screenshotMode": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "savedObjectsFinder": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "noDataPage": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "kibanaUtils": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "kibanaReact": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "ftrApis": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "fieldFormats": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "expressions": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "esUiShared": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "discoverShared": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "customIntegrations": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "contentManagement": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "bfetch": {
+                "level": "available",
+                "summary": "All services are available"
+            },
+            "globalSearch": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "globalSearchProviders": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "features": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "mapsEms": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "customBranding": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "devTools": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "inspector": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "banners": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "usageCollection": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "cloud": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "guidedOnboarding": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "telemetryCollectionManager": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "telemetryCollectionXpack": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "kibanaUsageCollection": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "newsfeed": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "screenshotting": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "dataViews": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "cloudExperiments": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "home": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "searchprofiler": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "painlessLab": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "grokdebugger": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "management": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "spaces": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "security": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "snapshotRestore": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "lists": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "encryptedSavedObjects": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "entityManager": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "cloudLinks": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "telemetry": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "licenseManagement": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "files": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "filesManagement": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "eventLog": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "actions": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "observabilityAIAssistant": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "investigate": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "notifications": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "cloudDataMigration": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "aiAssistantManagementSelection": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "advancedSettings": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "telemetryManagementSection": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "console": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "searchNotebooks": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "searchHomepage": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "data": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "logsDataAccess": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "apmDataAccess": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "fileUpload": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "ingestPipelines": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "ecsDataQualityDashboard": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "unifiedDocViewer": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "savedObjects": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "savedObjectsTaggingOss": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "savedObjectsTagging": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "globalSearchBar": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "savedObjectsManagement": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "unifiedSearch": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "navigation": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "graph": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "presentationPanel": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "embeddable": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "uiActionsEnhanced": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "embeddableEnhanced": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "imageEmbeddable": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "urlDrilldown": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "savedSearch": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "presentationUtil": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "expressionShape": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "expressionRevealImage": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "expressionRepeatImage": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "expressionMetric": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "expressionImage": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "expressionError": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "controls": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "esqlDataGrid": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "dataViewFieldEditor": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "dataViewEditor": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "kibanaOverview": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "dataViewManagement": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "charts": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "watcher": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "visualizations": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "visTypeXy": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "visTypeVislib": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "visTypeVega": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "visTypeTimeseries": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "visTypeTimelion": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "visTypeTagcloud": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "visTypeTable": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "visTypeMetric": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "visTypeHeatmap": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "visTypeMarkdown": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "visDefaultEditor": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "inputControlVis": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "eventAnnotation": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "expressionXY": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "dashboard": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "dashboardEnhanced": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "expressionTagcloud": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "expressionPartitionVis": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "visTypePie": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "expressionMetricVis": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "expressionLegacyMetricVis": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "expressionHeatmap": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "expressionGauge": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "lens": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "maps": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "dataVisualizer": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "eventAnnotationListing": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "visTypeGauge": {
+                "level": "available",
+                "summary": "All services and plugins are available"
+            },
+            "licensing": {
+                "level": "available",
+                "summary": "License fetched",
+                "reported": true
+            },
+            "taskManager": {
+                "level": "available",
+                "summary": "Task Manager is healthy",
+                "reported": true
+            }
+        }
+    },
+    "metrics": {
+        "last_updated": "2024-07-17T09:35:11.129Z",
+        "collection_interval_in_millis": 5000,
+        "os": {
+            "platform": "darwin",
+            "platformRelease": "darwin-23.5.0",
+            "load": {
+                "1m": 12.6708984375,
+                "5m": 10.1025390625,
+                "15m": 10.5244140625
+            },
+            "memory": {
+                "total_in_bytes": 34359738368,
+                "free_in_bytes": 82526208,
+                "used_in_bytes": 34277212160
+            },
+            "uptime_in_millis": 2116272000
+        },
+        "process": {
+            "memory": {
+                "heap": {
+                    "total_in_bytes": 739229696,
+                    "used_in_bytes": 613658752,
+                    "size_limit": 4345298944
+                },
+                "resident_set_size_in_bytes": 763396096,
+                "array_buffers_in_bytes": 15459091,
+                "external_in_bytes": 18984913
+            },
+            "pid": 94536,
+            "event_loop_delay": 29.786111,
+            "event_loop_delay_histogram": {
+                "min": 9.09312,
+                "max": 29.786111,
+                "mean": 10.76752587473,
+                "exceeds": 0,
+                "stddev": 1.65098471681065,
+                "fromTimestamp": "2024-07-17T09:35:06.129Z",
+                "lastUpdatedAt": "2024-07-17T09:35:11.128Z",
+                "percentiles": {
+                    "50": 10.387455,
+                    "75": 10.870783,
+                    "95": 13.459455,
+                    "99": 17.580031
+                }
+            },
+            "event_loop_utilization": {
+                "active": 1574.23844694346,
+                "idle": 3425.01509500295,
+                "utilization": 0.31489470052574
+            },
+            "uptime_in_millis": 57391843.684875
+        },
+        "processes": [
+            {
+                "memory": {
+                    "heap": {
+                        "total_in_bytes": 739229696,
+                        "used_in_bytes": 613658752,
+                        "size_limit": 4345298944
+                    },
+                    "resident_set_size_in_bytes": 763396096,
+                    "array_buffers_in_bytes": 15459091,
+                    "external_in_bytes": 18984913
+                },
+                "pid": 94536,
+                "event_loop_delay": 29.786111,
+                "event_loop_delay_histogram": {
+                    "min": 9.09312,
+                    "max": 29.786111,
+                    "mean": 10.76752587473,
+                    "exceeds": 0,
+                    "stddev": 1.65098471681065,
+                    "fromTimestamp": "2024-07-17T09:35:06.129Z",
+                    "lastUpdatedAt": "2024-07-17T09:35:11.128Z",
+                    "percentiles": {
+                        "50": 10.387455,
+                        "75": 10.870783,
+                        "95": 13.459455,
+                        "99": 17.580031
+                    }
+                },
+                "event_loop_utilization": {
+                    "active": 1574.23844694346,
+                    "idle": 3425.01509500295,
+                    "utilization": 0.31489470052574
+                },
+                "uptime_in_millis": 57391843.684875
+            }
+        ],
+        "response_times": {
+            "avg_in_millis": 15.8129032258065,
+            "max_in_millis": 863
+        },
+        "concurrent_connections": 6,
+        "requests": {
+            "disconnects": 0,
+            "total": 312,
+            "statusCodes": {
+                "200": 31,
+                "302": 2,
+                "304": 277
+            },
+            "status_codes": {
+                "200": 31,
+                "302": 2,
+                "304": 277
+            }
+        },
+        "elasticsearch_client": {
+            "totalActiveSockets": 2,
+            "totalIdleSockets": 8,
+            "totalQueuedRequests": 0
+        }
+    }
+}

@@ -6,7 +6,8 @@ ENV TC apache-tomcat-${TOMCAT_VERSION}
 ARG JOLOKIA_VERSION
 
 RUN apk update && \
-    apk add curl openssl ca-certificates bash
+    apk upgrade --no-cache && \
+    apk add curl openssl ca-certificates bash 
 
 HEALTHCHECK --interval=1s --retries=90 CMD curl -f localhost:8778/jolokia/
 EXPOSE 8778

@@ -6,8 +6,8 @@ package main
 
 import (
 	"os"
+	_ "time/tzdata" // for timezone handling
 
-	_ "github.com/elastic/beats/v7/heartbeat/include"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/cmd"
 )
 

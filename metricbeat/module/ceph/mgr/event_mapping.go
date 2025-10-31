@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/pkg/errors"
+	"errors"
 )
 
 // Request stores either or finished command result.
@@ -43,7 +43,7 @@ func UnmarshalResponse(content []byte, response interface{}) error {
 	var request Request
 	err := json.Unmarshal(content, &request)
 	if err != nil {
-		return errors.Wrap(err, "could not get request data")
+		return fmt.Errorf("could not get request data: %w", err)
 	}
 
 	if request.HasFailed {
@@ -59,7 +59,7 @@ func UnmarshalResponse(content []byte, response interface{}) error {
 
 	err = json.Unmarshal([]byte(request.Finished[0].Outb), response)
 	if err != nil {
-		return errors.Wrap(err, "could not get response data")
+		return fmt.Errorf("could not get response data: %w", err)
 	}
 	return nil
 }

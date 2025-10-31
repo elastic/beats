@@ -67,12 +67,12 @@ func ParseRedisInfo(info string) map[string]string {
 }
 
 // ParseRedisLine parses a single line returned by INFO
-func ParseRedisLine(s string, delimiter string) []string {
+func ParseRedisLine(s, delimiter string) []string {
 	return strings.Split(s, delimiter)
 }
 
 // ParseRedisCommandStats parses a map of stats returned by INFO COMMANDSTATS
-func ParseRedisCommandStats(key string, s string) map[string]string {
+func ParseRedisCommandStats(key, s string) map[string]string {
 	// calls=XX,usec=XXX,usec_per_call=XXX
 	results := strings.Split(s, ",")
 
@@ -88,20 +88,20 @@ func ParseRedisCommandStats(key string, s string) map[string]string {
 }
 
 // FetchRedisInfo returns a map of requested stats.
-func FetchRedisInfo(stat string, c rd.Conn) (map[string]string, error) {
+func FetchRedisInfo(stat string, c rd.Conn, logger *logp.Logger) (map[string]string, error) {
 	out, err := rd.String(c.Do("INFO", stat))
 	if err != nil {
-		logp.Err("Error retrieving INFO stats: %v", err)
+		logger.Errorf("Error retrieving INFO stats: %v", err)
 		return nil, err
 	}
 	return ParseRedisInfo(out), nil
 }
 
 // FetchSlowLogLength returns count of slow operations
-func FetchSlowLogLength(c rd.Conn) (int64, error) {
+func FetchSlowLogLength(c rd.Conn, logger *logp.Logger) (int64, error) {
 	count, err := rd.Int64(c.Do("SLOWLOG", "len"))
 	if err != nil {
-		logp.Err("Error retrieving slowlog len: %v", err)
+		logger.Errorf("Error retrieving slowlog len: %v", err)
 		return 0, err
 	}
 
@@ -109,7 +109,7 @@ func FetchSlowLogLength(c rd.Conn) (int64, error) {
 }
 
 // FetchKeyInfo collects info about a key
-func FetchKeyInfo(c rd.Conn, key string) (map[string]interface{}, error) {
+func FetchKeyInfo(c rd.Conn, key string, logger *logp.Logger) (map[string]interface{}, error) {
 	keyType, err := rd.String(c.Do("TYPE", key))
 	if err != nil {
 		return nil, err
@@ -146,7 +146,7 @@ func FetchKeyInfo(c rd.Conn, key string) (map[string]interface{}, error) {
 	case TypeHash:
 		lenCommand = "HLEN"
 	default:
-		logp.Debug("redis", "Not supported length for type %s", keyType)
+		logger.Named("redis").Debugf("Not supported length for type %s", keyType)
 	}
 
 	if lenCommand != "" {
@@ -208,27 +208,30 @@ func (p *Pool) DBNumber() int {
 }
 
 // CreatePool creates a redis connection pool
-func CreatePool(
-	host, password, network string,
-	dbNumber int,
-	maxConn int,
-	idleTimeout, connTimeout time.Duration,
-) *Pool {
+func CreatePool(host, username, password string, dbNumber int, config *Config, connTimeout time.Duration) *Pool {
 	pool := &rd.Pool{
-		MaxIdle:     maxConn,
-		IdleTimeout: idleTimeout,
+		MaxIdle:     config.MaxConn,
+		IdleTimeout: config.IdleTimeout,
 		Dial: func() (rd.Conn, error) {
-			return rd.Dial(network, host,
+			dialOptions := []rd.DialOption{
+				rd.DialUsername(username),
 				rd.DialPassword(password),
 				rd.DialDatabase(dbNumber),
 				rd.DialConnectTimeout(connTimeout),
 				rd.DialReadTimeout(connTimeout),
-				rd.DialWriteTimeout(connTimeout))
+				rd.DialWriteTimeout(connTimeout),
+			}
+
+			if config.TLS.IsEnabled() {
+				dialOptions = append(dialOptions,
+					rd.DialUseTLS(true),
+					rd.DialTLSConfig(config.UseTLSConfig),
+				)
+			}
+
+			return rd.Dial(config.Network, host, dialOptions...)
 		},
 	}
 
-	return &Pool{
-		Pool:     pool,
-		dbNumber: dbNumber,
-	}
+	return &Pool{Pool: pool, dbNumber: dbNumber}
 }

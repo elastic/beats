@@ -17,7 +17,10 @@
 
 package console
 
-import "github.com/elastic/beats/v7/libbeat/outputs/codec"
+import (
+	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/elastic-agent-libs/config"
+)
 
 type Config struct {
 	Codec codec.Config `config:"codec"`
@@ -26,6 +29,7 @@ type Config struct {
 	Pretty bool `config:"pretty"`
 
 	BatchSize int
+	Queue     config.Namespace `config:"queue"`
 }
 
 var defaultConfig = Config{}

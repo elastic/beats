@@ -18,9 +18,8 @@
 package ksm
 
 import (
+	"fmt"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/module/linux"
 )
@@ -40,37 +39,37 @@ func fetchKSMStats(ksmPath string) (ksmData, error) {
 	// ReadIntFromFile returns pretty verbose error strings, so omit errors.Wrap here
 	pshared, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "pages_shared"), 10)
 	if err != nil {
-		return ksmData{}, errors.Wrap(err, "error reading from pages_shared")
+		return ksmData{}, fmt.Errorf("error reading from pages_shared: %w", err)
 	}
 
 	pSharing, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "pages_sharing"), 10)
 	if err != nil {
-		return ksmData{}, errors.Wrap(err, "error reading from pages_sharing")
+		return ksmData{}, fmt.Errorf("error reading from pages_sharing: %w", err)
 	}
 
 	pUnshared, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "pages_unshared"), 10)
 	if err != nil {
-		return ksmData{}, errors.Wrap(err, "error reading from pages_unshared")
+		return ksmData{}, fmt.Errorf("error reading from pages_unshared: %w", err)
 	}
 
 	pVolatile, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "pages_volatile"), 10)
 	if err != nil {
-		return ksmData{}, errors.Wrap(err, "error reading from pages_volatile")
+		return ksmData{}, fmt.Errorf("error reading from pages_volatile: %w", err)
 	}
 
 	fScans, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "full_scans"), 10)
 	if err != nil {
-		return ksmData{}, errors.Wrap(err, "error reading from full_scans")
+		return ksmData{}, fmt.Errorf("error reading from full_scans: %w", err)
 	}
 
 	stableChains, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "stable_node_chains"), 10)
 	if err != nil {
-		return ksmData{}, errors.Wrap(err, "error reading from stable_node_chains")
+		return ksmData{}, fmt.Errorf("error reading from stable_node_chains: %w", err)
 	}
 
 	stableDups, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "stable_node_dups"), 10)
 	if err != nil {
-		return ksmData{}, errors.Wrap(err, "error reading from stable_node_dups ")
+		return ksmData{}, fmt.Errorf("error reading from stable_node_dups : %w", err)
 	}
 
 	return ksmData{PagesShared: pshared, PagesSharing: pSharing, PagesUnshared: pUnshared,

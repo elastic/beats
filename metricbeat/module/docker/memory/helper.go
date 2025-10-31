@@ -20,6 +20,7 @@ package memory
 import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 // MemoryData contains parsed container memory info
@@ -29,8 +30,8 @@ type MemoryData struct {
 	Failcnt   uint64
 	Limit     uint64
 	MaxUsage  uint64
-	TotalRss  uint64
-	TotalRssP float64
+	TotalRss  opt.Uint
+	TotalRssP opt.Float
 	Usage     uint64
 	UsageP    float64
 	//Raw stats from the cgroup subsystem
@@ -61,7 +62,7 @@ func (s *MemoryService) getMemoryStatsList(containers []docker.Stat, dedot bool)
 }
 
 func (s *MemoryService) getMemoryStats(myRawStat docker.Stat, dedot bool) MemoryData {
-	totalRSS := myRawStat.Stats.MemoryStats.Stats["total_rss"]
+	totalRSS, rssOK := myRawStat.Stats.MemoryStats.Stats["total_rss"]
 
 	// Emulate newer docker releases and exclude cache values from memory usage
 	// See here for a little more context. usage - cache won't work, as it includes shared mappings that can't be dropped
@@ -79,14 +80,12 @@ func (s *MemoryService) getMemoryStats(myRawStat docker.Stat, dedot bool) Memory
 	}
 
 	memUsage = myRawStat.Stats.MemoryStats.Usage - fileUsage
-	return MemoryData{
+	memData := MemoryData{
 		Time:      common.Time(myRawStat.Stats.Read),
 		Container: docker.NewContainer(myRawStat.Container, dedot),
 		Failcnt:   myRawStat.Stats.MemoryStats.Failcnt,
 		Limit:     myRawStat.Stats.MemoryStats.Limit,
 		MaxUsage:  myRawStat.Stats.MemoryStats.MaxUsage,
-		TotalRss:  totalRSS,
-		TotalRssP: float64(totalRSS) / float64(myRawStat.Stats.MemoryStats.Limit),
 		Usage:     memUsage,
 		UsageP:    float64(memUsage) / float64(myRawStat.Stats.MemoryStats.Limit),
 		Stats:     myRawStat.Stats.MemoryStats.Stats,
@@ -95,4 +94,13 @@ func (s *MemoryService) getMemoryStats(myRawStat docker.Stat, dedot bool) Memory
 		CommitPeak:        myRawStat.Stats.MemoryStats.CommitPeak,
 		PrivateWorkingSet: myRawStat.Stats.MemoryStats.PrivateWorkingSet,
 	}
+	// the RSS metrics are cgv1 only.
+	if rssOK {
+		memData.TotalRss = opt.UintWith(totalRSS)
+		if myRawStat.Stats.MemoryStats.Limit != 0 {
+			memData.TotalRssP = opt.FloatWith(float64(totalRSS) / float64(myRawStat.Stats.MemoryStats.Limit))
+		}
+
+	}
+	return memData
 }

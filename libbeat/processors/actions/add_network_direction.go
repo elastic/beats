@@ -21,14 +21,13 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -54,10 +53,10 @@ type networkDirectionProcessor struct {
 }
 
 // NewAddNetworkDirection constructs a new network direction processor.
-func NewAddNetworkDirection(cfg *conf.C) (processors.Processor, error) {
+func NewAddNetworkDirection(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	networkDirection := &networkDirectionProcessor{}
 	if err := cfg.Unpack(networkDirection); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the add_network_direction configuration")
+		return nil, fmt.Errorf("fail to unpack the add_network_direction configuration: %w", err)
 	}
 
 	return networkDirection, nil
@@ -66,7 +65,7 @@ func NewAddNetworkDirection(cfg *conf.C) (processors.Processor, error) {
 func (m *networkDirectionProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	sourceI, err := event.GetValue(m.Source)
 	if err != nil {
-		// doesn't have the required field value to analyze
+		//nolint:nilerr // doesn't have the required field value to analyze
 		return event, nil
 	}
 	source, _ := sourceI.(string)
@@ -76,7 +75,7 @@ func (m *networkDirectionProcessor) Run(event *beat.Event) (*beat.Event, error) 
 	}
 	destinationI, err := event.GetValue(m.Destination)
 	if err != nil {
-		// doesn't have the required field value to analyze
+		//nolint:nilerr // doesn't have the required field value to analyze
 		return event, nil
 	}
 	destination, _ := destinationI.(string)
@@ -100,7 +99,7 @@ func (m *networkDirectionProcessor) Run(event *beat.Event) (*beat.Event, error) 
 		return event, err
 	}
 
-	event.PutValue(m.Target, networkDirection(internalSource, internalDestination))
+	_, _ = event.PutValue(m.Target, networkDirection(internalSource, internalDestination))
 	return event, nil
 }
 

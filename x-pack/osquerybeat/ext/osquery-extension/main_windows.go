@@ -3,11 +3,17 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build windows
-// +build windows
 
 package main
 
-import "github.com/osquery/osquery-go"
+import (
+	"github.com/osquery/osquery-go"
+	"github.com/osquery/osquery-go/plugin/table"
 
-func RegisterTables(server *osquery.ExtensionManagerServer) {
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/browserhistory"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+)
+
+func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
+	server.RegisterPlugin(table.NewPlugin("browser_history", browserhistory.GetColumns(), browserhistory.GetGenerateFunc(log)))
 }

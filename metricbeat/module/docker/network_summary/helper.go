@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package network_summary
 
@@ -30,7 +29,6 @@ import (
 	"time"
 
 	"github.com/docker/docker/client"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/go-sysinfo"
 
@@ -56,19 +54,23 @@ func fetchContainerNetStats(client *client.Client, timeout time.Duration, contai
 
 	inspect, err := client.ContainerInspect(ctx, container)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error fetching stats for container %s", container)
+		return nil, fmt.Errorf("error fetching stats for container %s: %w", container, err)
 	}
 	rootPID := inspect.ContainerJSONBase.State.Pid
 
 	proc, err := sysinfo.Process(rootPID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot fetch process information for PID %d: %w", rootPID, err)
+	}
+
 	procNet, ok := proc.(sysinfotypes.NetworkCounters)
 	if !ok {
-		return nil, errors.Wrapf(err, "cannot fetch network counters for PID %d", rootPID)
+		return nil, fmt.Errorf("cannot fetch network counters for PID %d", rootPID)
 	}
 
 	counters, err := procNet.NetworkCounters()
 	if err != nil {
-		return &sysinfotypes.NetworkCountersInfo{}, errors.Wrapf(err, "error fetching network counters for PID %d", rootPID)
+		return &sysinfotypes.NetworkCountersInfo{}, fmt.Errorf("error fetching network counters for PID %d: %w", rootPID, err)
 	}
 
 	return counters, nil
@@ -79,7 +81,7 @@ func fetchContainerNetStats(client *client.Client, timeout time.Duration, contai
 func fetchNamespace(pid int) (int, error) {
 	nsLink, err := os.Readlink(filepath.Join("/proc/", fmt.Sprintf("%d", pid), "/ns/net"))
 	if err != nil {
-		return 0, errors.Wrap(err, "error reading network namespace link")
+		return 0, fmt.Errorf("error reading network namespace link: %w", err)
 	}
 	nsidString := nsRegex.FindString(nsLink)
 	// This is minor metadata, so don't consider it an error
@@ -89,7 +91,7 @@ func fetchNamespace(pid int) (int, error) {
 
 	nsID, err := strconv.Atoi(nsidString)
 	if err != nil {
-		return 0, errors.Wrapf(err, "error converting %s to int", nsidString)
+		return 0, fmt.Errorf("error converting %s to int: %w", nsidString, err)
 	}
 	return nsID, nil
 }

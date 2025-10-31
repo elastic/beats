@@ -18,10 +18,9 @@
 package ingest_pipeline
 
 import (
+	"fmt"
 	"math"
 	"net/url"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -59,7 +58,7 @@ type IngestMetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The elasticsearch ingest metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The elasticsearch ingest metricset is beta."))
 	ms, err := elasticsearch.NewMetricSet(base, statsPathCluster)
 	if err != nil {
 		return nil, err
@@ -113,7 +112,7 @@ func (m *IngestMetricSet) Fetch(report mb.ReporterV2) error {
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI)
 	if err != nil {
-		return errors.Wrap(err, "failed to get info from Elasticsearch")
+		return fmt.Errorf("failed to get info from Elasticsearch: %w", err)
 	}
 
 	m.fetchCounter++ // It's fine if this overflows, it's only used for modulo

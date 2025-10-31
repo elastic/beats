@@ -16,8 +16,20 @@ type Option interface {
 // Settings for unpacking messages.
 type Settings struct {
 	fullExtensionNames bool
+	removeEmptyValues  bool
+	timezone           *time.Location
+}
 
-	timezone *time.Location
+type withRemoveEmptyValues struct{}
+
+func (w withRemoveEmptyValues) Apply(s *Settings) {
+	s.removeEmptyValues = true
+}
+
+// WithRemoveEmptyValues causes CEF extension keys without values to be
+// dropped.
+func WithRemoveEmptyValues() Option {
+	return withRemoveEmptyValues{}
 }
 
 type withFullExtensionNames struct{}

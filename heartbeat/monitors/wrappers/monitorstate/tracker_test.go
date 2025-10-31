@@ -18,6 +18,7 @@
 package monitorstate
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -28,43 +29,43 @@ import (
 
 func TestTrackerRecord(t *testing.T) {
 	mst := NewTracker(NilStateLoader, true)
-	ms := mst.RecordStatus(TestSf, StatusUp)
+	ms := mst.RecordStatus(TestSf, StatusUp, true)
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSStatusCount(t, ms, StatusUp, 1)
 
 	for i := 0; i < FlappingThreshold; i++ {
-		_ = mst.RecordStatus(TestSf, StatusDown)
-		ms = mst.RecordStatus(TestSf, StatusUp)
+		_ = mst.RecordStatus(TestSf, StatusDown, true)
+		ms = mst.RecordStatus(TestSf, StatusUp, true)
 	}
 	require.Equal(t, StatusFlapping, ms.Status)
 	requireMSCounts(t, ms, FlappingThreshold+1, FlappingThreshold)
 
 	// Restore stable state
 	for i := 0; i < FlappingThreshold; i++ {
-		_ = mst.RecordStatus(TestSf, StatusDown)
+		_ = mst.RecordStatus(TestSf, StatusDown, true)
 	}
 
-	ms = mst.RecordStatus(TestSf, StatusDown)
+	ms = mst.RecordStatus(TestSf, StatusDown, true)
 	require.Equal(t, StatusDown, ms.Status)
 	requireMSStatusCount(t, ms, StatusDown, FlappingThreshold-1)
 }
 
 func TestTrackerRecordFlappingDisabled(t *testing.T) {
 	mst := NewTracker(NilStateLoader, false)
-	ms := mst.RecordStatus(TestSf, StatusUp)
+	ms := mst.RecordStatus(TestSf, StatusUp, true)
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSStatusCount(t, ms, StatusUp, 1)
 
 	for i := 0; i < FlappingThreshold; i++ {
-		_ = mst.RecordStatus(TestSf, StatusDown)
-		ms = mst.RecordStatus(TestSf, StatusUp)
+		_ = mst.RecordStatus(TestSf, StatusDown, true)
+		ms = mst.RecordStatus(TestSf, StatusUp, true)
 	}
 
 	// with flapping disabled it only shows as up
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSCounts(t, ms, 1, 0)
 
-	ms = mst.RecordStatus(TestSf, StatusDown)
+	ms = mst.RecordStatus(TestSf, StatusDown, true)
 	require.Equal(t, StatusDown, ms.Status)
 	requireMSStatusCount(t, ms, StatusDown, 1)
 }
@@ -130,4 +131,52 @@ func TestDeferredStateLoader(t *testing.T) {
 	replace(loaderA)
 	resState, _ = dsl(stdfields.StdMonitorFields{})
 	require.Equal(t, stateA, resState)
+}
+
+func TestStateLoaderRetry(t *testing.T) {
+	// While testing the sleep time between retries should be negligible
+	waitFn := func() time.Duration {
+		return time.Microsecond
+	}
+
+	tests := []struct {
+		name          string
+		retryable     bool
+		rc            RetryConfig
+		expectedCalls int
+	}{
+		{
+			"should retry 3 times when fails with retryable error",
+			true,
+			RetryConfig{waitFn: waitFn},
+			3,
+		},
+		{
+			"should not retry when fails with non-retryable error",
+			false,
+			RetryConfig{waitFn: waitFn},
+			1,
+		},
+		{
+			"should honour the configured number of attempts when fails with retryable error",
+			true,
+			RetryConfig{attempts: 5, waitFn: waitFn},
+			5,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			calls := 0
+			errorStateLoader := func(_ stdfields.StdMonitorFields) (*State, error) {
+				calls += 1
+				return nil, LoaderError{err: errors.New("test error"), Retry: tt.retryable}
+			}
+
+			mst := NewTracker(errorStateLoader, true)
+			mst.GetCurrentState(stdfields.StdMonitorFields{}, tt.rc)
+
+			require.Equal(t, calls, tt.expectedCalls)
+		})
+	}
 }

@@ -18,7 +18,7 @@
 package agent
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -55,7 +55,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The consul agent metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The consul agent metricset is beta."))
 
 	http, err := helper.NewHTTP(base)
 	if err != nil {
@@ -74,12 +74,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		return errors.Wrap(err, "error in http fetch")
+		return fmt.Errorf("error in http fetch: %w", err)
 	}
 
 	mappings, err := eventMapping(content)
 	if err != nil {
-		return errors.Wrap(err, "error in event mapping")
+		return fmt.Errorf("error in event mapping: %w", err)
 	}
 
 	for _, m := range mappings {

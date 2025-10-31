@@ -4,7 +4,7 @@
 
 package gcp
 
-import monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+import "cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 
 const (
 	// ModuleName in Metricbeat
@@ -27,6 +27,7 @@ const (
 	ServiceDataproc       = "dataproc"
 	ServiceCloudSQL       = "cloudsql"
 	ServiceRedis          = "redis"
+	ServiceAIPlatform     = "aiplatform"
 )
 
 // Paths within the GCP monitoring.TimeSeries response, if converted to JSON, where you can find each ECS field required for the output event
@@ -48,9 +49,9 @@ const (
 
 	ECSCloudRegion = "region"
 
-	ECSCloudAccount     = "account"
-	ECSCloudAccountID   = "id"
-	ECSCloudAccountName = "name"
+	ECSCloudAccount = "account"
+	ECSCloudID      = "id"
+	ECSCloudName    = "name"
 
 	ECSCloudInstance        = "instance"
 	ECSCloudInstanceKey     = ECSCloud + "." + ECSCloudInstance
@@ -63,6 +64,7 @@ const (
 	ECSCloudMachineKey     = ECSCloud + "." + ECSCloudMachine
 	ECSCloudMachineType    = "type"
 	ECSCloudMachineTypeKey = ECSCloudMachineKey + "." + ECSCloudMachineType
+	ECSCloudProject        = "project"
 )
 
 // Metadata keys used for events. They follow GCP structure.
@@ -81,13 +83,14 @@ const (
 
 // NOTE: if you are adding labels make sure to update tests in metrics/metrics_requester_test.go.
 const (
-	DefaultResourceLabel  = "resource.label.zone"
-	ComputeResourceLabel  = "resource.labels.zone"
-	GKEResourceLabel      = "resource.label.location"
-	StorageResourceLabel  = "resource.label.location"
-	CloudSQLResourceLabel = "resource.labels.region"
-	DataprocResourceLabel = "resource.label.region"
-	RedisResourceLabel    = "resource.label.region"
+	DefaultResourceLabel    = "resource.label.zone"
+	ComputeResourceLabel    = "resource.labels.zone"
+	GKEResourceLabel        = "resource.label.location"
+	StorageResourceLabel    = "resource.label.location"
+	CloudSQLResourceLabel   = "resource.labels.region"
+	DataprocResourceLabel   = "resource.label.region"
+	RedisResourceLabel      = "resource.label.region"
+	AIPlatformResourceLabel = "resource.label.location"
 )
 
 // AlignersMapToGCP map contains available perSeriesAligner

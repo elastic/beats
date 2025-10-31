@@ -3,19 +3,110 @@
         "description": "Overview of all Windows Event Logs.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-            "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"kuery\",\"query\":\"\"}}"
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
         },
-        "optionsJSON": "{\"darkTheme\": false}",
-        "panelsJSON": "[{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":20,\"i\":\"1\",\"w\":36,\"x\":12,\"y\":0},\"panelIndex\":\"1\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_0\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":20,\"i\":\"3\",\"w\":12,\"x\":0,\"y\":0},\"panelIndex\":\"3\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_1\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":20,\"i\":\"4\",\"w\":16,\"x\":16,\"y\":20},\"panelIndex\":\"4\",\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}},\"enhancements\":{}},\"panelRefName\":\"panel_2\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":20,\"i\":\"5\",\"w\":16,\"x\":32,\"y\":20},\"panelIndex\":\"5\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_3\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":20,\"i\":\"6\",\"w\":16,\"x\":0,\"y\":20},\"panelIndex\":\"6\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_4\"}]",
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "1",
+                    "w": 36,
+                    "x": 12,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_0",
+                "version": "7.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "3",
+                    "w": 12,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_1",
+                "version": "7.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "4",
+                    "w": 16,
+                    "x": 16,
+                    "y": 20
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_2",
+                "version": "7.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "5",
+                    "w": 16,
+                    "x": 32,
+                    "y": 20
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_3",
+                "version": "7.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "6",
+                    "w": 16,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_4",
+                "version": "7.0.0-SNAPSHOT"
+            }
+        ],
         "timeRestore": false,
         "title": "[Winlogbeat] Overview",
         "version": 1
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:45:36.656Z",
     "id": "Winlogbeat-Dashboard-ecs",
-    "migrationVersion": {
-        "dashboard": "7.14.0"
-    },
+    "managed": false,
     "references": [
         {
             "id": "Number-of-Events-Over-Time-By-Event-Log-ecs",
@@ -44,6 +135,7 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2021-08-11T13:18:52.287Z",
-    "version": "WzIxNzMsMl0="
+    "typeMigrationVersion": "8.9.0",
+    "updated_at": "2023-11-10T17:45:36.656Z",
+    "version": "WzEwNiwxXQ=="
 }

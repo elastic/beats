@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -33,7 +34,7 @@ func TestRangeCreateNumeric(t *testing.T) {
 			"gtr": 0.3,
 		}},
 	}
-	_, err := NewCondition(&config)
+	_, err := NewCondition(&config, logptest.NewTestingLogger(t, ""))
 	assert.Error(t, err)
 }
 
@@ -43,7 +44,7 @@ func TestRangeCreateLexicographic(t *testing.T) {
 			"gt": "fdfdd",
 		}},
 	}
-	_, err := NewCondition(&config)
+	_, err := NewCondition(&config, logptest.NewTestingLogger(t, ""))
 	assert.Error(t, err)
 }
 
@@ -83,7 +84,8 @@ func TestMultipleOpenRangeConditionNegativeMatch(t *testing.T) {
 
 var procCPURangeConfig = &Config{
 	Range: &Fields{fields: map[string]interface{}{
-		"proc.cpu.total_p.gte": 0.5,
+		"proc.cpu.total_p.gte":     0.5,
+		"proc.cpu.total_p_str.gte": 0.5,
 	}},
 }
 
@@ -94,11 +96,12 @@ func TestOpenGteRangeConditionPositiveMatch(t *testing.T) {
 			"proc": mapstr.M{
 				"cmdline": "/System/Library/Frameworks/CoreServices.framework/Frameworks/Metadata.framework/Versions/A/Support/mdworker -s mdworker -c MDSImporterWorker -m com.apple.mdworker.single",
 				"cpu": mapstr.M{
-					"start_time": "09:19",
-					"system":     22,
-					"total":      66,
-					"total_p":    0.6,
-					"user":       44,
+					"start_time":  "09:19",
+					"system":      22,
+					"total":       66,
+					"total_p_str": "0.6",
+					"total_p":     0.6,
+					"user":        44,
 				},
 				"name":     "mdworker",
 				"pid":      44978,

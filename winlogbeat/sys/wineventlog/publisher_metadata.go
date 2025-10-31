@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package wineventlog
 
@@ -43,7 +42,7 @@ func (m *PublisherMetadata) Close() error {
 
 // NewPublisherMetadata opens the publisher's metadata. Close must be called on
 // the returned PublisherMetadata to release its handle.
-func NewPublisherMetadata(session EvtHandle, name string) (*PublisherMetadata, error) {
+func NewPublisherMetadata(session EvtHandle, name string, locale uint32) (*PublisherMetadata, error) {
 	var publisherName, logFile *uint16
 	if info, err := os.Stat(name); err == nil && info.Mode().IsRegular() {
 		logFile, err = syscall.UTF16PtrFromString(name)
@@ -232,7 +231,8 @@ func NewMetadataKeyword(publisherMetadataHandle EvtHandle, arrayHandle EvtObject
 
 type MetadataOpcode struct {
 	Name      string
-	Mask      uint32
+	Opcode    uint16
+	Task      uint16
 	MessageID uint32
 	Message   string
 }
@@ -293,11 +293,15 @@ func NewMetadataOpcode(publisherMetadataHandle EvtHandle, arrayHandle EvtObjectA
 	if err != nil {
 		return nil, err
 	}
+	// Mask high word contains the opcode value and the low word contains the task to which it belongs.
+	// If the low word is zero, the opcode is defined globally; otherwise, the opcode is task specific.
+	// Use the low word value to determine the task that defines the opcode.
 	valueMask := v.(uint32)
 
 	return &MetadataOpcode{
 		Name:      name,
-		Mask:      valueMask,
+		Opcode:    uint16((valueMask >> 16) & 0xFFFF),
+		Task:      uint16(valueMask & 0xFFFF),
 		MessageID: messageID,
 		Message:   message,
 	}, nil

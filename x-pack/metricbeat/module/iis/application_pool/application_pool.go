@@ -3,14 +3,12 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build windows
-// +build windows
 
 package application_pool
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -41,19 +39,18 @@ type Config struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The iis application_pool metricset is beta.")
 	var config Config
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 	// instantiate reader object
-	reader, err := newReader(config)
+	reader, err := newReader(config, base.Logger())
 	if err != nil {
 		return nil, err
 	}
 	ms := &MetricSet{
 		BaseMetricSet: base,
-		log:           logp.NewLogger("application pool"),
+		log:           base.Logger().Named("application pool"),
 		reader:        reader,
 	}
 
@@ -71,12 +68,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if m.reader.executed {
 		err := m.reader.initAppPools()
 		if err != nil {
-			return errors.Wrap(err, "failed retrieving counters")
+			return fmt.Errorf("failed retrieving counters: %w", err)
 		}
 	}
 	events, err := m.reader.read()
 	if err != nil {
-		return errors.Wrap(err, "failed reading counters")
+		return fmt.Errorf("failed reading counters: %w", err)
 	}
 
 	for _, event := range events {
@@ -92,7 +89,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 func (m *MetricSet) Close() error {
 	err := m.reader.close()
 	if err != nil {
-		return errors.Wrap(err, "failed to close pdh query")
+		return fmt.Errorf("failed to close pdh query: %w", err)
 	}
 	return nil
 }

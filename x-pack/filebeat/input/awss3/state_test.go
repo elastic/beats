@@ -61,7 +61,7 @@ func TestStateIsEqual(t *testing.T) {
 					Key:          "/key/to/this/file/1",
 					Etag:         "etag",
 					LastModified: lastModifed,
-					Error:        true,
+					Failed:       true,
 				},
 				{
 					Bucket:       "bucket a",

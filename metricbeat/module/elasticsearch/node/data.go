@@ -19,12 +19,11 @@ package node
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -71,10 +70,10 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 
 	err := json.Unmarshal(content, &nodesStruct)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
+		return fmt.Errorf("failure parsing Elasticsearch Node Stats API response: %w", err)
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	for id, node := range nodesStruct.Nodes {
 		event := mb.Event{}
 
@@ -87,7 +86,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 
 		event.MetricSetFields, err = schema.Apply(node)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure applying node schema"))
+			errs = append(errs, fmt.Errorf("failure applying node schema: %w", err))
 			continue
 		}
 
@@ -103,5 +102,5 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		r.Event(event)
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }

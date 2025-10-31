@@ -1,0 +1,122 @@
+[
+    {
+        "data_stream": {
+            "dataset": "osquery_manager.result",
+            "namespace": "default",
+            "type": "logs"
+        },
+        "id": "74c7d0a8-ce04-4663-95da-ff6d537c268c",
+        "index": "logs-osquery_manager.result-default",
+        "processors": [
+            {
+                "add_fields": {
+                    "fields": {
+                        "input_id": "74c7d0a8-ce04-4663-95da-ff6d537c268c"
+                    },
+                    "target": "@metadata"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "dataset": "osquery_manager.result",
+                        "namespace": "default",
+                        "type": "logs"
+                    },
+                    "target": "data_stream"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "dataset": "osquery_manager.result"
+                    },
+                    "target": "event"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "id": "abc7d0a8-ce04-4663-95da-ff6d537c268f",
+                        "snapshot": false,
+                        "version": "8.13.1"
+                    },
+                    "target": "elastic_agent"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "id": "abc7d0a8-ce04-4663-95da-ff6d537c268f"
+                    },
+                    "target": "agent"
+                }
+            }
+        ],
+        "type": "osquery"
+    },
+    {
+        "data_stream": {
+            "dataset": "osquery_manager.action.responses",
+            "namespace": "default",
+            "type": "logs"
+        },
+        "id": "osquery-osquery_manager.action.responses-74c7d0a8-ce04-4663-95da-ff6d537c268c",
+        "index": "logs-osquery_manager.action.responses-default",
+        "processors": [
+            {
+                "add_fields": {
+                    "fields": {
+                        "input_id": "74c7d0a8-ce04-4663-95da-ff6d537c268c"
+                    },
+                    "target": "@metadata"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "dataset": "osquery_manager.action.responses",
+                        "namespace": "default",
+                        "type": "logs"
+                    },
+                    "target": "data_stream"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "dataset": "osquery_manager.action.responses"
+                    },
+                    "target": "event"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "stream_id": "osquery-osquery_manager.action.responses-74c7d0a8-ce04-4663-95da-ff6d537c268c"
+                    },
+                    "target": "@metadata"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "id": "abc7d0a8-ce04-4663-95da-ff6d537c268f",
+                        "snapshot": false,
+                        "version": "8.13.1"
+                    },
+                    "target": "elastic_agent"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "id": "abc7d0a8-ce04-4663-95da-ff6d537c268f"
+                    },
+                    "target": "agent"
+                }
+            }
+        ],
+        "type": "osquery"
+    }
+]

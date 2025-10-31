@@ -24,11 +24,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/features"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/beats/v7/libbeat/processors/timeseries"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -77,14 +77,14 @@ type builtinModifier func(beat.Info) mapstr.M
 // MakeDefaultBeatSupport automatically adds the `ecs.version`, `host.name` and `agent.X` fields
 // to each event.
 func MakeDefaultBeatSupport(normalize bool) SupportFactory {
-	return MakeDefaultSupport(normalize, WithECS, WithHost, WithAgentMeta())
+	return MakeDefaultSupport(normalize, nil, WithECS, WithHost, WithAgentMeta())
 }
 
 // MakeDefaultObserverSupport creates a new SupportFactory based on NewDefaultSupport.
 // MakeDefaultObserverSupport automatically adds the `ecs.version` and `observer.X` fields
 // to each event.
 func MakeDefaultObserverSupport(normalize bool) SupportFactory {
-	return MakeDefaultSupport(normalize, WithECS, WithObserverMeta())
+	return MakeDefaultSupport(normalize, nil, WithECS, WithObserverMeta())
 }
 
 // MakeDefaultSupport creates a new SupportFactory for use with the publisher pipeline.
@@ -94,8 +94,11 @@ func MakeDefaultObserverSupport(normalize bool) SupportFactory {
 // and `processor` settings to the event processing pipeline to be generated.
 // Use WithFields, WithBeatMeta, and other to declare the builtin fields to be added
 // to each event. Builtin fields can be modified using global `processors`, and `fields` only.
+// the fleetDefaultProcessors argument will set the given global-level processors if the beat is currently running under fleet,
+// and no other global-level processors are set.
 func MakeDefaultSupport(
 	normalize bool,
+	fleetDefaultProcessors processors.PluginConfig,
 	modifiers ...modifier,
 ) SupportFactory {
 	return func(info beat.Info, log *logp.Logger, beatCfg *config.C) (Supporter, error) {
@@ -107,8 +110,20 @@ func MakeDefaultSupport(
 		if err := beatCfg.Unpack(&cfg); err != nil {
 			return nil, err
 		}
+		// don't try to "merge" the two lists somehow, if the supportFactory caller requests its own processors, use those
+		// also makes it easier to disable global processors if needed, since they're otherwise hardcoded
+		var rawProcessors processors.PluginConfig
 
-		processors, err := processors.New(cfg.Processors)
+		// don't check the array directly, use HasField, that way processors can easily be bypassed with -E processors=[]
+		if management.UnderAgent() && !beatCfg.HasField("processors") {
+			log.Debugf("In fleet/otel mode with no processors specified, defaulting to global processors")
+			rawProcessors = fleetDefaultProcessors
+
+		} else {
+			rawProcessors = cfg.Processors
+		}
+
+		processors, err := processors.New(rawProcessors, log)
 		if err != nil {
 			return nil, fmt.Errorf("error initializing processors: %w", err)
 		}
@@ -125,7 +140,7 @@ func WithFields(fields mapstr.M) modifier {
 }
 
 // WithECS modifier adds `ecs.version` builtin fields to a processing pipeline.
-var WithECS modifier = WithFields(mapstr.M{
+var WithECS = WithFields(mapstr.M{
 	"ecs": mapstr.M{
 		"version": ecs.Version,
 	},
@@ -243,6 +258,19 @@ func newBuilder(
 	return b, nil
 }
 
+// Processors returns a string description of the processor config
+func (b *builder) Processors() []string {
+	procList := []string{}
+
+	if b.processors != nil {
+		for _, proc := range b.processors.list {
+			procList = append(procList, proc.String())
+		}
+	}
+
+	return procList
+}
+
 // Create combines the builder configuration with the client settings
 // in order to build the event processing pipeline.
 //
@@ -296,10 +324,10 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	// setup 1: generalize/normalize output (P)
 	if cfg.EventNormalization != nil {
 		if *cfg.EventNormalization {
-			processors.add(newGeneralizeProcessor(cfg.KeepNull))
+			processors.add(newGeneralizeProcessor(cfg.KeepNull, b.log))
 		}
 	} else if !b.skipNormalize {
-		processors.add(newGeneralizeProcessor(cfg.KeepNull))
+		processors.add(newGeneralizeProcessor(cfg.KeepNull, b.log))
 	}
 
 	// setup 2: add Meta from client config (C)
@@ -312,7 +340,10 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	tags = append(tags, b.tags...)
 	tags = append(tags, cfg.EventMetadata.Tags...)
 	if len(tags) > 0 {
-		processors.add(actions.NewAddTags("tags", tags))
+		processors.add(newProcessor("add_tags", func(event *beat.Event) (*beat.Event, error) {
+			_ = mapstr.AddTagsWithKey(event.Fields, "tags", tags)
+			return event, nil
+		}))
 	}
 
 	// setup 3, 4, 5: client config fields + pipeline fields + client fields + dyn metadata
@@ -330,7 +361,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 		// With dynamic fields potentially changing at any time, we need to copy,
 		// so we do not change shared structures be accident.
 		fieldsNeedsCopy := needsCopy || cfg.DynamicFields != nil || hasKeyAnyOf(fields, builtin)
-		processors.add(actions.NewAddFields(fields, fieldsNeedsCopy, true))
+		processors.add(addfields.NewAddFields(fields, fieldsNeedsCopy, true))
 	}
 
 	if cfg.DynamicFields != nil {
@@ -345,7 +376,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	// setup 6: add beats and host metadata
 	if meta := builtin; len(meta) > 0 {
-		processors.add(actions.NewAddFields(meta, needsCopy, false))
+		processors.add(addfields.NewAddFields(meta, needsCopy, false))
 	}
 
 	// setup 8: pipeline processors list
@@ -356,11 +387,11 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	// setup 9: time series metadata
 	if b.timeSeries {
-		processors.add(timeseries.NewTimeSeriesProcessor(b.timeseriesFields))
+		processors.add(timeseries.NewTimeSeriesProcessor(b.timeseriesFields, b.log))
 	}
 
 	// setup 10: debug print final event (P)
-	if b.log.IsDebug() || publisher.UnderAgent() {
+	if b.log.IsDebug() || management.UnderAgent() {
 		processors.add(debugPrintProcessor(b.info, b.log))
 	}
 
@@ -382,7 +413,7 @@ func (b *builder) Close() error {
 func makeClientProcessors(
 	log *logp.Logger,
 	cfg beat.ProcessingConfig,
-) processors.Processor {
+) beat.Processor {
 	procs := cfg.Processor
 	if procs == nil || len(procs.All()) == 0 {
 		return nil

@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -170,7 +170,7 @@ func TestDecompressGzip(t *testing.T) {
 			t.Parallel()
 
 			f := &decompressGzipField{
-				log:    logp.NewLogger("decompress_gzip_field"),
+				log:    logptest.NewTestingLogger(t, "decompress_gzip_field"),
 				config: test.config,
 			}
 
@@ -212,7 +212,7 @@ func TestDecompressGzip(t *testing.T) {
 		}
 
 		f := &decompressGzipField{
-			log:    logp.NewLogger("decompress_gzip_field"),
+			log:    logptest.NewTestingLogger(t, "decompress_gzip_field"),
 			config: config,
 		}
 

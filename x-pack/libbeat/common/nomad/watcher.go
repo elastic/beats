@@ -59,11 +59,11 @@ type WatchOptions struct {
 
 // NewWatcher initializes the watcher client to provide a events handler for
 // resource from the cluster (filtered to the given node)
-func NewWatcher(client *api.Client, options WatchOptions) (Watcher, error) {
+func NewWatcher(client *api.Client, options WatchOptions, logger *logp.Logger) (Watcher, error) {
 	w := &watcher{
 		client:    client,
 		options:   options,
-		logger:    logp.NewLogger("nomad"),
+		logger:    logger.Named("nomad"),
 		waitIndex: options.InitialWaitIndex,
 		lastFetch: time.Now(),
 		done:      make(chan struct{}),

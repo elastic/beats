@@ -71,7 +71,7 @@ func (op *updateOp) Key() string {
 
 // Publish publishes an event. Publish returns false if the inputs cancellation context has been marked as done.
 // If cursorUpdate is not nil, Publish updates the in memory state and create and updateOp for the pending update.
-// It overwrite event.Private with the update operation, before finally sending the event.
+// It overwrites event.Private with the update operation, before finally sending the event.
 // The ACK ordering in the publisher pipeline guarantees that update operations
 // will be ACKed and executed in the correct order.
 func (c *cursorPublisher) Publish(event beat.Event, cursorUpdate interface{}) error {
@@ -132,7 +132,10 @@ func (op *updateOp) Execute(store *store, n uint) {
 		resource.cursor = resource.pendingCursor()
 		resource.pendingCursorValue = nil
 	} else {
-		typeconv.Convert(&resource.cursor, op.delta)
+		err := typeconv.Convert(&resource.cursor, op.delta)
+		if err != nil {
+			store.log.Errorf("failed to perform type conversion: %v", err)
+		}
 	}
 
 	if resource.internalState.Updated.Before(op.timestamp) {
@@ -142,7 +145,7 @@ func (op *updateOp) Execute(store *store, n uint) {
 	err := store.persistentStore.Set(resource.key, resource.inSyncStateSnapshot())
 	if err != nil {
 		if !statestore.IsClosed(err) {
-			store.log.Errorf("Failed to update state in the registry for '%v'", resource.key)
+			store.log.Errorf("Failed to update state in the registry for '%v': %s", resource.key, err)
 		}
 	} else {
 		resource.stored = true

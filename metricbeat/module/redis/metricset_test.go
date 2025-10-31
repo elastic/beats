@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package redis
 
@@ -32,6 +31,7 @@ func TestGetPasswordDBNumber(t *testing.T) {
 	cases := []struct {
 		title            string
 		hostData         mb.HostData
+		expectedUser     string
 		expectedPassword string
 		expectedDatabase int
 	}{
@@ -39,41 +39,62 @@ func TestGetPasswordDBNumber(t *testing.T) {
 			"test redis://127.0.0.1:6379 without password",
 			mb.HostData{URI: "redis://127.0.0.1:6379", Password: ""},
 			"",
+			"",
 			0,
 		},
 		{
-			"test redis uri with password in URI user info field",
+			"test redis URI with password in userinfo",
 			mb.HostData{URI: "redis://:password@127.0.0.2:6379", Password: "password"},
+			"",
 			"password",
 			0,
 		},
 		{
-			"test redis uri with password in query field",
+			"test redis URI with password in query parameter",
 			mb.HostData{URI: "redis://127.0.0.1:6379?password=test", Password: ""},
+			"",
 			"test",
 			0,
 		},
 		{
-			"test redis uri with password and db in query field",
+			"test redis URI with password and db in query parameter",
 			mb.HostData{URI: "redis://127.0.0.1:6379?password=test&db=1", Password: ""},
+			"",
 			"test",
 			1,
 		},
 		{
-			"test redis uri with password in URI user info field and query field",
+			"test redis URI with password in userinfo and URI's query parameter",
 			mb.HostData{URI: "redis://:password1@127.0.0.2:6379?password=password2", Password: "password1"},
+			"",
 			"password2",
 			0,
 		},
 		{
-			"test redis uri with db number in URI",
+			"test redis URI with db number in URI's query parameter and password in userinfo",
 			mb.HostData{URI: "redis://:password1@127.0.0.2:6379/1", Password: "password1"},
+			"",
 			"password1",
 			1,
 		},
 		{
-			"test redis uri with db number in URI and query field",
+			"test redis URI with db number and password in URI's query parameter and password in userinfo",
 			mb.HostData{URI: "redis://:password1@127.0.0.2:6379/1?password=password2&db=2", Password: "password1"},
+			"",
+			"password2",
+			2,
+		},
+		{
+			"test redis URI with db number, user and password in URI's query parameter and password in userinfo",
+			mb.HostData{URI: "redis://antirez:password1@127.0.0.2:6379/1?password=password2&db=2", User: "antirez", Password: "password1"},
+			"antirez",
+			"password2",
+			2,
+		},
+		{
+			"test redis URI with db number, user & password in URI's query parameter and user & password in userinfo",
+			mb.HostData{URI: "redis://antirez:password1@127.0.0.2:6379/1?username=salvatore&password=password2&db=2", User: "antirez", Password: "password1"},
+			"salvatore",
 			"password2",
 			2,
 		},
@@ -81,8 +102,9 @@ func TestGetPasswordDBNumber(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			password, database, err := getPasswordDBNumber(c.hostData)
+			username, password, database, err := getUsernamePasswordDBNumber(c.hostData)
 			assert.NoError(t, err)
+			assert.Equal(t, c.expectedUser, username)
 			assert.Equal(t, c.expectedPassword, password)
 			assert.Equal(t, c.expectedDatabase, database)
 		})

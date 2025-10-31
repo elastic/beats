@@ -18,6 +18,8 @@
 package input_logfile
 
 import (
+	"context"
+	"errors"
 	"time"
 
 	"github.com/elastic/go-concert/timed"
@@ -33,21 +35,25 @@ type cleaner struct {
 
 // run starts a loop that tries to clean entries from the registry.
 // The cleaner locks the store, such that no new states can be created
-// during the cleanup phase. Only resources that are finished and whos TTL
-// (clean_timeout setting) has expired will be removed.
+// during the cleanup phase. Only resources that are finished and whose TTL
+// (clean_inactive setting) has expired will be removed.
 //
 // Resources are considered "Finished" if they do not have a current owner (active input), and
 // if they have no pending updates that still need to be written to the registry file after associated
 // events have been ACKed by the outputs.
+//
 // The event acquisition timestamp is used as reference to clean resources. If a resources was blocked
-// for a long time, and the life time has been exhausted, then the resource will be removed immediately
+// for a long time, and the lifetime has been exhausted, then the resource will be removed immediately
 // once the last event has been ACKed.
 func (c *cleaner) run(canceler unison.Canceler, store *store, interval time.Duration) {
 	started := time.Now()
-	timed.Periodic(canceler, interval, func() error {
+	err := timed.Periodic(canceler, interval, func() error {
 		gcStore(c.log, started, store)
 		return nil
 	})
+	if err != nil && !errors.Is(err, context.Canceled) {
+		c.log.Errorw("failed running periodic registry cleaning routine", "error", err)
+	}
 }
 
 // gcStore looks for resources to remove and deletes these. `gcStore` receives
@@ -73,6 +79,10 @@ func gcStore(log *logp.Logger, started time.Time, store *store) {
 	if err := gcClean(store, keys); err != nil {
 		log.Errorf("Failed to remove all entries from the registry: %+v", err)
 	}
+
+	// The main reason for this log entry is to enable tests that want to observe
+	// if the resources are correctly removed from the store.
+	log.Debugf("%d entries removed", len(keys))
 }
 
 // gcFind searches the store of resources that can be removed. A set of keys to delete is returned.
@@ -120,5 +130,7 @@ func checkCleanResource(started, now time.Time, resource *resource) bool {
 		reference = started
 	}
 
-	return reference.Add(ttl).Before(now) && resource.stored
+	// if ttl is negative, we never delete the entry
+	// else check for time elapsed
+	return ttl >= 0 && reference.Add(ttl).Before(now) && resource.stored
 }

@@ -1,0 +1,6 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+
+# This pipeline is only for 7.17 branch. See catalog-info.yml
+steps:
+  - label: "Example test"
+    command: echo "Hello!"

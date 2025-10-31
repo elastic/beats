@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-ucfg"
 )
 
@@ -42,7 +43,7 @@ type Builders struct {
 }
 
 // BuilderConstructor is a func used to generate a Builder object
-type BuilderConstructor func(*config.C) (Builder, error)
+type BuilderConstructor func(c *config.C, logger *logp.Logger) (Builder, error)
 
 // AddBuilder registers a new BuilderConstructor
 func (r *registry) AddBuilder(name string, builder BuilderConstructor) error {
@@ -89,7 +90,7 @@ func (r *registry) BuildBuilder(c *config.C) (Builder, error) {
 		return nil, fmt.Errorf("unknown autodiscover builder %s", config.Type)
 	}
 
-	return builder(c)
+	return builder(c, r.logger)
 }
 
 // GetConfig creates configs for all builders initialized.
@@ -128,7 +129,10 @@ func NewBuilders(
 		}
 
 		// pass rest of hints settings to the builder
-		hintsCfg.SetString("type", -1, "hints")
+		err := hintsCfg.SetString("type", -1, "hints")
+		if err != nil {
+			return Builders{}, fmt.Errorf("autodiscover NewBuilder: could not set 'type' to 'hints' on hints config: %w", err)
+		}
 		bConfigs = append(bConfigs, hintsCfg)
 	}
 

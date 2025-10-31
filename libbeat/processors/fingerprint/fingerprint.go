@@ -21,14 +21,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strings"
+	"slices"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -38,7 +38,7 @@ const (
 
 func init() {
 	processors.RegisterPlugin(procName, New)
-	jsprocessor.RegisterPlugin(strings.Title(procName), New)
+	jsprocessor.RegisterPlugin("Fingerprint", New)
 }
 
 type fingerprint struct {
@@ -48,7 +48,7 @@ type fingerprint struct {
 }
 
 // New constructs a new fingerprint processor.
-func New(cfg *config.C) (processors.Processor, error) {
+func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, makeErrConfigUnpack(err)
@@ -56,12 +56,12 @@ func New(cfg *config.C) (processors.Processor, error) {
 
 	// The fields array must be sorted, to guarantee that we always
 	// get the same hash for a similar set of configured keys.
-	// The call `ToSlice` always returns a sorted slice.
-	fields := common.MakeStringSet(config.Fields...).ToSlice()
+	slices.Sort(config.Fields)
+	fields := slices.Compact(config.Fields)
 
 	p := &fingerprint{
 		config: config,
-		hash:   config.Method,
+		hash:   config.Method.Hash,
 		fields: fields,
 	}
 
@@ -76,7 +76,7 @@ func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 		return nil, makeErrComputeFingerprint(err)
 	}
 
-	encodedHash := p.config.Encoding(hashFn.Sum(nil))
+	encodedHash := p.config.Encoding.Encode(hashFn.Sum(nil))
 
 	if _, err := event.PutValue(p.config.TargetField, encodedHash); err != nil {
 		return nil, makeErrComputeFingerprint(err)
@@ -86,7 +86,7 @@ func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *fingerprint) String() string {
-	json, _ := json.Marshal(p.config)
+	json, _ := json.Marshal(&p.config)
 	return procName + "=" + string(json)
 }
 
@@ -111,6 +111,6 @@ func (p *fingerprint) writeFields(to io.Writer, event *beat.Event) error {
 		fmt.Fprintf(to, "|%v|%v", k, v)
 	}
 
-	io.WriteString(to, "|")
+	_, _ = io.WriteString(to, "|")
 	return nil
 }

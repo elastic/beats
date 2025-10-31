@@ -23,11 +23,14 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/v7/filebeat/beater"
-
-	cmd "github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/filebeat/fileset"
+	"github.com/elastic/beats/v7/filebeat/include"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 
 	// Import processors.
+	_ "github.com/elastic/beats/v7/libbeat/processors/cache"
 	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
 )
 
@@ -37,8 +40,13 @@ const Name = "filebeat"
 // RootCmd to handle beats cli
 var RootCmd *cmd.BeatsRootCmd
 
-// FilebeatSettings contains the default settings for filebeat
-func FilebeatSettings() instance.Settings {
+// FilebeatSettings contains the default settings for filebeat.
+// moduleNameSpace allows you to override the default setting of
+// "module" for the module metrics to avoid name collisions.
+func FilebeatSettings(moduleNameSpace string) instance.Settings {
+	if moduleNameSpace == "" {
+		moduleNameSpace = "module"
+	}
 	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("once"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("modules"))
@@ -46,6 +54,11 @@ func FilebeatSettings() instance.Settings {
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
+		Initialize: []func(){
+			include.InitializeModule,
+			func() { fileset.RegisterMonitoringModules(moduleNameSpace) },
+			func() { input.RegisterMonitoringInputs("") },
+		},
 	}
 }
 

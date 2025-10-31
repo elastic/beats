@@ -16,24 +16,38 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package instance
 
 import (
-	"io/ioutil"
+	"bytes"
+	"flag"
 	"os"
+	"path/filepath"
+	"sync"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/go-ucfg/yaml"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestNewInstance(t *testing.T) {
-	b, err := NewBeat("testbeat", "testidx", "0.9", false)
+	b, err := NewBeat("testbeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -47,17 +61,16 @@ func TestNewInstance(t *testing.T) {
 	assert.Equal(t, 36, len(b.Info.ID.String()))
 
 	// indexPrefix set to name if empty
-	b, err = NewBeat("testbeat", "", "0.9", false)
+	b, err = NewBeat("testbeat", "", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
 	assert.Equal(t, "testbeat", b.Info.Beat)
 	assert.Equal(t, "testbeat", b.Info.IndexPrefix)
-
 }
 
 func TestNewInstanceUUID(t *testing.T) {
-	b, err := NewBeat("testbeat", "", "0.9", false)
+	b, err := NewBeat("testbeat", "", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -71,7 +84,7 @@ func TestNewInstanceUUID(t *testing.T) {
 }
 
 func TestInitKibanaConfig(t *testing.T) {
-	b, err := NewBeat("filebeat", "testidx", "0.9", false)
+	b, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -114,13 +127,15 @@ func TestInitKibanaConfig(t *testing.T) {
 }
 
 func TestEmptyMetaJson(t *testing.T) {
-	b, err := NewBeat("filebeat", "testidx", "0.9", false)
+	b, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
+	logger := logptest.NewTestingLogger(t, "")
+	b.Info.Logger = logger
 	if err != nil {
 		panic(err)
 	}
 
 	// prepare empty meta file
-	metaFile, err := ioutil.TempFile("../test", "meta.json")
+	metaFile, err := os.CreateTemp("../test", "meta.json")
 	assert.Equal(t, nil, err, "Unable to create temporary meta file")
 
 	metaPath := metaFile.Name()
@@ -128,35 +143,38 @@ func TestEmptyMetaJson(t *testing.T) {
 	defer os.Remove(metaPath)
 
 	// load metadata
-	err = b.loadMeta(metaPath)
+	err = b.LoadMeta(metaPath)
 
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 	assert.NotEqual(t, uuid.Nil, b.Info.ID, "Beats UUID is not set")
 }
 
 func TestMetaJsonWithTimestamp(t *testing.T) {
-	firstBeat, err := NewBeat("filebeat", "testidx", "0.9", false)
+	firstBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
+	logger := logptest.NewTestingLogger(t, "")
+	firstBeat.Info.Logger = logger
 	if err != nil {
 		panic(err)
 	}
 	firstStart := firstBeat.Info.FirstStart
 
-	metaFile, err := ioutil.TempFile("../test", "meta.json")
+	metaFile, err := os.CreateTemp("../test", "meta.json")
 	assert.Equal(t, nil, err, "Unable to create temporary meta file")
 
 	metaPath := metaFile.Name()
 	metaFile.Close()
 	defer os.Remove(metaPath)
 
-	err = firstBeat.loadMeta(metaPath)
+	err = firstBeat.LoadMeta(metaPath)
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 
-	secondBeat, err := NewBeat("filebeat", "testidx", "0.9", false)
+	secondBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
+	secondBeat.Info.Logger = logger
 	assert.False(t, firstStart.Equal(secondBeat.Info.FirstStart), "Before meta.json is loaded, first start must be different")
-	err = secondBeat.loadMeta(metaPath)
+	err = secondBeat.LoadMeta(metaPath)
 	require.NoError(t, err)
 
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
@@ -223,4 +241,343 @@ func TestSanitizeIPs(t *testing.T) {
 			require.Equal(t, tc.expectedIPs, sanitizeIPs(tc.ips))
 		})
 	}
+}
+
+func TestReloader(t *testing.T) {
+	t.Run("updates the output configuration on the beat", func(t *testing.T) {
+		b, err := NewBeat("testbeat", "testidx", "0.9", false, nil)
+		require.NoError(t, err)
+
+		cfg := `
+elasticsearch:
+  hosts: ["https://127.0.0.1:9200"]
+  username: "elastic"
+  allow_older_versions: false
+`
+		c, err := config.NewConfigWithYAML([]byte(cfg), cfg)
+		require.NoError(t, err)
+		outCfg, err := c.Child("elasticsearch", -1)
+		require.NoError(t, err)
+
+		update := &reload.ConfigWithMeta{Config: c}
+		m := &outputReloaderMock{}
+		reloader := b.MakeOutputReloader(m)
+
+		require.False(t, b.Config.Output.IsSet(), "the output should not be set yet")
+		require.True(t, b.isConnectionToOlderVersionAllowed(), "allow_older_versions flag should be true from 8.11")
+		err = reloader.Reload(update)
+		require.NoError(t, err)
+		require.True(t, b.Config.Output.IsSet(), "now the output should be set")
+		require.Equal(t, outCfg, b.Config.Output.Config())
+		require.Same(t, c, m.cfg.Config)
+		require.False(t, b.isConnectionToOlderVersionAllowed(), "allow_older_versions flag should now be set to false")
+	})
+}
+
+type outputReloaderMock struct {
+	cfg *reload.ConfigWithMeta
+}
+
+func (r *outputReloaderMock) Reload(
+	cfg *reload.ConfigWithMeta,
+	factory func(o outputs.Observer, cfg config.Namespace) (outputs.Group, error),
+) error {
+	r.cfg = cfg
+	return nil
+}
+
+func TestPromoteOutputQueueSettings(t *testing.T) {
+	tests := map[string]struct {
+		input     []byte
+		memEvents int
+	}{
+		"blank": {
+			input:     []byte(""),
+			memEvents: 3200,
+		},
+		"defaults": {
+			input: []byte(`
+name: mockbeat
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			memEvents: 3200,
+		},
+		"topLevelQueue": {
+			input: []byte(`
+name: mockbeat
+queue:
+  mem:
+    events: 8096
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			memEvents: 8096,
+		},
+		"outputLevelQueue": {
+			input: []byte(`
+name: mockbeat
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      mem:
+        events: 8096
+`),
+			memEvents: 8096,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			cfg, err := yaml.NewConfig(tc.input)
+			require.NoError(t, err)
+
+			config := beatConfig{}
+			err = cfg.Unpack(&config)
+			require.NoError(t, err)
+
+			logger := logptest.NewTestingLogger(t, "")
+
+			b := &Beat{Config: config, Beat: beat.Beat{
+				Info: beat.Info{
+					Logger: logger,
+				},
+			}}
+
+			err = PromoteOutputQueueSettings(b)
+			require.NoError(t, err)
+
+			ms, err := memqueue.SettingsForUserConfig(b.Config.Pipeline.Queue.Config())
+			require.NoError(t, err)
+			require.Equalf(t, tc.memEvents, ms.Events, "config was: %v", config.Pipeline.Queue.Config())
+		})
+	}
+}
+
+func TestValidateBeatConfig(t *testing.T) {
+	tests := map[string]struct {
+		input                 []byte
+		expectValidationError string
+	}{
+		"blank": {
+			input:                 []byte(""),
+			expectValidationError: "",
+		},
+		"defaults": {
+			input: []byte(`
+name: mockbeat
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			expectValidationError: "",
+		},
+		"topAndOutputLevelQueue": {
+			input: []byte(`
+name: mockbeat
+queue:
+  mem:
+    events: 2048
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      mem:
+        events: 8096
+`),
+			expectValidationError: "top level queue and output level queue settings defined, only one is allowed accessing config",
+		},
+		"managementTopLevelDiskQueue": {
+			input: []byte(`
+name: mockbeat
+management:
+  enabled: true
+queue:
+  disk:
+    max_size: 1G
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			expectValidationError: "disk queue is not supported when management is enabled accessing config",
+		},
+		"managementOutputLevelDiskQueue": {
+			input: []byte(`
+name: mockbeat
+management:
+  enabled: true
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      disk:
+        max_size: 1G
+`),
+			expectValidationError: "disk queue is not supported when management is enabled accessing config",
+		},
+		"managementFalseOutputLevelDiskQueue": {
+			input: []byte(`
+name: mockbeat
+management:
+  enabled: false
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      disk:
+        max_size: 1G
+`),
+			expectValidationError: "",
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			cfg, err := yaml.NewConfig(tc.input)
+			require.NoError(t, err)
+			config := beatConfig{}
+			err = cfg.Unpack(&config)
+			if tc.expectValidationError != "" {
+				require.Error(t, err)
+				require.Equal(t, tc.expectValidationError, err.Error())
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestLogSystemInfo(t *testing.T) {
+	tcs := []struct {
+		name     string
+		managed  bool
+		assertFn func(*testing.T, *bytes.Buffer)
+	}{
+		{
+			name: "managed mode", managed: true,
+			assertFn: func(t *testing.T, b *bytes.Buffer) {
+				assert.Empty(t, b, "logSystemInfo should not have produced any log")
+			},
+		},
+		{
+			name: "stand alone", managed: false,
+			assertFn: func(t *testing.T, b *bytes.Buffer) {
+				logs := b.String()
+				assert.Contains(t, logs, "Beat info")
+				assert.Contains(t, logs, "Build info")
+				assert.Contains(t, logs, "Go runtime info")
+			},
+		},
+	}
+	log, buff := logp.NewInMemoryLocal("beat", logp.ConsoleEncoderConfig())
+	log.WithOptions()
+
+	b, err := NewBeat("testingbeat", "test-idx", "42", false, nil)
+	b.Info.Logger = log
+	require.NoError(t, err, "could not create beat")
+
+	for _, tc := range tcs {
+		buff.Reset()
+
+		b.Manager = mockManager{enabled: tc.managed}
+		b.logSystemInfo(log)
+
+		tc.assertFn(t, buff)
+	}
+}
+
+type mockManager struct {
+	enabled bool
+}
+
+func (m mockManager) AgentInfo() client.AgentInfo         { return client.AgentInfo{} }
+func (m mockManager) CheckRawConfig(cfg *config.C) error  { return nil }
+func (m mockManager) Enabled() bool                       { return m.enabled }
+func (m mockManager) RegisterAction(action client.Action) {}
+func (m mockManager) RegisterDiagnosticHook(name, description, filename, contentType string, hook client.DiagnosticHook) {
+}
+func (m mockManager) SetPayload(payload map[string]any)             {}
+func (m mockManager) SetStopCallback(f func())                      {}
+func (m mockManager) Start() error                                  { return nil }
+func (m mockManager) Status() status.Status                         { return status.Status(-42) }
+func (m mockManager) Stop()                                         {}
+func (m mockManager) UnregisterAction(action client.Action)         {}
+func (m mockManager) UpdateStatus(status status.Status, msg string) {}
+
+func TestManager(t *testing.T) {
+	// set the mockManger factory.
+	management.SetManagerFactory(func(c *config.C, r *reload.Registry, l *logp.Logger) (management.Manager, error) {
+		return mockManager{true}, nil
+	})
+	// initialize the flags.
+	cfgfile.Initialize()
+
+	t.Run("management.enabled=true", func(t *testing.T) {
+		defer func() {
+			// Since standard beats rely on global registries, we must reset them between test cases
+			// to prevent duplicate registrations and avoid runtime panics.
+			monitoring.GetNamespace("state").SetRegistry(nil)
+			monitoring.GetNamespace("info").SetRegistry(nil)
+		}()
+		flag.Set("E", "management.enabled=true")
+		b, err := NewInitializedBeat(Settings{})
+		require.NoError(t, err)
+		require.NotNil(t, b)
+		require.True(t, b.Manager.Enabled())
+		require.True(t, management.UnderAgent())
+		require.IsType(t, mockManager{}, b.Manager)
+	})
+	t.Run("management.enabled=false", func(t *testing.T) {
+		defer func() {
+			monitoring.GetNamespace("state").SetRegistry(nil)
+			monitoring.GetNamespace("info").SetRegistry(nil)
+		}()
+		flag.Set("E", "management.enabled=false")
+		flag.Set("c", "testdata/mockbeat.yml")
+		b, err := NewInitializedBeat(Settings{})
+		require.NoError(t, err)
+		require.NotNil(t, b)
+		require.False(t, b.Manager.Enabled())
+		require.False(t, management.UnderAgent())
+	})
+	t.Run("management.enabled not set", func(t *testing.T) {
+		defer func() {
+			monitoring.GetNamespace("state").SetRegistry(nil)
+			monitoring.GetNamespace("info").SetRegistry(nil)
+		}()
+		flag.Set("E", "management.enabled=false")
+		flag.Set("c", "testdata/mockbeat.yml")
+		b, err := NewInitializedBeat(Settings{})
+		require.NoError(t, err)
+		require.NotNil(t, b)
+		require.False(t, b.Manager.Enabled())
+		require.False(t, management.UnderAgent())
+	})
+}
+
+func TestMultipleLoadMeta(t *testing.T) {
+	metaFile := filepath.Join(t.TempDir(), "meta.json")
+	var wg sync.WaitGroup
+	for range 64 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			testBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
+			require.NoError(t, err)
+			logger := logptest.NewTestingLogger(t, "")
+			testBeat.Info.Logger = logger
+			err = testBeat.LoadMeta(metaFile)
+			require.NoError(t, err)
+		}()
+	}
+	wg.Wait()
 }

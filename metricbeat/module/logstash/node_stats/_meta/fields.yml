@@ -161,6 +161,17 @@
                   type: long
                 - name: max_queue_size_in_bytes
                   type: long
+                - name: capacity
+                  type: group
+                  fields:
+                    - name: max_queue_size_in_bytes
+                      type: long
+                    - name: max_unread_events
+                      type: long
+                    - name: page_capacity_in_bytes
+                      type: long
+                    - name: queue_size_in_bytes
+                      type: long
             - name: events
               type: group
               fields:

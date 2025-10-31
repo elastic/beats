@@ -23,8 +23,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -267,7 +265,7 @@ func (r *Register) metricSetRegistration(module, name string) (MetricSetRegistra
 	if source := r.secondarySource; source != nil && source.HasMetricSet(module, name) {
 		registration, err := source.MetricSetRegistration(r, module, name)
 		if err != nil {
-			return MetricSetRegistration{}, errors.Wrapf(err, "failed to obtain registration for non-registered metricset '%s/%s'", module, name)
+			return MetricSetRegistration{}, fmt.Errorf("failed to obtain registration for non-registered metricset '%s/%s': %w", module, name, err)
 		}
 		return registration, nil
 	}
@@ -391,7 +389,7 @@ func (r *Register) ProcessorsForMetricSet(module, name string) (*processors.Proc
 	if exists {
 		_, exists := metricSets[name]
 		if exists {
-			return processors.NewList(nil), nil // Standard metricsets don't have processor definitions.
+			return processors.NewList(r.log), nil // Standard metricsets don't have processor definitions.
 		}
 	}
 

@@ -7,12 +7,13 @@ package nomad
 import (
 	"fmt"
 	"net/http"
+	"net/http/httptest"
+	"sync/atomic"
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/hashicorp/nomad/api"
-	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -20,7 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -88,7 +89,7 @@ func TestGenerateHints(t *testing.T) {
 
 	p := Provider{
 		config: cfg,
-		logger: logp.NewLogger("nomad"),
+		logger: logptest.NewTestingLogger(t, "nomad"),
 	}
 	for _, test := range tests {
 		assert.Equal(t, test.result, p.generateHints(test.event))
@@ -148,12 +149,10 @@ func TestEmitEvent(t *testing.T) {
 									},
 									Services: []*api.Service{
 										{
-											Id:   "service-a",
 											Name: "web",
 											Tags: []string{"tag-a", "tag-b"},
 										},
 										{
-											Id:   "service-b",
 											Name: "nginx",
 											Tags: []string{"tag-c", "tag-d"},
 										},
@@ -256,12 +255,10 @@ func TestEmitEvent(t *testing.T) {
 									},
 									Services: []*api.Service{
 										{
-											Id:   "service-a",
 											Name: "web",
 											Tags: []string{"tag-a", "tag-b"},
 										},
 										{
-											Id:   "service-b",
 											Name: "nginx",
 											Tags: []string{"tag-c", "tag-d"},
 										},
@@ -276,31 +273,32 @@ func TestEmitEvent(t *testing.T) {
 		},
 	}
 
+	var count atomic.Int64
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/v1/node/5456bd7a":
+			count.Add(1)
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer s.Close()
+
 	config := &api.Config{
-		Address:  "http://127.0.0.1",
+		Address:  s.URL,
 		SecretID: "",
 	}
-
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	// use the httpmock patched client
-	config.HttpClient = http.DefaultClient
-
-	httpmock.RegisterResponder(http.MethodGet, "http://127.0.0.1/v1/node/5456bd7a",
-		func(req *http.Request) (*http.Response, error) {
-			return httpmock.NewStringResponse(http.StatusNotFound, ""), nil
-		},
-	)
 
 	client, err := api.NewClient(config)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
+
 	for _, test := range tests {
+		test := test
 		t.Run(test.Message, func(t *testing.T) {
-			mapper, err := template.NewConfigMapper(nil, nil, nil)
+			mapper, err := template.NewConfigMapper(nil, nil, nil, logger)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -312,11 +310,11 @@ func TestEmitEvent(t *testing.T) {
 
 			p := &Provider{
 				config:    defaultConfig(),
-				bus:       bus.New(logp.NewLogger("bus"), "test"),
+				bus:       bus.New(logger.Named("bus"), "test"),
 				metagen:   metaGen,
 				templates: mapper,
 				uuid:      UUID,
-				logger:    logp.NewLogger("nomad"),
+				logger:    logger.Named("nomad"),
 			}
 
 			listener := p.bus.Subscribe()
@@ -337,7 +335,7 @@ func TestEmitEvent(t *testing.T) {
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
 
-	assert.Equal(t, httpmock.GetCallCountInfo()["GET http://127.0.0.1/v1/node/5456bd7a"], 1)
+	assert.Equal(t, int64(1), count.Load())
 }
 
 func getNestedAnnotations(in mapstr.M) mapstr.M {

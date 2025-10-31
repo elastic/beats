@@ -16,14 +16,13 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package cluster_stats
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -32,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func createEsMuxer(license string) *http.ServeMux {
@@ -46,7 +46,7 @@ func createEsMuxer(license string) *http.ServeMux {
 			http.NotFound(w, r)
 		}
 
-		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
+		input, _ := os.ReadFile("./_meta/test/root.710.json")
 		w.Write(input)
 	}
 	licenseHandler := func(w http.ResponseWriter, r *http.Request) {
@@ -62,25 +62,25 @@ func createEsMuxer(license string) *http.ServeMux {
 
 	mux.Handle("/_xpack/usage", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/xpack-usage.710.json")
+			input, _ := os.ReadFile("./_meta/test/xpack-usage.710.json")
 			w.Write(input)
 		}))
 
 	mux.Handle("/_cluster/settings", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/cluster-settings.710.json")
+			input, _ := os.ReadFile("./_meta/test/cluster-settings.710.json")
 			w.Write(input)
 		}))
 
 	mux.Handle("/_cluster/stats", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/cluster_stats.710.json")
+			input, _ := os.ReadFile("./_meta/test/cluster_stats.710.json")
 			w.Write(input)
 		}))
 
 	mux.Handle("/_cluster/state/version,master_node,nodes,routing_table", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/cluster_state.710.json")
+			input, _ := os.ReadFile("./_meta/test/cluster_state.710.json")
 			w.Write(input)
 		}))
 
@@ -97,7 +97,7 @@ func TestMapper(t *testing.T) {
 		URI:          server.URL,
 		SanitizedURI: server.URL,
 		Host:         server.URL,
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	elasticsearch.TestMapperWithHttpHelper(t, "./_meta/test/cluster_stats.*.json",

@@ -29,7 +29,6 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/dev-tools/mage"
 )
@@ -106,14 +105,14 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 	// Apply the manifest from the dir. This is the requirements for the tests that will
 	// run inside the cluster.
 	if err := KubectlApply(env, stdOut, stdErr, manifestPath); err != nil {
-		return errors.Wrapf(err, "failed to apply manifest %s", manifestPath)
+		return fmt.Errorf("failed to apply manifest %s: %w", manifestPath, err)
 	}
 	defer func() {
 		if mg.Verbose() {
 			fmt.Println(">> Deleting module manifest from cluster...")
 		}
 		if err := KubectlDelete(env, stdOut, stdErr, manifestPath); err != nil {
-			log.Printf("%s", errors.Wrapf(err, "failed to apply manifest %s", manifestPath))
+			log.Printf("%s", fmt.Errorf("failed to apply manifest %s: %w", manifestPath, err))
 		}
 	}()
 
@@ -164,7 +163,7 @@ func waitKubeStateMetricsReadiness(env map[string]string, stdOut, stdErr io.Writ
 			break
 		}
 		if readyAttempts > checkKubeStateMetricsReadyAttempts {
-			return errors.Wrapf(err, "Timeout waiting for kube-state-metrics")
+			return fmt.Errorf("Timeout waiting for kube-state-metrics: %w", err)
 		}
 		time.Sleep(6 * time.Second)
 		readyAttempts += 1
@@ -177,12 +176,12 @@ func waitKubeStateMetricsReadiness(env map[string]string, stdOut, stdErr io.Writ
 func kubernetesClusterName() string {
 	commit, err := mage.CommitHash()
 	if err != nil {
-		panic(errors.Wrap(err, "failed to construct kind cluster name"))
+		panic(fmt.Errorf("failed to construct kind cluster name:  %w", err))
 	}
 
 	version, err := mage.BeatQualifiedVersion()
 	if err != nil {
-		panic(errors.Wrap(err, "failed to construct kind cluster name"))
+		panic(fmt.Errorf("failed to construct kind cluster name:  %w", err))
 	}
 	version = strings.NewReplacer(".", "-").Replace(version)
 
@@ -202,7 +201,7 @@ func kubernetesClusterName() string {
 	// Note that underscores, in particular, are not permitted.
 	matched, err := regexp.MatchString(subDomainPattern, clusterName)
 	if err != nil {
-		panic(errors.Wrap(err, "error while validating kind cluster name"))
+		panic(fmt.Errorf("error while validating kind cluster name: %w", err))
 	}
 	if !matched {
 		panic("constructed invalid kind cluster name")

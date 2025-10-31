@@ -19,9 +19,10 @@ package fileset
 
 import (
 	"fmt"
+	"sync"
 
-	"github.com/gofrs/uuid"
-	"github.com/mitchellh/hashstructure"
+	"github.com/gofrs/uuid/v5"
+	"github.com/gohugoio/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -30,12 +31,19 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-var moduleList = monitoring.NewUniqueList()
+var (
+	moduleList            = monitoring.NewUniqueList()
+	moduleListMetricsOnce sync.Once
+)
 
-func init() {
-	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
+// RegisterMonitoringModules registers the modules list with the monitoring system.
+func RegisterMonitoringModules(namespace string) {
+	moduleListMetricsOnce.Do(func() {
+		monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), namespace, moduleList.Report, monitoring.Report)
+	})
 }
 
 // Factory for modules
@@ -45,6 +53,7 @@ type Factory struct {
 	overwritePipelines    bool
 	pipelineCallbackID    uuid.UUID
 	inputFactory          cfgfile.RunnerFactory
+	beatPaths             *paths.Path
 }
 
 // Wrap an array of inputs and implements cfgfile.Runner interface
@@ -64,6 +73,7 @@ func NewFactory(
 	beatInfo beat.Info,
 	pipelineLoaderFactory PipelineLoaderFactory,
 	overwritePipelines bool,
+	beatPaths *paths.Path,
 ) *Factory {
 	return &Factory{
 		inputFactory:          inputFactory,
@@ -71,6 +81,7 @@ func NewFactory(
 		pipelineLoaderFactory: pipelineLoaderFactory,
 		pipelineCallbackID:    uuid.Nil,
 		overwritePipelines:    overwritePipelines,
+		beatPaths:             beatPaths,
 	}
 }
 
@@ -106,7 +117,7 @@ func (f *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 		pipelineLoaderFactory: f.pipelineLoaderFactory,
 		pipelineCallbackID:    f.pipelineCallbackID,
 		overwritePipelines:    f.overwritePipelines,
-		log:                   logp.NewLogger(logName),
+		log:                   f.beatInfo.Logger.Named(logName),
 	}, nil
 }
 
@@ -129,7 +140,7 @@ func (f *Factory) CheckConfig(c *conf.C) error {
 // createRegistry starts a registry for a set of filesets, it returns the registry and
 // its input configurations
 func (f *Factory) createRegistry(c *conf.C) (*ModuleRegistry, []*conf.C, error) {
-	m, err := NewModuleRegistry([]*conf.C{c}, f.beatInfo, false, false)
+	m, err := NewModuleRegistry([]*conf.C{c}, f.beatInfo, false, FilesetOverrides{}, f.beatPaths)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -163,7 +174,7 @@ func (p *inputsRunner) Start() {
 		}
 
 		// Register callback to try to load pipelines when connecting to ES.
-		callback := func(esClient *eslegclient.Connection) error {
+		callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 			return p.moduleRegistry.LoadPipelines(esClient, p.overwritePipelines)
 		}
 		p.pipelineCallbackID, err = elasticsearch.RegisterConnectCallback(callback)

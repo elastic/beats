@@ -1,0 +1,26 @@
+[
+    {
+        "@timestamp": "2023-03-12T19:26:00.000-02:00",
+        "event.category": [
+            "database",
+            "network"
+        ],
+        "event.dataset": "mysql.error",
+        "event.kind": "event",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "Warning",
+        "log.offset": 0,
+        "message": "IP address '10.10.10.10' could not be resolved: Name or service not known",
+        "related.ip": [
+            "10.10.10.10"
+        ],
+        "service.type": "mysql",
+        "source.ip": "10.10.10.10"
+    }
+]

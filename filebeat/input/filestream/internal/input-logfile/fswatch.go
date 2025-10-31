@@ -18,9 +18,9 @@
 package input_logfile
 
 import (
-	"os"
-
 	"github.com/elastic/go-concert/unison"
+
+	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 const (
@@ -31,27 +31,58 @@ const (
 	OpRename
 	OpTruncate
 	OpArchived
+	OpNotChanged
 )
 
 var operationNames = map[Operation]string{
-	OpDone:     "done",
-	OpCreate:   "create",
-	OpWrite:    "write",
-	OpDelete:   "delete",
-	OpRename:   "rename",
-	OpTruncate: "truncate",
-	OpArchived: "archive",
+	OpDone:       "done",
+	OpCreate:     "create",
+	OpWrite:      "write",
+	OpDelete:     "delete",
+	OpRename:     "rename",
+	OpTruncate:   "truncate",
+	OpArchived:   "archive",
+	OpNotChanged: "not changed",
 }
 
 // Operation describes what happened to a file.
 type Operation uint8
 
-func (o *Operation) String() string {
-	name, ok := operationNames[*o]
+func (o Operation) String() string {
+	name, ok := operationNames[o]
 	if !ok {
 		return ""
 	}
 	return name
+}
+
+// FileDescriptor represents full information about a file.
+type FileDescriptor struct {
+	// Filename is an original filename this descriptor was created from.
+	// In case it was a symlink, this will be the filename of the symlink unlike
+	// the filename from the `Info`.
+	Filename string
+	// Info is the result of file stat
+	Info file.ExtendedFileInfo
+	// Fingerprint is a computed hash of the file header
+	Fingerprint string
+	// GZIP indicates if the file is compressed with GZIP.
+	GZIP bool
+}
+
+// FileID returns a unique file ID
+// If fingerprint is computed it's used as the ID.
+// Otherwise, a combination of the device ID and inode is used.
+func (fd FileDescriptor) FileID() string {
+	if fd.Fingerprint != "" {
+		return fd.Fingerprint
+	}
+	return fd.Info.GetOSState().String()
+}
+
+// SameFile returns true if descriptors point to the same file.
+func SameFile(a, b *FileDescriptor) bool {
+	return a.FileID() == b.FileID()
 }
 
 // FSEvent returns inforamation about file system changes.
@@ -63,16 +94,16 @@ type FSEvent struct {
 	OldPath string
 	// Op is the file system event: create, write, rename, remove
 	Op Operation
-	// Info describes the file in the event.
-	Info os.FileInfo
+	// Descriptor describes the file in the event.
+	Descriptor FileDescriptor
 }
 
 // FSScanner retrieves a list of files from the file system.
 type FSScanner interface {
 	// GetFiles returns the list of monitored files.
 	// The keys of the map are the paths to the files and
-	// the values are the FileInfos describing the file.
-	GetFiles() map[string]os.FileInfo
+	// the values are the file descriptors that contain all necessary information about the file.
+	GetFiles() map[string]FileDescriptor
 }
 
 // FSWatcher returns file events of the monitored files.

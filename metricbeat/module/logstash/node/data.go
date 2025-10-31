@@ -19,10 +19,8 @@ package node
 
 import (
 	"encoding/json"
+	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
@@ -86,7 +84,7 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Logstash Node API response")
+		return fmt.Errorf("failure parsing Logstash Node API response: %w", err)
 	}
 
 	pipelines = getUserDefinedPipelines(pipelines)
@@ -96,7 +94,7 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 		for _, pipeline := range pipelines {
 			fields, err := schema.Apply(data)
 			if err != nil {
-				return errors.Wrap(err, "failure applying node schema")
+				return fmt.Errorf("failure applying node schema: %w", err)
 			}
 			removeClusterUUIDsFromPipeline(pipeline)
 
@@ -152,17 +150,17 @@ func makeClusterToPipelinesMap(pipelines []logstash.PipelineState, overrideClust
 	}
 
 	for _, pipeline := range pipelines {
-		clusterUUIDs := common.StringSet{}
+		clusterUUIDs := make(map[string]struct{})
 		for _, vertex := range pipeline.Graph.Graph.Vertices {
 			clusterUUID := logstash.GetVertexClusterUUID(vertex, overrideClusterUUID)
 			if clusterUUID != "" {
-				clusterUUIDs.Add(clusterUUID)
+				clusterUUIDs[clusterUUID] = struct{}{}
 			}
 		}
 
 		// If no cluster UUID was found in this pipeline, assign it a blank one
 		if len(clusterUUIDs) == 0 {
-			clusterUUIDs.Add("")
+			clusterUUIDs[""] = struct{}{}
 		}
 
 		for clusterUUID := range clusterUUIDs {

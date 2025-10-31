@@ -18,7 +18,7 @@
 package memory
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -46,7 +46,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The linux memory metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The linux memory metricset is beta."))
 	sys := base.Module().(resolve.Resolver)
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -61,7 +61,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	rootEvent := mapstr.M{}
 	err := FetchLinuxMemStats(rootEvent, m.mod)
 	if err != nil {
-		return errors.Wrap(err, "error fetching memory stats")
+		return fmt.Errorf("error fetching memory stats: %w", err)
 	}
 	report.Event(mb.Event{
 		MetricSetFields: rootEvent,

@@ -67,7 +67,8 @@ func TestProcessorsForConfig(t *testing.T) {
 			t.Errorf("[%s] %v", description, err)
 			continue
 		}
-		processedEvent, err := processors.Run(&test.event)
+		testEvent := testCases[description].event
+		processedEvent, err := processors.Run(&testEvent)
 		// We don't check if err != nil, because we are testing the final outcome
 		// of running the processors, including when some of them fail.
 		if processedEvent == nil {
@@ -105,7 +106,7 @@ func (fmsr *fakeMetricSetRegister) ProcessorsForMetricSet(moduleName, metricSetN
 	}
 
 	procs := new(processors.Processors)
-	procs.List = []processors.Processor{nil, nil}
+	procs.List = []beat.Processor{nil, nil}
 	return procs, nil
 }
 
@@ -125,7 +126,7 @@ func TestUseMetricSetProcessors_ReadingProcessorsSucceeded(t *testing.T) {
 
 	connector := Connector{
 		processors: &processors.Processors{
-			List: []processors.Processor{},
+			List: []beat.Processor{},
 		},
 	}
 	err := connector.UseMetricSetProcessors(r, "module", "metricset")

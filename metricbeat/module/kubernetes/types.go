@@ -131,6 +131,10 @@ type Summary struct {
 			InodesUsed     uint64 `json:"inodesUsed"`
 			Name           string `json:"name"`
 			UsedBytes      uint64 `json:"usedBytes"`
+			PvcRef         struct {
+				Name      string `json:"name"`
+				Namespace string `json:"namespace"`
+			} `json:"pvcRef"`
 		} `json:"volume"`
 	} `json:"pods"`
 }

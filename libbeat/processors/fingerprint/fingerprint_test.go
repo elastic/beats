@@ -18,7 +18,8 @@
 package fingerprint
 
 import (
-	"math/rand"
+	"fmt"
+	"math/rand/v2"
 	"strconv"
 	"testing"
 	"time"
@@ -28,6 +29,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -69,7 +72,7 @@ func TestWithConfig(t *testing.T) {
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			config := config.MustNewConfigFrom(test.config)
-			p, err := New(config)
+			p, err := New(config, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -77,6 +80,7 @@ func TestWithConfig(t *testing.T) {
 				Fields:    test.input.Clone(),
 			}
 			newEvent, err := p.Run(testEvent)
+			assert.NoError(t, err)
 			v, err := newEvent.GetValue("fingerprint")
 			assert.NoError(t, err)
 			assert.Equal(t, test.want, v)
@@ -88,7 +92,7 @@ func TestWithConfig(t *testing.T) {
 			"fields":       []string{"@metadata.message"},
 			"target_field": "@metadata.fingerprint",
 		})
-		p, err := New(config)
+		p, err := New(config, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		testEvent := &beat.Event{
@@ -127,15 +131,15 @@ func TestHashMethods(t *testing.T) {
 		"xxhash": {"37bc50682fba6686"},
 	}
 
-	for method, test := range tests {
-		t.Run(method, func(t *testing.T) {
+	for _, method := range hashes {
+		t.Run(method.Name, func(t *testing.T) {
 			testConfig, err := config.NewConfigFrom(mapstr.M{
 				"fields": []string{"field1", "field2"},
-				"method": method,
+				"method": method.Name,
 			})
 			assert.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -148,7 +152,7 @@ func TestHashMethods(t *testing.T) {
 
 			v, err := newEvent.GetValue("fingerprint")
 			assert.NoError(t, err)
-			assert.Equal(t, test.expected, v)
+			assert.Equal(t, tests[method.Name].expected, v)
 		})
 	}
 }
@@ -180,7 +184,7 @@ func TestSourceFields(t *testing.T) {
 			})
 			assert.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -210,21 +214,21 @@ func TestEncoding(t *testing.T) {
 	tests := map[string]struct {
 		expectedFingerprint string
 	}{
-		"hex":    {"8934ca639027aab1ee9f3944d4d6bd1e"},
-		"base32": {"RE2MUY4QE6VLD3U7HFCNJVV5DY======"},
-		"base64": {"iTTKY5AnqrHunzlE1Na9Hg=="},
+		"hex":    {"49f15f7c03c606b4bdf43f60481842954ff7b45a020a22a1d0911d76f170c798"},
+		"base32": {"JHYV67ADYYDLJPPUH5QEQGCCSVH7PNC2AIFCFIOQSEOXN4LQY6MA===="},
+		"base64": {"SfFffAPGBrS99D9gSBhClU/3tFoCCiKh0JEddvFwx5g="},
 	}
 
 	for encoding, test := range tests {
 		t.Run(encoding, func(t *testing.T) {
 			testConfig, err := config.NewConfigFrom(mapstr.M{
 				"fields":   []string{"field2", "nested.field"},
-				"method":   "md5",
+				"method":   "sha256",
 				"encoding": encoding,
 			})
 			assert.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -275,7 +279,7 @@ func TestConsistentHashingTimeFields(t *testing.T) {
 			})
 			assert.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -316,7 +320,7 @@ func TestTargetField(t *testing.T) {
 			})
 			assert.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -365,7 +369,7 @@ func TestSourceFieldErrors(t *testing.T) {
 			})
 			assert.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -407,7 +411,7 @@ func TestInvalidConfig(t *testing.T) {
 			testConfig, err := config.NewConfigFrom(test.config)
 			assert.NoError(t, err)
 
-			_, err = New(testConfig)
+			_, err = New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.IsType(t, errConfigUnpack{}, err)
 		})
 	}
@@ -440,7 +444,7 @@ func TestIgnoreMissing(t *testing.T) {
 			})
 			assert.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -459,6 +463,18 @@ func TestIgnoreMissing(t *testing.T) {
 	}
 }
 
+func TestProcessorStringer(t *testing.T) {
+	testConfig, err := config.NewConfigFrom(mapstr.M{
+		"fields":   []string{"field1"},
+		"encoding": "hex",
+		"method":   "sha256",
+	})
+	require.NoError(t, err)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+	require.Equal(t, `fingerprint={"Method":"sha256","Encoding":"hex","Fields":["field1"],"TargetField":"fingerprint","IgnoreMissing":false}`, fmt.Sprint(p))
+}
+
 func BenchmarkHashMethods(b *testing.B) {
 	events := nRandomEvents(100000)
 
@@ -468,12 +484,12 @@ func BenchmarkHashMethods(b *testing.B) {
 			"method": method,
 		})
 
-		p, _ := New(testConfig)
+		p, _ := New(testConfig, logp.NewNopLogger())
 
 		b.Run(method, func(b *testing.B) {
 			b.ResetTimer()
-			for _, e := range events {
-				_, err := p.Run(&e)
+			for i := range events {
+				_, err := p.Run(&events[i])
 				if err != nil {
 					b.Fatal(err)
 				}
@@ -483,7 +499,7 @@ func BenchmarkHashMethods(b *testing.B) {
 }
 
 func nRandomEvents(num int) []beat.Event {
-	prng := rand.New(rand.NewSource(12345))
+	prng := rand.New(rand.NewPCG(0, 12345))
 
 	const charset = "abcdefghijklmnopqrstuvwxyz" +
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
@@ -491,10 +507,10 @@ func nRandomEvents(num int) []beat.Event {
 	charsetLen := len(charset)
 	b := make([]byte, 200)
 
-	var events []beat.Event
+	events := make([]beat.Event, 0, num)
 	for i := 0; i < num; i++ {
 		for j := range b {
-			b[j] = charset[prng.Intn(charsetLen)]
+			b[j] = charset[prng.IntN(charsetLen)]
 		}
 		events = append(events, beat.Event{
 			Fields: mapstr.M{

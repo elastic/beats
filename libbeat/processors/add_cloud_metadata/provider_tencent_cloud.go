@@ -27,7 +27,7 @@ import (
 var qcloudMetadataFetcher = provider{
 	Name: "tencent-qcloud",
 
-	Local: false,
+	DefaultEnabled: false,
 
 	Create: func(_ string, c *conf.C) (metadataFetcher, error) {
 		qcloudMetadataHost := "metadata.tencentyun.com"

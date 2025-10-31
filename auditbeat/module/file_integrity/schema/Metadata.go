@@ -154,8 +154,42 @@ func (rcv *Metadata) MutateType(n Type) bool {
 	return rcv._tab.MutateByteSlot(20, byte(n))
 }
 
+func (rcv *Metadata) Selinux() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(22))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+func (rcv *Metadata) PosixAclAccess(j int) int8 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(24))
+	if o != 0 {
+		a := rcv._tab.Vector(o)
+		return rcv._tab.GetInt8(a + flatbuffers.UOffsetT(j*1))
+	}
+	return 0
+}
+
+func (rcv *Metadata) PosixAclAccessLength() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(24))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+func (rcv *Metadata) MutatePosixAclAccess(j int, n int8) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(24))
+	if o != 0 {
+		a := rcv._tab.Vector(o)
+		return rcv._tab.MutateInt8(a+flatbuffers.UOffsetT(j*1), n)
+	}
+	return false
+}
+
 func MetadataStart(builder *flatbuffers.Builder) {
-	builder.StartObject(9)
+	builder.StartObject(11)
 }
 func MetadataAddInode(builder *flatbuffers.Builder, inode uint64) {
 	builder.PrependUint64Slot(0, inode, 0)
@@ -183,6 +217,15 @@ func MetadataAddCtimeNs(builder *flatbuffers.Builder, ctimeNs int64) {
 }
 func MetadataAddType(builder *flatbuffers.Builder, type_ Type) {
 	builder.PrependByteSlot(8, byte(type_), 1)
+}
+func MetadataAddSelinux(builder *flatbuffers.Builder, selinux flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(9, flatbuffers.UOffsetT(selinux), 0)
+}
+func MetadataAddPosixAclAccess(builder *flatbuffers.Builder, posixAclAccess flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(10, flatbuffers.UOffsetT(posixAclAccess), 0)
+}
+func MetadataStartPosixAclAccessVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(1, numElems, 1)
 }
 func MetadataEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

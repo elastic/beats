@@ -16,16 +16,18 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package cfgfile
 
 import (
+	"flag"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/management"
 )
 
 type TestConfig struct {
@@ -43,7 +45,7 @@ type Connection struct {
 	Host string
 }
 
-func TestRead(t *testing.T) {
+func TestLoad(t *testing.T) {
 	absPath, err := filepath.Abs("../tests/files/")
 	os.Setenv("TEST_KEY", "test_value")
 
@@ -52,13 +54,38 @@ func TestRead(t *testing.T) {
 
 	config := &TestConfig{}
 
-	if err = Read(config, absPath+"/config.yml"); err != nil {
-		t.Fatal(err)
-	}
+	cfg, err := Load(absPath+"/config.yml", nil)
+	assert.NoError(t, err)
+
+	err = cfg.Unpack(config)
+	assert.NoError(t, err)
 
 	// validate
 	assert.Equal(t, "localhost", config.Output.Elasticsearch.Host)
 	assert.Equal(t, 9200, config.Output.Elasticsearch.Port)
 	assert.Equal(t, "test_value", config.Env)
 	assert.Equal(t, "default", config.EnvDefault)
+}
+
+func TestManagementFlag(t *testing.T) {
+	t.Run("management.enabled=true", func(t *testing.T) {
+		Initialize()
+		flag.Set("E", "management.enabled=true")
+		flag.Parse()
+		HandleFlags()
+		assert.True(t, management.UnderAgent())
+	})
+	t.Run("management.enabled=false", func(t *testing.T) {
+		Initialize()
+		flag.Set("E", "management.enabled=false")
+		flag.Parse()
+		HandleFlags()
+		assert.False(t, management.UnderAgent())
+	})
+	t.Run("management.enabled not set", func(t *testing.T) {
+		Initialize()
+		flag.Parse()
+		HandleFlags()
+		assert.False(t, management.UnderAgent())
+	})
 }

@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package add_cloudfoundry_metadata
 
@@ -11,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"

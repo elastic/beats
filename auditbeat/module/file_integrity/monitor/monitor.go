@@ -18,6 +18,8 @@
 package monitor
 
 import (
+	"fmt"
+
 	"github.com/fsnotify/fsnotify"
 )
 
@@ -37,15 +39,15 @@ type Watcher interface {
 
 // New creates a new Watcher backed by fsnotify with optional recursive
 // logic.
-func New(recursive bool, IsExcludedPath func(path string) bool) (Watcher, error) {
+func New(recursive bool, isExcludedPath func(path string) bool) (Watcher, error) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating new watcher: %w", err)
 	}
 	// Use our simulated recursive watches unless the fsnotify implementation
 	// supports OS-provided recursive watches
 	if recursive && watcher.SetRecursive() != nil {
-		return newRecursiveWatcher(watcher, IsExcludedPath), nil
+		return newRecursiveWatcher(watcher, isExcludedPath), nil //nolint:nilerr // Ignore SetRecursive() errors.
 	}
 	return (*nonRecursiveWatcher)(watcher), nil
 }

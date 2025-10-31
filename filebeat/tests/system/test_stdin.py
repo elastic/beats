@@ -58,9 +58,9 @@ class Test(BaseTest):
             close_eof="true",
         )
 
-        args = [self.test_binary, "-systemTest"]
+        args = [self.test_binary, "--systemTest"]
         if os.getenv("TEST_COVERAGE") == "true":
-            args += ["-test.coverprofile",
+            args += ["--test.coverprofile",
                      os.path.join(self.working_dir, "coverage.cov")]
         args += ["-c", os.path.join(self.working_dir, "filebeat.yml"), "-e",
                  "-v", "-d", "*"]

@@ -1,0 +1,131 @@
+[
+    {
+        "@timestamp": "2023-04-18T11:37:18.000Z",
+        "event.action": [
+            "database_audit",
+            "logged-in"
+        ],
+        "event.category": [
+            "authentication",
+            "database"
+        ],
+        "event.dataset": "oracle.database_audit",
+        "event.kind": "event",
+        "event.module": "oracle",
+        "event.outcome": "success",
+        "event.timezone": "+03:00",
+        "event.type": "access",
+        "fileset.name": "database_audit",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 573,
+        "oracle.database_audit.action": "100",
+        "oracle.database_audit.comment_text": "Authenticated by: DATABASE; Client address: (ADDRESS=(PROTOCOL=tcp)(HOST=10.10.10.10)(PORT=58864))",
+        "oracle.database_audit.database.id": "1956306463",
+        "oracle.database_audit.entryid": "1",
+        "oracle.database_audit.length": 357,
+        "oracle.database_audit.os_userid": "sherlock",
+        "oracle.database_audit.priv_used": "5",
+        "oracle.database_audit.returncode": "0",
+        "oracle.database_audit.session_id": "4294967295",
+        "oracle.database_audit.statement": "1",
+        "oracle.database_audit.terminal": "pts/0",
+        "oracle.database_audit.userid": "SHERLOCK",
+        "process.pid": "9680",
+        "related.hosts": [
+            "testhost"
+        ],
+        "server.address": "testhost",
+        "server.domain": "testhost",
+        "service.type": "oracle",
+        "tags": [
+            "oracle-database-audit"
+        ]
+    },
+    {
+        "@timestamp": "2023-04-18T11:38:18.000Z",
+        "event.action": [
+            "database_audit",
+            "logon-failed"
+        ],
+        "event.category": [
+            "authentication",
+            "database"
+        ],
+        "event.dataset": "oracle.database_audit",
+        "event.kind": "event",
+        "event.module": "oracle",
+        "event.outcome": "failure",
+        "event.timezone": "+03:00",
+        "event.type": "access",
+        "fileset.name": "database_audit",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 971,
+        "oracle.database_audit.action": "100",
+        "oracle.database_audit.comment_text": "Authenticated by: DATABASE; Client address: (ADDRESS=(PROTOCOL=tcp)(HOST=10.10.10.10)(PORT=34254))",
+        "oracle.database_audit.database.id": "1956306463",
+        "oracle.database_audit.entryid": "1",
+        "oracle.database_audit.length": 340,
+        "oracle.database_audit.os_userid": "oracle",
+        "oracle.database_audit.returncode": "1017",
+        "oracle.database_audit.session_id": "4993385",
+        "oracle.database_audit.statement": "1",
+        "oracle.database_audit.terminal": "pts/1",
+        "oracle.database_audit.userid": "SYSTEM",
+        "process.pid": "9680",
+        "related.hosts": [
+            "testhost"
+        ],
+        "server.address": "testhost",
+        "server.domain": "testhost",
+        "service.type": "oracle",
+        "tags": [
+            "oracle-database-audit"
+        ]
+    },
+    {
+        "@timestamp": "2023-04-18T11:39:18.000Z",
+        "event.action": [
+            "database_audit",
+            "logout"
+        ],
+        "event.category": [
+            "authentication",
+            "database"
+        ],
+        "event.dataset": "oracle.database_audit",
+        "event.kind": "event",
+        "event.module": "oracle",
+        "event.outcome": "success",
+        "event.timezone": "+03:00",
+        "event.type": "access",
+        "fileset.name": "database_audit",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 1345,
+        "oracle.database_audit.action": "101",
+        "oracle.database_audit.database.id": "2433780671",
+        "oracle.database_audit.entryid": "1",
+        "oracle.database_audit.length": 226,
+        "oracle.database_audit.logoff_dead": "0",
+        "oracle.database_audit.logoff_lread": "94",
+        "oracle.database_audit.logoff_lwrite": "4",
+        "oracle.database_audit.logoff_pread": "0",
+        "oracle.database_audit.returncode": "0",
+        "oracle.database_audit.session_id": "10188168",
+        "oracle.database_audit.sessioncpu": "0",
+        "oracle.database_audit.userid": "SHERLOCK",
+        "process.pid": "9680",
+        "service.type": "oracle",
+        "tags": [
+            "oracle-database-audit"
+        ]
+    }
+]

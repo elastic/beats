@@ -35,7 +35,7 @@ func GenVersionCmd(settings instance.Settings) *cobra.Command {
 		Short: "Show current version info",
 		Run: cli.RunWith(
 			func(_ *cobra.Command, args []string) error {
-				beat, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed)
+				beat, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed, settings.Initialize)
 				if err != nil {
 					return fmt.Errorf("error initializing beat: %s", err)
 				}
@@ -44,9 +44,9 @@ func GenVersionCmd(settings instance.Settings) *cobra.Command {
 				if bt := version.BuildTime(); !bt.IsZero() {
 					buildTime = bt.String()
 				}
-				fmt.Printf("%s version %s (%s), libbeat %s [%s built %s]\n",
+				fmt.Printf("%s version %s (%s), libbeat %s [%s built %s] (FIPS-distribution: %v)\n",
 					beat.Info.Beat, beat.Info.Version, runtime.GOARCH, version.GetDefaultVersion(),
-					version.Commit(), buildTime)
+					version.Commit(), buildTime, version.FIPSDistribution)
 				return nil
 			}),
 	}

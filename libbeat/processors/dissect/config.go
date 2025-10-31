@@ -18,9 +18,8 @@
 package dissect
 
 import (
+	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 type trimMode byte
@@ -73,7 +72,7 @@ func (tm *trimMode) Unpack(v string) error {
 	case "all", "both":
 		*tm = trimModeAll
 	default:
-		return errors.Errorf("unsupported value %s. Must be one of [none, left, right, all]", v)
+		return fmt.Errorf("unsupported value %s. Must be one of [none, left, right, all]", v)
 	}
 	return nil
 }

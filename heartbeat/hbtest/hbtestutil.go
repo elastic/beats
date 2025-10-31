@@ -22,7 +22,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/bits"
 	"net"
 	"net/http"
@@ -39,6 +38,8 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/summarizertesthelper"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 
@@ -48,7 +49,6 @@ import (
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/common/x509util"
 )
 
@@ -127,7 +127,7 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 	if err != nil {
 		return 0, err
 	}
-	return uint16(p), nil
+	return uint16(p), nil //nolint:gosec // G115 Conversion from int to unit16 is safe here.
 }
 
 // TLSChecks validates the given x509 cert at the given position.
@@ -142,17 +142,13 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 		PeerCertificates:  []*x509.Certificate{certificate},
 	}, time.Duration(1))
 
-	//nolint:errcheck // There are no new changes to this line but
-	// linter has been activated in the meantime. We'll cleanup separately.
-	expected.Put("tls.rtt.handshake.us", hbtestllext.IsInt64)
+	_, _ = expected.Put("tls.rtt.handshake.us", hbtestllext.IsInt64)
 
 	// Generally, the exact cipher will match, but on windows 7 32bit this is not true!
 	// We don't actually care about the exact cipher matching, since we're not testing the TLS
 	// implementation, we trust go there, just that most of the metadata is present
 	if runtime.GOOS == "windows" && bits.UintSize == 32 {
-		//nolint:errcheck // There are no new changes to this line but
-		// linter has been activated in the meantime. We'll cleanup separately.
-		expected.Put("tls.cipher", isdef.IsString)
+		_, _ = expected.Put("tls.cipher", isdef.IsString)
 	}
 
 	return lookslike.MustCompile(expected)
@@ -175,6 +171,7 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 	}
 
 	return lookslike.Compose(
+		hbtestllext.MaybeHasEventType,
 		lookslike.MustCompile(map[string]interface{}{
 			"monitor": map[string]interface{}{
 				"ip":          ipCheck,
@@ -190,15 +187,14 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 	)
 }
 
-// SummaryChecks validates the "summary" + "state" fields
-func SummaryChecks(up int, down int) validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
-		"summary": map[string]interface{}{
-			"up":   uint16(up),
-			"down": uint16(down),
-		},
-		"state": hbtestllext.IsMonitorState,
-	})
+// SummaryStateChecks validates the "summary" + "state" fields
+func SummaryStateChecks(up uint16, down uint16) validator.Validator {
+	return lookslike.Compose(
+		summarizertesthelper.SummaryValidator(up, down),
+		lookslike.MustCompile(map[string]interface{}{
+			"state": hbtestllext.IsMonitorState,
+		}),
+	)
 }
 
 // ResolveChecks returns a lookslike matcher for the 'resolve' fields.
@@ -227,8 +223,10 @@ func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) vali
 
 // URLChecks returns a validator for the given URL's fields
 func URLChecks(t *testing.T, u *url.URL) validator.Validator {
+	t.Helper()
+	require.NotNil(t, u)
 	return lookslike.MustCompile(map[string]interface{}{
-		"url": wrappers.URLFields(u),
+		"url": wraputil.URLFields(u),
 	})
 }
 
@@ -278,7 +276,7 @@ func RespondingTCPChecks() validator.Validator {
 func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
 	// Write the certificate to a tempFile. Heartbeat would normally read certs from
 	// disk, not memory, so this little bit of extra work is worthwhile
-	certFile, err := ioutil.TempFile("", "sslcert")
+	certFile, err := os.CreateTemp("", "sslcert")
 	require.NoError(t, err)
 	_, _ = certFile.WriteString(x509util.CertToPEMString(cert))
 	return certFile
@@ -289,8 +287,7 @@ func StartHTTPSServer(t *testing.T, tlsCert tls.Certificate) (host string, port 
 	require.NoError(t, err)
 
 	// No need to start a real server, since this is invalid, we just
-	//nolint:gosec // There are no new changes to this line but
-	// linter has been activated in the meantime. We'll cleanup separately.
+	//nolint:gosec // it's a test, sec issues don't apply
 	l, err := tls.Listen("tcp", "127.0.0.1:0", &tls.Config{
 		Certificates: []tls.Certificate{tlsCert},
 	})

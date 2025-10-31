@@ -219,7 +219,7 @@ func RenderEvent(
 	eventHandle EvtHandle,
 	lang uint32,
 	renderBuf []byte,
-	pubHandleProvider func(string) sys.MessageFiles,
+	pubHandleProvider func(string) EvtHandle,
 	out io.Writer,
 ) error {
 	providerName, err := evtRenderProviderName(renderBuf, eventHandle)
@@ -227,27 +227,11 @@ func RenderEvent(
 		return err
 	}
 
-	var publisherHandle uintptr
-	if pubHandleProvider != nil {
-		messageFiles := pubHandleProvider(providerName)
-		if messageFiles.Err == nil {
-			// There is only ever a single handle when using the Windows Event
-			// Log API.
-			publisherHandle = messageFiles.Handles[0].Handle
-		}
-	}
-
 	// Only a single string is returned when rendering XML.
 	err = FormatEventString(EvtFormatMessageXml,
-		eventHandle, providerName, EvtHandle(publisherHandle), lang, renderBuf, out)
+		eventHandle, providerName, pubHandleProvider(providerName), lang, renderBuf, out)
 	// Recover by rendering the XML without the RenderingInfo (message string).
 	if err != nil {
-		// Do not try to recover from InsufficientBufferErrors because these
-		// can be retried with a larger buffer.
-		if errors.Is(err, sys.InsufficientBufferError{}) {
-			return err
-		}
-
 		err = RenderEventXML(eventHandle, renderBuf, out)
 	}
 
@@ -256,22 +240,13 @@ func RenderEvent(
 
 // Message reads the event data associated with the EvtHandle and renders
 // and returns the message only.
-func Message(h EvtHandle, buf []byte, pubHandleProvider func(string) sys.MessageFiles) (message string, err error) {
-	providerName, err := evtRenderProviderName(buf, h)
+func Message(h EvtHandle, renderBuf []byte, pubHandleProvider func(string) EvtHandle) (message string, err error) {
+	providerName, err := evtRenderProviderName(renderBuf, h)
 	if err != nil {
 		return "", err
 	}
 
-	var pub EvtHandle
-	if pubHandleProvider != nil {
-		messageFiles := pubHandleProvider(providerName)
-		if messageFiles.Err == nil {
-			// There is only ever a single handle when using the Windows Event
-			// Log API.
-			pub = EvtHandle(messageFiles.Handles[0].Handle)
-		}
-	}
-	return getMessageStringFromHandle(&PublisherMetadata{Handle: pub}, h, nil)
+	return getMessageStringFromHandle(&PublisherMetadata{Handle: pubHandleProvider(providerName)}, h, nil)
 }
 
 // RenderEventXML renders the event as XML. If the event is already rendered, as
@@ -333,19 +308,17 @@ func CreateBookmarkFromXML(bookmarkXML string) (EvtHandle, error) {
 // CreateRenderContext creates a render context. Close must be called on
 // returned EvtHandle when finished with the handle.
 func CreateRenderContext(valuePaths []string, flag EvtRenderContextFlag) (EvtHandle, error) {
-	paths := make([]uintptr, 0, len(valuePaths))
+	paths := make([]*uint16, 0, len(valuePaths))
 	for _, path := range valuePaths {
-		utf16, err := syscall.UTF16FromString(path)
+		utf16, err := syscall.UTF16PtrFromString(path)
 		if err != nil {
 			return 0, err
 		}
-
-		paths = append(paths, reflect.ValueOf(&utf16[0]).Pointer())
+		paths = append(paths, utf16)
 	}
-
-	var pathsAddr uintptr
-	if len(paths) > 0 {
-		pathsAddr = reflect.ValueOf(&paths[0]).Pointer()
+	var pathsAddr **uint16
+	if len(paths) != 0 {
+		pathsAddr = &paths[0]
 	}
 
 	context, err := _EvtCreateRenderContext(uint32(len(paths)), pathsAddr, flag)
@@ -388,20 +361,20 @@ func Close(h EvtHandle) error {
 // publisherHandle is a handle to the publisher's metadata as provided by
 // EvtOpenPublisherMetadata.
 // lang is the language ID.
-// buffer is optional and if not provided it will be allocated. If the provided
-// buffer is not large enough then an InsufficientBufferError will be returned.
+// renderBuf is a scratch buffer to render the message, if not provided or of
+// insufficient size then a buffer from a system pool will be used
 func FormatEventString(
 	messageFlag EvtFormatMessageFlag,
 	eventHandle EvtHandle,
 	publisher string,
 	publisherHandle EvtHandle,
 	lang uint32,
-	buffer []byte,
+	renderBuf []byte,
 	out io.Writer,
 ) error {
 	// Open a publisher handle if one was not provided.
 	ph := publisherHandle
-	if ph == 0 {
+	if ph == NilHandle {
 		var err error
 		ph, err = OpenPublisherMetadata(0, publisher, lang)
 		if err != nil {
@@ -410,33 +383,43 @@ func FormatEventString(
 		defer _EvtClose(ph) //nolint:errcheck // This is just a resource release.
 	}
 
-	// Create a buffer if one was not provided.
-	var bufferUsed uint32
-	if buffer == nil {
-		err := _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
-			0, nil, &bufferUsed)
-		if err != nil && err != ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
-			return err
+	var bufferPtr *byte
+	if len(renderBuf) > 0 {
+		bufferPtr = &renderBuf[0]
+	}
+
+	// EvtFormatMessage operates with WCHAR buffer, assuming the size of the buffer in characters.
+	// https://docs.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
+	var wcharBufferUsed uint32
+	wcharBufferSize := uint32(len(renderBuf) / 2)
+
+	err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, wcharBufferSize, bufferPtr, &wcharBufferUsed)
+	if err != nil && !errors.Is(err, windows.ERROR_INSUFFICIENT_BUFFER) {
+		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
+	} else if err == nil {
+		// wcharBufferUsed indicates the size used internally to render the message. When called with nil buffer
+		// EvtFormatMessage returns ERROR_INSUFFICIENT_BUFFER, but otherwise succeeds copying only up to
+		// wcharBufferSize to our buffer, truncating the message if our buffer was too small.
+		if wcharBufferUsed <= wcharBufferSize {
+			return common.UTF16ToUTF8Bytes(renderBuf[:wcharBufferUsed*2], out)
 		}
-
-		bufferUsed *= 2
-		buffer = make([]byte, bufferUsed)
-		bufferUsed = 0
 	}
 
-	err := _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
-		uint32(len(buffer)/2), &buffer[0], &bufferUsed)
-	bufferUsed *= 2
-	if err == ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
-		return sys.InsufficientBufferError{Cause: err, RequiredSize: int(bufferUsed)}
-	}
+	// Get a buffer from the pool and adjust its length.
+	bb := sys.NewPooledByteBuffer()
+	defer bb.Free()
+
+	bb.Reserve(int(wcharBufferUsed * 2))
+	wcharBufferSize = wcharBufferUsed
+
+	err = _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, wcharBufferSize, bb.PtrAt(0), &wcharBufferUsed)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	}
 
 	// This assumes there is only a single string value to read. This will
-	// not work to read keys (when messageFlag == EvtFormatMessageKeyword).
-	return common.UTF16ToUTF8Bytes(buffer[:bufferUsed], out)
+	// not work to read keys (when messageFlag == EvtFormatMessageKeyword)
+	return common.UTF16ToUTF8Bytes(bb.Bytes(), out)
 }
 
 // Publishers returns a sort list of event publishers on the local computer.
@@ -548,20 +531,36 @@ func evtRenderProviderName(renderBuf []byte, eventHandle EvtHandle) (string, err
 }
 
 func renderXML(eventHandle EvtHandle, flag EvtRenderFlag, renderBuf []byte, out io.Writer) error {
-	var bufferUsed, propertyCount uint32
-	err := _EvtRender(0, eventHandle, flag, uint32(len(renderBuf)),
-		&renderBuf[0], &bufferUsed, &propertyCount)
-	if err == ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
-		return sys.InsufficientBufferError{Cause: err, RequiredSize: int(bufferUsed)}
+	var bufferUsed, bufferSize, propertyCount uint32
+	var bufferPtr *byte
+
+	bufferSize = uint32(len(renderBuf))
+	if bufferSize > 0 {
+		bufferPtr = &renderBuf[0]
 	}
-	if err != nil {
+	err := _EvtRender(0, eventHandle, flag, bufferSize, bufferPtr, &bufferUsed, &propertyCount)
+	if err != nil && !errors.Is(err, windows.ERROR_INSUFFICIENT_BUFFER) {
 		return err
+	} else if err == nil {
+		// bufferUsed indicates the size used internally to render the message. When called with nil buffer
+		// EvtRender returns ERROR_INSUFFICIENT_BUFFER, but otherwise succeeds copying only up to
+		// bufferSize to our buffer, truncating the message if our buffer was too small.
+		if bufferUsed <= bufferSize {
+			return common.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
+		}
 	}
 
-	if int(bufferUsed) > len(renderBuf) {
-		return fmt.Errorf("Windows EvtRender reported that wrote %d bytes "+
-			"to the buffer, but the buffer can only hold %d bytes",
-			bufferUsed, len(renderBuf))
+	// Get a buffer from the pool and adjust its length.
+	bb := sys.NewPooledByteBuffer()
+	defer bb.Free()
+
+	bb.Reserve(int(bufferUsed))
+	bufferSize = bufferUsed
+
+	err = _EvtRender(0, eventHandle, flag, bufferSize, bb.PtrAt(0), &bufferUsed, &propertyCount)
+	if err != nil {
+		return fmt.Errorf("failed in EvtRender: %w", err)
 	}
-	return common.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
+
+	return common.UTF16ToUTF8Bytes(bb.Bytes(), out)
 }

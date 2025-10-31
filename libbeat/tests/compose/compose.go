@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package compose
 
 import (
@@ -26,6 +28,9 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // HostInfo exposes information about started scenario
@@ -42,7 +47,7 @@ type HostInfo interface {
 }
 
 // EnsureUp starts all the requested services (must be defined in docker-compose.yml)
-// with a default timeout of 300 seconds
+// with a default timeout of 60 seconds.
 func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 	t.Helper()
 
@@ -50,7 +55,7 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 		return hostInfo
 	}
 
-	compose, err := getComposeProject(os.Getenv("DOCKER_COMPOSE_PROJECT_NAME"))
+	compose, err := getComposeProject(os.Getenv("DOCKER_COMPOSE_PROJECT_NAME"), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,7 +81,7 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 		// Start container
 		err := compose.Start(service, upOptions)
 		if err != nil {
-			return fmt.Errorf("failed to start service '%s: %v", service, err)
+			return fmt.Errorf("failed to start service '%s': %w", service, err)
 		}
 
 		// Wait for health
@@ -86,7 +91,7 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 			if inspectErr != nil {
 				t.Logf("inspection error: %v", err)
 			} else {
-				t.Logf("Container state (service: '%s'): %s", service, inspected)
+				t.Logf("container state (service: '%s'): %s", service, inspected)
 			}
 
 			return err
@@ -102,8 +107,16 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 			break
 		}
 		t.Log(err)
+
 		// Ignore errors here
-		compose.Kill(service)
+		err = compose.Kill(service)
+		if err != nil {
+			t.Logf("kill container error: %v", err)
+		}
+		err = compose.Remove(service, true)
+		if err != nil {
+			t.Logf("remove container error: %v", err)
+		}
 	}
 	if err != nil {
 		t.FailNow()
@@ -165,7 +178,7 @@ func findComposePath() (string, error) {
 		return "", err
 	}
 	for {
-		if path == "/" {
+		if path == "/" { //nolint:all // need path to be checked each time
 			break
 		}
 
@@ -179,7 +192,7 @@ func findComposePath() (string, error) {
 	return "", errors.New("docker-compose.yml not found")
 }
 
-func getComposeProject(name string) (*Project, error) {
+func getComposeProject(name string, logger *logp.Logger) (*Project, error) {
 	path, err := findComposePath()
 	if err != nil {
 		return nil, err
@@ -190,5 +203,6 @@ func getComposeProject(name string) (*Project, error) {
 		[]string{
 			path,
 		},
+		logger,
 	)
 }

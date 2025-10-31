@@ -36,7 +36,7 @@ To build the binary for {Beat} run the command below. This will generate a binar
 in the same directory with the name osquerybeat.
 
 ```
-make
+mage build
 ```
 
 

@@ -26,18 +26,20 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestDNSProcessorRun(t *testing.T) {
+	c := defaultConfig()
+	c.Type = typePTR
 	p := &processor{
-		Config:   defaultConfig,
+		config:   c,
 		resolver: &stubResolver{},
-		log:      logp.NewLogger(logName),
+		log:      logptest.NewTestingLogger(t, logName),
 	}
-	p.Config.reverseFlat = map[string]string{
+	p.reverseFlat = map[string]string{
 		"source.ip": "source.domain",
 	}
 	t.Log(p.String())
@@ -58,7 +60,7 @@ func TestDNSProcessorRun(t *testing.T) {
 
 	const forwardDomain = "www." + gatewayName
 	t.Run("append", func(t *testing.T) {
-		p.Config.Action = ActionAppend
+		p.Action = actionAppend
 
 		event, err := p.Run(&beat.Event{
 			Fields: mapstr.M{
@@ -77,7 +79,7 @@ func TestDNSProcessorRun(t *testing.T) {
 	})
 
 	t.Run("replace", func(t *testing.T) {
-		p.Config.Action = ActionReplace
+		p.Action = actionReplace
 
 		event, err := p.Run(&beat.Event{
 			Fields: mapstr.M{
@@ -94,15 +96,16 @@ func TestDNSProcessorRun(t *testing.T) {
 	})
 
 	t.Run("metadata target", func(t *testing.T) {
-		config := defaultConfig
+		config := defaultConfig()
+		config.Type = typePTR
 		config.reverseFlat = map[string]string{
 			"@metadata.ip": "@metadata.domain",
 		}
 
 		p := &processor{
-			Config:   config,
+			config:   config,
 			resolver: &stubResolver{},
-			log:      logp.NewLogger(logName),
+			log:      logptest.NewTestingLogger(t, logName),
 		}
 
 		event := &beat.Event{
@@ -121,17 +124,16 @@ func TestDNSProcessorRun(t *testing.T) {
 		assert.Equal(t, expMeta, newEvent.Meta)
 		assert.Equal(t, event.Fields, newEvent.Fields)
 	})
-
 }
 
 func TestDNSProcessorTagOnFailure(t *testing.T) {
 	p := &processor{
-		Config:   defaultConfig,
+		config:   defaultConfig(),
 		resolver: &stubResolver{},
-		log:      logp.NewLogger(logName),
+		log:      logptest.NewTestingLogger(t, logName),
 	}
-	p.Config.TagOnFailure = []string{"_lookup_failed"}
-	p.Config.reverseFlat = map[string]string{
+	p.TagOnFailure = []string{"_lookup_failed"}
+	p.reverseFlat = map[string]string{
 		"source.ip":      "source.domain",
 		"destination.ip": "destination.domain",
 	}
@@ -149,7 +151,7 @@ func TestDNSProcessorTagOnFailure(t *testing.T) {
 
 	v, _ := event.GetValue("tags")
 	if assert.Len(t, v, 1) {
-		assert.ElementsMatch(t, v, p.Config.TagOnFailure)
+		assert.ElementsMatch(t, v, p.TagOnFailure)
 	}
 }
 
@@ -157,14 +159,14 @@ func TestDNSProcessorRunInParallel(t *testing.T) {
 	// This is a simple smoke test to make sure that there are no concurrency
 	// issues. It is most effective when run with the race detector.
 
-	conf := defaultConfig
+	conf := defaultConfig()
 	reg := monitoring.NewRegistry()
-	cache, err := NewPTRLookupCache(reg, conf.CacheConfig, &stubResolver{})
+	cache, err := newLookupCache(reg, conf.cacheConfig, &stubResolver{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	p := &processor{Config: conf, resolver: cache, log: logp.NewLogger(logName)}
-	p.Config.reverseFlat = map[string]string{"source.ip": "source.domain"}
+	p := &processor{config: conf, resolver: cache, log: logptest.NewTestingLogger(t, logName)}
+	p.reverseFlat = map[string]string{"source.ip": "source.domain"}
 
 	const numGoroutines = 10
 	const numEvents = 500

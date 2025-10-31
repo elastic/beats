@@ -18,14 +18,12 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
@@ -55,7 +53,7 @@ func GenerateDirModulesD() error {
 		}
 		moduleName := parts[1]
 
-		config, err := ioutil.ReadFile(f)
+		config, err := os.ReadFile(f)
 		if err != nil {
 			return err
 		}
@@ -69,7 +67,7 @@ func GenerateDirModulesD() error {
 		}
 
 		target := filepath.Join("modules.d", moduleName+".yml.disabled")
-		err = ioutil.WriteFile(createDir(target), []byte(data), 0644)
+		err = os.WriteFile(createDir(target), []byte(data), 0644)
 		if err != nil {
 			return err
 		}
@@ -101,7 +99,7 @@ func ValidateDirModulesDDatasetsDisabled() error {
 	if err != nil {
 		return err
 	}
-	var errs multierror.Errors
+	var errs []error
 	for path, cfg := range cfgs {
 		// A config.yml is a list of module configurations.
 		for modIdx, mod := range cfg {
@@ -119,7 +117,7 @@ func ValidateDirModulesDDatasetsDisabled() error {
 			}
 		}
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func loadModulesD() (modules map[string][]moduleDefinition, err error) {
@@ -129,13 +127,13 @@ func loadModulesD() (modules map[string][]moduleDefinition, err error) {
 	}
 	modules = make(map[string][]moduleDefinition, len(files))
 	for _, file := range files {
-		contents, err := ioutil.ReadFile(file)
+		contents, err := os.ReadFile(file)
 		if err != nil {
-			return nil, errors.Wrapf(err, "reading %s", file)
+			return nil, fmt.Errorf("reading %s: %w", file, err)
 		}
 		var cfg []moduleDefinition
 		if err = yaml.Unmarshal(contents, &cfg); err != nil {
-			return nil, errors.Wrapf(err, "parsing %s as YAML", file)
+			return nil, fmt.Errorf("parsing %s as YAML: %w", file, err)
 		}
 		modules[file] = cfg
 	}

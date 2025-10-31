@@ -11,13 +11,18 @@ import (
 
 // Source, it is the cursor source
 type Source struct {
-	BucketName    string
-	BucketTimeOut time.Duration
-	ProjectId     string
-	MaxWorkers    int
-	Poll          bool
-	PollInterval  time.Duration
-	ParseJSON     bool
+	BucketName               string
+	ProjectId                string
+	BatchSize                int
+	MaxWorkers               int
+	Poll                     bool
+	PollInterval             time.Duration
+	ParseJSON                bool
+	TimeStampEpoch           *int64
+	FileSelectors            []fileSelectorConfig
+	ReaderConfig             readerConfig
+	ExpandEventListFromField string
+	Retry                    retryConfig
 }
 
 func (s *Source) Name() string {
@@ -30,6 +35,7 @@ const (
 	ndJsonType   = "application/x-ndjson"
 	gzType       = "application/x-gzip"
 	encodingGzip = "gzip"
+	csvType      = "text/csv"
 )
 
 var allowedContentTypes = map[string]bool{
@@ -37,4 +43,5 @@ var allowedContentTypes = map[string]bool{
 	octetType:  true,
 	ndJsonType: true,
 	gzType:     true,
+	csvType:    true,
 }

@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package wineventlog
 
@@ -24,7 +23,6 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/andrewkroh/sys/windows/svc/eventlog"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sys/windows"
 
@@ -32,14 +30,14 @@ import (
 )
 
 func TestEventIterator(t *testing.T) {
-	logp.TestingSetup() //nolint:errcheck // Not needed.
+	logp.TestingSetup()
 
 	writer, tearDown := createLog(t)
 	defer tearDown()
 
 	const eventCount = 1500
 	for i := 0; i < eventCount; i++ {
-		safeWriteEvent(t, writer, eventlog.Info, 1, []string{"Test message " + strconv.Itoa(i+1)})
+		safeWriteEvent(t, writer, 1, "Test message "+strconv.Itoa(i+1))
 	}
 
 	// Validate the assumption that 1024 is the max number of handles supported

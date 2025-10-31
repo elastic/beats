@@ -19,13 +19,12 @@
 package status
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -43,8 +42,6 @@ const (
 )
 
 var (
-	debugf = logp.MakeDebug("apache-status")
-
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
 		PathConfigKey: "server_status_path",
@@ -77,7 +74,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		base,
 		http,
-		fleetmode.Enabled(),
+		management.UnderAgent(),
 	}, nil
 }
 
@@ -87,10 +84,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	scanner, err := m.http.FetchScanner()
 	if err != nil {
-		return errors.Wrap(err, "error fetching data")
+		return fmt.Errorf("error fetching data: %w", err)
 	}
 
-	data, _ := eventMapping(scanner, m.Host())
+	data, _ := eventMapping(scanner, m.Host(), m.Logger())
 	event := mb.Event{
 		MetricSetFields: data,
 	}
@@ -112,7 +109,7 @@ func adjustFleetEvent(event mb.Event) mb.Event {
 	// Convert apache.status.total_kbytes to apache.status.total_bytes
 	totalKBytes, err := adjusted.MetricSetFields.GetValue("total_kbytes")
 	if err == nil {
-		adjusted.MetricSetFields.Put("total_bytes", totalKBytes.(int64)*1024)
+		_, _ = adjusted.MetricSetFields.Put("total_bytes", totalKBytes.(int64)*1024) //nolint: errcheck //we can ignore the error here
 		adjusted.MetricSetFields.Delete("total_kbytes")
 	}
 

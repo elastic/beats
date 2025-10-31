@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -40,7 +41,7 @@ func init() {
 			checks.AllowedFields("tags", "target", "when")))
 }
 
-func createAddTags(c *conf.C) (processors.Processor, error) {
+func createAddTags(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := struct {
 		Tags   []string `config:"tags" validate:"required"`
 		Target string   `config:"target"`
@@ -48,7 +49,7 @@ func createAddTags(c *conf.C) (processors.Processor, error) {
 
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the add_tags configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the add_tags configuration: %w", err)
 	}
 
 	return NewAddTags(config.Target, config.Tags), nil
@@ -57,7 +58,7 @@ func createAddTags(c *conf.C) (processors.Processor, error) {
 // NewAddTags creates a new processor for adding tags to a field.
 // If the target field already contains tags, then the new tags will be
 // appended to the existing list of tags.
-func NewAddTags(target string, tags []string) processors.Processor {
+func NewAddTags(target string, tags []string) beat.Processor {
 	if target == "" {
 		target = mapstr.TagsKey
 	}
@@ -65,7 +66,7 @@ func NewAddTags(target string, tags []string) processors.Processor {
 	// make sure capacity == length such that different processors adding more tags
 	// do not change/overwrite each other on append
 	if cap(tags) != len(tags) {
-		tmp := make([]string, len(tags), len(tags))
+		tmp := make([]string, len(tags))
 		copy(tmp, tags)
 		tags = tmp
 	}
@@ -74,7 +75,7 @@ func NewAddTags(target string, tags []string) processors.Processor {
 }
 
 func (at *addTags) Run(event *beat.Event) (*beat.Event, error) {
-	mapstr.AddTagsWithKey(event.Fields, at.target, at.tags)
+	_ = mapstr.AddTagsWithKey(event.Fields, at.target, at.tags)
 	return event, nil
 }
 

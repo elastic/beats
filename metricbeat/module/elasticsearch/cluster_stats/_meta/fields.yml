@@ -17,6 +17,8 @@
           type: keyword
         - name: state_uuid
           type: keyword
+        - name: nodes
+          type: flattened
     - name: status
       type: keyword
       description: Cluster status (green, yellow, red).
@@ -52,6 +54,8 @@
         Indices statistics.
       fields:
       - name: store.size.bytes
+        type: long
+      - name: store.total_data_set_size.bytes
         type: long
       - name: total
         type: long
