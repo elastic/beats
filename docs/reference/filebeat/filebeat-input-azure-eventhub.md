@@ -27,7 +27,7 @@ filebeat.inputs:
   resource_manager_endpoint: ""
 ```
 
-Example configuration using OAuth2 authentication:
+{applies_to}`stack: ga 9.3.0` Example configuration using OAuth2 authentication:
 
 ```yaml
 filebeat.inputs:
@@ -70,21 +70,41 @@ A Blob Storage account is required in order to store/retrieve/update the offset 
 
 ## `eventhub_namespace` [_eventhub_namespace]
 
+```{applies_to}
+stack: ga 9.3.0
+```
+
 The fully qualified namespace for the Event Hub. Required when `connection_string` is not provided (OAuth2 authentication). Format: `your-eventhub-namespace.servicebus.windows.net`
 
 ## `tenant_id` [_tenant_id]
+
+```{applies_to}
+stack: ga 9.3.0
+```
 
 The Azure Active Directory tenant ID. Required when `connection_string` is not provided (OAuth2 authentication).
 
 ## `client_id` [_client_id]
 
+```{applies_to}
+stack: ga 9.3.0
+```
+
 The Azure Active Directory application (client) ID. Required when `connection_string` is not provided (OAuth2 authentication).
 
 ## `client_secret` [_client_secret]
 
+```{applies_to}
+stack: ga 9.3.0
+```
+
 The Azure Active Directory application client secret. Required when `connection_string` is not provided (OAuth2 authentication).
 
 ## `authority_host` [_authority_host]
+
+```{applies_to}
+stack: ga 9.3.0
+```
 
 The Azure Active Directory authority host. Optional when using OAuth2 authentication. Defaults to Azure Public Cloud (`https://login.microsoftonline.com`).
 
