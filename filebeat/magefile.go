@@ -211,7 +211,8 @@ func PythonIntegTest(ctx context.Context) error {
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
 }
 
-func PythonLogAsFilestream(ctx context.Context) error {
+// PythonIntegTestLogAsFilestream runs some Python integration tests with the log input running as filestream
+func PythonIntegTestLogAsFilestream(ctx context.Context) error {
 	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
 	args := devtools.DefaultPythonTestIntegrationFromHostArgs()
 	args.Env["RUN_AS_FILESTREAM"] = "true"
