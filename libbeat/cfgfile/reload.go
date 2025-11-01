@@ -228,9 +228,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			if forceReload {
 				rl.logger.Debugf("error '%v' can be retried. Will try again in %s", err, rl.config.Reload.Period.String())
 			} else {
-				if err != nil {
-					rl.logger.Debugf("error '%v' cannot retried. Modify any input file to reload.", err)
-				}
+				rl.logger.Debugf("error '%v' cannot retried. Modify any input file to reload.", err)
 			}
 		}
 

@@ -185,9 +185,9 @@ class Test(BaseTest):
             "-M", "*.*.input.close_eof=true",
         ]
 
-        # if the test file contains '.journal', later we will try to remove
-        # the '--once' flag, also it will be running the Journald input,
-        # so there is nothing to be done here.
+        # if the test file contains '.journal', later it will try to remove
+        # the '--once' flag and the journald input will be used,
+        # so there is nothing to do here.
         if log_as_filestream() and ".journal" not in test_file:
             cmd.append("-E")
             cmd.append("features.log_input_run_as_filestream.enabled=true")

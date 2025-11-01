@@ -18,6 +18,7 @@
 package logv2
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
@@ -49,6 +50,8 @@ func init() {
 // no input started. runAsFilestream also sets the input type accordingly.
 func runAsFilestream(cfg *config.C) (bool, error) {
 	// First of all, ensure the Log input configuration is valid.
+	// This ensures we return configuration errors compatible
+	// with the log input.
 	if err := loginput.IsConfigValid(cfg); err != nil {
 		return false, err
 	}
@@ -67,7 +70,7 @@ func runAsFilestream(cfg *config.C) (bool, error) {
 
 	// ID is required to run as Filestream input
 	if !cfg.HasField("id") {
-		return false, nil
+		return false, errors.New("'id' is required to run 'log' input as 'filestream'")
 	}
 
 	if ok := cfg.HasField("run_as_filestream"); ok {
@@ -121,7 +124,7 @@ func newV1Input(
 
 // PluginV2 returns a v2.Plugin with a manager that checks whether
 // the config is from a Log input that should run as Filestream.
-// If that is the case the Log input configuration is  converted to
+// If that is the case the Log input configuration is converted to
 // Filestream and the Filestream input returned.
 // Otherwise v2.ErrUnknownInput is returned.
 func PluginV2(logger *logp.Logger, store statestore.States) v2.Plugin {
@@ -134,7 +137,6 @@ func PluginV2(logger *logp.Logger, store statestore.States) v2.Plugin {
 		next:   filestreamPlugin.Manager,
 		logger: logger,
 	}
-	filestreamPlugin.Manager = m
 
 	p := v2.Plugin{
 		Name:      pluginName,
@@ -163,15 +165,15 @@ func (m manager) Create(cfg *config.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	if asFilestream {
-		newCfg, err := convertConfig(m.logger, cfg)
-		if err != nil {
-			return nil, fmt.Errorf("cannot translate log config to filestream: %s", err)
-		}
-
-		m.logger.Debug("Log input running as Filestream input")
-		return m.next.Create(newCfg)
+	if !asFilestream {
+		return nil, v2.ErrUnknownInput
 	}
 
-	return nil, v2.ErrUnknownInput
+	newCfg, err := convertConfig(m.logger, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("cannot translate log config to filestream: %w", err)
+	}
+
+	m.logger.Debug("Log input running as Filestream input")
+	return m.next.Create(newCfg)
 }
