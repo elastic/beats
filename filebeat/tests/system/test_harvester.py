@@ -9,7 +9,7 @@ import re
 import time
 import unittest
 
-from filebeat import BaseTest, log_as_filestream
+from filebeat import BaseTest
 from parameterized import parameterized
 
 """
