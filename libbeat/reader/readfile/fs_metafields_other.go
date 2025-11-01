@@ -31,8 +31,8 @@ import (
 const (
 	deviceIDKey = "log.file.device_id"
 	inodeKey    = "log.file.inode"
-	owner       = "log.file.owner"
-	group       = "log.file.group"
+	ownerKey    = "log.file.owner"
+	groupKey    = "log.file.group"
 )
 
 func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M, includeOwner bool, includeGroup bool) error {
@@ -51,9 +51,9 @@ func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M, includeOwn
 		if err != nil {
 			return fmt.Errorf("failed to lookup uid %q: %w", osstate.UID, err)
 		}
-		_, err = fields.Put(owner, o.Username)
+		_, err = fields.Put(ownerKey, o.Username)
 		if err != nil {
-			return fmt.Errorf("failed to set %q: %w", owner, err)
+			return fmt.Errorf("failed to set %q: %w", ownerKey, err)
 		}
 	}
 
@@ -62,9 +62,9 @@ func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M, includeOwn
 		if err != nil {
 			return fmt.Errorf("failed to lookup gid %q: %w", osstate.GID, err)
 		}
-		_, err = fields.Put(group, g.Name)
+		_, err = fields.Put(groupKey, g.Name)
 		if err != nil {
-			return fmt.Errorf("failed to set %q: %w", group, err)
+			return fmt.Errorf("failed to set %q: %w", groupKey, err)
 		}
 	}
 	return nil

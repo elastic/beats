@@ -216,6 +216,18 @@ A list of glob-based paths that will be crawled and fetched. All patterns suppor
 Filebeat starts a harvester for each file that it finds under the specified paths. You can specify one path per line. Each line begins with a dash (-).
 
 
+#### `include_file_owner_name` [filestream-input-include_file_owner_name]
+
+Includes the log file owner to `log.file` metadata. 
+This option is not supported on Windows.
+
+
+#### `include_file_owner_group_name` [filestream-input-include_file_owner_group_name]
+
+Includes the log file group to `log.file` metadata. 
+This option is not supported on Windows.
+
+
 ## Scanner options [_scanner_options]
 
 The scanner watches the configured paths. It scans the file system periodically and returns the file system events to the Prospector.
