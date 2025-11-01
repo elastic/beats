@@ -52,7 +52,7 @@ func TestMetaFields(t *testing.T) {
 	path := "test/path"
 	offset := int64(0)
 
-	in := &FileMetaReader{msgReader(messages), path, createTestFileInfo(), true, true, "hash", offset}
+	in := &FileMetaReader{msgReader(messages), path, createTestFileInfo(), false, false, "hash", offset}
 	for {
 		msg, err := in.Next()
 		if errors.Is(err, io.EOF) {
@@ -74,6 +74,47 @@ func TestMetaFields(t *testing.T) {
 		} else {
 			require.Equal(t, expectedFields, msg.Fields)
 		}
+		offset += int64(msg.Bytes)
+
+		require.Equal(t, offset, in.offset)
+	}
+}
+
+func TestMetaFieldsOwnerAndGroup(t *testing.T) {
+	messages := []reader.Message{
+		{
+			Content: []byte("my line"),
+			Bytes:   7,
+			Fields:  mapstr.M{},
+		},
+		{
+			Content: []byte("my line again"),
+			Bytes:   13,
+			Fields:  mapstr.M{},
+		},
+	}
+
+	path := "test/path"
+	offset := int64(0)
+
+	in := &FileMetaReader{msgReader(messages), path, createTestFileInfo(), true, true, "hash", offset}
+	for {
+		msg, err := in.Next()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+
+		expectedFields := mapstr.M{
+			"log": mapstr.M{
+				"file": mapstr.M{
+					"path":        path,
+					"fingerprint": "hash",
+				},
+				"offset": offset,
+			},
+		}
+		checkFieldsWithOwnerGroup(t, expectedFields, msg.Fields)
+
 		offset += int64(msg.Bytes)
 
 		require.Equal(t, offset, in.offset)

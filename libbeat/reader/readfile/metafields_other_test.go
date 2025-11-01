@@ -54,16 +54,40 @@ func checkFields(t *testing.T, expected, actual mapstr.M) {
 	err = actual.Delete(inodeKey)
 	require.NoError(t, err)
 
-	o, err := actual.GetValue(owner)
+	_, err = actual.GetValue(ownerKey)
+	require.Error(t, err)
+
+	_, err = actual.GetValue(groupKey)
+	require.Error(t, err)
+
+	require.Equal(t, expected, actual)
+}
+
+func checkFieldsWithOwnerGroup(t *testing.T, expected, actual mapstr.M) {
+	t.Helper()
+
+	dev, err := actual.GetValue(deviceIDKey)
 	require.NoError(t, err)
-	require.Equal(t, "root", o)
-	err = actual.Delete(owner)
+	require.Equal(t, "17", dev)
+	err = actual.Delete(deviceIDKey)
 	require.NoError(t, err)
 
-	g, err := actual.GetValue(group)
+	inode, err := actual.GetValue(inodeKey)
+	require.NoError(t, err)
+	require.Equal(t, "999", inode)
+	err = actual.Delete(inodeKey)
+	require.NoError(t, err)
+
+	o, err := actual.GetValue(ownerKey)
+	require.NoError(t, err)
+	require.Equal(t, "root", o)
+	err = actual.Delete(ownerKey)
+	require.NoError(t, err)
+
+	g, err := actual.GetValue(groupKey)
 	require.NoError(t, err)
 	require.Equal(t, "root", g)
-	err = actual.Delete(group)
+	err = actual.Delete(groupKey)
 	require.NoError(t, err)
 
 	require.Equal(t, expected, actual)

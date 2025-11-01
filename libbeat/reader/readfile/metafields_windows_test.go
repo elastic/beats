@@ -70,3 +70,8 @@ func checkFields(t *testing.T, expected, actual mapstr.M) {
 
 	require.Equal(t, expected, actual)
 }
+
+func checkFieldsWithOwnerGroup(t *testing.T, expected, actual mapstr.M) {
+	// Including owner and group are not supported on Windows yet
+	checkFields(t, expected, actual)
+}
