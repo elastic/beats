@@ -68,11 +68,6 @@ func runAsFilestream(cfg *config.C) (bool, error) {
 		return false, nil
 	}
 
-	// ID is required to run as Filestream input
-	if !cfg.HasField("id") {
-		return false, errors.New("'id' is required to run 'log' input as 'filestream'")
-	}
-
 	if ok := cfg.HasField("run_as_filestream"); ok {
 		runAsFilestream, err := cfg.Bool("run_as_filestream", -1)
 		if err != nil {
@@ -80,6 +75,11 @@ func runAsFilestream(cfg *config.C) (bool, error) {
 		}
 
 		if runAsFilestream {
+			// ID is required to run as Filestream input
+			if !cfg.HasField("id") {
+				return false, errors.New("'id' is required to run 'log' input as 'filestream'")
+			}
+
 			if err := cfg.SetString("type", -1, "filestream"); err != nil {
 				return false, fmt.Errorf("cannot set 'type': %w", err)
 			}
