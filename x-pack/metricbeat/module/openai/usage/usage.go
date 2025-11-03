@@ -81,7 +81,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) SetPath(p *paths.Path) error {
+func (m *MetricSet) SetPaths(p *paths.Path) error {
 	m.logger.Debugw("Setting path", "path", p)
 
 	sm, err := newStateManager(p.Resolve(

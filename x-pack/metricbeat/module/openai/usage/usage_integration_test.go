@@ -300,7 +300,7 @@ func TestMetricSetSetPath(t *testing.T) {
 	ms := newMetricSet(t, server.URL, apiKey)
 
 	tempDir := t.TempDir()
-	require.NoError(t, ms.SetPath(&paths.Path{
+	require.NoError(t, ms.SetPaths(&paths.Path{
 		Home:   tempDir,
 		Config: tempDir,
 		Data:   tempDir,
@@ -510,7 +510,7 @@ func newMetricSet(t *testing.T, serverUrl, apiKey string) *MetricSet {
 	require.Truef(t, ok, "Cannot convert %T to *MetricSet", ms)
 
 	tmpDir := t.TempDir()
-	err := msTyped.SetPath(&paths.Path{
+	err := msTyped.SetPaths(&paths.Path{
 		Home:   tmpDir,
 		Config: tmpDir,
 		Data:   tmpDir,

@@ -45,7 +45,7 @@ type metricSetWithProcessors interface {
 
 // metricSetWithPath is implemented by metricsets that need access to the beat paths.
 type metricSetWithPath interface {
-	SetPath(*paths.Path) error
+	SetPaths(*paths.Path) error
 }
 
 // NewFactory creates new Reloader instance for the given config
@@ -88,7 +88,7 @@ func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 		}
 
 		if msWithPath, ok := metricSet.(metricSetWithPath); ok {
-			err = msWithPath.SetPath(r.paths)
+			err = msWithPath.SetPaths(r.paths)
 			if err != nil {
 				return nil, err
 			}

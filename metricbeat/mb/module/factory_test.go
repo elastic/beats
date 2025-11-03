@@ -44,7 +44,7 @@ func (m *pathAwareMetricSet) Fetch(mb.ReporterV2) error {
 	return nil
 }
 
-func (m *pathAwareMetricSet) SetPath(p *paths.Path) error {
+func (m *pathAwareMetricSet) SetPaths(p *paths.Path) error {
 	m.received = append(m.received, p)
 	return nil
 }
