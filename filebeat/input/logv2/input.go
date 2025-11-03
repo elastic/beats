@@ -80,6 +80,9 @@ func runAsFilestream(cfg *config.C) (bool, error) {
 				return false, errors.New("'id' is required to run 'log' input as 'filestream'")
 			}
 
+			// This should never fail because the Log input configuration
+			// already reads 'type' and validates it is a string. Overriding
+			// the field should never fail.
 			if err := cfg.SetString("type", -1, "filestream"); err != nil {
 				return false, fmt.Errorf("cannot set 'type': %w", err)
 			}
