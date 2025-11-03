@@ -6,7 +6,10 @@
 
 package tables
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 // ApplicationFileEntry represents a single entry in the amcache application file table.
 // located at Root\\InventoryApplicationFile
@@ -25,7 +28,7 @@ type ApplicationFileEntry struct {
 	BinaryType            string    `osquery:"binary_type"`
 	ProductName           string    `osquery:"product_name"`
 	ProductVersion        string    `osquery:"product_version"`
-	LinkDate              string    `osquery:"link_date"`
+	LinkDate              time.Time `osquery:"link_date"`
 	BinProductVersion     string    `osquery:"bin_product_version"`
 	Size                  int64     `osquery:"size"`
 	Language              int64     `osquery:"language"`
@@ -33,5 +36,13 @@ type ApplicationFileEntry struct {
 	AppxPackageFullName   string    `osquery:"appx_package_full_name"`
 	IsOsComponent         string    `osquery:"is_os_component"`
 	AppxPackageRelativeId string    `osquery:"appx_package_relative_id"`
+	Sha1                  string    `osquery:"sha1"`
 }
 
+func (e *ApplicationFileEntry) PostProcess() {
+	// The sha1 is the last 40 characters of the ProgramId, the first 4 characters are 0000
+	if e.ProgramId == "" || len(e.ProgramId) != 44 {
+		return
+	}
+	e.Sha1 = strings.ToLower(e.ProgramId[4:])
+}

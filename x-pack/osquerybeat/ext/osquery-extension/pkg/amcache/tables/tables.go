@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
@@ -21,10 +22,15 @@ import (
 
 // GlobalState is an interface that defines methods for accessing global Amcache state.
 type GlobalStateInterface interface {
-	GetCachedEntries(amcacheTable AmcacheTable, filters []filters.Filter) []Entry
+	GetCachedEntries(amcacheTable AmcacheTable, filters []filters.Filter, log *logger.Logger) []Entry
 }
 
-type Entry any
+type Entry interface {
+	// PostProcess is called after the entry is populated from the registry key.
+	// It is used to perform any additional processing on the entry, such as converting
+	// the timestamp to a more human-readable format.
+	PostProcess()
+}
 
 type AmcacheTable struct {
 	Name     string
@@ -92,7 +98,7 @@ func (t AmcacheTable) Columns() []table.ColumnDefinition {
 func (t AmcacheTable) GenerateFunc(state GlobalStateInterface, log *logger.Logger) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
 		filters := filters.GetConstraintFilters(queryContext)
-		entries := state.GetCachedEntries(t, filters)
+		entries := state.GetCachedEntries(t, filters, log)
 		marshalled, err := MarshalEntries(entries)
 		if err != nil {
 			return nil, err
@@ -173,12 +179,26 @@ func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE) {
 			} else {
 				field.SetBool(false)
 			}
+		case reflect.Struct:
+			switch field.Type() {
+			case reflect.TypeOf(time.Time{}):
+				timeString := strings.TrimRight(value.ValueData().String, "\x00")
+				timestamp, err := time.Parse("01/02/2006 15:04:05", timeString)
+				if err != nil {
+					continue
+				}
+				field.Set(reflect.ValueOf(timestamp))
+			}
 		// Unsupported field type
 		default:
 			//log.Printf("Warning: unsupported field type for %s: %s", value.ValueName(), field.Kind())
 		}
 	}
+	// Set the common fields for the entry, timestamp and key name
 	SetEntryCommonFields(e, key)
+
+	// Call the PostProcess method to perform any additional processing on the entry
+	e.PostProcess()
 }
 
 // GetEntriesFromRegistry reads the registry and returns a map of entries for the specified TableType.

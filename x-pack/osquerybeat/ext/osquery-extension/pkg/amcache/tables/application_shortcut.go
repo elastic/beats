@@ -19,3 +19,6 @@ type ApplicationShortcutEntry struct {
 	ShortcutAumid      string    `osquery:"shortcut_aumid"`
 	ShortcutProgramId  string    `osquery:"shortcut_program_id"`
 }
+
+func (e *ApplicationShortcutEntry) PostProcess() {
+}

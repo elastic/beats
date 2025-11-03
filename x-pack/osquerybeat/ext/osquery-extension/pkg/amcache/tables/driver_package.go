@@ -29,3 +29,6 @@ type DriverPackageEntry struct {
 	Hwids        string    `osquery:"hwids"`
 	SYSFILE      string    `osquery:"sysfile"`
 }
+
+func (e *DriverPackageEntry) PostProcess() {
+}

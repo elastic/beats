@@ -7,13 +7,13 @@
 package state
 
 import (
-	"log"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/registry"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 // Expiration duration for the global state.
@@ -80,14 +80,14 @@ func GetAmcacheGlobalState() *AmcacheGlobalState {
 }
 
 // Update reloads the Amcache hive and repopulates all cached data.
-func (gs *AmcacheGlobalState) Update() {
+func (gs *AmcacheGlobalState) Update(log *logger.Logger) {
 	gs.Lock.Lock()
 	defer gs.Lock.Unlock()
 
 	// Reload the registry
-	regParser, err := registry.LoadRegistry(gs.Config.HivePath)
+	regParser, err := registry.LoadRegistry(gs.Config.HivePath, log)
 	if err != nil {
-		log.Printf("error opening amcache registry: %v", err)
+		log.Errorf("error opening amcache registry: %v", err)
 		return
 	}
 
@@ -103,7 +103,7 @@ func (gs *AmcacheGlobalState) Update() {
 		entries, err := tables.GetEntriesFromRegistry(amcacheTable, regParser)
 		if err != nil {
 			// Log the error for this key and continue so we don't leave a nil map.
-			log.Printf("error getting %s entries: %v", keyPath, err)
+			log.Errorf("error getting %s entries: %v", keyPath, err)
 		}
 		if entries != nil {
 			gs.Cache[amcacheTable.Name] = append(gs.Cache[amcacheTable.Name], entries...)
@@ -113,8 +113,8 @@ func (gs *AmcacheGlobalState) Update() {
 }
 
 // GetCachedEntries returns the cached entries for a given Amcache table and filter list.
-func (gs *AmcacheGlobalState) GetCachedEntries(amcacheTable tables.AmcacheTable, filterList []filters.Filter) []tables.Entry {
-	gs.UpdateIfNeeded()
+func (gs *AmcacheGlobalState) GetCachedEntries(amcacheTable tables.AmcacheTable, filterList []filters.Filter, log *logger.Logger) []tables.Entry {
+	gs.UpdateIfNeeded(log)
 
 	gs.Lock.Lock()
 	defer gs.Lock.Unlock()
@@ -137,13 +137,13 @@ func (gs *AmcacheGlobalState) GetCachedEntries(amcacheTable tables.AmcacheTable,
 }
 
 // UpdateIfNeeded checks if the cache has expired and updates it if necessary.
-func (gs *AmcacheGlobalState) UpdateIfNeeded() {
+func (gs *AmcacheGlobalState) UpdateIfNeeded(log *logger.Logger) {
 	gs.Lock.RLock()
 	lastUpdated := gs.LastUpdated
 	expirationDuration := gs.Config.ExpirationDuration
 	gs.Lock.RUnlock()
 
 	if time.Since(lastUpdated) > expirationDuration {
-		gs.Update()
+		gs.Update(log)
 	}
 }

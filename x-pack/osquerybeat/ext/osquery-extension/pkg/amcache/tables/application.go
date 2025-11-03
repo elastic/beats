@@ -6,7 +6,10 @@
 
 package tables
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 // ApplicationEntry represents a single entry in the amcache application table.
 type ApplicationEntry struct {
@@ -19,10 +22,10 @@ type ApplicationEntry struct {
 	Version            string    `osquery:"version"`
 	Publisher          string    `osquery:"publisher"`
 	Language           int64     `osquery:"language"`
-	InstallDate        string    `osquery:"install_date"`
+	InstallDate        time.Time `osquery:"install_date"`
 	Source             string    `osquery:"source"`
 	RootDirPath        string    `osquery:"root_dir_path"`
-	HiddenArp          string    `osquery:"hidden_arp"`
+	HiddenArp          int64     `osquery:"hidden_arp"`
 	UninstallString    string    `osquery:"uninstall_string"`
 	RegistryKeyPath    string    `osquery:"registry_key_path"`
 	StoreAppType       string    `osquery:"store_app_type"`
@@ -31,7 +34,16 @@ type ApplicationEntry struct {
 	PackageFullName    string    `osquery:"package_full_name"`
 	MsiPackageCode     string    `osquery:"msi_package_code"`
 	MsiProductCode     string    `osquery:"msi_product_code"`
-	MsiInstallDate     string    `osquery:"msi_install_date"`
+	MsiInstallDate     time.Time `osquery:"msi_install_date"`
 	BundleManifestPath string    `osquery:"bundle_manifest_path"`
 	UserSid            string    `osquery:"user_sid"`
+	Sha1               string    `osquery:"sha1"`
+}
+
+func (e *ApplicationEntry) PostProcess() {
+	// The sha1 is the last 40 characters of the ProgramId, the first 4 characters are 0000
+	if e.ProgramId == "" || len(e.ProgramId) != 44 {
+		return
+	}
+	e.Sha1 = strings.ToLower(e.ProgramId[4:])
 }

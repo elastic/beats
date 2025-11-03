@@ -27,8 +27,11 @@ type DriverBinaryEntry struct {
 	DriverIsKernelMode      string    `osquery:"driver_is_kernel_mode"`
 	DriverId                string    `osquery:"driver_id"`
 	DriverLastWriteTime     string    `osquery:"driver_last_write_time"`
-	DriverType              string    `osquery:"driver_type"`
-	DriverTimeStamp         string    `osquery:"driver_time_stamp"`
-	DriverCheckSum          string    `osquery:"driver_check_sum"`
-	ImageSize               string    `osquery:"image_size"`
+	DriverType              int64     `osquery:"driver_type"`
+	DriverTimeStamp         int64     `osquery:"driver_time_stamp"`
+	DriverCheckSum          int64     `osquery:"driver_check_sum"`
+	ImageSize               int64     `osquery:"image_size"`
+}
+
+func (e *DriverBinaryEntry) PostProcess() {
 }

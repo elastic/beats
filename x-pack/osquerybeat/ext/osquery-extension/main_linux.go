@@ -22,6 +22,6 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	server.RegisterPlugin(table.NewPlugin("browser_history", browserhistory.GetColumns(), browserhistory.GetGenerateFunc(log)))
 }
 
-func CreateViews(socket *string) {
+func CreateViews(socket *string, log *logger.Logger) {
 	// No views to create on Linux
 }

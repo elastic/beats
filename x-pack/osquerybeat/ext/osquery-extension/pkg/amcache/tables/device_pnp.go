@@ -48,3 +48,6 @@ type DevicePnpEntry struct {
 	DeviceInterfaceClasses  string    `osquery:"device_interface_classes"`
 	LocationPaths           string    `osquery:"location_paths"`
 }
+
+func (e *DevicePnpEntry) PostProcess() {
+}
