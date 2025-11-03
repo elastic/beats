@@ -949,11 +949,25 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 	defer goroutines.Check(t)
 
 	busChan := make(chan bus.Bus, 1)
-	Registry = NewRegistry()
-	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger) (Provider, error) {
-		busChan <- b
-		return &mockProvider{}, nil
-	})
+
+	logger := logptest.NewTestingLogger(t, "")
+
+	testRegistry := NewRegistry(logger)
+	err := testRegistry.AddProvider(
+		"mock",
+		func(beatName string,
+			b bus.Bus,
+			uuid uuid.UUID,
+			c *conf.C,
+			k keystore.Keystore,
+			l *logp.Logger,
+			r *Registry,
+		) (Provider, error) {
+			// intercept bus to mock events
+			busChan <- b
+
+			return &mockProvider{}, nil
+		})
 	require.NoError(t, err)
 
 	adapter := mockAdapter{}
@@ -964,9 +978,8 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
-	logger := logptest.NewTestingLogger(t, "")
 
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger, testRegistry)
 	require.NoError(t, err)
 
 	autodiscover.debouncePeriod = 50 * time.Millisecond
