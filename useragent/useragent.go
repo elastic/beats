@@ -93,7 +93,13 @@ func UserAgent(binaryNameCapitalized string, version, commit, buildTime string, 
 	return builder.String()
 }
 
-func UserAgentWithBeatTelemetry(binaryNameCapitalized string, version string, mode AgentManagementMode, unprivileged AgentUnprivilegedMode) string {
+func UserAgentWithBeatTelemetry(
+	binaryNameCapitalized string,
+	version string,
+	mode AgentManagementMode,
+	unprivileged AgentUnprivilegedMode,
+	isFIPSDistribution bool,
+) string {
 	var builder strings.Builder
 	builder.WriteString("Elastic-" + binaryNameCapitalized + "/" + version + " ")
 	uaValues := []string{
@@ -106,6 +112,10 @@ func UserAgentWithBeatTelemetry(binaryNameCapitalized string, version string, mo
 	if unprivileged != AgentUnprivilegedModeUnknown {
 		uaValues = append(uaValues, unprivileged.String())
 	}
+	if isFIPSDistribution {
+		uaValues = append(uaValues, "FIPS")
+	}
+
 	builder.WriteByte('(')
 	builder.WriteString(strings.Join(uaValues, "; "))
 	builder.WriteByte(')')
