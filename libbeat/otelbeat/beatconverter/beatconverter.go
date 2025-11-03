@@ -148,6 +148,9 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
 			}
 		}
+		// We're disabling the metrics telemetry for beat receivers for now because the default agent also uses the same port.
+		// If needed we can make this configurable later.
+		out["service::telemetry::metrics::level"] = "none"
 
 		err = conf.Merge(confmap.NewFromStringMap(out))
 		if err != nil {
