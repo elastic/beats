@@ -23,5 +23,5 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 }
 
 func CreateViews(socket *string, log *logger.Logger) {
-		// No views to create on Darwin
+	// No views to create on Darwin
 }
