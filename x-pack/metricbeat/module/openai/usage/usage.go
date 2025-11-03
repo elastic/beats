@@ -82,9 +82,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func (m *MetricSet) SetPath(p *paths.Path) error {
-	if p == nil {
-		p = paths.Paths
-	}
 	m.logger.Debugw("Setting path", "path", p)
 
 	sm, err := newStateManager(p.Resolve(
@@ -107,10 +104,7 @@ func (m *MetricSet) SetPath(p *paths.Path) error {
 // 4. Reports collected metrics through the mb.ReporterV2
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if m.stateManager == nil {
-		err := m.SetPath(nil)
-		if err != nil {
-			return fmt.Errorf("set path: %w", err)
-		}
+		return fmt.Errorf("no state manager for %s", m.Name())
 	}
 
 	endDate := time.Now().UTC().Truncate(time.Hour * 24) // truncate to day as we only collect daily data

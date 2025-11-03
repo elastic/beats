@@ -20,9 +20,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
+const usagePath = "/usage"
+
 func TestFetch(t *testing.T) {
 	apiKey := time.Now().String() // to generate a unique API key everytime to ignore the stateStore
-	usagePath := "/usage"
 	server := initServer(usagePath, apiKey)
 	defer server.Close()
 
@@ -277,7 +278,7 @@ func TestFetch(t *testing.T) {
 		},
 	}
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL+"/usage", apiKey))
+	f := newMetricSet(t, server.URL, apiKey)
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	require.Empty(t, errs, "Expected no errors")
@@ -292,15 +293,11 @@ func TestFetch(t *testing.T) {
 }
 
 func TestMetricSetSetPath(t *testing.T) {
-	const usagePath = "/usage"
-
 	apiKey := time.Now().String()
 	server := initServer(usagePath, apiKey)
 	defer server.Close()
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL+usagePath, apiKey))
-	ms, ok := metricSet.(*MetricSet)
-	require.True(t, ok)
+	ms := newMetricSet(t, server.URL, apiKey)
 
 	tempDir := t.TempDir()
 	require.NoError(t, ms.SetPath(&paths.Path{
@@ -311,18 +308,17 @@ func TestMetricSetSetPath(t *testing.T) {
 	}))
 	assert.Contains(t, ms.stateManager.store.Dir, tempDir)
 
-	events, errs := mbtest.ReportingFetchV2Error(metricSet)
+	events, errs := mbtest.ReportingFetchV2Error(ms)
 	require.Empty(t, errs)
 	assert.NotEmpty(t, events)
 }
 
 func TestData(t *testing.T) {
-	apiKey := time.Now().String() // to generate a unique API key everytime
-	usagePath := "/usage"
+	apiKey := time.Now().String() // to generate a unique API key everytime to ignore the stateStore
 	server := initServer(usagePath, apiKey)
 	defer server.Close()
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL+"/usage", apiKey))
+	f := newMetricSet(t, server.URL, apiKey)
 
 	err := mbtest.WriteEventsReporterV2Error(f, t, "")
 	require.NoError(t, err, "Writing events should not return an error")
@@ -349,7 +345,7 @@ func getConfig(url, apiKey string) map[string]interface{} {
 	}
 }
 
-func initServer(endpoint, api_key string) *httptest.Server {
+func initServer(endpoint, apiKey string) *httptest.Server {
 	data := []byte(`{
   "object": "list",
   "data": [
@@ -487,7 +483,7 @@ func initServer(endpoint, api_key string) *httptest.Server {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Validate Bearer token
 		authHeader := r.Header.Get("Authorization")
-		expectedToken := fmt.Sprintf("Bearer %s", api_key)
+		expectedToken := fmt.Sprintf("Bearer %s", apiKey)
 
 		if authHeader != expectedToken {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -504,4 +500,23 @@ func initServer(endpoint, api_key string) *httptest.Server {
 		_, _ = w.Write(data)
 	}))
 	return server
+}
+
+func newMetricSet(t *testing.T, serverUrl, apiKey string) *MetricSet {
+	t.Helper()
+
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(serverUrl+"/usage", apiKey))
+	msTyped, ok := ms.(*MetricSet)
+	require.Truef(t, ok, "Cannot convert %T to *MetricSet", ms)
+
+	tmpDir := t.TempDir()
+	err := msTyped.SetPath(&paths.Path{
+		Home:   tmpDir,
+		Config: tmpDir,
+		Data:   tmpDir,
+		Logs:   tmpDir,
+	})
+	require.NoError(t, err, "Could not set up paths")
+
+	return msTyped
 }
