@@ -67,9 +67,12 @@ coverage-report:
 
 ## update : TBD.
 .PHONY: update
-update: notice
-	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) update || exit 1;)
+update: notice $(addprefix update-,$(PROJECTS) $(PROJECTS_XPACK_MAGE))
 	@$(MAKE) -C deploy/kubernetes all
+
+# Individual update targets for parallel execution
+.PHONY: $(addprefix update-,$(PROJECTS) $(PROJECTS_XPACK_MAGE))
+$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(eval update-$(var):; @$$(MAKE) -C $(var) update || exit 1))
 
 ## clean : Clean target.
 .PHONY: clean
@@ -80,16 +83,16 @@ clean: mage
 
 ## check : TBD.
 .PHONY: check
-check:
-	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
-	$(MAKE) check-python
+check: $(addprefix check-,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE)) check-python check-vendor update check-headers check-go check-no-changes
+
+.PHONY: check-vendor
+check-vendor:
 	# check if vendor folder does not exists
-	[ ! -d vendor ]
-	# Validate that all updates were committed
-	@$(MAKE) update
-	@$(MAKE) check-headers
-	@$(MAKE) check-go
-	@$(MAKE) check-no-changes
+	@[ ! -d vendor ]
+
+# Individual check targets for parallel execution
+.PHONY: $(addprefix check-,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE))
+$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(eval check-$(var):; @$$(MAKE) -C $(var) check || exit 1))
 
 ## check : Run some checks similar to what the default check validation runs in the CI.
 .PHONY: check-default
