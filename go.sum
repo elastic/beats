@@ -366,6 +366,8 @@ github.com/elastic/elastic-agent-autodiscover v0.10.0 h1:WJ4zl9uSfk1kHmn2B/0byQB
 github.com/elastic/elastic-agent-autodiscover v0.10.0/go.mod h1:Nf3zh9FcJ9nTTswTwDTUAqXmvQllOrNliM6xmORSxwE=
 github.com/elastic/elastic-agent-client/v7 v7.15.0 h1:nDB7v8TBoNuD6IIzC3z7Q0y+7bMgXoT2DsHfolO2CHE=
 github.com/elastic/elastic-agent-client/v7 v7.15.0/go.mod h1:6h+f9QdIr3GO2ODC0Y8+aEXRwzbA5W4eV4dd/67z7nI=
+github.com/elastic/elastic-agent-libs v0.24.1-0.20251103215058-03ca4525a4b6 h1:i0c5UMN/6ArQW3v8XC4z1v37qCycMdnwd78CDimKwmk=
+github.com/elastic/elastic-agent-libs v0.24.1-0.20251103215058-03ca4525a4b6/go.mod h1:o/iXtbHYaojpG4BOY7Z3hFMQAgEoqq2owO17JPGpf3A=
 github.com/elastic/elastic-agent-system-metrics v0.13.3 h1:VlY3Ezuwi5bPZRsAM97WaJEW78XkXgqmPHcTl1WGMRw=
 github.com/elastic/elastic-agent-system-metrics v0.13.3/go.mod h1:lB8veYWYBlA9eF6TahmPN87G1IEgWlbep7QSqLSW90U=
 github.com/elastic/elastic-transport-go/v8 v8.7.0 h1:OgTneVuXP2uip4BA658Xi6Hfw+PeIOod2rY3GVMGoVE=
@@ -992,8 +994,6 @@ github.com/xdg-go/stringprep v1.0.4 h1:XLI/Ng3O1Atzq0oBs3TWm+5ZVgkq2aqdlvP9JtoZ6
 github.com/xdg-go/stringprep v1.0.4/go.mod h1:mPGuuIYwz7CmR2bT9j4GbQqutWS1zV24gijq1dTyGkM=
 github.com/xyproto/randomstring v1.0.5 h1:YtlWPoRdgMu3NZtP45drfy1GKoojuR7hmRcnhZqKjWU=
 github.com/xyproto/randomstring v1.0.5/go.mod h1:rgmS5DeNXLivK7YprL0pY+lTuhNQW3iGxZ18UQApw/E=
-github.com/ycombinator/elastic-agent-libs v0.0.0-20251030233529-00a787285e4a h1:39V8Yt7ejwdcptUHMrpQxJp2mPTaFgPoayqt2L2mQIY=
-github.com/ycombinator/elastic-agent-libs v0.0.0-20251030233529-00a787285e4a/go.mod h1:o/iXtbHYaojpG4BOY7Z3hFMQAgEoqq2owO17JPGpf3A=
 github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 h1:ilQV1hzziu+LLM3zUTJ0trRztfwgjqKnBWNtSRkbmwM=
 github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78/go.mod h1:aL8wCCfTfSfmXjznFBSZNN13rSJjlIOI1fUNAtF7rmI=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
