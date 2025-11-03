@@ -22,7 +22,7 @@ Every event sent by Metricbeat has the same basic structure. It contains the fol
 :   Name of the module that the data is from
 
 **`event.dataset`**
-:   Name of the dataset that the data is from
+:   Name of the source dataset in the format `<module>.<metricset>`
 
 For example:
 
