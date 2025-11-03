@@ -6,7 +6,6 @@ package views
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/osquery/osquery-go"
@@ -15,13 +14,19 @@ import (
 )
 
 type View struct {
+	tableName       string
 	requiredTables  []string
 	createViewQuery string
 	created         bool
 }
 
-func NewView(requiredTables []string, createViewQuery string) *View {
+func (v *View) Name() string {
+	return v.tableName
+}
+
+func NewView(tableName string, requiredTables []string, createViewQuery string) *View {
 	return &View{
+		tableName:       tableName,
 		requiredTables:  requiredTables,
 		createViewQuery: createViewQuery,
 		created:         false,
@@ -29,17 +34,19 @@ func NewView(requiredTables []string, createViewQuery string) *View {
 }
 
 // AreTablesReady checks if all required tables are ready in osquery
-func AreTablesReady(client *osquery.ExtensionManagerClient, tableNames []string) bool {
+func AreTablesReady(client *osquery.ExtensionManagerClient, tableNames []string, log *logger.Logger) bool {
 	for _, tableName := range tableNames {
 		resp, err := client.Query(fmt.Sprintf("pragma table_info(%s);", tableName))
 		if err != nil {
-			log.Printf("Error checking for table %s: %s\n", tableName, err)
+			log.Errorf("Error checking for table %s: %s\n", tableName, err)
 			return false
 		}
 		if len(resp.Response) == 0 {
+			log.Infof("Table %s is not ready", tableName)
 			return false
 		}
 	}
+	log.Infof("All tables %s are ready", tableNames)
 	return true
 }
 
@@ -53,34 +60,45 @@ func CreateViews(socket *string, views []*View, log *logger.Logger) error {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
 
-	// Track which views still need to be created
-	pendingViews := make(map[int]bool)
-	for i := range views {
-		pendingViews[i] = true
+	allViewsCreated := func(views []*View) bool {
+		for _, view := range views {
+			if !view.created {
+				return false
+			}
+		}
+		return true
 	}
 
 	for range ticker.C {
-		// Only try to create views for 30 seconds
-		if time.Since(startTime) > 30*time.Second {
-			return fmt.Errorf("timeout waiting for required tables to be ready")
+		if allViewsCreated(views) {
+			log.Infof("All views created successfully")
+			return nil
 		}
 
-		// Try to create each pending view
+		if time.Since(startTime) > 30*time.Second {
+			break
+		}
+
 		for _, view := range views {
-			if !view.created && AreTablesReady(client, view.requiredTables) {
+			if view.created {
+				continue
+			}
+
+			if AreTablesReady(client, view.requiredTables, log) {
 				_, err := client.Query(view.createViewQuery)
 				if err != nil {
 					log.Errorf("Error creating view %s: %s\n", view.createViewQuery, err)
 					continue
 				}
 				view.created = true
+				log.Infof("View %s created successfully", view.tableName)
 			}
 		}
-
-		// Exit if all views are created
-		if len(pendingViews) == 0 {
-			break
-		}
 	}
-	return nil
+	return fmt.Errorf("timeout waiting for required tables to be ready")
+}
+
+func CreateView(socket *string, view *View, log *logger.Logger) error {
+	views := []*View{view}
+	return CreateViews(socket, views, log)
 }

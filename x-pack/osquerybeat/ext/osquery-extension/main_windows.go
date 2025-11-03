@@ -19,7 +19,7 @@ import (
 func RegisterAmcacheTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
 	amcacheGlobalState := state.GetAmcacheGlobalState()
 	for _, t := range tables.AllAmcacheTables() {
-		server.RegisterPlugin(table.NewPlugin(t.Name, t.Columns(), t.GenerateFunc(amcacheGlobalState, log)))
+		server.RegisterPlugin(table.NewPlugin(string(t.Name), t.Columns(), t.GenerateFunc(amcacheGlobalState, log)))
 	}
 }
 
@@ -29,48 +29,27 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 }
 
 func CreateViews(socket *string, log *logger.Logger) {
-	applicationsView := views.NewView([]string{"amcache_application", "amcache_application_file"},
+	view := views.NewView(
+		"V_AmcacheApplications",
+		[]string{"amcache_application", "amcache_application_file"},
 		`CREATE VIEW V_AmcacheApplications AS
-		SELECT 
-		    T2.last_write_time,
-		    T2.program_id,
-		    T2.file_id,
-		    T2.lower_case_long_path,
-		    T2.name,
-		    T2.original_file_name,
-		    T2.publisher,
-		    T2.version,
-		    T2.bin_file_version,
-		    T2.binary_type,
-		    T2.product_name,
-		    T2.product_version,
-		    T2.link_date,
-		    T2.bin_product_version,
-		    T2.size,
-		    T2.language,
-		    T2.usn,
-		    T2.appx_package_full_name,
-		    T2.is_os_component,
-		    T2.appx_package_relative_id,
-		    T1.program_instance_id,
-		    T1.install_date,
-		    T1.source,
-		    T1.root_dir_path,
-		    T1.hidden_arp,
-		    T1.uninstall_string,
-		    T1.registry_key_path,
-		    T1.store_app_type,
-		    T1.inbox_modern_app,
-		    T1.manifest_path,
-		    T1.package_full_name,
-		    T1.msi_package_code,
-		    T1.msi_product_code,
-		    T1.msi_install_date,
-		    T1.bundle_manifest_path,
-		    T1.user_sid
-		FROM amcache_application_file T2
-		LEFT JOIN amcache_application T1 ON T2.program_id = T1.program_id;`)
-
-	viewsToCreate := []*views.View{applicationsView}
-	views.CreateViews(socket, viewsToCreate, log)
+		SELECT
+			app.*,
+			file.*
+		FROM
+			amcache_application AS app
+		LEFT JOIN amcache_application_file AS file ON app.program_id = file.program_id
+		UNION
+		SELECT
+			app.*,
+			file.*
+		FROM
+			amcache_application_file AS file
+		LEFT JOIN amcache_application AS app ON file.program_id = app.program_id
+		WHERE
+			app.program_id IS NULL;`)
+	err := views.CreateView(socket, view, log)
+	if err != nil {
+		log.Fatalf("Error creating view %s: %v\n", view.Name(), err)
+	}
 }
