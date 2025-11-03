@@ -13,7 +13,6 @@ import "time"
 type DevicePnpEntry struct {
 	Timestamp               time.Time `osquery:"timestamp" format:"unix"`
 	DateTime                time.Time `osquery:"date_time" format:"rfc3339" tz:"UTC"`
-	KeyName                 string    `osquery:"key_name"`
 	Model                   string    `osquery:"model"`
 	Manufacturer            string    `osquery:"manufacturer"`
 	DriverName              string    `osquery:"driver_name"`

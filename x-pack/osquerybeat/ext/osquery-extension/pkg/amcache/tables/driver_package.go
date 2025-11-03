@@ -13,7 +13,6 @@ import "time"
 type DriverPackageEntry struct {
 	Timestamp    time.Time `osquery:"timestamp" format:"unix"`
 	DateTime     time.Time `osquery:"date_time" format:"rfc3339" tz:"UTC"`
-	KeyName      string    `osquery:"key_name"`
 	ClassGuid    string    `osquery:"class_guid"`
 	Class        string    `osquery:"class"`
 	Directory    string    `osquery:"directory"`

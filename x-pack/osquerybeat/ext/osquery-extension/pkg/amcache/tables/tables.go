@@ -149,12 +149,6 @@ func SetEntryCommonFields(e Entry, key *regparser.CM_KEY_NODE) {
 		return
 	}
 
-	// Set KeyName from key name
-	keyName := elem.FieldByName("KeyName")
-	if keyName.IsValid() && keyName.CanSet() {
-		keyName.Set(reflect.ValueOf(key.Name()))
-	}
-
 	// Set Timestamp from key timestamp
 	timestamp := elem.FieldByName("Timestamp")
 	if timestamp.IsValid() && timestamp.CanSet() {

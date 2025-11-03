@@ -13,7 +13,6 @@ import "time"
 type ApplicationShortcutEntry struct {
 	Timestamp          time.Time `osquery:"timestamp" format:"unix"`
 	DateTime           time.Time `osquery:"date_time" format:"rfc3339" tz:"UTC"`
-	KeyName            string    `osquery:"key_name"`
 	ShortcutPath       string    `osquery:"shortcut_path"`
 	ShortcutTargetPath string    `osquery:"shortcut_target_path"`
 	ShortcutAumid      string    `osquery:"shortcut_aumid"`

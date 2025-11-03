@@ -15,7 +15,6 @@ import (
 type ApplicationEntry struct {
 	Timestamp          time.Time `osquery:"timestamp" format:"unix"`
 	DateTime           time.Time `osquery:"date_time" format:"rfc3339" tz:"UTC"`
-	KeyName            string    `osquery:"key_name"`
 	ProgramId          string    `osquery:"program_id"`
 	ProgramInstanceId  string    `osquery:"program_instance_id"`
 	Name               string    `osquery:"name"`

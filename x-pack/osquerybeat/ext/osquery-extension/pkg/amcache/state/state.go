@@ -78,6 +78,7 @@ func (gs *AmcacheGlobalState) Update(log *logger.Logger) error {
 	defer gs.Lock.Unlock()
 
 	// Reload the registry
+	log.Infof("Reading the Amcache hive from %s", gs.HivePath)
 	regParser, _, err := registry.LoadRegistry(gs.HivePath, log)
 	if err != nil {
 		log.Errorf("error opening amcache registry: %v", err)
@@ -92,10 +93,11 @@ func (gs *AmcacheGlobalState) Update(log *logger.Logger) error {
 		// Get entries for this keyPath from the loaded registry
 		entries, err := tables.GetEntriesFromRegistry(amcacheTable, regParser)
 		if err != nil {
-			// Log the error for this key and continue so we don't leave a nil map.
+			// Log the error for this key and continue so we don't leave a nil entry in the map.
 			log.Errorf("error getting %s entries: %v", amcacheTable.Name, err)
 			continue
 		}
+		log.Infof("Updating cache for table %s with %d entries", amcacheTable.Name, len(entries))
 		gs.Cache[amcacheTable.Name] = append(gs.Cache[amcacheTable.Name], entries...)
 	}
 	gs.LastUpdated = time.Now()
@@ -105,11 +107,16 @@ func (gs *AmcacheGlobalState) Update(log *logger.Logger) error {
 // GetCachedEntries returns the cached entries for a given Amcache table and filter list.
 func (gs *AmcacheGlobalState) GetCachedEntries(amcacheTable tables.AmcacheTable, filterList []filters.Filter, log *logger.Logger) ([]tables.Entry, error) {
 	if gs.IsExpired() {
+		log.Infof("Amcache cache is %s old, updating", time.Since(gs.LastUpdated))
 		err := gs.Update(log)
 		if err != nil {
+			log.Errorf("error updating amcache cache: %v", err)
 			return nil, err
 		}
 	}
+
+	gs.Lock.RLock()
+	defer gs.Lock.RUnlock()
 
 	result := make([]tables.Entry, 0)
 	cachedTableEntries := gs.Cache[amcacheTable.Name]
@@ -129,7 +136,7 @@ func (gs *AmcacheGlobalState) GetCachedEntries(amcacheTable tables.AmcacheTable,
 	return result, nil
 }
 
-// UpdateIfNeeded checks if the cache has expired and updates it if necessary.
+// IsExpired checks if the cache has expired.
 func (gs *AmcacheGlobalState) IsExpired() bool {
 	gs.Lock.RLock()
 	defer gs.Lock.RUnlock()

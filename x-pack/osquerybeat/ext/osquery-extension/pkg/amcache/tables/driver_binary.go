@@ -12,7 +12,6 @@ import "time"
 type DriverBinaryEntry struct {
 	Timestamp               time.Time `osquery:"timestamp" format:"unix"`
 	DateTime                time.Time `osquery:"date_time" format:"rfc3339" tz:"UTC"`
-	KeyName                 string    `osquery:"key_name"`
 	DriverName              string    `osquery:"driver_name"`
 	Inf                     string    `osquery:"inf"`
 	DriverVersion           string    `osquery:"driver_version"`

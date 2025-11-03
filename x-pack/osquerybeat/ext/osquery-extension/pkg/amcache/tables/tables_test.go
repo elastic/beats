@@ -62,9 +62,14 @@ func TestTables(t *testing.T) {
 
 	queryContext := table.QueryContext{
 		Constraints: map[string]table.ConstraintList{
-			"key_name": {
+			"name": {
 				Affinity:    table.ColumnTypeText,
-				Constraints: []table.Constraint{table.Constraint{Operator: table.OperatorEquals, Expression: rows[0]["key_name"]}},
+				Constraints: []table.Constraint{
+					{
+						Operator: table.OperatorEquals,
+						Expression: rows[0]["name"],
+					},
+				},
 			},
 		},
 	}
