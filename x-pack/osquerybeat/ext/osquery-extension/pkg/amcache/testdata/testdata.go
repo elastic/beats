@@ -46,3 +46,12 @@ func GetTestHivePathOrFatal(t *testing.T) string {
 	}
 	return absPath
 }
+
+func GetTestDataDirectoryOrFatal(t *testing.T) string {
+	_, currentFile, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("failed to get current file path")
+	}
+	dir := filepath.Dir(currentFile)
+	return dir
+}

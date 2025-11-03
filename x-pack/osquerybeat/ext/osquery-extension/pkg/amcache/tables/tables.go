@@ -22,7 +22,7 @@ import (
 
 // GlobalState is an interface that defines methods for accessing global Amcache state.
 type GlobalStateInterface interface {
-	GetCachedEntries(amcacheTable AmcacheTable, filters []filters.Filter, log *logger.Logger) []Entry
+	GetCachedEntries(amcacheTable AmcacheTable, filters []filters.Filter, log *logger.Logger) ([]Entry, error)
 }
 
 type Entry interface {
@@ -32,8 +32,18 @@ type Entry interface {
 	PostProcess()
 }
 
+type TableName string
+const (
+	TableNameApplication TableName = "amcache_application"
+	TableNameApplicationFile TableName = "amcache_application_file"
+	TableNameApplicationShortcut TableName = "amcache_application_shortcut"
+	TableNameDriverBinary TableName = "amcache_driver_binary"
+	TableNameDevicePnp TableName = "amcache_device_pnp"
+	TableNameDriverPackage TableName = "amcache_driver_package"
+)
+
 type AmcacheTable struct {
-	Name     string
+	Name     TableName
 	HiveKey  string
 	NewEntry func() Entry
 }
@@ -42,42 +52,42 @@ type AmcacheTable struct {
 func AllAmcacheTables() []AmcacheTable {
 	return []AmcacheTable{
 		{
-			Name:    "amcache_application",
+			Name:    TableNameApplication,
 			HiveKey: "Root\\InventoryApplication",
 			NewEntry: func() Entry {
 				return &ApplicationEntry{}
 			},
 		},
 		{
-			Name:    "amcache_application_file",
+			Name:    TableNameApplicationFile,
 			HiveKey: "Root\\InventoryApplicationFile",
 			NewEntry: func() Entry {
 				return &ApplicationFileEntry{}
 			},
 		},
 		{
-			Name:    "amcache_application_shortcut",
+			Name:    TableNameApplicationShortcut,
 			HiveKey: "Root\\InventoryApplicationShortcut",
 			NewEntry: func() Entry {
 				return &ApplicationShortcutEntry{}
 			},
 		},
 		{
-			Name:    "amcache_driver_binary",
+			Name:    TableNameDriverBinary,
 			HiveKey: "Root\\InventoryDriverBinary",
 			NewEntry: func() Entry {
 				return &DriverBinaryEntry{}
 			},
 		},
 		{
-			Name:    "amcache_device_pnp",
+			Name:    TableNameDevicePnp,
 			HiveKey: "Root\\InventoryDevicePnp",
 			NewEntry: func() Entry {
 				return &DevicePnpEntry{}
 			},
 		},
 		{
-			Name:    "amcache_driver_package",
+			Name:    TableNameDriverPackage,
 			HiveKey: "Root\\InventoryDriverPackage",
 			NewEntry: func() Entry {
 				return &DriverPackageEntry{}
@@ -86,11 +96,21 @@ func AllAmcacheTables() []AmcacheTable {
 	}
 }
 
+func GetAmcacheTableByName(name TableName) *AmcacheTable {
+	for _, table := range AllAmcacheTables() {
+		if table.Name == name {
+			return &table
+		}
+	}
+	return nil
+}
+
 func (t AmcacheTable) Columns() []table.ColumnDefinition {
 	entry := t.NewEntry()
 	columns, err := encoding.GenerateColumnDefinitions(entry)
 	if err != nil {
-		panic(fmt.Sprintf("failed to generate column definitions for %s: %v", t, err))
+		// This should never happen
+		panic(fmt.Sprintf("Warning: failed to generate column definitions for %s: %v", t.Name, err))
 	}
 	return columns
 }
@@ -98,7 +118,10 @@ func (t AmcacheTable) Columns() []table.ColumnDefinition {
 func (t AmcacheTable) GenerateFunc(state GlobalStateInterface, log *logger.Logger) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
 		filters := filters.GetConstraintFilters(queryContext)
-		entries := state.GetCachedEntries(t, filters, log)
+		entries, err := state.GetCachedEntries(t, filters, log)
+		if err != nil {
+			return nil, err
+		}
 		marshalled, err := MarshalEntries(entries)
 		if err != nil {
 			return nil, err
@@ -191,7 +214,8 @@ func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE) {
 			}
 		// Unsupported field type
 		default:
-			//log.Printf("Warning: unsupported field type for %s: %s", value.ValueName(), field.Kind())
+			// This should never happen
+			panic(fmt.Sprintf("Warning: unsupported field type for %s: %s", value.ValueName(), field.Kind()))
 		}
 	}
 	// Set the common fields for the entry, timestamp and key name

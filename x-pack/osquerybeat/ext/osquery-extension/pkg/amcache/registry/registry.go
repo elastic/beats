@@ -19,6 +19,9 @@ import (
 	"www.velocidex.com/golang/regparser"
 )
 
+// ensureLogger ensures that a logger is provided. If no logger is provided,
+// a new logger is created and returned. A simple check to ensure
+// that the logger is not nil.
 func ensureLogger(log *logger.Logger) *logger.Logger {
 	if log == nil {
 		log = logger.New(os.Stderr, false)
@@ -26,6 +29,9 @@ func ensureLogger(log *logger.Logger) *logger.Logger {
 	return log
 }
 
+// getFileContents reads the contents of a file and returns it as a byte slice.
+// If the file is not readable, it will attempt to read it using a low level read
+// using fslib.
 func getFileContents(filePath string, log *logger.Logger) ([]byte, error) {
 	log = ensureLogger(log)
 	content, err := os.ReadFile(filePath)
@@ -47,6 +53,7 @@ func getFileContents(filePath string, log *logger.Logger) ([]byte, error) {
 	return fs.ReadFile(sourceFS, fsPath)
 }
 
+// loadExistingRegistry loads the registry from the given file path.  Without any transaction logs.
 func loadExistingRegistry(filePath string, log *logger.Logger) (*regparser.Registry, error) {
 	log = ensureLogger(log)
 	hiveContent, err := getFileContents(filePath, log)
@@ -94,6 +101,7 @@ func createTempFile(contents []byte, log *logger.Logger) (*os.File, error) {
 	return tempFile, nil
 }
 
+// recoverRegistry recovers the registry from the given file path and transaction log paths.
 func recoverRegistry(filePath string, transactionLogPaths []string, log *logger.Logger) (registry *regparser.Registry, err error) {
 	log = ensureLogger(log)
 
@@ -201,27 +209,39 @@ func findTransactionLogs(filePath string, log *logger.Logger) []string {
 // The function returns a registry object and an error.
 // The registry object is the recovered registry if recovery was successful,
 // otherwise it is the existing registry.
-func LoadRegistry(filePath string, log *logger.Logger) (*regparser.Registry, error) {
+func LoadRegistry(filePath string, log *logger.Logger) (registry *regparser.Registry, recovered bool, err error) {
 	log = ensureLogger(log)
 
 	// ensure a path was provided
 	if filePath == "" {
 		log.Errorf("hive file path is empty")
-		return nil, fmt.Errorf("hive file path is empty")
+		return nil, false, fmt.Errorf("hive file path is empty")
 	}
 
 	transactionLogs := findTransactionLogs(filePath, log)
 	if len(transactionLogs) == 0 {
 		log.Infof("no transaction logs found, loading existing registry")
-		return loadExistingRegistry(filePath, log)
+		registry, err = loadExistingRegistry(filePath, log)
+		if err != nil {
+			log.Errorf("failed to load existing registry: %v", err)
+			return nil, false, err
+		}
+		return registry, false, nil
 	} else {
 		log.Infof("transaction logs found, recovering registry")
 		registry, err := recoverRegistry(filePath, transactionLogs, log)
 		if err != nil {
 			log.Errorf("failed to recover registry: %v", err)
-			return loadExistingRegistry(filePath, log)
+			// if recovery fails, try to fall back to the existing registry
+			registry, err = loadExistingRegistry(filePath, log)
+			if err != nil {
+				log.Errorf("failed to load existing registry: %v", err)
+				return nil, false, err
+			}
+			return registry, false, nil
 		} else {
-			return registry, nil
+			// if recovery succeeds, return the recovered registry
+			return registry, true, nil
 		}
 	}
 }
