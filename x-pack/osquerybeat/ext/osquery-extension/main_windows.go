@@ -121,8 +121,8 @@ func CreateViews(socket *string, log *logger.Logger) {
 		WHERE
 			app.program_id IS NULL;`)
 
-	err := views.CreateView(socket, view, log)
+	err := views.CreateViews(socket, []*views.View{view}, log)
 	if err != nil {
-		log.Fatalf("Error creating view %s: %v\n", view.Name(), err)
+		log.Fatalf("Error creating views: %v\n", err)
 	}
 }
