@@ -401,7 +401,7 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 			expectError:               false,
 		},
 		{
-			name:                      "success with display name failure",
+			name:                      "success with display name failure (4xx)",
 			clusterInfoStatusCode:     200,
 			clusterInfo:               clusterInfoForVersion("9.0.0"),
 			clusterSettingsStatusCode: 401, // fail to get settings because of auth error
@@ -410,7 +410,7 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 			expectError:               false,
 		},
 		{
-			name:                      "success with display name failure",
+			name:                      "success with display name failure (5xx)",
 			clusterInfoStatusCode:     200,
 			clusterInfo:               clusterInfoForVersion("9.0.0"),
 			clusterSettingsStatusCode: 500, // unknown server error
