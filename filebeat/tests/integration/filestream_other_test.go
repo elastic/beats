@@ -29,7 +29,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
@@ -43,16 +43,15 @@ func TestFilestreamHasOwnerAndGroup(t *testing.T) {
 	tempDir := filebeat.TempDir()
 	logFilePath := filepath.Join(tempDir, "input.log")
 
-	integration.WriteLogFile(t, logFilePath, 5, false)
+	integration.WriteLogFile(t, logFilePath, 25, false)
 
 	cfg := fmt.Sprintf(`
 filebeat.inputs:
   - type: filestream
-    enabled: true
     paths:
       - %s
-	include_file_owner_name: true
-	include_file_owner_group_name: true
+    include_file_owner_name: true
+    include_file_owner_group_name: true
 
 logging:
   level: debug
@@ -81,20 +80,24 @@ output:
 	if err != nil {
 		t.Fatalf("Failed to lookup uid %v", err)
 	}
-	logFileGroup, err := user.LookupId(strconv.FormatUint(uint64(stat.Gid), 10))
+	logFileGroup, err := user.LookupGroupId(strconv.FormatUint(uint64(stat.Gid), 10))
 	if err != nil {
 		t.Fatalf("Failed to lookup gid %v", err)
 	}
 
-	filebeat.WaitPublishedEvents(20*time.Second, 5)
+	filebeat.WaitPublishedEvents(30*time.Second, 25)
 
 	type evt struct {
-		LogFileOwner string `json:"log.file.owner"`
-		LogFileGroup string `json:"log.file.group"`
+		Log struct {
+			File struct {
+				Owner string `json:"owner"`
+				Group string `json:"group"`
+			} `json:"file"`
+		} `json:"log"`
 	}
 	evts := integration.GetEventsFromFileOutput[evt](filebeat, 5, false)
 	for _, e := range evts {
-		require.Equal(t, e.LogFileOwner, logFileOwner)
-		require.Equal(t, e.LogFileGroup, logFileGroup)
+		assert.Equal(t, logFileOwner.Username, e.Log.File.Owner)
+		assert.Equal(t, logFileGroup.Name, e.Log.File.Group)
 	}
 }

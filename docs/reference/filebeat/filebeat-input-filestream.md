@@ -217,12 +217,18 @@ Filebeat starts a harvester for each file that it finds under the specified path
 
 
 #### `include_file_owner_name` [filestream-input-include_file_owner_name]
+```yaml {applies_to}
+stack: ga 9.3
+```
 
 Includes the log file owner to `log.file` metadata. 
 This option is not supported on Windows.
 
 
 #### `include_file_owner_group_name` [filestream-input-include_file_owner_group_name]
+```yaml {applies_to}
+stack: ga 9.3
+```
 
 Includes the log file group to `log.file` metadata. 
 This option is not supported on Windows.
