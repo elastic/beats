@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   golang:
     image: docker.elastic.co/integrations-ci/beats-golang:1

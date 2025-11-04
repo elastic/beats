@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-windows-perfmon.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -48,6 +50,10 @@ You must configure queries for the Windows performance counters that you wish to
 
 **`refresh_wildcard_counters`**
 :   A boolean option to refresh the counter list at each fetch. By default, the counter list will be retrieved at the starting time, to refresh the list at each fetch, users will have to enable this setting.
+
+**`match_by_parent_instance`**
+:   A boolean option that causes all instances of the same parent to have the same instance value. In the previous example, this causes metrics for `svchost`, `svchost#1`, and so on to have an `instance`
+value of `svchost`. If set to `false` they keep the original values (`svchost`, `svchost#1`, and so on). Defaults to `true`.
 
 
 ### Query Configuration [_query_configuration]

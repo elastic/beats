@@ -65,9 +65,10 @@ func TestNewReceiver(t *testing.T) {
 					"*",
 				},
 			},
-			"path.home":    t.TempDir(),
-			"http.enabled": true,
-			"http.host":    monitorHost,
+			"path.home":               t.TempDir(),
+			"http.enabled":            true,
+			"http.host":               monitorHost,
+			"management.otel.enabled": true,
 		},
 	}
 
@@ -207,6 +208,16 @@ func TestMultipleReceivers(t *testing.T) {
 			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r1 log record")
 			assert.Equal(c, "metricbeatreceiver/r2", logs["r2"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r2 log record")
 			assert.Equal(c, "receiver", logs["r2"][0].Flatten()["agent.otelcol.component.kind"], "expected otelcol.component.kind field in r2 log record")
+
+			// Make sure that each receiver has a separate logger
+			// instance and does not interfere with others. Previously, the
+			// logger in Beats was global, causing logger fields to be
+			// overwritten when multiple receivers started in the same process.
+			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
+			assert.Equal(c, 1, r1StartLogs.Len(), "r1 should have a single start log")
+			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r2"))
+			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
+
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				tests := []string{monitorSocket1, monitorSocket2}
@@ -415,4 +426,37 @@ func TestReceiverDegraded(t *testing.T) {
 			})
 		})
 	}
+}
+
+func TestReceiverHook(t *testing.T) {
+	cfg := Config{
+		Beatconfig: map[string]any{
+			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
+				"modules": []map[string]any{
+					{
+						"module":     "benchmark",
+						"enabled":    true,
+						"period":     "1s",
+						"metricsets": []string{"info"},
+					},
+				},
+			},
+			"management.otel.enabled": true,
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+	receiverSettings := receiver.Settings{
+		ID: component.MustNewID(Name),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+
+	// For metricbeatreceiver, we expect 2 hooks to be registered:
+	// 	one for beat metrics and one for input metrics.
+	oteltest.TestReceiverHook(t, &cfg, NewFactory(), receiverSettings, 2)
 }

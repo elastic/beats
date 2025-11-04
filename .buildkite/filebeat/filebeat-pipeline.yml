@@ -86,6 +86,7 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+          - "filebeat/build/input-test/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -112,6 +113,7 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+          - "filebeat/build/input-test/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -138,6 +140,7 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+          - "filebeat/build/input-test/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -162,6 +165,7 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+          - "filebeat/build/input-test/**/*"
           - "filebeat/build/integration-tests/*"
           - "filebeat/build/integration-tests/Test*/*"
           - "filebeat/build/integration-tests/Test*/data/**/*"
@@ -193,6 +197,7 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+          - "filebeat/build/input-test/**/*"
           - "filebeat/build/integration-tests/*"
           - "filebeat/build/integration-tests/Test*/*"
           - "filebeat/build/integration-tests/Test*/data/**/*"
@@ -220,6 +225,7 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+          - "filebeat/build/input-test/**/*"
           - "filebeat/build/integration-tests/*"
           - "filebeat/build/integration-tests/Test*/*"
           - "filebeat/build/integration-tests/Test*/data/**/*"
@@ -338,6 +344,7 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+          - "filebeat/build/input-test/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -494,7 +501,7 @@ steps:
       - label: ":ubuntu: Filebeat: Packaging arm64"
         key: "packaging-arm"
         env:
-          PLATFORMS: "+all linux/arm64 darwin/arm64"
+          PLATFORMS: "+all linux/arm64 darwin/arm64 windows/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh filebeat
         retry:

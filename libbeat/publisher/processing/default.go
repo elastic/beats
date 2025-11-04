@@ -22,7 +22,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/asset"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/management"
@@ -114,10 +113,9 @@ func MakeDefaultSupport(
 		// don't try to "merge" the two lists somehow, if the supportFactory caller requests its own processors, use those
 		// also makes it easier to disable global processors if needed, since they're otherwise hardcoded
 		var rawProcessors processors.PluginConfig
-		shouldLoadDefaultProcessors := info.UseDefaultProcessors || fleetmode.Enabled()
 
 		// don't check the array directly, use HasField, that way processors can easily be bypassed with -E processors=[]
-		if shouldLoadDefaultProcessors && !beatCfg.HasField("processors") {
+		if management.UnderAgent() && !beatCfg.HasField("processors") {
 			log.Debugf("In fleet/otel mode with no processors specified, defaulting to global processors")
 			rawProcessors = fleetDefaultProcessors
 
