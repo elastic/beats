@@ -21,7 +21,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 
-func TestLogInputRunAsFilestreamEA(t *testing.T) {
+func TestLogAsFilestreamEA(t *testing.T) {
 	filebeat := NewFilebeat(t)
 	finalStateReached := atomic.Bool{}
 
