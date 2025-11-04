@@ -87,6 +87,42 @@ Google Cloud Billing metrics
     type: float
 
 
+**`gcp.billing.usage_start_time`** {applies_to}`stack: beta 9.2.1`
+:   The start time of the usage period for this billing record.
+
+    type: date
+
+
+**`gcp.billing.usage_end_time`** {applies_to}`stack: beta 9.2.1`
+:   The end time of the usage period for this billing record.
+
+    type: date
+
+
+**`gcp.billing.location.region`** {applies_to}`stack: beta 9.2.1`
+:   The geographic region where the resource was used (e.g., us-central1, europe-west1).
+
+    type: keyword
+
+
+**`gcp.billing.location.zone`** {applies_to}`stack: beta 9.2.1`
+:   The specific zone within the region (e.g., us-central1-a).
+
+    type: keyword
+
+
+**`gcp.billing.location.country`** {applies_to}`stack: beta 9.2.1`
+:   The country code for the resource location (e.g., US, GB).
+
+    type: keyword
+
+
+**`gcp.billing.labels`** {applies_to}`stack: beta 9.2.1`
+:   Resource labels as key-value pairs. Labels are user-defined metadata that can be attached to GCP resources.
+
+    type: object
+
+
 ## carbon [_carbon]
 
 ```{applies_to}
