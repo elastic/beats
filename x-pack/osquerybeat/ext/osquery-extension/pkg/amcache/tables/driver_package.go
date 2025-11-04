@@ -6,27 +6,24 @@
 
 package tables
 
-import "time"
-
 // DriverPackageEntry represents a single entry in the amcache inventory driver package table.
 // located at Root\\InventoryDriverPackage
 type DriverPackageEntry struct {
-	Timestamp    time.Time `osquery:"timestamp" format:"unix"`
-	DateTime     time.Time `osquery:"date_time" format:"rfc3339" tz:"UTC"`
-	ClassGuid    string    `osquery:"class_guid"`
-	Class        string    `osquery:"class"`
-	Directory    string    `osquery:"directory"`
-	Date         string    `osquery:"date"`
-	Version      string    `osquery:"version"`
-	Provider     string    `osquery:"provider"`
-	SubmissionId string    `osquery:"submission_id"`
-	DriverInBox  string    `osquery:"driver_in_box"`
-	Inf          string    `osquery:"inf"`
-	FlightIds    string    `osquery:"flight_ids"`
-	RecoveryIds  string    `osquery:"recovery_ids"`
-	IsActive     string    `osquery:"is_active"`
-	Hwids        string    `osquery:"hwids"`
-	SYSFILE      string    `osquery:"sysfile"`
+	BaseEntry
+	ClassGuid    string `osquery:"class_guid"`
+	Class        string `osquery:"class"`
+	Directory    string `osquery:"directory"`
+	Date         string `osquery:"date"`
+	Version      string `osquery:"version"`
+	Provider     string `osquery:"provider"`
+	SubmissionId string `osquery:"submission_id"`
+	DriverInBox  string `osquery:"driver_in_box"`
+	Inf          string `osquery:"inf"`
+	FlightIds    string `osquery:"flight_ids"`
+	RecoveryIds  string `osquery:"recovery_ids"`
+	IsActive     string `osquery:"is_active"`
+	Hwids        string `osquery:"hwids"`
+	SYSFILE      string `osquery:"sysfile"`
 }
 
 func (e *DriverPackageEntry) PostProcess() {

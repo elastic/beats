@@ -91,7 +91,7 @@ func (gs *AmcacheGlobalState) Update(log *logger.Logger) error {
 		gs.Cache[amcacheTable.Name] = make([]tables.Entry, 0)
 
 		// Get entries for this keyPath from the loaded registry
-		entries, err := tables.GetEntriesFromRegistry(amcacheTable, regParser)
+		entries, err := tables.GetEntriesFromRegistry(amcacheTable, regParser, log)
 		if err != nil {
 			// Log the error for this key and continue so we don't leave a nil entry in the map.
 			log.Errorf("error getting %s entries: %v", amcacheTable.Name, err)

@@ -8,13 +8,13 @@ package tables
 
 import (
 	"context"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/registry"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/testdata"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/osquery/osquery-go/plugin/table"
 	"os"
 	"testing"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/testdata"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/registry"
-	"github.com/osquery/osquery-go/plugin/table"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 )
 
 type MockGlobalState struct{}
@@ -24,7 +24,7 @@ func (m *MockGlobalState) GetCachedEntries(amcacheTable AmcacheTable, filters []
 	if err != nil {
 		return nil, err
 	}
-	entries, err := GetEntriesFromRegistry(amcacheTable, registry)
+	entries, err := GetEntriesFromRegistry(amcacheTable, registry, log)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func TestTables(t *testing.T) {
 	mockState := &MockGlobalState{}
 	amcacheTable := *GetAmcacheTableByName(TableNameApplication)
 	generateFunc := amcacheTable.GenerateFunc(mockState, log)
-	
+
 	rows, err := generateFunc(context.Background(), table.QueryContext{})
 	if err != nil {
 		t.Fatalf("Error generating rows for %s: %v", amcacheTable.Name, err)
@@ -63,10 +63,10 @@ func TestTables(t *testing.T) {
 	queryContext := table.QueryContext{
 		Constraints: map[string]table.ConstraintList{
 			"name": {
-				Affinity:    table.ColumnTypeText,
+				Affinity: table.ColumnTypeText,
 				Constraints: []table.Constraint{
 					{
-						Operator: table.OperatorEquals,
+						Operator:   table.OperatorEquals,
 						Expression: rows[0]["name"],
 					},
 				},

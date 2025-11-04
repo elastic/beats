@@ -9,6 +9,7 @@ package tables
 import (
 	"context"
 	"fmt"
+	"math"
 	"reflect"
 	"strings"
 	"time"
@@ -25,21 +26,30 @@ type GlobalStateInterface interface {
 	GetCachedEntries(amcacheTable AmcacheTable, filters []filters.Filter, log *logger.Logger) ([]Entry, error)
 }
 
+type BaseEntry struct {
+	Timestamp time.Time `osquery:"timestamp" format:"unix"`
+	DateTime  time.Time `osquery:"date_time" format:"rfc3339" tz:"UTC"`
+}
+
 type Entry interface {
 	// PostProcess is called after the entry is populated from the registry key.
-	// It is used to perform any additional processing on the entry, such as converting
-	// the timestamp to a more human-readable format.
+	// It is used to perform any additional processing on the entry such as
+	// calculating derived fields or performing other cleanup.
 	PostProcess()
+
+	// SetTimestamp sets the timestamp for the entry
+	SetTimestamp(timestamp time.Time)
 }
 
 type TableName string
+
 const (
-	TableNameApplication TableName = "amcache_application"
-	TableNameApplicationFile TableName = "amcache_application_file"
+	TableNameApplication         TableName = "amcache_application"
+	TableNameApplicationFile     TableName = "amcache_application_file"
 	TableNameApplicationShortcut TableName = "amcache_application_shortcut"
-	TableNameDriverBinary TableName = "amcache_driver_binary"
-	TableNameDevicePnp TableName = "amcache_device_pnp"
-	TableNameDriverPackage TableName = "amcache_driver_package"
+	TableNameDriverBinary        TableName = "amcache_driver_binary"
+	TableNameDevicePnp           TableName = "amcache_device_pnp"
+	TableNameDriverPackage       TableName = "amcache_driver_package"
 )
 
 type AmcacheTable struct {
@@ -143,42 +153,48 @@ func MarshalEntries(entries []Entry) ([]map[string]string, error) {
 	return marshalled, nil
 }
 
-func SetEntryCommonFields(e Entry, key *regparser.CM_KEY_NODE) {
-	elem := reflect.ValueOf(e).Elem()
-	if !elem.IsValid() || !elem.CanSet() {
-		return
-	}
-
-	// Set Timestamp from key timestamp
-	timestamp := elem.FieldByName("Timestamp")
-	if timestamp.IsValid() && timestamp.CanSet() {
-		timestamp.Set(reflect.ValueOf(key.LastWriteTime().Local()))
-	}
+func (e *BaseEntry) SetTimestamp(timestamp time.Time) {
+	e.Timestamp = timestamp
+	e.DateTime = timestamp.Local()
 }
 
 // FillInEntryFromKey takes an any, and using the FieldMappings, populates its fields from a registry key.
-func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE) {
+func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE, log *logger.Logger) {
+	// Get the element of the entry and make sure it is valid and can be set
 	elem := reflect.ValueOf(e).Elem()
 	if !elem.IsValid() || !elem.CanSet() {
 		return
 	}
 
+	// iterate over the values in the key
 	for _, value := range key.Values() {
+		// Skip if the value name is empty
 		if value.ValueName() == "" {
 			continue
 		}
+
+		// Get the field by the value name
+		// this function hinges on the entry having a field
+		// with the same name as the value name
 		field := elem.FieldByName(value.ValueName())
 		if !field.IsValid() || !field.CanSet() {
 			continue
 		}
 
+		// Switch on the kind of the field
 		switch field.Kind() {
 
 		// If the field is an integer type, make sure the registry value is DWORD or QWORD
-		case reflect.Int64, reflect.Int32:
+		case reflect.Int64:
 			switch value.ValueData().Type {
 			case regparser.REG_DWORD, regparser.REG_QWORD:
-				field.SetInt(int64(value.ValueData().Uint64))
+				val := value.ValueData().Uint64
+				// all integers in osquery are 64bit signed integers, but all registry values are unsigned
+				// so we need to convert the value to an int64 and check for overflow
+				if value.ValueData().Uint64 > math.MaxInt64 {
+					continue // Skip if value exceeds int64 range
+				}
+				field.SetInt(int64(val))
 			}
 		// If the field is a string type, handle STRING, DWORD, and QWORD registry value types
 		case reflect.String:
@@ -208,21 +224,22 @@ func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE) {
 			}
 		// Unsupported field type
 		default:
-			// This should never happen
-			panic(fmt.Sprintf("Warning: unsupported field type for %s: %s", value.ValueName(), field.Kind()))
+			// We control the entry types, so this should never happen
+			log.Fatalf("Error: unsupported field type for %s: %s", value.ValueName(), field.Kind())
 		}
 	}
-	// Set the common fields for the entry, timestamp and key name
-	SetEntryCommonFields(e, key)
+
+	// Set the timestamp for the entry
+	e.SetTimestamp(key.LastWriteTime().Time)
 
 	// Call the PostProcess method to perform any additional processing on the entry
 	e.PostProcess()
 }
 
 // GetEntriesFromRegistry reads the registry and returns a map of entries for the specified TableType.
-func GetEntriesFromRegistry(amcacheTable AmcacheTable, registry *regparser.Registry) ([]Entry, error) {
+func GetEntriesFromRegistry(amcacheTable AmcacheTable, registry *regparser.Registry, log *logger.Logger) ([]Entry, error) {
 	if registry == nil {
-		return nil, fmt.Errorf("registry is nil")
+		log.Fatalf("GetEntriesFromRegistry called with nil registry for table %s", amcacheTable.Name)
 	}
 
 	hiveKey := amcacheTable.HiveKey
@@ -234,7 +251,7 @@ func GetEntriesFromRegistry(amcacheTable AmcacheTable, registry *regparser.Regis
 	entries := make([]Entry, 0, len(keyNode.Subkeys()))
 	for _, subkey := range keyNode.Subkeys() {
 		ae := amcacheTable.NewEntry()
-		FillInEntryFromKey(ae, subkey)
+		FillInEntryFromKey(ae, subkey, log)
 		entries = append(entries, ae)
 	}
 	return entries, nil
