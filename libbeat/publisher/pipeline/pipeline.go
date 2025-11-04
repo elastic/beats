@@ -73,7 +73,7 @@ type Pipeline struct {
 
 	processors processing.Supporter
 
-	// paths TODO
+	// paths contains the paths configuration for processor initialization.
 	paths *paths.Path
 }
 
@@ -89,7 +89,7 @@ type Settings struct {
 
 	InputQueueSize int
 
-	// Paths TODO
+	// Paths contains the paths configuration used for processor initialization.
 	Paths *paths.Path
 }
 
@@ -290,7 +290,7 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 	if p.processors == nil {
 		return nil, nil
 	}
-	cfg.Paths = p.paths // TODO: ehm bad?
+	cfg.Paths = p.paths
 	return p.processors.Create(cfg, noPublish)
 }
 

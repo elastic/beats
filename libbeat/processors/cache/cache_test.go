@@ -661,5 +661,5 @@ func TestSetPathsUninitialized(t *testing.T) {
 	// Try to use without SetPaths - should fail
 	event, err := c.Run(&beat.Event{})
 	assert.NotNil(t, event)
-	require.ErrorContains(t, err, "uninitialized cache store")
+	require.ErrorContains(t, err, "cache processor store not initialized")
 }

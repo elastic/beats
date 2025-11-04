@@ -123,10 +123,10 @@ type CacheEntry struct {
 	index   int
 }
 
-// Run enriches the given event with the host metadata.
+// Run enriches the given event with cached metadata.
 func (p *cache) Run(event *beat.Event) (*beat.Event, error) {
 	if p.store == nil {
-		return event, fmt.Errorf("uninitialized cache store")
+		return event, fmt.Errorf("cache processor store not initialized; SetPaths must be called before use")
 	}
 
 	switch {
@@ -178,6 +178,8 @@ func (p *cache) Run(event *beat.Event) (*beat.Event, error) {
 	}
 }
 
+// SetPaths initializes the cache store with the provided paths configuration.
+// This method must be called before the processor can be used.
 func (p *cache) SetPaths(path *paths.Path) error {
 	src, cancel, err := getStoreFor(p.config, p.log, path)
 	if err != nil {

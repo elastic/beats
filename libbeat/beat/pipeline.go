@@ -127,7 +127,8 @@ type ProcessingConfig struct {
 	// pipeline builder.
 	Private interface{}
 
-	// Paths TODO
+	// Paths contains the paths configuration used for processor initialization.
+	// This is passed to processors that support lazy initialization via SetPaths.
 	Paths *paths.Path
 }
 

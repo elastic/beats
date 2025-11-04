@@ -117,15 +117,10 @@ func (p *group) All() []beat.Processor {
 	return p.list
 }
 
-// TODO: move to processors
-type setPaths interface {
-	SetPaths(*paths.Path) (err error)
-}
-
 func (p *group) SetPaths(paths *paths.Path) error {
 	var err error
 	for _, processor := range p.list {
-		setPather, ok := processor.(setPaths)
+		setPather, ok := processor.(processors.SetPather)
 		if ok {
 			err = errors.Join(err, setPather.SetPaths(paths))
 		}

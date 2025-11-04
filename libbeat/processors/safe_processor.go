@@ -47,17 +47,12 @@ func (p *SafeProcessor) Close() (err error) {
 	if atomic.CompareAndSwapUint32(&p.closed, 0, 1) {
 		return Close(p.Processor)
 	}
-	logp.L().Warnf("tried to close already closed %q processor", p.Processor.String())
+	logp.L().Warnf("tried to close already closed %q processor", p.String())
 	return nil
 }
 
-// TODO: common
-type setPaths interface {
-	SetPaths(*paths.Path) error
-}
-
 func (p *SafeProcessor) SetPaths(paths *paths.Path) error {
-	setPather, ok := p.Processor.(setPaths)
+	setPather, ok := p.Processor.(SetPather)
 	if ok {
 		return setPather.SetPaths(paths)
 	}
