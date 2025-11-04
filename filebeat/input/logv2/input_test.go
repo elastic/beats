@@ -78,7 +78,6 @@ func TestRunAsFilestream(t *testing.T) {
 			management.SetUnderAgent(tc.underAgent)
 
 			got, err := runAsFilestream(tc.cfg)
-			t.Log(got, err)
 			if err != nil && !tc.expectErr {
 				t.Errorf("did not expect an error: %s", err)
 			}
