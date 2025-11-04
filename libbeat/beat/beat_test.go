@@ -93,6 +93,16 @@ func TestUserAgentString(t *testing.T) {
 				Manager: nil},
 			expectedComments: []string{},
 		},
+		{
+			name:             "fips-distribution",
+			beat:             &Beat{Info: Info{Beat: "testbeat", FIPSDistribution: true}, Manager: nil},
+			expectedComments: []string{"FIPS"},
+		},
+		{
+			name:             "not-fips-distribution",
+			beat:             &Beat{Info: Info{Beat: "testbeat", FIPSDistribution: false}, Manager: nil},
+			expectedComments: []string{},
+		},
 	}
 
 	// User-Agent will take the form of
