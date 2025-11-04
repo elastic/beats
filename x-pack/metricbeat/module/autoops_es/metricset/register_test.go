@@ -401,6 +401,16 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 			expectError:               false,
 		},
 		{
+			name:                      "success with blank persistent and transient display name",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("9.2.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           clusterSettings("", ""),
+			licenseStatusCode:         200,
+			license:                   licenseForType("trial", "active"),
+			expectError:               false,
+		},
+		{
 			name:                      "success with display name failure (4xx)",
 			clusterInfoStatusCode:     200,
 			clusterInfo:               clusterInfoForVersion("9.0.0"),
