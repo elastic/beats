@@ -27,14 +27,14 @@ filebeat.inputs:
   resource_manager_endpoint: ""
 ```
 
-{applies_to}`stack: ga 9.3.0` Example configuration using OAuth2 authentication:
+{applies_to}`stack: ga 9.3.0` Example configuration using client secret authentication:
 
 ```yaml
 filebeat.inputs:
 - type: azure-eventhub
   eventhub: "insights-operational-logs"
   consumer_group: "test"
-  # No connection_string provided - automatically uses OAuth2 for both eventhub and storage account
+  auth_type: "client_secret"
   eventhub_namespace: "your-eventhub-namespace.servicebus.windows.net"
   tenant_id: "your-tenant-id"
   client_id: "your-client-id"
@@ -44,6 +44,7 @@ filebeat.inputs:
   storage_account_container: ""
   processor_version: "v2"
 ```
+
 
 ## Configuration options [_configuration_options]
 
@@ -60,13 +61,62 @@ The name of the eventhub users would like to read from, field required.
 Optional, we recommend using a dedicated consumer group for the azure input. Reusing consumer groups among non-related consumers can cause unexpected behavior and possibly lost events.
 
 
+## Authentication [_authentication]
+
+The azure-eventhub input supports multiple authentication methods. The `auth_type` configuration option controls the authentication method used for both Event Hub and Storage Account.
+
+### Authentication Types
+
+The following authentication types are supported:
+
+- **`connection_string`** (default if `auth_type` is not specified): Uses Azure Event Hubs and Storage Account connection strings
+- **`client_secret`**: Uses Azure Active Directory service principal with client secret credentials
+
+### Required Permissions
+
+When using `client_secret` authentication, the service principal needs the following Azure RBAC permissions:
+
+**For Azure Event Hubs:**
+- `Azure Event Hubs Data Receiver` role on the Event Hubs namespace or Event Hub
+- Alternatively, a custom role with the following permissions:
+  - `Microsoft.EventHub/namespaces/eventhubs/read`
+  - `Microsoft.EventHub/namespaces/eventhubs/consumergroups/read`
+
+**For Azure Storage Account:**
+- `Storage Blob Data Contributor` role on the Storage Account or container
+- Alternatively, a custom role with the following permissions:
+  - `Microsoft.Storage/storageAccounts/blobServices/containers/read`
+  - `Microsoft.Storage/storageAccounts/blobServices/containers/write`
+  - `Microsoft.Storage/storageAccounts/blobServices/containers/delete`
+  - `Microsoft.Storage/storageAccounts/blobServices/generateUserDelegationKey/action`
+
+For detailed instructions on how to set up an Azure AD service principal and configure permissions, refer to the official Microsoft documentation:
+
+- [Create an Azure service principal with Azure CLI](https://learn.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli)
+- [Create an Azure AD app registration using the Azure portal](https://learn.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal)
+- [Assign Azure roles using Azure CLI](https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-cli)
+- [Azure Event Hubs authentication and authorization](https://learn.microsoft.com/en-us/azure/event-hubs/authorize-access-azure-active-directory)
+- [Authorize access to blobs using Azure Active Directory](https://learn.microsoft.com/en-us/azure/storage/blobs/authorize-access-azure-active-directory)
+
 ## `connection_string` [_connection_string]
 
-The connection string required to communicate with Event Hubs when using Shared Access Key authentication, steps here [https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string).
+The connection string required to communicate with Event Hubs when using `connection_string` authentication, steps here [https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string).
 
-**Note**: If `connection_string` is not provided, the input will automatically use OAuth2 authentication and require the OAuth2 configuration parameters below.
+Required when `auth_type` is set to `connection_string` or when `auth_type` is not specified (defaults to `connection_string` for backwards compatibility).
 
 A Blob Storage account is required in order to store/retrieve/update the offset or state of the eventhub messages. This means that after stopping filebeat it can start back up at the spot that it stopped processing messages.
+
+## `auth_type` [_auth_type]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the authentication method to use for both Event Hub and Storage Account. If not specified, defaults to `connection_string` for backwards compatibility.
+
+Valid values:
+- `connection_string`: Uses connection string authentication (default)
+- `client_secret`: Uses Azure Active Directory service principal with client secret credentials
 
 ## `eventhub_namespace` [_eventhub_namespace]
 
@@ -74,7 +124,7 @@ A Blob Storage account is required in order to store/retrieve/update the offset 
 stack: ga 9.3.0
 ```
 
-The fully qualified namespace for the Event Hub. Required when `connection_string` is not provided (OAuth2 authentication). Format: `your-eventhub-namespace.servicebus.windows.net`
+The fully qualified namespace for the Event Hub. Required when using `client_secret` authentication (`auth_type` is set to `client_secret`). Format: `your-eventhub-namespace.servicebus.windows.net`
 
 ## `tenant_id` [_tenant_id]
 
@@ -82,7 +132,7 @@ The fully qualified namespace for the Event Hub. Required when `connection_strin
 stack: ga 9.3.0
 ```
 
-The Azure Active Directory tenant ID. Required when `connection_string` is not provided (OAuth2 authentication).
+The Azure Active Directory tenant ID. Required when using `client_secret` authentication for Event Hub or Storage Account.
 
 ## `client_id` [_client_id]
 
@@ -90,7 +140,7 @@ The Azure Active Directory tenant ID. Required when `connection_string` is not p
 stack: ga 9.3.0
 ```
 
-The Azure Active Directory application (client) ID. Required when `connection_string` is not provided (OAuth2 authentication).
+The Azure Active Directory application (client) ID. Required when using `client_secret` authentication for Event Hub or Storage Account.
 
 ## `client_secret` [_client_secret]
 
@@ -98,7 +148,7 @@ The Azure Active Directory application (client) ID. Required when `connection_st
 stack: ga 9.3.0
 ```
 
-The Azure Active Directory application client secret. Required when `connection_string` is not provided (OAuth2 authentication).
+The Azure Active Directory application client secret. Required when using `client_secret` authentication for Event Hub or Storage Account.
 
 ## `authority_host` [_authority_host]
 
@@ -106,7 +156,7 @@ The Azure Active Directory application client secret. Required when `connection_
 stack: ga 9.3.0
 ```
 
-The Azure Active Directory authority host. Optional when using OAuth2 authentication. Defaults to Azure Public Cloud (`https://login.microsoftonline.com`).
+The Azure Active Directory authority host. Optional when using `client_secret` authentication. Defaults to Azure Public Cloud (`https://login.microsoftonline.com`).
 
 Supported values:
 - `https://login.microsoftonline.com` (Azure Public Cloud - default)

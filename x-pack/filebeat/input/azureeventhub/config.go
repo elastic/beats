@@ -41,23 +41,28 @@ type azureInputConfig struct {
 	OverrideEnvironment string `config:"resource_manager_endpoint"`
 
 	// ---------------------------------------
-	// OAuth2 authentication configuration
+	// Authentication configuration
 	// ---------------------------------------
 
+	// AuthType specifies the authentication method to use for both Event Hub and Storage Account.
+	// If not specified, defaults to connection_string for backwards compatibility.
+	// Valid values: connection_string, client_secret
+	AuthType string `config:"auth_type"`
+
 	// EventHubNamespace is the fully qualified namespace for the Event Hub.
-	// Required when using OAuth2 authentication (when connection_string is not provided).
+	// Required when using client_secret authentication.
 	EventHubNamespace string `config:"eventhub_namespace"`
 	// TenantID is the Azure Active Directory tenant ID.
-	// Required when using OAuth2 authentication (when connection_string is not provided).
+	// Required when using client_secret authentication.
 	TenantID string `config:"tenant_id"`
 	// ClientID is the Azure Active Directory application (client) ID.
-	// Required when using OAuth2 authentication (when connection_string is not provided).
+	// Required when using client_secret authentication.
 	ClientID string `config:"client_id"`
 	// ClientSecret is the Azure Active Directory application client secret.
-	// Required when using OAuth2 authentication with client credentials flow.
+	// Required when using client_secret authentication.
 	ClientSecret string `config:"client_secret"`
 	// AuthorityHost is the Azure Active Directory authority host.
-	// Optional, defaults to Azure Public Cloud.
+	// Optional, defaults to Azure Public Cloud (https://login.microsoftonline.com).
 	AuthorityHost string `config:"authority_host"`
 	// LegacySanitizeOptions is a list of sanitization options to apply to messages.
 	//
@@ -145,33 +150,27 @@ func defaultConfig() azureInputConfig {
 // Validate validates the config.
 func (conf *azureInputConfig) Validate() error {
 	logger := logp.NewLogger("azureeventhub.config")
+	logger.Infof("DEBUG: Validate() method called")
 
-	// Determine authentication method based on whether connection_string is provided
-	useOAuth2 := conf.ConnectionString == ""
+	// Determine authentication method
+	authType := conf.AuthType
+	if authType == "" {
+		// Default to connection_string for backwards compatibility
+		authType = AuthTypeConnectionString
+	}
 
-	if useOAuth2 {
-		// Validate OAuth2 configuration
-		if conf.EventHubNamespace == "" {
-			return errors.New("eventhub_namespace is required when connection_string is not provided (OAuth2 authentication)")
-		}
-		if conf.TenantID == "" {
-			return errors.New("tenant_id is required when connection_string is not provided (OAuth2 authentication)")
-		}
-		if conf.ClientID == "" {
-			return errors.New("client_id is required when connection_string is not provided (OAuth2 authentication)")
-		}
-		if conf.ClientSecret == "" {
-			return errors.New("client_secret is required when connection_string is not provided (OAuth2 authentication)")
-		}
-	} else {
+	switch authType {
+	case AuthTypeConnectionString:
 		// Validate connection string configuration
+		if conf.ConnectionString == "" {
+			return errors.New("connection_string is required when auth_type is empty or set to connection_string")
+		}
 		connectionStringProperties, err := parseConnectionString(conf.ConnectionString)
 		if err != nil {
 			return fmt.Errorf("invalid connection string: %w", err)
 		}
 
-		// If the connection string contains an entity path, we need to double
-		// check that it matches the event hub name.
+		// If the connection string contains an entity path, we need to double-check that it matches the event hub name.
 		if connectionStringProperties.EntityPath != nil && *connectionStringProperties.EntityPath != conf.EventHubName {
 			return fmt.Errorf(
 				"invalid config: the entity path (%s) in the connection string does not match event hub name (%s)",
@@ -179,6 +178,22 @@ func (conf *azureInputConfig) Validate() error {
 				conf.EventHubName,
 			)
 		}
+	case AuthTypeClientSecret:
+		// Validate client secret configuration
+		if conf.EventHubNamespace == "" {
+			return errors.New("eventhub_namespace is required when using client_secret authentication")
+		}
+		if conf.TenantID == "" {
+			return errors.New("tenant_id is required when using client_secret authentication")
+		}
+		if conf.ClientID == "" {
+			return errors.New("client_id is required when using client_secret authentication")
+		}
+		if conf.ClientSecret == "" {
+			return errors.New("client_secret is required when using client_secret authentication")
+		}
+	default:
+		return fmt.Errorf("unknown auth_type: %s (valid values: connection_string, client_secret)", authType)
 	}
 
 	if conf.EventHubName == "" {
@@ -236,22 +251,23 @@ func (conf *azureInputConfig) Validate() error {
 			return errors.New("no storage account key configured (config: storage_account_key)")
 		}
 	case processorV2:
-		// For processor v2, either connection string or OAuth2 must be configured
-		useOAuth2ForStorage := conf.SAConnectionString == ""
-		if useOAuth2ForStorage {
-			// Validate OAuth2 configuration for storage
+		// For processor v2, either connection string or credential-based authentication must be configured
+		useCredentialForStorage := conf.SAConnectionString == ""
+		if useCredentialForStorage {
+			// Storage account uses the same auth_type as Event Hub
+			if authType != AuthTypeClientSecret {
+				return errors.New("storage account requires client_secret authentication when storage_account_connection_string is not provided")
+			}
+
+			// Validate client secret configuration for storage
 			if conf.TenantID == "" {
-				return errors.New("tenant_id is required when storage_account_connection_string is not provided (OAuth2 authentication)")
+				return errors.New("tenant_id is required when using client_secret authentication")
 			}
 			if conf.ClientID == "" {
-				return errors.New("client_id is required when storage_account_connection_string is not provided (OAuth2 authentication)")
+				return errors.New("client_id is required when using client_secret authentication")
 			}
 			if conf.ClientSecret == "" {
-				return errors.New("client_secret is required when storage_account_connection_string is not provided (OAuth2 authentication)")
-			}
-		} else {
-			if conf.SAConnectionString == "" {
-				return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
+				return errors.New("client_secret is required when using client_secret authentication")
 			}
 		}
 	default:

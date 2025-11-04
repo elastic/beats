@@ -306,21 +306,3 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 		})
 	}
 }
-
-func TestGetAzureCloud(t *testing.T) {
-	// Test that the function doesn't panic for different authority hosts
-	testCases := []string{
-		"https://login.microsoftonline.com",
-		"https://login.microsoftonline.us",
-		"https://login.chinacloudapi.cn",
-		"",
-	}
-
-	for _, authorityHost := range testCases {
-		t.Run("authority_host_"+authorityHost, func(t *testing.T) {
-			cloud := getAzureCloud(authorityHost)
-			// Just verify we got a result - we can't easily compare cloud configurations
-			_ = cloud
-		})
-	}
-}
