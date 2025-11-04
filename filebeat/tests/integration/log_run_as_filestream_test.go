@@ -20,6 +20,7 @@
 package integration
 
 import (
+	"fmt"
 	"path/filepath"
 	"slices"
 	"testing"
@@ -28,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-func TestStandaloneLogInputIgnoresRunAsFilestream(t *testing.T) {
+func TestLogAsFilestreamRunsLogInput(t *testing.T) {
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
@@ -70,7 +71,7 @@ func TestStandaloneLogInputIgnoresRunAsFilestream(t *testing.T) {
 	}
 }
 
-func TestStandaloneAsFilestreamFeatureFlag(t *testing.T) {
+func TestLogAsFilestreamFeatureFlag(t *testing.T) {
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
@@ -112,7 +113,7 @@ func TestStandaloneAsFilestreamFeatureFlag(t *testing.T) {
 	}
 }
 
-func TestStandaloneAsFilestreamFingerprint(t *testing.T) {
+func TestLogAsFilestreamSupportsFingerprint(t *testing.T) {
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
@@ -156,6 +157,67 @@ func TestStandaloneAsFilestreamFingerprint(t *testing.T) {
 			t.Errorf("Event %d: 'take_over' tag not present", i)
 		}
 	}
+}
+
+func TestLogAsFilestreamCanMigrateState(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	eventsCount := 50
+	logfile := filepath.Join(filebeat.TempDir(), "log.log")
+	integration.WriteLogFile(t, logfile, eventsCount, false, "")
+
+	cfg := getConfig(
+		t,
+		map[string]any{
+			"logfile": logfile,
+		},
+		filepath.Join("run_as_filestream"),
+		"run_as_log.yml")
+
+	// Write configuration file and start Filebeat
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	// Ensure the Log input is started
+	filebeat.WaitLogsContains(
+		"Log input running as Log input",
+		10*time.Second,
+		"Log input did not start",
+	)
+
+	filebeat.WaitPublishedEvents(5*time.Second, 50)
+
+	filebeat.Stop()
+
+	cfg = getConfig(
+		t,
+		map[string]any{
+			"logfile": logfile,
+		},
+		filepath.Join("run_as_filestream"),
+		"run_as_filestream.yml")
+
+	// Write configuration with the feature flag enabled
+	filebeat.WriteConfigFile(cfg)
+	filebeat.RemoveLogFiles()
+	filebeat.Start()
+
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", logfile),
+		5*time.Second,
+		"Filestream did not reach EOF")
+
+	// Ensure we still have 50 events in the output
+	filebeat.WaitPublishedEvents(time.Second, 50)
+
+	// Write more events
+	integration.WriteLogFile(t, logfile, 10, true)
+	// Ensure only the new events are ingested
+	filebeat.WaitPublishedEvents(15*time.Second, 60)
 }
 
 type BeatEvent struct {
