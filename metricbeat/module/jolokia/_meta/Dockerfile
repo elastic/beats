@@ -25,7 +25,6 @@ RUN retry --min 1 --max 180 -- curl -J -L -s -f --show-error -O \
     sha256sum -c jolokia.sum && \
     mv jolokia-war-${JOLOKIA_VERSION}.war /usr/${TC}/webapps/jolokia.war && rm jolokia.sum
 
-RUN ls -al /usr/lib/jvm
 
 # JMX setting to request authentication with remote connection
 RUN echo "monitorRole QED" >> /usr/lib/jvm/default-jvm/jre/lib/management/jmxremote.password && \
