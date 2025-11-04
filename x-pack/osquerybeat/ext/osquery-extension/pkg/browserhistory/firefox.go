@@ -28,7 +28,7 @@ type firefoxParser struct {
 	log      *logger.Logger
 }
 
-func newFirefoxParser(location searchLocation, log *logger.Logger) historyParser {
+func newFirefoxParser(_ context.Context, location searchLocation, log *logger.Logger) historyParser {
 	var profiles []*profile
 
 	// First, recursively search for profiles.ini files
