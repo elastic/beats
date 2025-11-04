@@ -14,11 +14,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/osquery/osquery-go/plugin/table"
+	"www.velocidex.com/golang/regparser"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	"github.com/osquery/osquery-go/plugin/table"
-	"www.velocidex.com/golang/regparser"
+
 )
 
 // GlobalState is an interface that defines methods for accessing global Amcache state.
@@ -27,8 +29,6 @@ type GlobalStateInterface interface {
 }
 
 type BaseEntry struct {
-	Timestamp time.Time `osquery:"timestamp" format:"unix"`
-	DateTime  time.Time `osquery:"date_time" format:"rfc3339" tz:"UTC"`
 }
 
 type Entry interface {
@@ -36,9 +36,6 @@ type Entry interface {
 	// It is used to perform any additional processing on the entry such as
 	// calculating derived fields or performing other cleanup.
 	PostProcess()
-
-	// SetTimestamp sets the timestamp for the entry
-	SetTimestamp(timestamp time.Time)
 }
 
 type TableName string
@@ -153,11 +150,6 @@ func MarshalEntries(entries []Entry) ([]map[string]string, error) {
 	return marshalled, nil
 }
 
-func (e *BaseEntry) SetTimestamp(timestamp time.Time) {
-	e.Timestamp = timestamp
-	e.DateTime = timestamp.Local()
-}
-
 // FillInEntryFromKey takes an any, and using the FieldMappings, populates its fields from a registry key.
 func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE, log *logger.Logger) {
 	// Get the element of the entry and make sure it is valid and can be set
@@ -189,12 +181,15 @@ func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE, log *logger.Logger)
 			switch value.ValueData().Type {
 			case regparser.REG_DWORD, regparser.REG_QWORD:
 				val := value.ValueData().Uint64
+				safeUint64ToInt64 := func(val uint64) int64 {
+					if val > math.MaxInt64 {
+						return math.MaxInt64
+					}
+					return int64(val)
+				}
 				// all integers in osquery are 64bit signed integers, but all registry values are unsigned
 				// so we need to convert the value to an int64 and check for overflow
-				if value.ValueData().Uint64 > math.MaxInt64 {
-					continue // Skip if value exceeds int64 range
-				}
-				field.SetInt(int64(val))
+				field.SetInt(safeUint64ToInt64(val))
 			}
 		// If the field is a string type, handle STRING, DWORD, and QWORD registry value types
 		case reflect.String:
@@ -230,7 +225,8 @@ func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE, log *logger.Logger)
 	}
 
 	// Set the timestamp for the entry
-	e.SetTimestamp(key.LastWriteTime().Time)
+	elem.FieldByName("Timestamp").Set(reflect.ValueOf(key.LastWriteTime().Time))
+	elem.FieldByName("DateTime").Set(reflect.ValueOf(key.LastWriteTime().Local()))
 
 	// Call the PostProcess method to perform any additional processing on the entry
 	e.PostProcess()

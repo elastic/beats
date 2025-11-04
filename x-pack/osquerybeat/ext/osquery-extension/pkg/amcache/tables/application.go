@@ -13,7 +13,8 @@ import (
 
 // ApplicationEntry represents a single entry in the amcache application table.
 type ApplicationEntry struct {
-	BaseEntry
+	Timestamp          time.Time `osquery:"timestamp" format:"unix"`
+	DateTime           time.Time `osquery:"date_time" format:"rfc3339" tz:"UTC"`
 	ProgramId          string    `osquery:"program_id"`
 	ProgramInstanceId  string    `osquery:"program_instance_id"`
 	Name               string    `osquery:"name"`

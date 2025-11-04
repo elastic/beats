@@ -9,14 +9,16 @@ package registry
 import (
 	"bytes"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	"github.com/forensicanalysis/fslib"
-	"github.com/forensicanalysis/fslib/systemfs"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
+
+	"github.com/forensicanalysis/fslib"
+	"github.com/forensicanalysis/fslib/systemfs"
 	"www.velocidex.com/golang/regparser"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 // ensureLogger ensures that a logger is provided. If no logger is provided,

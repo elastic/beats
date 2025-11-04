@@ -14,7 +14,8 @@ import (
 // ApplicationFileEntry represents a single entry in the amcache application file table.
 // located at Root\\InventoryApplicationFile
 type ApplicationFileEntry struct {
-	BaseEntry
+	Timestamp             time.Time `osquery:"timestamp" format:"unix"`
+	DateTime              time.Time `osquery:"date_time" format:"rfc3339" tz:"UTC"`
 	ProgramId             string    `osquery:"program_id"`
 	FileId                string    `osquery:"file_id"`
 	LowerCaseLongPath     string    `osquery:"lower_case_long_path"`
