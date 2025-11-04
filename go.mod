@@ -174,7 +174,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.8.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.0
-	github.com/elastic/elastic-agent-libs v0.24.1
+	github.com/elastic/elastic-agent-libs v0.24.1-0.20251103215058-03ca4525a4b6
 	github.com/elastic/elastic-agent-system-metrics v0.13.3
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
@@ -237,6 +237,7 @@ require (
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.19.0
+	github.com/mattn/go-sqlite3 v1.14.32
 	go.opentelemetry.io/collector/client v1.43.0
 	go.opentelemetry.io/collector/component/componenttest v0.137.0
 	go.opentelemetry.io/collector/confmap/xconfmap v0.137.0
