@@ -16,23 +16,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-// func TestLoadRegistry(t *testing.T) {
-// 	filePath := testdata.GetTestHivePathOrFatal(t)
-// 	registry, err := LoadRegistry(filePath)
-// 	if err != nil {
-// 		t.Fatalf("failed to load registry: %v", err)
-// 	}
-// 	if registry == nil {
-// 		t.Fatalf("registry is nil")
-// 	}
-// 	if len(registry.Subkeys()) == 0 {
-// 		t.Fatalf("registry has no subkeys")
-// 	}
-// 	if len(registry.Values()) == 0 {
-// 		t.Fatalf("registry has no values")
-// 	}
-// }
-
 func TestRecovery(t *testing.T) {
 	log := logger.New(os.Stdout, true)
 	filePath := testdata.GetRecoveryTestDataPathOrFatal(t)
@@ -53,37 +36,6 @@ func TestRecovery(t *testing.T) {
 		t.Fatalf("registry was recovered unexpectedly")
 	}
 }
-
-// func Test_getFileContents(t *testing.T) {
-// 	tests := []struct {
-// 		name string // description of this test case
-// 		// Named input parameters for target function.
-// 		filePath string
-// 		log      *logger.Logger
-// 		want     []byte
-// 		wantErr  bool
-// 	}{
-// 		// TODO: Add test cases.
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			got, gotErr := getFileContents(tt.filePath, tt.log)
-// 			if gotErr != nil {
-// 				if !tt.wantErr {
-// 					t.Errorf("getFileContents() failed: %v", gotErr)
-// 				}
-// 				return
-// 			}
-// 			if tt.wantErr {
-// 				t.Fatal("getFileContents() succeeded unexpectedly")
-// 			}
-// 			// TODO: update the condition below to compare got with tt.want.
-// 			if true {
-// 				t.Errorf("getFileContents() = %v, want %v", got, tt.want)
-// 			}
-// 		})
-// 	}
-// }
 
 func Test_findTransactionLogs(t *testing.T) {
 
@@ -120,47 +72,47 @@ func TestLoadRegistry(t *testing.T) {
 	log := logger.New(os.Stdout, true)
 
 	tests := []struct {
-		name string // description of this test case
-		filePath string
-		wantRecovered    bool
-		wantErr      bool	
+		name          string // description of this test case
+		filePath      string
+		wantRecovered bool
+		wantErr       bool
 	}{
 		//
 		{
-			name: "recovery test data", 
-			filePath: testdata.GetRecoveryTestDataPathOrFatal(t),
+			name:          "recovery test data",
+			filePath:      testdata.GetRecoveryTestDataPathOrFatal(t),
 			wantRecovered: true,
-			wantErr: false,
+			wantErr:       false,
 		},
 		{
-			name: "regular test data", 
-			filePath: testdata.GetTestHivePathOrFatal(t),
+			name:          "regular test data",
+			filePath:      testdata.GetTestHivePathOrFatal(t),
 			wantRecovered: false,
-			wantErr: false,
+			wantErr:       false,
 		},
 		{
-			name: "empty file path",
-			filePath: "",
+			name:          "empty file path",
+			filePath:      "",
 			wantRecovered: false,
-			wantErr: true,
+			wantErr:       true,
 		},
 		{
-			name: "invalid file path",
-			filePath: "invalid/path",
+			name:          "invalid file path",
+			filePath:      "invalid/path",
 			wantRecovered: false,
-			wantErr: true,
+			wantErr:       true,
 		},
 		{
-			name: "valid file not registry",
-			filePath: filepath.Join(testdata.GetTestDataDirectoryOrFatal(t), "not_a_registry.txt"),
+			name:          "valid file not registry",
+			filePath:      filepath.Join(testdata.GetTestDataDirectoryOrFatal(t), "not_a_registry.txt"),
 			wantRecovered: false,
-			wantErr: true,
+			wantErr:       true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			registry, gotRecovered, err := LoadRegistry(tt.filePath, log)
-            gotErr := err != nil
+			gotErr := err != nil
 
 			if gotErr != tt.wantErr {
 				t.Errorf("%s: LoadRegistry() failed: errorExpected: %v, gotErr: %v", tt.name, tt.wantErr, err)

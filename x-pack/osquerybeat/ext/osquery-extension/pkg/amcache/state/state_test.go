@@ -8,13 +8,12 @@ package state
 
 import (
 	"os"
-//	"reflect"
-	"testing"
 	"strings"
+	"testing"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/testdata"	
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/testdata"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	"github.com/osquery/osquery-go/plugin/table"
@@ -23,21 +22,21 @@ import (
 func TestCachingBehavior(t *testing.T) {
 	log := logger.New(os.Stdout, true)
 	tests := []struct {
-		name string // description of this test case
-		filePath string
-		wantRecovered    bool
-		wantErr      bool	
+		name          string // description of this test case
+		filePath      string
+		wantRecovered bool
+		wantErr       bool
 	}{
 		//
 		{
-			name: "recovery test data", 
+			name:     "recovery test data",
 			filePath: testdata.GetRecoveryTestDataPathOrFatal(t),
-			wantErr: false,
+			wantErr:  false,
 		},
 		{
-			name: "regular test data", 
+			name:     "regular test data",
 			filePath: testdata.GetTestHivePathOrFatal(t),
-			wantErr: false,
+			wantErr:  false,
 		},
 	}
 
@@ -45,9 +44,7 @@ func TestCachingBehavior(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create a new state with the test data
 			newState := newAmcacheGlobalState(tt.filePath, defaultExpirationDuration)
-			if newState == nil {
-				t.Errorf("Expected newState to be initialized")
-			}
+
 			// Check the state configuration
 			if newState.HivePath != tt.filePath {
 				t.Errorf("%s: Expected hive path %s, got %s", tt.name, tt.filePath, newState.HivePath)
@@ -83,9 +80,6 @@ func TestCachingBehavior(t *testing.T) {
 func TestGetCachedEntries(t *testing.T) {
 	log := logger.New(os.Stdout, true)
 	state := newAmcacheGlobalState(testdata.GetTestHivePathOrFatal(t), defaultExpirationDuration)
-	if state == nil {
-		t.Errorf("Expected newState to be initialized")
-	}
 
 	if !state.LastUpdated.IsZero() {
 		t.Errorf("Expected lastUpdated to be zero initially, got %v", state.LastUpdated)
@@ -116,7 +110,7 @@ func TestGetCachedEntries(t *testing.T) {
 	filters := []filters.Filter{
 		{
 			ColumnName: "name",
-			Operator: table.OperatorLike,
+			Operator:   table.OperatorLike,
 			Expression: "%Microsoft%",
 		},
 	}
@@ -132,7 +126,12 @@ func TestGetCachedEntries(t *testing.T) {
 	}
 
 	for _, entry := range filteredEntries {
-		name := entry.(*tables.ApplicationEntry).Name
+		appEntry, ok := entry.(*tables.ApplicationEntry)
+		if !ok {
+			t.Errorf("Expected entry to be a ApplicationEntry, got %T", entry)
+			continue
+		}
+		name := appEntry.Name
 		if !strings.Contains(name, "Microsoft") {
 			t.Errorf("Expected entry %s to contain Microsoft", name)
 		}
@@ -141,12 +140,12 @@ func TestGetCachedEntries(t *testing.T) {
 
 func TestGetCachedEntriesForcesUpdate(t *testing.T) {
 	log := logger.New(os.Stdout, true)
-	state := newAmcacheGlobalState(testdata.GetTestHivePathOrFatal(t), 3 * time.Minute)
+	state := newAmcacheGlobalState(testdata.GetTestHivePathOrFatal(t), 3*time.Minute)
 
 	if !state.IsExpired() {
 		t.Errorf("Expected state to be expired, got %v", state.LastUpdated)
 	}
-	
+
 	err := state.Update(log)
 	if err != nil {
 		t.Errorf("Expected Update to succeed, got error: %v", err)
