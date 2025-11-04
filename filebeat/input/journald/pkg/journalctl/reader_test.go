@@ -51,8 +51,8 @@ func TestEventWithNonStringData(t *testing.T) {
 	for idx, rawEvent := range testCases {
 		t.Run(fmt.Sprintf("test %d", idx), func(t *testing.T) {
 			mock := JctlMock{
-				NextFunc: func(canceler input.Canceler) ([]byte, bool, error) {
-					return rawEvent, false, nil
+				NextFunc: func(canceler input.Canceler) ([]byte, error) {
+					return rawEvent, nil
 				},
 			}
 			r := Reader{
@@ -76,8 +76,8 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	ctx := context.Background()
 
 	mock := JctlMock{
-		NextFunc: func(canceler input.Canceler) ([]byte, bool, error) {
-			return jdEvent, false, errors.New("journalctl exited with code 42")
+		NextFunc: func(canceler input.Canceler) ([]byte, error) {
+			return jdEvent, errors.New("journalctl exited with code 42")
 		},
 	}
 
@@ -94,8 +94,8 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 
 		// If calls have been made, change the Next function to always succeed
 		// and return it
-		mock.NextFunc = func(canceler input.Canceler) ([]byte, bool, error) {
-			return jdEvent, false, nil
+		mock.NextFunc = func(canceler input.Canceler) ([]byte, error) {
+			return jdEvent, nil
 		}
 
 		return &mock, nil
