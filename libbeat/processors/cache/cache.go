@@ -126,7 +126,7 @@ type CacheEntry struct {
 // Run enriches the given event with the host metadata.
 func (p *cache) Run(event *beat.Event) (*beat.Event, error) {
 	if p.store == nil {
-		return nil, fmt.Errorf("uninitialized cache store")
+		return event, fmt.Errorf("uninitialized cache store")
 	}
 
 	switch {
@@ -277,7 +277,9 @@ func (p *cache) deleteFor(event *beat.Event) error {
 }
 
 func (p *cache) Close() error {
-	p.cancel()
+	if p.cancel != nil {
+		p.cancel()
+	}
 	return nil
 }
 

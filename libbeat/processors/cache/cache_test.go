@@ -23,11 +23,14 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type cacheTestStep struct {
@@ -584,6 +587,16 @@ func TestCache(t *testing.T) {
 					t.Fatalf("processor %d is not an *cache", i)
 				}
 
+				// Initialize the store with paths
+				tmpDir := t.TempDir()
+				err = c.SetPaths(&paths.Path{
+					Home:   tmpDir,
+					Config: tmpDir,
+					Data:   tmpDir,
+					Logs:   tmpDir,
+				})
+				require.NoError(t, err)
+
 				defer func() {
 					err := c.Close()
 					if err != nil {
@@ -620,4 +633,33 @@ func TestCache(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSetPathsUninitialized(t *testing.T) {
+	cfg, err := conf.NewConfigFrom(mapstr.M{
+		"backend": mapstr.M{
+			"memory": mapstr.M{
+				"id": "test",
+			},
+		},
+		"get": mapstr.M{
+			"key_field":    "key",
+			"target_field": "target",
+		},
+	})
+	require.NoError(t, err)
+
+	p, err := New(cfg, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	c, ok := p.(*cache)
+	require.True(t, ok)
+	defer func() {
+		require.NoError(t, c.Close())
+	}()
+
+	// Try to use without SetPaths - should fail
+	event, err := c.Run(&beat.Event{})
+	assert.NotNil(t, event)
+	require.ErrorContains(t, err, "uninitialized cache store")
 }
