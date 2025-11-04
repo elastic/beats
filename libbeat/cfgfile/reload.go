@@ -216,7 +216,18 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			// can be retried.
 			// Errors are already logged by list.Reload, so we don't need to
 			// propagate details any further.
+<<<<<<< HEAD
 			forceReload = err != nil
+=======
+			forceReload = common.IsInputReloadable(err)
+			if forceReload {
+				rl.logger.Debugf("error '%v' can be retried. Will try again in %s", err, rl.config.Reload.Period.String())
+			} else {
+				if err != nil {
+					rl.logger.Debugf("error '%v' cannot retried. Modify any input file to reload.", err)
+				}
+			}
+>>>>>>> 9c4239e13 ([libbeat] Input reload: do not log error if error is nil (#47422))
 		}
 
 		// Path loading is enabled but not reloading. Loads files only once and then stops.
