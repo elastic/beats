@@ -135,9 +135,6 @@ func (in *eventHubInputV2) Run(
 
 // setup initializes the components needed to process events.
 func (in *eventHubInputV2) setup(ctx context.Context) error {
-	// DEBUG: setup method called
-	in.log.Infof("------- DEBUG: setup method called")
-
 	sanitizers, err := newSanitizers(in.config.Sanitizers, in.config.LegacySanitizeOptions)
 	if err != nil {
 		return fmt.Errorf("failed to create sanitizers: %w", err)
@@ -158,15 +155,13 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		authType = AuthTypeConnectionString
 	}
 
-	// DEBUG: authType determined
-	in.log.Infof("-----DEBUG: authType = %s", authType)
 	// Create the credential if needed (shared by both Event Hub and Storage Account)
 	// Both services use the same credential since they share the same auth_type
 	var credential azcore.TokenCredential
-	// Create the container client
-	var containerClient *container.Client
 	// Create the event hub consumerClient to receive events.
 	var consumerClient *azeventhubs.ConsumerClient
+	// Create the container client
+	var containerClient *container.Client
 
 	useCredentials := authType == AuthTypeClientSecret
 	if useCredentials {
@@ -197,7 +192,7 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 			return fmt.Errorf("failed to create consumer client with credential: %w", err)
 		}
 
-		// Use credential-based authentication for storage account
+		// Use credential-based authentication for the storage account
 		containerClient, err = newStorageContainerClient(
 			storageContainerClientConfig{
 				StorageAccount: in.config.SAName,

@@ -10,6 +10,7 @@ import (
 	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -28,7 +29,7 @@ type authConfig struct {
 	// - Otherwise, defaults to client_secret
 	AuthType string
 
-	// Connection string authentication (legacy)
+	// Connection string authentication
 	ConnectionString string
 
 	// Client secret authentication
@@ -39,8 +40,6 @@ type authConfig struct {
 }
 
 // newCredential creates a new TokenCredential based on the configured auth type.
-// This function is not required right now for only supporting client_secret.
-// But we will need it once we start supporting more auth types.
 func newCredential(config authConfig, authType string, log *logp.Logger) (azcore.TokenCredential, error) {
 	switch authType {
 	case AuthTypeConnectionString:
@@ -48,6 +47,8 @@ func newCredential(config authConfig, authType string, log *logp.Logger) (azcore
 		// This is handled separately in the client creation
 		return nil, fmt.Errorf("connection_string authentication does not use TokenCredential")
 	case AuthTypeClientSecret:
+		// This function is not required right now for only supporting client_secret.
+		// But we will need it once we start supporting more auth types.
 		return newClientSecretCredential(config, log)
 	default:
 		return nil, fmt.Errorf("unknown auth_type: %s (valid values: connection_string, client_secret)", authType)
