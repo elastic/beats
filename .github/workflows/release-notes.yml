@@ -1,0 +1,26 @@
+name: Generate release notes
+
+on:
+  workflow_dispatch:
+    inputs:
+      bc_commit_sha:
+        description: 'Commit SHA for the build candidate'
+        type: string
+        required: true
+      version:
+        description: 'Version to be released (for example, `9.2.1`)'
+        type: string
+        required: true
+
+jobs:
+  build-release-notes:
+    uses: elastic/elastic-agent-changelog-tool/.github/workflows/generate-release-notes.yml@main
+    with:
+      product: Beats
+      labels: docs,forwardport-main,release,skip-changelog,Team:Docs
+      bc_commit_sha: ${{ inputs.bc_commit_sha }}
+      version: ${{ inputs.version }}
+      release_manager: ${{ github.triggering_actor }}
+    permissions:
+      contents: write
+      pull-requests: write
