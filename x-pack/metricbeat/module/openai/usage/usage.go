@@ -86,7 +86,7 @@ func (m *MetricSet) SetPaths(p *paths.Path) error {
 
 	sm, err := newStateManager(p.Resolve(
 		paths.Data,
-		path.Join("state", m.Module().Name(), m.BaseMetricSet.Name()),
+		path.Join("state", m.Module().Name(), m.Name()),
 	))
 	if err != nil {
 		return fmt.Errorf("new state manager for %s: %w", p.String(), err)
