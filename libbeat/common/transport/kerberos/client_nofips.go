@@ -23,10 +23,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/elastic/gokrb5/v8/spnego"
 	krbclient "github.com/jcmturner/gokrb5/v8/client"
 	krbconfig "github.com/jcmturner/gokrb5/v8/config"
 	"github.com/jcmturner/gokrb5/v8/keytab"
+
+	"github.com/elastic/gokrb5/v8/spnego"
 )
 
 func NewClient(config *Config, httpClient *http.Client, esurl string) (Client, error) {
