@@ -383,7 +383,6 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	// setup 8: pipeline processors list
 	if b.processors != nil {
 		// Add the global pipeline as a function processor, so clients cannot close it
-		b.processors.SetPaths(cfg.Paths)
 		processors.add(newProcessor(b.processors.title, b.processors.Run))
 	}
 
@@ -400,6 +399,11 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	// setup 11: drop all events if outputs are disabled (P)
 	if drop {
 		processors.add(dropDisabledProcessor)
+	}
+
+	err := processors.SetPaths(cfg.Paths)
+	if err != nil {
+		return nil, fmt.Errorf("failed to set paths for processing pipeline: %w", err)
 	}
 
 	return processors, nil

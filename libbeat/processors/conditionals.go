@@ -49,13 +49,6 @@ type WhenProcessor struct {
 	p         beat.Processor
 }
 
-func (p *WhenProcessor) SetPaths(paths *paths.Path) {
-	setPather, ok := p.p.(setPaths)
-	if ok {
-		setPather.SetPaths(paths)
-	}
-}
-
 // NewConditionRule returns a processor that will execute the provided processor if the condition is true.
 func NewConditionRule(
 	c conditions.Config,
@@ -85,6 +78,14 @@ func (r *WhenProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	return r.p.Run(event)
 }
 
+func (r *WhenProcessor) SetPaths(paths *paths.Path) error {
+	setPather, ok := r.p.(setPaths)
+	if ok {
+		return setPather.SetPaths(paths)
+	}
+	return nil
+}
+
 func (r *WhenProcessor) String() string {
 	return fmt.Sprintf("%v, condition=%v", r.p.String(), r.condition.String())
 }
@@ -94,7 +95,7 @@ func (r *WhenProcessor) String() string {
 // processors, one with `Close` and one without.  The decision of
 // which to return is determined if the underlying processors require
 // `Close`.  This is useful because some places in the code base
-// (eg. javascript processors) require stateless processors (no Close
+// (e.g. javascript processors) require stateless processors (no Close
 // method).
 type ClosingWhenProcessor struct {
 	WhenProcessor

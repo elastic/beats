@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"sync"
 	"sync/atomic"
 	"time"
 
@@ -58,7 +57,6 @@ type cache struct {
 	store  Store
 	cancel context.CancelFunc
 	log    *logp.Logger
-	once   sync.Once
 }
 
 // Resulting processor implements `Close()` to release the cache resources.
@@ -74,6 +72,7 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 
 	return &cache{
 		config: config,
+		store:  nil, // initialized in SetPaths
 		log:    log,
 	}, nil
 }
@@ -126,7 +125,9 @@ type CacheEntry struct {
 
 // Run enriches the given event with the host metadata.
 func (p *cache) Run(event *beat.Event) (*beat.Event, error) {
-	p.SetPaths(paths.Paths) // set default if paths is not initialized
+	if p.store == nil {
+		return nil, fmt.Errorf("uninitialized cache store")
+	}
 
 	switch {
 	case p.config.Put != nil:
@@ -177,19 +178,17 @@ func (p *cache) Run(event *beat.Event) (*beat.Event, error) {
 	}
 }
 
-func (p *cache) SetPaths(path *paths.Path) {
-	p.once.Do(func() {
-		src, cancel, err := getStoreFor(p.config, p.log, path)
-		if err != nil {
-			p.log.Errorf("error getting store for %s: %v", name, err)
-			return
-		}
+func (p *cache) SetPaths(path *paths.Path) error {
+	src, cancel, err := getStoreFor(p.config, p.log, path)
+	if err != nil {
+		return fmt.Errorf("cache processor could not create store for %s: %w", name, err)
+	}
 
-		p.store = src
-		p.cancel = cancel
+	p.store = src
+	p.cancel = cancel
 
-		p.log.Infow("initialized cache processor", "details", p)
-	})
+	p.log.Infow("initialized cache processor", "details", p)
+	return nil
 }
 
 // putFrom takes the configured value from the event and stores it in the cache

@@ -53,14 +53,15 @@ func (p *SafeProcessor) Close() (err error) {
 
 // TODO: common
 type setPaths interface {
-	SetPaths(*paths.Path)
+	SetPaths(*paths.Path) error
 }
 
-func (p *SafeProcessor) SetPaths(paths *paths.Path) {
+func (p *SafeProcessor) SetPaths(paths *paths.Path) error {
 	setPather, ok := p.Processor.(setPaths)
 	if ok {
-		setPather.SetPaths(paths)
+		return setPather.SetPaths(paths)
 	}
+	return nil
 }
 
 // SafeWrap makes sure that the processor handles all the required edge-cases.
