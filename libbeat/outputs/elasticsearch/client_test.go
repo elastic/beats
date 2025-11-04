@@ -1024,7 +1024,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 			im, err := idxmgmt.DefaultSupport(info, c.NewConfig())
 			require.NoError(t, err)
 
-			index, pipeline, err := BuildSelectors(im, info, cfg)
+			index, pipeline, err := buildSelectors(im, info, cfg)
 			require.NoError(t, err)
 
 			client, err := NewClient(
@@ -1095,7 +1095,7 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 	im, err := idxmgmt.DefaultSupport(info, c.NewConfig())
 	require.NoError(t, err)
 
-	index, pipeline, err := BuildSelectors(im, info, cfg)
+	index, pipeline, err := buildSelectors(im, info, cfg)
 	require.NoError(t, err)
 
 	client, _ := NewClient(

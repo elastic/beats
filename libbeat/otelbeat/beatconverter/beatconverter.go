@@ -74,7 +74,6 @@ func (c Converter) Convert(_ context.Context, conf *confmap.Conf) error {
 			return fmt.Errorf("multiple outputs are not supported")
 		}
 
-		var otelconsumerOptions map[string]any
 		for key, output := range output.ToStringMap() {
 			switch key {
 			case "logstash":
@@ -113,11 +112,6 @@ func (c Converter) Convert(_ context.Context, conf *confmap.Conf) error {
 				}
 
 			case "elasticsearch":
-				if pipelines, ok := output.(map[string]any)["pipelines"]; ok {
-					otelconsumerOptions = map[string]any{
-						"pipelines": pipelines,
-					}
-				}
 				esConfig := config.MustNewConfigFrom(output)
 				// we use development logger here as this method is part of dev-only otel command
 				logger, _ := logp.NewDevelopmentLogger("")
@@ -175,10 +169,6 @@ func (c Converter) Convert(_ context.Context, conf *confmap.Conf) error {
 		}
 		out = map[string]any{
 			beatReceiverConfigKey + "::output::otelconsumer": nil,
-		}
-
-		if otelconsumerOptions != nil {
-			out[beatReceiverConfigKey+"::output::otelconsumer"] = otelconsumerOptions
 		}
 
 		// inject log level

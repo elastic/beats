@@ -16,7 +16,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -52,14 +51,9 @@ type otelConsumer struct {
 	pipelineSelector *outil.Selector
 }
 
-func makeOtelConsumer(im outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
+func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
 	ocConfig := defaultConfig()
 	if err := cfg.Unpack(&ocConfig); err != nil {
-		return outputs.Fail(err)
-	}
-
-	_, pipelineSelector, err := elasticsearch.BuildSelectors(im, beat, cfg)
-	if err != nil {
 		return outputs.Fail(err)
 	}
 
@@ -69,12 +63,11 @@ func makeOtelConsumer(im outputs.IndexManager, beat beat.Info, observer outputs.
 	clients := make([]outputs.Client, 0, runtime.NumCPU())
 	for range runtime.NumCPU() {
 		clients = append(clients, &otelConsumer{
-			observer:         observer,
-			logsConsumer:     beat.LogConsumer,
-			beatInfo:         beat,
-			log:              beat.Logger.Named("otelconsumer"),
-			isReceiverTest:   isReceiverTest,
-			pipelineSelector: pipelineSelector,
+			observer:       observer,
+			logsConsumer:   beat.LogConsumer,
+			beatInfo:       beat,
+			log:            beat.Logger.Named("otelconsumer"),
+			isReceiverTest: isReceiverTest,
 		})
 	}
 
@@ -114,12 +107,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	for _, event := range events {
 		logRecord := logRecords.AppendEmpty()
 
-		if out.pipelineSelector != nil {
-			if pipeline, err := out.pipelineSelector.Select(&event.Content); pipeline != "" && err == nil {
-				logRecord.Attributes().PutStr("elasticsearch.ingest_pipeline", pipeline)
-			}
-		}
-
 		if id, ok := event.Content.Meta["_id"]; ok {
 			// Specify the id as an attribute used by the elasticsearchexporter
 			// to set the final document ID in Elasticsearch.
@@ -137,6 +124,13 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 				if out.isReceiverTest {
 					logRecord.Attributes().PutStr(receivertest.UniqueIDAttrName, id)
 				}
+			}
+		}
+
+		// if pipeline field is set on event metadata
+		if pipeline, err := event.Content.Meta.GetValue("pipeline"); err == nil {
+			if s, ok := pipeline.(string); ok {
+				logRecord.Attributes().PutStr("elasticsearch.ingest_pipeline", s)
 			}
 		}
 
