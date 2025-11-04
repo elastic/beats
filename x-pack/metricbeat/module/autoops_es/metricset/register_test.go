@@ -490,20 +490,17 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 				assert.Equal(t, "/api/v1/cloud-connected/clusters", r.URL.Path)
 				assert.Equal(t, "ApiKey test-api-key", r.Header.Get("Authorization"))
 
-				if tc.clusterSettings != nil {
-					expectedName := "my-cluster" // default unless overridden by settings
+				expectedName := "my-cluster" // default unless overridden by settings
 
+				if tc.clusterSettings != nil {
 					if tc.clusterSettings.Transient.Cluster.Metadata.DisplayName != "" {
 						expectedName = tc.clusterSettings.Transient.Cluster.Metadata.DisplayName
 					} else if tc.clusterSettings.Persistent.Cluster.Metadata.DisplayName != "" {
 						expectedName = tc.clusterSettings.Persistent.Cluster.Metadata.DisplayName
 					}
-
-					assert.Equal(t, expectedName, cloudConnectedCluster.Cluster.Name)
-				} else {
-					assert.Equal(t, "my-cluster", cloudConnectedCluster.Cluster.Name)
 				}
 
+				assert.Equal(t, expectedName, cloudConnectedCluster.Cluster.Name)
 				assert.Equal(t, "id123", cloudConnectedCluster.Cluster.ID)
 				assert.Equal(t, tc.clusterInfo.Version.Number.String(), cloudConnectedCluster.Cluster.Version)
 				assert.Equal(t, "id456", cloudConnectedCluster.License.UID)
