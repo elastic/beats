@@ -8,8 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
-	"go.uber.org/multierr"
 )
 
 // Parser is generated from a ragel state machine using the following command:
@@ -131,15 +129,14 @@ func (e *Event) Unpack(data string, opts ...Option) error {
 	}
 
 	var errs []error
-	var err error
-	if err = e.unpack(data); err != nil {
-		errs = append(errs, err)
+	if recoveredErrs := e.unpack(data); recoveredErrs != nil {
+		errs = append(errs, recoveredErrs...)
 		if len(e.Extensions) == 0 {
 			// We must have failed in the headers,
 			// so go back for the extensions.
-			err = e.recoverExtensions(data)
-			if err != nil {
-				errs = append(errs, err)
+			recoveredErrs = e.recoverExtensions(data)
+			if recoveredErrs != nil {
+				errs = append(errs, recoveredErrs...)
 			}
 		}
 	}
@@ -159,6 +156,7 @@ func (e *Event) Unpack(data string, opts ...Option) error {
 			continue
 		}
 
+		var err error
 		field.Interface, err = toType(field.String, mapping.Type, &settings)
 		if err != nil {
 			// Drop the key because the field value is invalid.
@@ -174,7 +172,7 @@ func (e *Event) Unpack(data string, opts ...Option) error {
 		}
 	}
 
-	return multierr.Combine(errs...)
+	return errors.Join(errs...)
 }
 
 type escapePosition struct {
