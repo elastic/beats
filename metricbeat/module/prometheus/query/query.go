@@ -78,9 +78,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
+	m.Logger().Debugf("Running queries. There are %d queries to run", len(m.queries))
 	for _, pathConfig := range m.queries {
 		url := m.getURL(pathConfig.Path, pathConfig.Params)
 		m.http.SetURI(url)
+
+		m.Logger().Debugf("Running query. URL: %s", url)
 		response, err := m.http.FetchResponse()
 		if err != nil {
 			reporter.Error(fmt.Errorf("unable to fetch data from prometheus endpoint %v: %w", url, err))
@@ -105,9 +108,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		events, parseErr := parseResponse(body, pathConfig)
 		if parseErr != nil {
+			m.Logger().Debugf("error parsing prometheus response %v: %v", url, parseErr)
 			reporter.Error(fmt.Errorf("error parsing response from %v: %w", url, parseErr))
 			continue
 		}
+
+		m.Logger().Debugf("Fetched %d metric(s) from %s", len(events), url)
+
 		for _, e := range events {
 			reporter.Event(e)
 		}
