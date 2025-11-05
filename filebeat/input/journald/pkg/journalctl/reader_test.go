@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 //go:embed testdata/corner-cases.json
@@ -72,7 +73,7 @@ func TestEventWithNonStringData(t *testing.T) {
 var jdEvent []byte
 
 func TestRestartsJournalctlOnError(t *testing.T) {
-	logp.DevelopmentSetup(logp.ToObserverOutput())
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
 	ctx := context.Background()
 
 	mock := JctlMock{
@@ -101,7 +102,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		return &mock, nil
 	}
 
-	reader, err := New(logp.L(), ctx, nil, nil, nil, journalfield.IncludeMatches{}, []int{}, SeekHead, "", 0, "", false, factory)
+	reader, err := New(logger, ctx, nil, nil, nil, journalfield.IncludeMatches{}, []int{}, SeekHead, "", 0, "", false, factory)
 	if err != nil {
 		t.Fatalf("cannot instantiate journalctl reader: %s", err)
 	}
@@ -130,7 +131,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	//  - reader error: 'journalctl exited with code 42', restarting...
 	//  - starting new mock journalclt ID: 2
 
-	logs := logp.ObserverLogs().TakeAll()
+	logs := observedLogs.TakeAll()
 	if len(logs) != 3 {
 		t.Fatalf("expecting 3 log lines from 'input.journald.reader.journalctl-runner', got %d", len(logs))
 	}
