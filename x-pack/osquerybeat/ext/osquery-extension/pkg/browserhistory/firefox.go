@@ -8,6 +8,7 @@ import (
 	"bufio"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -15,7 +16,6 @@ import (
 	"strings"
 
 	"github.com/osquery/osquery-go/plugin/table"
-	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
@@ -87,7 +87,7 @@ func (parser *firefoxParser) parse(ctx context.Context, queryContext table.Query
 		}
 		vs, err := parser.parseProfile(ctx, queryContext, profile)
 		if err != nil {
-			merr = multierr.Append(merr, err)
+			merr = errors.Join(merr, err)
 			continue
 		}
 		visits = append(visits, vs...)
