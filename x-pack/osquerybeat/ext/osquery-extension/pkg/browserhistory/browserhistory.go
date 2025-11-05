@@ -6,13 +6,13 @@ package browserhistory
 
 import (
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/osquery/osquery-go/plugin/table"
-	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
@@ -59,7 +59,7 @@ func GetTableRows(ctx context.Context, queryContext table.QueryContext, log *log
 		for _, parser := range parsers {
 			visits, err := parser.parse(ctx, queryContext, filters)
 			if err != nil {
-				merr = multierr.Append(merr, err)
+				merr = errors.Join(merr, err)
 			}
 			if len(visits) == 0 {
 				continue
@@ -68,7 +68,7 @@ func GetTableRows(ctx context.Context, queryContext table.QueryContext, log *log
 			for i, visit := range visits {
 				mvisit, err := encoding.MarshalToMap(visit)
 				if err != nil {
-					merr = multierr.Append(merr, err)
+					merr = errors.Join(merr, err)
 					continue
 				}
 				rows[i] = mvisit
