@@ -13,8 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
-
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
@@ -154,109 +152,49 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 
 	// Create the credential if needed (shared by both Event Hub and Storage Account)
 	// Both services use the same credential since they share the same auth_type
-	var credential azcore.TokenCredential
+	credConfig := authConfig{
+		AuthType:      authType,
+		TenantID:      in.config.TenantID,
+		ClientID:      in.config.ClientID,
+		ClientSecret:  in.config.ClientSecret,
+		AuthorityHost: in.config.AuthorityHost,
+	}
+	credential, err := newCredential(credConfig, authType, in.log)
+	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating credential: %s", err.Error()))
+		return fmt.Errorf("failed to create credential: %w", err)
+	}
+
 	// Create the event hub consumerClient to receive events.
-	var consumerClient *azeventhubs.ConsumerClient
+	consumerClient, err := newEventHubConsumerClient(
+		eventHubClientConfig{
+			Namespace:     in.config.EventHubNamespace,
+			EventHubName:  in.config.EventHubName,
+			ConsumerGroup: in.config.ConsumerGroup,
+			Credential:    credential,
+		},
+		authType,
+		in.log,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create consumer client with credential: %w", err)
+	}
+
 	// Create the container client
-	var containerClient *container.Client
-
-	useCredentials := authType == AuthTypeClientSecret
-	if useCredentials {
-		credConfig := authConfig{
-			AuthType:      authType,
-			TenantID:      in.config.TenantID,
-			ClientID:      in.config.ClientID,
-			ClientSecret:  in.config.ClientSecret,
-			AuthorityHost: in.config.AuthorityHost,
-		}
-
-		credential, err = newCredential(credConfig, authType, in.log)
-		if err != nil {
-			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating credential: %s", err.Error()))
-			return fmt.Errorf("failed to create credential: %w", err)
-		}
-
-		consumerClient, err = newEventHubConsumerClient(
-			eventHubClientConfig{
-				Namespace:     in.config.EventHubNamespace,
-				EventHubName:  in.config.EventHubName,
-				ConsumerGroup: in.config.ConsumerGroup,
-				Credential:    credential,
-			},
-			in.log,
-		)
-		if err != nil {
-			return fmt.Errorf("failed to create consumer client with credential: %w", err)
-		}
-
-		// Use credential-based authentication for the storage account
-		containerClient, err = newStorageContainerClient(
-			storageContainerClientConfig{
-				StorageAccount: in.config.SAName,
-				Container:      in.config.SAContainer,
-				Credential:     credential,
-				Cloud:          getAzureCloud(in.config.AuthorityHost),
-			},
-			authType,
-			in.log,
-		)
-		if err != nil {
-			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating blob container client with credential: %s", err.Error()))
-			return fmt.Errorf("failed to create blob container client with credential: %w", err)
-		}
-	} else {
-		// Use connection string authentication for Event Hub
-		// There is a mismatch between how the azure-eventhub input and the new
-		// Event Hub SDK expect the event hub name in the connection string.
-		//
-		// The azure-eventhub input was designed to work with the old Event Hub SDK,
-		// which worked using the event hub name in the connection string.
-		//
-		// The new Event Hub SDK expects clients to pass the event hub name as a
-		// parameter, or in the connection string as the entity path.
-		//
-		// We need to handle both cases.
-		eventHubName := in.config.EventHubName
-
-		connectionStringProperties, err := parseConnectionString(in.config.ConnectionString)
-		if err != nil {
-			return fmt.Errorf("failed to parse connection string: %w", err)
-		}
-		if connectionStringProperties.EntityPath != nil {
-			// If the connection string contains an entity path, we need to
-			// set the event hub name to an empty string.
-			//
-			// This is a requirement of the new Event Hub SDK.
-			//
-			// See: https://github.com/Azure/azure-sdk-for-go/blob/4ece3e50652223bba502f2b73e7f297de34a799c/sdk/messaging/azeventhubs/producer_client.go#L304-L306
-			eventHubName = ""
-		}
-
-		consumerClient, err = newEventHubConsumerClient(
-			eventHubClientConfig{
-				ConnectionString: in.config.ConnectionString,
-				EventHubName:     eventHubName,
-				ConsumerGroup:    in.config.ConsumerGroup,
-			},
-			in.log,
-		)
-		if err != nil {
-			return fmt.Errorf("failed to create consumer client: %w", err)
-		}
-
-		containerClient, err = newStorageContainerClient(
-			storageContainerClientConfig{
-				ConnectionString: in.config.SAConnectionString,
-				Container:        in.config.SAContainer,
-				Cloud:            cloud.AzurePublic,
-			},
-			authType,
-			in.log,
-		)
-		if err != nil {
-			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating blob container client: %s", err.Error()))
-			return fmt.Errorf("failed to create blob container client: %w", err)
-		}
+	containerClient, err := newStorageContainerClient(
+		storageContainerClientConfig{
+			ConnectionString: in.config.SAConnectionString,
+			StorageAccount:   in.config.SAName,
+			Container:        in.config.SAContainer,
+			Credential:       credential,
+			Cloud:            getAzureCloud(in.config.AuthorityHost),
+		},
+		authType,
+		in.log,
+	)
+	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating blob container client with credential: %s", err.Error()))
+		return fmt.Errorf("failed to create blob container client with credential: %w", err)
 	}
 
 	// The modern event hub SDK does not create the container

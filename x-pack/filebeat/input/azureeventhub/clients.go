@@ -27,8 +27,33 @@ type eventHubClientConfig struct {
 }
 
 // newEventHubConsumerClient creates a new Event Hub consumer client using the provided credential or connection string.
-func newEventHubConsumerClient(config eventHubClientConfig, log *logp.Logger) (*azeventhubs.ConsumerClient, error) {
-	if config.ConnectionString != "" {
+func newEventHubConsumerClient(config eventHubClientConfig, authType string, log *logp.Logger) (*azeventhubs.ConsumerClient, error) {
+	if authType == AuthTypeConnectionString {
+		// Use connection string authentication for Event Hub
+		// There is a mismatch between how the azure-eventhub input and the new
+		// Event Hub SDK expect the event hub name in the connection string.
+		//
+		// The azure-eventhub input was designed to work with the old Event Hub SDK,
+		// which worked using the event hub name in the connection string.
+		//
+		// The new Event Hub SDK expects clients to pass the event hub name as a
+		// parameter, or in the connection string as the entity path.
+		//
+		// We need to handle both cases.
+		connectionStringProperties, err := parseConnectionString(config.ConnectionString)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse connection string: %w", err)
+		}
+		if connectionStringProperties.EntityPath != nil {
+			// If the connection string contains an entity path, we need to
+			// set the event hub name to an empty string.
+			//
+			// This is a requirement of the new Event Hub SDK.
+			//
+			// See: https://github.com/Azure/azure-sdk-for-go/blob/4ece3e50652223bba502f2b73e7f297de34a799c/sdk/messaging/azeventhubs/producer_client.go#L304-L306
+			config.EventHubName = ""
+		}
+
 		// Use connection string authentication
 		consumerClient, err := azeventhubs.NewConsumerClientFromConnectionString(
 			config.ConnectionString,
@@ -42,11 +67,11 @@ func newEventHubConsumerClient(config eventHubClientConfig, log *logp.Logger) (*
 		return consumerClient, nil
 	}
 
+	// Use credential authentication
 	if config.Credential == nil {
-		return nil, fmt.Errorf("credential is required when connection_string is not provided")
+		return nil, fmt.Errorf("credential cannot be empty when auth_type is not connection_string")
 	}
 
-	// Use credential authentication
 	consumerClient, err := azeventhubs.NewConsumerClient(
 		config.Namespace,
 		config.EventHubName,
@@ -97,14 +122,13 @@ func newStorageContainerClient(config storageContainerClientConfig, authType str
 		return containerClient, nil
 	}
 
+	// Use credential authentication
 	if config.Credential == nil {
-		return nil, fmt.Errorf("credential is required when connection_string is not provided")
+		return nil, fmt.Errorf("credential cannot be empty when auth_type is not connection_string")
 	}
 
 	// Build the storage account URL
 	storageAccountURL := fmt.Sprintf("https://%s.blob.core.windows.net/%s", config.StorageAccount, config.Container)
-
-	// Use credential authentication
 	containerClient, err := container.NewClient(storageAccountURL, config.Credential, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create container client with credential: %w", err)
