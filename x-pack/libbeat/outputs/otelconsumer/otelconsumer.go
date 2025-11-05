@@ -125,6 +125,13 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 		}
 
+		// if pipeline field is set on event metadata
+		if pipeline, err := event.Content.Meta.GetValue("pipeline"); err == nil {
+			if s, ok := pipeline.(string); ok {
+				logRecord.Attributes().PutStr("elasticsearch.ingest_pipeline", s)
+			}
+		}
+
 		beatEvent := event.Content.Fields.Clone()
 		if beatEvent == nil {
 			beatEvent = mapstr.M{}
