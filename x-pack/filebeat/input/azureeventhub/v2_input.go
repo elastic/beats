@@ -88,9 +88,6 @@ func (in *eventHubInputV2) Run(
 ) error {
 	var err error
 
-	// DEBUG: Run method called
-	in.log.Infof("DEBUG: Run method called for azure-eventhub input")
-
 	// Setting up the status reporter helper
 	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log, "Azure Event Hub")
 
@@ -654,7 +651,7 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 			// Update input metrics.
 			in.metrics.sentEvents.Inc()
 		}
-		records = nil
+
 		// Update input metrics.
 		in.metrics.processedMessages.Inc()
 		in.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())

@@ -78,27 +78,23 @@ type storageContainerClientConfig struct {
 // newStorageContainerClient creates a new Storage container client using the provided credential or connection string.
 func newStorageContainerClient(config storageContainerClientConfig, authType string, log *logp.Logger) (*container.Client, error) {
 	if authType == AuthTypeConnectionString {
-		if config.ConnectionString != "" {
-			// Use connection string authentication (legacy)
-			if config.Cloud.ActiveDirectoryAuthorityHost == "" {
-				config.Cloud = cloud.AzurePublic
-			}
-			containerClient, err := container.NewClientFromConnectionString(
-				config.ConnectionString,
-				config.Container,
-				&container.ClientOptions{
-					ClientOptions: azcore.ClientOptions{
-						Cloud: config.Cloud,
-					},
-				},
-			)
-			if err != nil {
-				return nil, fmt.Errorf("failed to create container client from connection string: %w", err)
-			}
-			return containerClient, nil
-		} else {
-
+		// Use connection string authentication
+		if config.Cloud.ActiveDirectoryAuthorityHost == "" {
+			config.Cloud = cloud.AzurePublic
 		}
+		containerClient, err := container.NewClientFromConnectionString(
+			config.ConnectionString,
+			config.Container,
+			&container.ClientOptions{
+				ClientOptions: azcore.ClientOptions{
+					Cloud: config.Cloud,
+				},
+			},
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create container client from connection string: %w", err)
+		}
+		return containerClient, nil
 	}
 
 	if config.Credential == nil {

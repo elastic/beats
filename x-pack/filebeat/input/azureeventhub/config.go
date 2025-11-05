@@ -150,7 +150,6 @@ func defaultConfig() azureInputConfig {
 // Validate validates the config.
 func (conf *azureInputConfig) Validate() error {
 	logger := logp.NewLogger("azureeventhub.config")
-	logger.Infof("DEBUG: Validate() method called")
 
 	// Determine authentication method
 	authType := conf.AuthType
