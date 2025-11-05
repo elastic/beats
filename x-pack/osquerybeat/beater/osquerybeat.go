@@ -176,11 +176,20 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		return err
 	}
 
+	// Initialize osqueryd health monitoring
+	osqdMetrics := newOsquerydMetrics(bt.b.Monitoring.StatsRegistry(), bt.log)
+
 	// Set reseable action handler
 	rah := newResetableActionHandler(bt.pub, bt.log)
 	defer rah.Clear()
 
 	g, ctx := errgroup.WithContext(ctx)
+
+	// Start osqueryd health monitoring
+	g.Go(func() error {
+		monitorOsquerydHealth(ctx, osq, osqdMetrics, bt.log)
+		return nil
+	})
 
 	// Start osquery runner.
 	// It restarts osquery on configuration options change
