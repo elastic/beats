@@ -59,7 +59,7 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 	escfg := defaultOptions
 
 	// check for unsupported config
-	err := checkUnsupportedConfig(output, logger)
+	err := checkUnsupportedConfig(output)
 	if err != nil {
 		return nil, err
 	}
@@ -134,6 +134,9 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 		"mapping": map[string]any{
 			"mode": "bodymap",
 		},
+		"logs_dynamic_pipeline": map[string]any{
+			"enabled": true,
+		},
 	}
 
 	// Compression
@@ -163,7 +166,7 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 }
 
 // log warning for unsupported config
-func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
+func checkUnsupportedConfig(cfg *config.C) error {
 	if cfg.HasField("indices") {
 		return fmt.Errorf("indices is currently not supported: %w", errors.ErrUnsupported)
 	} else if cfg.HasField("pipelines") {
