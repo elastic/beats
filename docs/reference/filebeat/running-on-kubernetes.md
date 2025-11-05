@@ -109,7 +109,7 @@ from `/var/log/pods`. For new deployments, use `/var/log/pods` directly.
 
 1. `add_kubernetes_metadata` needs to be configured to match pod metadata based
 on the new path, `/var/log/pods/`. Pod metadata do not include container 
-metadata. refer to the [add_kubernetes_metadata](https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_logs_path)
+metadata. Refer to the [add_kubernetes_metadata](https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_logs_path)
 documentation for details.
 
 ::::{warning}
