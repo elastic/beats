@@ -40,7 +40,6 @@ const (
 
 	ignoreInactiveSinceLastStartStr  = "since_last_start"
 	ignoreInactiveSinceFirstStartStr = "since_first_start"
-	prospectorDebugKey               = "file_prospector"
 )
 
 var ignoreInactiveSettings = map[string]ignoreInactiveType{
