@@ -169,24 +169,20 @@ func (j *journalctl) Kill() error {
 // journalctl finished returning all data and exited successfully, if journalctl
 // exited unexpectedly, then `err` is non-nil, `finished` is false and an empty
 // byte array is returned.
-func (j *journalctl) Next(cancel input.Canceler) ([]byte, bool, error) {
+func (j *journalctl) Next(cancel input.Canceler) ([]byte, error) {
 	select {
 	case <-cancel.Done():
-		return []byte{}, false, ErrCancelled
+		return []byte{}, ErrCancelled
 	case d, open := <-j.dataChan:
 		if !open {
 			// Wait for the process to exit, so we can read the exit code.
 			j.waitDone.Wait()
-			if j.cmd.ProcessState.ExitCode() == 0 {
-				return []byte{}, true, nil
-			}
 			return []byte{},
-				false,
 				fmt.Errorf(
 					"no more data to read, journalctl exited unexpectedly, exit code: %d",
 					j.cmd.ProcessState.ExitCode())
 		}
 
-		return d, false, nil
+		return d, nil
 	}
 }
