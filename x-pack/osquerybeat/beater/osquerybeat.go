@@ -187,7 +187,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 
 	// Start osqueryd health monitoring
 	g.Go(func() error {
-		monitorOsquerydHealth(ctx, osq, osqdMetrics, bt.log)
+		monitorOsquerydHealth(ctx, socketPath, osqdMetrics, bt.log)
 		return nil
 	})
 
