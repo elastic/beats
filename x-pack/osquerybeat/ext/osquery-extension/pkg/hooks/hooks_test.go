@@ -7,7 +7,6 @@ package hooks
 import (
 	"errors"
 	"os"
-	"reflect"
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
