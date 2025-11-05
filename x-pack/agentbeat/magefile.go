@@ -8,16 +8,15 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"slices"
 	"time"
 
-	"github.com/magefile/mage/sh"
-	"go.uber.org/multierr"
-
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
@@ -80,7 +79,7 @@ func GolangCrossBuild() error {
 
 	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 
-	return multierr.Combine(
+	return errors.Join(
 		devtools.GolangCrossBuild(args),
 		devtools.TestLinuxForCentosGLIBC(),
 	)

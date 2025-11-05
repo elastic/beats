@@ -6,13 +6,13 @@ package browserhistory
 
 import (
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/osquery/osquery-go/plugin/table"
-	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
@@ -51,14 +51,15 @@ func GetTableRows(ctx context.Context, queryContext table.QueryContext, log *log
 	}
 	var merr error
 	for _, location := range locations {
-		parsers := getParsers(location, log)
+		log.Infof("Parsing browser history for location: %v", location)
+		parsers := getParsers(ctx, location, log)
 		if len(parsers) == 0 {
 			continue
 		}
 		for _, parser := range parsers {
 			visits, err := parser.parse(ctx, queryContext, filters)
 			if err != nil {
-				merr = multierr.Append(merr, err)
+				merr = errors.Join(merr, err)
 			}
 			if len(visits) == 0 {
 				continue
@@ -67,7 +68,7 @@ func GetTableRows(ctx context.Context, queryContext table.QueryContext, log *log
 			for i, visit := range visits {
 				mvisit, err := encoding.MarshalToMap(visit)
 				if err != nil {
-					merr = multierr.Append(merr, err)
+					merr = errors.Join(merr, err)
 					continue
 				}
 				rows[i] = mvisit
@@ -98,14 +99,12 @@ func getSearchLocations(queryContext table.QueryContext, log *logger.Logger) ([]
 	var results []searchLocation
 	for _, browser := range defaultBrowsers {
 		for _, userPath := range userPaths {
-			browserBaseDir := getBrowserPath(browser)
-			if browserBaseDir == "" {
-				continue
+			for _, browserBaseDir := range getBrowserPaths(browser) {
+				results = append(results, searchLocation{
+					browser: browser,
+					path:    filepath.Join(userPath, browserBaseDir),
+				})
 			}
-			results = append(results, searchLocation{
-				browser: browser,
-				path:    filepath.Join(userPath, browserBaseDir),
-			})
 		}
 	}
 	return results, nil
@@ -165,6 +164,8 @@ func extractUserFromPath(filePath string, log *logger.Logger) string {
 		if (part == "Users" || part == "home") && i+1 < len(parts) {
 			user := parts[i+1]
 			return user
+		} else if part == "root" {
+			return "root"
 		}
 	}
 
