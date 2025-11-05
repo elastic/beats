@@ -17,7 +17,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/aws/smithy-go"
-	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -448,7 +447,7 @@ func (p *sqsS3EventProcessor) processS3Events(
 		}
 	}
 
-	return finalizers, multierr.Combine(errs...)
+	return finalizers, errors.Join(errs...)
 }
 
 func (r sqsProcessingResult) finalizeS3Objects() error {
@@ -460,7 +459,7 @@ func (r sqsProcessingResult) finalizeS3Objects() error {
 				i+1, len(r.finalizers), err))
 		}
 	}
-	return multierr.Combine(errs...)
+	return errors.Join(errs...)
 }
 
 // getSQSReceiveCount returns the SQS ApproximateReceiveCount attribute. If the value
