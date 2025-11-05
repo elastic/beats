@@ -1,7 +1,5 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-
 // or more contributor license agreements. Licensed under the Elastic License;
-
 // you may not use this file except in compliance with the Elastic License.
 
 package hooks
@@ -77,34 +75,6 @@ func TestHook_Execute(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := tt.h.Execute(tt.args.socket, tt.args.log); (err != nil) != tt.wantErr {
 				t.Errorf("Hook.Execute() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestNewHook(t *testing.T) {
-	type args struct {
-		hookName string
-		hookFunc HookFunc
-	}
-	tests := []struct {
-		name string
-		args args
-		want *Hook
-	}{
-		{
-			name: "TestCase1",
-			args: args{
-				hookName: "TestCase1",
-				hookFunc: func(socket *string, log *logger.Logger) error { return nil },
-			},
-			want: NewHook("TestCase1", func(socket *string, log *logger.Logger) error { return nil }),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewHook(tt.args.hookName, tt.args.hookFunc); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewHook() = %v, want %v", got, tt.want)
 			}
 		})
 	}
