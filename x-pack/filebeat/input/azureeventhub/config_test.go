@@ -155,7 +155,7 @@ func TestValidateConnectionStringV2(t *testing.T) {
 	})
 }
 
-func TestOAuth2ConfigValidation(t *testing.T) {
+func TestClientSecretConfigValidation(t *testing.T) {
 	tests := []struct {
 		name        string
 		config      azureInputConfig
@@ -163,7 +163,7 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 		errorMsg    string
 	}{
 		{
-			name: "valid client_secret config for both eventhub and storage account",
+			name: "valid client_secret config for both eventhub and storage account with processor v2",
 			config: func() azureInputConfig {
 				c := defaultConfig()
 				c.EventHubName = "test-hub"
@@ -187,7 +187,6 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 				c.ClientID = "test-client-id"
 				c.ClientSecret = "test-client-secret"
 				c.SAName = "test-storage"
-				c.SAConnectionString = "test-connection-string"
 				c.ProcessorVersion = "v2"
 				c.AuthType = "client_secret"
 				return c
@@ -204,7 +203,6 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 				c.ClientID = "test-client-id"
 				c.ClientSecret = "test-client-secret"
 				c.SAName = "test-storage"
-				c.SAConnectionString = "test-connection-string"
 				c.ProcessorVersion = "v2"
 				c.AuthType = "client_secret"
 				return c
@@ -221,7 +219,6 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 				c.TenantID = "test-tenant-id"
 				c.ClientSecret = "test-client-secret"
 				c.SAName = "test-storage"
-				c.SAConnectionString = "test-connection-string"
 				c.ProcessorVersion = "v2"
 				c.AuthType = "client_secret"
 				return c
@@ -230,7 +227,7 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 			errorMsg:    "client_id is required when using client_secret authentication",
 		},
 		{
-			name: "auth type client_secret config missing client_secret",
+			name: "client_secret config missing client_secret",
 			config: func() azureInputConfig {
 				c := defaultConfig()
 				c.EventHubName = "test-hub"
@@ -238,7 +235,6 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 				c.TenantID = "test-tenant-id"
 				c.ClientID = "test-client-id"
 				c.SAName = "test-storage"
-				c.SAConnectionString = "test-connection-string"
 				c.ProcessorVersion = "v2"
 				c.AuthType = "client_secret"
 				return c
@@ -247,7 +243,87 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 			errorMsg:    "client_secret is required when using client_secret authentication",
 		},
 		{
-			name: "valid connection_string config",
+			name: "valid client_secret config with processor v1",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.EventHubNamespace = "test-namespace.servicebus.windows.net"
+				c.TenantID = "test-tenant-id"
+				c.ClientID = "test-client-id"
+				c.ClientSecret = "test-client-secret"
+				c.SAName = "test-storage"
+				c.SAKey = "test-storage-key"
+				c.ProcessorVersion = "v1"
+				c.AuthType = "client_secret"
+				return c
+			}(),
+			expectError: false,
+		},
+		{
+			name: "client_secret config with processor v1 missing storage account key",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.EventHubNamespace = "test-namespace.servicebus.windows.net"
+				c.TenantID = "test-tenant-id"
+				c.ClientID = "test-client-id"
+				c.ClientSecret = "test-client-secret"
+				c.SAName = "test-storage"
+				c.ProcessorVersion = "v1"
+				c.AuthType = "client_secret"
+				return c
+			}(),
+			expectError: true,
+			errorMsg:    "storage_account_key is required when using client_secret authentication with processor v1",
+		},
+		{
+			name: "client_secret config with processor v2 uses same credentials for storage account",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.EventHubNamespace = "test-namespace.servicebus.windows.net"
+				c.TenantID = "test-tenant-id"
+				c.ClientID = "test-client-id"
+				c.ClientSecret = "test-client-secret"
+				c.SAName = "test-storage"
+				// No SAConnectionString - should use client_secret credentials
+				c.ProcessorVersion = "v2"
+				c.AuthType = "client_secret"
+				return c
+			}(),
+			expectError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.config.Validate()
+			if tt.expectError {
+				if err == nil {
+					t.Errorf("expected error but got none")
+					return
+				}
+				if tt.errorMsg != "" && err.Error() != tt.errorMsg {
+					t.Errorf("expected error message %q, got %q", tt.errorMsg, err.Error())
+				}
+			} else {
+				if err != nil {
+					t.Errorf("unexpected error: %v", err)
+				}
+			}
+		})
+	}
+}
+
+func TestConnectionStringConfigValidation(t *testing.T) {
+	tests := []struct {
+		name        string
+		config      azureInputConfig
+		expectError bool
+		errorMsg    string
+	}{
+		{
+			name: "valid connection_string config with processor v2",
 			config: func() azureInputConfig {
 				c := defaultConfig()
 				c.EventHubName = "test-hub"
@@ -261,7 +337,7 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 			expectError: false,
 		},
 		{
-			name: "valid connection_string config without auth_type",
+			name: "valid connection_string config without auth_type (defaults to connection_string)",
 			config: func() azureInputConfig {
 				c := defaultConfig()
 				c.EventHubName = "test-hub"
@@ -272,6 +348,90 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 				return c
 			}(),
 			expectError: false,
+		},
+		{
+			name: "valid connection_string config with processor v1",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
+				c.SAName = "test-storage"
+				c.SAKey = "test-storage-key"
+				c.ProcessorVersion = "v1"
+				c.AuthType = "connection_string"
+				return c
+			}(),
+			expectError: false,
+		},
+		{
+			name: "connection_string config missing connection_string",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.SAName = "test-storage"
+				c.SAConnectionString = "test-connection-string"
+				c.ProcessorVersion = "v2"
+				c.AuthType = "connection_string"
+				return c
+			}(),
+			expectError: true,
+			errorMsg:    "connection_string is required when auth_type is empty or set to connection_string",
+		},
+		{
+			name: "connection_string config with processor v1 missing storage account key",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
+				c.SAName = "test-storage"
+				c.ProcessorVersion = "v1"
+				c.AuthType = "connection_string"
+				return c
+			}(),
+			expectError: true,
+			errorMsg:    "storage_account_key is required when using connection_string authentication with processor v1",
+		},
+		{
+			name: "connection_string config with processor v2 missing storage account connection string",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
+				c.SAName = "test-storage"
+				c.ProcessorVersion = "v2"
+				c.AuthType = "connection_string"
+				return c
+			}(),
+			expectError: true,
+			errorMsg:    "storage_account_connection_string is required when using connection_string authentication with processor v2",
+		},
+		{
+			name: "invalid auth_type",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.SAName = "test-storage"
+				c.ProcessorVersion = "v2"
+				c.AuthType = "invalid_auth_type"
+				return c
+			}(),
+			expectError: true,
+			errorMsg:    "unknown auth_type: invalid_auth_type (valid values: connection_string, client_secret)",
+		},
+		{
+			name: "invalid processor_version",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.EventHubName = "test-hub"
+				c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
+				c.SAName = "test-storage"
+				c.SAKey = "test-storage-key"
+				c.ProcessorVersion = "v3"
+				c.AuthType = "connection_string"
+				return c
+			}(),
+			expectError: true,
+			errorMsg:    "invalid processor_version: v3 (available versions: v1, v2)",
 		},
 	}
 

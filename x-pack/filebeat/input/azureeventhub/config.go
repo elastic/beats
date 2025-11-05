@@ -159,9 +159,20 @@ func (conf *azureInputConfig) Validate() error {
 		authType = AuthTypeConnectionString
 	}
 
+	// Validate the processor version first to ensure it's valid
+	if conf.ProcessorVersion != processorV1 && conf.ProcessorVersion != processorV2 {
+		return fmt.Errorf(
+			"invalid processor_version: %s (available versions: %s, %s)",
+			conf.ProcessorVersion,
+			processorV1,
+			processorV2,
+		)
+	}
+
+	// Validate authentication for both Event Hub and Storage Account together
 	switch authType {
 	case AuthTypeConnectionString:
-		// Validate connection string configuration
+		// Validate Event Hub connection string configuration
 		if conf.ConnectionString == "" {
 			return errors.New("connection_string is required when auth_type is empty or set to connection_string")
 		}
@@ -178,8 +189,23 @@ func (conf *azureInputConfig) Validate() error {
 				conf.EventHubName,
 			)
 		}
+
+		// Validate Storage Account authentication for connection_string auth type
+		switch conf.ProcessorVersion {
+		case processorV1:
+			// Processor v1 requires storage account key
+			if conf.SAKey == "" {
+				return errors.New("storage_account_key is required when using connection_string authentication with processor v1")
+			}
+		case processorV2:
+			// Processor v2 requires storage account connection string
+			if conf.SAConnectionString == "" {
+				return errors.New("storage_account_connection_string is required when using connection_string authentication with processor v2")
+			}
+		}
+
 	case AuthTypeClientSecret:
-		// Validate client secret configuration
+		// Validate Event Hub client secret configuration
 		if conf.EventHubNamespace == "" {
 			return errors.New("eventhub_namespace is required when using client_secret authentication")
 		}
@@ -192,10 +218,25 @@ func (conf *azureInputConfig) Validate() error {
 		if conf.ClientSecret == "" {
 			return errors.New("client_secret is required when using client_secret authentication")
 		}
+
+		// Validate Storage Account authentication for client_secret auth type
+		switch conf.ProcessorVersion {
+		case processorV1:
+			// Processor v1 requires storage account key
+			if conf.SAKey == "" {
+				return errors.New("storage_account_key is required when using client_secret authentication with processor v1")
+			}
+		case processorV2:
+			// Processor v2 with client_secret auth type: Storage Account uses the same client_secret credentials as Event Hub
+			// The client_secret credentials are already validated above for Event Hub
+			// The storage account will use the same TenantID, ClientID, and ClientSecret as Event Hub
+		}
+
 	default:
 		return fmt.Errorf("unknown auth_type: %s (valid values: connection_string, client_secret)", authType)
 	}
 
+	// Validate required fields
 	if conf.EventHubName == "" {
 		return errors.New("no event hub name configured")
 	}
@@ -227,6 +268,7 @@ func (conf *azureInputConfig) Validate() error {
 		return err
 	}
 
+	// Validate processor-specific settings
 	if conf.ProcessorUpdateInterval < 1*time.Second {
 		return errors.New("processor_update_interval must be at least 1 second")
 	}
@@ -242,40 +284,6 @@ func (conf *azureInputConfig) Validate() error {
 			conf.ProcessorStartPosition,
 			startPositionEarliest,
 			startPositionLatest,
-		)
-	}
-
-	switch conf.ProcessorVersion {
-	case processorV1:
-		if conf.SAKey == "" {
-			return errors.New("no storage account key configured (config: storage_account_key)")
-		}
-	case processorV2:
-		// For processor v2, either connection string or credential-based authentication must be configured
-		useCredentialForStorage := conf.SAConnectionString == ""
-		if useCredentialForStorage {
-			// Storage account uses the same auth_type as Event Hub
-			if authType != AuthTypeClientSecret {
-				return errors.New("storage account requires client_secret authentication when storage_account_connection_string is not provided")
-			}
-
-			// Validate client secret configuration for storage
-			if conf.TenantID == "" {
-				return errors.New("tenant_id is required when using client_secret authentication")
-			}
-			if conf.ClientID == "" {
-				return errors.New("client_id is required when using client_secret authentication")
-			}
-			if conf.ClientSecret == "" {
-				return errors.New("client_secret is required when using client_secret authentication")
-			}
-		}
-	default:
-		return fmt.Errorf(
-			"invalid processor_version: %s (available versions: %s, %s)",
-			conf.ProcessorVersion,
-			processorV1,
-			processorV2,
 		)
 	}
 
