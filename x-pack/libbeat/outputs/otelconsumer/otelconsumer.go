@@ -16,7 +16,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -43,12 +42,11 @@ func init() {
 }
 
 type otelConsumer struct {
-	observer         outputs.Observer
-	logsConsumer     consumer.Logs
-	beatInfo         beat.Info
-	log              *logp.Logger
-	isReceiverTest   bool // whether we are running in receivertest context
-	pipelineSelector *outil.Selector
+	observer       outputs.Observer
+	logsConsumer   consumer.Logs
+	beatInfo       beat.Info
+	log            *logp.Logger
+	isReceiverTest bool // whether we are running in receivertest context
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
