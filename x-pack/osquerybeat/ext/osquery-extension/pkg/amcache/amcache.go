@@ -9,10 +9,9 @@ package amcache
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
-
 
 func CreateAmcacheApplicationsView(socket *string, log *logger.Logger) error {
 	view := hooks.NewView(
