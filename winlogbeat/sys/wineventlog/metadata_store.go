@@ -21,14 +21,13 @@ package wineventlog
 
 import (
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 	"sync"
 	"text/template"
 	"text/template/parse"
-
-	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
@@ -83,7 +82,7 @@ func NewPublisherMetadataStore(session EvtHandle, provider string, locale uint32
 
 	// Query the provider metadata to build an in-memory cache of the
 	// information to optimize event reading.
-	err = multierr.Combine(
+	err = errors.Join(
 		store.initKeywords(),
 		store.initOpcodes(),
 		store.initLevels(),
@@ -413,7 +412,7 @@ func newEventMetadataFromEventHandle(publisher *PublisherMetadata, eventHandle E
 // using the publisher metadata.
 func newEventMetadataFromPublisherMetadata(itr *EventMetadataIterator, publisher *PublisherMetadata) (*EventMetadata, error) {
 	em := &EventMetadata{}
-	err := multierr.Combine(
+	err := errors.Join(
 		em.initEventID(itr),
 		em.initVersion(itr),
 		em.initEventDataTemplate(itr),
@@ -623,7 +622,7 @@ func (c *publisherMetadataCache) close() error {
 			errs = append(errs, err)
 		}
 	}
-	return multierr.Combine(errs...)
+	return errors.Join(errs...)
 }
 
 // --- Template Funcs
