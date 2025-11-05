@@ -412,6 +412,8 @@ github.com/elastic/go-windows v1.0.2 h1:yoLLsAsV5cfg9FLhZ9EXZ2n2sQFKeDYrHenkcivY
 github.com/elastic/go-windows v1.0.2/go.mod h1:bGcDpBzXgYSqM0Gx3DM4+UxFj300SZLixie9u9ixLM8=
 github.com/elastic/goja v0.0.0-20190128172624-dd2ac4456e20 h1:bVZ3kDKa8Tqw9qvNrD91MwJMW6alg4Wn31l1TQ6RlTY=
 github.com/elastic/goja v0.0.0-20190128172624-dd2ac4456e20/go.mod h1:A1DWjF89MFVnxzmzTaMF7CwVy9PDem7DalMkm8RIMoY=
+github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102 h1:HBjzmhV2CkYn0qBDv9DN4/irmJ94xppH3kVL9VgBA8k=
+github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102/go.mod h1:xoTq5saXNyokdlvOhMz+JQGU+RTzTtYzqo1Bc86q3Fs=
 github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6 h1:VgOx6omXIMKozR+R4HhQRT9q1Irm/h13DLtSkejoAJY=
 github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6/go.mod h1:riddUzxTSBpJXk3qBHtYr4qOhFhT6k/1c0E3qkQjQpA=
 github.com/elastic/gosigar v0.14.3 h1:xwkKwPia+hSfg9GqrCUKYdId102m9qTJIIr7egmK/uo=
