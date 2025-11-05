@@ -8,13 +8,15 @@ package tables
 
 import (
 	"context"
+	"os"
+	"testing"
+
+	"github.com/osquery/osquery-go/plugin/table"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/registry"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/testdata"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	"github.com/osquery/osquery-go/plugin/table"
-	"os"
-	"testing"
 )
 
 type MockGlobalState struct{}
