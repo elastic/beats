@@ -216,24 +216,6 @@ A list of glob-based paths that will be crawled and fetched. All patterns suppor
 Filebeat starts a harvester for each file that it finds under the specified paths. You can specify one path per line. Each line begins with a dash (-).
 
 
-#### `include_file_owner_name` [filestream-input-include_file_owner_name]
-```yaml {applies_to}
-stack: ga 9.3
-```
-
-Includes the log file owner to `log.file` metadata. 
-This option is not supported on Windows.
-
-
-#### `include_file_owner_group_name` [filestream-input-include_file_owner_group_name]
-```yaml {applies_to}
-stack: ga 9.3
-```
-
-Includes the log file group to `log.file` metadata. 
-This option is not supported on Windows.
-
-
 ## Scanner options [_scanner_options]
 
 The scanner watches the configured paths. It scans the file system periodically and returns the file system events to the Prospector.
@@ -643,6 +625,24 @@ Setting a limit on the number of harvesters means that potentially not all files
 Currently if a new harvester can be started again, the harvester is picked randomly. This means it’s possible that the harvester for a file that was just closed and then updated again might be started instead of the harvester for a file that hasn’t been harvested for a longer period of time.
 
 This configuration option applies per input. You can use this option to indirectly set higher priorities on certain inputs by assigning a higher limit of harvesters.
+
+
+#### `include_file_owner_name` [filestream-input-include_file_owner_name]
+```yaml {applies_to}
+stack: ga 9.3
+```
+
+Includes the log file owner to `log.file` metadata. 
+This option is not supported on Windows.
+
+
+#### `include_file_owner_group_name` [filestream-input-include_file_owner_group_name]
+```yaml {applies_to}
+stack: ga 9.3
+```
+
+Includes the log file group to `log.file` metadata. 
+This option is not supported on Windows.
 
 
 #### `file_identity` [filebeat-input-filestream-file-identity]
