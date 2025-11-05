@@ -10,8 +10,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-
-// HookFunc represents a function that executes a hook, any 
+// HookFunc represents a function that executes a hook, any
 // function that implements this interface can be used as a hook
 type HookFunc func(socket *string, log *logger.Logger) error
 
@@ -31,7 +30,6 @@ func (h *Hook) Execute(socket *string, log *logger.Logger) error {
 	return h.hookFunc(socket, log)
 }
 
-
 // NewHook creates a new hook
 func NewHook(hookName string, hookFunc HookFunc) *Hook {
 	return &Hook{hookName: hookName, hookFunc: hookFunc}
@@ -39,6 +37,7 @@ func NewHook(hookName string, hookFunc HookFunc) *Hook {
 
 // HookType represents the type of hook
 type HookType string
+
 const (
 	HookTypePre  HookType = "pre"  // pre hooks are not implemented  yet, but may be in the future
 	HookTypePost HookType = "post" // post hooks are executed after the tables are registered
@@ -47,7 +46,7 @@ const (
 // HookManager is a struct that contains all hooks of a given type
 type HookManager struct {
 	hookType HookType
-	hooks []*Hook
+	hooks    []*Hook
 }
 
 // Register registers a new hook
