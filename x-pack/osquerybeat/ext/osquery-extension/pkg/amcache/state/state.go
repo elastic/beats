@@ -67,7 +67,6 @@ var (
 )
 
 // GetAmcacheGlobalState is the public accessor for the singleton.
-// It checks for expiration and re-creates the instance if needed.
 func GetAmcacheGlobalState() *AmcacheGlobalState {
 	return gInstance
 }
@@ -97,7 +96,7 @@ func (gs *AmcacheGlobalState) Update(log *logger.Logger) error {
 			log.Errorf("error getting %s entries: %v", amcacheTable.Name, err)
 			continue
 		}
-		log.Infof("Updating cache for table %s with %d entries", amcacheTable.Name, len(entries))
+		log.Infof("updating cache for table %s with %d entries", amcacheTable.Name, len(entries))
 		gs.Cache[amcacheTable.Name] = append(gs.Cache[amcacheTable.Name], entries...)
 	}
 	gs.LastUpdated = time.Now()
@@ -107,7 +106,7 @@ func (gs *AmcacheGlobalState) Update(log *logger.Logger) error {
 // GetCachedEntries returns the cached entries for a given Amcache table and filter list.
 func (gs *AmcacheGlobalState) GetCachedEntries(amcacheTable tables.AmcacheTable, filterList []filters.Filter, log *logger.Logger) ([]tables.Entry, error) {
 	if gs.IsExpired() {
-		log.Infof("Amcache cache is %s old, updating", time.Since(gs.LastUpdated))
+		log.Infof("amcache cache is %s old, updating", time.Since(gs.LastUpdated))
 		err := gs.Update(log)
 		if err != nil {
 			log.Errorf("error updating amcache cache: %v", err)

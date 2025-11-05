@@ -28,15 +28,14 @@ func TestCachingBehavior(t *testing.T) {
 		wantRecovered bool
 		wantErr       bool
 	}{
-		//
 		{
 			name:     "recovery test data",
-			filePath: testdata.GetRecoveryTestDataPathOrFatal(t),
+			filePath: testdata.MustGetRecoveryTestDataPath(t),
 			wantErr:  false,
 		},
 		{
 			name:     "regular test data",
-			filePath: testdata.GetTestHivePathOrFatal(t),
+			filePath: testdata.MustGetTestHivePath(t),
 			wantErr:  false,
 		},
 	}
@@ -80,7 +79,7 @@ func TestCachingBehavior(t *testing.T) {
 
 func TestGetCachedEntries(t *testing.T) {
 	log := logger.New(os.Stdout, true)
-	state := newAmcacheGlobalState(testdata.GetTestHivePathOrFatal(t), defaultExpirationDuration)
+	state := newAmcacheGlobalState(testdata.MustGetTestHivePath(t), defaultExpirationDuration)
 
 	if !state.LastUpdated.IsZero() {
 		t.Errorf("Expected lastUpdated to be zero initially, got %v", state.LastUpdated)
@@ -141,7 +140,7 @@ func TestGetCachedEntries(t *testing.T) {
 
 func TestGetCachedEntriesForcesUpdate(t *testing.T) {
 	log := logger.New(os.Stdout, true)
-	state := newAmcacheGlobalState(testdata.GetTestHivePathOrFatal(t), 3*time.Minute)
+	state := newAmcacheGlobalState(testdata.MustGetTestHivePath(t), 3*time.Minute)
 
 	if !state.IsExpired() {
 		t.Errorf("Expected state to be expired, got %v", state.LastUpdated)

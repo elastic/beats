@@ -18,7 +18,7 @@ import (
 
 func TestRecovery(t *testing.T) {
 	log := logger.New(os.Stdout, true)
-	filePath := testdata.GetRecoveryTestDataPathOrFatal(t)
+	filePath := testdata.MustGetRecoveryTestDataPath(t)
 	_, recovered, err := LoadRegistry(filePath, log)
 	if err != nil {
 		t.Fatalf("failed to load registry: %v", err)
@@ -27,7 +27,7 @@ func TestRecovery(t *testing.T) {
 		t.Fatalf("registry was not recovered unexpectedly")
 	}
 
-	filePath = testdata.GetTestHivePathOrFatal(t)
+	filePath = testdata.MustGetTestHivePath(t)
 	_, recovered, err = LoadRegistry(filePath, log)
 	if err != nil {
 		t.Fatalf("failed to load registry: %v", err)
@@ -39,8 +39,8 @@ func TestRecovery(t *testing.T) {
 
 func Test_findTransactionLogs(t *testing.T) {
 
-	recoveryTestDataPath := testdata.GetRecoveryTestDataPathOrFatal(t)
-	regularTestDataPath := testdata.GetTestHivePathOrFatal(t)
+	recoveryTestDataPath := testdata.MustGetRecoveryTestDataPath(t)
+	regularTestDataPath := testdata.MustGetTestHivePath(t)
 	log := logger.New(os.Stdout, true)
 
 	type args struct {
@@ -77,16 +77,15 @@ func TestLoadRegistry(t *testing.T) {
 		wantRecovered bool
 		wantErr       bool
 	}{
-		//
 		{
 			name:          "recovery test data",
-			filePath:      testdata.GetRecoveryTestDataPathOrFatal(t),
+			filePath:      testdata.MustGetRecoveryTestDataPath(t),
 			wantRecovered: true,
 			wantErr:       false,
 		},
 		{
 			name:          "regular test data",
-			filePath:      testdata.GetTestHivePathOrFatal(t),
+			filePath:      testdata.MustGetTestHivePath(t),
 			wantRecovered: false,
 			wantErr:       false,
 		},
@@ -104,7 +103,7 @@ func TestLoadRegistry(t *testing.T) {
 		},
 		{
 			name:          "valid file not registry",
-			filePath:      filepath.Join(testdata.GetTestDataDirectoryOrFatal(t), "not_a_registry.txt"),
+			filePath:      filepath.Join(testdata.MustGetTestDataDirectory(t), "not_a_registry.txt"),
 			wantRecovered: false,
 			wantErr:       true,
 		},

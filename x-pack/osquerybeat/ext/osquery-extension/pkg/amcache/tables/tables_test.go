@@ -22,7 +22,7 @@ import (
 type MockGlobalState struct{}
 
 func (m *MockGlobalState) GetCachedEntries(amcacheTable AmcacheTable, filters []filters.Filter, log *logger.Logger) ([]Entry, error) {
-	registry, _, err := registry.LoadRegistry(testdata.GetTestHivePathOrFatal(nil), log)
+	registry, _, err := registry.LoadRegistry(testdata.MustGetTestHivePath(nil), log)
 	if err != nil {
 		return nil, err
 	}

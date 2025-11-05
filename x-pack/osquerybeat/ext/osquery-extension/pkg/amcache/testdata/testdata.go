@@ -14,32 +14,9 @@ import (
 	"testing"
 )
 
-const TestHiveRelPath = "amcache.hve"
-
-func GetRecoveryTestDataPathOrFatal(t *testing.T) string {
-	_, currentFile, _, ok := runtime.Caller(0)
-	if !ok {
-		t.Fatal("failed to get current file path")
-	}
-	dir := filepath.Dir(currentFile)
-	absPath := filepath.Join(dir, "recovery_data")
-	hivePath := filepath.Join(absPath, "Amcache.hve")
-	if _, err := os.Stat(hivePath); os.IsNotExist(err) {
-		log.Printf("error: test hive path does not exist: %v", hivePath)
-		t.Fatal(err)
-	}
-	return hivePath
-}
-
-func GetTestHivePathOrFatal(t *testing.T) string {
-	_, currentFile, _, ok := runtime.Caller(0)
-	if !ok {
-		t.Fatal("failed to get current file path")
-	}
-
-	dir := filepath.Dir(currentFile)
-	absPath := filepath.Join(dir, TestHiveRelPath)
-
+// MustGetRecoveryTestDataPath returns the path to the recovery test hive
+func MustGetRecoveryTestDataPath(t *testing.T) string {
+	absPath := filepath.Join(MustGetTestDataDirectory(t), "recovery_data", "Amcache.hve")
 	if _, err := os.Stat(absPath); os.IsNotExist(err) {
 		log.Printf("error: test hive path does not exist: %v", absPath)
 		t.Fatal(err)
@@ -47,7 +24,18 @@ func GetTestHivePathOrFatal(t *testing.T) string {
 	return absPath
 }
 
-func GetTestDataDirectoryOrFatal(t *testing.T) string {
+// MustGetTestHivePath returns the path to the test hive
+func MustGetTestHivePath(t *testing.T) string {
+	absPath := filepath.Join(MustGetTestDataDirectory(t), "amcache.hve")
+	if _, err := os.Stat(absPath); os.IsNotExist(err) {
+		log.Printf("error: test hive path does not exist: %v", absPath)
+		t.Fatal(err)
+	}
+	return absPath
+}
+
+// MustGetTestDataDirectory returns the path to the test data directory
+func MustGetTestDataDirectory(t *testing.T) string {
 	_, currentFile, _, ok := runtime.Caller(0)
 	if !ok {
 		t.Fatal("failed to get current file path")
