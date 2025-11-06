@@ -6,5 +6,5 @@ kadmind
 
 
 ## set principal and user
-addprinc.sh HTTP/elasticsearch_kerberos.elastic
+addprinc.sh HTTP/localhost
 addprinc.sh beats testing

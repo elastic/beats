@@ -6,6 +6,7 @@ services:
     depends_on:
       elasticsearch:                  { condition: service_healthy }
       elasticsearchssl:               { condition: service_healthy }
+      elasticsearch_kerberos.elastic: { condition: service_healthy }
       logstash:                       { condition: service_healthy }
       kafka:                          { condition: service_healthy }
       redis:                          { condition: service_healthy }
@@ -75,7 +76,7 @@ services:
       - "indices.id_field_data.enabled=true"
       - "xpack.security.audit.enabled=true"
       - "xpack.security.authc.realms.kerberos.elastic.order=0"
-      - "xpack.security.authc.realms.kerberos.elastic.keytab.path=/usr/share/elasticsearch/config/HTTP_elasticsearch_kerberos.elastic.keytab"
+      - "xpack.security.authc.realms.kerberos.elastic.keytab.path=/usr/share/elasticsearch/config/HTTP_localhost.keytab"
       - "xpack.security.authc.realms.kerberos.elastic.remove_realm_name=false"
       - "xpack.security.authc.realms.kerberos.elastic.krb.debug=true"
     volumes:
