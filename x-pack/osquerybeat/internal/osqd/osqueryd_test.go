@@ -29,7 +29,7 @@ func TestNew(t *testing.T) {
 	configPluginName := "config_plugin_test"
 	loggerPluginName := "logger_plugin_test"
 
-	osq, err := New(
+	osq, err := newOsqueryD(
 		socketPath,
 		WithExtensionsTimeout(extensionsTimeout),
 		WithConfigRefresh(configurationRefreshIntervalSecs),

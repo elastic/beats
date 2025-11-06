@@ -7,12 +7,13 @@ package browserhistory
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/osquery/osquery-go/plugin/table"
-	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
@@ -25,8 +26,8 @@ type safariParser struct {
 	log      *logger.Logger
 }
 
-func newSafariParser(location searchLocation, log *logger.Logger) historyParser {
-	profiles := getSafariProfiles(location, log)
+func newSafariParser(ctx context.Context, location searchLocation, log *logger.Logger) historyParser {
+	profiles := getSafariProfiles(ctx, location, log)
 	if len(profiles) > 0 {
 		return &safariParser{
 			location: location,
@@ -64,7 +65,7 @@ func (parser *safariParser) parse(ctx context.Context, queryContext table.QueryC
 		}
 		vs, err := parser.parseProfile(ctx, queryContext, profile)
 		if err != nil {
-			merr = multierr.Append(merr, err)
+			merr = errors.Join(merr, err)
 			continue
 		}
 		visits = append(visits, vs...)
@@ -150,7 +151,7 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 	return entries, rows.Err()
 }
 
-func getSafariProfiles(location searchLocation, log *logger.Logger) []*profile {
+func getSafariProfiles(ctx context.Context, location searchLocation, log *logger.Logger) []*profile {
 	var profiles []*profile
 	user := extractUserFromPath(location.path, log)
 
@@ -159,12 +160,7 @@ func getSafariProfiles(location searchLocation, log *logger.Logger) []*profile {
 
 	for _, historyPath := range historyPaths {
 		profilePath := filepath.Dir(historyPath)
-		profileName := filepath.Base(profilePath)
-
-		// If the profile name is "Safari", use "Default" instead
-		if profileName == "Safari" {
-			profileName = "Default"
-		}
+		profileName := resolveProfileName(ctx, profilePath)
 
 		log.Infof("detected safari History.db file: %s", historyPath)
 
@@ -183,6 +179,45 @@ func getSafariProfiles(location searchLocation, log *logger.Logger) []*profile {
 	}
 
 	return profiles
+}
+
+// resolveProfileName tries to extract the profile name from SafariTabs.db bookmarks table.
+// Falls back to the base of the profile path.
+func resolveProfileName(ctx context.Context, profilePath string) string {
+	base := filepath.Base(profilePath)
+	if tabsPath := findClosestSafariTabsDB(profilePath); tabsPath != "" {
+		connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", tabsPath)
+		db, err := sql.Open("sqlite3", connectionString)
+		if err == nil {
+			defer db.Close()
+			row := db.QueryRowContext(ctx, "SELECT title FROM bookmarks WHERE external_uuid = ?", base)
+			var title string
+			if err := row.Scan(&title); err == nil && title != "" {
+				return title
+			}
+		}
+	}
+	if strings.Contains(base, "Safari") {
+		return "Default Profile"
+	}
+	return base
+}
+
+// findClosestSafariTabsDB recursively searches up the directory tree for SafariTabs.db
+func findClosestSafariTabsDB(startPath string) string {
+	dir := startPath
+	for {
+		tabsPath := filepath.Join(dir, "SafariTabs.db")
+		if _, err := os.Stat(tabsPath); err == nil {
+			return tabsPath
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+		dir = parent
+	}
+	return ""
 }
 
 // Unix timestamps are in seconds since January 1, 1970 UTC
