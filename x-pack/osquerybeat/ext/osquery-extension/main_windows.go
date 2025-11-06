@@ -18,15 +18,15 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-func RegisterAmcacheTables(server *osquery.ExtensionManagerServer, log *logger.Logger, postHooks *hooks.HookManager) {
+func RegisterAmcacheTables(server *osquery.ExtensionManagerServer, log *logger.Logger, hooks *hooks.HookManager) {
 	amcacheGlobalState := state.GetAmcacheGlobalState()
 	for _, t := range tables.AllAmcacheTables() {
 		server.RegisterPlugin(table.NewPlugin(string(t.Name), t.Columns(), t.GenerateFunc(amcacheGlobalState, log)))
 	}
-	amcache.RegisterPostHooks(postHooks)
+	amcache.RegisterHooks(hooks)
 }
 
-func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, postHooks *hooks.HookManager) {
+func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, hooks *hooks.HookManager) {
 	server.RegisterPlugin(table.NewPlugin("browser_history", browserhistory.GetColumns(), browserhistory.GetGenerateFunc(log)))
-	RegisterAmcacheTables(server, log, postHooks)
+	RegisterAmcacheTables(server, log, hooks)
 }
