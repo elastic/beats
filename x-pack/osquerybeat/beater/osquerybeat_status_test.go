@@ -194,8 +194,9 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
-		Manager:  mgr,
-		Registry: reload.NewRegistry(),
+		Manager:    mgr,
+		Registry:   reload.NewRegistry(),
+		Monitoring: beat.NewMonitoring(),
 	}
 
 	cfg := agentconfig.NewConfig()
@@ -230,8 +231,9 @@ func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
-		Manager:  mgr,
-		Registry: reload.NewRegistry(),
+		Manager:    mgr,
+		Registry:   reload.NewRegistry(),
+		Monitoring: beat.NewMonitoring(),
 	}
 
 	cfg := agentconfig.NewConfig()
@@ -266,8 +268,9 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 		startErr: assert.AnError, // Manager.Start() will fail
 	}
 	b := &beat.Beat{
-		Manager:  mgr,
-		Registry: reload.NewRegistry(),
+		Manager:    mgr,
+		Registry:   reload.NewRegistry(),
+		Monitoring: beat.NewMonitoring(),
 	}
 
 	cfg := agentconfig.NewConfig()
