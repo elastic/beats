@@ -237,6 +237,7 @@ require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.19.0
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
+<<<<<<< HEAD
 	github.com/otiai10/copy v1.14.1
 	go.opentelemetry.io/collector/client v1.41.0
 	go.opentelemetry.io/collector/component/componenttest v0.135.0
@@ -249,6 +250,25 @@ require (
 require (
 	github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.2.0
 	go.opentelemetry.io/collector/processor v1.41.0
+=======
+	github.com/mattn/go-sqlite3 v1.14.32
+	go.opentelemetry.io/collector/client v1.43.0
+	go.opentelemetry.io/collector/component/componenttest v0.137.0
+	go.opentelemetry.io/collector/config/configauth v1.43.0
+	go.opentelemetry.io/collector/config/confighttp v0.137.0
+	go.opentelemetry.io/collector/config/configoptional v1.43.0
+	go.opentelemetry.io/collector/confmap/xconfmap v0.137.0
+	go.opentelemetry.io/collector/consumer/consumertest v0.137.0
+	go.opentelemetry.io/collector/exporter v1.43.0
+	go.opentelemetry.io/collector/exporter/exportertest v0.137.0
+	go.opentelemetry.io/collector/extension v1.43.0
+	go.opentelemetry.io/collector/extension/extensionauth v1.43.0
+	go.opentelemetry.io/collector/extension/extensiontest v0.137.0
+	go.opentelemetry.io/collector/pipeline v1.43.0
+	go.opentelemetry.io/collector/processor v1.43.0
+	go.opentelemetry.io/collector/processor/processorhelper v0.137.0
+	go.opentelemetry.io/collector/receiver/receivertest v0.137.0
+>>>>>>> 68257d99f (Move beatsauth extension to beats repo (#47444))
 	go.opentelemetry.io/otel/sdk/metric v1.38.0
 	go.uber.org/goleak v1.3.0
 	sigs.k8s.io/kind v0.29.0
@@ -434,6 +454,7 @@ require (
 	go.elastic.co/fastjson v1.5.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.0 // indirect
+<<<<<<< HEAD
 	go.opentelemetry.io/collector/config/configauth v0.135.0 // indirect
 	go.opentelemetry.io/collector/config/configcompression v1.41.0 // indirect
 	go.opentelemetry.io/collector/config/confighttp v0.135.0 // indirect
@@ -471,6 +492,36 @@ require (
 	go.opentelemetry.io/collector/receiver/xreceiver v0.135.0 // indirect
 	go.opentelemetry.io/collector/service v0.135.0 // indirect
 	go.opentelemetry.io/collector/service/hostcapabilities v0.135.0 // indirect
+=======
+	go.opentelemetry.io/collector/config/configcompression v1.43.0 // indirect
+	go.opentelemetry.io/collector/config/configmiddleware v1.43.0 // indirect
+	go.opentelemetry.io/collector/config/configopaque v1.43.0 // indirect
+	go.opentelemetry.io/collector/config/configretry v1.43.0 // indirect
+	go.opentelemetry.io/collector/config/configtelemetry v0.137.0 // indirect
+	go.opentelemetry.io/collector/connector v0.137.0 // indirect
+	go.opentelemetry.io/collector/connector/connectortest v0.137.0 // indirect
+	go.opentelemetry.io/collector/connector/xconnector v0.137.0 // indirect
+	go.opentelemetry.io/collector/consumer/consumererror/xconsumererror v0.137.0 // indirect
+	go.opentelemetry.io/collector/consumer/xconsumer v0.137.0 // indirect
+	go.opentelemetry.io/collector/exporter/exporterhelper v0.137.0 // indirect
+	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.137.0 // indirect
+	go.opentelemetry.io/collector/exporter/xexporter v0.137.0 // indirect
+	go.opentelemetry.io/collector/extension/extensioncapabilities v0.137.0 // indirect
+	go.opentelemetry.io/collector/extension/extensionmiddleware v0.137.0 // indirect
+	go.opentelemetry.io/collector/extension/xextension v0.137.0 // indirect
+	go.opentelemetry.io/collector/featuregate v1.43.0 // indirect
+	go.opentelemetry.io/collector/internal/fanoutconsumer v0.137.0 // indirect
+	go.opentelemetry.io/collector/internal/telemetry v0.137.0 // indirect
+	go.opentelemetry.io/collector/pdata/pprofile v0.137.0 // indirect
+	go.opentelemetry.io/collector/pdata/testdata v0.137.0 // indirect
+	go.opentelemetry.io/collector/pdata/xpdata v0.137.0 // indirect
+	go.opentelemetry.io/collector/pipeline/xpipeline v0.137.0 // indirect
+	go.opentelemetry.io/collector/processor/processortest v0.137.0 // indirect
+	go.opentelemetry.io/collector/processor/xprocessor v0.137.0 // indirect
+	go.opentelemetry.io/collector/receiver/xreceiver v0.137.0 // indirect
+	go.opentelemetry.io/collector/service v0.137.0 // indirect
+	go.opentelemetry.io/collector/service/hostcapabilities v0.137.0 // indirect
+>>>>>>> 68257d99f (Move beatsauth extension to beats repo (#47444))
 	go.opentelemetry.io/contrib/bridges/otelzap v0.13.0 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.36.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.61.0 // indirect
