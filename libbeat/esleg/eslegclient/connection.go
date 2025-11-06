@@ -443,13 +443,14 @@ func (conn *Connection) getVersion() error {
 		conn.version = *v
 	}
 
-	if versionData.Version.BuildFlavor == "serverless" {
+	switch versionData.Version.BuildFlavor {
+	case "serverless":
 		conn.log.Info("build flavor of es is serverless, marking connection as serverless")
 		conn.isServerless = true
-	} else if versionData.Version.BuildFlavor == "default" {
+	case "default":
 		conn.isServerless = false
 		// not sure if this is even possible, just being defensive
-	} else {
+	default:
 		conn.log.Infof("Got unexpected build flavor '%s'", versionData.Version.BuildFlavor)
 	}
 
