@@ -249,9 +249,10 @@ func startTestServer(t *testing.T, serverCerts []tls.Certificate) string {
 			t.Errorf("coluld not write to client: %s", err)
 		}
 	}))
-	server.TLS = &tls.Config{}
-	server.TLS.Certificates = serverCerts
-	server.TLS.MinVersion = tls.VersionTLS12
+	server.TLS = &tls.Config{
+		MinVersion:   tls.VersionTLS12,
+		Certificates: serverCerts,
+	}
 	server.StartTLS()
 	t.Cleanup(func() { server.Close() })
 	return server.URL
