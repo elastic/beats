@@ -1,0 +1,109 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package cel
+
+import (
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+	"time"
+)
+
+type roundTripperFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripperFunc) RoundTrip(r *http.Request) (*http.Response, error) {
+	return f(r)
+}
+
+func TestFileAuthTransportSetsHeader(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "secret")
+	if err := os.WriteFile(path, []byte("super-secret\n"), 0o600); err != nil {
+		t.Fatalf("failed to write secret file: %v", err)
+	}
+
+	refresh := time.Second
+	cfg := &fileAuthConfig{Path: path, Prefix: "Bearer ", RefreshInterval: &refresh}
+
+	base := roundTripperFunc(func(r *http.Request) (*http.Response, error) {
+		auth := r.Header.Get("Authorization")
+		if auth != "Bearer super-secret" {
+			t.Fatalf("unexpected authorization header: got %q want %q", auth, "Bearer super-secret")
+		}
+		return &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(strings.NewReader("")), Header: make(http.Header)}, nil
+	})
+
+	transport, err := newFileAuthTransport(cfg, base)
+	if err != nil {
+		t.Fatalf("unexpected error creating transport: %v", err)
+	}
+
+	req, err := http.NewRequest(http.MethodGet, "http://example.test", nil)
+	if err != nil {
+		t.Fatalf("failed to create request: %v", err)
+	}
+
+	if _, err := transport.RoundTrip(req); err != nil {
+		t.Fatalf("unexpected round trip error: %v", err)
+	}
+}
+
+func TestFileAuthTransportRefreshesValue(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "secret")
+	if err := os.WriteFile(path, []byte("alpha"), 0o600); err != nil {
+		t.Fatalf("failed to write secret file: %v", err)
+	}
+
+	refresh := 50 * time.Millisecond
+	cfg := &fileAuthConfig{Path: path, Prefix: "ApiKey ", RefreshInterval: &refresh}
+
+	expectations := []string{"ApiKey alpha", "ApiKey beta"}
+	base := roundTripperFunc(func(r *http.Request) (*http.Response, error) {
+		if len(expectations) == 0 {
+			t.Fatalf("unexpected extra request")
+		}
+		expected := expectations[0]
+		expectations = expectations[1:]
+		if got := r.Header.Get("Authorization"); got != expected {
+			t.Fatalf("unexpected authorization header: got %q want %q", got, expected)
+		}
+		return &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(strings.NewReader("")), Header: make(http.Header)}, nil
+	})
+
+	transport, err := newFileAuthTransport(cfg, base)
+	if err != nil {
+		t.Fatalf("unexpected error creating transport: %v", err)
+	}
+
+	current := transport.loadedAt
+	transport.clock = func() time.Time { return current }
+
+	req, err := http.NewRequest(http.MethodGet, "http://example.test", nil)
+	if err != nil {
+		t.Fatalf("failed to create request: %v", err)
+	}
+
+	if _, err := transport.RoundTrip(req); err != nil {
+		t.Fatalf("unexpected round trip error: %v", err)
+	}
+
+	if err := os.WriteFile(path, []byte("beta"), 0o600); err != nil {
+		t.Fatalf("failed to rotate secret file: %v", err)
+	}
+
+	current = current.Add(refresh + time.Millisecond)
+
+	if _, err := transport.RoundTrip(req); err != nil {
+		t.Fatalf("unexpected round trip error after refresh: %v", err)
+	}
+
+	if len(expectations) != 0 {
+		t.Fatalf("not all expectations were consumed: %d remaining", len(expectations))
+	}
+}

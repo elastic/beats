@@ -9,7 +9,9 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -49,6 +51,57 @@ func TestIsEnabled(t *testing.T) {
 	enabled = true
 
 	assert.True(t, oauth2.isEnabled())
+}
+
+func TestFileAuthConfigValidate(t *testing.T) {
+	t.Run("requires path", func(t *testing.T) {
+		cfg := &fileAuthConfig{}
+		err := cfg.Validate()
+		if err == nil || err.Error() != "path must be set" {
+			t.Fatalf("expected path validation error, got %v", err)
+		}
+	})
+
+	t.Run("requires positive refresh interval", func(t *testing.T) {
+		path := filepath.Join(t.TempDir(), "token")
+		zero := time.Duration(0)
+		cfg := &fileAuthConfig{Path: path, RefreshInterval: &zero}
+		err := cfg.Validate()
+		if err == nil || err.Error() != "refresh_interval must be greater than 0" {
+			t.Fatalf("expected refresh interval validation error, got %v", err)
+		}
+	})
+
+	t.Run("valid configuration", func(t *testing.T) {
+		path := filepath.Join(t.TempDir(), "token")
+		refresh := time.Second
+		cfg := &fileAuthConfig{Path: path, RefreshInterval: &refresh}
+		if err := cfg.Validate(); err != nil {
+			t.Fatalf("unexpected validation error: %v", err)
+		}
+	})
+}
+
+func TestFileAuthConfigDefaults(t *testing.T) {
+	cfg := &fileAuthConfig{}
+	if got := cfg.headerName(); got != defaultFileAuthHeader {
+		t.Fatalf("unexpected default header: got %q want %q", got, defaultFileAuthHeader)
+	}
+	if got := cfg.refreshInterval(); got != defaultFileAuthRefreshInterval {
+		t.Fatalf("unexpected default refresh interval: got %v want %v", got, defaultFileAuthRefreshInterval)
+	}
+
+	header := "X-Api-Key"
+	cfg.Header = header
+	if got := cfg.headerName(); got != header {
+		t.Fatalf("unexpected header override: got %q want %q", got, header)
+	}
+
+	refresh := 30 * time.Second
+	cfg.RefreshInterval = &refresh
+	if got := cfg.refreshInterval(); got != refresh {
+		t.Fatalf("unexpected refresh interval override: got %v want %v", got, refresh)
+	}
 }
 
 func TestGetTokenURL(t *testing.T) {
@@ -133,6 +186,52 @@ func TestConfigOauth2Validation(t *testing.T) {
 			input: map[string]interface{}{
 				"auth.basic.user":     "user",
 				"auth.basic.password": "pass",
+				"auth.oauth2": map[string]interface{}{
+					"token_url": "localhost",
+					"client": map[string]interface{}{
+						"id":     "a_client_id",
+						"secret": "a_client_secret",
+					},
+				},
+			},
+		},
+		{
+			name:        "can't set file and basic auth together",
+			expectedErr: "only one kind of auth can be enabled accessing 'auth'",
+			input: map[string]interface{}{
+				"auth.basic.user":     "user",
+				"auth.basic.password": "pass",
+				"auth.file.path":      "./token",
+			},
+		},
+		{
+			name: "can set file and basic auth together if file auth disabled",
+			input: map[string]interface{}{
+				"auth.basic.user":     "user",
+				"auth.basic.password": "pass",
+				"auth.file.enabled":   false,
+				"auth.file.path":      "./token",
+			},
+		},
+		{
+			name:        "can't set file and oauth2 auth together",
+			expectedErr: "only one kind of auth can be enabled accessing 'auth'",
+			input: map[string]interface{}{
+				"auth.file.path": "./token",
+				"auth.oauth2": map[string]interface{}{
+					"token_url": "localhost",
+					"client": map[string]interface{}{
+						"id":     "a_client_id",
+						"secret": "a_client_secret",
+					},
+				},
+			},
+		},
+		{
+			name: "can set file and oauth2 auth together if file auth disabled",
+			input: map[string]interface{}{
+				"auth.file.enabled": false,
+				"auth.file.path":    "./token",
 				"auth.oauth2": map[string]interface{}{
 					"token_url": "localhost",
 					"client": map[string]interface{}{
