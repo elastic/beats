@@ -109,8 +109,10 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 // Run starts the input and blocks until it ends completes. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
+	dataStreamName := src.(*source).cfg.DataStream // May be empty.
+
 	var cursor map[string]interface{}
-	env.UpdateStatus(status.Starting, "")
+	env.UpdateStatus(status.Starting, dataStreamName)
 	if !crsr.IsNew() { // Allow the user to bootstrap the program if needed.
 		err := crsr.Unpack(&cursor)
 		if err != nil {
@@ -118,14 +120,40 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 			return err
 		}
 	}
-
-	err := input{}.run(env, src.(*source), cursor, pub)
+	var health status.StatusReporter = &env
+	if dataStreamName != "" {
+		health = namedStatusReporter{
+			name:   dataStreamName,
+			parent: &env,
+		}
+	}
+	err := input{}.run(env, src.(*source), cursor, pub, health)
 	if err != nil {
-		env.UpdateStatus(status.Failed, "failed to run: "+err.Error())
+		msg := "failed to run: " + err.Error()
+		if dataStreamName != "" {
+			msg = dataStreamName + ": " + msg
+		}
+		env.UpdateStatus(status.Failed, msg)
 		return err
 	}
-	env.UpdateStatus(status.Stopped, "")
+	env.UpdateStatus(status.Stopped, dataStreamName)
 	return nil
+}
+
+type namedStatusReporter struct {
+	name   string
+	parent status.StatusReporter
+}
+
+func (r namedStatusReporter) UpdateStatus(status status.Status, msg string) {
+	switch {
+	case r.name != "" && msg != "":
+		r.parent.UpdateStatus(status, r.name+": "+msg)
+	case r.name != "":
+		r.parent.UpdateStatus(status, r.name)
+	default:
+		r.parent.UpdateStatus(status, msg)
+	}
 }
 
 // sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
@@ -137,7 +165,7 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
-func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
+func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
@@ -203,7 +231,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	goodURL := cfg.Resource.URL.String()
 	state["url"] = goodURL
 	metrics.resource.Set(goodURL)
-	env.UpdateStatus(status.Running, "")
+	health.UpdateStatus(status.Running, "")
 	// On entry, state is expected to be in the shape:
 	//
 	// {
@@ -299,7 +327,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					}
 				}
 				log.Errorw("failed evaluation", "error", err)
-				env.UpdateStatus(status.Degraded, "failed evaluation: "+err.Error())
+				health.UpdateStatus(status.Degraded, "failed evaluation: "+err.Error())
 			}
 			isDegraded = err != nil
 			metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -436,9 +464,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					log.Errorw("single event object returned by evaluation", "error", e)
 				}
 				if err, ok := e["error"]; ok {
-					env.UpdateStatus(status.Degraded, fmt.Sprintf("single event error object returned by evaluation: %s", mapstr.M{"error": err}))
+					health.UpdateStatus(status.Degraded, fmt.Sprintf("single event error object returned by evaluation: %s", mapstr.M{"error": err}))
 				} else {
-					env.UpdateStatus(status.Degraded, "single event object returned by evaluation")
+					health.UpdateStatus(status.Degraded, "single event object returned by evaluation")
 				}
 				isDegraded = true
 				events = []interface{}{e}
@@ -466,7 +494,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if ok {
 					if len(cursors) != len(events) {
 						log.Errorw("unexpected cursor list length", "cursors", len(cursors), "events", len(events))
-						env.UpdateStatus(status.Degraded, "unexpected cursor list length")
+						health.UpdateStatus(status.Degraded, "unexpected cursor list length")
 						isDegraded = true
 						// But try to continue.
 						if len(cursors) < len(events) {
@@ -518,7 +546,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if err != nil {
 					hadPublicationError = true
 					log.Errorw("error publishing event", "error", err)
-					env.UpdateStatus(status.Degraded, "error publishing event: "+err.Error())
+					health.UpdateStatus(status.Degraded, "error publishing event: "+err.Error())
 					isDegraded = true
 					cursors = nil // We are lost, so retry with this event's cursor,
 					continue      // but continue with the events that we have without
@@ -538,7 +566,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 
 			if !isDegraded {
-				env.UpdateStatus(status.Running, "")
+				health.UpdateStatus(status.Running, "")
 			}
 
 			metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -560,7 +588,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			budget--
 			if budget <= 0 {
 				log.Warnw("exceeding maximum number of CEL executions", "limit", *cfg.MaxExecutions)
-				env.UpdateStatus(status.Degraded, "exceeding maximum number of CEL executions")
+				health.UpdateStatus(status.Degraded, "exceeding maximum number of CEL executions")
 				return nil
 			}
 		}
