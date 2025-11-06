@@ -56,10 +56,10 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
+	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
 	"github.com/elastic/elastic-agent-libs/testing/proxytest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 	mockes "github.com/elastic/mock-es/pkg/api"
-	"github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension"
 )
 
 // This test package tests ES exporter + beatsauth extension together
@@ -145,7 +145,7 @@ receivers:
 
 	// get new beats authenticator
 	beatsauth := newAuthenticator(t, beatsauthextension.Config{
-		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
+		BeatAuthConfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
 	})
 
 	// start extension
@@ -220,7 +220,7 @@ receivers:
 
 	// get new beats authenticator
 	beatsauth := newAuthenticator(t, beatsauthextension.Config{
-		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
+		BeatAuthConfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
 	})
 
 	// start extension
@@ -285,7 +285,7 @@ receivers:
 
 	// get new beats authenticator
 	beatsauth := newAuthenticator(t, beatsauthextension.Config{
-		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
+		BeatAuthConfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
 	})
 
 	// start extension
@@ -465,11 +465,11 @@ receivers:
 			exp := newTestESExporter(t, output)
 
 			authConfig := beatsauthextension.Config{
-				BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
+				BeatAuthConfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
 			}
 
 			if test.ignoreCerts {
-				delete(authConfig.BeatAuthconfig["ssl"].(map[string]any), "certificate_authorities") //nolint: errcheck // it is a test
+				delete(authConfig.BeatAuthConfig["ssl"].(map[string]any), "certificate_authorities") //nolint: errcheck // it is a test
 			}
 
 			// get new beats authenticator
@@ -625,7 +625,7 @@ receivers:
 
 			// get new beats authenticator
 			beatsauth := newAuthenticator(t, beatsauthextension.Config{
-				BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
+				BeatAuthConfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
 			})
 
 			// start extension
