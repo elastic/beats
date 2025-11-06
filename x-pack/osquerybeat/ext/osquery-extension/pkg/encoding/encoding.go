@@ -8,7 +8,10 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/osquery/osquery-go/plugin/table"
 )
 
 type EncodingFlag int
@@ -98,6 +101,92 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 	}
 
 	return result, nil
+}
+
+func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
+	if in == nil {
+		return nil, fmt.Errorf("input cannot be nil")
+	}
+
+	t := reflect.TypeOf(in)
+
+	var columns []table.ColumnDefinition
+
+	// Handle pointer types by unwrapping to get the underlying type
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
+	if t.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("unsupported type: %s, must be a struct or pointer to struct", t.Kind())
+	}
+
+	for i := 0; i < t.NumField(); i++ {
+		fieldType := t.Field(i)
+
+		if !fieldType.IsExported() {
+			continue
+		}
+
+		tag := fieldType.Tag
+		key := tag.Get("osquery")
+		switch key {
+		case "-":
+			continue
+		case "":
+			key = fieldType.Name
+		}
+
+		// Determine column type based on Go type
+		var column table.ColumnDefinition
+		fieldKind := fieldType.Type.Kind()
+
+		// Handle pointer types by unwrapping to get the underlying type
+		if fieldKind == reflect.Ptr {
+			fieldKind = fieldType.Type.Elem().Kind()
+		}
+
+		switch fieldKind {
+		case reflect.String:
+			column = table.TextColumn(key)
+
+		case reflect.Bool:
+			column = table.IntegerColumn(key)
+
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32,
+			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32:
+			column = table.IntegerColumn(key)
+
+		case reflect.Int64, reflect.Uint64:
+			column = table.BigIntColumn(key)
+
+		case reflect.Float32, reflect.Float64:
+			column = table.DoubleColumn(key)
+
+		case reflect.Struct:
+			// Handle time.Time type
+			switch fieldType.Type {
+			case reflect.TypeOf(time.Time{}):
+				if timeFormat, ok := tag.Lookup("format"); ok {
+					switch strings.ToLower(timeFormat) {
+					case "unix", "unixnano", "unixmilli", "unixmicro":
+						column = table.BigIntColumn(key)
+					default:
+						column = table.TextColumn(key)
+					}
+				} else {
+					column = table.TextColumn(key)
+				}
+			}
+		default:
+			// we default to table.TextColumn for unsupported types
+			column = table.TextColumn(key)
+		}
+
+		columns = append(columns, column)
+	}
+
+	return columns, nil
 }
 
 // convertValueToStringWithTag converts a reflect.Value to a string, handling pointers,
@@ -205,9 +294,15 @@ func formatTimeWithTagFormat(fieldValue reflect.Value, flag EncodingFlag, tag *r
 
 	var result string
 	if timeFormat, ok := tag.Lookup("format"); ok {
-		switch timeFormat {
+		switch strings.ToLower(timeFormat) {
 		case "unix":
 			result = strconv.FormatInt(t.Unix(), 10)
+		case "unixnano":
+			result = strconv.FormatInt(t.UnixNano(), 10)
+		case "unixmilli":
+			result = strconv.FormatInt(t.UnixMilli(), 10)
+		case "unixmicro":
+			result = strconv.FormatInt(t.UnixMicro(), 10)
 		case "rfc3339":
 			result = t.Format(time.RFC3339)
 		case "rfc3339nano":
