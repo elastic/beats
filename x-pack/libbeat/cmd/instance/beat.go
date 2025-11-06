@@ -39,7 +39,7 @@ import (
 const receiverPublisherCloseTimeout = 5 * time.Second
 
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
-func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, useDefaultProcessors bool, consumer consumer.Logs, componentID string, core zapcore.Core) (*instance.Beat, error) {
+func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, consumer consumer.Logs, componentID string, core zapcore.Core) (*instance.Beat, error) {
 	b, err := instance.NewBeat(settings.Name,
 		settings.IndexPrefix,
 		settings.Version,
@@ -235,7 +235,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, fmt.Errorf("error setting index supporter: %w", err)
 	}
 
-	b.Info.UseDefaultProcessors = useDefaultProcessors
 	processingFactory := settings.Processing
 	if processingFactory == nil {
 		processingFactory = processing.MakeDefaultBeatSupport(true)
