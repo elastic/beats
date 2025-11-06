@@ -63,6 +63,15 @@ type osqueryLogEntry struct {
 	message    string    // log message
 }
 
+type Runner interface {
+	Check(ctx context.Context) error
+	Run(ctx context.Context, flags Flags) error
+	SocketPath() string
+	DataPath() string
+}
+
+type RunnerFactory func(socketPath string, opts ...Option) (Runner, error)
+
 type OSQueryD struct {
 	socketPath string
 	binPath    string
@@ -123,7 +132,11 @@ func WithLoggerPlugin(name string) Option {
 	}
 }
 
-func New(socketPath string, opts ...Option) (*OSQueryD, error) {
+func New(socketPath string, opts ...Option) (Runner, error) {
+	return newOsqueryD(socketPath, opts...)
+}
+
+func newOsqueryD(socketPath string, opts ...Option) (*OSQueryD, error) {
 	q := &OSQueryD{
 		socketPath:            socketPath,
 		extensionsTimeout:     defaultExtensionsTimeout,
