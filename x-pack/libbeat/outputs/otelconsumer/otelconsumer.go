@@ -115,7 +115,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 		}
 
-		beatEvent := event.Content.Fields
+		beatEvent := event.Content.Fields.Clone()
 		if beatEvent == nil {
 			beatEvent = mapstr.M{}
 		}
