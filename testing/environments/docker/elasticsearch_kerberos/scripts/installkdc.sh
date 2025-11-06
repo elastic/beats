@@ -79,4 +79,4 @@ chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/krb5kdc/kadm5.acl
 chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/admin.keytab
 
 # Create a link so addprinc.sh is on path
-sudo ln -s /scripts/addprinc.sh /usr/bin/
+ln -s /scripts/addprinc.sh /usr/bin/
