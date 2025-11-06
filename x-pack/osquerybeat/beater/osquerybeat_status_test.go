@@ -92,6 +92,7 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	b := &beat.Beat{
 		Manager:  mgr,
 		Registry: reload.NewRegistry(),
+		Monitoring: beat.NewMonitoring(),
 	}
 
 	cfg := agentconfig.NewConfig()
