@@ -278,7 +278,8 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 	require.NoError(t, err)
 
 	// Inject mock osqueryd that works fine
-	ob := beater.(*osquerybeat)
+	ob, ok := beater.(*osquerybeat)
+	require.True(t, ok)
 	ob.osquerydFactory = func(socketPath string, opts ...osqd.Option) (osqd.Runner, error) {
 		return &mockOsqueryd{
 			checkErr: nil,
