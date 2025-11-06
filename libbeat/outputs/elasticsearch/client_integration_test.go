@@ -55,12 +55,14 @@ func TestClientPublishEvent(t *testing.T) {
 
 func TestClientPublishEventKerberosAware(t *testing.T) {
 
-	kerberosURL := "http://elasticsearch_kerberos.elastic:9203"
-	err := setupRoleMapping(t, kerberosURL)
+	err := setupRoleMapping(t, "http://localhost:9203")
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// elasticsearch_kerberos.elastic is the principal service name
+	// this is required to obtain TGT
+	kerberosURL := "http://elasticsearch_kerberos.elastic:9203"
 	index := "beat-int-pub-single-event-behind-kerb"
 	cfg := map[string]interface{}{
 		"hosts": kerberosURL,
