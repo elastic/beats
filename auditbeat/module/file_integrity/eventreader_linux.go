@@ -19,37 +19,14 @@
 
 package file_integrity
 
-import (
-	"errors"
+var autoBackendOrder = []Backend{
+	BackendEBPF,
+	BackendKprobes,
+	BackendFSNotify,
+}
 
-	"github.com/elastic/elastic-agent-libs/logp"
-)
-
-func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
-	if c.Backend == BackendAuto || c.Backend == BackendFSNotify || c.Backend == "" {
-		// Auto and unset defaults to fsnotify
-		l := logger.Named("fsnotify")
-		l.Info("selected backend: fsnotify")
-		return &fsNotifyReader{
-			config:  c,
-			log:     l,
-			parsers: FileParsers(c),
-		}, nil
-	}
-
-	if c.Backend == BackendEBPF {
-		l := logger.Named("ebpf")
-		l.Info("selected backend: ebpf")
-
-		return newEBPFReader(c, l)
-	}
-
-	if c.Backend == BackendKprobes {
-		l := logger.Named("kprobes")
-		l.Info("selected backend: kprobes")
-		return newKProbesReader(c, l, FileParsers(c))
-	}
-
-	// unimplemented
-	return nil, errors.ErrUnsupported
+var supportedBackends = map[Backend]backendInitializer{
+	BackendEBPF:     newEBPFReader,
+	BackendKprobes:  newKProbesReader,
+	BackendFSNotify: newFSNotifyReader,
 }

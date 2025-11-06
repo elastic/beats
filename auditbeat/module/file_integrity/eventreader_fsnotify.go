@@ -41,6 +41,10 @@ type fsNotifyReader struct {
 	parsers []FileParser
 }
 
+func newFSNotifyReader(c Config, l *logp.Logger) (EventProducer, error) {
+	return &fsNotifyReader{config: c, log: l, parsers: FileParsers(c)}, nil
+}
+
 func (r *fsNotifyReader) Start(done <-chan struct{}) (<-chan Event, error) {
 	watcher, err := monitor.New(r.config.Recursive, r.config.IsExcludedPath)
 	if err != nil {

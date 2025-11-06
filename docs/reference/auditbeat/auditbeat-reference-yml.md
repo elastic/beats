@@ -114,8 +114,11 @@ auditbeat.modules:
   # Select the backend which will be used to source events.
   # "fsnotify" doesn't have the ability to associate user data to file events.
   # Valid values: auto, fsnotify, kprobes, ebpf.
-  # Default: fsnotify.
-  backend: fsnotify
+  # When "auto" is used, the module will try backends in order of preference:
+  # - Linux: ebpf -> kprobes -> fsnotify
+  # - Windows: etw -> fsnotify
+  # Default: auto.
+  backend: auto
 
   # Scan over the configured file paths at startup and send events for new or
   # modified files since the last time Auditbeat was running.
