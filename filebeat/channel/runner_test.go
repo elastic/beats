@@ -246,7 +246,7 @@ index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
 	cfg, err := conf.NewConfigWithYAML([]byte(configYAML), configYAML)
 	require.NoError(t, err)
 
-	b := beat.Info{Logger: logptest.NewTestingLogger(t, "")} // not important for the test
+	b := beat.Info{Logger: logp.NewNopLogger()} // not important for the test
 	rf := &runnerFactoryMock{
 		clientCount: 3, // we will create 3 clients from the wrapped pipeline
 	}
