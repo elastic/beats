@@ -63,16 +63,16 @@ Kubernetes stores logs on `/var/log/pods` and uses symlinks on `/var/log/contain
 for active log files. For full details, refer to the official
 [Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
 
-By default, existing deployments monitor only active logs via `/var/log/containers`.
-To add rotated logs, you must change the path to: `/var/log/pods/*/*/*.log*`.
+By default, previous deployments monitor only active logs via `/var/log/containers`.
+To add rotated logs, you must change the path to: `/var/log/pods/`.
 
 ::::{warning}
-Data Duplication: When you modify the path of an existing integration,
-the integration reads all existing files in that directory from the beginning.
+Data Duplication: When you modify the path of an existing deployment,
+filebeat reads all existing files in that directory from the beginning.
 This action causes a one-time re-ingestion of the active log file and all 
 previously rotated logs, which results in duplicate data.
 
-After the initial scan, the integration tracks files normally and will only
+After the initial scan, filebeat tracks files normally and will only
 ingest new log data. Subsequent file rotations are handled correctly without
 further data duplication.
 ::::
@@ -114,7 +114,7 @@ documentation for details.
 
 ::::{warning}
 [add_kubernetes_metadata](https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_logs_path)
-adds *pod* metadata, which does not include
+configured as shown above adds *pod* metadata, which does not include
 container data (such as `kubernetes.container.name`). If you need container
 metadata, you must consider using autodiscover instead. Refer to the
 [autodiscover documentation](https://www.elastic.co/docs/reference/beats/filebeat/configuration-autodiscover#_kubernetes) for details.
