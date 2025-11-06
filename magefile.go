@@ -28,7 +28,6 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"go.uber.org/multierr"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 
@@ -136,7 +135,7 @@ func AddLicenseHeaders() error {
 
 	licenser := gotool.Licenser
 
-	return multierr.Combine(
+	return errors.Join(
 		licenser(
 			licenser.License("ASL2"),
 			licenser.Exclude("x-pack"),
@@ -159,7 +158,7 @@ func CheckLicenseHeaders() error {
 
 	licenser := gotool.Licenser
 
-	return multierr.Combine(
+	return errors.Join(
 		licenser(
 			licenser.Check(),
 			licenser.License("ASL2"),
