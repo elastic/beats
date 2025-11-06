@@ -13,7 +13,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-<<<<<<< HEAD
 type DiagnosticExtension interface {
 	RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook func() []byte)
 }
@@ -26,9 +25,6 @@ type WithDiagnosticExtension interface {
 
 var _ management.Manager = (*OtelManager)(nil)
 var _ WithDiagnosticExtension = (*OtelManager)(nil)
-=======
-var _ management.Manager = (*OtelManager)(nil)
->>>>>>> 4ba000d5c ([beatreceiver] - add manager for otel mode  (#46539))
 
 func NewOtelManager(cfg *config.C, registry *reload.Registry, logger *logp.Logger) (management.Manager, error) {
 	management.SetUnderAgent(true)
@@ -36,14 +32,10 @@ func NewOtelManager(cfg *config.C, registry *reload.Registry, logger *logp.Logge
 }
 
 // OtelManager is the main manager for managing beatreceivers
-<<<<<<< HEAD
 type OtelManager struct {
 	ext          DiagnosticExtension
 	receiverName string
 }
-=======
-type OtelManager struct{}
->>>>>>> 4ba000d5c ([beatreceiver] - add manager for otel mode  (#46539))
 
 func (n *OtelManager) UpdateStatus(_ status.Status, _ string) {
 	// a stub implemtation for now.
@@ -64,7 +56,6 @@ func (n *OtelManager) CheckRawConfig(cfg *config.C) error    { return nil }
 func (n *OtelManager) RegisterAction(action client.Action)   {}
 func (n *OtelManager) UnregisterAction(action client.Action) {}
 func (n *OtelManager) SetPayload(map[string]interface{})     {}
-<<<<<<< HEAD
 func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filename string, contentType string, hook client.DiagnosticHook) {
 	if n.ext != nil {
 		n.ext.RegisterDiagnosticHook(n.receiverName, description, filename, contentType, hook)
@@ -73,7 +64,4 @@ func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filen
 func (n *OtelManager) SetDiagnosticExtension(receiverName string, ext DiagnosticExtension) {
 	n.ext = ext
 	n.receiverName = receiverName
-=======
-func (n *OtelManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ client.DiagnosticHook) {
->>>>>>> 4ba000d5c ([beatreceiver] - add manager for otel mode  (#46539))
 }
