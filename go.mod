@@ -236,12 +236,8 @@ require (
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.19.0
-<<<<<<< HEAD
-	github.com/elastic/pkcs8 v1.0.0
-=======
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
-	github.com/mattn/go-sqlite3 v1.14.32
->>>>>>> 20c03b082 (Replace `gokrb5/v8/spnego` with elastic fork (#47443))
+	github.com/elastic/pkcs8 v1.0.0
 	go.opentelemetry.io/collector/client v1.43.0
 	go.opentelemetry.io/collector/component/componenttest v0.137.0
 	go.opentelemetry.io/collector/confmap/xconfmap v0.137.0
