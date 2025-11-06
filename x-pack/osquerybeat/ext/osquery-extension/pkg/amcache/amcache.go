@@ -13,8 +13,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-func CreateAmcacheApplicationsView(socket *string, log *logger.Logger) error {
-	view := hooks.NewView(
+func AmcacheApplicationView() *hooks.View {
+	return hooks.NewView(
 		"V_AmcacheApplications",
 		[]string{"amcache_application", "amcache_application_file"},
 		`CREATE VIEW V_AmcacheApplications AS
@@ -103,14 +103,25 @@ func CreateAmcacheApplicationsView(socket *string, log *logger.Logger) error {
 		LEFT JOIN amcache_application AS app ON file.program_id = app.program_id
 		WHERE
 			app.program_id IS NULL;`)
-
-	err := view.Create(socket, log)
-	if err != nil {
-		return fmt.Errorf("error creating view: %w", err)
-	}
-	return nil
 }
 
-func RegisterPostHooks(hm *hooks.HookManager) {
-	hm.Register(hooks.NewHook("CreateAmcacheApplicationsView", CreateAmcacheApplicationsView))
+func CreateViewHook(socket *string, log *logger.Logger, hookData any) error {
+	view, ok := hookData.(*hooks.View)
+	if !ok {
+		return fmt.Errorf("hook data is not a view")
+	}
+	return view.Create(socket, log)
+}
+
+func DeleteViewHook(socket *string, log *logger.Logger, hookData any) error {
+	view, ok := hookData.(*hooks.View)
+	if !ok {
+		return fmt.Errorf("hook data is not a view")
+	}
+	return view.Delete(socket, log)
+}
+
+func RegisterHooks(hm *hooks.HookManager) {
+	amcacheApplicationView := AmcacheApplicationView()
+	hm.Register(hooks.NewHook("CreateAmcacheApplicationsView", CreateViewHook, DeleteViewHook, amcacheApplicationView))
 }

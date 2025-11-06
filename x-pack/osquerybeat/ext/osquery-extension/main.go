@@ -58,7 +58,7 @@ func main() {
 	log := logger.New(os.Stderr, *verbose)
 
 	// Hook manager for post hooks
-	postHooks := hooks.NewHookManager(hooks.HookTypePost)
+	hooks := hooks.NewHookManager()
 
 	if *socket == "" {
 		log.Fatal("Missing required --socket argument")
@@ -101,10 +101,10 @@ func main() {
 	// Register the tables available for the specific platform build
 	// Any module that needs to execute a post hook should register the hook
 	// within this function
-	RegisterTables(server, log, postHooks)
+	RegisterTables(server, log, hooks)
 
 	// Execute all post hooks to create any views required for the specific platform build
-	go postHooks.Execute(socket, log)
+	go hooks.Execute(socket, log)
 
 	if *verbose {
 		log.Info("Starting osquery extension server")
@@ -113,6 +113,9 @@ func main() {
 	if err := server.Run(); err != nil {
 		log.Fatalf("Failed to run extension server: %s", err)
 	}
+
+	// Execute all shutdown hooks to clean up any resources
+	hooks.Shutdown(socket, log)
 }
 
 func getOsqueryOptions(client *osquery.ExtensionManagerClient, log *logger.Logger) osquerygen.InternalOptionList {
