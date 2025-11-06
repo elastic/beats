@@ -425,11 +425,8 @@ func rename(t *testing.T, oldPath, newPath string) {
 
 func TestBackendFallback(t *testing.T) {
 	logger := logp.NewLogger("test")
-	config := Config{
-		Paths:     []string{t.TempDir()},
-		Backend:   BackendAuto,
-		Recursive: false,
-	}
+	config := defaultConfig
+	config.Paths = []string{t.TempDir()}
 
 	// Test that auto backend selection succeeds (falls back if needed)
 	reader, err := NewEventReader(config, logger)

@@ -183,7 +183,7 @@ nextHash:
 	}
 
 	// Validate flush_interval for ETW backend
-	if c.Backend == BackendETW && c.FlushInterval < time.Second {
+	if runtime.GOOS == "windows" && (c.Backend == BackendETW || c.Backend == "auto" || c.Backend == "") && c.FlushInterval < time.Second {
 		errs = append(errs, fmt.Errorf("flush_interval must be at least 1 second, got %v", c.FlushInterval))
 	}
 
