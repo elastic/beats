@@ -158,6 +158,6 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 func discard(r io.ReadCloser) {
-	io.Copy(io.Discard, r)
+	io.Copy(io.Discard, r) //nolint:errcheck // ¯\_(ツ)_/¯
 	r.Close()
 }

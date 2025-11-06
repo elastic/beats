@@ -72,7 +72,7 @@ func buildJWKAndAlg(privateKey any) (any, error) {
 	case *rsa.PrivateKey:
 		return rsaPublicJWK(&k.PublicKey)
 	case *ed25519.PrivateKey:
-		return edPublicJWK(k.Public().(ed25519.PublicKey))
+		return edPublicJWK(k.Public().(ed25519.PublicKey)) //nolint:errcheck // errcheck is wrong to call this out; if this type assertion ever failed we should probably throw, not just panic.
 	default:
 		return nil, errors.New("unsupported private key type for DPoP: expected *ecdsa.PrivateKey, *rsa.PrivateKey or *ed25519.PrivateKey")
 	}

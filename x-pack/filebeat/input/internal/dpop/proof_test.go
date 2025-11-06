@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//nolint:bodyclose,errcheck,noctx // ಠ_ಠ
 package dpop
 
 import (
