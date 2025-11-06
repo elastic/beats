@@ -90,8 +90,8 @@ func (m *testManager) RegisterDiagnosticHook(string, string, string, string, cli
 func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
-		Manager:  mgr,
-		Registry: reload.NewRegistry(),
+		Manager:    mgr,
+		Registry:   reload.NewRegistry(),
 		Monitoring: beat.NewMonitoring(),
 	}
 
@@ -100,7 +100,8 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	require.NoError(t, err)
 
 	// Inject mock osqueryd that simulates successful startup
-	ob := beater.(*osquerybeat)
+	ob, ok := beater.(*osquerybeat)
+	require.True(t, ok)
 	ob.osquerydFactory = func(socketPath string, opts ...osqd.Option) (osqd.Runner, error) {
 		return &mockOsqueryd{
 			checkErr: nil,                    // Check succeeds
@@ -202,7 +203,8 @@ func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 	require.NoError(t, err)
 
 	// Inject mock osqueryd that fails the check
-	ob := beater.(*osquerybeat)
+	ob, ok := beater.(*osquerybeat)
+	require.True(t, ok)
 	ob.osquerydFactory = func(socketPath string, opts ...osqd.Option) (osqd.Runner, error) {
 		return &mockOsqueryd{
 			checkErr: assert.AnError, // Check fails
@@ -237,7 +239,8 @@ func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 	require.NoError(t, err)
 
 	// Inject factory that fails to create osqueryd
-	ob := beater.(*osquerybeat)
+	ob, ok := beater.(*osquerybeat)
+	require.True(t, ok)
 	ob.osquerydFactory = func(socketPath string, opts ...osqd.Option) (osqd.Runner, error) {
 		return nil, assert.AnError // Factory fails
 	}
