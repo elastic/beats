@@ -50,6 +50,7 @@ func TestEventReader(t *testing.T) {
 
 	// Create a new EventProducer.
 	config := defaultConfig
+	config.Backend = BackendFSNotify // Explicitly use fsnotify to maintain test behavior
 	config.Paths = []string{dir}
 	r, err := NewEventReader(config, logp.NewLogger(""))
 	if err != nil {
@@ -251,6 +252,7 @@ func TestRaces(t *testing.T) {
 
 	// Create a new EventProducer.
 	config := defaultConfig
+	config.Backend = BackendFSNotify // Explicitly use fsnotify to maintain test behavior
 	config.Paths = dirs
 	config.Recursive = true
 	r, err := NewEventReader(config, logp.NewLogger(""))
@@ -419,4 +421,70 @@ func rename(t *testing.T, oldPath, newPath string) {
 
 		t.Fatal(err)
 	}
+}
+
+func TestBackendFallback(t *testing.T) {
+	logger := logp.NewLogger("test")
+	config := Config{
+		Paths:     []string{t.TempDir()},
+		Backend:   BackendAuto,
+		Recursive: false,
+	}
+
+	// Test that auto backend selection succeeds (falls back if needed)
+	reader, err := NewEventReader(config, logger)
+	require.NoError(t, err, "auto backend selection should succeed by falling back to available backends")
+	require.NotNil(t, reader, "reader should not be nil")
+
+	// Test that Start() also succeeds
+	done := make(chan struct{})
+	defer close(done)
+
+	eventChan, err := reader.Start(done)
+	require.NoError(t, err, "Start() should succeed after successful initialization")
+	require.NotNil(t, eventChan, "event channel should not be nil")
+}
+
+func TestExplicitBackendValidation(t *testing.T) {
+	logger := logp.NewLogger("test")
+	config := Config{
+		Paths:     []string{t.TempDir()},
+		Recursive: false,
+	}
+
+	// Test each supported backend individually
+	// At least one should succeed (the fallback one, typically fsnotify)
+	successCount := 0
+	for backend := range supportedBackends {
+		t.Run(string(backend), func(t *testing.T) {
+			config.Backend = backend
+			reader, err := NewEventReader(config, logger)
+
+			// We don't require all backends to work (e.g., ebpf might need privileges)
+			// but we should get a clear error if initialization fails
+			if err != nil {
+				t.Logf("Backend %s initialization failed (expected on some systems): %v", backend, err)
+				return
+			}
+
+			assert.NotNil(t, reader, "reader should not be nil if initialization succeeded")
+			successCount++
+		})
+	}
+
+	// At least one backend should work (fsnotify is always available)
+	assert.Greater(t, successCount, 0, "at least one backend should be available")
+}
+
+func TestUnsupportedBackend(t *testing.T) {
+	logger := logp.NewLogger("test")
+	config := Config{
+		Paths:     []string{t.TempDir()},
+		Backend:   "invalid_backend",
+		Recursive: false,
+	}
+
+	// Test that invalid backend returns an error
+	_, err := NewEventReader(config, logger)
+	assert.Error(t, err, "unsupported backend should return an error")
 }

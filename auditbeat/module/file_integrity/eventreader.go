@@ -50,6 +50,7 @@ func tryBackendsInOrder(supportedBackends map[Backend]backendInitializer, backen
 			l.Fatalf("backend %s not supported, this is a bug", backend)
 		}
 		if reader, lastErr = initializer(c, l); lastErr == nil {
+			l.Infof("selected backend: %s", backend)
 			return reader, nil
 		}
 
