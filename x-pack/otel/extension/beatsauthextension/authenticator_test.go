@@ -14,7 +14,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componentstatus"
@@ -23,6 +22,8 @@ import (
 	"go.opentelemetry.io/collector/config/confighttp"
 	"go.opentelemetry.io/collector/config/configoptional"
 	"go.uber.org/goleak"
+
+	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 )
 
 func TestMain(m *testing.M) {
