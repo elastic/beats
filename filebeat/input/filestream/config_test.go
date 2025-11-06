@@ -28,7 +28,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestConfigValidate(t *testing.T) {
@@ -271,13 +271,12 @@ id: unique-id-3
 				require.NoError(t, err, "could not create input configuration")
 				inputs = append(inputs, cfg)
 			}
-			err := logp.DevelopmentSetup(logp.ToObserverOutput())
-			require.NoError(t, err, "could not setup log for development")
 
-			err = ValidateInputIDs(inputs, logp.L())
+			logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
+			err := ValidateInputIDs(inputs, logger)
 			tc.assertErr(t, err)
 			if tc.assertLogs != nil {
-				tc.assertLogs(t, logp.ObserverLogs())
+				tc.assertLogs(t, observedLogs)
 			}
 		})
 	}

@@ -7,93 +7,132 @@
 package tables
 
 import (
-	"bytes"
+	"context"
 	"fmt"
-	"io/fs"
-	"log"
-	"os"
+	"math"
 	"reflect"
 	"strings"
+	"time"
 
-	"github.com/forensicanalysis/fslib"
-	"github.com/forensicanalysis/fslib/systemfs"
 	"github.com/osquery/osquery-go/plugin/table"
 	"www.velocidex.com/golang/regparser"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
-
-// TableType represents the different types of Amcache tables.
-type TableType int
-const (
-	ApplicationTableType         TableType = iota // 0
-	ApplicationFileTableType                      // 1
-	ApplicationShortcutTableType                  // 2
-	DriverBinaryTableType                         // 3
-	DevicePnpTableType                            // 4
-)
-
-// AllTableTypes returns a slice of all defined TableTypes.
-func AllTableTypes() []TableType {
-	return []TableType{
-		ApplicationTableType,
-		ApplicationFileTableType,
-		ApplicationShortcutTableType,
-		DriverBinaryTableType,
-		DevicePnpTableType,
-	}
-}
-
-// GetHiveKey returns the registry hive key path associated with the TableType.
-func (tt TableType) GetHiveKey() string {
-	switch tt {
-	case ApplicationTableType:
-		return "Root\\InventoryApplication"
-	case ApplicationFileTableType:
-		return "Root\\InventoryApplicationFile"
-	case ApplicationShortcutTableType:
-		return "Root\\InventoryApplicationShortcut"
-	case DriverBinaryTableType:
-		return "Root\\InventoryDriverBinary"
-	case DevicePnpTableType:
-		return "Root\\InventoryDevicePnp"
-	default:
-		return ""
-	}
-}
-
-// TableInterface defines the methods that each Amcache table must implement.
-type TableInterface interface {
-	Type() TableType
-	Columns() []table.ColumnDefinition
-	GenerateFunc(state GlobalStateInterface) table.GenerateFunc
-	FilterColumn() string
-}
 
 // GlobalState is an interface that defines methods for accessing global Amcache state.
 type GlobalStateInterface interface {
-	GetCachedEntries(tableType TableType, ids ...string) []Entry
+	GetCachedEntries(amcacheTable AmcacheTable, filters []filters.Filter, log *logger.Logger) ([]Entry, error)
 }
 
-// Entry defines the methods that each Amcache entry must implement.
+type BaseEntry struct {
+}
+
 type Entry interface {
-	FilterValue() string
-	ToMap() (map[string]string, error)
+	// PostProcess is called after the entry is populated from the registry key.
+	// It is used to perform any additional processing on the entry such as
+	// calculating derived fields or performing other cleanup.
+	PostProcess()
 }
 
-// EntryFactory creates a new Entry instance based on the provided TableType.
-func EntryFactory(tableType TableType) Entry {
-	switch tableType {
-	case ApplicationTableType:
-		return &ApplicationEntry{}
-	case ApplicationFileTableType:
-		return &ApplicationFileEntry{}
-	case ApplicationShortcutTableType:
-		return &ApplicationShortcutEntry{}
-	case DriverBinaryTableType:
-		return &DriverBinaryEntry{}
-	case DevicePnpTableType:
-		return &DevicePnpEntry{}
-	default:
-		return nil
+type TableName string
+
+const (
+	TableNameApplication         TableName = "amcache_application"
+	TableNameApplicationFile     TableName = "amcache_application_file"
+	TableNameApplicationShortcut TableName = "amcache_application_shortcut"
+	TableNameDriverBinary        TableName = "amcache_driver_binary"
+	TableNameDevicePnp           TableName = "amcache_device_pnp"
+	TableNameDriverPackage       TableName = "amcache_driver_package"
+)
+
+type AmcacheTable struct {
+	Name     TableName
+	HiveKey  string
+	NewEntry func() Entry
+}
+
+// AllAmcacheTables returns a slice of all defined AmcacheTables.
+func AllAmcacheTables() []AmcacheTable {
+	return []AmcacheTable{
+		{
+			Name:    TableNameApplication,
+			HiveKey: "Root\\InventoryApplication",
+			NewEntry: func() Entry {
+				return &ApplicationEntry{}
+			},
+		},
+		{
+			Name:    TableNameApplicationFile,
+			HiveKey: "Root\\InventoryApplicationFile",
+			NewEntry: func() Entry {
+				return &ApplicationFileEntry{}
+			},
+		},
+		{
+			Name:    TableNameApplicationShortcut,
+			HiveKey: "Root\\InventoryApplicationShortcut",
+			NewEntry: func() Entry {
+				return &ApplicationShortcutEntry{}
+			},
+		},
+		{
+			Name:    TableNameDriverBinary,
+			HiveKey: "Root\\InventoryDriverBinary",
+			NewEntry: func() Entry {
+				return &DriverBinaryEntry{}
+			},
+		},
+		{
+			Name:    TableNameDevicePnp,
+			HiveKey: "Root\\InventoryDevicePnp",
+			NewEntry: func() Entry {
+				return &DevicePnpEntry{}
+			},
+		},
+		{
+			Name:    TableNameDriverPackage,
+			HiveKey: "Root\\InventoryDriverPackage",
+			NewEntry: func() Entry {
+				return &DriverPackageEntry{}
+			},
+		},
+	}
+}
+
+func GetAmcacheTableByName(name TableName) *AmcacheTable {
+	for _, table := range AllAmcacheTables() {
+		if table.Name == name {
+			return &table
+		}
+	}
+	return nil
+}
+
+func (t AmcacheTable) Columns() []table.ColumnDefinition {
+	entry := t.NewEntry()
+	columns, err := encoding.GenerateColumnDefinitions(entry)
+	if err != nil {
+		// This should never happen
+		panic(fmt.Sprintf("Warning: failed to generate column definitions for %s: %v", t.Name, err))
+	}
+	return columns
+}
+
+func (t AmcacheTable) GenerateFunc(state GlobalStateInterface, log *logger.Logger) table.GenerateFunc {
+	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
+		filters := filters.GetConstraintFilters(queryContext)
+		entries, err := state.GetCachedEntries(t, filters, log)
+		if err != nil {
+			return nil, err
+		}
+		marshalled, err := MarshalEntries(entries)
+		if err != nil {
+			return nil, err
+		}
+		return marshalled, nil
 	}
 }
 
@@ -101,7 +140,7 @@ func EntryFactory(tableType TableType) Entry {
 func MarshalEntries(entries []Entry) ([]map[string]string, error) {
 	marshalled := make([]map[string]string, 0, len(entries))
 	for _, entry := range entries {
-		mapped, err := entry.ToMap()
+		mapped, err := encoding.MarshalToMap(entry)
 		if err != nil {
 			return nil, err
 		}
@@ -110,50 +149,46 @@ func MarshalEntries(entries []Entry) ([]map[string]string, error) {
 	return marshalled, nil
 }
 
-// GetEntriesFromRegistry reads the registry and returns a map of entries for the specified TableType.
-func GetEntriesFromRegistry(tableType TableType, registry *regparser.Registry) (map[string][]Entry, error) {
-	if registry == nil {
-		return nil, fmt.Errorf("registry is nil")
-	}
-
-	keyNode := registry.OpenKey(tableType.GetHiveKey())
-	if keyNode == nil {
-		return nil, fmt.Errorf("error opening key: %s", tableType.GetHiveKey())
-	}
-
-	applicationEntries := make(map[string][]Entry, len(keyNode.Subkeys()))
-	for _, subkey := range keyNode.Subkeys() {
-		ae := EntryFactory(tableType)
-		FillInEntryFromKey(ae, subkey)
-		applicationEntries[ae.FilterValue()] = append(applicationEntries[ae.FilterValue()], ae)
-	}
-	return applicationEntries, nil
-}
-
 // FillInEntryFromKey takes an any, and using the FieldMappings, populates its fields from a registry key.
-func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE) {
+func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE, log *logger.Logger) {
+	// Get the element of the entry and make sure it is valid and can be set
 	elem := reflect.ValueOf(e).Elem()
 	if !elem.IsValid() || !elem.CanSet() {
-		log.Println("invalid struct pointer")
 		return
 	}
 
+	// iterate over the values in the key
 	for _, value := range key.Values() {
+		// Skip if the value name is empty
 		if value.ValueName() == "" {
 			continue
 		}
+
+		// Get the field by the value name
+		// this function hinges on the entry having a field
+		// with the same name as the value name
 		field := elem.FieldByName(value.ValueName())
 		if !field.IsValid() || !field.CanSet() {
 			continue
 		}
 
+		// Switch on the kind of the field
 		switch field.Kind() {
 
 		// If the field is an integer type, make sure the registry value is DWORD or QWORD
-		case reflect.Int64, reflect.Int32:
+		case reflect.Int64:
 			switch value.ValueData().Type {
 			case regparser.REG_DWORD, regparser.REG_QWORD:
-				field.SetInt(int64(value.ValueData().Uint64))
+				val := value.ValueData().Uint64
+				safeUint64ToInt64 := func(val uint64) int64 {
+					if val > math.MaxInt64 {
+						return math.MaxInt64
+					}
+					return int64(val)
+				}
+				// all integers in osquery are 64bit signed integers, but all registry values are unsigned
+				// so we need to convert the value to an int64 and check for overflow
+				field.SetInt(safeUint64ToInt64(val))
 			}
 		// If the field is a string type, handle STRING, DWORD, and QWORD registry value types
 		case reflect.String:
@@ -171,71 +206,48 @@ func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE) {
 			} else {
 				field.SetBool(false)
 			}
-		// Unsupported field type
-		default:
-			log.Printf("Warning: unsupported field type for %s: %s", value.ValueName(), field.Kind())
-		}
-	}
-	// Set LastWriteTime from key timestamp
-	lastWriteTime := elem.FieldByName("LastWriteTime")
-	if lastWriteTime.IsValid() && lastWriteTime.CanSet() {
-		lastWriteTime.SetInt(key.LastWriteTime().Unix())
-	}
-}
-
-// Registry reads the registry hive file and returns a regparser.Registry object.
-func LoadRegistry(filePath string) (*regparser.Registry, error) {
-	// ensure a path was provided
-	if filePath == "" {
-		return nil, fmt.Errorf("hive file path is empty")
-	}
-
-	// try reading the file directly first, which is faster if it works
-	content, err := os.ReadFile(filePath)
-	if err == nil {
-		registry, err := regparser.NewRegistry(bytes.NewReader(content))
-		if err == nil {
-			return registry, nil
-		}
-	}
-
-	// fallback to a low level read using fslib
-	sourceFS, err := systemfs.New()
-	if err != nil {
-		return nil, err
-	}
-	fsPath, err := fslib.ToFSPath(filePath)
-	if err != nil {
-		return nil, err
-	}
-	content, err = fs.ReadFile(sourceFS, fsPath)
-	if err != nil {
-		return nil, err
-	}
-
-	registry, err := regparser.NewRegistry(bytes.NewReader(content))
-	if err != nil {
-		return nil, err
-	}
-
-	return registry, nil
-}
-
-// GetConstraintsFromQueryContext extracts the constraints for a given field from the osquery QueryContext.
-// It returns a slice of strings representing the constraint values.
-// It only supports the '=' operator, and only for the indexed field (program_id, driver_id)
-func GetConstraintsFromQueryContext(fieldName string, context table.QueryContext) []string {
-	constraints := make([]string, 0)
-	for name, cList := range context.Constraints {
-		if len(cList.Constraints) > 0 && name == fieldName {
-			for _, c := range cList.Constraints {
-				if c.Operator != table.OperatorEquals {
-					log.Printf("Warning: only '=' operator is supported for %s constraints, skipping %d", fieldName, c.Operator)
+		case reflect.Struct:
+			switch field.Type() {
+			case reflect.TypeOf(time.Time{}):
+				timeString := strings.TrimRight(value.ValueData().String, "\x00")
+				timestamp, err := time.Parse("01/02/2006 15:04:05", timeString)
+				if err != nil {
 					continue
 				}
-				constraints = append(constraints, c.Expression)
+				field.Set(reflect.ValueOf(timestamp))
 			}
+		// Unsupported field type
+		default:
+			// We control the entry types, so this should never happen
+			log.Fatalf("Error: unsupported field type for %s: %s", value.ValueName(), field.Kind())
 		}
 	}
-	return constraints
+
+	// Set the timestamp for the entry
+	elem.FieldByName("Timestamp").Set(reflect.ValueOf(key.LastWriteTime().Time))
+	elem.FieldByName("DateTime").Set(reflect.ValueOf(key.LastWriteTime().Local()))
+
+	// Call the PostProcess method to perform any additional processing on the entry
+	e.PostProcess()
+}
+
+// GetEntriesFromRegistry reads the registry and returns a map of entries for the specified TableType.
+func GetEntriesFromRegistry(amcacheTable AmcacheTable, registry *regparser.Registry, log *logger.Logger) ([]Entry, error) {
+	if registry == nil {
+		log.Fatalf("GetEntriesFromRegistry called with nil registry for table %s", amcacheTable.Name)
+	}
+
+	hiveKey := amcacheTable.HiveKey
+	keyNode := registry.OpenKey(hiveKey)
+	if keyNode == nil {
+		return nil, fmt.Errorf("error opening key: %s", hiveKey)
+	}
+
+	entries := make([]Entry, 0, len(keyNode.Subkeys()))
+	for _, subkey := range keyNode.Subkeys() {
+		ae := amcacheTable.NewEntry()
+		FillInEntryFromKey(ae, subkey, log)
+		entries = append(entries, ae)
+	}
+	return entries, nil
 }
