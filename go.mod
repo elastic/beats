@@ -196,11 +196,6 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/icholy/digest v0.1.22
-<<<<<<< HEAD
-	github.com/jcmturner/gokrb5/v8 v8.4.4
-	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
-=======
->>>>>>> 20c03b082 (Replace `gokrb5/v8/spnego` with elastic fork (#47443))
 	github.com/klauspost/compress v1.18.0
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
 	github.com/microsoft/go-mssqldb v1.9.2
@@ -238,34 +233,17 @@ require (
 )
 
 require (
-<<<<<<< HEAD
 	github.com/apache/arrow/go/v17 v17.0.0
+	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.3.0
+	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/otiai10/copy v1.14.1
 	go.opentelemetry.io/collector/client v1.41.0
 	go.opentelemetry.io/collector/component/componenttest v0.135.0
 	go.opentelemetry.io/collector/consumer/consumertest v0.135.0
 	go.opentelemetry.io/collector/processor v1.41.0
 	go.opentelemetry.io/collector/processor/processorhelper v0.135.0
-=======
-	github.com/apache/arrow-go/v18 v18.4.1
-	github.com/cilium/ebpf v0.19.0
-	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
-	github.com/mattn/go-sqlite3 v1.14.32
-	go.opentelemetry.io/collector/client v1.43.0
-	go.opentelemetry.io/collector/component/componenttest v0.137.0
-	go.opentelemetry.io/collector/confmap/xconfmap v0.137.0
-	go.opentelemetry.io/collector/consumer/consumertest v0.137.0
-	go.opentelemetry.io/collector/exporter v1.43.0
-	go.opentelemetry.io/collector/exporter/exportertest v0.137.0
-	go.opentelemetry.io/collector/extension v1.43.0
-	go.opentelemetry.io/collector/extension/extensiontest v0.137.0
-	go.opentelemetry.io/collector/pipeline v1.43.0
-	go.opentelemetry.io/collector/processor v1.43.0
-	go.opentelemetry.io/collector/processor/processorhelper v0.137.0
-	go.opentelemetry.io/collector/receiver/receivertest v0.137.0
->>>>>>> 20c03b082 (Replace `gokrb5/v8/spnego` with elastic fork (#47443))
 	go.opentelemetry.io/otel/sdk/metric v1.38.0
 	go.uber.org/goleak v1.3.0
 )
