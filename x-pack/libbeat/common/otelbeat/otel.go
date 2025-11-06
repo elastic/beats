@@ -26,9 +26,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
+<<<<<<< HEAD
+=======
+	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter"
+	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
+>>>>>>> 68257d99f (Move beatsauth extension to beats repo (#47444))
 	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension"
 )
 
 var schemeMap = map[string]string{
