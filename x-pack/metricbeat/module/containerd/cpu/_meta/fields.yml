@@ -36,17 +36,17 @@
           type: scaled_float
           format: percent
           description: >
-            Percentage of total CPU time normalized by the number of CPU cores
+            Percentage of total CPU time normalized by the number of CPU cores, expressed as a value between 0 and 1.
         - name: kernel.pct
           type: scaled_float
           format: percent
           description: >
-            Percentage of time in kernel space normalized by the number of CPU cores.
+            Percentage of time in kernel space normalized by the number of CPU cores, expressed as a value between 0 and 1.
         - name: user.pct
           type: scaled_float
           format: percent
           description: >
-            Percentage of time in user space normalized by the number of CPU cores.
+            Percentage of time in user space normalized by the number of CPU cores, expressed as a value between 0 and 1.
         - name: cpu.*.ns
           type: object
           object_type: double

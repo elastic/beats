@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
-	"io/ioutil"
 	"testing"
 
 	"github.com/docker/docker/api/types/plugins/logdriver"
@@ -33,7 +32,7 @@ func CreateTestInputFromLine(t *testing.T, line string) io.ReadCloser {
 	writer := new(bytes.Buffer)
 
 	encodeLog(t, writer, exampleStruct)
-	return ioutil.NopCloser(writer)
+	return io.NopCloser(writer)
 }
 
 func encodeLog(t *testing.T, out io.Writer, entry *logdriver.LogEntry) {

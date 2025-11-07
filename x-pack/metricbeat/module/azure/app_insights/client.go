@@ -2,16 +2,17 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package app_insights
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -24,8 +25,8 @@ type Client struct {
 }
 
 // NewClient instantiates the an Azure monitoring client
-func NewClient(config Config) (*Client, error) {
-	service, err := NewService(config)
+func NewClient(config Config, logger *logp.Logger) (*Client, error) {
+	service, err := NewService(config, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -41,6 +42,7 @@ func (client *Client) GetMetricValues() (insights.ListMetricsResultsItem, error)
 	var bodyMetrics []insights.MetricsPostBodySchema
 	var result insights.ListMetricsResultsItem
 	for _, metrics := range client.Config.Metrics {
+		metrics := metrics
 		var aggregations []insights.MetricsAggregation
 		var segments []insights.MetricsSegment
 		for _, agg := range metrics.Aggregation {
@@ -62,7 +64,7 @@ func (client *Client) GetMetricValues() (insights.ListMetricsResultsItem, error)
 			}
 			id, err := uuid.NewV4()
 			if err != nil {
-				return result, errors.Wrap(err, "could not generate identifier in client")
+				return result, fmt.Errorf("could not generate identifier in client: %w", err)
 			}
 			strId := id.String()
 			bodyMetrics = append(bodyMetrics, insights.MetricsPostBodySchema{ID: &strId, Parameters: &bodyMetric})
@@ -72,7 +74,7 @@ func (client *Client) GetMetricValues() (insights.ListMetricsResultsItem, error)
 	if err == nil {
 		return result, nil
 	}
-	return result, errors.Wrap(err, "could not retrieve app insights metrics from service")
+	return result, fmt.Errorf("could not retrieve app insights metrics from service: %w", err)
 }
 
 func calculateTimespan(duration time.Duration) *string {

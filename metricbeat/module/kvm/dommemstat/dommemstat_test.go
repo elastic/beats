@@ -15,12 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package dommemstat
 
 import (
+	"net"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
@@ -28,7 +32,9 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
-	conn := libvirttest.New()
+	dialer := libvirttest.New()
+	conn, err := dialer.Dial()
+	require.NoError(t, err)
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(conn))
 
@@ -68,7 +74,7 @@ func TestFetchEventContents(t *testing.T) {
 	}
 }
 
-func getConfig(conn *libvirttest.MockLibvirt) map[string]interface{} {
+func getConfig(conn net.Conn) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "kvm",
 		"metricsets": []string{"dommemstat"},

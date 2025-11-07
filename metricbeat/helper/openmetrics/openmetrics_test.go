@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -97,8 +97,8 @@ metrics_one_count_total{name="john",surname="williams"} 2
 metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
 `
 
-	openMetricsCounterKeyLabelWithNaNInf = `# TYPE metrics_one_count_errors counter
-metrics_one_count_errors{name="jane",surname="foster"} 1
+	openMetricsCounterKeyLabelWithNaNInf = `# TYPE metrics_one_count_errors_total counter
+metrics_one_count_errors_total{name="jane",surname="foster"} 1
 # TYPE metrics_one_count_total counter
 metrics_one_count_total{name="jane",surname="foster"} NaN
 metrics_one_count_total{name="john",surname="williams"} +Inf
@@ -201,7 +201,7 @@ func (m mockFetcher) FetchResponse() (*http.Response, error) {
 
 func TestOpenMetrics(t *testing.T) {
 
-	p := &openmetrics{mockFetcher{response: openMetricsTestSamples}, logp.NewLogger("test")}
+	p := &openmetrics{mockFetcher{response: openMetricsTestSamples}, logptest.NewTestingLogger(t, "test")}
 
 	tests := []struct {
 		mapping  *MetricsMapping
@@ -537,14 +537,12 @@ func TestOpenMetrics(t *testing.T) {
 			msg: "Info metric",
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
-					"target_info": Metric("target_info.metric"),
+					"target": Metric("target"),
 				},
 			},
 			expected: []mapstr.M{
 				mapstr.M{
-					"target_info": mapstr.M{
-						"metric": int64(1),
-					},
+					"target": int64(1),
 				},
 			},
 		},
@@ -552,7 +550,7 @@ func TestOpenMetrics(t *testing.T) {
 			msg: "Info metric with labels",
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
-					"target_with_labels_info": Metric("target_with_labels_info.metric"),
+					"target_with_labels": Metric("target_with_labels"),
 				},
 				Labels: map[string]LabelMap{
 					"env":      Label("labels.env"),
@@ -561,9 +559,7 @@ func TestOpenMetrics(t *testing.T) {
 			},
 			expected: []mapstr.M{
 				mapstr.M{
-					"target_with_labels_info": mapstr.M{
-						"metric": int64(1),
-					},
+					"target_with_labels": int64(1),
 					"labels": mapstr.M{
 						"env":      "prod",
 						"hostname": "myhost",
@@ -747,8 +743,8 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 			openmetricsResponse: openMetricsCounterKeyLabelWithNaNInf,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
-					"metrics_one_count_errors": Metric("metrics.one.count"),
-					"metrics_one_count_total":  Metric("metrics.one.count"),
+					"metrics_one_count_errors_total": Metric("metrics.one.count"),
+					"metrics_one_count_total":        Metric("metrics.one.count"),
 				},
 				Labels: map[string]LabelMap{
 					"name":    KeyLabel("metrics.one.labels.name"),
@@ -1061,7 +1057,7 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 
 	for _, tc := range testCases {
 		r := &mbtest.CapturingReporterV2{}
-		p := &openmetrics{mockFetcher{response: tc.openmetricsResponse}, logp.NewLogger("test")}
+		p := &openmetrics{mockFetcher{response: tc.openmetricsResponse}, logptest.NewTestingLogger(t, "test")}
 		_ = p.ReportProcessedMetrics(tc.mapping, r)
 		if !assert.Nil(t, r.GetErrors(),
 			"error reporting/processing metrics, at %q", tc.testName) {

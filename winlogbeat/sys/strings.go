@@ -44,3 +44,27 @@ func RemoveWindowsLineEndings(s string) string {
 	s = strings.Replace(s, "\r\n", "\n", -1)
 	return strings.TrimRight(s, "\n")
 }
+
+// BinaryToString converts a binary field which is encoded in hexadecimal
+// to its string representation. This is equivalent to hex.EncodeToString
+// but its output is in uppercase to be equivalent to the windows
+// XML formatting of this fields.
+func BinaryToString(bin []byte) string {
+	if len(bin) == 0 {
+		return ""
+	}
+
+	const hexTable = "0123456789ABCDEF"
+
+	size := len(bin) * 2
+	buffer := make([]byte, size)
+
+	j := 0
+	for _, v := range bin {
+		buffer[j] = hexTable[v>>4]
+		buffer[j+1] = hexTable[v&0x0f]
+		j += 2
+	}
+
+	return string(buffer)
+}

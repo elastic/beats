@@ -1,5 +1,5 @@
 # Module: docker
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-docker.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-docker.html
 
 - module: docker
   #metricsets:
@@ -17,6 +17,9 @@
 
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
+
+  # Docker module supports metrics collection from podman's Docker-compatible API. In case of podman set to true.
+  # podman: false
 
   # Skip metrics for certain device major numbers in docker/diskio. 
   # Necessary on systems with software RAID, device mappers, 

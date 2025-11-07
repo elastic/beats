@@ -8,12 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestGetTimeIntervalAligner(t *testing.T) {
@@ -21,7 +22,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 		title            string
 		ingestDelay      time.Duration
 		samplePeriod     time.Duration
-		collectionPeriod *duration.Duration
+		collectionPeriod *durationpb.Duration
 		inputAligner     string
 		expectedAligner  string
 	}{
@@ -29,7 +30,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod equals to samplePeriod",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			&duration.Duration{
+			&durationpb.Duration{
 				Seconds: int64(60),
 			},
 			"",
@@ -39,7 +40,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod larger than samplePeriod",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			&duration.Duration{
+			&durationpb.Duration{
 				Seconds: int64(300),
 			},
 			"ALIGN_MEAN",
@@ -49,7 +50,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod smaller than samplePeriod",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			&duration.Duration{
+			&durationpb.Duration{
 				Seconds: int64(30),
 			},
 			"ALIGN_MAX",
@@ -59,7 +60,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod equals to samplePeriod with given aligner",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			&duration.Duration{
+			&durationpb.Duration{
 				Seconds: int64(60),
 			},
 			"ALIGN_MEAN",
@@ -76,12 +77,6 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 }
 
 func TestGetFilterForMetric(t *testing.T) {
-	if err := logp.DevelopmentSetup(logp.ToObserverOutput()); err != nil {
-		t.Fatalf("cannot initialise logger on development mode: %+v", err)
-	}
-
-	var logger = logp.NewLogger("TestGetFilterForMetric")
-
 	cases := []struct {
 		title          string
 		s              string
@@ -93,61 +88,67 @@ func TestGetFilterForMetric(t *testing.T) {
 			"compute service with empty config",
 			gcp.ServiceCompute,
 			"",
-			metricsRequester{config: config{}, logger: logger},
+			metricsRequester{config: config{}},
 			"metric.type=\"dummy\"",
 		},
 		{
 			"compute service with configured region",
 			gcp.ServiceCompute,
 			"",
-			metricsRequester{config: config{Region: "foo"}, logger: logger},
+			metricsRequester{config: config{Region: "foo"}},
 			"metric.type=\"dummy\" AND resource.labels.zone = starts_with(\"foo\")",
 		},
 		{
 			"compute service with configured zone",
 			gcp.ServiceCompute,
 			"",
-			metricsRequester{config: config{Zone: "foo"}, logger: logger},
+			metricsRequester{config: config{Zone: "foo"}},
 			"metric.type=\"dummy\" AND resource.labels.zone = starts_with(\"foo\")",
 		},
 		{
 			"compute service with configured regions",
 			gcp.ServiceCompute,
 			"",
-			metricsRequester{config: config{Regions: []string{"foo", "bar"}}, logger: logger},
+			metricsRequester{config: config{Regions: []string{"foo", "bar"}}},
 			"metric.type=\"dummy\" AND (resource.labels.zone = starts_with(\"foo\") OR resource.labels.zone = starts_with(\"bar\"))",
 		},
 		{
 			"compute service with configured region and zone",
 			gcp.ServiceCompute,
 			"",
-			metricsRequester{config: config{Region: "foo", Zone: "bar"}, logger: logger},
+			metricsRequester{config: config{Region: "foo", Zone: "bar"}},
 			"metric.type=\"dummy\" AND resource.labels.zone = starts_with(\"foo\")",
 		},
 		{
 			"compute service with configured region and regions",
 			gcp.ServiceCompute,
 			"",
-			metricsRequester{config: config{Region: "foobar", Regions: []string{"foo", "bar"}}, logger: logger},
+			metricsRequester{config: config{Region: "foobar", Regions: []string{"foo", "bar"}}},
 			"metric.type=\"dummy\" AND resource.labels.zone = starts_with(\"foobar\")",
+		},
+		{
+			"aiplatform service with configured region and zone",
+			"aiplatform",
+			"",
+			metricsRequester{config: config{Region: "foo", Zone: "bar", LocationLabel: "resource.label.location"}},
+			"metric.type=\"dummy\" AND resource.label.location = starts_with(\"foo\")",
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
+			logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "TestGetFilterForMetric")
+			c.r.logger = logger
 			filter := c.r.getFilterForMetric(c.s, "dummy")
 			assert.Equal(t, c.expectedFilter, filter)
 
 			// NOTE: test that we output a log message with the filter value, as this is **extremely**
 			// useful to debug issues and we want to make sure is being done.
-			logs := logp.ObserverLogs().
+			logs := observedLogs.
 				FilterLevelExact(zapcore.DebugLevel). // we are OK it being logged at debug level
 				FilterMessageSnippet(filter).
 				Len()
 			assert.Equal(t, logs, 1)
-			// NOTE: cleanup observed logs at each iteration to start with no messages.
-			_ = logp.ObserverLogs().TakeAll()
-
 		})
 	}
 }
@@ -225,6 +226,7 @@ func TestIsAGlobalService(t *testing.T) {
 		{"Dataproc service", gcp.ServiceDataproc, false},
 		{"CloudSQL service", gcp.ServiceCloudSQL, false},
 		{"Redis service", gcp.ServiceRedis, false},
+		{"AIPlatform service", gcp.ServiceAIPlatform, false},
 	}
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
@@ -252,6 +254,7 @@ func TestGetServiceLabelFor(t *testing.T) {
 		{"Dataproc service", gcp.ServiceDataproc, "resource.label.region"},
 		{"CloudSQL service", gcp.ServiceCloudSQL, "resource.labels.region"},
 		{"Redis service", gcp.ServiceRedis, "resource.label.region"},
+		{"AIPlatform service", gcp.ServiceAIPlatform, "resource.label.location"},
 	}
 
 	for _, c := range cases {

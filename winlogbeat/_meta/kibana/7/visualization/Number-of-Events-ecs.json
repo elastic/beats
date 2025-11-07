@@ -2,18 +2,38 @@
     "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-            "searchSourceJSON": "{\"filter\": [], \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\", \"query\": {\"language\": \"kuery\", \"query\": \"\"}}"
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
         },
         "title": "Number of Events [Winlogbeat Overview]",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"aggs\":[{\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"}],\"listeners\":{},\"params\":{\"fontSize\":60},\"type\":\"metric\"}"
+        "visState": {
+            "aggs": [
+                {
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "fontSize": 60
+            },
+            "type": "metric"
+        }
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:45:36.656Z",
     "id": "Number-of-Events-ecs",
-    "migrationVersion": {
-        "visualization": "7.14.0"
-    },
+    "managed": false,
     "references": [
         {
             "id": "winlogbeat-*",
@@ -22,6 +42,7 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-08-11T13:18:52.287Z",
-    "version": "WzIxNzUsMl0="
+    "typeMigrationVersion": "8.5.0",
+    "updated_at": "2023-11-10T17:45:36.656Z",
+    "version": "WzEwMiwxXQ=="
 }

@@ -57,7 +57,15 @@ func FlagsAreSame(flags1, flags2 Flags) bool {
 var protectedFlags = Flags{
 	"force":            true,
 	"disable_watchdog": true,
-	"utc":              true,
+
+	// Deprecated flag in osquery, kept for backward compatibility
+	// See: https://github.com/osquery/osquery/pull/7276
+	"utc": true,
+
+	// Use UTC time for glog timestamps (affects osqueryd log output)
+	// By default, glog uses local time. Setting this ensures consistent
+	// timezone handling across all deployments.
+	"log_utc_time": true,
 
 	// Setting this value to 1 will auto-clear events whenever a SELECT is performed against the table, reducing all impact of the buffer.
 	"events_expiry": 1,
@@ -92,6 +100,9 @@ var protectedFlags = Flags{
 
 	// certificates to use for curl table for example
 	"tls_server_certs": "certs.pem",
+
+	// Augeas lenses are bundled with osquery distributions
+	"augeas_lenses": "lenses",
 }
 
 func init() {

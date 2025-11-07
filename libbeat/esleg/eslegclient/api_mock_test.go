@@ -16,11 +16,11 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package eslegclient
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -64,14 +64,14 @@ func TestOneHostSuccessResp(t *testing.T) {
 
 	server := ElasticsearchMock(200, expectedResp)
 
-	client := newTestConnection(server.URL)
+	client := newTestConnection(t, server.URL)
 
 	params := map[string]string{
 		"refresh": "true",
 	}
 	_, resp, err := client.Index(index, "test", "1", params, body)
 	if err != nil {
-		t.Errorf("Index() returns error: %s", err)
+		t.Fatalf("Index() returns error: %s", err)
 	}
 	if !resp.Created {
 		t.Errorf("Index() fails: %s", resp)
@@ -90,8 +90,10 @@ func TestOneHost500Resp(t *testing.T) {
 
 	server := ElasticsearchMock(http.StatusInternalServerError, []byte("Something wrong happened"))
 
-	client := newTestConnection(server.URL)
-	err := client.Connect()
+	client := newTestConnection(t, server.URL)
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	err := client.Connect(ctx)
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
@@ -122,7 +124,7 @@ func TestOneHost503Resp(t *testing.T) {
 
 	server := ElasticsearchMock(503, []byte("Something wrong happened"))
 
-	client := newTestConnection(server.URL)
+	client := newTestConnection(t, server.URL)
 
 	params := map[string]string{
 		"refresh": "true",

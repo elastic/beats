@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package logstash
 
@@ -26,10 +25,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/transport/transptest"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport"
 )
 
@@ -65,10 +64,14 @@ func newClientServerTCP(t *testing.T, to time.Duration) *clientServer {
 }
 
 func makeTestClient(conn *transport.Client) testClientDriver {
-	config := defaultConfig()
+	config := DefaultConfig()
 	config.Timeout = 1 * time.Second
 	config.TTL = 5 * time.Second
-	client, err := newSyncClient(beat.Info{}, conn, outputs.NewNilObserver(), &config)
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		panic(err)
+	}
+	client, err := newSyncClient(logger, "beat_version", conn, outputs.NewNilObserver(), &config)
 	if err != nil {
 		panic(err)
 	}
@@ -87,6 +90,8 @@ func newClientTestDriver(client outputs.NetworkClient) *testSyncDriver {
 	go func() {
 		defer driver.wg.Done()
 
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
 		for {
 			cmd, ok := <-driver.ch
 			if !ok {
@@ -97,7 +102,7 @@ func newClientTestDriver(client outputs.NetworkClient) *testSyncDriver {
 			case driverCmdQuit:
 				return
 			case driverCmdConnect:
-				driver.client.Connect()
+				driver.client.Connect(ctx)
 			case driverCmdClose:
 				driver.client.Close()
 			case driverCmdPublish:

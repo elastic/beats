@@ -16,7 +16,7 @@
     hostname  = graph+ >tok %set_hostname;
 
     tag           = (print -- [ :\[])+ >tok %set_tag;
-    content_value = print+ >tok %set_content;
+    content_value = digit+ >tok %set_content;
     content       = '[' content_value ']';
     msg           = (tag content? ':' sp)? any+ >tok %set_msg;
 }%%

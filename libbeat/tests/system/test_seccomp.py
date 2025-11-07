@@ -20,7 +20,7 @@ def is_seccomp_supported():
         return False
     if is_version_below(p[1], '3.17'):
         return False
-    return {'i386', 'i686', 'x86_64', 'amd64'}.intersection(p)
+    return {'i386', 'i686', 'x86_64', 'amd64', 'aarch64'}.intersection(p)
 
 
 @unittest.skipUnless(is_seccomp_supported(), "Requires Linux 3.17 or greater and i386/amd64 architecture")

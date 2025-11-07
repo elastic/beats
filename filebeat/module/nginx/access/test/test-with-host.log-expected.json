@@ -41,7 +41,7 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "49.0."
+        "user_agent.version": "49.0"
     },
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
@@ -135,7 +135,7 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "49.0."
+        "user_agent.version": "49.0"
     },
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",

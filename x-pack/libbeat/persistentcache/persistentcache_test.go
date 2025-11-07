@@ -6,26 +6,25 @@ package persistentcache
 
 import (
 	"fmt"
-	"io/ioutil"
-	"math/rand"
-	"os"
+	"math/rand/v2"
 	"path/filepath"
 	"strconv"
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestPutGet(t *testing.T) {
-	logp.TestingSetup()
 	t.Parallel()
+	logger := logptest.NewTestingLogger(t, "")
 
-	cache, err := New("test", testOptions(t))
+	cache, err := New("test", testOptions(t), logger)
 	require.NoError(t, err)
 	defer cache.Close()
 
@@ -49,12 +48,12 @@ func TestPutGet(t *testing.T) {
 }
 
 func TestPersist(t *testing.T) {
-	logp.TestingSetup()
+	logger := logptest.NewTestingLogger(t, "")
 	t.Parallel()
 
 	options := testOptions(t)
 
-	cache, err := New("test", options)
+	cache, err := New("test", options, logger)
 	require.NoError(t, err)
 
 	type valueType struct {
@@ -69,8 +68,7 @@ func TestPersist(t *testing.T) {
 
 	err = cache.Close()
 	assert.NoError(t, err)
-
-	cache, err = New("test", options)
+	cache, err = New("test", options, logger)
 	require.NoError(t, err)
 	defer cache.Close()
 
@@ -84,11 +82,12 @@ func TestExpired(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping in short mode")
 	}
-	logp.TestingSetup()
 	t.Parallel()
 
 	options := testOptions(t)
-	cache, err := New("test", options)
+
+	logger := logptest.NewTestingLogger(t, "")
+	cache, err := New("test", options, logger)
 	require.NoError(t, err)
 	defer cache.Close()
 
@@ -120,7 +119,6 @@ func TestRefreshOnAccess(t *testing.T) {
 		t.Skip("skipping in short mode")
 	}
 
-	logp.TestingSetup()
 	t.Parallel()
 
 	// Badger TTL is not reliable on sub-second durations.
@@ -128,7 +126,8 @@ func TestRefreshOnAccess(t *testing.T) {
 	options.Timeout = 2 * time.Second
 	options.RefreshOnAccess = true
 
-	cache, err := New("test", options)
+	logger := logptest.NewTestingLogger(t, "")
+	cache, err := New("test", options, logger)
 	require.NoError(t, err)
 	defer cache.Close()
 
@@ -172,7 +171,7 @@ func BenchmarkPut(b *testing.B) {
 
 	options := testOptions(b)
 	newPersistentCache := func(tb testing.TB, name string) cache {
-		cache, err := New(name, options)
+		cache, err := New(name, options, logp.NewNopLogger())
 		require.NoError(tb, err)
 		return cache
 	}
@@ -277,6 +276,7 @@ func BenchmarkPut(b *testing.B) {
 					for i := 0; i < b.N; i++ {
 						cache := c.factory(b, b.Name())
 						for _, object := range objects {
+							//nolint:errcheck // benchmarks
 							cache.Put(object.ID, object)
 						}
 						cache.Close()
@@ -295,7 +295,7 @@ func BenchmarkOpen(b *testing.B) {
 
 	options := testOptions(b)
 	newPersistentCache := func(tb testing.TB, name string) cache {
-		cache, err := New(name, options)
+		cache, err := New(name, options, logp.NewNopLogger())
 		require.NoError(tb, err)
 		return cache
 	}
@@ -348,7 +348,7 @@ func BenchmarkGet(b *testing.B) {
 
 	options := testOptions(b)
 	newPersistentCache := func(tb testing.TB, name string) cache {
-		cache, err := New(name, options)
+		cache, err := New(name, options, logp.NewNopLogger())
 		require.NoError(tb, err)
 		return cache
 	}
@@ -391,7 +391,8 @@ func BenchmarkGet(b *testing.B) {
 
 					b.ResetTimer()
 					for i := 0; i < b.N; i++ {
-						expected := objects[rand.Intn(size)]
+						expected := objects[rand.IntN(size)]
+						//nolint:errcheck // benchmarks
 						cache.Get(expected.ID, &result)
 						if expected.ID != result.ID {
 							b.Fatalf("%s != %s", expected.ID, result.ID)
@@ -408,29 +409,7 @@ func BenchmarkGet(b *testing.B) {
 func testOptions(t testing.TB) Options {
 	t.Helper()
 
-	tempDir, err := ioutil.TempDir("", "beat-data-dir-")
-	require.NoError(t, err)
-
-	t.Cleanup(func() { os.RemoveAll(tempDir) })
-
 	return Options{
-		RootPath: filepath.Join(tempDir, cacheFile),
+		RootPath: filepath.Join(t.TempDir(), cacheFile),
 	}
-}
-
-func dirSize(tb testing.TB, path string) int64 {
-	var size int64
-
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() {
-			size += info.Size()
-		}
-		return nil
-	})
-	require.NoError(tb, err)
-
-	return size
 }

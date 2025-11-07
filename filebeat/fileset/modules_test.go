@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package fileset
 
@@ -32,6 +31,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -82,7 +82,12 @@ func TestNewModuleRegistry(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, false)
+	logger := logptest.NewTestingLogger(t, "")
+	beatPaths := paths.New()
+	beatPaths.Home = t.TempDir()
+	err = beatPaths.InitPaths(beatPaths)
+	require.NoError(t, err)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{}, beatPaths)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -149,7 +154,12 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, false)
+	logger := logptest.NewTestingLogger(t, "")
+	beatPaths := paths.New()
+	beatPaths.Home = t.TempDir()
+	err = beatPaths.InitPaths(beatPaths)
+	require.NoError(t, err)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{}, beatPaths)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -175,7 +185,12 @@ func TestMovedModule(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, false)
+	logger := logptest.NewTestingLogger(t, "")
+	beatPaths := paths.New()
+	beatPaths.Home = t.TempDir()
+	err = beatPaths.InitPaths(beatPaths)
+	require.NoError(t, err)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{}, beatPaths)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 }
@@ -438,15 +453,15 @@ func TestMcfgFromConfig(t *testing.T) {
 }
 
 func TestMissingModuleFolder(t *testing.T) {
-	home := paths.Paths.Home
-	paths.Paths.Home = "/no/such/path"
-	defer func() { paths.Paths.Home = home }()
+	p := paths.New()
+	p.Home = "/no/such/path"
 
 	configs := []*conf.C{
 		load(t, map[string]interface{}{"module": "nginx"}),
 	}
 
-	reg, err := NewModuleRegistry(configs, beat.Info{Version: "5.2.0"}, true, false)
+	logger := logptest.NewTestingLogger(t, "")
+	reg, err := NewModuleRegistry(configs, beat.Info{Version: "5.2.0", Logger: logger}, true, FilesetOverrides{}, p)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 

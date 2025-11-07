@@ -1,0 +1,35 @@
+- name: carbon
+  description: Google Cloud Carbon Footprint metrics
+  release: beta
+  type: group
+  fields:
+  - name: project_id
+    type: keyword
+    description: Project ID the carbon footprint report belongs to.
+  - name: project_name
+    type: keyword
+    description: Project name the carbon footprint report belongs to.
+  - name: service_id
+    type: keyword
+    description: Service ID for the carbon footprint usage.
+  - name: service_description
+    type: keyword
+    description: Service description for the carbon footprint usage.
+  - name: region
+    type: keyword
+    description: Region for the carbon fooprint usage.
+  - name: footprint.scope1
+    type: float
+    description: Scope 1 carbon footprint.
+  - name: footprint.scope2.location
+    type: float
+    description: Scope 2 carbon footprint using location-based methodology.
+  - name: footprint.scope2.market
+    type: float
+    description: Scope 2 carbon footprint using market-based methodology.
+  - name: footprint.scope3
+    type: float
+    description: Scope 3 carbon footprint.
+  - name: footprint.offsets
+    type: float
+    description: Total carbon offsets.

@@ -13,12 +13,13 @@ package main
 
 import (
 	"os"
+	_ "time/tzdata" // for timezone handling
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/cmd"
 )
 
 func main() {
-	if err := cmd.RootCmd.Execute(); err != nil {
+	if err := cmd.Initialize().Execute(); err != nil {
 		os.Exit(1)
 	}
 }

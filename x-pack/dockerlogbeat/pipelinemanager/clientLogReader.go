@@ -5,6 +5,7 @@
 package pipelinemanager
 
 import (
+	"errors"
 	"io"
 	"strings"
 	"time"
@@ -51,7 +52,7 @@ func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereade
 		WaitClose: 0,
 	}
 	clientLogger := logp.NewLogger("clientLogReader")
-	settings.ACKHandler = acker.Counting(func(n int) {
+	settings.EventListener = acker.Counting(func(n int) {
 		clientLogger.Debugf("Pipeline client ACKS; %v", n)
 	})
 	settings.PublishMode = beat.DefaultGuarantees
@@ -94,7 +95,7 @@ func (cl *ClientLogger) ConsumePipelineAndSend() {
 	for {
 		err := cl.logFile.ReadMessage(&log)
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				return
 			}
 			cl.logger.Errorf("Error getting message: %s\n", err)
@@ -137,7 +138,7 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 			return
 		}
 
-		cl.localLog.Log(constructLogSpoolMsg(entry))
+		_ = cl.localLog.Log(constructLogSpoolMsg(entry))
 		line := strings.TrimSpace(string(entry.Line))
 
 		cl.client.Publish(beat.Event{

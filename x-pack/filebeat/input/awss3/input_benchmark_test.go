@@ -8,16 +8,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"testing"
+	"text/tabwriter"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 
@@ -26,13 +27,11 @@ import (
 	s3Types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	sqsTypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/dustin/go-humanize"
-	"github.com/olekukonko/tablewriter"
 
-	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -47,27 +46,29 @@ type constantSQS struct {
 
 var _ sqsAPI = (*constantSQS)(nil)
 
-func newConstantSQS() *constantSQS {
-	return &constantSQS{
-		msgs: []sqsTypes.Message{
-			newSQSMessage(newS3Event(filepath.Base(cloudtrailTestFile))),
-		},
+func newConstantSQS() (*constantSQS, error) {
+	event, err := newSQSMessage(newS3Event(filepath.Base(cloudtrailTestFile)))
+	if err != nil {
+		return nil, err
 	}
+	return &constantSQS{
+		msgs: []sqsTypes.Message{event},
+	}, nil
 }
 
-func (c *constantSQS) ReceiveMessage(ctx context.Context, maxMessages int) ([]sqsTypes.Message, error) {
+func (c *constantSQS) ReceiveMessage(context.Context, int) ([]sqsTypes.Message, error) {
 	return c.msgs, nil
 }
 
-func (*constantSQS) DeleteMessage(ctx context.Context, msg *sqsTypes.Message) error {
+func (*constantSQS) DeleteMessage(context.Context, *sqsTypes.Message) error {
 	return nil
 }
 
-func (*constantSQS) ChangeMessageVisibility(ctx context.Context, msg *sqsTypes.Message, timeout time.Duration) error {
+func (*constantSQS) ChangeMessageVisibility(context.Context, *sqsTypes.Message, time.Duration) error {
 	return nil
 }
 
-func (c *constantSQS) GetQueueAttributes(ctx context.Context, attr []sqsTypes.QueueAttributeName) (map[string]string, error) {
+func (c *constantSQS) GetQueueAttributes(context.Context, []sqsTypes.QueueAttributeName) (map[string]string, error) {
 	return map[string]string{}, nil
 }
 
@@ -85,7 +86,7 @@ func (c *s3PagerConstant) HasMorePages() bool {
 	return c.currentIndex < len(c.objects)
 }
 
-func (c *s3PagerConstant) NextPage(ctx context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+func (c *s3PagerConstant) NextPage(context.Context, ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
 	if !c.HasMorePages() {
 		return nil, errors.New("no more pages")
 	}
@@ -132,7 +133,7 @@ type constantS3 struct {
 var _ s3API = (*constantS3)(nil)
 
 func newConstantS3(t testing.TB) *constantS3 {
-	data, err := ioutil.ReadFile(cloudtrailTestFile)
+	data, err := os.ReadFile(cloudtrailTestFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -144,29 +145,36 @@ func newConstantS3(t testing.TB) *constantS3 {
 	}
 }
 
-func (c constantS3) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {
+func (c constantS3) GetObject(context.Context, string, string, string) (*s3.GetObjectOutput, error) {
 	return newS3GetObjectResponse(c.filename, c.data, c.contentType), nil
 }
 
-func (c constantS3) CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
+func (c constantS3) CopyObject(context.Context, string, string, string, string, string) (*s3.CopyObjectOutput, error) {
 	return nil, nil
 }
 
-func (c constantS3) DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error) {
+func (c constantS3) DeleteObject(context.Context, string, string, string) (*s3.DeleteObjectOutput, error) {
 	return nil, nil
 }
 
-func (c constantS3) ListObjectsPaginator(bucket, prefix string) s3Pager {
+func (c constantS3) ListObjectsPaginator(string, string) s3Pager {
 	return c.pagerConstant
 }
 
 var _ beat.Pipeline = (*fakePipeline)(nil)
 
 // fakePipeline returns new ackClients.
-type fakePipeline struct{}
+type fakePipeline struct {
+}
 
-func (c *fakePipeline) ConnectWith(clientConfig beat.ClientConfig) (beat.Client, error) {
-	return &ackClient{}, nil
+func newFakePipeline() *fakePipeline {
+	return &fakePipeline{}
+}
+
+func (c *fakePipeline) ConnectWith(config beat.ClientConfig) (beat.Client, error) {
+	return &ackClient{
+		eventListener: config.EventListener,
+	}, nil
 }
 
 func (c *fakePipeline) Connect() (beat.Client, error) {
@@ -176,13 +184,15 @@ func (c *fakePipeline) Connect() (beat.Client, error) {
 var _ beat.Client = (*ackClient)(nil)
 
 // ackClient is a fake beat.Client that ACKs the published messages.
-type ackClient struct{}
+type ackClient struct {
+	eventListener beat.EventListener
+}
 
 func (c *ackClient) Close() error { return nil }
 
 func (c *ackClient) Publish(event beat.Event) {
-	// Fake the ACK handling.
-	event.Private.(*awscommon.EventACKTracker).ACK()
+	c.eventListener.AddEvent(event, true)
+	go c.eventListener.ACKEvents(1)
 }
 
 func (c *ackClient) PublishAll(event []beat.Event) {
@@ -207,25 +217,29 @@ file_selectors:
 	return inputConfig
 }
 
-func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkResult {
+func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
-		log := logp.NewLogger(inputName)
-		metricRegistry := monitoring.NewRegistry()
-		metrics := newInputMetrics("test_id", metricRegistry)
-		sqsAPI := newConstantSQS()
-		s3API := newConstantS3(t)
-		pipeline := &fakePipeline{}
-		conf := makeBenchmarkConfig(t)
+		var err error
 
-		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, conf.FileSelectors, backupConfig{})
-		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, pipeline, s3EventHandlerFactory)
-		sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, maxMessagesInflight, sqsMessageHandler)
+		config := makeBenchmarkConfig(t)
+		config.NumberOfWorkers = workerCount
+		sqsReader := newSQSReaderInput(config, aws.Config{}, paths.New())
+		sqsReader.log = log.Named("sqs")
+		sqsReader.status = &statusReporterHelperMock{}
+		sqsReader.pipeline = newFakePipeline()
+		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount, logp.NewNopLogger())
+		sqsReader.sqs, err = newConstantSQS()
+		require.NoError(t, err)
+		sqsReader.s3 = newConstantS3(t)
+		sqsReader.msgHandler, err = sqsReader.createEventProcessor()
+		require.NoError(t, err, "createEventProcessor must succeed")
 
 		ctx, cancel := context.WithCancel(context.Background())
 		b.Cleanup(cancel)
 
 		go func() {
-			for metrics.sqsMessagesReceivedTotal.Get() < uint64(b.N) {
+			//nolint:gosec // not going to have anywhere near uint64 overflow number of received messages
+			for sqsReader.metrics.sqsMessagesReceivedTotal.Get() < uint64(b.N) {
 				time.Sleep(5 * time.Millisecond)
 			}
 			cancel()
@@ -233,30 +247,25 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 
 		b.ResetTimer()
 		start := time.Now()
-		if err := sqsReader.Receive(ctx); err != nil {
-			if !errors.Is(err, context.DeadlineExceeded) {
-				t.Fatal(err)
-			}
-		}
+		sqsReader.run(ctx)
 		b.StopTimer()
 		elapsed := time.Since(start)
 
-		b.ReportMetric(float64(maxMessagesInflight), "max_messages_inflight")
+		b.ReportMetric(float64(workerCount), "number_of_workers")
 		b.ReportMetric(elapsed.Seconds(), "sec")
 
-		b.ReportMetric(float64(metrics.s3EventsCreatedTotal.Get()), "events")
-		b.ReportMetric(float64(metrics.s3EventsCreatedTotal.Get())/elapsed.Seconds(), "events_per_sec")
+		b.ReportMetric(float64(sqsReader.metrics.s3EventsCreatedTotal.Get()), "events")
+		b.ReportMetric(float64(sqsReader.metrics.s3EventsCreatedTotal.Get())/elapsed.Seconds(), "events_per_sec")
 
-		b.ReportMetric(float64(metrics.s3BytesProcessedTotal.Get()), "s3_bytes")
-		b.ReportMetric(float64(metrics.s3BytesProcessedTotal.Get())/elapsed.Seconds(), "s3_bytes_per_sec")
+		b.ReportMetric(float64(sqsReader.metrics.s3BytesProcessedTotal.Get()), "s3_bytes")
+		b.ReportMetric(float64(sqsReader.metrics.s3BytesProcessedTotal.Get())/elapsed.Seconds(), "s3_bytes_per_sec")
 
-		b.ReportMetric(float64(metrics.sqsMessagesDeletedTotal.Get()), "sqs_messages")
-		b.ReportMetric(float64(metrics.sqsMessagesDeletedTotal.Get())/elapsed.Seconds(), "sqs_messages_per_sec")
+		b.ReportMetric(float64(sqsReader.metrics.sqsMessagesDeletedTotal.Get()), "sqs_messages")
+		b.ReportMetric(float64(sqsReader.metrics.sqsMessagesDeletedTotal.Get())/elapsed.Seconds(), "sqs_messages_per_sec")
 	})
 }
 
 func TestBenchmarkInputSQS(t *testing.T) {
-	_ = logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputSQS(t, 1),
@@ -273,11 +282,11 @@ func TestBenchmarkInputSQS(t *testing.T) {
 	}
 
 	headers := []string{
-		"Max Msgs Inflight",
-		"Events per sec",
-		"S3 Bytes per sec",
-		"Time (sec)",
-		"CPUs",
+		"MAX MSGS INFLIGHT",
+		"EVENTS PER SEC",
+		"S3 BYTES PER SEC",
+		"TIME (SEC)",
+		"CPUS",
 	}
 	data := make([][]string, 0)
 	for _, r := range results {
@@ -290,10 +299,12 @@ func TestBenchmarkInputSQS(t *testing.T) {
 		})
 	}
 
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader(headers)
-	table.AppendBulk(data)
-	table.Render()
+	w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', tabwriter.Debug)
+	fmt.Fprintln(w, strings.Join(headers, "\t"))
+	for _, d := range data {
+		fmt.Fprintln(w, strings.Join(d, "\t"))
+	}
+	require.NoError(t, w.Flush())
 }
 
 func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult {
@@ -301,18 +312,11 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		log := logp.NewLogger(inputName)
 		log.Infof("benchmark with %d number of workers", numberOfWorkers)
 
-		metricRegistry := monitoring.NewRegistry()
-		metrics := newInputMetrics("test_id", metricRegistry)
-
-		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
-			event.Private.(*awscommon.EventACKTracker).ACK()
-		})
-
-		defer func() {
-			_ = client.Close()
-		}()
+		metrics := newInputMetrics(monitoring.NewRegistry(), numberOfWorkers, logp.NewNopLogger())
+		pipeline := newFakePipeline()
 
 		config := makeBenchmarkConfig(t)
+		config.NumberOfWorkers = numberOfWorkers
 
 		b.ResetTimer()
 		start := time.Now()
@@ -332,30 +336,30 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 			wg.Add(1)
 			go func(i int, wg *sync.WaitGroup) {
 				defer wg.Done()
-				listPrefix := fmt.Sprintf("list_prefix_%d", i)
+				curConfig := config
+				curConfig.BucketListPrefix = fmt.Sprintf("list_prefix_%d", i)
 				s3API := newConstantS3(t)
-				s3API.pagerConstant = newS3PagerConstant(listPrefix)
-				storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
-				store, err := storeReg.Get("test")
-				if err != nil {
-					errChan <- fmt.Errorf("failed to access store: %w", err)
-					return
+				s3API.pagerConstant = newS3PagerConstant(curConfig.BucketListPrefix)
+				store := openTestStatestore()
+
+				states, err := newStates(nil, store, "")
+				assert.NoError(t, err, "states creation should succeed")
+
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(metrics, s3API, config.FileSelectors, backupConfig{}, logp.NewNopLogger())
+				s3Poller := &s3PollerInput{
+					log:             logp.NewLogger(inputName),
+					config:          config,
+					metrics:         metrics,
+					s3:              s3API,
+					pipeline:        pipeline,
+					s3ObjectHandler: s3EventHandlerFactory,
+					states:          states,
+					provider:        "provider",
+					filterProvider:  newFilterProvider(&config),
+					status:          &statusReporterHelperMock{},
 				}
 
-				err = store.Set(awsS3WriteCommitPrefix+"bucket"+listPrefix, &commitWriteState{time.Time{}})
-				if err != nil {
-					errChan <- err
-					return
-				}
-
-				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, config.FileSelectors, backupConfig{})
-				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, client, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
-
-				if err := s3Poller.Poll(ctx); err != nil {
-					if !errors.Is(err, context.DeadlineExceeded) {
-						errChan <- err
-					}
-				}
+				s3Poller.run(ctx)
 			}(i, wg)
 		}
 
@@ -393,7 +397,6 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 }
 
 func TestBenchmarkInputS3(t *testing.T) {
-	_ = logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputS3(t, 1),
@@ -410,19 +413,19 @@ func TestBenchmarkInputS3(t *testing.T) {
 	}
 
 	headers := []string{
-		"Number of workers",
-		"Objects listed total",
-		"Objects listed per sec",
-		"Objects processed total",
-		"Objects processed per sec",
-		"Objects acked total",
-		"Objects acked per sec",
-		"Events total",
-		"Events per sec",
-		"S3 Bytes total",
-		"S3 Bytes per sec",
-		"Time (sec)",
-		"CPUs",
+		"NUMBER OF WORKERS",
+		"OBJECTS LISTED TOTAL",
+		"OBJECTS LISTED PER SEC",
+		"OBJECTS PROCESSED TOTAL",
+		"OBJECTS PROCESSED PER SEC",
+		"OBJECTS ACKED TOTAL",
+		"OBJECTS ACKED PER SEC",
+		"EVENTS TOTAL",
+		"EVENTS PER SEC",
+		"S3 BYTES TOTAL",
+		"S3 BYTES PER SEC",
+		"TIME (SEC)",
+		"CPUS",
 	}
 	data := make([][]string, 0)
 	for _, r := range results {
@@ -443,8 +446,10 @@ func TestBenchmarkInputS3(t *testing.T) {
 		})
 	}
 
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader(headers)
-	table.AppendBulk(data)
-	table.Render()
+	w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', tabwriter.Debug)
+	fmt.Fprintln(w, strings.Join(headers, "\t"))
+	for _, d := range data {
+		fmt.Fprintln(w, strings.Join(d, "\t"))
+	}
+	require.NoError(t, w.Flush())
 }

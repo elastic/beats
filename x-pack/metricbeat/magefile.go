@@ -3,12 +3,12 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build mage
-// +build mage
 
 package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -51,6 +51,11 @@ func Build() error {
 	return devtools.Build(args)
 }
 
+// BuildOTel builds the Beat binary with OTel sub command
+func BuildOTel() error {
+	return devtools.BuildOTel()
+}
+
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
@@ -59,22 +64,15 @@ func GolangCrossBuild() error {
 	if isWindows32bitRunner() {
 		args.LDFlags = append(args.LDFlags, "-w")
 	}
-	return devtools.GolangCrossBuild(args)
+	return errors.Join(
+		devtools.GolangCrossBuild(args),
+		devtools.TestLinuxForCentosGLIBC(),
+	)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	return devtools.CrossBuild()
-}
-
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
 }
 
 // UnitTest executes the unit tests (Go and Python).
@@ -92,6 +90,17 @@ func GoUnitTest(ctx context.Context) error {
 		args.ExtraFlags = append(args.ExtraFlags, "-ldflags=-w")
 	}
 	return devtools.GoTest(ctx, args)
+}
+
+// GoFIPSOnlyUnitTest sets GODEBUG=fips140=only when running unit tests
+func GoFIPSOnlyUnitTest() error {
+	ctx := context.Background()
+
+	fipsArgs := devtools.DefaultGoFIPSOnlyTestArgs()
+	if isWindows32bitRunner() {
+		fipsArgs.ExtraFlags = append(fipsArgs.ExtraFlags, "-ldflags=-w")
+	}
+	return devtools.GoTest(ctx, fipsArgs)
 }
 
 // PythonUnitTest executes the python system tests.
@@ -113,6 +122,7 @@ func BuildSystemTestBinary() error {
 	args := []string{
 		"test", "-c",
 		"-o", binArgs.Name + ".test",
+		"-tags", "otelbeat",
 	}
 
 	// On Windows 7 32-bit we run out of memory if we enable coverage and DWARF
@@ -160,7 +170,7 @@ func Package() {
 	devtools.PackageKibanaDashboardsFromBuildDir()
 
 	mg.Deps(Update, metricbeat.PrepareModulePackagingXPack)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -230,10 +240,42 @@ func IntegTest() {
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
 // Use MODULE=module to run only tests for `module`.
 func GoIntegTest(ctx context.Context) error {
+
+	// define modules
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
 	if !devtools.IsInIntegTestEnv() {
+		// build integration test binary with otel sub command
+		devtools.BuildSystemTestOTelBinary()
+		args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
+		// ES_USER must be admin in order for the Go Integration tests to function because they require
+		// indices:data/read/search
+		args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
+		args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
+		// run integration test from home directory
+		args.Packages = []string{"./tests/integration/"}
+		err := devtools.GoIntegTestFromHost(ctx, args)
+		if err != nil {
+			return err
+		}
+
 		mg.SerialDeps(Fields, Dashboards)
 	}
+
 	return devtools.GoTestIntegrationForModule(ctx)
+}
+
+// GoFIPSOnlyIntegTest executes the Go integration tests.
+// Sets GODEBUG=fips140=only.
+// Use TEST_COVERAGE=true to enable code coverage profiling if not running on Windows 7 32bit.
+// Use RACE_DETECTOR=true to enable the race detector.
+// Use TEST_TAGS=tag1,tag2 to add additional build tags.
+// Use MODULE=module to run only tests for `module`.
+func GoFIPSOnlyIntegTest(ctx context.Context) error {
+	os.Setenv("GODEBUG", "fips140=only")
+	return GoIntegTest(ctx)
 }
 
 // PythonIntegTest executes the python system tests in the integration
@@ -242,6 +284,10 @@ func GoIntegTest(ctx context.Context) error {
 // Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern.
 // Use any other PYTEST_* environment variable to influence the behavior of pytest.
 func PythonIntegTest(ctx context.Context) error {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
@@ -252,6 +298,9 @@ func PythonIntegTest(ctx context.Context) error {
 	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(BuildSystemTestBinary)
 		args := devtools.DefaultPythonTestIntegrationArgs()
+		// Always create a fresh virtual environment when running tests in a container, until we get
+		// get the requirements installed as part of the container build.
+		args.ForceCreateVenv = true
 		// On Windows 32-bit converage is not enabled.
 		if isWindows32bitRunner() {
 			args.Env["TEST_COVERAGE"] = "false"
@@ -262,4 +311,9 @@ func PythonIntegTest(ctx context.Context) error {
 
 func isWindows32bitRunner() bool {
 	return runtime.GOOS == "windows" && runtime.GOARCH == "386"
+}
+
+// FipsECHTest runs a smoke test using a FIPS enabled binary targetting an ECH deployment.
+func FipsECHTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultECHTestArgs())
 }

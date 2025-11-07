@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package cloudfoundry
 
@@ -47,7 +46,7 @@ func NewModuleWithHubFactory(base mb.BaseModule, hubFactory hubFactory) (mb.Modu
 		return nil, err
 	}
 
-	log := logp.NewLogger("cloudfoundry")
+	log := base.Logger.Named("cloudfoundry")
 	hub := hubFactory(&cfg, "metricbeat", log)
 
 	switch cfg.Version {

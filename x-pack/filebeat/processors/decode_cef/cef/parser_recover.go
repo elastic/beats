@@ -10,11 +10,9 @@ package cef
 import (
 	"fmt"
 	"strconv"
-
-	"go.uber.org/multierr"
 )
 
-//line parser_recover.go:16
+//line parser_recover.go:12
 var _cef_recover_eof_actions []byte = []byte{
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,
@@ -48,8 +46,8 @@ const cef_recover_en_main_cef_extensions int = 28
 
 // recoverExtensions unpacks a CEF message's extensions from messages with incomplete headers.
 //
-//line parser_recover.rl:17
-func (e *Event) recoverExtensions(data string) error {
+//line parser_recover.rl:15
+func (e *Event) recoverExtensions(data string) []error {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	mark, mark_slash := 0, 0
 
@@ -65,12 +63,12 @@ func (e *Event) recoverExtensions(data string) error {
 	// e was already initialised by the call to unpack.
 	t := *e
 
-//line parser_recover.go:70
+//line parser_recover.go:64
 	{
 		cs = cef_recover_start
 	}
 
-//line parser_recover.go:75
+//line parser_recover.go:68
 	{
 		if (p) == (pe) {
 			goto _test_eof
@@ -401,10 +399,6 @@ func (e *Event) recoverExtensions(data string) error {
 			goto tr1
 		case 29:
 			switch data[(p)] {
-			case 44:
-				goto tr60
-			case 46:
-				goto tr60
 			case 61:
 				goto tr61
 			case 93:
@@ -413,12 +407,17 @@ func (e *Event) recoverExtensions(data string) error {
 				goto tr60
 			}
 			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
+			case data[(p)] < 48:
+				if 44 <= data[(p)] && data[(p)] <= 46 {
 					goto tr60
 				}
-			case data[(p)] > 91:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 91:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr60
+					}
+				case data[(p)] >= 65:
 					goto tr60
 				}
 			default:
@@ -484,10 +483,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr106
-			case 44:
-				goto tr109
-			case 46:
-				goto tr109
 			case 61:
 				goto tr110
 			case 92:
@@ -497,7 +492,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr109
+					}
+				case data[(p)] >= 9:
 					goto tr105
 				}
 			case data[(p)] > 57:
@@ -572,10 +572,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr117
-			case 44:
-				goto tr120
-			case 46:
-				goto tr120
 			case 61:
 				goto tr110
 			case 92:
@@ -585,7 +581,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr120
+					}
+				case data[(p)] >= 9:
 					goto tr116
 				}
 			case data[(p)] > 57:
@@ -694,7 +695,7 @@ func (e *Event) recoverExtensions(data string) error {
 		case 34:
 			switch data[(p)] {
 			case 45:
-				goto tr54
+				goto tr65
 			case 61:
 				goto tr61
 			case 91:
@@ -750,10 +751,6 @@ func (e *Event) recoverExtensions(data string) error {
 			goto tr44
 		case 36:
 			switch data[(p)] {
-			case 44:
-				goto tr68
-			case 46:
-				goto tr68
 			case 61:
 				goto tr69
 			case 92:
@@ -764,12 +761,17 @@ func (e *Event) recoverExtensions(data string) error {
 				goto tr48
 			}
 			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
+			case data[(p)] < 48:
+				if 44 <= data[(p)] && data[(p)] <= 46 {
 					goto tr68
 				}
-			case data[(p)] > 93:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr68
+					}
+				case data[(p)] >= 65:
 					goto tr68
 				}
 			default:
@@ -841,10 +843,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr136
-			case 44:
-				goto tr140
-			case 46:
-				goto tr140
 			case 61:
 				goto tr141
 			case 92:
@@ -856,7 +854,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr140
+					}
+				case data[(p)] >= 9:
 					goto tr135
 				}
 			case data[(p)] > 57:
@@ -937,10 +940,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr149
-			case 44:
-				goto tr153
-			case 46:
-				goto tr153
 			case 61:
 				goto tr141
 			case 92:
@@ -952,7 +951,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr153
+					}
+				case data[(p)] >= 9:
 					goto tr148
 				}
 			case data[(p)] > 57:
@@ -1063,10 +1067,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr117
-			case 44:
-				goto tr166
-			case 46:
-				goto tr166
 			case 61:
 				goto tr61
 			case 92:
@@ -1076,7 +1076,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr166
+					}
+				case data[(p)] >= 9:
 					goto tr116
 				}
 			case data[(p)] > 57:
@@ -1157,7 +1162,7 @@ func (e *Event) recoverExtensions(data string) error {
 			case 32:
 				goto tr117
 			case 45:
-				goto tr160
+				goto tr167
 			case 61:
 				goto tr61
 			case 92:
@@ -1289,10 +1294,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr106
-			case 44:
-				goto tr180
-			case 46:
-				goto tr180
 			case 61:
 				goto tr61
 			case 92:
@@ -1302,7 +1303,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr180
+					}
+				case data[(p)] >= 9:
 					goto tr105
 				}
 			case data[(p)] > 57:
@@ -1383,7 +1389,7 @@ func (e *Event) recoverExtensions(data string) error {
 			case 32:
 				goto tr106
 			case 45:
-				goto tr174
+				goto tr181
 			case 61:
 				goto tr61
 			case 92:
@@ -1446,10 +1452,6 @@ func (e *Event) recoverExtensions(data string) error {
 			goto tr35
 		case 40:
 			switch data[(p)] {
-			case 44:
-				goto tr74
-			case 46:
-				goto tr74
 			case 61:
 				goto tr75
 			case 92:
@@ -1460,12 +1462,17 @@ func (e *Event) recoverExtensions(data string) error {
 				goto tr39
 			}
 			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
+			case data[(p)] < 48:
+				if 44 <= data[(p)] && data[(p)] <= 46 {
 					goto tr74
 				}
-			case data[(p)] > 93:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr74
+					}
+				case data[(p)] >= 65:
 					goto tr74
 				}
 			default:
@@ -1537,10 +1544,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr189
-			case 44:
-				goto tr193
-			case 46:
-				goto tr193
 			case 61:
 				goto tr194
 			case 92:
@@ -1552,7 +1555,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr193
+					}
+				case data[(p)] >= 9:
 					goto tr188
 				}
 			case data[(p)] > 57:
@@ -1633,10 +1641,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr202
-			case 44:
-				goto tr206
-			case 46:
-				goto tr206
 			case 61:
 				goto tr194
 			case 92:
@@ -1648,7 +1652,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr206
+					}
+				case data[(p)] >= 9:
 					goto tr201
 				}
 			case data[(p)] > 57:
@@ -1759,10 +1768,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr149
-			case 44:
-				goto tr216
-			case 46:
-				goto tr216
 			case 61:
 				goto tr69
 			case 92:
@@ -1774,7 +1779,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr216
+					}
+				case data[(p)] >= 9:
 					goto tr148
 				}
 			case data[(p)] > 57:
@@ -1885,10 +1895,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr136
-			case 44:
-				goto tr226
-			case 46:
-				goto tr226
 			case 61:
 				goto tr69
 			case 92:
@@ -1900,7 +1906,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr226
+					}
+				case data[(p)] >= 9:
 					goto tr135
 				}
 			case data[(p)] > 57:
@@ -1942,10 +1953,6 @@ func (e *Event) recoverExtensions(data string) error {
 			goto tr26
 		case 44:
 			switch data[(p)] {
-			case 44:
-				goto tr80
-			case 46:
-				goto tr80
 			case 61:
 				goto tr81
 			case 92:
@@ -1956,12 +1963,17 @@ func (e *Event) recoverExtensions(data string) error {
 				goto tr30
 			}
 			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
+			case data[(p)] < 48:
+				if 44 <= data[(p)] && data[(p)] <= 46 {
 					goto tr80
 				}
-			case data[(p)] > 93:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr80
+					}
+				case data[(p)] >= 65:
 					goto tr80
 				}
 			default:
@@ -2033,10 +2045,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr234
-			case 44:
-				goto tr238
-			case 46:
-				goto tr238
 			case 61:
 				goto tr239
 			case 92:
@@ -2048,7 +2056,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr238
+					}
+				case data[(p)] >= 9:
 					goto tr233
 				}
 			case data[(p)] > 57:
@@ -2129,10 +2142,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr247
-			case 44:
-				goto tr251
-			case 46:
-				goto tr251
 			case 61:
 				goto tr239
 			case 92:
@@ -2144,7 +2153,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr251
+					}
+				case data[(p)] >= 9:
 					goto tr246
 				}
 			case data[(p)] > 57:
@@ -2255,10 +2269,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr202
-			case 44:
-				goto tr261
-			case 46:
-				goto tr261
 			case 61:
 				goto tr75
 			case 92:
@@ -2270,7 +2280,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr261
+					}
+				case data[(p)] >= 9:
 					goto tr201
 				}
 			case data[(p)] > 57:
@@ -2381,10 +2396,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr189
-			case 44:
-				goto tr271
-			case 46:
-				goto tr271
 			case 61:
 				goto tr75
 			case 92:
@@ -2396,7 +2407,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr271
+					}
+				case data[(p)] >= 9:
 					goto tr188
 				}
 			case data[(p)] > 57:
@@ -2438,10 +2454,6 @@ func (e *Event) recoverExtensions(data string) error {
 			goto tr17
 		case 48:
 			switch data[(p)] {
-			case 44:
-				goto tr86
-			case 46:
-				goto tr86
 			case 61:
 				goto tr87
 			case 92:
@@ -2452,12 +2464,17 @@ func (e *Event) recoverExtensions(data string) error {
 				goto tr21
 			}
 			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
+			case data[(p)] < 48:
+				if 44 <= data[(p)] && data[(p)] <= 46 {
 					goto tr86
 				}
-			case data[(p)] > 93:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr86
+					}
+				case data[(p)] >= 65:
 					goto tr86
 				}
 			default:
@@ -2529,10 +2546,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr279
-			case 44:
-				goto tr283
-			case 46:
-				goto tr283
 			case 61:
 				goto tr284
 			case 92:
@@ -2544,7 +2557,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr283
+					}
+				case data[(p)] >= 9:
 					goto tr278
 				}
 			case data[(p)] > 57:
@@ -2625,10 +2643,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr292
-			case 44:
-				goto tr296
-			case 46:
-				goto tr296
 			case 61:
 				goto tr284
 			case 92:
@@ -2640,7 +2654,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr296
+					}
+				case data[(p)] >= 9:
 					goto tr291
 				}
 			case data[(p)] > 57:
@@ -2751,10 +2770,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr247
-			case 44:
-				goto tr306
-			case 46:
-				goto tr306
 			case 61:
 				goto tr81
 			case 92:
@@ -2766,7 +2781,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr306
+					}
+				case data[(p)] >= 9:
 					goto tr246
 				}
 			case data[(p)] > 57:
@@ -2877,10 +2897,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr234
-			case 44:
-				goto tr316
-			case 46:
-				goto tr316
 			case 61:
 				goto tr81
 			case 92:
@@ -2892,7 +2908,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr316
+					}
+				case data[(p)] >= 9:
 					goto tr233
 				}
 			case data[(p)] > 57:
@@ -2934,10 +2955,6 @@ func (e *Event) recoverExtensions(data string) error {
 			goto tr8
 		case 52:
 			switch data[(p)] {
-			case 44:
-				goto tr92
-			case 46:
-				goto tr92
 			case 61:
 				goto tr93
 			case 92:
@@ -2948,12 +2965,17 @@ func (e *Event) recoverExtensions(data string) error {
 				goto tr12
 			}
 			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
+			case data[(p)] < 48:
+				if 44 <= data[(p)] && data[(p)] <= 46 {
 					goto tr92
 				}
-			case data[(p)] > 93:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr92
+					}
+				case data[(p)] >= 65:
 					goto tr92
 				}
 			default:
@@ -3025,10 +3047,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr324
-			case 44:
-				goto tr328
-			case 46:
-				goto tr328
 			case 61:
 				goto tr329
 			case 92:
@@ -3040,7 +3058,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr328
+					}
+				case data[(p)] >= 9:
 					goto tr323
 				}
 			case data[(p)] > 57:
@@ -3121,10 +3144,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr337
-			case 44:
-				goto tr341
-			case 46:
-				goto tr341
 			case 61:
 				goto tr329
 			case 92:
@@ -3136,7 +3155,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr341
+					}
+				case data[(p)] >= 9:
 					goto tr336
 				}
 			case data[(p)] > 57:
@@ -3247,10 +3271,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr292
-			case 44:
-				goto tr351
-			case 46:
-				goto tr351
 			case 61:
 				goto tr87
 			case 92:
@@ -3262,7 +3282,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr351
+					}
+				case data[(p)] >= 9:
 					goto tr291
 				}
 			case data[(p)] > 57:
@@ -3373,10 +3398,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr279
-			case 44:
-				goto tr361
-			case 46:
-				goto tr361
 			case 61:
 				goto tr87
 			case 92:
@@ -3388,7 +3409,12 @@ func (e *Event) recoverExtensions(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr361
+					}
+				case data[(p)] >= 9:
 					goto tr278
 				}
 			case data[(p)] > 57:
@@ -3433,10 +3459,6 @@ func (e *Event) recoverExtensions(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr97
-			case 44:
-				goto tr98
-			case 46:
-				goto tr98
 			case 61:
 				goto tr99
 			case 93:
@@ -3445,12 +3467,17 @@ func (e *Event) recoverExtensions(data string) error {
 				goto tr98
 			}
 			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
+			case data[(p)] < 48:
+				if 44 <= data[(p)] && data[(p)] <= 46 {
 					goto tr98
 				}
-			case data[(p)] > 91:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 91:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr98
+					}
+				case data[(p)] >= 65:
 					goto tr98
 				}
 			default:
@@ -4799,7 +4826,7 @@ func (e *Event) recoverExtensions(data string) error {
 					state.reset()
 				}
 
-//line parser_recover.go:4081
+//line parser_recover.go:4103
 			}
 		}
 
@@ -4808,11 +4835,11 @@ func (e *Event) recoverExtensions(data string) error {
 		}
 	}
 
-//line parser_recover.rl:55
+//line parser_recover.rl:53
 
 	// Copy back the extensions.
 	t.Extensions = e.Extensions
 	*e = t
 
-	return multierr.Combine(recoveredErrs...)
+	return recoveredErrs
 }

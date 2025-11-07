@@ -22,10 +22,9 @@ import (
 	"errors"
 	"net"
 	"sync"
+	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -40,29 +39,30 @@ type asyncClient struct {
 	client   *v2.AsyncClient
 	win      *window
 
-	connect func() error
+	connect func(ctx context.Context) error
 
+	// mutex protects client and connect/close/send
 	mutex sync.Mutex
 }
 
 type msgRef struct {
-	client    *asyncClient
-	count     atomic.Uint32
-	batch     publisher.Batch
-	slice     []publisher.Event
-	err       error
-	win       *window
-	batchSize int
+	client           *asyncClient
+	count            atomic.Uint32
+	batch            publisher.Batch
+	slice            []publisher.Event
+	err              error
+	win              *window
+	batchSize        int
+	deadlockListener *deadlockListener
 }
 
 func newAsyncClient(
-	beat beat.Info,
+	log *logp.Logger,
+	beatVersion string,
 	conn *transport.Client,
 	observer outputs.Observer,
 	config *Config,
 ) (*asyncClient, error) {
-
-	log := logp.NewLogger("logstash")
 	c := &asyncClient{
 		log:      log,
 		Client:   conn,
@@ -77,7 +77,7 @@ func newAsyncClient(
 		log.Warn(`The async Logstash client does not support the "ttl" option`)
 	}
 
-	enc := makeLogstashEventEncoder(log, beat, config.EscapeHTML, config.Index)
+	enc := makeLogstashEventEncoder(log, beatVersion, config.EscapeHTML, config.Index)
 
 	queueSize := config.Pipelining - 1
 	timeout := config.Timeout
@@ -90,8 +90,8 @@ func newAsyncClient(
 		return nil, err
 	}
 
-	c.connect = func() error {
-		err := c.Client.Connect()
+	c.connect = func(ctx context.Context) error {
+		err := c.ConnectContext(ctx)
 		if err == nil {
 			c.client, err = clientFactory(c.Client)
 		}
@@ -116,9 +116,12 @@ func makeClientFactory(
 	}
 }
 
-func (c *asyncClient) Connect() error {
+func (c *asyncClient) Connect(ctx context.Context) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	c.log.Debug("connect")
-	return c.connect()
+	return c.connect(ctx)
 }
 
 func (c *asyncClient) Close() error {
@@ -146,14 +149,15 @@ func (c *asyncClient) Publish(_ context.Context, batch publisher.Batch) error {
 	}
 
 	ref := &msgRef{
-		client:    c,
-		count:     atomic.MakeUint32(1),
-		batch:     batch,
-		slice:     events,
-		batchSize: len(events),
-		win:       c.win,
-		err:       nil,
+		client:           c,
+		batch:            batch,
+		slice:            events,
+		batchSize:        len(events),
+		win:              c.win,
+		err:              nil,
+		deadlockListener: newDeadlockListener(c.log, logstashDeadlockTimeout),
 	}
+	ref.count.Store(1)
 	defer ref.dec()
 
 	for len(events) > 0 {
@@ -210,64 +214,62 @@ func (c *asyncClient) publishWindowed(
 }
 
 func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
-	client := c.getClient()
-	if client == nil {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	if c.client == nil {
 		return errors.New("connection closed")
 	}
 	window := make([]interface{}, len(events))
 	for i := range events {
 		window[i] = &events[i].Content
 	}
-	ref.count.Inc()
-	return client.Send(ref.callback, window)
+	ref.count.Add(1)
+
+	return c.client.Send(ref.customizedCallback(), window)
 }
 
-func (c *asyncClient) getClient() *v2.AsyncClient {
-	c.mutex.Lock()
-	client := c.client
-	c.mutex.Unlock()
-	return client
-}
+func (r *msgRef) customizedCallback() func(uint32, error) {
+	start := time.Now()
 
-func (r *msgRef) callback(seq uint32, err error) {
-	if err != nil {
-		r.fail(seq, err)
-	} else {
-		r.done(seq)
+	return func(n uint32, err error) {
+		r.callback(start, n, err)
 	}
 }
 
-func (r *msgRef) done(n uint32) {
-	r.client.observer.Acked(int(n))
+func (r *msgRef) callback(start time.Time, n uint32, err error) {
+	r.client.observer.AckedEvents(int(n))
 	r.slice = r.slice[n:]
-	if r.win != nil {
-		r.win.tryGrowWindow(r.batchSize)
-	}
-	r.dec()
-}
-
-func (r *msgRef) fail(n uint32, err error) {
+	r.deadlockListener.ack(int(n))
 	if r.err == nil {
 		r.err = err
 	}
-	r.slice = r.slice[n:]
+	// If publishing is windowed, update the window size.
 	if r.win != nil {
-		r.win.shrinkWindow()
+		if err != nil {
+			r.win.shrinkWindow()
+		} else {
+			r.win.tryGrowWindow(r.batchSize)
+		}
 	}
 
-	r.client.observer.Acked(int(n))
+	// Report the latency for the batch of events
+	duration := time.Since(start)
+	r.client.observer.ReportLatency(duration)
 
 	r.dec()
 }
 
 func (r *msgRef) dec() {
-	i := r.count.Dec()
+	i := r.count.Add(^uint32(0))
 	if i > 0 {
 		return
 	}
 
+	r.deadlockListener.close()
+
 	if L := len(r.slice); L > 0 {
-		r.client.observer.Failed(L)
+		r.client.observer.RetryableErrors(L)
 	}
 
 	err := r.err

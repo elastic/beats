@@ -16,11 +16,11 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package rapl
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -32,12 +32,10 @@ import (
 	"time"
 
 	"github.com/fearful-symmetry/gorapl/rapl"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
@@ -77,7 +75,7 @@ type energyUsage struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The linux rapl metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The linux rapl metricset is beta."))
 
 	config := config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -87,7 +85,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	sys := base.Module().(resolve.Resolver)
 	CPUList, err := getMSRCPUs(sys)
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting list of CPUs to query")
+		return nil, fmt.Errorf("error getting list of CPUs to query: %w", err)
 	}
 
 	// check to see if msr-safe is installed
@@ -98,12 +96,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			return nil, errors.New("no msr_safe device found. Is the kernel module loaded?")
 		}
 		if err != nil {
-			return nil, errors.Wrapf(err, "could not check msr_safe device at %s", queryPath)
+			return nil, fmt.Errorf("could not check msr_safe device at %s: %w", queryPath, err)
 		}
 	} else {
 		user, err := user.Current()
 		if err != nil {
-			return nil, errors.Wrap(err, "error fetching user list")
+			return nil, fmt.Errorf("error fetching user list: %w", err)
 		}
 		if user.Uid != "0" {
 			return nil, errors.New("linux/rapl must run as root if not using msr-safe")
@@ -120,7 +118,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 		handler, err := rapl.CreateNewHandler(cpu, formatPath)
 		if err != nil {
-			return nil, errors.Wrapf(err, "error creating handler at path %s for CPU %d", formatPath, cpu)
+			return nil, fmt.Errorf("error creating handler at path %s for CPU %d: %w", formatPath, cpu, err)
 		}
 		handlers[cpu] = handler
 
@@ -177,7 +175,7 @@ func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]energyUsage {
 				continue
 			}
 			if err != nil {
-				logp.L().Infof("Error reading MSR from domain %s: %s skipping.", domain, err)
+				m.Logger().Infof("Error reading MSR from domain %s: %s skipping.", domain.Name, err)
 				continue
 			}
 			domainList[domain] = energyTrack{joules: joules, time: time.Now()}
@@ -208,7 +206,7 @@ func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]energyUsage {
 func getMSRCPUs(hostfs resolve.Resolver) ([]int, error) {
 	CPUs, err := topoPkgCPUMap(hostfs)
 	if err != nil {
-		return nil, errors.Wrap(err, "error fetching CPU topology")
+		return nil, fmt.Errorf("error fetching CPU topology: %w", err)
 	}
 	coreList := []int{}
 	for _, cores := range CPUs {
@@ -245,16 +243,16 @@ func topoPkgCPUMap(hostfs resolve.Resolver) (map[int][]int, error) {
 			fullPkg := hostfs.ResolveHostFS(filepath.Join(sysdir, file.Name(), "/topology/physical_package_id"))
 			dat, err := ioutil.ReadFile(fullPkg)
 			if err != nil {
-				return nil, errors.Wrapf(err, "error reading file %s", fullPkg)
+				return nil, fmt.Errorf("error reading file %s: %w", fullPkg, err)
 			}
 			phys, err := strconv.ParseInt(strings.TrimSpace(string(dat)), 10, 64)
 			if err != nil {
-				return nil, errors.Wrapf(err, "error parsing value from %s", fullPkg)
+				return nil, fmt.Errorf("error parsing value from %s: %w", fullPkg, err)
 			}
 			var cpuCore int
 			_, err = fmt.Sscanf(file.Name(), "cpu%d", &cpuCore)
 			if err != nil {
-				return nil, errors.Wrapf(err, "error fetching CPU core value from string %s", file.Name())
+				return nil, fmt.Errorf("error fetching CPU core value from string %s: %w", file.Name(), err)
 			}
 			pkgList, ok := cpuMap[int(phys)]
 			if !ok {

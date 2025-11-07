@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestNoBatchAssemblyOnNilTarget(t *testing.T) {
@@ -32,8 +32,9 @@ func TestNoBatchAssemblyOnNilTarget(t *testing.T) {
 	// instead of starting up the full goroutine and relying on a timeout,
 	// which can cause flakiness on CI. (This test does not pass without the
 	// code change to check for a nil channel.)
+	logger := logptest.NewTestingLogger(t, "")
 	c := &eventConsumer{
-		logger: logp.NewLogger("eventConsumer test"),
+		logger: logger.Named("eventConsumer test"),
 		queueReader: queueReader{
 			req: make(chan queueReaderRequest, 1),
 		},

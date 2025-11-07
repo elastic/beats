@@ -1,7 +1,0 @@
-This is the `replstatus` metricset of the module mongodb.
-
-It requires the following privileges, which is covered by the https://docs.mongodb.com/manual/reference/built-in-roles/#clusterMonitor[`clusterMonitor` role]:
-
-- https://docs.mongodb.com/manual/reference/privilege-actions/#find[`find`/`listCollections` action] on https://docs.mongodb.com/manual/reference/local-database/[the `local` database resource]
-- https://docs.mongodb.com/manual/reference/privilege-actions/#collStats[`collStats` action] on https://docs.mongodb.com/manual/reference/local-database/#local.oplog.rs[the `local.oplog.rs` collection resource]
-- https://docs.mongodb.com/manual/reference/privilege-actions/#replSetGetStatus[`replSetGetStatus` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]

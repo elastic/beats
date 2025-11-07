@@ -21,7 +21,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/config"
@@ -93,7 +92,7 @@ func TestRemovedSettings(t *testing.T) {
 			cfg: config.MustNewConfigFrom(map[string]interface{}{
 				"hello.world": "ok",
 			}),
-			expected: multierror.Errors{errors.New("setting 'hello' has been removed")}.Err(),
+			expected: errors.Join(errors.New("setting 'hello' has been removed")),
 		},
 		{
 			name:   "multiple obsolete settings",
@@ -102,10 +101,10 @@ func TestRemovedSettings(t *testing.T) {
 				"hello.world": "ok",
 				"bad":         "true",
 			}),
-			expected: multierror.Errors{
+			expected: errors.Join(
 				errors.New("setting 'hello' has been removed"),
 				errors.New("setting 'bad' has been removed"),
-			}.Err(),
+			),
 		},
 		{
 			name:   "multiple obsolete settings not on first level",
@@ -114,10 +113,10 @@ func TestRemovedSettings(t *testing.T) {
 				"filebeat.prospectors":        "ok",
 				"filebeat.config.prospectors": map[string]interface{}{"ok": "ok1"},
 			}),
-			expected: multierror.Errors{
+			expected: errors.Join(
 				errors.New("setting 'filebeat.config.prospectors' has been removed"),
 				errors.New("setting 'filebeat.prospectors' has been removed"),
-			}.Err(),
+			),
 		},
 	}
 

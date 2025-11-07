@@ -16427,6 +16427,56 @@ type: integer
 
 --
 
+*`summary.status`*::
++
+--
+The status of this check as a whole. Either up or down.
+
+
+type: keyword
+
+--
+
+*`summary.attempt`*::
++
+--
+When performing a check this number is 1 for the first check, and increments in the event of a retry.
+
+
+type: short
+
+--
+
+*`summary.max_attempts`*::
++
+--
+The maximum number of checks that may be performed. Note, the actual number may be smaller.
+
+
+type: short
+
+--
+
+*`summary.final_attempt`*::
++
+--
+True if no further checks will be performed in this retry group.
+
+
+type: boolean
+
+--
+
+*`summary.retry_group`*::
++
+--
+A unique token used to group checks across attempts.
+
+
+type: keyword
+
+--
+
 [[exported-fields-synthetics]]
 == Synthetics types fields
 
@@ -16457,7 +16507,7 @@ type: keyword
 *`synthetics.index`*::
 +
 --
-Indexed used for creating total order of all events in this invocation.
+Index count used for creating total order of all events during invocation.
 
 
 type: integer
@@ -16556,6 +16606,21 @@ type: keyword
 Tags used for grouping journeys
 
 type: keyword
+
+--
+
+[float]
+=== duration
+
+Duration required to complete the journey.
+
+
+*`synthetics.journey.duration.us`*::
++
+--
+Duration in microseconds
+
+type: integer
 
 --
 

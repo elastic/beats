@@ -1,0 +1,10 @@
+- key: autoops_es
+  title: "AutoOps ES"
+  release: beta
+  description: >
+    AutoOps Elasticsearch module
+  fields:
+    - name: autoops_es
+      type: group
+      description: >
+      fields:

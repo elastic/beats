@@ -18,7 +18,8 @@
 package index_summary
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+	"net/url"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -35,7 +36,9 @@ func init() {
 }
 
 const (
-	statsPath = "/_stats"
+	nodeStatsPath = "/_nodes/stats"
+
+	nodeStatsParameters = "level=node&filter_path=nodes.*.indices.docs,nodes.*.indices.indexing.index_total,nodes.*.indices.indexing.index_time_in_millis,nodes.*.indices.search.query_total,nodes.*.indices.search.query_time_in_millis,nodes.*.indices.segments.count,nodes.*.indices.segments.memory_in_bytes,nodes.*.indices.store.size_in_bytes,nodes.*.indices.store.total_data_set_size_in_bytes"
 )
 
 var (
@@ -53,7 +56,7 @@ type MetricSet struct {
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Get the stats from the local node
-	ms, err := elasticsearch.NewMetricSet(base, statsPath)
+	ms, err := elasticsearch.NewMetricSet(base, nodeStatsPath)
 	if err != nil {
 		return nil, err
 	}
@@ -70,15 +73,41 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return nil
 	}
 
-	content, err := m.HTTP.FetchContent()
+	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+nodeStatsPath)
+	if err != nil {
+		return fmt.Errorf("failed to get info from Elasticsearch: %w", err)
+	}
+
+	if err := m.updateServicePath(); err != nil {
+		return err
+	}
+
+	content, err := m.FetchContent()
 	if err != nil {
 		return err
 	}
 
-	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+statsPath)
+	return eventMapping(r, info, content, m.XPackEnabled)
+}
+
+func (m *MetricSet) updateServicePath() error {
+	p, err := getServicePath()
 	if err != nil {
-		return errors.Wrap(err, "failed to get info from Elasticsearch")
+		return err
 	}
 
-	return eventMapping(r, info, content, m.XPackEnabled)
+	m.SetServiceURI(p)
+	return nil
+}
+
+func getServicePath() (string, error) {
+	currPath := nodeStatsPath
+	u, err := url.Parse(currPath)
+	if err != nil {
+		return "", err
+	}
+
+	u.RawQuery += nodeStatsParameters
+
+	return u.String(), nil
 }

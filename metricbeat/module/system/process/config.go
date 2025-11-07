@@ -19,6 +19,7 @@ package process
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
 )
 
@@ -32,14 +33,15 @@ type Config struct {
 	IncludeCPUTicks bool                     `config:"process.include_cpu_ticks"`
 	IncludePerCPU   bool                     `config:"process.include_per_cpu"`
 	CPUTicks        *bool                    `config:"cpu_ticks"` // Deprecated
+	// Pid, if set, will override the `processes` config, and only monitor a single process.
+	Pid int `config:"process.pid"`
 }
 
-// Validate checks for depricated config options
-func (c Config) Validate() error {
+// log warning for unsupported config
+func (c Config) checkUnsupportedConfig(logger *logp.Logger) {
 	if c.CPUTicks != nil {
-		cfgwarn.Deprecate("6.1.0", "cpu_ticks is deprecated. Use process.include_cpu_ticks instead")
+		logger.Warn(cfgwarn.Deprecate("6.1.0", "cpu_ticks is deprecated. Use process.include_cpu_ticks instead"))
 	}
-	return nil
 }
 
 var defaultConfig = Config{

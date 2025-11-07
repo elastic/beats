@@ -5,7 +5,7 @@
 package server
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 	"time"
 
@@ -17,11 +17,13 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
-	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
+	mb.Registry.SetSecondarySource(mb.NewLightModulesSource(logp.NewNopLogger(), "../../../module"))
 }
 
 func TestEventMapping(t *testing.T) {
@@ -737,11 +739,9 @@ func TestEventMapping(t *testing.T) {
 		},
 	} {
 		t.Run(test.metricName, func(t *testing.T) {
-			metricSetFields := mapstr.M{}
 			builtMappings, _ := buildMappings(mappings)
-			eventMapping(test.metricName, test.metricValue, metricSetFields, builtMappings)
-
-			assert.Equal(t, test.expected, metricSetFields)
+			ms := eventMapping(test.metricName, test.metricValue, builtMappings, logptest.NewTestingLogger(t, ""))
+			assert.Equal(t, test.expected, ms)
 		})
 	}
 }
@@ -820,7 +820,7 @@ func TestBuildMappings(t *testing.T) {
         value:
           field: started
 `,
-			err:      fmt.Errorf(`repeated label fields "repeated_label_field"`),
+			err:      errors.New(`repeated label fields "repeated_label_field"`),
 			expected: nil,
 		},
 		{
@@ -833,13 +833,14 @@ func TestBuildMappings(t *testing.T) {
         value:
           field: colliding_field
 `,
-			err:      fmt.Errorf(`collision between label field "colliding_field" and value field "colliding_field"`),
+			err:      errors.New(`collision between label field "colliding_field" and value field "colliding_field"`),
 			expected: nil,
 		},
 	} {
 		t.Run(test.title, func(t *testing.T) {
 			var mappings []StatsdMapping
 			err := yaml.Unmarshal([]byte(test.input), &mappings)
+			require.NoError(t, err)
 			actual, err := buildMappings(mappings)
 			for k, v := range actual {
 				v.regex = nil
@@ -874,6 +875,14 @@ func TestParseMetrics(t *testing.T) {
 			}},
 		},
 		{
+			input: "counter1:11.12|c",
+			expected: []statsdMetric{{
+				name:       "counter1",
+				metricType: "c",
+				value:      "11.12",
+			}},
+		},
+		{
 			input: "counter2:15|c|@0.1",
 			expected: []statsdMetric{{
 				name:       "counter2",
@@ -883,12 +892,36 @@ func TestParseMetrics(t *testing.T) {
 			}},
 		},
 		{
-			input: "decrement-counter:-15|c",
-			expected: []statsdMetric{{
-				name:       "decrement-counter",
-				metricType: "c",
-				value:      "-15",
-			}},
+			// All metrics are parsed except the invalid packet
+			input: "decrement-counter:-15|c\nmeter1-1.4|m\ndecrement-counter:-20|c",
+			expected: []statsdMetric{
+				{
+					name:       "decrement-counter",
+					metricType: "c",
+					value:      "-15",
+				},
+				{
+					name:       "decrement-counter",
+					metricType: "c",
+					value:      "-20",
+				},
+			},
+		},
+		{
+			// All metrics are parsed except the invalid packet
+			input: "meter1-1.4|m\ndecrement-counter:-20|c\ntimer1:1.2|ms",
+			expected: []statsdMetric{
+				{
+					name:       "decrement-counter",
+					metricType: "c",
+					value:      "-20",
+				},
+				{
+					name:       "timer1",
+					metricType: "ms",
+					value:      "1.2",
+				},
+			},
 		},
 		{
 			input: "timer1:1.2|ms",
@@ -991,28 +1024,93 @@ func TestParseMetrics(t *testing.T) {
 				},
 			},
 		},
+		{ // Graphite 1.1.x Tags
+			input: "tags3;k1=v1;k2=v2:1|c",
+			expected: []statsdMetric{
+				{
+					name:       "tags3",
+					metricType: "c",
+					value:      "1",
+					tags: map[string]string{
+						"k1": "v1",
+						"k2": "v2",
+					},
+				},
+			},
+		},
 		/// errors
 		{
 			input:    "meter1-1.4|m",
 			expected: []statsdMetric{},
-			err:      errInvalidPacket,
 		},
 		{
 			input:    "meter1:1.4-m",
 			expected: []statsdMetric{},
-			err:      errInvalidPacket,
 		},
 	} {
-		actual, err := parse([]byte(test.input))
+		logger := logptest.NewTestingLogger(t, "")
+		actual, err := parse([]byte(test.input), logger)
 		assert.Equal(t, test.err, err, test.input)
 		assert.Equal(t, test.expected, actual, test.input)
 
-		processor := newMetricProcessor(time.Second)
+		processor := newMetricProcessor(time.Second, logger)
 		for _, e := range actual {
 			err := processor.processSingle(e)
 
 			assert.NoError(t, err)
 		}
+	}
+}
+
+func TestParseSingle(t *testing.T) {
+	tests := map[string]struct {
+		input string
+		err   error
+		want  statsdMetric
+	}{
+		"invalid packet #1": {input: "meter1-1.4|m", err: errInvalidPacket, want: statsdMetric{}},
+		"invalid packet #2": {input: "meter1:1.4-m", err: errInvalidPacket, want: statsdMetric{}},
+		"valid packet: counter with tags": {
+			input: "tags1:1|c|#k1:v1,k2:v2",
+			err:   nil,
+			want: statsdMetric{
+				name:       "tags1",
+				metricType: "c",
+				sampleRate: "",
+				value:      "1",
+				tags:       map[string]string{"k1": "v1", "k2": "v2"},
+			},
+		},
+		"valid packet: counter with Graphite tags": {
+			input: "tags2;k1=v1;k2=v2:1|c",
+			err:   nil,
+			want: statsdMetric{
+				name:       "tags2",
+				metricType: "c",
+				sampleRate: "",
+				value:      "1",
+				tags:       map[string]string{"k1": "v1", "k2": "v2"},
+			},
+		},
+		"valid packet: gauge": {
+			input: "gauge1:1.0|g",
+			err:   nil,
+			want: statsdMetric{
+				name:       "gauge1",
+				metricType: "g",
+				sampleRate: "",
+				value:      "1.0",
+				tags:       nil,
+			},
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			got, err := parseSingle([]byte(tc.input), logptest.NewTestingLogger(t, ""))
+			assert.Equal(t, tc.err, err)
+			assert.Equal(t, tc.want, got)
+		})
 	}
 }
 
@@ -1054,13 +1152,14 @@ func TestTagsGrouping(t *testing.T) {
 
 		"metric3:3|c|@0.1|#k1:v2,k2:v3",
 		"metric4:4|ms|#k1:v2,k2:v3",
+		"metric5;k1=v3;k2=v4:5|c",
 	}
 
 	err := process(testData, ms)
 	require.NoError(t, err)
 
 	events := ms.getEvents()
-	assert.Len(t, events, 2)
+	assert.Len(t, events, 5)
 
 	actualTags := []mapstr.M{}
 	for _, e := range events {
@@ -1068,16 +1167,34 @@ func TestTagsGrouping(t *testing.T) {
 	}
 
 	expectedTags := []mapstr.M{
-		mapstr.M{
+		{
 			"labels": mapstr.M{
 				"k1": "v1",
 				"k2": "v2",
 			},
 		},
-		mapstr.M{
+		{
+			"labels": mapstr.M{
+				"k1": "v1",
+				"k2": "v2",
+			},
+		},
+		{
 			"labels": mapstr.M{
 				"k1": "v2",
 				"k2": "v3",
+			},
+		},
+		{
+			"labels": mapstr.M{
+				"k1": "v2",
+				"k2": "v3",
+			},
+		},
+		{
+			"labels": mapstr.M{
+				"k1": "v3",
+				"k2": "v4",
 			},
 		},
 	}
@@ -1091,6 +1208,7 @@ func TestTagsCleanup(t *testing.T) {
 		"metric1:1|g|#k1:v1,k2:v2",
 
 		"metric2:3|ms|#k1:v2,k2:v3",
+		"metric3;k1=v3;k2=v4:5|c",
 	}
 	err := process(testData, ms)
 	require.NoError(t, err)
@@ -1098,7 +1216,7 @@ func TestTagsCleanup(t *testing.T) {
 	time.Sleep(1000 * time.Millisecond)
 
 	// they will be reported at least once
-	assert.Len(t, ms.getEvents(), 2)
+	assert.Len(t, ms.getEvents(), 3)
 
 	testData = []string{
 		"metric1:+2|g|#k1:v1,k2:v2",
@@ -1147,12 +1265,13 @@ func TestData(t *testing.T) {
 		"metric08:seven|s|#k1:v1,k2:v2",
 		"metric09,k1=v1,k2=v2:8|h",
 		"metric10.with.dots,k1=v1,k2=v2:9|h",
+		"metric11;k1=v1;k2=v2:10|c",
 	}
 	err := process(testData, ms)
 	require.NoError(t, err)
 
 	events := ms.getEvents()
-	assert.Len(t, events, 1)
+	assert.Len(t, events, 11)
 
 	mbevent := mbtest.StandardizeEvent(ms, *events[0])
 	mbtest.WriteEventToDataJSON(t, mbevent, "")
@@ -1182,6 +1301,7 @@ func TestGaugeDeltas(t *testing.T) {
 		"metric01": map[string]interface{}{"value": -1.0},
 	})
 }
+
 func TestCounter(t *testing.T) {
 	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
 	testData := []string{
@@ -1296,6 +1416,7 @@ func BenchmarkIngest(b *testing.B) {
 		"metric08:seven|s|#k1:v1,k2:v2",
 		"metric09,k1=v1,k2=v2:8|h",
 		"metric10.with.dots,k1=v1,k2=v2:9|h",
+		"metric11;k1=v1;k2=v2:10|c",
 	}
 
 	events := make([]*testUDPEvent, len(tests))
@@ -1316,5 +1437,4 @@ func BenchmarkIngest(b *testing.B) {
 		err := ms.processor.Process(events[i%len(events)])
 		assert.NoError(b, err)
 	}
-
 }

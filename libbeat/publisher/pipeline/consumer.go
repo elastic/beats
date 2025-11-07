@@ -31,8 +31,8 @@ import (
 type eventConsumer struct {
 	logger *logp.Logger
 
-	// eventConsumer calls the observer methods eventsRetry and eventsDropped.
-	observer outputObserver
+	// eventConsumer calls the retryObserver methods eventsRetry and eventsDropped.
+	retryObserver retryObserver
 
 	// When the output changes, the new target is sent to the worker routine
 	// on this channel. Clients should call eventConsumer.setTarget().
@@ -53,14 +53,12 @@ type eventConsumer struct {
 	// This waitgroup is released when this eventConsumer's worker
 	// goroutines return.
 	wg sync.WaitGroup
-
-	// The queue the eventConsumer will retrieve batches from.
-	queue queue.Queue
 }
 
-// consumerTarget specifies the output channel and parameters needed for
-// eventConsumer to generate a batch.
+// consumerTarget specifies the queue to read from, the parameters needed
+// to generate a batch, and the output channel to send batches to.
 type consumerTarget struct {
+	queue      queue.Queue
 	ch         chan publisher.Batch
 	timeToLive int
 	batchSize  int
@@ -75,14 +73,12 @@ type retryRequest struct {
 
 func newEventConsumer(
 	log *logp.Logger,
-	queue queue.Queue,
-	observer outputObserver,
+	observer retryObserver,
 ) *eventConsumer {
 	c := &eventConsumer{
-		logger:      log,
-		observer:    observer,
-		queue:       queue,
-		queueReader: makeQueueReader(),
+		logger:        log,
+		retryObserver: observer,
+		queueReader:   makeQueueReader(),
 
 		targetChan: make(chan consumerTarget),
 		retryChan:  make(chan retryRequest),
@@ -133,10 +129,10 @@ outerLoop:
 		// If possible, start reading the next batch in the background.
 		// We require a non-nil target channel so we don't queue up a large
 		// batch before we know the real requested size for our output.
-		if queueBatch == nil && !pendingRead && target.ch != nil {
+		if queueBatch == nil && !pendingRead && target.queue != nil && target.ch != nil {
 			pendingRead = true
 			c.queueReader.req <- queueReaderRequest{
-				queue:      c.queue,
+				queue:      target.queue,
 				retryer:    c,
 				batchSize:  target.batchSize,
 				timeToLive: target.timeToLive,
@@ -166,8 +162,7 @@ outerLoop:
 		case outputChan <- active:
 			// Successfully sent a batch to the output workers
 			if len(retryBatches) > 0 {
-				// This was a retry, report it to the observer
-				c.observer.eventsRetry(len(active.Events()))
+				// This was a retry, advance the retry batch list
 				retryBatches = retryBatches[1:]
 			} else {
 				// This was directly from the queue, clear the value so we can
@@ -186,8 +181,10 @@ outerLoop:
 
 				alive := req.batch.reduceTTL()
 
+				// Report retried vs dropped event count to the observer
 				countDropped := countFailed - len(req.batch.Events())
-				c.observer.eventsDropped(countDropped)
+				c.retryObserver.eventsDropped(countDropped)
+				c.retryObserver.eventsRetry(len(req.batch.Events()))
 
 				if !alive {
 					log.Info("Drop batch")

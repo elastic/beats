@@ -18,17 +18,18 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 )
 
 // Package packages the Beat for distribution. It generates packages based on
@@ -50,6 +51,11 @@ func Package() error {
 	var tasks []interface{}
 	for _, target := range platforms {
 		for _, pkg := range Packages {
+
+			if mg.Verbose() {
+				log.Printf("Evaluating package %v for target %s", pkg.Spec, target)
+			}
+
 			if pkg.OS != target.GOOS() || pkg.Arch != "" && pkg.Arch != target.Arch() {
 				continue
 			}
@@ -79,6 +85,18 @@ func Package() error {
 				agentPackageArch, err := getOSArchName(target, agentPackageType)
 				if err != nil {
 					log.Printf("Skipping arch %v for package type %v: %v", target.Arch(), pkgType, err)
+					continue
+				}
+
+				// Filter out non fips-enabled beats
+				if FIPSBuild && !slices.Contains(FIPSConfig.Beats, BeatName) {
+					log.Printf("Skipping creation for beat %v package type %v because beat is not listed as FIPS-capable %v", BeatName, pkgType, FIPSConfig.Beats)
+					continue
+				}
+
+				// Filter out non fips specs
+				if pkg.Spec.FIPS != FIPSBuild {
+					log.Printf("Skipping creation for package type %v because spec.FIPS = %v and FIPSBuild = %v", pkgType, pkg.Spec.FIPS, FIPSBuild)
 					continue
 				}
 
@@ -120,6 +138,11 @@ func Package() error {
 //
 // Use SNAPSHOT=true to build snapshots.
 func Ironbank() error {
+	if FIPSBuild {
+		fmt.Println(">> IronBank images are not supported for FIPS builds")
+		return nil
+	}
+
 	if runtime.GOARCH != "amd64" {
 		fmt.Printf(">> IronBank images are only supported for amd64 arch (%s is not supported)\n", runtime.GOARCH)
 		return nil
@@ -172,7 +195,6 @@ func prepareIronbankBuild() error {
 		}
 		return nil
 	})
-
 	if err != nil {
 		return fmt.Errorf("cannot create templates for the IronBank: %w", err)
 	}
@@ -201,14 +223,14 @@ func saveIronbank() error {
 	ironbank := getIronbankContextName()
 	buildDir := filepath.Join("build", ironbank)
 	if _, err := os.Stat(buildDir); os.IsNotExist(err) {
-		return fmt.Errorf("cannot find the folder with the ironbank context: %+v", err)
+		return fmt.Errorf("cannot find the folder with the ironbank context: %w", err)
 	}
 
 	distributionsDir := "build/distributions"
 	if _, err := os.Stat(distributionsDir); os.IsNotExist(err) {
-		err := os.MkdirAll(distributionsDir, 0750)
+		err := os.MkdirAll(distributionsDir, 0o750)
 		if err != nil {
-			return fmt.Errorf("cannot create folder for docker artifacts: %+v", err)
+			return fmt.Errorf("cannot create folder for docker artifacts: %w", err)
 		}
 	}
 	tarGzFile := filepath.Join(distributionsDir, ironbank+".tar.gz")
@@ -216,24 +238,13 @@ func saveIronbank() error {
 	// Save the build context as tar.gz artifact
 	err := TarWithOptions(buildDir, tarGzFile, true)
 	if err != nil {
-		return fmt.Errorf("cannot compress the tar.gz file: %+v", err)
+		return fmt.Errorf("cannot compress the tar.gz file: %w", err)
 	}
 
-	return errors.Wrap(CreateSHA512File(tarGzFile), "failed to create .sha512 file")
-}
-
-// updateWithDarwinUniversal checks if darwin/amd64 and darwin/arm64, are listed
-// if so, the universal binary was built, then we need to package it as well.
-func updateWithDarwinUniversal(platforms BuildPlatformList) BuildPlatformList {
-	if IsDarwinUniversal() {
-		platforms = append(platforms,
-			BuildPlatform{
-				Name:  "darwin/universal",
-				Flags: CGOSupported | CrossBuildSupported | Default,
-			})
+	if err = CreateSHA512File(tarGzFile); err != nil {
+		return fmt.Errorf("failed to create .sha512 file: %w", err)
 	}
-
-	return platforms
+	return nil
 }
 
 // isPackageTypeSelected returns true if SelectedPackageTypes is empty or if
@@ -258,10 +269,13 @@ type packageBuilder struct {
 }
 
 func (b packageBuilder) Build() error {
-	fmt.Printf(">> package: Building %v type=%v for platform=%v\n", b.Spec.Name, b.Type, b.Platform.Name)
+	fmt.Printf(">> package: Building %v type=%v for platform=%v fips=%v\n", b.Spec.Name, b.Type, b.Platform.Name, b.Spec.FIPS)
 	log.Printf("Package spec: %+v", b.Spec)
-	return errors.Wrapf(b.Type.Build(b.Spec), "failed building %v type=%v for platform=%v",
-		b.Spec.Name, b.Type, b.Platform.Name)
+	if err := b.Type.Build(b.Spec); err != nil {
+		return fmt.Errorf("failed building %v type=%v for platform=%v fips=%v: %w",
+			b.Spec.Name, b.Type, b.Platform.Name, b.Spec.FIPS, err)
+	}
+	return nil
 }
 
 type testPackagesParams struct {
@@ -356,9 +370,7 @@ func TestPackages(options ...TestPackagesOption) error {
 	args = append(args, "-files", MustExpand("{{.PWD}}/build/distributions/*"))
 
 	if out, err := goTest(args...); err != nil {
-		if !mg.Verbose() {
-			fmt.Println(out)
-		}
+		fmt.Println(out)
 		return err
 	}
 
@@ -366,12 +378,12 @@ func TestPackages(options ...TestPackagesOption) error {
 }
 
 // TestLinuxForCentosGLIBC checks the GLIBC requirements of linux/amd64 and
-// linux/386 binaries to ensure they meet the requirements for RHEL 6 which has
-// glibc 2.12.
+// linux/386 binaries to ensure they meet the requirements for RHEL 7 which has
+// glibc 2.17.
 func TestLinuxForCentosGLIBC() error {
 	switch Platform.Name {
-	case "linux/amd64", "linux/386":
-		return TestBinaryGLIBCVersion(filepath.Join("build/golang-crossbuild", BeatName+"-linux-"+Platform.GOARCH), "2.12")
+	case "linux/amd64":
+		return TestBinaryGLIBCVersion(filepath.Join("build/golang-crossbuild", BeatName+"-linux-"+Platform.GOARCH), "2.17")
 	default:
 		return nil
 	}

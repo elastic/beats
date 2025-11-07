@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -29,7 +30,7 @@ import (
 )
 
 func TestDefaultTargetField(t *testing.T) {
-	p, err := New(conf.MustNewConfigFrom(nil))
+	p, err := New(conf.MustNewConfigFrom(nil), logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 
 	testEvent := &beat.Event{}
@@ -46,7 +47,7 @@ func TestNonDefaultTargetField(t *testing.T) {
 	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"target_field": "foo",
 	})
-	p, err := New(cfg)
+	p, err := New(cfg, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 
 	testEvent := &beat.Event{
@@ -61,15 +62,15 @@ func TestNonDefaultTargetField(t *testing.T) {
 	assert.NotEmpty(t, v)
 
 	v, err = newEvent.GetValue("@metadata._id")
-	assert.NoError(t, err)
-	assert.Empty(t, v)
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, mapstr.ErrKeyNotFound)
 }
 
 func TestNonDefaultMetadataTarget(t *testing.T) {
 	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"target_field": "@metadata.foo",
 	})
-	p, err := New(cfg)
+	p, err := New(cfg, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 
 	testEvent := &beat.Event{

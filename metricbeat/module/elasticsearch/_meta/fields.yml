@@ -6,6 +6,8 @@
   settings: ["ssl", "http"]
   short_config: false
   fields:
+    - name: cluster_settings.cluster.metadata.display_name
+      type: keyword
     - name: index_recovery
       type: group
       fields:

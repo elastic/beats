@@ -19,7 +19,6 @@ package conditions
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -33,19 +32,22 @@ type rangeValue struct {
 }
 
 // Range is a Condition type for checking against ranges.
-type Range map[string]rangeValue
+type Range struct {
+	rangemap map[string]rangeValue
+	logger   *logp.Logger
+}
 
 // NewRangeCondition builds a new Range from a map of ranges.
-func NewRangeCondition(config map[string]interface{}) (c Range, err error) {
-	c = Range{}
+func NewRangeCondition(config map[string]interface{}, log *logp.Logger) (c Range, err error) {
+	c = Range{logger: log, rangemap: make(map[string]rangeValue)}
 
 	updateRangeValue := func(key string, op string, value float64) error {
 		field := strings.TrimSuffix(key, "."+op)
-		_, exists := c[field]
+		_, exists := c.rangemap[field]
 		if !exists {
-			c[field] = rangeValue{}
+			c.rangemap[field] = rangeValue{}
 		}
-		rv := c[field]
+		rv := c.rangemap[field]
 		switch op {
 		case "gte":
 			rv.gte = &value
@@ -58,7 +60,7 @@ func NewRangeCondition(config map[string]interface{}) (c Range, err error) {
 		default:
 			return fmt.Errorf("unexpected range operator %s", op)
 		}
-		c[field] = rv
+		c.rangemap[field] = rv
 		return nil
 	}
 
@@ -106,37 +108,20 @@ func (c Range) Check(event ValuesMap) bool {
 		return true
 	}
 
-	for field, rangeValue := range c {
+	for field, rangeValue := range c.rangemap {
 
 		value, err := event.GetValue(field)
 		if err != nil {
 			return false
 		}
 
-		switch value.(type) {
-		case int, int8, int16, int32, int64:
-			intValue := reflect.ValueOf(value).Int()
+		floatValue, err := ExtractFloat(value)
+		if err != nil {
+			c.logger.Named(logName).Warn(err.Error())
+			return false
+		}
 
-			if !checkValue(float64(intValue), rangeValue) {
-				return false
-			}
-
-		case uint, uint8, uint16, uint32, uint64:
-			uintValue := reflect.ValueOf(value).Uint()
-
-			if !checkValue(float64(uintValue), rangeValue) {
-				return false
-			}
-
-		case float64, float32:
-			floatValue := reflect.ValueOf(value).Float()
-
-			if !checkValue(floatValue, rangeValue) {
-				return false
-			}
-
-		default:
-			logp.L().Named(logName).Warnf("unexpected type %T in range condition.", value)
+		if !checkValue(floatValue, rangeValue) {
 			return false
 		}
 
@@ -145,5 +130,5 @@ func (c Range) Check(event ValuesMap) bool {
 }
 
 func (c Range) String() string {
-	return fmt.Sprintf("range: %v", map[string]rangeValue(c))
+	return fmt.Sprintf("range: %v", map[string]rangeValue(c.rangemap))
 }

@@ -1,3 +1,0 @@
-This is the `qmgr` metricset of the IBM MQ module. It collects status information for the Queue Manager.
-The manager is a system program that is responsible for maintaining the queues and ensuring that the messages
-in the queues reach their destination.

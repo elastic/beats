@@ -18,6 +18,7 @@
 package add_host_metadata
 
 import (
+	"os"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/processors/util"
@@ -25,17 +26,33 @@ import (
 
 // Config for add_host_metadata processor.
 type Config struct {
-	NetInfoEnabled bool            `config:"netinfo.enabled"` // Add IP and MAC to event
-	CacheTTL       time.Duration   `config:"cache.ttl"`
-	Geo            *util.GeoConfig `config:"geo"`
-	Name           string          `config:"name"`
-	ReplaceFields  bool            `config:"replace_fields"` // replace existing host fields with add_host_metadata
+	NetInfoEnabled      bool            `config:"netinfo.enabled"` // Add IP and MAC to event
+	CacheTTL            time.Duration   `config:"cache.ttl"`
+	ExpireUpdateTimeout time.Duration   `config:"expire_update_timeout"`
+	Geo                 *util.GeoConfig `config:"geo"`
+	Name                string          `config:"name"`
+	ReplaceFields       bool            `config:"replace_fields"` // replace existing host fields with add_host_metadata
 }
 
 func defaultConfig() Config {
-	return Config{
-		NetInfoEnabled: true,
-		CacheTTL:       5 * time.Minute,
-		ReplaceFields:  true,
+	// Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
+	// This will result to events not being enhanced with host.ip and host.mac
+	// Related to https://github.com/elastic/integrations/issues/6674
+	valueNETINFO, _ := os.LookupEnv("ELASTIC_NETINFO")
+
+	if valueNETINFO == "false" {
+		return Config{
+			NetInfoEnabled:      false,
+			CacheTTL:            5 * time.Minute,
+			ExpireUpdateTimeout: time.Second * 10,
+			ReplaceFields:       true,
+		}
+	} else {
+		return Config{
+			NetInfoEnabled:      true,
+			CacheTTL:            5 * time.Minute,
+			ExpireUpdateTimeout: time.Second * 10,
+			ReplaceFields:       true,
+		}
 	}
 }

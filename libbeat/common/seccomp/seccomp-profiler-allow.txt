@@ -29,3 +29,9 @@ wait4
 
 # Reexec
 execve
+
+# Jounrald input
+dup3
+faccessat2
+prctl
+setrlimit

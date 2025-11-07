@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package eslegclient
 
@@ -25,13 +24,9 @@ import (
 	"fmt"
 	"os"
 	"testing"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestBulk(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	client := getTestingElasticsearch(t)
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
@@ -55,7 +50,7 @@ func TestBulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, _, err := client.Bulk(context.Background(), index, "", params, body)
+	_, _, err := client.Bulk(context.Background(), index, "", nil, params, body)
 	if err != nil {
 		t.Fatalf("Bulk() returned error: %s", err)
 	}
@@ -78,8 +73,6 @@ func TestBulk(t *testing.T) {
 }
 
 func TestEmptyBulk(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	client := getTestingElasticsearch(t)
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
@@ -88,7 +81,7 @@ func TestEmptyBulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, resp, err := client.Bulk(context.Background(), index, "", params, body)
+	_, resp, err := client.Bulk(context.Background(), index, "", nil, params, body)
 	if err != nil {
 		t.Fatalf("Bulk() returned error: %s", err)
 	}
@@ -98,8 +91,6 @@ func TestEmptyBulk(t *testing.T) {
 }
 
 func TestBulkMoreOperations(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	client := getTestingElasticsearch(t)
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
@@ -152,7 +143,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, resp, err := client.Bulk(context.Background(), index, "", params, body)
+	_, resp, err := client.Bulk(context.Background(), index, "", nil, params, body)
 	if err != nil {
 		t.Fatalf("Bulk() returned error: %s [%s]", err, resp)
 	}

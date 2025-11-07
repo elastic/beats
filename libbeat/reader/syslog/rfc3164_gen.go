@@ -19,10 +19,9 @@
 package syslog
 
 import (
+	"errors"
 	"io"
 	"time"
-
-	"go.uber.org/multierr"
 )
 
 const rfc3164_parser_start int = 1
@@ -34,7 +33,7 @@ const rfc3164_parser_en_main int = 1
 // parseRFC3164 parses an RFC 3164-formatted syslog message. loc is used to enrich
 // timestamps that lack a time zone.
 func parseRFC3164(data string, loc *time.Location) (message, error) {
-	var errs error
+	var errs []error
 	var p, cs, tok int
 
 	pe := len(data)
@@ -80,10 +79,6 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 			goto st_case_29
 		case 30:
 			goto st_case_30
-		case 31:
-			goto st_case_31
-		case 32:
-			goto st_case_32
 		case 7:
 			goto st_case_7
 		case 8:
@@ -139,7 +134,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 		goto tr0
 	tr0:
 
-		errs = multierr.Append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
+		errs = append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
 		p--
 
 		goto st0
@@ -196,14 +191,14 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 	tr6:
 
 		if err := m.setTimestampRFC3339(data[tok:p]); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		goto st4
 	tr30:
 
 		if err := m.setTimestampBSD(data[tok:p], loc); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		goto st4
@@ -317,7 +312,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 			goto _test_eof28
 		}
 	st_case_28:
-		if 32 <= data[p] && data[p] <= 126 {
+		if 48 <= data[p] && data[p] <= 57 {
 			goto tr37
 		}
 		goto st24
@@ -334,7 +329,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 		if data[p] == 93 {
 			goto tr39
 		}
-		if 32 <= data[p] && data[p] <= 126 {
+		if 48 <= data[p] && data[p] <= 57 {
 			goto st29
 		}
 		goto st24
@@ -343,55 +338,15 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 		m.setContent(data[tok:p])
 
 		goto st30
-	tr42:
-
-		m.setContent(data[tok:p])
-
-		tok = p
-
-		goto st30
 	st30:
 		if p++; p == pe {
 			goto _test_eof30
 		}
 	st_case_30:
-		switch data[p] {
-		case 58:
-			goto st31
-		case 93:
-			goto tr39
-		}
-		if 32 <= data[p] && data[p] <= 126 {
-			goto st29
+		if data[p] == 58 {
+			goto st26
 		}
 		goto st24
-	st31:
-		if p++; p == pe {
-			goto _test_eof31
-		}
-	st_case_31:
-		switch data[p] {
-		case 32:
-			goto st32
-		case 93:
-			goto tr39
-		}
-		if 33 <= data[p] && data[p] <= 126 {
-			goto st29
-		}
-		goto st24
-	st32:
-		if p++; p == pe {
-			goto _test_eof32
-		}
-	st_case_32:
-		if data[p] == 93 {
-			goto tr42
-		}
-		if 32 <= data[p] && data[p] <= 126 {
-			goto tr37
-		}
-		goto tr11
 	st7:
 		if p++; p == pe {
 			goto _test_eof7
@@ -452,7 +407,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 	tr15:
 
 		if err := m.setPriority(data[tok:p]); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		goto st10
@@ -816,12 +771,6 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 	_test_eof30:
 		cs = 30
 		goto _test_eof
-	_test_eof31:
-		cs = 31
-		goto _test_eof
-	_test_eof32:
-		cs = 32
-		goto _test_eof
 	_test_eof7:
 		cs = 7
 		goto _test_eof
@@ -879,13 +828,13 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 		}
 		if p == eof {
 			switch cs {
-			case 24, 25, 26, 27, 28, 29, 30, 31, 32:
+			case 24, 25, 26, 27, 28, 29, 30:
 
 				m.setMsg(data[tok:p])
 
 			case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23:
 
-				errs = multierr.Append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
+				errs = append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
 				p--
 
 			}
@@ -896,5 +845,5 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 		}
 	}
 
-	return m, errs
+	return m, errors.Join(errs...)
 }

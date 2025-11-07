@@ -1,0 +1,7 @@
+{
+    "component_templates": [
+        { "name": "detailed-response" },
+        { "name": "ignored-response" },
+        { "name": "simple-response" }
+    ]
+}

@@ -18,8 +18,8 @@
 package file_integrity
 
 import (
+	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -30,6 +30,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -43,23 +46,12 @@ const ErrorSharingViolation syscall.Errno = 32
 func TestEventReader(t *testing.T) {
 	t.Skip("Flaky test: about 1/10 of builds fails https://github.com/elastic/beats/issues/21302")
 	// Make dir to monitor.
-	dir, err := ioutil.TempDir("", "audit")
-	if err != nil {
-		t.Fatal(err)
-	}
-	// under macOS, temp dir has a symlink in the path (/var -> /private/var)
-	// and the path returned in events has the symlink resolved
-	if runtime.GOOS == "darwin" {
-		if dirAlt, err := filepath.EvalSymlinks(dir); err == nil {
-			dir = dirAlt
-		}
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	// Create a new EventProducer.
 	config := defaultConfig
 	config.Paths = []string{dir}
-	r, err := NewEventReader(config)
+	r, err := NewEventReader(config, logp.NewLogger(""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,7 +67,7 @@ func TestEventReader(t *testing.T) {
 	txt1 := filepath.Join(dir, "test1.txt")
 	var fileMode os.FileMode = 0o640
 	mustRun(t, "created", func(t *testing.T) {
-		if err = ioutil.WriteFile(txt1, []byte("hello"), fileMode); err != nil {
+		if err = os.WriteFile(txt1, []byte("hello"), fileMode); err != nil {
 			t.Fatal(err)
 		}
 
@@ -145,8 +137,9 @@ func TestEventReader(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		f.WriteString(" world!")
-		f.Sync()
+		_, err = f.WriteString(" world!")
+		require.NoError(t, err)
+		require.NoError(t, f.Sync())
 		f.Close()
 
 		event := readTimeout(t, events)
@@ -194,12 +187,13 @@ func TestEventReader(t *testing.T) {
 	var moveInOrig string
 	moveIn := filepath.Join(dir, "test3.txt")
 	mustRun(t, "move in", func(t *testing.T) {
-		f, err := ioutil.TempFile("", "test3.txt")
+		f, err := os.CreateTemp("", "test3.txt")
 		if err != nil {
 			t.Fatal(err)
 		}
-		f.WriteString("move-in")
-		f.Sync()
+		_, err = f.WriteString("move-in")
+		require.NoError(t, err)
+		require.NoError(t, f.Sync())
 		f.Close()
 		moveInOrig = f.Name()
 
@@ -232,7 +226,7 @@ func TestEventReader(t *testing.T) {
 	// Test that it does not monitor recursively.
 	subFile := filepath.Join(subDir, "foo.txt")
 	mustRun(t, "non-recursive", func(t *testing.T) {
-		if err = ioutil.WriteFile(subFile, []byte("foo"), fileMode); err != nil {
+		if err = os.WriteFile(subFile, []byte("foo"), fileMode); err != nil {
 			t.Fatal(err)
 		}
 
@@ -252,27 +246,14 @@ func TestRaces(t *testing.T) {
 
 	dirs := make([]string, N)
 	for i := range dirs {
-		dir, err := ioutil.TempDir("", "audit")
-		if err != nil {
-			t.Fatal(err)
-		}
-		if dir, err = filepath.EvalSymlinks(dir); err != nil {
-			t.Fatal(err)
-		}
-		dirs[i] = dir
+		dirs[i] = t.TempDir()
 	}
-
-	defer func() {
-		for _, dir := range dirs {
-			os.RemoveAll(dir)
-		}
-	}()
 
 	// Create a new EventProducer.
 	config := defaultConfig
 	config.Paths = dirs
 	config.Recursive = true
-	r, err := NewEventReader(config)
+	r, err := NewEventReader(config, logp.NewLogger(""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -286,7 +267,7 @@ func TestRaces(t *testing.T) {
 		for i := 0; i < 10; i++ {
 			for _, dir := range dirs {
 				fname := filepath.Join(dir, fmt.Sprintf("%d.dat", i))
-				ioutil.WriteFile(fname, []byte("hello"), fileMode)
+				require.NoError(t, os.WriteFile(fname, []byte("hello"), fileMode))
 			}
 		}
 	}()
@@ -298,7 +279,7 @@ func TestRaces(t *testing.T) {
 	const marker = "test_file"
 	for _, dir := range dirs {
 		fname := filepath.Join(dir, marker)
-		ioutil.WriteFile(fname, []byte("hello"), fileMode)
+		require.NoError(t, os.WriteFile(fname, []byte("hello"), fileMode))
 	}
 
 	got := 0
@@ -431,7 +412,7 @@ func rename(t *testing.T, oldPath, newPath string) {
 			return
 		}
 
-		if linkErr, ok := err.(*os.LinkError); ok && linkErr.Err == ErrorSharingViolation {
+		if errors.Is(err, ErrorSharingViolation) {
 			time.Sleep(time.Millisecond)
 			continue
 		}

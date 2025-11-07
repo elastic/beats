@@ -20,5 +20,7 @@ package service
 
 //go:generate go run ../../../helper/windows/run.go -cmd "go tool cgo -godefs defs_service_windows.go" -goarch amd64 -output defs_service_windows_amd64.go
 //go:generate go run ../../../helper/windows/run.go -cmd "go tool cgo -godefs defs_service_windows.go" -goarch 386 -output defs_service_windows_386.go
+//go:generate go run ../../../helper/windows/run.go -cmd "go tool cgo -godefs defs_service_windows.go" -goarch arm64 -output defs_service_windows_arm64.go
+//go:generate go run ../../../helper/windows/run.go -cmd "go tool cgo -godefs defs_service_windows.go" -goarch arm -output defs_service_windows_arm.go
 //go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -output zservice_windows.go service_windows.go
-//go:generate goimports -w defs_service_windows_amd64.go defs_service_windows_386.go
+//go:generate goimports -w defs_service_windows_amd64.go defs_service_windows_386.go defs_service_windows_arm64.go defs_service_windows_arm.go

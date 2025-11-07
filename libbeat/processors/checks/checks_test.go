@@ -21,13 +21,14 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type mockProcessor struct{}
 
-func newMock(c *conf.C) (processors.Processor, error) {
+func newMock(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	return &mockProcessor{}, nil
 }
 
@@ -190,7 +191,7 @@ func runTest(
 		t.Fatalf("Unexpected error while creating configuration: %+v\n", err)
 	}
 	factory := ConfigChecked(newMock, check(fields...))
-	_, err = factory(cfg)
+	_, err = factory(cfg, logptest.NewTestingLogger(t, ""))
 
 	if err != nil && valid {
 		t.Errorf("Unexpected error when validating configuration of processor: %+v\n", err)

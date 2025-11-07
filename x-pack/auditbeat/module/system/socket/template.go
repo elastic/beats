@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package socket
 
@@ -11,8 +10,7 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/auditbeat/tracing"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -53,21 +51,19 @@ func syscallAlternatives(syscall string) []string {
 	}
 }
 
-func LoadTracingFunctions(tfs *tracing.TraceFS) (common.StringSet, error) {
+func LoadTracingFunctions(tfs *tracing.TraceFS) (map[string]struct{}, error) {
 	fnList, err := tfs.AvailableFilterFunctions()
 	if err != nil {
 		return nil, err
 	}
-	// This uses make() instead of common.MakeStringSet() because the later
-	// doesn't allow to create empty sets.
-	functions := common.StringSet(make(map[string]struct{}, len(fnList)))
+	functions := make(map[string]struct{}, len(fnList))
 	for _, fn := range fnList {
 		// Strip the module name (if any)
 		end := strings.IndexByte(fn, ' ')
 		if end == -1 {
 			end = len(fn)
 		}
-		functions.Add(fn[:end])
+		functions[fn[:end]] = struct{}{}
 	}
 	return functions, nil
 }

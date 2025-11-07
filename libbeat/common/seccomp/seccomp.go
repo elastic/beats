@@ -18,9 +18,10 @@
 package seccomp
 
 import (
+	"fmt"
 	"runtime"
 
-	"github.com/pkg/errors"
+	"errors"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -56,7 +57,7 @@ func MustRegisterPolicy(p *seccomp.Policy) {
 
 	// Ensure that the policy is valid and usable.
 	if _, err := p.Assemble(); err != nil {
-		panic(errors.Wrap(err, "failed to register seccomp policy"))
+		panic(fmt.Errorf("failed to register seccomp policy: %w", err))
 	}
 	registeredPolicy = p
 }
@@ -73,7 +74,7 @@ func MustRegisterPolicy(p *seccomp.Policy) {
 // - Policy values from config
 // - Application registered policy
 // - Default policy (a simple blacklist)
-func LoadFilter(c *config.C) error {
+func LoadFilter(c *config.C, log *logp.Logger) error {
 	// Bail out if seccomp.enabled=false.
 	if c != nil && !c.Enabled() {
 		return nil
@@ -84,13 +85,13 @@ func LoadFilter(c *config.C) error {
 		return err
 	}
 
-	loadFilter(p)
+	loadFilter(p, log)
 	return nil
 }
 
 // loadFilter loads a system call filter.
-func loadFilter(p *seccomp.Policy) {
-	log := logp.NewLogger("seccomp")
+func loadFilter(p *seccomp.Policy, log *logp.Logger) {
+	log = log.Named("seccomp")
 
 	if runtime.GOOS != "linux" {
 		log.Debug("Syscall filtering is only supported on Linux")

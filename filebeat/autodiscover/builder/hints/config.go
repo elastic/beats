@@ -17,7 +17,9 @@
 
 package hints
 
-import conf "github.com/elastic/elastic-agent-libs/config"
+import (
+	conf "github.com/elastic/elastic-agent-libs/config"
+)
 
 type config struct {
 	Key           string  `config:"key"`
@@ -26,11 +28,40 @@ type config struct {
 
 func defaultConfig() config {
 	defaultCfgRaw := map[string]interface{}{
-		"type": "container",
+		"type": "filestream",
+		"id":   "container-logs-${data.container.id}",
+		"prospector": map[string]interface{}{
+			"scanner": map[string]interface{}{
+				"fingerprint.enabled": true,
+				"symlinks":            true,
+			},
+		},
+		// Prevent partial ingestion when containers stop.
+		// Kubernetes is too eager to remove the log files, so Filebeat,
+		// sometimes, does not have enough time to ingest the whole file
+		// before it is removed.
+		"close.on_state_change.removed": false,
+		"file_identity.fingerprint":     nil,
+		// Enable take over mode to migrate state from the previous
+		// configuration version. This prevents re-ingestion of existing
+		// files.
+		"take_over": map[string]any{
+			"enabled": true,
+			"from_ids": []string{
+				"kubernetes-container-logs-${data.container.id}",
+			},
+		},
+		"parsers": []interface{}{
+			map[string]interface{}{
+				"container": map[string]interface{}{
+					"stream": "all",
+					"format": "auto",
+				},
+			},
+		},
 		"paths": []string{
-			// To be able to use this builder with CRI-O replace paths with:
-			// /var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log
-			"/var/lib/docker/containers/${data.container.id}/*-json.log",
+			"/var/log/containers/*-${data.container.id}.log",             // Kubernetes
+			"/var/lib/docker/containers/${data.container.id}/*-json.log", // Docker
 		},
 	}
 	defaultCfg, _ := conf.NewConfigFrom(defaultCfgRaw)
@@ -55,7 +86,7 @@ func (c *config) Unpack(from *conf.C) error {
 		if len(fields) == 1 && fields[0] == "enabled" {
 			// only enabling/disabling default config:
 			if err := c.DefaultConfig.Merge(config); err != nil {
-				return nil
+				return err
 			}
 		} else {
 			// full config provided, discard default. It must be a clone of the

@@ -16,14 +16,13 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package perfmon
 
 import (
+	"errors"
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 var allowedFormats = []string{"float", "large", "long"}
@@ -36,6 +35,7 @@ type Config struct {
 	RefreshWildcardCounters bool          `config:"perfmon.refresh_wildcard_counters"`
 	Queries                 []Query       `config:"perfmon.queries"`
 	GroupAllCountersTo      string        `config:"perfmon.group_all_counter"`
+	MatchByParentInstance   *bool         `config:"perfmon.match_by_parent_instance"`
 }
 
 // QueryConfig for perfmon queries. This will be used as the new configuration format
@@ -64,7 +64,7 @@ func (counter *QueryCounter) InitDefaults() {
 
 func (counter *QueryCounter) Validate() error {
 	if !isValidFormat(counter.Format) {
-		return errors.Errorf("initialization failed: format '%s' "+
+		return fmt.Errorf("initialization failed: format '%s' "+
 			"for counter '%s' is invalid (must be float, large or long)",
 			counter.Format, counter.Name)
 	}
@@ -76,6 +76,10 @@ func (conf *Config) Validate() error {
 		return errors.New("No perfmon queries have been configured. Please follow documentation on allowed configuration settings (perfmon.counters configuration option has been deprecated and is removed in 8.0, perfmon.queries configuration option can be used instead). ")
 	}
 	return nil
+}
+
+func (conf *Config) ShouldMatchByParentInstance() bool {
+	return conf.MatchByParentInstance == nil || *conf.MatchByParentInstance
 }
 
 func isValidFormat(format string) bool {

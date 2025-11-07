@@ -36,6 +36,13 @@ type authResponse struct {
 	AccessToken  string `json:"access_token"`
 	ExpiresIn    int    `json:"expires_in"`
 	ExtExpiresIn int    `json:"ext_expires_in"`
+
+	Error            string `json:"error"`
+	ErrorDescription string `json:"error_description"`
+	ErrorCodes       []int  `json:"error_codes"`
+	CorrelationID    string `json:"correlation_id"`
+	TraceID          string `json:"trace_id"`
+	ErrorURI         string `json:"error_uri"`
 }
 
 // conf contains parameters needed to configure the authenticator.
@@ -67,7 +74,7 @@ func (a *oauth2) renewToken(ctx context.Context) error {
 	reqValues := url.Values{
 		"client_id":     []string{a.conf.ClientID},
 		"scope":         a.conf.Scopes,
-		"client_secret": []string{url.QueryEscape(a.conf.Secret)},
+		"client_secret": []string{a.conf.Secret},
 		"grant_type":    []string{"client_credentials"},
 	}
 	reqEncoded := reqValues.Encode()
@@ -89,7 +96,7 @@ func (a *oauth2) renewToken(ctx context.Context) error {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("token request returned unexpected status code: %d body: %s", res.StatusCode, string(resData))
+		return fmt.Errorf("token request returned unexpected status code: %s, body: %s", res.Status, string(resData))
 	}
 
 	var authRes authResponse
@@ -131,7 +138,7 @@ func New(cfg *config.C, logger *logp.Logger) (authenticator.Authenticator, error
 		return nil, fmt.Errorf("unable to unpack oauth2 Authenticator config: %w", err)
 	}
 
-	client, err := c.Transport.Client()
+	client, err := c.Transport.Client(httpcommon.WithLogger(logger))
 	if err != nil {
 		return nil, fmt.Errorf("unable to create HTTP client: %w", err)
 	}

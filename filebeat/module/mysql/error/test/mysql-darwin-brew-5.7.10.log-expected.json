@@ -775,7 +775,11 @@
         "log.offset": 3746,
         "message": "Server socket created on IP: '::'.",
         "mysql.thread_id": 0,
-        "service.type": "mysql"
+        "related.ip": [
+            "::"
+        ],
+        "service.type": "mysql",
+        "source.ip": "::"
     },
     {
         "@timestamp": "2016-12-09T12:08:33.784Z",

@@ -39,7 +39,6 @@
         "source.geo.region_name": "England",
         "source.ip": "81.2.69.145",
         "source.port": 12345,
-        "url.extension": "1",
         "url.original": "12.2.1",
         "url.path": "12.2.1"
     },
@@ -83,7 +82,6 @@
         "source.geo.region_name": "England",
         "source.ip": "81.2.69.145",
         "source.port": 12345,
-        "url.extension": "/",
         "url.original": "./././././../../../../../../../../",
         "url.path": "./././././../../../../../../../../"
     },

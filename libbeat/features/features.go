@@ -20,6 +20,7 @@ package features
 import (
 	"fmt"
 	"sync"
+	"sync/atomic"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -32,10 +33,11 @@ var (
 type boolValueOnChangeCallback func(new, old bool)
 
 type fflags struct {
-	mu sync.RWMutex
+	// controls access to the callback hashmap
+	callbackMut sync.RWMutex
 
 	// TODO: Refactor to generalize for other feature flags
-	fqdnEnabled   bool
+	fqdnEnabled   atomic.Bool
 	fqdnCallbacks map[string]boolValueOnChangeCallback
 }
 
@@ -88,34 +90,37 @@ func UpdateFromConfig(c *conf.C) error {
 }
 
 func (f *fflags) SetFQDNEnabled(newValue bool) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
+	f.callbackMut.Lock()
+	defer f.callbackMut.Unlock()
+	oldValue := f.fqdnEnabled.Swap(newValue)
 
-	oldValue := f.fqdnEnabled
-	f.fqdnEnabled = newValue
 	for _, cb := range f.fqdnCallbacks {
 		cb(newValue, oldValue)
 	}
+
 }
 
 // FQDN reports if FQDN should be used instead of hostname for host.name.
 // If it hasn't been set by UpdateFromConfig or UpdateFromProto, it returns false.
 func FQDN() bool {
-	flags.mu.RLock()
-	defer flags.mu.RUnlock()
-	return flags.fqdnEnabled
+	return flags.fqdnEnabled.Load()
 }
 
 // AddFQDNOnChangeCallback takes a callback function that will be called with the new and old values
 // of `flags.fqdnEnabled` whenever it changes. It also takes a string ID - this is useful
 // in calling `RemoveFQDNOnChangeCallback` to de-register the callback.
+// if the ID already exists, this returns an error.
 func AddFQDNOnChangeCallback(cb boolValueOnChangeCallback, id string) error {
-	flags.mu.Lock()
-	defer flags.mu.Unlock()
+	flags.callbackMut.Lock()
+	defer flags.callbackMut.Unlock()
 
 	// Initialize callbacks map if necessary.
 	if flags.fqdnCallbacks == nil {
 		flags.fqdnCallbacks = map[string]boolValueOnChangeCallback{}
+	}
+
+	if _, ok := flags.fqdnCallbacks[id]; ok {
+		return fmt.Errorf("callback with ID %s already registered", id)
 	}
 
 	flags.fqdnCallbacks[id] = cb
@@ -126,8 +131,8 @@ func AddFQDNOnChangeCallback(cb boolValueOnChangeCallback, id string) error {
 // returned by `AddFQDNOnChangeCallback` so that function will be no longer be called when
 // `flags.fqdnEnabled` changes.
 func RemoveFQDNOnChangeCallback(id string) {
-	flags.mu.Lock()
-	defer flags.mu.Unlock()
+	flags.callbackMut.Lock()
+	defer flags.callbackMut.Unlock()
 
 	delete(flags.fqdnCallbacks, id)
 }

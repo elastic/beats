@@ -10,11 +10,9 @@ package cef
 import (
 	"fmt"
 	"strconv"
-
-	"go.uber.org/multierr"
 )
 
-//line parser.go:16
+//line parser.go:12
 var _cef_eof_actions []byte = []byte{
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,
@@ -34,8 +32,8 @@ const cef_en_main_cef_extensions int = 29
 
 // unpack unpacks a CEF message.
 //
-//line parser.rl:17
-func (e *Event) unpack(data string) error {
+//line parser.rl:15
+func (e *Event) unpack(data string) []error {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	mark, mark_slash := 0, 0
 
@@ -51,12 +49,12 @@ func (e *Event) unpack(data string) error {
 
 	e.init(data)
 
-//line parser.go:56
+//line parser.go:50
 	{
 		cs = cef_start
 	}
 
-//line parser.go:61
+//line parser.go:54
 	{
 		if (p) == (pe) {
 			goto _test_eof
@@ -343,10 +341,6 @@ func (e *Event) unpack(data string) error {
 			goto tr1
 		case 30:
 			switch data[(p)] {
-			case 44:
-				goto tr64
-			case 46:
-				goto tr64
 			case 61:
 				goto tr65
 			case 93:
@@ -355,12 +349,17 @@ func (e *Event) unpack(data string) error {
 				goto tr64
 			}
 			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
+			case data[(p)] < 48:
+				if 44 <= data[(p)] && data[(p)] <= 46 {
 					goto tr64
 				}
-			case data[(p)] > 91:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 91:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr64
+					}
+				case data[(p)] >= 65:
 					goto tr64
 				}
 			default:
@@ -426,10 +425,6 @@ func (e *Event) unpack(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr81
-			case 44:
-				goto tr84
-			case 46:
-				goto tr84
 			case 61:
 				goto tr85
 			case 92:
@@ -439,7 +434,12 @@ func (e *Event) unpack(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr84
+					}
+				case data[(p)] >= 9:
 					goto tr80
 				}
 			case data[(p)] > 57:
@@ -514,10 +514,6 @@ func (e *Event) unpack(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr92
-			case 44:
-				goto tr95
-			case 46:
-				goto tr95
 			case 61:
 				goto tr85
 			case 92:
@@ -527,7 +523,12 @@ func (e *Event) unpack(data string) error {
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr95
+					}
+				case data[(p)] >= 9:
 					goto tr91
 				}
 			case data[(p)] > 57:
@@ -622,10 +623,6 @@ func (e *Event) unpack(data string) error {
 			switch data[(p)] {
 			case 32:
 				goto tr70
-			case 44:
-				goto tr71
-			case 46:
-				goto tr71
 			case 61:
 				goto tr72
 			case 93:
@@ -634,12 +631,17 @@ func (e *Event) unpack(data string) error {
 				goto tr71
 			}
 			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
+			case data[(p)] < 48:
+				if 44 <= data[(p)] && data[(p)] <= 46 {
 					goto tr71
 				}
-			case data[(p)] > 91:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 91:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr71
+					}
+				case data[(p)] >= 65:
 					goto tr71
 				}
 			default:
@@ -1358,7 +1360,7 @@ func (e *Event) unpack(data string) error {
 					state.reset()
 				}
 
-//line parser.go:1156
+//line parser.go:1153
 			}
 		}
 
@@ -1367,21 +1369,21 @@ func (e *Event) unpack(data string) error {
 		}
 	}
 
-//line parser.rl:54
+//line parser.rl:52
 
 	// Check if state machine completed.
 	if cs < cef_first_final {
 		// Reached an early end.
 		if p == pe {
 			if complete {
-				return multierr.Append(multierr.Combine(recoveredErrs...), errUnexpectedEndOfEvent)
+				return append(recoveredErrs, errUnexpectedEndOfEvent)
 			}
-			return multierr.Append(multierr.Combine(recoveredErrs...), multierr.Combine(errUnexpectedEndOfEvent, errIncompleteHeader))
+			return append(recoveredErrs, errUnexpectedEndOfEvent, errIncompleteHeader)
 		}
 
 		// Encountered invalid input.
-		return multierr.Append(multierr.Combine(recoveredErrs...), fmt.Errorf("error in CEF event at pos %d", p+1))
+		return append(recoveredErrs, fmt.Errorf("error in CEF event at pos %d", p+1))
 	}
 
-	return multierr.Combine(recoveredErrs...)
+	return recoveredErrs
 }

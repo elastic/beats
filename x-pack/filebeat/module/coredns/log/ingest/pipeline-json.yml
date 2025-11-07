@@ -5,6 +5,7 @@ processors:
       field: message
       target_field: event.original
       ignore_failure: true
+      if: ctx.event?.original == null
   - json:
       field: event.original
       target_field: json

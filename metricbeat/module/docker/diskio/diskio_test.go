@@ -22,7 +22,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
@@ -35,7 +36,7 @@ var newBlkioRaw = make([]BlkioRaw, 3)
 func TestDeltaMultipleContainers(t *testing.T) {
 	var apiContainer1 docker.Stat
 	var apiContainer2 docker.Stat
-	metrics := types.BlkioStatEntry{
+	metrics := container.BlkioStatEntry{
 		Major: 123,
 		Minor: 123,
 		Op:    "Total",
@@ -49,7 +50,7 @@ func TestDeltaMultipleContainers(t *testing.T) {
              "Id": "8dfafdbc3a41",
 			 "Names": ["container1"]
      }]`
-	var containers []types.Container
+	var containers []container.Summary
 	err := json.Unmarshal([]byte(jsonContainers), &containers)
 	if err != nil {
 		t.Fatal(err)
@@ -127,7 +128,7 @@ func TestBlkIOSkip(t *testing.T) {
 
 	var readVal uint64 = 2359296
 	var writeVal uint64 = 94544896
-	testInt := []types.BlkioStatEntry{
+	testInt := []container.BlkioStatEntry{
 		{
 			Major: 8,
 			Minor: 0,
@@ -168,7 +169,7 @@ func TestBlkIOSkip(t *testing.T) {
 
 func TestDeltaOneContainer(t *testing.T) {
 	var apiContainer docker.Stat
-	metrics := types.BlkioStatEntry{
+	metrics := container.BlkioStatEntry{
 		Major: 123,
 		Minor: 123,
 		Op:    "Total",
@@ -179,7 +180,7 @@ func TestDeltaOneContainer(t *testing.T) {
              "Id": "8dfafdbc3a40",
 			 "Names": ["container"]
      }`
-	var containers types.Container
+	var containers container.Summary
 	err := json.Unmarshal([]byte(jsonContainers), &containers)
 	if err != nil {
 		t.Fatal(err)
@@ -306,14 +307,14 @@ func TestGetBlkioStatsList(t *testing.T) {
 	}
 
 	dockerStats := []docker.Stat{{
-		Container: &types.Container{
+		Container: &container.Summary{
 			ID:    "cebada",
 			Names: []string{"test"},
 		},
-		Stats: types.StatsJSON{Stats: types.Stats{
+		Stats: container.StatsResponse{
 			Read: later,
-			BlkioStats: types.BlkioStats{
-				IoServicedRecursive: []types.BlkioStatEntry{
+			BlkioStats: container.BlkioStats{
+				IoServicedRecursive: []container.BlkioStatEntry{
 					{Major: 1, Minor: 1, Op: "Read", Value: 100},
 					{Major: 1, Minor: 1, Op: "Write", Value: 200},
 					{Major: 1, Minor: 1, Op: "Total", Value: 300},
@@ -321,7 +322,7 @@ func TestGetBlkioStatsList(t *testing.T) {
 					{Major: 1, Minor: 2, Op: "Write", Value: 100},
 					{Major: 1, Minor: 2, Op: "Total", Value: 150},
 				},
-				IoServiceBytesRecursive: []types.BlkioStatEntry{
+				IoServiceBytesRecursive: []container.BlkioStatEntry{
 					{Major: 1, Minor: 1, Op: "Read", Value: 1000},
 					{Major: 1, Minor: 1, Op: "Write", Value: 2000},
 					{Major: 1, Minor: 1, Op: "Total", Value: 3000},
@@ -329,7 +330,7 @@ func TestGetBlkioStatsList(t *testing.T) {
 					{Major: 1, Minor: 2, Op: "Write", Value: 1000},
 					{Major: 1, Minor: 2, Op: "Total", Value: 1500},
 				},
-				IoServiceTimeRecursive: []types.BlkioStatEntry{
+				IoServiceTimeRecursive: []container.BlkioStatEntry{
 					{Major: 1, Minor: 1, Op: "Read", Value: 10000},
 					{Major: 1, Minor: 1, Op: "Write", Value: 20000},
 					{Major: 1, Minor: 1, Op: "Total", Value: 30000},
@@ -337,7 +338,7 @@ func TestGetBlkioStatsList(t *testing.T) {
 					{Major: 1, Minor: 2, Op: "Write", Value: 1500},
 					{Major: 1, Minor: 2, Op: "Total", Value: 2000},
 				},
-				IoWaitTimeRecursive: []types.BlkioStatEntry{
+				IoWaitTimeRecursive: []container.BlkioStatEntry{
 					{Major: 1, Minor: 1, Op: "Read", Value: 1000000},
 					{Major: 1, Minor: 1, Op: "Write", Value: 25604332},
 					{Major: 1, Minor: 1, Op: "Total", Value: 26604332},
@@ -345,7 +346,7 @@ func TestGetBlkioStatsList(t *testing.T) {
 					{Major: 1, Minor: 2, Op: "Write", Value: 1500},
 					{Major: 1, Minor: 2, Op: "Total", Value: 2000},
 				},
-				IoQueuedRecursive: []types.BlkioStatEntry{
+				IoQueuedRecursive: []container.BlkioStatEntry{
 					{Major: 1, Minor: 1, Op: "Read", Value: 100},
 					{Major: 1, Minor: 1, Op: "Write", Value: 200},
 					{Major: 1, Minor: 1, Op: "Total", Value: 300},
@@ -355,7 +356,7 @@ func TestGetBlkioStatsList(t *testing.T) {
 				},
 			},
 		}},
-	}}
+	}
 
 	statsList := blkioService.getBlkioStatsList(dockerStats, true, []uint64{})
 	stats := statsList[0]
@@ -390,20 +391,20 @@ func TestGetBlkioStatsListWindows(t *testing.T) {
 	}
 
 	dockerStats := []docker.Stat{{
-		Container: &types.Container{
+		Container: &container.Summary{
 			ID:    "cebada",
 			Names: []string{"test"},
 		},
-		Stats: types.StatsJSON{Stats: types.Stats{
+		Stats: container.StatsResponse{
 			Read: later,
-			StorageStats: types.StorageStats{
+			StorageStats: container.StorageStats{
 				ReadCountNormalized:  150,
 				WriteCountNormalized: 300,
 				ReadSizeBytes:        1500,
 				WriteSizeBytes:       3000,
 			},
 		}},
-	}}
+	}
 
 	statsList := blkioService.getBlkioStatsList(dockerStats, true, []uint64{})
 	stats := statsList[0]

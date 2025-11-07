@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -59,24 +58,14 @@ type Settings struct {
 	// this limit can keep it from overflowing memory.
 	WriteAheadLimit int
 
-	// A listener that should be sent ACKs when an event is successfully
-	// written to disk.
-	WriteToDiskListener queue.ACKListener
-
 	// RetryInterval specifies how long to wait before retrying a fatal error
 	// writing to disk. If MaxRetryInterval is nonzero, subsequent retries will
 	// use exponential backoff up to the specified limit.
 	RetryInterval    time.Duration
 	MaxRetryInterval time.Duration
 
-	// EncryptionKey is used to encrypt data if SchemaVersion 2 is used.
-	EncryptionKey []byte
-
 	// UseCompression enables or disables LZ4 compression
 	UseCompression bool
-
-	// UseProtobuf enables protobuf serialization instead of CBOR
-	UseProtobuf bool
 }
 
 // userConfig holds the parameters for a disk queue that are configurable
@@ -146,7 +135,7 @@ func DefaultSettings() Settings {
 func SettingsForUserConfig(config *config.C) (Settings, error) {
 	userConfig := userConfig{}
 	if err := config.Unpack(&userConfig); err != nil {
-		return Settings{}, fmt.Errorf("parsing user config: %w", err)
+		return Settings{}, fmt.Errorf("couldn't unpack disk queue config: %w", err)
 	}
 	settings := DefaultSettings()
 	settings.Path = userConfig.Path
@@ -171,7 +160,7 @@ func SettingsForUserConfig(config *config.C) (Settings, error) {
 		settings.RetryInterval = *userConfig.RetryInterval
 	}
 	if userConfig.MaxRetryInterval != nil {
-		settings.MaxRetryInterval = *userConfig.RetryInterval
+		settings.MaxRetryInterval = *userConfig.MaxRetryInterval
 	}
 
 	return settings, nil

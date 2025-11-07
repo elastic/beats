@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -92,7 +93,7 @@ condition.equals:
 				t.Fatal(err)
 			}
 
-			appender, err := NewConfigAppender(config)
+			appender, err := NewConfigAppender(config, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 			assert.NotNil(t, appender)
 

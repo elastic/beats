@@ -15,9 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build ((linux && go1.8) || (darwin && go1.10)) && cgo
-// +build linux,go1.8 darwin,go1.10
-// +build cgo
+//go:build (linux || darwin) && cgo
 
 package plugin
 
@@ -59,7 +57,9 @@ func init() {
 
 func Initialize() error {
 	if len(plugins.paths) > 0 {
-		cfgwarn.Experimental("loadable plugin support is experimental")
+		// this is never logged even with global loggers here because logp package is not initialized before this code path.
+		// TODO: use local logger here
+		logp.NewNopLogger().Warn(cfgwarn.Experimental("loadable plugin support is experimental"))
 	}
 
 	for _, path := range plugins.paths {

@@ -5,18 +5,19 @@
 package system
 
 import (
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-sysinfo"
 )
 
 const (
-	moduleName = "system"
+	// ModuleName is the name for this module.
+	ModuleName = "system"
 )
 
 func init() {
 	// Register the custom ModuleFactory function for the system module.
-	if err := mb.Registry.AddModule(moduleName, NewModule); err != nil {
+	if err := ab.Registry.AddModule(ModuleName, NewModule); err != nil {
 		panic(err)
 	}
 }
@@ -52,7 +53,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		return nil, err
 	}
 
-	log := logp.NewLogger(moduleName)
+	log := base.Logger.Named(ModuleName)
 
 	var hostID string
 	if hostInfo, err := sysinfo.Host(); err != nil {
