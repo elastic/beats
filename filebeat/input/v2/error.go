@@ -32,7 +32,7 @@ type LoadError struct {
 	// Plugin or some other indicator like ErrUnknown
 	Reason error
 
-	// (optional) Message to report in additon.
+	// (optional) Message to report in addition.
 	Message string
 }
 
@@ -61,7 +61,7 @@ func IsUnknownInputError(err error) bool { return errors.Is(err, ErrUnknownInput
 // Unwrap returns the reason if present
 func (e *LoadError) Unwrap() error { return e.Reason }
 
-// Error returns the errors string repesentation
+// Error returns the errors string representation
 func (e *LoadError) Error() string {
 	var buf strings.Builder
 
@@ -85,7 +85,7 @@ func (e *LoadError) Error() string {
 	return buf.String()
 }
 
-// Error returns the errors string repesentation
+// Error returns the errors string representation
 func (e *SetupError) Error() string {
 	var buf strings.Builder
 	buf.WriteString("invalid plugin setup found:")

@@ -117,7 +117,7 @@ func (s *event) SetTimeZone(b []byte) {
 	}
 
 	// +00 +00:00 or +0000
-	// Use second value directly and don't use unecessary time.Duration.
+	// Use second value directly and don't use unnecessary time.Duration.
 	// Time.FixedZone accepts number of seconds.
 	var h, m int
 	switch len(b[1:]) {

@@ -51,8 +51,8 @@ type InputManager interface {
 	// if inputs are only configured for testing/validation purposes.
 	Init(grp unison.Group) error
 
-	// Create builds a new Input instance from the given configuation, or returns
-	// an error if the configuation is invalid.
+	// Create builds a new Input instance from the given configuration, or returns
+	// an error if the configuration is invalid.
 	// The input must establish any connection for data collection yet. The Beat
 	// will use the Test/Run methods of the input.
 	Create(*conf.C) (Input, error)
@@ -98,8 +98,8 @@ type Context struct {
 	// Agent provides additional Beat info like instance ID or beat name.
 	Agent beat.Info
 
-	// Cancelation is used by Beats to signal the input to shut down.
-	Cancelation Canceler
+	// Cancellation is used by Beats to signal the input to shut down.
+	Cancellation Canceler
 
 	// StatusReporter provides a method to update the status of the underlying unit
 	// that maps to the config. Note: Under standalone execution of Filebeat this is
@@ -220,8 +220,8 @@ type TestContext struct {
 	// Agent provides additional Beat info like instance ID or beat name.
 	Agent beat.Info
 
-	// Cancelation is used by Beats to signal the input to shut down.
-	Cancelation Canceler
+	// Cancellation is used by Beats to signal the input to shut down.
+	Cancellation Canceler
 }
 
 // Canceler is used to provide shutdown handling to the Context.
