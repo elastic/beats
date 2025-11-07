@@ -23,7 +23,6 @@ import (
 )
 
 func TestBrowserSummaries(t *testing.T) {
-	t.Skip("Skipping flaky test https://github.com/elastic/beats/issues/47159")
 	t.Parallel()
 	scenarioDB.RunTagWithSeparateTwists(t, "browser", StdAttemptTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		all := mtr.Events()
@@ -38,7 +37,8 @@ func TestBrowserSummaries(t *testing.T) {
 
 		monStatus, _ := lastEvent.GetValue("monitor.status")
 		summaryIface, _ := lastEvent.GetValue("summary")
-		summary := summaryIface.(*jobsummary.JobSummary)
+		summary, ok := summaryIface.(*jobsummary.JobSummary)
+		require.True(t, ok, "expected JobSummary result: %T", summaryIface)
 		require.Equal(t, string(summary.Status), monStatus, "expected summary status and mon status to be equal in event: %v", lastEvent.Fields)
 
 		requireOneSummaryPerAttempt(t, all)

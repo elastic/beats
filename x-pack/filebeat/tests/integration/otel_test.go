@@ -368,6 +368,7 @@ func TestFilebeatOTelReceiverE2E(t *testing.T) {
     http.enabled: true
     http.host: localhost
     http.port: {{.MonitoringPort}}
+    management.otel.enabled: true
 exporters:
   debug:
     use_internal_logger: false
@@ -674,6 +675,8 @@ processors:
             level: 1
         endpoints:
             - http://localhost:9200
+        logs_dynamic_pipeline:
+            enabled: true
         logs_index: index
         mapping:
             mode: bodymap

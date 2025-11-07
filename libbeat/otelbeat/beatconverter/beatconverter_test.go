@@ -48,6 +48,8 @@ exporters:
       max_retries: 3
     user: elastic
     max_conns_per_host: 1
+    logs_dynamic_pipeline:
+      enabled: true
     sending_queue:
       batch:
         flush_timeout: 10s
@@ -115,6 +117,9 @@ receivers:
     output:
       otelconsumer: null
 service:
+  telemetry:
+    metrics:
+      level: none
   extensions:
     - beatsauth
   pipelines:
@@ -206,6 +211,8 @@ exporters:
       max_interval: 1m0s
       max_retries: 3
     user: elastic-cloud
+    logs_dynamic_pipeline:
+      enabled: true    
     max_conns_per_host: 1
     sending_queue:
       batch:
@@ -241,6 +248,9 @@ receivers:
       kibana:
         host: https://kibana-hostname.elastic.co:443
 service:
+  telemetry:
+    metrics:
+      level: none
   extensions:
     - beatsauth
   pipelines:
@@ -297,6 +307,9 @@ receivers:
     output:
       otelconsumer: null
 service:
+  telemetry:
+    metrics:
+      level: none
   extensions:
     - beatsauth
   pipelines:
@@ -372,6 +385,9 @@ receivers:
     output:
       otelconsumer: null
 service:
+  telemetry:
+    metrics:
+      level: none
   pipelines:
     logs:
       exporters:
@@ -439,6 +455,9 @@ receivers:
     output:
       otelconsumer: null
 service:
+  telemetry:
+    metrics:
+      level: none
   pipelines:
     logs:
       exporters:
@@ -475,6 +494,9 @@ receivers:
     output:
       otelconsumer: null
 service:
+  telemetry:
+    metrics:
+      level: none
   pipelines:
     logs:
       receivers:
@@ -615,6 +637,8 @@ exporters:
   elasticsearch:
     endpoints:
       - http://localhost:9200
+    logs_dynamic_pipeline:
+      enabled: true      
     retry:
       enabled: true
       initial_interval: 1s
@@ -641,6 +665,9 @@ exporters:
       queue_size: 3200
       wait_for_result: true
 service:
+  telemetry:
+    metrics:
+      level: none
   extensions:
     - beatsauth
   pipelines:
