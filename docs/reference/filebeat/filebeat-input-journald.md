@@ -103,9 +103,6 @@ For example, this configuration will ingest all journals and correctly handle th
       - /var/log/journal
 ```
 
-Specifying a directory is only supported on versions
-- `9.0.8`
-- `>= 9.1.5`
 
 :::{warning}
 If a glob (e.g.: `/var/log/journal/*/*.journal` is used, the journald
