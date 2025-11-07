@@ -2,13 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-<<<<<<< HEAD:libbeat/otelbeat/oteltest/beatsauth_test.go
-package oteltest
-=======
 //go:build !requirefips
 
 package otelbeat
->>>>>>> 68257d99f (Move beatsauth extension to beats repo (#47444)):x-pack/libbeat/common/otelbeat/beatsuth_test.go
 
 import (
 	"bytes"
@@ -156,8 +152,6 @@ receivers:
 	assertReceivedLogRecord(t, metricReader)
 }
 
-<<<<<<< HEAD:libbeat/otelbeat/oteltest/beatsauth_test.go
-=======
 func TestKeyPassPhrase(t *testing.T) {
 
 	// create server certificates
@@ -233,7 +227,6 @@ receivers:
 	assertReceivedLogRecord(t, metricReader)
 }
 
->>>>>>> 68257d99f (Move beatsauth extension to beats repo (#47444)):x-pack/libbeat/common/otelbeat/beatsuth_test.go
 // tests ca_trusted_fingerprint
 func TestCATrustedFingerPrint(t *testing.T) {
 	// create server certificates
