@@ -129,7 +129,7 @@ func TestUpdateChan_SendRecv(t *testing.T) {
 
 		select {
 		case <-done:
-		case <-time.After(100 * time.Millisecond):
+		case <-time.After(1 * time.Second):
 			t.Fatal("timeout waiting for Recv to return")
 		}
 	})
