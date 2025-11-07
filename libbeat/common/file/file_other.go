@@ -71,6 +71,18 @@ func (fs StateOS) String() string {
 	return string(current)
 }
 
+// StringInodeDevice returns a string representation of inode and device only.
+// Filebeat inodeDeviceIdentifier uses this string when generating its ID. With
+// the addition of UID and GID in the String() method, we need to keep the old
+// behaviour for backward compatibility.
+func (fs StateOS) StringInodeDevice() string {
+	var buf [64]byte
+	current := strconv.AppendUint(buf[:0], fs.Inode, 10)
+	current = append(current, '-')
+	current = strconv.AppendUint(current, fs.Device, 10)
+	return string(current)
+}
+
 // ReadOpen opens a file for reading only
 func ReadOpen(path string) (*os.File, error) {
 	flag := os.O_RDONLY
