@@ -38,8 +38,9 @@ func getCustomDataDirFilters(queryContext table.QueryContext) ([]string, error) 
 }
 
 type filter struct {
-	field string
-	value string
+	field    string
+	value    string
+	operator table.Operator
 }
 
 func getConstraintFilters(queryContext table.QueryContext, fieldName string) []filter {
@@ -49,13 +50,19 @@ func getConstraintFilters(queryContext table.QueryContext, fieldName string) []f
 	}
 	var results []filter
 	for _, c := range clist.Constraints {
-		switch c.Operator {
+		f := filter{
+			field:    fieldName,
+			operator: c.Operator,
+		}
+		switch f.operator {
 		case table.OperatorEquals, table.OperatorGlob, table.OperatorRegexp:
-			results = append(results, filter{field: fieldName, value: c.Expression})
+			f.value = c.Expression
+			results = append(results, f)
 		case table.OperatorLike:
 			// Convert SQL LIKE pattern to filepath.Match pattern
 			pattern := strings.ReplaceAll(c.Expression, "%", "*")
-			results = append(results, filter{field: fieldName, value: pattern})
+			f.value = pattern
+			results = append(results, f)
 		}
 	}
 	return results
@@ -132,18 +139,20 @@ func matchesFiltersForField(field, value string, filters []filter) bool {
 		return true
 	}
 	for _, filter := range fieldFilters {
-		// Check for exact match
-		if value == filter.value {
-			return true
-		}
-		// Check for glob pattern match
-		if matched, _ := filepath.Match(filter.value, value); matched {
-			return true
-		}
-		// Check for regexp pattern match
-		if re, err := regexp.Compile(filter.value); err == nil {
-			if re.MatchString(value) {
+		switch filter.operator {
+		case table.OperatorEquals:
+			if value == filter.value {
 				return true
+			}
+		case table.OperatorGlob, table.OperatorLike:
+			if matched, _ := filepath.Match(filter.value, value); matched {
+				return true
+			}
+		case table.OperatorRegexp:
+			if re, err := regexp.Compile(filter.value); err == nil {
+				if re.MatchString(value) {
+					return true
+				}
 			}
 		}
 	}
