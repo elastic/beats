@@ -87,10 +87,44 @@ filebeat.inputs:
 
 ### `paths` [filebeat-input-journald-paths]
 
-A list of paths that will be crawled and fetched. Each path can be a directory path (to collect events from all journals in a directory), or a file path. If you specify a directory, Filebeat merges all journals under the directory into a single journal and reads them.
+A list of paths that will be crawled and fetched. A path can be either:
+
+* A file path
+* {applies_to}`stack: ga 9.1.5` {applies_to}`stack: ga 9.0.8` A directory path (to collect events from all journals in a directory). If you specify a directory, Filebeat merges all journals under the directory into a single journal and reads them.
 
 If no paths are specified, Filebeat reads from the default journal.
 
+<<<<<<< HEAD
+=======
+For example, this configuration will ingest all journals and correctly handle the journald rotation:
+
+```yaml
+  - type: journald
+    id: journald-id
+    paths:
+      - /var/log/journal
+```
+
+
+:::{warning}
+If a glob (for example, `/var/log/journal/*/*.journal`) is used, the journald
+input will only ingest the journal files found when started. New
+files will not be ingested.
+:::
+
+
+
+
+
+### `merge` [filebeat-input-journald-merge]
+```{applies_to}
+stack: ga 9.2.0
+```
+
+When enabled, log entries will be ingested interleaved from all
+available journals, including remote ones. This option is disabled by
+default.
+>>>>>>> d7c3735e7 ([Filebeat/Journald] Add note about the issues with using globs (#47494))
 
 ### `seek` [filebeat-input-journald-seek]
 
