@@ -216,6 +216,10 @@ func (p *IfThenElseProcessor) SetPaths(paths *paths.Path) error {
 		}
 	}
 
+	if p.els == nil {
+		return err
+	}
+
 	for _, proc := range p.els.List {
 		if procWithSet, ok := proc.(SetPather); ok {
 			err = errors.Join(err, procWithSet.SetPaths(paths))

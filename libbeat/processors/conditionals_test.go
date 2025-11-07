@@ -23,6 +23,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -248,6 +249,18 @@ func (c *errorProcessor) Close() error {
 	return ErrProcessorClose
 }
 
+var ErrSetPathsProcessor = fmt.Errorf("error processor set paths error")
+
+type setPathsProcessor struct{}
+
+func (c *setPathsProcessor) Run(e *beat.Event) (*beat.Event, error) {
+	return e, nil
+}
+func (c *setPathsProcessor) String() string { return "error_processor" }
+func (c *setPathsProcessor) SetPaths(p *paths.Path) error {
+	return fmt.Errorf("error_processor set paths error: %s", p)
+}
+
 func TestConditionRuleClose(t *testing.T) {
 	const whenCondition = `
 contains.a: b
@@ -293,4 +306,62 @@ func TestIfThenElseProcessorClose(t *testing.T) {
 	err := Close(proc)
 	require.ErrorIs(t, err, ErrProcessorClose)
 	require.Equal(t, ErrProcessorClose.Error()+"\n"+ErrProcessorClose.Error(), err.Error())
+}
+
+func TestIfThenElseProcessorSetPaths(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	thenProcessors := &Processors{
+		List: []beat.Processor{&setPathsProcessor{}},
+		log:  logger,
+	}
+	elsProcessors := &Processors{
+		List: []beat.Processor{&setPathsProcessor{}},
+		log:  logger,
+	}
+	proc := &IfThenElseProcessor{
+		cond: nil,
+		then: thenProcessors,
+		els:  elsProcessors,
+	}
+
+	// SetPaths should not panic when then is nil
+	tmpDir := t.TempDir()
+	beatPaths := &paths.Path{
+		Home:   tmpDir,
+		Config: tmpDir,
+		Data:   tmpDir,
+		Logs:   tmpDir,
+	}
+	err := proc.SetPaths(beatPaths)
+	require.ErrorAs(t, err, &ErrSetPathsProcessor)
+	require.ErrorContains(t, err, ErrSetPathsProcessor.Error())
+	require.ErrorContains(t, err, beatPaths.String())
+}
+
+func TestIfThenElseProcessorSetPathsNil(t *testing.T) {
+	const cfg = `
+if:
+  equals.test: value
+then:
+  - add_fields: {target: "", fields: {test_field: test_value}}
+`
+	c, err := conf.NewConfigWithYAML([]byte(cfg), "if-then config")
+	require.NoError(t, err)
+
+	beatProcessor, err := NewIfElseThenProcessor(c, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	proc, ok := beatProcessor.(SetPather)
+	require.True(t, ok)
+
+	// SetPaths should not panic when then is nil
+	tmpDir := t.TempDir()
+	beatPaths := &paths.Path{
+		Home:   tmpDir,
+		Config: tmpDir,
+		Data:   tmpDir,
+		Logs:   tmpDir,
+	}
+	err = proc.SetPaths(beatPaths)
+	require.NoError(t, err)
 }
