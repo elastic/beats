@@ -423,8 +423,21 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id s
 // data stream contains a json array as the root element or not, without
 // advancing the reader. If the data stream contains an array as the root
 // element, the value of the boolean return type is set to true.
+// If a UTF-8 BOM is present at the beginning, it is automatically discarded.
 func evaluateJSON(reader *bufio.Reader) (io.Reader, bool, error) {
 	eof := false
+
+	// UTF-8 BOM is 0xEF 0xBB 0xBF
+	// Check for UTF-8 BOM at the beginning and discard it
+	if b, err := reader.Peek(3); err == nil && len(b) >= 3 {
+		if b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF {
+			// Actually discard the BOM bytes from the reader
+			if _, err := reader.Discard(3); err != nil {
+				return nil, false, fmt.Errorf("failed to discard UTF-8 BOM: %w", err)
+			}
+		}
+	}
+
 	for i := 0; ; i++ {
 		b, err := reader.Peek((i + 1) * 5)
 		if errors.Is(err, io.EOF) {
