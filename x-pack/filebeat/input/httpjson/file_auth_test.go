@@ -5,6 +5,7 @@
 package httpjson
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"os"
@@ -42,14 +43,16 @@ func TestFileAuthTransportSetsHeader(t *testing.T) {
 		t.Fatalf("unexpected error creating transport: %v", err)
 	}
 
-	req, err := http.NewRequest(http.MethodGet, "http://example.test", nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://example.test", nil)
 	if err != nil {
 		t.Fatalf("failed to create request: %v", err)
 	}
 
-	if _, err := transport.RoundTrip(req); err != nil {
+	resp, err := transport.RoundTrip(req)
+	if err != nil {
 		t.Fatalf("unexpected round trip error: %v", err)
 	}
+	resp.Body.Close()
 }
 
 func TestFileAuthTransportRefreshesToken(t *testing.T) {
@@ -83,14 +86,16 @@ func TestFileAuthTransportRefreshesToken(t *testing.T) {
 	current := transport.loadedAt
 	transport.clock = func() time.Time { return current }
 
-	req, err := http.NewRequest(http.MethodGet, "http://example.test", nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://example.test", nil)
 	if err != nil {
 		t.Fatalf("failed to create request: %v", err)
 	}
 
-	if _, err := transport.RoundTrip(req); err != nil {
+	resp, err := transport.RoundTrip(req)
+	if err != nil {
 		t.Fatalf("unexpected round trip error: %v", err)
 	}
+	resp.Body.Close()
 
 	if err := os.WriteFile(path, []byte("beta"), 0o600); err != nil {
 		t.Fatalf("failed to rotate token: %v", err)
@@ -98,9 +103,11 @@ func TestFileAuthTransportRefreshesToken(t *testing.T) {
 
 	current = current.Add(refresh + time.Millisecond)
 
-	if _, err := transport.RoundTrip(req); err != nil {
+	resp, err = transport.RoundTrip(req)
+	if err != nil {
 		t.Fatalf("unexpected round trip error after refresh: %v", err)
 	}
+	resp.Body.Close()
 
 	if len(expect) != 0 {
 		t.Fatalf("not all expectations consumed: %d remaining", len(expect))
