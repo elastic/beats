@@ -274,23 +274,29 @@ contains.a: b
 	require.ErrorIs(t, err, ErrProcessorClose)
 }
 
-func TestIfThenElseProcessorClose(t *testing.T) {
-	logger := logptest.NewTestingLogger(t, "")
-	thenProcessors := &Processors{
-		List: []beat.Processor{&errorProcessor{}},
-		log:  logger,
-	}
-	elsProcessors := &Processors{
-		List: []beat.Processor{&errorProcessor{}},
-		log:  logger,
-	}
-	proc := &ClosingIfThenElseProcessor{
-		IfThenElseProcessor{
-			then: thenProcessors,
-			els:  elsProcessors,
-		},
-	}
-	err := Close(proc)
-	require.ErrorIs(t, err, ErrProcessorClose)
-	require.Equal(t, ErrProcessorClose.Error()+"\n"+ErrProcessorClose.Error(), err.Error())
+func TestIfThenElseProcessorCloseNil(t *testing.T) {
+	// Use add_process_metadata processor which implements Closer, so we get a ClosingIfThenElseProcessor
+	const cfg = `
+if:
+  equals.test: value
+then:
+  - add_process_metadata:
+      match_pids:
+        - process.pid
+`
+	c, err := conf.NewConfigWithYAML([]byte(cfg), "if-then config")
+	require.NoError(t, err)
+
+	beatProcessor, err := NewIfElseThenProcessor(c, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	// Verify we got a ClosingIfThenElseProcessor
+	closingProc, ok := beatProcessor.(*ClosingIfThenElseProcessor)
+	require.True(t, ok, "expected ClosingIfThenElseProcessor, got %T", beatProcessor)
+	assert.Nil(t, closingProc.els, "els should be nil when no else clause is provided")
+
+	_, ok = beatProcessor.(Closer)
+	require.True(t, ok, "sanity check: implements Closer")
+	err = closingProc.Close()
+	require.NoError(t, err)
 }
