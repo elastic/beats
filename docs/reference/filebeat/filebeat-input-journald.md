@@ -94,14 +94,14 @@ journals under the directory into a single journal and reads them.
 
 If no paths are specified, Filebeat reads from the default journal.
 
+For example, this configuration will ingest all journals and correctly handle the journald rotation:
+
 ```yaml
   - type: journald
     id: journald-id
     paths:
       - /var/log/journal
 ```
-
-Will ingest all journals and correctly handle the journald rotation.
 
 Specifying a directory is only supported on versions
 - `9.0.8`
