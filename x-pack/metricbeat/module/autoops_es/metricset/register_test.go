@@ -229,6 +229,8 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 		}
 	}
 
+	explicitlyBlankDisplayName := clusterSettings("", "")
+
 	clusterInfoForVersion := func(v string) *utils.ClusterInfo {
 		return &utils.ClusterInfo{
 			ClusterName: "my-cluster",
@@ -335,7 +337,7 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 			clusterInfoStatusCode:     200,
 			clusterInfo:               clusterInfoForVersion("8.0.0"),
 			clusterSettingsStatusCode: 200,
-			clusterSettings:           noDisplayName,
+			clusterSettings:           explicitlyBlankDisplayName,
 			licenseStatusCode:         200,
 			license:                   licenseForType("enterprise", "active"),
 			expectError:               false,
@@ -355,7 +357,7 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 			clusterInfoStatusCode:     200,
 			clusterInfo:               clusterInfoForVersion("7.17.0"),
 			clusterSettingsStatusCode: 200,
-			clusterSettings:           noDisplayName,
+			clusterSettings:           explicitlyBlankDisplayName,
 			licenseStatusCode:         200,
 			license:                   licenseForType("enterprise", "active"),
 			expectError:               false,
@@ -452,8 +454,14 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 						w.Header().Set("Content-Type", "application/json")
 
 						if tc.clusterSettings != nil {
-							err := json.NewEncoder(w).Encode(tc.clusterSettings)
-							assert.NoError(t, err)
+							if tc.clusterSettings == noDisplayName {
+								// write empty object that behaves like if these values are truly unset
+								_, err := w.Write([]byte(`{}`))
+								assert.NoError(t, err)
+							} else {
+								err := json.NewEncoder(w).Encode(tc.clusterSettings)
+								assert.NoError(t, err)
+							}
 						}
 					case licensePath: // License for non-7.x versions
 						if tc.clusterInfo == nil || tc.clusterInfo.Version.Number.Major == 7 {

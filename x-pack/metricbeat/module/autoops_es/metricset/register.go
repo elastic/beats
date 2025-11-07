@@ -24,17 +24,17 @@ const (
 )
 
 type clusterSettingsResponse struct {
-	Persistent clusterSettingsDisplayName `json:"persistent,omitempty"`
-	Transient  clusterSettingsDisplayName `json:"transient,omitempty"`
+	Persistent clusterSettingsDisplayName `json:"persistent"`
+	Transient  clusterSettingsDisplayName `json:"transient"`
 }
 
 // Partial structure to extract the cluster display name from the cluster settings API response.
 type clusterSettingsDisplayName struct {
 	Cluster struct {
 		Metadata struct {
-			DisplayName string `json:"display_name,omitempty"`
-		} `json:"metadata,omitempty"`
-	} `json:"cluster,omitempty"`
+			DisplayName string `json:"display_name"`
+		} `json:"metadata"`
+	} `json:"cluster"`
 }
 
 // License information returned from `GET /_license`, contained within the "license" object.
@@ -110,17 +110,15 @@ func maybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterIn
 		// Log the error, but do not fail the registration - we can continue with the existing cluster name
 		// Note: You can restart the agent to re-fetch the name later if needed
 		m.Logger().Warnf("Ignoring failure to fetch cluster settings for Cloud Connected: %v", err)
-	} else {
 		// prefer transient setting over persistent setting
-		if clusterSettings.Transient.Cluster.Metadata.DisplayName != "" {
-			m.Logger().Debugf("Using transient cluster display name %s for Cloud Connected in place of cluster name %s", clusterSettings.Transient.Cluster.Metadata.DisplayName, clusterInfo.ClusterName)
+	} else if clusterSettings.Transient.Cluster.Metadata.DisplayName != "" {
+		m.Logger().Debugf("Using transient cluster display name %s for Cloud Connected in place of cluster name %s", clusterSettings.Transient.Cluster.Metadata.DisplayName, clusterInfo.ClusterName)
 
-			clusterInfo.ClusterName = clusterSettings.Transient.Cluster.Metadata.DisplayName
-		} else if clusterSettings.Persistent.Cluster.Metadata.DisplayName != "" {
-			m.Logger().Debugf("Using persistent cluster display name %s for Cloud Connected in place of cluster name %s", clusterSettings.Persistent.Cluster.Metadata.DisplayName, clusterInfo.ClusterName)
+		clusterInfo.ClusterName = clusterSettings.Transient.Cluster.Metadata.DisplayName
+	} else if clusterSettings.Persistent.Cluster.Metadata.DisplayName != "" {
+		m.Logger().Debugf("Using persistent cluster display name %s for Cloud Connected in place of cluster name %s", clusterSettings.Persistent.Cluster.Metadata.DisplayName, clusterInfo.ClusterName)
 
-			clusterInfo.ClusterName = clusterSettings.Persistent.Cluster.Metadata.DisplayName
-		}
+		clusterInfo.ClusterName = clusterSettings.Persistent.Cluster.Metadata.DisplayName
 	}
 
 	m.Logger().Debugf("Attempting to fetch license for Cloud Connected...")
