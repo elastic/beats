@@ -173,46 +173,20 @@ func NewStandardBeat(t *testing.T, beatName, binary string, args ...string) *Bea
 // NewAgentBeat creates a new agentbeat process that runs the beatName as a subcommand.
 // See `NewBeat` for options and information for the parameters.
 func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
-	require.FileExistsf(t, binary, "agentbeat binary must exists")
-	rootDir, err := filepath.Abs(filepath.Join("..", "..", "build", "integration-tests"))
-	if err != nil {
-		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
-	}
+	b := NewBeat(t, beatName, binary, args...)
 
-	tempDir := CreateTempDir(t, rootDir)
-	configFile := filepath.Join(tempDir, beatName+".yml")
-
-	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
-	require.NoError(t, err, "error creating stdout file")
-	stderrFile, err := os.Create(filepath.Join(tempDir, "stderr"))
-	require.NoError(t, err, "error creating stderr file")
-
-	p := BeatProc{
-		Binary: binary,
-		baseArgs: append([]string{
+	// Remove the first two arguments: beatName and --systemTest
+	baseArgs := b.baseArgs[2:]
+	// Add the agentbeat argumet and re-organise the others
+	b.baseArgs = append(
+		[]string{
 			"agentbeat",
 			"--systemTest",
 			beatName,
-			"--path.home", tempDir,
-			"--path.logs", tempDir,
-			"-E", "logging.to_files=true",
-			"-E", "logging.files.rotateeverybytes=104857600", // About 100MB
-			"-E", "logging.files.rotateonstartup=false",
-		}, args...),
-		tempDir:    tempDir,
-		beatName:   beatName,
-		configFile: configFile,
-		t:          t,
-		stdout:     stdoutFile,
-		stderr:     stderrFile,
-	}
-	t.Cleanup(func() {
-		if !t.Failed() {
-			return
-		}
-		reportErrors(t, tempDir, beatName)
-	})
-	return &p
+		},
+		baseArgs...)
+
+	return b
 }
 
 // Start starts the Beat process
