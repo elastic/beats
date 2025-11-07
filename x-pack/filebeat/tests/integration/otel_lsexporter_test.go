@@ -177,7 +177,6 @@ service:
 		// only present in beats receivers
 		"agent.otelcol.component.id",
 		"agent.otelcol.component.kind",
-		// TODO(mauri870): Why are these fields different now?
 		"log.file.device_id",
 		"log.file.fingerprint",
 	}

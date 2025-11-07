@@ -186,9 +186,7 @@ http.port: %d
 		// only present in beats receivers
 		"agent.otelcol.component.id",
 		"agent.otelcol.component.kind",
-		// TODO(mauri870): Why are these fields different now?
 		"log.file.device_id", // changes value between filebeat and otel receiver
-		// "container.id",       // only present in filebeat
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
@@ -578,7 +576,6 @@ http.port: %d
 		// only present in beats receivers
 		"agent.otelcol.component.id",
 		"agent.otelcol.component.kind",
-		// TODO(mauri870): Why are these fields different now?
 		"log.file.device_id", // changes value between filebeat and otel receiver
 		"container.id",       // only present in filebeat
 	}

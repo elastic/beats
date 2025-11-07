@@ -52,7 +52,6 @@ func New(tb testing.TB, configYAML string) *Collector {
 		tb.Fatalf("failed to create collector: %v", err)
 	}
 
-	// TODO(mauri870): this logger is too verbose, change it so it does not log everything to stderr.
 	zapCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		&zaptest.Discarder{},
