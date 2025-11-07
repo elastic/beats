@@ -105,7 +105,7 @@ For example, this configuration will ingest all journals and correctly handle th
 
 
 :::{warning}
-If a glob (e.g.: `/var/log/journal/*/*.journal` is used, the journald
+If a glob (for example, `/var/log/journal/*/*.journal`) is used, the journald
 input will only ingest the journal files found when started. New
 files will not be ingested.
 :::
