@@ -146,38 +146,40 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 
 	// Determine authentication method (shared by both Event Hub and Storage Account)
 	authType := in.config.AuthType
-	if authType == "" {
-		authType = AuthTypeConnectionString
-	}
 
-	// Create the credential if needed (shared by both Event Hub and Storage Account)
+	// Create the credential if needed (only for client_secret auth)
 	// Both services use the same credential since they share the same auth_type
-	credConfig := authConfig{
-		AuthType:      authType,
-		TenantID:      in.config.TenantID,
-		ClientID:      in.config.ClientID,
-		ClientSecret:  in.config.ClientSecret,
-		AuthorityHost: in.config.AuthorityHost,
-	}
-	credential, err := newCredential(credConfig, authType, in.log)
-	if err != nil {
-		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating credential: %s", err.Error()))
-		return fmt.Errorf("failed to create credential: %w", err)
+	var credential azcore.TokenCredential
+	if authType == AuthTypeClientSecret {
+		credConfig := authConfig{
+			AuthType:      authType,
+			TenantID:      in.config.TenantID,
+			ClientID:      in.config.ClientID,
+			ClientSecret:  in.config.ClientSecret,
+			AuthorityHost: in.config.AuthorityHost,
+		}
+		var err error
+		credential, err = newCredential(credConfig, authType, in.log)
+		if err != nil {
+			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating credential: %s", err.Error()))
+			return fmt.Errorf("failed to create credential: %w", err)
+		}
 	}
 
 	// Create the event hub consumerClient to receive events.
 	consumerClient, err := newEventHubConsumerClient(
 		eventHubClientConfig{
-			Namespace:     in.config.EventHubNamespace,
-			EventHubName:  in.config.EventHubName,
-			ConsumerGroup: in.config.ConsumerGroup,
-			Credential:    credential,
+			Namespace:        in.config.EventHubNamespace,
+			EventHubName:     in.config.EventHubName,
+			ConsumerGroup:    in.config.ConsumerGroup,
+			Credential:       credential,
+			ConnectionString: in.config.ConnectionString,
 		},
 		authType,
 		in.log,
 	)
 	if err != nil {
-		return fmt.Errorf("failed to create consumer client with credential: %w", err)
+		return fmt.Errorf("failed to create consumer client: %w", err)
 	}
 
 	// Create the container client
@@ -261,7 +263,6 @@ func (in *eventHubInputV2) run(ctx context.Context) error {
 		// Check if we need to migrate the checkpoint store.
 		err := in.migrationAssistant.checkAndMigrate(
 			ctx,
-			in.config.ConnectionString,
 			in.config.ConsumerGroup,
 		)
 		if err != nil {

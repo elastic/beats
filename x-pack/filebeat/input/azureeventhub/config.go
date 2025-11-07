@@ -151,11 +151,9 @@ func defaultConfig() azureInputConfig {
 func (conf *azureInputConfig) Validate() error {
 	logger := logp.NewLogger("azureeventhub.config")
 
-	// Determine authentication method
-	authType := conf.AuthType
-	if authType == "" {
-		// Default to connection_string for backwards compatibility
-		authType = AuthTypeConnectionString
+	// Normalize authentication method (default to connection_string if empty)
+	if conf.AuthType == "" {
+		conf.AuthType = AuthTypeConnectionString
 	}
 
 	// Validate the processor version first to ensure it's valid
@@ -169,7 +167,7 @@ func (conf *azureInputConfig) Validate() error {
 	}
 
 	// Validate authentication for both Event Hub and Storage Account together
-	switch authType {
+	switch conf.AuthType {
 	case AuthTypeConnectionString:
 		// Validate Event Hub connection string configuration
 		if conf.ConnectionString == "" {
@@ -232,7 +230,7 @@ func (conf *azureInputConfig) Validate() error {
 		}
 
 	default:
-		return fmt.Errorf("unknown auth_type: %s (valid values: connection_string, client_secret)", authType)
+		return fmt.Errorf("unknown auth_type: %s (valid values: connection_string, client_secret)", conf.AuthType)
 	}
 
 	// Validate required fields

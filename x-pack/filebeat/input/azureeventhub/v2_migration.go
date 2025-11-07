@@ -57,7 +57,7 @@ func newMigrationAssistant(config azureInputConfig, log *logp.Logger, consumerCl
 
 // checkAndMigrate checks if the v1 checkpoint information for the partitions
 // exists and migrates it to v2 if it does.
-func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnectionString, consumerGroup string) error {
+func (m *migrationAssistant) checkAndMigrate(ctx context.Context, consumerGroup string) error {
 	// Fetching event hub information
 	eventHubProperties, err := m.consumerClient.GetEventHubProperties(ctx, nil)
 	if err != nil {
@@ -78,9 +78,24 @@ func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnec
 		return err
 	}
 
-	connectionStringProperties, err := parseConnectionString(m.config.ConnectionString)
-	if err != nil {
-		return fmt.Errorf("migration assistant: failed to parse connection string: %w", err)
+	// Determine the fully qualified namespace based on the auth type
+	var fullyQualifiedNamespace string
+	switch m.config.AuthType {
+	case AuthTypeConnectionString:
+		// When using connection_string auth, parse it to get the namespace
+		connectionStringProperties, err := parseConnectionString(m.config.ConnectionString)
+		if err != nil {
+			return fmt.Errorf("migration assistant: failed to parse connection string: %w", err)
+		}
+		fullyQualifiedNamespace = connectionStringProperties.FullyQualifiedNamespace
+	case AuthTypeClientSecret:
+		// When using client_secret auth, use EventHubNamespace directly
+		if m.config.EventHubNamespace == "" {
+			return fmt.Errorf("migration assistant: eventhub_namespace is required when using client_secret authentication")
+		}
+		fullyQualifiedNamespace = m.config.EventHubNamespace
+	default:
+		return fmt.Errorf("migration assistant: unknown auth_type: %s", m.config.AuthType)
 	}
 
 	for _, partitionID := range eventHubProperties.PartitionIDs {
@@ -88,7 +103,7 @@ func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnec
 			ctx,
 			blobs,
 			partitionID,
-			connectionStringProperties.FullyQualifiedNamespace,
+			fullyQualifiedNamespace,
 			eventHubProperties.Name,
 			consumerGroup,
 		)
