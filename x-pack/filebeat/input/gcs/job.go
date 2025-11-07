@@ -454,11 +454,11 @@ func evaluateJSON(reader *bufio.Reader) (io.Reader, bool, error) {
 			case unicode.IsSpace(bytes.Runes(char)[0]):
 				continue
 			default:
-				return nil, false, fmt.Errorf("unexpected error: JSON data is malformed")
+				return nil, false, fmt.Errorf("unexpected error: JSON data is malformed %q", b)
 			}
 		}
 		if eof {
-			return nil, false, fmt.Errorf("unexpected error: JSON data is malformed")
+			return nil, false, fmt.Errorf("unexpected error: JSON data is malformed unexpected EOF")
 		}
 	}
 }
