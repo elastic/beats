@@ -243,7 +243,6 @@ steps:
         command: |
           cd filebeat
           mage pythonIntegTest
-          mage PythonIntegTestLogAsFilestream
         retry:
           automatic:
             - limit: 1
@@ -266,6 +265,33 @@ steps:
         notify:
           - github_commit_status:
               context: "filebeat: Python Integration Tests"
+
+      - label: ":ubuntu: Filebeat: Log input as Filestream Python Integration Tests"
+        command: |
+          cd filebeat
+          mage PythonIntegTestLogAsFilestream
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+          - "filebeat/build/integration-tests/*"
+          - "filebeat/build/integration-tests/Test*/*"
+          - "filebeat/build/integration-tests/Test*/data/**/*"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "filebeat: Log input as Filestream Python Integration Tests"
 
       - label: ":windows: Filebeat: Win 2016 Unit Tests"
         key: "windows-2016-unit-tests"
