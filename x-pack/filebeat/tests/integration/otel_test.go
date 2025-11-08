@@ -9,6 +9,7 @@ package integration
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -36,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
+	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"
 )
 
@@ -995,4 +997,177 @@ http.port: {{.MonitoringPort}}
 			}, 10*time.Second, 100*time.Millisecond, "expected output stats to be available in monitoring endpoint")
 		})
 	}
+}
+
+func TestFileBeatKerberos(t *testing.T) {
+
+	wantEvents := 1
+
+	// ES client
+	esCfg := elasticsearch.Config{
+		Addresses: []string{"http://localhost:9203"}, // this is kerberos client - we've hardcoded the URL here
+		Username:  "admin",
+		Password:  "testing",
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
+			},
+		},
+	}
+
+	es, err := elasticsearch.NewClient(esCfg)
+	if err != nil {
+		t.Fatalf("could not get elasticsearch client due to: %v", err)
+	}
+
+	err = setupRoleMapping(t, es)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// start filebeat in otel mode
+	filebeatOTel := integration.NewBeat(
+		t,
+		"filebeat-otel",
+		"../../filebeat.test",
+		"otel",
+	)
+
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	filebeatIndex := "logs-filebeat.kerberos-" + namespace
+
+	otelConfig := struct {
+		Index     string
+		InputFile string
+		PathHome  string
+	}{
+		Index:     filebeatIndex,
+		InputFile: filepath.Join(filebeatOTel.TempDir(), "log.log"),
+		PathHome:  filebeatOTel.TempDir(),
+	}
+
+	cfg := `receivers:
+  filebeatreceiver/filestream:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-fbreceiver
+          enabled: true
+          paths:
+            - {{.InputFile}}
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    output:
+      otelconsumer:
+    queue.mem.flush.timeout: 0s
+    management.otel.enabled: true
+    path.home: {{.PathHome}}	
+extensions:
+  beatsauth:
+   kerberos: 
+     auth_type: "password"
+     config_path: "/Users/khushijain/Documents/beats/libbeat/outputs/elasticsearch/testdata/krb5.conf"
+     username: "beats"
+     password: "testing"
+     realm: "elastic"
+exporters:
+  debug:
+    use_internal_logger: false
+    verbosity: detailed
+  elasticsearch/log:
+    endpoints:
+      - http://localhost:9203
+    logs_index: {{.Index}}
+    mapping:
+      mode: bodymap
+    auth:
+     authenticator: beatsauth
+service:
+  extensions: 
+  - beatsauth
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver/filestream
+      exporters:
+        - elasticsearch/log
+        - debug
+`
+
+	var configBuffer bytes.Buffer
+	require.NoError(t,
+		template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, otelConfig))
+	configContents := configBuffer.Bytes()
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Config contents:\n%s", configContents)
+		}
+	})
+
+	filebeatOTel.WriteConfigFile(string(configContents))
+	writeEventsToLogFile(t, otelConfig.InputFile, wantEvents)
+	filebeatOTel.Start()
+	defer filebeatOTel.Stop()
+
+	// wait for logs to be published
+	require.EventuallyWithT(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err := estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+filebeatIndex+"*")
+			assert.NoError(ct, err)
+
+			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, wantEvents, "expected at least %d events, got %d", wantEvents, otelDocs.Hits.Total.Value)
+		},
+		2*time.Minute, 1*time.Second)
+
+}
+
+// setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
+func setupRoleMapping(t *testing.T, client *elasticsearch.Client) error {
+
+	// Create a context
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// prepare to query ES
+	roleMappingURL := "http://localhost:9203/_security/role_mapping/kerbrolemapping"
+
+	body := map[string]interface{}{
+		"roles":   []string{"superuser"},
+		"enabled": true,
+		"rules": map[string]interface{}{
+			"field": map[string]interface{}{
+				"username": "beats@elastic",
+			},
+		},
+	}
+
+	jsonData, err := json.Marshal(body)
+	if err != nil {
+		t.Fatalf("error marshalling json body:%v", err)
+	}
+
+	// Build request
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost,
+		roleMappingURL,
+		bytes.NewReader(jsonData))
+	if err != nil {
+		return fmt.Errorf("could not create http request to ES server: %v", err)
+	}
+
+	// Set content type header
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Perform(req)
+	if err != nil {
+		return fmt.Errorf("error performing request: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("incorrect response code: %v", err)
+	}
+
+	return err
 }
