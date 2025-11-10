@@ -11,7 +11,7 @@ The extension adds several custom tables to osquery that provide:
 
 | Table | Linux | macOS | Windows |
 |-------|-------|-------|---------|
-| `browser_history` | ✅ | ✅ | ✅ |
+| `elastic_browser_history` | ✅ | ✅ | ✅ |
 
 ---
 
@@ -19,7 +19,7 @@ The extension adds several custom tables to osquery that provide:
 
 Each table has detailed documentation in its own file:
 
-### 1. [browser_history](docs/browser_history.md)
+### 1. [elastic_browser_history](docs/browser_history.md)
 Query browser history from multiple browsers (Chrome, Edge, Firefox, Safari) with unified schema and advanced filtering capabilities.
 
 ---
@@ -50,10 +50,10 @@ osqueryi --extension /path/to/osquery-extension [--allow-unsafe]
 
 # Verify tables are loaded
 osqueryi> .tables
-  => browser_history
+  => elastic_browser_history
 
 # Query the tables
-osqueryi> SELECT * FROM browser_history LIMIT 10;
+osqueryi> SELECT * FROM elastic_browser_history LIMIT 10;
 ```
 
 ---
