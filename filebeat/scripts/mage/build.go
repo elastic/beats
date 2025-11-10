@@ -18,7 +18,7 @@
 package mage
 
 import (
-	"go.uber.org/multierr"
+	"errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
@@ -27,7 +27,7 @@ import (
 // checks the binaries GLIBC requirements for RHEL compatibility.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return multierr.Combine(
+	return errors.Join(
 		golangCrossBuild(),
 		// Test the linked glibc version requirement of the binary.
 		devtools.TestLinuxForCentosGLIBC(),
