@@ -5,6 +5,7 @@ services:
     image: busybox
     depends_on:
       elasticsearch: { condition: service_healthy }
+      elasticsearch_kerberos.elastic: { condition: service_healthy }
       kibana:        { condition: service_healthy }
       cometd: { condition: service_healthy }
 

@@ -1016,14 +1016,9 @@ func TestFileBeatKerberos(t *testing.T) {
 	}
 
 	es, err := elasticsearch.NewClient(esCfg)
-	if err != nil {
-		t.Fatalf("could not get elasticsearch client due to: %v", err)
-	}
+	require.NoError(t, err, "could not get elasticsearch client")
 
-	err = setupRoleMapping(t, es)
-	if err != nil {
-		t.Fatal(err)
-	}
+	setupRoleMapping(t, es)
 
 	// start filebeat in otel mode
 	filebeatOTel := integration.NewBeat(
@@ -1125,7 +1120,7 @@ service:
 }
 
 // setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
-func setupRoleMapping(t *testing.T, client *elasticsearch.Client) error {
+func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 
 	// Create a context
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -1145,30 +1140,21 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) error {
 	}
 
 	jsonData, err := json.Marshal(body)
-	if err != nil {
-		t.Fatalf("error marshalling json body:%v", err)
-	}
+	require.NoError(t, err, "could not marshal role mapping body to json")
 
 	// Build request
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost,
 		roleMappingURL,
 		bytes.NewReader(jsonData))
-	if err != nil {
-		return fmt.Errorf("could not create http request to ES server: %w", err)
-	}
+	require.NoError(t, err, "could not create role mapping request")
 
 	// Set content type header
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.Perform(req)
-	if err != nil {
-		return fmt.Errorf("error performing request: %w", err)
-	}
+	requir.e.NoError(t, err, "could not perform role mapping request")
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("incorrect response code: %w", err)
-	}
+	require.Equal(t, resp.StatusCode, http.StatusOK, "incorrect response code")
 
-	return err
 }
