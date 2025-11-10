@@ -15,6 +15,7 @@ import (
 	"github.com/osquery/osquery-go/plugin/table"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
@@ -41,23 +42,20 @@ func GetTableRows(ctx context.Context, queryContext table.QueryContext, log *log
 
 	results := make([]map[string]string, 0)
 
-	profileFilters := getConstraintFilters(queryContext, "profile_name")
-	userFilters := getConstraintFilters(queryContext, "user")
-	browserFilters := getConstraintFilters(queryContext, "browser")
-	filters := append(profileFilters, append(userFilters, browserFilters...)...)
+	allFilters := filters.GetConstraintFilters(queryContext)
 	locations, err := getSearchLocations(queryContext, log)
 	if err != nil {
 		return nil, err
 	}
 	var merr error
 	for _, location := range locations {
-		log.Infof("Parsing browser history for location: %v", location)
 		parsers := getParsers(ctx, location, log)
 		if len(parsers) == 0 {
 			continue
 		}
+		log.Infof("Parsing browser history for location: %#v", location)
 		for _, parser := range parsers {
-			visits, err := parser.parse(ctx, queryContext, filters)
+			visits, err := parser.parse(ctx, queryContext, allFilters)
 			if err != nil {
 				merr = errors.Join(merr, err)
 			}

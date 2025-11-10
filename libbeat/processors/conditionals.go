@@ -258,6 +258,10 @@ func (citep *ClosingIfThenElseProcessor) Close() error {
 	for _, proc := range citep.then.List {
 		err = errors.Join(err, Close(proc))
 	}
+	if citep.els == nil {
+		return err
+	}
+
 	for _, proc := range citep.els.List {
 		err = errors.Join(err, Close(proc))
 	}
