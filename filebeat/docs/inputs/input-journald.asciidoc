@@ -109,12 +109,9 @@ an unique ID.
 A list of paths that will be crawled and fetched. A path can be either:
 
 * A file path
-* A directory path (to collect events from all journals in a
-* directory). If you specify a directory, Filebeat merges all journals
-* under the directory into a single journal and reads them.
+* A directory path (to collect events from all journals in a directory). If you specify a directory, Filebeat merges all journals under the directory into a single journal and reads them.
 
-If no paths are specified, {beatname_uc} reads from the default
-journal.
+If no paths are specified, {beatname_uc} reads from the default journal.
 
 For example, this configuration will ingest all journals and correctly handle the journald rotation:
 
