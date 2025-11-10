@@ -130,12 +130,14 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 		return nil, fmt.Errorf("failed creating http client: %w", err)
 	}
 
+	// if loadbalance is disabled, all outgoing requests should go to a single endpoint
+	// unless the endpoint is unreachable, then the next endpoint in the list is used
 	if !beatAuthConfig.LoadBalance {
-		loadBalanceProvider, err := NewLoadBalanceProvider(beatAuthConfig, client)
+		singleRouterProvider, err := NewSingleRouterProvider(beatAuthConfig, client)
 		if err != nil {
 			return nil, fmt.Errorf("failed creating http client :%w", err)
 		}
-		return loadBalanceProvider, nil
+		return singleRouterProvider, nil
 	}
 
 	return &httpClientProvider{client: client}, nil
@@ -150,14 +152,15 @@ func (h *httpClientProvider) RoundTripper() http.RoundTripper {
 	return h.client.Transport
 }
 
-// loadBalanceProvider provides a RoundTripper from an http.Client
-type loadBalanceProvider struct {
+type singleRouterProvider struct {
 	endpoints []*url.URL
 	client    *http.Client
 	mx        sync.Mutex
 }
 
-func NewLoadBalanceProvider(config ESAuthConfig, client *http.Client) (*loadBalanceProvider, error) {
+// NewSingleRouterProvider returns a RoundTripper that always returns the first endpoint in the list
+// If the connection to the first endpoint fails, the next endpoint in the list is used for subsequent requests
+func NewSingleRouterProvider(config ESAuthConfig, client *http.Client) (*singleRouterProvider, error) {
 	if len(config.Endpoints) == 0 {
 		return nil, fmt.Errorf("endpoints must be provided when load_balance is disabled")
 	}
@@ -174,27 +177,27 @@ func NewLoadBalanceProvider(config ESAuthConfig, client *http.Client) (*loadBala
 		}
 	}
 
-	return &loadBalanceProvider{client: client, endpoints: urls}, nil
+	return &singleRouterProvider{client: client, endpoints: urls}, nil
 }
 
-func (lbr *loadBalanceProvider) RoundTripper() http.RoundTripper {
-	return lbr
+func (srp *singleRouterProvider) RoundTripper() http.RoundTripper {
+	return srp
 }
 
-func (lbr *loadBalanceProvider) RoundTrip(req *http.Request) (*http.Response, error) {
+func (srp *singleRouterProvider) RoundTrip(req *http.Request) (*http.Response, error) {
 	// use the first endpoint in the list
-	lbr.mx.Lock()
-	req.URL = lbr.endpoints[0]
-	lbr.mx.Unlock()
+	srp.mx.Lock()
+	req.URL = srp.endpoints[0]
+	srp.mx.Unlock()
 
 	// perform the request
-	resp, err := lbr.client.Transport.RoundTrip(req)
+	resp, err := srp.client.Transport.RoundTrip(req)
 
-	if err != nil && len(lbr.endpoints) > 1 {
+	if err != nil && len(srp.endpoints) > 1 {
 		// if response is unsuccessful, move the first endpoint to the end of the list
-		lbr.mx.Lock()
-		lbr.endpoints = append(lbr.endpoints[1:], lbr.endpoints[0])
-		lbr.mx.Unlock()
+		srp.mx.Lock()
+		srp.endpoints = append(srp.endpoints[1:], srp.endpoints[0])
+		srp.mx.Unlock()
 	}
 
 	// return the error as is for the caller of RoundTrip to handle retry logic
