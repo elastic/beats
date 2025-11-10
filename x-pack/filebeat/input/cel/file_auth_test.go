@@ -114,3 +114,15 @@ func TestFileAuthTransportRefreshesValue(t *testing.T) {
 		t.Fatalf("not all expectations were consumed: %d remaining", len(expectations))
 	}
 }
+
+func TestFileAuthTransportFailsWithMissingFile(t *testing.T) {
+	cfg := &fileAuthConfig{Path: "/nonexistent/path/to/secret"}
+
+	_, err := newFileAuthTransport(cfg, http.DefaultTransport)
+	if err == nil {
+		t.Fatal("expected error creating transport with missing file, got nil")
+	}
+	if !strings.Contains(err.Error(), "no such file or directory") {
+		t.Fatalf("expected file not found error, got: %v", err)
+	}
+}

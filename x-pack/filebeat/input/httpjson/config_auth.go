@@ -103,10 +103,10 @@ func (f *fileAuthConfig) Validate() error {
 		return errors.New("refresh_interval must be greater than 0")
 	}
 
-	// Check that the file exists and is readable.
-	if _, err := os.Stat(f.Path); err != nil {
-		return fmt.Errorf("cannot access file: %w", err)
-	}
+	// Note: File existence check is performed later during transport initialization
+	// (in newFileAuthTransport) to allow configuration validation to complete first.
+	// This ensures proper error precedence: configuration errors (like multiple auth
+	// methods) are reported before runtime errors (like missing files).
 
 	return nil
 }
