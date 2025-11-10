@@ -24,6 +24,6 @@ import (
 	"net/http"
 )
 
-func NewClient(config *Config, httpClient *http.Client, esurl string) (Client, error) {
+func NewClient(config *Config, httpClient *http.Client) (Client, error) {
 	return nil, errors.New("kerberos is not supported in fips mode")
 }

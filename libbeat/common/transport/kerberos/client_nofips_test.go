@@ -33,7 +33,7 @@ func TestNewClient(t *testing.T) {
 	c, err := NewClient(&Config{
 		AuthType:   authPassword,
 		ConfigPath: cfg.Name(),
-	}, http.DefaultClient, "")
+	}, http.DefaultClient)
 	require.Nil(t, err)
 	require.NotNil(t, c)
 }
