@@ -15,5 +15,5 @@ import (
 )
 
 func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
-	server.RegisterPlugin(table.NewPlugin("browser_history", browserhistory.GetColumns(), browserhistory.GetGenerateFunc(log)))
+	server.RegisterPlugin(table.NewPlugin("elastic_browser_history", browserhistory.GetColumns(), browserhistory.GetGenerateFunc(log)))
 }
