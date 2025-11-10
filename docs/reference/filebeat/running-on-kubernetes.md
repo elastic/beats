@@ -57,8 +57,6 @@ for more details and to the official [Kubernetes documentation on log rotation](
 Enable this by enabling decompression of GZIP files and adding the path to the
 rotated logs to the paths monitored by filebeat.
 
-### Which path to add
-
 Kubernetes stores logs on `/var/log/pods` and uses symlinks on `/var/log/containers`
 for active log files. For full details, refer to the official
 [Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
@@ -67,8 +65,8 @@ By default, previous deployments monitor only active logs via `/var/log/containe
 To add rotated logs, you must change the path to: `/var/log/pods/`.
 
 ::::{warning}
-Data Duplication: When you modify the path of an existing deployment,
-filebeat reads all existing files in that directory from the beginning.
+Data Duplication: When you add a new path to an existing deployment,
+filebeat reads all existing files in the new directory from the beginning.
 This action causes a one-time re-ingestion of the active log file and all 
 previously rotated logs, which results in duplicate data.
 
