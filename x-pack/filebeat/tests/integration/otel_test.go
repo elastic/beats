@@ -1066,7 +1066,7 @@ extensions:
   beatsauth:
    kerberos: 
      auth_type: "password"
-     config_path: "/Users/khushijain/Documents/beats/libbeat/outputs/elasticsearch/testdata/krb5.conf"
+     config_path: "../../../../libbeat/outputs/elasticsearch/testdata/krb5.conf"
      username: "beats"
      password: "testing"
      realm: "elastic"
