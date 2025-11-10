@@ -105,6 +105,9 @@ func TestFileAuthConfigValidate(t *testing.T) {
 
 	t.Run("requires positive refresh interval", func(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "token")
+		if err := os.WriteFile(path, []byte("secret"), 0o600); err != nil {
+			t.Fatalf("failed to write test file: %v", err)
+		}
 		zero := time.Duration(0)
 		cfg := &fileAuthConfig{Path: path, RefreshInterval: &zero}
 		if err := cfg.Validate(); err == nil || err.Error() != "refresh_interval must be greater than 0" {
@@ -114,6 +117,9 @@ func TestFileAuthConfigValidate(t *testing.T) {
 
 	t.Run("valid configuration", func(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "token")
+		if err := os.WriteFile(path, []byte("secret"), 0o600); err != nil {
+			t.Fatalf("failed to write test file: %v", err)
+		}
 		refresh := time.Second
 		cfg := &fileAuthConfig{Path: path, RefreshInterval: &refresh}
 		if err := cfg.Validate(); err != nil {

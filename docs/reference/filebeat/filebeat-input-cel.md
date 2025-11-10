@@ -582,6 +582,10 @@ File auth settings are disabled if either `enabled` is set to `false` or the `au
 
 The path to the file containing the authentication value. The file contents are trimmed before use. This field is required when file auth is enabled.
 
+::::{warning}
+The file should have restrictive permissions (e.g., `0600` on Unix systems) to prevent unauthorized access to credentials. While Filebeat will work with more permissive file permissions, it is strongly recommended to limit read access to the file owner only.
+::::
+
 
 ### `auth.file.header` [_auth_file_header]
 

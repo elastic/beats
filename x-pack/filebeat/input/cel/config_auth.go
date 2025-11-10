@@ -160,6 +160,12 @@ func (f *fileAuthConfig) Validate() error {
 	if f.RefreshInterval != nil && (*f.RefreshInterval <= 0) {
 		return errors.New("refresh_interval must be greater than 0")
 	}
+
+	// Check that the file exists and is readable.
+	if _, err := os.Stat(f.Path); err != nil {
+		return fmt.Errorf("cannot access file: %w", err)
+	}
+
 	return nil
 }
 

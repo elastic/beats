@@ -13,17 +13,20 @@ import (
 	"time"
 )
 
+// fileAuthTransport is an http.RoundTripper that injects authentication
+// credentials from a file into HTTP request headers. It periodically reloads
+// the file to support credential rotation without service restart.
 type fileAuthTransport struct {
-	header  string
-	prefix  string
-	path    string
-	refresh time.Duration
-	base    http.RoundTripper
-	clock   func() time.Time
+	header  string            // The HTTP header name to set (e.g., "Authorization")
+	prefix  string            // Optional prefix to prepend to the file content (e.g., "Bearer ")
+	path    string            // Path to the file containing the authentication value
+	refresh time.Duration     // How often to reload the file
+	base    http.RoundTripper // The underlying transport to use for requests
+	clock   func() time.Time  // Clock function for testing
 
-	mu       sync.Mutex
-	value    string
-	loadedAt time.Time
+	mu       sync.Mutex // Protects the fields below
+	value    string     // The current authentication value (prefix + file content)
+	loadedAt time.Time  // When the value was last loaded
 }
 
 func newFileAuthTransport(cfg *fileAuthConfig, base http.RoundTripper) (*fileAuthTransport, error) {
@@ -48,9 +51,7 @@ func newFileAuthTransport(cfg *fileAuthConfig, base http.RoundTripper) (*fileAut
 }
 
 func (t *fileAuthTransport) initialise() error {
-	t.mu.Lock()
-	defer t.mu.Unlock()
-	return t.refreshLocked(t.clock())
+	return t.refreshValue(t.clock())
 }
 
 func (t *fileAuthTransport) RoundTrip(r *http.Request) (*http.Response, error) {
@@ -74,18 +75,20 @@ func (t *fileAuthTransport) currentValue() (string, error) {
 	now := t.clock()
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	if t.value == "" || t.refresh <= 0 || now.Sub(t.loadedAt) >= t.refresh {
-		if err := t.refreshLocked(now); err != nil {
+	if now.Sub(t.loadedAt) >= t.refresh {
+		if err := t.refreshValue(now); err != nil {
 			return "", err
 		}
 	}
 	return t.value, nil
 }
 
-func (t *fileAuthTransport) refreshLocked(now time.Time) error {
+// refreshValue reloads the authentication value from disk.
+// It must be called with t.mu held.
+func (t *fileAuthTransport) refreshValue(now time.Time) error {
 	data, err := os.ReadFile(t.path)
 	if err != nil {
-		return fmt.Errorf("file auth: failed reading %q: %w", t.path, err)
+		return fmt.Errorf("file auth: %w", err)
 	}
 	value := strings.TrimSpace(string(data))
 	if value == "" {
