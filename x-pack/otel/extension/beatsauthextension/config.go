@@ -5,12 +5,23 @@
 package beatsauthextension
 
 import (
+	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"go.opentelemetry.io/collector/component"
 )
 
 type Config struct {
 	BeatAuthConfig  map[string]interface{} `mapstructure:",remain"`
 	ContinueOnError bool                   `mapstructure:"continue_on_error"`
+}
+
+type ESAuthConfig struct {
+	Kerberos    *kerberos.Config                 `config:"kerberos"`
+	Transport   httpcommon.HTTPTransportSettings `config:",inline"`
+	LoadBalance bool                             `config:"load_balance"`
+	Endpoints   []string                         `config:"endpoints"`
+	Path        string                           `config:"path"`
+	Protocol    string                           `config:"protocol"`
 }
 
 func createDefaultConfig() component.Config {

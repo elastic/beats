@@ -8,6 +8,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
+	"sync"
 	"time"
 
 	"go.elastic.co/apm/module/apmelasticsearch/v2"
@@ -17,6 +19,7 @@ import (
 	"go.opentelemetry.io/collector/extension/extensionauth"
 	"google.golang.org/grpc/credentials"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -62,7 +65,7 @@ func (a *authenticator) Start(_ context.Context, host component.Host) error {
 	}
 
 	var provider roundTripperProvider
-	client, err := getHttpClient(a)
+	prov, err := getHttpClient(a)
 	if err != nil {
 		componentstatus.ReportStatus(host, componentstatus.NewPermanentErrorEvent(err))
 		err = fmt.Errorf("failed creating http client: %w", err)
@@ -73,7 +76,7 @@ func (a *authenticator) Start(_ context.Context, host component.Host) error {
 		provider = &errorRoundTripperProvider{err: err}
 	} else {
 		componentstatus.ReportStatus(host, componentstatus.NewEvent(componentstatus.StatusOK))
-		provider = &httpClientProvider{client: client}
+		provider = prov
 	}
 
 	a.rtProvider = provider
@@ -110,24 +113,32 @@ func (a *authenticator) PerRPCCredentials() (credentials.PerRPCCredentials, erro
 	return nil, nil
 }
 
-func getHttpClient(a *authenticator) (*http.Client, error) {
+func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 	parsedCfg, err := config.NewConfigFrom(a.cfg.BeatAuthConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating config: %w", err)
 	}
 
-	beatAuthConfig := httpcommon.HTTPTransportSettings{}
+	beatAuthConfig := ESAuthConfig{}
 	err = parsedCfg.Unpack(&beatAuthConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed unpacking config: %w", err)
 	}
 
-	client, err := beatAuthConfig.Client(a.getHTTPOptions(beatAuthConfig.IdleConnTimeout)...)
+	client, err := beatAuthConfig.Transport.Client(a.getHTTPOptions(beatAuthConfig.Transport.IdleConnTimeout)...)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating http client: %w", err)
 	}
 
-	return client, nil
+	if !beatAuthConfig.LoadBalance {
+		loadBalanceProvider, err := NewLoadBalanceProvider(beatAuthConfig, client)
+		if err != nil {
+			return nil, fmt.Errorf("failed creating http client :%w", err)
+		}
+		return loadBalanceProvider, nil
+	}
+
+	return &httpClientProvider{client: client}, nil
 }
 
 // httpClientProvider provides a RoundTripper from an http.Client
@@ -137,6 +148,57 @@ type httpClientProvider struct {
 
 func (h *httpClientProvider) RoundTripper() http.RoundTripper {
 	return h.client.Transport
+}
+
+// loadBalanceProvider provides a RoundTripper from an http.Client
+type loadBalanceProvider struct {
+	endpoints []*url.URL
+	client    *http.Client
+	mx        sync.Mutex
+}
+
+func NewLoadBalanceProvider(config ESAuthConfig, client *http.Client) (*loadBalanceProvider, error) {
+	if len(config.Endpoints) == 0 {
+		return nil, fmt.Errorf("endpoints must be provided when load_balance is disabled")
+	}
+
+	urls := make([]*url.URL, 0, len(config.Endpoints))
+	for i, endpoint := range config.Endpoints {
+		finalEndpoint, err := common.MakeURL(config.Protocol, config.Path, endpoint, 9200)
+		if err != nil {
+			return nil, fmt.Errorf("failed building URL for endpoint %q: %w", endpoint, err)
+		}
+		urls[i], err = url.Parse(finalEndpoint)
+		if err != nil {
+			return nil, fmt.Errorf("failed parsing endpoint %q: %w", endpoint, err)
+		}
+	}
+
+	return &loadBalanceProvider{client: client, endpoints: urls}, nil
+}
+
+func (lbr *loadBalanceProvider) RoundTripper() http.RoundTripper {
+	return lbr
+}
+
+func (lbr *loadBalanceProvider) RoundTrip(req *http.Request) (*http.Response, error) {
+	// use the first endpoint in the list
+	lbr.mx.Lock()
+	req.URL = lbr.endpoints[0]
+	lbr.mx.Unlock()
+
+	// perform the request
+	resp, err := lbr.client.Transport.RoundTrip(req)
+
+	if err != nil && len(lbr.endpoints) > 1 {
+		// if response is unsuccessful, move the first endpoint to the end of the list
+		lbr.mx.Lock()
+		lbr.endpoints = append(lbr.endpoints[1:], lbr.endpoints[0])
+		lbr.mx.Unlock()
+	}
+
+	// return the error as is for the caller of RoundTrip to handle retry logic
+	return resp, err
 }
 
 // errorRoundTripperProvider provides a RoundTripper that always returns an error
