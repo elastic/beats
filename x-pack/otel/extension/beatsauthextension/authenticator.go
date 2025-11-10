@@ -198,7 +198,6 @@ func (k *kerberosClientProvider) RoundTrip(req *http.Request) (*http.Response, e
 		return nil, err
 	}
 
-	fmt.Println("we successfully set set spnego header")
 	return k.httpClient.Transport.RoundTrip(req)
 }
 
