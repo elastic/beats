@@ -243,6 +243,7 @@ unregister input metrics without relaying on the global 'dataset' namespace.{pul
 - Filebeat filebeat/testing/integration test framework ExpectEOF accounts for closed files and allows to choose to pretty print or not the output. {pull}45023[45023]
 - Updated apache/arrow library used in `x-pack/libbeat/reader/parquet` to v18 {issue}45573[45573] {pull}45574[45574]
 - Update `dependabot.yml` to include dependencies for Meraki, Haproxy, Salesforce, Vsphere, Redis, Panw, mongodb. {pull}46348[46348]
+- Redis: Add client address and name to submitted slowlogs {issue}40973[40973] {pull}41507[41507]
 
 ==== Deprecated
 
