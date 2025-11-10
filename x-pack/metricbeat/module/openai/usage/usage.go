@@ -82,6 +82,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func (m *MetricSet) SetPaths(p *paths.Path) error {
+	if m.stateManager != nil {
+		m.logger.Warnf("Unexpected second call to SetPaths, stateManager already set: %v", m.stateManager)
+	}
 	m.logger.Debugw("Setting path", "path", p)
 
 	sm, err := newStateManager(p.Resolve(
