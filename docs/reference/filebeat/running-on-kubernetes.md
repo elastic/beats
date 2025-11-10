@@ -55,9 +55,9 @@ Kubernetes stores logs on `/var/log/pods` and uses symlinks on `/var/log/contain
 for active log files. For full details, refer to the official
 [Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
 
-Enable this by enabling decompression of GZIP files and changing the monitored 
+Ingest rotated logs by enabling decompression of GZIP files and changing the monitored 
 path to `/var/log/pods/` instead of `/var/log/containers`, which only contains
-active log files
+active log files.
 
 ::::{warning}
 Data Duplication: When you change the path on an existing deployment,
@@ -84,7 +84,7 @@ The following is an example configuration for ingesting rotated log files:
                symlinks: true
          file_identity.fingerprint: ~
          processors:
-            - add_kubernetes_metadata: <2>
+            - add_kubernetes_metadata:
                  host: ${NODE_NAME}
                  default_indexers.enabled: false
                  default_matchers.enabled: false
@@ -92,8 +92,8 @@ The following is an example configuration for ingesting rotated log files:
                     - pod_uid:
                  matchers:
                     - logs_path:
-                         logs_path: "/var/log/pods/"
-                         resource_type: "pod"
+                         logs_path: "/var/log/pods/" <2>
+                         resource_type: "pod" <2>
 ```
 
 1. `/var/log/pods/` contains the active log files as well as rotated log files.
