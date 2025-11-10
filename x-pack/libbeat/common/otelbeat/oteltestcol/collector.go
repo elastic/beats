@@ -61,12 +61,6 @@ func New(tb testing.TB, configYAML string) *Collector {
 	observed, observer := observer.New(zapcore.DebugLevel)
 	core := zapcore.NewTee(zapCore, observed)
 
-	tb.Cleanup(func() {
-		if tb.Failed() {
-			tb.Log("OTel Collector logs:\n" + zapBuf.String())
-		}
-	})
-
 	settings := newCollectorSettings("file:"+configFile, core)
 	col, err := otelcol.NewCollector(settings)
 	require.NoError(tb, err)
@@ -75,6 +69,10 @@ func New(tb testing.TB, configYAML string) *Collector {
 	tb.Cleanup(func() {
 		col.Shutdown()
 		wg.Wait()
+
+		if tb.Failed() {
+			tb.Log("OTel Collector logs:\n" + zapBuf.String())
+		}
 	})
 
 	wg.Add(1)
