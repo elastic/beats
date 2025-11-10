@@ -291,12 +291,22 @@ then:
 	require.NoError(t, err)
 
 	// Verify we got a ClosingIfThenElseProcessor
-	closingProc, ok := beatProcessor.(*ClosingIfThenElseProcessor)
-	require.True(t, ok, "expected ClosingIfThenElseProcessor, got %T", beatProcessor)
+	closingProc := requireAs[*ClosingIfThenElseProcessor](t, beatProcessor)
 	assert.Nil(t, closingProc.els, "els should be nil when no else clause is provided")
+	assert.Implements(t, (*Closer)(nil), beatProcessor)
 
-	_, ok = beatProcessor.(Closer)
-	require.True(t, ok, "sanity check: implements Closer")
 	err = closingProc.Close()
 	require.NoError(t, err)
+}
+
+// requireAs performs a type assertion and requires it to succeed.
+func requireAs[T any](t *testing.T, v any) T {
+	t.Helper()
+	expected := *new(T)
+	require.IsType(t, expected, v)
+
+	result, ok := v.(T)
+	require.True(t, ok, "sanity check: expected %T, got %T", expected, v)
+
+	return result
 }
