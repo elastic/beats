@@ -68,7 +68,7 @@ exporters:
 `
 
 func TestConverter(t *testing.T) {
-	c := converter{}
+	c := Converter{}
 	t.Run("test converter functionality", func(t *testing.T) {
 		var supportedInput = `
 receivers:
@@ -325,7 +325,7 @@ service:
 }
 
 func TestLogLevel(t *testing.T) {
-	c := converter{}
+	c := Converter{}
 	tests := []struct {
 		name          string
 		level         string
@@ -397,7 +397,7 @@ func TestLogLevel(t *testing.T) {
 // This test ensures correct values of idle_connection_timeout, which is an http config, is configured on beastauth extension
 // Also tests correct queue config is set under filebeatreceiver
 func TestPresets(t *testing.T) {
-	c := converter{}
+	c := Converter{}
 
 	commonBeatCfg := `
 receivers:
