@@ -79,17 +79,12 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 			switch key {
 			case "elasticsearch":
 				esConfig := config.MustNewConfigFrom(output)
-<<<<<<< HEAD
-=======
 
 				// ignore elasticsearch output if it is not enabled
 				if !esConfig.Enabled() {
 					continue
 				}
 
-				// we use development logger here as this method is part of dev-only otel command
-				logger, _ := logp.NewDevelopmentLogger("")
->>>>>>> f1267b89f (beatconverter: Ignore disabled elasticsearch output (#47154))
 				esOTelConfig, err := elasticsearchtranslate.ToOTelConfig(esConfig, logger)
 				if err != nil {
 					return fmt.Errorf("cannot convert elasticsearch config: %w", err)
