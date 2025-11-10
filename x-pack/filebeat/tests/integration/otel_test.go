@@ -1154,7 +1154,7 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) error {
 		roleMappingURL,
 		bytes.NewReader(jsonData))
 	if err != nil {
-		return fmt.Errorf("could not create http request to ES server: %v", err)
+		return fmt.Errorf("could not create http request to ES server: %w", err)
 	}
 
 	// Set content type header
@@ -1162,11 +1162,12 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) error {
 
 	resp, err := client.Perform(req)
 	if err != nil {
-		return fmt.Errorf("error performing request: %v", err)
+		return fmt.Errorf("error performing request: %w", err)
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("incorrect response code: %v", err)
+		return fmt.Errorf("incorrect response code: %w", err)
 	}
 
 	return err
