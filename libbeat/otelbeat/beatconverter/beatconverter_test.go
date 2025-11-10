@@ -47,6 +47,8 @@ exporters:
       max_retries: 3
     user: elastic
     max_conns_per_host: 1
+    logs_dynamic_pipeline:
+      enabled: true
     sending_queue:
       batch:
         flush_timeout: 10s
@@ -208,6 +210,8 @@ exporters:
       max_interval: 1m0s
       max_retries: 3
     user: elastic-cloud
+    logs_dynamic_pipeline:
+      enabled: true    
     max_conns_per_host: 1
     sending_queue:
       batch:
@@ -431,6 +435,8 @@ exporters:
   elasticsearch:
     endpoints:
       - http://localhost:9200
+    logs_dynamic_pipeline:
+      enabled: true      
     retry:
       enabled: true
       initial_interval: 1s
