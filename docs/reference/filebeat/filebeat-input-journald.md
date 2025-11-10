@@ -94,8 +94,6 @@ A list of paths that will be crawled and fetched. A path can be either:
 
 If no paths are specified, Filebeat reads from the default journal.
 
-<<<<<<< HEAD
-=======
 For example, this configuration will ingest all journals and correctly handle the journald rotation:
 
 ```yaml
@@ -124,7 +122,6 @@ stack: ga 9.2.0
 When enabled, log entries will be ingested interleaved from all
 available journals, including remote ones. This option is disabled by
 default.
->>>>>>> d7c3735e7 ([Filebeat/Journald] Add note about the issues with using globs (#47494))
 
 ### `seek` [filebeat-input-journald-seek]
 
