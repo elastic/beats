@@ -110,6 +110,30 @@ func TestUpdateChan_SendRecv(t *testing.T) {
 		assert.Equal(t, ctx.Err(), err)
 	})
 
+	t.Run("recv with context error should not deadlock", func(t *testing.T) {
+		ch := newUpdateChan()
+
+		ctx, cancel := context.WithCancel(t.Context())
+		// cancel the context on purpose
+		cancel()
+
+		done := make(chan struct{})
+		go func() {
+			for range 2 {
+				// should return immediately with context cancelled
+				_, err := ch.Recv(ctx)
+				assert.Equal(t, context.Canceled, err)
+			}
+			close(done)
+		}()
+
+		select {
+		case <-done:
+		case <-time.After(1 * time.Second):
+			t.Fatal("timeout waiting for Recv to return")
+		}
+	})
+
 	t.Run("wait for send", func(t *testing.T) {
 		ch := newUpdateChan()
 
