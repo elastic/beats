@@ -27,22 +27,6 @@ Contains log file lines.
     required: False
 
 
-**`log.file.device_id`**
-:   The device ID used for the log file, this is used by the 'native' file identity.
-
-    type: keyword
-
-    required: False
-
-
-**`log.file.inode`**
-:   The inode of the log file, this is used by the 'native' file identity.
-
-    type: long
-
-    required: False
-
-
 **`stream`**
 :   Log stream when reading container logs, can be 'stdout' or 'stderr'
 

@@ -94,19 +94,16 @@ func runAsFilestream(cfg *config.C) (bool, error) {
 	return false, nil
 }
 
-// newV1Input instantiates the Log input. If 'run_as_filestream' is
-// true, then v2.ErrUnknownInput is returned so the Filestream input
-// can be instantiated.
+// newV1Input instantiates the Log input. If Log input is supposed to run as
+// Filestream, then v2.ErrUnknownInput is returned so the Filestream input
+// can be instantiated by the V2.Plugin returned by [PluginV2]. Otherwise
+// the Log input is instantiated.
 func newV1Input(
 	cfg *config.C,
 	outlet channel.Connector,
 	context v1.Context,
 	logger *logp.Logger,
 ) (v1.Input, error) {
-	// Inputs V1 should be tried last, so if this function is run we are
-	// supposed to be running as the Log input. However do not rely on the
-	// factory implementation, also check whether to run as Log or Filestream
-	// inputs.
 	asFilestream, err := runAsFilestream(cfg)
 	if err != nil {
 		return nil, err
@@ -125,15 +122,13 @@ func newV1Input(
 	return inp, err
 }
 
-// PluginV2 returns a v2.Plugin with a manager that checks whether
-// the config is from a Log input that should run as Filestream.
-// If that is the case the Log input configuration is converted to
-// Filestream and the Filestream input returned.
-// Otherwise v2.ErrUnknownInput is returned.
+// PluginV2 returns a v2.Plugin with a manager that can convert
+// the Log input configuration to Filestream and run the Filestream
+// input instead of the Log input.
 func PluginV2(logger *logp.Logger, store statestore.States) v2.Plugin {
 	// The InputManager for Filestream input is from an internal package, so we
 	// cannot instantiate it directly here. To circumvent that, we instantiate
-	// the whole Filestream Plugin
+	// the whole Filestream Plugin and get its manager.
 	filestreamPlugin := filestream.Plugin(logger, store)
 
 	m := manager{
@@ -160,9 +155,11 @@ func (m manager) Init(grp unison.Group) error {
 	return m.next.Init(grp)
 }
 
+// Create first checks whether the config is supposed to run as Filestream
+// and creates the Filestream input if needed.
+// If the configuration is not supposed to run as Filestream,
+// v2.ErrUnknownInput is returned.
 func (m manager) Create(cfg *config.C) (v2.Input, error) {
-	// When inputs are created, inputs V2 are tried first, so if we
-	// are supposed to run as the Log input, return v2.ErrUnknownInput
 	asFilestream, err := runAsFilestream(cfg)
 	if err != nil {
 		return nil, err

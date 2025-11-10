@@ -283,6 +283,15 @@ class Test(BaseTest):
                 # There are dynamic fields that are not documented.
                 pass
             else:
+                # Remove some fields if running the Filestream input
+                if log_as_filestream():
+                    for obj in objects:
+                        if 'log' in obj:
+                            if 'file' in obj['log']:
+                                if 'inode' in obj['log']['file']:
+                                    del obj['log']['file']['inode']
+                                if 'device_id' in obj['log']['file']:
+                                    del obj['log']['file']['device_id']
                 self.assert_fields_are_documented(obj)
 
         self._test_expected_events(test_file, objects)

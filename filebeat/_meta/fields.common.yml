@@ -16,20 +16,6 @@
       description: >
         The file offset the reported line starts at.
 
-    - name: log.file.device_id
-      type: keyword
-      required: false
-      description: >-
-        The device ID used for the log file, this is used by the
-        'native' file identity.
-
-    - name: log.file.inode
-      type: long
-      required: false
-      description: >-
-        The inode of the log file, this is used by the 'native' file
-        identity.
-
     - name: stream
       type: keyword
       required: false
