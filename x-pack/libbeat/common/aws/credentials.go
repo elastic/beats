@@ -52,6 +52,10 @@ type ConfigAWS struct {
 	// AssumeRoleExpiryWindow will allow the credentials to trigger refreshing prior to the credentials
 	// actually expiring. If expiry_window is less than or equal to zero, the setting is ignored.
 	AssumeRoleExpiryWindow time.Duration `config:"assume_role.expiry_window"`
+
+	// SupportsCloudConnectors indicates whether the cloud connectors flow is used.
+	// If this is true, the InitializeAWSConfig should initialize the AWS cloud connector role chaining flow.
+	SupportsCloudConnectors bool `config:"supports_cloud_connectors"`
 }
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
@@ -66,8 +70,14 @@ func InitializeAWSConfig(beatsConfig ConfigAWS, logger *logp.Logger) (awssdk.Con
 	}
 
 	// Assume IAM role if iam_role config parameter is given
-	if beatsConfig.RoleArn != "" {
+	if beatsConfig.RoleArn != "" && !beatsConfig.SupportsCloudConnectors {
 		addAssumeRoleProviderToAwsConfig(beatsConfig, &awsConfig, logger)
+	}
+
+	// If cloud connectors are selected from config, initialize the role chaining using the id token.
+	if beatsConfig.SupportsCloudConnectors {
+		cloudConnectorsConfig := parseCloudConnectorsConfigFromEnv()
+		addCloudConnectorsCredentials(beatsConfig, cloudConnectorsConfig, &awsConfig, logger)
 	}
 
 	var proxy func(*http.Request) (*url.URL, error)

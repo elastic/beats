@@ -1,0 +1,93 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package aws
+
+import (
+	"os"
+	"time"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/elastic/elastic-agent-libs/logp"
+)
+
+const (
+	CloudConnectorsGlobalRoleEnvVar = "CLOUD_CONNECTORS_GLOBAL_ROLE"
+	CloudConnectorsJWTPathEnvVar    = "CLOUD_CONNECTORS_ID_TOKEN_FILE"
+)
+
+type CloudConnectorsConfig struct {
+	ElasticGlobalRoleARN string
+	IDTokenPath          string
+}
+
+func parseCloudConnectorsConfigFromEnv() CloudConnectorsConfig {
+	return CloudConnectorsConfig{
+		ElasticGlobalRoleARN: os.Getenv(CloudConnectorsGlobalRoleEnvVar),
+		IDTokenPath:          os.Getenv(CloudConnectorsJWTPathEnvVar),
+	}
+}
+
+func addCloudConnectorsCredentials(config ConfigAWS, cloudConnectorsConfig CloudConnectorsConfig, awsConfig *awssdk.Config, logger *logp.Logger) {
+	addCloudConnectorsCredentialsWithOptions(config, cloudConnectorsConfig, awsConfig, logger, nil, nil)
+}
+
+const defaultIntermediateDuration = 20 * time.Minute
+
+func addCloudConnectorsCredentialsWithOptions(
+	config ConfigAWS,
+	cloudConnectorsConfig CloudConnectorsConfig,
+	awsConfig *awssdk.Config,
+	logger *logp.Logger,
+	webIdentityRoleOptions []func(opt *stscreds.WebIdentityRoleOptions),
+	assumeRoleOptions []func(aro *stscreds.AssumeRoleOptions),
+) {
+	logger = logger.Named("addCloudConnectorsCredentials")
+	logger.Debug("Switching credentials provider to Cloud Connectors")
+
+	addCredentialsChain(
+		awsConfig,
+
+		// step 1 assume Super Global Role with web identity
+		func(c awssdk.Config) awssdk.CredentialsProvider {
+			provider := stscreds.NewWebIdentityRoleProvider(
+				sts.NewFromConfig(c), // client uses credentials from previous config, step
+				cloudConnectorsConfig.ElasticGlobalRoleARN,
+				stscreds.IdentityTokenFile(cloudConnectorsConfig.IDTokenPath),
+				append(webIdentityRoleOptions, func(opt *stscreds.WebIdentityRoleOptions) {
+					opt.Duration = defaultIntermediateDuration
+				})...,
+			)
+			return aws.NewCredentialsCache(provider)
+		},
+
+		// step 2 assume the remote role (customer's configured one) having the previous one in chain
+		func(c awssdk.Config) awssdk.CredentialsProvider {
+			assumeRoleProvider := stscreds.NewAssumeRoleProvider(
+				sts.NewFromConfig(c), // client uses credentials from previous config, step
+				config.RoleArn,
+				append(assumeRoleOptions, func(aro *stscreds.AssumeRoleOptions) {
+					aro.Duration = config.AssumeRoleDuration
+					if config.ExternalID != "" {
+						aro.ExternalID = awssdk.String(config.ExternalID)
+					}
+				})...,
+			)
+			return aws.NewCredentialsCache(assumeRoleProvider, func(options *awssdk.CredentialsCacheOptions) {
+				if config.AssumeRoleExpiryWindow > 0 {
+					options.ExpiryWindow = config.AssumeRoleExpiryWindow
+				}
+			})
+		},
+	)
+}
+
+func addCredentialsChain(awsConfig *awssdk.Config, chain ...func(awssdk.Config) awssdk.CredentialsProvider) {
+	for _, fn := range chain {
+		awsConfig.Credentials = fn(*awsConfig)
+	}
+}
