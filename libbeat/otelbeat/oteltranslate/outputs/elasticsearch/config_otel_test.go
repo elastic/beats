@@ -63,6 +63,8 @@ logs_index: some-index
 max_conns_per_host: 1
 password: changeme
 pipeline: some-ingest-pipeline
+logs_dynamic_pipeline:
+  enabled: true
 retry:
   enabled: true
   initial_interval: 42s
@@ -109,6 +111,8 @@ api_key: "TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA"
 endpoints:
   - http://localhost:9200
 logs_index: some-index
+logs_dynamic_pipeline:
+  enabled: true
 retry:
   enabled: true
   initial_interval: 1s
@@ -155,6 +159,8 @@ preset: %s
 `
 
 		commonOTelCfg := `
+logs_dynamic_pipeline:
+  enabled: true    
 endpoints:
   - http://localhost:9200
 retry:
@@ -221,6 +227,8 @@ retry:
   max_interval: 5m0s
   max_retries: 3
 logs_index: some-index
+logs_dynamic_pipeline:
+  enabled: true
 password: changeme
 user: elastic
 max_conns_per_host: 1
@@ -315,6 +323,8 @@ retry:
   initial_interval: 1s
   max_interval: 1m0s
   max_retries: 3
+logs_dynamic_pipeline:
+  enabled: true  
 max_conns_per_host: 1
 user: elastic
 sending_queue:
