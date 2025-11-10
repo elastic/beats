@@ -84,7 +84,7 @@ func TestFileAuthTransportRefreshesValue(t *testing.T) {
 		t.Fatalf("unexpected error creating transport: %v", err)
 	}
 
-	current := transport.loadedAt
+	current := transport.expires.Add(-refresh)
 	transport.clock = func() time.Time { return current }
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://example.test", nil)
@@ -124,5 +124,42 @@ func TestFileAuthTransportFailsWithMissingFile(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "no such file or directory") {
 		t.Fatalf("expected file not found error, got: %v", err)
+	}
+}
+
+func TestFileAuthTransportFailsWithInsecurePermissions(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "secret")
+	if err := os.WriteFile(path, []byte("secret"), 0o644); err != nil {
+		t.Fatalf("failed to write secret file: %v", err)
+	}
+
+	cfg := &fileAuthConfig{Path: path}
+
+	_, err := newFileAuthTransport(cfg, http.DefaultTransport)
+	if err == nil {
+		t.Fatal("expected error creating transport with insecure permissions, got nil")
+	}
+	if !strings.Contains(err.Error(), "insecure permissions") {
+		t.Fatalf("expected insecure permissions error, got: %v", err)
+	}
+}
+
+func TestFileAuthTransportAllowsInsecurePermissionsWithFlag(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "secret")
+	if err := os.WriteFile(path, []byte("secret"), 0o644); err != nil {
+		t.Fatalf("failed to write secret file: %v", err)
+	}
+
+	relaxed := true
+	cfg := &fileAuthConfig{Path: path, RelaxedPermissions: &relaxed}
+
+	transport, err := newFileAuthTransport(cfg, http.DefaultTransport)
+	if err != nil {
+		t.Fatalf("unexpected error with relaxed_permissions: %v", err)
+	}
+	if transport == nil {
+		t.Fatal("expected transport to be created with relaxed_permissions")
 	}
 }

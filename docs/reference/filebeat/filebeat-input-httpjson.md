@@ -286,7 +286,9 @@ File auth settings are disabled if either `enabled` is set to `false` or the `au
 The path to the file that contains the authentication value. The file contents are trimmed before use. This field is required when file auth is enabled.
 
 ::::{warning}
-The file should have restrictive permissions (e.g., `0600` on Unix systems) to prevent unauthorized access to credentials. While Filebeat will work with more permissive file permissions, it is strongly recommended to limit read access to the file owner only.
+By default, Filebeat requires the file to have `0600` permissions (read/write for owner only) and will fail if the file has more permissive permissions. This security measure helps prevent unauthorized access to credentials. To allow files with different permissions, set `relaxed_permissions: true`.
+
+**Note:** On Windows, POSIX-style permission checking is not enforced. Ensure file security using NTFS file permissions or Access Control Lists (ACLs).
 ::::
 
 
@@ -303,6 +305,15 @@ An optional prefix that is prepended to the trimmed value from `path` before it 
 ### `auth.file.refresh_interval` [_auth_file_refresh_interval_2]
 
 How frequently Filebeat rereads the file defined by `path` to pick up changes. Defaults to `1m`. The value must be greater than zero when set.
+
+
+### `auth.file.relaxed_permissions` [_auth_file_relaxed_permissions_2]
+
+When set to `true`, allows the authentication file to have permissions other than `0600`. By default (`false`), Filebeat requires the file to have `0600` permissions and will fail to start if the file is more permissive. This security measure helps prevent unauthorized access to credentials.
+
+::::{warning}
+Setting this to `true` reduces security. Only enable this option if you understand the security implications and cannot set the file to `0600` permissions.
+::::
 
 
 ### `auth.oauth2.enabled` [_auth_oauth2_enabled_2]

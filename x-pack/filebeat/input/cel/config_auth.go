@@ -139,11 +139,12 @@ func (d *digestAuthConfig) Validate() error {
 }
 
 type fileAuthConfig struct {
-	Enabled         *bool          `config:"enabled"`
-	Path            string         `config:"path"`
-	Header          string         `config:"header"`
-	Prefix          string         `config:"prefix"`
-	RefreshInterval *time.Duration `config:"refresh_interval"`
+	Enabled            *bool          `config:"enabled"`
+	Path               string         `config:"path"`
+	Header             string         `config:"header"`
+	Prefix             string         `config:"prefix"`
+	RefreshInterval    *time.Duration `config:"refresh_interval"`
+	RelaxedPermissions *bool          `config:"relaxed_permissions"`
 }
 
 func (f *fileAuthConfig) isEnabled() bool {

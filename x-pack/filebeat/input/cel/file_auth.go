@@ -24,9 +24,9 @@ type fileAuthTransport struct {
 	base    http.RoundTripper // The underlying transport to use for requests
 	clock   func() time.Time  // Clock function for testing
 
-	mu       sync.Mutex // Protects the fields below
-	value    string     // The current authentication value (prefix + file content)
-	loadedAt time.Time  // When the value was last loaded
+	mu      sync.Mutex // Protects the fields below
+	value   string     // The current authentication value (prefix + file content)
+	expires time.Time  // When the value expires and needs reloading
 }
 
 func newFileAuthTransport(cfg *fileAuthConfig, base http.RoundTripper) (*fileAuthTransport, error) {
@@ -36,6 +36,22 @@ func newFileAuthTransport(cfg *fileAuthConfig, base http.RoundTripper) (*fileAut
 	if base == nil {
 		base = http.DefaultTransport
 	}
+
+	// Check file existence and permissions before initializing the transport
+	info, err := os.Stat(cfg.Path)
+	if err != nil {
+		return nil, fmt.Errorf("file auth: %w", err)
+	}
+
+	// Verify file permissions are restrictive (0600) unless relaxed_permissions is enabled
+	relaxedPermissions := cfg.RelaxedPermissions != nil && *cfg.RelaxedPermissions
+	if !relaxedPermissions {
+		perm := info.Mode().Perm()
+		if perm != 0o600 {
+			return nil, fmt.Errorf("file auth: file %q has insecure permissions %o, expected 0600 (set relaxed_permissions: true to allow)", cfg.Path, perm)
+		}
+	}
+
 	transport := &fileAuthTransport{
 		header:  cfg.headerName(),
 		prefix:  cfg.Prefix,
@@ -75,7 +91,7 @@ func (t *fileAuthTransport) currentValue() (string, error) {
 	now := t.clock()
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	if now.Sub(t.loadedAt) >= t.refresh {
+	if now.After(t.expires) {
 		if err := t.refreshValue(now); err != nil {
 			return "", err
 		}
@@ -95,6 +111,6 @@ func (t *fileAuthTransport) refreshValue(now time.Time) error {
 		return fmt.Errorf("file auth: file %q is empty", t.path)
 	}
 	t.value = t.prefix + value
-	t.loadedAt = now
+	t.expires = now.Add(t.refresh)
 	return nil
 }
