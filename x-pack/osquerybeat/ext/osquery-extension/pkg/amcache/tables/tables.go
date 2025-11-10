@@ -40,12 +40,12 @@ type Entry interface {
 type TableName string
 
 const (
-	TableNameApplication         TableName = "amcache_application"
-	TableNameApplicationFile     TableName = "amcache_application_file"
-	TableNameApplicationShortcut TableName = "amcache_application_shortcut"
-	TableNameDriverBinary        TableName = "amcache_driver_binary"
-	TableNameDevicePnp           TableName = "amcache_device_pnp"
-	TableNameDriverPackage       TableName = "amcache_driver_package"
+	TableNameApplication         TableName = "elastic_amcache_application"
+	TableNameApplicationFile     TableName = "elastic_amcache_application_file"
+	TableNameApplicationShortcut TableName = "elastic_amcache_application_shortcut"
+	TableNameDriverBinary        TableName = "elastic_amcache_driver_binary"
+	TableNameDevicePnp           TableName = "elastic_amcache_device_pnp"
+	TableNameDriverPackage       TableName = "elastic_amcache_driver_package"
 )
 
 type AmcacheTable struct {
