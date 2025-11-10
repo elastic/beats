@@ -1,4 +1,4 @@
-# browser_history
+# elastic_browser_history
 
 Query browser history from multiple browsers with a unified schema. Supports Chrome, Edge, Firefox, and Safari across Linux, macOS, and Windows.
 
@@ -14,11 +14,12 @@ Query browser history from multiple browsers with a unified schema. Supports Chr
 
 | Column | Type | Description |
 |--------|------|-------------|
-| `timestamp` | `BIGINT` | Unix timestamp in seconds since epoch |
-| `datetime` | `TEXT` | Human-readable datetime string (RFC3339 format) |
+| `timestamp` | `BIGINT` | Unix timestamp in seconds since epoch (visit time) |
+| `datetime` | `TEXT` | Human-readable datetime string in RFC3339 format (visit time) |
 | `url_id` | `BIGINT` | Unique URL identifier |
 | `scheme` | `TEXT` | URL scheme/protocol (e.g., "https", "http", "file", "ftp") |
-| `domain` | `TEXT` | Domain/hostname extracted from URL (e.g., "github.com", "google.com") |
+| `hostname` | `TEXT` | Full hostname from URL (e.g., "www.github.com", "mail.google.com") |
+| `domain` | `TEXT` | Registrable domain (eTLD+1) extracted from hostname (e.g., "github.com", "google.com", "example.co.uk") |
 | `url` | `TEXT` | Full URL visited |
 | `title` | `TEXT` | Page title |
 | `browser` | `TEXT` | Browser name (chrome, edge, firefox, safari, brave) |
@@ -91,15 +92,15 @@ The table automatically discovers browsers from standard user profile locations 
 
 ```sql
 -- Query from custom Chrome profile
-SELECT * FROM browser_history 
+SELECT * FROM elastic_browser_history 
 WHERE custom_data_dir = '/mnt/backup/Users/john/AppData/Local/Google';
 
 -- Query all profiles in a custom location using glob
-SELECT * FROM browser_history 
+SELECT * FROM elastic_browser_history 
 WHERE custom_data_dir GLOB '/forensics/users/*/Library/Application Support/Google';
 
 -- Query from mounted container filesystem
-SELECT * FROM browser_history 
+SELECT * FROM elastic_browser_history 
 WHERE custom_data_dir = '/var/lib/docker/overlay2/.../home/user/.config/google-chrome';
 ```
 
@@ -111,18 +112,18 @@ The `custom_data_dir` should point to the browser's base directory (not the prof
 
 ```sql
 -- Get all history from all discovered browsers
-SELECT * FROM browser_history;
+SELECT * FROM elastic_browser_history;
 
 -- Get history from specific browser
-SELECT * FROM browser_history WHERE browser = 'chrome';
+SELECT * FROM elastic_browser_history WHERE browser = 'chrome';
 
 -- Get history from specific profile
-SELECT * FROM browser_history 
+SELECT * FROM elastic_browser_history 
 WHERE browser = 'firefox' AND profile_name = 'default-release';
 
 -- Recent history (last 7 days)
 SELECT url, title, browser, datetime 
-FROM browser_history 
+FROM elastic_browser_history 
 WHERE timestamp > (strftime('%s', 'now') - 604800)
 ORDER BY timestamp DESC;
 ```
@@ -130,65 +131,79 @@ ORDER BY timestamp DESC;
 ### Advanced Filtering
 
 ```sql
--- Search for specific domains (using domain field)
+-- Search for specific domains (using domain field for registrable domain)
 SELECT browser, profile_name, url, title, datetime
-FROM browser_history
+FROM elastic_browser_history
 WHERE domain = 'github.com'
 ORDER BY timestamp DESC;
 
+-- Search for specific hostnames (using hostname field for full hostname)
+SELECT browser, profile_name, url, title, datetime
+FROM elastic_browser_history
+WHERE hostname = 'www.github.com'
+ORDER BY timestamp DESC;
+
 -- Search domains with pattern matching
-SELECT browser, domain, url, title
-FROM browser_history
+SELECT browser, domain, hostname, url, title
+FROM elastic_browser_history
 WHERE domain LIKE '%.google.com'
 ORDER BY timestamp DESC;
 
 -- Filter by URL scheme/protocol
 SELECT browser, scheme, url, title, datetime
-FROM browser_history
+FROM elastic_browser_history
 WHERE scheme = 'https'
 ORDER BY timestamp DESC;
 
 -- Find non-HTTPS visits (potential security concern)
 SELECT browser, url, title, datetime
-FROM browser_history
+FROM elastic_browser_history
 WHERE scheme IN ('http', 'ftp')
 ORDER BY timestamp DESC;
 
--- Most visited URLs (count actual visits)
+-- Most visited URLs (count actual visits, grouped by url_id for consistency)
 SELECT url, domain, COUNT(*) as visit_count
-FROM browser_history
-GROUP BY url
+FROM elastic_browser_history
+GROUP BY url_id
 ORDER BY visit_count DESC
 LIMIT 20;
 
--- Most visited domains
+-- Most visited domains (registrable domains)
 SELECT domain, COUNT(*) as visits, COUNT(DISTINCT url_id) as unique_urls
-FROM browser_history
+FROM elastic_browser_history
 WHERE domain != ''
 GROUP BY domain
 ORDER BY visits DESC
 LIMIT 20;
 
+-- Most visited hostnames (full hostnames)
+SELECT hostname, COUNT(*) as visits, COUNT(DISTINCT url_id) as unique_urls
+FROM elastic_browser_history
+WHERE hostname != ''
+GROUP BY hostname
+ORDER BY visits DESC
+LIMIT 20;
+
 -- Find typed URLs (direct navigation by user)
 SELECT url, title, browser, datetime
-FROM browser_history
+FROM elastic_browser_history
 WHERE transition_type = 'TYPED'
 ORDER BY timestamp DESC;
 
 -- Analyze transition types (how users navigate)
 SELECT transition_type, COUNT(*) as count
-FROM browser_history
+FROM elastic_browser_history
 GROUP BY transition_type
 ORDER BY count DESC;
 
 -- Find hidden entries (private or deleted history)
 SELECT url, title, browser, datetime
-FROM browser_history
+FROM elastic_browser_history
 WHERE is_hidden = 1;
 
 -- Filter by visit source (data origin)
 SELECT url, title, browser, visit_source
-FROM browser_history
+FROM elastic_browser_history
 WHERE visit_source = 'synced'  -- Only show synced history from other devices
 ORDER BY timestamp DESC;
 
@@ -197,7 +212,7 @@ SELECT
     transition_type,
     visit_source,
     COUNT(*) as count
-FROM browser_history
+FROM elastic_browser_history
 GROUP BY transition_type, visit_source
 ORDER BY count DESC;
 ```
@@ -257,27 +272,80 @@ Browser history databases use a two-table structure:
 
 **This table returns one row per visit**, providing detailed information about each individual page view.
 
+#### Understanding url_id
+
+The `url_id` column is a unique identifier that links visits to their corresponding URL entry in the browser's database. This is crucial for proper data aggregation because:
+
+**Important: `url_id` is only consistent within the same browser profile.** Different browsers or different profiles within the same browser will assign different `url_id` values to the same URL. When analyzing data across multiple browsers or profiles, you should include `browser`, `user`, and `profile_name` in your grouping along with `url_id`.
+
+**Why use `url_id` instead of `url` for grouping:**
+
+1. **URL Normalization**: Browsers may store the same logical URL in slightly different formats:
+   - `https://example.com/` vs `https://example.com` (trailing slash)
+   - `https://example.com?utm_source=a` vs `https://example.com?utm_source=b` (different query parameters)
+   - Fragment differences: `https://example.com#section1` vs `https://example.com#section2`
+
+2. **Database Consistency**: The `url_id` represents how the browser itself groups visits:
+   - Browsers deduplicate URLs internally and assign a single ID
+   - Multiple visits to "the same URL" (from the browser's perspective) share the same `url_id`
+   - This matches the browser's own statistics and aggregate calculations
+
+3. **Accurate Visit Counts**: Using `url_id` ensures you count visits exactly as the browser does:
+   ```sql
+   -- CORRECT: Groups by browser's URL identifier within same profile
+   SELECT url, COUNT(*) as visits 
+   FROM elastic_browser_history 
+   WHERE browser = 'chrome' AND profile_name = 'Default'
+   GROUP BY url_id;
+   
+   -- CORRECT: Groups across multiple profiles/browsers (include profile info)
+   SELECT browser, profile_name, url, COUNT(*) as visits 
+   FROM elastic_browser_history 
+   GROUP BY browser, profile_name, url_id;
+   
+   -- INCORRECT: May split visits to the same URL into multiple groups
+   SELECT url, COUNT(*) as visits FROM elastic_browser_history GROUP BY url;
+   ```
+
+4. **Performance**: `url_id` is an integer index, making grouping operations faster than string comparisons on full URLs.
+
+**Example scenario:**
+```
+Visit 1: https://github.com/elastic/beats?tab=readme    -> url_id = 123
+Visit 2: https://github.com/elastic/beats?tab=code      -> url_id = 123
+Visit 3: https://github.com/elastic/beats#installation  -> url_id = 123
+```
+All three visits have the same `url_id` because the browser considers them the same base URL. Grouping by `url_id` correctly counts this as 3 visits to one URL, while grouping by `url` would incorrectly show 3 different URLs with 1 visit each.
+
 #### Calculating Aggregates
 
 Since each row represents a single visit, you can easily calculate statistics using SQL:
 
 ```sql
--- Count total visits per URL
+-- Count total visits per URL (use url_id for consistent grouping)
 SELECT url, COUNT(*) as visit_count
-FROM browser_history
-GROUP BY url;
+FROM elastic_browser_history
+GROUP BY url_id;
 
--- Count typed visits per URL
+-- Count typed visits per URL (use url_id for consistent grouping)
 SELECT url, COUNT(*) as typed_count
-FROM browser_history
+FROM elastic_browser_history
 WHERE transition_type = 'TYPED'
-GROUP BY url;
+GROUP BY url_id;
 
--- Most visited domains
+-- Most visited domains (registrable domains)
 SELECT domain, COUNT(*) as visits
-FROM browser_history
+FROM elastic_browser_history
 WHERE domain != ''
 GROUP BY domain
+ORDER BY visits DESC
+LIMIT 10;
+
+-- Most visited hostnames (full hostnames)
+SELECT hostname, COUNT(*) as visits
+FROM elastic_browser_history
+WHERE hostname != ''
+GROUP BY hostname
 ORDER BY visits DESC
 LIMIT 10;
 ```
