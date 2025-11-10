@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"go.opentelemetry.io/collector/component"
@@ -39,10 +40,16 @@ func newLoadBalanceMiddleware(cfg *Config, _ component.TelemetrySettings) (exten
 }
 
 func (lb *loadBalanceMiddleware) Start(ctx context.Context, host component.Host) error {
-	if lb.cfg == nil {
+	switch {
+	case lb == nil:
+		return fmt.Errorf("loadbalance middlewar is nil")
+	case lb.cfg == nil:
 		return fmt.Errorf("loadbalance middleware config is nil")
+	case len(lb.cfg.Endpoints) == 0:
+		return fmt.Errorf("loadbalance middleware endpoints cannot be empty")
 	}
 
+	// build list of URLs from endpoints
 	urls := make([]*url.URL, 0, len(lb.cfg.Endpoints))
 	for i, endpoint := range lb.cfg.Endpoints {
 		finalEndpoint, err := common.MakeURL(lb.cfg.Protocol, lb.cfg.Path, endpoint, 9200)
@@ -81,20 +88,27 @@ func (lb *loadBalanceMiddleware) GetHTTPRoundTripper(base http.RoundTripper) (ht
 type loadBalanceRoundTripperProvider struct {
 	endpoints []*url.URL
 	base      http.RoundTripper
+	mx        sync.Mutex
 }
 
 func (lbr *loadBalanceRoundTripperProvider) RoundTripper(base http.RoundTripper) http.RoundTripper {
+	// we assume base remains constant for the lifetime of the provider
 	lbr.base = base
 	return lbr
 }
 
 func (lbr *loadBalanceRoundTripperProvider) RoundTrip(req *http.Request) (*http.Response, error) {
 	// use the first endpoint in the list
+	lbr.mx.Lock()
 	req.URL = lbr.endpoints[0]
+	lbr.mx.Unlock()
+	// perform the request
 	resp, err := lbr.base.RoundTrip(req)
-	if err != nil {
+	if err != nil && len(lbr.endpoints) > 1 {
 		// if response is unsuccessful, move the first endpoint to the end of the list
+		lbr.mx.Lock()
 		lbr.endpoints = append(lbr.endpoints[1:], lbr.endpoints[0])
+		lbr.mx.Unlock()
 	}
 	// return the error as is for the caller of RoundTrip to handle retry logic
 	return resp, err
