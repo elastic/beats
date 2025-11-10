@@ -427,14 +427,17 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id s
 func evaluateJSON(reader *bufio.Reader) (io.Reader, bool, error) {
 	eof := false
 
-	// UTF-8 BOM is 0xEF 0xBB 0xBF
-	// Check for UTF-8 BOM at the beginning and discard it
-	if b, err := reader.Peek(3); err == nil && len(b) >= 3 {
-		if b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF {
-			// Actually discard the BOM bytes from the reader
-			if _, err := reader.Discard(3); err != nil {
-				return nil, false, fmt.Errorf("failed to discard UTF-8 BOM: %w", err)
-			}
+	// Check for BOM at the beginning and discard it
+	const byteOrderMark = "\ufeff"
+	if b, err := reader.Peek(len(byteOrderMark)); err != nil {
+		// likely EOF
+		if !errors.Is(err, io.EOF) {
+			return nil, false, fmt.Errorf("failed to peek for UTF-8 BOM: %w", err)
+		}
+	} else if bytes.Equal(b, []byte(byteOrderMark)) {
+		// Actually discard the BOM bytes from the reader
+		if _, err := reader.Discard(len(byteOrderMark)); err != nil {
+			return nil, false, fmt.Errorf("failed to discard UTF-8 BOM: %w", err)
 		}
 	}
 
