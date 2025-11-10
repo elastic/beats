@@ -21,12 +21,15 @@ import (
 	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 type authConfig struct {
-	Basic  *basicAuthConfig  `config:"basic"`
-	Digest *digestAuthConfig `config:"digest"`
-	OAuth2 *oAuth2Config     `config:"oauth2"`
+	Basic  *basicAuthConfig       `config:"basic"`
+	Token  *tokenAuthConfig       `config:"token"`
+	Digest *digestAuthConfig      `config:"digest"`
+	OAuth2 *oAuth2Config          `config:"oauth2"`
+	AWS    *aws.SignerInputConfig `config:"aws"`
 }
 
 func (c authConfig) Validate() error {
@@ -34,10 +37,16 @@ func (c authConfig) Validate() error {
 	if c.Basic.isEnabled() {
 		n++
 	}
+	if c.Token.isEnabled() {
+		n++
+	}
 	if c.Digest.isEnabled() {
 		n++
 	}
 	if c.OAuth2.isEnabled() {
+		n++
+	}
+	if c.AWS.IsEnabled() {
 		n++
 	}
 	if n > 1 {
@@ -65,6 +74,30 @@ func (b *basicAuthConfig) Validate() error {
 
 	if b.User == "" || b.Password == "" {
 		return errors.New("both user and password must be set")
+	}
+
+	return nil
+}
+
+type tokenAuthConfig struct {
+	Enabled *bool  `config:"enabled"`
+	Type    string `config:"type"`
+	Value   string `config:"value"`
+}
+
+// isEnabled returns true if the `enable` field is set to true in the yaml.
+func (b *tokenAuthConfig) isEnabled() bool {
+	return b != nil && (b.Enabled == nil || *b.Enabled)
+}
+
+// Validate checks if token authentication config is valid.
+func (b *tokenAuthConfig) Validate() error {
+	if !b.isEnabled() {
+		return nil
+	}
+
+	if b.Type == "" || b.Value == "" {
+		return errors.New("both type and value must be set")
 	}
 
 	return nil
@@ -197,9 +230,18 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 			return cfg.Client(ctx), nil
 		}
 
-		creds, err := google.CredentialsFromJSON(ctx, o.GoogleCredentialsJSON, o.Scopes...)
-		if err != nil {
-			return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
+		var creds *google.Credentials
+		var err error
+		if len(o.GoogleCredentialsJSON) != 0 {
+			creds, err = google.CredentialsFromJSON(ctx, o.GoogleCredentialsJSON, o.Scopes...)
+			if err != nil {
+				return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
+			}
+		} else {
+			creds, err = findDefaultGoogleCredentials(ctx, o.Scopes...)
+			if err != nil {
+				return nil, fmt.Errorf("oauth2 client: no valid auth specified: %w", err)
+			}
 		}
 		return oauth2.NewClient(ctx, creds.TokenSource), nil
 	case oAuth2ProviderOkta:
@@ -313,8 +355,7 @@ func (o *oAuth2Config) validateGoogleProvider() error {
 
 	// Application Default Credentials (ADC)
 	ctx := context.Background()
-	if creds, err := findDefaultGoogleCredentials(ctx, o.Scopes...); err == nil {
-		o.GoogleCredentialsJSON = creds.JSON
+	if _, err := findDefaultGoogleCredentials(ctx, o.Scopes...); err == nil {
 		return nil
 	}
 

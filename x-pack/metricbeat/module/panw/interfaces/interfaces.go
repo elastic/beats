@@ -40,14 +40,14 @@ func init() {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The panw interfaces metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The panw interfaces metricset is beta."))
 
 	config, err := panw.NewConfig(base)
 	if err != nil {
 		return nil, err
 	}
 
-	logger := logp.NewLogger(base.FullyQualifiedName())
+	logger := base.Logger().Named(base.FullyQualifiedName())
 
 	//client := &pango.Firewall{Client: pango.Client{Hostname: config.HostIp, ApiKey: config.ApiKey}}
 	client, err := panw.GetPanwClient(config)

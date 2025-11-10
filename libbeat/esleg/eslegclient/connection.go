@@ -93,7 +93,7 @@ type ConnectionSettings struct {
 	Transport httpcommon.HTTPTransportSettings
 
 	// UserAgent can be used to report the agent running mode
-	// to ES via the User Agent string. If running under Agent (fleetmode.Enabled() == true)
+	// to ES via the User Agent string. If running under Agent (management.UnderAgent() == true)
 	// then this string will be appended to the user agent.
 	UserAgent string
 }
@@ -109,8 +109,8 @@ type ESVersionData struct {
 }
 
 // NewConnection returns a new Elasticsearch client.
-func NewConnection(s ConnectionSettings) (*Connection, error) {
-	logger := logp.NewLogger("esclientleg")
+func NewConnection(s ConnectionSettings, log *logp.Logger) (*Connection, error) {
+	logger := log.Named("esclientleg")
 
 	if s.IdleConnTimeout == 0 {
 		s.IdleConnTimeout = 1 * time.Minute
@@ -176,7 +176,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 
 	esClient := esHTTPClient(httpClient)
 	if s.Kerberos.IsEnabled() {
-		esClient, err = kerberos.NewClient(s.Kerberos, httpClient, s.URL)
+		esClient, err = kerberos.NewClient(s.Kerberos, httpClient)
 		if err != nil {
 			return nil, err
 		}
@@ -203,15 +203,15 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 // output, except for the output specific configuration options.  If multiple hosts
 // are defined in the configuration, a client is returned for each of them.
 // The returned Connection is a non-thread-safe connection.
-func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
+func NewClients(cfg *cfg.C, beatname string, log *logp.Logger) ([]Connection, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
 	if proxyURL := config.Transport.Proxy.URL; proxyURL != nil {
-		logp.Debug("breaking down proxy URL. Scheme: '%s', host[:port]: '%s', path: '%s'", proxyURL.Scheme, proxyURL.Host, proxyURL.Path)
-		logp.Info("using proxy URL: %s", proxyURL.URI().String())
+		log.Debugf("breaking down proxy URL. Scheme: '%s', host[:port]: '%s', path: '%s'", proxyURL.Scheme, proxyURL.Host, proxyURL.Path)
+		log.Infof("using proxy URL: %s", proxyURL.URI().String())
 	}
 
 	params := config.Params
@@ -223,7 +223,7 @@ func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 	for _, host := range config.Hosts {
 		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
 		if err != nil {
-			logp.Err("invalid host param set: %s, Error: %v", host, err)
+			log.Errorf("invalid host param set: %s, Error: %v", host, err)
 			return nil, err
 		}
 
@@ -238,7 +238,7 @@ func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 			Headers:          config.Headers,
 			CompressionLevel: config.CompressionLevel,
 			Transport:        config.Transport,
-		})
+		}, log)
 		if err != nil {
 			return clients, err
 		}
@@ -251,8 +251,8 @@ func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 }
 
 // NewConnectedClient returns a non-thread-safe connection. Make sure for each goroutine you initialize a new connection.
-func NewConnectedClient(ctx context.Context, cfg *cfg.C, beatname string) (*Connection, error) {
-	clients, err := NewClients(cfg, beatname)
+func NewConnectedClient(ctx context.Context, cfg *cfg.C, beatname string, log *logp.Logger) (*Connection, error) {
+	clients, err := NewClients(cfg, beatname, log)
 	if err != nil {
 		return nil, err
 	}
@@ -347,13 +347,13 @@ func (conn *Connection) Test(d testing.Driver) {
 			d.Warn("TLS", "secure connection disabled")
 		} else {
 			d.Run("TLS", func(d testing.Driver) {
-				tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS)
+				tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS, conn.log)
 				if err != nil {
 					d.Fatal("load tls config", err)
 				}
 
 				netDialer := transport.NetDialer(conn.Transport.Timeout)
-				tlsDialer := transport.TestTLSDialer(d, netDialer, tls, conn.Transport.Timeout)
+				tlsDialer := transport.TestTLSDialer(d, netDialer, tls, conn.Transport.Timeout, conn.log)
 				_, err = tlsDialer.Dial("tcp", address)
 				d.Fatal("dial up", err)
 			})
@@ -443,13 +443,14 @@ func (conn *Connection) getVersion() error {
 		conn.version = *v
 	}
 
-	if versionData.Version.BuildFlavor == "serverless" {
+	switch versionData.Version.BuildFlavor {
+	case "serverless":
 		conn.log.Info("build flavor of es is serverless, marking connection as serverless")
 		conn.isServerless = true
-	} else if versionData.Version.BuildFlavor == "default" {
+	case "default":
 		conn.isServerless = false
 		// not sure if this is even possible, just being defensive
-	} else {
+	default:
 		conn.log.Infof("Got unexpected build flavor '%s'", versionData.Version.BuildFlavor)
 	}
 

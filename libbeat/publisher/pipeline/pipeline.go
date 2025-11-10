@@ -66,6 +66,10 @@ type Pipeline struct {
 	// specified time when it is closed for pending events to be acknowledged.
 	waitCloseTimeout time.Duration
 
+	// forceCloseQueue causes us to force close the queue after the waitCloseTimeout
+	// elapses.
+	forceCloseQueue bool
+
 	processors processing.Supporter
 }
 
@@ -94,6 +98,12 @@ const (
 	// to ACK any outstanding events. This is independent of Clients asking for
 	// ACK and/or WaitClose. Clients can still optionally configure WaitClose themselves.
 	WaitOnPipelineClose
+
+	// WaitOnPipelineCloseThenForce is identical to WaitOnPipelineClose, but it also force closes
+	// the queue after the timeout, dropping in-flight data and unprocessed acknowledgements.
+	// This is useful when we know terminating the process won't free the memory for us, such as
+	// when running in an otel receiver.
+	WaitOnPipelineCloseThenForce
 )
 
 // OutputReloader interface, that can be queried from an active publisher pipeline.
@@ -126,9 +136,15 @@ func New(
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
 	}
-	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
-		p.waitCloseTimeout = settings.WaitClose
+	switch settings.WaitCloseMode {
+	case WaitOnPipelineClose, WaitOnPipelineCloseThenForce:
+		if settings.WaitClose > 0 {
+			p.waitCloseTimeout = settings.WaitClose
+		}
+	default:
 	}
+
+	p.forceCloseQueue = settings.WaitCloseMode == WaitOnPipelineCloseThenForce
 
 	if monitors.Metrics != nil {
 		p.observer = newMetricsObserver(monitors.Metrics)
@@ -166,7 +182,7 @@ func (p *Pipeline) Close() error {
 	log.Debug("close pipeline")
 
 	// Note: active clients are not closed / disconnected.
-	p.outputController.WaitClose(p.waitCloseTimeout)
+	p.outputController.WaitClose(p.waitCloseTimeout, p.forceCloseQueue)
 
 	p.observer.cleanup()
 	return nil
@@ -179,8 +195,8 @@ func (p *Pipeline) Connect() (beat.Client, error) {
 
 // ConnectWith create a new Client for publishing events to the pipeline.
 // The client behavior on close and ACK handling can be configured by setting
-// the appropriate fields in the passed ClientConfig.
-// If not set otherwise the defaut publish mode is OutputChooses.
+// the appropriate fields in provided ClientConfig.
+// If not set otherwise the default publish mode is OutputChooses.
 //
 // It is responsibility of the caller to close the client.
 func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
@@ -208,14 +224,20 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		return nil, err
 	}
 
+	clientListener := cfg.ClientListener
+	if clientListener == nil {
+		clientListener = noopClientListener{}
+	}
+
 	client := &client{
 		logger:         p.monitors.Logger,
-		clientListener: cfg.ClientListener,
+		clientListener: clientListener,
 		processors:     processors,
 		eventFlags:     eventFlags,
 		canDrop:        canDrop,
 		observer:       p.observer,
 	}
+
 	client.isOpen.Store(true)
 
 	ackHandler := cfg.EventListener
@@ -290,3 +312,12 @@ func queueFactoryForUserConfig(queueType string, userConfig *conf.C) (queue.Queu
 		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
 	}
 }
+
+type noopClientListener struct{}
+
+func (n noopClientListener) Closing()                    {}
+func (n noopClientListener) Closed()                     {}
+func (n noopClientListener) NewEvent()                   {}
+func (n noopClientListener) Filtered()                   {}
+func (n noopClientListener) Published()                  {}
+func (n noopClientListener) DroppedOnPublish(beat.Event) {}

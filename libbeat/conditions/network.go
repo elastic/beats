@@ -114,10 +114,10 @@ func invalidTypeError(field string, value interface{}) error {
 }
 
 // NewNetworkCondition builds a new Network using the given configuration.
-func NewNetworkCondition(fields map[string]interface{}) (*Network, error) {
+func NewNetworkCondition(fields map[string]interface{}, logger *logp.Logger) (*Network, error) {
 	cond := &Network{
 		fields: map[string]networkMatcher{},
-		log:    logp.NewLogger(logName),
+		log:    logger.Named(logName),
 	}
 
 	for field, value := range mapstr.M(fields).Flatten() {

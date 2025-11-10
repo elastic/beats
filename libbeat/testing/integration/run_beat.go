@@ -32,6 +32,8 @@ import (
 	"strings"
 	"sync"
 	"testing"
+
+	"github.com/elastic/beats/v7/libbeat/common/proc"
 )
 
 var (
@@ -49,12 +51,13 @@ type RunningBeat struct {
 	outputDone  chan struct{}
 	watcher     OutputWatcher
 	keepRunning bool
+	t           *testing.T
 }
 
 // CollectOutput returns the last `limit` lines of the currently
 // accumulated output.
 // `limit=-1` returns the entire output from the beginning.
-func (b *RunningBeat) CollectOutput(limit int) string {
+func (b *RunningBeat) CollectOutput(limit int, pretty bool) string {
 	b.outputRW.RLock()
 	defer b.outputRW.RUnlock()
 	if limit < 0 {
@@ -67,15 +70,31 @@ func (b *RunningBeat) CollectOutput(limit int) string {
 		output = output[len(output)-limit:]
 	}
 
-	m := make(map[string]any)
-	for i, l := range output {
-		err := json.Unmarshal([]byte(l), &m)
-		if err != nil {
-			builder.WriteString(l)
-		} else {
-			pretty, _ := json.MarshalIndent(m, "", "  ")
-			builder.Write(pretty)
+	writeLine := func(l string) {
+		builder.WriteString(l)
+	}
+	if pretty {
+		m := make(map[string]any)
+		writeLine = func(l string) {
+			err := json.Unmarshal([]byte(l), &m)
+			if err != nil {
+				builder.WriteString(l)
+				return
+			}
+
+			data, err := json.MarshalIndent(m, "", "  ")
+			if err != nil {
+				builder.WriteString(l)
+				return
+			}
+
+			builder.Write(data)
 		}
+	}
+
+	for i, l := range output {
+		writeLine(l)
+
 		if i < len(output)-1 {
 			builder.WriteByte('\n')
 		}
@@ -84,7 +103,7 @@ func (b *RunningBeat) CollectOutput(limit int) string {
 	return builder.String()
 }
 
-// Wait until the Beat exists and all the output is processed
+// Wait until the Beat exits and all the output is processed
 func (b *RunningBeat) Wait() error {
 	err := b.c.Wait()
 	<-b.outputDone
@@ -104,7 +123,9 @@ func (b *RunningBeat) writeOutputLine(line string) {
 	b.watcher.Inspect(line)
 	if b.watcher.Observed() {
 		if !b.keepRunning {
-			_ = b.c.Process.Kill()
+			if err := proc.StopCmd(b.c.Process); err != nil {
+				b.t.Logf("Cannot stop Beat: %s\n", err)
+			}
 		}
 		b.watcher = nil
 	}
@@ -126,18 +147,17 @@ type RunBeatOptions struct {
 	KeepRunning bool
 }
 
-// Runs a Beat binary with the given config and args.
+// RunBeat runs a Beat binary with the given config and args.
 // Returns a `RunningBeat` that allow to collect the output and wait until the exit.
-func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher OutputWatcher) *RunningBeat {
+func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher OutputWatcher, homeDir string) *RunningBeat {
 	t.Logf("preparing to run %s...", opts.Beatname)
 
 	binaryFilename := findBeatBinaryPath(t, opts.Beatname)
-	dir := t.TempDir()
-	// create a temporary Beat config
-	cfgPath := filepath.Join(dir, fmt.Sprintf("%s.yml", opts.Beatname))
-	homePath := filepath.Join(dir, "home")
 
-	err := os.WriteFile(cfgPath, []byte(opts.Config), 0777)
+	// create a temporary Beat config
+	cfgPath := filepath.Join(homeDir, fmt.Sprintf("%s.yml", opts.Beatname))
+
+	err := os.WriteFile(cfgPath, []byte(opts.Config), 0644)
 	if err != nil {
 		t.Fatalf("failed to create a temporary config file: %s", err)
 		return nil
@@ -152,7 +172,7 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 		// we want all the logs
 		"-E", "logging.level=debug",
 		// so we can run multiple Beats at the same time
-		"--path.home", homePath,
+		"--path.home", homeDir,
 	}
 	execArgs := make([]string, 0, len(baseArgs)+len(opts.Args))
 	execArgs = append(execArgs, baseArgs...)
@@ -160,6 +180,7 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 
 	t.Logf("running %s %s", binaryFilename, strings.Join(execArgs, " "))
 	c := exec.CommandContext(ctx, binaryFilename, execArgs...)
+	c.SysProcAttr = proc.GetSysProcAttr()
 
 	// we must use 2 pipes since writes are not aligned by lines
 	// part of the stdout output can end up in the middle of the stderr line
@@ -180,6 +201,7 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 		watcher:     watcher,
 		keepRunning: opts.KeepRunning,
 		outputDone:  make(chan struct{}),
+		t:           t,
 	}
 
 	var wg sync.WaitGroup

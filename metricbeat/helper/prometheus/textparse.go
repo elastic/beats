@@ -19,6 +19,7 @@ package prometheus
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"math"
 	"mime"
@@ -32,6 +33,7 @@ import (
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/model/textparse"
 	"github.com/prometheus/prometheus/model/timestamp"
+	"github.com/prometheus/prometheus/schema"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -42,6 +44,7 @@ const (
 	TextVersion                  = "0.0.4"
 	OpenMetricsType              = `application/openmetrics-text`
 	ContentTypeTextFormat string = `text/plain; version=` + TextVersion + `; charset=utf-8`
+	textMediaType                = "text/plain"
 )
 
 type Gauge struct {
@@ -116,12 +119,12 @@ func (m *Quantile) GetValue() float64 {
 }
 
 type Summary struct {
-	SampleCount *uint64
+	SampleCount *float64
 	SampleSum   *float64
 	Quantile    []*Quantile
 }
 
-func (m *Summary) GetSampleCount() uint64 {
+func (m *Summary) GetSampleCount() float64 {
 	if m != nil && m.SampleCount != nil {
 		return *m.SampleCount
 	}
@@ -154,12 +157,12 @@ func (m *Unknown) GetValue() float64 {
 }
 
 type Bucket struct {
-	CumulativeCount *uint64
+	CumulativeCount *float64
 	UpperBound      *float64
 	Exemplar        *exemplar.Exemplar
 }
 
-func (m *Bucket) GetCumulativeCount() uint64 {
+func (m *Bucket) GetCumulativeCount() float64 {
 	if m != nil && m.CumulativeCount != nil {
 		return *m.CumulativeCount
 	}
@@ -174,13 +177,13 @@ func (m *Bucket) GetUpperBound() float64 {
 }
 
 type Histogram struct {
-	SampleCount      *uint64
+	SampleCount      *float64
 	SampleSum        *float64
 	Bucket           []*Bucket
 	IsGaugeHistogram bool
 }
 
-func (m *Histogram) GetSampleCount() uint64 {
+func (m *Histogram) GetSampleCount() float64 {
 	if m != nil && m.SampleCount != nil {
 		return *m.SampleCount
 	}
@@ -371,8 +374,7 @@ func summaryMetricName(name string, s float64, qv string, lbls string, summaries
 
 	switch {
 	case isCount(name):
-		u := uint64(s)
-		summary.SampleCount = &u
+		summary.SampleCount = &s
 		name = strings.TrimSuffix(name, suffixCount)
 	case isSum(name):
 		summary.SampleSum = &s
@@ -423,15 +425,13 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 
 	switch {
 	case isCount(name):
-		u := uint64(s)
-		histogram.SampleCount = &u
+		histogram.SampleCount = &s
 		name = strings.TrimSuffix(name, suffixCount)
 	case isSum(name):
 		histogram.SampleSum = &s
 		name = strings.TrimSuffix(name, suffixSum)
 	case isGaugeHistogram && isGCount(name):
-		u := uint64(s)
-		histogram.SampleCount = &u
+		histogram.SampleCount = &s
 		name = strings.TrimSuffix(name, suffixGCount)
 	case isGaugeHistogram && isGSum(name):
 		histogram.SampleSum = &s
@@ -441,9 +441,8 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 		if err != nil {
 			f = math.MaxUint64
 		}
-		cnt := uint64(s)
 		bkt.UpperBound = &f
-		bkt.CumulativeCount = &cnt
+		bkt.CumulativeCount = &s
 
 		if e != nil {
 			if !e.HasTs {
@@ -480,10 +479,18 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 }
 
 func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
-	parser, err := textparse.New(b, contentType, false, labels.NewSymbolTable())
-	if err != nil {
-		return nil, err
+	// Fallback to text/plain if content type is blank or unrecognized.
+	parser, err := textparse.New(b, contentType, textMediaType, false, false, false, labels.NewSymbolTable())
+	// This check allows to continue where the content type is blank/invalid but the parser is non-nil. Returns error on all other cases.
+	if parser == nil {
+		if err != nil {
+			return nil, err
+
+		}
+
+		return nil, fmt.Errorf("no parser returned for contentType %q", contentType)
 	}
+
 	var (
 		defTime              = timestamp.FromTime(ts)
 		metricFamiliesByName = map[string]*MetricFamily{}
@@ -567,32 +574,30 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		t := defTime
 		_, tp, v := parser.Series()
 
-		var (
-			lset labels.Labels
-			mets string
-		)
+		var lset labels.Labels
+		parser.Labels(&lset)
+		metadata := schema.NewMetadataFromLabels(lset)
+		metricName := metadata.Name
 
-		mets = parser.Metric(&lset)
-
-		if !lset.Has(labels.MetricName) {
+		if metricName == "" {
 			// missing metric name from labels.MetricName, skip.
 			break
 		}
 
 		var lbls strings.Builder
-		lbls.Grow(len(mets))
 		var labelPairs = []*labels.Label{}
 		var qv string // value of le or quantile label
-		for _, l := range lset.Copy() {
+		lset.Range(func(l labels.Label) {
 			if l.Name == labels.MetricName {
-				continue
+				return
 			}
 
-			if l.Name == model.QuantileLabel {
+			switch l.Name {
+			case model.QuantileLabel:
 				qv = lset.Get(model.QuantileLabel)
-			} else if l.Name == labels.BucketLabel {
+			case labels.BucketLabel:
 				qv = lset.Get(labels.BucketLabel)
-			} else {
+			default:
 				lbls.WriteString(l.Name)
 				lbls.WriteString(l.Value)
 			}
@@ -604,11 +609,9 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 				Name:  n,
 				Value: v,
 			})
-		}
+		})
 
 		var metric *OpenMetric
-
-		metricName := lset.Get(labels.MetricName)
 
 		// lookupMetricName will have the suffixes removed
 		lookupMetricName := metricName
@@ -757,8 +760,6 @@ func GetContentType(h http.Header) string {
 		return ""
 	}
 
-	const textType = "text/plain"
-
 	switch mediatype {
 	case OpenMetricsType:
 		if e, ok := params["encoding"]; ok && e != "delimited" {
@@ -766,7 +767,7 @@ func GetContentType(h http.Header) string {
 		}
 		return OpenMetricsType
 
-	case textType:
+	case textMediaType:
 		if v, ok := params["version"]; ok && v != TextVersion {
 			return ""
 		}

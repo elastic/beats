@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -127,26 +128,38 @@ func TestGenerateHints(t *testing.T) {
 			len: 1,
 			result: []mapstr.M{
 				{
-					"id":    "kubernetes-container-logs-abc",
-					"paths": []interface{}{"/var/log/containers/*-abc.log"},
-					"parsers": []interface{}{
-						map[string]interface{}{
-							"container": map[string]interface{}{
+					"id": "container-logs-abc",
+					"paths": []any{
+						"/var/log/containers/*-abc.log",
+						"/var/lib/docker/containers/abc/*-json.log",
+					},
+					"parsers": []any{
+						map[string]any{
+							"container": map[string]any{
 								"format": "auto",
 								"stream": "all",
 							},
 						},
 					},
-					"prospector": map[string]interface{}{
-						"scanner": map[string]interface{}{
+					"prospector": map[string]any{
+						"scanner": map[string]any{
 							"symlinks": true,
-							"fingerprint": map[string]interface{}{
+							"fingerprint": map[string]any{
 								"enabled": true,
 							},
 						},
 					},
-					"file_identity": map[string]interface{}{
+					"close": map[string]any{
+						"on_state_change": map[string]any{
+							"removed": false,
+						},
+					},
+					"file_identity": map[string]any{
 						"fingerprint": nil,
+					},
+					"take_over": map[string]any{
+						"enabled":  true,
+						"from_ids": []any{"kubernetes-container-logs-abc"},
 					},
 					"type": "filestream",
 				},
@@ -196,28 +209,40 @@ func TestGenerateHints(t *testing.T) {
 			len: 1,
 			result: []mapstr.M{
 				{
-					"id":    "kubernetes-container-logs-abc",
-					"paths": []interface{}{"/var/log/containers/*-abc.log"},
-					"parsers": []interface{}{
-						map[string]interface{}{
-							"container": map[string]interface{}{
+					"id": "container-logs-abc",
+					"paths": []any{
+						"/var/log/containers/*-abc.log",
+						"/var/lib/docker/containers/abc/*-json.log",
+					},
+					"parsers": []any{
+						map[string]any{
+							"container": map[string]any{
 								"format": "auto",
 								"stream": "all",
 							},
 						},
 					},
-					"prospector": map[string]interface{}{
-						"scanner": map[string]interface{}{
+					"prospector": map[string]any{
+						"scanner": map[string]any{
 							"symlinks": true,
-							"fingerprint": map[string]interface{}{
+							"fingerprint": map[string]any{
 								"enabled": true,
 							},
 						},
 					},
-					"file_identity": map[string]interface{}{
+					"close": map[string]any{
+						"on_state_change": map[string]any{
+							"removed": false,
+						},
+					},
+					"file_identity": map[string]any{
 						"fingerprint": nil,
 					},
-					"exclude_lines": []interface{}{"^test2", "^test3"},
+					"take_over": map[string]any{
+						"enabled":  true,
+						"from_ids": []any{"kubernetes-container-logs-abc"},
+					},
+					"exclude_lines": []any{"^test2", "^test3"},
 					"type":          "filestream",
 				},
 			},
@@ -875,56 +900,80 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"module": "apache",
-					"error": map[string]interface{}{
+					"error": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
-							"id":    "kubernetes-container-logs-abc",
-							"paths": []interface{}{"/var/log/containers/*-abc.log"},
-							"parsers": []interface{}{
-								map[string]interface{}{
-									"container": map[string]interface{}{
+						"input": map[string]any{
+							"id": "container-logs-abc",
+							"paths": []any{
+								"/var/log/containers/*-abc.log",
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
+							"parsers": []any{
+								map[string]any{
+									"container": map[string]any{
 										"format": "auto",
 										"stream": "all",
 									},
 								},
 							},
-							"prospector": map[string]interface{}{
-								"scanner": map[string]interface{}{
+							"prospector": map[string]any{
+								"scanner": map[string]any{
 									"symlinks": true,
-									"fingerprint": map[string]interface{}{
+									"fingerprint": map[string]any{
 										"enabled": true,
 									},
 								},
 							},
-							"file_identity": map[string]interface{}{
+							"file_identity": map[string]any{
 								"fingerprint": nil,
+							},
+							"take_over": map[string]any{
+								"enabled":  true,
+								"from_ids": []any{"kubernetes-container-logs-abc"},
 							},
 							"type": "filestream",
 						},
 					},
-					"access": map[string]interface{}{
+					"access": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
-							"id":    "kubernetes-container-logs-abc",
-							"paths": []interface{}{"/var/log/containers/*-abc.log"},
-							"parsers": []interface{}{
-								map[string]interface{}{
-									"container": map[string]interface{}{
+						"input": map[string]any{
+							"id": "container-logs-abc",
+							"paths": []any{
+								"/var/log/containers/*-abc.log",
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
+							"parsers": []any{
+								map[string]any{
+									"container": map[string]any{
 										"format": "auto",
 										"stream": "all",
 									},
 								},
 							},
-							"prospector": map[string]interface{}{
-								"scanner": map[string]interface{}{
+							"prospector": map[string]any{
+								"scanner": map[string]any{
 									"symlinks": true,
-									"fingerprint": map[string]interface{}{
+									"fingerprint": map[string]any{
 										"enabled": true,
 									},
 								},
 							},
-							"file_identity": map[string]interface{}{
+							"file_identity": map[string]any{
 								"fingerprint": nil,
+							},
+							"take_over": map[string]any{
+								"enabled":  true,
+								"from_ids": []any{"kubernetes-container-logs-abc"},
 							},
 							"type": "filestream",
 						},
@@ -958,56 +1007,80 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"module": "apache",
-					"access": map[string]interface{}{
+					"access": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
-							"id":    "kubernetes-container-logs-abc",
-							"paths": []interface{}{"/var/log/containers/*-abc.log"},
-							"parsers": []interface{}{
-								map[string]interface{}{
-									"container": map[string]interface{}{
+						"input": map[string]any{
+							"id": "container-logs-abc",
+							"paths": []any{
+								"/var/log/containers/*-abc.log",
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
+							"parsers": []any{
+								map[string]any{
+									"container": map[string]any{
 										"format": "auto",
 										"stream": "all",
 									},
 								},
 							},
-							"prospector": map[string]interface{}{
-								"scanner": map[string]interface{}{
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
+							"prospector": map[string]any{
+								"scanner": map[string]any{
 									"symlinks": true,
-									"fingerprint": map[string]interface{}{
+									"fingerprint": map[string]any{
 										"enabled": true,
 									},
 								},
 							},
-							"file_identity": map[string]interface{}{
+							"file_identity": map[string]any{
 								"fingerprint": nil,
+							},
+							"take_over": map[string]any{
+								"enabled":  true,
+								"from_ids": []any{"kubernetes-container-logs-abc"},
 							},
 							"type": "filestream",
 						},
 					},
-					"error": map[string]interface{}{
+					"error": map[string]any{
 						"enabled": false,
-						"input": map[string]interface{}{
-							"id":    "kubernetes-container-logs-abc",
-							"paths": []interface{}{"/var/log/containers/*-abc.log"},
-							"parsers": []interface{}{
-								map[string]interface{}{
-									"container": map[string]interface{}{
+						"input": map[string]any{
+							"id": "container-logs-abc",
+							"paths": []any{
+								"/var/log/containers/*-abc.log",
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
+							"parsers": []any{
+								map[string]any{
+									"container": map[string]any{
 										"format": "auto",
 										"stream": "all",
 									},
 								},
 							},
-							"prospector": map[string]interface{}{
-								"scanner": map[string]interface{}{
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
+							"prospector": map[string]any{
+								"scanner": map[string]any{
 									"symlinks": true,
-									"fingerprint": map[string]interface{}{
+									"fingerprint": map[string]any{
 										"enabled": true,
 									},
 								},
 							},
-							"file_identity": map[string]interface{}{
+							"file_identity": map[string]any{
 								"fingerprint": nil,
+							},
+							"take_over": map[string]any{
+								"enabled":  true,
+								"from_ids": []any{"kubernetes-container-logs-abc"},
 							},
 							"type": "filestream",
 						},
@@ -1042,56 +1115,80 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"module": "apache",
-					"access": map[string]interface{}{
+					"access": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
-							"id":    "kubernetes-container-logs-abc",
-							"paths": []interface{}{"/var/log/containers/*-abc.log"},
-							"parsers": []interface{}{
-								map[string]interface{}{
-									"container": map[string]interface{}{
+						"input": map[string]any{
+							"id": "container-logs-abc",
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
+							"paths": []any{
+								"/var/log/containers/*-abc.log",
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
+							"parsers": []any{
+								map[string]any{
+									"container": map[string]any{
 										"format": "auto",
 										"stream": "stdout",
 									},
 								},
 							},
-							"prospector": map[string]interface{}{
-								"scanner": map[string]interface{}{
+							"prospector": map[string]any{
+								"scanner": map[string]any{
 									"symlinks": true,
-									"fingerprint": map[string]interface{}{
+									"fingerprint": map[string]any{
 										"enabled": true,
 									},
 								},
 							},
-							"file_identity": map[string]interface{}{
+							"file_identity": map[string]any{
 								"fingerprint": nil,
+							},
+							"take_over": map[string]any{
+								"enabled":  true,
+								"from_ids": []any{"kubernetes-container-logs-abc"},
 							},
 							"type": "filestream",
 						},
 					},
-					"error": map[string]interface{}{
+					"error": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
-							"id":    "kubernetes-container-logs-abc",
-							"paths": []interface{}{"/var/log/containers/*-abc.log"},
-							"parsers": []interface{}{
-								map[string]interface{}{
-									"container": map[string]interface{}{
+						"input": map[string]any{
+							"id": "container-logs-abc",
+							"paths": []any{
+								"/var/log/containers/*-abc.log",
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
+							"parsers": []any{
+								map[string]any{
+									"container": map[string]any{
 										"format": "auto",
 										"stream": "stderr",
 									},
 								},
 							},
-							"prospector": map[string]interface{}{
-								"scanner": map[string]interface{}{
+							"prospector": map[string]any{
+								"scanner": map[string]any{
 									"symlinks": true,
-									"fingerprint": map[string]interface{}{
+									"fingerprint": map[string]any{
 										"enabled": true,
 									},
 								},
 							},
-							"file_identity": map[string]interface{}{
+							"file_identity": map[string]any{
 								"fingerprint": nil,
+							},
+							"take_over": map[string]any{
+								"enabled":  true,
+								"from_ids": []any{"kubernetes-container-logs-abc"},
 							},
 							"type": "filestream",
 						},
@@ -1102,30 +1199,33 @@ func TestGenerateHints(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		// Configure path for modules access
-		abs, _ := filepath.Abs("../../..")
-		require.NoError(t, paths.InitPaths(&paths.Path{
-			Home: abs,
-		}))
+		t.Run(test.msg, func(t *testing.T) {
+			// Configure path for modules access
+			abs, _ := filepath.Abs("../../..")
+			require.NoError(t, paths.InitPaths(&paths.Path{
+				Home: abs,
+			}))
 
-		l, err := NewLogHints(test.config)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		cfgs := l.CreateConfig(test.event)
-		assert.Equal(t, test.len, len(cfgs), test.msg)
-		configs := make([]mapstr.M, 0)
-		for _, cfg := range cfgs {
-			config := mapstr.M{}
-			err := cfg.Unpack(&config)
-			ok := assert.Nil(t, err, test.msg)
-			if !ok {
-				break
+			logger := logptest.NewTestingLogger(t, "")
+			l, err := NewLogHints(test.config, logger)
+			if err != nil {
+				t.Fatal(err)
 			}
-			configs = append(configs, config)
-		}
-		assert.Equal(t, test.result, configs, test.msg)
+
+			cfgs := l.CreateConfig(test.event)
+			assert.Equal(t, test.len, len(cfgs), test.msg)
+			configs := make([]mapstr.M, 0)
+			for _, cfg := range cfgs {
+				config := mapstr.M{}
+				err := cfg.Unpack(&config)
+				ok := assert.Nil(t, err, test.msg)
+				if !ok {
+					break
+				}
+				configs = append(configs, config)
+			}
+			assert.Equal(t, test.result, configs, test.msg)
+		})
 	}
 }
 
@@ -1342,8 +1442,8 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 		require.NoError(t, paths.InitPaths(&paths.Path{
 			Home: abs,
 		}))
-
-		l, err := NewLogHints(cfg)
+		logger := logptest.NewTestingLogger(t, "")
+		l, err := NewLogHints(cfg, logger)
 		if err != nil {
 			t.Fatal(err)
 		}

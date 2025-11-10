@@ -22,7 +22,7 @@ import (
 // the packetbeat executable. It is used to specify which npcap builder crossbuild
 // image to use and the installer to obtain from the cloud store for testing.
 const (
-	NpcapVersion = "1.80"
+	NpcapVersion = "1.83"
 	installer    = "npcap-" + NpcapVersion + "-oem.exe"
 )
 
@@ -84,10 +84,10 @@ func GetNpcapInstallerFn(dir string) func() error {
 		ciBucketName := getBucketName()
 
 		fmt.Printf("getting %s from private cache to %q\n", installer, dstPath) //nolint:forbidigo // fmt.Println is ok here
-		return sh.RunV("gsutil", "cp", "gs://"+ciBucketName+"/private/"+installer, dstPath)
+		return sh.RunV("gcloud", "storage", "cp", "gs://"+ciBucketName+"/private/"+installer, dstPath)
 	}
 }
 
 func getBucketName() string {
-	return "ingest-buildkite-ci"
+	return "golang-crossbuild-ci-internal"
 }

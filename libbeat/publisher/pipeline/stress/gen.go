@@ -62,12 +62,13 @@ func generate(
 	config generateConfig,
 	id int,
 	errors func(err error),
+	logger *logp.Logger,
 ) error {
 	settings := beat.ClientConfig{
 		WaitClose: config.WaitClose,
 	}
 
-	logger := logp.NewLogger("publisher_pipeline_stress_generate")
+	logger = logger.Named("publisher_pipeline_stress_generate")
 	if config.ACK {
 		settings.EventListener = acker.Counting(func(n int) {
 			logger.Infof("Pipeline client (%v) ACKS; %v", id, n)
@@ -77,7 +78,7 @@ func generate(
 	if m := config.PublishMode; m != "" {
 		mode, exists := publishModes[m]
 		if !exists {
-			err := fmt.Errorf("Unknown publish mode '%v'", mode)
+			err := fmt.Errorf("unknown publish mode '%v'", mode)
 			if errors != nil {
 				errors(err)
 			}

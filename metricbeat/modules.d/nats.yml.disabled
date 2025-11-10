@@ -9,6 +9,7 @@
     #- "subscriptions"
     #- "connection"
     #- "route"
+    #- "jetstream"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
@@ -17,3 +18,12 @@
   #subscriptions.metrics_path: "/subsz"
   #connection.metrics_path: "/connz"
   #route.metrics_path: "/routez"
+  #jetstream:
+  #  stats:
+  #    enabled: true
+  #  account:
+  #    enabled: true
+  #  stream:
+  #    enabled: true
+  #  consumer:
+  #    enabled: true

@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 )
 
 type config struct {
@@ -44,7 +45,8 @@ type config struct {
 	RegionName         string               `config:"region"`
 	SQSMaxReceiveCount int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
 	SQSScript          *scriptConfig        `config:"sqs.notification_parsing_script"`
-	SQSWaitTime        time.Duration        `config:"sqs.wait_time"` // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
+	SQSWaitTime        time.Duration        `config:"sqs.wait_time"`           // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
+	SQSGraceTime       time.Duration        `config:"sqs.shutdown_grace_time"` // The time that the processing loop will wait for messages before shutting down.
 	StartTimestamp     string               `config:"start_timestamp"`
 	VisibilityTimeout  time.Duration        `config:"visibility_timeout"`
 }
@@ -56,6 +58,7 @@ func defaultConfig() config {
 		BucketListInterval: 120 * time.Second,
 		BucketListPrefix:   "",
 		SQSWaitTime:        20 * time.Second,
+		SQSGraceTime:       20 * time.Second,
 		SQSMaxReceiveCount: 5,
 		NumberOfWorkers:    5,
 		PathStyle:          false,
@@ -99,6 +102,10 @@ func (c *config) Validate() error {
 	if c.QueueURL != "" && (c.SQSWaitTime <= 0 || c.SQSWaitTime.Seconds() > 20) {
 		return fmt.Errorf("wait_time <%v> must be greater than 0 and "+
 			"less than or equal to 20s", c.SQSWaitTime)
+	}
+
+	if c.QueueURL != "" && c.SQSGraceTime < 0 {
+		return fmt.Errorf("shutdown_grace_time <%v> must not be negative", c.SQSGraceTime)
 	}
 
 	if c.QueueURL != "" && c.APITimeout < c.SQSWaitTime {
@@ -185,7 +192,7 @@ type readerConfig struct {
 	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
 	MaxBytes                 cfgtype.ByteSize        `config:"max_bytes"`
 	Parsers                  parser.Config           `config:",inline"`
-	Decoding                 decoderConfig           `config:"decoding"`
+	Decoding                 decoder.Config          `config:"decoding"`
 }
 
 func (rc *readerConfig) Validate() error {
@@ -302,6 +309,8 @@ func (c config) s3ConfigModifier(o *s3.Options) {
 func (c config) sqsConfigModifier(o *sqs.Options) {
 	if c.AWSConfig.FIPSEnabled {
 		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		// Disable checksum validation temporarily till https://github.com/golang/go/issues/74630#issuecomment-3228203391 is implemented
+		o.DisableMessageChecksumValidation = true
 	}
 	if c.AWSConfig.Endpoint != "" {
 		//nolint:staticcheck // not changing through this PR

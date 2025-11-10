@@ -24,18 +24,18 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestCreateNilCondition(t *testing.T) {
-	cond, err := NewCondition(nil)
+	cond, err := NewCondition(nil, logptest.NewTestingLogger(t, ""))
 	assert.Nil(t, cond)
 	assert.Error(t, err)
 }
 
 func GetCondition(t *testing.T, config Config) Condition {
-	cond, err := NewCondition(&config)
+	cond, err := NewCondition(&config, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 	return cond
 }
@@ -130,15 +130,13 @@ var httpResponseEventIPList = &beat.Event{
 
 func testConfig(t *testing.T, expected bool, event *beat.Event, config *Config) {
 	t.Helper()
-	logp.TestingSetup()
-	cond, err := NewCondition(config)
+	cond, err := NewCondition(config, logptest.NewTestingLogger(t, ""))
 	if assert.NoError(t, err) {
 		assert.Equal(t, expected, cond.Check(event))
 	}
 }
 
 func TestCombinedCondition(t *testing.T) {
-	logp.TestingSetup()
 	config := Config{
 		OR: []Config{
 			{

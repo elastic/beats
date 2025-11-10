@@ -213,6 +213,29 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: password
 
+#------------------------------ AutoOps ES Module ------------------------------
+- module: autoops_es
+  metricsets:
+    - cat_shards
+    - cluster_health
+    - cluster_settings
+    - hot_threads
+    - license
+    - node_stats
+    - tasks_management
+  period: 10s
+  enabled: true
+  hosts: ["http://localhost:9200"]
+
+- module: autoops_es
+  metricsets:
+    - cat_template
+    - component_template
+    - index_template
+  period: 1d
+  enabled: true
+  hosts: ["http://localhost:9200"]
+
 #--------------------------------- AWS Module ---------------------------------
 - module: aws
   period: 300s
@@ -576,15 +599,6 @@ metricbeat.modules:
   #xpack.enabled: false
   #scope: node
 
-#-------------------------- Enterprise Search Module --------------------------
-- module: enterprisesearch
-  metricsets: ["health", "stats"]
-  enabled: true
-  period: 10s
-  hosts: ["http://localhost:3002"]
-  #username: "user"
-  #password: "secret"
-
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   metricsets: ["server"]
@@ -606,13 +620,14 @@ metricbeat.modules:
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
+  metadata_cache: true
+  metadata_cache_refresh_period: 1h
 
 - module: gcp
   metricsets:
     - pubsub
     - loadbalancing
     - firestore
-    - dataproc
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -671,6 +686,28 @@ metricbeat.modules:
   endpoint: http://your-endpoint
   dataset_id: "dataset id"
   table_pattern: "table pattern"
+
+- module: gcp
+  metricsets:
+    - dataproc
+  zone: "us-central1-a"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+  collect_dataproc_user_labels: true
+
+- module: gcp
+  metricsets:
+    - vertexai_logs
+  period: 300s  # 5 minutes
+  project_id: "your-project-id"
+  table_id: "your-project-id.dataset.id.table_name"
+  credentials_file_path: "/path/to/service-account.json"
+  # credentials_json: '{"type": "service_account", ...}'
+  time_lookback_hours: 1  # How many hours back to look for initial data fetch
+
+
 
 #-------------------------------- Golang Module --------------------------------
 - module: golang
@@ -996,6 +1033,7 @@ metricbeat.modules:
     - state_persistentvolume
     - state_persistentvolumeclaim
     - state_storageclass
+    # - state_horizontalpodautoscaler
     # Uncomment this to get k8s events:
     #- event  period: 10s
   hosts: ["kube-state-metrics:8080"]
@@ -1150,7 +1188,7 @@ metricbeat.modules:
 
 #----------------------------- Cisco Meraki Module -----------------------------
 - module: meraki
-  metricsets: ["device_health"]
+  metricsets: ["device_health", "network_health"]
   enabled: true
   period: 300s
   apiKey: "Meraki dashboard API key"
@@ -1159,7 +1197,7 @@ metricbeat.modules:
 #------------------------------- MongoDB Module -------------------------------
 - module: mongodb
   metricsets: ["dbstats", "status", "collstats", "metrics", "replstatus"]
-  period: 10s
+  period: 60s
   enabled: true
 
   # The hosts must be passed as MongoDB URLs in the format:
@@ -1263,6 +1301,7 @@ metricbeat.modules:
     - "subscriptions"
     #- "connection"
     #- "route"
+    #- "jetstream"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
@@ -1271,6 +1310,24 @@ metricbeat.modules:
   #subscriptions.metrics_path: "/subsz"
   #connection.metrics_path: "/connz"
   #route.metrics_path: "/routez"
+  #jetstream:
+  #  stats:
+  #    enabled: true
+  #  account:
+  #    enabled: true
+  #    names:
+  #      - default
+  #  stream:
+  #    enabled: true
+  #    names:
+  #      - my-stream-1
+  #      - another-stream
+  #  consumer:
+  #    enabled: true
+  #    names:
+  #      - my-stream-1-consumer-1
+  #      - my-stream-1-consumer-2
+  #      - another-stream-consumer-1
 
 #-------------------------------- Nginx Module --------------------------------
 - module: nginx
@@ -1622,11 +1679,28 @@ metricbeat.modules:
   metricsets:
     - query
   period: 10s
-  hosts: ["user=myuser password=mypassword dbname=mydb sslmode=disable"]
+  hosts: ["postgres://postgres:mysecretpassword@localhost:5432"]
+  # Example of using SSL parameters manually in the Postgres connection string (with ssl.* parameters unset). The Postgres SSL parameters "sslmode", "sslcert", "sslkey", and "sslrootcert" are passed in the connection string with slashes "/" being url-encoded to "%2F"
+  # hosts: ["postgres://postgres:mysecretpassword@localhost:5432?sslmode=verify-full&sslcert=%2Fpath%2Fto%2Fcert.pem&sslkey=%2Fpath%2Fto%2Fkey.pem&sslrootcert=%2Fpath%2Fto%2Fca.pem"]
+  # Example for SQL server
+  # hosts: ["sqlserver://myuser:mypassword@localhost:1433?TrustServerCertificate=false&certificate=%2Fpath%2Fto%2Fca.pem&database=mydb&encrypt=true"]
+
 
   driver: "postgres"
   sql_query: "select now()"
   sql_response_format: table
+
+  # List of root certificates for SSL/TLS server verification
+  # ssl.certificate_authorities: ["/path/to/ca.pem"]
+
+  # Certificate for SSL/TLS client authentication
+  # ssl.certificate: "/path/to/client-cert.pem"
+
+  # Client certificate key file
+  # ssl.key: "/path/to/client-key.pem"
+
+  # Controls the verification of server certificate
+  # ssl.verification_mode: full
 
 #--------------------------------- Stan Module ---------------------------------
 - module: stan
@@ -1724,24 +1798,28 @@ metricbeat.modules:
 
 - module: windows
   metricsets: ["wmi"]
-  period: 60s
+  period: 10m
   wmi:
-    include_null: false          # Exclude fields with null values from the output
-    include_queries: false       # Do not include the query string in the output
-    include_empty_string: false  # Exclude fields with empty string values from the output
-    warning_threshold: 30s       # Maximum time to wait for a query result before logging a warning (defaults to period)
+    # Do not include the query string in the output
+    include_queries: false
+    # Exclude properties with null values from the output
+    include_null_properties: false
+    # Exclude properties with empty string values from the output
+    include_empty_string_properties: false
+    # Maximum time to wait for a query result before logging a warning (defaults to period)
+    warning_threshold: 10m
     # Default WMI namespace for all queries (if not specified per query)
     # Uncomment to override the default, which is "root\\cimv2".
     # namespace: "root\\cimv2"
     queries:
-    - class: Win32_OperatingSystem # FROM: Class to fetch
-      fields:                      # SELECT: Fields to retrieve for this WMI class. Omit the setting to fetch all properties
+    - class: Win32_OperatingSystem          # FROM: Class to fetch
+      properties:                           # SELECT: Fields to retrieve for this WMI class. Omit the setting to fetch all properties
        - FreePhysicalMemory
        - FreeSpaceInPagingFiles
        - FreeVirtualMemory
        - LocalDateTime
        - NumberOfUsers
-      where: ""                   # Optional WHERE clause to filter query results
+      where: ""                             # Optional WHERE clause to filter query results
       # Override the WMI namespace for this specific query (optional).
       # If set, this takes precedence over the default namespace above.
       # namespace: "root\\cimv2" # Overrides the metric

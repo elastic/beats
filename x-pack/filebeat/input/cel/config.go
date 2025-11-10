@@ -17,12 +17,17 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/mito/lib"
 )
 
 const defaultMaxExecutions = 1000
 
 // config is the top-level configuration for a cel input.
 type config struct {
+	// DataStream holds the data_stream.dataset name if it
+	// was available on configuration.
+	DataStream string
+
 	// Interval is the period interval between runs of the input.
 	Interval time.Duration `config:"interval" validate:"required"`
 
@@ -90,14 +95,6 @@ func (t *dumpConfig) enabled() bool {
 }
 
 func (c config) Validate() error {
-	if c.RecordCoverage {
-		logp.L().Named("input.cel").Warn("execution coverage enabled: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-record-coverage")
-	}
-	if c.Redact == nil {
-		logp.L().Named("input.cel").Warn("missing recommended 'redact' configuration: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-state-redact")
-	}
 	if c.Interval <= 0 {
 		return errors.New("interval must be greater than 0")
 	}
@@ -114,7 +111,7 @@ func (c config) Validate() error {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
 	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
-	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil, wantDump, false)
+	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, lib.HTTPOptions{}, patterns, c.XSDs, logp.NewNopLogger(), nil, wantDump, false)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
@@ -233,10 +230,12 @@ func (c keepAlive) settings() httpcommon.WithKeepaliveSettings {
 
 type ResourceConfig struct {
 	URL                    *urlConfig       `config:"url" validate:"required"`
+	Headers                http.Header      `config:"headers"`
 	Retry                  retryConfig      `config:"retry"`
 	RedirectForwardHeaders bool             `config:"redirect.forward_headers"`
 	RedirectHeadersBanList []string         `config:"redirect.headers_ban_list"`
 	RedirectMaxRedirects   int              `config:"redirect.max_redirects"`
+	MaxBodySize            int64            `config:"max_body_size"`
 	RateLimit              *rateLimitConfig `config:"rate_limit"`
 	KeepAlive              keepAlive        `config:"keep_alive"`
 

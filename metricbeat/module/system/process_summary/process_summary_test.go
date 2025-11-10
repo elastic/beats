@@ -28,7 +28,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -43,7 +42,6 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	logp.DevelopmentSetup()
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
@@ -60,7 +58,6 @@ func TestFetch(t *testing.T) {
 
 }
 func TestFetchDegradeOnPartial(t *testing.T) {
-	logp.DevelopmentSetup()
 	config := getConfig()
 	config["degrade_on_partial"] = true
 
@@ -82,7 +79,6 @@ func TestFetchDegradeOnPartial(t *testing.T) {
 }
 
 func TestStateNames(t *testing.T) {
-	logp.DevelopmentSetup()
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 

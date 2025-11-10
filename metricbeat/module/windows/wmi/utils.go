@@ -24,52 +24,165 @@ import (
 	"fmt"
 	"strconv"
 	"time"
-	"unicode"
 
+	"github.com/cespare/xxhash/v2"
 	"github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
 	base "github.com/microsoft/wmi/go/wmi"
 	wmi "github.com/microsoft/wmi/pkg/wmiinstance"
+
+	"github.com/elastic/go-freelru"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Utilities related to Type conversion
 
-// WmiStringConversionFunction defines a function type for converting string values
-// into other data types, such as integers or timestamps.
-type WmiStringConversionFunction func(string) (interface{}, error)
+// Function that convert single strings
+type internalWmiConversionFunction[T any] func(string) (T, error)
 
-func ConvertUint64(v string) (interface{}, error) {
+func internalConvertUint64(v string) (uint64, error) {
 	return strconv.ParseUint(v, 10, 64)
 }
 
-func ConvertSint64(v string) (interface{}, error) {
+func internalConvertSint64(v string) (int64, error) {
 	return strconv.ParseInt(v, 10, 64)
 }
 
-func ConvertDatetime(v string) (interface{}, error) {
-	layout := "20060102150405.999999-0700"
-	return time.Parse(layout, v+"0")
+const WMI_DATETIME_LAYOUT string = "20060102150405.999999"
+const TIMEZONE_LAYOUT string = "-07:00"
+
+// The CIMDateFormat is defined as "yyyymmddHHMMSS.mmmmmmsUUU".
+// Example: "20231224093045.123456+000"
+// More information: https://learn.microsoft.com/en-us/windows/win32/wmisdk/cim-datetime
+//
+// The "yyyyMMddHHmmSS.mmmmmm" part can be parsed using time.Parse, but Go's time package does not support parsing the "sUUU"
+// part (the sign and minute offset from UTC).
+//
+// Here, "s" represents the sign (+ or -), and "UUU" represents the UTC offset in minutes.
+//
+// The approach for handling this is:
+// 1. Extract the sign ('+' or '-') from the string.
+// 2. Normalize the offset from minutes to the standard `hh:mm` format.
+// 3. Concatenate the "yyyyMMddHHmmSS.mmmmmm" part with the normalized offset.
+// 4. Parse the combined string using time.Parse to return a time.Date object.
+func internalConvertDateTime(v string) (time.Time, error) {
+
+	if len(v) != 25 {
+		return time.Time{}, fmt.Errorf("datetime is invalid: the datetime is expected to be exactly 25 characters long, got: %s", v)
+	}
+
+	// Extract the sign (either '+' or '-')
+	utcOffsetSign := v[21]
+	if utcOffsetSign != '+' && utcOffsetSign != '-' {
+		return time.Time{}, fmt.Errorf("datetime is invalid: the offset sign is expected to be either + or -")
+	}
+
+	// Extract UTC offset (last 3 characters)
+	utcOffsetStr := v[22:]
+	utcOffset, err := strconv.ParseInt(utcOffsetStr, 10, 16)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("datetime is invalid: error parsing UTC offset: %w", err)
+	}
+	offsetHours := utcOffset / 60
+	offsetMinutes := utcOffset % 60
+
+	// Build the complete date string including the UTC offset in the format yyyyMMddHHmmss.mmmmmm+hh:mm
+	// Concatenate the date string with the offset formatted as "+hh:mm"
+	dateString := fmt.Sprintf("%s%c%02d:%02d", v[:21], utcOffsetSign, offsetHours, offsetMinutes)
+
+	// Parse the combined datetime string using the defined layout
+	date, err := time.Parse(WMI_DATETIME_LAYOUT+TIMEZONE_LAYOUT, dateString)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("datetime is invalid: error parsing the final datetime: %w", err)
+	}
+
+	return date, err
 }
 
-func ConvertString(v string) (interface{}, error) {
+// Type conversion that applies to both arrays and scalars
+type WmiConversionFunction func(interface{}) (interface{}, error)
+
+// General-purpose function that invokes the internal WMI conversion on
+// both strings and arrays to avoid code duplication.
+func GenericWmiConversionFunction[T any](v interface{}, convert internalWmiConversionFunction[T]) (interface{}, error) {
+	if v == nil {
+		return nil, nil
+	}
+	switch value := v.(type) {
+	case string:
+		return convert(value)
+	case []interface{}:
+		results := make([]T, 0, len(value))
+		for i, raw := range value {
+			str, ok := raw.(string)
+			if !ok {
+				return nil, fmt.Errorf("expected array of strings, got %v at index %d", raw, i)
+			}
+			result, err := convert(str)
+			if err != nil {
+				return nil, fmt.Errorf("invalid string at index %d: %w", i, err)
+			}
+			results = append(results, result)
+		}
+		return results, nil
+	default:
+		return nil, fmt.Errorf("expected string or an array of strings, got %T", v)
+	}
+}
+
+func ConvertUint64(v interface{}) (interface{}, error) {
+	return GenericWmiConversionFunction[uint64](v, internalConvertUint64)
+}
+
+func ConvertSint64(v interface{}) (interface{}, error) {
+	return GenericWmiConversionFunction[int64](v, internalConvertSint64)
+}
+
+func ConvertDatetime(v interface{}) (interface{}, error) {
+	return GenericWmiConversionFunction[time.Time](v, internalConvertDateTime)
+}
+
+func ConvertIdentity(v interface{}) (interface{}, error) {
 	return v, nil
 }
 
-// Function that determines if a given value requires additional conversion
-// This holds true for strings that encode uint64, sint64 and datetime format
-func RequiresExtraConversion(fieldValue interface{}) bool {
-	stringValue, isString := fieldValue.(string)
-	if !isString {
-		return false
+// Function that returns a WmiConversionFunction that reports an error
+// independently of the input value.
+func getInvalidConversion(err error) WmiConversionFunction {
+	return func(v interface{}) (interface{}, error) {
+		return nil, err
 	}
-	isEmptyString := len(stringValue) == 0
+}
 
-	// Heuristic to avoid fetching the raw properties for every string property
-	//   If the string is empty, no need to convert the string
-	//   If the string does not end with a digit, it's not an uint64, sint64, datetime
-	return !isEmptyString && unicode.IsDigit(rune(stringValue[len(stringValue)-1]))
+// Hash Function used for the LRU impementation
+func getConverterCacheKey(class string, property string) uint32 {
+	// Code taken from the freelru main: https://github.com/elastic/go-freelru/tree/main
+	//nolint:gosec // G115: Intentional truncation of uint64 hash to uint32 using modulo for LRU key.
+	return uint32(xxhash.Sum64String(class + ":" + property))
+}
+
+type WMISchema struct {
+	subClassSchemas *freelru.LRU[uint32, WmiConversionFunction]
+}
+
+func (ws WMISchema) Get(class string, property string) (WmiConversionFunction, bool) {
+	return ws.subClassSchemas.Get(getConverterCacheKey(class, property))
+}
+
+func (ws *WMISchema) Add(class string, property string, wcf WmiConversionFunction) {
+	ws.subClassSchemas.Add(getConverterCacheKey(class, property), wcf)
+}
+
+func NewWMISchema(size uint32) (*WMISchema, error) {
+	flu, err := freelru.New[uint32, WmiConversionFunction](size, func(k uint32) uint32 { return k })
+	if err != nil {
+		return nil, err
+	}
+
+	return &WMISchema{
+		subClassSchemas: flu,
+	}, nil
 }
 
 // Given a Property it returns its CIM Type Qualifier
@@ -82,14 +195,19 @@ func getPropertyType(property *ole.IDispatch) (base.WmiType, error) {
 		return base.WmiType(0), err
 	}
 
-	return base.WmiType(value.(int32)), nil
+	v, ok := value.(int32)
+	if !ok {
+		return 0, fmt.Errorf("type assertion to int32 failed")
+	}
+
+	return base.WmiType(v), nil
 }
 
-// Returns the "raw" SWbemProperty containing type information for a given field.
+// Returns the "raw" SWbemProperty containing type information for a given property.
 //
 // The microsoft/wmi library does not have a function that given an instance and a property name
 // returns the wmi.wmiProperty object. This function mimics the behavior of the `GetSystemProperty`
-// method in the wmi.wmiInstance struct and applies it on the Properties_ field
+// method in the wmi.wmiInstance struct and applies it on the Properties_ property
 // https://github.com/microsoft/wmi/blob/v0.25.2/pkg/wmiinstance/WmiInstance.go#L87
 //
 // Note: We are not instantiating a wmi.wmiProperty because of this issue
@@ -109,7 +227,7 @@ func getProperty(instance *wmi.WmiInstance, propertyName string, logger *logp.Lo
 	sWbemObjectExAsIDispatch := rawResult.ToIDispatch()
 	defer func() {
 		if cerr := rawResult.Clear(); cerr != nil {
-			logger.Debugf("failed to release connection: %w", err)
+			logger.Debugf("failed to release connection: %v", err)
 		}
 	}()
 
@@ -123,7 +241,7 @@ func getProperty(instance *wmi.WmiInstance, propertyName string, logger *logp.Lo
 }
 
 // Given an instance and a property Name, it returns the appropriate conversion function
-func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *logp.Logger) (WmiStringConversionFunction, error) {
+func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *logp.Logger) (WmiConversionFunction, error) {
 	rawProperty, err := getProperty(instance, propertyName, logger)
 	if err != nil {
 		return nil, err
@@ -133,7 +251,7 @@ func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *
 		return nil, fmt.Errorf("could not fetch CIMType for property '%s' with error %w", propertyName, err)
 	}
 
-	var f WmiStringConversionFunction
+	var f WmiConversionFunction
 
 	switch propType {
 	case base.WbemCimtypeDatetime:
@@ -142,9 +260,19 @@ func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *
 		f = ConvertUint64
 	case base.WbemCimtypeSint64:
 		f = ConvertSint64
+	case base.WbemCimtypeObject:
+		// NOTE: The WMI CIM type 'object' is intentionally not supported here.
+		//
+		// Supporting embedded object types would require complex COM marshaling,
+		// and without further processing can cause go panic during (JSON) marshalling
+		//
+		// If you have a real-world need for this, please open a GitHub issue to discuss.
+		f = getInvalidConversion(fmt.Errorf("the Type %s is unsupported. Consider flattening your class", "CIM Type Object"))
+
 	default: // For all other types we return the identity function
-		f = ConvertString
+		f = ConvertIdentity
 	}
+
 	return f, err
 }
 
@@ -185,7 +313,7 @@ func ExecuteGuardedQueryInstances(session WmiQueryInterface, query string, timeo
 			} else {
 				tailMessage = fmt.Sprintf("with an error %v", err)
 			}
-			logger.Warn("%s %s", baseMessage, tailMessage)
+			logger.Warnf("%s %s", baseMessage, tailMessage)
 		}
 	}()
 
@@ -198,4 +326,66 @@ func ExecuteGuardedQueryInstances(session WmiQueryInterface, query string, timeo
 		// Query completed in time either successfully or with an error
 	}
 	return rows, err
+}
+
+func errorOnClassDoesNotExist(rows []*wmi.WmiInstance, class string, namespace string) error {
+	switch len(rows) {
+	case 0:
+		return fmt.Errorf("class '%s' not found in namespace '%s'", class, namespace)
+	case 1:
+		return nil
+	default:
+		return fmt.Errorf("unexpected case: Metaclass should return only a single entry for the class %s", class)
+	}
+}
+
+// Given an instance a list of desired properties, it returns two arrays:
+//
+// Valid Properties: the list of properties that it's both desired and in the class
+// Invalid properties the list of properties that are desired but are not part of the class
+func filterValidProperties(instance_properties []string, properties []string) ([]string, []string) {
+	if len(properties) == 0 {
+		return instance_properties, []string{}
+	}
+
+	// Create the map for membership checks
+	set := make(map[string]struct{})
+	for _, item := range instance_properties {
+		set[item] = struct{}{} // struct{} takes 0 bytes
+	}
+
+	validProperties := []string{}
+	invalidProperties := []string{}
+	for _, p := range properties {
+		if _, exists := set[p]; exists {
+			validProperties = append(validProperties, p)
+		} else {
+			invalidProperties = append(invalidProperties, p)
+		}
+	}
+	return validProperties, invalidProperties
+}
+
+func validateQueryFields(instance *wmi.WmiInstance, queryConfig *QueryConfig, logger *logp.Logger) error {
+
+	// We are using '*', so we don't modify the queryConfig
+	if len(queryConfig.Properties) == 0 {
+		return nil
+	}
+
+	// Valid Properties contains the properties that are both contained in the
+	// user-provided lists and in the properties of the class
+	validProperties, invalidProperties := filterValidProperties(instance.GetClass().GetPropertiesNames(), queryConfig.Properties)
+
+	if len(validProperties) == 0 {
+		return fmt.Errorf("all the properties listed are invalid %v. We are skipping the query", invalidProperties)
+	}
+
+	if len(invalidProperties) > 0 {
+		logger.Warnf("We are going to ignore the properties '%v' because '%s' class in namespace '%s' does not contain those properties. Please amend your configuration or check why it's the case", invalidProperties, queryConfig.Class, queryConfig.Namespace)
+	}
+
+	queryConfig.Properties = validProperties
+
+	return nil
 }

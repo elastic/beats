@@ -9,7 +9,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -34,8 +33,8 @@ type states struct {
 }
 
 // newStates generates a new states registry.
-func newStates(log *logp.Logger, stateStore beater.StateStore, listPrefix string) (*states, error) {
-	store, err := stateStore.Access("")
+func newStates(log *logp.Logger, stateStore statestore.States, listPrefix string) (*states, error) {
+	store, err := stateStore.StoreFor("")
 	if err != nil {
 		return nil, fmt.Errorf("can't access persistent store: %w", err)
 	}

@@ -1,4 +1,3 @@
-version: '2.3'
 services:
   # This is a proxy used to block beats until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
@@ -19,6 +18,16 @@ services:
       interval: 1s
     ports:
       - 9200:9200
+
+  googlepubsub:
+    image: docker.elastic.co/integrations-ci/beats-googlepubsub:emulator-${SDK_VERSION:-467.0.0-0}-1
+    build:
+      context: ${ES_BEATS}/testing/environments/docker/googlepubsub
+      args:
+        SDK_VERSION: ${SDK_VERSION:-467.0.0-0}
+    hostname: googlepubsub
+    ports:
+      - 8432:8432
 
   cometd:
     build: ${ES_BEATS}/testing/environments/docker/cometd

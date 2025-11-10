@@ -1,0 +1,92 @@
+[
+    {
+        "n" : ".monitoring-es",
+        "t" : "[.monitoring-es-7-*]",
+        "c" : ""
+    },
+    {
+        "n" : ".monitoring-beats",
+        "t" : "[.monitoring-beats-7-*]",
+        "c" : ""
+    },
+    {
+        "n" : ".monitoring-logstash",
+        "t" : "[.monitoring-logstash-7-*]",
+        "c" : ""
+    },
+    {
+        "n" : ".monitoring-kibana",
+        "t" : "[.monitoring-kibana-7-*]",
+        "c" : ""
+    },
+    {
+        "n" : ".monitoring-alerts-7",
+        "t" : "[.monitoring-alerts-7]",
+        "c" : ""
+    },
+    {
+        "n" : "customer-template",
+        "t" : "[my-indexes-*, my-indexes2-*]",
+        "c" : ""
+    },
+    {
+        "n" : ".ml-state",
+        "t" : "[.ml-state*]",
+        "c" : "[]"
+    },
+    {
+        "n" : "ilm-history",
+        "t" : "[ilm-history-5*]",
+        "c" : "[]"
+    },
+    {
+        "n" : ".kibana-event-log-7.17.0-template",
+        "t" : "[.kibana-event-log-7.17.0-*]",
+        "c" : "[]"
+    },
+    {
+        "n" : ".slm-history",
+        "t" : "[.slm-history-5*]",
+        "c" : "[]"
+    },
+    {
+        "n" : "synthetics",
+        "t" : "[synthetics-*-*]",
+        "c" : "[synthetics-mappings, data-streams-mappings, synthetics-settings]"
+    },
+    {
+        "n" : ".ml-anomalies-",
+        "t" : "[.ml-anomalies-*]",
+        "c" : "[]"
+    },
+    {
+        "n" : "metrics",
+        "t" : "[metrics-*-*]",
+        "c" : "[metrics-mappings, data-streams-mappings, metrics-settings]"
+    },
+    {
+        "n" : ".ml-notifications-000002",
+        "t" : "[.ml-notifications-000002]",
+        "c" : "[]"
+    },
+    {
+        "n" : ".deprecation-indexing-template",
+        "t" : "[.logs-deprecation.*]",
+        "c" : "[.deprecation-indexing-mappings, .deprecation-indexing-settings]"
+    },
+    {
+        "n" : ".watch-history-13",
+        "t" : "[.watcher-history-13*]",
+        "c" : "[]"
+    },
+    {
+        "n" : "logs",
+        "t" : "[logs-*-*]",
+        "c" : "[logs-mappings, data-streams-mappings, logs-settings]"
+    },
+    {
+        "n" : ".ml-stats",
+        "t" : "[.ml-stats-*]",
+        "c" : "[]"
+    }
+]

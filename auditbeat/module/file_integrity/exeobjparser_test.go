@@ -28,6 +28,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -52,6 +53,8 @@ func TestExeObjParser(t *testing.T) {
 						t.Skip("skipping test because target binary was not found: see https://github.com/elastic/beats/issues/38211")
 					}
 				}
+
+				testutils.SkipIfFIPSOnly(t, "file parser uses MD5.")
 
 				got := make(mapstr.M)
 				err := exeObjParser(nil).Parse(got, target)

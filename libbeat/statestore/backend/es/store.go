@@ -296,7 +296,7 @@ func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error 
 }
 
 func (s *store) configure(ctx context.Context, c *conf.C) {
-	s.log.Debugf("Configure ES store")
+	s.log.Info("Configuring ES store")
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
@@ -306,7 +306,7 @@ func (s *store) configure(ctx context.Context, c *conf.C) {
 	}
 	s.cliErr = nil
 
-	cli, err := eslegclient.NewConnectedClient(ctx, c, s.name)
+	cli, err := eslegclient.NewConnectedClient(ctx, c, s.name, s.log)
 	if err != nil {
 		s.log.Errorf("ES store, failed to create elasticsearch client: %v", err)
 		s.cliErr = err

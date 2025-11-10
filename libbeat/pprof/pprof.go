@@ -18,11 +18,10 @@
 package pprof
 
 import (
+	"errors"
 	"net/http"
 	"net/http/pprof"
 	"runtime"
-
-	"go.uber.org/multierr"
 )
 
 type handlerAttacher interface {
@@ -65,8 +64,8 @@ func HttpAttach(cfg *Config, mux handlerAttacher) error {
 	}
 
 	const path = "/debug/pprof"
-	return multierr.Combine(
-		mux.AttachHandler(path+"/", http.HandlerFunc(pprof.Index)),
+	return errors.Join(
+		mux.AttachHandler(path+"/{$}", http.HandlerFunc(pprof.Index)),
 		mux.AttachHandler(path+"/allocs", http.HandlerFunc(pprof.Index)),
 		mux.AttachHandler(path+"/block", http.HandlerFunc(pprof.Index)),
 		mux.AttachHandler(path+"/goroutine", http.HandlerFunc(pprof.Index)),

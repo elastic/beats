@@ -6,12 +6,12 @@ package elb
 
 import (
 	"context"
+	"errors"
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
-	"go.uber.org/multierr"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -55,12 +55,13 @@ func (amf *apiMultiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 		}
 	}
 
-	return results, multierr.Combine(errs...)
+	return results, errors.Join(errs...)
 }
 
 // apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
 type apiFetcher struct {
 	client autodiscoverElbClient
+	logger *logp.Logger
 }
 
 type autodiscoverElbClient interface {
@@ -68,11 +69,12 @@ type autodiscoverElbClient interface {
 	elasticloadbalancingv2.DescribeLoadBalancersAPIClient
 }
 
-func newAPIFetcher(clients []autodiscoverElbClient) fetcher {
+func newAPIFetcher(clients []autodiscoverElbClient, logger *logp.Logger) fetcher {
 	fetchers := make([]fetcher, len(clients))
 	for idx, client := range clients {
 		fetchers[idx] = &apiFetcher{
 			client: client,
+			logger: logger,
 		}
 	}
 	return &apiMultiFetcher{fetchers}
@@ -94,7 +96,7 @@ func (f *apiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 		taskPool: sync.Pool{},
 		context:  ctx,
 		cancel:   cancel,
-		logger:   logp.NewLogger("autodiscover-elb-fetch"),
+		logger:   f.logger.Named("autodiscover-elb-fetch"),
 	}
 
 	// Limit concurrency against the AWS API by creating a pool of objects
@@ -134,7 +136,7 @@ func (p *fetchRequest) fetch() ([]*lbListener, error) {
 
 	// Since everything is async we have to retrieve any errors that occurred from here
 	if len(p.errs) > 0 {
-		return nil, multierr.Combine(p.errs...)
+		return nil, errors.Join(p.errs...)
 	}
 
 	return p.lbListeners, nil

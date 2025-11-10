@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -189,7 +190,8 @@ func TestProcessorRun(t *testing.T) {
 		},
 	}
 
-	dec, err := newDecodeCEF(defaultConfig())
+	logger := logp.NewNopLogger()
+	dec, err := newDecodeCEF(defaultConfig(), logger)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -198,7 +200,7 @@ func TestProcessorRun(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			dec := dec
 			if tc.config != nil {
-				dec, err = newDecodeCEF(tc.config())
+				dec, err = newDecodeCEF(tc.config(), logger)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -279,7 +281,7 @@ func readCEFSamples(t testing.TB, source string) []mapstr.M {
 
 	conf := defaultConfig()
 	conf.Field = "event.original"
-	dec, err := newDecodeCEF(conf)
+	dec, err := newDecodeCEF(conf, logp.NewNopLogger())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -379,7 +381,7 @@ func assertEqual(t testing.TB, expected, actual interface{}) bool {
 }
 
 func BenchmarkProcessorRun(b *testing.B) {
-	dec, err := newDecodeCEF(defaultConfig())
+	dec, err := newDecodeCEF(defaultConfig(), logp.NewNopLogger())
 	if err != nil {
 		b.Fatal(err)
 	}

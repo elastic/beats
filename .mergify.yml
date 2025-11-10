@@ -1,8 +1,23 @@
+commands_restrictions:
+  backport:
+    conditions:
+      - or:
+        - sender-permission>=write
+        - sender=github-actions[bot]
 queue_rules:
   - name: default
     merge_method: squash
     conditions:
       - check-success=buildkite/beats
+      - check-success=CLA
+defaults:
+  actions:
+    backport:
+      title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+      assignees:
+        - "{{ author }}"
+      labels:
+        - "backport"
 pull_request_rules:
   - name: self-assign PRs
     conditions:
@@ -19,19 +34,14 @@ pull_request_rules:
       - label=forwardport-main
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "main"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: ask to resolve conflict
     conditions:
       - -merged
       - -closed
       - conflict
-      - -author=apmmachine
+      - -author=github-actions[bot]
     actions:
         comment:
           message: |
@@ -48,7 +58,7 @@ pull_request_rules:
       - -merged
       - -closed
       - conflict
-      - author=apmmachine
+      - author=github-actions[bot]
       - label=automation
     actions:
       close:
@@ -57,7 +67,7 @@ pull_request_rules:
           There are some other up-to-date pull requests.
   - name: automatic approval for automated pull requests with bump updates
     conditions:
-      - author=apmmachine
+      - author=github-actions[bot]
       - check-success=buildkite/beats
       - label=automation
       - files~=^testing/environments/snapshot.*\.yml$
@@ -81,7 +91,7 @@ pull_request_rules:
         - closed
       - and:
         - label=automation
-        - head~=^updatecli_bump-elastic-stack
+        - head~=^updatecli_
         - files~=^testing/environments/snapshot.*\.yml$
     actions:
       delete_head_branch:
@@ -92,7 +102,7 @@ pull_request_rules:
         - closed
       - and:
         - label=automation
-        - head~=^updatecli_bump-golang-version
+        - head~=^updatecli_
         - files~=^\.go-version$
     actions:
       delete_head_branch:
@@ -110,20 +120,29 @@ pull_request_rules:
   - name: automatic squash and merge with success checks and the files matching the regex ^.mergify.yml is modified.
     conditions:
       - check-success=buildkite/beats
-      - label=automation
+      - author=elastic-vault-github-plugin-prod[bot]
       - files~=^\.mergify\.yml$
       - head~=^add-backport-next.*
       - "#approved-reviews-by>=1"
     actions:
       queue:
         name: default
+  - name: delete upstream branch for mergify backports
+    conditions:
+      - or:
+        - merged
+        - closed
+      - and:
+        - head~=^mergify/bp/.*
+    actions:
+      delete_head_branch:
   - name: delete upstream branch with changes on ^.mergify.yml that has been merged or closed
     conditions:
       - or:
         - merged
         - closed
       - and:
-        - label=automation
+        - author=elastic-vault-github-plugin-prod[bot]
         - head~=^add-backport-next.*
         - files~=^\.mergify\.yml$
     actions:
@@ -168,298 +187,177 @@ pull_request_rules:
       - label~=^(backport-v7.17.0|backport-7.17)$
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "7.17"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.3 branch
     conditions:
       - merged
       - label=backport-v8.3.0
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.3"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.4 branch
     conditions:
       - merged
       - label=backport-v8.4.0
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.4"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.5 branch
     conditions:
       - merged
       - label=backport-v8.5.0
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.5"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.6 branch
     conditions:
       - merged
       - label=backport-v8.6.0
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.6"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.7 branch
     conditions:
       - merged
       - label=backport-v8.7.0
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.7"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.8 branch
     conditions:
       - merged
       - label=backport-v8.8.0
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.8"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.9 branch
     conditions:
       - merged
       - label=backport-v8.9.0
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.9"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.10 branch
     conditions:
       - merged
       - label=backport-v8.10.0
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.10"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.11 branch
     conditions:
       - merged
       - label=backport-v8.11.0
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.11"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.12 branch
     conditions:
       - merged
       - label=backport-v8.12.0
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.12"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.13 branch
     conditions:
       - merged
       - label=backport-v8.13.0
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.13"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.14 branch
     conditions:
       - merged
       - label=backport-v8.14.0
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.14"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.15 branch
     conditions:
       - merged
       - label~=^(backport-v8.15.0|backport-8.15)$
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.15"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.16 branch
     conditions:
       - merged
       - label~=^(backport-v8.16.0|backport-8.16)$
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.16"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
-  - name: backport patches to 8.x branch
-    conditions:
-      - merged
-      - label~=^(backport-v8.x|backport-8.x)$
-    actions:
-      backport:
-        assignees:
-          - "{{ author }}"
-        branches:
-          - "8.x"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.17 branch
     conditions:
       - merged
       - label=backport-8.17
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.17"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.18 branch
     conditions:
       - merged
       - label=backport-8.18
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "8.18"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.19 branch
+    conditions:
+      - merged
+      - label=backport-8.19
+    actions:
+      backport:
+        branches:
+          - "8.19"
   - name: backport patches to 9.0 branch
     conditions:
       - merged
       - label=backport-9.0
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
         branches:
           - "9.0"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 9.1 branch
+    conditions:
+      - merged
+      - label=backport-9.1
+    actions:
+      backport:
+        branches:
+          - "9.1"
 
-  - name: backport patches to all active minor branches for the 8 major.
+  - name: forwardport docs changes to main
     conditions:
       - merged
-      - label=backport-active-8
+      - label=docs
+      - files~=^docs/
+      - base~=^\d+\.
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
-        # NOTE: this list needs to be changed when a new minor branch is created
-        #       or an existing minor branch reached EOL.
         branches:
-          - "8.x"
-          - "8.18"
-          - "8.17"
-          - "8.16"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
-  - name: backport patches to all active minor branches for the 9 major.
+          - main
+        title: "[{{ destination_branch }}](forwardport #{{ number }}) {{ title }}"
+  - name: backport patches to 9.2 branch
     conditions:
       - merged
-      - label=backport-active-9
+      - label=backport-9.2
     actions:
       backport:
-        assignees:
-          - "{{ author }}"
-        # NOTE: this list needs to be changed when a new minor branch is created
-        #       or an existing minor branch reached EOL.
         branches:
-          - "9.0"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
-  - name: backport patches to all active branches
-    conditions:
-      - merged
-      - label=backport-active-all
-    actions:
-      backport:
-        assignees:
-          - "{{ author }}"
-        # NOTE: this list needs to be changed when a new minor branch is created
-        #       or an existing release branch reached EOL.
-        branches:
-          - "9.0"
-          - "8.18"
-          - "8.17"
-          - "8.16"
-          - "8.x"
-          - "7.17"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+          - "9.2"

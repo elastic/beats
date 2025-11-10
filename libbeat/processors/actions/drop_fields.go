@@ -19,20 +19,18 @@ package actions
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
-
-	"errors"
-
-	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -51,7 +49,7 @@ func init() {
 	jsprocessor.RegisterPlugin("DropFields", newDropFields)
 }
 
-func newDropFields(c *conf.C) (beat.Processor, error) {
+func newDropFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := struct {
 		Fields        []string `config:"fields"`
 		IgnoreMissing bool     `config:"ignore_missing"`
@@ -109,7 +107,7 @@ func (f *dropFields) Run(event *beat.Event) (*beat.Event, error) {
 		}
 	}
 
-	return event, multierr.Combine(errs...)
+	return event, errors.Join(errs...)
 }
 
 func (f *dropFields) deleteField(event *beat.Event, field string, errs *[]error) {

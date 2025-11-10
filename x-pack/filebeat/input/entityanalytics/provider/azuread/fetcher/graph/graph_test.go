@@ -521,3 +521,82 @@ func TestGraph_Devices(t *testing.T) {
 		})
 	}
 }
+
+var formatQueryTests = []struct {
+	name   string
+	query  []string
+	deflt  string
+	expand map[string][]string
+	want   string
+}{
+	{
+		name:   "default",
+		query:  nil,
+		deflt:  defaultUsersQuery,
+		expand: nil,
+		want:   "$select=accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones",
+	},
+	{
+		name:   "defined_query_no_expand",
+		query:  []string{"id", "displayName"},
+		deflt:  defaultUsersQuery,
+		expand: nil,
+		want:   "$select=id,displayName",
+	},
+	{
+		name:   "defined_query_empty_expand",
+		query:  []string{"id", "displayName"},
+		deflt:  defaultUsersQuery,
+		expand: map[string][]string{},
+		want:   "$select=id,displayName",
+	},
+	{
+		name:   "default_manager_default",
+		query:  nil,
+		deflt:  defaultUsersQuery,
+		expand: map[string][]string{"manager": {}},
+		want:   "$expand=manager($select=accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones)&$select=accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones",
+	},
+	{
+		name:   "default_manager_id",
+		query:  nil,
+		deflt:  defaultUsersQuery,
+		expand: map[string][]string{"manager": {"id"}},
+		want:   "$expand=manager($select=id)&$select=accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones",
+	},
+	{
+		name:   "defined_manager_id",
+		query:  []string{"id", "displayName"},
+		deflt:  defaultUsersQuery,
+		expand: map[string][]string{"manager": {"id"}},
+		want:   "$expand=manager($select=id)&$select=id,displayName",
+	},
+	{
+		name:   "defined_manager_default",
+		query:  []string{"id", "displayName"},
+		deflt:  defaultUsersQuery,
+		expand: map[string][]string{"manager": {}},
+		want:   "$expand=manager($select=id,displayName)&$select=id,displayName",
+	},
+	{
+		name:   "expand_two",
+		query:  []string{"id", "displayName"},
+		deflt:  defaultUsersQuery,
+		expand: map[string][]string{"manager": {}, "directReports": {}},
+		want:   "$expand=directReports($select=id,displayName),manager($select=id,displayName)&$select=id,displayName",
+	},
+}
+
+func TestFormatQuery(t *testing.T) {
+	for _, test := range formatQueryTests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := formatQuery(queryName, test.query, test.deflt, test.expand)
+			if err != nil {
+				t.Fatalf("unexpected error from formatQuery: %v", err)
+			}
+			if got != test.want {
+				t.Errorf("unexpected query string: got=%q want=%q", got, test.want)
+			}
+		})
+	}
+}

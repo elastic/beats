@@ -86,14 +86,14 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 		testCase := testCase
 
 		t.Run(name, func(t *testing.T) {
-			testStore := newMockProspectorCleaner(testCase.entries)
+			testStore := newMockStoreUpdater(testCase.entries)
 			p := fileProspector{
 				logger:       logp.L(),
 				identifier:   mustPathIdentifier(false),
 				cleanRemoved: testCase.cleanRemoved,
 				filewatcher:  newMockFileWatcherWithFiles(testCase.filesOnDisk),
 			}
-			p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return "" })
+			p.Init(testStore, newMockStoreUpdater(nil), func(loginp.Source) string { return "" })
 
 			assert.ElementsMatch(t, testCase.expectedCleanedKeys, testStore.cleanedKeys)
 		})
@@ -157,13 +157,13 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 		testCase := testCase
 
 		t.Run(name, func(t *testing.T) {
-			testStore := newMockProspectorCleaner(testCase.entries)
+			testStore := newMockStoreUpdater(testCase.entries)
 			p := fileProspector{
 				logger:      logp.L(),
 				identifier:  mustPathIdentifier(false),
 				filewatcher: newMockFileWatcherWithFiles(testCase.filesOnDisk),
 			}
-			err := p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return testCase.newKey })
+			err := p.Init(testStore, newMockStoreUpdater(nil), func(loginp.Source) string { return testCase.newKey })
 			require.NoError(t, err, "prospector Init must succeed")
 			assert.EqualValues(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
 		})
@@ -192,9 +192,9 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 		Fingerprint: mockFingerprint,
 	}
 
-	fingerprintIdentifier, _ := newFingerprintIdentifier(nil)
-	nativeIdentifier, _ := newINodeDeviceIdentifier(nil)
-	pathIdentifier, _ := newPathIdentifier(nil)
+	fingerprintIdentifier, _ := newFingerprintIdentifier(nil, nil)
+	nativeIdentifier, _ := newINodeDeviceIdentifier(nil, nil)
+	pathIdentifier, _ := newPathIdentifier(nil, nil)
 	newIDFunc := func(s loginp.Source) string {
 		return mockInputPrefix + "-" + s.Name()
 	}
@@ -253,7 +253,7 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 				},
 			}
 
-			testStore := newMockProspectorCleaner(entries)
+			testStore := newMockStoreUpdater(entries)
 			filesOnDisk := map[string]loginp.FileDescriptor{
 				tmpFileName: fd,
 			}
@@ -266,7 +266,7 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 
 			err = p.Init(
 				testStore,
-				newMockProspectorCleaner(nil),
+				newMockStoreUpdater(nil),
 				newIDFunc,
 			)
 			require.NoError(t, err, "prospector Init must succeed")
@@ -745,39 +745,39 @@ func (u *mockUnpackValue) Key() string {
 	return u.key
 }
 
-type mockProspectorCleaner struct {
+type mockStoreUpdater struct {
 	available   map[string]loginp.Value
 	cleanedKeys []string
 	updatedKeys map[string]string
 }
 
-func newMockProspectorCleaner(available map[string]loginp.Value) *mockProspectorCleaner {
-	return &mockProspectorCleaner{
+func newMockStoreUpdater(available map[string]loginp.Value) *mockStoreUpdater {
+	return &mockStoreUpdater{
 		available:   available,
 		cleanedKeys: make([]string, 0),
 		updatedKeys: make(map[string]string, 0),
 	}
 }
 
-func (c *mockProspectorCleaner) CleanIf(pred func(v loginp.Value) bool) {
-	for key, meta := range c.available {
+func (m *mockStoreUpdater) CleanIf(pred func(v loginp.Value) bool) {
+	for key, meta := range m.available {
 		if pred(meta) {
-			c.cleanedKeys = append(c.cleanedKeys, key)
+			m.cleanedKeys = append(m.cleanedKeys, key)
 		}
 	}
 }
 
-func (c *mockProspectorCleaner) UpdateIdentifiers(updater func(v loginp.Value) (string, interface{})) {
-	for key, meta := range c.available {
+func (m *mockStoreUpdater) UpdateIdentifiers(updater func(v loginp.Value) (string, any)) {
+	for key, meta := range m.available {
 		k, _ := updater(meta)
 		if k != "" {
-			c.updatedKeys[key] = k
+			m.updatedKeys[key] = k
 		}
 	}
 }
 
-// FixUpIdentifiers does nothing
-func (c *mockProspectorCleaner) FixUpIdentifiers(func(loginp.Value) (string, interface{})) {}
+// TakeOver is a noop on this mock
+func (m *mockStoreUpdater) TakeOver(func(v loginp.Value) (string, any)) {}
 
 type renamedPathIdentifier struct {
 	fileIdentifier
@@ -786,7 +786,7 @@ type renamedPathIdentifier struct {
 func (p *renamedPathIdentifier) Supports(_ identifierFeature) bool { return true }
 
 func mustPathIdentifier(renamed bool) fileIdentifier {
-	pathIdentifier, err := newPathIdentifier(nil)
+	pathIdentifier, err := newPathIdentifier(nil, logp.NewNopLogger())
 	if err != nil {
 		panic(err)
 	}
@@ -834,12 +834,12 @@ func TestOnRenameFileIdentity(t *testing.T) {
 	for k, tc := range testCases {
 		t.Run(k, func(t *testing.T) {
 			p := fileProspector{
-				logger:            logp.L(),
+				logger:            logp.NewNopLogger(),
 				filewatcher:       newMockFileWatcher(tc.events, len(tc.events)),
 				identifier:        mustPathIdentifier(true),
 				stateChangeCloser: stateChangeCloserConfig{Renamed: true},
 			}
-			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 
 			path := "/new/path/to/file"
 			expectedIdentifier := tc.identifier

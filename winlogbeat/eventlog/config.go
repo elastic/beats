@@ -21,11 +21,10 @@ package eventlog
 
 import (
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/joeshaw/multierror"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
@@ -48,16 +47,27 @@ func readConfig(c *conf.C, config interface{}) error {
 	return nil
 }
 
+func defaultConfig() config {
+	return config{
+		BatchReadSize: 512,
+	}
+}
+
 type config struct {
-	Name          string             `config:"name"`            // Name of the event log or channel or file.
-	ID            string             `config:"id"`              // Identifier for the event log.
-	XMLQuery      string             `config:"xml_query"`       // Custom query XML. Must not be used with the keys from eventlog.query.
-	BatchReadSize int                `config:"batch_read_size"` // Maximum number of events that Read will return.
-	IncludeXML    bool               `config:"include_xml"`
-	Forwarded     *bool              `config:"forwarded"`
-	SimpleQuery   query              `config:",inline"`
-	NoMoreEvents  NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
-	EventLanguage uint32             `config:"language"`
+	Name                 string             `config:"name"`            // Name of the event log or channel or file.
+	ID                   string             `config:"id"`              // Identifier for the event log.
+	XMLQuery             string             `config:"xml_query"`       // Custom query XML. Must not be used with the keys from eventlog.query.
+	BatchReadSize        int                `config:"batch_read_size"` // Maximum number of events that Read will return.
+	IncludeXML           bool               `config:"include_xml"`
+	Forwarded            *bool              `config:"forwarded"`
+	SimpleQuery          query              `config:",inline"`
+	NoMoreEvents         NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
+	EventLanguage        uint32             `config:"language"`
+	IgnoreMissingChannel *bool              `config:"ignore_missing_channel"` // Ignore missing channels and continue reading.
+
+	// FIXME: This is for a WS2025 known issue so we can bypass the workaround
+	// and will be removed in the future.
+	Bypass2025Workaround bool `config:"bypass_2025_workaround"`
 }
 
 // query contains parameters used to customize the event log data that is
@@ -103,7 +113,7 @@ func (a NoMoreEventsAction) String() string { return noMoreEventsActionNames[a] 
 // Validate validates the winEventLogConfig data and returns an error describing
 // any problems or nil.
 func (c *config) Validate() error {
-	var errs multierror.Errors
+	var errs []error
 
 	if c.XMLQuery != "" {
 		if c.ID == "" {
@@ -131,5 +141,5 @@ func (c *config) Validate() error {
 		errs = append(errs, fmt.Errorf("event log is missing a 'name'"))
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }

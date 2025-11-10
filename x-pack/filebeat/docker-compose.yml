@@ -1,4 +1,3 @@
-version: '2.3'
 services:
   # This is a proxy used to block beats until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
@@ -20,6 +19,16 @@ services:
     ports:
       - 9200:9200
 
+  googlepubsub:
+    image: docker.elastic.co/integrations-ci/beats-googlepubsub:emulator-${SDK_VERSION:-467.0.0-0}-1
+    build:
+      context: ${ES_BEATS}/testing/environments/docker/googlepubsub
+      args:
+        SDK_VERSION: ${SDK_VERSION:-467.0.0-0}
+    hostname: googlepubsub
+    ports:
+      - 8432:8432
+
   cometd:
     build: ${ES_BEATS}/testing/environments/docker/cometd
     hostname: cometd
@@ -33,3 +42,57 @@ services:
     healthcheck:
       test: [ "CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'" ]
       retries: 600
+
+## stream is a mock http service - required for integration testing
+  beatStreams:
+    image: docker.elastic.co/observability/stream:v0.15.0
+    hostname: testStreams
+    ports:
+      - 8090:8090
+    volumes:
+      - ./tests/integration/testdata/:/files:ro
+    environment:
+      PORT: '8090'
+    command:
+      - http-server
+      - --addr=:8090
+      - --config=/files/config.yaml
+
+  socks5-proxy:
+    image: serjs/go-socks5-proxy:latest
+    container_name: socks5-proxy
+    ports:
+      - "1080:1080"
+    environment:
+      PROXY_USER: elastic
+      PROXY_PASSWORD: changeme
+  init-logstash:
+    image: busybox:latest
+    user: "0:0"
+    command: ["sh", "-c", "chown -R 1000:1000 /data"]
+    volumes:
+      - logstash_testdata:/data
+    restart: "no"
+  logstash:
+    depends_on:
+      - init-logstash
+      - socks5-proxy
+    extends:
+      file: ${ES_BEATS}/testing/environments/${STACK_ENVIRONMENT}.yml
+      service: logstash
+    volumes:
+      - ./tests/integration/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - logstash_testdata:/usr/share/logstash/testdata
+    ports:
+      - 9600:9600
+  nginx:
+    image: nginx:alpine
+    depends_on:
+      - init-logstash
+    volumes:
+      - logstash_testdata:/usr/share/nginx/html:ro
+    ports:
+      - 8082:80
+
+volumes:
+  logstash_testdata:

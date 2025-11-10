@@ -73,8 +73,8 @@ type addDockerMetadata struct {
 const selector = "add_docker_metadata"
 
 // New constructs a new add_docker_metadata processor.
-func New(cfg *conf.C) (beat.Processor, error) {
-	return buildDockerMetadataProcessor(logp.NewLogger(selector), cfg, docker.NewWatcher)
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
+	return buildDockerMetadataProcessor(log.Named(selector), cfg, docker.NewWatcher)
 }
 
 func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstructor docker.WatcherConstructor) (beat.Processor, error) {
@@ -106,7 +106,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 			"index":     config.SourceIndex,
 			"target":    dockerContainerIDKey,
 		})
-		sourceProcessor, err = actions.NewExtractField(procConf)
+		sourceProcessor, err = actions.NewExtractField(procConf, log)
 		if err != nil {
 			return nil, err
 		}

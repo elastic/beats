@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -65,7 +66,7 @@ func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Serv
 
 	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL: server.URL,
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("could not create the elasticsearch client, error: %s", err)
 	}
@@ -80,6 +81,7 @@ func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Serv
 }
 
 func TestParseJSON(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	t.Run("OSS release of Elasticsearch (Code: 405)", func(t *testing.T) {
 		h := func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
@@ -88,7 +90,7 @@ func TestParseJSON(t *testing.T) {
 		defer s.Close()
 		defer c.Close()
 
-		fetcher := NewElasticFetcher(c)
+		fetcher := NewElasticFetcher(c, logger)
 		_, err := fetcher.Fetch()
 		assert.Error(t, err)
 	})
@@ -101,7 +103,7 @@ func TestParseJSON(t *testing.T) {
 		defer s.Close()
 		defer c.Close()
 
-		fetcher := NewElasticFetcher(c)
+		fetcher := NewElasticFetcher(c, logger)
 		_, err := fetcher.Fetch()
 		assert.Error(t, err)
 	})
@@ -114,7 +116,7 @@ func TestParseJSON(t *testing.T) {
 		defer s.Close()
 		defer c.Close()
 
-		fetcher := NewElasticFetcher(c)
+		fetcher := NewElasticFetcher(c, logger)
 		_, err := fetcher.Fetch()
 		assert.Error(t, err)
 	})
@@ -127,7 +129,7 @@ func TestParseJSON(t *testing.T) {
 		defer s.Close()
 		defer c.Close()
 
-		fetcher := NewElasticFetcher(c)
+		fetcher := NewElasticFetcher(c, logger)
 		_, err := fetcher.Fetch()
 		assert.Equal(t, err.Error(), "unauthorized access, could not connect to the xpack endpoint, verify your credentials")
 	})
@@ -140,7 +142,7 @@ func TestParseJSON(t *testing.T) {
 		defer s.Close()
 		defer c.Close()
 
-		fetcher := NewElasticFetcher(c)
+		fetcher := NewElasticFetcher(c, logger)
 		_, err := fetcher.Fetch()
 		assert.Error(t, err)
 	})
@@ -164,7 +166,7 @@ func TestParseJSON(t *testing.T) {
 				defer s.Close()
 				defer c.Close()
 
-				fetcher := NewElasticFetcher(c)
+				fetcher := NewElasticFetcher(c, logger)
 				license, err := fetcher.Fetch()
 				if !assert.NoError(t, err) {
 					return

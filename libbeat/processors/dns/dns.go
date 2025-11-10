@@ -26,7 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -50,7 +50,7 @@ type processor struct {
 }
 
 // New constructs a new DNS processor.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the dns configuration: %w", err)
@@ -59,17 +59,17 @@ func New(cfg *conf.C) (beat.Processor, error) {
 	// Logging and metrics (each processor instance has a unique ID).
 	var (
 		id      = int(instanceID.Add(1))
-		log     = logp.NewLogger(logName).With("instance_id", id)
-		metrics = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
+		metrics = monitoring.Default.GetOrCreateRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
 	)
 
+	log = log.Named(logName).With("instance_id", id)
 	log.Debugf("DNS processor config: %+v", c)
-	resolver, err := newMiekgResolver(metrics, c.Timeout, c.Transport, c.Nameservers...)
+	resolver, err := newMiekgResolver(metrics, c.Timeout, c.Transport, log, c.Nameservers...)
 	if err != nil {
 		return nil, err
 	}
 
-	cache, err := newLookupCache(metrics.NewRegistry("cache"), c.cacheConfig, resolver)
+	cache, err := newLookupCache(metrics.GetOrCreateRegistry("cache"), c.cacheConfig, resolver)
 	if err != nil {
 		return nil, err
 	}

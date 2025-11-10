@@ -60,7 +60,7 @@ type cache struct {
 }
 
 // Resulting processor implements `Close()` to release the cache resources.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 	if err != nil {
@@ -68,7 +68,7 @@ func New(cfg *conf.C) (beat.Processor, error) {
 	}
 	// Logging (each processor instance has a unique ID).
 	id := int(instanceID.Add(1))
-	log := logp.NewLogger(name).With("instance_id", id)
+	log = log.Named(name).With("instance_id", id)
 
 	src, cancel, err := getStoreFor(config, log)
 	if err != nil {
@@ -238,7 +238,7 @@ func (p *cache) getFor(event *beat.Event) (result *beat.Event, err error) {
 	if meta == nil {
 		return nil, fmt.Errorf("%w for '%s'", ErrNoData, k)
 	}
-	if m, ok := meta.(map[string]interface{}); ok {
+	if m, ok := meta.(map[string]any); ok {
 		meta = mapstr.M(m)
 	}
 	// ... and write it into the event.

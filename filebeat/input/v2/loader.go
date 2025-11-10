@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
@@ -80,9 +81,9 @@ func (l *Loader) Init(group unison.Group) error {
 // the type does not exist. Error values for Configuration errors do depend on
 // the InputManager.
 func (l *Loader) Configure(cfg *conf.C) (Input, error) {
-	name, p, input, err := l.loadFromCfg(cfg)
+	name, p, err := l.loadFromCfg(cfg)
 	if err != nil {
-		return input, err
+		return nil, err
 	}
 
 	log := l.log.With("input", name, "stability", p.Stability, "deprecated", p.Deprecated)
@@ -96,14 +97,18 @@ func (l *Loader) Configure(cfg *conf.C) (Input, error) {
 		log.Warnf("DEPRECATED: The %v input is deprecated", name)
 	}
 
+	if version.FIPSDistribution && p.ExcludeFromFIPS {
+		return nil, fmt.Errorf("running a FIPS-capable distribution but input [%s] is not FIPS capable", name)
+	}
+
 	return p.Manager.Create(cfg)
 }
 
-func (l *Loader) loadFromCfg(cfg *conf.C) (string, Plugin, Input, error) {
+func (l *Loader) loadFromCfg(cfg *conf.C) (string, Plugin, error) {
 	name, err := cfg.String(l.typeField, -1)
 	if err != nil {
 		if l.defaultType == "" {
-			return "", Plugin{}, nil, &LoadError{
+			return "", Plugin{}, &LoadError{
 				Reason:  ErrNoInputConfigured,
 				Message: fmt.Sprintf("%v setting is missing", l.typeField),
 			}
@@ -113,13 +118,13 @@ func (l *Loader) loadFromCfg(cfg *conf.C) (string, Plugin, Input, error) {
 
 	p, exists := l.registry[name]
 	if !exists {
-		return "", Plugin{}, nil, &LoadError{Name: name, Reason: ErrUnknownInput}
+		return "", Plugin{}, &LoadError{Name: name, Reason: ErrUnknownInput}
 	}
-	return name, p, nil, nil
+	return name, p, nil
 }
 
 func (l *Loader) Delete(cfg *conf.C) error {
-	_, p, _, err := l.loadFromCfg(cfg)
+	_, p, err := l.loadFromCfg(cfg)
 	if err != nil {
 		return err
 	}

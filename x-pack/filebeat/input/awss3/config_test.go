@@ -39,6 +39,7 @@ func TestConfig(t *testing.T) {
 			VisibilityTimeout:  300 * time.Second,
 			SQSMaxReceiveCount: 5,
 			SQSWaitTime:        20 * time.Second,
+			SQSGraceTime:       20 * time.Second,
 			BucketListInterval: 120 * time.Second,
 			BucketListPrefix:   "",
 			PathStyle:          false,

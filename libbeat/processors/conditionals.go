@@ -18,40 +18,28 @@
 package processors
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // NewConditional returns a constructor suitable for registering when conditionals as a plugin.
 func NewConditional(
 	ruleFactory Constructor,
 ) Constructor {
-	return func(cfg *config.C) (beat.Processor, error) {
-		rule, err := ruleFactory(cfg)
+	return func(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
+		rule, err := ruleFactory(cfg, log)
 		if err != nil {
 			return nil, err
 		}
 
-		return addCondition(cfg, rule)
+		return addCondition(cfg, rule, log)
 	}
-}
-
-// NewConditionList takes a slice of Config objects and turns them into real Condition objects.
-func NewConditionList(configs []conditions.Config) ([]conditions.Condition, error) {
-	out := make([]conditions.Condition, len(configs))
-	for i := range configs {
-		cond, err := conditions.NewCondition(&configs[i])
-		if err != nil {
-			return nil, err
-		}
-
-		out[i] = cond
-	}
-	return out, nil
 }
 
 // WhenProcessor is a tuple of condition plus a Processor.
@@ -64,8 +52,9 @@ type WhenProcessor struct {
 func NewConditionRule(
 	c conditions.Config,
 	p beat.Processor,
+	log *logp.Logger,
 ) (beat.Processor, error) {
-	cond, err := conditions.NewCondition(&c)
+	cond, err := conditions.NewCondition(&c, log)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize condition: %w", err)
 	}
@@ -73,6 +62,10 @@ func NewConditionRule(
 	if cond == nil {
 		return p, nil
 	}
+	if _, ok := p.(Closer); ok {
+		return &ClosingWhenProcessor{WhenProcessor{cond, p}}, nil
+	}
+
 	return &WhenProcessor{cond, p}, nil
 }
 
@@ -88,9 +81,25 @@ func (r *WhenProcessor) String() string {
 	return fmt.Sprintf("%v, condition=%v", r.p.String(), r.condition.String())
 }
 
+// ClosingWhenProcessor is the same as WhenProcessor but has the Close
+// method.  This is so NewConditionRule can create two types of "when"
+// processors, one with `Close` and one without.  The decision of
+// which to return is determined if the underlying processors require
+// `Close`.  This is useful because some places in the code base
+// (eg. javascript processors) require stateless processors (no Close
+// method).
+type ClosingWhenProcessor struct {
+	WhenProcessor
+}
+
+func (cwp *ClosingWhenProcessor) Close() error {
+	return Close(cwp.p)
+}
+
 func addCondition(
 	cfg *config.C,
 	p beat.Processor,
+	log *logp.Logger,
 ) (beat.Processor, error) {
 	if !cfg.HasField("when") {
 		return p, nil
@@ -105,7 +114,7 @@ func addCondition(
 		return nil, err
 	}
 
-	return NewConditionRule(condConfig, p)
+	return NewConditionRule(condConfig, p, log)
 }
 
 type ifThenElseConfig struct {
@@ -123,13 +132,13 @@ type IfThenElseProcessor struct {
 }
 
 // NewIfElseThenProcessor construct a new IfThenElseProcessor.
-func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
+func NewIfElseThenProcessor(cfg *config.C, logger *logp.Logger) (beat.Processor, error) {
 	var c ifThenElseConfig
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, err
 	}
 
-	cond, err := conditions.NewCondition(&c.Cond)
+	cond, err := conditions.NewCondition(&c.Cond, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -139,14 +148,14 @@ func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
 			return nil, nil
 		}
 		if !c.IsArray() {
-			return New([]*config.C{c})
+			return New([]*config.C{c}, logger)
 		}
 
 		var pc PluginConfig
 		if err := c.Unpack(&pc); err != nil {
 			return nil, err
 		}
-		return New(pc)
+		return New(pc, logger)
 	}
 
 	var ifProcessors, elseProcessors *Processors
@@ -157,6 +166,25 @@ func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
 		return nil, err
 	}
 
+	closingProcessor := false
+	if ifProcessors != nil {
+		for _, proc := range ifProcessors.List {
+			if _, ok := proc.(Closer); ok {
+				closingProcessor = true
+			}
+		}
+	}
+	if elseProcessors != nil {
+		for _, proc := range elseProcessors.List {
+			if _, ok := proc.(Closer); ok {
+				closingProcessor = true
+			}
+		}
+	}
+
+	if closingProcessor {
+		return &ClosingIfThenElseProcessor{IfThenElseProcessor{cond, ifProcessors, elseProcessors}}, nil
+	}
 	return &IfThenElseProcessor{cond, ifProcessors, elseProcessors}, nil
 }
 
@@ -182,4 +210,30 @@ func (p *IfThenElseProcessor) String() string {
 		sb.WriteString(p.els.String())
 	}
 	return sb.String()
+}
+
+// ClosingIfThenElseProcessor is the same as IfThenElseProcessor but
+// has the Close method.  This is so NewIfThenElseProcessor can create
+// two types of "if/then/else" processors, one with `Close` and one
+// without.  The decision of which to return is determined if the
+// underlying processors require `Close`.  This is useful because some
+// places in the code base (eg. javascript processors) require
+// stateless processors (no Close method).
+type ClosingIfThenElseProcessor struct {
+	IfThenElseProcessor
+}
+
+func (citep *ClosingIfThenElseProcessor) Close() error {
+	var err error
+	for _, proc := range citep.then.List {
+		err = errors.Join(err, Close(proc))
+	}
+	if citep.els == nil {
+		return err
+	}
+
+	for _, proc := range citep.els.List {
+		err = errors.Join(err, Close(proc))
+	}
+	return err
 }

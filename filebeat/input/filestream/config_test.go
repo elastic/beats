@@ -26,15 +26,77 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest/observer"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestConfigValidate(t *testing.T) {
 	t.Run("paths cannot be empty", func(t *testing.T) {
 		c := config{Paths: []string{}}
 		err := c.Validate()
-		require.Error(t, err)
+		assert.Error(t, err)
+	})
+
+	t.Run("take_over requires ID", func(t *testing.T) {
+		c := config{
+			Paths:    []string{"/foo/bar"},
+			TakeOver: loginp.TakeOverConfig{Enabled: true},
+		}
+		err := c.Validate()
+		assert.Error(t, err, "take_over.enabled can only be true if ID is set")
+	})
+
+	t.Run("take_over works with ID set", func(t *testing.T) {
+		c := config{
+			Paths:    []string{"/foo/bar"},
+			ID:       "some id",
+			TakeOver: loginp.TakeOverConfig{Enabled: true},
+		}
+		err := c.Validate()
+		assert.NoError(t, err)
+	})
+
+	t.Run("take_over does works with AllowIDDuplication", func(t *testing.T) {
+		c := config{
+			Paths:              []string{"/foo/bar"},
+			ID:                 "some id",
+			AllowIDDuplication: true,
+			TakeOver:           loginp.TakeOverConfig{Enabled: true},
+		}
+		err := c.Validate()
+		assert.Error(t, err)
+	})
+
+	t.Run("gzip_experimental works with file_identity.fingerprint", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(`
+id: 'some id'
+paths: [/foo/bar*]
+gzip_experimental: true
+file_identity.fingerprint: ~
+`)
+		require.NoError(t, err, "could not create config from string")
+		got := defaultConfig()
+		err = c.Unpack(&got)
+		require.NoError(t, err, "could not unpack config")
+
+		err = got.Validate()
+		assert.NoError(t, err)
+	})
+
+	t.Run("gzip_experimental requires file_identity.fingerprint", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(`
+id: 'some id'
+paths: [/foo/bar*]
+gzip_experimental: true
+file_identity.path: ~
+`)
+		require.NoError(t, err, "could not create config from string")
+		got := defaultConfig()
+		err = c.Unpack(&got)
+		assert.ErrorContains(t,
+			err,
+			"gzip_experimental=true requires file_identity to be 'fingerprint")
 	})
 }
 
@@ -209,13 +271,12 @@ id: unique-id-3
 				require.NoError(t, err, "could not create input configuration")
 				inputs = append(inputs, cfg)
 			}
-			err := logp.DevelopmentSetup(logp.ToObserverOutput())
-			require.NoError(t, err, "could not setup log for development")
 
-			err = ValidateInputIDs(inputs, logp.L())
+			logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
+			err := ValidateInputIDs(inputs, logger)
 			tc.assertErr(t, err)
 			if tc.assertLogs != nil {
-				tc.assertLogs(t, logp.ObserverLogs())
+				tc.assertLogs(t, observedLogs)
 			}
 		})
 	}

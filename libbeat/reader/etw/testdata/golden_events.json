@@ -1,0 +1,230 @@
+[
+  {
+    "ProviderGUID": {
+      "Data1": 116449294,
+      "Data2": 16938,
+      "Data3": 18823,
+      "Data4": [
+        146,
+        43,
+        46,
+        193,
+        62,
+        40,
+        30,
+        164
+      ]
+    },
+    "ProviderName": "Beats-ETW-TestProvider",
+    "EventID": 1,
+    "Version": 0,
+    "Level": "Information",
+    "LevelRaw": 4,
+    "Task": "Connect",
+    "TaskRaw": 2,
+    "Opcode": "Stop",
+    "OpcodeRaw": 20,
+    "Keywords": [
+      "Local",
+      "Read"
+    ],
+    "KeywordsRaw": 5,
+    "Channel": "Beats-ETW-TestProvider/Operational",
+    "Timestamp": "0001-01-01T00:00:00Z",
+    "ProcessID": 51820,
+    "ThreadID": 29960,
+    "ActivityIDName": "",
+    "RelatedActivityIDName": "",
+    "EventMessage": "All data types event with comprehensive field coverage.",
+    "ProviderMessage": "Beats ETW Test Provider",
+    "Properties": [
+      {
+        "Name": "StringValue",
+        "Value": "charlie"
+      },
+      {
+        "Name": "AnsiStringValue",
+        "Value": "delta"
+      },
+      {
+        "Name": "Int8Value",
+        "Value": "123"
+      },
+      {
+        "Name": "UInt8Value",
+        "Value": "160"
+      },
+      {
+        "Name": "Int16Value",
+        "Value": "-1503"
+      },
+      {
+        "Name": "UInt16Value",
+        "Value": "22222"
+      },
+      {
+        "Name": "Int32Value",
+        "Value": "-1181584329"
+      },
+      {
+        "Name": "UInt32Value",
+        "Value": "1047049900"
+      },
+      {
+        "Name": "Int64Value",
+        "Value": "-4586928309515620291"
+      },
+      {
+        "Name": "UInt64Value",
+        "Value": "4624071100264480186"
+      },
+      {
+        "Name": "FloatValue",
+        "Value": "94.389999"
+      },
+      {
+        "Name": "DoubleValue",
+        "Value": "735.615000"
+      },
+      {
+        "Name": "BooleanValue",
+        "Value": "true"
+      },
+      {
+        "Name": "BinarySize",
+        "Value": "11"
+      },
+      {
+        "Name": "BinaryValue",
+        "Value": "0xF5FB719BFDEA5006C274A3"
+      },
+      {
+        "Name": "GuidValue",
+        "Value": "{a3c31c52-f160-4fc0-b985-49e3c1872504}"
+      },
+      {
+        "Name": "PointerValue",
+        "Value": "0xD1690A28"
+      },
+      {
+        "Name": "FileTimeValue",
+        "Value": "2016-05-23T16:28:38.746455300Z"
+      },
+      {
+        "Name": "SystemTimeValue",
+        "Value": "2016-05-23T18:28:38.746Z"
+      },
+      {
+        "Name": "SidValue",
+        "Value": "S-1-5-21-2780061590-16800514-487331630"
+      },
+      {
+        "Name": "HexInt32Value",
+        "Value": "0x1271E6F5"
+      },
+      {
+        "Name": "HexInt64Value",
+        "Value": "0xAAF7780B8F3FDC7C"
+      }
+    ],
+    "ExtendedData": null
+  },
+  {
+    "ProviderGUID": {
+      "Data1": 116449294,
+      "Data2": 16938,
+      "Data3": 18823,
+      "Data4": [
+        146,
+        43,
+        46,
+        193,
+        62,
+        40,
+        30,
+        164
+      ]
+    },
+    "ProviderName": "Beats-ETW-TestProvider",
+    "EventID": 2,
+    "Version": 0,
+    "Level": "Error",
+    "LevelRaw": 2,
+    "Task": "Disconnect",
+    "TaskRaw": 1,
+    "Opcode": "Initialize",
+    "OpcodeRaw": 12,
+    "Keywords": [
+      "Remote",
+      "Write"
+    ],
+    "KeywordsRaw": 10,
+    "Channel": "Beats-ETW-TestProvider/Operational",
+    "Timestamp": "0001-01-01T00:00:00Z",
+    "ProcessID": 51820,
+    "ThreadID": 29960,
+    "ActivityIDName": "",
+    "RelatedActivityIDName": "",
+    "EventMessage": "Complex data event with nested structures and arrays.",
+    "ProviderMessage": "Beats ETW Test Provider",
+    "Properties": [
+      {
+        "Name": "TransferName",
+        "Value": "alpha"
+      },
+      {
+        "Name": "ErrorCode",
+        "Value": "Unknown HResult Error code: 0xeb21"
+      },
+      {
+        "Name": "FilesCount",
+        "Value": "2"
+      },
+      {
+        "Name": "Files",
+        "Value": [
+          "C:/Users/Public/Documents/readme.md",
+          "C:/Program Files/Example/file.txt"
+        ]
+      },
+      {
+        "Name": "BufferSize",
+        "Value": "8"
+      },
+      {
+        "Name": "Buffer",
+        "Value": "0x3328BFFB5568A114"
+      },
+      {
+        "Name": "Certificate",
+        "Value": "0x3A2383908D95F209BBBC3A"
+      },
+      {
+        "Name": "IsLocal",
+        "Value": "true"
+      },
+      {
+        "Name": "Path",
+        "Value": "D:/Data/report.csv"
+      },
+      {
+        "Name": "ValuesCount",
+        "Value": "2"
+      },
+      {
+        "Name": "Values",
+        "Value": [
+          {
+            "Name": "bravo",
+            "Value": "748"
+          },
+          {
+            "Name": "echo",
+            "Value": "90"
+          }
+        ]
+      }
+    ],
+    "ExtendedData": null
+  }
+]

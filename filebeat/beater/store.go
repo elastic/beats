@@ -32,6 +32,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
+var _ statestore.States = (*filebeatStore)(nil)
+
 type filebeatStore struct {
 	registry      *statestore.Registry
 	esRegistry    *statestore.Registry
@@ -44,7 +46,7 @@ type filebeatStore struct {
 	notifier *es.Notifier
 }
 
-func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry) (*filebeatStore, error) {
+func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry, beatPaths *paths.Path) (*filebeatStore, error) {
 	var (
 		reg backend.Registry
 		err error
@@ -59,7 +61,7 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 	}
 
 	reg, err = memlog.New(logger, memlog.Settings{
-		Root:     paths.Resolve(paths.Data, cfg.Path),
+		Root:     beatPaths.Resolve(paths.Data, cfg.Path),
 		FileMode: cfg.Permissions,
 	})
 	if err != nil {
@@ -84,8 +86,8 @@ func (s *filebeatStore) Close() {
 	s.registry.Close()
 }
 
-// Access returns the storage registry depending on the type. Default is the file store.
-func (s *filebeatStore) Access(typ string) (*statestore.Store, error) {
+// StoreFor returns the storage registry depending on the type. Default is the file store.
+func (s *filebeatStore) StoreFor(typ string) (*statestore.Store, error) {
 	if features.IsElasticsearchStateStoreEnabledForInput(typ) && s.esRegistry != nil {
 		return s.esRegistry.Get(s.storeName)
 	}

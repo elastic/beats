@@ -18,9 +18,11 @@
 package elasticsearchtranslate
 
 import (
+	"bytes"
 	_ "embed"
 	"fmt"
 	"testing"
+	"text/template"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -28,9 +30,12 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestToOtelConfig(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 
 	t.Run("basic config translation", func(t *testing.T) {
 		beatCfg := `
@@ -43,7 +48,6 @@ username: elastic
 password: changeme
 index: "some-index"
 pipeline: "some-ingest-pipeline"
-proxy_url: "https://proxy.url"
 backoff:
   init: 42s
   max: 420s
@@ -53,41 +57,98 @@ headers:
   X-Bar-Header: bar`
 
 		OTelCfg := `
-api_key: ""
 endpoints:
   - http://localhost:9200/foo/bar
   - http://localhost:9300/foo/bar
-idle_conn_timeout: 3s
 logs_index: some-index
-num_workers: 30
+max_conns_per_host: 30
 password: changeme
 pipeline: some-ingest-pipeline
-proxy_url: https://proxy.url
+logs_dynamic_pipeline:
+  enabled: true
 retry:
   enabled: true
   initial_interval: 42s
   max_interval: 7m0s
   max_retries: 3
-timeout: 1m30s
+sending_queue:
+  batch:
+    flush_timeout: 10s
+    max_size: 1600
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
+  enabled: true
+  num_consumers: 30
+  queue_size: 3200
+  wait_for_result: true
 user: elastic
 headers:
   X-Header-1: foo
   X-Bar-Header: bar
-batcher:
-  enabled: true
-  max_size_items: 1600
+mapping:
+  mode: bodymap
+compression: gzip
+compression_params:
+  level: 1
  `
-		input := newFromYamlString(t, beatCfg)
-		cfg := config.MustNewConfigFrom(input.ToStringMap())
-		got, err := ToOTelConfig(cfg)
-		require.NoError(t, err, "error translating elasticsearch output to OTel ES exporter type")
+		cfg := config.MustNewConfigFrom(beatCfg)
+		got, err := ToOTelConfig(cfg, logger)
+		require.NoError(t, err, "error translating elasticsearch output to ES exporter config")
 		expOutput := newFromYamlString(t, OTelCfg)
 		compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
 
 	})
 
-	// when preset is configured, we only test worker, bulk_max_size, idle_connection_timeout here
-	// TODO: Check for compression_level when we add support upstream
+	t.Run("test api key is encoded before mapping to es-exporter", func(t *testing.T) {
+		beatCfg := `
+hosts:
+  - localhost:9200
+index: "some-index"
+api_key: "TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA"
+`
+
+		OTelCfg := `
+endpoints:
+  - http://localhost:9200
+logs_index: some-index
+logs_dynamic_pipeline:
+  enabled: true
+retry:
+  enabled: true
+  initial_interval: 1s
+  max_interval: 1m0s
+  max_retries: 3
+sending_queue:
+  batch:
+    flush_timeout: 10s
+    max_size: 1600
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
+  enabled: true
+  num_consumers: 1
+  queue_size: 3200
+  wait_for_result: true
+mapping:
+  mode: bodymap
+max_conns_per_host: 1
+api_key: VGlOQUdHNEJhYU1kYUgxdFJmdVU6S25SNnlFNDFSclNvd2Iwa1EwSFdvQQ==
+compression: gzip
+compression_params:
+  level: 1
+ `
+		cfg := config.MustNewConfigFrom(beatCfg)
+		got, err := ToOTelConfig(cfg, logger)
+		require.NoError(t, err, "error translating elasticsearch output to ES exporter config ")
+		expOutput := newFromYamlString(t, OTelCfg)
+		compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
+
+	})
+
+	// when preset is configured, we only test worker, bulk_max_size
+	// idle_connection_timeout should be correctly configured on beatsauthextension
+	// es-exporter sets compression level to 1 by default
 	t.Run("check preset config translation", func(t *testing.T) {
 		commonBeatCfg := `
 hosts:
@@ -99,7 +160,8 @@ preset: %s
 `
 
 		commonOTelCfg := `
-api_key: ""
+logs_dynamic_pipeline:
+  enabled: true    
 endpoints:
   - http://localhost:9200
 retry:
@@ -110,7 +172,11 @@ retry:
 logs_index: some-index
 password: changeme
 user: elastic
-timeout: 1m30s
+mapping:
+  mode: bodymap
+compression: gzip
+compression_params:
+  level: 1
 `
 
 		tests := []struct {
@@ -120,27 +186,40 @@ timeout: 1m30s
 			{
 				presetName: "balanced",
 				output: commonOTelCfg + `
-idle_conn_timeout: 3s
-num_workers: 1
-batcher:
+max_conns_per_host: 1
+sending_queue:
+  batch:
+    flush_timeout: 10s
+    max_size: 1600
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
   enabled: true
-  max_size_items: 1600
+  num_consumers: 1
+  queue_size: 3200
+  wait_for_result: true
  `,
 			},
 			{
 				presetName: "throughput",
 				output: commonOTelCfg + `
-idle_conn_timeout: 15s
-num_workers: 4
-batcher:
+max_conns_per_host: 4
+sending_queue:
+  batch:
+    flush_timeout: 10s
+    max_size: 1600
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
   enabled: true
-  max_size_items: 1600
+  num_consumers: 4
+  queue_size: 12800
+  wait_for_result: true
  `,
 			},
 			{
 				presetName: "scale",
 				output: `
-api_key: ""
 endpoints:
   - http://localhost:9200
 retry:
@@ -149,49 +228,144 @@ retry:
   max_interval: 5m0s
   max_retries: 3
 logs_index: some-index
+logs_dynamic_pipeline:
+  enabled: true
 password: changeme
 user: elastic
-timeout: 1m30s
-idle_conn_timeout: 1s
-num_workers: 1
-batcher:
+max_conns_per_host: 1
+sending_queue:
+  batch:
+    flush_timeout: 10s
+    max_size: 1600
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
   enabled: true
-  max_size_items: 1600
+  num_consumers: 1
+  queue_size: 3200
+  wait_for_result: true
+mapping:
+  mode: bodymap
+compression: gzip
+compression_params:
+  level: 1
  `,
 			},
 			{
 				presetName: "latency",
 				output: commonOTelCfg + `
-idle_conn_timeout: 1m0s
-num_workers: 1
-batcher:
+max_conns_per_host: 1
+sending_queue:
+  batch:
+    flush_timeout: 10s
+    max_size: 50
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
   enabled: true
-  max_size_items: 50
+  num_consumers: 1
+  queue_size: 4100
+  wait_for_result: true
  `,
 			},
 			{
 				presetName: "custom",
 				output: commonOTelCfg + `
-idle_conn_timeout: 3s
-num_workers: 0
-batcher:
+max_conns_per_host: 1
+sending_queue:
+  batch:
+    flush_timeout: 10s
+    max_size: 1600
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
   enabled: true
-  max_size_items: 1600
+  num_consumers: 1
+  queue_size: 3200
+  wait_for_result: true
  `,
 			},
 		}
 
 		for _, test := range tests {
 			t.Run("config translation w/"+test.presetName, func(t *testing.T) {
-				input := newFromYamlString(t, fmt.Sprintf(commonBeatCfg, test.presetName))
-				cfg := config.MustNewConfigFrom(input.ToStringMap())
-				got, err := ToOTelConfig(cfg)
+				cfg := config.MustNewConfigFrom(fmt.Sprintf(commonBeatCfg, test.presetName))
+				got, err := ToOTelConfig(cfg, logger)
 				require.NoError(t, err, "error translating elasticsearch output to OTel ES exporter type")
 				expOutput := newFromYamlString(t, test.output)
 				compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
 			})
 		}
 
+	})
+
+}
+
+func TestCompressionConfig(t *testing.T) {
+	compressionConfig := `
+hosts:
+  - localhost:9200
+  - localhost:9300
+protocol: http
+path: /foo/bar
+username: elastic
+password: changeme
+index: "some-index"
+compression_level: %d`
+
+	otelConfig := `
+endpoints:
+  - http://localhost:9200/foo/bar
+  - http://localhost:9300/foo/bar
+logs_index: some-index
+password: changeme
+retry:
+  enabled: true
+  initial_interval: 1s
+  max_interval: 1m0s
+  max_retries: 3
+logs_dynamic_pipeline:
+  enabled: true  
+max_conns_per_host: 1
+user: elastic
+sending_queue:
+  batch:
+    flush_timeout: 10s
+    max_size: 1600
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
+  enabled: true
+  num_consumers: 1
+  queue_size: 3200
+  wait_for_result: true
+mapping:
+  mode: bodymap
+{{ if gt . 0 }}
+compression: gzip
+compression_params:
+  level: {{ . }}
+{{ else }}
+compression: none
+{{ end }}`
+
+	for level := range 9 {
+		t.Run(fmt.Sprintf("compression-level-%d", level), func(t *testing.T) {
+			cfg := config.MustNewConfigFrom(fmt.Sprintf(compressionConfig, level))
+			got, err := ToOTelConfig(cfg, logp.NewNopLogger())
+			require.NoError(t, err, "error translating elasticsearch output to ES exporter config")
+			var otelBuffer bytes.Buffer
+			require.NoError(t, template.Must(template.New("config").Parse(otelConfig)).Execute(&otelBuffer, level))
+			expOutput := newFromYamlString(t, otelBuffer.String())
+			compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
+		})
+	}
+
+	t.Run("invalid-compression-level", func(t *testing.T) {
+		cfg := config.MustNewConfigFrom(fmt.Sprintf(compressionConfig, 10))
+		got, err := ToOTelConfig(cfg, logp.NewNopLogger())
+		require.ErrorContains(t, err, "failed unpacking config. requires value <= 9 accessing 'compression_level'")
+		require.Nil(t, got)
 	})
 
 }

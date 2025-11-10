@@ -20,14 +20,21 @@
 package journald
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
+	"go.elastic.co/ecszap"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -37,6 +44,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -49,6 +57,9 @@ type inputTestingEnvironment struct {
 
 	pluginInitOnce sync.Once
 	plugin         v2.Plugin
+
+	inputLogger *logp.Logger
+	logBuffer   *bytes.Buffer
 
 	wg  sync.WaitGroup
 	grp unison.TaskGroup
@@ -90,6 +101,37 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 
 func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) {
 	e.wg.Add(1)
+	t := e.t
+
+	e.inputLogger, e.logBuffer = newInMemoryJSON()
+	e.t.Cleanup(func() {
+		if t.Failed() {
+			folder := filepath.Join("..", "..", "build", "input-test")
+			if err := os.MkdirAll(folder, 0o750); err != nil {
+				t.Logf("cannot create folder for error logs: %s", err)
+				return
+			}
+
+			f, err := os.CreateTemp(folder, "Filebeat-Test-Journald"+"-*")
+			if err != nil {
+				t.Logf("cannot create file for error logs: %s", err)
+				return
+			}
+			defer f.Close()
+			fullLogPath, err := filepath.Abs(f.Name())
+			if err != nil {
+				t.Logf("cannot get full path from log file: %s", err)
+			}
+
+			if _, err := f.Write(e.logBuffer.Bytes()); err != nil {
+				t.Logf("cannot write to file: %s", err)
+				return
+			}
+
+			t.Logf("Test Failed, logs from input at %q", fullLogPath)
+		}
+	})
+
 	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
 		defer wg.Done()
 		defer func() {
@@ -98,7 +140,16 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 			}
 		}()
 
-		inputCtx := v2.Context{Logger: logp.L(), Cancelation: ctx, StatusReporter: e.statusReporter}
+		id := uuid.Must(uuid.NewV4()).String()
+		inputCtx := v2.Context{
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
+			Cancelation:     ctx,
+			StatusReporter:  e.statusReporter,
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          e.inputLogger,
+		}
 		if err := inp.Run(inputCtx, e.pipeline); err != nil {
 			e.t.Errorf("input 'Run' method returned an error: %s", err)
 		}
@@ -128,6 +179,23 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	}, 5*time.Second, 10*time.Millisecond, &msg)
 }
 
+// waitUntilEventCount waits until total count events arrive to the client.
+func (e *inputTestingEnvironment) waitUntilEventsPublished(published int) {
+	e.t.Helper()
+	msg := strings.Builder{}
+	require.Eventually(e.t, func() bool {
+		sum := len(e.pipeline.GetAllEvents())
+		if sum >= published {
+			return true
+		}
+
+		msg.Reset()
+		fmt.Fprintf(&msg, "too few events; expected: %d, actual: %d", published, sum)
+
+		return false
+	}, 5*time.Second, 10*time.Millisecond, &msg)
+}
+
 func (e *inputTestingEnvironment) RequireStatuses(expected []statusUpdate) {
 	t := e.t
 	t.Helper()
@@ -147,6 +215,8 @@ func (e *inputTestingEnvironment) RequireStatuses(expected []statusUpdate) {
 	}
 }
 
+var _ statestore.States = (*testInputStore)(nil)
+
 type testInputStore struct {
 	registry *statestore.Registry
 }
@@ -161,7 +231,7 @@ func (s *testInputStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testInputStore) Access(_ string) (*statestore.Store, error) {
+func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 
@@ -294,4 +364,25 @@ func (m *mockStatusReporter) GetUpdates() []statusUpdate {
 	m.mutex.RLock()
 	defer m.mutex.RUnlock()
 	return append([]statusUpdate{}, m.updates...)
+}
+
+func newInMemoryJSON() (*logp.Logger, *bytes.Buffer) {
+	buff := bytes.Buffer{}
+	encoderConfig := ecszap.ECSCompatibleEncoderConfig(logp.JSONEncoderConfig())
+	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	encoder := zapcore.NewJSONEncoder(encoderConfig)
+
+	core := zapcore.NewCore(
+		encoder,
+		zapcore.Lock(zapcore.AddSync(&buff)),
+		zap.NewAtomicLevelAt(zap.DebugLevel))
+	ecszap.ECSCompatibleEncoderConfig(logp.ConsoleEncoderConfig())
+
+	logger, _ := logp.NewDevelopmentLogger(
+		"journald",
+		zap.WrapCore(func(in zapcore.Core) zapcore.Core {
+			return core
+		}))
+
+	return logger, &buff
 }

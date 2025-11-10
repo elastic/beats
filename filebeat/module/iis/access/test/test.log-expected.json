@@ -48,7 +48,7 @@
         "user_agent.os.full": "Windows 7",
         "user_agent.os.name": "Windows",
         "user_agent.os.version": "7",
-        "user_agent.version": "57.0."
+        "user_agent.version": "57.0"
     },
     {
         "@timestamp": "2018-01-01T09:10:11.000Z",
@@ -88,7 +88,7 @@
         "user_agent.os.full": "Windows 7",
         "user_agent.os.name": "Windows",
         "user_agent.os.version": "7",
-        "user_agent.version": "57.0."
+        "user_agent.version": "57.0"
     },
     {
         "@timestamp": "2018-01-01T10:11:12.000Z",

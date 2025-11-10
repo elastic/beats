@@ -32,12 +32,16 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func makeTestInfo(version string) beat.Info {
+	logger, _ := logp.NewDevelopmentLogger("")
 	return beat.Info{
 		IndexPrefix: "filebeat",
 		Version:     version,
+		Logger:      logger,
 	}
 }
 
@@ -61,7 +65,7 @@ func TestLoadPipeline(t *testing.T) {
 		},
 	}
 
-	log := logp.NewLogger(logName)
+	log := logptest.NewTestingLogger(t, logName)
 	err := LoadPipeline(client, "my-pipeline-id", content, false, log)
 	require.NoError(t, err)
 
@@ -89,7 +93,7 @@ func checkUploadedPipeline(t *testing.T, client *eslegclient.Connection, expecte
 	var res map[string]interface{}
 	err = json.Unmarshal(response, &res)
 	if assert.NoError(t, err) {
-		assert.Equal(t, expectedDescription, res["my-pipeline-id"].(map[string]interface{})["description"], string(response))
+		assert.Equal(t, expectedDescription, res["my-pipeline-id"].(map[string]interface{})["description"], string(response)) //nolint:errcheck // Safe to ignore
 	}
 }
 
@@ -115,7 +119,12 @@ func TestSetupNginx(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("5.2.0"), FilesetOverrides{})
+	beatPaths := paths.New()
+	beatPaths.Home = t.TempDir()
+	if err := beatPaths.InitPaths(beatPaths); err != nil {
+		t.Fatal(err)
+	}
+	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("5.2.0"), FilesetOverrides{}, beatPaths)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -194,7 +203,12 @@ func TestLoadMultiplePipelines(t *testing.T) {
 		{"foo", &enabled, filesetConfigs},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"), FilesetOverrides{})
+	beatPaths := paths.New()
+	beatPaths.Home = t.TempDir()
+	if err := beatPaths.InitPaths(beatPaths); err != nil {
+		t.Fatal(err)
+	}
+	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"), FilesetOverrides{}, beatPaths)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -239,7 +253,13 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 		{"foo", &enabled, filesetConfigs},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"), FilesetOverrides{})
+	beatPaths := paths.New()
+	beatPaths.Home = t.TempDir()
+	if err := beatPaths.InitPaths(beatPaths); err != nil {
+		t.Fatal(err)
+	}
+
+	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"), FilesetOverrides{}, beatPaths)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -257,11 +277,15 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 }
 
 func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		t.Fatal(err)
+	}
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:      eslegtest.GetURL(),
 		Username: eslegtest.GetUser(),
 		Password: eslegtest.GetPass(),
-	})
+	}, logger)
 	if err != nil {
 		t.Fatal(err)
 		panic(err) // panic in case TestLogger did not stop test

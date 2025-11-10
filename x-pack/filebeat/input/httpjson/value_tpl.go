@@ -26,6 +26,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/useragent"
@@ -82,6 +83,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"urlEncode":           urlEncode,
 			"userAgent":           userAgentString,
 			"uuid":                uuidString,
+			"terminate":           func(s string) (any, error) { return nil, &errTerminate{s} },
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -94,20 +96,36 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
-func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
+type errTerminate struct {
+	Reason string
+}
+
+func (e *errTerminate) Error() string {
+	if e.Reason != "" {
+		return "terminated template: " + e.Reason
+	}
+	return "terminated template"
+}
+
+func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, stat status.StatusReporter, log *logp.Logger) (val string, err error) {
 	fallback := func(err error) (string, error) {
 		if defaultVal != nil {
 			log.Debugw("template execution: falling back to default value", "target", targetName)
-			return defaultVal.Execute(emptyTransformContext(), transformable{}, targetName, nil, log)
+			return defaultVal.Execute(emptyTransformContext(), transformable{}, targetName, nil, stat, log)
 		}
 		return "", err
 	}
 
 	defer func() {
 		if r := recover(); r != nil {
+			// Let's make this slightly less awful than it currently is.
+			log.Debugw("panicked in template", "target", targetName, "error", r)
 			val, err = fallback(errExecutingTemplate)
 		}
 		if err != nil {
+			if _, ignoreEmpty := stat.(ignoreEmptyValueReporter); !ignoreEmpty || !errors.Is(err, errEmptyTemplateResult) {
+				stat.UpdateStatus(status.Degraded, fmt.Sprintf("failed to execute template %s: %v", targetName, err))
+			}
 			log.Debugw("template execution failed", "target", targetName, "error", err)
 		}
 		tryDebugTemplateValue(targetName, val, log)
@@ -128,6 +146,11 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName
 	}
 
 	if err := t.Template.Execute(buf, data); err != nil {
+		var termErr *errTerminate
+		if errors.As(err, &termErr) {
+			log.Debugw("template execution terminated", "target", targetName, "reason", termErr.Reason)
+			return "", nil
+		}
 		return fallback(err)
 	}
 

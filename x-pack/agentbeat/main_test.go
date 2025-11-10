@@ -10,6 +10,8 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
+
+	"github.com/elastic/beats/v7/x-pack/agentbeat/cmd"
 )
 
 var (
@@ -20,7 +22,7 @@ var (
 func init() {
 	testing.Init()
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
-	abCommand = AgentBeat()
+	abCommand = cmd.AgentBeat()
 	abCommand.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
 	abCommand.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
 }

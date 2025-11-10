@@ -243,7 +243,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#------------------------------- Mongodb Module -------------------------------
+#------------------------------- MongoDB Module -------------------------------
 #- module: mongodb
   # Logs
   #log:
@@ -845,7 +845,13 @@ filebeat.inputs:
 
   # Files for the modification data is older than clean_inactive the state from the registry is removed
   # By default this is disabled.
+  # Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
   #clean_inactive: -1
+
+  # Enable this to disable all checks regarding clean_inactive and re-ingest
+  # all data when clean_inactive: 0, effectively keeping the
+  # old behaviour.
+  #legacy_clean_inactive: false
 
   # Removes the state for files which cannot be found on disk anymore immediately
   #clean_removed: true
@@ -879,10 +885,18 @@ filebeat.inputs:
   # Available options: since_first_start, since_last_start.
   #ignore_inactive: ""
 
-  # If `take_over` is set to `true`, this `filestream` will take over all files
-  # from `log` inputs if they match at least one of the `paths` set in the `filestream`.
+  # When `take_over.enabled` is set to `true` this `filestream` input
+  # will take over files from `log` or `filestream` (need to set `from_ids`) inputs.
+  # Taking over states of active `log` or `filestream` inputs is not
+  # supported and will lead to inconsistent data ingestion (data
+  # duplication or data loss).
   # This functionality is still in beta.
-  #take_over: false
+  #take_over:
+  #  enabled: true
+  #  If `from_ids` is set, then the files are taken over
+  #  from `filestream` inputs that were assigned these IDs.
+  #  Taking over from `log` inputs is disabled when `from_ids` is set.
+  #  from_ids: ["foo", "bar"]
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
@@ -928,7 +942,8 @@ filebeat.inputs:
   # When enabling this option, a file handler is closed immediately in case a file can't be found
   # any more. In case the file shows up again later, harvesting will continue at the last known position
   # after scan_frequency.
-  #close.on_state_change.removed: true
+  # By default, it's `true` on Windows and `false` on the rest of the platforms.
+  #close.on_state_change.removed: false
 
   # Closes the file handler as soon as the harvesters reaches the end of the file.
   # By default this option is disabled.
@@ -940,6 +955,20 @@ filebeat.inputs:
   # By default this option is disabled.
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close.reader.after_interval: 0
+
+  ### File deleting options
+  # Filestream cam delete the file after it has been acknowledged by the output,
+  # has reached EOF or became inactive.
+
+  # Enable deleting the file after the reader is closed
+  # and all events have been ingested.
+  #delete.enabled: false
+
+  # Grace period to wait before trying to remove a file.
+  # If data is added during the grace, deletion is cancelled.
+  # The grace period will re-start next time the close condition
+  # is reached.
+  #delete.grace_period: 30m
 
 #----------------------------- Stdin input -------------------------------
 # Configuration to use stdin input
@@ -973,6 +1002,9 @@ filebeat.inputs:
 #- type: udp
   #enabled: false
 
+  # Number of pipeline workers
+  #number_of_workers: 1
+
   # Maximum size of the message received over UDP
   #max_message_size: 10KiB
 
@@ -990,6 +1022,9 @@ filebeat.inputs:
 
   # Character used to split new message
   #line_delimiter: "\n"
+
+  # Number of pipeline workers
+  #number_of_workers: 1
 
   # Maximum size in bytes of the message received over TCP
   #max_message_size: 20MiB
@@ -1194,6 +1229,10 @@ filebeat.inputs:
   # Glob based paths.
   #paths:
     #- /var/log/custom.journal
+
+  # When enabled, log entries will be ingested interleaved from all
+  # available journals, including remote ones.
+  #merge: false
 
   # The position to start reading from the journal, valid options are:
   #  - head: Starts reading at the beginning of the journal.

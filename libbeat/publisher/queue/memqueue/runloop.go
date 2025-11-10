@@ -125,11 +125,16 @@ func (l *runLoop) runIteration() {
 	}
 
 	select {
-	case <-l.broker.closeChan:
-		l.closing = true
-		close(l.broker.closingChan)
-		// Get requests are handled immediately during shutdown
-		l.maybeUnblockGetRequest()
+	case force := <-l.broker.closeChan:
+		if !l.closing {
+			l.closing = true
+			close(l.broker.closingChan)
+			// Get requests are handled immediately during shutdown
+			l.maybeUnblockGetRequest()
+		}
+		if force {
+			l.broker.ctxCancel()
+		}
 
 	case <-l.broker.ctx.Done():
 		// The queue is fully shut down, do nothing
@@ -154,6 +159,12 @@ func (l *runLoop) runIteration() {
 		l.getTimer.Stop()
 		l.handleGetReply(l.pendingGetRequest)
 		l.pendingGetRequest = nil
+	}
+
+	// Check for final shutdown (if we are closing and the event buffer is
+	// completely drained)
+	if l.closing && l.eventCount == 0 {
+		l.broker.ctxCancel()
 	}
 }
 
@@ -214,10 +225,6 @@ func (l *runLoop) handleDelete(count int) {
 	l.eventCount -= count
 	l.consumedCount -= count
 	l.observer.RemoveEvents(count, byteCount)
-	if l.closing && l.eventCount == 0 {
-		// Our last events were acknowledged during shutdown, signal final shutdown
-		l.broker.ctxCancel()
-	}
 }
 
 func (l *runLoop) handleInsert(req *pushRequest) {

@@ -137,10 +137,6 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 // as modified.
 func (s *stateStore) storeUser(u okta.User) *User {
 	su := User{User: u}
-	if u.Status == "DEPROVISIONED" {
-		su.State = Deleted
-		return &su
-	}
 	if existing, ok := s.users[u.ID]; ok {
 		su.State = Modified
 		*existing = su
@@ -156,10 +152,6 @@ func (s *stateStore) storeUser(u okta.User) *User {
 // as modified.
 func (s *stateStore) storeDevice(d okta.Device) *Device {
 	du := Device{Device: d}
-	if d.Status == "DEPROVISIONED" {
-		du.State = Deleted
-		return &du
-	}
 	if existing, ok := s.devices[d.ID]; ok {
 		du.State = Modified
 		*existing = du

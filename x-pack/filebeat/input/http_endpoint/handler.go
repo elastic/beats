@@ -13,6 +13,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"reflect"
 	"sort"
@@ -32,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -55,6 +57,7 @@ type handler struct {
 	validator   apiValidator
 	txBaseID    string        // Random value to make transaction IDs unique.
 	txIDCounter atomic.Uint64 // Transaction ID counter that is incremented for each request.
+	status      status.StatusReporter
 
 	// inFlight is the sum of message body length
 	// that have been received but not yet ACKed
@@ -84,15 +87,25 @@ type handler struct {
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	txID := h.nextTxID()
-	h.log.Debugw("request", "url", r.URL, "tx_id", txID)
-	status, err := h.validator.validateRequest(r)
+	h.log.Debugw("request", "url", r.URL, "method", r.Method, "tx_id", txID)
+	code, err := h.validator.validateRequest(r)
 	if err != nil {
-		h.sendAPIErrorResponse(txID, w, r, h.log, status, err)
+		h.status.UpdateStatus(status.Degraded, "request did not validate: "+err.Error())
+		h.sendAPIErrorResponse(txID, w, r, h.log, code, err)
+		return
+	}
+
+	if r.Method == http.MethodOptions {
+		for k, v := range h.validator.optionsHeaders {
+			w.Header()[textproto.CanonicalMIMEHeaderKey(k)] = v
+		}
+		w.WriteHeader(h.validator.optionsStatus)
 		return
 	}
 
 	wait, err := getTimeoutWait(r.URL, h.log)
 	if err != nil {
+		h.status.UpdateStatus(status.Degraded, "invalid wait_for_completion_timeout request: "+err.Error())
 		h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusBadRequest, err)
 		return
 	}
@@ -116,6 +129,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				h.log.Errorw("failed to write 503", "error", err)
 			}
+			h.status.UpdateStatus(status.Degraded, "exceeded max bytes in flight")
 			return
 		}
 	}
@@ -143,9 +157,10 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	})
 	h.metrics.batchesReceived.Add(1)
 	h.metrics.contentLength.Update(r.ContentLength)
-	body, status, err := getBodyReader(r)
+	body, code, err := getBodyReader(r)
 	if err != nil {
-		h.sendAPIErrorResponse(txID, w, r, h.log, status, err)
+		h.status.UpdateStatus(status.Degraded, "unable to get body reader: "+err.Error())
+		h.sendAPIErrorResponse(txID, w, r, h.log, code, err)
 		h.metrics.apiErrors.Add(1)
 		return
 	}
@@ -162,9 +177,10 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r.Body = io.NopCloser(&buf)
 	}
 
-	objs, status, err := httpReadJSON(body, h.program)
+	objs, code, err := httpReadJSON(body, h.program)
 	if err != nil {
-		h.sendAPIErrorResponse(txID, w, r, h.log, status, err)
+		h.sendAPIErrorResponse(txID, w, r, h.log, code, err)
+		h.status.UpdateStatus(status.Degraded, "unable to read message JSON: "+err.Error())
 		h.metrics.apiErrors.Add(1)
 		return
 	}
@@ -189,6 +205,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				break
 			} else if !errors.Is(err, errNotCRC) {
 				h.metrics.apiErrors.Add(1)
+				h.status.UpdateStatus(status.Degraded, "request did not validate with CRC: "+err.Error())
 				h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusBadRequest, err)
 				return
 			}
@@ -197,6 +214,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		acker.Add()
 		if err = h.publishEvent(obj, headers, acker); err != nil {
 			h.metrics.apiErrors.Add(1)
+			h.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
 			h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusInternalServerError, err)
 			return
 		}
@@ -205,6 +223,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	acker.Ready()
+	h.status.UpdateStatus(status.Running, "")
 	if acked == nil {
 		h.sendResponse(w, respCode, respBody)
 	} else {
@@ -217,6 +236,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			h.sendResponse(w, respCode, respBody)
 		case <-timeout.C:
 			h.log.Debugw("request timed out", "tx_id", txID)
+			h.status.UpdateStatus(status.Degraded, "request timeout exceeded")
 			h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusGatewayTimeout, errTookTooLong)
 		case <-h.ctx.Done():
 			h.log.Debugw("request context cancelled", "tx_id", txID)

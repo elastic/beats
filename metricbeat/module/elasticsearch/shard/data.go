@@ -19,14 +19,13 @@ package shard
 
 import (
 	"encoding/json"
+	"errors"
 	"strconv"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"fmt"
-
-	"github.com/joeshaw/multierror"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -65,7 +64,7 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		return fmt.Errorf("failure parsing Elasticsearch Cluster State API response: %w", err)
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	for _, index := range stateData.RoutingTable.Indices {
 		for _, shards := range index.Shards {
 			for i, shard := range shards {
@@ -146,7 +145,7 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		}
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func getSourceNode(nodeID string, stateData *stateStruct) (mapstr.M, error) {

@@ -7,28 +7,32 @@ package awss3
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 )
 
 const inputName = "aws-s3"
 
-func Plugin(store beater.StateStore) v2.Plugin {
+func Plugin(logger *logp.Logger, store statestore.States, p *paths.Path) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "Collect logs from s3",
-		Manager:    &s3InputManager{store: store},
+		Manager:    &s3InputManager{store: store, logger: logger, path: p},
 	}
 }
 
 type s3InputManager struct {
-	store beater.StateStore
+	store  statestore.States
+	logger *logp.Logger
+	path   *paths.Path
 }
 
 func (im *s3InputManager) Init(grp unison.Group) error {
@@ -41,7 +45,7 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
+	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig, im.logger)
 	if err != nil {
 		return nil, fmt.Errorf("initializing AWS config: %w", err)
 	}
@@ -53,7 +57,7 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	}
 
 	if config.QueueURL != "" {
-		return newSQSReaderInput(config, awsConfig), nil
+		return newSQSReaderInput(config, awsConfig, im.path), nil
 	}
 
 	if config.BucketARN != "" || config.AccessPointARN != "" || config.NonAWSBucketName != "" {

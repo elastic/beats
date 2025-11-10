@@ -10,8 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"go.uber.org/multierr"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef/cef"
@@ -36,17 +34,17 @@ type processor struct {
 }
 
 // New constructs a new processor built from ucfg config.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the "+procName+" processor configuration: %w", err)
 	}
 
-	return newDecodeCEF(c)
+	return newDecodeCEF(c, log)
 }
 
-func newDecodeCEF(c config) (*processor, error) {
-	log := logp.NewLogger(logName)
+func newDecodeCEF(c config, logger *logp.Logger) (*processor, error) {
+	log := logger.Named(logName)
 	if c.ID != "" {
 		log = log.With("instance_id", c.ID)
 	}
@@ -97,7 +95,17 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, err
 	}
 
-	cefErrors := multierr.Errors(err)
+	var cefErrors []error
+	if err != nil {
+		if u, ok := err.(interface {
+			Unwrap() []error
+		}); ok {
+			cefErrors = u.Unwrap()
+		} else {
+			cefErrors = []error{err}
+		}
+	}
+
 	cefObject := toCEFObject(&ce)
 	_, _ = event.PutValue(p.TargetField, cefObject)
 

@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/mitchellh/hashstructure"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
@@ -32,6 +30,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+
+	"github.com/gohugoio/hashstructure"
 )
 
 // RunnerList implements a reloadable.List of Runners
@@ -44,12 +44,12 @@ type RunnerList struct {
 }
 
 // NewRunnerList builds and returns a RunnerList
-func NewRunnerList(name string, factory RunnerFactory, pipeline beat.PipelineConnector) *RunnerList {
+func NewRunnerList(name string, factory RunnerFactory, pipeline beat.PipelineConnector, logger *logp.Logger) *RunnerList {
 	return &RunnerList{
 		runners:  map[uint64]Runner{},
 		factory:  factory,
 		pipeline: pipeline,
-		logger:   logp.NewLogger(name),
+		logger:   logger.Named(name),
 	}
 }
 
@@ -95,7 +95,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		hash, err := HashConfig(config.Config)
 		if err != nil {
 			r.logger.Errorf("Unable to hash given config: %s", err)
-			errs = append(errs, fmt.Errorf("Unable to hash given config: %w", err))
+			errs = append(errs, fmt.Errorf("Unable to hash given config: %w", err)) //nolint:staticcheck //Keep old behavior
 			continue
 		}
 
@@ -238,6 +238,9 @@ func createRunner(factory RunnerFactory, pipeline beat.PipelineConnector, cfg *r
 	// Pass a copy of the config to the factory, this way if the factory modifies it,
 	// that doesn't affect the hash of the original one.
 	c, _ := config.NewConfigFrom(cfg.Config)
+	if run, ok := factory.(RunnerFactoryWithStatusReporter); ok && cfg.StatusReporter != nil {
+		return run.CreateWithReporter(pipetool.WithDynamicFields(pipeline, cfg.Meta), c, cfg.StatusReporter)
+	}
 	return factory.Create(pipetool.WithDynamicFields(pipeline, cfg.Meta), c)
 }
 

@@ -1,5 +1,5 @@
 - key: mysql
-  title: "MySQL"
+  title: MySQL
   description: >
     Module for parsing the MySQL log files.
   short_config: true

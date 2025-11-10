@@ -32,6 +32,7 @@ import (
 	"time"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -178,12 +179,13 @@ func TestFetchTimeout(t *testing.T) {
 	elapsed := time.Since(start)
 	var found bool
 	for _, err := range errs {
-		if strings.Contains(err.Error(), "Client.Timeout exceeded") {
+		if strings.Contains(err.Error(), "Client.Timeout exceeded") ||
+			strings.Contains(err.Error(), "context deadline exceeded") {
 			found = true
 		}
 	}
 	if !found {
-		assert.Failf(t, "", "expected an error containing 'Client.Timeout exceeded'. Got %v", errs)
+		assert.Failf(t, "", "expected an error containing 'context deadline exceeded' or 'Client.Timeout exceeded'. Got %v", errs)
 	}
 
 	// Elapsed should be ~50ms, sometimes it can be up to 1s
@@ -243,7 +245,7 @@ func TestHostParser(t *testing.T) {
 		{"localhost/ServerStatus", "http://localhost/ServerStatus?auto=", ""},
 		{"127.0.0.1", "http://127.0.0.1/server-status?auto=", ""},
 		{"https://127.0.0.1", "https://127.0.0.1/server-status?auto=", ""},
-		{"[2001:db8:0:1]:80", "http://[2001:db8:0:1]:80/server-status?auto=", ""},
+		{"[2001:db8::1]:80", "http://[2001:db8::1]:80/server-status?auto=", ""},
 		{"https://admin:secret@127.0.0.1", "https://admin:secret@127.0.0.1/server-status?auto=", ""},
 	}
 
@@ -267,7 +269,7 @@ func TestStatusOutputs(t *testing.T) {
 		assert.NoError(t, err, "cannot open test file "+filename)
 		scanner := bufio.NewScanner(f)
 
-		_, err = eventMapping(scanner, "localhost")
+		_, err = eventMapping(scanner, "localhost", logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err, "error mapping "+filename)
 	}
 }

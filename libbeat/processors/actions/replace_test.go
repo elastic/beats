@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -217,12 +217,78 @@ func TestReplaceRun(t *testing.T) {
 			IgnoreMissing: false,
 			FailOnError:   true,
 		},
+		{
+			description: "non-string value: nil",
+			Fields: []replaceConfig{
+				{
+					Field:       "f",
+					Pattern:     regexp.MustCompile(`.*`),
+					Replacement: ptr("b"),
+				},
+			},
+			Input: mapstr.M{
+				"f": nil,
+			},
+			Output: mapstr.M{
+				"f": nil,
+				"error": mapstr.M{
+					"message": "Failed to replace fields in processor: key 'f' expected type string, but got <nil> with value '<nil>'",
+				},
+			},
+			error:         true,
+			IgnoreMissing: false,
+			FailOnError:   true,
+		},
+		{
+			description: "non-string value: float64",
+			Fields: []replaceConfig{
+				{
+					Field:       "f",
+					Pattern:     regexp.MustCompile(`.*`),
+					Replacement: ptr("b"),
+				},
+			},
+			Input: mapstr.M{
+				"f": 123.45,
+			},
+			Output: mapstr.M{
+				"f": 123.45,
+				"error": mapstr.M{
+					"message": "Failed to replace fields in processor: key 'f' expected type string, but got float64 with value '123.45'",
+				},
+			},
+			error:         true,
+			IgnoreMissing: false,
+			FailOnError:   true,
+		},
+		{
+			description: "non-string value: integer",
+			Fields: []replaceConfig{
+				{
+					Field:       "f",
+					Pattern:     regexp.MustCompile(`.*`),
+					Replacement: ptr("b"),
+				},
+			},
+			Input: mapstr.M{
+				"f": 123,
+			},
+			Output: mapstr.M{
+				"f": 123,
+				"error": mapstr.M{
+					"message": "Failed to replace fields in processor: key 'f' expected type string, but got int with value '123'",
+				},
+			},
+			error:         true,
+			IgnoreMissing: false,
+			FailOnError:   true,
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
 			f := &replaceString{
-				log: logp.NewLogger("replace"),
+				log: logptest.NewTestingLogger(t, "replace"),
 				config: replaceStringConfig{
 					Fields:        test.Fields,
 					IgnoreMissing: test.IgnoreMissing,

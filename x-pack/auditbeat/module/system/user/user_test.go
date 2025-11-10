@@ -28,7 +28,7 @@ func TestData(t *testing.T) {
 	// Set lastState and add test process to cache so it will be reported as stopped.
 	f.(*MetricSet).lastState = time.Now()
 	u := testUser()
-	f.(*MetricSet).cache.DiffAndUpdateCache(convertToCacheable([]*User{u}))
+	f.(*MetricSet).cache.DiffAndUpdateCache([]*User{u})
 
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {

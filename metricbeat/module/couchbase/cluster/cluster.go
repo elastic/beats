@@ -74,7 +74,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	reporter.Event(mb.Event{
-		MetricSetFields: eventMapping(content),
+		MetricSetFields: eventMapping(content, m.Logger()),
 	})
 
 	return nil

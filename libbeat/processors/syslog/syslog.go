@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/beats/v7/libbeat/reader/syslog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -107,7 +107,7 @@ func defaultConfig() config {
 }
 
 // New creates a new processor from the provided configuration, or an error if the configuration is invalid.
-func New(c *conf.C) (beat.Processor, error) {
+func New(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	cfg := defaultConfig()
 
 	if err := c.Unpack(&cfg); err != nil {
@@ -115,14 +115,14 @@ func New(c *conf.C) (beat.Processor, error) {
 	}
 
 	id := int(instanceID.Add(1))
-	log := logp.NewLogger(logName).With("instance_id", id)
+	log = log.Named(logName).With("instance_id", id)
 	registryName := logName + "." + strconv.Itoa(id)
 
 	if cfg.Tag != "" {
 		log = log.With("tag", cfg.Tag)
 		registryName = logName + "." + cfg.Tag + "-" + strconv.Itoa(id)
 	}
-	registry := monitoring.Default.NewRegistry(registryName, monitoring.DoNotReport)
+	registry := monitoring.Default.GetOrCreateRegistry(registryName, monitoring.DoNotReport)
 
 	return &processor{
 		config: cfg,

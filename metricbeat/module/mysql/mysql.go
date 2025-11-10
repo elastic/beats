@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 /*
 Package mysql is Metricbeat module for MySQL server.
 */
@@ -62,7 +64,7 @@ func NewMetricset(base mb.BaseMetricSet) (*Metricset, error) {
 	}
 
 	if c.TLS.IsEnabled() {
-		tlsConfig, err := tlscommon.LoadTLSConfig(c.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(c.TLS, base.Logger())
 		if err != nil {
 			return nil, fmt.Errorf("could not load provided TLS configuration: %w", err)
 		}

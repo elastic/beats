@@ -1,0 +1,100 @@
+{
+    "component_templates": [
+        {
+            "name": "metrics-mappings",
+            "component_template": {
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "synthetics-mappings",
+            "component_template": {
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".alerts-ecs-mappings"
+        },
+        {
+            "name": ".alerts-observability.uptime.alerts-mappings"
+        },
+        {
+            "name": ".alerts-observability.apm.alerts-mappings"
+        },
+        {
+            "name": ".alerts-observability.logs.alerts-mappings"
+        },
+        {
+            "name": ".deprecation-indexing-settings",
+            "component_template": {
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "logs-mappings",
+            "component_template": {
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "synthetics-settings",
+            "component_template": {
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".deprecation-indexing-mappings",
+            "component_template": {
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".alerts-observability.metrics.alerts-mappings"
+        },
+        {
+            "name": "metrics-settings",
+            "component_template": {
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "logs-settings",
+            "component_template": {
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".alerts-technical-mappings"
+        },
+        {
+            "name": "data-streams-mappings",
+            "component_template": {
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "my-component-template-1"
+        },
+        {
+            "name": "my-component-template-2"
+        }
+    ]
+}
