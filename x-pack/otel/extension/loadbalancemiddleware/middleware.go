@@ -53,7 +53,6 @@ func (lb *loadBalanceMiddleware) Start(ctx context.Context, host component.Host)
 				return err
 			}
 			lb.provider = &errorRoundTripperProvider{err: err}
-			// we break out of the loop
 			return nil
 		}
 		urls[i], err = url.Parse(finalEndpoint)
@@ -64,7 +63,6 @@ func (lb *loadBalanceMiddleware) Start(ctx context.Context, host component.Host)
 				return err
 			}
 			lb.provider = &errorRoundTripperProvider{err: err}
-			// we break out of the loop
 			return nil
 		}
 	}
@@ -80,7 +78,6 @@ func (lb *loadBalanceMiddleware) GetHTTPRoundTripper(base http.RoundTripper) (ht
 	return lb.provider.RoundTripper(base), nil
 }
 
-// errorRoundTripperProvider provides a RoundTripper that always returns an error
 type loadBalanceRoundTripperProvider struct {
 	endpoints []*url.URL
 	base      http.RoundTripper
@@ -92,14 +89,14 @@ func (lbr *loadBalanceRoundTripperProvider) RoundTripper(base http.RoundTripper)
 }
 
 func (lbr *loadBalanceRoundTripperProvider) RoundTrip(req *http.Request) (*http.Response, error) {
-	// Use the first endpoint in the list
+	// use the first endpoint in the list
 	req.URL = lbr.endpoints[0]
 	resp, err := lbr.base.RoundTrip(req)
 	if err != nil {
 		// if response is unsuccessful, move the first endpoint to the end of the list
 		lbr.endpoints = append(lbr.endpoints[1:], lbr.endpoints[0])
 	}
-	// Return the error as is for the caller of RoundTrip to handle retry logic
+	// return the error as is for the caller of RoundTrip to handle retry logic
 	return resp, err
 }
 
