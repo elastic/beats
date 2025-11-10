@@ -52,13 +52,20 @@ func New(tb testing.TB, configYAML string) *Collector {
 		tb.Fatalf("failed to create collector: %v", err)
 	}
 
+	var zapBuf zaptest.Buffer
 	zapCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
-		&zaptest.Discarder{},
+		&zapBuf,
 		zapcore.DebugLevel,
 	)
 	observed, observer := observer.New(zapcore.DebugLevel)
 	core := zapcore.NewTee(zapCore, observed)
+
+	tb.Cleanup(func() {
+		if tb.Failed() {
+			tb.Log("OTel Collector logs:\n" + zapBuf.String())
+		}
+	})
 
 	settings := newCollectorSettings("file:"+configFile, core)
 	col, err := otelcol.NewCollector(settings)
