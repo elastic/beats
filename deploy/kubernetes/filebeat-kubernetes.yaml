@@ -167,7 +167,7 @@ data:
     #       hints.enabled: true
     #       hints.default_config:
     #         type: filestream
-    #         id: kubernetes-pod-logs-${data.kubernetes.pod.name}_${data.kubernetes.pod.uid}
+    #         id: kubernetes-container-logs-${data.kubernetes.pod.uid}-${data.kubernetes.container.name}
     #         gzip_experimental: true # BETA: enable gzip decompression. Refer to the docs for details: https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-filestream#reading-gzip-files
     #         paths:
     #           - /var/log/pods/${data.kubernetes.namespace}_${data.kubernetes.pod.name}_${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log
