@@ -151,8 +151,7 @@ func TestFileAuthTransportAllowsInsecurePermissionsWithFlag(t *testing.T) {
 		t.Fatalf("failed to write token file: %v", err)
 	}
 
-	relaxed := true
-	cfg := &fileAuthConfig{Path: path, RelaxedPermissions: &relaxed}
+	cfg := &fileAuthConfig{Path: path, RelaxedPermissions: true}
 
 	transport, err := newFileAuthTransport(cfg, http.DefaultTransport)
 	if err != nil {

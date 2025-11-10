@@ -44,8 +44,7 @@ func newFileAuthTransport(cfg *fileAuthConfig, base http.RoundTripper) (*fileAut
 	}
 
 	// Verify file permissions are restrictive (0600) unless relaxed_permissions is enabled
-	relaxedPermissions := cfg.RelaxedPermissions != nil && *cfg.RelaxedPermissions
-	if !relaxedPermissions {
+	if !cfg.RelaxedPermissions {
 		perm := info.Mode().Perm()
 		if perm != 0o600 {
 			return nil, fmt.Errorf("file auth: file %q has insecure permissions %o, expected 0600 (set relaxed_permissions: true to allow)", cfg.Path, perm)

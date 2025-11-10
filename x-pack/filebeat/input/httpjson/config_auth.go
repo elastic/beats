@@ -86,7 +86,7 @@ type fileAuthConfig struct {
 	Header             string         `config:"header"`
 	Prefix             string         `config:"prefix"`
 	RefreshInterval    *time.Duration `config:"refresh_interval"`
-	RelaxedPermissions *bool          `config:"relaxed_permissions"`
+	RelaxedPermissions bool           `config:"relaxed_permissions"`
 }
 
 func (f *fileAuthConfig) isEnabled() bool {
