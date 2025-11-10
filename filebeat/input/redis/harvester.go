@@ -165,7 +165,13 @@ func (h *Harvester) Run() error {
 
 		var log log
 		var args []string
-		_, err = rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args, &log.clientAddr, &log.clientName)
+
+		// Redis < 6.0 returns 4 fields, Redis >= 6.0 returns 6 fields (adds clientAddr and clientName)
+		if len(entry) >= 6 {
+			_, err = rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args, &log.clientAddr, &log.clientName)
+		} else {
+			_, err = rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args)
+		}
 		if err != nil {
 			h.logger.Errorf("Error scanning slowlog entry: %s", err)
 			continue
@@ -192,9 +198,15 @@ func (h *Harvester) Run() error {
 			"duration": mapstr.M{
 				"us": log.duration,
 			},
-			"role":       role,
-			"clientAddr": log.clientAddr,
-			"clientName": log.clientName,
+			"role": role,
+		}
+
+		// Only include client fields if they are present (Redis 6.0+)
+		if log.clientAddr != "" {
+			slowlogEntry["clientAddr"] = log.clientAddr
+		}
+		if log.clientName != "" {
+			slowlogEntry["clientName"] = log.clientName
 		}
 
 		if log.args != nil {
