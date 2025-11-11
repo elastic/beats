@@ -15,9 +15,9 @@ import (
 
 func AmcacheApplicationView() *hooks.View {
 	return hooks.NewView(
-		"V_AmcacheApplications",
-		[]string{"amcache_application", "amcache_application_file"},
-		`CREATE VIEW V_AmcacheApplications AS
+		"elastic_amcache_applications_view",
+		[]string{"elastic_amcache_application", "elastic_amcache_application_file"},
+		`CREATE VIEW elastic_amcache_applications_view AS
 		-- Part 1: Get all 'app' rows, and any matching 'file' rows
 		SELECT
 			-- 'file' columns (22) - Prioritize file data when it exists
@@ -63,8 +63,8 @@ func AmcacheApplicationView() *hooks.View {
 			app.user_sid,
 			app.sha1 as app_sha1
 		FROM
-			amcache_application AS app
-		LEFT JOIN amcache_application_file AS file ON app.program_id = file.program_id
+			elastic_amcache_application AS app
+		LEFT JOIN elastic_amcache_application_file AS file ON app.program_id = file.program_id
 
 		UNION ALL
 
@@ -99,8 +99,8 @@ func AmcacheApplicationView() *hooks.View {
 			NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			NULL as app_sha1
 		FROM
-			amcache_application_file AS file
-		LEFT JOIN amcache_application AS app ON file.program_id = app.program_id
+			elastic_amcache_application_file AS file
+		LEFT JOIN elastic_amcache_application AS app ON file.program_id = app.program_id
 		WHERE
 			app.program_id IS NULL;`)
 }
