@@ -25,13 +25,18 @@ import (
 	"sync"
 
 	"github.com/go-ldap/ldap/v3"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // ldapClient manages a single reusable LDAP connection
 type ldapClient struct {
-	conn *ldap.Conn
-	mu   sync.Mutex
 	*ldapConfig
+
+	mu   sync.Mutex
+	conn *ldap.Conn
+
+	log *logp.Logger
 }
 
 type ldapConfig struct {
@@ -46,21 +51,22 @@ type ldapConfig struct {
 }
 
 // newLDAPClient initializes a new ldapClient with a single connection
-func newLDAPClient(config *ldapConfig) (*ldapClient, error) {
-	client := &ldapClient{ldapConfig: config}
+func newLDAPClient(config *ldapConfig, log *logp.Logger) (*ldapClient, error) {
+	client := &ldapClient{ldapConfig: config, log: log}
 
 	// Establish initial connection
-	if err := client.connect(); err != nil {
+	conn, err := client.dial()
+	if err != nil {
 		return nil, err
 	}
+	client.conn = conn
 
 	return client, nil
 }
 
-// connect establishes a new connection to the LDAP server
-func (client *ldapClient) connect() error {
-	client.mu.Lock()
-	defer client.mu.Unlock()
+// dial establishes a new connection to the LDAP server
+func (client *ldapClient) dial() (*ldap.Conn, error) {
+	client.log.Debugw("ldap client connecting")
 
 	// Connect with or without TLS based on configuration
 	var opts []ldap.DialOpt
@@ -69,45 +75,48 @@ func (client *ldapClient) connect() error {
 	}
 	conn, err := ldap.DialURL(client.address, opts...)
 	if err != nil {
-		return fmt.Errorf("failed to dial LDAP server: %w", err)
+		return nil, fmt.Errorf("failed to dial LDAP server: %w", err)
 	}
 
 	if client.password != "" {
+		client.log.Debugw("ldap client bind")
 		err = conn.Bind(client.username, client.password)
 	} else {
+		client.log.Debugw("ldap client unauthenticated bind")
 		err = conn.UnauthenticatedBind(client.username)
 	}
 
 	if err != nil {
 		conn.Close()
-		return fmt.Errorf("failed to bind to LDAP server: %w", err)
+		return nil, fmt.Errorf("failed to bind to LDAP server: %w", err)
 	}
 
-	client.conn = conn
-	return nil
+	return conn, nil
 }
 
 // reconnect checks the connection's health and reconnects if necessary
-func (client *ldapClient) reconnect() error {
+func (client *ldapClient) connection() (*ldap.Conn, error) {
 	client.mu.Lock()
 	defer client.mu.Unlock()
 
 	// Check if the connection is still alive
 	if client.conn.IsClosing() {
-		return client.connect()
+		conn, err := client.dial()
+		if err != nil {
+			return nil, err
+		}
+		client.conn = conn
 	}
-	return nil
+	return client.conn, nil
 }
 
 // findObjectBy searches for an object and returns its mapped values.
 func (client *ldapClient) findObjectBy(searchBy string) ([]string, error) {
 	// Ensure the connection is alive or reconnect if necessary
-	if err := client.reconnect(); err != nil {
+	conn, err := client.connection()
+	if err != nil {
 		return nil, fmt.Errorf("failed to reconnect: %w", err)
 	}
-
-	client.mu.Lock()
-	defer client.mu.Unlock()
 
 	// Format the filter and perform the search
 	filter := fmt.Sprintf("(%s=%s)", client.searchAttr, searchBy)
@@ -118,7 +127,7 @@ func (client *ldapClient) findObjectBy(searchBy string) ([]string, error) {
 	)
 
 	// Execute search
-	result, err := client.conn.Search(searchRequest)
+	result, err := conn.Search(searchRequest)
 	if err != nil {
 		return nil, fmt.Errorf("search failed: %w", err)
 	}
@@ -137,5 +146,6 @@ func (client *ldapClient) close() {
 	defer client.mu.Unlock()
 	if client.conn != nil {
 		client.conn.Close()
+		client.conn = nil
 	}
 }
