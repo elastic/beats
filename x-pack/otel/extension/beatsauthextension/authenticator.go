@@ -19,13 +19,14 @@ import (
 	"google.golang.org/grpc/credentials"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	krbclient "github.com/elastic/gokrb5/v8/client"
 	krbconfig "github.com/elastic/gokrb5/v8/config"
 	"github.com/elastic/gokrb5/v8/keytab"
 	"github.com/elastic/gokrb5/v8/spnego"
+
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 var (
