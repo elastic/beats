@@ -31,7 +31,7 @@ func GetPredictableTime(seed int64) time.Time {
 	return time.Date(year, time.Month(month), day, hour, minute, second, 0, time.UTC)
 }
 
-func GetCurrentDirectoryOrFatal(t *testing.T) string {
+func MustGetTestDataDirectory(t *testing.T) string {
 	_, currentFile, _, ok := runtime.Caller(0)
 	if !ok {
 		t.Fatal("failed to get current file path")
@@ -39,44 +39,49 @@ func GetCurrentDirectoryOrFatal(t *testing.T) string {
 	return filepath.Dir(currentFile)
 }
 
-func EnsureDirectoryExistsOrFatal(t *testing.T, directory string) {
+func MustEnsureDirectoryExists(t *testing.T, directory string) {
 	if _, err := os.Stat(directory); os.IsNotExist(err) {
 		log.Printf("error: directory does not exist: %v", directory)
 		t.Fatal(err)
 	}
 }
 
-func GetAutomaticDestinationsOrFatal(t *testing.T) []string {
-	currentDirectory := GetCurrentDirectoryOrFatal(t)
-	automaticDestinationsDirectory := filepath.Join(currentDirectory, "AutomaticDestinations")
-	EnsureDirectoryExistsOrFatal(t, automaticDestinationsDirectory)
+func MustGetFilesInDirectory(t *testing.T, directory string) []string {
+	MustEnsureDirectoryExists(t, directory)
 
-	files, err := os.ReadDir(automaticDestinationsDirectory)
+	absPath, err := filepath.Abs(directory)
 	if err != nil {
-		log.Printf("error: failed to read AutomaticDestinations directory: %v", err)
+		log.Printf("error: failed to get absolute path: %v", err)
 		t.Fatal(err)
 	}
-
-	automaticDestinations := []string{}
-	for _, file := range files {
-		automaticDestinations = append(automaticDestinations, filepath.Join(automaticDestinationsDirectory, file.Name()))
+	files, err := os.ReadDir(absPath)
+	if err != nil {
+		log.Printf("error: failed to read directory: %v", err)
+		t.Fatal(err)
 	}
-	return automaticDestinations
+	filesNames := []string{}
+	for _, file := range files {
+		filesNames = append(filesNames, filepath.Join(absPath, file.Name()))
+	}
+	return filesNames
 }
 
-func GetCustomDestinationsOrFatal(t *testing.T) []string {
-	currentDirectory := GetCurrentDirectoryOrFatal(t)
-	customDestinationsDirectory := filepath.Join(currentDirectory, "CustomDestinations")
-	EnsureDirectoryExistsOrFatal(t, customDestinationsDirectory)
+func MustGetCustomDestinationDirectory(t *testing.T) string {
+	testDataDirectory := MustGetTestDataDirectory(t)
+	return filepath.Join(testDataDirectory, "custom_destinations")
+}
 
-	files, err := os.ReadDir(customDestinationsDirectory)
-	if err != nil {
-		log.Printf("error: failed to read CustomDestinations directory: %v", err)
-		t.Fatal(err)
-	}
-	customDestinations := []string{}
-	for _, file := range files {
-		customDestinations = append(customDestinations, filepath.Join(customDestinationsDirectory, file.Name()))
-	}
-	return customDestinations
+func MustGetAutomaticDestinationDirectory(t *testing.T) string {
+	testDataDirectory := MustGetTestDataDirectory(t)
+	return filepath.Join(testDataDirectory, "automatic_destinations")
+}
+
+func MustGetAutomaticDestinations(t *testing.T) []string {
+	automaticDestinationsDirectory := MustGetAutomaticDestinationDirectory(t)
+	return MustGetFilesInDirectory(t, automaticDestinationsDirectory)
+}
+
+func MustGetCustomDestinations(t *testing.T) []string {
+	customDestinationsDirectory := MustGetCustomDestinationDirectory(t)
+	return MustGetFilesInDirectory(t, customDestinationsDirectory)
 }
