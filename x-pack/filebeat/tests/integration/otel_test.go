@@ -1002,10 +1002,11 @@ http.port: {{.MonitoringPort}}
 func TestFileBeatKerberos(t *testing.T) {
 
 	wantEvents := 1
+	krbURL := fmt.Sprintf("http://localhost:9203") // this is kerberos client - we've hardcoded the URL here
 
 	// ES client
 	esCfg := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9203"}, // this is kerberos client - we've hardcoded the URL here
+		Addresses: []string{krbURL},
 		Username:  "admin",
 		Password:  "testing",
 		Transport: &http.Transport{
@@ -1035,10 +1036,12 @@ func TestFileBeatKerberos(t *testing.T) {
 		Index     string
 		InputFile string
 		PathHome  string
+		Endpoint  string
 	}{
 		Index:     filebeatIndex,
 		InputFile: filepath.Join(filebeatOTel.TempDir(), "log.log"),
 		PathHome:  filebeatOTel.TempDir(),
+		Endpoint:  krbURL,
 	}
 
 	cfg := `receivers:
@@ -1071,7 +1074,7 @@ exporters:
     verbosity: detailed
   elasticsearch/log:
     endpoints:
-      - http://localhost:9203
+      - {{.Endpoint}}
     logs_index: {{.Index}}
     mapping:
       mode: bodymap
@@ -1122,7 +1125,6 @@ service:
 // setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
 func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 
-	// Create a context
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -1152,7 +1154,7 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.Perform(req)
-	requir.e.NoError(t, err, "could not perform role mapping request")
+	require.NoError(t, err, "could not perform role mapping request")
 	defer resp.Body.Close()
 
 	require.Equal(t, resp.StatusCode, http.StatusOK, "incorrect response code")
