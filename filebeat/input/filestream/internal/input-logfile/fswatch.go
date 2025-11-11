@@ -69,19 +69,22 @@ type FileDescriptor struct {
 	// GZIP indicates if the file is compressed with GZIP.
 	GZIP bool
 
-	size int64
+	// bytesIngested is the number of bytes already ingested by the harvester
+	// for this file
+	bytesIngested int64
 }
 
-// SetSize allows for setting a size that is different than the one in Info
-func (fd *FileDescriptor) SetSize(s int64) {
-	fd.size = s
+// SetBytesIngested allows for setting a size that is different than the one in Info
+func (fd *FileDescriptor) SetBytesIngested(s int64) {
+	fd.bytesIngested = s
 }
 
-// Size returns the file size. If [SetSize] has been called with a value other
-// than zero, this size is returned, otherwise Info.Size() is returned.
-func (fd FileDescriptor) Size() int64 {
-	if fd.size != 0 {
-		return fd.size
+// SizeOrBytesIngested returns the bytes ingested for the file or its size.
+// If [SetBytesIngested] has been called with a value other
+// than zero, the bytes ingested is returned, otherwise Info.Size() is returned.
+func (fd FileDescriptor) SizeOrBytesIngested() int64 {
+	if fd.bytesIngested != 0 {
+		return fd.bytesIngested
 	}
 
 	return fd.Info.Size()

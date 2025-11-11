@@ -49,7 +49,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 			// Check the filewatcher state
 			// Use the path from the event to be consistent with the
 			// fileWatcher implementation
-			stateSize := fw.prev[evt.NewPath].Size()
+			stateSize := fw.prev[evt.NewPath].SizeOrBytesIngested()
 			// 50 bytes per line, 60 lines = 3000 bytes
 			if stateSize != 3000 {
 				t.Fatalf(

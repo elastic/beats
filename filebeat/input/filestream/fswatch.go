@@ -197,8 +197,8 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 			continue
 		}
 
-		// If we got notifications about harvesters being closed, update their
-		// file size accordingly.
+		// If we got notifications about harvesters being closed, update
+		// the state accordingly.
 		//
 		// This is used to prevent a sort of race condition:
 		// When the reader/harvester reaches EOF, it blocks on a backoff,
@@ -222,7 +222,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		w.closedHarvestersMutex.Lock()
 		if size, harvesterClosed := w.closedHarvesters[srcID]; harvesterClosed {
 			w.log.Debugf("Updating previous state because harvester was closed. '%s': %d", srcID, size)
-			prevDesc.SetSize(size)
+			prevDesc.SetBytesIngested(size)
 		}
 		w.closedHarvestersMutex.Unlock()
 
@@ -243,7 +243,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		// the new size is larger, something was written.
 		// If a harvester for this file was closed recently,
 		// we use its state instead of the one we have cached.
-		case prevDesc.Size() < fd.Info.Size():
+		case prevDesc.SizeOrBytesIngested() < fd.Info.Size():
 			e = writeEvent(path, fd, srcID)
 			writtenCount++
 
