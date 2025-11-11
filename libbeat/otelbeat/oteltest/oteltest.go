@@ -20,7 +20,6 @@ package oteltest
 
 import (
 	"context"
-	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -217,11 +216,10 @@ func VerifyNoLeaks(t *testing.T) {
 		// See https://github.com/googleapis/google-cloud-go/issues/10948
 		// and https://github.com/census-instrumentation/opencensus-go/issues/1191
 		goleak.IgnoreAnyFunction("go.opencensus.io/stats/view.(*worker).start"),
-	}
-
-	if runtime.GOOS == "linux" && runtime.GOARCH == "arm64" {
-		// On arm64, some HTTP transport goroutines are leaked while still dialing.
-		skipped = append(skipped, goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"))
+		// On Linux, mainly arm64, some HTTP transport goroutines are leaked while still dialing.
+		goleak.IgnoreAnyFunction("net.(*netFD).connect"),
+		goleak.IgnoreAnyFunction("net.(*netFD).connect.func2"),
+		goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"),
 	}
 
 	goleak.VerifyNone(t, skipped...)
