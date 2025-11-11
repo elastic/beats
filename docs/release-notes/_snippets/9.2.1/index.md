@@ -19,8 +19,8 @@
 
 **All**
 
-* Add close to conditional processors if underlying processors have close method. [#46653](https://github.com/elastic/beats/pull/46653) [#46575](https://github.com/elastic/beats/issues/46575)
-* Fixes a bug where kerberos authentication could be disabled when server supports multiple authentication types. [#47444](https://github.com/elastic/beats/pull/47444) [#47443](https://github.com/elastic/beats/pull/47443) [#47110](https://github.com/elastic/beats/issues/47110)
+* Add `close` to conditional processors if underlying processors have a `close` method. [#46653](https://github.com/elastic/beats/pull/46653) [#46575](https://github.com/elastic/beats/issues/46575)
+* Fix a bug where Kerberos authentication could be disabled when server supports multiple authentication types. [#47444](https://github.com/elastic/beats/pull/47444) [#47443](https://github.com/elastic/beats/pull/47443) [#47110](https://github.com/elastic/beats/issues/47110)
 
 **Filebeat**
 
