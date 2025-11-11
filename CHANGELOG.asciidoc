@@ -6,12 +6,12 @@
 // begin 8.19.7 relnotes
 
 [[release-notes-8.19.7]]
-==  8.19.7
+=== Beats version 8.19.7
 https://github.com/elastic/beats/compare/v8.19.6\...v8.19.7[View commits]
 
 [discrete]
 [[new-features-8.19.7]]
-=== New features
+==== New features
 
 The 8.19.7 release adds the following new and notable features.
 
@@ -21,7 +21,7 @@ The 8.19.7 release adds the following new and notable features.
 
 [discrete]
 [[bug-fixes-8.19.7]]
-=== Bug fixes
+==== Bug fixes
 
 **All**
 
