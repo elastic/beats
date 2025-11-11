@@ -44,6 +44,7 @@ import (
 )
 
 type MockHost struct {
+	mu  sync.Mutex
 	Evt *componentstatus.Event
 }
 
@@ -52,7 +53,15 @@ func (*MockHost) GetExtensions() map[component.ID]component.Component {
 }
 
 func (h *MockHost) Report(evt *componentstatus.Event) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
 	h.Evt = evt
+}
+
+func (h *MockHost) getEvent() *componentstatus.Event {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.Evt
 }
 
 type ReceiverConfig struct {
@@ -170,7 +179,46 @@ func CheckReceivers(params CheckReceiversParams) {
 			}
 		}
 
+<<<<<<< HEAD
 		return ""
+=======
+		require.EventuallyWithT(t, func(ct *assert.CollectT) {
+			logsMu.Lock()
+			defer logsMu.Unlock()
+
+			// Ensure the logger fields from the otel collector are present
+			for _, zl := range zapLogs.All() {
+				require.Contains(ct, zl.ContextMap(), "otelcol.component.kind")
+				require.Equal(ct, "receiver", zl.ContextMap()["otelcol.component.kind"])
+				require.Contains(ct, zl.ContextMap(), "otelcol.signal")
+				require.Equal(ct, "logs", zl.ContextMap()["otelcol.signal"])
+				require.Contains(ct, zl.ContextMap(), "otelcol.component.id")
+				compID, ok := zl.ContextMap()["otelcol.component.id"].(string)
+				require.True(ct, ok, "otelcol.component.id should be a string")
+				compName := strings.Split(compID, "/")[1]
+				require.Contains(ct, zl.ContextMap(), "service.name")
+				require.Equal(ct, beatForCompName(compName), zl.ContextMap()["service.name"])
+				break
+			}
+			require.NotNil(ct, host.getEvent(), "expected not nil, got nil")
+
+			if params.Status.Error == "" {
+				require.Equalf(ct, host.Evt.Status(), componentstatus.StatusOK, "expected %v, got %v", params.Status.Status, host.Evt.Status())
+				require.Nilf(ct, host.Evt.Err(), "expected nil, got %v", host.Evt.Err())
+			} else {
+				require.Equalf(ct, host.Evt.Status(), params.Status.Status, "expected %v, got %v", params.Status.Status, host.Evt.Status())
+				require.ErrorContainsf(ct, host.Evt.Err(), params.Status.Error, "expected error to contain '%v': %v", params.Status.Error, host.Evt.Err())
+			}
+
+			if params.AssertFunc != nil {
+				params.AssertFunc(ct, logs, zapLogs)
+			}
+		}, 2*time.Minute, 1*time.Second,
+			"timeout waiting for logger fields from the OTel collector are present in the logs and other assertions to be met")
+		for i, r := range receivers {
+			require.NoErrorf(t, r.Shutdown(ctx), "Error shutting down receiver %d", i)
+		}
+>>>>>>> c997509dd (otel: unskip filebeat TestMultipleReceivers (#47228))
 	}
 
 	require.EventuallyWithT(t, func(ct *assert.CollectT) {
