@@ -72,18 +72,7 @@ func buildJWKAndAlg(privateKey any) (any, error) {
 	case *rsa.PrivateKey:
 		return rsaPublicJWK(&k.PublicKey)
 	case *ed25519.PrivateKey:
-		// The nolint comment is a contrafactual referring to runtime.throw,
-		// that we should not be using; it is pointing out that if we were in
-		// the state that a *ed25519.PrivateKey returned a value from Public()
-		// that was not a ed25519.PublicKey, something terrible has gone wrong,
-		// not limited to issues that are explained under the computing model
-		// that the physical layer is perfect. In that case we should crash in
-		// a way that cannot be recovered. This is a throw, necessitated by the
-		// fact that there is unreasonable use of recover in the beats code that
-		// attempts to cover up these kinds of outcomes.
-		//
-		// The whole comment here is pointless, including the nolint.
-		return edPublicJWK(k.Public().(ed25519.PublicKey)) //nolint:errcheck // errcheck is wrong to call this out; if this type assertion ever failed we should probably throw, not just panic.
+		return edPublicJWK(k.Public().(ed25519.PublicKey)) //nolint:errcheck // This cannot panic; *ed25519.PrivateKey.Public returns a ed25519.PublicKey.
 	default:
 		return nil, errors.New("unsupported private key type for DPoP: expected *ecdsa.PrivateKey, *rsa.PrivateKey or *ed25519.PrivateKey")
 	}

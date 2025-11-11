@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//nolint:bodyclose,errcheck,noctx // ಠ_ಠ These are already incorporated into the testing logic, or are redundant because of the limited life-span of the test execution.
+//nolint:bodyclose,errcheck,noctx // These are redundant in the context of testing.
 package dpop
 
 import (

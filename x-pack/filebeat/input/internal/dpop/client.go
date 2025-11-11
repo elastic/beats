@@ -158,14 +158,6 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 func discard(r io.ReadCloser) {
-	// The errcheck linter is an overly strict linter that has no conception
-	// of data flow and origins of errors. io.Discard never return an error
-	// and is documented to have this behaviour. This function's sole role
-	// it to discard a response body in order to allow the release of a
-	// network connection; we do not care whether the read failed. If there
-	// is a deeper underlying issue that caused the read to fail and the
-	// program is thus in a bad state, that will come up elsewhere and was
-	// almost certainly not interesting here.
-	io.Copy(io.Discard, r) //nolint:errcheck // ¯\_(ツ)_/¯
+	io.Copy(io.Discard, r) //nolint:errcheck // io.Discard.Write never returns an error and we do not care about r.Read failing since we are just discarding.
 	r.Close()
 }
