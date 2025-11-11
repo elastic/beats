@@ -5,10 +5,11 @@ import unittest
 
 from beat.beat import INTEGRATION_TESTS
 from contextlib import contextmanager
+from filebeat import log_as_filestream, remove_filestream_fields
 
 
 stopping_msg = "Stopping runner: input"
-if filebeat.log_as_filestream():
+if log_as_filestream():
     stopping_msg = "Stopping runner: filestream"
 
 
@@ -98,7 +99,7 @@ class TestAutodiscover(filebeat.BaseTest):
             err_msg="the test container is not running yet")
 
         start_msg = "Starting runner: input"
-        if filebeat.log_as_filestream():
+        if log_as_filestream():
             start_msg = "Starting runner: filestream"
 
         self.wait_until(lambda: self.log_contains(start_msg),
@@ -113,7 +114,8 @@ class TestAutodiscover(filebeat.BaseTest):
         assert output[0]['container']['name'] == container.name
         assert output[0]['docker']['container']['labels'] == container.labels
         assert 'name' in output[0]['container']
-
+        if log_as_filestream():
+            remove_filestream_fields(output)
         self.assert_fields_are_documented(output[0])
 
     @contextmanager

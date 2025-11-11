@@ -222,3 +222,13 @@ class LogState:
 
 def log_as_filestream():
     return setuptools.distutils.util.strtobool(os.getenv("RUN_AS_FILESTREAM", "False"))
+
+
+def remove_filestream_fields(evts):
+    for evt in evts:
+        if 'log' in evt:
+            if 'file' in evt['log']:
+                if 'inode' in evt['log']['file']:
+                    del evt['log']['file']['inode']
+                if 'device_id' in evt['log']['file']:
+                    del evt['log']['file']['device_id']
