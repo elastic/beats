@@ -18,7 +18,7 @@ type Config struct {
 type ESAuthConfig struct {
 	Kerberos    *kerberos.Config                 `config:"kerberos"`
 	Transport   httpcommon.HTTPTransportSettings `config:",inline"`
-	LoadBalance bool                             `config:"load_balance"`
+	LoadBalance bool                             `config:"loadbalance"`
 	Endpoints   []string                         `config:"endpoints"`
 	Path        string                           `config:"path"`
 	Protocol    string                           `config:"protocol"`

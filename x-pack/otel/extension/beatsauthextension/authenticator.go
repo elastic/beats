@@ -135,7 +135,7 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 	if !beatAuthConfig.LoadBalance {
 		singleRouterProvider, err := NewSingleRouterProvider(beatAuthConfig, client)
 		if err != nil {
-			return nil, fmt.Errorf("failed creating http client :%w", err)
+			return nil, fmt.Errorf("failed creating http client: %w", err)
 		}
 		return singleRouterProvider, nil
 	}
@@ -166,15 +166,16 @@ func NewSingleRouterProvider(config ESAuthConfig, client *http.Client) (*singleR
 	}
 
 	urls := make([]*url.URL, 0, len(config.Endpoints))
-	for i, endpoint := range config.Endpoints {
+	for _, endpoint := range config.Endpoints {
 		finalEndpoint, err := common.MakeURL(config.Protocol, config.Path, endpoint, 9200)
 		if err != nil {
 			return nil, fmt.Errorf("failed building URL for endpoint %q: %w", endpoint, err)
 		}
-		urls[i], err = url.Parse(finalEndpoint)
+		parsedEndpoint, err := url.Parse(finalEndpoint)
 		if err != nil {
 			return nil, fmt.Errorf("failed parsing endpoint %q: %w", endpoint, err)
 		}
+		urls = append(urls, parsedEndpoint)
 	}
 
 	return &singleRouterProvider{client: client, endpoints: urls}, nil

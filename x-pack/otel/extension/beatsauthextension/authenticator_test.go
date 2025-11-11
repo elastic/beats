@@ -59,6 +59,7 @@ func TestAuthenticator(t *testing.T) {
 						"proxy_disable":           true,
 						"timeout":                 "60s",
 						"idle_connection_timeout": "3s",
+						"loadbalance":             true,
 						"ssl": map[string]any{
 							"enabled":           "true",
 							"verification_mode": "full",
@@ -119,7 +120,9 @@ func TestAuthenticator(t *testing.T) {
 			name: "successful client creation with minimal config",
 			setupConfig: func(t *testing.T) *Config {
 				return &Config{
-					BeatAuthConfig: map[string]any{},
+					BeatAuthConfig: map[string]any{
+						"loadbalance": true,
+					},
 				}
 			},
 			expectStartError:     false,
@@ -135,6 +138,38 @@ func TestAuthenticator(t *testing.T) {
 			},
 			skipStart:                true,
 			testRoundTripperPreStart: true,
+		},
+		{
+			name: "when loadbalance is false, and endpoints are not configured",
+			setupConfig: func(t *testing.T) *Config {
+				return &Config{
+					BeatAuthConfig: map[string]any{
+						"loadbalance": false,
+					},
+					ContinueOnError: true,
+				}
+			},
+			expectStartError:     false,
+			expectStatus:         componentstatus.StatusPermanentError,
+			expectHTTPClientType: "errorRoundTripperProvider",
+			testRoundTripError:   true,
+		},
+		{
+			name: "when loadbalance is false, and endpoints are configured",
+			setupConfig: func(t *testing.T) *Config {
+				return &Config{
+					BeatAuthConfig: map[string]any{
+						"loadbalance": false,
+						"endpoints": []string{
+							"http://localhost:9200",
+						},
+					},
+					ContinueOnError: true,
+				}
+			},
+			expectStartError:     false,
+			expectStatus:         componentstatus.StatusOK,
+			expectHTTPClientType: "singleRouterProvider",
 		},
 	}
 
@@ -188,6 +223,9 @@ func TestAuthenticator(t *testing.T) {
 				case "errorRoundTripperProvider":
 					_, ok := (auth.rtProvider).(*errorRoundTripperProvider)
 					require.True(t, ok, "Provider should be an errorRoundTripperProvider")
+				case "singleRouterProvider":
+					_, ok := (auth.rtProvider).(*singleRouterProvider)
+					require.True(t, ok, "Provider should be a singleRouterProvider")
 				}
 
 				rt, err := auth.RoundTripper(nil)
@@ -211,7 +249,6 @@ func TestAuthenticator(t *testing.T) {
 				require.Error(t, err)
 				require.Nil(t, resp)
 				require.Contains(t, err.Error(), "failed")
-				_ = resp.Body.Close()
 			}
 
 			// Test HTTP request if specified
