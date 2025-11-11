@@ -138,7 +138,7 @@ func TestAuthenticator(t *testing.T) {
 			testRoundTripperPreStart: true,
 		},
 		{
-			name: "invalid kerberos auth type- continueOnError true",
+			name: "invalid kerberos auth type - continueOnError true",
 			setupConfig: func(t *testing.T) *Config {
 				return &Config{
 					BeatAuthConfig: map[string]any{
