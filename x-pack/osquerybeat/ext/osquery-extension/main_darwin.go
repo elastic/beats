@@ -20,5 +20,5 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, 
 	server.RegisterPlugin(table.NewPlugin("host_users", tables.HostUsersColumns(), tables.GetHostUsersGenerateFunc(log)))
 	server.RegisterPlugin(table.NewPlugin("host_groups", tables.HostGroupsColumns(), tables.GetHostGroupsGenerateFunc(log)))
 	server.RegisterPlugin(table.NewPlugin("elastic_file_analysis", tables.FileAnalysisColumns(), tables.GetFileAnalysisGenerateFunc(log)))
-	server.RegisterPlugin(table.NewPlugin("browser_history", browserhistory.GetColumns(), browserhistory.GetGenerateFunc(log)))
+	server.RegisterPlugin(table.NewPlugin("elastic_browser_history", browserhistory.GetColumns(), browserhistory.GetGenerateFunc(log)))
 }
