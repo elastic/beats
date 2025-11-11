@@ -6,10 +6,12 @@ package cel
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -122,12 +124,15 @@ func TestFileAuthTransportFailsWithMissingFile(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error creating transport with missing file, got nil")
 	}
-	if !strings.Contains(err.Error(), "no such file or directory") {
+	if !errors.Is(err, os.ErrNotExist) {
 		t.Fatalf("expected file not found error, got: %v", err)
 	}
 }
 
 func TestFileAuthTransportFailsWithInsecurePermissions(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("file permission bits are not enforced on Windows")
+	}
 	dir := t.TempDir()
 	path := filepath.Join(dir, "secret")
 	if err := os.WriteFile(path, []byte("secret"), 0o644); err != nil {

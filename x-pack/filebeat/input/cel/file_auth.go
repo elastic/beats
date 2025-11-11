@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -43,8 +44,9 @@ func newFileAuthTransport(cfg *fileAuthConfig, base http.RoundTripper) (*fileAut
 		return nil, fmt.Errorf("file auth: %w", err)
 	}
 
-	// Verify file permissions are restrictive (0600) unless relaxed_permissions is enabled
-	if !cfg.RelaxedPermissions {
+	// Verify file permissions are restrictive (0600) unless relaxed_permissions is enabled.
+	// Windows does not expose POSIX permission bits, so skip the check there.
+	if !cfg.RelaxedPermissions && runtime.GOOS != "windows" {
 		perm := info.Mode().Perm()
 		if perm != 0o600 {
 			return nil, fmt.Errorf("file auth: file %q has insecure permissions %o, expected 0600 (set relaxed_permissions: true to allow)", cfg.Path, perm)
