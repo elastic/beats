@@ -44,6 +44,7 @@ import (
 )
 
 type MockHost struct {
+	mu  sync.Mutex
 	Evt *componentstatus.Event
 }
 
@@ -52,7 +53,15 @@ func (*MockHost) GetExtensions() map[component.ID]component.Component {
 }
 
 func (h *MockHost) Report(evt *componentstatus.Event) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
 	h.Evt = evt
+}
+
+func (h *MockHost) getEvent() *componentstatus.Event {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.Evt
 }
 
 type ReceiverConfig struct {
@@ -190,7 +199,7 @@ func CheckReceivers(params CheckReceiversParams) {
 				require.Equal(ct, beatForCompName(compName), zl.ContextMap()["service.name"])
 				break
 			}
-			require.NotNil(ct, host.Evt, "expected not nil, got nil")
+			require.NotNil(ct, host.getEvent(), "expected not nil, got nil")
 
 			if params.Status.Error == "" {
 				require.Equalf(ct, host.Evt.Status(), componentstatus.StatusOK, "expected %v, got %v", params.Status.Status, host.Evt.Status())
