@@ -235,7 +235,6 @@ require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.19.0
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
-	github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.20.0
 	github.com/mattn/go-sqlite3 v1.14.32
 	go.opentelemetry.io/collector/client v1.44.0
 	go.opentelemetry.io/collector/component/componenttest v0.138.0
