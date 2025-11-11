@@ -233,6 +233,7 @@ require (
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
+	github.com/elastic/pkcs8 v1.0.0
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/otiai10/copy v1.14.1
 	go.opentelemetry.io/collector/client v1.45.0
@@ -320,7 +321,6 @@ require (
 	github.com/elastic/elastic-transport-go/v8 v8.7.0 // indirect
 	github.com/elastic/go-docappender/v2 v2.11.2 // indirect
 	github.com/elastic/go-windows v1.0.2 // indirect
-	github.com/elastic/pkcs8 v1.0.0 // indirect
 	github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 // indirect
 	github.com/elazarl/goproxy/ext v0.0.0-20240909085733-6741dbfc16a1 // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
