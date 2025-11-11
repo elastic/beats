@@ -1,21 +1,10 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
 
-package oteltest
+//go:build !requirefips
+
+package otelbeat
 
 import (
 	"bytes"
@@ -54,10 +43,11 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
 	"github.com/elastic/elastic-agent-libs/testing/proxytest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 	mockes "github.com/elastic/mock-es/pkg/api"
-	"github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension"
 )
 
 // This test package tests ES exporter + beatsauth extension together
@@ -97,7 +87,7 @@ func TestMTLS(t *testing.T) {
 	}
 
 	// get client certificates paths
-	clientCertificate, clientKey := GetClientCerts(t, caCert, "")
+	clientCertificate, clientKey := oteltest.GetClientCerts(t, caCert, "")
 
 	// start test server with given server and root certs
 	certPool := x509.NewCertPool()
@@ -143,7 +133,82 @@ receivers:
 
 	// get new beats authenticator
 	beatsauth := newAuthenticator(t, beatsauthextension.Config{
-		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
+		BeatAuthConfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
+	})
+
+	// start extension
+	host := extensionsMap{component.NewID(component.MustNewType(beatsAuthName)): beatsauth}
+	err = beatsauth.Start(t.Context(), host)
+	require.NoError(t, err, "could not start extension")
+
+	// start exporter
+	err = exp.Start(t.Context(), host)
+	require.NoError(t, err, "could not start exporter")
+
+	// send logs
+	require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
+
+	// check if data has reached ES
+	assertReceivedLogRecord(t, metricReader)
+}
+
+func TestKeyPassPhrase(t *testing.T) {
+
+	// create server certificates
+	serverCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "server", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
+	if err != nil {
+		t.Fatalf("could not generate certificates: %s", err)
+	}
+
+	// get client certificates paths with key file encrypted in PKCS#8 format
+	clientCertificate, clientKey := oteltest.GetClientCerts(t, caCert, "your-password")
+
+	// start test server with given server and root certs
+	certPool := x509.NewCertPool()
+	certPool.AddCert(caCert.Leaf)
+
+	serverName, metricReader := startTestServer(t, &tls.Config{
+		// NOTE: client certificates are not verified unless ClientAuth is set to RequireAndVerifyClientCert.
+		ClientAuth:   tls.RequireAndVerifyClientCert,
+		ClientCAs:    certPool,
+		Certificates: []tls.Certificate{serverCerts},
+		MinVersion:   tls.VersionTLS12,
+	})
+
+	inputConfig := `
+receivers:
+  filebeatreceiver:
+    output:
+      elasticsearch:
+        hosts: {{ .Host }}
+        ssl:
+          enabled: true
+          certificate_authorities:
+            - {{ .CACertificate }}
+          certificate: {{ .ClientCert }}
+          key: {{ .ClientKey }}
+          key_passphrase: your-password
+`
+
+	var otelConfigBuffer bytes.Buffer
+	require.NoError(t,
+		template.Must(template.New("otelConfig").Parse(inputConfig)).Execute(&otelConfigBuffer,
+			options{
+				Host:          serverName,
+				CACertificate: caFilePath(t),
+				ClientCert:    clientCertificate,
+				ClientKey:     clientKey,
+			}))
+
+	// translate beat to beatreceiver config
+	output := getTranslatedConf(t, otelConfigBuffer.Bytes())
+
+	// get new test exporter
+	exp := newTestESExporter(t, output)
+
+	// get new beats authenticator
+	beatsauth := newAuthenticator(t, beatsauthextension.Config{
+		BeatAuthConfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
 	})
 
 	// start extension
@@ -208,7 +273,7 @@ receivers:
 
 	// get new beats authenticator
 	beatsauth := newAuthenticator(t, beatsauthextension.Config{
-		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
+		BeatAuthConfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
 	})
 
 	// start extension
@@ -388,11 +453,11 @@ receivers:
 			exp := newTestESExporter(t, output)
 
 			authConfig := beatsauthextension.Config{
-				BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
+				BeatAuthConfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
 			}
 
 			if test.ignoreCerts {
-				delete(authConfig.BeatAuthconfig["ssl"].(map[string]any), "certificate_authorities") //nolint: errcheck // it is a test
+				delete(authConfig.BeatAuthConfig["ssl"].(map[string]any), "certificate_authorities") //nolint: errcheck // it is a test
 			}
 
 			// get new beats authenticator
@@ -548,7 +613,7 @@ receivers:
 
 			// get new beats authenticator
 			beatsauth := newAuthenticator(t, beatsauthextension.Config{
-				BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
+				BeatAuthConfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
 			})
 
 			// start extension
