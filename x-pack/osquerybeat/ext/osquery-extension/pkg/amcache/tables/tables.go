@@ -27,7 +27,6 @@ type GlobalStateInterface interface {
 	GetCachedEntries(amcacheTable AmcacheTable, filters []filters.Filter, log *logger.Logger) ([]Entry, error)
 }
 
-
 type Entry interface {
 	// PostProcess is called after the entry is populated from the registry key.
 	// It is used to perform any additional processing on the entry such as

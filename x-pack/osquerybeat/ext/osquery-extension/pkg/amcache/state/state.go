@@ -99,7 +99,6 @@ func (gs *AmcacheState) updateLockHeld(log *logger.Logger) error {
 
 // GetCachedEntries returns the cached entries for a given Amcache table and filter list.
 func (gs *AmcacheState) GetCachedEntries(amcacheTable tables.AmcacheTable, filterList []filters.Filter, log *logger.Logger) ([]tables.Entry, error) {
-
 	gs.lock.Lock()
 	defer gs.lock.Unlock()
 

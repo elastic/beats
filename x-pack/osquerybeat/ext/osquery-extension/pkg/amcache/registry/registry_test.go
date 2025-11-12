@@ -74,7 +74,6 @@ func TestRecovery(t *testing.T) {
 }
 
 func Test_findTransactionLogs(t *testing.T) {
-
 	recoveryTestDataPath, err := getRecoveryTestDataPath()
 	if err != nil {
 		t.Fatalf("failed to get recovery test data path: %v", err)
@@ -110,7 +109,6 @@ func Test_findTransactionLogs(t *testing.T) {
 }
 
 func TestLoadRegistry(t *testing.T) {
-
 	log := logger.New(os.Stdout, true)
 
 	recoveryTestDataPath, err := getRecoveryTestDataPath()

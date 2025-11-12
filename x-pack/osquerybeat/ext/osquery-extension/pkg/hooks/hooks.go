@@ -61,7 +61,7 @@ func (hm *HookManager) Register(hook *Hook) {
 
 // Execute executes all hooks of a given type concurrently
 func (hm *HookManager) Execute(socket *string, log *logger.Logger) {
-	wg := &sync.WaitGroup{}
+	var wg sync.WaitGroup
 	wg.Add(len(hm.hooks))
 	for _, hook := range hm.hooks {
 		go func(hook *Hook) {
@@ -76,7 +76,7 @@ func (hm *HookManager) Execute(socket *string, log *logger.Logger) {
 }
 
 func (hm *HookManager) Shutdown(socket *string, log *logger.Logger) {
-	wg := &sync.WaitGroup{}
+	var wg sync.WaitGroup
 	wg.Add(len(hm.hooks))
 	for _, hook := range hm.hooks {
 		go func(hook *Hook) {
@@ -91,5 +91,5 @@ func (hm *HookManager) Shutdown(socket *string, log *logger.Logger) {
 }
 
 func NewHookManager() *HookManager {
-	return &HookManager{hooks: make([]*Hook, 0)}
+	return &HookManager{}
 }

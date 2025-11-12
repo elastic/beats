@@ -111,7 +111,6 @@ func TestCachingBehavior(t *testing.T) {
 					t.Errorf("%s: Expected cache for table %s to be populated, got 0", tt.name, table.Name)
 				}
 			}
-
 		})
 	}
 }
@@ -211,7 +210,7 @@ func TestGetCachedEntriesForcesUpdate(t *testing.T) {
 	}
 	lastUpdated := state.lastUpdated
 
-	//rewind the last updated time by 6 minutes and make sure getCachedEntries forces an update
+	// rewind the last updated time by 6 minutes and make sure getCachedEntries forces an update
 	state.lastUpdated = state.lastUpdated.Add(-6 * time.Minute)
 	if !isStateExpired() {
 		t.Errorf("Expected state to be expired, got %v", state.lastUpdated)

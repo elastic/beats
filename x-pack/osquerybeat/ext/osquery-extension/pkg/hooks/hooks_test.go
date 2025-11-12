@@ -13,7 +13,6 @@ import (
 )
 
 func TestHookManager(t *testing.T) {
-
 	socket := ""
 	log := logger.New(os.Stderr, false)
 
@@ -77,5 +76,4 @@ func TestHookManager(t *testing.T) {
 	if !hookData2.shutdownCompleted {
 		t.Errorf("hookData2.shutdownCompleted = %v, want %v", hookData2.shutdownCompleted, true)
 	}
-
 }
