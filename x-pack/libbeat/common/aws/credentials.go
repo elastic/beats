@@ -152,7 +152,11 @@ func getConfigSharedCredentialProfile(beatsConfig ConfigAWS, logger *logp.Logger
 		return cfg, fmt.Errorf("awsConfig.LoadDefaultConfig failed with shared credential profile given: [%w]", err)
 	}
 
-	logger.Debug("Using shared credential profile for AWS credential")
+	if beatsConfig.ProfileName != "" || beatsConfig.SharedCredentialFile != "" {
+		logger.Debug("Using shared credential profile for AWS credential")
+	} else {
+		logger.Debug("Using default config for AWS")
+	}
 	return cfg, nil
 }
 

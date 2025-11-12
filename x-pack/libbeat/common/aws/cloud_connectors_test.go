@@ -75,7 +75,7 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 						assert.Equal(t, "AssumeRoleWithWebIdentity", q.Get("Action"))
 						assert.Equal(t, "1200", q.Get("DurationSeconds"))
 						assert.Equal(t, cloudConnectorsConfig.ElasticGlobalRoleARN, q.Get("RoleArn"))
-						assert.Equal(t, "abc123", q.Get("WebIdentityToken"))
+						assert.Equal(t, tokenFileContent, q.Get("WebIdentityToken"))
 						return middleware.FinalizeOutput{
 							Result: &sts.AssumeRoleWithWebIdentityOutput{
 								Credentials: &types.Credentials{
@@ -93,7 +93,7 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 						assert.NoError(t, err)
 						assert.Equal(t, "AssumeRole", q.Get("Action"))
 						assert.Equal(t, "7200", q.Get("DurationSeconds"))
-						assert.Equal(t, "external-id-456", q.Get("ExternalId"))
+						assert.Equal(t, config.ExternalID, q.Get("ExternalId"))
 						assert.Equal(t, config.RoleArn, q.Get("RoleArn"))
 						return middleware.FinalizeOutput{
 							Result: &sts.AssumeRoleOutput{
