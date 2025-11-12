@@ -73,16 +73,14 @@ func newFromConfig(c config, logger *logp.Logger) (*processor, error) {
 		}
 		ldapConfig.tlsConfig = tlsConfig.ToConfig()
 	}
-	log := logger.Named(logName)
-	client, err := newLDAPClient(ldapConfig, log)
+	p := &processor{config: c}
+	p.log = logger.Named(logName).With(logp.Stringer("processor", p))
+	client, err := newLDAPClient(ldapConfig, p.log)
 	if err != nil {
 		return nil, err
 	}
-	return &processor{
-		config: c,
-		client: client,
-		log:    log,
-	}, nil
+	p.client = client
+	return p, nil
 }
 
 func (p *processor) String() string {
@@ -91,14 +89,14 @@ func (p *processor) String() string {
 }
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
-	p.log.Debugw("run ldap translation", logp.Stringer("processor", p))
+	p.log.Debugw("run ldap translation")
 	err := p.translateLDAPAttr(event)
 	if err != nil {
 		// Always log errors at debug level, even when we are
 		// ignoring failures.
-		p.log.Debugw("ldap translation error", logp.Stringer("processor", p), "error", err)
+		p.log.Debugw("ldap translation error", "error", err)
 	} else {
-		p.log.Debugw("ldap translation complete", logp.Stringer("processor", p))
+		p.log.Debugw("ldap translation complete")
 	}
 	if err == nil || p.IgnoreFailure || (p.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound)) {
 		return event, nil
@@ -117,9 +115,9 @@ func (p *processor) translateLDAPAttr(event *beat.Event) error {
 		return errInvalidType
 	}
 
-	p.log.Debugw("ldap search", logp.Stringer("processor", p), "guid", guidString)
+	p.log.Debugw("ldap search", "guid", guidString)
 	cn, err := p.client.findObjectBy(guidString)
-	p.log.Debugw("ldap result", logp.Stringer("processor", p), "common_name", cn)
+	p.log.Debugw("ldap result", "common_name", cn)
 	if err != nil {
 		return err
 	}
