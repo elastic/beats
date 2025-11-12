@@ -7,6 +7,7 @@
 package state
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -42,102 +43,101 @@ const defaultHivePath = "C:\\Windows\\AppCompat\\Programs\\Amcache.hve"
 //
 //	in general
 
-type CachedTables map[tables.TableName][]tables.Entry
+type cachedTables map[tables.TableName][]tables.Entry
 
-type AmcacheGlobalState struct {
-	Cache              CachedTables
-	HivePath           string
-	ExpirationDuration time.Duration
-	Lock               sync.RWMutex
-	LastUpdated        time.Time
+type AmcacheState struct {
+	cache              cachedTables
+	hivePath           string
+	expirationDuration time.Duration
+	lock               sync.RWMutex
+	lastUpdated        time.Time
 }
 
-// NewAmcacheGlobalState creates a new AmcacheGlobalState instance with the default configuration.
-func newAmcacheGlobalState(hivePath string, expirationDuration time.Duration) *AmcacheGlobalState {
-	cachedTables := make(CachedTables)
+// newAmcacheState creates a nnw AmcacheState instance with the default configuration.
+func newAmcacheState(hivePath string, expirationDuration time.Duration) *AmcacheState {
+	cachedTables := cachedTables{}
 	for _, amcacheTable := range tables.AllAmcacheTables() {
-		cachedTables[amcacheTable.Name] = make([]tables.Entry, 0)
+		cachedTables[amcacheTable.Name] = nil
 	}
-	return &AmcacheGlobalState{HivePath: hivePath, ExpirationDuration: expirationDuration, Cache: cachedTables}
+	return &AmcacheState{hivePath: hivePath, expirationDuration: expirationDuration, cache: cachedTables}
 }
 
 // Global variables for the gInstance and a mutex to protect it.
 var (
-	gInstance *AmcacheGlobalState = newAmcacheGlobalState(defaultHivePath, defaultExpirationDuration)
+	instance = newAmcacheState(defaultHivePath, defaultExpirationDuration)
 )
 
-// GetAmcacheGlobalState is the public accessor for the singleton.
-func GetAmcacheGlobalState() *AmcacheGlobalState {
-	return gInstance
+// GetAmcacheState returns the singleton AmcacheState instance.
+func GetAmcacheState() *AmcacheState {
+	return instance
 }
 
 // Update reloads the Amcache hive and repopulates all cached data.
-func (gs *AmcacheGlobalState) Update(log *logger.Logger) error {
-	gs.Lock.Lock()
-	defer gs.Lock.Unlock()
-
+func (gs *AmcacheState) updateLockHeld(log *logger.Logger) error {
 	// Reload the registry
-	log.Infof("Reading the Amcache hive from %s", gs.HivePath)
-	regParser, _, err := registry.LoadRegistry(gs.HivePath, log)
+	log.Infof("Reading the Amcache hive from %s", gs.hivePath)
+	regParser, _, err := registry.LoadRegistry(gs.hivePath, log)
 	if err != nil {
-		log.Errorf("error opening amcache registry: %v", err)
-		return err
+		return fmt.Errorf("failed to load amcache registry from %s: %w", gs.hivePath, err)
 	}
 
 	// Repopulate all caches.
 	for _, amcacheTable := range tables.AllAmcacheTables() {
-		// Initialize the map for this keyPath
-		gs.Cache[amcacheTable.Name] = make([]tables.Entry, 0)
-
-		// Get entries for this keyPath from the loaded registry
 		entries, err := tables.GetEntriesFromRegistry(amcacheTable, regParser, log)
 		if err != nil {
-			// Log the error for this key and continue so we don't leave a nil entry in the map.
-			log.Errorf("error getting %s entries: %v", amcacheTable.Name, err)
+			log.Warningf("failed to get entries for table %s: %v", amcacheTable.Name, err)
+			gs.cache[amcacheTable.Name] = nil
 			continue
 		}
+
 		log.Infof("updating cache for table %s with %d entries", amcacheTable.Name, len(entries))
-		gs.Cache[amcacheTable.Name] = append(gs.Cache[amcacheTable.Name], entries...)
+		gs.cache[amcacheTable.Name] = entries
 	}
-	gs.LastUpdated = time.Now()
+	gs.lastUpdated = time.Now()
 	return nil
 }
 
 // GetCachedEntries returns the cached entries for a given Amcache table and filter list.
-func (gs *AmcacheGlobalState) GetCachedEntries(amcacheTable tables.AmcacheTable, filterList []filters.Filter, log *logger.Logger) ([]tables.Entry, error) {
-	if gs.IsExpired() {
-		log.Infof("amcache cache is %s old, updating", time.Since(gs.LastUpdated))
-		err := gs.Update(log)
+// The lock is held for the duration of the function.
+// This is to avoid race conditions when the cache is updated while the function is running.
+// This function accepts a list of filters to filter the entries by.
+// If the list of filters is empty, all entries are returned.
+// If the list of filters is not empty, only the entries that match all filters are returned.
+func (gs *AmcacheState) GetCachedEntries(amcacheTable tables.AmcacheTable, filterList []filters.Filter, log *logger.Logger) ([]tables.Entry, error) {
+	gs.lock.Lock()
+	defer gs.lock.Unlock()
+
+	if time.Since(gs.lastUpdated) > gs.expirationDuration {
+		log.Infof("amcache cache is %s old, updating", time.Since(gs.lastUpdated))
+		err := gs.updateLockHeld(log)
 		if err != nil {
 			log.Errorf("error updating amcache cache: %v", err)
 			return nil, err
 		}
 	}
 
-	gs.Lock.RLock()
-	defer gs.Lock.RUnlock()
-
 	result := make([]tables.Entry, 0)
-	cachedTableEntries := gs.Cache[amcacheTable.Name]
+	cachedTableEntries := gs.cache[amcacheTable.Name]
 
 	if len(filterList) == 0 {
-		result = append(result, cachedTableEntries...)
+		result := make([]tables.Entry, len(cachedTableEntries))
+		copy(result, cachedTableEntries)
 		return result, nil
 	}
 
+	// Filter the entries by the filters.
+	// Filters are evaluated as AND operations.
 	for _, entry := range cachedTableEntries {
+		matches := true
 		for _, filter := range filterList {
-			if filter.Matches(entry) {
-				result = append(result, entry)
+			if !filter.Matches(entry) {
+				matches = false
+				break
 			}
+		}
+		if matches {
+			result = append(result, entry)
 		}
 	}
 	return result, nil
-}
-
-// IsExpired checks if the cache has expired.
-func (gs *AmcacheGlobalState) IsExpired() bool {
-	gs.Lock.RLock()
-	defer gs.Lock.RUnlock()
-	return time.Since(gs.LastUpdated) > gs.ExpirationDuration
 }

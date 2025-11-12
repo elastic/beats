@@ -19,7 +19,7 @@ import (
 )
 
 func RegisterAmcacheTables(server *osquery.ExtensionManagerServer, log *logger.Logger, hooks *hooks.HookManager) {
-	amcacheGlobalState := state.GetAmcacheGlobalState()
+	amcacheGlobalState := state.GetAmcacheState()
 	for _, t := range tables.AllAmcacheTables() {
 		server.RegisterPlugin(table.NewPlugin(string(t.Name), t.Columns(), t.GenerateFunc(amcacheGlobalState, log)))
 	}

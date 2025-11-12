@@ -52,16 +52,22 @@ func NewHook(hookName string, hookFunc HookFunc, shutdownFunc HookFunc, hookData
 // HookManager is a struct that contains all hooks of a given type
 type HookManager struct {
 	hooks []*Hook
+	lock  sync.RWMutex
 }
 
 // Register registers a new hook
 func (hm *HookManager) Register(hook *Hook) {
+	hm.lock.Lock()
+	defer hm.lock.Unlock()
 	hm.hooks = append(hm.hooks, hook)
 }
 
 // Execute executes all hooks of a given type concurrently
 func (hm *HookManager) Execute(socket *string, log *logger.Logger) {
-	wg := &sync.WaitGroup{}
+	var wg sync.WaitGroup
+	hm.lock.RLock()
+	defer hm.lock.RUnlock()
+
 	wg.Add(len(hm.hooks))
 	for _, hook := range hm.hooks {
 		go func(hook *Hook) {
@@ -76,7 +82,10 @@ func (hm *HookManager) Execute(socket *string, log *logger.Logger) {
 }
 
 func (hm *HookManager) Shutdown(socket *string, log *logger.Logger) {
-	wg := &sync.WaitGroup{}
+	var wg sync.WaitGroup
+	hm.lock.RLock()
+	defer hm.lock.RUnlock()
+
 	wg.Add(len(hm.hooks))
 	for _, hook := range hm.hooks {
 		go func(hook *Hook) {
@@ -91,5 +100,5 @@ func (hm *HookManager) Shutdown(socket *string, log *logger.Logger) {
 }
 
 func NewHookManager() *HookManager {
-	return &HookManager{hooks: make([]*Hook, 0)}
+	return &HookManager{}
 }

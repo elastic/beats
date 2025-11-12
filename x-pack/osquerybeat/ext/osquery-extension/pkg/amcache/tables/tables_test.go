@@ -8,21 +8,40 @@ package tables
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/osquery/osquery-go/plugin/table"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/registry"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/testdata"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 type MockGlobalState struct{}
 
+func getTestHivePath() (string, error) {
+	_, currentFile, _, ok := runtime.Caller(0)
+	if !ok {
+		return "", fmt.Errorf("failed to get current file path")
+	}
+	dir := filepath.Dir(currentFile)
+	filePath := filepath.Join(dir, "..", "testdata", "amcache.hve")
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		return "", fmt.Errorf("test hive path does not exist: %w", err)
+	}
+	return filePath, nil
+}
+
 func (m *MockGlobalState) GetCachedEntries(amcacheTable AmcacheTable, filters []filters.Filter, log *logger.Logger) ([]Entry, error) {
-	registry, _, err := registry.LoadRegistry(testdata.MustGetTestHivePath(nil), log)
+	hivePath, err := getTestHivePath()
+	if err != nil {
+		return nil, err
+	}
+	registry, _, err := registry.LoadRegistry(hivePath, log)
 	if err != nil {
 		return nil, err
 	}

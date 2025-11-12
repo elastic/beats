@@ -10,11 +10,12 @@ Tables corresponding to keys in the amcache.hve.  Amcache.hve is a registry hive
 
 ## Schema
 
-### amcache_application
+### elastic_amcache_application
 
 | Column | Type | Description |
 | --- | --- | --- |
-| last\_write\_time | BIGINT | Last write time of the application entry. |
+| timestamp | BIGINT | Last write time of the application entry. |
+| date_time | TEXT | Last write time of the application entry (human readable). |
 | name | TEXT | Application name. |
 | program\_id | TEXT | Unique ProgramID from the AmCache. |
 | program\_instance\_id | TEXT | Program instance ID. |
@@ -36,12 +37,15 @@ Tables corresponding to keys in the amcache.hve.  Amcache.hve is a registry hive
 | msi\_install\_date | TEXT | MSI install date, if applicable. |
 | bundle\_manifest\_path | TEXT | Path to the bundle manifest. |
 | user\_sid | TEXT | The SID of the user who installed the application. |
+| sha1 | TEXT | The Sha1 of the installed the application (extracted from program_id). |
 
-### amcache_application_file
+
+### elastic_amcache_application_file
 
 | Column | Type | Description |
 | --- | --- | --- |
-| last\_write\_time | BIGINT | Last write time of the file entry. |
+| timestamp | BIGINT | Last write time of the file entry. |
+| date_time | TEXT | Last write time of the application entry (human readable). |
 | name | TEXT | File name. |
 | program\_id | TEXT | The ProgramID from the AmCache. |
 | file\_id | TEXT | The FileID from the AmCache. |
@@ -61,22 +65,26 @@ Tables corresponding to keys in the amcache.hve.  Amcache.hve is a registry hive
 | appx\_package\_full\_name | TEXT | AppX package full name, if applicable. |
 | is\_os\_component | TEXT | Whether the file is an OS component. |
 | appx\_package\_relative\_id | TEXT | AppX package relative ID, if applicable. |
+| sha1 | TEXT | The Sha1 of the installed the application (extracted from program_id). |
 
-### amcache_application_shortcut
+
+### elastic_amcache_application_shortcut
 
 | Column | Type | Description |
 | --- | --- | --- |
-| last\_write\_time | BIGINT | Last write time of the shortcut entry. |
+| timestamp | BIGINT | Last write time of the shortcut entry. |
+| date_time | TEXT | Last write time of the application entry (human readable). |
 | shortcut\_path | TEXT | Full path to the shortcut (.lnk) file. |
 | shortcut\_target\_path | TEXT | The target file path the shortcut points to. |
 | shortcut\_aumid | TEXT | Application User Model ID (AUMID) for the shortcut. |
 | shortcut\_program\_id | TEXT | The ProgramID from AmCache associated with this shortcut. |
 
-### amcache_device_pnp
+### elastic_amcache_device_pnp
 
 | Column | Type | Description |
 | --- | --- | --- |
-| last\_write\_time | BIGINT | Last write time of the device entry. |
+| timestamp | BIGINT | Last write time of the device entry. |
+| date_time | TEXT | Last write time of the application entry (human readable). |
 | model | TEXT | Device model. |
 | manufacturer | TEXT | Device manufacturer. |
 | driver\_name | TEXT | Driver file name. |
@@ -107,15 +115,16 @@ Tables corresponding to keys in the amcache.hve.  Amcache.hve is a registry hive
 | upper\_class\_filters | TEXT | Upper class filters. |
 | lower\_class\_filters | TEXT | Lower class filters. |
 | upper\_filters | TEXT | Upper filters. |
-G| lower\_filters | TEXT | Lower filters. |
+| lower\_filters | TEXT | Lower filters. |
 | device\_interface\_classes | TEXT | GUIDs of device interfaces. |
 | location\_paths | TEXT | Device location paths. |
 
-### amcache_driver_binary
+### elastic_amcache_driver_binary
 
 | Column | Type | Description |
 | --- | --- | --- |
-| last\_write\_time | BIGINT | Last write time of the driver binary entry. |
+| timestamp | BIGINT | Last write time of the driver binary entry. |
+| date_time | TEXT | Last write time of the application entry (human readable). |
 | driver\_name | TEXT | File name of the driver binary. |
 | inf | TEXT | Name of the INF file. |
 | driver\_version | TEXT | Driver version. |
@@ -141,7 +150,7 @@ SELECT
   publisher,
   product_name,
   size
-FROM amcache_application_file
+FROM elastic_amcache_application_file
 ORDER BY last_write_time DESC
 LIMIT 100;
 ```
@@ -156,7 +165,7 @@ SELECT
   lower_case_long_path,
   publisher,
   DATETIME(last_write_time, 'unixepoch') AS last_run_time
-FROM amcache_application_file
+FROM elastic_amcache_application_file
 WHERE
   name IN (
     'powershell.exe',
@@ -182,7 +191,7 @@ SELECT
   lower_case_long_path,
   size,
   DATETIME(last_write_time, 'unixepoch') AS last_run_time
-FROM amcache_application_file
+FROM elastic_amcache_application_file
 WHERE
   (publisher IS NULL OR publisher = '')
   AND (product_name IS NULL OR product_name = '')
@@ -208,7 +217,7 @@ SELECT
   lower_case_long_path,
   publisher,
   DATETIME(last_write_time, 'unixepoch') AS last_run_time
-FROM amcache_application_file
+FROM elastic_amcache_application_file
 WHERE
   name IN (
     'mimikatz.exe',
@@ -237,8 +246,8 @@ SELECT
   file.name AS file_name,
   file.lower_case_long_path,
   DATETIME(file.last_write_time, 'unixepoch') AS file_last_run
-FROM amcache_application AS app
-JOIN amcache_application_file AS file
+FROM elastic_amcache_application AS app
+JOIN elastic_amcache_application_file AS file
 ON app.program_id = file.program_id
 
 ```
@@ -255,7 +264,7 @@ SELECT
   publisher,
   version,
   uninstall_string
-FROM amcache_application
+FROM elastic_amcache_application
 ORDER BY last_write_time DESC
 LIMIT 50;
 ```
