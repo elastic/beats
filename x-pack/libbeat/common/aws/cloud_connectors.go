@@ -34,20 +34,9 @@ func parseCloudConnectorsConfigFromEnv() CloudConnectorsConfig {
 	}
 }
 
-func addCloudConnectorsCredentials(config ConfigAWS, cloudConnectorsConfig CloudConnectorsConfig, awsConfig *awssdk.Config, logger *logp.Logger) {
-	addCloudConnectorsCredentialsWithOptions(config, cloudConnectorsConfig, awsConfig, logger, nil, nil)
-}
-
 const defaultIntermediateDuration = 20 * time.Minute
 
-func addCloudConnectorsCredentialsWithOptions(
-	config ConfigAWS,
-	cloudConnectorsConfig CloudConnectorsConfig,
-	awsConfig *awssdk.Config,
-	logger *logp.Logger,
-	webIdentityRoleOptions []func(opt *stscreds.WebIdentityRoleOptions),
-	assumeRoleOptions []func(aro *stscreds.AssumeRoleOptions),
-) {
+func addCloudConnectorsCredentials(config ConfigAWS, cloudConnectorsConfig CloudConnectorsConfig, awsConfig *awssdk.Config, logger *logp.Logger) {
 	logger = logger.Named("addCloudConnectorsCredentials")
 	logger.Debug("Switching credentials provider to Cloud Connectors")
 
@@ -60,9 +49,9 @@ func addCloudConnectorsCredentialsWithOptions(
 				sts.NewFromConfig(c), // client uses credentials from previous config, step
 				cloudConnectorsConfig.ElasticGlobalRoleARN,
 				stscreds.IdentityTokenFile(cloudConnectorsConfig.IDTokenPath),
-				append(webIdentityRoleOptions, func(opt *stscreds.WebIdentityRoleOptions) {
+				func(opt *stscreds.WebIdentityRoleOptions) {
 					opt.Duration = defaultIntermediateDuration
-				})...,
+				},
 			)
 			return awssdk.NewCredentialsCache(provider)
 		},
@@ -72,12 +61,12 @@ func addCloudConnectorsCredentialsWithOptions(
 			assumeRoleProvider := stscreds.NewAssumeRoleProvider(
 				sts.NewFromConfig(c), // client uses credentials from previous config, step
 				config.RoleArn,
-				append(assumeRoleOptions, func(aro *stscreds.AssumeRoleOptions) {
+				func(aro *stscreds.AssumeRoleOptions) {
 					aro.Duration = config.AssumeRoleDuration
 					if config.ExternalID != "" {
 						aro.ExternalID = awssdk.String(config.ExternalID)
 					}
-				})...,
+				},
 			)
 			return awssdk.NewCredentialsCache(assumeRoleProvider, func(options *awssdk.CredentialsCacheOptions) {
 				if config.AssumeRoleExpiryWindow > 0 {
