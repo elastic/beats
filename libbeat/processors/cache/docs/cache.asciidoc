@@ -72,7 +72,7 @@ of the fields in `match_keys` will be discarded and an error will be generated. 
 default, this condition is ignored.
 
 `ignore_failure`:: (Optional) When set to `true`, processor failures, including
-absence of values in the cache will be ignored and logged at debug level.
+absence of values in the cache, will be ignored and logged at debug level.
 
 `overwrite_keys`:: (Optional) By default, if a target field already exists, it
 will not be overwritten and an error will be logged. If `overwrite_keys` is
