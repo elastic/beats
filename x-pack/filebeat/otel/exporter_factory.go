@@ -2,8 +2,8 @@ package otel
 
 import (
 	"context"
-	"fmt"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -27,96 +27,108 @@ const (
 	None    ExporterType = "none"
 )
 
-type CollectionPeriodType string
-
-const (
-	Manual   CollectionPeriodType = "manual"
-	Fixed    CollectionPeriodType = "fixed"
-	Interval CollectionPeriodType = "interval"
-)
-
-type HttpExporterConfig struct {
-	options []otlpmetrichttp.Option
-}
-
-func (c HttpExporterConfig) GetExporter(ctx context.Context) (sdkmetric.Exporter, error) {
-	return otlpmetrichttp.New(ctx, c.options...)
-}
-
-func (c HttpExporterConfig) GetType() ExporterType {
-	return HTTP
-}
-
-type GRPCExporterConfig struct {
-	options []otlpmetricgrpc.Option
-}
-
-func (c GRPCExporterConfig) GetExporter(ctx context.Context) (sdkmetric.Exporter, error) {
-	return otlpmetricgrpc.New(ctx, c.options...)
-}
-
-func (c GRPCExporterConfig) GetType() ExporterType {
-	return GRPC
-}
-
-type ConsoleExporterConfig struct {
-	options []stdoutmetric.Option
-}
-
-func (c ConsoleExporterConfig) GetExporter(ctx context.Context) (sdkmetric.Exporter, error) {
-	return stdoutmetric.New(c.options...)
-}
-
-func (c ConsoleExporterConfig) GetType() ExporterType {
-	return console
-}
-
 type ExporterFactory struct {
-	log             *logp.Logger
-	exporterGetters map[ExporterType]GetExporter
+	log            *logp.Logger
+	grpcOptions    []otlpmetricgrpc.Option
+	consoleOptions []stdoutmetric.Option
+	httpOptions    []otlpmetrichttp.Option
 }
 
+// NewExporterFactory creates a new ExporterFactory with default configurations for GRPC, HTTP, and Console exporters.
+//
+// The factory will cache the created exporter to avoid recreating it multiple times.
+//
+// Args:
+//
+//	log (*logp.Logger): A logger instance used for logging within the factory.
+//
+// Returns:
+//
+//	*ExporterFactory: A new ExporterFactory instance with default configurations.
 func NewExporterFactory(log *logp.Logger) *ExporterFactory {
-	return &ExporterFactory{log: log, exporterGetters: map[ExporterType]GetExporter{}}
-}
-func (ef *ExporterFactory) NewExporter(ctx context.Context, exporterType ExporterType) (sdkmetric.Exporter, error) {
-	if exporterType == None {
-		return nil, nil
+	return &ExporterFactory{log: log,
+		grpcOptions:    []otlpmetricgrpc.Option{otlpmetricgrpc.WithTemporalitySelector(DeltaSelector)},
+		consoleOptions: []stdoutmetric.Option{stdoutmetric.WithPrettyPrint(), stdoutmetric.WithTemporalitySelector(DeltaSelector)},
+		httpOptions:    []otlpmetrichttp.Option{otlpmetrichttp.WithTemporalitySelector(DeltaSelector)},
 	}
-	getter, ok := ef.exporterGetters[exporterType]
-	if !ok {
-		switch exporterType {
-		case console:
-			getter = ConsoleExporterConfig{
-				options: []stdoutmetric.Option{stdoutmetric.WithPrettyPrint(), stdoutmetric.WithTemporalitySelector(DeltaSelector)},
-			}
-		case GRPC:
-			getter = GRPCExporterConfig{
-				options: []otlpmetricgrpc.Option{otlpmetricgrpc.WithTemporalitySelector(DeltaSelector)},
-			}
-		case HTTP:
-			getter = HttpExporterConfig{
-				options: []otlpmetrichttp.Option{otlpmetrichttp.WithTemporalitySelector(DeltaSelector)},
-			}
-
-		}
-		if getter == nil {
-			return nil, fmt.Errorf("unknown exporter type: %s", exporterType)
-		}
-	}
-	return getter.GetExporter(ctx)
 }
 
+// NewExporter creates a new exporter based on exporter type which is determined from the environment
+// Exporters are not required to be concurrency safe. This factory creates a new exporter
+// for each call to GetExporter
+// Args:
+//     ctx (context.Context): A context object created using the Go standard library.
+//
+// Returns:
+//     sdkmetric.Exporter: A new exporter instance of the sdkmetric.Exporter type, along with an error if creation fails.
+
+func (ef *ExporterFactory) GetExporter(ctx context.Context) (sdkmetric.Exporter, ExporterType, error) {
+
+	exporterType := GetExporterTypeFromEnv()
+	var err error
+	var exporter sdkmetric.Exporter
+	switch exporterType {
+	case console:
+		exporter, err = stdoutmetric.New(ef.consoleOptions...)
+	case GRPC:
+		exporter, err = otlpmetricgrpc.New(ctx, ef.grpcOptions...)
+
+	case HTTP:
+		exporter, err = otlpmetrichttp.New(ctx, ef.httpOptions...)
+	}
+	return exporter, exporterType, err
+}
+
+// SetHttpOptions sets the HTTP options for the factory.
+// Checks for equality before overwriting.
+//
+// Args:
+//
+//	options ([]otlpmetrichttp.Option): The new HTTP options to set.
 func (ef *ExporterFactory) SetHttpOptions(options []otlpmetrichttp.Option) {
-	ef.exporterGetters[HTTP] = HttpExporterConfig{options: options}
-}
-func (ef *ExporterFactory) SetGRPCOptions(options []otlpmetricgrpc.Option) {
-	ef.exporterGetters[GRPC] = GRPCExporterConfig{options: options}
-}
-func (ef *ExporterFactory) SetConsoleOptions(options []stdoutmetric.Option) {
-	ef.exporterGetters[console] = ConsoleExporterConfig{options: options}
+	if !slices.Equal(ef.httpOptions, options) {
+		ef.httpOptions = options
+
+	}
 }
 
+// SetGRPCOptions sets the gRPC options for the factory.
+// Checks for equality before overwriting.
+//
+// Args:
+//
+//	options ([]otlpmetricgrpc.Option): The new gRPC options to set.
+func (ef *ExporterFactory) SetGRPCOptions(options []otlpmetricgrpc.Option) {
+	if !slices.Equal(ef.grpcOptions, options) {
+		ef.grpcOptions = options
+
+	}
+}
+
+// SetConsoleOptions sets the console options for the factory.
+// Checks for equality before overwriting.
+//
+// Args:
+//
+//	options ([]stdoutmetric.Option): The new console options to set.
+func (ef *ExporterFactory) SetConsoleOptions(options []stdoutmetric.Option) {
+	if !slices.Equal(ef.consoleOptions, options) {
+		ef.consoleOptions = options
+
+	}
+}
+
+// DeltaSelector determines the temporality for a given instrument kind.
+//
+// It returns metricdata.DeltaTemporality for all known instrument kinds. If an unknown instrument kind is provided, it panics.
+//
+// Args:
+//
+//	kind (sdkmetric.InstrumentKind): The instrument kind to determine the temporality for.
+//
+// Returns:
+//
+//	metricdata.Temporality: The temporality determined for the given instrument kind.
 func DeltaSelector(kind sdkmetric.InstrumentKind) metricdata.Temporality {
 	switch kind {
 	case sdkmetric.InstrumentKindCounter,
@@ -128,17 +140,20 @@ func DeltaSelector(kind sdkmetric.InstrumentKind) metricdata.Temporality {
 		sdkmetric.InstrumentKindObservableUpDownCounter:
 		return metricdata.DeltaTemporality
 	}
-	panic("unknown instrument kind")
+	return metricdata.DeltaTemporality
 }
 
-/*
-GetExporterTypeFromEnv()
+// GetExporterTypeFromEnv determines the exporter type based on environment variables.
+//
+// It checks for OTEL_METRICS_EXPORTER and OTEL_EXPORTER_OTLP_METRICS_PROTOCOL to determine the exporter type.
+// If no configuration is found, it defaults to None.
+//
+// Args:
+//     None
+//
+// Returns:
+//     ExporterType: The exporter type determined from environment variables.
 
-	Checks environment for OTEL environment variables that are needed for APM opentelemetry.
-	Defaults to OTLP/gRPC output when APM is configured.
-	Supports debugging to console if APM is not configured. Set OTEL_METRICS_EXPORTER=console to export to console.
-	Uses a noop metrics exporter if no OTEL environment variables are configured.
-*/
 func GetExporterTypeFromEnv() ExporterType {
 	/*
 		OTEL_METRICS_EXPORTER are:
@@ -158,10 +173,13 @@ func GetExporterTypeFromEnv() ExporterType {
 	// this is the expected setup for agentless
 	if IsOTLPExport() {
 		protocol, ok := os.LookupEnv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL")
-		if ok && strings.Contains(protocol, string(HTTP)) {
+		if ok && strings.Contains(strings.ToLower(protocol), string(GRPC)) {
+			return GRPC
+		}
+		if ok && strings.Contains(strings.ToLower(protocol), string(HTTP)) {
 			return HTTP
 		}
-		return GRPC
+		// fall through in case we are debugging in console
 	}
 
 	// we can also export to the console for debugging purposes
@@ -174,16 +192,23 @@ func GetExporterTypeFromEnv() ExporterType {
 
 }
 
+// IsOTLPExport checks if OTLP (OpenTelemetry Protocol) export is configured.
+//
+// It verifies the presence of OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_EXPORTER_OTLP_HEADERS
+//
+// Args:
+//
+//	None
+//
+// Returns:
+//
+//	bool: True if OTLP export is configured, False otherwise.
 func IsOTLPExport() bool {
 	_, ok := os.LookupEnv("OTEL_EXPORTER_OTLP_ENDPOINT")
 	if !ok {
 		return false
 	}
 	_, ok = os.LookupEnv("OTEL_EXPORTER_OTLP_HEADERS")
-	if !ok {
-		return false
-	}
-	_, ok = os.LookupEnv("OTEL_RESOURCE_ATTRIBUTES")
 	if !ok {
 		return false
 	}

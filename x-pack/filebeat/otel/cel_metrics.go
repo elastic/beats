@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -22,6 +23,7 @@ type OTELCELMetrics struct {
 	shutdownFuncs                        []func(context.Context) error
 	flushFuncs                           []func(context.Context) error
 	manualExportFunc                     func(context.Context) error
+	exportLock                           sync.Mutex
 	started                              bool
 	periodicRunCount                     metric.Int64Counter
 	periodicProgramStartedCount          metric.Int64Counter
@@ -44,11 +46,22 @@ type OTELCELMetrics struct {
 	programEventPublishDurationHistogram metric.Float64Histogram
 }
 
+// StartPeriodic starts the periodic metrics collection.
+// exportLock blocks starting a new periodic if the
+// export is still processing. This should not happen
+// in the real world use due to the use of intervals for
+// running periodic runs. However, test environments with
+// small intervals could potentially cause this to happen.
 func (o *OTELCELMetrics) StartPeriodic() {
+	o.exportLock.Lock() // Acquire the lock
+	defer o.exportLock.Unlock()
 	o.started = true
 }
 
+// EndPeriodic ends the periodic metrics collection and manually exports metrics if a manual export function is set.
 func (o *OTELCELMetrics) EndPeriodic(ctx context.Context) {
+	o.exportLock.Lock() // Acquire the lock
+	defer o.exportLock.Unlock()
 	if o.started {
 		o.log.Debug("OTELCELMetrics EndPeriodic called")
 		o.started = false
@@ -128,6 +141,17 @@ func (o *OTELCELMetrics) Shutdown(ctx context.Context) error {
 	return err
 }
 
+// NewOTELCELMetrics initializes a new instance of OTELCELMetrics.
+//
+// Parameters:
+//   - log: A logger instance for logging debug and error messages.
+//   - input: A string representing the input source or identifier. Usually the datastream name.
+//   - resource: The OpenTelemetry resource containing metadata about the metrics exporter.
+//   - tripper: An HTTP RoundTripper to be wrapped by otelhttp.NewTransport.
+//   - metricExporter: The OpenTelemetry Metric Exporter that will handle exporting metrics to an endpoint.
+//
+// Returns:
+//   - *OTELCELMetrics: A pointer to a new OTELCELMetrics instance, wrapped in an otelhttp.Transport, and any error encountered during initialization.
 func NewOTELCELMetrics(log *logp.Logger,
 	input string,
 	resource resource.Resource,
