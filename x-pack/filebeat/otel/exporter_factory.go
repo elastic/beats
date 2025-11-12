@@ -2,18 +2,16 @@ package otel
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
-	"os"
-	"strconv"
-	"strings"
-	"time"
 )
 
 type GetExporter interface {
@@ -190,25 +188,4 @@ func IsOTLPExport() bool {
 		return false
 	}
 	return true
-}
-
-func GetCollectionPeriodFromEnvironment(ctx context.Context, period time.Duration) (time.Duration, error) {
-	collectionType, ok := os.LookupEnv("OTEL_EXPORTER_OTLP_METRICS_COLLECTION_PERIOD_TYPE")
-	if !ok || strings.ToLower(collectionType) == string(Manual) {
-		return 0, nil
-	}
-	if strings.ToLower(collectionType) == string(Fixed) {
-		collectionInterval, ok := os.LookupEnv("OTEL_EXPORTER_OTLP_METRICS_COLLECTION_PERIOD_INTERVAL")
-		if !ok || collectionInterval == "" {
-			return 0, nil
-		}
-		collectionPeriod, err := strconv.Atoi(collectionInterval)
-		if err != nil {
-			return 0, errors.New(fmt.Sprintf("OTEL metrics collection period type is Fixed, but interval in OTEL_EXPORTER_OTLP_METRICS_COLLECTION_PERIOD_INTERVAL %s is not an integer defined. Using manual metrics", collectionPeriod))
-		}
-	}
-	if strings.ToLower(collectionType) == string(Interval) {
-		return period, nil
-	}
-	return 0, errors.New(fmt.Sprintf("invalid OTEL metrics collection period type %s is unknown. Using manual metrics"))
 }
