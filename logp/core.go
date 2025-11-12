@@ -417,6 +417,8 @@ func TestingSetup(options ...Option) error {
 
 // ObserverLogs provides the list of logs generated during the observation
 // process.
+//
+// Deprecated: Use logptest.NewTestingLoggerWithObserver.
 func ObserverLogs() *observer.ObservedLogs {
 	return loadLogger().observedLogs
 }
