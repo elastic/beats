@@ -42,9 +42,10 @@ type Info struct {
 	UserAgent        string    // A string of the user-agent that can be passed to any outputs or network connections
 	FIPSDistribution bool      // If the beat was compiled as a FIPS distribution.
 
-	LogConsumer consumer.Logs // otel log consumer
-	ComponentID string        // otel component id from the collector config e.g. "filebeatreceiver/logs"
-	Logger      *logp.Logger
+	LogConsumer          consumer.Logs // otel log consumer
+	ComponentID          string        // otel component id from the collector config e.g. "filebeatreceiver/logs"
+	UseDefaultProcessors bool          // Whether to use the default processors
+	Logger               *logp.Logger
 }
 
 func (i Info) FQDNAwareHostname(useFQDN bool) string {

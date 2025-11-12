@@ -295,12 +295,10 @@ func TestPublish(t *testing.T) {
 						"_id": "abc123",
 					},
 				}
-				ch := make(chan plog.Logs, 1)
 				batch := outest.NewBatch(event)
 				var countLogs int
 				otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 					countLogs = countLogs + ld.LogRecordCount()
-					ch <- ld
 					return nil
 				})
 				otelConsumer.beatInfo.ComponentID = tc.componentID
@@ -309,31 +307,11 @@ func TestPublish(t *testing.T) {
 				assert.Len(t, batch.Signals, 1)
 				assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 				assert.Equal(t, len(batch.Events()), countLogs, "all events should be consumed")
-				log := <-ch
-				for i := 0; i < log.ResourceLogs().Len(); i++ {
-					resourceLog := log.ResourceLogs().At(i)
-					for j := 0; j < resourceLog.ScopeLogs().Len(); j++ {
-						scopeLog := resourceLog.ScopeLogs().At(j)
-						for k := 0; k < scopeLog.LogRecords().Len(); k++ {
-							logRecord := scopeLog.LogRecords().At(k)
-							body := logRecord.Body().Map()
-
-							// Traverse nested "agent.otelcol.component" structure
-							agentVal, ok := body.Get("agent")
-							require.True(t, ok, "expected 'agent' in log body")
-
-							agentMap := agentVal.Map()
-							idVal, ok := agentMap.Get("otelcol.component.id")
-							require.True(t, ok, "expected 'agent.otelcol.component.id' in log body")
-							assert.Equal(t, tc.expectedComponentID, idVal.AsString())
-
-							kindVal, ok := agentMap.Get("otelcol.component.kind")
-							require.True(t, ok, "expected 'agent.otelcol.component.kind' in log body")
-							assert.Equal(t, tc.expectedComponentKind, kindVal.AsString())
-						}
-					}
+				for _, event := range batch.Events() {
+					beatEvent := event.Content.Fields.Flatten()
+					assert.Equal(t, tc.expectedComponentID, beatEvent["agent."+otelComponentIDKey], "expected agent.otelcol.component.id field in log record")
+					assert.Equal(t, tc.expectedComponentKind, beatEvent["agent."+otelComponentKindKey], "expected agent.otelcol.component.kind field in log record")
 				}
-
 			})
 		}
 	})
