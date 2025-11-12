@@ -2,8 +2,12 @@ package otel
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/metric"
@@ -11,35 +15,33 @@ import (
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"go.opentelemetry.io/otel/sdk/resource"
-	"net/http"
-	"time"
 )
 
 type OTELCELMetrics struct {
-	log                          *logp.Logger
-	shutdownFuncs                []func(context.Context) error
-	flushFuncs                   []func(context.Context) error
-	manualExportFunc             func(context.Context) error
-	started                      bool
-	periodicRunCount             metric.Int64Counter
-	periodicProgramStarted       metric.Int64Counter
-	periodicProgramSuccess       metric.Int64Counter
-	periodicBatchGenerated       metric.Int64Counter
-	periodicBatchPublished       metric.Int64Counter
-	periodicEventGenerated       metric.Int64Counter
-	periodicEventPublished       metric.Int64Counter
-	periodicRunDuration          metric.Float64Counter
-	periodicCelDuration          metric.Float64Counter
-	periodicEventPublishDuration metric.Float64Counter
-	programRunStartedCount       metric.Int64Counter
-	programRunSuccessCount       metric.Int64Counter
-	programBatchCount            metric.Int64Counter
-	programBatchPublishedCount   metric.Int64Counter
-	programEventCount            metric.Int64Counter
-	programEventPublishedCount   metric.Int64Counter
-	programRunDuration           metric.Float64Counter
-	programCelDuration           metric.Float64Counter
-	programEventPublishDuration  metric.Float64Counter
+	log                                  *logp.Logger
+	shutdownFuncs                        []func(context.Context) error
+	flushFuncs                           []func(context.Context) error
+	manualExportFunc                     func(context.Context) error
+	started                              bool
+	periodicRunCount                     metric.Int64Counter
+	periodicProgramStartedCount          metric.Int64Counter
+	periodicProgramSuccessCount          metric.Int64Counter
+	periodicBatchGeneratedCount          metric.Int64Counter
+	periodicBatchPublishedCount          metric.Int64Counter
+	periodicEventGeneratedCount          metric.Int64Counter
+	periodicEventPublishedCount          metric.Int64Counter
+	periodicRunDuration                  metric.Float64Counter
+	periodicCelDuration                  metric.Float64Counter
+	periodicEventPublishDuration         metric.Float64Counter
+	programRunStartedCount               metric.Int64Counter
+	programRunSuccessCount               metric.Int64Counter
+	programBatchProcessedHistogram       metric.Int64Histogram
+	programBatchPublishedHistogram       metric.Int64Histogram
+	programEventGeneratedHistogram       metric.Int64Histogram
+	programEventPublishedHistogram       metric.Int64Histogram
+	programRunDurationHistogram          metric.Float64Histogram
+	programCelDurationHistogram          metric.Float64Histogram
+	programEventPublishDurationHistogram metric.Float64Histogram
 }
 
 func (o *OTELCELMetrics) StartPeriodic() {
@@ -52,7 +54,10 @@ func (o *OTELCELMetrics) EndPeriodic(ctx context.Context) {
 		o.started = false
 		if o.manualExportFunc != nil {
 			o.log.Debug("OTELCELMetrics manual export started")
-			o.manualExportFunc(ctx)
+			err := o.manualExportFunc(ctx)
+			if err != nil {
+				o.log.Errorf("error exporting metrics: %v", err)
+			}
 			o.log.Debug("OTELCELMetrics manual export ended")
 		}
 	}
@@ -76,31 +81,31 @@ func (o *OTELCELMetrics) AddPeriodicRun(ctx context.Context, count int64) {
 }
 func (o *OTELCELMetrics) AddTotalDuration(ctx context.Context, duration time.Duration) {
 	o.periodicRunDuration.Add(ctx, duration.Seconds())
-	o.programRunDuration.Add(ctx, duration.Seconds())
+	o.programRunDurationHistogram.Record(ctx, duration.Seconds())
 }
 func (o *OTELCELMetrics) AddPublishDuration(ctx context.Context, duration time.Duration) {
 	o.periodicEventPublishDuration.Add(ctx, duration.Seconds())
-	o.programEventPublishDuration.Add(ctx, duration.Seconds())
+	o.programEventPublishDurationHistogram.Record(ctx, duration.Seconds())
 }
 func (o *OTELCELMetrics) AddCELDuration(ctx context.Context, duration time.Duration) {
 	o.periodicCelDuration.Add(ctx, duration.Seconds())
-	o.programCelDuration.Add(ctx, duration.Seconds())
+	o.programCelDurationHistogram.Record(ctx, duration.Seconds())
 }
-func (o *OTELCELMetrics) AddBatch(ctx context.Context, count int64) {
-	o.periodicBatchGenerated.Add(ctx, count)
-	o.programBatchCount.Add(ctx, count)
+func (o *OTELCELMetrics) AddGeneratedBatch(ctx context.Context, count int64) {
+	o.periodicBatchGeneratedCount.Add(ctx, count)
+	o.programBatchProcessedHistogram.Record(ctx, count)
 }
 func (o *OTELCELMetrics) AddPublishedBatch(ctx context.Context, count int64) {
-	o.periodicBatchPublished.Add(ctx, count)
-	o.programBatchPublishedCount.Add(ctx, count)
+	o.periodicBatchPublishedCount.Add(ctx, count)
+	o.programBatchPublishedHistogram.Record(ctx, count)
 }
 func (o *OTELCELMetrics) AddEvents(ctx context.Context, count int64) {
-	o.periodicEventGenerated.Add(ctx, count)
-	o.programEventCount.Add(ctx, count)
+	o.periodicEventGeneratedCount.Add(ctx, count)
+	o.programEventGeneratedHistogram.Record(ctx, count)
 }
 func (o *OTELCELMetrics) AddPublishedEvents(ctx context.Context, count int64) {
-	o.periodicEventPublished.Add(ctx, count)
-	o.programEventPublishedCount.Add(ctx, count)
+	o.periodicEventPublishedCount.Add(ctx, count)
+	o.programEventPublishedHistogram.Record(ctx, count)
 }
 
 func (o *OTELCELMetrics) AddProgramExecution(ctx context.Context, count int64) {
@@ -127,8 +132,7 @@ func NewOTELCELMetrics(log *logp.Logger,
 	input string,
 	resource resource.Resource,
 	tripper http.RoundTripper,
-	metricExporter sdkmetric.Exporter,
-	interval time.Duration) (*OTELCELMetrics, *otelhttp.Transport, error) {
+	metricExporter sdkmetric.Exporter) (*OTELCELMetrics, *otelhttp.Transport, error) {
 	var shutdownFuncs []func(context.Context) error
 	var flushFuncs []func(context.Context) error
 	var manualExportFunc func(context.Context) error
@@ -137,29 +141,42 @@ func NewOTELCELMetrics(log *logp.Logger,
 	if metricExporter == nil {
 		meterProvider = noop.NewMeterProvider()
 	} else {
-		var sdkmeterProvider *sdkmetric.MeterProvider
-		if interval == 0 {
-			log.Debug("OTELCELMetrics NewMeterProvider called without interval. Creating Manual Export")
-			reader := sdkmetric.NewManualReader(sdkmetric.WithTemporalitySelector(DeltaSelector))
-			sdkmeterProvider = sdkmetric.NewMeterProvider(
-				sdkmetric.WithReader(reader), sdkmetric.WithResource(&resource))
-			manualExportFunc = func(ctx context.Context) error {
-				collectedMetrics := &metricdata.ResourceMetrics{}
-				err := reader.Collect(ctx, collectedMetrics)
-				if err != nil {
-					return err
-				}
-				return metricExporter.Export(ctx, collectedMetrics)
+		log.Debug("OTELCELMetrics NewMeterProvider called without interval. Creating Manual Export")
+		reader := sdkmetric.NewManualReader(sdkmetric.WithTemporalitySelector(DeltaSelector))
+		exponentialView := sdkmetric.NewView(
+			sdkmetric.Instrument{
+				// captures every histogram that will produced by this provider
+				Name: "*",
+				Kind: sdkmetric.InstrumentKindHistogram,
+			},
+			sdkmetric.Stream{
+				Aggregation: sdkmetric.AggregationBase2ExponentialHistogram{
+					MaxSize:  160, // Optional: configure max buckets
+					MaxScale: 20,  // Optional: configure max scale
+				},
+			},
+		)
+		sdkmeterProvider := sdkmetric.NewMeterProvider(
+			sdkmetric.WithReader(reader),
+			sdkmetric.WithResource(&resource),
+			sdkmetric.WithView(exponentialView))
+		manualExportFunc = func(ctx context.Context) error {
+			collectedMetrics := &metricdata.ResourceMetrics{}
+			err := reader.Collect(ctx, collectedMetrics)
+			if err != nil {
+				return err
 			}
-			flushFuncs = append(flushFuncs, manualExportFunc)
-		} else {
-			log.Debug("OTELCELMetrics NewMeterProvider has fixed interval. Creating Periodic Export")
-			sdkmeterProvider = sdkmetric.NewMeterProvider(
-				sdkmetric.WithReader(sdkmetric.NewPeriodicReader(metricExporter,
-					sdkmetric.WithInterval(interval))), sdkmetric.WithResource(&resource))
-			shutdownFuncs = append(shutdownFuncs, sdkmeterProvider.Shutdown)
-			flushFuncs = append(flushFuncs, sdkmeterProvider.ForceFlush)
+			if log.IsDebug() {
+				jsonData, err := json.Marshal(collectedMetrics)
+				if err == nil {
+					log.Debugf("OTELCELMetrics Collected metrics %s", jsonData)
+				} else {
+					log.Debugf("OTELCELMetrics could not marshall Collected metrics into json %v", collectedMetrics)
+				}
+			}
+			return metricExporter.Export(ctx, collectedMetrics)
 		}
+		flushFuncs = append(flushFuncs, manualExportFunc)
 		meterProvider = sdkmeterProvider
 	}
 	meter := meterProvider.Meter(input)
@@ -215,60 +232,61 @@ func NewOTELCELMetrics(log *logp.Logger,
 		return nil, nil, fmt.Errorf("failed to create input.cel.program.success.count: %w", err)
 	}
 
-	programBatchCount, err := meter.Int64Counter("input.cel.program.batch.count")
+	programBatchProcessed, err := meter.Int64Histogram("input.cel.program.batch.processed")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.batch.count: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.program.batch.processed: %w", err)
 	}
 
-	programEventCount, err := meter.Int64Counter("input.cel.program.event.count")
+	programEventGenerated, err := meter.Int64Histogram("input.cel.program.event.generated.histogram")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.event.count: %w", err)
+		return nil, nil, fmt.Errorf("failed"+
+			" to create input.cel.program.event.generated.histogram: %w", err)
 	}
-	programEventPublishedCount, err := meter.Int64Counter("input.cel.program.event.published.count")
+	programEventPublished, err := meter.Int64Histogram("input.cel.program.event.published.histogram")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.event.published.count: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.program.event.published.histogram: %w", err)
 	}
-	programBatchPublishedCount, err := meter.Int64Counter("input.cel.program.batch.published.count")
+	programBatchPublished, err := meter.Int64Histogram("input.cel.program.batch.published.histogram")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.batch.published.count: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.program.batch.published.histogram: %w", err)
 	}
-	programRunDuration, err := meter.Float64Counter("input.cel.program.run.duration")
+	programRunDuration, err := meter.Float64Histogram("input.cel.program.run.duration.histogram")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.run.duration: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.program.run.duration.histogram: %w", err)
 	}
-	programCELDuration, err := meter.Float64Counter("input.cel.program.cel.duration")
+	programCELDuration, err := meter.Float64Histogram("input.cel.program.cel.duration.histogram")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.cel.duration: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.program.cel.duration.histogram: %w", err)
 	}
-	programPublishDuration, err := meter.Float64Counter("input.cel.program.publish.duration")
+	programPublishDuration, err := meter.Float64Histogram("input.cel.program.publish.duration.histogram")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.publish.duration: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.program.publish.duration.histogram: %w", err)
 	}
 
 	return &OTELCELMetrics{
-		log:                          log,
-		shutdownFuncs:                shutdownFuncs,
-		flushFuncs:                   flushFuncs,
-		manualExportFunc:             manualExportFunc,
-		periodicRunCount:             periodicTotalRunCount,
-		periodicProgramStarted:       periodicProgramStarted,
-		periodicProgramSuccess:       periodicProgramSuccess,
-		periodicBatchGenerated:       periodicBatchCount,
-		periodicBatchPublished:       periodicPublishedBatchCount,
-		periodicEventGenerated:       periodicEventCount,
-		periodicEventPublished:       periodicPublishedEventCount,
-		periodicRunDuration:          periodicTotalDuration,
-		periodicCelDuration:          periodicCELDuration,
-		periodicEventPublishDuration: periodicPublishDuration,
-		programRunStartedCount:       programRunStartedCount,
-		programRunSuccessCount:       programRunSuccessCount,
-		programBatchCount:            programBatchCount,
-		programBatchPublishedCount:   programBatchPublishedCount,
-		programEventCount:            programEventCount,
-		programEventPublishedCount:   programEventPublishedCount,
-		programRunDuration:           programRunDuration,
-		programCelDuration:           programCELDuration,
-		programEventPublishDuration:  programPublishDuration,
+		log:                                  log,
+		shutdownFuncs:                        shutdownFuncs,
+		flushFuncs:                           flushFuncs,
+		manualExportFunc:                     manualExportFunc,
+		periodicRunCount:                     periodicTotalRunCount,
+		periodicProgramStartedCount:          periodicProgramStarted,
+		periodicProgramSuccessCount:          periodicProgramSuccess,
+		periodicBatchGeneratedCount:          periodicBatchCount,
+		periodicBatchPublishedCount:          periodicPublishedBatchCount,
+		periodicEventGeneratedCount:          periodicEventCount,
+		periodicEventPublishedCount:          periodicPublishedEventCount,
+		periodicRunDuration:                  periodicTotalDuration,
+		periodicCelDuration:                  periodicCELDuration,
+		periodicEventPublishDuration:         periodicPublishDuration,
+		programRunStartedCount:               programRunStartedCount,
+		programRunSuccessCount:               programRunSuccessCount,
+		programBatchProcessedHistogram:       programBatchProcessed,
+		programBatchPublishedHistogram:       programBatchPublished,
+		programEventGeneratedHistogram:       programEventGenerated,
+		programEventPublishedHistogram:       programEventPublished,
+		programRunDurationHistogram:          programRunDuration,
+		programCelDurationHistogram:          programCELDuration,
+		programEventPublishDurationHistogram: programPublishDuration,
 	}, transport, nil
 
 }

@@ -28,6 +28,10 @@ import (
 	"strings"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/sdk/resource"
+	semconv "go.opentelemetry.io/otel/semconv/v1.34.0"
+
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/icholy/digest"
 	"github.com/rcrowley/go-metrics"
@@ -454,11 +458,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			switch e := e.(type) {
 			case []interface{}:
 				if len(e) == 0 {
+					otelMetrics.AddProgramSuccessExecution(ctx, 1)
 					return nil
 				}
 				events = e
 			case map[string]interface{}:
 				if e == nil {
+					otelMetrics.AddProgramSuccessExecution(ctx, 1)
 					return nil
 				}
 				if _, ok := e["error"]; ok {
@@ -493,7 +499,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			metrics.batchesReceived.Add(1)
 			metrics.eventsReceived.Add(uint64(len(events)))
 			otelMetrics.AddEvents(ctx, int64(len(events)))
-			otelMetrics.AddBatch(ctx, 1)
+			otelMetrics.AddGeneratedBatch(ctx, 1)
 			// Drop events from state. If we fail during the publication,
 			// we will re-request these events.
 			delete(state, "events")
@@ -574,7 +580,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 				}
 				metrics.eventsPublished.Add(1)
-				otelMetrics.AddPublishedEvents(ctx, 1)
+				otelMetrics.AddPublishedEvents(ctx, int64(len(events)))
 
 				err = ctx.Err()
 				if err != nil {
@@ -972,15 +978,19 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}
 	}
 
+	log.Infof("env context %v", env)
+	//For resource attributes, at a minimum we need to relate the data to an Agent Policy ID.
+	// Ideally, we would also include Organization ID, Project ID, Agent version, and the integration name, version, and owner.
+
+	// each cel program will have a unique resource object
+	resourceAttributes := GetResourceAttributes(env, cfg)
+
+	log.Infof("env context %v", env)
 	resource := resource.NewWithAttributes(
-		semconv.SchemaURL,
-		semconv.ServiceInstanceID(env.IDWithoutName),
-		semconv.ServiceNameKey.String(cfg.GetPackageName()),
-		semconv.ServiceVersionKey.String(cfg.GetPackageVersion()),
-		attribute.String("agent.version", env.Agent.Version),
-		attribute.String("agent.componentID", env.Agent.ComponentID),
-		attribute.String("agent.id", env.Agent.ID.String()),
+		semconv.SchemaURL, resourceAttributes...,
 	)
+
+	//
 
 	log.Infof("created cel input resource", resource.String())
 	exporterType := otel.GetExporterTypeFromEnv()
@@ -988,14 +998,47 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	if err != nil {
 		log.Errorw("failed to get exporter", "error", err)
 	}
-	exportInterval, err := otel.GetCollectionPeriodFromEnvironment(ctx, cfg.Interval)
 	if err != nil {
 		log.Errorw("failed to get collection period", "error", err)
 	}
 	log.Infof("created OTEL cel input exporter %s for input %s", exporterType, env.IDWithoutName)
-	otelMetrics, otelTransport, err := otel.NewOTELCELMetrics(log, env.Agent.UserAgent, *resource, c.Transport, exporter, exportInterval)
+	otelMetrics, otelTransport, err := otel.NewOTELCELMetrics(log, env.Agent.UserAgent, *resource, c.Transport, exporter)
 	c.Transport = otelTransport
 	return c, trace, otelMetrics, nil
+}
+
+func GetResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
+	attrs := []attribute.KeyValue{semconv.ServiceInstanceID(env.IDWithoutName),
+		semconv.ServiceNameKey.String(env.ID),
+		semconv.ServiceVersionKey.String(cfg.GetPackageVersion()),
+		attribute.String("package.name", cfg.GetPackageName()),
+		attribute.String("package.version", cfg.GetPackageVersion()),
+		attribute.String("agent.version", env.Agent.Version),
+		attribute.String("agent.componentID", env.Agent.ComponentID),
+		attribute.String("agent.id", env.Agent.ID.String())}
+
+	attributesStr, ok := os.LookupEnv("OTEL_RESOURCE_ATTRIBUTES")
+	if ok && len(attributesStr) > 0 {
+		attributes := make(map[string]string)
+		pairs := strings.Split(attributesStr, ",")
+		for _, pair := range pairs {
+			kv := strings.SplitN(pair, "=", 2)
+			if len(kv) == 2 {
+				key := strings.TrimSpace(kv[0])
+				value := strings.TrimSpace(kv[1])
+				if key != "" {
+					attributes[key] = value
+				}
+			}
+		}
+		de, ok := attributes["deployment.environment"]
+		if ok {
+			attrs = append(attrs, semconv.DeploymentEnvironmentName(de))
+		}
+	}
+
+	return attrs
+
 }
 
 func wantClient(cfg config) bool {
