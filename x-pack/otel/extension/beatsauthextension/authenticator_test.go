@@ -211,7 +211,6 @@ func TestAuthenticator(t *testing.T) {
 				require.Error(t, err)
 				require.Nil(t, resp)
 				require.Contains(t, err.Error(), "failed")
-				_ = resp.Body.Close()
 			}
 
 			// Test HTTP request if specified
