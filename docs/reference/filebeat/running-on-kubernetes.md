@@ -32,6 +32,48 @@ curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.
 **If you are using Kubernetes 1.7 or earlier:** Filebeat uses a hostPath volume to persist internal data. It’s located under `/var/lib/filebeat-data`. The manifest uses folder autocreation (`DirectoryOrCreate`), which was introduced in Kubernetes 1.8. You need to remove `type: DirectoryOrCreate` from the manifest, and create the host folder yourself.
 ::::
 
+In order to support runtime environments different from docker (for example, CRI-O, containerd), you need to configure the following path:
+
+```yaml
+filebeat.inputs:
+- type: filestream
+  id: container-logs <1>
+  prospector.scanner.symlinks: true <2>
+  parsers:
+    - container: ~
+  paths:
+    - /var/log/containers/*.log <3>
+  processors:
+    - add_kubernetes_metadata:
+      host: ${NODE_NAME}
+      matchers:
+        - logs_path:
+            logs_path: /var/log/containers/
+```
+1. All `filestream` inputs require a unique ID. One input will be created for all container logs.
+2. Container logs use symlinks, so they need to be enabled.
+3. Path for all container logs.
+
+ ```yaml
+ filebeat.autodiscover:
+   providers:
+     - type: kubernetes
+       node: ${NODE_NAME}
+       hints.enabled: true
+       hints.default_config:
+         type: filestream
+         id: container-${data.kubernetes.container.id} <1>
+         prospector.scanner.symlinks: true <2>
+         parsers:
+           - container: ~
+         paths:
+           - /var/log/containers/*-${data.kubernetes.container.id}.log <3>
+ ```
+
+1. All `filestream` inputs require a unique ID. one input will be created per container.
+2. Container logs use symlinks, so they need to be enabled.
+3. A path for each container, so the input will only ingest the logs from its 
+container.
 
 ## Settings [_settings]
 
@@ -89,43 +131,6 @@ If you are using Red Hat OpenShift, you need to specify additional settings in t
     ```
 
     This command sets the node selector for the project to an empty string. If you don’t run this command, the default node selector will skip control plane nodes.
-
-In order to support runtime environments with Openshift (for example, CRI-O, containerd), you need to configure the following path:
-
-```yaml
-filebeat.inputs:
-- type: filestream
-  id: container-${data.kubernetes.container.id} <1>
-  prospector.scanner.symlinks: true <2>
-  parsers:
-    - container: ~
-  paths: <3>
-    - /var/log/containers/*.log
-```
-1. All `filestream` inputs require a unique ID.
-2. Container logs use symlinks, so they need to be enabled.
-3. The same path needs to be configured in the autodiscover settings, if enabled:
-
-    ```yaml
-    filebeat.autodiscover:
-      providers:
-        - type: kubernetes
-          node: ${NODE_NAME}
-          hints.enabled: true
-          hints.default_config:
-            type: filestream
-            id: container-${data.kubernetes.container.id}
-            prospector.scanner.symlinks: true
-            parsers:
-              - container: ~
-            paths:
-              - /var/log/containers/*.log
-    ```
-
-::::{note}
-`/var/log/containers/\*.log` is normally a symlink to `/var/log/pods/*/*.log`, so `paths` can be edited accordingly.
-::::
-
 
 ## Load {{kib}} dashboards [_load_kib_dashboards]
 
