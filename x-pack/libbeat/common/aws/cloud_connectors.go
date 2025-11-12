@@ -15,11 +15,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// These env vars are provided from agentless controller when the cloud connectors flow is enabled.
 const (
 	CloudConnectorsGlobalRoleEnvVar = "CLOUD_CONNECTORS_GLOBAL_ROLE"
 	CloudConnectorsJWTPathEnvVar    = "CLOUD_CONNECTORS_ID_TOKEN_FILE"
 )
 
+// CloudConnectorsConfig is the config for the cloud connectors flow
 type CloudConnectorsConfig struct {
 	ElasticGlobalRoleARN string
 	IDTokenPath          string
