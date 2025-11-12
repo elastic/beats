@@ -873,7 +873,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		tr, err := aws.InitializeSignerTransport(*cfg.Auth.AWS, log, c.Transport)
 		if err != nil {
 			log.Errorw("failed to initialize aws config failed for signer", "error", err)
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 		c.Transport = tr
 	} else if cfg.Auth.File.isEnabled() {
@@ -979,22 +979,16 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	log.Infof("env context %v", env)
-	//For resource attributes, at a minimum we need to relate the data to an Agent Policy ID.
-	// Ideally, we would also include Organization ID, Project ID, Agent version, and the integration name, version, and owner.
-
-	// each cel program will have a unique resource object
-	resourceAttributes := GetResourceAttributes(env, cfg)
 
 	log.Infof("env context %v", env)
 	resource := resource.NewWithAttributes(
-		semconv.SchemaURL, resourceAttributes...,
+		semconv.SchemaURL, GetResourceAttributes(env, cfg)...,
 	)
 
 	//
 
 	log.Infof("created cel input resource", resource.String())
-	exporterType := otel.GetExporterTypeFromEnv()
-	exporter, err := otel.NewExporterFactory(log).NewExporter(ctx, exporterType)
+	exporter, exporterType, err := otel.NewExporterFactory(log).GetExporter(ctx)
 	if err != nil {
 		log.Errorw("failed to get exporter", "error", err)
 	}
@@ -1013,13 +1007,19 @@ func GetResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
 		semconv.ServiceVersionKey.String(cfg.GetPackageVersion()),
 		attribute.String("package.name", cfg.GetPackageName()),
 		attribute.String("package.version", cfg.GetPackageVersion()),
+		attribute.String("package.datastream", cfg.DataStream),
 		attribute.String("agent.version", env.Agent.Version),
-		attribute.String("agent.componentID", env.Agent.ComponentID),
 		attribute.String("agent.id", env.Agent.ID.String())}
 
+	usedKeys := make(map[string]struct{})
+
+	for _, attr := range attrs {
+		// Access the Key field of the KeyValue struct
+		usedKeys[string(attr.Key)] = struct{}{}
+	}
 	attributesStr, ok := os.LookupEnv("OTEL_RESOURCE_ATTRIBUTES")
 	if ok && len(attributesStr) > 0 {
-		attributes := make(map[string]string)
+		attributes := make([]attribute.KeyValue, 0)
 		pairs := strings.Split(attributesStr, ",")
 		for _, pair := range pairs {
 			kv := strings.SplitN(pair, "=", 2)
@@ -1027,14 +1027,15 @@ func GetResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
 				key := strings.TrimSpace(kv[0])
 				value := strings.TrimSpace(kv[1])
 				if key != "" {
-					attributes[key] = value
+					// don't overwrite existing keys
+					_, used := usedKeys[key]
+					if !used {
+						attributes = append(attributes, attribute.String(key, value))
+					}
 				}
 			}
 		}
-		de, ok := attributes["deployment.environment"]
-		if ok {
-			attrs = append(attrs, semconv.DeploymentEnvironmentName(de))
-		}
+		attrs = append(attrs, attributes...)
 	}
 
 	return attrs

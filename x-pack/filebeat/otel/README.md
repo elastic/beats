@@ -17,18 +17,27 @@ In production the APM server UI will display the value that should be used
 export OTEL_EXPORTER_OTLP_ENDPOINT=<value>
 export OTEL_RESOURCE_ATTRIBUTES=service.name=<app-name>,service.version=<app-version>,deployment.environment=production
 export OTEL_EXPORTER_OTLP_HEADERS=<value>
+
+If OTEL_RESOURCE_ATTRIBUTES
+is in the environment, the key value pairs will be added to the input's
+Resource Attributes ans sent with the metrics.
+
 ```
 
 To export OTEL metrics to console set these environment variables.
 ```
 unset OTEL_EXPORTER_OTLP_ENDPOINT
 unset OTEL_EXPORTER_OTLP_HEADERS
-unset OTEL_RESOURCE_ATTRIBUTES
 export OTEL_METRICS_EXPORTER=console
+
+setting OTEL_RESOURCE_ATTRIBUTES is optional
 ```
 
 The console exports in JSON. The default protocol for OTLP is gRPC.
-Filebeat also supports "http/protobuf". It does not support "http/json."
+Filebeat also supports "http/protobuf". It does not support "http/json"
+because the Go SDK does not support it. The http protocol is included
+for endpoints other than the elastic OTEL OTLP endpoint
+
 To use an http/protobuf protocol:
 
 ```
