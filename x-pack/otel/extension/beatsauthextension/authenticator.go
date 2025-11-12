@@ -188,7 +188,7 @@ func (srp *singleRouterProvider) RoundTripper() http.RoundTripper {
 }
 
 func (srp *singleRouterProvider) RoundTrip(req *http.Request) (*http.Response, error) {
-	// use the first endpoint in the list
+	// set the request URL to the active endpoint
 	srp.mx.Lock()
 	req.URL = srp.endpoints[srp.active]
 	srp.mx.Unlock()
@@ -196,7 +196,7 @@ func (srp *singleRouterProvider) RoundTrip(req *http.Request) (*http.Response, e
 	// perform the request
 	resp, err := srp.client.Transport.RoundTrip(req)
 
-	if err != nil && len(srp.endpoints) > 1 {
+	if err != nil {
 		// if response is unsuccessful, get a random next endpoint
 		srp.mx.Lock()
 		srp.active = getNextActiveClient(srp.active, len(srp.endpoints))

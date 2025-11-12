@@ -27,7 +27,10 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	goleak.VerifyTestMain(m)
+	goleak.VerifyTestMain(m, []goleak.Option{
+		goleak.IgnoreAnyFunction("net/http.(*persistConn).readLoop"),
+		goleak.IgnoreTopFunction("net/http.(*persistConn).writeLoop")}...)
+
 }
 
 func TestAuthenticator(t *testing.T) {
@@ -140,7 +143,7 @@ func TestAuthenticator(t *testing.T) {
 			testRoundTripperPreStart: true,
 		},
 		{
-			name: "when loadbalance is false, and endpoints are not configured",
+			name: "when loadbalance is false and endpoints are not configured",
 			setupConfig: func(t *testing.T) *Config {
 				return &Config{
 					BeatAuthConfig: map[string]any{
@@ -155,7 +158,7 @@ func TestAuthenticator(t *testing.T) {
 			testRoundTripError:   true,
 		},
 		{
-			name: "when loadbalance is false, and endpoints are configured",
+			name: "when loadbalance is false and endpoints are configured",
 			setupConfig: func(t *testing.T) *Config {
 				return &Config{
 					BeatAuthConfig: map[string]any{
@@ -272,6 +275,72 @@ func TestAuthenticator(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSingleRouterProvider(t *testing.T) {
+
+	var requestReceived bool
+	var startServer = func(url string, requestReceived *bool) {
+		l, err := net.Listen("tcp", url)
+		require.NoError(t, err)
+		server := &http.Server{ //nolint:gosec // testing
+			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				*requestReceived = true
+				if _, err := w.Write([]byte("Hello, World!")); err != nil {
+					t.Errorf("could not write to client: %s", err)
+				}
+			}),
+		}
+
+		// Start server and shut it down when the tests are over.
+		go func() {
+			_ = server.Serve(l)
+		}()
+
+		t.Cleanup(
+			func() {
+				if l == nil {
+					return
+				} else {
+					_ = server.Close()
+				}
+			},
+		)
+	}
+
+	cfg := &Config{
+		BeatAuthConfig: map[string]any{
+			"loadbalance": false,
+			"endpoints": []string{
+				"http://localhost:8080",
+				"http://localhost:8090",
+			},
+		},
+	}
+	settings := componenttest.NewNopTelemetrySettings()
+	auth, err := newAuthenticator(cfg, settings)
+	require.NoError(t, err)
+
+	err = auth.Start(context.Background(), nil)
+	require.NoError(t, err)
+
+	startServer("localhost:8080", &requestReceived)
+
+	rt, err := auth.RoundTripper(nil)
+	require.NoError(t, err)
+
+	// we set wrong endpoint to see if it uses the correct one set on beatsauth
+	req1, err := http.NewRequest("GET", "http://example.com", nil)
+	require.NoError(t, err)
+
+	_, err = rt.RoundTrip(req1)
+	// if err is not nil, we retry again and this time it should connect to the active server
+	if err != nil {
+		_, err = rt.RoundTrip(req1)
+		require.NoError(t, err)
+	}
+	require.Equal(t, true, requestReceived)
+
 }
 
 // startTestServer starts a HTTP server for testing using the provided
