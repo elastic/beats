@@ -8,10 +8,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -62,7 +62,7 @@ func addCloudConnectorsCredentialsWithOptions(
 					opt.Duration = defaultIntermediateDuration
 				})...,
 			)
-			return aws.NewCredentialsCache(provider)
+			return awssdk.NewCredentialsCache(provider)
 		},
 
 		// step 2 assume the remote role (customer's configured one) having the previous one in chain
@@ -77,7 +77,7 @@ func addCloudConnectorsCredentialsWithOptions(
 					}
 				})...,
 			)
-			return aws.NewCredentialsCache(assumeRoleProvider, func(options *awssdk.CredentialsCacheOptions) {
+			return awssdk.NewCredentialsCache(assumeRoleProvider, func(options *awssdk.CredentialsCacheOptions) {
 				if config.AssumeRoleExpiryWindow > 0 {
 					options.ExpiryWindow = config.AssumeRoleExpiryWindow
 				}

@@ -39,7 +39,7 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 
 	tmpDir := t.TempDir()
 	pth := path.Join(tmpDir, "id_token")
-	os.WriteFile(path.Join(tmpDir, "id_token"), []byte(tokenFileContent), 0o644)
+	_ = os.WriteFile(path.Join(tmpDir, "id_token"), []byte(tokenFileContent), 0o644)
 	cloudConnectorsConfig.IDTokenPath = pth
 
 	// Create a base AWS config
@@ -58,7 +58,8 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 			middleware.FinalizeMiddlewareFunc(
 				"mock",
 				func(ctx context.Context, in middleware.FinalizeInput, next middleware.FinalizeHandler) (middleware.FinalizeOutput, middleware.Metadata, error) {
-					req := in.Request.(*smithyhttp.Request)
+					req, is := in.Request.(*smithyhttp.Request)
+					assert.True(t, is, "request expected to be of type *smithyhttp.Request")
 					receivedCalls++
 					bd, err := io.ReadAll(req.GetStream())
 					assert.NoError(t, req.RewindStream())
