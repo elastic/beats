@@ -100,7 +100,7 @@ func (client *ldapClient) connection() (*ldap.Conn, error) {
 	defer client.mu.Unlock()
 
 	// Check if the connection is still alive
-	if client.conn.IsClosing() {
+	if client.conn == nil || client.conn.IsClosing() {
 		conn, err := client.dial()
 		if err != nil {
 			return nil, err
