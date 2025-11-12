@@ -68,7 +68,7 @@ steps:
         key: "x-pack-otel-mandatory-linux-unit-test"
         command: |
           cd x-pack/otel
-          mage unitTest
+          mage goUnitTest
         retry:
           automatic:
             - limit: 1
@@ -93,7 +93,7 @@ steps:
         key: "x-pack-otel-mandatory-linux-unit-test-FIPS-tag"
         command: |
           cd x-pack/otel
-          mage unitTest
+          mage goUnitTest
         retry:
           automatic:
             - limit: 1
@@ -125,7 +125,7 @@ steps:
         key: "extended-arm64-unit-tests"
         command: |
           cd x-pack/otel
-          mage unitTest
+          mage goUnitTest
         retry:
           automatic:
             - limit: 1
