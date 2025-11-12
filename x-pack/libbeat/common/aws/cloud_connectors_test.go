@@ -84,10 +84,6 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 									SessionToken:    aws.String("FwoGZXIvYXdzEFAaDFAKESESSIONTOKENEXAMPLE1"),
 									Expiration:      aws.Time(time.Now().Add(defaultIntermediateDuration)),
 								},
-								AssumedRoleUser: &types.AssumedRoleUser{
-									Arn:           aws.String(cloudConnectorsConfig.ElasticGlobalRoleARN + "/u1"),
-									AssumedRoleId: aws.String("AKIAFAKEEXAMPLE00001:testSession-123"),
-								},
 							},
 						}, middleware.Metadata{}, nil
 
@@ -106,10 +102,6 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 									SecretAccessKey: aws.String("FAKEwJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY2"),
 									SessionToken:    aws.String("FwoGZXIvYXdzEFAaDFAKESESSIONTOKENEXAMPLE2"),
 									Expiration:      aws.Time(time.Now().Add(defaultIntermediateDuration)),
-								},
-								AssumedRoleUser: &types.AssumedRoleUser{
-									Arn:           aws.String(cloudConnectorsConfig.ElasticGlobalRoleARN + "/u2"),
-									AssumedRoleId: aws.String("AKIAFAKEEXAMPLE00002:testSession-456"),
 								},
 							},
 						}, middleware.Metadata{}, nil
