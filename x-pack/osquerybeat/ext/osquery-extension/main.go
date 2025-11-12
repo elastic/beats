@@ -34,12 +34,16 @@ package main
 import (
 	"flag"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/osquery/osquery-go"
 	osquerygen "github.com/osquery/osquery-go/gen/osquery"
+	"github.com/osquery/osquery-go/plugin/table"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tablespec"
 )
 
 var (
@@ -95,7 +99,7 @@ func main() {
 	}
 
 	// Register the tables available for the specific platform build
-	RegisterTables(server, log)
+	registerTables(server, log)
 
 	if *verbose {
 		log.Info("Starting osquery extension server")
@@ -103,6 +107,14 @@ func main() {
 
 	if err := server.Run(); err != nil {
 		log.Fatalf("Failed to run extension server: %s", err)
+	}
+}
+
+func registerTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
+	tables.Init()
+
+	for _, spec := range tablespec.GetGlobalRegistry().ListByPlatform(runtime.GOOS) {
+		server.RegisterPlugin(table.NewPlugin(spec.Name(), spec.Columns(), spec.Generate(log)))
 	}
 }
 
