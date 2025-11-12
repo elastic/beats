@@ -132,3 +132,19 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 	require.NotNil(t, crd)
 	require.Equal(t, 2, receivedCalls)
 }
+
+func TestParseCloudConnectorsConfigFromEnv(t *testing.T) {
+	t.Setenv(CloudConnectorsGlobalRoleEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
+	t.Setenv(CloudConnectorsJWTPathEnvVar, "/path/token")
+
+	got := parseCloudConnectorsConfigFromEnv()
+
+	assert.Equal(
+		t,
+		CloudConnectorsConfig{
+			ElasticGlobalRoleARN: "arn:aws:iam::999999999999:role/elastic-global-role",
+			IDTokenPath:          "/path/token",
+		},
+		got,
+	)
+}
