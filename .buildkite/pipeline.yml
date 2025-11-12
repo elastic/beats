@@ -469,7 +469,6 @@ steps:
                 - .buildkite/scripts
                 - .buildkite/hooks
                 - go.mod
-                - pytest.ini
                 - dev-tools/
                 - testing/
               config:
