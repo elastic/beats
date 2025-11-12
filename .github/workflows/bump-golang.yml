@@ -24,7 +24,7 @@ jobs:
         uses: elastic/oblt-actions/git/setup@v1
 
       - name: Install Updatecli in the runner
-        uses: updatecli/updatecli-action@57aa8966d4d775cb1420b90c270ba97a4b5abe47
+        uses: updatecli/updatecli-action@719e3592d124cbf826da704cbe557e1221dd4bba
 
       - name: Run Updatecli
         env:
