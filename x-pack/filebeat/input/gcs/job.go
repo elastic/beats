@@ -452,8 +452,24 @@ func (j *job) addGzipDecoderIfNeeded(reader *bufio.Reader) (io.Reader, error) {
 // data stream contains a json array as the root element or not, without
 // advancing the reader. If the data stream contains an array as the root
 // element, the value of the boolean return type is set to true.
+// If a UTF-8 BOM is present at the beginning, it is automatically discarded.
 func evaluateJSON(reader *bufio.Reader) (io.Reader, bool, error) {
 	eof := false
+
+	// Check for BOM at the beginning and discard it
+	const byteOrderMark = "\ufeff"
+	if b, err := reader.Peek(len(byteOrderMark)); err != nil {
+		// likely EOF
+		if !errors.Is(err, io.EOF) {
+			return nil, false, fmt.Errorf("failed to peek for UTF-8 BOM: %w", err)
+		}
+	} else if bytes.Equal(b, []byte(byteOrderMark)) {
+		// Actually discard the BOM bytes from the reader
+		if _, err := reader.Discard(len(byteOrderMark)); err != nil {
+			return nil, false, fmt.Errorf("failed to discard UTF-8 BOM: %w", err)
+		}
+	}
+
 	for i := 0; ; i++ {
 		b, err := reader.Peek((i + 1) * 5)
 		if errors.Is(err, io.EOF) {
@@ -470,11 +486,11 @@ func evaluateJSON(reader *bufio.Reader) (io.Reader, bool, error) {
 			case unicode.IsSpace(bytes.Runes(char)[0]):
 				continue
 			default:
-				return nil, false, fmt.Errorf("unexpected error: JSON data is malformed")
+				return nil, false, fmt.Errorf("unexpected error: JSON data is malformed %q", b)
 			}
 		}
 		if eof {
-			return nil, false, fmt.Errorf("unexpected error: JSON data is malformed")
+			return nil, false, fmt.Errorf("unexpected error: JSON data is malformed unexpected EOF")
 		}
 	}
 }
