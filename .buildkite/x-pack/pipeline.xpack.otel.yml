@@ -1,0 +1,5 @@
+name: "beats-xpack-osquerybeat"
+
+steps:
+  - label: ":wave: Greetings"            
+    command: "echo 'My first pipeline!'"
