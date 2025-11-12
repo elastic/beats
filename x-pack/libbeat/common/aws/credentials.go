@@ -74,7 +74,7 @@ func InitializeAWSConfig(beatsConfig ConfigAWS, logger *logp.Logger) (awssdk.Con
 		addAssumeRoleProviderToAwsConfig(beatsConfig, &awsConfig, logger)
 	}
 
-	// If cloud connectors are selected from config, initialize the role chaining using the id token.
+	// If cloud connectors method is selected from config, initialize the role chaining.
 	if beatsConfig.SupportsCloudConnectors {
 		cloudConnectorsConfig := parseCloudConnectorsConfigFromEnv()
 		addCloudConnectorsCredentials(beatsConfig, cloudConnectorsConfig, &awsConfig, logger)

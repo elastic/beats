@@ -27,8 +27,9 @@ func TestInitializeAWSConfigCloudConnectors(t *testing.T) {
 	awsConfig, err := InitializeAWSConfig(inputConfig, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 
-	// we cannot mock APIOptions at this point because a copy of config has already passed to each sts client
-	// So lets, check that credentials is CredentialsCache (so cloud connectors init was run).
+	// we cannot append to APIOptions at this point (and mock the chain responses)
+	// because a copy of config has already been passed to each sts client.
+	// So lets just check that .Credentials is CredentialsCache (so cloud connectors init was run).
 	c, isCredCache := awsConfig.Credentials.(*aws.CredentialsCache)
 	require.True(t, isCredCache)
 	require.NotNil(t, c)

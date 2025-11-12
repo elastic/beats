@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// These env vars are provided from agentless controller when the cloud connectors flow is enabled.
+// These env vars are provided by agentless controller when the cloud connectors flow is enabled.
 const (
 	CloudConnectorsGlobalRoleEnvVar = "CLOUD_CONNECTORS_GLOBAL_ROLE"
 	CloudConnectorsJWTPathEnvVar    = "CLOUD_CONNECTORS_ID_TOKEN_FILE"
@@ -43,10 +43,10 @@ func addCloudConnectorsCredentials(config ConfigAWS, cloudConnectorsConfig Cloud
 	addCredentialsChain(
 		awsConfig,
 
-		// step 1 assume Super Global Role with web identity
+		// step 1 assume Elastic Global Role with web identity using the id token provided by the agentless OIDC issuer.
 		func(c awssdk.Config) awssdk.CredentialsProvider {
 			provider := stscreds.NewWebIdentityRoleProvider(
-				sts.NewFromConfig(c), // client uses credentials from previous config, step
+				sts.NewFromConfig(c), // client uses credentials from previous config.
 				cloudConnectorsConfig.ElasticGlobalRoleARN,
 				stscreds.IdentityTokenFile(cloudConnectorsConfig.IDTokenPath),
 				func(opt *stscreds.WebIdentityRoleOptions) {
@@ -56,10 +56,10 @@ func addCloudConnectorsCredentials(config ConfigAWS, cloudConnectorsConfig Cloud
 			return awssdk.NewCredentialsCache(provider)
 		},
 
-		// step 2 assume the remote role (customer's configured one) having the previous one in chain
+		// step 2 assume the remote role (users's configured one) having the previous one in chain.
 		func(c awssdk.Config) awssdk.CredentialsProvider {
 			assumeRoleProvider := stscreds.NewAssumeRoleProvider(
-				sts.NewFromConfig(c), // client uses credentials from previous config, step
+				sts.NewFromConfig(c), // client uses credentials from previous config.
 				config.RoleArn,
 				func(aro *stscreds.AssumeRoleOptions) {
 					aro.Duration = config.AssumeRoleDuration
