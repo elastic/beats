@@ -22,5 +22,5 @@ jobs:
       version: ${{ inputs.version }}
       release_manager: ${{ github.triggering_actor }}
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
+      id-token: write
