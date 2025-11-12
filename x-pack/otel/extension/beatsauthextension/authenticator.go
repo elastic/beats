@@ -131,8 +131,6 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 		return nil, fmt.Errorf("failed creating http client: %w", err)
 	}
 
-	// if loadbalance is disabled, all outgoing requests should go to a single endpoint
-	// unless the endpoint is unreachable, then the next endpoint in the list is used
 	if !beatAuthConfig.LoadBalance {
 		singleRouterProvider, err := NewSingleRouterProvider(beatAuthConfig, client)
 		if err != nil {
@@ -160,8 +158,8 @@ type singleRouterProvider struct {
 	mx        sync.Mutex
 }
 
-// NewSingleRouterProvider returns a RoundTripper that atmost one active endpoint
-// If the connection to the active client fails, the next endpoint is used and so
+// NewSingleRouterProvider returns a RoundTripper with atmost one active endpoint
+// If the connection to the active client fails, the next endpoint is used
 func NewSingleRouterProvider(config ESAuthConfig, client *http.Client) (*singleRouterProvider, error) {
 	if len(config.Endpoints) == 0 {
 		return nil, fmt.Errorf("atleast one endpoint must be provided when loadbalance is disabled")
@@ -188,7 +186,7 @@ func (srp *singleRouterProvider) RoundTripper() http.RoundTripper {
 }
 
 func (srp *singleRouterProvider) RoundTrip(req *http.Request) (*http.Response, error) {
-	// set the request URL to the active endpoint
+	// set the request URL to active endpoint
 	srp.mx.Lock()
 	req.URL = srp.endpoints[srp.active]
 	srp.mx.Unlock()
@@ -203,11 +201,10 @@ func (srp *singleRouterProvider) RoundTrip(req *http.Request) (*http.Response, e
 		srp.mx.Unlock()
 	}
 
-	// return the error as is for the caller of RoundTrip to handle retry logic
 	return resp, err
 }
 
-// getNextActiveClient returns the next active client index given the current active index and total clients
+// getNextActiveClient returns the next active client given the current active index and total clients
 // Note: This logic has been adapted from failoverClient in libbeat/outputs/failover.go
 func getNextActiveClient(active int, totalClients int) (next int) {
 	switch {
