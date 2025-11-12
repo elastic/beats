@@ -98,6 +98,11 @@ func (gs *AmcacheState) updateLockHeld(log *logger.Logger) error {
 }
 
 // GetCachedEntries returns the cached entries for a given Amcache table and filter list.
+// The lock is held for the duration of the function.
+// This is to avoid race conditions when the cache is updated while the function is running.
+// This function accepts a list of filters to filter the entries by.
+// If the list of filters is empty, all entries are returned.
+// If the list of filters is not empty, only the entries that match all filters are returned.
 func (gs *AmcacheState) GetCachedEntries(amcacheTable tables.AmcacheTable, filterList []filters.Filter, log *logger.Logger) ([]tables.Entry, error) {
 	gs.lock.Lock()
 	defer gs.lock.Unlock()
@@ -120,12 +125,18 @@ func (gs *AmcacheState) GetCachedEntries(amcacheTable tables.AmcacheTable, filte
 		return result, nil
 	}
 
+	// Filter the entries by the filters.
+	// Filters are evaluated as AND operations.
 	for _, entry := range cachedTableEntries {
+		matches := true
 		for _, filter := range filterList {
-			if filter.Matches(entry) {
-				result = append(result, entry)
+			if !filter.Matches(entry) {
+				matches = false
 				break
 			}
+		}
+		if matches {
+			result = append(result, entry)
 		}
 	}
 	return result, nil
