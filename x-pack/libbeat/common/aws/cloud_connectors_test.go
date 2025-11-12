@@ -79,14 +79,14 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 						return middleware.FinalizeOutput{
 							Result: &sts.AssumeRoleWithWebIdentityOutput{
 								Credentials: &types.Credentials{
-									AccessKeyId:     aws.String("ABC"),
-									SecretAccessKey: aws.String("DEF"),
-									SessionToken:    aws.String("ABCDEF"),
+									AccessKeyId:     aws.String("AKIAFAKEEXAMPLE00001"),
+									SecretAccessKey: aws.String("FAKEwJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY1"),
+									SessionToken:    aws.String("FwoGZXIvYXdzEFAaDFAKESESSIONTOKENEXAMPLE1"),
 									Expiration:      aws.Time(time.Now().Add(defaultIntermediateDuration)),
 								},
 								AssumedRoleUser: &types.AssumedRoleUser{
-									Arn:           aws.String("abc"),
-									AssumedRoleId: aws.String("abc"),
+									Arn:           aws.String(cloudConnectorsConfig.ElasticGlobalRoleARN + "/u1"),
+									AssumedRoleId: aws.String("AKIAFAKEEXAMPLE00001:testSession-123"),
 								},
 							},
 						}, middleware.Metadata{}, nil
@@ -102,10 +102,14 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 						return middleware.FinalizeOutput{
 							Result: &sts.AssumeRoleOutput{
 								Credentials: &types.Credentials{
-									AccessKeyId:     aws.String("A12"),
-									SecretAccessKey: aws.String("A13"),
-									SessionToken:    aws.String("A1234"),
-									Expiration:      aws.Time(time.Now().Add(config.AssumeRoleDuration)),
+									AccessKeyId:     aws.String("AKIAFAKEEXAMPLE00002"),
+									SecretAccessKey: aws.String("FAKEwJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY2"),
+									SessionToken:    aws.String("FwoGZXIvYXdzEFAaDFAKESESSIONTOKENEXAMPLE2"),
+									Expiration:      aws.Time(time.Now().Add(defaultIntermediateDuration)),
+								},
+								AssumedRoleUser: &types.AssumedRoleUser{
+									Arn:           aws.String(cloudConnectorsConfig.ElasticGlobalRoleARN + "/u2"),
+									AssumedRoleId: aws.String("AKIAFAKEEXAMPLE00002:testSession-456"),
 								},
 							},
 						}, middleware.Metadata{}, nil
