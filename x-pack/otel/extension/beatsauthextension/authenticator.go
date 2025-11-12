@@ -7,6 +7,7 @@ package beatsauthextension
 import (
 	"context"
 	"fmt"
+	"math/rand/v2"
 	"net/http"
 	"net/url"
 	"sync"
@@ -154,15 +155,16 @@ func (h *httpClientProvider) RoundTripper() http.RoundTripper {
 
 type singleRouterProvider struct {
 	endpoints []*url.URL
+	active    int
 	client    *http.Client
 	mx        sync.Mutex
 }
 
-// NewSingleRouterProvider returns a RoundTripper that always returns the first endpoint in the list
-// If the connection to the first endpoint fails, the next endpoint in the list is used for subsequent requests
+// NewSingleRouterProvider returns a RoundTripper that atmost one active endpoint
+// If the connection to the active client fails, the next endpoint is used and so
 func NewSingleRouterProvider(config ESAuthConfig, client *http.Client) (*singleRouterProvider, error) {
 	if len(config.Endpoints) == 0 {
-		return nil, fmt.Errorf("endpoints must be provided when load_balance is disabled")
+		return nil, fmt.Errorf("atleast one endpoint must be provided when loadbalance is disabled")
 	}
 
 	urls := make([]*url.URL, 0, len(config.Endpoints))
@@ -178,7 +180,7 @@ func NewSingleRouterProvider(config ESAuthConfig, client *http.Client) (*singleR
 		urls = append(urls, parsedEndpoint)
 	}
 
-	return &singleRouterProvider{client: client, endpoints: urls}, nil
+	return &singleRouterProvider{client: client, endpoints: urls, active: getNextActiveClient(-1, len(urls))}, nil
 }
 
 func (srp *singleRouterProvider) RoundTripper() http.RoundTripper {
@@ -188,21 +190,44 @@ func (srp *singleRouterProvider) RoundTripper() http.RoundTripper {
 func (srp *singleRouterProvider) RoundTrip(req *http.Request) (*http.Response, error) {
 	// use the first endpoint in the list
 	srp.mx.Lock()
-	req.URL = srp.endpoints[0]
+	req.URL = srp.endpoints[srp.active]
 	srp.mx.Unlock()
 
 	// perform the request
 	resp, err := srp.client.Transport.RoundTrip(req)
 
 	if err != nil && len(srp.endpoints) > 1 {
-		// if response is unsuccessful, move the first endpoint to the end of the list
+		// if response is unsuccessful, get a random next endpoint
 		srp.mx.Lock()
-		srp.endpoints = append(srp.endpoints[1:], srp.endpoints[0])
+		srp.active = getNextActiveClient(srp.active, len(srp.endpoints))
 		srp.mx.Unlock()
 	}
 
 	// return the error as is for the caller of RoundTrip to handle retry logic
 	return resp, err
+}
+
+// getNextActiveClient returns the next active client index given the current active index and total clients
+// Note: This logic has been adapted from failoverClient in libbeat/outputs/failover.go
+func getNextActiveClient(active int, totalClients int) (next int) {
+	switch {
+	case totalClients == 1:
+		next = 0
+	case totalClients == 2 && 0 <= active && active <= 1:
+		next = 1 - active
+	default:
+		for {
+			// Connect to random server to potentially spread the
+			// load when large number of beats with same set of sinks
+			// are started up at about the same time.
+			next = rand.Int() % totalClients
+			if next != active {
+				break
+			}
+		}
+	}
+
+	return next
 }
 
 // errorRoundTripperProvider provides a RoundTripper that always returns an error
