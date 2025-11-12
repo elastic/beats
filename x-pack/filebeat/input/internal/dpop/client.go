@@ -10,6 +10,8 @@ package dpop
 
 import (
 	"crypto"
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
 	"io"
 	"net/http"
@@ -160,4 +162,11 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 func discard(r io.ReadCloser) {
 	io.Copy(io.Discard, r) //nolint:errcheck // io.Discard.Write never returns an error and we do not care about r.Read failing since we are just discarding.
 	r.Close()
+}
+
+// RandomJTI returns a URL-safe, random identifier for the "jti" claim.
+func RandomJTI() string {
+	var b [16]byte
+	rand.Read(b[:]) //nolint:errcheck // rand.Read is documented to unrecoverably crash on error.
+	return base64.RawURLEncoding.EncodeToString(b[:])
 }

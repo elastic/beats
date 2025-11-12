@@ -349,17 +349,10 @@ func (c durationClaimer) Claims() *jwt.RegisteredClaims {
 	now := time.Now()
 	claims := &jwt.RegisteredClaims{
 		IssuedAt: jwt.NewNumericDate(now),
-		ID:       randomJTI(),
+		ID:       RandomJTI(),
 	}
 	if c >= 0 {
 		claims.ExpiresAt = jwt.NewNumericDate(now.Add(time.Duration(c)))
 	}
 	return claims
-}
-
-// randomJTI returns a URL-safe, random identifier for the "jti" claim.
-func randomJTI() string {
-	var b [16]byte
-	rand.Read(b[:])
-	return base64.RawURLEncoding.EncodeToString(b[:])
 }

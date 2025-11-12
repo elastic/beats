@@ -34,7 +34,9 @@ type Claimer interface {
 	// to the DPoP claims held by a ProofClaims constructed by
 	// ProofGenerator.BuildProof.
 	//
-	// When json/v2 is available this will be changed to return jwt.Claims.
+	// When json/v2 is available this will be changed to return
+	// yet to be defined interface{ jwt.Claims; ID() string }
+	// type value.
 	Claims() *jwt.RegisteredClaims
 }
 
@@ -63,7 +65,7 @@ func NewProofGenerator(claim Claimer, key crypto.Signer, signing jwt.SigningMeth
 
 // buildJWKAndAlg constructs a JWK (public key only). Supported keys:
 //   - *ecdsa.PrivateKey
-//   - *prsa.PrivateKey
+//   - *rsa.PrivateKey
 //   - *ed25519.PrivateKey
 func buildJWKAndAlg(privateKey any) (any, error) {
 	switch k := privateKey.(type) {
@@ -163,6 +165,9 @@ type ProofOptions struct {
 func (g *ProofGenerator) BuildProof(ctx context.Context, method, url string, opts ProofOptions) (string, error) {
 	if g == nil || g.key == nil {
 		return "", errors.New("nil proof generator or key")
+	}
+	if g.claim.Claims().ID == "" {
+		return "", errors.New("proof generator jti claim is not set")
 	}
 
 	htu := url

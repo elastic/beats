@@ -64,6 +64,7 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context) (*http.Client, 
 				Subject:   conf.ClientID,
 				IssuedAt:  jwt.NewNumericDate(now),
 				ExpiresAt: jwt.NewNumericDate(now.Add(time.Hour)),
+				ID:        dpop.RandomJTI(),
 			}
 		}
 		var err error
