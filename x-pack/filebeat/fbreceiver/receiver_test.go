@@ -172,10 +172,7 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
-<<<<<<< HEAD
 	t.Skip("flaky test, see https://github.com/elastic/beats/issues/43832")
-=======
->>>>>>> c997509dd (otel: unskip filebeat TestMultipleReceivers (#47228))
 	// This test verifies that multiple receivers can be instantiated
 	// in isolation, started, and can ingest logs without interfering
 	// with each other.
