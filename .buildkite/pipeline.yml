@@ -455,6 +455,33 @@ steps:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
 
+  - label: "Trigger x-pack/otel"
+    if: build.pull_request.id != null
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
+          watch:
+            - path:
+                - .go-version
+                - x-pack/otel/
+                - .buildkite/x-pack/pipeline.xpack.otel.yml
+                - .buildkite/scripts
+                - .buildkite/hooks
+                - go.mod
+                - pytest.ini
+                - dev-tools/
+                - testing/
+              config:
+                trigger: "beats-xpack-otel"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
   - label: "Trigger x-pack/auditbeat"
     if: build.pull_request.id != null
     plugins:
