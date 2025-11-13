@@ -247,9 +247,9 @@ func TestAuthenticator(t *testing.T) {
 				rt, err := auth.RoundTripper(nil)
 				require.NoError(t, err)
 
-				req, err := http.NewRequest("GET", "http://example.com", nil) //nolint:noctx this is only in test
+				req, err := http.NewRequest("GET", "http://example.com", nil) //nolint:noctx // this is only in test
 				require.NoError(t, err)
-				resp, err := rt.RoundTrip(req)
+				resp, err := rt.RoundTrip(req) //nolint:bodyclose // response is nil
 				require.Error(t, err)
 				require.Nil(t, resp)
 				require.Contains(t, err.Error(), "failed")
@@ -270,7 +270,7 @@ func TestAuthenticator(t *testing.T) {
 				require.NoError(t, err)
 				require.NotNil(t, client)
 
-				resp, err := client.Get(serverURL) //nolint:noctx this is a test
+				resp, err := client.Get(serverURL) //nolint:noctx // this is a test
 				require.NoError(t, err)
 				_ = resp.Body.Close()
 			}

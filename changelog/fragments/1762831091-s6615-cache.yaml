@@ -9,11 +9,11 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: bug-fix
+kind: feature
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary:  fixes a bug where kerberos authentication could be disabled when server supports multiple authentication types.
+summary: Improve logging of cache processor and add ignore failure option.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
@@ -28,7 +28,7 @@ summary:  fixes a bug where kerberos authentication could be disabled when serve
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: all
+component: filebeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
@@ -42,4 +42,4 @@ component: all
 # OPTIONAL to manually add other issue URLs
 # Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
 # If not present is automatically filled by the tooling with the issue linked to the PR number.
-issue: https://github.com/elastic/beats/issues/47110
+# issue: https://github.com/owner/repo/1234
