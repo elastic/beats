@@ -24,7 +24,10 @@ steps:
 
     steps:
       - label: "x-pack/otel: Run check and pre-commit"
-        command: {{matrix}}
+        command: |
+          make -C x-pack/otel check
+          make check-no-changes
+          pre-commit run --all-files
         retry:
           automatic:
             - limit: 1
@@ -36,11 +39,6 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/otel: run check and pre-commit"
-        matrix:
-        - |
-          make -C x-pack/otel check
-          make check-no-changes
-        - pre-commit run --all-files
 
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
@@ -69,7 +67,7 @@ steps:
           - "x-pack/otel/build/*.xml"
           - "x-pack/otel/build/*.json"
         plugins:
-          - test-collector#v1.10.2:
+          - test-collector#v1.11.0:
               files: "x-pack/otel/build/TEST-*.xml"
               format: "junit"
               branches: "main"
