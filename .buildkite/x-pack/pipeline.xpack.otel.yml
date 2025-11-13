@@ -25,7 +25,6 @@ steps:
     steps:
       - label: "x-pack/otel: Run check"
         command: |
-          set -eo pipefail
           make -C x-pack/otel check
           make check-no-changes
         retry:
