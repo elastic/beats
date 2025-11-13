@@ -14,6 +14,7 @@ import (
 	"github.com/osquery/osquery-go/plugin/table"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hostfs"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/proc"
 )
 
@@ -72,10 +73,11 @@ func HostProcessesColumns() []table.ColumnDefinition {
 	}
 }
 
-func GetHostProcessesGenerateFunc() table.GenerateFunc {
+func GetHostProcessesGenerateFunc(log *logger.Logger) table.GenerateFunc {
 	root := hostfs.GetPath("")
 
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
+		log.Infof("generating host_processes table with root path: %s", root)
 		return genProcesses(root, queryContext)
 	}
 }
@@ -198,7 +200,7 @@ func genProcess(root string, pid string, systemBootTime int64) map[string]string
 	return r
 }
 
-func mustString(s string, err error) string {
+func mustString(s string, _ error) string {
 	return s
 }
 

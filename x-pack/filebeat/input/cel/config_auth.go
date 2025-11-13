@@ -21,13 +21,15 @@ import (
 	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 type authConfig struct {
-	Basic  *basicAuthConfig  `config:"basic"`
-	Token  *tokenAuthConfig  `config:"token"`
-	Digest *digestAuthConfig `config:"digest"`
-	OAuth2 *oAuth2Config     `config:"oauth2"`
+	Basic  *basicAuthConfig       `config:"basic"`
+	Token  *tokenAuthConfig       `config:"token"`
+	Digest *digestAuthConfig      `config:"digest"`
+	OAuth2 *oAuth2Config          `config:"oauth2"`
+	AWS    *aws.SignerInputConfig `config:"aws"`
 }
 
 func (c authConfig) Validate() error {
@@ -42,6 +44,9 @@ func (c authConfig) Validate() error {
 		n++
 	}
 	if c.OAuth2.isEnabled() {
+		n++
+	}
+	if c.AWS.IsEnabled() {
 		n++
 	}
 	if n > 1 {
@@ -170,6 +175,7 @@ type oAuth2Config struct {
 	OktaJWKFile string          `config:"okta.jwk_file"`
 	OktaJWKJSON common.JSONBlob `config:"okta.jwk_json"`
 	OktaJWKPEM  string          `config:"okta.jwk_pem"`
+	DPoPKeyPEM  string          `config:"okta.dpop_key_pem"`
 }
 
 // isEnabled returns true if the `enable` field is set to true in the yaml.
@@ -240,7 +246,7 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 		}
 		return oauth2.NewClient(ctx, creds.TokenSource), nil
 	case oAuth2ProviderOkta:
-		return o.fetchOktaOauthClient(ctx, client)
+		return o.fetchOktaOauthClient(ctx)
 	default:
 		return nil, errors.New("oauth2 client: unknown provider")
 	}
