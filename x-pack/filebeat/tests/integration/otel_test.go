@@ -292,7 +292,7 @@ extensions:
     idle_connection_timeout: 3s
     proxy_disable: false
     timeout: 1m30s
-	loadbalance: true
+    loadbalance: true
 service:
   extensions:
     - beatsauth
@@ -919,7 +919,7 @@ extensions:
     idle_connection_timeout: 3s
     proxy_disable: false
     timeout: 1m30s
-	loadbalance: true
+    loadbalance: true
 service:
   extensions:
     - beatsauth

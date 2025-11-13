@@ -106,7 +106,7 @@ receivers:
   filebeatreceiver:
     output:
       elasticsearch:
-	    loadbalance: true
+        loadbalance: true
         hosts: {{ .Host }}
         ssl:
           enabled: true
@@ -181,7 +181,7 @@ receivers:
   filebeatreceiver:
     output:
       elasticsearch:
-	    loadbalance: true
+        loadbalance: true
         hosts: {{ .Host }}
         ssl:
           enabled: true
@@ -253,7 +253,7 @@ receivers:
   filebeatreceiver:
     output:
       elasticsearch:
-	    loadbalance: true
+        loadbalance: true
         hosts: {{ .Host }}
         ssl:
           enabled: true
@@ -431,7 +431,7 @@ func TestVerificationMode(t *testing.T) {
 receivers:
   filebeatreceiver:
     output:
-	  loadbalance: true
+      loadbalance: true
       elasticsearch:
         hosts: {{ .Host }}
         ssl:
@@ -529,7 +529,7 @@ receivers:
   filebeatreceiver:
     output:
       elasticsearch:
-	    loadbalance: true
+        loadbalance: true
         hosts: {{ .Host }}
         proxy_url: {{ .ProxyURL }}
 `,
@@ -563,7 +563,7 @@ receivers:
   filebeatreceiver:
     output:
       elasticsearch:
-	    loadbalance: true
+        loadbalance: true
         hosts: {{ .Host }}
         proxy_url: {{ .ProxyURL }}
         ssl:
@@ -582,7 +582,7 @@ receivers:
   filebeatreceiver:
     output:
       elasticsearch:
-	    loadbalance: true
+        loadbalance: true
         hosts: {{ .Host }}
         proxy_url: {{ .ProxyURL }}
         proxy_disable: true
