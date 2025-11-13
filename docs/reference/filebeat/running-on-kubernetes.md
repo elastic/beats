@@ -48,70 +48,6 @@ By default, Filebeat sends events to an existing Elasticsearch deployment, if pr
   value: changeme
 ```
 
-## Ingesting rotated log files
-
-Filebeat can also ship the rotated logs, including the GZIP-compressed logs.
-Kubernetes stores logs on `/var/log/pods` and uses symlinks on `/var/log/containers`
-for active log files. For full details, refer to the official
-[Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
-
-Ingest rotated logs by enabling decompression of GZIP files and changing the monitored 
-path to `/var/log/pods/` instead of `/var/log/containers`, which only contains
-active log files.
-
-::::{warning}
-Data Duplication: When you change the path on an existing deployment,
-filebeat reads all existing files in the new directory from the beginning.
-This action causes a one-time re-ingestion of the log files.
-
-After the initial scan, filebeat tracks files normally and will only
-ingest new log data.
-::::
-The following is an example configuration for ingesting rotated log files:
-
-```yaml
-    filebeat.inputs:
-       - type: filestream
-         id: kubernetes-container-logs
-         gzip_experimental: true # BETA: enable gzip decompression. Refer to the docs for details: https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-filestream#reading-gzip-files
-         parsers:
-            - container: ~
-         paths:
-            - /var/log/pods/*/*/*.log* <1>
-         prospector:
-            scanner:
-               fingerprint.enabled: true
-               symlinks: true
-         file_identity.fingerprint: ~
-         processors:
-            - add_kubernetes_metadata:
-                 host: ${NODE_NAME}
-                 default_indexers.enabled: false
-                 default_matchers.enabled: false
-                 indexers:
-                    - pod_uid:
-                 matchers:
-                    - logs_path:
-                         logs_path: "/var/log/pods/" <2>
-                         resource_type: "pod" <2>
-```
-
-1. `/var/log/pods/` contains the active log files as well as rotated log files.
-
-2. `add_kubernetes_metadata` needs to be configured to match pod metadata based
-on the new path, `/var/log/pods/`. Pod metadata do not include container 
-metadata. Refer to the [add_kubernetes_metadata](https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_logs_path)
-documentation for details.
-
-::::{warning}
-[add_kubernetes_metadata](https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_logs_path)
-configured as shown above adds *pod* metadata, which does not include
-container data (such as `kubernetes.container.name`). If you need container
-metadata, you must consider using autodiscover instead. Refer to the
-[autodiscover documentation](https://www.elastic.co/docs/reference/beats/filebeat/configuration-autodiscover#_kubernetes) for details.
-::::
-
-
 ### Running Filebeat on control plane nodes [_running_filebeat_on_control_plane_nodes]
 
 Kubernetes control plane nodes can use [taints](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) to limit the workloads that can run on them. To run Filebeat on control plane nodes, you may need to update the Daemonset spec to include proper tolerations:
@@ -187,6 +123,71 @@ filebeat.inputs:
 
 ::::{note}
 `/var/log/containers/\*.log` is normally a symlink to `/var/log/pods/*/*.log`, so `paths` can be edited accordingly.
+::::
+
+
+## Ingesting rotated log files
+
+Filebeat can also ship the rotated logs, including the GZIP-compressed logs.
+Kubernetes stores logs on `/var/log/pods` and uses symlinks on `/var/log/containers`
+for active log files. For full details, refer to the official
+[Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
+
+Ingest rotated logs by enabling decompression of GZIP files and changing the monitored
+path to `/var/log/pods/` instead of `/var/log/containers`, which only contains
+active log files.
+
+::::{warning}
+When you change the path on an existing deployment,
+Filebeat reads all existing files in the new directory from the beginning.
+This action causes a one-time re-ingestion of the log files.
+
+After the initial scan, Filebeat tracks files normally and will only
+ingest new log data.
+::::
+
+The following is an example configuration for ingesting rotated log files:
+
+```yaml
+    filebeat.inputs:
+       - type: filestream
+         id: kubernetes-container-logs
+         gzip_experimental: true <1>
+         parsers:
+            - container: ~
+         paths:
+            - /var/log/pods/*/*/*.log* <2>
+         prospector:
+            scanner:
+               fingerprint.enabled: true
+               symlinks: true
+         file_identity.fingerprint: ~
+         processors:
+            - add_kubernetes_metadata:
+                 host: ${NODE_NAME}
+                 default_indexers.enabled: false
+                 default_matchers.enabled: false
+                 indexers:
+                    - pod_uid:
+                 matchers:
+                    - logs_path:
+                         logs_path: "/var/log/pods/" <3>
+                         resource_type: "pod" <3>
+```
+
+1. {applies_to}`stack: beta 9.2.0` Enable gzip decompression. Refer to [Reading GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
+
+2`/var/log/pods/` contains the active log files as well as the rotated log files.
+
+3`add_kubernetes_metadata` needs to be configured to match pod metadata based
+on the new path, `/var/log/pods/`.
+
+::::{note}
+With this configuration, [add_kubernetes_metadata](/reference/beats/filebeat/add-kubernetes-metadata#_logs_path)
+adds **pod** metadata, which does not include
+container data (such as `kubernetes.container.name`). If you need container
+metadata, you must consider using autodiscover instead. Refer to the
+[autodiscover documentation](/reference/beats/filebeat/configuration-autodiscover#_kubernetes) for details.
 ::::
 
 
@@ -326,4 +327,4 @@ For the example we're using:
 
 Refer to the official [Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
 
-Filebeat supports reading from rotating log files, [including GZIP file](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files). However, some log rotation strategies can result in lost or duplicate events when using Filebeat to forward messages. For more information, refer to [Log rotation results in lost or duplicate events](/reference/filebeat/file-log-rotation.md).
+Filebeat supports reading from rotating log files, [including GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files). However, some log rotation strategies can result in lost or duplicate events when using Filebeat to forward messages. For more information, refer to [Log rotation results in lost or duplicate events](/reference/filebeat/file-log-rotation.md).
