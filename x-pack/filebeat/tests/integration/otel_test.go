@@ -9,6 +9,7 @@ package integration
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -36,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
+	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"
 )
 
@@ -874,4 +876,156 @@ http.port: {{.MonitoringPort}}
 			}, 10*time.Second, 100*time.Millisecond, "expected output stats to be available in monitoring endpoint")
 		})
 	}
+}
+
+func TestFileBeatKerberos(t *testing.T) {
+
+	wantEvents := 1
+	krbURL := "http://localhost:9203" // this is kerberos client - we've hardcoded the URL here
+	tempFile := t.TempDir()
+	// ES client
+	esCfg := elasticsearch.Config{
+		Addresses: []string{krbURL},
+		Username:  "admin",
+		Password:  "testing",
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
+			},
+		},
+	}
+
+	es, err := elasticsearch.NewClient(esCfg)
+	require.NoError(t, err, "could not get elasticsearch client")
+
+	setupRoleMapping(t, es)
+
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	filebeatIndex := "logs-filebeat.kerberos-" + namespace
+
+	otelConfig := struct {
+		Index     string
+		InputFile string
+		PathHome  string
+		Endpoint  string
+	}{
+		Index:     filebeatIndex,
+		InputFile: filepath.Join(tempFile, "log.log"),
+		PathHome:  tempFile,
+		Endpoint:  krbURL,
+	}
+
+	cfg := `receivers:
+  filebeatreceiver/filestream:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-fbreceiver
+          enabled: true
+          paths:
+            - {{.InputFile}}
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    output:
+      otelconsumer:
+    queue.mem.flush.timeout: 0s
+    management.otel.enabled: true
+    path.home: {{.PathHome}}	
+extensions:
+  beatsauth:
+   kerberos: 
+     auth_type: "password"
+     config_path: "../../../../libbeat/outputs/elasticsearch/testdata/krb5.conf"
+     username: "beats"
+     password: "testing"
+     realm: "elastic"
+exporters:
+  debug:
+    use_internal_logger: false
+    verbosity: detailed
+  elasticsearch/log:
+    endpoints:
+      - {{.Endpoint}}
+    logs_index: {{.Index}}
+    mapping:
+      mode: bodymap
+    auth:
+     authenticator: beatsauth
+service:
+  extensions: 
+  - beatsauth
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver/filestream
+      exporters:
+        - elasticsearch/log
+        - debug
+`
+
+	var configBuffer bytes.Buffer
+	require.NoError(t,
+		template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, otelConfig))
+	configContents := configBuffer.Bytes()
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Config contents:\n%s", configContents)
+		}
+	})
+
+	writeEventsToLogFile(t, otelConfig.InputFile, wantEvents)
+	oteltestcol.New(t, string(configContents))
+
+	// wait for logs to be published
+	require.EventuallyWithT(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err := estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+filebeatIndex+"*")
+			assert.NoError(ct, err)
+
+			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, wantEvents, "expected at least %d events, got %d", wantEvents, otelDocs.Hits.Total.Value)
+		},
+		2*time.Minute, 1*time.Second)
+
+}
+
+// setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
+func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// prepare to query ES
+	roleMappingURL := "http://localhost:9203/_security/role_mapping/kerbrolemapping"
+
+	body := map[string]interface{}{
+		"roles":   []string{"superuser"},
+		"enabled": true,
+		"rules": map[string]interface{}{
+			"field": map[string]interface{}{
+				"username": "beats@elastic",
+			},
+		},
+	}
+
+	jsonData, err := json.Marshal(body)
+	require.NoError(t, err, "could not marshal role mapping body to json")
+
+	// Build request
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost,
+		roleMappingURL,
+		bytes.NewReader(jsonData))
+	require.NoError(t, err, "could not create role mapping request")
+
+	// Set content type header
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Perform(req)
+	require.NoError(t, err, "could not perform role mapping request")
+	defer resp.Body.Close()
+
+	require.Equal(t, resp.StatusCode, http.StatusOK, "incorrect response code")
+
 }
