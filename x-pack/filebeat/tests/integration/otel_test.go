@@ -1127,7 +1127,7 @@ func TestFileBeatKerberos(t *testing.T) {
 
 	wantEvents := 1
 	krbURL := fmt.Sprintf("http://localhost:9203") // this is kerberos client - we've hardcoded the URL here
-
+	tempFile := t.TempDir()
 	// ES client
 	esCfg := elasticsearch.Config{
 		Addresses: []string{krbURL},
@@ -1145,14 +1145,6 @@ func TestFileBeatKerberos(t *testing.T) {
 
 	setupRoleMapping(t, es)
 
-	// start filebeat in otel mode
-	filebeatOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
-
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	filebeatIndex := "logs-filebeat.kerberos-" + namespace
 
@@ -1163,8 +1155,8 @@ func TestFileBeatKerberos(t *testing.T) {
 		Endpoint  string
 	}{
 		Index:     filebeatIndex,
-		InputFile: filepath.Join(filebeatOTel.TempDir(), "log.log"),
-		PathHome:  filebeatOTel.TempDir(),
+		InputFile: filepath.Join(tempFile, "log.log"),
+		PathHome:  tempFile,
 		Endpoint:  krbURL,
 	}
 
@@ -1226,10 +1218,8 @@ service:
 		}
 	})
 
-	filebeatOTel.WriteConfigFile(string(configContents))
 	writeEventsToLogFile(t, otelConfig.InputFile, wantEvents)
-	filebeatOTel.Start()
-	defer filebeatOTel.Stop()
+	oteltestcol.New(t, string(configContents))
 
 	// wait for logs to be published
 	require.EventuallyWithT(t,
