@@ -147,13 +147,9 @@ require (
 	github.com/shopspring/decimal v1.2.0
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
-<<<<<<< HEAD
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.10.0
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/tsg/gopacket v0.0.0-20200626092518-2ab8e397a786
-=======
-	github.com/stretchr/testify v1.10.0
->>>>>>> 3ff193186 (Update testify and fix filebeat tests (#42747))
 	github.com/ugorji/go/codec v1.1.8
 	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
@@ -288,7 +284,7 @@ require (
 	github.com/santhosh-tekuri/jsonschema v1.2.4 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
-	github.com/stretchr/objx v0.5.0 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797 // indirect
 	github.com/urso/go-bin v0.0.0-20180220135811-781c575c9f0e // indirect
 	github.com/urso/magetools v0.0.0-20190919040553-290c89e0c230 // indirect

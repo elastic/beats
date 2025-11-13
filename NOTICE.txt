@@ -15444,19 +15444,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/stretchr/testify
-<<<<<<< HEAD
-Version: v1.8.4
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/stretchr/testify@v1.8.4/LICENSE:
-=======
 Version: v1.10.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/stretchr/testify@v1.10.0/LICENSE:
->>>>>>> 3ff193186 (Update testify and fix filebeat tests (#42747))
 
 MIT License
 
@@ -37987,11 +37979,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/stretchr/objx
-Version: v0.5.0
+Version: v0.5.2
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/stretchr/objx@v0.5.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/stretchr/objx@v0.5.2/LICENSE:
 
 The MIT License
 
