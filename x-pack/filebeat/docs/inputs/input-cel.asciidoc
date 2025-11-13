@@ -671,6 +671,11 @@ The RSA JWK private key PEM block for your Okta Service App which is used for in
 NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
 
 [float]
+==== `auth.oauth2.okta.dpop_key_pem`
+
+The Demonstrating Proof-of-Possession private key PEM block for your Okta authentication token. When this key is provided, Okta authentication will make use of the https://www.okta.com/blog/product-innovation/a-leap-forward-in-token-security-okta-adds-support-for-dpop/[Okta DPoP authentication flow].
+
+[float]
 ==== `auth.token.enabled`
 
 When set to `false`, disables the token authentication configuration. Default: `true`.
