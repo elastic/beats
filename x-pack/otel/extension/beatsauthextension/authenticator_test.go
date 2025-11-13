@@ -165,6 +165,7 @@ func TestAuthenticator(t *testing.T) {
 			setupConfig: func(t *testing.T) *Config {
 				return &Config{
 					BeatAuthConfig: map[string]any{
+						"loadbalance": "true",
 						"kerberos": map[string]any{
 							"auth_type":   "password",
 							"config_path": "../../../../libbeat/outputs/elasticsearch/testdata/krb5.conf",
