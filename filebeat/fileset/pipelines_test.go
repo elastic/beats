@@ -20,6 +20,7 @@
 package fileset
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -29,7 +30,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -85,7 +86,7 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 						},
 					},
 				},
-				log: logp.NewLogger(logName),
+				log: logptest.NewTestingLogger(t, logName),
 			}
 
 			testESServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -98,10 +99,12 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 				Transport: httpcommon.HTTPTransportSettings{
 					Timeout: 90 * time.Second,
 				},
-			})
+			}, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
-			err = testESClient.Connect()
+			ctx, cancel := context.WithCancel(context.Background())
+			t.Cleanup(cancel)
+			err = testESClient.Connect(ctx)
 			require.NoError(t, err)
 
 			err = testRegistry.LoadPipelines(testESClient, false)

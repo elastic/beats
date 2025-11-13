@@ -39,7 +39,10 @@ type Entry interface{}
 type Queue interface {
 	// Close signals the queue to shut down, but it may keep handling requests
 	// and acknowledgments for events that are already in progress.
-	Close() error
+	// Passing force=true causes the queue to drop in-flight events and acks
+	// and free all resources immediately. This may block.
+	// Close is idempotent and can be called multiple times safely.
+	Close(force bool) error
 
 	// Done returns a channel that unblocks when the queue is closed and all
 	// its events are persisted or acknowledged.
@@ -112,6 +115,10 @@ type Batch interface {
 	Count() int
 	Entry(i int) Entry
 	Done()
+	// Release internal references to the contained events if supported
+	// (the disk queue does not currently implement this).
+	// Entry() should not be used after this call.
+	FreeEntries()
 }
 
 // Outputs can provide an EncoderFactory to enable early encoding, in which

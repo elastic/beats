@@ -21,10 +21,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/prometheus/prometheus/pkg/labels"
+	"github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func stringp(x string) *string {
@@ -32,10 +32,6 @@ func stringp(x string) *string {
 }
 
 func float64p(x float64) *float64 {
-	return &x
-}
-
-func uint64p(x uint64) *uint64 {
 	return &x
 }
 
@@ -507,7 +503,7 @@ first_metric{label1="value1"} 1
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), logp.NewLogger("test"))
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), logptest.NewTestingLogger(t, "test"))
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -587,7 +583,7 @@ summary_metric_impossible 123
 					Label: []*labels.Label{},
 					Name:  stringp("summary_metric"),
 					Summary: &Summary{
-						SampleCount: uint64p(44000),
+						SampleCount: float64p(44000),
 						SampleSum:   float64p(234892394),
 						Quantile: []*Quantile{
 							{
@@ -639,7 +635,7 @@ summary_metric_impossible 123
 					Label: []*labels.Label{},
 					Name:  stringp("summary_metric"),
 					Summary: &Summary{
-						SampleCount: uint64p(44000),
+						SampleCount: float64p(44000),
 						SampleSum:   float64p(234892394),
 						Quantile: []*Quantile{
 							{
@@ -704,15 +700,15 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 					Name: stringp("http_server_requests_seconds"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: false,
-						SampleCount:      uint64p(1.0),
+						SampleCount:      float64p(1.0),
 						SampleSum:        float64p(0.046745444),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: uint64p(0),
+								CumulativeCount: float64p(0),
 								UpperBound:      float64p(0.001),
 							},
 							{
-								CumulativeCount: uint64p(0),
+								CumulativeCount: float64p(0),
 								UpperBound:      float64p(0.001048576),
 							},
 						},
@@ -763,15 +759,15 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 					Name: stringp("http_server_requests_seconds"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: false,
-						SampleCount:      uint64p(1.0),
+						SampleCount:      float64p(1.0),
 						SampleSum:        float64p(0.046745444),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: uint64p(0),
+								CumulativeCount: float64p(0),
 								UpperBound:      float64p(0.001),
 							},
 							{
-								CumulativeCount: uint64p(0),
+								CumulativeCount: float64p(0),
 								UpperBound:      float64p(0.001048576),
 							},
 						},
@@ -810,11 +806,11 @@ ggh 99
 					Name:  stringp("ggh"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: true,
-						SampleCount:      uint64p(2.0),
+						SampleCount:      float64p(2.0),
 						SampleSum:        float64p(1),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: uint64p(2),
+								CumulativeCount: float64p(2),
 								UpperBound:      float64p(0.9),
 							},
 						},
@@ -898,4 +894,70 @@ redis_connected_clients{instance="rough-snowflake-web"} 10.0`
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
 	}
 	require.ElementsMatch(t, expected, result)
+}
+
+func TestParseMetricFamiliesContentTypes(t *testing.T) {
+	inputPrometheus := `
+# TYPE process_cpu_total counter
+# HELP process_cpu_total Some help.
+process_cpu_total 4.20072246e+06
+`
+
+	inputOpenMetricsType := `# TYPE process_cpu_total counter
+# HELP process_cpu_total Some help.
+process_cpu_total 4200722.46
+# EOF
+`
+
+	expected := []*MetricFamily{
+		{
+			Name: stringp("process_cpu_total"),
+			Help: stringp("Some help."),
+			Type: "counter",
+			Metric: []*OpenMetric{
+				{
+					Label: []*labels.Label{},
+					Name:  stringp("process_cpu_total"),
+					Counter: &Counter{
+						Value: float64p(4.20072246e+06),
+					},
+				},
+			},
+		},
+	}
+
+	tests := []struct {
+		name        string
+		contentType string
+		wantErr     bool
+	}{
+		{"plain", "text/plain", false},
+		{"plain_charset", "text/plain; charset=utf-8", false},
+		{"plain_version_0_0_4", "text/plain; version=0.0.4; charset=utf-8", false},
+		{"plain_version_1.0.0", "text/plain; version=1.0.0; charset=utf-8", false},
+		{"json", "application/json", false},
+		{"html", "text/html; charset=utf-8", false},
+		{"empty_content_type", "", false},
+		{"openmetrics", "application/openmetrics-text", false},
+		{"octet_stream", "application/octet-stream", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			input := inputPrometheus
+
+			if tt.contentType == OpenMetricsType {
+				input = inputOpenMetricsType
+			}
+
+			result, err := ParseMetricFamilies([]byte(input), tt.contentType, time.Now(), logptest.NewTestingLogger(t, "test"))
+			if tt.wantErr {
+				require.Error(t, err, "expected error for %s", tt.contentType)
+				return
+			}
+
+			require.NoError(t, err, "unexpected error for %s", tt.contentType)
+			require.ElementsMatch(t, expected, result)
+		})
+	}
 }

@@ -22,13 +22,13 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -54,7 +54,10 @@ var (
 
 	procCache = newProcessCache(cacheExpiration, cacheCapacity, cacheEvictionEffort, gosysinfoProvider{})
 
-	processCgroupPaths = cgroup.ProcessCgroupPaths
+	// cgroups resolver, turned to a stub function to make testing easier.
+	initCgroupPaths processors.InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
+		return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+	}
 
 	instanceID atomic.Uint32
 )
@@ -95,41 +98,41 @@ func init() {
 }
 
 // New constructs a new add_process_metadata processor.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
-	return newProcessMetadataProcessorWithProvider(config, &procCache, false)
+	return newProcessMetadataProcessorWithProvider(config, &procCache, false, log)
 }
 
 // NewWithCache construct a new add_process_metadata processor with cache for container IDs.
 // Resulting processor implements `Close()` to release the cache resources.
-func NewWithCache(cfg *conf.C) (beat.Processor, error) {
+func NewWithCache(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
-	return newProcessMetadataProcessorWithProvider(config, &procCache, true)
+	return newProcessMetadataProcessorWithProvider(config, &procCache, true, log)
 }
 
-func NewWithConfig(opts ...ConfigOption) (beat.Processor, error) {
+func NewWithConfig(logger *logp.Logger, opts ...ConfigOption) (beat.Processor, error) {
 	cfg := defaultConfig()
 
 	for _, o := range opts {
 		o(&cfg)
 	}
 
-	return newProcessMetadataProcessorWithProvider(cfg, &procCache, true)
+	return newProcessMetadataProcessorWithProvider(cfg, &procCache, true, logger)
 }
 
-func newProcessMetadataProcessorWithProvider(config config, provider processMetadataProvider, withCache bool) (proc beat.Processor, err error) {
+func newProcessMetadataProcessorWithProvider(config config, provider processMetadataProvider, withCache bool, logger *logp.Logger) (proc beat.Processor, err error) {
 	// Logging (each processor instance has a unique ID).
 	var (
-		id  = int(instanceID.Inc())
-		log = logp.NewLogger(processorName).With("instance_id", id)
+		id  = int(instanceID.Add(1))
+		log = logger.Named(processorName).With("instance_id", id)
 	)
 
 	// If neither option is configured, then add a default. A default cgroup_regex
@@ -160,6 +163,13 @@ func newProcessMetadataProcessorWithProvider(config config, provider processMeta
 		}
 	}
 
+	reader, err := initCgroupPaths(resolve.NewTestResolver(config.HostPath), false)
+	if errors.Is(err, cgroup.ErrCgroupsMissing) {
+		reader = &processors.NilCGReader{}
+	} else if err != nil {
+		return nil, fmt.Errorf("error creating cgroup reader: %w", err)
+	}
+
 	// don't use cgroup.ProcessCgroupPaths to save it from doing the work when container id disabled
 	if ok := containsValue(mappings, "container.id"); ok {
 		if withCache && config.CgroupCacheExpireTime != 0 {
@@ -170,9 +180,9 @@ func newProcessMetadataProcessorWithProvider(config config, provider processMeta
 
 			p.cgroupsCache = common.NewCacheWithRemovalListener(config.CgroupCacheExpireTime, 100, evictionListener)
 			p.cgroupsCache.StartJanitor(config.CgroupCacheExpireTime)
-			p.cidProvider = newCidProvider(resolve.NewTestResolver(config.HostPath), config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, p.cgroupsCache)
+			p.cidProvider = newCidProvider(config.CgroupPrefixes, config.CgroupRegex, reader, p.cgroupsCache, logger)
 		} else {
-			p.cidProvider = newCidProvider(resolve.NewTestResolver(config.HostPath), config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, nil)
+			p.cidProvider = newCidProvider(config.CgroupPrefixes, config.CgroupRegex, reader, nil, logger)
 		}
 	}
 

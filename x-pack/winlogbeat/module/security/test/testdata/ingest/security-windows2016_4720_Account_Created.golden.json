@@ -25,7 +25,7 @@
     "log": {
       "level": "information"
     },
-    "message": "A user account was created.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x264B2\n\nNew Account:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1005\n\tAccount Name:\t\telastictest1\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\nAttributes:\n\tSAM Account Name:\telastictest1\n\tDisplay Name:\t\t\u003cvalue not set\u003e\n\tUser Principal Name:\t-\n\tHome Directory:\t\t\u003cvalue not set\u003e\n\tHome Drive:\t\t\u003cvalue not set\u003e\n\tScript Path:\t\t\u003cvalue not set\u003e\n\tProfile Path:\t\t\u003cvalue not set\u003e\n\tUser Workstations:\t\u003cvalue not set\u003e\n\tPassword Last Set:\t\u003cnever\u003e\n\tAccount Expires:\t\t\u003cnever\u003e\n\tPrimary Group ID:\t513\n\tAllowed To Delegate To:\t-\n\tOld UAC Value:\t\t0x0\n\tNew UAC Value:\t\t0x15\n\tUser Account Control:\t\n\t\tAccount Disabled\n\t\t'Password Not Required' - Enabled\n\t\t'Normal Account' - Enabled\n\tUser Parameters:\t\u003cvalue not set\u003e\n\tSID History:\t\t-\n\tLogon Hours:\t\tAll\n\nAdditional Information:\n\tPrivileges\t\t-",
+    "message": "A user account was created.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x264b2\n\nNew Account:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1005\n\tAccount Name:\t\telastictest1\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\nAttributes:\n\tSAM Account Name:\telastictest1\n\tDisplay Name:\t\t\u003cvalue not set\u003e\n\tUser Principal Name:\t-\n\tHome Directory:\t\t\u003cvalue not set\u003e\n\tHome Drive:\t\t\u003cvalue not set\u003e\n\tScript Path:\t\t\u003cvalue not set\u003e\n\tProfile Path:\t\t\u003cvalue not set\u003e\n\tUser Workstations:\t\u003cvalue not set\u003e\n\tPassword Last Set:\t\u003cnever\u003e\n\tAccount Expires:\t\t\u003cnever\u003e\n\tPrimary Group ID:\t513\n\tAllowed To Delegate To:\t-\n\tOld UAC Value:\t\t0x0\n\tNew UAC Value:\t\t0x15\n\tUser Account Control:\t\n\t\tAccount Disabled\n\t\t'Password Not Required' - Enabled\n\t\t'Normal Account' - Enabled\n\tUser Parameters:\t\u003cvalue not set\u003e\n\tSID History:\t\t-\n\tLogon Hours:\t\tAll\n\nAdditional Information:\n\tPrivileges\t\t-",
     "related": {
       "user": [
         "Administrator",
@@ -43,17 +43,16 @@
       }
     },
     "winlog": {
-      "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
-      "api": "wineventlog",
+      "activity_id": "{1200CE16-64B6-0000-0ED0-0012B664D501}",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR",
       "event_data": {
-        "AccountExpires": "%%1794",
+        "AccountExpires": "\u003cnever\u003e",
         "AllowedToDelegateTo": "-",
-        "DisplayName": "%%1793",
-        "HomeDirectory": "%%1793",
-        "HomePath": "%%1793",
-        "LogonHours": "%%1797",
+        "DisplayName": "\u003cvalue not set\u003e",
+        "HomeDirectory": "\u003cvalue not set\u003e",
+        "HomePath": "\u003cvalue not set\u003e",
+        "LogonHours": "All",
         "NewUACList": [
           "USER_ACCOUNT_DISABLED",
           "USER_PASSWORD_NOT_REQUIRED",
@@ -61,12 +60,12 @@
         ],
         "NewUacValue": "0x15",
         "OldUacValue": "0x0",
-        "PasswordLastSet": "%%1794",
+        "PasswordLastSet": "\u003cnever\u003e",
         "PrimaryGroupId": "513",
         "PrivilegeList": "-",
-        "ProfilePath": "%%1793",
+        "ProfilePath": "\u003cvalue not set\u003e",
         "SamAccountName": "elastictest1",
-        "ScriptPath": "%%1793",
+        "ScriptPath": "\u003cvalue not set\u003e",
         "SidHistory": "-",
         "SubjectDomainName": "WIN-41OB2LO92CR",
         "SubjectLogonId": "0x264b2",
@@ -76,13 +75,13 @@
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1005",
         "TargetUserName": "elastictest1",
         "UserAccountControl": [
-          "2080",
-          "2082",
-          "2084"
+          "Account Disabled",
+          "'Password Not Required' - Enabled",
+          "'Normal Account' - Enabled"
         ],
-        "UserParameters": "%%1793",
+        "UserParameters": "\u003cvalue not set\u003e",
         "UserPrincipalName": "-",
-        "UserWorkstations": "%%1793"
+        "UserWorkstations": "\u003cvalue not set\u003e"
       },
       "event_id": "4720",
       "keywords": [
@@ -98,7 +97,7 @@
           "id": 820
         }
       },
-      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": "2751",
       "task": "User Account Management"
@@ -130,7 +129,7 @@
     "log": {
       "level": "information"
     },
-    "message": "A user account was created.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x264B2\n\nNew Account:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1006\n\tAccount Name:\t\taudittest0609\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\nAttributes:\n\tSAM Account Name:\taudittest0609\n\tDisplay Name:\t\t\u003cvalue not set\u003e\n\tUser Principal Name:\t-\n\tHome Directory:\t\t\u003cvalue not set\u003e\n\tHome Drive:\t\t\u003cvalue not set\u003e\n\tScript Path:\t\t\u003cvalue not set\u003e\n\tProfile Path:\t\t\u003cvalue not set\u003e\n\tUser Workstations:\t\u003cvalue not set\u003e\n\tPassword Last Set:\t\u003cnever\u003e\n\tAccount Expires:\t\t\u003cnever\u003e\n\tPrimary Group ID:\t513\n\tAllowed To Delegate To:\t-\n\tOld UAC Value:\t\t0x0\n\tNew UAC Value:\t\t0x15\n\tUser Account Control:\t\n\t\tAccount Disabled\n\t\t'Password Not Required' - Enabled\n\t\t'Normal Account' - Enabled\n\tUser Parameters:\t\u003cvalue not set\u003e\n\tSID History:\t\t-\n\tLogon Hours:\t\tAll\n\nAdditional Information:\n\tPrivileges\t\t-",
+    "message": "A user account was created.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x264b2\n\nNew Account:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1006\n\tAccount Name:\t\taudittest0609\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\nAttributes:\n\tSAM Account Name:\taudittest0609\n\tDisplay Name:\t\t\u003cvalue not set\u003e\n\tUser Principal Name:\t-\n\tHome Directory:\t\t\u003cvalue not set\u003e\n\tHome Drive:\t\t\u003cvalue not set\u003e\n\tScript Path:\t\t\u003cvalue not set\u003e\n\tProfile Path:\t\t\u003cvalue not set\u003e\n\tUser Workstations:\t\u003cvalue not set\u003e\n\tPassword Last Set:\t\u003cnever\u003e\n\tAccount Expires:\t\t\u003cnever\u003e\n\tPrimary Group ID:\t513\n\tAllowed To Delegate To:\t-\n\tOld UAC Value:\t\t0x0\n\tNew UAC Value:\t\t0x15\n\tUser Account Control:\t\n\t\tAccount Disabled\n\t\t'Password Not Required' - Enabled\n\t\t'Normal Account' - Enabled\n\tUser Parameters:\t\u003cvalue not set\u003e\n\tSID History:\t\t-\n\tLogon Hours:\t\tAll\n\nAdditional Information:\n\tPrivileges\t\t-",
     "related": {
       "user": [
         "Administrator",
@@ -148,17 +147,16 @@
       }
     },
     "winlog": {
-      "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
-      "api": "wineventlog",
+      "activity_id": "{1200CE16-64B6-0000-0ED0-0012B664D501}",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR",
       "event_data": {
-        "AccountExpires": "%%1794",
+        "AccountExpires": "\u003cnever\u003e",
         "AllowedToDelegateTo": "-",
-        "DisplayName": "%%1793",
-        "HomeDirectory": "%%1793",
-        "HomePath": "%%1793",
-        "LogonHours": "%%1797",
+        "DisplayName": "\u003cvalue not set\u003e",
+        "HomeDirectory": "\u003cvalue not set\u003e",
+        "HomePath": "\u003cvalue not set\u003e",
+        "LogonHours": "All",
         "NewUACList": [
           "USER_ACCOUNT_DISABLED",
           "USER_PASSWORD_NOT_REQUIRED",
@@ -166,12 +164,12 @@
         ],
         "NewUacValue": "0x15",
         "OldUacValue": "0x0",
-        "PasswordLastSet": "%%1794",
+        "PasswordLastSet": "\u003cnever\u003e",
         "PrimaryGroupId": "513",
         "PrivilegeList": "-",
-        "ProfilePath": "%%1793",
+        "ProfilePath": "\u003cvalue not set\u003e",
         "SamAccountName": "audittest0609",
-        "ScriptPath": "%%1793",
+        "ScriptPath": "\u003cvalue not set\u003e",
         "SidHistory": "-",
         "SubjectDomainName": "WIN-41OB2LO92CR",
         "SubjectLogonId": "0x264b2",
@@ -181,13 +179,13 @@
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1006",
         "TargetUserName": "audittest0609",
         "UserAccountControl": [
-          "2080",
-          "2082",
-          "2084"
+          "Account Disabled",
+          "'Password Not Required' - Enabled",
+          "'Normal Account' - Enabled"
         ],
-        "UserParameters": "%%1793",
+        "UserParameters": "\u003cvalue not set\u003e",
         "UserPrincipalName": "-",
-        "UserWorkstations": "%%1793"
+        "UserWorkstations": "\u003cvalue not set\u003e"
       },
       "event_id": "4720",
       "keywords": [
@@ -203,7 +201,7 @@
           "id": 820
         }
       },
-      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": "2775",
       "task": "User Account Management"

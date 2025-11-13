@@ -239,6 +239,7 @@ func TestGetRateLimitWhenMissingLimit(t *testing.T) {
 		limit:      nil,
 		reset:      tplReset,
 		remaining:  tplRemaining,
+		status:     noopReporter{},
 		log:        logp.NewLogger("TestGetRateLimitWhenMissingLimit"),
 		earlyLimit: earlyLimit,
 	}

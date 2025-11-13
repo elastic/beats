@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package billing
 
 import (
@@ -30,15 +32,15 @@ type Usage struct {
 }
 
 // NewClient builds a new client for the azure billing service
-func NewClient(config azure.Config) (*Client, error) {
-	usageService, err := NewService(config)
+func NewClient(config azure.Config, logger *logp.Logger) (*Client, error) {
+	usageService, err := NewService(config, logger)
 	if err != nil {
 		return nil, err
 	}
 	client := &Client{
 		BillingService: usageService,
 		Config:         config,
-		Log:            logp.NewLogger("azure billing client"),
+		Log:            logger.Named("azure billing client"),
 	}
 	return client, nil
 }

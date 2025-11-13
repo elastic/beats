@@ -20,11 +20,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"go.uber.org/multierr"
 
 	auditbeat "github.com/elastic/beats/v7/auditbeat/scripts/mage"
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
@@ -59,25 +59,15 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return multierr.Combine(
+	return errors.Join(
 		devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs()),
 		devtools.TestLinuxForCentosGLIBC(),
 	)
 }
 
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	return devtools.CrossBuild()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -100,7 +90,7 @@ func Package() {
 	auditbeat.CustomizePackaging(auditbeat.OSSPackaging)
 
 	mg.SerialDeps(Fields, Dashboards, Config, devtools.GenerateModuleIncludeListGo)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 

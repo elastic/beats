@@ -117,27 +117,27 @@ func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, igno
 				corruptFilePath := active.path + ".corrupted"
 				err := os.Rename(active.path, corruptFilePath)
 				if err != nil {
-					logp.Debug("Failed to backup corrupt data file '%s': %+v", active.path, err)
+					log.Debugf("Failed to backup corrupt data file '%s': %+v", active.path, err)
 				}
-				logp.Warn("Data file is corrupt. It has been renamed to %s. Attempting to restore partial state from log file.", corruptFilePath)
+				log.Warnf("Data file is corrupt. It has been renamed to %s. Attempting to restore partial state from log file.", corruptFilePath)
 			} else {
 				return nil, err
 			}
 		} else {
-			logp.Info("Loading data file of '%v' succeeded. Active transaction id=%v", home, txid)
+			log.Infof("Loading data file of '%v' succeeded. Active transaction id=%v", home, txid)
 		}
 	}
 
 	var entries uint
 	memstore := memstore{tbl}
 	txid, entries, err = loadLogFile(&memstore, txid, home)
-	logp.Info("Finished loading transaction log file for '%v'. Active transaction id=%v", home, txid)
+	log.Infof("Finished loading transaction log file for '%v'. Active transaction id=%v", home, txid)
 
 	if err != nil {
 		// Error indicates the log file was incomplete or corrupted.
 		// Anyways, we already have the table in a valid state and will
 		// continue opening the store from here.
-		logp.Warn("Incomplete or corrupted log file in %v. Continue with last known complete and consistent state. Reason: %v", home, err)
+		log.Warnf("Incomplete or corrupted log file in %v. Continue with last known complete and consistent state. Reason: %v", home, err)
 	}
 
 	diskstore, err := newDiskStore(log, home, dataFiles, txid, mode, entries, err != nil, bufSz, checkpoint)
@@ -274,6 +274,10 @@ func (m *memstore) Remove(key string) bool {
 	}
 	delete(m.table, key)
 	return true
+}
+
+func (s *store) SetID(_ string) {
+	// NOOP
 }
 
 func (e entry) Decode(to interface{}) error {

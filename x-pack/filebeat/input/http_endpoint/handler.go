@@ -13,6 +13,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"reflect"
 	"sort"
@@ -32,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -55,6 +57,21 @@ type handler struct {
 	validator   apiValidator
 	txBaseID    string        // Random value to make transaction IDs unique.
 	txIDCounter atomic.Uint64 // Transaction ID counter that is incremented for each request.
+	status      status.StatusReporter
+
+	// inFlight is the sum of message body length
+	// that have been received but not yet ACKed
+	// or timed out or otherwise handled.
+	//
+	// Requests that do not request a timeout do
+	// not contribute to this value.
+	inFlight atomic.Int64
+	// maxInFlight is the maximum value of inFligh
+	// that will be allowed for any messages received
+	// by the handler. If non-zero, inFlight may
+	// not exceed this value.
+	maxInFlight int64
+	retryAfter  int
 
 	reqLogger    *zap.Logger
 	host, scheme string
@@ -70,15 +87,25 @@ type handler struct {
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	txID := h.nextTxID()
-	h.log.Debugw("request", "url", r.URL, "tx_id", txID)
-	status, err := h.validator.validateRequest(r)
+	h.log.Debugw("request", "url", r.URL, "method", r.Method, "tx_id", txID)
+	code, err := h.validator.validateRequest(r)
 	if err != nil {
-		h.sendAPIErrorResponse(txID, w, r, h.log, status, err)
+		h.status.UpdateStatus(status.Degraded, "request did not validate: "+err.Error())
+		h.sendAPIErrorResponse(txID, w, r, h.log, code, err)
+		return
+	}
+
+	if r.Method == http.MethodOptions {
+		for k, v := range h.validator.optionsHeaders {
+			w.Header()[textproto.CanonicalMIMEHeaderKey(k)] = v
+		}
+		w.WriteHeader(h.validator.optionsStatus)
 		return
 	}
 
 	wait, err := getTimeoutWait(r.URL, h.log)
 	if err != nil {
+		h.status.UpdateStatus(status.Degraded, "invalid wait_for_completion_timeout request: "+err.Error())
 		h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusBadRequest, err)
 		return
 	}
@@ -86,9 +113,39 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		acked   chan struct{}
 		timeout *time.Timer
 	)
+	if h.maxInFlight != 0 {
+		// Consider non-ACKing messages as well. These do not add
+		// to the sum of in-flight bytes, but we can still assess
+		// whether a message would take us over the limit.
+		inFlight := h.inFlight.Load() + r.ContentLength
+		if inFlight > h.maxInFlight {
+			w.Header().Set(headerContentEncoding, "application/json")
+			w.Header().Set("Retry-After", strconv.Itoa(h.retryAfter))
+			w.WriteHeader(http.StatusServiceUnavailable)
+			_, err := fmt.Fprintf(w,
+				`{"warn":"max in flight message memory exceeded","max_in_flight":%d,"in_flight":%d}`,
+				h.maxInFlight, inFlight,
+			)
+			if err != nil {
+				h.log.Errorw("failed to write 503", "error", err)
+			}
+			h.status.UpdateStatus(status.Degraded, "exceeded max bytes in flight")
+			return
+		}
+	}
 	if wait != 0 {
 		acked = make(chan struct{})
 		timeout = time.NewTimer(wait)
+		h.inFlight.Add(r.ContentLength)
+		defer func() {
+			// Any return will be a message handling completion and the
+			// the removal of the allocation from the queue assuming that
+			// the client has requested a timeout. Either we have an early
+			// error condition or timeout and the message is dropped, we
+			// have ACKed all the events in the request, or the input has
+			// been cancelled.
+			h.inFlight.Add(-r.ContentLength)
+		}()
 	}
 	start := time.Now()
 	acker := newBatchACKTracker(func() {
@@ -100,9 +157,10 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	})
 	h.metrics.batchesReceived.Add(1)
 	h.metrics.contentLength.Update(r.ContentLength)
-	body, status, err := getBodyReader(r)
+	body, code, err := getBodyReader(r)
 	if err != nil {
-		h.sendAPIErrorResponse(txID, w, r, h.log, status, err)
+		h.status.UpdateStatus(status.Degraded, "unable to get body reader: "+err.Error())
+		h.sendAPIErrorResponse(txID, w, r, h.log, code, err)
 		h.metrics.apiErrors.Add(1)
 		return
 	}
@@ -119,9 +177,10 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r.Body = io.NopCloser(&buf)
 	}
 
-	objs, _, status, err := httpReadJSON(body, h.program)
+	objs, code, err := httpReadJSON(body, h.program)
 	if err != nil {
-		h.sendAPIErrorResponse(txID, w, r, h.log, status, err)
+		h.sendAPIErrorResponse(txID, w, r, h.log, code, err)
+		h.status.UpdateStatus(status.Degraded, "unable to read message JSON: "+err.Error())
 		h.metrics.apiErrors.Add(1)
 		return
 	}
@@ -146,6 +205,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				break
 			} else if !errors.Is(err, errNotCRC) {
 				h.metrics.apiErrors.Add(1)
+				h.status.UpdateStatus(status.Degraded, "request did not validate with CRC: "+err.Error())
 				h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusBadRequest, err)
 				return
 			}
@@ -154,6 +214,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		acker.Add()
 		if err = h.publishEvent(obj, headers, acker); err != nil {
 			h.metrics.apiErrors.Add(1)
+			h.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
 			h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusInternalServerError, err)
 			return
 		}
@@ -162,6 +223,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	acker.Ready()
+	h.status.UpdateStatus(status.Running, "")
 	if acked == nil {
 		h.sendResponse(w, respCode, respBody)
 	} else {
@@ -174,6 +236,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			h.sendResponse(w, respCode, respBody)
 		case <-timeout.C:
 			h.log.Debugw("request timed out", "tx_id", txID)
+			h.status.UpdateStatus(status.Degraded, "request timeout exceeded")
 			h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusGatewayTimeout, errTookTooLong)
 		case <-h.ctx.Done():
 			h.log.Debugw("request context cancelled", "tx_id", txID)
@@ -333,18 +396,18 @@ func (h *handler) publishEvent(obj, headers mapstr.M, acker *batchACKTracker) er
 	return nil
 }
 
-func httpReadJSON(body io.Reader, prg *program) (objs []mapstr.M, rawMessages []json.RawMessage, status int, err error) {
+func httpReadJSON(body io.Reader, prg *program) (objs []mapstr.M, status int, err error) {
 	if body == http.NoBody {
-		return nil, nil, http.StatusNotAcceptable, errBodyEmpty
+		return nil, http.StatusNotAcceptable, errBodyEmpty
 	}
-	obj, rawMessage, err := decodeJSON(body, prg)
+	obj, err := decodeJSON(body, prg)
 	if err != nil {
-		return nil, nil, http.StatusBadRequest, err
+		return nil, http.StatusBadRequest, err
 	}
-	return obj, rawMessage, http.StatusOK, err
+	return obj, http.StatusOK, err
 }
 
-func decodeJSON(body io.Reader, prg *program) (objs []mapstr.M, rawMessages []json.RawMessage, err error) {
+func decodeJSON(body io.Reader, prg *program) (objs []mapstr.M, err error) {
 	decoder := json.NewDecoder(body)
 	for decoder.More() {
 		var raw json.RawMessage
@@ -352,45 +415,46 @@ func decodeJSON(body io.Reader, prg *program) (objs []mapstr.M, rawMessages []js
 			if err == io.EOF { //nolint:errorlint // This will never be a wrapped error.
 				break
 			}
-			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", decoder.InputOffset(), err)
+			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", decoder.InputOffset(), err)
 		}
 
 		var obj interface{}
 		if err = newJSONDecoder(bytes.NewReader(raw)).Decode(&obj); err != nil {
-			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", decoder.InputOffset(), err)
+			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", decoder.InputOffset(), err)
 		}
 
 		if prg != nil {
 			obj, err = prg.eval(obj)
 			if err != nil {
-				return nil, nil, err
+				return nil, err
 			}
-			// Re-marshal to ensure the raw bytes agree with the constructed object.
-			raw, err = json.Marshal(obj)
-			if err != nil {
-				return nil, nil, fmt.Errorf("failed to remarshal object: %w", err)
+			if _, ok := obj.([]interface{}); ok {
+				// Re-marshal to ensure the raw bytes agree with the constructed object.
+				// This is only necessary when the program constructs an array return.
+				raw, err = json.Marshal(obj)
+				if err != nil {
+					return nil, fmt.Errorf("failed to remarshal object: %w", err)
+				}
 			}
 		}
 
 		switch v := obj.(type) {
 		case map[string]interface{}:
 			objs = append(objs, v)
-			rawMessages = append(rawMessages, raw)
 		case []interface{}:
-			nobjs, nrawMessages, err := decodeJSONArray(bytes.NewReader(raw))
+			nobjs, err := decodeJSONArray(bytes.NewReader(raw))
 			if err != nil {
-				return nil, nil, fmt.Errorf("recursive error %d: %w", decoder.InputOffset(), err)
+				return nil, fmt.Errorf("recursive error %d: %w", decoder.InputOffset(), err)
 			}
 			objs = append(objs, nobjs...)
-			rawMessages = append(rawMessages, nrawMessages...)
 		default:
-			return nil, nil, fmt.Errorf("%w: %T", errUnsupportedType, v)
+			return nil, fmt.Errorf("%w: %T", errUnsupportedType, v)
 		}
 	}
 	for i := range objs {
 		jsontransform.TransformNumbers(objs[i])
 	}
-	return objs, rawMessages, nil
+	return objs, nil
 }
 
 type program struct {
@@ -506,17 +570,17 @@ func (p *program) eval(obj interface{}) (interface{}, error) {
 	}
 }
 
-func decodeJSONArray(raw *bytes.Reader) (objs []mapstr.M, rawMessages []json.RawMessage, err error) {
+func decodeJSONArray(raw *bytes.Reader) (objs []mapstr.M, err error) {
 	dec := newJSONDecoder(raw)
 	token, err := dec.Token()
 	if err != nil {
 		if err == io.EOF { //nolint:errorlint // This will never be a wrapped error.
-			return nil, nil, nil
+			return nil, nil
 		}
-		return nil, nil, fmt.Errorf("failed reading JSON array: %w", err)
+		return nil, fmt.Errorf("failed reading JSON array: %w", err)
 	}
 	if token != json.Delim('[') {
-		return nil, nil, fmt.Errorf("malformed JSON array, not starting with delimiter [ at position: %d", dec.InputOffset())
+		return nil, fmt.Errorf("malformed JSON array, not starting with delimiter [ at position: %d", dec.InputOffset())
 	}
 
 	for dec.More() {
@@ -525,21 +589,20 @@ func decodeJSONArray(raw *bytes.Reader) (objs []mapstr.M, rawMessages []json.Raw
 			if err == io.EOF { //nolint:errorlint // This will never be a wrapped error.
 				break
 			}
-			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", dec.InputOffset(), err)
+			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", dec.InputOffset(), err)
 		}
 
 		var obj interface{}
 		if err := newJSONDecoder(bytes.NewReader(raw)).Decode(&obj); err != nil {
-			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", dec.InputOffset(), err)
+			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", dec.InputOffset(), err)
 		}
 
 		m, ok := obj.(map[string]interface{})
 		if ok {
-			rawMessages = append(rawMessages, raw)
 			objs = append(objs, m)
 		}
 	}
-	return objs, rawMessages, nil
+	return objs, nil
 }
 
 func getIncludedHeaders(r *http.Request, headerConf []string) (includedHeaders mapstr.M) {

@@ -69,7 +69,7 @@ MiB Swap:   5961.0 total,   4403.5 free,   1557.6 used.   1530.0 avail Mem
 */
 func formatResourceEvents(m *MetricSet, input string) []mb.Event {
 	timestamp := time.Now().UTC()
-	rootFields := panw.MakeRootFields(m.config.HostIp)
+
 	events := make([]mb.Event, 0)
 
 	// We only need the top 5 lines
@@ -126,7 +126,7 @@ func formatResourceEvents(m *MetricSet, input string) []mb.Event {
 				"available": swapInfo.Available,
 			},
 		},
-		RootFields: rootFields,
+		RootFields: panw.MakeRootFields(m.config.HostIp),
 	}
 
 	events = append(events, event)

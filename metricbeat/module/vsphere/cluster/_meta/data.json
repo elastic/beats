@@ -49,6 +49,7 @@
                   "entity_name": "121.0.0.0"
               }
           ],
+          "id": "domain-c1",
           "name": "Cluster_1",
           "das_config": {
               "enabled": false,

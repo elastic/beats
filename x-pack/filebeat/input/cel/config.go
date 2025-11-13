@@ -17,12 +17,17 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/mito/lib"
 )
 
 const defaultMaxExecutions = 1000
 
 // config is the top-level configuration for a cel input.
 type config struct {
+	// DataStream holds the data_stream.dataset name if it
+	// was available on configuration.
+	DataStream string
+
 	// Interval is the period interval between runs of the input.
 	Interval time.Duration `config:"interval" validate:"required"`
 
@@ -47,6 +52,10 @@ type config struct {
 	// Redact is the debug log state redaction configuration.
 	Redact *redact `config:"redact"`
 
+	// AllowedEnvironment is the set of env vars made
+	// visible to an executing CEL evaluation.
+	AllowedEnvironment []string `config:"allowed_environment"`
+
 	// Auth is the authentication config for connection to an HTTP
 	// API endpoint.
 	Auth authConfig `config:"auth"`
@@ -54,6 +63,13 @@ type config struct {
 	// Resource is the configuration for establishing an
 	// HTTP request or for locating a local resource.
 	Resource *ResourceConfig `config:"resource" validate:"required"`
+
+	// FailureDump configures failure dump behaviour.
+	FailureDump *dumpConfig `config:"failure_dump"`
+
+	// RecordCoverage indicates whether a program should
+	// record and log execution coverage.
+	RecordCoverage bool `config:"record_coverage"`
 }
 
 type redact struct {
@@ -65,11 +81,20 @@ type redact struct {
 	Delete bool `config:"delete"`
 }
 
+// dumpConfig configures the CEL program to retain
+// the full evaluation state using the cel.OptTrackState
+// option. The state is written to a file in the path if
+// the evaluation fails.
+type dumpConfig struct {
+	Enabled  *bool  `config:"enabled"`
+	Filename string `config:"filename"`
+}
+
+func (t *dumpConfig) enabled() bool {
+	return t != nil && (t.Enabled == nil || *t.Enabled)
+}
+
 func (c config) Validate() error {
-	if c.Redact == nil {
-		logp.L().Named("input.cel").Warn("missing recommended 'redact' configuration: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#_redact")
-	}
 	if c.Interval <= 0 {
 		return errors.New("interval must be greater than 0")
 	}
@@ -81,15 +106,12 @@ func (c config) Validate() error {
 		return fmt.Errorf("failed to check regular expressions: %w", err)
 	}
 	// TODO: Consider just building the program here to avoid this wasted work.
-	var client *http.Client
-	if wantClient(c) {
-		client = &http.Client{}
-	}
 	var patterns map[string]*regexp.Regexp
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, _, err = newProgram(context.Background(), c.Program, root, client, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil)
+	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
+	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, lib.HTTPOptions{}, patterns, c.XSDs, logp.NewNopLogger(), nil, wantDump, false)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
@@ -208,10 +230,12 @@ func (c keepAlive) settings() httpcommon.WithKeepaliveSettings {
 
 type ResourceConfig struct {
 	URL                    *urlConfig       `config:"url" validate:"required"`
+	Headers                http.Header      `config:"headers"`
 	Retry                  retryConfig      `config:"retry"`
 	RedirectForwardHeaders bool             `config:"redirect.forward_headers"`
 	RedirectHeadersBanList []string         `config:"redirect.headers_ban_list"`
 	RedirectMaxRedirects   int              `config:"redirect.max_redirects"`
+	MaxBodySize            int64            `config:"max_body_size"`
 	RateLimit              *rateLimitConfig `config:"rate_limit"`
 	KeepAlive              keepAlive        `config:"keep_alive"`
 

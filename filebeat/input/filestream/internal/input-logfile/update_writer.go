@@ -66,7 +66,7 @@ func newUpdateWriter(store *store, ch *updateChan) *updateWriter {
 		return nil
 	})
 	if err != nil {
-		store.log.Errorf("failed to schedule the update writer routine: %w", err)
+		store.log.Errorf("failed to schedule the update writer routine: %v", err)
 	}
 
 	return w
@@ -77,7 +77,7 @@ func newUpdateWriter(store *store, ch *updateChan) *updateWriter {
 func (w *updateWriter) Close() {
 	err := w.tg.Stop()
 	if err != nil {
-		w.store.log.Errorf("failed to stop the update writer routine: %w", err)
+		w.store.log.Errorf("failed to stop the update writer routine: %v", err)
 	}
 	w.syncStates(w.ch.TryRecv())
 }
@@ -133,9 +133,9 @@ func (ch *updateChan) Send(upd scheduledUpdate) {
 // Recv waits until at least one entry is available and returns a table of key
 // value pairs with pending updates that need to be written to the registry.
 func (ch *updateChan) Recv(ctx context.Context) ([]scheduledUpdate, error) {
-	ch.mutex.Lock()
-
 	for ctx.Err() == nil {
+		ch.mutex.Lock()
+
 		updates := ch.updates
 		if len(updates) > 0 {
 			ch.pending = map[string]int{}
@@ -152,7 +152,6 @@ func (ch *updateChan) Recv(ctx context.Context) ([]scheduledUpdate, error) {
 		case <-ctx.Done():
 			return nil, ctx.Err()
 		case <-waiter:
-			ch.mutex.Lock()
 		}
 	}
 

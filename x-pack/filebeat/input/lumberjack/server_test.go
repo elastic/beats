@@ -78,7 +78,7 @@ func testSendReceive(t testing.TB, c config, numberOfEvents int, clientTLSConfig
 	collect := newEventCollector(ctx, numberOfEvents)
 
 	// Start server.
-	s, err := newServer(c, log, collect.Publish, nil)
+	s, err := newServer(c, log, collect.Publish, nil, nil)
 	require.NoError(t, err)
 	go func() {
 		<-ctx.Done()

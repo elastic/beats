@@ -5,13 +5,17 @@
 package cloudwatch
 
 import (
+	"crypto/fips140"
 	"fmt"
+	"maps"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/apigateway"
+	"github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
@@ -23,12 +27,24 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+const checkns = "AWS/ApiGateway"
+const checkresource_type = "apigateway:restapis"
+
 var (
-	metricsetName          = "cloudwatch"
-	defaultStatistics      = []string{"Average", "Maximum", "Minimum", "Sum", "SampleCount"}
-	dimensionSeparator     = ","
-	dimensionValueWildcard = "*"
+	metricsetName            = "cloudwatch"
+	defaultStatistics        = []string{"Average", "Maximum", "Minimum", "Sum", "SampleCount"}
+	dimensionSeparator       = ","
+	dimensionValueWildcard   = "*"
+	checkns_lower            = strings.ToLower(checkns)
+	checkresource_type_lower = strings.ToLower(checkresource_type)
 )
+
+type APIClients struct {
+	CloudWatchClient         *cloudwatch.Client
+	Resourcegroupstaggingapi *resourcegroupstaggingapi.Client
+	Apigateway               *apigateway.Client
+	Apigatewayv2             *apigatewayv2.Client
+}
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
@@ -48,6 +64,7 @@ type MetricSet struct {
 	*aws.MetricSet
 	logger            *logp.Logger
 	CloudwatchConfigs []Config `config:"metrics" validate:"nonzero,required"`
+	PreviousEndTime   time.Time
 }
 
 // Dimension holds name and value for cloudwatch metricset dimension config.
@@ -87,7 +104,7 @@ type namespaceDetail struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger(metricsetName)
+	logger := base.Logger().Named(aws.ModuleName + "." + metricsetName)
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, fmt.Errorf("error creating aws metricset: %w", err)
@@ -119,9 +136,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency, m.PreviousEndTime)
+	m.PreviousEndTime = endTime
 	m.Logger().Debugf("startTime = %s, endTime = %s", startTime, endTime)
-
+	// Initialise the map that will be used in case APIGateway api is configured. Infoapi includes Name_of_API:ID_of_API entries
+	infoapi := make(map[string]string)
 	// Check statistic method in config
 	err := m.checkStatistics()
 	if err != nil {
@@ -130,8 +149,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// Get listMetricDetailTotal and namespaceDetailTotal from configuration
 	listMetricDetailTotal, namespaceDetailTotal := m.readCloudwatchConfig()
-	m.logger.Debugf("listMetricDetailTotal = %s", listMetricDetailTotal)
-	m.logger.Debugf("namespaceDetailTotal = %s", namespaceDetailTotal)
+	m.logger.Debugf("listMetricDetailTotal = %v", listMetricDetailTotal)
+	m.logger.Debugf("namespaceDetailTotal = %v", namespaceDetailTotal)
 
 	var config aws.Config
 	err = m.Module().UnpackConfig(&config)
@@ -139,19 +158,26 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return err
 	}
 
+	// Starting from Go 1.24, when FIPS 140-3 mode is active, fips140.Enabled() will return true.
+	// So, regardless of whether `fips_enabled` is set to true or false, when FIPS 140-3 mode is active, the
+	// resolver will resolve to the FIPS endpoint.
+	// See: https://go.dev/doc/security/fips140#fips-140-3-mode
+	if fips140.Enabled() {
+		config.AWSConfig.FIPSEnabled = true
+	}
+
 	// Create events based on listMetricDetailTotal from configuration
 	if len(listMetricDetailTotal.metricsWithStats) != 0 {
-		for _, regionName := range m.MetricSet.RegionsList {
+		for _, regionName := range m.RegionsList {
 			m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
-			beatsConfig := m.MetricSet.AwsConfig.Copy()
+			beatsConfig := m.AwsConfig.Copy()
 			beatsConfig.Region = regionName
-
-			svcCloudwatch, svcResourceAPI, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
+			APIClients, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
 			if err != nil {
 				m.Logger().Warn("skipping metrics list from region '%s'", regionName)
 			}
 
-			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, regionName, startTime, endTime)
+			eventsWithIdentifier, err := m.createEvents(APIClients.CloudWatchClient, APIClients.Resourcegroupstaggingapi, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, infoapi, regionName, startTime, endTime)
 			if err != nil {
 				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
 			}
@@ -166,21 +192,33 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	// Create events based on namespaceDetailTotal from configuration
-	for _, regionName := range m.MetricSet.RegionsList {
+	for _, regionName := range m.RegionsList {
 		m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
-		beatsConfig := m.MetricSet.AwsConfig.Copy()
+		beatsConfig := m.AwsConfig.Copy()
 		beatsConfig.Region = regionName
 
-		svcCloudwatch, svcResourceAPI, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
+		APIClients, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
 		if err != nil {
 			m.Logger().Warn("skipping metrics list from region '%s'", regionName, err)
 			continue
 		}
 
-		// retrieve all the details for all the metrics available in the current region
-		listMetricsOutput, err := aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, svcCloudwatch)
-		if err != nil {
-			m.Logger().Errorf("Error while retrieving the list of metrics for region %s: %w", regionName, err)
+		// retrieve all the details for all the metrics available in the current region when no namespace is specified
+		// otherwise only retrieve metrics from the specific namespaces from the config
+		var listMetricsOutput []aws.MetricWithID
+		if len(namespaceDetailTotal) == 0 {
+			listMetricsOutput, err = aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, APIClients.CloudWatchClient)
+			if err != nil {
+				m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %v", regionName, "*", err)
+			}
+		} else {
+			for namespace := range namespaceDetailTotal {
+				listMetricsOutputPerNamespace, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, APIClients.CloudWatchClient)
+				if err != nil {
+					m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %v", regionName, namespace, err)
+				}
+				listMetricsOutput = append(listMetricsOutput, listMetricsOutputPerNamespace...)
+			}
 		}
 
 		if len(listMetricsOutput) == 0 {
@@ -189,14 +227,50 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		for namespace, namespaceDetails := range namespaceDetailTotal {
 			m.logger.Debugf("Collected metrics from namespace %s", namespace)
-
 			// filter listMetricsOutput by detailed configuration per each namespace
 			filteredMetricWithStatsTotal := filterListMetricsOutput(listMetricsOutput, namespace, namespaceDetails)
 
 			// get resource type filters and tags filters for each namespace
 			resourceTypeTagFilters := constructTagsFilters(namespaceDetails)
 
-			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, filteredMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+			//Check whether namespace is APIGW
+			if strings.Contains(strings.ToLower(namespace), checkns_lower) {
+				useonlyrest := false
+				if len(resourceTypeTagFilters) == 1 {
+					for key := range resourceTypeTagFilters {
+						if strings.Compare(strings.ToLower(key), checkresource_type_lower) == 0 {
+							useonlyrest = true
+						}
+					}
+				}
+				// inforestapi includes only Rest APIs
+				if useonlyrest {
+					infoapi, err = aws.GetAPIGatewayRestAPIOutput(APIClients.Apigateway, config.LimitRestAPI)
+					if err != nil {
+						m.Logger().Errorf("could not get rest apis output: %v", err)
+					}
+				} else {
+					// infoapi  includes only Rest APIs
+					// apiGatewayAPI includes only WebSocket and HTTP APIs
+					infoapi, err = aws.GetAPIGatewayRestAPIOutput(APIClients.Apigateway, config.LimitRestAPI)
+					if err != nil {
+						m.Logger().Errorf("could not get rest apis output: %v", err)
+					}
+
+					apiGatewayAPI, err := aws.GetAPIGatewayAPIOutput(APIClients.Apigatewayv2)
+					if err != nil {
+						m.Logger().Errorf("could not get http and websocket apis output: %v", err)
+					}
+					if len(apiGatewayAPI) > 0 {
+						maps.Copy(infoapi, apiGatewayAPI)
+					}
+
+				}
+
+				m.Logger().Debugf("infoapi response: %v", infoapi)
+
+			}
+			eventsWithIdentifier, err := m.createEvents(APIClients.CloudWatchClient, APIClients.Resourcegroupstaggingapi, filteredMetricWithStatsTotal, resourceTypeTagFilters, infoapi, regionName, startTime, endTime)
 			if err != nil {
 				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
 			}
@@ -219,23 +293,32 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 }
 
 // createAwsRequiredClients will return the two necessary client instances to do Metric requests to the AWS API
-func (m *MetricSet) createAwsRequiredClients(beatsConfig awssdk.Config, regionName string, config aws.Config) (*cloudwatch.Client, *resourcegroupstaggingapi.Client, error) {
+func (m *MetricSet) createAwsRequiredClients(beatsConfig awssdk.Config, regionName string, config aws.Config) (APIClients, error) {
 	m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
 
-	svcCloudwatchClient := cloudwatch.NewFromConfig(beatsConfig, func(o *cloudwatch.Options) {
+	APIClients := APIClients{}
+	APIClients.CloudWatchClient = cloudwatch.NewFromConfig(beatsConfig, func(o *cloudwatch.Options) {
 		if config.AWSConfig.FIPSEnabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 
 	})
 
-	svcResourceAPIClient := resourcegroupstaggingapi.NewFromConfig(beatsConfig, func(o *resourcegroupstaggingapi.Options) {
+	APIClients.Resourcegroupstaggingapi = resourcegroupstaggingapi.NewFromConfig(beatsConfig, func(o *resourcegroupstaggingapi.Options) {
 		if config.AWSConfig.FIPSEnabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 	})
 
-	return svcCloudwatchClient, svcResourceAPIClient, nil
+	APIClients.Apigateway = apigateway.NewFromConfig(beatsConfig, func(o *apigateway.Options) {
+
+	})
+
+	APIClients.Apigatewayv2 = apigatewayv2.NewFromConfig(beatsConfig, func(o *apigatewayv2.Options) {
+
+	})
+
+	return APIClients, nil
 }
 
 // filterListMetricsOutput compares config details with listMetricsOutput and filter out the ones don't match
@@ -337,14 +420,14 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 			}
 
 			if config.ResourceType != "" {
-				resourceTypesWithTags[config.ResourceType] = m.MetricSet.TagsFilter
+				resourceTypesWithTags[config.ResourceType] = m.TagsFilter
 			}
 			continue
 		}
 
 		configPerNamespace := namespaceDetail{
 			names:              config.MetricName,
-			tags:               m.MetricSet.TagsFilter,
+			tags:               m.TagsFilter,
 			statistics:         config.Statistic,
 			resourceTypeFilter: config.ResourceType,
 			dimensions:         cloudwatchDimensions,
@@ -456,7 +539,7 @@ func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.E
 	return event
 }
 
-func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient, svcResourceAPI resourcegroupstaggingapi.GetResourcesAPIClient, listMetricWithStatsTotal []metricsWithStatistics, resourceTypeTagFilters map[string][]aws.Tag, regionName string, startTime time.Time, endTime time.Time) (map[string]mb.Event, error) {
+func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient, svcResourceAPI resourcegroupstaggingapi.GetResourcesAPIClient, listMetricWithStatsTotal []metricsWithStatistics, resourceTypeTagFilters map[string][]aws.Tag, infoAPImap map[string]string, regionName string, startTime time.Time, endTime time.Time) (map[string]mb.Event, error) {
 	// Initialize events for each identifier.
 	events := make(map[string]mb.Event)
 
@@ -496,7 +579,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 					continue
 				}
 
-				identifierValue := labels[aws.LabelConst.IdentifierValueIdx] + fmt.Sprint("-", valI)
+				identifierValue := labels[aws.LabelConst.AccountIdIdx] + "-" + labels[aws.LabelConst.IdentifierValueIdx] + fmt.Sprint("-", valI)
 				if _, ok := events[identifierValue]; !ok {
 					events[identifierValue] = aws.InitEvent(regionName, labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], metricDataResult.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
 				}
@@ -557,7 +640,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				}
 
 				identifierValue := labels[aws.LabelConst.IdentifierValueIdx]
-				uniqueIdentifierValue := identifierValue + fmt.Sprint("-", valI)
+				uniqueIdentifierValue := labels[aws.LabelConst.AccountIdIdx] + "-" + identifierValue + fmt.Sprint("-", valI)
 
 				// add tags to event based on identifierValue
 				// Check if identifier includes dimensionSeparator (comma in this case),
@@ -566,6 +649,13 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				// And tags are only store under s3BucketName in resourceTagMap.
 				subIdentifiers := strings.Split(identifierValue, dimensionSeparator)
 				for _, subIdentifier := range subIdentifiers {
+
+					if len(infoAPImap) > 0 { // If infoAPImap includes data
+						if valAPIName, ok := infoAPImap[subIdentifier]; ok {
+							subIdentifier = valAPIName
+						}
+					}
+
 					if _, ok := events[uniqueIdentifierValue]; !ok {
 						// when tagsFilter is not empty but no entry in
 						// resourceTagMap for this identifier, do not initialize

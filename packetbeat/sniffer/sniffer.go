@@ -22,9 +22,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/google/gopacket"
@@ -33,9 +35,9 @@ import (
 	"github.com/google/gopacket/pcapgo"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/logp"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/decoder"
 )
@@ -51,7 +53,7 @@ type Sniffer struct {
 type sniffer struct {
 	config config.InterfaceConfig
 
-	state atomic.Int32 // store snifferState
+	state *atomic.Int32 // store snifferState
 
 	// device is the first active device after calling New.
 	// It is not updated by default route polling.
@@ -71,6 +73,8 @@ type sniffer struct {
 	decoders Decoders
 
 	log *logp.Logger
+
+	reporter status.StatusReporter
 }
 
 type snifferHandle interface {
@@ -90,7 +94,7 @@ const (
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method. The id parameter is used to specify the metric
 // collection ID for AF_PACKET sniffers on Linux.
-func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig) (*Sniffer, error) {
+func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig, reporter status.StatusReporter) (*Sniffer, error) {
 	s := &Sniffer{
 		sniffers: make([]sniffer, len(interfaces)),
 		log:      logp.NewLogger("sniffer"),
@@ -103,13 +107,15 @@ func New(id string, testMode bool, _ string, decoders map[string]Decoders, inter
 			return nil, fmt.Errorf("no decoder for %s", iface.Device)
 		}
 		child := sniffer{
-			state:         atomic.MakeInt32(snifferInactive),
+			state:         &atomic.Int32{},
 			followDefault: iface.PollDefaultRoute > 0 && strings.HasPrefix(iface.Device, "default_route"),
 			id:            id,
 			idx:           i,
 			decoders:      dec,
 			log:           s.log,
+			reporter:      reporter,
 		}
+		child.state.Store(snifferInactive)
 
 		s.log.Debugf("interface: %d, BPF filter: '%s'", i, iface.BpfFilter)
 
@@ -156,7 +162,7 @@ func New(id string, testMode bool, _ string, decoders map[string]Decoders, inter
 			}
 		}
 
-		err := validateConfig(iface.BpfFilter, &iface) //nolint:gosec // Bad linter! validateConfig completes before the next iteration.
+		err := validateConfig(iface.BpfFilter, &iface)
 		if err != nil {
 			cfg, _ := json.Marshal(iface)
 			return nil, fmt.Errorf("validate: %w: %s", err, cfg)
@@ -373,7 +379,7 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 	// Mark inactive sniffer as active. In case of the sniffer/packetbeat closing
 	// before/while Run is executed, the state will be snifferClosing.
 	// => return if state is already snifferClosing.
-	if !s.state.CAS(snifferInactive, snifferActive) {
+	if !s.state.CompareAndSwap(snifferInactive, snifferActive) {
 		return nil
 	}
 	defer s.state.Store(snifferInactive)
@@ -382,6 +388,7 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 		packets  int
 		timeouts int
 	)
+	s.UpdateStatus(status.Running, fmt.Sprintf("running sniffer for handle %s", s.id))
 	for s.state.Load() == snifferActive {
 		select {
 		case <-ctx.Done():
@@ -396,7 +403,8 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 
 		if s.config.OneAtATime {
 			fmt.Fprintln(os.Stdout, "Press enter to read packet")
-			fmt.Scanln()
+			// we just use this to block the for loop, don't care about input or error
+			_, _ = fmt.Scanln()
 		}
 
 		data, ci, err := handle.ReadPacketData()
@@ -477,6 +485,13 @@ func (s *sniffer) open(device string) (snifferHandle, error) {
 	}
 }
 
+// UpdateStatus wraps the status reporter we get from central management
+func (s *sniffer) UpdateStatus(status status.Status, message string) {
+	if s.reporter != nil {
+		s.reporter.UpdateStatus(status, message)
+	}
+}
+
 // Stop marks a sniffer as stopped. The Run method will return once the stop
 // signal has been given.
 func (s *Sniffer) Stop() {
@@ -492,6 +507,9 @@ func (s *Sniffer) Stop() {
 }
 
 func openPcap(device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
+	if cfg.Snaplen > math.MaxInt32 || cfg.Snaplen < math.MinInt32 {
+		return nil, fmt.Errorf("snaplen %d is larger than max int32, would overflow", cfg.Snaplen)
+	}
 	snaplen := int32(cfg.Snaplen)
 	timeout := 500 * time.Millisecond
 	h, err := pcap.OpenLive(device, snaplen, true, timeout)

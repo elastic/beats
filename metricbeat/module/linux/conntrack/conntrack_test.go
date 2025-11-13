@@ -18,10 +18,15 @@
 package conntrack
 
 import (
+	"errors"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -47,7 +52,7 @@ func TestFetch(t *testing.T) {
 	testConn := mapstr.M{
 		"drop":           uint64(0),
 		"early_drop":     uint64(0),
-		"entries":        uint64(16),
+		"entries":        uint64(4),
 		"found":          uint64(0),
 		"ignore":         uint64(3271028),
 		"insert_failed":  uint64(0),
@@ -55,9 +60,26 @@ func TestFetch(t *testing.T) {
 		"search_restart": uint64(3),
 	}
 
-	rawEvent := events[0].BeatEvent("linux", "conntrack").Fields["linux"].(mapstr.M)["conntrack"].(mapstr.M)["summary"]
+	rawEvent := events[0].BeatEvent("linux", "conntrack").Fields["linux"].(mapstr.M)["conntrack"].(mapstr.M)["summary"] //nolint:errcheck // ignore
 
 	assert.Equal(t, testConn, rawEvent)
+}
+
+func TestFetchConntrackModuleNotLoaded(t *testing.T) {
+	// Create a temporary directory to simulate a missing /proc/net/stat/nf_conntrack file
+	tmpDir := t.TempDir()
+	assert.NoError(t, os.MkdirAll(filepath.Join(tmpDir, "proc/net/stat"), 0755))
+	c := getConfig()
+	c["hostfs"] = tmpDir
+
+	f := mbtest.NewReportingMetricSetV2Error(t, c)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+
+	require.Len(t, errs, 1)
+	err := errors.Join(errs...)
+	assert.ErrorAs(t, err, &mb.PartialMetricsError{})
+	assert.Contains(t, err.Error(), "error fetching conntrack stats: nf_conntrack kernel module not loaded")
+	require.Empty(t, events)
 }
 
 func getConfig() map[string]interface{} {

@@ -5,22 +5,22 @@
 package auth
 
 import (
-	"fmt"
-
-	"github.com/Azure/go-autorest/autorest/adal"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 )
 
 // NewProviderFromClientSecret returns a token provider that uses a secret
 // for authentication.
 func NewProviderFromClientSecret(endpoint, resource, applicationID, tenantID, secret string) (p TokenProvider, err error) {
-	oauth, err := adal.NewOAuthConfig(endpoint, tenantID)
-	if err != nil {
-		return nil, fmt.Errorf("error generating OAuthConfig: %w", err)
-	}
-	spt, err := adal.NewServicePrincipalToken(*oauth, applicationID, secret, resource)
+	clientOpts := azcore.ClientOptions{Cloud: cloud.Configuration{ActiveDirectoryAuthorityHost: endpoint}}
+
+	cred, err := azidentity.NewClientSecretCredential(
+		tenantID, applicationID, secret, &azidentity.ClientSecretCredentialOptions{ClientOptions: clientOpts},
+	)
 	if err != nil {
 		return nil, err
 	}
-	spt.SetAutoRefresh(true)
-	return (*servicePrincipalToken)(spt), nil
+
+	return (*credentialTokenProvider)(cred), nil
 }

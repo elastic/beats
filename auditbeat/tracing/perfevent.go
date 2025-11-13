@@ -29,7 +29,6 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/joeshaw/multierror"
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/go-perf"
@@ -336,7 +335,7 @@ func (c *PerfChannel) Close() error {
 		defer close(c.errC)
 		defer close(c.lostC)
 	}
-	var errs multierror.Errors
+	var errs []error
 	for _, ev := range c.events {
 		if err := ev.Disable(); err != nil {
 			errs = append(errs, fmt.Errorf("failed to disable event channel: %w", err))
@@ -345,7 +344,7 @@ func (c *PerfChannel) Close() error {
 			errs = append(errs, fmt.Errorf("failed to close event channel: %w", err))
 		}
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // doneWrapperContext is a custom context.Context that is tailored to

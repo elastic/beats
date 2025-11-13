@@ -322,7 +322,8 @@ func TestGetListMetricsOutputWithWildcard(t *testing.T) {
 }
 
 func TestGetMetricDataPerRegion(t *testing.T) {
-	startTime, endTime := GetStartTimeEndTime(time.Now(), 10*time.Minute, 0)
+	var previousEndTime time.Time
+	startTime, endTime := GetStartTimeEndTime(time.Now(), 10*time.Minute, 0, previousEndTime)
 
 	mockSvc := &MockCloudWatchClient{}
 	var metricDataQueries []cloudwatchtypes.MetricDataQuery
@@ -356,7 +357,8 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 }
 
 func TestGetMetricDataResults(t *testing.T) {
-	startTime, endTime := GetStartTimeEndTime(time.Now(), 10*time.Minute, 0)
+	var previousEndTime time.Time
+	startTime, endTime := GetStartTimeEndTime(time.Now(), 10*time.Minute, 0, previousEndTime)
 
 	mockSvc := &MockCloudWatchClient{}
 	metricInfo := cloudwatchtypes.Metric{
@@ -393,7 +395,8 @@ func TestGetMetricDataResults(t *testing.T) {
 }
 
 func TestGetMetricDataResultsCrossAccounts(t *testing.T) {
-	startTime, endTime := GetStartTimeEndTime(time.Now(), 10*time.Minute, 0)
+	var previousEndTime time.Time
+	startTime, endTime := GetStartTimeEndTime(time.Now(), 10*time.Minute, 0, previousEndTime)
 
 	mockSvc := &MockCloudwatchClientCrossAccounts{}
 	metricInfo := cloudwatchtypes.Metric{
@@ -552,6 +555,11 @@ func TestGetResourcesTags(t *testing.T) {
 }
 
 func parseTime(t *testing.T, in string) time.Time {
+	var zeroTime time.Time
+	if in == "" {
+		return zeroTime
+	}
+
 	time, err := time.Parse(time.RFC3339, in)
 	if err != nil {
 		t.Errorf("test setup failed - could not parse time with time.RFC3339: %s", in)
@@ -561,39 +569,46 @@ func parseTime(t *testing.T, in string) time.Time {
 
 func TestGetStartTimeEndTime(t *testing.T) {
 	var cases = []struct {
-		title         string
-		start         string
-		period        time.Duration
-		latency       time.Duration
-		expectedStart string
-		expectedEnd   string
+		title           string
+		start           string
+		period          time.Duration
+		latency         time.Duration
+		previousEndTime string
+		expectedStart   string
+		expectedEnd     string
 	}{
 		// window should align with period e.g. requesting a 5 minute period at 10:27 gives 10:20->10:25
-		{"1 minute", "2022-08-15T13:38:45Z", time.Second * 60, 0, "2022-08-15T13:37:00Z", "2022-08-15T13:38:00Z"},
-		{"2 minutes", "2022-08-15T13:38:45Z", time.Second * 60 * 2, 0, "2022-08-15T13:36:00Z", "2022-08-15T13:38:00Z"},
-		{"3 minutes", "2022-08-15T13:38:45Z", time.Second * 60 * 3, 0, "2022-08-15T13:33:00Z", "2022-08-15T13:36:00Z"},
-		{"5 minutes", "2022-08-15T13:38:45Z", time.Second * 60 * 5, 0, "2022-08-15T13:30:00Z", "2022-08-15T13:35:00Z"},
-		{"30 minutes", "2022-08-15T13:38:45Z", time.Second * 60 * 30, 0, "2022-08-15T13:00:00Z", "2022-08-15T13:30:00Z"},
+		{"1 minute", "2022-08-15T13:38:45Z", time.Second * 60, 0, "", "2022-08-15T13:37:00Z", "2022-08-15T13:38:00Z"},
+		{"2 minutes", "2022-08-15T13:38:45Z", time.Second * 60 * 2, 0, "", "2022-08-15T13:36:00Z", "2022-08-15T13:38:00Z"},
+		{"3 minutes", "2022-08-15T13:38:45Z", time.Second * 60 * 3, 0, "", "2022-08-15T13:33:00Z", "2022-08-15T13:36:00Z"},
+		{"5 minutes", "2022-08-15T13:38:45Z", time.Second * 60 * 5, 0, "", "2022-08-15T13:30:00Z", "2022-08-15T13:35:00Z"},
+		{"30 minutes", "2022-08-15T13:38:45Z", time.Second * 60 * 30, 0, "", "2022-08-15T13:00:00Z", "2022-08-15T13:30:00Z"},
 
 		// latency should shift the time *before* period alignment
 		// e.g. requesting a 5 minute period at 10:27 with 1 minutes latency still gives 10:20->10:25,
 		//      but with 3 minutes latency gives 10:15->10:20
-		{"1 minute, 10 minutes latency", "2022-08-15T13:38:45Z", time.Second * 60, time.Second * 60 * 10, "2022-08-15T13:27:00Z", "2022-08-15T13:28:00Z"},
-		{"2 minutes, 1 minute latency", "2022-08-15T13:38:45Z", time.Second * 60 * 2, time.Second * 60, "2022-08-15T13:34:00Z", "2022-08-15T13:36:00Z"},
-		{"5 minutes, 4 minutes latency", "2022-08-15T13:38:45Z", time.Second * 60 * 5, time.Second * 60 * 4, "2022-08-15T13:25:00Z", "2022-08-15T13:30:00Z"},
-		{"30 minutes, 30 minutes latency", "2022-08-15T13:38:45Z", time.Second * 60 * 30, time.Second * 60 * 30, "2022-08-15T12:30:00Z", "2022-08-15T13:00:00Z"},
+		{"1 minute, 10 minutes latency", "2022-08-15T13:38:45Z", time.Second * 60, time.Second * 60 * 10, "", "2022-08-15T13:27:00Z", "2022-08-15T13:28:00Z"},
+		{"2 minutes, 1 minute latency", "2022-08-15T13:38:45Z", time.Second * 60 * 2, time.Second * 60, "", "2022-08-15T13:34:00Z", "2022-08-15T13:36:00Z"},
+		{"5 minutes, 4 minutes latency", "2022-08-15T13:38:45Z", time.Second * 60 * 5, time.Second * 60 * 4, "", "2022-08-15T13:25:00Z", "2022-08-15T13:30:00Z"},
+		{"30 minutes, 30 minutes latency", "2022-08-15T13:38:45Z", time.Second * 60 * 30, time.Second * 60 * 30, "", "2022-08-15T12:30:00Z", "2022-08-15T13:00:00Z"},
 
 		// non-whole-minute periods should be rounded up to the nearest minute; latency is applied as-is before period adjustment
-		{"20 seconds, 45 second latency", "2022-08-15T13:38:45Z", time.Second * 20, time.Second * 45, "2022-08-15T13:37:00Z", "2022-08-15T13:38:00Z"},
-		{"1.5 minutes, 60 second latency", "2022-08-15T13:38:45Z", time.Second * 90, time.Second * 60, "2022-08-15T13:34:00Z", "2022-08-15T13:36:00Z"},
-		{"just less than 5 minutes, 3 minute latency", "2022-08-15T13:38:45Z", time.Second * 59 * 5, time.Second * 90, "2022-08-15T13:30:00Z", "2022-08-15T13:35:00Z"},
+		{"1 minute, 10 minutes latency", "2022-08-15T13:38:45Z", time.Second * 60, time.Second * 60 * 10, "2022-08-15T13:45:00Z", "2022-08-15T13:45:00Z", "2022-08-15T13:46:00Z"},
+		{"5 minute, 3 minutes latency", "2022-08-15T13:38:45Z", time.Second * 60 * 5, time.Second * 60 * 3, "2022-08-15T13:45:00Z", "2022-08-15T13:45:00Z", "2022-08-15T13:50:00Z"},
+
+		// latency should shift the time *before* period alignment
+		// previousEndTime should be the same as the next startTime
+		{"1 minute, 10 minutes latency", "2022-08-15T13:38:45Z", time.Second * 60, time.Second * 60 * 10, "", "2022-08-15T13:27:00Z", "2022-08-15T13:28:00Z"},
+		{"2 minutes, 1 minute latency", "2022-08-15T13:38:45Z", time.Second * 60 * 2, time.Second * 60, "", "2022-08-15T13:34:00Z", "2022-08-15T13:36:00Z"},
+		{"5 minutes, 4 minutes latency", "2022-08-15T13:38:45Z", time.Second * 60 * 5, time.Second * 60 * 4, "", "2022-08-15T13:25:00Z", "2022-08-15T13:30:00Z"},
+		{"30 minutes, 30 minutes latency", "2022-08-15T13:38:45Z", time.Second * 60 * 30, time.Second * 60 * 30, "", "2022-08-15T12:30:00Z", "2022-08-15T13:00:00Z"},
 	}
 
 	for _, tt := range cases {
 		t.Run(tt.title, func(t *testing.T) {
-			startTime, expectedStartTime, expectedEndTime := parseTime(t, tt.start), parseTime(t, tt.expectedStart), parseTime(t, tt.expectedEnd)
+			startTime, previousEndTime, expectedStartTime, expectedEndTime := parseTime(t, tt.start), parseTime(t, tt.previousEndTime), parseTime(t, tt.expectedStart), parseTime(t, tt.expectedEnd)
 
-			start, end := GetStartTimeEndTime(startTime, tt.period, tt.latency)
+			start, end := GetStartTimeEndTime(startTime, tt.period, tt.latency, previousEndTime)
 
 			if expectedStartTime != start || expectedEndTime != end {
 				t.Errorf("got (%s, %s), want (%s, %s)", start, end, tt.expectedStart, tt.expectedEnd)
@@ -607,6 +622,7 @@ func TestGetStartTimeEndTime_AlwaysCreatesContinuousIntervals(t *testing.T) {
 		start, end string
 	}
 
+	var previousEndTime time.Time
 	startTime := parseTime(t, "2022-08-24T11:01:00Z")
 	numCalls := 5
 
@@ -614,38 +630,39 @@ func TestGetStartTimeEndTime_AlwaysCreatesContinuousIntervals(t *testing.T) {
 		title             string
 		period            time.Duration
 		latency           time.Duration
+		previousEndTime   time.Time
 		expectedIntervals []interval
 	}{
 		// with no latency
-		{"1 minute", time.Second * 60, 0, []interval{
+		{"1 minute", time.Second * 60, 0, previousEndTime, []interval{
 			{"2022-08-24T11:00:00Z", "2022-08-24T11:01:00Z"},
 			{"2022-08-24T11:01:00Z", "2022-08-24T11:02:00Z"},
 			{"2022-08-24T11:02:00Z", "2022-08-24T11:03:00Z"},
 			{"2022-08-24T11:03:00Z", "2022-08-24T11:04:00Z"},
 			{"2022-08-24T11:04:00Z", "2022-08-24T11:05:00Z"},
 		}},
-		{"2 minutes", time.Second * 60 * 2, 0, []interval{
+		{"2 minutes", time.Second * 60 * 2, 0, previousEndTime, []interval{
 			{"2022-08-24T10:58:00Z", "2022-08-24T11:00:00Z"},
 			{"2022-08-24T11:00:00Z", "2022-08-24T11:02:00Z"},
 			{"2022-08-24T11:02:00Z", "2022-08-24T11:04:00Z"},
 			{"2022-08-24T11:04:00Z", "2022-08-24T11:06:00Z"},
 			{"2022-08-24T11:06:00Z", "2022-08-24T11:08:00Z"},
 		}},
-		{"3 minutes", time.Second * 60 * 3, 0, []interval{
+		{"3 minutes", time.Second * 60 * 3, 0, previousEndTime, []interval{
 			{"2022-08-24T10:57:00Z", "2022-08-24T11:00:00Z"},
 			{"2022-08-24T11:00:00Z", "2022-08-24T11:03:00Z"},
 			{"2022-08-24T11:03:00Z", "2022-08-24T11:06:00Z"},
 			{"2022-08-24T11:06:00Z", "2022-08-24T11:09:00Z"},
 			{"2022-08-24T11:09:00Z", "2022-08-24T11:12:00Z"},
 		}},
-		{"5 minutes", time.Second * 60 * 5, 0, []interval{
+		{"5 minutes", time.Second * 60 * 5, 0, previousEndTime, []interval{
 			{"2022-08-24T10:55:00Z", "2022-08-24T11:00:00Z"},
 			{"2022-08-24T11:00:00Z", "2022-08-24T11:05:00Z"},
 			{"2022-08-24T11:05:00Z", "2022-08-24T11:10:00Z"},
 			{"2022-08-24T11:10:00Z", "2022-08-24T11:15:00Z"},
 			{"2022-08-24T11:15:00Z", "2022-08-24T11:20:00Z"},
 		}},
-		{"30 minutes", time.Second * 60 * 30, 0, []interval{
+		{"30 minutes", time.Second * 60 * 30, 0, previousEndTime, []interval{
 			{"2022-08-24T10:30:00Z", "2022-08-24T11:00:00Z"},
 			{"2022-08-24T11:00:00Z", "2022-08-24T11:30:00Z"},
 			{"2022-08-24T11:30:00Z", "2022-08-24T12:00:00Z"},
@@ -654,7 +671,7 @@ func TestGetStartTimeEndTime_AlwaysCreatesContinuousIntervals(t *testing.T) {
 		}},
 
 		// with 90s latency (sanity check)
-		{"1 minute with 2 minute latency", time.Second * 60, time.Second * 90, []interval{
+		{"1 minute with 2 minute latency", time.Second * 60, time.Second * 90, previousEndTime, []interval{
 			{"2022-08-24T10:58:00Z", "2022-08-24T10:59:00Z"},
 			{"2022-08-24T10:59:00Z", "2022-08-24T11:00:00Z"},
 			{"2022-08-24T11:00:00Z", "2022-08-24T11:01:00Z"},
@@ -669,7 +686,7 @@ func TestGetStartTimeEndTime_AlwaysCreatesContinuousIntervals(t *testing.T) {
 			intervals := make([]interval, numCalls)
 			for i := range intervals {
 				adjustedStartTime := startTime.Add(tt.period * time.Duration(i))
-				start, end := GetStartTimeEndTime(adjustedStartTime, tt.period, tt.latency)
+				start, end := GetStartTimeEndTime(adjustedStartTime, tt.period, tt.latency, tt.previousEndTime)
 				intervals[i] = interval{start.Format(time.RFC3339), end.Format(time.RFC3339)}
 			}
 

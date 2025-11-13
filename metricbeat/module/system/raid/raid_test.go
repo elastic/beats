@@ -18,10 +18,14 @@
 package raid
 
 import (
+	"errors"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
@@ -44,6 +48,22 @@ func TestFetch(t *testing.T) {
 	}
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		events[0].BeatEvent("system", "raid").Fields.StringToPrint())
+}
+
+func TestFetchNoRAID(t *testing.T) {
+	// Ensure that we return partial metrics when no RAID devices are present.
+	tmpDir := t.TempDir()
+	assert.NoError(t, os.MkdirAll(filepath.Join(tmpDir, "sys/block"), 0755))
+	c := getConfig()
+	c["hostfs"] = tmpDir
+
+	f := mbtest.NewReportingMetricSetV2Error(t, c)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+
+	assert.Len(t, errs, 1)
+	assert.ErrorAs(t, errors.Join(errs...), &mb.PartialMetricsError{})
+	assert.Contains(t, errors.Join(errs...).Error(), "failed to list RAID devices: no RAID devices found. You have probably enabled the RAID metrics on a non-RAID system.")
+	assert.Empty(t, events)
 }
 
 func getConfig() map[string]interface{} {

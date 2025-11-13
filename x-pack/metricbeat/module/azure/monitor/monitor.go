@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package monitor
 
 import (
@@ -33,6 +35,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	ms.MapMetrics = mapMetrics
+	ms.ConcMapMetrics = concurrentMapMetrics
 	return &MetricSet{
 		MetricSet: ms,
 	}, nil

@@ -56,7 +56,7 @@ func Package() {
 	heartbeat.CustomizePackaging()
 
 	mg.Deps(Update)
-	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
+	mg.Deps(build.CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -95,7 +95,7 @@ func PythonIntegTest() {
 }
 
 func GoIntegTest(ctx context.Context) error {
-	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
+	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs(ctx))
 }
 
 func Fields() error {

@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package performance
 
 import (
@@ -45,7 +47,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger("mssql.performance").With("host", base.HostData().SanitizedURI)
+	logger := base.Logger().Named("mssql.performance").With("host", base.HostData().SanitizedURI)
 
 	db, err := mssql.NewConnection(base.HostData().URI)
 	if err != nil {
@@ -81,16 +83,16 @@ WHERE  counter_name = 'SQL Compilations/sec'
         OR counter_name = 'Batch Requests/sec'
         OR ( counter_name = 'Lock Waits/sec'
              AND instance_name = '_Total' )
-        OR ( counter_name IN ( 'Page life expectancy', 
-                  'Buffer cache hit ratio', 
+        OR ( counter_name IN ( 'Page life expectancy',
+                  'Buffer cache hit ratio',
 	          'Buffer cache hit ratio base',
-                  'Target pages', 'Database pages', 
+                  'Target pages', 'Database pages',
                   'Checkpoint pages/sec' )
              AND object_name LIKE '%:Buffer Manager%' )
-        OR ( counter_name IN ( 'Transactions', 
-                  'Logins/sec', 
-                  'Logouts/sec', 
-                  'Connection Reset/sec', 
+        OR ( counter_name IN ( 'Transactions',
+                  'Logins/sec',
+                  'Logouts/sec',
+                  'Connection Reset/sec',
                   'Active Temp Tables' )
              AND object_name LIKE '%:General Statistics%' )`)
 	if err != nil {

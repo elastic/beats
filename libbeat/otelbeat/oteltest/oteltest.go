@@ -1,0 +1,302 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+// Package oteltest provides test utilities for OpenTelemetry and Beats components.
+package oteltest
+
+import (
+	"context"
+	"strings"
+	"sync"
+	"testing"
+	"time"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
+	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/consumer/consumertest"
+	"go.opentelemetry.io/collector/pdata/plog"
+	"go.opentelemetry.io/collector/receiver"
+	"go.uber.org/goleak"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest"
+	"go.uber.org/zap/zaptest/observer"
+)
+
+type MockHost struct {
+	mu  sync.Mutex
+	Evt *componentstatus.Event
+}
+
+func (*MockHost) GetExtensions() map[component.ID]component.Component {
+	return nil
+}
+
+func (h *MockHost) Report(evt *componentstatus.Event) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.Evt = evt
+}
+
+func (h *MockHost) getEvent() *componentstatus.Event {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.Evt
+}
+
+type ReceiverConfig struct {
+	// Name is the unique identifier for the component
+	Name string
+	// Beat is the name of the Beat that is running as a receiver
+	Beat string
+	// Config is the configuration for the receiver component
+	Config component.Config
+	// Factory is the factory to instantiate the receiver
+	Factory receiver.Factory
+}
+
+type ExpectedStatus struct {
+	Status componentstatus.Status
+	Error  string
+}
+
+type CheckReceiversParams struct {
+	T *testing.T
+	// Receivers is a list of receiver configurations to create.
+	Receivers []ReceiverConfig
+	// AssertFunc is a function that asserts the test conditions.
+	// The function is called periodically until the assertions are met or the timeout is reached.
+	AssertFunc func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs)
+
+	Status      ExpectedStatus
+	NumRestarts int
+}
+
+// CheckReceivers creates receivers using the provided configuration.
+func CheckReceivers(params CheckReceiversParams) {
+	t := params.T
+	ctx := t.Context()
+
+	defer VerifyNoLeaks(t)
+
+	var logsMu sync.Mutex
+	logs := make(map[string][]mapstr.M)
+	t.Cleanup(func() {
+		if t.Failed() {
+			logsMu.Lock()
+			defer logsMu.Unlock()
+			t.Logf("Ingested Logs: %v", logs)
+		}
+	})
+	for range params.NumRestarts + 1 {
+		host := &MockHost{}
+
+		zapCore := zapcore.NewCore(
+			zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+			&zaptest.Discarder{},
+			zapcore.DebugLevel,
+		)
+		observed, zapLogs := observer.New(zapcore.DebugLevel)
+
+		core := zapcore.NewTee(zapCore, observed)
+
+		createReceiver := func(t *testing.T, rc ReceiverConfig) receiver.Logs {
+			t.Helper()
+
+			require.NotEmpty(t, rc.Name, "receiver name must not be empty")
+			require.NotEmpty(t, rc.Beat, "receiver beat must not be empty")
+
+			var receiverSettings receiver.Settings
+			receiverSettings.ID = component.NewIDWithName(rc.Factory.Type(), rc.Name)
+
+			// Replicate the behavior of the collector logger
+			receiverCore := core.
+				With([]zapcore.Field{
+					zap.String("otelcol.component.id", receiverSettings.ID.String()),
+					zap.String("otelcol.component.kind", "receiver"),
+					zap.String("otelcol.signal", "logs"),
+				})
+
+			receiverSettings.Logger = zap.New(receiverCore)
+
+			logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
+				for _, rl := range ld.ResourceLogs().All() {
+					for _, sl := range rl.ScopeLogs().All() {
+						for _, lr := range sl.LogRecords().All() {
+							logsMu.Lock()
+							logs[rc.Name] = append(logs[rc.Name], lr.Body().Map().AsRaw())
+							logsMu.Unlock()
+						}
+					}
+				}
+				return nil
+			})
+			assert.NoErrorf(t, err, "Error creating log consumer for %q", rc.Name)
+
+			r, err := rc.Factory.CreateLogs(ctx, receiverSettings, rc.Config, logConsumer)
+			assert.NoErrorf(t, err, "Error creating receiver %q", rc.Name)
+			return r
+		}
+
+		// Replicate the collector behavior to instantiate components first and then start them.
+		// use a map so the order of startup and shutdown is random
+		receivers := make(map[int]receiver.Logs)
+
+		for i, rec := range params.Receivers {
+			receivers[i] = createReceiver(t, rec)
+		}
+
+		for i, r := range receivers {
+			err := r.Start(ctx, host)
+			require.NoErrorf(t, err, "Error starting receiver %d", i)
+		}
+
+		beatForCompName := func(compName string) string {
+			for _, rec := range params.Receivers {
+				if rec.Name == compName {
+					return rec.Beat
+				}
+			}
+
+			return ""
+		}
+
+		require.EventuallyWithT(t, func(ct *assert.CollectT) {
+			logsMu.Lock()
+			defer logsMu.Unlock()
+
+			// Ensure the logger fields from the otel collector are present
+			for _, zl := range zapLogs.All() {
+				require.Contains(ct, zl.ContextMap(), "otelcol.component.kind")
+				require.Equal(ct, "receiver", zl.ContextMap()["otelcol.component.kind"])
+				require.Contains(ct, zl.ContextMap(), "otelcol.signal")
+				require.Equal(ct, "logs", zl.ContextMap()["otelcol.signal"])
+				require.Contains(ct, zl.ContextMap(), "otelcol.component.id")
+				compID, ok := zl.ContextMap()["otelcol.component.id"].(string)
+				require.True(ct, ok, "otelcol.component.id should be a string")
+				compName := strings.Split(compID, "/")[1]
+				require.Contains(ct, zl.ContextMap(), "service.name")
+				require.Equal(ct, beatForCompName(compName), zl.ContextMap()["service.name"])
+				break
+			}
+			require.NotNil(ct, host.getEvent(), "expected not nil, got nil")
+
+			if params.Status.Error == "" {
+				require.Equalf(ct, host.Evt.Status(), componentstatus.StatusOK, "expected %v, got %v", params.Status.Status, host.Evt.Status())
+				require.Nilf(ct, host.Evt.Err(), "expected nil, got %v", host.Evt.Err())
+			} else {
+				require.Equalf(ct, host.Evt.Status(), params.Status.Status, "expected %v, got %v", params.Status.Status, host.Evt.Status())
+				require.ErrorContainsf(ct, host.Evt.Err(), params.Status.Error, "expected error to contain '%v': %v", params.Status.Error, host.Evt.Err())
+			}
+
+			if params.AssertFunc != nil {
+				params.AssertFunc(ct, logs, zapLogs)
+			}
+		}, 2*time.Minute, 1*time.Second,
+			"timeout waiting for logger fields from the OTel collector are present in the logs and other assertions to be met")
+		for i, r := range receivers {
+			require.NoErrorf(t, r.Shutdown(ctx), "Error shutting down receiver %d", i)
+		}
+	}
+}
+
+// VerifyNoLeaks fails the test if any goroutines are leaked during the test.
+func VerifyNoLeaks(t *testing.T) {
+	skipped := []goleak.Option{
+		// See https://github.com/microsoft/go-winio/issues/272
+		goleak.IgnoreAnyFunction("github.com/Microsoft/go-winio.getQueuedCompletionStatus"),
+		// False positive, from init in cloud.google.com/go/pubsub and filebeat/input/gcppubsub.
+		// See https://github.com/googleapis/google-cloud-go/issues/10948
+		// and https://github.com/census-instrumentation/opencensus-go/issues/1191
+		goleak.IgnoreAnyFunction("go.opencensus.io/stats/view.(*worker).start"),
+		// On Linux, mainly arm64, some HTTP transport goroutines are leaked while still dialing.
+		goleak.IgnoreAnyFunction("net.(*netFD).connect"),
+		goleak.IgnoreAnyFunction("net.(*netFD).connect.func2"),
+		goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"),
+	}
+
+	goleak.VerifyNone(t, skipped...)
+}
+
+type DummyConsumer struct {
+	context.Context
+	ConsumeError error
+}
+
+func (d *DummyConsumer) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
+	return d.ConsumeError
+}
+
+func (d *DummyConsumer) Capabilities() consumer.Capabilities {
+	return consumer.Capabilities{}
+}
+
+type mockHost struct {
+	component.Host
+	diagExt *mockDiagExtension
+}
+
+type hook struct {
+	description string
+	filename    string
+	contentType string
+	hook        func() []byte
+}
+
+type mockDiagExtension struct {
+	component.Component
+	hooks map[string][]hook
+}
+
+func (m *mockHost) GetExtensions() map[component.ID]component.Component {
+	return map[component.ID]component.Component{
+		component.MustNewIDWithName("mockdiagextension", ""): m.diagExt,
+	}
+}
+
+func (m *mockDiagExtension) RegisterDiagnosticHook(name string, description string, filename string, contentType string, fn func() []byte) {
+	m.hooks[name] = append(m.hooks[name], hook{
+		description: description,
+		filename:    filename,
+		contentType: contentType,
+		hook:        fn,
+	})
+}
+
+func TestReceiverHook(t *testing.T, config component.Config, factory receiver.Factory, set receiver.Settings, expectedHooks int) {
+	logs, err := factory.CreateLogs(context.Background(), set, config, consumertest.NewNop())
+	diagExt := &mockDiagExtension{
+		hooks: make(map[string][]hook),
+	}
+	require.NoError(t, err)
+	require.NotNil(t, logs)
+	require.NoError(t, logs.Start(context.Background(), &mockHost{diagExt: diagExt}))
+
+	defer func() {
+		require.NoError(t, logs.Shutdown(context.Background()))
+	}()
+
+	assert.EventuallyWithT(t, func(c *assert.CollectT) {
+		assert.Contains(c, diagExt.hooks, set.ID.String())
+		assert.Len(c, diagExt.hooks[set.ID.String()], expectedHooks)
+	}, 5*time.Second, 100*time.Millisecond, "expected hook to be registered")
+}

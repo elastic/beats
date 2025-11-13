@@ -18,6 +18,8 @@
 package statestore
 
 import (
+	"fmt"
+
 	"github.com/stretchr/testify/mock"
 
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
@@ -39,7 +41,11 @@ func (m *mockRegistry) Access(name string) (backend.Store, error) {
 
 	var store backend.Store
 	if ifc := args.Get(0); ifc != nil {
-		store = ifc.(backend.Store)
+		var ok bool
+		store, ok = ifc.(backend.Store)
+		if !ok {
+			return store, fmt.Errorf("unexpected type: %T", store)
+		}
 	}
 
 	return store, args.Error(1)
@@ -86,4 +92,7 @@ func (m *mockStore) Set(key string, from interface{}) error {
 func (m *mockStore) Each(fn func(string, backend.ValueDecoder) (bool, error)) error {
 	args := m.Called(fn)
 	return args.Error(0)
+}
+
+func (m *mockStore) SetID(_ string) {
 }

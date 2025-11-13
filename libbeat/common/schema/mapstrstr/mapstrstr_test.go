@@ -18,6 +18,7 @@
 package mapstrstr
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -124,9 +125,10 @@ func TestKeyInErrors(t *testing.T) {
 		}
 
 		_, errs := c.Schema.ApplyTo(mapstr.M{}, c.Input)
-		assert.Error(t, errs.Err(), c.Description)
+		assert.NotEmpty(t, errs, c.Description)
 		if assert.Equal(t, 1, len(errs), c.Description) {
-			keyErr, ok := errs[0].(s.KeyError)
+			var keyErr s.KeyError
+			ok := errors.As(errs[0], &keyErr)
 			if assert.True(t, ok, c.Description) {
 				assert.Equal(t, c.Expected, keyErr.Key(), c.Description)
 			}

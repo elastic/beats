@@ -23,6 +23,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
@@ -38,6 +39,9 @@ var includeMatchesWarnOnce sync.Once
 
 // Config stores the options of a journald input.
 type config struct {
+	// ID is the input ID, each instance must have a unique ID
+	ID string `config:"id"`
+
 	// Paths stores the paths to the journal files to be read.
 	Paths []string `config:"paths"`
 
@@ -63,8 +67,15 @@ type config struct {
 	// SaveRemoteHostname defines if the original source of the entry needs to be saved.
 	SaveRemoteHostname bool `config:"save_remote_hostname"`
 
+	// Facility is a list of facilities to filter journal messages
+	Facilities []int `config:"facilities"`
+
 	// Parsers configuration
 	Parsers parser.Config `config:",inline"`
+
+	// Allow ingesting log entries interleaved from all available journals,
+	// including remote ones.
+	Merge bool `config:"merge"`
 }
 
 // bwcIncludeMatches is a wrapper that accepts include_matches configuration
@@ -82,8 +93,9 @@ func (im *bwcIncludeMatches) Unpack(c *ucfg.Config) error {
 		im.Matches = append(im.Matches, matches...)
 
 		includeMatchesWarnOnce.Do(func() {
-			cfgwarn.Deprecate("", "Please migrate your journald input's "+
-				"include_matches config to the new more expressive format.")
+			// TODO: use a local logger here
+			logp.NewLogger("journald").Warn(cfgwarn.Deprecate("", "Please migrate your journald input's "+
+				"include_matches config to the new more expressive format."))
 		})
 		return nil
 	}

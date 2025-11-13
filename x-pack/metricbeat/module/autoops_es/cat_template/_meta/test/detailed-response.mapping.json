@@ -1,0 +1,40 @@
+{
+    "order": 789,
+    "version": 123456,
+    "index_patterns": ["a", "b", "c", "d*"],
+    "settings": {
+        "index": {
+            "lifecycle": {
+                "name": "operator",
+                "rollover_alias": "rolloveralias"
+            }
+        }
+    },
+    "mappings": {
+        "dynamic": false,
+        "properties": {
+            "@timestamp": {
+                "type": "date"
+            },
+            "message": {
+                "type": "text",
+                "fields": {
+                    "raw": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "metadata": {
+                "properties": {
+                    "count": {
+                        "type": "long"
+                    }
+                }
+            }
+        }
+    },
+    "aliases": {
+        "alias1": {},
+        "alias2": {}
+    }
+}

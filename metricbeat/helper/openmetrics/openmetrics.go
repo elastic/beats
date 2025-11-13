@@ -98,10 +98,6 @@ func (p *openmetrics) GetFamilies() ([]*prometheus.MetricFamily, error) {
 	}
 
 	contentType := prometheus.GetContentType(resp.Header)
-	if contentType == "" {
-		return nil, fmt.Errorf("Invalid format for response of response")
-	}
-
 	appendTime := time.Now().Round(0)
 	b, err := io.ReadAll(reader)
 	if err != nil {

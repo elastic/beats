@@ -19,13 +19,18 @@ package processors
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/conditions"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -41,7 +46,7 @@ func (c *countFilter) Run(e *beat.Event) (*beat.Event, error) {
 func (c *countFilter) String() string { return "count" }
 
 func TestWhenProcessor(t *testing.T) {
-	type config map[string]interface{}
+	type config map[string]any
 
 	tests := []struct {
 		title    string
@@ -91,9 +96,9 @@ func TestWhenProcessor(t *testing.T) {
 		}
 
 		cf := &countFilter{}
-		filter, err := NewConditional(func(_ *conf.C) (beat.Processor, error) {
+		filter, err := NewConditional(func(_ *conf.C, log *logp.Logger) (beat.Processor, error) {
 			return cf, nil
-		})(config)
+		})(config, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Error(err)
 			continue
@@ -116,9 +121,9 @@ func TestWhenProcessor(t *testing.T) {
 
 func TestConditionRuleInitErrorPropagates(t *testing.T) {
 	testErr := errors.New("test")
-	filter, err := NewConditional(func(_ *conf.C) (beat.Processor, error) {
+	filter, err := NewConditional(func(_ *conf.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, testErr
-	})(conf.NewConfig())
+	})(conf.NewConfig(), logptest.NewTestingLogger(t, ""))
 
 	assert.Equal(t, testErr, err)
 	assert.Nil(t, filter)
@@ -132,7 +137,6 @@ type testCase struct {
 
 func testProcessors(t *testing.T, cases map[string]testCase) {
 	for name, test := range cases {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			c, err := conf.NewConfigWithYAML([]byte(test.cfg), "test "+name)
 			if err != nil {
@@ -144,7 +148,7 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 				t.Fatal(err)
 			}
 
-			processor, err := New(pluginConfig)
+			processor, err := New(pluginConfig, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -230,4 +234,79 @@ func TestIfElseThenProcessor(t *testing.T) {
 			cfg:   ifThenElseIf,
 		},
 	})
+}
+
+var ErrProcessorClose = fmt.Errorf("error processor close error")
+
+type errorProcessor struct{}
+
+func (c *errorProcessor) Run(e *beat.Event) (*beat.Event, error) {
+	return e, nil
+}
+func (c *errorProcessor) String() string { return "error_processor" }
+func (c *errorProcessor) Close() error {
+	return ErrProcessorClose
+}
+
+func TestConditionRuleClose(t *testing.T) {
+	const whenCondition = `
+contains.a: b
+`
+	c, err := conf.NewConfigWithYAML([]byte(whenCondition), "when config")
+	require.NoError(t, err)
+
+	condConfig := conditions.Config{}
+	err = c.Unpack(&condConfig)
+	require.NoError(t, err)
+
+	ep := &errorProcessor{}
+	condRule, err := NewConditionRule(condConfig, ep, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	event := &beat.Event{
+		Timestamp: time.Now(),
+		Fields:    mapstr.M{"a": "b"},
+	}
+	result, err := condRule.Run(event)
+	require.NoError(t, err)
+	require.Equal(t, event, result)
+	err = Close(condRule)
+	require.ErrorIs(t, err, ErrProcessorClose)
+}
+
+func TestIfThenElseProcessorCloseNil(t *testing.T) {
+	// Use add_process_metadata processor which implements Closer, so we get a ClosingIfThenElseProcessor
+	const cfg = `
+if:
+  equals.test: value
+then:
+  - add_process_metadata:
+      match_pids:
+        - process.pid
+`
+	c, err := conf.NewConfigWithYAML([]byte(cfg), "if-then config")
+	require.NoError(t, err)
+
+	beatProcessor, err := NewIfElseThenProcessor(c, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	// Verify we got a ClosingIfThenElseProcessor
+	closingProc := requireAs[*ClosingIfThenElseProcessor](t, beatProcessor)
+	assert.Nil(t, closingProc.els, "els should be nil when no else clause is provided")
+	assert.Implements(t, (*Closer)(nil), beatProcessor)
+
+	err = closingProc.Close()
+	require.NoError(t, err)
+}
+
+// requireAs performs a type assertion and requires it to succeed.
+func requireAs[T any](t *testing.T, v any) T {
+	t.Helper()
+	expected := *new(T)
+	require.IsType(t, expected, v)
+
+	result, ok := v.(T)
+	require.True(t, ok, "sanity check: expected %T, got %T", expected, v)
+
+	return result
 }

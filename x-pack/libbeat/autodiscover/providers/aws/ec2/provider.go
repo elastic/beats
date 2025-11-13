@@ -44,8 +44,9 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *conf.C,
 	keystore keystore.Keystore,
+	log *logp.Logger,
 ) (autodiscover.Provider, error) {
-	cfgwarn.Experimental("aws_ec2 autodiscover is experimental")
+	log.Warn(cfgwarn.Experimental("aws_ec2 autodiscover is experimental"))
 
 	config := awsauto.DefaultConfig()
 	err := c.Unpack(&config)
@@ -59,7 +60,7 @@ func AutodiscoverBuilder(
 			SecretAccessKey: config.AWSConfig.SecretAccessKey,
 			SessionToken:    config.AWSConfig.SessionToken,
 			ProfileName:     config.AWSConfig.ProfileName,
-		})
+		}, log)
 
 	// Construct MetricSet with a full regions list if there is no region specified.
 	if config.Regions == nil {
@@ -92,13 +93,19 @@ func AutodiscoverBuilder(
 		}))
 	}
 
-	return internalBuilder(uuid, bus, config, newAPIFetcher(clients), keystore)
+	return internalBuilder(uuid, bus, config, newAPIFetcher(clients, log), keystore, log)
 }
 
 // internalBuilder is mainly intended for testing via mocks and stubs.
 // it can be configured to use a fetcher that doesn't actually hit the AWS API.
-func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetcher fetcher, keystore keystore.Keystore) (*Provider, error) {
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
+func internalBuilder(
+	uuid uuid.UUID,
+	bus bus.Bus,
+	config *awsauto.Config,
+	fetcher fetcher,
+	keystore keystore.Keystore,
+	log *logp.Logger) (*Provider, error) {
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil, log)
 	if err != nil {
 		return nil, err
 	}
@@ -115,6 +122,7 @@ func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetche
 		config.Period,
 		p.onWatcherStart,
 		p.onWatcherStop,
+		log,
 	)
 
 	return p, nil

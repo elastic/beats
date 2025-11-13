@@ -57,7 +57,7 @@ class Test(BaseTest):
                 }
             }]
         )
-        proc = self.start_beat(extra_args=['-strict.perms=false'])
+        proc = self.start_beat(extra_args=['--strict.perms=false'])
         # auditbeat adds an extra rule to ignore itself
         self.wait_log_contains('Successfully added {0} of {0} audit rules.'.format(len(rules) + 1),
                                max_timeout=30)

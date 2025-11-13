@@ -26,9 +26,9 @@ import (
 	"net"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -44,7 +44,7 @@ type Listener struct {
 	wg              sync.WaitGroup
 	log             *logp.Logger
 	ctx             ctxtool.CancelContext
-	clientsCount    atomic.Int
+	clientsCount    atomic.Int64
 	handlerFactory  HandlerFactory
 	listenerFactory ListenerFactory
 }
@@ -90,11 +90,11 @@ func (f *FramingType) Unpack(value string) error {
 }
 
 // NewListener creates a new Listener
-func NewListener(family inputsource.Family, location string, handlerFactory HandlerFactory, listenerFactory ListenerFactory, config *ListenerConfig) *Listener {
+func NewListener(family inputsource.Family, location string, handlerFactory HandlerFactory, listenerFactory ListenerFactory, config *ListenerConfig, logger *logp.Logger) *Listener {
 	return &Listener{
 		config:          config,
 		family:          family,
-		log:             logp.NewLogger(string(family)).With("address", location),
+		log:             logger.Named(string(family)).With("address", location),
 		handlerFactory:  handlerFactory,
 		listenerFactory: listenerFactory,
 	}
@@ -190,11 +190,11 @@ func (l *Listener) handleConnection(conn net.Conn) {
 	defer cancel()
 
 	// Track number of clients.
-	l.clientsCount.Inc()
-	log.Debugw("New client connection.", "active_clients", l.clientsCount.Load())
+	l.clientsCount.Add(1)
+	log.Debugw("New client connection", "active_clients", l.clientsCount.Load())
 	defer func() {
-		l.clientsCount.Dec()
-		log.Debugw("Client disconnected.", "active_clients", l.clientsCount.Load())
+		l.clientsCount.Add(-1)
+		log.Debugw("Client disconnected", "active_clients", l.clientsCount.Load())
 	}()
 
 	handler := l.handlerFactory(*l.config)

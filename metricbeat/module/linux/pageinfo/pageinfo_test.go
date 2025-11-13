@@ -27,7 +27,7 @@ import (
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -37,7 +37,7 @@ func TestFileRead(t *testing.T) {
 
 	reader := bufio.NewReader(fd)
 
-	zones, err := readPageFile(logp.L(), reader)
+	zones, err := readPageFile(logptest.NewTestingLogger(t, ""), reader)
 	require.NoError(t, err)
 	require.Equal(t, int64(100000), zones.Zones[0].Normal["Movable"][1])
 }

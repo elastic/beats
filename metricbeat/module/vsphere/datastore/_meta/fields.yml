@@ -51,6 +51,10 @@
       type: keyword
       description: >
         List of all the host names.
+    - name: id
+      type: keyword
+      description: >
+        Unique datastore ID.
     - name: name
       type: keyword
       description: >
@@ -82,4 +86,3 @@
       description: >
         Rate of writing data to the datastore.
       format: bytes
-

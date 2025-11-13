@@ -18,10 +18,11 @@
 package memqueue
 
 import (
+	"context"
+	"encoding/binary"
 	"flag"
 	"fmt"
-	"math"
-	"math/rand"
+	"math/rand/v2"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -32,6 +33,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var seed int64
@@ -44,10 +47,13 @@ func TestProduceConsumer(t *testing.T) {
 	maxEvents := 1024
 	minEvents := 32
 
-	randGen := rand.New(rand.NewSource(seed))
-	events := randGen.Intn(maxEvents-minEvents) + minEvents
-	batchSize := randGen.Intn(events-8) + 4
-	bufferSize := randGen.Intn(batchSize*2) + 4
+	var seedBytes [32]byte
+	_, err := binary.Encode(seedBytes[:], binary.NativeEndian, seed)
+	require.NoError(t, err)
+	randGen := rand.New(rand.NewChaCha8(seedBytes))
+	events := randGen.IntN(maxEvents-minEvents) + minEvents
+	batchSize := randGen.IntN(events-8) + 4
+	bufferSize := randGen.IntN(batchSize*2) + 4
 
 	// events := 4
 	// batchSize := 1
@@ -86,7 +92,7 @@ func TestProduceConsumer(t *testing.T) {
 // than 2 events to it, p.Publish will block, once we call q.Close,
 // we ensure the 3rd event was not successfully published.
 func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
-	q := NewQueue(nil, nil,
+	q := NewQueue(logp.NewNopLogger(), nil,
 		Settings{
 			Events:        2, // Queue size
 			MaxGetRequest: 1, // make sure the queue won't buffer events
@@ -139,7 +145,7 @@ func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
 	// has successfully sent a request to the queue, it must wait for
 	// the response unless the queue shuts down, otherwise the pipeline
 	// event totals will be wrong.
-	q.Close()
+	q.Close(false)
 
 	require.Eventually(
 		t,
@@ -156,7 +162,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 
 	var activeEvents atomic.Int64
 
-	q := NewQueue(nil, nil,
+	q := NewQueue(logp.NewNopLogger(), nil,
 		Settings{
 			Events:        3, // Queue size
 			MaxGetRequest: 2,
@@ -223,13 +229,48 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	// to unblock any helpers and verify that the final active event
 	// count isn't negative.
 	time.Sleep(10 * time.Millisecond)
-	q.Close()
+	q.Close(false)
 	assert.False(t, activeEvents.Load() < 0, "active event count should never be negative")
 }
 
+func TestDoubleClose(t *testing.T) {
+	q := NewQueue(logp.NewNopLogger(), nil,
+		Settings{
+			Events:        3, // Queue size
+			MaxGetRequest: 3,
+			FlushTimeout:  10 * time.Millisecond,
+		}, 1, nil)
+
+	p := q.Producer(queue.ProducerConfig{})
+
+	// Write some events to the queue synchronously
+	for i := 0; i < 3; i++ {
+		event := i
+		_, ok := p.Publish(event)
+		assert.True(t, ok)
+	}
+
+	// Keep writing to the queue as long as we're successful
+	var wgProducer sync.WaitGroup
+	wgProducer.Add(1)
+	go func() {
+		queueOpen := true
+		for queueOpen {
+			_, queueOpen = p.Publish(0)
+		}
+		wgProducer.Done()
+	}()
+
+	// Close the queue without force, then with it enabled
+	// Both should succeed
+	require.NoError(t, q.Close(false))
+	require.NoError(t, q.Close(true))
+	<-q.Done()
+}
+
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
-	return func(_ *testing.T) queue.Queue {
-		return NewQueue(nil, nil, Settings{
+	return func(t *testing.T) queue.Queue {
+		return NewQueue(logptest.NewTestingLogger(t, ""), nil, Settings{
 			Events:        sz,
 			MaxGetRequest: minEvents,
 			FlushTimeout:  flushTimeout,
@@ -237,28 +278,167 @@ func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.Queu
 	}
 }
 
-func TestAdjustInputQueueSize(t *testing.T) {
-	t.Run("zero yields default value (main queue size=0)", func(t *testing.T) {
-		assert.Equal(t, minInputQueueSize, AdjustInputQueueSize(0, 0))
-	})
-	t.Run("zero yields default value (main queue size=10)", func(t *testing.T) {
-		assert.Equal(t, minInputQueueSize, AdjustInputQueueSize(0, 10))
-	})
-	t.Run("can't go below min", func(t *testing.T) {
-		assert.Equal(t, minInputQueueSize, AdjustInputQueueSize(1, 0))
-	})
-	t.Run("can set any value within bounds", func(t *testing.T) {
-		for q, mainQueue := minInputQueueSize+1, 4096; q < int(float64(mainQueue)*maxInputQueueSizeRatio); q += 10 {
-			assert.Equal(t, q, AdjustInputQueueSize(q, mainQueue))
+func TestBatchFreeEntries(t *testing.T) {
+	const queueSize = 10
+	const batchSize = 5
+	// 1. Add 10 events to the queue, request two batches with 5 events each
+	// 2. Make sure the queue buffer has 10 non-nil events
+	// 3. Call FreeEntries on the second batch
+	// 4. Make sure only events 6-10 are nil
+	// 5. Call FreeEntries on the first batch
+	// 6. Make sure all events are nil
+	testQueue := NewQueue(logp.NewNopLogger(), nil, Settings{Events: queueSize, MaxGetRequest: batchSize, FlushTimeout: time.Second}, 0, nil)
+	producer := testQueue.Producer(queue.ProducerConfig{})
+	for i := 0; i < queueSize; i++ {
+		_, ok := producer.Publish(i)
+		require.True(t, ok, "Queue publish must succeed")
+	}
+	batch1, err := testQueue.Get(batchSize)
+	require.NoError(t, err, "Queue read must succeed")
+	require.Equal(t, batchSize, batch1.Count(), "Returned batch size must match request")
+	batch2, err := testQueue.Get(batchSize)
+	require.NoError(t, err, "Queue read must succeed")
+	require.Equal(t, batchSize, batch2.Count(), "Returned batch size must match request")
+	// Slight concurrency subtlety: we check events are non-nil after the queue
+	// reads, since if we do it before we have no way to be sure the insert
+	// has been completed.
+	for i := 0; i < queueSize; i++ {
+		require.NotNil(t, testQueue.buf[i].event, "All queue events must be non-nil")
+	}
+	batch2.FreeEntries()
+	for i := 0; i < batchSize; i++ {
+		require.NotNilf(t, testQueue.buf[i].event, "Queue index %v: batch 1's events should be unaffected by calling FreeEntries on Batch 2", i)
+		require.Nilf(t, testQueue.buf[batchSize+i].event, "Queue index %v: batch 2's events should be nil after FreeEntries", batchSize+i)
+	}
+	batch1.FreeEntries()
+	for i := 0; i < queueSize; i++ {
+		require.Nilf(t, testQueue.buf[i].event, "Queue index %v: all events should be nil after calling FreeEntries on both batches")
+	}
+}
+
+func TestProducerShutdown(t *testing.T) {
+	// Test that the number of acknowledgment callbacks exactly matches the
+	// number of published events when many goroutines are publishing during
+	// queue shutdown.
+	//
+	// The numbers here (queue size, number of publisher workers, etc.) are
+	// kind of magic since there's no deterministic way to verify this, but they
+	// were chosen so that, when there _was_ a race in the queue shutdown that
+	// could send an extra acknowledgment
+	// (https://github.com/elastic/beats/issues/47246), this test failed about
+	// 90% of the time.
+	const queueSize = 1000
+	const publishWorkers = 50
+	var ackedCount atomic.Int64
+	var publishedCount atomic.Int64
+	testQueue := NewQueue(
+		logp.NewNopLogger(),
+		nil,
+		Settings{
+			Events:        queueSize,
+			MaxGetRequest: queueSize,
+			FlushTimeout:  time.Second},
+		0,
+		nil)
+
+	var wg sync.WaitGroup
+	// Start workers to continuously publish events to the queue
+	publishWorker := func() {
+		defer wg.Done()
+		// Continuously publish events until Publish returns false indicating queue
+		// shutdown.
+		producer := testQueue.Producer(
+			queue.ProducerConfig{
+				ACK: func(count int) { ackedCount.Add(int64(count)) },
+			})
+		for {
+			_, published := producer.Publish(0)
+			if published {
+				publishedCount.Add(1)
+			} else {
+				return
+			}
 		}
-	})
-	t.Run("can set any value if no upper bound", func(t *testing.T) {
-		for q := minInputQueueSize + 1; q < math.MaxInt32; q *= 2 {
-			assert.Equal(t, q, AdjustInputQueueSize(q, 0))
+	}
+	for range publishWorkers {
+		wg.Add(1)
+		go publishWorker()
+	}
+	// Start a reader to continuously drain the queue and acknowledge the events
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		// Continuously read and acknowledge events from the queue
+		for {
+			batch, err := testQueue.Get(queueSize)
+			if err == nil {
+				batch.Done()
+			} else {
+				return
+			}
 		}
-	})
-	t.Run("can't go above upper bound", func(t *testing.T) {
-		mainQueue := 4096
-		assert.Equal(t, int(float64(mainQueue)*maxInputQueueSizeRatio), AdjustInputQueueSize(mainQueue, mainQueue))
-	})
+	}()
+
+	// Wait for the queue to go through at least one full rotation
+	require.Eventually(
+		t,
+		func() bool { return publishedCount.Load() > queueSize },
+		time.Second,
+		time.Millisecond,
+		"events are not flowing through the queue")
+
+	// Trigger queue shutdown
+	testQueue.Close(false)
+
+	// Wait for queue context to finish
+	select {
+	case <-testQueue.Done():
+	case <-time.After(5 * time.Second):
+		require.Fail(t, "queue never shut down")
+	}
+
+	// Wait for helper routines to finish
+	wg.Wait()
+
+	// Wait for the ack loop to finish processing callbacks
+	testQueue.wg.Wait()
+
+	require.Equal(t, publishedCount.Load(), ackedCount.Load(), "published and acknowledged event counts should match")
+}
+
+func BenchmarkProducerThroughput(b *testing.B) {
+	const queueSize = 10000
+	const publishWorkers = 10
+	testQueue := NewQueue(
+		logp.NewNopLogger(),
+		nil,
+		Settings{
+			Events:        queueSize,
+			MaxGetRequest: queueSize,
+			FlushTimeout:  time.Second},
+		0,
+		nil)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	publishWorker := func() {
+		producer := testQueue.Producer(queue.ProducerConfig{})
+		for ctx.Err() == nil {
+			producer.Publish(0)
+		}
+	}
+	for range publishWorkers {
+		go publishWorker()
+	}
+	for b.Loop() {
+		// With a flush timeout of a second, we can confidently expect we'll get
+		// a full batch each time, so each iteration is measuring the time for the
+		// publish workers to fill the queue.
+		batch, err := testQueue.Get(queueSize)
+		if err != nil {
+			b.Fatal("Fetching queue batch should succeed")
+		}
+		batch.Done()
+	}
+	cancel()
+	testQueue.Close(true)
 }

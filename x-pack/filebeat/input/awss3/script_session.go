@@ -36,9 +36,9 @@ type session struct {
 	timeout   time.Duration
 }
 
-func newSession(p *goja.Program, conf scriptConfig, test bool) (*session, error) {
+func newSession(p *goja.Program, conf scriptConfig, test bool, logger *logp.Logger) (*session, error) {
 	// Create a logger
-	logger := logp.NewLogger(logName)
+	logger = logger.Named(logName)
 
 	// Setup JS runtime.
 	s := &session{
@@ -180,15 +180,15 @@ type sessionPool struct {
 	C   chan *session
 }
 
-func newSessionPool(p *goja.Program, c scriptConfig) (*sessionPool, error) {
-	s, err := newSession(p, c, true)
+func newSessionPool(p *goja.Program, c scriptConfig, logger *logp.Logger) (*sessionPool, error) {
+	s, err := newSession(p, c, true, logger)
 	if err != nil {
 		return nil, err
 	}
 
 	pool := sessionPool{
 		New: func() *session {
-			s, _ := newSession(p, c, false)
+			s, _ := newSession(p, c, false, logger)
 			return s
 		},
 		C: make(chan *session, c.MaxCachedSessions),

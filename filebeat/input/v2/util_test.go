@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -37,8 +38,8 @@ type fakeInput struct {
 	OnRun  func(Context, beat.PipelineConnector) error
 }
 
-func makeConfigFakeInput(prototype fakeInput) func(*conf.C) (Input, error) {
-	return func(cfg *conf.C) (Input, error) {
+func makeConfigFakeInput(prototype fakeInput) func(*conf.C, *logp.Logger) (Input, error) {
+	return func(cfg *conf.C, _ *logp.Logger) (Input, error) {
 		tmp := prototype
 		return &tmp, nil
 	}

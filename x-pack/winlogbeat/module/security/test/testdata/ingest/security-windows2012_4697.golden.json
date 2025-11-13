@@ -26,7 +26,7 @@
     "log": {
       "level": "information"
     },
-    "message": "A service was installed in the system.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x4C323\n\nService Information:\n\tService Name: \t\twinlogbeat\n\tService File Name:\t\"C:\\Program Files\\Winlogbeat\\winlogbeat.exe\" -c \"C:\\Program Files\\Winlogbeat\\winlogbeat.yml\" -path.home \"C:\\Program Files\\Winlogbeat\" -path.data \"C:\\ProgramData\\winlogbeat\" -path.logs \"C:\\ProgramData\\winlogbeat\\logs\" -E logging.files.redirect_stderr=true\n\tService Type: \t\t0x10\n\tService Start Type:\t2\n\tService Account: \t\tLocalSystem",
+    "message": "A service was installed in the system.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x4c323\n\nService Information:\n\tService Name: \t\twinlogbeat\n\tService File Name:\t\"C:\\Program Files\\Winlogbeat\\winlogbeat.exe\" -c \"C:\\Program Files\\Winlogbeat\\winlogbeat.yml\" -path.home \"C:\\Program Files\\Winlogbeat\" -path.data \"C:\\ProgramData\\winlogbeat\" -path.logs \"C:\\ProgramData\\winlogbeat\\logs\" -E logging.files.redirect_stderr=true\n\tService Type: \t\t0x10\n\tService Start Type:\t2\n\tService Account: \t\tLocalSystem",
     "related": {
       "user": [
         "Administrator"
@@ -42,8 +42,7 @@
       "name": "Administrator"
     },
     "winlog": {
-      "activity_id": "{74b64d41-08ce-0000-454f-b674ce08d601}",
-      "api": "wineventlog",
+      "activity_id": "{74B64D41-08CE-0000-454F-B674CE08D601}",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
       "event_data": {
@@ -71,7 +70,7 @@
           "id": 2492
         }
       },
-      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": "90108",
       "task": "Security System Extension"

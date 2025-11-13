@@ -12,11 +12,9 @@ import (
 	"cloud.google.com/go/storage"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func fetchStorageClient(ctx context.Context, cfg config, log *logp.Logger) (*storage.Client, error) {
+func fetchStorageClient(ctx context.Context, cfg config) (*storage.Client, error) {
 	if cfg.AlternativeHost != "" {
 		var h *url.URL
 		h, err := url.Parse(cfg.AlternativeHost)

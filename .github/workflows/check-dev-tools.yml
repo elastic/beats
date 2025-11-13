@@ -17,10 +17,14 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-go@v5
+    - uses: actions/checkout@v5
+    - uses: actions/setup-go@v6
       with:
         go-version-file: .go-version
+    - uses: actions/setup-python@v6
+      with:
+        cache: "pip"
+        python-version-file: .python-version
     - name: Run check/update
       run: |
         go install github.com/magefile/mage

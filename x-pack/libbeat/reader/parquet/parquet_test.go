@@ -14,13 +14,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/apache/arrow/go/v14/arrow"
-	"github.com/apache/arrow/go/v14/arrow/array"
-	"github.com/apache/arrow/go/v14/arrow/memory"
-	"github.com/apache/arrow/go/v14/parquet/pqarrow"
+	"github.com/apache/arrow-go/v18/arrow"
+	"github.com/apache/arrow-go/v18/arrow/array"
+	"github.com/apache/arrow-go/v18/arrow/memory"
+	"github.com/apache/arrow-go/v18/parquet/pqarrow"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // all test files are read from/stored within the "testdata" directory
@@ -85,7 +86,7 @@ func TestParquetWithRandomData(t *testing.T) {
 
 // readAndValidateParquetFile reads the parquet file and validates the data
 func readAndValidateParquetFile(t *testing.T, cfg *Config, file *os.File, data map[string]bool) int {
-	sReader, err := NewBufferedReader(file, cfg)
+	sReader, err := NewBufferedReader(file, cfg, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("failed to init stream reader: %v", err)
 	}
@@ -196,7 +197,6 @@ func TestParquetWithFiles(t *testing.T) {
 	for _, tc := range testCases {
 		name := fmt.Sprintf("Test parquet files with source file=%s, and target comparison file=%s", tc.parquetFile, tc.jsonFile)
 		t.Run(name, func(t *testing.T) {
-
 			parquetFile, err := os.Open(filepath.Join(testDataPath, tc.parquetFile))
 			if err != nil {
 				t.Fatalf("Failed to open parquet test file: %v", err)
@@ -235,7 +235,7 @@ func readJSONFromFile(t *testing.T, filepath string) (map[int]string, int) {
 
 // readAndCompareParquetFile reads the parquet file and compares the data with the input data
 func readAndCompareParquetFile(t *testing.T, cfg *Config, file *os.File, data map[int]string, rows int, maxRowsToCompare int) {
-	sReader, err := NewBufferedReader(file, cfg)
+	sReader, err := NewBufferedReader(file, cfg, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("failed to init stream reader: %v", err)
 	}

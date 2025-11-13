@@ -7,7 +7,6 @@ package gcs
 import (
 	"bufio"
 	"bytes"
-	"compress/gzip"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -22,8 +21,12 @@ import (
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type job struct {
@@ -45,6 +48,10 @@ type job struct {
 	src *Source
 	// publisher is used to publish a beat event to the output stream
 	publisher cursor.Publisher
+	// job status reporter
+	status status.StatusReporter
+	// metrics used to track the errors and success of jobs
+	metrics *inputMetrics
 	// custom logger
 	log *logp.Logger
 	// flag used to denote if this object has previously failed without being processed at all.
@@ -53,8 +60,12 @@ type job struct {
 
 // newJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
 func newJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, objectURI string,
-	state *state, src *Source, publisher cursor.Publisher, log *logp.Logger, isFailed bool,
+	state *state, src *Source, publisher cursor.Publisher, stat status.StatusReporter, metrics *inputMetrics, log *logp.Logger, isFailed bool,
 ) *job {
+	if metrics == nil {
+		// metrics are optional, initialize a stub if not provided
+		metrics = newInputMetrics(monitoring.NewRegistry(), log)
+	}
 	return &job{
 		bucket:    bucket,
 		object:    object,
@@ -63,6 +74,8 @@ func newJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, objectURI
 		state:     state,
 		src:       src,
 		publisher: publisher,
+		status:    stat,
+		metrics:   metrics,
 		log:       log,
 		isFailed:  isFailed,
 	}
@@ -78,6 +91,17 @@ func gcsObjectHash(src *Source, object *storage.ObjectAttrs) string {
 
 func (j *job) do(ctx context.Context, id string) {
 	var fields mapstr.M
+	// metrics & logging
+	j.log.Debug("begin gcs object processing.")
+	j.metrics.gcsObjectsRequestedTotal.Inc()
+	j.metrics.gcsObjectsInflight.Inc()
+	start := time.Now()
+	defer func() {
+		elapsed := time.Since(start)
+		j.metrics.gcsObjectsInflight.Dec()
+		j.metrics.gcsObjectProcessingTime.Update(elapsed.Nanoseconds())
+		j.log.Debugw("end gcs object processing.", "elapsed_time_ns", elapsed)
+	}()
 
 	if allowedContentTypes[j.object.ContentType] {
 		if j.object.ContentType == gzType || j.object.ContentEncoding == encodingGzip {
@@ -85,13 +109,19 @@ func (j *job) do(ctx context.Context, id string) {
 		}
 		err := j.processAndPublishData(ctx, id)
 		if err != nil {
-			j.state.updateFailedJobs(j.object.Name)
+			j.state.updateFailedJobs(j.object.Name, j.metrics)
 			j.log.Errorw("job encountered an error while publishing data and has been added to a failed jobs list", "gcs.jobId", id, "error", err)
+			j.metrics.gcsFailedJobsTotal.Inc()
+			j.metrics.errorsTotal.Inc()
 			return
 		}
+		j.metrics.gcsObjectsPublishedTotal.Inc()
+		//nolint:gosec // object size cannot be negative hence this conversion is safe
+		j.metrics.gcsBytesProcessedTotal.Add(uint64(j.object.Size))
 
 	} else {
 		err := fmt.Errorf("job with jobId %s encountered an error: content-type %s not supported", id, j.object.ContentType)
+		j.status.UpdateStatus(status.Degraded, fmt.Sprintf("found unsupported content-type: %s", j.object.ContentType))
 		fields = mapstr.M{
 			"message": err.Error(),
 		}
@@ -101,9 +131,12 @@ func (j *job) do(ctx context.Context, id string) {
 		}
 		event.SetID(objectID(j.hash, 0))
 		// locks while data is being saved and published to avoid concurrent map read/writes
-		cp, done := j.state.saveForTx(j.object.Name, j.object.Updated)
-		if err := j.publisher.Publish(event, cp); err != nil {
+		cp, done := j.state.saveForTx(j.object.Name, j.object.Updated, j.metrics)
+		err = j.publisher.Publish(event, cp)
+		if err != nil {
 			j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
+			j.status.UpdateStatus(status.Degraded, "failed to publish unsupported content-type event: "+err.Error())
+			j.metrics.errorsTotal.Inc()
 		}
 		// unlocks after data is saved and published
 		done()
@@ -123,34 +156,111 @@ func (j *job) Timestamp() time.Time {
 }
 
 func (j *job) processAndPublishData(ctx context.Context, id string) error {
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, j.src.BucketTimeOut)
-	defer cancel()
 	obj := j.bucket.Object(j.object.Name)
-	reader, err := obj.NewReader(ctxWithTimeout)
+	reader, err := obj.NewReader(ctx)
 	if err != nil {
+		j.status.UpdateStatus(status.Degraded, "could not open object to read: "+err.Error())
 		return fmt.Errorf("failed to open reader for object: %s, with error: %w", j.object.Name, err)
 	}
 	defer func() {
 		err = reader.Close()
 		if err != nil {
+			j.metrics.errorsTotal.Inc()
 			j.log.Errorw("failed to close reader for object", "objectName", j.object.Name, "error", err)
 		}
 	}()
 
-	err = j.readJsonAndPublish(ctx, reader, id)
+	// update the source lag time metric
+	j.metrics.sourceLagTime.Update(time.Since(j.object.Updated).Nanoseconds())
+
+	// calculate number of decode errors
+	if err := j.decode(ctx, reader, id); err != nil {
+		j.metrics.decodeErrorsTotal.Inc()
+		return fmt.Errorf("failed to decode object: %s, with error: %w", j.object.Name, err)
+	}
+
+	return nil
+}
+
+func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
+	r, err := reader.AddGzipDecoderIfNeeded(bufio.NewReader(r))
 	if err != nil {
-		return fmt.Errorf("failed to read data from object: %s, with error: %w", j.object.Name, err)
+		return fmt.Errorf("failed to add gzip decoder to object: %s, with error: %w", j.object.Name, err)
+	}
+	dec, err := decoder.NewDecoder(j.src.ReaderConfig.Decoding, r, j.log)
+	if err != nil {
+		return err
+	}
+	var evtOffset int64
+	switch dec := dec.(type) {
+	case decoder.ValueDecoder:
+		defer dec.Close()
+
+		for dec.Next() {
+			var (
+				msg []byte
+				val []mapstr.M
+			)
+			if j.src.ParseJSON {
+				var v mapstr.M
+				_, msg, v, err = dec.DecodeValue()
+				if err != nil {
+					if err == io.EOF {
+						return nil
+					}
+					break
+				}
+				val = []mapstr.M{v}
+			} else {
+				msg, err = dec.Decode()
+				if err != nil {
+					if err == io.EOF {
+						return nil
+					}
+					break
+				}
+			}
+			evt := j.createEvent(msg, val, evtOffset)
+			j.publish(evt, !dec.More(), id)
+		}
+
+	case decoder.Decoder:
+		defer dec.Close()
+
+		for dec.Next() {
+			msg, err := dec.Decode()
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					return nil
+				}
+				break
+			}
+			var val []mapstr.M
+			if j.src.ParseJSON {
+				val, err = decodeJSON(bytes.NewReader(msg))
+				if err != nil {
+					j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
+				}
+			}
+			evt := j.createEvent(msg, val, evtOffset)
+			j.publish(evt, !dec.More(), id)
+		}
+
+	default:
+		err = j.readJsonAndPublish(ctx, r, id)
+		if err != nil {
+			return fmt.Errorf("failed to read data from object: %s, with error: %w", j.object.Name, err)
+		}
+	}
+	if err != nil {
+		j.status.UpdateStatus(status.Degraded, err.Error())
 	}
 
 	return err
 }
 
 func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {
-	r, err := j.addGzipDecoderIfNeeded(bufio.NewReader(r))
-	if err != nil {
-		return fmt.Errorf("failed to add gzip decoder to object: %s, with error: %w", j.object.Name, err)
-	}
-
+	var err error
 	r, j.isRootArray, err = evaluateJSON(bufio.NewReader(r))
 	if err != nil {
 		return fmt.Errorf("failed to evaluate json for object: %s, with error: %w", j.object.Name, err)
@@ -163,7 +273,9 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 	if j.isRootArray {
 		_, err := dec.Token()
 		if err != nil {
-			return fmt.Errorf("failed to read JSON token for object: %s, with error: %w", j.object.Name, err)
+			err = fmt.Errorf("failed to read JSON token for object: %s, with error: %w", j.object.Name, err)
+			j.status.UpdateStatus(status.Degraded, err.Error())
+			return err
 		}
 	}
 
@@ -171,52 +283,79 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		var item json.RawMessage
 		offset := dec.InputOffset()
 		if err = dec.Decode(&item); err != nil {
-			return fmt.Errorf("failed to decode json: %w", err)
+			err = fmt.Errorf("failed to decode json: %w", err)
+			j.status.UpdateStatus(status.Degraded, err.Error())
+			return err
 		}
 
 		// if expand_event_list_from_field is set, then split the event list
 		if j.src.ExpandEventListFromField != "" {
-			if err := j.splitEventList(j.src.ExpandEventListFromField, item, offset, j.hash, id); err != nil {
+			if numEvents, err := j.splitEventList(j.src.ExpandEventListFromField, item, offset, id); err != nil {
 				return err
+			} else {
+				j.metrics.gcsEventsPerObject.Update(int64(numEvents))
 			}
 			continue
+		} else {
+			j.metrics.gcsEventsPerObject.Update(1)
 		}
 
 		var parsedData []mapstr.M
 		if j.src.ParseJSON {
 			parsedData, err = decodeJSON(bytes.NewReader(item))
 			if err != nil {
-				j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
+				// since we do not want to stop processing the job here as this is purely cosmetic and optional, we log the error and continue
+				j.metrics.errorsTotal.Inc()
+				j.metrics.decodeErrorsTotal.Inc()
+				j.log.Errorw("job encountered an error during 'ParseJSON' op", "gcs.jobId", id, "error", err)
 			}
 		}
 		evt := j.createEvent(item, parsedData, offset)
-		if !dec.More() {
-			// if this is the last object, then perform a complete state save
-			cp, done := j.state.saveForTx(j.object.Name, j.object.Updated)
-			if err := j.publisher.Publish(evt, cp); err != nil {
-				j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
-			}
-			done()
-		} else {
-			// since we don't update the cursor checkpoint, lack of a lock here is not a problem
-			if err := j.publisher.Publish(evt, nil); err != nil {
-				j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
-			}
-		}
+		j.publish(evt, !dec.More(), id)
 	}
 	return nil
 }
 
+func (j *job) publish(evt beat.Event, last bool, id string) {
+	if last {
+		// if this is the last object, then perform a complete state save
+		cp, done := j.state.saveForTx(j.object.Name, j.object.Updated, j.metrics)
+		err := j.publisher.Publish(evt, cp)
+		if err != nil {
+			j.metrics.errorsTotal.Inc()
+			j.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
+			j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
+		} else {
+			j.status.UpdateStatus(status.Running, "")
+		}
+		done()
+		return
+	}
+	// since we don't update the cursor checkpoint, lack of a lock here is not a problem
+	err := j.publisher.Publish(evt, nil)
+	if err != nil {
+		j.metrics.errorsTotal.Inc()
+		j.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
+		j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
+	} else {
+		j.status.UpdateStatus(status.Running, "")
+	}
+}
+
 // splitEventList splits the event list into individual events and publishes them
-func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objHash string, id string) error {
+func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id string) (int, error) {
 	var jsonObject map[string]json.RawMessage
+	var eventsPerObject int
 	if err := json.Unmarshal(raw, &jsonObject); err != nil {
-		return fmt.Errorf("job with job id %s encountered an unmarshaling error: %w", id, err)
+		j.status.UpdateStatus(status.Degraded, "failed to unmarshal JSON: "+err.Error())
+		return eventsPerObject, fmt.Errorf("job with job id %s encountered an unmarshaling error: %w", id, err)
 	}
 
 	raw, found := jsonObject[key]
 	if !found {
-		return fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+		err := fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+		j.status.UpdateStatus(status.Degraded, "possible configuration issue: "+err.Error())
+		return eventsPerObject, err
 	}
 
 	dec := json.NewDecoder(bytes.NewReader(raw))
@@ -225,11 +364,14 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 
 	tok, err := dec.Token()
 	if err != nil {
-		return fmt.Errorf("failed to read JSON token for object: %s, with error: %w", j.object.Name, err)
+		j.status.UpdateStatus(status.Degraded, "failed to unmarshal JSON: "+err.Error())
+		return eventsPerObject, fmt.Errorf("failed to read JSON token for object: %s, with error: %w", j.object.Name, err)
 	}
 	delim, ok := tok.(json.Delim)
 	if !ok || delim != '[' {
-		return fmt.Errorf("expand_event_list_from_field <%v> is not an array", key)
+		err := fmt.Errorf("expand_event_list_from_field <%v> is not an array", key)
+		j.status.UpdateStatus(status.Degraded, "possible configuration issue: "+err.Error())
+		return eventsPerObject, err
 	}
 
 	for dec.More() {
@@ -237,69 +379,68 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 
 		var item json.RawMessage
 		if err := dec.Decode(&item); err != nil {
-			return fmt.Errorf("failed to decode array item at offset %d: %w", offset+arrayOffset, err)
+			j.status.UpdateStatus(status.Degraded, "failed to unmarshal JSON: "+err.Error())
+			return eventsPerObject, fmt.Errorf("failed to decode array item at offset %d: %w", offset+arrayOffset, err)
 		}
 
 		data, err := item.MarshalJSON()
 		if err != nil {
-			return fmt.Errorf("job with job id %s encountered a marshaling error: %w", id, err)
+			j.status.UpdateStatus(status.Degraded, "failed to re-marshal JSON: "+err.Error())
+			return eventsPerObject, fmt.Errorf("job with job id %s encountered a marshaling error: %w", id, err)
 		}
 		evt := j.createEvent(data, nil, offset+arrayOffset)
 
 		if !dec.More() {
 			// if this is the last object, then perform a complete state save
-			cp, done := j.state.saveForTx(j.object.Name, j.object.Updated)
-			if err := j.publisher.Publish(evt, cp); err != nil {
+			cp, done := j.state.saveForTx(j.object.Name, j.object.Updated, j.metrics)
+			err := j.publisher.Publish(evt, cp)
+			if err != nil {
+				j.metrics.errorsTotal.Inc()
 				j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
+				j.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
+			} else {
+				j.status.UpdateStatus(status.Running, "")
 			}
 			done()
 		} else {
 			// since we don't update the cursor checkpoint, lack of a lock here is not a problem
-			if err := j.publisher.Publish(evt, nil); err != nil {
+			err := j.publisher.Publish(evt, nil)
+			if err != nil {
+				j.metrics.errorsTotal.Inc()
 				j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
+				j.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
+			} else {
+				j.status.UpdateStatus(status.Running, "")
 			}
 		}
+		eventsPerObject++
 	}
 
-	return nil
-}
-
-// addGzipDecoderIfNeeded determines whether the given stream of bytes (encapsulated in a buffered reader)
-// represents gzipped content or not and adds gzipped decoder if needed. A bufio.Reader is used
-// so the function can peek into the byte  stream without consuming it. This makes it convenient for
-// code executed after this function call to consume the stream if it wants.
-func (j *job) addGzipDecoderIfNeeded(reader *bufio.Reader) (io.Reader, error) {
-	isStreamGzipped := false
-	// check if stream is gziped or not
-	buf, err := reader.Peek(3)
-	if err != nil {
-		if errors.Is(err, io.EOF) {
-			err = nil
-		}
-		return reader, err
-	}
-
-	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
-	isStreamGzipped = bytes.Equal(buf, []byte{0x1F, 0x8B, 0x08})
-
-	if !isStreamGzipped {
-		return reader, nil
-	}
-
-	gzReader, err := gzip.NewReader(reader)
-	if err != nil {
-		return nil, err
-	}
-
-	return gzReader, nil
+	return eventsPerObject, nil
 }
 
 // evaluateJSON, uses a bufio.NewReader & reader.Peek to evaluate if the
 // data stream contains a json array as the root element or not, without
 // advancing the reader. If the data stream contains an array as the root
 // element, the value of the boolean return type is set to true.
+// If a UTF-8 BOM is present at the beginning, it is automatically discarded.
 func evaluateJSON(reader *bufio.Reader) (io.Reader, bool, error) {
 	eof := false
+
+	// Check for BOM at the beginning and discard it
+	const byteOrderMark = "\ufeff"
+	if b, err := reader.Peek(len(byteOrderMark)); err != nil {
+		// likely EOF
+		if !errors.Is(err, io.EOF) {
+			return nil, false, fmt.Errorf("failed to peek for UTF-8 BOM: %w", err)
+		}
+	} else if bytes.Equal(b, []byte(byteOrderMark)) {
+		// Actually discard the BOM bytes from the reader
+		if _, err := reader.Discard(len(byteOrderMark)); err != nil {
+			return nil, false, fmt.Errorf("failed to discard UTF-8 BOM: %w", err)
+		}
+	}
+
 	for i := 0; ; i++ {
 		b, err := reader.Peek((i + 1) * 5)
 		if errors.Is(err, io.EOF) {
@@ -316,11 +457,11 @@ func evaluateJSON(reader *bufio.Reader) (io.Reader, bool, error) {
 			case unicode.IsSpace(bytes.Runes(char)[0]):
 				continue
 			default:
-				return nil, false, fmt.Errorf("unexpected error: JSON data is malformed")
+				return nil, false, fmt.Errorf("unexpected error: JSON data is malformed %q", b)
 			}
 		}
 		if eof {
-			return nil, false, fmt.Errorf("unexpected error: JSON data is malformed")
+			return nil, false, fmt.Errorf("unexpected error: JSON data is malformed unexpected EOF")
 		}
 	}
 }
@@ -357,7 +498,7 @@ func (j *job) createEvent(message []byte, data []mapstr.M, offset int64) beat.Ev
 		},
 	}
 	event.SetID(objectID(j.hash, offset))
-
+	j.metrics.gcsEventsCreatedTotal.Inc()
 	return event
 }
 

@@ -22,12 +22,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"path"
 	"path/filepath"
 	"strings"
 
-	"github.com/joeshaw/multierror"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/filebeat/fileset"
@@ -113,7 +111,10 @@ func readFile(filename string, info beat.Info) (p pipeline, err error) {
 	if err != nil {
 		return pipeline{}, err
 	}
-	ds, _, _ := strings.Cut(filename, string(os.PathSeparator))
+	ds, _, ok := strings.Cut(filename, "/")
+	if !ok {
+		return pipeline{}, fmt.Errorf("unexpected filename '%s': missing '/' between data stream and 'ingest'", filename)
+	}
 	p = pipeline{
 		id:       fileset.FormatPipelineID(info.IndexPrefix, "", "", ds, info.Version),
 		contents: updatedContent,
@@ -139,14 +140,14 @@ func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipel
 	}
 
 	if err != nil {
-		errs := multierror.Errors{err}
+		errs := []error{err}
 		for _, id := range loaded {
 			err = fileset.DeletePipeline(esClient, id)
 			if err != nil {
 				errs = append(errs, err)
 			}
 		}
-		return nil, errs.Err()
+		return nil, errors.Join(errs...)
 	}
 	return loaded, nil
 }
@@ -180,6 +181,7 @@ func applyTemplates(prefix string, version string, filename string, original []b
 		if err != nil {
 			return nil, fmt.Errorf("failed to sanitize the YAML pipeline file: %s: %w", filename, err)
 		}
+		//nolint:errcheck // ignore
 		content = newContent.(map[string]interface{})
 	default:
 		return nil, fmt.Errorf("unsupported extension '%s' for pipeline file: %s", extension, filename)

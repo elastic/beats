@@ -23,7 +23,9 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/version"
 
 	"github.com/stretchr/testify/assert"
@@ -35,6 +37,10 @@ func TestFileLoader_Load(t *testing.T) {
 	prefix := "mock"
 	info := beat.Info{Beat: "mock", Version: ver, IndexPrefix: prefix}
 	tmplName := fmt.Sprintf("%s-%s", prefix, ver)
+	beatPaths := paths.New()
+	beatPaths.Home = t.TempDir()
+	err := beatPaths.InitPaths(beatPaths)
+	require.NoError(t, err)
 
 	for name, test := range map[string]struct {
 		settings     TemplateSettings
@@ -51,7 +57,8 @@ func TestFileLoader_Load(t *testing.T) {
 				"data_stream":    struct{}{},
 				"priority":       150,
 				"template": mapstr.M{
-					"settings": mapstr.M{"index": nil}},
+					"settings": mapstr.M{"index": nil},
+				},
 			},
 		},
 		"load minimal config info serverless": {
@@ -61,7 +68,8 @@ func TestFileLoader_Load(t *testing.T) {
 				"data_stream":    struct{}{},
 				"priority":       150,
 				"template": mapstr.M{
-					"settings": mapstr.M{"index": nil}},
+					"settings": mapstr.M{"index": nil},
+				},
 			},
 		},
 		"load minimal config with index settings": {
@@ -72,7 +80,8 @@ func TestFileLoader_Load(t *testing.T) {
 				"data_stream":    struct{}{},
 				"priority":       150,
 				"template": mapstr.M{
-					"settings": mapstr.M{"index": mapstr.M{"code": "best_compression"}}},
+					"settings": mapstr.M{"index": mapstr.M{"code": "best_compression"}},
+				},
 			},
 		},
 		"load minimal config with source settings": {
@@ -90,7 +99,8 @@ func TestFileLoader_Load(t *testing.T) {
 						"date_detection":    false,
 						"dynamic_templates": nil,
 						"properties":        nil,
-					}},
+					},
+				},
 			},
 		},
 		"load config and in-line analyzer fields": {
@@ -100,7 +110,8 @@ func TestFileLoader_Load(t *testing.T) {
 				"data_stream":    struct{}{},
 				"priority":       150,
 				"template": mapstr.M{
-					"settings": mapstr.M{"index": nil}},
+					"settings": mapstr.M{"index": nil},
+				},
 			},
 			fields: []byte(`- key: test
   title: Test fields.yml with analyzer
@@ -170,7 +181,7 @@ func TestFileLoader_Load(t *testing.T) {
 							"refresh_interval": "5s",
 							"mapping": mapstr.M{
 								"total_fields": mapstr.M{
-									"limit": 10000,
+									"limit": defaultTotalFieldsLimit,
 								},
 							},
 							"query": mapstr.M{
@@ -226,7 +237,8 @@ func TestFileLoader_Load(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			fc := newFileClient(ver)
-			fl := NewFileLoader(fc, test.isServerless)
+			logger := logptest.NewTestingLogger(t, "")
+			fl := NewFileLoader(fc, test.isServerless, logger, beatPaths)
 
 			cfg := DefaultConfig(info)
 			cfg.Settings = test.settings

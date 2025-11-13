@@ -19,12 +19,11 @@ package node_stats
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/joeshaw/multierror"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -51,6 +50,9 @@ var (
 					"survivor": c.Dict("survivor", poolSchema),
 					"old":      c.Dict("old", poolSchema),
 				}),
+			}),
+			"threads": c.Dict("threads", s.Schema{
+				"count": c.Int("count"),
 			}),
 			"gc": c.Dict("gc", s.Schema{
 				"collectors": c.Dict("collectors", s.Schema{
@@ -83,7 +85,29 @@ var (
 				"count":   c.Int("count"),
 				"deleted": c.Int("deleted"),
 			}),
+			"get": c.Dict("get", s.Schema{
+				"time": s.Object{
+					"ms": c.Int("time_in_millis"),
+				},
+				"total": s.Object{
+					"count": c.Int("total"),
+				},
+			}),
+			"merges":  c.Dict("merges", indicesTotalsSchema, c.DictOptional),
+			"refresh": c.Dict("refresh", indicesTotalsSchema, c.DictOptional),
+			"flush":   c.Dict("flush", indicesTotalsSchema, c.DictOptional),
+			"translog": c.Dict("translog", s.Schema{
+				"operations": s.Object{
+					"count": c.Int("operations"),
+				},
+				"size": s.Object{
+					"bytes": c.Int("size_in_bytes"),
+				},
+			}, c.DictOptional),
 			"fielddata": c.Dict("fielddata", s.Schema{
+				"evictions": s.Object{
+					"count": c.Int("evictions"),
+				},
 				"memory": s.Object{
 					"bytes": c.Int("memory_size_in_bytes"),
 				},
@@ -110,6 +134,12 @@ var (
 				},
 			}),
 			"search": c.Dict("search", s.Schema{
+				"fetch_time": s.Object{
+					"ms": c.Int("fetch_time_in_millis"),
+				},
+				"fetch_total": s.Object{
+					"count": c.Int("fetch_total"),
+				},
 				"query_time": s.Object{
 					"ms": c.Int("query_time_in_millis"),
 				},
@@ -262,14 +292,40 @@ var (
 			"cpu": c.Dict("cpu", s.Schema{
 				"pct": c.Int("percent"),
 			}),
+			"mem": c.Dict("mem", s.Schema{
+				"total_virtual": s.Object{
+					"bytes": c.Int("total_virtual_in_bytes"),
+				},
+			}),
+			"open_file_descriptors": c.Int("open_file_descriptors"),
+		}),
+		"transport": c.Dict("transport", s.Schema{
+			"rx": s.Object{
+				"count": c.Int("rx_count"),
+				"size": s.Object{
+					"bytes": c.Int("rx_size_in_bytes"),
+				},
+			},
+			"tx": s.Object{
+				"count": c.Int("tx_count"),
+				"size": s.Object{
+					"bytes": c.Int("tx_size_in_bytes"),
+				},
+			},
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
-			"bulk":        c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
-			"force_merge": c.Dict("force_merge", threadPoolStatsSchema, c.DictOptional),
-			"index":       c.Dict("index", threadPoolStatsSchema, c.DictOptional),
-			"write":       c.Dict("write", threadPoolStatsSchema, c.DictOptional),
-			"get":         c.Dict("get", threadPoolStatsSchema),
-			"search":      c.Dict("search", threadPoolStatsSchema),
+			"bulk":          c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
+			"esql_worker":   c.Dict("esql_worker", threadPoolStatsSchema, c.DictOptional),
+			"force_merge":   c.Dict("force_merge", threadPoolStatsSchema, c.DictOptional),
+			"flush":         c.Dict("flush", threadPoolStatsSchema, c.DictOptional),
+			"get":           c.Dict("get", threadPoolStatsSchema),
+			"index":         c.Dict("index", threadPoolStatsSchema, c.DictOptional),
+			"search":        c.Dict("search", threadPoolStatsSchema),
+			"search_worker": c.Dict("search_worker", threadPoolStatsSchema, c.DictOptional),
+			"snapshot":      c.Dict("snapshot", threadPoolStatsSchema, c.DictOptional),
+			"system_read":   c.Dict("system_read", threadPoolStatsSchema, c.DictOptional),
+			"system_write":  c.Dict("system_write", threadPoolStatsSchema, c.DictOptional),
+			"write":         c.Dict("write", threadPoolStatsSchema, c.DictOptional),
 		}),
 		"indexing_pressure": c.Dict("indexing_pressure", s.Schema{
 			"memory": c.Dict("memory", s.Schema{
@@ -350,11 +406,23 @@ var (
 	}
 
 	threadPoolStatsSchema = s.Schema{
+		"active": s.Object{
+			"count": c.Int("active"),
+		},
 		"queue": s.Object{
 			"count": c.Int("queue"),
 		},
 		"rejected": s.Object{
 			"count": c.Int("rejected"),
+		},
+	}
+
+	indicesTotalsSchema = s.Schema{
+		"total_time": s.Object{
+			"ms": c.Int("total_time_in_millis"),
+		},
+		"total": s.Object{
+			"count": c.Int("total"),
 		},
 	}
 )
@@ -375,7 +443,7 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 		return err
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	for nodeID, node := range nodeData.Nodes {
 		isMaster := nodeID == masterNodeID
 
@@ -452,5 +520,5 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 
 		r.Event(event)
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }

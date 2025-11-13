@@ -27,33 +27,18 @@ import (
 func TestSegmentsRoundTrip(t *testing.T) {
 	tests := map[string]struct {
 		id        segmentID
-		encrypt   bool
 		compress  bool
 		plaintext []byte
 	}{
-		"No Encryption or Compression": {
+		"No Compression": {
 			id:        0,
-			encrypt:   false,
 			compress:  false,
 			plaintext: []byte("no encryption or compression"),
 		},
-		"Encryption Only": {
-			id:        1,
-			encrypt:   true,
-			compress:  false,
-			plaintext: []byte("encryption only"),
-		},
-		"Compression Only": {
+		"With Compression": {
 			id:        2,
-			encrypt:   false,
 			compress:  true,
 			plaintext: []byte("compression only"),
-		},
-		"Encryption and Compression": {
-			id:        3,
-			encrypt:   true,
-			compress:  true,
-			plaintext: []byte("encryption and compression"),
 		},
 	}
 	dir := t.TempDir()
@@ -61,9 +46,6 @@ func TestSegmentsRoundTrip(t *testing.T) {
 		dst := make([]byte, len(tc.plaintext))
 		settings := DefaultSettings()
 		settings.Path = dir
-		if tc.encrypt {
-			settings.EncryptionKey = []byte("keykeykeykeykeyk")
-		}
 		settings.UseCompression = tc.compress
 		qs := &queueSegment{
 			id: tc.id,
@@ -86,7 +68,7 @@ func TestSegmentsRoundTrip(t *testing.T) {
 
 		assert.Equal(t, len(dst), n, name)
 
-		//make sure we read back what we wrote
+		// make sure we read back what we wrote
 		assert.Equal(t, tc.plaintext, dst, name)
 
 		_, err = sr.Read(dst)
@@ -101,31 +83,16 @@ func TestSegmentsRoundTrip(t *testing.T) {
 func TestSegmentReaderSeek(t *testing.T) {
 	tests := map[string]struct {
 		id         segmentID
-		encrypt    bool
 		compress   bool
 		plaintexts [][]byte
 	}{
-		"No Encryption or compression": {
+		"No Compression": {
 			id:         0,
-			encrypt:    false,
 			compress:   false,
 			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
 		},
-		"Encryption Only": {
-			id:         1,
-			encrypt:    true,
-			compress:   false,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-		},
-		"Compression Only": {
+		"With Compression": {
 			id:         2,
-			encrypt:    false,
-			compress:   true,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-		},
-		"Encryption and Compression": {
-			id:         3,
-			encrypt:    true,
 			compress:   true,
 			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
 		},
@@ -134,9 +101,6 @@ func TestSegmentReaderSeek(t *testing.T) {
 	for name, tc := range tests {
 		settings := DefaultSettings()
 		settings.Path = dir
-		if tc.encrypt {
-			settings.EncryptionKey = []byte("keykeykeykeykeyk")
-		}
 		settings.UseCompression = tc.compress
 
 		qs := &queueSegment{
@@ -154,7 +118,7 @@ func TestSegmentReaderSeek(t *testing.T) {
 		sw.Close()
 		sr, err := qs.getReader(settings)
 		assert.Nil(t, err, name)
-		//seek to second data piece
+		// seek to second data piece
 		n, err := sr.Seek(segmentHeaderSize+int64(len(tc.plaintexts[0])), io.SeekStart)
 		assert.Nil(t, err, name)
 		assert.Equal(t, segmentHeaderSize+int64(len(tc.plaintexts[0])), n, name)
@@ -171,35 +135,18 @@ func TestSegmentReaderSeek(t *testing.T) {
 func TestSegmentReaderSeekLocations(t *testing.T) {
 	tests := map[string]struct {
 		id         segmentID
-		encrypt    bool
 		compress   bool
 		plaintexts [][]byte
 		location   int64
 	}{
-		"No Encryption or Compression": {
+		"No Compression": {
 			id:         0,
-			encrypt:    false,
 			compress:   false,
 			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
 			location:   -1,
 		},
-		"Encryption": {
-			id:         1,
-			encrypt:    true,
-			compress:   false,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-			location:   2,
-		},
 		"Compression": {
 			id:         1,
-			encrypt:    false,
-			compress:   true,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-			location:   2,
-		},
-		"Encryption and Compression": {
-			id:         1,
-			encrypt:    true,
 			compress:   true,
 			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
 			location:   2,
@@ -209,9 +156,6 @@ func TestSegmentReaderSeekLocations(t *testing.T) {
 	for name, tc := range tests {
 		settings := DefaultSettings()
 		settings.Path = dir
-		if tc.encrypt {
-			settings.EncryptionKey = []byte("keykeykeykeykeyk")
-		}
 		settings.UseCompression = tc.compress
 		qs := &queueSegment{
 			id: tc.id,
@@ -226,7 +170,7 @@ func TestSegmentReaderSeekLocations(t *testing.T) {
 		sw.Close()
 		sr, err := qs.getReader(settings)
 		assert.Nil(t, err, name)
-		//seek to location
+		// seek to location
 		_, err = sr.Seek(tc.location, io.SeekStart)
 		assert.NotNil(t, err, name)
 	}

@@ -22,10 +22,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -60,15 +60,15 @@ type cache struct {
 }
 
 // Resulting processor implements `Close()` to release the cache resources.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unpack the %s configuration: %w", name, err)
 	}
 	// Logging (each processor instance has a unique ID).
-	id := int(instanceID.Inc())
-	log := logp.NewLogger(name).With("instance_id", id)
+	id := int(instanceID.Add(1))
+	log = log.Named(name).With("instance_id", id)
 
 	src, cancel, err := getStoreFor(config, log)
 	if err != nil {
@@ -166,6 +166,10 @@ func (p *cache) Run(event *beat.Event) (*beat.Event, error) {
 		if result != nil {
 			return result, nil
 		}
+		if p.config.IgnoreFailure {
+			p.log.Debugw("no match", "backend_id", p.store, "error", ErrNoMatch)
+			return event, nil
+		}
 		return event, ErrNoMatch
 
 	case p.config.Delete != nil:
@@ -184,14 +188,24 @@ func (p *cache) Run(event *beat.Event) (*beat.Event, error) {
 
 // putFrom takes the configured value from the event and stores it in the cache
 // if it exists.
-func (p *cache) putFrom(event *beat.Event) error {
+func (p *cache) putFrom(event *beat.Event) (err error) {
+	if p.config.IgnoreFailure {
+		defer func() {
+			if err == nil {
+				return
+			}
+			p.log.Debugw("ignoring put error", "backend_id", p.store, "error", err)
+			err = nil
+		}()
+	}
+
 	k, err := event.GetValue(p.config.Put.Key)
 	if err != nil {
 		return err
 	}
 	key, ok := k.(string)
 	if !ok {
-		return fmt.Errorf("key field '%s' not a string: %T", p.config.Put.Key, k)
+		return fmt.Errorf("key field '%s' used in %s not a string: %T", p.config.Put.Key, p.store, k)
 	}
 	p.log.Debugw("put", "backend_id", p.store, "key", key)
 
@@ -202,7 +216,7 @@ func (p *cache) putFrom(event *beat.Event) error {
 
 	err = p.store.Put(key, val)
 	if err != nil {
-		return fmt.Errorf("failed to put '%s' into '%s': %w", key, p.config.Put.Value, err)
+		return fmt.Errorf("failed to put '%s' into '%s' in %s: %w", key, p.config.Put.Value, p.store, err)
 	}
 	return nil
 }
@@ -210,6 +224,16 @@ func (p *cache) putFrom(event *beat.Event) error {
 // getFor gets the configured value from the cache for the event and inserts
 // it into the configured field if it exists.
 func (p *cache) getFor(event *beat.Event) (result *beat.Event, err error) {
+	if p.config.IgnoreFailure {
+		defer func() {
+			if err == nil {
+				return
+			}
+			p.log.Debugw("ignoring get error", "backend_id", p.store, "error", err)
+			err = nil
+		}()
+	}
+
 	// Check for clobbering.
 	dst := p.config.Get.Target
 	if !p.config.OverwriteKeys {
@@ -226,19 +250,19 @@ func (p *cache) getFor(event *beat.Event) (result *beat.Event, err error) {
 	}
 	k, ok := v.(string)
 	if !ok {
-		return nil, fmt.Errorf("key field '%s' not a string: %T", key, v)
+		return nil, fmt.Errorf("key field '%s' used in %s not a string: %T", key, p.store, v)
 	}
 	p.log.Debugw("get", "backend_id", p.store, "key", k)
 
 	// Get metadata...
 	meta, err := p.store.Get(k)
 	if err != nil {
-		return nil, fmt.Errorf("%w for '%s': %w", ErrNoData, k, err)
+		return nil, fmt.Errorf("%w for '%s' in %s: %w", ErrNoData, k, p.store, err)
 	}
 	if meta == nil {
-		return nil, fmt.Errorf("%w for '%s'", ErrNoData, k)
+		return nil, fmt.Errorf("%w for '%s' in %s", ErrNoData, k, p.store)
 	}
-	if m, ok := meta.(map[string]interface{}); ok {
+	if m, ok := meta.(map[string]any); ok {
 		meta = mapstr.M(m)
 	}
 	// ... and write it into the event.
@@ -255,14 +279,24 @@ func (p *cache) getFor(event *beat.Event) (result *beat.Event, err error) {
 
 // deleteFor deletes the configured value from the cache based on the value of
 // the configured key.
-func (p *cache) deleteFor(event *beat.Event) error {
+func (p *cache) deleteFor(event *beat.Event) (err error) {
+	if p.config.IgnoreFailure {
+		defer func() {
+			if err == nil {
+				return
+			}
+			p.log.Debugw("ignoring delete error", "backend_id", p.store, "error", err)
+			err = nil
+		}()
+	}
+
 	v, err := event.GetValue(p.config.Delete.Key)
 	if err != nil {
 		return err
 	}
 	k, ok := v.(string)
 	if !ok {
-		return fmt.Errorf("key field '%s' not a string: %T", p.config.Delete.Key, v)
+		return fmt.Errorf("key field '%s' used in %s not a string: %T", p.config.Delete.Key, p.store, v)
 	}
 	return p.store.Delete(k)
 }
@@ -276,11 +310,11 @@ func (p *cache) Close() error {
 func (p *cache) String() string {
 	switch {
 	case p.config.Put != nil:
-		return fmt.Sprintf("%s=[operation=put, store_id=%s, key_field=%s, value_field=%s, ttl=%v, ignore_missing=%t, overwrite_fields=%t]",
-			name, p.store, p.config.Put.Key, p.config.Put.Value, p.config.Put.TTL, p.config.IgnoreMissing, p.config.OverwriteKeys)
+		return fmt.Sprintf("%s=[operation=put, store_id=%s, key_field=%s, value_field=%s, ttl=%v, ignore_missing=%t, ignore_failure=%t, overwrite_fields=%t]",
+			name, p.store, p.config.Put.Key, p.config.Put.Value, p.config.Put.TTL, p.config.IgnoreMissing, p.config.IgnoreFailure, p.config.OverwriteKeys)
 	case p.config.Get != nil:
-		return fmt.Sprintf("%s=[operation=get, store_id=%s, key_field=%s, target_field=%s, ignore_missing=%t, overwrite_fields=%t]",
-			name, p.store, p.config.Get.Key, p.config.Get.Target, p.config.IgnoreMissing, p.config.OverwriteKeys)
+		return fmt.Sprintf("%s=[operation=get, store_id=%s, key_field=%s, target_field=%s, ignore_missing=%t, ignore_failure=%t, overwrite_fields=%t]",
+			name, p.store, p.config.Get.Key, p.config.Get.Target, p.config.IgnoreMissing, p.config.IgnoreFailure, p.config.OverwriteKeys)
 	case p.config.Delete != nil:
 		return fmt.Sprintf("%s=[operation=delete, store_id=%s, key_field=%s]", name, p.store, p.config.Delete.Key)
 	default:

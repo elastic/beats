@@ -82,9 +82,9 @@ type session struct {
 	tagOnException string
 }
 
-func newSession(p *goja.Program, conf Config, test bool) (*session, error) {
+func newSession(p *goja.Program, conf Config, test bool, logger *logp.Logger) (*session, error) {
 	// Create a logger
-	logger := logp.NewLogger(logName)
+	logger = logger.Named(logName)
 	if conf.Tag != "" {
 		logger = logger.With("instance_id", conf.Tag)
 	}
@@ -278,15 +278,15 @@ type sessionPool struct {
 	NewSessionsAllowed bool
 }
 
-func newSessionPool(p *goja.Program, c Config) (*sessionPool, error) {
-	s, err := newSession(p, c, true)
+func newSessionPool(p *goja.Program, c Config, logger *logp.Logger) (*sessionPool, error) {
+	s, err := newSession(p, c, true, logger)
 	if err != nil {
 		return nil, err
 	}
 
 	pool := sessionPool{
 		New: func() *session {
-			s, _ := newSession(p, c, false)
+			s, _ := newSession(p, c, false, logger)
 			return s
 		},
 		C:                  make(chan *session, c.MaxCachedSessions),

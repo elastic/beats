@@ -26,5 +26,5 @@ import (
 )
 
 func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
-	return errors.New("file auditing metricset is not implemented on this system")
+	return nil, errors.New("file auditing metricset is not implemented on this system")
 }

@@ -51,7 +51,6 @@ func getIFNetInterfaceEvents(m *MetricSet) ([]mb.Event, error) {
 func formatIFInterfaceEvents(m *MetricSet, input InterfaceResult) []mb.Event {
 	events := make([]mb.Event, 0, len(input.HW.Entries)+len(input.Ifnet.Entries))
 	timestamp := time.Now().UTC()
-	rootFields := panw.MakeRootFields(m.config.HostIp)
 
 	// First process the phyiscal interfaces
 	for _, entry := range input.HW.Entries {
@@ -82,7 +81,7 @@ func formatIFInterfaceEvents(m *MetricSet, input InterfaceResult) []mb.Event {
 				"physical.full_state": entry.ST,
 				"physical.ae_member":  members,
 			},
-			RootFields: rootFields,
+			RootFields: panw.MakeRootFields(m.config.HostIp),
 		}
 
 		events = append(events, event)
@@ -104,7 +103,7 @@ func formatIFInterfaceEvents(m *MetricSet, input InterfaceResult) []mb.Event {
 				"logical.dyn_addr": entry.DynAddr,
 				"logical.addr6":    entry.Addr6,
 			},
-			RootFields: rootFields,
+			RootFields: panw.MakeRootFields(m.config.HostIp),
 		}
 
 		events = append(events, event)

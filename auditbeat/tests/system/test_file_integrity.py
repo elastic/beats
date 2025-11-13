@@ -193,6 +193,7 @@ class Test(BaseTest):
         self._test_non_recursive("fsnotify")
 
     @unittest.skipUnless(is_root(), "Requires root")
+    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_non_recursive__ebpf(self):
         self._test_non_recursive("ebpf")
 
@@ -273,6 +274,7 @@ class Test(BaseTest):
         self._test_recursive("fsnotify")
 
     @unittest.skipUnless(is_root(), "Requires root")
+    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_recursive__ebpf(self):
         self._test_recursive("ebpf")
 
@@ -308,27 +310,27 @@ class Test(BaseTest):
             f = os.path.join(dirs[0], f'file_{backend}.txt')
             self.create_file(f, "hello world!")
 
-            # FSNotify can't catch the events if operations happens too fast
-            time.sleep(1)
+            # Wait for file creation to be reported
+            self.wait_output(1)
 
             # Event 2: chmod
             os.chmod(f, 0o777)
-            # FSNotify can't catch the events if operations happens too fast
-            time.sleep(1)
+
+            # Wait for mode change to be reported
+            self.wait_output(2)
 
             with open(f, "w") as fd:
                 # Event 3: write
                 fd.write("data")
-                # FSNotify can't catch the events if operations happens too fast
-                time.sleep(1)
+                fd.flush()
+                # Wait for write to be reported
+                self.wait_output(3)
 
                 # Event 4: truncate
                 fd.truncate(0)
-                # FSNotify can't catch the events if operations happens too fast
-                time.sleep(1)
-
-            # Wait N events
-            self.wait_output(4)
+                fd.flush()
+                # Wait for truncate to be reported
+                self.wait_output(4)
 
             proc.check_kill_and_wait()
             self.assert_no_logged_warnings()
@@ -344,6 +346,7 @@ class Test(BaseTest):
 
     @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
     @unittest.skipUnless(is_root(), "Requires root")
+    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_file_modified__ebpf(self):
         self._test_file_modified("ebpf")
 

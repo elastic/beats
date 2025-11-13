@@ -167,6 +167,7 @@
             "network_names": [
                 "VM Network"
             ],
+            "id": "host-0",
             "name": "DC0_H0",
             "status": "green",
             "uptime": 1728865

@@ -21,18 +21,24 @@ package instance
 
 import (
 	"bytes"
-	"io/ioutil"
+	"flag"
 	"os"
+	"path/filepath"
+	"sync"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-ucfg/yaml"
 
 	"github.com/gofrs/uuid/v5"
@@ -61,7 +67,6 @@ func TestNewInstance(t *testing.T) {
 	}
 	assert.Equal(t, "testbeat", b.Info.Beat)
 	assert.Equal(t, "testbeat", b.Info.IndexPrefix)
-
 }
 
 func TestNewInstanceUUID(t *testing.T) {
@@ -123,12 +128,14 @@ func TestInitKibanaConfig(t *testing.T) {
 
 func TestEmptyMetaJson(t *testing.T) {
 	b, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
+	logger := logptest.NewTestingLogger(t, "")
+	b.Info.Logger = logger
 	if err != nil {
 		panic(err)
 	}
 
 	// prepare empty meta file
-	metaFile, err := ioutil.TempFile("../test", "meta.json")
+	metaFile, err := os.CreateTemp("../test", "meta.json")
 	assert.Equal(t, nil, err, "Unable to create temporary meta file")
 
 	metaPath := metaFile.Name()
@@ -136,7 +143,7 @@ func TestEmptyMetaJson(t *testing.T) {
 	defer os.Remove(metaPath)
 
 	// load metadata
-	err = b.loadMeta(metaPath)
+	err = b.LoadMeta(metaPath)
 
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 	assert.NotEqual(t, uuid.Nil, b.Info.ID, "Beats UUID is not set")
@@ -144,27 +151,30 @@ func TestEmptyMetaJson(t *testing.T) {
 
 func TestMetaJsonWithTimestamp(t *testing.T) {
 	firstBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
+	logger := logptest.NewTestingLogger(t, "")
+	firstBeat.Info.Logger = logger
 	if err != nil {
 		panic(err)
 	}
 	firstStart := firstBeat.Info.FirstStart
 
-	metaFile, err := ioutil.TempFile("../test", "meta.json")
+	metaFile, err := os.CreateTemp("../test", "meta.json")
 	assert.Equal(t, nil, err, "Unable to create temporary meta file")
 
 	metaPath := metaFile.Name()
 	metaFile.Close()
 	defer os.Remove(metaPath)
 
-	err = firstBeat.loadMeta(metaPath)
+	err = firstBeat.LoadMeta(metaPath)
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 
 	secondBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
+	secondBeat.Info.Logger = logger
 	assert.False(t, firstStart.Equal(secondBeat.Info.FirstStart), "Before meta.json is loaded, first start must be different")
-	err = secondBeat.loadMeta(metaPath)
+	err = secondBeat.LoadMeta(metaPath)
 	require.NoError(t, err)
 
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
@@ -251,7 +261,7 @@ elasticsearch:
 
 		update := &reload.ConfigWithMeta{Config: c}
 		m := &outputReloaderMock{}
-		reloader := b.makeOutputReloader(m)
+		reloader := b.MakeOutputReloader(m)
 
 		require.False(t, b.Config.Output.IsSet(), "the output should not be set yet")
 		require.True(t, b.isConnectionToOlderVersionAllowed(), "allow_older_versions flag should be true from 8.11")
@@ -331,10 +341,18 @@ output:
 			err = cfg.Unpack(&config)
 			require.NoError(t, err)
 
-			err = promoteOutputQueueSettings(&config)
+			logger := logptest.NewTestingLogger(t, "")
+
+			b := &Beat{Config: config, Beat: beat.Beat{
+				Info: beat.Info{
+					Logger: logger,
+				},
+			}}
+
+			err = PromoteOutputQueueSettings(b)
 			require.NoError(t, err)
 
-			ms, err := memqueue.SettingsForUserConfig(config.Pipeline.Queue.Config())
+			ms, err := memqueue.SettingsForUserConfig(b.Config.Pipeline.Queue.Config())
 			require.NoError(t, err)
 			require.Equalf(t, tc.memEvents, ms.Events, "config was: %v", config.Pipeline.Queue.Config())
 		})
@@ -460,10 +478,11 @@ func TestLogSystemInfo(t *testing.T) {
 			},
 		},
 	}
-	log, buff := logp.NewInMemory("beat", logp.ConsoleEncoderConfig())
+	log, buff := logp.NewInMemoryLocal("beat", logp.ConsoleEncoderConfig())
 	log.WithOptions()
 
 	b, err := NewBeat("testingbeat", "test-idx", "42", false, nil)
+	b.Info.Logger = log
 	require.NoError(t, err, "could not create beat")
 
 	for _, tc := range tcs {
@@ -486,10 +505,79 @@ func (m mockManager) Enabled() bool                       { return m.enabled }
 func (m mockManager) RegisterAction(action client.Action) {}
 func (m mockManager) RegisterDiagnosticHook(name, description, filename, contentType string, hook client.DiagnosticHook) {
 }
-func (m mockManager) SetPayload(payload map[string]interface{})     {}
+func (m mockManager) SetPayload(payload map[string]any)             {}
 func (m mockManager) SetStopCallback(f func())                      {}
 func (m mockManager) Start() error                                  { return nil }
 func (m mockManager) Status() status.Status                         { return status.Status(-42) }
 func (m mockManager) Stop()                                         {}
 func (m mockManager) UnregisterAction(action client.Action)         {}
 func (m mockManager) UpdateStatus(status status.Status, msg string) {}
+
+func TestManager(t *testing.T) {
+	// set the mockManger factory.
+	management.SetManagerFactory(func(c *config.C, r *reload.Registry, l *logp.Logger) (management.Manager, error) {
+		return mockManager{true}, nil
+	})
+	// initialize the flags.
+	cfgfile.Initialize()
+
+	t.Run("management.enabled=true", func(t *testing.T) {
+		defer func() {
+			// Since standard beats rely on global registries, we must reset them between test cases
+			// to prevent duplicate registrations and avoid runtime panics.
+			monitoring.GetNamespace("state").SetRegistry(nil)
+			monitoring.GetNamespace("info").SetRegistry(nil)
+		}()
+		flag.Set("E", "management.enabled=true")
+		b, err := NewInitializedBeat(Settings{})
+		require.NoError(t, err)
+		require.NotNil(t, b)
+		require.True(t, b.Manager.Enabled())
+		require.True(t, management.UnderAgent())
+		require.IsType(t, mockManager{}, b.Manager)
+	})
+	t.Run("management.enabled=false", func(t *testing.T) {
+		defer func() {
+			monitoring.GetNamespace("state").SetRegistry(nil)
+			monitoring.GetNamespace("info").SetRegistry(nil)
+		}()
+		flag.Set("E", "management.enabled=false")
+		flag.Set("c", "testdata/mockbeat.yml")
+		b, err := NewInitializedBeat(Settings{})
+		require.NoError(t, err)
+		require.NotNil(t, b)
+		require.False(t, b.Manager.Enabled())
+		require.False(t, management.UnderAgent())
+	})
+	t.Run("management.enabled not set", func(t *testing.T) {
+		defer func() {
+			monitoring.GetNamespace("state").SetRegistry(nil)
+			monitoring.GetNamespace("info").SetRegistry(nil)
+		}()
+		flag.Set("E", "management.enabled=false")
+		flag.Set("c", "testdata/mockbeat.yml")
+		b, err := NewInitializedBeat(Settings{})
+		require.NoError(t, err)
+		require.NotNil(t, b)
+		require.False(t, b.Manager.Enabled())
+		require.False(t, management.UnderAgent())
+	})
+}
+
+func TestMultipleLoadMeta(t *testing.T) {
+	metaFile := filepath.Join(t.TempDir(), "meta.json")
+	var wg sync.WaitGroup
+	for range 64 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			testBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
+			require.NoError(t, err)
+			logger := logptest.NewTestingLogger(t, "")
+			testBeat.Info.Logger = logger
+			err = testBeat.LoadMeta(metaFile)
+			require.NoError(t, err)
+		}()
+	}
+	wg.Wait()
+}

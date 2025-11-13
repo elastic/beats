@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -58,7 +58,8 @@ var (
 
 // Smoke test.
 func TestStartStop(t *testing.T) {
-	r, err := MakeReporter(beat.Info{}, conf.NewConfig())
+	logger := logptest.NewTestingLogger(t, "")
+	r, err := MakeReporter(beat.Info{Logger: logger}, conf.NewConfig())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,11 +78,12 @@ func TestMakeDeltaSnapshot(t *testing.T) {
 }
 
 func TestReporterLog(t *testing.T) {
-	logp.DevelopmentSetup(logp.ToObserverOutput())
-	reporter := reporter{config: defaultConfig(), logger: logp.NewLogger("monitoring")}
+	logger, zapLogs := logptest.NewTestingLoggerWithObserver(t, "")
+
+	reporter := reporter{config: defaultConfig(), logger: logger.Named("monitoring")}
 
 	reporter.logSnapshot(map[string]monitoring.FlatSnapshot{})
-	logs := logp.ObserverLogs().TakeAll()
+	logs := zapLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, "No non-zero metrics in the last 30s", logs[0].Message)
 	}
@@ -95,14 +97,14 @@ func TestReporterLog(t *testing.T) {
 			},
 		},
 	)
-	logs = logp.ObserverLogs().TakeAll()
+	logs = zapLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, "Non-zero metrics in the last 30s", logs[0].Message)
 		assertMapHas(t, logs[0].ContextMap(), "monitoring.metrics.running", true)
 	}
 
 	reporter.logTotals(map[string]monitoring.FlatSnapshot{"metrics": curSnap})
-	logs = logp.ObserverLogs().TakeAll()
+	logs = zapLogs.TakeAll()
 	if assert.Len(t, logs, 2) {
 		assert.Equal(t, "Total metrics", logs[0].Message)
 		assertMapHas(t, logs[0].ContextMap(), "monitoring.metrics.count", 20)

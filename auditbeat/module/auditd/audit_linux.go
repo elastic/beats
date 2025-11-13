@@ -20,8 +20,10 @@ package auditd
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -29,7 +31,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -65,7 +66,7 @@ const (
 )
 
 var (
-	auditdMetrics         = monitoring.Default.NewRegistry(moduleName)
+	auditdMetrics         = monitoring.Default.GetOrCreateRegistry(moduleName)
 	reassemblerGapsMetric = monitoring.NewInt(auditdMetrics, "reassembler_seq_gaps")
 	kernelLostMetric      = monitoring.NewInt(auditdMetrics, "kernel_lost")
 	userspaceLostMetric   = monitoring.NewInt(auditdMetrics, "userspace_lost")
@@ -87,6 +88,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	config     Config
+	control    *libaudit.AuditClient
 	client     *libaudit.AuditClient
 	log        *logp.Logger
 	kernelLost struct {
@@ -107,9 +109,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	_, _, kernel, _ := kernelVersion()
 	log.Infof("auditd module is running as euid=%v on kernel=%v", os.Geteuid(), kernel)
 
+	control, err := libaudit.NewAuditClient(nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create audit control client: %w", err)
+	}
+
 	client, err := newAuditClient(&config, log)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create audit client: %w", err)
+		return nil, fmt.Errorf("failed to create audit data client: %w", err)
 	}
 
 	reassemblerGapsMetric.Set(0)
@@ -119,6 +126,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet:        base,
+		control:              control,
 		client:               client,
 		config:               config,
 		log:                  log,
@@ -140,38 +148,17 @@ func newAuditClient(c *Config, log *logp.Logger) (*libaudit.AuditClient, error) 
 	return libaudit.NewAuditClient(nil)
 }
 
-func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
-	discard := func(bytes []byte) ([]syscall.NetlinkMessage, error) {
-		return nil, nil
-	}
-	// Drain the netlink channel in parallel to Close() to prevent a deadlock.
-	// This goroutine will terminate once receive from netlink errors (EBADF,
-	// EBADFD, or any other error). This happens because the fd is closed.
-	go func() {
-		for {
-			_, err := client.Netlink.Receive(true, discard)
-			switch {
-			case err == nil, errors.Is(err, syscall.EINTR):
-			case errors.Is(err, syscall.EAGAIN):
-				time.Sleep(50 * time.Millisecond)
-			default:
-				return
-			}
-		}
-	}()
-	if err := client.Close(); err != nil {
-		log.Errorw("Error closing audit monitoring client", "error", err)
-	}
-}
-
 // Run initializes the audit client and receives audit messages from the
 // kernel until the reporter's done channel is closed.
 func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
-	defer closeAuditClient(ms.client, ms.log)
+	defer ms.client.Close()
+	defer ms.control.Close()
 
 	// Don't attempt to change configuration if audit rules are locked (enabled == 2).
-	// Will result in EPERM.
-	status, err := ms.client.GetStatus()
+	// Will result in EPERM. Also, ensure that another socket is used to determine the
+	// status, because audit data can already buffering for ms.client. Which can lead
+	// to an ENOBUFS error bubbling up.
+	status, err := ms.control.GetStatus()
 	if err != nil {
 		err = fmt.Errorf("failed to get audit status before adding rules: %w", err)
 		reporter.Error(err)
@@ -179,7 +166,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 	}
 
 	if status.Enabled == auditLocked {
-		err := errors.New("Skipping rule configuration: Audit rules are locked")
+		err := errors.New("skipping rule configuration: Audit rules are locked")
 		reporter.Error(err)
 	} else if err := ms.addRules(reporter); err != nil {
 		reporter.Error(err)
@@ -211,7 +198,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 		go func() {
 			defer func() { // Close the most recently allocated "client" instance.
 				if client != nil {
-					closeAuditClient(client, ms.log)
+					ms.client.Close()
 				}
 			}()
 			timer := time.NewTicker(lostEventsUpdateInterval)
@@ -225,7 +212,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 						ms.updateKernelLostMetric(status.Lost)
 					} else {
 						ms.log.Error("get status request failed:", err)
-						closeAuditClient(client, ms.log)
+						client.Close()
 						client, err = libaudit.NewAuditClient(nil)
 						if err != nil {
 							ms.log.Errorw("Failure creating audit monitoring client", "error", err)
@@ -278,7 +265,7 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 	if err != nil {
 		return fmt.Errorf("failed to create audit client for adding rules: %w", err)
 	}
-	defer closeAuditClient(client, ms.log)
+	defer client.Close()
 
 	// Delete existing rules.
 	n, err := client.DeleteRules()
@@ -406,17 +393,49 @@ func (ms *MetricSet) initClient() error {
 }
 
 func (ms *MetricSet) setPID(retries int) (err error) {
-	if err = ms.client.SetPID(libaudit.WaitForReply); err == nil || !errors.Is(err, syscall.ENOBUFS) || retries == 0 {
-		return err
+	noParse := func([]byte) ([]syscall.NetlinkMessage, error) {
+		return nil, nil
 	}
-	// At this point the netlink channel is congested (ENOBUFS).
-	// Drain and close the client, then retry with a new client.
-	closeAuditClient(ms.client, ms.log)
-	if ms.client, err = newAuditClient(&ms.config, ms.log); err != nil {
-		return fmt.Errorf("failed to recover from ENOBUFS: %w", err)
+
+	// run the SetPID logic in a retry loop, since the startup process can be fragile.
+	for i := 0; i < retries; i++ {
+		// This call will block on send, which isn't great, but the reply can *also* time out
+		// or return something like ENOBUFS.
+		err = ms.client.SetPID(libaudit.WaitForReply)
+		switch {
+		case err == nil:
+			return nil
+		case errors.Is(err, syscall.EINTR):
+			// SetPID wraps a lot of logic, so we'll only ever get an EINTR on a send, the receive will always retry
+			continue
+		case errors.Is(err, syscall.ENOBUFS):
+			ms.log.Info("Recovering from ENOBUFS during setup...")
+			// the netlink connection is losing data. Try to drain and send again.
+			// This is technically dropping data, but auditbeat is configured as best-effort anyway, and we'll drop events under high load anyway.
+			maxRecv := 10000
+			for i := 0; i < maxRecv; i++ {
+				var retryOuter bool // hack because of how switch/break statements work
+				_, err = ms.client.Netlink.Receive(true, noParse)
+				switch {
+				case err == nil, errors.Is(err, syscall.EINTR), errors.Is(err, syscall.ENOBUFS):
+					continue
+				case errors.Is(err, syscall.EAGAIN):
+					// means receive would block, try to set our PID again
+					retryOuter = true
+				default:
+					return fmt.Errorf("failed to recover from ENOBUFS: %w", err)
+				}
+
+				if retryOuter {
+					break
+				}
+			}
+		default:
+			return fmt.Errorf("failed to set PID for auditbeat, got %w", err)
+		}
 	}
-	ms.log.Info("Recovering from ENOBUFS ...")
-	return ms.setPID(retries - 1)
+
+	return fmt.Errorf("could not set PID for audit process after %d attempts", retries)
 }
 
 func (ms *MetricSet) updateKernelLostMetric(lost uint32) {
@@ -432,7 +451,7 @@ func (ms *MetricSet) updateKernelLostMetric(lost uint32) {
 		}
 		logFn("kernel lost events: %d (total: %d)", delta, lost)
 	} else {
-		ms.log.Warnf("kernel lost event counter reset from %d to %d", ms.kernelLost, lost)
+		ms.log.Warnf("kernel lost event counter reset from %d to %d", ms.kernelLost.counter, lost)
 	}
 	ms.kernelLost.counter = lost
 }
@@ -611,13 +630,13 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	normalizeEventFields(auditEvent, out.RootFields)
 
 	// User set for related.user
-	var userSet common.StringSet
+	var userSet map[string]struct{}
 	if config.ResolveIDs {
-		userSet = make(common.StringSet)
+		userSet = make(map[string]struct{})
 	}
 
 	// Copy user.*/group.* fields from event
-	setECSEntity := func(key string, ent aucoalesce.ECSEntityData, root mapstr.M, set common.StringSet) {
+	setECSEntity := func(key string, ent aucoalesce.ECSEntityData, root mapstr.M, set map[string]struct{}) {
 		if ent.ID == "" && ent.Name == "" {
 			return
 		}
@@ -634,7 +653,7 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 		if ent.Name != "" {
 			_, _ = root.Put(nameField, ent.Name)
 			if set != nil {
-				set.Add(ent.Name)
+				set[ent.Name] = struct{}{}
 			}
 		} else {
 			_ = root.Delete(nameField)
@@ -647,10 +666,9 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	setECSEntity("user.changes", auditEvent.ECS.User.Changes, out.RootFields, userSet)
 	setECSEntity("group", auditEvent.ECS.Group, out.RootFields, nil)
 
-	if userSet != nil {
-		if userSet.Count() != 0 {
-			_, _ = out.RootFields.Put("related.user", userSet.ToSlice())
-		}
+	if len(userSet) != 0 {
+		relatedUser := slices.Compact(slices.Sorted(maps.Keys(userSet)))
+		_, _ = out.RootFields.Put("related.user", relatedUser)
 	}
 	getStringField := func(key string, m mapstr.M) (str string) {
 		if asIf, _ := m.GetValue(key); asIf != nil {

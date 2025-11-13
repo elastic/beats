@@ -46,7 +46,6 @@ func formatGPStatsEvents(m *MetricSet, response GPStatsResponse) []mb.Event {
 
 	events := make([]mb.Event, 0, len(response.Result.Gateways))
 	timestamp := time.Now().UTC()
-	rootFields := panw.MakeRootFields(m.config.HostIp)
 
 	totalCurrent := response.Result.TotalCurrentUsers
 	totalPrevious := response.Result.TotalPreviousUsers
@@ -61,7 +60,7 @@ func formatGPStatsEvents(m *MetricSet, response GPStatsResponse) []mb.Event {
 				"globalprotect.total_current_users":    totalCurrent,
 				"globalprotect.total_previous_users":   totalPrevious,
 			},
-			RootFields: rootFields,
+			RootFields: panw.MakeRootFields(m.config.HostIp),
 		}
 
 		events = append(events, event)

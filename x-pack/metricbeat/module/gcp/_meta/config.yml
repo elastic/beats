@@ -6,13 +6,14 @@
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
+  metadata_cache: true
+  metadata_cache_refresh_period: 1h
 
 - module: gcp
   metricsets:
     - pubsub
     - loadbalancing
     - firestore
-    - dataproc
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -34,6 +35,7 @@
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
+  location_label: "resource.labels.zone"
   metrics:
     - aligner: ALIGN_NONE
       service: compute
@@ -67,5 +69,28 @@
   period: 24h
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
+  endpoint: http://your-endpoint
   dataset_id: "dataset id"
   table_pattern: "table pattern"
+
+- module: gcp
+  metricsets:
+    - dataproc
+  zone: "us-central1-a"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+  collect_dataproc_user_labels: true
+
+- module: gcp
+  metricsets:
+    - vertexai_logs
+  period: 300s  # 5 minutes
+  project_id: "your-project-id"
+  table_id: "your-project-id.dataset.id.table_name"
+  credentials_file_path: "/path/to/service-account.json"
+  # credentials_json: '{"type": "service_account", ...}'
+  time_lookback_hours: 1  # How many hours back to look for initial data fetch
+
+

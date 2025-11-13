@@ -6,52 +6,47 @@ package awss3
 
 import (
 	"errors"
+	"sync"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/stretchr/testify/assert"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-func TestGetProviderFromDomain(t *testing.T) {
-	tests := []struct {
-		endpoint string
-		override string
-		want     string
-	}{
-		{endpoint: "", override: "", want: "aws"},
-		{endpoint: "c2s.ic.gov", want: "aws"},
-		{endpoint: "abc.com", override: "abc", want: "abc"},
-		{endpoint: "oraclecloud.com", override: "xyz", want: "xyz"},
-		{endpoint: "amazonaws.com", want: "aws"},
-		{endpoint: "c2s.sgov.gov", want: "aws"},
-		{endpoint: "c2s.ic.gov", want: "aws"},
-		{endpoint: "amazonaws.com.cn", want: "aws"},
-		{endpoint: "https://backblazeb2.com", want: "backblaze"},
-		{endpoint: "https://1234567890.r2.cloudflarestorage.com", want: "cloudflare"},
-		{endpoint: "https://wasabisys.com", want: "wasabi"},
-		{endpoint: "https://digitaloceanspaces.com", want: "digitalocean"},
-		{endpoint: "https://dream.io", want: "dreamhost"},
-		{endpoint: "https://scw.cloud", want: "scaleway"},
-		{endpoint: "https://googleapis.com", want: "gcp"},
-		{endpoint: "https://cloud.it", want: "arubacloud"},
-		{endpoint: "https://linodeobjects.com", want: "linode"},
-		{endpoint: "https://vultrobjects.com", want: "vultr"},
-		{endpoint: "https://appdomain.cloud", want: "ibm"},
-		{endpoint: "https://aliyuncs.com", want: "alibaba"},
-		{endpoint: "https://oraclecloud.com", want: "oracle"},
-		{endpoint: "https://exo.io", want: "exoscale"},
-		{endpoint: "https://upcloudobjects.com", want: "upcloud"},
-		{endpoint: "https://ilandcloud.com", want: "iland"},
-		{endpoint: "https://zadarazios.com", want: "zadara"},
-	}
+// statusReporterHelperMock is a thread-safe mock of a status reporter that
+// behaves like StatusReporterHelper
+type statusReporterHelperMock struct {
+	mu       sync.Mutex
+	statuses []mgmtStatusUpdate
+	current  status.Status
+}
 
-	for _, test := range tests {
-		assert.Equal(t, test.want, getProviderFromDomain(test.endpoint, test.override),
-			"for endpoint=%q and override=%q", test.endpoint, test.override)
+type mgmtStatusUpdate struct {
+	status status.Status
+	msg    string
+}
+
+func (r *statusReporterHelperMock) getStatuses() []mgmtStatusUpdate {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	s := make([]mgmtStatusUpdate, len(r.statuses))
+	copy(s, r.statuses)
+	return s
+}
+
+func (r *statusReporterHelperMock) UpdateStatus(s status.Status, msg string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	// Imitate behavior of statusReporterHelper. Only record if the new status is different.
+	if s != r.current {
+		r.current = s
+		r.statuses = append(r.statuses, mgmtStatusUpdate{status: s, msg: msg})
 	}
 }
 
@@ -88,8 +83,20 @@ func TestRegionSelection(t *testing.T) {
 			want:       "us-west-3",
 		},
 		{
-			name:     "abc.xyz_and_domain_with_blank_endpoint",
+			name:     "abc.xyz_and_domain_with_matching_endpoint_and_scheme",
 			queueURL: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
+			endpoint: "https://abc.xyz",
+			want:     "us-east-1",
+		},
+		{
+			name:     "abc.xyz_and_domain_with_matching_url_endpoint",
+			queueURL: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
+			endpoint: "https://s3.us-east-1.abc.xyz",
+			want:     "us-east-1",
+		},
+		{
+			name:     "abc.xyz_and_no_region_term",
+			queueURL: "https://sqs.abc.xyz/627959692251/test-s3-logs",
 			wantErr:  errBadQueueURL,
 		},
 		{
@@ -118,7 +125,7 @@ func TestRegionSelection(t *testing.T) {
 		{
 			name:     "non_aws_vpce_without_endpoint",
 			queueURL: "https://vpce-test.sqs.us-east-1.vpce.abc.xyz/12345678912/sqs-queue",
-			wantErr:  errBadQueueURL,
+			want:     "us-east-1",
 		},
 		{
 			name:       "non_aws_vpce_with_region_override",
@@ -135,12 +142,14 @@ func TestRegionSelection(t *testing.T) {
 				RegionName: test.regionName,
 				AWSConfig:  awscommon.ConfigAWS{Endpoint: test.endpoint},
 			}
-			in := newSQSReaderInput(config, awssdk.Config{})
+			in := newSQSReaderInput(config, awssdk.Config{}, paths.New())
 			inputCtx := v2.Context{
-				Logger: logp.NewLogger("awss3_test"),
-				ID:     "test_id",
+				Logger:          logp.NewLogger("awss3_test"),
+				ID:              "test_id",
+				MetricsRegistry: monitoring.NewRegistry(),
 			}
 
+			in.status = &statusReporterHelperMock{}
 			// Run setup and verify that it put the correct region in awsConfig.Region
 			err := in.setup(inputCtx, &fakePipeline{})
 			in.cleanup()

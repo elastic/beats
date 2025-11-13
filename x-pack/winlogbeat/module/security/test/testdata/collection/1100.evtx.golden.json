@@ -16,7 +16,6 @@
     },
     "message": "The event logging service has shut down.",
     "winlog": {
-      "api": "wineventlog",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
       "event_id": "1100",
@@ -30,7 +29,7 @@
           "id": 4532
         }
       },
-      "provider_guid": "{fc65ddd8-d6ef-4962-83d5-6e5cfe9ce148}",
+      "provider_guid": "{FC65DDD8-D6EF-4962-83D5-6E5CFE9CE148}",
       "provider_name": "Microsoft-Windows-Eventlog",
       "record_id": 14257,
       "task": "Service shutdown"

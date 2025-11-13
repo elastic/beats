@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package kubernetes
 
 import (
@@ -38,22 +40,25 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGenerateHints(t *testing.T) {
 	tests := []struct {
+		name   string
 		event  bus.Event
 		result bus.Event
 	}{
 		// Empty events should return empty hints
 		{
+			name:   "empty",
 			event:  bus.Event{},
 			result: bus.Event{},
 		},
 		// Only kubernetes payload must return only kubernetes as part of the hint
 		{
+			name: "only kubernetes",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"pod": mapstr.M{
@@ -71,6 +76,7 @@ func TestGenerateHints(t *testing.T) {
 		},
 		// Kubernetes payload with container info must be bubbled to top level
 		{
+			name: "kubernetes container info top level",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"container": mapstr.M{
@@ -102,6 +108,7 @@ func TestGenerateHints(t *testing.T) {
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
 		{
+			name: "multiple hints",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"annotations": getNestedAnnotations(mapstr.M{
@@ -163,6 +170,7 @@ func TestGenerateHints(t *testing.T) {
 		// Have one set of hints come from the pod and the other come from namespaces
 		// The resultant hints should have a combination of both
 		{
+			name: "hints from Pod and Namespace",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"annotations": getNestedAnnotations(mapstr.M{
@@ -227,6 +235,7 @@ func TestGenerateHints(t *testing.T) {
 		// Have one set of hints come from the pod and the same keys come from namespaces
 		// The resultant hints should honor only pods and not namespace.
 		{
+			name: "pod hints win over namespace",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"annotations": getNestedAnnotations(mapstr.M{
@@ -288,6 +297,7 @@ func TestGenerateHints(t *testing.T) {
 		// Have no hints on the pod and have namespace level defaults.
 		// The resultant hints should honor only namespace defaults.
 		{
+			name: "namespace defaults",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"namespace_annotations": getNestedAnnotations(mapstr.M{
@@ -333,13 +343,16 @@ func TestGenerateHints(t *testing.T) {
 	}
 
 	cfg := defaultConfig()
-
+	logger := logptest.NewTestingLogger(t, "")
 	p := pod{
 		config: cfg,
-		logger: logp.NewLogger("kubernetes.pod"),
+		logger: logger.Named("kubernetes.pod"),
 	}
 	for _, test := range tests {
-		assert.Equal(t, p.GenerateHints(test.event), test.result)
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.result, p.GenerateHints(test.event))
+		})
 	}
 }
 
@@ -1938,9 +1951,10 @@ func TestPod_EmitEvent(t *testing.T) {
 
 	client := k8sfake.NewSimpleClientset()
 	addResourceMetadata := metadata.GetDefaultResourceMetadataConfig()
+	logger := logptest.NewTestingLogger(t, "")
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
-			mapper, err := template.NewConfigMapper(nil, nil, nil)
+			mapper, err := template.NewConfigMapper(nil, nil, nil, logger)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -1948,9 +1962,9 @@ func TestPod_EmitEvent(t *testing.T) {
 			metaGen := metadata.NewPodMetadataGenerator(conf.NewConfig(), nil, client, nil, nil, nil, nil, addResourceMetadata)
 			p := &Provider{
 				config:    defaultConfig(),
-				bus:       bus.New(logp.NewLogger("bus"), "test"),
+				bus:       bus.New(logptest.NewTestingLogger(t, "bus"), "test"),
 				templates: mapper,
-				logger:    logp.NewLogger("kubernetes"),
+				logger:    logger.Named("kubernetes"),
 			}
 
 			pub := &publisher{b: p.bus}
@@ -1959,7 +1973,7 @@ func TestPod_EmitEvent(t *testing.T) {
 				config:      defaultConfig(),
 				publishFunc: pub.publish,
 				uuid:        UUID,
-				logger:      logp.NewLogger("kubernetes.pod"),
+				logger:      logger.Named("kubernetes.pod"),
 			}
 
 			p.eventManager = NewMockPodEventerManager(pod)
@@ -2203,7 +2217,7 @@ func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
 			err = config.Unpack(&c)
 			assert.NoError(t, err)
 
-			eventer, err := NewPodEventer(uuid, config, client, nil)
+			eventer, err := NewPodEventer(uuid, config, client, nil, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}

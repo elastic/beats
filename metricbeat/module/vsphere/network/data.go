@@ -26,6 +26,7 @@ import (
 func (m *NetworkMetricSet) mapEvent(net mo.Network, data *metricData) mapstr.M {
 	event := mapstr.M{}
 
+	event.Put("id", net.Self.Value)
 	event.Put("name", net.Name)
 	event.Put("status", net.OverallStatus)
 	event.Put("accessible", net.Summary.GetNetworkSummary().Accessible)

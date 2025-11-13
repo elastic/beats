@@ -5,6 +5,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Sysmon config state changed",
       "category": [
         "configuration"
       ],
@@ -22,11 +23,11 @@
     "log": {
       "level": "information"
     },
+    "message": "Sysmon config state changed:\nUtcTime: 2019-03-18 16:57:37.933\nConfiguration: C:\\Users\\vagrant\\Downloads\\\"C:\\Users\\vagrant\\Downloads\\Sysmon.exe\"  -i -n\nConfigurationFileHash: ",
     "user": {
       "id": "S-1-5-21-3541430928-2051711210-1391384369-1001"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_data": {
@@ -40,9 +41,10 @@
           "id": 4724
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "1",
+      "task": "Sysmon config state changed",
       "user": {
         "identifier": "S-1-5-21-3541430928-2051711210-1391384369-1001"
       },
@@ -55,6 +57,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Sysmon service state changed",
       "category": [
         "process"
       ],
@@ -72,11 +75,11 @@
     "log": {
       "level": "information"
     },
+    "message": "Sysmon service state changed:\nUtcTime: 2019-03-18 16:57:38.011\nState: Started\nVersion: 9.01\nSchemaVersion: 4.20",
     "user": {
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_data": {
@@ -92,9 +95,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "2",
+      "task": "Sysmon service state changed",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -110,6 +114,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Process Create (rule: ProcessCreate)",
       "category": [
         "process"
       ],
@@ -127,13 +132,14 @@
     "log": {
       "level": "information"
     },
+    "message": "Process Create:\nRuleName: \nUtcTime: 2019-03-18 16:57:37.949\nProcessGuid: {42F11C3B-CE01-5C8F-0000-0010C73E2A00}\nProcessId: 0\nImage: C:\\Windows\\Sysmon.exe\nFileVersion: 9.01\nDescription: System activity monitor\nProduct: Sysinternals Sysmon\nCompany: Sysinternals - www.sysinternals.com\nOriginalFileName: C:\\Windows\\Sysmon.exe\nCommandLine: C:\\Windows\\system32\\\nCurrentDirectory: NT AUTHORITY\\SYSTEM\nUser: {42F11C3B-6E1A-5C8C-0000-0020E7030000}\nLogonGuid: 0x3e7\nLogonId: 0x0\nTerminalSessionId: 0\nIntegrityLevel: SHA1=AC93C3B38E57A2715572933DBCB2A1C2892DBC5E\nHashes: {42F11C3B-6E1A-5C8C-0000-0010F14D0000}\nParentProcessGuid: 488\nParentProcessId: 0\nParentImage: C:\\Windows\\system32\\services.exe\nParentCommandLine: %22\nParentUser: %23",
     "process": {
       "args": [
         "C:\\Windows\\Sysmon.exe"
       ],
       "args_count": 1,
       "command_line": "C:\\Windows\\Sysmon.exe",
-      "entity_id": "{42f11c3b-ce01-5c8f-0000-0010c73e2a00}",
+      "entity_id": "{42F11C3B-CE01-5C8F-0000-0010C73E2A00}",
       "executable": "C:\\Windows\\Sysmon.exe",
       "hash": {
         "sha1": "ac93c3b38e57a2715572933dbcb2a1c2892dbc5e"
@@ -145,7 +151,7 @@
         ],
         "args_count": 1,
         "command_line": "C:\\Windows\\system32\\services.exe",
-        "entity_id": "{42f11c3b-6e1a-5c8c-0000-0010f14d0000}",
+        "entity_id": "{42F11C3B-6E1A-5C8C-0000-0010F14D0000}",
         "executable": "C:\\Windows\\System32\\services.exe",
         "name": "services.exe",
         "pid": 488
@@ -173,7 +179,6 @@
       "name": "SYSTEM"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_data": {
@@ -181,7 +186,7 @@
         "Description": "System activity monitor",
         "FileVersion": "9.01",
         "IntegrityLevel": "System",
-        "LogonGuid": "{42f11c3b-6e1a-5c8c-0000-0020e7030000}",
+        "LogonGuid": "{42F11C3B-6E1A-5C8C-0000-0020E7030000}",
         "LogonId": "0x3e7",
         "Product": "Sysinternals Sysmon",
         "TerminalSessionId": "0"
@@ -194,9 +199,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "3",
+      "task": "Process Create (rule: ProcessCreate)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -212,6 +218,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Process Create (rule: ProcessCreate)",
       "category": [
         "process"
       ],
@@ -229,6 +236,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Process Create:\nRuleName: \nUtcTime: 2019-03-18 16:57:37.964\nProcessGuid: {42F11C3B-CE01-5C8F-0000-00102C412A00}\nProcessId: 0\nImage: C:\\Windows\\System32\\wbem\\unsecapp.exe\nFileVersion: 6.3.9600.16384 (winblue_rtm.130821-1623)\nDescription: Sink to receive asynchronous callbacks for WMI client application\nProduct: Microsoft® Windows® Operating System\nCompany: Microsoft Corporation\nOriginalFileName: C:\\Windows\\system32\\wbem\\unsecapp.exe -Embedding\nCommandLine: C:\\Windows\\system32\\\nCurrentDirectory: NT AUTHORITY\\SYSTEM\nUser: {42F11C3B-6E1A-5C8C-0000-0020E7030000}\nLogonGuid: 0x3e7\nLogonId: 0x0\nTerminalSessionId: 0\nIntegrityLevel: SHA1=6DF8163A6320B80B60733F9D62E2F39B4B16B678\nHashes: {42F11C3B-6E1B-5C8C-0000-00102F610000}\nParentProcessGuid: 560\nParentProcessId: 0\nParentImage: C:\\Windows\\system32\\svchost.exe -k DcomLaunch\nParentCommandLine: %22\nParentUser: %23",
     "process": {
       "args": [
         "C:\\Windows\\system32\\wbem\\unsecapp.exe",
@@ -236,7 +244,7 @@
       ],
       "args_count": 2,
       "command_line": "C:\\Windows\\system32\\wbem\\unsecapp.exe -Embedding",
-      "entity_id": "{42f11c3b-ce01-5c8f-0000-00102c412a00}",
+      "entity_id": "{42F11C3B-CE01-5C8F-0000-00102C412A00}",
       "executable": "C:\\Windows\\System32\\wbem\\unsecapp.exe",
       "hash": {
         "sha1": "6df8163a6320b80b60733f9d62e2f39b4b16b678"
@@ -250,7 +258,7 @@
         ],
         "args_count": 3,
         "command_line": "C:\\Windows\\system32\\svchost.exe -k DcomLaunch",
-        "entity_id": "{42f11c3b-6e1b-5c8c-0000-00102f610000}",
+        "entity_id": "{42F11C3B-6E1B-5C8C-0000-00102F610000}",
         "executable": "C:\\Windows\\System32\\svchost.exe",
         "name": "svchost.exe",
         "pid": 560
@@ -278,7 +286,6 @@
       "name": "SYSTEM"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_data": {
@@ -286,7 +293,7 @@
         "Description": "Sink to receive asynchronous callbacks for WMI client application",
         "FileVersion": "6.3.9600.16384 (winblue_rtm.130821-1623)",
         "IntegrityLevel": "System",
-        "LogonGuid": "{42f11c3b-6e1a-5c8c-0000-0020e7030000}",
+        "LogonGuid": "{42F11C3B-6E1A-5C8C-0000-0020E7030000}",
         "LogonId": "0x3e7",
         "Product": "Microsoft® Windows® Operating System",
         "TerminalSessionId": "0"
@@ -299,9 +306,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "4",
+      "task": "Process Create (rule: ProcessCreate)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -317,6 +325,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Process terminated (rule: ProcessTerminate)",
       "category": [
         "process"
       ],
@@ -334,8 +343,9 @@
     "log": {
       "level": "information"
     },
+    "message": "Process terminated:\nRuleName: \nUtcTime: 2019-03-18 16:57:38.981\nProcessGuid: {42F11C3B-CDF4-5C8F-0000-0010E61E2A00}\nProcessId: 0\nImage: C:\\Users\\vagrant\\AppData\\Local\\Temp\\Sysmon.exe\nUser: %6",
     "process": {
-      "entity_id": "{42f11c3b-cdf4-5c8f-0000-0010e61e2a00}",
+      "entity_id": "{42F11C3B-CDF4-5C8F-0000-0010E61E2A00}",
       "executable": "C:\\Users\\vagrant\\AppData\\Local\\Temp\\Sysmon.exe",
       "name": "Sysmon.exe",
       "pid": 4616
@@ -344,7 +354,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "5",
@@ -355,9 +364,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "5",
+      "task": "Process terminated (rule: ProcessTerminate)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -373,6 +383,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Process terminated (rule: ProcessTerminate)",
       "category": [
         "process"
       ],
@@ -390,8 +401,9 @@
     "log": {
       "level": "information"
     },
+    "message": "Process terminated:\nRuleName: \nUtcTime: 2019-03-18 16:57:38.981\nProcessGuid: {42F11C3B-CDF4-5C8F-0000-0010071E2A00}\nProcessId: 0\nImage: C:\\Users\\vagrant\\Downloads\\Sysmon.exe\nUser: %6",
     "process": {
-      "entity_id": "{42f11c3b-cdf4-5c8f-0000-0010071e2a00}",
+      "entity_id": "{42F11C3B-CDF4-5C8F-0000-0010071E2A00}",
       "executable": "C:\\Users\\vagrant\\Downloads\\Sysmon.exe",
       "name": "Sysmon.exe",
       "pid": 4648
@@ -400,7 +412,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "5",
@@ -411,9 +422,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "6",
+      "task": "Process terminated (rule: ProcessTerminate)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -429,6 +441,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Process Create (rule: ProcessCreate)",
       "category": [
         "process"
       ],
@@ -446,6 +459,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Process Create:\nRuleName: \nUtcTime: 2019-03-18 16:57:39.012\nProcessGuid: {42F11C3B-CE03-5C8F-0000-0010E9462A00}\nProcessId: 0\nImage: C:\\Windows\\System32\\wbem\\WmiPrvSE.exe\nFileVersion: 6.3.9600.16384 (winblue_rtm.130821-1623)\nDescription: WMI Provider Host\nProduct: Microsoft® Windows® Operating System\nCompany: Microsoft Corporation\nOriginalFileName: C:\\Windows\\system32\\wbem\\wmiprvse.exe -Embedding\nCommandLine: C:\\Windows\\system32\\\nCurrentDirectory: NT AUTHORITY\\SYSTEM\nUser: {42F11C3B-6E1A-5C8C-0000-0020E7030000}\nLogonGuid: 0x3e7\nLogonId: 0x0\nTerminalSessionId: 0\nIntegrityLevel: SHA1=5A4C0E82FF95C9FB762D46A696EF9F1B68001C21\nHashes: {42F11C3B-6E1B-5C8C-0000-00102F610000}\nParentProcessGuid: 560\nParentProcessId: 0\nParentImage: C:\\Windows\\system32\\svchost.exe -k DcomLaunch\nParentCommandLine: %22\nParentUser: %23",
     "process": {
       "args": [
         "C:\\Windows\\system32\\wbem\\wmiprvse.exe",
@@ -453,7 +467,7 @@
       ],
       "args_count": 2,
       "command_line": "C:\\Windows\\system32\\wbem\\wmiprvse.exe -Embedding",
-      "entity_id": "{42f11c3b-ce03-5c8f-0000-0010e9462a00}",
+      "entity_id": "{42F11C3B-CE03-5C8F-0000-0010E9462A00}",
       "executable": "C:\\Windows\\System32\\wbem\\WmiPrvSE.exe",
       "hash": {
         "sha1": "5a4c0e82ff95c9fb762d46a696ef9f1b68001c21"
@@ -467,7 +481,7 @@
         ],
         "args_count": 3,
         "command_line": "C:\\Windows\\system32\\svchost.exe -k DcomLaunch",
-        "entity_id": "{42f11c3b-6e1b-5c8c-0000-00102f610000}",
+        "entity_id": "{42F11C3B-6E1B-5C8C-0000-00102F610000}",
         "executable": "C:\\Windows\\System32\\svchost.exe",
         "name": "svchost.exe",
         "pid": 560
@@ -495,7 +509,6 @@
       "name": "SYSTEM"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_data": {
@@ -503,7 +516,7 @@
         "Description": "WMI Provider Host",
         "FileVersion": "6.3.9600.16384 (winblue_rtm.130821-1623)",
         "IntegrityLevel": "System",
-        "LogonGuid": "{42f11c3b-6e1a-5c8c-0000-0020e7030000}",
+        "LogonGuid": "{42F11C3B-6E1A-5C8C-0000-0020E7030000}",
         "LogonId": "0x3e7",
         "Product": "Microsoft® Windows® Operating System",
         "TerminalSessionId": "0"
@@ -516,9 +529,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "7",
+      "task": "Process Create (rule: ProcessCreate)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -538,6 +552,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -557,6 +572,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:47.847\nProcessGuid: {42F11C3B-0BAD-5C8C-0000-0010DFBC0000}\nProcessId: 924\nImage: C:\\Windows\\System32\\svchost.exe\nUser: NT AUTHORITY\\NETWORK SERVICE\nProtocol: udp\nInitiated: true\nSourceIsIpv6: true\nSourceIp: a00:20f:0:0:18a2:6e00:e0:ffff\nSourceHostname: \nSourcePort: 62141\nSourcePortName: \nDestinationIsIpv6: true\nDestinationIp: a00:203:3000:3000:3000:3000:3000:3300\nDestinationHostname: \nDestinationPort: 53\nDestinationPortName: domain",
     "network": {
       "community_id": "1:EQDBfI6vAylArTBQHY8kNmaweOA=",
       "direction": "egress",
@@ -565,7 +581,7 @@
       "type": "ipv6"
     },
     "process": {
-      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "entity_id": "{42F11C3B-0BAD-5C8C-0000-0010DFBC0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 924
@@ -589,7 +605,6 @@
       "name": "NETWORK SERVICE"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -600,9 +615,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "8",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -622,6 +638,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -641,6 +658,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:48.070\nProcessGuid: {42F11C3B-0BAD-5C8C-0000-0010DFBC0000}\nProcessId: 924\nImage: C:\\Windows\\System32\\svchost.exe\nUser: NT AUTHORITY\\NETWORK SERVICE\nProtocol: udp\nInitiated: false\nSourceIsIpv6: false\nSourceIp: 10.0.2.15\nSourceHostname: vagrant-2012-r2.local.crowbird.com\nSourcePort: 62141\nSourcePortName: \nDestinationIsIpv6: false\nDestinationIp: 10.0.2.3\nDestinationHostname: \nDestinationPort: 53\nDestinationPortName: domain",
     "network": {
       "community_id": "1:TXczQujzvcGYSvZ/CKEBu1p2riE=",
       "direction": "ingress",
@@ -649,7 +667,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "entity_id": "{42F11C3B-0BAD-5C8C-0000-0010DFBC0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 924
@@ -674,7 +692,6 @@
       "name": "NETWORK SERVICE"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -685,9 +702,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "9",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -707,6 +725,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -726,6 +745,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:48.148\nProcessGuid: {42F11C3B-CCAA-5C8F-0000-0010B4E22700}\nProcessId: 1600\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nUser: VAGRANT-2012-R2\\vagrant\nProtocol: tcp\nInitiated: true\nSourceIsIpv6: false\nSourceIp: 10.0.2.15\nSourceHostname: vagrant-2012-r2.local.crowbird.com\nSourcePort: 1138\nSourcePortName: \nDestinationIsIpv6: false\nDestinationIp: 40.77.226.250\nDestinationHostname: \nDestinationPort: 443\nDestinationPortName: https",
     "network": {
       "community_id": "1:W2ZbP8nXMY+YAGYw2h/3Sa8Gu/w=",
       "direction": "egress",
@@ -734,7 +754,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -759,7 +779,6 @@
       "name": "vagrant"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -770,9 +789,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "10",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -792,6 +812,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -811,6 +832,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:48.214\nProcessGuid: {42F11C3B-CCAA-5C8F-0000-0010B4E22700}\nProcessId: 1600\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nUser: VAGRANT-2012-R2\\vagrant\nProtocol: tcp\nInitiated: true\nSourceIsIpv6: false\nSourceIp: 10.0.2.15\nSourceHostname: vagrant-2012-r2.local.crowbird.com\nSourcePort: 1139\nSourcePortName: \nDestinationIsIpv6: false\nDestinationIp: 40.77.226.250\nDestinationHostname: \nDestinationPort: 443\nDestinationPortName: https",
     "network": {
       "community_id": "1:5MsyqYltV9KkhIFGPWiByzQqHDo=",
       "direction": "egress",
@@ -819,7 +841,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -844,7 +866,6 @@
       "name": "vagrant"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -855,9 +876,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "11",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -877,6 +899,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -896,6 +919,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:48.250\nProcessGuid: {42F11C3B-6E19-5C8C-0000-0010EB030000}\nProcessId: 4\nImage: System\nUser: NT AUTHORITY\\SYSTEM\nProtocol: udp\nInitiated: true\nSourceIsIpv6: false\nSourceIp: 10.0.2.15\nSourceHostname: vagrant-2012-r2.local.crowbird.com\nSourcePort: 137\nSourcePortName: netbios-ns\nDestinationIsIpv6: false\nDestinationIp: 10.0.2.255\nDestinationHostname: \nDestinationPort: 137\nDestinationPortName: netbios-ns",
     "network": {
       "community_id": "1:0p51df9oGzNph3fcneX2H8jXsag=",
       "direction": "egress",
@@ -904,7 +928,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "pid": 4
     },
@@ -928,7 +952,6 @@
       "name": "SYSTEM"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -939,9 +962,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "12",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -962,6 +986,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -981,6 +1006,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:48.250\nProcessGuid: {42F11C3B-6E19-5C8C-0000-0010EB030000}\nProcessId: 4\nImage: System\nUser: NT AUTHORITY\\SYSTEM\nProtocol: udp\nInitiated: false\nSourceIsIpv6: false\nSourceIp: 10.0.2.255\nSourceHostname: \nSourcePort: 137\nSourcePortName: netbios-ns\nDestinationIsIpv6: false\nDestinationIp: 10.0.2.15\nDestinationHostname: vagrant-2012-r2.local.crowbird.com\nDestinationPort: 137\nDestinationPortName: netbios-ns",
     "network": {
       "community_id": "1:0p51df9oGzNph3fcneX2H8jXsag=",
       "direction": "ingress",
@@ -989,7 +1015,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "pid": 4
     },
@@ -1012,7 +1038,6 @@
       "name": "SYSTEM"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -1023,9 +1048,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "13",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -1045,6 +1071,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -1064,6 +1091,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:48.250\nProcessGuid: {42F11C3B-0BAD-5C8C-0000-0010DFBC0000}\nProcessId: 924\nImage: C:\\Windows\\System32\\svchost.exe\nUser: NT AUTHORITY\\NETWORK SERVICE\nProtocol: udp\nInitiated: true\nSourceIsIpv6: true\nSourceIp: fe80:0:0:0:e488:b85c:5262:ff86\nSourceHostname: vagrant-2012-r2.local.crowbird.com\nSourcePort: 55542\nSourcePortName: \nDestinationIsIpv6: true\nDestinationIp: ff02:0:0:0:0:0:1:3\nDestinationHostname: \nDestinationPort: 5355\nDestinationPortName: llmnr",
     "network": {
       "community_id": "1:4DSgubObvMEI9IKNWPDqltrux+k=",
       "direction": "egress",
@@ -1072,7 +1100,7 @@
       "type": "ipv6"
     },
     "process": {
-      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "entity_id": "{42F11C3B-0BAD-5C8C-0000-0010DFBC0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 924
@@ -1097,7 +1125,6 @@
       "name": "NETWORK SERVICE"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -1108,9 +1135,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "14",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -1130,6 +1158,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -1149,6 +1178,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:48.250\nProcessGuid: {42F11C3B-0BAD-5C8C-0000-0010DFBC0000}\nProcessId: 924\nImage: C:\\Windows\\System32\\svchost.exe\nUser: NT AUTHORITY\\NETWORK SERVICE\nProtocol: udp\nInitiated: true\nSourceIsIpv6: true\nSourceIp: a00:20f:0:0:18a2:6e00:e0:ffff\nSourceHostname: \nSourcePort: 55542\nSourcePortName: \nDestinationIsIpv6: true\nDestinationIp: e000:fc:4300:6800:7200:6f00:6d00:6500\nDestinationHostname: \nDestinationPort: 5355\nDestinationPortName: llmnr",
     "network": {
       "community_id": "1:sejGGvgk92xTvKdzlFitndKqdWw=",
       "direction": "egress",
@@ -1157,7 +1187,7 @@
       "type": "ipv6"
     },
     "process": {
-      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "entity_id": "{42F11C3B-0BAD-5C8C-0000-0010DFBC0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 924
@@ -1181,7 +1211,6 @@
       "name": "NETWORK SERVICE"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -1192,9 +1221,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "15",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -1214,6 +1244,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -1233,6 +1264,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:48.250\nProcessGuid: {42F11C3B-6E19-5C8C-0000-0010EB030000}\nProcessId: 4\nImage: System\nUser: NT AUTHORITY\\SYSTEM\nProtocol: udp\nInitiated: true\nSourceIsIpv6: false\nSourceIp: 169.254.180.25\nSourceHostname: \nSourcePort: 137\nSourcePortName: netbios-ns\nDestinationIsIpv6: false\nDestinationIp: 169.254.255.255\nDestinationHostname: \nDestinationPort: 137\nDestinationPortName: netbios-ns",
     "network": {
       "community_id": "1:yP71IXofOTWmF1LG760//yXa4Rk=",
       "direction": "egress",
@@ -1241,7 +1273,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "pid": 4
     },
@@ -1264,7 +1296,6 @@
       "name": "SYSTEM"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -1275,9 +1306,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "16",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -1297,6 +1329,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -1316,6 +1349,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:48.251\nProcessGuid: {42F11C3B-6E19-5C8C-0000-0010EB030000}\nProcessId: 4\nImage: System\nUser: NT AUTHORITY\\SYSTEM\nProtocol: udp\nInitiated: false\nSourceIsIpv6: false\nSourceIp: 169.254.255.255\nSourceHostname: \nSourcePort: 137\nSourcePortName: netbios-ns\nDestinationIsIpv6: false\nDestinationIp: 169.254.180.25\nDestinationHostname: \nDestinationPort: 137\nDestinationPortName: netbios-ns",
     "network": {
       "community_id": "1:yP71IXofOTWmF1LG760//yXa4Rk=",
       "direction": "ingress",
@@ -1324,7 +1358,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "pid": 4
     },
@@ -1347,7 +1381,6 @@
       "name": "SYSTEM"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -1358,9 +1391,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "17",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -1380,6 +1414,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -1399,6 +1434,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:48.251\nProcessGuid: {42F11C3B-0BAD-5C8C-0000-0010DFBC0000}\nProcessId: 924\nImage: C:\\Windows\\System32\\svchost.exe\nUser: NT AUTHORITY\\NETWORK SERVICE\nProtocol: udp\nInitiated: true\nSourceIsIpv6: true\nSourceIp: fe80:0:0:0:616f:32fa:b04f:b419\nSourceHostname: \nSourcePort: 55717\nSourcePortName: \nDestinationIsIpv6: true\nDestinationIp: ff02:0:0:0:0:0:1:3\nDestinationHostname: \nDestinationPort: 5355\nDestinationPortName: llmnr",
     "network": {
       "community_id": "1:Zt/ImHlMNf4MciHXlRDkivgw2jY=",
       "direction": "egress",
@@ -1407,7 +1443,7 @@
       "type": "ipv6"
     },
     "process": {
-      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "entity_id": "{42F11C3B-0BAD-5C8C-0000-0010DFBC0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 924
@@ -1431,7 +1467,6 @@
       "name": "NETWORK SERVICE"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -1442,9 +1477,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "18",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -1464,6 +1500,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -1483,6 +1520,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:48.251\nProcessGuid: {42F11C3B-0BAD-5C8C-0000-0010DFBC0000}\nProcessId: 924\nImage: C:\\Windows\\System32\\svchost.exe\nUser: NT AUTHORITY\\NETWORK SERVICE\nProtocol: udp\nInitiated: true\nSourceIsIpv6: true\nSourceIp: a9fe:b419:0:0:f880:2301:e0:ffff\nSourceHostname: \nSourcePort: 55717\nSourcePortName: \nDestinationIsIpv6: true\nDestinationIp: e000:fc:0:0:0:0:0:0\nDestinationHostname: \nDestinationPort: 5355\nDestinationPortName: llmnr",
     "network": {
       "community_id": "1:SHkoHfPFDYWai8qQBwIiRxvCPZw=",
       "direction": "egress",
@@ -1491,7 +1529,7 @@
       "type": "ipv6"
     },
     "process": {
-      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "entity_id": "{42F11C3B-0BAD-5C8C-0000-0010DFBC0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 924
@@ -1515,7 +1553,6 @@
       "name": "NETWORK SERVICE"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -1526,9 +1563,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "19",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -1548,6 +1586,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -1567,6 +1606,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:48.264\nProcessGuid: {42F11C3B-6E19-5C8C-0000-0010EB030000}\nProcessId: 4\nImage: System\nUser: NT AUTHORITY\\SYSTEM\nProtocol: udp\nInitiated: true\nSourceIsIpv6: false\nSourceIp: 10.0.2.15\nSourceHostname: vagrant-2012-r2.local.crowbird.com\nSourcePort: 137\nSourcePortName: netbios-ns\nDestinationIsIpv6: false\nDestinationIp: 40.77.226.250\nDestinationHostname: \nDestinationPort: 137\nDestinationPortName: netbios-ns",
     "network": {
       "community_id": "1:DI+g4BImhWaUwPmLEjdMMQVYPLs=",
       "direction": "egress",
@@ -1575,7 +1615,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "pid": 4
     },
@@ -1599,7 +1639,6 @@
       "name": "SYSTEM"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -1610,9 +1649,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "20",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -1632,6 +1672,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -1651,6 +1692,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:48.276\nProcessGuid: {42F11C3B-6E19-5C8C-0000-0010EB030000}\nProcessId: 4\nImage: System\nUser: NT AUTHORITY\\SYSTEM\nProtocol: udp\nInitiated: true\nSourceIsIpv6: false\nSourceIp: 10.0.2.15\nSourceHostname: vagrant-2012-r2.local.crowbird.com\nSourcePort: 137\nSourcePortName: netbios-ns\nDestinationIsIpv6: false\nDestinationIp: 10.0.2.3\nDestinationHostname: \nDestinationPort: 137\nDestinationPortName: netbios-ns",
     "network": {
       "community_id": "1:okFVyky/zOY2Q0BATy37YsbiveA=",
       "direction": "egress",
@@ -1659,7 +1701,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "pid": 4
     },
@@ -1683,7 +1725,6 @@
       "name": "SYSTEM"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -1694,9 +1735,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "21",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -1716,6 +1758,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -1735,6 +1778,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:49.213\nProcessGuid: {42F11C3B-6E19-5C8C-0000-0010EB030000}\nProcessId: 4\nImage: System\nUser: NT AUTHORITY\\SYSTEM\nProtocol: udp\nInitiated: true\nSourceIsIpv6: false\nSourceIp: 10.0.2.15\nSourceHostname: vagrant-2012-r2.local.crowbird.com\nSourcePort: 137\nSourcePortName: netbios-ns\nDestinationIsIpv6: false\nDestinationIp: 169.254.255.255\nDestinationHostname: \nDestinationPort: 137\nDestinationPortName: netbios-ns",
     "network": {
       "community_id": "1:ZHyFuF2PjubLSbAh4zRQIZHOZK8=",
       "direction": "egress",
@@ -1743,7 +1787,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "pid": 4
     },
@@ -1767,7 +1811,6 @@
       "name": "SYSTEM"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -1778,9 +1821,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "22",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -1800,6 +1844,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Network connection detected (rule: NetworkConnect)",
       "category": [
         "network"
       ],
@@ -1819,6 +1864,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Network connection detected:\nRuleName: \nUtcTime: 2019-03-18 16:57:49.218\nProcessGuid: {42F11C3B-6E19-5C8C-0000-0010EB030000}\nProcessId: 4\nImage: System\nUser: NT AUTHORITY\\SYSTEM\nProtocol: udp\nInitiated: true\nSourceIsIpv6: false\nSourceIp: 10.0.2.15\nSourceHostname: vagrant-2012-r2.local.crowbird.com\nSourcePort: 137\nSourcePortName: netbios-ns\nDestinationIsIpv6: false\nDestinationIp: 169.254.180.25\nDestinationHostname: \nDestinationPort: 137\nDestinationPortName: netbios-ns",
     "network": {
       "community_id": "1:r3C/WjbATNIislTQ0M+ySzwnuiw=",
       "direction": "egress",
@@ -1827,7 +1873,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "pid": 4
     },
@@ -1851,7 +1897,6 @@
       "name": "SYSTEM"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "3",
@@ -1862,9 +1907,10 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "23",
+      "task": "Network connection detected (rule: NetworkConnect)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -1880,6 +1926,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Process terminated (rule: ProcessTerminate)",
       "category": [
         "process"
       ],
@@ -1897,8 +1944,9 @@
     "log": {
       "level": "information"
     },
+    "message": "Process terminated:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.350\nProcessGuid: {42F11C3B-CCC6-5C8F-0000-001005082900}\nProcessId: 0\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nUser: %6",
     "process": {
-      "entity_id": "{42f11c3b-ccc6-5c8f-0000-001005082900}",
+      "entity_id": "{42F11C3B-CCC6-5C8F-0000-001005082900}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 4832
@@ -1907,7 +1955,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "5",
@@ -1918,9 +1965,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "24",
+      "task": "Process terminated (rule: ProcessTerminate)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -1936,6 +1984,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Process terminated (rule: ProcessTerminate)",
       "category": [
         "process"
       ],
@@ -1953,8 +2002,9 @@
     "log": {
       "level": "information"
     },
+    "message": "Process terminated:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.364\nProcessGuid: {42F11C3B-CCCC-5C8F-0000-0010E8272900}\nProcessId: 0\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nUser: %6",
     "process": {
-      "entity_id": "{42f11c3b-cccc-5c8f-0000-0010e8272900}",
+      "entity_id": "{42F11C3B-CCCC-5C8F-0000-0010E8272900}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 3208
@@ -1963,7 +2013,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "5",
@@ -1974,9 +2023,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "25",
+      "task": "Process terminated (rule: ProcessTerminate)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -1992,6 +2042,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "File creation time changed (rule: FileCreateTime)",
       "category": [
         "file"
       ],
@@ -2015,8 +2066,9 @@
     "log": {
       "level": "information"
     },
+    "message": "File creation time changed:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.387\nProcessGuid: {42F11C3B-CCAA-5C8F-0000-0010B4E22700}\nProcessId: 1600\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nTargetFilename: C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\fe823684-c940-49f2-a940-14b02cbafba9.tmp\nCreationUtcTime: 2019-03-18 16:52:04.980\nPreviousCreationUtcTime: 2019-03-18 16:57:52.387\nUser: %9",
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -2025,7 +2077,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_data": {
@@ -2040,9 +2091,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "26",
+      "task": "File creation time changed (rule: FileCreateTime)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -2058,6 +2110,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "File creation time changed (rule: FileCreateTime)",
       "category": [
         "file"
       ],
@@ -2081,8 +2134,9 @@
     "log": {
       "level": "information"
     },
+    "message": "File creation time changed:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.417\nProcessGuid: {42F11C3B-CCAA-5C8F-0000-0010B4E22700}\nProcessId: 1600\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nTargetFilename: C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\162d4140-cfab-4d05-9c92-bca60515a622.tmp\nCreationUtcTime: 2019-03-18 16:52:04.980\nPreviousCreationUtcTime: 2019-03-18 16:57:52.402\nUser: %9",
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -2091,7 +2145,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_data": {
@@ -2106,9 +2159,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "27",
+      "task": "File creation time changed (rule: FileCreateTime)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -2124,6 +2178,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "File creation time changed (rule: FileCreateTime)",
       "category": [
         "file"
       ],
@@ -2147,8 +2202,9 @@
     "log": {
       "level": "information"
     },
+    "message": "File creation time changed:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.417\nProcessGuid: {42F11C3B-CCAA-5C8F-0000-0010B4E22700}\nProcessId: 1600\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nTargetFilename: C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\1450fedf-ac4c-4e35-b371-ed5d3bbe4776.tmp\nCreationUtcTime: 2019-03-18 16:52:05.028\nPreviousCreationUtcTime: 2019-03-18 16:57:52.402\nUser: %9",
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -2157,7 +2213,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_data": {
@@ -2172,9 +2227,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "28",
+      "task": "File creation time changed (rule: FileCreateTime)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -2190,6 +2246,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "File creation time changed (rule: FileCreateTime)",
       "category": [
         "file"
       ],
@@ -2213,8 +2270,9 @@
     "log": {
       "level": "information"
     },
+    "message": "File creation time changed:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.417\nProcessGuid: {42F11C3B-CCAA-5C8F-0000-0010B4E22700}\nProcessId: 1600\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nTargetFilename: C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\37ed32e9-3c5f-4663-8457-c70743e9456d.tmp\nCreationUtcTime: 2019-03-18 16:51:54.980\nPreviousCreationUtcTime: 2019-03-18 16:57:52.417\nUser: %9",
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -2223,7 +2281,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_data": {
@@ -2238,9 +2295,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "29",
+      "task": "File creation time changed (rule: FileCreateTime)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -2256,6 +2314,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Process terminated (rule: ProcessTerminate)",
       "category": [
         "process"
       ],
@@ -2273,8 +2332,9 @@
     "log": {
       "level": "information"
     },
+    "message": "Process terminated:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.433\nProcessGuid: {42F11C3B-CCAB-5C8F-0000-001064EB2700}\nProcessId: 0\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nUser: %6",
     "process": {
-      "entity_id": "{42f11c3b-ccab-5c8f-0000-001064eb2700}",
+      "entity_id": "{42F11C3B-CCAB-5C8F-0000-001064EB2700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 2680
@@ -2283,7 +2343,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "5",
@@ -2294,9 +2353,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "30",
+      "task": "Process terminated (rule: ProcessTerminate)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -2312,6 +2372,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "File creation time changed (rule: FileCreateTime)",
       "category": [
         "file"
       ],
@@ -2335,8 +2396,9 @@
     "log": {
       "level": "information"
     },
+    "message": "File creation time changed:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.433\nProcessGuid: {42F11C3B-CCAA-5C8F-0000-0010B4E22700}\nProcessId: 1600\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nTargetFilename: C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\nmmhkkegccagdldgiimedpiccmgmieda\\def\\ecb9c915-c4c2-4600-a920-f2bc302990a8.tmp\nCreationUtcTime: 2019-03-18 16:52:08.496\nPreviousCreationUtcTime: 2019-03-18 16:57:52.417\nUser: %9",
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -2345,7 +2407,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_data": {
@@ -2360,9 +2421,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "31",
+      "task": "File creation time changed (rule: FileCreateTime)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -2378,6 +2440,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "File creation time changed (rule: FileCreateTime)",
       "category": [
         "file"
       ],
@@ -2401,8 +2464,9 @@
     "log": {
       "level": "information"
     },
+    "message": "File creation time changed:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.433\nProcessGuid: {42F11C3B-CCAA-5C8F-0000-0010B4E22700}\nProcessId: 1600\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nTargetFilename: C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\gfdkimpbcpahaombhbimeihdjnejgicl\\def\\ee4a6e45-bffd-49f4-98ae-32aebcc890b5.tmp\nCreationUtcTime: 2019-03-18 16:52:05.339\nPreviousCreationUtcTime: 2019-03-18 16:57:52.417\nUser: %9",
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -2411,7 +2475,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_data": {
@@ -2426,9 +2489,10 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "32",
+      "task": "File creation time changed (rule: FileCreateTime)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",

@@ -21,7 +21,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
@@ -153,7 +153,7 @@ func (io *BlkioService) getBlkioStats(myRawStat *docker.Stat, dedot bool, skipDe
 	}
 }
 
-func getNewStats(skip []uint64, time time.Time, blkioEntry []types.BlkioStatEntry) BlkioRaw {
+func getNewStats(skip []uint64, time time.Time, blkioEntry []container.BlkioStatEntry) BlkioRaw {
 	stats := BlkioRaw{
 		Time:   time,
 		reads:  0,

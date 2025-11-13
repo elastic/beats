@@ -15,12 +15,13 @@
     },
     "vsphere": {
         "virtualmachine": {
+            "id": "vm-51",
             "name": "xt0nmfpv9",
             "uptime": 5348978,
             "status": "green",
             "host": {
                 "id": "host-32",
-                "hostname": "phx-w1c1-esxi04.com"
+                "hostname": "example.com"
             },
             "cpu": {
                 "free": {

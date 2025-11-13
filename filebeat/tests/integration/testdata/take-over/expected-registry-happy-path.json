@@ -1,0 +1,50 @@
+{
+  "filestream::first-id::fingerprint::6fb3cb6c565bdba1354f64a42dd47ef937964019400dd571f25c2cd13a9fb5be": {
+    "Key": "filestream::first-id::fingerprint::6fb3cb6c565bdba1354f64a42dd47ef937964019400dd571f25c2cd13a9fb5be",
+    "Offset": 309,
+    "Filename": "TESTDATA-PATH/take-over/01.log",
+    "TTL": 0,
+    "Op": "set",
+    "Removed": true
+  },
+  "filestream::first-id::fingerprint::db8399294e69089070405b13d4f057672f3852fa8e0f56ce4b6c92398aef1b6a": {
+    "Key": "filestream::first-id::fingerprint::db8399294e69089070405b13d4f057672f3852fa8e0f56ce4b6c92398aef1b6a",
+    "Offset": 296,
+    "Filename": "TESTDATA-PATH/take-over/02.log",
+    "TTL": 0,
+    "Op": "set",
+    "Removed": true
+  },
+  "filestream::not-in-test-input::fingerprint::10c6577e45f2b06631e11285210d8bd967ebf9786cf81ccfc9fef64bc01725cd": {
+    "Key": "filestream::not-in-test-input::fingerprint::10c6577e45f2b06631e11285210d8bd967ebf9786cf81ccfc9fef64bc01725cd",
+    "Offset": 302,
+    "Filename": "TESTDATA-PATH/take-over/02.txt",
+    "TTL": -1,
+    "Op": "set",
+    "Removed": false
+  },
+  "filestream::not-in-test-input::fingerprint::9ef9433360a276b14e8eae3864594c0108042c0828d3504b34c082dfc1cd43da": {
+    "Key": "filestream::not-in-test-input::fingerprint::9ef9433360a276b14e8eae3864594c0108042c0828d3504b34c082dfc1cd43da",
+    "Offset": 304,
+    "Filename": "TESTDATA-PATH/take-over/01.txt",
+    "TTL": -1,
+    "Op": "set",
+    "Removed": false
+  },
+  "filestream::second-id::fingerprint::6fb3cb6c565bdba1354f64a42dd47ef937964019400dd571f25c2cd13a9fb5be": {
+    "Key": "filestream::second-id::fingerprint::6fb3cb6c565bdba1354f64a42dd47ef937964019400dd571f25c2cd13a9fb5be",
+    "Offset": 309,
+    "Filename": "TESTDATA-PATH/take-over/01.log",
+    "TTL": -1,
+    "Op": "set",
+    "Removed": false
+  },
+  "filestream::second-id::fingerprint::db8399294e69089070405b13d4f057672f3852fa8e0f56ce4b6c92398aef1b6a": {
+    "Key": "filestream::second-id::fingerprint::db8399294e69089070405b13d4f057672f3852fa8e0f56ce4b6c92398aef1b6a",
+    "Offset": 296,
+    "Filename": "TESTDATA-PATH/take-over/02.log",
+    "TTL": -1,
+    "Op": "set",
+    "Removed": false
+  }
+}

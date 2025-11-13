@@ -26,7 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -213,6 +213,87 @@ var cacheTests = []struct {
 					"one": {Key: "one", Value: "metadata_value"},
 				},
 				wantErr: nil,
+			},
+		},
+	},
+	{
+		name: "get_missing_value",
+		configs: []testConfig{
+			{
+				when: func(e mapstr.M) bool {
+					return e["get"] == true
+				},
+				cfg: mapstr.M{
+					"backend": mapstr.M{
+						"memory": mapstr.M{
+							"id": "aidmaster",
+						},
+					},
+					"get": mapstr.M{
+						"key_field":    "crowdstrike.aid",
+						"target_field": "crowdstrike.metadata_new",
+					},
+				},
+			},
+		},
+		wantInitErr: nil,
+		steps: []cacheTestStep{
+			{
+				event: mapstr.M{
+					"get": true,
+					"crowdstrike": mapstr.M{
+						"aid": "one",
+					},
+				},
+				want: mapstr.M{
+					"get": true,
+					"crowdstrike": mapstr.M{
+						"aid": "one",
+					},
+				},
+				wantCacheVal: map[string]*CacheEntry{},
+				wantErr:      errors.New("metadata not found for 'one' in memory:aidmaster: metadata not found"),
+			},
+		},
+	},
+	{
+		name: "get_missing_value_ignore_error",
+		configs: []testConfig{
+			{
+				when: func(e mapstr.M) bool {
+					return e["get"] == true
+				},
+				cfg: mapstr.M{
+					"backend": mapstr.M{
+						"memory": mapstr.M{
+							"id": "aidmaster",
+						},
+					},
+					"get": mapstr.M{
+						"key_field":    "crowdstrike.aid",
+						"target_field": "crowdstrike.metadata_new",
+					},
+					"ignore_failure": true,
+				},
+			},
+		},
+		wantInitErr: nil,
+		steps: []cacheTestStep{
+			{
+				event: mapstr.M{
+					"get": true,
+					"crowdstrike": mapstr.M{
+						"aid": "one",
+					},
+				},
+				want: mapstr.M{
+					"get": true,
+					"crowdstrike": mapstr.M{
+						"aid": "one",
+					},
+				},
+				wantCacheVal: map[string]*CacheEntry{},
+				wantErr:      nil,
 			},
 		},
 	},
@@ -561,7 +642,6 @@ type testConfig struct {
 }
 
 func TestCache(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors(name))
 	for _, test := range cacheTests {
 		t.Run(test.name, func(t *testing.T) {
 			var processors []beat.Processor
@@ -571,7 +651,7 @@ func TestCache(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				p, err := New(config)
+				p, err := New(config, logptest.NewTestingLogger(t, ""))
 				if !sameError(err, test.wantInitErr) {
 					t.Errorf("unexpected error from New: got:%v want:%v", err, test.wantInitErr)
 				}
@@ -591,7 +671,6 @@ func TestCache(t *testing.T) {
 						t.Errorf("unexpected error from c.Close(): %v", err)
 					}
 				}()
-
 				processors = append(processors, p)
 			}
 

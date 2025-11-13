@@ -41,8 +41,11 @@ type MetricSet struct {
 
 // New creates a new instance of the raid metricset.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("unexpected module type: %T", base.Module())
+	}
 
-	sys := base.Module().(resolve.Resolver)
 	return &MetricSet{
 		BaseMetricSet: base,
 
@@ -62,7 +65,7 @@ func blockto1024(b int64) int64 {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	devices, err := blockinfo.ListAll(m.mod.ResolveHostFS("/sys/block"))
 	if err != nil {
-		return fmt.Errorf("failed to parse sysfs: %w", err)
+		return fmt.Errorf("failed to list RAID devices: %w", err)
 	}
 
 	for _, blockDev := range devices {

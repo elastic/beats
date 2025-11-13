@@ -28,6 +28,10 @@ import (
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
 
+	vSphereClientUtil "github.com/elastic/beats/v7/metricbeat/module/vsphere/client"
+
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
@@ -56,6 +60,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	security.WarnIfInsecure(ms.Logger(), "resourcepool", ms.Insecure)
 	return &ResourcePoolMetricSet{ms}, nil
 }
 
@@ -91,7 +97,9 @@ func (m *ResourcePoolMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV
 	}
 
 	defer func() {
-		if err := client.Logout(ctx); err != nil {
+		err := vSphereClientUtil.Logout(ctx, client)
+
+		if err != nil {
 			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
@@ -132,7 +140,7 @@ func (m *ResourcePoolMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV
 
 			triggeredAlarm, err := getTriggeredAlarm(ctx, pc, rps[i].TriggeredAlarmState)
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve alerts from resource pool %s: %w", rps[i].Name, err)
+				m.Logger().Errorf("Failed to retrieve alerts from resource pool %s: %v", rps[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{

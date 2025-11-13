@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !aix
+//go:build linux || darwin || windows
 
 package kubernetes
 
@@ -23,6 +23,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"github.com/gofrs/uuid/v5"
 	k8s "k8s.io/client-go/kubernetes"
@@ -56,8 +58,14 @@ type pod struct {
 }
 
 // NewPodEventer creates an eventer that can discover and process pod objects
-func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
-	logger := logp.NewLogger("autodiscover.pod")
+func NewPodEventer(
+	uuid uuid.UUID,
+	cfg *conf.C,
+	client k8s.Interface,
+	publish func(event []bus.Event),
+	logger *logp.Logger,
+) (Eventer, error) {
+	logger = logger.Named("autodiscover.pod")
 
 	var replicaSetWatcher, jobWatcher, namespaceWatcher, nodeWatcher kubernetes.Watcher
 
@@ -66,6 +74,9 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	if err != nil {
 		return nil, err
 	}
+
+	// log warning about any unsupported params
+	config.checkUnsupportedParams(logger)
 
 	// Ensure that node is set correctly whenever the scope is set to "node". Make sure that node is empty
 	// when cluster scope is enforced.
@@ -91,12 +102,21 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 		Node:         config.Node,
 		Namespace:    config.Namespace,
 		HonorReSyncs: true,
-	}, nil)
+	}, nil, logger)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Pod{}, err)
 	}
 
 	metaConf := config.AddResourceMetadata
+	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+	err = metaConf.Namespace.SetBool("use_kubeadm", -1, config.KubeAdm)
+	if err != nil {
+		logger.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
+	}
+	err = metaConf.Node.SetBool("use_kubeadm", -1, config.KubeAdm)
+	if err != nil {
+		logger.Errorf("couldn't set kubeadm variable for node due to error %+v", err)
+	}
 
 	if metaConf.Node.Enabled() || config.Hints.Enabled() {
 		options := kubernetes.WatchOptions{
@@ -104,7 +124,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 			Node:         config.Node,
 			HonorReSyncs: true,
 		}
-		nodeWatcher, err = kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, options, nil)
+		nodeWatcher, err = kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, options, nil, logger)
 		if err != nil {
 			logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
 		}
@@ -115,7 +135,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 			SyncTimeout:  config.SyncPeriod,
 			Namespace:    config.Namespace,
 			HonorReSyncs: true,
-		}, nil)
+		}, nil, logger)
 		if err != nil {
 			logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 		}
@@ -126,11 +146,24 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	// Deployment -> Replicaset -> Pod
 	// CronJob -> job -> Pod
 	if metaConf.Deployment {
-		replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
-			SyncTimeout:  config.SyncPeriod,
-			Namespace:    config.Namespace,
-			HonorReSyncs: true,
-		}, nil)
+		metadataClient, err := kubernetes.GetKubernetesMetadataClient(config.KubeConfig, config.KubeClientOptions)
+		if err != nil {
+			logger.Errorf("Error creating metadata client due to error %+v", err)
+		}
+		replicaSetWatcher, err = kubernetes.NewNamedMetadataWatcher(
+			"resource_metadata_enricher_rs",
+			client,
+			metadataClient,
+			schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "replicasets"},
+			kubernetes.WatchOptions{
+				SyncTimeout:  config.SyncPeriod,
+				Namespace:    config.Namespace,
+				HonorReSyncs: true,
+			},
+			nil,
+			metadata.RemoveUnnecessaryReplicaSetData,
+			logger,
+		)
 		if err != nil {
 			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
 		}
@@ -140,7 +173,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 			SyncTimeout:  config.SyncPeriod,
 			Namespace:    config.Namespace,
 			HonorReSyncs: true,
-		}, nil)
+		}, nil, logger)
 		if err != nil {
 			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
 		}
@@ -216,23 +249,26 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	var kubeMeta, container mapstr.M
 
 	annotations := make(mapstr.M, 0)
-	rawMeta, ok := event["kubernetes"]
-	if ok {
-		kubeMeta = rawMeta.(mapstr.M)
-		// The builder base config can configure any of the field values of kubernetes if need be.
-		e["kubernetes"] = kubeMeta
-		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			anns, _ := rawAnn.(mapstr.M)
-			if len(anns) != 0 {
-				annotations = anns.Clone()
+	rawMeta, found := event["kubernetes"]
+	if found {
+		kubeMetaMap, ok := rawMeta.(mapstr.M)
+		if ok {
+			kubeMeta = kubeMetaMap
+			// The builder base config can configure any of the field values of kubernetes if need be.
+			e["kubernetes"] = kubeMeta
+			if rawAnn, ok := kubeMeta["annotations"]; ok {
+				anns, _ := rawAnn.(mapstr.M)
+				if len(anns) != 0 {
+					annotations = anns.Clone()
+				}
 			}
-		}
 
-		// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
-		if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
-			namespaceAnnotations, _ := rawNsAnn.(mapstr.M)
-			if len(namespaceAnnotations) != 0 {
-				annotations.DeepUpdateNoOverwrite(namespaceAnnotations)
+			// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
+			if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
+				namespaceAnnotations, _ := rawNsAnn.(mapstr.M)
+				if len(namespaceAnnotations) != 0 {
+					annotations.DeepUpdateNoOverwrite(namespaceAnnotations)
+				}
 			}
 		}
 	}
@@ -246,12 +282,14 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 		e["ports"] = ports
 	}
 
-	if rawCont, ok := kubeMeta["container"]; ok {
-		container = rawCont.(mapstr.M)
-		// This would end up adding a runtime entry into the event. This would make sure
-		// that there is not an attempt to spin up a docker input for a rkt container and when a
-		// rkt input exists it would be natively supported.
-		e["container"] = container
+	if rawCont, found := kubeMeta["container"]; found {
+		if containerMap, ok := rawCont.(mapstr.M); ok {
+			container = containerMap
+			// This would end up adding a runtime entry into the event. This would make sure
+			// that there is not an attempt to spin up a docker input for a rkt container and when a
+			// rkt input exists it would be natively supported.
+			e["container"] = container
+		}
 	}
 
 	cname := utils.GetContainerName(container)

@@ -35,8 +35,17 @@ var (
 		},
 	}
 	connectionsSchema = s.Schema{
-		"name":          c.Str("name"),
+		"id":            c.Int("cid", s.Optional),
+		"kind":          c.Str("kind", s.Optional),
+		"type":          c.Str("type", s.Optional),
+		"name":          c.Str("name", s.Optional),
+		"ip":            c.Str("ip", s.Optional),
+		"port":          c.Int("port", s.Optional),
 		"subscriptions": c.Int("subscriptions"),
+		"lang":          c.Str("lang", s.Optional),
+		"version":       c.Str("version", s.Optional),
+		"start":         c.Str("start", s.Optional),
+		"last_activity": c.Str("last_activity", s.Optional),
 		"in": s.Object{
 			"messages": c.Int("in_msgs"),
 			"bytes":    c.Int("in_bytes"),

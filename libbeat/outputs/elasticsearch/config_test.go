@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestValidDropPolicyConfig(t *testing.T) {
@@ -34,7 +35,7 @@ non_indexable_policy.drop: ~
 	if err != nil {
 		t.Fatalf("Can't create test configuration from valid input")
 	}
-	index, err := deadLetterIndexForPolicy(elasticsearchOutputConfig.NonIndexablePolicy)
+	index, err := deadLetterIndexForPolicy(elasticsearchOutputConfig.NonIndexablePolicy, logp.NewNopLogger())
 	if err != nil {
 		t.Fatalf("Can't read non-indexable policy: %v", err.Error())
 	}
@@ -51,7 +52,7 @@ non_indexable_policy.dead_letter_index:
 	if err != nil {
 		t.Fatalf("Can't create test configuration from valid input")
 	}
-	index, err := deadLetterIndexForPolicy(elasticsearchOutputConfig.NonIndexablePolicy)
+	index, err := deadLetterIndexForPolicy(elasticsearchOutputConfig.NonIndexablePolicy, logp.NewNopLogger())
 	if err != nil {
 		t.Fatalf("Can't read non-indexable policy: %v", err.Error())
 	}
@@ -89,7 +90,7 @@ non_indexable_policy.dead_letter_index:
 				t.Fatalf("Can't create test configuration from valid input")
 			}
 
-			_, err = deadLetterIndexForPolicy(elasticsearchOutputConfig.NonIndexablePolicy)
+			_, err = deadLetterIndexForPolicy(elasticsearchOutputConfig.NonIndexablePolicy, logp.NewNopLogger())
 			if err == nil {
 				t.Fatalf("Invalid non-indexable policy config should produce an error")
 			}
@@ -120,7 +121,7 @@ compression_level: 0
 	assert.Equal(t, 0, elasticsearchOutputConfig.CompressionLevel, "Explicit compression level should override defaults")
 }
 
-func readConfig(cfg *conf.C) (*elasticsearchConfig, error) {
+func readConfig(cfg *conf.C) (*ElasticsearchConfig, error) {
 	c := defaultConfig
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, err

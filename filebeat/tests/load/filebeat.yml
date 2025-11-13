@@ -1,6 +1,7 @@
 filebeat:
   inputs:
     - type: log
+      allow_deprecated_use: true
       paths:
         - /Users/ruflin/Dev/gopath/src/github.com/elastic/filebeat/tests/load/logs/*
 

@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package compose
 
 import (
@@ -23,6 +25,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net"
 	"os"
 	"os/exec"
@@ -33,7 +36,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
@@ -54,18 +56,19 @@ type wrapperDriver struct {
 	Environment []string
 
 	client *client.Client
+	logger *logp.Logger
 }
 
-func newWrapperDriver() (*wrapperDriver, error) {
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
+func newWrapperDriver(logger *logp.Logger) (*wrapperDriver, error) {
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logger)
 	if err != nil {
 		return nil, err
 	}
-	return &wrapperDriver{client: c}, nil
+	return &wrapperDriver{client: c, logger: logger}, nil
 }
 
 type wrapperContainer struct {
-	info types.Container
+	info container.Summary
 }
 
 func (c *wrapperContainer) ServiceName() string {
@@ -106,6 +109,7 @@ func (c *wrapperContainer) Old() bool {
 // running from the hoist network if the docker daemon runs natively.
 func (c *wrapperContainer) privateHost(port int) string {
 	var ip string
+	var shortPort uint16
 	for _, net := range c.info.NetworkSettings.Networks {
 		if len(net.IPAddress) > 0 {
 			ip = net.IPAddress
@@ -116,8 +120,13 @@ func (c *wrapperContainer) privateHost(port int) string {
 		return ""
 	}
 
+	if port >= 0 && port <= math.MaxUint16 {
+		shortPort = uint16(port)
+	} else {
+		return ""
+	}
 	for _, info := range c.info.Ports {
-		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == uint16(port)) {
+		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == shortPort) {
 			return net.JoinHostPort(ip, strconv.Itoa(int(info.PrivatePort)))
 		}
 	}
@@ -127,8 +136,15 @@ func (c *wrapperContainer) privateHost(port int) string {
 // exposedHost returns the exposed address in the host, can be used when the
 // test is run from the host network. Recommended when using docker machines.
 func (c *wrapperContainer) exposedHost(port int) string {
+	var shortPort uint16
+
+	if port >= 0 && port <= math.MaxUint16 {
+		shortPort = uint16(port)
+	} else {
+		return ""
+	}
 	for _, info := range c.info.Ports {
-		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == uint16(port)) {
+		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == shortPort) {
 			return net.JoinHostPort("localhost", strconv.Itoa(int(info.PublicPort)))
 		}
 	}
@@ -236,7 +252,7 @@ func writeToContainer(ctx context.Context, cli *client.Client, id, filename, con
 		return fmt.Errorf("failed to close tar: %w", err)
 	}
 
-	opts := types.CopyToContainerOptions{}
+	opts := container.CopyToContainerOptions{}
 	err = cli.CopyToContainer(ctx, id, filepath.Dir(filename), bytes.NewReader(buf.Bytes()), opts)
 	if err != nil {
 		return fmt.Errorf("failed to copy environment to container %s: %w", id, err)
@@ -329,7 +345,7 @@ func (d *wrapperDriver) Containers(ctx context.Context, projectFilter Filter, fi
 	return ids, nil
 }
 
-func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, filter ...string) ([]types.Container, error) {
+func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, filter ...string) ([]container.Summary, error) {
 	var serviceFilters []filters.Args
 	if len(filter) == 0 {
 		f := makeFilter(d.Name, "", projectFilter)
@@ -346,7 +362,7 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 		return nil, fmt.Errorf("failed to get container list: %w", err)
 	}
 
-	var containers []types.Container
+	var containers []container.Summary
 	for _, f := range serviceFilters {
 		list, err := d.client.ContainerList(ctx, container.ListOptions{
 			All:     true,
@@ -393,7 +409,7 @@ func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
 		if container.Running() && container.Old() {
 			err = d.client.ContainerRemove(ctx, container.info.ID, rmOpts)
 			if err != nil {
-				logp.Err("container remove: %v", err)
+				d.logger.Errorf("container remove: %v", err)
 			}
 		}
 	}
@@ -420,7 +436,7 @@ func (d *wrapperDriver) Inspect(ctx context.Context, serviceName string) (string
 	}
 
 	var found bool
-	var c types.Container
+	var c container.Summary
 	for _, container := range list {
 		aServiceName, ok := container.Labels[labelComposeService]
 		if ok && serviceName == aServiceName {
