@@ -435,8 +435,12 @@ func gatherData(modules []string) ([]moduleData, error) {
 
 // writeModuleDocs writes the module-level docs
 func writeModuleDocs(modules []moduleData, t *template.Template) error {
+	docsDir, err := mage.DocsDir()
+	if err != nil {
+		return err
+	}
 	for _, mod := range modules {
-		filename := filepath.Join(mage.DocsDir(), "reference", "metricbeat", fmt.Sprintf("metricbeat-module-%s.md", mod.Base))
+		filename := filepath.Join(docsDir, "reference", "metricbeat", fmt.Sprintf("metricbeat-module-%s.md", mod.Base))
 		err := writeTemplate(filename, t.Lookup("moduleDoc.tmpl"), mod)
 		if err != nil {
 			return err
@@ -447,6 +451,10 @@ func writeModuleDocs(modules []moduleData, t *template.Template) error {
 
 // writeMetricsetDocs writes the metricset-level docs
 func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
+	docsDir, err := mage.DocsDir()
+	if err != nil {
+		return err
+	}
 	for _, mod := range modules {
 		for _, metricset := range mod.Metricsets {
 			modData := struct {
@@ -456,7 +464,7 @@ func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
 				mod,
 				metricset,
 			}
-			filename := filepath.Join(mage.DocsDir(), "reference", "metricbeat", fmt.Sprintf("metricbeat-metricset-%s-%s.md", mod.Base, metricset.Title))
+			filename := filepath.Join(docsDir, "reference", "metricbeat", fmt.Sprintf("metricbeat-metricset-%s-%s.md", mod.Base, metricset.Title))
 
 			err := writeTemplate(filename, t.Lookup("metricsetDoc.tmpl"), modData)
 			if err != nil {
@@ -469,6 +477,10 @@ func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
 
 // writeModuleList writes the module linked list
 func writeModuleList(modules []moduleData, t *template.Template) error {
+	docsDir, err := mage.DocsDir()
+	if err != nil {
+		return err
+	}
 	// Turn the map into a sorted list
 	//Normally the glob functions would do this sorting for us,
 	//but because we mix the regular and x-pack dirs we have to sort them again.
@@ -476,7 +488,7 @@ func writeModuleList(modules []moduleData, t *template.Template) error {
 		return modules[i].Base < modules[j].Base
 	})
 	//write and execute the template
-	filepath := filepath.Join(mage.DocsDir(), "reference", "metricbeat", "metricbeat-modules.md")
+	filepath := filepath.Join(docsDir, "reference", "metricbeat", "metricbeat-modules.md")
 	return writeTemplate(filepath, t.Lookup("moduleList.tmpl"), modules)
 
 }
