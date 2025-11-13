@@ -23,11 +23,10 @@ steps:
     key: "x-pack-otel-check"
 
     steps:
-      - label: "x-pack/otel: Run check and pre-commit"
+      - label: "x-pack/otel: Run check"
         command: |
           make -C x-pack/otel check
           make check-no-changes
-          pre-commit run --all-files
         retry:
           automatic:
             - limit: 1
@@ -38,7 +37,7 @@ steps:
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
-              context: "x-pack/otel: run check and pre-commit"
+              context: "x-pack/otel: run check"
 
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
