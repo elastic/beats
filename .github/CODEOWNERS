@@ -129,6 +129,7 @@ CHANGELOG*
 /x-pack/filebeat/input/gcs/ @elastic/security-service-integrations
 /x-pack/filebeat/input/http_endpoint/ @elastic/security-service-integrations
 /x-pack/filebeat/input/httpjson/ @elastic/security-service-integrations
+/x-pack/filebeat/input/internal/dpop @elastic/security-service-integrations
 /x-pack/filebeat/input/internal/httplog @elastic/security-service-integrations
 /x-pack/filebeat/input/internal/httpmon @elastic/security-service-integrations
 /x-pack/filebeat/input/internal/private @elastic/security-service-integrations
