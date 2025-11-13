@@ -57,7 +57,8 @@ func runAsFilestream(cfg *config.C) (bool, error) {
 	}
 
 	// Global feature flag that forces all Log input instances
-	// to run as Filestream.
+	// to run as Filestream, even when not running under
+	// Elastic Agent
 	if features.LogInputRunFilestream() {
 		return true, nil
 	}
