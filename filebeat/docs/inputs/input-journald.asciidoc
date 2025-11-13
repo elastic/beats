@@ -115,12 +115,13 @@ If no paths are specified, {beatname_uc} reads from the default journal.
 
 For example, this configuration will ingest all journals and correctly handle the journald rotation:
 
-```yaml
+[source,yaml]
+----
   - type: journald
     id: journald-id
     paths:
       - /var/log/journal
-```
+----
 
 
 WARNING: If a glob (for example, `/var/log/journal/*/*.journal`) is used, the journald
