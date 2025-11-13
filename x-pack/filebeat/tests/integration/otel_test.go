@@ -1126,7 +1126,7 @@ service:
 func TestFileBeatKerberos(t *testing.T) {
 
 	wantEvents := 1
-	krbURL := fmt.Sprintf("http://localhost:9203") // this is kerberos client - we've hardcoded the URL here
+	krbURL := "http://localhost:9203" // this is kerberos client - we've hardcoded the URL here
 	tempFile := t.TempDir()
 	// ES client
 	esCfg := elasticsearch.Config{
