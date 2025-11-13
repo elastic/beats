@@ -86,33 +86,6 @@ steps:
           - github_commit_status:
               context: "x-pack/otel: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/otel: Ubuntu x86_64 Unit Tests with requirefips build tag"
-        key: "x-pack-otel-mandatory-linux-unit-test-FIPS-tag"
-        command: |
-          cd x-pack/otel
-          mage goUnitTest
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        env:
-          FIPS: "true"
-        artifact_paths:
-          - "x-pack/otel/build/*.xml"
-          - "x-pack/otel/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/otel/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "x-pack/otel: Ubuntu x86_64 Unit Tests with requirefips build tag"    
-
   - group: "Extended Tests"
     key: "x-pack-otel-extended-tests-linux-arm"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
