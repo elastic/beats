@@ -1,0 +1,80 @@
+version: 9.2.2-TEST-ONLY
+entries:
+    - kind: bug-fix
+      summary: '[Cloud Connect] Use cluster.metadata.display_name as cluster name if set'
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47622
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762213574
+      file:
+        name: 1762213574-cc-cluster-name.yaml
+        checksum: 320ea92d03c52c5f52d5efbfc49222f063cf98d5
+    - kind: feature
+      summary: Add support for DPoP authentication for the CEL and HTTP JSON inputs.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47622
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762225281
+      file:
+        name: 1762225281-15056-cel-httpjson.yaml
+        checksum: 3d82e8ee58f85befed3d07a40a5103e40b78c845
+    - kind: bug-fix
+      summary: Handle and remove BOM during JSON parsing in azureblobstorage and gcs inputs.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47622
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762506747
+      file:
+        name: 1762506747-Handle-and-remove-BOM-during-JSON-parsing-in-azureblobstorage.yaml
+        checksum: 32c69801f652e9e87b6f8997756e857bbbdf45de
+    - kind: bug-fix
+      summary: Fixed an issue where filebeat could hang during shutdown when using the filestream input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47622
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762533600
+      file:
+        name: 1762533600-fixed-an-issue-where-filebeat-could-hang-during-shutdown-when-using-the-filestream-input.yaml
+        checksum: dd47748c4e78963bdf1d3c5cba566130e601526f
+    - kind: feature
+      summary: Improve logging of cache processor and add ignore failure option.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47622
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762831091
+      file:
+        name: 1762831091-s6615-cache.yaml
+        checksum: 1216f473877af0718c45e3d778c0f7bc8736bcf9
+    - kind: bug-fix
+      summary: Fix double locking in translate_ldap_attribute processor and improve logging.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47622
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762903519
+      file:
+        name: 1762903519-s6615-ldap_logging.yaml
+        checksum: e451551ba16e9c3d1bfcb2eb17f6dcd83c569c77
