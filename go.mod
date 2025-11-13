@@ -327,10 +327,6 @@ replace (
 	github.com/golang/glog => github.com/elastic/glog v1.0.1-0.20210831205241-7d8b5c89dfc4
 	github.com/google/gopacket => github.com/adriansr/gopacket v1.1.18-0.20200327165309-dd62abfa8a41
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
-<<<<<<< HEAD
-=======
-	github.com/snowflakedb/gosnowflake => github.com/snowflakedb/gosnowflake v1.6.19
->>>>>>> 571569961 (metricbeat/module/rabbitmq/queue: Fix data type for `consumers.utilisation.pct` (#38436))
 	github.com/tonistiigi/fifo => github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 )
 
