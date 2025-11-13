@@ -5,8 +5,9 @@
 package beatsauthextension
 
 import (
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"go.opentelemetry.io/collector/component"
+
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 type Config struct {
