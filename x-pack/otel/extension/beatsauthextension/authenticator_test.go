@@ -22,6 +22,7 @@ import (
 	"go.opentelemetry.io/collector/config/confighttp"
 	"go.opentelemetry.io/collector/config/configoptional"
 	"go.uber.org/goleak"
+	"go.uber.org/zap/zaptest"
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 )
@@ -143,6 +144,43 @@ func TestAuthenticator(t *testing.T) {
 			testRoundTripperPreStart: true,
 		},
 		{
+			name: "invalid kerberos auth type - continueOnError true",
+			setupConfig: func(t *testing.T) *Config {
+				return &Config{
+					BeatAuthConfig: map[string]any{
+						"kerberos": map[string]any{
+							"auth_type": "invalid_auth_type",
+						},
+					},
+					ContinueOnError: true,
+				}
+			},
+			expectStartError:     false,
+			expectStatus:         componentstatus.StatusPermanentError,
+			expectHTTPClientType: "errorRoundTripperProvider",
+			testRoundTripError:   true,
+		},
+		{
+			name: "valid kerberos config",
+			setupConfig: func(t *testing.T) *Config {
+				return &Config{
+					BeatAuthConfig: map[string]any{
+						"kerberos": map[string]any{
+							"auth_type":   "password",
+							"config_path": "../../../../libbeat/outputs/elasticsearch/testdata/krb5.conf",
+							"username":    "user",
+							"password":    "pass",
+							"realm":       "elastic",
+						},
+					},
+					ContinueOnError: true,
+				}
+			},
+			expectStartError:     false,
+			expectStatus:         componentstatus.StatusOK,
+			expectHTTPClientType: "kerberosClientProvider",
+		},
+		{
 			name: "when loadbalance is false and endpoints are not configured",
 			setupConfig: func(t *testing.T) *Config {
 				return &Config{
@@ -179,6 +217,7 @@ func TestAuthenticator(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			settings := componenttest.NewNopTelemetrySettings()
+			settings.Logger = zaptest.NewLogger(t)
 			cfg := tc.setupConfig(t)
 
 			auth, err := newAuthenticator(cfg, settings)
@@ -229,6 +268,9 @@ func TestAuthenticator(t *testing.T) {
 				case "singleRouterProvider":
 					_, ok := (auth.rtProvider).(*singleRouterProvider)
 					require.True(t, ok, "Provider should be a singleRouterProvider")
+				case "kerberosClientProvider":
+					_, ok := (auth.rtProvider).(*kerberosClientProvider)
+					require.True(t, ok, "Provider should be a kerberosClientProvider")
 				}
 
 				rt, err := auth.RoundTripper(nil)

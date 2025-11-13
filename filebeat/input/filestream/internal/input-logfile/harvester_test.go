@@ -21,6 +21,7 @@ package input_logfile
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -35,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -457,9 +459,13 @@ func TestCursorAllEventsPublished(t *testing.T) {
 		}}
 
 	wg.Add(1)
+	testLogger := logptest.NewFileLogger(
+		t,
+		filepath.Join("..", "..", "..", "..", "build", "integration-tests"),
+	)
 	hg.Start(
 		input.Context{
-			Logger:      logp.NewNopLogger(),
+			Logger:      testLogger.Logger,
 			Cancelation: t.Context(),
 		},
 		source)
@@ -488,7 +494,9 @@ func TestCursorAllEventsPublished(t *testing.T) {
 	// Wait for the harvester to finish publishing
 	<-donePublishing
 
-	// Then wait for it to be fully closed
+	// Then wait for harvester.Run to return.
+	// wg.Done is called by mockHarvester.Run, but the resurce
+	// is released after mockHarvester.Run returns
 	wg.Wait()
 
 	// Once the harvester is closed, cursor.AllEventsPublished() must still
@@ -497,6 +505,14 @@ func TestCursorAllEventsPublished(t *testing.T) {
 		t,
 		cursor.AllEventsPublished(),
 		"cursor.AllEventsPublished() must return true when the harvester is closed.")
+
+	// Ensure the resource has been released.
+	// We know this log line is logged AFTER the resource is released
+	testLogger.WaitLogsContains(
+		t,
+		"Stopped harvester for file",
+		time.Second,
+		"harvester did not stop")
 
 	// Ensure the harvester has released the resource
 	require.EqualValues(
@@ -512,7 +528,7 @@ func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHa
 		pipeline:   &MockPipeline{},
 		harvester:  mockHarvester,
 		store:      testOpenStore(t, "test", nil),
-		identifier: &sourceIdentifier{"filestream::.global::"},
+		identifier: &SourceIdentifier{"filestream::.global::"},
 		tg:         task.NewGroup(0, time.Second, logp.L(), ""),
 	}
 }
