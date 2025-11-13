@@ -62,7 +62,7 @@ type InputManager struct {
 
 	// Configure returns an array of Sources, and a configured Input instances
 	// that will be used to collect events from each source.
-	Configure func(cfg *conf.C, log *logp.Logger) (Prospector, Harvester, error)
+	Configure func(cfg *conf.C, log *logp.Logger, src *SourceIdentifier) (Prospector, Harvester, error)
 
 	initOnce   sync.Once
 	initErr    error
@@ -74,7 +74,7 @@ type InputManager struct {
 }
 
 // Source describe a source the input can collect data from.
-// The `Name` method must return an unique name, that will be used to identify
+// The [Name] method must return an unique name, that will be used to identify
 // the source in the persistent state store.
 type Source interface {
 	Name() string
@@ -194,7 +194,12 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		}
 	}()
 
-	prospector, harvester, err := cim.Configure(config, cim.Logger)
+	srcIdentifier, err := NewSourceIdentifier(cim.Type, settings.ID)
+	if err != nil {
+		return nil, fmt.Errorf("error while creating source identifier for input: %w", err)
+	}
+
+	prospector, harvester, err := cim.Configure(config, cim.Logger, srcIdentifier)
 	if err != nil {
 		return nil, err
 	}
@@ -202,9 +207,25 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		return nil, errNoInputRunner
 	}
 
+<<<<<<< HEAD
 	sourceIdentifier, err := newSourceIdentifier(cim.Type, settings.ID)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating source identifier for input: %w", err)
+=======
+	var previousSrcIdentifiers []*SourceIdentifier
+	if settings.TakeOver.Enabled {
+		for _, id := range settings.TakeOver.FromIDs {
+			si, err := NewSourceIdentifier(cim.Type, id)
+			if err != nil {
+				return nil,
+					fmt.Errorf(
+						"[ID: %q] error while creating source identifier for previous ID %q: %w",
+						settings.ID, id, err)
+			}
+
+			previousSrcIdentifiers = append(previousSrcIdentifiers, si)
+		}
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 	}
 
 	pStore := cim.getRetainedStore()
@@ -214,7 +235,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 
 	// create a store with the deprecated global ID. This will be used to
 	// migrate the entries in the registry to use the new input ID.
-	globalIdentifier, err := newSourceIdentifier(cim.Type, "")
+	globalIdentifier, err := NewSourceIdentifier(cim.Type, "")
 	if err != nil {
 		return nil, fmt.Errorf("cannot create global identifier for input: %w", err)
 	}
@@ -228,7 +249,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	return &managedInput{
 		manager:          cim,
 		ackCH:            cim.ackCH,
-		userID:           settings.ID,
+		id:               settings.ID,
 		prospector:       prospector,
 		harvester:        harvester,
 		sourceIdentifier: sourceIdentifier,
@@ -262,11 +283,11 @@ func (cim *InputManager) getRetainedStore() *store {
 	return store
 }
 
-type sourceIdentifier struct {
+type SourceIdentifier struct {
 	prefix string
 }
 
-func newSourceIdentifier(pluginName, userID string) (*sourceIdentifier, error) {
+func NewSourceIdentifier(pluginName, userID string) (*SourceIdentifier, error) {
 	if userID == globalInputID {
 		return nil, fmt.Errorf("invalid input ID: .global")
 	}
@@ -275,15 +296,15 @@ func newSourceIdentifier(pluginName, userID string) (*sourceIdentifier, error) {
 		userID = globalInputID
 	}
 
-	return &sourceIdentifier{
+	return &SourceIdentifier{
 		prefix: pluginName + "::" + userID + "::",
 	}, nil
 }
 
-func (i *sourceIdentifier) ID(s Source) string {
+func (i *SourceIdentifier) ID(s Source) string {
 	return i.prefix + s.Name()
 }
 
-func (i *sourceIdentifier) MatchesInput(id string) bool {
+func (i *SourceIdentifier) MatchesInput(id string) bool {
 	return strings.HasPrefix(id, i.prefix)
 }

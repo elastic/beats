@@ -90,10 +90,16 @@ func TestFilestreamLiveFileTruncation(t *testing.T) {
 	}
 
 	// 3. Ensure Filebeat detected the file truncation
+<<<<<<< HEAD
 	filebeat.WaitForLogs("File was truncated as offset (10000) > size (0)", 20*time.Second, "file was not truncated")
 	filebeat.WaitForLogs("File was truncated, nothing to read", 20*time.Second, "reader loop did not stop")
 	filebeat.WaitForLogs("Stopped harvester for file", 20*time.Second, "harvester did not stop")
 	filebeat.WaitForLogs("Closing reader of filestream", 20*time.Second, "reader did not close")
+=======
+	filebeat.WaitLogsContains("File was truncated as offset (10000) > size (0)", 20*time.Second, "file was not truncated")
+	filebeat.WaitLogsContains("File was truncated, nothing to read", 20*time.Second, "reader loop did not stop")
+	filebeat.WaitLogsContains("Stopped harvester for file", 20*time.Second, "harvester did not stop")
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 
 	// 4. Now we need to stop Filebeat before the next scan cycle
 	filebeat.Stop()

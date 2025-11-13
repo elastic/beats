@@ -27,6 +27,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -43,11 +44,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-concert/unison"
 )
 
 type inputTestingEnvironment struct {
+<<<<<<< HEAD
+=======
+	testLogger *logptest.Logger
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 	t          *testing.T
 	workingDir string
 	stateStore statestore.States
@@ -69,6 +74,7 @@ type registryEntry struct {
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
+<<<<<<< HEAD
 	logp.DevelopmentSetup(logp.ToObserverOutput())
 
 	t.Cleanup(func() {
@@ -86,6 +92,15 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 	})
 
 	return &inputTestingEnvironment{
+=======
+	logger := logptest.NewFileLogger(
+		t,
+		filepath.Join("..", "..", "build", "integration-tests"),
+	)
+
+	return &inputTestingEnvironment{
+		testLogger: logger,
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 		t:          t,
 		workingDir: t.TempDir(),
 		stateStore: openTestStatestore(),
@@ -122,7 +137,11 @@ func (e *inputTestingEnvironment) createInput(config map[string]interface{}) (v2
 
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	e.pluginInitOnce.Do(func() {
+<<<<<<< HEAD
 		e.plugin = Plugin(logp.L(), e.stateStore)
+=======
+		e.plugin = Plugin(e.testLogger.Logger, e.stateStore)
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 	})
 	return e.plugin.Manager
 }
@@ -133,7 +152,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
 
-		logger, _ := logp.NewDevelopmentLogger("")
+		logger := e.testLogger.Named("metrics-registry")
 		reg := inputmon.NewMetricsRegistry(
 			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 		defer inputmon.CancelMetricsRegistry(
@@ -146,7 +165,11 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 			Cancelation:     ctx,
 			StatusReporter:  nil,
 			MetricsRegistry: reg,
+<<<<<<< HEAD
 			Logger:          logp.L(),
+=======
+			Logger:          e.testLogger.Named("input.filestream"),
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 		}
 		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
@@ -470,7 +493,7 @@ func (e *inputTestingEnvironment) waitUntilHarvesterIsDone() {
 	require.Eventually(
 		e.t,
 		func() bool {
-			return e.pipeline.clients[len(e.pipeline.clients)-1].closed
+			return e.pipeline.clients[len(e.pipeline.clients)-1].closed.Load()
 		},
 		time.Second*10,
 		time.Millisecond*10,
@@ -551,6 +574,21 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 	require.True(e.t, selectedEvent.Timestamp.Equal(tm), "got: %s, expected: %s", selectedEvent.Timestamp.String(), tm.String())
 }
 
+<<<<<<< HEAD
+=======
+// logContains ensures s is a sub string on any log line.
+// If s is not found, the test fails
+func (e *inputTestingEnvironment) logContains(s string) {
+	e.t.Helper()
+	e.testLogger.LogContains(e.t, s)
+}
+
+func (e *inputTestingEnvironment) WaitLogsContains(s string, timeout time.Duration, msgAndArgs ...any) {
+	e.t.Helper()
+	e.testLogger.WaitLogsContains(e.t, s, timeout, msgAndArgs...)
+}
+
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 var _ statestore.States = (*testInputStore)(nil)
 
 type testInputStore struct {
@@ -579,7 +617,7 @@ type mockClient struct {
 	publishing []beat.Event
 	published  []beat.Event
 	ackHandler beat.EventListener
-	closed     bool
+	closed     atomic.Bool
 	mtx        sync.Mutex
 	canceler   context.CancelFunc
 }
@@ -622,11 +660,11 @@ func (c *mockClient) Close() error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	if c.closed {
+	if c.closed.Load() {
 		return fmt.Errorf("mock client already closed")
 	}
 
-	c.closed = true
+	c.closed.Store(true)
 	return nil
 }
 

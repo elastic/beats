@@ -22,6 +22,11 @@ import (
 	"errors"
 	"io"
 	"os"
+<<<<<<< HEAD
+=======
+	"sync"
+	"sync/atomic"
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 	"time"
 
 	"github.com/elastic/go-concert/ctxtool"
@@ -53,10 +58,20 @@ type logFile struct {
 	closeRemoved  bool
 	closeRenamed  bool
 
+<<<<<<< HEAD
+=======
+	isInactive atomic.Bool
+
+	// offsetMutx is a mutex to ensure 'offset' and 'lastTimeRead' are
+	// atomically updated. Atomically updating them prevents issues
+	// detecting when the file is inactive by [shouldBeClosed].
+	offsetMutx   sync.Mutex
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 	offset       int64
 	lastTimeRead time.Time
-	backoff      backoff.Backoff
-	tg           *unison.TaskGroup
+
+	backoff backoff.Backoff
+	tg      *unison.TaskGroup
 }
 
 // newFileReader creates a new log instance to read log sources
@@ -104,8 +119,7 @@ func (f *logFile) Read(buf []byte) (int, error) {
 	for f.readerCtx.Err() == nil {
 		n, err := f.file.Read(buf)
 		if n > 0 {
-			f.offset += int64(n)
-			f.lastTimeRead = time.Now()
+			f.updateOffset(n)
 		}
 		totalN += n
 
@@ -179,9 +193,17 @@ func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 
 func (f *logFile) shouldBeClosed() bool {
 	if f.closeInactive > 0 {
+		f.offsetMutx.Lock()
 		if time.Since(f.lastTimeRead) > f.closeInactive {
+<<<<<<< HEAD
+=======
+			f.isInactive.Store(true)
+			f.log.Debugf("'%s' is inactive", f.file.Name())
+			f.offsetMutx.Unlock()
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 			return true
 		}
+		f.offsetMutx.Unlock()
 	}
 
 	if !f.closeRemoved && !f.closeRenamed {
@@ -269,4 +291,12 @@ func (f *logFile) Close() error {
 	err := f.file.Close()
 	_ = f.tg.Stop() // Wait until all resources are released for sure.
 	return err
+}
+
+// updateOffset updates the offset and lastTimeRead atomically
+func (f *logFile) updateOffset(delta int) {
+	f.offsetMutx.Lock()
+	f.offset += int64(delta)
+	f.lastTimeRead = time.Now()
+	f.offsetMutx.Unlock()
 }

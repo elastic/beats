@@ -85,6 +85,7 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	}
 }
 
+<<<<<<< HEAD
 func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvester, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
@@ -92,6 +93,32 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 	}
 
 	prospector, err := newProspector(config, log)
+=======
+func configure(
+	cfg *conf.C,
+	log *logp.Logger,
+	src *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
+
+	c := defaultConfig()
+	if err := cfg.Unpack(&c); err != nil {
+		return nil, nil, err
+	}
+
+	// zero must also disable clean_inactive, see:
+	// https://github.com/elastic/beats/issues/45601
+	// for more details. At the same time we need to allow
+	// users to keep the old behaviour.
+	if !c.LegacyCleanInactive && c.CleanInactive == 0 {
+		c.CleanInactive = -1
+	}
+
+	// log warning if deprecated params are set
+	c.checkUnsupportedParams(log)
+
+	c.TakeOver.LogWarnings(log)
+
+	prospector, err := newProspector(c, log, src)
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}

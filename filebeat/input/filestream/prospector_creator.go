@@ -37,25 +37,53 @@ const (
 
 var experimentalWarning sync.Once
 
+<<<<<<< HEAD
 func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 	logger := log.With("filestream_id", config.ID)
 	err := checkConfigCompatibility(config.FileWatcher, config.FileIdentity)
+=======
+func newProspector(
+	config config,
+	log *logp.Logger,
+	srci *loginp.SourceIdentifier) (loginp.Prospector, error) {
+
+	logger := log.Named("filestream").With("filestream_id", config.ID)
+	err := checkConfigCompatibility(config)
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 	if err != nil {
 		return nil, err
 	}
 
+<<<<<<< HEAD
 	filewatcher, err := newFileWatcher(logger, config.Paths, config.FileWatcher)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}
 
 	identifier, err := newFileIdentifier(config.FileIdentity, config.Reader.Parsers.Suffix, log)
+=======
+	identifier, err := newFileIdentifier(
+		config.FileIdentity,
+		config.Reader.Parsers.Suffix,
+		logger)
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 	if err != nil {
 		return nil, fmt.Errorf("error while creating file identifier: %w", err)
 	}
-
-	logger = logger.Named("filestream")
 	logger.Debugf("file identity is set to %s", identifier.Name())
+
+	filewatcher, err := newFileWatcher(
+		logger,
+		config.Paths,
+		config.FileWatcher,
+		config.GZIPExperimental,
+		config.Delete.Enabled,
+		identifier,
+		srci,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error while creating filewatcher %w", err)
+	}
 
 	fileprospector := fileProspector{
 		filewatcher:         filewatcher,

@@ -36,8 +36,19 @@ import (
 // sourceStore is a store which can access resources using the Source
 // from an input.
 type sourceStore struct {
+<<<<<<< HEAD
 	identifier *sourceIdentifier
 	store      *store
+=======
+	// identifier is the sourceIdentifier used to generate IDs fro this store.
+	identifier *SourceIdentifier
+	// identifiersToTakeOver are sourceIdentifier from previous input instances
+	// that this sourceStore will take states over.
+	identifiersToTakeOver []*SourceIdentifier
+	// store is the underlying store that encapsulates
+	// the in-memory and persistent store.
+	store *store
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 }
 
 // store encapsulates the persistent store and the in memory state store, that
@@ -163,7 +174,21 @@ func openStore(log *logp.Logger, statestore statestore.States, prefix string) (*
 	}, nil
 }
 
+<<<<<<< HEAD
 func newSourceStore(s *store, identifier *sourceIdentifier) *sourceStore {
+=======
+// newSourceStore store returns a souceStore that will operate on the provided
+// store. identifier is required and is used to generate the ID for the
+// resources stored on store. identifiersToTakeOver is used by the TakeOver
+// method when taking over states from other Filestream inputs.
+// identifiersToTakeOver is optional and can be nil.
+func newSourceStore(
+	s *store,
+	identifier *SourceIdentifier,
+	identifiersToTakeOver []*SourceIdentifier,
+) *sourceStore {
+
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 	return &sourceStore{
 		store:      s,
 		identifier: identifier,
@@ -388,7 +413,7 @@ func (s *store) UpdateTTL(resource *resource, ttl time.Duration) {
 
 	s.writeState(resource)
 
-	if resource.isDeleted() {
+	if resource.unsafeIsDeleted() {
 		// version must be incremented to make sure existing resource
 		// instances do not overwrite the removal of the entry
 		resource.version++
@@ -435,7 +460,17 @@ func (r *resource) IsNew() bool {
 	return r.pendingCursorValue == nil && r.pendingUpdate == nil && r.cursor == nil
 }
 
+// isDeleted locks stateMutex then checks whether [resource] is deleted.
 func (r *resource) isDeleted() bool {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+	return r.unsafeIsDeleted()
+}
+
+// unsafeIsDeleted DOES NOT LOCK THE RESOURCE!!!
+// Only call unsafeIsDeleted if you're currently holding the
+// lock from resource.stateMutex
+func (r *resource) unsafeIsDeleted() bool {
 	return !r.internalState.Updated.IsZero() && r.internalState.TTL == 0
 }
 
