@@ -664,6 +664,8 @@ processors:
             level: 1
         endpoints:
             - http://localhost:9200
+        logs_dynamic_pipeline:
+            enabled: true
         logs_index: index
         mapping:
             mode: bodymap
