@@ -311,7 +311,7 @@ func TestSingleRouterProvider(t *testing.T) {
 	cfg := &Config{
 		BeatAuthConfig: map[string]any{
 			"loadbalance": false,
-			"endpoints": []string{
+			"hosts": []string{
 				"http://localhost:8080",
 				"http://localhost:8090",
 			},
