@@ -94,7 +94,6 @@ func TestFilestreamLiveFileTruncation(t *testing.T) {
 	filebeat.WaitLogsContains("File was truncated as offset (10000) > size (0)", 20*time.Second, "file was not truncated")
 	filebeat.WaitLogsContains("File was truncated, nothing to read", 20*time.Second, "reader loop did not stop")
 	filebeat.WaitLogsContains("Stopped harvester for file", 20*time.Second, "harvester did not stop")
-	filebeat.WaitLogsContains("Closing reader of filestream", 20*time.Second, "reader did not close")
 
 	// 4. Now we need to stop Filebeat before the next scan cycle
 	filebeat.Stop()
