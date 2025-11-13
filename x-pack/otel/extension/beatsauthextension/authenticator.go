@@ -159,7 +159,7 @@ type singleRouterProvider struct {
 }
 
 // NewSingleRouterProvider returns a RoundTripper with atmost one active endpoint
-// If the connection to the active client fails, the next endpoint is used
+// If the connection to the active endpoint fails, the next endpoint is used
 func NewSingleRouterProvider(config BeatsAuthConfig, client *http.Client) (*singleRouterProvider, error) {
 	if len(config.Endpoints) == 0 {
 		return nil, fmt.Errorf("atleast one endpoint must be provided when loadbalance is disabled")
