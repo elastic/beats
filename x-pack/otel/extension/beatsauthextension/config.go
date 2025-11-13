@@ -17,7 +17,7 @@ type Config struct {
 type BeatsAuthConfig struct {
 	Transport   httpcommon.HTTPTransportSettings `config:",inline"`
 	LoadBalance bool                             `config:"loadbalance"`
-	Endpoints   []string                         `config:"endpoints"`
+	Endpoints   []string                         `config:"hosts"`
 	Path        string                           `config:"path"`
 	Protocol    string                           `config:"protocol"`
 }
