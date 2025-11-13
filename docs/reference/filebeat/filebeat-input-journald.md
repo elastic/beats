@@ -114,14 +114,6 @@ files will not be ingested.
 
 
 
-### `merge` [filebeat-input-journald-merge]
-```{applies_to}
-stack: ga 9.2.0
-```
-
-When enabled, log entries will be ingested interleaved from all
-available journals, including remote ones. This option is disabled by
-default.
 
 ### `seek` [filebeat-input-journald-seek]
 
