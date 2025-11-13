@@ -11,6 +11,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"testing"
 	"text/template"
@@ -233,8 +234,6 @@ func assertMonitoring(t *testing.T, port int) {
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
 
-<<<<<<< HEAD
-=======
 func TestMetricbeatOTelReceiverE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
@@ -558,7 +557,6 @@ service:
 	}
 }
 
->>>>>>> 3aec6d3f0 (otel: update integration tests to use an in-process testing collector (#47338))
 func assertMapstrKeysEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg string) {
 	t.Helper()
 	// Delete all ignored fields.
