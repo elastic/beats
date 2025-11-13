@@ -9,7 +9,6 @@ package integration
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -25,7 +24,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/sdk/metric"
@@ -33,18 +31,15 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
+	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
-	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"
 )
 
-<<<<<<< HEAD
-var beatsCfgFile = `
-=======
 func TestFilebeatOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	numEvents := 1
@@ -115,7 +110,6 @@ service:
 	oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
 
 	var beatsCfgFile = `
->>>>>>> 3aec6d3f0 (otel: update integration tests to use an in-process testing collector (#47338))
 filebeat.inputs:
   - type: filestream
     id: filestream-input-id
@@ -128,11 +122,11 @@ output:
   elasticsearch:
     hosts:
       - localhost:9200
-    protocol: http
     username: admin
     password: testing
     index: %s
 queue.mem.flush.timeout: 0s
+setup.template.enabled: false
 processors:
     - add_host_metadata: ~
     - add_cloud_metadata: ~
@@ -143,32 +137,6 @@ http.host: localhost
 http.port: %d
 `
 
-<<<<<<< HEAD
-func TestFilebeatOTelE2E(t *testing.T) {
-	integration.EnsureESIsRunning(t)
-	numEvents := 1
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbOtelIndex := "logs-integration-" + namespace
-	fbIndex := "logs-filebeat-" + namespace
-
-	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
-	filebeatMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
-
-	// start filebeat in otel mode
-	filebeatOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
-
-	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
-	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, fbOtelIndex, otelMonitoringPort))
-	writeEventsToLogFile(t, logFilePath, numEvents)
-	filebeatOTel.Start()
-
-=======
->>>>>>> 3aec6d3f0 (otel: update integration tests to use an in-process testing collector (#47338))
 	// start filebeat
 	filebeat := integration.NewBeat(
 		t,
@@ -176,30 +144,18 @@ func TestFilebeatOTelE2E(t *testing.T) {
 		"../../filebeat.test",
 	)
 	s := fmt.Sprintf(beatsCfgFile, logFilePath, fbIndex, filebeatMonitoringPort)
-	s = s + `
-setup.template.name: logs-filebeat-default
-setup.template.pattern: logs-filebeat-default
-`
 
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
+	defer filebeat.Stop()
 
 	// prepare to query ES
-	esCfg := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9200"},
-		Username:  "admin",
-		Password:  "testing",
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
-			},
-		},
-	}
-	es, err := elasticsearch.NewClient(esCfg)
-	require.NoError(t, err)
+	es := integration.GetESClient(t, "http")
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
+	var err error
+
 	// wait for logs to be published
 	require.EventuallyWithTf(t,
 		func(ct *assert.CollectT) {
@@ -233,7 +189,7 @@ setup.template.pattern: logs-filebeat-default
 		"log.file.device_id", // changes value between filebeat and otel receiver
 	}
 
-	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 
 	assert.Equal(t, "filebeatreceiver", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
 	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
@@ -242,8 +198,6 @@ setup.template.pattern: logs-filebeat-default
 	assertMonitoring(t, otelMonitoringPort)
 }
 
-<<<<<<< HEAD
-=======
 func TestFilebeatOTelHTTPJSONInput(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
@@ -422,7 +376,6 @@ service:
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 }
 
->>>>>>> 3aec6d3f0 (otel: update integration tests to use an in-process testing collector (#47338))
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
 	t.Helper()
 	logFile, err := os.Create(filename)
@@ -444,25 +397,6 @@ func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
 	}
 }
 
-func assertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg string) {
-	t.Helper()
-
-	flatM1 := m1.Flatten()
-	flatM2 := m2.Flatten()
-	for _, f := range ignoredFields {
-		hasKeyM1, _ := flatM1.HasKey(f)
-		hasKeyM2, _ := flatM2.HasKey(f)
-
-		if !hasKeyM1 && !hasKeyM2 {
-			assert.Failf(t, msg, "ignored field %q does not exist in either map, please remove it from the ignored fields", f)
-		}
-
-		flatM1.Delete(f)
-		flatM2.Delete(f)
-	}
-	require.Equal(t, "", cmp.Diff(flatM1, flatM2), "expected maps to be equal")
-}
-
 func assertMonitoring(t *testing.T, port int) {
 	address := fmt.Sprintf("http://localhost:%d", port)
 	r, err := http.Get(address) //nolint:noctx,bodyclose,gosec // fine for tests
@@ -478,8 +412,6 @@ func assertMonitoring(t *testing.T, port int) {
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
 
-<<<<<<< HEAD
-=======
 func TestFilebeatOTelReceiverE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	wantEvents := 1
@@ -789,7 +721,6 @@ service:
 	}
 }
 
->>>>>>> 3aec6d3f0 (otel: update integration tests to use an in-process testing collector (#47338))
 func TestFilebeatOTelInspect(t *testing.T) {
 	filebeatOTel := integration.NewBeat(
 		t,
@@ -831,6 +762,8 @@ processors:
             level: 1
         endpoints:
             - http://localhost:9200
+        logs_dynamic_pipeline:
+            enabled: true
         logs_index: index
         mapping:
             mode: bodymap
