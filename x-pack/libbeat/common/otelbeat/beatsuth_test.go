@@ -106,6 +106,7 @@ receivers:
   filebeatreceiver:
     output:
       elasticsearch:
+	    loadbalance: true
         hosts: {{ .Host }}
         ssl:
           enabled: true
@@ -146,7 +147,7 @@ receivers:
 	require.NoError(t, err, "could not start exporter")
 
 	// send logs
-	require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
+	require.NoError(t, mustSendLogs(t, exp, getLogRecord()), "error sending logs")
 
 	// check if data has reached ES
 	assertReceivedLogRecord(t, metricReader)
@@ -180,6 +181,7 @@ receivers:
   filebeatreceiver:
     output:
       elasticsearch:
+	    loadbalance: true
         hosts: {{ .Host }}
         ssl:
           enabled: true
@@ -221,7 +223,7 @@ receivers:
 	require.NoError(t, err, "could not start exporter")
 
 	// send logs
-	require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
+	require.NoError(t, mustSendLogs(t, exp, getLogRecord()), "error sending logs")
 
 	// check if data has reached ES
 	assertReceivedLogRecord(t, metricReader)
@@ -251,6 +253,7 @@ receivers:
   filebeatreceiver:
     output:
       elasticsearch:
+	    loadbalance: true
         hosts: {{ .Host }}
         ssl:
           enabled: true
@@ -286,7 +289,7 @@ receivers:
 	require.NoError(t, err, "could not start exporter")
 
 	// send logs
-	require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
+	require.NoError(t, mustSendLogs(t, exp, getLogRecord()), "error sending logs")
 
 	// check if data has reached ES
 	assertReceivedLogRecord(t, metricReader)
@@ -428,6 +431,7 @@ func TestVerificationMode(t *testing.T) {
 receivers:
   filebeatreceiver:
     output:
+	  loadbalance: true
       elasticsearch:
         hosts: {{ .Host }}
         ssl:
@@ -473,7 +477,7 @@ receivers:
 			require.NoError(t, err, "could not start exporter")
 
 			// send logs
-			err = mustSendLogs(t, exp, getLogRecord(t))
+			err = mustSendLogs(t, exp, getLogRecord())
 
 			if test.expectingError {
 				require.Error(t, err, "expected error got none")
@@ -525,6 +529,7 @@ receivers:
   filebeatreceiver:
     output:
       elasticsearch:
+	    loadbalance: true
         hosts: {{ .Host }}
         proxy_url: {{ .ProxyURL }}
 `,
@@ -558,6 +563,7 @@ receivers:
   filebeatreceiver:
     output:
       elasticsearch:
+	    loadbalance: true
         hosts: {{ .Host }}
         proxy_url: {{ .ProxyURL }}
         ssl:
@@ -576,6 +582,7 @@ receivers:
   filebeatreceiver:
     output:
       elasticsearch:
+	    loadbalance: true
         hosts: {{ .Host }}
         proxy_url: {{ .ProxyURL }}
         proxy_disable: true
@@ -626,7 +633,7 @@ receivers:
 			require.NoError(t, err, "could not start exporter")
 
 			// send logs
-			require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
+			require.NoError(t, mustSendLogs(t, exp, getLogRecord()), "error sending logs")
 
 			// check if data has reached ES
 			assertReceivedLogRecord(t, metricReader)
@@ -726,7 +733,7 @@ func startTestServer(t *testing.T, tlsConifg *tls.Config) (serverURL string, met
 }
 
 // getLogRecord returns a single bodymap encoded log record
-func getLogRecord(t *testing.T) plog.Logs {
+func getLogRecord() plog.Logs {
 	logs := plog.NewLogs()
 	resourceLogs := logs.ResourceLogs().AppendEmpty()
 	scopeLogs := resourceLogs.ScopeLogs().AppendEmpty()
