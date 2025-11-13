@@ -64,6 +64,31 @@ type FileDescriptor struct {
 	Info file.ExtendedFileInfo
 	// Fingerprint is a computed hash of the file header
 	Fingerprint string
+<<<<<<< HEAD
+=======
+	// GZIP indicates if the file is compressed with GZIP.
+	GZIP bool
+
+	// bytesIngested is the number of bytes already ingested by the harvester
+	// for this file
+	bytesIngested int64
+}
+
+// SetBytesIngested allows for setting a size that is different than the one in Info
+func (fd *FileDescriptor) SetBytesIngested(s int64) {
+	fd.bytesIngested = s
+}
+
+// SizeOrBytesIngested returns the bytes ingested for the file or its size.
+// If [SetBytesIngested] has been called with a value other
+// than zero, the bytes ingested is returned, otherwise Info.Size() is returned.
+func (fd FileDescriptor) SizeOrBytesIngested() int64 {
+	if fd.bytesIngested != 0 {
+		return fd.bytesIngested
+	}
+
+	return fd.Info.Size()
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 }
 
 // FileID returns a unique file ID
@@ -92,6 +117,9 @@ type FSEvent struct {
 	Op Operation
 	// Descriptor describes the file in the event.
 	Descriptor FileDescriptor
+	// SrcID is the identifier used to identify the harvester and the
+	// entry in the registry
+	SrcID string
 }
 
 // FSScanner retrieves a list of files from the file system.
@@ -111,4 +139,7 @@ type FSWatcher interface {
 	Run(unison.Canceler)
 	// Event returns the next event captured by FSWatcher.
 	Event() FSEvent
+	// NotifyChan returns the channel used to listen for
+	// harvester closing notifications
+	NotifyChan() chan HarvesterStatus
 }

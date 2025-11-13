@@ -85,15 +85,34 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	}
 }
 
+<<<<<<< HEAD
 func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvester, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
+=======
+func configure(
+	cfg *conf.C,
+	log *logp.Logger,
+	src *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
+
+	c := defaultConfig()
+	if err := cfg.Unpack(&c); err != nil {
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 		return nil, nil, err
 	}
 
 	config.TakeOver.LogWarnings(log)
 
+<<<<<<< HEAD
 	prospector, err := newProspector(config, log)
+=======
+	// log warning if deprecated params are set
+	c.checkUnsupportedParams(log)
+
+	c.TakeOver.LogWarnings(log)
+
+	prospector, err := newProspector(c, log, src)
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}

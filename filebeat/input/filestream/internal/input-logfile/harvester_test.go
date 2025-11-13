@@ -21,6 +21,7 @@ package input_logfile
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -35,6 +36,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/elastic-agent-libs/logp"
+<<<<<<< HEAD
+=======
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 )
 
 func TestReaderGroup(t *testing.T) {
@@ -390,13 +396,145 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	})
 }
 
+<<<<<<< HEAD
+=======
+func TestCursorAllEventsPublished(t *testing.T) {
+	fieldKey := "foo bar"
+	var wg sync.WaitGroup
+	source := &testSource{name: "/path/to/fake/file"}
+
+	cursorCh := make(chan Cursor)
+	publishLock := make(chan struct{})
+	donePublishing := make(chan struct{})
+	runFn := func(ctx input.Context, s Source, c Cursor, p Publisher) error {
+		// Once the harvester is started, we send the cursor on the channel
+		// so the test has access to it and can it proceed
+		cursorCh <- c
+		<-publishLock
+		p.Publish(
+			beat.Event{
+				Timestamp: time.Now(),
+				Fields: mapstr.M{
+					// Add a known field so we can identify this event later on
+					fieldKey: t.Name(),
+				},
+			}, c)
+		donePublishing <- struct{}{}
+		return nil
+	}
+
+	var cursor Cursor
+	mockHarvester := &mockHarvester{onRun: runFn, wg: &wg}
+	hg := testDefaultHarvesterGroup(t, mockHarvester)
+	hg.pipeline = &MockPipeline{
+		// Define the callback that will be called before each event is
+		// published/acknowledged, when this callback is called, the
+		// resource is still 'pending' on this acknowledgement.
+		// So resource.pending must be 2, the input 'lock' and this pending
+		// acknowledgement.
+		//
+		// This callback runs on a different goroutine, therefore we cannot
+		// call t.FailNow and friends.
+		publishCallback: func(e beat.Event) {
+			// Ensure we have the correct event
+			if ok, _ := e.Fields.HasKey(fieldKey); ok {
+				uop, ok := e.Private.(*updateOp)
+				if !ok {
+					return
+				}
+				evtResource := uop.resource.key
+				cursorKey := cursor.resource.key
+
+				// Just to be on the safe side, ensure the event belongs to
+				// the resource we're testing.
+				if evtResource != cursorKey {
+					t.Errorf(
+						"cursor key %q and event resource key %q must be the same.",
+						cursorKey, logp.EventType)
+				}
+				// cursor.resource.pending must be 2 here and
+				// cursor.AllEventsPublished must return false
+				if cursor.AllEventsPublished() {
+					t.Errorf(
+						"not all events have been published, pending events: %d",
+						cursor.resource.pending.Load(),
+					)
+				}
+			}
+		}}
+
+	wg.Add(1)
+	testLogger := logptest.NewFileLogger(
+		t,
+		filepath.Join("..", "..", "..", "..", "build", "integration-tests"),
+	)
+	hg.Start(
+		input.Context{
+			Logger:      testLogger.Logger,
+			Cancelation: t.Context(),
+		},
+		source)
+
+	// Wait for the harvester to start and send us its resource
+	cursor = <-cursorCh
+
+	// As soon as the harvester starts, 'pending' must be 1
+	// because the harvester locked the resource and no events
+	// have been published yet.
+	require.True(
+		t,
+		cursor.AllEventsPublished(),
+		"All events must be published")
+
+	// Ensure the harvester has the resource locked
+	require.EqualValues(
+		t,
+		1,
+		cursor.resource.pending.Load(),
+		"While the harvester is running the resource must be locked, 'pending' must be 1")
+
+	// Let the harvester call publish
+	publishLock <- struct{}{}
+
+	// Wait for the harvester to finish publishing
+	<-donePublishing
+
+	// Then wait for harvester.Run to return.
+	// wg.Done is called by mockHarvester.Run, but the resurce
+	// is released after mockHarvester.Run returns
+	wg.Wait()
+
+	// Once the harvester is closed, cursor.AllEventsPublished() must still
+	// return true
+	require.True(
+		t,
+		cursor.AllEventsPublished(),
+		"cursor.AllEventsPublished() must return true when the harvester is closed.")
+
+	// Ensure the resource has been released.
+	// We know this log line is logged AFTER the resource is released
+	testLogger.WaitLogsContains(
+		t,
+		"Stopped harvester for file",
+		time.Second,
+		"harvester did not stop")
+
+	// Ensure the harvester has released the resource
+	require.EqualValues(
+		t,
+		0,
+		cursor.resource.pending.Load(),
+		"once the harvester is done, the resource must be unlocked, 'pending' must be 0")
+}
+
+>>>>>>> 3fa1a5ef7 ([Filebeat/Filestream] Fix missing last few lines of a file (#47247))
 func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHarvesterGroup {
 	return &defaultHarvesterGroup{
 		readers:    newReaderGroup(),
 		pipeline:   &MockPipeline{},
 		harvester:  mockHarvester,
 		store:      testOpenStore(t, "test", nil),
-		identifier: &sourceIdentifier{"filestream::.global::"},
+		identifier: &SourceIdentifier{"filestream::.global::"},
 		tg:         task.NewGroup(0, time.Second, logp.L(), ""),
 	}
 }
