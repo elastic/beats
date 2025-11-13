@@ -294,5 +294,7 @@ func getBeatsAuthExtensionConfig(cfg *config.C) (map[string]any, error) {
 		return nil, err
 	}
 
+	newMap["loadbalance"] = true
+
 	return newMap, nil
 }

@@ -175,8 +175,6 @@ func checkUnsupportedConfig(cfg *config.C) error {
 		return fmt.Errorf("parameters is currently not supported: %w", errors.ErrUnsupported)
 	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {
 		return fmt.Errorf("allow_older_versions:false is currently not supported: %w", errors.ErrUnsupported)
-	} else if cfg.HasField("loadbalance") {
-		return fmt.Errorf("loadbalance is currently not supported: %w", errors.ErrUnsupported)
 	} else if cfg.HasField("non_indexable_policy") {
 		return fmt.Errorf("non_indexable_policy is currently not supported: %w", errors.ErrUnsupported)
 	} else if cfg.HasField("escape_html") {

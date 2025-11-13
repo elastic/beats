@@ -431,8 +431,8 @@ func TestVerificationMode(t *testing.T) {
 receivers:
   filebeatreceiver:
     output:
-      loadbalance: true
       elasticsearch:
+        loadbalance: true
         hosts: {{ .Host }}
         ssl:
           enabled: true

@@ -945,7 +945,7 @@ service:
 			// Wait for file input to be fully read
 			require.Eventually(t, func() bool {
 				return collector.ObservedLogs().FilterMessageSnippet(fmt.Sprintf("End of file reached: %s; Backoff now.", beatsConfig.InputFile)).Len() == 1
-			}, 30*time.Second, 100*time.Millisecond, "timed out waiting for file input to be fully read")
+			}, 60*time.Second, 100*time.Millisecond, "timed out waiting for file input to be fully read")
 
 			// Wait for expected events to be ingested
 			require.EventuallyWithT(t, func(ct *assert.CollectT) {

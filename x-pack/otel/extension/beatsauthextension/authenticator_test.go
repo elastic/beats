@@ -163,7 +163,7 @@ func TestAuthenticator(t *testing.T) {
 				return &Config{
 					BeatAuthConfig: map[string]any{
 						"loadbalance": false,
-						"endpoints": []string{
+						"hosts": []string{
 							"http://localhost:9200",
 						},
 					},
