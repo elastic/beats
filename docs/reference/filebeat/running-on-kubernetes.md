@@ -34,7 +34,8 @@ curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.
 
 To support runtime environments different from Docker, like CRI-O or containerd, configure the `paths` as follows:
 
- - if using a single filestream input for all container logs:
+### A single filestream input for all container logs
+
 ```yaml
 filebeat.inputs:
 - type: filestream
@@ -55,7 +56,8 @@ filebeat.inputs:
 2. Container logs use symlinks, so they need to be enabled.
 3. Path for all container logs.
 
- - if using autodiscover to create one filestream input per container:
+### One filestream input per container using autodiscover:
+
 ```yaml
  filebeat.autodiscover:
    providers:
