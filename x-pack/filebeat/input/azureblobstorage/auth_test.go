@@ -46,8 +46,7 @@ func (t *customTransporter) Do(req *http.Request) (*http.Response, error) {
 		// Handle Azure AD endpoint patterns:
 		// /{tenant-id}/v2.0/.well-known/openid-configuration
 		// /{tenant-id}/oauth2/v2.0/token
-		// /common/discovery/instance (for authority validation)
-		re := regexp.MustCompile(`^/([0-9a-fA-F-]+|common)/?(oauth2/v2\.0/token|v2\.0/\.well-known/openid-configuration|discovery/instance)`)
+		re := regexp.MustCompile(`^/([0-9a-fA-F-]+|common)/?(oauth2/v2\.0/token|v2\.0/\.well-known/openid-configuration)`)
 		matches := re.FindStringSubmatch(req.URL.Path)
 
 		if len(matches) == 3 {
@@ -67,19 +66,6 @@ func (t *customTransporter) Do(req *http.Request) (*http.Response, error) {
 					"token_type":   "Bearer",
 					"expires_in":   3600,
 					"access_token": "mock_access_token_123",
-				}, 200)
-
-			case "discovery/instance":
-				// This endpoint is called by MSAL to validate the authority
-				return createJSONResponse(map[string]interface{}{
-					"tenant_discovery_endpoint": "https://login.microsoftonline.com/" + tenant_id + "/v2.0/.well-known/openid-configuration",
-					"metadata": []map[string]interface{}{
-						{
-							"preferred_network": "login.microsoftonline.com",
-							"preferred_cache":   "login.microsoftonline.com",
-							"aliases":           []string{"login.microsoftonline.com"},
-						},
-					},
 				}, 200)
 			}
 		}
