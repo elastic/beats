@@ -6,13 +6,10 @@ env:
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
 
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
-  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
@@ -122,7 +119,7 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/otel: Ubuntu arm64 Unit Tests"
-        key: "extended-arm64-unit-tests"
+        key: "x-pack-otel-extended-arm64-unit-tests"
         command: |
           cd x-pack/otel
           mage goUnitTest
