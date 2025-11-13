@@ -36,7 +36,7 @@ var (
 	beatsAuthName      = "beatsauth"
 )
 
-type converter struct{}
+type Converter struct{}
 
 // NewFactory returns a factory for a  confmap.Converter,
 func NewFactory() confmap.ConverterFactory {
@@ -44,11 +44,11 @@ func NewFactory() confmap.ConverterFactory {
 }
 
 func newConverter(set confmap.ConverterSettings) confmap.Converter {
-	return converter{}
+	return Converter{}
 }
 
 // Convert converts [beatreceiver].output to OTel config here
-func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
+func (c Converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
 	for _, beatreceiver := range supportedReceivers {
 		var out map[string]any
@@ -229,6 +229,21 @@ func getBeatsAuthExtensionConfig(cfg *config.C) (map[string]any, error) {
 	newConfig, err := config.NewConfigFrom(defaultTransportSettings)
 	if err != nil {
 		return nil, err
+	}
+
+	// proxy_url on newConfig is of type *url.URL which is not understood by beatsauth extension
+	// this logic here converts it into string type similar to what a user would set on filebeat config
+	if defaultTransportSettings.Proxy.URL != nil {
+		proxyURL, err := config.NewConfigFrom(map[string]any{
+			"proxy_url": defaultTransportSettings.Proxy.URL.String(),
+		})
+		if err != nil {
+			return nil, fmt.Errorf("error translating proxy_url: %w", err)
+		}
+		err = newConfig.Merge(proxyURL)
+		if err != nil {
+			return nil, fmt.Errorf("error merging proxy_url: %w", err)
+		}
 	}
 
 	var newMap map[string]any

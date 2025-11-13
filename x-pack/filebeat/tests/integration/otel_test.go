@@ -640,6 +640,7 @@ filebeat.inputs:
     file_identity.native: ~
     prospector.scanner.fingerprint.enabled: false
     paths:
+	    - /tmp/log.log
 output:
   elasticsearch:
     hosts:
