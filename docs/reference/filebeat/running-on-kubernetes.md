@@ -183,11 +183,11 @@ The following is an example configuration for ingesting rotated log files:
 on the new path, `/var/log/pods/`.
 
 ::::{note}
-With this configuration, [add_kubernetes_metadata](/reference/beats/filebeat/add-kubernetes-metadata#_logs_path)
+With this configuration, [add_kubernetes_metadata](/reference/filebeat/add-kubernetes-metadata#_logs_path)
 adds **pod** metadata, which does not include
 container data (such as `kubernetes.container.name`). If you need container
 metadata, you must consider using autodiscover instead. Refer to the
-[autodiscover documentation](/reference/beats/filebeat/configuration-autodiscover#_kubernetes) for details.
+[autodiscover documentation](/reference/filebeat/configuration-autodiscover#_kubernetes) for details.
 ::::
 
 
