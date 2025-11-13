@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.24.9
+go 1.24.10
 
 require (
 	cloud.google.com/go/bigquery v1.67.0
@@ -174,7 +174,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.8.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.0
-	github.com/elastic/elastic-agent-libs v0.24.1
+	github.com/elastic/elastic-agent-libs v0.26.0
 	github.com/elastic/elastic-agent-system-metrics v0.13.3
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
