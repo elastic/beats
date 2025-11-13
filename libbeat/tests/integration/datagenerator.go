@@ -33,6 +33,7 @@ import (
 // WriteLogFile writes count lines to path.
 // Each line contains the current time (RFC3339) and a counter.
 // Prefix is added instead of current time if it exists.
+// If no prefix is passed, each line is 50 bytes long
 func WriteLogFile(t *testing.T, path string, count int, append bool, prefix ...string) {
 	var file *os.File
 	var err error

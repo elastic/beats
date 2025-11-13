@@ -32,6 +32,52 @@ curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.
 **If you are using Kubernetes 1.7 or earlier:** Filebeat uses a hostPath volume to persist internal data. It’s located under `/var/lib/filebeat-data`. The manifest uses folder autocreation (`DirectoryOrCreate`), which was introduced in Kubernetes 1.8. You need to remove `type: DirectoryOrCreate` from the manifest, and create the host folder yourself.
 ::::
 
+To support runtime environments different from Docker, like CRI-O or containerd, configure the `paths` as follows:
+
+### A single filestream input for all container logs
+
+```yaml
+filebeat.inputs:
+- type: filestream
+  id: container-logs <1>
+  prospector.scanner.symlinks: true <2>
+  parsers:
+    - container: ~
+  paths:
+    - /var/log/containers/*.log <3>
+  processors:
+    - add_kubernetes_metadata:
+      host: ${NODE_NAME}
+      matchers:
+        - logs_path:
+            logs_path: /var/log/containers/
+```
+1. All `filestream` inputs require a unique ID. One input will be created for all container logs.
+2. Container logs use symlinks, so they need to be enabled.
+3. Path for all container logs.
+
+### One filestream input per container using autodiscover:
+
+```yaml
+ filebeat.autodiscover:
+   providers:
+     - type: kubernetes
+       node: ${NODE_NAME}
+       hints.enabled: true
+       hints.default_config:
+         type: filestream
+         id: container-${data.kubernetes.container.id} <1>
+         prospector.scanner.symlinks: true <2>
+         parsers:
+           - container: ~
+         paths:
+           - /var/log/containers/*-${data.kubernetes.container.id}.log <3>
+```
+
+1. All `filestream` inputs require a unique ID.
+2. Container logs use symlinks, so they need to be enabled.
+3. A path for each container, so the input will only ingest the logs from its 
+container.
 
 ## Settings [_settings]
 
@@ -125,7 +171,6 @@ filebeat.inputs:
 `/var/log/containers/\*.log` is normally a symlink to `/var/log/pods/*/*.log`, so `paths` can be edited accordingly.
 ::::
 
-
 ## Ingesting rotated log files
 
 Filebeat can also ship the rotated logs, including the GZIP-compressed logs.
@@ -189,7 +234,6 @@ container data (such as `kubernetes.container.name`). If you need container
 metadata, you must consider using autodiscover instead. Refer to the
 [autodiscover documentation](/reference/filebeat/configuration-autodiscover#_kubernetes) for details.
 ::::
-
 
 ## Load {{kib}} dashboards [_load_kib_dashboards]
 

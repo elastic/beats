@@ -7,6 +7,8 @@ package browserhistory
 import (
 	"net/url"
 	"time"
+
+	"golang.org/x/net/publicsuffix"
 )
 
 type visit struct {
@@ -16,6 +18,7 @@ type visit struct {
 	UrlID          int64     `osquery:"url_id"`
 	Scheme         string    `osquery:"scheme"`
 	Domain         string    `osquery:"domain"`
+	Hostname       string    `osquery:"hostname"`
 	URL            string    `osquery:"url"`
 	Title          string    `osquery:"title"`
 	Browser        string    `osquery:"browser"`
@@ -49,19 +52,24 @@ func newVisit(parser string, profile *profile, timestamp int64) *visit {
 	return &visit{
 		Timestamp:     t,
 		Datetime:      t,
-		Browser:       profile.browser,
 		Parser:        parser,
-		User:          profile.user,
-		ProfileName:   profile.name,
-		HistoryPath:   profile.historyPath,
-		CustomDataDir: profile.customDataDir,
+		Browser:       profile.Browser,
+		User:          profile.User,
+		ProfileName:   profile.Name,
+		HistoryPath:   profile.HistoryPath,
+		CustomDataDir: profile.CustomDataDir,
 	}
 }
 
-func extractSchemeAndDomain(rawURL string) (string, string) {
+func extractSchemeHostAndTLDPPlusOne(rawURL string) (string, string, string) {
 	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
-		return "", ""
+		return "", "", ""
 	}
-	return parsedURL.Scheme, parsedURL.Hostname()
+	// EffectiveTLDPlusOne returns the "registrable domain".
+	// e.g., "www.google.com" -> "google.com"
+	// e.g., "blog.example.co.uk" -> "example.co.uk"
+	// e.g., "my-project.github.io" -> "my-project.github.io"
+	eTLDPlusOne, _ := publicsuffix.EffectiveTLDPlusOne(parsedURL.Hostname())
+	return parsedURL.Scheme, parsedURL.Hostname(), eTLDPlusOne
 }
