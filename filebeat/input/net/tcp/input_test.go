@@ -37,6 +37,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
