@@ -32,8 +32,9 @@ curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.
 **If you are using Kubernetes 1.7 or earlier:** Filebeat uses a hostPath volume to persist internal data. It’s located under `/var/lib/filebeat-data`. The manifest uses folder autocreation (`DirectoryOrCreate`), which was introduced in Kubernetes 1.8. You need to remove `type: DirectoryOrCreate` from the manifest, and create the host folder yourself.
 ::::
 
-In order to support runtime environments different from docker (for example, CRI-O, containerd), you need to configure the following path:
+To support runtime environments different from Docker, like CRI-O or containerd, configure the `paths` as follows:
 
+ - if using a single filestream input for all container logs:
 ```yaml
 filebeat.inputs:
 - type: filestream
@@ -54,7 +55,8 @@ filebeat.inputs:
 2. Container logs use symlinks, so they need to be enabled.
 3. Path for all container logs.
 
- ```yaml
+ - if using autodiscover to create one filestream input per container:
+```yaml
  filebeat.autodiscover:
    providers:
      - type: kubernetes
@@ -68,9 +70,9 @@ filebeat.inputs:
            - container: ~
          paths:
            - /var/log/containers/*-${data.kubernetes.container.id}.log <3>
- ```
+```
 
-1. All `filestream` inputs require a unique ID. one input will be created per container.
+1. All `filestream` inputs require a unique ID.
 2. Container logs use symlinks, so they need to be enabled.
 3. A path for each container, so the input will only ingest the logs from its 
 container.
