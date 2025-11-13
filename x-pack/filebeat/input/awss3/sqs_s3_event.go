@@ -56,6 +56,18 @@ func nonRetryableErrorWrap(err error) error {
 	return &nonRetryableError{Err: err}
 }
 
+// s3TestEvent is the test message format that Amazon S3 sends when configuring
+// event notifications. This uses a different format than regular S3 event notifications.
+// https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-content-structure.html
+type s3TestEvent struct {
+	Service   string `json:"Service"`
+	Event     string `json:"Event"`
+	Time      string `json:"Time"`
+	Bucket    string `json:"Bucket"`
+	RequestId string `json:"RequestId"`
+	HostId    string `json:"HostId"`
+}
+
 // s3EventsV2 is the notification message that Amazon S3 sends to notify of S3 changes.
 // This was derived from the version 2.2 schema.
 // https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-content-structure.html
@@ -309,7 +321,25 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, m
 	}
 }
 
+// isTestEvent checks if the message body is an S3 test event notification.
+// Test events have a different format than regular S3 event notifications.
+func (p *sqsS3EventProcessor) isTestEvent(body string) bool {
+	var testEvent s3TestEvent
+	dec := json.NewDecoder(strings.NewReader(body))
+	if err := dec.Decode(&testEvent); err != nil {
+		return false
+	}
+	// Test events have Event field set to "s3:TestEvent"
+	return testEvent.Event == "s3:TestEvent"
+}
+
 func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, error) {
+	// Check if this is a test event and skip it (before script processing)
+	if p.isTestEvent(body) {
+		p.log.Debugw("Skipping S3 test event notification", "sqs_message_body", body)
+		return nil, nil
+	}
+
 	// Check if a parsing script is defined. If so, it takes precedence over
 	// format autodetection.
 	if p.script != nil {
@@ -326,6 +356,11 @@ func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, erro
 
 	// Check if the notification is from S3 -> SNS -> SQS
 	if events.TopicArn != "" {
+		// Check if the inner message is a test event
+		if p.isTestEvent(events.Message) {
+			p.log.Debugw("Skipping S3 test event notification (via SNS)", "sqs_message_body", body)
+			return []s3EventV2{}, nil
+		}
 		dec := json.NewDecoder(strings.NewReader(events.Message))
 		if err := dec.Decode(&events); err != nil {
 			p.log.Debugw("Invalid SQS message body.", "sqs_message_body", body)
