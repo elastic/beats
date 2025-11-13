@@ -127,7 +127,7 @@ func fetchGoPackages(module string) ([]string, error) {
 
 // testTagsFromEnv gets a list of comma-separated tags from the TEST_TAGS
 // environment variables, e.g: TEST_TAGS=aws,azure.
-// If the FIPS env var is set to true, the requirefips and ms_tls13kdf tags are injected.
+// If the FIPS env var is set to true, the requirefips tag is injected.
 func testTagsFromEnv() []string {
 	testTags := strings.Trim(os.Getenv("TEST_TAGS"), ", ")
 	var tags []string
@@ -135,7 +135,7 @@ func testTagsFromEnv() []string {
 		tags = strings.Split(testTags, ",")
 	}
 	if FIPSBuild {
-		tags = append(tags, "requirefips", "ms_tls13kdf")
+		tags = append(tags, "requirefips")
 	}
 	return tags
 }
@@ -148,7 +148,13 @@ func DefaultGoTestUnitArgs() GoTestArgs { return makeGoTestArgs("Unit") }
 // fips140=only unit tests.
 func DefaultGoFIPSOnlyTestArgs() GoTestArgs {
 	args := makeGoTestArgs("Unit-FIPS-only")
-	args.Env["GODEBUG"] = "fips140=only"
+
+	// We also set GODEBUG=tlsmlkem=0 to disable the X25519MLKEM768 TLS key
+	// exchange mechanism; without this setting and with the GODEBUG=fips140=only
+	// setting, we get errors in tests like so:
+	// Failed to connect: crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
+	// Note that we are only disabling this TLS key exchange mechanism in tests!
+	args.Env["GODEBUG"] = "fips140=only,tlsmlkem=0"
 	return args
 }
 
@@ -211,7 +217,13 @@ func FIPSOnlyGoTestIntegrationFromHostArgs(ctx context.Context) GoTestArgs {
 	args := DefaultGoTestIntegrationArgs(ctx)
 	args.Tags = append(args.Tags, "requirefips")
 	args.Env = WithGoIntegTestHostEnv(args.Env)
-	args.Env["GODEBUG"] = "fips140=only"
+
+	// We also set GODEBUG=tlsmlkem=0 to disable the X25519MLKEM768 TLS key
+	// exchange mechanism; without this setting and with the GODEBUG=fips140=only
+	// setting, we get errors in tests like so:
+	// Failed to connect: crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
+	// Note that we are only disabling this TLS key exchange mechanism in tests!
+	args.Env["GODEBUG"] = "fips140=only,tlsmlkem=0"
 	return args
 }
 

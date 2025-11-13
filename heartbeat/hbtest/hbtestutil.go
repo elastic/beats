@@ -212,7 +212,7 @@ func ResolveChecks(ip string) validator.Validator {
 func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) validator.Validator {
 	hostPort := host
 	if port != 0 {
-		hostPort = fmt.Sprintf("%s:%d", host, port)
+		hostPort = net.JoinHostPort(host, strconv.Itoa(int(port)))
 	}
 
 	u, err := url.Parse(fmt.Sprintf("%s://%s", scheme, hostPort))
