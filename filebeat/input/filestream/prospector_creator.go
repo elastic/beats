@@ -37,7 +37,7 @@ const (
 var experimentalWarning sync.Once
 
 func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
-	logger := log.With("filestream_id", config.ID)
+	logger := log.With("id", config.ID)
 	err := checkConfigCompatibility(config)
 	if err != nil {
 		return nil, err

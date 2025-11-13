@@ -62,8 +62,8 @@ func runAsFilestream(cfg *config.C) (bool, error) {
 		return true, nil
 	}
 
-	// Only allow to run the Log input as Filestream if Filebeat
-	// is running under Elastic Agent.
+	// We don't allow to run the Log input as Filestream if Filebeat
+	// is not running under Elastic Agent.
 	if !management.UnderAgent() {
 		return false, nil
 	}
@@ -113,12 +113,17 @@ func newV1Input(
 		return nil, v2.ErrUnknownInput
 	}
 
+	// Add the input ID to the logger, if it exists
+	if id, err := cfg.String("id", -1); err == nil {
+		logger = logger.With("id", id)
+	}
+
 	inp, err := loginput.NewInput(cfg, outlet, context, logger)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create log input: %w", err)
 	}
 
-	logger.Debug("Log input running as Log input")
+	logger.Info("Log input (deprecated) running as Log input (deprecated)")
 	return inp, err
 }
 
@@ -174,6 +179,10 @@ func (m manager) Create(cfg *config.C) (v2.Input, error) {
 		return nil, fmt.Errorf("cannot translate log config to filestream: %w", err)
 	}
 
-	m.logger.Debug("Log input running as Filestream input")
+	// We know 'id' exists in the config and can be retrieved because
+	// 'runAsFilestream' has already validated it, hence it is safe to
+	// ignore the error.
+	id, _ := cfg.String("id", -1)
+	m.logger.Infow("Log input (deprecated) running as Filestream input", "id", id)
 	return m.next.Create(newCfg)
 }
