@@ -1,7 +1,10 @@
 set -e
 
-krb5kdc
+export KRB5_KDC_PROFILE="/var/kerberos/krb5kdc/kdc.conf"
+krb5kdc 
 kadmind
 
-addprinc.sh HTTP/elasticsearch_kerberos.elastic
+
+## set principal and user
+addprinc.sh HTTP/localhost
 addprinc.sh beats testing
