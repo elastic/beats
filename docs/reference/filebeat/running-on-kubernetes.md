@@ -34,7 +34,11 @@ curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.
 
 To support runtime environments different from Docker, like CRI-O or containerd, configure the `paths` as follows:
 
-### A single filestream input for all container logs
+:::::{tab-set}
+
+::::{tab-item} Single input
+
+Use a single [filestream](/reference/filebeat/filebeat-input-filestream.md) input to ingest all container logs.
 
 ```yaml
 filebeat.inputs:
@@ -56,7 +60,13 @@ filebeat.inputs:
 2. Container logs use symlinks, so they need to be enabled.
 3. Path for all container logs.
 
-### One filestream input per container using autodiscover:
+::::
+
+::::{tab-item} One input per container
+
+Use [autodiscover](//reference/filebeat/configuration-autodiscover.md#_kubernetes) to generate a
+[filestream](/reference/filebeat/filebeat-input-filestream.md) input per
+container.
 
 ```yaml
  filebeat.autodiscover:
@@ -78,6 +88,9 @@ filebeat.inputs:
 2. Container logs use symlinks, so they need to be enabled.
 3. A path for each container, so the input will only ingest the logs from its 
 container.
+
+::::
+:::::
 
 ## Settings [_settings]
 
@@ -134,42 +147,6 @@ If you are using Red Hat OpenShift, you need to specify additional settings in t
     ```
 
     This command sets the node selector for the project to an empty string. If you don’t run this command, the default node selector will skip control plane nodes.
-
-In order to support runtime environments with Openshift (for example, CRI-O, containerd), you need to configure the following path:
-
-```yaml
-filebeat.inputs:
-- type: filestream
-  id: container-${data.kubernetes.container.id} <1>
-  prospector.scanner.symlinks: true <2>
-  parsers:
-    - container: ~
-  paths: <3>
-    - /var/log/containers/*.log
-```
-1. All `filestream` inputs require a unique ID.
-2. Container logs use symlinks, so they need to be enabled.
-3. The same path needs to be configured in the autodiscover settings, if enabled:
-
-    ```yaml
-    filebeat.autodiscover:
-      providers:
-        - type: kubernetes
-          node: ${NODE_NAME}
-          hints.enabled: true
-          hints.default_config:
-            type: filestream
-            id: container-${data.kubernetes.container.id}
-            prospector.scanner.symlinks: true
-            parsers:
-              - container: ~
-            paths:
-              - /var/log/containers/*.log
-    ```
-
-::::{note}
-`/var/log/containers/\*.log` is normally a symlink to `/var/log/pods/*/*.log`, so `paths` can be edited accordingly.
-::::
 
 ## Log rotation [_logrotation]
 
