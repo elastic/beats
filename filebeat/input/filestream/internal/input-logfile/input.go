@@ -104,10 +104,10 @@ func (inp *managedInput) Run(
 }
 
 func newInputACKHandler(ch *updateChan) beat.EventListener {
-	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
+	return acker.EventPrivateReporter(func(acked int, private []any) {
 		var n uint
 		var last int
-		for i := 0; i < len(private); i++ {
+		for i := range private {
 			current := private[i]
 			if current == nil {
 				continue
@@ -125,6 +125,7 @@ func newInputACKHandler(ch *updateChan) beat.EventListener {
 			return
 		}
 
+		//nolint:errcheck // We know it is alwys the correct type
 		op := private[last].(*updateOp)
 		ch.Send(scheduledUpdate{op: op, n: n})
 	})

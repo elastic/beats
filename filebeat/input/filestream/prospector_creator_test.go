@@ -49,7 +49,7 @@ func TestCreateProspector(t *testing.T) {
 					IgnoreInactive: ignoreInactiveSettings[test.ignore_inactive_since],
 				}
 				p, _ := newProspector(c, logp.NewNopLogger(), mustSourceIdentifier("foo-id"))
-				fileProspector := p.(*fileProspector)
+				fileProspector := p.(*fileProspector) //nolint:errcheck
 				assert.Equal(t, fileProspector.ignoreInactiveSince, ignoreInactiveSettings[test.ignore_inactive_since])
 			})
 		}
