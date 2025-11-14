@@ -53,7 +53,7 @@ func TestLogAsFilestreamRunsLogInput(t *testing.T) {
 
 	// Ensure the Log input is started
 	filebeat.WaitLogsContains(
-		"Log input running as Log input",
+		"Log input (deprecated) running as Log input (deprecated)",
 		10*time.Second,
 		"Log input did not start",
 	)
@@ -95,7 +95,7 @@ func TestLogAsFilestreamFeatureFlag(t *testing.T) {
 
 	// Ensure the Log input is started
 	filebeat.WaitLogsContains(
-		"Log input running as Filestream input",
+		"Log input (deprecated) running as Filestream input",
 		10*time.Second,
 		"Filestream input did not start",
 	)
@@ -136,7 +136,7 @@ func TestLogAsFilestreamSupportsFingerprint(t *testing.T) {
 
 	// Ensure the Log input is started
 	filebeat.WaitLogsContains(
-		"Log input running as Filestream input",
+		"Log input (deprecated) running as Filestream input",
 		10*time.Second,
 		"Filestream input did not start",
 	)
@@ -181,7 +181,7 @@ func TestLogAsFilestreamCanMigrateState(t *testing.T) {
 
 	// Ensure the Log input is started
 	filebeat.WaitLogsContains(
-		"Log input running as Log input",
+		"Log input (deprecated) running as Log input (deprecated)",
 		10*time.Second,
 		"Log input did not start",
 	)
