@@ -17,7 +17,7 @@ jobs:
     uses: elastic/elastic-agent-changelog-tool/.github/workflows/generate-release-notes.yml@main
     with:
       product: Beats
-      labels: docs,forwardport-main,release,skip-changelog,Team:Docs
+      labels: docs,backport-active-9,forwardport-main,release,skip-changelog,Team:Docs
       branching_model: 'latest minor version'
       bc_commit_sha: ${{ inputs.bc_commit_sha }}
       version: ${{ inputs.version }}
