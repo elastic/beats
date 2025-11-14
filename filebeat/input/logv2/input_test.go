@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestRunAsFilestream(t *testing.T) {
@@ -77,7 +78,7 @@ func TestRunAsFilestream(t *testing.T) {
 			})
 			management.SetUnderAgent(tc.underAgent)
 
-			got, err := runAsFilestream(tc.cfg)
+			got, err := runAsFilestream(logp.NewNopLogger(), tc.cfg)
 			if err != nil && !tc.expectErr {
 				t.Errorf("did not expect an error: %s", err)
 			}

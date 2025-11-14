@@ -48,7 +48,7 @@ func init() {
 // valid, then checks whether the configuration should be run as
 // Filestream input. On any error the boolean value must be ignore and
 // no input started. runAsFilestream also sets the input type accordingly.
-func runAsFilestream(cfg *config.C) (bool, error) {
+func runAsFilestream(logger *logp.Logger, cfg *config.C) (bool, error) {
 	// First of all, ensure the Log input configuration is valid.
 	// This ensures we return configuration errors compatible
 	// with the log input.
@@ -78,6 +78,10 @@ func runAsFilestream(cfg *config.C) (bool, error) {
 		if runAsFilestream {
 			// ID is required to run as Filestream input
 			if !cfg.HasField("id") {
+				logger.Warnf(
+					"'id' is required to run 'log' input as 'filestream'. Config: %s",
+					config.DebugString(cfg, false),
+				)
 				return false, errors.New("'id' is required to run 'log' input as 'filestream'")
 			}
 
@@ -105,7 +109,7 @@ func newV1Input(
 	context v1.Context,
 	logger *logp.Logger,
 ) (v1.Input, error) {
-	asFilestream, err := runAsFilestream(cfg)
+	asFilestream, err := runAsFilestream(logger, cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +170,7 @@ func (m manager) Init(grp unison.Group) error {
 // If the configuration is not supposed to run as Filestream,
 // v2.ErrUnknownInput is returned.
 func (m manager) Create(cfg *config.C) (v2.Input, error) {
-	asFilestream, err := runAsFilestream(cfg)
+	asFilestream, err := runAsFilestream(m.logger, cfg)
 	if err != nil {
 		return nil, err
 	}
