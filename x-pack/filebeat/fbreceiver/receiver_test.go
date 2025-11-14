@@ -172,7 +172,6 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
-	t.Skip("flaky test, renable after https://github.com/elastic/beats/pull/46846 and https://github.com/elastic/beats/pull/46844 are merged")
 	// This test verifies that multiple receivers can be instantiated
 	// in isolation, started, and can ingest logs without interfering
 	// with each other.
@@ -421,6 +420,7 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 			},
 		},
 	}
+	defer client.CloseIdleConnections()
 	url, err := url.JoinPath("http://unix", endpoint)
 	if err != nil {
 		sb.Reset()
