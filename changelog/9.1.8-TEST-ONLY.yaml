@@ -1,0 +1,114 @@
+version: 9.1.8-TEST-ONLY
+entries:
+    - kind: feature
+      summary: Include whether Beat is running from a FIPS distribution in User Agent
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47644
+        - https://github.com/elastic/beats/pull/47645
+        - https://github.com/elastic/beats/pull/47618
+      issue:
+        - https://github.com/elastic/beats/issues/47550
+      impact: ""
+      action: ""
+      timestamp: 1761868722
+      file:
+        name: 1761868722-ua-fips.yaml
+        checksum: 2468f1f3a0c807f9333414eba3df954f960a309c
+    - kind: bug-fix
+      summary: '[Cloud Connect] Use cluster.metadata.display_name as cluster name if set'
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47644
+        - https://github.com/elastic/beats/pull/47645
+        - https://github.com/elastic/beats/pull/47618
+      issue:
+        - https://github.com/elastic/beats/issues/47550
+      impact: ""
+      action: ""
+      timestamp: 1762213574
+      file:
+        name: 1762213574-cc-cluster-name.yaml
+        checksum: 320ea92d03c52c5f52d5efbfc49222f063cf98d5
+    - kind: bug-fix
+      summary: Handle and remove BOM during JSON parsing in azureblobstorage and gcs inputs.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47644
+        - https://github.com/elastic/beats/pull/47645
+        - https://github.com/elastic/beats/pull/47618
+      issue:
+        - https://github.com/elastic/beats/issues/47550
+      impact: ""
+      action: ""
+      timestamp: 1762506747
+      file:
+        name: 1762506747-Handle-and-remove-BOM-during-JSON-parsing-in-azureblobstorage.yaml
+        checksum: 32c69801f652e9e87b6f8997756e857bbbdf45de
+    - kind: bug-fix
+      summary: Fixed an issue where filebeat could hang during shutdown when using the filestream input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47644
+        - https://github.com/elastic/beats/pull/47645
+        - https://github.com/elastic/beats/pull/47618
+      issue:
+        - https://github.com/elastic/beats/issues/47550
+      impact: ""
+      action: ""
+      timestamp: 1762533600
+      file:
+        name: 1762533600-fixed-an-issue-where-filebeat-could-hang-during-shutdown-when-using-the-filestream-input.yaml
+        checksum: dd47748c4e78963bdf1d3c5cba566130e601526f
+    - kind: feature
+      summary: Improve logging of cache processor and add ignore failure option.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47644
+        - https://github.com/elastic/beats/pull/47645
+        - https://github.com/elastic/beats/pull/47618
+      issue:
+        - https://github.com/elastic/beats/issues/47550
+      impact: ""
+      action: ""
+      timestamp: 1762831091
+      file:
+        name: 1762831091-s6615-cache.yaml
+        checksum: 1216f473877af0718c45e3d778c0f7bc8736bcf9
+    - kind: bug-fix
+      summary: Fix double locking in translate_ldap_attribute processor and improve logging.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47644
+        - https://github.com/elastic/beats/pull/47645
+        - https://github.com/elastic/beats/pull/47618
+      issue:
+        - https://github.com/elastic/beats/issues/47550
+      impact: ""
+      action: ""
+      timestamp: 1762903519
+      file:
+        name: 1762903519-s6615-ldap_logging.yaml
+        checksum: e451551ba16e9c3d1bfcb2eb17f6dcd83c569c77
+    - kind: bug-fix
+      summary: Fix possible data corruption in tcp, syslog and unix inputs
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47644
+        - https://github.com/elastic/beats/pull/47645
+        - https://github.com/elastic/beats/pull/47618
+      issue:
+        - https://github.com/elastic/beats/issues/47550
+      impact: ""
+      action: ""
+      timestamp: 1763040576
+      file:
+        name: 1763040576-fix-possible-data-corruption-in-tcp-syslog-unix-inputs.yaml
+        checksum: b03fa6c91df0fc8a51866345ea7cb696dc42af37
