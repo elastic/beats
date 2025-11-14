@@ -4,8 +4,16 @@
 
 //go:build windows
 
+// generate the application_id_generated.go file
 //go:generate go run ../tools/scrape_app_ids.go
-package parsers
+package resources
+
+import (
+	"path/filepath"
+	"strings"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+)
 
 func LookupApplicationId(appId string) string {
 	if _, ok := jumpListAppIds[appId]; ok {
@@ -21,4 +29,13 @@ type ApplicationId struct {
 
 func NewApplicationId(id string) ApplicationId {
 	return ApplicationId{Id: id, Name: LookupApplicationId(id)}
+}
+
+func GetAppIdFromFileName(filePath string, log *logger.Logger) ApplicationId {
+	fileName := filepath.Base(filePath)
+	dotIndex := strings.Index(fileName, ".")
+	if dotIndex != -1 {
+		return NewApplicationId(fileName[:dotIndex])
+	}
+	return NewApplicationId("")
 }

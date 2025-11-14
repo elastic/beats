@@ -4,7 +4,15 @@
 
 //go:build windows
 
-package parsers
+package lnk
+
+import (
+	"encoding/hex"
+	"fmt"
+	"bytes"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/resources"
+)
 
 // https://www.forensic-cheatsheet.com/EN/Artifact/(EN)+Shellbag
 type ShellItemType string
@@ -13,6 +21,7 @@ const (
 	ShellItemTypeUnknown          ShellItemType = "Unknown"
 	ShellItemTypeTerminator       ShellItemType = "Terminator"
 	ShellItemTypeRootFolder       ShellItemType = "RootFolder"
+	ShellItemTypeDelegateFolder   ShellItemType = "DelegateFolder"
 	ShellItemTypeVolume           ShellItemType = "Volume"
 	ShellItemTypeDirectory        ShellItemType = "Directory"
 	ShellItemTypeFile             ShellItemType = "File"
@@ -22,16 +31,41 @@ const (
 	ShellItemTypeUri              ShellItemType = "Uri"
 )
 
-func (s *ShellItemType) String() string {
-	return string(*s)
+type RootFolderShellItem struct {
+	Guid *resources.GUID
+}
+
+func ParseRootFolderShellItem(data []byte) (*RootFolderShellItem, error) {
+	fmt.Printf("Root Folder Shell Item Data:\n %s\n", hex.Dump(data))
+	extensionBlockSig := []byte{0xef, 0xbe}
+	for i := 0; i < len(data) - len(extensionBlockSig); i++ {
+		if bytes.Equal(data[i:i+len(extensionBlockSig)], extensionBlockSig) {
+			fmt.Printf("Extension Block Signature found at index %d\n", i)
+		}
+	}
+
+	return &RootFolderShellItem{Guid: nil}, nil
 }
 
 type ShellItem struct {
-	Data []byte
+	Size  uint16
+	Data  []byte
+	Value any
 }
 
-func (s *ShellItem) Size() int {
-	return len(s.Data)
+func NewShellItem(size uint16, data []byte) *ShellItem {
+	shellItem := &ShellItem{Size: size, Data: data}
+	var err error
+	switch shellItem.Type() {
+	case ShellItemTypeRootFolder:
+		shellItem.Value, err = ParseRootFolderShellItem(shellItem.Data)
+		if err != nil {
+			return nil
+		}
+	default:
+		shellItem.Value = shellItem.Data
+	}
+	return shellItem
 }
 
 func (s *ShellItem) Type() ShellItemType {
@@ -56,6 +90,8 @@ func (s *ShellItem) Type() ShellItemType {
 		return ShellItemTypeUri
 	case 0x70:
 		return ShellItemTypeControlPanel
+	case 0x74:
+		return ShellItemTypeDelegateFolder
 	}
 	return ShellItemTypeUnknown
 }

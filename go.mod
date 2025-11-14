@@ -238,6 +238,7 @@ require (
 	github.com/forensicanalysis/fslib v0.15.2
 	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/parsiya/golnk v0.0.0-20221103095132-740a4c27c4ff
+	github.com/richardlehane/mscfb v1.0.4
 	go.opentelemetry.io/collector/client v1.43.0
 	go.opentelemetry.io/collector/component/componenttest v0.137.0
 	go.opentelemetry.io/collector/config/configauth v1.43.0
@@ -422,6 +423,7 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/prometheus/client_golang v1.23.2 // indirect
 	github.com/prometheus/otlptranslator v0.0.2 // indirect
+	github.com/richardlehane/msoleps v1.0.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/rs/cors v1.11.1 // indirect

@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/browserhistory"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
@@ -28,5 +29,6 @@ func RegisterAmcacheTables(server *osquery.ExtensionManagerServer, log *logger.L
 
 func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, hooks *hooks.HookManager) {
 	server.RegisterPlugin(table.NewPlugin("elastic_browser_history", browserhistory.GetColumns(), browserhistory.GetGenerateFunc(log)))
+	server.RegisterPlugin(table.NewPlugin("elastic_jump_lists", jumplists.GetColumns(), jumplists.GetGenerateFunc(log)))
 	RegisterAmcacheTables(server, log, hooks)
 }
