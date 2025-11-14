@@ -33,7 +33,6 @@ type managedInput struct {
 	// id is the input ID, it is defined by setting 'id'
 	// in the input configuration
 	id               string
-	metricsID        string
 	manager          *InputManager
 	ackCH            *updateChan
 	sourceIdentifier *SourceIdentifier
