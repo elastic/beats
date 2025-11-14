@@ -232,9 +232,9 @@ Use a single [filestream](/reference/filebeat/filebeat-input-filestream.md) inpu
 
 1. {applies_to}`stack: beta 9.2.0` Enable gzip decompression. Refer to [Reading GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
 
-2`/var/log/pods/` contains the active log files as well as the rotated log files.
+2. `/var/log/pods/` contains the active log files as well as the rotated log files.
 
-3`add_kubernetes_metadata` needs to be configured to match pod metadata based
+3. `add_kubernetes_metadata` needs to be configured to match pod metadata based
 on the new path, `/var/log/pods/`.
 
 ::::{note}
