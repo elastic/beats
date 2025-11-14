@@ -51,10 +51,15 @@ filebeat.inputs:
     - /var/log/containers/*.log <3>
   processors:
     - add_kubernetes_metadata:
-      host: ${NODE_NAME}
-      matchers:
-        - logs_path:
-            logs_path: /var/log/containers/
+         host: ${NODE_NAME}
+         default_indexers.enabled: false
+         default_matchers.enabled: false
+         indexers:
+            - pod_uid:
+         matchers:
+            - logs_path:
+                 logs_path: "/var/log/pods/" <3>
+                 resource_type: "pod" <3>
 ```
 1. All `filestream` inputs require a unique ID. One input will be created for all container logs.
 2. Container logs use symlinks, so they need to be enabled.
