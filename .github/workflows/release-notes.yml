@@ -18,6 +18,7 @@ jobs:
     with:
       product: Beats
       labels: docs,forwardport-main,release,skip-changelog,Team:Docs
+      branching_model: 'latest minor version'
       bc_commit_sha: ${{ inputs.bc_commit_sha }}
       version: ${{ inputs.version }}
       release_manager: ${{ github.triggering_actor }}
