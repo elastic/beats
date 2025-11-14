@@ -180,7 +180,7 @@ when using Filebeat to forward messages. For more information, refer to
 
 Kubernetes stores logs on `/var/log/pods` and uses symlinks on `/var/log/containers`
 for active log files. For full details, refer to the official
-[Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation){:target="_blank"}.
+[Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
 
 Ingest rotated logs by enabling decompression of GZIP files and changing the monitored
 path to `/var/log/pods/` instead of `/var/log/containers`, which only contains
@@ -197,9 +197,9 @@ ingest new log data.
 
 The following are examples of configurations for ingesting rotated log files:
 
-::::{tab-set}
+:::::{tab-set}
 
-:::{tab-item} Single input
+::::{tab-item} Single input
 
 Use a single [filestream](/reference/filebeat/filebeat-input-filestream.md) input to ingest all container logs.
 
@@ -237,17 +237,17 @@ Use a single [filestream](/reference/filebeat/filebeat-input-filestream.md) inpu
 3. `add_kubernetes_metadata` needs to be configured to match pod metadata based
 on the new path, `/var/log/pods/`.
 
-::::{note}
+:::{note}
 With this configuration, [add_kubernetes_metadata](/reference/filebeat/add-kubernetes-metadata.md#_logs_path)
 adds pod metadata, which does not include
 container data (such as `kubernetes.container.name`). If you need container
 metadata, you must consider using autodiscover instead. Refer to the
 [autodiscover documentation](/reference/filebeat/configuration-autodiscover.md#_kubernetes) for details.
+:::
+
 ::::
 
-:::::{tab-set}
-
-:::{tab-item} One input per container
+::::{tab-item} One input per container
 
 Use [autodiscover](//reference/filebeat/configuration-autodiscover.md#_kubernetes) to generate a 
 [filestream](/reference/filebeat/filebeat-input-filestream.md) input per 
@@ -274,9 +274,9 @@ container.
 2. `/var/log/pods/` contains the active log files as well as the rotated log files.
 The input is configured to only read logs from the container it's for.
 
-:::
-
 ::::
+
+:::::
 
 ## Load {{kib}} dashboards [_load_kib_dashboards]
 
