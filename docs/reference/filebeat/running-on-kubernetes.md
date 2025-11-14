@@ -171,9 +171,15 @@ filebeat.inputs:
 `/var/log/containers/\*.log` is normally a symlink to `/var/log/pods/*/*.log`, so `paths` can be edited accordingly.
 ::::
 
-## Ingesting rotated log files
+## Log rotation [_logrotation]
 
-Filebeat can also ship the rotated logs, including the GZIP-compressed logs.
+Refer to the official [Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
+
+Filebeat supports reading from rotating log files, [including GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
+However, some log rotation strategies can result in lost or duplicate events 
+when using Filebeat to forward messages. For more information, refer to 
+[Log rotation results in lost or duplicate events](/reference/filebeat/file-log-rotation.md).
+
 Kubernetes stores logs on `/var/log/pods` and uses symlinks on `/var/log/containers`
 for active log files. For full details, refer to the official
 [Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
@@ -191,7 +197,13 @@ After the initial scan, Filebeat tracks files normally and will only
 ingest new log data.
 ::::
 
-The following is an example configuration for ingesting rotated log files:
+The following are examples of configurations for ingesting rotated log files:
+
+::::{tab-set}
+
+:::{tab-item} Single input
+
+Use a single [filestream](/reference/filebeat/filebeat-input-filestream.md) input to ingest all container logs.
 
 ```yaml
     filebeat.inputs:
@@ -228,11 +240,42 @@ The following is an example configuration for ingesting rotated log files:
 on the new path, `/var/log/pods/`.
 
 ::::{note}
-With this configuration, [add_kubernetes_metadata](/reference/filebeat/add-kubernetes-metadata#_logs_path)
+With this configuration, [add_kubernetes_metadata](/reference/filebeat/add-kubernetes-metadata.md#_logs_path)
 adds **pod** metadata, which does not include
 container data (such as `kubernetes.container.name`). If you need container
 metadata, you must consider using autodiscover instead. Refer to the
-[autodiscover documentation](/reference/filebeat/configuration-autodiscover#_kubernetes) for details.
+[autodiscover documentation](/reference/filebeat/configuration-autodiscover.md#_kubernetes) for details.
+:::::::
+
+:::{tab-item} One input per container
+
+Use [autodiscover(/rTODO.md) to generate a 
+[filestream](/reference/filebeat/filebeat-input-filestream.md) input per 
+container.
+
+```yaml
+     filebeat.autodiscover:
+            id: kubernetes-container-logs-${data.kubernetes.pod.uid}-${data.kubernetes.container.name}
+            gzip_experimental: true <1>
+            paths:
+              - /var/log/pods/${data.kubernetes.namespace}_${data.kubernetes.pod.name}_${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log* <2>
+
+            parsers:
+            - container: ~
+            prospector:
+             scanner:
+               fingerprint.enabled: true
+               symlinks: true
+            file_identity.fingerprint: ~
+```
+
+1. {applies_to}`stack: beta 9.2.0` Enable gzip decompression. Refer to [Reading GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
+
+2`/var/log/pods/` contains the active log files as well as the rotated log files.
+The input is configured to only read logs from the container it's for.
+
+:::
+
 ::::
 
 ## Load {{kib}} dashboards [_load_kib_dashboards]
@@ -367,8 +410,3 @@ For the example we're using:
     ```
 
 
-## Log rotation [_logrotation]
-
-Refer to the official [Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
-
-Filebeat supports reading from rotating log files, [including GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files). However, some log rotation strategies can result in lost or duplicate events when using Filebeat to forward messages. For more information, refer to [Log rotation results in lost or duplicate events](/reference/filebeat/file-log-rotation.md).
