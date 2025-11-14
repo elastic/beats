@@ -90,6 +90,12 @@ func (fs StateOS) String() string {
 	return string(current)
 }
 
+// StringInodeDevice returns the same as String() on Windows.
+// On other OSes it only returns inode and device for backwards compatibility.
+func (fs StateOS) StringInodeDevice() string {
+	return fs.String()
+}
+
 // ReadOpen opens a file for reading only
 // As Windows blocks deleting a file when its open, some special params are passed here.
 func ReadOpen(path string) (*os.File, error) {

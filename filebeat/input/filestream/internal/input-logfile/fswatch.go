@@ -97,7 +97,7 @@ func (fd FileDescriptor) FileID() string {
 	if fd.Fingerprint != "" {
 		return fd.Fingerprint
 	}
-	return fd.Info.GetOSState().String()
+	return fd.Info.GetOSState().StringInodeDevice()
 }
 
 // SameFile returns true if descriptors point to the same file.

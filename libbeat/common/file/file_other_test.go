@@ -91,7 +91,7 @@ func BenchmarkStateString(b *testing.B) {
 		for _, inode := range samples {
 			for _, device := range samples {
 				st := StateOS{Inode: inode, Device: device}
-				if st.String() == "" {
+				if st.StringInodeDevice() == "" {
 					b.Fatal("empty state string")
 				}
 			}

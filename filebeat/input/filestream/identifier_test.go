@@ -61,7 +61,7 @@ func TestFileIdentifier(t *testing.T) {
 			Descriptor: loginp.FileDescriptor{Info: file.ExtendFileInfo(fi)},
 		})
 
-		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).String(), src.Name())
+		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).StringInodeDevice(), src.Name())
 	})
 
 	t.Run("native file identifier with suffix", func(t *testing.T) {
@@ -90,7 +90,7 @@ func TestFileIdentifier(t *testing.T) {
 			Descriptor: loginp.FileDescriptor{Info: file.ExtendFileInfo(fi)},
 		})
 
-		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).String()+"-my-suffix", src.Name())
+		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).StringInodeDevice()+"-my-suffix", src.Name())
 	})
 
 	t.Run("path identifier", func(t *testing.T) {

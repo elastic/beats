@@ -626,13 +626,13 @@ The `harvester_limit` option limits the number of harvesters that are started in
 
 Setting a limit on the number of harvesters means that potentially not all files are opened in parallel. Therefore we recommended that you use this option in combination with the `close.on_state_change.*` options to make sure harvesters are stopped more often so that new files can be picked up.
 
-Currently if a new harvester can be started again, the harvester is picked randomly. This means it’s possible that the harvester for a file that was just closed and then updated again might be started instead of the harvester for a file that hasn’t been harvested for a longer period of time.
+Currently, if a new harvester can be started again, the harvester is picked randomly. This means it’s possible that the harvester for a file that was just closed and then updated again might be started instead of the harvester for a file that hasn’t been harvested for a longer period of time.
 
 This configuration option applies per input. You can use this option to indirectly set higher priorities on certain inputs by assigning a higher limit of harvesters.
 
 ### `exclude_lines` [filebeat-input-filestream-exclude-lines]
 
-#### `include_file_owner_name` [filestream-input-include_file_owner_name]
+### `include_file_owner_name` [filestream-input-include_file_owner_name]
 ```yaml {applies_to}
 stack: ga 9.3
 ```
@@ -640,8 +640,7 @@ stack: ga 9.3
 Includes the log file owner to `log.file` metadata. 
 This option is not supported on Windows.
 
-
-#### `include_file_owner_group_name` [filestream-input-include_file_owner_group_name]
+### `include_file_owner_group_name` [filestream-input-include_file_owner_group_name]
 ```yaml {applies_to}
 stack: ga 9.3
 ```
@@ -649,8 +648,7 @@ stack: ga 9.3
 Includes the log file group to `log.file` metadata. 
 This option is not supported on Windows.
 
-
-#### `file_identity` [filebeat-input-filestream-file-identity]
+### `file_identity` [filebeat-input-filestream-file-identity]
 
 Different `file_identity` methods can be configured to suit the environment where you are collecting log messages.
 A list of regular expressions to match the lines that you want Filebeat to exclude. Filebeat drops any lines that match a regular expression in the list. By default, no lines are dropped. Empty lines are ignored.

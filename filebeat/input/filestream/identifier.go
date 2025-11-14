@@ -114,7 +114,7 @@ func (i *inodeDeviceIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		fileID:              i.name + identitySep + e.Descriptor.Info.GetOSState().String(),
+		fileID:              i.name + identitySep + e.Descriptor.Info.GetOSState().StringInodeDevice(),
 		identifierGenerator: i.name,
 	}
 }

@@ -31,7 +31,7 @@ func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent, src loginp.Sourc
 		log = log.With("fingerprint", event.Descriptor.Fingerprint)
 	}
 	if event.Descriptor.Info != nil {
-		osID := event.Descriptor.Info.GetOSState().String()
+		osID := event.Descriptor.Info.GetOSState().StringInodeDevice()
 		if osID != "" {
 			log = log.With("os_id", osID)
 		}
