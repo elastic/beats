@@ -14,7 +14,7 @@ on:
 
 jobs:
   build-release-notes:
-    uses: elastic/elastic-agent-changelog-tool/.github/workflows/generate-release-notes.yml@main
+    uses: colleenmcginnis/elastic-agent-changelog-tool/.github/workflows/generate-release-notes.yml@fix-cleanup-step
     with:
       product: Beats
       labels: docs,backport-active-9,forwardport-main,release,skip-changelog,Team:Docs
