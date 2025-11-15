@@ -18,7 +18,6 @@
 package autodiscover
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"path/filepath"
@@ -31,8 +30,6 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -842,15 +839,13 @@ func TestErrNonReloadableIsNotRetried(t *testing.T) {
 		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore(filepath.Join(t.TempDir(), "keystore"))
-	logger := logptest.NewTestingLogger(t, "")
+	logger, observedLogs  := logptest.NewTestingLoggerWithObserver(t, "")
 	// Create autodiscover manager
 	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	logger, logsBuffer := newBufferLogger()
-	autodiscover.logger = logger
 	// set the debounce period to something small in order to
 	// speed up the tests. This seems to be the sweet stop
 	// for the fastest test run
@@ -875,14 +870,18 @@ func TestErrNonReloadableIsNotRetried(t *testing.T) {
 		},
 	})
 
+
 	// Ensure we logged the error about not retrying reloading input
 	require.Eventually(
 		t,
 		func() bool {
-			return strings.Contains(
-				logsBuffer.String(),
-				`all new inputs failed to start with a non-retriable error","error":"Error creating runner from config: ErrNonReloadable: a non reloadable error`,
-			)
+			logs := observedLogs.TakeAll()
+			for _, log  := range logs {
+				if log.Message == "all new inputs failed to start with a non-retriable error" && log.ContextMap()["error"] == "Error creating runner from config: ErrNonReloadable: a non reloadable error" {
+					return true
+				}
+			}
+			return false
 		},
 		time.Second*10,
 		time.Millisecond*10,
@@ -895,17 +894,6 @@ func TestErrNonReloadableIsNotRetried(t *testing.T) {
 
 	// Ensure the autodiscover got the config
 	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
-}
-
-func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
-	buf := &bytes.Buffer{}
-	encoderConfig := zap.NewProductionEncoderConfig()
-	encoder := zapcore.NewJSONEncoder(encoderConfig)
-	writeSyncer := zapcore.AddSync(buf)
-	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core {
-		return zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
-	}))
-	return log, buf
 }
 
 // TestAutodiscoverMetadataCleanup tests that the worker properly cleans up metadata
