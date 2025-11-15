@@ -839,7 +839,7 @@ func TestErrNonReloadableIsNotRetried(t *testing.T) {
 		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore(filepath.Join(t.TempDir(), "keystore"))
-	logger, observedLogs  := logptest.NewTestingLoggerWithObserver(t, "")
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
 	// Create autodiscover manager
 	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
@@ -875,7 +875,7 @@ func TestErrNonReloadableIsNotRetried(t *testing.T) {
 		t,
 		func() bool {
 			logs := observedLogs.TakeAll()
-			for _, log  := range logs {
+			for _, log := range logs {
 				if log.Message == "all new inputs failed to start with a non-retriable error" && log.ContextMap()["error"] == "Error creating runner from config: ErrNonReloadable: a non reloadable error" {
 					return true
 				}
