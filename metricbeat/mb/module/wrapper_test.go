@@ -193,7 +193,6 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 			require.NoError(t, err)
 
 			done := make(chan struct{})
-			defer close(done)
 
 			output := m.Start(done)
 
@@ -201,6 +200,13 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 
 			hasPeriod, _ := event.Fields.HasKey("metricset.period")
 			assert.Equal(t, c.hasPeriod, hasPeriod, "has metricset.period in event %+v", event)
+
+			// stop worker
+			close(done)
+
+			// wait for shutdown
+			for range output {
+			}
 		})
 	}
 }
