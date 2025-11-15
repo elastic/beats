@@ -394,6 +394,7 @@ func (k *kubernetesAnnotator) Close() error {
 	if k.cache != nil {
 		k.cache.stop()
 	}
+	k.initOnce.Do(func() {})
 	return nil
 }
 
