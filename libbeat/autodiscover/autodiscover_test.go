@@ -870,7 +870,6 @@ func TestErrNonReloadableIsNotRetried(t *testing.T) {
 		},
 	})
 
-
 	// Ensure we logged the error about not retrying reloading input
 	require.Eventually(
 		t,
