@@ -1,7 +1,5 @@
 kind: feature
-
-summary: Add data stream identification to Fleet health status updates.
-
+summary: Add support for DPoP authentication for the CEL and HTTP JSON inputs.
 component: filebeat
 
 # AUTOMATED

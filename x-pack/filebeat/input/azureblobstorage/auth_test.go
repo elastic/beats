@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"regexp"
 	"testing"
 	"time"
@@ -38,29 +39,39 @@ func (t *customTransporter) RoundTrip(req *http.Request) (*http.Response, error)
 // Do is responsible for the routing of the request to the appropriate handler based on the request URL
 func (t *customTransporter) Do(req *http.Request) (*http.Response, error) {
 	logp.L().Named("azure-blob-storage-test").Debug("request URL: ", req.URL)
-	re := regexp.MustCompile(`^/([0-9a-fA-F-]+)/?(oauth2/v2\.0/token|v2\.0/\.well-known/openid-configuration)`)
-	matches := re.FindStringSubmatch(req.URL.Path)
 
-	if len(matches) == 3 {
-		tenant_id := matches[1]
-		action := matches[2]
+	// Intercept calls to Azure AD endpoints and route them to our test server
+	testURL, _ := url.Parse(t.servURL)
+	if req.URL.Host == "login.microsoftonline.com" || req.URL.Host == testURL.Host {
+		// Handle Azure AD endpoint patterns:
+		// /{tenant-id}/v2.0/.well-known/openid-configuration
+		// /{tenant-id}/oauth2/v2.0/token
+		re := regexp.MustCompile(`^/([0-9a-fA-F-]+|common)/?(oauth2/v2\.0/token|v2\.0/\.well-known/openid-configuration)`)
+		matches := re.FindStringSubmatch(req.URL.Path)
 
-		switch action {
-		case "v2.0/.well-known/openid-configuration":
-			return createJSONResponse(map[string]interface{}{
-				"token_endpoint":         t.servURL + "/" + tenant_id + "/oauth2/v2.0/token",
-				"authorization_endpoint": t.servURL + "/" + tenant_id + "/oauth2/v2.0/authorize",
-				"issuer":                 t.servURL + "/" + tenant_id + "/oauth2/v2.0/issuer",
-			}, 200)
+		if len(matches) == 3 {
+			tenant_id := matches[1]
+			action := matches[2]
 
-		case "oauth2/v2.0/token":
-			return createJSONResponse(map[string]interface{}{
-				"token_type":   "Bearer",
-				"expires_in":   3600,
-				"access_token": "mock_access_token_123",
-			}, 200)
+			switch action {
+			case "v2.0/.well-known/openid-configuration":
+				return createJSONResponse(map[string]interface{}{
+					"token_endpoint":         "https://login.microsoftonline.com/" + tenant_id + "/oauth2/v2.0/token",
+					"authorization_endpoint": "https://login.microsoftonline.com/" + tenant_id + "/oauth2/v2.0/authorize",
+					"issuer":                 "https://login.microsoftonline.com/" + tenant_id + "/v2.0",
+				}, 200)
+
+			case "oauth2/v2.0/token":
+				return createJSONResponse(map[string]interface{}{
+					"token_type":   "Bearer",
+					"expires_in":   3600,
+					"access_token": "mock_access_token_123",
+				}, 200)
+			}
 		}
 	}
+
+	// Fall back to original behavior for other requests (Azure Storage)
 	return t.rt.RoundTrip(req)
 }
 

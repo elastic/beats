@@ -38,10 +38,10 @@ import (
 // from an input.
 type sourceStore struct {
 	// identifier is the sourceIdentifier used to generate IDs fro this store.
-	identifier *sourceIdentifier
+	identifier *SourceIdentifier
 	// identifiersToTakeOver are sourceIdentifier from previous input instances
 	// that this sourceStore will take states over.
-	identifiersToTakeOver []*sourceIdentifier
+	identifiersToTakeOver []*SourceIdentifier
 	// store is the underlying store that encapsulates
 	// the in-memory and persistent store.
 	store *store
@@ -177,8 +177,8 @@ func openStore(log *logp.Logger, statestore statestore.States, prefix string) (*
 // identifiersToTakeOver is optional and can be nil.
 func newSourceStore(
 	s *store,
-	identifier *sourceIdentifier,
-	identifiersToTakeOver []*sourceIdentifier,
+	identifier *SourceIdentifier,
+	identifiersToTakeOver []*SourceIdentifier,
 ) *sourceStore {
 
 	return &sourceStore{
@@ -639,7 +639,7 @@ func (s *store) UpdateTTL(resource *resource, ttl time.Duration) {
 
 	s.writeState(resource)
 
-	if resource.isDeleted() {
+	if resource.unsafeIsDeleted() {
 		// version must be incremented to make sure existing resource
 		// instances do not overwrite the removal of the entry
 		resource.version++
@@ -697,7 +697,17 @@ func (r *resource) IsNew() bool {
 	return r.pendingCursorValue == nil && r.pendingUpdate == nil && r.cursor == nil
 }
 
+// isDeleted locks stateMutex then checks whether [resource] is deleted.
 func (r *resource) isDeleted() bool {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+	return r.unsafeIsDeleted()
+}
+
+// unsafeIsDeleted DOES NOT LOCK THE RESOURCE!!!
+// Only call unsafeIsDeleted if you're currently holding the
+// lock from resource.stateMutex
+func (r *resource) unsafeIsDeleted() bool {
 	return !r.internalState.Updated.IsZero() && r.internalState.TTL == 0
 }
 

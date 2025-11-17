@@ -40,7 +40,6 @@ const (
 
 	ignoreInactiveSinceLastStartStr  = "since_last_start"
 	ignoreInactiveSinceFirstStartStr = "since_first_start"
-	prospectorDebugKey               = "file_prospector"
 )
 
 var ignoreInactiveSettings = map[string]ignoreInactiveType{
@@ -282,13 +281,19 @@ func (p *fileProspector) Init(
 //
 //nolint:dupl // Different prospectors have a similar run method
 func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
-	log := ctx.Logger.With("prospector", prospectorDebugKey)
-	log.Debug("Starting prospector")
-	defer log.Debug("Prospector has stopped")
+	p.logger.Debug("Starting prospector")
+	defer p.logger.Debug("Prospector has stopped")
 
-	defer p.stopHarvesterGroup(log, hg)
+	// ctx.Logger has its 'log.logger' set to 'input.filestream'.
+	// Because the harvester is not really part of the prospector,
+	// we use this logger instead of the prospector logger.
+	defer p.stopHarvesterGroup(ctx.Logger, hg)
 
 	var tg unison.MultiErrGroup
+
+	// The harvester needs to notify the FileWatcher
+	// when it closes
+	hg.SetObserver(p.filewatcher.NotifyChan())
 
 	tg.Go(func() error {
 		p.filewatcher.Run(ctx.Cancelation)
@@ -306,17 +311,19 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			}
 
 			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
+			p.onFSEvent(loggerWithEvent(p.logger, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
 		}
 		return nil
 	})
 
 	errs := tg.Wait()
 	if len(errs) > 0 {
-		log.Errorf("running prospector failed: %v", errors.Join(errs...))
+		p.logger.Errorf("running prospector failed: %v", errors.Join(errs...))
 	}
 }
 
+// onFSEvent uses 'log' instead of the [fileProspector] logger
+// because 'log' has been enriched with event information
 func (p *fileProspector) onFSEvent(
 	log *logp.Logger,
 	ctx input.Context,
@@ -326,6 +333,8 @@ func (p *fileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
+
+	log = log.With("source_file", event.SrcID)
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
 		switch event.Op {
