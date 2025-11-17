@@ -144,6 +144,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		m.eventGenStarted = true
 	}
 
+	m.Logger().Debugf("Fetching families")
+
 	families, err := m.prometheus.GetFamilies()
 	eventList := map[string]mapstr.M{}
 	if err != nil {
@@ -152,10 +154,14 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		// set the error to report it after sending the up event
 		err = fmt.Errorf("unable to decode response from prometheus endpoint: %w", err)
+
+		m.Logger().Debugf("Error getting families: %s", err)
 	} else {
 		// add up event to the list
 		families = append(families, m.upMetricFamily(1.0))
 	}
+
+	m.Logger().Debugf("Processing families. There are %d families", len(families))
 
 	for _, family := range families {
 		if m.skipFamily(family) {
@@ -186,6 +192,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			eventList[labelsHash].DeepUpdate(promEvent.Data)
 		}
 	}
+
+	m.Logger().Debugf("Reporting events. There are %d events to report", len(eventList))
 
 	// Report events
 	for _, e := range eventList {

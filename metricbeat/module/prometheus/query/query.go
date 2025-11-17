@@ -83,7 +83,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		url := m.getURL(pathConfig.Path, pathConfig.Params)
 		m.http.SetURI(url)
 
-		m.Logger().Debugf("Running query. URL: %s", url)
 		response, err := m.http.FetchResponse()
 		if err != nil {
 			reporter.Error(fmt.Errorf("unable to fetch data from prometheus endpoint %v: %w", url, err))
