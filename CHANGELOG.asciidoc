@@ -3,6 +3,38 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+// begin 8.19.7 relnotes
+
+[[release-notes-8.19.7]]
+=== Beats version 8.19.7
+https://github.com/elastic/beats/compare/v8.19.6\...v8.19.7[View commits]
+
+[discrete]
+[[new-features-8.19.7]]
+==== New features
+
+The 8.19.7 release adds the following new and notable features.
+
+**Filebeat**
+
+* Add data stream identification to Fleet health status updates. https://github.com/elastic/beats/pull/47229[#47229]
+
+[discrete]
+[[bug-fixes-8.19.7]]
+==== Bug fixes
+
+**All**
+
+* Add `close` to conditional processors if underlying processors have `close` method. https://github.com/elastic/beats/pull/46653[#46653] https://github.com/elastic/beats/issues/46575[#46575]
+* Fix a bug where Kerberos authentication could be disabled when server supports multiple authentication types. https://github.com/elastic/beats/pull/47443[#47443] https://github.com/elastic/beats/issues/47110[#47110]
+
+
+**Filebeat**
+
+* Fix potential Filebeat panic during memory queue shutdown. https://github.com/elastic/beats/pull/47248[#47248]
+
+// end 8.19.7 relnotes
+
 [[release-notes-8.19.6]]
 === Beats version 8.19.6
 https://github.com/elastic/beats/compare/v8.19.5\...v8.19.6[View commits]
