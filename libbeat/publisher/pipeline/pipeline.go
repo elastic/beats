@@ -290,8 +290,7 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 	if p.processors == nil {
 		return nil, nil
 	}
-	cfg.Paths = p.paths
-	return p.processors.Create(cfg, noPublish)
+	return p.processors.Create(cfg, noPublish, p.paths)
 }
 
 // OutputReloader returns a reloadable object for the output section of this pipeline

@@ -25,6 +25,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -475,7 +476,7 @@ type testProcessorSupporter struct {
 }
 
 // Create a running processor interface based on the given config
-func (p testProcessorSupporter) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error) {
+func (p testProcessorSupporter) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path) (beat.Processor, error) {
 	return p.Processor, nil
 }
 

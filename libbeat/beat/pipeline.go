@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Pipeline provides access to libbeat event publishing by creating a Client
@@ -126,10 +125,6 @@ type ProcessingConfig struct {
 	// Private contains additional information to be passed to the processing
 	// pipeline builder.
 	Private interface{}
-
-	// Paths contains the paths configuration used for processor initialization.
-	// This is passed to processors that support lazy initialization via SetPaths.
-	Paths *paths.Path
 }
 
 // ClientListener provides access to internal client events.
