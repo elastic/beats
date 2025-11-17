@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 
@@ -34,7 +35,9 @@ import (
 )
 
 func TestConfigWithCustomBuilders(t *testing.T) {
-	err := autodiscover.Registry.AddBuilder("mock", newMockBuilder)
+	logger := logptest.NewTestingLogger(t, "kubernetes")
+	reg := autodiscover.NewRegistry(logger)
+	err := reg.AddBuilder("mock", newMockBuilder)
 	assert.NoError(t, err)
 
 	cfg := mapstr.M{
@@ -123,8 +126,7 @@ func TestConfigLeaseFields(t *testing.T) {
 	}
 }
 
-type mockBuilder struct {
-}
+type mockBuilder struct{}
 
 func newMockBuilder(_ *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
 	return &mockBuilder{}, nil

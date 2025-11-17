@@ -24,6 +24,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/elastic/beats/v7/filebeat/autodiscover/builder/hints"
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
@@ -34,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/v2/compat"
 	"github.com/elastic/beats/v7/filebeat/registrar"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/initialization"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -75,18 +77,19 @@ type Filebeat struct {
 	pipeline                 beat.PipelineConnector
 	logger                   *logp.Logger
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
+	autodiscoverRegistry     *autodiscover.Registry
 }
 
 type PluginFactory func(beat.Info, *logp.Logger, statestore.States, *paths.Path) []v2.Plugin
 
 // New creates a new Filebeat pointer instance.
-func New(plugins PluginFactory) beat.Creator {
+func New(plugins PluginFactory, adSetup autodiscover.RegistrySetup) beat.Creator {
 	return func(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
-		return newBeater(b, plugins, rawConfig)
+		return newBeater(b, plugins, rawConfig, adSetup)
 	}
 }
 
-func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Beater, error) {
+func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C, adSetup autodiscover.RegistrySetup) (beat.Beater, error) {
 	config := cfg.DefaultConfig
 	if err := rawConfig.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %w", err) //nolint:staticcheck //Keep old behavior
@@ -152,12 +155,21 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		return nil, fmt.Errorf("stdin requires to be run in exclusive mode, configured inputs: %s", strings.Join(enabledInputs, ", "))
 	}
 
+	adRegistry := autodiscover.NewRegistry(b.Info.Logger.Named("autodiscover"))
+	if adSetup != nil {
+		err = adSetup(adRegistry)
+		if err != nil {
+			return nil, fmt.Errorf("error setting up autodiscover: %w", err)
+		}
+	}
+
 	fb := &Filebeat{
-		done:           make(chan struct{}),
-		config:         &config,
-		moduleRegistry: moduleRegistry,
-		pluginFactory:  plugins,
-		logger:         b.Info.Logger,
+		done:                 make(chan struct{}),
+		config:               &config,
+		moduleRegistry:       moduleRegistry,
+		pluginFactory:        plugins,
+		logger:               b.Info.Logger,
+		autodiscoverRegistry: adRegistry,
 	}
 
 	err = fb.setupPipelineLoaderCallback(b)
@@ -466,6 +478,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
+		adLogger := fb.logger.Named("autodiscover")
 		adiscover, err = autodiscover.NewAutodiscover(
 			"filebeat",
 			fb.pipeline,
@@ -476,7 +489,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			autodiscover.QueryConfig(),
 			config.Autodiscover,
 			b.Keystore,
-			fb.logger,
+			adLogger,
+			fb.autodiscoverRegistry,
 		)
 		if err != nil {
 			return err
@@ -554,4 +568,14 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, logger *log
 		return esClient, nil
 	}
 	return pipelineLoaderFactory
+}
+
+func FilebeatAutoDiscoverSetup(reg *autodiscover.Registry) error {
+	if err := initialization.Setup(reg); err != nil {
+		return fmt.Errorf("filebeat autodiscover initialization error: %w", err)
+	}
+	if err := hints.Setup(reg); err != nil {
+		return fmt.Errorf("autodiscover builder hints error: %w", err)
+	}
+	return nil
 }

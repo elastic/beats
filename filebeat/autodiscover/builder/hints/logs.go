@@ -57,9 +57,9 @@ type logHints struct {
 	log      *logp.Logger
 }
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	_ = autodiscover.Registry.AddBuilder("hints", NewLogHints)
+// Setup initializes this module.
+func Setup(r *autodiscover.Registry) error {
+	return r.AddBuilder("hints", NewLogHints)
 }
 
 // NewLogHints builds a log hints builder

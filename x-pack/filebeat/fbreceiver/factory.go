@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	xpBeater "github.com/elastic/beats/v7/x-pack/filebeat/beater"
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
@@ -50,7 +51,7 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
 
-	beatCreator := beater.New(inputs.Init)
+	beatCreator := beater.New(inputs.Init, xpBeater.FilebeatAutoDiscoverSetup)
 	br, err := xpInstance.NewBeatReceiver(ctx, b, beatCreator)
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s:%w", Name, err)

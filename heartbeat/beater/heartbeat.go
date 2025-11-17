@@ -28,6 +28,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 
+	"github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
@@ -37,6 +38,7 @@ import (
 	_ "github.com/elastic/beats/v7/heartbeat/security"
 	"github.com/elastic/beats/v7/heartbeat/tracer"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/initialization"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
@@ -50,17 +52,25 @@ type Heartbeat struct {
 	done     chan struct{}
 	stopOnce sync.Once
 	// config is used for iterating over elements of the config.
-	config             *config.Config
-	scheduler          *scheduler.Scheduler
-	monitorReloader    *cfgfile.Reloader
-	monitorFactory     *monitors.RunnerFactory
-	autodiscover       *autodiscover.Autodiscover
-	replaceStateLoader func(sl monitorstate.StateLoader)
-	trace              tracer.Tracer
+	config               *config.Config
+	scheduler            *scheduler.Scheduler
+	monitorReloader      *cfgfile.Reloader
+	monitorFactory       *monitors.RunnerFactory
+	autodiscover         *autodiscover.Autodiscover
+	autodiscoverRegistry *autodiscover.Registry
+	replaceStateLoader   func(sl monitorstate.StateLoader)
+	trace                tracer.Tracer
 }
 
 // New creates a new heartbeat.
-func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
+func New(adSetup autodiscover.RegistrySetup) beat.Creator {
+	return func(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
+		return newBeater(b, rawConfig, adSetup)
+	}
+}
+
+// New creates a new heartbeat.
+func newBeater(b *beat.Beat, rawConfig *conf.C, adSetup autodiscover.RegistrySetup) (beat.Beater, error) {
 	parsedConfig := config.DefaultConfig()
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
 		return nil, fmt.Errorf("error reading config file: %w", err)
@@ -134,8 +144,17 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			PipelineClientFactory: pipelineClientFactory,
 			BeatRunFrom:           parsedConfig.RunFrom,
 		}),
-		trace: trace,
+		trace:                trace,
+		autodiscoverRegistry: autodiscover.NewRegistry(b.Info.Logger.Named("autodiscover")),
 	}
+
+	if adSetup != nil {
+		err = adSetup(bt.autodiscoverRegistry)
+		if err != nil {
+			return nil, fmt.Errorf("error setting up autodiscover: %w", err)
+		}
+	}
+
 	runFromID := "<unknown location>"
 	if parsedConfig.RunFrom != nil {
 		runFromID = parsedConfig.RunFrom.ID
@@ -311,6 +330,7 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 		bt.config.Autodiscover,
 		b.Keystore,
 		b.Info.Logger,
+		bt.autodiscoverRegistry,
 	)
 	if err != nil {
 		return nil, err
@@ -352,7 +372,7 @@ func makeESClient(ctx context.Context, cfg *conf.C, attempts int, wait time.Dura
 		return nil, fmt.Errorf("error setting the ES timeout in config: %w", err)
 	}
 
-	for i := 0; i < attempts; i++ {
+	for range attempts {
 		// TODO: use local logger here
 		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, "Heartbeat", logp.NewLogger(""))
 		if err == nil {
@@ -364,4 +384,14 @@ func makeESClient(ctx context.Context, cfg *conf.C, attempts int, wait time.Dura
 	}
 
 	return nil, fmt.Errorf("could not establish states loader connection after %d attempts, with %s delay", attempts, wait)
+}
+
+func HeartbeatAutodiscoverSetup(reg *autodiscover.Registry) error {
+	if err := initialization.Setup(reg); err != nil {
+		return fmt.Errorf("heartbeat autodiscover initialization error: %w", err)
+	}
+	if err := hints.Setup(reg); err != nil {
+		return fmt.Errorf("heartbeat hints autodiscover initialization error: %w", err)
+	}
+	return nil
 }

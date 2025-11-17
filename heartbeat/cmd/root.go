@@ -63,7 +63,7 @@ func HeartbeatSettings() instance.Settings {
 
 // Initialize initializes the entrypoint commands for heartbeat
 func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
-	rootCmd := cmd.GenRootCmdWithSettings(beater.New, settings)
+	rootCmd := cmd.GenRootCmdWithSettings(beater.New(beater.HeartbeatAutodiscoverSetup), settings)
 
 	// remove dashboard from export commands
 	for _, cmd := range rootCmd.ExportCmd.Commands() {

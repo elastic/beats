@@ -36,13 +36,13 @@ func Plugin(name string, provider autodiscover.ProviderBuilder) map[string][]int
 	return p.MakePlugin(pluginKey, providerPlugin{name, provider})
 }
 
-func init() {
-	p.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
+func RegisterPluginProviders(registry *autodiscover.Registry) error {
+	return p.RegisterLoader(pluginKey, func(ifc any) error {
 		prov, ok := ifc.(providerPlugin)
 		if !ok {
 			return errors.New("plugin does not match processor plugin type")
 		}
 
-		return autodiscover.Registry.AddProvider(prov.name, prov.provider)
+		return registry.AddProvider(prov.name, prov.provider)
 	})
 }

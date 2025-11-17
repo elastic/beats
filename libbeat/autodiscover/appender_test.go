@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -39,8 +40,9 @@ func newFakeAppender(_ *conf.C, _ *logp.Logger) (Appender, error) {
 
 func TestAppenderRegistry(t *testing.T) {
 	// Add a new builder
-	reg := NewRegistry()
-	reg.AddAppender("fake", newFakeAppender)
+	reg := NewRegistry(logp.NewNopLogger())
+	err := reg.AddAppender("fake", newFakeAppender)
+	require.NoError(t, err)
 
 	// Check if that appender is available in registry
 	b := reg.GetAppender("fake")
@@ -60,9 +62,11 @@ func TestAppenderRegistry(t *testing.T) {
 	assert.NotNil(t, appender)
 
 	// Attempt to build using an array of configs
-	Registry.AddAppender("fake", newFakeAppender)
+	reg2 := NewRegistry(logp.NewNopLogger())
+	err = reg2.AddAppender("fake", newFakeAppender)
+	require.NoError(t, err)
 	cfgs := []*conf.C{cfg}
-	appenders, err := NewAppenders(cfgs)
+	appenders, err := NewAppenders(cfgs, reg2)
 	assert.NoError(t, err)
 	assert.Equal(t, len(appenders), 1)
 
@@ -73,7 +77,7 @@ func TestAppenderRegistry(t *testing.T) {
 	icfg, err := conf.NewConfigFrom(&incorrectConfig)
 	assert.NoError(t, err)
 	cfgs = append(cfgs, icfg)
-	appenders, err = NewAppenders(cfgs)
+	appenders, err = NewAppenders(cfgs, reg2)
 	assert.Error(t, err)
 	assert.Nil(t, appenders)
 

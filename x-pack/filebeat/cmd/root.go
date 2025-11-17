@@ -15,6 +15,7 @@ import (
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/x-pack/filebeat/beater"
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
@@ -36,7 +37,7 @@ func Filebeat() *cmd.BeatsRootCmd {
 	settings.Processing = processing.MakeDefaultSupport(true, globalProcs, processing.WithECS, processing.WithHost, processing.WithAgentMeta())
 	settings.ElasticLicensed = true
 	settings.Initialize = append(settings.Initialize, include.InitializeModule)
-	command := fbcmd.Filebeat(inputs.Init, settings)
+	command := fbcmd.Filebeat(inputs.Init, beater.FilebeatAutoDiscoverSetup, settings)
 	command.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		management.ConfigTransform.SetTransform(filebeatCfg)
 	}
