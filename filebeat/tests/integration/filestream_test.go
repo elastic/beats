@@ -71,8 +71,11 @@ output.file:
 logging:
   level: debug
   selectors:
-    - input
-    - input.filestream
+    - "input"
+    - "input.filestream"
+    - "input.filestream.file_watcher"
+    - "input.filestream.prospector"
+    - "input.filestream.scanner"
   metrics:
     enabled: false
 `
