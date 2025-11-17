@@ -62,9 +62,9 @@ exporters:
       mode: bodymap
     compression: gzip
     compression_params:
-      level: 1 
+      level: 1
     auth:
-      authenticator: beatsauth  
+      authenticator: beatsauth
 `
 
 func TestConverter(t *testing.T) {
@@ -226,7 +226,7 @@ exporters:
     compression_params:
       level: 1
     auth:
-      authenticator: beatsauth  
+      authenticator: beatsauth
 receivers:
   filebeatreceiver:
     filebeat:
@@ -322,6 +322,43 @@ service:
 		compareAndAssert(t, expOutput, input)
 
 	})
+
+	t.Run("test elasticsearch exporter with enabled false", func(t *testing.T) {
+		var supportedInput = `
+receivers:
+  filebeatreceiver:
+    output:
+      elasticsearch:
+        enabled: false
+        hosts: ["https://localhost:9200"]
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+
+		var expectedOutput = `
+receivers:
+  filebeatreceiver:
+    output:
+      otelconsumer: null
+service:
+  telemetry:
+    metrics:
+      level: none
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+`
+		input := newFromYamlString(t, supportedInput)
+		err := c.Convert(context.Background(), input)
+		require.NoError(t, err, "error converting beats elasticsearch-output config")
+
+		expOutput := newFromYamlString(t, expectedOutput)
+		compareAndAssert(t, expOutput, input)
+	})
 }
 
 func TestLogLevel(t *testing.T) {
@@ -414,7 +451,7 @@ service:
   pipelines:
     logs:
       receivers:
-        - filebeatreceiver  
+        - filebeatreceiver
 `
 
 	commonOTelCfg := `
@@ -422,11 +459,11 @@ extensions:
   beatsauth:
     idle_connection_timeout: 3s
     proxy_disable: false
-    timeout: 1m30s  
+    timeout: 1m30s
 receivers:
   filebeatreceiver:
     output:
-      otelconsumer: null    
+      otelconsumer: null
 exporters:
   elasticsearch:
     endpoints:
@@ -440,7 +477,7 @@ exporters:
     password: changeme
     user: elastic
     mapping:
-      mode: bodymap 
+      mode: bodymap
     compression: gzip
     compression_params:
       level: 1
@@ -467,7 +504,7 @@ service:
       exporters:
         - elasticsearch
       receivers:
-        - filebeatreceiver      
+        - filebeatreceiver
 `
 
 	tests := []struct {
@@ -484,7 +521,7 @@ receivers:
         events: 3200
         flush:
           min_events: 1600
-          timeout: 10s            
+          timeout: 10s
 extensions:
   beatsauth:
     idle_connection_timeout: 3s
@@ -496,7 +533,7 @@ exporters:
         max_size: 1600
       num_consumers: 1
       queue_size: 3200
-    max_conns_per_host: 1      
+    max_conns_per_host: 1
  `,
 		},
 		{
@@ -509,7 +546,7 @@ receivers:
         events: 12800
         flush:
           min_events: 1600
-          timeout: 5s           
+          timeout: 5s
 extensions:
   beatsauth:
     idle_connection_timeout: 15s
@@ -521,7 +558,7 @@ exporters:
         max_size: 1600
       num_consumers: 4
       queue_size: 12800
-    max_conns_per_host: 4      
+    max_conns_per_host: 4
 `,
 		},
 		{
@@ -534,7 +571,7 @@ receivers:
         events: 3200
         flush:
           min_events: 1600
-          timeout: 20s          
+          timeout: 20s
 extensions:
   beatsauth:
     idle_connection_timeout: 1s
@@ -549,7 +586,7 @@ exporters:
     max_conns_per_host: 1
     retry:
       initial_interval: 5s
-      max_interval: 5m0s       
+      max_interval: 5m0s
 `,
 		},
 		{
@@ -562,7 +599,7 @@ receivers:
         events: 4100
         flush:
           min_events: 2050
-          timeout: 1s          
+          timeout: 1s
 extensions:
   beatsauth:
     idle_connection_timeout: 1m0s
@@ -577,7 +614,7 @@ exporters:
     max_conns_per_host: 1
     retry:
       initial_interval: 1s
-      max_interval: 1m0s    
+      max_interval: 1m0s
 `}}
 
 	commonOTeMap := newFromYamlString(t, commonOTelCfg)
