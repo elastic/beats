@@ -11,7 +11,6 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/aws/aws-sdk-go-v2/service/sts/types"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -71,12 +70,9 @@ func addCloudConnectorsCredentials(config ConfigAWS, cloudConnectorsConfig Cloud
 					if config.ExternalID != "" {
 						aro.ExternalID = awssdk.String(config.ExternalID)
 
-						// This tag is set by the system (env var) and not user input (package policy).
+						// The source identity is set by the system (env var) and not user input (package policy).
 						// It should be requested on the other side (remote role) as a condition to assume.
-						aro.Tags = append(aro.Tags, types.Tag{
-							Key:   awssdk.String(CloudConnectorsAWSElasticResourceIDKey),
-							Value: awssdk.String(cloudConnectorsConfig.CloudResourceID),
-						})
+						aro.SourceIdentity = awssdk.String(cloudConnectorsConfig.CloudResourceID)
 					}
 				},
 			)
