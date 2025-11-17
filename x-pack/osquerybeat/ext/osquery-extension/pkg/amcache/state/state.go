@@ -38,10 +38,6 @@ const defaultHivePath = "C:\\Windows\\AppCompat\\Programs\\Amcache.hve"
 // unnecessary work if the tables are not used.  Additionally, the cache
 // is refreshed at query time if it has expired. But will not be updated until
 // the next query, even if it is expired.
-//
-// TODO: Make sure that keeping this data in memory is not a problem for osquerybeat
-//
-//	in general
 
 type cachedTables map[tables.TableName][]tables.Entry
 

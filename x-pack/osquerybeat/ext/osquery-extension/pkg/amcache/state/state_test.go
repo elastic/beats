@@ -152,7 +152,7 @@ func TestGetCachedEntriesForcesUpdate(t *testing.T) {
 	assert.NoError(t, err, "Expected Update to succeed, got error: %v", err)
 
 	cacheExpired := false
-	for _ = range 10 {
+	for range 10 {
 		state.lock.RLock()
 		cache := state.cache
 		state.lock.RUnlock()
