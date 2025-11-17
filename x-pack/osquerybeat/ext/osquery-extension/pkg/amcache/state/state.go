@@ -125,6 +125,10 @@ func (gs *AmcacheState) updateLockHeld(log *logger.Logger) error {
 // This function accepts a list of filters to filter the entries by.
 // If the list of filters is empty, all entries are returned.
 // If the list of filters is not empty, only the entries that match all filters are returned.
+// When no filters are provided, the returned slice references the
+// internal cache and must not be modified. If you need to modify
+// the slice, make a copy first.
+// When filters are provided, a new slice is returned.
 func (gs *AmcacheState) GetCachedEntries(amcacheTable tables.AmcacheTable, filterList []filters.Filter, log *logger.Logger) ([]tables.Entry, error) {
 	gs.lock.Lock()
 	defer gs.lock.Unlock()
@@ -137,15 +141,13 @@ func (gs *AmcacheState) GetCachedEntries(amcacheTable tables.AmcacheTable, filte
 		}
 	}
 
-	result := make([]tables.Entry, 0)
 	cachedTableEntries := gs.cache[amcacheTable.Name]
 
 	if len(filterList) == 0 {
-		result := make([]tables.Entry, len(cachedTableEntries))
-		copy(result, cachedTableEntries)
-		return result, nil
+		return cachedTableEntries, nil
 	}
 
+	var result []tables.Entry
 	// Filter the entries by the filters.
 	// Filters are evaluated as AND operations.
 	for _, entry := range cachedTableEntries {
