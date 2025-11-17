@@ -382,6 +382,11 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 
 	// setup 8: pipeline processors list
 	if b.processors != nil {
+		err := b.processors.SetPaths(paths)
+		if err != nil {
+			return nil, fmt.Errorf("failed setting paths for global processors: %w", err)
+		}
+
 		// Add the global pipeline as a function processor, so clients cannot close it
 		processors.add(newProcessor(b.processors.title, b.processors.Run))
 	}
