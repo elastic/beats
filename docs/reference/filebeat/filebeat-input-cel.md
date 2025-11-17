@@ -703,19 +703,6 @@ Only one of the credentials settings can be set at once. For more information pl
 
 
 
-<<<<<<< HEAD
-=======
-### `auth.oauth2.okta.dpop_key_pem` [_auth_oauth2_okta_dpop_key_pem]
-
-```{applies_to}
-stack: ga 9.2.0
-```
-
-The Demonstrating Proof-of-Possession private key PEM block for your Okta authentication token. When this key is provided, Okta authentication will make use of the [Okta DPoP authentication flow](https://www.okta.com/blog/product-innovation/a-leap-forward-in-token-security-okta-adds-support-for-dpop/).
-
-
-
->>>>>>> 648862624 (Docs: Add missing `applies_to` tags to recently added Filebeat configurations (#47610))
 ### `auth.token.enabled` [_auth_token_enabled]
 
 When set to `false`, disables the token authentication configuration. Default: `true`.
