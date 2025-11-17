@@ -181,6 +181,7 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 	var args []string
 
 	args = append(args, "-d")
+	args = append(args, "--remove-orphans")
 
 	if opts.Create.Build {
 		args = append(args, "--build")
