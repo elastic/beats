@@ -141,12 +141,12 @@ func LogWithLevel(log *logp.Logger, level Level, message string, args ...any) {
 // GlogEntry represents a parsed osquery glog entry emitted on osqueryd
 // stdout/stderr. It captures the level, timestamp, source, thread id and message.
 type GlogEntry struct {
-	Level      Level     // I, W, E
-	Timestamp  time.Time // parsed timestamp
-	ThreadID   int       // thread ID
-	SourceFile string    // source file name
-	SourceLine int       // source line number
-	Message    string    // log message
+	level      Level     // I, W, E
+	timestamp  time.Time // parsed timestamp
+	threadID   int       // thread ID
+	sourceFile string    // source file name
+	sourceLine int       // source line number
+	message    string    // log message
 }
 
 // Log writes the GlogEntry to the provided logger including structured fields
@@ -156,12 +156,12 @@ func (e *GlogEntry) Log(log *logp.Logger) {
 		return
 	}
 	args := []any{
-		"osquery.timestamp", e.Timestamp,
-		"osquery.thread_id", e.ThreadID,
-		"osquery.source.file", e.SourceFile,
-		"osquery.source.line", e.SourceLine,
+		"osquery.timestamp", e.timestamp,
+		"osquery.thread_id", e.threadID,
+		"osquery.source.file", e.sourceFile,
+		"osquery.source.line", e.sourceLine,
 	}
-	LogWithLevel(log, e.Level, e.Message, args...)
+	LogWithLevel(log, e.level, e.message, args...)
 }
 
 // ParseGlogLine parses an osquery log line in glog format from osqueryd
@@ -185,9 +185,9 @@ func ParseGlogLineWithNow(line string, now time.Time) (*GlogEntry, error) {
 	}
 
 	entry := &GlogEntry{
-		Level:      Level(matches[1]),
-		SourceFile: matches[5],
-		Message:    matches[7],
+		level:      Level(matches[1]),
+		sourceFile: matches[5],
+		message:    matches[7],
 	}
 
 	// Parse thread ID
@@ -195,14 +195,14 @@ func ParseGlogLineWithNow(line string, now time.Time) (*GlogEntry, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse thread ID: %w", err)
 	}
-	entry.ThreadID = threadID
+	entry.threadID = threadID
 
 	// Parse source line
 	sourceLine, err := strconv.Atoi(matches[6])
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse source line: %w", err)
 	}
-	entry.SourceLine = sourceLine
+	entry.sourceLine = sourceLine
 
 	// Parse timestamp (month/day and time-of-day)
 	monthDay := matches[2]
@@ -238,7 +238,7 @@ func ParseGlogLineWithNow(line string, now time.Time) (*GlogEntry, error) {
 		year++
 	}
 
-	entry.Timestamp = time.Date(
+	entry.timestamp = time.Date(
 		year,
 		logMonth,
 		day,

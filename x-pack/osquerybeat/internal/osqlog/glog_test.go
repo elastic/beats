@@ -25,61 +25,61 @@ func TestParseGlogLine(t *testing.T) {
 			name: "info log",
 			line: "I0314 15:24:36.123456 12345 extensions.cpp:123] Extension manager service starting",
 			expected: &GlogEntry{
-				Level:      LevelInfo,
-				ThreadID:   12345,
-				SourceFile: "extensions.cpp",
-				SourceLine: 123,
-				Message:    "Extension manager service starting",
-				Timestamp:  time.Date(2025, time.March, 14, 15, 24, 36, 123456000, time.UTC),
+				level:      LevelInfo,
+				threadID:   12345,
+				sourceFile: "extensions.cpp",
+				sourceLine: 123,
+				message:    "Extension manager service starting",
+				timestamp:  time.Date(2025, time.March, 14, 15, 24, 36, 123456000, time.UTC),
 			},
 		},
 		{
 			name: "warning log",
 			line: "W1225 09:15:42.987654 54321 database.cpp:456] Database file permissions are too open",
 			expected: &GlogEntry{
-				Level:      LevelWarning,
-				ThreadID:   54321,
-				SourceFile: "database.cpp",
-				SourceLine: 456,
-				Message:    "Database file permissions are too open",
+				level:      LevelWarning,
+				threadID:   54321,
+				sourceFile: "database.cpp",
+				sourceLine: 456,
+				message:    "Database file permissions are too open",
 				// With now fixed at 2025-03-14 (March), Dec 25 uses current year 2025
-				Timestamp: time.Date(2025, time.December, 25, 9, 15, 42, 987654000, time.UTC),
+				timestamp: time.Date(2025, time.December, 25, 9, 15, 42, 987654000, time.UTC),
 			},
 		},
 		{
 			name: "error log",
 			line: "E0101 00:00:00.000001 1 error.cpp:1] Fatal error occurred",
 			expected: &GlogEntry{
-				Level:      LevelError,
-				ThreadID:   1,
-				SourceFile: "error.cpp",
-				SourceLine: 1,
-				Message:    "Fatal error occurred",
-				Timestamp:  time.Date(2025, time.January, 1, 0, 0, 0, 1000, time.UTC),
+				level:      LevelError,
+				threadID:   1,
+				sourceFile: "error.cpp",
+				sourceLine: 1,
+				message:    "Fatal error occurred",
+				timestamp:  time.Date(2025, time.January, 1, 0, 0, 0, 1000, time.UTC),
 			},
 		},
 		{
 			name: "log with path in filename",
 			line: "I0520 12:30:45.555555 99999 src/osquery/extensions.cpp:789] Extension registered successfully",
 			expected: &GlogEntry{
-				Level:      LevelInfo,
-				ThreadID:   99999,
-				SourceFile: "src/osquery/extensions.cpp",
-				SourceLine: 789,
-				Message:    "Extension registered successfully",
-				Timestamp:  time.Date(2025, time.May, 20, 12, 30, 45, 555555000, time.UTC),
+				level:      LevelInfo,
+				threadID:   99999,
+				sourceFile: "src/osquery/extensions.cpp",
+				sourceLine: 789,
+				message:    "Extension registered successfully",
+				timestamp:  time.Date(2025, time.May, 20, 12, 30, 45, 555555000, time.UTC),
 			},
 		},
 		{
 			name: "log with empty message",
 			line: "I0710 08:45:30.111111 7777 test.cpp:999] ",
 			expected: &GlogEntry{
-				Level:      LevelInfo,
-				ThreadID:   7777,
-				SourceFile: "test.cpp",
-				SourceLine: 999,
-				Message:    "",
-				Timestamp:  time.Date(2025, time.July, 10, 8, 45, 30, 111111000, time.UTC),
+				level:      LevelInfo,
+				threadID:   7777,
+				sourceFile: "test.cpp",
+				sourceLine: 999,
+				message:    "",
+				timestamp:  time.Date(2025, time.July, 10, 8, 45, 30, 111111000, time.UTC),
 			},
 		},
 		{
@@ -109,23 +109,23 @@ func TestParseGlogLine(t *testing.T) {
 				return
 			}
 
-			if diff := cmp.Diff(tt.expected.Level, result.Level); diff != "" {
+			if diff := cmp.Diff(tt.expected.level, result.level); diff != "" {
 				t.Errorf("level mismatch: %s", diff)
 			}
-			if diff := cmp.Diff(tt.expected.ThreadID, result.ThreadID); diff != "" {
+			if diff := cmp.Diff(tt.expected.threadID, result.threadID); diff != "" {
 				t.Errorf("thread id mismatch: %s", diff)
 			}
-			if diff := cmp.Diff(tt.expected.SourceFile, result.SourceFile); diff != "" {
+			if diff := cmp.Diff(tt.expected.sourceFile, result.sourceFile); diff != "" {
 				t.Errorf("source file mismatch: %s", diff)
 			}
-			if diff := cmp.Diff(tt.expected.SourceLine, result.SourceLine); diff != "" {
+			if diff := cmp.Diff(tt.expected.sourceLine, result.sourceLine); diff != "" {
 				t.Errorf("source line mismatch: %s", diff)
 			}
-			if diff := cmp.Diff(tt.expected.Message, result.Message); diff != "" {
+			if diff := cmp.Diff(tt.expected.message, result.message); diff != "" {
 				t.Errorf("message mismatch: %s", diff)
 			}
-			if !result.Timestamp.Equal(tt.expected.Timestamp) {
-				t.Errorf("timestamp: expected %v, got %v", tt.expected.Timestamp, result.Timestamp)
+			if !result.timestamp.Equal(tt.expected.timestamp) {
+				t.Errorf("timestamp: expected %v, got %v", tt.expected.timestamp, result.timestamp)
 			}
 		})
 	}
@@ -139,7 +139,7 @@ func TestParseGlogLineYearRollover(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if result.Timestamp.Year() != 2025 {
-		t.Errorf("expected year %d, got %d", 2025, result.Timestamp.Year())
+	if result.timestamp.Year() != 2025 {
+		t.Errorf("expected year %d, got %d", 2025, result.timestamp.Year())
 	}
 }
