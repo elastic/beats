@@ -11,26 +11,31 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/aws/aws-sdk-go-v2/service/sts/types"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // These env vars are provided by agentless controller when the cloud connectors flow is enabled.
 const (
-	CloudConnectorsGlobalRoleEnvVar = "CLOUD_CONNECTORS_GLOBAL_ROLE"
-	CloudConnectorsJWTPathEnvVar    = "CLOUD_CONNECTORS_ID_TOKEN_FILE"
+	CloudConnectorsGlobalRoleEnvVar        = "CLOUD_CONNECTORS_GLOBAL_ROLE"
+	CloudConnectorsJWTPathEnvVar           = "CLOUD_CONNECTORS_ID_TOKEN_FILE"
+	CloudConnectorsCloudResourceIDEnvVar   = "CLOUD_RESOURCE_ID"
+	CloudConnectorsAWSElasticResourceIDKey = "elastic_resource_id"
 )
 
 // CloudConnectorsConfig is the config for the cloud connectors flow
 type CloudConnectorsConfig struct {
 	ElasticGlobalRoleARN string
 	IDTokenPath          string
+	CloudResourceID      string
 }
 
 func parseCloudConnectorsConfigFromEnv() CloudConnectorsConfig {
 	return CloudConnectorsConfig{
 		ElasticGlobalRoleARN: os.Getenv(CloudConnectorsGlobalRoleEnvVar),
 		IDTokenPath:          os.Getenv(CloudConnectorsJWTPathEnvVar),
+		CloudResourceID:      os.Getenv(CloudConnectorsCloudResourceIDEnvVar),
 	}
 }
 
@@ -65,6 +70,13 @@ func addCloudConnectorsCredentials(config ConfigAWS, cloudConnectorsConfig Cloud
 					aro.Duration = config.AssumeRoleDuration
 					if config.ExternalID != "" {
 						aro.ExternalID = awssdk.String(config.ExternalID)
+
+						// This tag is set by the system (env var) and not user input (package policy).
+						// It should be requested on the other side (remote role) as a condition to assume.
+						aro.Tags = append(aro.Tags, types.Tag{
+							Key:   awssdk.String(CloudConnectorsAWSElasticResourceIDKey),
+							Value: awssdk.String(cloudConnectorsConfig.CloudResourceID),
+						})
 					}
 				},
 			)

@@ -34,6 +34,7 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 	}
 	cloudConnectorsConfig := CloudConnectorsConfig{
 		ElasticGlobalRoleARN: "arn:aws:iam::999999999999:role/elastic-global-role",
+		CloudResourceID:      "abcd1234",
 	}
 	tokenFileContent := "abc123"
 
@@ -95,6 +96,8 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 						assert.Equal(t, "7200", q.Get("DurationSeconds"))
 						assert.Equal(t, config.ExternalID, q.Get("ExternalId"))
 						assert.Equal(t, config.RoleArn, q.Get("RoleArn"))
+						assert.Equal(t, "elastic_resource_id", q.Get("Tags.member.1.Key"))
+						assert.Equal(t, "abcd1234", q.Get("Tags.member.1.Value"))
 						return middleware.FinalizeOutput{
 							Result: &sts.AssumeRoleOutput{
 								Credentials: &types.Credentials{
