@@ -8,13 +8,11 @@ package tables
 
 import (
 	"context"
-	"fmt"
 	"os"
-	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/osquery/osquery-go/plugin/table"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/registry"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
@@ -23,25 +21,8 @@ import (
 
 type MockGlobalState struct{}
 
-func getTestHivePath() (string, error) {
-	_, currentFile, _, ok := runtime.Caller(0)
-	if !ok {
-		return "", fmt.Errorf("failed to get current file path")
-	}
-	dir := filepath.Dir(currentFile)
-	filePath := filepath.Join(dir, "..", "testdata", "amcache.hve")
-	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		return "", fmt.Errorf("test hive path does not exist: %w", err)
-	}
-	return filePath, nil
-}
-
 func (m *MockGlobalState) GetCachedEntries(amcacheTable AmcacheTable, filters []filters.Filter, log *logger.Logger) ([]Entry, error) {
-	hivePath, err := getTestHivePath()
-	if err != nil {
-		return nil, err
-	}
-	registry, _, err := registry.LoadRegistry(hivePath, log)
+	registry, _, err := registry.LoadRegistry("../testdata/Amcache.hve", log)
 	if err != nil {
 		return nil, err
 	}
@@ -50,21 +31,19 @@ func (m *MockGlobalState) GetCachedEntries(amcacheTable AmcacheTable, filters []
 		return nil, err
 	}
 
-	result := make([]Entry, 0)
-
 	if len(filters) == 0 {
-		result = append(result, entries...)
-		return result, nil
+		return entries, nil
 	}
 
+	filteredEntries := make([]Entry, 0)
 	for _, filter := range filters {
 		for _, entry := range entries {
 			if filter.Matches(entry) {
-				result = append(result, entry)
+				filteredEntries = append(filteredEntries, entry)
 			}
 		}
 	}
-	return result, nil
+	return filteredEntries, nil
 }
 
 func TestTables(t *testing.T) {
@@ -74,12 +53,8 @@ func TestTables(t *testing.T) {
 	generateFunc := amcacheTable.GenerateFunc(mockState, log)
 
 	rows, err := generateFunc(context.Background(), table.QueryContext{})
-	if err != nil {
-		t.Fatalf("Error generating rows for %s: %v", amcacheTable.Name, err)
-	}
-	if len(rows) == 0 {
-		t.Fatalf("No rows returned for %s", amcacheTable.Name)
-	}
+	assert.NoError(t, err, "failed to generate rows for %s", amcacheTable.Name)
+	assert.NotEmpty(t, rows, "no rows returned for %s", amcacheTable.Name)
 
 	queryContext := table.QueryContext{
 		Constraints: map[string]table.ConstraintList{
@@ -95,13 +70,7 @@ func TestTables(t *testing.T) {
 		},
 	}
 	filteredRows, err := generateFunc(context.Background(), queryContext)
-	if err != nil {
-		t.Fatalf("Error generating filtered rows for %s: %v", amcacheTable.Name, err)
-	}
-	if len(filteredRows) == 0 {
-		t.Fatalf("No filtered rows returned for %s", amcacheTable.Name)
-	}
-	if len(filteredRows) >= len(rows) {
-		t.Fatalf("Expected less than %d filtered rows, got %d", len(rows), len(filteredRows))
-	}
+	assert.NoError(t, err, "failed to generate filtered rows for %s", amcacheTable.Name)
+	assert.NotEmpty(t, filteredRows, "no filtered rows returned for %s", amcacheTable.Name)
+	assert.Less(t, len(filteredRows), len(rows), "expected less than %d filtered rows, got %d", len(rows), len(filteredRows))
 }

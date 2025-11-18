@@ -7,10 +7,7 @@
 package state
 
 import (
-	"fmt"
 	"os"
-	"path/filepath"
-	"runtime"
 	"testing"
 	"time"
 
@@ -22,45 +19,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-func getTestDataDirectory() (string, error) {
-	_, currentFile, _, ok := runtime.Caller(0)
-	if !ok {
-		return "", fmt.Errorf("failed to get current file path")
-	}
-	dir := filepath.Dir(currentFile)
-	testDataDirectory := filepath.Join(dir, "..", "testdata")
-	if _, err := os.Stat(testDataDirectory); os.IsNotExist(err) {
-		return "", fmt.Errorf("test data directory does not exist: %w", err)
-	}
-	return testDataDirectory, nil
-}
-
-func getTestHivePath() (string, error) {
-	testDataDirectory, err := getTestDataDirectory()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(testDataDirectory, "amcache.hve"), nil
-}
-
-func getRecoveryTestDataPath() (string, error) {
-	testDataDirectory, err := getTestDataDirectory()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(testDataDirectory, "recovery_data", "Amcache.hve"), nil
-}
-
 func TestCachingBehavior(t *testing.T) {
 	log := logger.New(os.Stdout, true)
-	hivePath, err := getTestHivePath()
-	if err != nil {
-		t.Fatalf("failed to get test hive path: %v", err)
-	}
-	recoveryTestDataPath, err := getRecoveryTestDataPath()
-	if err != nil {
-		t.Fatalf("failed to get recovery test data path: %v", err)
-	}
 	tests := []struct {
 		name          string // description of this test case
 		filePath      string
@@ -69,12 +29,12 @@ func TestCachingBehavior(t *testing.T) {
 	}{
 		{
 			name:     "recovery test data",
-			filePath: recoveryTestDataPath,
+			filePath: "../testdata/recovery_data/Amcache.hve",
 			wantErr:  false,
 		},
 		{
 			name:     "regular test data",
-			filePath: hivePath,
+			filePath: "../testdata/Amcache.hve",
 			wantErr:  false,
 		},
 	}
@@ -102,11 +62,7 @@ func TestCachingBehavior(t *testing.T) {
 
 func TestGetCachedEntries(t *testing.T) {
 	log := logger.New(os.Stdout, true)
-	hivePath, err := getTestHivePath()
-	if err != nil {
-		t.Fatalf("failed to get test hive path: %v", err)
-	}
-	state := newAmcacheState(hivePath, defaultExpirationDuration)
+	state := newAmcacheState("../testdata/Amcache.hve", defaultExpirationDuration)
 
 	for _, table := range tables.AllAmcacheTables() {
 		entries, err := state.GetCachedEntries(*tables.GetAmcacheTableByName(table.Name), nil, log)
@@ -139,14 +95,10 @@ func TestGetCachedEntries(t *testing.T) {
 
 func TestGetCachedEntriesForcesUpdate(t *testing.T) {
 	log := logger.New(os.Stdout, true)
-	hivePath, err := getTestHivePath()
-	if err != nil {
-		t.Fatalf("failed to get test hive path: %v", err)
-	}
-	state := newAmcacheState(hivePath, 5*time.Second)
+	state := newAmcacheState("../testdata/Amcache.hve", 5*time.Second)
 
 	state.lock.Lock()
-	err = state.updateLockHeld(log)
+	err := state.updateLockHeld(log)
 	state.lock.Unlock()
 
 	assert.NoError(t, err, "Expected Update to succeed, got error: %v", err)
