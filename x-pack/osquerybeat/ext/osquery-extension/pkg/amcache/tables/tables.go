@@ -231,13 +231,13 @@ func fillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE, log *logger.Logger)
 // GetEntriesFromRegistry reads the registry and returns a slice of entries for the specified AmcacheTable.
 func GetEntriesFromRegistry(amcacheTable AmcacheTable, registry *regparser.Registry, log *logger.Logger) ([]Entry, error) {
 	if registry == nil {
-		log.Fatalf("GetEntriesFromRegistry called with nil registry for table %s", amcacheTable.Name)
+		return nil, fmt.Errorf("GetEntriesFromRegistry called with nil registry for table %s", amcacheTable.Name)
 	}
 
 	hiveKey := amcacheTable.hiveKey
 	keyNode := registry.OpenKey(hiveKey)
 	if keyNode == nil {
-		return nil, fmt.Errorf("error opening key: %s", hiveKey)
+		return nil, fmt.Errorf("failed to open key: %s", hiveKey)
 	}
 
 	entries := make([]Entry, 0, len(keyNode.Subkeys()))
