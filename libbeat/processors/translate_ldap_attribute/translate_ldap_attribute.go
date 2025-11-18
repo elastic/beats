@@ -74,21 +74,13 @@ func newFromConfig(c config) (*processor, error) {
 		ldapConfig.tlsConfig = tlsConfig.ToConfig()
 	}
 	p := &processor{config: c}
-	p.log = logger.Named(logName).With(logp.Stringer("processor", p))
+	p.log = logp.NewLogger(logName).With(logp.Stringer("processor", p))
 	client, err := newLDAPClient(ldapConfig, p.log)
 	if err != nil {
 		return nil, err
 	}
-<<<<<<< HEAD
-	return &processor{
-		config: c,
-		client: client,
-		log:    logp.NewLogger(logName),
-	}, nil
-=======
 	p.client = client
 	return p, nil
->>>>>>> c2e6257e3 (libbeat/processors/translate_ldap_attribute: fix double locking and improve logging (#47585))
 }
 
 func (p *processor) String() string {
