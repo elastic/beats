@@ -18,9 +18,13 @@ import (
 type filebeatReceiver struct {
 	xpInstance.BeatReceiver
 	wg sync.WaitGroup
+	cb xpInstance.Callback
 }
 
 func (fb *filebeatReceiver) Start(ctx context.Context, host component.Host) error {
+	if err := fb.cb(host); err != nil {
+		return err
+	}
 	fb.wg.Add(1)
 	go func() {
 		defer fb.wg.Done()
