@@ -65,7 +65,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		ucfg.VarExp,
 	}
 
-	// all beatreceivers will use otelconsumer output by default
+	// all beatreceivers use otelconsumer output by default
 	receiverConfig["output"] = map[string]any{
 		"otelconsumer": map[string]any{},
 	}
