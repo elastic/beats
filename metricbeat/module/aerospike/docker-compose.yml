@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   aerospike:
     image: docker.elastic.co/integrations-ci/beats-aerospike:${AEROSPIKE_VERSION:-7.2.0.1}-1
@@ -10,6 +8,6 @@ services:
     build:
       context: ./_meta
       args:
-        AEROSPIKE_VERSION: ${AEROSPIKE_VERSION:-7.2.0}
+        AEROSPIKE_VERSION: ${AEROSPIKE_VERSION:-7.2.0.1}
     ports:
       - 3000
