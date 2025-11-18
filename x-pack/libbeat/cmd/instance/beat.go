@@ -65,6 +65,11 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		ucfg.VarExp,
 	}
 
+	// all beatreceivers will use otelconsumer output by default
+	receiverConfig["output"] = map[string]any{
+		"otelconsumer": map[string]any{},
+	}
+
 	tmp, err := ucfg.NewFrom(receiverConfig, cfOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("error converting receiver config to ucfg: %w", err)
@@ -154,10 +159,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, fmt.Errorf("error setting up instrumentation: %w", err)
 	}
 	b.Instrumentation = instrumentation
-
-	if err := instance.PromoteOutputQueueSettings(b); err != nil {
-		return nil, fmt.Errorf("could not promote output queue settings: %w", err)
-	}
 
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return nil, fmt.Errorf("could not parse features: %w", err)
@@ -260,17 +261,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, fmt.Errorf("error creating processors: %w", err)
 	}
 	b.SetProcessors(processors)
-
-	// This should be replaced with static config for otel consumer
-	// but need to figure out if we want the Queue settings from here.
-	outputEnabled := b.Config.Output.IsSet() && b.Config.Output.Config().Enabled()
-	if !outputEnabled {
-		if b.Manager.Enabled() {
-			logger.Info("Output is configured through Central Management")
-		} else {
-			return nil, fmt.Errorf("no outputs are defined, please define one under the output section")
-		}
-	}
 
 	reg := b.Monitoring.StatsRegistry().GetOrCreateRegistry("libbeat")
 
