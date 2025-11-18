@@ -116,7 +116,11 @@ func getHttpClient(a *authenticator) (*http.Client, error) {
 		return nil, fmt.Errorf("failed creating config: %w", err)
 	}
 
+<<<<<<< HEAD
 	beatAuthConfig := httpcommon.HTTPTransportSettings{}
+=======
+	beatAuthConfig := BeatsAuthConfig{}
+>>>>>>> d4ec03346 (Add string method to kerberos AuthType (#47687))
 	err = parsedCfg.Unpack(&beatAuthConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed unpacking config: %w", err)
