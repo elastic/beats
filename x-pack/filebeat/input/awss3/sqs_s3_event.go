@@ -55,16 +55,11 @@ func nonRetryableErrorWrap(err error) error {
 	return &nonRetryableError{Err: err}
 }
 
-// s3TestEvent is the test message format that Amazon S3 sends when configuring
-// event notifications. This uses a different format than regular S3 event notifications.
+// s3TestEvent is used to detect S3 test event notifications.
+// Test events have a different format than regular S3 event notifications.
 // https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-content-structure.html
 type s3TestEvent struct {
-	Service   string `json:"Service"`
-	Event     string `json:"Event"`
-	Time      string `json:"Time"`
-	Bucket    string `json:"Bucket"`
-	RequestId string `json:"RequestId"`
-	HostId    string `json:"HostId"`
+	Event string `json:"Event"`
 }
 
 // s3EventsV2 is the notification message that Amazon S3 sends to notify of S3 changes.
