@@ -126,7 +126,7 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 		return nil, fmt.Errorf("failed creating config: %w", err)
 	}
 
-	beatAuthConfig := esAuthConfig{}
+	beatAuthConfig := BeatsAuthConfig{}
 	err = parsedCfg.Unpack(&beatAuthConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed unpacking config: %w", err)
