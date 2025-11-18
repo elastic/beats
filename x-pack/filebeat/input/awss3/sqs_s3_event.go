@@ -61,7 +61,9 @@ func nonRetryableErrorWrap(err error) error {
 // https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-content-structure.html
 // If the notification message is sent from SNS to SQS, then Records will be
 // replaced by TopicArn and Message fields.
+// The Event field is present in test event notifications (s3:TestEvent) but not in regular events.
 type s3EventsV2 struct {
+	Event    string      `json:"Event"` // Present in test events (s3:TestEvent), empty in regular events
 	TopicArn string      `json:"TopicArn"`
 	Message  string      `json:"Message"`
 	Records  []s3EventV2 `json:"Records"`
@@ -291,13 +293,26 @@ func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, erro
 		return nil, fmt.Errorf("failed to decode SQS message body as an S3 notification: %w", err)
 	}
 
+	// Check if this is a test event and skip it
+	if events.Event == "s3:TestEvent" {
+		p.log.Debugw("Skipping S3 test event notification", "sqs_message_body", body)
+		return nil, nil
+	}
+
 	// Check if the notification is from S3 -> SNS -> SQS
 	if events.TopicArn != "" {
+		// Check if the inner message is a test event before unmarshaling
+		var innerEvents s3EventsV2
 		dec := json.NewDecoder(strings.NewReader(events.Message))
-		if err := dec.Decode(&events); err != nil {
+		if err := dec.Decode(&innerEvents); err != nil {
 			p.log.Debugw("Invalid SQS message body.", "sqs_message_body", body)
 			return nil, fmt.Errorf("failed to decode SQS message body as an S3 notification: %w", err)
 		}
+		if innerEvents.Event == "s3:TestEvent" {
+			p.log.Debugw("Skipping S3 test event notification (via SNS)", "sqs_message_body", body)
+			return nil, nil
+		}
+		events = innerEvents
 	}
 
 	if events.Records == nil {
