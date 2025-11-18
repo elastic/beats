@@ -333,16 +333,18 @@ func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, erro
 
 	// Check if the notification is from S3 -> SNS -> SQS
 	if events.TopicArn != "" {
+		// Check if the inner message is a test event before unmarshaling
+		var innerEvents s3EventsV2
 		dec := json.NewDecoder(strings.NewReader(events.Message))
-		if err := dec.Decode(&events); err != nil {
+		if err := dec.Decode(&innerEvents); err != nil {
 			p.log.Debugw("Invalid SQS message body.", "sqs_message_body", body)
 			return nil, fmt.Errorf("failed to decode SQS message body as an S3 notification: %w", err)
 		}
-		// Check if the inner message is a test event
-		if events.Event == "s3:TestEvent" {
+		if innerEvents.Event == "s3:TestEvent" {
 			p.log.Debugw("Skipping S3 test event notification (via SNS)", "sqs_message_body", body)
 			return nil, nil
 		}
+		events = innerEvents
 	}
 
 	// Check if the notification is from S3 -> EventBridge -> SQS
