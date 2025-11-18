@@ -11,6 +11,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"testing"
 	"text/template"
@@ -21,6 +22,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -36,11 +38,8 @@ func TestMetricbeatOTelE2E(t *testing.T) {
 
 	// create a random uuid and make sure it doesn't contain dashes/
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-<<<<<<< HEAD
-=======
 	mbIndex := "logs-integration-mb-" + namespace
 	mbReceiverIndex := "logs-integration-mbreceiver-" + namespace
->>>>>>> 3aec6d3f0 (otel: update integration tests to use an in-process testing collector (#47338))
 
 	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
 	metricbeatMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
@@ -153,35 +152,6 @@ http.host: localhost
 http.port: {{.MonitoringPort}}
 `
 
-<<<<<<< HEAD
-	// start metricbeat in otel mode
-	metricbeatOTel := integration.NewBeat(
-		t,
-		"metricbeat-otel",
-		"../../metricbeat.test",
-		"otel",
-	)
-
-	optionsValue := options{
-		ESURL:          fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-		Username:       user,
-		Password:       password,
-		MonitoringPort: 5078,
-	}
-
-	var configBuffer bytes.Buffer
-	optionsValue.Index = "logs-integration-mbreceiver-" + namespace
-	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&configBuffer, optionsValue))
-
-	metricbeatOTel.WriteConfigFile(configBuffer.String())
-	metricbeatOTel.Start()
-	defer metricbeatOTel.Stop()
-
-	var mbConfigBuffer bytes.Buffer
-	optionsValue.Index = "logs-integration-mb-" + namespace
-	optionsValue.MonitoringPort = 5079
-	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&mbConfigBuffer, optionsValue))
-=======
 	es := integration.GetESClient(t, "http")
 	t.Cleanup(func() {
 		_, err := es.Indices.DeleteDataStream([]string{
@@ -207,33 +177,31 @@ http.port: {{.MonitoringPort}}
 			MonitoringPort: metricbeatMonitoringPort,
 		}))
 
->>>>>>> 3aec6d3f0 (otel: update integration tests to use an in-process testing collector (#47338))
 	metricbeat := integration.NewBeat(t, "metricbeat", "../../metricbeat.test")
 	metricbeat.WriteConfigFile(mbConfigBuffer.String())
 	metricbeat.Start()
 	defer metricbeat.Stop()
 
-	// prepare to query ES
-	es := integration.GetESClient(t, "http")
-
 	// Make sure find the logs
 	var metricbeatDocs estools.Documents
 	var otelDocs estools.Documents
 	var err error
-	require.Eventually(t,
-		func() bool {
+
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-mbreceiver-"+namespace+"*")
-			require.NoError(t, err)
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+mbReceiverIndex+"*")
+			assert.NoError(ct, err)
 
-			metricbeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-mb-"+namespace+"*")
-			require.NoError(t, err)
+			metricbeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+mbIndex+"*")
+			assert.NoError(ct, err)
 
-			return otelDocs.Hits.Total.Value >= 1 && metricbeatDocs.Hits.Total.Value >= 1
+			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 log for otel receiver, got %d", otelDocs.Hits.Total.Value)
+			assert.GreaterOrEqual(ct, metricbeatDocs.Hits.Total.Value, 1, "expected at least 1 log for metricbeat, got %d", metricbeatDocs.Hits.Total.Value)
 		},
-		2*time.Minute, 1*time.Second, "Expected at least one ingested metric event, got metricbeat: %d, otel: %d", metricbeatDocs.Hits.Total.Value, otelDocs.Hits.Total.Value)
+		1*time.Minute, 1*time.Second, "expected at least 1 log for metricbeat and otel receiver")
 
 	var metricbeatDoc, otelDoc mapstr.M
 	otelDoc = otelDocs.Hits.Hits[0].Source
@@ -266,8 +234,6 @@ func assertMonitoring(t *testing.T, port int) {
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
 
-<<<<<<< HEAD
-=======
 func TestMetricbeatOTelReceiverE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
@@ -591,7 +557,6 @@ service:
 	}
 }
 
->>>>>>> 3aec6d3f0 (otel: update integration tests to use an in-process testing collector (#47338))
 func assertMapstrKeysEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg string) {
 	t.Helper()
 	// Delete all ignored fields.
