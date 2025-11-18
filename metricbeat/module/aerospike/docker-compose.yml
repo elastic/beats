@@ -2,18 +2,14 @@ version: '2.3'
 
 services:
   aerospike:
-<<<<<<< HEAD
-    image: docker.elastic.co/integrations-ci/beats-aerospike:${AEROSPIKE_VERSION:-3.9.0}-1
-=======
     image: docker.elastic.co/integrations-ci/beats-aerospike:${AEROSPIKE_VERSION:-7.2.0.1}-1
     ulimits:
       nofile:
         soft: 20000
         hard: 20000
->>>>>>> 3d17cad1a (Set ulimit for aerospike container so it runs. (#47682))
     build:
       context: ./_meta
       args:
-        AEROSPIKE_VERSION: ${AEROSPIKE_VERSION:-3.9.0}
+        AEROSPIKE_VERSION: ${AEROSPIKE_VERSION:-7.2.0}
     ports:
       - 3000
