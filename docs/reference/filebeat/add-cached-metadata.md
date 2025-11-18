@@ -89,6 +89,9 @@ One of `put`, `get` or `delete` must be provided.
 `ignore_missing`
 :   (Optional) When set to `false`, events that don’t contain any of the fields in `match_keys` will be discarded and an error will be generated. By default, this condition is ignored.
 
+`ignore_failure` {applies_to}`stack: preview 9.1.0`
+:   (Optional) When set to `true`, processor failures, including absence of values in the cache, will be ignored and logged at debug level.
+
 `overwrite_keys`
 :   (Optional) By default, if a target field already exists, it will not be overwritten and an error will be logged. If `overwrite_keys` is set to `true`, this condition will be ignored.
 

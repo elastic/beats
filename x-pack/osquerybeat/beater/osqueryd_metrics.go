@@ -82,8 +82,8 @@ func newOsquerydMetrics(registry *monitoring.Registry, log *logp.Logger) *osquer
 }
 
 // update queries osqueryd process metrics and updates the monitoring registry
-func (m *osquerydMetrics) update(ctx context.Context, socketPath string) error {
-	metrics, err := m.queryOsquerydMetrics(ctx, socketPath)
+func (m *osquerydMetrics) update(ctx context.Context, client *osqdcli.Client) error {
+	metrics, err := m.queryOsquerydMetrics(ctx, client)
 	if err != nil {
 		return fmt.Errorf("failed to query osqueryd metrics: %w", err)
 	}
@@ -116,7 +116,7 @@ func (m *osquerydMetrics) update(ctx context.Context, socketPath string) error {
 }
 
 // queryOsquerydMetrics queries osqueryd process metrics using osquery
-func (m *osquerydMetrics) queryOsquerydMetrics(ctx context.Context, socketPath string) (*processMetrics, error) {
+func (m *osquerydMetrics) queryOsquerydMetrics(ctx context.Context, client *osqdcli.Client) (*processMetrics, error) {
 	// Query for osqueryd process metrics by joining with osquery_info
 	// to get the current osqueryd process PID and version
 	query := `SELECT 
@@ -133,10 +133,6 @@ func (m *osquerydMetrics) queryOsquerydMetrics(ctx context.Context, socketPath s
 		o.version
 	FROM processes p
 	JOIN osquery_info o ON p.pid = o.pid`
-
-	// Create osquery client using the socket path
-	client := osqdcli.New(socketPath)
-	defer client.Close()
 
 	// Execute query with timeout
 	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -194,7 +190,7 @@ func (m *osquerydMetrics) checkHealth() []string {
 }
 
 // monitorOsquerydHealth periodically collects osqueryd metrics and reports issues
-func monitorOsquerydHealth(ctx context.Context, socketPath string, metrics *osquerydMetrics, log *logp.Logger) {
+func monitorOsquerydHealth(ctx context.Context, client *osqdcli.Client, metrics *osquerydMetrics, log *logp.Logger) {
 	ticker := time.NewTicker(osquerydHealthCheckInterval)
 	defer ticker.Stop()
 
@@ -206,7 +202,7 @@ func monitorOsquerydHealth(ctx context.Context, socketPath string, metrics *osqu
 			log.Info("Stopping osqueryd health monitoring")
 			return
 		case <-ticker.C:
-			if err := metrics.update(ctx, socketPath); err != nil {
+			if err := metrics.update(ctx, client); err != nil {
 				log.Warnf("Failed to update osqueryd metrics: %v", err)
 				continue
 			}
