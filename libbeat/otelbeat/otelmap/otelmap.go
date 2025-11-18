@@ -49,92 +49,184 @@ func ToMapstr(m pcommon.Map) mapstr.M {
 //     If you attempt to use other slice types (e.g., []string or []int),
 //     pcommon.Map.FromRaw(...) will return an "invalid type" error.
 //     To overcome this, we use "reflect" to transform []T into []any.
-func ConvertNonPrimitive[T mapstrOrMap](m T) {
-	for key, val := range m {
+func ConvertNonPrimitive[T mapstrOrMap](src T, dst pcommon.Map) {
+	dst.EnsureCapacity(len(src))
+	for key, val := range src {
 		switch x := val.(type) {
-		case mapstr.M:
-			ConvertNonPrimitive(x)
-			m[key] = map[string]any(x)
-		case []mapstr.M:
-			s := make([]any, len(x))
-			for i, val := range x {
-				ConvertNonPrimitive(val)
-				s[i] = map[string]any(val)
-			}
-			m[key] = s
-		case map[string]any:
-			ConvertNonPrimitive(x)
-			m[key] = x
-		case []map[string]any:
-			s := make([]any, len(x))
-			for i := range x {
-				ConvertNonPrimitive(x[i])
-				s[i] = x[i]
-			}
-			m[key] = s
+		case string:
+			dst.PutStr(key, x)
+		case bool:
+			dst.PutBool(key, x)
+		case int, int8, int16, int32, int64:
+			dst.PutInt(key, reflect.ValueOf(x).Int())
+		case uint, uint8, uint16, uint32, uint64:
+			dst.PutInt(key, int64(reflect.ValueOf(x).Uint()))
+		case float32, float64:
+			dst.PutDouble(key, reflect.ValueOf(x).Convert(reflect.TypeOf(float64(0))).Float())
 		case time.Time:
-			m[key] = x.UTC().Format("2006-01-02T15:04:05.000Z")
+			dst.PutStr(key, x.UTC().Format("2006-01-02T15:04:05.000Z"))
 		case common.Time:
-			m[key] = time.Time(x).UTC().Format("2006-01-02T15:04:05.000Z")
+			dst.PutStr(key, time.Time(x).UTC().Format("2006-01-02T15:04:05.000Z"))
+		case mapstr.M:
+			child := dst.PutEmptyMap(key)
+			ConvertNonPrimitive(map[string]any(x), child)
+		case map[string]any:
+			child := dst.PutEmptyMap(key)
+			ConvertNonPrimitive(x, child)
+		case []mapstr.M:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, val := range x {
+				child := s.AppendEmpty().SetEmptyMap()
+				ConvertNonPrimitive(map[string]any(val), child)
+			}
+		case []map[string]any:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, val := range x {
+				child := s.AppendEmpty().SetEmptyMap()
+				ConvertNonPrimitive(val, child)
+			}
 		case []time.Time:
-			s := make([]any, 0, len(x))
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
 			for _, i := range x {
-				s = append(s, i.UTC().Format("2006-01-02T15:04:05.000Z"))
+				s.AppendEmpty().SetStr(i.UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
-			m[key] = s
 		case []common.Time:
-			s := make([]any, 0, len(x))
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
 			for _, i := range x {
-				s = append(s, time.Time(i).UTC().Format("2006-01-02T15:04:05.000Z"))
+				s.AppendEmpty().SetStr(time.Time(i).UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
-			m[key] = s
 		case encoding.TextMarshaler:
 			text, err := x.MarshalText()
 			if err != nil {
-				m[key] = fmt.Sprintf("error converting %T to string: %s", x, err)
-				continue
+				text = fmt.Appendf(nil, "error converting %T to string: %s", x, err)
 			}
-			m[key] = string(text)
-		case []bool, []string, []float32, []float64, []int, []int8, []int16, []int32, []int64,
-			[]uint, []uint8, []uint16, []uint32, []uint64:
-			ref := reflect.ValueOf(x)
-			s := make([]any, ref.Len())
-			for i := 0; i < ref.Len(); i++ {
-				s[i] = ref.Index(i).Interface()
+			dst.PutStr(key, string(text))
+		// case []bool, []string, []float32, []float64, []int, []int8, []int16, []int32, []int64,
+		// 	[]uint, []uint8, []uint16, []uint32, []uint64:
+		// 	ref := reflect.ValueOf(x)
+		// 	s := dst.PutEmptySlice(key)
+		// 	s.EnsureCapacity(ref.Len())
+		// 	for i := 0; i < ref.Len(); i++ {
+		// 		s.AppendEmpty().FromRaw(ref.Index(i).Interface())
+		// 	}
+		case []string:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetStr(ele)
 			}
-			m[key] = s
-		case nil, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool:
+		case []float32:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetDouble(float64(ele))
+			}
+		case []float64:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetDouble(ele)
+			}
+		case []int:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []int8:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []int16:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []int32:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []int64:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []uint:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []uint8:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []uint16:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []uint32:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []uint64:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetInt(int64(ele))
+			}
+		case []bool:
+			s := dst.PutEmptySlice(key)
+			s.EnsureCapacity(len(x))
+			for _, ele := range x {
+				s.AppendEmpty().SetBool(ele)
+			}
 		default:
 			ref := reflect.ValueOf(x)
 			if ref.Kind() == reflect.Struct {
 				var im map[string]any
 				err := marshalUnmarshal(x, &im)
 				if err != nil {
-					m[key] = fmt.Sprintf("error encoding struct to map: %s", err)
-					continue
+					dst.PutStr(key, fmt.Sprintf("error encoding struct to map: %s", err))
+					break
 				}
-				ConvertNonPrimitive(im)
-				m[key] = im
+				child := dst.PutEmptyMap(key)
+				ConvertNonPrimitive(im, child)
 				break
 			}
 			if ref.Kind() == reflect.Slice || ref.Kind() == reflect.Array {
-				s := make([]any, ref.Len())
+				s := dst.PutEmptySlice(key)
 				for i := 0; i < ref.Len(); i++ {
 					elem := ref.Index(i).Interface()
 					if mi, ok := elem.(map[string]any); ok {
-						ConvertNonPrimitive(mi)
-						s[i] = mi
+						child := s.AppendEmpty().SetEmptyMap()
+						ConvertNonPrimitive(mi, child)
 					} else if mi, ok := elem.(mapstr.M); ok {
-						ConvertNonPrimitive(mi)
-						s[i] = map[string]any(mi)
+						child := s.AppendEmpty().SetEmptyMap()
+						ConvertNonPrimitive(map[string]any(mi), child)
 					} else {
-						s[i] = elem
+						s.AppendEmpty().FromRaw(elem)
 					}
 				}
-				m[key] = s
-				break // we figured out the type, so we don't need the unknown type case
+				break
 			}
-			m[key] = fmt.Sprintf("unknown type: %T", x)
+			dst.PutStr(key, fmt.Sprintf("unknown type: %T", x))
 		}
 	}
 }
