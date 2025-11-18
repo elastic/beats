@@ -13,7 +13,7 @@ kind: enhancement
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Add extra debug logging to simplify troubleshooting in prometheus query metricset.
+summary: Add extra debug logging to simplify troubleshooting in prometheus module.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
