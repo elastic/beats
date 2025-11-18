@@ -13,11 +13,7 @@ tags:
 # Build args passed to Dockerfile ARGs
 args:
   BASE_IMAGE: "redhat/ubi/ubi9"
-<<<<<<< HEAD
-  BASE_TAG: "9.4"
-=======
   BASE_TAG: "9.7"
->>>>>>> 204a79497 (deps: Bump ironbank version to 9.7 (#47641))
   ELASTIC_STACK: "{{ beat_version }}"
   ELASTIC_PRODUCT: "heartbeat"
 
