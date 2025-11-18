@@ -216,7 +216,7 @@ func fillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE, log *logger.Logger)
 		// Unsupported field type
 		default:
 			// We control the entry types, so this should never happen
-			log.Fatalf("Error: unsupported field type for %s: %s", value.ValueName(), field.Kind())
+			panic(fmt.Sprintf("Error: unsupported field type for %s: %s", value.ValueName(), field.Kind()))
 		}
 	}
 

@@ -9,6 +9,7 @@ package amcache
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
@@ -44,7 +45,7 @@ func AmcacheApplicationView() *hooks.View {
 			file.appx_package_relative_id,
 			file.sha1 AS file_sha1,
 		
-			-- 'app'-Only columns (16)
+			-- 'app'-Only columns (17)
 			app.program_instance_id,
 			app.install_date,
 			app.source,
@@ -94,7 +95,7 @@ func AmcacheApplicationView() *hooks.View {
 			file.appx_package_relative_id,
 			file.sha1 AS file_sha1,
 
-			-- 'app'-Only columns (16) - These must all be NULL
+			-- 'app'-Only columns (17) - These must all be NULL
 			NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			NULL as app_sha1
@@ -121,7 +122,14 @@ func DeleteViewHook(socket *string, log *logger.Logger, hookData any) error {
 	return view.Delete(socket, log)
 }
 
+func CleanupInstanceHook(socket *string, log *logger.Logger, hookData any) error {
+	amcacheState := tables.GetAmcacheState()
+	amcacheState.Close()
+	return nil
+}
+
 func RegisterHooks(hm *hooks.HookManager) {
 	amcacheApplicationView := AmcacheApplicationView()
 	hm.Register(hooks.NewHook("CreateAmcacheApplicationsView", CreateViewHook, DeleteViewHook, amcacheApplicationView))
+	hm.Register(hooks.NewHook("CleanupAmcacheInstance", nil, CleanupInstanceHook, nil))
 }

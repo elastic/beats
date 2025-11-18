@@ -4,17 +4,17 @@
 
 //go:build windows
 
-package state
+package tables
 
 import (
 	"os"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/osquery/osquery-go/plugin/table"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
@@ -43,6 +43,7 @@ func TestCachingBehavior(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create a new state with the test data
 			newState := newAmcacheState(tt.filePath, defaultExpirationDuration)
+			defer newState.Close()
 
 			// Check the state configuration
 			assert.Equal(t, tt.filePath, newState.hivePath, "%s: Expected hive path %s, got %s", tt.name, tt.filePath, newState.hivePath)
@@ -53,7 +54,7 @@ func TestCachingBehavior(t *testing.T) {
 			assert.NoError(t, err, "%s: Expected Update to succeed, got error: %v", tt.name, err)
 
 			// Check the cache
-			for _, table := range tables.AllAmcacheTables() {
+			for _, table := range AllAmcacheTables() {
 				assert.NotEmpty(t, newState.cache[table.Name], "%s: Expected cache for table %s to be populated, got 0", tt.name, table.Name)
 			}
 		})
@@ -64,15 +65,15 @@ func TestGetCachedEntries(t *testing.T) {
 	log := logger.New(os.Stdout, true)
 	state := newAmcacheState("../testdata/Amcache.hve", defaultExpirationDuration)
 
-	for _, table := range tables.AllAmcacheTables() {
-		entries, err := state.GetCachedEntries(*tables.GetAmcacheTableByName(table.Name), nil, log)
+	for _, table := range AllAmcacheTables() {
+		entries, err := state.GetCachedEntries(*GetAmcacheTableByName(table.Name), nil, log)
 		assert.NoError(t, err, "Expected GetCachedEntries to succeed, got error: %v", err)
 		assert.NotEmpty(t, entries, "Expected cache for table %s to be populated, got 0", table.Name)
 	}
 
-	nonFilteredEntries, err := state.GetCachedEntries(*tables.GetAmcacheTableByName(tables.TableNameApplication), nil, log)
+	nonFilteredEntries, err := state.GetCachedEntries(*GetAmcacheTableByName(TableNameApplication), nil, log)
 	assert.NoError(t, err, "Expected GetCachedEntries to succeed, got error: %v", err)
-	assert.NotEmpty(t, nonFilteredEntries, "Expected cache for table %s to be populated, got 0", tables.TableNameApplication)
+	assert.NotEmpty(t, nonFilteredEntries, "Expected cache for table %s to be populated, got 0", TableNameApplication)
 
 	filters := []filters.Filter{
 		{
@@ -81,13 +82,13 @@ func TestGetCachedEntries(t *testing.T) {
 			Expression: "%Microsoft%",
 		},
 	}
-	filteredEntries, err := state.GetCachedEntries(*tables.GetAmcacheTableByName(tables.TableNameApplication), filters, log)
+	filteredEntries, err := state.GetCachedEntries(*GetAmcacheTableByName(TableNameApplication), filters, log)
 	assert.NoError(t, err, "Expected GetCachedEntries to succeed, got error: %v", err)
-	assert.NotEmpty(t, filteredEntries, "Expected cache for table %s to be populated, got 0", tables.TableNameApplication)
+	assert.NotEmpty(t, filteredEntries, "Expected cache for table %s to be populated, got 0", TableNameApplication)
 	assert.Less(t, len(filteredEntries), len(nonFilteredEntries), "Expected less than %d entries, got %d", len(nonFilteredEntries), len(filteredEntries))
 
 	for _, entry := range filteredEntries {
-		appEntry, ok := entry.(*tables.ApplicationEntry)
+		appEntry, ok := entry.(*ApplicationEntry)
 		assert.True(t, ok, "Expected entry to be a ApplicationEntry, got %T", entry)
 		assert.Contains(t, appEntry.Name, "Microsoft", "Expected entry %s to contain Microsoft", appEntry.Name)
 	}
@@ -96,6 +97,7 @@ func TestGetCachedEntries(t *testing.T) {
 func TestGetCachedEntriesForcesUpdate(t *testing.T) {
 	log := logger.New(os.Stdout, true)
 	state := newAmcacheState("../testdata/Amcache.hve", 5*time.Second)
+	defer state.Close()
 
 	state.lock.Lock()
 	err := state.updateLockHeld(log)
@@ -116,7 +118,26 @@ func TestGetCachedEntriesForcesUpdate(t *testing.T) {
 	}
 	assert.True(t, cacheExpired, "Expected cache to be expired, got %v", cacheExpired)
 
-	entries, err := state.GetCachedEntries(*tables.GetAmcacheTableByName(tables.TableNameApplication), nil, log)
+	entries, err := state.GetCachedEntries(*GetAmcacheTableByName(TableNameApplication), nil, log)
 	assert.NoError(t, err, "Expected GetCachedEntries to succeed, got error: %v", err)
-	assert.NotEmpty(t, entries, "Expected cache for table %s to be populated, got 0", tables.TableNameApplication)
+	assert.NotEmpty(t, entries, "Expected cache for table %s to be populated, got 0", TableNameApplication)
+}
+
+func TestGetAmcacheState(t *testing.T) {
+	instance := GetAmcacheState()
+	defer instance.Close()
+	assert.NotNil(t, instance, "Expected GetAmcacheState to return a non-nil value")
+
+	var wg sync.WaitGroup
+	for range 10 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			got := GetAmcacheState()
+			assert.NotNil(t, got, "Expected GetAmcacheState to return a non-nil value")
+			assert.Equal(t, got, instance, "Expected GetAmcacheState to return the same instance")
+		}()
+	}
+	wg.Wait()
+
 }

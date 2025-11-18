@@ -119,9 +119,12 @@ func recoverRegistry(filePath string, transactionLogPaths []string, log *logger.
 			return nil, err
 		}
 
-		// close and remove the temporary file
+		// defer the removal and closing of the temporary file we just created.
+		// this is done here because we have easy access to the file handle and name of the file,
+		// whereas outside of this loop we don't have access to the file name.
+		defer os.Remove(transactionLogHandle.Name())
 		defer transactionLogHandle.Close()
-		defer os.Remove(transactionLogHandle.Name()) // Clean up temp file
+
 		transactionLogHandles = append(transactionLogHandles, transactionLogHandle)
 	}
 

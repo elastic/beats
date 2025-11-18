@@ -4,7 +4,7 @@
 
 //go:build windows
 
-package state
+package tables
 
 import (
 	"fmt"
@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/registry"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
@@ -39,11 +38,11 @@ const defaultHivePath = "C:\\Windows\\AppCompat\\Programs\\Amcache.hve"
 // is refreshed at query time if it has expired. But will not be updated until
 // the next query, even if it is expired.
 
-type cachedTables map[tables.TableName][]tables.Entry
+type cachedTables map[TableName][]Entry
 
 func newCachedTables() cachedTables {
 	cachedTables := cachedTables{}
-	for _, amcacheTable := range tables.AllAmcacheTables() {
+	for _, amcacheTable := range AllAmcacheTables() {
 		cachedTables[amcacheTable.Name] = nil
 	}
 	return cachedTables
@@ -57,12 +56,13 @@ type AmcacheState struct {
 	timer              *time.Timer
 }
 
-// Global variables for the gInstance and a mutex to protect it.
+// Global variables for the singleton instance and a sync.Once to ensure only one instance is created.
 var (
 	instance *AmcacheState
+	once     sync.Once
 )
 
-// newAmcacheState creates a nnw AmcacheState instance with the default configuration.
+// newAmcacheState creates a new AmcacheState instance with the default configuration.
 func newAmcacheState(hivePath string, expirationDuration time.Duration) *AmcacheState {
 	state := &AmcacheState{hivePath: hivePath, expirationDuration: expirationDuration, cache: nil}
 	state.timer = time.AfterFunc(expirationDuration, func() {
@@ -73,9 +73,9 @@ func newAmcacheState(hivePath string, expirationDuration time.Duration) *Amcache
 
 // GetAmcacheState returns the singleton AmcacheState instance.
 func GetAmcacheState() *AmcacheState {
-	if instance == nil {
+	once.Do(func() {
 		instance = newAmcacheState(defaultHivePath, defaultExpirationDuration)
-	}
+	})
 	return instance
 }
 
@@ -98,9 +98,9 @@ func (gs *AmcacheState) updateLockHeld(log *logger.Logger) error {
 	gs.cache = newCachedTables()
 
 	// Repopulate all caches.
-	for _, amcacheTable := range tables.AllAmcacheTables() {
+	for _, amcacheTable := range AllAmcacheTables() {
 		// Get the entries from the registry.
-		entries, err := tables.GetEntriesFromRegistry(amcacheTable, regParser, log)
+		entries, err := GetEntriesFromRegistry(amcacheTable, regParser, log)
 		if err != nil {
 			log.Warningf("failed to get entries for table %s: %v", amcacheTable.Name, err)
 			gs.cache[amcacheTable.Name] = nil
@@ -125,7 +125,7 @@ func (gs *AmcacheState) updateLockHeld(log *logger.Logger) error {
 // internal cache and must not be modified. If you need to modify
 // the slice, make a copy first.
 // When filters are provided, a new slice is returned.
-func (gs *AmcacheState) GetCachedEntries(amcacheTable tables.AmcacheTable, filterList []filters.Filter, log *logger.Logger) ([]tables.Entry, error) {
+func (gs *AmcacheState) GetCachedEntries(amcacheTable AmcacheTable, filterList []filters.Filter, log *logger.Logger) ([]Entry, error) {
 	gs.lock.Lock()
 	defer gs.lock.Unlock()
 
@@ -143,7 +143,7 @@ func (gs *AmcacheState) GetCachedEntries(amcacheTable tables.AmcacheTable, filte
 		return cachedTableEntries, nil
 	}
 
-	var result []tables.Entry
+	var result []Entry
 	// Filter the entries by the filters.
 	// Filters are evaluated as AND operations.
 	for _, entry := range cachedTableEntries {
@@ -159,4 +159,15 @@ func (gs *AmcacheState) GetCachedEntries(amcacheTable tables.AmcacheTable, filte
 		}
 	}
 	return result, nil
+}
+
+// Close stops the timer and clears the cache.
+func (gs *AmcacheState) Close() {
+	gs.lock.Lock()
+	defer gs.lock.Unlock()
+	if gs.timer != nil {
+		gs.timer.Stop()
+		gs.timer = nil
+	}
+	gs.cache = nil
 }
