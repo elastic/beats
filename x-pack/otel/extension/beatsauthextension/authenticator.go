@@ -8,7 +8,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/rand/v2"
 	"net/http"
+	"net/url"
+	"sync"
 	"time"
 
 	"go.elastic.co/apm/module/apmelasticsearch/v2"
@@ -18,6 +21,7 @@ import (
 	"go.opentelemetry.io/collector/extension/extensionauth"
 	"google.golang.org/grpc/credentials"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	krbclient "github.com/elastic/gokrb5/v8/client"
 	krbconfig "github.com/elastic/gokrb5/v8/config"
@@ -126,7 +130,7 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 		return nil, fmt.Errorf("failed creating config: %w", err)
 	}
 
-	beatAuthConfig := esAuthConfig{}
+	beatAuthConfig := BeatsAuthConfig{}
 	err = parsedCfg.Unpack(&beatAuthConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed unpacking config: %w", err)
@@ -137,15 +141,25 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 		return nil, fmt.Errorf("failed creating http client: %w", err)
 	}
 
+	var finalProvider roundTripperProvider
+	finalProvider = &httpClientProvider{client: client}
+	if !beatAuthConfig.LoadBalance {
+		singleRouterProvider, err := NewSingleRouterProvider(beatAuthConfig, finalProvider)
+		if err != nil {
+			return nil, fmt.Errorf("failed creating http client: %w", err)
+		}
+		finalProvider = singleRouterProvider
+	}
+
 	if beatAuthConfig.Kerberos.IsEnabled() {
-		p, err := NewKerberosClientProvider(beatAuthConfig.Kerberos, client)
+		p, err := NewKerberosClientProvider(beatAuthConfig.Kerberos, finalProvider)
 		if err != nil {
 			return nil, fmt.Errorf("error creating kerberos client provider: %w", err)
 		}
-		return p, nil
+		finalProvider = p
 	}
 
-	return &httpClientProvider{client: client}, nil
+	return finalProvider, nil
 }
 
 // httpClientProvider provides a RoundTripper from an http.Client
@@ -157,13 +171,89 @@ func (h *httpClientProvider) RoundTripper() http.RoundTripper {
 	return h.client.Transport
 }
 
+type singleRouterProvider struct {
+	endpoints []*url.URL
+	active    int
+	client    roundTripperProvider
+	mx        sync.Mutex
+}
+
+// NewSingleRouterProvider returns a RoundTripper with atmost one active endpoint
+// If the connection to the active endpoint fails, the next endpoint is used
+func NewSingleRouterProvider(config BeatsAuthConfig, client roundTripperProvider) (*singleRouterProvider, error) {
+	if len(config.Endpoints) == 0 {
+		return nil, fmt.Errorf("atleast one endpoint must be provided when loadbalance is disabled")
+	}
+
+	urls := make([]*url.URL, 0, len(config.Endpoints))
+	for _, endpoint := range config.Endpoints {
+		finalEndpoint, err := common.MakeURL(config.Protocol, config.Path, endpoint, 9200)
+		if err != nil {
+			return nil, fmt.Errorf("failed building URL for endpoint %q: %w", endpoint, err)
+		}
+		parsedEndpoint, err := url.Parse(finalEndpoint)
+		if err != nil {
+			return nil, fmt.Errorf("failed parsing endpoint %q: %w", endpoint, err)
+		}
+		urls = append(urls, parsedEndpoint)
+	}
+
+	return &singleRouterProvider{client: client, endpoints: urls, active: getNextActiveClient(-1, len(urls))}, nil
+}
+
+func (srp *singleRouterProvider) RoundTripper() http.RoundTripper {
+	return srp
+}
+
+func (srp *singleRouterProvider) RoundTrip(req *http.Request) (*http.Response, error) {
+	// set the request URL to active endpoint
+	srp.mx.Lock()
+	req.URL = srp.endpoints[srp.active]
+	srp.mx.Unlock()
+
+	// perform the request
+	resp, err := srp.client.RoundTripper().RoundTrip(req)
+
+	if err != nil {
+		// if response is unsuccessful, get a random next endpoint
+		srp.mx.Lock()
+		srp.active = getNextActiveClient(srp.active, len(srp.endpoints))
+		srp.mx.Unlock()
+	}
+
+	return resp, err
+}
+
+// getNextActiveClient returns the next active client given the current active index and total clients
+// Note: This logic has been adapted from failoverClient in libbeat/outputs/failover.go
+func getNextActiveClient(active int, totalClients int) (next int) {
+	switch {
+	case totalClients == 1:
+		next = 0
+	case totalClients == 2 && 0 <= active && active <= 1:
+		next = 1 - active
+	default:
+		for {
+			// Connect to random server to potentially spread the
+			// load when large number of beats with same set of sinks
+			// are started up at about the same time.
+			next = rand.Int() % totalClients
+			if next != active {
+				break
+			}
+		}
+	}
+
+	return next
+}
+
 // kerberosClientProvider provides a kerberos enabled roundtripper
 type kerberosClientProvider struct {
 	kerberosClient *krbclient.Client
-	httpClient     *http.Client
+	httpClient     roundTripperProvider
 }
 
-func NewKerberosClientProvider(config *kerberos.Config, httpClient *http.Client) (*kerberosClientProvider, error) {
+func NewKerberosClientProvider(config *kerberos.Config, httpClient roundTripperProvider) (*kerberosClientProvider, error) {
 	var krbClient *krbclient.Client
 	krbConf, err := krbconfig.Load(config.ConfigPath)
 	if err != nil {
@@ -199,7 +289,7 @@ func (k *kerberosClientProvider) RoundTrip(req *http.Request) (*http.Response, e
 		return nil, err
 	}
 
-	return k.httpClient.Transport.RoundTrip(req)
+	return k.httpClient.RoundTripper().RoundTrip(req)
 }
 
 // errorRoundTripperProvider provides a RoundTripper that always returns an error

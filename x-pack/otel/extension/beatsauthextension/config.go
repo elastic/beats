@@ -16,9 +16,13 @@ type Config struct {
 	ContinueOnError bool                   `mapstructure:"continue_on_error"`
 }
 
-type esAuthConfig struct {
-	Kerberos  *kerberos.Config                 `config:"kerberos"`
-	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+type BeatsAuthConfig struct {
+	Kerberos    *kerberos.Config                 `config:"kerberos"`
+	Transport   httpcommon.HTTPTransportSettings `config:",inline"`
+	LoadBalance bool                             `config:"loadbalance"`
+	Endpoints   []string                         `config:"hosts"`
+	Path        string                           `config:"path"`
+	Protocol    string                           `config:"protocol"`
 }
 
 func createDefaultConfig() component.Config {
