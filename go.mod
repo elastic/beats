@@ -250,6 +250,7 @@ require (
 	go.opentelemetry.io/collector/config/configauth v0.135.0
 	go.opentelemetry.io/collector/config/confighttp v0.135.0
 	go.opentelemetry.io/collector/config/configoptional v0.135.0
+	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.41.0
 	go.opentelemetry.io/collector/extension v1.41.0
 	go.opentelemetry.io/collector/extension/extensionauth v1.41.0
 	go.opentelemetry.io/collector/processor v1.41.0
