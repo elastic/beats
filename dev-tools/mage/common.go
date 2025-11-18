@@ -639,7 +639,7 @@ func numParallel() int {
 
 	info, err := GetDockerInfo()
 	// Check that info.NCPU != 0 since docker info doesn't return with an
-	// error status if communcation with the daemon failed.
+	// error status if communication with the daemon failed.
 	if err == nil && info.NCPU != 0 && info.NCPU < maxParallel {
 		maxParallel = info.NCPU
 	}
