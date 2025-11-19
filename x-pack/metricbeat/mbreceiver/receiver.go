@@ -18,9 +18,13 @@ import (
 type metricbeatReceiver struct {
 	xpInstance.BeatReceiver
 	wg sync.WaitGroup
+	cb xpInstance.Callback
 }
 
 func (mb *metricbeatReceiver) Start(ctx context.Context, host component.Host) error {
+	if err := mb.cb(host); err != nil {
+		return err
+	}
 	mb.wg.Add(1)
 	go func() {
 		defer mb.wg.Done()
