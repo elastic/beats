@@ -19,7 +19,7 @@ func TestRecovery(t *testing.T) {
 	log := logger.New(os.Stdout, true)
 	_, recovered, err := LoadRegistry("../testdata/recovery_data/Amcache.hve", log)
 	assert.NoError(t, err, "failed to load registry")
-	assert.False(t, recovered, "registry was not recovered unexpectedly")
+	assert.True(t, recovered, "registry was not recovered unexpectedly")
 
 	_, recovered, err = LoadRegistry("../testdata/Amcache.hve", log)
 	assert.NoError(t, err, "failed to load registry")
