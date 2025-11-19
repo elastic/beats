@@ -18,6 +18,7 @@
 package query
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -26,6 +27,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -253,5 +255,71 @@ func TestHTTPErrorCodeHandling(t *testing.T) {
 
 	if !strings.Contains(errs[0].Error(), strconv.Itoa(statusCode)) {
 		t.Fatalf("Expected error to contain HTTP response code %d, got error: %s\n", statusCode, errs[0])
+	}
+}
+
+func TestQueryFetchPartialError(t *testing.T) {
+	absPath, _ := filepath.Abs("./_meta/test/")
+
+	response, _ := os.ReadFile(absPath + "/querymetrics_instant_vector.json")
+	requestCount := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestCount++
+		switch requestCount {
+		case 1:
+			w.WriteHeader(200)
+			w.Header().Set("Content-Type", "application/json;")
+			_, _ = w.Write(response)
+		case 2:
+			w.WriteHeader(404)
+			w.Header().Set("Content-Type", "application/json;")
+			_, _ = w.Write([]byte{})
+			//default:
+
+		}
+	}))
+	defer server.Close()
+
+	config := map[string]interface{}{
+		"module":     "prometheus",
+		"metricsets": []string{"query"},
+		"hosts":      []string{server.URL},
+		// queries do not have an actual role here since all http responses are mocked
+		"queries": []mapstr.M{
+			mapstr.M{
+				"name": "up",
+				"path": "/api/v1/query",
+				"params": mapstr.M{
+					"query": "up",
+				},
+			},
+			{
+				"name": "up",
+				"path": "/api/v1/query_not_found",
+				"params": mapstr.M{
+					"query": "up",
+				},
+			},
+		},
+	}
+	reporter := &mbtest.CapturingReporterV2{}
+
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+	fetchErr := metricSet.Fetch(reporter)
+
+	events := reporter.GetEvents()
+	if len(events) != 2 {
+		t.Errorf("Expected 2 events, had %d. %v\n", len(events), events)
+	}
+	for _, event := range events {
+		e := mbtest.StandardizeEvent(metricSet, event)
+		t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+	}
+	errs := reporter.GetErrors()
+	if len(errs) != 1 {
+		t.Errorf("Expected 1 error, had %d: %v\n", len(errs), errs)
+	}
+	if !errors.As(fetchErr, &mb.PartialMetricsError{}) {
+		t.Errorf("Expected partial metrics error, got %v\n", fetchErr)
 	}
 }
