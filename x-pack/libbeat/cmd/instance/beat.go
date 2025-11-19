@@ -74,7 +74,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	logger := b.Info.Logger
 
 	// if output is set and if output is not otelconsumer, inform users
-	if receiverConfig["output"] != nil && receiverConfig["output"].(map[string]any)["otelconsumer"] == nil {
+	if receiverConfig["output"] != nil && receiverConfig["output"].(map[string]any)["otelconsumer"] == nil { //nolint: errcheck // output will always be of map type
 		logger.Debugf("configured output does not work with beatreceiver, please use appropriate exporter instead")
 	}
 
