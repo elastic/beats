@@ -65,7 +65,20 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		ucfg.VarExp,
 	}
 
-	// all beatreceivers use otelconsumer output by default
+	err = setLogger(b, receiverConfig, core)
+	if err != nil {
+		return nil, fmt.Errorf("error configuring beats logger: %w", err)
+	}
+
+	// extracting it here for ease of use
+	logger := b.Info.Logger
+
+	// if output is set and if output is not otelconsumer, inform users
+	if receiverConfig["output"] != nil && receiverConfig["output"].(map[string]any)["otelconsumer"] == nil {
+		logger.Debugf("configured output does not work with beatreceiver, please use appropriate exporter instead")
+	}
+
+	// all beatreceivers will use otelconsumer output by default
 	receiverConfig["output"] = map[string]any{
 		"otelconsumer": map[string]any{},
 	}
@@ -133,26 +146,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	if err != nil {
 		return nil, fmt.Errorf("error unpacking config data: %w", err)
 	}
-
-	logpConfig := logp.Config{}
-	logpConfig.AddCaller = true
-	logpConfig.Beat = b.Info.Beat
-	logpConfig.Files.MaxSize = 1
-
-	if b.Config.Logging == nil {
-		b.Config.Logging = config.NewConfig()
-	}
-
-	if err := b.Config.Logging.Unpack(&logpConfig); err != nil {
-		return nil, fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
-	}
-
-	b.Info.Logger, err = logp.ConfigureWithCoreLocal(logpConfig, core)
-	if err != nil {
-		return nil, fmt.Errorf("error configuring beats logp: %w", err)
-	}
-	// extracting it here for ease of use
-	logger := b.Info.Logger
 
 	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version, logger)
 	if err != nil {
@@ -287,4 +280,32 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	b.Publisher = publisher
 
 	return b, nil
+}
+
+// setLogger configures a logp logger and sets it on b.Info.Logger
+func setLogger(b *instance.Beat, receiverConfig map[string]any, core zapcore.Core) error {
+
+	var err error
+	logpConfig := logp.Config{}
+	logpConfig.AddCaller = true
+	logpConfig.Beat = b.Info.Beat
+	logpConfig.Files.MaxSize = 1
+
+	var logCfg *config.C
+	if _, ok := receiverConfig["logging"]; !ok {
+		logCfg = config.NewConfig()
+	} else {
+		logCfg = config.MustNewConfigFrom(receiverConfig["logging"])
+	}
+
+	if err := logCfg.Unpack(&logpConfig); err != nil {
+		return fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
+	}
+
+	b.Info.Logger, err = logp.ConfigureWithCoreLocal(logpConfig, core)
+	if err != nil {
+		return fmt.Errorf("error configuring beats logp: %w", err)
+	}
+
+	return nil
 }
