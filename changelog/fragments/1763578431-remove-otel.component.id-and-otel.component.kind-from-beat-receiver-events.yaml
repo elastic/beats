@@ -36,7 +36,7 @@ component: all
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-pr: https://github.com/elastic/beats/1234
+pr: https://github.com/elastic/beats/pull/47729
 
 # AUTOMATED
 # OPTIONAL to manually add other issue URLs
