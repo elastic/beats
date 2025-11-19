@@ -20,8 +20,6 @@ import (
 
 type OTELCELMetrics struct {
 	log                                  *logp.Logger
-	shutdownFuncs                        []func(context.Context) error
-	flushFuncs                           []func(context.Context) error
 	manualExportFunc                     func(context.Context) error
 	exportLock                           sync.Mutex
 	started                              bool
@@ -83,9 +81,6 @@ func (o *OTELCELMetrics) ForceFlush(ctx context.Context, force bool) error {
 		return errors.New("OTELCELMetrics cannot flush in the middle of a periodic run. Use force == true to force a flush.")
 	}
 	var err error
-	for _, fn := range o.flushFuncs {
-		err = errors.Join(err, fn(ctx))
-	}
 	return err
 }
 
@@ -135,9 +130,6 @@ func (o *OTELCELMetrics) Shutdown(ctx context.Context) error {
 	o.EndPeriodic(ctx)
 	o.ForceFlush(ctx, true)
 	var err error
-	for _, fn := range o.shutdownFuncs {
-		err = errors.Join(err, fn(ctx))
-	}
 	return err
 }
 
@@ -156,9 +148,8 @@ func NewOTELCELMetrics(log *logp.Logger,
 	input string,
 	resource resource.Resource,
 	tripper http.RoundTripper,
-	metricExporter sdkmetric.Exporter) (*OTELCELMetrics, *otelhttp.Transport, error) {
-	var shutdownFuncs []func(context.Context) error
-	var flushFuncs []func(context.Context) error
+	metricExporter sdkmetric.Exporter,
+	flattenHistograms bool) (*OTELCELMetrics, *otelhttp.Transport, error) {
 	var manualExportFunc func(context.Context) error
 	var meterProvider metric.MeterProvider
 
@@ -167,23 +158,41 @@ func NewOTELCELMetrics(log *logp.Logger,
 	} else {
 		log.Debug("OTELCELMetrics NewMeterProvider called without interval. Creating Manual Export")
 		reader := sdkmetric.NewManualReader(sdkmetric.WithTemporalitySelector(DeltaSelector))
-		exponentialView := sdkmetric.NewView(
-			sdkmetric.Instrument{
-				// captures every histogram that will produced by this provider
-				Name: "*",
-				Kind: sdkmetric.InstrumentKindHistogram,
-			},
-			sdkmetric.Stream{
-				Aggregation: sdkmetric.AggregationBase2ExponentialHistogram{
-					MaxSize:  160, // Optional: configure max buckets
-					MaxScale: 20,  // Optional: configure max scale
+		// the histogramView controls how the histogram metrics are exporterd.
+		// We default to exporting as exponential histograms. Optionally, we export the
+		// histogram as a Sum (counter) type.
+		var histogramView sdkmetric.View
+		if flattenHistograms {
+			histogramView = sdkmetric.NewView(
+				sdkmetric.Instrument{
+					// captures every histogram that will produced by this provider
+					Name: "*",
+					Kind: sdkmetric.InstrumentKindHistogram,
 				},
-			},
-		)
+				sdkmetric.Stream{
+					Aggregation: sdkmetric.AggregationSum{},
+				},
+			)
+		} else {
+			histogramView = sdkmetric.NewView(
+				sdkmetric.Instrument{
+					// captures every histogram that will produced by this provider
+					Name: "*",
+					Kind: sdkmetric.InstrumentKindHistogram,
+				},
+				sdkmetric.Stream{
+					Aggregation: sdkmetric.AggregationBase2ExponentialHistogram{
+						MaxSize:  160, // Optional: configure max buckets
+						MaxScale: 20,  // Optional: configure max scale
+					},
+				},
+			)
+		}
+
 		sdkmeterProvider := sdkmetric.NewMeterProvider(
 			sdkmetric.WithReader(reader),
 			sdkmetric.WithResource(&resource),
-			sdkmetric.WithView(exponentialView))
+			sdkmetric.WithView(histogramView))
 		manualExportFunc = func(ctx context.Context) error {
 			collectedMetrics := &metricdata.ResourceMetrics{}
 			err := reader.Collect(ctx, collectedMetrics)
@@ -198,9 +207,14 @@ func NewOTELCELMetrics(log *logp.Logger,
 					log.Debugf("OTELCELMetrics could not marshall Collected metrics into json %v", collectedMetrics)
 				}
 			}
-			return metricExporter.Export(ctx, collectedMetrics)
+			go func(ctx context.Context, log *logp.Logger, metricExporter sdkmetric.Exporter, collectedMetrics *metricdata.ResourceMetrics) {
+				err := metricExporter.Export(ctx, collectedMetrics)
+				if err != nil {
+					log.Error("Failed to export metrics: ", err)
+				}
+			}(ctx, log, metricExporter, collectedMetrics)
+			return nil
 		}
-		flushFuncs = append(flushFuncs, manualExportFunc)
 		meterProvider = sdkmeterProvider
 	}
 	meter := meterProvider.Meter(input)
@@ -289,8 +303,6 @@ func NewOTELCELMetrics(log *logp.Logger,
 
 	return &OTELCELMetrics{
 		log:                                  log,
-		shutdownFuncs:                        shutdownFuncs,
-		flushFuncs:                           flushFuncs,
 		manualExportFunc:                     manualExportFunc,
 		periodicRunCount:                     periodicTotalRunCount,
 		periodicProgramStartedCount:          periodicProgramStarted,
