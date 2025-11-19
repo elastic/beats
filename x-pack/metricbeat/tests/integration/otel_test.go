@@ -97,9 +97,10 @@ exporters:
     user: {{.Username}}
     password: {{.Password}}
     logs_index: {{.Index}}
-    batcher:
+    sending_queue:
       enabled: true
-      flush_timeout: 1s
+      batch:
+        flush_timeout: 1s
     mapping:
       mode: bodymap
 service:
@@ -289,9 +290,10 @@ exporters:
     user: {{.Username}}
     password: {{.Password}}
     logs_index: {{.Index}}
-    batcher:
+    sending_queue:
       enabled: true
-      flush_timeout: 1s
+      batch:
+        flush_timeout: 1s
     mapping:
       mode: bodymap
 service:
@@ -487,9 +489,10 @@ exporters:
     user: {{.Username}}
     password: {{.Password}}
     logs_index: {{.Index}}
-    batcher:
+    sending_queue:
       enabled: true
-      flush_timeout: 1s
+      batch:
+        flush_timeout: 1s
     mapping:
       mode: bodymap
 service:
