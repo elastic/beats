@@ -6,71 +6,61 @@
 
 package shell_items
 
+// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x1f.cs
+// 0x1F: RootDirectory
+// 
+// The RootDirectory shell item is used to store the GUID of a known folder.
+// It is a 16-bit unsigned integer that represents the length of the GUID.
+// The GUID is stored in the data field as a 16-byte array.
+// The GUID is encoded in Windows-1252.
+//
+// The data field is the GUID.
+// The known folder is the name of the known folder looked up in the guidMappings.
 
 import (
 	"fmt"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/resources"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-type ShellBag1F struct {
-	size uint16
-	data []byte
-}
-
-func (s *ShellBag1F) Type() ShellItemType {
-	return ShellItemTypeRootFolder
-}
-
-func (s *ShellBag1F) RawType() byte {
-	return s.data[0]
-}
-
-func (s *ShellBag1F) Value() any {
-	return s.data
-}
-
-type RootFolderShellItem struct {
+type RootDirectoryShellItem struct {
 	Guid *resources.GUID
+	KnownFolder string
 	size uint16
 	data []byte
 }
 
-func (s *RootFolderShellItem) Type() ShellItemType {
-	return ShellItemTypeRootFolder
+func (s *RootDirectoryShellItem) String() string {
+	return fmt.Sprintf("%s: guid: %s, known folder: %s", s.Type(), s.Guid.String(), s.KnownFolder)
 }
 
-func (s *RootFolderShellItem) RawType() byte {
+func (s *RootDirectoryShellItem) Type() ShellItemType {
+	return ShellItemTypeRootDirectory
+}
+
+func (s *RootDirectoryShellItem) RawType() byte {
 	return s.data[0]
 }
 
-func (s *RootFolderShellItem) Value() any {
-	return s.data
-}
-func NewRootFolderShellItem(size uint16, data []byte) ShellItem {
+func NewRootDirectoryShellItem(size uint16, data []byte, log *logger.Logger) (ShellItem, error) {
 	// Skip the first 2 bytes 1 byte for index, 1 byte unknown value
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x1f.cs#L369
 	guid, err := resources.NewGUID(data[2:18])
 	if err != nil {
-		return &GenericShellItem{size: size, data: data}
+		log.Errorf("Error creating GUID: %v\n", err)
+		return &GenericShellItem{size: size, data: data}, err
 	}
-
-	fmt.Printf("GUID: %s\n", guid.String())
-	return &RootFolderShellItem{Guid: guid, size: size, data: data}
+	knownFolder, ok := guid.LookupKnownFolder(); if !ok {
+		log.Infof("Unknown known folder for GUID: %s\n", guid.String())
+		knownFolder = ""
+	}
+	return &RootDirectoryShellItem{Guid: guid, KnownFolder: knownFolder, size: size, data: data}, nil
 }
 
-func NewShellBag1F(size uint16, data []byte) ShellItem {
-	fmt.Printf("Size: %X\n", size)
-	if size == 0x14 {
-		return NewRootFolderShellItem(size, data)
+func NewShellBag1F(size uint16, data []byte, log *logger.Logger) (ShellItem, error) {
+	if size != 0x14 {
+		return nil, fmt.Errorf("ShellBag1F: size is not 0x14")
 	}
-	
-	if data[0] != 0x1F {
-		return nil
-	}
-	off3Bitmask := data[1] & 0x70
-	fmt.Printf("off3Bitmask: %X\n", off3Bitmask)
-	if data[4] == 0x2F {
-		fmt.Printf("GUID ONLY")
-	}
-	return &ShellBag1F{size: size, data: data}
+	return NewRootDirectoryShellItem(size, data, log)
 }

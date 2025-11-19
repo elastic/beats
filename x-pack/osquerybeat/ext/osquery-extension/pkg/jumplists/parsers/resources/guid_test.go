@@ -24,7 +24,7 @@ func TestGUID(t *testing.T) {
 			name: "Videos",
 			bytes: []byte{0x1d, 0x9b, 0x98, 0x18, 0xb5, 0x99, 0x5b, 0x45, 0x84, 0x1c, 0xab, 0x7c, 0x74, 0xe4, 0xdd, 0xfc},
 			want: "18989B1D-99B5-455B-841C-AB7C74E4DDFC",
-			knownFolder: "Videos",
+			knownFolder: "My Video",
 			expectError: false,
 		},
 		{
@@ -38,7 +38,7 @@ func TestGUID(t *testing.T) {
 			name: "Extra Bytes",
 			bytes: []byte{0x1d, 0x9b, 0x98, 0x18, 0xb5, 0x99, 0x5b, 0x45, 0x84, 0x1c, 0xab, 0x7c, 0x74, 0xe4, 0xdd, 0xfc, 0x00, 0x00, 0x00, 0x00},
 			want: "18989B1D-99B5-455B-841C-AB7C74E4DDFC",
-			knownFolder: "Videos",
+			knownFolder: "My Video",
 			expectError: true,
 		},
 	}
@@ -53,33 +53,12 @@ func TestGUID(t *testing.T) {
 		if got := guid.String(); got != tt.want {
 			t.Errorf("GUID.String() = %v, want %v", got, tt.want)
 		}
-		if guid.ExtraData.KnownFolder != tt.knownFolder {
-			t.Errorf("GUID.ExtraData.KnownFolder = %v, want %v", guid.ExtraData.KnownFolder, tt.knownFolder)
+		knownFolder, ok := guid.LookupKnownFolder()
+		if !ok {
+			t.Errorf("GUID.LookupKnownFolder() = false, want true")
 		}
-	}
-}
-
-func TestLookupKnownFolder(t *testing.T) {
-	tests := []struct {
-		name  string
-		guid  string
-		want  string
-	}{
-		{
-			name: "Videos",
-			guid: "18989B1D-99B5-455B-841C-AB7C74E4DDFC",
-			want: "Videos",
-		},
-		{
-			name: "Windows",
-			guid: "F38BF404-1D43-42F2-9305-67DE0B28FC23",
-			want: "Windows",
-		},
-	}
-	for _, tt := range tests {
-		got, _ := LookupKnownFolder(tt.guid)
-		if got != tt.want {
-			t.Errorf("LookupKnownFolder() got = %v, want %v", got, tt.want)
+		if knownFolder != tt.knownFolder {
+			t.Errorf("GUID.LookupKnownFolder() = %v, want %v", knownFolder, tt.knownFolder)
 		}
 	}
 }

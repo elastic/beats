@@ -9,55 +9,22 @@ package shell_items
 import (
 	"fmt"
 	// "bytes"
+	// "encoding/hex"
 	// "fmt"
 
 	// "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/resources"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-// https://www.forensic-cheatsheet.com/EN/Artifact/(EN)+Shellbag
-type ShellItemType string
 
-const (
-	ShellItemTypeUnknown          ShellItemType = "Unknown"
-	ShellItemTypeTerminator       ShellItemType = "Terminator"
-	ShellItemTypeRootFolder       ShellItemType = "RootFolder"
-	ShellItemTypeDelegateFolder   ShellItemType = "DelegateFolder"
-	ShellItemTypeVolume           ShellItemType = "Volume"
-	ShellItemTypeDirectory        ShellItemType = "Directory"
-	ShellItemTypeFile             ShellItemType = "File"
-	ShellItemTypeNetworkLocation  ShellItemType = "NetworkLocation"
-	ShellItemTypeCompressedFolder ShellItemType = "CompressedFolder"
-	ShellItemTypeControlPanel     ShellItemType = "ControlPanel"
-	ShellItemTypeUri              ShellItemType = "Uri"
-	ShellItemTypeDriveLetter      ShellItemType = "DriveLetter"
-	ShellItemTypeRootDirectory    ShellItemType = "RootDirectory"
-)
-
-type ShellItem interface {
-	Type() ShellItemType
-	RawType() byte
-	String() string
+type ExtensionBlock struct {
+	signature byte
+	size uint16
+	data []byte
 }
 
-type GenericShellItem struct {
-	size  uint16
-	data  []byte
-}
 
-func (s *GenericShellItem) Type() ShellItemType {
-	return ShellItemTypeUnknown
-}
-
-func (s *GenericShellItem) RawType() byte {
-	return s.data[0]
-}
-
-func (s *GenericShellItem) String() string {
-	return fmt.Sprintf("GenericShellItem: size: %d, raw type: %X", s.size, s.RawType())
-}
-
-func NewShellItem(size uint16, data []byte, log *logger.Logger) ShellItem {
+func NewExtensionBlock(size uint16, data []byte, log *logger.Logger) ShellItem {
 	signature := data[0]
 	var shellItem ShellItem
 	var err error
@@ -67,10 +34,7 @@ func NewShellItem(size uint16, data []byte, log *logger.Logger) ShellItem {
 		shellItem, err = NewShellBag1F(size, data, log)
 	case 0x2F:
 		shellItem, err = NewShellBag2F(size, data, log)
-	case 0x31:
-		shellItem, err = NewShellBag31(size, data, log)
 	default:
-		fmt.Printf("Unknown shell item signature: %X\n", signature)
 		err = fmt.Errorf("Unknown shell item signature: %X\n", signature)
 	}
 

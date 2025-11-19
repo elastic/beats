@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"encoding/hex"
 
 	golnk "github.com/parsiya/golnk"
 
@@ -57,6 +58,9 @@ func NewLnkFromBytes(data []byte, log *logger.Logger) (*Lnk, error) {
 	var shellItems []shell_items.ShellItem
 	if lnkFile.Header.LinkFlags["HasLinkTargetIDList"] {
 		for _, item := range lnkFile.IDList.List.ItemIDList {
+			fmt.Printf("item: %s\n", hex.Dump(item.Data))
+			fmt.Printf("item size: %d\n", item.Size)
+			fmt.Printf("item data size: %d\n", len(item.Data))
 			shellItems = append(shellItems, shell_items.NewShellItem(item.Size, item.Data))
 		}
 	}

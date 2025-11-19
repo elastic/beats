@@ -103,6 +103,8 @@ func carveLnkFiles(fileBytes []byte, log *logger.Logger) ([]*lnk.Lnk, error) {
 			}
 		}
 
+		os.WriteFile(fmt.Sprintf("lnk_%d.bin", i), fileBytes[start:end], 0644)
+
 		// Carve out the LNK file, and convert it to an Lnk
 		lnkFile, err := lnk.NewLnkFromBytes(fileBytes[start:end], log)
 		if err != nil {

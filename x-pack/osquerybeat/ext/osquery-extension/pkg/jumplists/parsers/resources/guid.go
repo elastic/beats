@@ -13,32 +13,17 @@ import (
 	"strings"
 )
 
-type GuidType string
-const (
-	GuidTypeUnknown GuidType = "Unknown"
-	GuidTypeFolder GuidType  = "Folder"
-)
-
-// GuidExtraData contains extra data about a GUID.
-// Type is the type of the GUID.
-// KnownFolder is the name of the known folder if the GUID is a known folder.
-type GuidExtraData struct {
-	Type GuidType
-	KnownFolder string
-}
 
 // GUID represents a Windows GUID.
 // Data1 is the first 4 bytes of the GUID.
 // Data2 is the next 2 bytes of the GUID.
 // Data3 is the next 2 bytes of the GUID.
 // Data4 is the last 8 bytes of the GUID.
-// ExtraData contains extra data about the GUID.
 type GUID struct {
 	Data1 uint32
 	Data2 uint16
 	Data3 uint16
 	Data4 [8]byte
-	ExtraData GuidExtraData
 }
 
 // String returns the string representation of the GUID.
@@ -58,27 +43,17 @@ func NewGUID(data []byte) (*GUID, error) {
 	var data4 [8]byte
 	copy(data4[:], data[8:16]) // Data4 is big-endian
 	guid := &GUID{
-		ExtraData: GuidExtraData{
-			Type: GuidTypeUnknown,
-			KnownFolder: "",
-		},
 		Data1: binary.LittleEndian.Uint32(data[:4]),
 		Data2: binary.LittleEndian.Uint16(data[4:6]),
 		Data3: binary.LittleEndian.Uint16(data[6:8]),
 		Data4: data4,
 	}
-
-	if knownFolder, ok := LookupKnownFolder(guid.String()); ok {
-		guid.ExtraData.Type = GuidTypeFolder
-		guid.ExtraData.KnownFolder = knownFolder
-	}
-
 	return guid, nil
 }
 
 // LookupKnownFolder looks up a known folder by GUID.
-func LookupKnownFolder(guid string) (string, bool) {
-	if knownFolder, ok := knownFolderGuids[guid]; ok {
+func (g *GUID) LookupKnownFolder() (string, bool) {
+	if knownFolder, ok := guidMappings[g.String()]; ok {
 		return knownFolder, true
 	}
 	return "", false
