@@ -56,9 +56,6 @@ func TestNewReceiver(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
@@ -139,9 +136,6 @@ func TestMultipleReceivers(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
@@ -166,9 +160,6 @@ func TestMultipleReceivers(t *testing.T) {
 						"metricsets": []string{"cpu"},
 					},
 				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
 			},
 			"logging": map[string]any{
 				"level": "debug",
@@ -334,9 +325,6 @@ func BenchmarkFactory(b *testing.B) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "info",
 				"selectors": []string{
@@ -405,9 +393,6 @@ func TestReceiverDegraded(t *testing.T) {
 							},
 						},
 					},
-					"output": map[string]any{
-						"otelconsumer": map[string]any{},
-					},
 					"path.home": t.TempDir(),
 				},
 			}
@@ -442,10 +427,7 @@ func TestReceiverHook(t *testing.T) {
 				},
 			},
 			"management.otel.enabled": true,
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
-			"path.home": t.TempDir(),
+			"path.home":               t.TempDir(),
 		},
 	}
 	receiverSettings := receiver.Settings{
