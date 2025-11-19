@@ -274,8 +274,6 @@ func TestQueryFetchPartialError(t *testing.T) {
 			w.WriteHeader(404)
 			w.Header().Set("Content-Type", "application/json;")
 			_, _ = w.Write([]byte{})
-			//default:
-
 		}
 	}))
 	defer server.Close()
