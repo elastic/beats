@@ -173,7 +173,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.8.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.0
-	github.com/elastic/elastic-agent-libs v0.24.1
+	github.com/elastic/elastic-agent-libs v0.26.0
 	github.com/elastic/elastic-agent-system-metrics v0.13.3
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
@@ -250,6 +250,7 @@ require (
 	go.opentelemetry.io/collector/config/configauth v0.135.0
 	go.opentelemetry.io/collector/config/confighttp v0.135.0
 	go.opentelemetry.io/collector/config/configoptional v0.135.0
+	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.41.0
 	go.opentelemetry.io/collector/extension v1.41.0
 	go.opentelemetry.io/collector/extension/extensionauth v1.41.0
 	go.opentelemetry.io/collector/processor v1.41.0
