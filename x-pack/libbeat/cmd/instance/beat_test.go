@@ -30,9 +30,6 @@ func TestManager(t *testing.T) {
 				},
 			},
 		},
-		"output": map[string]any{
-			"otelconsumer": map[string]any{},
-		},
 		"path.home": tmpDir,
 	}
 	t.Run("otel management disabled - key missing", func(t *testing.T) {
