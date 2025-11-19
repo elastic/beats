@@ -11,15 +11,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/lnk"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/resources"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 type CustomJumpList struct {
 	appId resources.ApplicationId
-	path string
-	lnks []*lnk.Lnk
+	path  string
+	lnks  []*lnk.Lnk
 }
 
 func NewCustomJumpList(filePath string, log *logger.Logger) (*CustomJumpList, error) {
@@ -33,8 +33,8 @@ func NewCustomJumpList(filePath string, log *logger.Logger) (*CustomJumpList, er
 	}
 	return &CustomJumpList{
 		appId: resources.GetAppIdFromFileName(filePath, log),
-		path: filePath,
-		lnks: lnks,
+		path:  filePath,
+		lnks:  lnks,
 	}, nil
 }
 
@@ -73,45 +73,44 @@ func carveLnkFiles(fileBytes []byte, log *logger.Logger) ([]*lnk.Lnk, error) {
 
 	var lnks []*lnk.Lnk
 
-	// The magic number for a LNK file is 0x4c000000.
-	lnkSignature := []byte{0x4c, 0x00, 0x00, 0x00}
-
 	// Scan through file looking for LNK signatures
 	for i := 0; i < len(fileBytes); i++ {
 
 		// Check if we found a LNK signature
-		if i+len(lnkSignature) > len(fileBytes) {
+		if len(fileBytes[i:]) < len(lnk.LnkSignature) {
+			// stop scanning if we encounter a short buffer
 			break
 		}
 
-		if !bytes.Equal(fileBytes[i:i+len(lnkSignature)], lnkSignature) {
+		signatureSlice := fileBytes[i : i+len(lnk.LnkSignature)]
+		if !bytes.Equal(signatureSlice, lnk.LnkSignature) {
 			continue
 		}
 
-		start := i
+		// Found a LNK signature, so we can carve out the file
 		// Find end - either next signature or EOF
+		start := i
 		end := len(fileBytes)
-		for j := start + len(lnkSignature); j < len(fileBytes)-len(lnkSignature); j++ {
-			if bytes.Equal(fileBytes[j:j+len(lnkSignature)], lnkSignature) {
+
+		searchStart := start + len(lnk.LnkSignature) // skip the signature we just found
+		searchEnd := len(fileBytes) - len(lnk.LnkSignature) // stop at the next signature or EOF
+
+		for j := searchStart; j < searchEnd; j++ {
+			nextSignature := fileBytes[j : j+len(lnk.LnkSignature)]
+			if bytes.Equal(nextSignature, lnk.LnkSignature) {
 				end = j
 				break
 			}
 		}
 
-		// Carve out the LNK file, and convert it to a LnkFile struc usin golnk
+		// Carve out the LNK file, and convert it to an Lnk
 		lnkFile, err := lnk.NewLnkFromBytes(fileBytes[start:end], log)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read LNK file: %w", err)
 		}
-
-		// The LnkFile struct is not a complete representation of the jumplist entry
-		// We need to do some enrichment, so we wrap it in a JumpListLnk struct.
 		lnks = append(lnks, lnkFile)
 
 		i = end - 1 // Move cursor to end (minus 1 since loop will increment)
 	}
 	return lnks, nil
 }
-
-
-

@@ -3,7 +3,8 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build windows
-
+// generate the guid_generated.go file
+//go:generate go run ../../generate -output=guid_mapping_generated.go
 package resources
 
 import (

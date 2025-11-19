@@ -5,7 +5,7 @@
 //go:build windows
 
 // generate the application_id_generated.go file
-//go:generate go run ../tools/scrape_app_ids.go
+//go:generate go run ../../generate -output=application_id_generated.go
 package resources
 
 import (

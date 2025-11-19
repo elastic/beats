@@ -35,29 +35,12 @@ func TestFindCustomDestinationFiles(t *testing.T) {
 		fmt.Printf("Path: %s\n", customJumpList.Path())
 		fmt.Printf("AppId: %s\n", customJumpList.AppId())
 		fmt.Printf("Type: %s\n", customJumpList.Type())
-	}
-}
-
-func TestFindAutomaticFiles(t *testing.T) {
-	log := logger.New(os.Stdout, true)
-	files, err := FindJumplistFiles(JumpListTypeAutomatic, log)
-	fmt.Println("Files:")
-	for _, file := range files {
-		fmt.Printf("    %s\n", file)
-	}
-	if err != nil {
-		t.Errorf("FindAutomaticDestinationFiles() returned error: %v", err)
-	}
-	if len(files) == 0 {
-		t.Errorf("No automatic destination files found")
-	}
-	for _, file := range files {
-		automaticJumpList, err := NewAutomaticJumpList(file, log)
-		if err != nil {
-			t.Errorf("NewAutomaticJumpList() returned error: %v", err)
+		fmt.Printf("Lnks: %d\n", len(customJumpList.lnks))
+		for i, lnk := range customJumpList.lnks {
+			fmt.Printf("Lnk: %d: ShellItems: %d\n", i, len(lnk.ShellItems))
+			for j, shellItem := range lnk.ShellItems {
+				fmt.Printf("ShellItem: %d: Type: %s\n", j, shellItem.Type())
+			}
 		}
-		fmt.Printf("Path: %s\n", automaticJumpList.Path())
-		fmt.Printf("AppId: %s\n", automaticJumpList.AppId())
-		fmt.Printf("Type: %s\n", automaticJumpList.Type())
 	}
 }

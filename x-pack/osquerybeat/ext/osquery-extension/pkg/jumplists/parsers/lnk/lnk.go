@@ -8,25 +8,24 @@ package lnk
 
 import (
 	"bytes"
-	"os"
 	"fmt"
+	"os"
 
 	golnk "github.com/parsiya/golnk"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/lnk/shell_items"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-func IsLnkSignature(data []byte) bool {
-	if len(data) < 4 {
-		return false
-	}
-    lnkSignature := []byte{0x4c, 0x00, 0x00, 0x00}
-	return bytes.Equal(data[:4], lnkSignature)
-}
+var LnkSignature = []byte{0x4c, 0x00, 0x00, 0x00}
+var LnkFooterSignature = []byte{0xAB, 0xFB, 0xBF, 0xBA}
+
+// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/Lnk.cs#L24-L28
+var MinLnkSize = 76
 
 type Lnk struct {
 	golnk.LnkFile
-	ShellItems []*ShellItem
+	ShellItems []shell_items.ShellItem
 }
 
 func NewLnkFromPath(filePath string, log *logger.Logger) (*Lnk, error) {
@@ -38,12 +37,29 @@ func NewLnkFromPath(filePath string, log *logger.Logger) (*Lnk, error) {
 }
 
 func NewLnkFromBytes(data []byte, log *logger.Logger) (*Lnk, error) {
-	if !IsLnkSignature(data) {
+	if len(data) < len(LnkSignature) {
+		return nil, fmt.Errorf("data is too short to contain a LNK signature")
+	}
+
+	if !bytes.Equal(data[:len(LnkSignature)], LnkSignature) {
 		return nil, fmt.Errorf("not a LNK file")
 	}
+
+	if len(data) < MinLnkSize {
+		return nil, fmt.Errorf("data is too short to contain a valid LNK file")
+	}
+
 	lnkFile, err := golnk.Read(bytes.NewReader(data), uint64(len(data)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to read LNK file: %w", err)
 	}
-	return &Lnk{LnkFile: lnkFile, ShellItems: nil}, nil
+
+	var shellItems []shell_items.ShellItem
+	if lnkFile.Header.LinkFlags["HasLinkTargetIDList"] {
+		for _, item := range lnkFile.IDList.List.ItemIDList {
+			shellItems = append(shellItems, shell_items.NewShellItem(item.Size, item.Data))
+		}
+	}
+
+	return &Lnk{LnkFile: lnkFile, ShellItems: shellItems}, nil
 }

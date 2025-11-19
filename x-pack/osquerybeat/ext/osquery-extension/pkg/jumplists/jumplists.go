@@ -13,17 +13,16 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/resources"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/osquery/osquery-go/plugin/table"
 )
 
 type JumpListType string
 
 const (
-	JumpListTypeCustom    JumpListType = "custom"
-	JumpListTypeAutomatic JumpListType = "automatic"
+	JumpListTypeCustom JumpListType = "custom"
 )
 
 type JumpList interface {
@@ -50,8 +49,6 @@ func FindJumplistFiles(jumplistType JumpListType, log *logger.Logger) ([]string,
 	var path string
 
 	switch jumplistType {
-	case JumpListTypeAutomatic:
-		path = "$APPDATA\\Microsoft\\Windows\\Recent\\AutomaticDestinations"
 	case JumpListTypeCustom:
 		path = "$APPDATA\\Microsoft\\Windows\\Recent\\CustomDestinations"
 	}
@@ -66,7 +63,7 @@ func FindJumplistFiles(jumplistType JumpListType, log *logger.Logger) ([]string,
 	if err != nil {
 		return nil, fmt.Errorf("failed to read directory %s: %w", expandedPath, err)
 	}
-	
+
 	// Iterate over the file entries and build a list of file paths
 	var files []string // Return a list of file paths
 	for _, entry := range fileEntries {
