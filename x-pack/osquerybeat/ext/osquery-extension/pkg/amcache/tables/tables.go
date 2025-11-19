@@ -47,8 +47,8 @@ const (
 
 type AmcacheTable struct {
 	Name     TableName
-	HiveKey  string
-	NewEntry func() Entry
+	hiveKey  string
+	newEntry func() Entry
 }
 
 // AllAmcacheTables returns a slice of all defined AmcacheTables.
@@ -56,43 +56,43 @@ func AllAmcacheTables() []AmcacheTable {
 	return []AmcacheTable{
 		{
 			Name:    TableNameApplication,
-			HiveKey: "Root\\InventoryApplication",
-			NewEntry: func() Entry {
+			hiveKey: "Root\\InventoryApplication",
+			newEntry: func() Entry {
 				return &ApplicationEntry{}
 			},
 		},
 		{
 			Name:    TableNameApplicationFile,
-			HiveKey: "Root\\InventoryApplicationFile",
-			NewEntry: func() Entry {
+			hiveKey: "Root\\InventoryApplicationFile",
+			newEntry: func() Entry {
 				return &ApplicationFileEntry{}
 			},
 		},
 		{
 			Name:    TableNameApplicationShortcut,
-			HiveKey: "Root\\InventoryApplicationShortcut",
-			NewEntry: func() Entry {
+			hiveKey: "Root\\InventoryApplicationShortcut",
+			newEntry: func() Entry {
 				return &ApplicationShortcutEntry{}
 			},
 		},
 		{
 			Name:    TableNameDriverBinary,
-			HiveKey: "Root\\InventoryDriverBinary",
-			NewEntry: func() Entry {
+			hiveKey: "Root\\InventoryDriverBinary",
+			newEntry: func() Entry {
 				return &DriverBinaryEntry{}
 			},
 		},
 		{
 			Name:    TableNameDevicePnp,
-			HiveKey: "Root\\InventoryDevicePnp",
-			NewEntry: func() Entry {
+			hiveKey: "Root\\InventoryDevicePnp",
+			newEntry: func() Entry {
 				return &DevicePnpEntry{}
 			},
 		},
 		{
 			Name:    TableNameDriverPackage,
-			HiveKey: "Root\\InventoryDriverPackage",
-			NewEntry: func() Entry {
+			hiveKey: "Root\\InventoryDriverPackage",
+			newEntry: func() Entry {
 				return &DriverPackageEntry{}
 			},
 		},
@@ -109,7 +109,7 @@ func GetAmcacheTableByName(name TableName) *AmcacheTable {
 }
 
 func (t AmcacheTable) Columns() []table.ColumnDefinition {
-	entry := t.NewEntry()
+	entry := t.newEntry()
 	columns, err := encoding.GenerateColumnDefinitions(entry)
 	if err != nil {
 		// This should never happen
@@ -125,7 +125,7 @@ func (t AmcacheTable) GenerateFunc(state GlobalStateInterface, log *logger.Logge
 		if err != nil {
 			return nil, err
 		}
-		marshalled, err := MarshalEntries(entries)
+		marshalled, err := marshalEntries(entries)
 		if err != nil {
 			return nil, err
 		}
@@ -133,8 +133,8 @@ func (t AmcacheTable) GenerateFunc(state GlobalStateInterface, log *logger.Logge
 	}
 }
 
-// MarshalEntries takes a slice of Entry interfaces and marshals each to a map[string]string.
-func MarshalEntries(entries []Entry) ([]map[string]string, error) {
+// marshalEntries takes a slice of Entry interfaces and marshals each to a map[string]string.
+func marshalEntries(entries []Entry) ([]map[string]string, error) {
 	marshalled := make([]map[string]string, 0, len(entries))
 	for _, entry := range entries {
 		mapped, err := encoding.MarshalToMap(entry)
@@ -146,8 +146,8 @@ func MarshalEntries(entries []Entry) ([]map[string]string, error) {
 	return marshalled, nil
 }
 
-// FillInEntryFromKey takes an any, and using the FieldMappings, populates its fields from a registry key.
-func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE, log *logger.Logger) {
+// fillInEntryFromKey populates the fields of an Entry from a registry key.
+func fillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE, log *logger.Logger) {
 	// Get the element of the entry and make sure it is valid and can be set
 	elem := reflect.ValueOf(e).Elem()
 	if !elem.IsValid() || !elem.CanSet() {
@@ -216,7 +216,7 @@ func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE, log *logger.Logger)
 		// Unsupported field type
 		default:
 			// We control the entry types, so this should never happen
-			log.Fatalf("Error: unsupported field type for %s: %s", value.ValueName(), field.Kind())
+			panic(fmt.Sprintf("Error: unsupported field type for %s: %s", value.ValueName(), field.Kind()))
 		}
 	}
 
@@ -228,22 +228,22 @@ func FillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE, log *logger.Logger)
 	e.PostProcess()
 }
 
-// GetEntriesFromRegistry reads the registry and returns a map of entries for the specified TableType.
+// GetEntriesFromRegistry reads the registry and returns a slice of entries for the specified AmcacheTable.
 func GetEntriesFromRegistry(amcacheTable AmcacheTable, registry *regparser.Registry, log *logger.Logger) ([]Entry, error) {
 	if registry == nil {
-		log.Fatalf("GetEntriesFromRegistry called with nil registry for table %s", amcacheTable.Name)
+		return nil, fmt.Errorf("GetEntriesFromRegistry called with nil registry for table %s", amcacheTable.Name)
 	}
 
-	hiveKey := amcacheTable.HiveKey
+	hiveKey := amcacheTable.hiveKey
 	keyNode := registry.OpenKey(hiveKey)
 	if keyNode == nil {
-		return nil, fmt.Errorf("error opening key: %s", hiveKey)
+		return nil, fmt.Errorf("failed to open key: %s", hiveKey)
 	}
 
 	entries := make([]Entry, 0, len(keyNode.Subkeys()))
 	for _, subkey := range keyNode.Subkeys() {
-		ae := amcacheTable.NewEntry()
-		FillInEntryFromKey(ae, subkey, log)
+		ae := amcacheTable.newEntry()
+		fillInEntryFromKey(ae, subkey, log)
 		entries = append(entries, ae)
 	}
 	return entries, nil
