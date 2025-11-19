@@ -19,25 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-func GetColumns() []table.ColumnDefinition {
-	// Generate column definitions automatically from the visit struct using reflection.
-	// This ensures the columns always match the struct definition and prevents drift.
-	columns, err := encoding.GenerateColumnDefinitions(visit{})
-	if err != nil {
-		// This should never happen in practice since we control the struct definition,
-		// but if it does, panic to catch it during development/testing.
-		panic("failed to generate browser_history columns: " + err.Error())
-	}
-	return columns
-}
-
-func GetGenerateFunc(log *logger.Logger) table.GenerateFunc {
-	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		return GetTableRows(ctx, queryContext, log)
-	}
-}
-
-func GetTableRows(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]map[string]string, error) {
+func getTableRows(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]map[string]string, error) {
 	once.Do(initParsers)
 
 	results := make([]map[string]string, 0)

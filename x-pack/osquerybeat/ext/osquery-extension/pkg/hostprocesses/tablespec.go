@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package tables
+package hostprocesses
 
 import (
 	"context"
@@ -13,9 +13,11 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hostfs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/proc"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tablespec"
 )
 
 const (
@@ -42,38 +44,21 @@ const (
 	msIn1CLKTCK = (1000 / clkTck)
 )
 
-func HostProcessesColumns() []table.ColumnDefinition {
-	return []table.ColumnDefinition{
-		table.BigIntColumn("pid"),
-		table.TextColumn("name"),
-		table.TextColumn("path"),
-		table.TextColumn("cmdline"),
-		table.TextColumn("state"),
-		table.TextColumn("cwd"),
-		table.TextColumn("root"),
-		table.BigIntColumn("uid"),
-		table.BigIntColumn("gid"),
-		table.BigIntColumn("euid"),
-		table.BigIntColumn("egid"),
-		table.BigIntColumn("suid"),
-		table.BigIntColumn("sgid"),
-		table.IntegerColumn("on_disk"),
-		table.BigIntColumn("wired_size"),
-		table.BigIntColumn("resident_size"),
-		table.BigIntColumn("total_size"),
-		table.BigIntColumn("user_time"),
-		table.BigIntColumn("system_time"),
-		table.BigIntColumn("disk_bytes_read"),
-		table.BigIntColumn("disk_bytes_written"),
-		table.BigIntColumn("start_time"),
-		table.BigIntColumn("parent"),
-		table.BigIntColumn("pgroup"),
-		table.IntegerColumn("threads"),
-		table.IntegerColumn("nice"),
+func TableSpec() *tablespec.TableSpec {
+	columns, err := encoding.GenerateColumnDefinitions(hostProcess{})
+	if err != nil {
+		panic(err)
 	}
+	return tablespec.NewTableSpec(
+		"host_processes",
+		"Host processes information from /proc",
+		[]string{"linux"},
+		columns,
+		generate,
+	)
 }
 
-func GetHostProcessesGenerateFunc(log *logger.Logger) table.GenerateFunc {
+func generate(log *logger.Logger) table.GenerateFunc {
 	root := hostfs.GetPath("")
 
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {

@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/osquery/osquery-go/plugin/table"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tablespec"
 )
 
 type EncodingFlag int
@@ -103,14 +105,14 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 	return result, nil
 }
 
-func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
+func GenerateColumnDefinitions(in any) ([]tablespec.FullColumnDefinition, error) {
 	if in == nil {
 		return nil, fmt.Errorf("input cannot be nil")
 	}
 
 	t := reflect.TypeOf(in)
 
-	var columns []table.ColumnDefinition
+	var columns []tablespec.FullColumnDefinition
 
 	// Handle pointer types by unwrapping to get the underlying type
 	if t.Kind() == reflect.Ptr {
@@ -138,7 +140,7 @@ func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
 		}
 
 		// Determine column type based on Go type
-		var column table.ColumnDefinition
+		var column tablespec.FullColumnDefinition
 		fieldKind := fieldType.Type.Kind()
 
 		// Handle pointer types by unwrapping to get the underlying type
@@ -148,20 +150,20 @@ func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
 
 		switch fieldKind {
 		case reflect.String:
-			column = table.TextColumn(key)
+			column.ColumnDefinition = table.TextColumn(key)
 
 		case reflect.Bool:
-			column = table.IntegerColumn(key)
+			column.ColumnDefinition = table.IntegerColumn(key)
 
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32,
 			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32:
-			column = table.IntegerColumn(key)
+			column.ColumnDefinition = table.IntegerColumn(key)
 
 		case reflect.Int64, reflect.Uint64:
-			column = table.BigIntColumn(key)
+			column.ColumnDefinition = table.BigIntColumn(key)
 
 		case reflect.Float32, reflect.Float64:
-			column = table.DoubleColumn(key)
+			column.ColumnDefinition = table.DoubleColumn(key)
 
 		case reflect.Struct:
 			// Handle time.Time type
@@ -170,17 +172,21 @@ func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
 				if timeFormat, ok := tag.Lookup("format"); ok {
 					switch strings.ToLower(timeFormat) {
 					case "unix", "unixnano", "unixmilli", "unixmicro":
-						column = table.BigIntColumn(key)
+						column.ColumnDefinition = table.BigIntColumn(key)
 					default:
-						column = table.TextColumn(key)
+						column.ColumnDefinition = table.TextColumn(key)
 					}
 				} else {
-					column = table.TextColumn(key)
+					column.ColumnDefinition = table.TextColumn(key)
 				}
 			}
 		default:
 			// we default to table.TextColumn for unsupported types
-			column = table.TextColumn(key)
+			column.ColumnDefinition = table.TextColumn(key)
+		}
+
+		if desc, ok := tag.Lookup("desc"); ok {
+			column.Description = desc
 		}
 
 		columns = append(columns, column)

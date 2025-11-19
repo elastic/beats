@@ -4,7 +4,7 @@
 
 //go:build darwin
 
-package tables
+package fileanalysis
 
 import (
 	"bytes"
@@ -12,17 +12,17 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 	"syscall"
 
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 )
 
-func ExecuteStderr(ctx context.Context, name string, arg ...string) (out string, err error) {
+func executeStderr(ctx context.Context, name string, arg ...string) (out string, err error) {
 	cmd := exec.CommandContext(ctx, name, arg...)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
@@ -35,23 +35,7 @@ func ExecuteStderr(ctx context.Context, name string, arg ...string) (out string,
 	return stderr.String(), nil
 }
 
-func FileAnalysisColumns() []table.ColumnDefinition {
-	return []table.ColumnDefinition{
-		table.TextColumn("path"),
-		table.TextColumn("mode"),
-		table.BigIntColumn("uid"),
-		table.BigIntColumn("gid"),
-		table.BigIntColumn("size"),
-		table.BigIntColumn("mtime"),
-		table.TextColumn("file_type"),
-		table.TextColumn("code_sign"),
-		table.TextColumn("dependencies"),
-		table.TextColumn("symbols"),
-		table.TextColumn("strings"),
-	}
-}
-
-func GetFileAnalysisGenerateFunc(log *logger.Logger) table.GenerateFunc {
+func generate(log *logger.Logger) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
 		var results []map[string]string
 
@@ -89,12 +73,6 @@ func GetFileAnalysisGenerateFunc(log *logger.Logger) table.GenerateFunc {
 			return results, fmt.Errorf("unable to convert stat.Sys() to *syscall.Stat_t")
 		}
 
-		mode := fmt.Sprintf("%o", stat.Mode().Perm())
-		uid := strconv.FormatUint(uint64(sys.Uid), 10)
-		gid := strconv.FormatUint(uint64(sys.Gid), 10)
-		size := strconv.FormatUint(uint64(stat.Size()), 10)
-		mtime := strconv.FormatInt(stat.ModTime().Unix(), 10)
-
 		// Execute macOS commands
 		fileType, err := command.Execute(ctx, "file", *path)
 		if err != nil {
@@ -117,32 +95,34 @@ func GetFileAnalysisGenerateFunc(log *logger.Logger) table.GenerateFunc {
 		}
 
 		// Execute macOS codesign command and capture stderr for output
-		codeSign, err := ExecuteStderr(ctx, "codesign", "-dvvv", *path)
+		codeSign, err := executeStderr(ctx, "codesign", "-dvvv", *path)
 		if err != nil {
 			log.Warningf("Error running 'codesign' command: %v", err)
 		}
 
-		// Convert outputs to strings
-		fileTypeStr := strings.TrimSpace(fileType)
-		codeSignStr := strings.TrimSpace(codeSign)
-		dependenciesStr := strings.TrimSpace(dependencies)
-		symbolsStr := strings.TrimSpace(symbols)
-		stringsStr := strings.TrimSpace(stringsOutput)
+		// Create fileAnalysis struct
+		analysis := &fileAnalysis{
+			Path:         *path,
+			Mode:         fmt.Sprintf("%o", stat.Mode().Perm()),
+			UID:          int64(sys.Uid),
+			GID:          int64(sys.Gid),
+			Size:         stat.Size(),
+			Mtime:        stat.ModTime().Unix(),
+			FileType:     strings.TrimSpace(fileType),
+			CodeSign:     strings.TrimSpace(codeSign),
+			Dependencies: strings.TrimSpace(dependencies),
+			Symbols:      strings.TrimSpace(symbols),
+			Strings:      strings.TrimSpace(stringsOutput),
+		}
 
-		results = append(results, map[string]string{
-			"path":         *path,
-			"mode":         mode,
-			"uid":          uid,
-			"gid":          gid,
-			"size":         size,
-			"mtime":        mtime,
-			"file_type":    fileTypeStr,
-			"code_sign":    codeSignStr,
-			"dependencies": dependenciesStr,
-			"symbols":      symbolsStr,
-			"strings":      stringsStr,
-		})
+		// Convert to map using encoding
+		result, err := encoding.MarshalToMapWithFlags(analysis, encoding.EncodingFlagUseNumbersZeroValues)
+		if err != nil {
+			log.Errorf("Error marshaling file analysis: %v", err)
+			return results, fmt.Errorf("error marshaling file analysis: %w", err)
+		}
 
+		results = append(results, result)
 		return results, nil
 	}
 }

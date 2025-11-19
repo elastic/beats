@@ -2,18 +2,20 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build windows
+//go:build !darwin
 
-package main
+package fileanalysis
 
 import (
-	"github.com/osquery/osquery-go"
+	"context"
+
 	"github.com/osquery/osquery-go/plugin/table"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/browserhistory"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
-	server.RegisterPlugin(table.NewPlugin("elastic_browser_history", browserhistory.GetColumns(), browserhistory.GetGenerateFunc(log)))
+func generate(log *logger.Logger) table.GenerateFunc {
+	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
+		return nil, nil
+	}
 }
