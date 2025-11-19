@@ -717,6 +717,7 @@ func (inp *filestream) readFromSource(
 		//nolint:gosec // message.Bytes is always positive
 		metrics.BytesProcessed.Add(uint64(message.Bytes))
 		if isGZIP {
+			//nolint:gosec // message.Bytes is always positive, no risk of overflow here
 			metrics.BytesGZIPProcessed.Add(uint64(message.Bytes))
 		}
 
@@ -725,8 +726,10 @@ func (inp *filestream) readFromSource(
 			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
 		}
 
-		if isGZIP && message.Private == io.EOF {
-			s.EOF = true
+		if isGZIP {
+			if err, ok := (message.Private).(error); ok && errors.Is(err, io.EOF) {
+				s.EOF = true
+			}
 		}
 		if err := p.Publish(message.ToEvent(), s); err != nil {
 			metrics.ProcessingErrors.Inc()
