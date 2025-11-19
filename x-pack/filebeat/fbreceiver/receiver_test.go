@@ -61,9 +61,6 @@ func TestNewReceiver(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
@@ -135,9 +132,6 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": level.String(),
 				"selectors": []string{
@@ -191,12 +185,20 @@ func multiReceiverConfig(helper multiReceiverHelper) *Config {
 							},
 						},
 					},
+<<<<<<< HEAD
 					{
 						"type":                 "filestream",
 						"enabled":              true,
 						"id":                   "must-be-unique",
 						"paths":                []string{helper.ingest},
 						"file_identity.native": nil,
+=======
+				},
+				"logging": map[string]any{
+					"level": "info",
+					"selectors": []string{
+						"*",
+>>>>>>> b80d1e914 ([beatreceiver] Do not require specifiying otelconsumer output (#47693))
 					},
 				},
 			},
@@ -390,9 +392,6 @@ func TestReceiverStatus(t *testing.T) {
 								"status":  test.benchmarkStatus,
 							},
 						},
-					},
-					"output": map[string]any{
-						"otelconsumer": map[string]any{},
 					},
 					"logging": map[string]any{
 						"level": "debug",
@@ -602,9 +601,6 @@ func TestConsumeContract(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
@@ -639,9 +635,6 @@ func TestReceiverHook(t *testing.T) {
 						"count":   1,
 					},
 				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
 			},
 			"management.otel.enabled": true,
 			"path.home":               t.TempDir(),
