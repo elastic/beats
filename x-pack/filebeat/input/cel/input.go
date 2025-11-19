@@ -28,6 +28,10 @@ import (
 	"strings"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/sdk/resource"
+	semconv "go.opentelemetry.io/otel/semconv/v1.34.0"
+
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/icholy/digest"
 	"github.com/rcrowley/go-metrics"
@@ -51,6 +55,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
+	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -179,7 +184,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 	}
 
-	client, trace, err := newClient(ctx, cfg, log, reg)
+	client, trace, otelMetrics, err := newClient(ctx, cfg, log, reg, env)
 	if err != nil {
 		return err
 	}
@@ -268,6 +273,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
 	err = periodically(ctx, cfg.Interval, func() error {
+		log.Debug("Starting otel periodic")
+		otelMetrics.AddPeriodicRun(ctx, 1)
+		otelMetrics.StartPeriodic()
+		defer otelMetrics.EndPeriodic(ctx)
+
 		log.Info("process periodic request")
 		var (
 			budget    = *cfg.MaxExecutions
@@ -306,8 +316,12 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				log.Debugw("previous transaction", "transaction.id", trace.TxID())
 			}
 			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
+			otelMetrics.AddProgramExecution(ctx, 1)
 			metrics.executions.Add(1)
 			start := i.now().In(time.UTC)
+			defer func() {
+				otelMetrics.AddTotalDuration(ctx, time.Since(start))
+			}()
 			state, err = evalWith(ctx, prg, ast, state, start, wantDump, budget-1)
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
@@ -333,6 +347,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 			isDegraded = err != nil
 			metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
+			otelMetrics.AddCELDuration(ctx, time.Since(start))
 			if trace != nil {
 				log.Debugw("final transaction", "transaction.id", trace.TxID())
 			}
@@ -443,11 +458,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			switch e := e.(type) {
 			case []interface{}:
 				if len(e) == 0 {
+					otelMetrics.AddProgramSuccessExecution(ctx, 1)
 					return nil
 				}
 				events = e
 			case map[string]interface{}:
 				if e == nil {
+					otelMetrics.AddProgramSuccessExecution(ctx, 1)
 					return nil
 				}
 				if _, ok := e["error"]; ok {
@@ -481,7 +498,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// We have a non-empty batch of events to process.
 			metrics.batchesReceived.Add(1)
 			metrics.eventsReceived.Add(uint64(len(events)))
-
+			otelMetrics.AddGeneratedBatch(ctx, 1)
+			otelMetrics.AddEvents(ctx, int64(len(events)))
 			// Drop events from state. If we fail during the publication,
 			// we will re-request these events.
 			delete(state, "events")
@@ -558,8 +576,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				}
 				if i == 0 {
 					metrics.batchesPublished.Add(1)
+					otelMetrics.AddPublishedBatch(ctx, 1)
+
 				}
 				metrics.eventsPublished.Add(1)
+				otelMetrics.AddPublishedEvents(ctx, 1)
 
 				err = ctx.Err()
 				if err != nil {
@@ -572,11 +593,12 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 
 			metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
-
+			otelMetrics.AddPublishDuration(ctx, time.Since(start))
 			// Advance the cursor to the final state if there was no error during
 			// publications. This is needed to transition to the next set of events.
 			if !hadPublicationError {
 				goodCursor = cursor
+				otelMetrics.AddProgramSuccessExecution(ctx, 1)
 			}
 
 			// Replace the last known good cursor.
@@ -603,6 +625,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		log.Infof("input stopped because context was cancelled with: %v", err)
 		err = nil
 	}
+	otelMetrics.Shutdown(ctx)
 	return err
 }
 
@@ -827,10 +850,10 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 // https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
-func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry) (*http.Client, *httplog.LoggingRoundTripper, error) {
+func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry, env v2.Context) (*http.Client, *httplog.LoggingRoundTripper, *otel.OTELCELMetrics, error) {
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings(), log)...)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	if cfg.Auth.Digest.isEnabled() {
@@ -850,7 +873,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		tr, err := aws.InitializeSignerTransport(*cfg.Auth.AWS, log, c.Transport)
 		if err != nil {
 			log.Errorw("failed to initialize aws config failed for signer", "error", err)
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 		c.Transport = tr
 	}
@@ -935,19 +958,83 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	if cfg.Auth.OAuth2.isEnabled() {
-		authClient, err := cfg.Auth.OAuth2.client(ctx, c)
+		c, err = cfg.Auth.OAuth2.client(ctx, c)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
-		return authClient, trace, nil
+
+		//return authClient, trace, nil, nil
+	} else {
+
+		c.Transport = userAgentDecorator{
+			UserAgent: userAgent,
+			Transport: c.Transport,
+		}
 	}
 
-	c.Transport = userAgentDecorator{
-		UserAgent: userAgent,
-		Transport: c.Transport,
+	log.Infof("env context %v", env)
+
+	log.Infof("env context %v", env)
+	resource := resource.NewWithAttributes(
+		semconv.SchemaURL, GetResourceAttributes(env, cfg)...,
+	)
+
+	log.Infof("created cel input resource", resource.String())
+	exporter, exporterType, err := otel.GetGlobalExporterFactory(log).GetExporter(ctx)
+	if err != nil {
+		log.Errorw("failed to get exporter", "error", err)
+	}
+	if err != nil {
+		log.Errorw("failed to get collection period", "error", err)
+	}
+	log.Infof("created OTEL cel input exporter %s for input %s", exporterType, env.IDWithoutName)
+	otelMetrics, otelTransport, err := otel.NewOTELCELMetrics(log, env.Agent.UserAgent, *resource, c.Transport, exporter, flattenHistogram())
+	c.Transport = otelTransport
+	return c, trace, otelMetrics, nil
+}
+
+func flattenHistogram() bool {
+	_, ok := os.LookupEnv("APM_OTLP")
+	return ok
+}
+
+func GetResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
+	attrs := []attribute.KeyValue{semconv.ServiceInstanceID(env.IDWithoutName),
+		attribute.String("package.name", cfg.GetPackageName()),
+		attribute.String("package.version", cfg.GetPackageVersion()),
+		attribute.String("package.datastream", cfg.DataStream),
+		attribute.String("agent.version", env.Agent.Version),
+		attribute.String("agent.id", env.Agent.ID.String())}
+
+	usedKeys := make(map[string]struct{})
+
+	for _, attr := range attrs {
+		// Access the Key field of the KeyValue struct
+		usedKeys[string(attr.Key)] = struct{}{}
+	}
+	attributesStr, ok := os.LookupEnv("OTEL_RESOURCE_ATTRIBUTES")
+	if ok && len(attributesStr) > 0 {
+		attributes := make([]attribute.KeyValue, 0)
+		pairs := strings.Split(attributesStr, ",")
+		for _, pair := range pairs {
+			kv := strings.SplitN(pair, "=", 2)
+			if len(kv) == 2 {
+				key := strings.TrimSpace(kv[0])
+				value := strings.TrimSpace(kv[1])
+				if key != "" {
+					// don't overwrite existing keys
+					_, used := usedKeys[key]
+					if !used {
+						attributes = append(attributes, attribute.String(key, value))
+					}
+				}
+			}
+		}
+		attrs = append(attrs, attributes...)
 	}
 
-	return c, trace, nil
+	return attrs
+
 }
 
 func wantClient(cfg config) bool {

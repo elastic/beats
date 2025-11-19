@@ -89,6 +89,7 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamTyp
 	// If there are no streams, we fall into the 'simple input config' case,
 	// this means the key configuration values are on the root level instead of
 	// an element in the `streams` array.
+	fmt.Printf("raw %v", raw)
 	if raw.GetStreams() == nil {
 		streamSource, err := handleSimpleConfig(raw)
 		if err != nil {
@@ -111,7 +112,10 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamTyp
 		if err != nil {
 			return nil, fmt.Errorf("error creating stream rules: %w", err)
 		}
-
+		if raw.Meta != nil {
+			streamSource["meta"] = *raw.Meta
+		}
+		fmt.Printf("streamsource %v", streamSource)
 		inputs[iter] = streamSource
 	}
 
