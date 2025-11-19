@@ -498,8 +498,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// We have a non-empty batch of events to process.
 			metrics.batchesReceived.Add(1)
 			metrics.eventsReceived.Add(uint64(len(events)))
-			otelMetrics.AddEvents(ctx, int64(len(events)))
 			otelMetrics.AddGeneratedBatch(ctx, 1)
+			otelMetrics.AddEvents(ctx, int64(len(events)))
 			// Drop events from state. If we fail during the publication,
 			// we will re-request these events.
 			delete(state, "events")
@@ -580,7 +580,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 				}
 				metrics.eventsPublished.Add(1)
-				otelMetrics.AddPublishedEvents(ctx, int64(len(events)))
+				otelMetrics.AddPublishedEvents(ctx, 1)
 
 				err = ctx.Err()
 				if err != nil {
@@ -985,10 +985,8 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		semconv.SchemaURL, GetResourceAttributes(env, cfg)...,
 	)
 
-	//
-
 	log.Infof("created cel input resource", resource.String())
-	exporter, exporterType, err := otel.NewExporterFactory(log).GetExporter(ctx)
+	exporter, exporterType, err := otel.GetGlobalExporterFactory(log).GetExporter(ctx)
 	if err != nil {
 		log.Errorw("failed to get exporter", "error", err)
 	}
@@ -996,15 +994,18 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		log.Errorw("failed to get collection period", "error", err)
 	}
 	log.Infof("created OTEL cel input exporter %s for input %s", exporterType, env.IDWithoutName)
-	otelMetrics, otelTransport, err := otel.NewOTELCELMetrics(log, env.Agent.UserAgent, *resource, c.Transport, exporter)
+	otelMetrics, otelTransport, err := otel.NewOTELCELMetrics(log, env.Agent.UserAgent, *resource, c.Transport, exporter, flattenHistogram())
 	c.Transport = otelTransport
 	return c, trace, otelMetrics, nil
 }
 
+func flattenHistogram() bool {
+	_, ok := os.LookupEnv("APM_OTLP")
+	return ok
+}
+
 func GetResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
 	attrs := []attribute.KeyValue{semconv.ServiceInstanceID(env.IDWithoutName),
-		semconv.ServiceNameKey.String(env.ID),
-		semconv.ServiceVersionKey.String(cfg.GetPackageVersion()),
 		attribute.String("package.name", cfg.GetPackageName()),
 		attribute.String("package.version", cfg.GetPackageVersion()),
 		attribute.String("package.datastream", cfg.DataStream),
