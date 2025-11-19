@@ -394,6 +394,8 @@ func (k *kubernetesAnnotator) Close() error {
 	if k.cache != nil {
 		k.cache.stop()
 	}
+	// ensure there are no goroutines leaking
+	// after the processor has been closed
 	k.initOnce.Do(func() {})
 	return nil
 }
