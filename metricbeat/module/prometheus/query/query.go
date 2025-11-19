@@ -79,6 +79,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.Logger().Debugf("Running queries. There are %d queries to run", len(m.queries))
+	successfulQueriesCount := 0
 	for _, pathConfig := range m.queries {
 		url := m.getURL(pathConfig.Path, pathConfig.Params)
 		m.http.SetURI(url)
@@ -117,6 +118,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		for _, e := range events {
 			reporter.Event(e)
 		}
+		successfulQueriesCount++
+	}
+	if successfulQueriesCount == 0 {
+		return fmt.Errorf("all Prometheus queries failed to run")
+	} else if successfulQueriesCount != len(m.queries) {
+		return mb.PartialMetricsError{Err: fmt.Errorf("%d Prometheus querie(s) failed to run", len(m.queries)-successfulQueriesCount)}
 	}
 	return nil
 }
