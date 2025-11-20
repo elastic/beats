@@ -47,7 +47,7 @@ func addCloudConnectorsCredentials(config ConfigAWS, cloudConnectorsConfig Cloud
 	addCredentialsChain(
 		awsConfig,
 
-		// step 1 assume Elastic Global Role with web identity using the id token provided by the agentless OIDC issuer.
+		// Step 1: Assume the Elastic Global Role with web identity using the ID token provided by the agentless OIDC issuer.
 		func(c awssdk.Config) awssdk.CredentialsProvider {
 			provider := stscreds.NewWebIdentityRoleProvider(
 				sts.NewFromConfig(c), // client uses credentials from previous config.
