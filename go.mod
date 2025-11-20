@@ -128,15 +128,9 @@ require (
 	golang.org/x/mod v0.29.0
 	golang.org/x/net v0.47.0
 	golang.org/x/oauth2 v0.30.0
-<<<<<<< HEAD
-	golang.org/x/sync v0.16.0
-	golang.org/x/sys v0.35.0
-	golang.org/x/text v0.28.0
-=======
 	golang.org/x/sync v0.18.0
 	golang.org/x/sys v0.38.0
 	golang.org/x/text v0.31.0
->>>>>>> d333f3c19 ([azureblobstorage] - Make OAuth2 tests compatible with latest version of AzIdentity and AzureAD libraries (#47611))
 	golang.org/x/time v0.12.0
 	golang.org/x/tools v0.38.0
 	google.golang.org/api v0.238.0
@@ -194,13 +188,8 @@ require (
 	github.com/go-ldap/ldap/v3 v3.4.6
 	github.com/go-ole/go-ole v1.2.6
 	github.com/go-resty/resty/v2 v2.16.5
-<<<<<<< HEAD
-	github.com/gofrs/uuid/v5 v5.2.0
-	github.com/golang-jwt/jwt/v5 v5.2.2
-=======
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.0
->>>>>>> d333f3c19 ([azureblobstorage] - Make OAuth2 tests compatible with latest version of AzIdentity and AzureAD libraries (#47611))
 	github.com/google/cel-go v0.25.0
 	github.com/googleapis/gax-go/v2 v2.14.2
 	github.com/gorilla/handlers v1.5.1
@@ -237,14 +226,8 @@ require (
 	go.opentelemetry.io/collector/pdata v1.41.0
 	go.opentelemetry.io/collector/receiver v1.41.0
 	go.uber.org/mock v0.5.0
-<<<<<<< HEAD
-	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
-	golang.org/x/term v0.34.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20250804133106-a7a43d27e69b
-=======
 	golang.org/x/term v0.37.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250825161204-c5933d9347a5
->>>>>>> d333f3c19 ([azureblobstorage] - Make OAuth2 tests compatible with latest version of AzIdentity and AzureAD libraries (#47611))
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -272,6 +255,7 @@ require (
 	go.opentelemetry.io/collector/processor v1.41.0
 	go.opentelemetry.io/otel/sdk/metric v1.38.0
 	go.uber.org/goleak v1.3.0
+	golang.org/x/exp v0.0.0-20250811191247-51f88131bc50
 	sigs.k8s.io/kind v0.29.0
 )
 
@@ -515,14 +499,10 @@ require (
 	go.uber.org/ratelimit v0.3.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-<<<<<<< HEAD
-=======
-	golang.org/x/exp v0.0.0-20250811191247-51f88131bc50 // indirect
 	golang.org/x/telemetry v0.0.0-20251008203120-078029d740a8 // indirect
->>>>>>> d333f3c19 ([azureblobstorage] - Make OAuth2 tests compatible with latest version of AzIdentity and AzureAD libraries (#47611))
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	gonum.org/v1/gonum v0.16.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250811230008-5f3141c8851a // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250818200422-3122310a409c // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20241105132330-32ad38e42d3f // indirect
