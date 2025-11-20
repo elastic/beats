@@ -77,8 +77,6 @@ receivers:
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    output:
-      otelconsumer:
     processors:
       # Configure a processor to prevent enabling default processors
       - add_fields:
@@ -161,8 +159,6 @@ receivers:
           fields:
             custom_field: "custom_value"
       - add_host_metadata:
-    output:
-      otelconsumer:
     logging:
       level: info
       selectors:

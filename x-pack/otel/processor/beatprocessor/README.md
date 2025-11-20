@@ -41,8 +41,6 @@ receivers:
           id: host-logs
           paths:
             - /var/log/*.log
-    output:
-      otelconsumer:
 ```
 
 The above Filebeat receiver configuration does not explicitly specify the `processors` option.
@@ -58,8 +56,6 @@ receivers:
           paths:
             - /var/log/*.log
     processors: []
-    output:
-      otelconsumer:
 ```
 
 The above Filebeat receiver configuration specifies an empty list of processors.
@@ -82,8 +78,6 @@ receivers:
       - add_host_metadata:
           netinfo:
             enabled: false
-    output:
-      otelconsumer:
 ```
 
 is functionally equivalent to this one, using the Beat processor:
@@ -98,8 +92,6 @@ receivers:
           paths:
             - /var/log/*.log
     processors: []
-    output:
-      otelconsumer:
 
 processors:
   beat:
