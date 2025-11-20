@@ -144,9 +144,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		m.eventGenStarted = true
 	}
 
-	m.Logger().Debugf("Fetching families")
+	m.Logger().Debugf("Fetching families from %s", m.host)
 
 	families, err := m.prometheus.GetFamilies()
+
 	eventList := map[string]mapstr.M{}
 	if err != nil {
 		// send up event only
@@ -159,12 +160,14 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	} else {
 		// add up event to the list
 		families = append(families, m.upMetricFamily(1.0))
+		m.Logger().Debugf("Successfully fetched %d families", len(families))
 	}
 
-	m.Logger().Debugf("Processing families. There are %d families", len(families))
+	skippedFamiliesCount := 0
 
 	for _, family := range families {
 		if m.skipFamily(family) {
+			skippedFamiliesCount++
 			continue
 		}
 		promEvents := m.promEventsGen.GeneratePromEvents(family)
@@ -193,9 +196,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 	}
 
-	m.Logger().Debugf("Reporting events. There are %d events to report", len(eventList))
+	m.Logger().Debugf("Processed %d families (%d skipped), generated %d events",
+		len(families), skippedFamiliesCount, len(eventList))
 
 	// Report events
+	reportedCount := 0
 	for _, e := range eventList {
 		event := mb.Event{RootFields: mapstr.M{m.namespace: e}}
 
@@ -242,7 +247,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if !isOpen {
 			break
 		}
+		reportedCount++
 	}
+
+	m.Logger().Debugf("Fetch completed: reported %d/%d events", reportedCount, len(eventList))
 
 	return err
 }

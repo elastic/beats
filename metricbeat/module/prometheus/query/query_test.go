@@ -321,3 +321,64 @@ func TestQueryFetchPartialError(t *testing.T) {
 		t.Errorf("Expected partial metrics error, got %v\n", fetchErr)
 	}
 }
+
+func TestQueryFetchAllQueriesFailed(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(503)
+		w.Header().Set("Content-Type", "application/json;")
+		_, _ = w.Write([]byte(`{"status":"error","errorType":"unavailable","error":"service unavailable"}`))
+	}))
+	defer server.Close()
+
+	config := map[string]interface{}{
+		"module":     "prometheus",
+		"metricsets": []string{"query"},
+		"hosts":      []string{server.URL},
+		// queries do not have an actual role here since all http responses are mocked
+		"queries": []mapstr.M{
+			mapstr.M{
+				"name": "up",
+				"path": "/api/v1/query",
+				"params": mapstr.M{
+					"query": "up",
+				},
+			},
+			{
+				"name": "node_load",
+				"path": "/api/v1/query",
+				"params": mapstr.M{
+					"query": "node_load1",
+				},
+			},
+		},
+	}
+	reporter := &mbtest.CapturingReporterV2{}
+
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+	fetchErr := metricSet.Fetch(reporter)
+
+	// When all queries fail, we should get no events
+	events := reporter.GetEvents()
+	if len(events) != 0 {
+		t.Errorf("Expected 0 events, had %d. %v\n", len(events), events)
+	}
+
+	// Should get errors for each failed query
+	errs := reporter.GetErrors()
+	if len(errs) != 2 {
+		t.Errorf("Expected 2 errors, had %d: %v\n", len(errs), errs)
+	}
+
+	// fetchErr should NOT be a PartialMetricsError, but a regular error
+	if fetchErr == nil {
+		t.Errorf("Expected an error when all queries fail, got nil")
+	} else {
+		var partialErr mb.PartialMetricsError
+		if errors.As(fetchErr, &partialErr) {
+			t.Errorf("Expected non-partial error when all queries fail, got PartialMetricsError: %v", fetchErr)
+		}
+		if !strings.Contains(fetchErr.Error(), "all Prometheus queries failed") {
+			t.Errorf("Expected error message to contain 'all Prometheus queries failed', got: %v", fetchErr)
+		}
+	}
+}
