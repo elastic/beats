@@ -250,7 +250,7 @@ func TestMultipleReceivers(t *testing.T) {
 			require.Greater(c, len(logs["r2"]), 0, "receiver r2 does not have any logs")
 
 			assert.Equal(c, "test", logs["r1"][0].Flatten()["message"], "expected r1 message field to be 'test'")
-			assert.Equal(c, "test", logs["r2"][0].Flatten()["message"], "expected r1 message field to be 'test'")
+			assert.Equal(c, "test", logs["r2"][0].Flatten()["message"], "expected r2  message field to be 'test'")
 
 			// Make sure that each receiver has a separate logger
 			// instance and does not interfere with others. Previously, the
