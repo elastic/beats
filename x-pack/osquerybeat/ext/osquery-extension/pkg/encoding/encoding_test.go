@@ -473,6 +473,63 @@ func Test_formatTimeWithTagFormat(t *testing.T) {
 	}
 }
 
+func TestMarshalToMapWithFlags_embeddedStruct(t *testing.T) {
+	type EmbeddedStruct struct {
+		EmbeddedField string `osquery:"embedded_field"`
+	}
+
+	type TestStruct struct {
+		EmbeddedStruct
+		TestField string `osquery:"test_field"`
+	}
+
+	type TestStructWithPointer struct {
+		*EmbeddedStruct
+		TestField string `osquery:"test_field"`
+	}
+
+	cases := []struct {
+		name string
+		input any
+		expected map[string]string
+	}{
+		{
+			name: "embedded struct",
+			input: &TestStruct{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedField: "embedded_value"},
+				TestField:      "test_value",
+			},
+			expected: map[string]string{
+				"embedded_field": "embedded_value",
+				"test_field":     "test_value",
+			},
+		},
+		{
+			name: "embedded struct with pointer",
+			input: &TestStructWithPointer{
+				EmbeddedStruct: &EmbeddedStruct{EmbeddedField: "embedded_value"},
+				TestField:      "test_value",
+			},
+			expected: map[string]string{
+				"embedded_field": "embedded_value",
+				"test_field":     "test_value",
+			},
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := MarshalToMapWithFlags(tt.input, 0)
+			if err != nil {
+				t.Errorf("MarshalToMapWithFlags() error = %v", err)
+			}
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("%s: MarshalToMapWithFlags() = %v, want %v", tt.name, result, tt.expected)
+			}
+		})
+	}
+}
+
 func TestGenerateColumnDefinitions(t *testing.T) {
 	tests := []struct {
 		name          string
