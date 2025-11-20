@@ -60,7 +60,7 @@ func addCloudConnectorsCredentials(config ConfigAWS, cloudConnectorsConfig Cloud
 			return awssdk.NewCredentialsCache(provider)
 		},
 
-		// step 2 assume the remote role (users's configured one) having the previous one in chain.
+		// Step 2: Assume the remote role (the user's configured role), using the previously assumed role in the chain.
 		func(c awssdk.Config) awssdk.CredentialsProvider {
 			assumeRoleProvider := stscreds.NewAssumeRoleProvider(
 				sts.NewFromConfig(c), // client uses credentials from previous config.
