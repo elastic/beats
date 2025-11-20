@@ -205,8 +205,8 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 			close(done)
 
 			// wait for shutdown
-			for range output {
-			}
+			event, ok := <-output
+			assert.Falsef(t, ok, "received unexpected event: %+v", event)
 		})
 	}
 }
