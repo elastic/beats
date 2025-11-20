@@ -71,11 +71,11 @@ func (fs StateOS) String() string {
 	return string(current)
 }
 
-// StringInodeDevice returns a string representation of inode and device only.
+// Identifier returns a string representation of inode and device only.
 // Filebeat inodeDeviceIdentifier uses this string when generating its ID. With
 // the addition of UID and GID in the String() method, we need to keep the old
 // behaviour for backward compatibility.
-func (fs StateOS) StringInodeDevice() string {
+func (fs StateOS) Identifier() string {
 	var buf [64]byte
 	current := strconv.AppendUint(buf[:0], fs.Inode, 10)
 	current = append(current, '-')

@@ -90,9 +90,9 @@ func (fs StateOS) String() string {
 	return string(current)
 }
 
-// StringInodeDevice returns the same as String() on Windows.
+// Identifier returns the same as String() on Windows.
 // On other OSes it only returns inode and device for backwards compatibility.
-func (fs StateOS) StringInodeDevice() string {
+func (fs StateOS) Identifier() string {
 	return fs.String()
 }
 

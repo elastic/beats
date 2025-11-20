@@ -77,7 +77,7 @@ func newINodeDeviceIdentifier(_ *conf.C, _ *logp.Logger) (StateIdentifier, error
 }
 
 func (i *inodeDeviceIdentifier) GenerateID(s State) (id, identifierType string) {
-	stateID := i.name + identitySep + s.FileStateOS.StringInodeDevice()
+	stateID := i.name + identitySep + s.FileStateOS.Identifier()
 	return genIDWithHash(s.Meta, stateID), i.name
 }
 
