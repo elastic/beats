@@ -17,9 +17,9 @@ import (
 
 // These env vars are provided by agentless controller when the cloud connectors flow is enabled.
 const (
-	CloudConnectorsGlobalRoleEnvVar        = "CLOUD_CONNECTORS_GLOBAL_ROLE"
-	CloudConnectorsJWTPathEnvVar           = "CLOUD_CONNECTORS_ID_TOKEN_FILE"
-	CloudConnectorsCloudResourceIDEnvVar   = "CLOUD_RESOURCE_ID"
+	CloudConnectorsGlobalRoleEnvVar      = "CLOUD_CONNECTORS_GLOBAL_ROLE"
+	CloudConnectorsJWTPathEnvVar         = "CLOUD_CONNECTORS_ID_TOKEN_FILE"
+	CloudConnectorsCloudResourceIDEnvVar = "CLOUD_RESOURCE_ID"
 )
 
 // CloudConnectorsConfig is the config for the cloud connectors flow

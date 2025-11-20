@@ -19,9 +19,9 @@ import (
 
 func TestInitializeAWSConfigCloudConnectors(t *testing.T) {
 	inputConfig := ConfigAWS{
-		RoleArn:                 "arn:aws:iam::123456789012:role/customer-role",
-		ExternalID:              "external-id-456",
-		SupportsCloudConnectors: true,
+		RoleArn:            "arn:aws:iam::123456789012:role/customer-role",
+		ExternalID:         "external-id-456",
+		UseCloudConnectors: true,
 	}
 
 	awsConfig, err := InitializeAWSConfig(inputConfig, logptest.NewTestingLogger(t, ""))
