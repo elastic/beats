@@ -69,8 +69,8 @@ func addCloudConnectorsCredentials(config ConfigAWS, cloudConnectorsConfig Cloud
 					if config.ExternalID != "" {
 						aro.ExternalID = awssdk.String(config.ExternalID)
 
-						// The source identity is set by the system (env var) and not user input (package policy).
-						// It should be requested on the other side (remote role) as a condition to assume.
+						// The source identity is set by the system (env var) rather than user input (package policy).
+						// It should be required by the remote role (the role to assume) as a condition for assuming it.
 						aro.SourceIdentity = awssdk.String(cloudConnectorsConfig.CloudResourceID)
 					}
 				},
