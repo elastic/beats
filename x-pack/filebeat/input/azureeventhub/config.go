@@ -196,7 +196,32 @@ func (conf *azureInputConfig) Validate() error {
 		}
 	case processorV2:
 		if conf.SAConnectionString == "" {
-			return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
+			if conf.SAName != "" && conf.SAKey != "" {
+				// To avoid breaking changes, and ease the migration from v1 to v2,
+				// we can build the connection string using the following settings:
+				//
+				// - DefaultEndpointsProtocol=https;
+				// - AccountName=<SAName>;
+				// - AccountKey=<SAKey>;
+				// - EndpointSuffix=core.windows.net
+				env, err := getAzureEnvironment(conf.OverrideEnvironment)
+				if err != nil {
+					return fmt.Errorf("failed to get azure environment: %w", err)
+				}
+				conf.SAConnectionString = fmt.Sprintf(
+					"DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=%s",
+					conf.SAName,
+					conf.SAKey,
+					env.StorageEndpointSuffix,
+				)
+				logger.Warn("storage_account_connection_string is not configured, but storage_account and storage_account_key are configured. " +
+					"The connection string has been constructed from the storage account and key. " +
+					"Please configure storage_account_connection_string directly as storage_account_key is deprecated in processor v2.")
+				conf.SAKey = ""
+			} else {
+				// No connection string and no key, so we can't proceed.
+				return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
+			}
 		}
 	default:
 		return fmt.Errorf(
