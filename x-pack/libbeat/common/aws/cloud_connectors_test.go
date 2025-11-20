@@ -60,7 +60,7 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 				"mock",
 				func(ctx context.Context, in middleware.FinalizeInput, next middleware.FinalizeHandler) (middleware.FinalizeOutput, middleware.Metadata, error) {
 					req, is := in.Request.(*smithyhttp.Request)
-					assert.True(t, is, "request expected to be of type *smithyhttp.Request")
+					require.Truef(t, is, "request expected to be of type *smithyhttp.Request, got: %T", in.Request)
 					receivedCalls++
 					bd, err := io.ReadAll(req.GetStream())
 					assert.NoError(t, req.RewindStream())
