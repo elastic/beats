@@ -109,7 +109,7 @@ service:
 	writeEventsToLogFile(t, logFilePath, numEvents)
 	oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
 
-	var beatsCfgFile = `
+	beatsCfgFile := `
 filebeat.inputs:
   - type: filestream
     id: filestream-input-id
@@ -183,18 +183,13 @@ http.port: %d
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
-		// only present in beats receivers
-		"agent.otelcol.component.id",
-		"agent.otelcol.component.kind",
 		"log.file.device_id", // changes value between filebeat and otel receiver
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 
-	assert.Equal(t, "filebeatreceiver", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
-	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in filebeat log record")
-	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in filebeat log record")
+	assert.Equal(t, "filebeat", otelDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in otel docs")
+	assert.Equal(t, "filebeat", filebeatDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in filebeat docs")
 	assertMonitoring(t, otelMonitoringPort)
 }
 
@@ -366,9 +361,6 @@ service:
 		"agent.ephemeral_id",
 		"agent.id",
 		"event.created",
-		// only present in beats receivers
-		"agent.otelcol.component.id",
-		"agent.otelcol.component.kind",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
@@ -569,18 +561,13 @@ http.port: %d
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
-		// only present in beats receivers
-		"agent.otelcol.component.id",
-		"agent.otelcol.component.kind",
 		"log.file.device_id", // changes value between filebeat and otel receiver
 		"container.id",       // only present in filebeat
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-	assert.Equal(t, "filebeatreceiver/filestream", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
-	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in filebeat log record")
-	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in filebeat log record")
+	assert.Equal(t, "filebeat", otelDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in otel docs")
+	assert.Equal(t, "filebeat", filebeatDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in filebeat docs")
 	assertMonitoring(t, otelConfig.MonitoringPort)
 	assertMonitoring(t, filebeatMonitoringPort) // filebeat
 }
@@ -722,7 +709,7 @@ func TestFilebeatOTelInspect(t *testing.T) {
 		"otel",
 	)
 
-	var beatsCfgFile = `
+	beatsCfgFile := `
 filebeat.inputs:
   - type: filestream
     id: filestream-input-id
@@ -1113,7 +1100,6 @@ service:
 }
 
 func TestFileBeatKerberos(t *testing.T) {
-
 	wantEvents := 1
 	krbURL := "http://localhost:9203" // this is kerberos client - we've hardcoded the URL here
 	tempFile := t.TempDir()
@@ -1220,12 +1206,10 @@ service:
 			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, wantEvents, "expected at least %d events, got %d", wantEvents, otelDocs.Hits.Total.Value)
 		},
 		2*time.Minute, 1*time.Second)
-
 }
 
 // setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
 func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -1259,5 +1243,4 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 	defer resp.Body.Close()
 
 	require.Equal(t, resp.StatusCode, http.StatusOK, "incorrect response code")
-
 }
