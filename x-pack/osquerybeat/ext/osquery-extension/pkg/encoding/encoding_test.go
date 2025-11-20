@@ -489,8 +489,8 @@ func TestMarshalToMapWithFlags_embeddedStruct(t *testing.T) {
 	}
 
 	cases := []struct {
-		name string
-		input any
+		name     string
+		input    any
 		expected map[string]string
 	}{
 		{
