@@ -18,6 +18,10 @@ import (
 )
 
 func TestInitializeAWSConfigCloudConnectors(t *testing.T) {
+	t.Setenv(CloudConnectorsGlobalRoleEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
+	t.Setenv(CloudConnectorsJWTPathEnvVar, "/path/token")
+	t.Setenv(CloudConnectorsCloudResourceIDEnvVar, "abc123")
+
 	inputConfig := ConfigAWS{
 		RoleArn:            "arn:aws:iam::123456789012:role/customer-role",
 		ExternalID:         "external-id-456",
