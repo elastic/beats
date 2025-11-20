@@ -101,12 +101,8 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/magefile/mage v1.15.0
 	github.com/mattn/go-colorable v0.1.13 // indirect
-<<<<<<< HEAD
-	github.com/miekg/dns v1.1.66
-	github.com/mitchellh/gox v1.0.1
-=======
 	github.com/miekg/dns v1.1.68
->>>>>>> 2bacf0afc (Update OTel dependencies to 0.139.0/v1.45.0 and Elastic ones to v0.20.0/v0.21.0 (#47468))
+	github.com/mitchellh/gox v1.0.1
 	github.com/osquery/osquery-go v0.0.0-20231108163517-e3cde127e724
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
@@ -127,21 +123,6 @@ require (
 	go.etcd.io/bbolt v1.4.0
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
-<<<<<<< HEAD
-	golang.org/x/crypto v0.41.0
-	golang.org/x/mod v0.27.0
-	golang.org/x/net v0.43.0
-	golang.org/x/oauth2 v0.30.0
-	golang.org/x/sync v0.17.0
-	golang.org/x/sys v0.36.0
-	golang.org/x/text v0.29.0
-	golang.org/x/time v0.12.0
-	golang.org/x/tools v0.36.0
-	google.golang.org/api v0.238.0
-	google.golang.org/genproto v0.0.0-20250505200425-f936aa4a68b2 // indirect
-	google.golang.org/grpc v1.75.1
-	google.golang.org/protobuf v1.36.9
-=======
 	golang.org/x/crypto v0.44.0
 	golang.org/x/mod v0.29.0
 	golang.org/x/net v0.47.0
@@ -155,7 +136,6 @@ require (
 	google.golang.org/genproto v0.0.0-20250603155806-513f23925822 // indirect
 	google.golang.org/grpc v1.76.0
 	google.golang.org/protobuf v1.36.10
->>>>>>> 2bacf0afc (Update OTel dependencies to 0.139.0/v1.45.0 and Elastic ones to v0.20.0/v0.21.0 (#47468))
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/gotestsum v1.7.0
@@ -170,8 +150,8 @@ require (
 	cloud.google.com/go v0.121.0
 	cloud.google.com/go/compute v1.38.0
 	cloud.google.com/go/redis v1.18.2
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.18.0
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.10.1
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.19.1
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.12.0
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.3.1
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
@@ -209,7 +189,7 @@ require (
 	github.com/go-ole/go-ole v1.3.0
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/gofrs/uuid/v5 v5.3.2
-	github.com/golang-jwt/jwt/v5 v5.2.2
+	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/cel-go v0.25.0
 	github.com/googleapis/gax-go/v2 v2.15.0
 	github.com/gorilla/handlers v1.5.1
@@ -246,13 +226,8 @@ require (
 	go.opentelemetry.io/collector/pdata v1.45.0
 	go.opentelemetry.io/collector/receiver v1.45.0
 	go.uber.org/mock v0.5.0
-<<<<<<< HEAD
-	golang.org/x/term v0.34.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20250825161204-c5933d9347a5
-=======
 	golang.org/x/term v0.37.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250929231259-57b25ae835d4
->>>>>>> 2bacf0afc (Update OTel dependencies to 0.139.0/v1.45.0 and Elastic ones to v0.20.0/v0.21.0 (#47468))
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -261,26 +236,7 @@ require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.19.0
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
-<<<<<<< HEAD
 	github.com/elastic/pkcs8 v1.0.0
-	go.opentelemetry.io/collector/client v1.43.0
-	go.opentelemetry.io/collector/component/componenttest v0.137.0
-	go.opentelemetry.io/collector/config/configauth v1.43.0
-	go.opentelemetry.io/collector/config/confighttp v0.137.0
-	go.opentelemetry.io/collector/config/configoptional v1.43.0
-	go.opentelemetry.io/collector/confmap/xconfmap v0.137.0
-	go.opentelemetry.io/collector/consumer/consumertest v0.137.0
-	go.opentelemetry.io/collector/exporter v1.43.0
-	go.opentelemetry.io/collector/exporter/exportertest v0.137.0
-	go.opentelemetry.io/collector/extension v1.43.0
-	go.opentelemetry.io/collector/extension/extensionauth v1.43.0
-	go.opentelemetry.io/collector/extension/extensiontest v0.137.0
-	go.opentelemetry.io/collector/pipeline v1.43.0
-	go.opentelemetry.io/collector/processor v1.43.0
-	go.opentelemetry.io/collector/processor/processorhelper v0.137.0
-	go.opentelemetry.io/collector/receiver/receivertest v0.137.0
-=======
-	github.com/mattn/go-sqlite3 v1.14.32
 	go.opentelemetry.io/collector/client v1.45.0
 	go.opentelemetry.io/collector/component/componenttest v0.139.0
 	go.opentelemetry.io/collector/config/configauth v1.45.0
@@ -297,7 +253,6 @@ require (
 	go.opentelemetry.io/collector/processor v1.45.0
 	go.opentelemetry.io/collector/processor/processorhelper v0.139.0
 	go.opentelemetry.io/collector/receiver/receivertest v0.139.0
->>>>>>> 2bacf0afc (Update OTel dependencies to 0.139.0/v1.45.0 and Elastic ones to v0.20.0/v0.21.0 (#47468))
 	go.opentelemetry.io/otel/sdk/metric v1.38.0
 	go.uber.org/goleak v1.3.0
 	sigs.k8s.io/kind v0.29.0
@@ -316,7 +271,7 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.3 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/internal v1.11.1 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/internal v1.11.2 // indirect
 	github.com/Azure/go-amqp v1.3.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.9.24 // indirect
@@ -325,7 +280,7 @@ require (
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
-	github.com/AzureAD/microsoft-authentication-library-for-go v1.4.2 // indirect
+	github.com/AzureAD/microsoft-authentication-library-for-go v1.5.0 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.29.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.51.0 // indirect
@@ -537,12 +492,8 @@ require (
 	go.uber.org/ratelimit v0.3.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-<<<<<<< HEAD
-	golang.org/x/exp v0.0.0-20250811191247-51f88131bc50 // indirect
-=======
 	golang.org/x/exp v0.0.0-20250911091902-df9299821621 // indirect
 	golang.org/x/telemetry v0.0.0-20251008203120-078029d740a8 // indirect
->>>>>>> 2bacf0afc (Update OTel dependencies to 0.139.0/v1.45.0 and Elastic ones to v0.20.0/v0.21.0 (#47468))
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	gonum.org/v1/gonum v0.16.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251007200510-49b9836ed3ff // indirect
