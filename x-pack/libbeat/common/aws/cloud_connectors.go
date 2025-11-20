@@ -5,6 +5,8 @@
 package aws
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"time"
 
@@ -29,12 +31,30 @@ type CloudConnectorsConfig struct {
 	CloudResourceID      string
 }
 
-func parseCloudConnectorsConfigFromEnv() CloudConnectorsConfig {
-	return CloudConnectorsConfig{
+func parseCloudConnectorsConfigFromEnv() (CloudConnectorsConfig, error) {
+	cc := CloudConnectorsConfig{
 		ElasticGlobalRoleARN: os.Getenv(CloudConnectorsGlobalRoleEnvVar),
 		IDTokenPath:          os.Getenv(CloudConnectorsJWTPathEnvVar),
 		CloudResourceID:      os.Getenv(CloudConnectorsCloudResourceIDEnvVar),
 	}
+
+	var errs []error
+
+	if cc.ElasticGlobalRoleARN == "" {
+		errs = append(errs, errors.New("elastic global role arn is not configured"))
+	}
+	if cc.IDTokenPath == "" {
+		errs = append(errs, errors.New("id token path is not configured"))
+	}
+	if cc.CloudResourceID == "" {
+		errs = append(errs, errors.New("cloud resource id is not configured"))
+	}
+
+	if len(errs) > 0 {
+		return CloudConnectorsConfig{}, fmt.Errorf("cloud connectors config is invalid: %w", errors.Join(errs...))
+	}
+
+	return cc, nil
 }
 
 const defaultIntermediateDuration = 20 * time.Minute

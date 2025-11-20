@@ -76,7 +76,10 @@ func InitializeAWSConfig(beatsConfig ConfigAWS, logger *logp.Logger) (awssdk.Con
 
 	// If cloud connectors method is selected from config, initialize the role chaining.
 	if beatsConfig.UseCloudConnectors {
-		cloudConnectorsConfig := parseCloudConnectorsConfigFromEnv()
+		cloudConnectorsConfig, err := parseCloudConnectorsConfigFromEnv()
+		if err != nil {
+			return awsConfig, err
+		}
 		addCloudConnectorsCredentials(beatsConfig, cloudConnectorsConfig, &awsConfig, logger)
 	}
 

@@ -136,17 +136,42 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 }
 
 func TestParseCloudConnectorsConfigFromEnv(t *testing.T) {
-	t.Setenv(CloudConnectorsGlobalRoleEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
-	t.Setenv(CloudConnectorsJWTPathEnvVar, "/path/token")
+	t.Run("happy_path", func(t *testing.T) {
+		t.Setenv(CloudConnectorsGlobalRoleEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
+		t.Setenv(CloudConnectorsJWTPathEnvVar, "/path/token")
+		t.Setenv(CloudConnectorsCloudResourceIDEnvVar, "abc123")
 
-	got := parseCloudConnectorsConfigFromEnv()
+		got, err := parseCloudConnectorsConfigFromEnv()
 
-	assert.Equal(
-		t,
-		CloudConnectorsConfig{
-			ElasticGlobalRoleARN: "arn:aws:iam::999999999999:role/elastic-global-role",
-			IDTokenPath:          "/path/token",
-		},
-		got,
-	)
+		require.NoError(t, err)
+
+		assert.Equal(
+			t,
+			CloudConnectorsConfig{
+				ElasticGlobalRoleARN: "arn:aws:iam::999999999999:role/elastic-global-role",
+				IDTokenPath:          "/path/token",
+				CloudResourceID:      "abc123",
+			},
+			got,
+		)
+	})
+
+	t.Run("missing config single", func(t *testing.T) {
+		t.Setenv(CloudConnectorsGlobalRoleEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
+		t.Setenv(CloudConnectorsJWTPathEnvVar, "/path/token")
+
+		got, err := parseCloudConnectorsConfigFromEnv()
+
+		require.ErrorContains(t, err, "cloud resource id")
+		assert.Equal(t, CloudConnectorsConfig{}, got)
+	})
+
+	t.Run("missing config all", func(t *testing.T) {
+		got, err := parseCloudConnectorsConfigFromEnv()
+
+		require.ErrorContains(t, err, "elastic global role")
+		require.ErrorContains(t, err, "id token")
+		require.ErrorContains(t, err, "cloud resource id")
+		assert.Equal(t, CloudConnectorsConfig{}, got)
+	})
 }
