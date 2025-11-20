@@ -20,7 +20,6 @@ const (
 	CloudConnectorsGlobalRoleEnvVar        = "CLOUD_CONNECTORS_GLOBAL_ROLE"
 	CloudConnectorsJWTPathEnvVar           = "CLOUD_CONNECTORS_ID_TOKEN_FILE"
 	CloudConnectorsCloudResourceIDEnvVar   = "CLOUD_RESOURCE_ID"
-	CloudConnectorsAWSElasticResourceIDKey = "elastic_resource_id"
 )
 
 // CloudConnectorsConfig is the config for the cloud connectors flow
