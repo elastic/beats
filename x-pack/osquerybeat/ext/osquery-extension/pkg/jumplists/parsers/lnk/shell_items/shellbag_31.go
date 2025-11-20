@@ -7,9 +7,9 @@
 package shell_items
 
 import (
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"os"
 	"time"
 
 	//	"golang.org/x/text/encoding/charmap"
@@ -31,9 +31,11 @@ import (
 
 type DirectoryShellItem struct {
 	Directory string
+	ShortName string
 	LastModified time.Time
 	size uint16
 	data []byte
+	ExtensionBlocks []Beef0004
 }
 
 func (s *DirectoryShellItem) RawType() byte {
@@ -49,71 +51,72 @@ func (s *DirectoryShellItem) Type() ShellItemType {
 }
 
 func NewDirectoryShellItem(size uint16, data []byte, log *logger.Logger) (ShellItem, error) {
-	//https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x31.cs#L54-L59
+	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x31.cs#L54-L59
 
-	//1 byte for signature, 1 byte unknown value, 4 bytes for length (which is always 0 for directories)
+	directoryShellItem := &DirectoryShellItem{size: size, data: data}
+
+	// 1 byte for signature, 1 byte unknown value, 4 bytes for length (which is always 0 for directories)
 	index := 2 // signature (0x31) + unknown byte
 	index += 4 // length (which is always 0 for directories)
 
-	lastModified, err := extractDateTimeOffsetFromBytes(data[index:index+4])
+	// read the last modified time
+	lastModifiedBytes := data[index:index+4]
+	lastModified, err := extractDateTimeOffsetFromBytes(lastModifiedBytes)
 	if err != nil {
 		return nil, err
 	}
-
-	outfile := "directoryItem_data.bin"
-    _, err = os.Stat(outfile); if err != nil && os.IsNotExist(err) {
-		os.WriteFile(outfile, data, 0644)
-	}	
+	directoryShellItem.LastModified = *lastModified
 	
-	index += 4 // last modified
-	index += 4 // attributes
+	index += 4 // 4 bytes for last modified
+	index += 2 // 2 bytes for attributes
 
+	// search for the extension block
 	beefSignature := []byte{0x04, 0x00, 0xef, 0xbe}
-
     beefPos := bytes.Index(data, beefSignature)
-	
+
+	// TODO: Move this to a function/struct and handle the strings properly
 	extensionBlockStart := -1
 	if beefPos != -1 {
-		extensionBlockStart = beefPos - 4
-	}
-
-	strLen := -1
-	if extensionBlockStart != -1 {
-		strLen = extensionBlockStart - index
-	}
-
-	fmt.Printf("strLen: %d\n", strLen);
-	fmt.Printf("extensionBlockStart: %d\n", extensionBlockStart);
-	fmt.Printf("beefPos: %d\n", beefPos);
-
-	copyLen := 0
-	if strLen < 0 {
-		copyLen = 2
-		for (index + copyLen < len(data) && data[index + copyLen] != 0) {
-			copyLen += 2;
-		}
-	} else if (data[2] == 0x35) || (data[2] == 0x36) {
-		copyLen = strLen
+		extensionBlockStart = beefPos - 4 // rewind 4 bytes to get the start of the extension block
+		directoryShellItem.ShortName = string(data[index:extensionBlockStart])
+		index = extensionBlockStart
 	} else {
-		for (data[index + copyLen] != 0) {
-			copyLen += 1
+		// no extension block found, read until the NULL byte
+		nulBytePos := bytes.IndexByte(data[index:], 0x00)
+		if nulBytePos != -1 {
+			directoryShellItem.ShortName = string(data[index:nulBytePos]) // read until the NULL byte
 		}
+		index = nulBytePos
 	}
-	copyBytes := data[index:index+copyLen]
-	fmt.Printf("copyBytes: %s\n", hex.Dump(copyBytes));
-	fmt.Printf("copyLen: %d\n", copyLen);
-	fmt.Printf("strlen: %d\n", beefPos - index);
-	fmt.Printf("data[0x27]: %X\n", data[0x27]);
-	fmt.Printf("data[0x28]: %X\n", data[0x27]);
-	fmt.Printf("data[0x29]: %X\n", data[0x27]);
-	fmt.Printf("data[0x24]: %X\n", data[0x27]);
-	fmt.Printf("data[0x26]: %X\n", data[0x27]);
-	fmt.Printf("data[0x28]: %X\n", data[0x27]);
 
-	index += 2
-	directory := string(data[index:beefPos-4])
+	if extensionBlockStart == -1 {
+		return directoryShellItem, nil
+	}
 
-	return &DirectoryShellItem{Directory: directory, LastModified: *lastModified, size: size, data: data}, nil
+	for index < len(data) {
+		fmt.Printf("Extension block size: %s\n", hex.Dump(data[index:index+2]))
+		fmt.Printf("Extension block size little endian: %d\n", binary.LittleEndian.Uint16(data[index:index+2]))
+		fmt.Printf("Index: %d\n", index)
+		fmt.Printf("data length: %d\n", len(data))
+		extensionBlockSize := int(binary.LittleEndian.Uint16(data[index:index+2]))
+		fmt.Printf("index + extension block size: %d\n", index + extensionBlockSize)
+		if len(data) < index + extensionBlockSize {
+			err = fmt.Errorf("Extension block size is too large: %d", extensionBlockSize)
+			return nil, err
+		}
+		extensionBlockData := data[index:index+extensionBlockSize]
+		fmt.Printf("Extension block data: %s\n", hex.Dump(extensionBlockData))
+		fmt.Printf("Extension block size: %d\n", extensionBlockSize)
+		index += extensionBlockSize
+		extensionBlock, err := NewBeef0004(extensionBlockData)
+		if err != nil {
+			return nil, err
+		}
+		directoryShellItem.ExtensionBlocks = append(directoryShellItem.ExtensionBlocks, *extensionBlock)
+		fmt.Printf("Extension block: %s\n", extensionBlock.String())
+	}
+
+	return directoryShellItem, nil
 }
 
 func NewShellBag31(size uint16, data []byte, log *logger.Logger) (ShellItem, error) {

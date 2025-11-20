@@ -10,6 +10,8 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/lnk"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/resources"
@@ -17,9 +19,11 @@ import (
 )
 
 type CustomJumpList struct {
-	appId resources.ApplicationId
-	path  string
-	lnks  []*lnk.Lnk
+	application_id   string
+	application_name string
+	jump_list_type   JumpListType
+	path             string
+	lnks             []*lnk.Lnk
 }
 
 func NewCustomJumpList(filePath string, log *logger.Logger) (*CustomJumpList, error) {
@@ -31,6 +35,19 @@ func NewCustomJumpList(filePath string, log *logger.Logger) (*CustomJumpList, er
 	if err != nil {
 		return nil, fmt.Errorf("failed to carve LNK files: %w", err)
 	}
+
+	application_id := ""
+	application_name := ""
+	baseName  := filepath.Base(filePath)
+	dotIndex := strings.Index(baseName, ".")
+	if dotIndex != -1 {
+		application_id = baseName[:dotIndex]
+		application_name, ok := resources.jumpListAppIds[application_id]
+		if !ok {
+			application_name = ""
+		}
+	}
+
 	return &CustomJumpList{
 		appId: resources.GetAppIdFromFileName(filePath, log),
 		path:  filePath,
@@ -92,7 +109,7 @@ func carveLnkFiles(fileBytes []byte, log *logger.Logger) ([]*lnk.Lnk, error) {
 		start := i
 		end := len(fileBytes)
 
-		searchStart := start + len(lnk.LnkSignature) // skip the signature we just found
+		searchStart := start + len(lnk.LnkSignature)        // skip the signature we just found
 		searchEnd := len(fileBytes) - len(lnk.LnkSignature) // stop at the next signature or EOF
 
 		for j := searchStart; j < searchEnd; j++ {

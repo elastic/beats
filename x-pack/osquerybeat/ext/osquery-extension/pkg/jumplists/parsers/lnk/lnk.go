@@ -10,23 +10,46 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"encoding/hex"
+	"strings"
+	"time"
 
 	golnk "github.com/parsiya/golnk"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/lnk/shell_items"
+	//"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/lnk/shell_items"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 var LnkSignature = []byte{0x4c, 0x00, 0x00, 0x00}
-var LnkFooterSignature = []byte{0xAB, 0xFB, 0xBF, 0xBA}
 
 // https://github.com/EricZimmerman/Lnk/blob/master/Lnk/Lnk.cs#L24-L28
 var MinLnkSize = 76
 
 type Lnk struct {
-	golnk.LnkFile
-	ShellItems []shell_items.ShellItem
+	target_path            string
+	icon_location          string
+	command_line_arguments string
+	target_modified_time   time.Time
+	target_accessed_time   time.Time
+	target_created_time    time.Time
+	volume_serial_number   string
+	volume_type            string
+	volume_label           string
+	working_dir            string
+	name_string            string
+	relative_path          string
+}
+
+func (l *Lnk) String() string {
+	sb := strings.Builder{}
+	sb.WriteString("Lnk{")
+	sb.WriteString(fmt.Sprintf("target_path: %s, ", l.target_path))
+	sb.WriteString(fmt.Sprintf("target_modified_time: %s, ", l.target_modified_time.UTC().Format(time.RFC3339)))
+	sb.WriteString(fmt.Sprintf("target_accessed_time: %s, ", l.target_accessed_time.UTC().Format(time.RFC3339)))
+	sb.WriteString(fmt.Sprintf("target_created_time: %s, ", l.target_created_time.UTC().Format(time.RFC3339)))
+	sb.WriteString(fmt.Sprintf("volume_serial_number: %s, ", l.volume_serial_number))
+	sb.WriteString(fmt.Sprintf("volume_type: %s, ", l.volume_type))
+	sb.WriteString(fmt.Sprintf("volume_label: %s}", l.volume_label))
+	return sb.String()
 }
 
 func NewLnkFromPath(filePath string, log *logger.Logger) (*Lnk, error) {
@@ -55,15 +78,37 @@ func NewLnkFromBytes(data []byte, log *logger.Logger) (*Lnk, error) {
 		return nil, fmt.Errorf("failed to read LNK file: %w", err)
 	}
 
-	var shellItems []shell_items.ShellItem
-	if lnkFile.Header.LinkFlags["HasLinkTargetIDList"] {
-		for _, item := range lnkFile.IDList.List.ItemIDList {
-			fmt.Printf("item: %s\n", hex.Dump(item.Data))
-			fmt.Printf("item size: %d\n", item.Size)
-			fmt.Printf("item data size: %d\n", len(item.Data))
-			shellItems = append(shellItems, shell_items.NewShellItem(item.Size, item.Data))
-		}
+	// var shellItems []shell_items.ShellItem
+	// if lnkFile.Header.LinkFlags["HasLinkTargetIDList"] {
+	// 	for _, item := range lnkFile.IDList.List.ItemIDList {
+	// 		fmt.Printf("item: %s\n", hex.Dump(item.Data))
+	// 		fmt.Printf("item size: %d\n", item.Size)
+	// 		fmt.Printf("item data size: %d\n", len(item.Data))
+	// 		shellItems = append(shellItems, shell_items.NewShellItem(item.Size, item.Data, log))
+	// 	}
+	// }
+
+	fmt.Sprintf("StringData: %s\n", lnkFile.StringData)
+	fmt.Printf("StringData CommandLineArguments: %s\n", lnkFile.StringData.CommandLineArguments)
+	fmt.Printf("StringData IconLocation: %s\n", lnkFile.StringData.IconLocation)
+	fmt.Printf("StringData WorkingDir: %s\n", lnkFile.StringData.WorkingDir)
+	fmt.Printf("StringData NameString: %s\n", lnkFile.StringData.NameString)
+	fmt.Printf("StringData RelativePath: %s\n", lnkFile.StringData.RelativePath)
+
+	lnk := &Lnk{
+		target_path:            lnkFile.LinkInfo.LocalBasePath,
+		icon_location:          lnkFile.StringData.IconLocation,
+		target_modified_time:   lnkFile.Header.WriteTime,
+		target_accessed_time:   lnkFile.Header.AccessTime,
+		target_created_time:    lnkFile.Header.CreationTime,
+		volume_serial_number:   lnkFile.LinkInfo.VolID.DriveSerialNumber,
+		volume_type:            lnkFile.LinkInfo.VolID.DriveType,
+		volume_label:           lnkFile.LinkInfo.VolID.VolumeLabel,
+		command_line_arguments: lnkFile.StringData.CommandLineArguments,
+		working_dir:            lnkFile.StringData.WorkingDir,
+		name_string:            lnkFile.StringData.NameString,
+		relative_path:          lnkFile.StringData.RelativePath,
 	}
 
-	return &Lnk{LnkFile: lnkFile, ShellItems: shellItems}, nil
+	return lnk, nil
 }

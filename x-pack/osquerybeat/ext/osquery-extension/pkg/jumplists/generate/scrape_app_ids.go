@@ -29,7 +29,6 @@ func scrapeJumpListAppIDs(log *logger.Logger) (map[string]string, error) {
 		return nil, err
 	}
 
-	// for line in ... .splitlines()
 	lines := strings.Split(bodyString, "\n")
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
@@ -67,9 +66,7 @@ func scrapeJumpListAppIDs(log *logger.Logger) (map[string]string, error) {
 	return appIDs, nil
 }
 
-func writeAppIdGeneratedFile(outputFile string, log *logger.Logger) error {
-	log.Infof("outputting %s", outputFile)
-	
+func writeAppIdGeneratedFile(outputFile string, log *logger.Logger) error {	
 	appIDs, err := scrapeJumpListAppIDs(log)
 	if err != nil {
 		return err

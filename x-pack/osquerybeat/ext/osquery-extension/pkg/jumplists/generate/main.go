@@ -9,7 +9,6 @@
 package main
 
 import (
-	"flag"
 	"os"
 	"path/filepath"
 
@@ -18,28 +17,24 @@ import (
 
 func main() {
 	log := logger.New(os.Stdout, true)
-	output := flag.String("output", "", "output file")
-	flag.Parse()
 
+	// Files will be written to the directory containing the go generate directive
 	wd, err := os.Getwd()
 	if err != nil {
 		log.Fatalf("failed to get working directory: %v", err)
 	}
 
-	outputFile := filepath.Join(wd, *output)
+	// Write the generated app IDs file
+	appIdsFile := filepath.Join(wd, "generated_app_ids.go")
+	err = writeAppIdGeneratedFile(appIdsFile, log)
+	if err != nil {
+		log.Fatalf("failed to write generated_app_ids.go: %v", err)
+	}
 
-	switch *output {
-	case "application_id_generated.go":
-		err = writeAppIdGeneratedFile(outputFile, log)
-		if err != nil {
-			log.Fatalf("failed to write application_id_generated.go: %v", err)
-		}
-	case "guid_mapping_generated.go":
-		err = writeGuidMappingGeneratedFile(outputFile, log)
-		if err != nil {
-			log.Fatalf("failed to write guid_mapping_generated.go: %v", err)
-		}
-	default:
-		log.Fatalf("invalid output file: %s", *output)
+	// Write the generated guid mappings file
+	guidMappingsFile := filepath.Join(wd, "generated_guid_mappings.go")
+	err = writeGuidMappingGeneratedFile(guidMappingsFile, log)
+	if err != nil {
+		log.Fatalf("failed to write generated_guid_mappings.go: %v", err)
 	}
 }

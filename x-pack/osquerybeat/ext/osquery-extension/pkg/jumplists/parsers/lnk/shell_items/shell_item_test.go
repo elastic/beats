@@ -30,22 +30,19 @@ func TestShellItem(t *testing.T) {
 		t.Errorf("golnk.Read() returned error: %v", err)
 	}
 
-	var shellItems []ShellItem
 	if lnk.Header.LinkFlags["HasLinkTargetIDList"] {
 		for _, item := range lnk.IDList.List.ItemIDList {
 			fmt.Printf("item: %s\n", hex.Dump(item.Data))
 			fmt.Printf("item size: %d\n", item.Size)
 			fmt.Printf("item data size: %d\n", len(item.Data))
-			shellItems = append(shellItems, NewShellItem(item.Size, item.Data, log))
-			fmt.Printf("shellItem: %s\n", shellItems[len(shellItems)-1].String())
+			shellItem := NewShellItem(item.Size, item.Data, log)
+			if _, ok := shellItem.(*DirectoryShellItem); ok {
+				return
+			}
 		}
 	}
 
 
-	fmt.Printf("ShellItems: %d\n", len(shellItems))
-	for _, shellItem := range shellItems {
-		fmt.Printf("ShellItem: %s\n", shellItem.String())
-	}
 }
 
 // func TestShellItem(t *testing.T) {

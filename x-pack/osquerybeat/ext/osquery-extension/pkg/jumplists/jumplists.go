@@ -4,6 +4,8 @@
 
 //go:build windows
 
+//go:generate go run ./generate
+
 package jumplists
 
 import (
