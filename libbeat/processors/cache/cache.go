@@ -126,7 +126,7 @@ type CacheEntry struct {
 // Run enriches the given event with cached metadata.
 func (p *cache) Run(event *beat.Event) (*beat.Event, error) {
 	if p.store == nil {
-		return event, fmt.Errorf("cache processor store not initialized; SetPaths must be called before use")
+		return event, fmt.Errorf("cache processor store not initialized")
 	}
 
 	switch {
