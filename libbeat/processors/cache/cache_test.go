@@ -19,12 +19,11 @@ package cache
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -676,7 +675,9 @@ func TestCache(t *testing.T) {
 					Data:   tmpDir,
 					Logs:   tmpDir,
 				})
-				require.NoError(t, err)
+				if err != nil {
+					t.Fatalf("unexpected error from SetPaths: %v", err)
+				}
 
 				defer func() {
 					err := c.Close()
@@ -728,19 +729,31 @@ func TestSetPathsUninitialized(t *testing.T) {
 			"target_field": "target",
 		},
 	})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error from NewConfigFrom: %v", err)
+	}
 
 	p, err := New(cfg, logptest.NewTestingLogger(t, ""))
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error from New: %v", err)
+	}
 
 	c, ok := p.(*cache)
-	require.True(t, ok)
+	if !ok {
+		t.Fatal("processor is not an *cache")
+	}
 	defer func() {
-		require.NoError(t, c.Close())
+		if err := c.Close(); err != nil {
+			t.Errorf("unexpected error from c.Close(): %v", err)
+		}
 	}()
 
 	// Try to use without SetPaths - should fail
 	event, err := c.Run(&beat.Event{})
-	assert.NotNil(t, event)
-	require.ErrorContains(t, err, "cache processor store not initialized")
+	if event == nil {
+		t.Error("expected non-nil event")
+	}
+	if err == nil || !strings.Contains(err.Error(), "cache processor store not initialized") {
+		t.Fatalf("expected error containing 'cache processor store not initialized', got: %v", err)
+	}
 }
