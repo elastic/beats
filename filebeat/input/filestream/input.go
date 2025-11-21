@@ -85,7 +85,10 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	}
 }
 
-func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvester, error) {
+func configure(
+	cfg *conf.C,
+	log *logp.Logger,
+	src *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
@@ -93,7 +96,7 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 
 	config.TakeOver.LogWarnings(log)
 
-	prospector, err := newProspector(config, log)
+	prospector, err := newProspector(config, log, src)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
@@ -170,7 +173,15 @@ func (inp *filestream) Run(
 
 	// The caller of Run already reports the error and filters out errors that
 	// must not be reported, like 'context cancelled'.
-	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
+	err = inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
+	if err != nil {
+		// First handle actual errors
+		if !errors.Is(err, io.EOF) && !errors.Is(err, ErrInactive) {
+			return fmt.Errorf("error reading from source: %w", err)
+		}
+	}
+
+	return nil
 }
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
@@ -371,6 +382,9 @@ func (inp *filestream) readFromSource(
 				log.Debugf("Reader was closed. Closing. Path='%s'", path)
 			} else if errors.Is(err, io.EOF) {
 				log.Debugf("EOF has been reached. Closing. Path='%s'", path)
+			} else if errors.Is(err, ErrInactive) {
+				log.Debugf("File is inactive. Closing. Path='%s'", path)
+				return err
 			} else {
 				log.Errorf("Read line error: %v", err)
 				metrics.ProcessingErrors.Inc()
@@ -402,6 +416,7 @@ func (inp *filestream) readFromSource(
 			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
 		}
 
+		log.Info("++++++++++++++++++++ PUBLISH: %s", string(message.Content))
 		if err := p.Publish(message.ToEvent(), s); err != nil {
 			metrics.ProcessingErrors.Inc()
 			return err

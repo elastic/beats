@@ -247,6 +247,7 @@ require (
 )
 
 require (
+	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	go.opentelemetry.io/collector/config/configauth v0.135.0
 	go.opentelemetry.io/collector/config/confighttp v0.135.0
 	go.opentelemetry.io/collector/config/configoptional v0.135.0

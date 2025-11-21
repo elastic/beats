@@ -55,8 +55,8 @@ scanner:
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	logger := logp.NewNopLogger()
-	fw := createWatcherWithConfig(t, logger, paths, cfgStr)
+	logger := logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests"))
+	fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
 
 	go fw.Run(ctx)
 
@@ -75,6 +75,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 5}), // 5 bytes written
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -98,6 +99,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 10}), // +5 bytes appended
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -120,6 +122,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: newBasename, size: 10}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -140,6 +143,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 2}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -160,6 +164,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 2}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -179,6 +184,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 2}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -199,8 +205,8 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		logger := logp.NewNopLogger()
-		fw := createWatcherWithConfig(t, logger, paths, cfgStr)
+		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
+		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
 
 		go fw.Run(ctx)
 
@@ -219,6 +225,7 @@ scanner:
 				Info:        file.ExtendFileInfo(&testFileInfo{name: basename, size: 1024}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -234,8 +241,8 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
-		logger := logp.NewNopLogger()
-		fw := createWatcherWithConfig(t, logger, paths, cfgStr)
+		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
+		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
 
 		go fw.Run(ctx)
 
@@ -253,6 +260,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 1024}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 
 		time := time.Now().Local().Add(time.Hour)
@@ -314,6 +322,7 @@ scanner:
 					Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 5}), // +5 bytes appended
 				},
 			}
+			expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 			requireEqualEvents(t, expEvent, e)
 		})
 	})
@@ -330,8 +339,8 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 		defer cancel()
 
-		logger := logp.NewNopLogger()
-		fw := createWatcherWithConfig(t, logger, paths, cfgStr)
+		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
+		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
 
 		go fw.Run(ctx)
 
@@ -350,6 +359,7 @@ scanner:
 				Info:        file.ExtendFileInfo(&testFileInfo{name: basename, size: 1024}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 
 		// collisions are resolved in the alphabetical order, the first filename wins
@@ -388,9 +398,8 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		logp.DevelopmentSetup(logp.ToObserverOutput())
-
-		fw := createWatcherWithConfig(t, logp.L(), paths, cfgStr)
+		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
+		fw := createWatcherWithConfig(t, inMemoryLog, paths, cfgStr)
 
 		go fw.Run(ctx)
 
@@ -412,6 +421,10 @@ scanner:
 				},
 			},
 		}
+		// Add the SrcIDs
+		for i := range expectedEvents {
+			expectedEvents[i].SrcID = fw.getFileIdentity(expectedEvents[i].Descriptor)
+		}
 		var actualEvents []loginp.FSEvent
 		actualEvents = append(actualEvents, fw.Event())
 		actualEvents = append(actualEvents, fw.Event())
@@ -429,9 +442,8 @@ scanner:
 		for i, actualEvent := range actualEvents {
 			requireEqualEvents(t, expectedEvents[i], actualEvent)
 		}
-
-		logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
-		require.Lenf(t, logs, 0, "must be no warning messages, got: %v", logs)
+		require.NotContainsf(t, buff.String(), "WARN",
+			"must be no warning messages")
 	})
 }
 
@@ -873,27 +885,27 @@ scanner:
 	})
 
 	t.Run("returns error when creating scanner with a fingerprint too small", func(t *testing.T) {
-		cfgStr := `
-scanner:
-  fingerprint:
-    enabled: true
-    offset: 0
-    length: 1
-`
-		cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
-		require.NoError(t, err)
-
-		ns := &conf.Namespace{}
-		err = ns.Unpack(cfg)
-		require.NoError(t, err)
-
-		logger := logptest.NewTestingLogger(t, "log-selector")
-		_, err = newFileWatcher(logger, paths, ns)
+		cfg := fileWatcherConfig{
+			Scanner: fileScannerConfig{
+				Fingerprint: fingerprintConfig{
+					Enabled: true,
+					Offset:  0,
+					Length:  1,
+				},
+			}}
+		_, err = newFileWatcher(
+			logptest.NewTestingLogger(t, ""),
+			paths,
+			cfg,
+			mustPathIdentifier(false),
+			mustSourceIdentifier("foo-id"),
+		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
 }
 
+// TODO: REMOVE IT?
 type logEntry struct {
 	timestamp string
 	level     string
@@ -926,6 +938,22 @@ func parseLogs(buff string) []logEntry {
 	}
 
 	return logEntries
+}
+
+func mustFingerprintIdentifier() fileIdentifier {
+	fi, _ := newFingerprintIdentifier(nil, nil)
+
+	return fi
+}
+
+func mustSourceIdentifier(inputID string) *loginp.SourceIdentifier {
+	si, err := loginp.NewSourceIdentifier("filestream", inputID)
+	if err != nil {
+		// this will never happen
+		panic(err)
+	}
+
+	return si
 }
 
 const benchmarkFileCount = 1000
@@ -986,15 +1014,25 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 	}
 }
 
-func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, cfgStr string) loginp.FSWatcher {
+func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, cfgStr string) *fileWatcher {
+	tmpCfg := struct {
+		Scaner fileWatcherConfig `config:"scanner"`
+	}{
+		Scaner: defaultFileWatcherConfig(),
+	}
 	cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
 	require.NoError(t, err)
 
-	ns := &conf.Namespace{}
-	err = ns.Unpack(cfg)
-	require.NoError(t, err)
+	err = cfg.Unpack(&tmpCfg)
+	require.NoError(t, err, "cannot unpack file watcher config")
 
-	fw, err := newFileWatcher(logger, paths, ns)
+	fw, err := newFileWatcher(
+		logger,
+		paths,
+		tmpCfg.Scaner,
+		mustPathIdentifier(false),
+		mustSourceIdentifier("foo-id"),
+	)
 	require.NoError(t, err)
 
 	return fw

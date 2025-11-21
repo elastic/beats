@@ -24,12 +24,14 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/encoding"
@@ -1081,7 +1083,7 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id": id,
 		"paths": []string{
-			env.abspath("*"),
+			env.abspath("test.log*"),
 		},
 		"prospector.scanner.check_interval":      "100ms",
 		"close.on_state_change.check_interval":   "1s",
@@ -1100,17 +1102,20 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 	iterations := 3
 	r := 0
 	for r <= rotations {
+		t.Logf("========== Rotation: %d", r)
 		f, err := os.Create(env.abspath(testlogName))
 		if err != nil {
 			t.Fatalf("failed to open log file: %+v", err)
 		}
 		n := 0
 		for n <= iterations {
+			t.Logf("===== Iteration: %d", n)
 			f.Write([]byte(fmt.Sprintf("hello world %d\n", r*iterations+n)))
 			n += 1
 			time.Sleep(100 * time.Millisecond)
 		}
 		env.mustRenameFile(testlogName, testlogName+time.Now().Format("2006-01-02T15:04:05.99999999"))
+		// env.WaitLogsContains("has been renamed", 8*time.Second, "rename not detected")
 		r += 1
 	}
 
@@ -1118,6 +1123,7 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 	env.waitUntilAtLeastEventCount(rotations * iterations)
 
 	cancelInput()
+	t.Log("==================== Waiting input to stop")
 	env.waitUntilInputStops()
 }
 
@@ -1160,4 +1166,96 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 
 	cancelInput()
 	env.waitUntilInputStops()
+}
+
+func TestDataAddedAfterCloseInactive(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	logFilePath := filepath.Join(env.t.TempDir(), "log.log")
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("log file path: %s", logFilePath)
+		}
+	})
+
+	// Escape windows path separator
+	logFilePathStr := strings.ReplaceAll(logFilePath, `\`, `\\`)
+	integration.WriteLogFile(t, logFilePath, 50, false)
+
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	// The duration used to configure the input need to obey
+	// the following restrictions:
+	//  - Backoff needs to be longer than the prospector and close check
+	//    interval, as well as the inactive timeout so we can have a
+	//    a harvester failing to start because there is one blocked on
+	//    its backoff.
+	//  - Close check interval needs to be smaller than the prospector
+	//    check interval
+	//  - Inactive timeout needs to me as small as possible so the reader
+	//    context is closed due to inactivity while the reader is waiting
+	//    on its backoff.
+	inp := env.mustCreateInput(map[string]any{
+		"id": id,
+		"paths": []string{
+			logFilePath,
+		},
+		"prospector.scanner.check_interval":    "2s",
+		"close.on_state_change.check_interval": "1s",
+		"close.on_state_change.inactive":       "1s",
+		"backoff.init":                         "3s",
+		"backoff.max":                          "3s",
+	})
+
+	env.startInput(t.Context(), id, inp)
+	// File has been fully read
+	env.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePathStr),
+		1*time.Second)
+
+	// File is inactive, the reader context will be cancelled
+	env.WaitLogsContains(
+		fmt.Sprintf("'%s' is inactive", logFilePathStr),
+		5*time.Second,
+		"missing 'file is inactive' logs")
+
+	// Add more data to the file while the reader is blocked
+	// on its backoff and its context has been cancelled.
+	integration.WriteLogFile(t, logFilePath, 5, true)
+
+	// Ensure the FileWatcher detected the new data and sent a write event
+	env.WaitLogsContains(
+		fmt.Sprintf("File %s has been updated", logFilePathStr),
+		3*time.Second)
+
+	// Ensure the write event did not start a new harvester
+	env.WaitLogsContains("Harvester already running", 5*time.Second)
+
+	// Wait for the harvester to close
+	env.WaitLogsContains("Stopped harvester for file", 5*time.Second)
+
+	// HERE
+	// Wait for a new scan from the fileWatcher
+	env.WaitLogsContains("Start next scan", 5*time.Second)
+
+	// Ensure it got notified when the harvester closed and the offset
+	// is correct
+	env.WaitLogsContains(
+		"Updating previous state because harvester was closed.",
+		1*time.Second)
+
+	// Ensure the fileWatcher sent an write event
+	env.WaitLogsContains(
+		fmt.Sprintf("File %s has been updated", logFilePathStr),
+		1*time.Second)
+
+	// Wait for a new harvester to start
+	env.WaitLogsContains("Starting harvester for file", 2*time.Second)
+
+	// Wait for EOF to be reached
+	env.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePathStr),
+		2*time.Second)
+
+	// Ensure all events have been ingested
+	env.waitUntilEventCount(55)
 }
