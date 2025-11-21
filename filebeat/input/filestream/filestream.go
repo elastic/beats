@@ -22,6 +22,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/elastic/go-concert/ctxtool"
@@ -37,6 +38,7 @@ import (
 var (
 	ErrFileTruncate = errors.New("detected file being truncated")
 	ErrClosed       = errors.New("reader closed")
+	ErrInactive     = errors.New("inactive file, reader closed")
 )
 
 // logFile contains all log related data
@@ -53,10 +55,15 @@ type logFile struct {
 	closeRemoved  bool
 	closeRenamed  bool
 
+	// offsetMutex is a mutex to ensure 'offset' and 'lastTimeRead' are
+	// atomically updated. Atomically updating them prevents issues
+	// detecting when the file is inactive by [shouldBeClosed].
+	offsetMutex  sync.Mutex
 	offset       int64
 	lastTimeRead time.Time
-	backoff      backoff.Backoff
-	tg           *unison.TaskGroup
+
+	backoff backoff.Backoff
+	tg      *unison.TaskGroup
 }
 
 // newFileReader creates a new log instance to read log sources
@@ -104,8 +111,7 @@ func (f *logFile) Read(buf []byte) (int, error) {
 	for f.readerCtx.Err() == nil {
 		n, err := f.file.Read(buf)
 		if n > 0 {
-			f.offset += int64(n)
-			f.lastTimeRead = time.Now()
+			f.updateOffset(n)
 		}
 		totalN += n
 
@@ -179,9 +185,13 @@ func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 
 func (f *logFile) shouldBeClosed() bool {
 	if f.closeInactive > 0 {
+		f.offsetMutex.Lock()
 		if time.Since(f.lastTimeRead) > f.closeInactive {
+			f.log.Debugf("'%s' is inactive", f.file.Name())
+			f.offsetMutex.Unlock()
 			return true
 		}
+		f.offsetMutex.Unlock()
 	}
 
 	if !f.closeRemoved && !f.closeRenamed {
@@ -269,4 +279,12 @@ func (f *logFile) Close() error {
 	err := f.file.Close()
 	_ = f.tg.Stop() // Wait until all resources are released for sure.
 	return err
+}
+
+// updateOffset updates the offset and lastTimeRead atomically
+func (f *logFile) updateOffset(delta int) {
+	f.offsetMutex.Lock()
+	f.offset += int64(delta)
+	f.lastTimeRead = time.Now()
+	f.offsetMutex.Unlock()
 }

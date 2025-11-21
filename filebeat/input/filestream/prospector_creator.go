@@ -24,7 +24,6 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -37,21 +36,35 @@ const (
 
 var experimentalWarning sync.Once
 
-func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
-	logger := log.With("filestream_id", config.ID)
-	err := checkConfigCompatibility(config.FileWatcher, config.FileIdentity)
+func newProspector(
+	config config,
+	log *logp.Logger,
+	srci *loginp.SourceIdentifier) (loginp.Prospector, error) {
+
+	logger := log.Named("filestream").With("filestream_id", config.ID)
+	err := checkConfigCompatibility(config)
 	if err != nil {
 		return nil, err
 	}
 
-	filewatcher, err := newFileWatcher(logger, config.Paths, config.FileWatcher)
-	if err != nil {
-		return nil, fmt.Errorf("error while creating filewatcher %w", err)
-	}
-
-	identifier, err := newFileIdentifier(config.FileIdentity, config.Reader.Parsers.Suffix, log)
+	identifier, err := newFileIdentifier(
+		config.FileIdentity,
+		config.Reader.Parsers.Suffix,
+		logger)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating file identifier: %w", err)
+	}
+	logger.Debugf("file identity is set to %s", identifier.Name())
+
+	filewatcher, err := newFileWatcher(
+		logger,
+		config.Paths,
+		config.FileWatcher,
+		identifier,
+		srci,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}
 
 	logger = logger.Named("filestream")
@@ -117,21 +130,11 @@ func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 	return nil, fmt.Errorf("no such rotation method: %s", rotationMethod)
 }
 
-func checkConfigCompatibility(fileWatcher, fileIdentifier *conf.Namespace) error {
-	var fwCfg struct {
-		Fingerprint struct {
-			Enabled bool `config:"enabled"`
-		} `config:"fingerprint"`
-	}
-
-	if fileWatcher != nil && fileIdentifier != nil && fileIdentifier.Name() == fingerprintName {
-		err := fileWatcher.Config().Unpack(&fwCfg)
-		if err != nil {
-			return fmt.Errorf("failed to parse file watcher configuration: %w", err)
-		}
-		if !fwCfg.Fingerprint.Enabled {
-			return fmt.Errorf("fingerprint file identity can be used only when fingerprint is enabled in the scanner")
-		}
+func checkConfigCompatibility(config config) error {
+	if config.FileIdentity != nil &&
+		config.FileIdentity.Name() == fingerprintName &&
+		!config.FileWatcher.Scanner.Fingerprint.Enabled {
+		return fmt.Errorf("fingerprint file identity can be used only when fingerprint is enabled in the scanner")
 	}
 
 	return nil
