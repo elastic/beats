@@ -664,7 +664,7 @@ func TestCache(t *testing.T) {
 				t.Log(p)
 				c, ok := p.(*cache)
 				if !ok {
-					t.Fatalf("processor %d is not an *cache", i)
+					t.Fatalf("processor %d is not a *cache", i)
 				}
 
 				// Initialize the store with paths
@@ -740,7 +740,7 @@ func TestSetPathsUninitialized(t *testing.T) {
 
 	c, ok := p.(*cache)
 	if !ok {
-		t.Fatal("processor is not an *cache")
+		t.Fatal("processor is not a *cache")
 	}
 	defer func() {
 		if err := c.Close(); err != nil {
