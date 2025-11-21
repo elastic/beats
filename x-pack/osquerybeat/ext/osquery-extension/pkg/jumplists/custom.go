@@ -10,126 +10,97 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"path/filepath"
-	"strings"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/lnk"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/resources"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-type CustomJumpList struct {
-	application_id   string
-	application_name string
-	jump_list_type   JumpListType
-	path             string
-	lnks             []*lnk.Lnk
-}
+var CustomJumpListFooterSignature = []byte{0xAB, 0xFB, 0xBF, 0xBA}
 
-func NewCustomJumpList(filePath string, log *logger.Logger) (*CustomJumpList, error) {
+func ParseCustomJumpListFile(filePath string, log *logger.Logger) (JumpList, error) {
 	fileBytes, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read file %s: %w", filePath, err)
-	}
-	lnks, err := carveLnkFiles(fileBytes, log)
-	if err != nil {
-		return nil, fmt.Errorf("failed to carve LNK files: %w", err)
+		return JumpList{}, fmt.Errorf("failed to read")
 	}
 
-	application_id := ""
-	application_name := ""
-	baseName  := filepath.Base(filePath)
-	dotIndex := strings.Index(baseName, ".")
-	if dotIndex != -1 {
-		application_id = baseName[:dotIndex]
-		application_name, ok := resources.jumpListAppIds[application_id]
-		if !ok {
-			application_name = ""
-		}
+	// Scan through the file looking for footer signatures, there may be multiple custom jump lists in the file
+	lnks := carveLnkFiles(fileBytes, log)
+	if len(lnks) == 0 {
+		return JumpList{}, fmt.Errorf("jumplist file is empty")
 	}
 
-	return &CustomJumpList{
-		appId: resources.GetAppIdFromFileName(filePath, log),
-		path:  filePath,
-		lnks:  lnks,
-	}, nil
+	// Look up the application id and create the metadata
+	applicationId := NewApplicationIdFromFileName(filePath, log)
+	jumpListMeta := JumpListMeta{
+		ApplicationId:  applicationId,
+		jump_list_type: JumpListTypeCustom,
+		path:           filePath,
+	}
+	customJumpList := JumpList{
+		JumpListMeta: jumpListMeta,
+		lnks:         lnks,
+	}
+	return customJumpList, nil
 }
 
-func (c *CustomJumpList) Path() string {
-	return c.path
-}
-
-func (c *CustomJumpList) AppId() resources.ApplicationId {
-	return c.appId
-}
-
-func (c *CustomJumpList) Type() JumpListType {
-	return JumpListTypeCustom
-}
-
-func GetCustomJumpLists(log *logger.Logger) ([]*CustomJumpList, error) {
+func GetCustomJumpLists(log *logger.Logger) []JumpList {
 	files, err := FindJumplistFiles(JumpListTypeCustom, log)
 	if err != nil {
-		return nil, err
+		log.Infof("failed to find Custom Jump Lists: %v", err)
+		return []JumpList{}
 	}
-	var jumpLists []*CustomJumpList
+
+	var jumplists []JumpList
 	for _, file := range files {
-		jumpList, err := NewCustomJumpList(file, log)
+		customJumpList, err := ParseCustomJumpListFile(file, log)
 		if err != nil {
-			log.Errorf("failed to parse Custom Jump List: %v", err)
+			log.Infof("failed to parse Custom Jump List %s: %v", file, err)
 			continue
 		}
-		jumpLists = append(jumpLists, jumpList)
+		jumplists = append(jumplists, customJumpList)
 	}
-	return jumpLists, nil
+	return jumplists
 }
 
-func carveLnkFiles(fileBytes []byte, log *logger.Logger) ([]*lnk.Lnk, error) {
+func carveLnkFiles(fileBytes []byte, log *logger.Logger) []*Lnk {
 	// A custom destination file contains one or more LNK files.
 	// We need to scan the file looking for LNK signatures and carve out the individual LNK files.
 
-	var lnks []*lnk.Lnk
+	var lnks []*Lnk
+	sigLen := len(LnkSignature)
 
-	// Scan through file looking for LNK signatures
-	for i := 0; i < len(fileBytes); i++ {
+	// Find the first LNK signature
+	start := bytes.Index(fileBytes, LnkSignature)
+	if start == -1 {
+		return lnks
+	}
 
-		// Check if we found a LNK signature
-		if len(fileBytes[i:]) < len(lnk.LnkSignature) {
-			// stop scanning if we encounter a short buffer
+	// advance the buffer to the first LNK signature
+	fileBytes = fileBytes[start:]
+
+	for {
+		// Find the next LNK signature
+		nextSigIndex := bytes.Index(fileBytes[sigLen:], LnkSignature)
+
+		if nextSigIndex == -1 {
+			// This is the last Lnk in the file
+			lnk, err := NewLnkFromBytes(fileBytes, log)
+			if err == nil {
+				lnks = append(lnks, lnk)
+			}
 			break
 		}
 
-		signatureSlice := fileBytes[i : i+len(lnk.LnkSignature)]
-		if !bytes.Equal(signatureSlice, lnk.LnkSignature) {
-			continue
+		// calculate the cut point for the current Lnk
+		// nextSigIndex is a relaive index to the start of the fileBytes buffer
+		// so we need to add the sigLen to get the absolute index
+		cutPoint := nextSigIndex + sigLen
+		lnk, err := NewLnkFromBytes(fileBytes[:cutPoint], log)
+		if err == nil {
+			lnks = append(lnks, lnk)
 		}
 
-		// Found a LNK signature, so we can carve out the file
-		// Find end - either next signature or EOF
-		start := i
-		end := len(fileBytes)
-
-		searchStart := start + len(lnk.LnkSignature)        // skip the signature we just found
-		searchEnd := len(fileBytes) - len(lnk.LnkSignature) // stop at the next signature or EOF
-
-		for j := searchStart; j < searchEnd; j++ {
-			nextSignature := fileBytes[j : j+len(lnk.LnkSignature)]
-			if bytes.Equal(nextSignature, lnk.LnkSignature) {
-				end = j
-				break
-			}
-		}
-
-		os.WriteFile(fmt.Sprintf("lnk_%d.bin", i), fileBytes[start:end], 0644)
-
-		// Carve out the LNK file, and convert it to an Lnk
-		lnkFile, err := lnk.NewLnkFromBytes(fileBytes[start:end], log)
-		if err != nil {
-			return nil, fmt.Errorf("failed to read LNK file: %w", err)
-		}
-		lnks = append(lnks, lnkFile)
-
-		i = end - 1 // Move cursor to end (minus 1 since loop will increment)
+		// advance the buffer to the next LNK signature
+		fileBytes = fileBytes[cutPoint:]
 	}
-	return lnks, nil
+	return lnks
 }

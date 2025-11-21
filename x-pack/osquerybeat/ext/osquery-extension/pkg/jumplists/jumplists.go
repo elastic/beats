@@ -13,10 +13,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
+	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/resources"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	"github.com/osquery/osquery-go/plugin/table"
 )
@@ -27,24 +26,68 @@ const (
 	JumpListTypeCustom JumpListType = "custom"
 )
 
-type JumpList interface {
-	Path() string
-	AppId() resources.ApplicationId
-	Type() JumpListType
-	ToRows() []JumpListRow
+type ApplicationId struct {
+	Id string `osquery:"application_id"`
+	Name string `osquery:"application_name"`
+}
+
+type JumpListMeta struct {
+	ApplicationId
+	jump_list_type   JumpListType `osquery:"jump_list_type"`
+	path             string `osquery:"path"`
+}
+
+type JumpList struct {
+	JumpListMeta
+	lnks             []*Lnk
 }
 
 type JumpListRow struct {
-	Path               string    `osquery:"path"`
-	ApplicationId      string    `osquery:"application_id"`
-	ApplicationName    string    `osquery:"application_name"`
-	JumpListType       string    `osquery:"jump_list_type"`
-	TargetCreatedTime  time.Time `osquery:"target_created_time" format:"unix"`
-	TargetModifiedTime time.Time `osquery:"target_modified_time"`
-	TargetAccessedTime time.Time `osquery:"target_accessed_time"`
-	TargetSize         uint32    `osquery:"target_size"`
-	TargetPath         string    `osquery:"target_path"`
+	*JumpListMeta
+	*Lnk
 }
+
+func (j *JumpList) ToRows() []JumpListRow {
+	var rows []JumpListRow
+	for _, lnk := range j.lnks {
+		rows = append(rows, JumpListRow{
+			JumpListMeta: &j.JumpListMeta,
+			Lnk: lnk,
+		})
+	}
+	if len(rows) == 0 {
+		return []JumpListRow{
+			{
+				JumpListMeta: &j.JumpListMeta,
+				Lnk: &Lnk{},
+			},
+		}
+	}
+	return rows
+}
+
+func NewApplicationId(id string) ApplicationId {
+	name, ok := jumpListAppIds[id]; if !ok {
+		name = ""
+	}
+	return ApplicationId{
+		Id: id,
+		Name: name,
+	}
+}
+
+func NewApplicationIdFromFileName(fileName string, log *logger.Logger) ApplicationId {
+	baseName  := filepath.Base(fileName)
+	dotIndex := strings.Index(baseName, ".")
+	if dotIndex != -1 {
+		return NewApplicationId(baseName[:dotIndex])
+	}
+
+	// Not necessarily an error, just a fallback
+	log.Infof("failed to get application id from file name %s", fileName)
+	return ApplicationId{}
+}
+
 
 func FindJumplistFiles(jumplistType JumpListType, log *logger.Logger) ([]string, error) {
 	// Get the path to the automatic jumplist directory
@@ -85,23 +128,21 @@ func GetColumns() []table.ColumnDefinition {
 	return columns
 }
 
-// GenerateFunc generates the data for the ApplicationFileTable based on the provided GlobalStateInterface.
+// GenerateFunc
 func GetGenerateFunc(log *logger.Logger) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		// jumpLists, err := GetCustomDestinationJumpLists(log)
-		// if err != nil {
-		// 	return nil, err
-		// }
+		jumpLists := GetCustomJumpLists(log)
+
 		var rows []map[string]string
-		// for _, jumpList := range jumpLists {
-		// 	for _, row := range jumpList.ToRows() {
-		// 		rowMap, err := encoding.MarshalToMap(row)
-		// 		if err != nil {
-		// 			return nil, err
-		// 		}
-		// 		rows = append(rows, rowMap)
-		// 	}
-		// }
+		for _, jumpList := range jumpLists {
+			for _, row := range jumpList.ToRows() {
+				rowMap, err := encoding.MarshalToMap(row)
+				if err != nil {
+					return nil, err
+				}
+				rows = append(rows, rowMap)
+			}
+		}
 		return rows, nil
 	}
 }
