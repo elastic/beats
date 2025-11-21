@@ -27,7 +27,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elastic/pkcs8"
+	"github.com/youmark/pkcs8"
 )
 
 func decryptPKCS1Key(block pem.Block, passphrase []byte) (pem.Block, error) {

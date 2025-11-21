@@ -26,7 +26,7 @@ import (
 	"math/big"
 	"os"
 
-	"github.com/elastic/pkcs8"
+	"github.com/youmark/pkcs8"
 )
 
 // main will generate an encrypted pkcs1 keypair for in tlscommon tests

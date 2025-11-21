@@ -8,7 +8,6 @@ require (
 	github.com/elastic/go-elasticsearch/v8 v8.17.0
 	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-ucfg v0.8.5
-	github.com/elastic/pkcs8 v1.0.0
 	github.com/fatih/color v1.13.0
 	github.com/gofrs/uuid/v5 v5.2.0
 	github.com/magefile/mage v1.13.0
@@ -16,6 +15,7 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.9.0
+	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.0
 	go.elastic.co/ecszap v1.0.2
 	go.elastic.co/go-licence-detector v0.6.0
