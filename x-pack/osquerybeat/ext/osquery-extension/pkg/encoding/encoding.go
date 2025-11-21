@@ -158,6 +158,32 @@ func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
 
 		tag := fieldType.Tag
 		key := tag.Get("osquery")
+
+		// Handle embedded structs
+		// If a struct has an embedded struct, the field will be marked as anonymous
+		// and the tag will be empty. We need to recurse into the embedded struct and merge the results.
+		if fieldType.Anonymous && key == "" {
+			// Get the embedded struct type, handling pointer to struct if necessary
+			embeddedType := fieldType.Type
+			if embeddedType.Kind() == reflect.Ptr {
+				embeddedType = embeddedType.Elem()
+			}
+
+			// Only recurse if it's a struct
+			if embeddedType.Kind() == reflect.Struct {
+				// Create a zero value of the embedded type to pass to GenerateColumnDefinitions
+				// GenerateColumnDefinitions handles pointers, so we can pass either a pointer or value
+				embeddedValue := reflect.New(embeddedType).Elem().Interface()
+				embeddedColumns, err := GenerateColumnDefinitions(embeddedValue)
+				if err != nil {
+					return nil, err
+				}
+				// Append the embedded columns to the current columns list
+				columns = append(columns, embeddedColumns...)
+				continue // Skip the rest of the loop for this field
+			}
+		}
+
 		switch key {
 		case "-":
 			continue
