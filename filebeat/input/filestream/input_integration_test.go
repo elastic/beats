@@ -1103,14 +1103,12 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 	iterations := 3
 	r := 0
 	for r <= rotations {
-		t.Logf("========== Rotation: %d", r)
 		f, err := os.Create(env.abspath(testlogName))
 		if err != nil {
 			t.Fatalf("failed to open log file: %+v", err)
 		}
 		n := 0
 		for n <= iterations {
-			t.Logf("===== Iteration: %d", n)
 			f.Write([]byte(fmt.Sprintf("hello world %d\n", r*iterations+n)))
 			n += 1
 			time.Sleep(100 * time.Millisecond)
@@ -1124,7 +1122,6 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 	env.waitUntilAtLeastEventCount(rotations * iterations)
 
 	cancelInput()
-	t.Log("==================== Waiting input to stop")
 	env.waitUntilInputStops()
 }
 
@@ -1229,7 +1226,7 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 		3*time.Second)
 
 	// Ensure the write event did not start a new harvester
-	env.WaitLogsContains("Harvester already running", 5*time.Second)
+	env.WaitLogsContains("Harvester already running", 5*time.Second) // mabye increase it a bit
 
 	// Wait for the harvester to close
 	env.WaitLogsContains("Stopped harvester for file", 5*time.Second)

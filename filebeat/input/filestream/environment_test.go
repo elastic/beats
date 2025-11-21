@@ -176,7 +176,6 @@ func (e *inputTestingEnvironment) mustAppendToFile(filename string, data []byte)
 }
 
 func (e *inputTestingEnvironment) mustRenameFile(oldname, newname string) {
-	e.t.Logf("===== Renaming: %s -> %s", e.abspath(oldname), e.abspath(newname))
 	err := os.Rename(e.abspath(oldname), e.abspath(newname))
 	if err != nil {
 		e.t.Fatalf("failed to rename file '%s': %+v", oldname, err)
@@ -612,7 +611,7 @@ func (c *mockClient) Publish(e beat.Event) {
 
 // PublishAll mocks the Client PublishAll method
 func (c *mockClient) PublishAll(events []beat.Event) {
-	fmt.Println("=============== Publishing", len(events))
+	// fmt.Println("=============== Publishing", len(events))
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
