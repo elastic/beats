@@ -31,12 +31,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
+
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
 // test_close_renamed from test_harvester.py
