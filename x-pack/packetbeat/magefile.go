@@ -129,7 +129,7 @@ func TestPackages() error {
 func SystemTest(ctx context.Context) error {
 	mg.SerialDeps(xpacketbeat.GetNpcapInstallerFn("./"), devtools.BuildSystemTestBinary)
 
-	args := devtools.DefaultGoTestIntegrationArgs()
+	args := devtools.DefaultGoTestIntegrationArgs(ctx)
 	args.Packages = []string{"./tests/system/..."}
 	return devtools.GoTest(ctx, args)
 }
