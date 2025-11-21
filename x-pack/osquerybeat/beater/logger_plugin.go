@@ -10,6 +10,7 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/logger"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqlog"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -26,65 +27,6 @@ type QueryResult struct {
 		Added   []map[string]string `json:"added"`
 		Removed []map[string]string `json:"removed"`
 	} `json:"diffResults"`
-}
-
-type osqueryLogMessage struct {
-	Severity     int    `json:"s"`
-	Filename     string `json:"f"`
-	Line         int    `json:"i"`
-	Message      string `json:"m"`
-	CalendarTime string `json:"c"`
-	UnixTime     uint64 `json:"u"`
-}
-
-const osqueryLogMessageFieldsCount = 6
-
-type osqLogSeverity int
-
-// The severity levels are taken from osquery source
-// https://github.com/osquery/osquery/blob/master/osquery/core/plugins/logger.h#L39
-//
-//	 enum StatusLogSeverity {
-//		  O_INFO = 0,
-//		  O_WARNING = 1,
-//		  O_ERROR = 2,
-//		  O_FATAL = 3,
-//	 };
-const (
-	severityInfo osqLogSeverity = iota
-	severityWarning
-	severityError
-	severityFatal
-)
-
-func (m *osqueryLogMessage) Log(typ logger.LogType, log *logp.Logger) {
-	if log == nil {
-		return
-	}
-	args := make([]interface{}, 0, osqueryLogMessageFieldsCount*2)
-	args = append(args, "osquery.log_type")
-	args = append(args, typ)
-	args = append(args, "osquery.severity")
-	args = append(args, m.Severity)
-	args = append(args, "osquery.filename")
-	args = append(args, m.Filename)
-	args = append(args, "osquery.line")
-	args = append(args, m.Line)
-	args = append(args, "osquery.cal_time")
-	args = append(args, m.CalendarTime)
-	args = append(args, "osquery.time")
-	args = append(args, m.UnixTime)
-
-	switch osqLogSeverity(m.Severity) {
-	case severityError, severityFatal:
-		log.Errorw(m.Message, args...)
-	case severityWarning:
-		log.Warnw(m.Message, args...)
-	case severityInfo:
-		log.Debugw(m.Message, args...)
-	default:
-		log.Debugw(m.Message, args...)
-	}
 }
 
 type HandleQueryResultFunc func(res QueryResult)
@@ -114,7 +56,7 @@ func (p *LoggerPlugin) Log(ctx context.Context, typ logger.LogType, logText stri
 		}
 	} else {
 		if typ == logger.LogTypeStatus {
-			var m osqueryLogMessage
+			var m osqlog.LogMessage
 			if err := json.Unmarshal([]byte(logText), &m); err != nil {
 				p.log.Errorf("failed to unmarshal osquery log message: %v", err)
 				return err

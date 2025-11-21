@@ -39,6 +39,7 @@ import (
 	"github.com/osquery/osquery-go"
 	osquerygen "github.com/osquery/osquery-go/gen/osquery"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
@@ -55,6 +56,9 @@ func main() {
 	// Initialize glog-compatible logger with basic config
 	// Will be reconfigured after connecting to osqueryd
 	log := logger.New(os.Stderr, *verbose)
+
+	// Hook manager for post hooks
+	hooks := hooks.NewHookManager()
 
 	if *socket == "" {
 		log.Fatal("Missing required --socket argument")
@@ -95,7 +99,12 @@ func main() {
 	}
 
 	// Register the tables available for the specific platform build
-	RegisterTables(server, log)
+	// Any module that needs to execute a post hook should register the hook
+	// within this function
+	RegisterTables(server, log, hooks)
+
+	// Execute all post hooks to create any views required for the specific platform build
+	go hooks.Execute(socket, log)
 
 	if *verbose {
 		log.Info("Starting osquery extension server")
@@ -104,6 +113,9 @@ func main() {
 	if err := server.Run(); err != nil {
 		log.Fatalf("Failed to run extension server: %s", err)
 	}
+
+	// Execute all shutdown hooks to clean up any resources
+	hooks.Shutdown(socket, log)
 }
 
 func getOsqueryOptions(client *osquery.ExtensionManagerClient, log *logger.Logger) osquerygen.InternalOptionList {
