@@ -676,7 +676,7 @@ func TestCache(t *testing.T) {
 					Logs:   tmpDir,
 				})
 				if err != nil {
-					t.Fatalf("unexpected error from SetPaths: %v", err)
+					t.Errorf("unexpected error from SetPaths: %v", err)
 				}
 
 				defer func() {
