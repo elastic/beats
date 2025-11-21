@@ -6,7 +6,7 @@
 
 //go:build windows
 
-package resources
+package jumplists
 
 // jumpListAppIds is a lookup table for known windows AppIDs.
 // Source: https://raw.githubusercontent.com/EricZimmerman/JumpList/refs/heads/master/JumpList/Resources/AppIDs.txt

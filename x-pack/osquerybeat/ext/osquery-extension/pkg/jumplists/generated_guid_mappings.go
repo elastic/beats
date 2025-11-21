@@ -6,7 +6,7 @@
 
 //go:build windows
 
-package resources
+package jumplists
 
 // guidMappings is a lookup table for known windows GUIDs to names.
 // Source: https://github.com/EricZimmerman/GuidMapping/raw/refs/heads/master/Resources/GuidToName.txt

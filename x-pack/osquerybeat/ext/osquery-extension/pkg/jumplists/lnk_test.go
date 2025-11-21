@@ -4,17 +4,17 @@
 
 //go:build windows
 
-package lnk
+package jumplists
 
 import (
-	"os"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-func TestNewLnkFromPath(t *testing.T) {
+func TestLnkFromPath(t *testing.T) {
 	type args struct {
 		filePath string
 	}
@@ -27,23 +27,30 @@ func TestNewLnkFromPath(t *testing.T) {
 		{
 			name: "test_lnk_36.bin",
 			args: args{
-				filePath: "../../testdata/lnks/lnk_36.bin",
+				filePath: "./testdata/lnks/lnk_36.bin",
 			},
 		},
 		{
 			name: "test_lnk_48.bin",
 			args: args{
-				filePath: "../../testdata/lnks/lnk_48.bin",
+				filePath: "./testdata/lnks/lnk_48.bin",
 			},
 		},
 		{
 			name: "test_lnk_1332.bin",
 			args: args{
-				filePath: "../../testdata/lnks/lnk_1332.bin",
+				filePath: "./testdata/lnks/lnk_1332.bin",
+			},
+		},
+		{
+			name: "test_lnk_5312.bin",
+			args: args{
+				filePath: "./testdata/lnks/lnk_5312.bin",
 			},
 		},
 	}
-    log := logger.New(os.Stdout, true)
+
+	log := logger.New(os.Stdout, true)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := NewLnkFromPath(tt.args.filePath, log)
