@@ -24,6 +24,7 @@ import (
 )
 
 func TestGetFields(t *testing.T) {
+	clear(FieldsRegistry)
 
 	data := "hello world"
 	d, err := EncodeData(data)
