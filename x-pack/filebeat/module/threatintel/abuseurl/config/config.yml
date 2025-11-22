@@ -10,6 +10,12 @@ request.ssl: {{ .ssl | tojson }}
 {{ if .proxy_url }}
 request.proxy_url: {{ .proxy_url }}
 {{ end }}
+{{ if .api_token }}
+request.transforms:
+- set:
+    target: header.Auth-Key
+    value: {{ .api_token }}
+{{ end }}
 request.url: {{ .url }}
 
 response.split:
