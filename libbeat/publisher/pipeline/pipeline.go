@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Pipeline implementation providint all beats publisher functionality.
@@ -71,6 +72,9 @@ type Pipeline struct {
 	forceCloseQueue bool
 
 	processors processing.Supporter
+
+	// paths contains the paths configuration for processor initialization.
+	paths *paths.Path
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -84,6 +88,9 @@ type Settings struct {
 	Processors processing.Supporter
 
 	InputQueueSize int
+
+	// Paths contains the paths configuration used for processor initialization.
+	Paths *paths.Path
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -135,6 +142,7 @@ func New(
 		observer:         nilObserver,
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
+		paths:            settings.Paths,
 	}
 	switch settings.WaitCloseMode {
 	case WaitOnPipelineClose, WaitOnPipelineCloseThenForce:
@@ -282,7 +290,7 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 	if p.processors == nil {
 		return nil, nil
 	}
-	return p.processors.Create(cfg, noPublish)
+	return p.processors.Create(cfg, noPublish, p.paths)
 }
 
 // OutputReloader returns a reloadable object for the output section of this pipeline

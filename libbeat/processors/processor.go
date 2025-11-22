@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const logName = "processors"
@@ -42,6 +43,12 @@ type Processors struct {
 // be released or orderly closed.
 type Closer interface {
 	Close() error
+}
+
+// SetPather is an interface for processors that support lazy initialization
+// with beat-specific paths. This method must be called before the processor can be used.
+type SetPather interface {
+	SetPaths(*paths.Path) error
 }
 
 // Close closes a processor if it implements the Closer interface

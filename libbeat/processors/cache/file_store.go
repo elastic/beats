@@ -47,12 +47,12 @@ type fileStoreSet struct {
 // and its reference count is increased. The returned context.CancelFunc
 // reduces the reference count and deletes the fileStore from the set if the
 // count reaches zero.
-func (s *fileStoreSet) get(id string, cfg config, log *logp.Logger) (*fileStore, context.CancelFunc) {
+func (s *fileStoreSet) get(id string, cfg config, log *logp.Logger, path *paths.Path) (*fileStore, context.CancelFunc) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	store, ok := s.stores[id]
 	if !ok {
-		store = newFileStore(cfg, id, pathFromConfig(cfg, log), log)
+		store = newFileStore(cfg, id, pathFromConfig(cfg, log, path), log)
 		s.stores[store.id] = store
 	}
 	store.add(cfg)
@@ -63,10 +63,10 @@ func (s *fileStoreSet) get(id string, cfg config, log *logp.Logger) (*fileStore,
 }
 
 // pathFromConfig returns the mapping form a config to a file-system path.
-func pathFromConfig(cfg config, log *logp.Logger) string {
-	path := filepath.Join(paths.Resolve(paths.Data, "cache_processor"), cleanFilename(cfg.Store.File.ID))
-	log.Infow("mapping file-backed cache processor config to file path", "id", cfg.Store.File.ID, "path", path)
-	return path
+func pathFromConfig(cfg config, log *logp.Logger, path *paths.Path) string {
+	resultPath := filepath.Join(path.Resolve(paths.Data, "cache_processor"), cleanFilename(cfg.Store.File.ID))
+	log.Infow("mapping file-backed cache processor config to file path", "id", cfg.Store.File.ID, "path", resultPath)
+	return resultPath
 }
 
 // cleanFilename replaces illegal printable characters (and space or dot) in
