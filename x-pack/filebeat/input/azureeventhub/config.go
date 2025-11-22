@@ -23,7 +23,8 @@ type azureInputConfig struct {
 	// EventHubName is the name of the event hub to connect to.
 	EventHubName string `config:"eventhub" validate:"required"`
 	// ConnectionString is the connection string to connect to the event hub.
-	ConnectionString string `config:"connection_string" validate:"required"`
+	// This is required when using Shared Access Key authentication.
+	ConnectionString string `config:"connection_string"`
 	// ConsumerGroup is the name of the consumer group to use.
 	ConsumerGroup string `config:"consumer_group"`
 	// Azure Storage container to store leases and checkpoints
@@ -38,6 +39,31 @@ type azureInputConfig struct {
 	SAContainer string `config:"storage_account_container"`
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
 	OverrideEnvironment string `config:"resource_manager_endpoint"`
+
+	// ---------------------------------------
+	// Authentication configuration
+	// ---------------------------------------
+
+	// AuthType specifies the authentication method to use for both Event Hub and Storage Account.
+	// If not specified, defaults to connection_string for backwards compatibility.
+	// Valid values: connection_string, client_secret
+	AuthType string `config:"auth_type"`
+
+	// EventHubNamespace is the fully qualified namespace for the Event Hub.
+	// Required when using client_secret authentication.
+	EventHubNamespace string `config:"eventhub_namespace"`
+	// TenantID is the Azure Active Directory tenant ID.
+	// Required when using client_secret authentication.
+	TenantID string `config:"tenant_id"`
+	// ClientID is the Azure Active Directory application (client) ID.
+	// Required when using client_secret authentication.
+	ClientID string `config:"client_id"`
+	// ClientSecret is the Azure Active Directory application client secret.
+	// Required when using client_secret authentication.
+	ClientSecret string `config:"client_secret"`
+	// AuthorityHost is the Azure Active Directory authority host.
+	// Optional, defaults to Azure Public Cloud (https://login.microsoftonline.com).
+	AuthorityHost string `config:"authority_host"`
 	// LegacySanitizeOptions is a list of sanitization options to apply to messages.
 	//
 	// The supported options are:
@@ -125,21 +151,89 @@ func defaultConfig() azureInputConfig {
 func (conf *azureInputConfig) Validate() error {
 	logger := logp.NewLogger("azureeventhub.config")
 
-	connectionStringProperties, err := parseConnectionString(conf.ConnectionString)
-	if err != nil {
-		return fmt.Errorf("invalid connection string: %w", err)
+	// Normalize authentication method (default to connection_string if empty)
+	if conf.AuthType == "" {
+		conf.AuthType = AuthTypeConnectionString
 	}
 
-	// If the connection string contains an entity path, we need to double
-	// check that it matches the event hub name.
-	if connectionStringProperties.EntityPath != nil && *connectionStringProperties.EntityPath != conf.EventHubName {
+	// Validate the processor version first to ensure it's valid
+	if conf.ProcessorVersion != processorV1 && conf.ProcessorVersion != processorV2 {
 		return fmt.Errorf(
-			"invalid config: the entity path (%s) in the connection string does not match event hub name (%s)",
-			*connectionStringProperties.EntityPath,
-			conf.EventHubName,
+			"invalid processor_version: %s (available versions: %s, %s)",
+			conf.ProcessorVersion,
+			processorV1,
+			processorV2,
 		)
 	}
 
+	// Validate authentication for both Event Hub and Storage Account together
+	switch conf.AuthType {
+	case AuthTypeConnectionString:
+		// Validate Event Hub connection string configuration
+		if conf.ConnectionString == "" {
+			return errors.New("connection_string is required when auth_type is empty or set to connection_string")
+		}
+		connectionStringProperties, err := parseConnectionString(conf.ConnectionString)
+		if err != nil {
+			return fmt.Errorf("invalid connection string: %w", err)
+		}
+
+		// If the connection string contains an entity path, we need to double-check that it matches the event hub name.
+		if connectionStringProperties.EntityPath != nil && *connectionStringProperties.EntityPath != conf.EventHubName {
+			return fmt.Errorf(
+				"invalid config: the entity path (%s) in the connection string does not match event hub name (%s)",
+				*connectionStringProperties.EntityPath,
+				conf.EventHubName,
+			)
+		}
+
+		// Validate Storage Account authentication for connection_string auth type
+		switch conf.ProcessorVersion {
+		case processorV1:
+			// Processor v1 requires storage account key
+			if conf.SAKey == "" {
+				return errors.New("storage_account_key is required when using connection_string authentication with processor v1")
+			}
+		case processorV2:
+			// Processor v2 requires storage account connection string
+			if conf.SAConnectionString == "" {
+				return errors.New("storage_account_connection_string is required when using connection_string authentication with processor v2")
+			}
+		}
+
+	case AuthTypeClientSecret:
+		// Validate Event Hub client secret configuration
+		if conf.EventHubNamespace == "" {
+			return errors.New("eventhub_namespace is required when using client_secret authentication")
+		}
+		if conf.TenantID == "" {
+			return errors.New("tenant_id is required when using client_secret authentication")
+		}
+		if conf.ClientID == "" {
+			return errors.New("client_id is required when using client_secret authentication")
+		}
+		if conf.ClientSecret == "" {
+			return errors.New("client_secret is required when using client_secret authentication")
+		}
+
+		// Validate Storage Account authentication for client_secret auth type
+		switch conf.ProcessorVersion {
+		case processorV1:
+			// Processor v1 requires storage account key
+			if conf.SAKey == "" {
+				return errors.New("storage_account_key is required when using client_secret authentication with processor v1")
+			}
+		case processorV2:
+			// Processor v2 with client_secret auth type: Storage Account uses the same client_secret credentials as Event Hub
+			// The client_secret credentials are already validated above for Event Hub
+			// The storage account will use the same TenantID, ClientID, and ClientSecret as Event Hub
+		}
+
+	default:
+		return fmt.Errorf("unknown auth_type: %s (valid values: connection_string, client_secret)", conf.AuthType)
+	}
+
+	// Validate required fields
 	if conf.EventHubName == "" {
 		return errors.New("no event hub name configured")
 	}
@@ -171,6 +265,7 @@ func (conf *azureInputConfig) Validate() error {
 		return err
 	}
 
+	// Validate processor-specific settings
 	if conf.ProcessorUpdateInterval < 1*time.Second {
 		return errors.New("processor_update_interval must be at least 1 second")
 	}
@@ -186,24 +281,6 @@ func (conf *azureInputConfig) Validate() error {
 			conf.ProcessorStartPosition,
 			startPositionEarliest,
 			startPositionLatest,
-		)
-	}
-
-	switch conf.ProcessorVersion {
-	case processorV1:
-		if conf.SAKey == "" {
-			return errors.New("no storage account key configured (config: storage_account_key)")
-		}
-	case processorV2:
-		if conf.SAConnectionString == "" {
-			return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
-		}
-	default:
-		return fmt.Errorf(
-			"invalid processor_version: %s (available versions: %s, %s)",
-			conf.ProcessorVersion,
-			processorV1,
-			processorV2,
 		)
 	}
 

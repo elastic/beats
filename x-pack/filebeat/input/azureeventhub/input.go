@@ -71,7 +71,6 @@ func (m *eventHubInputManager) Init(unison.Group) error {
 
 // Create creates a new azure-eventhub input based on the configuration.
 func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
-
 	// Register the logs tracer only if the environment variable is
 	// set to avoid the overhead of the tracer in environments where
 	// it's not needed.
@@ -85,6 +84,11 @@ func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
 	}
 
 	config.checkUnsupportedParams(m.log)
+
+	// Validate config
+	if err := config.Validate(); err != nil {
+		return nil, fmt.Errorf("config validation failed: %w", err)
+	}
 
 	switch config.ProcessorVersion {
 	case processorV1:
