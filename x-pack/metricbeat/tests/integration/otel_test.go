@@ -122,7 +122,7 @@ service:
 
 	oteltestcol.New(t, configBuffer.String())
 
-	var beatsCfgFile = `
+	beatsCfgFile := `
 metricbeat:
    modules:
    - module: system
@@ -205,16 +205,9 @@ http.port: {{.MonitoringPort}}
 	var metricbeatDoc, otelDoc mapstr.M
 	otelDoc = otelDocs.Hits.Hits[0].Source
 	metricbeatDoc = metricbeatDocs.Hits.Hits[0].Source
-	ignoredFields := []string{
-		// only present in beats receivers
-		"agent.otelcol.component.id",
-		"agent.otelcol.component.kind",
-	}
-	assert.Equal(t, "metricbeatreceiver", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
-	assert.NotContains(t, metricbeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in metricbeat log record")
-	assert.NotContains(t, metricbeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in metricbeat log record")
-	assertMapstrKeysEqual(t, otelDoc, metricbeatDoc, ignoredFields, "expected documents keys to be equal")
+	assert.Equal(t, "metricbeat", otelDoc.Flatten()["agent.type"], "expected agent.type field to be 'metricbeat' in otel docs")
+	assert.Equal(t, "metricbeat", metricbeatDoc.Flatten()["agent.type"], "expected agent.type field to be 'metricbeat' in metricbeat docs")
+	assertMapstrKeysEqual(t, otelDoc, metricbeatDoc, nil, "expected documents keys to be equal")
 	assertMonitoring(t, metricbeatMonitoringPort)
 }
 
@@ -381,12 +374,7 @@ service:
 			assert.GreaterOrEqualf(ct, r1Docs.Hits.Total.Value, 1, "expected at least 1 log for receiver 1, got %d", r1Docs.Hits.Total.Value)
 		},
 		1*time.Minute, 100*time.Millisecond, "expected at least 1 log for each receiver")
-	ignoredFields := []string{
-		// only present in beats receivers
-		"agent.otelcol.component.id",
-		"agent.otelcol.component.kind",
-	}
-	assertMapstrKeysEqual(t, r0Docs.Hits.Hits[0].Source, r1Docs.Hits.Hits[0].Source, ignoredFields, "expected documents keys to be equal")
+	assertMapstrKeysEqual(t, r0Docs.Hits.Hits[0].Source, r1Docs.Hits.Hits[0].Source, nil, "expected documents keys to be equal")
 	for _, rec := range otelConfig.Receivers {
 		assertMonitoring(t, rec.MonitoringPort)
 	}
