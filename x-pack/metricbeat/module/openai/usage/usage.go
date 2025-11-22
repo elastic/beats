@@ -60,11 +60,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	sm, err := newStateManager(paths.Resolve(paths.Data, path.Join("state", base.Module().Name(), base.Name())))
-	if err != nil {
-		return nil, fmt.Errorf("create state manager: %w", err)
-	}
-
 	logger := base.Logger().Named("openai.usage")
 
 	httpClient := newClient(
@@ -81,9 +76,26 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		httpClient:    httpClient,
 		logger:        logger,
 		config:        config,
-		stateManager:  sm,
+		stateManager:  nil, // initialized later
 		headers:       processHeaders(config.Headers),
 	}, nil
+}
+
+func (m *MetricSet) SetPaths(p *paths.Path) error {
+	if m.stateManager != nil {
+		m.logger.Warnf("Unexpected second call to SetPaths, stateManager already set: %v", m.stateManager)
+	}
+	m.logger.Debugw("Setting path", "path", p)
+
+	sm, err := newStateManager(p.Resolve(
+		paths.Data,
+		path.Join("state", m.Module().Name(), m.Name()),
+	))
+	if err != nil {
+		return fmt.Errorf("new state manager for %s: %w", p.String(), err)
+	}
+	m.stateManager = sm
+	return nil
 }
 
 // Fetch collects OpenAI API usage data for the configured time range.
@@ -94,6 +106,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // 3. Fetches usage data for each day in the range
 // 4. Reports collected metrics through the mb.ReporterV2
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	if m.stateManager == nil {
+		return fmt.Errorf("no state manager for %s", m.Name())
+	}
+
 	endDate := time.Now().UTC().Truncate(time.Hour * 24) // truncate to day as we only collect daily data
 
 	if !m.config.Collection.Realtime {
