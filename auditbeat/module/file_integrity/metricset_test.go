@@ -303,6 +303,7 @@ func TestErrorReporting(t *testing.T) {
 
 	config := getConfig(dir)
 	config["scan_at_start"] = false
+	config["backend"] = "fsnotify" // Explicitly use fsnotify to maintain test behavior
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry)
 
 	done := make(chan struct{}, 1)

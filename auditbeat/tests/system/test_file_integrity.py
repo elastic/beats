@@ -128,6 +128,8 @@ class Test(BaseTest):
             }
             if platform.system() == "Linux":
                 extras["backend"] = backend
+            elif platform.system() == "Windows":
+                extras["backend"] = backend
 
             self.render_config_template(
                 modules=[{
@@ -216,6 +218,8 @@ class Test(BaseTest):
                 "recursive": True
             }
             if platform.system() == "Linux":
+                extras["backend"] = backend
+            elif platform.system() == "Windows":
                 extras["backend"] = backend
 
             self.render_config_template(

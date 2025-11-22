@@ -19,9 +19,19 @@
 
 package file_integrity
 
-import "github.com/elastic/elastic-agent-libs/logp"
+import (
+	"github.com/elastic/beats/v7/libbeat/ebpf"
+	"github.com/elastic/elastic-agent-libs/logp"
+)
 
 func newEBPFReader(c Config, l *logp.Logger) (EventProducer, error) {
+	// Test if eBPF is available by trying to get the watcher
+	// This validates early that eBPF can actually be used, allowing fallback to work
+	_, err := ebpf.GetWatcher()
+	if err != nil {
+		return nil, err
+	}
+
 	paths := make(map[string]struct{})
 	for _, p := range c.Paths {
 		paths[p] = struct{}{}
