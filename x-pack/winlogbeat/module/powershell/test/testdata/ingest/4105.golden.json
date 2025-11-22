@@ -2,17 +2,21 @@
   {
     "@timestamp": "2020-05-13T09:04:04.7552325Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Starting Command",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "4105",
-      "ingested": "2025-01-15T10:02:22.112704225Z",
+      "ingested": "2025-10-29T18:18:28.973112544Z",
       "kind": "event",
       "module": "powershell",
       "provider": "Microsoft-Windows-PowerShell",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant",

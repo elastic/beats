@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-05-17T11:06:58.210768Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-out",
@@ -69,7 +69,7 @@
   {
     "@timestamp": "2019-05-19T16:15:38.542273Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-out",

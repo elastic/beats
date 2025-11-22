@@ -2,10 +2,10 @@
   {
     "@timestamp": "2021-02-25T15:04:48.592Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Clipboard changed (rule: ClipboardChange)",
+      "action": "ClipboardChange (New content in the clipboard)",
       "code": "24",
       "kind": "event",
       "module": "sysmon",

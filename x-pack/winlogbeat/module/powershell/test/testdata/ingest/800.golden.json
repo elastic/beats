@@ -2,18 +2,22 @@
   {
     "@timestamp": "2020-02-26T09:37:40.4872415Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Pipeline Execution Details",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "800",
-      "ingested": "2025-01-15T10:02:22.127700838Z",
+      "ingested": "2025-10-29T18:18:28.980990835Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 17,
-      "type": "info"
+      "type": [
+        "info"
+      ]
     },
     "file": {
       "directory": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\Modules\\Microsoft.PowerShell.Archive",
@@ -109,18 +113,22 @@
   {
     "@timestamp": "2020-05-15T08:33:26.3769931Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Pipeline Execution Details",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "800",
-      "ingested": "2025-01-15T10:02:22.127748302Z",
+      "ingested": "2025-10-29T18:18:28.981003502Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 135,
-      "type": "info"
+      "type": [
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant",
@@ -197,18 +205,22 @@
   {
     "@timestamp": "2020-05-15T08:33:26.393089Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Pipeline Execution Details",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "800",
-      "ingested": "2025-01-15T10:02:22.127760188Z",
+      "ingested": "2025-10-29T18:18:28.981007419Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 141,
-      "type": "info"
+      "type": [
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant",
@@ -296,18 +308,22 @@
   {
     "@timestamp": "2020-05-15T08:33:26.393089Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Pipeline Execution Details",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "800",
-      "ingested": "2025-01-15T10:02:22.127766919Z",
+      "ingested": "2025-10-29T18:18:28.981010544Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 143,
-      "type": "info"
+      "type": [
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant",
