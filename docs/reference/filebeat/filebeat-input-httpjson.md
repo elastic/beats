@@ -17,8 +17,9 @@ This input supports:
 
 * Auth
 
-    * Basic
-    * OAuth2
+  * Basic
+  * {applies_to}`stack: ga 9.3.0` File
+  * OAuth2
 
 * Retrieval at a configurable interval
 * Pagination
@@ -61,7 +62,11 @@ filebeat.inputs:
         value: 5m
 ```
 
-Additionally, it supports authentication via Basic auth, HTTP Headers or oauth2.
+Additionally, it supports authentication via:
+* Basic auth
+* {applies_to}`stack: ga 9.3.0` File-based headers (`auth.file`)
+* HTTP headers
+* OAauth2
 
 Example configurations with authentication:
 
@@ -94,6 +99,16 @@ filebeat.inputs:
     token_url: http://localhost/oauth2/token
     user: user@domain.tld
     password: P@$$W0₹D
+  request.url: http://localhost
+```
+
+```yaml
+filebeat.inputs:
+- type: httpjson
+  auth.file:
+    path: /etc/elastic/token
+    prefix: "Bearer "
+    refresh_interval: 10m
   request.url: http://localhost
 ```
 
@@ -261,6 +276,74 @@ The user to authenticate with.
 The password to use.
 
 
+### `auth.file.enabled` [_auth_file_enabled_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `false`, disables the file auth configuration. Default: `true`.
+
+::::{note}
+File auth settings are disabled if either `enabled` is set to `false` or the `auth.file` section is missing.
+::::
+
+
+### `auth.file.path` [_auth_file_path_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The path to the file that contains the authentication value. The file contents are trimmed before use. This field is required when file auth is enabled.
+
+::::{warning}
+By default, Filebeat requires the file to have `0600` permissions (read/write for owner only) and will fail to start if the file is more permissive. This security measure helps prevent unauthorized access to credentials. To allow files with different permissions, set [`relaxed_permissions`](#_auth_file_relaxed_permissions_2) to `true`.
+
+On Windows, POSIX-style permission checking is not enforced. Ensure file security using NTFS file permissions or Access Control Lists (ACLs).
+::::
+
+
+### `auth.file.header` [_auth_file_header_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The request header that receives the value loaded from `path`. Defaults to `Authorization` when omitted or empty.
+
+
+### `auth.file.prefix` [_auth_file_prefix_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+An optional prefix that is prepended to the trimmed value from `path` before it is sent on the request header. This is commonly used for tokens that require a leading value such as `Bearer `.
+
+
+### `auth.file.refresh_interval` [_auth_file_refresh_interval_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+How frequently Filebeat rereads the file defined by `path` to pick up changes. Defaults to `1m`. The value must be greater than zero when set.
+
+
+### `auth.file.relaxed_permissions` [_auth_file_relaxed_permissions_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `true`, allows the authentication file to have permissions other than `0600`. By default (`false`), Filebeat requires the file to have `0600` permissions and will fail to start if the file is more permissive. This security measure helps prevent unauthorized access to credentials.
+
+::::{warning}
+Setting this to `true` reduces security. Only enable this option if you understand the security implications and cannot set the file to `0600` permissions.
+::::
+
+
 ### `auth.oauth2.enabled` [_auth_oauth2_enabled_2]
 
 When set to `false`, disables the oauth2 configuration. Default: `true`.
@@ -408,6 +491,10 @@ Only one of the credentials settings can be set at once. For more information pl
 ::::
 
 ### `auth.oauth2.okta.dpop_key_pem` [_auth_oauth2_okta_dpop_key_pem_2]
+
+```{applies_to}
+stack: ga 9.2.0
+```
 
 The Demonstrating Proof-of-Possession private key PEM block for your Okta authentication token. When this key is provided, Okta authentication will make use of the [Okta DPoP authentication flow](https://www.okta.com/blog/product-innovation/a-leap-forward-in-token-security-okta-adds-support-for-dpop/).
 

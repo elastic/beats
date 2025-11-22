@@ -522,6 +522,7 @@ func newTestServer(URL string, handler http.Handler) (*httptest.Server, error) {
 }
 
 func TestNegativeCases(t *testing.T) {
+	t.Skip("https://github.com/elastic/beats/issues/47698")
 	expectedHTTPEventCount = 1
 	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)

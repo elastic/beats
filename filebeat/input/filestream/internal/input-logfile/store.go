@@ -285,7 +285,7 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, any)) {
 			//  - 3. Finally, synchronously remove it from the disk store.
 			s.store.UpdateTTL(res, 0)
 			delete(s.store.ephemeralStore.table, res.key)
-			s.store.persistentStore.Remove(res.key)
+			_ = s.store.persistentStore.Remove(res.key)
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", key, newKey, r.cursor)
 		}
 
@@ -341,7 +341,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 	// a Filestream input
 	fromLogInput := map[string]logInputState{}
 	if len(s.identifiersToTakeOver) == 0 {
-		s.store.persistentStore.Each(func(key string, value statestore.ValueDecoder) (bool, error) {
+		_ = s.store.persistentStore.Each(func(key string, value statestore.ValueDecoder) (bool, error) {
 			if strings.HasPrefix(key, "filebeat::logs::") {
 				m := mapstr.M{}
 				if err := value.Decode(&m); err != nil {
@@ -450,7 +450,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 			//  - 3. Finally, synchronously remove it from the disk store.
 			s.store.UpdateTTL(res, 0)
 			delete(s.store.ephemeralStore.table, res.key)
-			s.store.persistentStore.Remove(res.key)
+			_ = s.store.persistentStore.Remove(res.key)
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, r.cursor)
 		}
 
@@ -484,7 +484,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 		// it read when Filebeat was starting, thus "overriding" this delete.
 		// We keep it here because when we remove the Log input we will ensure
 		// the entry is actually remove from the disk store.
-		s.store.persistentStore.Remove(k)
+		_ = s.store.persistentStore.Remove(k)
 		res.Release()
 		s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, res.cursor)
 	}
@@ -507,7 +507,7 @@ func logInputStateFromMapM(m mapstr.M) (logInputState, error) {
 
 	// typeconf.Convert kept failing with an "unsupported" error because
 	// FileStateOS was present, we don't need it, so just delete it.
-	m.Delete("FileStateOS") //nolint:errcheck // The key is always there
+	m.Delete("FileStateOS")
 	if err := typeconv.Convert(&state, m); err != nil {
 		return logInputState{}, fmt.Errorf("cannot convert Log input state: %w", err)
 	}

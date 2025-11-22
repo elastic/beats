@@ -480,7 +480,12 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 
 func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
 	// Fallback to text/plain if content type is blank or unrecognized.
-	parser, err := textparse.New(b, contentType, textMediaType, false, false, false, labels.NewSymbolTable())
+	parser, err := textparse.New(b, contentType, labels.NewSymbolTable(), textparse.ParserOptions{
+		KeepClassicOnClassicAndNativeHistograms: false,
+		OpenMetricsSkipCTSeries:                 false,
+		EnableTypeAndUnitLabels:                 false,
+		FallbackContentType:                     textMediaType,
+	})
 	// This check allows to continue where the content type is blank/invalid but the parser is non-nil. Returns error on all other cases.
 	if parser == nil {
 		if err != nil {
