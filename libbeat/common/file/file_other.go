@@ -28,6 +28,8 @@ import (
 type StateOS struct {
 	Inode  uint64 `json:"inode," struct:"inode"`
 	Device uint64 `json:"device," struct:"device"`
+	UID    uint64 `json:"uid," struct:"uid"`
+	GID    uint64 `json:"gid," struct:"gid"`
 }
 
 // GetOSState returns the FileStateOS for non windows systems
@@ -45,6 +47,8 @@ func GetOSState(info os.FileInfo) StateOS {
 	fileState := StateOS{
 		Inode:  uint64(stat.Ino),
 		Device: uint64(stat.Dev),
+		UID:    uint64(stat.Uid),
+		GID:    uint64(stat.Gid),
 	}
 
 	return fileState
@@ -56,6 +60,22 @@ func (fs StateOS) IsSame(state StateOS) bool {
 }
 
 func (fs StateOS) String() string {
+	var buf [64]byte
+	current := strconv.AppendUint(buf[:0], fs.Inode, 10)
+	current = append(current, '-')
+	current = strconv.AppendUint(current, fs.Device, 10)
+	current = append(current, '-')
+	current = strconv.AppendUint(current, fs.UID, 10)
+	current = append(current, '-')
+	current = strconv.AppendUint(current, fs.GID, 10)
+	return string(current)
+}
+
+// Identifier returns a string representation of inode and device only.
+// Filebeat inodeDeviceIdentifier uses this string when generating its ID. With
+// the addition of UID and GID in the String() method, we need to keep the old
+// behaviour for backward compatibility.
+func (fs StateOS) Identifier() string {
 	var buf [64]byte
 	current := strconv.AppendUint(buf[:0], fs.Inode, 10)
 	current = append(current, '-')

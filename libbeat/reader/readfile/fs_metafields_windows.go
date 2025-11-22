@@ -31,7 +31,7 @@ const (
 	volKey   = "log.file.vol"
 )
 
-func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M) error {
+func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M, includeOwner bool, includeGroup bool) error {
 	osstate := fi.GetOSState()
 	_, err := fields.Put(idxhiKey, strconv.FormatUint(osstate.IdxHi, 10))
 	if err != nil {
