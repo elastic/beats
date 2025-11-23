@@ -8,6 +8,7 @@ require (
 	github.com/elastic/elastic-agent-libs v0.21.2
 	github.com/magefile/mage v1.13.0
 	github.com/stretchr/testify v1.9.0
+	go.uber.org/zap v1.27.0
 	k8s.io/api v0.29.5
 	k8s.io/apimachinery v0.29.5
 	k8s.io/client-go v0.29.5
@@ -62,7 +63,6 @@ require (
 	go.opentelemetry.io/otel/sdk v1.28.0 // indirect
 	go.opentelemetry.io/otel/trace v1.28.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/crypto v0.36.0 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.38.0 // indirect

@@ -31,13 +31,16 @@ import (
 	"github.com/docker/docker/api/types/events"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type MockClient struct {
 	// containers to return on ContainerList call
-	containers [][]container.Summary
+	containers    [][]container.Summary
+	containersErr error
 	// event list to send on Events call
 	events []interface{}
 	// done channel is closed when the client has sent all events
@@ -45,6 +48,9 @@ type MockClient struct {
 }
 
 func (m *MockClient) ContainerList(ctx context.Context, options container.ListOptions) ([]container.Summary, error) {
+	if m.containersErr != nil {
+		return nil, m.containersErr
+	}
 	res := m.containers[0]
 	m.containers = m.containers[1:]
 	return res, nil
@@ -466,6 +472,32 @@ func TestWatcherDieShortID(t *testing.T) {
 	clock.Sleep(watcher.cleanupTimeout + 1*time.Second)
 	watcher.runCleanup()
 	assert.Equal(t, 0, len(watcher.Containers()))
+}
+
+func TestWatcherNoError(t *testing.T) {
+	core, obs := observer.New(zapcore.DebugLevel)
+	l, err := logp.ConfigureWithCoreLocal(logp.DefaultConfig(logp.DefaultEnvironment), core)
+	require.NoError(t, err)
+	client := &MockClient{
+		containersErr: errors.New("test error"),
+		events:        nil,
+		done:          make(chan any),
+	}
+	w, err := NewWatcherWithClient(l, client, 200*time.Millisecond, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	watcher, ok := w.(*watcher)
+	if !ok {
+		t.Fatal("'watcher' was supposed to be pointer to the watcher structure")
+	}
+	clock := newTestClock()
+	watcher.clock = clock
+
+	err = watcher.Start()
+	require.NoError(t, err)
+	watcher.Stop()
+	require.Len(t, obs.FilterMessageSnippet("Failed to call listContainers").All(), 1)
 }
 
 func testWatcher(t *testing.T, containers [][]container.Summary, events []interface{}) (*watcher, chan interface{}) {

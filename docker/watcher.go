@@ -216,7 +216,7 @@ func (w *watcher) Start() error {
 	defer w.Unlock()
 	containers, err := w.listContainers(container.ListOptions{})
 	if err != nil {
-		return err
+		w.log.Errorf("Failed to call listContainers: %v", err)
 	}
 
 	for _, c := range containers {
