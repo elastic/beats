@@ -65,7 +65,7 @@ setup.kibana:
 
 	filebeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.Host, esURL.User.Username(), esPassword, kURL.Host, kUserInfo.Username(), kPassword))
 	filebeat.Start("setup")
-	filebeat.WaitForLogs("Setup called, but no modules enabled.", 10*time.Second)
+	filebeat.WaitLogsContains("Setup called, but no modules enabled.", 10*time.Second)
 }
 
 func TestSetupModulesNoFileset(t *testing.T) {
@@ -104,7 +104,7 @@ logging.level: debug
 
 	filebeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.Host, esURL.User.Username(), esPassword, kURL.Host, kUserInfo.Username(), kPassword))
 	filebeat.Start("setup", "--pipelines")
-	filebeat.WaitForLogs("Number of module configs found: 0", 10*time.Second)
+	filebeat.WaitLogsContains("Number of module configs found: 0", 10*time.Second)
 }
 
 func TestSetupModulesOneEnabled(t *testing.T) {
@@ -143,7 +143,7 @@ logging.level: debug
 
 	filebeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.Host, esURL.User.Username(), esPassword, kURL.Host, kUserInfo.Username(), kPassword))
 	filebeat.Start("setup", "--pipelines", "--modules", "apache")
-	filebeat.WaitForLogs("Exiting: module apache is configured but has no enabled filesets", 10*time.Second)
+	filebeat.WaitLogsContains("Exiting: module apache is configured but has no enabled filesets", 10*time.Second)
 }
 
 func TestSetupModulesOneEnabledOverride(t *testing.T) {
@@ -197,6 +197,6 @@ logging.level: debug
 		}
 	})
 	filebeat.Start("setup", "--pipelines", "--modules", "apache", "--force-enable-module-filesets")
-	filebeat.WaitForLogs("Elasticsearch pipeline loaded.", 10*time.Second)
-	filebeat.WaitForLogs("Elasticsearch pipeline loaded.", 10*time.Second)
+	filebeat.WaitLogsContains("Elasticsearch pipeline loaded.", 10*time.Second)
+	filebeat.WaitLogsContains("Elasticsearch pipeline loaded.", 10*time.Second)
 }

@@ -67,7 +67,6 @@ func newProspector(
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}
 
-	logger = logger.Named("filestream")
 	logger.Debugf("file identity is set to %s", identifier.Name())
 
 	fileprospector := fileProspector{

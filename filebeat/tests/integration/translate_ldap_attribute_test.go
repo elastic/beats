@@ -99,7 +99,7 @@ func TestTranslateGUIDWithLDAP(t *testing.T) {
 
 	// 1. Generate the log file path
 	logFilePath := path.Join(tempDir, "log.log")
-	integration.GenerateLogFile(t, logFilePath, 1, false)
+	integration.WriteLogFile(t, logFilePath, 1, false)
 
 	// 2. Write configuration file and start Filebeat
 	filebeat.WriteConfigFile(
