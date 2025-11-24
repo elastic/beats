@@ -69,9 +69,10 @@ func TestNewReceiver(t *testing.T) {
 					"*",
 				},
 			},
-			"path.home":    t.TempDir(),
-			"http.enabled": true,
-			"http.host":    monitorHost,
+			"path.home":               t.TempDir(),
+			"http.enabled":            true,
+			"http.host":               monitorHost,
+			"management.otel.enabled": true,
 		},
 	}
 
@@ -363,6 +364,7 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 			},
 		},
 	}
+	defer client.CloseIdleConnections()
 	url, err := url.JoinPath("http://unix", endpoint)
 	if err != nil {
 		sb.Reset()

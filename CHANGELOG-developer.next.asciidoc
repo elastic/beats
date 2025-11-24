@@ -117,6 +117,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fixed Fileebat GCP Pub/Sub input integration tests. {pull}45150[45150]
 - `mage BuildSystemTestBinary` now build Otel enabled binaries for Filebeat and Metricbeat {pull}45824[45824]
 - testing/environments/docker/cometd: update base img version {pull}45889[45889]
+- Made Filebeat azureblobstorage input OAuth2 tests compatible with latest version of Azidentity and AzureAD libraries. {pull}47611[47611]
 
 ==== Added
 
@@ -236,6 +237,7 @@ client will aggregate metrics by input on this registry. It'll collect
 unregister input metrics without relaying on the global 'dataset' namespace.{pull}42618[42618] {issue}42761[42761]
 - Make `x-pack/libbeat/management.BeatV2Manager.UpdateStatus` a no-op if there is no change in state. {pull}44716[44716]
 - Remove usages of `inputmon.NewInputRegistry` on filebeat v2 inputs. {pull}43862[43862] {issue}43860[43860]
+- Updated apache/arrow library used in `x-pack/libbeat/reader/parquet` to v18 {issue}45573[45573] {pull}45574[45574]
 
 ==== Deprecated
 

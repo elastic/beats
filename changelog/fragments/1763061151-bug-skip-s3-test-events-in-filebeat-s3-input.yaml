@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: add close to conditional processors if underlying processors have close method
+summary: Skip s3 test events in filebeat s3 input
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
@@ -28,7 +28,7 @@ summary: add close to conditional processors if underlying processors have close
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: all
+component: filebeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
@@ -36,10 +36,10 @@ component: all
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-pr: https://github.com/elastic/beats/pull/46653
+# pr: https://github.com/owner/repo/1234
 
 # AUTOMATED
 # OPTIONAL to manually add other issue URLs
 # Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
 # If not present is automatically filled by the tooling with the issue linked to the PR number.
-issue: https://github.com/elastic/beats/issues/46575
+# issue: https://github.com/owner/repo/1234
