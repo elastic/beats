@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Prevent the watcher from failing in the add_docker_metadata processor. 
+summary: Not being able to start the add_docker_metadata processor is now consistently a non-fatal error when Docker is not available. 
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change

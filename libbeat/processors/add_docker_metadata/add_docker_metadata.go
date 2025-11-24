@@ -95,7 +95,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		if err = watcher.Start(); err != nil {
 			// mark dockerAvailable as false because watcher creation failed
 			dockerAvailable = false
-			log.Infof("unable to start the watcher: %v", err)
+			log.Infof("unable to start the docker watcher: %v", err)
 		}
 	}
 
