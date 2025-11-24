@@ -74,7 +74,7 @@ type azureInputConfig struct {
 	// ---------------------------------------
 
 	// MigrateCheckpoint controls if the input should perform the checkpoint information
-	// migration from v1 to v2 (processor v2 only). Default is false.
+	// migration from v1 to v2 (processor v2 only). Default is true.
 	MigrateCheckpoint bool `config:"migrate_checkpoint"`
 	// ProcessorVersion controls the processor version to use.
 	// Possible values are v1 and v2 (processor v2 only). The default is v2.
@@ -118,6 +118,9 @@ func defaultConfig() azureInputConfig {
 		PartitionReceiveCount:   100,
 		// Default
 		LegacySanitizeOptions: []string{},
+		// Default is true to avoid reprocessing data from the start of the retention
+		// when v2 replaces v1.
+		MigrateCheckpoint: true,
 	}
 }
 
