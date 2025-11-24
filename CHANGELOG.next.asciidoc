@@ -265,6 +265,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 - Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]19
+- Add support for DPoP authentication for the CEL and HTTP JSON inputs. {pull}47441[47441]
 
 *Auditbeat*
 
