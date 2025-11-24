@@ -39,6 +39,11 @@ var (
 		authPasswordStr: authPassword,
 		authKeytabStr:   authKeytab,
 	}
+
+	authTypeInverse = map[AuthType]string{
+		authPassword: authPasswordStr,
+		authKeytab:   authKeytabStr,
+	}
 )
 
 type Config struct {
@@ -68,4 +73,8 @@ func (t *AuthType) Unpack(value string) error {
 	*t = authT
 
 	return nil
+}
+
+func (t *AuthType) String() string {
+	return authTypeInverse[*t]
 }

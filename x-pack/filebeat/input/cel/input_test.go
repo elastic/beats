@@ -1711,6 +1711,96 @@ var inputTests = []struct {
 		},
 	},
 	{
+		name: "file_auth_default_header",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			dir := t.TempDir()
+			secret := "file-secret"
+			path := filepath.Join(dir, "auth_token")
+			if err := os.WriteFile(path, []byte(secret+"\n"), 0o600); err != nil {
+				t.Fatalf("failed to write auth token: %v", err)
+			}
+			config["auth.file.path"] = path
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                   1,
+			"auth.file.prefix":           "Bearer ",
+			"auth.file.refresh_interval": "100ms",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			"Bearer file-secret",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "file_auth_custom_header",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			dir := t.TempDir()
+			tokenPath := filepath.Join(dir, "api_token")
+			if err := os.WriteFile(tokenPath, []byte("secret-api-token\n"), 0o600); err != nil {
+				t.Fatalf("failed to write token file: %v", err)
+			}
+			config["auth.file.path"] = tokenPath
+			config["auth.file.header"] = "X-API-Key"
+			config["auth.file.prefix"] = "ApiToken "
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandlerWithHeader(
+			"ApiToken secret-api-token",
+			"X-API-Key",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
 		name: "digest_accept",
 		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 			s := httptest.NewServer(h)
@@ -2483,6 +2573,18 @@ func tokenAuthHandler(want string, handle http.HandlerFunc) http.HandlerFunc {
 		auth := r.Header.Get("Authorization")
 		if auth != want {
 			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
+			return
+		}
+
+		handle(w, r)
+	}
+}
+
+func tokenAuthHandlerWithHeader(want, headerName string, handle http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		value := r.Header.Get(headerName)
+		if value != want {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusUnauthorized)
 			return
 		}
 
