@@ -93,7 +93,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		dockerAvailable = true
 		log.Debugf("%v: docker environment detected", processorName)
 		if err = watcher.Start(); err != nil {
-			return nil, fmt.Errorf("failed to start watcher: %w", err)
+			log.Infof("unable to start the watcher: %v", err)
 		}
 	}
 
