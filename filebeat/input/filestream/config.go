@@ -114,6 +114,7 @@ func defaultConfig() config {
 		CleanRemoved:   true,
 		HarvesterLimit: 0,
 		IgnoreOlder:    0,
+		FileWatcher:    defaultFileWatcherConfig(), // Config key: prospector.scanner
 	}
 }
 
