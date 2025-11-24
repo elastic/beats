@@ -282,7 +282,7 @@ Using the following configuration:
       storage_account_key: "<redacted>"
       storage_account_connection_string: "<redacted>"
       processor_version: "v1"
-      migrate_checkpoint: yes
+      migrate_checkpoint: true
       start_position: "earliest"
 ```
 
@@ -377,7 +377,7 @@ Stop Filebeat and update the config with the following changes:
       storage_account_key: "<redacted>"
       storage_account_connection_string: "<redacted>" # NOTE: make sure this is set
       processor_version: "v2" # CHANGE: v1 > v2
-      migrate_checkpoint: yes
+      migrate_checkpoint: true
       start_position: "earliest"
 ```
 
@@ -438,7 +438,7 @@ Using the following configuration:
       storage_account_key: "<redacted>"
       storage_account_connection_string: "<redacted>"
       processor_version: "v2"
-      migrate_checkpoint: yes
+      migrate_checkpoint: true
       start_position: "earliest"
 ```
 
@@ -564,7 +564,7 @@ Using the following configuration for all inputs:
       storage_account_key: "<redacted>"
       storage_account_connection_string: "<redacted>"
       processor_version: "v2"
-      migrate_checkpoint: yes
+      migrate_checkpoint: true
       start_position: "earliest"
 ```
 
@@ -783,7 +783,7 @@ Using the following configuration:
       storage_account_key: "<redacted>"
       storage_account_connection_string: "<redacted>"
       processor_version: "v2"
-      migrate_checkpoint: yes
+      migrate_checkpoint: true
       start_position: "earliest"
 ```
 
