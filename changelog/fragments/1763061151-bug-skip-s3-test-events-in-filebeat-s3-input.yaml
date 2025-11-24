@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Add pagination support to the device health metricset in the meraki module
+summary: Skip s3 test events in filebeat s3 input
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
@@ -28,7 +28,7 @@ summary: Add pagination support to the device health metricset in the meraki mod
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: "metricbeat"
+component: filebeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs

@@ -1,8 +1,8 @@
-kind: feature
-
-summary: Add data stream identification to Fleet health status updates.
-
-component: filebeat
+# REQUIRED
+# - bug-fix: fixes a problem in a previous version
+kind: bug-fix
+summary: "[Cloud Connect] Use cluster.metadata.display_name as cluster name if set"
+component: metricbeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs

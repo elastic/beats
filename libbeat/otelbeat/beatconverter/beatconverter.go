@@ -79,6 +79,12 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 			switch key {
 			case "elasticsearch":
 				esConfig := config.MustNewConfigFrom(output)
+
+				// ignore elasticsearch output if it is not enabled
+				if !esConfig.Enabled() {
+					continue
+				}
+
 				esOTelConfig, err := elasticsearchtranslate.ToOTelConfig(esConfig, logger)
 				if err != nil {
 					return fmt.Errorf("cannot convert elasticsearch config: %w", err)
