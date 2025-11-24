@@ -175,14 +175,14 @@ func IntegTest() {
 func GoIntegTest(ctx context.Context) error {
 	// build integration test binary with otel sub command
 	devtools.BuildSystemTestOTelBinary()
-	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
+	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs(ctx))
 }
 
 // GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
 	// build integration test binary with otel sub command
 	devtools.BuildSystemTestOTelBinary()
-	return devtools.GoIntegTestFromHost(ctx, devtools.FIPSOnlyGoTestIntegrationFromHostArgs())
+	return devtools.GoIntegTestFromHost(ctx, devtools.FIPSOnlyGoTestIntegrationFromHostArgs(ctx))
 }
 
 // GoWindowsIntegTest executes the Go windows integration tests.
