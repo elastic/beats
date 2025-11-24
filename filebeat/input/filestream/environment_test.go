@@ -33,7 +33,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	///home/tiago/devel/beats-should-be-closed-fix/libbeat/tests/integration
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -611,7 +610,6 @@ func (c *mockClient) Publish(e beat.Event) {
 
 // PublishAll mocks the Client PublishAll method
 func (c *mockClient) PublishAll(events []beat.Event) {
-	// fmt.Println("=============== Publishing", len(events))
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 

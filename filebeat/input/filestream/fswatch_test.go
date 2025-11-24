@@ -905,7 +905,6 @@ scanner:
 	})
 }
 
-// TODO: REMOVE IT?
 type logEntry struct {
 	timestamp string
 	level     string

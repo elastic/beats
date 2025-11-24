@@ -1114,7 +1114,6 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 			time.Sleep(100 * time.Millisecond)
 		}
 		env.mustRenameFile(testlogName, testlogName+time.Now().Format("2006-01-02T15:04:05.99999999"))
-		// env.WaitLogsContains("has been renamed", 8*time.Second, "rename not detected")
 		r += 1
 	}
 

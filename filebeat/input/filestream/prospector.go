@@ -90,7 +90,6 @@ func (p *fileProspector) Init(
 	newID func(loginp.Source) string,
 ) error {
 	files := p.filewatcher.GetFiles()
-
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
 	// new ID.
@@ -282,9 +281,6 @@ func (p *fileProspector) Init(
 //
 //nolint:dupl // Different prospectors have a similar run method
 func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
-	// log := ctx.Logger.With("prospector", prospectorDebugKey)
-	// log.Debug("Starting prospector")
-	// defer log.Debug("Prospector has stopped")
 	p.logger.Debug("Starting prospector")
 	defer p.logger.Debug("Prospector has stopped")
 
