@@ -778,6 +778,10 @@ func CreateTempDir(t *testing.T, rootDir string) string {
 		rootDir = os.TempDir()
 	}
 
+	rootDir, err := filepath.Abs(rootDir)
+	if err != nil {
+		t.Fatalf("cannot get abs path of root dir: %s", err)
+	}
 	if err := os.MkdirAll(rootDir, 0o750); err != nil {
 		t.Fatalf("error making test dir: %s: %s", rootDir, err)
 	}

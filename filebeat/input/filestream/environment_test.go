@@ -250,34 +250,37 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID stri
 
 // requireMetaInRegistry checks if the expected metadata is saved to the registry.
 func (e *inputTestingEnvironment) waitUntilMetaInRegistry(filename, inputID string, expectedMeta fileMeta) {
-	for {
+	require.EventuallyWithT(e.t, func(t *assert.CollectT) {
 		filepath := e.abspath(filename)
 		fi, err := os.Stat(filepath)
 		if err != nil {
-			continue
+			t.Errorf("cannot stat file: %s", err)
+			return
 		}
 
 		id := getIDFromPath(filepath, inputID, fi)
 		entry, err := e.getRegistryState(id)
 		if err != nil {
-			continue
+			t.Errorf("cannot get registry state: %s", err)
+			return
 		}
 
 		if entry.Meta == nil {
-			continue
+			t.Errorf("entry metadata cannot be nil")
+			return
 		}
 
 		var meta fileMeta
 		err = typeconv.Convert(&meta, entry.Meta)
 		if err != nil {
-			e.t.Fatalf("cannot convert: %+v", err)
+			t.Errorf("cannot convert: %+v", err)
 		}
 
-		if requireMetadataEquals(expectedMeta, meta) {
-			break
+		if !requireMetadataEquals(expectedMeta, meta) {
+			t.Errorf("Metadata is not equal. Expecting:\n%#v\nGot:\n%#v", expectedMeta, meta)
 		}
-		time.Sleep(10 * time.Millisecond)
-	}
+
+	}, 30*time.Second, time.Second, "Metadata differs expected")
 }
 
 func requireMetadataEquals(one, other fileMeta) bool {
