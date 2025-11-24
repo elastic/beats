@@ -313,6 +313,16 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 			return nil, err
 		}
 		client.Transport = tr
+	case authCfg.File.isEnabled():
+		client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
+		if err != nil {
+			return nil, err
+		}
+		tr, err := newFileAuthTransport(authCfg.File, client.Transport)
+		if err != nil {
+			return nil, err
+		}
+		client.Transport = tr
 	case authCfg.OAuth2.isEnabled():
 		client = authCfg.OAuth2.prepared
 		if client == nil {

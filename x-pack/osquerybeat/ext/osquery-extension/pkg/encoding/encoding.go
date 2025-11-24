@@ -84,6 +84,34 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 			continue
 		}
 
+		tag := fieldType.Tag.Get("osquery")
+
+		// Handle embedded structs
+		// If a struct has an embedded struct, the field will be marked as anonymous
+		// and the tag will be empty.  We need to recurse into the embedded struct and merge the results.
+		if fieldType.Anonymous && tag == "" {
+			// Handle pointer to struct if necessary
+			if fieldValue.Kind() == reflect.Ptr {
+				if fieldValue.IsNil() {
+					continue
+				}
+				fieldValue = fieldValue.Elem()
+			}
+
+			// Only recurse if it's a struct
+			if fieldValue.Kind() == reflect.Struct {
+				embeddedMap, err := MarshalToMapWithFlags(fieldValue.Interface(), flags)
+				if err != nil {
+					return nil, err
+				}
+				// Merge the embedded results into the current map
+				for k, v := range embeddedMap {
+					result[k] = v
+				}
+				continue // Skip the rest of the loop for this field
+			}
+		}
+
 		key := fieldType.Tag.Get("osquery")
 		switch key {
 		case "-":
