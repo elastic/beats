@@ -131,30 +131,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, fmt.Errorf("error unpacking config data: %w", err)
 	}
 
-<<<<<<< HEAD
-	logpConfig := logp.Config{}
-	logpConfig.AddCaller = true
-	logpConfig.Beat = b.Info.Beat
-	logpConfig.Files.MaxSize = 1
-
-	if b.Config.Logging == nil {
-		b.Config.Logging = config.NewConfig()
-	}
-
-	if err := b.Config.Logging.Unpack(&logpConfig); err != nil {
-		return nil, fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
-	}
-
-	b.Info.Logger, err = logp.ConfigureWithCoreLocal(logpConfig, core)
-	if err != nil {
-		return nil, fmt.Errorf("error configuring beats logp: %w", err)
-	}
-
-	// extracting it here for ease of use
-	logger := b.Info.Logger
-
-=======
->>>>>>> b80d1e914 ([beatreceiver] Do not require specifiying otelconsumer output (#47693))
 	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version, logger)
 	if err != nil {
 		return nil, fmt.Errorf("error setting up instrumentation: %w", err)
