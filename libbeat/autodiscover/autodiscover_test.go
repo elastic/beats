@@ -18,12 +18,6 @@
 package autodiscover
 
 import (
-<<<<<<< HEAD
-	"encoding/json"
-=======
-	"bytes"
-	"errors"
->>>>>>> b5789af35 (refactor: replace lopg.ObserverLogs with logptest (#45734))
 	"fmt"
 	"reflect"
 	"strings"
