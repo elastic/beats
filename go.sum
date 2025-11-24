@@ -360,8 +360,8 @@ github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 h1:lnDkqiRFKm0rxdljqr
 github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3/go.mod h1:aPqzac6AYkipvp4hufTyMj5PDIphF3+At8zr7r51xjY=
 github.com/elastic/ebpfevents v0.8.0 h1:rIrhj3SSsrwSOIv/MderZd0ZpbCLT4pudBtfnAbj3Oo=
 github.com/elastic/ebpfevents v0.8.0/go.mod h1:b6nLyQ8SA1RolRkP/nyGN6VAKqIObSJj8c2mhDGoNmg=
-github.com/elastic/elastic-agent-autodiscover v0.10.1-0.20251123164809-5ce310ad7f28 h1:OQAGROSGiLBArIzrM+sO/AhwF/hq0lg8ggGFJ/8S6/Y=
-github.com/elastic/elastic-agent-autodiscover v0.10.1-0.20251123164809-5ce310ad7f28/go.mod h1:ry+IS/gzQlNYenOLvf/IBtTYajyQJkvs5hZo42e1E1M=
+github.com/elastic/elastic-agent-autodiscover v0.10.1 h1:Hafw63XFDB0PlQYpkJJVGp4/h5uSwzb+UdNupJU3w0U=
+github.com/elastic/elastic-agent-autodiscover v0.10.1/go.mod h1:ry+IS/gzQlNYenOLvf/IBtTYajyQJkvs5hZo42e1E1M=
 github.com/elastic/elastic-agent-client/v7 v7.15.0 h1:nDB7v8TBoNuD6IIzC3z7Q0y+7bMgXoT2DsHfolO2CHE=
 github.com/elastic/elastic-agent-client/v7 v7.15.0/go.mod h1:6h+f9QdIr3GO2ODC0Y8+aEXRwzbA5W4eV4dd/67z7nI=
 github.com/elastic/elastic-agent-libs v0.26.0 h1:ne+cNu2fleCzHm2z0tkAKwVH0EByJRi7r7TgIr3YKio=
