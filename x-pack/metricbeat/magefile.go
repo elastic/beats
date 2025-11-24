@@ -229,23 +229,6 @@ func GoIntegTest(ctx context.Context) error {
 	}
 
 	if !devtools.IsInIntegTestEnv() {
-<<<<<<< HEAD
-=======
-		// build integration test binary with otel sub command
-		devtools.BuildSystemTestOTelBinary()
-		args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
-		// ES_USER must be admin in order for the Go Integration tests to function because they require
-		// indices:data/read/search
-		args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
-		args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
-		// run integration test from home directory
-		args.Packages = []string{"./tests/integration/"}
-		err := devtools.GoIntegTestFromHost(ctx, args)
-		if err != nil {
-			return err
-		}
-
->>>>>>> d3197039d (Make Go linter happy (#47106))
 		mg.SerialDeps(Fields, Dashboards)
 	}
 	return devtools.GoTestIntegrationForModule(ctx)

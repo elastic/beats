@@ -190,20 +190,6 @@ func DefaultGoTestIntegrationFromHostArgs(ctx context.Context) GoTestArgs {
 	return args
 }
 
-<<<<<<< HEAD
-=======
-// FIPSOnlyGoTestIngrationFromHostArgs returns a default set of arguments for running
-// all integration tests from the host system (outside the docker network) along
-// with the GODEBUG=fips140=only arg set.
-func FIPSOnlyGoTestIntegrationFromHostArgs(ctx context.Context) GoTestArgs {
-	args := DefaultGoTestIntegrationArgs(ctx)
-	args.Tags = append(args.Tags, "requirefips")
-	args.Env = WithGoIntegTestHostEnv(args.Env)
-	args.Env["GODEBUG"] = "fips140=only"
-	return args
-}
-
->>>>>>> d3197039d (Make Go linter happy (#47106))
 // GoTestIntegrationArgsForPackage returns a default set of arguments for running
 // module integration tests. We tag integration test files with 'integration'.
 func GoTestIntegrationArgsForPackage(pkg string) GoTestArgs {
