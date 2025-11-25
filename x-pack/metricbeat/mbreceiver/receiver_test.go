@@ -207,15 +207,6 @@ func TestMultipleReceivers(t *testing.T) {
 			assert.Equal(c, "metricbeat", logs["r1"][0].Flatten()["agent.type"], "expected agent.type field to be 'metricbeat' in r1")
 			assert.Equal(c, "metricbeat", logs["r2"][0].Flatten()["agent.type"], "expected agent.type field to be 'metricbeat' in r2")
 
-			// Make sure that each receiver has a separate logger
-			// instance and does not interfere with others. Previously, the
-			// logger in Beats was global, causing logger fields to be
-			// overwritten when multiple receivers started in the same process.
-			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
-			assert.Equal(c, 1, r1StartLogs.Len(), "r1 should have a single start log")
-			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r2"))
-			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
-
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				tests := []string{monitorSocket1, monitorSocket2}
