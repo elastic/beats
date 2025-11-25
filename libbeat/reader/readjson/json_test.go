@@ -391,6 +391,21 @@ func TestMergeJSONFields(t *testing.T) {
 				},
 			},
 		},
+		"key collision with overwrite": {
+			Data: mapstr.M{
+				"log.level": "info",
+				"log": mapstr.M{
+					"logger": "agent_component.cli",
+				},
+			},
+			JSONConfig: Config{OverwriteKeys: true, AddErrorKey: true, IgnoreDecodingError: true},
+			ExpectedItems: mapstr.M{
+				"log.level": "info",
+				"log": mapstr.M{
+					"logger": "agent_component.cli",
+				},
+			},
+		},
 	}
 
 	for name, test := range tests {
