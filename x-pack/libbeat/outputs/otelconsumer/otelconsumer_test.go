@@ -271,13 +271,8 @@ func TestPublish(t *testing.T) {
 		batch := outest.NewBatch(event1)
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			cm := client.FromContext(ctx).Metadata
-<<<<<<< HEAD
 			assert.Equal(t, beatInfo.Beat, cm.Get(beatNameCtxKey)[0])
 			assert.Equal(t, beatInfo.Version, cm.Get(beatVersionCtxtKey)[0])
-=======
-			assert.Equal(t, beatInfo.Beat, cm.Get(otelctx.BeatNameCtxKey)[0])
-			assert.Equal(t, beatInfo.Version, cm.Get(otelctx.BeatVersionCtxKey)[0])
->>>>>>> ca1c17bca (remove otel.component.id and otel.component.kind fields from beat receivers (#47729))
 			return nil
 		})
 
@@ -286,76 +281,4 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
-<<<<<<< HEAD
-	t.Run("sets otel specific-fields", func(t *testing.T) {
-		testCases := []struct {
-			name                  string
-			componentID           string
-			componentKind         string
-			expectedComponentID   string
-			expectedComponentKind string
-		}{
-			{
-				name:                  "sets beat component ID",
-				componentID:           "filebeatreceiver/1",
-				expectedComponentID:   "filebeatreceiver/1",
-				expectedComponentKind: "receiver",
-			},
-		}
-
-		for _, tc := range testCases {
-			t.Run(tc.name, func(t *testing.T) {
-				event := beat.Event{
-					Fields: mapstr.M{
-						"field": 1,
-						"agent": mapstr.M{},
-					},
-					Meta: mapstr.M{
-						"_id": "abc123",
-					},
-				}
-				ch := make(chan plog.Logs, 1)
-				batch := outest.NewBatch(event)
-				var countLogs int
-				otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
-					countLogs = countLogs + ld.LogRecordCount()
-					ch <- ld
-					return nil
-				})
-				otelConsumer.beatInfo.ComponentID = tc.componentID
-				err := otelConsumer.Publish(ctx, batch)
-				assert.NoError(t, err)
-				assert.Len(t, batch.Signals, 1)
-				assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
-				assert.Equal(t, len(batch.Events()), countLogs, "all events should be consumed")
-				log := <-ch
-				for i := 0; i < log.ResourceLogs().Len(); i++ {
-					resourceLog := log.ResourceLogs().At(i)
-					for j := 0; j < resourceLog.ScopeLogs().Len(); j++ {
-						scopeLog := resourceLog.ScopeLogs().At(j)
-						for k := 0; k < scopeLog.LogRecords().Len(); k++ {
-							logRecord := scopeLog.LogRecords().At(k)
-							body := logRecord.Body().Map()
-
-							// Traverse nested "agent.otelcol.component" structure
-							agentVal, ok := body.Get("agent")
-							require.True(t, ok, "expected 'agent' in log body")
-
-							agentMap := agentVal.Map()
-							idVal, ok := agentMap.Get("otelcol.component.id")
-							require.True(t, ok, "expected 'agent.otelcol.component.id' in log body")
-							assert.Equal(t, tc.expectedComponentID, idVal.AsString())
-
-							kindVal, ok := agentMap.Get("otelcol.component.kind")
-							require.True(t, ok, "expected 'agent.otelcol.component.kind' in log body")
-							assert.Equal(t, tc.expectedComponentKind, kindVal.AsString())
-						}
-					}
-				}
-
-			})
-		}
-	})
-=======
->>>>>>> ca1c17bca (remove otel.component.id and otel.component.kind fields from beat receivers (#47729))
 }
