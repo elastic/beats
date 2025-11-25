@@ -204,12 +204,6 @@ func TestMultipleReceivers(t *testing.T) {
 			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 			}, "expected at least one ingest log for each receiver, got logs: %v", logs)
-<<<<<<< HEAD
-			assert.Equal(c, "metricbeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r1 log record")
-			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r1 log record")
-			assert.Equal(c, "metricbeatreceiver/r2", logs["r2"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r2 log record")
-			assert.Equal(c, "receiver", logs["r2"][0].Flatten()["agent.otelcol.component.kind"], "expected otelcol.component.kind field in r2 log record")
-=======
 			assert.Equal(c, "metricbeat", logs["r1"][0].Flatten()["agent.type"], "expected agent.type field to be 'metricbeat' in r1")
 			assert.Equal(c, "metricbeat", logs["r2"][0].Flatten()["agent.type"], "expected agent.type field to be 'metricbeat' in r2")
 
@@ -222,7 +216,6 @@ func TestMultipleReceivers(t *testing.T) {
 			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r2"))
 			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
 
->>>>>>> ca1c17bca (remove otel.component.id and otel.component.kind fields from beat receivers (#47729))
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				tests := []string{monitorSocket1, monitorSocket2}
