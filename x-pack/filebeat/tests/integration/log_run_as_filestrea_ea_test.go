@@ -62,12 +62,11 @@ func TestLogAsFilestreamEA(t *testing.T) {
 				{
 					Id: "log-input",
 					Source: integration.RequireNewStruct(t, map[string]any{
-						"id":                   "run-as-filestream",
-						"enabled":              true,
-						"type":                 "log",
-						"paths":                []any{logfile},
-						"run_as_filestream":    true,
-						"allow_deprecated_use": true,
+						"id":                "run-as-filestream",
+						"enabled":           true,
+						"type":              "log",
+						"paths":             []any{logfile},
+						"run_as_filestream": true,
 					}),
 				},
 			},

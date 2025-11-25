@@ -1,7 +1,6 @@
 filebeat.inputs:
   - type: log
     id: test-run-as-filestream
-    allow_deprecated_use: true
     file_identity.fingerprint: ~
     prospector.scanner:
       fingerprint.enabled: true
