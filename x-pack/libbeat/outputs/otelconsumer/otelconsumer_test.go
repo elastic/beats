@@ -271,8 +271,13 @@ func TestPublish(t *testing.T) {
 		batch := outest.NewBatch(event1)
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			cm := client.FromContext(ctx).Metadata
+<<<<<<< HEAD
 			assert.Equal(t, beatInfo.Beat, cm.Get(beatNameCtxKey)[0])
 			assert.Equal(t, beatInfo.Version, cm.Get(beatVersionCtxtKey)[0])
+=======
+			assert.Equal(t, beatInfo.Beat, cm.Get(otelctx.BeatNameCtxKey)[0])
+			assert.Equal(t, beatInfo.Version, cm.Get(otelctx.BeatVersionCtxKey)[0])
+>>>>>>> ca1c17bca (remove otel.component.id and otel.component.kind fields from beat receivers (#47729))
 			return nil
 		})
 
@@ -281,6 +286,7 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
+<<<<<<< HEAD
 	t.Run("sets otel specific-fields", func(t *testing.T) {
 		testCases := []struct {
 			name                  string
@@ -350,4 +356,6 @@ func TestPublish(t *testing.T) {
 			})
 		}
 	})
+=======
+>>>>>>> ca1c17bca (remove otel.component.id and otel.component.kind fields from beat receivers (#47729))
 }
