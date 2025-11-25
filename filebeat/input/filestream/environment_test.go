@@ -373,7 +373,6 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 			keys = append(keys, key)
 			return false, nil
 		})
-		e.t.Logf("keys in store: %v", keys)
 
 		return registryEntry{},
 			fmt.Errorf("error when getting expected key '%s' from store: %w",

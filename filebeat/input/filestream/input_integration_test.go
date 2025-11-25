@@ -982,9 +982,9 @@ func TestFilestreamTruncate(t *testing.T) {
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id": id,
 		"paths": []string{
-			env.abspath("*"),
+			env.abspath("test.log*"),
 		},
-		"prospector.scanner.check_interval":      "1ms",
+		"prospector.scanner.check_interval":      "250ms",
 		"prospector.scanner.resend_on_touch":     "true",
 		"prospector.scanner.symlinks":            "true",
 		"prospector.scanner.fingerprint.enabled": false,
@@ -1133,7 +1133,7 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id": id,
 		"paths": []string{
-			env.abspath("*"),
+			env.abspath("test.log*"),
 		},
 		"prospector.scanner.check_interval":      "1ms",
 		"close.on_state_change.check_interval":   "1ms",
@@ -1145,8 +1145,6 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, id, inp)
-
-	time.Sleep(1 * time.Second)
 
 	env.mustWriteToFile(testlogName, []byte("Line 1\n"))
 	env.waitUntilEventCount(1)
