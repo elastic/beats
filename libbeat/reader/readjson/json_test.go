@@ -89,6 +89,16 @@ func TestUnmarshal(t *testing.T) {
 				"b": float64(-1),
 			},
 		},
+		{
+			Name:  "Key collision",
+			Input: `{"log.level":"info","log":{"source":"connectors-py-default"},"log":{"logger":"agent_component.cli"}}`,
+			Output: map[string]interface{}{
+				"log.level": "info",
+				"log": map[string]interface{}{
+					"logger": "agent_component.cli",
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -350,6 +360,36 @@ func TestMergeJSONFields(t *testing.T) {
 			Data:          mapstr.M{"json": mapstr.M{"a.b": mapstr.M{"c": "c"}, "a.b.d": "d"}},
 			JSONConfig:    Config{ExpandKeys: true, KeysUnderRoot: true},
 			ExpectedItems: mapstr.M{"a": mapstr.M{"b": mapstr.M{"c": "c", "d": "d"}}},
+		},
+		"key collision with expanded keys": {
+			Data: mapstr.M{
+				"log.level": "info",
+				"log": mapstr.M{
+					"logger": "agent_component.cli",
+				},
+			},
+			JSONConfig: Config{ExpandKeys: true},
+			ExpectedItems: mapstr.M{
+				"log.level": "info",
+				"log": mapstr.M{
+					"logger": "agent_component.cli",
+				},
+			},
+		},
+		"key collision without expanded keys": {
+			Data: mapstr.M{
+				"log.level": "info",
+				"log": mapstr.M{
+					"logger": "agent_component.cli",
+				},
+			},
+			JSONConfig: Config{ExpandKeys: false},
+			ExpectedItems: mapstr.M{
+				"log.level": "info",
+				"log": mapstr.M{
+					"logger": "agent_component.cli",
+				},
+			},
 		},
 	}
 
