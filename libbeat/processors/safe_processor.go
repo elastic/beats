@@ -19,7 +19,8 @@ package processors
 
 import (
 	"errors"
-	"sync/atomic"
+	"fmt"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -27,24 +28,47 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-var ErrClosed = errors.New("attempt to use a closed processor")
+var (
+	ErrClosed           = errors.New("attempt to use a closed processor")
+	ErrPathsAlreadySet  = errors.New("attempt to set paths twice")
+	ErrSetPathsOnClosed = errors.New("attempt to set paths on closed processor")
+)
+
+type state = int
+
+const (
+	stateInit state = iota
+	stateSetPaths
+	stateClosed
+)
 
 type SafeProcessor struct {
 	beat.Processor
-	closed uint32
+
+	mu    sync.RWMutex
+	state state
+}
+
+type safeProcessorWithClose struct {
+	SafeProcessor
 }
 
 // Run allows to run processor only when `Close` was not called prior
 func (p *SafeProcessor) Run(event *beat.Event) (*beat.Event, error) {
-	if atomic.LoadUint32(&p.closed) == 1 {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	if p.state == stateClosed {
 		return nil, ErrClosed
 	}
 	return p.Processor.Run(event)
 }
 
 // Close makes sure the underlying `Close` function is called only once.
-func (p *SafeProcessor) Close() (err error) {
-	if atomic.CompareAndSwapUint32(&p.closed, 0, 1) {
+func (p *safeProcessorWithClose) Close() (err error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.state != stateClosed {
+		p.state = stateClosed
 		return Close(p.Processor)
 	}
 	logp.L().Warnf("tried to close already closed %q processor", p.String())
@@ -53,10 +77,22 @@ func (p *SafeProcessor) Close() (err error) {
 
 func (p *SafeProcessor) SetPaths(paths *paths.Path) error {
 	setPather, ok := p.Processor.(SetPather)
-	if ok {
-		return setPather.SetPaths(paths)
+	if !ok {
+		return nil
 	}
-	return nil
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	switch p.state {
+	case stateInit:
+		p.state = stateSetPaths
+		return setPather.SetPaths(paths)
+	case stateSetPaths:
+		return ErrPathsAlreadySet
+	case stateClosed:
+		return ErrSetPathsOnClosed
+	}
+	return fmt.Errorf("unknown state: %d", p.state)
 }
 
 // SafeWrap makes sure that the processor handles all the required edge-cases.
@@ -76,14 +112,17 @@ func SafeWrap(constructor Constructor) Constructor {
 		if err != nil {
 			return nil, err
 		}
-		// if the processor does not implement `Closer`
-		// it does not need a wrap
+		// if the processor does not implement `Closer` it does not need a wrap
 		if _, ok := processor.(Closer); !ok {
+			// if SetPaths is implemented, ensure single call of SetPaths
+			if _, ok = processor.(SetPather); ok {
+				return &SafeProcessor{Processor: processor}, nil
+			}
 			return processor, nil
 		}
 
-		return &SafeProcessor{
-			Processor: processor,
+		return &safeProcessorWithClose{
+			SafeProcessor: SafeProcessor{Processor: processor},
 		}, nil
 	}
 }
