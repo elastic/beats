@@ -65,7 +65,7 @@ func TestDataShapeOTelVSClassicE2E(t *testing.T) {
 
 	// Agent does not support `index` setting, while beats does.
 	//	Our focus is on agent classic vs otel mode comparison, so we do not test `index` for filebeat
-	var beatsCfgFile = `
+	beatsCfgFile := `
 filebeat.inputs:
   - type: filestream
     id: filestream-input-id
@@ -175,8 +175,6 @@ service:
 		"log.file.inode",
 		"log.file.path",
 		// only present in beats receivers
-		"agent.otelcol.component.id",
-		"agent.otelcol.component.kind",
 		"log.file.device_id",
 		"log.file.fingerprint",
 	}
@@ -272,7 +270,6 @@ service:
 	require.NoError(t, err, "failed to read otel events")
 	require.Equal(t, numEvents, len(otelEvents),
 		"different number of events: sent=%d, get=%d", numEvents, len(otelEvents))
-
 }
 
 func generateEvents(numEvents int) []string {
@@ -381,10 +378,8 @@ func compareOutputFiles(t *testing.T, fbFilePath, otelFilePath string, ignoredFi
 		oteltest.AssertMapsEqual(t, fbEvent.data, otelEvent.data, ignoredFields,
 			fmt.Sprintf("event comparison failed for ID %s (line %d)", fbEvent.id, i))
 
-		assert.Equal(t, "filebeatreceiver", otelEvent.data.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-		assert.Equal(t, "receiver", otelEvent.data.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
-		assert.NotContains(t, fbEvent.data.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in filebeat log record")
-		assert.NotContains(t, fbEvent.data.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in filebeat log record")
+		assert.Equal(t, "filebeat", otelEvent.data.Flatten()["agent.type"], "expected agent.type to be 'filebeat' in otel data")
+		assert.Equal(t, "filebeat", fbEvent.data.Flatten()["agent.type"], "expected agent.type to be 'filebeat' in filebeat data")
 	}
 }
 
