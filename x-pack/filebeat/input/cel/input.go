@@ -46,6 +46,17 @@ import (
 	"github.com/google/cel-go/ext"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/useragent"
+	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/go-concert/timed"
+	"github.com/elastic/mito/lib"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -57,16 +68,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-	"github.com/elastic/elastic-agent-libs/transport"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
-	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/timed"
-	"github.com/elastic/mito/lib"
 )
 
 const (
@@ -968,8 +969,6 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		if err != nil {
 			return nil, nil, nil, err
 		}
-
-		//return authClient, trace, nil, nil
 	} else {
 
 		c.Transport = userAgentDecorator{
@@ -978,14 +977,11 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}
 	}
 
-	log.Infof("env context %v", env)
-
-	log.Infof("env context %v", env)
 	resource := resource.NewWithAttributes(
 		semconv.SchemaURL, GetResourceAttributes(env, cfg)...,
 	)
 
-	log.Infof("created cel input resource", resource.String())
+	log.Infof("created cel input resource %s", resource.String())
 	exporter, exporterType, err := otel.GetGlobalExporterFactory(log).GetExporter(ctx)
 	if err != nil {
 		log.Errorw("failed to get exporter", "error", err)
@@ -994,20 +990,20 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		log.Errorw("failed to get collection period", "error", err)
 	}
 	log.Infof("created OTEL cel input exporter %s for input %s", exporterType, env.IDWithoutName)
-	otelMetrics, otelTransport, err := otel.NewOTELCELMetrics(log, env.Agent.UserAgent, *resource, c.Transport, exporter, flattenHistogram())
+	otelMetrics, otelTransport, err := otel.NewOTELCELMetrics(log, env.IDWithoutName, *resource, c.Transport, exporter, UseNonExponentialHistograms())
 	c.Transport = otelTransport
 	return c, trace, otelMetrics, nil
 }
 
-func flattenHistogram() bool {
-	_, ok := os.LookupEnv("APM_OTLP")
+func UseNonExponentialHistograms() bool {
+	_, ok := os.LookupEnv("USE_NON_EXPONENTIAL_HISTOGRAMS")
 	return ok
 }
 
 func GetResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
 	attrs := []attribute.KeyValue{semconv.ServiceInstanceID(env.IDWithoutName),
-		attribute.String("package.name", cfg.GetPackageName()),
-		attribute.String("package.version", cfg.GetPackageVersion()),
+		attribute.String("package.name", cfg.GetPackageStringValue("name")),
+		attribute.String("package.version", cfg.GetPackageStringValue("version")),
 		attribute.String("package.datastream", cfg.DataStream),
 		attribute.String("agent.version", env.Agent.Version),
 		attribute.String("agent.id", env.Agent.ID.String())}

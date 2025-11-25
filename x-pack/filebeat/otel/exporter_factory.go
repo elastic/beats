@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
@@ -198,24 +199,27 @@ func GetExporterTypeFromEnv() ExporterType {
 	*/
 
 	// this is the expected setup for agentless
-	_, ok := os.LookupEnv("OTEL_EXPORTER_OTLP_ENDPOINT")
-	if ok {
-		protocol, ok := os.LookupEnv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL")
-		if ok && strings.Contains(strings.ToLower(protocol), string(GRPC)) {
-			return GRPC
-		}
-		if ok && strings.Contains(strings.ToLower(protocol), string(HTTP)) {
-			return HTTP
-		}
-		// fall through in case we are debugging in console
-	}
-
-	// we can also export to the console for debugging purposes
 	exporter, ok := os.LookupEnv("OTEL_METRICS_EXPORTER")
 	if ok && exporter == "console" {
 		return console
 	}
-	// Allow the integration to start with no metrics.
+	if ok && exporter == "none" {
+		return None
+	}
+	if ok && exporter == "prometheus" {
+		return None
+	}
+
+	_, ok = os.LookupEnv("OTEL_EXPORTER_OTLP_ENDPOINT")
+	if ok {
+		protocol, ok := os.LookupEnv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL")
+		if !ok || (ok && strings.Contains(strings.ToLower(protocol), string(GRPC))) {
+			return GRPC
+		}
+		if ok && strings.ToLower(protocol) == "http/protobuf" {
+			return HTTP
+		}
+	}
 	return None
 
 }

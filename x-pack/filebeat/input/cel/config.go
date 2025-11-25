@@ -74,7 +74,7 @@ type config struct {
 	Meta map[string]interface{} `config:"meta"`
 }
 
-func (c config) GetPackageName() string {
+func (c config) GetPackageStringValue(key string) string {
 	if c.Meta == nil {
 		return "unknown"
 	}
@@ -82,26 +82,19 @@ func (c config) GetPackageName() string {
 	if !ok {
 		return "unknown"
 	}
-	name, ok := packageinfo.(map[string]interface{})["name"]
+	pmap, ok := packageinfo.(map[string]interface{})
 	if !ok {
 		return "unknown"
 	}
-	return name.(string)
-}
-
-func (c config) GetPackageVersion() string {
-	if c.Meta == nil {
-		return "unknown"
-	}
-	packageinfo, ok := c.Meta["package"]
+	value, ok := pmap[key]
 	if !ok {
 		return "unknown"
 	}
-	version, ok := packageinfo.(map[string]interface{})["version"]
+	valueString, ok := value.(string)
 	if !ok {
 		return "unknown"
 	}
-	return version.(string)
+	return valueString
 }
 
 type redact struct {

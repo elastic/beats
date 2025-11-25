@@ -16,7 +16,7 @@ func NewConcurentEncoder(encoder stdoutmetric.Encoder) *ConcurentEncoder {
 		encoder: encoder,
 	}
 }
-func (ce ConcurentEncoder) Encode(v any) error {
+func (ce *ConcurentEncoder) Encode(v any) error {
 	ce.lock.Lock()
 	defer ce.lock.Unlock()
 	return ce.encoder.Encode(v)
