@@ -21,6 +21,7 @@ This input supports:
 
     * Basic
     * Digest
+    * {applies_to}`stack: ga 9.3.0` File
     * OAuth2
 
 * Retrieval at a configurable interval
@@ -271,9 +272,10 @@ Additionally, it supports authentication via:
 * Basic Authentication
 * Digest Authentication {applies_to}`stack: ga 8.12.0`
 * OAuth2
+* file-based headers {applies_to}`stack: ga 9.3.0`
 * token authentication {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
 
-As described in Mito's [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) documentation, configuration for Basic Authentication or token authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication or OAuth2 will be used for all requests made from CEL.
+As described in Mito's [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) documentation, configuration for Basic Authentication or token authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication, file-based headers or OAuth2 will be used for all requests made from CEL.
 
 Example configurations with authentication:
 
@@ -314,6 +316,16 @@ filebeat.inputs:
     token_url: http://localhost/oauth2/token
     user: user@domain.tld
     password: P@$$W0₹D
+  resource.url: http://localhost
+```
+
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.file:
+    path: /etc/elastic/token
+    prefix: "Bearer "
+    refresh_interval: 10m
   resource.url: http://localhost
 ```
 
@@ -557,6 +569,74 @@ stack: ga 8.12.0
 When set to `true`, Digest Authentication challenges are not reused.
 
 
+### `auth.file.enabled` [_auth_file_enabled]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `false`, disables the file auth configuration. Default: `true`.
+
+::::{note}
+File auth settings are disabled if either `enabled` is set to `false` or the `auth.file` section is missing.
+::::
+
+
+### `auth.file.path` [_auth_file_path]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The path to the file containing the authentication value. The file contents are trimmed before use. This field is required when file auth is enabled.
+
+::::{warning}
+By default, Filebeat requires the file to have `0600` permissions (read/write for owner only) and will fail to start if the file is more permissive. This security measure helps prevent unauthorized access to credentials. To allow files with different permissions, set [`relaxed_permissions`](#_auth_file_relaxed_permissions) to `true`.
+
+On Windows, POSIX-style permission checking is not enforced. Ensure file security using NTFS file permissions or Access Control Lists (ACLs).
+::::
+
+
+### `auth.file.header` [_auth_file_header]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The request header that receives the value loaded from `path`. Defaults to `Authorization` when omitted or empty.
+
+
+### `auth.file.prefix` [_auth_file_prefix]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+An optional prefix that is prepended to the trimmed value from `path` before it is set on the request header. This is commonly used for tokens that require a leading value such as `Bearer `.
+
+
+### `auth.file.refresh_interval` [_auth_file_refresh_interval]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+How frequently Filebeat rereads the file defined by `path` to pick up changes. Defaults to `1m`. The value must be greater than zero when set.
+
+
+### `auth.file.relaxed_permissions` [_auth_file_relaxed_permissions]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `true`, allows the authentication file to have permissions other than `0600`. By default (`false`), Filebeat requires the file to have `0600` permissions and will fail to start if the file is more permissive. This security measure helps prevent unauthorized access to credentials.
+
+::::{warning}
+Setting this to `true` reduces security. Only enable this option if you understand the security implications and cannot set the file to `0600` permissions.
+::::
+
+
 ### `auth.oauth2.enabled` [_auth_oauth2_enabled]
 
 When set to `false`, disables the oauth2 configuration. Default: `true`.
@@ -712,6 +792,16 @@ The RSA JWK private key PEM block for your Okta Service App which is used for in
 ::::{note}
 Only one of the credentials settings can be set at once. For more information please refer to [https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/](https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/)
 ::::
+
+
+
+### `auth.oauth2.okta.dpop_key_pem` [_auth_oauth2_okta_dpop_key_pem]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+The Demonstrating Proof-of-Possession private key PEM block for your Okta authentication token. When this key is provided, Okta authentication will make use of the [Okta DPoP authentication flow](https://www.okta.com/blog/product-innovation/a-leap-forward-in-token-security-okta-adds-support-for-dpop/).
 
 
 

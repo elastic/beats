@@ -56,18 +56,16 @@ func TestNewReceiver(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
 					"*",
 				},
 			},
-			"path.home":    t.TempDir(),
-			"http.enabled": true,
-			"http.host":    monitorHost,
+			"path.home":               t.TempDir(),
+			"http.enabled":            true,
+			"http.host":               monitorHost,
+			"management.otel.enabled": true,
 		},
 	}
 
@@ -138,9 +136,6 @@ func TestMultipleReceivers(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
@@ -165,9 +160,6 @@ func TestMultipleReceivers(t *testing.T) {
 						"metricsets": []string{"cpu"},
 					},
 				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
 			},
 			"logging": map[string]any{
 				"level": "debug",
@@ -256,6 +248,7 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 			},
 		},
 	}
+	defer client.CloseIdleConnections()
 	url, err := url.JoinPath("http://unix", endpoint)
 	if err != nil {
 		sb.Reset()
@@ -334,9 +327,6 @@ func BenchmarkFactory(b *testing.B) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "info",
 				"selectors": []string{
@@ -405,9 +395,6 @@ func TestReceiverDegraded(t *testing.T) {
 							},
 						},
 					},
-					"output": map[string]any{
-						"otelconsumer": map[string]any{},
-					},
 					"path.home": t.TempDir(),
 				},
 			}
@@ -442,10 +429,7 @@ func TestReceiverHook(t *testing.T) {
 				},
 			},
 			"management.otel.enabled": true,
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
-			"path.home": t.TempDir(),
+			"path.home":               t.TempDir(),
 		},
 	}
 	receiverSettings := receiver.Settings{

@@ -29,6 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -87,20 +88,50 @@ processors:
 	testCaseName := uuid.Must(uuid.NewV4()).String()
 	events := generateEvents(numEvents)
 
-	// start filebeat in otel mode
-	fbOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
-
-	inputFilePath := filepath.Join(fbOTel.TempDir(), "event.json")
+	tmpdir := t.TempDir()
+	inputFilePath := filepath.Join(tmpdir, "event.json")
 	writeEvents(t, inputFilePath, events)
 
-	fbOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, inputFilePath, "5055", testCaseName))
-	fbOTel.Start()
-	defer fbOTel.Stop()
+	otelConfig := fmt.Sprintf(`receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-input-id
+          enabled: true
+          paths:
+            - %s
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    processors:
+      - add_host_metadata: ~
+      - add_fields:
+          target: ""
+          fields:
+            testcase: %s
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    path.home: %s
+exporters:
+  logstash:
+    hosts:
+      - "localhost:5055"
+    tls:
+      insecure: true
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - logstash
+  telemetry:
+    metrics:
+      level: none
+`, inputFilePath, testCaseName, tmpdir)
+
+	// Start OTel collector with filebeatreceiver
+	oteltestcol.New(t, otelConfig)
 
 	// start filebeat
 	filebeat := integration.NewBeat(
@@ -144,6 +175,8 @@ processors:
 		// only present in beats receivers
 		"agent.otelcol.component.id",
 		"agent.otelcol.component.kind",
+		"log.file.device_id",
+		"log.file.fingerprint",
 	}
 
 	compareOutputFiles(t, fbFilePath, otelFilePath, ignoredFields)
@@ -155,44 +188,58 @@ func TestLogstashExporterProxyURL(t *testing.T) {
 	// ensure the size of events is big enough
 	numEvents := 3
 
-	var beatsCfgFile = `
-filebeat.inputs:
-  - type: filestream
-    id: filestream-input-id
-    enabled: true
-    paths:
-      - %s
-output.logstash:
-  hosts:
-    - "logstash:%s"
-  pipelining: 0
-  worker: 1
-  proxy_url: "socks5://elastic:changeme@localhost:1080"
-queue.mem.flush.timeout: 0s
-processors:
-  - add_host_metadata: ~
-  - add_fields:
-      target: ""
-      fields:
-        testcase: %s
-`
 	testCaseName := uuid.Must(uuid.NewV4()).String()
 	events := generateEvents(numEvents)
 
-	// start filebeat in otel mode
-	fbOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
-
-	inputFilePath := filepath.Join(fbOTel.TempDir(), "event.json")
+	// Create OTel collector configuration with filebeatreceiver
+	tmpdir := t.TempDir()
+	inputFilePath := filepath.Join(tmpdir, "event.json")
 	writeEvents(t, inputFilePath, events)
 
-	fbOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, inputFilePath, "5055", testCaseName))
-	fbOTel.Start()
-	defer fbOTel.Stop()
+	otelConfig := fmt.Sprintf(`receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-input-id
+          enabled: true
+          paths:
+            - %s
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    processors:
+      - add_host_metadata: ~
+      - add_fields:
+          target: ""
+          fields:
+            testcase: %s
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    path.home: %s
+exporters:
+  logstash:
+    hosts:
+      - "logstash:5055"
+    ttl: 0s
+    proxy_url: "socks5://elastic:changeme@localhost:1080"
+    proxy_use_local_resolver: false
+    worker: 1
+    workers: 0
+    max_retries: 3
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - logstash
+  telemetry:
+    metrics:
+      level: none
+`, inputFilePath, testCaseName, tmpdir)
+
+	// Start OTel collector with filebeatreceiver
+	oteltestcol.New(t, otelConfig)
 
 	// Nginx endpoint URLs
 	baseURL := "http://localhost:8082"

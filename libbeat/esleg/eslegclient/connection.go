@@ -176,7 +176,7 @@ func NewConnection(s ConnectionSettings, log *logp.Logger) (*Connection, error) 
 
 	esClient := esHTTPClient(httpClient)
 	if s.Kerberos.IsEnabled() {
-		esClient, err = kerberos.NewClient(s.Kerberos, httpClient, s.URL)
+		esClient, err = kerberos.NewClient(s.Kerberos, httpClient)
 		if err != nil {
 			return nil, err
 		}
@@ -227,7 +227,6 @@ func NewClients(cfg *cfg.C, beatname string, log *logp.Logger) ([]Connection, er
 			return nil, err
 		}
 
-		// TODO: use local logger here
 		client, err := NewConnection(ConnectionSettings{
 			URL:              esURL,
 			Beatname:         beatname,
@@ -444,13 +443,14 @@ func (conn *Connection) getVersion() error {
 		conn.version = *v
 	}
 
-	if versionData.Version.BuildFlavor == "serverless" {
+	switch versionData.Version.BuildFlavor {
+	case "serverless":
 		conn.log.Info("build flavor of es is serverless, marking connection as serverless")
 		conn.isServerless = true
-	} else if versionData.Version.BuildFlavor == "default" {
+	case "default":
 		conn.isServerless = false
 		// not sure if this is even possible, just being defensive
-	} else {
+	default:
 		conn.log.Infof("Got unexpected build flavor '%s'", versionData.Version.BuildFlavor)
 	}
 

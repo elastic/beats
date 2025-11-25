@@ -8,6 +8,10 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
+	"time"
+
+	"github.com/osquery/osquery-go/plugin/table"
 )
 
 type EncodingFlag int
@@ -17,6 +21,9 @@ const (
 	// instead of empty strings. By default, zero values for int, uint, and float types
 	// are converted to empty strings, but this flag preserves them as "0".
 	EncodingFlagUseNumbersZeroValues EncodingFlag = 1 << iota
+
+	DefaultTimeFormat = time.RFC3339
+	DefaultTimezone   = "UTC"
 )
 
 func (f EncodingFlag) has(option EncodingFlag) bool {
@@ -56,7 +63,7 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 			key := k.String()
 			fieldValue := v.MapIndex(k)
 
-			value, err := convertValueToString(fieldValue, flags)
+			value, err := convertValueToStringWithTag(fieldValue, flags, nil)
 			if err != nil {
 				return nil, fmt.Errorf("failed to convert field %s: %w", key, err)
 			}
@@ -77,6 +84,34 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 			continue
 		}
 
+		tag := fieldType.Tag.Get("osquery")
+
+		// Handle embedded structs
+		// If a struct has an embedded struct, the field will be marked as anonymous
+		// and the tag will be empty.  We need to recurse into the embedded struct and merge the results.
+		if fieldType.Anonymous && tag == "" {
+			// Handle pointer to struct if necessary
+			if fieldValue.Kind() == reflect.Ptr {
+				if fieldValue.IsNil() {
+					continue
+				}
+				fieldValue = fieldValue.Elem()
+			}
+
+			// Only recurse if it's a struct
+			if fieldValue.Kind() == reflect.Struct {
+				embeddedMap, err := MarshalToMapWithFlags(fieldValue.Interface(), flags)
+				if err != nil {
+					return nil, err
+				}
+				// Merge the embedded results into the current map
+				for k, v := range embeddedMap {
+					result[k] = v
+				}
+				continue // Skip the rest of the loop for this field
+			}
+		}
+
 		key := fieldType.Tag.Get("osquery")
 		switch key {
 		case "-":
@@ -85,7 +120,7 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 			key = fieldType.Name
 		}
 
-		value, err := convertValueToString(fieldValue, flags)
+		value, err := convertValueToStringWithTag(fieldValue, flags, &fieldType.Tag)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert field %s: %w", key, err)
 		}
@@ -96,13 +131,102 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 	return result, nil
 }
 
-func convertValueToString(fieldValue reflect.Value, flag EncodingFlag) (string, error) {
+func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
+	if in == nil {
+		return nil, fmt.Errorf("input cannot be nil")
+	}
+
+	t := reflect.TypeOf(in)
+
+	var columns []table.ColumnDefinition
+
+	// Handle pointer types by unwrapping to get the underlying type
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
+	if t.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("unsupported type: %s, must be a struct or pointer to struct", t.Kind())
+	}
+
+	for i := 0; i < t.NumField(); i++ {
+		fieldType := t.Field(i)
+
+		if !fieldType.IsExported() {
+			continue
+		}
+
+		tag := fieldType.Tag
+		key := tag.Get("osquery")
+		switch key {
+		case "-":
+			continue
+		case "":
+			key = fieldType.Name
+		}
+
+		// Determine column type based on Go type
+		var column table.ColumnDefinition
+		fieldKind := fieldType.Type.Kind()
+
+		// Handle pointer types by unwrapping to get the underlying type
+		if fieldKind == reflect.Ptr {
+			fieldKind = fieldType.Type.Elem().Kind()
+		}
+
+		switch fieldKind {
+		case reflect.String:
+			column = table.TextColumn(key)
+
+		case reflect.Bool:
+			column = table.IntegerColumn(key)
+
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32,
+			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32:
+			column = table.IntegerColumn(key)
+
+		case reflect.Int64, reflect.Uint64:
+			column = table.BigIntColumn(key)
+
+		case reflect.Float32, reflect.Float64:
+			column = table.DoubleColumn(key)
+
+		case reflect.Struct:
+			// Handle time.Time type
+			switch fieldType.Type {
+			case reflect.TypeOf(time.Time{}):
+				if timeFormat, ok := tag.Lookup("format"); ok {
+					switch strings.ToLower(timeFormat) {
+					case "unix", "unixnano", "unixmilli", "unixmicro":
+						column = table.BigIntColumn(key)
+					default:
+						column = table.TextColumn(key)
+					}
+				} else {
+					column = table.TextColumn(key)
+				}
+			}
+		default:
+			// we default to table.TextColumn for unsupported types
+			column = table.TextColumn(key)
+		}
+
+		columns = append(columns, column)
+	}
+
+	return columns, nil
+}
+
+// convertValueToStringWithTag converts a reflect.Value to a string, handling pointers,
+// booleans, integers, unsigned integers, floats, time.Time, and unsupported types.
+// It also handles the EncodingFlagUseNumbersZeroValues flag and the tag format and tz attributes.
+func convertValueToStringWithTag(fieldValue reflect.Value, flag EncodingFlag, tag *reflect.StructTag) (string, error) {
 	// Handle pointers first
 	if fieldValue.Kind() == reflect.Ptr {
 		if fieldValue.IsNil() {
 			return "", nil
 		}
-		return convertValueToString(fieldValue.Elem(), flag)
+		return convertValueToStringWithTag(fieldValue.Elem(), flag, tag)
 	}
 
 	switch fieldValue.Kind() {
@@ -145,6 +269,15 @@ func convertValueToString(fieldValue reflect.Value, flag EncodingFlag) (string, 
 		}
 		return strconv.FormatFloat(val, 'f', -1, 64), nil
 
+	case reflect.Struct:
+		// Handle time.Time type
+		switch fieldValue.Type() {
+		case reflect.TypeOf(time.Time{}):
+			return formatTimeWithTagFormat(fieldValue, flag, tag)
+		default:
+			return "", fmt.Errorf("unsupported struct type: %s", fieldValue.Type())
+		}
+
 	// Default: use Sprintf for unsupported types
 	default:
 		if fieldValue.CanInterface() {
@@ -152,4 +285,80 @@ func convertValueToString(fieldValue reflect.Value, flag EncodingFlag) (string, 
 		}
 		return "", fmt.Errorf("unsupported type (%s)", fieldValue.Kind())
 	}
+}
+
+// formatTimeWithTagFormat formats a time.Time value with the specified format
+// and timezone conversion if specified in the tag.
+func formatTimeWithTagFormat(fieldValue reflect.Value, flag EncodingFlag, tag *reflect.StructTag) (string, error) {
+	// Check if the value is zero and the flag is not set to use numbers zero values
+	if !flag.has(EncodingFlagUseNumbersZeroValues) && fieldValue.IsZero() {
+		return "", nil
+	}
+
+	t, ok := fieldValue.Interface().(time.Time)
+	if !ok {
+		return "", fmt.Errorf("expected time.Time value but got %v", fieldValue.Type())
+	}
+
+	// If no tag is specified, use the default format
+	if tag == nil {
+		return t.Format(DefaultTimeFormat), nil
+	}
+
+	// Handle timezone conversion if specified in tag
+	if tz, ok := tag.Lookup("tz"); ok {
+		loc, err := time.LoadLocation(tz)
+		if err != nil {
+			return "", fmt.Errorf("invalid timezone %s: %w", tz, err)
+		}
+		t = t.In(loc)
+	} else {
+		loc, err := time.LoadLocation(DefaultTimezone)
+		if err != nil {
+			return "", fmt.Errorf("invalid default timezone %s: %w", DefaultTimezone, err)
+		}
+		t = t.In(loc)
+	}
+
+	var result string
+	if timeFormat, ok := tag.Lookup("format"); ok {
+		switch strings.ToLower(timeFormat) {
+		case "unix":
+			result = strconv.FormatInt(t.Unix(), 10)
+		case "unixnano":
+			result = strconv.FormatInt(t.UnixNano(), 10)
+		case "unixmilli":
+			result = strconv.FormatInt(t.UnixMilli(), 10)
+		case "unixmicro":
+			result = strconv.FormatInt(t.UnixMicro(), 10)
+		case "rfc3339":
+			result = t.Format(time.RFC3339)
+		case "rfc3339nano":
+			result = t.Format(time.RFC3339Nano)
+		case "rfc822":
+			result = t.Format(time.RFC822)
+		case "rfc822z":
+			result = t.Format(time.RFC822Z)
+		case "rfc850":
+			result = t.Format(time.RFC850)
+		case "rfc1123":
+			result = t.Format(time.RFC1123)
+		case "rfc1123z":
+			result = t.Format(time.RFC1123Z)
+		case "kitchen":
+			result = t.Format(time.Stamp)
+		case "stampmilli":
+			result = t.Format(time.StampMilli)
+		case "stampmicro":
+			result = t.Format(time.StampMicro)
+		case "stampnano":
+			result = t.Format(time.StampNano)
+		default:
+			return "", fmt.Errorf("unsupported time format: %s", timeFormat)
+		}
+	} else {
+		result = t.Format(time.RFC3339)
+	}
+
+	return result, nil
 }

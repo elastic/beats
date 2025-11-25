@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -1710,6 +1711,96 @@ var inputTests = []struct {
 		},
 	},
 	{
+		name: "file_auth_default_header",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			dir := t.TempDir()
+			secret := "file-secret"
+			path := filepath.Join(dir, "auth_token")
+			if err := os.WriteFile(path, []byte(secret+"\n"), 0o600); err != nil {
+				t.Fatalf("failed to write auth token: %v", err)
+			}
+			config["auth.file.path"] = path
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                   1,
+			"auth.file.prefix":           "Bearer ",
+			"auth.file.refresh_interval": "100ms",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			"Bearer file-secret",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "file_auth_custom_header",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			dir := t.TempDir()
+			tokenPath := filepath.Join(dir, "api_token")
+			if err := os.WriteFile(tokenPath, []byte("secret-api-token\n"), 0o600); err != nil {
+				t.Fatalf("failed to write token file: %v", err)
+			}
+			config["auth.file.path"] = tokenPath
+			config["auth.file.header"] = "X-API-Key"
+			config["auth.file.prefix"] = "ApiToken "
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandlerWithHeader(
+			"ApiToken secret-api-token",
+			"X-API-Key",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
 		name: "digest_accept",
 		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 			s := httptest.NewServer(h)
@@ -1828,6 +1919,44 @@ var inputTests = []struct {
 		handler: oauth2Handler,
 		want: []map[string]interface{}{
 			{"hello": "world"},
+		},
+	},
+
+	{
+		name: "Auth AWS V4 Signer",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                   1,
+			"auth.aws.access_key_id":     "AKIAIOSFODNN7EXAMPLE",
+			"auth.aws.secret_access_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+			"auth.aws.default_region":    "us-east-1",
+			"auth.aws.service_name":      "guardduty",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: awsAuthHandler("AKIAIOSFODNN7EXAMPLE", defaultHandler(http.MethodGet, "")),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
 		},
 	},
 
@@ -2238,7 +2367,7 @@ func TestInput(t *testing.T) {
 					cancel()
 				}
 			}
-			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client)
+			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
@@ -2443,6 +2572,36 @@ func tokenAuthHandler(want string, handle http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")
 		if auth != want {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
+			return
+		}
+
+		handle(w, r)
+	}
+}
+
+func tokenAuthHandlerWithHeader(want, headerName string, handle http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		value := r.Header.Get(headerName)
+		if value != want {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusUnauthorized)
+			return
+		}
+
+		handle(w, r)
+	}
+}
+
+func awsAuthHandler(expectedTokenID string, handle http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if !strings.HasPrefix(authHeader, fmt.Sprintf("AWS4-HMAC-SHA256 Credential=%s/", expectedTokenID)) {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
+			return
+		}
+
+		amzDate := r.Header.Get("X-Amz-Date")
+		if amzDate == "" {
 			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
 			return
 		}

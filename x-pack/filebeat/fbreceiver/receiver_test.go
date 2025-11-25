@@ -64,18 +64,16 @@ func TestNewReceiver(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
 					"*",
 				},
 			},
-			"path.home":    t.TempDir(),
-			"http.enabled": true,
-			"http.host":    monitorHost,
+			"path.home":               t.TempDir(),
+			"http.enabled":            true,
+			"http.host":               monitorHost,
+			"management.otel.enabled": true,
 		},
 	}
 
@@ -138,9 +136,6 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": level.String(),
 				"selectors": []string{
@@ -171,7 +166,6 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
-	t.Skip("flaky test, renable after https://github.com/elastic/beats/pull/46846 and https://github.com/elastic/beats/pull/46844 are merged")
 	// This test verifies that multiple receivers can be instantiated
 	// in isolation, started, and can ingest logs without interfering
 	// with each other.
@@ -202,9 +196,6 @@ func TestMultipleReceivers(t *testing.T) {
 							"file_identity.native": nil,
 						},
 					},
-				},
-				"output": map[string]any{
-					"otelconsumer": map[string]any{},
 				},
 				"logging": map[string]any{
 					"level": "info",
@@ -370,9 +361,6 @@ func TestReceiverDegraded(t *testing.T) {
 							},
 						},
 					},
-					"output": map[string]any{
-						"otelconsumer": map[string]any{},
-					},
 					"logging": map[string]any{
 						"level": "debug",
 						"selectors": []string{
@@ -420,6 +408,7 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 			},
 		},
 	}
+	defer client.CloseIdleConnections()
 	url, err := url.JoinPath("http://unix", endpoint)
 	if err != nil {
 		sb.Reset()
@@ -568,9 +557,6 @@ func TestConsumeContract(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
@@ -605,9 +591,6 @@ func TestReceiverHook(t *testing.T) {
 						"count":   1,
 					},
 				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
 			},
 			"management.otel.enabled": true,
 			"path.home":               t.TempDir(),

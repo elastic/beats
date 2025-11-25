@@ -24,6 +24,7 @@ import (
 
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
@@ -35,27 +36,91 @@ func TestMetricbeatOTelE2E(t *testing.T) {
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	es := integration.GetESClient(t, "http")
-
 	// create a random uuid and make sure it doesn't contain dashes/
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	mbIndex := "logs-integration-mb-" + namespace
 	mbReceiverIndex := "logs-integration-mbreceiver-" + namespace
-	t.Cleanup(func() {
-		_, err := es.Indices.DeleteDataStream([]string{
-			mbIndex,
-			mbReceiverIndex,
-		})
-		require.NoError(t, err, "failed to delete indices")
-	})
 
-	type options struct {
+	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
+	metricbeatMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
+
+	otelConfig := struct {
 		Index          string
 		ESURL          string
 		Username       string
 		Password       string
 		MonitoringPort int
+	}{
+		Index:          mbReceiverIndex,
+		ESURL:          fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username:       user,
+		Password:       password,
+		MonitoringPort: otelMonitoringPort,
 	}
+
+	cfg := `receivers:
+  metricbeatreceiver:
+    metricbeat:
+      modules:
+       - module: system
+         enabled: true
+         period: 1s
+         processes:
+          - '.*'
+         metricsets:
+          - cpu
+    processors:
+      - add_host_metadata: ~
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
+      - add_kubernetes_metadata: ~
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    http.enabled: true
+    http.host: localhost
+    http.port: {{.MonitoringPort}}
+    management.otel.enabled: true
+exporters:
+  debug:
+    use_internal_logger: false
+    verbosity: detailed
+  elasticsearch/log:
+    endpoints:
+      - {{.ESURL}}
+    compression: none
+    user: {{.Username}}
+    password: {{.Password}}
+    logs_index: {{.Index}}
+    sending_queue:
+      enabled: true
+      batch:
+        flush_timeout: 1s
+    mapping:
+      mode: bodymap
+service:
+  pipelines:
+    logs:
+      receivers:
+        - metricbeatreceiver
+      exporters:
+        - elasticsearch/log
+        - debug
+`
+	var configBuffer bytes.Buffer
+	require.NoError(t,
+		template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, otelConfig))
+	configContents := configBuffer.Bytes()
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Config contents:\n%s", configContents)
+		}
+	})
+
+	oteltestcol.New(t, configBuffer.String())
 
 	var beatsCfgFile = `
 metricbeat:
@@ -70,10 +135,10 @@ metricbeat:
 output:
   elasticsearch:
     hosts:
-      - {{ .ESURL }}
-    username: {{ .Username }}
-    password: {{ .Password }}
-    index: {{ .Index }}
+      - {{.ESURL}}
+    username: {{.Username}}
+    password: {{.Password}}
+    index: {{.Index}}
 queue.mem.flush.timeout: 0s
 setup.template.enabled: false
 processors:
@@ -81,37 +146,36 @@ processors:
     - add_cloud_metadata: ~
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
+http.enabled: true
 http.host: localhost
 http.port: {{.MonitoringPort}}
 `
 
-	// start metricbeat in otel mode
-	metricbeatOTel := integration.NewBeat(
-		t,
-		"metricbeat-otel",
-		"../../metricbeat.test",
-		"otel",
-	)
-
-	optionsValue := options{
-		ESURL:          fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-		Username:       user,
-		Password:       password,
-		MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
-	}
-
-	var configBuffer bytes.Buffer
-	optionsValue.Index = mbReceiverIndex
-	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&configBuffer, optionsValue))
-
-	metricbeatOTel.WriteConfigFile(configBuffer.String())
-	metricbeatOTel.Start()
-	defer metricbeatOTel.Stop()
+	es := integration.GetESClient(t, "http")
+	t.Cleanup(func() {
+		_, err := es.Indices.DeleteDataStream([]string{
+			mbIndex,
+			mbReceiverIndex,
+		})
+		require.NoError(t, err, "failed to delete indices")
+	})
 
 	var mbConfigBuffer bytes.Buffer
-	optionsValue.Index = mbIndex
-	optionsValue.MonitoringPort = int(libbeattesting.MustAvailableTCP4Port(t))
-	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&mbConfigBuffer, optionsValue))
+	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&mbConfigBuffer,
+		struct {
+			Index          string
+			ESURL          string
+			Username       string
+			Password       string
+			MonitoringPort int
+		}{
+			Index:          mbIndex,
+			ESURL:          fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+			Username:       user,
+			Password:       password,
+			MonitoringPort: metricbeatMonitoringPort,
+		}))
+
 	metricbeat := integration.NewBeat(t, "metricbeat", "../../metricbeat.test")
 	metricbeat.WriteConfigFile(mbConfigBuffer.String())
 	metricbeat.Start()
@@ -151,7 +215,7 @@ http.port: {{.MonitoringPort}}
 	assert.NotContains(t, metricbeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in metricbeat log record")
 	assert.NotContains(t, metricbeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in metricbeat log record")
 	assertMapstrKeysEqual(t, otelDoc, metricbeatDoc, ignoredFields, "expected documents keys to be equal")
-	assertMonitoring(t, optionsValue.MonitoringPort)
+	assertMonitoring(t, metricbeatMonitoringPort)
 }
 
 func assertMonitoring(t *testing.T, port int) {
@@ -169,176 +233,12 @@ func assertMonitoring(t *testing.T, port int) {
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
 
-func TestMetricbeatOTelReceiverE2E(t *testing.T) {
-	integration.EnsureESIsRunning(t)
-
-	host := integration.GetESURL(t, "http")
-	user := host.User.Username()
-	password, _ := host.User.Password()
-
-	es := integration.GetESClient(t, "http")
-
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	mbReceiverIndex := "logs-integration-mbreceiver-" + namespace
-	mbIndex := "logs-integration-mb-" + namespace
-	t.Cleanup(func() {
-		_, err := es.Indices.DeleteDataStream([]string{
-			mbIndex,
-			mbReceiverIndex,
-		})
-		require.NoError(t, err, "failed to delete indices")
-	})
-
-	type options struct {
-		Index    string
-		ESURL    string
-		Username string
-		Password string
-	}
-
-	cfg := `receivers:
-  metricbeatreceiver:
-    metricbeat:
-      modules:
-       - module: system
-         enabled: true
-         period: 1s
-         processes:
-          - '.*'
-         metricsets:
-          - cpu
-    output:
-      otelconsumer:
-    logging:
-      level: info
-      selectors:
-        - '*'
-    queue.mem.flush.timeout: 0s
-exporters:
-  debug:
-    use_internal_logger: false
-    verbosity: detailed
-  elasticsearch/log:
-    endpoints:
-      - {{.ESURL}}
-    compression: none
-    user: {{.Username}}
-    password: {{.Password}}
-    logs_index: {{.Index}}
-    batcher:
-      enabled: true
-      flush_timeout: 1s
-    mapping:
-      mode: bodymap
-service:
-  pipelines:
-    logs:
-      receivers:
-        - metricbeatreceiver
-      exporters:
-        - elasticsearch/log
-        - debug
-`
-
-	// start metricbeat in otel mode
-	metricbeatOTel := integration.NewBeat(
-		t,
-		"metricbeat-otel",
-		"../../metricbeat.test",
-		"otel",
-	)
-
-	var configBuffer bytes.Buffer
-	require.NoError(t, template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, options{
-		Index:    mbReceiverIndex,
-		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-		Username: user,
-		Password: password,
-	}))
-
-	metricbeatOTel.WriteConfigFile(configBuffer.String())
-	metricbeatOTel.Start()
-	defer metricbeatOTel.Stop()
-
-	var beatsCfgFile = `receivers:
-metricbeat:
-   modules:
-   - module: system
-     enabled: true
-     period: 1s
-     processes:
-      - '.*'
-     metricsets:
-      - cpu
-output:
-  elasticsearch:
-    hosts:
-      - {{ .ESURL }}
-    username: {{ .Username }}
-    password: {{ .Password }}
-    index: {{ .Index }}
-queue.mem.flush.timeout: 0s
-setup.template.enabled: false
-processors:
-    - add_host_metadata: ~
-    - add_cloud_metadata: ~
-    - add_docker_metadata: ~
-    - add_kubernetes_metadata: ~
-`
-	var mbConfigBuffer bytes.Buffer
-	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&mbConfigBuffer, options{
-		Index:    mbIndex,
-		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-		Username: user,
-		Password: password,
-	}))
-	metricbeat := integration.NewBeat(t, "metricbeat", "../../metricbeat.test")
-	metricbeat.WriteConfigFile(mbConfigBuffer.String())
-	metricbeat.Start()
-	defer metricbeat.Stop()
-
-	var metricbeatDocs estools.Documents
-	var otelDocs estools.Documents
-	var err error
-
-	require.EventuallyWithTf(t,
-		func(ct *assert.CollectT) {
-			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
-			defer findCancel()
-
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+mbReceiverIndex+"*")
-			assert.NoError(ct, err)
-
-			metricbeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+mbIndex+"*")
-			assert.NoError(ct, err)
-
-			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 log for otel receiver, got %d", otelDocs.Hits.Total.Value)
-			assert.GreaterOrEqual(ct, metricbeatDocs.Hits.Total.Value, 1, "expected at least 1 log for metricbeat receiver, got %d", metricbeatDocs.Hits.Total.Value)
-		},
-		1*time.Minute, 1*time.Second, "expected at least a single log for metricbeat and otel mode")
-	otelDoc := otelDocs.Hits.Hits[0]
-	metricbeatDoc := metricbeatDocs.Hits.Hits[0]
-	ignoredFields := []string{
-		// only present in beats receivers
-		"agent.otelcol.component.id",
-		"agent.otelcol.component.kind",
-	}
-	assertMapstrKeysEqual(t, otelDoc.Source, metricbeatDoc.Source, ignoredFields, "expected documents keys to be equal")
-}
-
 func TestMetricbeatOTelMultipleReceiversE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
 	host := integration.GetESURL(t, "http")
 	user := host.User.Username()
 	password, _ := host.User.Password()
-
-	metricbeatOTel := integration.NewBeat(
-		t,
-		"metricbeat-otel",
-		"../../metricbeat.test",
-		"otel",
-	)
 
 	type receiverConfig struct {
 		MonitoringPort int
@@ -356,23 +256,26 @@ func TestMetricbeatOTelMultipleReceiversE2E(t *testing.T) {
 		require.NoError(t, err, "failed to delete indices")
 	})
 
+	tmpDir := t.TempDir()
 	otelConfig := struct {
 		Index     string
+		ESURL     string
 		Username  string
 		Password  string
 		Receivers []receiverConfig
 	}{
 		Index:    index,
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
 		Username: user,
 		Password: password,
 		Receivers: []receiverConfig{
 			{
 				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
-				PathHome:       filepath.Join(metricbeatOTel.TempDir(), "r1"),
+				PathHome:       filepath.Join(tmpDir, "r1"),
 			},
 			{
 				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
-				PathHome:       filepath.Join(metricbeatOTel.TempDir(), "r2"),
+				PathHome:       filepath.Join(tmpDir, "r2"),
 			},
 		},
 	}
@@ -394,14 +297,13 @@ func TestMetricbeatOTelMultipleReceiversE2E(t *testing.T) {
           target: ''
           fields:
             receiverid: "{{$i}}"
-    output:
-      otelconsumer:
     logging:
       level: info
       selectors:
         - '*'
     queue.mem.flush.timeout: 0s
     path.home: {{$receiver.PathHome}}
+    management.otel.enabled: true
 {{if $receiver.MonitoringPort}}
     http.enabled: true
     http.host: localhost
@@ -414,14 +316,15 @@ exporters:
     verbosity: detailed
   elasticsearch/log:
     endpoints:
-      - http://localhost:9200
+      - {{.ESURL}}
     compression: none
     user: {{.Username}}
     password: {{.Password}}
     logs_index: {{.Index}}
-    batcher:
+    sending_queue:
       enabled: true
-      flush_timeout: 1s
+      batch:
+        flush_timeout: 1s
     mapping:
       mode: bodymap
 service:
@@ -446,9 +349,7 @@ service:
 		}
 	})
 
-	metricbeatOTel.WriteConfigFile(string(configContents))
-	metricbeatOTel.Start()
-	defer metricbeatOTel.Stop()
+	oteltestcol.New(t, string(configContents))
 
 	var r0Docs, r1Docs estools.Documents
 	var err error
@@ -510,116 +411,4 @@ func assertMapstrKeysEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string
 	}
 
 	require.Zero(t, cmp.Diff(flatM1, flatM2), msg)
-}
-
-func TestMetricbeatOTelInspect(t *testing.T) {
-	mbOTel := integration.NewBeat(
-		t,
-		"metricbeat-otel",
-		"../../metricbeat.test",
-		"otel",
-	)
-
-	var beatsCfgFile = `
-metricbeat:
-   modules:
-   - module: system
-     enabled: true
-     period: 1s
-     processes:
-      - '.*'
-     metricsets:
-      - cpu
-output:
-  elasticsearch:
-    hosts:
-      - localhost:9200
-    username: admin
-    password: testing
-    index: index
-queue.mem.flush.timeout: 0s
-setup.template.enabled: false
-processors:
-    - add_host_metadata: ~
-    - add_cloud_metadata: ~
-    - add_docker_metadata: ~
-    - add_kubernetes_metadata: ~
-`
-	expectedExporter := `exporters:
-    elasticsearch:
-        auth:
-            authenticator: beatsauth
-        compression: gzip
-        compression_params:
-            level: 1
-        endpoints:
-            - http://localhost:9200
-        logs_index: index
-        mapping:
-            mode: bodymap
-        max_conns_per_host: 1
-        password: testing
-        retry:
-            enabled: true
-            initial_interval: 1s
-            max_interval: 1m0s
-            max_retries: 3
-        sending_queue:
-            batch:
-                flush_timeout: 10s
-                max_size: 1600
-                min_size: 0
-                sizer: items
-            block_on_overflow: true
-            enabled: true
-            num_consumers: 1
-            queue_size: 3200
-            wait_for_result: true
-        user: admin
-extensions:
-    beatsauth:
-        idle_connection_timeout: 3s
-        proxy_disable: false
-        timeout: 1m30s
-`
-	expectedReceiver := `receivers:
-    metricbeatreceiver:
-        logging:
-            files:
-                rotateeverybytes: 104857600
-                rotateonstartup: false
-            to_files: true
-        metricbeat:
-            modules:
-                - enabled: true
-                  metricsets:
-                    - cpu
-                  module: system
-                  period: 1s
-                  processes:
-                    - .*
-`
-
-	expectedService := `service:
-    extensions:
-        - beatsauth
-    pipelines:
-        logs:
-            exporters:
-                - elasticsearch
-            receivers:
-                - metricbeatreceiver
-`
-	mbOTel.WriteConfigFile(beatsCfgFile)
-
-	mbOTel.Start("inspect")
-	defer mbOTel.Stop()
-
-	require.EventuallyWithT(t, func(collect *assert.CollectT) {
-		out, err := mbOTel.ReadStdout()
-		require.NoError(collect, err)
-		require.Contains(collect, out, expectedExporter)
-		require.Contains(collect, out, expectedReceiver)
-		require.Contains(collect, out, expectedService)
-	}, 10*time.Second, 500*time.Millisecond, "failed to get output of inspect command")
 }
