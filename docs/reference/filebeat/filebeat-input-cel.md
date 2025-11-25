@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html
 sub:
   mito_docs: https://pkg.go.dev/github.com/elastic/mito
-  mito_version: v1.23.0
+  mito_version: v1.24.0
 applies_to:
   stack: ga 8.6.0
 ---
@@ -245,6 +245,7 @@ As noted above the `cel` input provides functions, macros, and global variables 
     * [Format]({{mito_docs}}@{{mito_version}}/lib#hdr-Format-Time)
     * [Parse Time]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_Time-Time)
     * [Round]({{mito_docs}}@{{mito_version}}/lib#hdr-Round-Time) {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
+    * [Truncate]({{mito_docs}}@{{mito_version}}/lib#hdr-Truncate-Time) {applies_to}`stack: ga 9.3.0`
     * [Global Variables]({{mito_docs}}@{{mito_version}}/lib#hdr-Global_Variables-Time)
         * Support for [`DateOnly`](https://pkg.go.dev/time#DateOnly), [`DateTime`](https://pkg.go.dev/time#DateTime) and [`TimeOnly`](https://pkg.go.dev/time#TimeOnly) time formats. {applies_to}`stack: ga 8.15.0`
 
