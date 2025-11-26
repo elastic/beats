@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -28,12 +29,6 @@ func TestOTELCELMetrics(t *testing.T) {
 	defer testServer.Close()
 
 	client := testServer.Client()
-
-	resp, err := client.Get(testServer.URL)
-	if err != nil {
-		t.Fatalf("Failed to make request: %v", err)
-	}
-	defer resp.Body.Close()
 
 	// Set up the OTELCELMetrics
 	log := logp.NewLogger("cel_metrics_test")
@@ -66,7 +61,12 @@ func TestOTELCELMetrics(t *testing.T) {
 	for index := range 5 {
 		startProgram := time.Now()
 		otelCELMetrics.AddProgramExecution(ctx, 1)
-		resp, err := client.Get(testServer.URL)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, testServer.URL, nil)
+		if err != nil {
+			t.Fatalf("Failed to make request: %v", err)
+		}
+
+		resp, err := client.Do(req)
 		if err != nil {
 			t.Fatalf("Failed to make request: %v", err)
 		}

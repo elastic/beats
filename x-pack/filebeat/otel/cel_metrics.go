@@ -81,8 +81,8 @@ func (o *OTELCELMetrics) AddPeriodicRun(ctx context.Context, count int64) {
 }
 
 func (o *OTELCELMetrics) AddTotalDuration(ctx context.Context, duration time.Duration) {
-		o.periodicRunDuration.Add(ctx, duration.Seconds())
-		o.programRunDurationHistogram.Record(ctx, duration.Seconds())
+	o.periodicRunDuration.Add(ctx, duration.Seconds())
+	o.programRunDurationHistogram.Record(ctx, duration.Seconds())
 }
 
 func (o *OTELCELMetrics) AddPublishDuration(ctx context.Context, duration time.Duration) {
