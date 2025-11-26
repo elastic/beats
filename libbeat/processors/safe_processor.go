@@ -30,6 +30,7 @@ import (
 
 var (
 	ErrClosed           = errors.New("attempt to use a closed processor")
+	ErrPathsNotSet      = errors.New("attempt to run processor before SetPaths was called")
 	ErrPathsAlreadySet  = errors.New("attempt to set paths twice")
 	ErrSetPathsOnClosed = errors.New("attempt to set paths on closed processor")
 )
@@ -59,12 +60,18 @@ type safeProcessorWithClose struct {
 }
 
 // Run delegates to the underlying processor. Returns ErrClosed if the processor
-// has been closed.
+// has been closed, or ErrPathsNotSet if the processor implements SetPather but
+// SetPaths has not been called.
 func (p *SafeProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
-	if p.state == stateClosed {
+	switch p.state {
+	case stateClosed:
 		return nil, ErrClosed
+	case stateInit:
+		if _, ok := p.Processor.(SetPather); ok {
+			return nil, ErrPathsNotSet
+		}
 	}
 	return p.Processor.Run(event)
 }

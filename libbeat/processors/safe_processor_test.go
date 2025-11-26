@@ -183,6 +183,14 @@ func TestSafeProcessorSetPathsClose(t *testing.T) {
 		assert.Equal(t, 0, p.setPathsCount)
 	})
 
+	t.Run("does not run before SetPaths is called", func(t *testing.T) {
+		assert.Equal(t, 0, p.runCount)
+		e, err := bp.Run(nil)
+		assert.Nil(t, e)
+		assert.ErrorIs(t, err, ErrPathsNotSet)
+		assert.Equal(t, 0, p.runCount)
+	})
+
 	t.Run("sets paths", func(t *testing.T) {
 		assert.Equal(t, 0, p.setPathsCount)
 		require.Implements(t, (*SetPather)(nil), bp)
@@ -259,6 +267,14 @@ func TestSafeProcessorSetPaths(t *testing.T) {
 		assert.NoError(t, Close(p))
 	})
 
+	t.Run("does not run before SetPaths is called", func(t *testing.T) {
+		assert.Equal(t, 0, p.runCount)
+		e, err := bp.Run(nil)
+		assert.Nil(t, e)
+		assert.ErrorIs(t, err, ErrPathsNotSet)
+		assert.Equal(t, 0, p.runCount)
+	})
+
 	t.Run("sets paths", func(t *testing.T) {
 		assert.Equal(t, 0, p.setPathsCount)
 		require.Implements(t, (*SetPather)(nil), bp)
@@ -274,5 +290,13 @@ func TestSafeProcessorSetPaths(t *testing.T) {
 		err = sp.SetPaths(&paths.Path{})
 		assert.ErrorIs(t, err, ErrPathsAlreadySet)
 		assert.Equal(t, 1, p.setPathsCount)
+	})
+
+	t.Run("runs after SetPaths is called", func(t *testing.T) {
+		assert.Equal(t, 0, p.runCount)
+		e, err := bp.Run(nil)
+		assert.NoError(t, err)
+		assert.Equal(t, e, mockEvent)
+		assert.Equal(t, 1, p.runCount)
 	})
 }
