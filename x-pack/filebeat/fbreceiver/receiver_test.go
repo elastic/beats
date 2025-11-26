@@ -319,9 +319,6 @@ func TestMultipleReceivers(t *testing.T) {
 }
 
 func TestReceiverDegraded(t *testing.T) {
-	if runtime.GOARCH == "arm64" && runtime.GOOS == "linux" {
-		t.Skip("flaky test on Ubuntu arm64, see https://github.com/elastic/beats/issues/46437")
-	}
 	testCases := []struct {
 		name            string
 		status          oteltest.ExpectedStatus
@@ -486,26 +483,40 @@ type logGenerator struct {
 	t           *testing.T
 	tmpDir      string
 	f           *os.File
-	filePattern string
 	sequenceNum int64
+	currentFile string
 }
 
 func newLogGenerator(t *testing.T, tmpDir string) *logGenerator {
 	return &logGenerator{
-		t:           t,
-		tmpDir:      tmpDir,
-		filePattern: "input-*.log",
+		t:      t,
+		tmpDir: tmpDir,
 	}
 }
 
 func (g *logGenerator) Start() {
-	f, err := os.CreateTemp(g.tmpDir, g.filePattern)
+	if g.currentFile != "" {
+		os.Remove(g.currentFile)
+	}
+
+	filePath := filepath.Join(g.tmpDir, "input.log")
+
+	f, err := os.Create(filePath)
 	require.NoError(g.t, err)
 	g.f = f
+	g.currentFile = filePath
+	atomic.StoreInt64(&g.sequenceNum, 0)
 }
 
 func (g *logGenerator) Stop() {
-	require.NoError(g.t, g.f.Close())
+	if g.f != nil {
+		require.NoError(g.t, g.f.Close())
+		g.f = nil
+	}
+	if g.currentFile != "" {
+		os.Remove(g.currentFile)
+		g.currentFile = ""
+	}
 }
 
 func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
@@ -526,8 +537,6 @@ func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
 // - Random permanent error. We expect the batch to be dropped.
 // - Random error. We expect the batch to be retried or dropped based on the error type.
 func TestConsumeContract(t *testing.T) {
-	t.Skip("flaky test, see https://github.com/elastic/beats/issues/46437")
-
 	defer oteltest.VerifyNoLeaks(t)
 
 	tmpDir := t.TempDir()
@@ -547,7 +556,7 @@ func TestConsumeContract(t *testing.T) {
 						"id":      "filestream-test",
 						"enabled": true,
 						"paths": []string{
-							filepath.Join(tmpDir, "input-*.log"),
+							filepath.Join(tmpDir, "input.log"),
 						},
 						"file_identity.native": map[string]any{},
 						"prospector": map[string]any{
