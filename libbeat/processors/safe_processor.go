@@ -72,6 +72,7 @@ func (p *SafeProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		if _, ok := p.Processor.(SetPather); ok {
 			return nil, ErrPathsNotSet
 		}
+	default: // proceed
 	}
 	return p.Processor.Run(event)
 }
