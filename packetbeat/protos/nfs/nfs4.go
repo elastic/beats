@@ -163,46 +163,60 @@ var nfsOpnum4 = map[int]string{
 	10044: "ILLEGAL",
 }
 
-func (nfs *nfs) eatData(op int, xdr *xdr) {
+func (nfs *nfs) eatData(op int, xdr *xdr) error {
 	switch op {
 	case opGetattr:
-		xdr.getUIntVector()
+		_, err := xdr.getUIntVector()
+		return err
 	case opGetfh:
-		// nothing to eat
+		return nil
 	case opLookup:
-		xdr.getDynamicOpaque()
+		_, err := xdr.getDynamicOpaque()
+		return err
 	case opLookupp:
-		// nothing to eat
+		return nil
 	case opNverify:
-		xdr.getUIntVector()
-		xdr.getDynamicOpaque()
+		if _, err := xdr.getUIntVector(); err != nil {
+			return err
+		}
+		_, err := xdr.getDynamicOpaque()
+		return err
 	case opPutfh:
-		xdr.getDynamicOpaque()
+		_, err := xdr.getDynamicOpaque()
+		return err
 	case opPutpubfh:
-		// nothing to eat
+		return nil
 	case opPutrootfh:
-		// nothing to eat
+		return nil
 	case opReadlink:
-		// nothing to eat
+		return nil
 	case opRenew:
-		xdr.getUHyper()
+		_, err := xdr.getUHyper()
+		return err
 	case opRestorefh:
-		// nothing to eat
+		return nil
 	case opSavefh:
-		// nothing to eat
+		return nil
 	case opSecinfo:
-		xdr.getDynamicOpaque()
+		_, err := xdr.getDynamicOpaque()
+		return err
 	case opVerify:
-		xdr.getUIntVector()
-		xdr.getDynamicOpaque()
+		if _, err := xdr.getUIntVector(); err != nil {
+			return err
+		}
+		_, err := xdr.getDynamicOpaque()
+		return err
 	case opSequence:
-		xdr.getOpaque(16)
-		xdr.getUInt()
-		xdr.getUInt()
-		xdr.getUInt()
-		xdr.getUInt()
-
+		if _, err := xdr.getOpaque(16); err != nil {
+			return err
+		}
+		for i := 0; i < 4; i++ {
+			if _, err := xdr.getUInt(); err != nil {
+				return err
+			}
+		}
 	}
+	return nil
 }
 
 // findV4MainOpcode finds the main operation in a compound call. If no main operation can be found, the last operation
@@ -219,20 +233,28 @@ func (nfs *nfs) eatData(op int, xdr *xdr) {
 // PUTFH + GETATTR
 //
 // GETATTR is the main operation.
-func (nfs *nfs) findV4MainOpcode(xdr *xdr) string {
+func (nfs *nfs) findV4MainOpcode(xdr *xdr) (string, error) {
 	// did we find a main operation opcode?
 	found := false
 
 	// default op code
 	currentOpname := "ILLEGAL"
 
-	opcount := int(xdr.getUInt())
+	opcountVal, err := xdr.getUInt()
+	if err != nil {
+		return "", err
+	}
+	opcount := int(opcountVal)
 	for i := 0; !found && i < opcount; i++ {
-		op := int(xdr.getUInt())
+		opVal, err := xdr.getUInt()
+		if err != nil {
+			return "", err
+		}
+		op := int(opVal)
 		opname, ok := nfsOpnum4[op]
 
 		if !ok {
-			return "ILLEGAL"
+			return "ILLEGAL", nil
 		}
 		currentOpname = opname
 
@@ -302,8 +324,10 @@ func (nfs *nfs) findV4MainOpcode(xdr *xdr) string {
 
 			found = true
 		default:
-			nfs.eatData(op, xdr)
+			if err := nfs.eatData(op, xdr); err != nil {
+				return "", err
+			}
 		}
 	}
-	return currentOpname
+	return currentOpname, nil
 }

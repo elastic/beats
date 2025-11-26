@@ -239,9 +239,22 @@ func (r *rpc) handleRPCFragment(
 }
 
 func (r *rpc) handleRPCPacket(xdr *xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
-	xid := fmt.Sprintf("%.8x", xdr.getUInt())
+	defer func() {
+		if rec := recover(); rec != nil {
+			logp.Warn("nfs: recovered from panic while parsing RPC/NFS: %v", rec)
+		}
+	}()
 
-	msgType := xdr.getUInt()
+	xidVal, err := xdr.getUInt()
+	if dropMalformed("rpc packet xid", err) {
+		return
+	}
+	xid := fmt.Sprintf("%.8x", xidVal)
+
+	msgType, err := xdr.getUInt()
+	if dropMalformed("rpc packet msgType", err) {
+		return
+	}
 
 	switch msgType {
 	case rpcCall:

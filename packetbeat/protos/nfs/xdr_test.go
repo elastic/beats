@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var testMsg = []byte{
@@ -36,10 +37,24 @@ var testMsg = []byte{
 func TestXdrDecoding(t *testing.T) {
 	xdr := makeXDR(testMsg)
 
-	assert.Equal(t, uint32(0x800000e0), uint32(xdr.getUInt()))
-	assert.Equal(t, uint32(0xb54921ab), uint32(xdr.getUInt()))
-	assert.Equal(t, uint64(2), uint64(xdr.getUHyper()))
-	assert.Equal(t, uint32(4), uint32(xdr.getUInt()))
-	assert.Equal(t, "test string", xdr.getString())
+	v, err := xdr.getUInt()
+	require.NoError(t, err)
+	assert.Equal(t, uint32(0x800000e0), v)
+
+	v, err = xdr.getUInt()
+	require.NoError(t, err)
+	assert.Equal(t, uint32(0xb54921ab), v)
+
+	hv, err := xdr.getUHyper()
+	require.NoError(t, err)
+	assert.Equal(t, uint64(2), hv)
+
+	v, err = xdr.getUInt()
+	require.NoError(t, err)
+	assert.Equal(t, uint32(4), v)
+
+	str, err := xdr.getString()
+	require.NoError(t, err)
+	assert.Equal(t, "test string", str)
 	assert.Equal(t, len(testMsg), xdr.size())
 }
