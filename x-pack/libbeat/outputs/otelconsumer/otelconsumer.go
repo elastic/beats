@@ -31,10 +31,6 @@ import (
 const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
-	// otelComponentIDKey is the key used to store the Beat receiver's component id in the beat event.
-	otelComponentIDKey = "otelcol.component.id"
-	// otelComponentKindKey is the key used to store the Beat receiver's component kind in the beat event. This is always "receiver".
-	otelComponentKindKey = "otelcol.component.kind"
 )
 
 func init() {
@@ -125,7 +121,14 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 		}
 
-		beatEvent := event.Content.Fields
+		// if pipeline field is set on event metadata
+		if pipeline, err := event.Content.Meta.GetValue("pipeline"); err == nil {
+			if s, ok := pipeline.(string); ok {
+				logRecord.Attributes().PutStr("elasticsearch.ingest_pipeline", s)
+			}
+		}
+
+		beatEvent := event.Content.Fields.Clone()
 		if beatEvent == nil {
 			beatEvent = mapstr.M{}
 		}
@@ -145,15 +148,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 		}
 		logRecord.SetObservedTimestamp(observedTimestamp)
-
-		if agent, _ := beatEvent.GetValue("agent"); agent != nil {
-			switch agent := agent.(type) {
-			case mapstr.M:
-				agent[otelComponentIDKey] = out.beatInfo.ComponentID
-				agent[otelComponentKindKey] = "receiver"
-				beatEvent["agent"] = agent
-			}
-		}
 
 		otelmap.ConvertNonPrimitive(beatEvent)
 

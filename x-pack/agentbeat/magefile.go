@@ -8,16 +8,15 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"slices"
 	"time"
 
-	"github.com/magefile/mage/sh"
-	"go.uber.org/multierr"
-
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
@@ -80,7 +79,7 @@ func GolangCrossBuild() error {
 
 	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 
-	return multierr.Combine(
+	return errors.Join(
 		devtools.GolangCrossBuild(args),
 		devtools.TestLinuxForCentosGLIBC(),
 	)
@@ -215,7 +214,7 @@ func IntegTest() {
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
-	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 	args.Tags = append(args.Tags, "agentbeat")
 	for _, beat := range getIncludedBeats() {
 		// matricbeat integration test TestIndexTotalFieldsLimitNotReached fails with
@@ -237,7 +236,7 @@ func SystemTest(ctx context.Context) error {
 	if slices.Contains(getIncludedBeats(), "packetbeat") {
 		mg.SerialDeps(xpacketbeat.GetNpcapInstallerFn("../packetbeat"), Update, devtools.BuildSystemTestBinary)
 
-		args := devtools.DefaultGoTestIntegrationArgs()
+		args := devtools.DefaultGoTestIntegrationArgs(ctx)
 		args.Packages = []string{"../packetbeat/tests/system/..."}
 		args.Tags = append(args.Tags, "agentbeat")
 

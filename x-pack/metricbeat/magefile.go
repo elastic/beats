@@ -8,14 +8,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"runtime"
 	"strings"
 	"time"
-
-	"go.uber.org/multierr"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -65,7 +64,7 @@ func GolangCrossBuild() error {
 	if isWindows32bitRunner() {
 		args.LDFlags = append(args.LDFlags, "-w")
 	}
-	return multierr.Combine(
+	return errors.Join(
 		devtools.GolangCrossBuild(args),
 		devtools.TestLinuxForCentosGLIBC(),
 	)
@@ -250,7 +249,7 @@ func GoIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		// build integration test binary with otel sub command
 		devtools.BuildSystemTestOTelBinary()
-		args := devtools.DefaultGoTestIntegrationFromHostArgs()
+		args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 		// ES_USER must be admin in order for the Go Integration tests to function because they require
 		// indices:data/read/search
 		args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]

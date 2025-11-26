@@ -64,18 +64,16 @@ func TestNewReceiver(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
 					"*",
 				},
 			},
-			"path.home":    t.TempDir(),
-			"http.enabled": true,
-			"http.host":    monitorHost,
+			"path.home":               t.TempDir(),
+			"http.enabled":            true,
+			"http.host":               monitorHost,
+			"management.otel.enabled": true,
 		},
 	}
 
@@ -92,8 +90,7 @@ func TestNewReceiver(t *testing.T) {
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
 			require.Lenf(c, logs["r1"], 1, "expected 1 log, got %d", len(logs["r1"]))
-			assert.Equal(c, "filebeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+			assert.Equal(c, "test", logs["r1"][0].Flatten()["message"], "expected message field to contain string 'test'")
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket, "stats")
@@ -106,9 +103,8 @@ func TestNewReceiver(t *testing.T) {
 					FilterMessageSnippet("add_host_metadata").
 					FilterMessageSnippet("add_cloud_metadata").
 					FilterMessageSnippet("add_docker_metadata").
-					FilterMessageSnippet("add_kubernetes_metadata").
-					Len() == 1
-				assert.True(c, processorsLoaded, "processors not loaded")
+					FilterMessageSnippet("add_kubernetes_metadata")
+				assert.Len(t, processorsLoaded.All(), 1, "processors not loaded")
 				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
 				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
@@ -117,6 +113,14 @@ func TestNewReceiver(t *testing.T) {
 }
 
 func BenchmarkFactory(b *testing.B) {
+	for _, level := range []zapcore.Level{zapcore.InfoLevel, zapcore.DebugLevel} {
+		b.Run(level.String(), func(b *testing.B) {
+			benchmarkFactoryWithLogLevel(b, level)
+		})
+	}
+}
+
+func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
@@ -131,11 +135,8 @@ func BenchmarkFactory(b *testing.B) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
-				"level": "info",
+				"level": level.String(),
 				"selectors": []string{
 					"*",
 				},
@@ -148,7 +149,7 @@ func BenchmarkFactory(b *testing.B) {
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		zapcore.Lock(zapcore.AddSync(&zapLogs)),
-		zapcore.InfoLevel)
+		level)
 
 	factory := NewFactory()
 
@@ -164,7 +165,6 @@ func BenchmarkFactory(b *testing.B) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
-	t.Skip("flaky test, renable after https://github.com/elastic/beats/pull/46846 and https://github.com/elastic/beats/pull/46844 are merged")
 	// This test verifies that multiple receivers can be instantiated
 	// in isolation, started, and can ingest logs without interfering
 	// with each other.
@@ -195,9 +195,6 @@ func TestMultipleReceivers(t *testing.T) {
 							"file_identity.native": nil,
 						},
 					},
-				},
-				"output": map[string]any{
-					"otelconsumer": map[string]any{},
 				},
 				"logging": map[string]any{
 					"level": "info",
@@ -252,10 +249,8 @@ func TestMultipleReceivers(t *testing.T) {
 			require.Greater(c, len(logs["r1"]), 0, "receiver r1 does not have any logs")
 			require.Greater(c, len(logs["r2"]), 0, "receiver r2 does not have any logs")
 
-			assert.Equal(c, "filebeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r1 log record")
-			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r1 log record")
-			assert.Equal(c, "filebeatreceiver/r2", logs["r2"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r2 log record")
-			assert.Equal(c, "receiver", logs["r2"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r2 log record")
+			assert.Equal(c, "test", logs["r1"][0].Flatten()["message"], "expected r1 message field to be 'test'")
+			assert.Equal(c, "test", logs["r2"][0].Flatten()["message"], "expected r2  message field to be 'test'")
 
 			// Make sure that each receiver has a separate logger
 			// instance and does not interfere with others. Previously, the
@@ -363,9 +358,6 @@ func TestReceiverDegraded(t *testing.T) {
 							},
 						},
 					},
-					"output": map[string]any{
-						"otelconsumer": map[string]any{},
-					},
 					"logging": map[string]any{
 						"level": "debug",
 						"selectors": []string{
@@ -413,6 +405,7 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 			},
 		},
 	}
+	defer client.CloseIdleConnections()
 	url, err := url.JoinPath("http://unix", endpoint)
 	if err != nil {
 		sb.Reset()
@@ -530,7 +523,7 @@ func TestConsumeContract(t *testing.T) {
 
 	gen := newLogGenerator(t, tmpDir)
 
-	os.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
+	t.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
 
 	cfg := &Config{
 		Beatconfig: map[string]any{
@@ -560,9 +553,6 @@ func TestConsumeContract(t *testing.T) {
 						},
 					},
 				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
 			},
 			"logging": map[string]any{
 				"level": "debug",
@@ -598,9 +588,6 @@ func TestReceiverHook(t *testing.T) {
 						"count":   1,
 					},
 				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
 			},
 			"management.otel.enabled": true,
 			"path.home":               t.TempDir(),

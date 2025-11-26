@@ -10,11 +10,15 @@ import (
 	"github.com/osquery/osquery-go"
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/browserhistory"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables"
 )
 
-func RegisterTables(server *osquery.ExtensionManagerServer) {
-	server.RegisterPlugin(table.NewPlugin("host_users", tables.HostUsersColumns(), tables.GetHostUsersGenerateFunc()))
-	server.RegisterPlugin(table.NewPlugin("host_groups", tables.HostGroupsColumns(), tables.GetHostGroupsGenerateFunc()))
-	server.RegisterPlugin(table.NewPlugin("elastic_file_analysis", tables.FileAnalysisColumns(), tables.GetFileAnalysisGenerateFunc()))
+func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, postHooks *hooks.HookManager) {
+	server.RegisterPlugin(table.NewPlugin("host_users", tables.HostUsersColumns(), tables.GetHostUsersGenerateFunc(log)))
+	server.RegisterPlugin(table.NewPlugin("host_groups", tables.HostGroupsColumns(), tables.GetHostGroupsGenerateFunc(log)))
+	server.RegisterPlugin(table.NewPlugin("elastic_file_analysis", tables.FileAnalysisColumns(), tables.GetFileAnalysisGenerateFunc(log)))
+	server.RegisterPlugin(table.NewPlugin("elastic_browser_history", browserhistory.GetColumns(), browserhistory.GetGenerateFunc(log)))
 }
