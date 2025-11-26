@@ -50,42 +50,18 @@ export OTEL_METRICS_EXPORTER=console
 ```
 ## Exported metrics
 
-Each CEL input has an associated Open Telemetry Resource associate with it.
-Resource attributes that are included for every CEL input instance
-semconv.ServiceInstanceID(env.IDWithoutName),
-attribute.String("package.name", cfg.GetPackageStringValue("name")),
-attribute.String("package.version", cfg.GetPackageStringValue("version")),
-attribute.String("package.datastream", cfg.DataStream),
-attribute.String("agent.version", env.Agent.Version),
-attribute.String("agent.id", env.Agent.ID.String())}
-| name                                | description                         |
-|-------------------------------------|-------------------------------------|
-| agent.version                       | version of agent                    |
-| agent.id              | agent id              |
-| service.instance.id                 | id of the cel input instance |
-| package.name | name of the package|
-| package.version | version of the package|
-| package.datastream | the datastream name in the package|
-
-Resource attributes that may be passed in an OTEL_RESOURCE_ATTRIBUTES
-environment variable and added to the CEL input instance resource attributesexport
-OTEL_EXPORTER_OTLP_METRICS_PROTOCOL="httt/protobuf"
-export OTEL_METRICS_EXPORTER=console
-
-## Exported Metrics
-
 ### Resource attributes
 Each cel input has an associated Open Telemetry resource associated with it.
 These resource attributes that are included for every cel input instance.
 
-| name                                | description                         |
-|-------------------------------------|-------------------------------------|
-| agent.version                       | version of agent                    |
-| agent.id              | agent id              |
-| service.instance.id                 | id of the cel input instance |
-| package.name | name of the package|
-| package.version | version of the package|
-| package.datastream | the datastream name in the package|
+| name                | description                         |
+|---------------------|-------------------------------------|
+| agent.version       | version of agent                    |
+| agent.id            | agent id              |
+| service.instance.id | id of the cel input instance |
+| package.name        | name of the package|
+| package.version     | version of the package|
+| package.data_stream | the datastream name in the package|
 
 Resource attributes that are defined in an OTEL_RESOURCE_ATTRIBUTES
 environment variable will be added to the CEL input instance.
