@@ -23,10 +23,10 @@ Note: the search attribute is expected to map to a single object. If it doesn’
 processors:
   - translate_ldap_attribute:
       field: winlog.event_data.ObjectGuid
-      ldap_address: "ldap://"
       ldap_base_dn: "dc=example,dc=com"
       ignore_missing: true
       ignore_failure: true
+      # ldap_address: "ldap://ds.example.com:389"  # Optional - will auto-discover if omitted
 ```
 
 The `translate_ldap_attribute` processor has the following configuration settings:
@@ -35,7 +35,7 @@ The `translate_ldap_attribute` processor has the following configuration setting
 | --- | --- | --- | --- |
 | `field` | yes |  | Source field containing a GUID. |
 | `target_field` | no |  | Target field for the mapped attribute value. If not set it will be replaced in place. |
-| `ldap_address` | yes |  | LDAP server address. eg: `ldap://ds.example.com:389` |
+| `ldap_address` | no |  | LDAP server address (eg: `ldap://ds.example.com:389`). If not provided, auto-discovery will be attempted via DNS SRV records and, on Windows, the LOGONSERVER environment variable. |
 | `ldap_base_dn` | yes |  | LDAP base DN. eg: `dc=example,dc=com` |
 | `ldap_bind_user` | no |  | LDAP user. |
 | `ldap_bind_password` | no |  | LDAP password. |

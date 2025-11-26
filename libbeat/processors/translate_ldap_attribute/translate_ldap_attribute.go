@@ -57,8 +57,36 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 }
 
 func newFromConfig(c config, logger *logp.Logger) (*processor, error) {
+	p := &processor{config: c}
+	p.log = logger.Named(logName).With(logp.Stringer("processor", p))
+
+	client, err := newClient(c, p.log)
+	if err != nil {
+		return nil, err
+	}
+
+	p.client = client
+	return p, nil
+}
+
+// newClient creates a new LDAP client by discovering and connecting to available servers.
+func newClient(c config, log *logp.Logger) (*ldapClient, error) {
+	// Auto-discover LDAP addresses if not provided
+	var addresses []string
+	if c.LDAPAddress != "" {
+		addresses = []string{c.LDAPAddress}
+	} else {
+		log.Info("LDAP address not configured, attempting auto-discovery")
+		discoveredAddresses, err := discoverLDAPAddress(log)
+		if err != nil {
+			return nil, fmt.Errorf("failed to auto-discover LDAP server: %w", err)
+		}
+		addresses = discoveredAddresses
+		log.Infow("discovered LDAP servers", "count", len(addresses), "addresses", addresses)
+	}
+
+	// Prepare base LDAP config
 	ldapConfig := &ldapConfig{
-		address:         c.LDAPAddress,
 		baseDN:          c.LDAPBaseDN,
 		username:        c.LDAPBindUser,
 		password:        c.LDAPBindPassword,
@@ -67,20 +95,33 @@ func newFromConfig(c config, logger *logp.Logger) (*processor, error) {
 		searchTimeLimit: c.LDAPSearchTimeLimit,
 	}
 	if c.LDAPTLS != nil {
-		tlsConfig, err := tlscommon.LoadTLSConfig(c.LDAPTLS, logger)
+		tlsConfig, err := tlscommon.LoadTLSConfig(c.LDAPTLS, log)
 		if err != nil {
 			return nil, fmt.Errorf("could not load provided LDAP TLS configuration: %w", err)
 		}
 		ldapConfig.tlsConfig = tlsConfig.ToConfig()
 	}
-	p := &processor{config: c}
-	p.log = logger.Named(logName).With(logp.Stringer("processor", p))
-	client, err := newLDAPClient(ldapConfig, p.log)
-	if err != nil {
-		return nil, err
+
+	// Try each discovered address in order until one succeeds
+	var lastErr error
+	for i, address := range addresses {
+		log.Debugw("attempting to connect to LDAP server", "attempt", i+1, "total", len(addresses), "address", address)
+		ldapConfig.address = address
+
+		client, err := newLDAPClient(ldapConfig, log)
+		if err != nil {
+			log.Debugw("failed to connect to LDAP server", "address", address, "error", err)
+			lastErr = err
+			continue
+		}
+
+		// Successfully connected
+		log.Infow("successfully connected to LDAP server", "address", address)
+		return client, nil
 	}
-	p.client = client
-	return p, nil
+
+	// All addresses failed
+	return nil, fmt.Errorf("failed to connect to any discovered LDAP server (%d addresses tried): %w", len(addresses), lastErr)
 }
 
 func (p *processor) String() string {

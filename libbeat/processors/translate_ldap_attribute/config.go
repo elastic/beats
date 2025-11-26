@@ -26,7 +26,7 @@ import (
 type config struct {
 	Field               string            `config:"field"  validate:"required"`
 	TargetField         string            `config:"target_field"`
-	LDAPAddress         string            `config:"ldap_address" validate:"required"`
+	LDAPAddress         string            `config:"ldap_address"`
 	LDAPBaseDN          string            `config:"ldap_base_dn" validate:"required"`
 	LDAPBindUser        string            `config:"ldap_bind_user"`
 	LDAPBindPassword    string            `config:"ldap_bind_password"`
