@@ -42,6 +42,9 @@ const (
 	stateClosed
 )
 
+// SafeProcessor wraps a beat.Processor to provide thread-safe state management.
+// It ensures SetPaths is called only once and prevents Run after Close.
+// Use safeProcessorWithClose for processors that also implement Closer.
 type SafeProcessor struct {
 	beat.Processor
 
@@ -49,11 +52,14 @@ type SafeProcessor struct {
 	state state
 }
 
+// safeProcessorWithClose extends SafeProcessor to also handle Close.
+// It ensures Close is called only once on the underlying processor.
 type safeProcessorWithClose struct {
 	SafeProcessor
 }
 
-// Run allows to run processor only when `Close` was not called prior
+// Run delegates to the underlying processor. Returns ErrClosed if the processor
+// has been closed.
 func (p *SafeProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
@@ -75,6 +81,9 @@ func (p *safeProcessorWithClose) Close() (err error) {
 	return nil
 }
 
+// SetPaths delegates to the underlying processor if it implements SetPather.
+// Returns ErrPathsAlreadySet if called more than once, or ErrSetPathsOnClosed
+// if the processor has been closed.
 func (p *SafeProcessor) SetPaths(paths *paths.Path) error {
 	setPather, ok := p.Processor.(SetPather)
 	if !ok {
@@ -95,17 +104,19 @@ func (p *SafeProcessor) SetPaths(paths *paths.Path) error {
 	return fmt.Errorf("unknown state: %d", p.state)
 }
 
-// SafeWrap makes sure that the processor handles all the required edge-cases.
+// SafeWrap wraps a processor constructor to handle common edge cases:
 //
-// Each processor might end up in multiple processor groups.
-// Every group has its own `Close` that calls `Close` on each
-// processor of that group which leads to multiple `Close` calls
-// on the same processor.
+//   - Multiple Close calls: Each processor might end up in multiple processor
+//     groups. Every group has its own Close that calls Close on each processor,
+//     leading to multiple Close calls on the same processor.
 //
-// If `SafeWrap` is not used, the processor must handle multiple
-// `Close` calls by using `sync.Once` in its `Close` function.
-// We make it easer for processor developers and take care of it
-// in the processor registry instead.
+//   - Multiple SetPaths calls: The wrapper ensures SetPaths is called at most once.
+//
+//   - Close before/during SetPaths: Prevents initialization after shutdown and
+//     protects against race conditions between SetPaths and Close.
+//
+// Without SafeWrap, processors must handle these cases manually using sync.Once
+// or similar mechanisms. SafeWrap is automatically applied by RegisterPlugin.
 func SafeWrap(constructor Constructor) Constructor {
 	return func(config *config.C, log *logp.Logger) (beat.Processor, error) {
 		processor, err := constructor(config, log)
