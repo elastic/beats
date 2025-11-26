@@ -77,9 +77,10 @@ func (o *OTELCELMetrics) AddPeriodicRun(ctx context.Context, count int64) {
 }
 
 func (o *OTELCELMetrics) AddTotalDuration(ctx context.Context, duration time.Duration) {
-	o.periodicRunDuration.Add(ctx, duration.Seconds())
-	o.programRunDurationHistogram.Record(ctx, duration.Seconds())
+		o.periodicRunDuration.Add(ctx, duration.Seconds())
+		o.programRunDurationHistogram.Record(ctx, duration.Seconds())
 }
+
 func (o *OTELCELMetrics) AddPublishDuration(ctx context.Context, duration time.Duration) {
 	o.periodicEventPublishDuration.Add(ctx, duration.Seconds())
 	o.programEventPublishDurationHistogram.Record(ctx, duration.Seconds())
@@ -136,8 +137,7 @@ func NewOTELCELMetrics(log *logp.Logger,
 	input string,
 	resource resource.Resource,
 	tripper http.RoundTripper,
-	metricExporter sdkmetric.Exporter,
-	useNonExponetialHisto bool) (*OTELCELMetrics, *otelhttp.Transport, error) {
+	metricExporter sdkmetric.Exporter) (*OTELCELMetrics, *otelhttp.Transport, error) {
 	var manualExportFunc func(context.Context) error
 	var meterProvider metric.MeterProvider
 
@@ -146,31 +146,24 @@ func NewOTELCELMetrics(log *logp.Logger,
 	} else {
 		reader := sdkmetric.NewManualReader(sdkmetric.WithTemporalitySelector(DeltaSelector))
 
-		var sdkmeterProvider *sdkmetric.MeterProvider
-		if !useNonExponetialHisto {
-			exponentialView := sdkmetric.NewView(
-				sdkmetric.Instrument{
-					// captures every histogram that will produced by this provider
-					Name: "*",
-					Kind: sdkmetric.InstrumentKindHistogram,
+		exponentialView := sdkmetric.NewView(
+			sdkmetric.Instrument{
+				// captures every histogram that will produced by this provider
+				Name: "*",
+				Kind: sdkmetric.InstrumentKindHistogram,
+			},
+			sdkmetric.Stream{
+				Aggregation: sdkmetric.AggregationBase2ExponentialHistogram{
+					MaxSize:  160, // Optional: configure max buckets
+					MaxScale: 20,  // Optional: configure max scale
 				},
-				sdkmetric.Stream{
-					Aggregation: sdkmetric.AggregationBase2ExponentialHistogram{
-						MaxSize:  160, // Optional: configure max buckets
-						MaxScale: 20,  // Optional: configure max scale
-					},
-				},
-			)
-			sdkmeterProvider = sdkmetric.NewMeterProvider(
-				sdkmetric.WithReader(reader),
-				sdkmetric.WithResource(&resource),
-				sdkmetric.WithView(exponentialView))
-		} else {
-			sdkmeterProvider = sdkmetric.NewMeterProvider(
-				sdkmetric.WithReader(reader),
-				sdkmetric.WithResource(&resource))
-		}
-		meterProvider = sdkmeterProvider
+			},
+		)
+		meterProvider = sdkmetric.NewMeterProvider(
+			sdkmetric.WithReader(reader),
+			sdkmetric.WithResource(&resource),
+			sdkmetric.WithView(exponentialView))
+
 		manualExportFunc = func(ctx context.Context) error {
 			collectedMetrics := &metricdata.ResourceMetrics{}
 			err := reader.Collect(ctx, collectedMetrics)
@@ -196,19 +189,19 @@ func NewOTELCELMetrics(log *logp.Logger,
 	}
 	transport := otelhttp.NewTransport(tripper, otelhttp.WithMeterProvider(meterProvider))
 
-	meter := meterProvider.Meter(input)
+	meter := meterProvider.Meter("github.com/elastic/beats/x-pack/filebeat/otel/cel_metrics.go")
 
-	periodicRunCount, err := meter.Int64Counter("input.cel.periodic.run.count")
+	periodicRunCount, err := meter.Int64Counter("input.cel.periodic.run")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.run.count: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.run: %w", err)
 	}
-	programRunStartedCount, err := meter.Int64Counter("input.cel.periodic.program.run.started.count")
+	programRunStartedCount, err := meter.Int64Counter("input.cel.periodic.program.run.started")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.run.started.count: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.program.run.started: %w", err)
 	}
-	programRunSuccessCount, err := meter.Int64Counter("input.cel.periodic.program.run.success.count")
+	programRunSuccessCount, err := meter.Int64Counter("input.cel.periodic.program.run.success")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.success.count: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.program.success: %w", err)
 	}
 	periodicBatchCount, err := meter.Int64Counter("input.cel.periodic.batch.generated")
 	if err != nil {
@@ -239,35 +232,35 @@ func NewOTELCELMetrics(log *logp.Logger,
 		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.event.publish.duration: %w", err)
 	}
 
-	programBatchProcessed, err := GetIntHistogram(meter, "input.cel.program.batch.processed", GetDefaultBatchBucketOption(), useNonExponetialHisto)
+	programBatchProcessed, err := meter.Int64Histogram("input.cel.program.batch.processed")
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.program.batch.processed: %w", err)
 	}
-	programBatchPublished, err := GetIntHistogram(meter, "input.cel.program.batch.published.histogram", GetDefaultBatchBucketOption(), useNonExponetialHisto)
+	programBatchPublished, err := meter.Int64Histogram("input.cel.program.batch.published")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.batch.published.histogram: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.program.batch.published: %w", err)
 	}
-	programEventGenerated, err := GetIntHistogram(meter, "input.cel.program.event.generated.histogram", GetDefaultEventBucketOption(), useNonExponetialHisto)
+	programEventGenerated, err := meter.Int64Histogram("input.cel.program.event.generated")
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed"+
-			" to create input.cel.program.event.generated.histogram: %w", err)
+			" to create input.cel.program.event.generated: %w", err)
 	}
-	programEventPublished, err := GetIntHistogram(meter, "input.cel.program.event.published.histogram", GetDefaultEventBucketOption(), useNonExponetialHisto)
+	programEventPublished, err := meter.Int64Histogram("input.cel.program.event.published")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.event.published.histogram: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.program.event.published: %w", err)
 	}
 
-	programRunDuration, err := GetDurationHistogram(meter, "input.cel.program.run.duration.histogram", useNonExponetialHisto)
+	programRunDuration, err := meter.Float64Histogram("input.cel.program.run.duration")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.run.duration.histogram: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.program.run.duration: %w", err)
 	}
-	programCELDuration, err := GetDurationHistogram(meter, "input.cel.program.cel.duration.histogram", useNonExponetialHisto)
+	programCELDuration, err := meter.Float64Histogram("input.cel.program.cel.duration")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.cel.duration.histogram: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.program.cel.duration: %w", err)
 	}
-	programPublishDuration, err := GetDurationHistogram(meter, "input.cel.program.publish.duration.histogram", useNonExponetialHisto)
+	programPublishDuration, err := meter.Float64Histogram("input.cel.program.publish.duration")
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.publish.duration.histogram: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.program.publish.duration: %w", err)
 	}
 
 	return &OTELCELMetrics{
@@ -292,57 +285,4 @@ func NewOTELCELMetrics(log *logp.Logger,
 		programEventPublishDurationHistogram: programPublishDuration,
 	}, transport, nil
 
-}
-
-func GetIntHistogram(meter metric.Meter, name string, buckets metric.HistogramOption, nonexponential bool) (metric.Int64Histogram, error) {
-	if nonexponential {
-		return meter.Int64Histogram(name, buckets)
-	}
-	return meter.Int64Histogram(name)
-}
-func GetDurationHistogram(meter metric.Meter, name string, nonexponential bool) (metric.Float64Histogram, error) {
-	if nonexponential {
-		return meter.Float64Histogram(name, GetDefaultDurationBucketOption())
-	}
-	return meter.Float64Histogram(name)
-}
-
-func GetDefaultDurationBucketOption() metric.HistogramOption {
-	return metric.WithExplicitBucketBoundaries(0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10, 20, 60, 180, 600, 1200, 2400, 3600)
-}
-
-func GetDefaultBatchBucketOption() metric.HistogramOption {
-	return metric.WithExplicitBucketBoundaries(0,
-		5,
-		10,
-		25,
-		50,
-		75,
-		100,
-		250,
-		500,
-		750,
-		1000,
-		10000)
-}
-
-func GetDefaultEventBucketOption() metric.HistogramOption {
-	return metric.WithExplicitBucketBoundaries(0,
-		5,
-		10,
-		25,
-		50,
-		75,
-		100,
-		250,
-		500,
-		750,
-		1000,
-		2500,
-		5000,
-		7500,
-		10000,
-		25000,
-		50000,
-		100000)
 }

@@ -279,7 +279,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		otelMetrics.StartPeriodic()
 		defer otelMetrics.EndPeriodic(ctx)
 
-		log.Info("process periodic request")
+		log.Debug("process periodic request")
 		var (
 			budget    = *cfg.MaxExecutions
 			waitUntil time.Time
@@ -324,6 +324,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				otelMetrics.AddTotalDuration(ctx, time.Since(start))
 			}()
 			state, err = evalWith(ctx, prg, ast, state, start, wantDump, budget-1)
+			otelMetrics.AddCELDuration(ctx, time.Since(start))
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
 				var dump dumpError
@@ -348,7 +349,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 			isDegraded = err != nil
 			metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
-			otelMetrics.AddCELDuration(ctx, time.Since(start))
 			if trace != nil {
 				log.Debugw("final transaction", "transaction.id", trace.TxID())
 			}
@@ -880,7 +880,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	} else if cfg.Auth.File.isEnabled() {
 		tr, err := newFileAuthTransport(cfg.Auth.File, c.Transport)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 		c.Transport = tr
 	}
@@ -969,12 +969,11 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		if err != nil {
 			return nil, nil, nil, err
 		}
-	} else {
+	}
 
-		c.Transport = userAgentDecorator{
-			UserAgent: userAgent,
-			Transport: c.Transport,
-		}
+	c.Transport = userAgentDecorator{
+		UserAgent: userAgent,
+		Transport: c.Transport,
 	}
 
 	resource := resource.NewWithAttributes(
@@ -990,14 +989,9 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		log.Errorw("failed to get collection period", "error", err)
 	}
 	log.Infof("created OTEL cel input exporter %s for input %s", exporterType, env.IDWithoutName)
-	otelMetrics, otelTransport, err := otel.NewOTELCELMetrics(log, env.IDWithoutName, *resource, c.Transport, exporter, UseNonExponentialHistograms())
+	otelMetrics, otelTransport, err := otel.NewOTELCELMetrics(log, env.IDWithoutName, *resource, c.Transport, exporter)
 	c.Transport = otelTransport
 	return c, trace, otelMetrics, nil
-}
-
-func UseNonExponentialHistograms() bool {
-	_, ok := os.LookupEnv("USE_NON_EXPONENTIAL_HISTOGRAMS")
-	return ok
 }
 
 func GetResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
