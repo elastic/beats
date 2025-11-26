@@ -15,6 +15,7 @@
         Incoming network stats per second.
       fields:
         - name: bytes
+          format: bytes
           type: scaled_float
           description: >
             Incoming bytes per seconds.
@@ -36,6 +37,7 @@
         Outgoing network stats per second.
       fields:
         - name: bytes
+          format: bytes
           type: scaled_float
           description: >
             Outgoing bytes per second.
