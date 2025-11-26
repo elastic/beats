@@ -110,13 +110,18 @@ func (p *processor) translateLDAPAttr(event *beat.Event) error {
 		return err
 	}
 
-	guidString, ok := v.(string)
+	searchValue, ok := v.(string)
 	if !ok {
 		return errInvalidType
 	}
 
-	p.log.Debugw("ldap search", "guid", guidString)
-	cn, err := p.client.findObjectBy(guidString)
+	searchFilter, err := p.prepareSearchFilter(searchValue)
+	if err != nil {
+		return err
+	}
+
+	p.log.Debugw("ldap search", "search_value", searchValue, "filter_value", searchFilter)
+	cn, err := p.client.findObjectBy(searchFilter)
 	p.log.Debugw("ldap result", "common_name", cn)
 	if err != nil {
 		return err
@@ -128,6 +133,29 @@ func (p *processor) translateLDAPAttr(event *beat.Event) error {
 	}
 	_, err = event.PutValue(field, cn)
 	return err
+}
+
+// prepareSearchFilter converts the search value to the appropriate format for LDAP queries.
+// It applies GUID binary conversion when required based on the ADGUIDTranslation configuration.
+func (p *processor) prepareSearchFilter(searchValue string) (string, error) {
+	// Determine if GUID conversion should be applied
+	var shouldConvertGUID bool
+	if p.ADGUIDTranslation == nil {
+		shouldConvertGUID = (p.LDAPSearchAttribute == "objectGUID")
+	} else {
+		shouldConvertGUID = *p.ADGUIDTranslation
+	}
+
+	if !shouldConvertGUID {
+		return searchValue, nil
+	}
+
+	guidBytes, err := guidToBytes(searchValue)
+	if err != nil {
+		return "", fmt.Errorf("failed to convert GUID: %w", err)
+	}
+	searchFilter := escapeBinaryForLDAP(guidBytes)
+	return searchFilter, nil
 }
 
 func (p *processor) Close() error {

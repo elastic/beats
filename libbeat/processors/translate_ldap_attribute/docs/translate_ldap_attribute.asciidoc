@@ -51,6 +51,7 @@ The `translate_ldap_attribute` processor has the following configuration setting
 | `ldap_mapped_attribute`  | yes      | `cn`         | LDAP attribute to map to.
 | `ldap_search_time_limit` | no       | 30           | LDAP search time limit in seconds.
 | `ldap_ssl`*              | no       | 30           | LDAP TLS/SSL connection settings.
+| `ad_guid_translation`    | no       | null         | Controls Active Directory GUID binary conversion. When `null` (default), GUID conversion is enabled only when `ldap_search_attribute` is `objectGUID`. Set to `true` to always convert, or `false` to never convert. This is specific to Microsoft Active Directory; do not use for other LDAP implementations.
 | `ignore_missing`         | no       | false        | Ignore errors when the source field is missing.
 | `ignore_failure`         | no       | false        | Ignore all errors produced by the processor.
 |======
