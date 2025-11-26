@@ -122,7 +122,7 @@ require (
 	go.etcd.io/bbolt v1.4.0
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.44.0
+	golang.org/x/crypto v0.45.0
 	golang.org/x/mod v0.29.0
 	golang.org/x/net v0.47.0
 	golang.org/x/oauth2 v0.31.0
@@ -179,7 +179,7 @@ require (
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
-	github.com/elastic/mito v1.23.0
+	github.com/elastic/mito v1.24.0
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20250603175145-7672917f26b6
 	github.com/elastic/tk-btf v0.2.0
@@ -197,7 +197,7 @@ require (
 	github.com/icholy/digest v0.1.22
 	github.com/klauspost/compress v1.18.1
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-	github.com/microsoft/go-mssqldb v1.9.3
+	github.com/microsoft/go-mssqldb v1.9.4
 	github.com/microsoft/wmi v0.34.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.139.0
 	github.com/pierrec/lz4/v4 v4.1.22
