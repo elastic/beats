@@ -15,8 +15,7 @@
         Incoming network stats per second.
       fields:
         - name: bytes
-          type: long
-          format: bytes
+          type: scaled_float
           description: >
             Incoming bytes per seconds.
         - name: dropped
@@ -24,11 +23,11 @@
           description: >
             Dropped incoming packets per second.
         - name: errors
-          type: long
+          type: scaled_float
           description: >
             Errors on incoming packets per second.
         - name: packets
-          type: long
+          type: scaled_float
           description: >
             Incoming packets per second.
     - name: out
@@ -37,8 +36,7 @@
         Outgoing network stats per second.
       fields:
         - name: bytes
-          type: long
-          format: bytes
+          type: scaled_float
           description: >
             Outgoing bytes per second.
         - name: dropped
@@ -46,11 +44,11 @@
           description: >
             Dropped outgoing packets per second.
         - name: errors
-          type: long
+          type: scaled_float
           description: >
             Errors on outgoing packets per second.
         - name: packets
-          type: long
+          type: scaled_float
           description: >
             Outgoing packets per second.
     - name: inbound
