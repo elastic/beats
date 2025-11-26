@@ -1270,6 +1270,8 @@ receivers:
       - add_fields:
           fields:
             custom_field: "custom_value"
+    output:
+      otelconsumer:
     logging:
       level: info
       selectors:
@@ -1338,6 +1340,8 @@ receivers:
           fields:
             custom_field: "custom_value"
       - add_host_metadata:
+    output:
+      otelconsumer:
     logging:
       level: info
       selectors:
