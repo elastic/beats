@@ -81,6 +81,10 @@ The list of Elasticsearch nodes to connect to. The events are distributed to the
 When a node is defined as an `IP:PORT`, the *scheme* and *path* are taken from the [`protocol`](#protocol-option) and [`path`](#path-option) config options.
 ::::
 
+::::{warning}
+All configured hosts must belong to the same Elasticsearch cluster; using nodes from different clusters may result in split or inconsistent data.
+::::
+
 
 ```yaml
 output.elasticsearch:
