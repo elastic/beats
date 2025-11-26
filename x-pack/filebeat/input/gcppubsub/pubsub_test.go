@@ -8,11 +8,6 @@ package gcppubsub
 
 import (
 	"context"
-	"errors"
-	"io"
-	"net/http"
-	"os"
-	"strconv"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -21,13 +16,12 @@ import (
 	"cloud.google.com/go/pubsub"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
-	"google.golang.org/api/iterator"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcppubsub/testutil"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -38,6 +32,7 @@ const (
 	emulatorSubscription = "test-subscription-bar"
 )
 
+<<<<<<< HEAD
 var once sync.Once
 
 func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
@@ -189,6 +184,8 @@ func createSubscription(t *testing.T, client *pubsub.Client) {
 	t.Log("New subscription created:", sub.ID())
 }
 
+=======
+>>>>>>> 7577d5964 (otel: fix remaining tests to use in process testing collector (#47772))
 func ifNotDone(ctx context.Context, f func()) func() {
 	return func() {
 		select {
@@ -212,22 +209,18 @@ func defaultTestConfig() *conf.C {
 	})
 }
 
-func isInDockerIntegTestEnv() bool {
-	return os.Getenv("BEATS_INSIDE_INTEGRATION_TEST_ENV") != ""
-}
-
 func runTest(t *testing.T, cfg *conf.C, run func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T)) {
 	runTestWithACKer(t, cfg, ackEvent, run)
 }
 
 func runTestWithACKer(t *testing.T, cfg *conf.C, onEvent eventHandler, run func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T)) {
-	if !isInDockerIntegTestEnv() {
+	if !testutil.IsInDockerIntegTestEnv() {
 		// Don't test goroutines when using our compose.EnsureUp.
 		defer resources.NewGoroutinesChecker().Check(t)
 	}
 
 	// Create pubsub client for setting up and communicating to emulator.
-	client, clientCancel := testSetup(t)
+	client, clientCancel := testutil.TestSetup(t)
 	defer clientCancel()
 	defer client.Close()
 
@@ -355,7 +348,7 @@ func TestSubscriptionDoesNotExistError(t *testing.T) {
 	_ = cfg.SetBool("subscription.create", -1, false)
 
 	runTest(t, cfg, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
-		createTopic(t, client)
+		testutil.CreateTopic(t, client)
 
 		err := input.run()
 		if assert.Error(t, err) {
@@ -368,9 +361,15 @@ func TestSubscriptionExists(t *testing.T) {
 	cfg := defaultTestConfig()
 
 	runTest(t, cfg, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
+<<<<<<< HEAD
 		createTopic(t, client)
 		createSubscription(t, client)
 		publishMessages(t, client, 5)
+=======
+		testutil.CreateTopic(t, client)
+		testutil.CreateSubscription(t, emulatorSubscription, client)
+		testutil.PublishMessages(t, client, 5)
+>>>>>>> 7577d5964 (otel: fix remaining tests to use in process testing collector (#47772))
 
 		var group errgroup.Group
 		group.Go(input.run)
@@ -392,12 +391,12 @@ func TestSubscriptionCreate(t *testing.T) {
 	cfg := defaultTestConfig()
 
 	runTest(t, cfg, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
-		createTopic(t, client)
+		testutil.CreateTopic(t, client)
 
 		group, ctx := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
-		time.AfterFunc(1*time.Second, ifNotDone(ctx, func() { publishMessages(t, client, 5) }))
+		time.AfterFunc(1*time.Second, ifNotDone(ctx, func() { testutil.PublishMessages(t, client, 5) }))
 		time.AfterFunc(10*time.Second, func() { out.Close() })
 
 		events, ok := out.waitForEvents(5)
@@ -442,14 +441,19 @@ func TestEndToEndACK(t *testing.T) {
 	}
 
 	runTestWithACKer(t, cfg, halfAcker, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
+<<<<<<< HEAD
 		createTopic(t, client)
 		createSubscription(t, client)
+=======
+		testutil.CreateTopic(t, client)
+		testutil.CreateSubscription(t, emulatorSubscription, client)
+>>>>>>> 7577d5964 (otel: fix remaining tests to use in process testing collector (#47772))
 
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
 		const numMsgs = 10
-		publishMessages(t, client, numMsgs)
+		testutil.PublishMessages(t, client, numMsgs)
 		events, ok := out.waitForEvents(numMsgs)
 		if !ok {
 			t.Fatalf("Expected %d events, but got %d.", 1, len(events))
