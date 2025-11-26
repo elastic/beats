@@ -74,7 +74,10 @@ output:
 		t.Fatalf("Failed to stat file: %v", err)
 	}
 
-	stat := logFileInfo.Sys().(*syscall.Stat_t)
+	stat, ok := logFileInfo.Sys().(*syscall.Stat_t)
+	if !ok {
+		t.Fatalf("Failed to stat file")
+	}
 
 	logFileOwner, err := user.LookupId(strconv.FormatUint(uint64(stat.Uid), 10))
 	if err != nil {

@@ -229,7 +229,7 @@ func (c *config) Validate() error {
 	return nil
 }
 
-// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged parameters are set and logs a warning
 func (c config) checkUnsupportedParams(logger *logp.Logger) {
 	if c.AllowIDDuplication {
 		logger.Named("filestream").Warn(

@@ -45,7 +45,7 @@ func GetOSState(info os.FileInfo) StateOS {
 
 	// Convert inode and dev to uint64 to be cross platform compatible
 	fileState := StateOS{
-		Inode:  uint64(stat.Ino),
+		Inode:  stat.Ino,
 		Device: uint64(stat.Dev),
 		UID:    uint64(stat.Uid),
 		GID:    uint64(stat.Gid),
@@ -97,11 +97,14 @@ func IsRemoved(f *os.File) bool {
 		// if we got an error from a Stat call just assume we are removed
 		return true
 	}
-	sysStat := stat.Sys().(*syscall.Stat_t)
+	sysStat, ok := stat.Sys().(*syscall.Stat_t)
+	if !ok {
+		return true
+	}
 	return sysStat.Nlink == 0
 }
 
 // InodeString returns the inode in string.
-func (s *StateOS) InodeString() string {
-	return strconv.FormatUint(s.Inode, 10)
+func (fs *StateOS) InodeString() string {
+	return strconv.FormatUint(fs.Inode, 10)
 }
