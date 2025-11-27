@@ -79,9 +79,9 @@ func (r *WhenProcessor) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (r *WhenProcessor) SetPaths(paths *paths.Path) error {
-	setPather, ok := r.p.(SetPather)
+	pathSetter, ok := r.p.(PathSetter)
 	if ok {
-		return setPather.SetPaths(paths)
+		return pathSetter.SetPaths(paths)
 	}
 	return nil
 }
@@ -211,7 +211,7 @@ func (p *IfThenElseProcessor) Run(event *beat.Event) (*beat.Event, error) {
 func (p *IfThenElseProcessor) SetPaths(paths *paths.Path) error {
 	var err error
 	for _, proc := range p.then.List {
-		if procWithSet, ok := proc.(SetPather); ok {
+		if procWithSet, ok := proc.(PathSetter); ok {
 			err = errors.Join(err, procWithSet.SetPaths(paths))
 		}
 	}
@@ -221,7 +221,7 @@ func (p *IfThenElseProcessor) SetPaths(paths *paths.Path) error {
 	}
 
 	for _, proc := range p.els.List {
-		if procWithSet, ok := proc.(SetPather); ok {
+		if procWithSet, ok := proc.(PathSetter); ok {
 			err = errors.Join(err, procWithSet.SetPaths(paths))
 		}
 	}

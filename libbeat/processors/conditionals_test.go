@@ -356,7 +356,7 @@ then:
 	beatProcessor, err := NewIfElseThenProcessor(c, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
-	proc := requireImplements[SetPather](t, beatProcessor)
+	proc := requireImplements[PathSetter](t, beatProcessor)
 
 	// SetPaths should not panic when then is nil
 	tmpDir := t.TempDir()

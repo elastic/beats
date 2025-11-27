@@ -120,9 +120,9 @@ func (p *group) All() []beat.Processor {
 func (p *group) SetPaths(paths *paths.Path) error {
 	var err error
 	for _, processor := range p.list {
-		setPather, ok := processor.(processors.SetPather)
+		pathSetter, ok := processor.(processors.PathSetter)
 		if ok {
-			err = errors.Join(err, setPather.SetPaths(paths))
+			err = errors.Join(err, pathSetter.SetPaths(paths))
 		}
 	}
 	return err

@@ -62,34 +62,34 @@ func newMockCloserConstructor() (Constructor, *mockCloserProcessor) {
 	return constructor, &p
 }
 
-type mockSetPatherCloserProcessor struct {
+type mockPathSetterCloserProcessor struct {
 	mockCloserProcessor
 	setPathsCount int
 }
 
-func (p *mockSetPatherCloserProcessor) SetPaths(*paths.Path) error {
+func (p *mockPathSetterCloserProcessor) SetPaths(*paths.Path) error {
 	p.setPathsCount++
 	return nil
 }
 
-func newMockSetPatherCloserProcessor() (Constructor, *mockSetPatherCloserProcessor) {
-	p := mockSetPatherCloserProcessor{}
+func newMockPathSetterCloserProcessor() (Constructor, *mockPathSetterCloserProcessor) {
+	p := mockPathSetterCloserProcessor{}
 	constructor := func(config *config.C, _ *logp.Logger) (beat.Processor, error) { return &p, nil }
 	return constructor, &p
 }
 
-type mockSetPatherProcessor struct {
+type mockPathSetterProcessor struct {
 	mockProcessor
 	setPathsCount int
 }
 
-func (p *mockSetPatherProcessor) SetPaths(*paths.Path) error {
+func (p *mockPathSetterProcessor) SetPaths(*paths.Path) error {
 	p.setPathsCount++
 	return nil
 }
 
-func newMockSetPatherProcessor() (Constructor, *mockSetPatherProcessor) {
-	p := mockSetPatherProcessor{}
+func newMockPathSetterProcessor() (Constructor, *mockPathSetterProcessor) {
+	p := mockPathSetterProcessor{}
 	constructor := func(config *config.C, _ *logp.Logger) (beat.Processor, error) {
 		return &p, nil
 	}
@@ -170,10 +170,10 @@ func TestSafeProcessor(t *testing.T) {
 }
 
 func TestSafeProcessorSetPathsClose(t *testing.T) {
-	cons, p := newMockSetPatherCloserProcessor()
+	cons, p := newMockPathSetterCloserProcessor()
 	var (
 		bp  beat.Processor
-		sp  SetPather
+		sp  PathSetter
 		err error
 	)
 	t.Run("creates a wrapped processor", func(t *testing.T) {
@@ -193,9 +193,9 @@ func TestSafeProcessorSetPathsClose(t *testing.T) {
 
 	t.Run("sets paths", func(t *testing.T) {
 		assert.Equal(t, 0, p.setPathsCount)
-		require.Implements(t, (*SetPather)(nil), bp)
+		require.Implements(t, (*PathSetter)(nil), bp)
 		var ok bool
-		sp, ok = bp.(SetPather)
+		sp, ok = bp.(PathSetter)
 		require.True(t, ok)
 		require.NotNil(t, sp)
 		err = sp.SetPaths(&paths.Path{})
@@ -248,10 +248,10 @@ func TestSafeProcessorSetPathsClose(t *testing.T) {
 }
 
 func TestSafeProcessorSetPaths(t *testing.T) {
-	cons, p := newMockSetPatherProcessor()
+	cons, p := newMockPathSetterProcessor()
 	var (
 		bp  beat.Processor
-		sp  SetPather
+		sp  PathSetter
 		err error
 	)
 	t.Run("creates a wrapped processor", func(t *testing.T) {
@@ -277,9 +277,9 @@ func TestSafeProcessorSetPaths(t *testing.T) {
 
 	t.Run("sets paths", func(t *testing.T) {
 		assert.Equal(t, 0, p.setPathsCount)
-		require.Implements(t, (*SetPather)(nil), bp)
+		require.Implements(t, (*PathSetter)(nil), bp)
 		var ok bool
-		sp, ok = bp.(SetPather)
+		sp, ok = bp.(PathSetter)
 		require.True(t, ok)
 		require.NotNil(t, sp)
 		err = sp.SetPaths(&paths.Path{})

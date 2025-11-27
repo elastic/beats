@@ -60,7 +60,7 @@ type safeProcessorWithClose struct {
 }
 
 // Run delegates to the underlying processor. Returns ErrClosed if the processor
-// has been closed, or ErrPathsNotSet if the processor implements SetPather but
+// has been closed, or ErrPathsNotSet if the processor implements PathSetter but
 // SetPaths has not been called.
 func (p *SafeProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	p.mu.RLock()
@@ -69,7 +69,7 @@ func (p *SafeProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	case stateClosed:
 		return nil, ErrClosed
 	case stateInit:
-		if _, ok := p.Processor.(SetPather); ok {
+		if _, ok := p.Processor.(PathSetter); ok {
 			return nil, ErrPathsNotSet
 		}
 	default: // proceed
@@ -89,11 +89,11 @@ func (p *safeProcessorWithClose) Close() (err error) {
 	return nil
 }
 
-// SetPaths delegates to the underlying processor if it implements SetPather.
+// SetPaths delegates to the underlying processor if it implements PathSetter.
 // Returns ErrPathsAlreadySet if called more than once, or ErrSetPathsOnClosed
 // if the processor has been closed.
 func (p *SafeProcessor) SetPaths(paths *paths.Path) error {
-	setPather, ok := p.Processor.(SetPather)
+	pathSetter, ok := p.Processor.(PathSetter)
 	if !ok {
 		return nil
 	}
@@ -103,7 +103,7 @@ func (p *SafeProcessor) SetPaths(paths *paths.Path) error {
 	switch p.state {
 	case stateInit:
 		p.state = stateSetPaths
-		return setPather.SetPaths(paths)
+		return pathSetter.SetPaths(paths)
 	case stateSetPaths:
 		return ErrPathsAlreadySet
 	case stateClosed:
@@ -134,7 +134,7 @@ func SafeWrap(constructor Constructor) Constructor {
 		// if the processor does not implement `Closer` it does not need a wrap
 		if _, ok := processor.(Closer); !ok {
 			// if SetPaths is implemented, ensure single call of SetPaths
-			if _, ok = processor.(SetPather); ok {
+			if _, ok = processor.(PathSetter); ok {
 				return &SafeProcessor{Processor: processor}, nil
 			}
 			return processor, nil

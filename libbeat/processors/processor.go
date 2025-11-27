@@ -45,9 +45,9 @@ type Closer interface {
 	Close() error
 }
 
-// SetPather is an interface for processors that support lazy initialization
+// PathSetter is an interface for processors that support lazy initialization
 // with beat-specific paths. This method must be called before the processor can be used.
-type SetPather interface {
+type PathSetter interface {
 	SetPaths(*paths.Path) error
 }
 
