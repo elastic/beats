@@ -43,14 +43,9 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
-// BuildOTel builds the Beat binary with OTel sub command
-func BuildOTel() error {
-	return devtools.BuildOTel()
-}
-
 // BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
 func BuildSystemTestBinary() error {
-	return devtools.BuildSystemTestOTelBinary()
+	return devtools.BuildSystemTestBinary()
 }
 
 // GolangCrossBuild builds the Beat binary inside of the golang-builder.
@@ -173,15 +168,13 @@ func IntegTest() {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
-	// build integration test binary with otel sub command
-	devtools.BuildSystemTestOTelBinary()
+	devtools.BuildSystemTestBinary()
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs(ctx))
 }
 
 // GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
-	// build integration test binary with otel sub command
-	devtools.BuildSystemTestOTelBinary()
+	devtools.BuildSystemTestBinary()
 	return devtools.GoIntegTestFromHost(ctx, devtools.FIPSOnlyGoTestIntegrationFromHostArgs(ctx))
 }
 
