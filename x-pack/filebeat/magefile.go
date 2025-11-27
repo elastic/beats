@@ -168,36 +168,14 @@ func IntegTest() {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
-<<<<<<< HEAD
-	// build integration test binary with otel sub command
-	devtools.BuildSystemTestOTelBinary()
-	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs(ctx))
-=======
 	devtools.BuildSystemTestBinary()
-	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
-	// ES_USER must be admin in order for the Go Integration tests to function because they require
-	// indices:data/read/search
-	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
-	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
-	return devtools.GoIntegTestFromHost(ctx, args)
->>>>>>> f4b9ad1dd (chore(otel): remove otelbeat (#47804))
+	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs(ctx))
 }
 
 // GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
-<<<<<<< HEAD
-	// build integration test binary with otel sub command
-	devtools.BuildSystemTestOTelBinary()
-	return devtools.GoIntegTestFromHost(ctx, devtools.FIPSOnlyGoTestIntegrationFromHostArgs(ctx))
-=======
 	devtools.BuildSystemTestBinary()
-	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
-	// ES_USER must be admin in order for the Go Integration tests to function because they require
-	// indices:data/read/search
-	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
-	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
-	return devtools.GoIntegTestFromHost(ctx, args)
->>>>>>> f4b9ad1dd (chore(otel): remove otelbeat (#47804))
+	return devtools.GoIntegTestFromHost(ctx, devtools.FIPSOnlyGoTestIntegrationFromHostArgs(ctx))
 }
 
 // GoWindowsIntegTest executes the Go windows integration tests.
