@@ -232,6 +232,7 @@ require (
 
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
+	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/gorilla/mux v1.8.1
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
