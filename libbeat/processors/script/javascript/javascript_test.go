@@ -90,9 +90,7 @@ func TestNew(t *testing.T) {
 	})
 
 	t.Run("with glob pattern", func(t *testing.T) {
-		globDir := filepath.Join(tmpDir, "glob")
-		err := os.Mkdir(globDir, 0o755)
-		require.NoError(t, err)
+		globDir := t.TempDir()
 
 		// Create multiple files that should be matched by the glob
 		writeFile(t, globDir, "a_utils.js", "var fromGlob = true;")
