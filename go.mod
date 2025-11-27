@@ -185,7 +185,7 @@ require (
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/go-ldap/ldap/v3 v3.4.6
 	github.com/go-ole/go-ole v1.3.0
-	github.com/go-resty/resty/v2 v2.16.5
+	github.com/go-resty/resty/v2 v2.17.0
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/cel-go v0.25.0
