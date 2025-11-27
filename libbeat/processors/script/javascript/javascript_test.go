@@ -37,18 +37,11 @@ func TestNew(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	t.Run("with inline source", func(t *testing.T) {
-		cfg, err := config.NewConfigFrom(map[string]any{
-			"source": `function process(event) { event.Put("hello", "world"); }`,
-		})
-		require.NoError(t, err)
-
-		p, err := New(cfg, logptest.NewTestingLogger(t, ""))
-		require.NoError(t, err)
+		p := newTestProcessor(t, "source", `function process(event) { event.Put("hello", "world"); }`, "")
 
 		evt := &beat.Event{Fields: mapstr.M{}}
 		result, err := p.Run(evt)
 		require.NoError(t, err)
-		require.NotNil(t, result)
 
 		v, _ := result.GetValue("hello")
 		assert.Equal(t, "world", v)
@@ -56,12 +49,7 @@ func TestNew(t *testing.T) {
 
 	t.Run("with file", func(t *testing.T) {
 		file := writeFile(t, tmpDir, "processor.js", `function process(event) { event.Put("from_file", true); }`)
-
-		cfg, err := config.NewConfigFrom(map[string]any{"file": file})
-		require.NoError(t, err)
-
-		p, err := New(cfg, logptest.NewTestingLogger(t, ""))
-		require.NoError(t, err)
+		p := newTestProcessor(t, "file", file, "")
 
 		evt := &beat.Event{Fields: mapstr.M{}}
 		result, err := p.Run(evt)
@@ -74,12 +62,7 @@ func TestNew(t *testing.T) {
 	t.Run("with multiple files", func(t *testing.T) {
 		utilFile := writeFile(t, tmpDir, "util.js", "var multiplier = 2;")
 		mainFile := writeFile(t, tmpDir, "main.js", `function process(event) { event.Put("multiplier", multiplier); }`)
-
-		cfg, err := config.NewConfigFrom(map[string]any{"files": []string{utilFile, mainFile}})
-		require.NoError(t, err)
-
-		p, err := New(cfg, logptest.NewTestingLogger(t, ""))
-		require.NoError(t, err)
+		p := newTestProcessor(t, "files", []string{utilFile, mainFile}, "")
 
 		evt := &beat.Event{Fields: mapstr.M{}}
 		result, err := p.Run(evt)
@@ -91,36 +74,21 @@ func TestNew(t *testing.T) {
 
 	t.Run("with glob pattern", func(t *testing.T) {
 		globDir := t.TempDir()
-
-		// Create multiple files that should be matched by the glob
 		writeFile(t, globDir, "a_utils.js", "var fromGlob = true;")
 		writeFile(t, globDir, "b_main.js", `function process(event) { event.Put("from_glob", fromGlob); }`)
-
-		cfg, err := config.NewConfigFrom(map[string]any{"file": filepath.Join(globDir, "*.js")})
-		require.NoError(t, err)
-
-		p, err := New(cfg, logptest.NewTestingLogger(t, ""))
-		require.NoError(t, err)
+		p := newTestProcessor(t, "file", filepath.Join(globDir, "*.js"), "")
 
 		evt := &beat.Event{Fields: mapstr.M{}}
 		result, err := p.Run(evt)
 		require.NoError(t, err)
 
-		// Verify both files were loaded (b_main.js uses variable from a_util.js)
+		// Verify both files were loaded (b_main.js uses variable from a_utils.js)
 		v, _ := result.GetValue("from_glob")
 		assert.Equal(t, true, v)
 	})
 
 	t.Run("with tag", func(t *testing.T) {
-		cfg, err := config.NewConfigFrom(map[string]any{
-			"tag":    "my-processor",
-			"source": `function process(event) { return event; }`,
-		})
-		require.NoError(t, err)
-
-		p, err := New(cfg, logptest.NewTestingLogger(t, ""))
-		require.NoError(t, err)
-
+		p := newTestProcessor(t, "source", `function process(event) { return event; }`, "my-processor")
 		assert.Contains(t, p.String(), "id=my-processor")
 	})
 
@@ -207,6 +175,19 @@ func TestRunWithStats(t *testing.T) {
 		assert.NotNil(t, jp.stats)
 		assert.Equal(t, int64(1), jp.stats.exceptions.Get())
 	})
+}
+
+func newTestProcessor(t *testing.T, key string, value any, tag string) beat.Processor {
+	t.Helper()
+	cfg := map[string]any{key: value}
+	if tag != "" {
+		cfg["tag"] = tag
+	}
+	c, err := config.NewConfigFrom(cfg)
+	require.NoError(t, err)
+	p, err := New(c, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+	return p
 }
 
 func writeFile(t *testing.T, dir, name, contents string) string {
