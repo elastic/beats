@@ -236,13 +236,7 @@ require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.19.0
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
-<<<<<<< HEAD
-	github.com/elastic/pkcs8 v1.0.0
-=======
-	github.com/forensicanalysis/fslib v0.15.2
-	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
->>>>>>> 908d48fcb (feat: switch back to upstream pkcs8 lib (#47763))
 	go.opentelemetry.io/collector/client v1.45.0
 	go.opentelemetry.io/collector/component/componenttest v0.139.0
 	go.opentelemetry.io/collector/config/configauth v1.45.0
