@@ -18,7 +18,6 @@
 package autodiscover
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -29,8 +28,6 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -166,7 +163,6 @@ func TestNilAutodiscover(t *testing.T) {
 }
 
 func TestAutodiscover(t *testing.T) {
-	printDebugLogsOnFailure(t)
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
 
@@ -643,7 +639,6 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 }
 
 func TestAutodiscoverDebounce(t *testing.T) {
-	printDebugLogsOnFailure(t)
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
@@ -740,26 +735,6 @@ func TestAutodiscoverDebounce(t *testing.T) {
 		},
 	})
 	requireRunningRunners(t, autodiscover, 0)
-}
-
-func printDebugLogsOnFailure(t *testing.T) {
-	observed, zapLogs := observer.New(zapcore.DebugLevel)
-	_, err := logp.ConfigureWithCoreLocal(logp.Config{}, observed)
-	require.NoError(t, err)
-
-	t.Cleanup(func() {
-		if t.Failed() {
-			t.Logf("Debug Logs:\n")
-			for _, log := range zapLogs.TakeAll() {
-				data, err := json.Marshal(log)
-				if err != nil {
-					t.Errorf("failed encoding log as JSON: %s", err)
-				}
-				t.Logf("%s", string(data))
-			}
-			return
-		}
-	})
 }
 
 func requireRunningRunners(t *testing.T, autodiscover *Autodiscover, nRunners int) {
