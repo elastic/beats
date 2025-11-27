@@ -184,9 +184,9 @@ func newTestProcessor(t *testing.T, key string, value any, tag string) beat.Proc
 		cfg["tag"] = tag
 	}
 	c, err := config.NewConfigFrom(cfg)
-	require.NoError(t, err)
+	require.NoErrorf(t, err, "failed to create config from map: %v", cfg)
 	p, err := New(c, logptest.NewTestingLogger(t, ""))
-	require.NoError(t, err)
+	require.NoErrorf(t, err, "failed to create new javascript processor with config: %v", cfg)
 	return p
 }
 
