@@ -69,6 +69,7 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	// Logging (each processor instance has a unique ID).
 	id := int(instanceID.Add(1))
 	log = log.Named(name).With("instance_id", id)
+	log.Infow("cache processor created", "config", config)
 
 	return &cache{
 		config: config,
