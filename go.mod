@@ -70,7 +70,11 @@ require (
 	github.com/elastic/go-sysinfo v1.15.3
 	github.com/elastic/go-ucfg v0.8.8
 	github.com/elastic/gosigar v0.14.3
+<<<<<<< HEAD
 	github.com/fatih/color v1.16.0
+=======
+	github.com/fatih/color v1.16.0 // indirect
+>>>>>>> 908d48fcb (feat: switch back to upstream pkcs8 lib (#47763))
 	github.com/fearful-symmetry/gorapl v0.0.4
 	github.com/fsnotify/fsevents v0.1.1
 	github.com/fsnotify/fsnotify v1.9.0
@@ -171,7 +175,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.8.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.0
-	github.com/elastic/elastic-agent-libs v0.26.0
+	github.com/elastic/elastic-agent-libs v0.26.2
 	github.com/elastic/elastic-agent-system-metrics v0.13.4
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
@@ -233,12 +237,18 @@ require (
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
+<<<<<<< HEAD
 	github.com/elastic/pkcs8 v1.0.0
 	github.com/gorilla/mux v1.8.1
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/mitchellh/gox v1.0.1
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/otiai10/copy v1.14.1
+=======
+	github.com/forensicanalysis/fslib v0.15.2
+	github.com/mattn/go-sqlite3 v1.14.32
+	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
+>>>>>>> 908d48fcb (feat: switch back to upstream pkcs8 lib (#47763))
 	go.opentelemetry.io/collector/client v1.45.0
 	go.opentelemetry.io/collector/component/componenttest v0.139.0
 	go.opentelemetry.io/collector/config/configauth v1.45.0
@@ -427,7 +437,6 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
-	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zeebo/errs v1.4.0 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
