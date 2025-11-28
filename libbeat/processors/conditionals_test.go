@@ -26,6 +26,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/paths"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -248,6 +250,18 @@ func (c *errorProcessor) Close() error {
 	return ErrProcessorClose
 }
 
+var ErrSetPathsProcessor = fmt.Errorf("error processor set paths error")
+
+type setPathsProcessor struct{}
+
+func (c *setPathsProcessor) Run(e *beat.Event) (*beat.Event, error) {
+	return e, nil
+}
+func (c *setPathsProcessor) String() string { return "error_processor" }
+func (c *setPathsProcessor) SetPaths(p *paths.Path) error {
+	return fmt.Errorf("error_processor set paths error: %s", p)
+}
+
 func TestConditionRuleClose(t *testing.T) {
 	const whenCondition = `
 contains.a: b
@@ -289,13 +303,70 @@ then:
 
 	beatProcessor, err := NewIfElseThenProcessor(c, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
+	requireImplements[Closer](t, beatProcessor)
 
 	// Verify we got a ClosingIfThenElseProcessor
 	closingProc := requireAs[*ClosingIfThenElseProcessor](t, beatProcessor)
 	assert.Nil(t, closingProc.els, "els should be nil when no else clause is provided")
-	assert.Implements(t, (*Closer)(nil), beatProcessor)
 
 	err = closingProc.Close()
+	require.NoError(t, err)
+}
+
+func TestIfThenElseProcessorSetPaths(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	thenProcessors := &Processors{
+		List: []beat.Processor{&setPathsProcessor{}},
+		log:  logger,
+	}
+	elsProcessors := &Processors{
+		List: []beat.Processor{&setPathsProcessor{}},
+		log:  logger,
+	}
+	proc := &IfThenElseProcessor{
+		cond: nil,
+		then: thenProcessors,
+		els:  elsProcessors,
+	}
+
+	// SetPaths should not panic when then is nil
+	tmpDir := t.TempDir()
+	beatPaths := &paths.Path{
+		Home:   tmpDir,
+		Config: tmpDir,
+		Data:   tmpDir,
+		Logs:   tmpDir,
+	}
+	err := proc.SetPaths(beatPaths)
+	require.ErrorAs(t, err, &ErrSetPathsProcessor)
+	require.ErrorContains(t, err, ErrSetPathsProcessor.Error())
+	require.ErrorContains(t, err, beatPaths.String())
+}
+
+func TestIfThenElseProcessorSetPathsNil(t *testing.T) {
+	const cfg = `
+if:
+  equals.test: value
+then:
+  - add_fields: {target: "", fields: {test_field: test_value}}
+`
+	c, err := conf.NewConfigWithYAML([]byte(cfg), "if-then config")
+	require.NoError(t, err)
+
+	beatProcessor, err := NewIfElseThenProcessor(c, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	proc := requireImplements[PathSetter](t, beatProcessor)
+
+	// SetPaths should not panic when then is nil
+	tmpDir := t.TempDir()
+	beatPaths := &paths.Path{
+		Home:   tmpDir,
+		Config: tmpDir,
+		Data:   tmpDir,
+		Logs:   tmpDir,
+	}
+	err = proc.SetPaths(beatPaths)
 	require.NoError(t, err)
 }
 
@@ -304,6 +375,17 @@ func requireAs[T any](t *testing.T, v any) T {
 	t.Helper()
 	expected := *new(T)
 	require.IsType(t, expected, v)
+
+	result, ok := v.(T)
+	require.True(t, ok, "sanity check: expected %T, got %T", expected, v)
+
+	return result
+}
+
+func requireImplements[T any](t *testing.T, v any) T {
+	t.Helper()
+	expected := (*T)(nil)
+	require.Implements(t, expected, v)
 
 	result, ok := v.(T)
 	require.True(t, ok, "sanity check: expected %T, got %T", expected, v)
