@@ -1,10 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 steps:
-<<<<<<< HEAD
-=======
-
->>>>>>> da79b6ecc (ci: use if_changed (#47775))
   - label: "Trigger Auditbeat"
     if: build.pull_request.id != null
     if_changed:
