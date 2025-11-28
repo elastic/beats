@@ -522,7 +522,6 @@ func newTestServer(URL string, handler http.Handler) (*httptest.Server, error) {
 }
 
 func TestNegativeCases(t *testing.T) {
-	t.Skip("https://github.com/elastic/beats/issues/47698")
 	expectedHTTPEventCount = 1
 	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)
@@ -582,13 +581,14 @@ func TestNegativeCases(t *testing.T) {
 	require.NotNil(t, input)
 
 	input.Run()
-	go func() {
-		<-eventsCh
-		assert.Error(t, fmt.Errorf("there should be no events"))
-	}()
 
 	// wait for run to return error or event
-	time.Sleep(100 * time.Millisecond)
+	select {
+	case <-eventsCh:
+		t.Error("expected no events, but received one")
+	case <-time.After(100 * time.Millisecond):
+		// Expected: no events received.
+	}
 
 	input.Stop()
 }
