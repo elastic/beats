@@ -54,7 +54,6 @@ func Initialize() *cmd.BeatsRootCmd {
 	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		management.ConfigTransform.SetTransform(metricbeatCfg)
 	}
-	addOTelCommand(rootCmd)
 	return rootCmd
 }
 
