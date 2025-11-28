@@ -162,7 +162,7 @@ spec:
           args: [ "infinity" ]
           env:
             - name: ELASTICSEARCH_HOST
-              value: elasticsearch
+              value: "https://elasticsearch"
             - name: ELASTICSEARCH_PORT
               value: "9200"
             - name: ELASTICSEARCH_USERNAME
