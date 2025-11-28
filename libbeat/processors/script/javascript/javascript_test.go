@@ -36,6 +36,59 @@ import (
 func TestNew(t *testing.T) {
 	tmpDir := t.TempDir()
 
+	t.Run("with tag", func(t *testing.T) {
+		p := newTestProcessor(t, "source", `function process(event) { return event; }`, "my-processor")
+		assert.Contains(t, p.String(), "id=my-processor")
+	})
+
+	t.Run("with invalid config", func(t *testing.T) {
+		cfg, err := config.NewConfigFrom(map[string]any{})
+		require.NoError(t, err)
+
+		_, err = New(cfg, logptest.NewTestingLogger(t, ""))
+		require.ErrorContains(t, err, "javascript must be defined")
+	})
+
+	t.Run("with syntax error", func(t *testing.T) {
+		cfg, err := config.NewConfigFrom(map[string]any{
+			"source": `function process(event { invalid syntax`,
+		})
+		require.NoError(t, err)
+
+		_, err = New(cfg, logptest.NewTestingLogger(t, ""))
+		require.ErrorAs(t, err, new(*goja.CompilerSyntaxError))
+	})
+
+	t.Run("with missing process function", func(t *testing.T) {
+		cfg, err := config.NewConfigFrom(map[string]any{
+			"source": `function notProcess(event) { return event; }`,
+		})
+		require.NoError(t, err)
+
+		_, err = New(cfg, logptest.NewTestingLogger(t, ""))
+		require.ErrorContains(t, err, "process function not found")
+	})
+
+	t.Run("file not found", func(t *testing.T) {
+		cfg, err := config.NewConfigFrom(map[string]any{"file": filepath.Join(tmpDir, "nonexistent.js")})
+		require.NoError(t, err)
+
+		_, err = New(cfg, logptest.NewTestingLogger(t, ""))
+		require.ErrorContains(t, err, "no such file or directory")
+	})
+
+	t.Run("no sources found with glob", func(t *testing.T) {
+		cfg, err := config.NewConfigFrom(map[string]any{"file": filepath.Join(tmpDir, "nomatch", "*.js")})
+		require.NoError(t, err)
+
+		_, err = New(cfg, logptest.NewTestingLogger(t, ""))
+		require.ErrorContains(t, err, "no sources were found")
+	})
+}
+
+func TestRun(t *testing.T) {
+	tmpDir := t.TempDir()
+
 	t.Run("with inline source", func(t *testing.T) {
 		p := newTestProcessor(t, "source", `function process(event) { event.Put("hello", "world"); }`, "")
 
@@ -85,55 +138,6 @@ func TestNew(t *testing.T) {
 		// Verify both files were loaded (b_main.js uses variable from a_utils.js)
 		v, _ := result.GetValue("from_glob")
 		assert.Equal(t, true, v)
-	})
-
-	t.Run("with tag", func(t *testing.T) {
-		p := newTestProcessor(t, "source", `function process(event) { return event; }`, "my-processor")
-		assert.Contains(t, p.String(), "id=my-processor")
-	})
-
-	t.Run("with invalid config", func(t *testing.T) {
-		cfg, err := config.NewConfigFrom(map[string]any{})
-		require.NoError(t, err)
-
-		_, err = New(cfg, logptest.NewTestingLogger(t, ""))
-		require.ErrorContains(t, err, "javascript must be defined")
-	})
-
-	t.Run("with syntax error", func(t *testing.T) {
-		cfg, err := config.NewConfigFrom(map[string]any{
-			"source": `function process(event { invalid syntax`,
-		})
-		require.NoError(t, err)
-
-		_, err = New(cfg, logptest.NewTestingLogger(t, ""))
-		require.ErrorAs(t, err, new(*goja.CompilerSyntaxError))
-	})
-
-	t.Run("with missing process function", func(t *testing.T) {
-		cfg, err := config.NewConfigFrom(map[string]any{
-			"source": `function notProcess(event) { return event; }`,
-		})
-		require.NoError(t, err)
-
-		_, err = New(cfg, logptest.NewTestingLogger(t, ""))
-		require.ErrorContains(t, err, "process function not found")
-	})
-
-	t.Run("file not found", func(t *testing.T) {
-		cfg, err := config.NewConfigFrom(map[string]any{"file": filepath.Join(tmpDir, "nonexistent.js")})
-		require.NoError(t, err)
-
-		_, err = New(cfg, logptest.NewTestingLogger(t, ""))
-		require.ErrorContains(t, err, "no such file or directory")
-	})
-
-	t.Run("no sources found with glob", func(t *testing.T) {
-		cfg, err := config.NewConfigFrom(map[string]any{"file": filepath.Join(tmpDir, "nomatch", "*.js")})
-		require.NoError(t, err)
-
-		_, err = New(cfg, logptest.NewTestingLogger(t, ""))
-		require.ErrorContains(t, err, "no sources were found")
 	})
 }
 
