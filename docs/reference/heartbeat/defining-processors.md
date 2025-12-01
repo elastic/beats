@@ -116,7 +116,7 @@ The supported processors are:
 * [`replace`](/reference/heartbeat/replace-fields.md)
 * [`script`](/reference/heartbeat/processor-script.md)
 * [`syslog`](/reference/heartbeat/syslog.md)
-* [`translate_ldap_attribute`](/reference/heartbeat/processor-translate-ldap-attribute.md)
+* [`translate_ldap_attribute`](/reference/heartbeat/processor-translate-guid.md)
 * [`translate_sid`](/reference/heartbeat/processor-translate-sid.md)
 * [`truncate_fields`](/reference/heartbeat/truncate-fields.md)
 * [`urldecode`](/reference/heartbeat/urldecode.md)

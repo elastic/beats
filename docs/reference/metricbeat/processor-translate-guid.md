@@ -1,17 +1,16 @@
 ---
 navigation_title: "translate_ldap_attribute"
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/packetbeat/current/processor-translate-ldap-attribute.html
+  - https://www.elastic.co/guide/en/beats/metricbeat/current/processor-translate-guid.html
 applies_to:
   stack: ga
 ---
 
 # Translate LDAP Attribute [processor-translate-ldap-attribute]
 
-
 The `translate_ldap_attribute` processor translates LDAP attributes into friendlier values. The typical use case is converting an Active Directory Global Unique Identifier (GUID) into a human-readable name (for example the object's `cn`).
 
-Every object on an Active Directory or an LDAP server is issued a GUID. Internal processes refer to their GUID’s rather than the object’s name and these values sometimes appear in logs.
+Every object on an Active Directory or an LDAP server is issued a GUID. Internal processes refer to their GUID’s rather than the object's name and these values sometimes appear in logs.
 
 If the search attribute is invalid (malformed) or does not map to any object on the domain the processor returns an error unless `ignore_failure` is set.
 
@@ -42,12 +41,10 @@ The `translate_ldap_attribute` processor has the following configuration setting
 | `ldap_search_attribute` | yes | `objectGUID` | LDAP attribute to search by. |
 | `ldap_mapped_attribute` | yes | `cn` | LDAP attribute to map to. |
 | `ldap_search_time_limit` | no | 30 | LDAP search time limit in seconds. |
-| `ldap_ssl`\* | no |  | LDAP TLS/SSL connection settings. See [SSL](/reference/packetbeat/configuration-ssl.md). |
+| `ldap_ssl`* | no |  | LDAP TLS/SSL connection settings. See [SSL](/reference/metricbeat/configuration-ssl.md). |
 | `ad_guid_translation` | no | `auto` | Controls GUID binary conversion for Active Directory attributes. `auto` (default) converts when the LDAP search attribute equals `objectGUID` (case-insensitive). Use `always` to force conversion or `never` to disable it. |
 | `ignore_missing` | no | false | Ignore errors when the source field is missing. |
 | `ignore_failure` | no | false | Ignore all errors produced by the processor. |
-
-\* Also see [SSL](/reference/packetbeat/configuration-ssl.md) for a full description of the `ldap_ssl` options.
 
 ## Server auto-discovery
 
@@ -88,4 +85,3 @@ processors:
             key_field: winlog.event_data.ObjectGuid
             value_field: winlog.common_name
 ```
-
