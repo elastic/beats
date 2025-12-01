@@ -27,8 +27,8 @@ import (
 )
 
 var (
-	// ErrInvalidGUIDFormat is returned when the GUID format is invalid
-	ErrInvalidGUIDFormat = errors.New("invalid GUID format")
+	// errInvalidGUIDFormat is returned when the GUID format is invalid
+	errInvalidGUIDFormat = errors.New("invalid GUID format")
 )
 
 // guidToBytes converts a GUID string in various formats to the binary format
@@ -61,13 +61,13 @@ func guidToBytes(guid string) ([]byte, error) {
 
 	// Validate length
 	if len(guid) != 32 {
-		return nil, fmt.Errorf("%w: expected 32 hex characters, got %d", ErrInvalidGUIDFormat, len(guid))
+		return nil, fmt.Errorf("%w: expected 32 hex characters, got %d", errInvalidGUIDFormat, len(guid))
 	}
 
 	// Decode hex string
 	bytes, err := hex.DecodeString(guid)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrInvalidGUIDFormat, err)
+		return nil, fmt.Errorf("%w: %v", errInvalidGUIDFormat, err)
 	}
 
 	// Microsoft GUID format requires byte swapping for the first three components

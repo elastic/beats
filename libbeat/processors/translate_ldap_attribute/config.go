@@ -27,7 +27,7 @@ type config struct {
 	Field               string            `config:"field"  validate:"required"`
 	TargetField         string            `config:"target_field"`
 	LDAPAddress         string            `config:"ldap_address"`
-	LDAPBaseDN          string            `config:"ldap_base_dn" validate:"required"`
+	LDAPBaseDN          string            `config:"ldap_base_dn"`
 	LDAPBindUser        string            `config:"ldap_bind_user"`
 	LDAPBindPassword    string            `config:"ldap_bind_password"`
 	LDAPSearchAttribute string            `config:"ldap_search_attribute" validate:"required"`

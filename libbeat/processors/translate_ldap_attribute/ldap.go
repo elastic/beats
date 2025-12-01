@@ -22,6 +22,8 @@ package translate_ldap_attribute
 import (
 	"crypto/tls"
 	"fmt"
+	"net"
+	"strings"
 	"sync"
 
 	"github.com/go-ldap/ldap/v3"
@@ -35,6 +37,9 @@ type ldapClient struct {
 
 	mu   sync.Mutex
 	conn *ldap.Conn
+
+	// Server metadata
+	isActiveDirectory bool
 
 	log *logp.Logger
 }
@@ -50,7 +55,9 @@ type ldapConfig struct {
 	tlsConfig       *tls.Config
 }
 
-// newLDAPClient initializes a new ldapClient with a single connection
+// newLDAPClient initializes a new ldapClient with a single connection.
+// If baseDN is empty, it will attempt to discover it via rootDSE or domain inference.
+// It also detects whether the server is Active Directory.
 func newLDAPClient(config *ldapConfig, log *logp.Logger) (*ldapClient, error) {
 	client := &ldapClient{ldapConfig: config, log: log}
 
@@ -61,7 +68,158 @@ func newLDAPClient(config *ldapConfig, log *logp.Logger) (*ldapClient, error) {
 	}
 	client.conn = conn
 
+	// Discover base DN if not provided and detect AD
+	if err := client.initializeMetadata(); err != nil {
+		client.close()
+		return nil, fmt.Errorf("failed to initialize server metadata: %w", err)
+	}
+
 	return client, nil
+}
+
+// initializeMetadata discovers base DN (if needed) and detects server type
+func (client *ldapClient) initializeMetadata() error {
+	conn, err := client.connection()
+	if err != nil {
+		return fmt.Errorf("failed to get connection: %w", err)
+	}
+
+	client.log.Debug("querying rootDSE for server metadata")
+
+	// Query rootDSE with relevant attributes
+	searchRequest := ldap.NewSearchRequest(
+		"", // Empty base DN = rootDSE
+		ldap.ScopeBaseObject,
+		ldap.NeverDerefAliases,
+		0, // No size limit
+		client.searchTimeLimit,
+		false,
+		"(objectClass=*)", // Match everything
+		[]string{
+			"defaultNamingContext",
+			"namingContexts",
+			"rootDomainNamingContext",    // AD-specific
+			"configurationNamingContext", // AD-specific
+			"schemaNamingContext",        // AD-specific
+			"vendorName",
+			"vendorVersion",
+		},
+		nil,
+	)
+
+	result, err := conn.Search(searchRequest)
+	if err != nil {
+		client.log.Debugw("rootDSE query failed", "error", err)
+		// If baseDN is already set, treat rootDSE failure as non-fatal
+		if client.baseDN != "" {
+			return nil
+		}
+		return client.inferBaseDNFromAddress()
+	}
+
+	if len(result.Entries) == 0 {
+		client.log.Debug("rootDSE query returned no entries")
+		if client.baseDN != "" {
+			return nil
+		}
+		return client.inferBaseDNFromAddress()
+	}
+
+	entry := result.Entries[0]
+
+	// Detect Active Directory
+	// AD has rootDomainNamingContext, configurationNamingContext, and defaultNamingContext
+	hasRootDomain := len(entry.GetAttributeValues("rootDomainNamingContext")) > 0
+	hasConfigContext := len(entry.GetAttributeValues("configurationNamingContext")) > 0
+	hasDefaultContext := len(entry.GetAttributeValues("defaultNamingContext")) > 0
+
+	client.isActiveDirectory = hasRootDomain && hasConfigContext && hasDefaultContext
+
+	if client.isActiveDirectory {
+		client.log.Info("detected Active Directory server")
+	} else {
+		vendorName := ""
+		if values := entry.GetAttributeValues("vendorName"); len(values) > 0 {
+			vendorName = values[0]
+		}
+		client.log.Infow("detected LDAP server", "vendor", vendorName)
+	}
+
+	if client.baseDN != "" {
+		return nil
+	}
+
+	// Prefer defaultNamingContext (Active Directory)
+	if values := entry.GetAttributeValues("defaultNamingContext"); len(values) > 0 {
+		client.baseDN = values[0]
+		client.log.Infow("discovered base DN via defaultNamingContext", "base_dn", client.baseDN)
+		return nil
+	}
+
+	// Fallback to first namingContext
+	if values := entry.GetAttributeValues("namingContexts"); len(values) > 0 {
+		client.baseDN = values[0]
+		client.log.Infow("discovered base DN via namingContexts", "base_dn", client.baseDN)
+		return nil
+	}
+
+	return client.inferBaseDNFromAddress()
+}
+
+// inferBaseDNFromAddress infers base DN from the server address
+func (client *ldapClient) inferBaseDNFromAddress() error {
+	client.log.Debugw("attempting to infer base DN from server address", "address", client.address)
+
+	// Remove scheme
+	addr := strings.TrimPrefix(client.address, "ldap://")
+	addr = strings.TrimPrefix(addr, "ldaps://")
+
+	var hostname string
+	// Split host and port using net.SplitHostPort for robust hostname extraction
+	h, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		// If SplitHostPort fails, assume the whole address is the host (i.e., no port specified)
+		hostname = addr
+		if strings.Contains(hostname, ":") {
+			// If we still have a colon, it was likely a malformed or IPv6 address without brackets
+			return fmt.Errorf("unable to parse hostname from address: %s", client.address)
+		}
+	} else {
+		hostname = h
+	}
+
+	if hostname == "" {
+		return fmt.Errorf("unable to extract hostname from address: %s", client.address)
+	}
+
+	// Check if hostname is an IP address
+	if net.ParseIP(hostname) != nil {
+		return fmt.Errorf("cannot infer base DN from IP address: %s", hostname)
+	}
+
+	// Extract domain from hostname
+	parts := strings.Split(hostname, ".")
+	if len(parts) < 2 {
+		return fmt.Errorf("hostname does not contain a domain: %s", hostname)
+	}
+
+	// Skip first part if we have 3+ parts (likely hostname like dc1.example.com)
+	var domainParts []string
+	if len(parts) >= 3 {
+		domainParts = parts[1:]
+	} else {
+		domainParts = parts
+	}
+
+	// Convert to DN format: example.com -> dc=example,dc=com
+	var dnParts []string
+	for _, part := range domainParts {
+		dnParts = append(dnParts, fmt.Sprintf("dc=%s", part))
+	}
+
+	client.baseDN = strings.Join(dnParts, ",")
+	client.log.Infow("inferred base DN from server domain", "base_dn", client.baseDN)
+	return nil
 }
 
 // dial establishes a new connection to the LDAP server
@@ -78,10 +236,21 @@ func (client *ldapClient) dial() (*ldap.Conn, error) {
 		return nil, fmt.Errorf("failed to dial LDAP server: %w", err)
 	}
 
-	if client.password != "" {
-		client.log.Debugw("ldap client bind")
+	// Bind with appropriate method
+	switch {
+	case client.password != "":
+		// Explicit credentials provided
+		client.log.Debugw("ldap client bind with provided credentials")
 		err = conn.Bind(client.username, client.password)
-	} else {
+	case client.username == "" && client.password == "":
+		// No credentials: try Windows SSPI auth, fall back to unauthenticated
+		err = client.bindWithCurrentUser(conn)
+		if err != nil {
+			client.log.Debugw("Windows auth not available, falling back to unauthenticated bind", "error", err)
+			err = conn.UnauthenticatedBind("")
+		}
+	default:
+		// Username provided but no password: unauthenticated bind
 		client.log.Debugw("ldap client unauthenticated bind")
 		err = conn.UnauthenticatedBind(client.username)
 	}
@@ -94,7 +263,7 @@ func (client *ldapClient) dial() (*ldap.Conn, error) {
 	return conn, nil
 }
 
-// reconnect checks the connection's health and reconnects if necessary
+// connection checks the connection's health and reconnects if necessary
 func (client *ldapClient) connection() (*ldap.Conn, error) {
 	client.mu.Lock()
 	defer client.mu.Unlock()
@@ -135,9 +304,9 @@ func (client *ldapClient) findObjectBy(searchBy string) ([]string, error) {
 		return nil, fmt.Errorf("no entries found for search attribute %s", searchBy)
 	}
 
-	// Retrieve the CN attribute
-	cn := result.Entries[0].GetAttributeValues(client.mappedAttr)
-	return cn, nil
+	// Retrieve the mapped attribute values
+	values := result.Entries[0].GetAttributeValues(client.mappedAttr)
+	return values, nil
 }
 
 // close closes the LDAP connection

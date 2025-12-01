@@ -66,6 +66,9 @@ func newFromConfig(c config, logger *logp.Logger) (*processor, error) {
 	}
 
 	p.client = client
+	// Update config with the actual base DN used (may have been discovered)
+	p.LDAPBaseDN = client.baseDN
+	p.LDAPAddress = client.address
 	return p, nil
 }
 
@@ -108,15 +111,16 @@ func newClient(c config, log *logp.Logger) (*ldapClient, error) {
 		log.Debugw("attempting to connect to LDAP server", "attempt", i+1, "total", len(addresses), "address", address)
 		ldapConfig.address = address
 
+		// newLDAPClient handles connection, base DN discovery, and AD detection
 		client, err := newLDAPClient(ldapConfig, log)
 		if err != nil {
-			log.Debugw("failed to connect to LDAP server", "address", address, "error", err)
+			log.Debugw("failed to initialize LDAP client", "address", address, "error", err)
 			lastErr = err
 			continue
 		}
 
-		// Successfully connected
-		log.Infow("successfully connected to LDAP server", "address", address)
+		// Successfully connected and initialized
+		log.Infow("successfully connected to LDAP server", "address", address, "base_dn", client.baseDN, "is_ad", client.isActiveDirectory)
 		return client, nil
 	}
 
@@ -177,12 +181,13 @@ func (p *processor) translateLDAPAttr(event *beat.Event) error {
 }
 
 // prepareSearchFilter converts the search value to the appropriate format for LDAP queries.
-// It applies GUID binary conversion when required based on the ADGUIDTranslation configuration.
+// It applies GUID binary conversion when required based on the ADGUIDTranslation configuration
+// and server type detection.
 func (p *processor) prepareSearchFilter(searchValue string) (string, error) {
 	// Determine if GUID conversion should be applied
 	var shouldConvertGUID bool
 	if p.ADGUIDTranslation == nil {
-		shouldConvertGUID = (p.LDAPSearchAttribute == "objectGUID")
+		shouldConvertGUID = (p.LDAPSearchAttribute == "objectGUID") && p.client.isActiveDirectory
 	} else {
 		shouldConvertGUID = *p.ADGUIDTranslation
 	}

@@ -31,8 +31,8 @@ import (
 )
 
 var (
-	// ErrNoLDAPServerFound is returned when no LDAP server can be discovered
-	ErrNoLDAPServerFound = errors.New("no LDAP server found via DNS SRV or system configuration")
+	// errNoLDAPServerFound is returned when no LDAP server can be discovered
+	errNoLDAPServerFound = errors.New("no LDAP server found via DNS SRV or system configuration")
 )
 
 // discoverLDAPAddress attempts to auto-discover the LDAP server address.
@@ -56,7 +56,7 @@ func discoverLDAPAddress(log *logp.Logger) ([]string, error) {
 	}
 
 	if len(candidates) == 0 {
-		return nil, ErrNoLDAPServerFound
+		return nil, errNoLDAPServerFound
 	}
 
 	return candidates, nil
@@ -100,7 +100,7 @@ func findServers(useTLS bool, log *logp.Logger) []string {
 }
 
 // findLogonServer is a simplified wrapper for LOGONSERVER lookup.
-// It resolves the NetBIOS name to an IP or FQDN before returning the address.
+// It attempts to resolve the NetBIOS name to an IP address before returning the address.
 func findLogonServer(useTLS bool, log *logp.Logger) []string {
 	logonServer := os.Getenv("LOGONSERVER")
 	if logonServer == "" {
@@ -138,13 +138,12 @@ func findLogonServer(useTLS bool, log *logp.Logger) []string {
 	resolvedHost := resolvedAddr.IP.String()
 
 	// If the IP is unavailable or invalid, fall back to the original NetBIOS name.
-	// This is a calculated risk, but better than returning an empty string.
 	if resolvedHost == "" || resolvedHost == "<nil>" {
 		resolvedHost = serverName
-		log.Debug("Resolved IP was invalid or empty, falling back to original server name.")
+		log.Debugw("Resolved IP was invalid or empty, falling back to original server name.", "host", serverName)
 	}
 
-	// Construct the final LDAP URL using the resolved IP address and the specific port/scheme
+	// Construct the final LDAP URL using the resolved host and the specific port/scheme
 	ldapAddress := fmt.Sprintf("%s://%s:%d", scheme, resolvedHost, port)
 
 	log.Infow("discovered server via LOGONSERVER", "address", ldapAddress, "original_name", serverName)
