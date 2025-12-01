@@ -23,6 +23,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/go-ldap/ldap/v3"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
@@ -51,6 +53,9 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the translate_ldap_attribute configuration: %w", err)
+	}
+	if err := c.validate(); err != nil {
+		return nil, fmt.Errorf("invalid translate_ldap_attribute configuration: %w", err)
 	}
 
 	return newFromConfig(c, log)
@@ -186,14 +191,17 @@ func (p *processor) translateLDAPAttr(event *beat.Event) error {
 func (p *processor) prepareSearchFilter(searchValue string) (string, error) {
 	// Determine if GUID conversion should be applied
 	var shouldConvertGUID bool
-	if p.ADGUIDTranslation == nil {
+	switch p.ADGUIDTranslation {
+	case guidTranslationAlways:
+		shouldConvertGUID = true
+	case guidTranslationNever:
+		shouldConvertGUID = false
+	default: // auto
 		shouldConvertGUID = (p.LDAPSearchAttribute == "objectGUID") && p.client.isActiveDirectory
-	} else {
-		shouldConvertGUID = *p.ADGUIDTranslation
 	}
 
 	if !shouldConvertGUID {
-		return searchValue, nil
+		return ldap.EscapeFilter(searchValue), nil
 	}
 
 	guidBytes, err := guidToBytes(searchValue)

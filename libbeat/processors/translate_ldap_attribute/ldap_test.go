@@ -22,6 +22,7 @@ package translate_ldap_attribute
 import (
 	"testing"
 
+	"github.com/go-ldap/ldap/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -31,34 +32,31 @@ func TestPrepareSearchFilter(t *testing.T) {
 	guidBytes, _ := guidToBytes(validGUID)
 	expectedEscaped := escapeBinaryForLDAP(guidBytes)
 
-	boolTrue := true
-	boolFalse := false
-
 	tests := []struct {
 		name              string
 		ldapSearchAttr    string
-		adGuidTranslation *bool
+		adGuidTranslation string
 		isAD              bool
 		input             string
 		expect            string
 		expectErr         bool
 	}{
 		{
-			name:           "Default nil pointer converts when AD + objectGUID",
+			name:           "Auto mode converts when AD + objectGUID",
 			ldapSearchAttr: "objectGUID",
 			isAD:           true,
 			input:          validGUID,
 			expect:         expectedEscaped,
 		},
 		{
-			name:           "Default nil pointer does not convert when non-AD",
+			name:           "Auto mode does not convert when non-AD",
 			ldapSearchAttr: "objectGUID",
 			isAD:           false,
 			input:          validGUID,
 			expect:         validGUID,
 		},
 		{
-			name:           "Default nil pointer does not convert other attribute",
+			name:           "Auto mode does not convert other attribute",
 			ldapSearchAttr: "uid",
 			isAD:           true,
 			input:          validGUID,
@@ -67,7 +65,7 @@ func TestPrepareSearchFilter(t *testing.T) {
 		{
 			name:              "Explicit true converts even if attribute different",
 			ldapSearchAttr:    "uid",
-			adGuidTranslation: &boolTrue,
+			adGuidTranslation: guidTranslationAlways,
 			isAD:              false,
 			input:             validGUID,
 			expect:            expectedEscaped,
@@ -75,7 +73,7 @@ func TestPrepareSearchFilter(t *testing.T) {
 		{
 			name:              "Explicit false never converts",
 			ldapSearchAttr:    "objectGUID",
-			adGuidTranslation: &boolFalse,
+			adGuidTranslation: guidTranslationNever,
 			isAD:              true,
 			input:             validGUID,
 			expect:            validGUID,
@@ -86,6 +84,13 @@ func TestPrepareSearchFilter(t *testing.T) {
 			isAD:           true,
 			input:          "invalid-guid",
 			expectErr:      true,
+		},
+		{
+			name:           "Escapes filter characters when not converting",
+			ldapSearchAttr: "uid",
+			isAD:           true,
+			input:          "value*)(|(cn=*)",
+			expect:         ldap.EscapeFilter("value*)(|(cn=*)"),
 		},
 	}
 

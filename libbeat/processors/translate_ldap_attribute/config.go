@@ -20,7 +20,16 @@
 package translate_ldap_attribute
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+)
+
+const (
+	guidTranslationAuto   = "auto"
+	guidTranslationAlways = "always"
+	guidTranslationNever  = "never"
 )
 
 type config struct {
@@ -36,11 +45,11 @@ type config struct {
 	LDAPTLS             *tlscommon.Config `config:"ldap_ssl"`
 
 	// ADGUIDTranslation controls Active Directory GUID binary conversion.
-	// Values:
-	//   "nil" (default): Enable GUID conversion when objectGUID is used
-	//   "true": Always apply GUID conversion regardless of attribute name
-	//   "false": Never apply GUID conversion
-	ADGUIDTranslation *bool `config:"ad_guid_translation"`
+	// Supported values:
+	//   "auto"   (default): Enable GUID conversion when objectGUID is used against AD
+	//   "always": Always apply GUID conversion regardless of attribute name
+	//   "never" : Never apply GUID conversion
+	ADGUIDTranslation string `config:"ad_guid_translation"`
 
 	IgnoreMissing bool `config:"ignore_missing"`
 	IgnoreFailure bool `config:"ignore_failure"`
@@ -50,5 +59,21 @@ func defaultConfig() config {
 	return config{
 		LDAPSearchAttribute: "objectGUID",
 		LDAPMappedAttribute: "cn",
-		LDAPSearchTimeLimit: 30}
+		LDAPSearchTimeLimit: 30,
+		ADGUIDTranslation:   guidTranslationAuto,
+	}
+}
+
+func (c *config) validate() error {
+	switch strings.ToLower(strings.TrimSpace(c.ADGUIDTranslation)) {
+	case "", guidTranslationAuto:
+		c.ADGUIDTranslation = guidTranslationAuto
+	case guidTranslationAlways:
+		c.ADGUIDTranslation = guidTranslationAlways
+	case guidTranslationNever:
+		c.ADGUIDTranslation = guidTranslationNever
+	default:
+		return fmt.Errorf("invalid ad_guid_translation value %q (expected auto|always|never)", c.ADGUIDTranslation)
+	}
+	return nil
 }

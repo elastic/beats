@@ -22,10 +22,13 @@ package translate_ldap_attribute
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"net"
 	"os"
 	"runtime"
+	"slices"
 	"strings"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -33,7 +36,19 @@ import (
 var (
 	// errNoLDAPServerFound is returned when no LDAP server can be discovered
 	errNoLDAPServerFound = errors.New("no LDAP server found via DNS SRV or system configuration")
+
+	// resolveTCPAddr allows tests to stub DNS resolution
+	resolveTCPAddr = net.ResolveTCPAddr
+
+	// newSRVRandomizer returns a random source for SRV weighting (overridden in tests)
+	newSRVRandomizer = func() intnRandom {
+		return rand.New(rand.NewSource(time.Now().UnixNano()))
+	}
 )
+
+type intnRandom interface {
+	Intn(n int) int
+}
 
 // discoverLDAPAddress attempts to auto-discover the LDAP server address.
 // It returns a list of candidate addresses sorted by preference (LDAPS over LDAP, SRV over LOGONSERVER).
@@ -86,8 +101,9 @@ func findServers(useTLS bool, log *logp.Logger) []string {
 		return nil
 	}
 
+	ordered := orderSRVRecords(addrs, newSRVRandomizer())
 	var addresses []string
-	for _, addr := range addrs {
+	for _, addr := range ordered {
 		// Remove trailing dot if present (FQDN format in DNS often includes it)
 		target := strings.TrimSuffix(addr.Target, ".")
 		address := fmt.Sprintf("%s://%s:%d", scheme, target, addr.Port)
@@ -127,26 +143,93 @@ func findLogonServer(useTLS bool, log *logp.Logger) []string {
 	// Attempt to resolve the NetBIOS name to a resolvable IP/Hostname.
 	addressToResolve := net.JoinHostPort(serverName, fmt.Sprintf("%d", port))
 
-	// Use net.ResolveTCPAddr to resolve the NetBIOS name to a specific IP address.
-	resolvedAddr, err := net.ResolveTCPAddr("tcp", addressToResolve)
+	var resolvedIP string
+	resolvedAddr, err := resolveTCPAddr("tcp", addressToResolve)
 	if err != nil {
 		log.Debugw("failed to resolve LOGONSERVER address", "server_name", serverName, "port", port, "error", err)
+	} else if resolvedAddr.IP != nil {
+		resolvedIP = resolvedAddr.IP.String()
+	}
+
+	var addresses []string
+	hostURL := fmt.Sprintf("%s://%s:%d", scheme, serverName, port)
+	addresses = append(addresses, hostURL)
+
+	if resolvedIP != "" && !strings.EqualFold(resolvedIP, serverName) {
+		addresses = append(addresses, fmt.Sprintf("%s://%s:%d", scheme, resolvedIP, port))
+	}
+
+	log.Infow("discovered server via LOGONSERVER", "addresses", addresses, "original_name", serverName)
+
+	return addresses
+}
+
+// orderSRVRecords sorts SRV answers according to RFC 2782 so we do not
+// overload a single controller. The algorithm groups records by priority
+// (lower numeric value means a more preferred server) and, within each
+// priority, uses selectByWeight to shuffle according to the advertised
+// weight field. A deterministic sorter would break load balancing, so
+// we optionally accept a custom random source for tests.
+func orderSRVRecords(addrs []*net.SRV, r intnRandom) []*net.SRV {
+	if len(addrs) == 0 {
 		return nil
 	}
-
-	// The primary result we want is the IP address, which is reliable.
-	resolvedHost := resolvedAddr.IP.String()
-
-	// If the IP is unavailable or invalid, fall back to the original NetBIOS name.
-	if resolvedHost == "" || resolvedHost == "<nil>" {
-		resolvedHost = serverName
-		log.Debugw("Resolved IP was invalid or empty, falling back to original server name.", "host", serverName)
+	if r == nil {
+		r = rand.New(rand.NewSource(time.Now().UnixNano()))
 	}
 
-	// Construct the final LDAP URL using the resolved host and the specific port/scheme
-	ldapAddress := fmt.Sprintf("%s://%s:%d", scheme, resolvedHost, port)
+	// Build buckets keyed by priority so we can process high priority servers first.
+	priorityGroups := make(map[uint16][]*net.SRV)
+	for _, addr := range addrs {
+		priorityGroups[addr.Priority] = append(priorityGroups[addr.Priority], addr)
+	}
+	var priorities []uint16
+	for priority := range priorityGroups {
+		priorities = append(priorities, priority)
+	}
+	slices.Sort(priorities)
 
-	log.Infow("discovered server via LOGONSERVER", "address", ldapAddress, "original_name", serverName)
+	var ordered []*net.SRV
+	for _, priority := range priorities {
+		// Within each priority, pick servers according to relative weight.
+		group := priorityGroups[priority]
+		ordered = append(ordered, selectByWeight(group, r)...)
+	}
+	return ordered
+}
 
-	return []string{ldapAddress}
+// selectByWeight performs the weighted-shuffle portion of RFC 2782: each
+// iteration chooses one server proportionally to its Weight value, removes
+// it from the candidate list, and repeats. This ensures a server with a
+// higher advertised weight is more likely to be attempted earlier but every
+// server eventually appears in the ordered slice. Tests inject a deterministic
+// random source so the selection becomes predictable.
+func selectByWeight(group []*net.SRV, r intnRandom) []*net.SRV {
+	remaining := slices.Clone(group)
+	var ordered []*net.SRV
+	for len(remaining) > 0 {
+		totalWeight := 0
+		for _, addr := range remaining {
+			totalWeight += int(addr.Weight)
+		}
+
+		var idx int
+		if totalWeight == 0 {
+			idx = r.Intn(len(remaining))
+		} else {
+			pick := r.Intn(totalWeight)
+			sum := 0
+			for i, addr := range remaining {
+				sum += int(addr.Weight)
+				if pick < sum {
+					idx = i
+					break
+				}
+			}
+		}
+
+		ordered = append(ordered, remaining[idx])
+		remaining = slices.Delete(remaining, idx, idx+1)
+	}
+	return ordered
 }

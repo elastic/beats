@@ -78,12 +78,8 @@ func newLDAPClient(config *ldapConfig, log *logp.Logger) (*ldapClient, error) {
 }
 
 // initializeMetadata discovers base DN (if needed) and detects server type
-func (client *ldapClient) initializeMetadata() error {
-	conn, err := client.connection()
-	if err != nil {
-		return fmt.Errorf("failed to get connection: %w", err)
-	}
 
+func (client *ldapClient) initializeMetadata() error {
 	client.log.Debug("querying rootDSE for server metadata")
 
 	// Query rootDSE with relevant attributes
@@ -107,7 +103,12 @@ func (client *ldapClient) initializeMetadata() error {
 		nil,
 	)
 
-	result, err := conn.Search(searchRequest)
+	var result *ldap.SearchResult
+	err := client.withLockedConnection(func(conn *ldap.Conn) error {
+		var searchErr error
+		result, searchErr = conn.Search(searchRequest)
+		return searchErr
+	})
 	if err != nil {
 		client.log.Debugw("rootDSE query failed", "error", err)
 		// If baseDN is already set, treat rootDSE failure as non-fatal
@@ -264,29 +265,33 @@ func (client *ldapClient) dial() (*ldap.Conn, error) {
 }
 
 // connection checks the connection's health and reconnects if necessary
-func (client *ldapClient) connection() (*ldap.Conn, error) {
+// withLockedConnection runs fn while holding the client mutex and ensuring the
+// underlying LDAP connection is healthy before invoking the callback.
+func (client *ldapClient) withLockedConnection(fn func(*ldap.Conn) error) error {
 	client.mu.Lock()
 	defer client.mu.Unlock()
 
-	// Check if the connection is still alive
+	if err := client.ensureConnectedLocked(); err != nil {
+		return err
+	}
+	return fn(client.conn)
+}
+
+func (client *ldapClient) ensureConnectedLocked() error {
 	if client.conn == nil || client.conn.IsClosing() {
 		conn, err := client.dial()
 		if err != nil {
-			return nil, err
+			return err
 		}
 		client.conn = conn
 	}
-	return client.conn, nil
+	return nil
 }
 
 // findObjectBy searches for an object and returns its mapped values.
-func (client *ldapClient) findObjectBy(searchBy string) ([]string, error) {
-	// Ensure the connection is alive or reconnect if necessary
-	conn, err := client.connection()
-	if err != nil {
-		return nil, fmt.Errorf("failed to reconnect: %w", err)
-	}
 
+func (client *ldapClient) findObjectBy(searchBy string) ([]string, error) {
+	var result *ldap.SearchResult
 	// Format the filter and perform the search
 	filter := fmt.Sprintf("(%s=%s)", client.searchAttr, searchBy)
 	searchRequest := ldap.NewSearchRequest(
@@ -295,8 +300,12 @@ func (client *ldapClient) findObjectBy(searchBy string) ([]string, error) {
 		filter, []string{client.mappedAttr}, nil,
 	)
 
-	// Execute search
-	result, err := conn.Search(searchRequest)
+	// Execute search while holding the connection lock to avoid concurrent usage of *ldap.Conn
+	err := client.withLockedConnection(func(conn *ldap.Conn) error {
+		var searchErr error
+		result, searchErr = conn.Search(searchRequest)
+		return searchErr
+	})
 	if err != nil {
 		return nil, fmt.Errorf("search failed: %w", err)
 	}
