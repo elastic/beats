@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !windows || requirefips
+//go:build !windows && !requirefips
 
 package translate_ldap_attribute
 
