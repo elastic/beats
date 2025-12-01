@@ -119,11 +119,9 @@ func (o *OTELCELMetrics) AddProgramSuccessExecution(ctx context.Context, count i
 }
 
 // Shutdown(ctx context.Context) error
-// Attempts to write our metrics. May fail if the contect is cancelled
-func (o *OTELCELMetrics) Shutdown(ctx context.Context) error {
+// Attempts to write our metrics. May fail if the contect is canceled
+func (o *OTELCELMetrics) Shutdown(ctx context.Context) {
 	o.EndPeriodic(ctx)
-	var err error
-	return err
 }
 
 // NewOTELCELMetrics initializes a new instance of OTELCELMetrics.

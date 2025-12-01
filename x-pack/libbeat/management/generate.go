@@ -7,11 +7,12 @@ package management
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 )
 
 // DefaultNamespaceName is the fallback default namespace for data stream info
@@ -89,7 +90,6 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamTyp
 	// If there are no streams, we fall into the 'simple input config' case,
 	// this means the key configuration values are on the root level instead of
 	// an element in the `streams` array.
-	fmt.Printf("raw %v", raw)
 	if raw.GetStreams() == nil {
 		streamSource, err := handleSimpleConfig(raw)
 		if err != nil {
@@ -115,7 +115,6 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamTyp
 		if raw.Meta != nil {
 			streamSource["meta"] = *raw.Meta
 		}
-		fmt.Printf("streamsource %v", streamSource)
 		inputs[iter] = streamSource
 	}
 

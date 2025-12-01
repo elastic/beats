@@ -116,7 +116,11 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 // Run starts the input and blocks until it ends completes. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
-	dataStreamName := src.(*source).cfg.DataStream // May be empty.
+	srcP, ok := src.(*source)
+	if !ok {
+		return errors.New("inputcursor.Source is not a *source type")
+	}
+	dataStreamName := srcP.cfg.DataStream // May be empty.
 
 	var cursor map[string]interface{}
 	env.UpdateStatus(status.Starting, dataStreamName)
@@ -134,7 +138,7 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 			parent: &env,
 		}
 	}
-	err := input{}.run(env, src.(*source), cursor, pub, health)
+	err := input{}.run(env, srcP, cursor, pub, health)
 	if err != nil {
 		msg := "failed to run: " + err.Error()
 		if dataStreamName != "" {
@@ -990,6 +994,9 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 	log.Infof("created OTEL cel input exporter %s for input %s", exporterType, env.IDWithoutName)
 	otelMetrics, otelTransport, err := otel.NewOTELCELMetrics(log, env.IDWithoutName, *resource, c.Transport, exporter)
+	if err != nil {
+		return nil, nil, nil, err
+	}
 	c.Transport = otelTransport
 	return c, trace, otelMetrics, nil
 }

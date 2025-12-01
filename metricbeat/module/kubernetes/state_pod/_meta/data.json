@@ -6,17 +6,18 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": "default",
+        "namespace": "kube-system",
         "node": {
             "name": "kind-control-plane"
         },
         "pod": {
             "host_ip": "172.21.0.2",
-            "ip": "10.244.0.173",
-            "name": "hello-28564555-zdfjz",
+            "ip": "172.21.0.2",
+            "name": "kube-scheduler-kind-control-plane",
             "status": {
-                "phase": "succeeded",
-                "ready": "false",
+                "phase": "running",
+                "ready": "true",
+                "ready_time": 1713862197,
                 "scheduled": "true"
             }
         }
