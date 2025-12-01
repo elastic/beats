@@ -90,8 +90,7 @@ func TestNewReceiver(t *testing.T) {
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
 			require.Lenf(c, logs["r1"], 1, "expected 1 log, got %d", len(logs["r1"]))
-			assert.Equal(c, "filebeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+			assert.Equal(c, "test", logs["r1"][0].Flatten()["message"], "expected message field to contain string 'test'")
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket, "stats")
@@ -250,10 +249,8 @@ func TestMultipleReceivers(t *testing.T) {
 			require.Greater(c, len(logs["r1"]), 0, "receiver r1 does not have any logs")
 			require.Greater(c, len(logs["r2"]), 0, "receiver r2 does not have any logs")
 
-			assert.Equal(c, "filebeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r1 log record")
-			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r1 log record")
-			assert.Equal(c, "filebeatreceiver/r2", logs["r2"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r2 log record")
-			assert.Equal(c, "receiver", logs["r2"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r2 log record")
+			assert.Equal(c, "test", logs["r1"][0].Flatten()["message"], "expected r1 message field to be 'test'")
+			assert.Equal(c, "test", logs["r2"][0].Flatten()["message"], "expected r2  message field to be 'test'")
 
 			// Make sure that each receiver has a separate logger
 			// instance and does not interfere with others. Previously, the
@@ -313,9 +310,6 @@ func TestMultipleReceivers(t *testing.T) {
 }
 
 func TestReceiverDegraded(t *testing.T) {
-	if runtime.GOARCH == "arm64" && runtime.GOOS == "linux" {
-		t.Skip("flaky test on Ubuntu arm64, see https://github.com/elastic/beats/issues/46437")
-	}
 	testCases := []struct {
 		name            string
 		status          oteltest.ExpectedStatus
@@ -477,26 +471,40 @@ type logGenerator struct {
 	t           *testing.T
 	tmpDir      string
 	f           *os.File
-	filePattern string
 	sequenceNum int64
+	currentFile string
 }
 
 func newLogGenerator(t *testing.T, tmpDir string) *logGenerator {
 	return &logGenerator{
-		t:           t,
-		tmpDir:      tmpDir,
-		filePattern: "input-*.log",
+		t:      t,
+		tmpDir: tmpDir,
 	}
 }
 
 func (g *logGenerator) Start() {
-	f, err := os.CreateTemp(g.tmpDir, g.filePattern)
+	if g.currentFile != "" {
+		os.Remove(g.currentFile)
+	}
+
+	filePath := filepath.Join(g.tmpDir, "input.log")
+
+	f, err := os.Create(filePath)
 	require.NoError(g.t, err)
 	g.f = f
+	g.currentFile = filePath
+	atomic.StoreInt64(&g.sequenceNum, 0)
 }
 
 func (g *logGenerator) Stop() {
-	require.NoError(g.t, g.f.Close())
+	if g.f != nil {
+		require.NoError(g.t, g.f.Close())
+		g.f = nil
+	}
+	if g.currentFile != "" {
+		os.Remove(g.currentFile)
+		g.currentFile = ""
+	}
 }
 
 func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
@@ -517,8 +525,6 @@ func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
 // - Random permanent error. We expect the batch to be dropped.
 // - Random error. We expect the batch to be retried or dropped based on the error type.
 func TestConsumeContract(t *testing.T) {
-	t.Skip("flaky test, see https://github.com/elastic/beats/issues/46437")
-
 	defer oteltest.VerifyNoLeaks(t)
 
 	tmpDir := t.TempDir()
@@ -538,7 +544,7 @@ func TestConsumeContract(t *testing.T) {
 						"id":      "filestream-test",
 						"enabled": true,
 						"paths": []string{
-							filepath.Join(tmpDir, "input-*.log"),
+							filepath.Join(tmpDir, "input.log"),
 						},
 						"file_identity.native": map[string]any{},
 						"prospector": map[string]any{

@@ -78,11 +78,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	for _, pathConfig := range m.queries {
+	m.Logger().Debugf("Running queries. There are %d queries to run", len(m.queries))
+	successfulQueriesCount := 0
+	for idx, pathConfig := range m.queries {
 		url := m.getURL(pathConfig.Path, pathConfig.Params)
+		m.Logger().Debugf("Running query %d/%d: %s", idx+1, len(m.queries), url)
 		m.http.SetURI(url)
+
 		response, err := m.http.FetchResponse()
 		if err != nil {
+			m.Logger().Debugf("Query %d/%d failed to fetch: %v", idx+1, len(m.queries), err)
 			reporter.Error(fmt.Errorf("unable to fetch data from prometheus endpoint %v: %w", url, err))
 			continue
 		}
@@ -98,19 +103,32 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 
 		if response.StatusCode > 399 {
-			m.Logger().Debugf("error received from prometheus endpoint %v: %v", url, string(body))
+			m.Logger().Debugf("Query %d/%d received error status code %d from %v: %v", idx+1, len(m.queries), response.StatusCode, url, string(body))
 			reporter.Error(fmt.Errorf("unexpected status code %d from %v", response.StatusCode, url))
 			continue
 		}
 
 		events, parseErr := parseResponse(body, pathConfig)
 		if parseErr != nil {
+			m.Logger().Debugf("Query %d/%d failed to parse response from %v: %v", idx+1, len(m.queries), url, parseErr)
 			reporter.Error(fmt.Errorf("error parsing response from %v: %w", url, parseErr))
 			continue
 		}
+
+		m.Logger().Debugf("Query %d/%d completed successfully: fetched %d metric(s) from %s", idx+1, len(m.queries), len(events), url)
+
 		for _, e := range events {
 			reporter.Event(e)
 		}
+		successfulQueriesCount++
+	}
+
+	m.Logger().Debugf("Completed %d/%d queries successfully", successfulQueriesCount, len(m.queries))
+
+	if successfulQueriesCount == 0 {
+		return fmt.Errorf("all Prometheus queries failed to run")
+	} else if successfulQueriesCount != len(m.queries) {
+		return mb.PartialMetricsError{Err: fmt.Errorf("%d Prometheus queries failed to run", len(m.queries)-successfulQueriesCount)}
 	}
 	return nil
 }

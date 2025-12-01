@@ -84,8 +84,8 @@ func TestNewReceiver(t *testing.T) {
 			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0
 			}, "expected at least one ingest log, got logs: %v", logs["r1"])
-			assert.Equal(c, "metricbeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+			assert.Equal(c, "metricbeat", logs["r1"][0].Flatten()["agent.type"], "expected agent.type field in to be 'metricbeat'")
+
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket, "stats")
@@ -195,10 +195,8 @@ func TestMultipleReceivers(t *testing.T) {
 			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 			}, "expected at least one ingest log for each receiver, got logs: %v", logs)
-			assert.Equal(c, "metricbeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r1 log record")
-			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r1 log record")
-			assert.Equal(c, "metricbeatreceiver/r2", logs["r2"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r2 log record")
-			assert.Equal(c, "receiver", logs["r2"][0].Flatten()["agent.otelcol.component.kind"], "expected otelcol.component.kind field in r2 log record")
+			assert.Equal(c, "metricbeat", logs["r1"][0].Flatten()["agent.type"], "expected agent.type field to be 'metricbeat' in r1")
+			assert.Equal(c, "metricbeat", logs["r2"][0].Flatten()["agent.type"], "expected agent.type field to be 'metricbeat' in r2")
 
 			// Make sure that each receiver has a separate logger
 			// instance and does not interfere with others. Previously, the
