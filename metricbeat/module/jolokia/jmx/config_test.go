@@ -395,45 +395,6 @@ func TestCanonicalizeMbeanName(t *testing.T) {
 
 }
 
-func TestMBeanAttributeHasField(t *testing.T) {
-
-	cases := []struct {
-		attribute *Attribute
-		expected  bool
-	}{
-
-		{
-			attribute: &Attribute{
-				Attr:  "CollectionTime",
-				Field: "",
-			},
-			expected: false,
-		},
-		{
-			attribute: &Attribute{
-				Attr:  "CollectionTime",
-				Field: "  ",
-			},
-
-			expected: false,
-		},
-		{
-			attribute: &Attribute{
-				Attr:  "CollectionTime",
-				Field: "gc.cms_collection_time",
-			},
-			expected: true,
-		},
-	}
-
-	for _, c := range cases {
-		jolokiaGETFetcher := &JolokiaHTTPGetFetcher{}
-		hasField := jolokiaGETFetcher.mBeanAttributeHasField(c.attribute)
-
-		assert.Equal(t, c.expected, hasField, "mbean attribute: "+c.attribute.Attr, "mbean attribute field: "+c.attribute.Field)
-	}
-}
-
 func TestBuildGETRequestsAndMappings(t *testing.T) {
 
 	cases := []struct {

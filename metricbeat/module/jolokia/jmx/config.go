@@ -298,15 +298,6 @@ func (pc *JolokiaHTTPGetFetcher) buildJolokiaGETUri(mbean string, attr []Attribu
 	return tmpURL
 }
 
-func (pc *JolokiaHTTPGetFetcher) mBeanAttributeHasField(attr *Attribute) bool {
-
-	if attr.Field != "" && (strings.Trim(attr.Field, " ") != "") {
-		return true
-	}
-
-	return false
-}
-
 func (pc *JolokiaHTTPGetFetcher) buildGetRequestURIs(mappings []JMXMapping) ([]string, AttributeMapping, error) {
 
 	responseMapping := make(AttributeMapping)
