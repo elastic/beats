@@ -23,9 +23,10 @@ import (
 	"net"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestFindLogonServerPreservesHostname(t *testing.T) {
@@ -57,6 +58,26 @@ func TestFindLogonServerFallsBackWithoutResolution(t *testing.T) {
 	addresses := findLogonServer(false, log)
 	require.Len(t, addresses, 1)
 	assert.Equal(t, "ldap://DC02:389", addresses[0])
+}
+
+func TestDiscoverLDAPAddressUsesSRVRecords(t *testing.T) {
+	originalLookup := lookupSRV
+	lookupSRV = func(service, proto, name string) (string, []*net.SRV, error) {
+		switch service {
+		case "ldaps":
+			return "", []*net.SRV{{Target: "ldaps.example.com.", Port: 636, Priority: 0, Weight: 10}}, nil
+		case "ldap":
+			return "", []*net.SRV{{Target: "ldap.example.com.", Port: 389, Priority: 0, Weight: 5}}, nil
+		default:
+			return "", nil, assert.AnError
+		}
+	}
+	t.Cleanup(func() { lookupSRV = originalLookup })
+
+	log := logp.NewLogger("test")
+	addresses, err := discoverLDAPAddress(log)
+	require.NoError(t, err)
+	require.Equal(t, []string{"ldaps://ldaps.example.com:636", "ldap://ldap.example.com:389"}, addresses)
 }
 
 type fakeRand struct {
@@ -95,4 +116,73 @@ func TestOrderSRVRecordsPriorityAndWeight(t *testing.T) {
 	require.Len(t, ordered, len(records))
 	assert.Equal(t, "high.example.com.", ordered[0].Target)
 	assert.Equal(t, "heavy.example.com.", ordered[1].Target)
+}
+
+func TestInferBaseDNFromAddress(t *testing.T) {
+	tests := []struct {
+		name      string
+		address   string
+		expectDN  string
+		expectErr bool
+	}{
+		{
+			name:      "Skip first label with 3 parts",
+			address:   "ldap://dc1.example.com:389",
+			expectDN:  "dc=example,dc=com",
+			expectErr: false,
+		},
+		{
+			name:      "Keep multi-level domain when skipping host",
+			address:   "ldaps://corp.eu.example.com",
+			expectDN:  "dc=eu,dc=example,dc=com",
+			expectErr: false,
+		},
+		{
+			name:      "Two part domain no skip",
+			address:   "ldaps://example.com:636",
+			expectDN:  "dc=example,dc=com",
+			expectErr: false,
+		},
+		{
+			name:      "Multi part domain co.uk",
+			address:   "ldap://auth.example.co.uk:389",
+			expectDN:  "dc=example,dc=co,dc=uk",
+			expectErr: false,
+		},
+		{
+			name:      "Hostname only (no domain)",
+			address:   "ldap://localhost:389",
+			expectErr: true,
+		},
+		{
+			name:      "IPv4 address (cannot infer)",
+			address:   "ldaps://192.168.1.10:636",
+			expectErr: true,
+		},
+		{
+			name:      "IPv6 address (cannot infer)",
+			address:   "ldap://[2001:db8::1]:389",
+			expectErr: true,
+		},
+		{
+			name:      "Normalizes case and trailing dots",
+			address:   "LDAPS://CORP.EXAMPLE.COM.:636",
+			expectDN:  "dc=example,dc=com",
+			expectErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := &ldapClient{ldapConfig: &ldapConfig{address: tt.address}, log: logp.NewLogger("test")}
+			err := client.inferBaseDNFromAddress()
+			if tt.expectErr {
+				require.Error(t, err)
+				assert.Empty(t, client.baseDN)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, tt.expectDN, client.baseDN)
+			}
+		})
+	}
 }

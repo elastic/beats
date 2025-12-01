@@ -171,56 +171,117 @@ func (client *ldapClient) initializeMetadata() error {
 func (client *ldapClient) inferBaseDNFromAddress() error {
 	client.log.Debugw("attempting to infer base DN from server address", "address", client.address)
 
-	// Remove scheme
-	addr := strings.TrimPrefix(client.address, "ldap://")
-	addr = strings.TrimPrefix(addr, "ldaps://")
+	addr := client.address
+	lowerAddr := strings.ToLower(addr)
+	switch {
+	case strings.HasPrefix(lowerAddr, "ldap://"):
+		addr = addr[len("ldap://"):]
+	case strings.HasPrefix(lowerAddr, "ldaps://"):
+		addr = addr[len("ldaps://"):]
+	}
 
 	var hostname string
-	// Split host and port using net.SplitHostPort for robust hostname extraction
 	h, _, err := net.SplitHostPort(addr)
 	if err != nil {
-		// If SplitHostPort fails, assume the whole address is the host (i.e., no port specified)
 		hostname = addr
 		if strings.Contains(hostname, ":") {
-			// If we still have a colon, it was likely a malformed or IPv6 address without brackets
 			return fmt.Errorf("unable to parse hostname from address: %s", client.address)
 		}
 	} else {
 		hostname = h
 	}
 
+	hostname = strings.TrimSuffix(hostname, ".")
+	hostname = strings.ToLower(hostname)
+
 	if hostname == "" {
 		return fmt.Errorf("unable to extract hostname from address: %s", client.address)
 	}
 
-	// Check if hostname is an IP address
 	if net.ParseIP(hostname) != nil {
 		return fmt.Errorf("cannot infer base DN from IP address: %s", hostname)
 	}
 
-	// Extract domain from hostname
 	parts := strings.Split(hostname, ".")
 	if len(parts) < 2 {
 		return fmt.Errorf("hostname does not contain a domain: %s", hostname)
 	}
 
-	// Skip first part if we have 3+ parts (likely hostname like dc1.example.com)
-	var domainParts []string
-	if len(parts) >= 3 {
-		domainParts = parts[1:]
-	} else {
-		domainParts = parts
+	var candidates [][]string
+	seen := make(map[string]struct{})
+	addCandidate := func(parts []string) {
+		if len(parts) < 2 {
+			return
+		}
+		domain := strings.Join(parts, ".")
+		if _, ok := seen[domain]; ok {
+			return
+		}
+		seen[domain] = struct{}{}
+		candidates = append(candidates, append([]string(nil), parts...))
 	}
 
-	// Convert to DN format: example.com -> dc=example,dc=com
-	var dnParts []string
-	for _, part := range domainParts {
+	for i := 1; i < len(parts); i++ {
+		addCandidate(parts[i:])
+	}
+	addCandidate(parts[len(parts)-2:])
+
+	if len(candidates) == 0 {
+		addCandidate(parts)
+	}
+
+	validate := client.conn != nil
+	var fallbackDN string
+	for _, candidate := range candidates {
+		dn := domainPartsToDN(candidate)
+		if fallbackDN == "" {
+			fallbackDN = dn
+		}
+		if !validate {
+			continue
+		}
+		if err := client.validateBaseDN(dn); err != nil {
+			client.log.Debugw("base DN candidate validation failed", "candidate", dn, "error", err)
+			continue
+		}
+		client.baseDN = dn
+		client.log.Infow("inferred base DN from server domain", "base_dn", client.baseDN, "validated", true)
+		return nil
+	}
+
+	if fallbackDN != "" {
+		client.baseDN = fallbackDN
+		client.log.Infow("inferred base DN from server domain", "base_dn", client.baseDN, "validated", false)
+		return nil
+	}
+
+	return fmt.Errorf("unable to infer base DN from address: %s", client.address)
+}
+
+func domainPartsToDN(parts []string) string {
+	dnParts := make([]string, 0, len(parts))
+	for _, part := range parts {
 		dnParts = append(dnParts, fmt.Sprintf("dc=%s", part))
 	}
+	return strings.Join(dnParts, ",")
+}
 
-	client.baseDN = strings.Join(dnParts, ",")
-	client.log.Infow("inferred base DN from server domain", "base_dn", client.baseDN)
-	return nil
+func (client *ldapClient) validateBaseDN(baseDN string) error {
+	return client.withLockedConnection(func(conn *ldap.Conn) error {
+		req := ldap.NewSearchRequest(
+			baseDN,
+			ldap.ScopeBaseObject,
+			ldap.NeverDerefAliases,
+			1,
+			client.searchTimeLimit,
+			false,
+			"(objectClass=*)",
+			[]string{"distinguishedName"},
+			nil,
+		)
+		_, err := conn.Search(req)
+		return err
+	})
 }
 
 // dial establishes a new connection to the LDAP server

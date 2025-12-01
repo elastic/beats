@@ -22,6 +22,7 @@ package translate_ldap_attribute
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/go-ldap/ldap/v3"
 
@@ -197,7 +198,7 @@ func (p *processor) prepareSearchFilter(searchValue string) (string, error) {
 	case guidTranslationNever:
 		shouldConvertGUID = false
 	default: // auto
-		shouldConvertGUID = (p.LDAPSearchAttribute == "objectGUID") && p.client.isActiveDirectory
+		shouldConvertGUID = strings.EqualFold(p.LDAPSearchAttribute, "objectGUID")
 	}
 
 	if !shouldConvertGUID {

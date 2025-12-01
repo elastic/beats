@@ -40,6 +40,9 @@ var (
 	// resolveTCPAddr allows tests to stub DNS resolution
 	resolveTCPAddr = net.ResolveTCPAddr
 
+	// lookupSRV allows tests to stub DNS SRV lookups
+	lookupSRV = net.LookupSRV
+
 	// newSRVRandomizer returns a random source for SRV weighting (overridden in tests)
 	newSRVRandomizer = func() intnRandom {
 		return rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -90,7 +93,7 @@ func findServers(useTLS bool, log *logp.Logger) []string {
 
 	log.Debugw("looking up DNS SRV record", "service", service, "proto", proto)
 
-	_, addrs, err := net.LookupSRV(service, proto, "")
+	_, addrs, err := lookupSRV(service, proto, "")
 	if err != nil {
 		log.Debugw("DNS SRV lookup failed", "query", fmt.Sprintf("_%s._%s", service, proto), "error", err)
 		return nil

@@ -36,29 +36,25 @@ func TestPrepareSearchFilter(t *testing.T) {
 		name              string
 		ldapSearchAttr    string
 		adGuidTranslation string
-		isAD              bool
 		input             string
 		expect            string
 		expectErr         bool
 	}{
 		{
-			name:           "Auto mode converts when AD + objectGUID",
+			name:           "Auto mode converts when attribute is objectGUID",
 			ldapSearchAttr: "objectGUID",
-			isAD:           true,
 			input:          validGUID,
 			expect:         expectedEscaped,
 		},
 		{
-			name:           "Auto mode does not convert when non-AD",
-			ldapSearchAttr: "objectGUID",
-			isAD:           false,
+			name:           "Auto mode is case-insensitive",
+			ldapSearchAttr: "objectguid",
 			input:          validGUID,
-			expect:         validGUID,
+			expect:         expectedEscaped,
 		},
 		{
 			name:           "Auto mode does not convert other attribute",
 			ldapSearchAttr: "uid",
-			isAD:           true,
 			input:          validGUID,
 			expect:         validGUID,
 		},
@@ -66,7 +62,6 @@ func TestPrepareSearchFilter(t *testing.T) {
 			name:              "Explicit true converts even if attribute different",
 			ldapSearchAttr:    "uid",
 			adGuidTranslation: guidTranslationAlways,
-			isAD:              false,
 			input:             validGUID,
 			expect:            expectedEscaped,
 		},
@@ -74,21 +69,18 @@ func TestPrepareSearchFilter(t *testing.T) {
 			name:              "Explicit false never converts",
 			ldapSearchAttr:    "objectGUID",
 			adGuidTranslation: guidTranslationNever,
-			isAD:              true,
 			input:             validGUID,
 			expect:            validGUID,
 		},
 		{
 			name:           "Invalid GUID with conversion attempt returns error",
 			ldapSearchAttr: "objectGUID",
-			isAD:           true,
 			input:          "invalid-guid",
 			expectErr:      true,
 		},
 		{
 			name:           "Escapes filter characters when not converting",
 			ldapSearchAttr: "uid",
-			isAD:           true,
 			input:          "value*)(|(cn=*)",
 			expect:         ldap.EscapeFilter("value*)(|(cn=*)"),
 		},
@@ -101,7 +93,7 @@ func TestPrepareSearchFilter(t *testing.T) {
 					LDAPSearchAttribute: tt.ldapSearchAttr,
 					ADGUIDTranslation:   tt.adGuidTranslation,
 				},
-				client: &ldapClient{isActiveDirectory: tt.isAD},
+				client: &ldapClient{},
 			}
 			out, err := p.prepareSearchFilter(tt.input)
 			if tt.expectErr {
