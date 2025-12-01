@@ -92,7 +92,9 @@ func New(
 }
 
 func (r *rpc) init(results protos.Reporter, config *rpcConfig) error {
-	r.setFromConfig(config)
+	if err := r.setFromConfig(config); err != nil {
+		return err
+	}
 	r.results = results
 	r.callsSeen = common.NewCacheWithRemovalListener(
 		r.transactionTimeout,
@@ -214,7 +216,7 @@ func (r *rpc) handleRPCFragment(
 			break
 		}
 
-		marker := uint32(binary.BigEndian.Uint32(st.rawData[0:4]))
+		marker := binary.BigEndian.Uint32(st.rawData[0:4])
 		size := int(marker & rpcSizeMask)
 		islast := (marker & rpcLastFrag) != 0
 

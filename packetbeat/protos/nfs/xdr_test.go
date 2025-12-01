@@ -163,6 +163,11 @@ func TestXdrDecodingFailures(t *testing.T) {
 	_, err = xdr.getOpaque(maxOpaque + 1)
 	require.Error(t, err)
 
+	b = make([]byte, maxOpaque+1)
+	xdr = makeXDR(b)
+	_, err = xdr.getOpaque(-1)
+	require.Error(t, err)
+
 	b = make([]byte, maxOpaque-1)
 	xdr = makeXDR(b)
 	_, err = xdr.getOpaque(maxOpaque)
@@ -172,7 +177,7 @@ func TestXdrDecodingFailures(t *testing.T) {
 	xdr = makeXDR(b)
 	ba, err := xdr.getOpaque(maxOpaque)
 	require.NoError(t, err)
-	assert.Equal(t, int(maxOpaque), len(ba))
+	assert.Equal(t, maxOpaque, len(ba))
 
 	xdr = makeXDR([]byte{0x80})
 	_, err = xdr.getOpaque(1)

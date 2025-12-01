@@ -240,12 +240,22 @@ func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.T
 	// get cached request
 	v := r.callsSeen.Delete(reqID)
 	if v != nil {
-		nfs := v.(*nfs)
+		nfs, ok := v.(*nfs)
+		if !ok {
+			logp.Warn("nfs: failed to assert nfs interface")
+			return
+
+		}
 		nfs.pbf.Event.End = ts
 		nfs.pbf.Destination.Bytes = int64(xdr.size())
 
 		fields := nfs.event.Fields
-		rpcInfo := fields["rpc"].(mapstr.M)
+		rpcInfo, ok := fields["rpc"].(mapstr.M)
+		if !ok {
+			logp.Warn("nfs: failed to assert map[string]")
+			return
+
+		}
 		statusVal, err := xdr.getUInt()
 		if dropMalformed("rpc accept status", err) {
 			return
@@ -259,7 +269,12 @@ func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.T
 
 		// populate nfs info for successfully executed requests
 		if status == 0 {
-			nfsInfo := fields["nfs"].(mapstr.M)
+			nfsInfo, ok := fields["nfs"].(mapstr.M)
+			if !ok {
+				logp.Warn("nfs: failed to assert map[string]")
+				return
+
+			}
 			nfsStatus, err := nfs.getNFSReplyStatus(xdr)
 			if dropMalformed("nfs reply status", err) {
 				return

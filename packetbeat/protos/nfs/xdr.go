@@ -23,14 +23,14 @@ import (
 )
 
 const (
-	maxOpaque uint32 = 1 << 20
-	maxVector uint32 = 1 << 15
+	maxOpaque int = 1 << 20
+	maxVector int = 1 << 15
 )
 
 // XDR maps the External Data Representation
 type xdr struct {
 	data   []byte
-	offset uint32
+	offset int
 }
 
 func newXDR(data []byte) *xdr {
@@ -47,7 +47,7 @@ func (r *xdr) size() int {
 }
 
 func (r *xdr) getUInt() (uint32, error) {
-	if int(r.offset)+4 > len(r.data) {
+	if r.offset+4 > len(r.data) {
 		return 0, fmt.Errorf("xdr: truncated uint32")
 	}
 	i := binary.BigEndian.Uint32(r.data[r.offset : r.offset+4])
@@ -56,7 +56,7 @@ func (r *xdr) getUInt() (uint32, error) {
 }
 
 func (r *xdr) getUHyper() (uint64, error) {
-	if int(r.offset)+8 > len(r.data) {
+	if r.offset+8 > len(r.data) {
 		return 0, fmt.Errorf("xdr: truncated uint64")
 	}
 	i := binary.BigEndian.Uint64(r.data[r.offset : r.offset+8])
@@ -72,24 +72,24 @@ func (r *xdr) getString() (string, error) {
 	return string(b), nil
 }
 
-func (r *xdr) getOpaque(length uint32) ([]byte, error) {
-	if length > maxOpaque {
+func (r *xdr) getOpaque(length int) ([]byte, error) {
+	if length < 0 || length > maxOpaque {
 		return nil, fmt.Errorf("xdr: opaque length %d exceeds limit", length)
 	}
 
-	start := int(r.offset)
-	end := start + int(length)
+	start := r.offset
+	end := start + length
 	if end > len(r.data) {
 		return nil, fmt.Errorf("xdr: opaque length %d exceeds buffer", length)
 	}
 
-	padding := int((4 - (length & 3)) & 3)
+	padding := (4 - (length & 3)) & 3
 	if end+padding > len(r.data) {
 		return nil, fmt.Errorf("xdr: opaque padding exceeds buffer")
 	}
 
 	b := r.data[start:end]
-	r.offset = uint32(end + padding)
+	r.offset = end + padding
 	return b, nil
 }
 
@@ -98,7 +98,7 @@ func (r *xdr) getDynamicOpaque() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return r.getOpaque(l)
+	return r.getOpaque(int(l))
 }
 
 func (r *xdr) getUIntVector() ([]uint32, error) {
@@ -106,7 +106,7 @@ func (r *xdr) getUIntVector() ([]uint32, error) {
 	if err != nil {
 		return nil, err
 	}
-	if l > maxVector {
+	if int(l) > maxVector {
 		return nil, fmt.Errorf("xdr: vector length %d exceeds limit", l)
 	}
 	v := make([]uint32, int(l))
