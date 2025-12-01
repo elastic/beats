@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
@@ -25,13 +26,22 @@ import (
 
 type authConfig struct {
 	Basic  *basicAuthConfig       `config:"basic"`
+	File   *fileAuthConfig        `config:"file"`
 	OAuth2 *oAuth2Config          `config:"oauth2"`
 	AWS    *aws.SignerInputConfig `config:"aws"`
 }
 
+const (
+	defaultFileAuthHeader          = "Authorization"
+	defaultFileAuthRefreshInterval = time.Minute
+)
+
 func (c authConfig) Validate() error {
 	var n int
 	if c.Basic.isEnabled() {
+		n++
+	}
+	if c.File.isEnabled() {
 		n++
 	}
 	if c.OAuth2.isEnabled() {
@@ -68,6 +78,52 @@ func (b *basicAuthConfig) Validate() error {
 	}
 
 	return nil
+}
+
+type fileAuthConfig struct {
+	Enabled            *bool          `config:"enabled"`
+	Path               string         `config:"path"`
+	Header             string         `config:"header"`
+	Prefix             string         `config:"prefix"`
+	RefreshInterval    *time.Duration `config:"refresh_interval"`
+	RelaxedPermissions bool           `config:"relaxed_permissions"`
+}
+
+func (f *fileAuthConfig) isEnabled() bool {
+	return f != nil && (f.Enabled == nil || *f.Enabled)
+}
+
+func (f *fileAuthConfig) Validate() error {
+	if !f.isEnabled() {
+		return nil
+	}
+	if f.Path == "" {
+		return errors.New("path must be set")
+	}
+	if f.RefreshInterval != nil && *f.RefreshInterval <= 0 {
+		return errors.New("refresh_interval must be greater than 0")
+	}
+
+	// Note: File existence check is performed later during transport initialization
+	// (in newFileAuthTransport) to allow configuration validation to complete first.
+	// This ensures proper error precedence: configuration errors (like multiple auth
+	// methods) are reported before runtime errors (like missing files).
+
+	return nil
+}
+
+func (f *fileAuthConfig) headerName() string {
+	if f == nil || strings.TrimSpace(f.Header) == "" {
+		return defaultFileAuthHeader
+	}
+	return f.Header
+}
+
+func (f *fileAuthConfig) refreshInterval() time.Duration {
+	if f == nil || f.RefreshInterval == nil {
+		return defaultFileAuthRefreshInterval
+	}
+	return *f.RefreshInterval
 }
 
 // An oAuth2Provider represents a supported oauth provider.

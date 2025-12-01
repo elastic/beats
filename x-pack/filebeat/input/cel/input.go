@@ -853,6 +853,12 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 			return nil, nil, err
 		}
 		c.Transport = tr
+	} else if cfg.Auth.File.isEnabled() {
+		tr, err := newFileAuthTransport(cfg.Auth.File, c.Transport)
+		if err != nil {
+			return nil, nil, err
+		}
+		c.Transport = tr
 	}
 
 	var trace *httplog.LoggingRoundTripper
