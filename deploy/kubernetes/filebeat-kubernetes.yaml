@@ -144,7 +144,6 @@ data:
           #  prospector:
           #    scanner:
           #      fingerprint.enabled: true
-          #      symlinks: true
           #  file_identity.fingerprint: ~
           #  processors:
           #    - add_kubernetes_metadata:
@@ -181,7 +180,7 @@ data:
     #        prospector:
     #         scanner:
     #           fingerprint.enabled: true
-    #           symlinks: true
+    #           symlinks: true # it can be removed if collecting logs from /var/log/pods/
     #        file_identity.fingerprint: ~
     
     processors:

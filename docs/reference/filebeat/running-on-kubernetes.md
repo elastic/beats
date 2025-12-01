@@ -197,7 +197,6 @@ Use a single [filestream](/reference/filebeat/filebeat-input-filestream.md) inpu
          prospector:
             scanner:
                fingerprint.enabled: true
-               symlinks: true
          file_identity.fingerprint: ~
          processors:
             - add_kubernetes_metadata:
@@ -247,7 +246,6 @@ container.
             prospector:
              scanner:
                fingerprint.enabled: true
-               symlinks: true
             file_identity.fingerprint: ~
 ```
 
