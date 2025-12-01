@@ -1,0 +1,128 @@
+version: 8.19.8
+entries:
+    - kind: bug-fix
+      summary: Handle and remove BOM during JSON parsing in azureblobstorage and gcs inputs.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/46562
+        - https://github.com/elastic/beats/pull/46779
+        - https://github.com/elastic/beats/pull/47565
+        - https://github.com/elastic/beats/pull/47693
+        - https://github.com/elastic/beats/pull/47775
+        - https://github.com/elastic/beats/pull/47772
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762506747
+      file:
+        name: 1762506747-Handle-and-remove-BOM-during-JSON-parsing-in-azureblobstorage.yaml
+        checksum: 32c69801f652e9e87b6f8997756e857bbbdf45de
+    - kind: bug-fix
+      summary: Fixed an issue where filebeat could hang during shutdown when using the filestream input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/46562
+        - https://github.com/elastic/beats/pull/46779
+        - https://github.com/elastic/beats/pull/47565
+        - https://github.com/elastic/beats/pull/47693
+        - https://github.com/elastic/beats/pull/47775
+        - https://github.com/elastic/beats/pull/47772
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762533600
+      file:
+        name: 1762533600-fixed-an-issue-where-filebeat-could-hang-during-shutdown-when-using-the-filestream-input.yaml
+        checksum: dd47748c4e78963bdf1d3c5cba566130e601526f
+    - kind: bug-fix
+      summary: Fix double locking in translate_ldap_attribute processor and improve logging.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/46562
+        - https://github.com/elastic/beats/pull/46779
+        - https://github.com/elastic/beats/pull/47565
+        - https://github.com/elastic/beats/pull/47693
+        - https://github.com/elastic/beats/pull/47775
+        - https://github.com/elastic/beats/pull/47772
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762903519
+      file:
+        name: 1762903519-s6615-ldap_logging.yaml
+        checksum: e451551ba16e9c3d1bfcb2eb17f6dcd83c569c77
+    - kind: bug-fix
+      summary: Fix possible data corruption in tcp, syslog and unix inputs
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/46562
+        - https://github.com/elastic/beats/pull/46779
+        - https://github.com/elastic/beats/pull/47565
+        - https://github.com/elastic/beats/pull/47693
+        - https://github.com/elastic/beats/pull/47775
+        - https://github.com/elastic/beats/pull/47772
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1763040576
+      file:
+        name: 1763040576-fix-possible-data-corruption-in-tcp-syslog-unix-inputs.yaml
+        checksum: b03fa6c91df0fc8a51866345ea7cb696dc42af37
+    - kind: bug-fix
+      summary: Skip s3 test events in filebeat s3 input
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/46562
+        - https://github.com/elastic/beats/pull/46779
+        - https://github.com/elastic/beats/pull/47565
+        - https://github.com/elastic/beats/pull/47693
+        - https://github.com/elastic/beats/pull/47775
+        - https://github.com/elastic/beats/pull/47772
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1763061151
+      file:
+        name: 1763061151-bug-skip-s3-test-events-in-filebeat-s3-input.yaml
+        checksum: 6945c49b09002a2d8c702f36856ab7104be929be
+    - kind: bug-fix
+      summary: Fix a fatal startup error in Beats Receivers caused by truncation of long UTF-8 hostnames.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/46562
+        - https://github.com/elastic/beats/pull/46779
+        - https://github.com/elastic/beats/pull/47565
+        - https://github.com/elastic/beats/pull/47693
+        - https://github.com/elastic/beats/pull/47775
+        - https://github.com/elastic/beats/pull/47772
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1763556531
+      file:
+        name: 1763556531-fix-fatal-startup-error-from-long-utf-8-hostname-truncation.yaml
+        checksum: 965d20559c2da6a59ac3b7bbaea45d0a81118854
+    - kind: bug-fix
+      summary: Not being able to start the add_docker_metadata processor is now consistently a non-fatal error when Docker is not available.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/46562
+        - https://github.com/elastic/beats/pull/46779
+        - https://github.com/elastic/beats/pull/47565
+        - https://github.com/elastic/beats/pull/47693
+        - https://github.com/elastic/beats/pull/47775
+        - https://github.com/elastic/beats/pull/47772
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1764007304
+      file:
+        name: 1764007304-bump-elastic-autodiscover.yaml
+        checksum: 9462a508c047b7c529be3919829bce81aa392a8e
