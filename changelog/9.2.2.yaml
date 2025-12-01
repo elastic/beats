@@ -1,0 +1,186 @@
+version: 9.2.2
+entries:
+    - kind: bug-fix
+      summary: '[Filestream] ensure harvester always restarts if the file has not been fully ingested.'
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47107
+      issue:
+        - https://github.com/elastic/beats/issues/46923
+      impact: ""
+      action: ""
+      timestamp: 1760488402
+      file:
+        name: 1760488402-Prevent-modified-files-close-due-to-inactivity.yaml
+        checksum: 962de2ae400dafee98806df52af667c8bef29363
+    - kind: feature
+      summary: Include whether Beat is running from a FIPS distribution in User Agent
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47763
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1761868722
+      file:
+        name: 1761868722-ua-fips.yaml
+        checksum: 2468f1f3a0c807f9333414eba3df954f960a309c
+    - kind: bug-fix
+      summary: '[Cloud Connect] Use cluster.metadata.display_name as cluster name if set'
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47763
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762213574
+      file:
+        name: 1762213574-cc-cluster-name.yaml
+        checksum: 320ea92d03c52c5f52d5efbfc49222f063cf98d5
+    - kind: feature
+      summary: Add support for DPoP authentication for the CEL and HTTP JSON inputs.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47763
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762225281
+      file:
+        name: 1762225281-15056-cel-httpjson.yaml
+        checksum: 3d82e8ee58f85befed3d07a40a5103e40b78c845
+    - kind: other
+      summary: Bump Golang version to 1.24.10.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47525
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762347412
+      file:
+        name: 1762347412-bump-golang-1.24.10.yaml
+        checksum: 42277f0ff5f6a696585c1c93a4b523cde75a3ef2
+    - kind: bug-fix
+      summary: Handle and remove BOM during JSON parsing in azureblobstorage and gcs inputs.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47763
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762506747
+      file:
+        name: 1762506747-Handle-and-remove-BOM-during-JSON-parsing-in-azureblobstorage.yaml
+        checksum: 32c69801f652e9e87b6f8997756e857bbbdf45de
+    - kind: bug-fix
+      summary: Fixed an issue where filebeat could hang during shutdown when using the filestream input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47763
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762533600
+      file:
+        name: 1762533600-fixed-an-issue-where-filebeat-could-hang-during-shutdown-when-using-the-filestream-input.yaml
+        checksum: dd47748c4e78963bdf1d3c5cba566130e601526f
+    - kind: feature
+      summary: Improve logging of cache processor and add ignore failure option.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47763
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762831091
+      file:
+        name: 1762831091-s6615-cache.yaml
+        checksum: 1216f473877af0718c45e3d778c0f7bc8736bcf9
+    - kind: bug-fix
+      summary: Fix double locking in translate_ldap_attribute processor and improve logging.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47763
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1762903519
+      file:
+        name: 1762903519-s6615-ldap_logging.yaml
+        checksum: e451551ba16e9c3d1bfcb2eb17f6dcd83c569c77
+    - kind: bug-fix
+      summary: Fix possible data corruption in tcp, syslog and unix inputs
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47763
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1763040576
+      file:
+        name: 1763040576-fix-possible-data-corruption-in-tcp-syslog-unix-inputs.yaml
+        checksum: b03fa6c91df0fc8a51866345ea7cb696dc42af37
+    - kind: bug-fix
+      summary: Skip s3 test events in filebeat s3 input
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47763
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1763061151
+      file:
+        name: 1763061151-bug-skip-s3-test-events-in-filebeat-s3-input.yaml
+        checksum: 6945c49b09002a2d8c702f36856ab7104be929be
+    - kind: bug-fix
+      summary: Fix a fatal startup error in Beats Receivers caused by truncation of long UTF-8 hostnames.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47763
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1763556531
+      file:
+        name: 1763556531-fix-fatal-startup-error-from-long-utf-8-hostname-truncation.yaml
+        checksum: 965d20559c2da6a59ac3b7bbaea45d0a81118854
+    - kind: breaking-change
+      summary: remove otel.component.id and otel.component.kind from beat receiver events
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47729
+      issue:
+        - https://github.com/elastic/beats/issues/47600
+      impact: ""
+      action: ""
+      timestamp: 1763578431
+      file:
+        name: 1763578431-remove-otel.component.id-and-otel.component.kind-from-beat-receiver-events.yaml
+        checksum: f6a4de941dd71dec7c27c922a4a047ef8742a2e4
+    - kind: bug-fix
+      summary: Not being able to start the add_docker_metadata processor is now consistently a non-fatal error when Docker is not available.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47763
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1764007304
+      file:
+        name: 1764007304-bump-elastic-autodiscover.yaml
+        checksum: 9462a508c047b7c529be3919829bce81aa392a8e
