@@ -14,42 +14,46 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-var CustomJumpListFooterSignature = []byte{0xAB, 0xFB, 0xBF, 0xBA}
-
-func ParseCustomJumpListFile(filePath string, log *logger.Logger) (JumpList, error) {
+// ParseCustomJumpListFile parses a custom jump list file into a JumpList object.
+// It returns a JumpList object and an error if the file cannot be read or parsed.
+func ParseCustomJumpListFile(filePath string, log *logger.Logger) (*JumpList, error) {
 	fileBytes, err := os.ReadFile(filePath)
 	if err != nil {
-		return JumpList{}, fmt.Errorf("failed to read")
+		return nil, fmt.Errorf("failed to read")
 	}
 
 	// Scan through the file looking for footer signatures, there may be multiple custom jump lists in the file
 	lnks := carveLnkFiles(fileBytes, log)
+
+	// If the jumplist file is empty, return an error jlecmd does this as well
 	if len(lnks) == 0 {
-		return JumpList{}, fmt.Errorf("jumplist file is empty")
+		return nil, fmt.Errorf("custom jumplist file %s is empty", filePath)
 	}
 
 	// Look up the application id and create the metadata
 	applicationId := NewApplicationIdFromFileName(filePath, log)
 	jumpListMeta := JumpListMeta{
-		ApplicationId:  applicationId,
-		jump_list_type: JumpListTypeCustom,
-		path:           filePath,
+		ApplicationId: applicationId,
+		JumplistType:  JumpListTypeCustom,
+		Path:          filePath,
 	}
-	customJumpList := JumpList{
+	customJumpList := &JumpList{
 		JumpListMeta: jumpListMeta,
 		lnks:         lnks,
 	}
 	return customJumpList, nil
 }
 
-func GetCustomJumpLists(log *logger.Logger) []JumpList {
+// GetCustomJumpLists finds all the custom jump list files and parses them into JumpList objects.
+// It returns a slice of JumpList objects.
+func GetCustomJumpLists(log *logger.Logger) []*JumpList {
 	files, err := FindJumplistFiles(JumpListTypeCustom, log)
 	if err != nil {
 		log.Infof("failed to find Custom Jump Lists: %v", err)
-		return []JumpList{}
+		return []*JumpList{}
 	}
 
-	var jumplists []JumpList
+	var jumplists []*JumpList
 	for _, file := range files {
 		customJumpList, err := ParseCustomJumpListFile(file, log)
 		if err != nil {
@@ -61,10 +65,9 @@ func GetCustomJumpLists(log *logger.Logger) []JumpList {
 	return jumplists
 }
 
+// carveLnkFiles scans the fileBytes buffer looking for LNK signatures and carves out the individual LNK files.
+// It returns a slice of Lnk objects.
 func carveLnkFiles(fileBytes []byte, log *logger.Logger) []*Lnk {
-	// A custom destination file contains one or more LNK files.
-	// We need to scan the file looking for LNK signatures and carve out the individual LNK files.
-
 	var lnks []*Lnk
 	sigLen := len(LnkSignature)
 
@@ -77,13 +80,14 @@ func carveLnkFiles(fileBytes []byte, log *logger.Logger) []*Lnk {
 	// advance the buffer to the first LNK signature
 	fileBytes = fileBytes[start:]
 
+	entryNumber := 0
 	for {
 		// Find the next LNK signature
 		nextSigIndex := bytes.Index(fileBytes[sigLen:], LnkSignature)
 
 		if nextSigIndex == -1 {
 			// This is the last Lnk in the file
-			lnk, err := NewLnkFromBytes(fileBytes, log)
+			lnk, err := NewLnkFromBytes(fileBytes, entryNumber, log)
 			if err == nil {
 				lnks = append(lnks, lnk)
 			}
@@ -91,14 +95,14 @@ func carveLnkFiles(fileBytes []byte, log *logger.Logger) []*Lnk {
 		}
 
 		// calculate the cut point for the current Lnk
-		// nextSigIndex is a relaive index to the start of the fileBytes buffer
+		// nextSigIndex is a relative index to the start of the fileBytes buffer
 		// so we need to add the sigLen to get the absolute index
 		cutPoint := nextSigIndex + sigLen
-		lnk, err := NewLnkFromBytes(fileBytes[:cutPoint], log)
+		lnk, err := NewLnkFromBytes(fileBytes[:cutPoint], entryNumber, log)
 		if err == nil {
 			lnks = append(lnks, lnk)
 		}
-
+		entryNumber++
 		// advance the buffer to the next LNK signature
 		fileBytes = fileBytes[cutPoint:]
 	}

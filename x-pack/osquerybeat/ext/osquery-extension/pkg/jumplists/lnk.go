@@ -8,8 +8,10 @@ package jumplists
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -25,6 +27,7 @@ var LnkSignature = []byte{0x4c, 0x00, 0x00, 0x00}
 var MinLnkSize = 76
 
 type Lnk struct {
+	EntryNumber          int       `osquery:"entry_number"`
 	TargetPath           string    `osquery:"target_path"`
 	IconLocation         string    `osquery:"icon_location"`
 	CommandLineArguments string    `osquery:"command_line_arguments"`
@@ -39,32 +42,15 @@ type Lnk struct {
 	RelativePath         string    `osquery:"relative_path"`
 }
 
-func (l *Lnk) String() string {
-	sb := strings.Builder{}
-	sb.WriteString("Lnk{")
-	sb.WriteString(fmt.Sprintf("target_path: %s, ", l.TargetPath))
-	sb.WriteString(fmt.Sprintf("target_modified_time: %s, ", l.TargetModifiedTime.UTC().Format(time.RFC3339)))
-	sb.WriteString(fmt.Sprintf("target_accessed_time: %s, ", l.TargetAccessedTime.UTC().Format(time.RFC3339)))
-	sb.WriteString(fmt.Sprintf("target_created_time: %s, ", l.TargetCreatedTime.UTC().Format(time.RFC3339)))
-	sb.WriteString(fmt.Sprintf("volume_serial_number: %s, ", l.VolumeSerialNumber))
-	sb.WriteString(fmt.Sprintf("volume_type: %s, ", l.VolumeType))
-	sb.WriteString(fmt.Sprintf("volume_label: %s, ", l.VolumeLabel))
-	sb.WriteString(fmt.Sprintf("working_dir: %s, ", l.WorkingDir))
-	sb.WriteString(fmt.Sprintf("name_string: %s, ", l.NameString))
-	sb.WriteString(fmt.Sprintf("relative_path: %s, ", l.RelativePath))
-	sb.WriteString(fmt.Sprintf("command_line_arguments: %s}", l.CommandLineArguments))
-	return sb.String()
-}
-
 func NewLnkFromPath(filePath string, log *logger.Logger) (*Lnk, error) {
 	bytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read LNK file: %w", err)
 	}
-	return NewLnkFromBytes(bytes, log)
+	return NewLnkFromBytes(bytes, 0, log)
 }
 
-func NewLnkFromBytes(data []byte, log *logger.Logger) (*Lnk, error) {
+func NewLnkFromBytes(data []byte, entryNumber int, log *logger.Logger) (*Lnk, error) {
 	if len(data) < len(LnkSignature) {
 		return nil, fmt.Errorf("data is too short to contain a LNK signature")
 	}
@@ -82,13 +68,25 @@ func NewLnkFromBytes(data []byte, log *logger.Logger) (*Lnk, error) {
 		return nil, fmt.Errorf("failed to read LNK file: %w", err)
 	}
 
+	// the golnk library returns the drive serial number as a hex string representation of a uint32
+	// we need to convert it to a string in the format of XXXX-XXXX that windows displays
+	var volumeSerialNumber string
+	cleanInput := strings.TrimPrefix(lnkFile.LinkInfo.VolID.DriveSerialNumber, "0x")
+	val, err := strconv.ParseUint(cleanInput, 16, 32)
+	if err == nil {
+		bytes := make([]byte, 4)
+		binary.LittleEndian.PutUint32(bytes, uint32(val))
+		volumeSerialNumber = fmt.Sprintf("%02X%02X-%02X%02X", bytes[0], bytes[1], bytes[2], bytes[3])
+	}
+
 	lnk := &Lnk{
+		EntryNumber:          entryNumber,
 		TargetPath:           lnkFile.LinkInfo.LocalBasePath,
 		IconLocation:         lnkFile.StringData.IconLocation,
 		TargetModifiedTime:   lnkFile.Header.WriteTime,
 		TargetAccessedTime:   lnkFile.Header.AccessTime,
 		TargetCreatedTime:    lnkFile.Header.CreationTime,
-		VolumeSerialNumber:   lnkFile.LinkInfo.VolID.DriveSerialNumber,
+		VolumeSerialNumber:   volumeSerialNumber,
 		VolumeType:           lnkFile.LinkInfo.VolID.DriveType,
 		VolumeLabel:          lnkFile.LinkInfo.VolID.VolumeLabel,
 		CommandLineArguments: lnkFile.StringData.CommandLineArguments,
