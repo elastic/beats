@@ -215,6 +215,7 @@ func (nfs *nfs) eatData(op int, xdr *xdr) error {
 				return err
 			}
 		}
+		return nil
 	}
 	return nil
 }
