@@ -20,6 +20,7 @@
 package add_docker_metadata
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
@@ -34,6 +35,7 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -114,7 +116,7 @@ func TestInitializationNoDocker(t *testing.T) {
 func TestInitialization(t *testing.T) {
 	var testConfig = config.NewConfig()
 
-	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(nil))
+	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(nil, nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := mapstr.M{}
@@ -130,7 +132,7 @@ func TestNoMatch(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(nil))
+	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(nil, nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := mapstr.M{
@@ -148,7 +150,7 @@ func TestMatchNoContainer(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(nil))
+	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(nil, nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := mapstr.M{
@@ -179,7 +181,7 @@ func TestMatchContainer(t *testing.T) {
 					"b.foo": "3",
 				},
 			},
-		}))
+		}, nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := mapstr.M{
@@ -227,7 +229,7 @@ func TestMatchContainerWithDedot(t *testing.T) {
 					"b.foo": "3",
 				},
 			},
-		}))
+		}, nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := mapstr.M{
@@ -269,7 +271,7 @@ func TestMatchSource(t *testing.T) {
 					"b": "2",
 				},
 			},
-		}))
+		}, nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	var inputSource string
@@ -328,7 +330,7 @@ func TestDisableSource(t *testing.T) {
 					"b": "2",
 				},
 			},
-		}))
+		}, nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := mapstr.M{
@@ -354,6 +356,7 @@ func TestMatchPIDs(t *testing.T) {
 				},
 			},
 		},
+		nil,
 	))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
@@ -436,22 +439,45 @@ func TestMatchPIDs(t *testing.T) {
 	})
 }
 
+func TestWatcherError(t *testing.T) {
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
+	testConfig, err := config.NewConfigFrom(map[string]interface{}{
+		"match_fields": []string{"foo"},
+	})
+	assert.NoError(t, err)
+
+	p, err := buildDockerMetadataProcessor(logger, testConfig, MockWatcherFactory(nil, errors.New("mock error")))
+	assert.NoError(t, err, "initializing add_docker_metadata processor")
+	assert.Len(t, observedLogs.FilterMessageSnippet("unable to start the docker watcher").TakeAll(), 1)
+
+	input := mapstr.M{
+		"field": "value",
+	}
+	result, err := p.Run(&beat.Event{Fields: input})
+	assert.NoError(t, err, "processing an event")
+	assert.Equal(t, mapstr.M{"field": "value"}, result.Fields)
+}
+
 // Mock container watcher
 
-func MockWatcherFactory(containers map[string]*docker.Container) docker.WatcherConstructor {
+func MockWatcherFactory(containers map[string]*docker.Container, startErr error) docker.WatcherConstructor {
 	if containers == nil {
 		containers = make(map[string]*docker.Container)
 	}
 	return func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
-		return &mockWatcher{containers: containers}, nil
+		return &mockWatcher{containers: containers, startErr: startErr}, nil
 	}
 }
 
 type mockWatcher struct {
 	containers map[string]*docker.Container
+	startErr   error
 }
 
 func (m *mockWatcher) Start() error {
+	if m.startErr != nil {
+		return m.startErr
+	}
 	return nil
 }
 
