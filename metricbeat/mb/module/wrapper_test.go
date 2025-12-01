@@ -224,8 +224,6 @@ func TestDurationIsAddedToEvent(t *testing.T) {
 	require.NoError(t, err)
 
 	done := make(chan struct{})
-	defer close(done)
-
 	output := m.Start(done)
 
 	event := <-output
@@ -233,6 +231,13 @@ func TestDurationIsAddedToEvent(t *testing.T) {
 	fields := event.Fields.Flatten()
 	assert.Contains(t, fields, "event.duration", "event.duration should be present in event")
 	assert.Greater(t, fields["event.duration"], time.Duration(0), "event.duration should be greater than 0")
+
+	// stop worker
+	close(done)
+
+	// wait for shutdown to prevent logging after test completes
+	event, ok := <-output
+	assert.Falsef(t, ok, "received unexpected event: %+v", event)
 }
 
 func TestNewWrapperForMetricSet(t *testing.T) {
