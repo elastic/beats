@@ -44,9 +44,12 @@ type config struct {
 	LDAPSearchTimeLimit int               `config:"ldap_search_time_limit"`
 	LDAPTLS             *tlscommon.Config `config:"ldap_ssl"`
 
-	// ADGUIDTranslation controls Active Directory GUID binary conversion.
+	// ADGUIDTranslation controls when GUID values get converted to the binary form
+	// expected by Active Directory. We no longer rely on server detection; the
+	// auto mode simply checks whether the configured search attribute is named
+	// objectGUID (case-insensitive).
 	// Supported values:
-	//   "auto"   (default): Enable GUID conversion when objectGUID is used against AD
+	//   "auto"   (default): Convert when LDAP search attribute equals objectGUID
 	//   "always": Always apply GUID conversion regardless of attribute name
 	//   "never" : Never apply GUID conversion
 	ADGUIDTranslation string `config:"ad_guid_translation"`

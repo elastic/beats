@@ -43,7 +43,7 @@ The `translate_ldap_attribute` processor has the following configuration setting
 | `ldap_mapped_attribute` | yes | `cn` | LDAP attribute to map to. |
 | `ldap_search_time_limit` | no | 30 | LDAP search time limit in seconds. |
 | `ldap_ssl`\* | no |  | LDAP TLS/SSL connection settings. See [SSL](/reference/packetbeat/configuration-ssl.md). |
-| `ad_guid_translation` | no | `auto` | Controls Active Directory GUID binary conversion. `auto` (default) converts only when the search attribute is `objectGUID` on Active Directory. Use `always` to force conversion or `never` to disable it. |
+| `ad_guid_translation` | no | `auto` | Controls GUID binary conversion for Active Directory attributes. `auto` (default) converts when the LDAP search attribute equals `objectGUID` (case-insensitive). Use `always` to force conversion or `never` to disable it. |
 | `ignore_missing` | no | false | Ignore errors when the source field is missing. |
 | `ignore_failure` | no | false | Ignore all errors produced by the processor. |
 
