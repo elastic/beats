@@ -117,7 +117,7 @@ The supported processors are:
 * [`script`](/reference/winlogbeat/processor-script.md)
 * [`syslog`](/reference/winlogbeat/syslog.md)
 * [`timestamp`](/reference/winlogbeat/processor-timestamp.md)
-* [`translate_ldap_attribute`](/reference/winlogbeat/processor-translate-guid.md)
+* [`translate_ldap_attribute`](/reference/winlogbeat/processor-translate-ldap-attribute.md)
 * [`translate_sid`](/reference/winlogbeat/processor-translate-sid.md)
 * [`truncate_fields`](/reference/winlogbeat/truncate-fields.md)
 * [`urldecode`](/reference/winlogbeat/urldecode.md)

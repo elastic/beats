@@ -1,15 +1,15 @@
 ---
 navigation_title: "translate_ldap_attribute"
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/winlogbeat/current/processor-translate-guid.html
+  - https://www.elastic.co/guide/en/beats/winlogbeat/current/processor-translate-ldap-attribute.html
 applies_to:
   stack: ga
 ---
 
-# Translate GUID [processor-translate-guid]
+# Translate LDAP Attribute [processor-translate-ldap-attribute]
 
 
-The `translate_ldap_attribute` processor translates an LDAP attributes between eachother. It is typically used to translate AD Global Unique Identifiers (GUID) into their common names.
+The `translate_ldap_attribute` processor translates LDAP attributes between each other. It is typically used to translate AD Global Unique Identifiers (GUID) into their common names.
 
 Every object on an Active Directory or an LDAP server is issued a GUID. Internal processes refer to their GUID’s rather than the object’s name and these values sometimes appear in logs.
 
@@ -23,10 +23,10 @@ Note: the search attribute is expected to map to a single object. If it doesn’
 processors:
   - translate_ldap_attribute:
       field: winlog.event_data.ObjectGuid
-      ldap_base_dn: "dc=example,dc=com"
       ignore_missing: true
       ignore_failure: true
       # ldap_address: "ldap://ds.example.com:389"  # Optional - will auto-discover if omitted
+      # ldap_base_dn: "dc=example,dc=com"  # Optional - will auto-discover if omitted
 ```
 
 The `translate_ldap_attribute` processor has the following configuration settings:
@@ -36,9 +36,9 @@ The `translate_ldap_attribute` processor has the following configuration setting
 | `field` | yes |  | Source field containing a GUID. |
 | `target_field` | no |  | Target field for the mapped attribute value. If not set it will be replaced in place. |
 | `ldap_address` | no |  | LDAP server address (eg: `ldap://ds.example.com:389`). If not provided, auto-discovery will be attempted via DNS SRV records and, on Windows, the LOGONSERVER environment variable. |
-| `ldap_base_dn` | yes |  | LDAP base DN. eg: `dc=example,dc=com` |
-| `ldap_bind_user` | no |  | LDAP user. |
-| `ldap_bind_password` | no |  | LDAP password. |
+| `ldap_base_dn` | no |  | LDAP base DN (eg: `dc=example,dc=com`). If not provided, auto-discovery will be attempted via rootDSE query or inferred from the server domain. |
+| `ldap_bind_user` | no |  | LDAP user. If both `ldap_bind_user` and `ldap_bind_password` are omitted, the processor will attempt Windows SSPI authentication (on Windows) using the current process user's credentials, or fall back to an unauthenticated bind. |
+| `ldap_bind_password` | no |  | LDAP password. If both `ldap_bind_user` and `ldap_bind_password` are omitted, the processor will attempt Windows SSPI authentication (on Windows) using the current process user's credentials, or fall back to an unauthenticated bind. |
 | `ldap_search_attribute` | yes | `objectGUID` | LDAP attribute to search by. |
 | `ldap_mapped_attribute` | yes | `cn` | LDAP attribute to map to. |
 | `ldap_search_time_limit` | no | 30 | LDAP search time limit in seconds. |

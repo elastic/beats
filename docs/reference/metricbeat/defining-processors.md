@@ -116,7 +116,7 @@ The supported processors are:
 * [`replace`](/reference/metricbeat/replace-fields.md)
 * [`script`](/reference/metricbeat/processor-script.md)
 * [`syslog`](/reference/metricbeat/syslog.md)
-* [`translate_ldap_attribute`](/reference/metricbeat/processor-translate-guid.md)
+* [`translate_ldap_attribute`](/reference/metricbeat/processor-translate-ldap-attribute.md)
 * [`translate_sid`](/reference/metricbeat/processor-translate-sid.md)
 * [`truncate_fields`](/reference/metricbeat/truncate-fields.md)
 * [`urldecode`](/reference/metricbeat/urldecode.md)

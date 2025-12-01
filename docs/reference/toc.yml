@@ -95,7 +95,7 @@ toc:
               - file: auditbeat/rename-fields.md
               - file: auditbeat/replace-fields.md
               - file: auditbeat/syslog.md
-              - file: auditbeat/processor-translate-guid.md
+              - file: auditbeat/processor-translate-ldap-attribute.md
               - file: auditbeat/processor-translate-sid.md
               - file: auditbeat/truncate-fields.md
               - file: auditbeat/urldecode.md
@@ -309,7 +309,7 @@ toc:
               - file: filebeat/processor-script.md
               - file: filebeat/syslog.md
               - file: filebeat/processor-timestamp.md
-              - file: filebeat/processor-translate-guid.md
+              - file: filebeat/processor-translate-ldap-attribute.md
               - file: filebeat/processor-translate-sid.md
               - file: filebeat/truncate-fields.md
               - file: filebeat/urldecode.md
@@ -607,7 +607,7 @@ toc:
               - file: heartbeat/replace-fields.md
               - file: heartbeat/processor-script.md
               - file: heartbeat/syslog.md
-              - file: heartbeat/processor-translate-guid.md
+              - file: heartbeat/processor-translate-ldap-attribute.md
               - file: heartbeat/processor-translate-sid.md
               - file: heartbeat/truncate-fields.md
               - file: heartbeat/urldecode.md
@@ -781,7 +781,7 @@ toc:
               - file: metricbeat/replace-fields.md
               - file: metricbeat/processor-script.md
               - file: metricbeat/syslog.md
-              - file: metricbeat/processor-translate-guid.md
+              - file: metricbeat/processor-translate-ldap-attribute.md
               - file: metricbeat/processor-translate-sid.md
               - file: metricbeat/truncate-fields.md
               - file: metricbeat/urldecode.md
@@ -1425,7 +1425,7 @@ toc:
               - file: packetbeat/rename-fields.md
               - file: packetbeat/replace-fields.md
               - file: packetbeat/syslog.md
-              - file: packetbeat/processor-translate-guid.md
+              - file: packetbeat/processor-translate-ldap-attribute.md
               - file: packetbeat/processor-translate-sid.md
               - file: packetbeat/truncate-fields.md
               - file: packetbeat/urldecode.md
@@ -1605,7 +1605,7 @@ toc:
               - file: winlogbeat/processor-script.md
               - file: winlogbeat/syslog.md
               - file: winlogbeat/processor-timestamp.md
-              - file: winlogbeat/processor-translate-guid.md
+              - file: winlogbeat/processor-translate-ldap-attribute.md
               - file: winlogbeat/processor-translate-sid.md
               - file: winlogbeat/truncate-fields.md
               - file: winlogbeat/urldecode.md

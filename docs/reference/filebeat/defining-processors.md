@@ -122,7 +122,7 @@ The supported processors are:
 * [`script`](/reference/filebeat/processor-script.md)
 * [`syslog`](/reference/filebeat/syslog.md)
 * [`timestamp`](/reference/filebeat/processor-timestamp.md)
-* [`translate_ldap_attribute`](/reference/filebeat/processor-translate-guid.md)
+* [`translate_ldap_attribute`](/reference/filebeat/processor-translate-ldap-attribute.md)
 * [`translate_sid`](/reference/filebeat/processor-translate-sid.md)
 * [`truncate_fields`](/reference/filebeat/truncate-fields.md)
 * [`urldecode`](/reference/filebeat/urldecode.md)

@@ -116,7 +116,7 @@ The supported processors are:
 * [`rename`](/reference/auditbeat/rename-fields.md)
 * [`replace`](/reference/auditbeat/replace-fields.md)
 * [`syslog`](/reference/auditbeat/syslog.md)
-* [`translate_ldap_attribute`](/reference/auditbeat/processor-translate-guid.md)
+* [`translate_ldap_attribute`](/reference/auditbeat/processor-translate-ldap-attribute.md)
 * [`translate_sid`](/reference/auditbeat/processor-translate-sid.md)
 * [`truncate_fields`](/reference/auditbeat/truncate-fields.md)
 * [`urldecode`](/reference/auditbeat/urldecode.md)
