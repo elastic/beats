@@ -16,7 +16,7 @@ type Config struct {
 	ContinueOnError bool                   `mapstructure:"continue_on_error"`
 }
 
-type esAuthConfig struct {
+type BeatsAuthConfig struct {
 	Kerberos  *kerberos.Config                 `config:"kerberos"`
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }

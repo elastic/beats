@@ -74,11 +74,11 @@ type azureInputConfig struct {
 	// ---------------------------------------
 
 	// MigrateCheckpoint controls if the input should perform the checkpoint information
-	// migration from v1 to v2 (processor v2 only). Default is false.
+	// migration from v1 to v2 (processor v2 only). Default is true.
 	MigrateCheckpoint bool `config:"migrate_checkpoint"`
 	// ProcessorVersion controls the processor version to use.
-	// Possible values are v1 and v2 (processor v2 only). Default is v1.
-	ProcessorVersion string `config:"processor_version"`
+	// Possible values are v1 and v2 (processor v2 only). The default is v2.
+	ProcessorVersion string `config:"processor_version" default:"v2"`
 	// ProcessorUpdateInterval controls how often attempt to claim
 	// partitions (processor v2 only). The default value is 10 seconds.
 	ProcessorUpdateInterval time.Duration `config:"processor_update_interval"`
@@ -103,9 +103,9 @@ type azureInputConfig struct {
 
 func defaultConfig() azureInputConfig {
 	return azureInputConfig{
-		// For this release, we continue to use
-		// the processor v1 as the default.
-		ProcessorVersion: processorV1,
+		// For this release, we use
+		// the processor v2 as the default.
+		ProcessorVersion: processorV2,
 		// Controls how often attempt to claim partitions.
 		ProcessorUpdateInterval: 10 * time.Second,
 		// For backward compatibility with v1,
@@ -118,6 +118,9 @@ func defaultConfig() azureInputConfig {
 		PartitionReceiveCount:   100,
 		// Default
 		LegacySanitizeOptions: []string{},
+		// Default is true to avoid reprocessing data from the start of the retention
+		// when v2 replaces v1.
+		MigrateCheckpoint: true,
 	}
 }
 
@@ -196,7 +199,32 @@ func (conf *azureInputConfig) Validate() error {
 		}
 	case processorV2:
 		if conf.SAConnectionString == "" {
-			return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
+			if conf.SAName != "" && conf.SAKey != "" {
+				// To avoid breaking changes, and ease the migration from v1 to v2,
+				// we can build the connection string using the following settings:
+				//
+				// - DefaultEndpointsProtocol=https;
+				// - AccountName=<SAName>;
+				// - AccountKey=<SAKey>;
+				// - EndpointSuffix=core.windows.net
+				env, err := getAzureEnvironment(conf.OverrideEnvironment)
+				if err != nil {
+					return fmt.Errorf("failed to get azure environment: %w", err)
+				}
+				conf.SAConnectionString = fmt.Sprintf(
+					"DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=%s",
+					conf.SAName,
+					conf.SAKey,
+					env.StorageEndpointSuffix,
+				)
+				logger.Warn("storage_account_connection_string is not configured, but storage_account and storage_account_key are configured. " +
+					"The connection string has been constructed from the storage account and key. " +
+					"Please configure storage_account_connection_string directly as storage_account_key is deprecated in processor v2.")
+				conf.SAKey = ""
+			} else {
+				// No connection string and no key, so we can't proceed.
+				return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
+			}
 		}
 	default:
 		return fmt.Errorf(

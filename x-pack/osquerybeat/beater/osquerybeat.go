@@ -186,19 +186,13 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 
 	g, ctx := errgroup.WithContext(ctx)
 
-	// Start osqueryd health monitoring
-	g.Go(func() error {
-		monitorOsquerydHealth(ctx, socketPath, osqdMetrics, bt.log)
-		return nil
-	})
-
 	// Start osquery runner.
 	// It restarts osquery on configuration options change
 	// It exits if osqueryd fails to run for any reason, like a bad configuration for example
 	runner := newOsqueryRunner(bt.log)
 	g.Go(func() error {
 		return runner.Run(ctx, func(ctx context.Context, flags osqd.Flags, inputCh <-chan []config.InputConfig) error {
-			return bt.runOsquery(ctx, b, osq, flags, inputCh, rah)
+			return bt.runOsquery(ctx, b, osq, flags, inputCh, rah, osqdMetrics)
 		})
 	})
 
@@ -268,7 +262,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	return err
 }
 
-func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler) error {
+func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
 	socketPath := osq.SocketPath()
 
 	// Create a cache for queries types resolution
@@ -323,6 +317,12 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 			return err
 		}
 		defer cli.Close()
+
+		// Start osqueryd health monitoring after connection is established
+		g.Go(func() error {
+			monitorOsquerydHealth(ctx, cli, osqdMetrics, bt.log)
+			return nil
+		})
 
 		// Run extensions only after successful connect, otherwise the extension server fails with windows pipes if the pipe was not created by osqueryd yet
 		g.Go(func() error {

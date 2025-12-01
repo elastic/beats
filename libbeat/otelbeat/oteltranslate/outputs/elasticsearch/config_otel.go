@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// The translation logic here has been moved to elastic-agent. Any development here is effectively never used on beatreceivers
+// should only be used for manual testing
+
 package elasticsearchtranslate
 
 import (
