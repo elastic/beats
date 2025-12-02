@@ -817,7 +817,7 @@ func EnsureESIsRunning(t *testing.T) {
 	t.Helper()
 	esURL := GetESURL(t, "http")
 
-	ctx, cancel := context.WithDeadline(t.Context(), time.Now().Add(500*time.Second))
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(500*time.Second))
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, esURL.String(), nil)
 	if err != nil {
@@ -1023,7 +1023,7 @@ func HttpDo(t *testing.T, method string, targetURL url.URL) (statusCode int, bod
 	t.Helper()
 	client := &http.Client{}
 
-	ctx, cancel := context.WithDeadline(t.Context(), time.Now().Add(30*time.Second))
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, method, targetURL.String(), nil)
 	if err != nil {
