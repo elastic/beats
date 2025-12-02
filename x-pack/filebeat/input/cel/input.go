@@ -1003,8 +1003,8 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 
 func GetResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
 	attrs := []attribute.KeyValue{semconv.ServiceInstanceID(env.IDWithoutName),
-		attribute.String("package.name", cfg.GetPackageStringValue("name")),
-		attribute.String("package.version", cfg.GetPackageStringValue("version")),
+		attribute.String("package.name", cfg.GetPackageData("name")),
+		attribute.String("package.version", cfg.GetPackageData("version")),
 		attribute.String("package.data_stream", cfg.DataStream),
 		attribute.String("agent.version", env.Agent.Version),
 		attribute.String("agent.id", env.Agent.ID.String())}

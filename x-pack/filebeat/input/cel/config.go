@@ -71,30 +71,18 @@ type config struct {
 	// record and log execution coverage.
 	RecordCoverage bool `config:"record_coverage"`
 
-	Meta map[string]interface{} `config:"meta"`
+	Package map[string]string `config:"package"`
 }
 
-func (c config) GetPackageStringValue(key string) string {
-	if c.Meta == nil {
+func (c config) GetPackageData(key string) string {
+	if c.Package == nil {
 		return "unknown"
 	}
-	packageinfo, ok := c.Meta["package"]
+	value, ok := c.Package[key]
 	if !ok {
 		return "unknown"
 	}
-	pmap, ok := packageinfo.(map[string]interface{})
-	if !ok {
-		return "unknown"
-	}
-	value, ok := pmap[key]
-	if !ok {
-		return "unknown"
-	}
-	valueString, ok := value.(string)
-	if !ok {
-		return "unknown"
-	}
-	return valueString
+	return value
 }
 
 type redact struct {

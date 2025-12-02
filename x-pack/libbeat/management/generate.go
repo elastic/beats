@@ -6,6 +6,7 @@ package management
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
@@ -14,6 +15,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 )
+
+var celInputPrefix = "cel-"
 
 // DefaultNamespaceName is the fallback default namespace for data stream info
 var DefaultNamespaceName = "default"
@@ -84,7 +87,7 @@ func handleSimpleConfig(raw *proto.UnitExpectedConfig) (map[string]any, error) {
 }
 
 // CreateInputsFromStreams breaks down the raw Expected config into an array of individual inputs/modules from the Streams values
-// that can later be formatted into the reloader's ConfigWithMetaData and sent to an indvidual beat/
+// that can later be formatted into the reloader's ConfigWithMetaData and sent to an individual beat/
 // This also performs the basic task of inserting module-level add_field processors into the inputs/modules.
 func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) ([]map[string]interface{}, error) {
 	// If there are no streams, we fall into the 'simple input config' case,
@@ -112,8 +115,17 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamTyp
 		if err != nil {
 			return nil, fmt.Errorf("error creating stream rules: %w", err)
 		}
-		if raw.Meta != nil {
-			streamSource["meta"] = *raw.Meta
+
+		// integration package data resides in the raw.Meta field.
+		// Add this data to cel inputs
+		id, ok := streamSource["id"].(string)
+		if ok && id != "" && strings.HasPrefix(id, celInputPrefix) {
+			if raw.Meta != nil && raw.Meta.Package != nil {
+				packageData := make(map[string]string)
+				packageData["name"] = raw.Meta.Package.Name
+				packageData["version"] = raw.Meta.Package.Version
+				streamSource["package"] = packageData
+			}
 		}
 		inputs[iter] = streamSource
 	}
