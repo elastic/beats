@@ -150,7 +150,9 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 	if !done {
 		trans.timer = time.AfterFunc(mc.udpConfig.transTimeout, func() {
 			debug("transaction timeout -> forward")
-			mc.onUDPTrans(trans)
+			if err := mc.onUDPTrans(trans); err != nil {
+				logp.Warn("error processing timeout memcache transaction: %s", err)
+			}
 			mc.udpExpTrans.push(trans)
 		})
 	}
@@ -341,7 +343,9 @@ func (msg *udpMessage) addDatagram(
 
 	buffer := streambuf.New(nil)
 	for _, payload := range msg.datagrams {
-		buffer.Append(payload)
+		if err := buffer.Append(payload); err != nil {
+			return nil
+		}
 	}
 	msg.isComplete = true
 	msg.datagrams = nil
@@ -354,7 +358,9 @@ func parseUDPHeader(buf *streambuf.Buffer) (mcUDPHeader, error) {
 	h.requestID, _ = buf.ReadNetUint16()
 	h.seqNumber, _ = buf.ReadNetUint16()
 	h.numDatagrams, _ = buf.ReadNetUint16()
-	buf.Advance(2) // ignore reserved
+	if err := buf.Advance(2); err != nil { // ignore reserved
+		return h, err
+	}
 	return h, buf.Err()
 }
 
