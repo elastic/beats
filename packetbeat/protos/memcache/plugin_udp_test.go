@@ -23,6 +23,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 )
 
 func Test_UdpDatagramAddOnCompleteMessage(t *testing.T) {
@@ -95,4 +97,54 @@ func Test_UdpDatagramMultipleDups(t *testing.T) {
 
 	assert.Equal(t, 8, buf.Len())
 	assert.Equal(t, []byte{1, 2, 3, 4, 5, 6, 7, 8}, buf.Bytes())
+}
+
+func Test_NewUDPMessageZeroDatagrams(t *testing.T) {
+	hdr := &mcUDPHeader{requestID: 10, seqNumber: 0, numDatagrams: 0}
+	msg := newUDPMessage(hdr)
+	assert.Nil(t, msg)
+}
+
+func Test_NewUDPMessageExceedsMaxFragments(t *testing.T) {
+	hdr := &mcUDPHeader{requestID: 10, seqNumber: 0, numDatagrams: maxUDPMemcacheFragments + 1}
+	msg := newUDPMessage(hdr)
+	assert.Nil(t, msg)
+}
+
+func Test_NewUDPMessageAtMaxFragments(t *testing.T) {
+	hdr := &mcUDPHeader{requestID: 10, seqNumber: 0, numDatagrams: maxUDPMemcacheFragments}
+	msg := newUDPMessage(hdr)
+	assert.NotNil(t, msg)
+	assert.Equal(t, uint16(maxUDPMemcacheFragments), msg.numDatagrams)
+}
+
+func Test_AddDatagramOutOfBounds(t *testing.T) {
+	hdr := &mcUDPHeader{requestID: 10, seqNumber: 0, numDatagrams: 2}
+	msg := newUDPMessage(hdr)
+	assert.NotNil(t, msg)
+
+	// Add first datagram
+	buf := msg.addDatagram(hdr, []byte{1, 2})
+	assert.Nil(t, buf)
+
+	// Try to add datagram with seqNumber out of bounds
+	hdr.seqNumber = 2 // Only 0 and 1 are valid for numDatagrams=2
+	buf = msg.addDatagram(hdr, []byte{3, 4})
+	assert.Nil(t, buf)
+}
+
+func Test_UdpMessageForDirReturnsNilWhenNewUDPMessageFails(t *testing.T) {
+	trans := &udpTransaction{
+		messages: [2]*udpMessage{},
+	}
+
+	// Test with zero datagrams (should cause newUDPMessage to return nil)
+	hdr := &mcUDPHeader{requestID: 10, seqNumber: 0, numDatagrams: 0}
+	udpMsg := trans.udpMessageForDir(hdr, applayer.NetOriginalDirection)
+	assert.Nil(t, udpMsg)
+
+	// Test with too many datagrams (should cause newUDPMessage to return nil)
+	hdr.numDatagrams = maxUDPMemcacheFragments + 1
+	udpMsg = trans.udpMessageForDir(hdr, applayer.NetOriginalDirection)
+	assert.Nil(t, udpMsg)
 }
