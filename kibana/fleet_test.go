@@ -54,6 +54,12 @@ var (
 
 	//go:embed testdata/fleet_get_fleet_server_host_response.json
 	fleetGetFleetServerHostResponse []byte
+
+	//go:embed testdata/fleet_create_download_source_response.json
+	fleetCreateDownloadSourceResponse []byte
+
+	//go:embed testdata/fleet_update_download_source_response.json
+	fleetUpdateDownloadSourceResponse []byte
 )
 
 func TestFleetCreatePolicy(t *testing.T) {
@@ -383,6 +389,45 @@ func TestFleetGetFleetServerHost(t *testing.T) {
 	require.True(t, resp.IsDefault)
 	require.Equal(t, []string{"https://fleet-server:8220"}, resp.HostURLs)
 	require.True(t, resp.IsPreconfigured)
+}
+
+func TestFleetDownloadSource(t *testing.T) {
+	id := "test-id"
+	name := "test-name"
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			_, _ = w.Write(fleetCreateDownloadSourceResponse)
+		case http.MethodPut:
+			_, _ = w.Write(fleetUpdateDownloadSourceResponse)
+		default:
+			http.Error(w, "not implemented", http.StatusNotImplemented)
+		}
+	}
+	client, err := createTestServerAndClient(handler)
+	require.NoError(t, err)
+	require.NotNil(t, client)
+
+	t.Run("create", func(t *testing.T) {
+		resp, err := client.CreateDownloadSource(t.Context(), DownloadSource{
+			Name: name,
+			Host: "http://test.local",
+		})
+		require.NoError(t, err)
+		require.Equal(t, id, resp.Item.ID)
+		require.Equal(t, name, resp.Item.Name)
+		require.NotEmpty(t, "http://test.local", resp.Item.Host)
+	})
+	t.Run("update", func(t *testing.T) {
+		resp, err := client.UpdateDownloadSource(t.Context(), id, DownloadSource{
+			Name: name,
+			Host: "http://newtest.local",
+		})
+		require.NoError(t, err)
+		require.Equal(t, id, resp.Item.ID)
+		require.Equal(t, name, resp.Item.Name)
+		require.NotEmpty(t, "http://newtest.local", resp.Item.Host)
+	})
 }
 
 func createTestServerAndClient(handler http.HandlerFunc) (*Client, error) {
