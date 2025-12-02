@@ -106,7 +106,12 @@ func (i input) now() time.Time {
 func (input) Name() string { return inputName }
 
 func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
-	cfg := src.(*source).cfg
+	srcp, ok := src.(*source)
+	if !ok {
+		return fmt.Errorf("input type %T is not a source", src)
+	}
+
+	cfg := srcp.cfg
 	if !wantClient(cfg) {
 		return nil
 	}
