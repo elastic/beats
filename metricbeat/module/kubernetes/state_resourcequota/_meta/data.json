@@ -8,10 +8,10 @@
     "kubernetes": {
         "namespace": "default",
         "resourcequota": {
-            "name": "pods-high",
-            "quota": 204800,
-            "resource": "memory",
-            "type": "hard"
+            "created": {
+                "sec": 1713862291
+            },
+            "name": "pods-high"
         }
     },
     "metricset": {

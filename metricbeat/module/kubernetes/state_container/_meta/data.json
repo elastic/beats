@@ -1,9 +1,9 @@
 {
     "@timestamp": "2019-03-01T08:05:34.853Z",
     "container": {
-        "id": "bac57bbf9243208c19e1d52ae213fa6763c227c680bf7cdb1bdbcfeee86efa08",
+        "id": "054b424625a7c22c210e3fe0aae55069d4f3e18ce8bc802a9a96ce87bb7a2483",
         "image": {
-            "name": "quay.io/fluentd_elasticsearch/fluentd:v2.5.2"
+            "name": "docker.io/library/busybox:latest"
         },
         "runtime": "containerd"
     },
@@ -14,33 +14,21 @@
     },
     "kubernetes": {
         "container": {
-            "cpu": {
-                "request": {
-                    "cores": 0.1
-                }
-            },
-            "id": "bac57bbf9243208c19e1d52ae213fa6763c227c680bf7cdb1bdbcfeee86efa08",
-            "memory": {
-                "limit": {
-                    "bytes": 209715200
-                },
-                "request": {
-                    "bytes": 209715200
-                }
-            },
-            "name": "fluentd-elasticsearch",
+            "id": "054b424625a7c22c210e3fe0aae55069d4f3e18ce8bc802a9a96ce87bb7a2483",
+            "name": "hello",
             "status": {
-                "phase": "running",
-                "ready": true,
+                "phase": "terminated",
+                "ready": false,
+                "reason": "Completed",
                 "restarts": 0
             }
         },
-        "namespace": "kube-system",
+        "namespace": "default",
         "node": {
             "name": "kind-control-plane"
         },
         "pod": {
-            "name": "fluentd-elasticsearch-l8b6x"
+            "name": "hello-28564555-zdfjz"
         }
     },
     "metricset": {

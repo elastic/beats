@@ -6,10 +6,10 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": "local-path-storage",
+        "namespace": "default",
         "state_namespace": {
             "created": {
-                "sec": 1713862186
+                "sec": 1713862181
             },
             "status": {
                 "active": true,

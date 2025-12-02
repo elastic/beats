@@ -14,13 +14,12 @@
                 "version": "21"
             },
             "request": {
-                "code": "200",
+                "code": "0",
                 "component": "apiserver",
-                "count": 1,
-                "group": "apps",
-                "resource": "controllerrevisions",
-                "scope": "resource",
-                "verb": "DELETE",
+                "count": 14,
+                "resource": "endpoints",
+                "scope": "cluster",
+                "verb": "WATCH",
                 "version": "v1"
             }
         }
