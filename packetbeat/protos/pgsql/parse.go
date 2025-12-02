@@ -86,11 +86,12 @@ func (pgsql *pgsqlPlugin) parseMessageStart(s *pgsqlStream) (bool, bool) {
 		s.parseOffset += length
 		m.end = s.parseOffset
 		m.isSSLRequest = true
-		if m.start > m.end {
+		msgSize := m.end - m.start
+		if msgSize < 0 {
 			pgsql.detailf("invalid size: start: %d end: %d", m.start, m.end)
 			return false, false
 		}
-		m.size = uint64(m.end - m.start)
+		m.size = uint64(msgSize)
 
 		return true, true
 	}
@@ -112,11 +113,12 @@ func (pgsql *pgsqlPlugin) parseCommand(s *pgsqlStream) (bool, bool) {
 			s.parseOffset++
 			m.end = s.parseOffset
 			m.isSSLResponse = true
-			if m.start > m.end {
+			msgSize := m.end - m.start
+			if msgSize < 0 {
 				pgsql.detailf("invalid size: start: %d end: %d", m.start, m.end)
 				return false, false
 			}
-			m.size = uint64(m.end - m.start)
+			m.size = uint64(msgSize)
 
 			return true, true
 		}
@@ -170,7 +172,12 @@ func (pgsql *pgsqlPlugin) parseSimpleQuery(s *pgsqlStream, length int) (bool, bo
 	s.parseOffset++ // type
 	s.parseOffset += length
 	m.end = s.parseOffset
-	m.size = uint64(m.end - m.start)
+	msgSize := m.end - m.start
+	if msgSize < 0 {
+		pgsql.detailf("invalid size: start: %d end: %d", m.start, m.end)
+		return false, false
+	}
+	m.size = uint64(msgSize)
 
 	query, err := pgsqlString(s.data[m.start+5:], length-4)
 	if err != nil {
@@ -233,7 +240,12 @@ func (pgsql *pgsqlPlugin) parseEmptyQueryResponse(s *pgsqlStream) (bool, bool) {
 	m.toExport = true
 	s.parseOffset += 5 // type + length
 	m.end = s.parseOffset
-	m.size = uint64(m.end - m.start)
+	msgSize := m.end - m.start
+	if msgSize < 0 {
+		pgsql.detailf("invalid size: start: %d end: %d", m.start, m.end)
+		return false, false
+	}
+	m.size = uint64(msgSize)
 
 	return true, true
 }
@@ -257,7 +269,12 @@ func (pgsql *pgsqlPlugin) parseCommandComplete(s *pgsqlStream, length int) (bool
 
 	s.parseOffset += length
 	m.end = s.parseOffset
-	m.size = uint64(m.end - m.start)
+	msgSize := m.end - m.start
+	if msgSize < 0 {
+		pgsql.detailf("invalid size: start: %d end: %d", m.start, m.end)
+		return false, false
+	}
+	m.size = uint64(msgSize)
 
 	return true, true
 }
@@ -266,7 +283,12 @@ func (pgsql *pgsqlPlugin) parseReadyForQuery(s *pgsqlStream, length int) (bool, 
 	// ReadyForQuery -> backend ready for a new query cycle
 	m := s.message
 	m.start = s.parseOffset
-	m.size = uint64(m.end - m.start)
+	msgSize := m.end - m.start
+	if msgSize < 0 {
+		pgsql.detailf("invalid size: start: %d end: %d", m.start, m.end)
+		return false, false
+	}
+	m.size = uint64(msgSize)
 
 	s.parseOffset++ // type
 	s.parseOffset += length
@@ -290,7 +312,12 @@ func (pgsql *pgsqlPlugin) parseErrorResponse(s *pgsqlStream, length int) (bool, 
 
 	s.parseOffset += length // length
 	m.end = s.parseOffset
-	m.size = uint64(m.end - m.start)
+	msgSize := m.end - m.start
+	if msgSize < 0 {
+		pgsql.detailf("invalid size: start: %d end: %d", m.start, m.end)
+		return false, false
+	}
+	m.size = uint64(msgSize)
 
 	return true, true
 }
@@ -306,7 +333,12 @@ func (pgsql *pgsqlPlugin) parseExtReq(s *pgsqlStream, length int) (bool, bool) {
 	s.parseOffset++ // type
 	s.parseOffset += length
 	m.end = s.parseOffset
-	m.size = uint64(m.end - m.start)
+	msgSize := m.end - m.start
+	if msgSize < 0 {
+		pgsql.detailf("invalid size: start: %d end: %d", m.start, m.end)
+		return false, false
+	}
+	m.size = uint64(msgSize)
 	m.toExport = true
 
 	query, err := common.ReadString(s.data[m.start+6:])
@@ -350,7 +382,12 @@ func (pgsql *pgsqlPlugin) parseSkipMessage(s *pgsqlStream, length int) (bool, bo
 
 	m := s.message
 	m.end = s.parseOffset
-	m.size = uint64(m.end - m.start)
+	msgSize := m.end - m.start
+	if msgSize < 0 {
+		pgsql.detailf("invalid size: start: %d end: %d", m.start, m.end)
+		return false, false
+	}
+	m.size = uint64(msgSize)
 
 	// ok and complete, but ignore
 	m.toExport = false
@@ -504,7 +541,12 @@ func (pgsql *pgsqlPlugin) parseMessageData(s *pgsqlStream) (bool, bool) {
 			pgsql.detailf("CommandComplete length=%d, tag=%s", length, name)
 			s.parseOffset += length
 			m.end = s.parseOffset
-			m.size = uint64(m.end - m.start)
+			msgSize := m.end - m.start
+			if msgSize < 0 {
+				pgsql.detailf("invalid size: start: %d end: %d", m.start, m.end)
+				return false, false
+			}
+			m.size = uint64(msgSize)
 			s.parseState = pgsqlStartState
 
 			pgsql.detailf("Rows: %s", m.rows)
@@ -650,7 +692,12 @@ func (pgsql *pgsqlPlugin) parseMessageExtendedQuery(s *pgsqlStream) (bool, bool)
 			s.parseOffset++
 			s.parseOffset += length
 			m.end = s.parseOffset
-			m.size = uint64(m.end - m.start)
+			msgSize := m.end - m.start
+			if msgSize < 0 {
+				pgsql.detailf("invalid size: start: %d end: %d", m.start, m.end)
+				return false, false
+			}
+			m.size = uint64(msgSize)
 			s.parseState = pgsqlStartState
 
 			return true, true
