@@ -13,12 +13,12 @@ kind: other
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: We discontinued the OpenAI module, which was only ever in beta, because its reliance on a now-unsupported, undocumented API from OpenAI is obsolete following the release of the official API. We recommend using the OpenAI integration (https://www.elastic.co/docs/reference/integrations/openai) instead.
+summary: Discontinued OpenAI module in favor of official OpenAI integration
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# description:
+description: We discontinued the OpenAI module, which was only ever in beta, because its reliance on a now-unsupported, undocumented API from OpenAI is obsolete following the release of the official API. We recommend using the OpenAI integration (https://www.elastic.co/docs/reference/integrations/openai) instead.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
