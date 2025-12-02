@@ -86,7 +86,7 @@ func newClient(c config, log *logp.Logger) (*ldapClient, error) {
 		addresses = []string{c.LDAPAddress}
 	} else {
 		log.Info("LDAP address not configured, attempting auto-discovery")
-		discoveredAddresses, err := discoverLDAPAddress(log)
+		discoveredAddresses, err := discoverLDAPAddress(c.LDAPDomain, log)
 		if err != nil {
 			return nil, fmt.Errorf("failed to auto-discover LDAP server: %w", err)
 		}
@@ -173,7 +173,7 @@ func (p *processor) translateLDAPAttr(event *beat.Event) error {
 
 	p.log.Debugw("ldap search", "search_value", searchValue, "filter_value", searchFilter)
 	cn, err := p.client.findObjectBy(searchFilter)
-	p.log.Debugw("ldap result", "common_name", cn)
+	p.log.Debugw("ldap result", "common_name", cn, "error", err)
 	if err != nil {
 		return err
 	}

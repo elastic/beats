@@ -29,6 +29,7 @@ processors:
       field: winlog.event_data.ObjectGuid
       ignore_missing: true
       ignore_failure: true
+      # ldap_domain: "example.com"  # Optional - override auto-discovered domain for DNS SRV queries
       # ldap_address: "ldap://ds.example.com:389"  # Optional - resolve via DNS SRV/LOGONSERVER when omitted
       # ldap_base_dn: "dc=example,dc=com"  # Optional - discovered via rootDSE or inferred from server domain
 ----
@@ -41,6 +42,7 @@ The `translate_ldap_attribute` processor has the following configuration setting
 | Name                     | Required | Default      | Description
 | `field`                  | yes      |              | Source field containing a GUID.
 | `target_field`           | no       |              | Target field for the mapped attribute value. If not set it will be replaced in place.
+| `ldap_domain`            | no       |              | DNS domain name for DNS SRV lookups (eg: `example.com`). When omitted, the domain is auto-discovered from the `USERDNSDOMAIN` environment variable (Windows) or hostname. This setting is only used when `ldap_address` is not provided.
 | `ldap_address`           | no       |              | LDAP server address (eg: `ldap://ds.example.com:389`). If not provided, auto-discovery will be attempted via DNS SRV records and, on Windows, the LOGONSERVER environment variable.
 | `ldap_base_dn`           | no       |              | LDAP base DN (eg: `dc=example,dc=com`). If not provided, auto-discovery will be attempted via rootDSE query or inferred from the server domain.
 | `ldap_bind_user`         | no       |              | LDAP user. If both `ldap_bind_user` and `ldap_bind_password` are omitted, the processor will attempt Windows SSPI authentication (on Windows) using the current process user's credentials, or fall back to an unauthenticated bind.
@@ -61,9 +63,20 @@ The `translate_ldap_attribute` processor has the following configuration setting
 When `ldap_address` is omitted the processor attempts to discover controllers in
 the following order:
 
-1. DNS SRV lookups for `_ldaps._tcp` (preferred) and `_ldap._tcp`. Results are
-  ordered by SRV priority and weighted randomly as per RFC 2782 to avoid
-  overloading a single host.
+1. DNS SRV lookups for `_ldaps._tcp` (preferred) and `_ldap._tcp`. The processor
+  queries multiple patterns:
+  * `_ldap._tcp.dc._msdcs.<domain>` (Active Directory domain controllers)
+  * `_ldap._tcp.<domain>` (standard domain lookup)
+  * If no domain is available, bare queries like `_ldap._tcp` which rely on the
+    system's DNS search suffix configuration
++
+The domain used for DNS SRV lookups is determined from:
+  * The `ldap_domain` configuration option (highest priority)
+  * The `USERDNSDOMAIN` environment variable (on domain-joined Windows systems)
+  * The hostname's domain suffix (on domain-joined Unix systems)
++
+Results are ordered by SRV priority and weighted randomly as per RFC 2782 to
+avoid overloading a single host.
 2. On Windows, the `LOGONSERVER` environment variable. The processor keeps the
   hostname for TLS validation and may also try the resolved IP as a fallback.
 

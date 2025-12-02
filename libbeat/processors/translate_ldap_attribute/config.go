@@ -35,6 +35,7 @@ const (
 type config struct {
 	Field               string            `config:"field"  validate:"required"`
 	TargetField         string            `config:"target_field"`
+	LDAPDomain          string            `config:"ldap_domain"`
 	LDAPAddress         string            `config:"ldap_address"`
 	LDAPBaseDN          string            `config:"ldap_base_dn"`
 	LDAPBindUser        string            `config:"ldap_bind_user"`

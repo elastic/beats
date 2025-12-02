@@ -20,6 +20,7 @@
 package translate_ldap_attribute
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -31,6 +32,7 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/miekg/dns"
 )
 
 var (
@@ -56,55 +58,119 @@ type intnRandom interface {
 // discoverLDAPAddress attempts to auto-discover the LDAP server address.
 // It returns a list of candidate addresses sorted by preference (LDAPS over LDAP, SRV over LOGONSERVER).
 // The caller should attempt to connect to each address in order until one succeeds.
-func discoverLDAPAddress(log *logp.Logger) ([]string, error) {
-	log.Debugw("attempting LDAP server auto-discovery")
+func discoverLDAPAddress(configDomain string, log *logp.Logger) ([]string, error) {
+	log.Debug("attempting LDAP server auto-discovery")
 
 	var candidates []string
 
 	// 1. Primary: DNS SRV Lookup (LDAPS, then LDAP)
-	candidates = append(candidates, findServers(true, log)...)
-	candidates = append(candidates, findServers(false, log)...)
+	candidates = append(candidates, findServers(configDomain, true, log)...)
+	candidates = append(candidates, findServers(configDomain, false, log)...)
 
 	// 2. Windows Fallback: LOGONSERVER environment variable
-	if runtime.GOOS == "windows" {
-		// Log the attempt and try both secure and non-secure
-		log.Debug("attempting discovery via LOGONSERVER environment variable")
-		candidates = append(candidates, findLogonServer(true, log)...)
-		candidates = append(candidates, findLogonServer(false, log)...)
-	}
+	log.Debug("attempting discovery via LOGONSERVER environment variable")
+	candidates = append(candidates, findLogonServer(true, log)...)
+	candidates = append(candidates, findLogonServer(false, log)...)
 
 	if len(candidates) == 0 {
+		log.Warnw("no LDAP servers discovered", "dns_srv_attempted", true, "logonserver_attempted", runtime.GOOS == "windows")
 		return nil, errNoLDAPServerFound
 	}
 
+	log.Infow("LDAP server auto-discovery completed", "total_candidates", len(candidates), "candidates", candidates)
 	return candidates, nil
 }
 
-// findServers is a simplified wrapper for DNS SRV lookup.
-func findServers(useTLS bool, log *logp.Logger) []string {
-	// Note: net.LookupSRV with empty domain "" relies on the system resolver's default domain.
+// discoverDomainName attempts to discover the DNS domain name from various sources.
+// Priority order: USERDNSDOMAIN (Windows AD), hostname parsing.
+func discoverDomainName(log *logp.Logger) string {
+	// 1. Windows AD domain from USERDNSDOMAIN
+	domain := os.Getenv("USERDNSDOMAIN")
+	if domain != "" {
+		log.Infow("discovered domain name from USERDNSDOMAIN environment variable", "domain", domain)
+		return strings.ToLower(domain)
+	}
+
+	// 2. Try to extract domain from hostname (works on domain-joined Unix systems)
+	hostname, err := os.Hostname()
+	if err == nil && strings.Contains(hostname, ".") {
+		parts := strings.SplitN(hostname, ".", 2)
+		if len(parts) == 2 {
+			domain = parts[1]
+			log.Infow("discovered domain name from hostname", "hostname", hostname, "domain", domain)
+			return strings.ToLower(domain)
+		}
+	}
+
+	log.Debugw("no domain name discovered", "checked", []string{"USERDNSDOMAIN", "hostname"})
+	return ""
+}
+
+// findServers performs DNS SRV lookup using miekg/dns for better control.
+func findServers(configDomain string, useTLS bool, log *logp.Logger) []string {
+	// Use configured domain if provided, otherwise attempt auto-discovery
+	var domain string
+	if configDomain != "" {
+		log.Infow("using configured domain for DNS SRV lookup", "domain", configDomain)
+		domain = strings.ToLower(configDomain)
+	} else {
+		domain = discoverDomainName(log)
+	}
+
 	service := "ldap"
-	proto := "tcp"
 	scheme := "ldap"
 	if useTLS {
 		service = "ldaps"
 		scheme = "ldaps"
 	}
 
-	log.Debugw("looking up DNS SRV record", "service", service, "proto", proto)
+	// Build query patterns to try
+	var queries []string
+	if domain != "" {
+		// Pattern 1: Active Directory DC-specific: _ldap._tcp.dc._msdcs.{domain}
+		// Pattern 2: Standard domain: _ldap._tcp.{domain}
+		queries = []string{
+			fmt.Sprintf("_%s._tcp.dc._msdcs.%s.", service, domain),
+			fmt.Sprintf("_%s._tcp.%s.", service, domain),
+		}
+	} else {
+		// Fallback: bare query (let DNS resolver apply search suffixes)
+		queries = []string{
+			fmt.Sprintf("_%s._tcp.dc._msdcs", service),
+			fmt.Sprintf("_%s._tcp", service),
+		}
+		log.Infow("no domain available, attempting bare DNS SRV lookup with search suffix")
+	}
 
-	_, addrs, err := lookupSRV(service, proto, "")
-	if err != nil {
-		log.Debugw("DNS SRV lookup failed", "query", fmt.Sprintf("_%s._%s", service, proto), "error", err)
+	var netSRVs []*net.SRV
+	var successQuery string
+
+	for _, query := range queries {
+		log.Infow("executing DNS SRV lookup", "query", query, "service", service)
+
+		records, err := lookupSRVWithMiekgDNS(query, log)
+		if err == nil {
+			log.Infow("DNS SRV lookup succeeded", "query", query, "record_count", len(records))
+			for _, srv := range records {
+				netSRVs = append(netSRVs, &net.SRV{
+					Target:   srv.Target,
+					Port:     srv.Port,
+					Priority: srv.Priority,
+					Weight:   srv.Weight,
+				})
+			}
+			successQuery = query
+			break
+		}
+		log.Debugw("DNS SRV lookup failed", "query", query, "error", err)
+	}
+
+	if len(netSRVs) == 0 {
+		log.Warnw("all DNS SRV lookup attempts failed", "domain", domain, "queries_tried", queries)
 		return nil
 	}
 
-	if len(addrs) == 0 {
-		log.Debugw("No SRV records found", "query", fmt.Sprintf("_%s._%s", service, proto))
-		return nil
-	}
-
-	ordered := orderSRVRecords(addrs, newSRVRandomizer())
+	ordered := orderSRVRecords(netSRVs, newSRVRandomizer())
 	var addresses []string
 	for _, addr := range ordered {
 		// Remove trailing dot if present (FQDN format in DNS often includes it)
@@ -113,9 +179,75 @@ func findServers(useTLS bool, log *logp.Logger) []string {
 		addresses = append(addresses, address)
 	}
 
-	log.Infow("discovered servers via DNS SRV", "scheme", scheme, "count", len(addresses), "addresses", addresses)
+	log.Infow("discovered servers via DNS SRV", "scheme", scheme, "query", successQuery, "count", len(addresses), "addresses", addresses)
 
 	return addresses
+}
+
+// lookupSRVWithMiekgDNS performs DNS SRV lookup using miekg/dns client.
+// This gives us more control over the query and allows bare queries that use DNS search suffixes.
+func lookupSRVWithMiekgDNS(query string, log *logp.Logger) ([]*dns.SRV, error) {
+	// Get system DNS config
+	dnsConfig, err := dns.ClientConfigFromFile("/etc/resolv.conf")
+	if err != nil {
+		// On Windows or if file doesn't exist, use system defaults
+		dnsConfig = &dns.ClientConfig{
+			Servers: []string{"127.0.0.1"},
+			Port:    "53",
+			Timeout: 5,
+		}
+	}
+
+	client := &dns.Client{
+		Timeout: time.Duration(dnsConfig.Timeout) * time.Second,
+	}
+
+	msg := &dns.Msg{}
+	msg.SetQuestion(query, dns.TypeSRV)
+	msg.RecursionDesired = true
+
+	// Try each DNS server
+	var lastErr error
+	for _, server := range dnsConfig.Servers {
+		target := net.JoinHostPort(server, dnsConfig.Port)
+		log.Debugw("querying DNS server", "server", target, "query", query)
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		response, _, err := client.ExchangeContext(ctx, msg, target)
+		cancel()
+
+		if err != nil {
+			log.Debugw("DNS query failed", "server", target, "error", err)
+			lastErr = err
+			continue
+		}
+
+		if response.Rcode != dns.RcodeSuccess {
+			log.Debugw("DNS query returned error code", "server", target, "rcode", dns.RcodeToString[response.Rcode])
+			lastErr = fmt.Errorf("DNS query failed with rcode: %s", dns.RcodeToString[response.Rcode])
+			continue
+		}
+
+		// Extract SRV records from answer section
+		var srvRecords []*dns.SRV
+		for _, answer := range response.Answer {
+			if srv, ok := answer.(*dns.SRV); ok {
+				srvRecords = append(srvRecords, srv)
+			}
+		}
+
+		if len(srvRecords) > 0 {
+			log.Debugw("DNS server returned SRV records", "server", target, "count", len(srvRecords))
+			return srvRecords, nil
+		}
+
+		log.Debugw("DNS server returned no SRV records", "server", target)
+	}
+
+	if lastErr != nil {
+		return nil, lastErr
+	}
+	return nil, fmt.Errorf("no SRV records found")
 }
 
 // findLogonServer is a simplified wrapper for LOGONSERVER lookup.
