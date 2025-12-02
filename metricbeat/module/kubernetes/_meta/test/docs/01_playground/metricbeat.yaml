@@ -156,7 +156,11 @@ spec:
           args: [ "infinity" ]
           env:
             - name: ELASTICSEARCH_HOST
+<<<<<<< HEAD
               value: elasticsearch.default.svc.cluster.local
+=======
+              value: "https://elasticsearch"
+>>>>>>> 4d2365105 ([Metricbeat ] Change calculation of CPU/Memory to allocatable values (#47815))
             - name: ELASTICSEARCH_PORT
               value: "9200"
             - name: ELASTICSEARCH_USERNAME
