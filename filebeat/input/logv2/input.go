@@ -46,7 +46,7 @@ func init() {
 
 // runAsFilestream validates cfg as a Log input configuration, if it is
 // valid, then checks whether the configuration should be run as
-// Filestream input. On any error the boolean value must be ignore and
+// Filestream input. On any error the boolean value must be ignored and
 // no input started. runAsFilestream also sets the input type accordingly.
 func runAsFilestream(logger *logp.Logger, cfg *config.C) (bool, error) {
 	// First of all, ensure the Log input configuration is valid.
