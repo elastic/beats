@@ -24,9 +24,9 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 
 	"github.com/elastic/beats/v7/libbeat/cloudid"
-	elasticsearchtranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate/outputs/elasticsearch"
-	logstashstranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate/outputs/logstash"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	elasticsearchtranslate "github.com/elastic/beats/v7/x-pack/otel/oteltranslate/outputs/elasticsearch"
+	logstashstranslate "github.com/elastic/beats/v7/x-pack/otel/oteltranslate/outputs/logstash"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
