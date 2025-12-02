@@ -19,6 +19,7 @@ package pgsql
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -475,6 +476,7 @@ func (pgsql *pgsqlPlugin) parseMessageData(s *pgsqlStream) (bool, bool) {
 		case 'D':
 			err := pgsql.parseDataRow(s, s.data[s.parseOffset+5:s.parseOffset+length+1])
 			if err != nil {
+				pgsql.detailf("error parsing data row: %s", err)
 				return false, false
 			}
 			s.parseOffset++
@@ -531,7 +533,10 @@ func (pgsql *pgsqlPlugin) parseDataRow(s *pgsqlStream, buf []byte) error {
 	rows := []string{}
 	rowLength := 0
 
-	for i := 0; i < fieldCount; i++ {
+	if fieldCount > len(m.fieldsFormat) {
+		return fmt.Errorf("%w: DataRow field mismatch, got %d, expected %d", errFieldBufferBig, fieldCount, len(m.fieldsFormat))
+	}
+	for field := range fieldCount {
 		if len(buf) <= off {
 			return errFieldBufferShort
 		}
@@ -542,13 +547,13 @@ func (pgsql *pgsqlPlugin) parseDataRow(s *pgsqlStream, buf []byte) error {
 
 		if columnLength > 0 && columnLength > len(buf[off:]) {
 			pgsql.log.Errorf("Pgsql invalid column_length=%v, buffer_length=%v, i=%v",
-				columnLength, len(buf[off:]), i)
+				columnLength, len(buf[off:]), field)
 			return errInvalidLength
 		}
 
 		// read column value (byten)
 		var columnValue []byte
-		if m.fieldsFormat[i] == 0 {
+		if m.fieldsFormat[field] == 0 {
 			// field value in text format
 			if columnLength > 0 {
 				columnValue = buf[off : off+columnLength]
