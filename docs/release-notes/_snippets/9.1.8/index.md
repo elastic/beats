@@ -30,5 +30,5 @@
 
 **Metricbeat**
 
-* [Cloud Connect] Use cluster.metadata.display_name as cluster name if set. [#47440](https://github.com/elastic/beats/pull/47440)
+* [Cloud Connect] Use `cluster.metadata.display_name` as cluster name if set. [#47440](https://github.com/elastic/beats/pull/47440)
 
