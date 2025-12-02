@@ -133,7 +133,6 @@ func TestLnkFromPath(t *testing.T) {
 				t.Errorf("NewLnkFromPath() error = %v", err)
 				return
 			}
-			fmt.Printf("Lnk: %v\n", got)
 		})
 	}
 }

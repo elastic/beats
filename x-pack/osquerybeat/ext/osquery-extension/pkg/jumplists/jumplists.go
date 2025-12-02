@@ -16,9 +16,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/osquery/osquery-go/plugin/table"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	"github.com/osquery/osquery-go/plugin/table"
 )
 
 type JumpListType string
