@@ -86,6 +86,10 @@ func (pgsql *pgsqlPlugin) parseMessageStart(s *pgsqlStream) (bool, bool) {
 		s.parseOffset += length
 		m.end = s.parseOffset
 		m.isSSLRequest = true
+		if m.start > m.end {
+			pgsql.detailf("invalid size: start: %d end: %d", m.start, m.end)
+			return false, false
+		}
 		m.size = uint64(m.end - m.start)
 
 		return true, true
@@ -95,7 +99,7 @@ func (pgsql *pgsqlPlugin) parseMessageStart(s *pgsqlStream) (bool, bool) {
 
 func (pgsql *pgsqlPlugin) parseCommand(s *pgsqlStream) (bool, bool) {
 	// read type
-	typ := byte(s.data[s.parseOffset])
+	typ := s.data[s.parseOffset]
 
 	if s.expectSSLResponse {
 		// SSLRequest was received in the other stream
@@ -108,6 +112,10 @@ func (pgsql *pgsqlPlugin) parseCommand(s *pgsqlStream) (bool, bool) {
 			s.parseOffset++
 			m.end = s.parseOffset
 			m.isSSLResponse = true
+			if m.start > m.end {
+				pgsql.detailf("invalid size: start: %d end: %d", m.start, m.end)
+				return false, false
+			}
 			m.size = uint64(m.end - m.start)
 
 			return true, true
@@ -457,7 +465,7 @@ func (pgsql *pgsqlPlugin) parseMessageData(s *pgsqlStream) (bool, bool) {
 
 	for len(s.data[s.parseOffset:]) > 5 {
 		// read type
-		typ := byte(s.data[s.parseOffset])
+		typ := s.data[s.parseOffset]
 
 		// read message length
 		length := readLength(s.data[s.parseOffset+1:])
@@ -598,7 +606,7 @@ func (pgsql *pgsqlPlugin) parseMessageExtendedQuery(s *pgsqlStream) (bool, bool)
 
 	for len(s.data[s.parseOffset:]) >= 5 {
 		// read type
-		typ := byte(s.data[s.parseOffset])
+		typ := s.data[s.parseOffset]
 
 		// read message length
 		length := readLength(s.data[s.parseOffset+1:])
