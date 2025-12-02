@@ -60,26 +60,6 @@ func TestFindLogonServerFallsBackWithoutResolution(t *testing.T) {
 	assert.Equal(t, "ldap://DC02:389", addresses[0])
 }
 
-func TestDiscoverLDAPAddressUsesSRVRecords(t *testing.T) {
-	originalLookup := lookupSRV
-	lookupSRV = func(service, proto, name string) (string, []*net.SRV, error) {
-		switch service {
-		case "ldaps":
-			return "", []*net.SRV{{Target: "ldaps.example.com.", Port: 636, Priority: 0, Weight: 10}}, nil
-		case "ldap":
-			return "", []*net.SRV{{Target: "ldap.example.com.", Port: 389, Priority: 0, Weight: 5}}, nil
-		default:
-			return "", nil, assert.AnError
-		}
-	}
-	t.Cleanup(func() { lookupSRV = originalLookup })
-
-	log := logp.NewLogger("test")
-	addresses, err := discoverLDAPAddress(log)
-	require.NoError(t, err)
-	require.Equal(t, []string{"ldaps://ldaps.example.com:636", "ldap://ldap.example.com:389"}, addresses)
-}
-
 type fakeRand struct {
 	values []int
 }

@@ -31,8 +31,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/miekg/dns"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -41,9 +42,6 @@ var (
 
 	// resolveTCPAddr allows tests to stub DNS resolution
 	resolveTCPAddr = net.ResolveTCPAddr
-
-	// lookupSRV allows tests to stub DNS SRV lookups
-	lookupSRV = net.LookupSRV
 
 	// newSRVRandomizer returns a random source for SRV weighting (overridden in tests)
 	newSRVRandomizer = func() intnRandom {
