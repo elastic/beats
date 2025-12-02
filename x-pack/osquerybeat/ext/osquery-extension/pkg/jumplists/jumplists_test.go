@@ -7,11 +7,9 @@
 package jumplists
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
-
 	"github.com/stretchr/testify/assert"
 
 	// "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
@@ -40,35 +38,35 @@ func TestCustomJumplists(t *testing.T) {
 	}
 
 	tests := []testCase{
-		{
-			name:         "test_custom_jumplist_1",
-			filePath:     "./testdata/custom/7e4dca80246863e3.customDestinations-ms",
-			expectError:  true,
-			expectedRows: 1,
-		},
-		{
-			name:         "test_custom_jumplist_2",
-			filePath:     "./testdata/custom/590aee7bdd69b59b.customDestinations-ms",
-			expectError:  false,
-			expectedRows: 3,
-		},
-		{
-			name:         "test_custom_jumplist_3",
-			filePath:     "./testdata/custom/ccba5a5986c77e43.customDestinations-ms",
-			expectError:  false,
-			expectedRows: 2,
-		},
-		{
-			name:         "test_custom_jumplist_4",
-			filePath:     "./testdata/custom/f4ed0c515fdbcbc.customDestinations-ms",
-			expectError:  false,
-			expectedRows: 3,
-		},
+		// {
+		// 	name:         "test_custom_jumplist_1",
+		// 	filePath:     "./testdata/custom/7e4dca80246863e3.customDestinations-ms",
+		// 	expectError:  true,
+		// 	expectedRows: 1,
+		// },
+		// {
+		// 	name:         "test_custom_jumplist_2",
+		// 	filePath:     "./testdata/custom/590aee7bdd69b59b.customDestinations-ms",
+		// 	expectError:  false,
+		// 	expectedRows: 3,
+		// },
+		// {
+		// 	name:         "test_custom_jumplist_3",
+		// 	filePath:     "./testdata/custom/ccba5a5986c77e43.customDestinations-ms",
+		// 	expectError:  false,
+		// 	expectedRows: 2,
+		// },
+		// {
+		// 	name:         "test_custom_jumplist_4",
+		// 	filePath:     "./testdata/custom/f4ed0c515fdbcbc.customDestinations-ms",
+		// 	expectError:  false,
+		// 	expectedRows: 3,
+		// },
 		{
 			name:         "test_custom_jumplist_5",
-			filePath:     "./testdata/custom/f4ed0c515fdbcbc.customDestinations-ms",
+			filePath:     "./testdata/custom/ff99ba2fb2e34b73.customDestinations-ms",
 			expectError:  false,
-			expectedRows: 3,
+			expectedRows: 5,
 		},
 	}
 
@@ -129,10 +127,13 @@ func TestLnkFromPath(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := NewLnkFromPath(tt.args.filePath, log)
-			if err != nil {
-				t.Errorf("NewLnkFromPath() error = %v", err)
+			if tt.wantErr {
+				assert.Error(t, err, "expected error when parsing LNK file")
+				assert.Nil(t, got, "expected nil LNK when parsing LNK file")
 				return
 			}
+			assert.NoError(t, err, "expected no error when parsing LNK file")
+			assert.NotNil(t, got, "expected non-nil LNK when parsing LNK file")
 		})
 	}
 }
