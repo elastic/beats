@@ -82,6 +82,8 @@ type udpMessage struct {
 	datagrams    [][]byte
 }
 
+const maxUDPMemcacheFragments = 64
+
 func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 	buffer := streambuf.NewFixed(pkt.Payload)
 	header, err := parseUDPHeader(buffer)
@@ -114,6 +116,11 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 
 	// get UDP transaction stream combining datagram packets in transaction
 	udpMsg := trans.udpMessageForDir(&header, dir)
+	if udpMsg == nil {
+		logp.Warn("dropping memcache(UDP) transaction with invalid fragment metadata")
+		connection.killTransaction(trans)
+		return
+	}
 	if udpMsg.numDatagrams != header.numDatagrams {
 		logp.Warn("number of datagram mismatches in stream")
 		connection.killTransaction(trans)
@@ -283,18 +290,22 @@ func (t *udpTransaction) udpMessageForDir(
 	udpMsg := t.messages[dir]
 	if udpMsg == nil {
 		udpMsg = newUDPMessage(header)
+		if udpMsg == nil {
+			return nil
+		}
 		t.messages[dir] = udpMsg
 	}
 	return udpMsg
 }
 
 func newUDPMessage(header *mcUDPHeader) *udpMessage {
-	udpMsg := &udpMessage{
-		numDatagrams: header.numDatagrams,
-		count:        0,
+	count := header.numDatagrams
+	if count == 0 || count > maxUDPMemcacheFragments {
+		return nil
 	}
-	if header.numDatagrams > 1 {
-		udpMsg.datagrams = make([][]byte, header.numDatagrams)
+	udpMsg := &udpMessage{numDatagrams: count}
+	if count > 1 {
+		udpMsg.datagrams = make([][]byte, count)
 	}
 	return udpMsg
 }
@@ -313,10 +324,14 @@ func (msg *udpMessage) addDatagram(
 	}
 
 	if msg.count < msg.numDatagrams {
-		if msg.datagrams[header.seqNumber] != nil {
+		idx := int(header.seqNumber)
+		if idx >= len(msg.datagrams) {
 			return nil
 		}
-		msg.datagrams[header.seqNumber] = data
+		if msg.datagrams[idx] != nil {
+			return nil
+		}
+		msg.datagrams[idx] = data
 		msg.count++
 	}
 
