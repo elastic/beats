@@ -3,6 +3,31 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+// begin 8.19.8 relnotes
+
+[[release-notes-8.19.8]]
+=== Beats version 8.19.8
+https://github.com/elastic/beats/compare/v8.19.7\...v8.19.8[View commits]
+
+[discrete]
+[[bug-fixes-8.19.8]]
+==== Bug fixes
+
+**All**
+
+* Fix a fatal startup error in Beats Receivers caused by truncation of long UTF-8 hostnames. https://github.com/elastic/beats/pull/47713[#47713]
+* Not being able to start the add_docker_metadata processor is now consistently a non-fatal error when Docker is not available. https://github.com/elastic/beats/pull/47760[#47760]
+
+**Filebeat**
+
+* Handle and remove BOM during JSON parsing in azureblobstorage and gcs inputs. https://github.com/elastic/beats/pull/47508[#47508]
+* Fixed an issue where filebeat could hang during shutdown when using the filestream input. https://github.com/elastic/beats/pull/47518[#47518]
+* Fix double locking in translate_ldap_attribute processor and improve logging. https://github.com/elastic/beats/pull/47585[#47585]
+* Fix possible data corruption in tcp, syslog and unix inputs. https://github.com/elastic/beats/pull/47618[#47618]
+* Skip s3 test events in filebeat s3 input. https://github.com/elastic/beats/pull/47635[#47635]
+
+// end 8.19.8 relnotes
+
 // begin 8.19.7 relnotes
 
 [[release-notes-8.19.7]]
