@@ -33,6 +33,7 @@ changelog/fragments/
 /dev-tools/ @elastic/elastic-agent-data-plane
 /dev-tools/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /docs/ @elastic/ingest-docs
+/docs/release-notes @elastic/ingest-docs @elastic/elastic-agent-data-plane
 /filebeat @elastic/elastic-agent-data-plane
 /filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /filebeat/input/syslog/ @elastic/integration-experience
