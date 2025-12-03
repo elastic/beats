@@ -89,6 +89,12 @@ Cluster information.
     type: object
 
 
+**`vsphere.cluster.resourcepool.id`**
+:   id of resource pool associated with the cluster.
+
+    type: keyword
+
+
 ## datastore [_datastore]
 
 datastore
