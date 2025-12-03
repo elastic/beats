@@ -47,7 +47,7 @@ type jsProcessor struct {
 	stats       *processorStats
 }
 
-// New constructs a new Javascript processor.
+// New constructs a new JavaScript processor.
 func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	conf := defaultConfig()
 	if err := c.Unpack(&conf); err != nil {
@@ -57,7 +57,7 @@ func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	return NewFromConfig(conf, monitoring.Default, log)
 }
 
-// NewFromConfig constructs a new Javascript processor from the given config
+// NewFromConfig constructs a new JavaScript processor from the given config
 // object. It loads the sources, compiles them, and validates the entry point.
 func NewFromConfig(c Config, reg *monitoring.Registry, logger *logp.Logger) (beat.Processor, error) {
 	err := c.Validate()
@@ -66,12 +66,11 @@ func NewFromConfig(c Config, reg *monitoring.Registry, logger *logp.Logger) (bea
 	}
 
 	var sourceFile string
-	var sourceCode []byte
-
+	var sourceCode string
 	switch {
 	case c.Source != "":
 		sourceFile = "inline.js"
-		sourceCode = []byte(c.Source)
+		sourceCode = c.Source
 	case c.File != "":
 		sourceFile, sourceCode, err = loadSources(c.File)
 	case len(c.Files) > 0:
@@ -82,7 +81,7 @@ func NewFromConfig(c Config, reg *monitoring.Registry, logger *logp.Logger) (bea
 	}
 
 	// Validate processor source code.
-	prog, err := goja.Compile(sourceFile, string(sourceCode), true)
+	prog, err := goja.Compile(sourceFile, sourceCode, true)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +101,7 @@ func NewFromConfig(c Config, reg *monitoring.Registry, logger *logp.Logger) (bea
 }
 
 // loadSources loads javascript source from files.
-func loadSources(files ...string) (string, []byte, error) {
+func loadSources(files ...string) (string, string, error) {
 	var sources []string
 	buf := new(bytes.Buffer)
 
@@ -131,7 +130,7 @@ func loadSources(files ...string) (string, []byte, error) {
 		if hasMeta(filePath) {
 			matches, err := filepath.Glob(filePath)
 			if err != nil {
-				return "", nil, err
+				return "", "", err
 			}
 			sources = append(sources, matches...)
 		} else {
@@ -140,17 +139,17 @@ func loadSources(files ...string) (string, []byte, error) {
 	}
 
 	if len(sources) == 0 {
-		return "", nil, fmt.Errorf("no sources were found in %v",
+		return "", "", fmt.Errorf("no sources were found in %v",
 			strings.Join(files, ", "))
 	}
 
 	for _, name := range sources {
 		if err := readFile(name); err != nil {
-			return "", nil, err
+			return "", "", err
 		}
 	}
 
-	return strings.Join(sources, ";"), buf.Bytes(), nil
+	return strings.Join(sources, ";"), buf.String(), nil
 }
 
 func annotateError(id string, err error) error {
@@ -164,7 +163,7 @@ func annotateError(id string, err error) error {
 }
 
 // Run executes the processor on the given it event. It invokes the
-// process function defined in the Javascript source.
+// process function defined in the JavaScript source.
 func (p *jsProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	s := p.sessionPool.Get()
 	defer p.sessionPool.Put(s)
