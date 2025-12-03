@@ -60,44 +60,6 @@ func TestFindLogonServerFallsBackWithoutResolution(t *testing.T) {
 	assert.Equal(t, "ldap://DC02:389", addresses[0])
 }
 
-type fakeRand struct {
-	values []int
-}
-
-func (f *fakeRand) Intn(n int) int {
-	if len(f.values) == 0 {
-		return 0
-	}
-	v := f.values[0]
-	f.values = f.values[1:]
-	if n <= 0 {
-		return 0
-	}
-	if v < 0 {
-		v = 0
-	}
-	if v >= n {
-		v = n - 1
-	}
-	return v
-}
-
-func TestOrderSRVRecordsPriorityAndWeight(t *testing.T) {
-	records := []*net.SRV{
-		{Target: "low1.example.com.", Port: 389, Priority: 10, Weight: 1},
-		{Target: "low2.example.com.", Port: 389, Priority: 10, Weight: 1},
-		{Target: "heavy.example.com.", Port: 389, Priority: 10, Weight: 100},
-		{Target: "high.example.com.", Port: 389, Priority: 5, Weight: 1},
-	}
-
-	r := &fakeRand{values: []int{0, 101, 0, 0}}
-	ordered := orderSRVRecords(records, r)
-
-	require.Len(t, ordered, len(records))
-	assert.Equal(t, "high.example.com.", ordered[0].Target)
-	assert.Equal(t, "heavy.example.com.", ordered[1].Target)
-}
-
 func TestInferBaseDNFromAddress(t *testing.T) {
 	tests := []struct {
 		name      string

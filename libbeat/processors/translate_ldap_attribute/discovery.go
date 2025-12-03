@@ -20,18 +20,12 @@
 package translate_ldap_attribute
 
 import (
-	"context"
 	"errors"
 	"fmt"
-	"math/rand"
 	"net"
 	"os"
 	"runtime"
-	"slices"
 	"strings"
-	"time"
-
-	"github.com/miekg/dns"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -42,16 +36,7 @@ var (
 
 	// resolveTCPAddr allows tests to stub DNS resolution
 	resolveTCPAddr = net.ResolveTCPAddr
-
-	// newSRVRandomizer returns a random source for SRV weighting (overridden in tests)
-	newSRVRandomizer = func() intnRandom {
-		return rand.New(rand.NewSource(time.Now().UnixNano()))
-	}
 )
-
-type intnRandom interface {
-	Intn(n int) int
-}
 
 // discoverLDAPAddress attempts to auto-discover the LDAP server address.
 // It returns a list of candidate addresses sorted by preference (LDAPS over LDAP, SRV over LOGONSERVER).
@@ -104,7 +89,8 @@ func discoverDomainName(log *logp.Logger) string {
 	return ""
 }
 
-// findServers performs DNS SRV lookup using miekg/dns for better control.
+// findServers performs DNS SRV lookup using the standard Go net resolver.
+// This automatically handles Windows DNS configuration including search suffixes.
 func findServers(configDomain string, useTLS bool, log *logp.Logger) []string {
 	// Use configured domain if provided, otherwise attempt auto-discovery
 	var domain string
@@ -123,16 +109,18 @@ func findServers(configDomain string, useTLS bool, log *logp.Logger) []string {
 	}
 
 	// Build query patterns to try
+	// Always use empty service/proto to make net.LookupSRV do direct name lookup
+	// which allows full control over the query name and proper search suffix handling
 	var queries []string
 	if domain != "" {
 		// Pattern 1: Active Directory DC-specific: _ldap._tcp.dc._msdcs.{domain}
 		// Pattern 2: Standard domain: _ldap._tcp.{domain}
 		queries = []string{
-			fmt.Sprintf("_%s._tcp.dc._msdcs.%s.", service, domain),
-			fmt.Sprintf("_%s._tcp.%s.", service, domain),
+			fmt.Sprintf("_%s._tcp.dc._msdcs.%s", service, domain),
+			fmt.Sprintf("_%s._tcp.%s", service, domain),
 		}
 	} else {
-		// Fallback: bare query (let DNS resolver apply search suffixes)
+		// Fallback: bare query (net.LookupSRV will apply search suffixes)
 		queries = []string{
 			fmt.Sprintf("_%s._tcp.dc._msdcs", service),
 			fmt.Sprintf("_%s._tcp", service),
@@ -146,17 +134,11 @@ func findServers(configDomain string, useTLS bool, log *logp.Logger) []string {
 	for _, query := range queries {
 		log.Infow("executing DNS SRV lookup", "query", query, "service", service)
 
-		records, err := lookupSRVWithMiekgDNS(query, log)
-		if err == nil {
+		// Pass empty service/proto to make LookupSRV do direct lookup of the full name
+		_, records, err := net.LookupSRV("", "", query)
+		if err == nil && len(records) > 0 {
 			log.Infow("DNS SRV lookup succeeded", "query", query, "record_count", len(records))
-			for _, srv := range records {
-				netSRVs = append(netSRVs, &net.SRV{
-					Target:   srv.Target,
-					Port:     srv.Port,
-					Priority: srv.Priority,
-					Weight:   srv.Weight,
-				})
-			}
+			netSRVs = records
 			successQuery = query
 			break
 		}
@@ -164,13 +146,14 @@ func findServers(configDomain string, useTLS bool, log *logp.Logger) []string {
 	}
 
 	if len(netSRVs) == 0 {
-		log.Warnw("all DNS SRV lookup attempts failed", "domain", domain, "queries_tried", queries)
+		log.Warnw("all DNS SRV lookup attempts failed", "domain", domain, "queries_tried", len(queries))
 		return nil
 	}
 
-	ordered := orderSRVRecords(netSRVs, newSRVRandomizer())
+	// net.LookupSRV already sorts by priority and randomizes by weight per RFC 2782
+	// so we can use the records directly
 	var addresses []string
-	for _, addr := range ordered {
+	for _, addr := range netSRVs {
 		// Remove trailing dot if present (FQDN format in DNS often includes it)
 		target := strings.TrimSuffix(addr.Target, ".")
 		address := fmt.Sprintf("%s://%s:%d", scheme, target, addr.Port)
@@ -180,72 +163,6 @@ func findServers(configDomain string, useTLS bool, log *logp.Logger) []string {
 	log.Infow("discovered servers via DNS SRV", "scheme", scheme, "query", successQuery, "count", len(addresses), "addresses", addresses)
 
 	return addresses
-}
-
-// lookupSRVWithMiekgDNS performs DNS SRV lookup using miekg/dns client.
-// This gives us more control over the query and allows bare queries that use DNS search suffixes.
-func lookupSRVWithMiekgDNS(query string, log *logp.Logger) ([]*dns.SRV, error) {
-	// Get system DNS config
-	dnsConfig, err := dns.ClientConfigFromFile("/etc/resolv.conf")
-	if err != nil {
-		// On Windows or if file doesn't exist, use system defaults
-		dnsConfig = &dns.ClientConfig{
-			Servers: []string{"127.0.0.1"},
-			Port:    "53",
-			Timeout: 5,
-		}
-	}
-
-	client := &dns.Client{
-		Timeout: time.Duration(dnsConfig.Timeout) * time.Second,
-	}
-
-	msg := &dns.Msg{}
-	msg.SetQuestion(query, dns.TypeSRV)
-	msg.RecursionDesired = true
-
-	// Try each DNS server
-	var lastErr error
-	for _, server := range dnsConfig.Servers {
-		target := net.JoinHostPort(server, dnsConfig.Port)
-		log.Debugw("querying DNS server", "server", target, "query", query)
-
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		response, _, err := client.ExchangeContext(ctx, msg, target)
-		cancel()
-
-		if err != nil {
-			log.Debugw("DNS query failed", "server", target, "error", err)
-			lastErr = err
-			continue
-		}
-
-		if response.Rcode != dns.RcodeSuccess {
-			log.Debugw("DNS query returned error code", "server", target, "rcode", dns.RcodeToString[response.Rcode])
-			lastErr = fmt.Errorf("DNS query failed with rcode: %s", dns.RcodeToString[response.Rcode])
-			continue
-		}
-
-		// Extract SRV records from answer section
-		var srvRecords []*dns.SRV
-		for _, answer := range response.Answer {
-			if srv, ok := answer.(*dns.SRV); ok {
-				srvRecords = append(srvRecords, srv)
-			}
-		}
-
-		if len(srvRecords) > 0 {
-			log.Debugw("DNS server returned SRV records", "server", target, "count", len(srvRecords))
-			return srvRecords, nil
-		}
-
-		log.Debugw("DNS server returned no SRV records", "server", target)
-	}
-
-	if lastErr != nil {
-		return nil, lastErr
-	}
-	return nil, fmt.Errorf("no SRV records found")
 }
 
 // findLogonServer is a simplified wrapper for LOGONSERVER lookup.
@@ -295,74 +212,4 @@ func findLogonServer(useTLS bool, log *logp.Logger) []string {
 	log.Infow("discovered server via LOGONSERVER", "addresses", addresses, "original_name", serverName)
 
 	return addresses
-}
-
-// orderSRVRecords sorts SRV answers according to RFC 2782 so we do not
-// overload a single controller. The algorithm groups records by priority
-// (lower numeric value means a more preferred server) and, within each
-// priority, uses selectByWeight to shuffle according to the advertised
-// weight field. A deterministic sorter would break load balancing, so
-// we optionally accept a custom random source for tests.
-func orderSRVRecords(addrs []*net.SRV, r intnRandom) []*net.SRV {
-	if len(addrs) == 0 {
-		return nil
-	}
-	if r == nil {
-		r = rand.New(rand.NewSource(time.Now().UnixNano()))
-	}
-
-	// Build buckets keyed by priority so we can process high priority servers first.
-	priorityGroups := make(map[uint16][]*net.SRV)
-	for _, addr := range addrs {
-		priorityGroups[addr.Priority] = append(priorityGroups[addr.Priority], addr)
-	}
-	var priorities []uint16
-	for priority := range priorityGroups {
-		priorities = append(priorities, priority)
-	}
-	slices.Sort(priorities)
-
-	var ordered []*net.SRV
-	for _, priority := range priorities {
-		// Within each priority, pick servers according to relative weight.
-		group := priorityGroups[priority]
-		ordered = append(ordered, selectByWeight(group, r)...)
-	}
-	return ordered
-}
-
-// selectByWeight performs the weighted-shuffle portion of RFC 2782: each
-// iteration chooses one server proportionally to its Weight value, removes
-// it from the candidate list, and repeats. This ensures a server with a
-// higher advertised weight is more likely to be attempted earlier but every
-// server eventually appears in the ordered slice. Tests inject a deterministic
-// random source so the selection becomes predictable.
-func selectByWeight(group []*net.SRV, r intnRandom) []*net.SRV {
-	remaining := slices.Clone(group)
-	var ordered []*net.SRV
-	for len(remaining) > 0 {
-		totalWeight := 0
-		for _, addr := range remaining {
-			totalWeight += int(addr.Weight)
-		}
-
-		var idx int
-		if totalWeight == 0 {
-			idx = r.Intn(len(remaining))
-		} else {
-			pick := r.Intn(totalWeight)
-			sum := 0
-			for i, addr := range remaining {
-				sum += int(addr.Weight)
-				if pick < sum {
-					idx = i
-					break
-				}
-			}
-		}
-
-		ordered = append(ordered, remaining[idx])
-		remaining = slices.Delete(remaining, idx, idx+1)
-	}
-	return ordered
 }
