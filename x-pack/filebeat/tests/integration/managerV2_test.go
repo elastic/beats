@@ -1156,6 +1156,40 @@ func TestFoo(t *testing.T) {
 	testCases := map[string]*proto.UnitExpected{
 		"cel":        brokenCEL,
 		"filestream": brokenFilestream,
+		"net inputs": {
+			Id:             "broken-tcp",
+			Type:           proto.UnitType_INPUT,
+			ConfigStateIdx: 1,
+			State:          proto.State_HEALTHY,
+			LogLevel:       proto.UnitLogLevel_DEBUG,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "tcp-input",
+				Type: "tcp",
+				Name: "tcp",
+				Streams: []*proto.Stream{
+					{
+						Id: "tcp-input",
+						Source: integration.RequireNewStruct(t, map[string]any{
+							"enabled": true,
+							"type":    "tcp",
+							"host":    "localhost:9042", // random port
+							"processors": []any{
+								map[string]any{
+									"add_fields": map[string]any{
+										"fields_under_root": true, // invalid
+										"fields": map[string]any{
+											"labels": map[string]any{
+												"foo": "bar",
+											},
+										},
+									},
+								},
+							},
+						}),
+					},
+				},
+			},
+		},
 	}
 
 	for name, inputUnit := range testCases {
