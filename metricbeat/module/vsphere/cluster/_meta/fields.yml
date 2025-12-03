@@ -61,3 +61,9 @@
       object_type: keyword
       description: >
         List of all the triggered alarms.
+    - name: resourcepool
+      type: group
+      fields:
+        - name: id
+          type: keyword
+          description: test
