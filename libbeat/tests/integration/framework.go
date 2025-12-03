@@ -1227,9 +1227,10 @@ func StartMockES(
 		addr = "localhost:0"
 	}
 
-	l, err := net.Listen("tcp", addr)
+	lc := net.ListenConfig{}
+	l, err := lc.Listen(t.Context(), "tcp", addr)
 	if err != nil {
-		if l, err = net.Listen("tcp6", addr); err != nil {
+		if l, err = lc.Listen(t.Context(), "tcp6", addr); err != nil {
 			t.Fatalf("failed to listen on a port: %v", err)
 		}
 	}
@@ -1270,14 +1271,10 @@ func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
 	t := b.t
 	t.Helper()
 
-	msg := strings.Builder{}
 	path := filepath.Join(b.TempDir(), "output-*.ndjson")
-	assert.Eventually(t, func() bool {
-		got := b.CountFileLines(path)
-		msg.Reset()
-		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
-		return got == events
-	}, timeout, 200*time.Millisecond, &msg)
+	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		assert.Equal(collect, events, b.CountFileLines(path))
+	}, timeout, 200*time.Millisecond)
 }
 
 // GetEventsFromFileOutput reads all events from file output. If n > 0,
