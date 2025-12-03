@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func getMetricProcessor() *metricProcessor {
+func GetMetricProcessor() *metricProcessor {
 	templates := []TemplateConfig{
 		{
 			Namespace: "foo",
@@ -55,7 +55,7 @@ func getMetricProcessor() *metricProcessor {
 }
 
 func TestMetricProcessorAddTemplate(t *testing.T) {
-	processor := getMetricProcessor()
+	processor := GetMetricProcessor()
 	temp := TemplateConfig{
 		Namespace: "xyz",
 		Filter:    "a.b.*",
@@ -69,7 +69,7 @@ func TestMetricProcessorAddTemplate(t *testing.T) {
 }
 
 func TestMetricProcessorDeleteTemplate(t *testing.T) {
-	processor := getMetricProcessor()
+	processor := GetMetricProcessor()
 	temp := TemplateConfig{
 		Namespace: "xyz",
 		Filter:    "a.b.*",
@@ -83,7 +83,7 @@ func TestMetricProcessorDeleteTemplate(t *testing.T) {
 }
 
 func TestMetricProcessorProcess(t *testing.T) {
-	processor := getMetricProcessor()
+	processor := GetMetricProcessor()
 	event, err := processor.Process("test.localhost.bash.stats 42 1500934723")
 	assert.NoError(t, err)
 	assert.NotNil(t, event)
