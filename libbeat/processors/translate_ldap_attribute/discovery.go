@@ -65,16 +65,16 @@ func discoverLDAPAddress(configDomain string, log *logp.Logger) ([]string, error
 }
 
 // discoverDomainName attempts to discover the DNS domain name from various sources.
-// Priority order: USERDNSDOMAIN (Windows AD), hostname parsing.
+// Priority order: USERDNSDOMAIN (Windows AD), hostname parsing, reverse DNS lookup.
 func discoverDomainName(log *logp.Logger) string {
-	// 1. Windows AD domain from USERDNSDOMAIN
+	// 1. Windows AD domain from USERDNSDOMAIN (only available in interactive Windows sessions)
 	domain := os.Getenv("USERDNSDOMAIN")
 	if domain != "" {
 		log.Infow("discovered domain name from USERDNSDOMAIN environment variable", "domain", domain)
 		return strings.ToLower(domain)
 	}
 
-	// 2. Try to extract domain from hostname (works on domain-joined Unix systems)
+	// 2. Try to extract domain from hostname (works on domain-joined Unix systems with FQDN hostnames)
 	hostname, err := os.Hostname()
 	if err == nil && strings.Contains(hostname, ".") {
 		parts := strings.SplitN(hostname, ".", 2)
@@ -85,7 +85,57 @@ func discoverDomainName(log *logp.Logger) string {
 		}
 	}
 
-	log.Debugw("no domain name discovered", "checked", []string{"USERDNSDOMAIN", "hostname"})
+	// 3. Try reverse DNS lookup on local machine IP to get FQDN
+	// This works in service contexts where environment variables are unavailable
+	if hostname != "" {
+		domain = discoverDomainViaReverseDNS(hostname, log)
+		if domain != "" {
+			return strings.ToLower(domain)
+		}
+	}
+
+	log.Debugw("no domain name discovered", "checked", []string{"USERDNSDOMAIN", "hostname", "reverse_dns"})
+	return ""
+}
+
+// discoverDomainViaReverseDNS performs reverse DNS lookup to discover the domain.
+// It resolves the hostname to IP addresses, then does reverse lookup to get FQDN.
+func discoverDomainViaReverseDNS(hostname string, log *logp.Logger) string {
+	// Resolve hostname to IP addresses
+	addrs, err := net.LookupHost(hostname)
+	if err != nil {
+		log.Debugw("failed to resolve hostname for reverse DNS lookup", "hostname", hostname, "error", err)
+		return ""
+	}
+
+	// Try reverse DNS lookup on each IP address (prefer IPv4)
+	for _, addr := range addrs {
+		// Skip link-local IPv6 addresses (contain %)
+		if strings.Contains(addr, "%") {
+			continue
+		}
+
+		names, err := net.LookupAddr(addr)
+		if err != nil {
+			log.Debugw("reverse DNS lookup failed", "ip", addr, "error", err)
+			continue
+		}
+
+		// Extract domain from first FQDN found
+		for _, name := range names {
+			name = strings.TrimSuffix(name, ".")
+			if strings.Contains(name, ".") {
+				parts := strings.SplitN(name, ".", 2)
+				if len(parts) == 2 {
+					domain := parts[1]
+					log.Infow("discovered domain name via reverse DNS", "fqdn", name, "domain", domain, "ip", addr)
+					return domain
+				}
+			}
+		}
+	}
+
+	log.Debugw("reverse DNS lookup did not yield domain", "hostname", hostname, "addresses_tried", len(addrs))
 	return ""
 }
 
