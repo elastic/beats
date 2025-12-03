@@ -514,6 +514,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			start = time.Now()
 			var hadPublicationError bool
+		loop:
 			for i, e := range events {
 				event, ok := e.(map[string]interface{})
 				if !ok {
@@ -552,13 +553,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					// Don't update status, since we are about to pass
 					// through the Running state and then fall through
 					// to the input exit with a change to Stopped.
-					break
+					break loop
 				default:
 					// This should never happen.
 					log.Warnw("failed with unpublished events", "error", err, "unpublished", len(events)-i)
 					health.UpdateStatus(status.Degraded, "error publishing events: "+err.Error())
 					isDegraded = true
-					break
+					break loop
 				}
 				err = pub.Publish(beat.Event{
 					Timestamp: time.Now(),
