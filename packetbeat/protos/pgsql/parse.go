@@ -596,7 +596,7 @@ func (pgsql *pgsqlPlugin) parseDataRow(s *pgsqlStream, buf []byte) error {
 		off += 4
 
 		if columnLength > 0 && columnLength > len(buf[off:]) {
-			pgsql.log.Errorf("Pgsql invalid column_length=%v, buffer_length=%v, i=%v",
+			pgsql.log.Errorf("Pgsql invalid column_length=%v, buffer_length=%v, field=%v",
 				columnLength, len(buf[off:]), field)
 			return errInvalidLength
 		}
