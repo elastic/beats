@@ -1060,7 +1060,7 @@ func TestFoo(t *testing.T) {
 
 	integration.WriteLogFile(t, "/tmp/flog.log", 100, false)
 
-	outputUnit := proto.UnitExpected{
+	outputUnit := &proto.UnitExpected{
 		Id:             "output-unit",
 		Type:           proto.UnitType_OUTPUT,
 		ConfigStateIdx: 1,
@@ -1078,7 +1078,7 @@ func TestFoo(t *testing.T) {
 		},
 	}
 
-	brokenFilestream := proto.UnitExpected{
+	brokenFilestream := &proto.UnitExpected{
 		Id:             "broken-Filestream",
 		Type:           proto.UnitType_INPUT,
 		ConfigStateIdx: 1,
@@ -1113,7 +1113,7 @@ func TestFoo(t *testing.T) {
 		},
 	}
 
-	brokenCEL := proto.UnitExpected{
+	brokenCEL := &proto.UnitExpected{
 		Id:             "broken-cel",
 		Type:           proto.UnitType_INPUT,
 		ConfigStateIdx: 1,
@@ -1150,61 +1150,71 @@ func TestFoo(t *testing.T) {
 		},
 	}
 
+	// TODO: Remove me
 	fmt.Fprint(io.Discard, &brokenFilestream, &brokenCEL)
 
-	finalStateReached := atomic.Bool{}
-	var units = []*proto.UnitExpected{
-		&outputUnit,
-		// &brokenFilestream,
-		&brokenCEL,
+	testCases := map[string]*proto.UnitExpected{
+		"cel":        brokenCEL,
+		"filestream": brokenFilestream,
 	}
 
-	server := &mock.StubServerV2{
-		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
-			for _, unit := range observed.Units {
-				t.Logf("ID: %s, State: %s", unit.GetId(), unit.GetState().String())
+	for name, inputUnit := range testCases {
+		t.Run(name, func(t *testing.T) {
+			finalStateReached := atomic.Bool{}
+			var units = []*proto.UnitExpected{
+				outputUnit,
+				// brokenFilestream,
+				inputUnit,
 			}
 
-			brokenCEL.State = proto.State_FAILED
-			expectedState := []*proto.UnitExpected{
-				&outputUnit,
-				&brokenCEL,
+			server := &mock.StubServerV2{
+				CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+					for _, unit := range observed.Units {
+						t.Logf("ID: %s, State: %s", unit.GetId(), unit.GetState().String())
+					}
+
+					inputUnit.State = proto.State_FAILED
+					expectedState := []*proto.UnitExpected{
+						outputUnit,
+						inputUnit,
+					}
+					if management.DoesStateMatch(observed, expectedState, 0) {
+						finalStateReached.Store(true)
+					}
+
+					inputUnit.State = proto.State_HEALTHY
+					return &proto.CheckinExpected{
+						Units: units,
+					}
+				},
+				ActionImpl: func(response *proto.ActionResponse) error { return nil },
 			}
-			if management.DoesStateMatch(observed, expectedState, 0) {
-				finalStateReached.Store(true)
+
+			server.Port = 3000
+			require.NoError(t, server.Start())
+			t.Cleanup(server.Stop)
+
+			fmt.Println(
+				"Connection string:\n",
+				"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
+				"-E", "management.enabled=true",
+			)
+
+			// c := make(chan any)
+			// <-c
+
+			if true { //TODO: remove me
+				filebeat.Start(
+					"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
+					"-E", "management.enabled=true",
+				)
+
+				require.Eventually(t, func() bool {
+					return finalStateReached.Load()
+				}, 30*time.Second, 100*time.Millisecond, "Output unit did not report unhealthy")
+
+				t.Cleanup(server.Stop)
 			}
-
-			brokenCEL.State = proto.State_HEALTHY
-			return &proto.CheckinExpected{
-				Units: units,
-			}
-		},
-		ActionImpl: func(response *proto.ActionResponse) error { return nil },
-	}
-
-	server.Port = 3000
-	require.NoError(t, server.Start())
-	t.Cleanup(server.Stop)
-
-	fmt.Println(
-		"Connection string:\n",
-		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
-		"-E", "management.enabled=true",
-	)
-
-	// c := make(chan any)
-	// <-c
-
-	if true {
-		filebeat.Start(
-			"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
-			"-E", "management.enabled=true",
-		)
-
-		require.Eventually(t, func() bool {
-			return finalStateReached.Load()
-		}, 30*time.Second, 100*time.Millisecond, "Output unit did not report unhealthy")
-
-		t.Cleanup(server.Stop)
+		})
 	}
 }
