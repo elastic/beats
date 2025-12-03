@@ -84,22 +84,14 @@ func (c *crawler) Start(
 	}
 
 	if configInputs.Enabled() {
-<<<<<<< HEAD
-		c.inputReloader = cfgfile.NewReloader(log, pipeline, configInputs)
-=======
 		c.inputReloader = cfgfile.NewReloader(log.Named("input.reloader"), pipeline, configInputs, c.beatPaths)
->>>>>>> e55e0bedd ([fbreceiver] partial fix for global paths (#46779))
 		if err := c.inputReloader.Check(c.inputsFactory); err != nil {
 			return fmt.Errorf("creating input reloader failed: %w", err)
 		}
 	}
 
 	if configModules.Enabled() {
-<<<<<<< HEAD
-		c.modulesReloader = cfgfile.NewReloader(log, pipeline, configModules)
-=======
 		c.modulesReloader = cfgfile.NewReloader(log.Named("module.reloader"), pipeline, configModules, c.beatPaths)
->>>>>>> e55e0bedd ([fbreceiver] partial fix for global paths (#46779))
 		if err := c.modulesReloader.Check(c.modulesFactory); err != nil {
 			return fmt.Errorf("creating module reloader failed: %w", err)
 		}

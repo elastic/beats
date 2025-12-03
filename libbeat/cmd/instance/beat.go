@@ -345,7 +345,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	reg := b.Monitoring.StatsRegistry().GetOrCreateRegistry("libbeat")
 
-<<<<<<< HEAD
 	err = metricreport.SetupMetricsOptions(metricreport.MetricOptions{
 		Name:           b.Info.Beat,
 		Version:        version.GetDefaultVersion(),
@@ -354,9 +353,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		SystemMetrics:  monitoring.Default.GetOrCreateRegistry("system"),
 		ProcessMetrics: monitoring.Default.GetOrCreateRegistry("beat"),
 	})
-=======
-	err = metricreport.SetupMetrics(b.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion()) //nolint:staticcheck //keep behavior for now
->>>>>>> e55e0bedd ([fbreceiver] partial fix for global paths (#46779))
 	if err != nil {
 		return nil, err
 	}

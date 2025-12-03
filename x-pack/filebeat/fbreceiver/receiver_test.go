@@ -228,24 +228,14 @@ func TestMultipleReceivers(t *testing.T) {
 		Receivers: []oteltest.ReceiverConfig{
 			{
 				Name:    "r1",
-<<<<<<< HEAD
-				Config:  config(monitorSocket1),
-				Beat:    "filebeat",
-=======
 				Beat:    "filebeat",
 				Config:  config(monitorSocket1, dir1, ingest1),
->>>>>>> e55e0bedd ([fbreceiver] partial fix for global paths (#46779))
 				Factory: factory,
 			},
 			{
 				Name:    "r2",
-<<<<<<< HEAD
-				Config:  config(monitorSocket2),
-				Beat:    "filebeat",
-=======
 				Beat:    "filebeat",
 				Config:  config(monitorSocket2, dir2, ingest2),
->>>>>>> e55e0bedd ([fbreceiver] partial fix for global paths (#46779))
 				Factory: factory,
 			},
 		},
