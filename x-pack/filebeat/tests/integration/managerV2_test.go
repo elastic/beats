@@ -1194,6 +1194,7 @@ func TestFoo(t *testing.T) {
 			require.NoError(t, server.Start())
 			t.Cleanup(server.Stop)
 
+			//nolint:forbidigo // I'll remove it later
 			fmt.Println(
 				"Connection string:\n",
 				"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
