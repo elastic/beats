@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
@@ -21,6 +20,8 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
+
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 )
 
 func TestLeak(t *testing.T) {
