@@ -30,6 +30,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -174,10 +175,14 @@ func (inp *managedInput) runSource(
 		}
 	}()
 
-	client, err := pipeline.ConnectWith(beat.ClientConfig{
+	client, err := pipeline.ConnectWith(beat.ClientConfig{ // HERE, error connecting to the pipeline
 		EventListener: newInputACKHandler(ctx.Logger),
 	})
 	if err != nil {
+		ctx.StatusReporter.UpdateStatus(
+			status.Failed,
+			fmt.Sprintf("cannot connect to publishing pipeline: %s", err),
+		)
 		return err
 	}
 	defer client.Close()

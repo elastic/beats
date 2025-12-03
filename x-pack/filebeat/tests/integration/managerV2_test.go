@@ -1054,3 +1054,157 @@ func TestReloadErrorHandling(t *testing.T) {
 
 	t.Cleanup(server.Stop)
 }
+
+func TestFoo(t *testing.T) {
+	filebeat := NewFilebeat(t)
+
+	integration.WriteLogFile(t, "/tmp/flog.log", 100, false)
+
+	outputUnit := proto.UnitExpected{
+		Id:             "output-unit",
+		Type:           proto.UnitType_OUTPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "default",
+			Type: "discard",
+			Name: "discard",
+			Source: integration.RequireNewStruct(t,
+				map[string]any{
+					"type":  "discard",
+					"hosts": []any{"http://localhost:9200"},
+				}),
+		},
+	}
+
+	brokenFilestream := proto.UnitExpected{
+		Id:             "broken-Filestream",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "filestream-input",
+			Type: "filestream",
+			Name: "filestream",
+			Streams: []*proto.Stream{
+				{
+					Id: "filestream-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"enabled": true,
+						"type":    "filestream",
+						"paths":   "/tmp/flog.log",
+						"processors": []any{
+							map[string]any{
+								"add_fields": map[string]any{
+									"fields_under_root": true, // invalid
+									"fields": map[string]any{
+										"labels": map[string]any{
+											"foo": "bar",
+										},
+									},
+								},
+							},
+						},
+					}),
+				},
+			},
+		},
+	}
+
+	brokenCEL := proto.UnitExpected{
+		Id:             "broken-cel",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "cel-input",
+			Type: "cel",
+			Name: "cel",
+			Streams: []*proto.Stream{
+				{
+					Id: "cel-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"enabled":      true,
+						"type":         "cel",
+						"interval":     "1m",
+						"resource.url": "https://api.ipify.org/?format=text",
+						"program":      `{"events": [{"ip": string(get(state.url).Body)}]}`,
+						"processors": []any{
+							map[string]any{
+								"add_fields": map[string]any{
+									"fields_under_root": true, // invalid
+									"fields": map[string]any{
+										"labels": map[string]any{
+											"foo": "bar",
+										},
+									},
+								},
+							},
+						},
+					}),
+				},
+			},
+		},
+	}
+
+	fmt.Fprint(io.Discard, &brokenFilestream, &brokenCEL)
+
+	finalStateReached := atomic.Bool{}
+	var units = []*proto.UnitExpected{
+		&outputUnit,
+		// &brokenFilestream,
+		&brokenCEL,
+	}
+
+	server := &mock.StubServerV2{
+		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			for _, unit := range observed.Units {
+				t.Logf("ID: %s, State: %s", unit.GetId(), unit.GetState().String())
+			}
+
+			brokenCEL.State = proto.State_FAILED
+			expectedState := []*proto.UnitExpected{
+				&outputUnit,
+				&brokenCEL,
+			}
+			if management.DoesStateMatch(observed, expectedState, 0) {
+				finalStateReached.Store(true)
+			}
+
+			brokenCEL.State = proto.State_HEALTHY
+			return &proto.CheckinExpected{
+				Units: units,
+			}
+		},
+		ActionImpl: func(response *proto.ActionResponse) error { return nil },
+	}
+
+	server.Port = 3000
+	require.NoError(t, server.Start())
+	t.Cleanup(server.Stop)
+
+	fmt.Println(
+		"Connection string:\n",
+		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
+		"-E", "management.enabled=true",
+	)
+
+	// c := make(chan any)
+	// <-c
+
+	if true {
+		filebeat.Start(
+			"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
+			"-E", "management.enabled=true",
+		)
+
+		require.Eventually(t, func() bool {
+			return finalStateReached.Load()
+		}, 30*time.Second, 100*time.Millisecond, "Output unit did not report unhealthy")
+
+		t.Cleanup(server.Stop)
+	}
+}
