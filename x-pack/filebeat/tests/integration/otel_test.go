@@ -65,6 +65,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
             - %s
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
+          gzip_disabled: true
     processors:
       - add_host_metadata: ~
       - add_cloud_metadata: ~
@@ -117,6 +118,7 @@ filebeat.inputs:
     id: filestream-input-id
     enabled: true
     file_identity.native: ~
+    gzip_disabled: true
     prospector.scanner.fingerprint.enabled: false
     paths:
       - %s
@@ -451,6 +453,7 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
             - {{$receiver.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
+          gzip_disabled: true
     logging:
       level: info
       selectors:
@@ -688,6 +691,7 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
+          gzip_disabled: true
     logging:
       level: debug
     queue.mem.flush.timeout: 0s
@@ -868,6 +872,7 @@ func TestFileBeatKerberos(t *testing.T) {
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
+          gzip_disabled: true
     queue.mem.flush.timeout: 0s
     management.otel.enabled: true
     path.home: {{.PathHome}}	
@@ -973,6 +978,7 @@ receivers:
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
+          gzip_disabled: true
     processors:
       # Configure a processor to prevent enabling default processors
       - add_fields:
@@ -1041,6 +1047,7 @@ receivers:
             - %s
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
+          gzip_disabled: true
     processors:
       - add_fields:
           fields:

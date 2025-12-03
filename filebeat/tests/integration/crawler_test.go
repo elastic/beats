@@ -45,6 +45,7 @@ filebeat.inputs:
       - %s
 
     file_identity.native: ~
+    gzip_disabled: true
     prospector.scanner.fingerprint.enabled: false
 
 path.home: %s
@@ -135,6 +136,7 @@ filebeat.inputs:
       - %s
     include_lines: ['^ERR', '^WARN']
     file_identity.native: ~
+    gzip_disabled: true
     prospector.scanner.fingerprint.enabled: false
 
 path.home: %s
@@ -190,6 +192,7 @@ filebeat.inputs:
       - %s
     exclude_lines: ['^DBG']
     file_identity.native: ~
+    gzip_disabled: true
     prospector.scanner.fingerprint.enabled: false
 
 path.home: %s

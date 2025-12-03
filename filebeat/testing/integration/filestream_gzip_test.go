@@ -90,7 +90,6 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
 output.file:
   enabled: true
   path: %s
@@ -127,7 +126,7 @@ output.file:
 		}
 	})
 
-	t.Run("BetaWarning", func(t *testing.T) {
+	t.Run("gzip_experimental_deprecation_warning", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
@@ -162,7 +161,72 @@ output.console:
 			WithReportOptions(reportOptions).
 			ExpectStart().
 			ExpectOutput(
-				"BETA: filestream: beta gzip support enabled").
+				"'gzip_experimental' has been removed. GZIP support is now enabled by default. To disable it, use 'gzip_disabled: true'").
+			Start(ctx).
+			Wait()
+	})
+
+	t.Run("error_if_file_identity_is_not_fingerprint_and_gzip_is_enabled", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		td := t.TempDir()
+		logPath := filepath.Join(td, "input.log.gz")
+		require.NoError(t, os.WriteFile(logPath, []byte("test"), 0644))
+
+		config := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+      - %s
+    file_identity.path: ~
+output.console:
+  enabled: true
+`, logPath)
+
+		test := NewTest(t, TestOptions{
+			Config: config,
+		})
+		test.
+			WithReportOptions(reportOptions).
+			ExpectStart().
+			ExpectOutput("to use a file identity other than 'fingerprint', disable gzip, set 'gzip_disabled: true'").
+			ExpectStop(1).
+			Start(ctx).
+			Wait()
+	})
+
+	t.Run("allow_other_file_identity_if_gzip_is_disabled", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		td := t.TempDir()
+		logPath := filepath.Join(td, "input.log")
+		require.NoError(t, os.WriteFile(logPath, []byte("test"), 0644))
+
+		config := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+      - %s
+    file_identity.path: ~
+    gzip_disabled: true
+    prospector.scanner.fingerprint.enabled: false
+output.console:
+  enabled: true
+`, logPath)
+
+		test := NewTest(t, TestOptions{
+			Config: config,
+		})
+
+		test.
+			WithReportOptions(reportOptions).
+			ExpectStart().
+			ExpectOutput("file identity is 'path'").
+			ExpectOutput("Input 'filestream' starting").
 			Start(ctx).
 			Wait()
 	})

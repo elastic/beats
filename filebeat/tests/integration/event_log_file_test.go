@@ -38,6 +38,7 @@ filebeat.inputs:
     id: filestream-input-id
     enabled: true
     file_identity.native: ~
+    gzip_disabled: true
     prospector.scanner.fingerprint.enabled: false
     parsers:
       - ndjson:

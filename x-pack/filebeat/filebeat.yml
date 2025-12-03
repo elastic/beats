@@ -32,6 +32,10 @@ filebeat.inputs:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
 
+  # filestream input supports parsing of GZIP files. By default, GZIP support is
+  # enabled. If you want to disable it, set `gzip_disabled` to true.
+  #gzip_disabled: false
+
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
   # matching any regular expression from the list.
   # Line filtering happens after the parsers pipeline. If you would like to filter lines
