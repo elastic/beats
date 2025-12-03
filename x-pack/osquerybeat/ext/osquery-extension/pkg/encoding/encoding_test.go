@@ -819,3 +819,29 @@ func TestGenerateColumnDefinitions_unexportedFields(t *testing.T) {
 		}
 	}
 }
+
+func TestGenerateColumnDefinitions_embeddedStruct(t *testing.T) {
+	type EmbeddedStruct struct {
+		EmbeddedField string `osquery:"embedded_field"`
+	}
+	type testStruct struct {
+		EmbeddedStruct
+		TestField string `osquery:"test_field"`
+	}
+	expected := []table.ColumnDefinition{
+		table.TextColumn("embedded_field"),
+		table.TextColumn("test_field"),
+	}
+	cols, err := GenerateColumnDefinitions(testStruct{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(cols) != len(expected) {
+		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
+	}
+	for i := range cols {
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		}
+	}
+}
