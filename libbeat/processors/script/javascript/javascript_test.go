@@ -118,9 +118,17 @@ func TestRun(t *testing.T) {
 
 	t.Run("with file", func(t *testing.T) {
 		file := writeFile(t, tmpDir, "processor.js", `function process(event) { event.Put("from_file", true); }`)
-		p := newTestProcessorWithSetPaths(t, tmpDir, "file", filepath.Base(file), "")
+		p := newTestProcessor(t, "file", filepath.Base(file), "")
 
-		evt := &beat.Event{Fields: mapstr.M{}}
+		// Try to use without SetPaths - should fail
+		evt, err := p.Run(newTestEvent())
+		assert.NotNil(t, evt)
+		assert.ErrorContains(t, err, "javascript processor not initialized")
+		assert.ErrorContains(t, err, "SetPaths must be called")
+
+		setPaths(t, p, tmpDir)
+
+		evt = &beat.Event{Fields: mapstr.M{}}
 		result, err := p.Run(evt)
 		require.NoError(t, err)
 
@@ -131,7 +139,9 @@ func TestRun(t *testing.T) {
 	t.Run("with multiple files", func(t *testing.T) {
 		utilFile := writeFile(t, tmpDir, "util.js", "var multiplier = 2;")
 		mainFile := writeFile(t, tmpDir, "main.js", `function process(event) { event.Put("multiplier", multiplier); }`)
-		p := newTestProcessorWithSetPaths(t, tmpDir, "files", []string{filepath.Base(utilFile), filepath.Base(mainFile)}, "")
+
+		p := newTestProcessor(t, "files", []string{filepath.Base(utilFile), filepath.Base(mainFile)}, "")
+		setPaths(t, p, tmpDir)
 
 		evt := &beat.Event{Fields: mapstr.M{}}
 		result, err := p.Run(evt)
@@ -145,7 +155,9 @@ func TestRun(t *testing.T) {
 		globDir := t.TempDir()
 		writeFile(t, globDir, "a_utils.js", "var fromGlob = true;")
 		writeFile(t, globDir, "b_main.js", `function process(event) { event.Put("from_glob", fromGlob); }`)
-		p := newTestProcessorWithSetPaths(t, globDir, "file", "*.js", "")
+
+		p := newTestProcessor(t, "file", "*.js", "")
+		setPaths(t, p, globDir)
 
 		evt := &beat.Event{Fields: mapstr.M{}}
 		result, err := p.Run(evt)
@@ -156,31 +168,12 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, true, v)
 	})
 
-	t.Run("without SetPaths fails", func(t *testing.T) {
-		cfg, err := config.NewConfigFrom(map[string]any{"file": "test.js"})
-		require.NoError(t, err)
-
-		p, err := New(cfg, logptest.NewTestingLogger(t, ""))
-		require.NoError(t, err)
-
-		// Try to use without SetPaths - should fail
-		evt, err := p.Run(newTestEvent())
-		assert.Nil(t, evt)
-		assert.ErrorContains(t, err, "javascript processor not initialized")
-		assert.ErrorContains(t, err, "SetPaths must be called")
-	})
-
 	t.Run("after SetPaths on inline source", func(t *testing.T) {
 		p := newTestProcessor(t, "source", `function process(event) { event.Put("x", 1); return event; }`, "")
-
-		jsProc, ok := p.(*jsProcessor)
-		require.True(t, ok)
-
-		err := jsProc.SetPaths(tmpPaths(tmpDir))
-		require.NoError(t, err)
+		setPaths(t, p, "/does/not/matter")
 
 		// Should still work
-		evt, err := jsProc.Run(newTestEvent())
+		evt, err := p.Run(newTestEvent())
 		require.NoError(t, err)
 		v, _ := evt.GetValue("x")
 		assert.Equal(t, int64(1), v)
@@ -269,18 +262,13 @@ func newTestProcessor(t *testing.T, key string, value any, tag string) beat.Proc
 	return p
 }
 
-func newTestProcessorWithSetPaths(t *testing.T, tmpDir, key string, value any, tag string) beat.Processor {
+func setPaths(t *testing.T, p beat.Processor, tmpDir string) {
 	t.Helper()
-
-	p := newTestProcessor(t, key, value, tag)
 	require.IsType(t, &jsProcessor{}, p)
 	jsProc, ok := p.(*jsProcessor)
 	require.True(t, ok, "expected *jsProcessor type")
-
 	err := jsProc.SetPaths(tmpPaths(tmpDir))
-	require.NoErrorf(t, err, "failed to set paths for processor")
-
-	return p
+	require.NoError(t, err)
 }
 
 func writeFile(t *testing.T, dir, name, contents string) string {

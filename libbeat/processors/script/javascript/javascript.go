@@ -194,7 +194,7 @@ func (p *jsProcessor) compile(sourceFile, sourceCode string) error {
 // process function defined in the JavaScript source.
 func (p *jsProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	if p.sessionPool == nil {
-		return nil, fmt.Errorf("javascript processor not initialized: SetPaths must be called for file-based sources")
+		return event, fmt.Errorf("javascript processor not initialized: SetPaths must be called for file-based sources")
 	}
 
 	s := p.sessionPool.Get()
