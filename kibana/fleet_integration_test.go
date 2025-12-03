@@ -184,6 +184,7 @@ func testUpdatePolicyKibana(t *testing.T, client *Client, testPolicy AgentPolicy
 	require.Equal(t, respPolicy.InactivityTImeout, updateResp.InactivityTImeout)
 	require.Equal(t, respPolicy.Description, updateResp.Description)
 	require.Equal(t, respPolicy.IsProtected, updateResp.IsProtected)
+	require.Equal(t, respPolicy.AdvancedSettings, updateResp.AdvancedSettings)
 
 	// Enable tamper protection
 	updatePolicyTamperProtection := AgentPolicyUpdateRequest{

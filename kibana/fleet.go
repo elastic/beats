@@ -84,6 +84,7 @@ type AgentPolicy struct {
 	Name string `json:"name"`
 	// Namespace of the policy. Required to create a policy.
 	Namespace          string                    `json:"namespace"`
+	AdvancedSettings   map[string]interface{}    `json:"advanced_settings,omitempty"`
 	Description        string                    `json:"description,omitempty"`
 	MonitoringEnabled  []MonitoringEnabledOption `json:"monitoring_enabled,omitempty"`
 	DataOutputID       string                    `json:"data_output_id,omitempty"`
@@ -113,6 +114,7 @@ type AgentPolicyUpdateRequest struct {
 	Name string `json:"name"`
 	// Namespace of the policy. Required in an update request.
 	Namespace          string                    `json:"namespace"`
+	AdvancedSettings   map[string]interface{}    `json:"advanced_settings,omitempty"`
 	Description        string                    `json:"description,omitempty"`
 	MonitoringEnabled  []MonitoringEnabledOption `json:"monitoring_enabled,omitempty"`
 	DataOutputID       string                    `json:"data_output_id,omitempty"`
