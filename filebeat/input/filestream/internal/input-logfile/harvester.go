@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -203,6 +204,13 @@ func startHarvester(
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
 				ctx.Logger.Errorf("Harvester crashed with: %+v", err)
 				hg.readers.remove(srcID)
+			}
+
+			if err != nil {
+				ctx.StatusReporter.UpdateStatus(
+					status.Failed,
+					fmt.Sprintf("harvester failed: %s", err),
+				)
 			}
 		}()
 
