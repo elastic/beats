@@ -59,9 +59,9 @@ When `ldap_address` is omitted the processor attempts to discover controllers in
 
   The domain used for DNS SRV lookups is determined from:
   - The `ldap_domain` configuration option (highest priority)
-  - The `USERDNSDOMAIN` environment variable (Windows interactive sessions)
-  - The hostname's domain suffix (Unix systems with FQDN hostnames)
-  - Reverse DNS lookup on the machine's IP address (works in service contexts)
+  - Operating-system domain metadata (for example session environment values or Windows domain-join settings)
+  - The host's fully qualified name when available
+  - Reverse DNS lookup of the local machine as a last resort
 
   **Note:** The processor uses Go's standard library `net.LookupSRV()` which leverages the operating system's native DNS resolver. On Windows, this automatically reads DNS servers and search suffixes from the Windows registry, making autodiscovery work correctly even when running as a service without environment variables. SRV records are automatically ordered by priority with weight-based randomization per RFC 2782 to distribute load across available servers.
 2. On Windows, the `LOGONSERVER` environment variable. The processor keeps the hostname for TLS validation and may also try the resolved IP as a fallback.

@@ -72,9 +72,9 @@ the following order:
 +
 The domain used for DNS SRV lookups is determined from:
   * The `ldap_domain` configuration option (highest priority)
-  * The `USERDNSDOMAIN` environment variable (Windows interactive sessions)
-  * The hostname's domain suffix (Unix systems with FQDN hostnames)
-  * Reverse DNS lookup on the machine's IP address (works in service contexts)
+  * Operating-system domain metadata (for example session environment values or Windows domain-join settings)
+  * The host's fully qualified name when available
+  * Reverse DNS lookup of the local machine as a last resort
 +
 NOTE: The processor uses Go's standard library `net.LookupSRV()` which leverages
 the operating system's native DNS resolver. On Windows, this automatically reads

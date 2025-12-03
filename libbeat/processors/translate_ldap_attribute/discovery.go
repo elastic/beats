@@ -44,11 +44,20 @@ var (
 func discoverLDAPAddress(configDomain string, log *logp.Logger) ([]string, error) {
 	log.Debug("attempting LDAP server auto-discovery")
 
+	domain := normalizeDomain(configDomain)
+	if domain == "" {
+		domain = discoverDomainName(log)
+	}
+
 	var candidates []string
 
 	// 1. Primary: DNS SRV Lookup (LDAPS, then LDAP)
-	candidates = append(candidates, findServers(configDomain, true, log)...)
-	candidates = append(candidates, findServers(configDomain, false, log)...)
+	candidates = append(candidates, lookupSRVServers(domain, true, log)...)
+	candidates = append(candidates, lookupSRVServers(domain, false, log)...)
+
+	if len(candidates) > 0 {
+		return candidates, nil
+	}
 
 	// 2. Windows Fallback: LOGONSERVER environment variable
 	log.Debug("attempting discovery via LOGONSERVER environment variable")
@@ -64,53 +73,81 @@ func discoverLDAPAddress(configDomain string, log *logp.Logger) ([]string, error
 	return candidates, nil
 }
 
-// discoverDomainName attempts to discover the DNS domain name from various sources.
-// Priority order: USERDNSDOMAIN (Windows AD), hostname parsing, reverse DNS lookup.
+type domainSource struct {
+	name   string
+	getter func() string
+}
+
+// discoverDomainName attempts to discover the DNS domain name from various sources in priority order.
 func discoverDomainName(log *logp.Logger) string {
-	// 1. Windows AD domain from USERDNSDOMAIN (only available in interactive Windows sessions)
-	domain := os.Getenv("USERDNSDOMAIN")
-	if domain != "" {
-		log.Infow("discovered domain name from USERDNSDOMAIN environment variable", "domain", domain)
-		return strings.ToLower(domain)
+
+	sources := []domainSource{
+		{
+			name:   "USERDNSDOMAIN",
+			getter: func() string { return os.Getenv("USERDNSDOMAIN") },
+		},
 	}
 
-	// 2. Try to extract domain from hostname (works on domain-joined Unix systems with FQDN hostnames)
-	hostname, err := os.Hostname()
-	if err == nil && strings.Contains(hostname, ".") {
-		parts := strings.SplitN(hostname, ".", 2)
-		if len(parts) == 2 {
-			domain = parts[1]
-			log.Infow("discovered domain name from hostname", "hostname", hostname, "domain", domain)
-			return strings.ToLower(domain)
-		}
+	if h, err := os.Hostname(); err == nil && h != "" {
+		sources = append(sources,
+			domainSource{
+				name: "hostname",
+				getter: func() string {
+					if !strings.Contains(h, ".") {
+						return ""
+					}
+					parts := strings.SplitN(h, ".", 2)
+					if len(parts) == 2 {
+						return parts[1]
+					}
+					return ""
+				},
+			},
+			domainSource{
+				name:   "reverse_dns",
+				getter: func() string { return discoverDomainViaReverseDNS(h, log) },
+			},
+		)
+	} else {
+		log.Debugw("failed to read hostname", "error", err)
 	}
 
-	// 3. Try reverse DNS lookup on local machine IP to get FQDN
-	// This works in service contexts where environment variables are unavailable
-	if hostname != "" {
-		domain = discoverDomainViaReverseDNS(hostname, log)
+	if runtime.GOOS == "windows" {
+		sources = append(sources, domainSource{
+			name:   "windows_registry",
+			getter: func() string { return discoverDomainFromRegistry(log) },
+		})
+	}
+
+	triedSources := make([]string, 0, len(sources))
+	for _, source := range sources {
+		triedSources = append(triedSources, source.name)
+		domain := normalizeDomain(source.getter())
 		if domain != "" {
-			return strings.ToLower(domain)
+			log.Infow("discovered domain name", "source", source.name, "domain", domain)
+			return domain
 		}
 	}
 
-	log.Debugw("no domain name discovered", "checked", []string{"USERDNSDOMAIN", "hostname", "reverse_dns"})
+	log.Debugw("no domain name discovered", "sources_tried", triedSources)
 	return ""
+}
+
+// normalizeDomain trims and lower-cases a domain value.
+func normalizeDomain(domain string) string {
+	return strings.ToLower(strings.TrimSpace(domain))
 }
 
 // discoverDomainViaReverseDNS performs reverse DNS lookup to discover the domain.
 // It resolves the hostname to IP addresses, then does reverse lookup to get FQDN.
 func discoverDomainViaReverseDNS(hostname string, log *logp.Logger) string {
-	// Resolve hostname to IP addresses
 	addrs, err := net.LookupHost(hostname)
 	if err != nil {
 		log.Debugw("failed to resolve hostname for reverse DNS lookup", "hostname", hostname, "error", err)
 		return ""
 	}
 
-	// Try reverse DNS lookup on each IP address (prefer IPv4)
 	for _, addr := range addrs {
-		// Skip link-local IPv6 addresses (contain %)
 		if strings.Contains(addr, "%") {
 			continue
 		}
@@ -121,17 +158,17 @@ func discoverDomainViaReverseDNS(hostname string, log *logp.Logger) string {
 			continue
 		}
 
-		// Extract domain from first FQDN found
 		for _, name := range names {
 			name = strings.TrimSuffix(name, ".")
-			if strings.Contains(name, ".") {
-				parts := strings.SplitN(name, ".", 2)
-				if len(parts) == 2 {
-					domain := parts[1]
-					log.Infow("discovered domain name via reverse DNS", "fqdn", name, "domain", domain, "ip", addr)
-					return domain
-				}
+			if !strings.Contains(name, ".") {
+				continue
 			}
+			parts := strings.SplitN(name, ".", 2)
+			if len(parts) != 2 {
+				continue
+			}
+			log.Infow("discovered domain name via reverse DNS", "fqdn", name, "domain", parts[1], "ip", addr)
+			return parts[1]
 		}
 	}
 
@@ -139,18 +176,8 @@ func discoverDomainViaReverseDNS(hostname string, log *logp.Logger) string {
 	return ""
 }
 
-// findServers performs DNS SRV lookup using the standard Go net resolver.
-// This automatically handles Windows DNS configuration including search suffixes.
-func findServers(configDomain string, useTLS bool, log *logp.Logger) []string {
-	// Use configured domain if provided, otherwise attempt auto-discovery
-	var domain string
-	if configDomain != "" {
-		log.Infow("using configured domain for DNS SRV lookup", "domain", configDomain)
-		domain = strings.ToLower(configDomain)
-	} else {
-		domain = discoverDomainName(log)
-	}
-
+// lookupSRVServers performs DNS SRV lookups for the provided domain using the Go resolver.
+func lookupSRVServers(domain string, useTLS bool, log *logp.Logger) []string {
 	service := "ldap"
 	scheme := "ldap"
 	if useTLS {
@@ -158,33 +185,12 @@ func findServers(configDomain string, useTLS bool, log *logp.Logger) []string {
 		scheme = "ldaps"
 	}
 
-	// Build query patterns to try
-	// Always use empty service/proto to make net.LookupSRV do direct name lookup
-	// which allows full control over the query name and proper search suffix handling
-	var queries []string
-	if domain != "" {
-		// Pattern 1: Active Directory DC-specific: _ldap._tcp.dc._msdcs.{domain}
-		// Pattern 2: Standard domain: _ldap._tcp.{domain}
-		queries = []string{
-			fmt.Sprintf("_%s._tcp.dc._msdcs.%s", service, domain),
-			fmt.Sprintf("_%s._tcp.%s", service, domain),
-		}
-	} else {
-		// Fallback: bare query (net.LookupSRV will apply search suffixes)
-		queries = []string{
-			fmt.Sprintf("_%s._tcp.dc._msdcs", service),
-			fmt.Sprintf("_%s._tcp", service),
-		}
-		log.Infow("no domain available, attempting bare DNS SRV lookup with search suffix")
-	}
-
+	queries := buildSRVQueries(service, domain, log)
 	var netSRVs []*net.SRV
 	var successQuery string
 
 	for _, query := range queries {
 		log.Infow("executing DNS SRV lookup", "query", query, "service", service)
-
-		// Pass empty service/proto to make LookupSRV do direct lookup of the full name
 		_, records, err := net.LookupSRV("", "", query)
 		if err == nil && len(records) > 0 {
 			log.Infow("DNS SRV lookup succeeded", "query", query, "record_count", len(records))
@@ -200,19 +206,24 @@ func findServers(configDomain string, useTLS bool, log *logp.Logger) []string {
 		return nil
 	}
 
-	// net.LookupSRV already sorts by priority and randomizes by weight per RFC 2782
-	// so we can use the records directly
 	var addresses []string
 	for _, addr := range netSRVs {
-		// Remove trailing dot if present (FQDN format in DNS often includes it)
 		target := strings.TrimSuffix(addr.Target, ".")
-		address := fmt.Sprintf("%s://%s:%d", scheme, target, addr.Port)
-		addresses = append(addresses, address)
+		addresses = append(addresses, fmt.Sprintf("%s://%s:%d", scheme, target, addr.Port))
 	}
 
 	log.Infow("discovered servers via DNS SRV", "scheme", scheme, "query", successQuery, "count", len(addresses), "addresses", addresses)
-
 	return addresses
+}
+
+func buildSRVQueries(service, domain string, log *logp.Logger) []string {
+	if domain != "" {
+		domain = fmt.Sprintf(".%s", domain)
+	}
+	return []string{
+		fmt.Sprintf("_%s._tcp.dc._msdcs%s", service, domain),
+		fmt.Sprintf("_%s._tcp%s", service, domain),
+	}
 }
 
 // findLogonServer is a simplified wrapper for LOGONSERVER lookup.
