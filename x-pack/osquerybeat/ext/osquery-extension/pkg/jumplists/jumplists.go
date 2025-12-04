@@ -14,7 +14,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/osquery/osquery-go/plugin/table"
 
@@ -86,23 +85,6 @@ func (j *JumpList) ToRows() []JumpListRow {
 		}
 	}
 	return rows
-}
-
-// NewApplicationIdFromFileName creates a new ApplicationId from a given file name.
-// The file name is the name of the jumplist file.
-// The application ID contains all .
-// The application name is looked up from the jumpListAppIds map.
-// If the application ID is not found, the name is set to an empty string.
-func NewApplicationIdFromFileName(fileName string, log *logger.Logger) ApplicationId {
-	baseName := filepath.Base(fileName)
-	dotIndex := strings.Index(baseName, ".")
-	if dotIndex != -1 {
-		return NewApplicationId(baseName[:dotIndex])
-	}
-
-	// Not necessarily an error, just a fallback
-	log.Infof("failed to get application id from file name %s", fileName)
-	return ApplicationId{}
 }
 
 // FindJumplistFiles finds all the jump list files of a given type.
