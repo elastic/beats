@@ -27,7 +27,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -564,7 +563,6 @@ type testConfig struct {
 }
 
 func TestCache(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors(name))
 	for _, test := range cacheTests {
 		t.Run(test.name, func(t *testing.T) {
 			var processors []beat.Processor
@@ -606,7 +604,6 @@ func TestCache(t *testing.T) {
 						t.Errorf("unexpected error from c.Close(): %v", err)
 					}
 				}()
-
 				processors = append(processors, p)
 			}
 
