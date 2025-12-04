@@ -5,7 +5,7 @@ refreshenv
 
 # Install gvm and go
 # TODO: Move GVM download to the base VM image
-$env:GvmVersion = "0.5.2"
+$env:GvmVersion = "0.6.0" # https://github.com/andrewkroh/gvm/issues/44#issuecomment-1013231151
 [Net.ServicePointManager]::SecurityProtocol = "tls12"
 $env:GoVersion = Get-Content -Path .go-version
 Invoke-WebRequest -URI https://github.com/andrewkroh/gvm/releases/download/v$env:GvmVersion/gvm-windows-amd64.exe -Outfile C:\Windows\System32\gvm.exe
