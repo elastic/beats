@@ -72,6 +72,10 @@ type registryEntry struct {
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 	tempDir := libbeatinteg.CreateTempDir(t, filepath.Join("..", "..", "build", "integration-tests"))
+	tempDir, err := filepath.Abs(tempDir)
+	if err != nil {
+		t.Fatalf("cannot get abs path for temp dir: %s", err)
+	}
 	logger := logptest.NewFileLogger(
 		t,
 		tempDir,
