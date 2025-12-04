@@ -514,6 +514,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			start = time.Now()
 			var hadPublicationError bool
+		loop:
 			for i, e := range events {
 				event, ok := e.(map[string]interface{})
 				if !ok {
@@ -540,6 +541,25 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 						}
 						pubCursor = cursor
 					}
+				}
+				// This is checked prior to the publish attempt since the
+				// cursor.Publisher interface does not document the behaviour
+				// related to context cancellation and the context is not
+				// explicitly passed in, so favour this explicit clarity.
+				switch err := ctx.Err(); {
+				case err == nil:
+				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
+					log.Infow("context cancelled with unpublished events", "unpublished", len(events)-i)
+					// Don't update status, since we are about to pass
+					// through the Running state and then fall through
+					// to the input exit with a change to Stopped.
+					break loop
+				default:
+					// This should never happen.
+					log.Warnw("failed with unpublished events", "error", err, "unpublished", len(events)-i)
+					health.UpdateStatus(status.Degraded, "error publishing events: "+err.Error())
+					isDegraded = true
+					break loop
 				}
 				err = pub.Publish(beat.Event{
 					Timestamp: time.Now(),
