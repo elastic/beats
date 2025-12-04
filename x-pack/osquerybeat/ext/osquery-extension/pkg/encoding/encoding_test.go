@@ -337,7 +337,7 @@ func Test_formatTimeWithTagFormat(t *testing.T) {
 			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
 			flag:       0,
 			tag:        tagPtr(`format:"kitchen"`),
-			want:       "Jun 15 14:30:00",
+			want:       "2:30PM",
 			wantErr:    false,
 		},
 		{
@@ -402,6 +402,14 @@ func Test_formatTimeWithTagFormat(t *testing.T) {
 			flag:       EncodingFlagUseNumbersZeroValues,
 			tag:        tagPtr(`format:"rfc3339"`),
 			want:       "0001-01-01T00:00:00Z",
+			wantErr:    false,
+		},
+		{
+			name:       "Zero unix timestamp with UseNumbersZeroValues flag",
+			fieldValue: reflect.ValueOf(time.Time{}),
+			flag:       EncodingFlagUseNumbersZeroValues,
+			tag:        tagPtr(`format:"unix"`),
+			want:       "0",
 			wantErr:    false,
 		},
 		{
