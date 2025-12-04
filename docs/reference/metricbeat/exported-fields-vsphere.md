@@ -90,7 +90,7 @@ Cluster information.
 
 
 **`vsphere.cluster.resourcepool.id`**
-:   id of resource pool associated with the cluster.
+:   ID of resource pool associated with the cluster.
 
     type: keyword
 
