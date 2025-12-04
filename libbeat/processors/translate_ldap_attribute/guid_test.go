@@ -21,6 +21,7 @@ package translate_ldap_attribute
 
 import (
 	"encoding/hex"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -143,4 +144,17 @@ func TestEscapeBinaryForLDAP(t *testing.T) {
 			assert.Equal(t, tt.expected, result)
 		})
 	}
+}
+
+func TestGUIDBytesToString(t *testing.T) {
+	original := "{7fb125ee-ceaf-48ff-8385-32c516ab10ed}"
+	bytes, err := guidToBytes(original)
+	require.NoError(t, err)
+
+	guid, err := guidBytesToString(bytes)
+	require.NoError(t, err)
+	assert.Equal(t, strings.Trim(strings.ToLower(original), "{}"), guid)
+
+	_, err = guidBytesToString([]byte{0x00})
+	assert.Error(t, err)
 }

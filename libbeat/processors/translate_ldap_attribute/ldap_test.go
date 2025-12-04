@@ -105,3 +105,65 @@ func TestPrepareSearchFilter(t *testing.T) {
 		})
 	}
 }
+
+func TestMaybeConvertMappedGUID(t *testing.T) {
+	guidStr := "7fb125ee-ceaf-48ff-8385-32c516ab10ed"
+	raw, err := guidToBytes(guidStr)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name      string
+		cfg       config
+		values    []string
+		expect    []string
+		expectErr bool
+	}{
+		{
+			name: "auto converts objectGUID",
+			cfg: config{
+				LDAPMappedAttribute: "objectGUID",
+				ADGUIDTranslation:   guidTranslationAuto,
+			},
+			values: []string{string(raw)},
+			expect: []string{guidStr},
+		},
+		{
+			name: "never leaves binary untouched",
+			cfg: config{
+				LDAPMappedAttribute: "objectGUID",
+				ADGUIDTranslation:   guidTranslationNever,
+			},
+			values: []string{string(raw)},
+			expect: []string{string(raw)},
+		},
+		{
+			name: "non objectGUID attribute is ignored",
+			cfg: config{
+				LDAPMappedAttribute: "cn",
+			},
+			values: []string{string(raw)},
+			expect: []string{string(raw)},
+		},
+		{
+			name: "invalid length returns error",
+			cfg: config{
+				LDAPMappedAttribute: "objectGUID",
+			},
+			values:    []string{"short"},
+			expectErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := &processor{config: tt.cfg}
+			converted, err := p.maybeConvertMappedGUID(tt.values)
+			if tt.expectErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.expect, converted)
+		})
+	}
+}

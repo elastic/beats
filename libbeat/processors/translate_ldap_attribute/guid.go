@@ -100,3 +100,28 @@ func escapeBinaryForLDAP(data []byte) string {
 	}
 	return sb.String()
 }
+
+// guidBytesToString converts the binary representation used by Active Directory
+// back to the canonical GUID string format (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).
+func guidBytesToString(data []byte) (string, error) {
+	if len(data) != 16 {
+		return "", fmt.Errorf("%w: expected 16 bytes, got %d", errInvalidGUIDFormat, len(data))
+	}
+
+	bytes := make([]byte, 16)
+	copy(bytes, data)
+
+	// Reverse the byte swaps applied in guidToBytes (operation is symmetrical).
+	bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0]
+	bytes[4], bytes[5] = bytes[5], bytes[4]
+	bytes[6], bytes[7] = bytes[7], bytes[6]
+
+	hexStr := hex.EncodeToString(bytes)
+	return fmt.Sprintf("%s-%s-%s-%s-%s",
+		hexStr[0:8],
+		hexStr[8:12],
+		hexStr[12:16],
+		hexStr[16:20],
+		hexStr[20:32],
+	), nil
+}

@@ -172,17 +172,22 @@ func (p *processor) translateLDAPAttr(event *beat.Event) error {
 	}
 
 	p.log.Debugw("ldap search", "search_value", searchValue, "filter_value", searchFilter)
-	cn, err := p.client.findObjectBy(searchFilter)
-	p.log.Debugw("ldap result", "common_name", cn, "error", err)
+	values, err := p.client.findObjectBy(searchFilter)
+	p.log.Debugw("ldap result", "common_name", values, "error", err)
 	if err != nil {
 		return err
+	}
+
+	values, err = p.maybeConvertMappedGUID(values)
+	if err != nil {
+		return fmt.Errorf("objectGUID conversion failed: %w", err)
 	}
 
 	field := p.Field
 	if p.TargetField != "" {
 		field = p.TargetField
 	}
-	_, err = event.PutValue(field, cn)
+	_, err = event.PutValue(field, values)
 	return err
 }
 
@@ -211,6 +216,31 @@ func (p *processor) prepareSearchFilter(searchValue string) (string, error) {
 	}
 	searchFilter := escapeBinaryForLDAP(guidBytes)
 	return searchFilter, nil
+}
+
+// maybeConvertMappedGUID converts binary LDAP responses to canonical GUID strings
+// when AD GUID translation is enabled and the mapped attribute refers to objectGUID.
+func (p *processor) maybeConvertMappedGUID(values []string) ([]string, error) {
+	if !p.shouldConvertMappedGUID() || len(values) == 0 {
+		return values, nil
+	}
+
+	converted := make([]string, len(values))
+	for i, raw := range values {
+		guid, err := guidBytesToString([]byte(raw))
+		if err != nil {
+			return nil, err
+		}
+		converted[i] = guid
+	}
+	return converted, nil
+}
+
+func (p *processor) shouldConvertMappedGUID() bool {
+	if p.ADGUIDTranslation == guidTranslationNever {
+		return false
+	}
+	return strings.EqualFold(p.LDAPMappedAttribute, "objectGUID")
 }
 
 func (p *processor) Close() error {
