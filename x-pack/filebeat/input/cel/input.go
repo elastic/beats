@@ -28,14 +28,13 @@ import (
 	"strings"
 	"time"
 
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.34.0"
-
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/icholy/digest"
 	"github.com/rcrowley/go-metrics"
 	"go.elastic.co/ecszap"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/sdk/resource"
+	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/time/rate"
@@ -45,17 +44,6 @@ import (
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/ext"
 	"google.golang.org/protobuf/types/known/structpb"
-
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-	"github.com/elastic/elastic-agent-libs/transport"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
-	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/timed"
-	"github.com/elastic/mito/lib"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -68,6 +56,16 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/useragent"
+	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/go-concert/timed"
+	"github.com/elastic/mito/lib"
 )
 
 const (
@@ -106,12 +104,7 @@ func (i input) now() time.Time {
 func (input) Name() string { return inputName }
 
 func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
-	srcp, ok := src.(*source)
-	if !ok {
-		return fmt.Errorf("input type %T is not a source", src)
-	}
-
-	cfg := srcp.cfg
+	cfg := src.(*source).cfg //nolint:errcheck
 	if !wantClient(cfg) {
 		return nil
 	}
@@ -121,11 +114,7 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 // Run starts the input and blocks until it ends completes. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
-	srcP, ok := src.(*source)
-	if !ok {
-		return errors.New("inputcursor.Source is not a *source type")
-	}
-	dataStreamName := srcP.cfg.DataStream // May be empty.
+	dataStreamName := src.(*source).cfg.DataStream //nolint:errcheck May be empty.
 
 	var cursor map[string]interface{}
 	env.UpdateStatus(status.Starting, dataStreamName)
@@ -143,7 +132,7 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 			parent: &env,
 		}
 	}
-	err := input{}.run(env, srcP, cursor, pub, health)
+	err := input{}.run(env, src.(*source), cursor, pub, health)
 	if err != nil {
 		msg := "failed to run: " + err.Error()
 		if dataStreamName != "" {

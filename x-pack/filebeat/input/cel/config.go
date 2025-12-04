@@ -71,6 +71,8 @@ type config struct {
 	// record and log execution coverage.
 	RecordCoverage bool `config:"record_coverage"`
 
+	// Package contains pacakge level integration data.
+	// name and version are expected.
 	Package map[string]string `config:"package"`
 }
 

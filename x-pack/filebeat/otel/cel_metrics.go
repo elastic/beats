@@ -286,5 +286,4 @@ func NewOTELCELMetrics(log *logp.Logger,
 		programCelDurationHistogram:          programCELDuration,
 		programEventPublishDurationHistogram: programPublishDuration,
 	}, transport, nil
-
 }
