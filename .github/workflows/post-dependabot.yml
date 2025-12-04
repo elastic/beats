@@ -1,0 +1,56 @@
+# Follow-on actions relating to dependabot PRs. In elastic/elastic-agent, any changes to
+# dependencies contained in go.mod requires the change to be reflected in the
+# NOTICE.txt and NOTICE-fips.txt files. When dependabot creates a branch for a go_modules
+# change this will update the NOTICE.txt and NOTICE-fips files for that change.
+name: post-dependabot
+
+on:
+  push:
+    branches:
+      - "dependabot/go_modules/**"
+
+jobs:
+  update-notice:
+    permissions:
+      # Allow job to write to the branch.
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: .go-version
+
+      - name: set up git user
+        uses: elastic/oblt-actions/git/setup@v1
+        with:
+          username: 'dependabot[bot]'
+          email: 'dependabot[bot]@users.noreply.github.com'
+
+      - name: Install mage
+        uses: magefile/mage-action@6f50bbb8ea47d56e62dee92392788acbc8192d0b # v3.1.0
+        with:
+          version: v1.14.0
+          install-only: true
+
+      - name: update NOTICE.txt.
+        run: mage notice
+
+      - name: check for modified NOTICE.txt
+        id: notice-check
+        run: |
+          if git diff --quiet HEAD -- NOTICE*.txt; then
+            echo "modified=false" >> $GITHUB_OUTPUT
+          else
+            echo "modified=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: commit NOTICE.txt
+        if: steps.notice-check.outputs.modified == 'true'
+        run: |
+          git add NOTICE*.txt
+          git commit -m "Update NOTICE.txt"
+
+      - name: Push added commits
+        run: git push
