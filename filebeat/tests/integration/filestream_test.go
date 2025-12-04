@@ -104,11 +104,7 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	// of the file, so once the TTL of its state expires and the store GC runs,
 	// it will be removed from the registry.
 	// Wait for the log message stating 1 entry has been removed from the registry
-<<<<<<< HEAD
-	filebeat.WaitForLogs("1 entries removed", 20*time.Second, "entry was not removed from registtry")
-=======
 	filebeat.WaitLogsContains("1 entries removed", 20*time.Second, "entry was not removed from registry")
->>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 
 	// 6. Then assess it has been removed in the registry
 	registryFile := filepath.Join(filebeat.TempDir(), "data", "registry", "filebeat", "log.json")
@@ -374,6 +370,10 @@ logging:
 			workDir := filebeat.TempDir()
 			outputFile := filepath.Join(workDir, "output-file*")
 			logFilepath := filepath.Join(workDir, "log.log")
+			msgLogFilepath := logFilepath
+			if runtime.GOOS == "windows" {
+				msgLogFilepath = strings.ReplaceAll(logFilepath, `\`, `\\`)
+			}
 			integration.WriteLogFile(t, logFilepath, 25, false)
 
 			cfgYAML := fmt.Sprintf(cfgTemplate, logFilepath, tc.oldIdentityCfg, workDir)
@@ -381,7 +381,7 @@ logging:
 			filebeat.Start()
 
 			// Wait for the file to be fully ingested
-			eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
+			eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", msgLogFilepath)
 			filebeat.WaitLogsContains(eofMsg, time.Second*10, "EOF was not reached")
 			requirePublishedEvents(t, filebeat, 25, outputFile)
 			filebeat.Stop()
@@ -396,7 +396,8 @@ logging:
 			// The happy path is to migrate keys, so we assert it first
 			if tc.expectMigration {
 				// Test the case where the registry migration happens
-				migratingMsg := fmt.Sprintf("are the same, migrating. Source: '%s'", logFilepath)
+
+				migratingMsg := fmt.Sprintf("are the same, migrating. Source: '%s'", msgLogFilepath)
 				filebeat.WaitLogsContains(migratingMsg, time.Second*10, "prospector did not migrate registry entry")
 				filebeat.WaitLogsContains("migrated entry in registry from", time.Second*10, "store did not update registry key")
 				filebeat.WaitLogsContains(eofMsg, time.Second*10, "EOF was not reached the second time")
@@ -731,9 +732,12 @@ func createFileAndWaitIngestion(
 	}
 
 	integration.WriteLogFile(t, logFilepath, n, false)
+	msgLogFilepath := logFilepath
+	if runtime.GOOS == "windows" {
+		msgLogFilepath = strings.ReplaceAll(logFilepath, `\`, `\\`)
+	}
 
-	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
-
+	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", msgLogFilepath)
 	fb.WaitLogsContains(eofMsg, time.Second*10, "EOF was not reached")
 	requirePublishedEvents(t, fb, outputTotal, outputFilepath)
 }

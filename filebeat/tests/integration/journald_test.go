@@ -152,6 +152,9 @@ func TestJournaldLargeLines(t *testing.T) {
 	for i, e := range evts {
 		if len(e.Message) != evtLen {
 			t.Errorf("event %d: expecting len %d, got %d", i, evtLen, len(e.Message))
+			if len(e.Message) < 100 {
+				t.Logf("Message: %q", e.Message)
+			}
 		}
 	}
 }

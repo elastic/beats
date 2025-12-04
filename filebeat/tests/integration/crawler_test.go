@@ -68,7 +68,6 @@ output.file:
 	filebeat.Start()
 
 	// 3. Create the log file
-	//integration.WriteLogFile
 	integration.WriteLogFile(t, filepath.Join(tempDir, "log.log"), 10, false)
 
 	// wait for output file to exist
@@ -84,7 +83,6 @@ output.file:
 	}, 2*time.Minute, 10*time.Second)
 
 	// Ensure all log lines are ingested eventually
-	//	integration.WaitLineCountInFile
 	integration.WaitLineCountInFile(t, outputFile, 10)
 
 	// append a line without \n and ensure it is not crawled
