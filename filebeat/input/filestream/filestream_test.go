@@ -22,6 +22,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -61,8 +62,13 @@ func TestLogFileTimedClosing(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			reader, err := newFileReader(
+<<<<<<< HEAD
 				logp.NewNopLogger(),
 				context.TODO(),
+=======
+				logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests")).Logger,
+				t.Context(),
+>>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 				f,
 				readerConfig{},
 				closerConfig{

@@ -33,11 +33,11 @@ import (
 type config struct {
 	Reader readerConfig `config:",inline"`
 
-	ID           string          `config:"id"`
-	Paths        []string        `config:"paths"`
-	Close        closerConfig    `config:"close"`
-	FileWatcher  *conf.Namespace `config:"prospector"`
-	FileIdentity *conf.Namespace `config:"file_identity"`
+	ID           string            `config:"id"`
+	Paths        []string          `config:"paths"`
+	Close        closerConfig      `config:"close"`
+	FileWatcher  fileWatcherConfig `config:"prospector.scanner"`
+	FileIdentity *conf.Namespace   `config:"file_identity"`
 
 	// -1 means that registry will never be cleaned
 	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=-1"`
@@ -104,6 +104,7 @@ func defaultConfig() config {
 		CleanRemoved:   true,
 		HarvesterLimit: 0,
 		IgnoreOlder:    0,
+		FileWatcher:    defaultFileWatcherConfig(), // Config key: prospector.scanner
 	}
 }
 

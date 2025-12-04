@@ -27,6 +27,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -42,12 +43,17 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	libbeatinteg "github.com/elastic/beats/v7/libbeat/tests/integration"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-concert/unison"
 )
 
 type inputTestingEnvironment struct {
+<<<<<<< HEAD
+=======
+	testLogger *logptest.Logger
+>>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 	t          *testing.T
 	workingDir string
 	stateStore statestore.States
@@ -69,6 +75,7 @@ type registryEntry struct {
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
+<<<<<<< HEAD
 	logp.DevelopmentSetup(logp.ToObserverOutput())
 
 	t.Cleanup(func() {
@@ -88,6 +95,18 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 	return &inputTestingEnvironment{
 		t:          t,
 		workingDir: t.TempDir(),
+=======
+	tempDir := libbeatinteg.CreateTempDir(t, filepath.Join("..", "..", "build", "integration-tests"))
+	logger := logptest.NewFileLogger(
+		t,
+		tempDir,
+	)
+
+	return &inputTestingEnvironment{
+		testLogger: logger,
+		t:          t,
+		workingDir: tempDir,
+>>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 		stateStore: openTestStatestore(),
 		pipeline:   &mockPipelineConnector{},
 		monitoring: beat.NewMonitoring(),
@@ -122,7 +141,11 @@ func (e *inputTestingEnvironment) createInput(config map[string]interface{}) (v2
 
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	e.pluginInitOnce.Do(func() {
+<<<<<<< HEAD
 		e.plugin = Plugin(logp.L(), e.stateStore)
+=======
+		e.plugin = Plugin(e.testLogger.Logger, e.stateStore)
+>>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 	})
 	return e.plugin.Manager
 }
@@ -133,7 +156,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
 
-		logger, _ := logp.NewDevelopmentLogger("")
+		logger := e.testLogger.Named("metrics-registry")
 		reg := inputmon.NewMetricsRegistry(
 			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 		defer inputmon.CancelMetricsRegistry(
@@ -146,7 +169,11 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 			Cancelation:     ctx,
 			StatusReporter:  nil,
 			MetricsRegistry: reg,
+<<<<<<< HEAD
 			Logger:          logp.L(),
+=======
+			Logger:          e.testLogger.Named("input.filestream"),
+>>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 		}
 		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
@@ -156,12 +183,15 @@ func (e *inputTestingEnvironment) waitUntilInputStops() {
 	e.wg.Wait()
 }
 
-func (e *inputTestingEnvironment) mustWriteToFile(filename string, data []byte) {
+// mustWriteToFile writes data to file and returns the full path
+func (e *inputTestingEnvironment) mustWriteToFile(filename string, data []byte) string {
 	path := e.abspath(filename)
 	err := os.WriteFile(path, data, 0o644)
 	if err != nil {
 		e.t.Fatalf("failed to write file '%s': %+v", path, err)
 	}
+
+	return path
 }
 
 func (e *inputTestingEnvironment) mustAppendToFile(filename string, data []byte) {
@@ -254,34 +284,37 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID stri
 
 // requireMetaInRegistry checks if the expected metadata is saved to the registry.
 func (e *inputTestingEnvironment) waitUntilMetaInRegistry(filename, inputID string, expectedMeta fileMeta) {
-	for {
+	require.EventuallyWithT(e.t, func(t *assert.CollectT) {
 		filepath := e.abspath(filename)
 		fi, err := os.Stat(filepath)
 		if err != nil {
-			continue
+			t.Errorf("cannot stat file: %s", err)
+			return
 		}
 
 		id := getIDFromPath(filepath, inputID, fi)
 		entry, err := e.getRegistryState(id)
 		if err != nil {
-			continue
+			t.Errorf("cannot get registry state: %s", err)
+			return
 		}
 
 		if entry.Meta == nil {
-			continue
+			t.Errorf("entry metadata cannot be nil")
+			return
 		}
 
 		var meta fileMeta
 		err = typeconv.Convert(&meta, entry.Meta)
 		if err != nil {
-			e.t.Fatalf("cannot convert: %+v", err)
+			t.Errorf("cannot convert: %+v", err)
 		}
 
-		if requireMetadataEquals(expectedMeta, meta) {
-			break
+		if !requireMetadataEquals(expectedMeta, meta) {
+			t.Errorf("Metadata is not equal. Expecting:\n%#v\nGot:\n%#v", expectedMeta, meta)
 		}
-		time.Sleep(10 * time.Millisecond)
-	}
+
+	}, 30*time.Second, time.Second, "Metadata differs expected")
 }
 
 func requireMetadataEquals(one, other fileMeta) bool {
@@ -374,7 +407,6 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 			keys = append(keys, key)
 			return false, nil
 		})
-		e.t.Logf("keys in store: %v", keys)
 
 		return registryEntry{},
 			fmt.Errorf("error when getting expected key '%s' from store: %w",
@@ -455,13 +487,15 @@ func (e *inputTestingEnvironment) waitUntilEventCountCtx(ctx context.Context, co
 
 // waitUntilAtLeastEventCount waits until at least count events arrive to the client.
 func (e *inputTestingEnvironment) waitUntilAtLeastEventCount(count int) {
-	for {
-		sum := len(e.pipeline.GetAllEvents())
-		if count <= sum {
-			return
-		}
-		time.Sleep(10 * time.Millisecond)
-	}
+	require.EventuallyWithTf(
+		e.t,
+		func(t *assert.CollectT) {
+			sum := len(e.pipeline.GetAllEvents())
+			require.GreaterOrEqualf(t, sum, count, "got %d events", sum)
+		},
+		30*time.Second,
+		200*time.Millisecond,
+		"found less than %d events", count)
 }
 
 // waitUntilHarvesterIsDone detects Harvester stop by checking if the last client has been closed
@@ -470,7 +504,7 @@ func (e *inputTestingEnvironment) waitUntilHarvesterIsDone() {
 	require.Eventually(
 		e.t,
 		func() bool {
-			return e.pipeline.clients[len(e.pipeline.clients)-1].closed
+			return e.pipeline.clients[len(e.pipeline.clients)-1].closed.Load()
 		},
 		time.Second*10,
 		time.Millisecond*10,
@@ -551,6 +585,18 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 	require.True(e.t, selectedEvent.Timestamp.Equal(tm), "got: %s, expected: %s", selectedEvent.Timestamp.String(), tm.String())
 }
 
+// logContains ensures s is a sub string on any log line.
+// If s is not found, the test fails
+func (e *inputTestingEnvironment) logContains(s string) {
+	e.t.Helper()
+	e.testLogger.LogContains(e.t, s)
+}
+
+func (e *inputTestingEnvironment) WaitLogsContains(s string, timeout time.Duration, msgAndArgs ...any) {
+	e.t.Helper()
+	e.testLogger.WaitLogsContains(e.t, s, timeout, msgAndArgs...)
+}
+
 var _ statestore.States = (*testInputStore)(nil)
 
 type testInputStore struct {
@@ -579,7 +625,7 @@ type mockClient struct {
 	publishing []beat.Event
 	published  []beat.Event
 	ackHandler beat.EventListener
-	closed     bool
+	closed     atomic.Bool
 	mtx        sync.Mutex
 	canceler   context.CancelFunc
 }
@@ -622,11 +668,11 @@ func (c *mockClient) Close() error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	if c.closed {
+	if c.closed.Load() {
 		return fmt.Errorf("mock client already closed")
 	}
 
-	c.closed = true
+	c.closed.Store(true)
 	return nil
 }
 

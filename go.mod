@@ -238,6 +238,7 @@ require (
 	github.com/mitchellh/gox v1.0.1
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/otiai10/copy v1.14.1
+<<<<<<< HEAD
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
 	go.opentelemetry.io/collector/client v1.45.0
 	go.opentelemetry.io/collector/component/componenttest v0.139.0
@@ -253,6 +254,25 @@ require (
 	go.opentelemetry.io/collector/extension/extensiontest v0.139.0
 	go.opentelemetry.io/collector/processor v1.45.0
 	go.opentelemetry.io/collector/processor/processorhelper v0.139.0
+=======
+	go.opentelemetry.io/collector/client v1.41.0
+	go.opentelemetry.io/collector/component/componenttest v0.135.0
+	go.opentelemetry.io/collector/consumer/consumertest v0.135.0
+	go.opentelemetry.io/collector/pipeline v1.41.0
+	go.opentelemetry.io/collector/processor/processorhelper v0.135.0
+	go.opentelemetry.io/collector/receiver/receivertest v0.135.0
+)
+
+require (
+	github.com/brianvoe/gofakeit v3.18.0+incompatible
+	go.opentelemetry.io/collector/config/configauth v0.135.0
+	go.opentelemetry.io/collector/config/confighttp v0.135.0
+	go.opentelemetry.io/collector/config/configoptional v0.135.0
+	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.41.0
+	go.opentelemetry.io/collector/extension v1.41.0
+	go.opentelemetry.io/collector/extension/extensionauth v1.41.0
+	go.opentelemetry.io/collector/processor v1.41.0
+>>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 	go.opentelemetry.io/otel/sdk/metric v1.38.0
 	go.uber.org/goleak v1.3.0
 )

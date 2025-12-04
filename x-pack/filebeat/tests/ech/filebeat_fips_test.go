@@ -41,7 +41,7 @@ func TestFilebeatFIPSSmoke(t *testing.T) {
 	// Generate logs
 	tempDir := t.TempDir()
 	logFilePath := path.Join(tempDir, "log.log")
-	integration.GenerateLogFile(t, logFilePath, 1000, false)
+	integration.WriteLogFile(t, logFilePath, 1000, false)
 
 	ech.RunSmokeTest(t,
 		"filebeat",
