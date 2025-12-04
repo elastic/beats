@@ -46,14 +46,14 @@ filebeat.inputs:
 
 ## Authentication [_authentication]
 
-The azure-eventhub input supports multiple authentication methods. The `auth_type` configuration option controls the authentication method used for both Event Hub and Storage Account.
+The azure-eventhub input supports multiple authentication methods. The [`auth_type` configuration option](#_auth_type) controls the authentication method used for both Event Hub and Storage Account.
 
 ### Authentication types
 
 The following authentication types are supported:
 
-- **`connection_string`** (default if `auth_type` is not specified): Uses Azure Event Hubs and Storage Account connection strings
-- {applies_to}`stack: ga 9.3.0` **`client_secret`**: Uses Azure Active Directory service principal with client secret credentials
+- **`connection_string`** (default if `auth_type` is not specified): Uses Azure Event Hubs and Storage Account connection strings.
+- {applies_to}`stack: ga 9.3.0` **`client_secret`**: Uses Azure Active Directory service principal with client secret credentials.
 
 ### Required permissions
 
@@ -83,7 +83,7 @@ For detailed instructions on how to set up an Azure AD service principal and con
 
 ## Configuration options [_configuration_options]
 
-The `azure-eventhub` input supports the following configuration:
+The `azure-eventhub` input supports the following configuration options:
 
 
 ### `eventhub` [_eventhub]
@@ -103,9 +103,9 @@ stack: ga 9.3.0
 
 Specifies the authentication method to use for both Event Hub and Storage Account. If not specified, defaults to `connection_string` for backwards compatibility.
 
-Valid values:
-- `connection_string`: Uses connection string authentication (default)
-- `client_secret`: Uses Azure Active Directory service principal with client secret credentials
+Valid values include:
+- `connection_string` (default): Uses connection string authentication. You _must_ provide a [`connection_string`](#_connection_string).
+- `client_secret`: Uses Azure Active Directory service principal with client secret credentials.
 
 ### `connection_string` [_connection_string]
 
@@ -116,7 +116,7 @@ This option is required if:
 * `auth_type` is set to `connection_string`
 * `auth_type` is not specified (in which case it defaults to `connection_string` for backwards compatibility)
 
-A Blob Storage account is required to store, retrieve, or update the offset or state of the Event Hub messages. This means that after stopping Filebeat it can start back up at the spot that it stopped processing messages.
+A Blob Storage account is required to store, retrieve, or update the offset or state of the Event Hub messages. This means that after stopping Filebeat it can resume from where it stopped processing messages.
 
 
 ### `eventhub_namespace` [_eventhub_namespace]
