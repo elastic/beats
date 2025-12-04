@@ -98,7 +98,8 @@ func NewLnkFromBytes(data []byte, entryNumber int, log *logger.Logger) (*Lnk, er
 	// There appears to be a bug in the golnk library, where the access time, creation time, and modification time
 	// are not being converted to the correct time.Time values in cases where the time is zero (not set).
 	// I have submitted an issue to the golnk library: https://github.com/parsiya/golnk/issues/7
-	// and will put in a pull request to fix it as well.  In the meantime, we will convert the timestamps manually
+	// as well as a pull request to fix it: https://github.com/parsiya/golnk/pull/8
+	// In the meantime, we will convert the timestamps manually
 	// offset values pulled from https://github.com/EricZimmerman/Lnk/blob/master/Lnk/Header.cs#L134-L146
 	accessTime := toTime(data[28:36])
 	creationTime := toTime(data[36:44])
