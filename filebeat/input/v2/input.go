@@ -99,6 +99,11 @@ type Context struct {
 	Agent beat.Info
 
 	// Cancelation is used by Beats to signal the input to shut down.
+	//
+	// An input started with a Context parameter, ctx, must shut down when
+	// <-ctx.Cancelation.Done() does not block or when ctx.Cancelation.Error()
+	// returns a non-nil error. If an input is started with a specific Context
+	// it should only shutdown in response to that Context's Cancelation.
 	Cancelation Canceler
 
 	// StatusReporter provides a method to update the status of the underlying unit
@@ -221,6 +226,11 @@ type TestContext struct {
 	Agent beat.Info
 
 	// Cancelation is used by Beats to signal the input to shut down.
+	//
+	// An input started with a Context parameter, ctx, must shut down when
+	// <-ctx.Cancelation.Done() does not block or when ctx.Cancelation.Error()
+	// returns a non-nil error. If an input is started with a specific Context
+	// it should only shutdown in response to that Context's Cancelation.
 	Cancelation Canceler
 }
 
