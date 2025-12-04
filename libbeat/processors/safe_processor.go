@@ -51,6 +51,7 @@ type SafeProcessor struct {
 
 	mu    sync.RWMutex
 	state state
+	paths *paths.Path
 }
 
 // safeProcessorWithClose extends SafeProcessor to also handle Close.
@@ -103,9 +104,13 @@ func (p *SafeProcessor) SetPaths(paths *paths.Path) error {
 	switch p.state {
 	case stateInit:
 		p.state = stateSetPaths
+		p.paths = paths
 		return pathSetter.SetPaths(paths)
 	case stateSetPaths:
-		return ErrPathsAlreadySet
+		if p.paths != paths {
+			return ErrPathsAlreadySet
+		}
+		return nil
 	case stateClosed:
 		return ErrSetPathsOnClosed
 	}
