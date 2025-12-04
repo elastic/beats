@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !windows || !requirefips
+//go:build !windows && !requirefips
 
 package translate_ldap_attribute
 
@@ -26,7 +26,7 @@ import (
 	"strings"
 )
 
-// discoverDomain Chain: Resolv.conf -> Hostname -> Krb5.conf
+// discoverDomainInPlatform Chain: Resolv.conf -> Hostname -> Krb5.conf
 func discoverDomainInPlatform() (string, error) {
 	if d, err := getDomainResolv(); err == nil && d != "" {
 		return d, nil
