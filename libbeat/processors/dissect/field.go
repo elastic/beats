@@ -337,8 +337,8 @@ func newNormalField(id int, key string, dataType string, ordinal int, length int
 func extractKeyParts(rawKey string) (key string, dataType string, ordinal int, length int, greedy bool, err error) {
 	m := suffixRE.FindAllStringSubmatch(rawKey, -1)
 
-	// Check if regex matched - if not, the field name is invalid
-	if len(m) == 0 || len(m[0]) < 9 {
+	// check if we have at least one match otherwise the field is invalid.
+	if len(m) == 0 {
 		return "", "", 0, 0, false, errInvalidFieldName
 	}
 
