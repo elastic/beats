@@ -48,11 +48,7 @@ func TestCreateProspector(t *testing.T) {
 				c := config{
 					IgnoreInactive: ignoreInactiveSettings[test.ignore_inactive_since],
 				}
-<<<<<<< HEAD
-				p, _ := newProspector(c, logp.NewNopLogger())
-=======
 				p, _ := newProspector(c, logp.NewNopLogger(), mustSourceIdentifier("foo-id"))
->>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 				fileProspector := p.(*fileProspector)
 				assert.Equal(t, fileProspector.ignoreInactiveSince, ignoreInactiveSettings[test.ignore_inactive_since])
 			})
@@ -106,11 +102,7 @@ prospector.scanner.fingerprint.enabled: false
 				err = c.Unpack(&cfg)
 				require.NoError(t, err)
 
-<<<<<<< HEAD
-				_, err = newProspector(cfg, logp.NewNopLogger())
-=======
 				_, err = newProspector(cfg, logp.NewNopLogger(), mustSourceIdentifier("foo-id"))
->>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 				if tc.err == "" {
 					require.NoError(t, err)
 					return

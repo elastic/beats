@@ -21,7 +21,6 @@ package filestream
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -50,10 +49,7 @@ import (
 )
 
 type inputTestingEnvironment struct {
-<<<<<<< HEAD
-=======
 	testLogger *logptest.Logger
->>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 	t          *testing.T
 	workingDir string
 	stateStore statestore.States
@@ -71,49 +67,26 @@ type registryEntry struct {
 	Cursor struct {
 		Offset int `json:"offset"`
 	} `json:"cursor"`
-	Meta interface{} `json:"meta,omitempty"`
+	Meta any `json:"meta,omitempty"`
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
-<<<<<<< HEAD
-	logp.DevelopmentSetup(logp.ToObserverOutput())
-
-	t.Cleanup(func() {
-		if t.Failed() {
-			t.Logf("Debug Logs:\n")
-			for _, log := range logp.ObserverLogs().TakeAll() {
-				data, err := json.Marshal(log)
-				if err != nil {
-					t.Errorf("failed encoding log as JSON: %s", err)
-				}
-				t.Logf("%s", string(data))
-			}
-			return
-		}
-	})
-
-	return &inputTestingEnvironment{
-		t:          t,
-		workingDir: t.TempDir(),
-=======
 	tempDir := libbeatinteg.CreateTempDir(t, filepath.Join("..", "..", "build", "integration-tests"))
 	logger := logptest.NewFileLogger(
 		t,
 		tempDir,
 	)
-
 	return &inputTestingEnvironment{
 		testLogger: logger,
 		t:          t,
 		workingDir: tempDir,
->>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 		stateStore: openTestStatestore(),
 		pipeline:   &mockPipelineConnector{},
 		monitoring: beat.NewMonitoring(),
 	}
 }
 
-func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{}) v2.Input {
+func (e *inputTestingEnvironment) mustCreateInput(config map[string]any) v2.Input {
 	e.t.Helper()
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
@@ -126,7 +99,7 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 	return inp
 }
 
-func (e *inputTestingEnvironment) createInput(config map[string]interface{}) (v2.Input, error) {
+func (e *inputTestingEnvironment) createInput(config map[string]any) (v2.Input, error) {
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
 	_ = manager.Init(&e.grp)
@@ -141,11 +114,7 @@ func (e *inputTestingEnvironment) createInput(config map[string]interface{}) (v2
 
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	e.pluginInitOnce.Do(func() {
-<<<<<<< HEAD
-		e.plugin = Plugin(logp.L(), e.stateStore)
-=======
 		e.plugin = Plugin(e.testLogger.Logger, e.stateStore)
->>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 	})
 	return e.plugin.Manager
 }
@@ -169,11 +138,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 			Cancelation:     ctx,
 			StatusReporter:  nil,
 			MetricsRegistry: reg,
-<<<<<<< HEAD
-			Logger:          logp.L(),
-=======
 			Logger:          e.testLogger.Named("input.filestream"),
->>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 		}
 		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
@@ -546,6 +511,7 @@ func (e *inputTestingEnvironment) getOutputMessages() []string {
 	messages := make([]string, 0)
 	for _, c := range e.pipeline.clients {
 		for _, evt := range c.GetEvents() {
+			//nolint:errcheck // It's a test, we can force the type cast
 			messages = append(messages, evt.Fields["message"].(string))
 		}
 	}
@@ -735,7 +701,7 @@ func newMockACKHandler(starter context.Context, blocking bool, config beat.Clien
 }
 
 func blockingACKer(starter context.Context) beat.EventListener {
-	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
+	return acker.EventPrivateReporter(func(acked int, private []any) {
 		for starter.Err() == nil {
 		}
 	})

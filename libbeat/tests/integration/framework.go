@@ -36,6 +36,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"slices"
 	"strconv"
 	"strings"
@@ -876,44 +877,6 @@ func (b *BeatProc) Stdin() io.WriteCloser {
 	return b.stdin
 }
 
-func GetESURL(t *testing.T, scheme string) url.URL {
-	t.Helper()
-
-	esHost := os.Getenv("ES_HOST")
-	if esHost == "" {
-		esHost = "localhost"
-	}
-
-	esPort := os.Getenv("ES_PORT")
-	if esPort == "" {
-		switch scheme {
-		case "http":
-			esPort = "9200"
-		case "https":
-			esPort = "9201"
-		default:
-			t.Fatalf("could not determine port from env variable: ES_PORT=%s", esPort)
-		}
-	}
-
-	user := os.Getenv("ES_USER")
-	if user == "" {
-		user = "admin"
-	}
-
-	pass := os.Getenv("ES_PASS")
-	if pass == "" {
-		pass = "testing"
-	}
-
-	esURL := url.URL{
-		Scheme: scheme,
-		Host:   fmt.Sprintf("%s:%s", esHost, esPort),
-		User:   url.UserPassword(user, pass),
-	}
-	return esURL
-}
-
 func GetKibana(t *testing.T) (url.URL, *url.Userinfo) {
 	t.Helper()
 
@@ -1215,4 +1178,106 @@ func GetEventsFromFileOutput[E any](b *BeatProc, n int, waitForFile bool) []E {
 	}
 
 	return events
+}
+
+// GetESURL Returns the ES URL with username and password set,
+// it uses ES_USER and ES_PASS that on our mage automation defaults
+// to user 'beats' and pass 'testing'. This user/role has limited
+// privileges, it cannot create arbitrary indexes.
+func GetESURL(t *testing.T, scheme string) url.URL {
+	return getESURL(t, scheme, "ES_USER", "ES_PASS")
+}
+
+// GetESURL Returns the ES URL with admin username and password set,
+// it uses ES_SUPERUSER_USER and ES_SUPERUSER_PASS that on our mage
+// automation defaults to user 'admin' and pass 'testing'.
+func GetESAdminURL(t *testing.T, scheme string) url.URL {
+	return getESURL(t, scheme, "ES_SUPERUSER_USER", "ES_SUPERUSER_PASS")
+}
+
+func getESURL(t *testing.T, scheme string, userEnvVar, passEnvVar string) url.URL {
+	t.Helper()
+
+	esHost := os.Getenv("ES_HOST")
+	if esHost == "" {
+		esHost = "localhost"
+	}
+
+	esPort := os.Getenv("ES_PORT")
+	if esPort == "" {
+		switch scheme {
+		case "http":
+			esPort = "9200"
+		case "https":
+			esPort = "9201"
+		default:
+			t.Fatalf("could not determine port from env variable: ES_PORT=%s", esPort)
+		}
+	}
+
+	user := os.Getenv(userEnvVar)
+	if user == "" {
+		user = "admin"
+	}
+
+	pass := os.Getenv(passEnvVar)
+	if pass == "" {
+		pass = "testing"
+	}
+
+	esURL := url.URL{
+		Scheme: scheme,
+		Host:   fmt.Sprintf("%s:%s", esHost, esPort),
+		User:   url.UserPassword(user, pass),
+	}
+	return esURL
+}
+
+// CreateTempDir creates a temporary directory that will be
+// removed after the tests passes. The temporary directory is
+// created on rootDir. If rootDir is empty, then os.TempDir() is used.
+//
+// If the test fails, the temporary directory is not removed.
+//
+// If the tests are run with -v, the temporary directory will
+// be logged.
+func CreateTempDir(t *testing.T, rootDir string) string {
+	if rootDir == "" {
+		rootDir = os.TempDir()
+	}
+
+	rootDir, err := filepath.Abs(rootDir)
+	if err != nil {
+		t.Fatalf("cannot get abs path of root dir: %s", err)
+	}
+	if err := os.MkdirAll(rootDir, 0o750); err != nil {
+		t.Fatalf("error making test dir: %s: %s", rootDir, err)
+	}
+	tempDir, err := os.MkdirTemp(rootDir, strings.ReplaceAll(t.Name(), "/", "-"))
+	if err != nil {
+		t.Fatalf("failed to make temp directory: %s", err)
+	}
+
+	cleanup := func() {
+		if !t.Failed() {
+			if err := os.RemoveAll(tempDir); err != nil {
+				// Ungly workaround Windows limitations
+				// Windows does not support the Interrup signal, so it might
+				// happen that Filebeat is still running, keeping it's registry
+				// file open, thus preventing the temporary folder from being
+				// removed. So we log the error and move on without failing the
+				// test
+				if runtime.GOOS == "windows" {
+					t.Logf("[WARN] Could not remove temporatry directory '%s': %s", tempDir, err)
+				} else {
+					t.Errorf("could not remove temp dir '%s': %s", tempDir, err)
+				}
+			}
+		} else {
+			t.Logf("Temporary directory saved: %s", tempDir)
+		}
+	}
+	t.Cleanup(cleanup)
+
+	return tempDir
 }
