@@ -405,6 +405,14 @@ func Test_formatTimeWithTagFormat(t *testing.T) {
 			wantErr:    false,
 		},
 		{
+			name:       "Zero unix timestamp with UseNumbersZeroValues flag",
+			fieldValue: reflect.ValueOf(time.Time{}),
+			flag:       EncodingFlagUseNumbersZeroValues,
+			tag:        tagPtr(`format:"unix"`),
+			want:       "0",
+			wantErr:    false,
+		},
+		{
 			name:       "With timezone Asia/Tokyo",
 			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
 			flag:       0,
