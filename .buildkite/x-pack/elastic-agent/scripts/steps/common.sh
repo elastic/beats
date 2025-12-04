@@ -11,7 +11,7 @@ if [[ -z "${SETUP_MAGE_VERSION-""}" ]]; then
     SETUP_MAGE_VERSION="1.14.0"
 fi
 if [[ -z "${SETUP_GVM_VERSION-""}" ]]; then
-    SETUP_GVM_VERSION="v0.5.2"
+    SETUP_GVM_VERSION="v0.6.0" # https://github.com/andrewkroh/gvm/issues/44#issuecomment-1013231151
 fi
 
 if [[ -z "${GO_VERSION-""}" ]]; then
