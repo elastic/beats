@@ -66,4 +66,4 @@
       fields:
         - name: id
           type: keyword
-          description: id of resource pool associated with the cluster.
+          description: ID of resource pool associated with the cluster.
