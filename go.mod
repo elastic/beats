@@ -232,13 +232,13 @@ require (
 
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
+	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/gorilla/mux v1.8.1
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/mitchellh/gox v1.0.1
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/otiai10/copy v1.14.1
-<<<<<<< HEAD
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
 	go.opentelemetry.io/collector/client v1.45.0
 	go.opentelemetry.io/collector/component/componenttest v0.139.0
@@ -254,30 +254,13 @@ require (
 	go.opentelemetry.io/collector/extension/extensiontest v0.139.0
 	go.opentelemetry.io/collector/processor v1.45.0
 	go.opentelemetry.io/collector/processor/processorhelper v0.139.0
-=======
-	go.opentelemetry.io/collector/client v1.41.0
-	go.opentelemetry.io/collector/component/componenttest v0.135.0
-	go.opentelemetry.io/collector/consumer/consumertest v0.135.0
-	go.opentelemetry.io/collector/pipeline v1.41.0
-	go.opentelemetry.io/collector/processor/processorhelper v0.135.0
-	go.opentelemetry.io/collector/receiver/receivertest v0.135.0
-)
-
-require (
-	github.com/brianvoe/gofakeit v3.18.0+incompatible
-	go.opentelemetry.io/collector/config/configauth v0.135.0
-	go.opentelemetry.io/collector/config/confighttp v0.135.0
-	go.opentelemetry.io/collector/config/configoptional v0.135.0
-	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.41.0
-	go.opentelemetry.io/collector/extension v1.41.0
-	go.opentelemetry.io/collector/extension/extensionauth v1.41.0
-	go.opentelemetry.io/collector/processor v1.41.0
->>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 	go.opentelemetry.io/otel/sdk/metric v1.38.0
 	go.uber.org/goleak v1.3.0
+	sigs.k8s.io/kind v0.30.0
 )
 
 require (
+	al.essio.dev/pkg/shellescape v1.5.1 // indirect
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.24.0 // indirect
 	cloud.google.com/go/auth v0.16.5 // indirect
@@ -298,6 +281,7 @@ require (
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.6.0 // indirect
+	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.29.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.51.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.51.0 // indirect
@@ -347,6 +331,7 @@ require (
 	github.com/emicklei/go-restful/v3 v3.12.2 // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.35.0 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.2.1 // indirect
+	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
 	github.com/fearful-symmetry/gomsr v0.0.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/foxboron/go-tpm-keyfiles v0.0.0-20250903184740-5d135037bd4d // indirect
@@ -430,6 +415,7 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/otiai10/mint v1.6.3 // indirect
+	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect

@@ -36,19 +36,11 @@ import (
 // sourceStore is a store which can access resources using the Source
 // from an input.
 type sourceStore struct {
-<<<<<<< HEAD
-	identifier *sourceIdentifier
-	store      *store
-=======
 	// identifier is the sourceIdentifier used to generate IDs fro this store.
 	identifier *SourceIdentifier
-	// identifiersToTakeOver are sourceIdentifier from previous input instances
-	// that this sourceStore will take states over.
-	identifiersToTakeOver []*SourceIdentifier
 	// store is the underlying store that encapsulates
 	// the in-memory and persistent store.
 	store *store
->>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 }
 
 // store encapsulates the persistent store and the in memory state store, that
@@ -174,21 +166,10 @@ func openStore(log *logp.Logger, statestore statestore.States, prefix string) (*
 	}, nil
 }
 
-<<<<<<< HEAD
-func newSourceStore(s *store, identifier *sourceIdentifier) *sourceStore {
-=======
 // newSourceStore store returns a souceStore that will operate on the provided
 // store. identifier is required and is used to generate the ID for the
-// resources stored on store. identifiersToTakeOver is used by the TakeOver
-// method when taking over states from other Filestream inputs.
-// identifiersToTakeOver is optional and can be nil.
-func newSourceStore(
-	s *store,
-	identifier *SourceIdentifier,
-	identifiersToTakeOver []*SourceIdentifier,
-) *sourceStore {
-
->>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
+// resources stored on store.
+func newSourceStore(s *store, identifier *SourceIdentifier) *sourceStore {
 	return &sourceStore{
 		store:      s,
 		identifier: identifier,

@@ -207,25 +207,9 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		return nil, errNoInputRunner
 	}
 
-<<<<<<< HEAD
-	sourceIdentifier, err := newSourceIdentifier(cim.Type, settings.ID)
+	sourceIdentifier, err := NewSourceIdentifier(cim.Type, settings.ID)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating source identifier for input: %w", err)
-=======
-	var previousSrcIdentifiers []*SourceIdentifier
-	if settings.TakeOver.Enabled {
-		for _, id := range settings.TakeOver.FromIDs {
-			si, err := NewSourceIdentifier(cim.Type, id)
-			if err != nil {
-				return nil,
-					fmt.Errorf(
-						"[ID: %q] error while creating source identifier for previous ID %q: %w",
-						settings.ID, id, err)
-			}
-
-			previousSrcIdentifiers = append(previousSrcIdentifiers, si)
-		}
->>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 	}
 
 	pStore := cim.getRetainedStore()

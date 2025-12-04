@@ -94,13 +94,7 @@ func configure(
 		return nil, nil, err
 	}
 
-<<<<<<< HEAD
-	prospector, err := newProspector(config, log)
-=======
-	config.TakeOver.LogWarnings(log)
-
 	prospector, err := newProspector(config, log, src)
->>>>>>> 36109da43 ([9.1](backport #47247) [Filebeat/Filestream] Fix missing last few lines of a file (#47749))
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
