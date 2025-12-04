@@ -25,7 +25,7 @@ import (
 	"github.com/go-ldap/ldap/v3"
 )
 
-// bindWithCurrentUser is a no-op on non-Windows platforms.
-func (*ldapClient) bindWithCurrentUser(*ldap.Conn) error {
-	return errors.New("Windows SSPI authentication is only available on Windows")
+// TODO: implement automatic authentication for other platforms using kerberos
+func (*ldapClient) bindPlatformSpecific(*ldap.Conn, string) error {
+	return errors.New("unsupported platform for automatic authentication")
 }

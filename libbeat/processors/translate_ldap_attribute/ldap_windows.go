@@ -21,44 +21,25 @@ package translate_ldap_attribute
 
 import (
 	"fmt"
-	"net/url"
-	"strings"
 
 	"github.com/go-ldap/ldap/v3"
 	"github.com/go-ldap/ldap/v3/gssapi"
 )
 
-// bindWithCurrentUser performs GSSAPI bind using the current Windows user's credentials via SSPI.
-func (client *ldapClient) bindWithCurrentUser(conn *ldap.Conn) error {
-	client.log.Info("using Windows SSPI authentication with current user credentials")
+func (client *ldapClient) bindPlatformSpecific(conn *ldap.Conn, spn string) error {
+	client.log.Info("Attempting Windows SSPI Bind")
 
-	// Create SSPI client using current process credentials
 	sspiClient, err := gssapi.NewSSPIClient()
 	if err != nil {
 		return fmt.Errorf("failed to create SSPI client: %w", err)
 	}
-	defer sspiClient.Close()
+	defer sspiClient.DeleteSecContext()
 
-	// Extract hostname from LDAP address for SPN
-	parsedURL, err := url.Parse(client.address)
+	err = conn.GSSAPIBind(sspiClient, spn, "")
 	if err != nil {
-		return fmt.Errorf("failed to parse LDAP address: %w", err)
-	}
-	hostname := parsedURL.Hostname()
-	if hostname == "" {
-		return fmt.Errorf("could not extract hostname from address: %s", client.address)
+		return fmt.Errorf("SSPI bind failed: %w", err)
 	}
 
-	// Service Principal Name format: ldap/<hostname>
-	servicePrincipal := fmt.Sprintf("ldap/%s", strings.ToLower(hostname))
-	client.log.Debugw("performing GSSAPI bind", "spn", servicePrincipal)
-
-	// Perform GSSAPI bind
-	err = conn.GSSAPIBind(sspiClient, servicePrincipal, "")
-	if err != nil {
-		return fmt.Errorf("GSSAPI bind failed: %w", err)
-	}
-
-	client.log.Info("GSSAPI bind successful")
+	client.log.Info("Windows SSPI Bind Successful")
 	return nil
 }

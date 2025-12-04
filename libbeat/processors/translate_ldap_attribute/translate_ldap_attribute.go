@@ -126,7 +126,7 @@ func newClient(c config, log *logp.Logger) (*ldapClient, error) {
 		}
 
 		// Successfully connected and initialized
-		log.Infow("successfully connected to LDAP server", "address", address, "base_dn", client.baseDN, "is_ad", client.isActiveDirectory)
+		log.Infow("successfully connected to LDAP server", "address", address, "base_dn", client.baseDN)
 		return client, nil
 	}
 

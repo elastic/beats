@@ -24,9 +24,9 @@ processors:
       field: winlog.event_data.ObjectGuid
       ignore_missing: true
       ignore_failure: true
-      # ldap_domain: "example.com"  # Optional - override auto-discovered domain for DNS SRV queries
-      # ldap_address: "ldap://ds.example.com:389"  # Optional - resolve via DNS SRV/LOGONSERVER when omitted
-      # ldap_base_dn: "dc=example,dc=com"  # Optional - discovered via rootDSE or inferred from server domain
+      # ldap_domain: "example.com"  # Optional - override the OS-discovered domain used for SRV/LOGONSERVER hints
+      # ldap_address: "ldap://ds.example.com:389"  # Optional - Beats discovers controllers when omitted
+      # ldap_base_dn: "dc=example,dc=com"  # Optional - otherwise rootDSE and hostname inference are used
 ```
 
 The `translate_ldap_attribute` processor has the following configuration settings:
@@ -35,11 +35,11 @@ The `translate_ldap_attribute` processor has the following configuration setting
 | --- | --- | --- | --- |
 | `field` | yes |  | Source field containing a GUID. |
 | `target_field` | no |  | Target field for the mapped attribute value. If not set it will be replaced in place. |
-| `ldap_domain` | no |  | DNS domain name for DNS SRV lookups (e.g., `example.com`). When omitted, the domain is auto-discovered from the `USERDNSDOMAIN` environment variable (Windows) or the hostname's domain suffix. This setting is used only when `ldap_address` is not provided. |
-| `ldap_address` | no |  | LDAP server address (eg: `ldap://ds.example.com:389`). If not provided, auto-discovery will be attempted via DNS SRV records and, on Windows, the LOGONSERVER environment variable. |
-| `ldap_base_dn` | no |  | LDAP base DN (eg: `dc=example,dc=com`). If not provided, auto-discovery will be attempted via rootDSE query or inferred from the server domain. |
-| `ldap_bind_user` | no |  | LDAP user. If both `ldap_bind_user` and `ldap_bind_password` are omitted, the processor will attempt Windows SSPI authentication (on Windows) using the current process user's credentials, or fall back to an unauthenticated bind. |
-| `ldap_bind_password` | no |  | LDAP password. If both `ldap_bind_user` and `ldap_bind_password` are omitted, the processor will attempt Windows SSPI authentication (on Windows) using the current process user's credentials, or fall back to an unauthenticated bind. |
+| `ldap_domain` | no |  | DNS domain name (e.g., `example.com`) used for DNS SRV discovery and to construct FQDNs from `LOGONSERVER`. When omitted Beats inspects OS metadata to infer the domain (Windows: `USERDNSDOMAIN`, `GetComputerNameEx`, TCP/IP + Kerberos registry keys, hostname; Linux/macOS: `/etc/resolv.conf`, `/etc/krb5.conf`, hostname). |
+| `ldap_address` | no |  | LDAP server address (e.g., `ldap://ds.example.com:389`). When omitted Beats auto-discovers controllers by querying `_ldaps._tcp.<domain>` first, `_ldap._tcp.<domain>` second, and finally the Windows `LOGONSERVER` variable if available. Candidates are tried in order until one succeeds. |
+| `ldap_base_dn` | no |  | LDAP base DN (e.g., `dc=example,dc=com`). When omitted Beats queries the server's rootDSE for `defaultNamingContext`/`namingContexts`. If the controller does not expose those attributes, client initialization fails and you must configure the value manually. |
+| `ldap_bind_user` | no |  | LDAP DN/UPN for simple bind. When provided with `ldap_bind_password` Beats performs a standard bind. When set without a password Beats issues an unauthenticated bind using this identity (useful for servers that expect a bind DN even for anonymous operations). |
+| `ldap_bind_password` | no |  | LDAP password for simple bind. When both the username and password are omitted Beats attempts automatic authentication: on Windows it first tries SSPI with the Beat's service or user identity using the SPN `ldap/<hostname derived from ldap_address>` and falls back to an unauthenticated bind if that fails. Non-Windows platforms immediately use an unauthenticated bind. |
 | `ldap_search_attribute` | yes | `objectGUID` | LDAP attribute to search by. |
 | `ldap_mapped_attribute` | yes | `cn` | LDAP attribute to map to. |
 | `ldap_search_time_limit` | no | 30 | LDAP search time limit in seconds. |
@@ -48,25 +48,27 @@ The `translate_ldap_attribute` processor has the following configuration setting
 | `ignore_missing` | no | false | Ignore errors when the source field is missing. |
 | `ignore_failure` | no | false | Ignore all errors produced by the processor. |
 
+## Authentication flow
+
+Beats attempts LDAP authentication in the following order:
+
+1. Simple bind using `ldap_bind_user` + `ldap_bind_password` when both are supplied.
+2. Automatic bind when both values are empty. On Windows Beats creates an SSPI (Kerberos/NTLM) client for the SPN `ldap/<hostname derived from ldap_address>`, which works for Local System, domain-joined services, and gMSA accounts. Other platforms do not yet implement automatic authentication.
+3. If automatic authentication is unavailable or fails, Beats issues an unauthenticated bind. When `ldap_bind_user` is set without a password that identity is used; otherwise Beats binds anonymously.
+
+Always prefer specifying `ldap_address` as an FQDN (for example `ldap://dc1.example.com:389`) so the SPN built for SSPI matches the controller's service principal and TLS certificates.
+
 ## Server auto-discovery
 
-When `ldap_address` is omitted the processor attempts to discover controllers in the following order:
+When `ldap_address` is omitted Beats resolves controllers dynamically:
 
-1. DNS SRV lookups for `_ldaps._tcp` (preferred) and `_ldap._tcp` using the system's native DNS resolver. The processor queries multiple patterns:
-  - `_ldap._tcp.dc._msdcs.<domain>` (Active Directory domain controllers)
-  - `_ldap._tcp.<domain>` (standard domain lookup)
-  - If no domain is available, bare queries like `_ldap._tcp` which automatically use the system's DNS search suffix configuration (works on Windows, Linux, and macOS)
+1. **Domain discovery.** Beats determines the DNS domain from `ldap_domain` (if set) or OS metadata. Windows checks `USERDNSDOMAIN`, `GetComputerNameEx`, the TCP/IP and Kerberos registry keys, and the machine's FQDN. Linux/macOS read `/etc/resolv.conf`, `/etc/krb5.conf`, and the hostname suffix. If no domain is available SRV lookups are skipped.
+2. **DNS SRV queries.** When a domain is known Beats queries `_ldaps._tcp.<domain>` first and `_ldap._tcp.<domain>` second using the system resolver. Results are sorted by priority/weight per RFC 2782 and converted to `ldaps://host:port` or `ldap://host:port` URLs.
+3. **Windows LOGONSERVER fallback.** If SRV queries return no controllers or no domain was discovered, Beats reads the `LOGONSERVER` environment variable. When a domain is known the NetBIOS name is combined with it to build an FQDN so TLS validation and SSPI SPNs remain valid.
 
-  The domain used for DNS SRV lookups is determined from:
-  - The `ldap_domain` configuration option (highest priority)
-  - Operating-system domain metadata (for example session environment values or Windows domain-join settings)
-  - The host's fully qualified name when available
-  - Reverse DNS lookup of the local machine as a last resort
+Each candidate address is attempted in order (LDAPS before LDAP) until a connection and bind succeed.
 
-  **Note:** The processor uses Go's standard library `net.LookupSRV()` which leverages the operating system's native DNS resolver. On Windows, this automatically reads DNS servers and search suffixes from the Windows registry, making autodiscovery work correctly even when running as a service without environment variables. SRV records are automatically ordered by priority with weight-based randomization per RFC 2782 to distribute load across available servers.
-2. On Windows, the `LOGONSERVER` environment variable. The processor keeps the hostname for TLS validation and may also try the resolved IP as a fallback.
-
-Each candidate server is tried sequentially until one responds. Likewise, if `ldap_base_dn` is not supplied the client queries the server's rootDSE for `defaultNamingContext`/`namingContexts`, and if that fails, infers the DN from the server's domain name (for example `dc=example,dc=com`).
+When `ldap_base_dn` is empty the client queries the controller's rootDSE for `defaultNamingContext` or the first non-system `namingContexts` entry. If neither is present Beats cannot continue and you must provide `ldap_base_dn` explicitly.
 
 If the searches are slow or you expect a high amount of different key attributes to be found, consider using a cache processor to speed processing:
 

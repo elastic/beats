@@ -22,7 +22,7 @@ package translate_ldap_attribute
 import (
 	"crypto/tls"
 	"fmt"
-	"net"
+	"net/url"
 	"strings"
 	"sync"
 
@@ -37,9 +37,6 @@ type ldapClient struct {
 
 	mu   sync.Mutex
 	conn *ldap.Conn
-
-	// Server metadata
-	isActiveDirectory bool
 
 	log *logp.Logger
 }
@@ -68,18 +65,89 @@ func newLDAPClient(config *ldapConfig, log *logp.Logger) (*ldapClient, error) {
 	}
 	client.conn = conn
 
-	// Discover base DN if not provided and detect AD
-	if err := client.initializeMetadata(); err != nil {
-		client.close()
-		return nil, fmt.Errorf("failed to initialize server metadata: %w", err)
+	if client.baseDN == "" {
+		// Discover base DN if not provided
+		baseDN, err := client.getBaseDN()
+		if err != nil {
+			client.close()
+			return nil, fmt.Errorf("failed to discover base DN: %w", err)
+		}
+		client.baseDN = baseDN
 	}
 
 	return client, nil
 }
 
-// initializeMetadata discovers base DN (if needed) and detects server type
+// dial establishes a new connection to the LDAP server.
+// It handles the upgrade to StartTLS if the scheme is ldap:// and a TLS config is present.
+func (client *ldapClient) dial() (*ldap.Conn, error) {
+	client.log.Debugw("ldap client connecting")
 
-func (client *ldapClient) initializeMetadata() error {
+	// Connect with or without TLS based on configuration
+	var opts []ldap.DialOpt
+	if client.tlsConfig != nil {
+		opts = append(opts, ldap.DialWithTLSConfig(client.tlsConfig))
+	}
+
+	// ldap.DialURL handles parsing ldap:// vs ldaps://
+	conn, err := ldap.DialURL(client.address, opts...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to dial LDAP server: %w", err)
+	}
+
+	// Explicitly handle StartTLS upgrade.
+	// DialURL connects to 389 for "ldap://" but does not upgrade automatically.
+	// We must do this before binding credentials.
+	if strings.HasPrefix(client.address, "ldap://") && client.tlsConfig != nil {
+		if err := conn.StartTLS(client.tlsConfig); err != nil {
+			conn.Close()
+			return nil, fmt.Errorf("failed to upgrade connection to StartTLS: %w", err)
+		}
+		client.log.Debug("connection upgraded to StartTLS")
+	}
+
+	switch {
+	case client.password != "":
+		client.log.Debugw("ldap client bind with provided credentials")
+		if err = conn.Bind(client.username, client.password); err == nil {
+			return conn, nil
+		} else {
+			client.log.Debugw("ldap client bind with provided credentials failed", "error", err)
+		}
+	case client.username == "" && client.password == "":
+		client.log.Debugw("trying automatic ldap client bind")
+		if err = client.bindAuto(conn); err == nil {
+			return conn, nil
+		} else {
+			client.log.Debugw("automatic ldap client bind failed", "error", err)
+		}
+	}
+
+	client.log.Debugw("trying ldap client unauthenticated bind")
+	if err = conn.UnauthenticatedBind(client.username); err != nil {
+		conn.Close()
+		return nil, fmt.Errorf("failed to bind to LDAP server: %w", err)
+	}
+	return conn, nil
+}
+
+// bindAuto attempts to authenticate using the best available platform-specific method.
+// On Windows: SSPI (Current User)
+// On Linux: Kerberos Cache (Current User)
+func (client *ldapClient) bindAuto(conn *ldap.Conn) error {
+	// Parse hostname for SPN (Service Principal Name)
+	// SPN Format: ldap/server.example.com
+	parsedURL, err := url.Parse(client.address)
+	if err != nil {
+		return fmt.Errorf("failed to parse LDAP address: %w", err)
+	}
+	// Canonicalize the SPN (Active Directory expects this format)
+	spn := fmt.Sprintf("ldap/%s", strings.ToLower(parsedURL.Hostname()))
+	return client.bindPlatformSpecific(conn, spn)
+}
+
+// initializeMetadata discovers base DN (if needed) and detects server type
+func (client *ldapClient) getBaseDN() (string, error) {
 	client.log.Debug("querying rootDSE for server metadata")
 
 	// Query rootDSE with relevant attributes
@@ -94,11 +162,6 @@ func (client *ldapClient) initializeMetadata() error {
 		[]string{
 			"defaultNamingContext",
 			"namingContexts",
-			"rootDomainNamingContext",    // AD-specific
-			"configurationNamingContext", // AD-specific
-			"schemaNamingContext",        // AD-specific
-			"vendorName",
-			"vendorVersion",
 		},
 		nil,
 	)
@@ -110,219 +173,47 @@ func (client *ldapClient) initializeMetadata() error {
 		return searchErr
 	})
 	if err != nil {
-		client.log.Debugw("rootDSE query failed", "error", err)
-		// If baseDN is already set, treat rootDSE failure as non-fatal
-		if client.baseDN != "" {
-			return nil
-		}
-		return client.inferBaseDNFromAddress()
+		return "", fmt.Errorf("rootDSE query failed: %w", err)
 	}
 
 	if len(result.Entries) == 0 {
-		client.log.Debug("rootDSE query returned no entries")
-		if client.baseDN != "" {
-			return nil
-		}
-		return client.inferBaseDNFromAddress()
+		return "", fmt.Errorf("no entries returned from rootDSE")
 	}
 
 	entry := result.Entries[0]
 
-	// Detect Active Directory
-	// AD has rootDomainNamingContext, configurationNamingContext, and defaultNamingContext
-	hasRootDomain := len(entry.GetAttributeValues("rootDomainNamingContext")) > 0
-	hasConfigContext := len(entry.GetAttributeValues("configurationNamingContext")) > 0
-	hasDefaultContext := len(entry.GetAttributeValues("defaultNamingContext")) > 0
-
-	client.isActiveDirectory = hasRootDomain && hasConfigContext && hasDefaultContext
-
-	if client.isActiveDirectory {
-		client.log.Info("detected Active Directory server")
-	} else {
-		vendorName := ""
-		if values := entry.GetAttributeValues("vendorName"); len(values) > 0 {
-			vendorName = values[0]
-		}
-		client.log.Infow("detected LDAP server", "vendor", vendorName)
-	}
-
-	if client.baseDN != "" {
-		return nil
-	}
-
-	// Prefer defaultNamingContext (Active Directory)
+	// 1. Prefer defaultNamingContext (Active Directory standard)
 	if values := entry.GetAttributeValues("defaultNamingContext"); len(values) > 0 {
-		client.baseDN = values[0]
-		client.log.Infow("discovered base DN via defaultNamingContext", "base_dn", client.baseDN)
-		return nil
+		client.log.Infow("discovered base DN via defaultNamingContext", "base_dn", values[0])
+		return values[0], nil
 	}
 
-	// Fallback to first namingContext
+	// 2. Fallback to namingContexts (OpenLDAP / Standard)
+	// We must filter out system contexts like cn=config, cn=schema, etc.
 	if values := entry.GetAttributeValues("namingContexts"); len(values) > 0 {
-		client.baseDN = values[0]
-		client.log.Infow("discovered base DN via namingContexts", "base_dn", client.baseDN)
-		return nil
-	}
+		for _, v := range values {
+			lowerV := strings.ToLower(v)
+			// Skip common system contexts
+			if strings.HasPrefix(lowerV, "cn=config") ||
+				strings.HasPrefix(lowerV, "cn=schema") ||
+				strings.HasPrefix(lowerV, "cn=monitor") ||
+				strings.HasPrefix(lowerV, "cn=subschema") {
+				continue
+			}
 
-	return client.inferBaseDNFromAddress()
-}
-
-// inferBaseDNFromAddress infers base DN from the server address
-func (client *ldapClient) inferBaseDNFromAddress() error {
-	client.log.Debugw("attempting to infer base DN from server address", "address", client.address)
-
-	addr := client.address
-	lowerAddr := strings.ToLower(addr)
-	switch {
-	case strings.HasPrefix(lowerAddr, "ldap://"):
-		addr = addr[len("ldap://"):]
-	case strings.HasPrefix(lowerAddr, "ldaps://"):
-		addr = addr[len("ldaps://"):]
-	}
-
-	var hostname string
-	h, _, err := net.SplitHostPort(addr)
-	if err != nil {
-		hostname = addr
-		if strings.Contains(hostname, ":") {
-			return fmt.Errorf("unable to parse hostname from address: %s", client.address)
+			// We return the first "reasonable" context we find.
+			// Usually, this will be the main data partition (e.g., dc=example,dc=com)
+			client.log.Infow("discovered base DN via namingContexts", "base_dn", v)
+			return v, nil
 		}
-	} else {
-		hostname = h
+
+		// If we iterated everything and only found system contexts (unlikely for a user DB),
+		// we default to the first one but log a warning.
+		client.log.Warnw("only system contexts found in namingContexts, defaulting to first value", "base_dn", values[0])
+		return values[0], nil
 	}
 
-	hostname = strings.TrimSuffix(hostname, ".")
-	hostname = strings.ToLower(hostname)
-
-	if hostname == "" {
-		return fmt.Errorf("unable to extract hostname from address: %s", client.address)
-	}
-
-	if net.ParseIP(hostname) != nil {
-		return fmt.Errorf("cannot infer base DN from IP address: %s", hostname)
-	}
-
-	parts := strings.Split(hostname, ".")
-	if len(parts) < 2 {
-		return fmt.Errorf("hostname does not contain a domain: %s", hostname)
-	}
-
-	var candidates [][]string
-	seen := make(map[string]struct{})
-	addCandidate := func(parts []string) {
-		if len(parts) < 2 {
-			return
-		}
-		domain := strings.Join(parts, ".")
-		if _, ok := seen[domain]; ok {
-			return
-		}
-		seen[domain] = struct{}{}
-		candidates = append(candidates, append([]string(nil), parts...))
-	}
-
-	for i := 1; i < len(parts); i++ {
-		addCandidate(parts[i:])
-	}
-	addCandidate(parts[len(parts)-2:])
-
-	if len(candidates) == 0 {
-		addCandidate(parts)
-	}
-
-	validate := client.conn != nil
-	var fallbackDN string
-	for _, candidate := range candidates {
-		dn := domainPartsToDN(candidate)
-		if fallbackDN == "" {
-			fallbackDN = dn
-		}
-		if !validate {
-			continue
-		}
-		if err := client.validateBaseDN(dn); err != nil {
-			client.log.Debugw("base DN candidate validation failed", "candidate", dn, "error", err)
-			continue
-		}
-		client.baseDN = dn
-		client.log.Infow("inferred base DN from server domain", "base_dn", client.baseDN, "validated", true)
-		return nil
-	}
-
-	if fallbackDN != "" {
-		client.baseDN = fallbackDN
-		client.log.Infow("inferred base DN from server domain", "base_dn", client.baseDN, "validated", false)
-		return nil
-	}
-
-	return fmt.Errorf("unable to infer base DN from address: %s", client.address)
-}
-
-func domainPartsToDN(parts []string) string {
-	dnParts := make([]string, 0, len(parts))
-	for _, part := range parts {
-		dnParts = append(dnParts, fmt.Sprintf("dc=%s", part))
-	}
-	return strings.Join(dnParts, ",")
-}
-
-func (client *ldapClient) validateBaseDN(baseDN string) error {
-	return client.withLockedConnection(func(conn *ldap.Conn) error {
-		req := ldap.NewSearchRequest(
-			baseDN,
-			ldap.ScopeBaseObject,
-			ldap.NeverDerefAliases,
-			1,
-			client.searchTimeLimit,
-			false,
-			"(objectClass=*)",
-			[]string{"distinguishedName"},
-			nil,
-		)
-		_, err := conn.Search(req)
-		return err
-	})
-}
-
-// dial establishes a new connection to the LDAP server
-func (client *ldapClient) dial() (*ldap.Conn, error) {
-	client.log.Debugw("ldap client connecting")
-
-	// Connect with or without TLS based on configuration
-	var opts []ldap.DialOpt
-	if client.tlsConfig != nil {
-		opts = append(opts, ldap.DialWithTLSConfig(client.tlsConfig))
-	}
-	conn, err := ldap.DialURL(client.address, opts...)
-	if err != nil {
-		return nil, fmt.Errorf("failed to dial LDAP server: %w", err)
-	}
-
-	// Bind with appropriate method
-	switch {
-	case client.password != "":
-		// Explicit credentials provided
-		client.log.Debugw("ldap client bind with provided credentials")
-		err = conn.Bind(client.username, client.password)
-	case client.username == "" && client.password == "":
-		// No credentials: try Windows SSPI auth, fall back to unauthenticated
-		err = client.bindWithCurrentUser(conn)
-		if err != nil {
-			client.log.Debugw("Windows auth not available, falling back to unauthenticated bind", "error", err)
-			err = conn.UnauthenticatedBind("")
-		}
-	default:
-		// Username provided but no password: unauthenticated bind
-		client.log.Debugw("ldap client unauthenticated bind")
-		err = conn.UnauthenticatedBind(client.username)
-	}
-
-	if err != nil {
-		conn.Close()
-		return nil, fmt.Errorf("failed to bind to LDAP server: %w", err)
-	}
-
-	return conn, nil
+	return "", fmt.Errorf("base DN not found in rootDSE")
 }
 
 // connection checks the connection's health and reconnects if necessary
@@ -340,6 +231,11 @@ func (client *ldapClient) withLockedConnection(fn func(*ldap.Conn) error) error 
 
 func (client *ldapClient) ensureConnectedLocked() error {
 	if client.conn == nil || client.conn.IsClosing() {
+		// Ensure previous connection is fully closed
+		if client.conn != nil {
+			client.conn.Close()
+		}
+
 		conn, err := client.dial()
 		if err != nil {
 			return err
@@ -350,7 +246,6 @@ func (client *ldapClient) ensureConnectedLocked() error {
 }
 
 // findObjectBy searches for an object and returns its mapped values.
-
 func (client *ldapClient) findObjectBy(searchBy string) ([]string, error) {
 	var result *ldap.SearchResult
 	// Format the filter and perform the search

@@ -20,10 +20,57 @@
 package translate_ldap_attribute
 
 import (
-	"github.com/elastic/elastic-agent-libs/logp"
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
 )
 
-// discoverDomainFromRegistry is a no-op on non-Windows platforms.
-func discoverDomainFromRegistry(log *logp.Logger) string {
-	return ""
+// discoverDomain Chain: Resolv.conf -> Hostname -> Krb5.conf
+func discoverDomainInPlatform() (string, error) {
+	if d, err := getDomainResolv(); err == nil && d != "" {
+		return d, nil
+	}
+	if d, err := getDomainKrbConf(); err == nil && d != "" {
+		return d, nil
+	}
+	if d, err := getDomainHostname(); err == nil && d != "" {
+		return d, nil
+	}
+	return "", fmt.Errorf("domain discovery failed")
+}
+
+func getDomainResolv() (string, error) {
+	f, err := os.Open("/etc/resolv.conf")
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+	s := bufio.NewScanner(f)
+	for s.Scan() {
+		fields := strings.Fields(s.Text())
+		if len(fields) > 1 && (fields[0] == "search" || fields[0] == "domain") {
+			return fields[1], nil
+		}
+	}
+	return "", nil
+}
+
+func getDomainKrbConf() (string, error) {
+	f, err := os.Open("/etc/krb5.conf")
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+	s := bufio.NewScanner(f)
+	for s.Scan() {
+		line := strings.TrimSpace(s.Text())
+		if strings.HasPrefix(line, "default_realm") {
+			parts := strings.Split(line, "=")
+			if len(parts) == 2 {
+				return strings.ToLower(strings.TrimSpace(parts[1])), nil
+			}
+		}
+	}
+	return "", nil
 }
