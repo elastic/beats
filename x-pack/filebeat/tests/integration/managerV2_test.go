@@ -16,7 +16,6 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"path/filepath"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
