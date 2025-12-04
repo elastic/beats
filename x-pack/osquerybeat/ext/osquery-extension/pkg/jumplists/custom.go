@@ -25,6 +25,15 @@ func ParseCustomJumpListFile(filePath string, log *logger.Logger) (*JumpList, er
 	// Scan through the file looking for footer signatures, there may be multiple custom jump lists in the file
 	lnks := carveLnkFiles(fileBytes, log)
 
+	entries := make([]*JumpListEntry, 0)
+	for _, lnk := range lnks {
+		jumpListEntry := &JumpListEntry{
+			DestListEntry: nil,
+			Lnk:           lnk,
+		}
+		entries = append(entries, jumpListEntry)
+	}
+
 	// If the jumplist file is empty, return an error jlecmd does this as well
 	if len(lnks) == 0 {
 		return nil, fmt.Errorf("custom jumplist file %s is empty", filePath)
@@ -39,7 +48,7 @@ func ParseCustomJumpListFile(filePath string, log *logger.Logger) (*JumpList, er
 	}
 	customJumpList := &JumpList{
 		JumpListMeta: jumpListMeta,
-		lnks:         lnks,
+		entries:      entries,
 	}
 	return customJumpList, nil
 }

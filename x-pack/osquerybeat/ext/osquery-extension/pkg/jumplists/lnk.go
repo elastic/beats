@@ -82,12 +82,33 @@ func toTime(t []byte) time.Time {
 	return time.Unix(seconds, nanos)
 }
 
+func (l *Lnk) String() string {
+	sb := strings.Builder{}
+	sb.WriteString("Lnk{")
+	sb.WriteString(fmt.Sprintf("target_path: %s, ", l.TargetPath))
+	sb.WriteString(fmt.Sprintf("target_modified_time: %s, ", l.TargetModifiedTime.UTC().Format(time.RFC3339)))
+	sb.WriteString(fmt.Sprintf("target_accessed_time: %s, ", l.TargetAccessedTime.UTC().Format(time.RFC3339)))
+	sb.WriteString(fmt.Sprintf("target_created_time: %s, ", l.TargetCreatedTime.UTC().Format(time.RFC3339)))
+	sb.WriteString(fmt.Sprintf("volume_serial_number: %s, ", l.VolumeSerialNumber))
+	sb.WriteString(fmt.Sprintf("volume_type: %s, ", l.VolumeType))
+	sb.WriteString(fmt.Sprintf("volume_label: %s, ", l.VolumeLabel))
+	sb.WriteString(fmt.Sprintf("working_dir: %s, ", l.WorkingDir))
+	sb.WriteString(fmt.Sprintf("name_string: %s, ", l.NameString))
+	sb.WriteString(fmt.Sprintf("relative_path: %s, ", l.RelativePath))
+	sb.WriteString(fmt.Sprintf("command_line_arguments: %s}", l.CommandLineArguments))
+	return sb.String()
+}
+
+func IsLnkSignature(data []byte) bool {
+	return bytes.Equal(data[:len(LnkSignature)], LnkSignature)
+}
+
 func NewLnkFromBytes(data []byte, entryNumber int, log *logger.Logger) (*Lnk, error) {
 	if len(data) < len(LnkSignature) {
 		return nil, fmt.Errorf("data is too short to contain a LNK signature")
 	}
 
-	if !bytes.Equal(data[:len(LnkSignature)], LnkSignature) {
+	if !IsLnkSignature(data) {
 		return nil, fmt.Errorf("not a LNK file")
 	}
 

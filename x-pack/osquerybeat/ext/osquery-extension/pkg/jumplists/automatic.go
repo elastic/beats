@@ -8,53 +8,102 @@ package jumplists
 
 import (
 	"fmt"
+	"os"
+	"strings"
+	"io"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/olecfb"
+	"github.com/richardlehane/mscfb"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/resources"
 )
 
-type AutomaticJumpList struct {
-	appId resources.ApplicationId
-	olecfb *olecfb.Olecfb
-}
-
-func (a *AutomaticJumpList) Path() string {
-	return a.olecfb.Path
-}
-
-func (a *AutomaticJumpList) AppId() resources.ApplicationId {
-	return a.appId
-}
-
-func (a *AutomaticJumpList) Type() JumpListType {
-	return JumpListTypeAutomatic
-}
-
-func NewAutomaticJumpList(filePath string, log *logger.Logger) (*AutomaticJumpList, error) {
-	olecfb, err := olecfb.NewOlecfb(filePath, log)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse Olecfb: %w", err)
-	}
-	return &AutomaticJumpList{
-		appId: resources.GetAppIdFromFileName(filePath, log),
-		olecfb: olecfb,
-	}, nil
-}
-
-func GetAutomaticJumpLists(log *logger.Logger) ([]*AutomaticJumpList, error) {
-	files, err := FindJumplistFiles(JumpListTypeAutomatic, log)
+// ParseAutomaticJumpListFile parses an automatic jump list file into a JumpList object.
+// It returns a JumpList object and an error if the file cannot be read or parsed.
+func ParseAutomaticJumpListFile(filePath string, log *logger.Logger) (*JumpList, error) {
+	// Open the file
+	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
-	var jumpLists []*AutomaticJumpList
-	for _, file := range files {
-		jumpList, err := NewAutomaticJumpList(file, log)
+	defer file.Close()
+
+	// Parse the file as a Microsoft Compound File Binary (OLECFB)
+	doc, err := mscfb.New(file)
+	if err != nil {
+		return nil, err
+	}
+
+	streams := make(map[string][]byte)
+	// Iterate over the entries in the OLECFB
+	for entry, err := doc.Next(); err == nil; entry, err = doc.Next() {
+		streamName := strings.ToLower(entry.Name)
+		streams[streamName], err = io.ReadAll(entry)
 		if err != nil {
-			log.Errorf("failed to parse Automatic Jump List: %v", err)
+			return nil, fmt.Errorf("failed to read stream: %w", err)
+		}
+	}
+
+	// Parse the DestList stream
+	destListStream, ok := streams[strings.ToLower(DestListStreamName)]; if !ok {
+		return nil, fmt.Errorf("DestList stream not found")
+	}
+	destList, err := NewDestList(destListStream, log)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse DestList: %w", err)
+	}
+
+	entries := make([]*JumpListEntry, 0)
+	for _, entry := range destList.Entries {
+		jumpListEntry := &JumpListEntry{
+			DestListEntry: entry,
+			Lnk:           nil,
+		}
+
+		lnkStream, ok := streams[entry.StreamName]; if !ok {
+			fmt.Println("Stream not found: ", entry.StreamName)
 			continue
 		}
-		jumpLists = append(jumpLists, jumpList)
+
+		lnk, err := NewLnkFromBytes(lnkStream, int(entry.EntryNumber), log)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse LNK file: %w", err)
+		}
+
+		jumpListEntry.Lnk = lnk
+		entries = append(entries, jumpListEntry)
 	}
-	return jumpLists, nil
+
+	// Look up the application id and create the metadata
+	applicationId := NewApplicationIdFromFileName(filePath, log)
+	jumpListMeta := JumpListMeta{
+		ApplicationId: applicationId,
+		JumplistType:  JumpListTypeAutomatic,
+		Path:          filePath,
+	}
+	automaticJumpList := &JumpList{
+		JumpListMeta: jumpListMeta,
+		entries:      entries,
+	}
+	return automaticJumpList, nil
+}
+
+// GetAutomaticJumpLists finds all the automatic jump list files and parses them into JumpList objects.
+// It returns a slice of JumpList objects.
+func GetAutomaticJumpLists(log *logger.Logger) []*JumpList {
+	files, err := FindJumplistFiles(JumpListTypeAutomatic, log)
+	if err != nil {
+		log.Infof("failed to find Automatic Jump Lists: %v", err)
+		return []*JumpList{}
+	}
+
+	var jumplists []*JumpList
+	for _, file := range files {
+		automaticJumpList, err := ParseAutomaticJumpListFile(file, log)
+		if err != nil {
+			log.Infof("failed to parse Automatic Jump List %s: %v", file, err)
+			continue
+		}
+		jumplists = append(jumplists, automaticJumpList)
+	}
+	return jumplists
 }

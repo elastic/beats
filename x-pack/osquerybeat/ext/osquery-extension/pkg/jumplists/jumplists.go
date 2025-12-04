@@ -26,15 +26,8 @@ type JumpListType string
 
 const (
 	JumpListTypeCustom JumpListType = "custom"
+	JumpListTypeAutomatic JumpListType = "automatic"
 )
-
-// ApplicationId is the identifier for a jump list application.
-// It contains the application ID and name.
-// The application name is looked up from the jumpListAppIds map.
-type ApplicationId struct {
-	Id   string `osquery:"application_id"`
-	Name string `osquery:"application_name"`
-}
 
 // JumpListMeta is the metadata for a jump list.
 // It contains the application ID, jump list type, path to the jump list file,
@@ -45,6 +38,12 @@ type JumpListMeta struct {
 	Path         string       `osquery:"path"`
 }
 
+// JumpListEntry is a single entry in a jump list.
+type JumpListEntry struct {
+	*DestListEntry // Only used for automatic jumplists
+	*Lnk
+}
+
 // JumpList is a collection of Lnk objects that represent a single jump list.
 // It contains the metadata for the jump list and the Lnk objects.
 // This is a generic object that can represent either a custom jumplist
@@ -52,25 +51,25 @@ type JumpListMeta struct {
 // Both jumplist types are comprised of a collection of Lnk objects.
 type JumpList struct {
 	JumpListMeta
-	lnks []*Lnk
+	entries []*JumpListEntry
 }
 
 // JumpListRow is a single row in a jump list.
 // Each lnk object in the jumplist is represented by its own row, so the number of rows
 // is equal to the number of lnk objects in the jumplist.
 type JumpListRow struct {
-	*JumpListMeta // The metadata for the jump list
-	*Lnk          // The Lnk object that represents a single jump list entry
+	*JumpListMeta  // The metadata for the jump list
+	*JumpListEntry // The JumpListEntry object that represents a single jump list entry
 }
 
 // ToRows converts the JumpList to a slice of JumpListRow objects.
 // If the JumpList is empty, it returns a single empty JumpListRow.
 func (j *JumpList) ToRows() []JumpListRow {
 	var rows []JumpListRow
-	for _, lnk := range j.lnks {
+	for _, entry := range j.entries {
 		rows = append(rows, JumpListRow{
 			JumpListMeta: &j.JumpListMeta,
-			Lnk:          lnk,
+			JumpListEntry: entry,
 		})
 	}
 	// If the jumplist is empty, return a single empty JumpListRow. Which
@@ -79,25 +78,14 @@ func (j *JumpList) ToRows() []JumpListRow {
 		return []JumpListRow{
 			{
 				JumpListMeta: &j.JumpListMeta,
-				Lnk:          &Lnk{},
+				JumpListEntry: &JumpListEntry{
+					DestListEntry: nil,
+					Lnk:           nil,
+				},
 			},
 		}
 	}
 	return rows
-}
-
-// NewApplicationId creates a new ApplicationId from a given ID.
-// The application name is looked up from the jumpListAppIds map.
-// If the application ID is not found, the name is set to an empty string.
-func NewApplicationId(id string) ApplicationId {
-	name, ok := jumpListAppIds[id]
-	if !ok {
-		name = ""
-	}
-	return ApplicationId{
-		Id:   id,
-		Name: name,
-	}
 }
 
 // NewApplicationIdFromFileName creates a new ApplicationId from a given file name.

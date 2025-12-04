@@ -9,10 +9,11 @@ package jumplists
 import (
 	"os"
 	"path/filepath"
+	"fmt"
+	"encoding/json"
 	"testing"
 	"github.com/stretchr/testify/assert"
 
-	// "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
@@ -135,5 +136,44 @@ func TestLnkFromPath(t *testing.T) {
 			assert.NoError(t, err, "expected no error when parsing LNK file")
 			assert.NotNil(t, got, "expected non-nil LNK when parsing LNK file")
 		})
+	}
+}
+
+func TestAutomaticJumpList(t *testing.T) {
+	type testCase struct {
+		name         string
+		filePath     string
+		expectError  bool
+	}
+	tests := []testCase{
+		{
+			name:         "test_olecfb_1",
+			filePath:     "./testdata/automatic/5f7b5f1e01b83767.automaticDestinations-ms",
+			expectError:  false,
+		},
+	}
+	log := logger.New(os.Stdout, true)
+
+	for _, test := range tests {
+		automaticJumpList, err := ParseAutomaticJumpListFile(test.filePath, log)
+		if err != nil {
+			t.Fatalf("ParseAutomaticJumpListFile() returned error: %v", err)
+		}
+		if test.expectError {
+			assert.Error(t, err, "expected error when parsing Automatic Jump List")
+			assert.Nil(t, automaticJumpList, "expected nil Automatic Jump List when parsing Automatic Jump List")
+			return
+		}
+		assert.NoError(t, err, "expected no error when parsing Automatic Jump List")
+		assert.NotNil(t, automaticJumpList, "expected non-nil Automatic Jump List when parsing Automatic Jump List")
+		rows := automaticJumpList.ToRows()
+		for _, row := range rows {
+			assert.NotNil(t, row.Lnk, "expected non-nil LNK when parsing Automatic Jump List")
+			marshalledRow, err := json.Marshal(row)
+			if err != nil {
+				t.Fatalf("Marshal() returned error: %v", err)
+			}
+			fmt.Println(string(marshalledRow))
+		}
 	}
 }
