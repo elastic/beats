@@ -32,6 +32,7 @@ import (
 	"github.com/icholy/digest"
 	"github.com/rcrowley/go-metrics"
 	"go.elastic.co/ecszap"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
@@ -966,7 +967,14 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg, log)
 	}
 
+	otelMetrics, otelTransport, err := CreateOTELMetrics(ctx, cfg, log, env, c.Transport)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	c.Transport = otelTransport
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
+
 
 	if cfg.Resource.Retry.getMaxAttempts() > 1 {
 		maxAttempts := cfg.Resource.Retry.getMaxAttempts()
@@ -994,6 +1002,10 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		Transport: c.Transport,
 	}
 
+	return c, trace, otelMetrics, nil
+}
+
+func CreateOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2.Context, tripper http.RoundTripper)  (*otel.OTELCELMetrics, *otelhttp.Transport, error) {
 	resource := resource.NewWithAttributes(
 		semconv.SchemaURL, GetResourceAttributes(env, cfg)...,
 	)
@@ -1007,12 +1019,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		log.Errorw("failed to get collection period", "error", err)
 	}
 	log.Infof("created OTEL cel input exporter %s for input %s", exporterType, env.IDWithoutName)
-	otelMetrics, otelTransport, err := otel.NewOTELCELMetrics(log, env.IDWithoutName, *resource, c.Transport, exporter)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	c.Transport = otelTransport
-	return c, trace, otelMetrics, nil
+	return otel.NewOTELCELMetrics(log, env.IDWithoutName, *resource, tripper, exporter)
 }
 
 func GetResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
