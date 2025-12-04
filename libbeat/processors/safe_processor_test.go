@@ -198,11 +198,17 @@ func TestSafeProcessorSetPathsClose(t *testing.T) {
 		sp, ok = bp.(PathSetter)
 		require.True(t, ok)
 		require.NotNil(t, sp)
-		err = sp.SetPaths(&paths.Path{})
+		testPaths := &paths.Path{}
+		err = sp.SetPaths(testPaths)
 		assert.NoError(t, err)
 		assert.Equal(t, 1, p.setPathsCount)
 
-		// set paths again
+		// set paths again with the SAME pointer (idempotent for global processors)
+		err = sp.SetPaths(testPaths)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, p.setPathsCount)
+
+		// set paths again with a DIFFERENT pointer (should error)
 		err = sp.SetPaths(&paths.Path{})
 		assert.ErrorIs(t, err, ErrPathsAlreadySet)
 		assert.Equal(t, 1, p.setPathsCount)
@@ -282,11 +288,17 @@ func TestSafeProcessorSetPaths(t *testing.T) {
 		sp, ok = bp.(PathSetter)
 		require.True(t, ok)
 		require.NotNil(t, sp)
-		err = sp.SetPaths(&paths.Path{})
+		testPaths := &paths.Path{}
+		err = sp.SetPaths(testPaths)
 		assert.NoError(t, err)
 		assert.Equal(t, 1, p.setPathsCount)
 
-		// set paths again
+		// set paths again with the SAME pointer (idempotent for global processors)
+		err = sp.SetPaths(testPaths)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, p.setPathsCount)
+
+		// set paths again with a DIFFERENT pointer (should error)
 		err = sp.SetPaths(&paths.Path{})
 		assert.ErrorIs(t, err, ErrPathsAlreadySet)
 		assert.Equal(t, 1, p.setPathsCount)
