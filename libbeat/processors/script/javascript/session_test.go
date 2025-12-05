@@ -62,7 +62,7 @@ func TestSessionScriptParams(t *testing.T) {
 	t.Run("register required for params", func(t *testing.T) {
 		_, err := NewFromConfig(Config{
 			Source: header + footer,
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"threshold": 42,
 			},
 		}, nil, logger)
@@ -83,7 +83,7 @@ func TestSessionScriptParams(t *testing.T) {
 		`
 		_, err := NewFromConfig(Config{
 			Source: script,
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"threshold": 42,
 			},
 		}, nil, logger)
@@ -130,7 +130,7 @@ func TestSessionTestFunction(t *testing.T) {
 	t.Run("test success", func(t *testing.T) {
 		_, err := NewFromConfig(Config{
 			Source: script,
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"fail": false,
 			},
 		}, nil, logger)
@@ -140,7 +140,7 @@ func TestSessionTestFunction(t *testing.T) {
 	t.Run("test failure", func(t *testing.T) {
 		_, err := NewFromConfig(Config{
 			Source: script,
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"fail": true,
 			},
 		}, nil, logger)
@@ -151,7 +151,7 @@ func TestSessionTestFunction(t *testing.T) {
 func TestSessionTimeout(t *testing.T) {
 	const runawayLoop = `
 		while (!evt.fields.stop) {
-			evt.Put("hello", "world");			
+			evt.Put("hello", "world");
 		}
     `
 
@@ -183,14 +183,15 @@ func TestSessionTimeout(t *testing.T) {
 	}
 
 	// Verify that any internal runtime interrupt state has been cleared.
-	evt.PutValue("stop", true)
+	_, err = evt.PutValue("stop", true)
+	assert.NoError(t, err)
 	_, err = p.Run(evt)
 	assert.NoError(t, err)
 }
 
 func TestSessionParallel(t *testing.T) {
 	const script = `
-		evt.Put("host.name", "workstation");			
+		evt.Put("host.name", "workstation");
     `
 
 	p, err := NewFromConfig(Config{
@@ -207,7 +208,7 @@ func TestSessionParallel(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(goroutines)
-	for i := 0; i < goroutines; i++ {
+	for range goroutines {
 		go func() {
 			defer wg.Done()
 			for ctx.Err() == nil {
