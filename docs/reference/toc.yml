@@ -1090,9 +1090,6 @@ toc:
           - file: metricbeat/metricbeat-module-nginx.md
             children:
               - file: metricbeat/metricbeat-metricset-nginx-stubstatus.md
-          - file: metricbeat/metricbeat-module-openai.md
-            children:
-              - file: metricbeat/metricbeat-metricset-openai-usage.md
           - file: metricbeat/metricbeat-module-openmetrics.md
             children:
               - file: metricbeat/metricbeat-metricset-openmetrics-collector.md
@@ -1265,7 +1262,6 @@ toc:
           - file: metricbeat/exported-fields-mysql.md
           - file: metricbeat/exported-fields-nats.md
           - file: metricbeat/exported-fields-nginx.md
-          - file: metricbeat/exported-fields-openai.md
           - file: metricbeat/exported-fields-openmetrics.md
           - file: metricbeat/exported-fields-oracle.md
           - file: metricbeat/exported-fields-panw.md
