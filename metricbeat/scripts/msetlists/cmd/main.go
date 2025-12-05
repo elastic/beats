@@ -26,15 +26,13 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/scripts/msetlists"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func main() {
 	// Disable permission checks so it reads light modules in any case
 	os.Setenv("BEAT_STRICT_PERMS", "false")
 
-	path := paths.Resolve(paths.Home, "../metricbeat/module")
-	lm := mb.NewLightModulesSource(logp.NewNopLogger(), path)
+	lm := mb.NewLightModulesSource(logp.NewNopLogger(), "./module")
 	mb.Registry.SetSecondarySource(lm)
 
 	msList := msetlists.DefaultMetricsets()
