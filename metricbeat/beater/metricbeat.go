@@ -50,6 +50,7 @@ type Metricbeat struct {
 	stopOnce                 sync.Once     // wraps the Stop() method
 	config                   Config
 	registry                 *mb.Register
+	paths                    *paths.Path
 	autodiscover             *autodiscover.Autodiscover
 	dynamicCfgEnabled        bool
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
@@ -74,7 +75,7 @@ func WithModuleOptions(options ...module.Option) Option {
 // WithLightModules enables light modules support
 func WithLightModules() Option {
 	return func(m *Metricbeat) {
-		path := paths.Resolve(paths.Home, "module")
+		path := m.paths.Resolve(paths.Home, "module")
 		mb.Registry.SetSecondarySource(mb.NewLightModulesSource(m.logger, path))
 	}
 }
@@ -156,6 +157,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 		done:              make(chan struct{}),
 		config:            config,
 		registry:          registry,
+		paths:             b.Paths,
 		logger:            b.Info.Logger,
 		dynamicCfgEnabled: dynamicCfgEnabled,
 	}
