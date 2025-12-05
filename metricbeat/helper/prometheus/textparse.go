@@ -310,7 +310,7 @@ func (m *MetricFamily) GetName() string {
 	return ""
 }
 func (m *MetricFamily) GetUnit() string {
-	if m != nil && *m.Unit != "" {
+	if m != nil && m.Unit != nil && *m.Unit != "" {
 		return *m.Unit
 	}
 	return ""
@@ -506,6 +506,37 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		metricTypes = make(map[string]model.MetricType)
 	)
 
+	safeExemplar := func(e *exemplar.Exemplar) bool {
+		var hasExemplar bool
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					if logger != nil {
+						logger.Debugf("Recovered from panic while parsing exemplar: %v", r)
+					}
+				}
+			}()
+			hasExemplar = parser.Exemplar(e)
+		}()
+		return hasExemplar
+	}
+
+	safeLabels := func(lset *labels.Labels) bool {
+		var labelsRecovered bool
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					labelsRecovered = true
+					if logger != nil {
+						logger.Debugf("Recovered from panic while parsing labels: %v", r)
+					}
+				}
+			}()
+			parser.Labels(lset)
+		}()
+		return !labelsRecovered
+	}
+
 	for {
 		var (
 			et textparse.Entry
@@ -580,7 +611,9 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		_, tp, v := parser.Series()
 
 		var lset labels.Labels
-		parser.Labels(&lset)
+		if !safeLabels(&lset) {
+			continue
+		}
 		metadata := schema.NewMetadataFromLabels(lset)
 		metricName := metadata.Name
 
@@ -683,7 +716,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 				continue
 			}
 		case model.MetricTypeHistogram:
-			if hasExemplar := parser.Exemplar(&e); hasExemplar {
+			if hasExemplar := safeExemplar(&e); hasExemplar {
 				exm = &e
 			}
 			lookupMetricName, metric = histogramMetricName(metricName, v, qv, lbls.String(), &t, false, exm, histogramsByName)
@@ -696,7 +729,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 				continue
 			}
 		case model.MetricTypeGaugeHistogram:
-			if hasExemplar := parser.Exemplar(&e); hasExemplar {
+			if hasExemplar := safeExemplar(&e); hasExemplar {
 				exm = &e
 			}
 			lookupMetricName, metric = histogramMetricName(metricName, v, qv, lbls.String(), &t, true, exm, histogramsByName)
@@ -733,7 +766,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 			}
 		}
 
-		if hasExemplar := parser.Exemplar(&e); hasExemplar && mt != model.MetricTypeHistogram && metric != nil {
+		if hasExemplar := safeExemplar(&e); hasExemplar && mt != model.MetricTypeHistogram && metric != nil {
 			if !e.HasTs {
 				e.Ts = t
 			}
