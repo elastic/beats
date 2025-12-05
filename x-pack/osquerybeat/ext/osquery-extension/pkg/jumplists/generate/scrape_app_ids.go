@@ -76,9 +76,9 @@ func writeAppIdGeneratedFile(outputFile string, log *logger.Logger) error {
 	// Using strings.Builder is more efficient than repeated string concatenation
 	var sb strings.Builder
 	writeCopyrightHeader(&sb)
-	sb.WriteString("// jumpListAppIds is a lookup table for known windows AppIDs.\n")
+	sb.WriteString("// knownAppIds is a lookup table for known windows AppIDs.\n")
 	sb.WriteString(fmt.Sprintf("// Source: %s\n", appIdSourceUrl))
-	sb.WriteString("var jumpListAppIds = map[string]string{\n")
+	sb.WriteString("var knownAppIds = map[string]string{\n")
 
 	// Sort keys for consistent output
 	keys := make([]string, 0, len(appIDs))

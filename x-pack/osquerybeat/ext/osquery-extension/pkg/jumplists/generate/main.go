@@ -31,8 +31,7 @@ func main() {
 		log.Fatalf("failed to write generated_app_ids.go: %v", err)
 	}
 
-	// TODO: Add back in when we need guid mappings
-	//
+	// TODO: Enable this in automatic jumplist branch
 	// Write the generated guid mappings file
 	// guidMappingsFile := filepath.Join(wd, "generated_guid_mappings.go")
 	// err = writeGuidMappingGeneratedFile(guidMappingsFile, log)

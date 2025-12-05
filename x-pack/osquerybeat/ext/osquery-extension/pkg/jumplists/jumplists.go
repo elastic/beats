@@ -14,7 +14,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/osquery/osquery-go/plugin/table"
 
@@ -25,16 +24,8 @@ import (
 type JumpListType string
 
 const (
-	JumpListTypeCustom JumpListType = "custom"
+	JumpListTypeCustom    JumpListType = "custom"
 )
-
-// ApplicationId is the identifier for a jump list application.
-// It contains the application ID and name.
-// The application name is looked up from the jumpListAppIds map.
-type ApplicationId struct {
-	Id   string `osquery:"application_id"`
-	Name string `osquery:"application_name"`
-}
 
 // JumpListMeta is the metadata for a jump list.
 // It contains the application ID, jump list type, path to the jump list file,
@@ -45,6 +36,11 @@ type JumpListMeta struct {
 	Path         string       `osquery:"path"`
 }
 
+// JumpListEntry is a single entry in a jump list.
+type JumpListEntry struct {
+	*Lnk
+}
+
 // JumpList is a collection of Lnk objects that represent a single jump list.
 // It contains the metadata for the jump list and the Lnk objects.
 // This is a generic object that can represent either a custom jumplist
@@ -52,25 +48,25 @@ type JumpListMeta struct {
 // Both jumplist types are comprised of a collection of Lnk objects.
 type JumpList struct {
 	JumpListMeta
-	lnks []*Lnk
+	entries []*JumpListEntry
 }
 
 // JumpListRow is a single row in a jump list.
 // Each lnk object in the jumplist is represented by its own row, so the number of rows
 // is equal to the number of lnk objects in the jumplist.
 type JumpListRow struct {
-	*JumpListMeta // The metadata for the jump list
-	*Lnk          // The Lnk object that represents a single jump list entry
+	*JumpListMeta  // The metadata for the jump list
+	*JumpListEntry // The JumpListEntry object that represents a single jump list entry
 }
 
 // ToRows converts the JumpList to a slice of JumpListRow objects.
 // If the JumpList is empty, it returns a single empty JumpListRow.
 func (j *JumpList) ToRows() []JumpListRow {
 	var rows []JumpListRow
-	for _, lnk := range j.lnks {
+	for _, entry := range j.entries {
 		rows = append(rows, JumpListRow{
-			JumpListMeta: &j.JumpListMeta,
-			Lnk:          lnk,
+			JumpListMeta:  &j.JumpListMeta,
+			JumpListEntry: entry,
 		})
 	}
 	// If the jumplist is empty, return a single empty JumpListRow. Which
@@ -79,42 +75,13 @@ func (j *JumpList) ToRows() []JumpListRow {
 		return []JumpListRow{
 			{
 				JumpListMeta: &j.JumpListMeta,
-				Lnk:          &Lnk{},
+				JumpListEntry: &JumpListEntry{
+					Lnk:           nil,
+				},
 			},
 		}
 	}
 	return rows
-}
-
-// NewApplicationId creates a new ApplicationId from a given ID.
-// The application name is looked up from the jumpListAppIds map.
-// If the application ID is not found, the name is set to an empty string.
-func NewApplicationId(id string) ApplicationId {
-	name, ok := jumpListAppIds[id]
-	if !ok {
-		name = ""
-	}
-	return ApplicationId{
-		Id:   id,
-		Name: name,
-	}
-}
-
-// NewApplicationIdFromFileName creates a new ApplicationId from a given file name.
-// The file name is the name of the jumplist file.
-// The application ID contains all .
-// The application name is looked up from the jumpListAppIds map.
-// If the application ID is not found, the name is set to an empty string.
-func NewApplicationIdFromFileName(fileName string, log *logger.Logger) ApplicationId {
-	baseName := filepath.Base(fileName)
-	dotIndex := strings.Index(baseName, ".")
-	if dotIndex != -1 {
-		return NewApplicationId(baseName[:dotIndex])
-	}
-
-	// Not necessarily an error, just a fallback
-	log.Infof("failed to get application id from file name %s", fileName)
-	return ApplicationId{}
 }
 
 // FindJumplistFiles finds all the jump list files of a given type.

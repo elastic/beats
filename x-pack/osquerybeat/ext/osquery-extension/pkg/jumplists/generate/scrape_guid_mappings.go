@@ -57,9 +57,9 @@ func writeGuidMappingGeneratedFile(outputFile string, log *logger.Logger) error 
 	// Using strings.Builder is more efficient than repeated string concatenation
 	var sb strings.Builder
 	writeCopyrightHeader(&sb)
-	sb.WriteString("// guidMappings is a lookup table for known windows GUIDs to names.\n")
+	sb.WriteString("// knownFolderMappings is a lookup table for known windows GUIDs to names.\n")
 	sb.WriteString(fmt.Sprintf("// Source: %s\n", guidMappingSourceUrl))
-	sb.WriteString("var guidMappings = map[string]string{\n")
+	sb.WriteString("var knownFolderMappings = map[string]string{\n")
 
 	// Sort keys for consistent output
 	keys := make([]string, 0, len(guidMappings))

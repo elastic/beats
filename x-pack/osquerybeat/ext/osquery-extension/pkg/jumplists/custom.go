@@ -25,21 +25,28 @@ func ParseCustomJumpListFile(filePath string, log *logger.Logger) (*JumpList, er
 	// Scan through the file looking for footer signatures, there may be multiple custom jump lists in the file
 	lnks := carveLnkFiles(fileBytes, log)
 
+	entries := make([]*JumpListEntry, 0)
+	for _, lnk := range lnks {
+		jumpListEntry := &JumpListEntry{
+			Lnk:           lnk,
+		}
+		entries = append(entries, jumpListEntry)
+	}
+
 	// If the jumplist file is empty, return an error jlecmd does this as well
 	if len(lnks) == 0 {
 		return nil, fmt.Errorf("custom jumplist file %s is empty", filePath)
 	}
 
 	// Look up the application id and create the metadata
-	applicationId := NewApplicationIdFromFileName(filePath, log)
 	jumpListMeta := JumpListMeta{
-		ApplicationId: applicationId,
+		ApplicationId: GetAppIdFromFileName(filePath, log),
 		JumplistType:  JumpListTypeCustom,
 		Path:          filePath,
 	}
 	customJumpList := &JumpList{
 		JumpListMeta: jumpListMeta,
-		lnks:         lnks,
+		entries:      entries,
 	}
 	return customJumpList, nil
 }
@@ -80,14 +87,13 @@ func carveLnkFiles(fileBytes []byte, log *logger.Logger) []*Lnk {
 	// advance the buffer to the first LNK signature
 	fileBytes = fileBytes[start:]
 
-	entryNumber := 0
 	for {
 		// Find the next LNK signature
 		nextSigIndex := bytes.Index(fileBytes[sigLen:], LnkSignature)
 
 		if nextSigIndex == -1 {
 			// This is the last Lnk in the file
-			lnk, err := NewLnkFromBytes(fileBytes, entryNumber, log)
+			lnk, err := NewLnkFromBytes(fileBytes, log)
 			if err == nil {
 				lnks = append(lnks, lnk)
 			}
@@ -98,11 +104,10 @@ func carveLnkFiles(fileBytes []byte, log *logger.Logger) []*Lnk {
 		// nextSigIndex is a relative index to the start of the fileBytes buffer
 		// so we need to add the sigLen to get the absolute index
 		cutPoint := nextSigIndex + sigLen
-		lnk, err := NewLnkFromBytes(fileBytes[:cutPoint], entryNumber, log)
+		lnk, err := NewLnkFromBytes(fileBytes[:cutPoint], log)
 		if err == nil {
 			lnks = append(lnks, lnk)
 		}
-		entryNumber++
 		// advance the buffer to the next LNK signature
 		fileBytes = fileBytes[cutPoint:]
 	}
