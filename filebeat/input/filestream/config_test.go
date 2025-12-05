@@ -68,11 +68,78 @@ func TestConfigValidate(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("gzip_experimental works with file_identity.fingerprint", func(t *testing.T) {
+	t.Run("gzip works by default with file_identity.fingerprint", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(`
+id: 'some id'
+paths: [/foo/bar*]
+`)
+		require.NoError(t, err, "could not create config from string")
+
+		got := defaultConfig()
+		err = c.Unpack(&got)
+		require.NoError(t, err, "could not unpack config")
+
+		err = got.Validate()
+		assert.NoError(t, err)
+	})
+
+	t.Run("gzip requires file_identity.fingerprint", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(`
+id: 'some id'
+paths: [/foo/bar*]
+file_identity.native: ~
+`)
+		require.NoError(t, err, "could not create config from string")
+
+		got := defaultConfig()
+		err = c.Unpack(&got)
+
+		assert.ErrorContains(t,
+			err,
+			"to use a file identity other than 'fingerprint', disable gzip, set 'gzip_disabled: true'")
+	})
+
+	t.Run("gzip_disabled allows non-fingerprint file_identity", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(`
+id: 'some id'
+paths: [/foo/bar*]
+gzip_disabled: true
+file_identity.path: ~
+`)
+		require.NoError(t, err, "could not create config from string")
+
+		got := defaultConfig()
+		err = c.Unpack(&got)
+		require.NoError(t, err, "could not unpack config")
+
+		err = got.Validate()
+		assert.NoError(t, err)
+	})
+
+	t.Run("gzip_experimental true is accepted but ignored", func(t *testing.T) {
 		c, err := conf.NewConfigFrom(`
 id: 'some id'
 paths: [/foo/bar*]
 gzip_experimental: true
+file_identity.fingerprint: ~
+`)
+		require.NoError(t, err, "could not create config from string")
+
+		got := defaultConfig()
+		err = c.Unpack(&got)
+		require.NoError(t, err, "could not unpack config")
+
+		err = got.Validate()
+		assert.NoError(t, err)
+		// gzip_experimental is ignored, gzip is enabled by default
+		assert.False(t, got.GZIPDisabled, "gzip should be enabled")
+	})
+
+	t.Run("gzip_experimental false is accepted but ignored", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(`
+id: 'some id'
+paths: [/foo/bar*]
+gzip_experimental: false
 file_identity.fingerprint: ~
 `)
 		require.NoError(t, err, "could not create config from string")
@@ -82,21 +149,8 @@ file_identity.fingerprint: ~
 
 		err = got.Validate()
 		assert.NoError(t, err)
-	})
-
-	t.Run("gzip_experimental requires file_identity.fingerprint", func(t *testing.T) {
-		c, err := conf.NewConfigFrom(`
-id: 'some id'
-paths: [/foo/bar*]
-gzip_experimental: true
-file_identity.path: ~
-`)
-		require.NoError(t, err, "could not create config from string")
-		got := defaultConfig()
-		err = c.Unpack(&got)
-		assert.ErrorContains(t,
-			err,
-			"gzip_experimental=true requires file_identity to be 'fingerprint")
+		// gzip_experimental is ignored, gzip is still enabled by default
+		assert.False(t, got.GZIPDisabled, "gzip should be enabled")
 	})
 }
 

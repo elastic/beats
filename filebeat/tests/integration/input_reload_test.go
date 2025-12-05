@@ -64,6 +64,7 @@ logging.level: debug
   paths:
    - %s
   file_identity.native: ~
+  gzip_disabled: true
   prospector.scanner.fingerprint.enabled: false	   
 `
 	inputs := filepath.Join(tempDir, "inputs.d")

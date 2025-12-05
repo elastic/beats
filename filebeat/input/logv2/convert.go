@@ -163,6 +163,12 @@ func convertConfig(logger *logp.Logger, cfg *config.C) (*config.C, error) {
 		return nil, fmt.Errorf("cannot set 'take_over.enabled': %w", err)
 	}
 
+	// disable GZIP decompression, log input does not support it, and it only
+	// works with file identity fingerprint
+	if err := newCfg.SetBool("gzip_disabled", -1, true); err != nil {
+		return nil, fmt.Errorf("cannot set 'gzip_disabled': %w", err)
+	}
+
 	return newCfg, nil
 }
 

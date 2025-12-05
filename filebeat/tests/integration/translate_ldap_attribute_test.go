@@ -47,6 +47,7 @@ filebeat.inputs:
   - type: filestream
     id: "test-translateguidCfg"
     file_identity.native: ~
+    gzip_disabled: true
     prospector.scanner.fingerprint.enabled: false
     paths:
       - %s

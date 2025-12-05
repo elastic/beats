@@ -26,7 +26,6 @@ import (
 	"github.com/dustin/go-humanize"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
@@ -44,10 +43,13 @@ type config struct {
 	FileWatcher  fileWatcherConfig `config:"prospector.scanner"`
 	FileIdentity *conf.Namespace   `config:"file_identity"`
 
-	// GZIPExperimental enables beta support for ingesting GZIP files.
-	// When set to true the input will transparently stream-decompress GZIP files.
-	// This feature is experimental and subject to change.
-	GZIPExperimental bool `config:"gzip_experimental"`
+	// GZIPDisabled disables decompressing GZIP at ingestion time.
+	GZIPDisabled bool `config:"gzip_disabled"`
+
+	// GZIPExperimental is deprecated and ignored. It is kept to log a warning
+	// if it's set. Use GZIPDisabled to configure GZIP behaviour.
+	// Deprecated.
+	GZIPExperimental *bool `config:"gzip_experimental"`
 
 	// -1 means that registry will never be cleaned, disabling clean_inactive.
 	// Setting it to 0 also disables clean_inactive
@@ -207,11 +209,11 @@ func (c *config) Validate() error {
 		}
 	}
 
-	if c.GZIPExperimental {
-		// Validate file_identity must be fingerprint when gzip support is enabled.
+	if !c.GZIPDisabled {
+		// file_identity must be fingerprint when gzip support is enabled.
 		if c.FileIdentity != nil && c.FileIdentity.Name() != fingerprintName {
 			return fmt.Errorf(
-				"gzip_experimental=true requires file_identity to be 'fingerprint'")
+				"to use a file identity other than 'fingerprint', disable gzip, set 'gzip_disabled: true'")
 		}
 	}
 
@@ -230,9 +232,10 @@ func (c config) checkUnsupportedParams(logger *logp.Logger) {
 				"duplication and incomplete input metrics, it's use is " +
 				"highly discouraged.")
 	}
-	if c.GZIPExperimental {
-		logger.Named("filestream").Warn(cfgwarn.Beta(
-			"filestream: beta gzip support enabled"))
+	if c.GZIPExperimental != nil {
+		logger.Named("filestream").Warn(
+			"'gzip_experimental' has been removed. GZIP support is now " +
+				"enabled by default. To disable it, use 'gzip_disabled: true'")
 	}
 }
 

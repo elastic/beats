@@ -61,7 +61,6 @@ filebeat.inputs:
     id: test-filestream
     paths:
       - %s
-    gzip_experimental: true
 
 # we want to check that all messages are ingested
 # without using an external service, this is an easy way

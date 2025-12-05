@@ -48,6 +48,7 @@ filebeat.inputs:
 - type: filestream
   id: test-container
   file_identity.native: ~
+  gzip_disabled: true
   prospector.scanner.fingerprint.enabled: false	
   paths:
   - %s

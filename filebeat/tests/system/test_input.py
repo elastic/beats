@@ -752,7 +752,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             close_eof="true",
-            input_raw="  file_identity.path: ~",
+            input_raw="  file_identity.path: ~\n  gzip_disabled: true",
         )
 
         testfile = os.path.join(self.working_dir, "log", "test.log")
@@ -787,7 +787,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             close_eof="true",
-            input_raw="  file_identity.inode_marker.path: " + marker_location,
+            input_raw="  file_identity.inode_marker.path: " + marker_location + "\n  gzip_disabled: true",
         )
 
         testfile = os.path.join(self.working_dir, "log", "test.log")
@@ -820,7 +820,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            input_raw="  file_identity.inode_marker.path: " + marker_location,
+            input_raw="  file_identity.inode_marker.path: " + marker_location + "\n  gzip_disabled: true",
         )
 
         testfile = os.path.join(self.working_dir, "log", "test.log")
@@ -837,7 +837,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             rotateonstartup="false",
-            input_raw="  file_identity.path: ~",
+            input_raw="  file_identity.path: ~\n  gzip_disabled: true",
         )
 
         with open(testfile, 'w+') as f:

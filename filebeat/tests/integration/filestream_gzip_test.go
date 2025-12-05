@@ -149,7 +149,6 @@ filebeat.inputs:
     paths:
       - %s
     prospector.scanner.check_interval: 1s
-    gzip_experimental: true
 output.file:
   enabled: true
   path: %s
@@ -231,7 +230,6 @@ filebeat.inputs:
     id: "test-gzip-eof"
     paths:
       - %s
-    gzip_experimental: true
 path.home: %s
 filebeat.registry.flush: 1s
 output.discard:
@@ -333,7 +331,6 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
 output.file:
   enabled: true
   path: %s
@@ -405,7 +402,6 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
 output.file:
   enabled: true
   path: %s
@@ -587,7 +583,6 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
 output.file:
   enabled: true
   path: %s
@@ -672,7 +667,6 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
 output.file:
   enabled: true
   path: %s
@@ -812,8 +806,6 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
-    #rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
 output.file:
   enabled: true
   path: %s
@@ -984,7 +976,6 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
 output.file:
   enabled: true
   path: %s
@@ -1108,7 +1099,6 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
 output.file:
   enabled: true
   path: %s

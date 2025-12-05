@@ -669,6 +669,10 @@ filebeat.inputs:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
 
+  # filestream input supports parsing of GZIP files. By default, GZIP support is
+  # enabled. If you want to disable it, set `gzip_disabled` to true.
+  #gzip_disabled: false
+
   # Configure the file encoding for reading files with international characters
   # following the W3C recommendation for HTML5 (http://www.w3.org/TR/encoding).
   # Some sample encodings:

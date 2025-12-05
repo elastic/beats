@@ -24,6 +24,7 @@
   "file_identity": {
     "native": null
   },
+  "gzip_disabled": true,
   "harvester_limit": 10000,
   "id": "foo",
   "ignore_inactive": "since_last_start",

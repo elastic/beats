@@ -193,6 +193,7 @@ func TestMultipleReceivers(t *testing.T) {
 							"id":                   "must-be-unique",
 							"paths":                []string{ingestPath},
 							"file_identity.native": nil,
+							"gzip_disabled":        true,
 						},
 					},
 				},
@@ -547,6 +548,7 @@ func TestConsumeContract(t *testing.T) {
 							filepath.Join(tmpDir, "input.log"),
 						},
 						"file_identity.native": map[string]any{},
+						"gzip_disabled":        true,
 						"prospector": map[string]any{
 							"scanner": map[string]any{
 								"fingerprint.enabled": false,

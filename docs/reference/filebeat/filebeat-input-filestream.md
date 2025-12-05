@@ -26,7 +26,7 @@ Use the `filestream` input to read lines from log files. It is the improved alte
 * Only the most recent updates are serialized to the registry. In contrast, the `log` input has to serialize the complete registry on each ACK from the outputs. This makes the registry updates much quicker with this input.
 * The input ensures that only offsets updates are written to the registry append only log. The `log` writes the complete file state.
 * Stale entries can be removed from the registry, even if there is no active input.
-* {applies_to}`stack: beta 9.2.0` As a beta feature, it can read GZIP files.
+* {applies_to}`stack: beta 9.2.0` {applies_to}`stack: ga 9.3.0` It can read GZIP files.
 
 
 To configure this input, specify a list of glob-based [`paths`](#filestream-input-paths) that must be crawled to locate and fetch the log lines.
@@ -72,21 +72,22 @@ filebeat.inputs:
 ## Reading GZIP files
 
 ```{applies_to}
-stack: beta 9.2.0
+stack: ga 9.3.0, beta 9.2.0
 ```
 
-::::{warning}
-This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
-::::
-
-The `filestream` input can ingest GZIP files as a **beta** feature.
+The `filestream` input can ingest GZIP files. GZIP support is enabled by default.
 A GZIP file is treated like any other file, with the same guarantees `filestream`
 offers. This includes offset tracking and resuming from partially read files.
 
 Filestream decompresses GZIP files in memory as data is read. It
-respects [`buffer_size`](#_buffer_size), reading up to `buffer_size` of decompressed data.
+respects [`buffer_size`](#_buffer_size), reading up to `buffer_size` of 
+decompressed data.
 
-To enable it, set `gzip_experimental` to `true`.
+Reading GZIP files requires the [`file_identity`](#filebeat-input-filestream-file-identity)
+to be [`fingerprint`](#filebeat-input-filestream-file-identity-fingerprint), which is the default behaviour. The fingerprinting
+is done on the decompressed data, and log rotation is handled automatically.
+
+To disable GZIP support, set `gzip_disabled` to `true`.
 
 ```yaml
 filebeat.inputs:
@@ -94,17 +95,13 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - /var/some-app/app.log*
-    gzip_experimental: true
+    gzip_disabled: true
 ```
-
-Reading GZIP files requires the [`file_identity`](#filebeat-input-filestream-file-identity)
-to be [`fingerprint`](#filebeat-input-filestream-file-identity-fingerprint), which is the default behaviour.
-
-The fingerprinting is done on the decompressed data, and log rotation is handled automatically.
 
 ::::{important}
 Do not configure the [`copytruncate` strategy](#_rotation_external_strategy_copytruncate) for log rotation
-when ingesting GZIP files, as this may lead to data loss. The default mechanisms are sufficient.
+when ingesting GZIP files, as this may lead to data loss. The default mechanisms
+are sufficient.
 ::::
 
 GZIP files are considered immutable, meaning `filestream` does not expect new data to be appended
