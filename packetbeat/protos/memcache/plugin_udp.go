@@ -82,7 +82,7 @@ type udpMessage struct {
 	datagrams    [][]byte
 }
 
-const maxUDPMemcacheFragments = 64
+const maxUDPMemcacheFragments = 1024
 
 func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 	buffer := streambuf.NewFixed(pkt.Payload)
