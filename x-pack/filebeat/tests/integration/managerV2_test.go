@@ -1106,6 +1106,7 @@ func TestPipelineConnectionErrorFailsInput(t *testing.T) {
 				{
 					Id: "filestream-input",
 					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":         "a unique ID",
 						"type":       "filestream",
 						"paths":      logFilePath,
 						"processors": brokenProcessor,
@@ -1129,6 +1130,7 @@ func TestPipelineConnectionErrorFailsInput(t *testing.T) {
 				{
 					Id: "cel-input",
 					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":           "a unique ID",
 						"type":         "cel",
 						"interval":     "1m",
 						"resource.url": "https://api.ipify.org/?format=text",
@@ -1154,6 +1156,7 @@ func TestPipelineConnectionErrorFailsInput(t *testing.T) {
 				{
 					Id: "tcp-input",
 					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":         "a unique ID",
 						"type":       "tcp",
 						"host":       "localhost:9042",
 						"processors": brokenProcessor,
@@ -1177,6 +1180,7 @@ func TestPipelineConnectionErrorFailsInput(t *testing.T) {
 				{
 					Id: "kafka-input",
 					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":         "a unique ID",
 						"type":       "kafka",
 						"hosts":      []any{"localhost:9042"},
 						"topics":     []any{"foo-topic"},
@@ -1202,6 +1206,7 @@ func TestPipelineConnectionErrorFailsInput(t *testing.T) {
 				{
 					Id: "awss3-input",
 					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":                           "a unique ID",
 						"type":                         "aws-s3",
 						"queue_url":                    "https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue",
 						"expand_event_list_from_field": "Records",

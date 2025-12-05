@@ -130,6 +130,7 @@ type defaultHarvesterGroup struct {
 	tg           *task.Group
 	metrics      *Metrics
 	notifyChan   chan HarvesterStatus
+	inputID      string
 }
 
 // HarvesterStatus is used to notify an observer that the harvester for the ID
@@ -161,7 +162,7 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 	sourceName := hg.identifier.ID(src)
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 
-	if err := hg.tg.Go(startHarvester(ctx, hg, src, false, hg.metrics)); err != nil {
+	if err := hg.tg.Go(startHarvester(ctx, hg, src, false, hg.metrics, hg.inputID)); err != nil {
 		ctx.Logger.Warnf(
 			"tried to start harvester for %s with task group already closed",
 			ctx.ID)
@@ -178,7 +179,7 @@ func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 	ctx.Logger.Debug("Restarting harvester for file")
 
-	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics)); err != nil {
+	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics, hg.inputID)); err != nil {
 		ctx.Logger.Warnf(
 			"input %s tried to restart harvester with task group already closed",
 			ctx.ID)
@@ -195,6 +196,7 @@ func startHarvester(
 	src Source,
 	restart bool,
 	metrics *Metrics,
+	inputID string,
 ) func(context.Context) error {
 	srcID := hg.identifier.ID(src)
 
@@ -206,10 +208,11 @@ func startHarvester(
 				hg.readers.remove(srcID)
 			}
 
+			// Report any harvester error as a degraded state for the input
 			if err != nil {
 				ctx.StatusReporter.UpdateStatus(
 					status.Degraded,
-					fmt.Sprintf("harvester failed: %s", err),
+					fmt.Sprintf("Harvester for Filestream input %q failed: %s", inputID, err),
 				)
 			}
 		}()
