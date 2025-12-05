@@ -162,6 +162,10 @@ func (t *template) Apply(parts []string) (string, mapstr.M) {
 
 	tagsMap := make(map[string][]string)
 	for i := 0; i < len(t.Parts); i++ {
+		// Avoid out-of-bounds access when metric has fewer parts than template.
+		if i >= len(parts) {
+			break
+		}
 		if t.Parts[i] == "metric" {
 			metric = append(metric, parts[i])
 		} else if t.Parts[i] == "metric*" {
