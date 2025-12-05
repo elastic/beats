@@ -23,6 +23,9 @@ type runnerState struct {
 // This is used for grouping and managing statuses of multiple runners
 type RunnerReporter interface {
 	GetReporterForRunner(id uint64) status.StatusReporter
+
+	// UpdateStatus updates the group status of a runnerReporter
+	UpdateStatus(status status.Status, msg string)
 }
 
 type reporter struct {
