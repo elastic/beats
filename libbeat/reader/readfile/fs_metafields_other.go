@@ -21,6 +21,7 @@ package readfile
 
 import (
 	"fmt"
+	"os/user"
 	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -30,9 +31,11 @@ import (
 const (
 	deviceIDKey = "log.file.device_id"
 	inodeKey    = "log.file.inode"
+	ownerKey    = "log.file.owner"
+	groupKey    = "log.file.group"
 )
 
-func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M) error {
+func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M, includeOwner bool, includeGroup bool) error {
 	osstate := fi.GetOSState()
 	_, err := fields.Put(deviceIDKey, strconv.FormatUint(osstate.Device, 10))
 	if err != nil {
@@ -43,5 +46,26 @@ func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M) error {
 		return fmt.Errorf("failed to set %q: %w", inodeKey, err)
 	}
 
+	if includeOwner {
+		o, err := user.LookupId(strconv.FormatUint(osstate.UID, 10))
+		if err != nil {
+			return fmt.Errorf("failed to lookup uid %q: %w", osstate.UID, err)
+		}
+		_, err = fields.Put(ownerKey, o.Username)
+		if err != nil {
+			return fmt.Errorf("failed to set %q: %w", ownerKey, err)
+		}
+	}
+
+	if includeGroup {
+		g, err := user.LookupGroupId(strconv.FormatUint(osstate.GID, 10))
+		if err != nil {
+			return fmt.Errorf("failed to lookup gid %q: %w", osstate.GID, err)
+		}
+		_, err = fields.Put(groupKey, g.Name)
+		if err != nil {
+			return fmt.Errorf("failed to set %q: %w", groupKey, err)
+		}
+	}
 	return nil
 }

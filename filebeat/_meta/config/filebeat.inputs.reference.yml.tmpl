@@ -448,6 +448,10 @@ filebeat.inputs:
   # if the fingerprints match, then the files are considered equal.
   #file_identity.fingerprint: ~
 
+  # Include file owner name and group name in the event metadata.  This option is not currently supported on Windows.
+  #include_file_owner_name: false
+  #include_file_owner_group_name: false
+
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
   #fields:
