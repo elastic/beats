@@ -6,12 +6,18 @@ This osquery extension provides additional custom tables that enhance osquery's 
 
 The extension adds several custom tables to osquery that provide:
 - Browser history analysis across multiple browsers
+- Host system information access from containers (groups, users, processes)
+- Deep file analysis and security auditing on macOS
 
 ## Supported Platforms
 
 | Table | Linux | macOS | Windows |
 |-------|-------|-------|---------|
 | `elastic_browser_history` | ✅ | ✅ | ✅ |
+| `host_groups` | ✅ | ✅ | ❌ |
+| `host_users` | ✅ | ✅ | ❌ |
+| `host_processes` | ✅ | ❌ | ❌ |
+| `elastic_file_analysis` | ❌ | ✅ | ❌ |
 
 ---
 
@@ -19,8 +25,30 @@ The extension adds several custom tables to osquery that provide:
 
 Each table has detailed documentation in its own file:
 
-### 1. [elastic_browser_history](docs/browser_history.md)
+### 1. [elastic_browser_history](docs/elastic_browser_history.md)
 Query browser history from multiple browsers (Chrome, Edge, Firefox, Safari) with unified schema and advanced filtering capabilities.
+
+**Platforms**: Linux, macOS, Windows
+
+### 2. [host_groups](docs/host_groups.md)
+Query host system group information when running in a container environment. Access the host's `/etc/group` file to enumerate all groups on the host system.
+
+**Platforms**: Linux, macOS
+
+### 3. [host_users](docs/host_users.md)
+Query host system user accounts when running in a container environment. Access the host's user database (passwd) to enumerate all user accounts on the host system.
+
+**Platforms**: Linux, macOS
+
+### 4. [host_processes](docs/host_processes.md)
+Query running process information from the host system when running in a container environment. Read from the host's `/proc` filesystem to inspect all processes running on the host.
+
+**Platforms**: Linux
+
+### 5. [elastic_file_analysis](docs/elastic_file_analysis.md)
+Perform comprehensive security analysis of executable files on macOS. Extract code signing information, library dependencies, symbols, and strings from Mach-O binaries.
+
+**Platforms**: macOS
 
 ---
 
