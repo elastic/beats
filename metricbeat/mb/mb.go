@@ -332,7 +332,10 @@ func (b *BaseMetricSet) Registration() MetricSetRegistration {
 // Registration returns the parameters that were used when the MetricSet was
 // registered with the registry.
 func (b *BaseMetricSet) GetPath() *paths.Path {
-	return b.paths
+	if b.paths != nil {
+		return b.paths
+	}
+	return paths.Paths
 }
 
 // Configuration types
