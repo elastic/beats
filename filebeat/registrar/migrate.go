@@ -49,11 +49,11 @@ type Migrator struct {
 	logger      *logp.Logger
 }
 
-func NewMigrator(cfg config.Registry, logger *logp.Logger) *Migrator {
-	path := paths.Resolve(paths.Data, cfg.Path)
+func NewMigrator(cfg config.Registry, logger *logp.Logger, beatPaths *paths.Path) *Migrator {
+	path := beatPaths.Resolve(paths.Data, cfg.Path)
 	migrateFile := cfg.MigrateFile
 	if migrateFile != "" {
-		migrateFile = paths.Resolve(paths.Data, migrateFile)
+		migrateFile = beatPaths.Resolve(paths.Data, migrateFile)
 	}
 
 	return &Migrator{

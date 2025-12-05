@@ -248,11 +248,12 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			ID:               id,
 			FirstStart:       time.Now(),
 			StartTime:        time.Now(),
-			EphemeralID:      metricreport.EphemeralID(),
+			EphemeralID:      metricreport.EphemeralID(), //nolint:staticcheck //keep behavior for now
 			FIPSDistribution: version.FIPSDistribution,
 		},
 		Fields:   fields,
 		Registry: reload.NewRegistry(),
+		Paths:    paths.New(),
 	}
 
 	return &Beat{Beat: b}, nil
@@ -426,7 +427,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path. This is disabled under elastic-agent.
 	if !management.UnderAgent() {
-		bl := locks.New(b.Info)
+		bl := locks.New(b.Info, b.Paths)
 		err := bl.Lock()
 		if err != nil {
 			return err
@@ -690,7 +691,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				loadILM = idxmgmt.LoadModeEnabled
 			}
 
-			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
+			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Paths, b.Config.LifecycleConfig)
 			if err != nil {
 				return fmt.Errorf("error creating index management handler: %w", err)
 			}
@@ -766,10 +767,11 @@ func (b *Beat) configure(settings Settings) error {
 	if err := InitPaths(cfg); err != nil {
 		return err
 	}
+	b.Paths = paths.Paths
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
-	store, err := LoadKeystore(cfg, b.Info.Beat)
+	store, err := LoadKeystore(cfg, b.Info.Beat, b.Paths)
 	if err != nil {
 		return fmt.Errorf("could not initialize the keystore: %w", err)
 	}
@@ -829,9 +831,9 @@ func (b *Beat) configure(settings Settings) error {
 	b.Instrumentation = instrumentation
 
 	// log paths values to help with troubleshooting
-	logger.Infof("%s", paths.Paths.String())
+	logger.Infof("%s", b.Paths.String())
 
-	metaPath := paths.Resolve(paths.Data, "meta.json")
+	metaPath := b.Paths.Resolve(paths.Data, "meta.json")
 	err = b.LoadMeta(metaPath)
 	if err != nil {
 		return err
@@ -1068,7 +1070,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 			return fmt.Errorf("error generating index pattern: %w", err)
 		}
 
-		err = dashboards.ImportDashboards(ctx, b.Info, paths.Resolve(paths.Home, ""),
+		err = dashboards.ImportDashboards(ctx, b.Info, b.Paths.Resolve(paths.Home, ""),
 			kibanaConfig, b.Config.Dashboards, nil, pattern)
 		if err != nil {
 			return fmt.Errorf("error importing Kibana dashboards: %w", err)
@@ -1134,7 +1136,7 @@ func (b *Beat) registerESIndexManagement() error {
 
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *eslegclient.Connection, _ *logp.Logger) error {
-		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
+		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Paths, b.Config.LifecycleConfig)
 		if err != nil {
 			return fmt.Errorf("error creating index management handler: %w", err)
 		}
@@ -1381,10 +1383,10 @@ func (b *Beat) logSystemInfo(log *logp.Logger) {
 		"type": b.Info.Beat,
 		"uuid": b.Info.ID,
 		"path": mapstr.M{
-			"config": paths.Resolve(paths.Config, ""),
-			"data":   paths.Resolve(paths.Data, ""),
-			"home":   paths.Resolve(paths.Home, ""),
-			"logs":   paths.Resolve(paths.Logs, ""),
+			"config": b.Paths.Resolve(paths.Config, ""),
+			"data":   b.Paths.Resolve(paths.Data, ""),
+			"home":   b.Paths.Resolve(paths.Home, ""),
+			"logs":   b.Paths.Resolve(paths.Logs, ""),
 		},
 	}
 	log.Infow("Beat info", "beat", beat)
