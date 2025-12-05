@@ -129,7 +129,7 @@ func (br *BeatReceiver) Start(host component.Host) error {
 
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
 		// set beatreceiver status
-		groupReporter.UpdateStatus(status.Degraded, err.Error())
+		groupReporter.UpdateStatus(status.Failed, err.Error())
 		return fmt.Errorf("beat receiver run error: %w", err)
 	}
 
