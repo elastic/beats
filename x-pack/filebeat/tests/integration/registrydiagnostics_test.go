@@ -30,7 +30,7 @@ import (
 func TestFilestreamRegistryIsInDiagnostics(t *testing.T) {
 	filebeat := NewFilebeat(t)
 	logfile := filepath.Join(filebeat.TempDir(), "log.log")
-	integration.GenerateLogFile(t, logfile, 2, false)
+	integration.WriteLogFile(t, logfile, 2, false)
 	input := proto.UnitExpected{
 		Id:             "input-" + t.Name(),
 		Type:           proto.UnitType_INPUT,

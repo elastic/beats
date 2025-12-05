@@ -80,7 +80,7 @@ func TestSourceIdentifier_ID(t *testing.T) {
 		test := test
 
 		t.Run(name, func(t *testing.T) {
-			srcIdentifier, err := newSourceIdentifier(testPluginName, test.userID)
+			srcIdentifier, err := NewSourceIdentifier(testPluginName, test.userID)
 			if err != nil {
 				t.Fatalf("cannot create identifier: %v", err)
 			}
@@ -119,7 +119,7 @@ func TestSourceIdentifier_MatchesInput(t *testing.T) {
 
 	for name, test := range testCases {
 		t.Run(name, func(t *testing.T) {
-			srcIdentifier, err := newSourceIdentifier(testPluginName, test.userID)
+			srcIdentifier, err := NewSourceIdentifier(testPluginName, test.userID)
 			if err != nil {
 				t.Fatalf("cannot create identifier: %v", err)
 			}
@@ -149,7 +149,7 @@ func TestSourceIdentifier_NotMatchesInput(t *testing.T) {
 
 	for name, test := range testCases {
 		t.Run(name, func(t *testing.T) {
-			srcIdentifier, err := newSourceIdentifier(testPluginName, test.userID)
+			srcIdentifier, err := NewSourceIdentifier(testPluginName, test.userID)
 			if err != nil {
 				t.Fatalf("cannot create identifier: %v", err)
 			}
@@ -164,11 +164,11 @@ func TestSourceIdentifier_NotMatchesInput(t *testing.T) {
 }
 
 func TestSourceIdentifierNoAccidentalMatches(t *testing.T) {
-	noIDIdentifier, err := newSourceIdentifier(testPluginName, "")
+	noIDIdentifier, err := NewSourceIdentifier(testPluginName, "")
 	if err != nil {
 		t.Fatalf("cannot create identifier: %v", err)
 	}
-	withIDIdentifier, err := newSourceIdentifier(testPluginName, "id")
+	withIDIdentifier, err := NewSourceIdentifier(testPluginName, "id")
 	if err != nil {
 		t.Fatalf("cannot create identifier: %v", err)
 	}
@@ -191,7 +191,7 @@ func TestInputManager_Create(t *testing.T) {
 			cim := &InputManager{
 				Logger:     log,
 				StateStore: testStateStore{Store: testStore},
-				Configure: func(_ *config.C, _ *logp.Logger) (Prospector, Harvester, error) {
+				Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
 					return nil, nil, nil
 				}}
 			cfg, err := config.NewConfigFrom("id: my-id")
@@ -225,7 +225,7 @@ func TestInputManager_Create(t *testing.T) {
 		cim := &InputManager{
 			Logger:     log,
 			StateStore: testStateStore{Store: testStore},
-			Configure: func(cfg *config.C, _ *logp.Logger) (Prospector, Harvester, error) {
+			Configure: func(cfg *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
 				var wg sync.WaitGroup
 
 				settings := struct {
