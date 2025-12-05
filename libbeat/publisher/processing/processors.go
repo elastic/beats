@@ -18,6 +18,7 @@
 package processing
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
