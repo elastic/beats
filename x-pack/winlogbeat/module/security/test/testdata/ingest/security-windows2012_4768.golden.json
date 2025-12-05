@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-04-01T08:45:44.1717416Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "kerberos-authentication-ticket-requested",
@@ -61,8 +61,8 @@
         "TicketEncryptionTypeDescription": "AES256-CTS-HMAC-SHA1-96",
         "TicketOptions": "0x40810010",
         "TicketOptionsDescription": [
-          "Renewable-ok",
           "Name-canonicalize",
+          "Renewable-ok",
           "Renewable",
           "Forwardable"
         ]
