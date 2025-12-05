@@ -187,7 +187,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Retry()
 		}
 
-		out.log.Errorf("failed to send batch events to otel collector: %v", err)
+		out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
 		return nil
 	}
 
