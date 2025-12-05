@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 FROM golang:1.24.9-bookworm
+=======
+FROM golang:1.24.11-bookworm
+>>>>>>> 64983371a ([Automation] Bump Golang version to 1.24.11 (#47903))
 COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker  /usr/local/bin/
 
 RUN \
