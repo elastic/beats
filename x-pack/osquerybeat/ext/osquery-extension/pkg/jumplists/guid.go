@@ -13,16 +13,17 @@ import (
 )
 
 type GuidType string
+
 const (
 	GuidTypeUnknown GuidType = "Unknown"
-	GuidTypeFolder GuidType  = "Folder"
+	GuidTypeFolder  GuidType = "Folder"
 )
 
 // GuidExtraData contains extra data about a GUID.
 // Type is the type of the GUID.
 // KnownFolder is the name of the known folder if the GUID is a known folder.
 type GuidExtraData struct {
-	Type GuidType
+	Type        GuidType
 	KnownFolder string
 }
 
@@ -33,10 +34,10 @@ type GuidExtraData struct {
 // Data4 is the last 8 bytes of the GUID.
 // ExtraData contains extra data about the GUID.
 type GUID struct {
-	Data1 uint32
-	Data2 uint16
-	Data3 uint16
-	Data4 [8]byte
+	Data1     uint32
+	Data2     uint16
+	Data3     uint16
+	Data4     [8]byte
 	ExtraData GuidExtraData
 }
 
@@ -59,7 +60,7 @@ func NewGUID(data []byte) *GUID {
 	copy(data4[:], data[8:16]) // Data4 is big-endian
 	guid := &GUID{
 		ExtraData: GuidExtraData{
-			Type: GuidTypeUnknown,
+			Type:        GuidTypeUnknown,
 			KnownFolder: "",
 		},
 		Data1: binary.LittleEndian.Uint32(data[:4]),

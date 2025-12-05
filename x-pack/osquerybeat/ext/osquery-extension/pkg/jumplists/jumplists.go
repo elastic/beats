@@ -24,7 +24,7 @@ import (
 type JumpListType string
 
 const (
-	JumpListTypeCustom JumpListType = "custom"
+	JumpListTypeCustom    JumpListType = "custom"
 	JumpListTypeAutomatic JumpListType = "automatic"
 )
 
@@ -67,7 +67,7 @@ func (j *JumpList) ToRows() []JumpListRow {
 	var rows []JumpListRow
 	for _, entry := range j.entries {
 		rows = append(rows, JumpListRow{
-			JumpListMeta: &j.JumpListMeta,
+			JumpListMeta:  &j.JumpListMeta,
 			JumpListEntry: entry,
 		})
 	}

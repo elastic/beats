@@ -7,82 +7,146 @@
 package jumplists
 
 import (
-	"fmt"
+	"io"
 	"os"
 	"strings"
-	"io"
 
 	"github.com/richardlehane/mscfb"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-// ParseAutomaticJumpListFile parses an automatic jump list file into a JumpList object.
-// It returns a JumpList object and an error if the file cannot be read or parsed.
 func ParseAutomaticJumpListFile(filePath string, log *logger.Logger) (*JumpList, error) {
-	// Open the file
+
+	// Create a minimal JumpList object to return if there is an error.
+	automaticJumpList := &JumpList{
+		JumpListMeta: JumpListMeta{
+			ApplicationId: GetAppIdFromFileName(filePath, log),
+			JumplistType:  JumpListTypeAutomatic,
+			Path:          filePath,
+		},
+		entries: []*JumpListEntry{},
+	}
+
+	// Open the jumplist file
 	file, err := os.Open(filePath)
 	if err != nil {
-		return nil, err
+		log.Errorf("failed to open jumplist file %s: %v", filePath, err)
+		return automaticJumpList, nil
 	}
 	defer file.Close()
 
 	// Parse the file as a Microsoft Compound File Binary (OLECFB)
 	doc, err := mscfb.New(file)
 	if err != nil {
-		return nil, err
+		log.Infof("failed to parse jumplist file %s as OLECFB: %v", filePath, err)
+		return automaticJumpList, nil
 	}
 
-	streams := make(map[string][]byte)
-	// Iterate over the entries in the OLECFB
+	// The automatic jumplist is an OLECFB file. It is a collection of entries
+	// that contain the jumplist data.  Entries of note are the DestList and DestListPropertyStore streams.
+	// The DestList stream contains the list of entries in the jumplist.
+	// The DestListPropertyStore stream contains the property store for the jumplist. TODO: Parse this.
+	// The other entries are LNK files that contain the destination information for the jumplist entries.
+	//
+	// This block iterates over the entries in the OLECFB
+	//   - when it encounters the DestList and DestListPropertyStore streams, it parses them.
+	//   - when it encounters a Lnk file it saves the stream for later parsing
+	//   - all other streams are logged as unknown and ignored.
+	//
+	lnks := make(map[string]*Lnk)
+	var destList *DestList
 	for entry, err := doc.Next(); err == nil; entry, err = doc.Next() {
-		streamName := strings.ToLower(entry.Name)
-		streams[streamName], err = io.ReadAll(entry)
-		if err != nil {
-			return nil, fmt.Errorf("failed to read stream: %w", err)
+		// TODO: Parse the DestListPropertyStore stream.
+		if strings.EqualFold(entry.Name, DestListPropertyStoreStreamName) {
+			log.Infof("DestListPropertyStore stream found for path %s", filePath)
+			continue
 		}
+
+		// Parse the DestList stream.
+		if strings.EqualFold(entry.Name, DestListStreamName) {
+			// Read the DestList stream into a byte slice.
+			destListBytes := make([]byte, entry.Size)
+			if _, err := io.ReadFull(entry, destListBytes); err != nil {
+				log.Infof("failed to read DestList stream for path %s: %v", filePath, err)
+				return automaticJumpList, nil
+			}
+
+			// Parse the DestList stream into a DestList object.  The DestList is a
+			// crucial part of the jumplist, so we can't continue if it fails.
+			destList, err = NewDestList(destListBytes, log)
+			if err != nil {
+				log.Infof("failed to parse DestList for path %s: %v", filePath, err)
+				return automaticJumpList, nil
+			}
+			continue
+		}
+
+		// Other than the DestList and DestListPropertyStore streams, we only care about LNK files.
+		// Log unknown streams, but continue to the next entry.
+
+		// Read the first 4 bytes of the stream to check if it is a LNK file.
+		header := make([]byte, 4)
+		if _, err := io.ReadFull(entry, header); err != nil {
+			log.Infof("failed to read stream %s for path %s: %v", entry.Name, filePath, err)
+			continue
+		}
+
+		if !IsLnkSignature(header) {
+			log.Infof("stream %s for path %s is not a LNK file", entry.Name, filePath)
+			continue
+		}
+
+		// Read the rest of the stream into a byte slice.
+		streamBuffer := make([]byte, entry.Size)
+		copy(streamBuffer, header)
+		if _, err := io.ReadFull(entry, streamBuffer[4:]); err != nil {
+			log.Infof("failed to read stream %s for path %s: %v", entry.Name, filePath, err)
+			continue
+		}
+
+		// Parse the LNK stream into a Lnk object.
+		lnk, err := NewLnkFromBytes(streamBuffer, 0, log)
+		if err != nil {
+			log.Infof("failed to parse LNK stream %s for path %s: %v", entry.Name, filePath, err)
+			continue
+		}
+
+		// Save the Lnk object to the map with a lowercase key for case-insensitive lookup.
+		// The lnk object is named in the OLECFB by the hex value of the dest list entry number.
+		// We will save it to the map with a lowercase key for case-insensitive lookup.
+		lnks[strings.ToLower(entry.Name)] = lnk
 	}
 
-	// Parse the DestList stream
-	destListStream, ok := streams[strings.ToLower(DestListStreamName)]; if !ok {
-		return nil, fmt.Errorf("DestList stream not found")
-	}
-	destList, err := NewDestList(destListStream, log)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse DestList: %w", err)
+	if destList == nil {
+		log.Infof("DestList not found for path %s", filePath)
+		return automaticJumpList, nil
 	}
 
-	entries := make([]*JumpListEntry, 0)
+	// We have a parsed DestList object and a map of Lnk objects.
+	// Now we need to associate the Lnk objects with the DestList entries.
+	entries := make([]*JumpListEntry, 0, len(destList.Entries))
 	for _, entry := range destList.Entries {
+		// Create a minimal JumpListEntry object to return if there is an error.
 		jumpListEntry := &JumpListEntry{
 			DestListEntry: entry,
 			Lnk:           nil,
 		}
 
-		lnkStream, ok := streams[entry.StreamName]; if !ok {
-			fmt.Println("Stream not found: ", entry.StreamName)
+		// Lookup the Lnk object by the DestList entry name.
+		lnk, ok := lnks[strings.ToLower(entry.Name)]
+		if !ok {
+			log.Infof("LNK object %s not found for path %s", entry.Name, filePath)
+			entries = append(entries, jumpListEntry)
 			continue
 		}
-
-		lnk, err := NewLnkFromBytes(lnkStream, int(entry.EntryNumber), log)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse LNK file: %w", err)
-		}
-
 		jumpListEntry.Lnk = lnk
 		entries = append(entries, jumpListEntry)
 	}
 
-	// Look up the application id and create the metadata
-	jumpListMeta := JumpListMeta{
-		ApplicationId: GetAppIdFromFileName(filePath, log),
-		JumplistType:  JumpListTypeAutomatic,
-		Path:          filePath,
-	}
-	automaticJumpList := &JumpList{
-		JumpListMeta: jumpListMeta,
-		entries:      entries,
-	}
+	// Save the entries to the JumpList object.
+	automaticJumpList.entries = entries
+
 	return automaticJumpList, nil
 }
 
@@ -99,7 +163,7 @@ func GetAutomaticJumpLists(log *logger.Logger) []*JumpList {
 	for _, file := range files {
 		automaticJumpList, err := ParseAutomaticJumpListFile(file, log)
 		if err != nil {
-			log.Infof("failed to parse Automatic Jump List %s: %v", file, err)
+			log.Errorf("failed to parse Automatic Jump List %s: %v", file, err)
 			continue
 		}
 		jumplists = append(jumplists, automaticJumpList)

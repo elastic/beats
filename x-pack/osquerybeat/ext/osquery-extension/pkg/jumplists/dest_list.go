@@ -9,13 +9,13 @@ package jumplists
 import (
 	"encoding/binary"
 	"fmt"
-	"io"
-	"os"
+	//"io"
+	//"os"
 	"strings"
 	"time"
 	"unicode/utf16"
 
-	"github.com/richardlehane/mscfb"
+	//"github.com/richardlehane/mscfb"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
@@ -59,8 +59,7 @@ type DestListEntry struct {
 	Path             string
 	MacAddress       string
 	CreationTime     time.Time
-	Lnk              *Lnk
-	StreamName       string
+	Name             string
 }
 
 type DestList struct {
@@ -81,7 +80,7 @@ func NewDestList(data []byte, log *logger.Logger) (*DestList, error) {
 
 	destList := &DestList{
 		Header:  *header,
-		Entries: make([]*DestListEntry, 0),	
+		Entries: make([]*DestListEntry, 0),
 	}
 
 	index := DestListHeaderSize
@@ -255,7 +254,7 @@ func NewDestListEntry(data []byte, version int32) (*DestListEntry, error) {
 	fileBirthDroid := NewGUID(data[56:72])
 	hostname := parseHostname(data[72:88])
 	entryNumber := int32(binary.LittleEndian.Uint32(data[88:92]))
-	streamName := fmt.Sprintf("%x", entryNumber)
+	name := fmt.Sprintf("%x", entryNumber)
 	unknown0 := int32(binary.LittleEndian.Uint32(data[92:96]))
 	accessCount := float32(binary.LittleEndian.Uint32(data[96:100]))
 	lastModifiedTime := toTime(data[100:108])
@@ -281,7 +280,7 @@ func NewDestListEntry(data []byte, version int32) (*DestListEntry, error) {
 		Path:             path,
 		MacAddress:       macAddress,
 		CreationTime:     creationTime,
-		StreamName:       streamName,
+		Name:             name,
 	}, nil
 }
 
@@ -337,86 +336,80 @@ func (e *DestListEntry) String() string {
 	return sb.String()
 }
 
-// Olecfb represents a microsoft compound file binary file.
-// tailored for jump list files.
-// - path: the path to the file
-// - streams: a map of stream names to their data
-type Olecfb struct {
-	Path           string
-	DestList       *DestList
-	Lnks           []*Lnk
-	UnknownStreams map[string][]byte
-}
+// // Olecfb represents a microsoft compound file binary file.
+// // tailored for jump list files.
+// // - path: the path to the file
+// // - streams: a map of stream names to their data
+// type Olecfb struct {
+// 	Path           string
+// 	DestList       *DestList
+// 	Lnks           []*Lnk
+// 	UnknownStreams map[string][]byte
+// }
 
-func (o *Olecfb) HasValidDestList() bool {
-	return o.DestList != nil
-}
+// func (o *Olecfb) HasValidDestList() bool {
+// 	return o.DestList != nil
+// }
 
-// NewOlecfb creates a new Olecfb object.
-// - path: the path to the file
-// - log: the logger to use
-// returns: a new Olecfb object, or an error if the file cannot be opened or parsed
-func NewOlecfb(path string, log *logger.Logger) (*Olecfb, error) {
-	olecfb := &Olecfb{
-		Path:           path,
-		DestList:       nil,
-		Lnks:           make([]*Lnk, 0),
-		UnknownStreams: make(map[string][]byte),
-	}
-	
-	// Open the file
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
+// // NewOlecfb creates a new Olecfb object.
+// // - path: the path to the file
+// // - log: the logger to use
+// // returns: a new Olecfb object, or an error if the file cannot be opened or parsed
+// func NewOlecfb(path string, log *logger.Logger) (*Olecfb, error) {
+// 	olecfb := &Olecfb{
+// 		Path:           path,
+// 		DestList:       nil,
+// 		Lnks:           make([]*Lnk, 0),
+// 		UnknownStreams: make(map[string][]byte),
+// 	}
 
-	// Parse the file as a Microsoft Compound File Binary (OLECFB)
-	doc, err := mscfb.New(file)
-	if err != nil {
-		return nil, err
-	}
+// 	// Open the file
+// 	file, err := os.Open(path)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer file.Close()
 
-	streams := make(map[string][]byte)
-	// Iterate over the entries in the OLECFB
-	for entry, err := doc.Next(); err == nil; entry, err = doc.Next() {
-		streamName := strings.ToLower(entry.Name)
-		streams[streamName], err = io.ReadAll(entry)
-		if err != nil {
-			return nil, fmt.Errorf("failed to read stream: %w", err)
-		}
-	}
+// 	// Parse the file as a Microsoft Compound File Binary (OLECFB)
+// 	doc, err := mscfb.New(file)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	// Parse the DestList stream
-	destList, err := NewDestList(streams[strings.ToLower(DestListStreamName)], log)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse DestList: %w", err)
-	}
-	olecfb.DestList = destList
+// 	streams := make(map[string][]byte)
+// 	// Iterate over the entries in the OLECFB
+// 	for entry, err := doc.Next(); err == nil; entry, err = doc.Next() {
+// 		streamName := strings.ToLower(entry.Name)
+// 		streams[streamName], err = io.ReadAll(entry)
+// 		if err != nil {
+// 			return nil, fmt.Errorf("failed to read stream: %w", err)
+// 		}
+// 	}
 
-	for name, data := range streams {
-		fmt.Println("Stream: ", name, "Length: ", len(data))
-	}
+// 	// Parse the DestList stream
+// 	destList, err := NewDestList(streams[strings.ToLower(DestListStreamName)], log)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to parse DestList: %w", err)
+// 	}
+// 	olecfb.DestList = destList
 
-	for _, entry := range destList.Entries {
-		_, ok := streams[entry.StreamName]; if !ok {
-			fmt.Println("Stream not found: ", entry.StreamName)
-			continue
-		}
-		isLnk := IsLnkSignature(streams[entry.StreamName]) 
-		fmt.Printf("Entry: %s Number: %d streamExists: %t isLnk: %t\n", entry.StreamName, entry.EntryNumber, ok, isLnk)
-	}
+// 	for _, entry := range destList.Entries {
+// 		data, ok := streams[entry.StreamName]; if !ok {
+// 			fmt.Println("Stream not found: ", entry.StreamName)
+// 			continue
+// 		}
 
-	// // If the entry is a LNK file, parse it.
-	// if IsLnkSignature(data) {
-	// 	lnk, err := NewLnkFromBytes(data, 0, log)
-	// 	if err != nil {
-	// 		return nil, fmt.Errorf("failed to parse LNK file: %w", err)
-	// 	}
-	// 	olecfb.Lnks = append(olecfb.Lnks, lnk)
-	// 	continue
-	// }
-	// // If the entry is not a DestList stream or a LNK file, store the data in the UnknownStreams map.
-	// olecfb.UnknownStreams[entry.Name] = data
-	return olecfb, nil
-}
+// 		// If the entry is a LNK file, parse it.
+// 		lnk, err := NewLnkFromBytes(data, int(entry.EntryNumber), log)
+// 		if err != nil {
+// 			fmt.Println("Failed to parse LNK stream: ", entry.StreamName)
+// 			continue
+// 		} else {
+// 			entry.Lnk = lnk
+// 		}
+
+// 		entry.Lnk = lnk
+// 		olecfb.Lnks = append(olecfb.Lnks, lnk)
+// 	}
+// 	return olecfb, nil
+// }
