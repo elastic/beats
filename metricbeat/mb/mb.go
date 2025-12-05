@@ -32,6 +32,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -265,6 +266,7 @@ type BaseMetricSet struct {
 	registration MetricSetRegistration
 	metrics      *monitoring.Registry
 	logger       *logp.Logger
+	paths        *paths.Path
 }
 
 func (b *BaseMetricSet) String() string {
@@ -325,6 +327,12 @@ func (b *BaseMetricSet) HostData() HostData {
 // registered with the registry.
 func (b *BaseMetricSet) Registration() MetricSetRegistration {
 	return b.registration
+}
+
+// Registration returns the parameters that were used when the MetricSet was
+// registered with the registry.
+func (b *BaseMetricSet) GetPath() *paths.Path {
+	return b.paths
 }
 
 // Configuration types
