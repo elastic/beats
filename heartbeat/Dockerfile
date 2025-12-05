@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-FROM golang:1.24.9-bookworm
-=======
 FROM golang:1.24.11-bookworm
->>>>>>> 64983371a ([Automation] Bump Golang version to 1.24.11 (#47903))
 
 RUN \
     apt-get update \
