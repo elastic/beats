@@ -208,7 +208,7 @@ func startHarvester(
 
 			if err != nil {
 				ctx.StatusReporter.UpdateStatus(
-					status.Failed,
+					status.Degraded,
 					fmt.Sprintf("harvester failed: %s", err),
 				)
 			}

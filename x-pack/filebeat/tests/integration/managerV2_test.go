@@ -1098,7 +1098,7 @@ func TestFoo(t *testing.T) {
 						"processors": []any{
 							map[string]any{
 								"add_fields": map[string]any{
-									"fields_under_root": true, // invalid
+									"INVALID_CONFIG_KEY": true, // invalid
 									"fields": map[string]any{
 										"labels": map[string]any{
 											"foo": "bar",
@@ -1135,7 +1135,7 @@ func TestFoo(t *testing.T) {
 						"processors": []any{
 							map[string]any{
 								"add_fields": map[string]any{
-									"fields_under_root": true, // invalid
+									"INVALID_CONFIG_KEY": true, // invalid
 									"fields": map[string]any{
 										"labels": map[string]any{
 											"foo": "bar",
@@ -1150,55 +1150,56 @@ func TestFoo(t *testing.T) {
 		},
 	}
 
-	// TODO: Remove me
-	fmt.Fprint(io.Discard, &brokenFilestream, &brokenCEL)
-
-	testCases := map[string]*proto.UnitExpected{
-		"cel":        brokenCEL,
-		"filestream": brokenFilestream,
-		"net inputs": {
-			Id:             "broken-tcp",
-			Type:           proto.UnitType_INPUT,
-			ConfigStateIdx: 1,
-			State:          proto.State_HEALTHY,
-			LogLevel:       proto.UnitLogLevel_DEBUG,
-			Config: &proto.UnitExpectedConfig{
-				Id:   "tcp-input",
-				Type: "tcp",
-				Name: "tcp",
-				Streams: []*proto.Stream{
-					{
-						Id: "tcp-input",
-						Source: integration.RequireNewStruct(t, map[string]any{
-							"enabled": true,
-							"type":    "tcp",
-							"host":    "localhost:9042", // random port
-							"processors": []any{
-								map[string]any{
-									"add_fields": map[string]any{
-										"fields_under_root": true, // invalid
-										"fields": map[string]any{
-											"labels": map[string]any{
-												"foo": "bar",
-											},
+	brokenTCPInput := &proto.UnitExpected{
+		Id:             "broken-tcp",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "tcp-input",
+			Type: "tcp",
+			Name: "tcp",
+			Streams: []*proto.Stream{
+				{
+					Id: "tcp-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"enabled": true,
+						"type":    "tcp",
+						"host":    "localhost:9042", // random port
+						"processors": []any{
+							map[string]any{
+								"add_fields": map[string]any{
+									"INVALID_CONFIG_KEY": true, // invalid
+									"fields": map[string]any{
+										"labels": map[string]any{
+											"foo": "bar",
 										},
 									},
 								},
 							},
-						}),
-					},
+						},
+					}),
 				},
 			},
 		},
 	}
 
-	for name, inputUnit := range testCases {
+	testCases := map[string]struct {
+		expectedState proto.State
+		expectedUnit  *proto.UnitExpected
+	}{
+		"cel":        {expectedState: proto.State_FAILED, expectedUnit: brokenCEL},
+		"filestream": {expectedState: proto.State_DEGRADED, expectedUnit: brokenFilestream},
+		"net inputs": {expectedState: proto.State_FAILED, expectedUnit: brokenTCPInput},
+	}
+
+	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			finalStateReached := atomic.Bool{}
 			var units = []*proto.UnitExpected{
 				outputUnit,
-				// brokenFilestream,
-				inputUnit,
+				tc.expectedUnit,
 			}
 
 			server := &mock.StubServerV2{
@@ -1207,16 +1208,16 @@ func TestFoo(t *testing.T) {
 						t.Logf("ID: %s, State: %s", unit.GetId(), unit.GetState().String())
 					}
 
-					inputUnit.State = proto.State_FAILED
+					tc.expectedUnit.State = tc.expectedState
 					expectedState := []*proto.UnitExpected{
 						outputUnit,
-						inputUnit,
+						tc.expectedUnit,
 					}
 					if management.DoesStateMatch(observed, expectedState, 0) {
 						finalStateReached.Store(true)
 					}
 
-					inputUnit.State = proto.State_HEALTHY
+					tc.expectedUnit.State = proto.State_HEALTHY
 					return &proto.CheckinExpected{
 						Units: units,
 					}
@@ -1246,7 +1247,7 @@ func TestFoo(t *testing.T) {
 
 				require.Eventually(t, func() bool {
 					return finalStateReached.Load()
-				}, 30*time.Second, 100*time.Millisecond, "Output unit did not report unhealthy")
+				}, 30*time.Second, 100*time.Millisecond, "Input unit did not report %s", tc.expectedState.String())
 
 				t.Cleanup(server.Stop)
 			}
