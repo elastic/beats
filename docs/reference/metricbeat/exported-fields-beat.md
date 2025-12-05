@@ -749,6 +749,30 @@ Beat module
     alias to: beat.stats.apm_server.sampling.tail.storage.value_log_size
 
 
+**`beats_stats.apm-server.sampling.tail.storage.storage_limit`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.storage.storage_limit
+
+
+**`beats_stats.apm-server.sampling.tail.storage.disk_used`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.storage.disk_used
+
+
+**`beats_stats.apm-server.sampling.tail.storage.disk_total`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.storage.disk_total
+
+
+**`beats_stats.apm-server.sampling.tail.storage.disk_usage_threshold`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.storage.disk_usage_threshold
+
+
 **`beats_stats.apm-server.sampling.transactions_dropped`**
 :   type: alias
 
@@ -2030,6 +2054,22 @@ Beat stats
 
 
 **`beat.stats.apm_server.sampling.tail.storage.value_log_size`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.storage.storage_limit`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.storage.disk_used`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.storage.disk_total`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.storage.disk_usage_threshold`**
 :   type: long
 
 
