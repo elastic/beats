@@ -18,7 +18,7 @@ func TestGroupStatus(t *testing.T) {
 	m := &oteltest.MockHost{}
 	reporter := NewGroupStatusReporter(m)
 
-	subReporter1, subReporter2, subReporter3 := reporter.GetReporterForRunner(1), reporter.GetReporterForRunner(2), reporter.GetReporterForRunner(3)
+	subReporter1, subReporter2, subReporter3 := reporter.GetReporterForRunner("1"), reporter.GetReporterForRunner("2"), reporter.GetReporterForRunner("3")
 
 	subReporter1.UpdateStatus(status.Running, "")
 	subReporter2.UpdateStatus(status.Running, "")

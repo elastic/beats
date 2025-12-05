@@ -8,25 +8,38 @@ import (
 	"errors"
 	"sync"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/management/status"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componentstatus"
 )
 
+const inputStatusAttributesKey = "inputs"
+
 type runnerState struct {
 	state status.Status
 	msg   string
 }
 
+// toPdata converts a runnerState to a pdata.Map
+// The format is the same as x-pack/libbeat/management/unit.go#updateStateForStream
+func toPdata(r *runnerState) pcommon.Map {
+	pcommonMap := pcommon.NewMap()
+	pcommonMap.PutStr("status", r.state.String())
+	pcommonMap.PutStr("error", r.msg)
+	return pcommonMap
+}
+
 // RunnerReporter defines an interface that returns a StatusReporter for a specific runner.
 // This is used for grouping and managing statuses of multiple runners
 type RunnerReporter interface {
-	GetReporterForRunner(id uint64) status.StatusReporter
+	GetReporterForRunner(id string) status.StatusReporter
 }
 
 type reporter struct {
-	runnerStates map[uint64]*runnerState
+	runnerStates map[string]*runnerState
 	host         component.Host
 	mtx          sync.Mutex
 }
@@ -38,11 +51,11 @@ type reporter struct {
 func NewGroupStatusReporter(host component.Host) RunnerReporter {
 	return &reporter{
 		host:         host,
-		runnerStates: make(map[uint64]*runnerState),
+		runnerStates: make(map[string]*runnerState),
 	}
 }
 
-func (r *reporter) GetReporterForRunner(id uint64) status.StatusReporter {
+func (r *reporter) GetReporterForRunner(id string) status.StatusReporter {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	return &subReporter{
@@ -51,11 +64,11 @@ func (r *reporter) GetReporterForRunner(id uint64) status.StatusReporter {
 	}
 }
 
-func (r *reporter) updateStatusForRunner(id uint64, state status.Status, msg string) {
+func (r *reporter) updateStatusForRunner(id string, state status.Status, msg string) {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	if r.runnerStates == nil {
-		r.runnerStates = make(map[uint64]*runnerState)
+		r.runnerStates = make(map[string]*runnerState)
 	}
 	if rState, ok := r.runnerStates[id]; ok {
 		rState.msg = msg
@@ -68,15 +81,18 @@ func (r *reporter) updateStatusForRunner(id uint64, state status.Status, msg str
 		}
 	}
 
-	// calculate the aggregate state of beat based on the module states
-	calcState, calcMsg := r.calculateState()
-
 	// report status to parent reporter
-	r.UpdateStatus(calcState, calcMsg)
+	r.UpdateStatus()
 }
 
-func (r *reporter) UpdateStatus(s status.Status, msg string) {
+func (r *reporter) UpdateStatus() {
+	evt := r.calculateOtelStatus()
+	componentstatus.ReportStatus(r.host, evt)
+}
+
+func (r *reporter) calculateOtelStatus() *componentstatus.Event {
 	var evt *componentstatus.Event
+	s, msg := r.calculateAggregateState()
 	switch s {
 	case status.Starting:
 		evt = componentstatus.NewEvent(componentstatus.StatusStarting)
@@ -91,15 +107,24 @@ func (r *reporter) UpdateStatus(s status.Status, msg string) {
 	case status.Stopped:
 		evt = componentstatus.NewEvent(componentstatus.StatusStopped)
 	default:
-		return
+		return nil
 	}
 
-	componentstatus.ReportStatus(r.host, evt)
+	inputStatusesPdata := evt.Attributes().PutEmptyMap(inputStatusAttributesKey)
+
+	for id, rs := range r.runnerStates {
+		inputStatePdata := toPdata(rs)
+		m := inputStatusesPdata.PutEmptyMap(id)
+		inputStatePdata.MoveTo(m)
+	}
+
+	return evt
 }
 
-func (r *reporter) calculateState() (status.Status, string) {
+func (r *reporter) calculateAggregateState() (status.Status, string) {
 	reportedState := status.Running
 	reportedMsg := ""
+
 	for _, s := range r.runnerStates {
 		switch s.state {
 		case status.Degraded:
@@ -111,6 +136,7 @@ func (r *reporter) calculateState() (status.Status, string) {
 			// we've encountered a failed runner.
 			// short-circuit and return, as Failed state takes precedence over other states
 			return s.state, s.msg
+		default:
 		}
 	}
 	return reportedState, reportedMsg
@@ -118,7 +144,7 @@ func (r *reporter) calculateState() (status.Status, string) {
 
 // subReporter implements status.StatusReporter
 type subReporter struct {
-	id uint64
+	id string
 	r  *reporter
 }
 
