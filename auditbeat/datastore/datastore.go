@@ -22,8 +22,9 @@ import (
 	"os"
 	"sync"
 
-	"github.com/elastic/elastic-agent-libs/paths"
 	bolt "go.etcd.io/bbolt"
+
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var (
