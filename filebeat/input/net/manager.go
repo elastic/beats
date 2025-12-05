@@ -165,10 +165,6 @@ func (w wrapper) Run(ctx v2.Context, pipeline beat.PipelineConnector) (err error
 	m := w.inp.InitMetrics(ctx.ID, ctx.MetricsRegistry, ctx.Logger)
 	if err := w.initWorkers(ctx, pipeline, m); err != nil {
 		logger.Errorf("cannot initialise pipeline workers: %s", err)
-		ctx.UpdateStatus(
-			status.Failed,
-			fmt.Sprintf("cannot initialise workers: %s", err),
-		)
 		return fmt.Errorf("cannot initialise pipeline workers: %w", err)
 	}
 

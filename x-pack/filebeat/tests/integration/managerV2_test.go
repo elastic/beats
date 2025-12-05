@@ -1055,10 +1055,24 @@ func TestReloadErrorHandling(t *testing.T) {
 	t.Cleanup(server.Stop)
 }
 
-func TestFoo(t *testing.T) {
+func TestPipelineConnectionErrorFailsInput(t *testing.T) {
 	filebeat := NewFilebeat(t)
 
-	integration.WriteLogFile(t, "/tmp/flog.log", 100, false)
+	logFilePath := filepath.Join(filebeat.TempDir(), "a-log-file.log")
+	integration.WriteLogFile(t, logFilePath, 100, false)
+
+	brokenProcessor := []any{
+		map[string]any{
+			"add_fields": map[string]any{
+				"INVALID_CONFIG_KEY": true,
+				"fields": map[string]any{
+					"labels": map[string]any{
+						"foo": "bar",
+					},
+				},
+			},
+		},
+	}
 
 	outputUnit := &proto.UnitExpected{
 		Id:             "output-unit",
@@ -1078,8 +1092,8 @@ func TestFoo(t *testing.T) {
 		},
 	}
 
-	brokenFilestream := &proto.UnitExpected{
-		Id:             "broken-Filestream",
+	filestreamInput := &proto.UnitExpected{
+		Id:             "Filestream",
 		Type:           proto.UnitType_INPUT,
 		ConfigStateIdx: 1,
 		State:          proto.State_HEALTHY,
@@ -1092,29 +1106,17 @@ func TestFoo(t *testing.T) {
 				{
 					Id: "filestream-input",
 					Source: integration.RequireNewStruct(t, map[string]any{
-						"enabled": true,
-						"type":    "filestream",
-						"paths":   "/tmp/flog.log",
-						"processors": []any{
-							map[string]any{
-								"add_fields": map[string]any{
-									"INVALID_CONFIG_KEY": true, // invalid
-									"fields": map[string]any{
-										"labels": map[string]any{
-											"foo": "bar",
-										},
-									},
-								},
-							},
-						},
+						"type":       "filestream",
+						"paths":      logFilePath,
+						"processors": brokenProcessor,
 					}),
 				},
 			},
 		},
 	}
 
-	brokenCEL := &proto.UnitExpected{
-		Id:             "broken-cel",
+	celInput := &proto.UnitExpected{
+		Id:             "cel",
 		Type:           proto.UnitType_INPUT,
 		ConfigStateIdx: 1,
 		State:          proto.State_HEALTHY,
@@ -1127,31 +1129,19 @@ func TestFoo(t *testing.T) {
 				{
 					Id: "cel-input",
 					Source: integration.RequireNewStruct(t, map[string]any{
-						"enabled":      true,
 						"type":         "cel",
 						"interval":     "1m",
 						"resource.url": "https://api.ipify.org/?format=text",
 						"program":      `{"events": [{"ip": string(get(state.url).Body)}]}`,
-						"processors": []any{
-							map[string]any{
-								"add_fields": map[string]any{
-									"INVALID_CONFIG_KEY": true, // invalid
-									"fields": map[string]any{
-										"labels": map[string]any{
-											"foo": "bar",
-										},
-									},
-								},
-							},
-						},
+						"processors":   brokenProcessor,
 					}),
 				},
 			},
 		},
 	}
 
-	brokenTCPInput := &proto.UnitExpected{
-		Id:             "broken-tcp",
+	tcpinput := &proto.UnitExpected{
+		Id:             "tcp",
 		Type:           proto.UnitType_INPUT,
 		ConfigStateIdx: 1,
 		State:          proto.State_HEALTHY,
@@ -1164,39 +1154,81 @@ func TestFoo(t *testing.T) {
 				{
 					Id: "tcp-input",
 					Source: integration.RequireNewStruct(t, map[string]any{
-						"enabled": true,
-						"type":    "tcp",
-						"host":    "localhost:9042", // random port
-						"processors": []any{
-							map[string]any{
-								"add_fields": map[string]any{
-									"INVALID_CONFIG_KEY": true, // invalid
-									"fields": map[string]any{
-										"labels": map[string]any{
-											"foo": "bar",
-										},
-									},
-								},
-							},
-						},
+						"type":       "tcp",
+						"host":       "localhost:9042",
+						"processors": brokenProcessor,
 					}),
 				},
 			},
 		},
 	}
 
+	kafkaInput := &proto.UnitExpected{
+		Id:             "kafka",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "kafka-input",
+			Type: "kafka",
+			Name: "kafka",
+			Streams: []*proto.Stream{
+				{
+					Id: "kafka-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"type":       "kafka",
+						"hosts":      []any{"localhost:9042"},
+						"topics":     []any{"foo-topic"},
+						"group_id":   "foo",
+						"processors": brokenProcessor,
+					}),
+				},
+			},
+		},
+	}
+
+	awsS3Input := &proto.UnitExpected{
+		Id:             "awss3",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "awss3-input",
+			Type: "aws-s3",
+			Name: "aws-s3",
+			Streams: []*proto.Stream{
+				{
+					Id: "awss3-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"type":                         "aws-s3",
+						"queue_url":                    "https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue",
+						"expand_event_list_from_field": "Records",
+						"processors":                   brokenProcessor,
+					}),
+				},
+			},
+		},
+	}
+
+	// Test some inputs with different managers and
+	// different pipeline connection error handling
 	testCases := map[string]struct {
 		expectedState proto.State
 		expectedUnit  *proto.UnitExpected
 	}{
-		"cel":        {expectedState: proto.State_FAILED, expectedUnit: brokenCEL},
-		"filestream": {expectedState: proto.State_DEGRADED, expectedUnit: brokenFilestream},
-		"net inputs": {expectedState: proto.State_FAILED, expectedUnit: brokenTCPInput},
+		"cel":        {expectedState: proto.State_FAILED, expectedUnit: celInput},
+		"filestream": {expectedState: proto.State_DEGRADED, expectedUnit: filestreamInput},
+		"net inputs": {expectedState: proto.State_FAILED, expectedUnit: tcpinput},
+		"kafka":      {expectedState: proto.State_FAILED, expectedUnit: kafkaInput},
+		"aws-s3":     {expectedState: proto.State_DEGRADED, expectedUnit: awsS3Input},
 	}
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			finalStateReached := atomic.Bool{}
+
 			var units = []*proto.UnitExpected{
 				outputUnit,
 				tc.expectedUnit,
@@ -1204,16 +1236,22 @@ func TestFoo(t *testing.T) {
 
 			server := &mock.StubServerV2{
 				CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
-					for _, unit := range observed.Units {
-						t.Logf("ID: %s, State: %s", unit.GetId(), unit.GetState().String())
-					}
-
 					tc.expectedUnit.State = tc.expectedState
 					expectedState := []*proto.UnitExpected{
 						outputUnit,
 						tc.expectedUnit,
 					}
 					if management.DoesStateMatch(observed, expectedState, 0) {
+						// Ensure the error message is correct
+						for _, unit := range observed.Units {
+							if unit.Type == proto.UnitType_INPUT {
+								got := unit.GetMessage()
+								want := "unexpected INVALID_CONFIG_KEY option in processors"
+								if !strings.Contains(got, want) {
+									t.Errorf("Got the wrong error message. Expecting %q, got %q", want, got)
+								}
+							}
+						}
 						finalStateReached.Store(true)
 					}
 
@@ -1225,32 +1263,26 @@ func TestFoo(t *testing.T) {
 				ActionImpl: func(response *proto.ActionResponse) error { return nil },
 			}
 
-			server.Port = 3000
 			require.NoError(t, server.Start())
 			t.Cleanup(server.Stop)
 
-			//nolint:forbidigo // I'll remove it later
-			fmt.Println(
-				"Connection string:\n",
+			filebeat.Start(
 				"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
 				"-E", "management.enabled=true",
 			)
+			t.Cleanup(filebeat.Stop)
 
-			// c := make(chan any)
-			// <-c
-
-			if true { //TODO: remove me
-				filebeat.Start(
-					"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
-					"-E", "management.enabled=true",
-				)
-
-				require.Eventually(t, func() bool {
+			require.Eventually(
+				t,
+				func() bool {
 					return finalStateReached.Load()
-				}, 30*time.Second, 100*time.Millisecond, "Input unit did not report %s", tc.expectedState.String())
+				},
+				30*time.Second,
+				100*time.Millisecond,
+				"Input unit %q did not report status %s",
+				name, tc.expectedState.String())
 
-				t.Cleanup(server.Stop)
-			}
+			t.Cleanup(server.Stop)
 		})
 	}
 }
