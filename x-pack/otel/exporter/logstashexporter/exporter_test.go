@@ -21,9 +21,9 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter/internal"
+	"github.com/elastic/beats/v7/x-pack/otel/otelctx"
 	"github.com/elastic/elastic-agent-libs/transport"
 )
 
