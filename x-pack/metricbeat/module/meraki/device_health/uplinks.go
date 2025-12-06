@@ -193,7 +193,7 @@ func reportUplinkMetrics(reporter mb.ReporterV2, organizationID string, devices 
 			if uplink == nil {
 				continue
 			}
-			if uplink.lossAndLatency != nil {
+			if uplink.lossAndLatency != nil && uplink.lossAndLatency.TimeSeries != nil {
 				// each loss and latency metric can have multiple values per collection.
 				// we report each value as it's own (smaller) metric event, containing
 				// the identifying device/uplink fields.
