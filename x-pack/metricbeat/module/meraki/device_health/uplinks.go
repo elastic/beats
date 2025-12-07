@@ -72,8 +72,12 @@ func getDeviceUplinks(client *sdk.Client, organizationID string, devices map[Ser
 
 		for _, device := range *applicanceUplinks {
 			deviceObj, ok := devices[Serial(device.Serial)]
-			if device.HighAvailability != nil && ok && deviceObj != nil {
-				devices[Serial(device.Serial)].haStatus = device.HighAvailability
+			if !ok || deviceObj == nil {
+				continue
+			}
+
+			if device.HighAvailability != nil {
+				deviceObj.haStatus = device.HighAvailability
 			}
 
 			if device.Uplinks != nil {
@@ -96,9 +100,7 @@ func getDeviceUplinks(client *sdk.Client, organizationID string, devices map[Ser
 					uplinks = append(uplinks, uplink)
 				}
 
-				if ok && deviceObj != nil {
-					devices[Serial(device.Serial)].uplinks = uplinks
-				}
+				deviceObj.uplinks = uplinks
 			}
 		}
 
@@ -160,9 +162,8 @@ func getDeviceUplinks(client *sdk.Client, organizationID string, devices map[Ser
 				uplinks = append(uplinks, uplink)
 			}
 
-			deviceObj, ok := devices[Serial(device.Serial)]
-			if ok && deviceObj != nil {
-				devices[Serial(device.Serial)].uplinks = uplinks
+			if deviceObj, ok := devices[Serial(device.Serial)]; ok && deviceObj != nil {
+				deviceObj.uplinks = uplinks
 			}
 		}
 
@@ -190,7 +191,7 @@ func reportUplinkMetrics(reporter mb.ReporterV2, organizationID string, devices 
 			if uplink == nil {
 				continue
 			}
-			if uplink.lossAndLatency != nil {
+			if uplink.lossAndLatency != nil && uplink.lossAndLatency.TimeSeries != nil {
 				// each loss and latency metric can have multiple values per collection.
 				// we report each value as it's own (smaller) metric event, containing
 				// the identifying device/uplink fields.
