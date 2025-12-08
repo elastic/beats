@@ -2,6 +2,8 @@
 navigation_title: "dns"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/processor-dns.html
+applies_to:
+  stack: ga
 ---
 
 # DNS Reverse Lookup [processor-dns]
@@ -79,8 +81,8 @@ The `dns` processor has the following configuration settings:
 `success_cache.min_ttl`
 :   The duration of the minimum alternative cache TTL for successful DNS responses. Ensures that `TTL=0` successful reverse DNS responses can be cached. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". Default value is `1m`.
 
-`success_cache.enabled`
-:  Whether the success cache should be enabled. The default value is `true`, meaning the cache is used by default.
+`success_cache.enabled` {applies_to}`stack: ga 9.1.0`
+:   Whether the success cache should be enabled. The default value is `true`, meaning the cache is used by default.
 
 ::::{note}
 Disabling the cache has throughput implications, requiring each event to perform a round trip to the DNS server. For example, if a DNS lookup takes 1 ms, serial throughput is limited to a maximum of 1,000 events per second.
@@ -95,8 +97,8 @@ Disabling the cache has throughput implications, requiring each event to perform
 `failure_cache.ttl`
 :   The duration for which failures are cached. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". Default value is `1m`.
 
-`failure_cache.enabled`
-:  Whether the failure cache should be enabled. The default value is `true`, meaning the cache is used by default.
+`failure_cache.enabled` {applies_to}`stack: ga 9.1.0`
+:   Whether the failure cache should be enabled. The default value is `true`, meaning the cache is used by default.
 
 ::::{note}
 Disabling the cache has throughput implications, requiring each event to perform a round trip to the DNS server. For example, if a DNS lookup takes 1 ms, serial throughput is limited to a maximum of 1,000 events per second. Additionally, if the failure occurs because the server is overloaded, retrying immediately might have compounding effects.

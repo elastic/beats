@@ -2,6 +2,8 @@
 navigation_title: "move_fields"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/move-fields.html
+applies_to:
+  stack: ga
 ---
 
 # Move fields [move-fields]

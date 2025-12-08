@@ -23,11 +23,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"testing"
 
 	"golang.org/x/text/encoding"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func BenchmarkEncoderReader(b *testing.B) {
@@ -40,7 +41,7 @@ func BenchmarkEncoderReader(b *testing.B) {
 		b.Run(name, func(b *testing.B) {
 			b.ReportAllocs()
 			for bN := 0; bN < b.N; bN++ {
-				reader, err := NewEncodeReader(ioutil.NopCloser(bytes.NewReader(lines)), Config{encoding.Nop, bufferSize, LineFeed, lineMaxLimit, false})
+				reader, err := NewEncodeReader(io.NopCloser(bytes.NewReader(lines)), Config{encoding.Nop, bufferSize, LineFeed, lineMaxLimit, false}, logp.NewNopLogger())
 				if err != nil {
 					b.Fatal("failed to initialize reader:", err)
 				}

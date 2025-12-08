@@ -2,6 +2,8 @@
 navigation_title: "decode_csv_fields"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/decode-csv-fields.html
+applies_to:
+  stack: preview
 ---
 
 # Decode CSV fields [decode-csv-fields]

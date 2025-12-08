@@ -16,8 +16,8 @@
 # under the License.
 
 [kdcdefaults]
-    kdc_listen = 1088
-    kdc_tcp_listen = 1088
+    kdc_ports = 1088
+    kdc_tcp_ports = 1088
 
 [realms]
     ${REALM_NAME} = {
@@ -25,10 +25,15 @@
         max_life = 12h 0m 0s
         max_renewable_life = 7d 0h 0m 0s
         master_key_type = aes256-cts
-        supported_enctypes = aes128-cts:normal des3-hmac-sha1:normal arcfour-hmac:normal des-hmac-sha1:normal des-cbc-md5:normal des-cbc-crc:normal
+        acl_file = /etc/krb5kdc/kadm5.acl
+        database_name = /var/lib/krb5kdc/principal
+        key_stash_file = /etc/krb5kdc/stash
+        admin_keytab = FILE:/etc/admin.keytab
+        kdc_ports = 1088
+        default_principal_flags = +preauth
     }
 
 [logging]
-    kdc = FILE:/var/log/krb5/krb5kdc.log
-    admin_server = FILE:/var/log/krb5/kadmin.log
-    default = FILE:/var/log/krb5/krb5lib.log
+    kdc = STDERR
+    admin_server = STDERR
+    default = STDERR

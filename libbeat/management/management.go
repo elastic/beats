@@ -80,7 +80,7 @@ type Manager interface {
 }
 
 // ManagerFactory is the factory type for creating a config manager
-type ManagerFactory func(*config.C, *reload.Registry) (Manager, error)
+type ManagerFactory func(*config.C, *reload.Registry, *logp.Logger) (Manager, error)
 
 // If managerFactory is non-nil, NewManager will use it to create the
 // beats manager. managerFactoryLock must be held to access managerFactory.
@@ -93,16 +93,16 @@ var managerFactoryLock sync.Mutex
 // it returns a placeholder.
 // Tests can call SetManagerFactory to instead use a mocked manager,
 // see x-pack/libbeat/management/tests/init.go.
-func NewManager(cfg *config.C, registry *reload.Registry) (Manager, error) {
+func NewManager(cfg *config.C, registry *reload.Registry, logger *logp.Logger) (Manager, error) {
 	if cfg.Enabled() {
 		managerFactoryLock.Lock()
 		defer managerFactoryLock.Unlock()
 		if managerFactory != nil {
-			return managerFactory(cfg, registry)
+			return managerFactory(cfg, registry, logger)
 		}
 	}
-	return &fallbackManager{
-		logger: logp.NewLogger("mgmt"),
+	return &FallbackManager{
+		logger: logger.Named("mgmt"),
 		status: status.Unknown,
 		msg:    "",
 	}, nil
@@ -118,8 +118,8 @@ func SetManagerFactory(factory ManagerFactory) {
 	managerFactory = factory
 }
 
-// fallbackManager, fallback when no manager is present
-type fallbackManager struct {
+// FallbackManager, fallback when no manager is present
+type FallbackManager struct {
 	logger   *logp.Logger
 	lock     sync.Mutex
 	status   status.Status
@@ -128,7 +128,7 @@ type fallbackManager struct {
 	stopOnce sync.Once
 }
 
-func (n *fallbackManager) UpdateStatus(status status.Status, msg string) {
+func (n *FallbackManager) UpdateStatus(status status.Status, msg string) {
 	n.lock.Lock()
 	defer n.lock.Unlock()
 	if n.status != status || n.msg != msg {
@@ -138,13 +138,13 @@ func (n *fallbackManager) UpdateStatus(status status.Status, msg string) {
 	}
 }
 
-func (n *fallbackManager) SetStopCallback(f func()) {
+func (n *FallbackManager) SetStopCallback(f func()) {
 	n.lock.Lock()
 	n.stopFunc = f
 	n.lock.Unlock()
 }
 
-func (n *fallbackManager) Stop() {
+func (n *FallbackManager) Stop() {
 	n.lock.Lock()
 	defer n.lock.Unlock()
 	if n.stopFunc != nil {
@@ -162,12 +162,12 @@ func (n *fallbackManager) Stop() {
 // the nilManager is still used for shutdown on some cases,
 // but that does not mean the Beat is being managed externally,
 // hence it will always return false.
-func (n *fallbackManager) Enabled() bool                         { return false }
-func (n *fallbackManager) AgentInfo() client.AgentInfo           { return client.AgentInfo{} }
-func (n *fallbackManager) Start() error                          { return nil }
-func (n *fallbackManager) CheckRawConfig(cfg *config.C) error    { return nil }
-func (n *fallbackManager) RegisterAction(action client.Action)   {}
-func (n *fallbackManager) UnregisterAction(action client.Action) {}
-func (n *fallbackManager) SetPayload(map[string]interface{})     {}
-func (n *fallbackManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ client.DiagnosticHook) {
+func (n *FallbackManager) Enabled() bool                         { return false }
+func (n *FallbackManager) AgentInfo() client.AgentInfo           { return client.AgentInfo{} }
+func (n *FallbackManager) Start() error                          { return nil }
+func (n *FallbackManager) CheckRawConfig(cfg *config.C) error    { return nil }
+func (n *FallbackManager) RegisterAction(action client.Action)   {}
+func (n *FallbackManager) UnregisterAction(action client.Action) {}
+func (n *FallbackManager) SetPayload(map[string]interface{})     {}
+func (n *FallbackManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ client.DiagnosticHook) {
 }

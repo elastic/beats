@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-geoip.html
+applies_to:
+  stack: ga
 ---
 
 # Enrich events with geoIP information [packetbeat-geoip]

@@ -97,7 +97,9 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false)
+		false,
+		logptest.NewTestingLogger(t, ""),
+	)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -115,7 +117,9 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		true)
+		true,
+		logptest.NewTestingLogger(t, ""),
+	)
 	require.False(t, created)
 	require.NoError(t, err)
 
@@ -133,7 +137,7 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false)
+		false, logptest.NewTestingLogger(t, ""))
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -169,7 +173,7 @@ func TestAddToMetricsetsUsing(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false)
+		false, logptest.NewTestingLogger(t, ""))
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -217,7 +221,9 @@ func TestRemoveFromMetricsetsUsing(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false)
+		false,
+		logptest.NewTestingLogger(t, ""),
+	)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -329,7 +335,7 @@ func TestWatcherNodeMetrics(t *testing.T) {
 			Namespace: "default",
 		},
 		Status: v1.NodeStatus{
-			Capacity: v1.ResourceList{
+			Allocatable: v1.ResourceList{
 				v1.ResourceCPU:    cpuLimit,
 				v1.ResourceMemory: memoryLimit,
 			},
@@ -359,7 +365,7 @@ func TestWatcherNodeMetrics(t *testing.T) {
 	assert.Equal(t, 100*1024*1024.0, metrics.MemoryAllocatable.Value)
 
 	// modify the limit and verify the new value is present
-	node.Status.Capacity[v1.ResourceCPU] = resource.MustParse("200m")
+	node.Status.Allocatable[v1.ResourceCPU] = resource.MustParse("200m")
 	watcher.handler.OnUpdate(node)
 	metrics = nodeStore.GetNodeMetrics()
 	require.NotNil(t, metrics)

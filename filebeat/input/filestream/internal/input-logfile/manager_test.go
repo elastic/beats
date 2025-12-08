@@ -81,7 +81,7 @@ func TestSourceIdentifier_ID(t *testing.T) {
 		test := test
 
 		t.Run(name, func(t *testing.T) {
-			srcIdentifier, err := newSourceIdentifier(testPluginName, test.userID)
+			srcIdentifier, err := NewSourceIdentifier(testPluginName, test.userID)
 			if err != nil {
 				t.Fatalf("cannot create identifier: %v", err)
 			}
@@ -120,7 +120,7 @@ func TestSourceIdentifier_MatchesInput(t *testing.T) {
 
 	for name, test := range testCases {
 		t.Run(name, func(t *testing.T) {
-			srcIdentifier, err := newSourceIdentifier(testPluginName, test.userID)
+			srcIdentifier, err := NewSourceIdentifier(testPluginName, test.userID)
 			if err != nil {
 				t.Fatalf("cannot create identifier: %v", err)
 			}
@@ -150,7 +150,7 @@ func TestSourceIdentifier_NotMatchesInput(t *testing.T) {
 
 	for name, test := range testCases {
 		t.Run(name, func(t *testing.T) {
-			srcIdentifier, err := newSourceIdentifier(testPluginName, test.userID)
+			srcIdentifier, err := NewSourceIdentifier(testPluginName, test.userID)
 			if err != nil {
 				t.Fatalf("cannot create identifier: %v", err)
 			}
@@ -165,11 +165,11 @@ func TestSourceIdentifier_NotMatchesInput(t *testing.T) {
 }
 
 func TestSourceIdentifierNoAccidentalMatches(t *testing.T) {
-	noIDIdentifier, err := newSourceIdentifier(testPluginName, "")
+	noIDIdentifier, err := NewSourceIdentifier(testPluginName, "")
 	if err != nil {
 		t.Fatalf("cannot create identifier: %v", err)
 	}
-	withIDIdentifier, err := newSourceIdentifier(testPluginName, "id")
+	withIDIdentifier, err := NewSourceIdentifier(testPluginName, "id")
 	if err != nil {
 		t.Fatalf("cannot create identifier: %v", err)
 	}
@@ -192,7 +192,7 @@ func TestInputManager_Create(t *testing.T) {
 			cim := &InputManager{
 				Logger:     log,
 				StateStore: testStateStore{Store: testStore},
-				Configure: func(_ *config.C, _ *logp.Logger) (Prospector, Harvester, error) {
+				Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
 					return nil, nil, nil
 				}}
 			cfg, err := config.NewConfigFrom("id: my-id")
@@ -236,7 +236,7 @@ func TestInputManager_Create(t *testing.T) {
 				cim := &InputManager{
 					Logger:     log,
 					StateStore: testStateStore{Store: testStore},
-					Configure: func(_ *config.C, _ *logp.Logger) (Prospector, Harvester, error) {
+					Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
 						var wg sync.WaitGroup
 
 						return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
@@ -287,7 +287,7 @@ paths:
 		cim := &InputManager{
 			Logger:     log,
 			StateStore: testStateStore{Store: testStore},
-			Configure: func(cfg *config.C, _ *logp.Logger) (Prospector, Harvester, error) {
+			Configure: func(cfg *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
 				var wg sync.WaitGroup
 
 				settings := struct {
@@ -385,7 +385,7 @@ paths:
 		cim := &InputManager{
 			Logger:     log,
 			StateStore: testStateStore{Store: testStore},
-			Configure: func(_ *config.C, _ *logp.Logger) (Prospector, Harvester, error) {
+			Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
 				var wg sync.WaitGroup
 
 				return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
@@ -433,4 +433,90 @@ func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
 		return zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
 	}))
 	return log, buf
+}
+
+func TestTakeOverConfigUnpack(t *testing.T) {
+	testCases := map[string]struct {
+		cfgYAML   string
+		expected  TakeOverConfig
+		expectErr bool
+	}{
+		"legacy mode enabled": {
+			cfgYAML: `take_over: true`,
+			expected: TakeOverConfig{
+				Enabled:      true,
+				legacyFormat: true,
+			},
+		},
+		"legacy mode disabled": {
+			cfgYAML: `take_over: false`,
+			expected: TakeOverConfig{
+				Enabled:      false,
+				legacyFormat: true,
+			},
+		},
+		"new mode enabled": {
+			cfgYAML: `
+take_over:
+  enabled: true`,
+			expected: TakeOverConfig{
+				Enabled: true,
+			},
+		},
+		"new mode disabled": {
+			cfgYAML: `
+take_over:
+  enabled: false`,
+			expected: TakeOverConfig{
+				Enabled: false,
+			},
+		},
+		"new mode with IDs": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  from_ids: ["foo", "bar"]`,
+			expected: TakeOverConfig{
+				Enabled: true,
+				FromIDs: []string{"foo", "bar"},
+			},
+		},
+		"take_over not defined": {
+			cfgYAML:   "",
+			expectErr: false,
+		},
+		"invalid new config": {
+			cfgYAML:   "take_over.enabled: 42",
+			expectErr: true,
+		},
+		"invalid from_ids elements ": {
+			cfgYAML:   "take_over.from_ids: [\"foo\", 42]",
+			expectErr: true,
+		},
+		"invalid from_ids type ": {
+			cfgYAML:   "take_over.from_ids: false",
+			expectErr: true,
+		},
+		"invalid legacy config": {
+			cfgYAML:   "take_over: 42",
+			expectErr: true,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			cfg := config.MustNewConfigFrom(tc.cfgYAML)
+			outer := struct {
+				TakeOver TakeOverConfig `config:"take_over"`
+			}{}
+			err := cfg.Unpack(&outer)
+			if tc.expectErr {
+				require.Error(t, err, "Unpack must fail")
+			} else {
+				require.NoError(t, err, "Unpack must succeed")
+			}
+
+			assert.Equal(t, tc.expected, outer.TakeOver, "TakeOverConfig was not parsed correctly")
+		})
+	}
 }

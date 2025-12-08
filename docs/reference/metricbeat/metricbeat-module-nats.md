@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-nats.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -87,7 +89,7 @@ The following metricsets are available:
 
 * [connection](/reference/metricbeat/metricbeat-metricset-nats-connection.md)
 * [connections](/reference/metricbeat/metricbeat-metricset-nats-connections.md)
-* [jetstream](/reference/metricbeat/metricbeat-metricset-nats-jetstream.md)
+* [jetstream](/reference/metricbeat/metricbeat-metricset-nats-jetstream.md)  {applies_to}`stack: beta 9.1.0`
 * [route](/reference/metricbeat/metricbeat-metricset-nats-route.md)
 * [routes](/reference/metricbeat/metricbeat-metricset-nats-routes.md)
 * [stats](/reference/metricbeat/metricbeat-metricset-nats-stats.md)

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/pr-review.html
+applies_to:
+  stack: ga
 ---
 
 # Pull request review guidelines [pr-review]

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/_set_up_the_oauth_app_in_the_salesforce_2.html
+applies_to:
+  stack: ga
 ---
 
 # Set up the OAuth App in the Salesforce [_set_up_the_oauth_app_in_the_salesforce_2]

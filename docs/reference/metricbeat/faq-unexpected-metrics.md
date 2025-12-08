@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/faq-unexpected-metrics.html
+applies_to:
+  stack: ga
 ---
 
 # Metricbeat collects system metrics for interfaces you didn't configure [faq-unexpected-metrics]

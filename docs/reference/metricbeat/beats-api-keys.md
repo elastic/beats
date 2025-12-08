@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/beats-api-keys.html
+applies_to:
+  stack: ga
 ---
 
 # Grant access using API keys [beats-api-keys]

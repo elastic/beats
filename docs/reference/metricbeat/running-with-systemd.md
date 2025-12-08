@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/running-with-systemd.html
+applies_to:
+  stack: ga
 ---
 
 # Metricbeat and systemd [running-with-systemd]

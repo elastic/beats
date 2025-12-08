@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/bandwidth-throttling.html
+applies_to:
+  stack: ga
 ---
 
 # Heartbeat uses too much bandwidth [bandwidth-throttling]

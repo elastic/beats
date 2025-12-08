@@ -2,9 +2,9 @@
     "nodes": {
         "oGi95SP4TpizlP6O-vmFow": {
             "name": "instance-0000000123",
-            "transport_address": "172.22.245.90:19294",
-            "host": "172.22.245.90",
-            "ip": "172.22.245.90:19294",
+            "transport_address": "10.42.0.2:19052",
+            "host": "10.42.0.2",
+            "ip": "10.42.0.2:19052",
             "roles": ["master", "remote_cluster_client"],
             "indices": {
                 "docs": {
@@ -336,6 +336,14 @@
                     "rejected": 0,
                     "largest": 3,
                     "completed": 3
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -777,6 +785,14 @@
                     "rejected": 0,
                     "largest": 3,
                     "completed": 3
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -1218,6 +1234,14 @@
                     "rejected": 0,
                     "largest": 16,
                     "completed": 235207
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -1665,6 +1689,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 24175874622
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -2112,6 +2144,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 17962285103
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -2559,6 +2599,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23718507623
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -3006,6 +3054,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 2080460587
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -3453,6 +3509,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 21779244658
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -3900,6 +3964,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 24872332009
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -4347,6 +4419,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 24077579815
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -4794,6 +4874,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 24789252361
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -5241,6 +5329,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23705306300
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -5688,6 +5784,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 16088445278
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -6129,6 +6233,14 @@
                     "rejected": 0,
                     "largest": 8,
                     "completed": 42316
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -6570,6 +6682,14 @@
                     "rejected": 0,
                     "largest": 8,
                     "completed": 42461
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -7017,6 +7137,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 7447434555
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -7464,6 +7592,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23883380097
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -7911,6 +8047,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 24957578463
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -8352,6 +8496,14 @@
                     "rejected": 0,
                     "largest": 8,
                     "completed": 42510
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -8793,6 +8945,14 @@
                     "rejected": 0,
                     "largest": 8,
                     "completed": 42277
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -9240,6 +9400,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 24056721131
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -9681,6 +9849,14 @@
                     "rejected": 0,
                     "largest": 8,
                     "completed": 42317
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -10122,6 +10298,14 @@
                     "rejected": 0,
                     "largest": 8,
                     "completed": 42383
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -10563,6 +10747,14 @@
                     "rejected": 0,
                     "largest": 8,
                     "completed": 42481
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -11010,6 +11202,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23279739616
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -11451,6 +11651,14 @@
                     "rejected": 0,
                     "largest": 8,
                     "completed": 42337
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -11898,6 +12106,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 15823009582
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -12345,6 +12561,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 24335103043
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -12792,6 +13016,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 25193525323
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -13239,6 +13471,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 22423489843
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -13686,6 +13926,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23198900858
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -14133,6 +14381,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 24686218566
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -14580,6 +14836,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 24285159898
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -15027,6 +15291,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23486896173
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -15474,6 +15746,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 15543100358
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -15921,6 +16201,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23378314083
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -16368,6 +16656,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23822263793
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -16815,6 +17111,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 17264715529
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -17262,6 +17566,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 14398376428
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -17709,6 +18021,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 24039850205
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -18156,6 +18476,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 24195311555
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -18603,6 +18931,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23643794150
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -19050,6 +19386,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23801794267
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -19497,6 +19841,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 14969477975
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -19944,6 +20296,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 16403200352
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -20391,6 +20751,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23888711015
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -20838,6 +21206,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23806207721
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -21285,6 +21661,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23701505688
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -21732,6 +22116,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23889364448
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -22179,6 +22571,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 24341314463
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -22626,6 +23026,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 24168647232
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -23073,6 +23481,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 22752934712
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -23520,6 +23936,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 23101082401
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -23967,6 +24391,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 24261219041
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -24414,6 +24846,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 15259296218
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -24861,6 +25301,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 2254164472
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -25308,6 +25756,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 2309503598
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -25755,6 +26211,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 837988332
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {
@@ -26202,6 +26666,14 @@
                     "rejected": 0,
                     "largest": 32,
                     "completed": 1739466011
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 383009
                 }
             },
             "fs": {

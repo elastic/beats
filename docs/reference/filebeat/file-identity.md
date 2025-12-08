@@ -1,3 +1,8 @@
+---
+applies_to:
+  stack: ga
+---
+
 # How to choose file identity for filestream [file-identity]
 
 ## What is file identity?

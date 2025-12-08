@@ -2,6 +2,8 @@
 navigation_title: "Modules"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/configuration-auditbeat.html
+applies_to:
+  stack: ga
 ---
 
 # Configure modules [configuration-auditbeat]

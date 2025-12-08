@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-consul.html
+applies_to:
+  stack: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -48,4 +50,4 @@ This module supports TLS connections when using `ssl` config field, as described
 
 The following metricsets are available:
 
-* [agent](/reference/metricbeat/metricbeat-metricset-consul-agent.md)
+* [agent](/reference/metricbeat/metricbeat-metricset-consul-agent.md)  {applies_to}`stack: beta`

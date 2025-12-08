@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/contributing-to-beats.html
+applies_to:
+  stack: ga
 ---
 
 # Contribute [contributing-to-beats]

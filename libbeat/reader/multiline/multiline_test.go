@@ -381,7 +381,7 @@ func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg Config) reade
 		Codec:      enc,
 		BufferSize: 4096,
 		Terminator: readfile.LineFeed,
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("Failed to initialize line reader: %v", err)
 	}

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/config-file-format-tips.html
+applies_to:
+  stack: ga
 ---
 
 # YAML tips and gotchas [config-file-format-tips]

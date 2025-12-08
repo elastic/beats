@@ -1,0 +1,92 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "created"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "creation"
+        ]
+      },
+      "file": {
+        "accessed": "2025-08-11T09:47:45.1241698Z",
+        "attributes": [
+          "reparse_point",
+          "archive"
+        ],
+        "created": "2025-08-11T09:47:45.1241698Z",
+        "ctime": "2025-08-11T09:47:45.1241698Z",
+        "drive_letter": "C",
+        "inode": "7318349394946722",
+        "mtime": "2025-08-11T09:47:45.1241698Z",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesfsnotifycreate-symlink1513386984\\001\\symlink.txt",
+        "target_path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesfsnotifycreate-symlink1513386984\\001\\mainfile.txt",
+        "type": "symlink",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-08-11T09:47:45.1245193Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 1046800,
+    "Period": 0,
+    "DisableTimeSeries": false
+  },
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "updated"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "change"
+        ]
+      },
+      "file": {
+        "accessed": "2025-08-11T09:47:45.1241698Z",
+        "attributes": [
+          "reparse_point",
+          "archive"
+        ],
+        "created": "2025-08-11T09:47:45.1241698Z",
+        "ctime": "2025-08-11T09:47:45.1241698Z",
+        "drive_letter": "C",
+        "inode": "7318349394946722",
+        "mtime": "2025-08-11T09:47:45.1241698Z",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesfsnotifycreate-symlink1513386984\\001\\symlink.txt",
+        "target_path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesfsnotifycreate-symlink1513386984\\001\\mainfile.txt",
+        "type": "symlink",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-08-11T09:47:45.1261357Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 1770300,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]

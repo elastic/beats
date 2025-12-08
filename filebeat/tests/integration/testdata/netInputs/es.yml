@@ -1,0 +1,28 @@
+filebeat.inputs:
+  - type: {{.input}}
+    id: "{{.id}}"
+    host: "{{.addr}}"
+    number_of_workers: {{.numWorkers}}
+
+output.elasticsearch:
+  hosts:
+    - "{{ .esHost }}"
+  allow_older_versions: true
+  backoff:
+    init: 100ms
+    max: 100ms
+
+queue.mem:
+  events: 32
+  flush:
+    min_events: 1
+    timeout: 0
+
+http:
+  enabled: true
+  port: 5066
+
+logging:
+  level: debug
+  selectors:
+    - "*"

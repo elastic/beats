@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/load-ingest-pipelines.html
+applies_to:
+  stack: ga
 ---
 
 # Load ingest pipelines [load-ingest-pipelines]

@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -58,7 +59,7 @@ type adInput struct {
 }
 
 // New creates a new instance of an Active Directory identity provider.
-func New(logger *logp.Logger) (provider.Provider, error) {
+func New(logger *logp.Logger, path *paths.Path) (provider.Provider, error) {
 	p := adInput{
 		cfg: defaultConfig(),
 	}
@@ -66,6 +67,7 @@ func New(logger *logp.Logger) (provider.Provider, error) {
 		Logger:    logger,
 		Type:      FullName,
 		Configure: p.configure,
+		Path:      path,
 	}
 
 	return &p, nil
@@ -86,7 +88,7 @@ func (p *adInput) configure(cfg *config.C) (kvstore.Input, error) {
 		return nil, err
 	}
 	if p.cfg.TLS.IsEnabled() && u.Scheme == "ldaps" {
-		tlsConfig, err := tlscommon.LoadTLSConfig(p.cfg.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(p.cfg.TLS, p.logger)
 		if err != nil {
 			return nil, err
 		}
@@ -122,8 +124,7 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 	}
 	stat.UpdateStatus(status.Starting, "")
 	p.logger = inputCtx.Logger.With("provider", Name, "domain", p.cfg.URL)
-	p.metrics = newMetrics(inputCtx.ID, nil)
-	defer p.metrics.Close()
+	p.metrics = newMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.cfg.SyncInterval))

@@ -2,6 +2,8 @@
 navigation_title: "Internal queue"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/configuring-internal-queue.html
+applies_to:
+  stack: ga
 ---
 
 # Configure the internal queue [configuring-internal-queue]

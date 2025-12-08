@@ -14,19 +14,3 @@ var offlineEnvVar = "ELASTIC_SYNTHETICS_OFFLINE"
 func Offline() bool {
 	return os.Getenv(offlineEnvVar) == "true"
 }
-
-// GoOffline switches our current state to offline. Primarily for tests.
-func GoOffline() {
-	e := os.Setenv(offlineEnvVar, "true")
-	if e != nil {
-		panic("could not set offline env var!")
-	}
-}
-
-// GoOffline switches our current state to offline. Primarily for tests.
-func GoOnline() {
-	e := os.Setenv(offlineEnvVar, "false")
-	if e != nil {
-		panic("could not set offline env var!")
-	}
-}

@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
@@ -177,12 +178,12 @@ var testCases = []testCase{
 }
 
 func TestFilebeatSyslogCisco(t *testing.T) {
-	logp.TestingSetup()
 	testutils.SkipIfFIPSOnly(t, "javascript processor uses SHA-1.")
 
 	p, err := javascript.NewFromConfig(
 		javascript.Config{File: "config/pipeline.js"},
 		nil,
+		logptest.NewTestingLogger(t, ""),
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -238,6 +239,7 @@ func BenchmarkPipeline(b *testing.B) {
 	p, err := javascript.NewFromConfig(
 		javascript.Config{File: "config/pipeline.js"},
 		nil,
+		logp.NewNopLogger(),
 	)
 	if err != nil {
 		b.Fatal(err)

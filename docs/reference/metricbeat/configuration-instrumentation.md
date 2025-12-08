@@ -2,6 +2,8 @@
 navigation_title: "Instrumentation"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-instrumentation.html
+applies_to:
+  stack: ga
 ---
 
 # Configure APM instrumentation [configuration-instrumentation]

@@ -2,6 +2,8 @@
 navigation_title: "Logging"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-logging.html
+applies_to:
+  stack: ga
 ---
 
 # Configure logging [configuration-logging]

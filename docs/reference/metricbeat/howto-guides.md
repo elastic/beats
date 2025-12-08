@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/howto-guides.html
+applies_to:
+  stack: ga
 ---
 
 # How to guides [howto-guides]

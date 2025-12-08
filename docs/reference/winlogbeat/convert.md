@@ -2,6 +2,8 @@
 navigation_title: "convert"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/convert.html
+applies_to:
+  stack: ga
 ---
 
 # Convert [convert]

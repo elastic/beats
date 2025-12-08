@@ -18,6 +18,7 @@ import (
 
 const ephContainerName = "filebeat"
 
+// azureInputConfig is the configuration for the azureeventhub input.
 type azureInputConfig struct {
 	// EventHubName is the name of the event hub to connect to.
 	EventHubName string `config:"eventhub" validate:"required"`
@@ -32,6 +33,7 @@ type azureInputConfig struct {
 	// SAConnectionString is used to connect to the storage account (processor v2 only)
 	SAConnectionString string `config:"storage_account_connection_string"`
 	// SAContainer is the name of the storage account container to store
+
 	// partition ownership and checkpoint information.
 	SAContainer string `config:"storage_account_container"`
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
@@ -66,12 +68,17 @@ type azureInputConfig struct {
 	// Sanitizers is a list of sanitizers to apply to messages that
 	// contain invalid JSON.
 	Sanitizers []SanitizerSpec `config:"sanitizers"`
+
+	// ---------------------------------------
+	// input v2 specific configuration options
+	// ---------------------------------------
+
 	// MigrateCheckpoint controls if the input should perform the checkpoint information
-	// migration from v1 to v2 (processor v2 only). Default is false.
+	// migration from v1 to v2 (processor v2 only). Default is true.
 	MigrateCheckpoint bool `config:"migrate_checkpoint"`
 	// ProcessorVersion controls the processor version to use.
-	// Possible values are v1 and v2 (processor v2 only). Default is v1.
-	ProcessorVersion string `config:"processor_version"`
+	// Possible values are v1 and v2 (processor v2 only). The default is v2.
+	ProcessorVersion string `config:"processor_version" default:"v2"`
 	// ProcessorUpdateInterval controls how often attempt to claim
 	// partitions (processor v2 only). The default value is 10 seconds.
 	ProcessorUpdateInterval time.Duration `config:"processor_update_interval"`
@@ -96,9 +103,9 @@ type azureInputConfig struct {
 
 func defaultConfig() azureInputConfig {
 	return azureInputConfig{
-		// For this release, we continue to use
-		// the processor v1 as the default.
-		ProcessorVersion: processorV1,
+		// For this release, we use
+		// the processor v2 as the default.
+		ProcessorVersion: processorV2,
 		// Controls how often attempt to claim partitions.
 		ProcessorUpdateInterval: 10 * time.Second,
 		// For backward compatibility with v1,
@@ -111,15 +118,31 @@ func defaultConfig() azureInputConfig {
 		PartitionReceiveCount:   100,
 		// Default
 		LegacySanitizeOptions: []string{},
+		// Default is true to avoid reprocessing data from the start of the retention
+		// when v2 replaces v1.
+		MigrateCheckpoint: true,
 	}
 }
 
 // Validate validates the config.
 func (conf *azureInputConfig) Validate() error {
 	logger := logp.NewLogger("azureeventhub.config")
-	if conf.ConnectionString == "" {
-		return errors.New("no connection string configured")
+
+	connectionStringProperties, err := parseConnectionString(conf.ConnectionString)
+	if err != nil {
+		return fmt.Errorf("invalid connection string: %w", err)
 	}
+
+	// If the connection string contains an entity path, we need to double
+	// check that it matches the event hub name.
+	if connectionStringProperties.EntityPath != nil && *connectionStringProperties.EntityPath != conf.EventHubName {
+		return fmt.Errorf(
+			"invalid config: the entity path (%s) in the connection string does not match event hub name (%s)",
+			*connectionStringProperties.EntityPath,
+			conf.EventHubName,
+		)
+	}
+
 	if conf.EventHubName == "" {
 		return errors.New("no event hub name configured")
 	}
@@ -127,8 +150,10 @@ func (conf *azureInputConfig) Validate() error {
 		return errors.New("no storage account configured (config: storage_account)")
 	}
 	if conf.SAContainer == "" {
+		// side effect: set the default storage account container name
 		conf.SAContainer = fmt.Sprintf("%s-%s", ephContainerName, conf.EventHubName)
 	}
+
 	if strings.Contains(conf.SAContainer, "_") {
 		originalValue := conf.SAContainer
 		// When a user specifies an event hub name in the input settings,
@@ -140,21 +165,13 @@ func (conf *azureInputConfig) Validate() error {
 		//
 		// So instead of throwing an error to the user, we decided to replace
 		// underscores (_) characters with hyphens (-).
+
+		// side effect: replace underscores (_) with hyphens (-) in the storage account container name
 		conf.SAContainer = strings.ReplaceAll(conf.SAContainer, "_", "-")
 		logger.Warnf("replaced underscores (_) with hyphens (-) in the storage account container name (before: %s, now: %s", originalValue, conf.SAContainer)
 	}
-	err := storageContainerValidate(conf.SAContainer)
-	if err != nil {
+	if err := storageContainerValidate(conf.SAContainer); err != nil {
 		return err
-	}
-
-	// log a warning for each sanitization option not supported
-	for _, opt := range conf.LegacySanitizeOptions {
-		logger.Warnw("legacy sanitization `sanitize_options` options are deprecated and will be removed in the 9.0 release; use the `sanitizers` option instead", "option", opt)
-		err := sanitizeOptionsValidate(opt)
-		if err != nil {
-			logger.Warnf("%s: %v", opt, err)
-		}
 	}
 
 	if conf.ProcessorUpdateInterval < 1*time.Second {
@@ -181,11 +198,33 @@ func (conf *azureInputConfig) Validate() error {
 			return errors.New("no storage account key configured (config: storage_account_key)")
 		}
 	case processorV2:
-		if conf.SAKey != "" {
-			logger.Warnf("storage_account_key is not used in processor v2, please remove it from the configuration (config: storage_account_key)")
-		}
 		if conf.SAConnectionString == "" {
-			return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
+			if conf.SAName != "" && conf.SAKey != "" {
+				// To avoid breaking changes, and ease the migration from v1 to v2,
+				// we can build the connection string using the following settings:
+				//
+				// - DefaultEndpointsProtocol=https;
+				// - AccountName=<SAName>;
+				// - AccountKey=<SAKey>;
+				// - EndpointSuffix=core.windows.net
+				env, err := getAzureEnvironment(conf.OverrideEnvironment)
+				if err != nil {
+					return fmt.Errorf("failed to get azure environment: %w", err)
+				}
+				conf.SAConnectionString = fmt.Sprintf(
+					"DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=%s",
+					conf.SAName,
+					conf.SAKey,
+					env.StorageEndpointSuffix,
+				)
+				logger.Warn("storage_account_connection_string is not configured, but storage_account and storage_account_key are configured. " +
+					"The connection string has been constructed from the storage account and key. " +
+					"Please configure storage_account_connection_string directly as storage_account_key is deprecated in processor v2.")
+				conf.SAKey = ""
+			} else {
+				// No connection string and no key, so we can't proceed.
+				return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
+			}
 		}
 	default:
 		return fmt.Errorf(
@@ -197,6 +236,25 @@ func (conf *azureInputConfig) Validate() error {
 	}
 
 	return nil
+}
+
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged parameters are set and logs a warning
+func (conf *azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
+	logger = logger.Named("azureeventhub.config")
+
+	// log a warning for each sanitization option not supported
+	for _, opt := range conf.LegacySanitizeOptions {
+		logger.Warnw("legacy sanitization `sanitize_options` options are deprecated and will be removed in the 9.0 release; use the `sanitizers` option instead", "option", opt)
+		err := sanitizeOptionsValidate(opt)
+		if err != nil {
+			logger.Warnf("%s: %v", opt, err)
+		}
+	}
+	if conf.ProcessorVersion == processorV2 {
+		if conf.SAKey != "" {
+			logger.Warnf("storage_account_key is not used in processor v2, please remove it from the configuration (config: storage_account_key)")
+		}
+	}
 }
 
 // storageContainerValidate validated the storage_account_container to make sure it is conforming to all the Azure
@@ -220,13 +278,14 @@ func storageContainerValidate(name string) error {
 		return fmt.Errorf("storage_account_container (%s) must end with a lowercase letter or number", name)
 	}
 	for i := 0; i < length; i++ {
-		if !unicode.IsLower(runes[i]) && !unicode.IsNumber(runes[i]) && !(runes[i] == '-') {
-			return fmt.Errorf("rune %d of storage_account_container (%s) is not a lowercase letter, number or dash", i, name)
+		if !unicode.IsLower(runes[i]) && !unicode.IsNumber(runes[i]) && runes[i] != '-' {
+			return fmt.Errorf("rune (%d) of storage_account_container (%s) is not a lowercase letter, number or dash", i, name)
 		}
 		if runes[i] == '-' && previousRune == runes[i] {
 			return fmt.Errorf("consecutive dashes ('-') are not permitted in storage_account_container (%s)", name)
 		}
 		previousRune = runes[i]
 	}
+
 	return nil
 }

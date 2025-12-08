@@ -50,23 +50,6 @@ func TCPDialer(to time.Duration) NetDialer {
 	return CreateNetDialer(to)
 }
 
-// UDPDialer creates a new NetDialer with constant event fields and default
-// connection timeout.
-// The fields parameter holds additional constants to be added to the final
-// event structure.
-//
-// The dialer will update the active events with:
-//
-//	{
-//	  "udp": {
-//	    "port": ...,
-//	    "rtt": { "connect": { "us": ... }}
-//	  }
-//	}
-func UDPDialer(to time.Duration) NetDialer {
-	return CreateNetDialer(to)
-}
-
 // CreateNetDialer returns a NetDialer with the given timeout.
 func CreateNetDialer(timeout time.Duration) NetDialer {
 	return func(event *beat.Event) (transport.Dialer, error) {

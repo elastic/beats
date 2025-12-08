@@ -26,6 +26,16 @@ func intDefault(a string, defaults int) int {
 	return int(b)
 }
 
+func boolDefault(boolString string, defaults bool) bool {
+	val, err := strconv.ParseBool(boolString)
+
+	if err != nil {
+		return defaults
+	}
+
+	return val
+}
+
 // GetStrenv environment variable, if not supplied returns the default value
 func GetStrenv(name, defaultValue string) string {
 	return strDefault(os.Getenv(name), defaultValue)
@@ -33,4 +43,8 @@ func GetStrenv(name, defaultValue string) string {
 
 func GetIntEnvParam(name string, defaultValue int) int {
 	return intDefault(os.Getenv(name), defaultValue)
+}
+
+func GetBoolEnvParam(name string, defaults bool) bool {
+	return boolDefault(name, defaults)
 }

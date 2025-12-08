@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type logProcessor struct {
@@ -22,7 +23,7 @@ type logProcessor struct {
 
 func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Client) *logProcessor {
 	if metrics == nil {
-		metrics = newInputMetrics("", nil)
+		metrics = newInputMetrics(monitoring.NewRegistry())
 	}
 	return &logProcessor{
 		log:       log,
@@ -53,10 +54,12 @@ func createEvent(logEvent types.FilteredLogEvent, logGroupId string, regionName 
 				"id":       *logEvent.EventId,
 				"ingested": time.Now(),
 			},
-			"aws.cloudwatch": mapstr.M{
-				"log_group":      logGroupId,
-				"log_stream":     *logEvent.LogStreamName,
-				"ingestion_time": time.UnixMilli(*logEvent.IngestionTime),
+			"aws": mapstr.M{
+				"cloudwatch": mapstr.M{
+					"log_group":      logGroupId,
+					"log_stream":     *logEvent.LogStreamName,
+					"ingestion_time": time.UnixMilli(*logEvent.IngestionTime),
+				},
 			},
 			"cloud": mapstr.M{
 				"provider": "aws",

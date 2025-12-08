@@ -7,7 +7,6 @@ package memory
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
@@ -76,7 +75,7 @@ func init() {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The containerd cpu metricset is beta.")
+	base.Logger().Warn("The containerd cpu metricset is beta.")
 
 	pc, err := prometheus.NewPrometheusClient(base)
 	if err != nil {
@@ -128,17 +127,17 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 		if m.calcPct {
 			inactiveFiles, err := event.GetValue("inactiveFiles")
 			if err != nil {
-				m.Logger().Debugf("memoryUsagePct calculation skipped. inactiveFiles not present in the event: %w", err)
+				m.Logger().Debugf("memoryUsagePct calculation skipped. inactiveFiles not present in the event: %v", err)
 				continue
 			}
 			usageTotal, err := event.GetValue("usage.total")
 			if err != nil {
-				m.Logger().Debugf("memoryUsagePct calculation skipped. usage.total not present in the event: %w", err)
+				m.Logger().Debugf("memoryUsagePct calculation skipped. usage.total not present in the event: %v", err)
 				continue
 			}
 			memoryLimit, err := event.GetValue("usage.limit")
 			if err != nil {
-				m.Logger().Debugf("memoryUsagePct calculation skipped. usage.limit not present in the event: %w", err)
+				m.Logger().Debugf("memoryUsagePct calculation skipped. usage.limit not present in the event: %v", err)
 				continue
 			}
 			mLfloat, ok := memoryLimit.(float64)

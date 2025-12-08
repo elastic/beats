@@ -34,6 +34,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -58,10 +59,7 @@ type logHints struct {
 
 // InitializeModule initializes this module.
 func InitializeModule() {
-	err := autodiscover.Registry.AddBuilder("hints", NewLogHints)
-	if err != nil {
-		logp.Error(fmt.Errorf("could not add `hints` builder"))
-	}
+	_ = autodiscover.Registry.AddBuilder("hints", NewLogHints)
 }
 
 // NewLogHints builds a log hints builder
@@ -71,7 +69,7 @@ func NewLogHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error)
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger}, false, fileset.FilesetOverrides{})
+	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger}, false, fileset.FilesetOverrides{}, paths.Paths)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +86,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 
 	// Hint must be explicitly enabled when default_config sets enabled=false.
 	if !l.config.DefaultConfig.Enabled() && !utils.IsEnabled(hints, l.config.Key) ||
-		utils.IsDisabled(hints, l.config.Key) {
+		utils.IsDisabled(hints, l.config.Key, l.log) {
 		l.log.Debugw("Hints config is not enabled.", "autodiscover.event", event)
 		return nil
 	}
@@ -104,7 +102,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		}
 		l.log.Debugf("Generated %d input configs from hint.", len(configs))
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs)
+		return template.ApplyConfigTemplate(event, configs, l.log)
 	}
 
 	var configs []*conf.C //nolint:prealloc //breaks tests
@@ -158,12 +156,11 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 			} else {
 				shouldPut(tempCfg, json, jsonOpts, l.log)
 			}
-
 		}
 		// Merge config template with the configs from the annotations
 		// AppendValues option is used to append arrays from annotations to existing arrays while merging
 		if err := config.MergeWithOpts(tempCfg, ucfg.AppendValues); err != nil {
-			l.log.Debugf("hints.builder", "config merge failed with error: %v", err)
+			l.log.Debugf("config merge failed with error: %v", err)
 			continue
 		}
 		module := l.getModule(hints)
@@ -194,15 +191,15 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 				moduleConf[fileset+".enabled"] = cfg.Enabled
 				moduleConf[fileset+".input"] = filesetConf
 
-				l.log.Debugf("hints.builder", "generated config %+v", moduleConf)
+				l.log.Debugf("generated config %+v", moduleConf)
 			}
 			config, _ = conf.NewConfigFrom(moduleConf)
 		}
-		l.log.Debugf("hints.builder", "generated config %+v of logHints %+v", config, l)
+		l.log.Debugf("generated config %+v of logHints %+v", config, l)
 		configs = append(configs, config)
 	}
 	// Apply information in event to the template to generate the final config
-	return template.ApplyConfigTemplate(event, configs)
+	return template.ApplyConfigTemplate(event, configs, l.log)
 }
 
 func (l *logHints) getMultiline(hints mapstr.M) mapstr.M {
@@ -224,11 +221,11 @@ func (l *logHints) getModule(hints mapstr.M) string {
 }
 
 func (l *logHints) getInputsConfigs(hints mapstr.M) []mapstr.M {
-	return utils.GetHintAsConfigs(hints, l.config.Key)
+	return utils.GetHintAsConfigs(hints, l.config.Key, l.log)
 }
 
 func (l *logHints) getProcessors(hints mapstr.M) []mapstr.M {
-	return utils.GetProcessors(hints, l.config.Key)
+	return utils.GetProcessors(hints, l.config.Key, l.log)
 }
 
 func (l *logHints) getPipeline(hints mapstr.M) string {

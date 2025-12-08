@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/setup-repositories.html
+applies_to:
+  stack: ga
 ---
 
 # Repositories for APT and YUM [setup-repositories]
@@ -31,17 +33,17 @@ To add the Beats repository for APT:
     sudo apt-get install apt-transport-https
     ```
 
-3. Save the repository definition to _/etc/apt/sources.list.d/elastic-{{major-release}}.list_:
+3. Save the repository definition to _/etc/apt/sources.list.d/elastic-{{ version.stack | M.x }}.list_:
 
     ```shell subs=true
-    echo "deb https://artifacts.elastic.co/packages/{{major-release}}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{major-release}}.list
+    echo "deb https://artifacts.elastic.co/packages/{{ version.stack | M.x }}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{ version.stack | M.x }}.list
     ```
 
     :::{note}
     The package is free to use under the Elastic license. An alternative package which contains only features that are available under the Apache 2.0 license is also available. To install it, use the following sources list:
 
     ```shell subs=true
-    echo "deb https://artifacts.elastic.co/packages/oss-{{major-release}}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{major-release}}.list
+    echo "deb https://artifacts.elastic.co/packages/oss-{{ version.stack | M.x }}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{ version.stack | M.x }}.list
     ```
     :::
 
@@ -83,9 +85,9 @@ To add the Beats repository for YUM:
 2. Create a file with a `.repo` extension (for example, `elastic.repo`) in your `/etc/yum.repos.d/` directory and add the following lines:
 
     ```shell subs=true
-    [elastic-{{major-release}}]
-    name=Elastic repository for {{major-release}} packages
-    baseurl=https://artifacts.elastic.co/packages/{{major-release}}/yum
+    [elastic-{{ version.stack | M.x }}]
+    name=Elastic repository for {{ version.stack | M.x }} packages
+    baseurl=https://artifacts.elastic.co/packages/{{ version.stack | M.x }}/yum
     gpgcheck=1
     gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
     enabled=1
@@ -97,7 +99,7 @@ To add the Beats repository for YUM:
     The package is free to use under the Elastic license. An alternative package which contains only features that are available under the Apache 2.0 license is also available. To install it, use the following `baseurl` in your `.repo` file:
 
     ```shell subs=true
-    baseurl=https://artifacts.elastic.co/packages/oss-{{major-release}}/yum
+    baseurl=https://artifacts.elastic.co/packages/oss-{{ version.stack | M.x }}/yum
     ```
     :::
 

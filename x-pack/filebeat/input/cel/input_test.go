@@ -7,6 +7,7 @@ package cel
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -18,6 +19,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -31,6 +33,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
@@ -495,6 +498,68 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{"message": "AWS4-HMAC-SHA256 Credential=id/20091110/region/service/aws4_request, SignedHeaders=content-length;content-type;host;x-amz-date;x-amz-security-token, Signature=ad27046c0009e06c6626e6009ba2af96027f4893b7a190ab67aaec85becb25cd"},
 		},
+	},
+	{
+		// This test exists purely to demonstrate that the lib is available.
+		name: "optional_types_v2",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `{"events": [{
+				"message": optional.unwrap([optional.of(42), optional.none()]).encode_json(),
+			}]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "[42]"},
+		},
+	},
+	{
+		// This test exists purely to demonstrate that the lib is available.
+		name: "two_var_comprehension_v2",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `{"events": [{
+				"message": {'hello': 'world'}.transformMap(k, v, v + '!').encode_json(),
+			}]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": `{"hello":"world!"}`},
+		},
+	},
+	{
+		name: "timestamp_round",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":timestamp("2009-11-10T23:00:00Z").round(duration("24h"))}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{{
+			"message": "2009-11-11T00:00:00Z",
+		}},
+	},
+	{
+		name: "timestamp_truncate",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":timestamp("2009-11-10T23:00:00Z").truncate(duration("24h"))}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{{
+			"message": "2009-11-10T00:00:00Z",
+		}},
 	},
 
 	// FS-based tests.
@@ -1544,6 +1609,226 @@ var inputTests = []struct {
 
 	// Authenticated access tests.
 	{
+		name: "basic_accept",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":            1,
+			"auth.basic.user":     "test_client",
+			"auth.basic.password": "secret_password",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test_client:secret_password"))),
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "basic_reject",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":            1,
+			"auth.basic.user":     "test_client",
+			"auth.basic.password": "pleeassssee",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test_client:secret_password"))),
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"error": "not authorized",
+			},
+		},
+	},
+	{
+		name: "token_accept",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":         1,
+			"auth.token.type":  "Token",
+			"auth.token.value": "sssh_super_secret_token",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			"Token sssh_super_secret_token",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "token_reject",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":         1,
+			"auth.token.type":  "Token",
+			"auth.token.value": "leaked_but_rolled_over_token_found_on_github",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			"Token sssh_super_secret_token",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"error": "not authorized",
+			},
+		},
+	},
+	{
+		name: "file_auth_default_header",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			dir := t.TempDir()
+			secret := "file-secret"
+			path := filepath.Join(dir, "auth_token")
+			if err := os.WriteFile(path, []byte(secret+"\n"), 0o600); err != nil {
+				t.Fatalf("failed to write auth token: %v", err)
+			}
+			config["auth.file.path"] = path
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                   1,
+			"auth.file.prefix":           "Bearer ",
+			"auth.file.refresh_interval": "100ms",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			"Bearer file-secret",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "file_auth_custom_header",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			dir := t.TempDir()
+			tokenPath := filepath.Join(dir, "api_token")
+			if err := os.WriteFile(tokenPath, []byte("secret-api-token\n"), 0o600); err != nil {
+				t.Fatalf("failed to write token file: %v", err)
+			}
+			config["auth.file.path"] = tokenPath
+			config["auth.file.header"] = "X-API-Key"
+			config["auth.file.prefix"] = "ApiToken "
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandlerWithHeader(
+			"ApiToken secret-api-token",
+			"X-API-Key",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
 		name: "digest_accept",
 		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 			s := httptest.NewServer(h)
@@ -1662,6 +1947,44 @@ var inputTests = []struct {
 		handler: oauth2Handler,
 		want: []map[string]interface{}{
 			{"hello": "world"},
+		},
+	},
+
+	{
+		name: "Auth AWS V4 Signer",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                   1,
+			"auth.aws.access_key_id":     "AKIAIOSFODNN7EXAMPLE",
+			"auth.aws.secret_access_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+			"auth.aws.default_region":    "us-east-1",
+			"auth.aws.service_name":      "guardduty",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: awsAuthHandler("AKIAIOSFODNN7EXAMPLE", defaultHandler(http.MethodGet, "")),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
 		},
 	},
 
@@ -1910,6 +2233,33 @@ var inputTests = []struct {
 		},
 	},
 
+	{
+		name: "max_executions_with_remaining_executions",
+		config: map[string]interface{}{
+			"interval":       1,
+			"max_executions": 5,
+			"program": `debug("STATE", int(state.n).as(n, {
+							"events": [{"n": n+1, "remaining_executions": remaining_executions}],
+							"n":          n+1,
+							"want_more":  remaining_executions != 0,
+						}))`,
+			"state": map[string]any{"n": 0},
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		want: []map[string]interface{}{
+			{"n": float64(1), "remaining_executions": float64(4)},
+			{"n": float64(2), "remaining_executions": float64(3)},
+			{"n": float64(3), "remaining_executions": float64(2)},
+			{"n": float64(4), "remaining_executions": float64(1)},
+			{"n": float64(5), "remaining_executions": float64(0)},
+			{"n": float64(6), "remaining_executions": float64(4)},
+			{"n": float64(7), "remaining_executions": float64(3)},
+		},
+	},
+
 	// Coverage
 	{
 		name: "coverage",
@@ -1980,7 +2330,6 @@ func TestInput(t *testing.T) {
 		t.Fatalf("failed to remove failure_dumps directory: %v", err)
 	}
 
-	logp.TestingSetup()
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
 			if reason, skip := skipOnWindows[test.name]; runtime.GOOS == "windows" && skip {
@@ -2034,10 +2383,11 @@ func TestInput(t *testing.T) {
 
 			id := "test_id:" + test.name
 			v2Ctx := v2.Context{
-				Logger:        logp.NewLogger("cel_test"),
-				ID:            id,
-				IDWithoutName: id,
-				Cancelation:   ctx,
+				Logger:          logp.NewLogger("cel_test"),
+				ID:              id,
+				IDWithoutName:   id,
+				Cancelation:     ctx,
+				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
 			client.done = func() {
@@ -2045,7 +2395,7 @@ func TestInput(t *testing.T) {
 					cancel()
 				}
 			}
-			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client)
+			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
@@ -2242,6 +2592,49 @@ func retryHandler() http.HandlerFunc {
 		// Any 5xx except 501 will result in a retry.
 		w.WriteHeader(500)
 		count++
+	}
+}
+
+//nolint:errcheck // No point checking errors in test server.
+func tokenAuthHandler(want string, handle http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		auth := r.Header.Get("Authorization")
+		if auth != want {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
+			return
+		}
+
+		handle(w, r)
+	}
+}
+
+func tokenAuthHandlerWithHeader(want, headerName string, handle http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		value := r.Header.Get(headerName)
+		if value != want {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusUnauthorized)
+			return
+		}
+
+		handle(w, r)
+	}
+}
+
+func awsAuthHandler(expectedTokenID string, handle http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if !strings.HasPrefix(authHeader, fmt.Sprintf("AWS4-HMAC-SHA256 Credential=%s/", expectedTokenID)) {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
+			return
+		}
+
+		amzDate := r.Header.Get("X-Amz-Date")
+		if amzDate == "" {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
+			return
+		}
+
+		handle(w, r)
 	}
 }
 

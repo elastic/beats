@@ -1,0 +1,167 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "attributes_modified"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "change"
+        ]
+      },
+      "file": {
+        "accessed": "2025-09-01T10:31:58.4974356Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-09-01T10:31:50.4605347Z",
+        "ctime": "2025-09-01T10:31:50.4605347Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "fork_name": "MyStream",
+        "inode": "22236523160142838",
+        "mtime": "2025-09-01T10:31:58.4974356Z",
+        "name": "mainfile.txt",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwwrite-ads1551235893\\001\\mainfile.txt:MyStream",
+        "size": 14,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      },
+      "process": {
+        "pid": 4356,
+        "user": {
+          "domain": "tp",
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-09-01T10:31:58.4958976Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 4462300,
+    "Period": 0,
+    "DisableTimeSeries": false
+  },
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "updated"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "change"
+        ]
+      },
+      "file": {
+        "accessed": "2025-09-01T10:31:58.4974356Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-09-01T10:31:50.4605347Z",
+        "ctime": "2025-09-01T10:31:50.4605347Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "fork_name": "MyStream",
+        "inode": "22236523160142838",
+        "mtime": "2025-09-01T10:31:58.4974356Z",
+        "name": "mainfile.txt",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwwrite-ads1551235893\\001\\mainfile.txt:MyStream",
+        "size": 14,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      },
+      "process": {
+        "pid": 4356,
+        "user": {
+          "domain": "tp",
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-09-01T10:31:58.4966028Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 0,
+    "Period": 0,
+    "DisableTimeSeries": false
+  },
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "updated"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "change"
+        ]
+      },
+      "file": {
+        "accessed": "2025-09-01T10:32:00.2254283Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-09-01T10:31:50.4605347Z",
+        "ctime": "2025-09-01T10:31:50.4605347Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "fork_name": "MyStream",
+        "inode": "22236523160142838",
+        "mtime": "2025-09-01T10:31:58.4974356Z",
+        "name": "mainfile.txt",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwwrite-ads1551235893\\001\\mainfile.txt:MyStream",
+        "size": 14,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      },
+      "process": {
+        "pid": 4356,
+        "user": {
+          "domain": "tp",
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-09-01T10:31:58.497665Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 0,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]

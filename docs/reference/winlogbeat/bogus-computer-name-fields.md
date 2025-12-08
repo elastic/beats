@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/bogus-computer-name-fields.html
+applies_to:
+  stack: ga
 ---
 
 # Bogus computer_name fields are reported in some events [bogus-computer-name-fields]

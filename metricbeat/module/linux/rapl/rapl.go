@@ -75,7 +75,7 @@ type energyUsage struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The linux rapl metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The linux rapl metricset is beta."))
 
 	config := config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -175,7 +175,7 @@ func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]energyUsage {
 				continue
 			}
 			if err != nil {
-				m.Logger().Infof("Error reading MSR from domain %s: %s skipping.", domain, err)
+				m.Logger().Infof("Error reading MSR from domain %s: %s skipping.", domain.Name, err)
 				continue
 			}
 			domainList[domain] = energyTrack{joules: joules, time: time.Now()}

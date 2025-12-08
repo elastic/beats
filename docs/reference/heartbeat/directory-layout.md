@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/directory-layout.html
+applies_to:
+  stack: ga
 ---
 
 # Directory layout [directory-layout]

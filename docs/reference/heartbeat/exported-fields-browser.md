@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-browser.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -52,7 +54,7 @@ duration of Load end event
 **`browser.experience.cls`**
 :   culumative layout shift score across all frames
 
-type: integer
+    type: integer
 
 
 ## relative_trace [_relative_trace]
@@ -62,13 +64,13 @@ trace event with timing information that are realtive to journey timings in micr
 **`browser.relative_trace.name`**
 :   name of the trace event
 
-type: keyword
+    type: keyword
 
 
 **`browser.relative_trace.type`**
 :   could be one of mark or measure event types
 
-type: text
+    type: text
 
 
 ## start [_start]
@@ -90,6 +92,6 @@ duration of the trace event in microseconds.
 **`browser.relative_trace.score`**
 :   weighted score of the layout shift event
 
-type: integer
+    type: integer
 
 

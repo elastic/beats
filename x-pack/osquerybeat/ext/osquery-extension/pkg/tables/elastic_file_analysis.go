@@ -10,7 +10,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strconv"
@@ -19,6 +18,7 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 )
 
@@ -51,7 +51,7 @@ func FileAnalysisColumns() []table.ColumnDefinition {
 	}
 }
 
-func GetFileAnalysisGenerateFunc() table.GenerateFunc {
+func GetFileAnalysisGenerateFunc(log *logger.Logger) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
 		var results []map[string]string
 
@@ -74,18 +74,18 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 		// Validate and sanitize the input path
 		stat, err := os.Stat(*path)
 		if err != nil {
-			log.Printf("Error stating file path '%s': %v", *path, err)
+			log.Errorf("Error stating file path '%s': %v", *path, err)
 			return results, fmt.Errorf("error accessing file path %s: %w", *path, err)
 		}
 
 		if !stat.Mode().IsRegular() {
-			log.Printf("Path is not a regular file: %s", *path)
+			log.Errorf("Path is not a regular file: %s", *path)
 			return results, fmt.Errorf("invalid path: %s", *path)
 		}
 
 		sys, ok := stat.Sys().(*syscall.Stat_t)
 		if !ok {
-			log.Printf("Unable to convert stat.Sys() to *syscall.Stat_t for path: %s", *path)
+			log.Errorf("Unable to convert stat.Sys() to *syscall.Stat_t for path: %s", *path)
 			return results, fmt.Errorf("unable to convert stat.Sys() to *syscall.Stat_t")
 		}
 
@@ -98,28 +98,28 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 		// Execute macOS commands
 		fileType, err := command.Execute(ctx, "file", *path)
 		if err != nil {
-			log.Printf("Error running 'file' command: %v", err)
+			log.Warningf("Error running 'file' command: %v", err)
 		}
 
 		dependencies, err := command.Execute(ctx, "otool", "-L", *path)
 		if err != nil {
-			log.Printf("Error running 'otool' command: %v", err)
+			log.Warningf("Error running 'otool' command: %v", err)
 		}
 
 		symbols, err := command.Execute(ctx, "nm", *path)
 		if err != nil {
-			log.Printf("Error running 'nm' command: %v", err)
+			log.Warningf("Error running 'nm' command: %v", err)
 		}
 
 		stringsOutput, err := command.Execute(ctx, "strings", "-a", *path)
 		if err != nil {
-			log.Printf("Error running 'strings' command: %v", err)
+			log.Warningf("Error running 'strings' command: %v", err)
 		}
 
 		// Execute macOS codesign command and capture stderr for output
 		codeSign, err := ExecuteStderr(ctx, "codesign", "-dvvv", *path)
 		if err != nil {
-			log.Println("Error running 'codesign' command:", err)
+			log.Warningf("Error running 'codesign' command: %v", err)
 		}
 
 		// Convert outputs to strings

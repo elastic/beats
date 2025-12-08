@@ -44,6 +44,10 @@ func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
 	if err != nil {
 		return nil, ErrBadConfig(err)
 	}
+	err = s.browserCfg.Source.Active().Decode()
+	if err != nil {
+		return nil, ErrBadConfig(err)
+	}
 
 	return s, nil
 }
@@ -125,7 +129,7 @@ func (sj *SourceJob) extraArgs(uiOrigin bool) []string {
 		s, err := json.Marshal(sj.browserCfg.PlaywrightOpts)
 		if err != nil {
 			// This should never happen, if it was parsed as a config it should be serializable
-			logp.L().Warnf("could not serialize playwright options '%v': %w", sj.browserCfg.PlaywrightOpts, err)
+			logp.L().Warnf("could not serialize playwright options '%v': %v", sj.browserCfg.PlaywrightOpts, err)
 		} else {
 			extraArgs = append(extraArgs, "--playwright-options", string(s))
 		}
@@ -164,7 +168,7 @@ func (sj *SourceJob) jobs() []jobs.Job {
 	var j jobs.Job
 
 	isScript := sj.browserCfg.Source.Inline != nil
-	ctx := context.WithValue(sj.ctx, synthexec.SynthexecTimeout, sj.browserCfg.Timeout+30*time.Second)
+	ctx := context.WithValue(sj.ctx, synthexec.SynthexecTimeoutKey, sj.browserCfg.Timeout+30*time.Second)
 	sFields := sj.StdFields()
 
 	if isScript {

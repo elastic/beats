@@ -2,6 +2,8 @@
 navigation_title: "registered_domain"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/processor-registered-domain.html
+applies_to:
+  stack: ga
 ---
 
 # Registered Domain [processor-registered-domain]

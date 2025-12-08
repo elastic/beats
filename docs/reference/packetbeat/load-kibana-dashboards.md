@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/load-kibana-dashboards.html
+applies_to:
+  stack: ga
 ---
 
 # Load Kibana dashboards [load-kibana-dashboards]
@@ -49,7 +51,7 @@ packetbeat setup --dashboards
 
 ::::::{tab-item} Docker
 ```sh subs=true
-docker run --rm --net="host" docker.elastic.co/beats/packetbeat:{{stack-version}} setup --dashboards
+docker run --rm --net="host" docker.elastic.co/beats/packetbeat:{{version.stack}} setup --dashboards
 ```
 ::::::
 
@@ -125,7 +127,7 @@ packetbeat setup -e \
 
 ::::::{tab-item} Docker
 ```sh subs=true
-docker run --rm --net="host" docker.elastic.co/beats/packetbeat:{{stack-version}} setup -e \
+docker run --rm --net="host" docker.elastic.co/beats/packetbeat:{{version.stack}} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=packetbeat_internal \

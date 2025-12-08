@@ -48,6 +48,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/billing"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/carbon"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/vertexai_logs"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/ibmmq"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/iis/application_pool"

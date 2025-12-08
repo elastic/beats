@@ -81,46 +81,81 @@ func TestFetch(t *testing.T) {
 	}
 
 	t.Run("with api key", func(t *testing.T) {
-		apiKey := "foo:bar"
-		expectedHeader := "ApiKey " + base64.StdEncoding.EncodeToString([]byte(apiKey))
-
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			switch r.RequestURI {
-			case "/_nodes/_local":
-				apiKey := r.Header.Get("Authorization")
-				if apiKey != expectedHeader {
-					t.Errorf("expected api key to be %s but got %s", expectedHeader, apiKey)
-				}
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json;")
-				w.Write([]byte([]byte("{}")))
-
-			case "/":
-				apiKey := r.Header.Get("Authorization")
-				if apiKey != expectedHeader {
-					t.Errorf("expected api key to be %s but got %s", expectedHeader, apiKey)
-				}
-
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write([]byte("{}"))
-
-			default:
-				t.FailNow()
-			}
-
-		}))
-		defer server.Close()
-
-		config := map[string]interface{}{
-			"module":     "elasticsearch",
-			"metricsets": []string{"node"},
-			"hosts":      []string{server.URL},
-			"api_key":    "foo:bar",
+		tests := []struct {
+			name           string
+			envVar         string
+			apiKey         string
+			base64Encoded  bool
+			expectedHeader string
+		}{
+			{"from config without base64 encoding", "", "foo:bar1", false, "ApiKey " + base64.StdEncoding.EncodeToString([]byte("foo:bar1"))},
+			{"from config with base64 encoding", "", "foo:bar2", true, "ApiKey " + base64.StdEncoding.EncodeToString([]byte("foo:bar2"))},
+			{"from env [AUTOOPS_ES_API_KEY] without base64 encoding", "AUTOOPS_ES_API_KEY", "foo:bar3", false, "ApiKey " + base64.StdEncoding.EncodeToString([]byte("foo:bar3"))},
+			{"from env [AUTOOPS_ES_API_KEY] with base64 encoding", "AUTOOPS_ES_API_KEY", "bar:foo4", true, "ApiKey " + base64.StdEncoding.EncodeToString([]byte("bar:foo4"))},
+			{"from env [ELASTICSEARCH_READ_API_KEY] without base64 encoding", "ELASTICSEARCH_READ_API_KEY", "foo:bar5", false, "ApiKey " + base64.StdEncoding.EncodeToString([]byte("foo:bar5"))},
+			{"from env [ELASTICSEARCH_READ_API_KEY] with base64 encoding", "ELASTICSEARCH_READ_API_KEY", "bar:foo6", true, "ApiKey " + base64.StdEncoding.EncodeToString([]byte("bar:foo6"))},
 		}
-		reporter := &mbtest.CapturingReporterV2{}
 
-		metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-		metricSet.Fetch(reporter)
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				expectedHeader := tt.expectedHeader
+
+				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.RequestURI {
+					case "/_nodes/_local":
+						apiKey := r.Header.Get("Authorization")
+						if apiKey != expectedHeader {
+							t.Errorf("expected api key to be %s but got %s", expectedHeader, apiKey)
+						}
+						w.WriteHeader(200)
+						w.Header().Set("Content-Type", "application/json;")
+						w.Write([]byte([]byte("{}")))
+
+					case "/":
+						apiKey := r.Header.Get("Authorization")
+						if apiKey != expectedHeader {
+							t.Errorf("expected api key to be %s but got %s", expectedHeader, apiKey)
+						}
+
+						w.WriteHeader(200)
+						w.Header().Set("Content-Type", "application/json")
+						w.Write([]byte("{}"))
+
+					default:
+						t.FailNow()
+					}
+
+				}))
+				defer server.Close()
+
+				config := map[string]any{
+					"module":     "elasticsearch",
+					"metricsets": []string{"node"},
+					"hosts":      []string{server.URL},
+				}
+
+				apiKey := base64.StdEncoding.EncodeToString([]byte(tt.apiKey))
+
+				if tt.envVar != "" {
+					if tt.envVar != "ELASTICSEARCH_READ_API_KEY" {
+						// ensure that this is not the preferred value
+						t.Setenv("ELASTICSEARCH_READ_API_KEY", "_ignored_")
+					}
+					t.Setenv(tt.envVar, apiKey)
+				} else {
+					// config beats env
+					t.Setenv("AUTOOPS_ES_API_KEY", "_ignored_")
+					t.Setenv("ELASTICSEARCH_READ_API_KEY", "_ignored_")
+
+					config["api_key"] = apiKey
+				}
+
+				reporter := &mbtest.CapturingReporterV2{}
+
+				metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+				metricSet.Fetch(reporter)
+			})
+		}
+
 	})
 }

@@ -2,6 +2,8 @@
 navigation_title: "Redis"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/redis-output.html
+applies_to:
+  stack: ga
 ---
 
 # Configure the Redis output [redis-output]

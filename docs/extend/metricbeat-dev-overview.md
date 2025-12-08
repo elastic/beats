@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/metricbeat-dev-overview.html
+applies_to:
+  stack: ga
 ---
 
 # Overview [metricbeat-dev-overview]

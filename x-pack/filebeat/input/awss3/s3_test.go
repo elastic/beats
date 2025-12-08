@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -20,7 +21,6 @@ import (
 )
 
 func TestS3Poller(t *testing.T) {
-	logp.TestingSetup()
 
 	const bucket = "bucket"
 	const listPrefix = "key"
@@ -128,7 +128,7 @@ func TestS3Poller(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("2024-02-08T08:35:00+00:02.json.gz")).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{})
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{}, logp.NewNopLogger())
 		states, err := newStates(nil, store, listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 
@@ -147,8 +147,9 @@ func TestS3Poller(t *testing.T) {
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
-			metrics:         newInputMetrics("", nil, 0),
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
+			status:          &statusReporterHelperMock{},
 		}
 		poller.runPoll(ctx)
 	})
@@ -269,7 +270,7 @@ func TestS3Poller(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key5")).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{})
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{}, logp.NewNopLogger())
 		states, err := newStates(nil, store, listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 
@@ -280,6 +281,7 @@ func TestS3Poller(t *testing.T) {
 			BucketListPrefix:   "key",
 			RegionName:         "region",
 		}
+
 		poller := &s3PollerInput{
 			log: logp.NewLogger(inputName),
 			config: config{
@@ -294,8 +296,9 @@ func TestS3Poller(t *testing.T) {
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
-			metrics:         newInputMetrics("", nil, 0),
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
+			status:          &statusReporterHelperMock{},
 		}
 		poller.run(ctx)
 	})
@@ -524,8 +527,9 @@ func Test_S3StateHandling(t *testing.T) {
 				pipeline:        newFakePipeline(),
 				s3ObjectHandler: mockObjHandler,
 				states:          s3States,
-				metrics:         newInputMetrics("state-test: "+test.name, nil, 0),
+				metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 				filterProvider:  newFilterProvider(test.config),
+				status:          &statusReporterHelperMock{},
 			}
 
 			// when - run polling for desired time

@@ -2,6 +2,8 @@
 navigation_title: "Install and configure"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/loggingplugin/current/log-driver-installation.html
+applies_to:
+  stack: ga
 ---
 
 # Install and configure the Elastic Logging Plugin [log-driver-installation]
@@ -23,7 +25,7 @@ Make sure your system meets the following prerequisites:
     **To install from the Docker store:**
 
     ```sh subs=true
-    docker plugin install elastic/elastic-logging-plugin:{{stack-version}}
+    docker plugin install elastic/elastic-logging-plugin:{{version.stack}}
     ```
 
     **To build and install from source:**
@@ -38,7 +40,7 @@ Make sure your system meets the following prerequisites:
 2. If necessary, enable the plugin:
 
     ```sh subs=true
-    docker plugin enable elastic/elastic-logging-plugin:{{stack-version}}
+    docker plugin enable elastic/elastic-logging-plugin:{{version.stack}}
     ```
 
 3. Verify that the plugin is installed and enabled:
@@ -51,7 +53,7 @@ Make sure your system meets the following prerequisites:
 
     ```sh subs=true
     ID                  NAME                                   DESCRIPTION              ENABLED
-    c2ff9d2cf090        elastic/elastic-logging-plugin:{{stack-version}}   A beat for docker logs   true
+    c2ff9d2cf090        elastic/elastic-logging-plugin:{{version.stack}}   A beat for docker logs   true
     ```
 
 
@@ -65,7 +67,7 @@ You can set configuration options for a single container, or for all containers 
 Pass configuration options at run time when you start the container. For example:
 
 ```sh subs=true
-docker run --log-driver=elastic/elastic-logging-plugin:{{stack-version}} \
+docker run --log-driver=elastic/elastic-logging-plugin:{{version.stack}} \
            --log-opt hosts="https://myhost:9200" \
            --log-opt user="myusername" \
            --log-opt password="mypassword" \
@@ -78,7 +80,7 @@ Set configuration options in the Docker `daemon.json` configuration file. For ex
 
 ```json subs=true
 {
-  "log-driver" : "elastic/elastic-logging-plugin:{{stack-version}}",
+  "log-driver" : "elastic/elastic-logging-plugin:{{version.stack}}",
   "log-opts" : {
     "hosts" : "https://myhost:9200",
     "user" : "myusername",

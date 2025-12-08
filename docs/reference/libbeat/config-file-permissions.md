@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/config-file-permissions.html
+applies_to:
+  stack: ga
 ---
 
 # Config file ownership and permissions [config-file-permissions]

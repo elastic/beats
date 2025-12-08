@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-template.html
+applies_to:
+  stack: ga
 ---
 
 # Load the Elasticsearch index template [auditbeat-template]
@@ -97,7 +99,7 @@ auditbeat setup --index-management -E output.logstash.enabled=false -E 'output.e
 **docker:**
 
 ```sh subs=true
-docker run --rm docker.elastic.co/beats/auditbeat:{{stack-version}} setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+docker run --rm docker.elastic.co/beats/auditbeat:{{version.stack}} setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ```
 
 **win:**
@@ -171,7 +173,7 @@ auditbeat export template > auditbeat.template.json
 **win:**
 
 ```sh subs=true
-PS > .\auditbeat.exe export template --es.version {{stack-version}} | Out-File -Encoding UTF8 auditbeat.template.json
+PS > .\auditbeat.exe export template --es.version {{version.stack}} | Out-File -Encoding UTF8 auditbeat.template.json
 ```
 
 To install the template, run:
@@ -179,50 +181,50 @@ To install the template, run:
 **deb and rpm:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/auditbeat-{{stack-version}} -d@auditbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/auditbeat-{{version.stack}} -d@auditbeat.template.json
 ```
 
 **mac:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/auditbeat-{{stack-version}} -d@auditbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/auditbeat-{{version.stack}} -d@auditbeat.template.json
 ```
 
 **linux:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/auditbeat-{{stack-version}} -d@auditbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/auditbeat-{{version.stack}} -d@auditbeat.template.json
 ```
 
 **win:**
 
 ```sh subs=true
-PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile auditbeat.template.json -Uri http://localhost:9200/_index_template/auditbeat-{{stack-version}}
+PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile auditbeat.template.json -Uri http://localhost:9200/_index_template/auditbeat-{{version.stack}}
 ```
 
-Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on auditbeat-{{stack-version}} index.
+Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on auditbeat-{{version.stack}} index.
 
 **deb and rpm:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/auditbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/auditbeat-{{version.stack}}
 ```
 
 **mac:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/auditbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/auditbeat-{{version.stack}}
 ```
 
 **linux:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/auditbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/auditbeat-{{version.stack}}
 ```
 
 **win:**
 
 ```sh subs=true
-PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/auditbeat-{{stack-version}}
+PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/auditbeat-{{version.stack}}
 ```
 

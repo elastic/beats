@@ -19,6 +19,7 @@ package prometheus
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"math"
 	"mime"
@@ -32,6 +33,7 @@ import (
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/model/textparse"
 	"github.com/prometheus/prometheus/model/timestamp"
+	"github.com/prometheus/prometheus/schema"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -42,6 +44,7 @@ const (
 	TextVersion                  = "0.0.4"
 	OpenMetricsType              = `application/openmetrics-text`
 	ContentTypeTextFormat string = `text/plain; version=` + TextVersion + `; charset=utf-8`
+	textMediaType                = "text/plain"
 )
 
 type Gauge struct {
@@ -476,10 +479,23 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 }
 
 func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
-	parser, err := textparse.New(b, contentType, ContentTypeTextFormat, false, false, labels.NewSymbolTable()) // Fallback protocol set to ContentTypeTextFormat
-	if err != nil {
-		return nil, err
+	// Fallback to text/plain if content type is blank or unrecognized.
+	parser, err := textparse.New(b, contentType, labels.NewSymbolTable(), textparse.ParserOptions{
+		KeepClassicOnClassicAndNativeHistograms: false,
+		OpenMetricsSkipCTSeries:                 false,
+		EnableTypeAndUnitLabels:                 false,
+		FallbackContentType:                     textMediaType,
+	})
+	// This check allows to continue where the content type is blank/invalid but the parser is non-nil. Returns error on all other cases.
+	if parser == nil {
+		if err != nil {
+			return nil, err
+
+		}
+
+		return nil, fmt.Errorf("no parser returned for contentType %q", contentType)
 	}
+
 	var (
 		defTime              = timestamp.FromTime(ts)
 		metricFamiliesByName = map[string]*MetricFamily{}
@@ -565,8 +581,10 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 
 		var lset labels.Labels
 		parser.Labels(&lset)
+		metadata := schema.NewMetadataFromLabels(lset)
+		metricName := metadata.Name
 
-		if !lset.Has(labels.MetricName) {
+		if metricName == "" {
 			// missing metric name from labels.MetricName, skip.
 			break
 		}
@@ -574,9 +592,9 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		var lbls strings.Builder
 		var labelPairs = []*labels.Label{}
 		var qv string // value of le or quantile label
-		for _, l := range lset.Copy() {
+		lset.Range(func(l labels.Label) {
 			if l.Name == labels.MetricName {
-				continue
+				return
 			}
 
 			switch l.Name {
@@ -596,11 +614,9 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 				Name:  n,
 				Value: v,
 			})
-		}
+		})
 
 		var metric *OpenMetric
-
-		metricName := lset.Get(labels.MetricName)
 
 		// lookupMetricName will have the suffixes removed
 		lookupMetricName := metricName
@@ -749,8 +765,6 @@ func GetContentType(h http.Header) string {
 		return ""
 	}
 
-	const textType = "text/plain"
-
 	switch mediatype {
 	case OpenMetricsType:
 		if e, ok := params["encoding"]; ok && e != "delimited" {
@@ -758,7 +772,7 @@ func GetContentType(h http.Header) string {
 		}
 		return OpenMetricsType
 
-	case textType:
+	case textMediaType:
 		if v, ok := params["version"]; ok && v != TextVersion {
 			return ""
 		}

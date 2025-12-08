@@ -118,6 +118,20 @@ func (c *Context) UpdateStatus(status status.Status, msg string) {
 	}
 }
 
+// MetricsRegistryOverrideID sets the "id" variable in the Context's
+// MetricsRegistry and returns the modified registry. This is required as some
+// inputs do not use their input ID as the identifier for their metrics.
+func MetricsRegistryOverrideID(reg *monitoring.Registry, id string) {
+	monitoring.NewString(reg, inputmon.MetricKeyID).Set(id)
+}
+
+// MetricsRegistryOverrideInput sets the "input" variable in the Context's
+// MetricsRegistry and returns the modified registry. This is required as some
+// inputs do not use their input name for their metrics.
+func MetricsRegistryOverrideInput(reg *monitoring.Registry, inputName string) {
+	monitoring.NewString(reg, inputmon.MetricKeyInput).Set(inputName)
+}
+
 // NewPipelineClientListener returns a new beat.ClientListener.
 // The PipelineClientListener collects pipeline metrics for an input. The
 // metrics are created on reg.

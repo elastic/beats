@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
-	auto_ops_events "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/require"
@@ -26,11 +25,6 @@ func TestProperlyHandlesResponse(t *testing.T) {
 
 func TestProperlyHandlesResponseWhenNoOptionalFields(t *testing.T) {
 	metricset.RunTestsForServerlessMetricSetWithGlobFiles(t, "./_meta/test/license.valid_but_no_optionals*.json", LicenseMetricsSet, eventsMapping, expectValidParsedDataWithoutOptionalFields)
-}
-
-// Expect a corrupt response from Elasticsearch to trigger an error while applying the schema
-func TestKeyNotFoundBadResponse(t *testing.T) {
-	metricset.RunTestsForServerlessMetricSetWithGlobFiles(t, "./_meta/test/no_*.license.*.json", LicenseMetricsSet, eventsMapping, expectError)
 }
 
 // Tests that License reported with no errors
@@ -90,14 +84,4 @@ func expectValidParsedDataWithoutOptionalFields(t *testing.T, data metricset.Fet
 		actualValue := auto_ops_testing.GetObjectValue(event.MetricSetFields, key)
 		require.EqualValues(t, expectedValue, actualValue, "Field %s does not match", key)
 	}
-}
-
-func expectError(t *testing.T, data metricset.FetcherData[map[string]interface{}]) {
-	require.ErrorContains(t, data.Error, "failed applying license schema")
-	require.Equal(t, 1, len(data.Reporter.GetEvents()))
-
-	// Check error event
-	event := data.Reporter.GetEvents()[0]
-	_, ok := event.MetricSetFields["error"].(auto_ops_events.ErrorEvent)
-	require.True(t, ok, "expected error event to be of type auto_ops_events.ErrorEvent")
 }

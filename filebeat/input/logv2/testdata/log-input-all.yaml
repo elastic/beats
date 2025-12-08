@@ -1,0 +1,60 @@
+backoff: 20s
+max_backoff: 200s
+
+harvester_buffer_size: 42000
+
+clean_inactive: 20h
+clean_removed: false
+
+close_inactive: 3h
+close_timeout: 42s
+close_eof: true
+close_removed: false
+close_renamed: true
+
+encoding: "utf-8"
+
+exclude_lines:
+  - "foo-exclude"
+
+harvester_limit: 10000
+
+id: foo
+
+tail_files: true
+
+ignore_older: 10h
+
+include_lines:
+  - "foo-include"
+  - "bar-include"
+
+max_bytes: 44000
+
+paths:
+  - /var/log/*.log
+  - /foo/bar.log
+
+scan_frequency: 50s
+
+exclude_files:
+  - "excluded-file glob goes here"
+
+recursive_glob.enabled: false
+
+symlinks: true
+
+json:
+  keys_under_root: false
+  overwrite_keys: true
+  expand_keys: true
+  add_error_key: true
+  message_key: "message"
+  document_id: "the_id_key"
+  ignore_decoding_error: true
+
+multiline.type: pattern
+multiline.pattern: "reg exp goes here"
+multiline.negate: true
+multiline.match: after
+multiline.count_lines: 42

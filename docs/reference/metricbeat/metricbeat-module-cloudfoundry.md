@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-cloudfoundry.html
+applies_to:
+  stack: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -151,6 +153,6 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [container](/reference/metricbeat/metricbeat-metricset-cloudfoundry-container.md)
-* [counter](/reference/metricbeat/metricbeat-metricset-cloudfoundry-counter.md)
-* [value](/reference/metricbeat/metricbeat-metricset-cloudfoundry-value.md)
+* [container](/reference/metricbeat/metricbeat-metricset-cloudfoundry-container.md)  {applies_to}`stack: beta`
+* [counter](/reference/metricbeat/metricbeat-metricset-cloudfoundry-counter.md)  {applies_to}`stack: beta`
+* [value](/reference/metricbeat/metricbeat-metricset-cloudfoundry-value.md)  {applies_to}`stack: beta`

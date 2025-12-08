@@ -107,7 +107,7 @@ func unescapeString(str string) string {
 		b := str[i]
 		if b == '\\' && i+3 < len(str) {
 			if parsed, err := strconv.ParseInt(str[i+1:i+4], 8, 8); err == nil {
-				b = uint8(parsed)
+				b = uint8(parsed) //nolint:gosec // ParseInt will fail if we're larger than 8 bits anyway
 				i += 3
 			}
 		}
@@ -181,7 +181,7 @@ func readMountInfo(r io.Reader) (mountPoints, error) {
 		line := scanner.Text()
 		mnt, err := parseMountInfoLine(line)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error reading mountinfo line: %w", err)
 		}
 
 		if mnt == nil {
@@ -218,7 +218,7 @@ func getAllMountPoints() (mountPoints, error) {
 
 	file, err := os.Open("/proc/self/mountinfo")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error opening mountinfo: %w", err)
 	}
 	defer file.Close()
 	return readMountInfo(file)

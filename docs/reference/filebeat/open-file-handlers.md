@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/open-file-handlers.html
+applies_to:
+  stack: ga
 ---
 
 # Too many open file handlers [open-file-handlers]

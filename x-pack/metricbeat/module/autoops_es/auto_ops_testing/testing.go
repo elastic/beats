@@ -351,23 +351,23 @@ func CheckEventWithTransactionId(t *testing.T, event mb.Event, info utils.Cluste
 	CheckEvent(t, event, info)
 
 	// matching transaction ID
-	require.Equal(t, transactionId, GetObjectValue(event.ModuleFields, "transactionId"))
+	require.Equal(t, transactionId, GetObjectValue(event.ModuleFields, "transaction_id"))
 }
 
 func CheckEventWithRandomTransactionId(t *testing.T, event mb.Event, info utils.ClusterInfo) {
 	CheckEvent(t, event, info)
 
 	// valid, random UUID
-	_, err := uuid.FromString(GetObjectValue(event.ModuleFields, "transactionId").(string))
+	_, err := uuid.FromString(GetObjectValue(event.ModuleFields, "transaction_id").(string))
 	require.NoError(t, err)
 }
 
 func CheckAllEventsUseSameTransactionId(t *testing.T, events []mb.Event) {
 	if len(events) > 1 {
-		transactionId := GetObjectValue(events[0].ModuleFields, "transactionId")
+		transactionId := GetObjectValue(events[0].ModuleFields, "transaction_id")
 
 		for _, event := range events {
-			require.Equal(t, transactionId, GetObjectValue(event.ModuleFields, "transactionId"))
+			require.Equal(t, transactionId, GetObjectValue(event.ModuleFields, "transaction_id"))
 		}
 	}
 }

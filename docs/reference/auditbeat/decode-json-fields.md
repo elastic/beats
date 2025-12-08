@@ -2,6 +2,8 @@
 navigation_title: "decode_json_fields"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/decode-json-fields.html
+applies_to:
+  stack: ga
 ---
 
 # Decode JSON fields [decode-json-fields]

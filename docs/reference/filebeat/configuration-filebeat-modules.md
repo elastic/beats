@@ -2,6 +2,8 @@
 navigation_title: "Modules"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/configuration-filebeat-modules.html
+applies_to:
+  stack: ga
 ---
 
 # Configure modules [configuration-filebeat-modules]

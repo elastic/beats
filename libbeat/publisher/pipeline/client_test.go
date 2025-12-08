@@ -28,6 +28,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/paths"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -37,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -305,6 +308,7 @@ func TestMonitoring(t *testing.T) {
 			Monitors{
 				Metrics:   metrics,
 				Telemetry: telemetry,
+				Logger:    logp.NewNopLogger(),
 			},
 			config,
 			processing.Supporter(nil),
@@ -473,7 +477,7 @@ type testProcessorSupporter struct {
 }
 
 // Create a running processor interface based on the given config
-func (p testProcessorSupporter) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error) {
+func (p testProcessorSupporter) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path) (beat.Processor, error) {
 	return p.Processor, nil
 }
 

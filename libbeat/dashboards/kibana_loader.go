@@ -228,8 +228,8 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 }
 
 func (loader KibanaLoader) formatDashboardAssets(content []byte) []byte {
-	content = ReplaceIndexInDashboardObject(loader.config.Index, content)
-	content = EncodeJSONObjects(content)
+	content = ReplaceIndexInDashboardObject(loader.config.Index, content, loader.logger)
+	content = EncodeJSONObjects(content, loader.logger)
 
 	replacements := loader.config.StringReplacements
 	if replacements == nil {

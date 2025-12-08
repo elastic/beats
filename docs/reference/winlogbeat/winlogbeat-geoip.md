@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-geoip.html
+applies_to:
+  stack: ga
 ---
 
 # Enrich events with geoIP information [winlogbeat-geoip]

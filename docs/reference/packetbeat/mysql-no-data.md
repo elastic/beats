@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/mysql-no-data.html
+applies_to:
+  stack: ga
 ---
 
 # Packetbeat isn't capturing MySQL performance data [mysql-no-data]

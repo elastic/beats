@@ -2,6 +2,8 @@
 navigation_title: "drop_event"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/drop-event.html
+applies_to:
+  stack: ga
 ---
 
 # Drop events [drop-event]

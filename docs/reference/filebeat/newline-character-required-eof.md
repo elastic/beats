@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/newline-character-required-eof.html
+applies_to:
+  stack: ga
 ---
 
 # Filebeat isn't shipping the last line of a file [newline-character-required-eof]

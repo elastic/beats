@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-loopback-interface.html
+applies_to:
+  stack: ga
 ---
 
 # Packetbeat Can't capture traffic from Windows loopback interface [packetbeat-loopback-interface]

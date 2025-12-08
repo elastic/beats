@@ -30,11 +30,12 @@ import (
 )
 
 type managedInput struct {
-	userID           string
-	metricsID        string
+	// id is the input ID, it is defined by setting 'id'
+	// in the input configuration
+	id               string
 	manager          *InputManager
 	ackCH            *updateChan
-	sourceIdentifier *sourceIdentifier
+	sourceIdentifier *SourceIdentifier
 	prospector       Prospector
 	harvester        Harvester
 	cleanTimeout     time.Duration
@@ -64,7 +65,7 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
-	metrics := NewMetrics(ctx.MetricsRegistry)
+	metrics := NewMetrics(ctx.MetricsRegistry, inp.manager.Logger)
 
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
@@ -94,16 +95,16 @@ func (inp *managedInput) Run(
 
 	// Notify the manager the input has stopped, currently that is used to
 	// keep track of duplicated IDs
-	inp.manager.StopInput(inp.userID)
+	inp.manager.StopInput(inp.id)
 
 	return nil
 }
 
 func newInputACKHandler(ch *updateChan) beat.EventListener {
-	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
+	return acker.EventPrivateReporter(func(acked int, private []any) {
 		var n uint
 		var last int
-		for i := 0; i < len(private); i++ {
+		for i := range private {
 			current := private[i]
 			if current == nil {
 				continue
@@ -121,6 +122,7 @@ func newInputACKHandler(ch *updateChan) beat.EventListener {
 			return
 		}
 
+		//nolint:errcheck // We know it is alwys the correct type
 		op := private[last].(*updateOp)
 		ch.Send(scheduledUpdate{op: op, n: n})
 	})

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/learn-more-security.html
+applies_to:
+  stack: ga
 ---
 
 # Learn more about privileges, roles, and users [learn-more-security]

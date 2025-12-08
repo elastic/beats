@@ -2,6 +2,8 @@
 navigation_title: "Create a _monitoring_ user"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/privileges-to-publish-monitoring.html
+applies_to:
+  stack: ga
 ---
 
 # Grant privileges and roles needed for monitoring [privileges-to-publish-monitoring]

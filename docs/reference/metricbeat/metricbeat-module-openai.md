@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-openai.html
+applies_to:
+  stack: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -62,4 +64,4 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [usage](/reference/metricbeat/metricbeat-metricset-openai-usage.md)
+* [usage](/reference/metricbeat/metricbeat-metricset-openai-usage.md)  {applies_to}`stack: beta`

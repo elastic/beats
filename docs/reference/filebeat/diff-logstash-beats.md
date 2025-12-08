@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/diff-logstash-beats.html
+applies_to:
+  stack: ga
 ---
 
 # Not sure whether to use Logstash or Beats [diff-logstash-beats]

@@ -2,6 +2,8 @@
 navigation_title: "Monitors"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartbeat-options.html
+applies_to:
+  stack: ga
 ---
 
 # Configure Heartbeat monitors [configuration-heartbeat-options]

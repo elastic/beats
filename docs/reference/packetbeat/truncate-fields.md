@@ -2,6 +2,8 @@
 navigation_title: "truncate_fields"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/truncate-fields.html
+applies_to:
+  stack: ga
 ---
 
 # Truncate fields [truncate-fields]

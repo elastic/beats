@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/change-index-name.html
+applies_to:
+  stack: ga
 ---
 
 # Change the index name [change-index-name]

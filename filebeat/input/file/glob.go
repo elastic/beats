@@ -68,21 +68,3 @@ func GlobPatterns(pattern string, doubleStarPatternDepth uint8) ([]string, error
 	}
 	return patterns, nil
 }
-
-// Glob expands '**' patterns into multiple patterns to satisfy https://golang.org/pkg/path/filepath/#Match
-func Glob(pattern string, doubleStarPatternDepth uint8) ([]string, error) {
-	patterns, err := GlobPatterns(pattern, doubleStarPatternDepth)
-	if err != nil {
-		return nil, err
-	}
-	var matches []string
-	for _, p := range patterns {
-		// Evaluate the path as a wildcards/shell glob
-		match, err := filepath.Glob(p)
-		if err != nil {
-			return nil, err
-		}
-		matches = append(matches, match...)
-	}
-	return matches, nil
-}

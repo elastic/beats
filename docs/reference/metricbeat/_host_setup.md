@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/_host_setup.html
+applies_to:
+  stack: ga
 ---
 
 # Host Setup [_host_setup]

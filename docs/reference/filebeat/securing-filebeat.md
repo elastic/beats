@@ -2,6 +2,8 @@
 navigation_title: "Secure"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/securing-filebeat.html
+applies_to:
+  stack: ga
 ---
 
 # Secure Filebeat [securing-filebeat]

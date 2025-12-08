@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/dashboard-fields-incorrect.html
+applies_to:
+  stack: ga
 ---
 
 # Dashboard in Kibana is breaking up data fields incorrectly [dashboard-fields-incorrect]

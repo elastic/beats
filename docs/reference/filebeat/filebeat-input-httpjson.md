@@ -2,6 +2,8 @@
 navigation_title: "HTTP JSON"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-httpjson.html
+applies_to:
+  stack: ga
 ---
 
 # HTTP JSON input [filebeat-input-httpjson]
@@ -15,8 +17,9 @@ This input supports:
 
 * Auth
 
-    * Basic
-    * OAuth2
+  * Basic
+  * {applies_to}`stack: ga 9.3.0` File
+  * OAuth2
 
 * Retrieval at a configurable interval
 * Pagination
@@ -59,7 +62,11 @@ filebeat.inputs:
         value: 5m
 ```
 
-Additionally, it supports authentication via Basic auth, HTTP Headers or oauth2.
+Additionally, it supports authentication via:
+* Basic auth
+* {applies_to}`stack: ga 9.3.0` File-based headers (`auth.file`)
+* HTTP headers
+* OAauth2
 
 Example configurations with authentication:
 
@@ -92,6 +99,16 @@ filebeat.inputs:
     token_url: http://localhost/oauth2/token
     user: user@domain.tld
     password: P@$$W0₹D
+  request.url: http://localhost
+```
+
+```yaml
+filebeat.inputs:
+- type: httpjson
+  auth.file:
+    path: /etc/elastic/token
+    prefix: "Bearer "
+    refresh_interval: 10m
   request.url: http://localhost
 ```
 
@@ -197,7 +214,7 @@ Some built-in helper functions are provided to work with the input state inside 
 * `base64Decode`: Decodes the base64 string. Any binary output will be converted to a UTF8 string.
 * `base64EncodeNoPad`: Joins and base64 encodes all supplied strings without padding. Example `[[base64EncodeNoPad "string1" "string2"]]`
 * `base64Encode`: Joins and base64 encodes all supplied strings. Example `[[base64Encode "string1" "string2"]]`
-* `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns _{{version}}_.
+* `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns _{{version.stack}}_.
 * `div`: does the integer division of two integer values.
 * `formatDate`: formats a `time.Time`. By default the format layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. It will default to UTC timezone when formatting, but you can specify a different timezone. If the timezone is incorrect, it will default to UTC. Example: `[[ formatDate (now) "UnixDate" ]]`, `[[ formatDate (now) "UnixDate" "America/New_York" ]]`.
 * `getRFC5988Link`: extracts a specific relation from a list of [RFC5988](https://tools.ietf.org/html/rfc5988) links. It is useful when parsing header values for pagination. Example: `[[ getRFC5988Link "next" .last_response.header.Link ]]`.
@@ -219,6 +236,7 @@ Some built-in helper functions are provided to work with the input state inside 
 * `parseTimestamp`: parses a timestamp in seconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732]]` returns `2020-11-05 13:25:32 +0000 UTC`.
 * `replaceAll(old, new, s)`: replaces all non-overlapping instances of `old` with `new` in `s`. Example: `[[ replaceAll "some" "my" "some value" ]]` returns `my value`.
 * `sprintf`: formats according to a format specifier and returns the resulting string. Refer to [the Go docs](https://pkg.go.dev/fmt#Sprintf) for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
+* `terminate`: exits the template without falling back to the default value and without causing an error. It takes a single string argument that is logged in debug logging. {applies_to}`stack: ga 9.1.2` {applies_to}`stack: ga 9.0.6` {applies_to}`stack: ga 8.19.2` {applies_to}`stack: ga 8.18.6`
 * `toInt`: converts a value of any type to an integer when possible. Returns 0 if the conversion fails.
 * `toJSON`: converts a value to a JSON string. This can be used with `value_type: json` to create an object from a template. Example: `[[ toJSON .last_response.body.pagingIdentifiers ]]`.
 * `urlEncode`: URL encodes the supplied string. Example `[[urlEncode "string1"]]`. Example `[[urlEncode "<string1>"]]` will return `%3Cstring1%3E`.
@@ -256,6 +274,74 @@ The user to authenticate with.
 ### `auth.basic.password` [_auth_basic_password_2]
 
 The password to use.
+
+
+### `auth.file.enabled` [_auth_file_enabled_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `false`, disables the file auth configuration. Default: `true`.
+
+::::{note}
+File auth settings are disabled if either `enabled` is set to `false` or the `auth.file` section is missing.
+::::
+
+
+### `auth.file.path` [_auth_file_path_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The path to the file that contains the authentication value. The file contents are trimmed before use. This field is required when file auth is enabled.
+
+::::{warning}
+By default, Filebeat requires the file to have `0600` permissions (read/write for owner only) and will fail to start if the file is more permissive. This security measure helps prevent unauthorized access to credentials. To allow files with different permissions, set [`relaxed_permissions`](#_auth_file_relaxed_permissions_2) to `true`.
+
+On Windows, POSIX-style permission checking is not enforced. Ensure file security using NTFS file permissions or Access Control Lists (ACLs).
+::::
+
+
+### `auth.file.header` [_auth_file_header_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The request header that receives the value loaded from `path`. Defaults to `Authorization` when omitted or empty.
+
+
+### `auth.file.prefix` [_auth_file_prefix_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+An optional prefix that is prepended to the trimmed value from `path` before it is sent on the request header. This is commonly used for tokens that require a leading value such as `Bearer `.
+
+
+### `auth.file.refresh_interval` [_auth_file_refresh_interval_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+How frequently Filebeat rereads the file defined by `path` to pick up changes. Defaults to `1m`. The value must be greater than zero when set.
+
+
+### `auth.file.relaxed_permissions` [_auth_file_relaxed_permissions_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `true`, allows the authentication file to have permissions other than `0600`. By default (`false`), Filebeat requires the file to have `0600` permissions and will fail to start if the file is more permissive. This security measure helps prevent unauthorized access to credentials.
+
+::::{warning}
+Setting this to `true` reduces security. Only enable this option if you understand the security implications and cannot set the file to `0600` permissions.
+::::
 
 
 ### `auth.oauth2.enabled` [_auth_oauth2_enabled_2]
@@ -403,6 +489,15 @@ The RSA JWK private key PEM block for your Okta Service App which is used for in
 ::::{note}
 Only one of the credentials settings can be set at once. For more information please refer to [https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/](https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/)
 ::::
+
+### `auth.oauth2.okta.dpop_key_pem` [_auth_oauth2_okta_dpop_key_pem_2]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+The Demonstrating Proof-of-Possession private key PEM block for your Okta authentication token. When this key is provided, Okta authentication will make use of the [Okta DPoP authentication flow](https://www.okta.com/blog/product-innovation/a-leap-forward-in-token-security-okta-adds-support-for-dpop/).
+
 
 
 
@@ -583,7 +678,7 @@ The clause `.parent_last_response.` should only be used from within chain steps 
   - type: httpjson
     enabled: true
     id: my-httpjson-id
-    request.url: http://xyz.com/services/data/v1.0/export_ids/page
+    request.url: http://example.com/services/data/v1.0/export_ids/page
     request.method: POST
     interval: 1h
     request.retry.max_attempts: 2
@@ -601,7 +696,7 @@ The clause `.parent_last_response.` should only be used from within chain steps 
           do_not_log_failure: true
     chain:
     - step:
-          request.url: http://xyz.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
+          request.url: http://example.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
           request.method: POST
           request.transforms:
           - set:
@@ -1469,6 +1564,7 @@ Each cursor entry is formed by:
 * A `value` template, which will define the value to store when evaluated.
 * A `default` template, which will define the value to store when the value template fails or is empty.
 * An `ignore_empty_value` flag. When set to `true`, will not store empty values, preserving the previous one, if any. Default: `true`.
+* A `do_not_log_failure` flag. When set to `true`, will not signal a degraded Fleet health status. Default: `true`. {applies_to}`stack: ga 9.1.4` {applies_to}`stack: ga 9.0.7` {applies_to}`stack: ga 8.19.4` {applies_to}`stack: ga 8.18.7`
 
 Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`].
 

@@ -141,18 +141,18 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 	}
 
 	var r reader.Reader
+	logger, _ := logp.NewDevelopmentLogger("")
 	r, err = readfile.NewEncodeReader(f, readfile.Config{
 		Codec:      enc,
 		BufferSize: 4096,
 		Terminator: readfile.LineFeed,
-	})
+	}, logger)
 	if err != nil {
 		return nil, err
 	}
 
 	r = readfile.NewStripNewline(r, readfile.LineFeed)
 
-	logger, err := logp.NewDevelopmentLogger("")
 	if err != nil {
 		return nil, err
 	}

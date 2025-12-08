@@ -2,6 +2,8 @@
 navigation_title: "translate_ldap_attribute"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/processor-translate-guid.html
+applies_to:
+  stack: ga
 ---
 
 # Translate GUID [processor-translate-guid]

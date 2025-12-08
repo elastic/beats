@@ -2,6 +2,8 @@
 navigation_title: "journald"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-journald.html
+applies_to:
+  stack: ga
 ---
 
 # Journald input [filebeat-input-journald]
@@ -85,10 +87,41 @@ filebeat.inputs:
 
 ### `paths` [filebeat-input-journald-paths]
 
-A list of paths that will be crawled and fetched. Each path can be a directory path (to collect events from all journals in a directory), or a file path. If you specify a directory, Filebeat merges all journals under the directory into a single journal and reads them.
+A list of paths that will be crawled and fetched. A path can be either:
+
+* A file path
+* {applies_to}`stack: ga 9.1.5` {applies_to}`stack: ga 9.0.8` A directory path (to collect events from all journals in a directory). If you specify a directory, Filebeat merges all journals under the directory into a single journal and reads them.
 
 If no paths are specified, Filebeat reads from the default journal.
 
+For example, this configuration will ingest all journals and correctly handle the journald rotation:
+
+```yaml
+  - type: journald
+    id: journald-id
+    paths:
+      - /var/log/journal
+```
+
+
+:::{warning}
+If a glob (for example, `/var/log/journal/*/*.journal`) is used, the journald
+input will only ingest the journal files found when started. New
+files will not be ingested.
+:::
+
+
+
+
+
+### `merge` [filebeat-input-journald-merge]
+```{applies_to}
+stack: ga 9.2.0
+```
+
+When enabled, log entries will be ingested interleaved from all
+available journals, including remote ones. This option is disabled by
+default.
 
 ### `seek` [filebeat-input-journald-seek]
 
@@ -173,11 +206,11 @@ include_matches:
 ```
 
 The following include matches configuration is the equivalent of the following logical expression:
- 
+
  ```
  A=a OR (B=b AND C=c) OR (D=d AND B=1)
  ```
- 
+
 ```yaml
  include_matches:
    match:
@@ -188,7 +221,7 @@ The following include matches configuration is the equivalent of the following l
      - +
      - B=1
 ```
- 
+
 `include_matches` translates to `journalctl` `MATCHES`, its [documentation](https://www.man7.org/linux/man-pages/man1/journalctl.1.html)  is not clear about how multiple disjunctions are handled. The previous example was tested with journalctl version 257.
 
 To reference fields, use one of the following:
@@ -290,7 +323,7 @@ The following snippet configures Filebeat to read the `stdout` stream from all c
 
 #### `syslog` [_syslog_2]
 
-The `syslog` parser parses RFC 3146 and/or RFC 5424 formatted syslog messages.
+The `syslog` parser parses RFC 3164 and/or RFC 5424 formatted syslog messages.
 
 The supported configuration options are:
 

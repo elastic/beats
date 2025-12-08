@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-apache.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -20,13 +22,13 @@ Contains fields for the Apache HTTP Server access logs.
 **`apache.access.ssl.protocol`**
 :   SSL protocol version.
 
-type: keyword
+    type: keyword
 
 
 **`apache.access.ssl.cipher`**
 :   SSL cipher name.
 
-type: keyword
+    type: keyword
 
 
 ## error [_error]
@@ -36,6 +38,6 @@ Fields from the Apache error logs.
 **`apache.error.module`**
 :   The module producing the logged message.
 
-type: keyword
+    type: keyword
 
 

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-template.html
+applies_to:
+  stack: ga
 ---
 
 # Load the Elasticsearch index template [filebeat-template]
@@ -97,7 +99,7 @@ filebeat setup --index-management -E output.logstash.enabled=false -E 'output.el
 **docker:**
 
 ```sh subs=true
-docker run --rm docker.elastic.co/beats/filebeat:{{stack-version}} setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+docker run --rm docker.elastic.co/beats/filebeat:{{version.stack}} setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ```
 
 **win:**
@@ -171,7 +173,7 @@ filebeat export template > filebeat.template.json
 **win:**
 
 ```sh subs=true
-PS > .\filebeat.exe export template --es.version {{stack-version}} | Out-File -Encoding UTF8 filebeat.template.json
+PS > .\filebeat.exe export template --es.version {{version.stack}} | Out-File -Encoding UTF8 filebeat.template.json
 ```
 
 To install the template, run:
@@ -179,50 +181,50 @@ To install the template, run:
 **deb and rpm:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/filebeat-{{stack-version}} -d@filebeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/filebeat-{{version.stack}} -d@filebeat.template.json
 ```
 
 **mac:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/filebeat-{{stack-version}} -d@filebeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/filebeat-{{version.stack}} -d@filebeat.template.json
 ```
 
 **linux:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/filebeat-{{stack-version}} -d@filebeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/filebeat-{{version.stack}} -d@filebeat.template.json
 ```
 
 **win:**
 
 ```sh subs=true
-PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile filebeat.template.json -Uri http://localhost:9200/_index_template/filebeat-{{stack-version}}
+PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile filebeat.template.json -Uri http://localhost:9200/_index_template/filebeat-{{version.stack}}
 ```
 
-Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on filebeat-{{stack-version}} index.
+Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on filebeat-{{version.stack}} index.
 
 **deb and rpm:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/filebeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/filebeat-{{version.stack}}
 ```
 
 **mac:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/filebeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/filebeat-{{version.stack}}
 ```
 
 **linux:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/filebeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/filebeat-{{version.stack}}
 ```
 
 **win:**
 
 ```sh subs=true
-PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/filebeat-{{stack-version}}
+PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/filebeat-{{version.stack}}
 ```
 

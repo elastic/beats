@@ -2,6 +2,8 @@
 navigation_title: "Kibana dashboards"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-dashboards.html
+applies_to:
+  stack: ga
 ---
 
 # Configure Kibana dashboard loading [configuration-dashboards]

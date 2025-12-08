@@ -2,6 +2,8 @@
 navigation_title: "extract_array"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/extract-array.html
+applies_to:
+  stack: preview
 ---
 
 # Extract array [extract-array]

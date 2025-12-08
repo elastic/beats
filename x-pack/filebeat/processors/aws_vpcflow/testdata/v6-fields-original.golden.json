@@ -1,0 +1,44 @@
+[
+    {
+        "aws": {
+            "vpcflow": {
+                "account_id": "123456789123",
+                "bytes": 1600,
+                "dstaddr": "10.200.8.2",
+                "dstport": 53,
+                "end": "2025-12-27T15:22:13Z",
+                "flow_direction": "egress",
+                "log_status": "OK",
+                "packets": 1,
+                "packets_lost_blackhole": 0,
+                "packets_lost_mtu_exceeded": 2,
+                "packets_lost_no_route": 1,
+                "packets_lost_ttl_expired": 0,
+                "protocol": 6,
+                "region": "us-east-1",
+                "resource_type": "TransitGateway",
+                "srcaddr": "10.100.8.1",
+                "srcport": 43228,
+                "start": "2025-12-27T15:21:15Z",
+                "tcp_flags": 2,
+                "tcp_flags_array": [
+                    "syn"
+                ],
+                "tgw_attachment_id": "tgw-attach-3e0bbb28e9ac7e3d8",
+                "tgw_dst_az_id": "us-east-1b",
+                "tgw_dst_eni": "eni-309ffff1f06bf8d99",
+                "tgw_dst_subnet_id": "subnet-3abc2577ee1022895",
+                "tgw_dst_vpc_account_id": "123456789123",
+                "tgw_dst_vpc_id": "vpc-3da88d2d64d3e7d16",
+                "tgw_id": "tgw-3b86d5e89ec8ebd55",
+                "tgw_src_az_id": "us-east-1a",
+                "tgw_src_eni": "eni-008ffff1f06bf8d10",
+                "tgw_src_subnet_id": "subnet-3fbc536e360c36caб",
+                "tgw_src_vpc_account_id": "123456789123",
+                "tgw_src_vpc_id": "vpc-3620ee62fdaf70d01",
+                "type": "IPv4"
+            }
+        },
+        "message": "TransitGateway 123456789123 tgw-3b86d5e89ec8ebd55 tgw-attach-3e0bbb28e9ac7e3d8  123456789123  123456789123 vpc-3620ee62fdaf70d01 vpc-3da88d2d64d3e7d16 subnet-3fbc536e360c36caб subnet-3abc2577ee1022895 eni-008ffff1f06bf8d10 eni-309ffff1f06bf8d99 us-east-1a us-east-1b - 10.100.8.1 10.200.8.2 43228 53 6 1 1600 1766848875 1766848933 OK IPv4 1 0 2 0 2 us-east-1 egress - -"
+    }
+]

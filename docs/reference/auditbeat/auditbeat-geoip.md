@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-geoip.html
+applies_to:
+  stack: ga
 ---
 
 # Enrich events with geoIP information [auditbeat-geoip]

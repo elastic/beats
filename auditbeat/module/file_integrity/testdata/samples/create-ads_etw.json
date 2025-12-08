@@ -1,0 +1,224 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "created"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "creation"
+        ]
+      },
+      "file": {
+        "accessed": "2025-09-01T10:27:32.7746663Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-09-01T10:27:24.5814187Z",
+        "ctime": "2025-09-01T10:27:24.5814187Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "fork_name": "MyStream",
+        "inode": "40250921669664471",
+        "mtime": "2025-09-01T10:27:32.7746663Z",
+        "name": "mainfile.txt",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwcreate-ads2302969101\\001\\mainfile.txt:MyStream",
+        "size": 10,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      },
+      "process": {
+        "pid": 22052,
+        "user": {
+          "domain": "tp",
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-09-01T10:27:32.7756356Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 514100,
+    "Period": 0,
+    "DisableTimeSeries": false
+  },
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "created"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "creation"
+        ]
+      },
+      "file": {
+        "accessed": "2025-09-01T10:27:32.7746663Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-09-01T10:27:24.5814187Z",
+        "ctime": "2025-09-01T10:27:24.5814187Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "fork_name": "MyStream",
+        "inode": "40250921669664471",
+        "mtime": "2025-09-01T10:27:32.7746663Z",
+        "name": "mainfile.txt",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwcreate-ads2302969101\\001\\mainfile.txt:MyStream",
+        "size": 10,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      },
+      "process": {
+        "pid": 22052,
+        "user": {
+          "domain": "tp",
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-09-01T10:27:32.776039Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 0,
+    "Period": 0,
+    "DisableTimeSeries": false
+  },
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "created"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "creation"
+        ]
+      },
+      "file": {
+        "accessed": "2025-09-01T10:27:34.4293319Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-09-01T10:27:24.5814187Z",
+        "ctime": "2025-09-01T10:27:24.5814187Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "fork_name": "MyStream",
+        "inode": "40250921669664471",
+        "mtime": "2025-09-01T10:27:32.7746663Z",
+        "name": "mainfile.txt",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwcreate-ads2302969101\\001\\mainfile.txt:MyStream",
+        "size": 10,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      },
+      "process": {
+        "pid": 22052,
+        "user": {
+          "domain": "tp",
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-09-01T10:27:32.7760699Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 522100,
+    "Period": 0,
+    "DisableTimeSeries": false
+  },
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "created"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "creation"
+        ]
+      },
+      "file": {
+        "accessed": "2025-09-01T10:27:34.429854Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-09-01T10:27:24.5814187Z",
+        "ctime": "2025-09-01T10:27:24.5814187Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "fork_name": "MyStream",
+        "inode": "40250921669664471",
+        "mtime": "2025-09-01T10:27:32.7746663Z",
+        "name": "mainfile.txt",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwcreate-ads2302969101\\001\\mainfile.txt:MyStream",
+        "size": 10,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      },
+      "process": {
+        "entity_id": "4132-1756722455237229800",
+        "name": "C:\\Windows\\System32\\conhost.exe",
+        "pid": 4132,
+        "user": {
+          "domain": "tp",
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-09-01T10:27:33.4112374Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 709900,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]

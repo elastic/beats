@@ -40,7 +40,6 @@ const (
 
 	ignoreInactiveSinceLastStartStr  = "since_last_start"
 	ignoreInactiveSinceFirstStartStr = "since_first_start"
-	prospectorDebugKey               = "file_prospector"
 )
 
 var ignoreInactiveSettings = map[string]ignoreInactiveType{
@@ -81,7 +80,7 @@ type fileProspector struct {
 	ignoreInactiveSince ignoreInactiveType
 	cleanRemoved        bool
 	stateChangeCloser   stateChangeCloserConfig
-	takeOver            takeOverConfig
+	takeOver            loginp.TakeOverConfig
 }
 
 func (p *fileProspector) Init(
@@ -152,7 +151,7 @@ func (p *fileProspector) Init(
 			//  - The old identifier is neither native nor path
 			oldIdentifierName := fm.IdentifierName
 			if oldIdentifierName == identifierName ||
-				!(oldIdentifierName == nativeName || oldIdentifierName == pathName) {
+				(oldIdentifierName != nativeName && oldIdentifierName != pathName) {
 				return "", nil
 			}
 
@@ -282,13 +281,19 @@ func (p *fileProspector) Init(
 //
 //nolint:dupl // Different prospectors have a similar run method
 func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
-	log := ctx.Logger.With("prospector", prospectorDebugKey)
-	log.Debug("Starting prospector")
-	defer log.Debug("Prospector has stopped")
+	p.logger.Debug("Starting prospector")
+	defer p.logger.Debug("Prospector has stopped")
 
-	defer p.stopHarvesterGroup(log, hg)
+	// ctx.Logger has its 'log.logger' set to 'input.filestream'.
+	// Because the harvester is not really part of the prospector,
+	// we use this logger instead of the prospector logger.
+	defer p.stopHarvesterGroup(ctx.Logger, hg)
 
 	var tg unison.MultiErrGroup
+
+	// The harvester needs to notify the FileWatcher
+	// when it closes
+	hg.SetObserver(p.filewatcher.NotifyChan())
 
 	tg.Go(func() error {
 		p.filewatcher.Run(ctx.Cancelation)
@@ -306,17 +311,19 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			}
 
 			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
+			p.onFSEvent(loggerWithEvent(p.logger, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
 		}
 		return nil
 	})
 
 	errs := tg.Wait()
 	if len(errs) > 0 {
-		log.Errorf("running prospector failed: %v", errors.Join(errs...))
+		p.logger.Errorf("running prospector failed: %v", errors.Join(errs...))
 	}
 }
 
+// onFSEvent uses 'log' instead of the [fileProspector] logger
+// because 'log' has been enriched with event information
 func (p *fileProspector) onFSEvent(
 	log *logp.Logger,
 	ctx input.Context,
@@ -326,9 +333,12 @@ func (p *fileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
+
+	log = log.With("source_file", event.SrcID)
 	switch event.Op {
-	case loginp.OpCreate, loginp.OpWrite:
-		if event.Op == loginp.OpCreate {
+	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
+		switch event.Op {
+		case loginp.OpCreate:
 			log.Debugf("A new file %s has been found", event.NewPath)
 
 			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})
@@ -336,8 +346,11 @@ func (p *fileProspector) onFSEvent(
 				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
 			}
 
-		} else if event.Op == loginp.OpWrite {
+		case loginp.OpWrite:
 			log.Debugf("File %s has been updated", event.NewPath)
+
+		case loginp.OpNotChanged:
+			log.Debugf("File %s has not changed, trying to start new harvester", event.NewPath)
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
@@ -370,7 +383,7 @@ func (p *fileProspector) onFSEvent(
 		p.onRename(log, ctx, event, src, updater, group)
 
 	default:
-		log.Error("Unknown return value %v", event.Op)
+		log.Errorf("Unknown operation '%s'", event.Op.String())
 	}
 }
 
@@ -425,8 +438,8 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 		err := s.FindCursorMeta(src, &meta)
 		if err != nil {
 			meta.IdentifierName = p.identifier.Name()
-			log.Warnf("Error while getting cursor meta data of entry '%s': '%w'"+
-				", using prospector's identifier: '%s'",
+			log.Warnf(
+				"Error while getting cursor meta data of entry '%s': '%v', using prospector's identifier: '%s'",
 				src.Name(), err, meta.IdentifierName)
 		}
 		err = s.UpdateMetadata(src, fileMeta{Source: fe.NewPath, IdentifierName: meta.IdentifierName})

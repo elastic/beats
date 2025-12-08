@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-istio.html
+applies_to:
+  stack: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -101,10 +103,10 @@ This module supports TLS connections when using `ssl` config field, as described
 
 The following metricsets are available:
 
-* [citadel](/reference/metricbeat/metricbeat-metricset-istio-citadel.md)
-* [galley](/reference/metricbeat/metricbeat-metricset-istio-galley.md)
-* [istiod](/reference/metricbeat/metricbeat-metricset-istio-istiod.md)
-* [mesh](/reference/metricbeat/metricbeat-metricset-istio-mesh.md)
-* [mixer](/reference/metricbeat/metricbeat-metricset-istio-mixer.md)
-* [pilot](/reference/metricbeat/metricbeat-metricset-istio-pilot.md)
-* [proxy](/reference/metricbeat/metricbeat-metricset-istio-proxy.md)
+* [citadel](/reference/metricbeat/metricbeat-metricset-istio-citadel.md)  {applies_to}`stack: beta`
+* [galley](/reference/metricbeat/metricbeat-metricset-istio-galley.md)  {applies_to}`stack: beta`
+* [istiod](/reference/metricbeat/metricbeat-metricset-istio-istiod.md)  {applies_to}`stack: beta`
+* [mesh](/reference/metricbeat/metricbeat-metricset-istio-mesh.md)  {applies_to}`stack: beta`
+* [mixer](/reference/metricbeat/metricbeat-metricset-istio-mixer.md)  {applies_to}`stack: beta`
+* [pilot](/reference/metricbeat/metricbeat-metricset-istio-pilot.md)  {applies_to}`stack: beta`
+* [proxy](/reference/metricbeat/metricbeat-metricset-istio-proxy.md)  {applies_to}`stack: beta`

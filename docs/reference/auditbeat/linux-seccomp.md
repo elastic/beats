@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/linux-seccomp.html
+applies_to:
+  stack: beta
 ---
 
 # Use Linux Secure Computing Mode (seccomp) [linux-seccomp]

@@ -2,6 +2,8 @@
 navigation_title: "HTTP endpoint"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/http-endpoint.html
+applies_to:
+  stack: preview
 ---
 
 # Configure an HTTP endpoint for metrics [http-endpoint]
@@ -66,7 +68,7 @@ curl -XGET 'localhost:5066/?pretty'
   "hostname": "example.lan",
   "name": "example.lan",
   "uuid": "34f6c6e1-45a8-4b12-9125-11b3e6e89866",
-  "version": "{{stack-version}}"
+  "version": "{{version.stack}}"
 }
 ```
 

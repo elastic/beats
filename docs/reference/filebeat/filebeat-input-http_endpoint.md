@@ -2,6 +2,8 @@
 navigation_title: "HTTP Endpoint"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-http_endpoint.html
+applies_to:
+  stack: ga
 ---
 
 # HTTP Endpoint input [filebeat-input-http_endpoint]

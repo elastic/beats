@@ -2,6 +2,8 @@
 navigation_title: "Upgrade"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/upgrading-filebeat.html
+applies_to:
+  stack: ga
 ---
 
 # Upgrade Filebeat [upgrading-filebeat]

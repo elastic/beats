@@ -2,6 +2,8 @@
 navigation_title: "Elasticsearch"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/elasticsearch-output.html
+applies_to:
+  stack: ga
 ---
 
 # Configure the Elasticsearch output [elasticsearch-output]
@@ -77,6 +79,10 @@ The list of Elasticsearch nodes to connect to. The events are distributed to the
 
 ::::{note}
 When a node is defined as an `IP:PORT`, the *scheme* and *path* are taken from the [`protocol`](#protocol-option) and [`path`](#path-option) config options.
+::::
+
+::::{warning}
+All configured hosts must belong to the same Elasticsearch cluster; using nodes from different clusters may result in split or inconsistent data.
 ::::
 
 

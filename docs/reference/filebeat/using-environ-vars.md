@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/using-environ-vars.html
+applies_to:
+  stack: ga
 ---
 
 # Use environment variables in the configuration [using-environ-vars]

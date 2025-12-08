@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/config-gile-format-refs.html
+applies_to:
+  stack: ga
 ---
 
 # Reference variables [config-gile-format-refs]

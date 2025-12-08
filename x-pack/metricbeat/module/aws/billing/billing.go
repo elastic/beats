@@ -288,7 +288,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 		groupByOutput, err := svcCostExplorer.GetCostAndUsage(context.Background(), &groupByCostInput)
 		if err != nil {
 			err = fmt.Errorf("costexplorer GetCostAndUsageRequest failed: %w", err)
-			m.Logger().Errorf(err.Error())
+			m.Logger().Error(err.Error())
 			return nil
 		}
 
@@ -347,7 +347,7 @@ func (m *MetricSet) addCostMetrics(metrics map[string]costexplorertypes.MetricVa
 		costFloat, err := strconv.ParseFloat(*cost.Amount, 64)
 		if err != nil {
 			err = fmt.Errorf("strconv ParseFloat failed: %w", err)
-			m.Logger().Errorf(err.Error())
+			m.Logger().Error(err.Error())
 			continue
 		}
 

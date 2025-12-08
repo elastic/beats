@@ -15,11 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package kubernetes
 
 import (
 	"context"
 	"fmt"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -30,7 +33,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 const namespace = "default"
@@ -62,7 +65,7 @@ func TestLeaseConfigurableFields(t *testing.T) {
 
 	startLeadingFunc := func(uuid string, eventID string) {}
 	stopLeadingFunc := func(uuid string, eventID string) {}
-	logger := logp.NewLogger("kubernetes-test")
+	logger := logptest.NewTestingLogger(t, "kubernetes-test")
 
 	// the number of leader election managers corresponds to the number of nodes in a cluster with metricbeat
 	var leaseDuration time.Duration
@@ -107,15 +110,15 @@ func TestNewLeaderElectionManager(t *testing.T) {
 	require.NoError(t, err)
 
 	waitForNewLeader := make(chan string)
-	var loosingLeader = ""
+	var loosingLeader atomic.Pointer[string]
 
 	startLeadingFunc := func(uuid string, eventID string) {
 		waitForNewLeader <- eventID
 	}
 	stopLeadingFunc := func(uuid string, eventID string) {
-		loosingLeader = eventID
+		loosingLeader.Store(&eventID)
 	}
-	logger := logp.NewLogger("kubernetes-test")
+	logger := logptest.NewTestingLogger(t, "kubernetes-test")
 
 	cfg := Config{
 		LeaderLease:   leaseName,
@@ -168,7 +171,7 @@ func TestNewLeaderElectionManager(t *testing.T) {
 			t.Fatalf("The new leader produced the same event id as the previous one.")
 		}
 
-		_, exists = expectedLoosingEventIds[loosingLeader]
+		_, exists = expectedLoosingEventIds[*loosingLeader.Load()]
 		if !exists {
 			t.Fatalf("The loosing leader used an unexpected event id %s.", eventId)
 		}

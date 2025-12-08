@@ -35,7 +35,7 @@ func init() {
 
 // New constructs a new add_nomad_metadata processor.
 func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
-	cfgwarn.Experimental("The add_nomad_metadata processor is experimental")
+	log.Warn(cfgwarn.Experimental("The add_nomad_metadata processor is experimental"))
 
 	config := defaultNomadAnnotatorConfig()
 
@@ -70,7 +70,7 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	}
 	client, err := nomad.NewClient(clientConfig)
 	if err != nil {
-		logp.Err("nomad: Couldn't create client")
+		log.Error("nomad: Couldn't create client")
 		return nil, err
 	}
 
@@ -82,8 +82,8 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	indexers := NewIndexers(config.Indexers, metaGen)
 	matchers := NewMatchers(config.Matchers, log)
 
-	logp.Debug("nomad", "Using node: %s", config.Node)
-	logp.Debug("nomad", "Initializing watcher")
+	log.Named("nomad").Debugf("Using node: %s", config.Node)
+	log.Named("nomad").Debug("Initializing watcher")
 
 	options := nomad.WatchOptions{
 		SyncTimeout:     config.syncPeriod,
@@ -104,9 +104,9 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 		}
 		options.Node = node
 	}
-	watcher, err := nomad.NewWatcher(client, options)
+	watcher, err := nomad.NewWatcher(client, options, log)
 	if err != nil {
-		logp.Err("Error creating watcher %v", err.Error())
+		log.Errorf("Error creating watcher %v", err.Error())
 		return nil, err
 	}
 

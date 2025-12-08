@@ -22,13 +22,14 @@ import "time"
 // Backoff defines the interface for backoff strategies.
 type Backoff interface {
 	// Wait blocks for a duration of time governed by the backoff strategy.
+	// If the timer is completed, Wait returns true, otherwise it returns false.
 	Wait() bool
 
 	// Reset resets the backoff duration to an initial value governed by the backoff strategy.
 	Reset()
 
-	Last() time.Time
 	// Last returns the time when the last call to Wait returned
+	Last() time.Time
 }
 
 // WaitOnError is a convenience method, if an error is received it will block, if not errors is

@@ -1,0 +1,33 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "deleted"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "deletion"
+        ]
+      },
+      "file": {
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesfsnotifydelete-file2894114086\\001\\mainfile.txt"
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-08-11T09:48:17.4198565Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 575100,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]

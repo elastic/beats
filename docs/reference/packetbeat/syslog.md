@@ -2,17 +2,19 @@
 navigation_title: "syslog"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/syslog.html
+applies_to:
+  stack: ga
 ---
 
 # Syslog [syslog]
 
 
-The syslog processor parses RFC 3146 and/or RFC 5424 formatted syslog messages that are stored in a field. The processor itself does not handle receiving syslog messages from external sources. This is done through an input, such as the TCP input. Certain integrations, when enabled through configuration, will embed the syslog processor to process syslog messages, such as Custom TCP Logs and Custom UDP Logs.
+The syslog processor parses RFC 3164 and/or RFC 5424 formatted syslog messages that are stored in a field. The processor itself does not handle receiving syslog messages from external sources. This is done through an input, such as the TCP input. Certain integrations, when enabled through configuration, will embed the syslog processor to process syslog messages, such as Custom TCP Logs and Custom UDP Logs.
 
 
 ## Configuration [_configuration]
 
-The `syslog` processor parses RFC 3146 and/or RFC 5424 formatted syslog messages that are stored under the `field` key.
+The `syslog` processor parses RFC 3164 and/or RFC 5424 formatted syslog messages that are stored under the `field` key.
 
 The supported configuration options are:
 

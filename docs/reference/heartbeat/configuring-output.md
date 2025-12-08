@@ -2,6 +2,8 @@
 navigation_title: "Output"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/configuring-output.html
+applies_to:
+  stack: ga
 ---
 
 # Configure the output [configuring-output]

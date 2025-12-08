@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-mysql.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -103,7 +105,7 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [galera_status](/reference/metricbeat/metricbeat-metricset-mysql-galera_status.md)
-* [performance](/reference/metricbeat/metricbeat-metricset-mysql-performance.md)
-* [query](/reference/metricbeat/metricbeat-metricset-mysql-query.md)
+* [galera_status](/reference/metricbeat/metricbeat-metricset-mysql-galera_status.md)  {applies_to}`stack: beta`
+* [performance](/reference/metricbeat/metricbeat-metricset-mysql-performance.md)  {applies_to}`stack: beta`
+* [query](/reference/metricbeat/metricbeat-metricset-mysql-query.md)  {applies_to}`stack: beta`
 * [status](/reference/metricbeat/metricbeat-metricset-mysql-status.md)

@@ -41,7 +41,7 @@ var (
 )
 
 // DecodeExported decodes an exported dashboard
-func DecodeExported(exported []byte) []byte {
+func DecodeExported(exported []byte, logger *logp.Logger) []byte {
 	// remove unsupported chars
 	var result bytes.Buffer
 	r := bufio.NewReader(bytes.NewReader(exported))
@@ -49,7 +49,7 @@ func DecodeExported(exported []byte) []byte {
 		line, err := r.ReadBytes('\n')
 		if err != nil {
 			if err == io.EOF {
-				_, err = result.Write(decodeLine(line))
+				_, err = result.Write(decodeLine(line, logger))
 				if err != nil {
 					return exported
 				}
@@ -57,7 +57,7 @@ func DecodeExported(exported []byte) []byte {
 			}
 			return exported
 		}
-		_, err = result.Write(decodeLine(line))
+		_, err = result.Write(decodeLine(line, logger))
 		if err != nil {
 			return exported
 		}
@@ -68,7 +68,7 @@ func DecodeExported(exported []byte) []byte {
 	}
 }
 
-func decodeLine(line []byte) []byte {
+func decodeLine(line []byte, logger *logp.Logger) []byte {
 	if len(bytes.TrimSpace(line)) == 0 {
 		return line
 	}
@@ -78,19 +78,18 @@ func decodeLine(line []byte) []byte {
 	if err != nil {
 		return line
 	}
-	o = decodeObject(o)
-	o = decodeEmbeddableConfig(o)
+	o = decodeObject(o, logger)
+	o = decodeEmbeddableConfig(o, logger)
 
 	return []byte(o.String())
 }
 
-func decodeObject(o mapstr.M) mapstr.M {
+func decodeObject(o mapstr.M, logger *logp.Logger) mapstr.M {
 	for _, key := range responseToDecode {
 		// All fields are optional, so errors are not caught
 		err := decodeValue(o, key)
 		if err != nil {
-			logger := logp.NewLogger("dashboards")
-			logger.Debugf("Error while decoding dashboard objects: %+v", err)
+			logger.Named("dashboards").Debugf("Error while decoding dashboard objects: %+v", err)
 			continue
 		}
 	}
@@ -98,7 +97,7 @@ func decodeObject(o mapstr.M) mapstr.M {
 	return o
 }
 
-func decodeEmbeddableConfig(o mapstr.M) mapstr.M {
+func decodeEmbeddableConfig(o mapstr.M, logger *logp.Logger) mapstr.M {
 	p, err := o.GetValue("attributes.panelsJSON")
 	if err != nil {
 		return o
@@ -114,7 +113,7 @@ func decodeEmbeddableConfig(o mapstr.M) mapstr.M {
 				}
 				if embeddedConfig, ok := embedded.(map[string]interface{}); ok {
 					embeddedConfigObj := mapstr.M(embeddedConfig)
-					panelObj.Put("embeddableConfig", decodeObject(embeddedConfigObj))
+					panelObj.Put("embeddableConfig", decodeObject(embeddedConfigObj, logger))
 					panels[i] = panelObj
 				}
 			}

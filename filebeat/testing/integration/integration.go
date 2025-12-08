@@ -21,6 +21,7 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/testing/integration"
@@ -70,6 +71,9 @@ type test struct {
 func (fbt *test) ExpectEOF(files ...string) Test {
 	// Ensuring we completely ingest every file
 	for _, filename := range files {
+		// on windows backslashes are escaped in the logs, without it, the regex
+		// won't match the logs
+		filename = strings.ReplaceAll(filename, `\`, `\\`)
 		// accounts for reaching EOF, but still ingesting if more data is added
 		// to the file.
 		line1 := fmt.Sprintf("End of file reached: %s; Backoff now.", filename)
@@ -80,6 +84,5 @@ func (fbt *test) ExpectEOF(files ...string) Test {
 			fmt.Sprintf(`(%s|%s)`,
 				regexp.QuoteMeta(line1), regexp.QuoteMeta(line2))))
 	}
-
 	return fbt
 }

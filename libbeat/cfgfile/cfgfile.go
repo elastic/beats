@@ -25,7 +25,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -108,7 +108,7 @@ func HandleFlags() error {
 	home, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
 		if *homePath == "" {
-			return fmt.Errorf("The absolute path to %s could not be obtained. %w",
+			return fmt.Errorf("the absolute path to %s could not be obtained. %w",
 				os.Args[0], err)
 		}
 		home = *homePath
@@ -123,13 +123,13 @@ func HandleFlags() error {
 	// Enable check to see if beat is running under Agent
 	// This is stored in a package so the modules which don't have
 	// access to the config can check this value.
-	type management struct {
+	type managementCfg struct {
 		Enabled bool `config:"management.enabled"`
 	}
-	var managementSettings management
+	var managementSettings managementCfg
 	cfgFlag := flag.Lookup("E")
 	if cfgFlag == nil {
-		fleetmode.SetAgentMode(false)
+		management.SetUnderAgent(false)
 		return nil
 	}
 	cfgObject, _ := cfgFlag.Value.(*config.SettingsFlag)
@@ -137,25 +137,11 @@ func HandleFlags() error {
 
 	err = cliCfg.Unpack(&managementSettings)
 	if err != nil {
-		fleetmode.SetAgentMode(false)
+		management.SetUnderAgent(false)
 		return nil //nolint:nilerr // unpacking failing isn't an error for this case
 	}
-	fleetmode.SetAgentMode(managementSettings.Enabled)
+	management.SetUnderAgent(managementSettings.Enabled)
 	return nil
-}
-
-// Deprecated: Please use Load().
-//
-// Read reads the configuration from a YAML file into the given interface
-// structure. If path is empty this method reads from the configuration
-// file specified by the '-c' command line flag.
-func Read(out interface{}, path string) error {
-	config, err := Load(path, nil)
-	if err != nil {
-		return err
-	}
-
-	return config.Unpack(out)
 }
 
 // Load reads the configuration from a YAML file structure. If path is empty
@@ -169,7 +155,7 @@ func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
 
 	cfgpath := GetPathConfig()
 
-	if !fleetmode.Enabled() {
+	if !management.UnderAgent() {
 		if path == "" {
 			list := []string{}
 			for _, cfg := range configfiles.List() {
@@ -227,8 +213,8 @@ func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
 }
 
 // LoadList loads a list of configs data from the given file.
-func LoadList(file string) ([]*config.C, error) {
-	logp.Debug("cfgfile", "Load config from file: %s", file)
+func LoadList(file string, logger *logp.Logger) ([]*config.C, error) {
+	logger.Named("cfgfile").Debugf("Load config from file: %s", file)
 	rawConfig, err := common.LoadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("invalid config: %w", err)

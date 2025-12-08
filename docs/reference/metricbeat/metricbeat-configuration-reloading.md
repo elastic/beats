@@ -2,6 +2,8 @@
 navigation_title: "Config file loading"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-configuration-reloading.html
+applies_to:
+  stack: ga
 ---
 
 # Load external configuration files [metricbeat-configuration-reloading]

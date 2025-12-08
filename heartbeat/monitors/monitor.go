@@ -23,7 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -266,7 +266,7 @@ func (m *Monitor) Stop() {
 	if m.close != nil {
 		err := m.close()
 		if err != nil {
-			logp.L().Errorf("error closing monitor %s: %w", m.String(), err)
+			logp.L().Errorf("error closing monitor %s: %v", m.String(), err)
 		}
 	}
 

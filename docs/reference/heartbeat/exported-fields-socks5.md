@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-socks5.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -24,6 +26,6 @@ Time required to establish a connection via SOCKS5 to endpoint based on availabl
 **`socks5.rtt.connect.us`**
 :   Duration in microseconds
 
-type: long
+    type: long
 
 

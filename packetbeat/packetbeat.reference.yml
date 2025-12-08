@@ -102,6 +102,12 @@ packetbeat.flows:
   # Overrides where flow events are indexed.
   #index: my-custom-flow-index
 
+  # In situations where flows can contain different src/dst pairs on the return
+  # route, enabling this allows the flow to be constructed matching based on
+  # higher level protocol details if available.
+  allow_mismatched_eth: false
+
+
 # =========================== Transaction protocols ============================
 
 packetbeat.protocols:

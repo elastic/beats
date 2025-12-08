@@ -36,10 +36,14 @@ import (
 
 // moduleData provides module-level data that will be used to populate the module list
 type moduleData struct {
-	Path       string
-	Base       string
-	Title      string `yaml:"title"`
-	Release    string `yaml:"release"`
+	Path    string
+	Base    string
+	Title   string      `yaml:"title"`
+	Release string      `yaml:"release"`
+	Version versionData `yaml:"version"`
+	// Compile all info from `Version` into a single
+	// string to be passed to docs-builder's `applies_to`
+	Applies_to string
 	Dashboards bool
 	Settings   []string `yaml:"settings"`
 	CfgFile    string
@@ -49,13 +53,27 @@ type moduleData struct {
 }
 
 type metricsetData struct {
-	Doc        string
-	Title      string
-	Link       string
-	Release    string
+	Doc     string
+	Title   string
+	Link    string
+	Release string
+	Version versionData
+	// Compile all info from `Version` into a single
+	// string to be passed to docs-builder's `applies_to`
+	Applies_to string
 	DataExists bool
 	Data       string
 	IsDefault  bool
+}
+
+// Allow all product lifecycles to apply to a single
+// section or field
+type versionData struct {
+	Preview    string
+	Beta       string
+	Ga         string
+	Deprecated string
+	Removed    string
 }
 
 func writeTemplate(filename string, t *template.Template, args interface{}) error {
@@ -111,7 +129,7 @@ func getRelease(rel string) (string, error) {
 	case "":
 		return "", fmt.Errorf("Missing a release string")
 	default:
-		return "", fmt.Errorf("unknown release tag %s", rel)
+		return "ga", fmt.Errorf("unknown release tag %s", rel)
 	}
 }
 
@@ -181,7 +199,10 @@ func loadModuleFields(file string) (moduleData, error) {
 	if err != nil {
 		return mod[0], fmt.Errorf("file %s is missing a release string: %w", file, err)
 	}
+	applies_to, err := getVersion(fd)
+
 	module.Release = rel
+	module.Applies_to = applies_to
 
 	return module, nil
 }
@@ -206,6 +227,52 @@ func getReleaseState(metricsetPath string) (string, error) {
 		return "", fmt.Errorf("metricset %s is missing a release tag: %w", metricsetPath, err)
 	}
 	return relString, nil
+}
+
+// Get `version` from `fields.yml` to be used in `applies_to`.
+// NOTE: I just copied and adjusted the `getReleaseState` function
+// above. I'm sure this could be improved!
+func getVersion(raw []byte) (string, error) {
+
+	type metricset struct {
+		Version versionData `yaml:"version"`
+		Release string      `yaml:"release"`
+		Path    string
+	}
+	var rel []metricset
+	yaml.Unmarshal(raw, &rel)
+	// Build the applies_to string: a comma-separated list
+	// of all available lifecycles and versions
+	// NOTE: There's almost certainly a more efficient way
+	// to accomplish this.
+	var versions []string
+	if rel[0].Version.Removed != "" {
+		versions = append(versions, fmt.Sprintf("removed %s", rel[0].Version.Removed))
+	}
+	if rel[0].Version.Deprecated != "" {
+		versions = append(versions, fmt.Sprintf("deprecated %s", rel[0].Version.Deprecated))
+	}
+	if rel[0].Version.Ga != "" {
+		versions = append(versions, fmt.Sprintf("ga %s", rel[0].Version.Ga))
+	}
+	if rel[0].Version.Beta != "" {
+		versions = append(versions, fmt.Sprintf("beta %s", rel[0].Version.Beta))
+	}
+	if rel[0].Version.Preview != "" {
+		versions = append(versions, fmt.Sprintf("preview %s", rel[0].Version.Preview))
+	}
+	// If there's no version specified, check if there's
+	// a release state and use that instead
+	if len(versions) == 0 {
+		relString, err := getRelease(rel[0].Release)
+		if err != nil {
+			return "", fmt.Errorf("metricset %s is missing a release tag: %w", rel[0].Path, err)
+		}
+		return relString, nil
+	} else {
+		applies_to := strings.Join(versions, ", ")
+		return applies_to, nil
+	}
 }
 
 // hasDashboards checks to see if the metricset has dashboards
@@ -259,6 +326,11 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 		}
 		metricsetName := filepath.Base(metricset)
 		release, err := getReleaseState(filepath.Join(metricset, "_meta/fields.yml"))
+		raw, err := os.ReadFile(filepath.Join(metricset, "_meta/fields.yml"))
+		if err != nil {
+			return nil, err
+		}
+		applies_to, err := getVersion(raw)
 		if err != nil {
 			return nil, err
 		}
@@ -290,6 +362,7 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 			Doc:        strings.TrimSpace(string(metricsetDoc)),
 			Title:      metricsetName,
 			Release:    release,
+			Applies_to: applies_to,
 			Link:       link,
 			DataExists: hasData,
 			Data:       strings.TrimSpace(string(data)),
@@ -362,8 +435,12 @@ func gatherData(modules []string) ([]moduleData, error) {
 
 // writeModuleDocs writes the module-level docs
 func writeModuleDocs(modules []moduleData, t *template.Template) error {
+	docsDir, err := mage.DocsDir()
+	if err != nil {
+		return err
+	}
 	for _, mod := range modules {
-		filename := filepath.Join(mage.DocsDir(), "reference", "metricbeat", fmt.Sprintf("metricbeat-module-%s.md", mod.Base))
+		filename := filepath.Join(docsDir, "reference", "metricbeat", fmt.Sprintf("metricbeat-module-%s.md", mod.Base))
 		err := writeTemplate(filename, t.Lookup("moduleDoc.tmpl"), mod)
 		if err != nil {
 			return err
@@ -374,6 +451,10 @@ func writeModuleDocs(modules []moduleData, t *template.Template) error {
 
 // writeMetricsetDocs writes the metricset-level docs
 func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
+	docsDir, err := mage.DocsDir()
+	if err != nil {
+		return err
+	}
 	for _, mod := range modules {
 		for _, metricset := range mod.Metricsets {
 			modData := struct {
@@ -383,7 +464,7 @@ func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
 				mod,
 				metricset,
 			}
-			filename := filepath.Join(mage.DocsDir(), "reference", "metricbeat", fmt.Sprintf("metricbeat-metricset-%s-%s.md", mod.Base, metricset.Title))
+			filename := filepath.Join(docsDir, "reference", "metricbeat", fmt.Sprintf("metricbeat-metricset-%s-%s.md", mod.Base, metricset.Title))
 
 			err := writeTemplate(filename, t.Lookup("metricsetDoc.tmpl"), modData)
 			if err != nil {
@@ -396,6 +477,10 @@ func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
 
 // writeModuleList writes the module linked list
 func writeModuleList(modules []moduleData, t *template.Template) error {
+	docsDir, err := mage.DocsDir()
+	if err != nil {
+		return err
+	}
 	// Turn the map into a sorted list
 	//Normally the glob functions would do this sorting for us,
 	//but because we mix the regular and x-pack dirs we have to sort them again.
@@ -403,7 +488,7 @@ func writeModuleList(modules []moduleData, t *template.Template) error {
 		return modules[i].Base < modules[j].Base
 	})
 	//write and execute the template
-	filepath := filepath.Join(mage.DocsDir(), "reference", "metricbeat", "metricbeat-modules.md")
+	filepath := filepath.Join(docsDir, "reference", "metricbeat", "metricbeat-modules.md")
 	return writeTemplate(filepath, t.Lookup("moduleList.tmpl"), modules)
 
 }

@@ -2,6 +2,8 @@
 navigation_title: "Configure"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/configuring-howto-packetbeat.html
+applies_to:
+  stack: ga
 ---
 
 # Configure Packetbeat [configuring-howto-packetbeat]

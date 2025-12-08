@@ -4,8 +4,7 @@ filebeat.inputs:
       - {{.testdata}}/take-over/*.log
 {{ if .takeOver }}
     id: take-over-from-log-input
-    take_over:
-      enabled: true
+    take_over: true
     file_identity.fingerprint: ~
     prospector:
       scanner:

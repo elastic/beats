@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/upgrading-packetbeat.html
+applies_to:
+  stack: ga
 ---
 
 # Upgrade Packetbeat [upgrading-packetbeat]

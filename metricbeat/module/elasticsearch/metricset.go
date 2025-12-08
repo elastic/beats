@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -34,8 +35,8 @@ var (
 	// HostParser parses host urls for RabbitMQ management plugin
 	HostParser = parse.URLHostParserBuilder{
 		DefaultScheme:   "http",
-		DefaultUsername: os.Getenv("ELASTICSEARCH_READ_USERNAME"),
-		DefaultPassword: os.Getenv("ELASTICSEARCH_READ_PASSWORD"),
+		DefaultUsername: getEnv("AUTOOPS_ES_USERNAME", "ELASTICSEARCH_READ_USERNAME"),
+		DefaultPassword: getEnv("AUTOOPS_ES_PASSWORD", "ELASTICSEARCH_READ_PASSWORD"),
 		PathConfigKey:   "path",
 	}.Build()
 )
@@ -51,6 +52,16 @@ const (
 	// cluster (e.g. a load-balancing proxy) fronting the cluster.
 	ScopeCluster
 )
+
+// Get an environment variable set via the `key` and, if unset, return the value of the environment variable
+// defined by `backupKey`. If that's not set, it will ultimately return "".
+func getEnv(key string, backupKey string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+
+	return os.Getenv(backupKey)
+}
 
 func (h *Scope) Unpack(str string) error {
 	switch str {
@@ -96,7 +107,7 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 	}{
 		Scope:        ScopeNode,
 		XPackEnabled: false,
-		ApiKey:       os.Getenv("ELASTICSEARCH_READ_API_KEY"),
+		ApiKey:       getEnv("AUTOOPS_ES_API_KEY", "ELASTICSEARCH_READ_API_KEY"),
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -109,7 +120,15 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		if hostData.User != "" || hostData.Password != "" {
 			return nil, fmt.Errorf("cannot set both api_key and username/password")
 		}
-		http.SetHeader("Authorization", "ApiKey "+base64.StdEncoding.EncodeToString([]byte(config.ApiKey)))
+
+		apiKey := config.ApiKey
+
+		// Base64 encode the API Key if necessary
+		if strings.Contains(config.ApiKey, ":") {
+			apiKey = base64.StdEncoding.EncodeToString([]byte(apiKey))
+		}
+
+		http.SetHeader("Authorization", "ApiKey "+apiKey)
 	}
 
 	ms := &MetricSet{

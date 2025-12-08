@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/ssl-client-fails.html
+applies_to:
+  stack: ga
 ---
 
 # SSL client fails to connect to Logstash [ssl-client-fails]
@@ -21,7 +23,7 @@ The host running {{ls}} might be unreachable or the certificate may not be valid
     ::::
 
 * Use OpenSSL to test connectivity to the {{ls}} server and diagnose problems. See the [OpenSSL documentation](https://www.openssl.org/docs/manmaster/man1/openssl-s_client.md) for more info.
-* Make sure that you have enabled SSL (set `ssl => true`) when configuring the [Beats input plugin for {{ls}}](logstash-docs-md://lsr/plugins-inputs-beats.md).
+* Make sure that you have enabled SSL (set `ssl_enabled => true`) when configuring the [Beats input plugin for {{ls}}](logstash-docs-md://lsr/plugins-inputs-beats.md).
 
 ## Common SSL-Related Errors and Resolutions [_common_ssl_related_errors_and_resolutions]
 
