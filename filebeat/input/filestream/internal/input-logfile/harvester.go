@@ -218,6 +218,7 @@ func startHarvester(
 	}
 
 	return func(canceler context.Context) (err error) {
+		ctx.Logger.Infof("harvester for file %s, srcID %s. %T", src.Name(), srcID, src)
 		defer func() {
 			if v := recover(); v != nil {
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
@@ -306,7 +307,7 @@ func startHarvester(
 			ctx.Logger.Debugf("Harvester '%s' closed with offset: %d", srcID, st.Offset)
 		}()
 
-		ctx.Logger.Debug("Starting harvester for file")
+		ctx.Logger.Debug("Starting harvester for file. offset %v", resource.cursor)
 		err = hg.harvester.Run(ctx, src, cursor, publisher, metrics)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			hg.readers.remove(srcID)
