@@ -630,14 +630,12 @@ Currently, if a new harvester can be started again, the harvester is picked rand
 
 This configuration option applies per input. You can use this option to indirectly set higher priorities on certain inputs by assigning a higher limit of harvesters.
 
-### `exclude_lines` [filebeat-input-filestream-exclude-lines]
-
 ### `include_file_owner_name` [filestream-input-include_file_owner_name]
 ```yaml {applies_to}
 stack: ga 9.3
 ```
 
-Includes the log file owner to `log.file` metadata. 
+Includes the log file owner to `log.file` metadata.
 This option is not supported on Windows.
 
 ### `include_file_owner_group_name` [filestream-input-include_file_owner_group_name]
@@ -645,12 +643,12 @@ This option is not supported on Windows.
 stack: ga 9.3
 ```
 
-Includes the log file group to `log.file` metadata. 
+Includes the log file group to `log.file` metadata.
 This option is not supported on Windows.
+ 
 
-### `file_identity` [filebeat-input-filestream-file-identity]
+### `exclude_lines` [filebeat-input-filestream-exclude-lines]
 
-Different `file_identity` methods can be configured to suit the environment where you are collecting log messages.
 A list of regular expressions to match the lines that you want Filebeat to exclude. Filebeat drops any lines that match a regular expression in the list. By default, no lines are dropped. Empty lines are ignored.
 
 The following example configures Filebeat to drop any lines that start with `DBG`.

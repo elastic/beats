@@ -13,7 +13,7 @@ kind: feature
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Adds file owner and group to the events' meta fields
+summary: Allow adding file owner and group to the events' meta fields on Unix systems.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
