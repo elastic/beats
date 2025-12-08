@@ -15,23 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build requirefips
+package nfs
 
-package instance
+import "github.com/elastic/elastic-agent-libs/logp"
 
-import (
-	"testing"
-
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/paths"
-)
-
-func TestLoadKeystore(t *testing.T) {
-	ks, err := LoadKeystore(config.NewConfig(), "test", paths.New())
+func dropMalformed(context string, err error) bool {
 	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
+		logp.Warn("nfs: dropping malformed %s: %v", context, err)
+		return true
 	}
-	if ks != nil {
-		t.Error("keystore is not nil.")
-	}
+	return false
 }

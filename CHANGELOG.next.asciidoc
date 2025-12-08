@@ -266,6 +266,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 - Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]19
 - Add support for DPoP authentication for the CEL and HTTP JSON inputs. {pull}47441[47441]
+- Log unpublished event count and exit publish loop on input context cancellation. {issue}47717[47717] {pull}47730[47730]
 
 *Auditbeat*
 
@@ -323,6 +324,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Increase maximum query timeout to 24 hours {pull}42356[42356]
 
 *Packetbeat*
+- Optionally ignore MAC address in flow matching {pull}44965[44965]
+- Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
+- Bump Windows Npcap version to v1.83. {pull}46809[46809]
 
 *Winlogbeat*
 

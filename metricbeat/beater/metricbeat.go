@@ -50,6 +50,7 @@ type Metricbeat struct {
 	stopOnce                 sync.Once     // wraps the Stop() method
 	config                   Config
 	registry                 *mb.Register
+	paths                    *paths.Path
 	autodiscover             *autodiscover.Autodiscover
 	dynamicCfgEnabled        bool
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
@@ -74,7 +75,7 @@ func WithModuleOptions(options ...module.Option) Option {
 // WithLightModules enables light modules support
 func WithLightModules() Option {
 	return func(m *Metricbeat) {
-		path := paths.Resolve(paths.Home, "module")
+		path := m.paths.Resolve(paths.Home, "module")
 		mb.Registry.SetSecondarySource(mb.NewLightModulesSource(m.logger, path))
 	}
 }
@@ -156,6 +157,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 		done:              make(chan struct{}),
 		config:            config,
 		registry:          registry,
+		paths:             b.Paths,
 		logger:            b.Info.Logger,
 		dynamicCfgEnabled: dynamicCfgEnabled,
 	}
@@ -287,7 +289,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	// Dynamic file based modules (metricbeat.config.modules)
 	if bt.config.ConfigModules.Enabled() {
-		moduleReloader := cfgfile.NewReloader(bt.logger.Named("module.reload"), b.Publisher, bt.config.ConfigModules)
+		moduleReloader := cfgfile.NewReloader(bt.logger.Named("module.reload"), b.Publisher, bt.config.ConfigModules, b.Paths)
 
 		if err := moduleReloader.Check(factory); err != nil {
 			return err
@@ -329,7 +331,6 @@ func (bt *Metricbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
 // result in undefined behavior.
 func (bt *Metricbeat) Stop() {
 	bt.stopOnce.Do(func() { close(bt.done) })
-
 }
 
 // Modules return a list of all configured modules.
