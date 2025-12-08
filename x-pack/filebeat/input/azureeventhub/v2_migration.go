@@ -79,23 +79,9 @@ func (m *migrationAssistant) checkAndMigrate(ctx context.Context, consumerGroup 
 	}
 
 	// Determine the fully qualified namespace based on the auth type
-	var fullyQualifiedNamespace string
-	switch m.config.AuthType {
-	case AuthTypeConnectionString:
-		// When using connection_string auth, parse it to get the namespace
-		connectionStringProperties, err := parseConnectionString(m.config.ConnectionString)
-		if err != nil {
-			return fmt.Errorf("migration assistant: failed to parse connection string: %w", err)
-		}
-		fullyQualifiedNamespace = connectionStringProperties.FullyQualifiedNamespace
-	case AuthTypeClientSecret:
-		// When using client_secret auth, use EventHubNamespace directly
-		if m.config.EventHubNamespace == "" {
-			return fmt.Errorf("migration assistant: eventhub_namespace is required when using client_secret authentication")
-		}
-		fullyQualifiedNamespace = m.config.EventHubNamespace
-	default:
-		return fmt.Errorf("migration assistant: unknown auth_type: %s", m.config.AuthType)
+	fullyQualifiedNamespace, err := m.config.GetFullyQualifiedEventHubNamespace()
+	if err != nil {
+		return fmt.Errorf("migration assistant: %w", err)
 	}
 
 	for _, partitionID := range eventHubProperties.PartitionIDs {

@@ -287,6 +287,28 @@ func (conf *azureInputConfig) Validate() error {
 	return nil
 }
 
+// GetFullyQualifiedEventHubNamespace returns the fully qualified namespace for the Event Hub
+// based on the configured authentication type.
+func (conf *azureInputConfig) GetFullyQualifiedEventHubNamespace() (string, error) {
+	switch conf.AuthType {
+	case AuthTypeConnectionString:
+		// When using connection_string auth, parse it to get the namespace
+		connectionStringProperties, err := parseConnectionString(conf.ConnectionString)
+		if err != nil {
+			return "", fmt.Errorf("failed to parse connection string: %w", err)
+		}
+		return connectionStringProperties.FullyQualifiedNamespace, nil
+	case AuthTypeClientSecret:
+		// When using client_secret auth, use EventHubNamespace directly
+		if conf.EventHubNamespace == "" {
+			return "", fmt.Errorf("eventhub_namespace is required when using client_secret authentication")
+		}
+		return conf.EventHubNamespace, nil
+	default:
+		return "", fmt.Errorf("unknown auth_type: %s", conf.AuthType)
+	}
+}
+
 // checkUnsupportedParams checks if unsupported/deprecated/discouraged parameters are set and logs a warning
 func (conf *azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
 	logger = logger.Named("azureeventhub.config")

@@ -454,3 +454,116 @@ func TestConnectionStringConfigValidation(t *testing.T) {
 		})
 	}
 }
+
+func TestGetFullyQualifiedEventHubNamespace(t *testing.T) {
+	tests := []struct {
+		name           string
+		config         azureInputConfig
+		expectedResult string
+		expectError    bool
+		errorMsg       string
+	}{
+		{
+			name: "connection_string auth with valid connection string",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.AuthType = AuthTypeConnectionString
+				c.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret"
+				return c
+			}(),
+			expectedResult: "my-namespace.servicebus.windows.net",
+			expectError:    false,
+		},
+		{
+			name: "connection_string auth with connection string containing entity path",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.AuthType = AuthTypeConnectionString
+				c.ConnectionString = "Endpoint=sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET;EntityPath=my-event-hub"
+				return c
+			}(),
+			expectedResult: "test-ns.servicebus.windows.net",
+			expectError:    false,
+		},
+		{
+			name: "connection_string auth with invalid connection string",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.AuthType = AuthTypeConnectionString
+				c.ConnectionString = "InvalidConnectionString"
+				return c
+			}(),
+			expectError: true,
+			errorMsg:    "failed to parse connection string",
+		},
+		{
+			name: "connection_string auth with empty connection string",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.AuthType = AuthTypeConnectionString
+				c.ConnectionString = ""
+				return c
+			}(),
+			expectError: true,
+			errorMsg:    "failed to parse connection string",
+		},
+		{
+			name: "client_secret auth with valid namespace",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.AuthType = AuthTypeClientSecret
+				c.EventHubNamespace = "test-namespace.servicebus.windows.net"
+				return c
+			}(),
+			expectedResult: "test-namespace.servicebus.windows.net",
+			expectError:    false,
+		},
+		{
+			name: "client_secret auth with empty namespace",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.AuthType = AuthTypeClientSecret
+				c.EventHubNamespace = ""
+				return c
+			}(),
+			expectError: true,
+			errorMsg:    "eventhub_namespace is required when using client_secret authentication",
+		},
+		{
+			name: "unknown auth type",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.AuthType = "unknown_auth_type"
+				return c
+			}(),
+			expectError: true,
+			errorMsg:    "unknown auth_type: unknown_auth_type",
+		},
+		{
+			name: "empty auth type (should default but method doesn't handle default)",
+			config: func() azureInputConfig {
+				c := defaultConfig()
+				c.AuthType = ""
+				return c
+			}(),
+			expectError: true,
+			errorMsg:    "unknown auth_type:",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.config.GetFullyQualifiedEventHubNamespace()
+			if tt.expectError {
+				require.Error(t, err)
+				if tt.errorMsg != "" {
+					assert.Contains(t, err.Error(), tt.errorMsg)
+				}
+				assert.Empty(t, result)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, tt.expectedResult, result)
+			}
+		})
+	}
+}
