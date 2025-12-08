@@ -365,7 +365,10 @@ func genSocketPath(t *testing.T) string {
 	t.Helper()
 	socketName, err := uuid.NewV4()
 	require.NoError(t, err)
-	return filepath.Join(t.TempDir(), socketName.String()+".sock")
+	// Use os.TempDir() for short Unix socket paths
+	sockPath := filepath.Join(os.TempDir(), socketName.String()+".sock")
+	t.Cleanup(func() { _ = os.Remove(sockPath) })
+	return sockPath
 }
 
 func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoint string) bool {
