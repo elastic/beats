@@ -533,6 +533,34 @@ var inputTests = []struct {
 			{"message": `{"hello":"world!"}`},
 		},
 	},
+	{
+		name: "timestamp_round",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":timestamp("2009-11-10T23:00:00Z").round(duration("24h"))}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{{
+			"message": "2009-11-11T00:00:00Z",
+		}},
+	},
+	{
+		name: "timestamp_truncate",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":timestamp("2009-11-10T23:00:00Z").truncate(duration("24h"))}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{{
+			"message": "2009-11-10T00:00:00Z",
+		}},
+	},
 
 	// FS-based tests.
 	{
