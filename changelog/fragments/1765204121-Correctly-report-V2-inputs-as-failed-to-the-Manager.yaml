@@ -11,8 +11,8 @@
 kind: feature
 
 # Change summary; a 80ish characters long description of the change.
-summary: Improving input error reporting to Elastic Agent, specially
-when pipeline configurations are incorrect.
+summary: |
+  Improving input error reporting to Elastic Agent, specially when pipeline configurations are incorrect.
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
