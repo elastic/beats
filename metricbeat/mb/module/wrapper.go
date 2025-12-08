@@ -180,8 +180,8 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 	// Close the output channel when all writers to the channel have stopped.
 	go func() {
 		wg.Wait()
-		close(out)
 		mw.logger.Named("module").Debugf("Stopped %s", mw)
+		close(out)
 	}()
 
 	return out

@@ -21,6 +21,7 @@ class Test(BaseTest):
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_input(self):
         r = self.init()
+        r.client_setname("test-client")
         r.set("hello", "world")
 
         input_raw = """
@@ -48,6 +49,9 @@ class Test(BaseTest):
         assert output["input.type"] == "redis"
         assert "redis.slowlog.cmd" in output
         assert "redis.slowlog.role" in output
+        assert "redis.slowlog.clientAddr" in output
+        assert "redis.slowlog.clientName" in output
+        assert output["redis.slowlog.clientName"] == "test-client"
 
     def get_host(self):
         return os.getenv('REDIS_HOST', 'localhost')

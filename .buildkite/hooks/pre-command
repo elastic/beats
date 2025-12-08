@@ -20,6 +20,7 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-otel" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-winlogbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then

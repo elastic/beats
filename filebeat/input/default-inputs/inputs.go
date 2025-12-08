@@ -20,6 +20,7 @@ package inputs
 import (
 	"github.com/elastic/beats/v7/filebeat/input/filestream"
 	"github.com/elastic/beats/v7/filebeat/input/kafka"
+	"github.com/elastic/beats/v7/filebeat/input/logv2"
 	"github.com/elastic/beats/v7/filebeat/input/net/tcp"
 	"github.com/elastic/beats/v7/filebeat/input/net/udp"
 	"github.com/elastic/beats/v7/filebeat/input/unix"
@@ -44,5 +45,6 @@ func genericInputs(log *logp.Logger, components statestore.States) []v2.Plugin {
 		tcp.Plugin(),
 		udp.Plugin(),
 		unix.Plugin(),
+		logv2.PluginV2(log, components),
 	}
 }

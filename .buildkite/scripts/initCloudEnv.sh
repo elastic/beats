@@ -53,10 +53,8 @@ terraformSetup() {
 
   while true; do
     echo "~~~ Setting up Terraform"
-    out=$(terraformApply 2>&1)
+    terraformApply 2>&1
     exit_code=$?
-
-    echo "$out"
 
     if [ $exit_code -eq 0 ]; then
       break
@@ -65,7 +63,7 @@ terraformSetup() {
 
       if [ $retries -gt $max_retries ]; then
         teardown
-        echo "+++ Terraform init & apply failed: $out"
+        echo "+++ Terraform init & apply failed: check the logs above for details."
         exit 1
       fi
 

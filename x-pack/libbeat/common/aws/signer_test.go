@@ -74,6 +74,26 @@ func TestSignerTransportRoundTrip(t *testing.T) {
 			expectedRequestBody: []byte{},
 		},
 		{
+			name:               "no body overwrite service name and region",
+			defaultServiceName: "guardduty",
+			defaultRegion:      "us-east-1",
+			url:                "https://guardduty2.us-east-2.amazonaws.com/detector/abc123/findings",
+			requestBody:        http.NoBody,
+			requestHeaders:     map[string]string{},
+			credentials:        fakeStaticCreds,
+			now:                now,
+			initMockRoundTripper: func(mrt *mockRoundTripper) {
+				mrt.On("RoundTrip", mock.Anything).Return(&http.Response{}, nil).Once()
+			},
+			expectError: false,
+			expectedRequestHeaders: map[string]string{
+				"Authorization":        "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20251011/us-east-1/guardduty/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=2bc3ea894efa9703ec95cac0bdcd6a1067a64636058b66e88640af2dc06ff2dd",
+				"X-Amz-Date":           "20251011T160000Z",
+				"X-Amz-Security-Token": "session",
+			},
+			expectedRequestBody: []byte{},
+		},
+		{
 			name:               "with body",
 			defaultServiceName: "",
 			defaultRegion:      "",
@@ -127,6 +147,9 @@ func TestSignerTransportRoundTrip(t *testing.T) {
 
 			st := initializeSignerTransport(logger, tc.defaultServiceName, tc.defaultRegion, tc.credentials, &m)
 			st.now = tc.now
+
+			assert.Equal(t, tc.defaultServiceName, st.serviceName)
+			assert.Equal(t, tc.defaultRegion, st.region)
 
 			req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, tc.url, tc.requestBody)
 			require.NoError(t, err)

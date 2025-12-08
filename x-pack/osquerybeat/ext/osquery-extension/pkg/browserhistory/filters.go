@@ -6,13 +6,13 @@ package browserhistory
 
 import (
 	"errors"
-	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/osquery/osquery-go/plugin/table"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 )
 
 func getCustomDataDirFilters(queryContext table.QueryContext) ([]string, error) {
@@ -35,37 +35,6 @@ func getCustomDataDirFilters(queryContext table.QueryContext) ([]string, error) 
 		}
 	}
 	return results, nil
-}
-
-type filter struct {
-	field    string
-	value    string
-	operator table.Operator
-}
-
-func getConstraintFilters(queryContext table.QueryContext, fieldName string) []filter {
-	clist, ok := queryContext.Constraints[fieldName]
-	if !ok || len(clist.Constraints) == 0 {
-		return nil
-	}
-	var results []filter
-	for _, c := range clist.Constraints {
-		f := filter{
-			field:    fieldName,
-			operator: c.Operator,
-		}
-		switch f.operator {
-		case table.OperatorEquals, table.OperatorGlob, table.OperatorRegexp:
-			f.value = c.Expression
-			results = append(results, f)
-		case table.OperatorLike:
-			// Convert SQL LIKE pattern to filepath.Match pattern
-			pattern := strings.ReplaceAll(c.Expression, "%", "*")
-			f.value = pattern
-			results = append(results, f)
-		}
-	}
-	return results
 }
 
 type timestampConstraint struct {
@@ -115,46 +84,16 @@ func getDatetimeConstraints(queryContext table.QueryContext) []timestampConstrai
 	return constraints
 }
 
-func matchesProfileFilters(profile *profile, filters []filter) bool {
-	if !matchesFiltersForField("browser", profile.browser, filters) {
-		return false
-	}
-	if !matchesFiltersForField("user", profile.user, filters) {
-		return false
-	}
-	if !matchesFiltersForField("profile_name", profile.name, filters) {
-		return false
+// matchesProfile checks if a profile matches the given filters
+func matchesProfile(profile *profile, allFilters []filters.Filter) bool {
+	for _, filter := range allFilters {
+		// Only check profile-related filters
+		switch filter.ColumnName {
+		case "browser", "user", "profile_name":
+			if !filter.Matches(profile) {
+				return false
+			}
+		}
 	}
 	return true
-}
-
-func matchesFiltersForField(field, value string, filters []filter) bool {
-	var fieldFilters []filter
-	for _, filter := range filters {
-		if filter.field == field {
-			fieldFilters = append(fieldFilters, filter)
-		}
-	}
-	if len(fieldFilters) == 0 {
-		return true
-	}
-	for _, filter := range fieldFilters {
-		switch filter.operator {
-		case table.OperatorEquals:
-			if value == filter.value {
-				return true
-			}
-		case table.OperatorGlob, table.OperatorLike:
-			if matched, _ := filepath.Match(filter.value, value); matched {
-				return true
-			}
-		case table.OperatorRegexp:
-			if re, err := regexp.Compile(filter.value); err == nil {
-				if re.MatchString(value) {
-					return true
-				}
-			}
-		}
-	}
-	return false
 }

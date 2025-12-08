@@ -102,7 +102,11 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	}
 }
 
-func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvester, error) {
+func configure(
+	cfg *conf.C,
+	log *logp.Logger,
+	src *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
+
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, nil, err
@@ -121,7 +125,7 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 
 	c.TakeOver.LogWarnings(log)
 
-	prospector, err := newProspector(c, log)
+	prospector, err := newProspector(c, log, src)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
@@ -713,6 +717,7 @@ func (inp *filestream) readFromSource(
 		//nolint:gosec // message.Bytes is always positive
 		metrics.BytesProcessed.Add(uint64(message.Bytes))
 		if isGZIP {
+			//nolint:gosec // message.Bytes is always positive, no risk of overflow here
 			metrics.BytesGZIPProcessed.Add(uint64(message.Bytes))
 		}
 
@@ -721,8 +726,10 @@ func (inp *filestream) readFromSource(
 			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
 		}
 
-		if isGZIP && message.Private == io.EOF {
-			s.EOF = true
+		if isGZIP {
+			if err, ok := (message.Private).(error); ok && errors.Is(err, io.EOF) {
+				s.EOF = true
+			}
 		}
 		if err := p.Publish(message.ToEvent(), s); err != nil {
 			metrics.ProcessingErrors.Inc()

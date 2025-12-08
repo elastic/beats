@@ -81,8 +81,8 @@ func initializeSignerTransport(logger *logp.Logger, defaultServiceName string, d
 			})
 		}),
 		logger:      logger,
-		serviceName: defaultRegion,
-		region:      defaultServiceName,
+		serviceName: defaultServiceName,
+		region:      defaultRegion,
 		now:         time.Now,
 	}
 }
