@@ -24,6 +24,10 @@ const defaultMaxExecutions = 1000
 
 // config is the top-level configuration for a cel input.
 type config struct {
+	// DataStream holds the data_stream.dataset name if it
+	// was available on configuration.
+	DataStream string
+
 	// Interval is the period interval between runs of the input.
 	Interval time.Duration `config:"interval" validate:"required"`
 

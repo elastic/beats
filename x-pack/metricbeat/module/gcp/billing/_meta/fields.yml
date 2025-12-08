@@ -38,3 +38,39 @@
   - name: effective_price
     type: float
     description: The charged price for usage of the Google Cloud SKUs and SKU tiers. Reflects contract pricing if applicable, otherwise, it's the list price.
+  - name: usage_start_time
+    type: date
+    description: The start time of the usage period for this billing record.
+    version:
+      beta: 9.2.1
+  - name: usage_end_time
+    type: date
+    description: The end time of the usage period for this billing record.
+    version:
+      beta: 9.2.1
+  - name: location
+    type: group
+    version:
+      beta: 9.2.1
+    fields:
+      - name: region
+        type: keyword
+        description: The geographic region where the resource was used (e.g., us-central1, europe-west1).
+        version:
+          beta: 9.2.1
+      - name: zone
+        type: keyword
+        description: The specific zone within the region (e.g., us-central1-a).
+        version:
+          beta: 9.2.1
+      - name: country
+        type: keyword
+        description: The country code for the resource location (e.g., US, GB).
+        version:
+          beta: 9.2.1
+  - name: labels
+    type: object
+    object_type: keyword
+    description: Resource labels as key-value pairs. Labels are user-defined metadata that can be attached to GCP resources.
+    version:
+      beta: 9.2.1

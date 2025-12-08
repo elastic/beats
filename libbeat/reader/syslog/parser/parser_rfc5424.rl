@@ -2,9 +2,8 @@
 package syslog
 
 import (
+    "errors"
     "io"
-
-    "go.uber.org/multierr"
 )
 %%{
     machine rfc5424;
@@ -20,7 +19,7 @@ type machineState struct {
 
 // ParseRFC5424 parses an RFC 5424-formatted syslog message.
 func parseRFC5424(data string) (message, error) {
-    var errs error
+    var errs []error
     var p, cs, tok int
 
     pe := len(data)
@@ -39,7 +38,7 @@ func parseRFC5424(data string) (message, error) {
         write exec;
     }%%
 
-    return m, errs
+    return m, errors.Join(errs...)
 }
 
 %%{

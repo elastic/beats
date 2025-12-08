@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/proc"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -71,6 +72,8 @@ type osquerybeat struct {
 
 	// parent process watcher
 	watcher *Watcher
+
+	osquerydFactory osqd.RunnerFactory
 }
 
 // New creates an instance of osquerybeat.
@@ -83,10 +86,11 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	}
 
 	bt := &osquerybeat{
-		b:      b,
-		config: c,
-		log:    log,
-		pub:    pub.New(b, log),
+		b:               b,
+		config:          c,
+		log:             log,
+		pub:             pub.New(b, log),
+		osquerydFactory: osqd.New,
 	}
 
 	return bt, nil
@@ -144,21 +148,16 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Watch input configuration updates
 	inputConfigCh := config.WatchInputs(ctx, bt.log, b.Registry)
 
-	// Install osqueryd if needed
-	err = installOsquery(ctx)
-	if err != nil {
-		return err
-	}
-
 	// Create socket path
 	socketPath, cleanupFn, err := osqd.CreateSocketPath()
 	if err != nil {
+		b.Manager.UpdateStatus(status.Failed, "Failed to create socket path: "+err.Error())
 		return err
 	}
 	defer cleanupFn()
 
-	// Create osqueryd runner
-	osq, err := osqd.New(
+	// Create osqueryd runner using factory
+	osq, err := bt.osquerydFactory(
 		socketPath,
 		osqd.WithLogger(bt.log),
 		osqd.WithConfigRefresh(configurationRefreshIntervalSecs),
@@ -167,14 +166,19 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	)
 
 	if err != nil {
+		b.Manager.UpdateStatus(status.Failed, "Failed to create osqueryd: "+err.Error())
 		return err
 	}
 
 	// Check that osqueryd exists and runnable
 	err = osq.Check(ctx)
 	if err != nil {
+		b.Manager.UpdateStatus(status.Failed, "Failed to check osqueryd: "+err.Error())
 		return err
 	}
+
+	// Initialize osqueryd health monitoring
+	osqdMetrics := newOsquerydMetrics(bt.b.Monitoring.StatsRegistry(), bt.log)
 
 	// Set reseable action handler
 	rah := newResetableActionHandler(bt.pub, bt.log)
@@ -188,7 +192,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	runner := newOsqueryRunner(bt.log)
 	g.Go(func() error {
 		return runner.Run(ctx, func(ctx context.Context, flags osqd.Flags, inputCh <-chan []config.InputConfig) error {
-			return bt.runOsquery(ctx, b, osq, flags, inputCh, rah)
+			return bt.runOsquery(ctx, b, osq, flags, inputCh, rah, osqdMetrics)
 		})
 	})
 
@@ -202,6 +206,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Ensure that all the hooks and actions are ready before starting the Manager
 	// to receive configuration.
 	if err := b.Manager.Start(); err != nil {
+		b.Manager.UpdateStatus(status.Failed, "Failed to start manager: "+err.Error())
 		return err
 	}
 	defer b.Manager.Stop()
@@ -211,6 +216,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 
 	// Run main loop
 	g.Go(func() error {
+		b.Manager.UpdateStatus(status.Configuring, "Initial configuration")
 		// Configure publisher from initial input
 		err := bt.pub.Configure(bt.config.Inputs)
 		if err != nil {
@@ -218,11 +224,14 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		}
 
 		for {
+			b.Manager.UpdateStatus(status.Running, "Running")
 			select {
 			case <-ctx.Done():
+				b.Manager.UpdateStatus(status.Stopping, "Context cancelled, stopping")
 				bt.log.Info("osquerybeat context cancelled, exiting")
 				return ctx.Err()
 			case inputConfigs := <-inputConfigCh:
+				b.Manager.UpdateStatus(status.Configuring, "Received updated configuration")
 				err = bt.pub.Configure(inputConfigs)
 				if err != nil {
 					bt.log.Errorf("Failed to connect beat publisher client, err: %v", err)
@@ -240,17 +249,20 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	err = g.Wait()
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
+			b.Manager.UpdateStatus(status.Stopped, "Stopped")
 			bt.log.Debugf("osquerybeat Run exited, context cancelled")
 		} else {
+			b.Manager.UpdateStatus(status.Failed, "Failed: "+err.Error())
 			bt.log.Errorf("osquerybeat Run exited with error: %v", err)
 		}
 	} else {
+		b.Manager.UpdateStatus(status.Stopped, "Stopped")
 		bt.log.Debugf("osquerybeat Run exited")
 	}
 	return err
 }
 
-func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.OSQueryD, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler) error {
+func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
 	socketPath := osq.SocketPath()
 
 	// Create a cache for queries types resolution
@@ -305,6 +317,12 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 			return err
 		}
 		defer cli.Close()
+
+		// Start osqueryd health monitoring after connection is established
+		g.Go(func() error {
+			monitorOsquerydHealth(ctx, cli, osqdMetrics, bt.log)
+			return nil
+		})
 
 		// Run extensions only after successful connect, otherwise the extension server fails with windows pipes if the pipe was not created by osqueryd yet
 		g.Go(func() error {

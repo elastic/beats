@@ -92,7 +92,9 @@ func New(
 }
 
 func (r *rpc) init(results protos.Reporter, config *rpcConfig) error {
-	r.setFromConfig(config)
+	if err := r.setFromConfig(config); err != nil {
+		return err
+	}
 	r.results = results
 	r.callsSeen = common.NewCacheWithRemovalListener(
 		r.transactionTimeout,
@@ -214,7 +216,7 @@ func (r *rpc) handleRPCFragment(
 			break
 		}
 
-		marker := uint32(binary.BigEndian.Uint32(st.rawData[0:4]))
+		marker := binary.BigEndian.Uint32(st.rawData[0:4])
 		size := int(marker & rpcSizeMask)
 		islast := (marker & rpcLastFrag) != 0
 
@@ -239,9 +241,22 @@ func (r *rpc) handleRPCFragment(
 }
 
 func (r *rpc) handleRPCPacket(xdr *xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
-	xid := fmt.Sprintf("%.8x", xdr.getUInt())
+	defer func() {
+		if rec := recover(); rec != nil {
+			logp.Warn("nfs: recovered from panic while parsing RPC/NFS: %v", rec)
+		}
+	}()
 
-	msgType := xdr.getUInt()
+	xidVal, err := xdr.getUInt()
+	if dropMalformed("rpc packet xid", err) {
+		return
+	}
+	xid := fmt.Sprintf("%.8x", xidVal)
+
+	msgType, err := xdr.getUInt()
+	if dropMalformed("rpc packet msgType", err) {
+		return
+	}
 
 	switch msgType {
 	case rpcCall:

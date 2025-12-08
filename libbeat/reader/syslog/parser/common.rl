@@ -7,19 +7,19 @@
 
     action set_priority {
         if err := m.setPriority(data[tok:p]); err != nil {
-            errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok+1})
+            errs = append(errs, &ValidationError{Err: err, Pos: tok+1})
         }
     }
 
     action set_timestamp_rfc3339 {
         if err := m.setTimestampRFC3339(data[tok:p]); err != nil {
-            errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok+1})
+            errs = append(errs, &ValidationError{Err: err, Pos: tok+1})
         }
     }
 
     action set_timestamp_bsd {
         if err := m.setTimestampBSD(data[tok:p], loc); err != nil {
-            errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok+1})
+            errs = append(errs, &ValidationError{Err: err, Pos: tok+1})
         }
     }
 
@@ -40,7 +40,7 @@
     }
 
     action err_eof {
-        errs = multierr.Append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p+1})
+        errs = append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p+1})
         fhold;
     }
 

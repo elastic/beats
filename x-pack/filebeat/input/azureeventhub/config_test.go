@@ -38,6 +38,7 @@ func TestStorageContainerValidate(t *testing.T) {
 func TestValidate(t *testing.T) {
 	t.Run("Sanitize storage account containers with underscores", func(t *testing.T) {
 		config := defaultConfig()
+		config.ProcessorVersion = "v1"
 		config.ConnectionString = "Endpoint=sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET"
 		config.EventHubName = "event_hub_00"
 		config.SAName = "teststorageaccount"
@@ -139,6 +140,24 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		connectionStringProperties, err := parseConnectionString(config.ConnectionString)
 		require.NoError(t, err)
 		require.Nil(t, connectionStringProperties.EntityPath)
+	})
+
+	t.Run("Connection string fallback from SA key", func(t *testing.T) {
+		// Check the Validate() function
+		config := defaultConfig()
+		config.ProcessorVersion = "v2"
+		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-eh-secret;"
+		config.EventHubName = "my-event-hub"
+		config.SAName = "teststorageaccount"
+		config.SAKey = "my-sa-secret"
+		config.SAContainer = "filebeat-activitylogs-event_hub_00"
+		require.NoError(t, config.Validate())
+		require.Empty(t, config.SAKey)
+		// Check the parseConnectionString() function
+		connectionStringProperties, err := parseConnectionString(config.ConnectionString)
+		require.NoError(t, err)
+		require.Nil(t, connectionStringProperties.EntityPath)
+		require.Equal(t, "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-sa-secret;EndpointSuffix=core.windows.net", config.SAConnectionString)
 	})
 
 	t.Run("Connection string contains entity path but does not match event hub name", func(t *testing.T) {

@@ -113,6 +113,12 @@ func (c Converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
 			case "elasticsearch":
 				esConfig := config.MustNewConfigFrom(output)
+
+				// ignore elasticsearch output if it is not enabled
+				if !esConfig.Enabled() {
+					continue
+				}
+
 				// we use development logger here as this method is part of dev-only otel command
 				logger, _ := logp.NewDevelopmentLogger("")
 				esOTelConfig, err := elasticsearchtranslate.ToOTelConfig(esConfig, logger)
@@ -184,6 +190,9 @@ func (c Converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
 			}
 		}
+		// We're disabling the metrics telemetry for beat receivers for now because the default agent also uses the same port.
+		// If needed we can make this configurable later.
+		out["service::telemetry::metrics::level"] = "none"
 
 		err = conf.Merge(confmap.NewFromStringMap(out))
 		if err != nil {

@@ -117,7 +117,12 @@ type Total struct {
 // `args` will be passed as CLI arguments to the Beat
 func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "beat binary must exists")
-	tempDir := createTempDir(t)
+	rootDir, err := filepath.Abs(filepath.Join("..", "..", "build", "integration-tests"))
+	if err != nil {
+		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
+	}
+
+	tempDir := CreateTempDir(t, rootDir)
 	configFile := filepath.Join(tempDir, beatName+".yml")
 
 	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
@@ -168,41 +173,20 @@ func NewStandardBeat(t *testing.T, beatName, binary string, args ...string) *Bea
 // NewAgentBeat creates a new agentbeat process that runs the beatName as a subcommand.
 // See `NewBeat` for options and information for the parameters.
 func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
-	require.FileExistsf(t, binary, "agentbeat binary must exists")
-	tempDir := createTempDir(t)
-	configFile := filepath.Join(tempDir, beatName+".yml")
+	b := NewBeat(t, beatName, binary, args...)
 
-	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
-	require.NoError(t, err, "error creating stdout file")
-	stderrFile, err := os.Create(filepath.Join(tempDir, "stderr"))
-	require.NoError(t, err, "error creating stderr file")
-
-	p := BeatProc{
-		Binary: binary,
-		baseArgs: append([]string{
+	// Remove the first two arguments: beatName and --systemTest
+	baseArgs := b.baseArgs[2:]
+	// Add the agentbeat argumet and re-organise the others
+	b.baseArgs = append(
+		[]string{
 			"agentbeat",
 			"--systemTest",
 			beatName,
-			"--path.home", tempDir,
-			"--path.logs", tempDir,
-			"-E", "logging.to_files=true",
-			"-E", "logging.files.rotateeverybytes=104857600", // About 100MB
-			"-E", "logging.files.rotateonstartup=false",
-		}, args...),
-		tempDir:    tempDir,
-		beatName:   beatName,
-		configFile: configFile,
-		t:          t,
-		stdout:     stdoutFile,
-		stderr:     stderrFile,
-	}
-	t.Cleanup(func() {
-		if !t.Failed() {
-			return
-		}
-		reportErrors(t, tempDir, beatName)
-	})
-	return &p
+		},
+		baseArgs...)
+
+	return b
 }
 
 // Start starts the Beat process
@@ -781,20 +765,20 @@ func (b *BeatProc) SetExpectedErrorCode(errorCode int) {
 	b.expectedErrorCode = errorCode
 }
 
-// createTempDir creates a temporary directory that will be
-// removed after the tests passes.
+// CreateTempDir creates a temporary directory that will be
+// removed after the tests passes. The temporary directory is
+// created on rootDir. If rootDir is empty, then os.TempDir() is used.
 //
 // If the test fails, the temporary directory is not removed.
 //
 // If the tests are run with -v, the temporary directory will
 // be logged.
-func createTempDir(t *testing.T) string {
-	rootDir, err := filepath.Abs("../../build/integration-tests")
-	if err != nil {
-		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
+func CreateTempDir(t *testing.T, rootDir string) string {
+	if rootDir == "" {
+		rootDir = os.TempDir()
 	}
-	err = os.MkdirAll(rootDir, 0o750)
-	if err != nil {
+
+	if err := os.MkdirAll(rootDir, 0o750); err != nil {
 		t.Fatalf("error making test dir: %s: %s", rootDir, err)
 	}
 	tempDir, err := os.MkdirTemp(rootDir, strings.ReplaceAll(t.Name(), "/", "-"))
@@ -1128,7 +1112,7 @@ func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
 }
 
 func reportErrors(t *testing.T, tempDir string, beatName string) {
-	var maxlen int64 = 100 * 1024 // 100 KiB
+	var maxlen int64 = 1024
 	stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
 	if err != nil {
 		t.Logf("error reading stderr: %s", err)
@@ -1243,9 +1227,10 @@ func StartMockES(
 		addr = "localhost:0"
 	}
 
-	l, err := net.Listen("tcp", addr)
+	lc := net.ListenConfig{}
+	l, err := lc.Listen(t.Context(), "tcp", addr)
 	if err != nil {
-		if l, err = net.Listen("tcp6", addr); err != nil {
+		if l, err = lc.Listen(t.Context(), "tcp6", addr); err != nil {
 			t.Fatalf("failed to listen on a port: %v", err)
 		}
 	}
@@ -1286,14 +1271,10 @@ func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
 	t := b.t
 	t.Helper()
 
-	msg := strings.Builder{}
 	path := filepath.Join(b.TempDir(), "output-*.ndjson")
-	assert.Eventually(t, func() bool {
-		got := b.CountFileLines(path)
-		msg.Reset()
-		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
-		return got == events
-	}, timeout, 200*time.Millisecond, &msg)
+	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		assert.Equal(collect, events, b.CountFileLines(path))
+	}, timeout, 200*time.Millisecond)
 }
 
 // GetEventsFromFileOutput reads all events from file output. If n > 0,
