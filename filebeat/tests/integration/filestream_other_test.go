@@ -48,6 +48,7 @@ func TestFilestreamHasOwnerAndGroup(t *testing.T) {
 	cfg := fmt.Sprintf(`
 filebeat.inputs:
   - type: filestream
+    id: TestFilestreamHasOwnerAndGroup
     paths:
       - %s
     include_file_owner_name: true
