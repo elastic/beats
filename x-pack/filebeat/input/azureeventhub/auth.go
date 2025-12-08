@@ -43,7 +43,7 @@ func createCredential(cfg *azureInputConfig, log *logp.Logger) (azcore.TokenCred
 
 // CreateEventHubConsumerClient creates an Event Hub consumer client
 // using the configured authentication method from the provided config.
-func CreateEventHubConsumerClient(cfg *azureInputConfig, log *logp.Logger) (*azeventhubs.ConsumerClient, error) {
+func CreateEventHubConsumerClient(cfg *azureInputConfig, options *azeventhubs.ConsumerClientOptions, log *logp.Logger) (*azeventhubs.ConsumerClient, error) {
 	switch cfg.AuthType {
 	case AuthTypeConnectionString:
 		// Use connection string authentication for Event Hub
@@ -79,7 +79,7 @@ func CreateEventHubConsumerClient(cfg *azureInputConfig, log *logp.Logger) (*aze
 			cfg.ConnectionString,
 			eventHubName,
 			cfg.ConsumerGroup,
-			nil,
+			options,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create consumer client from connection string: %w", err)
@@ -100,7 +100,7 @@ func CreateEventHubConsumerClient(cfg *azureInputConfig, log *logp.Logger) (*aze
 			cfg.EventHubName,
 			cfg.ConsumerGroup,
 			credential,
-			nil,
+			options,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create consumer client with credential: %w", err)
