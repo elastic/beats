@@ -477,30 +477,6 @@ func Test_StorageClient(t *testing.T) {
 			},
 		},
 		{
-			name: "ReadCSV",
-			baseConfig: map[string]interface{}{
-				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
-				"max_workers":                         1,
-				"poll":                                true,
-				"poll_interval":                       "10s",
-				"decoding.codec.csv.enabled":          true,
-				"decoding.codec.csv.comma":            " ",
-				"containers": []map[string]interface{}{
-					{
-						"name":                       beatsCSVContainer,
-						"decoding.codec.csv.enabled": true,
-						"decoding.codec.csv.comma":   " ",
-					},
-				},
-			},
-			mockHandler: mock.AzureStorageFileServer,
-			expected: map[string]bool{
-				mock.BeatsFilesContainer_csv[0]: true,
-				mock.BeatsFilesContainer_csv[1]: true,
-			},
-		},
-		{
 			name: "CustomContentTypeUnsupported",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
@@ -586,6 +562,50 @@ func Test_StorageClient(t *testing.T) {
 			expected: map[string]bool{
 				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
 				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
+			},
+		},
+		{
+			name: "ReadCSVContainerLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":                       beatsCSVContainer,
+						"decoding.codec.csv.enabled": true,
+						"decoding.codec.csv.comma":   " ",
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_csv[0]: true,
+				mock.BeatsFilesContainer_csv[1]: true,
+			},
+		},
+		{
+			name: "ReadCSVRootLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"decoding.codec.csv.enabled":          true,
+				"decoding.codec.csv.comma":            " ",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsCSVContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_csv[0]: true,
+				mock.BeatsFilesContainer_csv[1]: true,
 			},
 		},
 	}
