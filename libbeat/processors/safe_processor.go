@@ -19,62 +19,129 @@ package processors
 
 import (
 	"errors"
-	"sync/atomic"
+	"fmt"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-var ErrClosed = errors.New("attempt to use a closed processor")
+var (
+	ErrClosed           = errors.New("attempt to use a closed processor")
+	ErrPathsNotSet      = errors.New("attempt to run processor before SetPaths was called")
+	ErrPathsAlreadySet  = errors.New("attempt to set paths twice")
+	ErrSetPathsOnClosed = errors.New("attempt to set paths on closed processor")
+)
 
+type state = int
+
+const (
+	stateInit state = iota
+	stateSetPaths
+	stateClosed
+)
+
+// SafeProcessor wraps a beat.Processor to provide thread-safe state management.
+// It ensures SetPaths is called only once and prevents Run after Close.
+// Use safeProcessorWithClose for processors that also implement Closer.
 type SafeProcessor struct {
 	beat.Processor
-	closed uint32
+
+	mu    sync.RWMutex
+	state state
 }
 
-// Run allows to run processor only when `Close` was not called prior
+// safeProcessorWithClose extends SafeProcessor to also handle Close.
+// It ensures Close is called only once on the underlying processor.
+type safeProcessorWithClose struct {
+	SafeProcessor
+}
+
+// Run delegates to the underlying processor. Returns ErrClosed if the processor
+// has been closed, or ErrPathsNotSet if the processor implements PathSetter but
+// SetPaths has not been called.
 func (p *SafeProcessor) Run(event *beat.Event) (*beat.Event, error) {
-	if atomic.LoadUint32(&p.closed) == 1 {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	switch p.state {
+	case stateClosed:
 		return nil, ErrClosed
+	case stateInit:
+		if _, ok := p.Processor.(PathSetter); ok {
+			return nil, ErrPathsNotSet
+		}
+	default: // proceed
 	}
 	return p.Processor.Run(event)
 }
 
 // Close makes sure the underlying `Close` function is called only once.
-func (p *SafeProcessor) Close() (err error) {
-	if atomic.CompareAndSwapUint32(&p.closed, 0, 1) {
+func (p *safeProcessorWithClose) Close() (err error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.state != stateClosed {
+		p.state = stateClosed
 		return Close(p.Processor)
 	}
-	logp.L().Warnf("tried to close already closed %q processor", p.Processor.String())
+	logp.L().Warnf("tried to close already closed %q processor", p.String())
 	return nil
 }
 
-// SafeWrap makes sure that the processor handles all the required edge-cases.
+// SetPaths delegates to the underlying processor if it implements PathSetter.
+// Returns ErrPathsAlreadySet if called more than once, or ErrSetPathsOnClosed
+// if the processor has been closed.
+func (p *SafeProcessor) SetPaths(paths *paths.Path) error {
+	pathSetter, ok := p.Processor.(PathSetter)
+	if !ok {
+		return nil
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	switch p.state {
+	case stateInit:
+		p.state = stateSetPaths
+		return pathSetter.SetPaths(paths)
+	case stateSetPaths:
+		return ErrPathsAlreadySet
+	case stateClosed:
+		return ErrSetPathsOnClosed
+	}
+	return fmt.Errorf("unknown state: %d", p.state)
+}
+
+// SafeWrap wraps a processor constructor to handle common edge cases:
 //
-// Each processor might end up in multiple processor groups.
-// Every group has its own `Close` that calls `Close` on each
-// processor of that group which leads to multiple `Close` calls
-// on the same processor.
+//   - Multiple Close calls: Each processor might end up in multiple processor
+//     groups. Every group has its own Close that calls Close on each processor,
+//     leading to multiple Close calls on the same processor.
 //
-// If `SafeWrap` is not used, the processor must handle multiple
-// `Close` calls by using `sync.Once` in its `Close` function.
-// We make it easer for processor developers and take care of it
-// in the processor registry instead.
+//   - Multiple SetPaths calls: The wrapper ensures SetPaths is called at most once.
+//
+//   - Close before/during SetPaths: Prevents initialization after shutdown and
+//     protects against race conditions between SetPaths and Close.
+//
+// Without SafeWrap, processors must handle these cases manually using sync.Once
+// or similar mechanisms. SafeWrap is automatically applied by RegisterPlugin.
 func SafeWrap(constructor Constructor) Constructor {
 	return func(config *config.C, log *logp.Logger) (beat.Processor, error) {
 		processor, err := constructor(config, log)
 		if err != nil {
 			return nil, err
 		}
-		// if the processor does not implement `Closer`
-		// it does not need a wrap
+		// if the processor does not implement `Closer` it does not need a wrap
 		if _, ok := processor.(Closer); !ok {
+			// if SetPaths is implemented, ensure single call of SetPaths
+			if _, ok = processor.(PathSetter); ok {
+				return &SafeProcessor{Processor: processor}, nil
+			}
 			return processor, nil
 		}
 
-		return &SafeProcessor{
-			Processor: processor,
+		return &safeProcessorWithClose{
+			SafeProcessor: SafeProcessor{Processor: processor},
 		}, nil
 	}
 }

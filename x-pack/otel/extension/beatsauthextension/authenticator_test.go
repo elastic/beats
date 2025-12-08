@@ -22,6 +22,7 @@ import (
 	"go.opentelemetry.io/collector/config/confighttp"
 	"go.opentelemetry.io/collector/config/configoptional"
 	"go.uber.org/goleak"
+	"go.uber.org/zap/zaptest"
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 )
@@ -136,11 +137,49 @@ func TestAuthenticator(t *testing.T) {
 			skipStart:                true,
 			testRoundTripperPreStart: true,
 		},
+		{
+			name: "invalid kerberos auth type - continueOnError true",
+			setupConfig: func(t *testing.T) *Config {
+				return &Config{
+					BeatAuthConfig: map[string]any{
+						"kerberos": map[string]any{
+							"auth_type": "invalid_auth_type",
+						},
+					},
+					ContinueOnError: true,
+				}
+			},
+			expectStartError:     false,
+			expectStatus:         componentstatus.StatusPermanentError,
+			expectHTTPClientType: "errorRoundTripperProvider",
+			testRoundTripError:   true,
+		},
+		{
+			name: "valid kerberos config",
+			setupConfig: func(t *testing.T) *Config {
+				return &Config{
+					BeatAuthConfig: map[string]any{
+						"kerberos": map[string]any{
+							"auth_type":   "password",
+							"config_path": "../../../../libbeat/outputs/elasticsearch/testdata/krb5.conf",
+							"username":    "user",
+							"password":    "pass",
+							"realm":       "elastic",
+						},
+					},
+					ContinueOnError: true,
+				}
+			},
+			expectStartError:     false,
+			expectStatus:         componentstatus.StatusOK,
+			expectHTTPClientType: "kerberosClientProvider",
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			settings := componenttest.NewNopTelemetrySettings()
+			settings.Logger = zaptest.NewLogger(t)
 			cfg := tc.setupConfig(t)
 
 			auth, err := newAuthenticator(cfg, settings)
@@ -188,6 +227,9 @@ func TestAuthenticator(t *testing.T) {
 				case "errorRoundTripperProvider":
 					_, ok := (auth.rtProvider).(*errorRoundTripperProvider)
 					require.True(t, ok, "Provider should be an errorRoundTripperProvider")
+				case "kerberosClientProvider":
+					_, ok := (auth.rtProvider).(*kerberosClientProvider)
+					require.True(t, ok, "Provider should be a kerberosClientProvider")
 				}
 
 				rt, err := auth.RoundTripper(nil)
@@ -205,13 +247,12 @@ func TestAuthenticator(t *testing.T) {
 				rt, err := auth.RoundTripper(nil)
 				require.NoError(t, err)
 
-				req, err := http.NewRequest("GET", "http://example.com", nil) //nolint:noctx this is only in test
+				req, err := http.NewRequest("GET", "http://example.com", nil) //nolint:noctx // this is only in test
 				require.NoError(t, err)
-				resp, err := rt.RoundTrip(req)
+				resp, err := rt.RoundTrip(req) //nolint:bodyclose // response is nil
 				require.Error(t, err)
 				require.Nil(t, resp)
 				require.Contains(t, err.Error(), "failed")
-				_ = resp.Body.Close()
 			}
 
 			// Test HTTP request if specified
@@ -229,7 +270,7 @@ func TestAuthenticator(t *testing.T) {
 				require.NoError(t, err)
 				require.NotNil(t, client)
 
-				resp, err := client.Get(serverURL) //nolint:noctx this is a test
+				resp, err := client.Get(serverURL) //nolint:noctx // this is a test
 				require.NoError(t, err)
 				_ = resp.Body.Close()
 			}

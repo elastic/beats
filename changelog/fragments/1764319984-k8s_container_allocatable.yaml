@@ -8,18 +8,18 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: bug-fix
+kind: feature
 
 # Change summary; a 80ish characters long description of the change.
-summary: Fix potential Filebeat panic during memory queue shutdown
+summary: k8s_container_allocatable
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 # NOTE: This field will be rendered only for breaking-change and known-issue kinds at the moment.
-#description:
+description: Updates kubernetes cpu and memory metrics to use allocatable values instead of capacity values.
 
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: filebeat
+component: metricbeat
 
 # PR URL; optional; the PR number that added the changeset.
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.

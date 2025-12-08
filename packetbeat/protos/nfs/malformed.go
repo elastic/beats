@@ -15,23 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package otelbeat
+package nfs
 
-import (
-	"fmt"
+import "github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/fbprovider"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/mbprovider"
-
-	"go.opentelemetry.io/collector/confmap"
-)
-
-func NewFactory(beatname string) (confmap.ProviderFactory, error) {
-	switch beatname {
-	case "filebeat":
-		return fbprovider.NewFactory(), nil
-	case "metricbeat":
-		return mbprovider.NewFactory(), nil
+func dropMalformed(context string, err error) bool {
+	if err != nil {
+		logp.Warn("nfs: dropping malformed %s: %v", context, err)
+		return true
 	}
-	return nil, fmt.Errorf("unknown beatname: %s", beatname)
+	return false
 }

@@ -20,7 +20,6 @@ package oteltest
 
 import (
 	"context"
-	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -44,6 +43,7 @@ import (
 )
 
 type MockHost struct {
+	mu  sync.Mutex
 	Evt *componentstatus.Event
 }
 
@@ -52,7 +52,15 @@ func (*MockHost) GetExtensions() map[component.ID]component.Component {
 }
 
 func (h *MockHost) Report(evt *componentstatus.Event) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
 	h.Evt = evt
+}
+
+func (h *MockHost) getEvent() *componentstatus.Event {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.Evt
 }
 
 type ReceiverConfig struct {
@@ -190,7 +198,7 @@ func CheckReceivers(params CheckReceiversParams) {
 				require.Equal(ct, beatForCompName(compName), zl.ContextMap()["service.name"])
 				break
 			}
-			require.NotNil(ct, host.Evt, "expected not nil, got nil")
+			require.NotNil(ct, host.getEvent(), "expected not nil, got nil")
 
 			if params.Status.Error == "" {
 				require.Equalf(ct, host.Evt.Status(), componentstatus.StatusOK, "expected %v, got %v", params.Status.Status, host.Evt.Status())
@@ -220,11 +228,10 @@ func VerifyNoLeaks(t *testing.T) {
 		// See https://github.com/googleapis/google-cloud-go/issues/10948
 		// and https://github.com/census-instrumentation/opencensus-go/issues/1191
 		goleak.IgnoreAnyFunction("go.opencensus.io/stats/view.(*worker).start"),
-	}
-
-	if runtime.GOOS == "linux" && runtime.GOARCH == "arm64" {
-		// On arm64, some HTTP transport goroutines are leaked while still dialing.
-		skipped = append(skipped, goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"))
+		// On Linux, mainly arm64, some HTTP transport goroutines are leaked while still dialing.
+		goleak.IgnoreAnyFunction("net.(*netFD).connect"),
+		goleak.IgnoreAnyFunction("net.(*netFD).connect.func2"),
+		goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"),
 	}
 
 	goleak.VerifyNone(t, skipped...)

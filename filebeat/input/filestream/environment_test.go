@@ -20,13 +20,13 @@
 package filestream
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -43,18 +43,17 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-concert/unison"
 )
 
 type inputTestingEnvironment struct {
-	logger       *logp.Logger
-	loggerBuffer *bytes.Buffer
-	t            *testing.T
-	workingDir   string
-	stateStore   statestore.States
-	pipeline     *mockPipelineConnector
-	monitoring   beat.Monitoring
+	testLogger *logptest.Logger
+	t          *testing.T
+	workingDir string
+	stateStore statestore.States
+	pipeline   *mockPipelineConnector
+	monitoring beat.Monitoring
 
 	pluginInitOnce sync.Once
 	plugin         v2.Plugin
@@ -71,40 +70,18 @@ type registryEntry struct {
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
-	// logp.NewInMemoryLocal will always use a console encoder, passing a
-	// JSONEncoderConfig will only change the keys, not the final encoding.
-	logger, buff := logp.NewInMemoryLocal("", logp.ConsoleEncoderConfig())
-
-	t.Cleanup(func() {
-		if t.Failed() {
-			pattern := strings.ReplaceAll(t.Name()+"-*", "/", "_")
-			f, err := os.CreateTemp("", pattern)
-			if err != nil {
-				t.Errorf("cannot create temp file for logs: %s", err)
-				return
-			}
-
-			defer f.Close()
-
-			data := buff.Bytes()
-			t.Logf("Debug Logs:%s\n", string(data))
-			t.Logf("Logs written to %s", f.Name())
-			if _, err := f.Write(data); err != nil {
-				t.Logf("could not write log file for debugging: %s", err)
-			}
-
-			return
-		}
-	})
+	logger := logptest.NewFileLogger(
+		t,
+		filepath.Join("..", "..", "build", "integration-tests"),
+	)
 
 	return &inputTestingEnvironment{
-		logger:       logger,
-		loggerBuffer: buff,
-		t:            t,
-		workingDir:   t.TempDir(),
-		stateStore:   openTestStatestore(),
-		pipeline:     &mockPipelineConnector{},
-		monitoring:   beat.NewMonitoring(),
+		testLogger: logger,
+		t:          t,
+		workingDir: t.TempDir(),
+		stateStore: openTestStatestore(),
+		pipeline:   &mockPipelineConnector{},
+		monitoring: beat.NewMonitoring(),
 	}
 }
 
@@ -136,7 +113,7 @@ func (e *inputTestingEnvironment) createInput(config map[string]any) (v2.Input, 
 
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	e.pluginInitOnce.Do(func() {
-		e.plugin = Plugin(e.logger, e.stateStore)
+		e.plugin = Plugin(e.testLogger.Logger, e.stateStore)
 	})
 	return e.plugin.Manager
 }
@@ -147,7 +124,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
 
-		logger, _ := logp.NewDevelopmentLogger("")
+		logger := e.testLogger.Named("metrics-registry")
 		reg := inputmon.NewMetricsRegistry(
 			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 		defer inputmon.CancelMetricsRegistry(
@@ -160,7 +137,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 			Cancelation:     ctx,
 			StatusReporter:  nil,
 			MetricsRegistry: reg,
-			Logger:          e.logger,
+			Logger:          e.testLogger.Named("input.filestream"),
 		}
 		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
@@ -487,7 +464,7 @@ func (e *inputTestingEnvironment) waitUntilHarvesterIsDone() {
 	require.Eventually(
 		e.t,
 		func() bool {
-			return e.pipeline.clients[len(e.pipeline.clients)-1].closed
+			return e.pipeline.clients[len(e.pipeline.clients)-1].closed.Load()
 		},
 		time.Second*10,
 		time.Millisecond*10,
@@ -572,14 +549,13 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 // logContains ensures s is a sub string on any log line.
 // If s is not found, the test fails
 func (e *inputTestingEnvironment) logContains(s string) {
-	logs := e.loggerBuffer.String()
-	for _, line := range strings.Split(logs, "\n") {
-		if strings.Contains(line, s) {
-			return
-		}
-	}
+	e.t.Helper()
+	e.testLogger.LogContains(e.t, s)
+}
 
-	e.t.Fatalf("%q not found in logs", s)
+func (e *inputTestingEnvironment) WaitLogsContains(s string, timeout time.Duration, msgAndArgs ...any) {
+	e.t.Helper()
+	e.testLogger.WaitLogsContains(e.t, s, timeout, msgAndArgs...)
 }
 
 var _ statestore.States = (*testInputStore)(nil)
@@ -610,7 +586,7 @@ type mockClient struct {
 	publishing []beat.Event
 	published  []beat.Event
 	ackHandler beat.EventListener
-	closed     bool
+	closed     atomic.Bool
 	mtx        sync.Mutex
 	canceler   context.CancelFunc
 }
@@ -653,11 +629,11 @@ func (c *mockClient) Close() error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	if c.closed {
+	if c.closed.Load() {
 		return fmt.Errorf("mock client already closed")
 	}
 
-	c.closed = true
+	c.closed.Store(true)
 	return nil
 }
 
