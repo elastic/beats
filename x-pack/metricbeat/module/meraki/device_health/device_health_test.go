@@ -42,16 +42,19 @@ func TestGetDeviceChannelUtilization(t *testing.T) {
 				},
 			},
 			validate: func(t *testing.T, devices map[Serial]*Device) {
-				assert.NotNil(t, devices["ABC123"].bandUtilization)
+				device, ok := devices["ABC123"]
+				require.True(t, ok, "device ABC123 should exist in the map")
+				require.NotNil(t, device, "device ABC123 should not be nil")
+				assert.NotNil(t, device.bandUtilization)
 
-				band1, ok := devices["ABC123"].bandUtilization["2.4"]
+				band1, ok := device.bandUtilization["2.4"]
 				assert.NotNil(t, band1)
 				assert.True(t, ok)
 				assert.Equal(t, 45.0, *band1.Wifi.Percentage)
 				assert.Equal(t, 10.0, *band1.NonWifi.Percentage)
 				assert.Equal(t, 55.0, *band1.Total.Percentage)
 
-				band2, ok := devices["ABC123"].bandUtilization["5"]
+				band2, ok := device.bandUtilization["5"]
 				assert.NotNil(t, band2)
 				assert.True(t, ok)
 				assert.Equal(t, 10.0, *band2.Wifi.Percentage)
