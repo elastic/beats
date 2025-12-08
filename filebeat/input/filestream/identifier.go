@@ -32,20 +32,22 @@ const (
 	// IDs if a source is renamed.
 	trackRename identifierFeature = iota
 
-	nativeName      = "native"
-	pathName        = "path"
-	inodeMarkerName = "inode_marker"
-	fingerprintName = "fingerprint"
+	nativeName             = "native"
+	pathName               = "path"
+	inodeMarkerName        = "inode_marker"
+	fingerprintName        = "fingerprint"
+	growingFingerprintName = "growing_fingerprint"
 
 	DefaultIdentifierName = nativeName
 	identitySep           = "::"
 )
 
 var identifierFactories = map[string]identifierFactory{
-	nativeName:      newINodeDeviceIdentifier,
-	pathName:        newPathIdentifier,
-	inodeMarkerName: newINodeMarkerIdentifier,
-	fingerprintName: newFingerprintIdentifier,
+	nativeName:             newINodeDeviceIdentifier,
+	pathName:               newPathIdentifier,
+	inodeMarkerName:        newINodeMarkerIdentifier,
+	fingerprintName:        newFingerprintIdentifier,
+	growingFingerprintName: newGrowingFingerprintIdentifier,
 }
 
 type identifierFactory func(*conf.C, *logp.Logger) (fileIdentifier, error)

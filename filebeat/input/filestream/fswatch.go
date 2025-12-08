@@ -26,6 +26,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -39,10 +40,11 @@ import (
 )
 
 const (
-	RecursiveGlobDepth           = 8
-	DefaultFingerprintSize int64 = 1024 // 1KB
-	scannerDebugKey              = "scanner"
-	watcherDebugKey              = "file_watcher"
+	RecursiveGlobDepth                  = 8
+	DefaultFingerprintSize        int64 = 1024 // 1KB
+	DefaultGrowingFingerprintSize int64 = 1000 // Same as OTEL's filelog receiver
+	scannerDebugKey                     = "scanner"
+	watcherDebugKey                     = "file_watcher"
 )
 
 var (
@@ -170,6 +172,13 @@ func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
 func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.log.Debug("Start next scan")
 
+	prevKeys := make([]string, 0, len(w.prev))
+	for k := range w.prev {
+		prevKeys = append(prevKeys, k)
+	}
+	w.log.Debugf("Start next scan: prevs: %s", strings.Join(prevKeys, ","))
+
+	// file identity is updated in GetFiles
 	paths := w.scanner.GetFiles()
 
 	// for debugging purposes
@@ -191,7 +200,11 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		// with a different file, it is a new file
 		prevDesc, ok := w.prev[path]
 		sfd := fd // to avoid memory aliasing
-		if !ok || !loginp.SameFile(&prevDesc, &sfd) {
+		if !ok || !loginp.SameFile(w.log, &prevDesc, &sfd) {
+			if ok {
+				w.log.Infof("file %q has been replaced by a new file. Old ID %q, new ID %q",
+					path, prevDesc.FileID(), fd.FileID())
+			}
 			newFilesByName[path] = &sfd
 			newFilesByID[fd.FileID()] = &sfd
 			continue
@@ -371,6 +384,12 @@ type fingerprintConfig struct {
 	Enabled bool  `config:"enabled"`
 	Offset  int64 `config:"offset"`
 	Length  int64 `config:"length"`
+	// Growing enables the growing fingerprint mode where the fingerprint
+	// is the raw bytes (not a hash) and can grow as the file grows.
+	Growing bool `config:"growing"`
+	// MaxLength is the maximum number of bytes to use for the growing fingerprint.
+	// Default is 1000 bytes (same as OTEL's filelog receiver).
+	MaxLength int64 `config:"max_length"`
 }
 
 type fileScannerConfig struct {
@@ -386,9 +405,11 @@ func defaultFileScannerConfig() fileScannerConfig {
 		Symlinks:      false,
 		RecursiveGlob: true,
 		Fingerprint: fingerprintConfig{
-			Enabled: true,
-			Offset:  0,
-			Length:  DefaultFingerprintSize,
+			Enabled:   true,
+			Offset:    0,
+			Length:    DefaultFingerprintSize,
+			Growing:   false,
+			MaxLength: DefaultGrowingFingerprintSize,
 		},
 	}
 }
@@ -396,12 +417,13 @@ func defaultFileScannerConfig() fileScannerConfig {
 // fileScanner looks for files which match the patterns in paths.
 // It is able to exclude files and symlinks.
 type fileScanner struct {
-	paths       []string
-	cfg         fileScannerConfig
-	log         *logp.Logger
-	hasher      hash.Hash
-	readBuffer  []byte
-	compression string
+	paths         []string
+	cfg           fileScannerConfig
+	log           *logp.Logger
+	hasher        hash.Hash
+	readBuffer    []byte
+	compression   string
+	growingBuffer []byte // buffer for growing fingerprint mode
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
@@ -413,7 +435,11 @@ func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfi
 		compression: compression,
 	}
 
-	if s.cfg.Fingerprint.Enabled {
+	if s.cfg.Fingerprint.Growing {
+		// Growing fingerprint mode: use raw bytes, no minimum size requirement
+		s.log.Debugf("growing fingerprint mode enabled: max_length %d", s.cfg.Fingerprint.MaxLength)
+		s.growingBuffer = make([]byte, s.cfg.Fingerprint.MaxLength)
+	} else if s.cfg.Fingerprint.Enabled { // TODO(AndersonQ): it's confusing having cfg.Fingerprint.Enabled and cfg.Fingerprint.Growing meaning different things
 		if s.cfg.Fingerprint.Length < sha256.BlockSize {
 			err := fmt.Errorf("fingerprint size %d bytes cannot be smaller than %d bytes", config.Fingerprint.Length, sha256.BlockSize)
 			return nil, fmt.Errorf("error while reading configuration of fingerprint: %w", err)
@@ -609,6 +635,11 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	var osFile *os.File
 	var file File
 
+	// Growing fingerprint mode: compute raw bytes fingerprint
+	if s.cfg.Fingerprint.Growing {
+		return s.computeGrowingFingerprint(it, fd)
+	}
+
 	if !s.cfg.Fingerprint.Enabled {
 		return fd, nil
 	}
@@ -685,6 +716,64 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	}
 
 	fd.Fingerprint = hex.EncodeToString(s.hasher.Sum(nil))
+
+	return fd, nil
+}
+
+// computeGrowingFingerprint computes a raw bytes fingerprint for the growing
+// fingerprint file identity. Unlike the hash-based fingerprint, this stores
+// the actual file content (hex-encoded) and can grow as the file grows.
+// Files of any size are supported - if the file is smaller than max_length,
+// the entire content is used as the fingerprint.
+func (s *fileScanner) computeGrowingFingerprint(it *ingestTarget, fd loginp.FileDescriptor) (loginp.FileDescriptor, error) {
+	// Empty files have no fingerprint yet - empty string fingerprint
+	if it.info.Size() == 0 {
+		s.log.Info("fileScanner: computeGrowingFingerprint: size 0, nothing to compute", fd.Filename)
+		return fd, nil
+	}
+
+	osFile, err := os.Open(it.originalFilename)
+	if err != nil {
+		return fd, fmt.Errorf("failed to open %q for growing fingerprint: %w", it.originalFilename, err)
+	}
+	defer osFile.Close()
+
+	// Check for GZIP if allowed
+	if s.compression == CompressionAuto || s.compression == CompressionGZIP {
+		fd.GZIP, err = IsGZIP(osFile)
+		if err != nil {
+			return fd, fmt.Errorf("failed to check if %q is gzip: %w", it.originalFilename, err)
+		}
+	}
+
+	// Determine how many bytes to read
+	maxLength := s.cfg.Fingerprint.MaxLength
+	fileSize := it.info.Size()
+	// TODO(AndersonQ): If the file is GZIP-compressed, we cannot use the compressed size
+	//   it needs to read until maxLength or EOF
+	toRead := fileSize
+	if toRead > maxLength {
+		toRead = maxLength
+	}
+	s.log.Infof("fileScanner: computeGrowingFingerprint: for file %s: %d/%d bytes",
+		fd.Filename, toRead, maxLength)
+
+	var r io.Reader = osFile
+	if fd.GZIP {
+		// fingerprint is computed on decompressed data
+		gzReader, err := newGzipSeekerReader(osFile, int(maxLength))
+		if err != nil {
+			return fd, fmt.Errorf("failed to create gzip reader for %q: %w", it.originalFilename, err)
+		}
+		defer gzReader.Close()
+		r = gzReader
+	}
+
+	n, err := io.ReadFull(r, s.growingBuffer[:toRead])
+	if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, io.ErrUnexpectedEOF) {
+		return fd, fmt.Errorf("failed to read %q for growing fingerprint: %w", it.originalFilename, err)
+	}
+	fd.Fingerprint = hex.EncodeToString(s.growingBuffer[:n])
 
 	return fd, nil
 }

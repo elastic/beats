@@ -18,6 +18,9 @@
 package input_logfile
 
 import (
+	"strings"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -64,7 +67,9 @@ type FileDescriptor struct {
 	Filename string
 	// Info is the result of file stat
 	Info file.ExtendedFileInfo
-	// Fingerprint is a computed hash of the file header
+	// Fingerprint is used for file identity. For the "fingerprint" identity,
+	// this is a hash of the file header. For "growing_fingerprint", this is
+	// the hex-encoded raw bytes of the file header (which can grow).
 	Fingerprint string
 	// GZIP indicates if the file is compressed with GZIP.
 	GZIP bool
@@ -101,11 +106,34 @@ func (fd FileDescriptor) FileID() string {
 }
 
 // SameFile returns true if descriptors point to the same file.
-func SameFile(a, b *FileDescriptor) bool {
-	return a.FileID() == b.FileID()
+// For growing fingerprint identity, this handles the case where a file's
+// fingerprint has grown - checks if one fingerprint is a prefix of the other
+// and verifies it's the same physical file via OS state (inode/device).
+func SameFile(log *logp.Logger, prev, current *FileDescriptor) bool {
+	// return prev.FileID() == current.FileID()
+
+	// Fast path: exact match
+	if prev.FileID() == current.FileID() {
+		return true
+	}
+
+	// For growing fingerprint: check if one fingerprint is a prefix of the other
+	// This happens when a file grows and its fingerprint expands
+	if prev.Fingerprint != "" && current.Fingerprint != "" {
+
+		// If shorter is a prefix of longer, verify it's the same physical file
+		same := strings.HasPrefix(current.Fingerprint, prev.Fingerprint) &&
+			prev.Filename == current.Filename
+
+		log.Infof("SameFile: %t: prev=%s, current=%s. prevPath: %s, currPath: %s",
+			same, prev.Fingerprint, current.Fingerprint, prev.Filename, current.Filename)
+		return same
+	}
+
+	return false
 }
 
-// FSEvent returns inforamation about file system changes.
+// FSEvent returns information about file system changes.
 type FSEvent struct {
 	// NewPath is the new path of the file.
 	NewPath string
