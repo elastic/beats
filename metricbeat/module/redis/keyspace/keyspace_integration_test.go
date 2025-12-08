@@ -52,6 +52,7 @@ func TestFetch(t *testing.T) {
 	assert.True(t, keyspace["avg_ttl"].(int64) >= 0)
 	assert.True(t, keyspace["expires"].(int64) >= 0)
 	assert.True(t, keyspace["keys"].(int64) >= 0)
+	assert.True(t, keyspace["subexpiry"].(int64) >= 0)
 	assert.True(t, strings.Contains(keyspace["id"].(string), "db"))
 }
 
