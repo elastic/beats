@@ -22,12 +22,12 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -61,8 +61,8 @@ func TestLogFileTimedClosing(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			reader, err := newFileReader(
-				logp.NewNopLogger(),
-				context.TODO(),
+				logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests")).Logger,
+				t.Context(),
 				f,
 				readerConfig{},
 				closerConfig{
