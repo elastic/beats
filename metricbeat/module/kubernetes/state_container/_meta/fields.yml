@@ -36,6 +36,10 @@
           type: double
           description: >
             Last terminated time (epoch) of the container
+        - name: last_terminated_exitcode
+          type: integer
+          description: >
+            The exit code of the container when it last terminated
     - name: cpu
       type: group
       fields:

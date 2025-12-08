@@ -1541,6 +1541,12 @@ kubernetes container metrics
     type: double
 
 
+**`kubernetes.container.status.last_terminated_exitcode`**
+:   The exit code of the container when it last terminated
+
+    type: integer
+
+
 **`kubernetes.container.cpu.limit.cores`**
 :   Container CPU cores limit
 
