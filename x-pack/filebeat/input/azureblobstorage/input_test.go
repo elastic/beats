@@ -483,7 +483,7 @@ func Test_StorageClient(t *testing.T) {
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
 				"max_workers":                         1,
 				"poll":                                true,
-				"poll_interval":                       "10000s",
+				"poll_interval":                       "10s",
 				"decoding.codec.csv.enabled":          true,
 				"decoding.codec.csv.comma":            " ",
 				"containers": []map[string]interface{}{
