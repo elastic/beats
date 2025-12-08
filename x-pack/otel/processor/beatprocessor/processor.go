@@ -116,7 +116,7 @@ func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Log
 	for _, resourceLogs := range logs.ResourceLogs().All() {
 		for _, scopeLogs := range resourceLogs.ScopeLogs().All() {
 			for _, logRecord := range scopeLogs.LogRecords().All() {
-				beatEvent, err := upackBeatEventFromOTelLogRecord(logRecord)
+				beatEvent, err := unpackBeatEventFromOTelLogRecord(logRecord)
 				if err != nil {
 					p.logger.Error("error converting OTel log to Beat event", zap.Error(err))
 					continue
@@ -142,7 +142,7 @@ func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Log
 	return logs, nil
 }
 
-func upackBeatEventFromOTelLogRecord(logRecord plog.LogRecord) (*beat.Event, error) {
+func unpackBeatEventFromOTelLogRecord(logRecord plog.LogRecord) (*beat.Event, error) {
 	beatEvent := &beat.Event{}
 	beatEvent.Timestamp = logRecord.Timestamp().AsTime()
 
