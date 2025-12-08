@@ -117,12 +117,12 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 	// get UDP transaction stream combining datagram packets in transaction
 	udpMsg := trans.udpMessageForDir(&header, dir)
 	if udpMsg == nil {
-		logp.Warn("dropping memcache(UDP) transaction with invalid fragment metadata")
+		debug("dropping memcache(UDP) transaction with invalid fragment metadata")
 		connection.killTransaction(trans)
 		return
 	}
 	if udpMsg.numDatagrams != header.numDatagrams {
-		logp.Warn("number of datagram mismatches in stream")
+		debug("number of datagram mismatches in stream")
 		connection.killTransaction(trans)
 		return
 	}
@@ -134,7 +134,7 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 		// parse memcached message
 		msg, err := parseUDP(&mc.config, pkt.Ts, payload)
 		if err != nil {
-			logp.Warn("failed to parse memcached(UDP) message: %s", err)
+			debug("failed to parse memcached(UDP) message: %s", err)
 			connection.killTransaction(trans)
 			return
 		}
@@ -142,7 +142,7 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 		// apply memcached to transaction
 		done, err = mc.onUDPMessage(trans, &pkt.Tuple, dir, msg)
 		if err != nil {
-			logp.Warn("error processing memcache message: %s", err)
+			debug("error processing memcache message: %s", err)
 			connection.killTransaction(trans)
 			done = true
 		}
@@ -151,7 +151,7 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 		trans.timer = time.AfterFunc(mc.udpConfig.transTimeout, func() {
 			debug("transaction timeout -> forward")
 			if err := mc.onUDPTrans(trans); err != nil {
-				logp.Warn("error processing timeout memcache transaction: %s", err)
+				debug("error processing timeout memcache transaction: %s", err)
 			}
 			mc.udpExpTrans.push(trans)
 		})
