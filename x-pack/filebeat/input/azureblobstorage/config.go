@@ -6,6 +6,7 @@ package azureblobstorage
 
 import (
 	"errors"
+	"reflect"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
@@ -39,11 +40,17 @@ type config struct {
 	StorageURL string `config:"storage_url"`
 	// Auth contains the authentication configuration for accessing the Azure Storage account.
 	Auth authConfig `config:"auth" validate:"required"`
+<<<<<<< HEAD
 	// BatchSize - Defines the maximum number of objects that will be fetched from the bucket in a single request.
 	BatchSize int `config:"batch_size"`
 	// MaxWorkers defines the maximum number of concurrent workers for processing blobs.
 	// It can be set globally or overridden at the container level.
 	MaxWorkers int `config:"max_workers" validate:"max=5000"`
+=======
+	// MaxWorkers defines the maximum number of concurrent workers for processing blobs.
+	// It can be set globally or overridden at the container level.
+	MaxWorkers *int `config:"max_workers" validate:"max=5000"`
+>>>>>>> f9a00bedd ([8.19](backport #44583) [filebeat][ABS] - Relax content-type restrictions along with some basic cleanup and refactor (#47964))
 	// Poll enables or disables polling for new blobs in the storage account.
 	// It can be set globally or overridden at the container level.
 	Poll *bool `config:"poll"`
@@ -63,16 +70,22 @@ type config struct {
 	// ExpandEventListFromField specifies a field from which to expand event lists.
 	// It can be set globally or overridden at the container level.
 	ExpandEventListFromField string `config:"expand_event_list_from_field"`
+<<<<<<< HEAD
 	// PathPrefix is the prefix for blob paths, useful for filtering blobs in a specific directory structure.
 	PathPrefix string `config:"path_prefix"`
+=======
+>>>>>>> f9a00bedd ([8.19](backport #44583) [filebeat][ABS] - Relax content-type restrictions along with some basic cleanup and refactor (#47964))
 }
 
 // container contains the config for each specific blob storage container in the root account.
 type container struct {
 	// Name is the name of the individual Azure blob storage container.
 	Name string `config:"name" validate:"required"`
+<<<<<<< HEAD
 	// BatchSize - Defines the maximum number of objects that will be fetched from the bucket in a single request.
 	BatchSize *int `config:"batch_size"`
+=======
+>>>>>>> f9a00bedd ([8.19](backport #44583) [filebeat][ABS] - Relax content-type restrictions along with some basic cleanup and refactor (#47964))
 	// MaxWorkers defines the maximum number of concurrent workers for processing blobs within this specific container.
 	// This value overrides the global MaxWorkers setting.
 	MaxWorkers *int `config:"max_workers" validate:"max=5000"`
@@ -94,8 +107,11 @@ type container struct {
 	// ExpandEventListFromField specifies a field from which to expand event lists for this specific container.
 	// This value overrides the global ExpandEventListFromField setting.
 	ExpandEventListFromField string `config:"expand_event_list_from_field"`
+<<<<<<< HEAD
 	// PathPrefix is the prefix for blob paths, useful for filtering blobs in a specific directory structure.
 	PathPrefix string `config:"path_prefix"`
+=======
+>>>>>>> f9a00bedd ([8.19](backport #44583) [filebeat][ABS] - Relax content-type restrictions along with some basic cleanup and refactor (#47964))
 }
 
 // fileSelectorConfig helps filter out Azure blobs based on a regex pattern.
@@ -110,7 +126,11 @@ type readerConfig struct {
 	// Parsers contains the configuration for different content parsers (e.g., JSON, XML, CSV).
 	Parsers parser.Config `config:",inline"`
 	// Decoding specifies options for decoding the content, such as compression.
+<<<<<<< HEAD
 	Decoding decoder.Config `config:"decoding"`
+=======
+	Decoding decoderConfig `config:"decoding"`
+>>>>>>> f9a00bedd ([8.19](backport #44583) [filebeat][ABS] - Relax content-type restrictions along with some basic cleanup and refactor (#47964))
 	// ContentType suggests the MIME type of the blob content, aiding in parsing.
 	ContentType string `config:"content_type"`
 	// Encoding specifies the character encoding of the blob content (e.g., "UTF-8", "gzip").
@@ -154,6 +174,57 @@ type OAuth2Config struct {
 	TenantID string `config:"tenant_id"`
 	// clientOptions is used internally for testing purposes only and should not be configured by users.
 	clientOptions azcore.ClientOptions
+}
+
+// isConfigEmpty checks if the provided configuration value is empty.
+// It uses reflection to determine if the value is empty based on its kind.
+func isConfigEmpty(value any) bool {
+	return isEmpty(reflect.ValueOf(value))
+}
+
+// isEmpty checks if a reflect.Value is empty.
+// It handles various types including pointers, slices, maps, structs, arrays, and basic types.
+// It returns true if the value is empty, false otherwise.
+func isEmpty(v reflect.Value) bool {
+	// Handles cases like reflect.ValueOf(nil) where nil is untyped,
+	// or an uninitialized interface variable.
+	if !v.IsValid() {
+		return true
+	}
+
+	switch v.Kind() {
+	case reflect.Ptr, reflect.Interface:
+		// v.IsNil() checks if the pointer or interface is nil.
+		// If it is nil, we consider it empty and return.
+		if v.IsNil() {
+			return true
+		}
+		return isEmpty(v.Elem())
+
+	case reflect.Slice, reflect.Map:
+		return v.IsNil() || v.Len() == 0
+
+	case reflect.Struct:
+		// Recursively check each field.
+		for i := 0; i < v.NumField(); i++ {
+			if !isEmpty(v.Field(i)) {
+				return false
+			}
+		}
+		return true
+
+	case reflect.Array:
+		for i := 0; i < v.Len(); i++ {
+			if !isEmpty(v.Index(i)) {
+				return false
+			}
+		}
+		return true
+
+	// 'default:' handles basic types like int, string, bool, float, complex etc.
+	default:
+		return v.IsZero()
+	}
 }
 
 func defaultConfig() config {

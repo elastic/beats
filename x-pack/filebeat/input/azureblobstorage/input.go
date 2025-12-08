@@ -109,6 +109,7 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		c.MaxWorkers = &maxWorkers
 	}
 
+<<<<<<< HEAD
 	if c.BatchSize == nil {
 		if cfg.BatchSize != 0 {
 			// If the global batch size is set, use it
@@ -121,6 +122,8 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		}
 	}
 
+=======
+>>>>>>> f9a00bedd ([8.19](backport #44583) [filebeat][ABS] - Relax content-type restrictions along with some basic cleanup and refactor (#47964))
 	if c.Poll == nil {
 		var poll bool
 		if cfg.Poll != nil {
@@ -148,6 +151,7 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	if len(c.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
 		c.FileSelectors = cfg.FileSelectors
 	}
+<<<<<<< HEAD
 	// If the container level ReaderConfig matches the default config ReaderConfig state,
 	// use the global ReaderConfig. Matching the default ReaderConfig state
 	// means that the container level ReaderConfig is not set, and we should use the
@@ -162,6 +166,15 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		c.PathPrefix = cfg.PathPrefix
 	}
 
+=======
+	// If the container level ReaderConfig is empty, use the root level ReaderConfig
+	// Partial definition of ReaderConfig at both the root and container level
+	// is not allowed, it's an either or scenario.
+	if isConfigEmpty(c.ReaderConfig) {
+		c.ReaderConfig = cfg.ReaderConfig
+	}
+
+>>>>>>> f9a00bedd ([8.19](backport #44583) [filebeat][ABS] - Relax content-type restrictions along with some basic cleanup and refactor (#47964))
 	return c
 }
 
