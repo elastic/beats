@@ -48,7 +48,7 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	}
 
 	if length < mongoHeaderSize {
-		logp.Err("Invalid MongoDB message length: %d", length)
+		debugf("Invalid MongoDB message length: %d", length)
 		return false, false
 	}
 
@@ -149,13 +149,13 @@ func opReplyParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	}
 
 	if numberReturned < 0 {
-		logp.Err("OP_REPLY has invalid negative numberReturned: %d", numberReturned)
+		debugf("OP_REPLY has invalid negative numberReturned: %d", numberReturned)
 		return false, false
 	}
 	remainingBytes := len(d.in) - d.i
 	maxPossibleDocs := remainingBytes / minBSONDocSize
 	if int(numberReturned) > maxPossibleDocs {
-		logp.Err("OP_REPLY numberReturned (%d) exceeds maximum possible documents (%d) in remaining %d bytes",
+		debugf("OP_REPLY numberReturned (%d) exceeds maximum possible documents (%d) in remaining %d bytes",
 			numberReturned, maxPossibleDocs, remainingBytes)
 		return false, false
 	}
@@ -434,12 +434,12 @@ func opMsgParse(d *decoder, m *mongodbMessage) (bool, bool) {
 		}
 
 		if size < 0 {
-			logp.Err("OP_MSG has invalid negative document sequence size: %d", size)
+			debugf("OP_MSG has invalid negative document sequence size: %d", size)
 			return false, false
 		}
 		end := start + int(size)
 		if end < start || end > len(d.in) {
-			logp.Err("OP_MSG document sequence size %d exceeds buffer bounds", size)
+			debugf("OP_MSG document sequence size %d exceeds buffer bounds", size)
 			return false, false
 		}
 
