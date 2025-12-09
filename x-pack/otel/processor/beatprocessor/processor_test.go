@@ -11,7 +11,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -67,19 +66,19 @@ func TestConsumeLogs(t *testing.T) {
 	}
 }
 
-func testLogger(t *testing.T) *logp.Logger {
-	return logptest.NewTestingLogger(t, t.Name())
+func testLogger() *logp.Logger {
+	return logp.NewNopLogger()
 }
 
 func TestCreateProcessor(t *testing.T) {
 	t.Run("nil config returns nil processor", func(t *testing.T) {
-		processor, err := createProcessor(nil, testLogger(t))
+		processor, err := createProcessor(nil, testLogger())
 		require.NoError(t, err)
 		assert.Nil(t, processor)
 	})
 
 	t.Run("empty config returns nil processor", func(t *testing.T) {
-		processor, err := createProcessor(map[string]any{}, testLogger(t))
+		processor, err := createProcessor(map[string]any{}, testLogger())
 		require.NoError(t, err)
 		assert.Nil(t, processor)
 	})
@@ -88,7 +87,7 @@ func TestCreateProcessor(t *testing.T) {
 		_, err := createProcessor(map[string]any{
 			"add_host_metadata": map[string]any{},
 			"another_key":       map[string]any{},
-		}, testLogger(t))
+		}, testLogger())
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "expected single processor name")
 	})
@@ -96,7 +95,7 @@ func TestCreateProcessor(t *testing.T) {
 	t.Run("unknown processor returns error", func(t *testing.T) {
 		_, err := createProcessor(map[string]any{
 			"unknown_processor": map[string]any{},
-		}, testLogger(t))
+		}, testLogger())
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "invalid processor name 'unknown_processor'")
 	})
@@ -104,7 +103,7 @@ func TestCreateProcessor(t *testing.T) {
 	t.Run("valid add_host_metadata processor config returns processor", func(t *testing.T) {
 		processor, err := createProcessor(map[string]any{
 			"add_host_metadata": map[string]any{},
-		}, testLogger(t))
+		}, testLogger())
 		require.NoError(t, err)
 		require.NotNil(t, processor)
 		assert.Equal(t, "add_host_metadata", processor.String()[:len("add_host_metadata")])
@@ -113,7 +112,7 @@ func TestCreateProcessor(t *testing.T) {
 	t.Run("valid add_kubernetes_metadata processor config returns processor", func(t *testing.T) {
 		processor, err := createProcessor(map[string]any{
 			"add_kubernetes_metadata": map[string]any{},
-		}, testLogger(t))
+		}, testLogger())
 		require.NoError(t, err)
 		require.NotNil(t, processor)
 		assert.Equal(t, "add_kubernetes_metadata", processor.String()[:len("add_kubernetes_metadata")])
