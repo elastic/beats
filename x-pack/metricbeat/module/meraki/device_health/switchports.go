@@ -89,7 +89,9 @@ func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map
 				}
 			}
 
-			devices[Serial(device.Serial)].switchports = filteredSwitchports
+			if d, ok := devices[Serial(device.Serial)]; ok && d != nil {
+				d.switchports = filteredSwitchports
+			}
 		}
 
 		return nil
