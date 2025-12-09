@@ -17,7 +17,7 @@
 
 // This file was contributed to by generative AI
 
-//go:build linux
+//go:build linux && integration
 
 package journalctl
 
