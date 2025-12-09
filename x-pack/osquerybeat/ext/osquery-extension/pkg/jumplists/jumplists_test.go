@@ -8,25 +8,11 @@ package jumplists
 
 import (
 	"os"
-	"path/filepath"
 	"testing"
 	"github.com/stretchr/testify/assert"
 
-	// "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
-
-func GetAllFilesInDirectory(dir string, t *testing.T) []string {
-	dir, err := filepath.Abs(dir)
-	if err != nil {
-		t.Fatalf("GetAllFilesInDirectory() returned error: %v", err)
-	}
-	files, err := filepath.Glob(filepath.Join(dir, "*"))
-	if err != nil {
-		t.Fatalf("GetAllFilesInDirectory() returned error: %v", err)
-	}
-	return files
-}
 
 func TestCustomJumplists(t *testing.T) {
 
@@ -38,30 +24,29 @@ func TestCustomJumplists(t *testing.T) {
 	}
 
 	tests := []testCase{
-		// {
-		// 	name:         "test_custom_jumplist_1",
-		// 	filePath:     "./testdata/custom/7e4dca80246863e3.customDestinations-ms",
-		// 	expectError:  true,
-		// 	expectedRows: 1,
-		// },
-		// {
-		// 	name:         "test_custom_jumplist_2",
-		// 	filePath:     "./testdata/custom/590aee7bdd69b59b.customDestinations-ms",
-		// 	expectError:  false,
-		// 	expectedRows: 3,
-		// },
-		// {
-		// 	name:         "test_custom_jumplist_3",
-		// 	filePath:     "./testdata/custom/ccba5a5986c77e43.customDestinations-ms",
-		// 	expectError:  false,
-		// 	expectedRows: 2,
-		// },
-		// {
-		// 	name:         "test_custom_jumplist_4",
-		// 	filePath:     "./testdata/custom/f4ed0c515fdbcbc.customDestinations-ms",
-		// 	expectError:  false,
-		// 	expectedRows: 3,
-		// },
+		{
+			name:         "test_custom_jumplist_1",
+			filePath:     "./testdata/custom/7e4dca80246863e3.customDestinations-ms",
+			expectError:  true,
+		},
+		{
+			name:         "test_custom_jumplist_2",
+			filePath:     "./testdata/custom/590aee7bdd69b59b.customDestinations-ms",
+			expectError:  false,
+			expectedRows: 3,
+		},
+		{
+			name:         "test_custom_jumplist_3",
+			filePath:     "./testdata/custom/ccba5a5986c77e43.customDestinations-ms",
+			expectError:  false,
+			expectedRows: 2,
+		},
+		{
+			name:         "test_custom_jumplist_4",
+			filePath:     "./testdata/custom/f4ed0c515fdbcbc.customDestinations-ms",
+			expectError:  false,
+			expectedRows: 3,
+		},
 		{
 			name:         "test_custom_jumplist_5",
 			filePath:     "./testdata/custom/ff99ba2fb2e34b73.customDestinations-ms",
@@ -87,7 +72,7 @@ func TestCustomJumplists(t *testing.T) {
 	}
 }
 
-func TestLnkFromPath(t *testing.T) {
+func TestLnk(t *testing.T) {
 	type args struct {
 		filePath string
 	}
@@ -126,7 +111,9 @@ func TestLnkFromPath(t *testing.T) {
 	log := logger.New(os.Stdout, true)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewLnkFromPath(tt.args.filePath, log)
+			bytes, err := os.ReadFile(tt.args.filePath)
+			assert.NoError(t, err, "expected no error when reading LNK file")
+			got, err := NewLnkFromBytes(bytes, log)
 			if tt.wantErr {
 				assert.Error(t, err, "expected error when parsing LNK file")
 				assert.Nil(t, got, "expected nil LNK when parsing LNK file")

@@ -863,6 +863,8 @@ github.com/oxtoacart/bpool v0.0.0-20150712133111-4e1c5567d7c2 h1:CXwSGu/LYmbjEab
 github.com/oxtoacart/bpool v0.0.0-20150712133111-4e1c5567d7c2/go.mod h1:L3UMQOThbttwfYRNFOWLLVXMhk5Lkio4GGOtw5UrxS0=
 github.com/parsiya/golnk v0.0.0-20221103095132-740a4c27c4ff h1:japdIZgV4tJIgn7NqUD7mAkLiPRsPK5LXVgjNwFtDA4=
 github.com/parsiya/golnk v0.0.0-20221103095132-740a4c27c4ff/go.mod h1:A24WXUol4NXZlK8grjh/CsZnPlimfwaQFt5PQsqS27s=
+github.com/parsiya/golnk v0.0.0-20251207220015-443df11fe4fb h1:z93DSibWqAmA9jfBwC3I8xGmohbRmVou2FKtJd4q/1Q=
+github.com/parsiya/golnk v0.0.0-20251207220015-443df11fe4fb/go.mod h1:A24WXUol4NXZlK8grjh/CsZnPlimfwaQFt5PQsqS27s=
 github.com/pelletier/go-toml v1.9.5 h1:4yBQzkHv+7BHq2PQUZF3Mx0IYxG7LsP222s7Agd3ve8=
 github.com/pelletier/go-toml v1.9.5/go.mod h1:u1nR/EPcESfeI/szUZKdtJ0xRNbUoANCkoOuaOx1Y+c=
 github.com/pierrec/lz4/v4 v4.1.22 h1:cKFw6uJDK+/gfw5BcDL0JL5aBsAFdsIT18eRtLj7VIU=

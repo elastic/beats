@@ -236,7 +236,7 @@ require (
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/forensicanalysis/fslib v0.15.2
 	github.com/mattn/go-sqlite3 v1.14.32
-	github.com/parsiya/golnk v0.0.0-20221103095132-740a4c27c4ff
+	github.com/parsiya/golnk v0.0.0-20251207220015-443df11fe4fb
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
 	go.opentelemetry.io/collector/client v1.45.0
 	go.opentelemetry.io/collector/component/componenttest v0.139.0
