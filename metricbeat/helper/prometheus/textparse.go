@@ -506,35 +506,23 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		metricTypes = make(map[string]model.MetricType)
 	)
 
-	safeExemplar := func(e *exemplar.Exemplar) bool {
-		var hasExemplar bool
-		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					if logger != nil {
-						logger.Debugf("Recovered from panic while parsing exemplar: %v", r)
-					}
-				}
-			}()
-			hasExemplar = parser.Exemplar(e)
+	safeExemplar := func(e *exemplar.Exemplar) (ok bool) {
+		defer func() {
+			if r := recover(); r != nil && logger != nil {
+				logger.Debugf("Recovered from panic while parsing exemplar: %v", r)
+			}
 		}()
-		return hasExemplar
+		return parser.Exemplar(e)
 	}
 
-	safeLabels := func(lset *labels.Labels) bool {
-		var labelsRecovered bool
-		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					labelsRecovered = true
-					if logger != nil {
-						logger.Debugf("Recovered from panic while parsing labels: %v", r)
-					}
-				}
-			}()
-			parser.Labels(lset)
+	safeLabels := func(lset *labels.Labels) (ok bool) {
+		defer func() {
+			if r := recover(); r != nil && logger != nil {
+				logger.Debugf("Recovered from panic while parsing labels: %v", r)
+			}
 		}()
-		return !labelsRecovered
+		parser.Labels(lset)
+		return true
 	}
 
 	for {
