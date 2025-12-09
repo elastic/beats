@@ -337,7 +337,7 @@ func Test_formatTimeWithTagFormat(t *testing.T) {
 			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
 			flag:       0,
 			tag:        tagPtr(`format:"kitchen"`),
-			want:       "Jun 15 14:30:00",
+			want:       "2:30PM",
 			wantErr:    false,
 		},
 		{
@@ -405,6 +405,14 @@ func Test_formatTimeWithTagFormat(t *testing.T) {
 			wantErr:    false,
 		},
 		{
+			name:       "Zero unix timestamp with UseNumbersZeroValues flag",
+			fieldValue: reflect.ValueOf(time.Time{}),
+			flag:       EncodingFlagUseNumbersZeroValues,
+			tag:        tagPtr(`format:"unix"`),
+			want:       "0",
+			wantErr:    false,
+		},
+		{
 			name:       "With timezone Asia/Tokyo",
 			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
 			flag:       0,
@@ -468,6 +476,63 @@ func Test_formatTimeWithTagFormat(t *testing.T) {
 			// TODO: update the condition below to compare got with tt.want.
 			if got != tt.want {
 				t.Errorf("Name: %s, formatTimeWithTagFormat() = %v, want %v", tt.name, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMarshalToMapWithFlags_embeddedStruct(t *testing.T) {
+	type EmbeddedStruct struct {
+		EmbeddedField string `osquery:"embedded_field"`
+	}
+
+	type TestStruct struct {
+		EmbeddedStruct
+		TestField string `osquery:"test_field"`
+	}
+
+	type TestStructWithPointer struct {
+		*EmbeddedStruct
+		TestField string `osquery:"test_field"`
+	}
+
+	cases := []struct {
+		name     string
+		input    any
+		expected map[string]string
+	}{
+		{
+			name: "embedded struct",
+			input: &TestStruct{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedField: "embedded_value"},
+				TestField:      "test_value",
+			},
+			expected: map[string]string{
+				"embedded_field": "embedded_value",
+				"test_field":     "test_value",
+			},
+		},
+		{
+			name: "embedded struct with pointer",
+			input: &TestStructWithPointer{
+				EmbeddedStruct: &EmbeddedStruct{EmbeddedField: "embedded_value"},
+				TestField:      "test_value",
+			},
+			expected: map[string]string{
+				"embedded_field": "embedded_value",
+				"test_field":     "test_value",
+			},
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := MarshalToMapWithFlags(tt.input, 0)
+			if err != nil {
+				t.Errorf("MarshalToMapWithFlags() error = %v", err)
+			}
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("%s: MarshalToMapWithFlags() = %v, want %v", tt.name, result, tt.expected)
 			}
 		})
 	}
@@ -748,6 +813,32 @@ func TestGenerateColumnDefinitions_unexportedFields(t *testing.T) {
 	expected := []table.ColumnDefinition{
 		table.TextColumn("public"),
 		table.IntegerColumn("exported2"),
+	}
+	cols, err := GenerateColumnDefinitions(testStruct{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(cols) != len(expected) {
+		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
+	}
+	for i := range cols {
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		}
+	}
+}
+
+func TestGenerateColumnDefinitions_embeddedStruct(t *testing.T) {
+	type EmbeddedStruct struct {
+		EmbeddedField string `osquery:"embedded_field"`
+	}
+	type testStruct struct {
+		EmbeddedStruct
+		TestField string `osquery:"test_field"`
+	}
+	expected := []table.ColumnDefinition{
+		table.TextColumn("embedded_field"),
+		table.TextColumn("test_field"),
 	}
 	cols, err := GenerateColumnDefinitions(testStruct{})
 	if err != nil {

@@ -139,19 +139,65 @@ Tables corresponding to keys in the amcache.hve.  Amcache.hve is a registry hive
 | driver\_is\_kernel\_mode | TEXT | Whether the driver is a kernel-mode driver. |
 | driver\_id | TEXT | Device driver ID. |
 
+### elastic_amcache_applications_view
+
+This view provides access to the executed applications history stored in the Amcache hive. It offers a detailed look at application execution, including paths, hashes, and package details.
+
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `timestamp` | `BIGINT` | The timestamp of the event or entry. |
+| `date\_time` | `TEXT` | The formatted date and time of the entry. |
+| `program\_id` | `TEXT` | Unique identifier for the program. |
+| `file\_id` | `TEXT` | Unique identifier for the file. |
+| `lower\_case\_long\_path` | `TEXT` | The full path to the executable file in lowercase. |
+| `name` | `TEXT` | The name of the application. |
+| `original\_file\_name` | `TEXT` | The original filename of the executable. |
+| `publisher` | `TEXT` | The publisher of the application. |
+| `version` | `TEXT` | The version of the application. |
+| `bin\_file\_version` | `TEXT` | The binary file version. |
+| `binary\_type` | `TEXT` | The type of the binary (e.g., architecture). |
+| `product\_name` | `TEXT` | The product name associated with the file. |
+| `product\_version` | `TEXT` | The product version. |
+| `link\_date` | `TEXT` | The date the binary was linked. |
+| `bin\_product\_version` | `TEXT` | The binary product version. |
+| `size` | `BIGINT` | The size of the file in bytes. |
+| `language` | `TEXT` | The language code of the file. |
+| `usn` | `BIGINT` | The Update Sequence Number (USN) in the MFT. |
+| `appx\_package\_full\_name` | `TEXT` | The full name of the AppX package, if applicable. |
+| `is\_os\_component` | `TEXT` | Indicates if the file is a Windows OS component. |
+| `appx\_package\_relative\_id` | `TEXT` | The relative ID of the AppX package. |
+| `file\_sha1` | `TEXT` | The SHA1 hash of the file. |
+| `program\_instance\_id` | `TEXT` | The instance ID of the program. |
+| `install\_date` | `TEXT` | The date the application was installed. |
+| `source` | `TEXT` | The source of the Amcache entry. |
+| `root\_dir\_path` | `TEXT` | The root directory path of the application. |
+| `hidden\_arp` | `BIGINT` | Indicates if the application is hidden from Add/Remove Programs (1 for hidden, 0 for visible). |
+| `uninstall\_string` | `TEXT` | The command string used to uninstall the application. |
+| `registry\_key\_path` | `TEXT` | The registry key path associated with the entry. |
+| `store\_app\_type` | `TEXT` | The type of Store application. |
+| `inbox\_modern\_app` | `TEXT` | Indicates if it is an inbox modern app. |
+| `manifest\_path` | `TEXT` | The path to the application manifest. |
+| `package\_full\_name` | `TEXT` | The full name of the package. |
+| `msi\_package\_code` | `TEXT` | The MSI package code. |
+| `msi\_product\_code` | `TEXT` | The MSI product code. |
+| `msi\_install\_date` | `TEXT` | The date the MSI package was installed. |
+| `bundle\_manifest\_path` | `TEXT` | The path to the bundle manifest. |
+| `user\_sid` | `TEXT` | The Security Identifier (SID) of the user associated with the execution. |
+| `app\_sha1` | `TEXT` | The SHA1 hash of the application. |
+
 ## Examples
 
 ### Find Recently Executed Programs
 ```sql
 SELECT
-  DATETIME(last_write_time, 'unixepoch') AS last_run_time,
+  DATETIME(timestamp, 'unixepoch') AS last_run_time,
   name,
   lower_case_long_path,
   publisher,
   product_name,
   size
 FROM elastic_amcache_application_file
-ORDER BY last_write_time DESC
+ORDER BY timestamp DESC
 LIMIT 100;
 ```
 
@@ -164,7 +210,7 @@ SELECT
   name,
   lower_case_long_path,
   publisher,
-  DATETIME(last_write_time, 'unixepoch') AS last_run_time
+  DATETIME(timestamp, 'unixepoch') AS last_run_time
 FROM elastic_amcache_application_file
 WHERE
   name IN (
@@ -190,7 +236,7 @@ SELECT
   name,
   lower_case_long_path,
   size,
-  DATETIME(last_write_time, 'unixepoch') AS last_run_time
+  DATETIME(timestamp, 'unixepoch') AS last_run_time
 FROM elastic_amcache_application_file
 WHERE
   (publisher IS NULL OR publisher = '')
@@ -203,7 +249,7 @@ WHERE
     OR lower_case_long_path LIKE 'c:\perflogs\%'
     OR lower_case_long_path LIKE 'c:\windows\temp\%'
   )
-ORDER BY last_write_time DESC;
+ORDER BY timestamp DESC;
 ```
 
 ### Hunt for Known Hacking/Reconnaissance Tool Names
@@ -216,7 +262,7 @@ SELECT
   original_file_name,
   lower_case_long_path,
   publisher,
-  DATETIME(last_write_time, 'unixepoch') AS last_run_time
+  DATETIME(timestamp, 'unixepoch') AS last_run_time
 FROM elastic_amcache_application_file
 WHERE
   name IN (
@@ -245,7 +291,7 @@ SELECT
   app.install_date,
   file.name AS file_name,
   file.lower_case_long_path,
-  DATETIME(file.last_write_time, 'unixepoch') AS file_last_run
+  DATETIME(file.timestamp, 'unixepoch') AS file_last_run
 FROM elastic_amcache_application AS app
 JOIN elastic_amcache_application_file AS file
 ON app.program_id = file.program_id
@@ -258,13 +304,36 @@ Similar to the "Add/Remove Programs" list, this helps you find recently installe
 
 ```sql
 SELECT
-  DATETIME(last_write_time, 'unixepoch') AS last_updated,
+  DATETIME(timestamp, 'unixepoch') AS last_updated,
   install_date,
   name,
   publisher,
   version,
   uninstall_string
 FROM elastic_amcache_application
-ORDER BY last_write_time DESC
+ORDER BY timestamp DESC
 LIMIT 50;
+```
+
+### Select the top 5 most recently recorded applications:
+
+```sql
+SELECT
+  date_time,
+  name,
+  version,
+  lower_case_long_path
+FROM elastic_amcache_applications_view
+ORDER BY timestamp DESC
+LIMIT 5;```
+
+### Identify potentially hidden applications (Hidden from ARP)
+
+```sql
+SELECT
+  name,
+  lower_case_long_path,
+  uninstall_string
+FROM elastic_amcache_applications_view
+WHERE hidden_arp = 1;
 ```
