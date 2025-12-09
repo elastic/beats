@@ -39,10 +39,10 @@ func (in *cometdInput) Run() {
 	in.workerOnce.Do(func() {
 		in.workerWg.Add(1)
 		go func() {
-			in.log.Info("Input worker has started.")
-			defer in.log.Info("Input worker has stopped.")
 			defer in.workerWg.Done()
 			defer in.workerCancel()
+			in.log.Info("Input worker has started.")
+			defer in.log.Info("Input worker has stopped.")
 			in.b = bay.Bayeux{}
 
 			rt := rate.NewLimiter(rate.Every(retryInterval), 1)
