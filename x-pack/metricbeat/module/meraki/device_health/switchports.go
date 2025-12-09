@@ -7,6 +7,8 @@ package device_health
 import (
 	"errors"
 	"fmt"
+	"slices"
+	"strings"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -24,7 +26,7 @@ type switchport struct {
 	portStatus *sdk.ResponseItemSwitchGetDeviceSwitchPortsStatuses
 }
 
-func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map[Serial]*Device, period time.Duration, logger *logp.Logger) error {
+func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map[Serial]*Device, period time.Duration, switchportStatuses []string, logger *logp.Logger) error {
 	params := &sdk.GetOrganizationSwitchPortsBySwitchQueryParams{}
 	setStart := func(s string) { params.StartingAfter = s }
 
@@ -44,7 +46,6 @@ func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map
 		if switches == nil {
 			return errors.New("GetOrganizationSwitchPortsBySwitch returned nil")
 		}
-
 		for _, device := range *switches {
 			if device.Ports == nil {
 				continue
@@ -76,7 +77,19 @@ func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map
 				}
 			}
 
-			devices[Serial(device.Serial)].switchports = switchports
+			// filter switchports by configured statuses
+			var filteredSwitchports []*switchport
+			for _, sp := range switchports {
+				if sp.portStatus == nil {
+					continue
+				}
+				portStatus := strings.ToLower(sp.portStatus.Status)
+				if slices.Contains(switchportStatuses, portStatus) {
+					filteredSwitchports = append(filteredSwitchports, sp)
+				}
+			}
+
+			devices[Serial(device.Serial)].switchports = filteredSwitchports
 		}
 
 		return nil

@@ -16,6 +16,7 @@ func TestDefaultConfig(t *testing.T) {
 	assert.Equal(t, "https://api.meraki.com", cfg.BaseURL)
 	assert.Equal(t, "false", cfg.DebugMode)
 	assert.Equal(t, time.Second*300, cfg.Period)
+	assert.Equal(t, []string{"connected"}, cfg.SwitchportStatuses)
 }
 
 func TestConfigValidate(t *testing.T) {
