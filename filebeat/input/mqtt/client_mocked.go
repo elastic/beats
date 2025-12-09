@@ -35,7 +35,6 @@ type mockedMessage struct {
 	retained  bool
 	topic     string
 	payload   []byte
-	ack       func()
 }
 
 var _ libmqtt.Message = new(mockedMessage)
