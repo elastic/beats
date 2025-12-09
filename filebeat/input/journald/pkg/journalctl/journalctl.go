@@ -152,7 +152,7 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 		logger.Infof("Journalctl command: journalctl %s", strings.Join(args, " "))
 
 		if err := cmd.Start(); err != nil {
-			return &journalctl{}, fmt.Errorf("cannot start journalctl: %w", err)
+			return &journalctl{}, fmt.Errorf("cannot start journalctl: %w. Chroot: %s", err, chroot)
 		}
 
 		logger.Infof("journalctl started with PID %d", cmd.Process.Pid)

@@ -68,7 +68,7 @@ func TestNewFactoryChroot(t *testing.T) {
 	// Create container configuration
 	containerConfig := &container.Config{
 		Image:       imageName,
-		Cmd:         []string{"go", "test", "-v", "-count=1", "-run=TestInDockerNewFactory"},
+		Cmd:         []string{"go", "test", "-v", "-count=1", "-tags=integration", "-run=TestInDockerNewFactory"},
 		Tty:         true,
 		AttachStdin: false,
 		WorkingDir:  "/workspace/filebeat/input/journald/pkg/journalctl",
@@ -93,7 +93,7 @@ func TestNewFactoryChroot(t *testing.T) {
 				Target: "/workspace",
 			},
 		},
-		Privileged: true, // Required for chroot
+		CapAdd:     []string{"CAP_SYS_CHROOT"}, // Required for chroot
 		AutoRemove: true,
 	}
 
