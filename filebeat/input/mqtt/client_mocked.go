@@ -105,6 +105,12 @@ func (m *mockedToken) Error() error {
 	return nil
 }
 
+func (m *mockedToken) Done() <-chan struct{} {
+	ch := make(chan struct{})
+	close(ch)
+	return ch
+}
+
 type mockedClient struct {
 	connectCount           int
 	disconnectCount        int
