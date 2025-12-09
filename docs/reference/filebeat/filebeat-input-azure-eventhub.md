@@ -8,7 +8,6 @@ applies_to:
 
 # Azure eventhub input [filebeat-input-azure-eventhub]
 
-
 Users can make use of the `azure-eventhub` input in order to read messages from an azure eventhub. The azure-eventhub input implementation is based on the the event processor host (EPH is intended to be run across multiple processes and machines while load balancing message consumers more on this here [https://github.com/Azure/azure-event-hubs-go#event-processor-host](https://github.com/Azure/azure-event-hubs-go#event-processor-host), [https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host)). State such as leases on partitions and checkpoints in the event stream are shared between receivers using an Azure Storage container. For this reason, as a prerequisite to using this input, users will have to create or use an existing storage account.
 
 Users can enable internal logs tracing for this input by setting the environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true`. When enabled, this input will log additional information to the logs. Additional information includes partition ownership, blob lease information, and other internal state.
@@ -45,34 +44,18 @@ filebeat.inputs:
   processor_version: "v2"
 ```
 
-
-## Configuration options [_configuration_options]
-
-The `azure-eventhub` input supports the following configuration:
-
-
-## `eventhub` [_eventhub]
-
-The name of the eventhub users would like to read from, field required.
-
-
-## `consumer_group` [_consumer_group]
-
-Optional, we recommend using a dedicated consumer group for the azure input. Reusing consumer groups among non-related consumers can cause unexpected behavior and possibly lost events.
-
-
 ## Authentication [_authentication]
 
-The azure-eventhub input supports multiple authentication methods. The `auth_type` configuration option controls the authentication method used for both Event Hub and Storage Account.
+The azure-eventhub input supports multiple authentication methods. The [`auth_type` configuration option](#_auth_type) controls the authentication method used for both Event Hub and Storage Account.
 
-### Authentication Types
+### Authentication types
 
 The following authentication types are supported:
 
-- **`connection_string`** (default if `auth_type` is not specified): Uses Azure Event Hubs and Storage Account connection strings
-- **`client_secret`**: Uses Azure Active Directory service principal with client secret credentials
+- **`connection_string`** (default if `auth_type` is not specified): Uses Azure Event Hubs and Storage Account connection strings.
+- {applies_to}`stack: ga 9.3.0` **`client_secret`**: Uses Azure Active Directory service principal with client secret credentials.
 
-### Required Permissions
+### Required permissions
 
 When using `client_secret` authentication, the service principal needs the following Azure RBAC permissions:
 
@@ -98,15 +81,21 @@ For detailed instructions on how to set up an Azure AD service principal and con
 - [Azure Event Hubs authentication and authorization](https://learn.microsoft.com/en-us/azure/event-hubs/authorize-access-azure-active-directory)
 - [Authorize access to blobs using Azure Active Directory](https://learn.microsoft.com/en-us/azure/storage/blobs/authorize-access-azure-active-directory)
 
-## `connection_string` [_connection_string]
+## Configuration options [_configuration_options]
 
-The connection string required to communicate with Event Hubs when using `connection_string` authentication, steps here [https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string).
+The `azure-eventhub` input supports the following configuration options:
 
-Required when `auth_type` is set to `connection_string` or when `auth_type` is not specified (defaults to `connection_string` for backwards compatibility).
 
-A Blob Storage account is required in order to store/retrieve/update the offset or state of the eventhub messages. This means that after stopping filebeat it can start back up at the spot that it stopped processing messages.
+### `eventhub` [_eventhub]
 
-## `auth_type` [_auth_type]
+The name of the eventhub users would like to read from, field required.
+
+
+### `consumer_group` [_consumer_group]
+
+Optional, we recommend using a dedicated consumer group for the azure input. Reusing consumer groups among non-related consumers can cause unexpected behavior and possibly lost events.
+
+### `auth_type` [_auth_type]
 
 ```{applies_to}
 stack: ga 9.3.0
@@ -114,11 +103,23 @@ stack: ga 9.3.0
 
 Specifies the authentication method to use for both Event Hub and Storage Account. If not specified, defaults to `connection_string` for backwards compatibility.
 
-Valid values:
-- `connection_string`: Uses connection string authentication (default)
-- `client_secret`: Uses Azure Active Directory service principal with client secret credentials
+Valid values include:
+- `connection_string` (default): Uses connection string authentication. You _must_ provide a [`connection_string`](#_connection_string).
+- `client_secret`: Uses Azure Active Directory service principal with client secret credentials.
 
-## `eventhub_namespace` [_eventhub_namespace]
+### `connection_string` [_connection_string]
+
+The connection string required to communicate with Event Hubs when using `connection_string` authentication. For more information, refer to [Get an Azure Event Hubs connection string](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string).
+
+This option is required if:
+
+* `auth_type` is set to `connection_string`
+* `auth_type` is not specified (in which case it defaults to `connection_string` for backwards compatibility)
+
+A Blob Storage account is required to store, retrieve, or update the offset or state of the Event Hub messages. This means that after stopping Filebeat it can resume from where it stopped processing messages.
+
+
+### `eventhub_namespace` [_eventhub_namespace]
 
 ```{applies_to}
 stack: ga 9.3.0
@@ -126,7 +127,7 @@ stack: ga 9.3.0
 
 The fully qualified namespace for the Event Hub. Required when using `client_secret` authentication (`auth_type` is set to `client_secret`). Format: `your-eventhub-namespace.servicebus.windows.net`
 
-## `tenant_id` [_tenant_id]
+### `tenant_id` [_tenant_id]
 
 ```{applies_to}
 stack: ga 9.3.0
@@ -134,7 +135,7 @@ stack: ga 9.3.0
 
 The Azure Active Directory tenant ID. Required when using `client_secret` authentication for Event Hub or Storage Account.
 
-## `client_id` [_client_id]
+### `client_id` [_client_id]
 
 ```{applies_to}
 stack: ga 9.3.0
@@ -142,7 +143,7 @@ stack: ga 9.3.0
 
 The Azure Active Directory application (client) ID. Required when using `client_secret` authentication for Event Hub or Storage Account.
 
-## `client_secret` [_client_secret]
+### `client_secret` [_client_secret]
 
 ```{applies_to}
 stack: ga 9.3.0
@@ -150,7 +151,7 @@ stack: ga 9.3.0
 
 The Azure Active Directory application client secret. Required when using `client_secret` authentication for Event Hub or Storage Account.
 
-## `authority_host` [_authority_host]
+### `authority_host` [_authority_host]
 
 ```{applies_to}
 stack: ga 9.3.0
@@ -164,22 +165,22 @@ Supported values:
 - `https://login.chinacloudapi.cn` (Azure China)
 
 
-## `storage_account` [_storage_account]
+### `storage_account` [_storage_account]
 
 The name of the storage account. Required.
 
 
-## `storage_account_key` [_storage_account_key]
+### `storage_account_key` [_storage_account_key]
 
 The storage account key, this key will be used to authorize access to data in your storage account, option is required.
 
 
-## `storage_account_container` [_storage_account_container]
+### `storage_account_container` [_storage_account_container]
 
 Optional, the name of the storage account container you would like to store the offset information in.
 
 
-## `resource_manager_endpoint` [_resource_manager_endpoint]
+### `resource_manager_endpoint` [_resource_manager_endpoint]
 
 Optional, by default we are using the azure public environment, to override, users can provide a specific resource manager endpoint in order to use a different azure environment. Ex: [https://management.chinacloudapi.cn/](https://management.chinacloudapi.cn/) for azure ChinaCloud [https://management.microsoftazure.de/](https://management.microsoftazure.de/) for azure GermanCloud [https://management.azure.com/](https://management.azure.com/) for azure PublicCloud [https://management.usgovcloudapi.net/](https://management.usgovcloudapi.net/) for azure USGovernmentCloud Users can also use this in case of a Hybrid Cloud model, where one may define their own endpoints.
 
@@ -198,5 +199,3 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `sent_events_total` | Number of events that were sent successfully. |
 | `processing_time` | Histogram of the elapsed processing times in nanoseconds. |
 | `decode_errors_total` | Number of errors that occurred while decoding a message. |
-
-
