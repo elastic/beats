@@ -27,8 +27,7 @@ var LnkSignature = []byte{0x4c, 0x00, 0x00, 0x00}
 var MinLnkSize = 76
 
 type Lnk struct {
-	EntryNumber          int       `osquery:"entry_number"`
-	TargetPath           string    `osquery:"target_path"`
+	TargetPath           string    `osquery:"local_base_path"`
 	IconLocation         string    `osquery:"icon_location"`
 	CommandLineArguments string    `osquery:"command_line_arguments"`
 	TargetModifiedTime   time.Time `osquery:"target_modified_time" format:"unix"`
@@ -47,7 +46,7 @@ func NewLnkFromPath(filePath string, log *logger.Logger) (*Lnk, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read LNK file: %w", err)
 	}
-	return NewLnkFromBytes(bytes, 0, log)
+	return NewLnkFromBytes(bytes, log)
 }
 
 func toTime(t []byte) time.Time {
@@ -103,7 +102,7 @@ func IsLnkSignature(data []byte) bool {
 	return bytes.Equal(data[:len(LnkSignature)], LnkSignature)
 }
 
-func NewLnkFromBytes(data []byte, entryNumber int, log *logger.Logger) (*Lnk, error) {
+func NewLnkFromBytes(data []byte, log *logger.Logger) (*Lnk, error) {
 	if len(data) < len(LnkSignature) {
 		return nil, fmt.Errorf("data is too short to contain a LNK signature")
 	}
@@ -143,7 +142,6 @@ func NewLnkFromBytes(data []byte, entryNumber int, log *logger.Logger) (*Lnk, er
 	}
 
 	lnk := &Lnk{
-		EntryNumber:          entryNumber,
 		TargetPath:           lnkFile.LinkInfo.LocalBasePath,
 		IconLocation:         lnkFile.StringData.IconLocation,
 		TargetModifiedTime:   modificationTime,

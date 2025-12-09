@@ -106,7 +106,7 @@ func ParseAutomaticJumpListFile(filePath string, log *logger.Logger) (*JumpList,
 		}
 
 		// Parse the LNK stream into a Lnk object.
-		lnk, err := NewLnkFromBytes(streamBuffer, 0, log)
+		lnk, err := NewLnkFromBytes(streamBuffer, log)
 		if err != nil {
 			log.Infof("failed to parse LNK stream %s for path %s: %v", entry.Name, filePath, err)
 			continue
@@ -134,9 +134,9 @@ func ParseAutomaticJumpListFile(filePath string, log *logger.Logger) (*JumpList,
 		}
 
 		// Lookup the Lnk object by the DestList entry name.
-		lnk, ok := lnks[strings.ToLower(entry.Name)]
+		lnk, ok := lnks[strings.ToLower(entry.name)]
 		if !ok {
-			log.Infof("LNK object %s not found for path %s", entry.Name, filePath)
+			log.Infof("LNK object %s not found for path %s", entry.name, filePath)
 			entries = append(entries, jumpListEntry)
 			continue
 		}
@@ -153,7 +153,7 @@ func ParseAutomaticJumpListFile(filePath string, log *logger.Logger) (*JumpList,
 // GetAutomaticJumpLists finds all the automatic jump list files and parses them into JumpList objects.
 // It returns a slice of JumpList objects.
 func GetAutomaticJumpLists(log *logger.Logger) []*JumpList {
-	files, err := FindJumplistFiles(JumpListTypeAutomatic, log)
+	files, err := FindJumpListFiles(JumpListTypeAutomatic, log)
 	if err != nil {
 		log.Infof("failed to find Automatic Jump Lists: %v", err)
 		return []*JumpList{}

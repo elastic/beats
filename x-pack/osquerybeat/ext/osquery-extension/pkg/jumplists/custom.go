@@ -55,7 +55,7 @@ func ParseCustomJumpListFile(filePath string, log *logger.Logger) (*JumpList, er
 // GetCustomJumpLists finds all the custom jump list files and parses them into JumpList objects.
 // It returns a slice of JumpList objects.
 func GetCustomJumpLists(log *logger.Logger) []*JumpList {
-	files, err := FindJumplistFiles(JumpListTypeCustom, log)
+	files, err := FindJumpListFiles(JumpListTypeCustom, log)
 	if err != nil {
 		log.Infof("failed to find Custom Jump Lists: %v", err)
 		return []*JumpList{}
@@ -88,14 +88,13 @@ func carveLnkFiles(fileBytes []byte, log *logger.Logger) []*Lnk {
 	// advance the buffer to the first LNK signature
 	fileBytes = fileBytes[start:]
 
-	entryNumber := 0
 	for {
 		// Find the next LNK signature
 		nextSigIndex := bytes.Index(fileBytes[sigLen:], LnkSignature)
 
 		if nextSigIndex == -1 {
 			// This is the last Lnk in the file
-			lnk, err := NewLnkFromBytes(fileBytes, entryNumber, log)
+			lnk, err := NewLnkFromBytes(fileBytes, log)
 			if err == nil {
 				lnks = append(lnks, lnk)
 			}
@@ -106,11 +105,10 @@ func carveLnkFiles(fileBytes []byte, log *logger.Logger) []*Lnk {
 		// nextSigIndex is a relative index to the start of the fileBytes buffer
 		// so we need to add the sigLen to get the absolute index
 		cutPoint := nextSigIndex + sigLen
-		lnk, err := NewLnkFromBytes(fileBytes[:cutPoint], entryNumber, log)
+		lnk, err := NewLnkFromBytes(fileBytes[:cutPoint], log)
 		if err == nil {
 			lnks = append(lnks, lnk)
 		}
-		entryNumber++
 		// advance the buffer to the next LNK signature
 		fileBytes = fileBytes[cutPoint:]
 	}

@@ -34,7 +34,7 @@ const (
 type JumpListMeta struct {
 	ApplicationId
 	JumplistType JumpListType `osquery:"jumplist_type"`
-	Path         string       `osquery:"path"`
+	Path         string       `osquery:"jumplist_file_path"`
 }
 
 // JumpListEntry is a single entry in a jump list.
@@ -87,15 +87,17 @@ func (j *JumpList) ToRows() []JumpListRow {
 	return rows
 }
 
-// FindJumplistFiles finds all the jump list files of a given type.
+// FindJumpListFiles finds all the jump list files of a given type.
 // It returns a slice of file paths.
-func FindJumplistFiles(jumplistType JumpListType, log *logger.Logger) ([]string, error) {
+func FindJumpListFiles(jumplistType JumpListType, log *logger.Logger) ([]string, error) {
 	// Get the path to the automatic jumplist directory
 	var path string
 
 	switch jumplistType {
 	case JumpListTypeCustom:
 		path = "$APPDATA\\Microsoft\\Windows\\Recent\\CustomDestinations"
+	case JumpListTypeAutomatic:
+		path = "$APPDATA\\Microsoft\\Windows\\Recent\\AutomaticDestinations"
 	}
 
 	expandedPath := os.ExpandEnv(path)
@@ -134,7 +136,9 @@ func GetColumns() []table.ColumnDefinition {
 // It returns a function that can be used to generate a table of JumpListRow objects.
 func GetGenerateFunc(log *logger.Logger) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		jumpLists := GetCustomJumpLists(log)
+		customJumpLists := GetCustomJumpLists(log)
+		automaticJumpLists := GetAutomaticJumpLists(log)
+		jumpLists := append(customJumpLists, automaticJumpLists...)
 
 		var rows []map[string]string
 		for _, jumpList := range jumpLists {
