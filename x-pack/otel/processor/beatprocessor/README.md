@@ -6,9 +6,6 @@
 
 [development]: https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/component-stability.md#development
 
-> [!NOTE]
-> This component is currently in development and functionality is limited.
-
 The Beat processor (`beat`) is an OpenTelemetry Collector processor that wraps the [Beat processors].
 This allows you to use Beat processors like e.g. [add_host_metadata] anywhere in the OpenTelemetry Collector's pipeline, independently of Beat receivers.
 
@@ -67,9 +64,60 @@ In this case, none of the default processors are ran as part of the Filebeat rec
 
 ## Example
 
-The following [Filebeat receiver] configuration
+Here are the currently supported processors:
+
+- [add_host_metadata]
+- [add_kubernetes_metadata]
+
+## Default processors in Beat receivers
+
+The Beat receivers have a set of default processors that are included when the `processors` option is not specified.
+These processors are: [add_cloud_metadata], [add_docker_metadata], [add_host_metadata], [add_kubernetes_metadata].
+To disable them, explicitly specify the `processors` configuration option of the Beat receiver.
+The list of processors can be an empty list or an arbitrary list of processors.
+
+For example:
 
 ```yaml
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: host-logs
+          paths:
+            - /var/log/*.log
+```
+
+The above Filebeat receiver configuration does not explicitly specify the `processors` option.
+In this case, the four processors listed above are included and ran as part of the Filebeat receiver.
+
+```yaml
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: host-logs
+          paths:
+            - /var/log/*.log
+    processors: []
+```
+
+The above Filebeat receiver configuration specifies an empty list of processors.
+In this case, none of the default processors are ran as part of the Filebeat receiver.
+
+## Examples
+
+The following OpenTelemetry Collector configuration using only the [Filebeat receiver]:
+
+```yaml
+service:
+  pipelines:
+    logs:
+      receivers: [filebeatreceiver]
+      exporters: [debug]
+
 receivers:
   filebeatreceiver:
     filebeat:
@@ -82,13 +130,21 @@ receivers:
       - add_host_metadata:
           netinfo:
             enabled: false
-    output:
-      otelconsumer:
+
+exporters:
+  debug:
 ```
 
 is functionally equivalent to this one, using the Beat processor:
 
 ```yaml
+service:
+  pipelines:
+    logs:
+      receivers: [filebeatreceiver]
+      processors: [beat]
+      exporters: [debug]
+
 receivers:
   filebeatreceiver:
     filebeat:
@@ -107,7 +163,43 @@ processors:
       - add_host_metadata:
           netinfo:
             enabled: false
+
+exporters:
+  debug:
 ```
+
+## Using the `add_host_metadata` processor
+
+To use the [add_host_metadata] processor, configure the processor as follows:
+
+```yaml
+processors:
+  beat:
+    processors:
+      - add_host_metadata:
+```
+
+You can configure the host metadata enrichment using the options supported by the [add_host_metadata] processor.
+
+## Using the `add_kubernetes_metadata` processor
+
+To use the [add_kubernetes_metadata] processor, configure the processor as follows:
+
+```yaml
+processors:
+  beat:
+    processors:
+      - add_kubernetes_metadata:
+          indexers:
+            - container:
+          matchers:
+            - logs_path:
+```
+
+You can configure the Kubernetes metadata enrichment using the options supported by the [add_kubernetes_metadata] processor.
+
+Note that you need to explicitly configure at least one [indexer][indexers] and at least one [matcher][matchers] for the enrichment to work.
+In the example above, the `container` indexer and the `logs_path` matcher are configured.
 
 [Beat processors]: https://www.elastic.co/docs/reference/beats/filebeat/filtering-enhancing-data#using-processors
 [Filebeat receiver]: https://github.com/elastic/beats/tree/main/x-pack/filebeat/fbreceiver
@@ -116,3 +208,5 @@ processors:
 [add_docker_metadata]: https://www.elastic.co/docs/reference/beats/filebeat/add-docker-metadata
 [add_host_metadata]: https://www.elastic.co/docs/reference/beats/filebeat/add-host-metadata
 [add_kubernetes_metadata]: https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata
+[indexers]: https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_indexers
+[matchers]: https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_matchers
