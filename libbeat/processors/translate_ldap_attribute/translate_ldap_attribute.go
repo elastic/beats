@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/go-ldap/ldap/v3"
 
@@ -36,7 +37,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-const logName = "processor.translate_ldap_attribute"
+const (
+	logName            = "processor.translate_ldap_attribute"
+	clientRetryBackoff = 30 * time.Second
+)
 
 var errInvalidType = errors.New("search attribute field value is not a string")
 
@@ -50,7 +54,9 @@ type processor struct {
 	client *ldapClient
 	log    *logp.Logger
 
-	clientMu sync.Mutex
+	clientMu          sync.Mutex
+	clientErr         error
+	nextClientAttempt time.Time
 }
 
 func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
@@ -248,6 +254,8 @@ func (p *processor) Close() error {
 		p.client.close()
 		p.client = nil
 	}
+	p.clientErr = nil
+	p.nextClientAttempt = time.Time{}
 	return nil
 }
 
@@ -259,8 +267,15 @@ func (p *processor) ensureClient() (*ldapClient, error) {
 		return p.client, nil
 	}
 
+	now := time.Now()
+	if !p.nextClientAttempt.IsZero() && now.Before(p.nextClientAttempt) && p.clientErr != nil {
+		return nil, fmt.Errorf("ldap client initialization paused until %s: %w", p.nextClientAttempt.Format(time.RFC3339), p.clientErr)
+	}
+
 	client, err := newClient(p.config, p.log)
 	if err != nil {
+		p.clientErr = err
+		p.nextClientAttempt = now.Add(clientRetryBackoff)
 		return nil, err
 	}
 
@@ -268,5 +283,7 @@ func (p *processor) ensureClient() (*ldapClient, error) {
 	p.client = client
 	p.LDAPBaseDN = client.baseDN
 	p.LDAPAddress = client.address
+	p.clientErr = nil
+	p.nextClientAttempt = time.Time{}
 	return client, nil
 }
