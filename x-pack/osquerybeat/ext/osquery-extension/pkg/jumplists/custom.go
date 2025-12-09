@@ -28,7 +28,7 @@ func ParseCustomJumpListFile(filePath string, log *logger.Logger) (*JumpList, er
 	entries := make([]*JumpListEntry, 0)
 	for _, lnk := range lnks {
 		jumpListEntry := &JumpListEntry{
-			Lnk:           lnk,
+			Lnk: lnk,
 		}
 		entries = append(entries, jumpListEntry)
 	}
