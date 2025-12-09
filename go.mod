@@ -59,20 +59,12 @@ require (
 	github.com/dop251/goja v0.0.0-20200831102558-9af81ddcf0e1
 	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/dustin/go-humanize v1.0.1
-<<<<<<< HEAD
 	github.com/eapache/go-resiliency v1.2.0
-	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
+	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/elastic/ecs v1.12.0
 	github.com/elastic/elastic-agent-client/v7 v7.8.1
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.3.1
-=======
-	github.com/eapache/go-resiliency v1.7.0
-	github.com/eclipse/paho.mqtt.golang v1.5.1
-	github.com/elastic/elastic-agent-client/v7 v7.15.0
-	github.com/elastic/go-concert v0.3.0
-	github.com/elastic/go-libaudit/v2 v2.6.2
->>>>>>> 6b4391b8e (Upgrade github.com/eclipse/paho.mqtt.golang module dependency (#47920))
 	github.com/elastic/go-licenser v0.4.2
 	github.com/elastic/go-lookslike v0.3.0
 	github.com/elastic/go-lumber v0.1.0
@@ -264,7 +256,7 @@ require (
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.2 // indirect
-	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
