@@ -85,11 +85,9 @@ For detailed instructions on how to set up an Azure AD service principal and con
 
 The `azure-eventhub` input supports the following configuration options:
 
-
 ### `eventhub` [_eventhub]
 
 The name of the eventhub users would like to read from, field required.
-
 
 ### `consumer_group` [_consumer_group]
 
@@ -117,7 +115,6 @@ This option is required if:
 * `auth_type` is not specified (in which case it defaults to `connection_string` for backwards compatibility)
 
 A Blob Storage account is required to store, retrieve, or update the offset or state of the Event Hub messages. This means that after stopping Filebeat it can resume from where it stopped processing messages.
-
 
 ### `eventhub_namespace` [_eventhub_namespace]
 
@@ -164,26 +161,21 @@ Supported values:
 - `https://login.microsoftonline.us` (Azure Government)
 - `https://login.chinacloudapi.cn` (Azure China)
 
-
 ### `storage_account` [_storage_account]
 
 The name of the storage account. Required.
-
 
 ### `storage_account_key` [_storage_account_key]
 
 The storage account key, this key will be used to authorize access to data in your storage account, option is required.
 
-
 ### `storage_account_container` [_storage_account_container]
 
 Optional, the name of the storage account container you would like to store the offset information in.
 
-
 ### `resource_manager_endpoint` [_resource_manager_endpoint]
 
 Optional, by default we are using the azure public environment, to override, users can provide a specific resource manager endpoint in order to use a different azure environment. Ex: [https://management.chinacloudapi.cn/](https://management.chinacloudapi.cn/) for azure ChinaCloud [https://management.microsoftazure.de/](https://management.microsoftazure.de/) for azure GermanCloud [https://management.azure.com/](https://management.azure.com/) for azure PublicCloud [https://management.usgovcloudapi.net/](https://management.usgovcloudapi.net/) for azure USGovernmentCloud Users can also use this in case of a Hybrid Cloud model, where one may define their own endpoints.
-
 
 ## Metrics [_metrics_3]
 

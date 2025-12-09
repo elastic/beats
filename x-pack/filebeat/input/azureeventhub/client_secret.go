@@ -17,7 +17,7 @@ import (
 )
 
 // newClientSecretCredential creates a new client secret credential(Oauth2).
-func newClientSecretCredential(config authConfig, log *logp.Logger) (azcore.TokenCredential, error) {
+func newClientSecretCredential(config *azureInputConfig, log *logp.Logger) (azcore.TokenCredential, error) {
 	log = log.Named("client_secret")
 
 	if config.TenantID == "" {

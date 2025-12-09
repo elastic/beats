@@ -422,7 +422,7 @@ func TestConnectionStringConfigValidation(t *testing.T) {
 				return c
 			}(),
 			expectError: true,
-			errorMsg:    "storage_account_connection_string is required when using connection_string authentication with processor v2",
+			errorMsg:    "no storage account connection string configured (config: storage_account_connection_string)",
 		},
 		{
 			name: "invalid auth_type",

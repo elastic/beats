@@ -24,24 +24,6 @@ const (
 	AuthTypeClientSecret string = "client_secret"
 )
 
-// authConfig represents the authentication configuration.
-type authConfig struct {
-	// AuthType specifies the authentication method to use.
-	// If not specified, will be inferred from other fields:
-	// - If connection_string is provided, defaults to connection_string
-	// - Otherwise, defaults to client_secret
-	AuthType string
-
-	// Connection string authentication
-	ConnectionString string
-
-	// Client secret authentication
-	TenantID      string
-	ClientID      string
-	ClientSecret  string
-	AuthorityHost string
-}
-
 // createCredential creates a TokenCredential if needed based on the authentication type.
 // Returns nil for connection_string authentication (which doesn't use credentials).
 func createCredential(cfg *azureInputConfig, log *logp.Logger) (azcore.TokenCredential, error) {
@@ -50,14 +32,7 @@ func createCredential(cfg *azureInputConfig, log *logp.Logger) (azcore.TokenCred
 		// No credential needed for connection string authentication
 		return nil, nil
 	case AuthTypeClientSecret:
-		credConfig := authConfig{
-			AuthType:      cfg.AuthType,
-			TenantID:      cfg.TenantID,
-			ClientID:      cfg.ClientID,
-			ClientSecret:  cfg.ClientSecret,
-			AuthorityHost: cfg.AuthorityHost,
-		}
-		credential, err := newClientSecretCredential(credConfig, log)
+		credential, err := newClientSecretCredential(cfg, log)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create client secret credential: %w", err)
 		}
@@ -196,4 +171,3 @@ func CreateStorageAccountContainerClient(cfg *azureInputConfig, log *logp.Logger
 		return nil, fmt.Errorf("invalid auth_type: %s", cfg.AuthType)
 	}
 }
-
