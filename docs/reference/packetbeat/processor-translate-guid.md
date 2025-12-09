@@ -16,7 +16,7 @@ If the search attribute is invalid (malformed) or does not map to any object on 
 
 The result of this operation is an array of values, given that a single attribute can hold multiple values.
 
-Note: the search attribute is expected to map to a single object. If multiple entries match, only the first entry's mapped attribute values are returned.
+The search attribute is expected to map to a single object. If multiple entries match, only the first entry's mapped attribute values are returned.
 
 ```yaml
 processors:
@@ -35,16 +35,16 @@ The `translate_ldap_attribute` processor has the following configuration setting
 | --- | --- | --- | --- |
 | `field` | yes |  | Source field containing a GUID. |
 | `target_field` | no |  | Target field for the mapped attribute value. If not set it will be replaced in place. |
-| `ldap_domain` | no |  | DNS domain name (e.g., `example.com`) used for DNS SRV discovery and to construct FQDNs from `LOGONSERVER`. When omitted Beats inspects OS metadata to infer the domain (Windows: `USERDNSDOMAIN`, `GetComputerNameEx`, TCP/IP + Kerberos registry keys, hostname; Linux/macOS: `/etc/resolv.conf`, `/etc/krb5.conf`, hostname). |
-| `ldap_address` | no |  | LDAP server address (e.g., `ldap://ds.example.com:389`). When omitted Beats auto-discovers controllers by querying `_ldaps._tcp.<domain>` first, `_ldap._tcp.<domain>` second, and finally the Windows `LOGONSERVER` variable if available. Candidates are tried in order until one succeeds. |
-| `ldap_base_dn` | no |  | LDAP base DN (e.g., `dc=example,dc=com`). When omitted Beats queries the server's rootDSE for `defaultNamingContext`/`namingContexts`. If the controller does not expose those attributes, client initialization fails and you must configure the value manually. |
+| `ldap_domain` | no |  | {applies_to}`stack: ga 9.2.3` DNS domain name (for example, `example.com`) used for DNS SRV discovery and to construct FQDNs from `LOGONSERVER`. When omitted Beats inspects OS metadata to infer the domain (Windows: `USERDNSDOMAIN`, `GetComputerNameEx`, TCP/IP + Kerberos registry keys, hostname; Linux/macOS: `/etc/resolv.conf`, `/etc/krb5.conf`, hostname). |
+| `ldap_address` | {applies_to}`stack: ga 9.2.3` no<br>{applies_to}`stack: ga 9.0.0` yes |  | LDAP server address (for example, `ldap://ds.example.com:389`). When omitted Beats auto-discovers controllers by querying `_ldaps._tcp.<domain>` first, `_ldap._tcp.<domain>` second, and finally the Windows `LOGONSERVER` variable if available. Candidates are tried in order until one succeeds. |
+| `ldap_base_dn` | {applies_to}`stack: ga 9.2.3` no<br>{applies_to}`stack: ga 9.0.0` yes |  | LDAP base DN (for example, `dc=example,dc=com`). When omitted Beats queries the server's rootDSE for `defaultNamingContext`/`namingContexts`. If the controller does not expose those attributes, client initialization fails and you must configure the value manually. |
 | `ldap_bind_user` | no |  | LDAP DN/UPN for simple bind. When provided with `ldap_bind_password` Beats performs a standard bind. When set without a password Beats issues an unauthenticated bind using this identity (useful for servers that expect a bind DN even for anonymous operations). |
 | `ldap_bind_password` | no |  | LDAP password for simple bind. When both the username and password are omitted Beats attempts automatic authentication: on Windows it first tries SSPI with the Beat's service or user identity using the SPN `ldap/<hostname derived from ldap_address>` and falls back to an unauthenticated bind if that fails. Non-Windows platforms immediately use an unauthenticated bind. |
 | `ldap_search_attribute` | yes | `objectGUID` | LDAP attribute to search by. |
 | `ldap_mapped_attribute` | yes | `cn` | LDAP attribute to map to. |
 | `ldap_search_time_limit` | no | 30 | LDAP search time limit in seconds. |
-| `ldap_ssl`* | no |  | LDAP TLS/SSL connection settings. See [SSL](/reference/packetbeat/configuration-ssl.md). |
-| `ad_guid_translation` | no | `auto` | Controls GUID binary conversion for Active Directory attributes. `auto` (default) converts when the LDAP search attribute equals `objectGUID` (case-insensitive). Use `always` to force conversion or `never` to disable it. |
+| `ldap_ssl` | no | {applies_to}`stack: ga 9.2.3` no default<br>{applies_to}`stack: ga 9.0.0` `30` | LDAP TLS/SSL connection settings. Refer to [SSL](/reference/packetbeat/configuration-ssl.md). |
+| `ad_guid_translation` | no | `auto` | {applies_to}`stack: ga 9.2.3` Controls GUID binary conversion for Active Directory attributes. `auto` (default) converts when the LDAP search attribute equals `objectGUID` (case-insensitive). Use `always` to force conversion or `never` to disable it. |
 | `ignore_missing` | no | false | Ignore errors when the source field is missing. |
 | `ignore_failure` | no | false | Ignore all errors produced by the processor. |
 
@@ -52,7 +52,7 @@ The `translate_ldap_attribute` processor has the following configuration setting
 
 Beats attempts LDAP authentication in the following order:
 
-1. Simple bind using `ldap_bind_user` + `ldap_bind_password` when both are supplied.
+1. Simple bind using `ldap_bind_user` and `ldap_bind_password` when both are supplied.
 2. Automatic bind when both values are empty. On Windows Beats creates an SSPI (Kerberos/NTLM) client for the SPN `ldap/<hostname derived from ldap_address>`, which works for Local System, domain-joined services, and gMSA accounts. Other platforms do not yet implement automatic authentication.
 3. If automatic authentication is unavailable or fails, Beats issues an unauthenticated bind. When `ldap_bind_user` is set without a password that identity is used; otherwise Beats binds anonymously.
 

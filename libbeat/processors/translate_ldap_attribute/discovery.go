@@ -20,12 +20,13 @@
 package translate_ldap_attribute
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"net"
 	"os"
 	"runtime"
-	"sort"
+	"slices"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -118,13 +119,13 @@ func lookupSRVServers(domain string, useTLS bool, log *logp.Logger) []string {
 
 	// Even if the DNS server *usually* sorts them, we enforce it here
 	// to ensure we don't accidentally hit a DR site first.
-	sort.Slice(records, func(i, j int) bool {
+	slices.SortFunc(records, func(a, b *net.SRV) int {
 		// 1. Lower Priority is better (RFC 2782)
-		if records[i].Priority != records[j].Priority {
-			return records[i].Priority < records[j].Priority
+		if c := cmp.Compare(a.Priority, b.Priority); c != 0 {
+			return c
 		}
 		// 2. Higher Weight is better (RFC 2782)
-		return records[i].Weight > records[j].Weight
+		return cmp.Compare(b.Weight, a.Weight)
 	})
 
 	var addresses []string

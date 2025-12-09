@@ -66,9 +66,8 @@ func getDomainKrbConf() (string, error) {
 	for s.Scan() {
 		line := strings.TrimSpace(s.Text())
 		if strings.HasPrefix(line, "default_realm") {
-			parts := strings.Split(line, "=")
-			if len(parts) == 2 {
-				return strings.ToLower(strings.TrimSpace(parts[1])), nil
+			if _, rhs, ok := strings.Cut(line, "="); ok {
+				return strings.ToLower(strings.TrimSpace(rhs)), nil
 			}
 		}
 	}
