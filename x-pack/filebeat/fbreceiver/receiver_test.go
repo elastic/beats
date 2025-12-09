@@ -217,8 +217,6 @@ func newMultiReceiverHelper(t *testing.T, number int) multiReceiverHelper {
 		scriptFormat = `function process(event) { event.Put("js_marker", %q); return event; }`
 	)
 
-	ingest := filepath.Join(t.TempDir(), fmt.Sprintf("test%d.log", number))
-
 	home := t.TempDir()
 
 	// Create JavaScript processor files in each receiver's home directory.
@@ -229,7 +227,7 @@ func newMultiReceiverHelper(t *testing.T, number int) multiReceiverHelper {
 	return multiReceiverHelper{
 		name:          fmt.Sprintf("r%d", number),
 		home:          home,
-		ingest:        ingest,
+		ingest:        filepath.Join(t.TempDir(), fmt.Sprintf("test%d.log", number)),
 		jsMarker:      jsMarker,
 		monitorSocket: genSocketPath(t),
 	}
