@@ -56,6 +56,8 @@ func TestGenerateProcessorList(t *testing.T) {
 	require.NoError(t, err)
 	// make sure the processor init got the config formatted in a way it expected
 	require.Equal(t, 4, len(processors.List))
+
+	require.NoError(t, processors.Close())
 }
 
 func TestProcessorsConfigs(t *testing.T) {
