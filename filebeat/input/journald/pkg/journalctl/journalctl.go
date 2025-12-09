@@ -45,11 +45,11 @@ type journalctl struct {
 	waitDone sync.WaitGroup
 }
 
-// NewFactory returns a function that instantiates[journalctl].
+// NewFactory returns a function that instantiates [journalctl].
 // The caller is responsible for calling Kill to ensure the
 // journalctl process created is correctly terminated.
 //
-// If chroot is non-empty, then journalctlPath must be set and be
+// If chroot is non-empty, then journalctlPath must be non-empty and be
 // the absolute path to the journalctl binary inside the chroot.
 //
 // The returned type is an interface to allow mocking for testing

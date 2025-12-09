@@ -67,10 +67,11 @@ func TestNewFactoryChroot(t *testing.T) {
 
 	// Create container configuration
 	containerConfig := &container.Config{
-		Image:      imageName,
-		Cmd:        []string{"go", "test", "-v", "-count=1", "-run=TestInDockerNewFactory"},
-		Tty:        true,
-		WorkingDir: "/workspace/filebeat/input/journald/pkg/journalctl",
+		Image:       imageName,
+		Cmd:         []string{"go", "test", "-v", "-count=1", "-run=TestInDockerNewFactory"},
+		Tty:         true,
+		AttachStdin: false,
+		WorkingDir:  "/workspace/filebeat/input/journald/pkg/journalctl",
 		Env: []string{
 			"IN_DOCKER_CONTAINER=true",
 			fmt.Sprintf("JOURNALCTL_PATH=%s", journalctlPath),
@@ -149,20 +150,21 @@ func TestInDockerNewFactory(t *testing.T) {
 	require.NotEmpty(t, chrootPath, "CHROOT_PATH must be set")
 
 	tempDir := os.Getenv("TEST_TEMP_DIR")
-	require.NotEmpty(t, chrootPath, "TEST_TEMP_DIR be set")
+	require.NotEmpty(t, tempDir, "TEST_TEMP_DIR be set")
 
-	testCtx, cancel := context.WithCancel(t.Context())
+	jctlCtx, cancel := context.WithCancel(t.Context())
 	t.Cleanup(cancel)
 
 	logger := logptest.NewFileLogger(t, tempDir)
 	factory := NewFactory(chrootPath, journalctlPath)
 
-	jctl, err := factory(testCtx, logger.Logger, "--version")
+	// Try to read version output, this ensures we can call journalctl
+	// without the need of any messages in the journal
+	jctl, err := factory(jctlCtx, logger.Logger, "--version")
 	require.NoError(t, err, "failed to create journalctl with chroot")
 	defer jctl.Kill()
 
-	// Try to read version output
-	data, err := jctl.Next(testCtx)
+	data, err := jctl.Next(jctlCtx)
 	require.NoError(t, err, "failed to read from journalctl")
 	require.NotEmpty(t, data, "expected output from journalctl --version")
 }
