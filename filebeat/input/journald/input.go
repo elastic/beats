@@ -60,8 +60,8 @@ type journald struct {
 	SaveRemoteHostname bool
 	Parsers            parser.Config
 	Merge              bool
-	Binary             string
 	Chroot             string
+	JournalctlPath     string
 }
 
 type checkpoint struct {
@@ -143,7 +143,7 @@ func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, erro
 		Parsers:            config.Parsers,
 		Merge:              config.Merge,
 		Chroot:             config.Chroot,
-		Binary:             config.JournalctlPath,
+		JournalctlPath:     config.JournalctlPath,
 	}, nil
 }
 
@@ -163,7 +163,7 @@ func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 		inp.Since,
 		src.Name(),
 		inp.Merge,
-		journalctl.NewFactory(inp.Chroot, inp.Binary),
+		journalctl.NewFactory(inp.Chroot, inp.JournalctlPath),
 	)
 	if err != nil {
 		return err
@@ -199,7 +199,7 @@ func (inp *journald) Run(
 		inp.Since,
 		src.Name(),
 		inp.Merge,
-		journalctl.NewFactory(inp.Chroot, inp.Binary),
+		journalctl.NewFactory(inp.Chroot, inp.JournalctlPath),
 	)
 	if err != nil {
 		wrappedErr := fmt.Errorf("could not start journal reader: %w", err)

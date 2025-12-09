@@ -45,16 +45,17 @@ type journalctl struct {
 	waitDone sync.WaitGroup
 }
 
-// NewFactory chroot and binary must be validated by the caller
-
-// FactoryOld returns an instance of journalctl ready to use.
+// NewFactory returns a function that instantiates[journalctl].
 // The caller is responsible for calling Kill to ensure the
 // journalctl process created is correctly terminated.
 //
+// If chroot is non-empty, then journalctlPath must be set and be
+// the absolute path to the journalctl binary inside the chroot.
+//
 // The returned type is an interface to allow mocking for testing
-func NewFactory(chroot, binary string) JctlFactory {
+func NewFactory(chroot, journalctlPath string) JctlFactory {
 	return func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
-		cmd := exec.Command(binary, args...)
+		cmd := exec.Command(journalctlPath, args...)
 
 		if chroot != "" {
 			cmd.SysProcAttr = &syscall.SysProcAttr{

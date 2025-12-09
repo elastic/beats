@@ -77,8 +77,11 @@ type config struct {
 	// including remote ones.
 	Merge bool `config:"merge"`
 
+	// Chroot is the chroot folder used to call journalctl
 	Chroot string `config:"chroot"`
 
+	// JournalctlPath is the path of the journalctl binary. It is only required
+	// if [Chroot] is set.
 	JournalctlPath string `config:"journalctl_path"`
 }
 
