@@ -12,6 +12,7 @@ import (
 const (
 	SwitchportStatusConnected    = "connected"
 	SwitchportStatusDisconnected = "disconnected"
+	SwitchportStatusDisabled     = "disabled"
 )
 
 type config struct {
