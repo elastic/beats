@@ -21,9 +21,6 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -35,6 +32,9 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
+
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNewReceiver(t *testing.T) {
