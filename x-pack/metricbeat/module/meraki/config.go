@@ -9,12 +9,6 @@ import (
 	"time"
 )
 
-const (
-	SwitchportStatusConnected    = "connected"
-	SwitchportStatusDisconnected = "disconnected"
-	SwitchportStatusDisabled     = "disabled"
-)
-
 type config struct {
 	BaseURL            string        `config:"apiBaseURL"`
 	ApiKey             string        `config:"apiKey"`
@@ -30,7 +24,7 @@ func DefaultConfig() *config {
 		BaseURL:            "https://api.meraki.com",
 		DebugMode:          "false",
 		Period:             time.Second * 300,
-		SwitchportStatuses: []string{SwitchportStatusConnected},
+		SwitchportStatuses: []string{"connected"},
 	}
 }
 
