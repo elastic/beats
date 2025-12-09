@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/go-ldap/ldap/v3"
 
@@ -48,6 +49,8 @@ type processor struct {
 	config
 	client *ldapClient
 	log    *logp.Logger
+
+	clientMu sync.Mutex
 }
 
 func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
@@ -65,16 +68,6 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 func newFromConfig(c config, logger *logp.Logger) (*processor, error) {
 	p := &processor{config: c}
 	p.log = logger.Named(logName).With(logp.Stringer("processor", p))
-
-	client, err := newClient(c, p.log)
-	if err != nil {
-		return nil, err
-	}
-
-	p.client = client
-	// Update config with the actual base DN used (may have been discovered)
-	p.LDAPBaseDN = client.baseDN
-	p.LDAPAddress = client.address
 	return p, nil
 }
 
@@ -156,6 +149,11 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *processor) translateLDAPAttr(event *beat.Event) error {
+	client, err := p.ensureClient()
+	if err != nil {
+		return err
+	}
+
 	v, err := event.GetValue(p.Field)
 	if err != nil {
 		return err
@@ -172,7 +170,7 @@ func (p *processor) translateLDAPAttr(event *beat.Event) error {
 	}
 
 	p.log.Debugw("ldap search", "search_value", searchValue, "filter_value", searchFilter)
-	values, err := p.client.findObjectBy(searchFilter)
+	values, err := client.findObjectBy(searchFilter)
 	p.log.Debugw("ldap result", "common_name", values, "error", err)
 	if err != nil {
 		return err
@@ -244,6 +242,31 @@ func (p *processor) shouldConvertMappedGUID() bool {
 }
 
 func (p *processor) Close() error {
-	p.client.close()
+	p.clientMu.Lock()
+	defer p.clientMu.Unlock()
+	if p.client != nil {
+		p.client.close()
+		p.client = nil
+	}
 	return nil
+}
+
+func (p *processor) ensureClient() (*ldapClient, error) {
+	p.clientMu.Lock()
+	defer p.clientMu.Unlock()
+
+	if p.client != nil {
+		return p.client, nil
+	}
+
+	client, err := newClient(p.config, p.log)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update config with discovered values for logging/debugging.
+	p.client = client
+	p.LDAPBaseDN = client.baseDN
+	p.LDAPAddress = client.address
+	return client, nil
 }
