@@ -66,7 +66,7 @@ func scrapeJumpListAppIDs(log *logger.Logger) (map[string]string, error) {
 	return appIDs, nil
 }
 
-func writeAppIdGeneratedFile(outputFile string, log *logger.Logger) error {	
+func writeAppIdGeneratedFile(outputFile string, log *logger.Logger) error {
 	appIDs, err := scrapeJumpListAppIDs(log)
 	if err != nil {
 		return err

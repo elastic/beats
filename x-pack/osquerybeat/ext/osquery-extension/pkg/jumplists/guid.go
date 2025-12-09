@@ -22,11 +22,11 @@ type GuidType string
 // Data4 is the last 8 bytes of the GUID.
 // ExtraData contains extra data about the GUID.
 type GUID struct {
-	Data1     uint32
-	Data2     uint16
-	Data3     uint16
-	Data4     [8]byte
-	Version   uint16
+	Data1   uint32
+	Data2   uint16
+	Data3   uint16
+	Data4   [8]byte
+	Version uint16
 }
 
 // String returns the string representation of the GUID.
@@ -44,7 +44,6 @@ func NewGUID(data []byte) *GUID {
 		return nil
 	}
 
-
 	data1 := binary.LittleEndian.Uint32(data[:4])
 	data2 := binary.LittleEndian.Uint16(data[4:6])
 	data3 := binary.LittleEndian.Uint16(data[6:8])
@@ -53,12 +52,11 @@ func NewGUID(data []byte) *GUID {
 	var data4 [8]byte
 	copy(data4[:], data[8:16]) // Data4 is big-endian
 
-	
 	guid := &GUID{
-		Data1: data1,
-		Data2: data2,
-		Data3: data3,
-		Data4: data4,
+		Data1:   data1,
+		Data2:   data2,
+		Data3:   data3,
+		Data4:   data4,
 		Version: version,
 	}
 	return guid
@@ -69,9 +67,9 @@ func (g *GUID) LookupGuidMapping() (string, bool) {
 }
 
 func (g *GUID) AsFileTime() time.Time {
-    if g.Version != 1 {
-        return time.Time{}
-    }
+	if g.Version != 1 {
+		return time.Time{}
+	}
 
 	// The 60-bit timestamp is stored across Data1, Data2, and Data3.
 	// Data1: time_low (32 bits)
@@ -102,7 +100,7 @@ func (g *GUID) AsFileTime() time.Time {
 	// We divide by 10,000,000 to get seconds (10 million 100ns ticks per second)
 	seconds := unixTimestamp100ns / 10_000_000
 	// We take the remainder and multiply by 100 to get nanoseconds
-    nanos := (unixTimestamp100ns % 10_000_000) * 100
+	nanos := (unixTimestamp100ns % 10_000_000) * 100
 
 	// Create the time.Time object in UTC
 	return time.Unix(seconds, nanos).UTC()
