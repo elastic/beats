@@ -26,6 +26,22 @@ type switchport struct {
 	portStatus *sdk.ResponseItemSwitchGetDeviceSwitchPortsStatuses
 }
 
+// filterSwitchportsByStatus filters switchports by their status, comparing against the allowed statuses.
+// The comparison is case insensitive. Switchports with nil portStatus are excluded.
+func filterSwitchportsByStatus(switchports []*switchport, statusesToReport []string) []*switchport {
+	var filtered []*switchport
+	for _, sp := range switchports {
+		if sp.portStatus == nil {
+			continue
+		}
+		portStatus := strings.ToLower(sp.portStatus.Status)
+		if slices.Contains(statusesToReport, portStatus) {
+			filtered = append(filtered, sp)
+		}
+	}
+	return filtered
+}
+
 func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map[Serial]*Device, period time.Duration, statusesToReport []string, logger *logp.Logger) error {
 	params := &sdk.GetOrganizationSwitchPortsBySwitchQueryParams{}
 	setStart := func(s string) { params.StartingAfter = s }
@@ -77,17 +93,7 @@ func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map
 				}
 			}
 
-			// filter switchports by configured statuses
-			var filteredSwitchports []*switchport
-			for _, sp := range switchports {
-				if sp.portStatus == nil {
-					continue
-				}
-				portStatus := strings.ToLower(sp.portStatus.Status)
-				if slices.Contains(statusesToReport, portStatus) {
-					filteredSwitchports = append(filteredSwitchports, sp)
-				}
-			}
+			filteredSwitchports := filterSwitchportsByStatus(switchports, statusesToReport)
 
 			if d, ok := devices[Serial(device.Serial)]; ok && d != nil {
 				d.switchports = filteredSwitchports
