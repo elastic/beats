@@ -28,7 +28,7 @@ summary: Add GUID translation, base DN inference, and SSPI authentication to LDA
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: libbeat
+component: all
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
