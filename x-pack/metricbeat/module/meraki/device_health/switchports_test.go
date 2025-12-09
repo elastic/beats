@@ -93,7 +93,7 @@ func TestFilterSwitchportsByStatus(t *testing.T) {
 			expectedPortIDs:  []string{"1"},
 		},
 		{
-			name: "case insensitive matching",
+			name: "case insensitive matching - port status varies",
 			switchports: []*switchport{
 				{
 					port:       &sdk.ResponseItemSwitchGetOrganizationSwitchPortsBySwitchPorts{PortID: "1"},
@@ -111,6 +111,22 @@ func TestFilterSwitchportsByStatus(t *testing.T) {
 			statusesToReport: []string{"connected"},
 			expectedCount:    3,
 			expectedPortIDs:  []string{"1", "2", "3"},
+		},
+		{
+			name: "case insensitive matching - config status varies",
+			switchports: []*switchport{
+				{
+					port:       &sdk.ResponseItemSwitchGetOrganizationSwitchPortsBySwitchPorts{PortID: "1"},
+					portStatus: &sdk.ResponseItemSwitchGetDeviceSwitchPortsStatuses{PortID: "1", Status: "connected"},
+				},
+				{
+					port:       &sdk.ResponseItemSwitchGetOrganizationSwitchPortsBySwitchPorts{PortID: "2"},
+					portStatus: &sdk.ResponseItemSwitchGetDeviceSwitchPortsStatuses{PortID: "2", Status: "disconnected"},
+				},
+			},
+			statusesToReport: []string{"CONNECTED", "Disconnected"},
+			expectedCount:    2,
+			expectedPortIDs:  []string{"1", "2"},
 		},
 		{
 			name:             "empty switchports",

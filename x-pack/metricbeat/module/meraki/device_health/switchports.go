@@ -7,7 +7,6 @@ package device_health
 import (
 	"errors"
 	"fmt"
-	"slices"
 	"strings"
 	"time"
 
@@ -35,8 +34,11 @@ func filterSwitchportsByStatus(switchports []*switchport, statusesToReport []str
 			continue
 		}
 		portStatus := strings.ToLower(sp.portStatus.Status)
-		if slices.Contains(statusesToReport, portStatus) {
-			filtered = append(filtered, sp)
+		for _, allowed := range statusesToReport {
+			if portStatus == strings.ToLower(allowed) {
+				filtered = append(filtered, sp)
+				break
+			}
 		}
 	}
 	return filtered
