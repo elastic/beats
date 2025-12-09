@@ -85,14 +85,8 @@ func New(f *flows.Flows, datalink layers.LinkType, icmp4 icmp.ICMPv4Processor, i
 		flows:     f,
 		decoders:  make(map[gopacket.LayerType]gopacket.DecodingLayer),
 		icmp4Proc: icmp4, icmp6Proc: icmp6, tcpProc: tcp, udpProc: udp,
-<<<<<<< HEAD
-		fragments: fragmentCache{collected: make(map[uint16]fragments)},
-		logger:    logp.NewLogger("decoder"),
-=======
 		fragments:          fragmentCache{collected: make(map[fragmentKey]fragments), lastPurge: time.Now()},
-		allowMismatchedEth: allowMismatchedEth,
 		logger:             logp.NewLogger("decoder"),
->>>>>>> 55057cb62 (packetbeat: Rework ip fragmentation and make it bound (#47970))
 	}
 	d.stD1Q.init(&d.d1q[0], &d.d1q[1])
 	d.stIP4.init(&d.ip4[0], &d.ip4[1])
