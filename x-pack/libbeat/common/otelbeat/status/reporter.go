@@ -87,6 +87,13 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 
 func (r *reporter) UpdateStatus() {
 	evt := r.calculateOtelStatus()
+	oppositeStatus := getOppositeStatus(evt.Status())
+	if oppositeStatus != componentstatus.StatusNone {
+		// emit a dummy event first to ensure the otel core framework acknowledges the change
+		// workaround for https://github.com/open-telemetry/opentelemetry-collector/issues/14282
+		dummyEvt := componentstatus.NewEvent(oppositeStatus)
+		componentstatus.ReportStatus(r.host, dummyEvt)
+	}
 	componentstatus.ReportStatus(r.host, evt)
 }
 
@@ -151,4 +158,16 @@ type subReporter struct {
 func (m *subReporter) UpdateStatus(status status.Status, msg string) {
 	// report status to its parent
 	m.r.updateStatusForRunner(m.id, status, msg)
+}
+
+// getOppositeStatus returns the opposite status of the given status, and None if no such status exists.
+func getOppositeStatus(status componentstatus.Status) componentstatus.Status {
+	switch status {
+	case componentstatus.StatusOK:
+		return componentstatus.StatusRecoverableError
+	case componentstatus.StatusRecoverableError:
+		return componentstatus.StatusOK
+	default:
+		return componentstatus.StatusNone
+	}
 }
