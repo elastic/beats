@@ -35,7 +35,6 @@ type mockedMessage struct {
 	retained  bool
 	topic     string
 	payload   []byte
-	ack       func()
 }
 
 var _ libmqtt.Message = new(mockedMessage)
@@ -103,6 +102,12 @@ func (m *mockedToken) WaitTimeout(time.Duration) bool {
 
 func (m *mockedToken) Error() error {
 	return nil
+}
+
+func (m *mockedToken) Done() <-chan struct{} {
+	ch := make(chan struct{})
+	close(ch)
+	return ch
 }
 
 type mockedClient struct {
