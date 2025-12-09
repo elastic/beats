@@ -85,8 +85,8 @@ func New(f *flows.Flows, datalink layers.LinkType, icmp4 icmp.ICMPv4Processor, i
 		flows:     f,
 		decoders:  make(map[gopacket.LayerType]gopacket.DecodingLayer),
 		icmp4Proc: icmp4, icmp6Proc: icmp6, tcpProc: tcp, udpProc: udp,
-		fragments:          fragmentCache{collected: make(map[fragmentKey]fragments), lastPurge: time.Now()},
-		logger:             logp.NewLogger("decoder"),
+		fragments: fragmentCache{collected: make(map[fragmentKey]fragments), lastPurge: time.Now()},
+		logger:    logp.NewLogger("decoder"),
 	}
 	d.stD1Q.init(&d.d1q[0], &d.d1q[1])
 	d.stIP4.init(&d.ip4[0], &d.ip4[1])
@@ -261,6 +261,7 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	if d.flowID != nil && d.flowID.Flags() != 0 {
 		flow := d.flows.Get(d.flowID)
 		d.statPackets.Add(flow, 1)
+		////nolint:gosec // G115: safe conversion, ci.Length is the size of the original packet and is therefore always positive
 		d.statBytes.Add(flow, uint64(ci.Length))
 	}
 }
