@@ -28,8 +28,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
-	"time"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
@@ -41,100 +41,50 @@ import (
 	"github.com/elastic/elastic-agent-libs/testing/fs"
 )
 
-const (
-	testTimeout     = 5 * time.Minute
-	testImage       = "golang:latest"
-	containerChroot = "/hostfs"
-)
-
-func TestNewFactoryChrootInDocker(t *testing.T) {
-	if os.Getenv("IN_DOCKER_CONTAINER") != "true" {
-		t.Skip("Skipping test - must run inside Docker container with IN_DOCKER_CONTAINER=true")
-	}
-
-	journalctlPath := os.Getenv("JOURNALCTL_PATH")
-	if journalctlPath == "" {
-		t.Fatal("environment variable JOURNALCTL_PATH not set")
-	}
-
-	// This test should be run inside the Docker container
-	chrootPath := containerChroot
-
-	// Check if journalctl exists in chroot
-	fullPath := filepath.Join(chrootPath, journalctlPath)
-	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
-		t.Skipf("journalctl not found at %s", fullPath)
-	}
-
-	testCtx, cancel := context.WithCancel(t.Context())
-	t.Cleanup(cancel)
-
-	tempDir := fs.TempDir(t)
-	logger := logptest.NewFileLogger(t, tempDir)
-
-	factory := NewFactory(chrootPath, journalctlPath)
-
-	jctl, err := factory(testCtx, logger.Logger, "--version")
-	require.NoError(t, err, "failed to create journalctl with chroot")
-	defer jctl.Kill()
-
-	// Try to read version output
-	data, err := jctl.Next(testCtx)
-	require.NoError(t, err, "failed to read from journalctl")
-	require.NotEmpty(t, data, "expected output from journalctl --version")
-
-	t.Logf("Successfully executed journalctl with chroot: %s", string(data))
-}
-
+// TestNewFactoryChroot starts a docker container mounting / as /hostfs and
+// the current directory as /workspace. The container runs TestInDockerNewFactory
+// that sets the chroot to access the host's journalctl
 func TestNewFactoryChroot(t *testing.T) {
-	ctx, cancel := context.WithTimeout(t.Context(), testTimeout)
-	defer cancel()
+	containerChroot := "/hostfs"
 
 	// Create Docker client
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	require.NoError(t, err, "failed to create docker client")
 	defer cli.Close()
 
-	// Pull the image if not present
-	pullImage(ctx, t, cli, testImage)
-
-	// Get the absolute path to the current binary for mounting
-	workDir, err := os.Getwd()
-	require.NoError(t, err, "failed to get working directory")
-
 	// Find the project root (where go.mod is)
-	projectRoot := findProjectRoot(t, workDir)
+	projectRoot := findProjectRoot(t)
+	imageName := getImageName(t, projectRoot)
 
-	// TODO: fix this constant
-	testDir := "/workspace/filebeat/input/journald/pkg/journalctl"
+	// Pull the image if not present
+	pullImage(t, cli, imageName)
 
 	// Find the absolute path to journalctl inside the chroot
 	journalctlPath, err := exec.LookPath("journalctl")
-	if err != nil {
-		t.Fatalf("cannot look path for journalctl: %s", err)
-	}
+	require.NoError(t, err, "cannot look path for journalctl")
 
-	t.Logf("Found journalctl at: %s", journalctlPath)
+	tempDir := fs.TempDir(t, "..", "..", "..", "..", "build")
 
 	// Create container configuration
 	containerConfig := &container.Config{
-		Image:      testImage,
-		Cmd:        []string{"go", "test", "-v", "-count=1", "-run=TestNewFactoryChrootInDocker"},
+		Image:      imageName,
+		Cmd:        []string{"go", "test", "-v", "-count=1", "-run=TestInDockerNewFactory"},
 		Tty:        true,
-		WorkingDir: testDir,
+		WorkingDir: "/workspace/filebeat/input/journald/pkg/journalctl",
 		Env: []string{
 			"IN_DOCKER_CONTAINER=true",
 			fmt.Sprintf("JOURNALCTL_PATH=%s", journalctlPath),
+			fmt.Sprintf("CHROOT_PATH=%s", containerChroot),
+			fmt.Sprintf("TEST_TEMP_DIR=%s", filepath.Join(containerChroot, tempDir)),
 		},
 	}
 
 	hostConfig := &container.HostConfig{
 		Mounts: []mount.Mount{
 			{
-				Type:     mount.TypeBind,
-				Source:   "/",
-				Target:   containerChroot,
-				ReadOnly: true,
+				Type:   mount.TypeBind,
+				Source: "/",
+				Target: containerChroot,
 			},
 			{
 				Type:   mount.TypeBind,
@@ -147,45 +97,79 @@ func TestNewFactoryChroot(t *testing.T) {
 	}
 
 	// Create the container
-	resp, err := cli.ContainerCreate(ctx, containerConfig, hostConfig, nil, nil, "")
+	ctx := t.Context()
+	createResp, err := cli.ContainerCreate(ctx, containerConfig, hostConfig, nil, nil, "")
 	require.NoError(t, err, "failed to create container")
-	containerID := resp.ID
+	containerID := createResp.ID
 
 	// Start the container
 	err = cli.ContainerStart(ctx, containerID, container.StartOptions{})
 	require.NoError(t, err, "failed to start container")
-	hr, err := cli.ContainerAttach(ctx, containerID, container.AttachOptions{
+	attachResp, err := cli.ContainerAttach(ctx, containerID, container.AttachOptions{
 		Stream: true,
 		Stdout: true,
 		Stderr: true,
 	})
-	if err != nil {
-		t.Fatalf("cannot attach to container: %d", err)
-	}
+	require.NoErrorf(t, err, "cannot attach to container: %d", err)
 
-	tempDir := fs.TempDir(t, "..", "..", "..", "..", "build")
 	containerLogs := fs.NewLogFile(t, tempDir, "docker-container-*.log")
 	go func() {
-		_, err := io.Copy(containerLogs, hr.Reader)
+		_, err := io.Copy(containerLogs, attachResp.Reader)
 		if err != nil {
 			t.Logf("could not fully copy container logs: %s", err)
 		}
 	}()
 
-	respChan, errchan := cli.ContainerWait(ctx, containerID, container.WaitConditionRemoved)
+	waitRespChan, waitErrChan := cli.ContainerWait(ctx, containerID, container.WaitConditionRemoved)
 	select {
-	case r := <-respChan:
+	case r := <-waitRespChan:
 		if r.StatusCode != 0 {
-			t.Errorf("test in container returned status %d", r.StatusCode)
+			t.Errorf("Test in container failed, returned status: %d.", r.StatusCode)
+			if r.Error != nil {
+				t.Logf("ContainerWait response error: %s", r.Error.Message)
+			}
+
+			logDockerCmd(t, imageName, containerConfig, hostConfig)()
+			t.Log("Check the docker container logs for more information")
 		}
-	case err := <-errchan:
-		t.Fatalf("error running container: %s", err)
+	case err := <-waitErrChan:
+		t.Fatalf("error waiting for container to finish: %s", err)
 	}
 }
 
-func pullImage(ctx context.Context, t *testing.T, cli *client.Client, imageName string) {
-	reader, err := cli.ImagePull(ctx, imageName, image.PullOptions{})
-	require.NoError(t, err, "failed to pull image")
+func TestInDockerNewFactory(t *testing.T) {
+	if os.Getenv("IN_DOCKER_CONTAINER") != "true" {
+		t.Skip("Skipping test - must run inside Docker container with IN_DOCKER_CONTAINER=true")
+	}
+
+	journalctlPath := os.Getenv("JOURNALCTL_PATH")
+	require.NotEmpty(t, journalctlPath, "JOURNALCTL_PATH must be set")
+
+	chrootPath := os.Getenv("CHROOT_PATH")
+	require.NotEmpty(t, chrootPath, "CHROOT_PATH must be set")
+
+	tempDir := os.Getenv("TEST_TEMP_DIR")
+	require.NotEmpty(t, chrootPath, "TEST_TEMP_DIR be set")
+
+	testCtx, cancel := context.WithCancel(t.Context())
+	t.Cleanup(cancel)
+
+	logger := logptest.NewFileLogger(t, tempDir)
+	factory := NewFactory(chrootPath, journalctlPath)
+
+	jctl, err := factory(testCtx, logger.Logger, "--version")
+	require.NoError(t, err, "failed to create journalctl with chroot")
+	defer jctl.Kill()
+
+	// Try to read version output
+	data, err := jctl.Next(testCtx)
+	require.NoError(t, err, "failed to read from journalctl")
+	require.NotEmpty(t, data, "expected output from journalctl --version")
+}
+
+func pullImage(t *testing.T, cli *client.Client, imageName string) {
+	reader, err := cli.ImagePull(t.Context(), imageName, image.PullOptions{})
+	require.NoErrorf(t, err, "failed to pull image: %q", imageName)
 	defer reader.Close()
 
 	// Wait for pull to complete
@@ -193,19 +177,73 @@ func pullImage(ctx context.Context, t *testing.T, cli *client.Client, imageName 
 	require.NoError(t, err, "failed to read image pull output")
 }
 
-func findProjectRoot(t *testing.T, startDir string) string {
-	dir := startDir
+func findProjectRoot(t *testing.T) string {
+	startDir, err := os.Getwd()
+	require.NoError(t, err, "failed to get working directory")
+
+	// Add a level so we start looking at the current directory
+	dir := filepath.Join(startDir, "foo")
 	for {
 		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
 			return dir
 		}
 
 		parent := filepath.Dir(dir)
-		if parent == dir {
+		if parent == "/" {
 			// Reached root without finding go.mod
-			t.Logf("Warning: go.mod not found, using current directory: %s", startDir)
-			return startDir
+			t.Fatal("go.mod not found")
 		}
+
 		dir = parent
+	}
+}
+
+func getImageName(t *testing.T, projectRoot string) string {
+	// Construct the path to the .go-version file
+	goVersionPath := filepath.Join(projectRoot, ".go-version")
+
+	// Read the contents of the .go-version file
+	data, err := os.ReadFile(goVersionPath)
+	require.NoError(t, err, "failed to read .go-version file")
+
+	// Trim leading and trailing spaces from the version string
+	version := strings.TrimSpace(string(data))
+
+	imageName := "golang:" + version + "-alpine"
+	return imageName
+}
+
+func logDockerCmd(
+	t *testing.T,
+	imageName string,
+	containerConfig *container.Config,
+	hostConfig *container.HostConfig) func() {
+	return func() {
+		t.Logf("To reproduce, you can run the following Docker command:")
+
+		// Construct the environment variables
+		var envVars []string
+		for _, env := range containerConfig.Env {
+			envVars = append(envVars, "-e "+env)
+		}
+
+		// Construct the volume mounts
+		var volumeMounts []string
+		for _, m := range hostConfig.Mounts {
+			mountOption := "-v " + m.Source + ":" + m.Target
+			volumeMounts = append(volumeMounts, mountOption)
+		}
+
+		// Construct the docker run command
+		dockerRunCmd := strings.Join([]string{
+			"docker run --rm",
+			strings.Join(envVars, " "),
+			strings.Join(volumeMounts, " "),
+			"-w " + containerConfig.WorkingDir,
+			imageName,
+			strings.Join(containerConfig.Cmd, " "),
+		}, " ")
+
+		t.Log(dockerRunCmd)
 	}
 }
