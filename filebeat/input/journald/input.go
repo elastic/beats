@@ -22,6 +22,8 @@ package journald
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -57,8 +59,9 @@ type journald struct {
 	Facilities         []int
 	SaveRemoteHostname bool
 	Parsers            parser.Config
-	Journalctl         bool
 	Merge              bool
+	Binary             string
+	Chroot             string
 }
 
 type checkpoint struct {
@@ -112,6 +115,21 @@ func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, erro
 		sources[i] = pathSource(p)
 	}
 
+	if config.Chroot != "" {
+		chrootStat, err := os.Stat(config.Chroot)
+		if err != nil {
+			return nil, nil, fmt.Errorf("cannot stat chroot:  %w", err)
+		}
+		if !chrootStat.IsDir() {
+			return nil, nil, fmt.Errorf("provided chroot (%s) is not a directory", config.Chroot)
+		}
+
+		fullPath := filepath.Join(config.Chroot, config.JournalctlPath)
+		if _, err := os.Stat(fullPath); err != nil {
+			return nil, nil, fmt.Errorf("cannot stat journalctl binary in chroot: %s", err)
+		}
+	}
+
 	return sources, &journald{
 		ID:                 config.ID,
 		Since:              config.Since,
@@ -124,6 +142,8 @@ func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, erro
 		SaveRemoteHostname: config.SaveRemoteHostname,
 		Parsers:            config.Parsers,
 		Merge:              config.Merge,
+		Chroot:             config.Chroot,
+		Binary:             config.JournalctlPath,
 	}, nil
 }
 
@@ -143,7 +163,7 @@ func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 		inp.Since,
 		src.Name(),
 		inp.Merge,
-		journalctl.Factory,
+		journalctl.NewFactory(inp.Chroot, inp.Binary),
 	)
 	if err != nil {
 		return err
@@ -179,7 +199,7 @@ func (inp *journald) Run(
 		inp.Since,
 		src.Name(),
 		inp.Merge,
-		journalctl.Factory,
+		journalctl.NewFactory(inp.Chroot, inp.Binary),
 	)
 	if err != nil {
 		wrappedErr := fmt.Errorf("could not start journal reader: %w", err)

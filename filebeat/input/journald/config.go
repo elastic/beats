@@ -76,6 +76,10 @@ type config struct {
 	// Allow ingesting log entries interleaved from all available journals,
 	// including remote ones.
 	Merge bool `config:"merge"`
+
+	Chroot string `config:"chroot"`
+
+	JournalctlPath string `config:"journalctl_path"`
 }
 
 // bwcIncludeMatches is a wrapper that accepts include_matches configuration
@@ -107,5 +111,6 @@ func defaultConfig() config {
 	return config{
 		Seek:               journalctl.SeekHead,
 		SaveRemoteHostname: false,
+		JournalctlPath:     "journalctl",
 	}
 }
