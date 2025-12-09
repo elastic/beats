@@ -49,11 +49,32 @@ func TestFetch(t *testing.T) {
 
 	keyspace := events[0].MetricSetFields
 
-	assert.True(t, keyspace["avg_ttl"].(int64) >= 0)
-	assert.True(t, keyspace["expires"].(int64) >= 0)
-	assert.True(t, keyspace["keys"].(int64) >= 0)
-	assert.True(t, keyspace["subexpiry"].(int64) >= 0)
-	assert.True(t, strings.Contains(keyspace["id"].(string), "db"))
+	avgTTL, ok := keyspace["avg_ttl"].(int64)
+	if !ok {
+		t.Errorf("avg_ttl is not of type int64")
+	}
+	expires, ok := keyspace["expires"].(int64)
+	if !ok {
+		t.Errorf("expires is not of type int64")
+	}
+	keys, ok := keyspace["keys"].(int64)
+	if !ok {
+		t.Errorf("keys is not of type int64")
+	}
+	subExpiry, ok := keyspace["subexpiry"].(int64)
+	if !ok {
+		t.Errorf("subexpiry is not of type int64")
+	}
+	id, ok := keyspace["id"].(string)
+	if !ok {
+		t.Errorf("id is not of type string")
+	}
+
+	assert.True(t, avgTTL >= 0)
+	assert.True(t, expires >= 0)
+	assert.True(t, keys >= 0)
+	assert.True(t, subExpiry >= 0)
+	assert.True(t, strings.Contains(id, "db"))
 }
 
 func TestData(t *testing.T) {
