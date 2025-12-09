@@ -259,6 +259,38 @@ func resolvePath(path string) string {
 	return sb.String()
 }
 
+func parseTimestamp(t []byte) time.Time {
+	if len(t) != 8 {
+		return time.Time{}
+	}
+
+	// read the low 32 bits and the high 32 bits as uint32 (little endian)
+	dwLow := binary.LittleEndian.Uint32(t[4:])
+	dwHigh := binary.LittleEndian.Uint32(t[:4])
+
+	// combine the low and high 32 bits into a single 64 bit integer
+	// this is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
+	ticks := int64(dwLow)<<32 + int64(dwHigh)
+
+	// if the ticks are less than the number of 100 nanosecond intervals since January 1, 1601 (UTC), the time is invalid
+	// so return zero time
+	if ticks < 116444736000000000 {
+		return time.Time{}
+	}
+
+	// subtract the number of 100 nanosecond representing the unix epoch (January 1, 1970 (UTC))
+	ticks -= 116444736000000000
+
+	// convert the ticks to seconds and nanoseconds
+	// the ticks are in 100 nanosecond intervals, so we need to divide by 10000000 to get seconds
+	// and take the remainder to get nanoseconds
+	seconds := ticks / 10000000
+	nanos := (ticks % 10000000) * 100
+
+	// return the time as a time.Time value
+	return time.Unix(seconds, nanos)
+}
+
 func NewDestListEntry(data []byte, version int32, log *logger.Logger) (*DestListEntry, error) {
 
 	var interactionCount int32
@@ -313,7 +345,7 @@ func NewDestListEntry(data []byte, version int32, log *logger.Logger) (*DestList
 	name := fmt.Sprintf("%x", entryNumber)
 	unknown0 := int32(binary.LittleEndian.Uint32(data[92:96]))
 	accessCount := float32(binary.LittleEndian.Uint32(data[96:100]))
-	lastModifiedTime := toTime(data[100:108])
+	lastModifiedTime := parseTimestamp(data[100:108])
 	pinStatus := int32(binary.LittleEndian.Uint32(data[108:112]))
 	macAddress := fileDroid.AsMacAddress()
 	creationTime := fileDroid.AsFileTime()

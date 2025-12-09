@@ -10,14 +10,12 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	golnk "github.com/parsiya/golnk"
 
-	//"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/parsers/lnk/shell_items"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
@@ -27,73 +25,40 @@ var LnkSignature = []byte{0x4c, 0x00, 0x00, 0x00}
 var MinLnkSize = 76
 
 type Lnk struct {
-	TargetPath           string    `osquery:"local_base_path"`
-	IconLocation         string    `osquery:"icon_location"`
-	CommandLineArguments string    `osquery:"command_line_arguments"`
-	TargetModifiedTime   time.Time `osquery:"target_modified_time" format:"unix"`
-	TargetAccessedTime   time.Time `osquery:"target_accessed_time" format:"unix"`
-	TargetCreatedTime    time.Time `osquery:"target_created_time" format:"unix"`
-	VolumeSerialNumber   string    `osquery:"volume_serial_number"`
-	VolumeType           string    `osquery:"volume_type"`
-	VolumeLabel          string    `osquery:"volume_label"`
-	WorkingDir           string    `osquery:"working_dir"`
-	NameString           string    `osquery:"name_string"`
-	RelativePath         string    `osquery:"relative_path"`
-}
-
-func NewLnkFromPath(filePath string, log *logger.Logger) (*Lnk, error) {
-	bytes, err := os.ReadFile(filePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read LNK file: %w", err)
-	}
-	return NewLnkFromBytes(bytes, log)
-}
-
-func toTime(t []byte) time.Time {
-	if len(t) != 8 {
-		return time.Time{}
-	}
-
-	// read the low 32 bits and the high 32 bits as uint32 (little endian)
-	dwLow := binary.LittleEndian.Uint32(t[4:])
-	dwHigh := binary.LittleEndian.Uint32(t[:4])
-
-	// combine the low and high 32 bits into a single 64 bit integer
-	// this is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
-	ticks := int64(dwLow)<<32 + int64(dwHigh)
-
-	// if the ticks are less than the number of 100 nanosecond intervals since January 1, 1601 (UTC), the time is invalid
-	// so return zero time
-	if ticks < 116444736000000000 {
-		return time.Time{}
-	}
-
-	// subtract the number of 100 nanosecond representing the unix epoch (January 1, 1970 (UTC))
-	ticks -= 116444736000000000
-
-	// convert the ticks to seconds and nanoseconds
-	// the ticks are in 100 nanosecond intervals, so we need to divide by 10000000 to get seconds
-	// and take the remainder to get nanoseconds
-	seconds := ticks / 10000000
-	nanos := (ticks % 10000000) * 100
-
-	// return the time as a time.Time value
-	return time.Unix(seconds, nanos)
+	LocalPath              string    `osquery:"local_path"`
+	FileSize               uint32    `osquery:"file_size"`
+	HotKey                 string    `osquery:"hot_key"`
+	IconIndex              int32     `osquery:"icon_index"`
+	ShowWindow             string    `osquery:"show_window"`
+	IconLocation           string    `osquery:"icon_location"`
+	CommandLineArguments   string    `osquery:"command_line_arguments"`
+	TargetModificationDate time.Time `osquery:"target_modification_time" format:"unix"`
+	TargetLastAccessedDate time.Time `osquery:"target_last_accessed_time" format:"unix"`
+	TargetCreationDate     time.Time `osquery:"target_creation_time" format:"unix"`
+	VolumeSerialNumber     string    `osquery:"volume_serial_number"`
+	VolumeType             string    `osquery:"volume_type"`
+	VolumeLabel            string    `osquery:"volume_label"`
+	VolumeLabelOffset      uint32    `osquery:"volume_label_offset"`
+	Name                   string    `osquery:"name"`
 }
 
 func (l *Lnk) String() string {
 	sb := strings.Builder{}
 	sb.WriteString("Lnk{")
-	sb.WriteString(fmt.Sprintf("target_path: %s, ", l.TargetPath))
-	sb.WriteString(fmt.Sprintf("target_modified_time: %s, ", l.TargetModifiedTime.UTC().Format(time.RFC3339)))
-	sb.WriteString(fmt.Sprintf("target_accessed_time: %s, ", l.TargetAccessedTime.UTC().Format(time.RFC3339)))
-	sb.WriteString(fmt.Sprintf("target_created_time: %s, ", l.TargetCreatedTime.UTC().Format(time.RFC3339)))
+	sb.WriteString(fmt.Sprintf("local_path: %s, ", l.LocalPath))
+	sb.WriteString(fmt.Sprintf("file_size: %d, ", l.FileSize))
+	sb.WriteString(fmt.Sprintf("hot_key: %s, ", l.HotKey))
+	sb.WriteString(fmt.Sprintf("icon_index: %d, ", l.IconIndex))
+	sb.WriteString(fmt.Sprintf("show_window: %s, ", l.ShowWindow))
+	sb.WriteString(fmt.Sprintf("icon_location: %s, ", l.IconLocation))
+	sb.WriteString(fmt.Sprintf("target_modification_time: %s, ", l.TargetModificationDate.UTC().Format(time.RFC3339)))
+	sb.WriteString(fmt.Sprintf("target_last_accessed_time: %s, ", l.TargetLastAccessedDate.UTC().Format(time.RFC3339)))
+	sb.WriteString(fmt.Sprintf("target_creation_time: %s, ", l.TargetCreationDate.UTC().Format(time.RFC3339)))
 	sb.WriteString(fmt.Sprintf("volume_serial_number: %s, ", l.VolumeSerialNumber))
 	sb.WriteString(fmt.Sprintf("volume_type: %s, ", l.VolumeType))
 	sb.WriteString(fmt.Sprintf("volume_label: %s, ", l.VolumeLabel))
-	sb.WriteString(fmt.Sprintf("working_dir: %s, ", l.WorkingDir))
-	sb.WriteString(fmt.Sprintf("name_string: %s, ", l.NameString))
-	sb.WriteString(fmt.Sprintf("relative_path: %s, ", l.RelativePath))
+	sb.WriteString(fmt.Sprintf("volume_label_offset: %d, ", l.VolumeLabelOffset))
+	sb.WriteString(fmt.Sprintf("name: %s, ", l.Name))
 	sb.WriteString(fmt.Sprintf("command_line_arguments: %s}", l.CommandLineArguments))
 	return sb.String()
 }
@@ -115,16 +80,6 @@ func NewLnkFromBytes(data []byte, log *logger.Logger) (*Lnk, error) {
 		return nil, fmt.Errorf("data is too short to contain a valid LNK file")
 	}
 
-	// There appears to be a bug in the golnk library, where the access time, creation time, and modification time
-	// are not being converted to the correct time.Time values in cases where the time is zero (not set).
-	// I have submitted an issue to the golnk library: https://github.com/parsiya/golnk/issues/7
-	// as well as a pull request to fix it: https://github.com/parsiya/golnk/pull/8
-	// In the meantime, we will convert the timestamps manually
-	// offset values pulled from https://github.com/EricZimmerman/Lnk/blob/master/Lnk/Header.cs#L134-L146
-	accessTime := toTime(data[28:36])
-	creationTime := toTime(data[36:44])
-	modificationTime := toTime(data[44:52])
-
 	lnkFile, err := golnk.Read(bytes.NewReader(data), uint64(len(data)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to read LNK file: %w", err)
@@ -141,19 +96,29 @@ func NewLnkFromBytes(data []byte, log *logger.Logger) (*Lnk, error) {
 		volumeSerialNumber = fmt.Sprintf("%02X%02X-%02X%02X", bytes[0], bytes[1], bytes[2], bytes[3])
 	}
 
+	// the golnk library returns "No Key Assigned" if no hotkey is set,
+	// we need to convert this to an empty string
+	hotKey := lnkFile.Header.HotKey
+	if hotKey == "No Key Assigned" {
+		hotKey = ""
+	}
+
 	lnk := &Lnk{
-		TargetPath:           lnkFile.LinkInfo.LocalBasePath,
-		IconLocation:         lnkFile.StringData.IconLocation,
-		TargetModifiedTime:   modificationTime,
-		TargetAccessedTime:   accessTime,
-		TargetCreatedTime:    creationTime,
-		VolumeSerialNumber:   volumeSerialNumber,
-		VolumeType:           lnkFile.LinkInfo.VolID.DriveType,
-		VolumeLabel:          lnkFile.LinkInfo.VolID.VolumeLabel,
-		CommandLineArguments: lnkFile.StringData.CommandLineArguments,
-		WorkingDir:           lnkFile.StringData.WorkingDir,
-		NameString:           lnkFile.StringData.NameString,
-		RelativePath:         lnkFile.StringData.RelativePath,
+		LocalPath:              lnkFile.LinkInfo.LocalBasePath,
+		FileSize:               lnkFile.Header.TargetFileSize,
+		HotKey:                 hotKey,
+		IconIndex:              lnkFile.Header.IconIndex,
+		ShowWindow:             lnkFile.Header.ShowCommand,
+		IconLocation:           lnkFile.StringData.IconLocation,
+		TargetModificationDate: lnkFile.Header.WriteTime,
+		TargetLastAccessedDate: lnkFile.Header.AccessTime,
+		TargetCreationDate:     lnkFile.Header.CreationTime,
+		VolumeSerialNumber:     volumeSerialNumber,
+		VolumeType:             lnkFile.LinkInfo.VolID.DriveType,
+		VolumeLabel:            lnkFile.LinkInfo.VolID.VolumeLabel,
+		VolumeLabelOffset:      lnkFile.LinkInfo.VolID.VolumeLabelOffset,
+		CommandLineArguments:   lnkFile.StringData.CommandLineArguments,
+		Name:                   lnkFile.StringData.NameString,
 	}
 
 	return lnk, nil

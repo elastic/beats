@@ -34,7 +34,7 @@ const (
 type JumpListMeta struct {
 	ApplicationId
 	JumplistType JumpListType `osquery:"jumplist_type"`
-	Path         string       `osquery:"jumplist_file_path"`
+	Path         string       `osquery:"source_file_path"`
 }
 
 // JumpListEntry is a single entry in a jump list.
