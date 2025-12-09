@@ -26,7 +26,7 @@ type switchport struct {
 	portStatus *sdk.ResponseItemSwitchGetDeviceSwitchPortsStatuses
 }
 
-func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map[Serial]*Device, period time.Duration, switchportStatuses []string, logger *logp.Logger) error {
+func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map[Serial]*Device, period time.Duration, statusesToReport []string, logger *logp.Logger) error {
 	params := &sdk.GetOrganizationSwitchPortsBySwitchQueryParams{}
 	setStart := func(s string) { params.StartingAfter = s }
 
@@ -84,7 +84,7 @@ func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map
 					continue
 				}
 				portStatus := strings.ToLower(sp.portStatus.Status)
-				if slices.Contains(switchportStatuses, portStatus) {
+				if slices.Contains(statusesToReport, portStatus) {
 					filteredSwitchports = append(filteredSwitchports, sp)
 				}
 			}
