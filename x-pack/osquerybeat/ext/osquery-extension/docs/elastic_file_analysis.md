@@ -26,15 +26,13 @@ This is particularly useful for:
 | Column | Type | Description |
 |--------|------|-------------|
 | `path` | `TEXT` | Absolute path to the file being analyzed |
-| `mode` | `TEXT` | File permissions (e.g., '0755') |
+| `mode` | `TEXT` | File permissions (e.g., `755`) |
 | `uid` | `BIGINT` | File owner user ID |
 | `gid` | `BIGINT` | File owner group ID |
 | `size` | `BIGINT` | File size in bytes |
-| `atime` | `BIGINT` | Last access time (Unix timestamp) |
 | `mtime` | `BIGINT` | Last modification time (Unix timestamp) |
-| `ctime` | `BIGINT` | Last status change time (Unix timestamp) |
-| `filetype` | `TEXT` | File type and architecture from `file` command |
-| `codesign` | `TEXT` | Code signing information from `codesign -dvv` |
+| `file_type` | `TEXT` | File type and architecture from the `file` command |
+| `code_sign` | `TEXT` | Code signing information from `codesign -dvvv` |
 | `dependencies` | `TEXT` | Linked libraries from `otool -L` |
 | `symbols` | `TEXT` | Exported symbols from `nm` |
 | `strings` | `TEXT` | Printable strings from binary (>= 4 characters) |
@@ -43,9 +41,9 @@ This is particularly useful for:
 
 When you query this table with a file path, it performs a comprehensive analysis by executing multiple macOS command-line tools:
 
-1. **File metadata**: Uses standard file system calls to get size, timestamps, permissions
+1. **File metadata**: Uses standard file system calls to get permissions, ownership, size, and `mtime`
 2. **File type detection**: Runs `file` command to identify binary type and architecture
-3. **Code signing**: Executes `codesign -dvv` to extract signing certificate and entitlements
+3. **Code signing**: Executes `codesign -dvvv` to extract signing certificates and entitlements
 4. **Dependencies**: Uses `otool -L` to list dynamically linked libraries (dylibs)
 5. **Symbols**: Runs `nm` to extract exported function names and symbols
 6. **Strings**: Executes `strings` command to extract printable text from the binary
@@ -62,12 +60,12 @@ SELECT * FROM elastic_file_analysis
 WHERE path = '/Applications/Safari.app/Contents/MacOS/Safari';
 
 -- Analyze all executables in a directory
-SELECT path, filetype, size 
+SELECT path, file_type, size 
 FROM elastic_file_analysis 
 WHERE path LIKE '/usr/local/bin/%';
 
 -- Get quick overview (metadata only)
-SELECT path, filetype, size, mode, uid, gid
+SELECT path, file_type, size, mode, uid, gid
 FROM elastic_file_analysis 
 WHERE path = '/usr/bin/sudo';
 ```
@@ -79,9 +77,9 @@ WHERE path = '/usr/bin/sudo';
 SELECT 
     path,
     CASE 
-        WHEN codesign LIKE '%Signature=adhoc%' THEN 'Ad-hoc signed'
-        WHEN codesign LIKE '%Authority=%Apple%' THEN 'Apple signed'
-        WHEN codesign LIKE '%Authority=%' THEN 'Developer signed'
+        WHEN code_sign LIKE '%Signature=adhoc%' THEN 'Ad-hoc signed'
+        WHEN code_sign LIKE '%Authority=%Apple%' THEN 'Apple signed'
+        WHEN code_sign LIKE '%Authority=%' THEN 'Developer signed'
         ELSE 'Not signed or invalid'
     END as signing_status
 FROM elastic_file_analysis 
@@ -91,24 +89,24 @@ WHERE path = '/Applications/Calculator.app/Contents/MacOS/Calculator';
 SELECT path
 FROM elastic_file_analysis 
 WHERE path LIKE '/Applications/%.app/Contents/MacOS/%'
-  AND (codesign = '' OR codesign NOT LIKE '%Signature=%');
+  AND (code_sign = '' OR code_sign NOT LIKE '%Signature=%');
 
 -- Extract signing authority
 SELECT 
     path,
-    substr(codesign, 
-           instr(codesign, 'Authority='), 
-           instr(substr(codesign, instr(codesign, 'Authority=')), char(10))) as authority
+        substr(code_sign, 
+          instr(code_sign, 'Authority='), 
+          instr(substr(code_sign, instr(code_sign, 'Authority=')), char(10))) as authority
 FROM elastic_file_analysis 
 WHERE path = '/usr/bin/codesign'
-  AND codesign LIKE '%Authority=%';
+  AND code_sign LIKE '%Authority=%';
 
 -- Check for hardened runtime
 SELECT path
 FROM elastic_file_analysis 
 WHERE path LIKE '/Applications/%'
-  AND codesign LIKE '%flags=%' 
-  AND codesign LIKE '%runtime%';
+  AND code_sign LIKE '%flags=%' 
+  AND code_sign LIKE '%runtime%';
 ```
 
 ### Dependency Analysis
@@ -197,25 +195,25 @@ WHERE path = '/usr/sbin/sshd'
 SELECT 
     path,
     mtime,
-    codesign,
+  code_sign,
     CASE 
-        WHEN codesign = '' THEN 'unsigned'
-        WHEN codesign LIKE '%adhoc%' THEN 'ad-hoc signed'
+    WHEN code_sign = '' THEN 'unsigned'
+    WHEN code_sign LIKE '%adhoc%' THEN 'ad-hoc signed'
         ELSE 'signed'
     END as sign_status
 FROM elastic_file_analysis 
 WHERE path LIKE '/usr/local/%'
   AND mtime > (strftime('%s', 'now') - 86400 * 7)  -- Last 7 days
-  AND (codesign = '' OR codesign LIKE '%adhoc%');
+  AND (code_sign = '' OR code_sign LIKE '%adhoc%');
 
 -- Detect executables in unusual locations
-SELECT path, filetype, size
+SELECT path, file_type, size
 FROM elastic_file_analysis 
 WHERE (path LIKE '/tmp/%' 
     OR path LIKE '/var/tmp/%'
     OR path LIKE '/dev/shm/%'
     OR path LIKE '/.%')  -- Hidden directories
-  AND filetype LIKE '%executable%';
+  AND file_type LIKE '%executable%';
 
 -- Find binaries with suspicious strings
 SELECT path
@@ -233,16 +231,16 @@ SELECT
     path,
     size / 1024 / 1024 as size_mb,
     datetime(mtime, 'unixepoch') as modified,
-    substr(codesign, instr(codesign, 'TeamIdentifier='), 30) as team_id
+    substr(code_sign, instr(code_sign, 'TeamIdentifier='), 30) as team_id
 FROM elastic_file_analysis 
 WHERE path LIKE '/Applications/%.app/Contents/MacOS/%';
 
 -- Compare file types and architectures
 SELECT 
     CASE 
-        WHEN filetype LIKE '%arm64%' THEN 'ARM64'
-        WHEN filetype LIKE '%x86_64%' THEN 'x86_64'
-        WHEN filetype LIKE '%universal%' THEN 'Universal'
+        WHEN file_type LIKE '%arm64%' THEN 'ARM64'
+        WHEN file_type LIKE '%x86_64%' THEN 'x86_64'
+        WHEN file_type LIKE '%universal%' THEN 'Universal'
         ELSE 'Other'
     END as architecture,
     COUNT(*) as count
@@ -289,7 +287,7 @@ SELECT * FROM elastic_file_analysis WHERE path IN (
 );
 
 -- ✅ Better: Query only needed columns
-SELECT path, filetype, codesign FROM elastic_file_analysis WHERE path = '/usr/bin/sudo';
+SELECT path, file_type, code_sign FROM elastic_file_analysis WHERE path = '/usr/bin/sudo';
 ```
 
 ## Security Considerations
@@ -305,10 +303,10 @@ SELECT path, filetype, codesign FROM elastic_file_analysis WHERE path = '/usr/bi
 
 ### Empty or Missing Fields
 
-1. **Empty `codesign` field**:
+1. **Empty `code_sign` field**:
    - File is not signed
    - File is not a Mach-O binary
-   - `codesign` command failed (check file permissions)
+  - `codesign` command failed (check file permissions)
 
 2. **Empty `dependencies` field**:
    - File has no dynamic library dependencies (statically linked)
@@ -338,7 +336,7 @@ SELECT * FROM file WHERE path = '/usr/bin/sudo';
 
 ### Understanding Code Signing Output
 
-The `codesign` field contains output from `codesign -dvv`:
+The `code_sign` column contains output from `codesign -dvvv`:
 
 ```
 Executable=/Applications/Safari.app/Contents/MacOS/Safari
@@ -361,7 +359,7 @@ Key indicators:
 
 ### File Type Examples
 
-The `filetype` field shows output from the `file` command:
+The `file_type` field shows output from the `file` command:
 
 - `Mach-O 64-bit executable x86_64`
 - `Mach-O universal binary with 2 architectures: [x86_64:Mach-O 64-bit executable x86_64] [arm64e:Mach-O 64-bit executable arm64e]`
@@ -376,7 +374,7 @@ For each file path queried:
 
 1. **File metadata**: `stat()` system calls
 2. **File type**: `file <path>`
-3. **Code signing**: `codesign -dvv <path> 2>&1`
+3. **Code signing**: `codesign -dvvv <path> 2>&1`
 4. **Dependencies**: `otool -L <path> 2>&1`
 5. **Symbols**: `nm <path> 2>&1`
 6. **Strings**: `strings <path> 2>&1`
@@ -441,7 +439,7 @@ WHERE path LIKE '/usr/local/bin/%'
   AND mtime > (strftime('%s', 'now') - 86400 * 7);
 
 -- 2. Analyze code signing
-SELECT path, codesign FROM elastic_file_analysis 
+SELECT path, code_sign FROM elastic_file_analysis 
 WHERE path = '/usr/local/bin/suspicious-binary';
 
 -- 3. Check dependencies for unusual libraries
