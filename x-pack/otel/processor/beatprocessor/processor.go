@@ -38,8 +38,8 @@ func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, erro
 		return nil, fmt.Errorf("failed to configure logp logger: %w", err)
 	}
 
-	for _, processorConfig := range cfg.Processors {
-		processor, err := createProcessor(processorConfig, logpLogger)
+	for _, processorNameAndConfig := range cfg.Processors {
+		processor, err := createProcessor(processorNameAndConfig, logpLogger)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create processor: %w", err)
 		}
@@ -56,56 +56,47 @@ func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, erro
 // The configuration is expected to be a map with a single key containing the processor name
 // and the processor's configuration as the value for that key.
 // For example: {"add_host_metadata":{"netinfo":{"enabled":false}}}
-func createProcessor(cfg map[string]any, logpLogger *logp.Logger) (beat.Processor, error) {
-	if len(cfg) == 0 {
+func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Logger) (beat.Processor, error) {
+	if len(processorNameAndConfig) == 0 {
 		return nil, nil
 	}
-	if len(cfg) > 1 {
-		if len(cfg) < 10 {
-			configKeys := make([]string, 0, len(cfg))
-			for k := range cfg {
+	if len(processorNameAndConfig) > 1 {
+		if len(processorNameAndConfig) < 10 {
+			configKeys := make([]string, 0, len(processorNameAndConfig))
+			for k := range processorNameAndConfig {
 				configKeys = append(configKeys, k)
 			}
-			return nil, fmt.Errorf("expected single processor name but got %v: %v", len(cfg), configKeys)
+			return nil, fmt.Errorf("expected single processor name but got %v: %v", len(processorNameAndConfig), configKeys)
 		}
-		return nil, fmt.Errorf("expected single processor name but got %v", len(cfg))
+		return nil, fmt.Errorf("expected single processor name but got %v", len(processorNameAndConfig))
 	}
 
-	for processorName, processorConfig := range cfg {
+	for processorName, processorConfig := range processorNameAndConfig {
+		processorConfig, configError := config.NewConfigFrom(processorConfig)
+		if configError != nil {
+			return nil, fmt.Errorf("failed to create config for processor '%s': %w", processorName, configError)
+		}
+
+		var processorInstance beat.Processor
+		var createProcessorError error
+
 		switch processorName {
 		case "add_host_metadata":
-			return createAddHostMetadataProcessor(processorConfig, logpLogger)
+			processorInstance, createProcessorError = add_host_metadata.New(processorConfig, logpLogger)
 		case "add_kubernetes_metadata":
-			return createAddKubernetesMetadataProcessor(processorConfig, logpLogger)
+			processorInstance, createProcessorError = add_kubernetes_metadata.New(processorConfig, logpLogger)
 		default:
 			return nil, fmt.Errorf("invalid processor name '%s'", processorName)
 		}
+
+		if createProcessorError != nil {
+			return nil, fmt.Errorf("failed to create processor '%s': %w", processorName, createProcessorError)
+		}
+
+		return processorInstance, nil
 	}
+
 	return nil, errors.New("malformed processor config")
-}
-
-func createAddHostMetadataProcessor(cfg any, logpLogger *logp.Logger) (beat.Processor, error) {
-	addHostMetadataConfig, err := config.NewConfigFrom(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create add_host_metadata processor config: %w", err)
-	}
-	addHostMetadataProcessor, err := add_host_metadata.New(addHostMetadataConfig, logpLogger)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create add_host_metadata processor: %w", err)
-	}
-	return addHostMetadataProcessor, nil
-}
-
-func createAddKubernetesMetadataProcessor(cfg any, logpLogger *logp.Logger) (beat.Processor, error) {
-	addKubernetesMetadataConfig, err := config.NewConfigFrom(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create add_kubernetes_metadata processor config: %w", err)
-	}
-	addKubernetesMetadataProcessor, err := add_kubernetes_metadata.New(addKubernetesMetadataConfig, logpLogger)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create add_kubernetes_metadata processor: %w", err)
-	}
-	return addKubernetesMetadataProcessor, nil
 }
 
 func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Logs, error) {
