@@ -137,7 +137,10 @@ func (s *event) SetTimeZone(b []byte) {
 
 // SetMonthNumeric sets the month with a number.
 func (s *event) SetMonthNumeric(b []byte) {
-	s.month = monthIndexed[bytesToInt(skipLeadZero(b))]
+	month := bytesToInt(skipLeadZero(b))
+	if month <= 12 {
+		s.month = monthIndexed[month]
+	}
 }
 
 // SetMonth sets the month.
@@ -211,6 +214,9 @@ func (s *event) Year() int {
 
 // SetMessage sets the message.
 func (s *event) SetMessage(b []byte) {
+	if len(b) < 3 {
+		return
+	}
 	// remove BOM
 	if b[0] == 0xef && b[1] == 0xbb && b[2] == 0xbf {
 		s.message = string(b[3:])
