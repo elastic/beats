@@ -547,7 +547,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// the current cursor object below; it is an array now.
 			delete(state, "cursor")
 
-			start = time.Now()
+			pubStart := time.Now()
 			var hadPublicationError bool
 		loop:
 			for i, e := range events {
@@ -629,11 +629,12 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				health.UpdateStatus(status.Running, "")
 			}
 
-			metricsRecorder.AddPublishDuration(ctx, time.Since(start))
+			metricsRecorder.AddPublishDuration(ctx, time.Since(pubStart))
 			// Advance the cursor to the final state if there was no error during
 			// publications. This is needed to transition to the next set of events.
 			if !hadPublicationError {
 				goodCursor = cursor
+				metricsRecorder.AddProgramSuccessExecution(ctx)
 			}
 
 			// Replace the last known good cursor.
