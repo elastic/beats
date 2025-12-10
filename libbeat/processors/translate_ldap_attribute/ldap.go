@@ -146,7 +146,7 @@ func (client *ldapClient) bindAuto(conn *ldap.Conn) error {
 	return client.bindPlatformSpecific(conn, spn)
 }
 
-// initializeMetadata discovers base DN (if needed) and detects server type
+// getBaseDN discovers base DN (if needed) and detects server type
 func (client *ldapClient) getBaseDN() (string, error) {
 	client.log.Debug("querying rootDSE for server metadata")
 
@@ -216,7 +216,6 @@ func (client *ldapClient) getBaseDN() (string, error) {
 	return "", fmt.Errorf("base DN not found in rootDSE")
 }
 
-// connection checks the connection's health and reconnects if necessary
 // withLockedConnection runs fn while holding the client mutex and ensuring the
 // underlying LDAP connection is healthy before invoking the callback.
 func (client *ldapClient) withLockedConnection(fn func(*ldap.Conn) error) error {
