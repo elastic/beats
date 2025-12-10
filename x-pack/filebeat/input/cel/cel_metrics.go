@@ -230,13 +230,15 @@ func (o *OTELCELMetrics) AddProgramExecutionSuccess(ctx context.Context, count i
 
 // Shutdown(ctx context.Context) error
 // Flushes the meters to the exporters, then shutsdown the exporter
-func (o *OTELCELMetrics) Shutdown(ctx context.Context) error {
+func (o *OTELCELMetrics) Shutdown(ctx context.Context) {
 	o.EndPeriodic(ctx)
 	var err error
 	for _, fn := range o.shutdownFuncs {
 		err = errors.Join(err, fn(ctx))
 	}
-	return err
+	if err != nil {
+		o.log.Errorf("error shutting down metrics: %v", err)
+	}
 }
 
 func NewOTELCELMetrics(log *logp.Logger,
@@ -373,6 +375,7 @@ func NewOTELCELMetrics(log *logp.Logger,
 
 	return &OTELCELMetrics{
 		log:                                  log,
+		shutdownFuncs:                        shutdownFuncs,
 		manualExportFunc:                     manualExportFunc,
 		periodicRunCount:                     periodicRunCount,
 		periodicBatchProcessedCount:          periodicBatchCount,
@@ -432,24 +435,24 @@ func (o *MetricsRecorder) AddPublishDuration(ctx context.Context, duration time.
 	o.inputMetrics.batchProcessingTime.Update(duration.Nanoseconds())
 }
 
-func (o *MetricsRecorder) AddReceivedBatch(ctx context.Context, count int64) {
+func (o *MetricsRecorder) AddReceivedBatch(ctx context.Context, count uint) {
 	o.inputMetrics.batchesReceived.Add(uint64(count))
-	o.otelMetrics.AddReceivedBatch(ctx, count)
+	o.otelMetrics.AddReceivedBatch(ctx, int64(count)) //nolint:gosec // disable G115
 }
 
-func (o *MetricsRecorder) AddPublishedBatch(ctx context.Context, count int64) {
+func (o *MetricsRecorder) AddPublishedBatch(ctx context.Context, count uint) {
 	o.inputMetrics.batchesPublished.Add(uint64(count))
-	o.otelMetrics.AddPublishedBatch(ctx, count)
+	o.otelMetrics.AddPublishedBatch(ctx, int64(count)) //nolint:gosec // disable G115
 }
 
-func (o *MetricsRecorder) AddReceivedEvents(ctx context.Context, count int64) {
+func (o *MetricsRecorder) AddReceivedEvents(ctx context.Context, count uint) {
 	o.inputMetrics.eventsReceived.Add(uint64(count))
-	o.otelMetrics.AddReceivedEvents(ctx, count)
+	o.otelMetrics.AddReceivedEvents(ctx, int64(count)) //nolint:gosec // disable G115
 }
 
-func (o *MetricsRecorder) AddPublishedEvents(ctx context.Context, count int64) {
+func (o *MetricsRecorder) AddPublishedEvents(ctx context.Context, count uint) {
 	o.inputMetrics.eventsPublished.Add(uint64(count))
-	o.otelMetrics.AddPublishedEvents(ctx, count)
+	o.otelMetrics.AddPublishedEvents(ctx, int64(count)) //nolint:gosec // disable G115
 }
 
 func (o *MetricsRecorder) AddProgramExecution(ctx context.Context) {

@@ -104,12 +104,12 @@ func TestOTELCELMetrics(t *testing.T) {
 		totalCelDuration = totalCelDuration + celDuration
 		mRecorder.AddCELDuration(ctx, celDuration)
 		mRecorder.AddProgramSuccessExecution(ctx)
-		mRecorder.AddReceivedEvents(ctx, int64(index+1))
+		mRecorder.AddReceivedEvents(ctx, uint(index+1)) //nolint:gosec // disable G115
 		mRecorder.AddReceivedBatch(ctx, 1)
 		startPublish := time.Now()
 		time.Sleep(100 * time.Millisecond)
 		mRecorder.AddPublishedBatch(ctx, 1)
-		mRecorder.AddPublishedEvents(ctx, int64(index+1))
+		mRecorder.AddPublishedEvents(ctx, uint(index+1)) //nolint:gosec // disable G115
 		publishDuration := time.Since(startPublish)
 		totalPublishDuration = totalPublishDuration + publishDuration
 		mRecorder.AddPublishDuration(ctx, publishDuration)

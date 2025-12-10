@@ -516,7 +516,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			// We have a non-empty batch of events to process.
 			metricsRecorder.AddReceivedBatch(ctx, 1)
-			metricsRecorder.AddReceivedEvents(ctx, int64(len(events)))
+			metricsRecorder.AddReceivedEvents(ctx, uint(len(events)))
 			// Drop events from state. If we fail during the publication,
 			// we will re-request these events.
 			delete(state, "events")
@@ -1025,7 +1025,7 @@ func CreateOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2
 	)
 
 	log.Infof("created cel input resource %s", resource.String())
-	exporter, exporterType, err := otel.GetGlobalMetricsExporterFactory().GetExporter(ctx, false)
+	exporter, exporterType, err := otel.GetGlobalMetricsExporterFactory().GetExporter(ctx, true)
 	if err != nil {
 		log.Errorw("failed to get exporter", "error", err)
 	}
