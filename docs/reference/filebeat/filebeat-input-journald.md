@@ -17,7 +17,7 @@ The Wolfi-based Docker image does not contain the `journalctl` binary and the `j
 :::{important}
 When using the Journald input from a Docker container, make sure that
 either:
- - {applies_to}`stack: ga 9.3.0` [`chroot`](#filebeat-input-journald-chroot), [`journalct_path`](#filebeat-input-journald-journalctl-path), or
+ - {applies_to}`stack: ga 9.3.0` [`chroot`](#filebeat-input-journald-chroot), [`journalct_path`](#filebeat-input-journald-journalctl-path) are set, or
  - The `journalctl` binary in the container is compatible with your
    Systemd/journal version. To get the version of the `journalctl` binary
    in Filebeat's image run the following, adjusting the image name/tag
@@ -112,11 +112,12 @@ input will only ingest the journal files found when started. New
 files will not be ingested.
 :::
 
-### `chroot` [filebeat-input-journald-chroot] {applies_to}`stack: ga 9.3.0`
+### `chroot` [filebeat-input-journald-chroot]
 ```{applies_to}
 stack: ga 9.3.0
 ```
-A folder to be used as chroot when calling `journalctl`. If using this
+A folder to be used as chroot when calling `journalctl`. This allows
+Filebeat to call the host's `journalctl` directly. If using this
 option, {{filebeat}} must be run as root and
 [`journalct_path`](#filebeat-input-journald-journalctl-path) must be
 set.
