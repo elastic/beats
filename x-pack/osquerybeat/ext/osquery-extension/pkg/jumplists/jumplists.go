@@ -24,7 +24,7 @@ import (
 type JumpListType string
 
 const (
-	JumpListTypeCustom    JumpListType = "custom"
+	JumpListTypeCustom JumpListType = "custom"
 )
 
 // JumpListMeta is the metadata for a jump list.
@@ -76,7 +76,7 @@ func (j *JumpList) ToRows() []JumpListRow {
 			{
 				JumpListMeta: &j.JumpListMeta,
 				JumpListEntry: &JumpListEntry{
-					Lnk:           nil,
+					Lnk: nil,
 				},
 			},
 		}

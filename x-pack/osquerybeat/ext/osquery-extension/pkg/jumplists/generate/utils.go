@@ -9,7 +9,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -21,19 +20,17 @@ import (
 
 // isHexString is a compiled regex to check for valid hex strings.
 var isHexString = regexp.MustCompile(`^[0-9a-fA-F]+$`)
+
+// isGUIDString is a compiled regex to check for valid GUID strings.
 var isGUIDString = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
 
-// downloadPage performs a GET request with a custom User-Agent.
-// It's the Go equivalent of the first part of download_webpage_as_soup.
-func downloadRawPage(url string, log *logger.Logger) (string, error) {
+// downloadPage performs a GET request
+func downloadPage(url string, log *logger.Logger) (string, error) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return "", err
 	}
-
-	// Set the User-Agent, just like in the Python script
-	req.Header.Set("User-Agent", "Mozilla/5.0")
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -41,7 +38,7 @@ func downloadRawPage(url string, log *logger.Logger) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	// Check for non-2xx status codes (like Python's raise_for_status())
+	// Check for non-2xx status codes
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		resp.Body.Close() // Make sure to close the body on error
 		return "", fmt.Errorf("bad status: %s", resp.Status)
@@ -50,12 +47,6 @@ func downloadRawPage(url string, log *logger.Logger) (string, error) {
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
-	}
-
-	// Remove the BOM ("\uFEFF") prefix if it exists.
-	// https://unicode.org/faq/utf_bom.html#bom5
-	if len(bodyBytes) > 3 && bytes.Equal(bodyBytes[:3], []byte{0xef, 0xbb, 0xbf}) {
-		bodyBytes = bodyBytes[3:]
 	}
 
 	return string(bodyBytes), nil
