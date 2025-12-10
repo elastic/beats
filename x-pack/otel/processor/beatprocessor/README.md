@@ -84,14 +84,9 @@ receivers:
       - add_host_metadata:
           netinfo:
             enabled: false
-<<<<<<< HEAD
-    output:
-      otelconsumer:
-=======
 
 exporters:
   debug:
->>>>>>> 3a9d1f4d7 (feat: add `add_kubernetes_metadata` processor to OTel Beat processor (#47942))
 ```
 
 is functionally equivalent to this one, using the Beat processor:
