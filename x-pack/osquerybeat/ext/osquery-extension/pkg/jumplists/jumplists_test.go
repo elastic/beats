@@ -8,7 +8,6 @@ package jumplists
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"strings"
 	"testing"
@@ -29,9 +28,6 @@ func TestCustomJumplists(t *testing.T) {
 
 	tests := []testCase{
 		{
-			name:        "test_custom_jumplist_1",
-			filePath:    "./testdata/custom/7e4dca80246863e3.customDestinations-ms",
-			expectError: true,
 			name:        "test_custom_jumplist_1",
 			filePath:    "./testdata/custom/7e4dca80246863e3.customDestinations-ms",
 			expectError: true,
@@ -258,19 +254,4 @@ func TestAutomaticJumpList(t *testing.T) {
 			}
 		}
 	}
-}
-
-func TestRegexp(t *testing.T) {
-	input := `::{26EE0668-A00A-44D7-9371-BEB064C98683}\3\::{8E908FC9-BECC-40F6-915B-F4CA0E70D03D}`
-
-	parts := strings.Split(input, "\\")
-
-	for _, part := range parts {
-		fmt.Printf("part: %s\n", part)
-		part = strings.Trim(part, ":{}")
-		fmt.Printf("trimmed part: %s\n", part)
-	}
-
-	// Output the result
-	fmt.Printf("%#v\n", parts)
 }

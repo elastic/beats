@@ -206,7 +206,6 @@ func resolveControlPanelCategory(part string) string {
 }
 
 func resolvePath(path string) string {
-	fmt.Printf("Resolving path: %s\n", path)
 	// Known folders start with "knownfolder" and are followed by a GUID.
 	if len(path) >= 50 && strings.HasPrefix(path, "knownfolder") {
 		knownFolderGuid := path[13:49]
@@ -255,7 +254,6 @@ func resolvePath(path string) string {
 	}
 
 	// Return the resolved path.
-	fmt.Printf("Resolved path: %s\n", sb.String())
 	return sb.String()
 }
 
