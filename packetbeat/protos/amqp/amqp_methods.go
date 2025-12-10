@@ -1027,7 +1027,7 @@ func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short s
 	if uint32(len(data)+size) < strlen {
 		return "", 0, true
 	}
-	return string(data[size : strlen+uint32(size)]), strlen + uint32(size), false
+	return string(data[offset+uint32(size) : offset+uint32(size)+strlen]), strlen + uint32(size), false
 }
 
 // Attempts to get an integer from a byte slice. Returns the integer and an err boolean.
