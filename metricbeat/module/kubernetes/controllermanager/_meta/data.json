@@ -7,10 +7,10 @@
     },
     "kubernetes": {
         "controllermanager": {
-            "name": "statefulset",
+            "name": "daemonset",
             "workqueue": {
                 "adds": {
-                    "count": 0
+                    "count": 5
                 },
                 "depth": {
                     "count": 0

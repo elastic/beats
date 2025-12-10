@@ -2,11 +2,11 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "kube-public"
+			"namespace": "kube-node-lease"
 		},
 		"MetricSetFields": {
 			"created": {
-				"sec": 1744036586
+				"sec": 1744036587
 			},
 			"status": {
 				"active": true,
@@ -52,11 +52,11 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "local-path-storage"
+			"namespace": "kube-public"
 		},
 		"MetricSetFields": {
 			"created": {
-				"sec": 1744036590
+				"sec": 1744036586
 			},
 			"status": {
 				"active": true,
@@ -102,11 +102,11 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "kube-node-lease"
+			"namespace": "local-path-storage"
 		},
 		"MetricSetFields": {
 			"created": {
-				"sec": 1744036587
+				"sec": 1744036590
 			},
 			"status": {
 				"active": true,

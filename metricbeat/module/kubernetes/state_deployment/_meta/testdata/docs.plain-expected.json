@@ -7,38 +7,6 @@
         },
         "kubernetes": {
             "deployment": {
-                "name": "local-path-provisioner",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                },
-                "status": {
-                    "available": "true",
-                    "progressing": "true"
-                }
-            },
-            "namespace": "local-path-storage"
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
                 "name": "kube-state-metrics",
                 "paused": false,
                 "replicas": {
@@ -52,7 +20,7 @@
                     "progressing": "true"
                 }
             },
-            "namespace": "default"
+            "namespace": "kube-system"
         },
         "metricset": {
             "name": "state_deployment",
@@ -103,20 +71,20 @@
         },
         "kubernetes": {
             "deployment": {
-                "name": "hellohpa",
+                "name": "local-path-provisioner",
                 "paused": false,
                 "replicas": {
-                    "available": 0,
+                    "available": 1,
                     "desired": 1,
-                    "unavailable": 1,
+                    "unavailable": 0,
                     "updated": 1
                 },
                 "status": {
-                    "available": "false",
+                    "available": "true",
                     "progressing": "true"
                 }
             },
-            "namespace": "default"
+            "namespace": "local-path-storage"
         },
         "metricset": {
             "name": "state_deployment",

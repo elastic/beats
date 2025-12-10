@@ -9,21 +9,21 @@
             "node": {
                 "cpu": {
                     "allocatable": {
-                        "cores": 32
+                        "cores": 16
                     },
                     "capacity": {
-                        "cores": 32
+                        "cores": 16
                     }
                 },
                 "kubelet": {
-                    "version": "v1.32.0"
+                    "version": "v1.29.1"
                 },
                 "memory": {
                     "allocatable": {
-                        "bytes": 67285303296
+                        "bytes": 16769380352
                     },
                     "capacity": {
-                        "bytes": 67285303296
+                        "bytes": 16769380352
                     }
                 },
                 "name": "kind-control-plane",

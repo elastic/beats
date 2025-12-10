@@ -7,48 +7,16 @@
         },
         "kubernetes": {
             "deployment": {
-                "name": "local-path-provisioner",
+                "name": "hellohpa",
                 "paused": false,
                 "replicas": {
-                    "available": 1,
+                    "available": 0,
                     "desired": 1,
-                    "unavailable": 0,
+                    "unavailable": 1,
                     "updated": 1
                 },
                 "status": {
-                    "available": "true",
-                    "progressing": "true"
-                }
-            },
-            "namespace": "local-path-storage"
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "kube-state-metrics",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                },
-                "status": {
-                    "available": "true",
+                    "available": "false",
                     "progressing": "true"
                 }
             },
@@ -103,20 +71,52 @@
         },
         "kubernetes": {
             "deployment": {
-                "name": "hellohpa",
+                "name": "kube-state-metrics",
                 "paused": false,
                 "replicas": {
-                    "available": 0,
+                    "available": 1,
                     "desired": 1,
-                    "unavailable": 1,
+                    "unavailable": 0,
                     "updated": 1
                 },
                 "status": {
-                    "available": "false",
+                    "available": "true",
                     "progressing": "true"
                 }
             },
             "namespace": "default"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "local-path-provisioner",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                },
+                "status": {
+                    "available": "true",
+                    "progressing": "true"
+                }
+            },
+            "namespace": "local-path-storage"
         },
         "metricset": {
             "name": "state_deployment",

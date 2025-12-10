@@ -32,19 +32,19 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "kube-system"
+			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"name": "coredns",
+			"name": "hellohpa",
 			"paused": false,
 			"replicas": {
-				"available": 2,
-				"desired": 2,
-				"unavailable": 0,
-				"updated": 2
+				"available": 0,
+				"desired": 1,
+				"unavailable": 1,
+				"updated": 1
 			},
 			"status": {
-				"available": "true",
+				"available": "false",
 				"progressing": "true"
 			}
 		},
@@ -92,19 +92,19 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "default"
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
-			"name": "hellohpa",
+			"name": "coredns",
 			"paused": false,
 			"replicas": {
-				"available": 0,
-				"desired": 1,
-				"unavailable": 1,
-				"updated": 1
+				"available": 2,
+				"desired": 2,
+				"unavailable": 0,
+				"updated": 2
 			},
 			"status": {
-				"available": "false",
+				"available": "true",
 				"progressing": "true"
 			}
 		},

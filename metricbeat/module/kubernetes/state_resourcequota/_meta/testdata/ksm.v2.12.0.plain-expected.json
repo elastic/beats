@@ -8,10 +8,10 @@
         "kubernetes": {
             "namespace": "default",
             "resourcequota": {
-                "name": "pods-high",
-                "quota": 204800,
-                "resource": "memory",
-                "type": "hard"
+                "created": {
+                    "sec": 1713862291
+                },
+                "name": "pods-high"
             }
         },
         "metricset": {
@@ -58,56 +58,8 @@
             "resourcequota": {
                 "name": "pods-high",
                 "quota": 0,
-                "resource": "pods",
+                "resource": "memory",
                 "type": "used"
-            }
-        },
-        "metricset": {
-            "name": "state_resourcequota",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.resourcequota",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "default",
-            "resourcequota": {
-                "name": "pods-high",
-                "quota": 0,
-                "resource": "cpu",
-                "type": "used"
-            }
-        },
-        "metricset": {
-            "name": "state_resourcequota",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.resourcequota",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "default",
-            "resourcequota": {
-                "created": {
-                    "sec": 1713862291
-                },
-                "name": "pods-high"
             }
         },
         "metricset": {
@@ -154,7 +106,55 @@
             "resourcequota": {
                 "name": "pods-high",
                 "quota": 0,
+                "resource": "cpu",
+                "type": "used"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "default",
+            "resourcequota": {
+                "name": "pods-high",
+                "quota": 204800,
                 "resource": "memory",
+                "type": "hard"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "default",
+            "resourcequota": {
+                "name": "pods-high",
+                "quota": 0,
+                "resource": "pods",
                 "type": "used"
             }
         },

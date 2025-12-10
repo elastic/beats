@@ -10,12 +10,12 @@
                 "name": "cpu",
                 "replicas": {
                     "current": 1,
-                    "desired": 0,
-                    "max": 2,
+                    "desired": 1,
+                    "max": 5,
                     "min": 1
                 },
                 "status": {
-                    "condition": "scalingactive"
+                    "condition": "scalinglimited"
                 }
             },
             "namespace": "default"

@@ -10,7 +10,12 @@
                 "completions": {
                     "desired": 1
                 },
-                "name": "hello",
+                "name": "hello-28564699",
+                "owner": {
+                    "is_controller": "true",
+                    "kind": "CronJob",
+                    "name": "hello"
+                },
                 "parallelism": {
                     "desired": 1
                 },
@@ -23,8 +28,8 @@
                     "complete": "true"
                 },
                 "time": {
-                    "completed": "2024-04-23T08:51:49.000Z",
-                    "created": "2024-04-23T08:51:31.000Z"
+                    "completed": "2024-04-23T14:19:02.000Z",
+                    "created": "2024-04-23T14:19:00.000Z"
                 }
             },
             "namespace": "default"
@@ -93,12 +98,7 @@
                 "completions": {
                     "desired": 1
                 },
-                "name": "hello-28564699",
-                "owner": {
-                    "is_controller": "true",
-                    "kind": "CronJob",
-                    "name": "hello"
-                },
+                "name": "hello",
                 "parallelism": {
                     "desired": 1
                 },
@@ -111,8 +111,8 @@
                     "complete": "true"
                 },
                 "time": {
-                    "completed": "2024-04-23T14:19:02.000Z",
-                    "created": "2024-04-23T14:19:00.000Z"
+                    "completed": "2024-04-23T08:51:49.000Z",
+                    "created": "2024-04-23T08:51:31.000Z"
                 }
             },
             "namespace": "default"

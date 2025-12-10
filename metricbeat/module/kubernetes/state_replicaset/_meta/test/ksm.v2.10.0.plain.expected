@@ -2,10 +2,10 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "kube-system"
+			"namespace": "local-path-storage"
 		},
 		"MetricSetFields": {
-			"name": "kube-state-metrics-7857446fb4",
+			"name": "local-path-provisioner-6bc4bddd6b",
 			"replicas": {
 				"available": 1,
 				"desired": 1,
@@ -28,10 +28,10 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "local-path-storage"
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
-			"name": "local-path-provisioner-6bc4bddd6b",
+			"name": "kube-state-metrics-7857446fb4",
 			"replicas": {
 				"available": 1,
 				"desired": 1,

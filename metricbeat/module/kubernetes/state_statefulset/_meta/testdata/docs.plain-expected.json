@@ -8,12 +8,12 @@
         "kubernetes": {
             "namespace": "default",
             "statefulset": {
-                "created": 1744115807,
+                "created": 1713862291,
                 "generation": {
                     "desired": 1,
                     "observed": 1
                 },
-                "name": "basic-sts",
+                "name": "web",
                 "replicas": {
                     "desired": 1,
                     "observed": 1,

@@ -11,13 +11,13 @@
             "name": "kind-control-plane"
         },
         "pod": {
-            "host_ip": "172.19.0.2",
-            "ip": "172.19.0.2",
-            "name": "kube-controller-manager-kind-control-plane",
+            "host_ip": "172.21.0.2",
+            "ip": "172.21.0.2",
+            "name": "kube-scheduler-kind-control-plane",
             "status": {
                 "phase": "running",
                 "ready": "true",
-                "ready_time": 1744115226,
+                "ready_time": 1713862197,
                 "scheduled": "true"
             }
         }
