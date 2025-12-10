@@ -39,7 +39,7 @@
         - name: last_terminated_exitcode
           type: integer
           description: >
-            The exit code of the container when it last terminated
+           The exit code for the last container in terminated state.
     - name: cpu
       type: group
       fields:
