@@ -622,6 +622,7 @@ func hostFromSocket(socket string) string {
 func writeFile(t require.TestingT, path string, data string) {
 	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	require.NoErrorf(t, err, "Could not open file %s", path)
+	defer f.Close()
 	_, err = f.WriteString(data + "\n")
 	require.NoErrorf(t, err, "Could not write %s to file %s", data, path)
 }
