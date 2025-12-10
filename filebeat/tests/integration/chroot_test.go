@@ -58,7 +58,7 @@ func TestJournaldChroot(t *testing.T) {
 	filebeatPath := buildFilebeatBinary(t, tempDir)
 	buildDockerImage(t, cli, imageName, tempDir, filebeatPath)
 	startDockerContainer(t, cli, imageName, syslogID, containerLogFile)
-	assertJournalctlStarted(t, containerLogFile, syslogID)
+	assertJournalctlWorks(t, containerLogFile, syslogID)
 }
 
 func buildDockerImage(t *testing.T, cli *client.Client, imageName, tempDir, filebeatPath string) {
@@ -164,7 +164,7 @@ func startDockerContainer(t *testing.T, cli *client.Client, imageName, syslogID 
 	return resp.ID
 }
 
-func assertJournalctlStarted(t *testing.T, logFile *fs.LogFile, syslogID string) {
+func assertJournalctlWorks(t *testing.T, logFile *fs.LogFile, syslogID string) {
 	t.Helper()
 	// Wait for the log message "journalctl started with PID XX"
 	logFile.WaitLogsContains(t, "journalctl started with PID", 30*time.Second, "journalctl did not start")
