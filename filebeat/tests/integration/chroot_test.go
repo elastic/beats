@@ -5,6 +5,7 @@ package integration
 import (
 	"archive/tar"
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -132,6 +133,15 @@ func startDockerContainer(t *testing.T, cli *client.Client, imageName, syslogID 
 	if err := cli.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
 		t.Fatalf("Failed to start Docker container: %s", err)
 	}
+
+	t.Cleanup(func() {
+		// By the time t.Cleanup runs the test context is already cancelled
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := cli.ContainerStop(ctx, resp.ID, container.StopOptions{}); err != nil {
+			t.Logf("Failed to stop container %s: %s\n", resp.ID, err)
+		}
+	})
 
 	return resp.ID
 }
