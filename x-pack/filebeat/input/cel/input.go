@@ -146,7 +146,7 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 			parent: &env,
 		}
 	}
-	err := input{}.run(env, src.(*source), cursor, pub, health)
+	err := input{}.run(env, src.(*source), cursor, pub, health) //nolint:errcheck // If this assertion fails, the program is incorrect and should panic.
 	if err != nil {
 		msg := "failed to run: " + err.Error()
 		if dataStreamName != "" {
