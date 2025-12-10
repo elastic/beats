@@ -5,150 +5,6 @@
 		"MetricSetFields": {
 			"client": {
 				"request": {
-					"count": 14
-				}
-			},
-			"code": "200",
-			"host": "[::1]:6443",
-			"method": "PATCH"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 14
-				}
-			},
-			"code": "500",
-			"host": "[::1]:6443",
-			"method": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 176
-				}
-			},
-			"code": "201",
-			"host": "[::1]:6443",
-			"method": "POST"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 1
-				}
-			},
-			"code": "404",
-			"host": "[::1]:6443",
-			"method": "PUT"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 1
-				}
-			},
-			"code": "404",
-			"host": "[::1]:6443",
-			"method": "POST"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 137
-				}
-			},
-			"code": "404",
-			"host": "[::1]:6443",
-			"method": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
 					"duration": {
 						"us": {
 							"bucket": {
@@ -232,6 +88,163 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
+			"client": {
+				"request": {
+					"duration": {
+						"us": {
+							"bucket": {
+								"+Inf": 20,
+								"100000": 20,
+								"1000000": 20,
+								"15000000": 20,
+								"2000000": 20,
+								"25000": 20,
+								"250000": 20,
+								"30000000": 20,
+								"4000000": 20,
+								"5000": 2,
+								"500000": 20,
+								"60000000": 20,
+								"8000000": 20
+							},
+							"count": 20,
+							"sum": 135804.386
+						}
+					},
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 20,
+								"1024": 19,
+								"1048576": 20,
+								"16384": 20,
+								"16777216": 20,
+								"256": 0,
+								"262144": 20,
+								"4096": 20,
+								"4194304": 20,
+								"512": 0,
+								"64": 0,
+								"65536": 20
+							},
+							"count": 20,
+							"sum": 14237
+						}
+					}
+				},
+				"response": {
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 20,
+								"1024": 20,
+								"1048576": 20,
+								"16384": 20,
+								"16777216": 20,
+								"256": 1,
+								"262144": 20,
+								"4096": 20,
+								"4194304": 20,
+								"512": 1,
+								"64": 0,
+								"65536": 20
+							},
+							"count": 20,
+							"sum": 11811
+						}
+					}
+				}
+			},
+			"host": "[::1]:6443",
+			"verb": "PUT"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"client": {
+				"request": {
+					"count": 14
+				}
+			},
+			"code": "500",
+			"host": "[::1]:6443",
+			"method": "GET"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"client": {
+				"request": {
+					"count": 1
+				}
+			},
+			"code": "404",
+			"host": "[::1]:6443",
+			"method": "PUT"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"client": {
+				"request": {
+					"count": 137
+				}
+			},
+			"code": "404",
+			"host": "[::1]:6443",
+			"method": "GET"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
 			"process": {
 				"cpu": {
 					"sec": 8
@@ -256,6 +269,126 @@
 					"sec": 1744036584.99
 				}
 			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"client": {
+				"request": {
+					"count": 19
+				}
+			},
+			"code": "200",
+			"host": "[::1]:6443",
+			"method": "PUT"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"client": {
+				"request": {
+					"count": 14
+				}
+			},
+			"code": "200",
+			"host": "[::1]:6443",
+			"method": "PATCH"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"client": {
+				"request": {
+					"count": 131
+				}
+			},
+			"code": "200",
+			"host": "[::1]:6443",
+			"method": "GET"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"client": {
+				"request": {
+					"count": 1
+				}
+			},
+			"code": "404",
+			"host": "[::1]:6443",
+			"method": "POST"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"client": {
+				"request": {
+					"count": 176
+				}
+			},
+			"code": "201",
+			"host": "[::1]:6443",
+			"method": "POST"
 		},
 		"Index": "",
 		"ID": "",
@@ -426,139 +559,6 @@
 			},
 			"host": "[::1]:6443",
 			"verb": "POST"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 20,
-								"100000": 20,
-								"1000000": 20,
-								"15000000": 20,
-								"2000000": 20,
-								"25000": 20,
-								"250000": 20,
-								"30000000": 20,
-								"4000000": 20,
-								"5000": 2,
-								"500000": 20,
-								"60000000": 20,
-								"8000000": 20
-							},
-							"count": 20,
-							"sum": 135804.386
-						}
-					},
-					"size": {
-						"bytes": {
-							"bucket": {
-								"+Inf": 20,
-								"1024": 19,
-								"1048576": 20,
-								"16384": 20,
-								"16777216": 20,
-								"256": 0,
-								"262144": 20,
-								"4096": 20,
-								"4194304": 20,
-								"512": 0,
-								"64": 0,
-								"65536": 20
-							},
-							"count": 20,
-							"sum": 14237
-						}
-					}
-				},
-				"response": {
-					"size": {
-						"bytes": {
-							"bucket": {
-								"+Inf": 20,
-								"1024": 20,
-								"1048576": 20,
-								"16384": 20,
-								"16777216": 20,
-								"256": 1,
-								"262144": 20,
-								"4096": 20,
-								"4194304": 20,
-								"512": 1,
-								"64": 0,
-								"65536": 20
-							},
-							"count": 20,
-							"sum": 11811
-						}
-					}
-				}
-			},
-			"host": "[::1]:6443",
-			"verb": "PUT"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 131
-				}
-			},
-			"code": "200",
-			"host": "[::1]:6443",
-			"method": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 19
-				}
-			},
-			"code": "200",
-			"host": "[::1]:6443",
-			"method": "PUT"
 		},
 		"Index": "",
 		"ID": "",

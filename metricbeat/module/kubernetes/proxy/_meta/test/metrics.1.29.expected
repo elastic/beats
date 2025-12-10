@@ -5,97 +5,12 @@
 		"MetricSetFields": {
 			"client": {
 				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 4,
-								"100000": 4,
-								"1000000": 4,
-								"15000000": 4,
-								"2000000": 4,
-								"25000": 4,
-								"250000": 4,
-								"30000000": 4,
-								"4000000": 4,
-								"5000": 3,
-								"500000": 4,
-								"60000000": 4,
-								"8000000": 4
-							},
-							"count": 4,
-							"sum": 25656.880000000005
-						}
-					},
-					"size": {
-						"bytes": {
-							"bucket": {
-								"+Inf": 4,
-								"1024": 4,
-								"1048576": 4,
-								"16384": 4,
-								"16777216": 4,
-								"256": 4,
-								"262144": 4,
-								"4096": 4,
-								"4194304": 4,
-								"512": 4,
-								"64": 4,
-								"65536": 4
-							},
-							"count": 4,
-							"sum": 0
-						}
-					}
-				},
-				"response": {
-					"size": {
-						"bytes": {
-							"bucket": {
-								"+Inf": 4,
-								"1024": 0,
-								"1048576": 4,
-								"16384": 4,
-								"16777216": 4,
-								"256": 0,
-								"262144": 4,
-								"4096": 4,
-								"4194304": 4,
-								"512": 0,
-								"64": 0,
-								"65536": 4
-							},
-							"count": 4,
-							"sum": 10814
-						}
-					}
+					"count": 1
 				}
 			},
+			"code": "201",
 			"host": "kind-control-plane:6443",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 22
-				}
-			},
-			"code": "200",
-			"host": "kind-control-plane:6443",
-			"method": "GET"
+			"method": "POST"
 		},
 		"Index": "",
 		"ID": "",
@@ -274,12 +189,97 @@
 		"MetricSetFields": {
 			"client": {
 				"request": {
-					"count": 1
+					"count": 22
 				}
 			},
-			"code": "201",
+			"code": "200",
 			"host": "kind-control-plane:6443",
-			"method": "POST"
+			"method": "GET"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"client": {
+				"request": {
+					"duration": {
+						"us": {
+							"bucket": {
+								"+Inf": 4,
+								"100000": 4,
+								"1000000": 4,
+								"15000000": 4,
+								"2000000": 4,
+								"25000": 4,
+								"250000": 4,
+								"30000000": 4,
+								"4000000": 4,
+								"5000": 3,
+								"500000": 4,
+								"60000000": 4,
+								"8000000": 4
+							},
+							"count": 4,
+							"sum": 25656.880000000005
+						}
+					},
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 4,
+								"1024": 4,
+								"1048576": 4,
+								"16384": 4,
+								"16777216": 4,
+								"256": 4,
+								"262144": 4,
+								"4096": 4,
+								"4194304": 4,
+								"512": 4,
+								"64": 4,
+								"65536": 4
+							},
+							"count": 4,
+							"sum": 0
+						}
+					}
+				},
+				"response": {
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 4,
+								"1024": 0,
+								"1048576": 4,
+								"16384": 4,
+								"16777216": 4,
+								"256": 0,
+								"262144": 4,
+								"4096": 4,
+								"4194304": 4,
+								"512": 0,
+								"64": 0,
+								"65536": 4
+							},
+							"count": 4,
+							"sum": 10814
+						}
+					}
+				}
+			},
+			"host": "kind-control-plane:6443",
+			"verb": "GET"
 		},
 		"Index": "",
 		"ID": "",
