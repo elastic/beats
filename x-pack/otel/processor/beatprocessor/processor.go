@@ -32,8 +32,18 @@ func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, erro
 		processors: []beat.Processor{},
 	}
 
+<<<<<<< HEAD
 	for _, processorConfig := range cfg.Processors {
 		processor, err := createProcessor(processorConfig)
+=======
+	logpLogger, err := logp.ConfigureWithCoreLocal(logp.Config{}, set.Logger.Core())
+	if err != nil {
+		return nil, fmt.Errorf("failed to configure logp logger: %w", err)
+	}
+
+	for _, processorNameAndConfig := range cfg.Processors {
+		processor, err := createProcessor(processorNameAndConfig, logpLogger)
+>>>>>>> 8458c5a1d (refactor: remove code duplication (#48013))
 		if err != nil {
 			return nil, fmt.Errorf("failed to create processor: %w", err)
 		}
@@ -45,31 +55,66 @@ func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, erro
 	return bp, nil
 }
 
+<<<<<<< HEAD
 func createProcessor(cfg map[string]any) (beat.Processor, error) {
 	if len(cfg) == 0 {
+=======
+// createProcessor creates a Beat processor using the provided configuration.
+// The configuration is expected to be a map with a single key containing the processor name
+// and the processor's configuration as the value for that key.
+// For example: {"add_host_metadata":{"netinfo":{"enabled":false}}}
+func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Logger) (beat.Processor, error) {
+	if len(processorNameAndConfig) == 0 {
+>>>>>>> 8458c5a1d (refactor: remove code duplication (#48013))
 		return nil, nil
 	}
-	if len(cfg) > 1 {
-		if len(cfg) < 10 {
-			configKeys := make([]string, 0, len(cfg))
-			for k := range cfg {
+	if len(processorNameAndConfig) > 1 {
+		if len(processorNameAndConfig) < 10 {
+			configKeys := make([]string, 0, len(processorNameAndConfig))
+			for k := range processorNameAndConfig {
 				configKeys = append(configKeys, k)
 			}
-			return nil, fmt.Errorf("expected single processor name but got %v: %v", len(cfg), configKeys)
+			return nil, fmt.Errorf("expected single processor name but got %v: %v", len(processorNameAndConfig), configKeys)
 		}
-		return nil, fmt.Errorf("expected single processor name but got %v", len(cfg))
+		return nil, fmt.Errorf("expected single processor name but got %v", len(processorNameAndConfig))
 	}
+<<<<<<< HEAD
 	for processorName, processorConfig := range cfg {
 		switch processorName {
 		case "add_host_metadata":
 			return createAddHostMetadataProcessor(processorConfig)
+=======
+
+	for processorName, processorConfig := range processorNameAndConfig {
+		processorConfig, configError := config.NewConfigFrom(processorConfig)
+		if configError != nil {
+			return nil, fmt.Errorf("failed to create config for processor '%s': %w", processorName, configError)
+		}
+
+		var processorInstance beat.Processor
+		var createProcessorError error
+
+		switch processorName {
+		case "add_host_metadata":
+			processorInstance, createProcessorError = add_host_metadata.New(processorConfig, logpLogger)
+		case "add_kubernetes_metadata":
+			processorInstance, createProcessorError = add_kubernetes_metadata.New(processorConfig, logpLogger)
+>>>>>>> 8458c5a1d (refactor: remove code duplication (#48013))
 		default:
 			return nil, fmt.Errorf("invalid processor name '%s'", processorName)
 		}
+
+		if createProcessorError != nil {
+			return nil, fmt.Errorf("failed to create processor '%s': %w", processorName, createProcessorError)
+		}
+
+		return processorInstance, nil
 	}
+
 	return nil, errors.New("malformed processor config")
 }
 
+<<<<<<< HEAD
 func createAddHostMetadataProcessor(cfg any) (beat.Processor, error) {
 	addHostMetadataConfig, err := config.NewConfigFrom(cfg)
 	if err != nil {
@@ -82,6 +127,8 @@ func createAddHostMetadataProcessor(cfg any) (beat.Processor, error) {
 	return addHostMetadataProcessor, nil
 }
 
+=======
+>>>>>>> 8458c5a1d (refactor: remove code duplication (#48013))
 func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Logs, error) {
 	if len(p.processors) == 0 {
 		return logs, nil
