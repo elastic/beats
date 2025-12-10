@@ -73,9 +73,10 @@ func TestNewReceiver(t *testing.T) {
 					"*",
 				},
 			},
-			"path.home":    t.TempDir(),
-			"http.enabled": true,
-			"http.host":    monitorHost,
+			"path.home":               t.TempDir(),
+			"http.enabled":            true,
+			"http.host":               monitorHost,
+			"management.otel.enabled": true,
 		},
 	}
 
@@ -106,9 +107,8 @@ func TestNewReceiver(t *testing.T) {
 					FilterMessageSnippet("add_host_metadata").
 					FilterMessageSnippet("add_cloud_metadata").
 					FilterMessageSnippet("add_docker_metadata").
-					FilterMessageSnippet("add_kubernetes_metadata").
-					Len() == 1
-				assert.True(c, processorsLoaded, "processors not loaded")
+					FilterMessageSnippet("add_kubernetes_metadata")
+				assert.Len(t, processorsLoaded.All(), 1, "processors not loaded")
 				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
 				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
@@ -117,6 +117,14 @@ func TestNewReceiver(t *testing.T) {
 }
 
 func BenchmarkFactory(b *testing.B) {
+	for _, level := range []zapcore.Level{zapcore.InfoLevel, zapcore.DebugLevel} {
+		b.Run(level.String(), func(b *testing.B) {
+			benchmarkFactoryWithLogLevel(b, level)
+		})
+	}
+}
+
+func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
@@ -135,7 +143,7 @@ func BenchmarkFactory(b *testing.B) {
 				"otelconsumer": map[string]any{},
 			},
 			"logging": map[string]any{
-				"level": "info",
+				"level": level.String(),
 				"selectors": []string{
 					"*",
 				},
@@ -148,7 +156,7 @@ func BenchmarkFactory(b *testing.B) {
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		zapcore.Lock(zapcore.AddSync(&zapLogs)),
-		zapcore.InfoLevel)
+		level)
 
 	factory := NewFactory()
 
@@ -265,9 +273,6 @@ func TestMultipleReceivers(t *testing.T) {
 }
 
 func TestReceiverDegraded(t *testing.T) {
-	if runtime.GOARCH == "arm64" && runtime.GOOS == "linux" {
-		t.Skip("flaky test on Ubuntu arm64, see https://github.com/elastic/beats/issues/46437")
-	}
 	testCases := []struct {
 		name            string
 		status          oteltest.ExpectedStatus
@@ -363,6 +368,7 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 			},
 		},
 	}
+	defer client.CloseIdleConnections()
 	url, err := url.JoinPath("http://unix", endpoint)
 	if err != nil {
 		sb.Reset()
@@ -431,26 +437,40 @@ type logGenerator struct {
 	t           *testing.T
 	tmpDir      string
 	f           *os.File
-	filePattern string
 	sequenceNum int64
+	currentFile string
 }
 
 func newLogGenerator(t *testing.T, tmpDir string) *logGenerator {
 	return &logGenerator{
-		t:           t,
-		tmpDir:      tmpDir,
-		filePattern: "input-*.log",
+		t:      t,
+		tmpDir: tmpDir,
 	}
 }
 
 func (g *logGenerator) Start() {
-	f, err := os.CreateTemp(g.tmpDir, g.filePattern)
+	if g.currentFile != "" {
+		os.Remove(g.currentFile)
+	}
+
+	filePath := filepath.Join(g.tmpDir, "input.log")
+
+	f, err := os.Create(filePath)
 	require.NoError(g.t, err)
 	g.f = f
+	g.currentFile = filePath
+	atomic.StoreInt64(&g.sequenceNum, 0)
 }
 
 func (g *logGenerator) Stop() {
-	require.NoError(g.t, g.f.Close())
+	if g.f != nil {
+		require.NoError(g.t, g.f.Close())
+		g.f = nil
+	}
+	if g.currentFile != "" {
+		os.Remove(g.currentFile)
+		g.currentFile = ""
+	}
 }
 
 func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
@@ -471,8 +491,6 @@ func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
 // - Random permanent error. We expect the batch to be dropped.
 // - Random error. We expect the batch to be retried or dropped based on the error type.
 func TestConsumeContract(t *testing.T) {
-	t.Skip("flaky test, see https://github.com/elastic/beats/issues/46437")
-
 	defer oteltest.VerifyNoLeaks(t)
 
 	tmpDir := t.TempDir()
@@ -480,7 +498,7 @@ func TestConsumeContract(t *testing.T) {
 
 	gen := newLogGenerator(t, tmpDir)
 
-	os.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
+	t.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
 
 	cfg := &Config{
 		Beatconfig: map[string]any{
@@ -492,7 +510,7 @@ func TestConsumeContract(t *testing.T) {
 						"id":      "filestream-test",
 						"enabled": true,
 						"paths": []string{
-							filepath.Join(tmpDir, "input-*.log"),
+							filepath.Join(tmpDir, "input.log"),
 						},
 						"file_identity.native": map[string]any{},
 						"prospector": map[string]any{

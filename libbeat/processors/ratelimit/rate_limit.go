@@ -80,7 +80,7 @@ func new(cfg *c.C, log *logp.Logger) (beat.Processor, error) {
 	// Logging and metrics (each processor instance has a unique ID).
 	var (
 		id  = int(instanceID.Add(1))
-		reg = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
+		reg = monitoring.Default.GetOrCreateRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
 	)
 
 	log = log.Named(logName).With("instance_id", id)

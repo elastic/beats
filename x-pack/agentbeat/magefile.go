@@ -215,7 +215,7 @@ func IntegTest() {
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
-	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 	args.Tags = append(args.Tags, "agentbeat")
 	for _, beat := range getIncludedBeats() {
 		// matricbeat integration test TestIndexTotalFieldsLimitNotReached fails with
@@ -237,7 +237,7 @@ func SystemTest(ctx context.Context) error {
 	if slices.Contains(getIncludedBeats(), "packetbeat") {
 		mg.SerialDeps(xpacketbeat.GetNpcapInstallerFn("../packetbeat"), Update, devtools.BuildSystemTestBinary)
 
-		args := devtools.DefaultGoTestIntegrationArgs()
+		args := devtools.DefaultGoTestIntegrationArgs(ctx)
 		args.Packages = []string{"../packetbeat/tests/system/..."}
 		args.Tags = append(args.Tags, "agentbeat")
 

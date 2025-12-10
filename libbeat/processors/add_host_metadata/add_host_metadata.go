@@ -50,7 +50,7 @@ func init() {
 	processors.RegisterPlugin(processorName, New)
 	jsprocessor.RegisterPlugin("AddHostMetadata", New)
 
-	reg = monitoring.Default.NewRegistry(logName, monitoring.DoNotReport)
+	reg = monitoring.Default.GetOrCreateRegistry(logName, monitoring.DoNotReport)
 }
 
 type metrics struct {

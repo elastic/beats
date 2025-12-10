@@ -39,6 +39,7 @@ func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, erro
 	if err := cfg.Unpack(&src.cfg); err != nil {
 		return nil, nil, err
 	}
+	src.cfg.DataStream = dataStreamName(cfg)
 	return []inputcursor.Source{src}, input{}, nil
 }
 
@@ -57,5 +58,19 @@ func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
+	config.DataStream = dataStreamName(cfg)
 	return m.cursor.Create(cfg)
+}
+
+func dataStreamName(cfg *conf.C) string {
+	var probe struct {
+		DataStream struct {
+			Dataset string `config:"dataset"`
+		} `config:"data_stream"`
+	}
+	err := cfg.Unpack(&probe)
+	if err != nil {
+		return ""
+	}
+	return probe.DataStream.Dataset
 }

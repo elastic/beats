@@ -159,7 +159,7 @@ func Test_StorageClient(t *testing.T) {
 			},
 			mockHandler: mock.GCSServer,
 			expected:    map[string]bool{},
-			isError:     errors.New("storage: bucket doesn't exist"),
+			isError:     errors.New("storage: bucket doesn't exist: googleapi: got HTTP response code 404 with body: "),
 		},
 		{
 			name: "SingleBucketWithoutPoll_InvalidBucketErr",
@@ -177,7 +177,7 @@ func Test_StorageClient(t *testing.T) {
 			},
 			mockHandler: mock.GCSServer,
 			expected:    map[string]bool{},
-			isError:     errors.New("storage: bucket doesn't exist"),
+			isError:     errors.New("storage: bucket doesn't exist: googleapi: got HTTP response code 404 with body: "),
 		},
 		{
 			name: "TwoBucketsWithPoll_InvalidBucketErr",
@@ -198,7 +198,7 @@ func Test_StorageClient(t *testing.T) {
 			},
 			mockHandler: mock.GCSServer,
 			expected:    map[string]bool{},
-			isError:     errors.New("storage: bucket doesn't exist"),
+			isError:     errors.New("storage: bucket doesn't exist: googleapi: got HTTP response code 404 with body: "),
 		},
 		{
 			name: "SingleBucketWithPoll_InvalidConfigValue",

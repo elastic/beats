@@ -65,7 +65,7 @@ const (
 )
 
 var (
-	auditdMetrics         = monitoring.Default.NewRegistry(moduleName)
+	auditdMetrics         = monitoring.Default.GetOrCreateRegistry(moduleName)
 	reassemblerGapsMetric = monitoring.NewInt(auditdMetrics, "reassembler_seq_gaps")
 	kernelLostMetric      = monitoring.NewInt(auditdMetrics, "kernel_lost")
 	userspaceLostMetric   = monitoring.NewInt(auditdMetrics, "userspace_lost")

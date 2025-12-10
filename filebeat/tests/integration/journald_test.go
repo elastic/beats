@@ -53,10 +53,7 @@ func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
 
 	filebeat.WriteConfigFile(yamlCfg)
 	filebeat.Start()
-	// On a normal execution we run journalclt twice, the first time to read all messages from the
-	// previous boot until 'now' and the second one with the --follow flag that should keep on running.
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
 
 	pidLine := filebeat.GetLastLogLine("journalctl started with PID")
 	logEntry := struct{ Message string }{}
@@ -74,7 +71,7 @@ func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
 	}
 
 	generateJournaldLogs(t, syslogID, 5, 100)
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
 	filebeat.WaitPublishedEvents(5*time.Second, 8)
 }
 
@@ -98,10 +95,7 @@ func TestJournaldInputDoesNotDuplicateData(t *testing.T) {
 
 	filebeat.WriteConfigFile(yamlCfg)
 	filebeat.Start()
-	// On a normal execution we run journalclt twice, the first time to read all messages from the
-	// previous boot until 'now' and the second one with the --follow flag that should keep on running.
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
 
 	pidLine := filebeat.GetLastLogLine("journalctl started with PID")
 	logEntry := struct{ Message string }{}
@@ -120,7 +114,7 @@ func TestJournaldInputDoesNotDuplicateData(t *testing.T) {
 	filebeat.Start()
 
 	// Wait for journalctl to start
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
 
 	// Wait for last even in the output
 	filebeat.WaitPublishedEvents(5*time.Second, 8)
@@ -154,7 +148,7 @@ func TestJournaldLargeLines(t *testing.T) {
 		Message string `json:"message"`
 	}
 
-	evts := integration.GetEventsFromFileOutput[evt](filebeat, 5)
+	evts := integration.GetEventsFromFileOutput[evt](filebeat, 5, true)
 	for i, e := range evts {
 		if len(e.Message) != evtLen {
 			t.Errorf("event %d: expecting len %d, got %d", i, evtLen, len(e.Message))
