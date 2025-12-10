@@ -36,6 +36,10 @@ import (
 //
 // When tests are run with -v, the temporary directory absolute
 // path will be logged.
+//
+// This function differs from the stdlib TempDir because when the test fails:
+//   - the path to the created directly is logged
+//   - the directory is not removed
 func TempDir(t *testing.T, path ...string) string {
 	rootDir := filepath.Join(path...)
 
