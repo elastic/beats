@@ -5,6 +5,21 @@
 // Package cel implements an input that uses the Common Expression Language to
 // perform requests and do endpoint processing of events. The cel package exposes
 // the github.com/elastic/mito/lib CEL extension library.
+//
+// # OpenTelemetry Metrics
+//
+// The CEL input exports OpenTelemetry metrics at the end of each periodic run.
+// Each export captures metrics for that interval only; counters reset between exports.
+//
+// Metrics export is disabled by default. Enable export to a OTLP/gRPC endpoint by setting environment variables:
+//
+//   - OTEL_EXPORTER_OTLP_ENDPOINT: Required. The OTLP endpoint URL.
+//   - OTEL_EXPORTER_OTLP_HEADERS: Required if endpoint is authenticated.
+//   - OTEL_RESOURCE_ATTRIBUTES: Optional but recommended
+//
+// See [OTELCELMetrics] for more information about OTEL_RESOURCE_ATTRIBUTES and Open Telemetry ResourceAttributes
+// See [otel.ExportFactory] for environment settings to run console or http/protobuf output.
+// See [OTELCELMetrics] for the complete list of exported metrics.
 package cel
 
 import (
@@ -30,7 +45,6 @@ import (
 
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/icholy/digest"
-	"github.com/rcrowley/go-metrics"
 	"go.elastic.co/ecszap"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/attribute"
@@ -60,7 +74,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
@@ -105,7 +118,7 @@ func (i input) now() time.Time {
 func (input) Name() string { return inputName }
 
 func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
-	cfg := src.(*source).cfg //nolint:errcheck
+	cfg := src.(*source).cfg //nolint:errcheck // If this assertion fails, the program is incorrect and should panic.
 	if !wantClient(cfg) {
 		return nil
 	}
@@ -115,7 +128,7 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 // Run starts the input and blocks until it ends completes. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
-	dataStreamName := src.(*source).cfg.DataStream //nolint:errcheck May be empty.
+	dataStreamName := src.(*source).cfg.DataStream //nolint:errcheck // If this assertion fails, the program is incorrect and should panic. datastreamName may be empty
 
 	var cursor map[string]interface{}
 	env.UpdateStatus(status.Starting, dataStreamName)
@@ -188,6 +201,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	if err != nil {
 		return err
 	}
+	defer otelMetrics.Shutdown(ctx)
+	metricsRecorder, err := NewMetricsRecorder(metrics, otelMetrics)
+	if err != nil {
+		return err
+	}
 
 	limiter := newRateLimiterFromConfig(cfg.Resource)
 
@@ -237,7 +255,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	goodCursor := cursor
 	goodURL := cfg.Resource.URL.String()
 	state["url"] = goodURL
-	metrics.resource.Set(goodURL)
+	metricsRecorder.SetResourceURL(goodURL)
 	health.UpdateStatus(status.Running, "")
 	// On entry, state is expected to be in the shape:
 	//
@@ -274,10 +292,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	// in requests.
 	err = periodically(ctx, cfg.Interval, func() error {
 		log.Debug("Starting otel periodic")
-		otelMetrics.AddPeriodicRun(ctx, 1)
-		otelMetrics.StartPeriodic()
-		defer otelMetrics.EndPeriodic(ctx)
-
+		metricsRecorder.StartPeriodic(ctx)
+		defer metricsRecorder.EndPeriodic(ctx)
 		log.Debug("process periodic request")
 		var (
 			budget    = *cfg.MaxExecutions
@@ -316,19 +332,17 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				log.Debugw("previous transaction", "transaction.id", trace.TxID())
 			}
 			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
-			otelMetrics.AddProgramExecution(ctx, 1)
-			metrics.executions.Add(1)
+			metricsRecorder.AddProgramExecution(ctx)
 			start := i.now().In(time.UTC)
-			defer func() {
-				otelMetrics.AddTotalDuration(ctx, time.Since(start))
-			}()
+
 			state, err = evalWith(ctx, prg, ast, state, start, wantDump, budget-1)
-			otelMetrics.AddCELDuration(ctx, time.Since(start))
+			metricsRecorder.AddCELDuration(ctx, time.Since(start))
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
 				var dump dumpError
 				switch {
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
+					metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
 					return err
 				case errors.As(err, &dump):
 					path := strings.ReplaceAll(cfg.FailureDump.Filename, "*", sanitizeFileName(env.IDWithoutName))
@@ -347,7 +361,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				health.UpdateStatus(status.Degraded, "failed evaluation: "+err.Error())
 			}
 			isDegraded = err != nil
-			metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
 			if trace != nil {
 				log.Debugw("final transaction", "transaction.id", trace.TxID())
 			}
@@ -438,9 +451,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			var ok bool
 			ok, waitUntil, err = handleResponse(log, state, limiter)
 			if err != nil {
+				metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
 				return err
 			}
 			if !ok {
+				metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
 				continue
 			}
 
@@ -452,19 +467,22 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			e, ok := state["events"]
 			if !ok {
+				metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
 				return errors.New("unexpected missing events array from evaluation")
 			}
 			var events []interface{}
 			switch e := e.(type) {
 			case []interface{}:
 				if len(e) == 0 {
-					otelMetrics.AddProgramSuccessExecution(ctx, 1)
+					metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+					metricsRecorder.AddProgramSuccessExecution(ctx)
 					return nil
 				}
 				events = e
 			case map[string]interface{}:
 				if e == nil {
-					otelMetrics.AddProgramSuccessExecution(ctx, 1)
+					metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+					metricsRecorder.AddProgramSuccessExecution(ctx)
 					return nil
 				}
 				if _, ok := e["error"]; ok {
@@ -492,14 +510,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				// Make sure the cursor is not updated.
 				delete(state, "cursor")
 			default:
+				metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
 				return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 			}
 
 			// We have a non-empty batch of events to process.
-			metrics.batchesReceived.Add(1)
-			metrics.eventsReceived.Add(uint64(len(events)))
-			otelMetrics.AddGeneratedBatch(ctx, 1)
-			otelMetrics.AddEvents(ctx, int64(len(events)))
+			metricsRecorder.AddReceivedBatch(ctx, 1)
+			metricsRecorder.AddReceivedEvents(ctx, int64(len(events)))
 			// Drop events from state. If we fail during the publication,
 			// we will re-request these events.
 			delete(state, "events")
@@ -547,6 +564,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 							goodCursor = cursor
 							cursor, ok = cursors[0].(map[string]interface{})
 							if !ok {
+								metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
 								return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
 							}
 							pubCursor = cursor
@@ -555,6 +573,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 						goodCursor = cursor
 						cursor, ok = cursors[i].(map[string]interface{})
 						if !ok {
+							metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
 							return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
 						}
 						pubCursor = cursor
@@ -595,15 +614,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					// correctly published cursor.
 				}
 				if i == 0 {
-					metrics.batchesPublished.Add(1)
-					otelMetrics.AddPublishedBatch(ctx, 1)
-
+					metricsRecorder.AddPublishedBatch(ctx, 1)
 				}
-				metrics.eventsPublished.Add(1)
-				otelMetrics.AddPublishedEvents(ctx, 1)
+				metricsRecorder.AddPublishedEvents(ctx, 1)
 
 				err = ctx.Err()
 				if err != nil {
+					metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
 					return err
 				}
 			}
@@ -612,18 +629,16 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				health.UpdateStatus(status.Running, "")
 			}
 
-			metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
-			otelMetrics.AddPublishDuration(ctx, time.Since(start))
+			metricsRecorder.AddPublishDuration(ctx, time.Since(start))
 			// Advance the cursor to the final state if there was no error during
 			// publications. This is needed to transition to the next set of events.
 			if !hadPublicationError {
 				goodCursor = cursor
-				otelMetrics.AddProgramSuccessExecution(ctx, 1)
 			}
 
 			// Replace the last known good cursor.
 			state["cursor"] = goodCursor
-
+			metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
 			if more, _ := state["want_more"].(bool); !more {
 				return nil
 			}
@@ -645,7 +660,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		log.Infof("input stopped because context was cancelled with: %v", err)
 		err = nil
 	}
-	otelMetrics.Shutdown(ctx)
 	return err
 }
 
@@ -870,7 +884,7 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 // https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
-func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry, env v2.Context) (*http.Client, *httplog.LoggingRoundTripper, *otel.OTELCELMetrics, error) {
+func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry, env v2.Context) (*http.Client, *httplog.LoggingRoundTripper, *OTELCELMetrics, error) {
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings(), log)...)
 	if err != nil {
 		return nil, nil, nil, err
@@ -975,7 +989,6 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	c.Transport = otelTransport
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
 
-
 	if cfg.Resource.Retry.getMaxAttempts() > 1 {
 		maxAttempts := cfg.Resource.Retry.getMaxAttempts()
 		c = (&retryablehttp.Client{
@@ -1005,60 +1018,50 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	return c, trace, otelMetrics, nil
 }
 
-func CreateOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2.Context, tripper http.RoundTripper)  (*otel.OTELCELMetrics, *otelhttp.Transport, error) {
+func CreateOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2.Context, tripper http.RoundTripper) (*OTELCELMetrics, *otelhttp.Transport, error) {
 	resource := resource.NewWithAttributes(
-		semconv.SchemaURL, GetResourceAttributes(env, cfg)...,
+		semconv.SchemaURL, getResourceAttributes(env, cfg)...,
 	)
 
 	log.Infof("created cel input resource %s", resource.String())
-	exporter, exporterType, err := otel.GetGlobalExporterFactory(log).GetExporter(ctx)
+	exporter, exporterType, err := otel.GetGlobalMetricsExporterFactory().GetExporter(ctx, false)
 	if err != nil {
 		log.Errorw("failed to get exporter", "error", err)
 	}
-	if err != nil {
-		log.Errorw("failed to get collection period", "error", err)
-	}
 	log.Infof("created OTEL cel input exporter %s for input %s", exporterType, env.IDWithoutName)
-	return otel.NewOTELCELMetrics(log, env.IDWithoutName, *resource, tripper, exporter)
+	return NewOTELCELMetrics(log, *resource, tripper, exporter)
 }
 
-func GetResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
-	attrs := []attribute.KeyValue{semconv.ServiceInstanceID(env.IDWithoutName),
+func getResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
+	attrs := []attribute.KeyValue{
+		semconv.ServiceInstanceID(env.IDWithoutName),
 		attribute.String("package.name", cfg.GetPackageData("name")),
 		attribute.String("package.version", cfg.GetPackageData("version")),
 		attribute.String("package.data_stream", cfg.DataStream),
 		attribute.String("agent.version", env.Agent.Version),
-		attribute.String("agent.id", env.Agent.ID.String())}
+		attribute.String("agent.id", env.Agent.ID.String()),
+	}
 
-	usedKeys := make(map[string]struct{})
+	attributes := os.Getenv("OTEL_RESOURCE_ATTRIBUTES")
+	if attributes == "" {
+		return attrs
+	}
+
+	seen := make(map[attribute.Key]bool)
 
 	for _, attr := range attrs {
-		// Access the Key field of the KeyValue struct
-		usedKeys[string(attr.Key)] = struct{}{}
+		seen[attr.Key] = true
 	}
-	attributesStr, ok := os.LookupEnv("OTEL_RESOURCE_ATTRIBUTES")
-	if ok && len(attributesStr) > 0 {
-		attributes := make([]attribute.KeyValue, 0)
-		pairs := strings.Split(attributesStr, ",")
-		for _, pair := range pairs {
-			kv := strings.SplitN(pair, "=", 2)
-			if len(kv) == 2 {
-				key := strings.TrimSpace(kv[0])
-				value := strings.TrimSpace(kv[1])
-				if key != "" {
-					// don't overwrite existing keys
-					_, used := usedKeys[key]
-					if !used {
-						attributes = append(attributes, attribute.String(key, value))
-					}
-				}
-			}
+
+	pairs := strings.Split(attributes, ",")
+	for _, pair := range pairs {
+		key, val, ok := strings.Cut(pair, "=")
+		if !ok || key == "" || seen[attribute.Key(key)] {
+			continue
 		}
-		attrs = append(attrs, attributes...)
+		attrs = append(attrs, attribute.String(key, val))
 	}
-
 	return attrs
-
 }
 
 func wantClient(cfg config) bool {
@@ -1451,37 +1454,6 @@ func test(url *url.URL) error {
 	}
 
 	return nil
-}
-
-// inputMetrics handles the input's metric reporting.
-type inputMetrics struct {
-	resource            *monitoring.String // URL-ish of input resource
-	executions          *monitoring.Uint   // times the CEL program has been executed
-	batchesReceived     *monitoring.Uint   // number of event arrays received
-	eventsReceived      *monitoring.Uint   // number of events received
-	batchesPublished    *monitoring.Uint   // number of event arrays published
-	eventsPublished     *monitoring.Uint   // number of events published
-	celProcessingTime   metrics.Sample     // histogram of the elapsed successful cel program processing times in nanoseconds
-	batchProcessingTime metrics.Sample     // histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
-}
-
-func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) (*inputMetrics, *monitoring.Registry) {
-	out := &inputMetrics{
-		resource:            monitoring.NewString(reg, "resource"),
-		executions:          monitoring.NewUint(reg, "cel_executions"),
-		batchesReceived:     monitoring.NewUint(reg, "batches_received_total"),
-		eventsReceived:      monitoring.NewUint(reg, "events_received_total"),
-		batchesPublished:    monitoring.NewUint(reg, "batches_published_total"),
-		eventsPublished:     monitoring.NewUint(reg, "events_published_total"),
-		celProcessingTime:   metrics.NewUniformSample(1024),
-		batchProcessingTime: metrics.NewUniformSample(1024),
-	}
-	_ = adapter.NewGoMetrics(reg, "cel_processing_time", logger, adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.celProcessingTime))
-	_ = adapter.NewGoMetrics(reg, "batch_processing_time", logger, adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
-
-	return out, reg
 }
 
 // redactor implements lazy field redaction of sets of a mapstr.M.
