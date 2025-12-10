@@ -22,6 +22,7 @@ package decoder
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -235,9 +236,13 @@ func TestFragment(t *testing.T) {
 	var payload []byte
 	t.Run("in_order", func(t *testing.T) {
 		d, tcp, udp := newTestDecoder(t)
-		for _, p := range packets {
+		for i, p := range packets {
 			d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
+			if i == 0 {
+				assert.Equal(t, len(d.fragments.collected), 1, "wrong fragment count")
+			}
 		}
+		assert.Equal(t, len(d.fragments.collected), 0, "wrong fragment count")
 
 		// Details confirmed by inspection of the test pcap with Wireshark.
 		assert.Nil(t, tcp.pkt, "unexpected non-nil TCP packet")
@@ -267,5 +272,29 @@ func TestFragment(t *testing.T) {
 		assert.Equal(t, "192.168.178.24", udp.pkt.Tuple.DstIP.String(), "unexpected destination IP")
 		assert.Equal(t, uint16(35873), udp.pkt.Tuple.DstPort, "unexpected destination port")
 		assert.Equal(t, udp.pkt.Payload, payload, "unexpected payload")
+	})
+
+	t.Run("expiry_with_hole", func(t *testing.T) {
+		d, tcp, udp := newTestDecoder(t)
+		// we're only gonna insert 2/3 packets
+		assert.Equal(t, len(d.fragments.collected), 0, "UUU wrong fragment count")
+		d.OnPacket(packets[0].Data(), &packets[0].Metadata().CaptureInfo)
+		d.OnPacket(packets[1].Data(), &packets[1].Metadata().CaptureInfo)
+		assert.Equal(t, 1, len(d.fragments.collected), "LLL wrong fragment count")
+		d.fragments.maybePurge(time.Now())
+		assert.Equal(t, 1, len(d.fragments.collected), "YYY wrong fragment count")
+		// Now find the actual key, and make sure the 2 fragments are there
+		for _, col := range d.fragments.collected {
+			assert.Equal(t, 2, len(col.fragments))
+			assert.False(t, col.haveFinal)
+		}
+		// Sleep so that the next time we process a complete packet, the cache is flushed of the old entries.
+		time.Sleep(fragmentHold)
+		d.fragments.maybePurge(time.Now())
+		assert.Equal(t, len(d.fragments.collected), 0, "DDD wrong fragment count")
+
+		// Details confirmed by inspection of the test pcap with Wireshark.
+		assert.Nil(t, tcp.pkt, "unexpected non-nil TCP packet")
+		assert.Nil(t, udp.pkt, "unexpected non-nil UDP packet")
 	})
 }
