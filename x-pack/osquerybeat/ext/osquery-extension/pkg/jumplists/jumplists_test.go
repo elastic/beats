@@ -13,6 +13,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
@@ -27,6 +29,9 @@ func TestCustomJumplists(t *testing.T) {
 
 	tests := []testCase{
 		{
+			name:        "test_custom_jumplist_1",
+			filePath:    "./testdata/custom/7e4dca80246863e3.customDestinations-ms",
+			expectError: true,
 			name:        "test_custom_jumplist_1",
 			filePath:    "./testdata/custom/7e4dca80246863e3.customDestinations-ms",
 			expectError: true,

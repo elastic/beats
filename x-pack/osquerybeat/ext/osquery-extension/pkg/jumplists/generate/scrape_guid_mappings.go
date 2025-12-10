@@ -19,15 +19,16 @@ import (
 
 const guidMappingSourceUrl = "https://github.com/EricZimmerman/GuidMapping/raw/refs/heads/master/Resources/GuidToName.txt"
 
-// scrapeJumpListAppIDs replicates the second Python scraping function.
+// scrapeGuidMappings
 func scrapeGuidMappings(log *logger.Logger) (map[string]string, error) {
 	guidMappings := make(map[string]string)
-	bodyString, err := downloadRawPage(guidMappingSourceUrl, log)
+	bodyString, err := downloadPage(guidMappingSourceUrl, log)
 	if err != nil {
 		return nil, err
 	}
 
-	// for line in ... .splitlines()
+	// split the body string into lines and extract the guid and name
+	// from each line, using the pipe character as the delimiter
 	lines := strings.Split(bodyString, "\n")
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
@@ -47,6 +48,8 @@ func scrapeGuidMappings(log *logger.Logger) (map[string]string, error) {
 	return guidMappings, nil
 }
 
+// writeGuidMappingGeneratedFile writes the guid mappings to a generated source file
+// that can be used to lookup guid names by guid.
 func writeGuidMappingGeneratedFile(outputFile string, log *logger.Logger) error {
 	guidMappings, err := scrapeGuidMappings(log)
 	if err != nil {

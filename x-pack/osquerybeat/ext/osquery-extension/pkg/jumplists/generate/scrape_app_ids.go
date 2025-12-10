@@ -20,11 +20,12 @@ import (
 
 const appIdSourceUrl = "https://raw.githubusercontent.com/EricZimmerman/JumpList/refs/heads/master/JumpList/Resources/AppIDs.txt"
 
-// scrapeJumpListAppIDs replicates the second Python scraping function.
+// scrapeJumpListAppIDs pulls the app ids from appSourceUrl and returns a map of app ids to app names.
+// the app ids are in the format of a hex string, and the app names are in the format of a string.
 func scrapeJumpListAppIDs(log *logger.Logger) (map[string]string, error) {
 	appIDs := make(map[string]string)
 	valueRegex := regexp.MustCompile(`.*"(.*)"`)
-	bodyString, err := downloadRawPage(appIdSourceUrl, log)
+	bodyString, err := downloadPage(appIdSourceUrl, log)
 	if err != nil {
 		return nil, err
 	}
@@ -66,6 +67,8 @@ func scrapeJumpListAppIDs(log *logger.Logger) (map[string]string, error) {
 	return appIDs, nil
 }
 
+// writeAppIdGeneratedFile writes the app ids to a generated source file
+// that can be used to lookup app ids by name.
 func writeAppIdGeneratedFile(outputFile string, log *logger.Logger) error {
 	appIDs, err := scrapeJumpListAppIDs(log)
 	if err != nil {
@@ -73,7 +76,6 @@ func writeAppIdGeneratedFile(outputFile string, log *logger.Logger) error {
 	}
 
 	// Build the Go map literal string
-	// Using strings.Builder is more efficient than repeated string concatenation
 	var sb strings.Builder
 	writeCopyrightHeader(&sb)
 	sb.WriteString("// knownAppIds is a lookup table for known windows AppIDs.\n")
