@@ -1,0 +1,16 @@
+filebeat.inputs:
+  - type: journald
+    id: journald-input-id
+    chroot: /host
+    journalctl_path: /usr/bin/journalctl
+
+output.discard:
+  enabled: true
+
+# output.console:
+#   enabled: true
+#   pretty: false
+
+logging:
+  to_stderr: true
+  metrics.period: 5s
