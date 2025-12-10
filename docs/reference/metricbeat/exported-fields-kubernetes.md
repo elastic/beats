@@ -1542,7 +1542,7 @@ kubernetes container metrics
 
 
 **`kubernetes.container.status.last_terminated_exitcode`**
-:   The exit code of the container when it last terminated
+:   The exit code for the last container in terminated state.
 
     type: integer
 
