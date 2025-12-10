@@ -28,6 +28,6 @@ func RegisterAmcacheTables(server *osquery.ExtensionManagerServer, log *logger.L
 
 func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, hooks *hooks.HookManager) {
 	server.RegisterPlugin(table.NewPlugin("elastic_browser_history", browserhistory.GetColumns(), browserhistory.GetGenerateFunc(log)))
-	server.RegisterPlugin(table.NewPlugin("elastic_jump_lists", jumplists.GetColumns(), jumplists.GetGenerateFunc(log)))
+	server.RegisterPlugin(table.NewPlugin("elastic_jumplists", jumplists.GetColumns(), jumplists.GetGenerateFunc(log)))
 	RegisterAmcacheTables(server, log, hooks)
 }

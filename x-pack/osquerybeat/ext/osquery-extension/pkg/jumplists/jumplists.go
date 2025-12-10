@@ -18,6 +18,7 @@ import (
 	"github.com/osquery/osquery-go/plugin/table"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
@@ -127,22 +128,34 @@ func GetColumns() []table.ColumnDefinition {
 	return columns
 }
 
+func matchesFilters(row JumpListRow, filters []filters.Filter) bool {
+	for _, filter := range filters {
+		if !filter.Matches(row) {
+			return false
+		}
+	}
+	return true
+}
+
 // GetGenerateFunc returns a function that can be used to generate a table of JumpListRow objects.
 // It returns a function that can be used to generate a table of JumpListRow objects.
 func GetGenerateFunc(log *logger.Logger) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
+		filters := filters.GetConstraintFilters(queryContext)
 		jumpLists := GetCustomJumpLists(log)
 
-		var rows []map[string]string
+		var marshalledRows []map[string]string
 		for _, jumpList := range jumpLists {
 			for _, row := range jumpList.ToRows() {
-				rowMap, err := encoding.MarshalToMapWithFlags(row, encoding.EncodingFlagUseNumbersZeroValues)
-				if err != nil {
-					return nil, err
+				if matchesFilters(row, filters) {
+					rowMap, err := encoding.MarshalToMapWithFlags(row, encoding.EncodingFlagUseNumbersZeroValues)
+					if err != nil {
+						return nil, err
+					}
+					marshalledRows = append(marshalledRows, rowMap)
 				}
-				rows = append(rows, rowMap)
 			}
 		}
-		return rows, nil
+		return marshalledRows, nil
 	}
 }
