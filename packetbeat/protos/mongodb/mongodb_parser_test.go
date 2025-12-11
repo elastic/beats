@@ -229,10 +229,10 @@ func TestMongodbParser_negativeBSONLength(t *testing.T) {
 	data = addInt32(data, 2004) // opCode = OP_QUERY
 	data = addInt32(data, 0)    // flags
 	data = addCStr(data, "db.$cmd")
-	data = addInt32(data, 0)                            // numberToSkip
-	data = addInt32(data, 1)                            // numberToReturn
-	data = append(data, 0xFF, 0xFF, 0xFF, 0xFF)         // BSON length = -1
-	data = append(data, 0x00, 0x00, 0x00, 0x00, 0x00)   // minimal invalid doc body
+	data = addInt32(data, 0)                          // numberToSkip
+	data = addInt32(data, 1)                          // numberToReturn
+	data = append(data, 0xFF, 0xFF, 0xFF, 0xFF)       // BSON length = -1
+	data = append(data, 0x00, 0x00, 0x00, 0x00, 0x00) // minimal invalid doc body
 
 	// Fix total length
 	tl := int32(len(data))
@@ -261,9 +261,9 @@ func TestMongodbParser_zeroBSONLength(t *testing.T) {
 	data = addInt32(data, 2004) // opCode = OP_QUERY
 	data = addInt32(data, 0)    // flags
 	data = addCStr(data, "db.$cmd")
-	data = addInt32(data, 0)    // numberToSkip
-	data = addInt32(data, 1)    // numberToReturn
-	data = addInt32(data, 0)    // BSON length = 0 (invalid, minimum is 5)
+	data = addInt32(data, 0) // numberToSkip
+	data = addInt32(data, 1) // numberToReturn
+	data = addInt32(data, 0) // BSON length = 0 (invalid, minimum is 5)
 
 	// Fix total length
 	tl := int32(len(data))
@@ -397,14 +397,14 @@ func TestMongodbParser_opMsgSequenceSizeExceedsBuffer(t *testing.T) {
 // Security test: Valid OP_REPLY with correct numberReturned should still work
 func TestMongodbParser_validOpReply(t *testing.T) {
 	var data []byte
-	data = addInt32(data, 0)  // placeholder for total length
-	data = addInt32(data, 1)  // requestId
-	data = addInt32(data, 1)  // responseTo
-	data = addInt32(data, 1)  // opCode = OP_REPLY
-	data = addInt32(data, 0)  // flags
-	data = addInt64(data, 0)  // cursorId
-	data = addInt32(data, 0)  // startingFrom
-	data = addInt32(data, 1)  // numberReturned = 1
+	data = addInt32(data, 0) // placeholder for total length
+	data = addInt32(data, 1) // requestId
+	data = addInt32(data, 1) // responseTo
+	data = addInt32(data, 1) // opCode = OP_REPLY
+	data = addInt32(data, 0) // flags
+	data = addInt64(data, 0) // cursorId
+	data = addInt32(data, 0) // startingFrom
+	data = addInt32(data, 1) // numberReturned = 1
 	// Add one minimal empty BSON document (5 bytes: length + null terminator)
 	data = append(data, 5, 0, 0, 0, 0)
 
