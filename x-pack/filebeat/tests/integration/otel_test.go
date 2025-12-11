@@ -1159,18 +1159,8 @@ receivers:
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-<<<<<<< HEAD
-    processors:
-      # Configure a processor to prevent enabling default processors
-      - add_fields:
-          fields:
-            custom_field: "custom_value"
-    output:
-      otelconsumer:
-=======
     # Clear the list of default processors
     processors: []
->>>>>>> e1630bed1 (feat: add `add_cloud_metadata` processor to OTel Beat processor (#48020))
     logging:
       level: info
       selectors:
@@ -1238,8 +1228,6 @@ receivers:
     processors:
       - add_cloud_metadata:
       - add_host_metadata:
-    output:
-      otelconsumer:
     logging:
       level: info
       selectors:
