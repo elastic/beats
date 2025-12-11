@@ -1,136 +1,129 @@
-# options for analysis running
-run:
-  # timeout for analysis, e.g. 30s, 5m, default is 1m
-  timeout: 1m
+version: "2"
 
+# Find the whole list here https://golangci-lint.run/usage/linters/
+linters:
+  enable:
+    - asciicheck # simple linter to check that your code does not contain non-ASCII identifiers
+    - bodyclose # checks whether HTTP response body is closed successfully
+    - containedctx # detects struct contained context.Context field
+    - contextcheck # checks whether the function uses a non-inherited context
+    - copyloopvar # checks for pointers to enclosing loop variables
+    - durationcheck # check for two durations multiplied together
+    - errcheck # checking for unchecked errors in go programs
+    - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
+    - exptostd # detects functions from golang.org/x/exp that can be replaced by std functions
+    - forbidigo # forbids identifiers matched by reg exps
+    - gomodguard # check for blocked dependencies
+    - gosec # inspects source code for security problems
+    - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
+    - importas # enforces consistent import aliases
+    - ineffassign # detects when assignments to existing variables are not used
+    - misspell # finds commonly misspelled English words in comments
+    - nakedret # finds naked returns in functions greater than a specified function length
+    - nilerr # finds the code that returns nil even if it checks that the error is not nil.
+    - nilnesserr # reports constructs that check for err != nil, but return a different nil value error
+    - noctx # noctx finds sending http request without context.Context
+    - nolintlint # reports ill-formed or insufficient nolint directives
+    - prealloc # finds slice declarations that could potentially be pre-allocated
+    - predeclared # finds code that shadows one of Go's predeclared identifiers
+    - staticcheck # Staticcheck is a go vet on steroids, applying a ton of static analysis checks
+    - unconvert # Remove unnecessary type conversions
+    - unused # checks Go code for unused constants, variables, functions and types
+    - usetesting # detects uses that could be replaced by standard testing helpers
+    - wastedassign # wastedassign finds wasted assignment statements.
+
+  # all available settings of specific linters
+  settings:
+    errcheck:
+      # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
+      check-type-assertions: true
+      # report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`.
+      check-blank: false
+      # List of functions to exclude from checking, where each entry is a single function to exclude.
+      # See https://github.com/kisielk/errcheck#excluding-functions for details.
+      exclude-functions:
+        - (mapstr.M).Delete # Only returns ErrKeyNotFound, can safely be ignored.
+        - (mapstr.M).Put # Can only fail on type conversions, usually safe to ignore.
+    errorlint:
+      # Check whether fmt.Errorf uses the %w verb for formatting errors. See the readme for caveats
+      errorf: true
+      # Check for plain type assertions and type switches
+      asserts: true
+      # Check for plain error comparisons
+      comparison: true
+    forbidigo:
+      # Forbid the following identifiers
+      forbid:
+        - pattern: fmt.Print.* # too much log noise
+    gomodguard:
+      blocked:
+        # List of blocked modules.
+        modules:
+          # Blocked module.
+          - github.com/pkg/errors:
+              # Recommended modules that should be used instead. (Optional)
+              recommendations:
+                - errors
+                - fmt
+              reason: This package is deprecated, use fmt.Errorf with %%w instead
+          - github.com/elastic/beats/v7:
+              reason: There must be no Beats dependency
+    gosec:
+      excludes:
+        - G115 # Integer overflow conversion
+        - G306 # Expect WriteFile permissions to be 0600 or less
+        - G404 # Use of weak random number generator
+        - G401 # Detect the usage of DES, RC4, MD5 or SHA1: Used in non-crypto contexts.
+        - G501 # Import blocklist: crypto/md5: Used in non-crypto contexts.
+        - G505 # Import blocklist: crypto/sha1: Used in non-crypto contexts.
+    nakedret:
+      # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
+      max-func-lines: 0
+    nolintlint:
+      # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
+      require-explanation: true
+      # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
+      require-specific: true
+      # Enable to ensure that nolint directives are all used. Default is true.
+      allow-unused: true
+    staticcheck:
+      checks:
+        - all
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      # Exclude some linters from running on tests files.
+      - linters:
+          - errcheck
+        path: _test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
-  # Maximum count of issues with the same text.
-  # Set to 0 to disable.
-  # Default: 3
-  max-same-issues: 0
   # Maximum issues count per one linter.
   # Set to 0 to disable.
   # Default: 50
   max-issues-per-linter: 0
-
-output:
-  sort-results: true
-
-# Find the whole list here https://golangci-lint.run/usage/linters/
-linters:
-  disable-all: true
+  # Maximum count of issues with the same text.
+  # Set to 0 to disable.
+  # Default: 3
+  max-same-issues: 0
+formatters:
   enable:
-    - errcheck # checking for unchecked errors in go programs
-    - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
-    - forbidigo # forbids identifiers	matched by reg exps
-    - gosimple # linter for Go source code that specializes in simplifying a code
-    - misspell # finds commonly misspelled English words in comments
-    - nakedret # finds naked returns in functions greater than a specified function length
-    - nolintlint # reports ill-formed or insufficient nolint directives
-    - staticcheck # Staticcheck is a go vet on steroids, applying a ton of static analysis checks
-    - stylecheck # a replacement for golint
-    - unused # checks Go code for unused constants, variables, functions and types
-    - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
-    - ineffassign # detects when assignments to existing variables are not used
-    - structcheck # finds unused struct fields
-    - typecheck # Like the front-end of a Go compiler, parses and type-checks Go code
-    - varcheck # Finds unused global variables and constants
-    - asciicheck # simple linter to check that your code does not contain non-ASCII identifiers
-    - bodyclose # checks whether HTTP response body is closed successfully
-    - durationcheck # check for two durations multiplied together
-    - exportloopref # checks for pointers to enclosing loop variables
     - goimports # Goimports does everything that gofmt does. Additionally it checks unused imports
-    - gosec # inspects source code for security problems
-    - importas # enforces consistent import aliases
-    - nilerr # finds the code that returns nil even if it checks that the error is not nil.
-    - noctx # noctx finds sending http request without context.Context
-    - unconvert # Remove unnecessary type conversions
-    - wastedassign # wastedassign finds wasted assignment statements.
-    - gomodguard # check for blocked dependencies
-
-# all available settings of specific linters
-linters-settings:
-  errcheck:
-    # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
-    check-type-assertions: true
-    # report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`.
-    check-blank: false
-    # List of functions to exclude from checking, where each entry is a single function to exclude.
-    # See https://github.com/kisielk/errcheck#excluding-functions for details.
-    exclude-functions:
-      - (mapstr.M).Delete # Only returns ErrKeyNotFound, can safely be ignored.
-      - (mapstr.M).Put # Can only fail on type conversions, usually safe to ignore.
-
-  errorlint:
-    # Check whether fmt.Errorf uses the %w verb for formatting errors. See the readme for caveats
-    errorf: true
-    # Check for plain type assertions and type switches
-    asserts: true
-    # Check for plain error comparisons
-    comparison: true
-
-  forbidigo:
-    # Forbid the following identifiers
-    forbid:
-      - fmt.Print.* # too much log noise
-    # Exclude godoc examples from forbidigo checks.  Default is true.
-    exclude_godoc_examples: true
-
-  goimports:
-    local-prefixes: github.com/elastic
-
-  gomodguard:
-    blocked:
-      # List of blocked modules.
-      modules:
-        # Blocked module.
-        - github.com/pkg/errors:
-            # Recommended modules that should be used instead. (Optional)
-            recommendations:
-              - errors
-              - fmt
-            reason: "This package is deprecated, use fmt.Errorf with %%w instead"
-        - github.com/elastic/beats/v7:
-            reason: "There must be no Beats dependency"
-
-  gosimple:
-    # Select the Go version to target. The default is '1.13'.
-    go: "{{.GoVersion}}"
-
-  nakedret:
-    # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
-    max-func-lines: 0
-
-  nolintlint:
-    # Enable to ensure that nolint directives are all used. Default is true.
-    allow-unused: false
-    # Disable to ensure that nolint directives don't have a leading space. Default is true.
-    allow-leading-space: false
-    # Exclude following linters from requiring an explanation.  Default is [].
-    allow-no-explanation: []
-    # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
-    require-explanation: true
-    # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
-    require-specific: true
-
-  staticcheck:
-    # Select the Go version to target. The default is '1.13'.
-    go: "{{.GoVersion}}"
-    checks: ["all"]
-
-  stylecheck:
-    # Select the Go version to target. The default is '1.13'.
-    go: "{{.GoVersion}}"
-    checks: ["all"]
-
-  unused:
-    # Select the Go version to target. The default is '1.13'.
-    go: "{{.GoVersion}}"
-
-  gosec:
-    excludes:
-    - G306 # Expect WriteFile permissions to be 0600 or less
-    - G404 # Use of weak random number generator
-    - G401 # Detect the usage of DES, RC4, MD5 or SHA1: Used in non-crypto contexts.
-    - G501 # Import blocklist: crypto/md5: Used in non-crypto contexts.
-    - G505 # Import blocklist: crypto/sha1: Used in non-crypto contexts.
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/elastic
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

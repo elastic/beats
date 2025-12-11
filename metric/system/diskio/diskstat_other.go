@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build (darwin && cgo) || freebsd
-// +build darwin,cgo freebsd
 
 package diskio
 
@@ -27,6 +26,11 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+// IOStat carries disk statistics for all devices
+type IOStat struct {
+	lastDiskIOCounters map[string]disk.IOCountersStat
+}
 
 // NewDiskIOStat :init DiskIOStat object.
 func NewDiskIOStat() *IOStat {

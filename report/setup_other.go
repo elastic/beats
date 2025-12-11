@@ -16,10 +16,6 @@
 // under the License.
 
 //go:build (!darwin || !cgo) && (!freebsd || !cgo) && !linux && !windows
-// +build !darwin !cgo
-// +build !freebsd !cgo
-// +build !linux
-// +build !windows
 
 package report
 

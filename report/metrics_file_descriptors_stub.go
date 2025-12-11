@@ -16,8 +16,6 @@
 // under the License.
 
 //go:build !linux && (!freebsd || !cgo)
-// +build !linux
-// +build !freebsd !cgo
 
 package report
 

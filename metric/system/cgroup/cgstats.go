@@ -73,7 +73,7 @@ func (stat *StatsV1) FillPercentages(prev CGStats, curTime, prevTime time.Time) 
 	if len(stat.CPUAccounting.UsagePerCPU) > 0 {
 		cpuCount = len(stat.CPUAccounting.UsagePerCPU)
 	} else {
-		cpuCount = numcpu.NumCPU()
+		cpuCount = numcpu.NumCPU() //nolint:staticcheck // NumCPUWithLogger requires a logger not available here
 	}
 
 	// if you look at the raw cgroup stats, the following normalized value is literally an average of per-cpu numbers.
@@ -129,7 +129,7 @@ func (stat *StatsV2) FillPercentages(prev CGStats, curTime, prevTime time.Time) 
 
 	pct := float64(totalCPUDeltaNanos) / float64(timeDeltaNanos)
 
-	cpuCount := numcpu.NumCPU()
+	cpuCount := numcpu.NumCPU() //nolint:staticcheck // NumCPUWithLogger requires a logger not available here
 
 	// if you look at the raw cgroup stats, the following normalized value is literally an average of per-cpu numbers.
 	normalizedPct := pct / float64(cpuCount)

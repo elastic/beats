@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !linux && !freebsd && !openbsd && !windows
-// +build !linux,!freebsd,!openbsd,!windows
 
 package numcpu
 

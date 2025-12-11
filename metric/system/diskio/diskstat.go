@@ -16,14 +16,8 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || windows || aix
-// +build darwin freebsd linux windows aix
 
 package diskio
-
-import (
-	"github.com/shirou/gopsutil/v4/cpu"
-	"github.com/shirou/gopsutil/v4/disk"
-)
 
 // IOMetric contains mapping fields which are outputted by `iostat -x` on linux
 //
@@ -44,11 +38,4 @@ type IOMetric struct {
 	AvgWriteAwaitTime float64 `json:"w_await"`
 	AvgServiceTime    float64 `json:"svctm"`
 	BusyPct           float64 `json:"busy"`
-}
-
-// IOStat carries disk statistics for all devices
-type IOStat struct {
-	lastDiskIOCounters map[string]disk.IOCountersStat
-	lastCPU            cpu.TimesStat
-	curCPU             cpu.TimesStat
 }

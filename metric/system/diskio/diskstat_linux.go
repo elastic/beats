@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package diskio
 
@@ -31,6 +30,13 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
 )
+
+// IOStat carries disk statistics for all devices
+type IOStat struct {
+	lastDiskIOCounters map[string]disk.IOCountersStat
+	lastCPU            cpu.TimesStat
+	curCPU             cpu.TimesStat
+}
 
 // GetCLKTCK emulates the _SC_CLK_TCK syscall
 func GetCLKTCK() uint32 {

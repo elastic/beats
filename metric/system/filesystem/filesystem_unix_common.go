@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build freebsd || linux || aix || solaris
-// +build freebsd linux aix solaris
 
 package filesystem
 

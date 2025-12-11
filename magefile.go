@@ -31,14 +31,14 @@ import (
 )
 
 // Aliases are shortcuts to long target names.
-// nolint: deadcode // it's used by `mage`.
+// nolint:unused // it's used by `mage`.
 var Aliases = map[string]interface{}{
 	"llc":  mage.Linter.LastChange,
 	"lint": mage.Linter.All,
 }
 
 // Check runs all the checks
-// nolint: deadcode,unparam // it's used as a `mage` target and requires returning an error
+// nolint:unused,unparam // it's used as a `mage` target and requires returning an error
 func Check() error {
 	mg.Deps(mage.Deps.CheckModuleTidy, CheckLicenseHeaders)
 	mg.Deps(mage.CheckNoChanges)

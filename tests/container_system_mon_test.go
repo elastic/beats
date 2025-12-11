@@ -73,7 +73,7 @@ func TestKernelProc(t *testing.T) {
 	}
 
 	t.Logf("monitoring kernel proc %d", testPid)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
+	ctx, cancel := context.WithTimeout(t.Context(), time.Minute*5)
 	defer cancel()
 
 	runner := systemtests.DockerTestRunner{
@@ -93,7 +93,7 @@ func TestKernelProc(t *testing.T) {
 }
 
 func TestProcessMetricsElevatedPerms(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
+	ctx, cancel := context.WithTimeout(t.Context(), time.Minute*5)
 	defer cancel()
 	// runs test cases where we do not expect any kind of permissions errors
 	baseRunner := systemtests.DockerTestRunner{
@@ -101,7 +101,7 @@ func TestProcessMetricsElevatedPerms(t *testing.T) {
 		Basepath:          "./metric/system/process",
 		Privileged:        true,
 		Testname:          "TestSystemHostFromContainer",
-		CreateHostProcess: exec.Command("sleep", "240"),
+		CreateHostProcess: exec.CommandContext(ctx, "sleep", "240"),
 		FatalLogMessages:  []string{"Error fetching PID info for", "Non-fatal error fetching"},
 	}
 
@@ -110,7 +110,7 @@ func TestProcessMetricsElevatedPerms(t *testing.T) {
 }
 
 func TestProcessAllSettings(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
+	ctx, cancel := context.WithTimeout(t.Context(), time.Minute*5)
 	defer cancel()
 	// runs test cases where we do not expect any kind of permissions errors
 	baseRunner := systemtests.DockerTestRunner{
@@ -118,7 +118,7 @@ func TestProcessAllSettings(t *testing.T) {
 		Basepath:          "./metric/system/process",
 		Privileged:        true,
 		Testname:          "TestSystemHostFromContainer",
-		CreateHostProcess: exec.Command("sleep", "480"),
+		CreateHostProcess: exec.CommandContext(ctx, "sleep", "480"),
 		FatalLogMessages:  []string{"Error fetching PID info for"},
 	}
 
@@ -129,8 +129,6 @@ func TestProcessAllSettings(t *testing.T) {
 }
 
 func TestContainerProcess(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
-	defer cancel()
 	// Make sure that monitoring container procs from within the container still works
 	baseRunner := systemtests.DockerTestRunner{
 		Runner:           t,
@@ -142,12 +140,12 @@ func TestContainerProcess(t *testing.T) {
 
 	// pick a user that has permission for its own home and GOMODCACHE dir
 	// 'nobody' has id 65534 on golang:alpine and has the same GOMODCACHE as root (/go/pkg/mod)
-	baseRunner.CreateAndRunPermissionMatrix(ctx, []container.CgroupnsMode{container.CgroupnsModeHost, container.CgroupnsModePrivate},
+	baseRunner.CreateAndRunPermissionMatrix(t.Context(), []container.CgroupnsMode{container.CgroupnsModeHost, container.CgroupnsModePrivate},
 		[]bool{true, false}, []string{"nobody", ""})
 }
 
 func TestFilesystem(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
+	ctx, cancel := context.WithTimeout(t.Context(), time.Minute*5)
 	defer cancel()
 
 	// TODO: once https://github.com/elastic/elastic-agent-system-metrics/issues/141 is fixed, add a FatalLogMessages check for

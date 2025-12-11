@@ -16,8 +16,6 @@
 // under the License.
 
 //go:build !integration && (darwin || freebsd || linux || openbsd || windows)
-// +build !integration
-// +build darwin freebsd linux openbsd windows
 
 package memory
 

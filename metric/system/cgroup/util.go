@@ -557,7 +557,7 @@ the container as /sys/fs/cgroup/unified and start the system module with the hos
 	}
 
 	if sc.Err() != nil {
-		return cPaths, fmt.Errorf("error scanning cgroup file: %w", err)
+		return cPaths, fmt.Errorf("error scanning cgroup file: %w", sc.Err())
 	}
 
 	return cPaths, nil

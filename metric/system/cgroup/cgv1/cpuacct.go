@@ -25,8 +25,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgcommon"
 	"github.com/shirou/gopsutil/v4/cpu"
+
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgcommon"
 )
 
 var clockTicks = uint64(cpu.ClocksPerSec)

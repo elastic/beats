@@ -210,7 +210,7 @@ func (tr *DockerTestRunner) createTestContainer(ctx context.Context, logger *log
 	_, err = io.Copy(os.Stdout, reader)
 	require.NoError(tr.Runner, err, "error copying image")
 
-	wdCmd := exec.Command("go", "list", "-m", "-f", "{{.Dir}}")
+	wdCmd := exec.CommandContext(ctx, "go", "list", "-m", "-f", "{{.Dir}}")
 	wdPath, err := wdCmd.CombinedOutput()
 	require.NoError(tr.Runner, err, "error finding root path")
 
@@ -237,7 +237,7 @@ func (tr *DockerTestRunner) createTestContainer(ctx context.Context, logger *log
 		containerEnv = append(containerEnv, fmt.Sprintf("MONITOR_PID=%d", tr.MonitorPID))
 	}
 
-	gomodcacheCmd := exec.Command("go", "env", "GOMODCACHE")
+	gomodcacheCmd := exec.CommandContext(ctx, "go", "env", "GOMODCACHE")
 	gomodcacheValue, err := gomodcacheCmd.CombinedOutput()
 	require.NoError(tr.Runner, err)
 	gomodcacheValue = bytes.TrimSuffix(gomodcacheValue, []byte("\n"))

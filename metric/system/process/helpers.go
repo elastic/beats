@@ -33,11 +33,11 @@ func unixTimeMsToTime(unixTimeMs uint64) string {
 	return typeconv.Time(time.Unix(0, int64(unixTimeMs*1000000))).String()
 }
 
-func stripNullByte(buf []byte) string { //nolint: deadcode,unused,nolintlint // it is used in platform specific code
+func stripNullByte(buf []byte) string { //nolint:unused // it is used in platform specific code
 	return string(buf[0 : len(buf)-1])
 }
 
-func stripNullByteRaw(buf []byte) []byte { //nolint: deadcode,unused,nolintlint // it is used in platform specific code
+func stripNullByteRaw(buf []byte) []byte { //nolint:unused // it is used in platform specific code
 	return buf[0 : len(buf)-1]
 }
 
@@ -90,7 +90,7 @@ func GetProcCPUPercentage(s0, s1 ProcState) ProcState {
 	if math.IsNaN(pct) {
 		return s1
 	}
-	normalizedPct := pct / float64(numcpu.NumCPU())
+	normalizedPct := pct / float64(numcpu.NumCPU()) //nolint:staticcheck // NumCPUWithLogger requires a logger not available here
 
 	s1.CPU.Total.Norm.Pct = opt.FloatWith(metric.Round(normalizedPct))
 	s1.CPU.Total.Pct = opt.FloatWith(metric.Round(pct))

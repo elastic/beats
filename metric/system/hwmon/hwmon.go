@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package hwmon
 
@@ -44,7 +43,7 @@ func ReportSensors(dev Device) (MonData, error) {
 			return nil, fmt.Errorf("error fetching sensor data for %s: %w", sensor.DevType, err)
 		}
 		// Create the device key from the label, a the values are considerably more intuative.
-		labelName := strings.ToLower(strings.Replace(data.Label, " ", "_", -1))
+		labelName := strings.ToLower(strings.ReplaceAll(data.Label, " ", "_"))
 		metrics[labelName] = data
 	}
 
