@@ -153,8 +153,14 @@ func CreateStorageAccountContainerClient(cfg *azureInputConfig, log *logp.Logger
 			return nil, fmt.Errorf("credential cannot be empty when auth_type is client_secret")
 		}
 
-		// Build the storage account URL
-		storageAccountURL := fmt.Sprintf("https://%s.blob.core.windows.net/%s", cfg.SAName, cfg.SAContainer)
+		// Get the Azure environment to determine the correct storage endpoint suffix
+		env, err := getAzureEnvironment(cfg.OverrideEnvironment)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get azure environment: %w", err)
+		}
+
+		// Build the storage account URL using the correct endpoint suffix for the cloud environment
+		storageAccountURL := fmt.Sprintf("https://%s.blob.%s/%s", cfg.SAName, env.StorageEndpointSuffix, cfg.SAContainer)
 		containerClient, err := container.NewClient(storageAccountURL, credential, nil)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create container client with credential: %w", err)

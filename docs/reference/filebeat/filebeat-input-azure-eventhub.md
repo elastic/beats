@@ -12,37 +12,77 @@ Users can make use of the `azure-eventhub` input in order to read messages from 
 
 Users can enable internal logs tracing for this input by setting the environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true`. When enabled, this input will log additional information to the logs. Additional information includes partition ownership, blob lease information, and other internal state.
 
-Example configuration using Shared Access Key authentication:
+## Example configurations
+
+### Connection string authentication (processor v1)
+
+Example configuration using connection string authentication with processor v1:
 
 ```yaml
 filebeat.inputs:
 - type: azure-eventhub
   eventhub: "insights-operational-logs"
-  consumer_group: "test"
-  connection_string: "Endpoint=sb://....."
-  storage_account: "azureeph"
-  storage_account_key: "....."
-  storage_account_container: ""
-  resource_manager_endpoint: ""
+  consumer_group: "$Default"
+  # Connection string authentication (default)
+  connection_string: "Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=your-shared-access-key"
+  # Storage account configuration
+  storage_account: "your-storage-account"
+  storage_account_key: "your-storage-account-key"
+  storage_account_container: ""  # Optional: defaults to filebeat-<eventhub-name>
+  processor_version: "v1"
+  # Optional: for non-public Azure clouds
+  # resource_manager_endpoint: "https://management.usgovcloudapi.net/"  # For Azure Government
 ```
 
-{applies_to}`stack: ga 9.3.0` Example configuration using client secret authentication:
+### Connection string authentication (processor v2)
+
+Example configuration using connection string authentication with processor v2:
 
 ```yaml
 filebeat.inputs:
 - type: azure-eventhub
   eventhub: "insights-operational-logs"
-  consumer_group: "test"
+  consumer_group: "$Default"
+  # Connection string authentication (default)
+  auth_type: "connection_string"
+  connection_string: "Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=your-shared-access-key"
+  # Storage account configuration
+  storage_account: "your-storage-account"
+  storage_account_connection_string: "DefaultEndpointsProtocol=https;AccountName=your-storage-account;AccountKey=your-storage-account-key;EndpointSuffix=core.windows.net"
+  storage_account_container: ""  # Optional: defaults to filebeat-<eventhub-name>
+  processor_version: "v2"
+  # Optional: for non-public Azure clouds
+  # resource_manager_endpoint: "https://management.usgovcloudapi.net/"  # For Azure Government
+```
+
+{applies_to}`stack: ga 9.3.0` ### Client secret authentication (processor v2)
+
+Example configuration using Azure Active Directory service principal authentication with processor v2:
+
+```yaml
+filebeat.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "$Default"
+  # Client secret authentication
   auth_type: "client_secret"
-  eventhub_namespace: "your-eventhub-namespace.servicebus.windows.net"
+  eventhub_namespace: "your-namespace.servicebus.windows.net"
   tenant_id: "your-tenant-id"
   client_id: "your-client-id"
   client_secret: "your-client-secret"
+  # Optional: defaults to Azure Public Cloud
   authority_host: "https://login.microsoftonline.com"
-  storage_account: "azureeph"
-  storage_account_container: ""
+  # For Azure Government, use: "https://login.microsoftonline.us"
+  # For Azure China, use: "https://login.chinacloudapi.cn"
+  # Storage account configuration
+  storage_account: "your-storage-account"
+  storage_account_container: ""  # Optional: defaults to filebeat-<eventhub-name>
   processor_version: "v2"
+  # Optional: for non-public Azure clouds
+  # resource_manager_endpoint: "https://management.usgovcloudapi.net/"  # For Azure Government
 ```
+
+**Note:** When using `client_secret` authentication, the service principal must have the appropriate Azure RBAC permissions. See [Required permissions](#_required_permissions) for details.
 
 ## Authentication [_authentication]
 
