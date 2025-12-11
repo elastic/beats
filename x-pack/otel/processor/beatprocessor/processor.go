@@ -45,6 +45,7 @@ func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, erro
 		}
 		if processor != nil {
 			bp.processors = append(bp.processors, processor)
+			bp.logger.Info("Configured Beat processor", zap.String("processor_name", processor.String()))
 		}
 	}
 
