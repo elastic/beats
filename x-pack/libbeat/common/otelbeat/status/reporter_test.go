@@ -54,7 +54,7 @@ func TestToPdata(t *testing.T) {
 			state: status.Running,
 			msg:   "",
 			wantKeys: map[string]string{
-				"status": "Running",
+				"status": componentstatus.StatusOK.String(),
 				"error":  "",
 			},
 		},
@@ -63,7 +63,7 @@ func TestToPdata(t *testing.T) {
 			state: status.Degraded,
 			msg:   "some error occurred",
 			wantKeys: map[string]string{
-				"status": "Degraded",
+				"status": componentstatus.StatusRecoverableError.String(),
 				"error":  "some error occurred",
 			},
 		},
@@ -72,7 +72,7 @@ func TestToPdata(t *testing.T) {
 			state: status.Failed,
 			msg:   "critical failure",
 			wantKeys: map[string]string{
-				"status": "Failed",
+				"status": componentstatus.StatusPermanentError.String(),
 				"error":  "critical failure",
 			},
 		},
@@ -162,7 +162,7 @@ func TestInputStatusesInEventAttributes(t *testing.T) {
 
 	runner1Status, ok := runner1Map.Get("status")
 	require.True(t, ok)
-	assert.Equal(t, "Running", runner1Status.Str())
+	assert.Equal(t, componentstatus.StatusOK.String(), runner1Status.Str())
 
 	runner1Error, ok := runner1Map.Get("error")
 	require.True(t, ok)
@@ -175,7 +175,7 @@ func TestInputStatusesInEventAttributes(t *testing.T) {
 
 	runner2Status, ok := runner2Map.Get("status")
 	require.True(t, ok)
-	assert.Equal(t, "Degraded", runner2Status.Str())
+	assert.Equal(t, componentstatus.StatusRecoverableError.String(), runner2Status.Str())
 
 	runner2Error, ok := runner2Map.Get("error")
 	require.True(t, ok)

@@ -378,14 +378,16 @@ func TestReceiverStatus(t *testing.T) {
 			status: componentstatus.NewEvent(
 				componentstatus.StatusRecoverableError,
 				componentstatus.WithError(errors.New(expectedDegradedErrorMessage)),
-				componentstatus.WithAttributes(inputStatusAttributes("Degraded", expectedDegradedErrorMessage)),
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusRecoverableError.String(), expectedDegradedErrorMessage)),
 			),
 			degrade: true,
 		},
 		{
 			name: "running input",
 			status: componentstatus.NewEvent(componentstatus.StatusOK,
-				componentstatus.WithAttributes(inputStatusAttributes("Running", ""))),
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusOK.String(), ""))),
 		},
 	}
 

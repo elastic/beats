@@ -315,7 +315,8 @@ func TestReceiverStatus(t *testing.T) {
 			status: componentstatus.NewEvent(
 				componentstatus.StatusPermanentError,
 				componentstatus.WithError(errors.New(expectedFailedErrorMessage)),
-				componentstatus.WithAttributes(inputStatusAttributes("Failed", expectedFailedErrorMessage)),
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusPermanentError.String(), expectedFailedErrorMessage)),
 			),
 			benchmarkStatus: "failed",
 		},
@@ -324,14 +325,16 @@ func TestReceiverStatus(t *testing.T) {
 			status: componentstatus.NewEvent(
 				componentstatus.StatusRecoverableError,
 				componentstatus.WithError(errors.New(expectedDegradedErrorMessage)),
-				componentstatus.WithAttributes(inputStatusAttributes("Degraded", expectedDegradedErrorMessage)),
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusRecoverableError.String(), expectedDegradedErrorMessage)),
 			),
 			benchmarkStatus: "degraded",
 		},
 		{
 			name: "running input",
 			status: componentstatus.NewEvent(componentstatus.StatusOK,
-				componentstatus.WithAttributes(inputStatusAttributes("Running", ""))),
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusOK.String(), ""))),
 		},
 	}
 

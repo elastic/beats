@@ -24,10 +24,10 @@ type runnerState struct {
 }
 
 // toPdata converts a runnerState to a pdata.Map
-// The format is the same as x-pack/libbeat/management/unit.go#updateStateForStream
+// The format is the same as the healthcheckv2 extension
 func toPdata(r *runnerState) pcommon.Map {
 	pcommonMap := pcommon.NewMap()
-	pcommonMap.PutStr("status", r.state.String())
+	pcommonMap.PutStr("status", beatStatusToOtelStatus(r.state).String())
 	pcommonMap.PutStr("error", r.msg)
 	return pcommonMap
 }
@@ -100,22 +100,15 @@ func (r *reporter) UpdateStatus() {
 func (r *reporter) calculateOtelStatus() *componentstatus.Event {
 	var evt *componentstatus.Event
 	s, msg := r.calculateAggregateState()
-	switch s {
-	case status.Starting:
-		evt = componentstatus.NewEvent(componentstatus.StatusStarting)
-	case status.Running:
-		evt = componentstatus.NewEvent(componentstatus.StatusOK)
-	case status.Degraded:
-		evt = componentstatus.NewRecoverableErrorEvent(errors.New(msg))
-	case status.Failed:
-		evt = componentstatus.NewPermanentErrorEvent(errors.New(msg))
-	case status.Stopping:
-		evt = componentstatus.NewEvent(componentstatus.StatusStopped)
-	case status.Stopped:
-		evt = componentstatus.NewEvent(componentstatus.StatusStopped)
-	default:
+	otelStatus := beatStatusToOtelStatus(s)
+	if otelStatus == componentstatus.StatusNone {
 		return nil
 	}
+	var eventBuilderOpts []componentstatus.EventBuilderOption
+	if componentstatus.StatusIsError(otelStatus) {
+		eventBuilderOpts = append(eventBuilderOpts, componentstatus.WithError(errors.New(msg)))
+	}
+	evt = componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
 
 	inputStatusesPdata := evt.Attributes().PutEmptyMap(inputStatusAttributesKey)
 
@@ -167,6 +160,28 @@ func getOppositeStatus(status componentstatus.Status) componentstatus.Status {
 		return componentstatus.StatusRecoverableError
 	case componentstatus.StatusRecoverableError:
 		return componentstatus.StatusOK
+	default:
+		return componentstatus.StatusNone
+	}
+}
+
+// beatStatusToOtelStatus converts a beat status to an otel status.
+func beatStatusToOtelStatus(beatStatus status.Status) componentstatus.Status {
+	switch beatStatus {
+	case status.Starting:
+		return componentstatus.StatusStarting
+	case status.Running:
+		return componentstatus.StatusOK
+	case status.Degraded:
+		return componentstatus.StatusRecoverableError
+	case status.Configuring:
+		return componentstatus.StatusOK
+	case status.Failed:
+		return componentstatus.StatusPermanentError
+	case status.Stopping:
+		return componentstatus.StatusStopping
+	case status.Stopped:
+		return componentstatus.StatusStopped
 	default:
 		return componentstatus.StatusNone
 	}
