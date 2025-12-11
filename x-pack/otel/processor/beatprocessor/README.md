@@ -14,56 +14,6 @@ This allows you to use Beat processors like e.g. [add_host_metadata] anywhere in
 > This is because it relies on the specific structure of telemetry emitted by those components.
 > Using it with data coming from other components is not recommended and may result in unexpected behavior.
 
-The processor enriches the telemetry with host metadata by using the [add_host_metadata] processor under the hood.
-Note that configuration is limited at this stage.
-Host metadata is added unconditionally and cannot be disabled.
-You can configure the host metadata enrichment using the options that the [add_host_metadata] processor allows.
-The only exception is that the option `replace_fields` is always set to `true` and setting it to `false` has no effect.
-
-## Default processors in Beat receivers
-
-The Beat receivers have a set of default processors that are included when the `processors` option is not specified.
-These processors are: [add_cloud_metadata], [add_docker_metadata], [add_host_metadata], [add_kubernetes_metadata].
-To disable them, explicitly specify the `processors` configuration option of the Beat receiver.
-The list of processors can be an empty list or an arbitrary list of processors.
-
-For example:
-
-```yaml
-receivers:
-  filebeatreceiver:
-    filebeat:
-      inputs:
-        - type: filestream
-          id: host-logs
-          paths:
-            - /var/log/*.log
-    output:
-      otelconsumer:
-```
-
-The above Filebeat receiver configuration does not explicitly specify the `processors` option.
-In this case, the four processors listed above are included and ran as part of the Filebeat receiver.
-
-```yaml
-receivers:
-  filebeatreceiver:
-    filebeat:
-      inputs:
-        - type: filestream
-          id: host-logs
-          paths:
-            - /var/log/*.log
-    processors: []
-    output:
-      otelconsumer:
-```
-
-The above Filebeat receiver configuration specifies an empty list of processors.
-In this case, none of the default processors are ran as part of the Filebeat receiver.
-
-## Example
-
 Here are the currently supported processors:
 
 - [add_host_metadata]
