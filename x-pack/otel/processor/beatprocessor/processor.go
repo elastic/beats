@@ -99,18 +99,6 @@ func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Log
 	return nil, errors.New("malformed processor config")
 }
 
-func createAddKubernetesMetadataProcessor(cfg any, logpLogger *logp.Logger) (beat.Processor, error) {
-	addKubernetesMetadataConfig, err := config.NewConfigFrom(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create add_kubernetes_metadata processor config: %w", err)
-	}
-	addKubernetesMetadataProcessor, err := add_kubernetes_metadata.New(addKubernetesMetadataConfig, logpLogger)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create add_kubernetes_metadata processor: %w", err)
-	}
-	return addKubernetesMetadataProcessor, nil
-}
-
 func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Logs, error) {
 	if len(p.processors) == 0 {
 		return logs, nil
