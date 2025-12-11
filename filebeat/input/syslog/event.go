@@ -43,7 +43,7 @@ var month = map[string]time.Month{
 	"Dec": time.December,
 }
 
-var monthIndexed = []time.Month{
+var monthIndexed = [...]time.Month{
 	0,
 	time.January,
 	time.February,
@@ -138,7 +138,7 @@ func (s *event) SetTimeZone(b []byte) {
 // SetMonthNumeric sets the month with a number.
 func (s *event) SetMonthNumeric(b []byte) {
 	month := bytesToInt(skipLeadZero(b))
-	if month <= 12 {
+	if month < len(monthIndexed) {
 		s.month = monthIndexed[month]
 	}
 }
@@ -214,15 +214,8 @@ func (s *event) Year() int {
 
 // SetMessage sets the message.
 func (s *event) SetMessage(b []byte) {
-	if len(b) < 3 {
-		return
-	}
-	// remove BOM
-	if b[0] == 0xef && b[1] == 0xbb && b[2] == 0xbf {
-		s.message = string(b[3:])
-	} else {
-		s.message = string(b)
-	}
+	// Trim BOM: https://unicode.org/faq/utf_bom#bom5
+	s.message = string(bytes.TrimPrefix(b, []byte("\ufeff")))
 }
 
 // Message returns the message.
