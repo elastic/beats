@@ -66,6 +66,10 @@ func TestConsumeLogs(t *testing.T) {
 	}
 }
 
+func testLogger() *logp.Logger {
+	return logp.NewNopLogger()
+}
+
 func TestCreateProcessor(t *testing.T) {
 	t.Run("nil config returns nil processor", func(t *testing.T) {
 		processor, err := createProcessor(nil, testLogger())
@@ -104,10 +108,15 @@ func TestCreateProcessor(t *testing.T) {
 		require.NotNil(t, processor)
 		assert.Equal(t, "add_host_metadata", processor.String()[:len("add_host_metadata")])
 	})
-}
 
-func testLogger() *logp.Logger {
-	return logp.NewNopLogger()
+	t.Run("valid add_kubernetes_metadata processor config returns processor", func(t *testing.T) {
+		processor, err := createProcessor(map[string]any{
+			"add_kubernetes_metadata": map[string]any{},
+		}, testLogger())
+		require.NoError(t, err)
+		require.NotNil(t, processor)
+		assert.Equal(t, "add_kubernetes_metadata", processor.String()[:len("add_kubernetes_metadata")])
+	})
 }
 
 type mockProcessor struct {
