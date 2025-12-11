@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 env:
-  SETUP_GVM_VERSION: 'v0.5.2'
+  SETUP_GVM_VERSION: 'v0.6.0'
   LINUX_AGENT_IMAGE: "golang:${GO_VERSION}"
   WINDOWS_AGENT_IMAGE: "family/core-windows-2022"
 

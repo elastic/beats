@@ -13,7 +13,7 @@ function fixCRLF {
 function withGolang($version) {
     Write-Host "-- Install golang --"
     [Net.ServicePointManager]::SecurityProtocol = "tls12"
-    Invoke-WebRequest -URI https://github.com/andrewkroh/gvm/releases/download/v0.5.2/gvm-windows-amd64.exe -Outfile C:\Windows\System32\gvm.exe
+    Invoke-WebRequest -URI https://github.com/andrewkroh/gvm/releases/download/v0.6.0/gvm-windows-amd64.exe -Outfile C:\Windows\System32\gvm.exe
     gvm --format=powershell $version | Invoke-Expression
     go version
     go env -w GOBIN="$(go env GOROOT)\bin"

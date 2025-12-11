@@ -28,7 +28,7 @@ import (
 // The logic here is extremely simple: if USE_HOSTFS is set, return that for the resolver
 func DockerTestResolver(logger *logp.Logger) resolve.Resolver {
 	if path, set := os.LookupEnv("HOSTFS"); set {
-		logger.Info("Using /hostfs for container tests")
+		logger.Infof("Using %s for container tests", path)
 		return resolve.NewTestResolver(path)
 	}
 	return resolve.NewTestResolver("/")

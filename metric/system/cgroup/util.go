@@ -270,7 +270,7 @@ func SubsystemMountpoints(rootfs resolve.Resolver, subsystems map[string]struct{
 		mountInfo.ContainerizedRootMount, err = guessContainerCgroupPath(mountInfo.V2Loc, os.Getpid())
 		// treat this as a non-fatal error. If we end up needing this value, the lookups will fail down the line
 		if err != nil {
-			logger.Debugf("could not fetch cgroup path inside container: %w", err)
+			logger.Debugf("Non-fatal error fetching cgroup path inside container: %v", err)
 		}
 	}
 

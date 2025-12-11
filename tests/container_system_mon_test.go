@@ -80,7 +80,6 @@ func TestKernelProc(t *testing.T) {
 		Runner:           t,
 		MonitorPID:       int(testPid),
 		Basepath:         "./metric/system/process",
-		Verbose:          true,
 		Privileged:       true,
 		Testname:         "TestSystemHostFromContainer",
 		FatalLogMessages: []string{"error", "Error"},
@@ -100,7 +99,6 @@ func TestProcessMetricsElevatedPerms(t *testing.T) {
 	baseRunner := systemtests.DockerTestRunner{
 		Runner:            t,
 		Basepath:          "./metric/system/process",
-		Verbose:           true,
 		Privileged:        true,
 		Testname:          "TestSystemHostFromContainer",
 		CreateHostProcess: exec.Command("sleep", "240"),
@@ -118,7 +116,6 @@ func TestProcessAllSettings(t *testing.T) {
 	baseRunner := systemtests.DockerTestRunner{
 		Runner:            t,
 		Basepath:          "./metric/system/process",
-		Verbose:           false,
 		Privileged:        true,
 		Testname:          "TestSystemHostFromContainer",
 		CreateHostProcess: exec.Command("sleep", "480"),
@@ -138,7 +135,6 @@ func TestContainerProcess(t *testing.T) {
 	baseRunner := systemtests.DockerTestRunner{
 		Runner:           t,
 		Basepath:         "./metric/system/process",
-		Verbose:          false,
 		Privileged:       true,
 		Testname:         "TestContainerMonitoringFromInsideContainer",
 		FatalLogMessages: []string{"error", "Error"},
@@ -159,7 +155,6 @@ func TestFilesystem(t *testing.T) {
 	baseRunner := systemtests.DockerTestRunner{
 		Runner:     t,
 		Basepath:   "./metric/system/filesystem",
-		Verbose:    true,
 		Privileged: false,
 	}
 
