@@ -71,6 +71,7 @@ func (m *eventHubInputManager) Init(unison.Group) error {
 
 // Create creates a new azure-eventhub input based on the configuration.
 func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
+
 	// Register the logs tracer only if the environment variable is
 	// set to avoid the overhead of the tracer in environments where
 	// it's not needed.
