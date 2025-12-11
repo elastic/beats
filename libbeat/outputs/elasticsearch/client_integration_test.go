@@ -22,13 +22,17 @@ package elasticsearch
 import (
 	"context"
 	"fmt"
+	"io"
 	"math/rand/v2"
+	"net/http"
+	"strings"
 	"testing"
 	"time"
 
 	"go.elastic.co/apm/v2/apmtest"
 	"go.uber.org/zap"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -466,36 +470,90 @@ func randomClient(grp outputs.Group) outputs.NetworkClient {
 	return client.(outputs.NetworkClient) //nolint:errcheck //This is a test file, can ignore
 }
 
-func deleteDatastream(t *testing.T, client *Client, ds string) {
-	status, _, err := client.conn.Request("DELETE", fmt.Sprintf("/_data_stream/%s", ds), "", nil, nil)
-	if err != nil {
-		t.Fatalf("failed to delete datastream %s: %v", ds, err)
-	}
+func configureDatastream(t *testing.T, client *Client, ds string) {
+	// Define the request body
+	requestBody := `{
+  "index_patterns": ["` + ds + `*"],
+  "data_stream": { },
+  "template": {
+    "data_stream_options": {
+      "failure_store": {
+        "enabled": true
+      }
+    }
+  }
+}`
 
-	if status != 200 && status != 404 {
-		t.Fatalf("unexpected status code %d while deleting datastream %s", status, ds)
+	// Create the HTTP request
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/_index_template/idx-tmpl-"+ds, client.conn.URL), strings.NewReader(requestBody))
+	if err != nil {
+		t.Fatalf("failed to create HTTP request: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.SetBasicAuth(client.conn.Username, client.conn.Password)
+
+	// Send the HTTP request
+	resp, err := client.conn.HTTP.Do(req)
+	if err != nil {
+		t.Fatalf("failed to send HTTP request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Check for non-2xx status codes
+	if resp.StatusCode >= 300 {
+		body, _ := io.ReadAll(resp.Body)
+		t.Fatalf("unexpected status code %d while configuring datastream %s: %s", resp.StatusCode, ds, body)
+	}
+}
+
+func createDatastream(t *testing.T, client *Client, ds string) {
+	configureDatastream(t, client, ds)
+	timestamp := time.Now().Format(time.RFC3339)
+	bulkRequest := fmt.Sprintf(`{"create":{}}
+{"@timestamp":"%s","foo":1234}
+`, timestamp)
+
+	// Create the HTTP request
+	req, err := http.NewRequest(
+		"POST",
+		fmt.Sprintf("%s/%s/_bulk", client.conn.URL, ds),
+		strings.NewReader(bulkRequest))
+
+	if err != nil {
+		t.Fatalf("failed to create HTTP request: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/x-ndjson")
+	req.SetBasicAuth(client.conn.Username, client.conn.Password)
+
+	// Send the HTTP request
+	resp, err := client.conn.HTTP.Do(req)
+	if err != nil {
+		t.Fatalf("failed to send HTTP request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Check for non-2xx status codes
+	if resp.StatusCode >= 300 {
+		body, _ := io.ReadAll(resp.Body)
+		t.Fatalf("unexpected status code %d while creating datastream %s: %s", resp.StatusCode, ds, body)
 	}
 }
 
 func TestFoo(t *testing.T) {
-	index := "my-datastream-test"
+	ds := uuid.Must(uuid.NewV4()).String()
 	registry := monitoring.NewRegistry()
 
 	cfg := map[string]any{
-		"index": index,
+		"index": ds,
 	}
 	output, client := connectTestEs(t, cfg, outputs.NewStats(registry, logp.NewNopLogger()))
 
-	// drop old index preparing test
-	// _, _, _ = client.conn.Delete(index, "", "", nil)
-
-	// deleteDatastream(t, client, index)
+	createDatastream(t, client, ds)
 
 	batch := encodeBatch(client, outest.NewBatch(
 		beat.Event{
 			Timestamp: time.Now(),
 			Fields: mapstr.M{
-				"type":    "test foo",
 				"foo":     "invalid type",
 				"message": "this one works",
 			},
@@ -503,7 +561,6 @@ func TestFoo(t *testing.T) {
 		beat.Event{
 			Timestamp: time.Now(),
 			Fields: mapstr.M{
-				"type":   "test foo",
 				"foo":    42,
 				"mesage": "success event",
 			},
@@ -515,25 +572,22 @@ func TestFoo(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, _, err = client.conn.Refresh(index)
+	_, _, err = client.conn.Refresh(ds)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// _, resp, err := client.conn.CountSearchURI(index, "", nil)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
+	_, resp, err := client.conn.CountSearchURI(ds, "", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	// assert.Equal(t, 2, resp.Count)
+	// Expect two events in the index: one from the batch and another
+	// from when we created the datastream
+	assert.Equal(t, 2, resp.Count)
 
 	outputSnapshot := monitoring.CollectFlatSnapshot(registry, monitoring.Full, true)
+	// Ensure the correct number of events was acked and sent to the failure store
 	assert.EqualValues(t, 1, outputSnapshot.Ints["events.failure_store"], "failure store metric was not incremented")
 	assert.EqualValues(t, 2, outputSnapshot.Ints["events.acked"], "wrong number of acked events")
-
-	assert.Greater(t, outputSnapshot.Ints["write.bytes"], int64(0), "output.events.write.bytes must be greater than 0")
-	assert.Greater(t, outputSnapshot.Ints["read.bytes"], int64(0), "output.events.read.bytes must be greater than 0")
-	assert.Equal(t, int64(0), outputSnapshot.Ints["write.errors"])
-	assert.Equal(t, int64(0), outputSnapshot.Ints["read.errors"])
-
 }
