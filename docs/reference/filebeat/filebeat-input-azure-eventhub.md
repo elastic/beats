@@ -23,15 +23,11 @@ filebeat.inputs:
 - type: azure-eventhub
   eventhub: "insights-operational-logs"
   consumer_group: "$Default"
-  # Connection string authentication (default)
   connection_string: "Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=your-shared-access-key"
-  # Storage account configuration
   storage_account: "your-storage-account"
   storage_account_key: "your-storage-account-key"
-  storage_account_container: ""  # Optional: defaults to filebeat-<eventhub-name>
+  storage_account_container: "your-storage-container"
   processor_version: "v1"
-  # Optional: for non-public Azure clouds
-  # resource_manager_endpoint: "https://management.usgovcloudapi.net/"  # For Azure Government
 ```
 
 ### Connection string authentication (processor v2)
@@ -43,16 +39,11 @@ filebeat.inputs:
 - type: azure-eventhub
   eventhub: "insights-operational-logs"
   consumer_group: "$Default"
-  # Connection string authentication (default)
   auth_type: "connection_string"
   connection_string: "Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=your-shared-access-key"
-  # Storage account configuration
   storage_account: "your-storage-account"
   storage_account_connection_string: "DefaultEndpointsProtocol=https;AccountName=your-storage-account;AccountKey=your-storage-account-key;EndpointSuffix=core.windows.net"
-  storage_account_container: ""  # Optional: defaults to filebeat-<eventhub-name>
-  processor_version: "v2"
-  # Optional: for non-public Azure clouds
-  # resource_manager_endpoint: "https://management.usgovcloudapi.net/"  # For Azure Government
+  storage_account_container: "your-storage-container"
 ```
 
 {applies_to}`stack: ga 9.3.0` ### Client secret authentication (processor v2)
@@ -64,22 +55,13 @@ filebeat.inputs:
 - type: azure-eventhub
   eventhub: "insights-operational-logs"
   consumer_group: "$Default"
-  # Client secret authentication
   auth_type: "client_secret"
   eventhub_namespace: "your-namespace.servicebus.windows.net"
   tenant_id: "your-tenant-id"
   client_id: "your-client-id"
   client_secret: "your-client-secret"
-  # Optional: defaults to Azure Public Cloud
-  authority_host: "https://login.microsoftonline.com"
-  # For Azure Government, use: "https://login.microsoftonline.us"
-  # For Azure China, use: "https://login.chinacloudapi.cn"
-  # Storage account configuration
   storage_account: "your-storage-account"
-  storage_account_container: ""  # Optional: defaults to filebeat-<eventhub-name>
-  processor_version: "v2"
-  # Optional: for non-public Azure clouds
-  # resource_manager_endpoint: "https://management.usgovcloudapi.net/"  # For Azure Government
+  storage_account_container: "your-storage-container"
 ```
 
 **Note:** When using `client_secret` authentication, the service principal must have the appropriate Azure RBAC permissions. See [Required permissions](#_required_permissions) for details.
@@ -95,7 +77,7 @@ The following authentication types are supported:
 - **`connection_string`** (default if `auth_type` is not specified): Uses Azure Event Hubs and Storage Account connection strings.
 - {applies_to}`stack: ga 9.3.0` **`client_secret`**: Uses Azure Active Directory service principal with client secret credentials.
 
-### Required permissions
+### Required permissions [_required_permissions]
 
 When using `client_secret` authentication, the service principal needs the following Azure RBAC permissions:
 

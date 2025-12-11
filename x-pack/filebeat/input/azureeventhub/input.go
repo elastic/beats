@@ -85,11 +85,6 @@ func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
 
 	config.checkUnsupportedParams(m.log)
 
-	// Validate config
-	if err := config.Validate(); err != nil {
-		return nil, fmt.Errorf("config validation failed: %w", err)
-	}
-
 	switch config.ProcessorVersion {
 	case processorV1:
 		return newEventHubInputV1(config, m.log)
