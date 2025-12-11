@@ -66,10 +66,6 @@ func TestConsumeLogs(t *testing.T) {
 	}
 }
 
-func testLogger() *logp.Logger {
-	return logp.NewNopLogger()
-}
-
 func TestCreateProcessor(t *testing.T) {
 	t.Run("nil config returns nil processor", func(t *testing.T) {
 		processor, err := createProcessor(nil, testLogger())
@@ -100,6 +96,15 @@ func TestCreateProcessor(t *testing.T) {
 		assert.Contains(t, err.Error(), "invalid processor name 'unknown_processor'")
 	})
 
+	t.Run("valid add_cloud_metadata processor config returns processor", func(t *testing.T) {
+		processor, err := createProcessor(map[string]any{
+			"add_cloud_metadata": map[string]any{},
+		}, testLogger())
+		require.NoError(t, err)
+		require.NotNil(t, processor)
+		assert.Equal(t, "add_cloud_metadata", processor.String()[:len("add_cloud_metadata")])
+	})
+
 	t.Run("valid add_host_metadata processor config returns processor", func(t *testing.T) {
 		processor, err := createProcessor(map[string]any{
 			"add_host_metadata": map[string]any{},
@@ -117,6 +122,10 @@ func TestCreateProcessor(t *testing.T) {
 		require.NotNil(t, processor)
 		assert.Equal(t, "add_kubernetes_metadata", processor.String()[:len("add_kubernetes_metadata")])
 	})
+}
+
+func testLogger() *logp.Logger {
+	return logp.NewNopLogger()
 }
 
 type mockProcessor struct {
