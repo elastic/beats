@@ -1210,7 +1210,7 @@ func TestBulkRequestHasFilterPath(t *testing.T) {
 	event1 := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
 
 	const filterPathKey = "filter_path"
-	const filterPathValue = "errors,items.*.error,items.*.status"
+	const filterPathValue = "errors,items.*.error,items.*.status,items.*.failure_store"
 	t.Run("Single event with response filtering", func(t *testing.T) {
 		var reqParams url.Values
 		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -31,9 +31,10 @@ var (
 	errUnexpectedEmptyObject = errors.New("empty object")
 	errExpectedObjectEnd     = errors.New("expected end of object")
 
-	nameItems  = []byte("items")
-	nameStatus = []byte("status")
-	nameError  = []byte("error")
+	nameItems        = []byte("items")
+	nameStatus       = []byte("status")
+	nameError        = []byte("error")
+	nameFailureStore = []byte("failure_store")
 )
 
 // bulkReadToItems reads the bulk response up to (but not including) items
@@ -70,52 +71,53 @@ func bulkReadToItems(reader *jsonReader) error {
 }
 
 // bulkReadItemStatus reads the status and error fields from the bulk item
-func bulkReadItemStatus(logger *logp.Logger, reader *jsonReader) (int, []byte, error) {
+func bulkReadItemStatus(logger *logp.Logger, reader *jsonReader) (int, []byte, bool, error) {
 	// skip outer dictionary
 	if err := reader.ExpectDict(); err != nil {
-		return 0, nil, errExpectedItemObject
+		return 0, nil, false, errExpectedItemObject
 	}
 
 	// find first field in outer dictionary (e.g. 'create')
 	kind, _, err := reader.nextFieldName()
 	if err != nil {
 		logger.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
+		return 0, nil, false, err
 	}
 	if kind == dictEnd {
 		err = errUnexpectedEmptyObject
 		logger.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
+		return 0, nil, false, err
 	}
 
 	// parse actual item response code and error message
-	status, msg, err := itemStatusInner(reader, logger)
+	status, msg, failureStoreUsed, err := itemStatusInner(reader, logger)
 	if err != nil {
 		logger.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
+		return 0, nil, false, err
 	}
 
 	// close dictionary. Expect outer dictionary to have only one element
 	kind, _, err = reader.step()
 	if err != nil {
 		logger.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
+		return 0, nil, false, err
 	}
 	if kind != dictEnd {
 		err = errExpectedObjectEnd
 		logger.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
+		return 0, nil, false, err
 	}
 
-	return status, msg, nil
+	return status, msg, failureStoreUsed, nil
 }
 
-func itemStatusInner(reader *jsonReader, logger *logp.Logger) (int, []byte, error) {
+func itemStatusInner(reader *jsonReader, logger *logp.Logger) (int, []byte, bool, error) {
 	if err := reader.ExpectDict(); err != nil {
-		return 0, nil, errExpectedItemObject
+		return 0, nil, false, errExpectedItemObject
 	}
 
 	status := -1
+	failureStoreUsed := false
 	var msg []byte
 	for {
 		kind, name, err := reader.nextFieldName()
@@ -131,25 +133,36 @@ func itemStatusInner(reader *jsonReader, logger *logp.Logger) (int, []byte, erro
 			status, err = reader.nextInt()
 			if err != nil {
 				logger.Errorf("Failed to parse bulk response item: %s", err)
-				return 0, nil, err
+				return 0, nil, false, err
 			}
 
 		case bytes.Equal(name, nameError): // name == "error"
 			msg, err = reader.ignoreNext() // collect raw string for "error" field
 			if err != nil {
-				return 0, nil, err
+				return 0, nil, false, err
+			}
+
+		case bytes.Equal(name, nameFailureStore):
+			msg, err := reader.ignoreNext()
+			if err != nil {
+				return 0, nil, false, err
+			}
+
+			if bytes.Equal(msg, []byte(`"used"`)) { //missign quotes
+				failureStoreUsed = true
 			}
 
 		default: // ignore unknown fields
 			_, err = reader.ignoreNext()
 			if err != nil {
-				return 0, nil, err
+				return 0, nil, false, err
 			}
 		}
 	}
 
 	if status < 0 {
-		return 0, nil, errExpectedStatusCode
+		return 0, nil, false, errExpectedStatusCode
 	}
-	return status, msg, nil
+
+	return status, msg, failureStoreUsed, nil
 }

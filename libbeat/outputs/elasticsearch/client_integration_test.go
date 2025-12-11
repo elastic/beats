@@ -465,3 +465,75 @@ func randomClient(grp outputs.Group) outputs.NetworkClient {
 	client := grp.Clients[rand.IntN(L)]
 	return client.(outputs.NetworkClient) //nolint:errcheck //This is a test file, can ignore
 }
+
+func deleteDatastream(t *testing.T, client *Client, ds string) {
+	status, _, err := client.conn.Request("DELETE", fmt.Sprintf("/_data_stream/%s", ds), "", nil, nil)
+	if err != nil {
+		t.Fatalf("failed to delete datastream %s: %v", ds, err)
+	}
+
+	if status != 200 && status != 404 {
+		t.Fatalf("unexpected status code %d while deleting datastream %s", status, ds)
+	}
+}
+
+func TestFoo(t *testing.T) {
+	index := "my-datastream-test"
+	registry := monitoring.NewRegistry()
+
+	cfg := map[string]any{
+		"index": index,
+	}
+	output, client := connectTestEs(t, cfg, outputs.NewStats(registry, logp.NewNopLogger()))
+
+	// drop old index preparing test
+	// _, _, _ = client.conn.Delete(index, "", "", nil)
+
+	// deleteDatastream(t, client, index)
+
+	batch := encodeBatch(client, outest.NewBatch(
+		beat.Event{
+			Timestamp: time.Now(),
+			Fields: mapstr.M{
+				"type":    "test foo",
+				"foo":     "invalid type",
+				"message": "this one works",
+			},
+		},
+		beat.Event{
+			Timestamp: time.Now(),
+			Fields: mapstr.M{
+				"type":   "test foo",
+				"foo":    42,
+				"mesage": "success event",
+			},
+		},
+	))
+
+	err := output.Publish(context.Background(), batch)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, _, err = client.conn.Refresh(index)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// _, resp, err := client.conn.CountSearchURI(index, "", nil)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+
+	// assert.Equal(t, 2, resp.Count)
+
+	outputSnapshot := monitoring.CollectFlatSnapshot(registry, monitoring.Full, true)
+	assert.EqualValues(t, 1, outputSnapshot.Ints["events.failure_store"], "failure store metric was not incremented")
+	assert.EqualValues(t, 2, outputSnapshot.Ints["events.acked"], "wrong number of acked events")
+
+	assert.Greater(t, outputSnapshot.Ints["write.bytes"], int64(0), "output.events.write.bytes must be greater than 0")
+	assert.Greater(t, outputSnapshot.Ints["read.bytes"], int64(0), "output.events.read.bytes must be greater than 0")
+	assert.Equal(t, int64(0), outputSnapshot.Ints["write.errors"])
+	assert.Equal(t, int64(0), outputSnapshot.Ints["read.errors"])
+
+}
