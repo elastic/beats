@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -20,6 +21,8 @@ import (
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
@@ -288,34 +291,48 @@ func TestMultipleReceivers(t *testing.T) {
 	})
 }
 
-func TestReceiverDegraded(t *testing.T) {
+func TestReceiverStatus(t *testing.T) {
+	benchmarkInputId := "benchmark-id"
+	inputStatusAttributes := func(state string, msg string) pcommon.Map {
+		eventAttributes := pcommon.NewMap()
+		inputStatuses := eventAttributes.PutEmptyMap("inputs")
+		benchmarkStatus := inputStatuses.PutEmptyMap(benchmarkInputId)
+		benchmarkStatus.PutStr("status", state)
+		benchmarkStatus.PutStr("error", msg)
+		return eventAttributes
+	}
+	expectedDegradedErrorMessage := "benchmark input degraded"
+	expectedFailedErrorMessage := "benchmark input failed"
 	testCases := []struct {
 		name            string
-		status          oteltest.ExpectedStatus
+		status          *componentstatus.Event
 		benchmarkStatus string
 	}{
 		{
 			name: "failed input",
-			status: oteltest.ExpectedStatus{
-				Status: componentstatus.StatusPermanentError,
-				Error:  "benchmark input failed",
-			},
+			status: componentstatus.NewEvent(
+				componentstatus.StatusPermanentError,
+				componentstatus.WithError(errors.New(expectedFailedErrorMessage)),
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusPermanentError.String(), expectedFailedErrorMessage)),
+			),
 			benchmarkStatus: "failed",
 		},
 		{
 			name: "degraded input",
-			status: oteltest.ExpectedStatus{
-				Status: componentstatus.StatusRecoverableError,
-				Error:  "benchmark input degraded",
-			},
+			status: componentstatus.NewEvent(
+				componentstatus.StatusRecoverableError,
+				componentstatus.WithError(errors.New(expectedDegradedErrorMessage)),
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusRecoverableError.String(), expectedDegradedErrorMessage)),
+			),
 			benchmarkStatus: "degraded",
 		},
 		{
 			name: "running input",
-			status: oteltest.ExpectedStatus{
-				Status: componentstatus.StatusOK,
-				Error:  "",
-			},
+			status: componentstatus.NewEvent(componentstatus.StatusOK,
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusOK.String(), ""))),
 		},
 	}
 
@@ -326,6 +343,7 @@ func TestReceiverDegraded(t *testing.T) {
 					"filebeat": map[string]any{
 						"inputs": []map[string]any{
 							{
+								"id":      benchmarkInputId,
 								"type":    "benchmark",
 								"enabled": true,
 								"message": "test",
