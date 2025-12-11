@@ -44,15 +44,15 @@ const (
 
 	osqueryLensesDir = "lenses"
 
-	osqueryVersion = "5.18.1"
+	osqueryVersion = "5.19.0"
 	osqueryMSIExt  = ".msi"
 	osqueryPkgExt  = ".pkg"
 	osqueryZipExt  = ".zip"
 
-	osqueryDistroDarwinSHA256     = "fa0c035be9456ced1f8b7267f209ca1ea3cf217074fec295d1b11e551cba3195"
-	osqueryDistroLinuxSHA256      = "4617173d9df4459335fffcc9973496d55a410874b5509378add63afb9545bb00"
-	osqueryDistroLinuxARMSHA256   = "a056d66f9683f491e4829a23651a7001492bb636d9eecc4814dee3dca7e306c6"
-	osqueryDistroWindowsSHA256    = "ba4c5def84e35ef101fc4ec3f47dd2124c66d736f0f124acdb18c7b29df253fe"
+	osqueryDistroDarwinSHA256     = "f24b62075c22e3edcbb635bc0b118a221f69584b5d70c7caa78475bb4fd3ade4"
+	osqueryDistroLinuxSHA256      = "3b9583cc037a2c5a7405d567083398103256a42e0fcfd026a11cc7aef410c772"
+	osqueryDistroLinuxARMSHA256   = "fa649f57bfb1a6cb836a9af6e280b79382ff4a4e885c5998359c12e5caa051d3"
+	osqueryDistroWindowsSHA256    = "6fe06cab43a31c596e4001616eee66fb32556bf5c228c4a4ba6daf2897edc1a3"
 	osqueryDistroWindowsZipSHA256 = "0dba2c42679ba1eae71d666ce0014cf01d26c328723065ef6e84a9a5270e9743"
 )
 
