@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -112,7 +113,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		defer goroutinesChecker.WaitUntilOriginalCount()
 
 		wg.Add(1)
-		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+		hg.Start(input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}, source)
 
 		// wait until harvester.Run is done
 		wg.Wait()
@@ -164,10 +165,10 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		source2 := &testSource{name: "/path/to/test/2"}
 		wg.Add(2)
 		hg.Start(
-			input.Context{Logger: logp.L(), Cancelation: context.Background()},
+			input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}},
 			source1)
 		hg.Start(
-			input.Context{Logger: logp.L(), Cancelation: context.Background()},
+			input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}},
 			source2)
 
 		assert.Eventually(t,
@@ -218,7 +219,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 
-		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+		hg.Start(input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}, source)
 
 		goroutinesChecker.WaitUntilIncreased(1)
 		// wait until harvester is started
@@ -238,7 +239,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	t.Run("assert a harvester for same source cannot be started", func(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
@@ -271,7 +272,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 
-		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+		hg.Start(input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}, source)
 
 		// wait until harvester is stopped
 		goroutinesChecker.WaitUntilOriginalCount()
@@ -292,7 +293,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
 
-		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+		hg.Start(input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}, source)
 
 		goroutinesChecker.WaitUntilOriginalCount()
 
@@ -308,7 +309,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		var wg sync.WaitGroup
 		mockHarvester := &mockHarvester{onRun: correctOnRun, wg: &wg}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}
 
 		r, err := lock(inputCtx, hg.store, hg.identifier.ID(source))
 		if err != nil {
@@ -343,7 +344,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: correctOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 		hg.tg = task.NewGroup(0, 50*time.Millisecond, testLog, "")
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
@@ -366,7 +367,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		var wg sync.WaitGroup
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun, wg: &wg}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
@@ -456,10 +457,10 @@ func panicOnRun(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
 
 type testLogger strings.Builder
 
-func (tl *testLogger) Errorf(format string, args ...interface{}) {
+func (tl *testLogger) Errorf(format string, args ...any) {
 	sb := (*strings.Builder)(tl)
-	sb.WriteString(fmt.Sprintf(format, args...))
-	sb.WriteString("\n")
+	fmt.Fprintf(sb, format, args...)
+	fmt.Fprint(sb, "\n")
 }
 
 func (tl *testLogger) String() string {
@@ -532,4 +533,10 @@ func (mp *MockPipeline) ConnectWith(config beat.ClientConfig) (beat.Client, erro
 // Connect connects the mock pipeline with a client using the default configuration.
 func (mp *MockPipeline) Connect() (beat.Client, error) {
 	return mp.ConnectWith(beat.ClientConfig{})
+}
+
+type mockStatusReporter struct{}
+
+// UpdateStatus is a no-op
+func (m mockStatusReporter) UpdateStatus(status status.Status, msg string) {
 }
