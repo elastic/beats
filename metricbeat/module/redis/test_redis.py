@@ -11,7 +11,7 @@ REDIS_FIELDS = metricbeat.COMMON_FIELDS + ["redis"]
 REDIS_INFO_FIELDS = ["clients", "cluster", "commandstats", "cpu", "memory",
                      "persistence", "replication", "server", "stats", "slowlog"]
 
-REDIS_KEYSPACE_FIELDS = ["keys", "expires", "id", "avg_ttl"]
+REDIS_KEYSPACE_FIELDS = ["keys", "expires", "id", "avg_ttl", "subexpiry"]
 
 CPU_FIELDS = ["used.sys", "used.sys_children", "used.user",
               "used.user_children"]
