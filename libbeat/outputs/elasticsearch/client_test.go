@@ -747,7 +747,8 @@ func TestCollectPublishFailWithFailureStore(t *testing.T) {
 	assert.NoError(t, err)
 
 	response := []byte(`{
-      "took": 0, "errors": false,
+      "took": 42,
+      "errors": false,
       "items": [
         {
           "create": {
