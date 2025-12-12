@@ -40,11 +40,15 @@ func ParseCustomJumplistFile(filePath string, userProfile *UserProfile, log *log
 		JumplistType:  JumplistTypeCustom,
 		Path:          filePath,
 	}
+	entries := make([]*JumplistEntry, 0, len(lnks))
+	for _, lnk := range lnks {
+		entries = append(entries, &JumplistEntry{Lnk: lnk})
+	}
 
 	// Combine the metadata and the entries into a Jumplist object
 	customJumplist := &Jumplist{
 		JumplistMeta: jumpListMeta,
-		entries:      lnks,
+		entries:      entries,
 	}
 	return customJumplist, nil
 }

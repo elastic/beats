@@ -37,13 +37,19 @@ type JumplistMeta struct {
 	Path         string       `osquery:"source_file_path"`
 }
 
+// JumplistEntry is a single entry in a jump list.
+// TODO: Automatic jumplists will add additional fields to the JumplistEntry object.
+type JumplistEntry struct {
+	*Lnk
+}
+
 // Jumplist is a collection of Lnk objects that represent a single jump list.
-// It contains the metadata for the jump list and the Entries (Lnk objects).
+// It contains the metadata for the jump list and the entries (Lnk objects).
 // This is a generic object that can represent either a custom jumplist
 // or an automatic jumplist. It is comprised of a JumplistMeta object and a slice of Lnk objects.
 type Jumplist struct {
 	*JumplistMeta
-	entries []*Lnk
+	entries []*JumplistEntry
 }
 
 // JumplistRow is a single row in a jump list.
@@ -62,7 +68,7 @@ func (j *Jumplist) ToRows() []JumplistRow {
 	for _, entry := range j.entries {
 		rows = append(rows, JumplistRow{
 			JumplistMeta: j.JumplistMeta,
-			Lnk:          entry,
+			Lnk:          entry.Lnk,
 		})
 	}
 	return rows
