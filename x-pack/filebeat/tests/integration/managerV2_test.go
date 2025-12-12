@@ -16,6 +16,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"path/filepath"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -935,8 +936,6 @@ func outputUnitES(t *testing.T, id int) *proto.UnitExpected {
 		},
 	}
 }
-<<<<<<< HEAD
-=======
 
 func TestReloadErrorHandling(t *testing.T) {
 	filebeat := NewFilebeat(t)
@@ -1429,4 +1428,3 @@ func TestPipelineConnectionErrorFailsInput(t *testing.T) {
 		})
 	}
 }
->>>>>>> 462751c83 ([Filebeat] Correctly report V2 inputs as failed to the Manager (#47905))

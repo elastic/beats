@@ -202,7 +202,7 @@ func startHarvester(
 ) func(context.Context) error {
 	srcID := hg.identifier.ID(src)
 
-	return func(canceler context.Context) error {
+	return func(canceler context.Context) (err error) {
 		defer func() {
 			if v := recover(); v != nil {
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
