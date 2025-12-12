@@ -148,7 +148,7 @@ func itemStatusInner(reader *jsonReader, logger *logp.Logger) (int, []byte, bool
 				return 0, nil, false, err
 			}
 
-			if bytes.Equal(msg, []byte(`"used"`)) { //missign quotes
+			if bytes.Equal(msg, []byte(`"used"`)) {
 				failureStoreUsed = true
 			}
 

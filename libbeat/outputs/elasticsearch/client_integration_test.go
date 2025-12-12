@@ -469,7 +469,10 @@ func randomClient(grp outputs.Group) outputs.NetworkClient {
 	return client.(outputs.NetworkClient) //nolint:errcheck //This is a test file, can ignore
 }
 
-func configureDatastream(t *testing.T, client *Client, ds string) {
+// configureDatastreamFailureStore creates an index template with the failure
+// store enabled and two mapped fields. The index template will match the passed
+// data stream (ds).
+func configureDatastreamFailureStore(t *testing.T, client *Client, ds string) {
 	templateBody := map[string]any{
 		"index_patterns": []string{ds + "*"},
 		"data_stream":    map[string]any{},
@@ -501,11 +504,10 @@ func configureDatastream(t *testing.T, client *Client, ds string) {
 	}
 }
 
-// createDatastream creates an index template with the failure store enabled,
-// and mappings for two fields that will be used to test the failure store
-// metrics.
-func createDatastream(t *testing.T, client *Client, ds string) {
-	configureDatastream(t, client, ds)
+// createDatastreamFailureStore creates and initialises a data stream with the
+// failure store enabled used to test the output failure store metrics.
+func createDatastreamFailureStore(t *testing.T, client *Client, ds string) {
+	configureDatastreamFailureStore(t, client, ds)
 	timestamp := time.Now().Format(time.RFC3339)
 	body := []any{
 		map[string]any{
@@ -518,6 +520,9 @@ func createDatastream(t *testing.T, client *Client, ds string) {
 		},
 	}
 
+	// We need to manually send a bulk request because Publish sets the index
+	// in the body, which causes ES to create an index instead of a data stream.
+	// An index does not use the failure store.
 	status, _, err := client.conn.Bulk(t.Context(), ds, "", nil, nil, body)
 	if err != nil {
 		t.Fatalf("failed to create datastream %s: %v", ds, err)
@@ -527,7 +532,7 @@ func createDatastream(t *testing.T, client *Client, ds string) {
 	}
 }
 
-func TestFailureStore(t *testing.T) {
+func TestFailureStoreOutputMetrics(t *testing.T) {
 	ds := "test-failure-store-" + uuid.Must(uuid.NewV4()).String()
 	registry := monitoring.NewRegistry()
 
@@ -536,7 +541,7 @@ func TestFailureStore(t *testing.T) {
 	}
 	output, client := connectTestEs(t, cfg, outputs.NewStats(registry, logp.NewNopLogger()))
 
-	createDatastream(t, client, ds)
+	createDatastreamFailureStore(t, client, ds)
 
 	batch := encodeBatch(client, outest.NewBatch(
 		beat.Event{
