@@ -161,7 +161,9 @@ func (r *runner) Start() {
 
 		err := r.input.Run(ctx, pc)
 		if err != nil && !errors.Is(err, context.Canceled) {
-			log.Errorf("Input '%s' failed with: %+v", name, err)
+			errMsg := fmt.Sprintf("Input '%s' failed with: %+v", name, err)
+			log.Error(errMsg)
+			ctx.StatusReporter.UpdateStatus(status.Failed, errMsg)
 		} else {
 			log.Infof("Input '%s' stopped (goroutine)", name)
 		}
