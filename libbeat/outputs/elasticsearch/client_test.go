@@ -734,6 +734,53 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 	assert.Equal(t, events, res)
 }
 
+func TestCollectPublishFailWithFailureStore(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	reg := monitoring.NewRegistry()
+	client, err := NewClient(
+		clientSettings{
+			observer: outputs.NewStats(reg, logp.NewNopLogger()),
+		},
+		nil,
+		logger,
+	)
+	assert.NoError(t, err)
+
+	response := []byte(`{
+      "took": 0, "errors": false,
+      "items": [
+        {
+          "create": {
+            "status": 201,
+            "failure_store": "used"
+          }
+        },
+        {
+          "create": {
+            "status": 201
+          }
+        }
+      ]
+    }`)
+
+	event1 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}})
+	event2 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}})
+	events := []publisher.Event{event1, event2}
+
+	res, stats := client.bulkCollectPublishFails(bulkResult{
+		events:   events,
+		status:   200,
+		response: response,
+	})
+	assert.Equal(t, 0, len(res))
+	assert.Equal(t, bulkResultStats{acked: 2, failureStoreUsed: 1}, stats)
+
+	stats.reportToObserver(client.observer)
+	snapshot := monitoring.CollectFlatSnapshot(reg, monitoring.Full, true)
+	assert.EqualValues(t, 1, snapshot.Ints["events.failure_store"])
+	assert.EqualValues(t, 2, snapshot.Ints["events.acked"])
+}
+
 func TestPublishResultForStats(t *testing.T) {
 	// publishResultForStats should return errTooMany if it is given
 	// stats with tooMany > 0, and nil otherwise (all other errors are
