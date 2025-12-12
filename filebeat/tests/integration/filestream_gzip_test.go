@@ -149,7 +149,7 @@ filebeat.inputs:
     paths:
       - %s
     prospector.scanner.check_interval: 1s
-    gzip_experimental: true
+    compression: auto
 output.file:
   enabled: true
   path: %s
@@ -208,6 +208,142 @@ logging.level: debug
 	}
 }
 
+// TestFilestreamGZIPCompressionNotSetWithGZIPFile ensures filestream reads a
+// gzip file as plain text (raw bytes) when compression is not set or empty.
+func TestFilestreamGZIPCompressionNotSetWithGZIPFile(t *testing.T) {
+	var plainContent []byte
+	for i := range 500 {
+		plainContent = append(plainContent, []byte(fmt.Sprintf("%d: a log line\n", i))...)
+	}
+	gzContent := gziptest.Compress(t, plainContent, gziptest.CorruptNone)
+
+	tcs := []struct {
+		name        string
+		compression string
+	}{
+		{
+			name:        "compression not set",
+			compression: "",
+		},
+		{
+			name:        "compression empty string",
+			compression: "compression: \"\"",
+		},
+		{
+			name:        "compression empty string with gzip_experimental set",
+			compression: "compression: \"\"\n    gzip_experimental: true",
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			filebeat := integration.NewBeat(
+				t,
+				"filebeat",
+				"../../filebeat.test",
+			)
+			workDir := filebeat.TempDir()
+
+			logFilepath := filepath.Join(workDir, "log.gz")
+			cfg := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: "test-no-compression-gzip-file"
+    paths:
+      - %s
+    %s
+path.home: %s
+output.file:
+  enabled: true
+  path: %s
+  filename: "output"
+logging.level: debug
+`, logFilepath, tc.compression, workDir, workDir)
+			require.NoError(t, os.WriteFile(logFilepath, gzContent, 0644))
+
+			filebeat.WriteConfigFile(cfg)
+			filebeat.Start()
+
+			eofLog := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
+			filebeat.WaitLogsContains(
+				eofLog,
+				30*time.Second,
+				"Filebeat did not reach EOF for '%s'",
+				logFilepath,
+			)
+
+			filebeat.Stop()
+
+			type event struct {
+				Message string `json:"message"`
+			}
+			events := integration.GetEventsFromFileOutput[event](filebeat, 0, true)
+			require.Equal(t, len(events), 1, "expected one event")
+
+			// assert the message is not the decompressed content
+			assert.NotEqual(t, "0: a log line", events[0].Message,
+				"message should be raw gzip bytes, not decompressed content")
+		})
+	}
+}
+
+// TestFilestreamGZIPCompressionOnPlainFile ensures filestream correctly handles
+// the case when compression: gzip is explicitly set but the file is a plain
+// text file (not gzip compressed). It should fail to read the file and log an
+// appropriate error.
+func TestFilestreamGZIPCompressionGZIPWithPlainFile(t *testing.T) {
+	var content []byte
+	for i := range 100 {
+		content = append(content, []byte(fmt.Sprintf("%d: a log line\n", i))...)
+	}
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+
+	// Write a plain text file (not gzip compressed)
+	logFilepath := filepath.Join(workDir, "log.log")
+	cfg := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: "test-gzip-on-plain-file"
+    paths:
+      - %s
+    compression: gzip
+path.home: %s
+output.file:
+  enabled: true
+  path: %s
+  filename: "output"
+logging.level: debug
+`, logFilepath, workDir, workDir)
+
+	// Write plain text content (not compressed)
+	require.NoError(t, os.WriteFile(logFilepath, content, 0644))
+
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("cannot create a file descriptor for an ingest target \\\"%s\\\": failed to create gzip seeker: could not create gzip reader: gzip: invalid header", logFilepath),
+		30*time.Second,
+		"Filebeat did not log expected gzip error for plain file '%s'",
+		logFilepath,
+	)
+
+	filebeat.Stop()
+
+	// output file isn't created because no event has been published. Thus,
+	// check it manually.
+	path := filepath.Join(filebeat.TempDir(), "output-*.ndjson")
+	files, err := filepath.Glob(path)
+	require.NoError(t, err, "failed to glob output files")
+	require.Len(t, files, 0, "expected no output file to be created as no event should have been published")
+}
+
 // TestFilestreamGZIPEOF ensures, for GZIP files, filestream:
 //   - sets EOF on the registry when it reached the end of the file
 //   - if EOF is set, it does not read the file again.
@@ -231,7 +367,7 @@ filebeat.inputs:
     id: "test-gzip-eof"
     paths:
       - %s
-    gzip_experimental: true
+    compression: auto
 path.home: %s
 filebeat.registry.flush: 1s
 output.discard:
@@ -333,7 +469,7 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
+    compression: auto
 output.file:
   enabled: true
   path: %s
@@ -405,7 +541,7 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
+    compression: auto
 output.file:
   enabled: true
   path: %s
@@ -587,7 +723,7 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
+    compression: auto
 output.file:
   enabled: true
   path: %s
@@ -672,7 +808,7 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
+    compression: auto
 output.file:
   enabled: true
   path: %s
@@ -812,7 +948,7 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
+    compression: auto
     #rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
 output.file:
   enabled: true
@@ -984,7 +1120,7 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
+    compression: auto
 output.file:
   enabled: true
   path: %s
@@ -1108,7 +1244,7 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
+    compression: auto
 output.file:
   enabled: true
   path: %s
