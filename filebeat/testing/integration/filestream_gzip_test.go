@@ -90,7 +90,7 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
+    compression: auto
 output.file:
   enabled: true
   path: %s
@@ -126,8 +126,7 @@ output.file:
 			})
 		}
 	})
-
-	t.Run("BetaWarning", func(t *testing.T) {
+	t.Run("GzipExperimentalDeprecationWarning", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
@@ -162,7 +161,7 @@ output.console:
 			WithReportOptions(reportOptions).
 			ExpectStart().
 			ExpectOutput(
-				"BETA: filestream: beta gzip support enabled").
+				"'gzip_experimental' is deprecated and ignored, set 'compression' instead").
 			Start(ctx).
 			Wait()
 	})

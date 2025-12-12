@@ -68,35 +68,32 @@ func TestConfigValidate(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("gzip_experimental works with file_identity.fingerprint", func(t *testing.T) {
-		c, err := conf.NewConfigFrom(`
-id: 'some id'
-paths: [/foo/bar*]
-gzip_experimental: true
-file_identity.fingerprint: ~
-`)
-		require.NoError(t, err, "could not create config from string")
-		got := defaultConfig()
-		err = c.Unpack(&got)
-		require.NoError(t, err, "could not unpack config")
+	t.Run("compression validation", func(t *testing.T) {
+		tcs := []struct {
+			name        string
+			compression string
+			wantErr     string
+		}{
+			{name: "none is valid", compression: CompressionNone},
+			{name: "gzip is valid", compression: CompressionGZIP},
+			{name: "auto is valid", compression: CompressionAuto},
+			{name: "invalid value returns error", compression: "invalid", wantErr: `invalid compression value "invalid"`},
+		}
 
-		err = got.Validate()
-		assert.NoError(t, err)
-	})
-
-	t.Run("gzip_experimental requires file_identity.fingerprint", func(t *testing.T) {
-		c, err := conf.NewConfigFrom(`
-id: 'some id'
-paths: [/foo/bar*]
-gzip_experimental: true
-file_identity.path: ~
-`)
-		require.NoError(t, err, "could not create config from string")
-		got := defaultConfig()
-		err = c.Unpack(&got)
-		assert.ErrorContains(t,
-			err,
-			"gzip_experimental=true requires file_identity to be 'fingerprint")
+		for _, tc := range tcs {
+			t.Run(tc.name, func(t *testing.T) {
+				c := config{
+					Paths:       []string{"/foo/bar"},
+					Compression: tc.compression,
+				}
+				err := c.Validate()
+				if tc.wantErr == "" {
+					assert.NoError(t, err)
+				} else {
+					assert.ErrorContains(t, err, tc.wantErr)
+				}
+			})
+		}
 	})
 }
 

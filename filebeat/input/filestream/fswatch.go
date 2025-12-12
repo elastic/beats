@@ -89,14 +89,14 @@ func newFileWatcher(
 	logger *logp.Logger,
 	paths []string,
 	config fileWatcherConfig,
-	gzipAllowed bool,
+	compression string,
 	sendNotChanged bool,
 	fi fileIdentifier,
 	srci *loginp.SourceIdentifier,
 ) (*fileWatcher, error) {
 
 	config.SendNotChanged = sendNotChanged
-	scanner, err := newFileScanner(logger, paths, config.Scanner, gzipAllowed)
+	scanner, err := newFileScanner(logger, paths, config.Scanner, compression)
 	if err != nil {
 		return nil, err
 	}
@@ -401,16 +401,16 @@ type fileScanner struct {
 	log         *logp.Logger
 	hasher      hash.Hash
 	readBuffer  []byte
-	gzipAllowed bool
+	compression string
 }
 
-func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, gzipAllowed bool) (*fileScanner, error) {
+func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
 	s := fileScanner{
 		paths:       paths,
 		cfg:         config,
 		log:         logger.Named(scannerDebugKey),
 		hasher:      sha256.New(),
-		gzipAllowed: gzipAllowed,
+		compression: compression,
 	}
 
 	if s.cfg.Fingerprint.Enabled {
@@ -620,7 +620,12 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	}
 	defer osFile.Close()
 
-	if s.gzipAllowed {
+	switch s.compression {
+	case CompressionNone:
+		// fd.GZIP stays false
+	case CompressionGZIP:
+		fd.GZIP = true
+	case CompressionAuto:
 		fd.GZIP, err = IsGZIP(osFile)
 		if err != nil {
 			return fd, fmt.Errorf("failed to check if %q is gzip: %w",

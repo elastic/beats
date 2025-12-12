@@ -187,7 +187,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 				logptest.NewFileLogger(t, filepath.Join(dir, "logger")).Logger,
 				[]string{filepath.Join(dir, "*.log")},
 				cfg,
-				false,
+				CompressionNone,
 				false,
 				mustFingerprintIdentifier(),
 				mustSourceIdentifier("foo-id"),
