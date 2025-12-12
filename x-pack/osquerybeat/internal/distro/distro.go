@@ -22,7 +22,7 @@ var (
 	DataCacheDir   = filepath.Join(DataDir, "cache")
 )
 
-// Windows ARM URL: https://github.com/osquery/osquery/releases/download/5.15.0/osquery-5.15.0.windows_arm64.zip
+// Windows ARM URL: https://github.com/osquery/osquery/releases/download/5.19.0/osquery-5.19.0.windows_arm64.zip
 const (
 	osqueryDownloadBaseURL       = "https://pkg.osquery.io"
 	osqueryDownloadGithubBaseURL = "https://github.com/osquery/osquery/releases/download"
@@ -53,7 +53,7 @@ const (
 	osqueryDistroLinuxSHA256      = "3b9583cc037a2c5a7405d567083398103256a42e0fcfd026a11cc7aef410c772"
 	osqueryDistroLinuxARMSHA256   = "fa649f57bfb1a6cb836a9af6e280b79382ff4a4e885c5998359c12e5caa051d3"
 	osqueryDistroWindowsSHA256    = "6fe06cab43a31c596e4001616eee66fb32556bf5c228c4a4ba6daf2897edc1a3"
-	osqueryDistroWindowsZipSHA256 = "0dba2c42679ba1eae71d666ce0014cf01d26c328723065ef6e84a9a5270e9743"
+	osqueryDistroWindowsZipSHA256 = "298f4dfb2dad2bdf666b337d9d258c4bcc5254ad546c4710b24fcc864096c587"
 )
 
 type OSArch struct {
