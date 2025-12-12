@@ -33,7 +33,7 @@ type JWTBearerFlow struct {
 	Enabled *bool `config:"enabled"`
 
 	URL            string `config:"url"`
-	TokenURL       string `config:"token_url"` // If not provided, the URL will be used by go-sfdc package.
+	TokenURL       string `config:"token_url"` // If not provided, the URL field will be used as the audience URL by the go-sfdc package.
 	ClientID       string `config:"client.id"`
 	ClientUsername string `config:"client.username"`
 	ClientKeyPath  string `config:"client.key_path"`
