@@ -80,7 +80,7 @@ func (p Process) toMapStr() mapstr.M {
 
 // NewFromSysInfo constructs a new MetricSet backed by go-sysinfo.
 func NewFromSysInfo(ms MetricSet) (mb.MetricSet, error) {
-	bucket, err := datastore.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, ms.paths)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}
