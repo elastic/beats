@@ -27,6 +27,7 @@ const (
 )
 
 // JumplistMeta is the metadata for a jump list.
+// JumplistMeta is the metadata for a jump list.
 // It contains the application ID, jump list type, path to the jump list file,
 // and any jumplist type specific metadata.  The embedded fields
 // have osquery tags defined in their object definitions, and our encoding package
@@ -85,6 +86,8 @@ func GetColumns() []table.ColumnDefinition {
 	return columns
 }
 
+// GetGenerateFunc returns a function that can be used to generate a table of JumplistRow objects.
+// It returns a function that can be used to generate a table of JumplistRow objects.
 // matchesFilters is a helper function that checks if a row matches the given filters.
 func matchesFilters(row JumplistRow, filters []filters.Filter) bool {
 	for _, filter := range filters {

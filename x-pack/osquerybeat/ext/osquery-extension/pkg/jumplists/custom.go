@@ -27,10 +27,6 @@ func ParseCustomJumplistFile(filePath string, userProfile *UserProfile, log *log
 
 	// Carve out the Lnk objects from the file
 	lnks := carveLnkFiles(fileBytes, log)
-	entries := make([]*JumplistEntry, 0, len(lnks))
-	for _, lnk := range lnks {
-		entries = append(entries, &JumplistEntry{Lnk: lnk})
-	}
 
 	// If the jumplist file is empty, return an error jlecmd does this as well
 	if len(lnks) == 0 {
@@ -38,16 +34,21 @@ func ParseCustomJumplistFile(filePath string, userProfile *UserProfile, log *log
 	}
 
 	// Look up the application id and create the metadata
-	jumpListMeta := &JumplistMeta{
+	jumplistMeta := &JumplistMeta{
 		UserProfile:   userProfile,
 		ApplicationId: GetAppIdFromFileName(filePath, log),
 		JumplistType:  JumplistTypeCustom,
 		Path:          filePath,
 	}
 
+	entries := make([]*JumplistEntry, 0, len(lnks))
+	for _, lnk := range lnks {
+		entries = append(entries, &JumplistEntry{Lnk: lnk})
+	}
+
 	// Combine the metadata and the entries into a Jumplist object
 	customJumplist := &Jumplist{
-		JumplistMeta: jumpListMeta,
+		JumplistMeta: jumplistMeta,
 		entries:      entries,
 	}
 	return customJumplist, nil
