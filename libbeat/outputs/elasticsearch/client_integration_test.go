@@ -471,38 +471,24 @@ func randomClient(grp outputs.Group) outputs.NetworkClient {
 }
 
 func configureDatastream(t *testing.T, client *Client, ds string) {
-	// Define the request body
-	requestBody := `{
-  "index_patterns": ["` + ds + `*"],
-  "data_stream": { },
-  "template": {
-    "data_stream_options": {
-      "failure_store": {
-        "enabled": true
-      }
-    }
-  }
-}`
-
-	// Create the HTTP request
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/_index_template/idx-tmpl-"+ds, client.conn.URL), strings.NewReader(requestBody))
-	if err != nil {
-		t.Fatalf("failed to create HTTP request: %v", err)
+	templateBody := map[string]any{
+		"index_patterns": []string{ds + "*"},
+		"data_stream":    map[string]any{},
+		"template": map[string]any{
+			"data_stream_options": map[string]any{
+				"failure_store": map[string]any{
+					"enabled": true,
+				},
+			},
+		},
 	}
-	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(client.conn.Username, client.conn.Password)
 
-	// Send the HTTP request
-	resp, err := client.conn.HTTP.Do(req)
+	status, resp, err := client.conn.Request("PUT", "/_index_template/idx-tmpl-"+ds, "", nil, templateBody)
 	if err != nil {
-		t.Fatalf("failed to send HTTP request: %v", err)
+		t.Fatalf("failed to configure datastream %s: %v", ds, err)
 	}
-	defer resp.Body.Close()
-
-	// Check for non-2xx status codes
-	if resp.StatusCode >= 300 {
-		body, _ := io.ReadAll(resp.Body)
-		t.Fatalf("unexpected status code %d while configuring datastream %s: %s", resp.StatusCode, ds, body)
+	if status >= 300 {
+		t.Fatalf("unexpected status code %d while configuring datastream %s: %s", status, ds, resp)
 	}
 }
 
@@ -539,8 +525,8 @@ func createDatastream(t *testing.T, client *Client, ds string) {
 	}
 }
 
-func TestFoo(t *testing.T) {
-	ds := uuid.Must(uuid.NewV4()).String()
+func TestFailureStore(t *testing.T) {
+	ds := "test-failure-store-" + uuid.Must(uuid.NewV4()).String()
 	registry := monitoring.NewRegistry()
 
 	cfg := map[string]any{
