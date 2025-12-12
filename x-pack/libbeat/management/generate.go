@@ -16,7 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 )
 
-var celInputPrefix = "cel-"
+const celInputPrefix = "cel-"
 
 // DefaultNamespaceName is the fallback default namespace for data stream info
 var DefaultNamespaceName = "default"

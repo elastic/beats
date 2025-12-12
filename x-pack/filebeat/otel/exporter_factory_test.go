@@ -8,69 +8,119 @@ import (
 	"context"
 	"os"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestGetGlobalExporterFactory(t *testing.T) {
 	// set global to false
 	factory1 := GetGlobalMetricsExporterFactory()
-	assert.NotNil(t, factory1, "Expected non-nil factory, got nil")
+	if factory1 == nil {
+		t.Errorf("Expected non-nil factory, got nil")
+	}
 
 	factory2 := GetGlobalMetricsExporterFactory()
-	assert.Equal(t, factory1, factory2, "Expected same factory instance, got different instances")
+	if factory1 != factory2 {
+		t.Errorf("Expected same factory instance, got different instances")
+	}
 }
 
 func TestExporterFactory(t *testing.T) {
 	os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
 	options := GetDefaultMetricExporterOptions()
 	factory := NewMetricsExporterFactory(options)
-	assert.NotNil(t, factory, "Expected non-nil factory")
+	if factory == nil {
+		t.Errorf("Expected non-nil factory")
+	}
 	exporter1, etype1, err := factory.GetExporter(context.Background(), false)
-	assert.Nil(t, err)
-	assert.NotNil(t, exporter1)
-	assert.NotNil(t, etype1)
+	if err != nil {
+		t.Errorf("GetExporter returned error: %v", err)
+	}
+	if exporter1 == nil {
+		t.Errorf("exporter1 is nil")
+	}
+	if etype1 == "" {
+		t.Errorf("etype1 is empty")
+	}
 	exporter2, etype2, err := factory.GetExporter(context.Background(), true)
-	assert.Nil(t, err)
-	assert.NotNil(t, exporter2)
-	assert.NotNil(t, etype2)
+	if err != nil {
+		t.Errorf("GetExporter returned error: %v", err)
+	}
+	if exporter2 == nil {
+		t.Errorf("exporter2 is nil")
+	}
+	if etype2 == "" {
+		t.Errorf("etype2 is empty")
+	}
 	exporter3, etype3, err := factory.GetExporter(context.Background(), true)
-	assert.Nil(t, err)
-	assert.NotNil(t, exporter3)
-	assert.NotNil(t, etype3)
-	assert.Equal(t, etype1, etype2)
-	assert.NotEqual(t, exporter1, exporter2)
-	assert.Equal(t, exporter2, exporter3)
+	if err != nil {
+		t.Errorf("GetExporter returned error: %v", err)
+	}
+	if exporter3 == nil {
+		t.Errorf("exporter3 is nil")
+	}
+	if etype3 == "" {
+		t.Errorf("etype3 is empty")
+	}
+	if etype1 != etype2 {
+		t.Errorf("etype1 = %v, want %v", etype1, etype2)
+	}
+	if exporter1 == exporter2 {
+		t.Errorf("exporter1 and exporter2 should be different")
+	}
+	if exporter2 != exporter3 {
+		t.Errorf("exporter2 = %v, want %v", exporter2, exporter3)
+	}
 }
 
 func TestExporterFactoryNoMetricsEnvironment(t *testing.T) {
 	os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
 	options := GetDefaultMetricExporterOptions()
 	factory := NewMetricsExporterFactory(options)
-	assert.NotNil(t, factory, "Expected non-nil factory")
+	if factory == nil {
+		t.Errorf("Expected non-nil factory")
+	}
 	exporter, etype, err := factory.GetExporter(context.Background(), false)
-	assert.Nil(t, err)
-	assert.NotNil(t, exporter)
-	assert.NotNil(t, etype)
-	assert.Equal(t, ExporterType("grpc"), etype)
+	if err != nil {
+		t.Errorf("GetExporter returned error: %v", err)
+	}
+	if exporter == nil {
+		t.Errorf("exporter is nil")
+	}
+	if etype == "" {
+		t.Errorf("etype is empty")
+	}
+	if etype != ExporterType("grpc") {
+		t.Errorf("etype = %v, want %v", etype, ExporterType("grpc"))
+	}
 }
 
 func TestGetGlobalExporterNoneType(t *testing.T) {
 	os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
 	factory := GetGlobalMetricsExporterFactory()
 	exporter, _, err := factory.GetExporter(context.Background(), true)
-	assert.Nil(t, err, "GetExporter returned an error ")
-	assert.NotNil(t, exporter, "Exporter should be nil")
-	assert.Equal(t, exporter, factory.globalMetricsExporter)
+	if err != nil {
+		t.Errorf("GetExporter returned an error: %v", err)
+	}
+	if exporter == nil {
+		t.Errorf("Exporter should not be nil")
+	}
+	if exporter != factory.globalMetricsExporter {
+		t.Errorf("exporter = %v, want %v", exporter, factory.globalMetricsExporter)
+	}
 }
 
 func TestGetGlobalExporterGRPCType(t *testing.T) {
 	os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
 	factory := GetGlobalMetricsExporterFactory()
 	exporter, _, err := factory.GetExporter(context.Background(), true)
-	assert.Nil(t, err, "GetExporter returned an error ")
-	assert.NotNil(t, exporter, "Exporter should not be nil")
-	assert.Equal(t, exporter, factory.globalMetricsExporter)
+	if err != nil {
+		t.Errorf("GetExporter returned an error: %v", err)
+	}
+	if exporter == nil {
+		t.Errorf("Exporter should not be nil")
+	}
+	if exporter != factory.globalMetricsExporter {
+		t.Errorf("exporter = %v, want %v", exporter, factory.globalMetricsExporter)
+	}
 }
 
 func TestGetExporterFromEnvironment(t *testing.T) {
@@ -121,9 +171,15 @@ func TestGetExporterFromEnvironment(t *testing.T) {
 			os.Setenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL", tc.protocol)
 		}
 		exporter, etype, err := factory.GetExporter(context.Background(), false)
-		assert.Nil(t, err)
-		assert.Equal(t, tc.isNil, exporter == nil, tc.name+", exporter unexpected")
-		assert.Equal(t, ExporterType(tc.eType), etype, tc.name+", exporter type unexpected")
+		if err != nil {
+			t.Errorf("%s: GetExporter returned error: %v", tc.name, err)
+		}
+		if (exporter == nil) != tc.isNil {
+			t.Errorf("%s, exporter unexpected: got nil=%v, want nil=%v", tc.name, exporter == nil, tc.isNil)
+		}
+		if etype != ExporterType(tc.eType) {
+			t.Errorf("%s, exporter type unexpected: got %v, want %v", tc.name, etype, ExporterType(tc.eType))
+		}
 
 	}
 }

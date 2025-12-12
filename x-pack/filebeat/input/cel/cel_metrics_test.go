@@ -19,7 +19,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
-	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
@@ -34,7 +33,7 @@ func TestOTELCELMetrics(t *testing.T) {
 
 	client := testServer.Client()
 
-	// Set up the OTELCELMetrics
+	// Set up the otelCELMetrics
 	log := logp.NewLogger("cel_metrics_test")
 	resource := resource.NewWithAttributes(
 		semconv.SchemaURL,
@@ -59,14 +58,14 @@ func TestOTELCELMetrics(t *testing.T) {
 
 	metricExporter, err := stdoutmetric.New(stdoutmetric.WithPrettyPrint(),
 		stdoutmetric.WithTemporalitySelector(otel.DeltaSelector),
-		stdoutmetric.WithEncoder(otel.NewConcurentEncoder(json.NewEncoder(w))))
+		stdoutmetric.WithEncoder(&otel.ConcurrentEncoder{Encoder: json.NewEncoder(w)}))
 	if err != nil {
 		t.Fatalf("failed to create exporter: %v", err)
 	}
 
-	otelCELMetrics, transport, err := NewOTELCELMetrics(log, *resource, client.Transport, metricExporter)
+	otelCELMetrics, transport, err := newOTELCELMetrics(log, *resource, client.Transport, metricExporter)
 	if err != nil {
-		t.Fatalf("failed to create OTELCELMetrics: %v", err)
+		t.Fatalf("failed to create otelCELMetrics: %v", err)
 	}
 	ctx := context.Background()
 	defer otelCELMetrics.Shutdown(ctx)
@@ -75,11 +74,11 @@ func TestOTELCELMetrics(t *testing.T) {
 
 	inputMetrics, _ := newInputMetrics(reg, log)
 
-	mRecorder, err := NewMetricsRecorder(inputMetrics, otelCELMetrics)
+	mRecorder, err := newMetricsRecorder(inputMetrics, otelCELMetrics)
 	if err != nil {
 		t.Fatalf("failed to create metrics recorder: %v", err)
 	}
-	// Create an HTTP client using the OTELCELMetrics transport
+	// Create an HTTP client using the otelCELMetrics transport
 	client.Transport = transport
 
 	var totalCelDuration time.Duration
@@ -155,14 +154,30 @@ func TestOTELCELMetrics(t *testing.T) {
 		}
 	}
 
-	assert.Equal(t, 0, len(notFound), notFound)
+	if len(notFound) != 0 {
+		t.Errorf("expected all metrics to be found, but missing: %v", notFound)
+	}
 
 	// check that inputMetrics are incremented
-	assert.Equal(t, uint64(5), inputMetrics.executions.Get())
-	assert.Equal(t, uint64(15), inputMetrics.eventsReceived.Get())
-	assert.Equal(t, uint64(5), inputMetrics.batchesReceived.Get())
-	assert.Equal(t, uint64(15), inputMetrics.eventsPublished.Get())
-	assert.Equal(t, uint64(5), inputMetrics.batchesPublished.Get())
-	assert.Equal(t, int64(5), inputMetrics.celProcessingTime.Count())
-	assert.Equal(t, totalCelDuration.Nanoseconds(), inputMetrics.celProcessingTime.Sum())
+	if inputMetrics.executions.Get() != uint64(5) {
+		t.Errorf("executions = %v, want %v", inputMetrics.executions.Get(), uint64(5))
+	}
+	if inputMetrics.eventsReceived.Get() != uint64(15) {
+		t.Errorf("eventsReceived = %v, want %v", inputMetrics.eventsReceived.Get(), uint64(15))
+	}
+	if inputMetrics.batchesReceived.Get() != uint64(5) {
+		t.Errorf("batchesReceived = %v, want %v", inputMetrics.batchesReceived.Get(), uint64(5))
+	}
+	if inputMetrics.eventsPublished.Get() != uint64(15) {
+		t.Errorf("eventsPublished = %v, want %v", inputMetrics.eventsPublished.Get(), uint64(15))
+	}
+	if inputMetrics.batchesPublished.Get() != uint64(5) {
+		t.Errorf("batchesPublished = %v, want %v", inputMetrics.batchesPublished.Get(), uint64(5))
+	}
+	if inputMetrics.celProcessingTime.Count() != int64(5) {
+		t.Errorf("celProcessingTime.Count() = %v, want %v", inputMetrics.celProcessingTime.Count(), int64(5))
+	}
+	if inputMetrics.celProcessingTime.Sum() != totalCelDuration.Nanoseconds() {
+		t.Errorf("celProcessingTime.Sum() = %v, want %v", inputMetrics.celProcessingTime.Sum(), totalCelDuration.Nanoseconds())
+	}
 }

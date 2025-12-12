@@ -16,19 +16,11 @@ import (
 )
 
 // ConcurrentEncoder wraps a stdoutmetric.Encoder to serialize
-// access to the underlying encoder.
+// access to the underlying Encoder.
 // Allows the Exporter used for writing to console to be concurrent.
 type ConcurrentEncoder struct {
-	encoder stdoutmetric.Encoder
 	lock    sync.Mutex
-}
-
-// NewConcurentEncoder creates a ConcurrentEncoder that wraps that
-// stdoutmetric.Encoder that is passed in.
-func NewConcurentEncoder(encoder stdoutmetric.Encoder) *ConcurrentEncoder {
-	return &ConcurrentEncoder{
-		encoder: encoder,
-	}
+	Encoder stdoutmetric.Encoder
 }
 
 // Encode enforces serial access to the underlying Encoder.
@@ -37,5 +29,5 @@ func NewConcurentEncoder(encoder stdoutmetric.Encoder) *ConcurrentEncoder {
 func (ce *ConcurrentEncoder) Encode(v any) error {
 	ce.lock.Lock()
 	defer ce.lock.Unlock()
-	return ce.encoder.Encode(v)
+	return ce.Encoder.Encode(v)
 }

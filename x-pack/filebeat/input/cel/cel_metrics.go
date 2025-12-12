@@ -31,7 +31,7 @@
 // +------------------------+-------------------------------------------------------+
 //
 // See [otel.ExportFactory] for environment settings to run console or http/protobuf output.
-// See [OTELCELMetrics] for the complete list of exported metrics.
+// See [otelCELMetrics] for the complete list of exported metrics.
 
 // Open Telemetry Metrics for CEL Input
 //
@@ -126,7 +126,7 @@ func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) (*inputMetri
 	return out, reg
 }
 
-type OTELCELMetrics struct {
+type otelCELMetrics struct {
 	log                                  *logp.Logger
 	shutdownFuncs                        []func(context.Context) error
 	manualExportFunc                     func(context.Context) error
@@ -158,16 +158,16 @@ type OTELCELMetrics struct {
 // in the real world use due to the use of intervals for
 // running periodic runs. However, test environments with
 // small intervals could potentially cause this to happen.
-func (o *OTELCELMetrics) StartPeriodic(ctx context.Context) {
-	o.exportLock.Lock() // Acquire the lock
-	defer o.exportLock.Unlock()
+func (o *otelCELMetrics) StartPeriodic(ctx context.Context) {
+	o.exportLock.Lock()
 	o.export = true
+	o.exportLock.Unlock()
 	o.periodicRunCount.Add(ctx, 1)
 	o.startRunTime = time.Now()
 }
 
 // EndPeriodic ends the periodic metrics collection and manually exports metrics if a manual export function is set.
-func (o *OTELCELMetrics) EndPeriodic(ctx context.Context) {
+func (o *otelCELMetrics) EndPeriodic(ctx context.Context) {
 	if o.export {
 		o.periodicRunDuration.Add(ctx, time.Since(o.startRunTime).Seconds())
 	}
@@ -176,61 +176,61 @@ func (o *OTELCELMetrics) EndPeriodic(ctx context.Context) {
 	}
 	o.exportLock.Lock() // Acquire the lock
 	defer o.exportLock.Unlock()
-	o.log.Debug("OTELCELMetrics EndPeriodic called")
+	o.log.Debug("otelCELMetrics EndPeriodic called")
 	o.export = false
-	o.log.Debug("OTELCELMetrics manual export export")
+	o.log.Debug("otelCELMetrics manual export export")
 	err := o.manualExportFunc(ctx)
 	if err != nil {
 		o.log.Errorf("error exporting metrics: %v", err)
 	}
-	o.log.Debug("OTELCELMetrics manual export ended")
+	o.log.Debug("otelCELMetrics manual export ended")
 }
 
-func (o *OTELCELMetrics) AddProgramRunDuration(ctx context.Context, duration time.Duration) {
+func (o *otelCELMetrics) AddProgramRunDuration(ctx context.Context, duration time.Duration) {
 	o.programRunDurationHistogram.Record(ctx, duration.Seconds())
 }
 
-func (o *OTELCELMetrics) AddPublishDuration(ctx context.Context, duration time.Duration) {
+func (o *otelCELMetrics) AddPublishDuration(ctx context.Context, duration time.Duration) {
 	o.periodicEventPublishDuration.Add(ctx, duration.Seconds())
 	o.programEventPublishDurationHistogram.Record(ctx, duration.Seconds())
 }
 
-func (o *OTELCELMetrics) AddCELDuration(ctx context.Context, duration time.Duration) {
+func (o *otelCELMetrics) AddCELDuration(ctx context.Context, duration time.Duration) {
 	o.periodicCelDuration.Add(ctx, duration.Seconds())
 	o.programCelDurationHistogram.Record(ctx, duration.Seconds())
 }
 
-func (o *OTELCELMetrics) AddReceivedBatch(ctx context.Context, count int64) {
+func (o *otelCELMetrics) AddReceivedBatch(ctx context.Context, count int64) {
 	o.periodicBatchProcessedCount.Add(ctx, count)
 	o.programBatchProcessedHistogram.Record(ctx, count)
 }
 
-func (o *OTELCELMetrics) AddPublishedBatch(ctx context.Context, count int64) {
+func (o *otelCELMetrics) AddPublishedBatch(ctx context.Context, count int64) {
 	o.periodicBatchPublishedCount.Add(ctx, count)
 	o.programBatchPublishedHistogram.Record(ctx, count)
 }
 
-func (o *OTELCELMetrics) AddReceivedEvents(ctx context.Context, count int64) {
+func (o *otelCELMetrics) AddReceivedEvents(ctx context.Context, count int64) {
 	o.periodicEventProcessedCount.Add(ctx, count)
 	o.programEventProcessedHistogram.Record(ctx, count)
 }
 
-func (o *OTELCELMetrics) AddPublishedEvents(ctx context.Context, count int64) {
+func (o *otelCELMetrics) AddPublishedEvents(ctx context.Context, count int64) {
 	o.periodicEventPublishedCount.Add(ctx, count)
 	o.programEventPublishedHistogram.Record(ctx, count)
 }
 
-func (o *OTELCELMetrics) AddProgramExecutionStarted(ctx context.Context, count int64) {
+func (o *otelCELMetrics) AddProgramExecutionStarted(ctx context.Context, count int64) {
 	o.periodicProgramRunStartedCount.Add(ctx, count)
 }
 
-func (o *OTELCELMetrics) AddProgramExecutionSuccess(ctx context.Context, count int64) {
+func (o *otelCELMetrics) AddProgramExecutionSuccess(ctx context.Context, count int64) {
 	o.periodicProgramRunSuccessCount.Add(ctx, count)
 }
 
 // Shutdown(ctx context.Context) error
 // Flushes the meters to the exporters, then shutsdown the exporter
-func (o *OTELCELMetrics) Shutdown(ctx context.Context) {
+func (o *otelCELMetrics) Shutdown(ctx context.Context) {
 	o.EndPeriodic(ctx)
 	var err error
 	for _, fn := range o.shutdownFuncs {
@@ -241,11 +241,11 @@ func (o *OTELCELMetrics) Shutdown(ctx context.Context) {
 	}
 }
 
-func NewOTELCELMetrics(log *logp.Logger,
+func newOTELCELMetrics(log *logp.Logger,
 	resource resource.Resource,
 	tripper http.RoundTripper,
 	metricExporter sdkmetric.Exporter,
-) (*OTELCELMetrics, *otelhttp.Transport, error) {
+) (*otelCELMetrics, *otelhttp.Transport, error) {
 	var manualExportFunc func(context.Context) error
 	var meterProvider metric.MeterProvider
 	var shutdownFuncs []func(context.Context) error
@@ -283,9 +283,9 @@ func NewOTELCELMetrics(log *logp.Logger,
 			if log.IsDebug() {
 				jsonData, err := json.Marshal(collectedMetrics)
 				if err == nil {
-					log.Debugf("OTELCELMetrics Collected metrics %s", jsonData)
+					log.Debugf("otelCELMetrics Collected metrics %s", jsonData)
 				} else {
-					log.Debugf("OTELCELMetrics could not marshall Collected metrics into json %v", collectedMetrics)
+					log.Debugf("otelCELMetrics could not marshall Collected metrics into json %v", collectedMetrics)
 				}
 			}
 			go func(ctx context.Context, log *logp.Logger, metricExporter sdkmetric.Exporter, collectedMetrics *metricdata.ResourceMetrics) {
@@ -373,7 +373,7 @@ func NewOTELCELMetrics(log *logp.Logger,
 		return nil, nil, fmt.Errorf("failed to create input.cel.program.publish.duration: %w", err)
 	}
 
-	return &OTELCELMetrics{
+	return &otelCELMetrics{
 		log:                                  log,
 		shutdownFuncs:                        shutdownFuncs,
 		manualExportFunc:                     manualExportFunc,
@@ -397,73 +397,73 @@ func NewOTELCELMetrics(log *logp.Logger,
 	}, transport, nil
 }
 
-type MetricsRecorder struct {
+type metricsRecorder struct {
 	inputMetrics *inputMetrics
-	otelMetrics  *OTELCELMetrics
+	otelMetrics  *otelCELMetrics
 }
 
-func NewMetricsRecorder(inputMetrics *inputMetrics, otelMetrics *OTELCELMetrics) (*MetricsRecorder, error) {
+func newMetricsRecorder(inputMetrics *inputMetrics, otelMetrics *otelCELMetrics) (*metricsRecorder, error) {
 	if inputMetrics == nil || otelMetrics == nil {
 		return nil, errors.New("input metrics and otel metrics cannot be nil")
 	}
-	return &MetricsRecorder{
+	return &metricsRecorder{
 		inputMetrics,
 		otelMetrics,
 	}, nil
 }
 
-func (o *MetricsRecorder) StartPeriodic(ctx context.Context) {
+func (o *metricsRecorder) StartPeriodic(ctx context.Context) {
 	o.otelMetrics.StartPeriodic(ctx)
 }
 
 // EndPeriodic ends the periodic metrics collection and manually exports metrics if a manual export function is set.
-func (o *MetricsRecorder) EndPeriodic(ctx context.Context) {
+func (o *metricsRecorder) EndPeriodic(ctx context.Context) {
 	o.otelMetrics.EndPeriodic(ctx)
 }
 
-func (o *MetricsRecorder) AddCELDuration(ctx context.Context, duration time.Duration) {
+func (o *metricsRecorder) AddCELDuration(ctx context.Context, duration time.Duration) {
 	o.otelMetrics.AddCELDuration(ctx, duration)
 	o.inputMetrics.celProcessingTime.Update(duration.Nanoseconds())
 }
 
-func (o *MetricsRecorder) AddProgramRunDuration(ctx context.Context, duration time.Duration) {
+func (o *metricsRecorder) AddProgramRunDuration(ctx context.Context, duration time.Duration) {
 	o.otelMetrics.AddProgramRunDuration(ctx, duration)
 }
 
-func (o *MetricsRecorder) AddPublishDuration(ctx context.Context, duration time.Duration) {
+func (o *metricsRecorder) AddPublishDuration(ctx context.Context, duration time.Duration) {
 	o.otelMetrics.AddPublishDuration(ctx, duration)
 	o.inputMetrics.batchProcessingTime.Update(duration.Nanoseconds())
 }
 
-func (o *MetricsRecorder) AddReceivedBatch(ctx context.Context, count uint) {
+func (o *metricsRecorder) AddReceivedBatch(ctx context.Context, count uint) {
 	o.inputMetrics.batchesReceived.Add(uint64(count))
 	o.otelMetrics.AddReceivedBatch(ctx, int64(count)) //nolint:gosec // disable G115
 }
 
-func (o *MetricsRecorder) AddPublishedBatch(ctx context.Context, count uint) {
+func (o *metricsRecorder) AddPublishedBatch(ctx context.Context, count uint) {
 	o.inputMetrics.batchesPublished.Add(uint64(count))
 	o.otelMetrics.AddPublishedBatch(ctx, int64(count)) //nolint:gosec // disable G115
 }
 
-func (o *MetricsRecorder) AddReceivedEvents(ctx context.Context, count uint) {
+func (o *metricsRecorder) AddReceivedEvents(ctx context.Context, count uint) {
 	o.inputMetrics.eventsReceived.Add(uint64(count))
 	o.otelMetrics.AddReceivedEvents(ctx, int64(count)) //nolint:gosec // disable G115
 }
 
-func (o *MetricsRecorder) AddPublishedEvents(ctx context.Context, count uint) {
+func (o *metricsRecorder) AddPublishedEvents(ctx context.Context, count uint) {
 	o.inputMetrics.eventsPublished.Add(uint64(count))
 	o.otelMetrics.AddPublishedEvents(ctx, int64(count)) //nolint:gosec // disable G115
 }
 
-func (o *MetricsRecorder) AddProgramExecution(ctx context.Context) {
+func (o *metricsRecorder) AddProgramExecution(ctx context.Context) {
 	o.inputMetrics.executions.Add(1)
 	o.otelMetrics.AddProgramExecutionStarted(ctx, 1)
 }
 
-func (o *MetricsRecorder) AddProgramSuccessExecution(ctx context.Context) {
+func (o *metricsRecorder) AddProgramSuccessExecution(ctx context.Context) {
 	o.otelMetrics.AddProgramExecutionSuccess(ctx, 1)
 }
 
-func (o *MetricsRecorder) SetResourceURL(url string) {
+func (o *metricsRecorder) SetResourceURL(url string) {
 	o.inputMetrics.resource.Set(url)
 }

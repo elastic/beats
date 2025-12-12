@@ -41,7 +41,10 @@ func init() {
 
 // A global singleton factory. This is set by GetGlobalMetricsExporterFactory()
 // This singleton can return a global Exporter that can be used by all the inputs.
-var exporterFactory *MetricsExporterFactory
+var (
+	exporterOnce    sync.Once
+	exporterFactory *MetricsExporterFactory
+)
 
 type ExporterType string
 
@@ -66,7 +69,7 @@ func GetDefaultMetricExporterOptions() MetricExporterOptions {
 		consoleOptions: []stdoutmetric.Option{
 			stdoutmetric.WithPrettyPrint(),
 			stdoutmetric.WithTemporalitySelector(DeltaSelector),
-			stdoutmetric.WithEncoder(NewConcurentEncoder(json.NewEncoder(os.Stdout))),
+			stdoutmetric.WithEncoder(&ConcurrentEncoder{Encoder: json.NewEncoder(os.Stdout)}),
 		},
 		httpOptions: []otlpmetrichttp.Option{otlpmetrichttp.WithTemporalitySelector(DeltaSelector)},
 	}
@@ -82,12 +85,18 @@ type MetricsExporterFactory struct {
 	globalMetricsExporter sdkmetric.Exporter
 }
 
+// initializeGlobalMetricsExporterFactory creates the global exporter factory
+func initializeGlobalMetricsExporterFactory() {
+	exporterFactory = NewMetricsExporterFactory(GetDefaultMetricExporterOptions())
+}
+
 // GetGlobalMetricsExporterFactory returns a globally defined MetricsExporterFactory.
 // The GlobalExporterFactory returns the same Exporter for every call to
 // GetExporter(ctx, true). The global MetricsExporterFactory is created using
 // default MetricExporterOptions.
 // Using the same Exporter across inputs reduces connections to the OTLP endpoint.
 func GetGlobalMetricsExporterFactory() *MetricsExporterFactory {
+	exporterOnce.Do(initializeGlobalMetricsExporterFactory) // Guarantees initializeConfig runs exactly once
 	return exporterFactory
 }
 
