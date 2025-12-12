@@ -212,7 +212,7 @@ func startHarvester(
 
 			// Report any harvester error as a degraded state for the input
 			if err != nil {
-				ctx.StatusReporter.UpdateStatus(
+				ctx.UpdateStatus(
 					status.Degraded,
 					fmt.Sprintf("Harvester for Filestream input %q failed: %s", inputID, err),
 				)
