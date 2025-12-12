@@ -118,7 +118,7 @@ Example config:
         client.username: "my.email@here.com"
         client.key_path: client_key.pem
         url: https://login.salesforce.com
-        token_url: "https://[custom-domain].my.salesforce.com"
+        token_url: "<custom-token-url>"
       user_password_flow:
         enabled: true
         client.id: "my-client-id"
@@ -241,7 +241,7 @@ Example config:
         client.username: "my.email@here.com"
         client.key_path: client_key.pem
         url: https://login.salesforce.com
-        token_url: "https://[custom-domain].my.salesforce.com"
+        token_url: "<custom-token-url>"
       user_password_flow:
         enabled: true
         client.id: "my-client-id"
@@ -364,7 +364,7 @@ Example config:
         client.username: "my.email@here.com"
         client.key_path: client_key.pem
         url: https://login.salesforce.com
-        token_url: "https://[custom-domain].my.salesforce.com"
+        token_url: "<custom-token-url>"
       user_password_flow:
         enabled: true
         client.id: "my-client-id"
@@ -472,7 +472,7 @@ Example config:
         client.username: "my.email@here.com"
         client.key_path: client_key.pem
         url: https://login.salesforce.com
-        token_url: "https://[custom-domain].my.salesforce.com"
+        token_url: "<custom-token-url>"
       user_password_flow:
         enabled: true
         client.id: "my-client-id"
