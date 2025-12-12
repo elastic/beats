@@ -19,11 +19,18 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
+// LnkSignature is the signature for a LNK file.
 var LnkSignature = []byte{0x4c, 0x00, 0x00, 0x00}
 
+// MinLnkSize is the minimum size of a LNK file, anything smaller can not be a valid LNK file
 // https://github.com/EricZimmerman/Lnk/blob/master/Lnk/Lnk.cs#L24-L28
 var MinLnkSize = 76
 
+// Lnk is a struct that contains the data for a LNK file.
+// It is used to store the data for a LNK file.
+// There is more data in the LNK file, but we are only interested in the data that is relevant forensically
+// I used the github.com/EricZimmerman/Lnk library for reference when creating this struct, and the fields
+// are similar to the output of jlecmd which leverages the same library.
 type Lnk struct {
 	LocalPath              string    `osquery:"local_path"`
 	FileSize               uint32    `osquery:"file_size"`
@@ -42,44 +49,20 @@ type Lnk struct {
 	Name                   string    `osquery:"name"`
 }
 
-func (l *Lnk) String() string {
-	sb := strings.Builder{}
-	sb.WriteString("Lnk{")
-	sb.WriteString(fmt.Sprintf("local_path: %s, ", l.LocalPath))
-	sb.WriteString(fmt.Sprintf("file_size: %d, ", l.FileSize))
-	sb.WriteString(fmt.Sprintf("hot_key: %s, ", l.HotKey))
-	sb.WriteString(fmt.Sprintf("icon_index: %d, ", l.IconIndex))
-	sb.WriteString(fmt.Sprintf("show_window: %s, ", l.ShowWindow))
-	sb.WriteString(fmt.Sprintf("icon_location: %s, ", l.IconLocation))
-	sb.WriteString(fmt.Sprintf("target_modification_time: %s, ", l.TargetModificationDate.UTC().Format(time.RFC3339)))
-	sb.WriteString(fmt.Sprintf("target_last_accessed_time: %s, ", l.TargetLastAccessedDate.UTC().Format(time.RFC3339)))
-	sb.WriteString(fmt.Sprintf("target_creation_time: %s, ", l.TargetCreationDate.UTC().Format(time.RFC3339)))
-	sb.WriteString(fmt.Sprintf("volume_serial_number: %s, ", l.VolumeSerialNumber))
-	sb.WriteString(fmt.Sprintf("volume_type: %s, ", l.VolumeType))
-	sb.WriteString(fmt.Sprintf("volume_label: %s, ", l.VolumeLabel))
-	sb.WriteString(fmt.Sprintf("volume_label_offset: %d, ", l.VolumeLabelOffset))
-	sb.WriteString(fmt.Sprintf("name: %s, ", l.Name))
-	sb.WriteString(fmt.Sprintf("command_line_arguments: %s}", l.CommandLineArguments))
-	return sb.String()
-}
-
-func IsLnkSignature(data []byte) bool {
-	return bytes.Equal(data[:len(LnkSignature)], LnkSignature)
-}
-
+// NewLnkFromBytes creates a new Lnk object from a byte slice.
+// It is used to create a new Lnk object from a byte slice.
 func NewLnkFromBytes(data []byte, log *logger.Logger) (*Lnk, error) {
-	if len(data) < len(LnkSignature) {
-		return nil, fmt.Errorf("data is too short to contain a LNK signature")
-	}
-
-	if !IsLnkSignature(data) {
-		return nil, fmt.Errorf("not a LNK file")
-	}
-
 	if len(data) < MinLnkSize {
 		return nil, fmt.Errorf("data is too short to contain a valid LNK file")
 	}
 
+	// Check if the data contains a LNK signature
+	if !bytes.Equal(data[:len(LnkSignature)], LnkSignature) {
+		return nil, fmt.Errorf("not a LNK file")
+	}
+
+	// Read the LNK file using the golnk library
+	// github.com/parsiya/golnk
 	lnkFile, err := golnk.Read(bytes.NewReader(data), uint64(len(data)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to read LNK file: %w", err)

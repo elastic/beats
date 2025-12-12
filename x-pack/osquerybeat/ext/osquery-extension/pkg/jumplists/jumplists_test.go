@@ -9,7 +9,6 @@ package jumplists
 import (
 	"fmt"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -61,7 +60,7 @@ func TestCustomJumplists(t *testing.T) {
 	log := logger.New(os.Stdout, true)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			jumplist, err := ParseCustomJumpListFile(test.filePath, log)
+			jumplist, err := ParseCustomJumplistFile(test.filePath, &UserProfile{Username: "test", Domain: "test", Sid: "test"}, log)
 			if test.expectError {
 				assert.Error(t, err, "expected error when parsing custom jumplist")
 				assert.Nil(t, jumplist, "expected nil jumplist when parsing custom jumplist")
@@ -227,7 +226,7 @@ func TestAutomaticJumpList(t *testing.T) {
 	}
 	log := logger.New(os.Stdout, true)
 	for _, test := range tests {
-		automaticJumpList, err := ParseAutomaticJumpListFile(test.filePath, log)
+		automaticJumpList, err := ParseAutomaticJumpListFile(test.filePath, &UserProfile{Username: "test", Domain: "test", Sid: "test"}, log)
 		if err != nil {
 			t.Fatalf("%s %s ParseAutomaticJumpListFile() returned error: %v", test.filePath, test.name, err)
 		}
@@ -252,6 +251,25 @@ func TestAutomaticJumpList(t *testing.T) {
 				assert.NotNil(t, row.Lnk, "expected non-nil LNK when parsing Automatic Jump List")
 				assert.NotNil(t, row.DestListEntry, "expected non-nil DestListEntry when parsing Automatic Jump List")
 			}
+		}
+	}
+}
+
+func TestGetUserProfiles(t *testing.T) {
+	log := logger.New(os.Stdout, true)
+	userProfiles, err := GetUserProfiles(log)
+	assert.NoError(t, err, "expected no error when getting user profiles")
+	assert.NotEmpty(t, userProfiles, "expected non-empty user profiles")
+}
+
+func TestGetJumplists(t *testing.T) {
+	log := logger.New(os.Stdout, true)
+	userProfiles, err := GetUserProfiles(log)
+	assert.NoError(t, err, "expected no error when getting user profiles")
+	for _, userProfile := range userProfiles {
+		jumplists := userProfile.GetJumplists(log)
+		for _, jumplist := range jumplists {
+			log.Infof("found jumplist: %s, username: %s, domain: %s, sid: %s", jumplist.Path, userProfile.Username, userProfile.Domain, userProfile.Sid)
 		}
 	}
 }

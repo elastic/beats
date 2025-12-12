@@ -7,6 +7,7 @@
 package jumplists
 
 import (
+	"bytes"
 	"io"
 	"os"
 	"strings"
@@ -16,16 +17,17 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-func ParseAutomaticJumpListFile(filePath string, log *logger.Logger) (*JumpList, error) {
+func ParseAutomaticJumpListFile(filePath string, userProfile *UserProfile, log *logger.Logger) (*Jumplist, error) {
 
 	// Create a minimal JumpList object to return if there is an error.
-	automaticJumpList := &JumpList{
-		JumpListMeta: JumpListMeta{
+	automaticJumpList := &Jumplist{
+		JumplistMeta: &JumplistMeta{
+			UserProfile:   userProfile,
 			ApplicationId: GetAppIdFromFileName(filePath, log),
-			JumplistType:  JumpListTypeAutomatic,
+			JumplistType:  JumplistTypeAutomatic,
 			Path:          filePath,
 		},
-		entries: []*JumpListEntry{},
+		entries: []*JumplistEntry{},
 	}
 
 	// Open the jumplist file
@@ -92,7 +94,7 @@ func ParseAutomaticJumpListFile(filePath string, log *logger.Logger) (*JumpList,
 			continue
 		}
 
-		if !IsLnkSignature(header) {
+		if !bytes.Equal(header, LnkSignature) {
 			log.Infof("stream %s for path %s is not a LNK file", entry.Name, filePath)
 			continue
 		}
@@ -125,12 +127,12 @@ func ParseAutomaticJumpListFile(filePath string, log *logger.Logger) (*JumpList,
 
 	// We have a parsed DestList object and a map of Lnk objects.
 	// Now we need to associate the Lnk objects with the DestList entries.
-	entries := make([]*JumpListEntry, 0, len(destList.Entries))
+	entries := make([]*JumplistEntry, 0, len(destList.Entries))
 	for _, entry := range destList.Entries {
 		// Create a minimal JumpListEntry object to return if there is an error.
-		jumpListEntry := &JumpListEntry{
+		jumpListEntry := &JumplistEntry{
 			DestListEntry: entry,
-			Lnk:           nil,
+			Lnk:           &Lnk{},
 		}
 
 		// Lookup the Lnk object by the DestList entry name.
@@ -148,25 +150,4 @@ func ParseAutomaticJumpListFile(filePath string, log *logger.Logger) (*JumpList,
 	automaticJumpList.entries = entries
 
 	return automaticJumpList, nil
-}
-
-// GetAutomaticJumpLists finds all the automatic jump list files and parses them into JumpList objects.
-// It returns a slice of JumpList objects.
-func GetAutomaticJumpLists(log *logger.Logger) []*JumpList {
-	files, err := FindJumpListFiles(JumpListTypeAutomatic, log)
-	if err != nil {
-		log.Infof("failed to find Automatic Jump Lists: %v", err)
-		return []*JumpList{}
-	}
-
-	var jumplists []*JumpList
-	for _, file := range files {
-		automaticJumpList, err := ParseAutomaticJumpListFile(file, log)
-		if err != nil {
-			log.Errorf("failed to parse Automatic Jump List %s: %v", file, err)
-			continue
-		}
-		jumplists = append(jumplists, automaticJumpList)
-	}
-	return jumplists
 }

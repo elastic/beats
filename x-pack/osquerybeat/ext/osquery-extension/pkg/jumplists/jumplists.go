@@ -11,145 +11,125 @@ package jumplists
 
 import (
 	"context"
-	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/osquery/osquery-go/plugin/table"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-type JumpListType string
+type JumplistType uint32
 
 const (
-	JumpListTypeCustom    JumpListType = "custom"
-	JumpListTypeAutomatic JumpListType = "automatic"
+	JumplistTypeCustom    JumplistType = 1
+	JumplistTypeAutomatic JumplistType = 2
 )
 
-// JumpListMeta is the metadata for a jump list.
+// JumplistMeta is the metadata for a jump list.
 // It contains the application ID, jump list type, path to the jump list file,
-// and any jumplist type specific metadata.
-type JumpListMeta struct {
-	ApplicationId
-	JumplistType JumpListType `osquery:"jumplist_type"`
+// and any jumplist type specific metadata.  The embedded fields
+// have osquery tags defined in their object definitions, and our encoding package
+// will automatically marshal the fields to the correct JSON format.
+type JumplistMeta struct {
+	*ApplicationId
+	*UserProfile
+	JumplistType JumplistType `osquery:"jumplist_type"`
 	Path         string       `osquery:"source_file_path"`
 }
 
-// JumpListEntry is a single entry in a jump list.
-type JumpListEntry struct {
-	*DestListEntry // Only used for automatic jumplists
+// JumplistEntry is a single entry in a jump list.
+type JumplistEntry struct {
+	*DestListEntry
 	*Lnk
 }
 
-// JumpList is a collection of Lnk objects that represent a single jump list.
-// It contains the metadata for the jump list and the Lnk objects.
+// Jumplist is a collection of Lnk objects that represent a single jump list.
+// It contains the metadata for the jump list and the Entries (Lnk objects).
 // This is a generic object that can represent either a custom jumplist
-// or an automatic jumplist.  The JumpListMeta contains any data specific to the jumplist type.
-// Both jumplist types are comprised of a collection of Lnk objects.
-type JumpList struct {
-	JumpListMeta
-	entries []*JumpListEntry
+// or an automatic jumplist. It is comprised of a JumplistMeta object and a slice of Lnk objects.
+type Jumplist struct {
+	*JumplistMeta
+	entries []*JumplistEntry
 }
 
-// JumpListRow is a single row in a jump list.
-// Each lnk object in the jumplist is represented by its own row, so the number of rows
-// is equal to the number of lnk objects in the jumplist.
-type JumpListRow struct {
-	*JumpListMeta  // The metadata for the jump list
-	*JumpListEntry // The JumpListEntry object that represents a single jump list entry
+// JumplistRow is a single row in a jump list.
+// Each jumplist is a collection of LNK objects, but each LNK object in the jumplist
+// has the same metadata (application id, jumplist type, path, etc).
+// This object using embedded pointers so that multiple rows can share the same metadata.
+// each embedded field has osquery tags defined in their object definitions
+type JumplistRow struct {
+	*JumplistMeta // The metadata for the jump list
+	*JumplistEntry // The JumplistEntry object that represents a single jump list entry
 }
 
-// ToRows converts the JumpList to a slice of JumpListRow objects.
-// If the JumpList is empty, it returns a single empty JumpListRow.
-func (j *JumpList) ToRows() []JumpListRow {
-	var rows []JumpListRow
+// ToRows converts the Jumplist to a slice of JumplistRow objects.
+func (j *Jumplist) ToRows() []JumplistRow {
+	var rows []JumplistRow
 	for _, entry := range j.entries {
-		rows = append(rows, JumpListRow{
-			JumpListMeta:  &j.JumpListMeta,
-			JumpListEntry: entry,
+		rows = append(rows, JumplistRow{
+			JumplistMeta: j.JumplistMeta,
+			JumplistEntry: entry,
 		})
-	}
-	// If the jumplist is empty, return a single empty JumpListRow. Which
-	// will still have the metadata for the jump list (application id, jumplist type, path, etc)
-	if len(rows) == 0 {
-		return []JumpListRow{
-			{
-				JumpListMeta: &j.JumpListMeta,
-				JumpListEntry: &JumpListEntry{
-					DestListEntry: nil,
-					Lnk:           nil,
-				},
-			},
-		}
 	}
 	return rows
 }
 
-// FindJumpListFiles finds all the jump list files of a given type.
-// It returns a slice of file paths.
-func FindJumpListFiles(jumplistType JumpListType, log *logger.Logger) ([]string, error) {
-	// Get the path to the automatic jumplist directory
-	var path string
-
-	switch jumplistType {
-	case JumpListTypeCustom:
-		path = "$APPDATA\\Microsoft\\Windows\\Recent\\CustomDestinations"
-	case JumpListTypeAutomatic:
-		path = "$APPDATA\\Microsoft\\Windows\\Recent\\AutomaticDestinations"
-	}
-
-	expandedPath := os.ExpandEnv(path)
-	if _, err := os.Stat(expandedPath); os.IsNotExist(err) {
-		return nil, err
-	}
-
-	// Get a list of the files in the directory
-	fileEntries, err := os.ReadDir(expandedPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read directory %s: %w", expandedPath, err)
-	}
-
-	// Iterate over the file entries and build a list of file paths
-	var files []string // Return a list of file paths
-	for _, entry := range fileEntries {
-		filePath := filepath.Join(expandedPath, entry.Name())
-		files = append(files, filePath)
-	}
-
-	// Return the list of file paths (absolute paths)
-	return files, nil
-}
-
-// GetColumns returns the column definitions for the JumpListRow object.
+// GetColumns returns the column definitions for the JumplistRow object.
 // It returns a slice of table.ColumnDefinition objects.
 func GetColumns() []table.ColumnDefinition {
-	columns, err := encoding.GenerateColumnDefinitions(JumpListRow{})
+	columns, err := encoding.GenerateColumnDefinitions(JumplistRow{})
 	if err != nil {
 		return nil
 	}
 	return columns
 }
 
-// GetGenerateFunc returns a function that can be used to generate a table of JumpListRow objects.
-// It returns a function that can be used to generate a table of JumpListRow objects.
+// matchesFilters is a helper function that checks if a row matches the given filters.
+func matchesFilters(row JumplistRow, filters []filters.Filter) bool {
+	for _, filter := range filters {
+		if !filter.Matches(row) {
+			return false
+		}
+	}
+	return true
+}
+
+// getAllJumplists is a helper function that gets all the jumplists for all the user profiles.
+func getAllJumplists(log *logger.Logger) ([]*Jumplist, error) {
+	var jumplists []*Jumplist
+	userProfiles, err := GetUserProfiles(log)
+	if err != nil {
+		return nil, err
+	}
+	for _, userProfile := range userProfiles {
+		jumplists = append(jumplists, userProfile.GetJumplists(log)...)
+	}
+	return jumplists, nil
+}
+
+// GetGenerateFunc returns a function that can be used to generate a table of JumplistRow objects.
+// It returns a function that can be used to generate a table of JumplistRow objects.
 func GetGenerateFunc(log *logger.Logger) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		customJumpLists := GetCustomJumpLists(log)
-		automaticJumpLists := GetAutomaticJumpLists(log)
-		jumpLists := append(customJumpLists, automaticJumpLists...)
-
-		var rows []map[string]string
-		for _, jumpList := range jumpLists {
+		jumplists, err := getAllJumplists(log)
+		if err != nil {
+			return nil, err
+		}
+		// Convert the jumplists to a slice of map[string]string objects that will
+		var marshalledRows []map[string]string
+		filters := filters.GetConstraintFilters(queryContext)
+		for _, jumpList := range jumplists {
 			for _, row := range jumpList.ToRows() {
-				rowMap, err := encoding.MarshalToMapWithFlags(row, encoding.EncodingFlagUseNumbersZeroValues)
-				if err != nil {
-					return nil, err
+				if matchesFilters(row, filters) {
+					rowMap, err := encoding.MarshalToMapWithFlags(row, encoding.EncodingFlagUseNumbersZeroValues)
+					if err != nil {
+						return nil, err
+					}
+					marshalledRows = append(marshalledRows, rowMap)
 				}
-				rows = append(rows, rowMap)
 			}
 		}
-		return rows, nil
+		return marshalledRows, nil
 	}
 }
