@@ -186,7 +186,7 @@ func createDockerContext(t *testing.T, dir, filebeatPath string) io.Reader {
 
 		header, err := tar.FileInfoHeader(fi, file)
 		if err != nil {
-			return fmt.Errorf("cannot get FileInfoHeader for %q: %s", file, err)
+			return fmt.Errorf("cannot get FileInfoHeader for %q: %w", file, err)
 		}
 
 		header.Name, _ = filepath.Rel(dir, file)
@@ -201,7 +201,7 @@ func createDockerContext(t *testing.T, dir, filebeatPath string) io.Reader {
 		if !fi.IsDir() {
 			f, err := os.Open(file)
 			if err != nil {
-				return fmt.Errorf("cannot open file: %s", err)
+				return fmt.Errorf("cannot open file: %w", err)
 			}
 			defer f.Close()
 

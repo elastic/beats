@@ -126,7 +126,7 @@ func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, erro
 
 		fullPath := filepath.Join(config.Chroot, config.JournalctlPath)
 		if _, err := os.Stat(fullPath); err != nil {
-			return nil, nil, fmt.Errorf("cannot stat journalctl binary in chroot: %s", err)
+			return nil, nil, fmt.Errorf("cannot stat journalctl binary in chroot: %w", err)
 		}
 	}
 

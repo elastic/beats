@@ -148,8 +148,12 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 			}
 		}()
 
-		// TODO: add chroot information
-		logger.Infof("Journalctl command: journalctl %s", strings.Join(args, " "))
+		jctlCommandMsg := fmt.Sprintf("Journalctl command: %s %s", journalctlPath, strings.Join(args, " "))
+		if chroot != "" {
+			jctlCommandMsg = fmt.Sprintf("%s Chroot: %s (command path relative to chroot)", jctlCommandMsg, chroot)
+		}
+
+		logger.Info(jctlCommandMsg)
 
 		if err := cmd.Start(); err != nil {
 			return &journalctl{}, fmt.Errorf("cannot start journalctl: %w. Chroot: %s", err, chroot)

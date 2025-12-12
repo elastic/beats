@@ -162,7 +162,7 @@ func TestInDockerNewFactory(t *testing.T) {
 	// without the need of any messages in the journal
 	jctl, err := factory(jctlCtx, logger.Logger, "--version")
 	require.NoError(t, err, "failed to create journalctl with chroot")
-	defer jctl.Kill()
+	defer jctl.Kill() // nolint: deadcode // It's a test, there is nothing to do
 
 	data, err := jctl.Next(jctlCtx)
 	require.NoError(t, err, "failed to read from journalctl")
