@@ -516,6 +516,7 @@ func (d *decoder) readInt32() (int32, error) {
 		return 0, err
 	}
 
+	//nolint:gosec // G115: intentional uint32->int32 conversion for BSON signed integer decoding
 	return int32((uint32(b[0]) << 0) |
 		(uint32(b[1]) << 8) |
 		(uint32(b[2]) << 16) |
@@ -528,6 +529,7 @@ func (d *decoder) readInt64() (int64, error) {
 		return 0, err
 	}
 
+	//nolint:gosec // G115: intentional uint64->int64 conversion for BSON signed integer decoding
 	return int64((uint64(b[0]) << 0) |
 		(uint64(b[1]) << 8) |
 		(uint64(b[2]) << 16) |
