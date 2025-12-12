@@ -14,24 +14,19 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-// ParseCustomJumpListFile parses a custom jump list file into a JumpList object.
-// It returns a JumpList object and an error if the file cannot be read or parsed.
-func ParseCustomJumpListFile(filePath string, log *logger.Logger) (*JumpList, error) {
+// ParseCustomJumplistFile parses a custom jump list file into a Jumplist object.
+// It returns a Jumplist object and an error if the file cannot be read or parsed.
+// Custom jumplists are comprised of some metadata and a collection of Lnk objects.
+// The lnk objects have to be carved out of the file and there may be multiple of them per file
+func ParseCustomJumplistFile(filePath string, userProfile *UserProfile, log *logger.Logger) (*Jumplist, error) {
+	// Read the file into a byte slice
 	fileBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read")
 	}
 
-	// Scan through the file looking for footer signatures, there may be multiple custom jump lists in the file
+	// Carve out the Lnk objects from the file
 	lnks := carveLnkFiles(fileBytes, log)
-
-	entries := make([]*JumpListEntry, 0)
-	for _, lnk := range lnks {
-		jumpListEntry := &JumpListEntry{
-			Lnk: lnk,
-		}
-		entries = append(entries, jumpListEntry)
-	}
 
 	// If the jumplist file is empty, return an error jlecmd does this as well
 	if len(lnks) == 0 {
@@ -39,37 +34,19 @@ func ParseCustomJumpListFile(filePath string, log *logger.Logger) (*JumpList, er
 	}
 
 	// Look up the application id and create the metadata
-	jumpListMeta := JumpListMeta{
+	jumpListMeta := &JumplistMeta{
+		UserProfile:   userProfile,
 		ApplicationId: GetAppIdFromFileName(filePath, log),
-		JumplistType:  JumpListTypeCustom,
+		JumplistType:  JumplistTypeCustom,
 		Path:          filePath,
 	}
-	customJumpList := &JumpList{
-		JumpListMeta: jumpListMeta,
-		entries:      entries,
-	}
-	return customJumpList, nil
-}
 
-// GetCustomJumpLists finds all the custom jump list files and parses them into JumpList objects.
-// It returns a slice of JumpList objects.
-func GetCustomJumpLists(log *logger.Logger) []*JumpList {
-	files, err := FindJumplistFiles(JumpListTypeCustom, log)
-	if err != nil {
-		log.Infof("failed to find Custom Jump Lists: %v", err)
-		return []*JumpList{}
+	// Combine the metadata and the entries into a Jumplist object
+	customJumplist := &Jumplist{
+		JumplistMeta: jumpListMeta,
+		entries:      lnks,
 	}
-
-	var jumplists []*JumpList
-	for _, file := range files {
-		customJumpList, err := ParseCustomJumpListFile(file, log)
-		if err != nil {
-			log.Infof("failed to parse Custom Jump List %s: %v", file, err)
-			continue
-		}
-		jumplists = append(jumplists, customJumpList)
-	}
-	return jumplists
+	return customJumplist, nil
 }
 
 // carveLnkFiles scans the fileBytes buffer looking for LNK signatures and carves out the individual LNK files.

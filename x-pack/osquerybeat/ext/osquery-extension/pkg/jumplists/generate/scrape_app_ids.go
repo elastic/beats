@@ -18,11 +18,11 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-const appIdSourceUrl = "https://raw.githubusercontent.com/EricZimmerman/JumpList/refs/heads/master/JumpList/Resources/AppIDs.txt"
+const appIdSourceUrl = "https://raw.githubusercontent.com/EricZimmerman/Jumplist/refs/heads/master/Jumplist/Resources/AppIDs.txt"
 
-// scrapeJumpListAppIDs pulls the app ids from appSourceUrl and returns a map of app ids to app names.
+// scrapeJumplistAppIDs pulls the app ids from appSourceUrl and returns a map of app ids to app names.
 // the app ids are in the format of a hex string, and the app names are in the format of a string.
-func scrapeJumpListAppIDs(log *logger.Logger) (map[string]string, error) {
+func scrapeJumplistAppIDs(log *logger.Logger) (map[string]string, error) {
 	appIDs := make(map[string]string)
 	valueRegex := regexp.MustCompile(`.*"(.*)"`)
 	bodyString, err := downloadPage(appIdSourceUrl, log)
@@ -70,7 +70,7 @@ func scrapeJumpListAppIDs(log *logger.Logger) (map[string]string, error) {
 // writeAppIdGeneratedFile writes the app ids to a generated source file
 // that can be used to lookup app ids by name.
 func writeAppIdGeneratedFile(outputFile string, log *logger.Logger) error {
-	appIDs, err := scrapeJumpListAppIDs(log)
+	appIDs, err := scrapeJumplistAppIDs(log)
 	if err != nil {
 		return err
 	}
