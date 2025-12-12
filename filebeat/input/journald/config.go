@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build linux
 
 package journald
@@ -80,8 +82,13 @@ type config struct {
 	// Chroot is the chroot folder used to call journalctl
 	Chroot string `config:"chroot"`
 
-	// JournalctlPath is the path of the journalctl binary. It is only required
-	// if [Chroot] is set.
+	// JournalctlPath specifies the path to the `journalctl` binary.
+	// This field is required only if the Chroot option is set, as the
+	// input needs to locate the binary within the chroot environment.
+	// If Chroot is set, JournalctlPath must be an absolute path within
+	// the chroot environment. If JournalctlPath is not explicitly set,
+	// it defaults to `journalctl`, which assumes that the `journalctl`
+	// binary is available in the system's `PATH` environment variable.
 	JournalctlPath string `config:"journalctl_path"`
 }
 
