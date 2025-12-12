@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.24.11
+go 1.25.4
 
 require (
 	cloud.google.com/go/bigquery v1.69.0
@@ -188,7 +188,7 @@ require (
 	github.com/go-resty/resty/v2 v2.17.0
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.0
-	github.com/google/cel-go v0.25.0
+	github.com/google/cel-go v0.26.1
 	github.com/googleapis/gax-go/v2 v2.15.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
