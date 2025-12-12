@@ -35,6 +35,7 @@ type State struct {
 	Offset         int64             `json:"offset" struct:"offset"`
 	Timestamp      time.Time         `json:"timestamp" struct:"timestamp"`
 	TTL            time.Duration     `json:"ttl" struct:"ttl"`
+	CleanRemoved   bool              `json:"clean_removed" struct:"clean_removed"`
 	Type           string            `json:"type"  struct:"type"`
 	Meta           map[string]string `json:"meta" struct:"meta,omitempty"`
 	FileStateOS    file.StateOS      `json:"FileStateOS" struct:"FileStateOS"`
