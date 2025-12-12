@@ -57,12 +57,6 @@ func (h *MockHost) Report(evt *componentstatus.Event) {
 	h.Evt = evt
 }
 
-func (h *MockHost) getEvent() *componentstatus.Event {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-	return h.Evt
-}
-
 type ReceiverConfig struct {
 	// Name is the unique identifier for the component
 	Name string
