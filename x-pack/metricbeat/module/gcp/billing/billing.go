@@ -432,6 +432,15 @@ SELECT
 	        CONCAT(t.key, ':', t.value)
 	    FROM
 	        UNNEST(tags) AS t), ',') AS tags_string,
+<<<<<<< HEAD
+=======
+	TO_JSON_STRING(labels) AS labels_json,
+	usage_start_time as usage_start_time,
+	usage_end_time as usage_end_time,
+	IFNULL(location.region, '') AS location_region,
+	IFNULL(location.zone, '') AS location_zone,
+	IFNULL(location.country, '') AS location_country,
+>>>>>>> a80965157 ([gcp] [billing] remove `TIMESTAMP_MICROS` functions (#47963))
 	(SUM(CAST(cost * 1000000 AS int64)) + SUM(IFNULL((
 			SELECT
 				SUM(CAST(c.amount * 1000000 AS int64))
@@ -494,6 +503,15 @@ SELECT
 	        CONCAT(t.key, ':', t.value)
 	    FROM
 	        UNNEST(tags) AS t), ',') AS tags_string,
+<<<<<<< HEAD
+=======
+	TO_JSON_STRING(labels) AS labels_json,
+	usage_start_time as usage_start_time,
+	usage_end_time as usage_end_time,
+	IFNULL(location.region, '') AS location_region,
+	IFNULL(location.zone, '') AS location_zone,
+	IFNULL(location.country, '') AS location_country,
+>>>>>>> a80965157 ([gcp] [billing] remove `TIMESTAMP_MICROS` functions (#47963))
 	(SUM(CAST(cost * 1000000 AS int64)) + SUM(IFNULL((
 			SELECT
 				SUM(CAST(c.amount * 1000000 AS int64))
@@ -516,7 +534,17 @@ GROUP BY
 	service_id,
 	service_description,
 	effective_price,
+<<<<<<< HEAD
 	tags_string
+=======
+	tags_string,
+	labels_json,
+	location_region,
+	location_zone,
+	location_country,
+	usage_start_time,
+	usage_end_time
+>>>>>>> a80965157 ([gcp] [billing] remove `TIMESTAMP_MICROS` functions (#47963))
 ORDER BY
 	invoice_month ASC,
 	project_id ASC,
