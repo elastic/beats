@@ -41,7 +41,7 @@ It has the following settings:
 :   (Optional) Specify the time of inactivity before stopping the running configuration for a container, 60s by default.
 
 `labels.dedot`
-:   (Optional) Default to be false. If set to true, replace dots in labels with `_`.
+:   (Optional) Default to be true. If set to true, replace dots in labels with `_`.
 
 These are the fields available within config templating. The `docker.*` fields will be available on each emitted event. event:
 
