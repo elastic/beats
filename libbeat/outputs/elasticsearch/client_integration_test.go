@@ -22,10 +22,7 @@ package elasticsearch
 import (
 	"context"
 	"fmt"
-	"io"
 	"math/rand/v2"
-	"net/http"
-	"strings"
 	"testing"
 	"time"
 
@@ -480,6 +477,16 @@ func configureDatastream(t *testing.T, client *Client, ds string) {
 					"enabled": true,
 				},
 			},
+			"mappings": map[string]any{
+				"properties": map[string]any{
+					"answer": map[string]any{
+						"type": "integer",
+					},
+					"not_a_number": map[string]any{
+						"type": "keyword",
+					},
+				},
+			},
 		},
 	}
 
@@ -492,36 +499,29 @@ func configureDatastream(t *testing.T, client *Client, ds string) {
 	}
 }
 
+// createDatastream creates an index template with the failure store enabled,
+// and mappings for two fields that will be used to test the failure store
+// metrics.
 func createDatastream(t *testing.T, client *Client, ds string) {
 	configureDatastream(t, client, ds)
 	timestamp := time.Now().Format(time.RFC3339)
-	bulkRequest := fmt.Sprintf(`{"create":{}}
-{"@timestamp":"%s","foo":1234}
-`, timestamp)
-
-	// Create the HTTP request
-	req, err := http.NewRequest(
-		"POST",
-		fmt.Sprintf("%s/%s/_bulk", client.conn.URL, ds),
-		strings.NewReader(bulkRequest))
-
-	if err != nil {
-		t.Fatalf("failed to create HTTP request: %v", err)
+	body := []any{
+		map[string]any{
+			"create": map[string]any{},
+		},
+		map[string]any{
+			"@timestamp":   timestamp,
+			"answer":       42,
+			"not_a_number": "forty two",
+		},
 	}
-	req.Header.Set("Content-Type", "application/x-ndjson")
-	req.SetBasicAuth(client.conn.Username, client.conn.Password)
 
-	// Send the HTTP request
-	resp, err := client.conn.HTTP.Do(req)
+	status, _, err := client.conn.Bulk(t.Context(), ds, "", nil, nil, body)
 	if err != nil {
-		t.Fatalf("failed to send HTTP request: %v", err)
+		t.Fatalf("failed to create datastream %s: %v", ds, err)
 	}
-	defer resp.Body.Close()
-
-	// Check for non-2xx status codes
-	if resp.StatusCode >= 300 {
-		body, _ := io.ReadAll(resp.Body)
-		t.Fatalf("unexpected status code %d while creating datastream %s: %s", resp.StatusCode, ds, body)
+	if status >= 300 {
+		t.Fatalf("unexpected status code %d while creating datastream %s", status, ds)
 	}
 }
 
@@ -540,15 +540,15 @@ func TestFailureStore(t *testing.T) {
 		beat.Event{
 			Timestamp: time.Now(),
 			Fields: mapstr.M{
-				"foo":     "invalid type",
-				"message": "this one works",
+				"answer":       "forty two",
+				"not_a_number": "this should work",
 			},
 		},
 		beat.Event{
 			Timestamp: time.Now(),
 			Fields: mapstr.M{
-				"foo":    42,
-				"mesage": "success event",
+				"answer":       42,
+				"not_a_number": "forty two",
 			},
 		},
 	))
