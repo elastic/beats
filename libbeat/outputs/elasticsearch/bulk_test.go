@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build !integration
 
 package elasticsearch
@@ -71,7 +73,6 @@ func TestBulkReadToItems(t *testing.T) {
 	}
 }
 
-// TODO ADD TEST
 func TestBulkReadItemStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 200}}`)
 	logger := logptest.NewTestingLogger(t, "")
