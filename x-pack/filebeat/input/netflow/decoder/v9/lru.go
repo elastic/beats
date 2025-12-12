@@ -53,6 +53,19 @@ type pendingTemplatesCache struct {
 	events  map[SessionKey][]*bytes.Buffer
 }
 
+const (
+	maxPendingPerKey = 256
+	maxTotalPending  = 8192
+)
+
+func (h *pendingTemplatesCache) totalPendingLocked() int {
+	total := 0
+	for _, queued := range h.events {
+		total += len(queued)
+	}
+	return total
+}
+
 func newPendingTemplatesCache() *pendingTemplatesCache {
 	cache := &pendingTemplatesCache{
 		events: make(map[SessionKey][]*bytes.Buffer),
@@ -82,7 +95,11 @@ func (h *pendingTemplatesCache) Add(key SessionKey, events *bytes.Buffer) {
 	h.mtx.Lock()
 	defer h.mtx.Unlock()
 
-	h.events[key] = append(h.events[key], events)
+	q := h.events[key]
+	if len(q) >= maxPendingPerKey || h.totalPendingLocked() >= maxTotalPending {
+		return
+	}
+	h.events[key] = append(q, events)
 	h.hp.Push(eventWithMissingTemplate{key: key, entryTime: time.Now()})
 }
 

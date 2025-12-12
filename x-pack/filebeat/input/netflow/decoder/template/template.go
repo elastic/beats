@@ -17,6 +17,8 @@ import (
 
 const (
 	VariableLength uint16 = 0xffff
+	// this creates a boundary for record allocations derived headers
+	maxRecordsPerPacket = 1024
 )
 
 var ErrEmptyTemplate = errors.New("empty template")
@@ -73,8 +75,15 @@ func (t *Template) Apply(data *bytes.Buffer, n int) ([]record.Record, error) {
 	if t.Length == 0 {
 		return nil, ErrEmptyTemplate
 	}
-	if n == 0 {
-		n = data.Len() / t.Length
+	maxRecords := 0
+	if t.Length > 0 {
+		maxRecords = data.Len() / t.Length
+	}
+	if n == 0 || n > maxRecords {
+		n = maxRecords
+	}
+	if n > maxRecordsPerPacket {
+		n = maxRecordsPerPacket
 	}
 	limit, alloc := n, n
 	if t.VariableLength {
