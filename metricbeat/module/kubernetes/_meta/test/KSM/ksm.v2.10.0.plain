@@ -515,8 +515,10 @@ kube_pod_container_state_started{namespace="default",pod="web-0",uid="e9cebbf1-9
 kube_pod_container_state_started{namespace="kube-system",pod="fluentd-elasticsearch-m2tlp",uid="7c4da822-be1a-4ee2-9f43-fded815d2452",container="fluentd-elasticsearch"} 1.698751173e+09
 # HELP kube_pod_container_status_last_terminated_reason Describes the last reason the container was in terminated state.
 # TYPE kube_pod_container_status_last_terminated_reason gauge
+kube_pod_container_status_last_terminated_reason{namespace="default",pod="failpodloop",uid="a67536f5-5f43-4f43-8cea-ae304364c76f",container="fail",reason="Error"} 1
 # HELP kube_pod_container_status_last_terminated_exitcode Describes the exit code for the last container in terminated state.
 # TYPE kube_pod_container_status_last_terminated_exitcode gauge
+kube_pod_container_status_last_terminated_exitcode{namespace="default",pod="failpodloop",uid="a67536f5-5f43-4f43-8cea-ae304364c76f",container="fail"} 42
 # HELP kube_pod_container_status_ready [STABLE] Describes whether the containers readiness check succeeded.
 # TYPE kube_pod_container_status_ready gauge
 kube_pod_container_status_ready{namespace="kube-system",pod="kindnet-xg6gs",uid="ecb2283b-05a4-4a4b-b9da-c1cc217e2915",container="kindnet-cni"} 1

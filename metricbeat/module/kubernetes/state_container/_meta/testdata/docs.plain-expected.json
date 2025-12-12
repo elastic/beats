@@ -1,131 +1,9 @@
 [
     {
         "container": {
-            "id": "054b424625a7c22c210e3fe0aae55069d4f3e18ce8bc802a9a96ce87bb7a2483",
+            "id": "fed1a0f0adeb312c82caea61cf5b46f0a6d81bd4ae891dad54f88d99a822fb3d",
             "image": {
-                "name": "docker.io/library/busybox:latest"
-            },
-            "runtime": "containerd"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "id": "054b424625a7c22c210e3fe0aae55069d4f3e18ce8bc802a9a96ce87bb7a2483",
-                "name": "hello",
-                "status": {
-                    "phase": "terminated",
-                    "ready": false,
-                    "reason": "Completed",
-                    "restarts": 0
-                }
-            },
-            "namespace": "default",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "name": "hello-28564555-zdfjz"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "9415b19af919bcffb17914b1fa5d78014945b4b4f0fb9b3ecbf918699cacc757",
-            "image": {
-                "name": "docker.io/library/busybox:latest"
-            },
-            "runtime": "containerd"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "id": "9415b19af919bcffb17914b1fa5d78014945b4b4f0fb9b3ecbf918699cacc757",
-                "name": "hello",
-                "status": {
-                    "phase": "terminated",
-                    "ready": false,
-                    "reason": "Completed",
-                    "restarts": 0
-                }
-            },
-            "namespace": "default",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "name": "hello-wlb5q"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "4127a8e540add897dd859ec8a70d2c26f68a6ae61f6664a98e755f26dd1f75df",
-            "image": {
-                "name": "docker.io/library/nginx:1.24.0-alpine-slim"
-            },
-            "runtime": "containerd"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "id": "4127a8e540add897dd859ec8a70d2c26f68a6ae61f6664a98e755f26dd1f75df",
-                "name": "nginx",
-                "status": {
-                    "phase": "running",
-                    "ready": true,
-                    "restarts": 0
-                }
-            },
-            "namespace": "default",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "name": "web-0"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "9a40af12036875eb414555deeca2a09e73f37ccb7c8bbf787bfe9616cbbcbd98",
-            "image": {
-                "name": "registry.k8s.io/kube-apiserver-amd64:v1.29.1"
+                "name": "docker.io/kindest/kindnetd:v20241212-9f82dd49"
             },
             "runtime": "containerd"
         },
@@ -137,16 +15,30 @@
         "kubernetes": {
             "container": {
                 "cpu": {
+                    "limit": {
+                        "cores": 0.1
+                    },
                     "request": {
-                        "cores": 0.25
+                        "cores": 0.1
                     }
                 },
-                "id": "9a40af12036875eb414555deeca2a09e73f37ccb7c8bbf787bfe9616cbbcbd98",
-                "name": "kube-apiserver",
+                "id": "fed1a0f0adeb312c82caea61cf5b46f0a6d81bd4ae891dad54f88d99a822fb3d",
+                "memory": {
+                    "limit": {
+                        "bytes": 52428800
+                    },
+                    "request": {
+                        "bytes": 52428800
+                    }
+                },
+                "name": "kindnet-cni",
                 "status": {
+                    "last_terminated_exitcode": 255,
+                    "last_terminated_reason": "Unknown",
+                    "last_terminated_timestamp": 1744109218,
                     "phase": "running",
                     "ready": true,
-                    "restarts": 0
+                    "restarts": 1
                 }
             },
             "namespace": "kube-system",
@@ -154,7 +46,7 @@
                 "name": "kind-control-plane"
             },
             "pod": {
-                "name": "kube-apiserver-kind-control-plane"
+                "name": "kindnet-gzkxz"
             }
         },
         "metricset": {
@@ -168,9 +60,9 @@
     },
     {
         "container": {
-            "id": "247a9901c7f9c5bf461abc213a0e5e0daf6b9af6c2821ac8c81d0cb3eece7a9d",
+            "id": "dc2ffda9ed1750895a17ca0610ae9644a31033de2f61cb3bea5a9a29cd0a1c08",
             "image": {
-                "name": "registry.k8s.io/etcd:3.5.10-0"
+                "name": "registry.k8s.io/coredns/coredns:v1.11.3"
             },
             "runtime": "containerd"
         },
@@ -186,7 +78,152 @@
                         "cores": 0.1
                     }
                 },
-                "id": "247a9901c7f9c5bf461abc213a0e5e0daf6b9af6c2821ac8c81d0cb3eece7a9d",
+                "id": "dc2ffda9ed1750895a17ca0610ae9644a31033de2f61cb3bea5a9a29cd0a1c08",
+                "memory": {
+                    "limit": {
+                        "bytes": 178257920
+                    },
+                    "request": {
+                        "bytes": 73400320
+                    }
+                },
+                "name": "coredns",
+                "status": {
+                    "last_terminated_exitcode": 255,
+                    "last_terminated_reason": "Unknown",
+                    "last_terminated_timestamp": 1744109218,
+                    "phase": "running",
+                    "ready": true,
+                    "restarts": 1
+                }
+            },
+            "namespace": "kube-system",
+            "node": {
+                "name": "kind-control-plane"
+            },
+            "pod": {
+                "name": "coredns-668d6bf9bc-brttt"
+            }
+        },
+        "metricset": {
+            "name": "state_container",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "container": {
+            "id": "7871fa7bade45162ac99c9459dac0cf22012f2a1206eea103e3c539f26e11dc4",
+            "image": {
+                "name": "docker.io/library/busybox:latest"
+            },
+            "runtime": "containerd"
+        },
+        "event": {
+            "dataset": "kubernetes.container",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "container": {
+                "id": "7871fa7bade45162ac99c9459dac0cf22012f2a1206eea103e3c539f26e11dc4",
+                "name": "hello",
+                "status": {
+                    "phase": "terminated",
+                    "ready": false,
+                    "reason": "Completed",
+                    "restarts": 0
+                }
+            },
+            "namespace": "default",
+            "node": {
+                "name": "kind-control-plane"
+            },
+            "pod": {
+                "name": "hello-29068597-h8rtv"
+            }
+        },
+        "metricset": {
+            "name": "state_container",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "container": {
+            "id": "9c176f4f9215ce66ca37033312942e5bbc297f935acace2532c4abd248023cde",
+            "image": {
+                "name": "registry.k8s.io/kube-controller-manager-amd64:v1.32.0"
+            },
+            "runtime": "containerd"
+        },
+        "event": {
+            "dataset": "kubernetes.container",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "container": {
+                "cpu": {
+                    "request": {
+                        "cores": 0.2
+                    }
+                },
+                "id": "9c176f4f9215ce66ca37033312942e5bbc297f935acace2532c4abd248023cde",
+                "name": "kube-controller-manager",
+                "status": {
+                    "last_terminated_exitcode": 1,
+                    "last_terminated_reason": "Error",
+                    "last_terminated_timestamp": 1744115197,
+                    "phase": "running",
+                    "ready": true,
+                    "restarts": 4
+                }
+            },
+            "namespace": "kube-system",
+            "node": {
+                "name": "kind-control-plane"
+            },
+            "pod": {
+                "name": "kube-controller-manager-kind-control-plane"
+            }
+        },
+        "metricset": {
+            "name": "state_container",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "container": {
+            "id": "4cde3638748a436bec96f8cd149a0b47156c8548c229e4c2939f3391b9f789ee",
+            "image": {
+                "name": "registry.k8s.io/etcd:3.5.16-0"
+            },
+            "runtime": "containerd"
+        },
+        "event": {
+            "dataset": "kubernetes.container",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "container": {
+                "cpu": {
+                    "request": {
+                        "cores": 0.1
+                    }
+                },
+                "id": "4cde3638748a436bec96f8cd149a0b47156c8548c229e4c2939f3391b9f789ee",
                 "memory": {
                     "request": {
                         "bytes": 104857600
@@ -194,9 +231,12 @@
                 },
                 "name": "etcd",
                 "status": {
+                    "last_terminated_exitcode": 255,
+                    "last_terminated_reason": "Unknown",
+                    "last_terminated_timestamp": 1744109218,
                     "phase": "running",
                     "ready": true,
-                    "restarts": 0
+                    "restarts": 1
                 }
             },
             "namespace": "kube-system",
@@ -218,9 +258,97 @@
     },
     {
         "container": {
-            "id": "bac57bbf9243208c19e1d52ae213fa6763c227c680bf7cdb1bdbcfeee86efa08",
+            "id": "c86744220ad31bc7543ca6eb03a13d8290f09d055a1035c2905aa6d8739286e3",
             "image": {
-                "name": "quay.io/fluentd_elasticsearch/fluentd:v2.5.2"
+                "name": "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.15.0"
+            },
+            "runtime": "containerd"
+        },
+        "event": {
+            "dataset": "kubernetes.container",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "container": {
+                "id": "c86744220ad31bc7543ca6eb03a13d8290f09d055a1035c2905aa6d8739286e3",
+                "name": "kube-state-metrics",
+                "status": {
+                    "phase": "running",
+                    "ready": true,
+                    "restarts": 0
+                }
+            },
+            "namespace": "default",
+            "node": {
+                "name": "kind-control-plane"
+            },
+            "pod": {
+                "name": "kube-state-metrics-597784bb8-5m7mj"
+            }
+        },
+        "metricset": {
+            "name": "state_container",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "container": {
+            "id": "7674fc0247a9ca45907ad4ea10c75bbf5794ca3ce5cbee5ca7328a1e822adde5",
+            "image": {
+                "name": "registry.k8s.io/kube-apiserver-amd64:v1.32.0"
+            },
+            "runtime": "containerd"
+        },
+        "event": {
+            "dataset": "kubernetes.container",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "container": {
+                "cpu": {
+                    "request": {
+                        "cores": 0.25
+                    }
+                },
+                "id": "7674fc0247a9ca45907ad4ea10c75bbf5794ca3ce5cbee5ca7328a1e822adde5",
+                "name": "kube-apiserver",
+                "status": {
+                    "last_terminated_exitcode": 137,
+                    "last_terminated_reason": "Error",
+                    "last_terminated_timestamp": 1744109952,
+                    "phase": "running",
+                    "ready": true,
+                    "restarts": 2
+                }
+            },
+            "namespace": "kube-system",
+            "node": {
+                "name": "kind-control-plane"
+            },
+            "pod": {
+                "name": "kube-apiserver-kind-control-plane"
+            }
+        },
+        "metricset": {
+            "name": "state_container",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "container": {
+            "id": "4a484cd2d02f9510aad97bd9c95f6a142177cfd9685f7df7eb14440136cd6e31",
+            "image": {
+                "name": "registry.k8s.io/coredns/coredns:v1.11.3"
             },
             "runtime": "containerd"
         },
@@ -236,223 +364,7 @@
                         "cores": 0.1
                     }
                 },
-                "id": "bac57bbf9243208c19e1d52ae213fa6763c227c680bf7cdb1bdbcfeee86efa08",
-                "memory": {
-                    "limit": {
-                        "bytes": 209715200
-                    },
-                    "request": {
-                        "bytes": 209715200
-                    }
-                },
-                "name": "fluentd-elasticsearch",
-                "status": {
-                    "phase": "running",
-                    "ready": true,
-                    "restarts": 0
-                }
-            },
-            "namespace": "kube-system",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "name": "fluentd-elasticsearch-l8b6x"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "be5708afe249a81a67f812bfda962b8c60022ec47250f9e84a2bcfd0d74e94bc",
-            "image": {
-                "name": "docker.io/curlimages/curl:latest"
-            },
-            "runtime": "containerd"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "id": "be5708afe249a81a67f812bfda962b8c60022ec47250f9e84a2bcfd0d74e94bc",
-                "name": "mycurlpod",
-                "status": {
-                    "phase": "terminated",
-                    "ready": false,
-                    "reason": "Completed",
-                    "restarts": 0
-                }
-            },
-            "namespace": "kube-system",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "name": "mycurlpod"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "8748f765ed9ef2d2ac148301f784a15a3cd902b8179e02ca5370486ca177b138",
-            "image": {
-                "name": "registry.k8s.io/kube-proxy-amd64:v1.29.1"
-            },
-            "runtime": "containerd"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "id": "8748f765ed9ef2d2ac148301f784a15a3cd902b8179e02ca5370486ca177b138",
-                "name": "kube-proxy",
-                "status": {
-                    "phase": "running",
-                    "ready": true,
-                    "restarts": 0
-                }
-            },
-            "namespace": "kube-system",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "name": "kube-proxy-45qj9"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "921d3b54ac614468e4fbab9f9fdfe62d193d1f20a8468d66f4b817b794ce6450",
-            "image": {
-                "name": "docker.io/library/busybox:latest"
-            },
-            "runtime": "containerd"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "id": "921d3b54ac614468e4fbab9f9fdfe62d193d1f20a8468d66f4b817b794ce6450",
-                "name": "hello",
-                "status": {
-                    "phase": "terminated",
-                    "ready": false,
-                    "reason": "Completed",
-                    "restarts": 0
-                }
-            },
-            "namespace": "default",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "name": "hello-28564554-llbsx"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "546515935a22a504502baaaa5c4ad43e9ffb397723da496adb2d853f5a79a71d",
-            "image": {
-                "name": "docker.io/library/busybox:latest"
-            },
-            "runtime": "containerd"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "id": "546515935a22a504502baaaa5c4ad43e9ffb397723da496adb2d853f5a79a71d",
-                "name": "hello",
-                "status": {
-                    "phase": "terminated",
-                    "ready": false,
-                    "reason": "Completed",
-                    "restarts": 0
-                }
-            },
-            "namespace": "default",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "name": "hello-28564556-gkqsk"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "03762feb69c6fa220ff5af305ce76e8bb2a671208830cf890d9f707a325d4fd4",
-            "image": {
-                "name": "registry.k8s.io/coredns/coredns:v1.11.1"
-            },
-            "runtime": "containerd"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "cpu": {
-                    "request": {
-                        "cores": 0.1
-                    }
-                },
-                "id": "03762feb69c6fa220ff5af305ce76e8bb2a671208830cf890d9f707a325d4fd4",
+                "id": "4a484cd2d02f9510aad97bd9c95f6a142177cfd9685f7df7eb14440136cd6e31",
                 "memory": {
                     "limit": {
                         "bytes": 178257920
@@ -463,9 +375,12 @@
                 },
                 "name": "coredns",
                 "status": {
+                    "last_terminated_exitcode": 255,
+                    "last_terminated_reason": "Unknown",
+                    "last_terminated_timestamp": 1744109218,
                     "phase": "running",
                     "ready": true,
-                    "restarts": 0
+                    "restarts": 1
                 }
             },
             "namespace": "kube-system",
@@ -473,7 +388,7 @@
                 "name": "kind-control-plane"
             },
             "pod": {
-                "name": "coredns-76f75df574-wfchs"
+                "name": "coredns-668d6bf9bc-54zxr"
             }
         },
         "metricset": {
@@ -487,9 +402,9 @@
     },
     {
         "container": {
-            "id": "92715dd9282a125b40b198c1718bd4f3373f1eef247c37c7cdc5c9d7f199854a",
+            "id": "347f110525ff335ab39a89d9d5a6b0575d66042f2cf7f9b0da5dd37669d88b37",
             "image": {
-                "name": "docker.io/kindest/kindnetd:v20240202-8f1494ea"
+                "name": "docker.io/kindest/local-path-provisioner:v20241212-8ac705d0"
             },
             "runtime": "containerd"
         },
@@ -500,68 +415,15 @@
         },
         "kubernetes": {
             "container": {
-                "cpu": {
-                    "limit": {
-                        "cores": 0.1
-                    },
-                    "request": {
-                        "cores": 0.1
-                    }
-                },
-                "id": "92715dd9282a125b40b198c1718bd4f3373f1eef247c37c7cdc5c9d7f199854a",
-                "memory": {
-                    "limit": {
-                        "bytes": 52428800
-                    },
-                    "request": {
-                        "bytes": 52428800
-                    }
-                },
-                "name": "kindnet-cni",
-                "status": {
-                    "phase": "running",
-                    "ready": true,
-                    "restarts": 0
-                }
-            },
-            "namespace": "kube-system",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "name": "kindnet-98xlt"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "033cae4f770f37b24fddb21333777bc73698e8806bbb81e8effa71b4202aab2b",
-            "image": {
-                "name": "docker.io/kindest/local-path-provisioner:v20240202-8f1494ea"
-            },
-            "runtime": "containerd"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "id": "033cae4f770f37b24fddb21333777bc73698e8806bbb81e8effa71b4202aab2b",
+                "id": "347f110525ff335ab39a89d9d5a6b0575d66042f2cf7f9b0da5dd37669d88b37",
                 "name": "local-path-provisioner",
                 "status": {
+                    "last_terminated_exitcode": 255,
+                    "last_terminated_reason": "Unknown",
+                    "last_terminated_timestamp": 1744109218,
                     "phase": "running",
                     "ready": true,
-                    "restarts": 0
+                    "restarts": 1
                 }
             },
             "namespace": "local-path-storage",
@@ -569,7 +431,7 @@
                 "name": "kind-control-plane"
             },
             "pod": {
-                "name": "local-path-provisioner-7577fdbbfb-wmdwd"
+                "name": "local-path-provisioner-58cc7856b6-mzds5"
             }
         },
         "metricset": {
@@ -583,9 +445,52 @@
     },
     {
         "container": {
-            "id": "cd52120cda244a98ed01e9259381cbcd439bc087115d93c7573bada504dbb620",
+            "id": "1525f82af693f5afa7d9a565fac13f6b6d756465b4270b83508ff52b73458426",
             "image": {
-                "name": "registry.k8s.io/kube-scheduler-amd64:v1.29.1"
+                "name": "registry.k8s.io/kube-proxy-amd64:v1.32.0"
+            },
+            "runtime": "containerd"
+        },
+        "event": {
+            "dataset": "kubernetes.container",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "container": {
+                "id": "1525f82af693f5afa7d9a565fac13f6b6d756465b4270b83508ff52b73458426",
+                "name": "kube-proxy",
+                "status": {
+                    "last_terminated_exitcode": 255,
+                    "last_terminated_reason": "Unknown",
+                    "last_terminated_timestamp": 1744109218,
+                    "phase": "running",
+                    "ready": true,
+                    "restarts": 1
+                }
+            },
+            "namespace": "kube-system",
+            "node": {
+                "name": "kind-control-plane"
+            },
+            "pod": {
+                "name": "kube-proxy-mnz5s"
+            }
+        },
+        "metricset": {
+            "name": "state_container",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "container": {
+            "id": "525a938dded08d8a5174f09b33288bd9c8984a42c7ce0812dfe8f6494dd0f4e9",
+            "image": {
+                "name": "registry.k8s.io/kube-scheduler-amd64:v1.32.0"
             },
             "runtime": "containerd"
         },
@@ -601,12 +506,15 @@
                         "cores": 0.1
                     }
                 },
-                "id": "cd52120cda244a98ed01e9259381cbcd439bc087115d93c7573bada504dbb620",
+                "id": "525a938dded08d8a5174f09b33288bd9c8984a42c7ce0812dfe8f6494dd0f4e9",
                 "name": "kube-scheduler",
                 "status": {
+                    "last_terminated_exitcode": 1,
+                    "last_terminated_reason": "Error",
+                    "last_terminated_timestamp": 1744115202,
                     "phase": "running",
                     "ready": true,
-                    "restarts": 0
+                    "restarts": 5
                 }
             },
             "namespace": "kube-system",
@@ -628,9 +536,9 @@
     },
     {
         "container": {
-            "id": "54c671509ea7b99312164a5a49297e48eb0b724a8cb2459d2d3917a25ce0c585",
+            "id": "9cd6e1156b7d737ccd070e09c2acae648ef53cc2d8b8f28ae9e74638be274605",
             "image": {
-                "name": "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.12.0"
+                "name": "docker.io/library/alpine:3"
             },
             "runtime": "containerd"
         },
@@ -641,20 +549,20 @@
         },
         "kubernetes": {
             "container": {
-                "id": "54c671509ea7b99312164a5a49297e48eb0b724a8cb2459d2d3917a25ce0c585",
-                "name": "kube-state-metrics",
+                "id": "9cd6e1156b7d737ccd070e09c2acae648ef53cc2d8b8f28ae9e74638be274605",
+                "name": "sh",
                 "status": {
                     "phase": "running",
                     "ready": true,
                     "restarts": 0
                 }
             },
-            "namespace": "kube-system",
+            "namespace": "default",
             "node": {
                 "name": "kind-control-plane"
             },
             "pod": {
-                "name": "kube-state-metrics-5bcd4898-bntgt"
+                "name": "basic-sts-0"
             }
         },
         "metricset": {
@@ -668,9 +576,9 @@
     },
     {
         "container": {
-            "id": "1be2795038ca3a3a291a6aca5d7ecdfaf0b326453c74e471bab3064822f0bdfb",
+            "id": "c25e2f3ae6c2a4103847c94472f763f96fb3caf78c31fed71ddb18b80560722b",
             "image": {
-                "name": "registry.k8s.io/coredns/coredns:v1.11.1"
+                "name": "docker.io/library/busybox:latest"
             },
             "runtime": "containerd"
         },
@@ -686,73 +594,24 @@
                         "cores": 0.1
                     }
                 },
-                "id": "1be2795038ca3a3a291a6aca5d7ecdfaf0b326453c74e471bab3064822f0bdfb",
-                "memory": {
-                    "limit": {
-                        "bytes": 178257920
-                    },
-                    "request": {
-                        "bytes": 73400320
-                    }
-                },
-                "name": "coredns",
+                "id": "c25e2f3ae6c2a4103847c94472f763f96fb3caf78c31fed71ddb18b80560722b",
+                "name": "hello-app",
                 "status": {
-                    "phase": "running",
-                    "ready": true,
-                    "restarts": 0
+                    "last_terminated_exitcode": 0,
+                    "last_terminated_reason": "Completed",
+                    "last_terminated_timestamp": 1744115832,
+                    "phase": "terminated",
+                    "ready": false,
+                    "reason": "Completed",
+                    "restarts": 3
                 }
             },
-            "namespace": "kube-system",
+            "namespace": "default",
             "node": {
                 "name": "kind-control-plane"
             },
             "pod": {
-                "name": "coredns-76f75df574-v8skx"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "f4f832629b98ce1cefd9f409ab57dcd0850164fad75c46e3407b337679e39879",
-            "image": {
-                "name": "registry.k8s.io/kube-controller-manager-amd64:v1.29.1"
-            },
-            "runtime": "containerd"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "cpu": {
-                    "request": {
-                        "cores": 0.2
-                    }
-                },
-                "id": "f4f832629b98ce1cefd9f409ab57dcd0850164fad75c46e3407b337679e39879",
-                "name": "kube-controller-manager",
-                "status": {
-                    "phase": "running",
-                    "ready": true,
-                    "restarts": 0
-                }
-            },
-            "namespace": "kube-system",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "name": "kube-controller-manager-kind-control-plane"
+                "name": "hellohpa-5947cf467d-q5m9v"
             }
         },
         "metricset": {
