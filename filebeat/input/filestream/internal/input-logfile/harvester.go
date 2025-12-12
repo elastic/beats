@@ -206,6 +206,17 @@ func startHarvester(
 				ctx.Logger.Errorf("Harvester crashed with: %+v", err)
 				hg.readers.remove(srcID)
 			}
+<<<<<<< HEAD
+=======
+
+			// Report any harvester error as a degraded state for the input
+			if err != nil {
+				ctx.UpdateStatus(
+					status.Degraded,
+					fmt.Sprintf("Harvester for Filestream input %q failed: %s", inputID, err),
+				)
+			}
+>>>>>>> 72314a046 (Remove direct access to v2.Context.StatusReporter in Filestream (#48075))
 		}()
 
 		if restart {
