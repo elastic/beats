@@ -41,6 +41,7 @@ To configure the module, please utilize the default URL unless specified as the 
     enabled: true
     var.input: httpjson
     var.url: https://urlhaus-api.abuse.ch/v1/urls/recent/
+    var.api_token: 754dcaafbcb9740dc0d119e72d5eaad699cc4a5cdbc856fc6215883842ba8142
     var.interval: 60m
 ```
 
@@ -49,6 +50,10 @@ To configure the module, please utilize the default URL unless specified as the 
 
 **`var.url`**
 :   The URL of the API endpoint to connect with.
+
+**`var.api_token`**
+
+:   The Authentication key to access the API endpoint.
 
 **`var.interval`**
 :   How often the API is polled for updated information.
@@ -77,6 +82,7 @@ To configure the module, please utilize the default URL unless specified as the 
     enabled: true
     var.input: httpjson
     var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
+    var.api_token: 754dcaafbcb9740dc0d119e72d5eaad699cc4a5cdbc856fc6215883842ba8142
     var.interval: 60m
 ```
 
@@ -85,6 +91,10 @@ To configure the module, please utilize the default URL unless specified as the 
 
 **`var.url`**
 :   The URL of the API endpoint to connect with.
+
+**`var.api_token`**
+
+:   The Authentication key to access the API endpoint.
 
 **`var.interval`**
 :   How often the API is polled for updated information.
@@ -113,6 +123,7 @@ To configure the module, please utilize the default URL unless specified as the 
     enabled: true
     var.input: httpjson
     var.url: https://mb-api.abuse.ch/api/v1/
+    var.api_token: 754dcaafbcb9740dc0d119e72d5eaad699cc4a5cdbc856fc6215883842ba8142
     var.interval: 10m
 ```
 
@@ -121,6 +132,10 @@ To configure the module, please utilize the default URL unless specified as the 
 
 **`var.url`**
 :   The URL of the API endpoint to connect with.
+
+**`var.api_token`**
+
+:   The Authentication key to access the API endpoint.
 
 **`var.interval`**
 :   How often the API is polled for updated information.
