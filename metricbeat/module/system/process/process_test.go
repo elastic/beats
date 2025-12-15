@@ -20,12 +20,15 @@
 package process
 
 import (
+	"errors"
 	"os"
 	"runtime"
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -79,15 +82,14 @@ func TestFetchDegradeOnPartial(t *testing.T) {
 }
 
 func TestFetchSinglePid(t *testing.T) {
-
 	cfg := getConfig()
 	cfg["process.pid"] = os.Getpid()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, cfg)
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
-	assert.NotEmpty(t, events)
-	assert.Equal(t, os.Getpid(), events[0].RootFields["process"].(map[string]interface{})["pid"])
+	require.NotEmpty(t, events)
+	assert.Equal(t, os.Getpid(), requireGetSubMap(t, events[0].RootFields, "process")["pid"])
 	assert.NotEmpty(t, events[0].MetricSetFields["cpu"])
 }
 
@@ -104,8 +106,80 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func TestCgroupPressure(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("cgroup stats are only available on Linux")
+	}
+
+	cfg := getConfig()
+	cfg["process.pid"] = os.Getpid()
+
+	f := mbtest.NewReportingMetricSetV2Error(t, cfg)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	assert.Empty(t, errs)
+	require.NotEmpty(t, events)
+
+	// Get cgroup data from the event
+	cgroupData, err := events[0].MetricSetFields.GetValue("cgroup")
+	if errors.Is(err, mapstr.ErrKeyNotFound) {
+		t.Skip("cgroup data not available")
+	}
+	require.NoError(t, err)
+
+	cgroup, ok := cgroupData.(map[string]any)
+	require.Truef(t, ok, "unexpected cgroup data type: %T", cgroupData)
+
+	for _, subsystem := range []string{"cpu", "memory", "io"} {
+		t.Run(subsystem, func(t *testing.T) {
+			controller := requireGetSubMap(t, cgroup, subsystem)
+			t.Run("pressure", func(t *testing.T) {
+				// Pressure might not exist, be nil, or be empty depending on kernel configuration
+				_, ok := controller["pressure"]
+				if !ok {
+					t.Skip("pressure data not available on this cgroup")
+				}
+				pressure := requireGetSubMap(t, controller, "pressure")
+				if pressure == nil {
+					t.Skip("pressure data not available on this cgroup")
+				}
+				for _, stall := range []string{"some", "full"} {
+					t.Run(stall, func(t *testing.T) {
+						checkPressure(t, pressure, stall)
+					})
+				}
+			})
+		})
+	}
+}
+
+func checkPressure(t *testing.T, pressure map[string]any, stall string) {
+	// Verify pressure structure has expected fields
+	stallMap := requireGetSubMap(t, pressure, stall)
+
+	// Check for time window fields (10, 60, 300 seconds)
+	for _, window := range []string{"10", "60", "300"} {
+		windowMap := requireGetSubMap(t, stallMap, window)
+
+		// Check for pct field
+		assert.Contains(t, windowMap, "pct", "expected pressure.%s.%s.pct to exist", stall, window)
+	}
+
+	// Check for total field
+	assert.Contains(t, stallMap, "total", "expected pressure.%s.total to exist", stall)
+}
+
+func requireGetSubMap(t *testing.T, m map[string]any, key string) map[string]any {
+	t.Helper()
+	require.Contains(t, m, key)
+	rawValue := m[key]
+	require.IsType(t, rawValue, map[string]any{})
+	subMap, ok := rawValue.(map[string]any)
+	require.True(t, ok)
+	return subMap
+}
+
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":                        "system",
 		"metricsets":                    []string{"process"},
 		"processes":                     []string{".*"}, // in case we want a prettier looking example for data.json
