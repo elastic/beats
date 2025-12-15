@@ -68,4 +68,4 @@
           type: keyword
           description: ID of resource pool associated with the cluster.
           version:
-            ga: 9.3.0
+            ga: 9.1.10

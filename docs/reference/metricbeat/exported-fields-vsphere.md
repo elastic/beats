@@ -89,7 +89,7 @@ Cluster information.
     type: object
 
 
-**`vsphere.cluster.resourcepool.id`** {applies_to}`stack: ga 9.3.0`
+**`vsphere.cluster.resourcepool.id`** {applies_to}`stack: ga 9.1.10`
 :   ID of resource pool associated with the cluster.
 
     type: keyword
