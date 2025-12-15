@@ -68,7 +68,7 @@ type filestream struct {
 	parsers                   parser.Config
 	takeOver                  loginp.TakeOverConfig
 	scannerCheckInterval      time.Duration
-	compression          string
+	compression               string
 	includeFileOwnerName      bool
 	includeFileOwnerGroupName bool
 
@@ -143,7 +143,7 @@ func configure(
 		closerConfig:              c.Close,
 		parsers:                   c.Reader.Parsers,
 		takeOver:                  c.TakeOver,
-		compression:       c.Compression,
+		compression:               c.Compression,
 		includeFileOwnerName:      c.IncludeFileOwnerName,
 		includeFileOwnerGroupName: c.IncludeFileOwnerGroupName,
 		deleterConfig:             c.Delete,
