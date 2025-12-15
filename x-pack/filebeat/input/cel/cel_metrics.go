@@ -165,7 +165,7 @@ func (o *otelCELMetrics) AddProgramExecutionSuccess(ctx context.Context, count i
 func (o *otelCELMetrics) Shutdown(ctx context.Context) {
 	o.EndPeriodic(ctx)
 	// Consider adding an environment variable to control timeout time
-	timeOutContext, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	timeOutContext, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	var err error
 	for _, fn := range o.shutdownFuncs {
 		err = errors.Join(err, fn(timeOutContext))
@@ -173,6 +173,7 @@ func (o *otelCELMetrics) Shutdown(ctx context.Context) {
 	if err != nil {
 		o.log.Errorf("error shutting down metrics: %v", err)
 	}
+	cancel()
 }
 
 func newOTELCELMetrics(log *logp.Logger,
