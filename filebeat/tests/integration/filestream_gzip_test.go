@@ -278,7 +278,7 @@ logging.level: debug
 				Message string `json:"message"`
 			}
 			events := integration.GetEventsFromFileOutput[event](filebeat, 0, true)
-			require.Equal(t, len(events), 1, "expected one event")
+			require.Len(t, events, 1, "expected one event")
 
 			// assert the message is not the decompressed content
 			assert.NotEqual(t, "0: a log line", events[0].Message,
