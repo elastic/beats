@@ -11,11 +11,6 @@ import (
 	"time"
 )
 
-const (
-	maxPendingPerKey = 256
-	maxTotalPending = 8192
-)
-
 type eventWithMissingTemplate struct {
 	key       SessionKey
 	entryTime time.Time
@@ -57,6 +52,11 @@ type pendingTemplatesCache struct {
 	started bool
 	events  map[SessionKey][]*bytes.Buffer
 }
+
+const (
+	maxPendingPerKey = 512
+	maxTotalPending  = 16384
+)
 
 func newPendingTemplatesCache() *pendingTemplatesCache {
 	cache := &pendingTemplatesCache{
