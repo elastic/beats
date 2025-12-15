@@ -17,7 +17,9 @@ import (
 
 const (
 	VariableLength uint16 = 0xffff
-	// this creates a boundary for record allocations derived headers
+	// this creates a boundary for record allocations derived from headers
+	// max length of a Data Record Packet is 65535; a template would have to be
+	// shorter than 64 bytes for a packet to contain more Records
 	maxRecordsPerPacket = 1024
 )
 
@@ -75,10 +77,7 @@ func (t *Template) Apply(data *bytes.Buffer, n int) ([]record.Record, error) {
 	if t.Length == 0 {
 		return nil, ErrEmptyTemplate
 	}
-	var maxRecords int
-	if t.Length > 0 {
-		maxRecords = data.Len() / t.Length
-	}
+	maxRecords := data.Len() / t.Length
 	if n == 0 || n > maxRecords {
 		n = maxRecords
 	}
