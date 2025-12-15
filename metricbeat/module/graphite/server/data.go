@@ -163,7 +163,8 @@ func (t *template) Apply(parts []string) (string, mapstr.M) {
 	tagsMap := make(map[string][]string)
 
 	// Match template parts to corresponding metric parts.
-	for i, templatePart := range t.Parts[:min(len(t.Parts), len(parts))] {
+	for i := 0; i < min(len(t.Parts), len(parts)); i++ {
+		templatePart := t.Parts[i]
 		switch templatePart {
 		case "metric":
 			metric = append(metric, parts[i])
