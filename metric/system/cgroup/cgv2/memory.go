@@ -35,9 +35,10 @@ type MemorySubsystem struct {
 	ID   string `json:"id,omitempty"`   // ID of the cgroup.
 	Path string `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
 
-	Mem     MemoryData `json:"mem" struct:"mem"`     // Memory usage by tasks in this cgroup.
-	MemSwap MemoryData `json:"memsw" struct:"memsw"` // Memory plus swap usage by tasks in this cgroup.
-	Stats   MemoryStat `json:"stats" struct:"stats"` // A wide range of memory statistics.
+	Mem      MemoryData                   `json:"mem" struct:"mem"`                               // Memory usage by tasks in this cgroup.
+	MemSwap  MemoryData                   `json:"memsw" struct:"memsw"`                           // Memory plus swap usage by tasks in this cgroup.
+	Stats    MemoryStat                   `json:"stats" struct:"stats"`                           // A wide range of memory statistics.
+	Pressure map[string]cgcommon.Pressure `json:"pressure,omitempty" struct:"pressure,omitempty"` // Shows pressure stall information for memory.
 }
 
 // MemoryData contains basic metrics for the V2 controller
@@ -189,8 +190,16 @@ var keySetters = map[string]func(*MemoryStat, uint64){
 
 // Get fetches memory subsystem metrics for V2 cgroups
 func (mem *MemorySubsystem) Get(path string) error {
-
 	var err error
+	mem.Pressure, err = cgcommon.GetPressure(filepath.Join(path, "memory.pressure"))
+	// Not all systems have pressure stats. Treat this as a soft error.
+	if os.IsNotExist(err) {
+		err = nil
+	}
+	if err != nil {
+		return fmt.Errorf("error fetching memory.pressure data: %w", err)
+	}
+
 	mem.Mem, err = memoryData(path, "memory")
 	if err != nil {
 		return fmt.Errorf("error reading memory stats: %w", err)

@@ -46,8 +46,8 @@ func TestReaderOptsWithoutResolve(t *testing.T) {
 	require.NoError(t, err)
 
 	// actual value doesn't matter, the point is that we don't set RootfsMountpoint and we __don't__ get a nil pointer deref panic.
-	_, err = reader.CgroupsVersion(345)
-	require.Error(t, err)
+	got, err := reader.CgroupsVersion(345)
+	require.Errorf(t, err, "expected error, got: %v", got)
 }
 
 func TestV1EventDifferentPaths(t *testing.T) {

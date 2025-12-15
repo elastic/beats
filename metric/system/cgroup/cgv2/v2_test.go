@@ -24,7 +24,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgcommon"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/testhelpers"
 )
 
@@ -191,6 +194,73 @@ func TestGetMem(t *testing.T) {
 
 	assert.Equal(t, uint64(17756400), mem.Stats.SlabReclaimable.Bytes)
 	assert.Equal(t, uint64(12), mem.Stats.THPFaultAlloc)
+
+	// Test memory pressure stall information
+	expectedPressure := map[string]cgcommon.Pressure{
+		"some": {
+			Ten:          opt.Pct{Pct: 0.0},
+			Sixty:        opt.Pct{Pct: 0.0},
+			ThreeHundred: opt.Pct{Pct: 0.0},
+			Total:        opt.UintWith(0),
+		},
+		"full": {
+			Ten:          opt.Pct{Pct: 0.0},
+			Sixty:        opt.Pct{Pct: 0.0},
+			ThreeHundred: opt.Pct{Pct: 0.0},
+			Total:        opt.UintWith(0),
+		},
+	}
+	assert.Equal(t, expectedPressure, mem.Pressure)
+}
+
+func TestGetMemPressure(t *testing.T) {
+	// Create a temp directory with memory.pressure file containing non-zero values
+	tempDir := t.TempDir()
+
+	// Create a memory.pressure file with meaningful values
+	pressureContent := `some avg10=1.50 avg60=2.30 avg300=0.75 total=123456
+full avg10=0.80 avg60=1.20 avg300=0.40 total=78901
+`
+	err := os.WriteFile(tempDir+"/memory.pressure", []byte(pressureContent), 0644)
+	require.NoError(t, err)
+
+	// Create minimal required memory files
+	err = os.WriteFile(tempDir+"/memory.stat", []byte("anon 0\n"), 0644)
+	require.NoError(t, err)
+
+	mem := MemorySubsystem{}
+	err = mem.Get(tempDir)
+	assert.NoError(t, err, "error in Get")
+
+	expectedPressure := map[string]cgcommon.Pressure{
+		"some": {
+			Ten:          opt.Pct{Pct: 1.50},
+			Sixty:        opt.Pct{Pct: 2.30},
+			ThreeHundred: opt.Pct{Pct: 0.75},
+			Total:        opt.UintWith(123456),
+		},
+		"full": {
+			Ten:          opt.Pct{Pct: 0.80},
+			Sixty:        opt.Pct{Pct: 1.20},
+			ThreeHundred: opt.Pct{Pct: 0.40},
+			Total:        opt.UintWith(78901),
+		},
+	}
+	assert.Equal(t, expectedPressure, mem.Pressure)
+}
+
+func TestGetMemNoPressure(t *testing.T) {
+	// Test that memory subsystem works when memory.pressure doesn't exist
+	tempDir := t.TempDir()
+
+	// Create minimal required memory files but NOT memory.pressure
+	err := os.WriteFile(tempDir+"/memory.stat", []byte("anon 0\n"), 0644)
+	require.NoError(t, err)
+
+	mem := MemorySubsystem{}
+	err = mem.Get(tempDir)
+	assert.NoError(t, err, "error in Get - should not fail if memory.pressure is missing")
+	assert.Empty(t, mem.Pressure, "Pressure should be empty when memory.pressure file doesn't exist")
 }
 
 func TestGetCPU(t *testing.T) {
