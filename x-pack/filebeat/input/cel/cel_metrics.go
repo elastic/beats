@@ -100,11 +100,8 @@ func (o *otelCELMetrics) StartPeriodic(ctx context.Context) {
 
 // EndPeriodic ends the periodic metrics collection and manually exports metrics if a manual export function is set.
 func (o *otelCELMetrics) EndPeriodic(ctx context.Context) {
-	// use a different context to capture duration and have export function run even while shutting down.
-	// Consider adding an environment variable to control timeout time
-	timeOutContext, _ := context.WithTimeout(context.Background(), 30*time.Second)
 	if o.export {
-		o.periodicRunDuration.Add(timeOutContext, time.Since(o.startRunTime).Seconds())
+		o.periodicRunDuration.Add(ctx, time.Since(o.startRunTime).Seconds())
 	}
 	if o.manualExportFunc == nil || !o.export {
 		return
@@ -115,7 +112,7 @@ func (o *otelCELMetrics) EndPeriodic(ctx context.Context) {
 	o.export = false
 	o.log.Debug("otelCELMetrics manual export export")
 
-	err := o.manualExportFunc(timeOutContext)
+	err := o.manualExportFunc(ctx)
 	if err != nil {
 		o.log.Errorf("error exporting metrics: %v", err)
 	}
@@ -225,12 +222,14 @@ func newOTELCELMetrics(log *logp.Logger,
 					log.Debugf("otelCELMetrics could not marshall Collected metrics into json %v", collectedMetrics)
 				}
 			}
-			go func(ctx context.Context, log *logp.Logger, metricExporter sdkmetric.Exporter, collectedMetrics *metricdata.ResourceMetrics) {
-				err := metricExporter.Export(ctx, collectedMetrics)
+			go func(log *logp.Logger, metricExporter sdkmetric.Exporter, collectedMetrics *metricdata.ResourceMetrics) {
+				timeOutContext, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+				err := metricExporter.Export(timeOutContext, collectedMetrics)
 				if err != nil {
 					log.Error("Failed to export metrics: ", err)
 				}
-			}(ctx, log, metricExporter, collectedMetrics)
+				cancel()
+			}(log, metricExporter, collectedMetrics)
 			return nil
 		}
 	}
