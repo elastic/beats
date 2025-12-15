@@ -143,7 +143,7 @@ func (inp *managedInput) Run(
 				Name:            ctx.Name,
 				Agent:           ctx.Agent,
 				Cancelation:     ctx.Cancelation,
-				StatusReporter:  ctx.StatusReporter,
+				StatusReporter:  ctx,
 				MetricsRegistry: reg,
 				Logger:          log,
 			}
