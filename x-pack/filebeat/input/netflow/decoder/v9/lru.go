@@ -11,6 +11,11 @@ import (
 	"time"
 )
 
+const (
+	maxPendingPerKey = 256
+	maxTotalPending = 8192
+)
+
 type eventWithMissingTemplate struct {
 	key       SessionKey
 	entryTime time.Time
@@ -53,25 +58,22 @@ type pendingTemplatesCache struct {
 	events  map[SessionKey][]*bytes.Buffer
 }
 
-const (
-	maxPendingPerKey = 256
-	maxTotalPending  = 8192
-)
-
-func (h *pendingTemplatesCache) totalPendingLocked() int {
-	total := 0
-	for _, queued := range h.events {
-		total += len(queued)
-	}
-	return total
-}
-
 func newPendingTemplatesCache() *pendingTemplatesCache {
 	cache := &pendingTemplatesCache{
 		events: make(map[SessionKey][]*bytes.Buffer),
 		hp:     pendingEventsHeap{},
 	}
 	return cache
+}
+
+// totalPendingLocked counts the total number of pending events
+// across all template IDs we have seen
+func (h *pendingTemplatesCache) totalPendingLocked() int {
+	total := 0
+	for _, queued := range h.events {
+		total += len(queued)
+	}
+	return total
 }
 
 // GetAndRemove returns all events for a given session key and removes them from the cache
@@ -95,11 +97,16 @@ func (h *pendingTemplatesCache) Add(key SessionKey, events *bytes.Buffer) {
 	h.mtx.Lock()
 	defer h.mtx.Unlock()
 
-	q := h.events[key]
-	if len(q) >= maxPendingPerKey || h.totalPendingLocked() >= maxTotalPending {
+	if len(h.events[key]) > maxPendingPerKey {
 		return
 	}
-	h.events[key] = append(q, events)
+
+	totalPending := h.totalPendingLocked()
+	if totalPending >= maxTotalPending {
+		return
+	}
+
+	h.events[key] = append(h.events[key], events)
 	h.hp.Push(eventWithMissingTemplate{key: key, entryTime: time.Now()})
 }
 
