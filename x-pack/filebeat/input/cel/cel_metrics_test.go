@@ -21,7 +21,7 @@ import (
 
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 )
 
 func TestOTELCELMetrics(t *testing.T) {
@@ -98,7 +98,7 @@ func TestOTELCELMetrics(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to make request: %v", err)
 		}
-		defer resp.Body.Close()
+		resp.Body.Close()
 		celDuration := time.Since(startProgram)
 		totalCelDuration = totalCelDuration + celDuration
 		mRecorder.AddCELDuration(ctx, celDuration)

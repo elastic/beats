@@ -2,24 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// Package cel implements an input that uses the Common Expression Language to
-// perform requests and do endpoint processing of events. The cel package exposes
-// the github.com/elastic/mito/lib CEL extension library.
-//
-// # OpenTelemetry Metrics
-//
-// The CEL input exports OpenTelemetry metrics at the end of each periodic run.
-// Each export captures metrics for that interval only; counters reset between exports.
-//
-// Metrics export is disabled by default. Enable export to a OTLP/gRPC endpoint by setting environment variables:
-//
-//   - OTEL_EXPORTER_OTLP_ENDPOINT: Required. The OTLP endpoint URL.
-//   - OTEL_EXPORTER_OTLP_HEADERS: Required if endpoint is authenticated.
-//   - OTEL_RESOURCE_ATTRIBUTES: Optional but recommended
-//
-// See [otelCELMetrics] for more information about OTEL_RESOURCE_ATTRIBUTES and Open Telemetry ResourceAttributes
-// See [otel.ExportFactory] for environment settings to run console or http/protobuf output.
-// See [otelCELMetrics] for the complete list of exported metrics.
 package cel
 
 import (

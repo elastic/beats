@@ -1,22 +1,10 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-//
-// The MetricsExporterFactory reads environment variables and creates the metrics exporter requested
-// by the environment.
-//
-// To export OTEL metrics to an OTLP/gRPC endpoint set these environment variables:
-//   - OTEL_EXPORTER_OTLP_ENDPOINT: Required. The OTLP endpoint URL.
-//   - OTEL_EXPORTER_OTLP_HEADERS: Required if endpoint is authenticated.
-//
-// To export using the httt/protobuf protocol add this environment variable with the above environment variables:
-// - OTEL_EXPORTER_OTLP_METRICS_PROTOCOL="http/protobuf"
-//
-// To override other environment variables and print a JSON representation of the metrics to console set:
-// - OTEL_METRICS_EXPORTER=console
-//
-// To override other environment variables and disable OTEL metrics collection set:
-// - OTEL_METRICS_EXPORTER=none
+
+// Package otel provides Open Telemetry Exporters and Encoders. The package
+// provides a global Exporter that is separate from the SDK global Exporter
+// to allow inputs to share an Exporter that is separate from the application.
 package otel
 
 import (
@@ -32,12 +20,6 @@ import (
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 )
-
-// init() Creates a singleton MetricsExporterFactory that can be used to create
-// global exporters.
-func init() {
-	exporterFactory = NewMetricsExporterFactory(GetDefaultMetricExporterOptions())
-}
 
 // A global singleton factory. This is set by GetGlobalMetricsExporterFactory()
 // This singleton can return a global Exporter that can be used by all the inputs.
@@ -57,32 +39,43 @@ const (
 
 // MetricExporterOptions are options used to create the Exporter.
 type MetricExporterOptions struct {
-	grpcOptions    []otlpmetricgrpc.Option
-	consoleOptions []stdoutmetric.Option
-	httpOptions    []otlpmetrichttp.Option
+	GrpcOptions    []otlpmetricgrpc.Option
+	ConsoleOptions []stdoutmetric.Option
+	HttpOptions    []otlpmetrichttp.Option
 }
 
-// GetDefaultMetricExporterOptions() returns the default set of MetricExporterOptions
+// GetDefaultMetricExporterOptions returns the default set of MetricExporterOptions.
 func GetDefaultMetricExporterOptions() MetricExporterOptions {
 	return MetricExporterOptions{
-		grpcOptions: []otlpmetricgrpc.Option{otlpmetricgrpc.WithTemporalitySelector(DeltaSelector)},
-		consoleOptions: []stdoutmetric.Option{
+		GrpcOptions: []otlpmetricgrpc.Option{otlpmetricgrpc.WithTemporalitySelector(DeltaSelector)},
+		ConsoleOptions: []stdoutmetric.Option{
 			stdoutmetric.WithPrettyPrint(),
 			stdoutmetric.WithTemporalitySelector(DeltaSelector),
 			stdoutmetric.WithEncoder(&ConcurrentEncoder{Encoder: json.NewEncoder(os.Stdout)}),
 		},
-		httpOptions: []otlpmetrichttp.Option{otlpmetrichttp.WithTemporalitySelector(DeltaSelector)},
+		HttpOptions: []otlpmetrichttp.Option{otlpmetrichttp.WithTemporalitySelector(DeltaSelector)},
 	}
 }
 
-// MetricsExporterFactory reads environment variables and creates the Exporter based on these
-// environment variables. The Exporter is created using the MetricExporterOptions in the
-// exporterOptions field.
-// An exporter that can be used by multiple inputs, globalMetricsExporter, can be created.
+// The MetricsExporterFactory reads environment variables and creates the metrics exporter requested
+// by the environment.
+//
+// To export OTEL metrics to an OTLP/gRPC endpoint set these environment variables:
+//   - OTEL_EXPORTER_OTLP_ENDPOINT: Required. The OTLP endpoint URL.
+//   - OTEL_EXPORTER_OTLP_HEADERS: Required if endpoint is authenticated.
+//
+// To export using the http/protobuf protocol add this environment variable with the above environment variables:
+//   - OTEL_EXPORTER_OTLP_METRICS_PROTOCOL="http/protobuf"
+//
+// To override other environment variables and print a JSON representation of the metrics to console set:
+//   - OTEL_METRICS_EXPORTER=console
+//
+// To override other environment variables and disable OTEL metrics collection set:
+//   - OTEL_METRICS_EXPORTER=none
 type MetricsExporterFactory struct {
 	lock                  sync.Mutex
-	exporterOptions       MetricExporterOptions
 	globalMetricsExporter sdkmetric.Exporter
+	exporterOptions       MetricExporterOptions
 }
 
 // initializeGlobalMetricsExporterFactory creates the global exporter factory
@@ -109,11 +102,12 @@ func NewMetricsExporterFactory(exporterOptions MetricExporterOptions) *MetricsEx
 	}
 }
 
-// GetExporter returns an Exporter
-//     ctx context.Context: A context object created using the Go standard library.
-//     global bool: if true, returns the global Exporter. If false, it generates a new Exporter.
+// GetExporter returns a metrics exporter based on the current environment
+// configuration.
 //
-
+// If global is true, GetExporter returns the cached global exporter, creating it
+// on first use. If global is false, GetExporter always creates and returns a new
+// exporter.
 func (ef *MetricsExporterFactory) GetExporter(ctx context.Context, global bool) (sdkmetric.Exporter, ExporterType, error) {
 	exporterType := GetExporterTypeFromEnv()
 	var err error
@@ -126,12 +120,12 @@ func (ef *MetricsExporterFactory) GetExporter(ctx context.Context, global bool) 
 	var exporter sdkmetric.Exporter
 	switch exporterType {
 	case console:
-		exporter, err = stdoutmetric.New(ef.exporterOptions.consoleOptions...)
+		exporter, err = stdoutmetric.New(ef.exporterOptions.ConsoleOptions...)
 	case GRPC:
-		exporter, err = otlpmetricgrpc.New(ctx, ef.exporterOptions.grpcOptions...)
+		exporter, err = otlpmetricgrpc.New(ctx, ef.exporterOptions.GrpcOptions...)
 
 	case HTTP:
-		exporter, err = otlpmetrichttp.New(ctx, ef.exporterOptions.httpOptions...)
+		exporter, err = otlpmetrichttp.New(ctx, ef.exporterOptions.HttpOptions...)
 
 	default:
 		exporter = nil
