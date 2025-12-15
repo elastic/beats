@@ -69,24 +69,21 @@ filebeat.inputs:
 1. Harvests lines from two files:  `system.log` and `wifi.log`.
 2. Harvests lines from every file in the `apache2` directory, and uses the `fields` configuration option to add a field called `apache` to the output.
 
-## Reading GZIP files
+## Reading GZIP files [reading-gzip-files]
 
 ```{applies_to}
-stack: beta 9.2.0
+stack: ga 9.3.0, beta 9.2.0
 ```
 
-::::{warning}
-This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
-::::
-
-The `filestream` input can ingest GZIP files as a **beta** feature.
+The `filestream` input can ingest GZIP files.
 A GZIP file is treated like any other file, with the same guarantees `filestream`
 offers. This includes offset tracking and resuming from partially read files.
 
 Filestream decompresses GZIP files in memory as data is read. It
 respects [`buffer_size`](#_buffer_size), reading up to `buffer_size` of decompressed data.
 
-To enable it, set `gzip_experimental` to `true`.
+To enable it, set `compression` to `auto`. For more details refer to
+[`compression`](#filebeat-input-filestream-compression).
 
 ```yaml
 filebeat.inputs:
@@ -94,7 +91,7 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - /var/some-app/app.log*
-    gzip_experimental: true
+    compression: auto
 ```
 
 Reading GZIP files requires the [`file_identity`](#filebeat-input-filestream-file-identity)
@@ -695,6 +692,45 @@ See [Regular expression support](/reference/filebeat/regexp-support.md) for a li
 ### `buffer_size` [_buffer_size]
 
 The size in bytes of the buffer that each harvester uses when fetching a file. The default is 16384.
+
+### `compression` [filebeat-input-filestream-compression]
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies how file compression is handled. Valid values are:
+
+**`""` (empty string or not set)**
+:   Disables compression handling. All files are treated as plain text. This is the default.
+
+**`gzip`**
+:   Treats all files as GZIP compressed. Use this when you know all files matching your `paths` are GZIP files.
+
+**`auto`**
+:   Auto-detects GZIP files. Files are checked for GZIP magic bytes, and decompression is applied only to actual GZIP files. Plain text files are read normally.
+
+```yaml
+filebeat.inputs:
+  - type: filestream
+    id: "my-filestream"
+    paths:
+      - /var/log/app/*.log*
+    compression: auto
+```
+
+See [Reading GZIP files](#reading-gzip-files) for more details on GZIP support.
+
+### `gzip_experimental` (deprecated) [filebeat-input-filestream-gzip-experimental]
+
+```{applies_to}
+stack: removed 9.3.0, beta 9.2.0
+```
+
+:::{note}
+`gzip_experimental` is deprecated and ignored. Use [`compression`](#filebeat-input-filestream-compression) instead.
+:::
+
+When set to `true`, enables GZIP file reading with auto-detection.
 
 ### `message_max_bytes` [_message_max_bytes]
 
