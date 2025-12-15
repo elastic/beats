@@ -43,9 +43,9 @@ output.console:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
 	mockbeat.Stop()
-	mockbeat.WaitForLogs("mockbeat stopped.", 30*time.Second)
+	mockbeat.WaitLogsContains("mockbeat stopped.", 30*time.Second)
 }
 
 func TestSigHUP(t *testing.T) {
@@ -66,19 +66,19 @@ output.console:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
-	err := mockbeat.Process.Signal(syscall.SIGHUP)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
+	err := mockbeat.Cmd.Process.Signal(syscall.SIGHUP)
 	require.NoErrorf(t, err, "error sending SIGHUP to mockbeat")
 	mockbeat.Stop()
-	mockbeat.WaitForLogs("mockbeat stopped.", 30*time.Second)
+	mockbeat.WaitLogsContains("mockbeat stopped.", 30*time.Second)
 }
 
 func TestNoConfig(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.Start()
-	procState, err := mockbeat.Process.Wait()
-	require.NoError(t, err, "error waiting for mockbeat to exit")
-	require.Equal(t, 1, procState.ExitCode(), "incorrect exit code")
+	err := mockbeat.Cmd.Wait()
+	require.Error(t, err, "mockbeat must exit with error code")
+	require.Equal(t, 1, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitStdErrContains("error loading config file", 10*time.Second)
 }
 
@@ -91,9 +91,9 @@ test:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	procState, err := mockbeat.Process.Wait()
-	require.NoError(t, err, "error waiting for mockbeat to exit")
-	require.Equal(t, 1, procState.ExitCode(), "incorrect exit code")
+	err := mockbeat.Cmd.Wait()
+	require.Error(t, err, "mockbeat must exit with an error")
+	require.Equal(t, 1, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitStdErrContains("error loading config file", 10*time.Second)
 }
 
@@ -112,9 +112,9 @@ output.console:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", "-d", "config", "-E", "output.console=invalid")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	procState, err := mockbeat.Process.Wait()
-	require.NoError(t, err, "error waiting for mockbeat to exit")
-	require.Equal(t, 1, procState.ExitCode(), "incorrect exit code")
+	err := mockbeat.Cmd.Wait()
+	require.Error(t, err, "mockbeat must exit with an error")
+	require.Equal(t, 1, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitStdErrContains("error unpacking config data", 10*time.Second)
 }
 
@@ -205,5 +205,6 @@ output.console:
 	mockbeat.Start()
 	mockbeat.WaitStdErrContains("mockbeat start running.", 10*time.Second)
 	metaFile2, err := mockbeat.LoadMeta()
+	require.NoError(t, err, "LoadMeta returned an error")
 	require.Equal(t, metaFile1.UUID.String(), metaFile2.UUID.String())
 }

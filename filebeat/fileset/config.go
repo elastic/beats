@@ -60,10 +60,10 @@ func NewFilesetConfig(cfg *conf.C) (*FilesetConfig, error) {
 // mergePathDefaults returns a copy of c containing the path variables that must
 // be available for variable expansion in module configuration (e.g. it enables
 // the use of ${path.config} in module config).
-func mergePathDefaults(c *conf.C) (*conf.C, error) {
+func mergePathDefaults(c *conf.C, beatPaths *paths.Path) (*conf.C, error) {
 	defaults := conf.MustNewConfigFrom(map[string]interface{}{
 		"path": map[string]interface{}{
-			"home":   paths.Paths.Home,
+			"home":   beatPaths.Home,
 			"config": "${path.home}",
 			"data":   filepath.Join("${path.home}", "data"),
 			"logs":   filepath.Join("${path.home}", "logs"),

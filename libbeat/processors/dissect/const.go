@@ -61,4 +61,5 @@ var (
 	errEmptyKey                  = errors.New("empty key")
 	errInvalidDatatype           = errors.New("invalid data type")
 	errMissingDatatype           = errors.New("missing data type")
+	errInvalidFieldName          = errors.New("invalid field name")
 )
