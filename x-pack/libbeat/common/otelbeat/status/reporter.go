@@ -84,15 +84,15 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 		}
 	}
 
-	// report sub component status
+	// report aggregated status for all sub-components
 	evt := r.calculateOtelStatus()
 	r.emitDummyStatus(evt)
 	componentstatus.ReportStatus(r.host, evt)
 }
 
-// UpdateStatus reports the status of the group reporter.
-// This will override all sub-reporter statuses.
-// This is useful when the overall component fails independently of the sub-reporters.
+// UpdateStatus reports the overall status of the group.
+// This is useful to report any failures encountered before a runner is initialized.
+// Note: This will override all sub-reporter statuses if any
 func (r *reporter) UpdateStatus(status status.Status, msg string) {
 	otelStatus := beatStatusToOtelStatus(status)
 	if otelStatus == componentstatus.StatusNone {
@@ -117,6 +117,7 @@ func (r *reporter) emitDummyStatus(evt *componentstatus.Event) {
 	}
 }
 
+// calculateOtelStatus aggregates the statuses of all runners
 func (r *reporter) calculateOtelStatus() *componentstatus.Event {
 	var evt *componentstatus.Event
 	s, msg := r.calculateAggregateState()
