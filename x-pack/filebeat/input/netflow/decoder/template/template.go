@@ -75,7 +75,7 @@ func (t *Template) Apply(data *bytes.Buffer, n int) ([]record.Record, error) {
 	if t.Length == 0 {
 		return nil, ErrEmptyTemplate
 	}
-	maxRecords := 0
+	var maxRecords int
 	if t.Length > 0 {
 		maxRecords = data.Len() / t.Length
 	}
