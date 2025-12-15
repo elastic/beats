@@ -168,6 +168,7 @@ steps:
           - "filebeat/build/input-test/**/*"
           - "filebeat/build/integration-tests/*"
           - "filebeat/build/integration-tests/Test*/*"
+          - "filebeat/build/integration-tests/Test*/**/*"
           - "filebeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
@@ -194,6 +195,7 @@ steps:
           - "filebeat/build/input-test/**/*"
           - "filebeat/build/integration-tests/*"
           - "filebeat/build/integration-tests/Test*/*"
+          - "filebeat/build/integration-tests/Test*/**/*"
           - "filebeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
@@ -222,6 +224,7 @@ steps:
           - "filebeat/build/input-test/**/*"
           - "filebeat/build/integration-tests/*"
           - "filebeat/build/integration-tests/Test*/*"
+          - "filebeat/build/integration-tests/Test*/**/*"
           - "filebeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
