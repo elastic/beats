@@ -1,0 +1,120 @@
+version: 8.19.9
+entries:
+    - kind: bug-fix
+      summary: '[Filestream] ensure harvester always restarts if the file has not been fully ingested.'
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47107
+      issue:
+        - https://github.com/elastic/beats/issues/46923
+      impact: ""
+      action: ""
+      timestamp: 1760488402
+      file:
+        name: 1760488402-Prevent-modified-files-close-due-to-inactivity.yaml
+        checksum: 962de2ae400dafee98806df52af667c8bef29363
+    - kind: bug-fix
+      summary: rpc_fragment_sanitization
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47803
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1764181634
+      file:
+        name: 1764181634-rpc_fragment_sanitization.yaml
+        checksum: ba005922d6bfc94a433cfdef282f58c05f46a88e
+    - kind: feature
+      summary: k8s_container_allocatable
+      description: Updates kubernetes cpu and memory metrics to use allocatable values instead of capacity values.
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48088
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1764319984
+      file:
+        name: 1764319984-k8s_container_allocatable.yaml
+        checksum: 06446f3b975740a891c137ddc6d1fc4d38d49d2c
+    - kind: bug-fix
+      summary: Prevent panic during startup if dissect processor has invalid field name in tokenizer
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48088
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1764614942
+      file:
+        name: 1764614942-fix-panic-in-dissect-processor-with-invalid-field-name.yaml
+        checksum: 8be30cc83742127414dac9c61a2d353fd4fa2697
+    - kind: bug-fix
+      summary: verify and cap memcache udp fragment counts
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48088
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1764710604
+      file:
+        name: 1764710604-memcache-udp-fragment-check.yaml
+        checksum: e19d129d24d0ca9e4d588172491b4c11e5e5e812
+    - kind: other
+      summary: Bump golang version to 1.24.11.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47903
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1764715502
+      file:
+        name: 1764715502-bump-golang-12411.yaml
+        checksum: 4438acc3725f02b150683ea72ef7cf1f1f9a1ecb
+    - kind: bug-fix
+      summary: Improve defensive checks to prevent panics in meraki module
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48088
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1765018492
+      file:
+        name: 1765018492-improve-meraki-defensive-checks.yaml
+        checksum: 04c94a42ea65cfa82cd66b03a165f006df1af796
+    - kind: feature
+      summary: ipfrag2
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48088
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1765279149
+      file:
+        name: 1765279149-ipfrag2.yaml
+        checksum: db1ac94f13ebff3eb9df1481079e84265025dc0f
+    - kind: feature
+      summary: Make beats receivers emit status for their subcomponents
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/48088
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1765389915
+      file:
+        name: 1765389915-beat-receiver-subcomponent-status.yaml
+        checksum: 105897a8cfd767d1eac0497a8f0116d27f61d1b7
