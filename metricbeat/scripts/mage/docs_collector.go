@@ -141,19 +141,16 @@ func createDocsPath(module string) error {
 // testIfDocsInDir tests for a `_meta/docs.md` in a given directory
 func testIfDocsInDir(moduleDir string) bool {
 	_, err := os.Stat(filepath.Join(moduleDir, "_meta/docs.md"))
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 // compile and run the seprate go script to generate a list of default metricsets.
 // This is done so a compile-time issue in metricbeat doesn't break the docs build
 func getDefaultMetricsets() (map[string][]string, error) {
 
-	runpaths := []string{
-		mage.OSSBeatDir("scripts/msetlists/cmd/main.go"),
-		mage.XPackBeatDir("scripts/msetlists/main.go"),
+	runpaths := [][]string{
+		{"run", mage.OSSBeatDir("scripts/msetlists/cmd/main.go")},
+		{"run", mage.XPackBeatDir("scripts/msetlists/main.go"), "--module", mage.XPackBeatDir("module")},
 	}
 
 	var masterMap = make(map[string][]string)
@@ -163,11 +160,10 @@ func getDefaultMetricsets() (map[string][]string, error) {
 		return masterMap, nil
 	}
 
-	cmd := []string{"run"}
 	for _, dir := range runpaths {
-		rawMap, err := sh.OutCmd("go", append(cmd, dir)...)()
+		rawMap, err := sh.OutCmd("go", dir...)()
 		if err != nil {
-			return nil, fmt.Errorf("Error running subcommand to get metricsets: %w", err)
+			return nil, fmt.Errorf("error running subcommand to get metricsets: %w", err)
 		}
 		var msetMap = make(map[string][]string)
 		err = json.Unmarshal([]byte(rawMap), &msetMap)

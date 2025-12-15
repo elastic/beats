@@ -19,6 +19,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"os"
 
@@ -29,10 +30,17 @@ import (
 )
 
 func main() {
+	modulePath := flag.String(
+		"module",
+		"../../metricbeat/module",
+		"Path to Metricbeat module directory",
+	)
+	flag.Parse()
+
 	// Disable permission checks so it reads light modules in any case
 	os.Setenv("BEAT_STRICT_PERMS", "false")
 
-	lm := mb.NewLightModulesSource(logp.NewNopLogger(), "./module")
+	lm := mb.NewLightModulesSource(logp.NewNopLogger(), *modulePath)
 	mb.Registry.SetSecondarySource(lm)
 
 	msList := msetlists.DefaultMetricsets()
