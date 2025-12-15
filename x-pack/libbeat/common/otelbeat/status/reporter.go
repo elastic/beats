@@ -35,7 +35,7 @@ func toPdata(r *runnerState) pcommon.Map {
 // RunnerReporter defines an interface that returns a StatusReporter for a specific runner.
 // This is used for grouping and managing statuses of multiple runners
 type RunnerReporter interface {
-	GetReporterForRunner(id uint64) status.StatusReporter
+	GetReporterForRunner(id string) status.StatusReporter
 
 	// UpdateStatus updates the group status of a runnerReporter
 	UpdateStatus(status status.Status, msg string)
@@ -84,12 +84,30 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 		}
 	}
 
-	// report status to parent reporter
-	r.UpdateStatus()
+	// report sub component status
+	evt := r.calculateOtelStatus()
+	r.emitDummyStatus(evt)
+	componentstatus.ReportStatus(r.host, evt)
 }
 
-func (r *reporter) UpdateStatus() {
-	evt := r.calculateOtelStatus()
+// UpdateStatus reports the status of the group reporter.
+// This will override all sub-reporter statuses.
+// This is useful when the overall component fails independently of the sub-reporters.
+func (r *reporter) UpdateStatus(status status.Status, msg string) {
+	otelStatus := beatStatusToOtelStatus(status)
+	if otelStatus == componentstatus.StatusNone {
+		return
+	}
+	var eventBuilderOpts []componentstatus.EventBuilderOption
+	if componentstatus.StatusIsError(otelStatus) {
+		eventBuilderOpts = append(eventBuilderOpts, componentstatus.WithError(errors.New(msg)))
+	}
+	evt := componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
+	r.emitDummyStatus(evt)
+	componentstatus.ReportStatus(r.host, evt)
+}
+
+func (r *reporter) emitDummyStatus(evt *componentstatus.Event) {
 	oppositeStatus := getOppositeStatus(evt.Status())
 	if oppositeStatus != componentstatus.StatusNone {
 		// emit a dummy event first to ensure the otel core framework acknowledges the change
@@ -97,7 +115,6 @@ func (r *reporter) UpdateStatus() {
 		dummyEvt := componentstatus.NewEvent(oppositeStatus)
 		componentstatus.ReportStatus(r.host, dummyEvt)
 	}
-	componentstatus.ReportStatus(r.host, evt)
 }
 
 func (r *reporter) calculateOtelStatus() *componentstatus.Event {
