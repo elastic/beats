@@ -52,6 +52,9 @@ Open Telemetry Metrics for CEL Input
 
 CEL Metrics are sent as Delta metrics for each Periodic Run (Interval).
 Export occurs as a push to an OTLP endpoint at the end of the Periodic Run. Metrics are reset between Periodic Runs.
+Metrics are collected at several points during the CEL input periodic run see the diagram
+https://github.com/elastic/beats/tree/main/x-pack/filebeat/input/cel/cel_metric_collection.png for collection points.
+
 CEL Metrics exported for each periodic run:
   Name                                        Description                                                                              Metric Type
 
