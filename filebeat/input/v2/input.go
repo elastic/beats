@@ -99,11 +99,18 @@ type Context struct {
 	Agent beat.Info
 
 	// Cancelation is used by Beats to signal the input to shut down.
+	//
+	// An input started with a Context parameter, ctx, must shut down when
+	// <-ctx.Cancelation.Done() does not block or when ctx.Cancelation.Error()
+	// returns a non-nil error. If an input is started with a specific Context
+	// it should only shut down in response to that Context's Cancelation.
 	Cancelation Canceler
 
 	// StatusReporter provides a method to update the status of the underlying unit
 	// that maps to the config. Note: Under standalone execution of Filebeat this is
 	// expected to be nil.
+	// Deprecated: Direct access to StatusReporter is deprecated because it
+	// can be nil, use the UpdateStatus method instead
 	StatusReporter status.StatusReporter
 
 	// MetricsRegistry is the registry collecting metrics for the input using
@@ -221,6 +228,11 @@ type TestContext struct {
 	Agent beat.Info
 
 	// Cancelation is used by Beats to signal the input to shut down.
+	//
+	// An input started with a Context parameter, ctx, must shut down when
+	// <-ctx.Cancelation.Done() does not block or when ctx.Cancelation.Error()
+	// returns a non-nil error. If an input is started with a specific Context
+	// it should only shut down in response to that Context's Cancelation.
 	Cancelation Canceler
 }
 
