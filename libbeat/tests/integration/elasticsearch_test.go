@@ -77,13 +77,13 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	}
 
 	// 3. Wait for connection error logs
-	mockbeat.WaitForLogs(
+	mockbeat.WaitLogsContains(
 		fmt.Sprintf(`Get \"%s\": dial tcp %s: connect: connection refused`, esAddr, esURL.Host),
 
 		2*time.Second,
 		"did not find connection refused error")
 
-	mockbeat.WaitForLogs(
+	mockbeat.WaitLogsContains(
 		fmt.Sprintf("Attempting to reconnect to backoff(elasticsearch(%s)) with 2 reconnect attempt(s)", esAddr),
 		2*time.Second,
 		"did not find two tries to reconnect")
@@ -92,7 +92,7 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	s, _, _, mr = StartMockES(t, ":4242", 0, 0, 0, 0, 0)
 
 	// 5. Wait for reconnection logs
-	mockbeat.WaitForLogs(
+	mockbeat.WaitLogsContains(
 		fmt.Sprintf("Connection to backoff(elasticsearch(%s)) established", esAddr),
 		5*time.Second, // There is a backoff, so ensure we wait enough
 		"did not find re connection confirmation")
@@ -128,8 +128,8 @@ logging.level: debug
 	mockbeat.Start()
 
 	// 1. wait mockbeat to start
-	mockbeat.WaitForLogs(
-		"mockbeat start running",
+	mockbeat.WaitLogsContains(
+		fmt.Sprint("mockbeat start running"),
 		10*time.Second,
 		"did not find 'mockbeat start running' log")
 
@@ -138,20 +138,20 @@ logging.level: debug
 	require.NoError(t, err, "could not rotate CA")
 
 	// 3. Wait for cert change detection logs
-	mockbeat.WaitForLogs(
+	mockbeat.WaitLogsContains(
 		fmt.Sprintf("some of the following files have been modified: [%s]", caPath),
 		10*time.Second,
 		"did not detect CA rotation")
 
 	// 4. Wait for CA load log
-	mockbeat.WaitForLogs(
+	mockbeat.WaitLogsContains(
 		fmt.Sprintf("Successfully loaded CA certificate: %s", caPath),
 		10*time.Second,
 		"did not find 'Successfully loaded CA' log")
 
 	// 5. wait mockbeat to start again
-	mockbeat.WaitForLogs(
-		"mockbeat start running",
+	mockbeat.WaitLogsContains(
+		fmt.Sprint("mockbeat start running"),
 		10*time.Second,
 		"did not find 'mockbeat start running' log again")
 }
