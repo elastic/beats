@@ -119,7 +119,7 @@ func (m *ClusterMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 
 	// Retrieve summary property for all Clusters
 	var clt []mo.ClusterComputeResource
-	err = v.Retrieve(ctx, []string{"ClusterComputeResource"}, []string{"name", "host", "network", "datastore", "configuration", "triggeredAlarmState"}, &clt)
+	err = v.Retrieve(ctx, []string{"ClusterComputeResource"}, []string{"name", "host", "network", "datastore", "configuration", "triggeredAlarmState", "resourcePool"}, &clt)
 	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
