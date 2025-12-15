@@ -506,23 +506,37 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		metricTypes = make(map[string]model.MetricType)
 	)
 
+	// safeExemplar wraps parser.Exemplar with panic recovery.
+	// Returns false if parsing fails or if a panic occurs.
 	safeExemplar := func(e *exemplar.Exemplar) (ok bool) {
+		ok = false
 		defer func() {
-			if r := recover(); r != nil && logger != nil {
-				logger.Debugf("Recovered from panic while parsing exemplar: %v", r)
+			if r := recover(); r != nil {
+				ok = false
+				if logger != nil {
+					logger.Debugf("Recovered from panic while parsing exemplar: %v", r)
+				}
 			}
 		}()
-		return parser.Exemplar(e)
+		ok = parser.Exemplar(e)
+		return
 	}
 
+	// safeLabels wraps parser.Labels with panic recovery.
+	// Returns false if a panic occurs, true otherwise.
 	safeLabels := func(lset *labels.Labels) (ok bool) {
+		ok = false
 		defer func() {
-			if r := recover(); r != nil && logger != nil {
-				logger.Debugf("Recovered from panic while parsing labels: %v", r)
+			if r := recover(); r != nil {
+				ok = false
+				if logger != nil {
+					logger.Debugf("Recovered from panic while parsing labels: %v", r)
+				}
 			}
 		}()
 		parser.Labels(lset)
-		return true
+		ok = true
+		return
 	}
 
 	for {
