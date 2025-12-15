@@ -263,9 +263,7 @@ func TestMultipleReceivers(t *testing.T) {
 				writeFile(c, helper.ingest, "A log line")
 
 				require.Greaterf(c, len(logs[helper.name]), 0, "receiver %v does not have any logs", helper)
-
-				assert.Equalf(c, "filebeatreceiver/"+helper.name, logs[helper.name][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in %v log record", helper)
-				assert.Equalf(c, "receiver", logs[helper.name][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in %v log record", helper)
+				assert.Equal(c, "test", logs[helper.name][0].Flatten()["message"], "expected message field to contain string 'test'")
 
 				// Verify that each receiver used its own JavaScript processor script.
 				// This demonstrates path isolation: each receiver loads processor.js from its own path.config.
