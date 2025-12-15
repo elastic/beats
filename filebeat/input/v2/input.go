@@ -109,6 +109,8 @@ type Context struct {
 	// StatusReporter provides a method to update the status of the underlying unit
 	// that maps to the config. Note: Under standalone execution of Filebeat this is
 	// expected to be nil.
+	// Deprecated: Direct access to StatusReporter is deprecated because it
+	// can be nil, use the UpdateStatus method instead
 	StatusReporter status.StatusReporter
 
 	// MetricsRegistry is the registry collecting metrics for the input using
