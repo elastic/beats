@@ -64,6 +64,11 @@ type config struct {
 	// Deprecated.
 	GZIPExperimental *bool `config:"gzip_experimental"`
 
+	// Whether to add the file owner name and group to the event metadata.
+	// Disabled by default.
+	IncludeFileOwnerName      bool `config:"include_file_owner_name"`
+	IncludeFileOwnerGroupName bool `config:"include_file_owner_group_name"`
+
 	// -1 means that registry will never be cleaned, disabling clean_inactive.
 	// Setting it to 0 also disables clean_inactive
 	// "clean_inactive" is parsed, again, and used by internal/input-logfile/manager.go
@@ -146,15 +151,17 @@ type copyTruncateConfig commonRotationConfig
 
 func defaultConfig() config {
 	return config{
-		Reader:         defaultReaderConfig(),
-		Paths:          []string{},
-		Close:          defaultCloserConfig(),
-		CleanInactive:  -1,
-		CleanRemoved:   true,
-		HarvesterLimit: 0,
-		IgnoreOlder:    0,
-		Delete:         defaultDeleterConfig(),
-		FileWatcher:    defaultFileWatcherConfig(), // Config key: prospector.scanner
+		Reader:                    defaultReaderConfig(),
+		Paths:                     []string{},
+		Close:                     defaultCloserConfig(),
+		IncludeFileOwnerName:      false,
+		IncludeFileOwnerGroupName: false,
+		CleanInactive:             -1,
+		CleanRemoved:              true,
+		HarvesterLimit:            0,
+		IgnoreOlder:               0,
+		Delete:                    defaultDeleterConfig(),
+		FileWatcher:               defaultFileWatcherConfig(), // Config key: prospector.scanner
 	}
 }
 

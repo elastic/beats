@@ -61,14 +61,16 @@ type fileMeta struct {
 // filestream is the input for reading from files which
 // are actively written by other applications.
 type filestream struct {
-	readerConfig         readerConfig
-	encodingFactory      encoding.EncodingFactory
-	closerConfig         closerConfig
-	deleterConfig        deleterConfig
-	parsers              parser.Config
-	takeOver             loginp.TakeOverConfig
-	scannerCheckInterval time.Duration
+	readerConfig              readerConfig
+	encodingFactory           encoding.EncodingFactory
+	closerConfig              closerConfig
+	deleterConfig             deleterConfig
+	parsers                   parser.Config
+	takeOver                  loginp.TakeOverConfig
+	scannerCheckInterval      time.Duration
 	compression          string
+	includeFileOwnerName      bool
+	includeFileOwnerGroupName bool
 
 	// Function references for testing
 	waitGracePeriodFn func(
@@ -136,17 +138,19 @@ func configure(
 	}
 
 	filestream := &filestream{
-		readerConfig:      c.Reader,
-		encodingFactory:   encodingFactory,
-		closerConfig:      c.Close,
-		parsers:           c.Reader.Parsers,
-		takeOver:          c.TakeOver,
+		readerConfig:              c.Reader,
+		encodingFactory:           encodingFactory,
+		closerConfig:              c.Close,
+		parsers:                   c.Reader.Parsers,
+		takeOver:                  c.TakeOver,
 		compression:       c.Compression,
-		deleterConfig:     c.Delete,
-		waitGracePeriodFn: waitGracePeriod,
-		tickFn:            time.Tick,
-		removeFn:          os.Remove,
-		statFn:            os.Stat,
+		includeFileOwnerName:      c.IncludeFileOwnerName,
+		includeFileOwnerGroupName: c.IncludeFileOwnerGroupName,
+		deleterConfig:             c.Delete,
+		waitGracePeriodFn:         waitGracePeriod,
+		tickFn:                    time.Tick,
+		removeFn:                  os.Remove,
+		statFn:                    os.Stat,
 	}
 
 	// Read the scan interval from the prospector so we can use during the
@@ -485,7 +489,7 @@ func (inp *filestream) open(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, fs.desc.Fingerprint, offset)
+	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
 
 	r = inp.parsers.Create(r, log)
 
