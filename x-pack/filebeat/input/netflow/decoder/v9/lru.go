@@ -54,8 +54,8 @@ type pendingTemplatesCache struct {
 }
 
 const (
-	maxPendingPerKey = 256
-	maxTotalPending  = 8192
+	maxPendingPerKey = 512
+	maxTotalPending  = 16384
 )
 
 func (h *pendingTemplatesCache) totalPendingLocked() int {

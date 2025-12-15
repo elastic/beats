@@ -17,8 +17,11 @@ import (
 
 const (
 	VariableLength uint16 = 0xffff
-	// this creates a boundary for record allocations derived headers
-	maxRecordsPerPacket = 1024
+	// this creates a boundary for record allocations derived from headers
+	// the maximum length is 65535
+	// if the minimum template length is 4 bytes, then the maximum number of
+	// records per packet is 16k
+	maxRecordsPerPacket = 16384
 )
 
 var ErrEmptyTemplate = errors.New("empty template")
