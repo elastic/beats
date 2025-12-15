@@ -32,7 +32,7 @@ entries:
       description: Updates kubernetes cpu and memory metrics to use allocatable values instead of capacity values.
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48088
+        - https://github.com/elastic/beats/pull/47815
       issue: []
       impact: ""
       action: ""
@@ -41,11 +41,11 @@ entries:
         name: 1764319984-k8s_container_allocatable.yaml
         checksum: 06446f3b975740a891c137ddc6d1fc4d38d49d2c
     - kind: bug-fix
-      summary: Prevent panic during startup if dissect processor has invalid field name in tokenizer
+      summary: Prevent panic during startup if dissect processor has invalid field name in tokenizer.
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48088
+        - https://github.com/elastic/beats/pull/47839
       issue: []
       impact: ""
       action: ""
@@ -54,11 +54,11 @@ entries:
         name: 1764614942-fix-panic-in-dissect-processor-with-invalid-field-name.yaml
         checksum: 8be30cc83742127414dac9c61a2d353fd4fa2697
     - kind: bug-fix
-      summary: verify and cap memcache udp fragment counts
+      summary: Verify and cap memcache udp fragment counts.
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/48088
+        - https://github.com/elastic/beats/pull/47874
       issue: []
       impact: ""
       action: ""
@@ -80,11 +80,11 @@ entries:
         name: 1764715502-bump-golang-12411.yaml
         checksum: 4438acc3725f02b150683ea72ef7cf1f1f9a1ecb
     - kind: bug-fix
-      summary: Improve defensive checks to prevent panics in meraki module
+      summary: Improve defensive checks to prevent panics in meraki module.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48088
+        - https://github.com/elastic/beats/pull/47950
       issue: []
       impact: ""
       action: ""
@@ -93,11 +93,11 @@ entries:
         name: 1765018492-improve-meraki-defensive-checks.yaml
         checksum: 04c94a42ea65cfa82cd66b03a165f006df1af796
     - kind: feature
-      summary: ipfrag2
+      summary: Rework ip fragmentation and make it bound.
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/48088
+        - https://github.com/elastic/beats/pull/47970
       issue: []
       impact: ""
       action: ""
@@ -106,11 +106,11 @@ entries:
         name: 1765279149-ipfrag2.yaml
         checksum: db1ac94f13ebff3eb9df1481079e84265025dc0f
     - kind: feature
-      summary: Make beats receivers emit status for their subcomponents
+      summary: Make beats receivers emit status for their subcomponents.
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/48088
+        - https://github.com/elastic/beats/pull/48015
       issue: []
       impact: ""
       action: ""
