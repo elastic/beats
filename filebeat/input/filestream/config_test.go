@@ -95,6 +95,94 @@ func TestConfigValidate(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("compression requires fingerprint file_identity", func(t *testing.T) {
+		makeFileIdentity := func(t *testing.T, name string) *conf.Namespace {
+			cfg := conf.MustNewConfigFrom(map[string]interface{}{
+				name: nil,
+			})
+			ns := &conf.Namespace{}
+			err := cfg.Unpack(ns)
+			require.NoError(t, err, "failed to unpack config into conf.Namespace")
+			return ns
+		}
+
+		tcs := []struct {
+			name         string
+			compression  string
+			fileIdentity string
+			wantErr      string
+		}{
+			// gzip compression + file_identity combinations
+			{
+				name:         "gzip with fingerprint is valid",
+				compression:  CompressionGZIP,
+				fileIdentity: fingerprintName,
+			},
+			{
+				name:         "gzip with native errors",
+				compression:  CompressionGZIP,
+				fileIdentity: nativeName,
+				wantErr:      "compression='gzip' requires 'file_identity' to be 'fingerprint'",
+			},
+			{
+				name:         "gzip with path errors",
+				compression:  CompressionGZIP,
+				fileIdentity: pathName,
+				wantErr:      "compression='gzip' requires 'file_identity' to be 'fingerprint'",
+			},
+			// auto compression + file_identity combinations
+			{
+				name:         "auto with fingerprint is valid",
+				compression:  CompressionAuto,
+				fileIdentity: fingerprintName,
+			},
+			{
+				name:         "auto with native errors",
+				compression:  CompressionAuto,
+				fileIdentity: nativeName,
+				wantErr:      "compression='auto' requires 'file_identity' to be 'fingerprint'",
+			},
+			{
+				name:         "auto with path errors",
+				compression:  CompressionAuto,
+				fileIdentity: pathName,
+				wantErr:      "compression='auto' requires 'file_identity' to be 'fingerprint'",
+			},
+			// no compression allows any file_identity
+			{
+				name:         "none with native is valid",
+				compression:  CompressionNone,
+				fileIdentity: nativeName,
+			},
+			{
+				name:         "none with path is valid",
+				compression:  CompressionNone,
+				fileIdentity: pathName,
+			},
+			{
+				name:         "none with fingerprint is valid",
+				compression:  CompressionNone,
+				fileIdentity: fingerprintName,
+			},
+		}
+
+		for _, tc := range tcs {
+			t.Run(tc.name, func(t *testing.T) {
+				c := config{
+					Paths:        []string{"/foo/bar"},
+					Compression:  tc.compression,
+					FileIdentity: makeFileIdentity(t, tc.fileIdentity),
+				}
+				err := c.Validate()
+				if tc.wantErr == "" {
+					assert.NoError(t, err)
+				} else {
+					assert.ErrorContains(t, err, tc.wantErr)
+				}
+			})
+		}
+	})
 }
 
 func TestValidateInputIDs(t *testing.T) {

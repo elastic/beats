@@ -287,50 +287,73 @@ logging.level: debug
 	}
 }
 
-func TestFilestreamGZIPCompressionAutoFileIdentityNative(t *testing.T) {
-	var plainContent []byte
-	events := 500
-	for i := range events {
-		plainContent = append(plainContent, []byte(fmt.Sprintf("%d: a log line\n", i))...)
+// TestFilestreamGZIPCompressioAndInvalidFileIdentity
+func TestFilestreamGZIPCompressionAutoFileIdentityNativeErrors(t *testing.T) {
+	tcs := []struct {
+		name         string
+		compression  string
+		fileIdentity string
+	}{
+		{
+			name:         "auto compression with native file_identity",
+			compression:  "auto",
+			fileIdentity: "file_identity.native: ~",
+		},
+		{
+			name:         "gzip compression with native file_identity",
+			compression:  "gzip",
+			fileIdentity: "file_identity.native: ~",
+		},
+		{
+			name:         "auto compression with path file_identity",
+			compression:  "auto",
+			fileIdentity: "file_identity.path: ~",
+		},
+		{
+			name:         "gzip compression with path file_identity",
+			compression:  "gzip",
+			fileIdentity: "file_identity.path: ~",
+		},
 	}
-	gzContent := gziptest.Compress(t, plainContent, gziptest.CorruptNone)
 
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
-	workDir := filebeat.TempDir()
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			filebeat := integration.NewBeat(
+				t,
+				"filebeat",
+				"../../filebeat.test",
+			)
+			workDir := filebeat.TempDir()
 
-	logFilepath := filepath.Join(workDir, "log.gz")
-	cfg := fmt.Sprintf(`
+			logFilepath := filepath.Join(workDir, "log.gz")
+			cfg := fmt.Sprintf(`
 filebeat.inputs:
   - type: filestream
-    id: "test-no-compression-gzip-file"
+    id: "test-compression-file-identity-error"
     paths:
       - %s
-    compression: auto
-    file_identity.native: ~
+    compression: %s
+    %s
 path.home: %s
 output.file:
   enabled: true
   path: %s
   filename: "output"
 logging.level: debug
-`, logFilepath, workDir, workDir)
-	require.NoError(t, os.WriteFile(logFilepath, gzContent, 0644))
+`, logFilepath, tc.compression, tc.fileIdentity, workDir, workDir)
 
-	filebeat.WriteConfigFile(cfg)
-	filebeat.Start()
+			filebeat.WriteConfigFile(cfg)
+			filebeat.Start()
 
-	filebeat.WaitLogsContains(
-		"compression='auto' requires file_identity to be 'fingerprint'",
-		30*time.Second,
-		"Filebeat warning",
-		logFilepath,
-	)
-	filebeat.WaitPublishedEvents(1*time.Minute, events)
-	filebeat.Stop()
+			filebeat.WaitLogsContains(
+				fmt.Sprintf("compression='%s' requires 'file_identity' to be 'fingerprint'",
+					tc.compression),
+				30*time.Second,
+				"Filebeat did not log expected config validation error",
+			)
+			filebeat.Stop()
+		})
+	}
 }
 
 // TestFilestreamGZIPCompressionOnPlainFile ensures filestream correctly handles

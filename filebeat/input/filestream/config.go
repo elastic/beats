@@ -230,8 +230,14 @@ func (c *config) Validate() error {
 	}
 
 	switch c.Compression {
-	case CompressionNone, CompressionGZIP, CompressionAuto:
-		// valid values
+	case CompressionNone:
+		// no validation needed
+	case CompressionGZIP, CompressionAuto:
+		if c.FileIdentity != nil && c.FileIdentity.Name() != fingerprintName {
+			return fmt.Errorf(
+				"compression='%s' requires 'file_identity' to be 'fingerprint'. Current file_identity is '%s'",
+				c.Compression, c.FileIdentity.Name())
+		}
 	default:
 		return fmt.Errorf("invalid compression value %q, must be one of: %q, %q, %q",
 			c.Compression, CompressionNone, CompressionGZIP, CompressionAuto)
@@ -256,13 +262,6 @@ func (c config) checkUnsupportedParams(logger *logp.Logger) {
 		logger.Named("filestream").Warn(cfgwarn.Deprecate(
 			"",
 			"'gzip_experimental' is deprecated and ignored, set 'compression' instead"))
-	}
-
-	// file_identity should be fingerprint when compression is enabled.
-	if (c.Compression == CompressionGZIP || c.Compression == CompressionAuto) &&
-		(c.FileIdentity != nil && c.FileIdentity.Name() != fingerprintName) {
-		logger.Warnf(
-			"compression='%s' requires file_identity to be 'fingerprint'", c.Compression)
 	}
 }
 
