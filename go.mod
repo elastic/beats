@@ -57,7 +57,7 @@ require (
 	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.7.0
-	github.com/eclipse/paho.mqtt.golang v1.3.5
+	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/elastic/elastic-agent-client/v7 v7.15.0
 	github.com/elastic/go-concert v0.3.0
 	github.com/elastic/go-libaudit/v2 v2.6.2
@@ -232,6 +232,7 @@ require (
 
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
+	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/gorilla/mux v1.8.1
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
