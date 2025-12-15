@@ -154,10 +154,10 @@ func (r *runner) Start() {
 			Name:            r.input.Name(),
 			Agent:           *r.agent,
 			Cancelation:     r.sig,
-			StatusReporter:  r.statusReporter,
 			MetricsRegistry: reg,
 			Logger:          log,
 		}
+		ctx = ctx.WithStatusReporter(r.statusReporter)
 
 		err := r.input.Run(ctx, pc)
 		if err != nil && !errors.Is(err, context.Canceled) {

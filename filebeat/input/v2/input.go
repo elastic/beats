@@ -118,11 +118,20 @@ type Context struct {
 	MetricsRegistry *monitoring.Registry
 }
 
+// UpdateStatus Updates the status of this unit. This method is safe to use
+// without a StatusReporter set.
 func (c Context) UpdateStatus(status status.Status, msg string) {
 	if c.StatusReporter != nil {
 		c.Logger.Debugf("updating status, status: '%s', message: '%s'", status.String(), msg)
 		c.StatusReporter.UpdateStatus(status, msg)
 	}
+}
+
+// WithStatusReporter returns a copy of this context with the StatusReporter set
+// to reporter.
+func (c Context) WithStatusReporter(reporter status.StatusReporter) Context {
+	c.StatusReporter = reporter
+	return c
 }
 
 // MetricsRegistryOverrideID sets the "id" variable in the Context's

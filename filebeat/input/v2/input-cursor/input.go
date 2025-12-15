@@ -143,10 +143,10 @@ func (inp *managedInput) Run(
 				Name:            ctx.Name,
 				Agent:           ctx.Agent,
 				Cancelation:     ctx.Cancelation,
-				StatusReporter:  ctx,
 				MetricsRegistry: reg,
 				Logger:          log,
 			}
+			inpCtx = inpCtx.WithStatusReporter(ctx)
 
 			if err = inp.runSource(inpCtx, inp.manager.store, source, pc); err != nil {
 				cancel()
