@@ -34,6 +34,17 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// Compression mode constants
+const (
+	// CompressionNone disables compression handling; all files are treated as
+	// plain text.
+	CompressionNone = ""
+	// CompressionGZIP treats all files as gzip compressed.
+	CompressionGZIP = "gzip"
+	// CompressionAuto auto-detects gzip files and decompresses them.
+	CompressionAuto = "auto"
+)
+
 // config stores the options of a file stream.
 type config struct {
 	Reader readerConfig `config:",inline"`
@@ -44,10 +55,14 @@ type config struct {
 	FileWatcher  fileWatcherConfig `config:"prospector.scanner"`
 	FileIdentity *conf.Namespace   `config:"file_identity"`
 
-	// GZIPExperimental enables beta support for ingesting GZIP files.
-	// When set to true the input will transparently stream-decompress GZIP files.
-	// This feature is experimental and subject to change.
-	GZIPExperimental bool `config:"gzip_experimental"`
+	// Compression specifies how file compression is handled.
+	// Valid values: "" (none), "gzip" (all files are gzip), "auto"
+	// (auto-detect).
+	Compression string `config:"compression"`
+
+	// GZIPExperimental is deprecated and is ignored. Use Compression instead.
+	// Deprecated.
+	GZIPExperimental *bool `config:"gzip_experimental"`
 
 	// Whether to add the file owner name and group to the event metadata.
 	// Disabled by default.
@@ -214,12 +229,18 @@ func (c *config) Validate() error {
 		}
 	}
 
-	if c.GZIPExperimental {
-		// Validate file_identity must be fingerprint when gzip support is enabled.
+	switch c.Compression {
+	case CompressionNone:
+		// no validation needed
+	case CompressionGZIP, CompressionAuto:
 		if c.FileIdentity != nil && c.FileIdentity.Name() != fingerprintName {
 			return fmt.Errorf(
-				"gzip_experimental=true requires file_identity to be 'fingerprint'")
+				"compression='%s' requires 'file_identity' to be 'fingerprint'. Current file_identity is '%s'",
+				c.Compression, c.FileIdentity.Name())
 		}
+	default:
+		return fmt.Errorf("invalid compression value %q, must be one of: %q, %q, %q",
+			c.Compression, CompressionNone, CompressionGZIP, CompressionAuto)
 	}
 
 	if c.ID == "" && c.TakeOver.Enabled {
@@ -237,9 +258,10 @@ func (c config) checkUnsupportedParams(logger *logp.Logger) {
 				"duplication and incomplete input metrics, it's use is " +
 				"highly discouraged.")
 	}
-	if c.GZIPExperimental {
-		logger.Named("filestream").Warn(cfgwarn.Beta(
-			"filestream: beta gzip support enabled"))
+	if c.GZIPExperimental != nil {
+		logger.Named("filestream").Warn(cfgwarn.Deprecate(
+			"",
+			"'gzip_experimental' is deprecated and ignored, set 'compression' instead"))
 	}
 }
 
