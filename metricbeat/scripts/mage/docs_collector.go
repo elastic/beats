@@ -20,7 +20,6 @@ package mage
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -29,6 +28,8 @@ import (
 	"text/template"
 
 	"github.com/magefile/mage/sh"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/dev-tools/mage"
@@ -102,7 +103,10 @@ var funcMap = template.FuncMap{
 	"getBeatName": func() string {
 		return mage.BeatName
 	},
-	"title": strings.Title,
+	"title": func(s string) string {
+		caser := cases.Title(language.English)
+		return caser.String(s)
+	},
 }
 
 // checkXpack checks to see if the module belongs to x-pack.
@@ -127,7 +131,7 @@ func getRelease(rel string) (string, error) {
 	case "ga", "beta", "experimental":
 		return rel, nil
 	case "":
-		return "", fmt.Errorf("Missing a release string")
+		return "", fmt.Errorf("missing a release string")
 	default:
 		return "ga", fmt.Errorf("unknown release tag %s", rel)
 	}
@@ -195,7 +199,7 @@ func loadModuleFields(file string) (moduleData, error) {
 	if err != nil {
 		return mod[0], fmt.Errorf("file %s is missing a release string: %w", file, err)
 	}
-	applies_to, err := getVersion(fd)
+	applies_to, _ := getVersion(fd)
 
 	module.Release = rel
 	module.Applies_to = applies_to
@@ -236,7 +240,9 @@ func getVersion(raw []byte) (string, error) {
 		Path    string
 	}
 	var rel []metricset
-	yaml.Unmarshal(raw, &rel)
+	if err := yaml.Unmarshal(raw, &rel); err != nil {
+		return "", err
+	}
 	// Build the applies_to string: a comma-separated list
 	// of all available lifecycles and versions
 	// NOTE: There's almost certainly a more efficient way
@@ -296,7 +302,7 @@ func getConfigfile(modulePath string) (string, error) {
 		return "", fmt.Errorf("could not find a config file in %s", modulePath)
 	}
 
-	raw, err := ioutil.ReadFile(goodPath)
+	raw, err := os.ReadFile(goodPath)
 	return strings.TrimSpace(string(raw)), err
 
 }
@@ -321,7 +327,7 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 			return nil, err
 		}
 		metricsetName := filepath.Base(metricset)
-		release, err := getReleaseState(filepath.Join(metricset, "_meta/fields.yml"))
+		release, _ := getReleaseState(filepath.Join(metricset, "_meta/fields.yml"))
 		raw, err := os.ReadFile(filepath.Join(metricset, "_meta/fields.yml"))
 		if err != nil {
 			return nil, err
