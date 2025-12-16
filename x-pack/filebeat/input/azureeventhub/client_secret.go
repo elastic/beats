@@ -57,13 +57,41 @@ func newClientSecretCredential(config *azureInputConfig, log *logp.Logger) (azco
 }
 
 // getAzureCloud returns the appropriate Azure cloud configuration based on the authority host.
+// If the authority host is empty or unknown, it defaults to Azure Public Cloud.
 func getAzureCloud(authorityHost string) cloud.Configuration {
+	var cloudConfig cloud.Configuration
 	switch authorityHost {
 	case "https://login.microsoftonline.us":
-		return cloud.AzureGovernment
+		cloudConfig = cloud.AzureGovernment
 	case "https://login.chinacloudapi.cn":
-		return cloud.AzureChina
+		cloudConfig = cloud.AzureChina
 	default:
+		cloudConfig = cloud.AzurePublic
+	}
+
+	// Fallback to Azure Public Cloud if the cloud configuration has an empty authority host
+	if cloudConfig.ActiveDirectoryAuthorityHost == "" {
 		return cloud.AzurePublic
+	}
+	return cloudConfig
+}
+
+// getStorageEndpointSuffix returns the storage endpoint suffix for the given authority host.
+// This is used for processor v2 to construct storage account URLs without depending on
+// the deprecated go-autorest package. For processor v1, use getAzureEnvironment() instead.
+func getStorageEndpointSuffix(authorityHost string) string {
+	switch authorityHost {
+	case "https://login.microsoftonline.us":
+		// Azure GovCloud
+		return "core.usgovcloudapi.net"
+	case "https://login.chinacloudapi.cn":
+		// Azure China
+		return "core.chinacloudapi.cn"
+	case "https://login.microsoftonline.de":
+		// Azure Germany (deprecated, but still supported)
+		return "core.cloudapi.de"
+	default:
+		// Azure Public Cloud (default)
+		return "core.windows.net"
 	}
 }

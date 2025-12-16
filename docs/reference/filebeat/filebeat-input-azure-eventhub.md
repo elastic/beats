@@ -16,6 +16,8 @@ Users can enable internal logs tracing for this input by setting the environment
 
 ### Connection string authentication (processor v1)
 
+**Note:** Processor v1 only supports connection string authentication.
+
 Example configuration using connection string authentication with processor v1:
 
 ```yaml
@@ -144,7 +146,7 @@ A Blob Storage account is required to store, retrieve, or update the offset or s
 stack: ga 9.3.0
 ```
 
-The fully qualified namespace for the Event Hub. Required when using `client_secret` authentication (`auth_type` is set to `client_secret`). Format: `your-eventhub-namespace.servicebus.windows.net`
+The fully qualified namespace for the Event Hub. Required when using credential-based authentication methods (such as `client_secret`). Not required when using `connection_string` authentication, as the namespace is embedded in the connection string. Format: `your-eventhub-namespace.servicebus.windows.net`
 
 ### `tenant_id` [_tenant_id]
 

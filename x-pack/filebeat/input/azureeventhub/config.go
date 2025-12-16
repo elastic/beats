@@ -303,16 +303,18 @@ func (conf *azureInputConfig) Validate() error {
 					// - DefaultEndpointsProtocol=https;
 					// - AccountName=<SAName>;
 					// - AccountKey=<SAKey>;
-					// - EndpointSuffix=core.windows.net
-					env, err := getAzureEnvironment(conf.OverrideEnvironment)
-					if err != nil {
-						return fmt.Errorf("failed to get azure environment: %w", err)
-					}
+					// - EndpointSuffix=<determined from authority_host or defaults to core.windows.net>
+					//
+					// Note: For processor v2, we use authority_host to determine the endpoint suffix
+					// instead of the deprecated OverrideEnvironment/resource_manager_endpoint.
+					// Users can also provide the storage_account_connection_string directly
+					// with the correct EndpointSuffix for their cloud environment.
+					storageEndpointSuffix := getStorageEndpointSuffix(conf.AuthorityHost)
 					conf.SAConnectionString = fmt.Sprintf(
 						"DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=%s",
 						conf.SAName,
 						conf.SAKey,
-						env.StorageEndpointSuffix,
+						storageEndpointSuffix,
 					)
 					logger.Warn("storage_account_connection_string is not configured, but storage_account and storage_account_key are configured. " +
 						"The connection string has been constructed from the storage account and key. " +

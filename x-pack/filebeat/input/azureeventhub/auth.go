@@ -10,7 +10,6 @@ import (
 	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 
@@ -126,9 +125,6 @@ func CreateStorageAccountContainerClient(cfg *azureInputConfig, log *logp.Logger
 	case AuthTypeConnectionString:
 		// Use connection string authentication
 		cloudConfig := getAzureCloud(cfg.AuthorityHost)
-		if cloudConfig.ActiveDirectoryAuthorityHost == "" {
-			cloudConfig = cloud.AzurePublic
-		}
 
 		containerClient, err := container.NewClientFromConnectionString(
 			cfg.SAConnectionString,
@@ -153,14 +149,11 @@ func CreateStorageAccountContainerClient(cfg *azureInputConfig, log *logp.Logger
 			return nil, fmt.Errorf("credential cannot be empty when auth_type is client_secret")
 		}
 
-		// Get the Azure environment to determine the correct storage endpoint suffix
-		env, err := getAzureEnvironment(cfg.OverrideEnvironment)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get azure environment: %w", err)
-		}
+		// Get the storage endpoint suffix based on the authority host.
+		storageEndpointSuffix := getStorageEndpointSuffix(cfg.AuthorityHost)
 
 		// Build the storage account URL using the correct endpoint suffix for the cloud environment
-		storageAccountURL := fmt.Sprintf("https://%s.blob.%s/%s", cfg.SAName, env.StorageEndpointSuffix, cfg.SAContainer)
+		storageAccountURL := fmt.Sprintf("https://%s.blob.%s/%s", cfg.SAName, storageEndpointSuffix, cfg.SAContainer)
 		containerClient, err := container.NewClient(storageAccountURL, credential, nil)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create container client with credential: %w", err)
