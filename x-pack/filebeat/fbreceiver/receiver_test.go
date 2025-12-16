@@ -159,7 +159,7 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 }
 
 // multiReceiverConfig creates a Config for testing multiple receivers.
-// Each receiver gets a unique home path.
+// Each receiver gets a unique home path and a JavaScript processor that loads from its own path.config directory.
 func multiReceiverConfig(helper multiReceiverHelper) *Config {
 	return &Config{
 		Beatconfig: map[string]any{
@@ -170,6 +170,17 @@ func multiReceiverConfig(helper multiReceiverHelper) *Config {
 						"enabled": true,
 						"message": "test",
 						"count":   1,
+						// Each receiver gets a JavaScript processor that loads from its own
+						// path.config directory, adding a unique marker field to verify isolation.
+						"processors": []map[string]any{
+							{
+								"script": map[string]any{
+									"lang": "javascript",
+									"file": "processor.js",
+									"tag":  "js-" + helper.jsMarker,
+								},
+							},
+						},
 					},
 					{
 						"type":                 "filestream",
@@ -197,14 +208,27 @@ type multiReceiverHelper struct {
 	name          string
 	home          string
 	ingest        string
+	jsMarker      string
 	monitorSocket string
 }
 
 func newMultiReceiverHelper(t *testing.T, number int) multiReceiverHelper {
+	const (
+		scriptFormat = `function process(event) { event.Put("js_marker", %q); return event; }`
+	)
+
+	home := t.TempDir()
+
+	// Create JavaScript processor files in each receiver's home directory.
+	// Each script adds a unique marker field to verify path isolation.
+	jsMarker := fmt.Sprintf("receiver%d", number)
+	writeFile(t, filepath.Join(home, "processor.js"), fmt.Sprintf(scriptFormat, jsMarker))
+
 	return multiReceiverHelper{
 		name:          fmt.Sprintf("r%d", number),
-		home:          t.TempDir(),
+		home:          home,
 		ingest:        filepath.Join(t.TempDir(), fmt.Sprintf("test%d.log", number)),
+		jsMarker:      jsMarker,
 		monitorSocket: genSocketPath(t),
 	}
 }
@@ -243,6 +267,10 @@ func TestMultipleReceivers(t *testing.T) {
 
 				assert.Equalf(c, "filebeatreceiver/"+helper.name, logs[helper.name][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in %v log record", helper)
 				assert.Equalf(c, "receiver", logs[helper.name][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in %v log record", helper)
+
+				// Verify that each receiver used its own JavaScript processor script.
+				// This demonstrates path isolation: each receiver loads processor.js from its own path.config.
+				assert.Equalf(c, helper.jsMarker, logs[helper.name][0].Flatten()["js_marker"], "expected %v to have js_marker from its own script", helper)
 
 				// Make sure that each receiver has a separate logger
 				// instance and does not interfere with others. Previously, the
