@@ -129,11 +129,17 @@ func TestCgroupPressure(t *testing.T) {
 	cgroup, ok := cgroupData.(map[string]any)
 	require.Truef(t, ok, "unexpected cgroup data type: %T", cgroupData)
 
+	subsystems := []string{"cpu", "memory", "io"}
 	if cgroup["path"] == "/" {
+		// Sanity check: verify our assertion that the / cgroup result in no subsystem data. If these checks fail, it
+		// means a change in expected behavior and this test should be adjusted.
+		for _, subsystem := range subsystems {
+			assert.NotContains(t, cgroup, subsystem)
+		}
 		t.Skip("Process in / cgroup, skipping because of IgnoreRootCgroups")
 	}
 
-	for _, subsystem := range []string{"cpu", "memory", "io"} {
+	for _, subsystem := range subsystems {
 		t.Run(subsystem, func(t *testing.T) {
 			controller := requireGetSubMap(t, cgroup, subsystem)
 			t.Run("pressure", func(t *testing.T) {
