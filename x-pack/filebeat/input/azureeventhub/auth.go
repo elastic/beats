@@ -43,7 +43,24 @@ func createCredential(cfg *azureInputConfig, log *logp.Logger) (azcore.TokenCred
 
 // CreateEventHubConsumerClient creates an Event Hub consumer client
 // using the configured authentication method from the provided config.
-func CreateEventHubConsumerClient(cfg *azureInputConfig, options *azeventhubs.ConsumerClientOptions, log *logp.Logger) (*azeventhubs.ConsumerClient, error) {
+func CreateEventHubConsumerClient(cfg *azureInputConfig, log *logp.Logger) (*azeventhubs.ConsumerClient, error) {
+	// Create the consumer client options
+	options := azeventhubs.ConsumerClientOptions{}
+
+	// Set up the transport
+	switch cfg.Transport {
+	case transportWebsocket:
+		// Enable WebSocket transport if configured.
+		// This allows connectivity through HTTP proxies and firewalls
+		// that block AMQP port 5671 but allow HTTPS on port 443.
+		log.Infow("using AMQP-over-WebSocket transport for Event Hub connection")
+		options.NewWebSocketConn = newWebSocketConn
+	default:
+		// Default transport, nothing to do.
+		log.Infow("using AMQP transport for Event Hub connection")
+	}
+
+	// Set up the consumer client based on the authentication type
 	switch cfg.AuthType {
 	case AuthTypeConnectionString:
 		// Use connection string authentication for Event Hub
@@ -79,7 +96,7 @@ func CreateEventHubConsumerClient(cfg *azureInputConfig, options *azeventhubs.Co
 			cfg.ConnectionString,
 			eventHubName,
 			cfg.ConsumerGroup,
-			options,
+			&options,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create consumer client from connection string: %w", err)
@@ -100,7 +117,7 @@ func CreateEventHubConsumerClient(cfg *azureInputConfig, options *azeventhubs.Co
 			cfg.EventHubName,
 			cfg.ConsumerGroup,
 			credential,
-			options,
+			&options,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create consumer client with credential: %w", err)

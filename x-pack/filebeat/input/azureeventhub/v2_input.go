@@ -151,25 +151,11 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		sanitizers: sanitizers,
 	}
 
-	consumerClientOptions := azeventhubs.ConsumerClientOptions{}
-
-	switch in.config.Transport {
-	case transportWebsocket:
-		// Enable WebSocket transport if configured.
-		// This allows connectivity through HTTP proxies and firewalls
-		// that block AMQP port 5671 but allow HTTPS on port 443.
-		in.log.Infow("using WebSocket transport for Event Hub connection")
-		consumerClientOptions.NewWebSocketConn = newWebSocketConn
-	default:
-		// Default transport, nothing to do.
-		in.log.Infow("using AMQP transport for Event Hub connection (default)")
-	}
-
 	// Create the event hub consumer client
 	consumerClient, err := CreateEventHubConsumerClient(&in.config, &consumerClientOptions, in.log)
-	in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating consumer client: %s", err.Error()))
-	return fmt.Errorf("failed to create consumer client: %w", err)
 	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating consumer client: %s", err.Error()))
+		return fmt.Errorf("failed to create consumer client: %w", err)
 	}
 
 	// Create the container client
