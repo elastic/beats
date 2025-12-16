@@ -160,6 +160,40 @@ func (conf *azureInputConfig) Validate() error {
 	}
 
 	// Validate the processor version first to ensure it's valid
+	if err := conf.validateProcessorVersion(); err != nil {
+		return err
+	}
+
+	// Validate authentication configuration
+	if err := conf.validateAuth(); err != nil {
+		return err
+	}
+
+	// Validate required fields
+	if err := conf.validateRequiredFields(); err != nil {
+		return err
+	}
+
+	// Normalize and validate storage container
+	if err := conf.normalizeAndValidateStorageContainer(logger); err != nil {
+		return err
+	}
+
+	// Validate processor-specific settings
+	if err := conf.validateProcessorSettings(); err != nil {
+		return err
+	}
+
+	// Validate storage account configuration based on processor version
+	if err := conf.validateStorageAccountConfig(logger); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateProcessorVersion validates that the processor version is valid.
+func (conf *azureInputConfig) validateProcessorVersion() error {
 	if conf.ProcessorVersion != processorV1 && conf.ProcessorVersion != processorV2 {
 		return fmt.Errorf(
 			"invalid processor_version: %s (available versions: %s, %s)",
@@ -168,79 +202,110 @@ func (conf *azureInputConfig) Validate() error {
 			processorV2,
 		)
 	}
+	return nil
+}
 
-	// Validate authentication for both Event Hub and Storage Account together
+// validateAuth validates the authentication configuration based on auth type.
+func (conf *azureInputConfig) validateAuth() error {
 	switch conf.AuthType {
 	case AuthTypeConnectionString:
-		// Validate Event Hub connection string configuration
-		if conf.ConnectionString == "" {
-			return errors.New("connection_string is required when auth_type is empty or set to connection_string")
-		}
-		connectionStringProperties, err := parseConnectionString(conf.ConnectionString)
-		if err != nil {
-			return fmt.Errorf("invalid connection string: %w", err)
-		}
-
-		// If the connection string contains an entity path, we need to double-check that it matches the event hub name.
-		if connectionStringProperties.EntityPath != nil && *connectionStringProperties.EntityPath != conf.EventHubName {
-			return fmt.Errorf(
-				"invalid config: the entity path (%s) in the connection string does not match event hub name (%s)",
-				*connectionStringProperties.EntityPath,
-				conf.EventHubName,
-			)
-		}
-
-		// Validate Storage Account authentication for connection_string auth type
-		switch conf.ProcessorVersion {
-		case processorV1:
-			// Processor v1 requires storage account key
-			if conf.SAKey == "" {
-				return errors.New("storage_account_key is required when using connection_string authentication with processor v1")
-			}
-		case processorV2:
-			// Processor v2 requires storage account connection string, but it can be auto-constructed
-			// from SAName and SAKey later in validation. We don't validate it here.
-		}
-
+		return conf.validateConnectionStringAuth()
 	case AuthTypeClientSecret:
-		// Validate Event Hub client secret configuration
-		if conf.EventHubNamespace == "" {
-			return errors.New("eventhub_namespace is required when using client_secret authentication")
-		}
-		if conf.TenantID == "" {
-			return errors.New("tenant_id is required when using client_secret authentication")
-		}
-		if conf.ClientID == "" {
-			return errors.New("client_id is required when using client_secret authentication")
-		}
-		if conf.ClientSecret == "" {
-			return errors.New("client_secret is required when using client_secret authentication")
-		}
-
-		// Validate Storage Account authentication for client_secret auth type
-		switch conf.ProcessorVersion {
-		case processorV1:
-			// Processor v1 requires storage account key
-			if conf.SAKey == "" {
-				return errors.New("storage_account_key is required when using client_secret authentication with processor v1")
-			}
-		case processorV2:
-			// Processor v2 with client_secret auth type: Storage Account uses the same client_secret credentials as Event Hub
-			// The client_secret credentials are already validated above for Event Hub
-			// The storage account will use the same TenantID, ClientID, and ClientSecret as Event Hub
-		}
-
+		return conf.validateClientSecretAuth()
 	default:
 		return fmt.Errorf("unknown auth_type: %s (valid values: connection_string, client_secret)", conf.AuthType)
 	}
+}
 
-	// Validate required fields
+// validateConnectionStringAuth validates connection string authentication configuration.
+func (conf *azureInputConfig) validateConnectionStringAuth() error {
+	// Validate Event Hub connection string configuration
+	if conf.ConnectionString == "" {
+		return errors.New("connection_string is required when auth_type is empty or set to connection_string")
+	}
+	connectionStringProperties, err := parseConnectionString(conf.ConnectionString)
+	if err != nil {
+		return fmt.Errorf("invalid connection string: %w", err)
+	}
+
+	// If the connection string contains an entity path, we need to double-check that it matches the event hub name.
+	if connectionStringProperties.EntityPath != nil && *connectionStringProperties.EntityPath != conf.EventHubName {
+		return fmt.Errorf(
+			"invalid config: the entity path (%s) in the connection string does not match event hub name (%s)",
+			*connectionStringProperties.EntityPath,
+			conf.EventHubName,
+		)
+	}
+
+	// Validate Storage Account authentication for connection_string auth type
+	return conf.validateStorageAccountAuthForConnectionString()
+}
+
+// validateStorageAccountAuthForConnectionString validates storage account authentication for connection_string auth type.
+func (conf *azureInputConfig) validateStorageAccountAuthForConnectionString() error {
+	switch conf.ProcessorVersion {
+	case processorV1:
+		// Processor v1 requires storage account key
+		if conf.SAKey == "" {
+			return errors.New("storage_account_key is required when using connection_string authentication with processor v1")
+		}
+	case processorV2:
+		// Processor v2 requires storage account connection string, but it can be auto-constructed
+		// from SAName and SAKey later in validation. We don't validate it here.
+	}
+	return nil
+}
+
+// validateClientSecretAuth validates client secret authentication configuration.
+func (conf *azureInputConfig) validateClientSecretAuth() error {
+	// Validate Event Hub client secret configuration
+	if conf.EventHubNamespace == "" {
+		return errors.New("eventhub_namespace is required when using client_secret authentication")
+	}
+	if conf.TenantID == "" {
+		return errors.New("tenant_id is required when using client_secret authentication")
+	}
+	if conf.ClientID == "" {
+		return errors.New("client_id is required when using client_secret authentication")
+	}
+	if conf.ClientSecret == "" {
+		return errors.New("client_secret is required when using client_secret authentication")
+	}
+
+	// Validate Storage Account authentication for client_secret auth type
+	return conf.validateStorageAccountAuthForClientSecret()
+}
+
+// validateStorageAccountAuthForClientSecret validates storage account authentication for client_secret auth type.
+func (conf *azureInputConfig) validateStorageAccountAuthForClientSecret() error {
+	switch conf.ProcessorVersion {
+	case processorV1:
+		// Processor v1 requires storage account key
+		if conf.SAKey == "" {
+			return errors.New("storage_account_key is required when using client_secret authentication with processor v1")
+		}
+	case processorV2:
+		// Processor v2 with client_secret auth type: Storage Account uses the same client_secret credentials as Event Hub
+		// The client_secret credentials are already validated above for Event Hub
+		// The storage account will use the same TenantID, ClientID, and ClientSecret as Event Hub
+	}
+	return nil
+}
+
+// validateRequiredFields validates that all required fields are present.
+func (conf *azureInputConfig) validateRequiredFields() error {
 	if conf.EventHubName == "" {
 		return errors.New("no event hub name configured")
 	}
 	if conf.SAName == "" {
 		return errors.New("no storage account configured (config: storage_account)")
 	}
+	return nil
+}
+
+// normalizeAndValidateStorageContainer normalizes and validates the storage container name.
+func (conf *azureInputConfig) normalizeAndValidateStorageContainer(logger *logp.Logger) error {
+	// Set default storage account container name if not provided
 	if conf.SAContainer == "" {
 		// side effect: set the default storage account container name
 		conf.SAContainer = fmt.Sprintf("%s-%s", ephContainerName, conf.EventHubName)
@@ -262,11 +327,13 @@ func (conf *azureInputConfig) Validate() error {
 		conf.SAContainer = strings.ReplaceAll(conf.SAContainer, "_", "-")
 		logger.Warnf("replaced underscores (_) with hyphens (-) in the storage account container name (before: %s, now: %s", originalValue, conf.SAContainer)
 	}
-	if err := storageContainerValidate(conf.SAContainer); err != nil {
-		return err
-	}
 
-	// Validate processor-specific settings
+	// Validate the container name conforms to Azure naming rules
+	return storageContainerValidate(conf.SAContainer)
+}
+
+// validateProcessorSettings validates processor-specific configuration settings.
+func (conf *azureInputConfig) validateProcessorSettings() error {
 	if conf.ProcessorUpdateInterval < 1*time.Second {
 		return errors.New("processor_update_interval must be at least 1 second")
 	}
@@ -284,50 +351,18 @@ func (conf *azureInputConfig) Validate() error {
 			startPositionLatest,
 		)
 	}
+	return nil
+}
 
+// validateStorageAccountConfig validates storage account configuration based on processor version.
+func (conf *azureInputConfig) validateStorageAccountConfig(logger *logp.Logger) error {
 	switch conf.ProcessorVersion {
 	case processorV1:
 		if conf.SAKey == "" {
 			return errors.New("no storage account key configured (config: storage_account_key)")
 		}
 	case processorV2:
-		// For processor v2, storage account authentication depends on auth_type:
-		// - connection_string: needs SAConnectionString (can be auto-constructed from SAName+SAKey)
-		// - client_secret: uses the same credentials as Event Hub, no connection string needed
-		if conf.AuthType == AuthTypeConnectionString {
-			if conf.SAConnectionString == "" {
-				if conf.SAName != "" && conf.SAKey != "" {
-					// To avoid breaking changes, and ease the migration from v1 to v2,
-					// we can build the connection string using the following settings:
-					//
-					// - DefaultEndpointsProtocol=https;
-					// - AccountName=<SAName>;
-					// - AccountKey=<SAKey>;
-					// - EndpointSuffix=<determined from authority_host or defaults to core.windows.net>
-					//
-					// Note: For processor v2, we use authority_host to determine the endpoint suffix
-					// instead of the deprecated OverrideEnvironment/resource_manager_endpoint.
-					// Users can also provide the storage_account_connection_string directly
-					// with the correct EndpointSuffix for their cloud environment.
-					storageEndpointSuffix := getStorageEndpointSuffix(conf.AuthorityHost)
-					conf.SAConnectionString = fmt.Sprintf(
-						"DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=%s",
-						conf.SAName,
-						conf.SAKey,
-						storageEndpointSuffix,
-					)
-					logger.Warn("storage_account_connection_string is not configured, but storage_account and storage_account_key are configured. " +
-						"The connection string has been constructed from the storage account and key. " +
-						"Please configure storage_account_connection_string directly as storage_account_key is deprecated in processor v2.")
-					conf.SAKey = ""
-				} else {
-					// No connection string and no key, so we can't proceed.
-					return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
-				}
-			}
-		}
-		// For client_secret auth with processor v2, storage account uses the same credentials
-		// No connection string validation needed
+		return conf.validateStorageAccountConfigV2(logger)
 	default:
 		return fmt.Errorf(
 			"invalid processor_version: %s (available versions: %s, %s)",
@@ -336,7 +371,48 @@ func (conf *azureInputConfig) Validate() error {
 			processorV2,
 		)
 	}
+	return nil
+}
 
+// validateStorageAccountConfigV2 validates storage account configuration for processor v2.
+func (conf *azureInputConfig) validateStorageAccountConfigV2(logger *logp.Logger) error {
+	// For processor v2, storage account authentication depends on auth_type:
+	// - connection_string: needs SAConnectionString (can be auto-constructed from SAName+SAKey)
+	// - client_secret: uses the same credentials as Event Hub, no connection string needed
+	if conf.AuthType == AuthTypeConnectionString {
+		if conf.SAConnectionString == "" {
+			if conf.SAName != "" && conf.SAKey != "" {
+				// To avoid breaking changes, and ease the migration from v1 to v2,
+				// we can build the connection string using the following settings:
+				//
+				// - DefaultEndpointsProtocol=https;
+				// - AccountName=<SAName>;
+				// - AccountKey=<SAKey>;
+				// - EndpointSuffix=<determined from authority_host or defaults to core.windows.net>
+				//
+				// Note: For processor v2, we use authority_host to determine the endpoint suffix
+				// instead of the deprecated OverrideEnvironment/resource_manager_endpoint.
+				// Users can also provide the storage_account_connection_string directly
+				// with the correct EndpointSuffix for their cloud environment.
+				storageEndpointSuffix := getStorageEndpointSuffix(conf.AuthorityHost)
+				conf.SAConnectionString = fmt.Sprintf(
+					"DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=%s",
+					conf.SAName,
+					conf.SAKey,
+					storageEndpointSuffix,
+				)
+				logger.Warn("storage_account_connection_string is not configured, but storage_account and storage_account_key are configured. " +
+					"The connection string has been constructed from the storage account and key. " +
+					"Please configure storage_account_connection_string directly as storage_account_key is deprecated in processor v2.")
+				conf.SAKey = ""
+			} else {
+				// No connection string and no key, so we can't proceed.
+				return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
+			}
+		}
+	}
+	// For client_secret auth with processor v2, storage account uses the same credentials
+	// No connection string validation needed
 	return nil
 }
 
