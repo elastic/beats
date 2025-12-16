@@ -228,7 +228,7 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 		}
 
 		done := d.process(&packet, currentType)
-		if done {
+		if done == nil {
 			d.logger.Debugf("processed")
 			break
 		}
@@ -368,7 +368,7 @@ type fragment struct {
 	expire time.Time
 }
 
-func (d *Decoder) process(packet *protos.Packet, layerType gopacket.LayerType) (done bool) {
+func (d *Decoder) process(packet *protos.Packet, layerType gopacket.LayerType) error {
 	withFlow := d.flowID != nil
 
 	switch layerType {
@@ -413,25 +413,25 @@ func (d *Decoder) process(packet *protos.Packet, layerType gopacket.LayerType) (
 	case layers.LayerTypeICMPv4:
 		d.logger.Debugf("ICMPv4 packet")
 		d.onICMPv4(packet)
-		return true
+		return nil
 
 	case layers.LayerTypeICMPv6:
 		d.logger.Debugf("ICMPv6 packet")
 		d.onICMPv6(packet)
-		return true
+		return nil
 
 	case layers.LayerTypeUDP:
 		d.logger.Debugf("UDP packet")
 		d.onUDP(packet)
-		return true
+		return nil
 
 	case layers.LayerTypeTCP:
 		d.logger.Debugf("TCP packet")
 		d.onTCP(packet)
-		return true
+		return nil
 	}
 
-	return false
+	return nil
 }
 
 func (d *Decoder) onICMPv4(packet *protos.Packet) {
@@ -453,7 +453,7 @@ func (d *Decoder) onICMPv6(packet *protos.Packet) {
 		d.icmpV6TypeCode.Set(flow, uint64(d.icmp6.TypeCode))
 	}
 
-	if d.icmp6Proc != nil {
+	if d.icmp6Proc != nil && len(d.icmp6.Payload) >= 4 {
 		// google/gopacket treats the first four bytes
 		// after the typo, code and checksum as part of
 		// the payload. So drop those bytes.

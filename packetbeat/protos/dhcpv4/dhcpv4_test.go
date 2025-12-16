@@ -23,7 +23,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -31,17 +30,10 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var _ protos.UDPPlugin = &dhcpv4Plugin{}
-
-var (
-	_ dhcpv4.Option = &TextOption{}
-	_ dhcpv4.Option = &IPAddressOption{}
-	_ dhcpv4.Option = &IPAddressesOption{}
-)
 
 // Application layer data from packetbeat/tests/system/pcaps/dhcp.pcap.
 var (
@@ -76,13 +68,17 @@ var (
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x63, 0x82, 0x53, 0x63,
 		0x35, 0x01, 0x05, 0x3a, 0x04, 0x00, 0x00, 0x07, 0x08, 0x3b, 0x04, 0x00, 0x00, 0x0c, 0x4e, 0x33, 0x04, 0x00, 0x00, 0x0e,
-		0x10, 0x36, 0x04, 0xc0, 0xa8, 0x00, 0x01, 0x01, 0x04, 0xff, 0xff, 0xff, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x10, 0x36, 0x04, 0xc0, 0xa8, 0x00, 0x01, 0x01, 0x04, 0xff, 0xff, 0xff, 0x00,
+		// options added to test
+		0x02, 0x04, 0x00, 0x00, 0x1c, 0x20, // OptionTimeOfffset
+		0x03, 0x4 * 2, 0xc0, 0xa8, 0x01, 0x01, 0xc0, 0xa8, 0x01, 0x02, // Router
+		// end of Options
+		0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	}
 )
 
 func TestParseDHCPRequest(t *testing.T) {
-	logp.TestingSetup()
 	p, err := newPlugin(true, nil, &procs.ProcessesWatcher{}, nil)
 	if err != nil {
 		t.Fatal(err)
@@ -160,12 +156,11 @@ func TestParseDHCPRequest(t *testing.T) {
 	}
 
 	actual := p.parseDHCPv4(pkt)
-	if assert.NotNil(t, actual) {
-		_, err := publish.MarshalPacketbeatFields(actual, nil, nil)
-		assert.NoError(t, err, "marshalling packet beat fields")
-		t.Logf("DHCP event: %+v", actual)
-		assertEqual(t, expected, *actual)
-	}
+	assert.NotNil(t, actual)
+	_, err = publish.MarshalPacketbeatFields(actual, nil, nil)
+	assert.NoError(t, err, "marshalling packet beat fields")
+	t.Logf("DHCP event: %+v", actual)
+	assertEqual(t, expected, *actual)
 }
 
 func TestParseDHCPACK(t *testing.T) {
@@ -189,7 +184,7 @@ func TestParseDHCPACK(t *testing.T) {
 			"source": mapstr.M{
 				"ip":    "192.168.0.1",
 				"port":  67,
-				"bytes": 300,
+				"bytes": 316,
 			},
 			"destination": mapstr.M{
 				"ip":   "192.168.0.10",
@@ -202,7 +197,7 @@ func TestParseDHCPACK(t *testing.T) {
 			"server": mapstr.M{
 				"ip":    "192.168.0.1",
 				"port":  67,
-				"bytes": 300,
+				"bytes": 316,
 			},
 			"event": mapstr.M{
 				"category": []string{"network"},
@@ -216,7 +211,7 @@ func TestParseDHCPACK(t *testing.T) {
 				"direction":    "unknown",
 				"transport":    "udp",
 				"protocol":     "dhcpv4",
-				"bytes":        300,
+				"bytes":        316,
 				"community_id": "1:VbRSZnvQqvLiQRhYHLrdVI17sLQ=",
 			},
 			"related": mapstr.M{
@@ -238,12 +233,18 @@ func TestParseDHCPACK(t *testing.T) {
 					"renewal_time_sec":          1800,
 					"server_identifier":         "192.168.0.1",
 					"subnet_mask":               "255.255.255.0",
+					"utc_time_offset_sec":       7200,
+					"router": []string{
+						"192.168.1.1",
+						"192.168.1.2",
+					},
 				},
 			},
 		},
 	}
 
 	actual := p.parseDHCPv4(pkt)
+
 	if assert.NotNil(t, actual) {
 		_, err := publish.MarshalPacketbeatFields(actual, nil, nil)
 		assert.NoError(t, err, "marshalling packet beat fields")
