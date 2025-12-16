@@ -10,7 +10,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"slices"
 
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
@@ -76,10 +75,6 @@ type cloudConnectedResource struct {
 // the version is not supported.
 type clusterInfoFetcher func(*elasticsearch.MetricSet) (*utils.ClusterInfo, error)
 
-var (
-	SUPPORTED_LICENSE_TYPES = []string{"enterprise", "trial"}
-)
-
 // maybeRegisterCloudConnectedCluster fetches cluster information and license details, then sets the global resource ID if applicable.
 func maybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterInfo clusterInfoFetcher) error {
 	// if resource ID is already set, then we don't need to check/register anything
@@ -136,8 +131,6 @@ func maybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterIn
 		return fmt.Errorf("failed to load cluster license: %w", err)
 	} else if licenseWrapper.License.Status != "active" {
 		return fmt.Errorf("cluster license is not active: %s", licenseWrapper.License.Status)
-	} else if !slices.Contains(SUPPORTED_LICENSE_TYPES, licenseWrapper.License.Type) {
-		return fmt.Errorf("cluster license type is not supported: %s", licenseWrapper.License.Type)
 	}
 
 	m.Logger().Debugf("Successfully fetched license for Cloud Connected: UUID=%s License=%s", clusterInfo.ClusterID, licenseWrapper.License.UID)
