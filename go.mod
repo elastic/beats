@@ -121,6 +121,7 @@ require (
 	go.etcd.io/bbolt v1.4.0
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.1
+<<<<<<< HEAD
 	golang.org/x/crypto v0.47.0
 	golang.org/x/mod v0.31.0
 	golang.org/x/net v0.49.0
@@ -131,6 +132,18 @@ require (
 	golang.org/x/time v0.14.0
 	golang.org/x/tools v0.40.0
 	google.golang.org/api v0.257.0
+=======
+	golang.org/x/crypto v0.45.0
+	golang.org/x/mod v0.29.0
+	golang.org/x/net v0.47.0
+	golang.org/x/oauth2 v0.31.0
+	golang.org/x/sync v0.18.0
+	golang.org/x/sys v0.38.0
+	golang.org/x/text v0.31.0
+	golang.org/x/time v0.13.0
+	golang.org/x/tools v0.38.0
+	google.golang.org/api v0.250.0
+>>>>>>> c3f35a907 ([Metricbeat] Add memory PSI metrics for cgroupv2 (#48054))
 	google.golang.org/genproto v0.0.0-20250603155806-513f23925822 // indirect
 	google.golang.org/grpc v1.78.0
 	google.golang.org/protobuf v1.36.11
@@ -172,7 +185,11 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.8.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.0
+<<<<<<< HEAD
 	github.com/elastic/elastic-agent-libs v0.32.2
+=======
+	github.com/elastic/elastic-agent-libs v0.28.0
+>>>>>>> c3f35a907 ([Metricbeat] Add memory PSI metrics for cgroupv2 (#48054))
 	github.com/elastic/elastic-agent-system-metrics v0.13.5
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
