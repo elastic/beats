@@ -136,7 +136,7 @@ data:
           ##    - container metadata isn't available when collecting logs from /var/log/pods/. Refer to add_kubernetes_metadata docs for details: https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_logs_path
           #- type: filestream
           #  id: kubernetes-container-logs
-          #  gzip_experimental: true # BETA: enable gzip decompression. Refer to the docs for details: https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-filestream#reading-gzip-files
+          #  compression: auto # enable gzip decompression. Refer to the docs for details: https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-filestream#reading-gzip-files
           #  parsers:
           #    - container: ~
           #  paths:
@@ -171,7 +171,7 @@ data:
     #        - /var/log/containers/*-${data.kubernetes.container.id}.log
     # # To enable collection of rotated logs, use the following configuration instead. WARNING: It might cause data re-ingestion for existing deployments. Refer to the docs for details: https://www.elastic.co/docs/reference/beats/filebeat/running-on-kubernetes#ingesting-rotated-log-files
     # #         id: kubernetes-container-logs-${data.kubernetes.pod.uid}-${data.kubernetes.container.name}
-    # #         gzip_experimental: true # BETA: enable gzip decompression. Refer to the docs for details: https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-filestream#reading-gzip-files
+    # #         compression: auto # enable gzip decompression. Refer to the docs for details: https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-filestream#reading-gzip-files
     # #         paths:
     # #           - /var/log/pods/${data.kubernetes.namespace}_${data.kubernetes.pod.name}_${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log*
 

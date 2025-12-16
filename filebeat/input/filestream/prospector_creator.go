@@ -60,7 +60,7 @@ func newProspector(
 		logger,
 		config.Paths,
 		config.FileWatcher,
-		config.GZIPExperimental,
+		config.Compression,
 		config.Delete.Enabled,
 		identifier,
 		srci,
