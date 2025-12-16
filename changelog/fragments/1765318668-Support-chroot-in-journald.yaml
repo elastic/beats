@@ -11,7 +11,12 @@
 kind: feature
 
 # Change summary; a 80ish characters long description of the change.
-summary: The Journald input now supports setting a chroot to use when calling the journalctl binary
+summary: |
+  The Journald input now supports setting a chroot to use when calling
+  the journalctl binary, thus allowing the journald input to be used
+  with the wolfi container variant and in environments where the
+  host's Journald is not compatible with the `journalctl` version
+  shipped with the container.
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
