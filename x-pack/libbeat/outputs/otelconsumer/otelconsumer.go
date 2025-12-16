@@ -190,12 +190,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Retry()
 		}
 
-<<<<<<< HEAD
-		return fmt.Errorf("failed to send batch events to otel collector: %w", err)
-=======
 		out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
 		return nil
->>>>>>> 60555ff8c (skip caller by 1 in beats auth extension (#47931))
 	}
 
 	batch.ACK()
