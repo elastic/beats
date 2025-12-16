@@ -120,7 +120,7 @@ require (
 	go.elastic.co/go-licence-detector v0.7.0
 	go.etcd.io/bbolt v1.4.0
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.27.1
 	golang.org/x/crypto v0.45.0
 	golang.org/x/mod v0.29.0
 	golang.org/x/net v0.47.0
@@ -173,7 +173,7 @@ require (
 	github.com/elastic/ebpfevents v0.8.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.0
 	github.com/elastic/elastic-agent-libs v0.28.0
-	github.com/elastic/elastic-agent-system-metrics v0.13.5-0.20251215071043-d9d092bbeb16
+	github.com/elastic/elastic-agent-system-metrics v0.13.5
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.3.0
