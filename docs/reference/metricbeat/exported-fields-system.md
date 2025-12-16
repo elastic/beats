@@ -1813,9 +1813,17 @@ number of times the controller tripped a given usage level
 
 ## pressure [_pressure]
 
+```{applies_to}
+stack: ga 9.3.0
+```
+
 Pressure (resource contention) stats.
 
 ## some [_some]
+
+```{applies_to}
+stack: ga 9.3.0
+```
 
 Share of time in which at least some tasks are stalled on a given resource
 
@@ -1850,6 +1858,10 @@ Share of time in which at least some tasks are stalled on a given resource
 
 
 ## full [_full]
+
+```{applies_to}
+stack: ga 9.3.0
+```
 
 Share of time in which all non-idle tasks are stalled on a given resource simultaneously
 
