@@ -259,9 +259,15 @@ func (c config) checkUnsupportedParams(logger *logp.Logger) {
 				"highly discouraged.")
 	}
 	if c.GZIPExperimental != nil {
-		logger.Named("filestream").Warn(cfgwarn.Deprecate(
-			"",
-			"'gzip_experimental' is deprecated and ignored, set 'compression' instead"))
+		if c.Compression != CompressionNone {
+			logger.Named("filestream").Warn(cfgwarn.Deprecate(
+				"",
+				"'gzip_experimental' is deprecated and ignored. 'compression' is set, using it instead"))
+		} else {
+			logger.Named("filestream").Warn(cfgwarn.Deprecate(
+				"",
+				"'gzip_experimental' is deprecated and ignored, set 'compression' instead"))
+		}
 	}
 }
 

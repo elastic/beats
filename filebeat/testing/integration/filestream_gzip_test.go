@@ -165,6 +165,47 @@ output.console:
 			Start(ctx).
 			Wait()
 	})
+
+	t.Run("GzipExperimentalDeprecationWarningWithCompressionSet", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		td := t.TempDir()
+		logPath := filepath.Join(td, "input.log.gz")
+
+		var gzBuff bytes.Buffer
+		gw := gzip.NewWriter(&gzBuff)
+		_, err := gw.Write([]byte("hello world"))
+		require.NoError(t, err)
+		require.NoError(t, gw.Close())
+
+		err = os.WriteFile(logPath, gzBuff.Bytes(), 0644)
+		require.NoError(t, err)
+
+		config := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+      - %s
+    compression: auto
+    gzip_experimental: true
+output.console:
+  enabled: true
+`, logPath)
+
+		test := NewTest(t, TestOptions{
+			Config: config,
+		})
+
+		test.
+			WithReportOptions(reportOptions).
+			ExpectStart().
+			ExpectOutput(
+				"'gzip_experimental' is deprecated and ignored. 'compression' is set, using it instead").
+			Start(ctx).
+			Wait()
+	})
 }
 
 func matchPublishedLines(t *testing.T, got []byte, want []string) {
