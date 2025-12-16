@@ -74,7 +74,12 @@ func (t *Template) Apply(data *bytes.Buffer, n int) ([]record.Record, error) {
 		return nil, ErrEmptyTemplate
 	}
 	if n == 0 {
+		// each record is t.Length long, so we can have multiple records in the
+		// buffer
 		n = data.Len() / t.Length
+	} else if n > data.Len() {
+		// make sure we're not allocating more than we need
+		n = data.Len()
 	}
 	limit, alloc := n, n
 	if t.VariableLength {
