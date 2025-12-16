@@ -22,7 +22,14 @@ type runnerState struct {
 // RunnerReporter defines an interface that returns a StatusReporter for a specific runner.
 // This is used for grouping and managing statuses of multiple runners
 type RunnerReporter interface {
+<<<<<<< HEAD
 	GetReporterForRunner(id uint64) status.StatusReporter
+=======
+	GetReporterForRunner(id string) status.StatusReporter
+
+	// UpdateStatus updates the group status of a runnerReporter
+	UpdateStatus(status status.Status, msg string)
+>>>>>>> 2ac081b10 ([beatreceiver] fix status reporting (#47936))
 }
 
 type reporter struct {
@@ -68,6 +75,7 @@ func (r *reporter) updateStatusForRunner(id uint64, state status.Status, msg str
 		}
 	}
 
+<<<<<<< HEAD
 	// calculate the aggregate state of beat based on the module states
 	calcState, calcMsg := r.calculateState()
 
@@ -98,6 +106,67 @@ func (r *reporter) UpdateStatus(s status.Status, msg string) {
 }
 
 func (r *reporter) calculateState() (status.Status, string) {
+=======
+	// report aggregated status for all sub-components
+	evt := r.calculateOtelStatus()
+	r.emitDummyStatus(evt)
+	componentstatus.ReportStatus(r.host, evt)
+}
+
+// UpdateStatus reports the overall status of the group.
+// This is useful to report any failures encountered before a runner is initialized.
+// Note: This will override all sub-reporter statuses if any
+func (r *reporter) UpdateStatus(status status.Status, msg string) {
+	otelStatus := beatStatusToOtelStatus(status)
+	if otelStatus == componentstatus.StatusNone {
+		return
+	}
+	var eventBuilderOpts []componentstatus.EventBuilderOption
+	if componentstatus.StatusIsError(otelStatus) {
+		eventBuilderOpts = append(eventBuilderOpts, componentstatus.WithError(errors.New(msg)))
+	}
+	evt := componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
+	r.emitDummyStatus(evt)
+	componentstatus.ReportStatus(r.host, evt)
+}
+
+func (r *reporter) emitDummyStatus(evt *componentstatus.Event) {
+	oppositeStatus := getOppositeStatus(evt.Status())
+	if oppositeStatus != componentstatus.StatusNone {
+		// emit a dummy event first to ensure the otel core framework acknowledges the change
+		// workaround for https://github.com/open-telemetry/opentelemetry-collector/issues/14282
+		dummyEvt := componentstatus.NewEvent(oppositeStatus)
+		componentstatus.ReportStatus(r.host, dummyEvt)
+	}
+}
+
+// calculateOtelStatus aggregates the statuses of all runners
+func (r *reporter) calculateOtelStatus() *componentstatus.Event {
+	var evt *componentstatus.Event
+	s, msg := r.calculateAggregateState()
+	otelStatus := beatStatusToOtelStatus(s)
+	if otelStatus == componentstatus.StatusNone {
+		return nil
+	}
+	var eventBuilderOpts []componentstatus.EventBuilderOption
+	if componentstatus.StatusIsError(otelStatus) {
+		eventBuilderOpts = append(eventBuilderOpts, componentstatus.WithError(errors.New(msg)))
+	}
+	evt = componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
+
+	inputStatusesPdata := evt.Attributes().PutEmptyMap(inputStatusAttributesKey)
+
+	for id, rs := range r.runnerStates {
+		inputStatePdata := toPdata(rs)
+		m := inputStatusesPdata.PutEmptyMap(id)
+		inputStatePdata.MoveTo(m)
+	}
+
+	return evt
+}
+
+func (r *reporter) calculateAggregateState() (status.Status, string) {
+>>>>>>> 2ac081b10 ([beatreceiver] fix status reporting (#47936))
 	reportedState := status.Running
 	reportedMsg := ""
 	for _, s := range r.runnerStates {

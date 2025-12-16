@@ -38,4 +38,11 @@ func TestGroupStatus(t *testing.T) {
 	require.Equalf(t, m.Evt.Status(), componentstatus.StatusPermanentError, "expected StatusPermanentError, got %v", m.Evt.Status())
 	require.NotNil(t, m.Evt.Err(), "expected non-nil error, got nil")
 	require.Equalf(t, m.Evt.Err().Error(), "Failed Runner2", "expected 'Failed Runner1', got %v", m.Evt.Err())
+
+	// group reporter is updated directly
+	reporter.UpdateStatus(status.Failed, "beatreceiver failed to start")
+
+	require.Equalf(t, m.Evt.Status(), componentstatus.StatusPermanentError, "expected StatusPermanentError, got %v", m.Evt.Status())
+	require.NotNil(t, m.Evt.Err(), "expected non-nil error, got nil")
+	require.Equalf(t, m.Evt.Err().Error(), "beatreceiver failed to start", "expected 'beatreceiver failed to start', got %v", m.Evt.Err())
 }
