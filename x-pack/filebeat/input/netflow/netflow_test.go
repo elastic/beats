@@ -98,6 +98,8 @@ func TestNetFlow(t *testing.T) {
 			pluginCfg, err := conf.NewConfigFrom(mapstr.M{})
 			require.NoError(t, err)
 			if isReversed {
+				t.Skip("Flaky test: https://github.com/elastic/beats/issues/43670")
+
 				// if pcap is reversed packet order we need to have multiple workers
 				// and thus enable the input packets lru
 				err = pluginCfg.SetInt("workers", -1, 2)

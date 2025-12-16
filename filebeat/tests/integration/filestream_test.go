@@ -67,6 +67,7 @@ logging:
   selectors:
     - input
     - input.filestream
+    - input.filestream.prospector
   metrics:
     enabled: false
 `
@@ -87,16 +88,15 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	filebeat.Start()
 
 	// 3. Create the log file
-	integration.GenerateLogFile(t, logFilePath, 10, false)
+	integration.WriteLogFile(t, logFilePath, 10, false)
 
 	// 4. Wait for Filebeat to start scanning for files
-	//
-	filebeat.WaitForLogs(
+	filebeat.WaitLogsContains(
 		fmt.Sprintf("A new file %s has been found", logFilePath),
 		10*time.Second,
 		"Filebeat did not start looking for files to ingest")
 
-	filebeat.WaitForLogs(
+	filebeat.WaitLogsContains(
 		fmt.Sprintf("Reader was closed. Closing. Path='%s", logFilePath),
 		10*time.Second, "Filebeat did not close the file")
 
@@ -104,7 +104,7 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	// of the file, so once the TTL of its state expires and the store GC runs,
 	// it will be removed from the registry.
 	// Wait for the log message stating 1 entry has been removed from the registry
-	filebeat.WaitForLogs("1 entries removed", 20*time.Second, "entry was not removed from registtry")
+	filebeat.WaitLogsContains("1 entries removed", 20*time.Second, "entry was not removed from registry")
 
 	// 6. Then assess it has been removed in the registry
 	registryFile := filepath.Join(filebeat.TempDir(), "data", "registry", "filebeat", "log.json")
@@ -145,18 +145,18 @@ logging:
 	// > 1kb in total to trigger default fingerprinting
 	numEvents := 30
 
-	integration.GenerateLogFile(t, logFilePath, numEvents, false)
+	integration.WriteLogFile(t, logFilePath, numEvents, false)
 
 	filebeat.WriteConfigFile(fmt.Sprintf(cfg, logFilePath, tempDir))
 	filebeat.Start()
 
-	filebeat.WaitForLogs(
+	filebeat.WaitLogsContains(
 		fmt.Sprintf("A new file %s has been found", logFilePath),
 		10*time.Second,
 		"Filebeat did not start looking for files to ingest")
 
 	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath)
-	filebeat.WaitForLogs(eofMsg, 10*time.Second, "EOF was not reached")
+	filebeat.WaitLogsContains(eofMsg, 10*time.Second, "EOF was not reached")
 
 	requirePublishedEvents(t, filebeat, numEvents, outputFile)
 
