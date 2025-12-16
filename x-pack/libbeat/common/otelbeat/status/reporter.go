@@ -36,6 +36,9 @@ func toPdata(r *runnerState) pcommon.Map {
 // This is used for grouping and managing statuses of multiple runners
 type RunnerReporter interface {
 	GetReporterForRunner(id string) status.StatusReporter
+
+	// UpdateStatus updates the group status of a runnerReporter
+	UpdateStatus(status status.Status, msg string)
 }
 
 type reporter struct {
@@ -81,12 +84,30 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 		}
 	}
 
-	// report status to parent reporter
-	r.UpdateStatus()
+	// report aggregated status for all sub-components
+	evt := r.calculateOtelStatus()
+	r.emitDummyStatus(evt)
+	componentstatus.ReportStatus(r.host, evt)
 }
 
-func (r *reporter) UpdateStatus() {
-	evt := r.calculateOtelStatus()
+// UpdateStatus reports the overall status of the group.
+// This is useful to report any failures encountered before a runner is initialized.
+// Note: This will override all sub-reporter statuses if any
+func (r *reporter) UpdateStatus(status status.Status, msg string) {
+	otelStatus := beatStatusToOtelStatus(status)
+	if otelStatus == componentstatus.StatusNone {
+		return
+	}
+	var eventBuilderOpts []componentstatus.EventBuilderOption
+	if componentstatus.StatusIsError(otelStatus) {
+		eventBuilderOpts = append(eventBuilderOpts, componentstatus.WithError(errors.New(msg)))
+	}
+	evt := componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
+	r.emitDummyStatus(evt)
+	componentstatus.ReportStatus(r.host, evt)
+}
+
+func (r *reporter) emitDummyStatus(evt *componentstatus.Event) {
 	oppositeStatus := getOppositeStatus(evt.Status())
 	if oppositeStatus != componentstatus.StatusNone {
 		// emit a dummy event first to ensure the otel core framework acknowledges the change
@@ -94,9 +115,9 @@ func (r *reporter) UpdateStatus() {
 		dummyEvt := componentstatus.NewEvent(oppositeStatus)
 		componentstatus.ReportStatus(r.host, dummyEvt)
 	}
-	componentstatus.ReportStatus(r.host, evt)
 }
 
+// calculateOtelStatus aggregates the statuses of all runners
 func (r *reporter) calculateOtelStatus() *componentstatus.Event {
 	var evt *componentstatus.Event
 	s, msg := r.calculateAggregateState()
