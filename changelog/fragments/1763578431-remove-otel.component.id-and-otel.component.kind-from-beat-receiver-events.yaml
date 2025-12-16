@@ -28,11 +28,7 @@ summary: remove otel.component.id and otel.component.kind from beat receiver eve
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-<<<<<<< HEAD:changelog/fragments/1763578431-remove-otel.component.id-and-otel.component.kind-from-beat-receiver-events.yaml
 component: all
-=======
-component: osquerybeat
->>>>>>> 45d5eaf3f (add missing components (#48115)):changelog/fragments/1764715501-encoding_timestamps.yaml
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
