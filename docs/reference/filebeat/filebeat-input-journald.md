@@ -25,8 +25,11 @@ either:
    
    
    ```sh
-   docker run --rm -it --entrypoint "journalctl" docker.elastic.co/beats/filebeat-wolfi:<VERSION> --version
+   docker run --rm -it --entrypoint "journalctl" docker.elastic.co/beats/filebeat:<VERSION> --version
    ```
+   The container variants that contain `journalctl` are: `filebeat`,
+   `filebeat-oss` and `filebeat-ubi`
+
 :::
 
 If the `journalctl` process exits unexpectedly the journald input will terminate with an error and Filebeat will need to be restarted to start reading from the journal again.
@@ -118,8 +121,11 @@ stack: ga 9.3.0
 ```
 A folder to be used as chroot when calling `journalctl`. This allows
 Filebeat to call the host's `journalctl` directly. If using this
-option, {{filebeat}} must be run as root and
-[`journalct_path`](#filebeat-input-journald-journalctl-path) must be
+option in a container, the container needs `CAP_SYS_CHROOT` to start
+the chroot and {{filebeat}} needs permissions to read the desired
+journals, usually being added to `systemd-journal` group.
+Using chroot requires
+[`journalct_path`](#filebeat-input-journald-journalctl-path) to be
 set.
 
 ### `journalct_path` [filebeat-input-journald-journalctl-path]
