@@ -23,6 +23,7 @@ import (
 	"errors"
 	"os"
 	"runtime"
+	"strconv"
 	"testing"
 	"time"
 
@@ -112,7 +113,7 @@ func TestCgroupPressure(t *testing.T) {
 	}
 
 	cfg := getConfig()
-	cfg["process.pid"] = os.Getpid()
+	cfg["process.pid"] = getTestPid(t)
 
 	f := mbtest.NewReportingMetricSetV2Error(t, cfg)
 	events, errs := mbtest.ReportingFetchV2Error(f)
@@ -120,7 +121,9 @@ func TestCgroupPressure(t *testing.T) {
 	require.NotEmpty(t, events)
 
 	// Get cgroup data from the event
-	cgroupData, err := events[0].MetricSetFields.GetValue("cgroup")
+	event := events[0]
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	cgroupData, err := event.MetricSetFields.GetValue("cgroup")
 	if errors.Is(err, mapstr.ErrKeyNotFound) {
 		t.Skip("cgroup data not available")
 	}
@@ -133,6 +136,12 @@ func TestCgroupPressure(t *testing.T) {
 	if cgroup["path"] == "/" {
 		// Sanity check: verify our assertion that the / cgroup result in no subsystem data. If these checks fail, it
 		// means a change in expected behavior and this test should be adjusted.
+		// Example command to test with / cgroup:
+		// sleep 60 &
+		// pid=$!
+		// sudo sh -c "echo $pid > /sys/fs/cgroup/cgroup.procs"
+		// cat /proc/$pid/cgroup
+		// MONITOR_PID=$pid go test -run TestCgroupPressure -v ./metricbeat/module/system/process
 		for _, subsystem := range subsystems {
 			assert.NotContains(t, cgroup, subsystem)
 		}
@@ -141,6 +150,12 @@ func TestCgroupPressure(t *testing.T) {
 
 	for _, subsystem := range subsystems {
 		t.Run(subsystem, func(t *testing.T) {
+			// Subsystem might not exist depending on cgroup configuration.
+			// For example, io accounting is disabled by default in systemd:
+			// https://www.freedesktop.org/software/systemd/man/latest/systemd-system.conf.html#DefaultMemoryAccounting=
+			if _, ok := cgroup[subsystem]; !ok {
+				t.Skipf("%s subsystem not available in this cgroup", subsystem)
+			}
 			controller := requireGetSubMap(t, cgroup, subsystem)
 			t.Run("pressure", func(t *testing.T) {
 				// Pressure might not exist, be nil, or be empty depending on kernel configuration
@@ -187,6 +202,16 @@ func requireGetSubMap(t *testing.T, m map[string]any, key string) map[string]any
 	subMap, ok := rawValue.(map[string]any)
 	require.True(t, ok)
 	return subMap
+}
+
+func getTestPid(t *testing.T) int {
+	t.Helper()
+	if targetPid := os.Getenv("MONITOR_PID"); targetPid != "" {
+		intPid, err := strconv.ParseInt(targetPid, 10, 32)
+		require.NoError(t, err, "error parsing MONITOR_PID")
+		return int(intPid)
+	}
+	return os.Getpid()
 }
 
 func getConfig() map[string]any {
