@@ -152,7 +152,7 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	}
 
 	// Create the event hub consumer client
-	consumerClient, err := CreateEventHubConsumerClient(&in.config, &consumerClientOptions, in.log)
+	consumerClient, err := CreateEventHubConsumerClient(&in.config, in.log)
 	if err != nil {
 		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating consumer client: %s", err.Error()))
 		return fmt.Errorf("failed to create consumer client: %w", err)
