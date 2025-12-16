@@ -91,5 +91,4 @@ func checkToken(t *testing.T, text string, cnf *oauth2.Config) {
 	if gotSubject != cnf.ClientID {
 		t.Errorf("unexpected issuer: got:%s want:%s", gotSubject, cnf.ClientID)
 	}
-
 }
