@@ -64,6 +64,9 @@ type Stats struct {
 	// These events are also included in eventsFailed.
 	eventsTooMany *monitoring.Uint
 
+	// Number of events sent to the Failure store
+	eventsFailureStore *monitoring.Uint
+
 	// Output batch stats
 
 	// Number of times a batch was split for being too large
@@ -87,15 +90,16 @@ type Stats struct {
 // The registry must not be null.
 func NewStats(reg *monitoring.Registry, logger *logp.Logger) *Stats {
 	obj := &Stats{
-		eventsBatches:    monitoring.NewUint(reg, "events.batches"),
-		eventsTotal:      monitoring.NewUint(reg, "events.total"),
-		eventsACKed:      monitoring.NewUint(reg, "events.acked"),
-		eventsDeadLetter: monitoring.NewUint(reg, "events.dead_letter"),
-		eventsFailed:     monitoring.NewUint(reg, "events.failed"),
-		eventsDropped:    monitoring.NewUint(reg, "events.dropped"),
-		eventsDuplicates: monitoring.NewUint(reg, "events.duplicates"),
-		eventsActive:     monitoring.NewUint(reg, "events.active"),
-		eventsTooMany:    monitoring.NewUint(reg, "events.toomany"),
+		eventsBatches:      monitoring.NewUint(reg, "events.batches"),
+		eventsTotal:        monitoring.NewUint(reg, "events.total"),
+		eventsACKed:        monitoring.NewUint(reg, "events.acked"),
+		eventsDeadLetter:   monitoring.NewUint(reg, "events.dead_letter"),
+		eventsFailed:       monitoring.NewUint(reg, "events.failed"),
+		eventsDropped:      monitoring.NewUint(reg, "events.dropped"),
+		eventsDuplicates:   monitoring.NewUint(reg, "events.duplicates"),
+		eventsActive:       monitoring.NewUint(reg, "events.active"),
+		eventsTooMany:      monitoring.NewUint(reg, "events.toomany"),
+		eventsFailureStore: monitoring.NewUint(reg, "events.failure_store"),
 
 		batchesSplit: monitoring.NewUint(reg, "batches.split"),
 
@@ -208,5 +212,11 @@ func (s *Stats) ReadError(err error) {
 func (s *Stats) ReadBytes(n int) {
 	if s != nil {
 		s.readBytes.Add(uint64(n)) //nolint:gosec //num events not over uint64
+	}
+}
+
+func (s *Stats) FailureStoreEvents(n int) {
+	if s != nil {
+		s.eventsFailureStore.Add(uint64(n)) //nolint:gosec //num events is never negative
 	}
 }

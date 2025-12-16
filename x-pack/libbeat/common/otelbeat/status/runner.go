@@ -26,17 +26,12 @@ func (s *statusFactory) Create(p beat.PipelineConnector, config *config.C) (cfgf
 		return nil, err
 	}
 	if runnerWithStatus, ok := runner.(status.WithStatusReporter); ok {
-		var h map[string]interface{}
-		err := config.Unpack(&h)
+		inputId, err := getInputId(config)
 		if err != nil {
-			return nil, fmt.Errorf("could not unpack config: %w", err)
+			return nil, err
 		}
-		id, err := hashstructure.Hash(h, nil)
-		if err != nil {
-			return nil, fmt.Errorf("can not compute id from configuration: %w", err)
-		}
-		reporter := s.reporter.GetReporterForRunner(id)
-		runnerWithStatus.SetStatusReporter(reporter)
+		statusReporter := s.reporter.GetReporterForRunner(inputId)
+		runnerWithStatus.SetStatusReporter(statusReporter)
 	}
 	return runner, nil
 }
@@ -49,4 +44,22 @@ func StatusReporterFactory(reporter RunnerReporter) cfgfile.FactoryWrapper {
 	return func(f cfgfile.RunnerFactory) cfgfile.RunnerFactory {
 		return &statusFactory{factory: f, reporter: reporter}
 	}
+}
+
+func getInputId(config *config.C) (string, error) {
+	var h map[string]interface{}
+	err := config.Unpack(&h)
+	if err != nil {
+		return "", fmt.Errorf("could not unpack config: %w", err)
+	}
+	if inputId, ok := h["id"]; ok {
+		return fmt.Sprintf("%v", inputId), nil
+	}
+
+	inputId, err := hashstructure.Hash(h, nil)
+	if err != nil {
+		return "", fmt.Errorf("can not compute id from configuration: %w", err)
+	}
+
+	return fmt.Sprintf("%x", inputId), nil
 }
