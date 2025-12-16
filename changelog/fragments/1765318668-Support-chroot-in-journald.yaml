@@ -16,7 +16,12 @@ summary: The Journald input now supports setting a chroot to use when calling th
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 # NOTE: This field will be rendered only for breaking-change and known-issue kinds at the moment.
-#description:
+description: |
+  Add support in the journald inpur for using chroot when calling
+  `journalctl`. In a container environment this allows to mount the host
+  file system into the container and use its `journalctl`, which
+  prevents any sort of incompatibility between the `journalctl` in the
+  container image and the host Journald. Allows using the journald input with Wolfi based Docker containers.
 
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
 component: filebeat
