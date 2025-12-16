@@ -129,17 +129,22 @@ func TestCgroupPressure(t *testing.T) {
 	cgroup, ok := cgroupData.(map[string]any)
 	require.Truef(t, ok, "unexpected cgroup data type: %T", cgroupData)
 
+	if cgroup["path"] == "/" {
+		t.Skip("Process in / cgroup, skipping because of IgnoreRootCgroups")
+	}
+
 	for _, subsystem := range []string{"cpu", "memory", "io"} {
 		t.Run(subsystem, func(t *testing.T) {
 			controller := requireGetSubMap(t, cgroup, subsystem)
 			t.Run("pressure", func(t *testing.T) {
 				// Pressure might not exist, be nil, or be empty depending on kernel configuration
-				_, ok := controller["pressure"]
-				if !ok {
+				if _, ok := controller["pressure"]; !ok {
 					t.Skip("pressure data not available on this cgroup")
 				}
 				pressure := requireGetSubMap(t, controller, "pressure")
 				if pressure == nil {
+					// See https://github.com/elastic/elastic-agent-system-metrics/pull/276
+					require.Equal(t, "io", subsystem, "only the io subsystem returns nil when unavailable")
 					t.Skip("pressure data not available on this cgroup")
 				}
 				for _, stall := range []string{"some", "full"} {
