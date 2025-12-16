@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"math/rand/v2"
@@ -20,6 +21,8 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -366,26 +369,37 @@ func BenchmarkFactory(b *testing.B) {
 	}
 }
 
-func TestReceiverDegraded(t *testing.T) {
+func TestReceiverStatus(t *testing.T) {
+	benchmarkInputId := "benchmark-id"
+	inputStatusAttributes := func(state string, msg string) pcommon.Map {
+		eventAttributes := pcommon.NewMap()
+		inputStatuses := eventAttributes.PutEmptyMap("inputs")
+		benchmarkStatus := inputStatuses.PutEmptyMap(benchmarkInputId)
+		benchmarkStatus.PutStr("status", state)
+		benchmarkStatus.PutStr("error", msg)
+		return eventAttributes
+	}
+	expectedDegradedErrorMessage := "Error fetching data for metricset benchmark.info: benchmark input degraded"
 	testCases := []struct {
 		name    string
-		status  oteltest.ExpectedStatus
+		status  *componentstatus.Event
 		degrade bool
 	}{
 		{
 			name: "degraded input",
-			status: oteltest.ExpectedStatus{
-				Status: componentstatus.StatusRecoverableError,
-				Error:  "benchmark input degraded",
-			},
+			status: componentstatus.NewEvent(
+				componentstatus.StatusRecoverableError,
+				componentstatus.WithError(errors.New(expectedDegradedErrorMessage)),
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusRecoverableError.String(), expectedDegradedErrorMessage)),
+			),
 			degrade: true,
 		},
 		{
 			name: "running input",
-			status: oteltest.ExpectedStatus{
-				Status: componentstatus.StatusOK,
-				Error:  "",
-			},
+			status: componentstatus.NewEvent(componentstatus.StatusOK,
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusOK.String(), ""))),
 		},
 	}
 
@@ -397,6 +411,7 @@ func TestReceiverDegraded(t *testing.T) {
 						"max_start_delay": "0s",
 						"modules": []map[string]any{
 							{
+								"id":         benchmarkInputId,
 								"module":     "benchmark",
 								"enabled":    true,
 								"period":     "1s",
