@@ -116,12 +116,23 @@ func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, erro
 	}
 
 	if config.Chroot != "" {
+		// When using chroot we need absolute paths for the journalctl binary
+		// (see https://github.com/golang/go/issues/39341). However for a
+		// normal operation we look for 'journalctl' in the PATH.
+		// So if chroot is set, change the default value.
+		if config.JournalctlPath == defaultJournalCtlPath {
+			config.JournalctlPath = defaultJournalCtlPathChroot
+		}
 		chrootStat, err := os.Stat(config.Chroot)
 		if err != nil {
 			return nil, nil, fmt.Errorf("cannot stat chroot:  %w", err)
 		}
 		if !chrootStat.IsDir() {
 			return nil, nil, fmt.Errorf("provided chroot (%s) is not a directory", config.Chroot)
+		}
+
+		if !filepath.IsAbs(config.JournalctlPath) {
+			return nil, nil, errors.New("journalctl_path must be an absolute path when chroot is set")
 		}
 
 		fullPath := filepath.Join(config.Chroot, config.JournalctlPath)

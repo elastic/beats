@@ -39,6 +39,16 @@ import (
 // logged only once if an old config format is detected.
 var includeMatchesWarnOnce sync.Once
 
+// defaultJournalCtlPath is the default journalctl binary path for the normal
+// operation of the input. It requires that the jouranlctl binary is in the
+// PATH.
+var defaultJournalCtlPath = "journalctl"
+
+// defaultJournalCtlPathChroot is the default journalctl binary path when
+// using a chroot, which requires absolute paths.
+// See https://github.com/golang/go/issues/39341
+var defaultJournalCtlPathChroot = "/usr/bin/journalctl"
+
 // Config stores the options of a journald input.
 type config struct {
 	// ID is the input ID, each instance must have a unique ID
@@ -121,6 +131,6 @@ func defaultConfig() config {
 	return config{
 		Seek:               journalctl.SeekHead,
 		SaveRemoteHostname: false,
-		JournalctlPath:     "journalctl",
+		JournalctlPath:     defaultJournalCtlPath,
 	}
 }
