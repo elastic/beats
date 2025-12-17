@@ -16,6 +16,8 @@ This allows you to use Beat processors like e.g. [add_host_metadata] anywhere in
 
 Here are the currently supported processors:
 
+- [add_cloud_metadata]
+- [add_docker_metadata]
 - [add_host_metadata]
 - [add_kubernetes_metadata]
 
@@ -115,6 +117,32 @@ processors:
 exporters:
   debug:
 ```
+
+## Using the `add_cloud_metadata` processor
+
+To use the [add_cloud_metadata] processor, configure the processor as follows:
+
+```yaml
+processors:
+  beat:
+    processors:
+      - add_cloud_metadata:
+```
+
+You can configure the cloud metadata enrichment using the options supported by the [add_cloud_metadata] processor.
+
+## Using the `add_docker_metadata` processor
+
+To use the [add_docker_metadata] processor, configure the processor as follows:
+
+```yaml
+processors:
+  beat:
+    processors:
+      - add_docker_metadata:
+```
+
+You can configure the Docker metadata enrichment using the options supported by the [add_docker_metadata] processor.
 
 ## Using the `add_host_metadata` processor
 

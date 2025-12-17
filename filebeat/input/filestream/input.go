@@ -61,14 +61,16 @@ type fileMeta struct {
 // filestream is the input for reading from files which
 // are actively written by other applications.
 type filestream struct {
-	readerConfig         readerConfig
-	encodingFactory      encoding.EncodingFactory
-	closerConfig         closerConfig
-	deleterConfig        deleterConfig
-	parsers              parser.Config
-	takeOver             loginp.TakeOverConfig
-	scannerCheckInterval time.Duration
-	gzipExperimental     bool
+	readerConfig              readerConfig
+	encodingFactory           encoding.EncodingFactory
+	closerConfig              closerConfig
+	deleterConfig             deleterConfig
+	parsers                   parser.Config
+	takeOver                  loginp.TakeOverConfig
+	scannerCheckInterval      time.Duration
+	compression               string
+	includeFileOwnerName      bool
+	includeFileOwnerGroupName bool
 
 	// Function references for testing
 	waitGracePeriodFn func(
@@ -136,17 +138,19 @@ func configure(
 	}
 
 	filestream := &filestream{
-		readerConfig:      c.Reader,
-		encodingFactory:   encodingFactory,
-		closerConfig:      c.Close,
-		parsers:           c.Reader.Parsers,
-		takeOver:          c.TakeOver,
-		gzipExperimental:  c.GZIPExperimental,
-		deleterConfig:     c.Delete,
-		waitGracePeriodFn: waitGracePeriod,
-		tickFn:            time.Tick,
-		removeFn:          os.Remove,
-		statFn:            os.Stat,
+		readerConfig:              c.Reader,
+		encodingFactory:           encodingFactory,
+		closerConfig:              c.Close,
+		parsers:                   c.Reader.Parsers,
+		takeOver:                  c.TakeOver,
+		compression:               c.Compression,
+		includeFileOwnerName:      c.IncludeFileOwnerName,
+		includeFileOwnerGroupName: c.IncludeFileOwnerGroupName,
+		deleterConfig:             c.Delete,
+		waitGracePeriodFn:         waitGracePeriod,
+		tickFn:                    time.Tick,
+		removeFn:                  os.Remove,
+		statFn:                    os.Stat,
 	}
 
 	// Read the scan interval from the prospector so we can use during the
@@ -485,7 +489,7 @@ func (inp *filestream) open(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, fs.desc.Fingerprint, offset)
+	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
 
 	r = inp.parsers.Create(r, log)
 
@@ -584,36 +588,48 @@ func (inp *filestream) openFile(
 
 // newFile wraps the given os.File into an appropriate File interface implementation.
 //
-// If the 'gzip_experimental' flag is false, it returns a plain file reader
-// (plainFile).
-//
-// If the 'gzip_experimental' flag is true, it attempts to detect if the
-// underlying file is GZIP compressed. If it is, it returns a GZIP-aware file
-// reader (gzipSeekerReader). If the file is not GZIP compressed, it returns a
-// plain file reader (plainFile).
+// The behavior depends on the compression setting:
+//   - "" (none): returns a plain file reader (plainFile)
+//   - "gzip": always creates a gzipSeekerReader (errors if file is not gzip)
+//   - "auto": auto-detects gzip files; returns gzipSeekerReader for gzip files,
+//     plainFile otherwise
 //
 // It returns an error if any happens.
 func (inp *filestream) newFile(rawFile *os.File) (File, error) {
-	if !inp.gzipExperimental {
+	switch inp.compression {
+	case CompressionNone:
 		return newPlainFile(rawFile), nil
-	}
 
-	isGZIP, err := IsGZIP(rawFile)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"gzip detection error on %s: %w", rawFile.Name(), err)
-	}
+	case CompressionGZIP:
+		f, err := newGzipSeekerReader(rawFile, inp.readerConfig.BufferSize)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to create gzip reader for %s: %w", rawFile.Name(), err)
+		}
+		return f, nil
 
-	if !isGZIP {
-		return newPlainFile(rawFile), nil
-	}
+	case CompressionAuto:
+		isGZIP, err := IsGZIP(rawFile)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"gzip detection error on %s: %w", rawFile.Name(), err)
+		}
 
-	f, err := newGzipSeekerReader(rawFile, inp.readerConfig.BufferSize)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed create gzip seeker reader %s: %w", rawFile.Name(), err)
+		if !isGZIP {
+			return newPlainFile(rawFile), nil
+		}
+
+		f, err := newGzipSeekerReader(rawFile, inp.readerConfig.BufferSize)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to create gzip reader for %s: %w", rawFile.Name(), err)
+		}
+		return f, nil
+
+	default:
+		// This should not happen as validation catches invalid values
+		return nil, fmt.Errorf("invalid compression mode: %q", inp.compression)
 	}
-	return f, nil
 }
 
 func checkFileBeforeOpening(fi os.FileInfo) error {
