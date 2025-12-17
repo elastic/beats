@@ -63,7 +63,7 @@ func TestNewFactoryChroot(t *testing.T) {
 	journalctlPath, err := exec.LookPath("journalctl")
 	require.NoError(t, err, "cannot look path for journalctl")
 
-	tempDir := fs.TempDir(t, "..", "..", "..", "..", "build")
+	tempDir := fs.TempDir(t, "..", "..", "..", "..", "build", "integration-tests")
 
 	// Create container configuration
 	containerConfig := &container.Config{

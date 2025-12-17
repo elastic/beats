@@ -54,7 +54,7 @@ func TestJournaldChroot(t *testing.T) {
 
 	generateJournaldLogs(t, syslogID, 5, 100)
 
-	tempDir := fs.TempDir(t, filepath.Join("..", "..", "build"))
+	tempDir := fs.TempDir(t, filepath.Join("..", "..", "build", "integration-tests"))
 	containerLogFile := fs.NewLogFile(t, tempDir, "container-logs-*.log")
 
 	filebeatPath := buildFilebeatBinary(t, tempDir)
