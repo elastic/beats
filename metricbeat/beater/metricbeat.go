@@ -58,7 +58,6 @@ type Metricbeat struct {
 	// Options
 	moduleOptions []module.Option
 	logger        *logp.Logger
-	paths         *paths.Path
 }
 
 // Option specifies some optional arguments used for configuring the behavior
