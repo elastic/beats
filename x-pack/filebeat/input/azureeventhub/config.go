@@ -378,9 +378,6 @@ func (conf *azureInputConfig) validateStorageAccountConfigV2(logger *logp.Logger
 	// - client_secret: uses the same credentials as Event Hub, no connection string needed
 	if conf.AuthType == AuthTypeConnectionString {
 		if conf.SAConnectionString == "" {
-<<<<<<< HEAD
-			return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
-=======
 			if conf.SAName != "" && conf.SAKey != "" {
 				// To avoid breaking changes, and ease the migration from v1 to v2,
 				// we can build the connection string using the following settings:
@@ -409,7 +406,6 @@ func (conf *azureInputConfig) validateStorageAccountConfigV2(logger *logp.Logger
 				// No connection string and no key, so we can't proceed.
 				return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
 			}
->>>>>>> 7ffcd634b ([Azure] Add client secret (Oauth2) support for eventhub filebeat input (#47256))
 		}
 	}
 	// For client_secret auth with processor v2, storage account uses the same credentials
