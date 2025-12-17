@@ -985,6 +985,7 @@ processors:
   beat:
     processors:
       - add_cloud_metadata:
+      - add_docker_metadata:
       - add_host_metadata:
 exporters:
   debug:
@@ -1041,6 +1042,7 @@ receivers:
           file_identity.native: ~
     processors:
       - add_cloud_metadata:
+      - add_docker_metadata:
       - add_host_metadata:
     logging:
       level: info
