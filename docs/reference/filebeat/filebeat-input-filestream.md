@@ -727,7 +727,7 @@ stack: removed 9.3.0, beta 9.2.0
 ```
 
 :::{note}
-`gzip_experimental` is deprecated and ignored. Use [`compression`](#filebeat-input-filestream-compression) instead.
+`gzip_experimental` was removed. Use [`compression`](#filebeat-input-filestream-compression) instead.
 :::
 
 When set to `true`, enables GZIP file reading with auto-detection.
