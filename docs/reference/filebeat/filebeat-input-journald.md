@@ -17,7 +17,7 @@ The Wolfi-based Docker image does not contain the `journalctl` binary and the `j
 :::{important}
 When using the Journald input from a Docker container, make sure that
 either:
- - {applies_to}`stack: ga 9.3.0` [`chroot`](#filebeat-input-journald-chroot), [`journalct_path`](#filebeat-input-journald-journalctl-path) are set, or
+ - {applies_to}`stack: ga 9.3.0` [`chroot`](#filebeat-input-journald-chroot) is set, or
  - The `journalctl` binary in the container is compatible with your
    Systemd/journal version. To get the version of the `journalctl` binary
    in Filebeat's image run the following, adjusting the image name/tag
@@ -124,18 +124,24 @@ Filebeat to call the host's `journalctl` directly. If using this
 option in a container, the container needs `CAP_SYS_CHROOT` to start
 the chroot and {{filebeat}} needs permissions to read the desired
 journals, usually being added to `systemd-journal` group.
-Using chroot requires
-[`journalct_path`](#filebeat-input-journald-journalctl-path) to be
-set.
 
-### `journalct_path` [filebeat-input-journald-journalctl-path]
+When `chroot` is set, if
+[`journalctl_path`](#filebeat-input-journald-journalctl-path) is not
+explicitly configured, it defaults to `/usr/bin/journalctl`. If
+`journalctl_path` is explicitly set, it must be an absolute path from
+within the chroot directory.
+
+### `journalctl_path` [filebeat-input-journald-journalctl-path]
 ```{applies_to}
 stack: ga 9.3.0
 ```
-The absolute path for the `journalctl` binary. If not set {{filebeat}}
-will look for `journalctl` in `PATH`. When using
-[`chroot`](#filebeat-input-journald-chroot), `journalct_path` must be
-an absolute path from within the chroot directory.
+The path for the `journalctl` binary. If not set, {{filebeat}} will
+look for `journalctl` in `PATH`. When using
+[`chroot`](#filebeat-input-journald-chroot), if `journalctl_path` is
+not explicitly set, it automatically defaults to
+`/usr/bin/journalctl`. If `journalctl_path` is explicitly set when
+`chroot` is configured, it must be an absolute path from within the
+chroot directory.
 
 
 ### `merge` [filebeat-input-journald-merge]
