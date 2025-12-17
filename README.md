@@ -1,7 +1,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/elastic/beats)](https://goreportcard.com/report/github.com/elastic/beats)
 [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
-# Beats - The Lightweight Shippers of the Elastic Stack
+# Beats - The Lightweight Shippers of the Elastic Stack architecture
 
 The [Beats](https://www.elastic.co/beats) are lightweight data
 shippers, written in Go, that you install on your servers to capture all sorts
