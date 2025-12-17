@@ -21,6 +21,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"math"
 )
 
 var (
@@ -96,12 +97,12 @@ func init() {
 	}
 }
 
-var supportedCurveTypes = make(map[tlsCurveType]string, len(tlsCurveTypes))
-var tlsCurveTypes = map[string]tlsCurveType{
-	"P-256":  tlsCurveType(tls.CurveP256),
-	"P-384":  tlsCurveType(tls.CurveP384),
-	"P-521":  tlsCurveType(tls.CurveP521),
-	"X25519": tlsCurveType(tls.X25519),
+var supportedCurveTypes = make(map[TLSCurveType]string, len(tlsCurveTypes))
+var tlsCurveTypes = map[string]TLSCurveType{
+	"P-256":  TLSCurveType(tls.CurveP256),
+	"P-384":  TLSCurveType(tls.CurveP384),
+	"P-521":  TLSCurveType(tls.CurveP521),
+	"X25519": TLSCurveType(tls.X25519),
 }
 
 var tlsRenegotiationSupportTypes = map[string]TLSRenegotiationSupport{
@@ -162,7 +163,7 @@ func (m TLSVerificationMode) MarshalText() ([]byte, error) {
 }
 
 // Unpack unpacks the input into a TLSVerificationMode.
-func (m *TLSVerificationMode) Unpack(in interface{}) error {
+func (m *TLSVerificationMode) Unpack(in any) error {
 	if in == nil {
 		*m = VerifyFull
 		return nil
@@ -180,9 +181,15 @@ func (m *TLSVerificationMode) Unpack(in interface{}) error {
 		}
 		*m = mode
 	case int64:
-		*m = TLSVerificationMode(o)
+		if o < 0 || o > math.MaxUint8 {
+			return fmt.Errorf("unknown verification mode '%d'", o)
+		}
+		*m = TLSVerificationMode(uint8(o))
 	case uint64:
-		*m = TLSVerificationMode(o)
+		if o > math.MaxUint8 {
+			return fmt.Errorf("unknown verification mode '%d'", o)
+		}
+		*m = TLSVerificationMode(uint8(o))
 	default:
 		return fmt.Errorf("verification mode is an unknown type: %T", o)
 	}
@@ -210,7 +217,7 @@ func (m TLSClientAuth) MarshalText() ([]byte, error) {
 	return nil, fmt.Errorf("could not marshal '%+v' to text", m)
 }
 
-func (m *TLSClientAuth) Unpack(in interface{}) error {
+func (m *TLSClientAuth) Unpack(in any) error {
 	if in == nil {
 		*m = TLSClientAuthNone
 		return nil
@@ -228,9 +235,15 @@ func (m *TLSClientAuth) Unpack(in interface{}) error {
 
 		*m = mode
 	case uint64:
-		*m = TLSClientAuth(o)
+		if o > math.MaxInt {
+			return fmt.Errorf("unknown client authentication mode '%d'", o)
+		}
+		*m = TLSClientAuth(int(o))
 	case int64: // underlying type is int so we need both uint64 and int64 as options for TLSClientAuth
-		*m = TLSClientAuth(o)
+		if o < math.MinInt || o > math.MaxInt {
+			return fmt.Errorf("unknown client authentication mode '%d'", o)
+		}
+		*m = TLSClientAuth(int(o))
 	default:
 		return fmt.Errorf("client auth mode is an unknown type: %T", o)
 	}
@@ -239,7 +252,7 @@ func (m *TLSClientAuth) Unpack(in interface{}) error {
 
 type CipherSuite uint16
 
-func (cs *CipherSuite) Unpack(i interface{}) error {
+func (cs *CipherSuite) Unpack(i any) error {
 	switch o := i.(type) {
 	case string:
 		suite, found := tlsCipherSuites[o]
@@ -249,9 +262,15 @@ func (cs *CipherSuite) Unpack(i interface{}) error {
 
 		*cs = suite
 	case int64:
-		*cs = CipherSuite(o)
+		if o < 0 || o > math.MaxUint16 {
+			return fmt.Errorf("invalid tls cipher suite '%d'", o)
+		}
+		*cs = CipherSuite(uint16(o))
 	case uint64:
-		*cs = CipherSuite(o)
+		if o > math.MaxUint16 {
+			return fmt.Errorf("invalid tls cipher suite '%d'", o)
+		}
+		*cs = CipherSuite(uint16(o))
 	default:
 		return fmt.Errorf("cipher suite is an unknown type: %T", o)
 	}
@@ -272,9 +291,9 @@ func (cs CipherSuite) String() string {
 	return unknownType
 }
 
-type tlsCurveType tls.CurveID
+type TLSCurveType tls.CurveID
 
-func (ct *tlsCurveType) Unpack(i interface{}) error {
+func (ct *TLSCurveType) Unpack(i any) error {
 	switch o := i.(type) {
 	case string:
 		t, found := tlsCurveTypes[o]
@@ -284,16 +303,22 @@ func (ct *tlsCurveType) Unpack(i interface{}) error {
 
 		*ct = t
 	case int64:
-		*ct = tlsCurveType(o)
+		if o < 0 || o > math.MaxUint16 {
+			return fmt.Errorf("invalid tls curve type '%d'", o)
+		}
+		*ct = TLSCurveType(uint16(o))
 	case uint64:
-		*ct = tlsCurveType(o)
+		if o > math.MaxUint16 {
+			return fmt.Errorf("invalid tls curve type '%d'", o)
+		}
+		*ct = TLSCurveType(uint16(o))
 	default:
 		return fmt.Errorf("tls curve type is an unsupported input type: %T", o)
 	}
 	return nil
 }
 
-func (ct *tlsCurveType) Validate() error {
+func (ct *TLSCurveType) Validate() error {
 	if _, ok := supportedCurveTypes[*ct]; !ok {
 		return fmt.Errorf("unsupported curve type: %s", tls.CurveID(*ct).String())
 	}
@@ -309,7 +334,7 @@ func (r TLSRenegotiationSupport) String() string {
 	return "<" + unknownType + ">"
 }
 
-func (r *TLSRenegotiationSupport) Unpack(i interface{}) error {
+func (r *TLSRenegotiationSupport) Unpack(i any) error {
 	switch o := i.(type) {
 	case string:
 		t, found := tlsRenegotiationSupportTypes[o]
@@ -319,9 +344,15 @@ func (r *TLSRenegotiationSupport) Unpack(i interface{}) error {
 
 		*r = t
 	case int64:
-		*r = TLSRenegotiationSupport(o)
+		if o < math.MinInt || o > math.MaxInt {
+			return fmt.Errorf("invalid tls renegotiation type '%d'", o)
+		}
+		*r = TLSRenegotiationSupport(int(o))
 	case uint64:
-		*r = TLSRenegotiationSupport(o)
+		if o > math.MaxInt {
+			return fmt.Errorf("invalid tls renegotiation type '%d'", o)
+		}
+		*r = TLSRenegotiationSupport(int(o))
 	default:
 		return fmt.Errorf("tls renegotation support is an unknown type: %T", o)
 	}
@@ -336,7 +367,7 @@ func (r TLSRenegotiationSupport) MarshalText() ([]byte, error) {
 	return nil, fmt.Errorf("could not marshal '%+v' to text", r)
 }
 
-func (r TLSRenegotiationSupport) MarshalYAML() (interface{}, error) {
+func (r TLSRenegotiationSupport) MarshalYAML() (any, error) {
 	if t, found := tlsRenegotiationSupportTypesInverse[r]; found {
 		return t, nil
 	}

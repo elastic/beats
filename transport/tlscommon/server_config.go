@@ -34,7 +34,7 @@ type ServerConfig struct {
 	CipherSuites     []CipherSuite       `config:"cipher_suites" yaml:"cipher_suites,omitempty"`
 	CAs              []string            `config:"certificate_authorities" yaml:"certificate_authorities,omitempty"`
 	Certificate      CertificateConfig   `config:",inline" yaml:",inline"`
-	CurveTypes       []tlsCurveType      `config:"curve_types" yaml:"curve_types,omitempty"`
+	CurveTypes       []TLSCurveType      `config:"curve_types" yaml:"curve_types,omitempty"`
 	ClientAuth       *TLSClientAuth      `config:"client_authentication" yaml:"client_authentication,omitempty"` //`none`, `optional` or `required`
 	CASha256         []string            `config:"ca_sha256" yaml:"ca_sha256,omitempty"`
 }
