@@ -119,9 +119,6 @@ func stripLinuxOsqueryd() error {
 	}
 
 	// Strip osqueryd only once when osquery-extension is built
-	// There are two build paths at the moment both through GolangCrossBuild
-	// 1. Standlone osquerybeat package (this function is called twice: for osquerybeat and osquery-extension)
-	// 2. Agentbeat package, this function is only called once for osquery-extension
 	if !strings.HasSuffix(cwd, "/osquery-extension") {
 		return nil
 	}
