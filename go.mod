@@ -234,32 +234,9 @@ require (
 
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
-<<<<<<< HEAD
-	github.com/cilium/ebpf v0.19.0
-=======
 	github.com/cilium/ebpf v0.20.0
-	github.com/coder/websocket v1.8.14
->>>>>>> eca1c02f6 (Update collector-contrib to 0.141.0 and collector to 1.47.0 (#48122))
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
-<<<<<<< HEAD
-	go.opentelemetry.io/collector/client v1.45.0
-	go.opentelemetry.io/collector/component/componenttest v0.139.0
-	go.opentelemetry.io/collector/config/configauth v1.45.0
-	go.opentelemetry.io/collector/config/confighttp v0.139.0
-	go.opentelemetry.io/collector/config/configoptional v1.45.0
-	go.opentelemetry.io/collector/confmap/xconfmap v0.139.0
-	go.opentelemetry.io/collector/consumer/consumertest v0.139.0
-	go.opentelemetry.io/collector/exporter v1.45.0
-	go.opentelemetry.io/collector/exporter/exportertest v0.139.0
-	go.opentelemetry.io/collector/extension v1.45.0
-	go.opentelemetry.io/collector/extension/extensionauth v1.45.0
-	go.opentelemetry.io/collector/extension/extensiontest v0.139.0
-	go.opentelemetry.io/collector/pipeline v1.45.0
-	go.opentelemetry.io/collector/processor v1.45.0
-	go.opentelemetry.io/collector/processor/processorhelper v0.139.0
-	go.opentelemetry.io/collector/receiver/receivertest v0.139.0
-=======
 	go.opentelemetry.io/collector/client v1.47.0
 	go.opentelemetry.io/collector/component/componenttest v0.141.0
 	go.opentelemetry.io/collector/config/configauth v1.47.0
@@ -276,16 +253,7 @@ require (
 	go.opentelemetry.io/collector/processor v1.47.0
 	go.opentelemetry.io/collector/processor/processorhelper v0.141.0
 	go.opentelemetry.io/collector/receiver/receivertest v0.141.0
-	go.opentelemetry.io/collector/service v0.141.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0
-	go.opentelemetry.io/otel v1.38.0
-	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.38.0
-	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.38.0
-	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.38.0
-	go.opentelemetry.io/otel/metric v1.38.0
-	go.opentelemetry.io/otel/sdk v1.38.0
->>>>>>> eca1c02f6 (Update collector-contrib to 0.141.0 and collector to 1.47.0 (#48122))
-	go.opentelemetry.io/otel/sdk/metric v1.38.0
+    go.opentelemetry.io/otel/sdk/metric v1.38.0
 	go.uber.org/goleak v1.3.0
 	sigs.k8s.io/kind v0.29.0
 )
@@ -500,12 +468,7 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0 // indirect
 	go.opentelemetry.io/contrib/otelconf v0.18.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.38.0 // indirect
-<<<<<<< HEAD
-	go.opentelemetry.io/ebpf-profiler v0.0.202540 // indirect
-	go.opentelemetry.io/otel v1.38.0 // indirect
-=======
 	go.opentelemetry.io/ebpf-profiler v0.0.202547 // indirect
->>>>>>> eca1c02f6 (Update collector-contrib to 0.141.0 and collector to 1.47.0 (#48122))
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.14.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.14.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.38.0 // indirect
