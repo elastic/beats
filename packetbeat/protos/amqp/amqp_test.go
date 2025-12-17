@@ -345,6 +345,7 @@ func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
 	assert.Equal(t, false, fields["no-wait"])
 }
 
+// FIXME: failing
 func TestAmqp_PublishMessage(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
@@ -394,6 +395,7 @@ func TestAmqp_PublishMessage(t *testing.T) {
 	assert.Equal(t, false, fields["mandatory"])
 }
 
+// FIXME: failing
 func TestAmqp_DeliverMessage(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
@@ -440,6 +442,7 @@ func TestAmqp_DeliverMessage(t *testing.T) {
 	assert.Equal(t, false, fields["redelivered"])
 }
 
+// FIXME: failing
 func TestAmqp_MessagePropertiesFields(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
@@ -620,6 +623,7 @@ func TestAmqp_GetEmptyMethod(t *testing.T) {
 	assert.Equal(t, common.OK_STATUS, trans["status"])
 }
 
+// FIXME: failing
 func TestAmqp_GetMethod(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
@@ -652,6 +656,7 @@ func TestAmqp_GetMethod(t *testing.T) {
 	assert.Equal(t, "Get me if you dare", trans["response"])
 }
 
+// FIXME: failing
 func TestAmqp_MaxBodyLength(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
@@ -892,6 +897,7 @@ func TestAmqp_GetTable(t *testing.T) {
 	assert.Equal(t, "TestHeader", m.request)
 }
 
+// FIXME: failing
 func TestAmqp_TableInception(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
@@ -944,6 +950,7 @@ func TestAmqp_TableInception(t *testing.T) {
 	assert.Equal(t, "Saito", limbo["limbo2"])
 }
 
+// FIXME: failing
 func TestAmqp_ArrayFields(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 

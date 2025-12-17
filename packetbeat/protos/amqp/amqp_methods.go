@@ -1004,10 +1004,10 @@ func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short s
 	if len(data) == 0 {
 		return "", 0, true
 	}
-	size := int(unsafe.Sizeof(length))
+	lengthSize := int(unsafe.Sizeof(length))
 
 	// If there's not enough data to read the length of the string return err
-	if offset+uint32(size) >= uint32(len(data)) {
+	if offset+uint32(lengthSize) >= uint32(len(data)) {
 		return "", 0, true
 	}
 
@@ -1015,19 +1015,21 @@ func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short s
 	case uint8:
 		length = T(data[offset])
 	case uint16:
-		length = T(binary.BigEndian.Uint16(data[offset : offset+uint32(size)]))
+		length = T(binary.BigEndian.Uint16(data[offset : offset+uint32(lengthSize)]))
 	case uint32:
-		length = T(binary.BigEndian.Uint32(data[offset : offset+uint32(size)]))
+		length = T(binary.BigEndian.Uint32(data[offset : offset+uint32(lengthSize)]))
 	}
 	strlen := uint32(length)
 
 	if strlen == 0 {
-		return "", 1, false
+		return "", uint32(lengthSize), false
 	}
-	if uint32(len(data)+size) < strlen {
+
+	if offset+uint32(lengthSize)+strlen > uint32(len(data)) {
+		logp.Debug("amqp", "Not enough data for string")
 		return "", 0, true
 	}
-	return string(data[offset+uint32(size) : offset+uint32(size)+strlen]), strlen + uint32(size), false
+	return string(data[offset+uint32(lengthSize) : offset+uint32(lengthSize)+strlen]), strlen + uint32(lengthSize), false
 }
 
 // Attempts to get an integer from a byte slice. Returns the integer and an err boolean.
@@ -1038,7 +1040,7 @@ func getIntegerAt[T uint8 | uint16 | uint32 | uint64 | int8 | int16 | int32 | in
 	size := int(unsafe.Sizeof(value))
 
 	// If there's not enough bytes to read the requested integer type
-	if offset+uint32(size) >= uint32(len(data)) {
+	if offset+uint32(size) > uint32(len(data)) {
 		return T(0), true
 	}
 

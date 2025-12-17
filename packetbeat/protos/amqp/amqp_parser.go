@@ -217,6 +217,8 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 		}
 	}
 
+	logp.Debug("amqp", "offset:%d, lastbit:%d", offset, lastbit)
+
 	if hasProperty(prop1, contentTypeProp) {
 		contentType, consumed, err := getLVString[uint8](data, offset)
 		if err {

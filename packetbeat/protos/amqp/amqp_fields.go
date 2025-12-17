@@ -217,7 +217,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 			return true
 		}
 		table[name] = s
-		offset += consumed
+		offset += consumed + 1
 	case longString:
 		s, consumed, err := getLVString[uint32](data, offset+1)
 		if err {
@@ -225,7 +225,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 			return true
 		}
 		table[name] = s
-		offset += consumed
+		offset += consumed + 1
 	case fieldArray:
 		newMap := mapstr.M{}
 		next, err, _ := getArray(newMap, data, offset+1)
@@ -257,7 +257,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	case byteArray:
 		size, err := getIntegerAt[uint32](data, offset+1)
 		if err || len(data) < int(offset+5+size) {
-			logp.Debug("amqp", "Failed to get timestamp in table")
+			logp.Debug("amqp", "Failed to get byte array in table")
 			return true
 		}
 		table[name] = bodyToByteArray(data[offset+1+size : offset+5+size])
