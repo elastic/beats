@@ -97,7 +97,7 @@ func (t *Template) Apply(data *bytes.Buffer, n int) ([]record.Record, error) {
 	for i := 0; i < limit; i++ {
 		event, err := makeFn(data)
 		if err != nil {
-			if err == io.EOF && t.VariableLength {
+			if errors.Is(err, io.EOF) && t.VariableLength {
 				break
 			}
 			return events, err
