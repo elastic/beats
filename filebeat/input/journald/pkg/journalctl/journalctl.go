@@ -148,18 +148,25 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 			}
 		}()
 
-		jctlCommandMsg := fmt.Sprintf("Journalctl command: %s %s", journalctlPath, strings.Join(args, " "))
-		if chroot != "" {
-			jctlCommandMsg = fmt.Sprintf("%s Chroot: %s (command path relative to chroot)", jctlCommandMsg, chroot)
-		}
+		processCmdLine := strings.Join(append([]string{journalctlPath}, args...), " ")
 
-		logger.Info(jctlCommandMsg)
+		logger.Infow(
+			"Journalctl command. Paths relative to chroot (if set)",
+			"process.command_line", processCmdLine,
+			"process.chroot", chroot,
+		)
 
 		if err := cmd.Start(); err != nil {
 			return &journalctl{}, fmt.Errorf("cannot start journalctl: %w. Chroot: %s", err, chroot)
 		}
 
-		logger.Infof("journalctl started with PID %d", cmd.Process.Pid)
+		logger.Infow(
+			"journalctl started",
+			"process.pid", cmd.Process.Pid,
+		)
+		jctl.logger = jctl.logger.With(
+			"process.pid", cmd.Process.Pid,
+		)
 
 		// Whenever the journalctl process exits, the `Wait` call returns,
 		// if there was an error it is logged and this goroutine exits.

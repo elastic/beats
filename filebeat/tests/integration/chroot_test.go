@@ -168,8 +168,8 @@ func startDockerContainer(t *testing.T, cli *client.Client, imageName, syslogID 
 
 func assertJournalctlWorks(t *testing.T, logFile *fs.LogFile, syslogID string) {
 	t.Helper()
-	// Wait for the log message "journalctl started with PID XX"
-	logFile.WaitLogsContains(t, "journalctl started with PID", 30*time.Second, "journalctl did not start")
+	// Wait for the log message "journalctl started"
+	logFile.WaitLogsContains(t, "journalctl started", 30*time.Second, "journalctl did not start")
 	for range 5 {
 		logFile.WaitLogsContains(t, syslogID, 5*time.Second, "did not find event")
 	}
