@@ -69,7 +69,12 @@ func CreateEventHubConsumerClient(cfg *azureInputConfig, log *logp.Logger) (*aze
 	}
 
 	// Set up the consumer client based on the authentication type
+<<<<<<< HEAD
 	if cfg.AuthType == AuthTypeConnectionString {
+=======
+	switch cfg.AuthType {
+	case AuthTypeConnectionString:
+>>>>>>> af5d23e75 ([azure-eventhub] Support for AMQP-over-WebSocket transport in the processor v2 (#47956))
 		// Use connection string authentication for Event Hub
 		// There is a mismatch between how the azure-eventhub input and the new
 		// Event Hub SDK expect the event hub name in the connection string.
@@ -109,6 +114,39 @@ func CreateEventHubConsumerClient(cfg *azureInputConfig, log *logp.Logger) (*aze
 			return nil, fmt.Errorf("failed to create consumer client from connection string: %w", err)
 		}
 		return consumerClient, nil
+<<<<<<< HEAD
+=======
+
+	case AuthTypeClientSecret:
+		credential, err := createCredential(cfg, log)
+		if err != nil {
+			return nil, err
+		}
+		if credential == nil {
+			return nil, fmt.Errorf("credential cannot be empty when auth_type is client_secret")
+		}
+
+		consumerClient, err := azeventhubs.NewConsumerClient(
+			cfg.EventHubNamespace,
+			cfg.EventHubName,
+			cfg.ConsumerGroup,
+			credential,
+			&options,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create consumer client with credential: %w", err)
+		}
+
+		log.Infow("successfully created consumer client with credential authentication",
+			"namespace", cfg.EventHubNamespace,
+			"eventhub", cfg.EventHubName,
+		)
+
+		return consumerClient, nil
+
+	default:
+		return nil, fmt.Errorf("invalid auth_type: %s", cfg.AuthType)
+>>>>>>> af5d23e75 ([azure-eventhub] Support for AMQP-over-WebSocket transport in the processor v2 (#47956))
 	}
 
 	// All credential-based authentication types (client_secret, managed_identity, etc.)
