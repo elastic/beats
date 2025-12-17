@@ -36,7 +36,7 @@ type IOSubsystem struct {
 	Path string `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
 
 	Stats    map[string]IOStat            `json:"stats" struct:"stats"`
-	Pressure map[string]cgcommon.Pressure `json:"pressure" struct:"pressure"`
+	Pressure map[string]cgcommon.Pressure `json:"pressure,omitempty" struct:"pressure,omitempty"`
 }
 
 // IOStat carries io.Stat data for the controllers
