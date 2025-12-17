@@ -150,23 +150,13 @@ func stripLinuxOsqueryd() error {
 		}
 
 		// Strip osqueryd
-		// There are two scenarios where the build path is created depending on the type of build
-		// 1. Standlone osquerybeat build: the osqueryd binaries are downloaded into osquerybeat/build/data/install/[GOOS]/[GOARCH]
-		// 2. Agentbeat build: the osqueryd binaries are downloaded agentbeat/build/data/install/[GOOS]/[GOARCH]
 
 		// This returns something like build/data/install/linux/amd64/osqueryd
 		querydRelativePath := distro.OsquerydPath(distro.GetDataInstallDir(osarch))
 
-		// Checking and stripping osqueryd binary and both paths osquerybeat/build and agentbeat/build
-		// because at the moment it's unclear if this step was initiated from osquerybeat or agentbeat build
+		// Checking and stripping osqueryd binary
 		osquerybeatPath := filepath.Clean(filepath.Join(cwd, "../..", querydRelativePath))
 		err = strip(osquerybeatPath, osarch)
-		if err != nil {
-			return err
-		}
-
-		agentbeatPath := filepath.Clean(filepath.Join(cwd, "../../../agentbeat", querydRelativePath))
-		err = strip(agentbeatPath, osarch)
 		if err != nil {
 			return err
 		}
