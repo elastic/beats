@@ -120,7 +120,7 @@ require (
 	go.elastic.co/go-licence-detector v0.7.0
 	go.etcd.io/bbolt v1.4.0
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.27.1
 	golang.org/x/crypto v0.45.0
 	golang.org/x/mod v0.29.0
 	golang.org/x/net v0.47.0
@@ -172,8 +172,8 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.8.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.0
-	github.com/elastic/elastic-agent-libs v0.26.2
-	github.com/elastic/elastic-agent-system-metrics v0.13.4
+	github.com/elastic/elastic-agent-libs v0.28.0
+	github.com/elastic/elastic-agent-system-metrics v0.13.5
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.3.0
@@ -233,6 +233,7 @@ require (
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.19.0
+	github.com/coder/websocket v1.8.14
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/forensicanalysis/fslib v0.15.2
 	github.com/mattn/go-sqlite3 v1.14.32
@@ -253,6 +254,13 @@ require (
 	go.opentelemetry.io/collector/processor v1.45.0
 	go.opentelemetry.io/collector/processor/processorhelper v0.139.0
 	go.opentelemetry.io/collector/receiver/receivertest v0.139.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0
+	go.opentelemetry.io/otel v1.38.0
+	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.38.0
+	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.38.0
+	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.38.0
+	go.opentelemetry.io/otel/metric v1.38.0
+	go.opentelemetry.io/otel/sdk v1.38.0
 	go.opentelemetry.io/otel/sdk/metric v1.38.0
 	go.uber.org/goleak v1.3.0
 	sigs.k8s.io/kind v0.29.0
@@ -273,7 +281,7 @@ require (
 	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.3 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.11.2 // indirect
-	github.com/Azure/go-amqp v1.3.0 // indirect
+	github.com/Azure/go-amqp v1.4.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.9.24 // indirect
 	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
@@ -469,25 +477,18 @@ require (
 	go.opentelemetry.io/contrib/bridges/otelzap v0.13.0 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.36.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.61.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0 // indirect
 	go.opentelemetry.io/contrib/otelconf v0.18.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.38.0 // indirect
 	go.opentelemetry.io/ebpf-profiler v0.0.202540 // indirect
-	go.opentelemetry.io/otel v1.38.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.14.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.14.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.38.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.38.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.38.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.38.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.38.0 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.60.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdoutlog v0.14.0 // indirect
-	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.38.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.38.0 // indirect
 	go.opentelemetry.io/otel/log v0.14.0 // indirect
-	go.opentelemetry.io/otel/metric v1.38.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.38.0 // indirect
 	go.opentelemetry.io/otel/sdk/log v0.14.0 // indirect
 	go.opentelemetry.io/otel/trace v1.38.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.7.1 // indirect
