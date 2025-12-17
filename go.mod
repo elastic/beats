@@ -232,7 +232,11 @@ require (
 
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
+<<<<<<< HEAD
 	github.com/cilium/ebpf v0.20.0
+=======
+	github.com/cilium/ebpf v0.19.0
+>>>>>>> af5d23e75 ([azure-eventhub] Support for AMQP-over-WebSocket transport in the processor v2 (#47956))
 	github.com/coder/websocket v1.8.14
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/forensicanalysis/fslib v0.15.2
