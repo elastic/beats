@@ -125,6 +125,10 @@ type azureInputConfig struct {
 	// for at least `PartitionReceiveCount` events, then it returns
 	// the events it has received.
 	PartitionReceiveCount int `config:"partition_receive_count"`
+	// Transport controls the transport type to use for the event hub connection.
+	// Possible values are "amqp" (default) and "websocket".
+	// Use "websocket" when connecting through HTTP proxies or when port 5671 is blocked.
+	Transport string `config:"transport"`
 }
 
 func defaultConfig() azureInputConfig {
@@ -144,6 +148,11 @@ func defaultConfig() azureInputConfig {
 		PartitionReceiveCount:   100,
 		// Default
 		LegacySanitizeOptions: []string{},
+		// Default is true to avoid reprocessing data from the start of the retention
+		// when v2 replaces v1.
+		MigrateCheckpoint: true,
+		// Default transport is AMQP for backward compatibility.
+		Transport: transportAmqp,
 	}
 }
 
@@ -154,6 +163,11 @@ func (conf *azureInputConfig) Validate() error {
 	// Normalize authentication method (default to connection_string if empty)
 	if conf.AuthType == "" {
 		conf.AuthType = AuthTypeConnectionString
+	}
+
+	// Validate event hub transport option
+	if err := conf.validateEventHubTransport(); err != nil {
+		return err
 	}
 
 	// Validate the processor version first to ensure it's valid
@@ -186,6 +200,20 @@ func (conf *azureInputConfig) Validate() error {
 		return err
 	}
 
+	return nil
+}
+
+// validateEventHubTransport validates the event hub transport option.
+func (conf *azureInputConfig) validateEventHubTransport() error {
+	// Validate transport option
+	if conf.Transport != transportAmqp && conf.Transport != transportWebsocket {
+		return fmt.Errorf(
+			"invalid event hub transport: %s (available transports: %s, %s)",
+			conf.Transport,
+			transportAmqp,
+			transportWebsocket,
+		)
+	}
 	return nil
 }
 
