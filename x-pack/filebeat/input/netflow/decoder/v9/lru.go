@@ -59,7 +59,7 @@ const (
 	maxPendingPerKey = 512
 	// this is the culmination of 32 templates being maxed out on records
 	// before any of the templates themselves show up
-	maxTotalPending  = 16384
+	maxTotalPending = 16384
 )
 
 func newPendingTemplatesCache() *pendingTemplatesCache {
