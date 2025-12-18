@@ -11,6 +11,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
+	"github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
+	"github.com/elastic/beats/v7/libbeat/processors/add_docker_metadata"
 	"github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
 	"github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -81,6 +83,10 @@ func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Log
 		var createProcessorError error
 
 		switch processorName {
+		case "add_cloud_metadata":
+			processorInstance, createProcessorError = add_cloud_metadata.New(processorConfig, logpLogger)
+		case "add_docker_metadata":
+			processorInstance, createProcessorError = add_docker_metadata.New(processorConfig, logpLogger)
 		case "add_host_metadata":
 			processorInstance, createProcessorError = add_host_metadata.New(processorConfig, logpLogger)
 		case "add_kubernetes_metadata":
