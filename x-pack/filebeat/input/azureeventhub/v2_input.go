@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 //go:build !aix
 
 package azureeventhub
@@ -89,7 +91,7 @@ func (in *eventHubInputV2) Run(
 	var err error
 
 	// Setting up the status reporter helper
-	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log, "Azure Event Hub")
+	in.status = statusreporterhelper.New(inputContext, in.log, "Azure Event Hub")
 
 	// When the input is initializing before attempting to connect to Azure Event Hub.
 	in.status.UpdateStatus(status.Starting, "Input starting")
