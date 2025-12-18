@@ -1158,6 +1158,9 @@ processors:
     processors:
       - add_cloud_metadata:
       - add_docker_metadata:
+      - add_fields:
+          fields:
+            custom_field: "CustomValue"
       - add_host_metadata:
 exporters:
   debug:
@@ -1215,6 +1218,9 @@ receivers:
     processors:
       - add_cloud_metadata:
       - add_docker_metadata:
+      - add_fields:
+          fields:
+            custom_field: "CustomValue"
       - add_host_metadata:
     logging:
       level: info
