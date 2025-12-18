@@ -42,7 +42,7 @@ func TestRunUpdatesStatusToStartingAndFailed(t *testing.T) {
 		Cancelation:     ctx,
 		MetricsRegistry: monitoring.NewRegistry(),
 	}
-	inputTestCtx.WithStatusReporter(statusReporter)
+	inputTestCtx = inputTestCtx.WithStatusReporter(statusReporter)
 
 	// The Run function is expected to return the error from the mock setup function.
 	err = eventHubInputV2.Run(inputTestCtx, nil)
