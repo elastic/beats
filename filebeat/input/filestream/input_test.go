@@ -192,30 +192,41 @@ func TestNewFile(t *testing.T) {
 	require.NoError(t, err)
 
 	testCases := map[string]struct {
-		gzipEnabled   bool
+		compression   string
 		filePath      string
 		expectedType  interface{}
 		expectError   bool
 		errorContains string
 		setup         func(t *testing.T, filePath string) *os.File
 	}{
-		"gzip_disabled_returns_plain_file": {
-			gzipEnabled:  false,
+		"compression_none_returns_plain_file": {
+			compression:  CompressionNone,
 			filePath:     plainFilePath,
 			expectedType: &plainFile{},
 		},
-		"gzip_enabled_with_plain_file_returns_plain_file": {
-			gzipEnabled:  true,
-			filePath:     plainFilePath,
-			expectedType: &plainFile{},
-		},
-		"gzip_enabled_with_gzip_file_returns_gzip_reader": {
-			gzipEnabled:  true,
+		"compression_gzip_with_gzip_file_returns_gzip_reader": {
+			compression:  CompressionGZIP,
 			filePath:     gzippedFilePath,
 			expectedType: &gzipSeekerReader{},
 		},
-		"gzip_enabled_with_unreadable_file_returns_error": {
-			gzipEnabled: true,
+		"compression_gzip_with_plain_file_returns_error": {
+			compression:   CompressionGZIP,
+			filePath:      plainFilePath,
+			expectError:   true,
+			errorContains: "failed to create gzip reader",
+		},
+		"compression_auto_with_plain_file_returns_plain_file": {
+			compression:  CompressionAuto,
+			filePath:     plainFilePath,
+			expectedType: &plainFile{},
+		},
+		"compression_auto_with_gzip_file_returns_gzip_reader": {
+			compression:  CompressionAuto,
+			filePath:     gzippedFilePath,
+			expectedType: &gzipSeekerReader{},
+		},
+		"compression_auto_with_unreadable_file_returns_error": {
+			compression: CompressionAuto,
 			filePath:    plainFilePath, // content doesn't matter
 			setup: func(t *testing.T, filePath string) *os.File {
 				// Return a file that is already closed to trigger a read error
@@ -233,8 +244,8 @@ func TestNewFile(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			inp := &filestream{
-				gzipExperimental: tc.gzipEnabled,
-				readerConfig:     defaultReaderConfig(),
+				compression:  tc.compression,
+				readerConfig: defaultReaderConfig(),
 			}
 
 			var rawFile *os.File
@@ -280,33 +291,33 @@ func TestOpenFile_GZIPNeverTruncated(t *testing.T) {
 	require.NoError(t, err, "could not save gzip file")
 
 	tcs := []struct {
-		name             string
-		gzipExperimental bool
-		path             string
-		want             bool
-		errMsg           string
+		name        string
+		compression string
+		path        string
+		want        bool
+		errMsg      string
 	}{
 		{
-			name:             "plain file is truncated",
-			gzipExperimental: false,
-			path:             plainPath,
-			want:             true,
-			errMsg:           "plain file should be considered truncated",
+			name:        "plain file is truncated",
+			compression: CompressionNone,
+			path:        plainPath,
+			want:        true,
+			errMsg:      "plain file should be considered truncated",
 		},
 		{
-			name:             "GZIP file is never truncated",
-			gzipExperimental: true,
-			path:             gzPath,
-			want:             false,
-			errMsg:           "GZIP file skips truncated validation",
+			name:        "GZIP file is never truncated",
+			compression: CompressionAuto,
+			path:        gzPath,
+			want:        false,
+			errMsg:      "GZIP file skips truncated validation",
 		},
 	}
 
 	for _, tc := range tcs {
 		inp := filestream{
-			gzipExperimental: tc.gzipExperimental,
-			encodingFactory:  encoding.Plain,
-			readerConfig:     readerConfig{BufferSize: 32},
+			compression:     tc.compression,
+			encodingFactory: encoding.Plain,
+			readerConfig:    readerConfig{BufferSize: 32},
 		}
 
 		f, _, truncated, err := inp.openFile(
