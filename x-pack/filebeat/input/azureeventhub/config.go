@@ -323,25 +323,12 @@ func (conf *azureInputConfig) normalizeAndValidateStorageContainer(logger *logp.
 		conf.SAContainer = strings.ReplaceAll(conf.SAContainer, "_", "-")
 		logger.Warnf("replaced underscores (_) with hyphens (-) in the storage account container name (before: %s, now: %s", originalValue, conf.SAContainer)
 	}
-
-<<<<<<< HEAD
-	// log a warning for each sanitization option not supported
-	for _, opt := range conf.LegacySanitizeOptions {
-		logger.Warnw("legacy sanitization `sanitize_options` options are deprecated and will be removed in the 9.0 release; use the `sanitizers` option instead", "option", opt)
-		err := sanitizeOptionsValidate(opt)
-		if err != nil {
-			logger.Warnf("%s: %v", opt, err)
-		}
-	}
-
-=======
 	// Validate the container name conforms to Azure naming rules
 	return storageContainerValidate(conf.SAContainer)
 }
 
 // validateProcessorSettings validates processor-specific configuration settings.
 func (conf *azureInputConfig) validateProcessorSettings() error {
->>>>>>> 7ffcd634b ([Azure] Add client secret (Oauth2) support for eventhub filebeat input (#47256))
 	if conf.ProcessorUpdateInterval < 1*time.Second {
 		return errors.New("processor_update_interval must be at least 1 second")
 	}
@@ -370,13 +357,6 @@ func (conf *azureInputConfig) validateStorageAccountConfig(logger *logp.Logger) 
 			return errors.New("no storage account key configured (config: storage_account_key)")
 		}
 	case processorV2:
-<<<<<<< HEAD
-		if conf.SAKey != "" {
-			logger.Warnf("storage_account_key is not used in processor v2, please remove it from the configuration (config: storage_account_key)")
-		}
-		if conf.SAConnectionString == "" {
-			return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
-=======
 		return conf.validateStorageAccountConfigV2(logger)
 	default:
 		return fmt.Errorf(
@@ -424,7 +404,6 @@ func (conf *azureInputConfig) validateStorageAccountConfigV2(logger *logp.Logger
 				// No connection string and no key, so we can't proceed.
 				return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
 			}
->>>>>>> 7ffcd634b ([Azure] Add client secret (Oauth2) support for eventhub filebeat input (#47256))
 		}
 	}
 	// For client_secret auth with processor v2, storage account uses the same credentials
@@ -432,8 +411,6 @@ func (conf *azureInputConfig) validateStorageAccountConfigV2(logger *logp.Logger
 	return nil
 }
 
-<<<<<<< HEAD
-=======
 // GetFullyQualifiedEventHubNamespace returns the fully qualified namespace for the Event Hub
 // based on the configured authentication type.
 func (conf *azureInputConfig) GetFullyQualifiedEventHubNamespace() (string, error) {
@@ -475,7 +452,6 @@ func (conf *azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
 	}
 }
 
->>>>>>> 7ffcd634b ([Azure] Add client secret (Oauth2) support for eventhub filebeat input (#47256))
 // storageContainerValidate validated the storage_account_container to make sure it is conforming to all the Azure
 // naming rules.
 // To learn more, please check the Azure documentation visiting:
