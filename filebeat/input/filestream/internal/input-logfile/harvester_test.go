@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //nolint:errcheck // It's a test file
 package input_logfile
 
@@ -112,7 +114,12 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		defer goroutinesChecker.WaitUntilOriginalCount()
 
 		wg.Add(1)
+<<<<<<< HEAD
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+=======
+		ctx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg.Start(ctx, source)
+>>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 
 		// wait until harvester.Run is done
 		wg.Wait()
@@ -163,12 +170,18 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		source1 := &testSource{name: "/path/to/test/1"}
 		source2 := &testSource{name: "/path/to/test/2"}
 		wg.Add(2)
+<<<<<<< HEAD
 		hg.Start(
 			input.Context{Logger: logp.L(), Cancelation: context.Background()},
 			source1)
 		hg.Start(
 			input.Context{Logger: logp.L(), Cancelation: context.Background()},
 			source2)
+=======
+		ctx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg.Start(ctx, source1)
+		hg.Start(ctx, source2)
+>>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 
 		assert.Eventually(t,
 			func() bool {
@@ -218,7 +231,12 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 
+<<<<<<< HEAD
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+=======
+		ctx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg.Start(ctx, source)
+>>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 
 		goroutinesChecker.WaitUntilIncreased(1)
 		// wait until harvester is started
@@ -238,7 +256,11 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	t.Run("assert a harvester for same source cannot be started", func(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
+<<<<<<< HEAD
 		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+=======
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+>>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
@@ -271,7 +293,12 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 
+<<<<<<< HEAD
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+=======
+		ctx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg.Start(ctx, source)
+>>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 
 		// wait until harvester is stopped
 		goroutinesChecker.WaitUntilOriginalCount()
@@ -292,7 +319,12 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
 
+<<<<<<< HEAD
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+=======
+		ctx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg.Start(ctx, source)
+>>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 
 		goroutinesChecker.WaitUntilOriginalCount()
 
@@ -308,7 +340,11 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		var wg sync.WaitGroup
 		mockHarvester := &mockHarvester{onRun: correctOnRun, wg: &wg}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
+<<<<<<< HEAD
 		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+=======
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+>>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 
 		r, err := lock(inputCtx, hg.store, hg.identifier.ID(source))
 		if err != nil {
@@ -343,7 +379,11 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: correctOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 		hg.tg = task.NewGroup(0, 50*time.Millisecond, testLog, "")
+<<<<<<< HEAD
 		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+=======
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+>>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
@@ -366,7 +406,11 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		var wg sync.WaitGroup
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun, wg: &wg}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
+<<<<<<< HEAD
 		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+=======
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+>>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
