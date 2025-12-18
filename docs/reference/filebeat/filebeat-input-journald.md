@@ -120,16 +120,19 @@ files will not be ingested.
 stack: ga 9.3.0
 ```
 A folder to be used as chroot when calling `journalctl`. This allows
-Filebeat to call the host's `journalctl` directly. If using this
-option in a container, the container needs `CAP_SYS_CHROOT` to start
-the chroot and {{filebeat}} needs permissions to read the desired
-journals, usually being added to `systemd-journal` group.
+Filebeat to call the host's `journalctl` directly.
 
 When `chroot` is set, if
 [`journalctl_path`](#filebeat-input-journald-journalctl-path) is not
 explicitly configured, it defaults to `/usr/bin/journalctl`. If
 `journalctl_path` is explicitly set, it must be an absolute path from
 within the chroot directory.
+
+If using this option in a container, the container needs the capability
+`SYS_CHROOT` and {{filebeat}} needs to be running as root (uid 0) to
+start the chroot.
+{{filebeat}} also needs permissions to read the desired journals,
+usually being root or being added to `systemd-journal` group.
 
 ### `journalctl_path` [filebeat-input-journald-journalctl-path]
 ```{applies_to}
