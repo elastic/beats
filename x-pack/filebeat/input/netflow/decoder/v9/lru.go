@@ -54,7 +54,11 @@ type pendingTemplatesCache struct {
 }
 
 const (
+	// templates should be sent frequently, so expecting one to show up
+	// within 512 records seems reasonable
 	maxPendingPerKey = 512
+	// this is the culmination of 32 templates being maxed out on records
+	// before any of the templates themselves show up
 	maxTotalPending  = 16384
 )
 
