@@ -18,6 +18,7 @@ Here are the currently supported processors:
 
 - [add_cloud_metadata]
 - [add_docker_metadata]
+- [add_fields]
 - [add_host_metadata]
 - [add_kubernetes_metadata]
 
@@ -150,6 +151,21 @@ processors:
 
 You can configure the Docker metadata enrichment using the options supported by the [add_docker_metadata] processor.
 
+## Using the `add_fields` processor
+
+To use the [add_fields] processor, configure the processor as follows:
+
+```yaml
+processors:
+  beat:
+    processors:
+      - add_fields:
+          fields:
+            custom_field: custom-value
+```
+
+You can configure the processor using the options supported by the [add_fields] processor.
+
 ## Using the `add_host_metadata` processor
 
 To use the [add_host_metadata] processor, configure the processor as follows:
@@ -188,6 +204,7 @@ In the example above, the `container` indexer and the `logs_path` matcher are co
 [Metricbeat receiver]: https://github.com/elastic/beats/tree/main/x-pack/metricbeat/mbreceiver
 [add_cloud_metadata]: https://www.elastic.co/docs/reference/beats/filebeat/add-cloud-metadata
 [add_docker_metadata]: https://www.elastic.co/docs/reference/beats/filebeat/add-docker-metadata
+[add_fields]: https://www.elastic.co/docs/reference/beats/filebeat/add-fields
 [add_host_metadata]: https://www.elastic.co/docs/reference/beats/filebeat/add-host-metadata
 [add_kubernetes_metadata]: https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata
 [indexers]: https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_indexers
