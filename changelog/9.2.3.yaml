@@ -5,11 +5,9 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/47256
-        - https://github.com/elastic/beats/pull/47956
-        - https://github.com/elastic/beats/pull/48115
+        - https://github.com/elastic/beats/pull/47730
       issue:
-        - https://github.com/elastic/beats/issues/47823
+        - https://github.com/elastic/beats/issues/47717
       impact: ""
       action: ""
       timestamp: 1763583500
@@ -47,11 +45,9 @@ entries:
       description: Updates kubernetes cpu and memory metrics to use allocatable values instead of capacity values.
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/47256
-        - https://github.com/elastic/beats/pull/47956
-        - https://github.com/elastic/beats/pull/48115
+        - https://github.com/elastic/beats/pull/47815
       issue:
-        - https://github.com/elastic/beats/issues/47823
+        - https://github.com/elastic/beats/issues/40701
       impact: ""
       action: ""
       timestamp: 1764319984
@@ -63,11 +59,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/47256
-        - https://github.com/elastic/beats/pull/47956
-        - https://github.com/elastic/beats/pull/48115
-      issue:
-        - https://github.com/elastic/beats/issues/47823
+        - https://github.com/elastic/beats/pull/47839
+      issue: []
       impact: ""
       action: ""
       timestamp: 1764614942
@@ -79,11 +72,8 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/47256
-        - https://github.com/elastic/beats/pull/47956
-        - https://github.com/elastic/beats/pull/48115
-      issue:
-        - https://github.com/elastic/beats/issues/47823
+        - https://github.com/elastic/beats/pull/47874
+      issue: []
       impact: ""
       action: ""
       timestamp: 1764710604
@@ -108,11 +98,8 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/47256
-        - https://github.com/elastic/beats/pull/47956
-        - https://github.com/elastic/beats/pull/48115
-      issue:
-        - https://github.com/elastic/beats/issues/47823
+        - https://github.com/elastic/beats/pull/47883
+      issue: []
       impact: ""
       action: ""
       timestamp: 1764752046
@@ -124,11 +111,8 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/47256
-        - https://github.com/elastic/beats/pull/47956
-        - https://github.com/elastic/beats/pull/48115
-      issue:
-        - https://github.com/elastic/beats/issues/47823
+        - https://github.com/elastic/beats/pull/47950
+      issue: []
       impact: ""
       action: ""
       timestamp: 1765018492
@@ -140,11 +124,9 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/47256
-        - https://github.com/elastic/beats/pull/47956
-        - https://github.com/elastic/beats/pull/48115
+        - https://github.com/elastic/beats/pull/47963
       issue:
-        - https://github.com/elastic/beats/issues/47823
+        - https://github.com/elastic/beats/issues/47967
       impact: ""
       action: ""
       timestamp: 1765186407
@@ -170,11 +152,8 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/47256
-        - https://github.com/elastic/beats/pull/47956
-        - https://github.com/elastic/beats/pull/48115
-      issue:
-        - https://github.com/elastic/beats/issues/47823
+        - https://github.com/elastic/beats/pull/47970
+      issue: []
       impact: ""
       action: ""
       timestamp: 1765279149
@@ -186,11 +165,8 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/47256
-        - https://github.com/elastic/beats/pull/47956
-        - https://github.com/elastic/beats/pull/48115
-      issue:
-        - https://github.com/elastic/beats/issues/47823
+        - https://github.com/elastic/beats/pull/48015
+      issue: []
       impact: ""
       action: ""
       timestamp: 1765389915
