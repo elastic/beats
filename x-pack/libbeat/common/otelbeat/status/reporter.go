@@ -8,25 +8,41 @@ import (
 	"errors"
 	"sync"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/management/status"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componentstatus"
 )
 
+const inputStatusAttributesKey = "inputs"
+
 type runnerState struct {
 	state status.Status
 	msg   string
 }
 
+// toPdata converts a runnerState to a pdata.Map
+// The format is the same as the healthcheckv2 extension
+func toPdata(r *runnerState) pcommon.Map {
+	pcommonMap := pcommon.NewMap()
+	pcommonMap.PutStr("status", beatStatusToOtelStatus(r.state).String())
+	pcommonMap.PutStr("error", r.msg)
+	return pcommonMap
+}
+
 // RunnerReporter defines an interface that returns a StatusReporter for a specific runner.
 // This is used for grouping and managing statuses of multiple runners
 type RunnerReporter interface {
-	GetReporterForRunner(id uint64) status.StatusReporter
+	GetReporterForRunner(id string) status.StatusReporter
+
+	// UpdateStatus updates the group status of a runnerReporter
+	UpdateStatus(status status.Status, msg string)
 }
 
 type reporter struct {
-	runnerStates map[uint64]*runnerState
+	runnerStates map[string]*runnerState
 	host         component.Host
 	mtx          sync.Mutex
 }
@@ -38,11 +54,11 @@ type reporter struct {
 func NewGroupStatusReporter(host component.Host) RunnerReporter {
 	return &reporter{
 		host:         host,
-		runnerStates: make(map[uint64]*runnerState),
+		runnerStates: make(map[string]*runnerState),
 	}
 }
 
-func (r *reporter) GetReporterForRunner(id uint64) status.StatusReporter {
+func (r *reporter) GetReporterForRunner(id string) status.StatusReporter {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	return &subReporter{
@@ -51,11 +67,11 @@ func (r *reporter) GetReporterForRunner(id uint64) status.StatusReporter {
 	}
 }
 
-func (r *reporter) updateStatusForRunner(id uint64, state status.Status, msg string) {
+func (r *reporter) updateStatusForRunner(id string, state status.Status, msg string) {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	if r.runnerStates == nil {
-		r.runnerStates = make(map[uint64]*runnerState)
+		r.runnerStates = make(map[string]*runnerState)
 	}
 	if rState, ok := r.runnerStates[id]; ok {
 		rState.msg = msg
@@ -68,38 +84,68 @@ func (r *reporter) updateStatusForRunner(id uint64, state status.Status, msg str
 		}
 	}
 
-	// calculate the aggregate state of beat based on the module states
-	calcState, calcMsg := r.calculateState()
-
-	// report status to parent reporter
-	r.UpdateStatus(calcState, calcMsg)
-}
-
-func (r *reporter) UpdateStatus(s status.Status, msg string) {
-	var evt *componentstatus.Event
-	switch s {
-	case status.Starting:
-		evt = componentstatus.NewEvent(componentstatus.StatusStarting)
-	case status.Running:
-		evt = componentstatus.NewEvent(componentstatus.StatusOK)
-	case status.Degraded:
-		evt = componentstatus.NewRecoverableErrorEvent(errors.New(msg))
-	case status.Failed:
-		evt = componentstatus.NewPermanentErrorEvent(errors.New(msg))
-	case status.Stopping:
-		evt = componentstatus.NewEvent(componentstatus.StatusStopped)
-	case status.Stopped:
-		evt = componentstatus.NewEvent(componentstatus.StatusStopped)
-	default:
-		return
-	}
-
+	// report aggregated status for all sub-components
+	evt := r.calculateOtelStatus()
+	r.emitDummyStatus(evt)
 	componentstatus.ReportStatus(r.host, evt)
 }
 
-func (r *reporter) calculateState() (status.Status, string) {
+// UpdateStatus reports the overall status of the group.
+// This is useful to report any failures encountered before a runner is initialized.
+// Note: This will override all sub-reporter statuses if any
+func (r *reporter) UpdateStatus(status status.Status, msg string) {
+	otelStatus := beatStatusToOtelStatus(status)
+	if otelStatus == componentstatus.StatusNone {
+		return
+	}
+	var eventBuilderOpts []componentstatus.EventBuilderOption
+	if componentstatus.StatusIsError(otelStatus) {
+		eventBuilderOpts = append(eventBuilderOpts, componentstatus.WithError(errors.New(msg)))
+	}
+	evt := componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
+	r.emitDummyStatus(evt)
+	componentstatus.ReportStatus(r.host, evt)
+}
+
+func (r *reporter) emitDummyStatus(evt *componentstatus.Event) {
+	oppositeStatus := getOppositeStatus(evt.Status())
+	if oppositeStatus != componentstatus.StatusNone {
+		// emit a dummy event first to ensure the otel core framework acknowledges the change
+		// workaround for https://github.com/open-telemetry/opentelemetry-collector/issues/14282
+		dummyEvt := componentstatus.NewEvent(oppositeStatus)
+		componentstatus.ReportStatus(r.host, dummyEvt)
+	}
+}
+
+// calculateOtelStatus aggregates the statuses of all runners
+func (r *reporter) calculateOtelStatus() *componentstatus.Event {
+	var evt *componentstatus.Event
+	s, msg := r.calculateAggregateState()
+	otelStatus := beatStatusToOtelStatus(s)
+	if otelStatus == componentstatus.StatusNone {
+		return nil
+	}
+	var eventBuilderOpts []componentstatus.EventBuilderOption
+	if componentstatus.StatusIsError(otelStatus) {
+		eventBuilderOpts = append(eventBuilderOpts, componentstatus.WithError(errors.New(msg)))
+	}
+	evt = componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
+
+	inputStatusesPdata := evt.Attributes().PutEmptyMap(inputStatusAttributesKey)
+
+	for id, rs := range r.runnerStates {
+		inputStatePdata := toPdata(rs)
+		m := inputStatusesPdata.PutEmptyMap(id)
+		inputStatePdata.MoveTo(m)
+	}
+
+	return evt
+}
+
+func (r *reporter) calculateAggregateState() (status.Status, string) {
 	reportedState := status.Running
 	reportedMsg := ""
+
 	for _, s := range r.runnerStates {
 		switch s.state {
 		case status.Degraded:
@@ -111,6 +157,7 @@ func (r *reporter) calculateState() (status.Status, string) {
 			// we've encountered a failed runner.
 			// short-circuit and return, as Failed state takes precedence over other states
 			return s.state, s.msg
+		default:
 		}
 	}
 	return reportedState, reportedMsg
@@ -118,11 +165,45 @@ func (r *reporter) calculateState() (status.Status, string) {
 
 // subReporter implements status.StatusReporter
 type subReporter struct {
-	id uint64
+	id string
 	r  *reporter
 }
 
 func (m *subReporter) UpdateStatus(status status.Status, msg string) {
 	// report status to its parent
 	m.r.updateStatusForRunner(m.id, status, msg)
+}
+
+// getOppositeStatus returns the opposite status of the given status, and None if no such status exists.
+func getOppositeStatus(status componentstatus.Status) componentstatus.Status {
+	switch status {
+	case componentstatus.StatusOK:
+		return componentstatus.StatusRecoverableError
+	case componentstatus.StatusRecoverableError:
+		return componentstatus.StatusOK
+	default:
+		return componentstatus.StatusNone
+	}
+}
+
+// beatStatusToOtelStatus converts a beat status to an otel status.
+func beatStatusToOtelStatus(beatStatus status.Status) componentstatus.Status {
+	switch beatStatus {
+	case status.Starting:
+		return componentstatus.StatusStarting
+	case status.Running:
+		return componentstatus.StatusOK
+	case status.Degraded:
+		return componentstatus.StatusRecoverableError
+	case status.Configuring:
+		return componentstatus.StatusOK
+	case status.Failed:
+		return componentstatus.StatusPermanentError
+	case status.Stopping:
+		return componentstatus.StatusStopping
+	case status.Stopped:
+		return componentstatus.StatusStopped
+	default:
+		return componentstatus.StatusNone
+	}
 }

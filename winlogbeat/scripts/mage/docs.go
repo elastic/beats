@@ -47,6 +47,11 @@ func moduleDocs() error {
 		return fmt.Errorf("No modules found matching %v", searchPath)
 	}
 
+	docsDir, err := mage.DocsDir()
+	if err != nil {
+		return err
+	}
+
 	// Extract module name from path and copy the file.
 	var names []string
 	for _, f := range files {
@@ -59,12 +64,12 @@ func moduleDocs() error {
 		modulesListTmpl += fmt.Sprintf("* [%s](/reference/winlogbeat/winlogbeat-module-%s.md)\n", strings.Title(name), name)
 
 		// Copy to the docs dirs.
-		dest := filepath.Join(mage.DocsDir(), "reference", "winlogbeat", fmt.Sprintf("winlogbeat-module-%s.md", name))
+		dest := filepath.Join(docsDir, "reference", "winlogbeat", fmt.Sprintf("winlogbeat-module-%s.md", name))
 		if err = mage.Copy(f, mage.CreateDir(dest)); err != nil {
 			return err
 		}
 	}
 
 	fmt.Printf(">> update:moduleDocs: Collecting module documentation for %v.\n", strings.Join(names, ", "))
-	return os.WriteFile(filepath.Join(mage.DocsDir(), "reference", "winlogbeat", "winlogbeat-modules.md"), []byte(modulesListTmpl), 0o644)
+	return os.WriteFile(filepath.Join(docsDir, "reference", "winlogbeat", "winlogbeat-modules.md"), []byte(modulesListTmpl), 0o644)
 }

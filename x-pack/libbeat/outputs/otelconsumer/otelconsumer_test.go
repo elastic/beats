@@ -111,6 +111,40 @@ func TestPublish(t *testing.T) {
 		}
 	})
 
+	t.Run("elasticsearch.ingest_pipeline fields are set on logrecord.Attribute", func(t *testing.T) {
+		event1.Meta = mapstr.M{}
+		event1.Meta["pipeline"] = "error_pipeline"
+
+		batch := outest.NewBatch(event1)
+
+		var countLogs int
+		var attributes pcommon.Map
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			countLogs = countLogs + ld.LogRecordCount()
+			for i := 0; i < ld.ResourceLogs().Len(); i++ {
+				resourceLog := ld.ResourceLogs().At(i)
+				for j := 0; j < resourceLog.ScopeLogs().Len(); j++ {
+					scopeLog := resourceLog.ScopeLogs().At(j)
+					for k := 0; k < scopeLog.LogRecords().Len(); k++ {
+						LogRecord := scopeLog.LogRecords().At(k)
+						attributes = LogRecord.Attributes()
+					}
+				}
+			}
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+
+		dynamicAttributeKey := "elasticsearch.ingest_pipeline"
+		gotValue, ok := attributes.Get(dynamicAttributeKey)
+		require.True(t, ok, "dynamic pipeline attribute was not set")
+		assert.EqualValues(t, "error_pipeline", gotValue.AsString())
+	})
+
 	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {
 		batch := outest.NewBatch(event1, event2, event3)
 
@@ -254,53 +288,6 @@ func TestPublish(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
-	})
-	t.Run("sets otel specific-fields", func(t *testing.T) {
-		testCases := []struct {
-			name                  string
-			componentID           string
-			componentKind         string
-			expectedComponentID   string
-			expectedComponentKind string
-		}{
-			{
-				name:                  "sets beat component ID",
-				componentID:           "filebeatreceiver/1",
-				expectedComponentID:   "filebeatreceiver/1",
-				expectedComponentKind: "receiver",
-			},
-		}
-
-		for _, tc := range testCases {
-			t.Run(tc.name, func(t *testing.T) {
-				event := beat.Event{
-					Fields: mapstr.M{
-						"field": 1,
-						"agent": mapstr.M{},
-					},
-					Meta: mapstr.M{
-						"_id": "abc123",
-					},
-				}
-				batch := outest.NewBatch(event)
-				var countLogs int
-				otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
-					countLogs = countLogs + ld.LogRecordCount()
-					return nil
-				})
-				otelConsumer.beatInfo.ComponentID = tc.componentID
-				err := otelConsumer.Publish(ctx, batch)
-				assert.NoError(t, err)
-				assert.Len(t, batch.Signals, 1)
-				assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
-				assert.Equal(t, len(batch.Events()), countLogs, "all events should be consumed")
-				for _, event := range batch.Events() {
-					beatEvent := event.Content.Fields.Flatten()
-					assert.Equal(t, tc.expectedComponentID, beatEvent["agent."+otelComponentIDKey], "expected agent.otelcol.component.id field in log record")
-					assert.Equal(t, tc.expectedComponentKind, beatEvent["agent."+otelComponentKindKey], "expected agent.otelcol.component.kind field in log record")
-				}
-			})
-		}
 	})
 	t.Run("sets the client context metadata with the beat info", func(t *testing.T) {
 		batch := outest.NewBatch(event1)

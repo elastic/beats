@@ -107,7 +107,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 	}
 	defer f.Close()
 	tmpFileName := f.Name()
-	fi, err := f.Stat() //nolint:typecheck // It is used on L151
+	fi, err := f.Stat()
 	if err != nil {
 		t.Fatalf("cannot stat test file: %v", err)
 	}
@@ -637,6 +637,10 @@ func (t *testHarvesterGroup) StopHarvesters() error {
 	return nil
 }
 
+// SetObserver is a no-op
+func (t *testHarvesterGroup) SetObserver(c chan loginp.HarvesterStatus) {
+}
+
 type mockFileWatcher struct {
 	events      []loginp.FSEvent
 	filesOnDisk map[string]loginp.FileDescriptor
@@ -644,15 +648,24 @@ type mockFileWatcher struct {
 	outputCount, eventCount int
 
 	out chan loginp.FSEvent
+
+	c chan loginp.HarvesterStatus
 }
 
 // newMockFileWatcher creates an FSWatch mock, so you can read
 // the required FSEvents from it using the Event function.
 func newMockFileWatcher(events []loginp.FSEvent, eventCount int) *mockFileWatcher {
-	w := &mockFileWatcher{events: events, eventCount: eventCount, out: make(chan loginp.FSEvent, eventCount)}
+	w := &mockFileWatcher{
+		events:     events,
+		eventCount: eventCount,
+		out:        make(chan loginp.FSEvent, eventCount),
+		c:          make(chan loginp.HarvesterStatus),
+	}
+
 	for _, evt := range events {
 		w.out <- evt
 	}
+
 	return w
 }
 
@@ -679,6 +692,10 @@ func (m *mockFileWatcher) Event() loginp.FSEvent {
 func (m *mockFileWatcher) Run(_ unison.Canceler) {}
 
 func (m *mockFileWatcher) GetFiles() map[string]loginp.FileDescriptor { return m.filesOnDisk }
+
+func (m *mockFileWatcher) NotifyChan() chan loginp.HarvesterStatus {
+	return m.c
+}
 
 type mockMetadataUpdater struct {
 	table map[string]interface{}

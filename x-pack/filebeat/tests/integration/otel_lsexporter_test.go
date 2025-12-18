@@ -29,6 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -64,7 +65,7 @@ func TestDataShapeOTelVSClassicE2E(t *testing.T) {
 
 	// Agent does not support `index` setting, while beats does.
 	//	Our focus is on agent classic vs otel mode comparison, so we do not test `index` for filebeat
-	var beatsCfgFile = `
+	beatsCfgFile := `
 filebeat.inputs:
   - type: filestream
     id: filestream-input-id
@@ -87,20 +88,50 @@ processors:
 	testCaseName := uuid.Must(uuid.NewV4()).String()
 	events := generateEvents(numEvents)
 
-	// start filebeat in otel mode
-	fbOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
-
-	inputFilePath := filepath.Join(fbOTel.TempDir(), "event.json")
+	tmpdir := t.TempDir()
+	inputFilePath := filepath.Join(tmpdir, "event.json")
 	writeEvents(t, inputFilePath, events)
 
-	fbOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, inputFilePath, "5055", testCaseName))
-	fbOTel.Start()
-	defer fbOTel.Stop()
+	otelConfig := fmt.Sprintf(`receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-input-id
+          enabled: true
+          paths:
+            - %s
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    processors:
+      - add_host_metadata: ~
+      - add_fields:
+          target: ""
+          fields:
+            testcase: %s
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    path.home: %s
+exporters:
+  logstash:
+    hosts:
+      - "localhost:5055"
+    tls:
+      insecure: true
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - logstash
+  telemetry:
+    metrics:
+      level: none
+`, inputFilePath, testCaseName, tmpdir)
+
+	// Start OTel collector with filebeatreceiver
+	oteltestcol.New(t, otelConfig)
 
 	// start filebeat
 	filebeat := integration.NewBeat(
@@ -142,11 +173,99 @@ processors:
 		"log.file.inode",
 		"log.file.path",
 		// only present in beats receivers
-		"agent.otelcol.component.id",
-		"agent.otelcol.component.kind",
+		"log.file.device_id",
+		"log.file.fingerprint",
 	}
 
 	compareOutputFiles(t, fbFilePath, otelFilePath, ignoredFields)
+}
+
+// TestLogstashExporterProxyURL verifies that Filebeat OTel mode can send data to Logstash via a SOCKS5 proxy.
+// Filebeat otel mode sends events to "logstash" via a socks5-proxy container running on localhost:1080
+func TestLogstashExporterProxyURL(t *testing.T) {
+	// ensure the size of events is big enough
+	numEvents := 3
+
+	testCaseName := uuid.Must(uuid.NewV4()).String()
+	events := generateEvents(numEvents)
+
+	// Create OTel collector configuration with filebeatreceiver
+	tmpdir := t.TempDir()
+	inputFilePath := filepath.Join(tmpdir, "event.json")
+	writeEvents(t, inputFilePath, events)
+
+	otelConfig := fmt.Sprintf(`receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-input-id
+          enabled: true
+          paths:
+            - %s
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    processors:
+      - add_host_metadata: ~
+      - add_fields:
+          target: ""
+          fields:
+            testcase: %s
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    path.home: %s
+exporters:
+  logstash:
+    hosts:
+      - "logstash:5055"
+    ttl: 0s
+    proxy_url: "socks5://elastic:changeme@localhost:1080"
+    proxy_use_local_resolver: false
+    worker: 1
+    workers: 0
+    max_retries: 3
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - logstash
+  telemetry:
+    metrics:
+      level: none
+`, inputFilePath, testCaseName, tmpdir)
+
+	// Start OTel collector with filebeatreceiver
+	oteltestcol.New(t, otelConfig)
+
+	// Nginx endpoint URLs
+	baseURL := "http://localhost:8082"
+	outOTelFileURL := fmt.Sprintf("%s/%s_otel.json", baseURL, testCaseName)
+
+	// Logstash is outputting to a file inside its container, to access
+	// this file we use Nginx to serve the output folder via HTTP
+	// (see docker-compose.yml for Logstash and Nginx configuration).
+	// Wait to ensure the file can be downloaded via HTTP, the file
+	// being available indicates that Filebeat successfully sent data
+	// to Logstash
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
+			for _, url := range []string{outOTelFileURL} {
+				checkURLHasContent(ct, url)
+			}
+		},
+		30*time.Second,
+		1*time.Second,
+		"did not find Logstash output file served via Nginx")
+
+	// download files from Nginx
+	otelFilePath := downloadToTestData(t, outOTelFileURL, fmt.Sprintf("%s_otel.json", testCaseName))
+	otelEvents, err := readAllEvents(otelFilePath)
+
+	require.NoError(t, err, "failed to read otel events")
+	require.Equal(t, numEvents, len(otelEvents),
+		"different number of events: sent=%d, get=%d", numEvents, len(otelEvents))
 }
 
 func generateEvents(numEvents int) []string {
@@ -255,10 +374,8 @@ func compareOutputFiles(t *testing.T, fbFilePath, otelFilePath string, ignoredFi
 		oteltest.AssertMapsEqual(t, fbEvent.data, otelEvent.data, ignoredFields,
 			fmt.Sprintf("event comparison failed for ID %s (line %d)", fbEvent.id, i))
 
-		assert.Equal(t, "filebeatreceiver", otelEvent.data.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-		assert.Equal(t, "receiver", otelEvent.data.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
-		assert.NotContains(t, fbEvent.data.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in filebeat log record")
-		assert.NotContains(t, fbEvent.data.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in filebeat log record")
+		assert.Equal(t, "filebeat", otelEvent.data.Flatten()["agent.type"], "expected agent.type to be 'filebeat' in otel data")
+		assert.Equal(t, "filebeat", fbEvent.data.Flatten()["agent.type"], "expected agent.type to be 'filebeat' in filebeat data")
 	}
 }
 

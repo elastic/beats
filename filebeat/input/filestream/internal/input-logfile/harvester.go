@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -114,6 +115,8 @@ type HarvesterGroup interface {
 	Stop(Source)
 	// StopHarvesters cancels all running Harvesters.
 	StopHarvesters() error
+	// SetObserver sets the observer to get notified when a harvester closes
+	SetObserver(c chan HarvesterStatus)
 }
 
 type defaultHarvesterGroup struct {
@@ -123,9 +126,32 @@ type defaultHarvesterGroup struct {
 	cleanTimeout time.Duration
 	store        *store
 	ackCH        *updateChan
-	identifier   *sourceIdentifier
+	identifier   *SourceIdentifier
 	tg           *task.Group
 	metrics      *Metrics
+	notifyChan   chan HarvesterStatus
+	inputID      string
+}
+
+// HarvesterStatus is used to notify an observer that the harvester for the ID
+// has closed and the amount of data ingested from the file.
+type HarvesterStatus struct {
+	// ID is the ID of the harvester
+	ID string
+	// Size is the amount of data ingested, in other words the size of the file
+	// when the harvester closed.
+	Size int64
+}
+
+func (hg *defaultHarvesterGroup) notifyObserver(srcID string, size int64) {
+	if hg.notifyChan != nil {
+		hg.notifyChan <- HarvesterStatus{srcID, size}
+	}
+}
+
+// SetObserver sets the observer to get notifications when a harvester closes
+func (hg *defaultHarvesterGroup) SetObserver(c chan HarvesterStatus) {
+	hg.notifyChan = c
 }
 
 // Start starts the Harvester for a Source if no Harvester is running for the
@@ -136,7 +162,7 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 	sourceName := hg.identifier.ID(src)
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 
-	if err := hg.tg.Go(startHarvester(ctx, hg, src, false, hg.metrics)); err != nil {
+	if err := hg.tg.Go(startHarvester(ctx, hg, src, false, hg.metrics, hg.inputID)); err != nil {
 		ctx.Logger.Warnf(
 			"tried to start harvester for %s with task group already closed",
 			ctx.ID)
@@ -153,7 +179,7 @@ func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 	ctx.Logger.Debug("Restarting harvester for file")
 
-	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics)); err != nil {
+	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics, hg.inputID)); err != nil {
 		ctx.Logger.Warnf(
 			"input %s tried to restart harvester with task group already closed",
 			ctx.ID)
@@ -170,6 +196,7 @@ func startHarvester(
 	src Source,
 	restart bool,
 	metrics *Metrics,
+	inputID string,
 ) func(context.Context) error {
 	srcID := hg.identifier.ID(src)
 
@@ -179,6 +206,14 @@ func startHarvester(
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
 				ctx.Logger.Errorf("Harvester crashed with: %+v", err)
 				hg.readers.remove(srcID)
+			}
+
+			// Report any harvester error as a degraded state for the input
+			if err != nil {
+				ctx.UpdateStatus(
+					status.Degraded,
+					fmt.Sprintf("Harvester for Filestream input %q failed: %s", inputID, err),
+				)
 			}
 		}()
 
@@ -235,6 +270,24 @@ func startHarvester(
 		hg.store.UpdateTTL(resource, hg.cleanTimeout)
 		cursor := makeCursor(resource)
 		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
+
+		defer func() {
+			// The cursor struct used by Filestream, it is defined on:
+			// filebeat/input/filestream/input.go
+			st := struct {
+				Offset int64 `json:"offset" struct:"offset"`
+			}{}
+			if err := cursor.Unpack(&st); err != nil {
+				// Unpack should never fail, if it fails either the cursor
+				// structure had a breaking change or our registry is corrupted.
+				// Either way, it is better to not notify the observer.
+				ctx.Logger.Errorf("cannot unpack cursor at the end of the harvester: %s", err)
+				return
+			}
+
+			hg.notifyObserver(srcID, st.Offset)
+			ctx.Logger.Debugf("Harvester '%s' closed with offset: %d", srcID, st.Offset)
+		}()
 
 		ctx.Logger.Debug("Starting harvester for file")
 		err = hg.harvester.Run(ctx, src, cursor, publisher, metrics)

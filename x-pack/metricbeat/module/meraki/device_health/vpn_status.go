@@ -19,6 +19,7 @@ func getDeviceVPNStatuses(client *sdk.Client, organizationID string, devices map
 	setStart := func(s string) { params.StartingAfter = s }
 
 	doRequest := func() (*sdk.ResponseApplianceGetOrganizationApplianceVpnStatuses, *resty.Response, error) {
+		logger.Debugf("calling GetOrganizationApplianceVpnStatuses with params: %+v", params)
 		return client.Appliance.GetOrganizationApplianceVpnStatuses(organizationID, params)
 	}
 

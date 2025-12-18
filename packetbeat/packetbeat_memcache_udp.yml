@@ -1,0 +1,24 @@
+packetbeat.interfaces:
+  device: lo
+
+packetbeat.protocols:
+  - type: memcache
+    ports: [11211]
+    udp_only: true
+
+queue.mem:
+  events: 64
+  flush.min_events: 1
+
+output.console:
+  enabled: true
+  pretty: true
+
+logging:
+  level: debug
+  selectors: [memcache]
+  to_files: false
+
+setup.template.enabled: false
+setup.kibana:
+  host: 0.0.0.0:0

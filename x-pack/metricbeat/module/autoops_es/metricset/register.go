@@ -10,7 +10,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"slices"
 
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
@@ -18,9 +17,24 @@ import (
 )
 
 const (
-	licensePath   = "/_license"
-	licensePathV7 = "/_license?accept_enterprise"
+	clusterSettingsPath = "/_cluster/settings?filter_path=**.cluster.metadata.display_name"
+	licensePath         = "/_license"
+	licensePathV7       = "/_license?accept_enterprise"
 )
+
+type clusterSettingsResponse struct {
+	Persistent clusterSettingsDisplayName `json:"persistent"`
+	Transient  clusterSettingsDisplayName `json:"transient"`
+}
+
+// Partial structure to extract the cluster display name from the cluster settings API response.
+type clusterSettingsDisplayName struct {
+	Cluster struct {
+		Metadata struct {
+			DisplayName string `json:"display_name"`
+		} `json:"metadata"`
+	} `json:"cluster"`
+}
 
 // License information returned from `GET /_license`, contained within the "license" object.
 type license struct {
@@ -61,10 +75,6 @@ type cloudConnectedResource struct {
 // the version is not supported.
 type clusterInfoFetcher func(*elasticsearch.MetricSet) (*utils.ClusterInfo, error)
 
-var (
-	SUPPORTED_LICENSE_TYPES = []string{"enterprise", "trial"}
-)
-
 // maybeRegisterCloudConnectedCluster fetches cluster information and license details, then sets the global resource ID if applicable.
 func maybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterInfo clusterInfoFetcher) error {
 	// if resource ID is already set, then we don't need to check/register anything
@@ -75,20 +85,38 @@ func maybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterIn
 	cloudApiKey, err := getCloudConnectedModeApiKey(m)
 
 	if err != nil {
-		return fmt.Errorf("failed to get Cloud Connected Mode API key: %w", err)
+		return fmt.Errorf("failed to get Cloud Connected API Key: %w", err)
 	} else if cloudApiKey == "" {
 		// if there is no Cloud API Key configured, then there is no request to make
 		return nil
 	}
 
-	m.Logger().Debugf("Attempting to get cluster info for Cloud Connected Mode...")
+	m.Logger().Debugf("Attempting to get cluster info for Cloud Connected...")
 	clusterInfo, err := getClusterInfo(m)
 
 	if err != nil {
 		return fmt.Errorf("failed to load cluster info: %w", err)
 	}
 
-	m.Logger().Debugf("Attempting to fetch license for Cloud Connected Mode...")
+	m.Logger().Debugf("Attempting to fetch cluster settings for Cloud Connected...")
+	clusterSettings, err := utils.FetchAPIData[clusterSettingsResponse](m, clusterSettingsPath)
+
+	if err != nil {
+		// Log the error, but do not fail the registration - we can continue with the existing cluster name
+		// Note: You can restart the agent to re-fetch the name later if needed
+		m.Logger().Warnf("Ignoring failure to fetch cluster settings for Cloud Connected: %v", err)
+		// prefer transient setting over persistent setting
+	} else if clusterSettings.Transient.Cluster.Metadata.DisplayName != "" {
+		m.Logger().Debugf("Using transient cluster display name %s for Cloud Connected in place of cluster name %s", clusterSettings.Transient.Cluster.Metadata.DisplayName, clusterInfo.ClusterName)
+
+		clusterInfo.ClusterName = clusterSettings.Transient.Cluster.Metadata.DisplayName
+	} else if clusterSettings.Persistent.Cluster.Metadata.DisplayName != "" {
+		m.Logger().Debugf("Using persistent cluster display name %s for Cloud Connected in place of cluster name %s", clusterSettings.Persistent.Cluster.Metadata.DisplayName, clusterInfo.ClusterName)
+
+		clusterInfo.ClusterName = clusterSettings.Persistent.Cluster.Metadata.DisplayName
+	}
+
+	m.Logger().Debugf("Attempting to fetch license for Cloud Connected...")
 	versionedLicensePath := licensePath
 
 	// TODO: Drop support for this when we drop support for 7.17
@@ -103,11 +131,9 @@ func maybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterIn
 		return fmt.Errorf("failed to load cluster license: %w", err)
 	} else if licenseWrapper.License.Status != "active" {
 		return fmt.Errorf("cluster license is not active: %s", licenseWrapper.License.Status)
-	} else if !slices.Contains(SUPPORTED_LICENSE_TYPES, licenseWrapper.License.Type) {
-		return fmt.Errorf("cluster license type is not supported: %s", licenseWrapper.License.Type)
 	}
 
-	m.Logger().Debugf("Successfully fetched license for Cloud Connected Mode: UUID=%s License=%s", clusterInfo.ClusterID, licenseWrapper.License.UID)
+	m.Logger().Debugf("Successfully fetched license for Cloud Connected: UUID=%s License=%s", clusterInfo.ClusterID, licenseWrapper.License.UID)
 
 	return registerCloudConnectedCluster(cloudApiKey, clusterInfo, &licenseWrapper.License, m.Logger())
 }
@@ -128,14 +154,14 @@ func registerCloudConnectedCluster(cloudApiKey string, clusterInfo *utils.Cluste
 	})
 
 	if err != nil {
-		return fmt.Errorf("failed to serialize payload for Cloud Connected Mode: %w", err)
+		return fmt.Errorf("failed to serialize payload for Cloud Connected: %w", err)
 	}
 
 	requestURL := getCloudConnectedModeAPIURL() + "/api/v1/cloud-connected/clusters"
 	req, err := http.NewRequestWithContext(context.Background(), "POST", requestURL, bytes.NewBuffer(jsonData))
 
 	if err != nil {
-		return fmt.Errorf("failed to create HTTP request for Cloud Connected Mode: %w", err)
+		return fmt.Errorf("failed to create HTTP request for Cloud Connected: %w", err)
 	}
 
 	req.Header.Set("Accept", "application/json")
@@ -146,9 +172,9 @@ func registerCloudConnectedCluster(cloudApiKey string, clusterInfo *utils.Cluste
 
 	if err == nil {
 		utils.SetResourceID(data.ID)
-		logger.Infof("Registered cluster %s for Cloud Connected Mode: %s", clusterInfo.ClusterID, data.ID)
+		logger.Infof("Registered cluster %s for Cloud Connected: %s", clusterInfo.ClusterID, data.ID)
 		return nil
 	}
 
-	return fmt.Errorf("failed to register for Cloud Connected Mode: %w", err)
+	return fmt.Errorf("failed to register for Cloud Connected: %w", err)
 }

@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build integration
 
 package elasticsearch
@@ -27,7 +29,9 @@ import (
 	"time"
 
 	"go.elastic.co/apm/v2/apmtest"
+	"go.uber.org/zap"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -53,25 +57,22 @@ func TestClientPublishEvent(t *testing.T) {
 }
 
 func TestClientPublishEventKerberosAware(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/21295")
-
-	err := setupRoleMapping(t, eslegtest.GetEsKerberosHost())
+	kerberosURL := "http://localhost:9203"
+	err := setupRoleMapping(t, kerberosURL)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	index := "beat-int-pub-single-event-behind-kerb"
 	cfg := map[string]interface{}{
-		"hosts":    eslegtest.GetEsKerberosHost(),
-		"index":    index,
-		"username": "",
-		"password": "",
+		"hosts": kerberosURL,
+		"index": index,
 		"kerberos": map[string]interface{}{
 			"auth_type":   "password",
 			"config_path": "testdata/krb5.conf",
-			"username":    eslegtest.GetUser(),
-			"password":    eslegtest.GetPass(),
-			"realm":       "ELASTIC",
+			"username":    "beats",
+			"password":    "testing",
+			"realm":       "elastic",
 		},
 	}
 
@@ -405,7 +406,7 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 		t.Fatal(err)
 	}
 
-	logger := logptest.NewTestingLogger(t, "elasticsearch")
+	logger := logptest.NewTestingLogger(t, "elasticsearch", zap.AddCallerSkip(1))
 	info := beat.Info{Beat: "libbeat", Logger: logger}
 	// disable ILM if using specified index name
 	im, _ := idxmgmt.DefaultSupport(info, conf.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))
@@ -431,12 +432,12 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 	return client, client
 }
 
-// setupRoleMapping sets up role mapping for the Kerberos user beats@ELASTIC
+// setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
 func setupRoleMapping(t *testing.T, host string) error {
 	_, client := connectTestEs(t, map[string]interface{}{
 		"hosts":    host,
-		"username": "elastic",
-		"password": "changeme",
+		"username": "admin",
+		"password": "testing",
 	}, nil)
 
 	roleMappingURL := client.conn.URL + "/_security/role_mapping/kerbrolemapping"
@@ -446,7 +447,7 @@ func setupRoleMapping(t *testing.T, host string) error {
 		"enabled": true,
 		"rules": map[string]interface{}{
 			"field": map[string]interface{}{
-				"username": "beats@ELASTIC",
+				"username": "beats@elastic",
 			},
 		},
 	})
@@ -466,4 +467,120 @@ func randomClient(grp outputs.Group) outputs.NetworkClient {
 
 	client := grp.Clients[rand.IntN(L)]
 	return client.(outputs.NetworkClient) //nolint:errcheck //This is a test file, can ignore
+}
+
+// configureDatastreamFailureStore creates an index template with the failure
+// store enabled and two mapped fields. The index template will match the passed
+// data stream (ds).
+func configureDatastreamFailureStore(t *testing.T, client *Client, ds string) {
+	templateBody := map[string]any{
+		"index_patterns": []string{ds + "*"},
+		"data_stream":    map[string]any{},
+		"template": map[string]any{
+			"data_stream_options": map[string]any{
+				"failure_store": map[string]any{
+					"enabled": true,
+				},
+			},
+			"mappings": map[string]any{
+				"properties": map[string]any{
+					"answer": map[string]any{
+						"type": "integer",
+					},
+					"not_a_number": map[string]any{
+						"type": "keyword",
+					},
+				},
+			},
+		},
+	}
+
+	status, resp, err := client.conn.Request("PUT", "/_index_template/idx-tmpl-"+ds, "", nil, templateBody)
+	if err != nil {
+		t.Fatalf("failed to configure datastream %s: %v", ds, err)
+	}
+	if status >= 300 {
+		t.Fatalf("unexpected status code %d while configuring datastream %s: %s", status, ds, resp)
+	}
+}
+
+// createDatastreamFailureStore creates and initialises a data stream with the
+// failure store enabled used to test the output failure store metrics.
+func createDatastreamFailureStore(t *testing.T, client *Client, ds string) {
+	configureDatastreamFailureStore(t, client, ds)
+	timestamp := time.Now().Format(time.RFC3339)
+	body := []any{
+		map[string]any{
+			"create": map[string]any{},
+		},
+		map[string]any{
+			"@timestamp":   timestamp,
+			"answer":       42,
+			"not_a_number": "forty two",
+		},
+	}
+
+	// We need to manually send a bulk request because Publish sets the index
+	// in the body, which causes ES to create an index instead of a data stream.
+	// An index does not use the failure store.
+	status, _, err := client.conn.Bulk(t.Context(), ds, "", nil, nil, body)
+	if err != nil {
+		t.Fatalf("failed to create datastream %s: %v", ds, err)
+	}
+	if status >= 300 {
+		t.Fatalf("unexpected status code %d while creating datastream %s", status, ds)
+	}
+}
+
+func TestFailureStoreOutputMetrics(t *testing.T) {
+	ds := "test-failure-store-" + uuid.Must(uuid.NewV4()).String()
+	registry := monitoring.NewRegistry()
+
+	cfg := map[string]any{
+		"index": ds,
+	}
+	output, client := connectTestEs(t, cfg, outputs.NewStats(registry, logp.NewNopLogger()))
+
+	createDatastreamFailureStore(t, client, ds)
+
+	batch := encodeBatch(client, outest.NewBatch(
+		beat.Event{
+			Timestamp: time.Now(),
+			Fields: mapstr.M{
+				"answer":       "forty two",
+				"not_a_number": "this should work",
+			},
+		},
+		beat.Event{
+			Timestamp: time.Now(),
+			Fields: mapstr.M{
+				"answer":       42,
+				"not_a_number": "forty two",
+			},
+		},
+	))
+
+	err := output.Publish(context.Background(), batch)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, _, err = client.conn.Refresh(ds)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, resp, err := client.conn.CountSearchURI(ds, "", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Expect two events in the index: one from the batch and another
+	// from when we created the datastream
+	assert.Equal(t, 2, resp.Count)
+
+	outputSnapshot := monitoring.CollectFlatSnapshot(registry, monitoring.Full, true)
+	// Ensure the correct number of events was acked and sent to the failure store
+	assert.EqualValues(t, 1, outputSnapshot.Ints["events.failure_store"], "failure store metric was not incremented")
+	assert.EqualValues(t, 2, outputSnapshot.Ints["events.acked"], "wrong number of acked events")
 }
