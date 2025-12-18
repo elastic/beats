@@ -8,11 +8,28 @@ This section summarizes the changes in each release. Also read
 <<breaking-changes>> for more detail about changes that affect
 upgrade.
 
+<<<<<<< HEAD
 * <<release-notes-9.0.0-rc1>>
 * <<release-notes-9.0.0-beta1>>
 * <<release-notes-9.0.0>>
 * <<release-notes-9.0.0-rc1>>
 * <<release-notes-9.0.0-beta1>>
+=======
+* <<release-notes-8.19.9>>
+* <<release-notes-8.19.8>>
+* <<release-notes-8.19.7>>
+* <<release-notes-8.19.6>>
+* <<release-notes-8.19.5>>
+* <<release-notes-8.19.4>>
+* <<release-notes-8.19.3>>
+* <<release-notes-8.19.2>>
+* <<release-notes-8.19.1>>
+* <<release-notes-8.19.0>>
+* <<release-notes-8.18.5>>
+* <<release-notes-8.18.4>>
+* <<release-notes-8.18.3>>
+* <<release-notes-8.18.2>>
+>>>>>>> 46b47b4f9 (Add Beats 8.19.9 release notes (#48168))
 * <<release-notes-8.18.1>>
 * <<release-notes-8.18.0>>
 * <<release-notes-8.17.6>>
