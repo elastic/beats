@@ -8,7 +8,7 @@
 
 For more information, check [#47729](https://github.com/elastic/beats/pull/47729)[#47600](https://github.com/elastic/beats/issues/47600).
 
-% **Impact**<br>_Add a description of the impact_
+**Impact**<br>If previously using the `otel.component.id` or `otel.component.kind` to track Beats receiver events, the fields are no longer used.
 
 % **Action**<br>_Add a description of the what action to take_
 ::::
