@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package httpjson
 
 import (
@@ -176,12 +178,8 @@ func runWithMetrics(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr 
 }
 
 func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor, reg *monitoring.Registry) error {
-	stat := ctx.StatusReporter
-	if stat == nil {
-		stat = noopReporter{}
-	}
-	stat.UpdateStatus(status.Starting, "")
-	stat.UpdateStatus(status.Configuring, "")
+	ctx.UpdateStatus(status.Starting, "")
+	ctx.UpdateStatus(status.Configuring, "")
 
 	log := ctx.Logger.With("input_url", cfg.Request.URL)
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
@@ -202,17 +200,21 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	}
 
 	metrics := newInputMetrics(reg, ctx.Logger)
+<<<<<<< HEAD
 
 	client, err := newHTTPClient(stdCtx, cfg, stat, log, reg)
+=======
+	client, err := newHTTPClient(stdCtx, cfg.Auth, cfg.Request, ctx, log, reg, nil)
+>>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 	if err != nil {
-		stat.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
+		ctx.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
 		return err
 	}
 
-	requestFactory, err := newRequestFactory(stdCtx, cfg, stat, log, metrics, reg)
+	requestFactory, err := newRequestFactory(stdCtx, cfg, ctx, log, metrics, reg)
 	if err != nil {
 		log.Errorf("Error while creating requestFactory: %v", err)
-		stat.UpdateStatus(status.Failed, "failed to create request factory: "+err.Error())
+		ctx.UpdateStatus(status.Failed, "failed to create request factory: "+err.Error())
 		return err
 	}
 	var xmlDetails map[string]xml.Detail
@@ -220,16 +222,16 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		xmlDetails, err = xml.Details([]byte(cfg.Response.XSD))
 		if err != nil {
 			log.Errorf("error while collecting xml decoder type hints: %v", err)
-			stat.UpdateStatus(status.Failed, "error while collecting xml decoder type hints: "+err.Error())
+			ctx.UpdateStatus(status.Failed, "error while collecting xml decoder type hints: "+err.Error())
 			return err
 		}
 	}
-	pagination := newPagination(cfg, client, stat, log)
-	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, stat, log)
-	requester := newRequester(client, requestFactory, responseProcessor, metrics, stat, log)
+	pagination := newPagination(cfg, client, ctx, log)
+	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, ctx, log)
+	requester := newRequester(client, requestFactory, responseProcessor, metrics, ctx, log)
 
 	trCtx := emptyTransformContext()
-	trCtx.cursor = newCursor(cfg.Cursor, stat, log)
+	trCtx.cursor = newCursor(cfg.Cursor, ctx, log)
 	trCtx.cursor.load(crsr)
 
 	doFunc := func() error {
@@ -260,7 +262,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		metrics.updateIntervalMetrics(err, startTime)
 
 		if err := stdCtx.Err(); err != nil {
-			stat.UpdateStatus(status.Stopping, "")
+			ctx.UpdateStatus(status.Stopping, "")
 			return err
 		}
 
@@ -274,7 +276,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	}
 
 	log.Infof("Input stopped because context was cancelled with: %v", err)
-	stat.UpdateStatus(status.Stopped, "")
+	ctx.UpdateStatus(status.Stopped, "")
 	return nil
 }
 

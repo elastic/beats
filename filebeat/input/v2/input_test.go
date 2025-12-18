@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
@@ -179,3 +180,59 @@ func TestPrepareInputMetrics_safeConcurrentPipelineClientCreation(t *testing.T) 
 		})
 	}
 }
+<<<<<<< HEAD
+=======
+
+func TestContextMetricsRegistryOverride(t *testing.T) {
+	tcs := []struct {
+		name       string
+		field      string
+		overrideFn func(reg *monitoring.Registry, val string)
+		value      string
+	}{
+		{
+			name:       "MetricsRegistryOverrideID",
+			field:      inputmon.MetricKeyID,
+			overrideFn: MetricsRegistryOverrideID,
+			value:      "new-id",
+		},
+		{
+			name:       "MetricsRegistryOverrideInput",
+			field:      inputmon.MetricKeyInput,
+			overrideFn: MetricsRegistryOverrideInput,
+			value:      "new-input-name",
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			reg := monitoring.NewRegistry()
+			monitoring.NewString(reg, tc.field).Set("old-" + tc.field)
+
+			tc.overrideFn(reg, tc.value)
+			require.NotNil(t, reg)
+			assert.Equal(t, reg, reg)
+
+			var got string
+			reg.Visit(
+				monitoring.Full,
+				monitoring.NewKeyValueVisitor(func(key string, value any) {
+					if key == tc.field {
+						if s, ok := value.(string); ok {
+							got = s
+						}
+					}
+				}))
+			assert.Equal(t, tc.value, got,
+				"The %q variable in MetricsRegistry was not set correctly", tc.field)
+		})
+	}
+}
+
+// TestContexStatusReporterDoesNotPanic ensures that the UpdateStatus method
+// is safe to use with a nil statusReporter
+func TestContexStatusReporterDoesNotPanic(t *testing.T) {
+	v2Ctx := Context{statusReporter: nil} // explicitly set it to nil
+	v2Ctx.UpdateStatus(status.Configuring, "it does not panic")
+}
+>>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))

@@ -20,12 +20,22 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+<<<<<<< HEAD
+=======
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
+>>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // all test files are read from the "testdata" directory
 const testDataPath = "testdata"
+
+type noopReporter struct{}
+
+// UpdateStatus is no-op
+func (n noopReporter) UpdateStatus(status status.Status, msg string) {}
 
 func TestDecoding(t *testing.T) {
 	logp.TestingSetup()
