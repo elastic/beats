@@ -57,12 +57,6 @@ func (h *MockHost) Report(evt *componentstatus.Event) {
 	h.Evt = evt
 }
 
-func (h *MockHost) getEvent() *componentstatus.Event {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-	return h.Evt
-}
-
 type ReceiverConfig struct {
 	// Name is the unique identifier for the component
 	Name string
@@ -87,7 +81,7 @@ type CheckReceiversParams struct {
 	// The function is called periodically until the assertions are met or the timeout is reached.
 	AssertFunc func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs)
 
-	Status      ExpectedStatus
+	Status      *componentstatus.Event
 	NumRestarts int
 }
 
@@ -200,12 +194,11 @@ func CheckReceivers(params CheckReceiversParams) {
 			}
 			require.NotNil(ct, host.Evt, "expected not nil, got nil")
 
-			if params.Status.Error == "" {
-				require.Equalf(ct, host.Evt.Status(), componentstatus.StatusOK, "expected %v, got %v", params.Status.Status, host.Evt.Status())
-				require.Nilf(ct, host.Evt.Err(), "expected nil, got %v", host.Evt.Err())
-			} else {
-				require.Equalf(ct, host.Evt.Status(), params.Status.Status, "expected %v, got %v", params.Status.Status, host.Evt.Status())
-				require.ErrorContainsf(ct, host.Evt.Err(), params.Status.Error, "expected error to contain '%v': %v", params.Status.Error, host.Evt.Err())
+			if params.Status != nil {
+				assert.Equal(t, params.Status.Status(), params.Status.Status(), host.Evt.Status(),
+					"expected status to be %v, got %v", params.Status.Status(), host.Evt.Status())
+				assert.Equal(t, params.Status.Err(), host.Evt.Err())
+				assert.Equal(t, params.Status.Attributes().AsRaw(), host.Evt.Attributes().AsRaw())
 			}
 
 			if params.AssertFunc != nil {

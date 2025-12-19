@@ -140,7 +140,6 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 			IDWithoutName:   id,
 			Name:            inp.Name(),
 			Cancelation:     ctx,
-			StatusReporter:  nil,
 			MetricsRegistry: reg,
 			Logger:          e.testLogger.Named("input.filestream"),
 		}
