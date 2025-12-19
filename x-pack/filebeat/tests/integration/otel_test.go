@@ -52,7 +52,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
 	filebeatMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
 
-	var beatsCfgFile = `
+	beatsCfgFile := `
 filebeat.inputs:
   - type: filestream
     id: filestream-input-id
@@ -199,19 +199,14 @@ setup.template.pattern: logs-filebeat-default
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
-		// only present in beats receivers
-		"agent.otelcol.component.id",
-		"agent.otelcol.component.kind",
 		"log.file.device_id", // changes value between filebeat and otel receiver
 		"container.id",       // only present in filebeat
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 
-	assert.Equal(t, "filebeatreceiver", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
-	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in filebeat log record")
-	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in filebeat log record")
+	assert.Equal(t, "filebeat", otelDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in otel docs")
+	assert.Equal(t, "filebeat", filebeatDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in filebeat docs")
 	assertMonitoring(t, otelMonitoringPort)
 }
 

@@ -13,6 +13,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -98,3 +99,8 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 	}
 	return g.Wait()
 }
+
+type noopReporter struct{}
+
+// UpdateStatus is no-op
+func (n noopReporter) UpdateStatus(status status.Status, msg string) {}
