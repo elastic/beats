@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package lumberjack
 
 import (
@@ -79,7 +81,7 @@ func (i *lumberjackInput) Run(inputCtx inputv2.Context, pipeline beat.Pipeline) 
 
 	metrics := newInputMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
 
-	s, err := newServer(i.config, inputCtx.Logger, client.Publish, inputCtx.StatusReporter, metrics)
+	s, err := newServer(i.config, inputCtx.Logger, client.Publish, inputCtx, metrics)
 	if err != nil {
 		return err
 	}
