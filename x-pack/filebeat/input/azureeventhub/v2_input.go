@@ -15,8 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
-
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
@@ -149,15 +147,15 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		sanitizers: sanitizers,
 	}
 
-	containerClient, err := container.NewClientFromConnectionString(
-		in.config.SAConnectionString,
-		in.config.SAContainer,
-		&container.ClientOptions{
-			ClientOptions: azcore.ClientOptions{
-				Cloud: cloud.AzurePublic,
-			},
-		},
-	)
+	// Create the event hub consumer client
+	consumerClient, err := CreateEventHubConsumerClient(&in.config, in.log)
+	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating consumer client: %s", err.Error()))
+		return fmt.Errorf("failed to create consumer client: %w", err)
+	}
+
+	// Create the container client
+	containerClient, err := CreateStorageAccountContainerClient(&in.config, in.log)
 	if err != nil {
 		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating blob container client: %s", err.Error()))
 		return fmt.Errorf("failed to create blob container client: %w", err)
@@ -190,43 +188,6 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		return fmt.Errorf("failed to create checkpoint store: %w", err)
 	}
 	in.checkpointStore = checkpointStore
-
-	// There is a mismatch between how the azure-eventhub input and the new
-	// Event Hub SDK expect the event hub name in the connection string.
-	//
-	// The azure-eventhub input was designed to work with the old Event Hub SDK,
-	// which worked using the event hub name in the connection string.
-	//
-	// The new Event Hub SDK expects clients to pass the event hub name as a
-	// parameter, or in the connection string as the entity path.
-	//
-	// We need to handle both cases.
-	eventHubName := in.config.EventHubName
-
-	connectionStringProperties, err := parseConnectionString(in.config.ConnectionString)
-	if err != nil {
-		return fmt.Errorf("failed to parse connection string: %w", err)
-	}
-	if connectionStringProperties.EntityPath != nil {
-		// If the connection string contains an entity path, we need to
-		// set the event hub name to an empty string.
-		//
-		// This is a requirement of the new Event Hub SDK.
-		//
-		// See: https://github.com/Azure/azure-sdk-for-go/blob/4ece3e50652223bba502f2b73e7f297de34a799c/sdk/messaging/azeventhubs/producer_client.go#L304-L306
-		eventHubName = ""
-	}
-
-	// Create the event hub consumerClient to receive events.
-	consumerClient, err := azeventhubs.NewConsumerClientFromConnectionString(
-		in.config.ConnectionString,
-		eventHubName,
-		in.config.ConsumerGroup,
-		nil,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create consumer client: %w", err)
-	}
 	in.consumerClient = consumerClient
 
 	// Manage the migration of the checkpoint information
@@ -264,7 +225,6 @@ func (in *eventHubInputV2) run(ctx context.Context) error {
 		// Check if we need to migrate the checkpoint store.
 		err := in.migrationAssistant.checkAndMigrate(
 			ctx,
-			in.config.ConnectionString,
 			in.config.ConsumerGroup,
 		)
 		if err != nil {
