@@ -106,13 +106,9 @@ type Context struct {
 	// statusReporter provides a method to update the status of the underlying unit
 	// that maps to the config. Note: Under standalone execution of Filebeat this is
 	// expected to be nil.
-<<<<<<< HEAD
-	StatusReporter status.StatusReporter
-=======
 	// Context implements the status.StatusReporter interface using this
 	// statusReporter.
 	statusReporter status.StatusReporter
->>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 
 	// MetricsRegistry is the registry collecting metrics for the input using
 	// this context.
