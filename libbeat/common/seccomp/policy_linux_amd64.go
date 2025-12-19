@@ -37,6 +37,7 @@ func init() {
 					"capget",
 					"chmod",
 					"chown",
+					"chroot",
 					"clock_gettime",
 					"clock_nanosleep",
 					"clone",
