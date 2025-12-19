@@ -116,7 +116,6 @@ func (inp *o365input) Test(src cursor.Source, ctx v2.TestContext) error {
 	return nil
 }
 
-<<<<<<< HEAD
 func (inp *o365input) Run(
 	ctx v2.Context,
 	src cursor.Source,
@@ -130,24 +129,6 @@ func (inp *o365input) Run(
 		}
 		//nolint:errorlint // ignore
 		if ctx.Cancelation.Err() != err && !errors.Is(err, context.Canceled) {
-=======
-func (inp *o365input) Run(ctx v2.Context, src cursor.Source, cursor cursor.Cursor, pub cursor.Publisher) error {
-	ctx.UpdateStatus(status.Starting, "")
-
-	stream, ok := src.(*stream)
-	if !ok {
-		// This should never happen.
-		ctx.UpdateStatus(status.Failed, "source is not an O365 stream")
-		return errors.New("source is not an O365 stream")
-	}
-
-	for ctx.Cancelation.Err() == nil {
-		err := inp.run(ctx, stream, cursor, pub, ctx)
-		switch {
-		case err == nil, errors.Is(err, context.Canceled):
-			return nil
-		case err != ctx.Cancelation.Err():
->>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 			msg := mapstr.M{}
 			msg.Put("error.message", err.Error())
 			msg.Put("event.kind", "pipeline_error")
@@ -155,17 +136,9 @@ func (inp *o365input) Run(ctx v2.Context, src cursor.Source, cursor cursor.Curso
 				Timestamp: time.Now(),
 				Fields:    msg,
 			}
-<<<<<<< HEAD
 			if err := publisher.Publish(event, nil); err != nil {
 				ctx.Logger.Errorf("publisher.Publish failed: %v", err)
 			}
-=======
-			if err := pub.Publish(event, nil); err != nil {
-				ctx.UpdateStatus(status.Degraded, "failed to publish error: "+err.Error())
-				ctx.Logger.Errorf("publisher.Publish failed: %v", err)
-			}
-			ctx.UpdateStatus(status.Degraded, err.Error())
->>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 			ctx.Logger.Errorf("Input failed: %v", err)
 			ctx.Logger.Infof("Restarting in %v", inp.config.API.ErrorRetryInterval)
 			//nolint:errcheck // ignore

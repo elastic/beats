@@ -200,12 +200,8 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	}
 
 	metrics := newInputMetrics(reg, ctx.Logger)
-<<<<<<< HEAD
 
-	client, err := newHTTPClient(stdCtx, cfg, stat, log, reg)
-=======
-	client, err := newHTTPClient(stdCtx, cfg.Auth, cfg.Request, ctx, log, reg, nil)
->>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
+	client, err := newHTTPClient(stdCtx, cfg, ctx, log, reg) //	client, err := newHTTPClient(stdCtx, cfg.Auth, cfg.Request, ctx, log, reg, nil)
 	if err != nil {
 		ctx.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
 		return err
