@@ -1811,6 +1811,90 @@ number of times the controller tripped a given usage level
     format: bytes
 
 
+## pressure [_pressure]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Pressure (resource contention) stats.
+
+## some [_some]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Share of time in which at least some tasks are stalled on a given resource
+
+**`system.process.cgroup.memory.pressure.some.10.pct`**
+:   Pressure over 10 seconds
+
+    type: float
+
+    format: percent
+
+
+**`system.process.cgroup.memory.pressure.some.60.pct`**
+:   Pressure over 60 seconds
+
+    type: float
+
+    format: percent
+
+
+**`system.process.cgroup.memory.pressure.some.300.pct`**
+:   Pressure over 300 seconds
+
+    type: float
+
+    format: percent
+
+
+**`system.process.cgroup.memory.pressure.some.total`**
+:   total Some pressure time
+
+    type: long
+
+
+## full [_full]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Share of time in which all non-idle tasks are stalled on a given resource simultaneously
+
+**`system.process.cgroup.memory.pressure.full.10.pct`**
+:   Pressure over 10 seconds
+
+    type: float
+
+    format: percent
+
+
+**`system.process.cgroup.memory.pressure.full.60.pct`**
+:   Pressure over 60 seconds
+
+    type: float
+
+    format: percent
+
+
+**`system.process.cgroup.memory.pressure.full.300.pct`**
+:   Pressure over 300 seconds
+
+    type: float
+
+    format: percent
+
+
+**`system.process.cgroup.memory.pressure.full.total`**
+:   total Full pressure time
+
+    type: long
+
+
 ## blkio [_blkio]
 
 Block IO metrics.

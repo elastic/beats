@@ -68,35 +68,120 @@ func TestConfigValidate(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("gzip_experimental works with file_identity.fingerprint", func(t *testing.T) {
-		c, err := conf.NewConfigFrom(`
-id: 'some id'
-paths: [/foo/bar*]
-gzip_experimental: true
-file_identity.fingerprint: ~
-`)
-		require.NoError(t, err, "could not create config from string")
-		got := defaultConfig()
-		err = c.Unpack(&got)
-		require.NoError(t, err, "could not unpack config")
+	t.Run("compression validation", func(t *testing.T) {
+		tcs := []struct {
+			name        string
+			compression string
+			wantErr     string
+		}{
+			{name: "none is valid", compression: CompressionNone},
+			{name: "gzip is valid", compression: CompressionGZIP},
+			{name: "auto is valid", compression: CompressionAuto},
+			{name: "invalid value returns error", compression: "invalid", wantErr: `invalid compression value "invalid"`},
+		}
 
-		err = got.Validate()
-		assert.NoError(t, err)
+		for _, tc := range tcs {
+			t.Run(tc.name, func(t *testing.T) {
+				c := config{
+					Paths:       []string{"/foo/bar"},
+					Compression: tc.compression,
+				}
+				err := c.Validate()
+				if tc.wantErr == "" {
+					assert.NoError(t, err)
+				} else {
+					assert.ErrorContains(t, err, tc.wantErr)
+				}
+			})
+		}
 	})
 
-	t.Run("gzip_experimental requires file_identity.fingerprint", func(t *testing.T) {
-		c, err := conf.NewConfigFrom(`
-id: 'some id'
-paths: [/foo/bar*]
-gzip_experimental: true
-file_identity.path: ~
-`)
-		require.NoError(t, err, "could not create config from string")
-		got := defaultConfig()
-		err = c.Unpack(&got)
-		assert.ErrorContains(t,
-			err,
-			"gzip_experimental=true requires file_identity to be 'fingerprint")
+	t.Run("compression requires fingerprint file_identity", func(t *testing.T) {
+		makeFileIdentity := func(t *testing.T, name string) *conf.Namespace {
+			cfg := conf.MustNewConfigFrom(map[string]interface{}{
+				name: nil,
+			})
+			ns := &conf.Namespace{}
+			err := cfg.Unpack(ns)
+			require.NoError(t, err, "failed to unpack config into conf.Namespace")
+			return ns
+		}
+
+		tcs := []struct {
+			name         string
+			compression  string
+			fileIdentity string
+			wantErr      string
+		}{
+			// gzip compression + file_identity combinations
+			{
+				name:         "gzip with fingerprint is valid",
+				compression:  CompressionGZIP,
+				fileIdentity: fingerprintName,
+			},
+			{
+				name:         "gzip with native errors",
+				compression:  CompressionGZIP,
+				fileIdentity: nativeName,
+				wantErr:      "compression='gzip' requires 'file_identity' to be 'fingerprint'",
+			},
+			{
+				name:         "gzip with path errors",
+				compression:  CompressionGZIP,
+				fileIdentity: pathName,
+				wantErr:      "compression='gzip' requires 'file_identity' to be 'fingerprint'",
+			},
+			// auto compression + file_identity combinations
+			{
+				name:         "auto with fingerprint is valid",
+				compression:  CompressionAuto,
+				fileIdentity: fingerprintName,
+			},
+			{
+				name:         "auto with native errors",
+				compression:  CompressionAuto,
+				fileIdentity: nativeName,
+				wantErr:      "compression='auto' requires 'file_identity' to be 'fingerprint'",
+			},
+			{
+				name:         "auto with path errors",
+				compression:  CompressionAuto,
+				fileIdentity: pathName,
+				wantErr:      "compression='auto' requires 'file_identity' to be 'fingerprint'",
+			},
+			// no compression allows any file_identity
+			{
+				name:         "none with native is valid",
+				compression:  CompressionNone,
+				fileIdentity: nativeName,
+			},
+			{
+				name:         "none with path is valid",
+				compression:  CompressionNone,
+				fileIdentity: pathName,
+			},
+			{
+				name:         "none with fingerprint is valid",
+				compression:  CompressionNone,
+				fileIdentity: fingerprintName,
+			},
+		}
+
+		for _, tc := range tcs {
+			t.Run(tc.name, func(t *testing.T) {
+				c := config{
+					Paths:        []string{"/foo/bar"},
+					Compression:  tc.compression,
+					FileIdentity: makeFileIdentity(t, tc.fileIdentity),
+				}
+				err := c.Validate()
+				if tc.wantErr == "" {
+					assert.NoError(t, err)
+				} else {
+					assert.ErrorContains(t, err, tc.wantErr)
+				}
+			})
+		}
 	})
 }
 
