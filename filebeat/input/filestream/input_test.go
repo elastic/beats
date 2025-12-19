@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 package filestream
 
 import (
@@ -201,7 +203,6 @@ func createFilestreamTestRunner(ctx context.Context, b testing.TB, testID string
 		Name:            "filestream-test",
 		Agent:           beat.Info{},
 		Cancelation:     ctx,
-		StatusReporter:  nil,
 		MetricsRegistry: monitoring.NewRegistry(),
 		Logger:          logger,
 	}
