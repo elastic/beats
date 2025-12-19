@@ -460,10 +460,10 @@ func panicOnRun(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
 
 type testLogger strings.Builder
 
-func (tl *testLogger) Errorf(format string, args ...interface{}) {
+func (tl *testLogger) Errorf(format string, args ...any) {
 	sb := (*strings.Builder)(tl)
-	sb.WriteString(fmt.Sprintf(format, args...))
-	sb.WriteString("\n")
+	fmt.Fprintf(sb, format, args...)
+	fmt.Fprint(sb, "\n")
 }
 
 func (tl *testLogger) String() string {
