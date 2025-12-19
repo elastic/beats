@@ -224,6 +224,7 @@ func newInputACKHandler(log *logp.Logger) beat.EventListener {
 		if n == 0 {
 			return
 		}
+		//nolint:errcheck // We know it will always work
 		private[last].(*updateOp).Execute(n)
 	})
 }
