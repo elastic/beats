@@ -17,7 +17,7 @@ The Wolfi-based Docker image does not contain the `journalctl` binary and the `j
 :::{important}
 When using the Journald input from a Docker container, make sure that
 either:
- - {applies_to}`stack: ga 9.3.0` [`chroot`](#filebeat-input-journald-chroot) is set, or
+ - {applies_to}`stack: ga 9.3.0` [`chroot`](#filebeat-input-journald-chroot) is set.
  - The `journalctl` binary in the container is compatible with your
    Systemd/journal version. To get the version of the `journalctl` binary
    in Filebeat's image run the following, adjusting the image name/tag
@@ -28,7 +28,7 @@ either:
    docker run --rm -it --entrypoint "journalctl" docker.elastic.co/beats/filebeat:<VERSION> --version
    ```
    The container variants that contain `journalctl` are: `filebeat`,
-   `filebeat-oss` and `filebeat-ubi`
+   `filebeat-oss` and `filebeat-ubi`.
 
 :::
 
