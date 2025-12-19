@@ -106,13 +106,9 @@ type Context struct {
 	// statusReporter provides a method to update the status of the underlying unit
 	// that maps to the config. Note: Under standalone execution of Filebeat this is
 	// expected to be nil.
-<<<<<<< HEAD
-	StatusReporter status.StatusReporter
-=======
 	// Context implements the status.StatusReporter interface using this
 	// statusReporter.
 	statusReporter status.StatusReporter
->>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 
 	// MetricsRegistry is the registry collecting metrics for the input using
 	// this context.
@@ -128,8 +124,6 @@ func (c Context) UpdateStatus(status status.Status, msg string) {
 	}
 }
 
-<<<<<<< HEAD
-=======
 // WithStatusReporter returns a copy of this context with the StatusReporter set
 // to reporter.
 func (c Context) WithStatusReporter(reporter status.StatusReporter) Context {
@@ -137,21 +131,6 @@ func (c Context) WithStatusReporter(reporter status.StatusReporter) Context {
 	return c
 }
 
-// MetricsRegistryOverrideID sets the "id" variable in the Context's
-// MetricsRegistry and returns the modified registry. This is required as some
-// inputs do not use their input ID as the identifier for their metrics.
-func MetricsRegistryOverrideID(reg *monitoring.Registry, id string) {
-	monitoring.NewString(reg, inputmon.MetricKeyID).Set(id)
-}
-
-// MetricsRegistryOverrideInput sets the "input" variable in the Context's
-// MetricsRegistry and returns the modified registry. This is required as some
-// inputs do not use their input name for their metrics.
-func MetricsRegistryOverrideInput(reg *monitoring.Registry, inputName string) {
-	monitoring.NewString(reg, inputmon.MetricKeyInput).Set(inputName)
-}
-
->>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 // NewPipelineClientListener returns a new beat.ClientListener.
 // The PipelineClientListener collects pipeline metrics for an input. The
 // metrics are created on reg.

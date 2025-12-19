@@ -161,13 +161,9 @@ func (r *runner) Start() {
 
 		err := r.input.Run(ctx, pc)
 		if err != nil && !errors.Is(err, context.Canceled) {
-<<<<<<< HEAD
-			log.Errorf("Input '%s' failed with: %+v", name, err)
-=======
 			errMsg := fmt.Sprintf("Input '%s' failed with: %+v", name, err)
 			log.Error(errMsg)
 			ctx.UpdateStatus(status.Failed, errMsg)
->>>>>>> 2d1581840 (Fix panic on input v2 errors by making Context.StatusReporter private. (#48089))
 		} else {
 			log.Infof("Input '%s' stopped (goroutine)", name)
 		}
