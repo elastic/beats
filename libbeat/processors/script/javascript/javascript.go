@@ -42,9 +42,9 @@ import (
 type jsProcessor struct {
 	Config
 	sessionPool *sessionPool
-	sourceProg  *goja.Program
 	sourceFile  string
 	stats       *processorStats
+	logger      *logp.Logger
 }
 
 // New constructs a new JavaScript processor.
@@ -59,50 +59,60 @@ func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 
 // NewFromConfig constructs a new JavaScript processor from the given config
 // object. It loads the sources, compiles them, and validates the entry point.
+// For inline sources, initialization happens immediately. For file-based sources,
+// initialization is deferred until SetPaths is called.
 func NewFromConfig(c Config, reg *monitoring.Registry, logger *logp.Logger) (beat.Processor, error) {
 	err := c.Validate()
 	if err != nil {
 		return nil, err
 	}
 
-	var sourceFile string
-	var sourceCode string
-	switch {
-	case c.Source != "":
-		sourceFile = "inline.js"
-		sourceCode = c.Source
-	case c.File != "":
-		sourceFile, sourceCode, err = loadSources(c.File)
-	case len(c.Files) > 0:
-		sourceFile, sourceCode, err = loadSources(c.Files...)
-	}
-	if err != nil {
-		return nil, annotateError(c.Tag, err)
+	processor := &jsProcessor{
+		Config: c,
+		logger: logger,
+		stats:  getStats(c.Tag, reg, logger),
 	}
 
-	// Validate processor source code.
-	prog, err := goja.Compile(sourceFile, sourceCode, true)
-	if err != nil {
-		return nil, err
+	// For inline sources, we can initialize immediately.
+	// For file-based sources, we defer initialization until SetPaths is called.
+	if c.Source != "" {
+		const inlineSourceFile = "inline.js"
+
+		err = processor.compile(inlineSourceFile, c.Source)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	pool, err := newSessionPool(prog, c, logger)
-	if err != nil {
-		return nil, annotateError(c.Tag, err)
-	}
-
-	return &jsProcessor{
-		Config:      c,
-		sessionPool: pool,
-		sourceProg:  prog,
-		sourceFile:  sourceFile,
-		stats:       getStats(c.Tag, reg, logger),
-	}, nil
+	return processor, nil
 }
 
-// loadSources loads javascript source from files.
-func loadSources(files ...string) (string, string, error) {
-	var sources []string
+// SetPaths initializes the processor with the provided paths configuration.
+// This method must be called before the processor can be used for file-based sources.
+func (p *jsProcessor) SetPaths(path *paths.Path) error {
+	if p.Source != "" {
+		return nil // inline source already set
+	}
+
+	var sourceFile string
+	var sourceCode string
+	var err error
+
+	switch {
+	case p.File != "":
+		sourceFile, sourceCode, err = loadSources(path, p.File)
+	case len(p.Files) > 0:
+		sourceFile, sourceCode, err = loadSources(path, p.Files...)
+	}
+	if err != nil {
+		return annotateError(p.Tag, err)
+	}
+
+	return p.compile(sourceFile, sourceCode)
+}
+
+// loadSources loads javascript source from files using the provided paths.
+func loadSources(pathConfig *paths.Path, files ...string) (string, string, error) {
 	buf := new(bytes.Buffer)
 
 	readFile := func(path string) error {
@@ -124,8 +134,9 @@ func loadSources(files ...string) (string, string, error) {
 		return nil
 	}
 
+	sources := make([]string, 0, len(files))
 	for _, filePath := range files {
-		filePath = paths.Resolve(paths.Config, filePath)
+		filePath = pathConfig.Resolve(paths.Config, filePath)
 
 		if hasMeta(filePath) {
 			matches, err := filepath.Glob(filePath)
@@ -162,9 +173,30 @@ func annotateError(id string, err error) error {
 	return fmt.Errorf("failed in processor.javascript: %w", err)
 }
 
+func (p *jsProcessor) compile(sourceFile, sourceCode string) error {
+	// Validate processor source code.
+	prog, err := goja.Compile(sourceFile, sourceCode, true)
+	if err != nil {
+		return err
+	}
+
+	pool, err := newSessionPool(prog, p.Config, p.logger)
+	if err != nil {
+		return annotateError(p.Tag, err)
+	}
+
+	p.sessionPool = pool
+	p.sourceFile = sourceFile
+	return nil
+}
+
 // Run executes the processor on the given it event. It invokes the
 // process function defined in the JavaScript source.
 func (p *jsProcessor) Run(event *beat.Event) (*beat.Event, error) {
+	if p.sessionPool == nil {
+		return event, fmt.Errorf("javascript processor not initialized: SetPaths must be called for file-based sources")
+	}
+
 	s := p.sessionPool.Get()
 	defer p.sessionPool.Put(s)
 
