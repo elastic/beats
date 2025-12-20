@@ -57,6 +57,20 @@ func UseNamedMetricSet(name string) SetupConfigCallback {
 	}
 }
 
+// Setup a Server with the Cluster Info route set to fail (HTTP 401).
+func SetupClusterInfoErrorServer(t *testing.T, _ []byte, _ []byte, _ string) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.RequestURI {
+		case "/":
+			w.WriteHeader(401)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(`{"error":"Bad Auth"}`))
+		default:
+			t.Fatalf("Unrecognized request %v", r.RequestURI)
+		}
+	}))
+}
+
 // Setup a Server with the data route set to `dataRoute`.
 func SetupSuccessfulServer(dataRoute string) SetupServerCallback {
 	return func(t *testing.T, clusterInfo []byte, data []byte, _ string) *httptest.Server {
