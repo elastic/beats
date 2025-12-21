@@ -38,7 +38,7 @@ func getTable(fields mapstr.M, data []byte, offset uint32) (next uint32, err boo
 	length := binary.BigEndian.Uint32(data[offset : offset+4])
 
 	// size declared too big
-	if length > uint32(len(data[offset+4:])) {
+	if len(data) < int(offset+4+length) {
 		return 0, true, false
 	}
 	if length > 0 {
@@ -64,7 +64,7 @@ func getArray(fields mapstr.M, data []byte, offset uint32) (next uint32, err boo
 	}
 
 	// less actual data than the transmitted length indicates
-	if length > uint32(len(data))-(offset+4) {
+	if len(data) < int(offset+4+length) {
 		return 0, true, false
 	}
 	if length > 0 {

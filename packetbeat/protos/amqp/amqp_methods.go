@@ -484,7 +484,7 @@ func exchangeDeclareMethod(m *amqpMessage, args []byte) (bool, bool) {
 		"durable":       params[1],
 		"no-wait":       params[4],
 	}
-	if uint32(len(args)) <= offset+1 {
+	if len(args) <= int(offset+1) {
 		logp.Debug("amqp", "Error getting name of routing key in exchange declare")
 		return false, false
 	}
