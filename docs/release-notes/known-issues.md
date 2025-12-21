@@ -21,6 +21,21 @@ Known issues are significant defects or limitations that may impact your impleme
 
 % :::
 
+:::{dropdown} Filebeat might crash (panic) on input errors or invalid processor configuration
+**Applies to**: Filebeat 9.2.3
+
+**Details**
+Filebeat might crash with a panic on input errors or when invalid
+processors are defined at the input level.
+
+**Workaround**
+If the crash is caused by invalid configuration, fixing the
+configuration solves the problem.
+
+**Fix planned in**: 9.2.4 by [PR #48089](https://github.com/elastic/beats/pull/48089)
+
+:::
+
 :::{dropdown} Winlogbeat and Filebeat `winlog` input can crash the Event Log on Windows Server 2025.
 **Details** 
 On 04/16/2025, a known issue was discovered that can cause a crash of the Event Log service in Windows Server 2025 **when reading forwarded events in an Event Collector setup**. The issue appears for some combinations of filters where the OS handles non-null-terminated strings, leading to the crash.
