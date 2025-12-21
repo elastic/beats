@@ -318,7 +318,7 @@ func queueBindMethod(m *amqpMessage, args []byte) (bool, bool) {
 	if len(exchange) > 0 {
 		m.fields["exchange"] = exchange
 	}
-	if len(args) <= int(offset)+1 {
+	if len(args) <= int(offset+1) {
 		logp.Debug("amqp", "Expected end of frame or arguments in queue bind")
 		return false, false
 	}
@@ -577,6 +577,11 @@ func exchangeBindUnbindInfo(m *amqpMessage, args []byte) bool {
 		"routing-key": routingKey,
 		"no-wait":     params[0],
 	}
+
+	if len(args) <= int(offset+1) {
+		logp.Debug("amqp", "Error getting args in exchange bind/unbind")
+		return true
+	}
 	if args[offset+1] != frameEndOctet && m.parseArguments {
 		arguments := make(mapstr.M)
 		_, err, exists := getTable(arguments, args, offset+1)
@@ -645,7 +650,7 @@ func basicConsumeMethod(m *amqpMessage, args []byte) (bool, bool) {
 		"exclusive":    params[2],
 		"no-wait":      params[3],
 	}
-	if len(args) <= int(offset)+1 {
+	if len(args) <= int(offset+1) {
 		logp.Debug("amqp", "Expected end of frame or arguments in basic consume")
 		return false, false
 	}
@@ -981,19 +986,6 @@ func okMethod(m *amqpMessage, args []byte) (bool, bool) {
 	return true, true
 }
 
-// function to get a short string. It sends back an error if slice is too short
-// for declared length. if length == 0, the function sends back an empty string and
-// advances the offset. Otherwise, it returns the string and the new offset
-func getShortString(data []byte, start uint32, length uint32) (short string, nextOffset uint32, err bool) {
-	if length == 0 {
-		return "", start, false
-	}
-	if uint32(len(data)) < start || uint32(len(data[start:])) < length {
-		return "", 0, true
-	}
-	return string(data[start : start+length]), start + length, false
-}
-
 // Function to get a Length-Value string. It is generic over the integer length
 // of the length key. It sends back an error if slice is too short for declared
 // length and string, or if the offset itself is out of bounds. if length == 0
@@ -1004,10 +996,10 @@ func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short s
 	if len(data) == 0 {
 		return "", 0, true
 	}
-	lengthSize := int(unsafe.Sizeof(length))
+	lengthSize := uint32(unsafe.Sizeof(length))
 
 	// If there's not enough data to read the length of the string return err
-	if offset+uint32(lengthSize) >= uint32(len(data)) {
+	if int(offset+lengthSize) >= len(data) {
 		return "", 0, true
 	}
 
@@ -1015,21 +1007,21 @@ func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short s
 	case uint8:
 		length = T(data[offset])
 	case uint16:
-		length = T(binary.BigEndian.Uint16(data[offset : offset+uint32(lengthSize)]))
+		length = T(binary.BigEndian.Uint16(data[offset : offset+lengthSize]))
 	case uint32:
-		length = T(binary.BigEndian.Uint32(data[offset : offset+uint32(lengthSize)]))
+		length = T(binary.BigEndian.Uint32(data[offset : offset+lengthSize]))
 	}
 	strlen := uint32(length)
 
 	if strlen == 0 {
-		return "", uint32(lengthSize), false
+		return "", lengthSize, false
 	}
 
-	if offset+uint32(lengthSize)+strlen > uint32(len(data)) {
+	if offset+lengthSize+strlen > uint32(len(data)) {
 		logp.Debug("amqp", "Not enough data for string")
 		return "", 0, true
 	}
-	return string(data[offset+uint32(lengthSize) : offset+uint32(lengthSize)+strlen]), strlen + uint32(lengthSize), false
+	return string(data[offset+lengthSize : offset+lengthSize+strlen]), strlen + lengthSize, false
 }
 
 // Attempts to get an integer from a byte slice. Returns the integer and an err boolean.
