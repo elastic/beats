@@ -20,6 +20,7 @@ package mage
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -125,17 +126,12 @@ func createDocsPath(module string) error {
 
 // testIfDocsInDir tests for a `_meta/docs.asciidoc` in a given directory
 func testIfDocsInDir(moduleDir string) bool {
-<<<<<<< HEAD
 
 	_, err := os.Stat(filepath.Join(moduleDir, "_meta/docs.asciidoc"))
 	if err != nil {
 		return false
 	}
 	return true
-=======
-	_, err := os.Stat(filepath.Join(moduleDir, "_meta/docs.md"))
-	return err == nil
->>>>>>> ba38bef56 (Remove global paths in msetlist (#47930))
 }
 
 // compile and run the seprate go script to generate a list of default metricsets.
@@ -189,11 +185,6 @@ func loadModuleFields(file string) (moduleData, error) {
 	if err != nil {
 		return mod[0], fmt.Errorf("file %s is missing a release string: %w", file, err)
 	}
-<<<<<<< HEAD
-=======
-	applies_to, _ := getVersion(fd)
-
->>>>>>> ba38bef56 (Remove global paths in msetlist (#47930))
 	module.Release = rel
 
 	return module, nil
@@ -221,57 +212,6 @@ func getReleaseState(metricsetPath string) (string, error) {
 	return relString, nil
 }
 
-<<<<<<< HEAD
-=======
-// Get `version` from `fields.yml` to be used in `applies_to`.
-// NOTE: I just copied and adjusted the `getReleaseState` function
-// above. I'm sure this could be improved!
-func getVersion(raw []byte) (string, error) {
-
-	type metricset struct {
-		Version versionData `yaml:"version"`
-		Release string      `yaml:"release"`
-		Path    string
-	}
-	var rel []metricset
-	if err := yaml.Unmarshal(raw, &rel); err != nil {
-		return "", err
-	}
-	// Build the applies_to string: a comma-separated list
-	// of all available lifecycles and versions
-	// NOTE: There's almost certainly a more efficient way
-	// to accomplish this.
-	var versions []string
-	if rel[0].Version.Removed != "" {
-		versions = append(versions, fmt.Sprintf("removed %s", rel[0].Version.Removed))
-	}
-	if rel[0].Version.Deprecated != "" {
-		versions = append(versions, fmt.Sprintf("deprecated %s", rel[0].Version.Deprecated))
-	}
-	if rel[0].Version.Ga != "" {
-		versions = append(versions, fmt.Sprintf("ga %s", rel[0].Version.Ga))
-	}
-	if rel[0].Version.Beta != "" {
-		versions = append(versions, fmt.Sprintf("beta %s", rel[0].Version.Beta))
-	}
-	if rel[0].Version.Preview != "" {
-		versions = append(versions, fmt.Sprintf("preview %s", rel[0].Version.Preview))
-	}
-	// If there's no version specified, check if there's
-	// a release state and use that instead
-	if len(versions) == 0 {
-		relString, err := getRelease(rel[0].Release)
-		if err != nil {
-			return "", fmt.Errorf("metricset %s is missing a release tag: %w", rel[0].Path, err)
-		}
-		return relString, nil
-	} else {
-		applies_to := strings.Join(versions, ", ")
-		return applies_to, nil
-	}
-}
-
->>>>>>> ba38bef56 (Remove global paths in msetlist (#47930))
 // hasDashboards checks to see if the metricset has dashboards
 func hasDashboards(modulePath string) bool {
 	info, err := os.Stat(filepath.Join(modulePath, "_meta/kibana"))
@@ -297,13 +237,8 @@ func getConfigfile(modulePath string) (string, error) {
 		return "", fmt.Errorf("could not find a config file in %s", modulePath)
 	}
 
-<<<<<<< HEAD
 	raw, err := ioutil.ReadFile(goodPath)
 	return string(raw), err
-=======
-	raw, err := os.ReadFile(goodPath)
-	return strings.TrimSpace(string(raw)), err
->>>>>>> ba38bef56 (Remove global paths in msetlist (#47930))
 
 }
 
@@ -323,16 +258,7 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 			continue
 		}
 		metricsetName := filepath.Base(metricset)
-<<<<<<< HEAD
 		release, err := getReleaseState(filepath.Join(metricset, "_meta/fields.yml"))
-=======
-		release, _ := getReleaseState(filepath.Join(metricset, "_meta/fields.yml"))
-		raw, err := os.ReadFile(filepath.Join(metricset, "_meta/fields.yml"))
-		if err != nil {
-			return nil, err
-		}
-		applies_to, err := getVersion(raw)
->>>>>>> ba38bef56 (Remove global paths in msetlist (#47930))
 		if err != nil {
 			return nil, err
 		}
