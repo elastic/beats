@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 const (
@@ -69,7 +70,24 @@ type cloudConnectedCluster struct {
 
 // Response from CCM after successfully registering a Self-Managed Cluster.
 type cloudConnectedResource struct {
-	ID string `json:"id"`
+	ID       string                 `json:"id"`
+	Services cloudConnectedServices `json:"services"`
+}
+
+type cloudConnectedServices struct {
+	AutoOps cloudConnectedService `json:"auto_ops"`
+}
+
+type cloudConnectedService struct {
+	// Note: We don't need the 'enabled' field, but it may be interesting in the future
+	// Enabled bool                         `json:"enabled"`
+	Support cloudConnectedServiceSupport `json:"support"`
+}
+
+type cloudConnectedServiceSupport struct {
+	MinimumStackVersion string   `json:"minimum_stack_version"`
+	Supported           bool     `json:"supported"`
+	ValidLicenseTypes   []string `json:"valid_license_types"`
 }
 
 // The special metricset.getClusterInfo function, which will shutdown the Beat / Agent if
@@ -90,38 +108,37 @@ func maybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterIn
 	cloudApiKey, err := getCloudConnectedModeApiKey(m)
 
 	if err != nil {
-		return fmt.Errorf("failed to get Cloud Connected API Key: %w", err)
+		return fmt.Errorf("failed to get Cloud Connect API Key: %w", err)
 	} else if cloudApiKey == "" {
 		// if there is no Cloud API Key configured, then there is no request to make
 		return nil
 	}
 
-	m.Logger().Debugf("Attempting to get cluster info for Cloud Connected...")
+	m.Logger().Debugf("Attempting to get cluster info for Cloud Connect...")
 	clusterInfo, err := getClusterInfo(m)
 
 	if err != nil {
 		return fmt.Errorf("failed to load cluster info: %w", err)
 	}
 
-	m.Logger().Debugf("Attempting to fetch cluster settings for Cloud Connected...")
+	m.Logger().Debugf("Attempting to fetch cluster settings for Cloud Connect...")
 	clusterSettings, err := utils.FetchAPIData[clusterSettingsResponse](m, clusterSettingsPath)
 
 	if err != nil {
 		// Log the error, but do not fail the registration - we can continue with the existing cluster name
 		// Note: You can restart the agent to re-fetch the name later if needed
-		m.Logger().Warnf("Ignoring failure to fetch cluster settings for Cloud Connected: %v", err)
+		m.Logger().Warnf("Ignoring failure to fetch cluster settings for Cloud Connect: %v", err)
 		// prefer transient setting over persistent setting
 	} else if clusterSettings.Transient.Cluster.Metadata.DisplayName != "" {
-		m.Logger().Debugf("Using transient cluster display name %s for Cloud Connected in place of cluster name %s", clusterSettings.Transient.Cluster.Metadata.DisplayName, clusterInfo.ClusterName)
+		m.Logger().Debugf("Using transient cluster display name %s for Cloud Connect in place of cluster name %s", clusterSettings.Transient.Cluster.Metadata.DisplayName, clusterInfo.ClusterName)
 
 		clusterInfo.ClusterName = clusterSettings.Transient.Cluster.Metadata.DisplayName
 	} else if clusterSettings.Persistent.Cluster.Metadata.DisplayName != "" {
-		m.Logger().Debugf("Using persistent cluster display name %s for Cloud Connected in place of cluster name %s", clusterSettings.Persistent.Cluster.Metadata.DisplayName, clusterInfo.ClusterName)
-
+		m.Logger().Debugf("Using persistent cluster display name %s for Cloud Connect in place of cluster name %s", clusterSettings.Persistent.Cluster.Metadata.DisplayName, clusterInfo.ClusterName)
 		clusterInfo.ClusterName = clusterSettings.Persistent.Cluster.Metadata.DisplayName
 	}
 
-	m.Logger().Debugf("Attempting to fetch license for Cloud Connected...")
+	m.Logger().Debugf("Attempting to fetch license for Cloud Connect...")
 	versionedLicensePath := licensePath
 
 	// TODO: Drop support for this when we drop support for 7.17
@@ -140,7 +157,7 @@ func maybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterIn
 		return fmt.Errorf("cluster license type is not supported: %s", licenseWrapper.License.Type)
 	}
 
-	m.Logger().Debugf("Successfully fetched license for Cloud Connected: UUID=%s License=%s", clusterInfo.ClusterID, licenseWrapper.License.UID)
+	m.Logger().Debugf("Successfully fetched license for Cloud Connect: UUID=%s License=%s", clusterInfo.ClusterID, licenseWrapper.License.UID)
 
 	return registerCloudConnectedCluster(cloudApiKey, clusterInfo, &licenseWrapper.License, m.Logger())
 }
@@ -161,14 +178,14 @@ func registerCloudConnectedCluster(cloudApiKey string, clusterInfo *utils.Cluste
 	})
 
 	if err != nil {
-		return fmt.Errorf("failed to serialize payload for Cloud Connected: %w", err)
+		return fmt.Errorf("failed to serialize payload for Cloud Connect: %w", err)
 	}
 
 	requestURL := getCloudConnectedModeAPIURL() + "/api/v1/cloud-connected/clusters"
 	req, err := http.NewRequestWithContext(context.Background(), "POST", requestURL, bytes.NewBuffer(jsonData))
 
 	if err != nil {
-		return fmt.Errorf("failed to create HTTP request for Cloud Connected: %w", err)
+		return fmt.Errorf("failed to create HTTP request for Cloud Connect: %w", err)
 	}
 
 	req.Header.Set("Accept", "application/json")
@@ -177,11 +194,38 @@ func registerCloudConnectedCluster(cloudApiKey string, clusterInfo *utils.Cluste
 
 	data, err := utils.HandleHTTPResponse[cloudConnectedResource](http.DefaultClient.Do(req)) //nolint:bodyclose // the handler closes the body
 
-	if err == nil {
-		utils.SetResourceID(data.ID)
-		logger.Infof("Registered cluster %s for Cloud Connected: %s", clusterInfo.ClusterID, data.ID)
-		return nil
+	return handleRegisterCloudConnectedCluster(data, err, clusterInfo, license, logger)
+}
+
+// Parse the data and err response from registering the Cloud Connected cluster, and either set the resource ID or return an error.
+func handleRegisterCloudConnectedCluster(data *cloudConnectedResource, err error, clusterInfo *utils.ClusterInfo, license *license, logger *logp.Logger) error {
+	if err != nil {
+		return fmt.Errorf("error communicating with Cloud Connect API: %w", err)
 	}
 
-	return fmt.Errorf("failed to register for Cloud Connected: %w", err)
+	if !data.Services.AutoOps.Support.Supported {
+		logger.Warnf("Cloud Connected cluster %s is not supported by AutoOps", data.ID)
+
+		if !slices.Contains(data.Services.AutoOps.Support.ValidLicenseTypes, license.Type) {
+			return fmt.Errorf("failed to enable AutoOps because cluster license type is not supported: %s", license.Type)
+		}
+
+		if data.Services.AutoOps.Support.MinimumStackVersion != "" {
+			minimumVersion, err := version.New(data.Services.AutoOps.Support.MinimumStackVersion)
+
+			if err == nil && clusterInfo.Version.Number.LessThan(minimumVersion) {
+				return fmt.Errorf("failed to enable AutoOps because cluster version is not supported: %s < %s", clusterInfo.Version.Number.String(), data.Services.AutoOps.Support.MinimumStackVersion)
+			}
+		}
+
+		return fmt.Errorf("failed to enable AutoOps because cluster is not supported")
+	} else if data.ID == "" {
+		return fmt.Errorf("failed to register Cloud Connected cluster because no resource ID was returned")
+	}
+
+	logger.Infof("Registered cluster %s for Cloud Connect: %s", clusterInfo.ClusterID, data.ID)
+
+	utils.SetResourceID(data.ID)
+
+	return nil
 }
