@@ -330,7 +330,7 @@ func (b *BaseMetricSet) Registration() MetricSetRegistration {
 }
 
 // GetPath returns the paths associated with this MetricSet or
-// the global is none was set.
+// the global if none was set.
 func (b *BaseMetricSet) GetPath() *paths.Path {
 	if b.paths != nil {
 		return b.paths
