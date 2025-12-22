@@ -19,39 +19,164 @@ this input will log additional information to the logs. Additional information
 includes partition ownership, blob lease information, and other internal state.
 
 
-Example configuration:
+== Example configurations
+
+=== Connection string authentication (processor v1)
+
+**Note:** Processor v1 only supports connection string authentication.
+
+Example configuration using connection string authentication with processor v1:
 
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
 - type: azure-eventhub
   eventhub: "insights-operational-logs"
-  consumer_group: "test"
-  connection_string: "Endpoint=sb://....."
-  storage_account: "azureeph"
-  storage_account_key: "....."
-  storage_account_container: ""
-  resource_manager_endpoint: ""
-
+  consumer_group: "$Default"
+  connection_string: "Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=your-shared-access-key"
+  storage_account: "your-storage-account"
+  storage_account_key: "your-storage-account-key"
+  storage_account_container: "your-storage-container"
+  processor_version: "v1"
 ----
 
-==== Configuration options
+=== Connection string authentication (processor v2)
 
-The `azure-eventhub` input supports the following configuration:
+Example configuration using connection string authentication with processor v2:
 
-==== `eventhub`
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "$Default"
+  auth_type: "connection_string"
+  connection_string: "Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=your-shared-access-key"
+  storage_account: "your-storage-account"
+  storage_account_connection_string: "DefaultEndpointsProtocol=https;AccountName=your-storage-account;AccountKey=your-storage-account-key;EndpointSuffix=core.windows.net"
+  storage_account_container: "your-storage-container"
+----
+
+=== Client secret authentication (processor v2)
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "$Default"
+  auth_type: "client_secret"
+  eventhub_namespace: "your-namespace.servicebus.windows.net"
+  tenant_id: "your-tenant-id"
+  client_id: "your-client-id"
+  client_secret: "your-client-secret"
+  storage_account: "your-storage-account"
+  storage_account_container: "your-storage-container"
+----
+
+**Note:** When using `client_secret` authentication, the service principal must have the appropriate Azure RBAC permissions. See <<_required_permissions,Required permissions>> for details.
+
+== Authentication
+
+The azure-eventhub input supports multiple authentication methods. The <<_auth_type,`auth_type` configuration option>> controls the authentication method used for both Event Hub and Storage Account.
+
+=== Authentication types
+
+The following authentication types are supported:
+
+- **`connection_string`** (default if `auth_type` is not specified): Uses Azure Event Hubs and Storage Account connection strings.
+
+- {applies_to}`stack: ga 9.3.0` **`client_secret`**: Uses Azure Active Directory service principal with client secret credentials.
+
+=== Required permissions
+
+When using `client_secret` authentication, the service principal needs the following Azure RBAC permissions:
+
+**For Azure Event Hubs:**
+
+- `Azure Event Hubs Data Receiver` role on the Event Hubs namespace or Event Hub
+
+- Alternatively, a custom role with the following permissions:
+
+  - `Microsoft.EventHub/namespaces/eventhubs/read`
+
+  - `Microsoft.EventHub/namespaces/eventhubs/consumergroups/read`
+
+**For Azure Storage Account:**
+
+- `Storage Blob Data Contributor` role on the Storage Account or container
+
+- Alternatively, a custom role with the following permissions:
+
+  - `Microsoft.Storage/storageAccounts/blobServices/containers/read`
+
+  - `Microsoft.Storage/storageAccounts/blobServices/containers/write`
+
+  - `Microsoft.Storage/storageAccounts/blobServices/containers/delete`
+
+  - `Microsoft.Storage/storageAccounts/blobServices/generateUserDelegationKey/action`
+
+For detailed instructions on how to set up an Azure AD service principal and configure permissions, refer to the official Microsoft documentation:
+
+- https://learn.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli[Create an Azure service principal with Azure CLI]
+
+- https://learn.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal[Create an Azure AD app registration using the Azure portal]
+
+- https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-cli[Assign Azure roles using Azure CLI]
+
+- https://learn.microsoft.com/en-us/azure/event-hubs/authorize-access-azure-active-directory[Azure Event Hubs authentication and authorization]
+
+- https://learn.microsoft.com/en-us/azure/storage/blobs/authorize-access-azure-active-directory[Authorize access to blobs using Azure Active Directory]
+
+== Configuration options
+
+The `azure-eventhub` input supports the following configuration options:
+
+=== `eventhub`
 
 The name of the eventhub users would like to read from, field required.
 
-==== `consumer_group`
+=== `consumer_group`
 
 Optional, we recommend using a dedicated consumer group for the azure input. Reusing consumer groups among non-related consumers can cause unexpected behavior and possibly lost events.
 
-==== `connection_string`
+=== `auth_type`
+Specifies the authentication method to use for both Event Hub and Storage Account. If not specified, defaults to `connection_string` for backwards compatibility.
 
-The connection string required to communicate with Event Hubs, steps here https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string.
+Valid values include:
 
-A Blob Storage account is required in order to store/retrieve/update the offset or state of the eventhub messages. This means that after stopping filebeat it can start back up at the spot that it stopped processing messages.
+-  **`connection_string`** (default): Uses connection string authentication. You _must_ provide a `connection_string`.
+-  **`client_secret` **: Uses Azure Active Directory service principal with client secret credentials.
+
+=== `connection_string`
+
+The connection string required to communicate with Event Hubs when using `connection_string` authentication. For more information, refer to https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string[Get an Azure Event Hubs connection string].
+
+This option is required if:
+
+* `auth_type` is set to `connection_string`
+* `auth_type` is not specified (in which case it defaults to `connection_string` for backwards compatibility)
+
+=== `eventhub_namespace`
+The fully qualified namespace for the Event Hub. Required when using credential-based authentication methods (such as `client_secret`). Not required when using `connection_string` authentication, as the namespace is embedded in the connection string. Format: `your-eventhub-namespace.servicebus.windows.net`
+
+=== `tenant_id`
+The Azure Active Directory tenant ID. Required when using `client_secret` authentication for Event Hub or Storage Account.
+
+=== `client_id`
+The Azure Active Directory application (client) ID. Required when using `client_secret` authentication for Event Hub or Storage Account.
+
+=== `client_secret`
+The Azure Active Directory application client secret. Required when using `client_secret` authentication for Event Hub or Storage Account.
+
+=== `authority_host`
+The Azure Active Directory authority host. Optional when using `client_secret` authentication. Defaults to Azure Public Cloud (`https://login.microsoftonline.com`).
+
+Supported values:
+
+* `https://login.microsoftonline.com` (Azure Public Cloud - default)
+* `https://login.microsoftonline.us` (Azure Government)
+* `https://login.chinacloudapi.cn` (Azure China)
 
 ==== `storage_account`
 

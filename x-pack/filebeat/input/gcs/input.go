@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package gcs
 
 import (
@@ -127,12 +129,8 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 	st := newState()
 	currentSource := src.(*Source)
 
-	stat := inputCtx.StatusReporter
-	if stat == nil {
-		stat = noopReporter{}
-	}
-	stat.UpdateStatus(status.Starting, "")
-	stat.UpdateStatus(status.Configuring, "")
+	inputCtx.UpdateStatus(status.Starting, "")
+	inputCtx.UpdateStatus(status.Configuring, "")
 
 	log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
 	log.Infof("Running google cloud storage for project: %s", input.config.ProjectId)
@@ -144,7 +142,7 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 	if !cursor.IsNew() {
 		if err := cursor.Unpack(&cp); err != nil {
 			metrics.errorsTotal.Inc()
-			stat.UpdateStatus(status.Failed, "failed to configure input: "+err.Error())
+			inputCtx.UpdateStatus(status.Failed, "failed to configure input: "+err.Error())
 			return err
 		}
 
@@ -160,7 +158,7 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 	client, err := fetchStorageClient(ctx, input.config)
 	if err != nil {
 		metrics.errorsTotal.Inc()
-		stat.UpdateStatus(status.Failed, "failed to get storage client: "+err.Error())
+		inputCtx.UpdateStatus(status.Failed, "failed to get storage client: "+err.Error())
 		return err
 	}
 
@@ -177,11 +175,7 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 		// Since we are only reading, the operation is always idempotent
 		storage.WithPolicy(storage.RetryAlways),
 	)
-	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, stat, metrics, log)
+	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, &inputCtx, metrics, log)
 
 	return scheduler.schedule(ctx)
 }
-
-type noopReporter struct{}
-
-func (noopReporter) UpdateStatus(status.Status, string) {}

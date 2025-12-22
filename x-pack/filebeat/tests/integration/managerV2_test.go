@@ -16,6 +16,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"path/filepath"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -933,5 +934,379 @@ func outputUnitES(t *testing.T, id int) *proto.UnitExpected {
 					"allow_older_versions": true,
 				}),
 		},
+	}
+}
+
+func TestPipelineConnectionErrorFailsInput(t *testing.T) {
+	filebeat := NewFilebeat(t)
+
+	logFilePath := filepath.Join(filebeat.TempDir(), "a-log-file.log")
+	integration.WriteLogFile(t, logFilePath, 100, false)
+
+	brokenProcessor := []any{
+		map[string]any{
+			"add_fields": map[string]any{
+				"INVALID_CONFIG_KEY": true,
+				"fields": map[string]any{
+					"labels": map[string]any{
+						"foo": "bar",
+					},
+				},
+			},
+		},
+	}
+
+	outputUnit := &proto.UnitExpected{
+		Id:             "output-unit",
+		Type:           proto.UnitType_OUTPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "default",
+			Type: "discard",
+			Name: "discard",
+			Source: integration.RequireNewStruct(t,
+				map[string]any{
+					"type":  "discard",
+					"hosts": []any{"http://localhost:9200"},
+				}),
+		},
+	}
+
+	filestreamInput := &proto.UnitExpected{
+		Id:             "Filestream",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "filestream-input",
+			Type: "filestream",
+			Name: "filestream",
+			Streams: []*proto.Stream{
+				{
+					Id: "filestream-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":         "a unique ID",
+						"type":       "filestream",
+						"paths":      logFilePath,
+						"processors": brokenProcessor,
+					}),
+				},
+			},
+		},
+	}
+
+	celInput := &proto.UnitExpected{
+		Id:             "cel",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "cel-input",
+			Type: "cel",
+			Name: "cel",
+			Streams: []*proto.Stream{
+				{
+					Id: "cel-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":           "a unique ID",
+						"type":         "cel",
+						"interval":     "1m",
+						"resource.url": "https://api.ipify.org/?format=text",
+						"program":      `{"events": [{"ip": string(get(state.url).Body)}]}`,
+						"processors":   brokenProcessor,
+					}),
+				},
+			},
+		},
+	}
+
+	tcpinput := &proto.UnitExpected{
+		Id:             "tcp",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "tcp-input",
+			Type: "tcp",
+			Name: "tcp",
+			Streams: []*proto.Stream{
+				{
+					Id: "tcp-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":         "a unique ID",
+						"type":       "tcp",
+						"host":       "localhost:9042",
+						"processors": brokenProcessor,
+					}),
+				},
+			},
+		},
+	}
+
+	kafkaInput := &proto.UnitExpected{
+		Id:             "kafka",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "kafka-input",
+			Type: "kafka",
+			Name: "kafka",
+			Streams: []*proto.Stream{
+				{
+					Id: "kafka-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":         "a unique ID",
+						"type":       "kafka",
+						"hosts":      []any{"localhost:9042"},
+						"topics":     []any{"foo-topic"},
+						"group_id":   "foo",
+						"processors": brokenProcessor,
+					}),
+				},
+			},
+		},
+	}
+
+	awsS3Input := &proto.UnitExpected{
+		Id:             "awss3",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "awss3-input",
+			Type: "aws-s3",
+			Name: "aws-s3",
+			Streams: []*proto.Stream{
+				{
+					Id: "awss3-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":                           "a unique ID",
+						"type":                         "aws-s3",
+						"queue_url":                    "https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue",
+						"expand_event_list_from_field": "Records",
+						"processors":                   brokenProcessor,
+					}),
+				},
+			},
+		},
+	}
+
+	httpjsonInput := &proto.UnitExpected{
+		Id:             "awss3",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "awss3-input",
+			Type: "httpjson",
+			Name: "httpjson",
+			Streams: []*proto.Stream{
+				{
+					Id: "awss3-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":          "a unique ID",
+						"type":        "httpjson",
+						"interval":    "1m",
+						"request.url": "https://api.ipify.org/?format=json",
+						"processors":  brokenProcessor,
+					}),
+				},
+			},
+		},
+	}
+
+	awscloudwatchInput := &proto.UnitExpected{
+		Id:             "awss3",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "awss3-input",
+			Type: "aws-cloudwatch",
+			Name: "aws-cloudwatch",
+			Streams: []*proto.Stream{
+				{
+					Id: "awss3-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":                      "a unique ID",
+						"type":                    "aws-cloudwatch",
+						"log_group_arn":           "arn:aws:logs:us-east-1:428152502467:log-group:test:*",
+						"scan_frequency":          "1m",
+						"credential_profile_name": "elastic-beats",
+						"start_position":          "beginning",
+						"processors":              brokenProcessor,
+					}),
+				},
+			},
+		},
+	}
+
+	netflowinput := &proto.UnitExpected{
+		Id:             "netflow",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "netflow-input",
+			Type: "netflow",
+			Name: "netflow",
+			Streams: []*proto.Stream{
+				{
+					Id: "netflow-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":         "a unique ID",
+						"type":       "netflow",
+						"host":       "localhost:9042",
+						"processors": brokenProcessor,
+					}),
+				},
+			},
+		},
+	}
+
+	streaminginput := &proto.UnitExpected{
+		Id:             "streaming",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "streaming-input",
+			Type: "streaming",
+			Name: "streaming",
+			Streams: []*proto.Stream{
+				{
+					Id: "streaming-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":         "a unique ID",
+						"type":       "streaming",
+						"url":        "ws://localhost:443/v1/stream",
+						"processors": brokenProcessor,
+					}),
+				},
+			},
+		},
+	}
+
+	journaldinput := &proto.UnitExpected{
+		Id:             "journald",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "journald-input",
+			Type: "journald",
+			Name: "journald",
+			Streams: []*proto.Stream{
+				{
+					Id: "journald-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":         "a unique ID",
+						"type":       "journald",
+						"processors": brokenProcessor,
+					}),
+				},
+			},
+		},
+	}
+
+	// Test most inputs with different managers and different pipeline
+	// connection error handling.
+	// Some inputs reach out to external services before
+	// trying to connect to the pipeline, so they cannot be tested here.
+	testCases := map[string]struct {
+		expectedState proto.State
+		expectedUnit  *proto.UnitExpected
+	}{
+		// Custom manager
+		"aws-cloudwatch": {expectedState: proto.State_FAILED, expectedUnit: awscloudwatchInput},
+		"aws-s3":         {expectedState: proto.State_DEGRADED, expectedUnit: awsS3Input},
+		"cel":            {expectedState: proto.State_FAILED, expectedUnit: celInput},
+		"filestream":     {expectedState: proto.State_DEGRADED, expectedUnit: filestreamInput},
+		"net inputs":     {expectedState: proto.State_FAILED, expectedUnit: tcpinput},
+		"netflow":        {expectedState: proto.State_FAILED, expectedUnit: netflowinput},
+		"streaming":      {expectedState: proto.State_FAILED, expectedUnit: streaminginput},
+
+		// input-statless.InputManager
+		"httpjson": {expectedState: proto.State_FAILED, expectedUnit: httpjsonInput},
+
+		// v2.simpleInputManager
+		"kafka": {expectedState: proto.State_FAILED, expectedUnit: kafkaInput},
+
+		// v2.input-cursor.InputManager
+		"journald": {expectedState: proto.State_FAILED, expectedUnit: journaldinput},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			finalStateReached := atomic.Bool{}
+
+			var units = []*proto.UnitExpected{
+				outputUnit,
+				tc.expectedUnit,
+			}
+
+			server := &mock.StubServerV2{
+				CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+					tc.expectedUnit.State = tc.expectedState
+					expectedState := []*proto.UnitExpected{
+						outputUnit,
+						tc.expectedUnit,
+					}
+					if management.DoesStateMatch(observed, expectedState, 0) {
+						// Ensure the error message is correct
+						for _, unit := range observed.Units {
+							if unit.Type == proto.UnitType_INPUT {
+								got := unit.GetMessage()
+								want := "unexpected INVALID_CONFIG_KEY option in processors"
+								if !strings.Contains(got, want) {
+									t.Errorf("Got the wrong error message. Expecting %q, got %q", want, got)
+								}
+							}
+						}
+						finalStateReached.Store(true)
+					}
+
+					tc.expectedUnit.State = proto.State_HEALTHY
+					return &proto.CheckinExpected{
+						Units: units,
+					}
+				},
+				ActionImpl: func(response *proto.ActionResponse) error { return nil },
+			}
+
+			require.NoError(t, server.Start())
+			t.Cleanup(server.Stop)
+
+			filebeat.Start(
+				"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
+				"-E", "management.enabled=true",
+			)
+			t.Cleanup(filebeat.Stop)
+
+			require.Eventually(
+				t,
+				func() bool {
+					return finalStateReached.Load()
+				},
+				30*time.Second,
+				100*time.Millisecond,
+				"Input unit %q did not report status %s",
+				name, tc.expectedState.String())
+
+			t.Cleanup(server.Stop)
+		})
 	}
 }

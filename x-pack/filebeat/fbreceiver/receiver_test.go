@@ -83,8 +83,7 @@ func TestNewReceiver(t *testing.T) {
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
 			require.Lenf(c, logs["r1"], 1, "expected 1 log, got %d", len(logs["r1"]))
-			assert.Equal(c, "filebeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+			assert.Equal(c, "test", logs["r1"][0].Flatten()["message"], "expected message field to contain string 'test'")
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket, "stats")
@@ -264,9 +263,7 @@ func TestMultipleReceivers(t *testing.T) {
 				writeFile(c, helper.ingest, "A log line")
 
 				require.Greaterf(c, len(logs[helper.name]), 0, "receiver %v does not have any logs", helper)
-
-				assert.Equalf(c, "filebeatreceiver/"+helper.name, logs[helper.name][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in %v log record", helper)
-				assert.Equalf(c, "receiver", logs[helper.name][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in %v log record", helper)
+				assert.Equal(c, "test", logs[helper.name][0].Flatten()["message"], "expected message field to contain string 'test'")
 
 				// Verify that each receiver used its own JavaScript processor script.
 				// This demonstrates path isolation: each receiver loads processor.js from its own path.config.
