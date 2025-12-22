@@ -53,16 +53,17 @@ func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
 
 	filebeat.WriteConfigFile(yamlCfg)
 	filebeat.Start()
-	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitLogsContains("journalctl started", 10*time.Second, "journalctl did not start")
 
-	pidLine := filebeat.GetLastLogLine("journalctl started with PID")
-	logEntry := struct{ Message string }{}
+	pidLine := filebeat.GetLastLogLine("journalctl started")
+	logEntry := struct {
+		Pid int `json:"process.pid"`
+	}{}
 	if err := json.Unmarshal([]byte(pidLine), &logEntry); err != nil {
-		t.Errorf("could not parse PID log entry as JSON: %s", err)
+		t.Errorf("could not parse PID log entry as JSON: %s. Line: %q", err, pidLine)
 	}
 
-	pid := 0
-	fmt.Sscanf(logEntry.Message, "journalctl started with PID %d", &pid) ///nolint:errcheck
+	pid := logEntry.Pid
 	filebeat.WaitPublishedEvents(5*time.Second, 3)
 
 	// Kill journalctl
@@ -71,7 +72,7 @@ func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
 	}
 
 	generateJournaldLogs(t, syslogID, 5, 100)
-	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitLogsContains("journalctl started", 10*time.Second, "journalctl did not start")
 	filebeat.WaitPublishedEvents(5*time.Second, 8)
 }
 
@@ -95,12 +96,15 @@ func TestJournaldInputDoesNotDuplicateData(t *testing.T) {
 
 	filebeat.WriteConfigFile(yamlCfg)
 	filebeat.Start()
-	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitLogsContains("journalctl started", 10*time.Second, "journalctl did not start")
 
-	pidLine := filebeat.GetLastLogLine("journalctl started with PID")
-	logEntry := struct{ Message string }{}
+	// Ensure started line is logged and PID is correctly read
+	pidLine := filebeat.GetLastLogLine("journalctl started")
+	logEntry := struct {
+		Pid int `json:"process.pid"`
+	}{}
 	if err := json.Unmarshal([]byte(pidLine), &logEntry); err != nil {
-		t.Errorf("could not parse PID log entry as JSON: %s", err)
+		t.Errorf("could not parse PID log entry as JSON: %s. Line: %q", err, pidLine)
 	}
 
 	filebeat.WaitPublishedEvents(5*time.Second, 3)
@@ -114,7 +118,7 @@ func TestJournaldInputDoesNotDuplicateData(t *testing.T) {
 	filebeat.Start()
 
 	// Wait for journalctl to start
-	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitLogsContains("journalctl started", 10*time.Second, "journalctl did not start")
 
 	// Wait for last even in the output
 	filebeat.WaitPublishedEvents(5*time.Second, 8)
