@@ -18,11 +18,21 @@
 package remote_write
 
 import (
+	"bytes"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
+	"github.com/gogo/protobuf/proto"
+	"github.com/golang/snappy"
 	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/prompb"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -262,4 +272,187 @@ func TestMetricsCount(t *testing.T) {
 			}
 		})
 	}
+}
+
+// createTestWriteRequest creates a prompb.WriteRequest with the given number of samples
+func createTestWriteRequest(numSamples int) *prompb.WriteRequest {
+	samples := make([]prompb.Sample, numSamples)
+	for i := 0; i < numSamples; i++ {
+		samples[i] = prompb.Sample{
+			Value:     float64(i),
+			Timestamp: int64(i * 1000),
+		}
+	}
+
+	return &prompb.WriteRequest{
+		Timeseries: []prompb.TimeSeries{
+			{
+				Labels: []prompb.Label{
+					{Name: "__name__", Value: "test_metric"},
+					{Name: "instance", Value: "localhost:9090"},
+				},
+				Samples: samples,
+			},
+		},
+	}
+}
+
+// encodeWriteRequest encodes a WriteRequest to snappy-compressed protobuf
+func encodeWriteRequest(req *prompb.WriteRequest) ([]byte, error) {
+	data, err := proto.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+	return snappy.Encode(nil, data), nil
+}
+
+// newTestMetricSet creates a MetricSet for testing using the mbtest infrastructure
+// to ensure proper initialization (including logger)
+func newTestMetricSet(t *testing.T, maxCompressedBodyBytes, maxDecodedBodyBytes int64) *MetricSet {
+	config := map[string]interface{}{
+		"module":     "prometheus",
+		"metricsets": []string{"remote_write"},
+	}
+
+	ms := mbtest.NewMetricSet(t, config)
+	m, ok := ms.(*MetricSet)
+	require.True(t, ok, "expected *MetricSet, got %T", ms)
+
+	// Override the size limits for testing
+	m.maxCompressedBodyBytes = maxCompressedBodyBytes
+	m.maxDecodedBodyBytes = maxDecodedBodyBytes
+	// Ensure events channel exists for the handler
+	m.events = make(chan mb.Event, 100)
+
+	return m
+}
+
+func TestHandleFuncDecodedSizeLimit(t *testing.T) {
+	tests := []struct {
+		name                   string
+		maxDecodedBodyBytes    int64
+		maxCompressedBodyBytes int64
+		numSamples             int
+		expectedStatus         int
+		expectedBodyContains   string
+	}{
+		{
+			name:                   "request within decoded size limit succeeds",
+			maxDecodedBodyBytes:    1024 * 1024, // 1MB
+			maxCompressedBodyBytes: 1024 * 1024, // 1MB
+			numSamples:             10,
+			expectedStatus:         http.StatusAccepted,
+		},
+		{
+			name:                   "request exceeding decoded size limit rejected",
+			maxDecodedBodyBytes:    100, // Very small limit
+			maxCompressedBodyBytes: 1024 * 1024,
+			numSamples:             100, // Will decode to more than 100 bytes
+			expectedStatus:         http.StatusRequestEntityTooLarge,
+			expectedBodyContains:   "decoded length too large",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := newTestMetricSet(t, tt.maxCompressedBodyBytes, tt.maxDecodedBodyBytes)
+
+			// Create a test write request
+			writeReq := createTestWriteRequest(tt.numSamples)
+			body, err := encodeWriteRequest(writeReq)
+			require.NoError(t, err)
+
+			// Create HTTP request
+			req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+			rec := httptest.NewRecorder()
+
+			// Call the handler
+			m.handleFunc(rec, req)
+
+			// Check the response
+			assert.Equal(t, tt.expectedStatus, rec.Code)
+			if tt.expectedBodyContains != "" {
+				assert.True(t, strings.Contains(rec.Body.String(), tt.expectedBodyContains),
+					"expected body to contain %q, got %q", tt.expectedBodyContains, rec.Body.String())
+			}
+		})
+	}
+}
+
+func TestHandleFuncCompressedSizeLimit(t *testing.T) {
+	tests := []struct {
+		name                   string
+		maxCompressedBodyBytes int64
+		maxDecodedBodyBytes    int64
+		bodySize               int
+		expectedStatus         int
+		expectedBodyContains   string
+	}{
+		{
+			name:                   "compressed body within limit succeeds",
+			maxCompressedBodyBytes: 1024 * 1024, // 1MB
+			maxDecodedBodyBytes:    10 * 1024 * 1024,
+			bodySize:               100,
+			expectedStatus:         http.StatusAccepted,
+		},
+		{
+			name:                   "compressed body exceeding limit rejected",
+			maxCompressedBodyBytes: 50,
+			maxDecodedBodyBytes:    10 * 1024 * 1024,
+			bodySize:               100, // More than 50 bytes
+			expectedStatus:         http.StatusRequestEntityTooLarge,
+			expectedBodyContains:   "request body too large",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := newTestMetricSet(t, tt.maxCompressedBodyBytes, tt.maxDecodedBodyBytes)
+
+			var body []byte
+			if tt.bodySize <= 100 {
+				// For small sizes, use a valid request
+				writeReq := createTestWriteRequest(tt.bodySize)
+				var err error
+				body, err = encodeWriteRequest(writeReq)
+				require.NoError(t, err)
+			} else {
+				// For larger sizes, create arbitrary data
+				body = make([]byte, tt.bodySize)
+				for i := range body {
+					body[i] = byte(i % 256)
+				}
+			}
+
+			// Create HTTP request
+			req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+			rec := httptest.NewRecorder()
+
+			// Call the handler
+			m.handleFunc(rec, req)
+
+			// Check the response
+			assert.Equal(t, tt.expectedStatus, rec.Code)
+			if tt.expectedBodyContains != "" {
+				assert.True(t, strings.Contains(rec.Body.String(), tt.expectedBodyContains),
+					"expected body to contain %q, got %q", tt.expectedBodyContains, rec.Body.String())
+			}
+		})
+	}
+}
+
+func TestHandleFuncInvalidSnappyData(t *testing.T) {
+	m := newTestMetricSet(t, 1024*1024, 10*1024*1024)
+
+	// Send data with an invalid truncated varint header that will fail at snappy.DecodedLen. We simulate only one sample scenario.
+	// A byte with high bit set (0x80+) indicates continuation, but with no following byte it's invalid
+	invalidData := []byte{0x80, 0x80, 0x80, 0x80, 0x80, 0x80}
+	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(invalidData))
+	rec := httptest.NewRecorder()
+
+	m.handleFunc(rec, req)
+
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+	assert.True(t, strings.Contains(rec.Body.String(), "Invalid decoded data"),
+		"expected 'Invalid decoded data' error, got %q", rec.Body.String())
 }
