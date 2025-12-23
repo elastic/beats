@@ -20,10 +20,10 @@ package remote_write
 import "github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
 const (
-	// DefaultMaxCompressedBodyBytes is the default maximum size of compressed request body (50MB)
-	DefaultMaxCompressedBodyBytes int64 = 50 * 1024 * 1024
-	// DefaultMaxDecodedBodyBytes is the default maximum size of decoded request body (250MB)
-	DefaultMaxDecodedBodyBytes int64 = 250 * 1024 * 1024
+	// DefaultMaxCompressedBodyBytes is the default maximum size of compressed request body (2MB)
+	DefaultMaxCompressedBodyBytes int64 = 2 * 1024 * 1024
+	// DefaultMaxDecodedBodyBytes is the default maximum size of decoded request body (10MB)
+	DefaultMaxDecodedBodyBytes int64 = 10 * 1024 * 1024
 )
 
 type Config struct {
