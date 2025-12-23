@@ -188,7 +188,7 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 		return
 	}
 	if int64(decodedLen) > m.maxDecodedBodyBytes {
-		m.Logger().Warnf("Decoded lenght too large: %d bytes exceeds %d max decoded bytes limit (maxDecodedBodyBytes)", decodedLen, m.maxDecodedBodyBytes)
+		m.Logger().Warnf("Decoded length too large: %d bytes exceeds %d max decoded bytes limit (maxDecodedBodyBytes)", decodedLen, m.maxDecodedBodyBytes)
 		http.Error(writer, fmt.Sprintf("decoded length too large: %d bytes exceeds %d max decoded bytes limit (maxDecodedBodyBytes)", decodedLen, m.maxDecodedBodyBytes), http.StatusRequestEntityTooLarge)
 		return
 	}
