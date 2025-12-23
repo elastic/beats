@@ -36,6 +36,7 @@ const (
 	fleetAgentAPI                = "/api/fleet/agents/%s"
 	fleetAgentPoliciesAPI        = "/api/fleet/agent_policies"
 	fleetAgentPolicyAPI          = "/api/fleet/agent_policies/%s"
+	fleetAgentPolicyReassignAPI  = "/api/fleet/agents/%s/reassign"
 	fleetAgentsAPI               = "/api/fleet/agents"
 	fleetAgentsDeleteAPI         = "/api/fleet/agent_policies/delete"
 	fleetEnrollmentAPIKeysAPI    = "/api/fleet/enrollment_api_keys" //nolint:gosec // no API key being leaked here
@@ -308,6 +309,36 @@ func (client *Client) DeletePolicy(ctx context.Context, id string) error {
 		}
 		return fmt.Errorf("unable to delete policy; API returned status code [%d] and body [%s]", resp.StatusCode, string(respBody))
 	}
+	return nil
+}
+
+type AgentPolicyReassignRequest struct {
+	PolicyID string `json:"policy_id"`
+}
+
+// ReassignAgentToPolicy reassigns the given agent to the policy ID specified in the request
+func (client *Client) ReassignAgentToPolicy(ctx context.Context, agentID string, request AgentPolicyReassignRequest) error {
+	reqBody, err := json.Marshal(request)
+	if err != nil {
+		return fmt.Errorf("unable to marshal agent policy reassign request into JSON: %w", err)
+	}
+
+	apiURL := fmt.Sprintf(fleetAgentPolicyReassignAPI, agentID)
+
+	resp, err := client.SendWithContext(ctx, http.MethodPost, apiURL, nil, nil, bytes.NewReader(reqBody))
+	if err != nil {
+		return fmt.Errorf("error calling agent policy reassign API: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("unable to reassign agent to policy; API returned status code [%d] and error reading response: %w", resp.StatusCode, err)
+		}
+		return fmt.Errorf("unable to reassign agent to policy; API returned status code [%d] and body [%s]", resp.StatusCode, string(respBody))
+	}
+
 	return nil
 }
 
