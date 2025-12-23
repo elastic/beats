@@ -184,7 +184,7 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 	decodedLen, err := snappy.DecodedLen(compressed)
 	if err != nil {
 		m.Logger().Errorf("Decoded length error: %v", err)
-		http.Error(writer, "Invalid decoded data", http.StatusBadRequest)
+		http.Error(writer, "Decoded length error", http.StatusBadRequest)
 		return
 	}
 	if int64(decodedLen) > m.maxDecodedBodyBytes {

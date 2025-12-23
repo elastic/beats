@@ -453,6 +453,6 @@ func TestHandleFuncInvalidSnappyData(t *testing.T) {
 	m.handleFunc(rec, req)
 
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
-	assert.True(t, strings.Contains(rec.Body.String(), "Invalid decoded data"),
-		"expected 'Invalid decoded data' error, got %q", rec.Body.String())
+	assert.True(t, strings.Contains(rec.Body.String(), "Decoded length error"),
+		"expected 'Decoded length error' error, got %q", rec.Body.String())
 }
