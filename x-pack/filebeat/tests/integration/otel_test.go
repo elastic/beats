@@ -1154,13 +1154,10 @@ receivers:
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    processors:
-      # Configure a processor to prevent enabling default processors
-      - add_fields:
-          fields:
-            custom_field: "custom_value"
     output:
       otelconsumer:
+    # Clear the list of default processors
+    processors: []
     logging:
       level: info
       selectors:
@@ -1170,6 +1167,11 @@ receivers:
 processors:
   beat:
     processors:
+      - add_cloud_metadata:
+      - add_docker_metadata:
+      - add_fields:
+          fields:
+            custom_field: "CustomValue"
       - add_host_metadata:
 exporters:
   debug:
@@ -1225,9 +1227,11 @@ receivers:
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
     processors:
+      - add_cloud_metadata:
+      - add_docker_metadata:
       - add_fields:
           fields:
-            custom_field: "custom_value"
+            custom_field: "CustomValue"
       - add_host_metadata:
     output:
       otelconsumer:

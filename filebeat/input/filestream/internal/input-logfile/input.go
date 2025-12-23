@@ -84,6 +84,7 @@ func (inp *managedInput) Run(
 			ctx.Logger,
 			"harvester:"),
 		metrics: metrics,
+		inputID: inp.id,
 	}
 
 	prospectorStore := inp.manager.getRetainedStore()
