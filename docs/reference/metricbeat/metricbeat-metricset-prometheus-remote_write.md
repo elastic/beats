@@ -68,7 +68,6 @@ remote_write:
         #insecure_skip_verify: true
 ```
 
-
 ## Request size limits [_request_size_limits]
 
 To protect against resource exhaustion from malicious or oversized payloads, the remote_write metricset enforces configurable size limits on incoming requests:
