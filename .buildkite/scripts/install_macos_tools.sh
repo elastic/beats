@@ -3,7 +3,7 @@
 set -euo pipefail
 
 GO_VERSION=$(cat .go-version)
-SETUP_GVM_VERSION="v0.5.1"
+SETUP_GVM_VERSION="v0.6.0"
 PLATFORM_TYPE_LOWERCASE=$(uname | tr '[:upper:]' '[:lower:]')
 
 export BIN=${WORKSPACE:-$PWD}/bin

@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build linux
 
 package journald
@@ -112,9 +114,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 				return
 			}
 
-			cleanTestName := strings.Replace(t.Name(), "\\", "_", -1)
-
-			f, err := os.CreateTemp(folder, cleanTestName+"-*")
+			f, err := os.CreateTemp(folder, "Filebeat-Test-Journald"+"-*")
 			if err != nil {
 				t.Logf("cannot create file for error logs: %s", err)
 				return
@@ -148,10 +148,10 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 			IDWithoutName:   id,
 			Name:            inp.Name(),
 			Cancelation:     ctx,
-			StatusReporter:  e.statusReporter,
 			MetricsRegistry: monitoring.NewRegistry(),
 			Logger:          e.inputLogger,
 		}
+		inputCtx = inputCtx.WithStatusReporter(e.statusReporter)
 		if err := inp.Run(inputCtx, e.pipeline); err != nil {
 			e.t.Errorf("input 'Run' method returned an error: %s", err)
 		}

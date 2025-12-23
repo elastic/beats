@@ -33,9 +33,9 @@
             "namespace": "default",
             "resourcequota": {
                 "name": "object-counts",
-                "quota": 1,
+                "quota": 99,
                 "resource": "configmaps",
-                "type": "used"
+                "type": "hard"
             }
         },
         "metricset": {
@@ -57,9 +57,9 @@
             "namespace": "default",
             "resourcequota": {
                 "name": "object-counts",
-                "quota": 99,
+                "quota": 1,
                 "resource": "configmaps",
-                "type": "hard"
+                "type": "used"
             }
         },
         "metricset": {

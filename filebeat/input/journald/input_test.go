@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build linux
 
 package journald
@@ -32,6 +34,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
@@ -39,6 +42,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -509,18 +513,91 @@ func TestDoubleStarCanBeUsed(t *testing.T) {
 	}
 
 	env.startInput(ctx, inp)
-	// Wait for at least 11 events, this means more than one journal file
-	// has been read and ingested.
-	//
-	// When many small journal files are ingested, the journalctl process
-	// may exit before the input has fully read its stdout, which makes us
-	// discard the last few lines/entries.
-	//
-	// We still correctly track the cursor of events published to the output,
-	// however the cursor returned by journalctl on this set of handcrafted
-	// journal files leads to us skipping some events.
-	// See https://github.com/elastic/beats/issues/46904.
-	env.waitUntilEventsPublished(11)
+	env.waitUntilEventCount(len(srcFiles) * 10)
+}
+
+func TestConfigureJournalctlPath(t *testing.T) {
+	t.Run("default path without chroot", func(t *testing.T) {
+		cfg := conf.MustNewConfigFrom(mapstr.M{})
+		_, inp, err := Configure(cfg, logp.NewNopLogger())
+		require.NoError(t, err, "Configure should succeed without chroot")
+		jd, ok := inp.(*journald)
+		require.True(t, ok, "input should be of type *journald")
+		assert.Equal(t, defaultJournalCtlPath, jd.JournalctlPath, "should use default journalctl path when chroot is not set")
+	})
+
+	t.Run("chroot with default path auto-switches to chroot default", func(t *testing.T) {
+		chrootDir := t.TempDir()
+		cfg := conf.MustNewConfigFrom(mapstr.M{
+			"chroot": chrootDir,
+		})
+		_, _, err := Configure(cfg, logp.NewNopLogger())
+		require.Error(t, err, "Configure should fail when journalctl binary doesn't exist in chroot")
+		assert.Contains(t, err.Error(), "cannot stat journalctl binary in chroot", "error should indicate journalctl binary is missing")
+	})
+
+	t.Run("chroot with relative path returns error", func(t *testing.T) {
+		chrootDir := t.TempDir()
+		cfg := conf.MustNewConfigFrom(mapstr.M{
+			"chroot":          chrootDir,
+			"journalctl_path": "relative/path/journalctl",
+		})
+		_, _, err := Configure(cfg, logp.NewNopLogger())
+		require.Error(t, err, "Configure should fail with relative path when chroot is set")
+		assert.Contains(t, err.Error(), "journalctl_path must be an absolute path when chroot is set", "error should indicate path must be absolute")
+	})
+
+	t.Run("chroot with absolute path", func(t *testing.T) {
+		chrootDir := t.TempDir()
+		journalctlPath := "/usr/bin/journalctl"
+		cfg := conf.MustNewConfigFrom(mapstr.M{
+			"chroot":          chrootDir,
+			"journalctl_path": journalctlPath,
+		})
+		_, inp, err := Configure(cfg, logp.NewNopLogger())
+		require.Error(t, err, "Configure should fail when journalctl binary doesn't exist in chroot")
+		assert.Contains(t, err.Error(), "cannot stat journalctl binary in chroot", "error should indicate journalctl binary is missing")
+		jd, ok := inp.(*journald)
+		if ok {
+			assert.Equal(t, journalctlPath, jd.JournalctlPath, "journalctl path should be set correctly even when binary doesn't exist")
+		}
+	})
+
+	t.Run("chroot auto-switches default to chroot default", func(t *testing.T) {
+		chrootDir := t.TempDir()
+		cfg := conf.MustNewConfigFrom(mapstr.M{
+			"chroot": chrootDir,
+		})
+		_, inp, err := Configure(cfg, logp.NewNopLogger())
+		require.Error(t, err, "Configure should fail when journalctl binary doesn't exist in chroot")
+		assert.Contains(t, err.Error(), "cannot stat journalctl binary in chroot", "error should indicate journalctl binary is missing")
+		jd, ok := inp.(*journald)
+		if ok {
+			assert.Equal(t, defaultJournalCtlPathChroot, jd.JournalctlPath, "should auto-switch to chroot default")
+		}
+	})
+
+	t.Run("chroot with non-existent directory returns error", func(t *testing.T) {
+		cfg := conf.MustNewConfigFrom(mapstr.M{
+			"chroot":          "/nonexistent/directory",
+			"journalctl_path": "/usr/bin/journalctl",
+		})
+		_, _, err := Configure(cfg, logp.NewNopLogger())
+		require.Error(t, err, "Configure should fail when chroot directory doesn't exist")
+		assert.Contains(t, err.Error(), "cannot stat chroot", "error should indicate chroot directory is missing")
+	})
+
+	t.Run("chroot with file instead of directory returns error", func(t *testing.T) {
+		tmpFile := filepath.Join(t.TempDir(), "notadir")
+		require.NoError(t, os.WriteFile(tmpFile, []byte("test"), 0o644), "should create temp file")
+		cfg := conf.MustNewConfigFrom(mapstr.M{
+			"chroot":          tmpFile,
+			"journalctl_path": "/usr/bin/journalctl",
+		})
+		_, _, err := Configure(cfg, logp.NewNopLogger())
+		require.Error(t, err, "Configure should fail when chroot path is a file")
+		assert.Contains(t, err.Error(), "is not a directory", "error should indicate chroot path is not a directory")
+	})
 }
 
 func decompress(t *testing.T, namegz string) string {

@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 //go:embed testdata/corner-cases.json
@@ -51,8 +52,8 @@ func TestEventWithNonStringData(t *testing.T) {
 	for idx, rawEvent := range testCases {
 		t.Run(fmt.Sprintf("test %d", idx), func(t *testing.T) {
 			mock := JctlMock{
-				NextFunc: func(canceler input.Canceler) ([]byte, bool, error) {
-					return rawEvent, false, nil
+				NextFunc: func(canceler input.Canceler) ([]byte, error) {
+					return rawEvent, nil
 				},
 			}
 			r := Reader{
@@ -72,17 +73,17 @@ func TestEventWithNonStringData(t *testing.T) {
 var jdEvent []byte
 
 func TestRestartsJournalctlOnError(t *testing.T) {
-	logp.DevelopmentSetup(logp.ToObserverOutput())
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
 	ctx := context.Background()
 
 	mock := JctlMock{
-		NextFunc: func(canceler input.Canceler) ([]byte, bool, error) {
-			return jdEvent, false, errors.New("journalctl exited with code 42")
+		NextFunc: func(canceler input.Canceler) ([]byte, error) {
+			return jdEvent, errors.New("journalctl exited with code 42")
 		},
 	}
 
 	factoryCalls := atomic.Uint32{}
-	factory := func(canceller input.Canceler, logger *logp.Logger, binary string, args ...string) (Jctl, error) {
+	factory := func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
 		factoryCalls.Add(1)
 		// Add a log to make debugging easier and better mimic the behaviour of the real factory/journalctl
 		logger.Debugf("starting new mock journalclt ID: %d", factoryCalls.Load())
@@ -94,14 +95,14 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 
 		// If calls have been made, change the Next function to always succeed
 		// and return it
-		mock.NextFunc = func(canceler input.Canceler) ([]byte, bool, error) {
-			return jdEvent, false, nil
+		mock.NextFunc = func(canceler input.Canceler) ([]byte, error) {
+			return jdEvent, nil
 		}
 
 		return &mock, nil
 	}
 
-	reader, err := New(logp.L(), ctx, nil, nil, nil, journalfield.IncludeMatches{}, []int{}, SeekHead, "", 0, "", false, factory)
+	reader, err := New(logger, ctx, nil, nil, nil, journalfield.IncludeMatches{}, []int{}, SeekHead, "", 0, "", false, factory)
 	if err != nil {
 		t.Fatalf("cannot instantiate journalctl reader: %s", err)
 	}
@@ -130,7 +131,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	//  - reader error: 'journalctl exited with code 42', restarting...
 	//  - starting new mock journalclt ID: 2
 
-	logs := logp.ObserverLogs().TakeAll()
+	logs := observedLogs.TakeAll()
 	if len(logs) != 3 {
 		t.Fatalf("expecting 3 log lines from 'input.journald.reader.journalctl-runner', got %d", len(logs))
 	}
@@ -161,7 +162,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 }
 
 func TestNewUsesMergeFlag(t *testing.T) {
-	f := func(_ input.Canceler, _ *logp.Logger, _ string, s ...string) (Jctl, error) {
+	f := func(_ input.Canceler, _ *logp.Logger, s ...string) (Jctl, error) {
 		return nil, nil
 	}
 	r, err := New(

@@ -581,13 +581,14 @@ func TestNegativeCases(t *testing.T) {
 	require.NotNil(t, input)
 
 	input.Run()
-	go func() {
-		<-eventsCh
-		assert.Error(t, fmt.Errorf("there should be no events"))
-	}()
 
 	// wait for run to return error or event
-	time.Sleep(100 * time.Millisecond)
+	select {
+	case <-eventsCh:
+		t.Error("expected no events, but received one")
+	case <-time.After(100 * time.Millisecond):
+		// Expected: no events received.
+	}
 
 	input.Stop()
 }

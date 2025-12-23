@@ -64,14 +64,19 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		// First we get the list of all devices for this org (and their metadata).
 		// Devices are uniquely identified by their serial number, which are used to
 		// associate the metrics we collect later with the devices returned here.
-		devices, err := getDevices(m.client, org)
+
+		organizationsService := &OrganizationsServiceWrapper{
+			service: m.client.Organizations,
+		}
+
+		devices, err := getDevices(organizationsService, org, m.logger)
 		if err != nil {
 			return fmt.Errorf("getDevices failed; %w", err)
 		}
 
 		// Now we continue to populate the device data structure with health
 		// attributes/statuses/metrics etc in the following functions...
-		err = getDeviceStatuses(m.client, org, devices)
+		err = getDeviceStatuses(m.client, org, devices, m.logger)
 		if err != nil {
 			return fmt.Errorf("getDeviceStatuses failed; %w", err)
 		}
@@ -87,17 +92,17 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			return fmt.Errorf("getDeviceChannelUtilization failed; %w", err)
 		}
 
-		err = getDeviceLicenses(m.client, org, devices)
+		err = getDeviceLicenses(m.client, org, devices, m.logger)
 		if err != nil {
 			return fmt.Errorf("getDeviceLicenses failed; %w", err)
 		}
 
-		err = getDeviceUplinks(m.client, org, devices, collectionPeriod)
+		err = getDeviceUplinks(m.client, org, devices, collectionPeriod, m.logger)
 		if err != nil {
 			return fmt.Errorf("getDeviceUplinks failed; %w", err)
 		}
 
-		err = getDeviceSwitchports(m.client, org, devices, collectionPeriod)
+		err = getDeviceSwitchports(m.client, org, devices, collectionPeriod, m.logger)
 		if err != nil {
 			return fmt.Errorf("getDeviceSwitchports failed; %w", err)
 		}

@@ -19,6 +19,7 @@ package prometheus
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"math"
 	"mime"
@@ -309,7 +310,7 @@ func (m *MetricFamily) GetName() string {
 	return ""
 }
 func (m *MetricFamily) GetUnit() string {
-	if m != nil && *m.Unit != "" {
+	if m != nil && m.Unit != nil && *m.Unit != "" {
 		return *m.Unit
 	}
 	return ""
@@ -479,10 +480,20 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 
 func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
 	// Fallback to text/plain if content type is blank or unrecognized.
-	parser, err := textparse.New(b, contentType, textMediaType, false, false, false, labels.NewSymbolTable())
-	// This check allows to continue where the content type is blank but the parser is non-nil. Returns error on all other cases.
-	if err != nil && !strings.Contains(err.Error(), "non-compliant scrape target sending blank Content-Type, using fallback_scrape_protocol") {
-		return nil, err
+	parser, err := textparse.New(b, contentType, labels.NewSymbolTable(), textparse.ParserOptions{
+		KeepClassicOnClassicAndNativeHistograms: false,
+		OpenMetricsSkipCTSeries:                 false,
+		EnableTypeAndUnitLabels:                 false,
+		FallbackContentType:                     textMediaType,
+	})
+	// This check allows to continue where the content type is blank/invalid but the parser is non-nil. Returns error on all other cases.
+	if parser == nil {
+		if err != nil {
+			return nil, err
+
+		}
+
+		return nil, fmt.Errorf("no parser returned for contentType %q", contentType)
 	}
 
 	var (
@@ -494,6 +505,39 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		// metricTypes stores the metric type for each metric name.
 		metricTypes = make(map[string]model.MetricType)
 	)
+
+	// safeExemplar wraps parser.Exemplar with panic recovery.
+	// Returns false if parsing fails or if a panic occurs.
+	safeExemplar := func(e *exemplar.Exemplar) (ok bool) {
+		ok = false
+		defer func() {
+			if r := recover(); r != nil {
+				ok = false
+				if logger != nil {
+					logger.Debugf("Recovered from panic while parsing exemplar: %v", r)
+				}
+			}
+		}()
+		ok = parser.Exemplar(e)
+		return
+	}
+
+	// safeLabels wraps parser.Labels with panic recovery.
+	// Returns false if a panic occurs, true otherwise.
+	safeLabels := func(lset *labels.Labels) (ok bool) {
+		ok = false
+		defer func() {
+			if r := recover(); r != nil {
+				ok = false
+				if logger != nil {
+					logger.Debugf("Recovered from panic while parsing labels: %v", r)
+				}
+			}
+		}()
+		parser.Labels(lset)
+		ok = true
+		return
+	}
 
 	for {
 		var (
@@ -569,7 +613,9 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		_, tp, v := parser.Series()
 
 		var lset labels.Labels
-		parser.Labels(&lset)
+		if !safeLabels(&lset) {
+			continue
+		}
 		metadata := schema.NewMetadataFromLabels(lset)
 		metricName := metadata.Name
 
@@ -672,7 +718,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 				continue
 			}
 		case model.MetricTypeHistogram:
-			if hasExemplar := parser.Exemplar(&e); hasExemplar {
+			if hasExemplar := safeExemplar(&e); hasExemplar {
 				exm = &e
 			}
 			lookupMetricName, metric = histogramMetricName(metricName, v, qv, lbls.String(), &t, false, exm, histogramsByName)
@@ -685,7 +731,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 				continue
 			}
 		case model.MetricTypeGaugeHistogram:
-			if hasExemplar := parser.Exemplar(&e); hasExemplar {
+			if hasExemplar := safeExemplar(&e); hasExemplar {
 				exm = &e
 			}
 			lookupMetricName, metric = histogramMetricName(metricName, v, qv, lbls.String(), &t, true, exm, histogramsByName)
@@ -722,7 +768,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 			}
 		}
 
-		if hasExemplar := parser.Exemplar(&e); hasExemplar && mt != model.MetricTypeHistogram && metric != nil {
+		if hasExemplar := safeExemplar(&e); hasExemplar && mt != model.MetricTypeHistogram && metric != nil {
 			if !e.HasTs {
 				e.Ts = t
 			}
