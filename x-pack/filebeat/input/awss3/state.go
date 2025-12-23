@@ -32,8 +32,12 @@ type state struct {
 // ID is used to identify the state in the store, and it is composed by
 // Bucket + Key + Etag + LastModified.String(): changing this value or how it is
 // composed will break backward compatibilities with entries already in the store.
-func stateID(bucket, key, etag string, lastModified time.Time) string {
-	return bucket + key + etag + lastModified.String()
+func stateID(bucket, key, etag string, lastModified time.Time, lexicographicalOrdering bool) string {
+	id := bucket + key + etag + lastModified.String()
+	if lexicographicalOrdering {
+		id += "::lexicographical"
+	}
+	return id
 }
 
 // newState creates a new s3 object state
@@ -46,8 +50,8 @@ func newState(bucket, key, etag string, lastModified time.Time) state {
 	}
 }
 
-func (s *state) ID() string {
-	return stateID(s.Bucket, s.Key, s.Etag, s.LastModified)
+func (s *state) ID(lexicographicalOrdering bool) string {
+	return stateID(s.Bucket, s.Key, s.Etag, s.LastModified, lexicographicalOrdering)
 }
 
 // IsEqual checks if the two states point to the same s3 object.

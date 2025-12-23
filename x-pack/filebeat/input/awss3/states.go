@@ -5,6 +5,7 @@
 package awss3
 
 import (
+	"container/list"
 	"fmt"
 	"strings"
 	"sync"
@@ -20,8 +21,10 @@ const awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
 type states struct {
 	// Completed S3 object states, indexed by state ID.
 	// statesLock must be held to access states.
-	states     map[string]*state
+	states     map[string]*list.Element
 	statesLock sync.Mutex
+
+	order *list.List
 
 	// The store used to persist state changes to the registry.
 	// storeLock must be held to access store.
@@ -51,34 +54,81 @@ func newStates(log *logp.Logger, stateStore statestore.States, listPrefix string
 	}, nil
 }
 
-func (s *states) IsProcessed(state state) bool {
+func (s *states) IsProcessed(state state, lexicographicalOrdering bool) bool {
 	s.statesLock.Lock()
 	defer s.statesLock.Unlock()
 	// Our in-memory table only stores completed objects
-	_, ok := s.states[state.ID()]
+	_, ok := s.states[state.ID(lexicographicalOrdering)]
 	return ok
 }
 
-func (s *states) AddState(state state) error {
-	if !strings.HasPrefix(state.Key, s.keyPrefix) {
+// func (fm *FixedMap) Set(key string, value int) {
+// 	// If key already exists, update value and move to back (most recent)
+// 	if elem, exists := fm.data[key]; exists {
+// 		elem.Value.(*entry).value = value
+// 		fm.order.MoveToBack(elem)
+// 		return
+// 	}
+
+// 	// If at capacity, remove the oldest (front) element
+// 	if len(fm.data) >= fm.maxSize {
+// 		oldest := fm.order.Front()
+// 		if oldest != nil {
+// 			oldEntry := oldest.Value.(*entry)
+// 			delete(fm.data, oldEntry.key)
+// 			fm.order.Remove(oldest)
+// 		}
+// 	}
+
+// 	// Add new element
+// 	e := &entry{key: key, value: value}
+// 	elem := fm.order.PushBack(e)
+// 	fm.data[key] = elem
+// }
+
+func (s *states) AddState(st state, lexicographicalOrdering bool, lexicographicalLookbackKeys int) error {
+	if !strings.HasPrefix(st.Key, s.keyPrefix) {
 		// Note - This failure should not happen since we create a dedicated state instance per input.
 		// Yet, this is here to avoid any wiring errors within the component.
-		return fmt.Errorf("expected prefix %s in key %s, skipping state registering", s.keyPrefix, state.Key)
+		return fmt.Errorf("expected prefix %s in key %s, skipping state registering", s.keyPrefix, st.Key)
 	}
 
-	id := state.ID()
+	id := st.ID(lexicographicalOrdering)
+
 	// Update in-memory copy
 	s.statesLock.Lock()
-	s.states[id] = &state
+	// If key already exists, update value and move to back (most recent)
+	if elem, exists := s.states[id]; exists {
+		elem.Value = &st
+		s.order.MoveToBack(elem)
+	}
+
+	// If at capacity, remove the oldest (front) element
+	if len(s.states) >= lexicographicalLookbackKeys {
+		oldest := s.order.Front()
+		if oldest != nil {
+			oldestState := oldest.Value.(*state)
+			delete(s.states, oldestState.ID(lexicographicalOrdering))
+			s.order.Remove(oldest)
+		}
+	}
+
+	elem := s.order.PushBack(&st)
+	s.states[id] = elem
+
 	s.statesLock.Unlock()
 
 	// Persist to the registry
 	s.storeLock.Lock()
 	defer s.storeLock.Unlock()
-	if err := s.store.Set(getStoreKey(id), state); err != nil {
+	if err := s.store.Set(getStoreKey(id), st); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (s *states) GetOldestState() *state {
+	return s.order.Front().Value.(*state)
 }
 
 // CleanUp performs state and store cleanup based on provided knownIDs.
@@ -122,8 +172,8 @@ func getStoreKey(stateID string) string {
 
 // loadS3StatesFromRegistry loads a copy of the registry states.
 // If prefix is set, entries will match the provided prefix(including empty prefix)
-func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix string) (map[string]*state, error) {
-	stateTable := map[string]*state{}
+func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix string) (map[string]*list.Element, error) {
+	stateTable := map[string]*list.Element{}
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
 		if !strings.HasPrefix(key, awsS3ObjectStatePrefix) {
 			return true, nil
@@ -148,12 +198,9 @@ func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix 
 
 		// filter based on prefix and add entry to local copy
 		if strings.HasPrefix(st.Key, prefix) {
-			stateTable[st.ID()] = &st
+			stateTable[st.ID(false)] = s.order.PushBack(&st)
 		}
 		return true, nil
 	})
-	if err != nil {
-		return nil, err
-	}
-	return stateTable, nil
+	return stateTable, err
 }

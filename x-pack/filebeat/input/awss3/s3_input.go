@@ -209,7 +209,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 
 		// Add the cleanup handling to the acks helper
 		acks.Add(publishCount, func() {
-			err := in.states.AddState(state)
+			err := in.states.AddState(state, in.config.LexicographicalOrdering, in.config.LexicographicalLookbackKeys)
 			if err != nil {
 				in.log.Errorf("saving completed object state: %v", err.Error())
 				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failure checkpointing (saving completed object state): %s", err.Error()))
@@ -234,7 +234,11 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 
 	errorBackoff := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 	circuitBreaker := 0
-	paginator := in.s3.ListObjectsPaginator(bucketName, in.config.BucketListPrefix)
+	var startAfterKey string
+	if in.config.LexicographicalOrdering {
+		startAfterKey = in.states.GetOldestState().Key
+	}
+	paginator := in.s3.ListObjectsPaginator(bucketName, in.config.BucketListPrefix, startAfterKey)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
 
@@ -265,13 +269,13 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 		in.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Contents {
 			state := newState(bucketName, *object.Key, *object.ETag, *object.LastModified)
-			if !isStateValid(in.log, state) {
+			if !in.config.LexicographicalOrdering && !isStateValid(in.log, state) {
 				continue
 			}
 
 			// add to known states only if valid for processing
-			knownStateIDSlice = append(knownStateIDSlice, state.ID())
-			if in.states.IsProcessed(state) {
+			knownStateIDSlice = append(knownStateIDSlice, state.ID(in.config.LexicographicalOrdering))
+			if in.states.IsProcessed(state, in.config.LexicographicalOrdering) {
 				in.log.Debugw("skipping state processing as already processed.", "state", state)
 				continue
 			}
