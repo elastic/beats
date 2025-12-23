@@ -126,10 +126,10 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 		if errAbsDir != nil {
 			return nil, fmt.Errorf("error resolving log directory: %w", errAbsDir)
 		}
-		absLogPath, errAbsLog := filepath.Abs(info.LogPath)
-		if errAbsLog != nil {
+		absLogPath, errAbsPath := filepath.Abs(info.LogPath)
+		if errAbsPath != nil {
 			// On error resolving the provided path, fall back to the default.
-			pm.Logger.Warnf("invalid log path %q provided for container %s, falling back to default: %v", info.LogPath, info.ContainerID, errAbsLog)
+			pm.Logger.Warnf("invalid log path %q provided for container %s, falling back to default: %v", info.LogPath, info.ContainerID, errAbsPath)
 			info.LogPath = defaultLogPath
 		} else {
 			// Ensure absLogPath is under absLogDir.
