@@ -70,6 +70,7 @@ data:
 
     output.elasticsearch:
       hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      ssl.verification_mode: "none"
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
 ---
@@ -81,58 +82,65 @@ metadata:
   labels:
     k8s-app: metricbeat
 data:
-  system.yml: |-
-    - module: system
-      period: 10s
-      metricsets:
-        - cpu
-        - load
-        - memory
-        - network
-        - process
-        - process_summary
-        #- core
-        #- diskio
-        #- socket
-      processes: ['.*']
-      process.include_top_n:
-        by_cpu: 5      # include top 5 processes by CPU
-        by_memory: 5   # include top 5 processes by memory
+  # system.yml: |-
+  #   - module: system
+  #     period: 10s
+  #     metricsets:
+  #       - cpu
+  #       - load
+  #       - memory
+  #       - network
+  #       - process
+  #       - process_summary
+  #       #- core
+  #       #- diskio
+  #       #- socket
+  #     processes: ['.*']
+  #     process.include_top_n:
+  #       by_cpu: 5      # include top 5 processes by CPU
+  #       by_memory: 5   # include top 5 processes by memory
 
-    - module: system
-      period: 1m
+  #   - module: system
+  #     period: 1m
+  #     metricsets:
+  #       - filesystem
+  #       - fsstat
+  #     processors:
+  #     - drop_event.when.regexp:
+  #         system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib|snap)($|/)'
+  # kubernetes.yml: |-
+  #   - module: kubernetes
+  #     metricsets:
+  #       - node
+  #       - system
+  #       - pod
+  #       - container
+  #       - volume
+  #     period: 10s
+  #     host: ${NODE_NAME}
+  #     # use_kubeadm: true
+  #     hosts: ["https://${NODE_NAME}:10250"]
+  #     bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #     ssl.verification_mode: "none"
+  #     # If there is a CA bundle that contains the issuer of the certificate used in the Kubelet API,
+  #     # remove ssl.verification_mode entry and use the CA, for instance:
+  #     #ssl.certificate_authorities:
+  #       #- /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+  #   # Currently `proxy` metricset is not supported on Openshift, comment out section
+  #   - module: kubernetes
+  #     metricsets:
+  #       - proxy
+  #     period: 10s
+  #     # use_kubeadm: true
+  #     host: ${NODE_NAME}
+  #     hosts: ["localhost:10249"]
+  prometheus.yml: |-
+    - module: prometheus
       metricsets:
-        - filesystem
-        - fsstat
-      processors:
-      - drop_event.when.regexp:
-          system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib|snap)($|/)'
-  kubernetes.yml: |-
-    - module: kubernetes
-      metricsets:
-        - node
-        - system
-        - pod
-        - container
-        - volume
+        - remote_write
+      host: "0.0.0.0"
+      port: 9201
       period: 10s
-      host: ${NODE_NAME}
-      # use_kubeadm: true
-      hosts: ["https://${NODE_NAME}:10250"]
-      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-      ssl.verification_mode: "none"
-      # If there is a CA bundle that contains the issuer of the certificate used in the Kubelet API,
-      # remove ssl.verification_mode entry and use the CA, for instance:
-      #ssl.certificate_authorities:
-        #- /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
-    # Currently `proxy` metricset is not supported on Openshift, comment out section
-    - module: kubernetes
-      metricsets:
-        - proxy
-      period: 10s
-      # use_kubeadm: true
-      host: ${NODE_NAME}
-      hosts: ["localhost:10249"]
 ---
 # Deploy a Metricbeat instance per node for node metrics retrieval
 apiVersion: apps/v1
@@ -157,7 +165,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: metricbeat
-          image: docker.elastic.co/beats/metricbeat:8.16.0-SNAPSHOT
+          image: docker.elastic.co/beats/metricbeat-wolfi:9.2.3
           command: [ "sleep" ]
           args: [ "infinity" ]
           env:
@@ -183,7 +191,7 @@ spec:
             #privileged: true
           resources:
             limits:
-              memory: 200Mi
+              memory: 1Gi
             requests:
               cpu: 100m
               memory: 100Mi
