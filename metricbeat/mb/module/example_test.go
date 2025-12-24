@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // ExampleWrapper demonstrates how to create a single Wrapper
@@ -54,7 +55,11 @@ func ExampleWrapper() {
 		return
 	}
 	// Create a new Wrapper based on the configuration.
+<<<<<<< HEAD
 	m, err := module.NewWrapper(config, mb.Registry, logger, beatmonitoring.NewMonitoring(), module.WithMetricSetInfo())
+=======
+	m, err := module.NewWrapper(config, mb.Registry, logger, beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+>>>>>>> efa88f4c7 ([beatreceiver] Remove global paths from auditbeat (#47935))
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
@@ -138,7 +143,11 @@ func ExampleRunner() {
 	}
 
 	// Create a new Wrapper based on the configuration.
+<<<<<<< HEAD
 	m, err := module.NewWrapper(config, mb.Registry, logp.NewNopLogger(), beatmonitoring.NewMonitoring(), module.WithMetricSetInfo())
+=======
+	m, err := module.NewWrapper(config, mb.Registry, logp.NewNopLogger(), beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+>>>>>>> efa88f4c7 ([beatreceiver] Remove global paths from auditbeat (#47935))
 	if err != nil {
 		return
 	}

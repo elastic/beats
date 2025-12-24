@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -111,7 +112,11 @@ func TestWrapperOfReportingFetcher(t *testing.T) {
 		"hosts":      hosts,
 	})
 
+<<<<<<< HEAD
 	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring())
+=======
+	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New())
+>>>>>>> efa88f4c7 ([beatreceiver] Remove global paths from auditbeat (#47935))
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -142,7 +147,11 @@ func TestWrapperOfPushMetricSet(t *testing.T) {
 		"hosts":      hosts,
 	})
 
+<<<<<<< HEAD
 	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring())
+=======
+	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New())
+>>>>>>> efa88f4c7 ([beatreceiver] Remove global paths from auditbeat (#47935))
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -189,7 +198,11 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 				"hosts":      hosts,
 			})
 
+<<<<<<< HEAD
 			m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), module.WithMetricSetInfo())
+=======
+			m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+>>>>>>> efa88f4c7 ([beatreceiver] Remove global paths from auditbeat (#47935))
 			require.NoError(t, err)
 
 			done := make(chan struct{})
@@ -220,7 +233,11 @@ func TestDurationIsAddedToEvent(t *testing.T) {
 	})
 
 	registry := newTestRegistry(t)
+<<<<<<< HEAD
 	m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), module.WithMetricSetInfo())
+=======
+	m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+>>>>>>> efa88f4c7 ([beatreceiver] Remove global paths from auditbeat (#47935))
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -248,7 +265,7 @@ func TestNewWrapperForMetricSet(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), logp.NewNopLogger())
+	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), paths.New(), logp.NewNopLogger())
 	require.NoError(t, err)
 
 	m, err := module.NewWrapperForMetricSet(aModule, metricSets[0], beatmonitoring.NewMonitoring(), logp.NewNopLogger(), module.WithMetricSetInfo())

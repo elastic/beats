@@ -33,6 +33,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/testing"
 )
 
@@ -89,8 +90,13 @@ type stats struct {
 }
 
 // NewWrapper creates a new module and its associated metricsets based on the given configuration.
+<<<<<<< HEAD
 func NewWrapper(config *conf.C, r *mb.Register, logger *logp.Logger, monitoring beatmonitoring.Monitoring, options ...Option) (*Wrapper, error) {
 	module, metricSets, err := mb.NewModule(config, r, logger)
+=======
+func NewWrapper(config *conf.C, r *mb.Register, logger *logp.Logger, monitoring beat.Monitoring, p *paths.Path, options ...Option) (*Wrapper, error) {
+	module, metricSets, err := mb.NewModule(config, r, p, logger)
+>>>>>>> efa88f4c7 ([beatreceiver] Remove global paths from auditbeat (#47935))
 	if err != nil {
 		return nil, err
 	}

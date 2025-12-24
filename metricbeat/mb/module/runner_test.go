@@ -33,6 +33,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/cpu"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -50,7 +51,11 @@ func TestRunner(t *testing.T) {
 	}
 
 	// Create a new Wrapper based on the configuration.
+<<<<<<< HEAD
 	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), module.WithMetricSetInfo())
+=======
+	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+>>>>>>> efa88f4c7 ([beatreceiver] Remove global paths from auditbeat (#47935))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,7 +83,11 @@ func TestCPUDiagnostics(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create a new Wrapper based on the configuration.
+<<<<<<< HEAD
 	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), module.WithMetricSetInfo())
+=======
+	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+>>>>>>> efa88f4c7 ([beatreceiver] Remove global paths from auditbeat (#47935))
 	if err != nil {
 		t.Fatal(err)
 	}
