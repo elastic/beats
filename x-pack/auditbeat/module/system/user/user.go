@@ -248,7 +248,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)
 	}
 
-	bucket, err := datastore.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, base.GetPath())
 	if err != nil {
 		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}
