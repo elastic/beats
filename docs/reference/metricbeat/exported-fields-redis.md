@@ -113,8 +113,16 @@ Redis memory stats.
     format: bytes
 
 
-**`redis.info.memory.used.lua`**
+**`redis.info.memory.used.lua`** {applies_to}`stack: deprecated True`
 :   Used memory by the Lua engine.
+
+    type: long
+
+    format: bytes
+
+
+**`redis.info.memory.used.scripts`**
+:   Used memory by Lua scripts.
 
     type: long
 
@@ -123,6 +131,14 @@ Redis memory stats.
 
 **`redis.info.memory.used.dataset`**
 :   The size in bytes of the dataset
+
+    type: long
+
+    format: bytes
+
+
+**`redis.info.memory.total_system`**
+:   Total amount in bytes of memory available to Redis.
 
     type: long
 
@@ -599,6 +615,12 @@ Server info
     type: keyword
 
 
+**`redis.info.server.number_of_cached_scripts`**
+:   Number of cached scripts.
+
+    type: long
+
+
 ## stats [_stats]
 
 Redis stats.
@@ -743,6 +765,28 @@ Redis stats.
 
 **`redis.info.stats.active_defrag.key_misses`**
 :   Number of keys that were skipped by the active defragmentation process
+
+    type: long
+
+
+## tracking [_tracking]
+
+Redis client side caching tracking stats.
+
+**`redis.info.stats.tracking.total_keys`**
+:   Total number of keys being tracked.
+
+    type: long
+
+
+**`redis.info.stats.tracking.total_items`**
+:   Total number of tracked items.
+
+    type: long
+
+
+**`redis.info.stats.tracking.total_prefixes`**
+:   Total number of tracked prefixes.
 
     type: long
 

@@ -83,11 +83,23 @@
           format: bytes
           description: >
             Used memory by the Lua engine.
+          deprecated: true
+        - name: used.scripts
+          type: long
+          format: bytes
+          description: >
+            Used memory by Lua scripts.
         - name: used.dataset
           type: long
           format: bytes
           description: >
             The size in bytes of the dataset
+
+        - name: total_system
+          type: long
+          format: bytes
+          description: >
+            Total amount in bytes of memory available to Redis.
 
         - name: max.value
           type: long
@@ -435,6 +447,11 @@
           type: keyword
           description:
 
+        - name: number_of_cached_scripts
+          type: long
+          description: >
+            Number of cached scripts.
+
     - name: stats
       type: group
       description: >
@@ -547,6 +564,25 @@
           type: long
           description: >
             Number of keys that were skipped by the active defragmentation process
+
+        - name: tracking
+          type: group
+          description: >
+            Redis client side caching tracking stats.
+          fields:
+            - name: total_keys
+              type: long
+              description: >
+                Total number of keys being tracked.
+            - name: total_items
+              type: long
+              description: >
+                Total number of tracked items.
+            - name: total_prefixes
+              type: long
+              description: >
+                Total number of tracked prefixes.
+
     - name: slowlog.count
       type: long
       description: >

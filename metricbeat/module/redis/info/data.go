@@ -50,9 +50,15 @@ var (
 				"value":   c.Int("used_memory"), // As it is a top key, this goes into value
 				"rss":     c.Int("used_memory_rss"),
 				"peak":    c.Int("used_memory_peak"),
-				"lua":     c.Int("used_memory_lua"),
+				"lua":     c.Int("used_memory_lua", s.Optional),
 				"dataset": c.Int("used_memory_dataset"),
+
+				// Redis 7.x/8.x
+				"scripts": c.Int("used_memory_scripts", s.Optional),
 			},
+
+			// Redis 7.x/8.x
+			"total_system": c.Int("total_system_memory", s.Optional),
 			"max": s.Object{
 				"value":  c.Int("maxmemory"),
 				"policy": c.Str("maxmemory_policy"),
@@ -181,6 +187,9 @@ var (
 			"hz":               c.Int("hz"),
 			"lru_clock":        c.Int("lru_clock"),
 			"config_file":      c.Str("config_file"),
+
+			// Redis 7.x/8.x
+			"number_of_cached_scripts": c.Int("number_of_cached_scripts", s.Optional),
 		},
 		"stats": s.Object{
 			"connections": s.Object{
@@ -228,6 +237,13 @@ var (
 				"misses":     c.Int("active_defrag_misses"),
 				"key_hits":   c.Int("active_defrag_key_hits"),
 				"key_misses": c.Int("active_defrag_key_misses"),
+			},
+
+			// Redis 7.x/8.x
+			"tracking": s.Object{
+				"total_keys":     c.Int("tracking_total_keys", s.Optional),
+				"total_items":    c.Int("tracking_total_items", s.Optional),
+				"total_prefixes": c.Int("tracking_total_prefixes", s.Optional),
 			},
 		},
 		"slowlog": s.Object{
