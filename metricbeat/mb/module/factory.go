@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Factory creates new Runner instances from configuration objects.
@@ -31,6 +32,7 @@ type Factory struct {
 	monitoring beat.Monitoring
 	options    []Option
 	registry   *mb.Register
+	paths      *paths.Path
 }
 
 // metricSetWithProcessors is an interface to check if a MetricSet has directly attached Processors
@@ -42,18 +44,19 @@ type metricSetWithProcessors interface {
 }
 
 // NewFactory creates new Reloader instance for the given config
-func NewFactory(beatInfo beat.Info, monitoring beat.Monitoring, registry *mb.Register, options ...Option) cfgfile.RunnerFactory {
+func NewFactory(beatInfo beat.Info, monitoring beat.Monitoring, registry *mb.Register, paths *paths.Path, options ...Option) cfgfile.RunnerFactory {
 	return &Factory{
 		beatInfo:   beatInfo,
 		monitoring: monitoring,
 		options:    options,
 		registry:   registry,
+		paths:      paths,
 	}
 }
 
 // Create creates a new metricbeat module runner reporting events to the passed pipeline.
 func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
-	module, metricSets, err := mb.NewModule(c, r.registry, r.beatInfo.Logger)
+	module, metricSets, err := mb.NewModule(c, r.registry, r.paths, r.beatInfo.Logger)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +94,7 @@ func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 
 // CheckConfig checks if a config is valid or not
 func (r *Factory) CheckConfig(config *conf.C) error {
-	_, err := NewWrapper(config, r.registry, r.beatInfo.Logger, r.monitoring, r.options...)
+	_, err := NewWrapper(config, r.registry, r.beatInfo.Logger, r.monitoring, r.paths, r.options...)
 	if err != nil {
 		return err
 	}
