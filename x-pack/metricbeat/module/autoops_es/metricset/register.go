@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"slices"
 
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
