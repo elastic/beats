@@ -70,6 +70,10 @@ remote_write:
 
 ## Request size limits [_request_size_limits]
 
+```{applies_to}
+stack:  ga 9.1.10, ga 9.2.4, ga 9.3.1, ga 9.4
+```
+
 To protect against resource exhaustion from malicious or oversized payloads, the remote_write metricset enforces configurable size limits on incoming requests:
 
 * `max_compressed_body_bytes`: Maximum size of the compressed (snappy-encoded) request body in bytes. Requests exceeding this limit are rejected with HTTP 413 before being read into memory. Default: 2 MB (2097152 bytes).
