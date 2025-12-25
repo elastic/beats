@@ -7,6 +7,7 @@ package device_health
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -24,7 +25,26 @@ type switchport struct {
 	portStatus *sdk.ResponseItemSwitchGetDeviceSwitchPortsStatuses
 }
 
-func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map[Serial]*Device, period time.Duration, logger *logp.Logger) error {
+// filterSwitchportsByStatus filters switchports by their status, comparing against the allowed statuses.
+// The comparison is case insensitive. Switchports with nil portStatus are excluded.
+func filterSwitchportsByStatus(switchports []*switchport, statusesToReport []string) []*switchport {
+	var filtered []*switchport
+	for _, sp := range switchports {
+		if sp.portStatus == nil {
+			continue
+		}
+		portStatus := strings.ToLower(sp.portStatus.Status)
+		for _, allowed := range statusesToReport {
+			if portStatus == strings.ToLower(allowed) {
+				filtered = append(filtered, sp)
+				break
+			}
+		}
+	}
+	return filtered
+}
+
+func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map[Serial]*Device, period time.Duration, statusesToReport []string, logger *logp.Logger) error {
 	params := &sdk.GetOrganizationSwitchPortsBySwitchQueryParams{}
 	setStart := func(s string) { params.StartingAfter = s }
 
@@ -44,7 +64,6 @@ func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map
 		if switches == nil {
 			return errors.New("GetOrganizationSwitchPortsBySwitch returned nil")
 		}
-
 		for _, device := range *switches {
 			if device.Ports == nil {
 				continue
@@ -76,8 +95,10 @@ func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map
 				}
 			}
 
+			filteredSwitchports := filterSwitchportsByStatus(switchports, statusesToReport)
+
 			if d, ok := devices[Serial(device.Serial)]; ok && d != nil {
-				d.switchports = switchports
+				d.switchports = filteredSwitchports
 			}
 		}
 

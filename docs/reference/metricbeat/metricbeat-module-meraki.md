@@ -29,6 +29,7 @@ metricbeat.modules:
   period: 300s
   apiKey: "Meraki dashboard API key"
   organizations: ["Meraki organization ID"]
+  switchport_statuses: ["connected"]
 ```
 
 
