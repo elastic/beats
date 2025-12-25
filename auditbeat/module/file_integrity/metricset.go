@@ -179,7 +179,7 @@ func (ms *MetricSet) Close() error {
 }
 
 func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
-	bucket, err := datastore.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, ms.GetPath())
 	if err != nil {
 		err = fmt.Errorf("failed to open persistent datastore: %w", err)
 		reporter.Error(err)

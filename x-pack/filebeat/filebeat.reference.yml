@@ -2925,6 +2925,17 @@ filebeat.inputs:
   #paths:
     #- /var/log/custom.journal
 
+  # Specify a folder to be used as chroot when calling the journalctl binary
+  #chroot:
+
+  # The path for the `journalctl` binary. If not set, Filebeat will look for
+  # `journalctl` in PATH (defaults to `journalctl`). When using `chroot`, if
+  # `journalctl_path` is not explicitly set, it automatically defaults to
+  # `/usr/bin/journalctl`. If `journalctl_path` is explicitly set when `chroot`
+  # is configured, it must be an absolute path from within the chroot directory.
+  #journalctl_path:
+
+
   # When enabled, log entries will be ingested interleaved from all
   # available journals, including remote ones.
   #merge: false

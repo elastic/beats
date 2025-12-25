@@ -266,7 +266,7 @@ func TestAuthenticator(t *testing.T) {
 					AuthenticatorID: component.NewID(Type),
 				})
 
-				client, err := httpClientConfig.ToClient(context.Background(), host, settings)
+				client, err := httpClientConfig.ToClient(context.Background(), host.GetExtensions(), settings)
 				require.NoError(t, err)
 				require.NotNil(t, client)
 
