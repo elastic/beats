@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   etcd:
     image: docker.elastic.co/integrations-ci/beats-etcd:${ETCD_VERSION:-3.3.10}-1
