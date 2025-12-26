@@ -120,6 +120,10 @@
       type: group
       description: Data related to the executed script file.
       fields:
+        - name: script_block_hash
+          type: keyword
+          description: A hash of the script to be used in rules.
+          
         - name: script_block_id
           type: keyword
           description: Id of the executed script block.

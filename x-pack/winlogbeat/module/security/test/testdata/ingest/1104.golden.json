@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-11-08T07:56:17.3217049Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logging-full",

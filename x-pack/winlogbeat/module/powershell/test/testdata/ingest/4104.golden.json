@@ -2,17 +2,21 @@
   {
     "@timestamp": "2020-05-14T11:33:51.3892662Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Execute a Remote Command",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "4104",
-      "ingested": "2025-01-15T10:02:22.104487839Z",
+      "ingested": "2025-10-29T18:18:28.968386210Z",
       "kind": "event",
       "module": "powershell",
       "provider": "Microsoft-Windows-PowerShell",
-      "type": "info"
+      "type": [
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant",
@@ -27,6 +31,7 @@
     "message": "Creating Scriptblock text (1 of 1):\n.\\patata.ps1\n\nScriptBlock ID: 50d2dbda-7361-4926-a94d-d9eadfdb43fa\nPath: ",
     "powershell": {
       "file": {
+        "script_block_hash": "64TcviMSSJ/OdhiN8lVcBQeKWDU=",
         "script_block_id": "50d2dbda-7361-4926-a94d-d9eadfdb43fa",
         "script_block_text": ".\\patata.ps1"
       },
@@ -61,17 +66,21 @@
   {
     "@timestamp": "2020-05-14T11:33:51.3938848Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Execute a Remote Command",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "4104",
-      "ingested": "2025-01-15T10:02:22.104615177Z",
+      "ingested": "2025-10-29T18:18:28.968402377Z",
       "kind": "event",
       "module": "powershell",
       "provider": "Microsoft-Windows-PowerShell",
-      "type": "info"
+      "type": [
+        "info"
+      ]
     },
     "file": {
       "directory": "C:\\Users\\vagrant\\Desktop",

@@ -2,10 +2,10 @@
   {
     "@timestamp": "2020-10-28T02:39:26.374Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Image loaded (rule: ImageLoad)",
+      "action": "Image loaded",
       "category": [
         "process"
       ],
