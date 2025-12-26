@@ -75,9 +75,9 @@ func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger) 
 // BaseModule's name will always be lower case.
 func newBaseModuleFromConfig(rawConfig *conf.C, logger *logp.Logger) (BaseModule, error) {
 	baseModule := BaseModule{
+		Logger:    logger,
 		config:    DefaultModuleConfig(),
 		rawConfig: rawConfig,
-		Logger:    logger,
 	}
 	err := rawConfig.Unpack(&baseModule.config)
 	if err != nil {
