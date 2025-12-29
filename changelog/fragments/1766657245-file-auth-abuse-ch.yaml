@@ -1,4 +1,4 @@
 kind: bug-fix
-summary: abuse.ch APIs now require auth-key to access data
+summary: Support abuse.ch auth key usage in the Threat Intel module.
 component: filebeat
 issue: https://github.com/elastic/beats/issues/45206
