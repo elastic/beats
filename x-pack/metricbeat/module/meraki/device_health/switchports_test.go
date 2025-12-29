@@ -154,6 +154,22 @@ func TestFilterSwitchportsByStatus(t *testing.T) {
 			expectedCount:    0,
 			expectedPortIDs:  []string{},
 		},
+		{
+			name: "empty statusesToReport returns no ports",
+			switchports: []*switchport{
+				{
+					port:       &sdk.ResponseItemSwitchGetOrganizationSwitchPortsBySwitchPorts{PortID: "1"},
+					portStatus: &sdk.ResponseItemSwitchGetDeviceSwitchPortsStatuses{PortID: "1", Status: "Connected"},
+				},
+				{
+					port:       &sdk.ResponseItemSwitchGetOrganizationSwitchPortsBySwitchPorts{PortID: "2"},
+					portStatus: &sdk.ResponseItemSwitchGetDeviceSwitchPortsStatuses{PortID: "2", Status: "Disconnected"},
+				},
+			},
+			statusesToReport: []string{},
+			expectedCount:    0,
+			expectedPortIDs:  []string{},
+		},
 	}
 
 	for _, tt := range tests {

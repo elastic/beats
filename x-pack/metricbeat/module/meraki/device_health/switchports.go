@@ -28,17 +28,19 @@ type switchport struct {
 // filterSwitchportsByStatus filters switchports by their status, comparing against the allowed statuses.
 // The comparison is case insensitive. Switchports with nil portStatus are excluded.
 func filterSwitchportsByStatus(switchports []*switchport, statusesToReport []string) []*switchport {
+	// Pre-compute lowercase allowed statuses for efficient lookup
+	allowedStatuses := make(map[string]struct{}, len(statusesToReport))
+	for _, status := range statusesToReport {
+		allowedStatuses[strings.ToLower(status)] = struct{}{}
+	}
+
 	var filtered []*switchport
 	for _, sp := range switchports {
 		if sp.portStatus == nil {
 			continue
 		}
-		portStatus := strings.ToLower(sp.portStatus.Status)
-		for _, allowed := range statusesToReport {
-			if portStatus == strings.ToLower(allowed) {
-				filtered = append(filtered, sp)
-				break
-			}
+		if _, ok := allowedStatuses[strings.ToLower(sp.portStatus.Status)]; ok {
+			filtered = append(filtered, sp)
 		}
 	}
 	return filtered
