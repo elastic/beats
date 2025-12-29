@@ -220,7 +220,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		Headers:     cfg.Resource.Headers,
 		MaxBodySize: cfg.Resource.MaxBodySize,
 	}
-	prg, ast, cov, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, httpOptions, patterns, cfg.XSDs, log, trace, wantDump, doCov)
+	ctxForEval := ctx
+	prg, ast, cov, err := newProgram(func() context.Context { return ctxForEval }, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, httpOptions, patterns, cfg.XSDs, log, trace, wantDump, doCov)
 	if err != nil {
 		return err
 	}
@@ -317,6 +318,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			metricsRecorder.AddProgramExecution(ctx)
 			start := i.now().In(time.UTC)
 
+			ctxForEval = ctx
 			state, err = evalWith(ctx, prg, ast, state, start, wantDump, budget-1)
 			metricsRecorder.AddCELDuration(ctx, time.Since(start))
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
@@ -1230,7 +1232,7 @@ func getEnv(allowed []string) map[string]string {
 	return env
 }
 
-func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limit *rate.Limiter, httpOptions lib.HTTPOptions, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details, coverage bool) (cel.Program, *cel.Ast, *lib.Coverage, error) {
+func newProgram(ctxFn func() context.Context, src, root string, vars map[string]string, client *http.Client, limit *rate.Limiter, httpOptions lib.HTTPOptions, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details, coverage bool) (cel.Program, *cel.Ast, *lib.Coverage, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
@@ -1251,7 +1253,7 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 		lib.Debug(debug(log, trace)),
 		lib.File(mimetypes),
 		lib.MIME(mimetypes),
-		lib.HTTPWithContextOpts(ctx, client, httpOptions),
+		lib.HTTPWithContextFnOpts(ctxFn, client, httpOptions),
 		lib.LimitWithApply(limitPolicies, func(m map[string]any, h http.Header) map[string]any {
 			waitUntil := handleRateLimit(log, m, h, limit)
 			if !waitUntil.IsZero() {
