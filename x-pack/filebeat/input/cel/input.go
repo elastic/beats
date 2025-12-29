@@ -173,6 +173,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	metrics, reg := newInputMetrics(env.MetricsRegistry, env.Logger)
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
+	otelTracerProvider, err := otel.GetGlobalTracerProvider(ctx)
+	if err != nil {
+		return err
+	}
+	otelTracer := otelTracerProvider.Tracer("github.com/elastic/beats/v7/x-pack/filebeat/input/cel")
 
 	if cfg.Resource.Tracer != nil {
 		id := sanitizeFileName(env.IDWithoutName)
@@ -273,9 +278,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
 	err = periodically(ctx, cfg.Interval, func() error {
+		runCtx, runSpan := otelTracer.Start(ctx, "cel.periodic.run")
+		defer runSpan.End()
+
 		log.Debug("Starting otel periodic")
-		metricsRecorder.StartPeriodic(ctx)
-		defer metricsRecorder.EndPeriodic(ctx)
+
+		metricsRecorder.StartPeriodic(runCtx)
+		defer metricsRecorder.EndPeriodic(runCtx)
 		log.Debug("process periodic request")
 		var (
 			budget    = *cfg.MaxExecutions
@@ -293,6 +302,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		}
 		for {
 			if wait := time.Until(waitUntil); wait > 0 {
+				waitCtx, waitSpan := otelTracer.Start(runCtx, "cel.periodic.run.ratelimitwait")
 				// We have a special-case wait for when we have a zero limit.
 				// x/time/rate allow a burst through even when the limit is zero
 				// so in order to ensure that we don't try until we are out of
@@ -300,31 +310,35 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				// the retry after for a 429 and rate limit headers if we have
 				// a zero rate quota. See handleResponse below.
 				select {
-				case <-ctx.Done():
-					return ctx.Err()
+				case <-waitCtx.Done():
+					return waitCtx.Err()
 				case <-time.After(wait):
 				}
-			} else if err = ctx.Err(); err != nil {
+				waitSpan.End()
+			} else if err = runCtx.Err(); err != nil {
 				// Otherwise exit if we have been cancelled.
 				return err
 			}
+
+			execCtx, execSpan := otelTracer.Start(runCtx, "cel.program.execution")
+			defer execSpan.End() // end span for early returns
 
 			// Process a set of event requests.
 			if trace != nil {
 				log.Debugw("previous transaction", "transaction.id", trace.TxID())
 			}
 			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
-			metricsRecorder.AddProgramExecution(ctx)
+			metricsRecorder.AddProgramExecution(execCtx)
 			start := i.now().In(time.UTC)
 
-			state, err = evalWith(ctx, prg, ast, state, start, wantDump, budget-1)
-			metricsRecorder.AddCELDuration(ctx, time.Since(start))
+			state, err = evalWith(execCtx, prg, ast, state, start, wantDump, budget-1)
+			metricsRecorder.AddCELDuration(execCtx, time.Since(start))
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
 				var dump dumpError
 				switch {
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
-					metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 					return err
 				case errors.As(err, &dump):
 					path := strings.ReplaceAll(cfg.FailureDump.Filename, "*", sanitizeFileName(env.IDWithoutName))
@@ -433,11 +447,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			var ok bool
 			ok, waitUntil, err = handleResponse(log, state, limiter)
 			if err != nil {
-				metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 				return err
 			}
 			if !ok {
-				metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 				continue
 			}
 
@@ -449,22 +463,22 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			e, ok := state["events"]
 			if !ok {
-				metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 				return errors.New("unexpected missing events array from evaluation")
 			}
 			var events []interface{}
 			switch e := e.(type) {
 			case []interface{}:
 				if len(e) == 0 {
-					metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
-					metricsRecorder.AddProgramSuccessExecution(ctx)
+					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+					metricsRecorder.AddProgramSuccessExecution(execCtx)
 					return nil
 				}
 				events = e
 			case map[string]interface{}:
 				if e == nil {
-					metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
-					metricsRecorder.AddProgramSuccessExecution(ctx)
+					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+					metricsRecorder.AddProgramSuccessExecution(execCtx)
 					return nil
 				}
 				if _, ok := e["error"]; ok {
@@ -492,13 +506,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				// Make sure the cursor is not updated.
 				delete(state, "cursor")
 			default:
-				metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 				return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 			}
 
 			// We have a non-empty batch of events to process.
-			metricsRecorder.AddReceivedBatch(ctx, 1)
-			metricsRecorder.AddReceivedEvents(ctx, uint(len(events)))
+			metricsRecorder.AddReceivedBatch(execCtx, 1)
+			metricsRecorder.AddReceivedEvents(execCtx, uint(len(events)))
 			// Drop events from state. If we fail during the publication,
 			// we will re-request these events.
 			delete(state, "events")
@@ -531,6 +545,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			pubStart := time.Now()
 			var hadPublicationError bool
+
+			pubCtx, pubSpan := otelTracer.Start(execCtx, "cel.program.publish")
+			defer pubSpan.End() // end span for early returns
 		loop:
 			for i, e := range events {
 				event, ok := e.(map[string]interface{})
@@ -546,7 +563,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 							goodCursor = cursor
 							cursor, ok = cursors[0].(map[string]interface{})
 							if !ok {
-								metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+								metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 								return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
 							}
 							pubCursor = cursor
@@ -555,7 +572,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 						goodCursor = cursor
 						cursor, ok = cursors[i].(map[string]interface{})
 						if !ok {
-							metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+							metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 							return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
 						}
 						pubCursor = cursor
@@ -565,7 +582,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				// cursor.Publisher interface does not document the behaviour
 				// related to context cancellation and the context is not
 				// explicitly passed in, so favour this explicit clarity.
-				switch err := ctx.Err(); {
+				switch err := pubCtx.Err(); {
 				case err == nil:
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
 					log.Infow("context cancelled with unpublished events", "unpublished", len(events)-i)
@@ -596,13 +613,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					// correctly published cursor.
 				}
 				if i == 0 {
-					metricsRecorder.AddPublishedBatch(ctx, 1)
+					metricsRecorder.AddPublishedBatch(pubCtx, 1)
 				}
-				metricsRecorder.AddPublishedEvents(ctx, 1)
+				metricsRecorder.AddPublishedEvents(pubCtx, 1)
 
-				err = ctx.Err()
+				err = pubCtx.Err()
 				if err != nil {
-					metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+					metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 					return err
 				}
 			}
@@ -611,17 +628,19 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				health.UpdateStatus(status.Running, "")
 			}
 
-			metricsRecorder.AddPublishDuration(ctx, time.Since(pubStart))
+			metricsRecorder.AddPublishDuration(pubCtx, time.Since(pubStart))
 			// Advance the cursor to the final state if there was no error during
 			// publications. This is needed to transition to the next set of events.
 			if !hadPublicationError {
 				goodCursor = cursor
-				metricsRecorder.AddProgramSuccessExecution(ctx)
+				metricsRecorder.AddProgramSuccessExecution(pubCtx)
 			}
+
+			pubSpan.End()
 
 			// Replace the last known good cursor.
 			state["cursor"] = goodCursor
-			metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+			metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 			if more, _ := state["want_more"].(bool); !more {
 				return nil
 			}
@@ -636,6 +655,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				health.UpdateStatus(status.Degraded, "exceeding maximum number of CEL executions")
 				return nil
 			}
+
+			execSpan.End()
 		}
 	})
 	switch {
