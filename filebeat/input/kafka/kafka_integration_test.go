@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"os"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -337,89 +336,112 @@ func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
 
 func TestSASLAuthentication(t *testing.T) {
 	testutils.SkipIfFIPSOnly(t, "SASL disabled when in fips140=only mode.")
-	testTopic := createTestTopicName()
-	groupID := "filebeat"
 
-	// Send test messages to the topic for the input to read.
-	messages := []testMessage{
-		{message: "testing"},
-		{message: "sasl and stuff"},
-	}
-	for _, m := range messages {
-		writeToKafkaTopic(t, testTopic, m.message, m.headers)
-	}
-
-	// Setup the input config
-	config := conf.MustNewConfigFrom(mapstr.M{
-		"hosts":          []string{getTestSASLKafkaHost()},
-		"protocol":       "https",
-		"sasl.mechanism": "SCRAM-SHA-512",
-		// Disable hostname verification since we are likely writing to localhost.
-		"ssl.verification_mode": "certificate",
-		"ssl.certificate_authorities": []string{
-			"../../../testing/environments/docker/kafka/certs/ca-cert",
+	testCases := []struct {
+		name      string
+		mechanism string
+	}{
+		{
+			name:      "SCRAM-SHA-256",
+			mechanism: sarama.SASLTypeSCRAMSHA256,
 		},
-		"username": "beats",
-		"password": "KafkaTest",
-
-		"topics":     []string{testTopic},
-		"group_id":   groupID,
-		"wait_close": 0,
-	})
-
-	client := beattest.NewChanClient(100)
-	defer client.Close()
-	events := client.Channel
-	input, cancel := run(t, config, client)
-
-	timeout := time.After(30 * time.Second)
-	for range messages {
-		select {
-		case event := <-events:
-			v, err := event.Fields.GetValue("message")
-			if err != nil {
-				t.Fatal(err)
-			}
-			text, ok := v.(string)
-			if !ok {
-				t.Fatal("could not get message text from event")
-			}
-			msg := findMessage(t, text, messages)
-			assert.Equal(t, text, msg.message)
-
-			checkMatchingHeaders(t, event, msg.headers)
-
-			// emulating the pipeline (kafkaInput.Run)
-			meta, ok := event.Private.(eventMeta)
-			if !ok {
-				t.Fatal("could not get eventMeta and ack the message")
-			}
-			meta.ackHandler()
-		case <-timeout:
-			t.Fatal("timeout waiting for incoming events")
-		}
+		{
+			name:      "SCRAM-SHA-512",
+			mechanism: sarama.SASLTypeSCRAMSHA512,
+		},
+		{
+			name:      "PLAIN",
+			mechanism: sarama.SASLTypePlaintext,
+		},
 	}
 
-	// sarama commits every second, we need to make sure
-	// all message acks are committed before the rest of the checks
-	<-time.After(2 * time.Second)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testTopic := createTestTopicName()
+			groupID := "filebeat"
 
-	// Close the done channel and make sure the beat shuts down in a reasonable
-	// amount of time.
-	cancel()
-	didClose := make(chan struct{})
-	go func() {
-		input.Wait()
-		close(didClose)
-	}()
+			// Send test messages to the topic for the input to read.
+			messages := []testMessage{
+				{message: "testing"},
+				{message: fmt.Sprintf("sasl test with %s", tc.name)},
+			}
+			for _, m := range messages {
+				writeToKafkaTopic(t, testTopic, m.message, m.headers)
+			}
 
-	select {
-	case <-time.After(30 * time.Second):
-		t.Fatal("timeout waiting for beat to shut down")
-	case <-didClose:
+			// Setup the input config
+			config := conf.MustNewConfigFrom(mapstr.M{
+				"hosts":          []string{getTestSASLKafkaHost()},
+				"protocol":       "https",
+				"sasl.mechanism": tc.mechanism,
+				// Disable hostname verification since we are likely writing to localhost.
+				"ssl.verification_mode": "certificate",
+				"ssl.certificate_authorities": []string{
+					"../../../testing/environments/docker/kafka/certs/ca-cert",
+				},
+				"username": "beats",
+				"password": "KafkaTest",
+
+				"topics":     []string{testTopic},
+				"group_id":   groupID,
+				"wait_close": 0,
+			})
+
+			client := beattest.NewChanClient(100)
+			defer client.Close()
+			events := client.Channel
+			input, cancel := run(t, config, client)
+
+			timeout := time.After(30 * time.Second)
+			for range messages {
+				select {
+				case event := <-events:
+					v, err := event.Fields.GetValue("message")
+					if err != nil {
+						t.Fatal(err)
+					}
+					text, ok := v.(string)
+					if !ok {
+						t.Fatal("could not get message text from event")
+					}
+					msg := findMessage(t, text, messages)
+					assert.Equal(t, text, msg.message)
+
+					checkMatchingHeaders(t, event, msg.headers)
+
+					// emulating the pipeline (kafkaInput.Run)
+					meta, ok := event.Private.(eventMeta)
+					if !ok {
+						t.Fatal("could not get eventMeta and ack the message")
+					}
+					meta.ackHandler()
+				case <-timeout:
+					t.Fatal("timeout waiting for incoming events")
+				}
+			}
+
+			// sarama commits every second, we need to make sure
+			// all message acks are committed before the rest of the checks
+			<-time.After(2 * time.Second)
+
+			// Close the done channel and make sure the beat shuts down in a reasonable
+			// amount of time.
+			cancel()
+			didClose := make(chan struct{})
+			go func() {
+				input.Wait()
+				close(didClose)
+			}()
+
+			select {
+			case <-time.After(30 * time.Second):
+				t.Fatal("timeout waiting for beat to shut down")
+			case <-didClose:
+			}
+
+			assertOffset(t, groupID, testTopic, int64(len(messages)))
+		})
 	}
-
-	assertOffset(t, groupID, testTopic, int64(len(messages)))
 }
 
 func TestTest(t *testing.T) {
@@ -455,8 +477,12 @@ func TestTest(t *testing.T) {
 }
 
 func createTestTopicName() string {
+<<<<<<< HEAD
 	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("Filebeat-TestInput-%s", id)
+=======
+	testTopic := fmt.Sprintf("Filebeat-TestInput-%d", rand.Int())
+>>>>>>> 36d04b525 (filebeat: add kafka input tests for SASL PLAIN and SCRAM-SHA-256 (#48026))
 	return testTopic
 }
 
