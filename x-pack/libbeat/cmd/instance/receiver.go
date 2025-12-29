@@ -16,9 +16,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
-	"github.com/elastic/beats/v7/x-pack/otel/status"
+	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
@@ -96,9 +97,10 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 
 // BeatReceiver.Start() starts the beat receiver.
 func (br *BeatReceiver) Start(host component.Host) error {
+	var groupReporter otelstatus.RunnerReporter
 	if w, ok := br.beater.(cfgfile.WithOtelFactoryWrapper); ok {
-		groupReporter := status.NewGroupStatusReporter(host)
-		w.WithOtelFactoryWrapper(status.StatusReporterFactory(groupReporter))
+		groupReporter = otelstatus.NewGroupStatusReporter(host)
+		w.WithOtelFactoryWrapper(otelstatus.StatusReporterFactory(groupReporter))
 	}
 
 	// We go through all extensions to find any that implement the DiagnosticExtension interface.
@@ -126,6 +128,8 @@ func (br *BeatReceiver) Start(host component.Host) error {
 	}
 
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
+		// set beatreceiver status
+		groupReporter.UpdateStatus(status.Failed, err.Error())
 		return fmt.Errorf("beat receiver run error: %w", err)
 	}
 

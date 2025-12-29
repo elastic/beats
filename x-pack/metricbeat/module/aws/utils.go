@@ -191,16 +191,6 @@ func GetMetricDataResults(metricDataQueries []types.MetricDataQuery, svc cloudwa
 	return getMetricDataOutput.MetricDataResults, nil
 }
 
-// CheckTimestampInArray checks if input timestamp exists in timestampArray and if it exists, return the position.
-func CheckTimestampInArray(timestamp time.Time, timestampArray []time.Time) (bool, int) {
-	for i := 0; i < len(timestampArray); i++ {
-		if timestamp.Equal(timestampArray[i]) {
-			return true, i
-		}
-	}
-	return false, -1
-}
-
 func getContextWithTimeout(timeout time.Duration) (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), timeout)
 }
