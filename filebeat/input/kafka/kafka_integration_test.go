@@ -477,12 +477,7 @@ func TestTest(t *testing.T) {
 }
 
 func createTestTopicName() string {
-<<<<<<< HEAD
-	id := strconv.Itoa(rand.Int())
-	testTopic := fmt.Sprintf("Filebeat-TestInput-%s", id)
-=======
 	testTopic := fmt.Sprintf("Filebeat-TestInput-%d", rand.Int())
->>>>>>> 36d04b525 (filebeat: add kafka input tests for SASL PLAIN and SCRAM-SHA-256 (#48026))
 	return testTopic
 }
 
