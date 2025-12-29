@@ -5,8 +5,9 @@
 package awss3
 
 import (
-	"container/list"
 	"fmt"
+	"maps"
+	"slices"
 	"strings"
 	"sync"
 
@@ -21,10 +22,10 @@ const awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
 type states struct {
 	// Completed S3 object states, indexed by state ID.
 	// statesLock must be held to access states.
-	states     map[string]*list.Element
+	states     map[string]*state
 	statesLock sync.Mutex
-
-	order *list.List
+	head       *state // oldest (front) in lexicographical ordering
+	tail       *state // newest (back) in lexicographical ordering
 
 	// The store used to persist state changes to the registry.
 	// storeLock must be held to access store.
@@ -36,13 +37,13 @@ type states struct {
 }
 
 // newStates generates a new states registry.
-func newStates(log *logp.Logger, stateStore statestore.States, listPrefix string) (*states, error) {
+func newStates(log *logp.Logger, stateStore statestore.States, listPrefix string, lexicographicalOrdering bool) (*states, error) {
 	store, err := stateStore.StoreFor("")
 	if err != nil {
 		return nil, fmt.Errorf("can't access persistent store: %w", err)
 	}
 
-	stateTable, err := loadS3StatesFromRegistry(log, store, listPrefix)
+	stateTable, err := loadS3StatesFromRegistry(log, store, listPrefix, lexicographicalOrdering)
 	if err != nil {
 		return nil, fmt.Errorf("loading S3 input state: %w", err)
 	}
@@ -54,37 +55,52 @@ func newStates(log *logp.Logger, stateStore statestore.States, listPrefix string
 	}, nil
 }
 
-func (s *states) IsProcessed(state state, lexicographicalOrdering bool) bool {
+func (s *states) IsProcessed(id string) bool {
 	s.statesLock.Lock()
 	defer s.statesLock.Unlock()
 	// Our in-memory table only stores completed objects
-	_, ok := s.states[state.ID(lexicographicalOrdering)]
+	var ok bool
+	_, ok = s.states[id]
 	return ok
 }
 
-// func (fm *FixedMap) Set(key string, value int) {
-// 	// If key already exists, update value and move to back (most recent)
-// 	if elem, exists := fm.data[key]; exists {
-// 		elem.Value.(*entry).value = value
-// 		fm.order.MoveToBack(elem)
-// 		return
-// 	}
+// addToBack adds a state to the tail (newest position)
+func (s *states) addToBack(st *state) {
+	st.prev = s.tail
+	st.next = nil
+	if s.tail != nil {
+		s.tail.next = st
+	}
+	s.tail = st
+	if s.head == nil {
+		s.head = st
+	}
+}
 
-// 	// If at capacity, remove the oldest (front) element
-// 	if len(fm.data) >= fm.maxSize {
-// 		oldest := fm.order.Front()
-// 		if oldest != nil {
-// 			oldEntry := oldest.Value.(*entry)
-// 			delete(fm.data, oldEntry.key)
-// 			fm.order.Remove(oldest)
-// 		}
-// 	}
+// remove removes a state from the linked list
+func (s *states) remove(st *state) {
+	if st.prev != nil {
+		st.prev.next = st.next
+	} else {
+		s.head = st.next // removing head
+	}
+	if st.next != nil {
+		st.next.prev = st.prev
+	} else {
+		s.tail = st.prev // removing tail
+	}
+	st.prev = nil
+	st.next = nil
+}
 
-// 	// Add new element
-// 	e := &entry{key: key, value: value}
-// 	elem := fm.order.PushBack(e)
-// 	fm.data[key] = elem
-// }
+// moveToBack moves an existing state to the tail (newest position)
+func (s *states) moveToBack(st *state) {
+	if st == s.tail {
+		return // already at back
+	}
+	s.remove(st)
+	s.addToBack(st)
+}
 
 func (s *states) AddState(st state, lexicographicalOrdering bool, lexicographicalLookbackKeys int) error {
 	if !strings.HasPrefix(st.Key, s.keyPrefix) {
@@ -93,34 +109,49 @@ func (s *states) AddState(st state, lexicographicalOrdering bool, lexicographica
 		return fmt.Errorf("expected prefix %s in key %s, skipping state registering", s.keyPrefix, st.Key)
 	}
 
-	id := st.ID(lexicographicalOrdering)
+	var id string
 
 	// Update in-memory copy
 	s.statesLock.Lock()
-	// If key already exists, update value and move to back (most recent)
-	if elem, exists := s.states[id]; exists {
-		elem.Value = &st
-		s.order.MoveToBack(elem)
-	}
 
-	// If at capacity, remove the oldest (front) element
-	if len(s.states) >= lexicographicalLookbackKeys {
-		oldest := s.order.Front()
-		if oldest != nil {
-			oldestState := oldest.Value.(*state)
-			delete(s.states, oldestState.ID(lexicographicalOrdering))
-			s.order.Remove(oldest)
+	var oldest *state
+
+	if lexicographicalOrdering {
+		// maintain a doubly linked list structure for lexicographical ordering
+		// with lexicographicalLookbackKeys as capacity
+		id = st.IDWithLexicographicalOrdering()
+		// If state already exists, update it and move to back (newest position)
+		if _, exists := s.states[id]; exists {
+			s.states[id] = &st
+			s.moveToBack(&st)
 		}
+		// If at capacity, remove the oldest (front) state
+		if len(s.states) >= lexicographicalLookbackKeys {
+			oldest = s.head
+			if oldest != nil {
+				delete(s.states, oldest.IDWithLexicographicalOrdering())
+				s.remove(oldest)
+			}
+		}
+		// Add new state to the back (newest position)
+		s.addToBack(&st)
+	} else {
+		id = st.ID()
 	}
 
-	elem := s.order.PushBack(&st)
-	s.states[id] = elem
-
+	// Add new state to the in-memory copy of the states
+	s.states[id] = &st
 	s.statesLock.Unlock()
 
 	// Persist to the registry
 	s.storeLock.Lock()
 	defer s.storeLock.Unlock()
+	if oldest != nil {
+		if err := s.store.Remove(getStoreKey(oldest.IDWithLexicographicalOrdering())); err != nil {
+			return fmt.Errorf("error while removing the oldest state: %w", err)
+		}
+	}
+
 	if err := s.store.Set(getStoreKey(id), st); err != nil {
 		return err
 	}
@@ -128,7 +159,7 @@ func (s *states) AddState(st state, lexicographicalOrdering bool, lexicographica
 }
 
 func (s *states) GetOldestState() *state {
-	return s.order.Front().Value.(*state)
+	return s.head
 }
 
 // CleanUp performs state and store cleanup based on provided knownIDs.
@@ -172,8 +203,8 @@ func getStoreKey(stateID string) string {
 
 // loadS3StatesFromRegistry loads a copy of the registry states.
 // If prefix is set, entries will match the provided prefix(including empty prefix)
-func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix string) (map[string]*list.Element, error) {
-	stateTable := map[string]*list.Element{}
+func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix string, lexicographicalOrdering bool) (map[string]*state, error) {
+	stateTable := map[string]*state{}
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
 		if !strings.HasPrefix(key, awsS3ObjectStatePrefix) {
 			return true, nil
@@ -198,9 +229,34 @@ func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix 
 
 		// filter based on prefix and add entry to local copy
 		if strings.HasPrefix(st.Key, prefix) {
-			stateTable[st.ID(false)] = s.order.PushBack(&st)
+			if lexicographicalOrdering {
+				stateTable[st.IDWithLexicographicalOrdering()] = &st
+			} else {
+				stateTable[st.ID()] = &st
+			}
 		}
 		return true, nil
 	})
 	return stateTable, err
+}
+
+func (s *states) GetKeys() []string {
+	s.statesLock.Lock()
+	defer s.statesLock.Unlock()
+	keys := make([]string, 0, len(s.states))
+	for key := range s.states {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
+func (s *states) SortStatesByLexicographicalOrdering() {
+	s.statesLock.Lock()
+	defer s.statesLock.Unlock()
+	sortedKeys := slices.Sorted(maps.Keys(s.states))
+	newStates := make(map[string]*state)
+	for _, key := range sortedKeys {
+		newStates[key] = s.states[key]
+	}
+	s.states = newStates
 }

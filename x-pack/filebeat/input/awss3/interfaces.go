@@ -73,7 +73,7 @@ type s3Mover interface {
 }
 
 type s3Lister interface {
-	ListObjectsPaginator(bucket, prefix string, startAfterKey string) s3Pager
+	ListObjectsPaginator(log *logp.Logger, bucket, prefix string, startAfterKey string) s3Pager
 }
 
 type s3Pager interface {
@@ -319,13 +319,16 @@ func (a *awsS3API) clientFor(region string) *s3.Client {
 	return cli
 }
 
-func (a *awsS3API) ListObjectsPaginator(bucket, prefix string, startAfterKey string) s3Pager {
+func (a *awsS3API) ListObjectsPaginator(log *logp.Logger, bucket, prefix string, startAfterKey string) s3Pager {
 	input := &s3.ListObjectsV2Input{
 		Bucket: awssdk.String(bucket),
 		Prefix: awssdk.String(prefix),
 	}
 	if startAfterKey != "" {
 		input.StartAfter = awssdk.String(startAfterKey)
+		log.Debugf("LexicographicalOrdering is enabled, listing objects after key: %s", startAfterKey)
+	} else {
+		log.Debugf("Listing objects from the beginning")
 	}
 	pager := s3.NewListObjectsV2Paginator(a.client, input)
 

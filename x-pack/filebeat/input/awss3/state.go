@@ -27,6 +27,13 @@ type state struct {
 	// so that users upgrading from old versions aren't prevented from
 	// retrying old download failures.
 	Failed bool `json:"failed" struct:"failed"`
+
+	// prev and next are used to maintain the lexicographical ordering of the states in the registry
+	// when lexicographicalOrdering is true.
+	// prev is the previous state in the lexicographical ordering.
+	// next is the next state in the lexicographical ordering.
+	prev *state
+	next *state
 }
 
 // ID is used to identify the state in the store, and it is composed by
@@ -50,8 +57,12 @@ func newState(bucket, key, etag string, lastModified time.Time) state {
 	}
 }
 
-func (s *state) ID(lexicographicalOrdering bool) string {
-	return stateID(s.Bucket, s.Key, s.Etag, s.LastModified, lexicographicalOrdering)
+func (s *state) ID() string {
+	return stateID(s.Bucket, s.Key, s.Etag, s.LastModified, false)
+}
+
+func (s *state) IDWithLexicographicalOrdering() string {
+	return stateID(s.Bucket, s.Key, s.Etag, s.LastModified, true)
 }
 
 // IsEqual checks if the two states point to the same s3 object.
