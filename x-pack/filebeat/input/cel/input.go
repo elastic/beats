@@ -281,11 +281,16 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		runCtx, runSpan := otelTracer.Start(ctx, "cel.periodic.run")
 		defer runSpan.End()
 
-		log.Debug("Starting otel periodic")
+		runSpanCtx := runSpan.SpanContext()
+		runLog := log.With(
+			"trace.id", runSpanCtx.TraceID().String(),
+			"span.id", runSpanCtx.SpanID().String(),
+		)
+		runLog.Debug("Starting otel periodic")
 
 		metricsRecorder.StartPeriodic(runCtx)
 		defer metricsRecorder.EndPeriodic(runCtx)
-		log.Debug("process periodic request")
+		runLog.Debug("process periodic request")
 		var (
 			budget    = *cfg.MaxExecutions
 			waitUntil time.Time
@@ -322,18 +327,23 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			execCtx, execSpan := otelTracer.Start(runCtx, "cel.program.execution")
 			defer execSpan.End() // end span for early returns
+			execSpanCtx := execSpan.SpanContext()
+			execLog := log.With(
+				"trace.id", execSpanCtx.TraceID().String(),
+				"span.id", execSpanCtx.SpanID().String(),
+			)
 
 			// Process a set of event requests.
 			if trace != nil {
-				log.Debugw("previous transaction", "transaction.id", trace.TxID())
+				execLog.Debugw("previous transaction", "transaction.id", trace.TxID())
 			}
-			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
+			execLog.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			metricsRecorder.AddProgramExecution(execCtx)
 			start := i.now().In(time.UTC)
 
 			state, err = evalWith(execCtx, prg, ast, state, start, wantDump, budget-1)
 			metricsRecorder.AddCELDuration(execCtx, time.Since(start))
-			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
+			execLog.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
 				var dump dumpError
 				switch {
@@ -347,18 +357,18 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					ext := filepath.Ext(base)
 					prefix := strings.TrimSuffix(base, ext)
 					path = filepath.Join(dir, prefix+"-"+i.now().In(time.UTC).Format("2006-01-02T15-04-05.000")+ext)
-					log.Debugw("writing failure dump file", "path", path)
+					execLog.Debugw("writing failure dump file", "path", path)
 					err := dump.writeToFile(path)
 					if err != nil {
-						log.Errorw("failed to write failure dump", "path", path, "error", err)
+						execLog.Errorw("failed to write failure dump", "path", path, "error", err)
 					}
 				}
-				log.Errorw("failed evaluation", "error", err)
+				execLog.Errorw("failed evaluation", "error", err)
 				health.UpdateStatus(status.Degraded, "failed evaluation: "+err.Error())
 			}
 			isDegraded = err != nil
 			if trace != nil {
-				log.Debugw("final transaction", "transaction.id", trace.TxID())
+				execLog.Debugw("final transaction", "transaction.id", trace.TxID())
 			}
 
 			// On exit, state is expected to be in the shape:
@@ -445,7 +455,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// the lost events and potentially re-requesting e3.
 
 			var ok bool
-			ok, waitUntil, err = handleResponse(log, state, limiter)
+			ok, waitUntil, err = handleResponse(execLog, state, limiter)
 			if err != nil {
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 				return err
@@ -458,7 +468,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			_, ok = state["url"]
 			if !ok && goodURL != "" {
 				state["url"] = goodURL
-				log.Debugw("adding missing url from last valid value: state did not contain a url", "last_valid_url", goodURL)
+				execLog.Debugw("adding missing url from last valid value: state did not contain a url", "last_valid_url", goodURL)
 			}
 
 			e, ok := state["events"]
@@ -484,17 +494,17 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if _, ok := e["error"]; ok {
 					// If we have an error, log the complete object on the basis
 					// that it is ECS-conformant.
-					if log.Core().Enabled(zapcore.ErrorLevel) {
+					if execLog.Core().Enabled(zapcore.ErrorLevel) {
 						kv := make([]any, 0, 2*len(e))
 						for k := range maps.Keys(e) {
 							kv = append(kv, k, e[k])
 						}
-						log.Errorw("single event object returned by evaluation", kv...)
+						execLog.Errorw("single event object returned by evaluation", kv...)
 					}
 				} else {
 					// Otherwise, be consistent with the existing documented
 					// behaviour and log the entire object as the error.
-					log.Errorw("single event object returned by evaluation", "error", e)
+					execLog.Errorw("single event object returned by evaluation", "error", e)
 				}
 				if err, ok := e["error"]; ok {
 					health.UpdateStatus(status.Degraded, fmt.Sprintf("single event error object returned by evaluation: %s", mapstr.M{"error": err}))
@@ -526,7 +536,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				cursors, ok = c.([]interface{})
 				if ok {
 					if len(cursors) != len(events) {
-						log.Errorw("unexpected cursor list length", "cursors", len(cursors), "events", len(events))
+						execLog.Errorw("unexpected cursor list length", "cursors", len(cursors), "events", len(events))
 						health.UpdateStatus(status.Degraded, "unexpected cursor list length")
 						isDegraded = true
 						// But try to continue.
@@ -548,6 +558,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			pubCtx, pubSpan := otelTracer.Start(execCtx, "cel.program.publish")
 			defer pubSpan.End() // end span for early returns
+			pubSpanCtx := pubSpan.SpanContext()
+			pubLog := log.With(
+				"trace.id", pubSpanCtx.TraceID().String(),
+				"span.id", pubSpanCtx.SpanID().String(),
+			)
 		loop:
 			for i, e := range events {
 				event, ok := e.(map[string]interface{})
@@ -585,14 +600,14 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				switch err := pubCtx.Err(); {
 				case err == nil:
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
-					log.Infow("context cancelled with unpublished events", "unpublished", len(events)-i)
+					pubLog.Infow("context cancelled with unpublished events", "unpublished", len(events)-i)
 					// Don't update status, since we are about to pass
 					// through the Running state and then fall through
 					// to the input exit with a change to Stopped.
 					break loop
 				default:
 					// This should never happen.
-					log.Warnw("failed with unpublished events", "error", err, "unpublished", len(events)-i)
+					pubLog.Warnw("failed with unpublished events", "error", err, "unpublished", len(events)-i)
 					health.UpdateStatus(status.Degraded, "error publishing events: "+err.Error())
 					isDegraded = true
 					break loop
@@ -603,7 +618,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				}, pubCursor)
 				if err != nil {
 					hadPublicationError = true
-					log.Errorw("error publishing event", "error", err)
+					pubLog.Errorw("error publishing event", "error", err)
 					health.UpdateStatus(status.Degraded, "error publishing event: "+err.Error())
 					isDegraded = true
 					cursors = nil // We are lost, so retry with this event's cursor,
@@ -648,7 +663,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// Check we have a remaining execution budget.
 			budget--
 			if budget <= 0 {
-				log.Warnw("exceeding maximum number of CEL executions: will continue at next periodic evaluation",
+				execLog.Warnw("exceeding maximum number of CEL executions: will continue at next periodic evaluation",
 					"limit", *cfg.MaxExecutions,
 					"next_eval_time", start.Add(cfg.Interval),
 				)
