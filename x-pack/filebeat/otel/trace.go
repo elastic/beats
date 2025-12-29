@@ -1,0 +1,71 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package otel
+
+import (
+	"context"
+	"os"
+	"sync"
+
+	"go.opentelemetry.io/contrib/exporters/autoexport"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+)
+
+var (
+	tracerProviderMu sync.Mutex
+	tracerProvider   *sdktrace.TracerProvider
+)
+
+// GetGlobalTracerProvider returns an existing or new global TracerProvider
+func GetGlobalTracerProvider(ctx context.Context) (*sdktrace.TracerProvider, error) {
+	tracerProviderMu.Lock()
+	defer tracerProviderMu.Unlock()
+
+	if tracerProvider == nil {
+		tp, err := newTracerProvider(ctx)
+		if err != nil {
+			return nil, err
+		}
+		otel.SetTracerProvider(tp)
+		tracerProvider = tp
+	}
+
+	return tracerProvider, nil
+}
+
+func newTracerProvider(ctx context.Context) (*sdktrace.TracerProvider, error) {
+	// Make "none" the default exporter (rather than "oltp")
+	const otelTracesExporterKey = "OTEL_TRACES_EXPORTER"
+	if _, ok := os.LookupEnv(otelTracesExporterKey); !ok {
+		os.Setenv(otelTracesExporterKey, "none")
+	}
+
+	// New exporter based on OTEL_TRACES_EXPORTER and OTEL_EXPORTER_OTLP_PROTOCOL
+	// TODO probably switch away from autoexport later to avoid unnecessary dependencies
+	exp, err := autoexport.NewSpanExporter(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a resource with attributes from various sources
+	res, err := resource.New(
+		ctx,
+		resource.WithFromEnv(),
+		resource.WithTelemetrySDK(),
+		resource.WithHost(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	tp := sdktrace.NewTracerProvider(
+		sdktrace.WithSpanProcessor(sdktrace.NewBatchSpanProcessor(exp)),
+		sdktrace.WithResource(res),
+	)
+
+	return tp, nil
+}
