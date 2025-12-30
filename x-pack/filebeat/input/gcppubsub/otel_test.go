@@ -167,7 +167,7 @@ service:
 	optionsValue.Subscription = "test-subscription-otel"
 	require.NoError(t, template.Must(template.New("config").Parse(gcpOTelConfig)).Execute(&configBuffer, optionsValue))
 
-	oteltestcol.New(t, configBuffer.String())
+	oteltestcol.Run(t, configBuffer.String())
 
 	// reset buffer
 	configBuffer.Reset()
