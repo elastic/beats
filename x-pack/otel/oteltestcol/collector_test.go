@@ -40,7 +40,7 @@ service:
     metrics:
       level: none
 `
-	col := New(t, cfg)
+	col := Run(t, cfg)
 	require.NotNil(t, col)
 
 	require.Eventually(t, func() bool {

@@ -109,7 +109,7 @@ service:
 `
 	logFilePath := filepath.Join(tmpdir, "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
+	oteltestcol.Run(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
 
 	beatsCfgFile := `
 filebeat.inputs:
@@ -307,7 +307,7 @@ service:
 	var configBuffer bytes.Buffer
 	optionsValue.Namespace = otelNamespace
 	require.NoError(t, template.Must(template.New("config").Parse(otelConfigFile)).Execute(&configBuffer, optionsValue))
-	oteltestcol.New(t, configBuffer.String())
+	oteltestcol.Run(t, configBuffer.String())
 
 	// reset buffer
 	configBuffer.Reset()
@@ -509,7 +509,7 @@ service:
 
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 
-	oteltestcol.New(t, configBuffer.String())
+	oteltestcol.Run(t, configBuffer.String())
 
 	es := integration.GetESClient(t, "http")
 
@@ -748,7 +748,7 @@ service:
 			require.NoError(t,
 				template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, beatsConfig))
 
-			collector := oteltestcol.New(t, configBuffer.String())
+			collector := oteltestcol.Run(t, configBuffer.String())
 			writeEventsToLogFile(t, beatsConfig.InputFile, numTestEvents)
 
 			// Wait for file input to be fully read
@@ -914,7 +914,7 @@ service:
 	})
 
 	writeEventsToLogFile(t, otelConfig.InputFile, wantEvents)
-	oteltestcol.New(t, string(configContents))
+	oteltestcol.Run(t, string(configContents))
 
 	// wait for logs to be published
 	require.EventuallyWithT(t,
@@ -1018,7 +1018,7 @@ exporters:
 	})
 
 	writeEventsToLogFile(t, configParameters.InputFile, wantEvents)
-	oteltestcol.New(t, string(configContents))
+	oteltestcol.Run(t, string(configContents))
 
 	receiverConfig := `
 service:
@@ -1086,7 +1086,7 @@ exporters:
 			t.Logf("Receiver config:\n%s", receiverRenderedConfig)
 		}
 	})
-	oteltestcol.New(t, receiverRenderedConfig)
+	oteltestcol.Run(t, receiverRenderedConfig)
 
 	es := integration.GetESClient(t, "http")
 
