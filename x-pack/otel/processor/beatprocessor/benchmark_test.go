@@ -13,10 +13,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/oteltestcol"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/otelcol"
+
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/oteltestcol"
 )
 
 func BenchmarkBeatProcessor(b *testing.B) {
