@@ -13,10 +13,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/oteltestcol"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/otelcol"
+
+	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 )
 
 func BenchmarkBeatProcessor(b *testing.B) {
@@ -63,7 +64,6 @@ exporters:
 				config = strings.ReplaceAll(config, "_BEAT_PROCESSORS_", "[]")
 				config = strings.ReplaceAll(config, "_OTEL_PROCESSORS_PIPELINE_", "[]")
 				config = strings.ReplaceAll(config, "_OTEL_PROCESSORS_DEFINITION_", "{}")
-				config = strings.ReplaceAll(config, "_PATH_HOME_", b.TempDir())
 				return config
 			},
 		},
@@ -74,11 +74,9 @@ exporters:
 				config = strings.ReplaceAll(config, "_BEAT_PROCESSORS_", `
       - add_fields:
           fields:
-            custom_field: custom-value
-`)
+            custom_field: custom-value`)
 				config = strings.ReplaceAll(config, "_OTEL_PROCESSORS_PIPELINE_", "[]")
 				config = strings.ReplaceAll(config, "_OTEL_PROCESSORS_DEFINITION_", "{}")
-				config = strings.ReplaceAll(config, "_PATH_HOME_", b.TempDir())
 				return config
 			},
 		},
@@ -93,20 +91,19 @@ exporters:
     processors:
       - add_fields:
           fields:
-            custom_field: custom-value
-`)
-				config = strings.ReplaceAll(config, "_PATH_HOME_", b.TempDir())
+            custom_field: custom-value`)
 				return config
 			},
 		},
 	}
 
-	for _, numEvents := range []int{1, 10, 100} {
+	for _, numEvents := range []int{1, 100, 1000} {
 		for _, tc := range testCases {
 			testName := fmt.Sprintf("%d_Events/%s", numEvents, tc.name)
 			configTemplateWithNumEvents := strings.ReplaceAll(configTemplate, "_NUM_EVENTS_", fmt.Sprintf("%d", numEvents))
 			b.Run(testName, func(b *testing.B) {
 				config := tc.createConfig(configTemplateWithNumEvents)
+				config = strings.ReplaceAll(config, "_PATH_HOME_", b.TempDir())
 
 				for b.Loop() {
 					b.StopTimer()
@@ -119,7 +116,7 @@ exporters:
 						defer wg.Done()
 						ctx, cancel := signal.NotifyContext(b.Context(), os.Interrupt)
 						defer cancel()
-						assert.NoError(b, col.Collector.Run(ctx))
+						require.NoError(b, col.Collector.Run(ctx), "failed to run collector")
 					}()
 
 					require.Eventually(b, func() bool {
