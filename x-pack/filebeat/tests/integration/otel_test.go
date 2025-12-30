@@ -1161,3 +1161,64 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 
 	require.Equal(t, resp.StatusCode, http.StatusOK, "incorrect response code")
 }
+
+func BenchmarkFilebeatOTelCollector(b *testing.B) {
+	cfg := `receivers:
+  filebeatreceiver/1:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: 1
+  filebeatreceiver/2:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: 1
+  filebeatreceiver/3:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: 1
+  filebeatreceiver/4:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: 1
+    processors: ~
+    logging:
+      level: debug
+    queue.mem.flush.timeout: 0s
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver/1
+        - filebeatreceiver/2
+        - filebeatreceiver/3
+        - filebeatreceiver/4
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`
+
+	for b.Loop() {
+		col := oteltestcol.New(b, cfg)
+		require.NotNil(b, col)
+		require.Eventually(b, func() bool {
+			return col.ObservedLogs().
+				FilterMessageSnippet("Publish event").Len() == 4
+		}, 30*time.Second, 1*time.Millisecond, "expected all receivers to publish events")
+		col.Shutdown()
+	}
+}
