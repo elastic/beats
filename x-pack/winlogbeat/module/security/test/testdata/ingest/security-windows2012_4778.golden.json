@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-04-05T16:33:32.3888253Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "session-reconnected",
