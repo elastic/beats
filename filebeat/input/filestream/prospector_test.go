@@ -749,6 +749,23 @@ func (mu *mockMetadataUpdater) Remove(s loginp.Source) error {
 	return nil
 }
 
+func (mu *mockMetadataUpdater) IterateOnPrefix(fn func(key string, meta interface{}) bool) {
+	for key, meta := range mu.table {
+		if !fn(key, meta) {
+			return
+		}
+	}
+}
+
+func (mu *mockMetadataUpdater) UpdateKey(oldKey, newKey string, meta interface{}) error {
+	if _, ok := mu.table[oldKey]; !ok {
+		return fmt.Errorf("old key %s not found", oldKey)
+	}
+	mu.table[newKey] = meta
+	delete(mu.table, oldKey)
+	return nil
+}
+
 type mockUnpackValue struct {
 	fileMeta
 	key string
