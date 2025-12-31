@@ -63,6 +63,10 @@ func (p *paginator[T]) GetAllPages() error {
 		}
 
 		hasMorePages = false
+		if res == nil {
+			p.logger.Warnf("response is nil despite no error; cannot check for pagination")
+			return nil
+		}
 		linkHeader := res.Header().Get("Link")
 		p.logger.Debugf("link header: %s", linkHeader)
 

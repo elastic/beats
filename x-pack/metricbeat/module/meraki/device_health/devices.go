@@ -278,6 +278,9 @@ func getDeviceLicenses(client *sdk.Client, organizationID string, devices map[Se
 }
 
 func deviceDetailsToMapstr(details *sdk.ResponseItemOrganizationsGetOrganizationDevices) mapstr.M {
+	if details == nil {
+		return mapstr.M{}
+	}
 	return mapstr.M{
 		"device.serial":       details.Serial,
 		"device.address":      details.Address,
@@ -367,6 +370,9 @@ func reportDeviceMetrics(reporter mb.ReporterV2, organizationID string, devices 
 }
 
 func vpnStatusToMapStr(status *sdk.ResponseItemApplianceGetOrganizationApplianceVpnStatuses) mapstr.M {
+	if status == nil {
+		return mapstr.M{}
+	}
 	res := mapstr.M{
 		"mode": status.VpnMode,
 	}

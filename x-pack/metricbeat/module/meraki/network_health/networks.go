@@ -49,6 +49,9 @@ func reportNetworkMetrics(reporter mb.ReporterV2, organizationID string, network
 }
 
 func vpnPeerToMapStr(peer *sdk.ResponseItemApplianceGetOrganizationApplianceVpnStatsMerakiVpnpeers) mapstr.M {
+	if peer == nil {
+		return mapstr.M{}
+	}
 	res := mapstr.M{
 		"network_id":   peer.NetworkID,
 		"network_name": peer.NetworkName,
