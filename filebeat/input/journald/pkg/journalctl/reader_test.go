@@ -83,7 +83,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	}
 
 	factoryCalls := atomic.Uint32{}
-	factory := func(canceller input.Canceler, logger *logp.Logger, binary string, args ...string) (Jctl, error) {
+	factory := func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
 		factoryCalls.Add(1)
 		// Add a log to make debugging easier and better mimic the behaviour of the real factory/journalctl
 		logger.Debugf("starting new mock journalclt ID: %d", factoryCalls.Load())
@@ -162,7 +162,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 }
 
 func TestNewUsesMergeFlag(t *testing.T) {
-	f := func(_ input.Canceler, _ *logp.Logger, _ string, s ...string) (Jctl, error) {
+	f := func(_ input.Canceler, _ *logp.Logger, s ...string) (Jctl, error) {
 		return nil, nil
 	}
 	r, err := New(

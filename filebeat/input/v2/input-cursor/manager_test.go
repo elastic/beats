@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 package cursor
 
 import (
@@ -287,7 +289,6 @@ func TestManager_InputsRun(t *testing.T) {
 			IDWithoutName:   id,
 			Name:            inp.Name(),
 			Cancelation:     cancelCtx,
-			StatusReporter:  nil,
 			MetricsRegistry: monitoring.NewRegistry(),
 			Logger:          manager.Logger,
 		}
@@ -318,7 +319,6 @@ func TestManager_InputsRun(t *testing.T) {
 			IDWithoutName:   id,
 			Name:            inp.Name(),
 			Cancelation:     cancelCtx,
-			StatusReporter:  nil,
 			MetricsRegistry: monitoring.NewRegistry(),
 			Logger:          manager.Logger,
 		}
@@ -354,7 +354,6 @@ func TestManager_InputsRun(t *testing.T) {
 				IDWithoutName:   id,
 				Name:            inp.Name(),
 				Cancelation:     cancelCtx,
-				StatusReporter:  nil,
 				MetricsRegistry: monitoring.NewRegistry(),
 				Logger:          manager.Logger,
 			}
@@ -419,7 +418,6 @@ func TestManager_InputsRun(t *testing.T) {
 			IDWithoutName:   id,
 			Name:            inp.Name(),
 			Cancelation:     context.Background(),
-			StatusReporter:  nil,
 			MetricsRegistry: monitoring.NewRegistry(),
 			Logger:          log,
 		}
@@ -434,7 +432,6 @@ func TestManager_InputsRun(t *testing.T) {
 			IDWithoutName:   id,
 			Name:            inp.Name(),
 			Cancelation:     context.Background(),
-			StatusReporter:  nil,
 			MetricsRegistry: monitoring.NewRegistry(),
 			Logger:          log,
 		}
@@ -499,7 +496,6 @@ func TestManager_InputsRun(t *testing.T) {
 				IDWithoutName:   id,
 				Name:            inp.Name(),
 				Cancelation:     cancelCtx,
-				StatusReporter:  nil,
 				MetricsRegistry: monitoring.NewRegistry(),
 				Logger:          manager.Logger,
 			}

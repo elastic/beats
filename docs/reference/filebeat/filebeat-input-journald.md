@@ -15,16 +15,21 @@ The Wolfi-based Docker image does not contain the `journalctl` binary and the `j
 :::
 
 :::{important}
-When using the Journald input from a Docker container, make sure the
-`journalctl` binary in the container is compatible with your
-Systemd/journal version. To get the version of the `journalctl` binary
-in Filebeat's image run the following, adjusting the image name/tag
-according to the version that you are running:
+When using the Journald input from a Docker container, make sure that
+either:
+ - {applies_to}`stack: ga 9.3.0` [`chroot`](#filebeat-input-journald-chroot) is set.
+ - The `journalctl` binary in the container is compatible with your
+   Systemd/journal version. To get the version of the `journalctl` binary
+   in Filebeat's image run the following, adjusting the image name/tag
+   according to the version that you are running:
+   
+   
+   ```sh
+   docker run --rm -it --entrypoint "journalctl" docker.elastic.co/beats/filebeat:<VERSION> --version
+   ```
+   The container variants that contain `journalctl` are: `filebeat`,
+   `filebeat-oss` and `filebeat-ubi`.
 
-
-```sh
-docker run --rm -it --entrypoint "journalctl" docker.elastic.co/beats/filebeat-wolfi:<VERSION> --version
-```
 :::
 
 If the `journalctl` process exits unexpectedly the journald input will terminate with an error and Filebeat will need to be restarted to start reading from the journal again.
@@ -110,8 +115,36 @@ input will only ingest the journal files found when started. New
 files will not be ingested.
 :::
 
+### `chroot` [filebeat-input-journald-chroot]
+```{applies_to}
+stack: ga 9.3.0
+```
+A folder to be used as chroot when calling `journalctl`. This allows
+Filebeat to call the host's `journalctl` directly.
 
+When `chroot` is set, if
+[`journalctl_path`](#filebeat-input-journald-journalctl-path) is not
+explicitly configured, it defaults to `/usr/bin/journalctl`. If
+`journalctl_path` is explicitly set, it must be an absolute path from
+within the chroot directory.
 
+If using this option in a container, the container needs the capability
+`SYS_CHROOT` and {{filebeat}} needs to be running as root (uid 0) to
+start the chroot.
+{{filebeat}} also needs permissions to read the desired journals,
+usually being root or being added to `systemd-journal` group.
+
+### `journalctl_path` [filebeat-input-journald-journalctl-path]
+```{applies_to}
+stack: ga 9.3.0
+```
+The path for the `journalctl` binary. If not set, {{filebeat}} will
+look for `journalctl` in `PATH`. When using
+[`chroot`](#filebeat-input-journald-chroot), if `journalctl_path` is
+not explicitly set, it automatically defaults to
+`/usr/bin/journalctl`. If `journalctl_path` is explicitly set when
+`chroot` is configured, it must be an absolute path from within the
+chroot directory.
 
 
 ### `merge` [filebeat-input-journald-merge]
