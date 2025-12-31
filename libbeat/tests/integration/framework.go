@@ -170,25 +170,6 @@ func NewStandardBeat(t *testing.T, beatName, binary string, args ...string) *Bea
 	return b
 }
 
-// NewAgentBeat creates a new agentbeat process that runs the beatName as a subcommand.
-// See `NewBeat` for options and information for the parameters.
-func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
-	b := NewBeat(t, beatName, binary, args...)
-
-	// Remove the first two arguments: beatName and --systemTest
-	baseArgs := b.baseArgs[2:]
-	// Add the agentbeat argumet and re-organise the others
-	b.baseArgs = append(
-		[]string{
-			"agentbeat",
-			"--systemTest",
-			beatName,
-		},
-		baseArgs...)
-
-	return b
-}
-
 // Start starts the Beat process
 // args are extra arguments to be passed to the Beat.
 func (b *BeatProc) Start(args ...string) {
