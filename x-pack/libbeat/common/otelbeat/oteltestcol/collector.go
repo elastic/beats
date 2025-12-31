@@ -36,11 +36,12 @@ import (
 )
 
 type Collector struct {
-	collector *otelcol.Collector
-	observer  *observer.ObservedLogs
+	Collector *otelcol.Collector
+	AllLogs   *zaptest.Buffer
+	Observer  *observer.ObservedLogs
 }
 
-// New creates and starts a new OTel collector for testing.
+// New creates a new OTel collector for testing without starting it.
 func New(tb testing.TB, configYAML string) *Collector {
 	tb.Helper()
 
@@ -53,7 +54,7 @@ func New(tb testing.TB, configYAML string) *Collector {
 		tb.Fatalf("failed to create collector: %v", err)
 	}
 
-	var zapBuf zaptest.Buffer
+	zapBuf := zaptest.Buffer{}
 	zapCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		&zapBuf,
@@ -66,13 +67,23 @@ func New(tb testing.TB, configYAML string) *Collector {
 	col, err := otelcol.NewCollector(settings)
 	require.NoError(tb, err)
 
+	return &Collector{Collector: col, Observer: observer, AllLogs: &zapBuf}
+}
+
+// Run creates and starts a new OTel collector for testing.
+// The instance will be automatically shutdown when the test ends.
+func Run(tb testing.TB, configYAML string) *Collector {
+	tb.Helper()
+
+	col := New(tb, configYAML)
+
 	var wg sync.WaitGroup
 	tb.Cleanup(func() {
-		col.Shutdown()
+		col.Collector.Shutdown()
 		wg.Wait()
 
 		if tb.Failed() {
-			tb.Log("OTel Collector logs:\n" + zapBuf.String())
+			tb.Log("OTel Collector logs:\n" + col.AllLogs.String())
 		}
 	})
 
@@ -81,18 +92,18 @@ func New(tb testing.TB, configYAML string) *Collector {
 		defer wg.Done()
 		ctx, cancel := signal.NotifyContext(tb.Context(), os.Interrupt)
 		defer cancel()
-		assert.NoError(tb, col.Run(ctx))
+		assert.NoError(tb, col.Collector.Run(ctx))
 	}()
 
 	require.Eventually(tb, func() bool {
-		return col.GetState() == otelcol.StateRunning
+		return col.Collector.GetState() == otelcol.StateRunning
 	}, 10*time.Second, 10*time.Millisecond, "Collector did not start in time")
 
-	return &Collector{collector: col, observer: observer}
+	return col
 }
 
 func (c *Collector) ObservedLogs() *observer.ObservedLogs {
-	return c.observer
+	return c.Observer
 }
 
 func getComponent() (otelcol.Factories, error) {

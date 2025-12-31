@@ -131,7 +131,7 @@ service:
 `, inputFilePath, testCaseName, tmpdir)
 
 	// Start OTel collector with filebeatreceiver
-	oteltestcol.New(t, otelConfig)
+	oteltestcol.Run(t, otelConfig)
 
 	// start filebeat
 	filebeat := integration.NewBeat(
@@ -237,7 +237,7 @@ service:
 `, inputFilePath, testCaseName, tmpdir)
 
 	// Start OTel collector with filebeatreceiver
-	oteltestcol.New(t, otelConfig)
+	oteltestcol.Run(t, otelConfig)
 
 	// Nginx endpoint URLs
 	baseURL := "http://localhost:8082"

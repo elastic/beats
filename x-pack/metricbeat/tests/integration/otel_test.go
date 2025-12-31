@@ -120,7 +120,7 @@ service:
 		}
 	})
 
-	oteltestcol.New(t, configBuffer.String())
+	oteltestcol.Run(t, configBuffer.String())
 
 	beatsCfgFile := `
 metricbeat:
@@ -342,7 +342,7 @@ service:
 		}
 	})
 
-	oteltestcol.New(t, string(configContents))
+	oteltestcol.Run(t, string(configContents))
 
 	var r0Docs, r1Docs estools.Documents
 	var err error
