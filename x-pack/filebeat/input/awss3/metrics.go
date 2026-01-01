@@ -74,6 +74,7 @@ type inputMetrics struct {
 	s3EventsPerObject       metrics.Sample   // Histogram of events in an individual S3 object
 	s3PollingRunTime        metrics.Sample   // Histogram of the elapsed time for each S3 polling run in nanoseconds.
 	s3PollingRunTimeTotal   *monitoring.Uint // Cumulative time spent in S3 polling runs in nanoseconds.
+	s3ObjectsListedPerRun   metrics.Sample   // Histogram of the number of S3 objects listed in each polling run.
 }
 
 // Close cancels the context and removes the metrics from the registry.
@@ -178,6 +179,7 @@ func newInputMetrics(reg *monitoring.Registry, maxWorkers int, logger *logp.Logg
 		s3EventsPerObject:                   metrics.NewUniformSample(1024),
 		s3PollingRunTime:                    metrics.NewUniformSample(1024),
 		s3PollingRunTimeTotal:               monitoring.NewUint(reg, "s3_polling_run_time_total"),
+		s3ObjectsListedPerRun:               metrics.NewUniformSample(1024),
 	}
 
 	// Initializing the sqs_messages_waiting_gauge value to -1 so that we can distinguish between no messages waiting (0) and never collected / error collecting (-1).
@@ -195,6 +197,8 @@ func newInputMetrics(reg *monitoring.Registry, maxWorkers int, logger *logp.Logg
 		Register("histogram", metrics.NewHistogram(out.s3EventsPerObject)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	adapter.NewGoMetrics(reg, "s3_polling_run_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3PollingRunTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "s3_objects_listed_per_run", logger, adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.s3ObjectsListedPerRun)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	if maxWorkers > 0 {
 		// Periodically update the sqs worker utilization metric.

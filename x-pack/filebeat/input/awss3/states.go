@@ -121,26 +121,31 @@ func (s *states) AddState(st state, lexicographicalOrdering bool, lexicographica
 		// with lexicographicalLookbackKeys as capacity
 		id = st.IDWithLexicographicalOrdering()
 		// If state already exists, update it and move to back (newest position)
-		if _, exists := s.states[id]; exists {
-			s.states[id] = &st
-			s.moveToBack(&st)
-		}
-		// If at capacity, remove the oldest (front) state
-		if len(s.states) >= lexicographicalLookbackKeys {
-			oldest = s.head
-			if oldest != nil {
-				delete(s.states, oldest.IDWithLexicographicalOrdering())
-				s.remove(oldest)
+		if existing, exists := s.states[id]; exists {
+			// Update the existing state's fields
+			existing.Stored = st.Stored
+			existing.Failed = st.Failed
+			s.moveToBack(existing)
+		} else {
+			// New state: check capacity and add to back
+			// If at capacity, remove the oldest (front) state
+			if len(s.states) >= lexicographicalLookbackKeys {
+				oldest = s.head
+				if oldest != nil {
+					delete(s.states, oldest.IDWithLexicographicalOrdering())
+					s.remove(oldest)
+				}
 			}
+			// Add new state to the back (newest position)
+			s.states[id] = &st
+			s.addToBack(&st)
 		}
-		// Add new state to the back (newest position)
-		s.addToBack(&st)
 	} else {
 		id = st.ID()
+		// Add new state to the in-memory copy of the states
+		s.states[id] = &st
 	}
 
-	// Add new state to the in-memory copy of the states
-	s.states[id] = &st
 	s.statesLock.Unlock()
 
 	// Persist to the registry
@@ -241,22 +246,35 @@ func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix 
 }
 
 func (s *states) GetKeys() []string {
-	s.statesLock.Lock()
-	defer s.statesLock.Unlock()
-	keys := make([]string, 0, len(s.states))
-	for key := range s.states {
-		keys = append(keys, key)
-	}
-	return keys
+	return slices.Collect(maps.Keys(s.states))
 }
 
-func (s *states) SortStatesByLexicographicalOrdering() {
-	s.statesLock.Lock()
-	defer s.statesLock.Unlock()
-	sortedKeys := slices.Sorted(maps.Keys(s.states))
-	newStates := make(map[string]*state)
-	for _, key := range sortedKeys {
-		newStates[key] = s.states[key]
+func (s *states) SortStatesByLexicographicalOrdering(log *logp.Logger) {
+	// s.statesLock.Lock()
+	// defer s.statesLock.Unlock()
+
+	if len(s.states) == 0 {
+		return
 	}
-	s.states = newStates
+
+	log.Debugf("Before sorting states by lexicographical ordering - len(s.states): %d, s.head: %v, s.tail: %v, s.states.keys: %v", len(s.states), s.head, s.tail, s.GetKeys())
+	sortedKeys := slices.Sorted(maps.Keys(s.states))
+
+	// Rebuild the doubly linked list in sorted order
+	var prev *state
+	for i, key := range sortedKeys {
+		st := s.states[key]
+		st.prev = prev
+		st.next = nil
+		if prev != nil {
+			prev.next = st
+		}
+		if i == 0 {
+			s.head = st
+		}
+		prev = st
+	}
+	s.tail = prev
+
+	log.Debugf("Sorted states by lexicographical ordering - len(s.states): %d, s.head: %v, s.tail: %v, s.states.keys: %v", len(s.states), s.head, s.tail, sortedKeys)
 }
