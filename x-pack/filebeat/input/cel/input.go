@@ -366,7 +366,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				switch {
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
 					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+					runSpan.RecordError(err)
 					runSpan.SetStatus(codes.Error, err.Error())
+					execSpan.RecordError(err)
 					execSpan.SetStatus(codes.Error, err.Error())
 					execSpan.End()
 					return err
@@ -478,8 +480,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			ok, waitUntil, err = handleResponse(execLog, state, limiter)
 			if err != nil {
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+				execSpan.RecordError(err)
 				execSpan.SetStatus(codes.Error, err.Error())
 				execSpan.End()
+				runSpan.RecordError(err)
 				runSpan.SetStatus(codes.Error, err.Error())
 				return err
 			}
@@ -497,8 +501,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			e, ok := state["events"]
 			if !ok {
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+				execSpan.RecordError(err)
 				execSpan.SetStatus(codes.Error, err.Error())
 				execSpan.End()
+				runSpan.RecordError(err)
 				runSpan.SetStatus(codes.Error, err.Error())
 				return errors.New("unexpected missing events array from evaluation")
 			}
@@ -548,8 +554,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			default:
 				err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+				execSpan.RecordError(err)
 				execSpan.SetStatus(codes.Error, err.Error())
 				execSpan.End()
+				runSpan.RecordError(err)
 				runSpan.SetStatus(codes.Error, err.Error())
 				return err
 			}
@@ -605,10 +613,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				event, ok := e.(map[string]interface{})
 				if !ok {
 					err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+					pubSpan.RecordError(err)
 					pubSpan.SetStatus(codes.Error, err.Error())
 					pubSpan.End()
+					execSpan.RecordError(err)
 					execSpan.SetStatus(codes.Error, err.Error())
 					execSpan.End()
+					runSpan.RecordError(err)
 					runSpan.SetStatus(codes.Error, err.Error())
 					return err
 				}
@@ -623,10 +634,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 							if !ok {
 								err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
 								metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
+								pubSpan.RecordError(err)
 								pubSpan.SetStatus(codes.Error, err.Error())
 								pubSpan.End()
+								execSpan.RecordError(err)
 								execSpan.SetStatus(codes.Error, err.Error())
 								execSpan.End()
+								runSpan.RecordError(err)
 								runSpan.SetStatus(codes.Error, err.Error())
 								return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
 							}
@@ -638,8 +652,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 						if !ok {
 							err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
 							metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
+							pubSpan.RecordError(err)
 							pubSpan.SetStatus(codes.Error, err.Error())
 							pubSpan.End()
+							runSpan.RecordError(err)
 							runSpan.SetStatus(codes.Error, err.Error())
 							return err
 						}
@@ -674,6 +690,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					pubLog.Errorw("error publishing event", "error", err)
 					msg := "error publishing event: " + err.Error()
 					health.UpdateStatus(status.Degraded, msg)
+					pubSpan.RecordError(err)
 					pubSpan.SetStatus(codes.Error, msg)
 					isDegraded = true
 					cursors = nil // We are lost, so retry with this event's cursor,
@@ -692,10 +709,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				err = pubCtx.Err()
 				if err != nil {
 					metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
+					pubSpan.RecordError(err)
 					pubSpan.SetStatus(codes.Error, err.Error())
 					pubSpan.End()
+					execSpan.RecordError(err)
 					execSpan.SetStatus(codes.Error, err.Error())
 					execSpan.End()
+					runSpan.RecordError(err)
 					runSpan.SetStatus(codes.Error, err.Error())
 					return err
 				}
