@@ -179,11 +179,59 @@ ingest new log data.
 
 The following are examples of configurations for ingesting rotated log files:
 
-:::::{tab-set}
-
-::::{tab-item} Single input
+### Single input
 
 Use a single [filestream](/reference/filebeat/filebeat-input-filestream.md) input to ingest all container logs.
+
+::::{applies-switch}
+:group: log-rotation
+
+:::{applies-item} stack: ga 9.3
+
+```yaml
+    filebeat.inputs:
+       - type: filestream
+         id: kubernetes-container-logs
+         compression: auto <1>
+         parsers:
+            - container: ~
+         paths:
+            - /var/log/pods/*/*/*.log* <2>
+         prospector:
+            scanner:
+               fingerprint.enabled: true
+         file_identity.fingerprint: ~
+         processors:
+            - add_kubernetes_metadata:
+                 host: ${NODE_NAME}
+                 default_indexers.enabled: false
+                 default_matchers.enabled: false
+                 indexers:
+                    - pod_uid:
+                 matchers:
+                    - logs_path:
+                         logs_path: "/var/log/pods/" <3>
+                         resource_type: "pod" <3>
+```
+
+1. {applies_to}`stack: ga 9.3.0` Enable gzip detection and decompression. Refer to [Reading GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
+
+2. `/var/log/pods/` contains the active log files as well as the rotated log files.
+
+3. `add_kubernetes_metadata` needs to be configured to match pod metadata based
+   on the new path, `/var/log/pods/`.
+
+:::{note}
+With this configuration, [add_kubernetes_metadata](/reference/filebeat/add-kubernetes-metadata.md#_logs_path)
+adds pod metadata, which does not include
+container data (such as `kubernetes.container.name`). If you need container
+metadata, you must consider using autodiscover instead. Refer to the
+[autodiscover documentation](/reference/filebeat/configuration-autodiscover.md#_kubernetes) for details.
+:::
+
+:::
+
+:::{applies-item} stack: beta 9.2
 
 ```yaml
     filebeat.inputs:
@@ -211,12 +259,12 @@ Use a single [filestream](/reference/filebeat/filebeat-input-filestream.md) inpu
                          resource_type: "pod" <3>
 ```
 
-1. {applies_to}`stack: beta 9.2.0` Enable gzip decompression. Refer to [Reading GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
+1. {applies_to}`stack: beta 9.2.0, removed 9.3.0` Enable gzip decompression. Refer to [Reading GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
 
 2. `/var/log/pods/` contains the active log files as well as the rotated log files.
 
 3. `add_kubernetes_metadata` needs to be configured to match pod metadata based
-on the new path, `/var/log/pods/`.
+   on the new path, `/var/log/pods/`.
 
 :::{note}
 With this configuration, [add_kubernetes_metadata](/reference/filebeat/add-kubernetes-metadata.md#_logs_path)
@@ -226,37 +274,69 @@ metadata, you must consider using autodiscover instead. Refer to the
 [autodiscover documentation](/reference/filebeat/configuration-autodiscover.md#_kubernetes) for details.
 :::
 
+:::
+
 ::::
 
-::::{tab-item} One input per container
+### One input per container
 
-Use [autodiscover](//reference/filebeat/configuration-autodiscover.md#_kubernetes) to generate a 
-[filestream](/reference/filebeat/filebeat-input-filestream.md) input per 
+Use [autodiscover](//reference/filebeat/configuration-autodiscover.md#_kubernetes) to generate a
+[filestream](/reference/filebeat/filebeat-input-filestream.md) input per
 container.
+
+::::{applies-switch}
+:group: log-rotation
+
+:::{applies-item} stack: ga 9.3
 
 ```yaml
      filebeat.autodiscover:
-            id: kubernetes-container-logs-${data.kubernetes.pod.uid}-${data.kubernetes.container.name}
-            gzip_experimental: true <1>
-            paths:
-              - /var/log/pods/${data.kubernetes.namespace}_${data.kubernetes.pod.name}_${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log* <2>
+        id: kubernetes-container-logs-${data.kubernetes.pod.uid}-${data.kubernetes.container.name}
+        compression: auto <1>
+        paths:
+          - /var/log/pods/${data.kubernetes.namespace}_${data.kubernetes.pod.name}_${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log* <2>
 
-            parsers:
-            - container: ~
-            prospector:
-             scanner:
-               fingerprint.enabled: true
-            file_identity.fingerprint: ~
+        parsers:
+          - container: ~
+        prospector:
+          scanner:
+            fingerprint.enabled: true
+        file_identity.fingerprint: ~
 ```
 
-1. {applies_to}`stack: beta 9.2.0` Enable gzip decompression. Refer to [Reading GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
+1. {applies_to}`stack: ga 9.3.0` Enable gzip detection and decompression. Refer to [Reading GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
 
 2. `/var/log/pods/` contains the active log files as well as the rotated log files.
-The input is configured to only read logs from the container it's for.
+   The input is configured to only read logs from the container it's for.
+
+:::
+
+:::{applies-item} stack: beta 9.2
+
+```yaml
+     filebeat.autodiscover:
+        id: kubernetes-container-logs-${data.kubernetes.pod.uid}-${data.kubernetes.container.name}
+        gzip_experimental: true <1>
+        paths:
+          - /var/log/pods/${data.kubernetes.namespace}_${data.kubernetes.pod.name}_${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log* <2>
+
+        parsers:
+          - container: ~
+        prospector:
+          scanner:
+            fingerprint.enabled: true
+        file_identity.fingerprint: ~
+```
+
+1. {applies_to}`stack: beta 9.2.0, removed 9.3.0` Enable gzip decompression. Refer to [Reading GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
+
+2. `/var/log/pods/` contains the active log files as well as the rotated log files.
+   The input is configured to only read logs from the container it's for.
+
+:::
 
 ::::
 
-:::::
 
 ## Load {{kib}} dashboards [_load_kib_dashboards]
 
@@ -388,5 +468,3 @@ For the example we're using:
       co.elastic.logs.json-logging/json.add_error_key: "true"
       co.elastic.logs.json-logging/json.message_key: "message"
     ```
-
-

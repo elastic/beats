@@ -27,8 +27,10 @@ ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override listeners=INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094,SASL_SSL://0.0.0.0:9093 \
     --override advertised.listeners=INSIDE://${KAFKA_ADVERTISED_HOST}:9092,OUTSIDE://localhost:9094,SASL_SSL://localhost:9093 \
     --override inter.broker.listener.name=INSIDE \
-    --override sasl.enabled.mechanisms=SCRAM-SHA-512 \
+    --override sasl.enabled.mechanisms=SCRAM-SHA-512,SCRAM-SHA-256,PLAIN \
     --override listener.name.sasl_ssl.scram-sha-512.sasl.jaas.config="org.apache.kafka.common.security.scram.ScramLoginModule required;" \
+    --override listener.name.sasl_ssl.scram-sha-256.sasl.jaas.config="org.apache.kafka.common.security.scram.ScramLoginModule required;" \
+    --override listener.name.sasl_ssl.plain.sasl.jaas.config="org.apache.kafka.common.security.plain.PlainLoginModule required user_beats=\"KafkaTest\";" \
     --override logs.dir=${KAFKA_LOGS_DIR} \
     --override log4j.logger.kafka=DEBUG,kafkaAppender \
     --override log.flush.interval.ms=200 \
@@ -46,6 +48,12 @@ echo "Kafka load status code $?"
 /kafka/bin/kafka-configs.sh \
 	--bootstrap-server localhost:9092 \
 	--alter --add-config 'SCRAM-SHA-512=[password=KafkaTest]' \
+	--entity-type users \
+	--entity-name beats
+
+/kafka/bin/kafka-configs.sh \
+	--bootstrap-server localhost:9092 \
+	--alter --add-config 'SCRAM-SHA-256=[password=KafkaTest]' \
 	--entity-type users \
 	--entity-name beats
 

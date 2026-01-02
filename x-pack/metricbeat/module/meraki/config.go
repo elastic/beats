@@ -10,19 +10,21 @@ import (
 )
 
 type config struct {
-	BaseURL       string        `config:"apiBaseURL"`
-	ApiKey        string        `config:"apiKey"`
-	DebugMode     string        `config:"apiDebugMode"`
-	Organizations []string      `config:"organizations"`
-	Period        time.Duration `config:"period"`
+	BaseURL            string        `config:"apiBaseURL"`
+	ApiKey             string        `config:"apiKey"`
+	DebugMode          string        `config:"apiDebugMode"`
+	Organizations      []string      `config:"organizations"`
+	Period             time.Duration `config:"period"`
+	SwitchportStatuses []string      `config:"switchport_statuses"`
 	// todo: device/network filtering?
 }
 
 func DefaultConfig() *config {
 	return &config{
-		BaseURL:   "https://api.meraki.com",
-		DebugMode: "false",
-		Period:    time.Second * 300,
+		BaseURL:            "https://api.meraki.com",
+		DebugMode:          "false",
+		Period:             time.Second * 300,
+		SwitchportStatuses: []string{"connected"},
 	}
 }
 
