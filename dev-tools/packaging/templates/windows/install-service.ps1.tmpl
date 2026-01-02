@@ -46,7 +46,20 @@ If ($ForceLegacyPath -eq $True) {
 } elseif (Test-Path $LegacyDataPath) {
     Write-Output "Files found at $LegacyDataPath, moving them to $BasePath"
   Try {
-    Move-Item $LegacyDataPath $BasePath -ErrorAction Stop
+    $BeatPath = "$BasePath\{{.BeatName | title}}"
+    if (-not (Test-Path $BeatPath)) {
+      New-Item -ItemType Directory -Path $BeatPath -ErrorAction Stop | Out-Null
+    }
+
+    Get-ChildItem -Path $LegacyDataPath -Force | ForEach-Object {
+      $dest = Join-Path $BeatPath $_.Name
+      if (Test-Path $dest) {
+          Remove-Item $dest -Recurse -Force -ErrorAction Stop
+      }
+      Move-Item $_.FullName $BeatPath -ErrorAction Stop
+    }
+    Remove-Item $LegacyDataPath -Recurse -Force -ErrorAction Stop
+    Write-Output "Successfully moved $LegacyDataPath to $BasePath"
   } Catch {
     Write-Output "Could not move $LegacyDataPath to $BasePath"
     Write-Output "make sure the folder can be moved or set -ForceLegacyPath"
