@@ -13,7 +13,7 @@ kind: enhancement
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Add the subexpiry field to the Redis INFO Keyspace (Redis ≥ 7.x)
+summary: Add the subexpiry field to the Redis INFO Keyspace (Redis ≥ 7.4)
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
