@@ -594,6 +594,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			pubCtx, pubSpan := otelTracer.Start(execCtx, "cel.program.publish")
 			pubSpanCtx := pubSpan.SpanContext()
+			pubSpanEventCount := 0
+			pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount)) // to be overridden if there are events
 			pubLog := log.With(
 				"trace.id", pubSpanCtx.TraceID().String(),
 				"span.id", pubSpanCtx.SpanID().String(),
@@ -684,6 +686,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					metricsRecorder.AddPublishedBatch(pubCtx, 1)
 				}
 				metricsRecorder.AddPublishedEvents(pubCtx, 1)
+				pubSpanEventCount++
+				pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount))
 
 				err = pubCtx.Err()
 				if err != nil {
