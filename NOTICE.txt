@@ -1,5 +1,5 @@
 Elastic Agent Libraries
-Copyright 2022-2025 Elasticsearch BV
+Copyright 2022-2026 Elasticsearch BV
 
 This product includes software developed by The Apache Software
 Foundation (http://www.apache.org/).
