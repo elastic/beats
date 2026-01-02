@@ -342,11 +342,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			execSpanEventCount := 0
 			execCtx, execSpan := otelTracer.Start(runCtx, "cel.program.execution")
 			execSpan.SetAttributes(attribute.Int("cel.program.execution_number", runSpanExecutionCount))
-			// end span for early returns
-			defer func() {
-				execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
-				execSpan.End()
-			}()
 			execSpanCtx := execSpan.SpanContext()
 			execLog := log.With(
 				"trace.id", execSpanCtx.TraceID().String(),
@@ -370,6 +365,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
 					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 					runSpan.SetAttributes(attribute.Bool("cel.periodic.success", false))
+					execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
+					execSpan.End()
 					return err
 				case errors.As(err, &dump):
 					path := strings.ReplaceAll(cfg.FailureDump.Filename, "*", sanitizeFileName(env.IDWithoutName))
@@ -480,6 +477,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			if err != nil {
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 				runSpan.SetAttributes(attribute.Bool("cel.periodic.success", false))
+				execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
+				execSpan.End()
 				return err
 			}
 			if !ok {
@@ -497,6 +496,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			if !ok {
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 				runSpan.SetAttributes(attribute.Bool("cel.periodic.success", false))
+				execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
+				execSpan.End()
 				return errors.New("unexpected missing events array from evaluation")
 			}
 			var events []interface{}
@@ -505,6 +506,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if len(e) == 0 {
 					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 					metricsRecorder.AddProgramSuccessExecution(execCtx)
+					execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
+					execSpan.End()
 					return nil
 				}
 				events = e
@@ -512,6 +515,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if e == nil {
 					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 					metricsRecorder.AddProgramSuccessExecution(execCtx)
+					execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
+					execSpan.End()
 					return nil
 				}
 				if _, ok := e["error"]; ok {
@@ -541,6 +546,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			default:
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 				runSpan.SetAttributes(attribute.Bool("cel.periodic.success", false))
+				execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
+				execSpan.End()
 				return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 			}
 
@@ -583,7 +590,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			var hadPublicationError bool
 
 			pubCtx, pubSpan := otelTracer.Start(execCtx, "cel.program.publish")
-			defer pubSpan.End() // end span for early returns
 			pubSpanCtx := pubSpan.SpanContext()
 			pubLog := log.With(
 				"trace.id", pubSpanCtx.TraceID().String(),
@@ -594,6 +600,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				event, ok := e.(map[string]interface{})
 				if !ok {
 					runSpan.SetAttributes(attribute.Bool("cel.periodic.success", false))
+					execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
+					execSpan.End()
+					pubSpan.End()
 					return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 				}
 				var pubCursor interface{}
@@ -607,6 +616,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 							if !ok {
 								metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 								runSpan.SetAttributes(attribute.Bool("cel.periodic.success", false))
+								execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
+								execSpan.End()
+								pubSpan.End()
 								return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
 							}
 							pubCursor = cursor
@@ -617,6 +629,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 						if !ok {
 							metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 							runSpan.SetAttributes(attribute.Bool("cel.periodic.success", false))
+							pubSpan.End()
 							return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
 						}
 						pubCursor = cursor
@@ -665,6 +678,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if err != nil {
 					metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 					runSpan.SetAttributes(attribute.Bool("cel.periodic.success", false))
+					execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
+					execSpan.End()
+					pubSpan.End()
 					return err
 				}
 			}
@@ -687,6 +703,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			state["cursor"] = goodCursor
 			metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 			if more, _ := state["want_more"].(bool); !more {
+				execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
+				execSpan.End()
+				pubSpan.End()
 				return nil
 			}
 
@@ -699,6 +718,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				)
 				health.UpdateStatus(status.Degraded, "exceeding maximum number of CEL executions")
 				runSpan.SetAttributes(attribute.Bool("cel.periodic.max_execution_limited", true))
+				execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
+				execSpan.End()
+				pubSpan.End()
 				return nil
 			}
 
