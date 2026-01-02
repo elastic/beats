@@ -28,7 +28,7 @@ func GetInfo(m *elasticsearch.MetricSet) (*utils.ClusterInfo, error) {
 		return nil, &utils.ClusterInfoError{Message: "cluster ID is unset, which means the cluster is not ready"}
 	}
 
-	// because different metricsets can call this function, we need to check the version only once
+	// Because different metricsets can call this function, we need to check the version only once
 	if !isVersionChecked {
 		// for some reason log.Fatal() isn't working properly so we need to handle the error in a goroutine
 		errChan := make(chan error)
