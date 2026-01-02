@@ -78,7 +78,7 @@ func (in *s3PollerInput) Run(
 	var err error
 
 	// Load the persistent S3 polling state.
-	in.states, err = newStates(in.log, in.store, in.config.BucketListPrefix, in.config.LexicographicalOrdering)
+	in.states, err = newStates(in.log, in.store, in.config.BucketListPrefix, in.config.LexicographicalOrdering, in.config.LexicographicalLookbackKeys)
 	if err != nil {
 		err = fmt.Errorf("can not start persistent store: %w", err)
 		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failure: %s", err.Error()))
@@ -125,7 +125,7 @@ func (in *s3PollerInput) run(ctx context.Context) {
 
 		// Sort in.states.states by lexicographical ordering
 		if in.config.LexicographicalOrdering {
-			in.states.SortStatesByLexicographicalOrdering(in.log)
+			in.states.SortStatesByLexicographicalOrdering(in.log, in.config.LexicographicalLookbackKeys)
 		}
 		// in.states.statesLock.Unlock()
 
@@ -172,7 +172,7 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 	}
 
 	// Perform state cleanup operation
-	err := in.states.CleanUp(ids)
+	err := in.states.CleanUp(ids, in.config.LexicographicalOrdering)
 	if err != nil {
 		in.log.Errorf("failed to cleanup states: %v", err.Error())
 		in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Input state cleanup failure: %s", err.Error()))

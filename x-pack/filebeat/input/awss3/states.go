@@ -37,7 +37,7 @@ type states struct {
 }
 
 // newStates generates a new states registry.
-func newStates(log *logp.Logger, stateStore statestore.States, listPrefix string, lexicographicalOrdering bool) (*states, error) {
+func newStates(log *logp.Logger, stateStore statestore.States, listPrefix string, lexicographicalOrdering bool, lexicographicalLookbackKeys int) (*states, error) {
 	store, err := stateStore.StoreFor("")
 	if err != nil {
 		return nil, fmt.Errorf("can't access persistent store: %w", err)
@@ -48,11 +48,19 @@ func newStates(log *logp.Logger, stateStore statestore.States, listPrefix string
 		return nil, fmt.Errorf("loading S3 input state: %w", err)
 	}
 
-	return &states{
+	s := &states{
 		store:     store,
 		states:    stateTable,
 		keyPrefix: listPrefix,
-	}, nil
+	}
+
+	// If lexicographical ordering is enabled, trim the loaded states to capacity
+	// and build the linked list structure
+	if lexicographicalOrdering && len(stateTable) > 0 {
+		s.trimAndBuildLinkedList(log, lexicographicalLookbackKeys)
+	}
+
+	return s, nil
 }
 
 func (s *states) IsProcessed(id string) bool {
@@ -102,6 +110,22 @@ func (s *states) moveToBack(st *state) {
 	s.addToBack(st)
 }
 
+// findLexicographicallyOldest finds the state with the smallest key lexicographically.
+// This is used during eviction to ensure we always remove the oldest key, not just
+// the first inserted one. Assumes statesLock is held by the caller.
+func (s *states) findLexicographicallyOldest() *state {
+	if len(s.states) == 0 {
+		return nil
+	}
+	var oldest *state
+	for _, st := range s.states {
+		if oldest == nil || st.IDWithLexicographicalOrdering() < oldest.IDWithLexicographicalOrdering() {
+			oldest = st
+		}
+	}
+	return oldest
+}
+
 func (s *states) AddState(st state, lexicographicalOrdering bool, lexicographicalLookbackKeys int) error {
 	if !strings.HasPrefix(st.Key, s.keyPrefix) {
 		// Note - This failure should not happen since we create a dedicated state instance per input.
@@ -128,9 +152,9 @@ func (s *states) AddState(st state, lexicographicalOrdering bool, lexicographica
 			s.moveToBack(existing)
 		} else {
 			// New state: check capacity and add to back
-			// If at capacity, remove the oldest (front) state
+			// If at capacity, find and remove the lexicographically oldest state
 			if len(s.states) >= lexicographicalLookbackKeys {
-				oldest = s.head
+				oldest = s.findLexicographicallyOldest()
 				if oldest != nil {
 					delete(s.states, oldest.IDWithLexicographicalOrdering())
 					s.remove(oldest)
@@ -170,7 +194,9 @@ func (s *states) GetOldestState() *state {
 // CleanUp performs state and store cleanup based on provided knownIDs.
 // knownIDs must contain valid currently tracked state IDs that must be known by this state registry.
 // State and underlying storage will be cleaned if ID is no longer present in knownIDs set.
-func (s *states) CleanUp(knownIDs []string) error {
+// When lexicographicalOrdering is enabled, at least one state (the lexicographically newest)
+// is always preserved to ensure startAfterKey can be used for subsequent S3 listings.
+func (s *states) CleanUp(knownIDs []string, lexicographicalOrdering bool) error {
 	knownIDHashSet := map[string]struct{}{}
 	for _, id := range knownIDs {
 		knownIDHashSet[id] = struct{}{}
@@ -181,14 +207,38 @@ func (s *states) CleanUp(knownIDs []string) error {
 	s.statesLock.Lock()
 	defer s.statesLock.Unlock()
 
+	// Collect IDs to remove (can't modify map while iterating)
+	var idsToRemove []string
 	for id := range s.states {
 		if _, contains := knownIDHashSet[id]; !contains {
-			// remove from sate & store as ID is no longer seen in known ID set
-			delete(s.states, id)
-			err := s.store.Remove(getStoreKey(id))
-			if err != nil {
-				return fmt.Errorf("error while removing the state for ID %s: %w", id, err)
-			}
+			idsToRemove = append(idsToRemove, id)
+		}
+	}
+
+	if len(idsToRemove) == 0 {
+		return nil
+	}
+
+	// For lexicographical ordering, preserve the newest state for startAfterKey
+	if lexicographicalOrdering {
+		slices.Sort(idsToRemove)
+		// Keep the lexicographically newest, and ensure at least one state remains
+		newestIdx := len(idsToRemove) - 1
+		if len(s.states)-len(idsToRemove) < 1 {
+			// Would remove all states, so keep the newest one
+			idsToRemove = idsToRemove[:newestIdx]
+		}
+	}
+
+	// Remove the states
+	for _, id := range idsToRemove {
+		st := s.states[id]
+		if lexicographicalOrdering {
+			s.remove(st) // Remove from linked list
+		}
+		delete(s.states, id)
+		if err := s.store.Remove(getStoreKey(id)); err != nil {
+			return fmt.Errorf("error while removing the state for ID %s: %w", id, err)
 		}
 	}
 
@@ -249,18 +299,51 @@ func (s *states) GetKeys() []string {
 	return slices.Collect(maps.Keys(s.states))
 }
 
-func (s *states) SortStatesByLexicographicalOrdering(log *logp.Logger) {
-	// s.statesLock.Lock()
-	// defer s.statesLock.Unlock()
+// GetKeysLocked returns the keys without acquiring the lock (caller must hold statesLock)
+func (s *states) GetKeysLocked() []string {
+	return slices.Collect(maps.Keys(s.states))
+}
+
+func (s *states) SortStatesByLexicographicalOrdering(log *logp.Logger, lexicographicalLookbackKeys int) {
+	s.statesLock.Lock()
+	defer s.statesLock.Unlock()
 
 	if len(s.states) == 0 {
 		return
 	}
 
-	log.Debugf("Before sorting states by lexicographical ordering - len(s.states): %d, s.head: %v, s.tail: %v, s.states.keys: %v", len(s.states), s.head, s.tail, s.GetKeys())
+	log.Debugf("Before sorting states by lexicographical ordering - len(s.states): %d, s.head: %v, s.tail: %v, s.states.keys: %v", len(s.states), s.head, s.tail, s.GetKeysLocked())
+	s.trimAndBuildLinkedList(log, lexicographicalLookbackKeys)
+	log.Debugf("Sorted states by lexicographical ordering - len(s.states): %d, s.head: %v, s.tail: %v, s.states.keys: %v", len(s.states), s.head, s.tail, s.GetKeysLocked())
+}
+
+// trimAndBuildLinkedList trims states to capacity and rebuilds the linked list.
+// It acquires storeLock internally for store operations.
+func (s *states) trimAndBuildLinkedList(log *logp.Logger, capacity int) {
 	sortedKeys := slices.Sorted(maps.Keys(s.states))
 
-	// Rebuild the doubly linked list in sorted order
+	// If over capacity, remove oldest states from both map and store
+	if len(sortedKeys) > capacity {
+		keysToRemove := sortedKeys[:len(sortedKeys)-capacity]
+		s.storeLock.Lock()
+		for _, key := range keysToRemove {
+			delete(s.states, key)
+			// Also remove from persistent store
+			if err := s.store.Remove(getStoreKey(key)); err != nil {
+				log.Warnf("failed to remove old state from store: %v", err)
+			}
+		}
+		s.storeLock.Unlock()
+		// Update sortedKeys to only include remaining keys
+		sortedKeys = sortedKeys[len(sortedKeys)-capacity:]
+	}
+
+	// Build the doubly linked list in sorted order
+	s.buildLinkedListFromKeys(sortedKeys)
+}
+
+// buildLinkedListFromKeys rebuilds the doubly linked list from sorted keys.
+func (s *states) buildLinkedListFromKeys(sortedKeys []string) {
 	var prev *state
 	for i, key := range sortedKeys {
 		st := s.states[key]
@@ -275,6 +358,4 @@ func (s *states) SortStatesByLexicographicalOrdering(log *logp.Logger) {
 		prev = st
 	}
 	s.tail = prev
-
-	log.Debugf("Sorted states by lexicographical ordering - len(s.states): %d, s.head: %v, s.tail: %v, s.states.keys: %v", len(s.states), s.head, s.tail, sortedKeys)
 }
