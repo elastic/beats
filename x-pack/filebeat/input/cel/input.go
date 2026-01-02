@@ -723,12 +723,16 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			state["cursor"] = goodCursor
 			metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 			if more, _ := state["want_more"].(bool); !more {
-				execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
+				execSpan.SetAttributes(
+					attribute.Int("cel.program.event_count", execSpanEventCount),
+					attribute.Bool("cel.program.want_more", false),
+				)
 				execSpan.SetStatus(codes.Ok, "")
 				execSpan.End()
 				runSpan.SetStatus(codes.Ok, "")
 				return nil
 			}
+			execSpan.SetAttributes(attribute.Bool("cel.program.want_more", true))
 
 			// Check we have a remaining execution budget.
 			budget--
