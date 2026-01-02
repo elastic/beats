@@ -151,7 +151,7 @@ func (s *states) AddState(st state, lexicographicalOrdering bool, lexicographica
 	// Persist to the registry
 	s.storeLock.Lock()
 	defer s.storeLock.Unlock()
-	if oldest != nil {
+	if lexicographicalOrdering && oldest != nil {
 		if err := s.store.Remove(getStoreKey(oldest.IDWithLexicographicalOrdering())); err != nil {
 			return fmt.Errorf("error while removing the oldest state: %w", err)
 		}

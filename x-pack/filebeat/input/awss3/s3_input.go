@@ -120,25 +120,27 @@ func (in *s3PollerInput) run(ctx context.Context) {
 		runStartTime := time.Now()
 		in.log.Debugf("Running scheduled poll number %d at %s", numRuns, runStartTime.Format(time.RFC3339))
 		// TODO: Remove this debug logging and count the number of runs
-		in.states.statesLock.Lock()
-		in.log.Debugf("Initial state before scheduled run %d - len(in.states.states): %d, in.states.head: %v, in.states.tail: %v, in.states.states.keys: %v", numRuns, len(in.states.states), in.states.head, in.states.tail, in.states.GetKeys())
+		// in.states.statesLock.Lock()
+		// in.log.Debugf("Initial state before scheduled run %d - len(in.states.states): %d, in.states.head: %v, in.states.tail: %v, in.states.states.keys: %v", numRuns, len(in.states.states), in.states.head, in.states.tail, in.states.GetKeys())
+
 		// Sort in.states.states by lexicographical ordering
 		if in.config.LexicographicalOrdering {
 			in.states.SortStatesByLexicographicalOrdering(in.log)
 		}
-		in.states.statesLock.Unlock()
+		// in.states.statesLock.Unlock()
 
 		in.runPoll(ctx)
 
 		runElapsedTime := time.Since(runStartTime)
 		in.metrics.s3PollingRunTime.Update(runElapsedTime.Nanoseconds())
 		in.metrics.s3PollingRunTimeTotal.Add(uint64(runElapsedTime.Nanoseconds()))
+
 		in.log.Debugf("Scheduled poll number %d completed at %s, elapsed time: %d nanoseconds", numRuns, time.Now().Format(time.RFC3339), runElapsedTime.Nanoseconds())
 
 		// TODO: Remove this debug logging and count the number of runs
-		in.states.statesLock.Lock()
-		in.log.Debugf("Final state after scheduled run %d - len(in.states.states): %d, in.states.head: %v, in.states.tail: %v, in.states.states.keys: %v", numRuns, len(in.states.states), in.states.head, in.states.tail, in.states.GetKeys())
-		in.states.statesLock.Unlock()
+		// in.states.statesLock.Lock()
+		// in.log.Debugf("Final state after scheduled run %d - len(in.states.states): %d, in.states.head: %v, in.states.tail: %v, in.states.states.keys: %v", numRuns, len(in.states.states), in.states.head, in.states.tail, in.states.GetKeys())
+		// in.states.statesLock.Unlock()
 		numRuns++
 
 		_ = timed.Wait(ctx, in.config.BucketListInterval)
@@ -294,9 +296,9 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 		errorBackoff.Reset()
 
 		// TODO: Remove this debug logging and count the number of pages
-		in.states.statesLock.Lock()
-		in.log.Debugf("More pages found. State sizes before current page listing - len(knownStateIDSlice): %d, len(in.states.states): %d, in.states.head: %v, in.states.tail: %v, in.states.states.keys: %v", len(knownStateIDSlice), len(in.states.states), in.states.head, in.states.tail, in.states.GetKeys())
-		in.states.statesLock.Unlock()
+		// in.states.statesLock.Lock()
+		// in.log.Debugf("More pages found. State sizes before current page listing - len(knownStateIDSlice): %d, len(in.states.states): %d, in.states.head: %v, in.states.tail: %v, in.states.states.keys: %v", len(knownStateIDSlice), len(in.states.states), in.states.head, in.states.tail, in.states.GetKeys())
+		// in.states.statesLock.Unlock()
 
 		totListedObjects := len(page.Contents)
 		numObjectsListed += totListedObjects
@@ -336,9 +338,9 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 			if i == len(page.Contents)-1 {
 				in.log.Debugf("Last object listed in this page: %s", *object.Key)
 				// TODO: Remove this debug logging and count the number of pages
-				in.states.statesLock.Lock()
-				in.log.Debugf("State sizes after current page listing - len(knownStateIDSlice): %d, len(in.states.states): %d, in.states.head: %v, in.states.tail: %v, in.states.states.keys: %v", len(knownStateIDSlice), len(in.states.states), in.states.head, in.states.tail, in.states.GetKeys())
-				in.states.statesLock.Unlock()
+				// in.states.statesLock.Lock()
+				// in.log.Debugf("State sizes after current page listing - len(knownStateIDSlice): %d, len(in.states.states): %d, in.states.head: %v, in.states.tail: %v, in.states.states.keys: %v", len(knownStateIDSlice), len(in.states.states), in.states.head, in.states.tail, in.states.GetKeys())
+				// in.states.statesLock.Unlock()
 			}
 		}
 	}
