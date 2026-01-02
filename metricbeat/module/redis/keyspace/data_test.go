@@ -18,6 +18,7 @@
 package keyspace
 
 import (
+	"math"
 	"strconv"
 	"testing"
 )
@@ -36,7 +37,11 @@ func getInt64(t *testing.T, v interface{}) int64 {
 	case int64:
 		return n
 	case uint:
-		return int64(n)
+		// check for overflow when converting platform-dependent uint to int64
+		if uint64(n) <= uint64(math.MaxInt64) {
+			return int64(n)
+		}
+		t.Fatalf("uint value overflows int64: %v", n)
 	case uint8:
 		return int64(n)
 	case uint16:
@@ -44,7 +49,11 @@ func getInt64(t *testing.T, v interface{}) int64 {
 	case uint32:
 		return int64(n)
 	case uint64:
-		return int64(n)
+		// check for overflow when converting uint64 to int64
+		if n <= uint64(math.MaxInt64) {
+			return int64(n)
+		}
+		t.Fatalf("uint64 value overflows int64: %v", n)
 	case string:
 		if s, err := strconv.ParseInt(n, 10, 64); err == nil {
 			return s
