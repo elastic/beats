@@ -607,6 +607,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				event, ok := e.(map[string]interface{})
 				if !ok {
 					err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+					pubSpan.SetStatus(codes.Error, err.Error())
 					pubSpan.End()
 					execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 					execSpan.SetStatus(codes.Error, err.Error())
@@ -625,6 +626,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 							if !ok {
 								err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
 								metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
+								pubSpan.SetStatus(codes.Error, err.Error())
 								pubSpan.End()
 								execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 								execSpan.SetStatus(codes.Error, err.Error())
@@ -640,8 +642,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 						if !ok {
 							err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
 							metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
-							runSpan.SetStatus(codes.Error, err.Error())
+							pubSpan.SetStatus(codes.Error, err.Error())
 							pubSpan.End()
+							runSpan.SetStatus(codes.Error, err.Error())
 							return err
 						}
 						pubCursor = cursor
@@ -673,7 +676,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if err != nil {
 					hadPublicationError = true
 					pubLog.Errorw("error publishing event", "error", err)
-					health.UpdateStatus(status.Degraded, "error publishing event: "+err.Error())
+					msg := "error publishing event: " + err.Error()
+					health.UpdateStatus(status.Degraded, msg)
+					pubSpan.SetStatus(codes.Error, msg)
 					isDegraded = true
 					cursors = nil // We are lost, so retry with this event's cursor,
 					continue      // but continue with the events that we have without
@@ -689,6 +694,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				err = pubCtx.Err()
 				if err != nil {
 					metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
+					pubSpan.SetStatus(codes.Error, err.Error())
 					pubSpan.End()
 					execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 					execSpan.SetStatus(codes.Error, err.Error())
@@ -708,6 +714,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			if !hadPublicationError {
 				goodCursor = cursor
 				metricsRecorder.AddProgramSuccessExecution(pubCtx)
+				pubSpan.SetStatus(codes.Ok, "")
 			}
 
 			pubSpan.End()
@@ -716,7 +723,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			state["cursor"] = goodCursor
 			metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 			if more, _ := state["want_more"].(bool); !more {
-				pubSpan.End()
 				execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 				execSpan.SetStatus(codes.Ok, "")
 				execSpan.End()
@@ -733,7 +739,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					"next_eval_time", start.Add(cfg.Interval),
 				)
 				health.UpdateStatus(status.Degraded, msg)
-				pubSpan.End()
 				execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 				execSpan.SetStatus(codes.Unset, msg)
 				execSpan.End()
