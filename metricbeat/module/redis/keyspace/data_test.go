@@ -37,9 +37,11 @@ func getInt64(t *testing.T, v interface{}) int64 {
 	case int64:
 		return n
 	case uint:
-		// check for overflow when converting platform-dependent uint to int64
-		if uint64(n) <= uint64(math.MaxInt64) {
-			return int64(n)
+		// Normalize to uint64 and check against MaxInt64 to avoid overflow on
+		// any platform. Using a uint64 comparison is clearer for static analysis.
+		u := uint64(n)
+		if u <= math.MaxInt64 {
+			return int64(u)
 		}
 		t.Fatalf("uint value overflows int64: %v", n)
 	case uint8:
