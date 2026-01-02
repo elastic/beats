@@ -339,8 +339,14 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 
 			runSpanExecutionCount++
+			execSpanEventCount := 0
 			execCtx, execSpan := otelTracer.Start(runCtx, "cel.program.execution")
-			defer execSpan.End() // end span for early returns
+			execSpan.SetAttributes(attribute.Int("cel.program.execution_number", runSpanExecutionCount))
+			// end span for early returns
+			defer func() {
+				execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
+				execSpan.End()
+			}()
 			execSpanCtx := execSpan.SpanContext()
 			execLog := log.With(
 				"trace.id", execSpanCtx.TraceID().String(),
@@ -542,6 +548,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			metricsRecorder.AddReceivedBatch(execCtx, 1)
 			metricsRecorder.AddReceivedEvents(execCtx, uint(len(events)))
 			runSpanEventCount += len(events)
+			execSpanEventCount = len(events)
 			// Drop events from state. If we fail during the publication,
 			// we will re-request these events.
 			delete(state, "events")
@@ -695,6 +702,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				return nil
 			}
 
+			execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 			execSpan.End()
 		}
 	})
