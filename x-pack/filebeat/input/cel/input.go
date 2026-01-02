@@ -340,9 +340,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 
 			runSpanExecutionCount++
-			execSpanEventCount := 0
 			execCtx, execSpan := otelTracer.Start(runCtx, "cel.program.execution")
-			execSpan.SetAttributes(attribute.Int("cel.program.execution_number", runSpanExecutionCount))
+			execSpan.SetAttributes(
+				attribute.Int("cel.program.execution_number", runSpanExecutionCount),
+				attribute.Int("cel.program.event_count", 0), // to be overridden if there are events
+			)
 			execSpanCtx := execSpan.SpanContext()
 			execLog := log.With(
 				"trace.id", execSpanCtx.TraceID().String(),
@@ -367,7 +369,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
 					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 					runSpan.SetStatus(codes.Error, err.Error())
-					execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 					execSpan.SetStatus(codes.Error, err.Error())
 					execSpan.End()
 					return err
@@ -479,7 +480,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			ok, waitUntil, err = handleResponse(execLog, state, limiter)
 			if err != nil {
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-				execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 				execSpan.SetStatus(codes.Error, err.Error())
 				execSpan.End()
 				runSpan.SetStatus(codes.Error, err.Error())
@@ -499,7 +499,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			e, ok := state["events"]
 			if !ok {
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-				execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 				execSpan.SetStatus(codes.Error, err.Error())
 				execSpan.End()
 				runSpan.SetStatus(codes.Error, err.Error())
@@ -511,7 +510,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if len(e) == 0 {
 					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 					metricsRecorder.AddProgramSuccessExecution(execCtx)
-					execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 					execSpan.SetStatus(codes.Ok, "")
 					execSpan.End()
 					return nil
@@ -521,7 +519,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if e == nil {
 					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 					metricsRecorder.AddProgramSuccessExecution(execCtx)
-					execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 					execSpan.SetStatus(codes.Ok, "")
 					execSpan.End()
 					return nil
@@ -553,7 +550,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			default:
 				err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-				execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 				execSpan.SetStatus(codes.Error, err.Error())
 				execSpan.End()
 				runSpan.SetStatus(codes.Error, err.Error())
@@ -564,7 +560,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			metricsRecorder.AddReceivedBatch(execCtx, 1)
 			metricsRecorder.AddReceivedEvents(execCtx, uint(len(events)))
 			runSpanEventCount += len(events)
-			execSpanEventCount = len(events)
+			execSpan.SetAttributes(attribute.Int("cel.program.event_count", len(events)))
 			// Drop events from state. If we fail during the publication,
 			// we will re-request these events.
 			delete(state, "events")
@@ -611,7 +607,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 					pubSpan.SetStatus(codes.Error, err.Error())
 					pubSpan.End()
-					execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 					execSpan.SetStatus(codes.Error, err.Error())
 					execSpan.End()
 					runSpan.SetStatus(codes.Error, err.Error())
@@ -630,7 +625,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 								metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 								pubSpan.SetStatus(codes.Error, err.Error())
 								pubSpan.End()
-								execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 								execSpan.SetStatus(codes.Error, err.Error())
 								execSpan.End()
 								runSpan.SetStatus(codes.Error, err.Error())
@@ -698,7 +692,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 					pubSpan.SetStatus(codes.Error, err.Error())
 					pubSpan.End()
-					execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 					execSpan.SetStatus(codes.Error, err.Error())
 					execSpan.End()
 					runSpan.SetStatus(codes.Error, err.Error())
@@ -725,10 +718,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			state["cursor"] = goodCursor
 			metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 			if more, _ := state["want_more"].(bool); !more {
-				execSpan.SetAttributes(
-					attribute.Int("cel.program.event_count", execSpanEventCount),
-					attribute.Bool("cel.program.want_more", false),
-				)
+				execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
 				execSpan.SetStatus(codes.Ok, "")
 				execSpan.End()
 				runSpan.SetStatus(codes.Ok, "")
@@ -745,7 +735,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					"next_eval_time", start.Add(cfg.Interval),
 				)
 				health.UpdateStatus(status.Degraded, msg)
-				execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 				execSpan.SetStatus(codes.Unset, msg)
 				execSpan.End()
 				runSpan.SetAttributes(attribute.Bool("cel.periodic.max_execution_limited", true))
@@ -753,7 +742,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				return nil
 			}
 
-			execSpan.SetAttributes(attribute.Int("cel.program.event_count", execSpanEventCount))
 			execSpan.SetStatus(codes.Ok, "")
 			execSpan.End()
 		}
