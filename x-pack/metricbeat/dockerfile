@@ -32,7 +32,6 @@ COPY . .
 
 # Build x-pack metricbeat
 WORKDIR /go/src/github.com/elastic/beats/x-pack/metricbeat
-RUN go mod download
 RUN mage build
 
 # Final runtime image
