@@ -9,6 +9,18 @@ applyTo: '**'
 - Show architectural/design considerations and security implications
 - When code is requested, provide code only unless explanations are explicitly asked
 
+# Project Structure
+- OSS Beats (root level): `auditbeat/`, `filebeat/`, `heartbeat/`, `metricbeat/`, `packetbeat/`, `winlogbeat/`
+- Elastic-licensed Beats: `x-pack/` folder (e.g., `x-pack/osquerybeat/`)
+- Shared framework: `libbeat/` - common interfaces, processors, outputs, pipeline, publisher. Follows same licensing scheme as individual Beats
+- NEVER import Elastic-licensed code (`x-pack/`) into OSS code
+- Build/dev tools: `dev-tools/` - mage build system, packaging templates, testing utilities
+- Documentation: `docs/` - markdown documentation
+- Testing infrastructure: `testing/` - test utilities, environments, terraform configs
+- Integration tests: `tests/` folder in each Beat. Some Beats also have `testing/` folder - these map to different testing frameworks in `libbeat`
+- When modifying a Beat: check both OSS version (root) and x-pack version (if it exists in `x-pack/`)
+- Config files: Beat root and module directories contain `.yml`, `.yaml` config files
+
 # Communication
 - Direct, honest, no sugar-coating
 - Correct mistakes immediately, challenge incorrect assumptions
