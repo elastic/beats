@@ -589,7 +589,7 @@ If neither the direct keys nor the shared credentials file is set, AWS SDK [Load
 stack: ga 9.3.0
 ```
 
-The profile name of the AWS shared credentials file. Should be optionally used alongside with [`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file).
+The profile name of the AWS shared credentials file. This is optional and can be used with [`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file).
 
 ### `auth.aws.role_arn` [_auth_aws_role_arn]
 
