@@ -28,8 +28,7 @@ func GetInfo(m *elasticsearch.MetricSet) (*utils.ClusterInfo, error) {
 		var httpResponse *utils.HTTPResponse
 		if errors.As(err, &httpResponse) {
 			if httpResponse.StatusCode == 401 || httpResponse.StatusCode == 403 || httpResponse.StatusCode == 404 {
-				// in these cases Autoops agent can't recover itself, hence panic and stop the agent, later AMS would
-				// identify that agent is crashloo due to these errors and would re-create the agent with new creds
+				// in these error cases Autoops agent can't recover itself, hence panic and stop the agent
 				errChan := make(chan error)
 				go handleErrors(m.Logger(), errChan)
 				customErr := fmt.Errorf("autoops agent can't fetch the metrics due to http error! Code: %d, Status: %s",
