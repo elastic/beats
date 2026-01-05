@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -30,6 +31,7 @@ type MetricSet struct {
 	system.SystemMetricSet
 	config Config
 	log    *logp.Logger
+	paths  *paths.Path
 }
 
 type eventAction uint8
@@ -95,6 +97,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms.config = defaultConfig
 	ms.log = base.Logger().Named(metricsetName)
 	ms.SystemMetricSet = system.NewSystemMetricSet(base)
+	ms.paths = base.GetPath()
 
 	if err := base.Module().UnpackConfig(&ms.config); err != nil {
 		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)

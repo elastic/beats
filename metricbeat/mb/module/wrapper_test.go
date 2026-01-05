@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -111,7 +112,7 @@ func TestWrapperOfReportingFetcher(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beat.NewMonitoring())
+	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New())
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -142,7 +143,7 @@ func TestWrapperOfPushMetricSet(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beat.NewMonitoring())
+	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New())
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -189,7 +190,7 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 				"hosts":      hosts,
 			})
 
-			m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), module.WithMetricSetInfo())
+			m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
 			require.NoError(t, err)
 
 			done := make(chan struct{})
@@ -220,7 +221,7 @@ func TestDurationIsAddedToEvent(t *testing.T) {
 	})
 
 	registry := newTestRegistry(t)
-	m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), module.WithMetricSetInfo())
+	m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -248,7 +249,7 @@ func TestNewWrapperForMetricSet(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), logp.NewNopLogger())
+	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), paths.New(), logp.NewNopLogger())
 	require.NoError(t, err)
 
 	m, err := module.NewWrapperForMetricSet(aModule, metricSets[0], beat.NewMonitoring(), logp.NewNopLogger(), module.WithMetricSetInfo())
