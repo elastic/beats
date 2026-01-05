@@ -637,7 +637,7 @@ Specifies the AWS service name that will be used into the v4 signing process. Th
 stack: ga 9.3.0
 ```
 
-Specifies the AWS region that will be used into the v4 signing process. This is optional and if not set it will be inferred by the request url.
+Specifies the AWS region that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
 
 
 ### `request.url` [request-parameters]
