@@ -414,17 +414,10 @@ github.com/elastic/mito v1.23.0 h1:V9wS2EWpKWibLP+0WE2CXr4J/Mt/IPj1G+zf/ELNp/I=
 github.com/elastic/mito v1.23.0/go.mod h1:h1V+8B62+DXsu0TstJkjsTh5ewJIDJlwzxPkP3HBM9s=
 github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6 h1:JVNuBrmOoqLJgp9o68YBMnOrXCzQI3mCppW+suwRSlw=
 github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6/go.mod h1:cXqWcLnmu5y4QveTb2hjk7rgzkHMuZsqeXtbJpNAcu0=
-<<<<<<< HEAD
-github.com/elastic/sarama v1.19.1-0.20250603175145-7672917f26b6 h1:2COw7kzXkIyS4hKNUl5qw0KolrwncrY4VVNpngVNo8I=
-github.com/elastic/sarama v1.19.1-0.20250603175145-7672917f26b6/go.mod h1:Ua/oXS4NS+U/pp/urxgzEGWd1MvocHA+yd4Bu4+Eb80=
-github.com/elastic/tk-btf v0.1.0 h1:T4rbsnfaRH/MZKSLwZFd3sndt/NexsQb0IXWtMQ9PAA=
-github.com/elastic/tk-btf v0.1.0/go.mod h1:caLQPEcMbyKmPUQb2AsbX3ZAj1yCz06lOxfhn0esLR8=
-=======
 github.com/elastic/sarama v1.19.1-0.20251224062803-313637a62841 h1:arI5QqFbuPfR1Ee4lgLUuYT5pCxVMTTQIZnn1q3/6Qs=
 github.com/elastic/sarama v1.19.1-0.20251224062803-313637a62841/go.mod h1:2mh/PhvJXqGFxvVT+24fOW1dNc6oTFa8M+FzLAWgTJU=
 github.com/elastic/tk-btf v0.2.0 h1:8Am3b2mNIoG7RIoD6EVCnhhrdJySuAUUnnkaCU3EGAM=
 github.com/elastic/tk-btf v0.2.0/go.mod h1:yxzXvfHaTMgtpasIzrSn1wPeKKjNyiL/UUc7LRBis2A=
->>>>>>> 6f987b73b (Update `elastic/sarama` fork and deduplicate `gokrb5` package (#48230))
 github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb h1:8SvKmGOYyxKi6jB0nvV1lpxEHfIS6tQ40x1BXBhKMsE=
 github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb/go.mod h1:5hdJb3ERm3hyHBfHFL39pyWvGgkW7ZCoFlaEemNNHIw=
 github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 h1:g7YUigN4dW2+zpdusdTTghZ+5Py3BaUMAStvL8Nk+FY=

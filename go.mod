@@ -179,13 +179,8 @@ require (
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.23.0
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
-<<<<<<< HEAD
-	github.com/elastic/sarama v1.19.1-0.20250603175145-7672917f26b6
-	github.com/elastic/tk-btf v0.1.0
-=======
 	github.com/elastic/sarama v1.19.1-0.20251224062803-313637a62841
 	github.com/elastic/tk-btf v0.2.0
->>>>>>> 6f987b73b (Update `elastic/sarama` fork and deduplicate `gokrb5` package (#48230))
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/go-ldap/ldap/v3 v3.4.6
