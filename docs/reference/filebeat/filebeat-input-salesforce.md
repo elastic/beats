@@ -85,6 +85,13 @@ filebeat.inputs:
 
 In order to use this integration, users need to create a new Salesforce Application using OAuth. Follow the steps below to create a connected application in Salesforce:
 
+::::{note}
+**OAuth token limitation**
+
+Salesforce OAuth apps have a limit of [five concurrent token approvals](https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_request_manage.htm&type=5). If you have more than five inputs using the same OAuth client tokens, you will receive `INVALID_SESSION_ID` errors. If you are collecting from multiple inputs, you may need mutliple Connected Apps to prevent token invalidation.
+
+::::
+
 1. Login to [Salesforce](https://login.salesforce.com/) with the same user credentials that the user wants to collect data with.
 2. Click on Setup on the top right menu bar. On the Setup page, search for `App Manager` in the `Search Setup` search box at the top of the page, then select `App Manager`.
 3. Click *New Connected App*.
