@@ -629,7 +629,7 @@ Specifies the credentials retrieved by the IAM assume-role to trigger refreshing
 stack: ga 9.3.0
 ```
 
-Specifies the AWS service name that will be used into the v4 signing process. This is optional and if not set it will be inferred by the request url.
+Specifies the AWS service name that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
 
 ### `auth.aws.default_region` [_auth_aws_default_region]
 
