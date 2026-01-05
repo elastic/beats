@@ -927,7 +927,7 @@ The IAM Role ARN to assume. Assume-role authentication is layered on top of the 
 stack: ga 9.3.0
 ```
 
-Specifies the external ID to use for every IAM assume-role request. This value is optional and can be provided when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+Specifies the external ID to use for every IAM assume-role request. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
 
 ### `auth.aws.assume_role.duration` [_auth_aws_assume_role_duration]
 
