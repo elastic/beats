@@ -533,7 +533,7 @@ Email of the delegated account used to create the credentials (usually an admin)
 stack: ga 9.3.0
 ```
 
-When set to `false`, disables the file aws auth configuration. Default: `true`.
+When set to `false`, disables the file AWS auth configuration. Default: `true`.
 
 ::::{note}
 AWS auth settings are disabled if either `enabled` is set to `false` or the `auth.aws` section is missing.
