@@ -613,7 +613,7 @@ Specifies the external ID to use for every IAM assume-role request. This value i
 stack: ga 9.3.0
 ```
 
-Specifies the duration of the credentials retrieved by the IAM assume-role. It is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+Specifies the duration of the credentials retrieved by the IAM assume-role. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
 
 ### `auth.aws.assume_role.expiry_window` [_auth_aws_assume_expiry_window]
 
