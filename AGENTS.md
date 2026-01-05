@@ -20,8 +20,8 @@ applyTo: '**'
 - Integration tests: `tests/` folder in each Beat. Some Beats also have `testing/` folder - these map to different testing frameworks in `libbeat`
 - When modifying a Beat: check both OSS version (root) and x-pack version (if it exists in `x-pack/`)
 - Config files: Beat root and module directories contain `.yml`, `.yaml` config files
-- The current Beats version is on `libbeat/version/version.go:20`
-- Documentation for Beats version < 9.0.0 is in asciidoc.
+- Current Beats version is in `libbeat/version/version.go:20`
+- Documentation for Beats version < 9.0.0 is in AsciiDoc format
 
 ## Automation
 - [Mage](https://magefile.org/) is used for project automation
@@ -29,7 +29,7 @@ applyTo: '**'
 - After code changes: run `mage update` first if modifying fields/configs, then `mage check` for validation
 - Root-level commands: `mage fmt` (format all), `mage unitTest` (test all Beats), `mage checkLicenseHeaders` (validate headers)
 - Legacy Makefile targets exist for compatibility but Mage is preferred
-- Never run mage targets like `test`, `unitTest`, `goIntegTest`, etc without explicitly stating your intent and asking for confirmation. Those commands will run the whole test suit, which can take a very long time.
+- Never run mage targets like `test`, `unitTest`, `goIntegTest`, etc. without explicitly stating intent and asking for confirmation. These commands run the entire test suite, which can take a very long time.
 
 # Communication
 - Direct, honest, no sugar-coating
