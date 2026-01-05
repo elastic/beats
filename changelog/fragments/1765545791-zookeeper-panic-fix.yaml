@@ -9,11 +9,11 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: enhancement
+kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Add GUID translation, base DN inference, and SSPI authentication to LDAP processor.
+summary: Add bounds checking to Zookeeper server module to prevent index-out-of-range panics
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
@@ -28,7 +28,7 @@ summary: Add GUID translation, base DN inference, and SSPI authentication to LDA
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: all
+component: metricbeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
@@ -36,7 +36,7 @@ component: all
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-pr: https://github.com/elastic/beats/pull/47827
+# pr: https://github.com/owner/repo/1234
 
 # AUTOMATED
 # OPTIONAL to manually add other issue URLs

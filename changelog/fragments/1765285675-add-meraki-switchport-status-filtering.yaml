@@ -6,14 +6,14 @@
 # - enhancement: extends functionality but does not break or fix existing behavior
 # - feature: new functionality
 # - known-issue: problems that we are aware of in a given version
-# - security: impacts on the security of a product or a user’s deployment.
+# - security: impacts on the security of a product or a user's deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
 kind: enhancement
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: add resource pool id to vsphere cluster metricset
+summary: Add switchport_statuses config option to filter Meraki switchports by status
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change

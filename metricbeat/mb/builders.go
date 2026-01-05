@@ -27,6 +27,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var (
@@ -46,7 +47,7 @@ var (
 // will be unpacked into ModuleConfig structs). r is the Register where the
 // ModuleFactory's and MetricSetFactory's will be obtained from. This method
 // returns a Module and its configured MetricSets or an error.
-func NewModule(config *conf.C, r *Register, logger *logp.Logger) (Module, []MetricSet, error) {
+func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger) (Module, []MetricSet, error) {
 	if !config.Enabled() {
 		return nil, nil, ErrModuleDisabled
 	}
@@ -61,7 +62,7 @@ func NewModule(config *conf.C, r *Register, logger *logp.Logger) (Module, []Metr
 		return nil, nil, err
 	}
 
-	metricsets, err := initMetricSets(r, module, logger)
+	metricsets, err := initMetricSets(r, module, p, logger)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -106,12 +107,12 @@ func createModule(r *Register, bm BaseModule) (Module, error) {
 	return f(bm)
 }
 
-func initMetricSets(r *Register, m Module, logger *logp.Logger) ([]MetricSet, error) {
+func initMetricSets(r *Register, m Module, p *paths.Path, logger *logp.Logger) ([]MetricSet, error) {
 	var (
 		errs []error
 	)
 
-	bms, err := newBaseMetricSets(r, m, logger)
+	bms, err := newBaseMetricSets(r, m, p, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +158,7 @@ func initMetricSets(r *Register, m Module, logger *logp.Logger) ([]MetricSet, er
 // newBaseMetricSets creates a new BaseMetricSet for all MetricSets defined
 // in the module's config. An error is returned if no MetricSets are specified
 // in the module's config and no default MetricSet is defined.
-func newBaseMetricSets(r *Register, m Module, logger *logp.Logger) ([]BaseMetricSet, error) {
+func newBaseMetricSets(r *Register, m Module, p *paths.Path, logger *logp.Logger) ([]BaseMetricSet, error) {
 	hosts := []string{""}
 	if l := m.Config().Hosts; len(l) > 0 {
 		hosts = l
@@ -209,6 +210,7 @@ func newBaseMetricSets(r *Register, m Module, logger *logp.Logger) ([]BaseMetric
 				host:    host,
 				metrics: metrics,
 				logger:  logger,
+				paths:   p,
 			})
 		}
 	}
