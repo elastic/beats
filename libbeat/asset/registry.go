@@ -154,10 +154,5 @@ func DecodeData(data string) ([]byte, error) {
 	}
 	defer r.Close()
 
-	out, err := iobuf.ReadAll(r)
-	if err != nil {
-		return nil, err
-	}
-
-	return out, nil
+	return iobuf.ReadAll(r)
 }
