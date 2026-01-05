@@ -578,7 +578,7 @@ stack: ga 9.3.0
 The path of the AWS shared credentials file.
 
 ::::{note}
-Direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) can not be set alongside with shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)) if both are set, the direct keys takes precedence.
+Use either direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) or a shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)). If both are set, the direct keys take precedence.
 
 If neither the direct keys nor the shared credentials file is set, AWS SDK [LoadDefaultConfig](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config#LoadDefaultConfig) will be used.
 ::::
