@@ -943,7 +943,7 @@ Specifies the duration of the credentials retrieved by the IAM assume-role. This
 stack: ga 9.3.0
 ```
 
-Specifies the credentials retrieved by the IAM assume-role to trigger refreshing prior to the credentials actually expiring. It is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+Specifies the credentials retrieved by the IAM assume-role to trigger refreshing prior to the credentials actually expiring. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
 
 ### `auth.aws.service_name` [_auth_aws_service_name]
 
