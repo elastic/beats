@@ -11,6 +11,7 @@ import (
 
 	"go.opentelemetry.io/contrib/exporters/autoexport"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
@@ -21,12 +22,12 @@ var (
 )
 
 // GetGlobalTracerProvider returns an existing or new global TracerProvider
-func GetGlobalTracerProvider(ctx context.Context) (*sdktrace.TracerProvider, error) {
+func GetGlobalTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyValue) (*sdktrace.TracerProvider, error) {
 	tracerProviderMu.Lock()
 	defer tracerProviderMu.Unlock()
 
 	if tracerProvider == nil {
-		tp, err := newTracerProvider(ctx)
+		tp, err := newTracerProvider(ctx, resourceAttributes)
 		if err != nil {
 			return nil, err
 		}
@@ -37,7 +38,7 @@ func GetGlobalTracerProvider(ctx context.Context) (*sdktrace.TracerProvider, err
 	return tracerProvider, nil
 }
 
-func newTracerProvider(ctx context.Context) (*sdktrace.TracerProvider, error) {
+func newTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyValue) (*sdktrace.TracerProvider, error) {
 	// Make "none" the default exporter (rather than "oltp")
 	const otelTracesExporterKey = "OTEL_TRACES_EXPORTER"
 	if _, ok := os.LookupEnv(otelTracesExporterKey); !ok {
@@ -57,6 +58,7 @@ func newTracerProvider(ctx context.Context) (*sdktrace.TracerProvider, error) {
 		resource.WithFromEnv(),
 		resource.WithTelemetrySDK(),
 		resource.WithHost(),
+		resource.WithAttributes(resourceAttributes...),
 	)
 	if err != nil {
 		return nil, err
