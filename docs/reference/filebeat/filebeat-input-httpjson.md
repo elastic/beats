@@ -545,7 +545,7 @@ AWS auth settings are disabled if either `enabled` is set to `false` or the `aut
 stack: ga 9.3.0
 ```
 
-The AWS access key id. It should be used alongside with [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key).
+The AWS access key ID. It should be used with [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key).
 
 ### `auth.aws.secret_access_key` [_auth_aws_secret_access_key]
 
