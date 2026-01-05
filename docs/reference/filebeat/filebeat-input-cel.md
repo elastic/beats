@@ -875,7 +875,7 @@ The AWS access key id. It should be used alongside with [`auth.aws.secret_access
 stack: ga 9.3.0
 ```
 
-The AWS secret access key. It should be used alongside with [`auth.aws.access_key_id`](#_auth_aws_access_key_id).
+The AWS secret access key. It should be used with [`auth.aws.access_key_id`](#_auth_aws_access_key_id).
 
 ::::{note}
 Direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) can not be set alongside with shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)) if both are set, the direct keys takes precedence.
