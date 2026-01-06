@@ -57,6 +57,10 @@ type Registry struct {
 
 	// BBolt holds bbolt-specific configuration.
 	BBolt BBoltConfig `config:"bbolt"`
+
+	// DebugPort enables a read-only web interface for debugging the registry.
+	// Set to 0 to disable. Default: 8000.
+	DebugPort int `config:"debug_port"`
 }
 
 type BBoltConfig struct {
@@ -91,6 +95,7 @@ var DefaultConfig = Config{
 		CleanInterval: 5 * time.Minute,
 		FlushTimeout:  time.Second,
 		Type:          "bbolt",
+		DebugPort:     8000,
 		BBolt: BBoltConfig{
 			DiskTTL:        30 * 24 * time.Hour,
 			CacheTTL:       1 * time.Hour,
@@ -134,6 +139,10 @@ func (r Registry) ValidateConfig() error {
 	}
 	if r.BBolt.GCBatchSize < 0 {
 		return fmt.Errorf("filebeat.registry.bbolt.gc_batch_size must be >= 0 (got %d)", r.BBolt.GCBatchSize)
+	}
+
+	if r.DebugPort < 0 || r.DebugPort > 65535 {
+		return fmt.Errorf("filebeat.registry.debug_port must be between 0 and 65535 (got %d)", r.DebugPort)
 	}
 
 	return nil

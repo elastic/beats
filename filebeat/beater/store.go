@@ -46,6 +46,9 @@ type filebeatStore struct {
 	// which is available only after the beat runtime manager connects to the Agent
 	// and receives the output configuration
 	notifier *es.Notifier
+
+	// For debug access
+	bboltRegistry *bbolt.Registry
 }
 
 func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry, beatPaths *paths.Path) (*filebeatStore, error) {
@@ -68,7 +71,7 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 
 	switch cfg.NormalizedType() {
 	case "bbolt":
-		reg, err = bbolt.New(logger, bbolt.Settings{
+		bboltReg, err := bbolt.New(logger, bbolt.Settings{
 			Root:           beatPaths.Resolve(paths.Data, cfg.Path),
 			FileMode:       cfg.BBolt.FileMode,
 			DiskTTL:        cfg.BBolt.DiskTTL,
@@ -76,6 +79,21 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 			NoGrowSync:     cfg.BBolt.NoGrowSync,
 			NoFreelistSync: cfg.BBolt.NoFreelistSync,
 		})
+		if err != nil {
+			return nil, err
+		}
+		reg = bboltReg
+		store := &filebeatStore{
+			registry:      statestore.NewRegistry(reg),
+			storeName:     info.Beat,
+			cleanInterval: cfg.CleanInterval,
+			notifier:      notifier,
+			bboltRegistry: bboltReg,
+		}
+		if esreg != nil {
+			store.esRegistry = statestore.NewRegistry(esreg)
+		}
+		return store, nil
 	case "memlog":
 		reg, err = memlog.New(logger, memlog.Settings{
 			Root:     beatPaths.Resolve(paths.Data, cfg.Path),
@@ -116,4 +134,9 @@ func (s *filebeatStore) StoreFor(typ string) (*statestore.Store, error) {
 
 func (s *filebeatStore) CleanupInterval() time.Duration {
 	return s.cleanInterval
+}
+
+// BBoltRegistry returns the underlying bbolt registry for debug access.
+func (s *filebeatStore) BBoltRegistry() *bbolt.Registry {
+	return s.bboltRegistry
 }

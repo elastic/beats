@@ -1,7 +1,7 @@
 # BBolt as registry backend
  - Add a new backend for Filebeat's registry. The current backend
    interface is defined @libbeat/statestore/backend/backend.go and the
-   current implementation is @@libbeat/statestore/backend/memlog
+   current implementation is @libbeat/statestore/backend/memlog
  - The registry can be chosen by setting `registry.type` in the
    configuration file.
  - The default is the new, bbolt, implementation.

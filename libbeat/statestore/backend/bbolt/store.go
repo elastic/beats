@@ -348,6 +348,18 @@ func (s *store) SetID(_ string) {
 	// NOOP
 }
 
+// DB returns the underlying bbolt database for read-only access.
+// Returns nil if store is closed.
+func (s *store) DB() *bbolt.DB {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	if s.closed {
+		return nil
+	}
+	return s.db
+}
+
 // collectGarbage is implemented in gc.go (Day 2-3).
 // For now it is a no-op so the registry-level GC dispatcher can be wired safely.
 func (s *store) collectGarbage() error {

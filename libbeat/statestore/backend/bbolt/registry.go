@@ -29,6 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"go.etcd.io/bbolt"
 )
 
 const defaultFileMode os.FileMode = 0o600
@@ -143,6 +144,25 @@ func (r *Registry) Access(name string) (backend.Store, error) {
 
 	r.stores[name] = s
 	return s, nil
+}
+
+// GetDB returns the underlying bbolt database for a named store.
+// Returns nil if store doesn't exist or is closed.
+// This is intended for debugging/inspection tools only.
+func (r *Registry) GetDB(name string) *bbolt.DB {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if !r.active {
+		return nil
+	}
+
+	s := r.stores[name]
+	if s == nil {
+		return nil
+	}
+
+	return s.DB()
 }
 
 // Close closes the registry and all open stores.
