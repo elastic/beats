@@ -1418,15 +1418,15 @@ Test scenarios:
   - [x] JSON serialization
 
 #### Day 2-3: GC Implementation (Full Scan)
-- [ ] Implement `gc.go`
-  - [ ] Registry-level GC goroutine
-  - [ ] Store-level collectGarbage() method (full scan)
-  - [ ] Expired entry identification
-  - [ ] Batch deletion
-  - [ ] Error handling and logging
-  - [ ] Performance logging (warn if > 10s)
-  - [ ] Graceful shutdown
-- [ ] Add `doc.go` with package documentation
+- [x] Implement `gc.go`
+  - [x] Registry-level GC goroutine
+  - [x] Store-level collectGarbage() method (full scan)
+  - [x] Expired entry identification
+  - [x] Batch deletion
+  - [x] Error handling and logging
+  - [x] Performance logging (warn if > 10s)
+  - [x] Graceful shutdown
+- [x] Add `doc.go` with package documentation
 
 #### Day 3-4: Configuration & Integration
 - [x] Update `filebeat/config/config.go`

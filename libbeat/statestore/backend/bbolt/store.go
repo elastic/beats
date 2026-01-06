@@ -360,15 +360,6 @@ func (s *store) DB() *bbolt.DB {
 	return s.db
 }
 
-// collectGarbage is implemented in gc.go (Day 2-3).
-// For now it is a no-op so the registry-level GC dispatcher can be wired safely.
-func (s *store) collectGarbage() error {
-	if s.settings.DiskTTL <= 0 {
-		return nil
-	}
-	return nil
-}
-
 func ensureFilePermissions(path string, wantPerm os.FileMode) error {
 	if runtime.GOOS == "windows" {
 		return nil
