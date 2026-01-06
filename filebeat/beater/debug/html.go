@@ -347,7 +347,7 @@ const htmlTemplate = `<!DOCTYPE html>
                     '<div class="key-header">' +
                     '<span class="key-name">' + escapeHtml(kv.key) + '</span>' +
                     '</div>' +
-                    '<div class="key-value" id="key-' + idx + '">' +
+                    '<div class="key-value expanded" id="key-' + idx + '">' +
                     '<div class="json-content">' + valueStr + '</div>' +
                     '</div>' +
                     '</div>';
@@ -378,12 +378,31 @@ const htmlTemplate = `<!DOCTYPE html>
         }
 
         function formatJSON(value) {
-            try {
-                const obj = JSON.parse(value);
-                return escapeHtml(JSON.stringify(obj, null, 2));
-            } catch (e) {
-                return escapeHtml(value);
+            if (value === null || value === undefined) {
+                return escapeHtml(String(value));
             }
+            
+            // If value is already an object, stringify it directly
+            if (typeof value === 'object') {
+                try {
+                    return escapeHtml(JSON.stringify(value, null, 2));
+                } catch (e) {
+                    return escapeHtml(String(value));
+                }
+            }
+            
+            // If value is a string, try to parse then stringify for formatting
+            if (typeof value === 'string') {
+                try {
+                    const obj = JSON.parse(value);
+                    return escapeHtml(JSON.stringify(obj, null, 2));
+                } catch (e) {
+                    return escapeHtml(value);
+                }
+            }
+            
+            // Fallback for other types
+            return escapeHtml(String(value));
         }
 
         function escapeHtml(text) {
