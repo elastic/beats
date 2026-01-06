@@ -110,7 +110,7 @@ Four-pass method: Overview → Error Focus → Context Analysis → Cross-Refere
 - Use descriptive error messages with context
 - Wrap errors with additional context when propagating
 
-## Testing
+## Writing Tests
 - Write unit tests for new functionality
 - Use table-driven tests when appropriate
 - Follow existing test patterns in codebase
@@ -129,6 +129,12 @@ Four-pass method: Overview → Error Focus → Context Analysis → Cross-Refere
 - Document exported functions and types
 - Keep comments concise, focused on "why" not "what"
 - Update documentation when changing behavior
+
+## Running tests
+- The whole test suit takes way too long to run, NEVER run `go test
+  ./...` in the project's root or on a Beat.
+- Only run tests for the packages you have changed.
+- Always check that the Beat you're working on compiles with `go build .`
 
 ## Project-Specific
 - OSS beats are in the root folder, the ones in `x-pack` are Elastic licensed.
