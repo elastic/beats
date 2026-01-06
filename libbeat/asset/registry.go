@@ -39,7 +39,7 @@ const (
 	Lowest           Priority = math.MaxInt32
 )
 
-var beatFieldsCacheMu sync.RWMutex
+var beatFieldsCacheMu sync.Mutex
 var beatFieldsCache = map[string][]byte{}
 
 // FieldsRegistry contains a list of fields.yml files
@@ -128,8 +128,8 @@ func EncodeData(data string) (string, error) {
 }
 
 func getBeatFieldsCache(beat string) ([]byte, bool) {
-	beatFieldsCacheMu.RLock()
-	defer beatFieldsCacheMu.RUnlock()
+	beatFieldsCacheMu.Lock()
+	defer beatFieldsCacheMu.Unlock()
 	cached, ok := beatFieldsCache[beat]
 	return cached, ok
 }
