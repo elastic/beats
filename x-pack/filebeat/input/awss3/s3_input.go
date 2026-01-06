@@ -118,29 +118,17 @@ func (in *s3PollerInput) run(ctx context.Context) {
 	var numRuns int
 	for ctx.Err() == nil {
 		runStartTime := time.Now()
-		in.log.Debugf("Running scheduled poll number %d at %s", numRuns, runStartTime.Format(time.RFC3339))
-		// TODO: Remove this debug logging and count the number of runs
-		// in.states.statesLock.Lock()
-		// in.log.Debugf("Initial state before scheduled run %d - len(in.states.states): %d, in.states.head: %v, in.states.tail: %v, in.states.states.keys: %v", numRuns, len(in.states.states), in.states.head, in.states.tail, in.states.GetKeys())
 
-		// Sort in.states.states by lexicographical ordering
+		// In lexicographical ordering mode, sort states before running the poll
 		if in.config.LexicographicalOrdering {
 			in.states.SortStatesByLexicographicalOrdering(in.log, in.config.LexicographicalLookbackKeys)
 		}
-		// in.states.statesLock.Unlock()
 
 		in.runPoll(ctx)
 
 		runElapsedTime := time.Since(runStartTime)
 		in.metrics.s3PollingRunTime.Update(runElapsedTime.Nanoseconds())
 		in.metrics.s3PollingRunTimeTotal.Add(uint64(runElapsedTime.Nanoseconds()))
-
-		in.log.Debugf("Scheduled poll number %d completed at %s, elapsed time: %d nanoseconds", numRuns, time.Now().Format(time.RFC3339), runElapsedTime.Nanoseconds())
-
-		// TODO: Remove this debug logging and count the number of runs
-		// in.states.statesLock.Lock()
-		// in.log.Debugf("Final state after scheduled run %d - len(in.states.states): %d, in.states.head: %v, in.states.tail: %v, in.states.states.keys: %v", numRuns, len(in.states.states), in.states.head, in.states.tail, in.states.GetKeys())
-		// in.states.statesLock.Unlock()
 		numRuns++
 
 		_ = timed.Wait(ctx, in.config.BucketListInterval)
@@ -295,19 +283,12 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 		circuitBreaker = 0
 		errorBackoff.Reset()
 
-		// TODO: Remove this debug logging and count the number of pages
-		// in.states.statesLock.Lock()
-		// in.log.Debugf("More pages found. State sizes before current page listing - len(knownStateIDSlice): %d, len(in.states.states): %d, in.states.head: %v, in.states.tail: %v, in.states.states.keys: %v", len(knownStateIDSlice), len(in.states.states), in.states.head, in.states.tail, in.states.GetKeys())
-		// in.states.statesLock.Unlock()
-
 		totListedObjects := len(page.Contents)
 		numObjectsListed += totListedObjects
-		// TODO: Remove this debug logging
-		in.log.Debugf("Total objects listed in this page: %d, total objects listed this run: %d", totListedObjects, numObjectsListed)
 
 		// Metrics
 		in.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
-		for i, object := range page.Contents {
+		for _, object := range page.Contents {
 			state := newState(bucketName, *object.Key, *object.ETag, *object.LastModified)
 			if !in.config.LexicographicalOrdering && !isStateValid(in.log, state) {
 				continue
@@ -329,19 +310,6 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 			workChan <- state
 
 			in.metrics.s3ObjectsProcessedTotal.Inc()
-
-			// TODO: Remove this debug logging and count the number of objects listed
-			if i == 0 {
-				in.log.Debugf("First object listed in this page: %s, stateID: %s", *object.Key, id)
-			}
-			// TODO: Remove this debug logging and count the number of objects listed
-			if i == len(page.Contents)-1 {
-				in.log.Debugf("Last object listed in this page: %s", *object.Key)
-				// TODO: Remove this debug logging and count the number of pages
-				// in.states.statesLock.Lock()
-				// in.log.Debugf("State sizes after current page listing - len(knownStateIDSlice): %d, len(in.states.states): %d, in.states.head: %v, in.states.tail: %v, in.states.states.keys: %v", len(knownStateIDSlice), len(in.states.states), in.states.head, in.states.tail, in.states.GetKeys())
-				// in.states.statesLock.Unlock()
-			}
 		}
 	}
 

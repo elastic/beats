@@ -30,8 +30,8 @@ type state struct {
 
 	// prev and next are used to maintain the lexicographical ordering of the states in the registry
 	// when lexicographicalOrdering is true.
-	// prev is the previous state in the lexicographical ordering.
-	// next is the next state in the lexicographical ordering.
+	// prev is the previous state in the linked list.
+	// next is the next state in the linked list.
 	prev *state
 	next *state
 }

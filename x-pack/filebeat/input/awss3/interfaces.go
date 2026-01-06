@@ -326,9 +326,7 @@ func (a *awsS3API) ListObjectsPaginator(log *logp.Logger, bucket, prefix string,
 	}
 	if startAfterKey != "" {
 		input.StartAfter = awssdk.String(startAfterKey)
-		log.Debugf("LexicographicalOrdering is enabled, listing objects after key: %s", startAfterKey)
-	} else {
-		log.Debugf("Listing objects from the beginning")
+		log.Debugf("Listing objects after key: %s", startAfterKey)
 	}
 	pager := s3.NewListObjectsV2Paginator(a.client, input)
 

@@ -24,8 +24,8 @@ type states struct {
 	// statesLock must be held to access states.
 	states     map[string]*state
 	statesLock sync.Mutex
-	head       *state // oldest (front) in lexicographical ordering
-	tail       *state // newest (back) in lexicographical ordering
+	head       *state // In lexicographical ordering mode, this is the oldest (front) state.
+	tail       *state // In lexicographical ordering mode, this is the newest (back) state.
 
 	// The store used to persist state changes to the registry.
 	// storeLock must be held to access store.
@@ -55,7 +55,7 @@ func newStates(log *logp.Logger, stateStore statestore.States, listPrefix string
 	}
 
 	// If lexicographical ordering is enabled, trim the loaded states to capacity
-	// and build the linked list structure
+	// and build the linked list structure. Otherwise, the linked list structure is not built.
 	if lexicographicalOrdering && len(stateTable) > 0 {
 		s.trimAndBuildLinkedList(log, lexicographicalLookbackKeys)
 	}
@@ -140,9 +140,9 @@ func (s *states) AddState(st state, lexicographicalOrdering bool, lexicographica
 
 	var oldest *state
 
+	// Maintain a doubly linked list structure for lexicographical ordering
+	// with lexicographicalLookbackKeys as capacity
 	if lexicographicalOrdering {
-		// maintain a doubly linked list structure for lexicographical ordering
-		// with lexicographicalLookbackKeys as capacity
 		id = st.IDWithLexicographicalOrdering()
 		// If state already exists, update it and move to back (newest position)
 		if existing, exists := s.states[id]; exists {
@@ -295,15 +295,6 @@ func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix 
 	return stateTable, err
 }
 
-func (s *states) GetKeys() []string {
-	return slices.Collect(maps.Keys(s.states))
-}
-
-// GetKeysLocked returns the keys without acquiring the lock (caller must hold statesLock)
-func (s *states) GetKeysLocked() []string {
-	return slices.Collect(maps.Keys(s.states))
-}
-
 func (s *states) SortStatesByLexicographicalOrdering(log *logp.Logger, lexicographicalLookbackKeys int) {
 	s.statesLock.Lock()
 	defer s.statesLock.Unlock()
@@ -312,9 +303,8 @@ func (s *states) SortStatesByLexicographicalOrdering(log *logp.Logger, lexicogra
 		return
 	}
 
-	log.Debugf("Before sorting states by lexicographical ordering - len(s.states): %d, s.head: %v, s.tail: %v, s.states.keys: %v", len(s.states), s.head, s.tail, s.GetKeysLocked())
 	s.trimAndBuildLinkedList(log, lexicographicalLookbackKeys)
-	log.Debugf("Sorted states by lexicographical ordering - len(s.states): %d, s.head: %v, s.tail: %v, s.states.keys: %v", len(s.states), s.head, s.tail, s.GetKeysLocked())
+	log.Debugf("Sorted states by lexicographical ordering: state_count=%d, oldest_state=%s, newest_state=%s", len(s.states), s.head.IDWithLexicographicalOrdering(), s.tail.IDWithLexicographicalOrdering())
 }
 
 // trimAndBuildLinkedList trims states to capacity and rebuilds the linked list.
