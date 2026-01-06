@@ -1163,35 +1163,41 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 }
 
 func BenchmarkFilebeatOTelCollector(b *testing.B) {
-	cfg := `receivers:
-  filebeatreceiver/1:
+	numReceivers := 4
+
+	for b.Loop() {
+		b.StopTimer()
+		tmpDir := b.TempDir()
+
+		type receiverConfig struct {
+			Index    int
+			PathHome string
+		}
+
+		configData := struct {
+			Receivers []receiverConfig
+		}{
+			Receivers: make([]receiverConfig, numReceivers),
+		}
+
+		for i := range numReceivers {
+			configData.Receivers[i] = receiverConfig{
+				Index:    i + 1,
+				PathHome: filepath.Join(tmpDir, strconv.Itoa(i+1)),
+			}
+		}
+
+		cfgTemplate := `receivers:
+{{range .Receivers}}
+  filebeatreceiver/{{.Index}}:
     filebeat:
       inputs:
         - type: benchmark
           enabled: true
           count: 1
+    path.home: {{.PathHome}}
     queue.mem.flush.timeout: 0s
-  filebeatreceiver/2:
-    filebeat:
-      inputs:
-        - type: benchmark
-          enabled: true
-          count: 1
-    queue.mem.flush.timeout: 0s
-  filebeatreceiver/3:
-    filebeat:
-      inputs:
-        - type: benchmark
-          enabled: true
-          count: 1
-    queue.mem.flush.timeout: 0s
-  filebeatreceiver/4:
-    filebeat:
-      inputs:
-        - type: benchmark
-          enabled: true
-          count: 1
-    queue.mem.flush.timeout: 0s
+{{end}}
 exporters:
   debug:
     verbosity: detailed
@@ -1199,10 +1205,9 @@ service:
   pipelines:
     logs:
       receivers:
-        - filebeatreceiver/1
-        - filebeatreceiver/2
-        - filebeatreceiver/3
-        - filebeatreceiver/4
+{{range .Receivers}}
+        - filebeatreceiver/{{.Index}}
+{{end}}
       exporters:
         - debug
   telemetry:
@@ -1212,12 +1217,16 @@ service:
       level: none
 `
 
-	for b.Loop() {
-		col := oteltestcol.New(b, cfg)
+		var configBuffer bytes.Buffer
+		require.NoError(b, template.Must(template.New("config").Parse(cfgTemplate)).Execute(&configBuffer, configData))
+
+		b.StartTimer()
+
+		col := oteltestcol.New(b, configBuffer.String())
 		require.NotNil(b, col)
 		require.Eventually(b, func() bool {
 			return col.ObservedLogs().
-				FilterMessageSnippet("Publish event").Len() == 4
+				FilterMessageSnippet("Publish event").Len() == numReceivers
 		}, 30*time.Second, 1*time.Millisecond, "expected all receivers to publish events")
 		col.Shutdown()
 	}
