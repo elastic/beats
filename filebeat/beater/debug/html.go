@@ -236,7 +236,16 @@ const htmlTemplate = `<!DOCTYPE html>
                 <button onclick="loadPage(1)">Refresh</button>
                 <div class="auto-refresh">
                     <input type="checkbox" id="autoRefresh" checked onchange="toggleAutoRefresh()">
-                    <label for="autoRefresh">Auto-refresh (10s)</label>
+                    <label for="autoRefresh">Auto-refresh:</label>
+                    <select id="refreshIntervalSelect" onchange="changeRefreshInterval()">
+                        <option value="500">500ms</option>
+                        <option value="1000" selected>1s</option>
+                        <option value="2000">2s</option>
+                        <option value="5000">5s</option>
+                        <option value="10000">10s</option>
+                        <option value="30000">30s</option>
+                        <option value="60000">1m</option>
+                    </select>
                 </div>
             </div>
             <div class="control-group">
@@ -275,6 +284,7 @@ const htmlTemplate = `<!DOCTYPE html>
         let currentPageSize = 50;
         let allKeys = [];
         let autoRefreshInterval = null;
+        let refreshIntervalMS = 1000; // Default: 1s
 
         function toggleAutoRefresh() {
             const checkbox = document.getElementById('autoRefresh');
@@ -285,11 +295,21 @@ const htmlTemplate = `<!DOCTYPE html>
             }
         }
 
+        function changeRefreshInterval() {
+            const select = document.getElementById('refreshIntervalSelect');
+            refreshIntervalMS = parseInt(select.value);
+            // Restart auto-refresh if it's currently enabled
+            const checkbox = document.getElementById('autoRefresh');
+            if (checkbox && checkbox.checked) {
+                startAutoRefresh();
+            }
+        }
+
         function startAutoRefresh() {
             stopAutoRefresh();
-            autoRefreshInterval = setInterval(() => {
+            autoRefreshInterval = setInterval(function() {
                 loadPage(currentPage);
-            }, 10000);
+            }, refreshIntervalMS);
         }
 
         function stopAutoRefresh() {
