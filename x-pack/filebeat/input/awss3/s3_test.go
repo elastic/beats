@@ -42,9 +42,9 @@ func TestS3Poller(t *testing.T) {
 
 		gomock.InOrder(
 			mockAPI.EXPECT().
-				ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq("key")).
+				ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key"), gomock.Any()).
 				Times(1).
-				DoAndReturn(func(_, _ string) s3Pager {
+				DoAndReturn(func(_ *logp.Logger, _, _ string, _ string) s3Pager {
 					return mockPager
 				}),
 		)
@@ -129,7 +129,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{}, logp.NewNopLogger())
-		states, err := newStates(nil, store, listPrefix)
+		states, err := newStates(nil, store, listPrefix, false, 0)
 		require.NoError(t, err, "states creation must succeed")
 
 		cfg := config{
@@ -173,16 +173,16 @@ func TestS3Poller(t *testing.T) {
 		gomock.InOrder(
 			// Initial ListObjectPaginator gets an error.
 			mockS3.EXPECT().
-				ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq("key")).
+				ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key"), gomock.Any()).
 				Times(1).
-				DoAndReturn(func(_, _ string) s3Pager {
+				DoAndReturn(func(_ *logp.Logger, _, _ string, _ string) s3Pager {
 					return mockErrorPager
 				}),
 			// After waiting for pollInterval, it retries.
 			mockS3.EXPECT().
-				ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq("key")).
+				ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key"), gomock.Any()).
 				Times(1).
-				DoAndReturn(func(_, _ string) s3Pager {
+				DoAndReturn(func(_ *logp.Logger, _, _ string, _ string) s3Pager {
 					return mockSuccessPager
 				}),
 		)
@@ -271,7 +271,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{}, logp.NewNopLogger())
-		states, err := newStates(nil, store, listPrefix)
+		states, err := newStates(nil, store, listPrefix, false, 0)
 		require.NoError(t, err, "states creation must succeed")
 
 		cfg := config{
@@ -301,6 +301,413 @@ func TestS3Poller(t *testing.T) {
 			status:          &statusReporterHelperMock{},
 		}
 		poller.run(ctx)
+	})
+
+	t.Run("lexicographical ordering uses startAfterKey from oldest state", func(t *testing.T) {
+		store := openTestStatestore()
+
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockAPI := NewMockS3API(ctrl)
+		mockPager := NewMockS3Pager(ctrl)
+		pipeline := newFakePipeline()
+
+		states, err := newStates(nil, store, "", true, 100)
+		require.NoError(t, err, "states creation must succeed")
+
+		// This will be used as startAfterKey
+		existingState := newState(bucket, "existing-key", "etag", time.Unix(1000, 0))
+		existingState.Stored = true
+		err = states.AddState(existingState, true, 100)
+		require.NoError(t, err, "state add must succeed")
+
+		oldestState := states.GetOldestState()
+		require.NotNil(t, oldestState)
+		require.Equal(t, "existing-key", oldestState.Key)
+
+		// Expect ListObjectsPaginator to be called with startAfterKey = "existing-key"
+		mockAPI.EXPECT().
+			ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Eq("existing-key")).
+			Times(1).
+			DoAndReturn(func(_ *logp.Logger, _, _ string, startAfterKey string) s3Pager {
+				require.Equal(t, "existing-key", startAfterKey)
+				return mockPager
+			})
+
+		mockPager.EXPECT().
+			HasMorePages().
+			Times(1).
+			DoAndReturn(func() bool {
+				return true
+			})
+
+		mockPager.EXPECT().
+			NextPage(gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+				return &s3.ListObjectsV2Output{
+					Contents: []types.Object{
+						{
+							ETag:         aws.String("etag-new"),
+							Key:          aws.String("new-key"),
+							LastModified: aws.Time(time.Now()),
+						},
+					},
+				}, nil
+			})
+
+		mockPager.EXPECT().
+			HasMorePages().
+			Times(1).
+			DoAndReturn(func() bool {
+				return false
+			})
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("new-key")).
+			Return(nil, errFakeConnectivityFailure)
+
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{}, logp.NewNopLogger())
+
+		cfg := config{
+			NumberOfWorkers:             numberOfWorkers,
+			BucketListInterval:          pollInterval,
+			BucketARN:                   bucket,
+			BucketListPrefix:            "",
+			RegionName:                  "region",
+			LexicographicalOrdering:     true,
+			LexicographicalLookbackKeys: 100,
+		}
+		poller := &s3PollerInput{
+			log:             logp.NewLogger(inputName),
+			config:          cfg,
+			s3:              mockAPI,
+			pipeline:        pipeline,
+			s3ObjectHandler: s3ObjProc,
+			states:          states,
+			provider:        "provider",
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
+			filterProvider:  newFilterProvider(&cfg),
+			status:          &statusReporterHelperMock{},
+		}
+		poller.runPoll(ctx)
+	})
+
+	t.Run("lexicographical ordering with empty states uses empty startAfterKey", func(t *testing.T) {
+		store := openTestStatestore()
+
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockAPI := NewMockS3API(ctrl)
+		mockPager := NewMockS3Pager(ctrl)
+		pipeline := newFakePipeline()
+
+		// Create empty states
+		states, err := newStates(nil, store, "", true, 100)
+		require.NoError(t, err, "states creation must succeed")
+
+		oldestState := states.GetOldestState()
+		require.Nil(t, oldestState)
+
+		// Expect ListObjectsPaginator to be called with empty startAfterKey
+		mockAPI.EXPECT().
+			ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Eq("")).
+			Times(1).
+			DoAndReturn(func(_ *logp.Logger, _, _ string, startAfterKey string) s3Pager {
+				require.Equal(t, "", startAfterKey)
+				return mockPager
+			})
+
+		mockPager.EXPECT().
+			HasMorePages().
+			Times(1).
+			DoAndReturn(func() bool {
+				return true
+			})
+
+		mockPager.EXPECT().
+			NextPage(gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+				return &s3.ListObjectsV2Output{
+					Contents: []types.Object{
+						{
+							ETag:         aws.String("etag1"),
+							Key:          aws.String("key1"),
+							LastModified: aws.Time(time.Now()),
+						},
+					},
+				}, nil
+			})
+
+		mockPager.EXPECT().
+			HasMorePages().
+			Times(1).
+			DoAndReturn(func() bool {
+				return false
+			})
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key1")).
+			Return(nil, errFakeConnectivityFailure)
+
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{}, logp.NewNopLogger())
+
+		cfg := config{
+			NumberOfWorkers:             numberOfWorkers,
+			BucketListInterval:          pollInterval,
+			BucketARN:                   bucket,
+			BucketListPrefix:            "",
+			RegionName:                  "region",
+			LexicographicalOrdering:     true,
+			LexicographicalLookbackKeys: 100,
+		}
+		poller := &s3PollerInput{
+			log:             logp.NewLogger(inputName),
+			config:          cfg,
+			s3:              mockAPI,
+			pipeline:        pipeline,
+			s3ObjectHandler: s3ObjProc,
+			states:          states,
+			provider:        "provider",
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
+			filterProvider:  newFilterProvider(&cfg),
+			status:          &statusReporterHelperMock{},
+		}
+		poller.runPoll(ctx)
+	})
+
+	t.Run("non-lexicographical ordering uses empty startAfterKey", func(t *testing.T) {
+		store := openTestStatestore()
+
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockAPI := NewMockS3API(ctrl)
+		mockPager := NewMockS3Pager(ctrl)
+		pipeline := newFakePipeline()
+
+		// Non-lexicographical mode
+		states, err := newStates(nil, store, "", false, 0)
+		require.NoError(t, err, "states creation must succeed")
+
+		// Expect ListObjectsPaginator to be called with empty startAfterKey
+		mockAPI.EXPECT().
+			ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Eq("")).
+			Times(1).
+			DoAndReturn(func(_ *logp.Logger, _, _ string, startAfterKey string) s3Pager {
+				require.Equal(t, "", startAfterKey)
+				return mockPager
+			})
+
+		mockPager.EXPECT().
+			HasMorePages().
+			Times(1).
+			DoAndReturn(func() bool {
+				return true
+			})
+
+		mockPager.EXPECT().
+			NextPage(gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+				return &s3.ListObjectsV2Output{
+					Contents: []types.Object{
+						{
+							ETag:         aws.String("etag1"),
+							Key:          aws.String("key1"),
+							LastModified: aws.Time(time.Now()),
+						},
+					},
+				}, nil
+			})
+
+		mockPager.EXPECT().
+			HasMorePages().
+			Times(1).
+			DoAndReturn(func() bool {
+				return false
+			})
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key1")).
+			Return(nil, errFakeConnectivityFailure)
+
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{}, logp.NewNopLogger())
+
+		cfg := config{
+			NumberOfWorkers:         numberOfWorkers,
+			BucketListInterval:      pollInterval,
+			BucketARN:               bucket,
+			BucketListPrefix:        "",
+			RegionName:              "region",
+			LexicographicalOrdering: false,
+		}
+		poller := &s3PollerInput{
+			log:             logp.NewLogger(inputName),
+			config:          cfg,
+			s3:              mockAPI,
+			pipeline:        pipeline,
+			s3ObjectHandler: s3ObjProc,
+			states:          states,
+			provider:        "provider",
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
+			filterProvider:  newFilterProvider(&cfg),
+			status:          &statusReporterHelperMock{},
+		}
+		poller.runPoll(ctx)
+	})
+
+	t.Run("s3ObjectsListedPerRun metric is updated", func(t *testing.T) {
+		store := openTestStatestore()
+
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockAPI := NewMockS3API(ctrl)
+		mockPager := NewMockS3Pager(ctrl)
+		pipeline := newFakePipeline()
+
+		states, err := newStates(nil, store, "", false, 0)
+		require.NoError(t, err, "states creation must succeed")
+
+		// Expect ListObjectsPaginator to be called
+		mockAPI.EXPECT().
+			ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ *logp.Logger, _, _ string, _ string) s3Pager {
+				return mockPager
+			})
+
+		// First page with 3 objects
+		mockPager.EXPECT().
+			HasMorePages().
+			Times(1).
+			DoAndReturn(func() bool {
+				return true
+			})
+
+		mockPager.EXPECT().
+			NextPage(gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+				return &s3.ListObjectsV2Output{
+					Contents: []types.Object{
+						{
+							ETag:         aws.String("etag1"),
+							Key:          aws.String("key1"),
+							LastModified: aws.Time(time.Now()),
+						},
+						{
+							ETag:         aws.String("etag2"),
+							Key:          aws.String("key2"),
+							LastModified: aws.Time(time.Now()),
+						},
+						{
+							ETag:         aws.String("etag3"),
+							Key:          aws.String("key3"),
+							LastModified: aws.Time(time.Now()),
+						},
+					},
+				}, nil
+			})
+
+		// Second page with 2 more objects
+		mockPager.EXPECT().
+			HasMorePages().
+			Times(1).
+			DoAndReturn(func() bool {
+				return true
+			})
+
+		mockPager.EXPECT().
+			NextPage(gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+				return &s3.ListObjectsV2Output{
+					Contents: []types.Object{
+						{
+							ETag:         aws.String("etag4"),
+							Key:          aws.String("key4"),
+							LastModified: aws.Time(time.Now()),
+						},
+						{
+							ETag:         aws.String("etag5"),
+							Key:          aws.String("key5"),
+							LastModified: aws.Time(time.Now()),
+						},
+					},
+				}, nil
+			})
+
+		// No more pages
+		mockPager.EXPECT().
+			HasMorePages().
+			Times(1).
+			DoAndReturn(func() bool {
+				return false
+			})
+
+		// Mock GetObject calls for all 5 objects
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key1")).
+			Return(nil, errFakeConnectivityFailure)
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key2")).
+			Return(nil, errFakeConnectivityFailure)
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key3")).
+			Return(nil, errFakeConnectivityFailure)
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key4")).
+			Return(nil, errFakeConnectivityFailure)
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key5")).
+			Return(nil, errFakeConnectivityFailure)
+
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{}, logp.NewNopLogger())
+
+		// Create metrics and keep a reference to check later
+		inputMetrics := newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger())
+
+		cfg := config{
+			NumberOfWorkers:    numberOfWorkers,
+			BucketListInterval: pollInterval,
+			BucketARN:          bucket,
+			BucketListPrefix:   "",
+			RegionName:         "region",
+		}
+		poller := &s3PollerInput{
+			log:             logp.NewLogger(inputName),
+			config:          cfg,
+			s3:              mockAPI,
+			pipeline:        pipeline,
+			s3ObjectHandler: s3ObjProc,
+			states:          states,
+			provider:        "provider",
+			metrics:         inputMetrics,
+			filterProvider:  newFilterProvider(&cfg),
+			status:          &statusReporterHelperMock{},
+		}
+
+		// Verify initial state of metric
+		require.Equal(t, int64(0), inputMetrics.s3ObjectsListedPerRun.Count(), "s3ObjectsListedPerRun should start at 0")
+
+		poller.runPoll(ctx)
+
+		// Verify the metric was updated with the correct count (5 objects total: 3 + 2)
+		require.Equal(t, int64(1), inputMetrics.s3ObjectsListedPerRun.Count(), "s3ObjectsListedPerRun should have 1 sample")
+		require.Equal(t, int64(5), inputMetrics.s3ObjectsListedPerRun.Sum(), "s3ObjectsListedPerRun sum should be 5")
 	})
 }
 
@@ -333,7 +740,7 @@ func Test_S3StateHandling(t *testing.T) {
 			},
 			initStates:     []state{newState(bucket, "obj-A", "etag-A", time.Unix(1732622400, 0))}, // 2024-11-26T12:00:00Z
 			runPollFor:     1,
-			expectStateIDs: []string{stateID(bucket, "obj-A", "etag-A", time.Unix(1732622400, 0))}, // 2024-11-26T12:00:00Z
+			expectStateIDs: []string{stateID(bucket, "obj-A", "etag-A", time.Unix(1732622400, 0), false)}, // 2024-11-26T12:00:00Z
 		},
 		{
 			name: "State cleanup - remove existing registry entry based on ignore older filter",
@@ -388,7 +795,7 @@ func Test_S3StateHandling(t *testing.T) {
 				BucketARN:          bucket,
 			},
 			runPollFor:     1,
-			expectStateIDs: []string{stateID(bucket, "obj-A", "etag-A", time.Unix(1732622400, 0))}, // 2024-11-26T12:00:00Z
+			expectStateIDs: []string{stateID(bucket, "obj-A", "etag-A", time.Unix(1732622400, 0), false)}, // 2024-11-26T12:00:00Z
 		},
 		{
 			name: "State updated - ignore old filter",
@@ -406,7 +813,7 @@ func Test_S3StateHandling(t *testing.T) {
 				IgnoreOlder:        1 * time.Hour,
 			},
 			runPollFor:     1,
-			expectStateIDs: []string{stateID(bucket, "obj-A", "etag-A", fixedTimeNow)},
+			expectStateIDs: []string{stateID(bucket, "obj-A", "etag-A", fixedTimeNow, false)},
 		},
 		{
 			name: "State updated - timestamp filter",
@@ -424,7 +831,7 @@ func Test_S3StateHandling(t *testing.T) {
 				StartTimestamp:     "2024-11-26T12:00:00Z",
 			},
 			runPollFor:     1,
-			expectStateIDs: []string{stateID(bucket, "obj-A", "etag-A", fixedTimeNow)},
+			expectStateIDs: []string{stateID(bucket, "obj-A", "etag-A", fixedTimeNow, false)},
 		},
 		{
 			name: "State updated - combined filters of ignore old and timestamp entry exist after first run",
@@ -444,7 +851,7 @@ func Test_S3StateHandling(t *testing.T) {
 			},
 			// run once to validate initial coverage of entries till start timestamp
 			runPollFor:     1,
-			expectStateIDs: []string{stateID(bucket, "obj-A", "etag-A", time.Unix(1732622400, 0))}, // 2024-11-26T12:00:00Z
+			expectStateIDs: []string{stateID(bucket, "obj-A", "etag-A", time.Unix(1732622400, 0), false)}, // 2024-11-26T12:00:00Z
 		},
 		{
 			name: "State updated - combined filters of ignore old and timestamp remove entry after second run",
@@ -484,9 +891,9 @@ func Test_S3StateHandling(t *testing.T) {
 
 			gomock.InOrder(
 				mockS3API.EXPECT().
-					ListObjectsPaginator(gomock.Eq(bucket), "").
+					ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Any()).
 					AnyTimes().
-					DoAndReturn(func(_, _ string) s3Pager {
+					DoAndReturn(func(_ *logp.Logger, _, _ string, _ string) s3Pager {
 						return mockS3Pager
 					}),
 			)
@@ -511,12 +918,12 @@ func Test_S3StateHandling(t *testing.T) {
 				})
 
 			store := openTestStatestore()
-			s3States, err := newStates(logger, store, "")
+			s3States, err := newStates(logger, store, "", false, 0)
 			require.NoError(t, err, "States creation must succeed")
 
 			// Note - add init states as if we are deriving them from registry
 			for _, st := range test.initStates {
-				err := s3States.AddState(st)
+				err := s3States.AddState(st, false, 0)
 				require.NoError(t, err, "State add should not error")
 			}
 
