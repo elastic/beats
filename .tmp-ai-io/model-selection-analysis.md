@@ -30,33 +30,59 @@
 - **Testing**: Unit tests, integration tests, compliance tests
 - **Code quality**: Following Beats patterns, proper error handling, logging
 
+## Available Models in cursor-agent CLI
+
+### Claude Models
+- `sonnet-4.5` - Claude Sonnet 4.5
+- `sonnet-4.5-thinking` - Claude Sonnet 4.5 (thinking mode)
+- `opus-4.5` - Claude Opus 4.5
+- `opus-4.5-thinking` - Claude Opus 4.5 (thinking mode)
+- `opus-4.1` - Claude Opus 4.1
+
+### GPT Models
+- `gpt-5.2` - GPT-5.2
+- `gpt-5.1` - GPT-5.1
+- `gpt-5.2-high` - GPT-5.2 (high capability)
+- `gpt-5.1-high` - GPT-5.1 (high capability)
+- `gpt-5.1-codex` - GPT-5.1 Codex
+- `gpt-5.1-codex-high` - GPT-5.1 Codex (high)
+- `gpt-5.1-codex-max` - GPT-5.1 Codex Max
+- `gpt-5.1-codex-max-high` - GPT-5.1 Codex Max (high)
+
+### Other Models
+- `gemini-3-pro` - Google Gemini 3 Pro
+- `gemini-3-flash` - Google Gemini 3 Flash
+- `grok` - Grok
+- `composer-1` - Composer model
+- `auto` - Auto-select model
+
 ## Recommended Approach
 
-### Option 1: Single Model (Recommended for Planning)
-**Model**: Claude Sonnet 4.5 or GPT-4o
+### Option 1: Single Model (Recommended)
+**Model**: `gpt-5.2` or `gpt-5.2-high`
 - **Strengths**: 
-  - Excellent at codebase analysis and architecture
-  - Strong Go knowledge
-  - Good at breaking down complex tasks
+  - Latest GPT model with excellent capabilities
+  - Strong Go knowledge and implementation skills
+  - Good at codebase analysis and architecture
   - Can handle both planning and execution
-- **Use case**: If you want one model to handle everything with context continuity
+- **Use case**: Best balance for end-to-end task completion with context continuity
 
-### Option 2: Two-Model Approach (Recommended)
-**Planning Model**: Claude Sonnet 4.5 or GPT-4o
+### Option 2: Two-Model Approach (Recommended for Complex Tasks)
+**Planning Model**: `sonnet-4.5` or `sonnet-4.5-thinking`
 - **Why**: Superior at understanding complex codebases, architectural design, identifying edge cases
 - **Deliverable**: Detailed implementation plan, architecture diagram, file-by-file breakdown
 
-**Execution Model**: Claude Sonnet 4.5 or GPT-4o (same or different)
-- **Why**: Strong Go implementation skills, can follow detailed plans
+**Execution Model**: `gpt-5.2-high` or `gpt-5.1-codex-max-high`
+- **Why**: Strong Go implementation skills, excellent at following detailed plans, code-focused
 - **Deliverable**: Complete implementation with tests
 
 ### Option 3: Specialized Models
-**Planning**: Claude Sonnet 4.5 (best for architecture)
-**Execution**: GPT-4o (strong Go implementation, good at following patterns)
+**Planning**: `sonnet-4.5-thinking` (best for deep architecture analysis)
+**Execution**: `gpt-5.1-codex-max-high` (strong Go implementation, excellent at following patterns)
 
 ## Detailed Recommendation: Two-Model Approach
 
-### Phase 1: Planning (Claude Sonnet 4.5 or GPT-4o)
+### Phase 1: Planning (`sonnet-4.5` or `sonnet-4.5-thinking`)
 
 **Tasks**:
 1. Analyze existing backend implementations (`memlog`, `es`)
@@ -73,7 +99,7 @@
 - Test strategy
 - Configuration schema
 
-### Phase 2: Execution (Claude Sonnet 4.5 or GPT-4o)
+### Phase 2: Execution (`gpt-5.2-high` or `gpt-5.1-codex-max-high`)
 
 **Tasks**:
 1. Implement bbolt backend (`libbeat/statestore/backend/bbolt/`)
@@ -109,22 +135,40 @@ If using one model:
 
 ## Model-Specific Notes
 
-### Claude Sonnet 4.5
-- **Best for**: Architecture, codebase analysis, design patterns
-- **Go skills**: Excellent
-- **Code quality**: High, follows best practices
-
-### GPT-4o
-- **Best for**: Implementation, following patterns, comprehensive code generation
+### GPT-5.2 / GPT-5.2-high
+- **Best for**: General-purpose implementation, codebase analysis, comprehensive code generation
 - **Go skills**: Excellent
 - **Code quality**: High, good at matching existing style
+- **Recommendation**: Primary choice for both planning and execution
 
-### GPT-4 Turbo
-- **Alternative**: Good balance, slightly less sophisticated than 4.5/4o
+### GPT-5.1 Codex Max / Codex Max-high
+- **Best for**: Code-focused implementation, following patterns, comprehensive code generation
+- **Go skills**: Excellent
+- **Code quality**: High, excellent at matching existing patterns
+- **Recommendation**: Best for execution phase when following detailed plans
+
+### Claude Sonnet 4.5 / Sonnet 4.5-thinking
+- **Best for**: Architecture, codebase analysis, design patterns, deep thinking
+- **Go skills**: Excellent
+- **Code quality**: High, follows best practices
+- **Recommendation**: Best for planning phase, thinking mode for complex architecture
+
+### Claude Opus 4.5
+- **Best for**: Complex problem-solving, advanced architecture
+- **Go skills**: Excellent
+- **Code quality**: Very high
+- **Recommendation**: Alternative to Sonnet 4.5 for planning
+
+### GPT-5.1 / GPT-5.1-high
+- **Best for**: General implementation, good balance of capability
+- **Go skills**: Excellent
+- **Code quality**: High
+- **Recommendation**: Alternative to GPT-5.2 if needed
 
 ## Final Recommendation
 
-**Use Claude Sonnet 4.5 or GPT-4o for both phases**, with clear separation:
+### Primary Recommendation: Single Model Approach
+**Use `gpt-5.2` or `gpt-5.2-high` for both phases**, with clear separation:
 
 1. **Planning session**: 
    - "Analyze the codebase and create a detailed implementation plan for bbolt backend"
@@ -134,7 +178,22 @@ If using one model:
    - "Implement the bbolt backend according to the plan"
    - Iterate on implementation
 
-**Why**: Both models excel at Go and complex systems. The two-phase approach ensures thorough planning before implementation, reducing refactoring needs.
+**Why**: GPT-5.2 is the latest model with excellent Go skills and can handle both codebase analysis and implementation. The two-phase approach ensures thorough planning before implementation, reducing refactoring needs.
+
+### Alternative: Two-Model Approach
+**Planning**: `sonnet-4.5-thinking` (superior architecture analysis)
+**Execution**: `gpt-5.2-high` or `gpt-5.1-codex-max-high` (strong implementation)
+
+**Why**: Leverages Claude's strength in architecture design and GPT's strength in code implementation. Best for complex tasks requiring deep analysis.
+
+### Usage Example
+```bash
+# Planning phase
+cursor-agent agent --model sonnet-4.5-thinking "Analyze the codebase and create a detailed implementation plan for bbolt backend"
+
+# Execution phase
+cursor-agent agent --model gpt-5.2-high "Implement the bbolt backend according to the plan"
+```
 
 ## Key Files to Reference
 
