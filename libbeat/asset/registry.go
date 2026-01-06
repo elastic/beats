@@ -140,6 +140,12 @@ func setBeatFieldsCache(beat string, fields []byte) {
 	beatFieldsCache[beat] = fields
 }
 
+func deleteBeatFieldsCache(beat string) {
+	beatFieldsCacheMu.Lock()
+	defer beatFieldsCacheMu.Unlock()
+	delete(beatFieldsCache, beat)
+}
+
 // DecodeData base64 decodes the data and uncompresses it
 func DecodeData(data string) ([]byte, error) {
 	decoded, err := base64.StdEncoding.DecodeString(data)

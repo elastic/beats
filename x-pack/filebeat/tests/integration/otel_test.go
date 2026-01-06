@@ -1170,27 +1170,27 @@ func BenchmarkFilebeatOTelCollector(b *testing.B) {
         - type: benchmark
           enabled: true
           count: 1
+    queue.mem.flush.timeout: 0s
   filebeatreceiver/2:
     filebeat:
       inputs:
         - type: benchmark
           enabled: true
           count: 1
+    queue.mem.flush.timeout: 0s
   filebeatreceiver/3:
     filebeat:
       inputs:
         - type: benchmark
           enabled: true
           count: 1
+    queue.mem.flush.timeout: 0s
   filebeatreceiver/4:
     filebeat:
       inputs:
         - type: benchmark
           enabled: true
           count: 1
-    processors: ~
-    logging:
-      level: debug
     queue.mem.flush.timeout: 0s
 exporters:
   debug:
