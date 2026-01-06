@@ -41,14 +41,14 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 		},
 		"not existing state": {
 			statesEdit: func(states *states) error {
-				return states.AddState(testState2, false, 0)
+				return states.AddState(testState2)
 			},
 			state:               testState1,
 			expectedIsProcessed: false,
 		},
 		"existing state": {
 			statesEdit: func(states *states) error {
-				return states.AddState(testState1, false, 0)
+				return states.AddState(testState1)
 			},
 			state:               testState1,
 			expectedIsProcessed: true,
@@ -57,7 +57,7 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 			statesEdit: func(states *states) error {
 				state := testState1
 				state.Stored = true
-				return states.AddState(state, false, 0)
+				return states.AddState(state)
 			},
 			state:               testState1,
 			shouldReload:        true,
@@ -67,7 +67,7 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 			statesEdit: func(states *states) error {
 				state := testState1
 				state.Failed = true
-				return states.AddState(state, false, 0)
+				return states.AddState(state)
 			},
 			state:               testState1,
 			shouldReload:        true,
@@ -75,7 +75,7 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 		},
 		"existing unprocessed state is not persisted": {
 			statesEdit: func(states *states) error {
-				return states.AddState(testState1, false, 0)
+				return states.AddState(testState1)
 			},
 			state:               testState1,
 			shouldReload:        true,
@@ -150,12 +150,12 @@ func TestStatesCleanUp(t *testing.T) {
 			require.NoError(t, err, "states creation must succeed")
 
 			for _, s := range test.initStates {
-				err := statesInstance.AddState(s, false, 0)
+				err := statesInstance.AddState(s)
 				require.NoError(t, err, "state initialization must succeed")
 			}
 
 			// perform cleanup
-			err = statesInstance.CleanUp(test.knownIDs, false)
+			err = statesInstance.CleanUp(test.knownIDs)
 			require.NoError(t, err, "state cleanup must succeed")
 
 			// validate
@@ -186,11 +186,11 @@ func TestStatesPrefixHandling(t *testing.T) {
 		require.NoError(t, err)
 
 		// then - fail for non prefixed
-		err = st.AddState(newState("bucket", "production-logA", "etag", time.Now()), false, 0)
+		err = st.AddState(newState("bucket", "production-logA", "etag", time.Now()))
 		require.Error(t, err)
 
 		// then - pass for correctly prefixed
-		err = st.AddState(newState("bucket", "staging-logA", "etag", time.Now()), false, 0)
+		err = st.AddState(newState("bucket", "staging-logA", "etag", time.Now()))
 		require.NoError(t, err)
 	})
 
@@ -211,10 +211,10 @@ func TestStatesPrefixHandling(t *testing.T) {
 		st, err := newStates(logger, registry, "", false, 0)
 		require.NoError(t, err)
 
-		_ = st.AddState(sA, false, 0)
-		_ = st.AddState(sStagingA, false, 0)
-		_ = st.AddState(sProdB, false, 0)
-		_ = st.AddState(sSpace, false, 0)
+		_ = st.AddState(sA)
+		_ = st.AddState(sStagingA)
+		_ = st.AddState(sProdB)
+		_ = st.AddState(sSpace)
 
 		// Reload states and validate
 
@@ -258,7 +258,7 @@ func TestStatesLexicographicalMode(t *testing.T) {
 
 		state1 := newState("bucket", "key1", "etag1", time.Unix(1000, 0))
 		state1.Stored = true
-		err = states.AddState(state1, true, 10)
+		err = states.AddState(state1)
 		require.NoError(t, err)
 
 		require.True(t, states.IsProcessed(state1.IDWithLexicographicalOrdering()))
@@ -280,11 +280,11 @@ func TestStatesLexicographicalMode(t *testing.T) {
 		stateD := newState("bucket", "d", "etag", time.Unix(4000, 0))
 		stateD.Stored = true
 
-		err = states.AddState(stateA, true, capacity)
+		err = states.AddState(stateA)
 		require.NoError(t, err)
-		err = states.AddState(stateB, true, capacity)
+		err = states.AddState(stateB)
 		require.NoError(t, err)
-		err = states.AddState(stateC, true, capacity)
+		err = states.AddState(stateC)
 		require.NoError(t, err)
 
 		require.True(t, states.IsProcessed(stateA.IDWithLexicographicalOrdering()))
@@ -292,7 +292,7 @@ func TestStatesLexicographicalMode(t *testing.T) {
 		require.True(t, states.IsProcessed(stateC.IDWithLexicographicalOrdering()))
 
 		// This should evict stateA (lexicographically oldest)
-		err = states.AddState(stateD, true, capacity)
+		err = states.AddState(stateD)
 		require.NoError(t, err)
 
 		require.False(t, states.IsProcessed(stateA.IDWithLexicographicalOrdering()))
@@ -314,15 +314,15 @@ func TestStatesLexicographicalMode(t *testing.T) {
 		state1 := newState("bucket", "key1", "etag", time.Unix(1000, 0))
 		state2 := newState("bucket", "key2", "etag", time.Unix(2000, 0))
 
-		err = states.AddState(state1, true, capacity)
+		err = states.AddState(state1)
 		require.NoError(t, err)
-		err = states.AddState(state2, true, capacity)
+		err = states.AddState(state2)
 		require.NoError(t, err)
 
 		// Update state1 (should not trigger eviction)
 		state1Updated := newState("bucket", "key1", "etag", time.Unix(1000, 0))
 		state1Updated.Stored = true
-		err = states.AddState(state1Updated, true, capacity)
+		err = states.AddState(state1Updated)
 		require.NoError(t, err)
 
 		require.True(t, states.IsProcessed(state1.IDWithLexicographicalOrdering()))
@@ -339,11 +339,11 @@ func TestStatesLexicographicalMode(t *testing.T) {
 		stateB := newState("bucket", "b", "etag", time.Unix(2000, 0))
 		stateC := newState("bucket", "c", "etag", time.Unix(3000, 0))
 
-		err = states.AddState(stateC, true, 10)
+		err = states.AddState(stateC)
 		require.NoError(t, err)
-		err = states.AddState(stateA, true, 10)
+		err = states.AddState(stateA)
 		require.NoError(t, err)
-		err = states.AddState(stateB, true, 10)
+		err = states.AddState(stateB)
 		require.NoError(t, err)
 
 		oldest := states.GetOldestState()
@@ -363,14 +363,14 @@ func TestStatesLexicographicalMode(t *testing.T) {
 		stateC := newState("bucket", "c", "etag", time.Unix(3000, 0))
 		stateC.Stored = true
 
-		err = states.AddState(stateA, true, 10)
+		err = states.AddState(stateA)
 		require.NoError(t, err)
-		err = states.AddState(stateB, true, 10)
+		err = states.AddState(stateB)
 		require.NoError(t, err)
-		err = states.AddState(stateC, true, 10)
+		err = states.AddState(stateC)
 		require.NoError(t, err)
 
-		err = states.CleanUp([]string{}, true)
+		err = states.CleanUp([]string{})
 		require.NoError(t, err)
 
 		// stateC (lexicographically greatest) should be preserved
@@ -392,14 +392,14 @@ func TestStatesLexicographicalMode(t *testing.T) {
 		stateC := newState("bucket", "c", "etag", time.Unix(3000, 0))
 		stateC.Stored = true
 
-		err = states.AddState(stateA, true, 10)
+		err = states.AddState(stateA)
 		require.NoError(t, err)
-		err = states.AddState(stateB, true, 10)
+		err = states.AddState(stateB)
 		require.NoError(t, err)
-		err = states.AddState(stateC, true, 10)
+		err = states.AddState(stateC)
 		require.NoError(t, err)
 
-		err = states.CleanUp([]string{stateA.IDWithLexicographicalOrdering()}, true)
+		err = states.CleanUp([]string{stateA.IDWithLexicographicalOrdering()})
 		require.NoError(t, err)
 
 		require.True(t, states.IsProcessed(stateA.IDWithLexicographicalOrdering()))
@@ -463,14 +463,14 @@ func TestStatesLexicographicalMode(t *testing.T) {
 		stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
 		stateB := newState("bucket", "b", "etag", time.Unix(2000, 0))
 
-		err = states.AddState(stateC, true, 10)
+		err = states.AddState(stateC)
 		require.NoError(t, err)
-		err = states.AddState(stateA, true, 10)
+		err = states.AddState(stateA)
 		require.NoError(t, err)
-		err = states.AddState(stateB, true, 10)
+		err = states.AddState(stateB)
 		require.NoError(t, err)
 
-		states.SortStatesByLexicographicalOrdering(logger, 10)
+		states.SortStatesByLexicographicalOrdering(logger)
 
 		// After sorting, verify the linked list structure: nil <- (head) a <-> b <-> c (tail) -> nil
 		require.NotNil(t, states.head)

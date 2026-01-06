@@ -321,7 +321,7 @@ func TestS3Poller(t *testing.T) {
 		// This will be used as startAfterKey
 		existingState := newState(bucket, "existing-key", "etag", time.Unix(1000, 0))
 		existingState.Stored = true
-		err = states.AddState(existingState, true, 100)
+		err = states.AddState(existingState)
 		require.NoError(t, err, "state add must succeed")
 
 		oldestState := states.GetOldestState()
@@ -923,7 +923,7 @@ func Test_S3StateHandling(t *testing.T) {
 
 			// Note - add init states as if we are deriving them from registry
 			for _, st := range test.initStates {
-				err := s3States.AddState(st, false, 0)
+				err := s3States.AddState(st)
 				require.NoError(t, err, "State add should not error")
 			}
 

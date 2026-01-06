@@ -121,7 +121,7 @@ func (in *s3PollerInput) run(ctx context.Context) {
 
 		// In lexicographical ordering mode, sort states before running the poll
 		if in.config.LexicographicalOrdering {
-			in.states.SortStatesByLexicographicalOrdering(in.log, in.config.LexicographicalLookbackKeys)
+			in.states.SortStatesByLexicographicalOrdering(in.log)
 		}
 
 		in.runPoll(ctx)
@@ -160,7 +160,7 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 	}
 
 	// Perform state cleanup operation
-	err := in.states.CleanUp(ids, in.config.LexicographicalOrdering)
+	err := in.states.CleanUp(ids)
 	if err != nil {
 		in.log.Errorf("failed to cleanup states: %v", err.Error())
 		in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Input state cleanup failure: %s", err.Error()))
@@ -226,7 +226,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 
 		// Add the cleanup handling to the acks helper
 		acks.Add(publishCount, func() {
-			err := in.states.AddState(state, in.config.LexicographicalOrdering, in.config.LexicographicalLookbackKeys)
+			err := in.states.AddState(state)
 			if err != nil {
 				in.log.Errorf("saving completed object state: %v", err.Error())
 				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failure checkpointing (saving completed object state): %s", err.Error()))

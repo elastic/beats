@@ -34,6 +34,10 @@ type states struct {
 
 	// Accepted prefixes of state keys of this registry
 	keyPrefix string
+
+	// Lexicographical ordering configuration
+	lexicographicalOrdering     bool
+	lexicographicalLookbackKeys int
 }
 
 // newStates generates a new states registry.
@@ -49,9 +53,11 @@ func newStates(log *logp.Logger, stateStore statestore.States, listPrefix string
 	}
 
 	s := &states{
-		store:     store,
-		states:    stateTable,
-		keyPrefix: listPrefix,
+		store:                       store,
+		states:                      stateTable,
+		keyPrefix:                   listPrefix,
+		lexicographicalOrdering:     lexicographicalOrdering,
+		lexicographicalLookbackKeys: lexicographicalLookbackKeys,
 	}
 
 	// If lexicographical ordering is enabled, trim the loaded states to capacity
@@ -126,7 +132,7 @@ func (s *states) findLexicographicallyOldest() *state {
 	return oldest
 }
 
-func (s *states) AddState(st state, lexicographicalOrdering bool, lexicographicalLookbackKeys int) error {
+func (s *states) AddState(st state) error {
 	if !strings.HasPrefix(st.Key, s.keyPrefix) {
 		// Note - This failure should not happen since we create a dedicated state instance per input.
 		// Yet, this is here to avoid any wiring errors within the component.
@@ -142,7 +148,7 @@ func (s *states) AddState(st state, lexicographicalOrdering bool, lexicographica
 
 	// Maintain a doubly linked list structure for lexicographical ordering
 	// with lexicographicalLookbackKeys as capacity
-	if lexicographicalOrdering {
+	if s.lexicographicalOrdering {
 		id = st.IDWithLexicographicalOrdering()
 		// If state already exists, update it and move to back (newest position)
 		if existing, exists := s.states[id]; exists {
@@ -153,7 +159,7 @@ func (s *states) AddState(st state, lexicographicalOrdering bool, lexicographica
 		} else {
 			// New state: check capacity and add to back
 			// If at capacity, find and remove the lexicographically oldest state
-			if len(s.states) >= lexicographicalLookbackKeys {
+			if len(s.states) >= s.lexicographicalLookbackKeys {
 				oldest = s.findLexicographicallyOldest()
 				if oldest != nil {
 					delete(s.states, oldest.IDWithLexicographicalOrdering())
@@ -175,7 +181,7 @@ func (s *states) AddState(st state, lexicographicalOrdering bool, lexicographica
 	// Persist to the registry
 	s.storeLock.Lock()
 	defer s.storeLock.Unlock()
-	if lexicographicalOrdering && oldest != nil {
+	if s.lexicographicalOrdering && oldest != nil {
 		if err := s.store.Remove(getStoreKey(oldest.IDWithLexicographicalOrdering())); err != nil {
 			return fmt.Errorf("error while removing the oldest state: %w", err)
 		}
@@ -196,7 +202,7 @@ func (s *states) GetOldestState() *state {
 // State and underlying storage will be cleaned if ID is no longer present in knownIDs set.
 // When lexicographicalOrdering is enabled, at least one state (the lexicographically newest)
 // is always preserved to ensure startAfterKey can be used for subsequent S3 listings.
-func (s *states) CleanUp(knownIDs []string, lexicographicalOrdering bool) error {
+func (s *states) CleanUp(knownIDs []string) error {
 	knownIDHashSet := map[string]struct{}{}
 	for _, id := range knownIDs {
 		knownIDHashSet[id] = struct{}{}
@@ -220,7 +226,7 @@ func (s *states) CleanUp(knownIDs []string, lexicographicalOrdering bool) error 
 	}
 
 	// For lexicographical ordering, preserve the newest state for startAfterKey
-	if lexicographicalOrdering {
+	if s.lexicographicalOrdering {
 		slices.Sort(idsToRemove)
 		// Keep the lexicographically newest, and ensure at least one state remains
 		newestIdx := len(idsToRemove) - 1
@@ -233,7 +239,7 @@ func (s *states) CleanUp(knownIDs []string, lexicographicalOrdering bool) error 
 	// Remove the states
 	for _, id := range idsToRemove {
 		st := s.states[id]
-		if lexicographicalOrdering {
+		if s.lexicographicalOrdering {
 			s.remove(st) // Remove from linked list
 		}
 		delete(s.states, id)
@@ -295,7 +301,7 @@ func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix 
 	return stateTable, err
 }
 
-func (s *states) SortStatesByLexicographicalOrdering(log *logp.Logger, lexicographicalLookbackKeys int) {
+func (s *states) SortStatesByLexicographicalOrdering(log *logp.Logger) {
 	s.statesLock.Lock()
 	defer s.statesLock.Unlock()
 
@@ -303,7 +309,7 @@ func (s *states) SortStatesByLexicographicalOrdering(log *logp.Logger, lexicogra
 		return
 	}
 
-	s.trimAndBuildLinkedList(log, lexicographicalLookbackKeys)
+	s.trimAndBuildLinkedList(log, s.lexicographicalLookbackKeys)
 	log.Debugf("Sorted states by lexicographical ordering: state_count=%d, oldest_state=%s, newest_state=%s", len(s.states), s.head.IDWithLexicographicalOrdering(), s.tail.IDWithLexicographicalOrdering())
 }
 
