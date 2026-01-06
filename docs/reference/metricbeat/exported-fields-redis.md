@@ -888,6 +888,14 @@ Redis command statistics
 
 
 **`redis.keyspace.expires`**
-:       type: long
+:   Number of keys with an expiry set.
+
+    type: long
+
+
+**`redis.keyspace.subexpiry`**
+:   Number of sub-keys with an expiry set (0 when not reported).
+
+    type: long
 
 
