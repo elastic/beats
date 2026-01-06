@@ -3,8 +3,9 @@
 ## Executive Summary
 
 This document provides a detailed implementation plan for adding a bbolt-based registry backend to Filebeat with a 2-layer caching system (in-memory hot cache + on-disk cold storage). Implementation follows a phased approach:
-- **Phase 1**: bbolt backend with disk TTL/GC
+- **Phase 1**: bbolt backend with disk TTL/GC (full scan)
 - **Phase 2**: In-memory cache layer with TTL/GC
+- **Phase 3**: Incremental GC optimization for scalability
 
 ## 1. Requirements Analysis
 
@@ -13,7 +14,7 @@ This document provides a detailed implementation plan for adding a bbolt-based r
 **Phase 1: BBolt Backend (Cold Storage)**
 - Implement `backend.Registry` and `backend.Store` interfaces
 - On-disk key-value storage using bbolt
-- Disk-level TTL with garbage collection
+- Disk-level TTL with garbage collection (full scan)
 - Configuration: `registry.type` (default: "bbolt"), `registry.disk.ttl`
 - Thread-safe operations
 - Background GC goroutine (interval = TTL)
@@ -21,11 +22,18 @@ This document provides a detailed implementation plan for adding a bbolt-based r
 
 **Phase 2: In-Memory Cache (Hot Storage)**
 - In-memory cache layer on top of bbolt
-- Cache-level TTL with separate GC
+- Cache-level TTL with separate GC (full scan)
 - Configuration: `registry.cache.ttl`
 - Background GC goroutine (interval = TTL)
 - Transparent read-through/write-through caching
 - Frequently accessed entries remain in cache
+
+**Phase 3: Incremental GC Optimization**
+- Replace full-scan GC with incremental batch-based GC
+- Configuration: `registry.bbolt.gc_batch_size`
+- Cursor-based scanning for both disk and cache GC
+- Adaptive strategy based on registry size
+- GC metrics and monitoring
 
 ### 1.2 Interface Compliance
 
@@ -180,12 +188,23 @@ type memCache struct {
 - TTL calculation: `time.Now() - lastAccessTime > diskTTL`
 - On expiry: delete from both metadata and data buckets
 - Runs in background goroutine with ticker
+- **Phase 1 & 2**: Full scan of all entries
+- **Phase 3**: Incremental batch-based scan
 
 **Cache GC (Phase 2)**
 - Interval: `registry.cache.ttl` (e.g., 1h, 24h)
 - TTL calculation: `time.Now() - lastAccessTime > cacheTTL`
 - On expiry: remove from in-memory cache only (keep on disk)
 - Access-based: frequently accessed entries stay in cache
+- **Phase 2**: Full scan of cache map
+- **Phase 3**: Incremental batch-based scan
+
+**Incremental GC (Phase 3)**
+- Batch size: configurable (default 50K entries)
+- Cursor-based: remember scan position between cycles
+- Wraps around: when reaching end, start from beginning
+- Adaptive: adjust batch size based on registry size
+- Performance: ~0.5s per cycle for 50K entries vs 7-13s for 1M entries
 
 **Access Time Updates**
 - Update on: Get, Set
@@ -236,6 +255,9 @@ type BBoltConfig struct {
     // Cache TTL (Phase 2)
     CacheTTL      time.Duration `config:"cache_ttl"`
     
+    // GC optimization (Phase 3)
+    GCBatchSize   int           `config:"gc_batch_size"`
+    
     // BBolt-specific options
     FileMode      os.FileMode   `config:"file_permissions"`
     Timeout       time.Duration `config:"timeout"`
@@ -249,6 +271,7 @@ var DefaultConfig = Config{
         BBolt: BBoltConfig{
             DiskTTL:        30 * 24 * time.Hour,  // 30 days
             CacheTTL:       1 * time.Hour,         // 1 hour (Phase 2)
+            GCBatchSize:    50000,                 // 50K entries per GC cycle (Phase 3)
             FileMode:       0o600,
             Timeout:        1 * time.Second,
             NoGrowSync:     false,
@@ -270,8 +293,9 @@ filebeat.registry:
 filebeat.registry:
   type: bbolt
   bbolt:
-    disk_ttl: 60d    # 60 days
-    cache_ttl: 2h    # 2 hours (Phase 2)
+    disk_ttl: 60d           # 60 days
+    cache_ttl: 2h           # 2 hours (Phase 2)
+    gc_batch_size: 100000   # 100K entries per GC cycle (Phase 3)
 
 # Example 3: Legacy memlog backend
 filebeat.registry:
@@ -292,7 +316,8 @@ libbeat/statestore/backend/bbolt/
 ├── registry.go           # Registry implementation
 ├── store.go             # Store implementation (Phase 1)
 ├── store_cache.go       # Cache layer (Phase 2)
-├── gc.go                # Garbage collection logic
+├── gc.go                # Garbage collection logic (Phase 1 & 2: full scan)
+├── gc_incremental.go    # Incremental GC (Phase 3)
 ├── metadata.go          # Metadata handling
 ├── doc.go              # Package documentation
 ├── bbolt_test.go       # Compliance tests
@@ -483,9 +508,11 @@ func (e entry) Decode(to interface{}) error {
 }
 ```
 
-#### 5.1.3 Garbage Collection
+#### 5.1.3 Garbage Collection (Full Scan)
 
 **File:** `libbeat/statestore/backend/bbolt/gc.go`
+
+**Note:** This is the Phase 1 & 2 implementation using full scans. Phase 3 will add incremental GC.
 
 ```go
 package bbolt
@@ -513,11 +540,15 @@ func (s *store) runGC(interval time.Duration, done <-chan struct{}) {
     }
 }
 
+// collectGarbage performs a full scan of all entries (Phase 1 & 2)
+// This will be replaced with incremental GC in Phase 3
 func (s *store) collectGarbage() error {
+    start := time.Now()
     now := time.Now()
     var toDelete []string
+    var totalScanned int
     
-    // Phase 1: Identify expired entries
+    // Phase 1: Identify expired entries (FULL SCAN)
     err := s.db.View(func(tx *bbolt.Tx) error {
         metaBucket := tx.Bucket([]byte(metadataBucket))
         if metaBucket == nil {
@@ -525,9 +556,12 @@ func (s *store) collectGarbage() error {
         }
         
         return metaBucket.ForEach(func(k, v []byte) error {
+            totalScanned++
+            
             var meta metadata
             if err := json.Unmarshal(v, &meta); err != nil {
-                return err
+                s.log.Warnf("Failed to unmarshal metadata for key %s: %v", string(k), err)
+                return nil // Continue scanning
             }
             
             if now.Sub(meta.LastAccess) > s.settings.DiskTTL {
@@ -543,8 +577,6 @@ func (s *store) collectGarbage() error {
     
     // Phase 2: Delete expired entries
     if len(toDelete) > 0 {
-        s.log.Infof("GC: deleting %d expired entries", len(toDelete))
-        
         err = s.db.Update(func(tx *bbolt.Tx) error {
             dataBucket := tx.Bucket([]byte(dataBucket))
             metaBucket := tx.Bucket([]byte(metadataBucket))
@@ -559,6 +591,20 @@ func (s *store) collectGarbage() error {
             }
             return nil
         })
+    }
+    
+    duration := time.Since(start)
+    s.log.Infow("GC completed",
+        "duration_ms", duration.Milliseconds(),
+        "scanned", totalScanned,
+        "deleted", len(toDelete),
+        "gc_type", "full_scan",
+    )
+    
+    // Log warning if GC takes too long (> 10 seconds for 1M entries)
+    if duration > 10*time.Second {
+        s.log.Warnf("GC took %v to scan %d entries. Consider enabling incremental GC (Phase 3)", 
+            duration, totalScanned)
     }
     
     return err
@@ -802,7 +848,364 @@ func (s *storeWithCache) collectCacheGarbage() {
 }
 ```
 
-### 5.3 Backend Selection Logic
+### 5.3 Phase 3: Incremental GC Implementation
+
+#### 5.3.1 Incremental GC Logic
+
+**File:** `libbeat/statestore/backend/bbolt/gc_incremental.go`
+
+```go
+package bbolt
+
+import (
+    "encoding/json"
+    "time"
+    
+    "go.etcd.io/bbolt"
+    "github.com/elastic/elastic-agent-libs/logp"
+)
+
+// gcState tracks the incremental GC cursor position
+type gcState struct {
+    cursor       []byte    // Last scanned key
+    lastFullScan time.Time // When we completed a full cycle
+    totalScanned int64     // Total entries scanned in current cycle
+    totalDeleted int64     // Total entries deleted in current cycle
+}
+
+// collectGarbageIncremental performs incremental batch-based GC (Phase 3)
+// This replaces the full-scan collectGarbage() from Phase 1 & 2
+func (s *store) collectGarbageIncremental() error {
+    start := time.Now()
+    now := time.Now()
+    
+    batchSize := s.settings.GCBatchSize
+    if batchSize <= 0 {
+        batchSize = 50000 // Default
+    }
+    
+    var toDelete []string
+    var scanned int
+    var newCursor []byte
+    wrappedAround := false
+    
+    // Phase 1: Scan batch of entries
+    err := s.db.View(func(tx *bbolt.Tx) error {
+        metaBucket := tx.Bucket([]byte(metadataBucket))
+        if metaBucket == nil {
+            return nil
+        }
+        
+        cursor := metaBucket.Cursor()
+        
+        // Resume from last position or start from beginning
+        var k, v []byte
+        if s.gcState.cursor != nil {
+            k, v = cursor.Seek(s.gcState.cursor)
+            // If cursor not found, we've wrapped around
+            if k == nil {
+                k, v = cursor.First()
+                wrappedAround = true
+            }
+        } else {
+            k, v = cursor.First()
+        }
+        
+        // Scan up to batchSize entries
+        for ; k != nil && scanned < batchSize; k, v = cursor.Next() {
+            scanned++
+            
+            var meta metadata
+            if err := json.Unmarshal(v, &meta); err != nil {
+                s.log.Warnf("Failed to unmarshal metadata for key %s: %v", string(k), err)
+                continue
+            }
+            
+            if now.Sub(meta.LastAccess) > s.settings.DiskTTL {
+                toDelete = append(toDelete, string(k))
+            }
+            
+            // Save last key as new cursor
+            newCursor = append([]byte(nil), k...)
+        }
+        
+        // If we reached the end, mark as wrapped around
+        if k == nil {
+            wrappedAround = true
+            newCursor = nil
+        }
+        
+        return nil
+    })
+    
+    if err != nil {
+        return err
+    }
+    
+    // Phase 2: Delete expired entries
+    if len(toDelete) > 0 {
+        err = s.db.Update(func(tx *bbolt.Tx) error {
+            dataBucket := tx.Bucket([]byte(dataBucket))
+            metaBucket := tx.Bucket([]byte(metadataBucket))
+            
+            for _, key := range toDelete {
+                if dataBucket != nil {
+                    dataBucket.Delete([]byte(key))
+                }
+                if metaBucket != nil {
+                    metaBucket.Delete([]byte(key))
+                }
+            }
+            return nil
+        })
+        
+        if err != nil {
+            return err
+        }
+    }
+    
+    // Update GC state
+    s.gcMu.Lock()
+    s.gcState.cursor = newCursor
+    s.gcState.totalScanned += int64(scanned)
+    s.gcState.totalDeleted += int64(len(toDelete))
+    
+    if wrappedAround {
+        // Completed a full cycle
+        s.log.Infow("Incremental GC full cycle completed",
+            "cycle_duration", time.Since(s.gcState.lastFullScan),
+            "total_scanned", s.gcState.totalScanned,
+            "total_deleted", s.gcState.totalDeleted,
+        )
+        s.gcState.lastFullScan = now
+        s.gcState.totalScanned = 0
+        s.gcState.totalDeleted = 0
+    }
+    s.gcMu.Unlock()
+    
+    duration := time.Since(start)
+    s.log.Debugw("Incremental GC batch completed",
+        "duration_ms", duration.Milliseconds(),
+        "scanned", scanned,
+        "deleted", len(toDelete),
+        "batch_size", batchSize,
+        "wrapped", wrappedAround,
+    )
+    
+    return nil
+}
+
+// getGCStats returns current GC statistics
+func (s *store) getGCStats() GCStats {
+    s.gcMu.RLock()
+    defer s.gcMu.RUnlock()
+    
+    return GCStats{
+        TotalScanned:    s.gcState.totalScanned,
+        TotalDeleted:    s.gcState.totalDeleted,
+        LastFullScan:    s.gcState.lastFullScan,
+        CurrentPosition: len(s.gcState.cursor) > 0,
+    }
+}
+
+type GCStats struct {
+    TotalScanned    int64
+    TotalDeleted    int64
+    LastFullScan    time.Time
+    CurrentPosition bool // false if at beginning
+}
+```
+
+#### 5.3.2 Updated Store Structure
+
+**File:** `libbeat/statestore/backend/bbolt/store.go` (additions)
+
+```go
+type store struct {
+    db   *bbolt.DB
+    log  *logp.Logger
+    mu   sync.RWMutex
+    
+    name     string
+    settings Settings
+    
+    closed bool
+    
+    // GC state (Phase 3)
+    gcState gcState
+    gcMu    sync.RWMutex
+}
+
+type Settings struct {
+    Root           string
+    FileMode       os.FileMode
+    DiskTTL        time.Duration
+    CacheTTL       time.Duration
+    GCBatchSize    int           // Phase 3: entries per GC batch
+    Timeout        time.Duration
+    NoGrowSync     bool
+    NoFreelistSync bool
+}
+```
+
+#### 5.3.3 Adaptive GC Strategy
+
+**File:** `libbeat/statestore/backend/bbolt/gc_adaptive.go`
+
+```go
+package bbolt
+
+// selectGCStrategy chooses between full scan and incremental based on registry size
+func (s *store) selectGCStrategy() (useIncremental bool, err error) {
+    var entryCount int64
+    
+    err = s.db.View(func(tx *bbolt.Tx) error {
+        metaBucket := tx.Bucket([]byte(metadataBucket))
+        if metaBucket == nil {
+            return nil
+        }
+        
+        stats := metaBucket.Stats()
+        entryCount = int64(stats.KeyN)
+        return nil
+    })
+    
+    if err != nil {
+        return false, err
+    }
+    
+    // Use incremental GC for registries > 100K entries
+    // Or if batch size is explicitly configured
+    useIncremental = entryCount > 100000 || s.settings.GCBatchSize > 0
+    
+    if useIncremental {
+        s.log.Debugf("Using incremental GC (registry size: %d entries)", entryCount)
+    } else {
+        s.log.Debugf("Using full-scan GC (registry size: %d entries)", entryCount)
+    }
+    
+    return useIncremental, nil
+}
+
+// collectGarbageSmart selects the appropriate GC strategy
+func (s *store) collectGarbageSmart() error {
+    useIncremental, err := s.selectGCStrategy()
+    if err != nil {
+        return err
+    }
+    
+    if useIncremental {
+        return s.collectGarbageIncremental()
+    }
+    return s.collectGarbage() // Full scan
+}
+```
+
+#### 5.3.4 Cache Incremental GC (Phase 2 + 3)
+
+**File:** `libbeat/statestore/backend/bbolt/store_cache.go` (additions)
+
+```go
+type storeWithCache struct {
+    *store // Embed Phase 1 store
+    
+    cache   map[string]*cacheEntry
+    cacheMu sync.RWMutex
+    
+    cacheTTL time.Duration
+    
+    // GC control
+    cacheGCDone chan struct{}
+    cacheGCWg   sync.WaitGroup
+    
+    // Cache GC state (Phase 3)
+    cacheGCState struct {
+        keys         []string  // Snapshot of keys for incremental scan
+        position     int       // Current scan position
+        lastFullScan time.Time
+        mu           sync.Mutex
+    }
+}
+
+func (s *storeWithCache) collectCacheGarbageIncremental() {
+    now := time.Now()
+    batchSize := s.settings.GCBatchSize
+    if batchSize <= 0 {
+        batchSize = 50000
+    }
+    
+    s.cacheGCState.mu.Lock()
+    
+    // Create snapshot of keys if starting new cycle
+    if s.cacheGCState.position == 0 {
+        s.cacheMu.RLock()
+        s.cacheGCState.keys = make([]string, 0, len(s.cache))
+        for key := range s.cache {
+            s.cacheGCState.keys = append(s.cacheGCState.keys, key)
+        }
+        s.cacheMu.RUnlock()
+    }
+    
+    keys := s.cacheGCState.keys
+    start := s.cacheGCState.position
+    end := start + batchSize
+    if end > len(keys) {
+        end = len(keys)
+    }
+    
+    s.cacheGCState.mu.Unlock()
+    
+    // Scan batch
+    var toDelete []string
+    for i := start; i < end; i++ {
+        key := keys[i]
+        
+        s.cacheMu.RLock()
+        entry, exists := s.cache[key]
+        s.cacheMu.RUnlock()
+        
+        if !exists {
+            continue
+        }
+        
+        entry.mu.RLock()
+        expired := now.Sub(entry.lastAccess) > s.cacheTTL
+        entry.mu.RUnlock()
+        
+        if expired {
+            toDelete = append(toDelete, key)
+        }
+    }
+    
+    // Delete expired entries
+    if len(toDelete) > 0 {
+        s.cacheMu.Lock()
+        for _, key := range toDelete {
+            delete(s.cache, key)
+        }
+        s.cacheMu.Unlock()
+    }
+    
+    // Update state
+    s.cacheGCState.mu.Lock()
+    s.cacheGCState.position = end
+    
+    if end >= len(keys) {
+        // Completed cycle
+        s.log.Debugf("Cache GC cycle completed: scanned %d entries, deleted %d", 
+            len(keys), len(toDelete))
+        s.cacheGCState.position = 0
+        s.cacheGCState.keys = nil
+        s.cacheGCState.lastFullScan = now
+    } else {
+        s.log.Debugf("Cache GC batch: scanned %d entries (%d-%d), deleted %d",
+            end-start, start, end, len(toDelete))
+    }
+    s.cacheGCState.mu.Unlock()
+}
+```
+
+### 5.4 Backend Selection Logic
 
 **File:** `filebeat/beater/store.go` (modification)
 
@@ -937,9 +1340,57 @@ Test scenarios:
 - Performance benchmarks
 - Memory usage monitoring
 
-## 7. Implementation Checklist
+## 7. Performance Considerations
 
-### 7.1 Phase 1: BBolt Backend (Estimated: 3-5 days)
+### 7.1 GC Performance Analysis
+
+**Full Scan GC (Phase 1 & 2):**
+- 1M entries: 7-13 seconds
+- 10M entries: 50-150 seconds
+- Linear scaling: O(n)
+- Acceptable for small-medium registries (< 100K entries)
+
+**Incremental GC (Phase 3):**
+- 50K entries per batch: ~0.5 seconds
+- 1M entries = 20 batches
+- Constant per-batch time: O(batch_size)
+- Scalable to 10M+ entries
+
+**When to use incremental GC:**
+- Registry size > 100K entries
+- Explicitly configured via `gc_batch_size`
+- Adaptive: automatically selected based on size
+
+### 7.2 BBolt Optimizations
+
+- `NoFreelistSync: true` - Faster writes, slight increase in DB size
+- `NoGrowSync: false` - Safer default, can be tuned
+- Batch operations in GC
+- Read-only transactions for Get/Has/Each
+- Single write transaction per operation
+
+### 7.3 Cache Optimizations (Phase 2)
+
+- LRU-style eviction through TTL
+- No cache on Has() to avoid pollution
+- Batch cache updates
+- Separate mutexes for cache vs disk
+
+### 7.4 Expected Performance
+
+**vs memlog:**
+- Faster random reads (no log replay)
+- Similar write performance
+- Better memory usage (with cache)
+- Automatic cleanup (GC)
+
+**GC overhead:**
+- Phase 1 & 2: Periodic spikes (7-13s for 1M entries)
+- Phase 3: Smooth, predictable (~0.5s per batch)
+
+## 8. Implementation Checklist
+
+### 8.1 Phase 1: BBolt Backend (Estimated: 3-5 days)
 
 #### Day 1-2: Core Implementation
 - [ ] Create `libbeat/statestore/backend/bbolt/` directory
@@ -966,13 +1417,14 @@ Test scenarios:
   - [ ] updateMetadata() helper
   - [ ] JSON serialization
 
-#### Day 2-3: GC Implementation
+#### Day 2-3: GC Implementation (Full Scan)
 - [ ] Implement `gc.go`
   - [ ] Registry-level GC goroutine
-  - [ ] Store-level collectGarbage() method
+  - [ ] Store-level collectGarbage() method (full scan)
   - [ ] Expired entry identification
   - [ ] Batch deletion
   - [ ] Error handling and logging
+  - [ ] Performance logging (warn if > 10s)
   - [ ] Graceful shutdown
 - [ ] Add `doc.go` with package documentation
 
@@ -1004,9 +1456,9 @@ Test scenarios:
 - [ ] Fix any issues
 - [ ] Performance benchmarks
 
-### 7.2 Phase 2: In-Memory Cache (Estimated: 2-3 days)
+### 8.2 Phase 2: In-Memory Cache (Estimated: 2-3 days)
 
-#### Day 1: Cache Implementation
+#### Day 1: Cache Implementation (Full Scan GC)
 - [ ] Implement `store_cache.go`
   - [ ] cacheEntry struct
   - [ ] storeWithCache struct
@@ -1017,9 +1469,9 @@ Test scenarios:
   - [ ] Remove() with cache invalidation
   - [ ] Has() cache-aware
   - [ ] Each() cache-aware
-- [ ] Cache GC goroutine
+- [ ] Cache GC goroutine (full scan)
   - [ ] runCacheGC() method
-  - [ ] collectCacheGarbage() method
+  - [ ] collectCacheGarbage() method (full scan)
   - [ ] Graceful shutdown
 
 #### Day 2: Configuration & Integration
@@ -1041,18 +1493,66 @@ Test scenarios:
   - [ ] Cache vs no-cache comparison
   - [ ] Memory usage analysis
 
-### 7.3 Documentation & Finalization
+### 8.3 Phase 3: Incremental GC (Estimated: 2-3 days)
+
+#### Day 1: Incremental GC for Disk
+- [ ] Implement `gc_incremental.go`
+  - [ ] gcState struct with cursor tracking
+  - [ ] collectGarbageIncremental() method
+  - [ ] Batch-based scanning with cursor
+  - [ ] Wrap-around logic
+  - [ ] Full cycle tracking
+  - [ ] getGCStats() for monitoring
+- [ ] Implement `gc_adaptive.go`
+  - [ ] selectGCStrategy() based on size
+  - [ ] collectGarbageSmart() dispatcher
+  - [ ] Entry count estimation
+- [ ] Update store struct
+  - [ ] Add gcState field
+  - [ ] Add gcMu mutex
+  - [ ] Add GCBatchSize to Settings
+
+#### Day 2: Incremental GC for Cache
+- [ ] Update `store_cache.go`
+  - [ ] Add cacheGCState struct
+  - [ ] Implement collectCacheGarbageIncremental()
+  - [ ] Key snapshot mechanism
+  - [ ] Batch-based cache scanning
+  - [ ] Position tracking
+- [ ] Update Registry.runGC()
+  - [ ] Call collectGarbageSmart() instead of collectGarbage()
+
+#### Day 3: Testing & Tuning
+- [ ] Update `gc_test.go`
+  - [ ] Incremental GC functionality tests
+  - [ ] Cursor tracking tests
+  - [ ] Wrap-around tests
+  - [ ] Full cycle verification
+  - [ ] Adaptive strategy tests
+  - [ ] Performance comparison tests
+- [ ] Benchmarks
+  - [ ] Full scan vs incremental comparison
+  - [ ] Various batch sizes
+  - [ ] Various registry sizes (100K, 1M, 10M)
+- [ ] Update documentation
+  - [ ] GC strategy explanation
+  - [ ] Tuning guidelines
+  - [ ] Performance characteristics
+
+### 8.4 Documentation & Finalization
 
 - [ ] Update project documentation
   - [ ] README mentions bbolt backend
   - [ ] Migration guide from memlog
   - [ ] Configuration examples
+  - [ ] GC strategy documentation
+  - [ ] Performance tuning guide
 - [ ] Update CHANGELOG
 - [ ] Code review
 - [ ] Address feedback
 - [ ] Final testing
 
-## 8. Migration & Backward Compatibility
+## 9. Migration & Backward Compatibility
 
 ### 8.1 Migration Path
 
@@ -1078,9 +1578,9 @@ Test scenarios:
 - Configuration changes are additive
 - No breaking changes to existing configs
 
-## 9. Performance Considerations
+## 10. Error Handling
 
-### 9.1 BBolt Optimizations
+### 10.1 Error Categories
 
 - `NoFreelistSync: true` - Faster writes, slight increase in DB size
 - `NoGrowSync: false` - Safer default, can be tuned
@@ -1121,38 +1621,40 @@ Test scenarios:
 - Non-fatal, logged only
 - Retry on next interval
 
-### 10.2 Recovery Strategies
+### 11.2 Recovery Strategies
 
 - DB corruption: log error, attempt to continue
 - Permission issues: fail fast with clear message
 - GC failures: log and continue
 - Graceful degradation where possible
 
-## 11. Security Considerations
+## 12. Open Questions & Decisions
 
 - File permissions: 0600 by default
 - No sensitive data logging
 - Secure defaults for bbolt options
 - No network exposure
 
-## 12. Open Questions & Decisions
+## 13. Open Questions & Decisions
 
-### 12.1 Design Decisions Made
+### 13.1 Design Decisions Made
 
 1. **Separate DB file per store** - Isolation, easier management
 2. **JSON encoding** - Compatibility, debugging ease
 3. **Two buckets** - Data/metadata separation
 4. **Access time on Get** - Track usage accurately
 5. **No automatic migration** - Reduced complexity, lower risk
+6. **Incremental GC in Phase 3** - Scalability without complexity in Phase 1
 
-### 12.2 Tunable Parameters
+### 13.2 Tunable Parameters
 
 - GC intervals (= TTL values)
+- GC batch size (Phase 3)
 - BBolt options (NoFreelistSync, etc.)
 - Cache enabled/disabled (Phase 2)
 - File permissions
 
-### 12.3 Future Enhancements
+### 13.3 Future Enhancements
 
 - Automatic migration from memlog
 - Metrics/monitoring
@@ -1160,7 +1662,7 @@ Test scenarios:
 - Batch operation APIs
 - Cache size limits (Phase 2)
 
-## 13. Success Criteria
+## 14. Timeline Estimate
 
 **Phase 1:**
 - [ ] All compliance tests pass
@@ -1179,34 +1681,73 @@ Test scenarios:
 
 ## 14. Timeline Estimate
 
-**Phase 1 (BBolt Backend):**
+**Phase 1 (BBolt Backend with Full Scan GC):**
 - Development: 3-5 days
 - Testing: 1-2 days
 - Review & fixes: 1-2 days
 - **Total: 5-9 days**
 
-**Phase 2 (In-Memory Cache):**
+**Phase 2 (In-Memory Cache with Full Scan GC):**
 - Development: 2-3 days
 - Testing: 1 day
 - Review & fixes: 1 day
 - **Total: 4-5 days**
 
-**Overall: 9-14 days** for complete implementation.
+**Phase 3 (Incremental GC Optimization):**
+- Development: 2-3 days
+- Testing & benchmarking: 1 day
+- Review & fixes: 1 day
+- **Total: 4-5 days**
 
-## 15. Appendix
+**Overall: 13-19 days** for complete implementation.
 
-### 15.1 BBolt Resources
+**Recommended approach:**
+- Phase 1: Get basic functionality working, validate approach
+- Phase 2: Add caching layer, ensure performance improvement
+- Phase 3: Optimize for scalability (can be deferred if registries stay small)
+
+**Note:** Phase 3 is optional initially. If Filebeat registries remain small (< 100K entries), Phase 1 & 2 provide sufficient performance.
+
+**Phase 3:**
+- [ ] Incremental GC correctly handles large registries
+- [ ] Cursor tracking works across restarts
+- [ ] Wrap-around logic correct
+- [ ] Adaptive strategy selects correct GC method
+- [ ] Performance metrics available
+- [ ] GC batch time < 1 second
+- [ ] Memory usage reasonable during GC
+
+## 16. Appendix
+
+### 16.1 BBolt Resources
 
 - [BBolt Documentation](https://github.com/etcd-io/bbolt)
 - [BBolt Best Practices](https://github.com/etcd-io/bbolt#caveats--limitations)
 
-### 15.2 Reference Implementations
+### 16.2 Reference Implementations
 
 - `libbeat/statestore/backend/memlog/` - Pattern reference
 - `libbeat/statestore/backend/es/` - Simpler pattern
 - BBolt examples in etcd codebase
 
-### 15.3 Code Review Checklist
+### 16.3 GC Performance Reference
+
+**Full Scan (Phase 1 & 2):**
+- 100K entries: ~1-2 seconds
+- 1M entries: ~7-13 seconds
+- 10M entries: ~50-150 seconds
+
+**Incremental (Phase 3):**
+- Batch of 50K: ~0.5 seconds
+- Batch of 100K: ~1 second
+- Independent of total registry size
+
+**Recommendations:**
+- < 100K entries: Use full scan (simpler, fast enough)
+- 100K - 1M entries: Use incremental with 50K batch
+- > 1M entries: Use incremental with 10K-50K batch
+
+### 16.4 Code Review Checklist
 
 - [ ] All exported functions documented
 - [ ] Error handling consistent
@@ -1216,3 +1757,6 @@ Test scenarios:
 - [ ] Tests comprehensive
 - [ ] No magic numbers
 - [ ] Configuration validated
+- [ ] GC performance acceptable
+- [ ] Cursor state properly managed (Phase 3)
+- [ ] Metrics/monitoring in place
