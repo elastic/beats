@@ -12,8 +12,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"strings"
 	"time"
+
+	"github.com/coder/websocket"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
@@ -45,6 +48,10 @@ const (
 	// processorRestartMaxBackoff is the maximum backoff time before
 	// restarting the processor.
 	processorRestartMaxBackoff = 120 * time.Second
+	// AMQP transport for Event Hub connection.
+	transportAmqp = "amqp"
+	// WebSocket transport for Event Hub connection.
+	transportWebsocket = "websocket"
 )
 
 // azureInputConfig the Azure Event Hub input v2,
@@ -620,4 +627,27 @@ func shutdownPartitionResources(ctx context.Context, partitionClient *azeventhub
 	// Closing the pipeline since we're done
 	// processing events for this partition.
 	defer pipelineClient.Close()
+}
+
+// newWebSocketConn creates a WebSocket connection for AMQP-over-WebSocket transport.
+//
+// This function is used when the transport configuration is set to "websocket".
+// It enables connectivity through HTTP proxies and firewalls that block the
+// standard AMQP port (5671) but allow HTTPS traffic on port 443.
+//
+// HTTP proxy configuration is automatically detected from environment variables:
+// - HTTP_PROXY / http_proxy
+// - HTTPS_PROXY / https_proxy
+// - NO_PROXY / no_proxy
+func newWebSocketConn(ctx context.Context, args azeventhubs.WebSocketConnParams) (net.Conn, error) {
+	opts := &websocket.DialOptions{
+		Subprotocols: []string{"amqp"},
+	}
+
+	wssConn, _, err := websocket.Dial(ctx, args.Host, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return websocket.NetConn(ctx, wssConn, websocket.MessageBinary), nil
 }
