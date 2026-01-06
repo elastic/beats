@@ -1393,13 +1393,13 @@ Test scenarios:
 ### 8.1 Phase 1: BBolt Backend (Estimated: 3-5 days)
 
 #### Day 1-2: Core Implementation
-- [ ] Create `libbeat/statestore/backend/bbolt/` directory
-- [ ] Implement `registry.go`
-  - [ ] Registry struct with settings
-  - [ ] New() constructor with validation
-  - [ ] Access() method - open/create stores
-  - [ ] Close() method - cleanup
-  - [ ] Basic logging
+- [x] Create `libbeat/statestore/backend/bbolt/` directory
+- [x] Implement `registry.go`
+  - [x] Registry struct with settings
+  - [x] New() constructor with validation
+  - [x] Access() method - open/create stores
+  - [x] Close() method - cleanup
+  - [x] Basic logging
 - [ ] Implement `store.go`
   - [ ] Store struct with bbolt.DB
   - [ ] openStore() - DB initialization
