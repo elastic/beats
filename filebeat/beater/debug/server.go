@@ -25,9 +25,10 @@ import (
 	"net/http"
 	"strconv"
 
+	bolt "go.etcd.io/bbolt"
+
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/bbolt"
 	"github.com/elastic/elastic-agent-libs/logp"
-	bolt "go.etcd.io/bbolt"
 )
 
 const (

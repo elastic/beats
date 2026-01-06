@@ -30,10 +30,11 @@ import (
 
 	"slices"
 
+	"go.etcd.io/bbolt"
+
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"go.etcd.io/bbolt"
 )
 
 const (
