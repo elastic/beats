@@ -1400,22 +1400,22 @@ Test scenarios:
   - [x] Access() method - open/create stores
   - [x] Close() method - cleanup
   - [x] Basic logging
-- [ ] Implement `store.go`
-  - [ ] Store struct with bbolt.DB
-  - [ ] openStore() - DB initialization
-  - [ ] Bucket creation (data, metadata)
-  - [ ] Close() method
-  - [ ] Has() method
-  - [ ] Get() method with access time update
-  - [ ] Set() method with metadata
-  - [ ] Remove() method
-  - [ ] Each() method
-  - [ ] SetID() method
-- [ ] Implement `metadata.go`
-  - [ ] metadata struct
-  - [ ] updateAccessTime() helper
-  - [ ] updateMetadata() helper
-  - [ ] JSON serialization
+- [x] Implement `store.go`
+  - [x] Store struct with bbolt.DB
+  - [x] openStore() - DB initialization
+  - [x] Bucket creation (data, metadata)
+  - [x] Close() method
+  - [x] Has() method
+  - [x] Get() method with access time update
+  - [x] Set() method with metadata
+  - [x] Remove() method
+  - [x] Each() method
+  - [x] SetID() method
+- [x] Implement `metadata.go`
+  - [x] metadata struct
+  - [x] updateAccessTime() helper
+  - [x] updateMetadata() helper
+  - [x] JSON serialization
 
 #### Day 2-3: GC Implementation (Full Scan)
 - [ ] Implement `gc.go`

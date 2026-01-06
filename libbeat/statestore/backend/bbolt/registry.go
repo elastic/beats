@@ -130,7 +130,7 @@ func (r *Registry) Access(name string) (backend.Store, error) {
 		return nil, errors.New("bbolt store name is empty")
 	}
 
-	if existing := r.stores[name]; existing != nil {
+	if existing := r.stores[name]; existing != nil && !existing.isClosed() {
 		return existing, nil
 	}
 
