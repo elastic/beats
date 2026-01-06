@@ -52,22 +52,7 @@ type filestreamFileMeta struct {
 	IdentifierName string `json:"identifier_name"`
 }
 
-func TestBBoltRegistrySyncedOnShutdown(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
-
-	home := filebeat.TempDir()
-	logfile := filepath.Join(home, "log.log")
-	integration.WriteLogFile(t, logfile, 50, false, "")
-
-	fi, err := os.Stat(logfile)
-	require.NoError(t, err)
-	expectedOffset := fi.Size()
-
-	cfg := fmt.Sprintf(`
+var bboltCfg = `
 filebeat.inputs:
   - type: filestream
     id: test-bbolt-shutdown
@@ -92,7 +77,21 @@ output.file:
 path.home: %q
 
 logging.level: debug
-`, logfile, home, home)
+`
+
+func TestBBoltRegistrySyncedOnShutdown(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	home := filebeat.TempDir()
+	logfile := filepath.Join(home, "log.log")
+	integration.WriteLogFile(t, logfile, 50, false)
+	expectedOffset := int64(50 * 50) // 50 lines of 50 bytes
+
+	cfg := fmt.Sprintf(bboltCfg, logfile, home, home)
 
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
@@ -110,8 +109,22 @@ logging.level: debug
 	filebeat.Stop()
 
 	dbPath := filepath.Join(home, "data", "registry", "filebeat.db")
-	_, err = os.Stat(dbPath)
+	_, err := os.Stat(dbPath)
 	require.NoErrorf(t, err, "expected bbolt registry db to exist at %q", dbPath)
+
+	states := readBBoltRegistryStates(t, dbPath)
+	for _, st := range states {
+		if st.Meta.Source != logfile {
+			continue
+		}
+		require.EqualValuesf(t, expectedOffset, st.Cursor.Offset, "expected bbolt registry cursor offset to match file size for %q", logfile)
+		return
+	}
+	require.Failf(t, "missing registry state", "expected bbolt registry to contain state for %q", logfile)
+}
+
+func readBBoltRegistryStates(t *testing.T, dbPath string) []bboltRegistryState {
+	t.Helper()
 
 	db, err := bbolt.Open(dbPath, 0o600, &bbolt.Options{
 		ReadOnly: true,
@@ -120,7 +133,7 @@ logging.level: debug
 	require.NoError(t, err)
 	defer db.Close()
 
-	var found bool
+	var states []bboltRegistryState
 	err = db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket([]byte("data"))
 		require.NotNil(t, b, "bbolt data bucket must exist")
@@ -130,14 +143,11 @@ logging.level: debug
 			if err := json.Unmarshal(v, &st); err != nil {
 				return err
 			}
-			if st.Meta.Source != logfile {
-				return nil
-			}
-			found = true
-			require.Equalf(t, expectedOffset, st.Cursor.Offset, "expected bbolt registry cursor offset to match file size for %q", logfile)
+			states = append(states, st)
 			return nil
 		})
 	})
 	require.NoError(t, err)
-	require.Truef(t, found, "expected bbolt registry to contain state for %q", logfile)
+
+	return states
 }
