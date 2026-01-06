@@ -26,6 +26,9 @@ import (
 	"path/filepath"
 	"runtime"
 	"sync"
+	"time"
+
+	"slices"
 
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
@@ -46,6 +49,7 @@ var (
 type store struct {
 	db     *bbolt.DB
 	logger *logp.Logger
+	now    func() time.Time
 
 	mu     sync.RWMutex
 	closed bool
@@ -55,19 +59,25 @@ type store struct {
 	settings Settings
 }
 
+type metadata struct {
+	LastAccess int64 `json:"last_access"`
+	LastChange int64 `json:"last_change"`
+}
+
 type entry struct {
 	value any
 }
 
-func (e entry) Decode(to interface{}) error {
+func (e entry) Decode(to any) error {
 	return typeconv.Convert(to, e.value)
 }
 
+// jsonDecoder implements backend.ValueDecoder
 type jsonDecoder struct {
 	raw []byte
 }
 
-func (d jsonDecoder) Decode(to interface{}) error {
+func (d jsonDecoder) Decode(to any) error {
 	var tmp any
 	if err := json.Unmarshal(d.raw, &tmp); err != nil {
 		return err
@@ -107,6 +117,7 @@ func openStore(logger *logp.Logger, path string, settings Settings) (*store, err
 	s := &store{
 		db:       db,
 		logger:   logger,
+		now:      time.Now,
 		name:     filepath.Base(path),
 		path:     path,
 		settings: settings,
@@ -152,6 +163,7 @@ func (s *store) Close() error {
 	if s.closed {
 		return nil
 	}
+
 	s.closed = true
 	return s.db.Close()
 }
@@ -176,7 +188,7 @@ func (s *store) Has(key string) (bool, error) {
 	return exists, err
 }
 
-func (s *store) Get(key string, to interface{}) error {
+func (s *store) Get(key string, to any) error {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	if err := s.requireOpen(); err != nil {
@@ -193,7 +205,7 @@ func (s *store) Get(key string, to interface{}) error {
 		if v == nil {
 			return errKeyUnknown
 		}
-		raw = append(raw[:0], v...)
+		raw = slices.Clone(v)
 		return s.updateAccessTime(tx, key)
 	})
 	if err != nil {
@@ -207,7 +219,7 @@ func (s *store) Get(key string, to interface{}) error {
 	return typeconv.Convert(to, tmp)
 }
 
-func (s *store) Set(key string, value interface{}) error {
+func (s *store) Set(key string, value any) error {
 	data, err := json.Marshal(value)
 	if err != nil {
 		return err
@@ -265,8 +277,12 @@ func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error 
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			key := string(k)
-			raw := append([]byte(nil), v...)
+			raw := slices.Clone(v)
 
+			// TODO(Tiago): We might not need the clone above because
+			// we sto pusing the values returned by next are valid until
+			// the end of the transaction, and we only use the values to
+			// decode/convert them into the final type.
 			cont, err := fn(key, jsonDecoder{raw: raw})
 			if !cont || err != nil {
 				return err
@@ -274,6 +290,58 @@ func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error 
 		}
 		return nil
 	})
+}
+
+func (s *store) updateAccessTime(tx *bbolt.Tx, key string) error {
+	bucket := tx.Bucket(bucketMetadata)
+	if bucket == nil {
+		return nil
+	}
+
+	nowNanos := s.now().UnixNano()
+
+	var meta metadata
+	if v := bucket.Get([]byte(key)); v != nil {
+		if err := json.Unmarshal(v, &meta); err != nil {
+			// Best-effort: keep scanning; rewrite metadata from scratch.
+			meta = metadata{}
+		}
+	}
+	meta.LastAccess = nowNanos
+
+	data, err := json.Marshal(meta)
+	if err != nil {
+		return err
+	}
+	return bucket.Put([]byte(key), data)
+}
+
+func (s *store) updateMetadata(tx *bbolt.Tx, key string, changeTime bool) error {
+	bucket := tx.Bucket(bucketMetadata)
+	if bucket == nil {
+		return nil
+	}
+
+	nowNanos := s.now().UnixNano()
+
+	meta := metadata{
+		LastAccess: nowNanos,
+	}
+
+	if changeTime {
+		meta.LastChange = nowNanos
+	} else if v := bucket.Get([]byte(key)); v != nil {
+		var existing metadata
+		if err := json.Unmarshal(v, &existing); err == nil {
+			meta.LastChange = existing.LastChange
+		}
+	}
+
+	data, err := json.Marshal(meta)
+	if err != nil {
+		return err
+	}
+	return bucket.Put([]byte(key), data)
 }
 
 func (s *store) SetID(_ string) {
