@@ -149,6 +149,25 @@ const htmlTemplate = `<!DOCTYPE html>
             word-wrap: break-word;
             overflow-x: auto;
         }
+        .json-key {
+            color: #9cdcfe;
+        }
+        .json-string {
+            color: #ce9178;
+        }
+        .json-number {
+            color: #b5cea8;
+        }
+        .json-boolean {
+            color: #569cd6;
+        }
+        .json-null {
+            color: #569cd6;
+            font-style: italic;
+        }
+        .json-punctuation {
+            color: #d4d4d4;
+        }
         .error {
             color: #ff6b6b;
         }
@@ -378,31 +397,176 @@ const htmlTemplate = `<!DOCTYPE html>
         }
 
         function formatJSON(value) {
-            if (value === null || value === undefined) {
-                return escapeHtml(String(value));
-            }
+            let jsonStr;
             
-            // If value is already an object, stringify it directly
-            if (typeof value === 'object') {
+            if (value === null || value === undefined) {
+                jsonStr = String(value);
+            } else if (typeof value === 'object') {
                 try {
-                    return escapeHtml(JSON.stringify(value, null, 2));
+                    jsonStr = JSON.stringify(value, null, 2);
                 } catch (e) {
                     return escapeHtml(String(value));
                 }
-            }
-            
-            // If value is a string, try to parse then stringify for formatting
-            if (typeof value === 'string') {
+            } else if (typeof value === 'string') {
                 try {
                     const obj = JSON.parse(value);
-                    return escapeHtml(JSON.stringify(obj, null, 2));
+                    jsonStr = JSON.stringify(obj, null, 2);
                 } catch (e) {
                     return escapeHtml(value);
                 }
+            } else {
+                jsonStr = String(value);
             }
             
-            // Fallback for other types
-            return escapeHtml(String(value));
+            return highlightJSON(jsonStr);
+        }
+        
+        function highlightJSON(jsonStr) {
+            // Escape HTML first
+            let html = escapeHtml(jsonStr);
+            
+            // Track positions that are already wrapped to avoid double-wrapping
+            const wrapped = new Array(html.length).fill(false);
+            
+            function wrap(start, end, className) {
+                for (let i = start; i < end; i++) {
+                    wrapped[i] = true;
+                }
+                return '<span class="' + className + '">' + html.substring(start, end) + '</span>';
+            }
+            
+            let result = '';
+            let lastPos = 0;
+            
+            // Process in order: keys first, then strings, then other tokens
+            // This avoids conflicts
+            
+            // Step 1: Highlight keys (quoted strings followed by colon)
+            const keyRegex = /"([^"\\]|\\.)*"\s*:/g;
+            const keyMatches = [];
+            let match;
+            while ((match = keyRegex.exec(html)) !== null) {
+                keyMatches.push({
+                    start: match.index,
+                    end: match.index + match[0].length,
+                    text: match[0]
+                });
+            }
+            
+            // Step 2: Highlight string values (quoted strings not already marked as keys)
+            const stringRegex = /"([^"\\]|\\.)*"/g;
+            const stringMatches = [];
+            while ((match = stringRegex.exec(html)) !== null) {
+                // Check if this string is already a key
+                let isKey = false;
+                for (let i = 0; i < keyMatches.length; i++) {
+                    if (match.index >= keyMatches[i].start && match.index < keyMatches[i].end) {
+                        isKey = true;
+                        break;
+                    }
+                }
+                if (!isKey) {
+                    stringMatches.push({
+                        start: match.index,
+                        end: match.index + match[0].length,
+                        text: match[0]
+                    });
+                }
+            }
+            
+            // Step 3: Highlight numbers, booleans, null (avoiding strings)
+            const numberRegex = /-?\d+\.?\d*/g;
+            const numberMatches = [];
+            while ((match = numberRegex.exec(html)) !== null) {
+                // Check if inside a string
+                let inString = false;
+                for (let i = 0; i < keyMatches.length; i++) {
+                    if (match.index >= keyMatches[i].start && match.index < keyMatches[i].end) {
+                        inString = true;
+                        break;
+                    }
+                }
+                if (!inString) {
+                    for (let i = 0; i < stringMatches.length; i++) {
+                        if (match.index >= stringMatches[i].start && match.index < stringMatches[i].end) {
+                            inString = true;
+                            break;
+                        }
+                    }
+                }
+                if (!inString) {
+                    numberMatches.push({
+                        start: match.index,
+                        end: match.index + match[0].length,
+                        text: match[0]
+                    });
+                }
+            }
+            
+            const boolRegex = /\b(true|false|null)\b/g;
+            const boolMatches = [];
+            while ((match = boolRegex.exec(html)) !== null) {
+                // Check if inside a string
+                let inString = false;
+                for (let i = 0; i < keyMatches.length; i++) {
+                    if (match.index >= keyMatches[i].start && match.index < keyMatches[i].end) {
+                        inString = true;
+                        break;
+                    }
+                }
+                if (!inString) {
+                    for (let i = 0; i < stringMatches.length; i++) {
+                        if (match.index >= stringMatches[i].start && match.index < stringMatches[i].end) {
+                            inString = true;
+                            break;
+                        }
+                    }
+                }
+                if (!inString) {
+                    boolMatches.push({
+                        start: match.index,
+                        end: match.index + match[0].length,
+                        text: match[0],
+                        isNull: match[0] === 'null'
+                    });
+                }
+            }
+            
+            // Combine all matches and sort by position
+            const allMatches = [];
+            keyMatches.forEach(function(m) { allMatches.push({...m, type: 'key'}); });
+            stringMatches.forEach(function(m) { allMatches.push({...m, type: 'string'}); });
+            numberMatches.forEach(function(m) { allMatches.push({...m, type: 'number'}); });
+            boolMatches.forEach(function(m) { allMatches.push({...m, type: m.isNull ? 'null' : 'boolean'}); });
+            
+            allMatches.sort(function(a, b) { return a.start - b.start; });
+            
+            // Build result string
+            for (let i = 0; i < allMatches.length; i++) {
+                const m = allMatches[i];
+                
+                // Add text before this match
+                if (m.start > lastPos) {
+                    // Check for punctuation in the gap
+                    let gap = html.substring(lastPos, m.start);
+                    gap = gap.replace(/([{}[\],:])/g, '<span class="json-punctuation">$1</span>');
+                    result += gap;
+                }
+                
+                // Add the highlighted match
+                const className = 'json-' + m.type;
+                result += '<span class="' + className + '">' + m.text + '</span>';
+                lastPos = m.end;
+            }
+            
+            // Add remaining text
+            if (lastPos < html.length) {
+                let remaining = html.substring(lastPos);
+                remaining = remaining.replace(/([{}[\],:])/g, '<span class="json-punctuation">$1</span>');
+                result += remaining;
+            }
+            
+            return result;
         }
 
         function escapeHtml(text) {
