@@ -19,6 +19,7 @@ package beater
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/config"
@@ -26,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/bbolt"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -60,10 +62,28 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 		esreg = es.New(ctx, logger, notifier)
 	}
 
-	reg, err = memlog.New(logger, memlog.Settings{
-		Root:     beatPaths.Resolve(paths.Data, cfg.Path),
-		FileMode: cfg.Permissions,
-	})
+	if err := cfg.ValidateConfig(); err != nil {
+		return nil, err
+	}
+
+	switch cfg.NormalizedType() {
+	case "bbolt":
+		reg, err = bbolt.New(logger, bbolt.Settings{
+			Root:           beatPaths.Resolve(paths.Data, cfg.Path),
+			FileMode:       cfg.BBolt.FileMode,
+			DiskTTL:        cfg.BBolt.DiskTTL,
+			Timeout:        cfg.BBolt.Timeout,
+			NoGrowSync:     cfg.BBolt.NoGrowSync,
+			NoFreelistSync: cfg.BBolt.NoFreelistSync,
+		})
+	case "memlog":
+		reg, err = memlog.New(logger, memlog.Settings{
+			Root:     beatPaths.Resolve(paths.Data, cfg.Path),
+			FileMode: cfg.Permissions,
+		})
+	default:
+		return nil, fmt.Errorf("unknown registry backend type: %q", cfg.Type)
+	}
 	if err != nil {
 		return nil, err
 	}

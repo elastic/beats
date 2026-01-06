@@ -1429,17 +1429,17 @@ Test scenarios:
 - [ ] Add `doc.go` with package documentation
 
 #### Day 3-4: Configuration & Integration
-- [ ] Update `filebeat/config/config.go`
-  - [ ] Add Type field
-  - [ ] Add BBoltConfig struct
-  - [ ] Update DefaultConfig
-  - [ ] Validation logic
-- [ ] Update `filebeat/beater/store.go`
-  - [ ] Add backend type selection logic
-  - [ ] Initialize bbolt registry
-  - [ ] Handle configuration errors
-  - [ ] Backward compatibility
-- [ ] Add import to make bbolt available
+- [x] Update `filebeat/config/config.go`
+  - [x] Add Type field
+  - [x] Add BBoltConfig struct
+  - [x] Update DefaultConfig
+  - [x] Validation logic
+- [x] Update `filebeat/beater/store.go`
+  - [x] Add backend type selection logic
+  - [x] Initialize bbolt registry
+  - [x] Handle configuration errors
+  - [x] Backward compatibility
+- [x] Add import to make bbolt available
 
 #### Day 4-5: Testing
 - [ ] Implement `bbolt_test.go`

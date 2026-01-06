@@ -53,6 +53,7 @@ filebeat.inputs:
     prospector.scanner.check_interval: 1s
 
 filebeat.registry:
+  type: memlog
   cleanup_interval: 5s
   flush: 1s
 

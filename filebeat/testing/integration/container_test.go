@@ -56,6 +56,7 @@ filebeat.inputs:
       stream: stdout
 output.console:
   enabled: true
+filebeat.registry.type: memlog
 filebeat.registry.flush: 0s
 queue.mem.flush.timeout: 0s
 `
