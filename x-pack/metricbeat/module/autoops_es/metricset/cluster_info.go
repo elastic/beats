@@ -42,7 +42,7 @@ func GetInfo(m *elasticsearch.MetricSet) (*utils.ClusterInfo, error) {
 	if !isVersionChecked {
 		// for some reason log.Fatal() isn't working properly so we need to handle the error in a goroutine
 		errChan := make(chan error)
-		go handleErrors(m.Logger(), errChan, CLUSTER_INFO_INITIAL_ERROR)
+		go handleFatalErrors(m.Logger(), errChan, CLUSTER_INFO_INITIAL_ERROR)
 
 		if err := checkEsVersion(info.Version.Number, errChan); err != nil {
 			return nil, err
@@ -57,7 +57,7 @@ func handleClusterInfoError(m *elasticsearch.MetricSet, err error, httpResponse 
 		if slices.Contains(terminalHttpErrorStatusCodes, httpResponse.StatusCode) {
 			// in these error cases Autoops agent can't recover itself, hence stop the agent
 			errChan := make(chan error)
-			go handleErrors(m.Logger(), errChan, CLUSTER_INFO_RUNTIME_ERROR)
+			go handleFatalErrors(m.Logger(), errChan, CLUSTER_INFO_RUNTIME_ERROR)
 			customErr := fmt.Errorf("autoops agent can't fetch the metrics due to http error! Code: %d, Status: %s",
 				httpResponse.StatusCode, httpResponse.Status)
 			errChan <- customErr

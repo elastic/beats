@@ -7,7 +7,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func handleErrors(logger *logp.Logger, errChan chan error, errorCode int) {
+func handleFatalErrors(logger *logp.Logger, errChan chan error, errorCode int) {
 	for err := range errChan {
 		logger.Error(err)
 		// sleep is needed to make sure the error is logged and error event is sent before exiting
