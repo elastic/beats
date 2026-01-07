@@ -7,12 +7,10 @@ package metricset
 import (
 	"errors"
 	"fmt"
-	"os"
-	"time"
+	"slices"
 
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
-	"github.com/elastic/elastic-agent-libs/logp"
 	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
@@ -21,21 +19,20 @@ const MinimumEsVersion = "7.17.0"
 var minVersion = libversion.MustNew(MinimumEsVersion)
 var isVersionChecked = false
 
+const (
+	CLUSTER_INFO_INITIAL_ERROR = 1
+	CLUSTER_INFO_RUNTIME_ERROR = 2
+)
+
+// List of HTTP status codes that indicate the agent cannot recover
+var terminalHttpErrorStatusCodes = []int{401, 403, 404}
+
 func GetInfo(m *elasticsearch.MetricSet) (*utils.ClusterInfo, error) {
 	info, err := utils.FetchAPIData[utils.ClusterInfo](m, "/")
 
 	if err != nil {
 		var httpResponse *utils.HTTPResponse
-		if errors.As(err, &httpResponse) {
-			if httpResponse.StatusCode == 401 || httpResponse.StatusCode == 403 || httpResponse.StatusCode == 404 {
-				// in these error cases Autoops agent can't recover itself, hence panic and stop the agent
-				errChan := make(chan error)
-				go handleErrors(m.Logger(), errChan)
-				customErr := fmt.Errorf("autoops agent can't fetch the metrics due to http error! Code: %d, Status: %s",
-					httpResponse.StatusCode, httpResponse.Status)
-				errChan <- customErr
-			}
-		}
+		handleClusterInfoError(m, err, httpResponse)
 		return nil, err
 	} else if info.ClusterID == "" || info.ClusterID == "_na_" {
 		return nil, &utils.ClusterInfoError{Message: "cluster ID is unset, which means the cluster is not ready"}
@@ -45,7 +42,7 @@ func GetInfo(m *elasticsearch.MetricSet) (*utils.ClusterInfo, error) {
 	if !isVersionChecked {
 		// for some reason log.Fatal() isn't working properly so we need to handle the error in a goroutine
 		errChan := make(chan error)
-		go handleErrors(m.Logger(), errChan)
+		go handleErrors(m.Logger(), errChan, CLUSTER_INFO_INITIAL_ERROR)
 
 		if err := checkEsVersion(info.Version.Number, errChan); err != nil {
 			return nil, err
@@ -53,6 +50,19 @@ func GetInfo(m *elasticsearch.MetricSet) (*utils.ClusterInfo, error) {
 	}
 
 	return info, nil
+}
+
+func handleClusterInfoError(m *elasticsearch.MetricSet, err error, httpResponse *utils.HTTPResponse) {
+	if errors.As(err, &httpResponse) {
+		if slices.Contains(terminalHttpErrorStatusCodes, httpResponse.StatusCode) {
+			// in these error cases Autoops agent can't recover itself, hence stop the agent
+			errChan := make(chan error)
+			go handleErrors(m.Logger(), errChan, CLUSTER_INFO_RUNTIME_ERROR)
+			customErr := fmt.Errorf("autoops agent can't fetch the metrics due to http error! Code: %d, Status: %s",
+				httpResponse.StatusCode, httpResponse.Status)
+			errChan <- customErr
+		}
+	}
 }
 
 func checkEsVersion(esVersion *libversion.V, errChan chan error) error {
@@ -67,13 +77,4 @@ func checkEsVersion(esVersion *libversion.V, errChan chan error) error {
 	}
 
 	return nil
-}
-
-func handleErrors(logger *logp.Logger, errChan chan error) {
-	for err := range errChan {
-		logger.Error(err)
-		// sleep is needed to make sure the error is logged and error event is sent before exiting
-		time.Sleep(time.Second * 5)
-		os.Exit(1)
-	}
 }
