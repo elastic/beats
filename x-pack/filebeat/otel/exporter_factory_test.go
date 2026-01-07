@@ -7,8 +7,24 @@ package otel
 import (
 	"context"
 	"os"
+	"sync"
 	"testing"
 )
+
+func TestExporterFactoryRace(t *testing.T) {
+	os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
+	factory := NewMetricsExporterFactory(GetDefaultMetricExporterOptions())
+
+	var wg sync.WaitGroup
+	for i := 0; i < 100; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			factory.GetExporter(context.Background(), true) // global=true
+		}()
+	}
+	wg.Wait()
+}
 
 func TestGetGlobalExporterFactory(t *testing.T) {
 	// set global to false

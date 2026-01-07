@@ -111,12 +111,16 @@ func NewMetricsExporterFactory(exporterOptions MetricExporterOptions) *MetricsEx
 func (ef *MetricsExporterFactory) GetExporter(ctx context.Context, global bool) (sdkmetric.Exporter, ExporterType, error) {
 	exporterType := GetExporterTypeFromEnv()
 	var err error
-	if global && ef.globalMetricsExporter != nil {
-		return ef.globalMetricsExporter, exporterType, nil
-	}
+
 	if global {
 		ef.lock.Lock()
 	}
+
+	if global && ef.globalMetricsExporter != nil {
+		ef.lock.Unlock()
+		return ef.globalMetricsExporter, exporterType, nil
+	}
+
 	var exporter sdkmetric.Exporter
 	switch exporterType {
 	case console:
