@@ -33,7 +33,9 @@ steps:
         agents:
           image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
           cpu: "4000m"
-          memory: "12Gi"
+          memory: "8Gi"
+          # 10GB storage was not enough for check/update.
+          ephemeralStorage: "50G"
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
