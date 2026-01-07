@@ -107,6 +107,7 @@ type ProcIOInfo struct {
 type ProcMemInfo struct {
 	Size  opt.Uint   `struct:"size,omitempty"`
 	Share opt.Uint   `struct:"share,omitempty"`
+	Swap  opt.Uint   `struct:"swap,omitempty"`
 	Rss   MemBytePct `struct:"rss,omitempty"`
 }
 
