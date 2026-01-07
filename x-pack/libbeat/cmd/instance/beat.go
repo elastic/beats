@@ -45,10 +45,10 @@ var fqdnOnce = sync.OnceValues(func() (string, error) {
 		return "", fmt.Errorf("failed to get host information: %w", err)
 	}
 
-	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 	defer cancel()
 
-	return h.FQDNWithContext(fqdnLookupCtx)
+	return h.FQDNWithContext(ctx)
 })
 
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
