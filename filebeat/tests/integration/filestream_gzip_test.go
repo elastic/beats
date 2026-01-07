@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build integration
 
 package integration
@@ -34,6 +36,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/filebeat/testing/gziptest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/iobuf"
@@ -460,9 +463,9 @@ logging.level: debug
 
 	registryLogFile := filepath.Join(workDir,
 		"data", "registry", "filebeat", "log.json")
-	entries, _ := readFilestreamRegistryLog(t, registryLogFile)
+	entries, _ := testhelpers.ReadFilestreamRegistryLog(t, registryLogFile)
 
-	var lastEntry *registryEntry
+	var lastEntry *testhelpers.RegistryEntry
 	for i := range entries {
 		entry := &entries[i]
 		if entry.Filename == logFilepath {
@@ -486,7 +489,7 @@ logging.level: debug
 	)
 
 	// =============== Verify file read to EOF isn't read again ================
-	gotEntries, _ := readFilestreamRegistryLog(t, registryLogFile)
+	gotEntries, _ := testhelpers.ReadFilestreamRegistryLog(t, registryLogFile)
 	// when the harvester starts, before attempting to open the log file, it
 	// updates the registry, thus reading it again will bring one more entry
 	assert.Equal(t, entries, gotEntries[:len(gotEntries)-1],
@@ -1336,8 +1339,8 @@ logging.level: debug
 	// assert EOF is set on registry
 	registryLogFile := filepath.Join(workDir,
 		"data", "registry", "filebeat", "log.json")
-	entries, _ := readFilestreamRegistryLog(t, registryLogFile)
-	var lastEntry *registryEntry
+	entries, _ := testhelpers.ReadFilestreamRegistryLog(t, registryLogFile)
+	var lastEntry *testhelpers.RegistryEntry
 	for i := range entries {
 		entry := &entries[i]
 		if entry.Filename == logPath {

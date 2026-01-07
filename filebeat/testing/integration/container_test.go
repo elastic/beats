@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build integration
 
 package integration
@@ -29,6 +31,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/testing/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -133,7 +136,7 @@ queue.mem.flush.timeout: 0s
 		require.Eventually(
 			t,
 			func() bool {
-				return AssertLastOffset(t, registryLogFile, 2243)
+				return testhelpers.AssertLastOffset(t, registryLogFile, 2243)
 			},
 			20*time.Second,
 			250*time.Millisecond, "did not find the expected registry offset of 2243")
