@@ -10,8 +10,10 @@ applyTo: '**'
 - When code is requested, provide code only unless explanations are explicitly asked
 
 # Project Structure
+- The repo conteins several "Bears", which are compoiles as standalone binaryes
+- All Beats are built on top of a common framework, `libbeat`
 - OSS Beats (root level): `auditbeat/`, `filebeat/`, `heartbeat/`, `metricbeat/`, `packetbeat/`, `winlogbeat/`
-- Elastic-licensed Beats: `x-pack/` folder (e.g., `x-pack/osquerybeat/`)
+- Elastic-licensed Beats: under `x-pack/` folder (e.g., `x-pack/osquerybeat/`)
 - Shared framework: `libbeat/` - common interfaces, processors, outputs, pipeline, publisher. Follows same licensing scheme as individual Beats
 - NEVER import Elastic-licensed code (`x-pack/`) into OSS code
 - Build/dev tools: `dev-tools/` - mage build system, packaging templates, testing utilities
@@ -69,7 +71,7 @@ applyTo: '**'
 Four-pass method: Overview → Error Focus → Context Analysis → Cross-Reference
 - Search: exact error messages, variable/function names, state transitions (start/stop/fail/success)
 - Patterns: correlation IDs, request IDs, session IDs, timestamps, user IDs
-- Levels: ERROR, WARN, INFO, DEBUG
+- Levels: error, warn, info, debug
 - Parse structured logs (JSON) for complete context
 - Track event sequences with timestamp ranges/frequency, find anomalies, track state changes
 
@@ -88,6 +90,7 @@ Four-pass method: Overview → Error Focus → Context Analysis → Cross-Refere
 - Solve step-by-step
 
 # Go Code Standards
+
 ## General
 - Follow Go best practices and idiomatic style from "Effective Go"
 - Maintain consistency with existing codebase patterns
@@ -96,9 +99,10 @@ Four-pass method: Overview → Error Focus → Context Analysis → Cross-Refere
 - Prefer explicit error handling over silent failures
 - Use `any` instead of `interface{}`
 - For all .go files edited, ALWAYS add `// This file was contributed to by generative AI` below license header if not already present
+- When you're done, run `mage fmt` to ensure all changes are correctly formated and the imports are correct
 
 ## Style
-- Use `gofmt` formatting standards
+- Use the "Effective Go" formatting standards
 - Follow project's existing naming conventions
 - Keep functions focused and single-purpose
 - Prefer composition over inheritance
