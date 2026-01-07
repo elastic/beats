@@ -103,7 +103,7 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	filebeat.Start()
 
 	// 3. Create the log file
-	integration.WriteLogFile(t, logFilePath, 10, false)
+	testhelpers.WriteLogFile(t, logFilePath, 10, false)
 
 	// 4. Wait for Filebeat to start scanning for files
 	filebeat.WaitLogsContains(
@@ -379,7 +379,7 @@ logging:
 			if runtime.GOOS == "windows" {
 				msgLogFilepath = strings.ReplaceAll(logFilepath, `\`, `\\`)
 			}
-			integration.WriteLogFile(t, logFilepath, 25, false)
+			testhelpers.WriteLogFile(t, logFilepath, 25, false)
 
 			cfgYAML := fmt.Sprintf(cfgTemplate, logFilepath, tc.oldIdentityCfg, workDir)
 			filebeat.WriteConfigFile(cfgYAML)
@@ -409,7 +409,7 @@ logging:
 				requirePublishedEvents(t, filebeat, 25, outputFile)
 
 				// Ingest more data to ensure the offset was migrated
-				integration.WriteLogFile(t, logFilepath, 17, true)
+				testhelpers.WriteLogFile(t, logFilepath, 17, true)
 				filebeat.WaitLogsContains(eofMsg, time.Second*5, "EOF was not reached the third time")
 
 				requirePublishedEvents(t, filebeat, 42, outputFile)
@@ -430,7 +430,7 @@ logging:
 			requirePublishedEvents(t, filebeat, 50, outputFile)
 
 			// Ingest more data to ensure the offset is correctly tracked
-			integration.WriteLogFile(t, logFilepath, 10, true)
+			testhelpers.WriteLogFile(t, logFilepath, 10, true)
 			filebeat.WaitLogsContains(eofMsg, time.Second*5, "EOF was not reached the third time")
 			requirePublishedEvents(t, filebeat, 60, outputFile)
 		})
@@ -519,7 +519,7 @@ logging:
 
 	requirePublishedEvents(t, filebeat, 200, outputFile)
 	// Ingest more data to ensure the offset was migrated
-	integration.WriteLogFile(t, logFilepath, 20, true)
+	testhelpers.WriteLogFile(t, logFilepath, 20, true)
 	filebeat.WaitLogsContains(eofMsg, time.Second*5, "EOF was not reached after adding data")
 
 	requirePublishedEvents(t, filebeat, 220, outputFile)
@@ -749,7 +749,7 @@ func createFileAndWaitIngestion(
 		}
 	}
 
-	integration.WriteLogFile(t, logFilepath, n, false)
+	testhelpers.WriteLogFile(t, logFilepath, n, false)
 	msgLogFilepath := logFilepath
 	if runtime.GOOS == "windows" {
 		msgLogFilepath = strings.ReplaceAll(logFilepath, `\`, `\\`)
@@ -928,7 +928,7 @@ func TestCleanInactiveLegacyBehaviour(t *testing.T) {
 	)
 
 	logFilePath := filepath.Join(filebeat.TempDir(), "log.log")
-	integration.WriteLogFile(t, logFilePath, 42, false)
+	testhelpers.WriteLogFile(t, logFilePath, 42, false)
 	cfg := getConfig(
 		t,
 		map[string]any{

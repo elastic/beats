@@ -25,6 +25,7 @@ import (
 	"testing"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -41,7 +42,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 			//  - closedHarvesters is empty at the end of this scan
 
 			// Write to the file, so we get a write operation
-			integration.WriteLogFile(t, logFilePath, 10, true)
+			testhelpers.WriteLogFile(t, logFilePath, 10, true)
 			fw.watch(t.Context())
 			evt = <-fw.events
 			requireOperation(t, evt, loginp.OpWrite)
@@ -180,7 +181,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 
 			// Create a 3000 bytes file
 			logFilePath := filepath.Join(dir, "log.log")
-			integration.WriteLogFile(t, logFilePath, 50, false)
+			testhelpers.WriteLogFile(t, logFilePath, 50, false)
 
 			cfg := defaultFileWatcherConfig()
 			fw, err := newFileWatcher(
