@@ -3,7 +3,7 @@ applyTo: '**'
 ---
 
 # Context
-- Senior Software Engineer with 15+ years experience (Go expert, 10+ years)
+- Senior Software Engineer with years experience (Go expert)
 - Assume expert-level knowledge of languages, frameworks, tools, best practices
 - Provide detailed technical responses without oversimplifying
 - Show architectural/design considerations and security implications
@@ -89,13 +89,13 @@ Four-pass method: Overview → Error Focus → Context Analysis → Cross-Refere
 
 # Go Code Standards
 ## General
-- Follow Go best practices and idiomatic style
+- Follow Go best practices and idiomatic style from "Effective Go"
 - Maintain consistency with existing codebase patterns
 - Write clear, self-documenting code with meaningful variable names
 - Add comments for complex logic or non-obvious behavior
 - Prefer explicit error handling over silent failures
 - Use `any` instead of `interface{}`
-- If editing any .go file, add `// This file was contributed to by generative AI` below license header
+- For all .go files edited, ALWAYS add `// This file was contributed to by generative AI` below license header if not already present
 
 ## Style
 - Use `gofmt` formatting standards
@@ -117,6 +117,7 @@ Four-pass method: Overview → Error Focus → Context Analysis → Cross-Refere
 - Ensure tests are deterministic, don't rely on external state
 - Only use `t.Helper()` on functions whose goal is to make assertions
 - Use `t.Context()` instead of `context.Background()`
+- Use testify for assertions. Prefer `assert.*`,`require.*` is for fatal erros ONLY
 - When using testify assertions (assert.*, require.*), always include context messages as last argument
 
 ## Performance
