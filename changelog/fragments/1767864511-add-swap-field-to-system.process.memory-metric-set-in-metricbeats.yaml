@@ -13,7 +13,7 @@ kind: enhancement
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: update elastic-agent-system-metrics version (to introduce process swap memory monitoring)
+summary: add swap field to system.process.memory metric set in metricbeat
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
