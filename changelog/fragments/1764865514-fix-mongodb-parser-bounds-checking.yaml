@@ -1,4 +1,0 @@
-kind: bug-fix
-summary: fix bounds checking in MongoDB protocol parser to prevent panics
-component: packetbeat
-PR URL: https://github.com/elastic/beats/pull/47925
