@@ -7,10 +7,11 @@ package management
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestNewConfigFromProto(t *testing.T) {
