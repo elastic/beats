@@ -14,12 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/management"
-<<<<<<< HEAD
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
-=======
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
-	conf "github.com/elastic/elastic-agent-libs/config"
->>>>>>> 8a10df6d5 (cleanup(otel): move otelbeat packages to x-pack/otel (#47873))
 )
 
 func TestManager(t *testing.T) {

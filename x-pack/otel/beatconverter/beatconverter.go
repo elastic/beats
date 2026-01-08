@@ -11,13 +11,8 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 
 	"github.com/elastic/beats/v7/libbeat/cloudid"
-<<<<<<< HEAD:libbeat/otelbeat/beatconverter/beatconverter.go
-	elasticsearchtranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate/outputs/elasticsearch"
-=======
->>>>>>> 8a10df6d5 (cleanup(otel): move otelbeat packages to x-pack/otel (#47873)):x-pack/otel/beatconverter/beatconverter.go
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	elasticsearchtranslate "github.com/elastic/beats/v7/x-pack/otel/oteltranslate/outputs/elasticsearch"
-	logstashstranslate "github.com/elastic/beats/v7/x-pack/otel/oteltranslate/outputs/logstash"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
