@@ -379,9 +379,11 @@ PS C:\Program Files\heartbeat> Start-Service heartbeat
 ::::::
 :::::::
 
-The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Heartbeat-Data\logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\heartbeat\logs`
+By default Windows log files are stored in `C:\Program Files\Heartbeat-Data\logs`.
+
+:::{note}
+In versions before 9.0.6, the default location for Windows log files was `C:\ProgramData\heartbeat\logs`.
+:::
 
 Heartbeat is now ready to check the status of your services and send events to your defined output.
 

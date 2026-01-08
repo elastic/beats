@@ -401,9 +401,11 @@ Packetbeat comes with predefined assets for parsing, indexing, and visualizing y
 
     `-e` is optional and sends output to standard error instead of the configured log output.
 
-The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Packetbeat-Data\logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\packetbeat\logs`
+By default Windows log files are stored in `C:\Program Files\Packetbeat-Data\logs`.
+
+:::{note}
+In versions before 9.0.6, the default location for Windows log files was `C:\ProgramData\packetbeat\logs`.
+:::
 
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to Elasticsearch and deploys the sample dashboards for visualizing the data in Kibana.
 
@@ -474,9 +476,11 @@ sudo ./packetbeat -e
 PS C:\Program Files\packetbeat> Start-Service packetbeat
 ```
 
-The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Packetbeat-Data\logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\packetbeat\logs`
+By default Windows log files are stored in `C:\Program Files\Packetbeat-Data\logs`.
+
+:::{note}
+In versions before 9.0.6, the default location for Windows log files was `C:\ProgramData\packetbeat\logs`.
+:::
 ::::::
 
 :::::::

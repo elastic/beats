@@ -147,8 +147,8 @@ filebeat.inputs:
 
 In order to indicate that the new `filestream` inputs are supposed to take over the files from the previously defined `log` or `container` inputs and continue where they left off, activate the [take over](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-take-over) mode in each new `filestream` using:
 
-* {applies_to}`stack: ga 9.1` `take_over.enabled: true`
-* {applies_to}`stack: ga 9.0` `take_over: true`
+* {applies_to}`stack: ga 9.1+` `take_over.enabled: true`
+* {applies_to}`stack: ga =9.0` `take_over: true`
 
 ::::{important}
 For the "take over" mode to work the `paths` list in each new `filestream` inputs must match the `paths` list in each old `log` or `container` inputs accordingly.
