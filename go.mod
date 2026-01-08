@@ -110,7 +110,7 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
-	github.com/shopspring/decimal v1.3.1 // indirect
+	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/pflag v1.0.9
 	github.com/stretchr/testify v1.11.1
@@ -196,7 +196,7 @@ require (
 	github.com/icholy/digest v0.1.22
 	github.com/klauspost/compress v1.18.1
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-	github.com/microsoft/go-mssqldb v1.9.4
+	github.com/microsoft/go-mssqldb v1.9.5
 	github.com/microsoft/wmi v0.38.3
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.141.0
 	github.com/pierrec/lz4/v4 v4.1.22

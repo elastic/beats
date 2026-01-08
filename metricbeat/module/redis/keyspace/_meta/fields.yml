@@ -21,4 +21,8 @@
 
     - name: expires
       type: long
-      description: >
+      description: "Number of keys with an expiry set."
+
+    - name: subexpiry
+      type: long
+      description: "Number of sub-keys with an expiry set (0 when not reported)."
