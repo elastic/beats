@@ -18,7 +18,6 @@
 package management
 
 import (
-	"context"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -78,36 +77,6 @@ type Manager interface {
 	// RegisterDiagnosticHook registers a callback for elastic-agent diagnostics
 	RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook DiagnosticHook)
 }
-
-// Copy of github.com/elastic/elastic-agent-client/v7/pkg/proto.AgentInfo to avoid the ELv2 license.
-// https://github.com/elastic/elastic-agent-client/blob/112583e0a933bebd719f48d78934b027d884b2b0/elastic-agent-client.proto#L203-L220
-type AgentInfo struct {
-	ID           string
-	Version      string
-	Snapshot     bool
-	ManagedMode  AgentManagedMode
-	Unprivileged bool
-}
-
-// Copy of AgentManagedMode to avoid the ELv2 License
-// https://github.com/elastic/elastic-agent-client/blob/112583e0a933bebd719f48d78934b027d884b2b0/elastic-agent-client.proto#L110-L114
-type AgentManagedMode int
-
-const (
-	AgentManagedMode_MANAGED AgentManagedMode = iota
-	AgentManagedMode_STANDALONE
-)
-
-// Action is an action the client exposed to the Elastic Agent.
-type Action interface {
-	// Name of the action.
-	Name() string
-
-	// Execute performs the action.
-	Execute(context.Context, map[string]interface{}) (map[string]interface{}, error)
-}
-
-type DiagnosticHook func() []byte
 
 // ManagerFactory is the factory type for creating a config manager
 type ManagerFactory func(*config.C, *reload.Registry, *logp.Logger) (Manager, error)
