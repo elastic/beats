@@ -11,7 +11,9 @@ applies_to:
 [`journald`](https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html) is a system service that collects and stores logging data. The `journald` input reads this log data and the metadata associated with it. To read this log data Filebeat calls `journalctl` to read from the journal, therefore Filebeat needs permission to execute `journalctl`.
 
 :::{warning}
-The Wolfi-based Docker image does not contain the `journalctl` binary and the `journald` input type cannot be used with it.
+The Wolfi-based Docker image does not contain the `journalctl` binary.
+
+{applies_to}`stack: ga 9.3.0` To use the `journald` input type with Wolfi images, you must configure the [`chroot`](#filebeat-input-journald-chroot) option to use the host's `journalctl` binary.
 :::
 
 :::{important}
@@ -26,8 +28,6 @@ according to the version that you are running:
 docker run --rm -it --entrypoint "journalctl" docker.elastic.co/beats/filebeat-wolfi:<VERSION> --version
 ```
 :::
-
-If the `journalctl` process exits unexpectedly the journald input will terminate with an error and Filebeat will need to be restarted to start reading from the journal again.
 
 The simplest configuration example is one that reads all logs from the default journal.
 
