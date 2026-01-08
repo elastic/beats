@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -101,10 +100,10 @@ func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
 	}
 
 	info := beat.Manager.AgentInfo()
-	switch info.ManagedMode {
-	case proto.AgentManagedMode_MANAGED:
+	switch management.AgentManagedMode(info.ManagedMode) {
+	case management.AgentManagedMode_MANAGED:
 		return useragent.AgentManagementModeManaged
-	case proto.AgentManagedMode_STANDALONE:
+	case management.AgentManagedMode_STANDALONE:
 		return useragent.AgentManagementModeUnmanaged
 	}
 	// this is probably not reachable

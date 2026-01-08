@@ -27,6 +27,15 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// Copy of AgentManagedMode to avoid the ELv2 License
+// https://github.com/elastic/elastic-agent-client/blob/112583e0a933bebd719f48d78934b027d884b2b0/elastic-agent-client.proto#L110-L114
+type AgentManagedMode int
+
+const (
+	AgentManagedMode_MANAGED AgentManagedMode = iota
+	AgentManagedMode_STANDALONE
+)
+
 // DebugK used as key for all things central management
 var DebugK = "centralmgmt"
 
