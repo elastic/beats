@@ -4,7 +4,7 @@
 
 //go:build !requirefips
 
-package otelbeat
+package beatsauthextension_test
 
 import (
 	"bytes"
@@ -42,9 +42,9 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/beatconverter"
 	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/elastic-agent-libs/testing/proxytest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 	mockes "github.com/elastic/mock-es/pkg/api"
@@ -79,7 +79,6 @@ type options struct {
 
 // tests mutual TLS
 func TestMTLS(t *testing.T) {
-
 	// create server certificates
 	serverCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "server", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
 	if err != nil {
@@ -150,10 +149,12 @@ receivers:
 
 	// check if data has reached ES
 	assertReceivedLogRecord(t, metricReader)
+
+	require.NoError(t, exp.Shutdown(t.Context()), "error shutting down exporter")
+	require.NoError(t, beatsauth.Shutdown(t.Context()), "error shutting down extension")
 }
 
 func TestKeyPassPhrase(t *testing.T) {
-
 	// create server certificates
 	serverCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "server", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
 	if err != nil {
@@ -225,6 +226,9 @@ receivers:
 
 	// check if data has reached ES
 	assertReceivedLogRecord(t, metricReader)
+
+	require.NoError(t, exp.Shutdown(t.Context()), "error shutting down exporter")
+	require.NoError(t, beatsauth.Shutdown(t.Context()), "error shutting down extension")
 }
 
 // tests ca_trusted_fingerprint
@@ -290,12 +294,14 @@ receivers:
 
 	// check if data has reached ES
 	assertReceivedLogRecord(t, metricReader)
+
+	require.NoError(t, exp.Shutdown(t.Context()), "error shutting down exporter")
+	require.NoError(t, beatsauth.Shutdown(t.Context()), "error shutting down extension")
 }
 
 // tests verification mode
 // The test scenarios are taken from https://github.com/elastic/elastic-agent-libs/blob/main/transport/tlscommon/tls_config_test.go#L495
 func TestVerificationMode(t *testing.T) {
-
 	testcases := map[string]struct {
 		verificationMode string
 		expectingError   bool
@@ -477,12 +483,16 @@ receivers:
 
 			if test.expectingError {
 				require.Error(t, err, "expected error got none")
+				require.NoError(t, exp.Shutdown(t.Context()), "error shutting down exporter")
+				require.NoError(t, beatsauth.Shutdown(t.Context()), "error shutting down extension")
 				return
 			}
 
 			// check if data has reached ES
 			assertReceivedLogRecord(t, metricReader)
 
+			require.NoError(t, exp.Shutdown(t.Context()), "error shutting down exporter")
+			require.NoError(t, beatsauth.Shutdown(t.Context()), "error shutting down extension")
 		})
 	}
 
@@ -491,7 +501,6 @@ receivers:
 // TestProxyHTTPS tests proxy_url with http and https proxy server
 // It also tests proxy_disable configuration
 func TestProxyHTTP(t *testing.T) {
-
 	// caCert cert pool
 	certPool := x509.NewCertPool()
 	certPool.AddCert(caCert.Leaf)
@@ -589,6 +598,7 @@ receivers:
 
 			serverName, metricReader := startTestServer(t, test.serverTLSConfig)
 			proxy := proxytest.New(t, test.proxyOptions...)
+			defer proxy.Close()
 
 			if test.serverTLSConfig != nil {
 				require.NoErrorf(t, proxy.StartTLS(), "error starting proxy server")
@@ -637,6 +647,9 @@ receivers:
 			} else {
 				assert.Empty(t, proxy.ProxiedRequests(), "proxy should have captured at least 1 request")
 			}
+
+			require.NoError(t, exp.Shutdown(t.Context()), "error shutting down exporter")
+			require.NoError(t, beatsauth.Shutdown(t.Context()), "error shutting down extension")
 		})
 	}
 
