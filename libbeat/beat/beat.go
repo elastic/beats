@@ -100,7 +100,7 @@ func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
 	}
 
 	info := beat.Manager.AgentInfo()
-	switch management.AgentManagedMode(info.ManagedMode) {
+	switch info.ManagedMode {
 	case management.AgentManagedMode_MANAGED:
 		return useragent.AgentManagementModeManaged
 	case management.AgentManagedMode_STANDALONE:
