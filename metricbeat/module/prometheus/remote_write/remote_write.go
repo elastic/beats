@@ -62,33 +62,6 @@ type MetricSet struct {
 	eventGenStarted bool
 }
 
-func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := defaultConfig()
-	err := base.Module().UnpackConfig(&config)
-	if err != nil {
-		return nil, err
-	}
-
-	promEventsGen, err := DefaultRemoteWriteEventsGeneratorFactory(base, WithCountMetrics(config.MetricsCount))
-	if err != nil {
-		return nil, err
-	}
-
-	m := &MetricSet{
-		BaseMetricSet:   base,
-		events:          make(chan mb.Event),
-		promEventsGen:   promEventsGen,
-		eventGenStarted: false,
-	}
-
-	svc, err := httpserver.NewHttpServerWithHandler(base, m.handleFunc)
-	if err != nil {
-		return nil, err
-	}
-	m.server = svc
-	return m, nil
-}
-
 // MetricSetBuilder returns a builder function for a new Prometheus remote_write metricset using
 // the given namespace and event generator
 func MetricSetBuilder(genFactory RemoteWriteEventsGeneratorFactory) func(base mb.BaseMetricSet) (mb.MetricSet, error) {
