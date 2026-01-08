@@ -1047,14 +1047,6 @@ Memory-specific statistics per process.
     format: bytes
 
 
-**`system.process.memory.swap`**
-:   The swap memory the process uses (supported only on Linux kernel version 2.6.34+).
-
-    type: long
-
-    format: bytes
-
-
 ## io [_io]
 
 Disk I/O Metrics, as forwarded from /proc/[PID]/io. Available on Linux only.
