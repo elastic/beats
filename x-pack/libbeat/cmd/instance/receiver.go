@@ -16,9 +16,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/status"
+=======
+	"github.com/elastic/beats/v7/libbeat/management/status"
+>>>>>>> 8a10df6d5 (cleanup(otel): move otelbeat packages to x-pack/otel (#47873))
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
+	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"

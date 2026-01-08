@@ -36,6 +36,12 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
+<<<<<<< HEAD
+=======
+
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+>>>>>>> 8a10df6d5 (cleanup(otel): move otelbeat packages to x-pack/otel (#47873))
 )
 
 func TestNewReceiver(t *testing.T) {

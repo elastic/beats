@@ -15,9 +15,14 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
+=======
+>>>>>>> 8a10df6d5 (cleanup(otel): move otelbeat packages to x-pack/otel (#47873))
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/x-pack/otel/otelctx"
+	"github.com/elastic/beats/v7/x-pack/otel/otelmap"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
