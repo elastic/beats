@@ -83,7 +83,8 @@
           format: bytes
           description: >
             Used memory by the Lua engine.
-          deprecated: true
+          version:
+           deprecated: 9.4.0
         - name: used.scripts
           type: long
           format: bytes

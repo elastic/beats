@@ -113,7 +113,7 @@ Redis memory stats.
     format: bytes
 
 
-**`redis.info.memory.used.lua`** {applies_to}`stack: deprecated True`
+**`redis.info.memory.used.lua`** {applies_to}`stack: deprecated 9.4.0`
 :   Used memory by the Lua engine.
 
     type: long
