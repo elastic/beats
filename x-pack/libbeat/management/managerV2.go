@@ -614,7 +614,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 		}
 		if expected.Features != nil {
 			// unit is expected to update its feature flags
-			featuresCfg, err := features.NewConfigFromProto(expected.Features)
+			featuresCfg, err := NewConfigFromProto(expected.Features)
 			if err != nil {
 				unitErrors[unit.ID()] = append(unitErrors[unit.ID()], err)
 			}
