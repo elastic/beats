@@ -455,6 +455,10 @@ Prefix to apply for the list request to the S3 bucket. Default empty.
 
 ### `lexicographical_ordering` [_lexicographical_ordering]
 
+```{applies_to}
+stack: ga 9.4.0
+```
+
 When set to `true`, enables lexicographical ordering mode for S3 bucket polling. In this mode, the input uses the S3 `StartAfter` parameter to resume listing from the last processed object key, which can significantly reduce the number of objects listed in each polling cycle. This is particularly useful for buckets with a large number of objects where object keys are naturally ordered (e.g., timestamp-prefixed keys like `CloudTrail/us-east-1/2025/01/15/log-001.json.gz`).
 
 When enabled, the input maintains a state of processed object keys and uses the lexicographically oldest tracked key as the starting point for subsequent list operations. The number of keys tracked is controlled by `lexicographical_lookback_keys`.
@@ -467,6 +471,10 @@ This option is only applicable when using S3 bucket polling (`bucket_arn` or `no
 
 
 ### `lexicographical_lookback_keys` [_lexicographical_lookback_keys]
+
+```{applies_to}
+stack: ga 9.4.0
+```
 
 Specifies the maximum number of S3 object keys to track in memory when `lexicographical_ordering` is enabled. This value determines how many recently processed object keys are retained to support the `StartAfter` functionality. The lookback buffer ensures objects that arrive out of lexicographical order (due to late delivery, clock skew, or retries) are still detected and processed.
 
