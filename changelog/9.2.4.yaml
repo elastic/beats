@@ -5,11 +5,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48290
-        - https://github.com/elastic/beats/pull/48330
-        - https://github.com/elastic/beats/pull/48331
-        - https://github.com/elastic/beats/pull/48332
-        - https://github.com/elastic/beats/pull/48292
+        - https://github.com/elastic/beats/pull/47256
       issue: []
       impact: ""
       action: ""
@@ -18,15 +14,11 @@ entries:
         name: 1761678237-feat-add-client-secret-auth-for-azure-eventhub.yaml
         checksum: bd410e43c8c12c2ac8bbd67d4ef6a086a462a024
     - kind: bug-fix
-      summary: fix bounds checking in MongoDB protocol parser to prevent panics
+      summary: Fix bounds checking in MongoDB protocol parser to prevent panics.
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/48290
-        - https://github.com/elastic/beats/pull/48330
-        - https://github.com/elastic/beats/pull/48331
-        - https://github.com/elastic/beats/pull/48332
-        - https://github.com/elastic/beats/pull/48292
+        - https://github.com/elastic/beats/pull/47925
       issue: []
       impact: ""
       action: ""
@@ -35,7 +27,7 @@ entries:
         name: 1764865514-fix-mongodb-parser-bounds-checking.yaml
         checksum: c1b5c5b19eca5066fa146031e239d09cc100ec7b
     - kind: feature
-      summary: azure-eventhub-v2-add-support-for-amqp-over-websocket-and-https-proxy
+      summary: Support for AMQP-over-WebSocket transport in the azure-eventhub processor v2.
       description: ""
       component: filebeat
       pr:
@@ -49,15 +41,11 @@ entries:
         name: 1765280088-azure-eventhub-v2-add-support-for-amqp-over-websocket-and-https-proxy.yaml
         checksum: 1f1fc5540af22b8067fa7adf8ecc4ffd029811ba
     - kind: enhancement
-      summary: Add `last_terminated_exitcode` to `kubernetes.container.status`
+      summary: Add `last_terminated_exitcode` to `kubernetes.container.status`.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48290
-        - https://github.com/elastic/beats/pull/48330
-        - https://github.com/elastic/beats/pull/48331
-        - https://github.com/elastic/beats/pull/48332
-        - https://github.com/elastic/beats/pull/48292
+        - https://github.com/elastic/beats/pull/47968
       issue: []
       impact: ""
       action: ""
@@ -66,15 +54,11 @@ entries:
         name: 1765359658-k8s_status_last_terminated_exitcode.yaml
         checksum: 600b993725f8c24ec0310d1ab63aafa90869237b
     - kind: bug-fix
-      summary: Harden Prometheus metrics parser against panics caused by malformed input data
+      summary: Harden Prometheus metrics parser against panics caused by malformed input data.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48290
-        - https://github.com/elastic/beats/pull/48330
-        - https://github.com/elastic/beats/pull/48331
-        - https://github.com/elastic/beats/pull/48332
-        - https://github.com/elastic/beats/pull/48292
+        - https://github.com/elastic/beats/pull/47914
       issue: []
       impact: ""
       action: ""
@@ -83,15 +67,11 @@ entries:
         name: 1765545606-prometheus-parser-panic-fix.yaml
         checksum: 11eb2d7c75f886ada31683f02737942cfb6f3197
     - kind: bug-fix
-      summary: Add bounds checking to Zookeeper server module to prevent index-out-of-range panics
+      summary: Add bounds checking to Zookeeper server module to prevent index-out-of-range panics.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48290
-        - https://github.com/elastic/beats/pull/48330
-        - https://github.com/elastic/beats/pull/48331
-        - https://github.com/elastic/beats/pull/48332
-        - https://github.com/elastic/beats/pull/48292
+        - https://github.com/elastic/beats/pull/47915
       issue: []
       impact: ""
       action: ""
@@ -100,15 +80,11 @@ entries:
         name: 1765545791-zookeeper-panic-fix.yaml
         checksum: 1e5ec03a5573800254df1442fb80f811b85cfe4d
     - kind: bug-fix
-      summary: Fix panic in graphite server metricset when metric has fewer parts than template expects
+      summary: Fix panic in graphite server metricset when metric has fewer parts than template expects.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48290
-        - https://github.com/elastic/beats/pull/48330
-        - https://github.com/elastic/beats/pull/48331
-        - https://github.com/elastic/beats/pull/48332
-        - https://github.com/elastic/beats/pull/48292
+        - https://github.com/elastic/beats/pull/47916
       issue: []
       impact: ""
       action: ""
@@ -117,7 +93,7 @@ entries:
         name: 1765545902-graphite-panic-fix.yaml
         checksum: c6edc712a38fda9e12000af1cbb607f43470c214
     - kind: other
-      summary: Upgrade opentelemtry-collector-contrib to 0.141.0 and opentelemetry-collector to 1.47.0
+      summary: Upgrade opentelemtry-collector-contrib to 0.141.0 and opentelemetry-collector to 1.47.0.
       description: ""
       component: all
       pr:
@@ -130,15 +106,11 @@ entries:
         name: 1765934075-upgrade-opentelemtry-collector-contrib-to-0.141.0-and-opentelemetry-collector-to-1.47.0.yaml
         checksum: 1296886e0c350aa506ded72a720005212e329c6b
     - kind: bug-fix
-      summary: Skip regions with no permission to query for AWS CloudWatch metrics
+      summary: Skip regions with no permission to query for AWS CloudWatch metrics.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48290
-        - https://github.com/elastic/beats/pull/48330
-        - https://github.com/elastic/beats/pull/48331
-        - https://github.com/elastic/beats/pull/48332
-        - https://github.com/elastic/beats/pull/48292
+        - https://github.com/elastic/beats/pull/48135
       issue: []
       impact: ""
       action: ""
@@ -147,15 +119,11 @@ entries:
         name: 1765999977-aws-cloudwatch-skip-region.yaml
         checksum: aebf66827410e12721468fbe19c7d15f10a715af
     - kind: bug-fix
-      summary: Add msync syscall to seccomp whitelist for BadgerDB persistent cache
+      summary: Add msync syscall to seccomp whitelist for BadgerDB persistent cache.
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/48290
-        - https://github.com/elastic/beats/pull/48330
-        - https://github.com/elastic/beats/pull/48331
-        - https://github.com/elastic/beats/pull/48332
-        - https://github.com/elastic/beats/pull/48292
+        - https://github.com/elastic/beats/pull/48229
       issue: []
       impact: ""
       action: ""
