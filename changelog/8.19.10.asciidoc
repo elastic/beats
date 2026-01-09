@@ -24,9 +24,9 @@ The 8.19.10 release adds the following new and notable features.
 
 **Filebeat**
 
-* Add client secret authentication method for Azure Event Hub and storage in Filebeat. https://github.com/elastic/beats/pull/48289[#48289] https://github.com/elastic/beats/pull/48322[#48322] https://github.com/elastic/beats/pull/48324[#48324] https://github.com/elastic/beats/pull/48325[#48325] https://github.com/elastic/beats/pull/47873[#47873] 
+* Add client secret authentication method for Azure Event Hub and storage in Filebeat. https://github.com/elastic/beats/pull/47256[#47256]
 * Improving input error reporting to Elastic Agent, specially when pipeline configurations are incorrect. https://github.com/elastic/beats/pull/47905[#47905] https://github.com/elastic/beats/issues/45649[#45649]
-* Azure-eventhub-v2-add-support-for-amqp-over-websocket-and-https-proxy. https://github.com/elastic/beats/pull/47956[#47956] https://github.com/elastic/beats/issues/47823[#47823]
+* Support for AMQP-over-WebSocket transport in the azure-eventhub processor v2. https://github.com/elastic/beats/pull/47956[#47956] https://github.com/elastic/beats/issues/47823[#47823]
 
 
 
@@ -42,19 +42,19 @@ The 8.19.10 release adds the following new and notable features.
 
 **All**
 
-* Add msync syscall to seccomp whitelist for BadgerDB persistent cache. https://github.com/elastic/beats/pull/48289[#48289] https://github.com/elastic/beats/pull/48322[#48322] https://github.com/elastic/beats/pull/48324[#48324] https://github.com/elastic/beats/pull/48325[#48325] https://github.com/elastic/beats/pull/47873[#47873] 
+* Add msync syscall to seccomp whitelist for BadgerDB persistent cache. https://github.com/elastic/beats/pull/48229[#48229]
 
 
 **Metricbeat**
 
-* Harden Prometheus metrics parser against panics caused by malformed input data. https://github.com/elastic/beats/pull/48289[#48289] https://github.com/elastic/beats/pull/48322[#48322] https://github.com/elastic/beats/pull/48324[#48324] https://github.com/elastic/beats/pull/48325[#48325] https://github.com/elastic/beats/pull/47873[#47873] 
-* Add bounds checking to Zookeeper server module to prevent index-out-of-range panics. https://github.com/elastic/beats/pull/48289[#48289] https://github.com/elastic/beats/pull/48322[#48322] https://github.com/elastic/beats/pull/48324[#48324] https://github.com/elastic/beats/pull/48325[#48325] https://github.com/elastic/beats/pull/47873[#47873] 
-* Fix panic in graphite server metricset when metric has fewer parts than template expects. https://github.com/elastic/beats/pull/48289[#48289] https://github.com/elastic/beats/pull/48322[#48322] https://github.com/elastic/beats/pull/48324[#48324] https://github.com/elastic/beats/pull/48325[#48325] https://github.com/elastic/beats/pull/47873[#47873] 
-* Skip regions with no permission to query for AWS CloudWatch metrics. https://github.com/elastic/beats/pull/48289[#48289] https://github.com/elastic/beats/pull/48322[#48322] https://github.com/elastic/beats/pull/48324[#48324] https://github.com/elastic/beats/pull/48325[#48325] https://github.com/elastic/beats/pull/47873[#47873] 
+* Harden Prometheus metrics parser against panics caused by malformed input data. https://github.com/elastic/beats/pull/47914[#47914]
+* Add bounds checking to Zookeeper server module to prevent index-out-of-range panics. https://github.com/elastic/beats/pull/47915[#47915]
+* Fix panic in graphite server metricset when metric has fewer parts than template expects. https://github.com/elastic/beats/pull/47916[#47916]
+* Skip regions with no permission to query for AWS CloudWatch metrics. https://github.com/elastic/beats/pull/48135[#48135]
 
 
 **Packetbeat**
 
-* Fix bounds checking in MongoDB protocol parser to prevent panics. https://github.com/elastic/beats/pull/48289[#48289] https://github.com/elastic/beats/pull/48322[#48322] https://github.com/elastic/beats/pull/48324[#48324] https://github.com/elastic/beats/pull/48325[#48325] https://github.com/elastic/beats/pull/47873[#47873] 
+* Fix bounds checking in MongoDB protocol parser to prevent panics. https://github.com/elastic/beats/pull/47925[#47925]
 
 // end 8.19.10 relnotes

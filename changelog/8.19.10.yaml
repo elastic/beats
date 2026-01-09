@@ -5,11 +5,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48289
-        - https://github.com/elastic/beats/pull/48322
-        - https://github.com/elastic/beats/pull/48324
-        - https://github.com/elastic/beats/pull/48325
-        - https://github.com/elastic/beats/pull/47873
+        - https://github.com/elastic/beats/pull/47256
       issue: []
       impact: ""
       action: ""
@@ -22,11 +18,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/48289
-        - https://github.com/elastic/beats/pull/48322
-        - https://github.com/elastic/beats/pull/48324
-        - https://github.com/elastic/beats/pull/48325
-        - https://github.com/elastic/beats/pull/47873
+        - https://github.com/elastic/beats/pull/47925
       issue: []
       impact: ""
       action: ""
@@ -49,7 +41,7 @@ entries:
         name: 1765204121-Correctly-report-V2-inputs-as-failed-to-the-Manager.yaml
         checksum: b29fc353572f21e3500e9563be8ef4e7c1a6bd78
     - kind: feature
-      summary: azure-eventhub-v2-add-support-for-amqp-over-websocket-and-https-proxy
+      summary: Support for AMQP-over-WebSocket transport in the azure-eventhub processor v2.
       description: ""
       component: filebeat
       pr:
@@ -67,11 +59,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48289
-        - https://github.com/elastic/beats/pull/48322
-        - https://github.com/elastic/beats/pull/48324
-        - https://github.com/elastic/beats/pull/48325
-        - https://github.com/elastic/beats/pull/47873
+        - https://github.com/elastic/beats/pull/447914
       issue: []
       impact: ""
       action: ""
@@ -84,11 +72,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48289
-        - https://github.com/elastic/beats/pull/48322
-        - https://github.com/elastic/beats/pull/48324
-        - https://github.com/elastic/beats/pull/48325
-        - https://github.com/elastic/beats/pull/47873
+        - https://github.com/elastic/beats/pull/47915
       issue: []
       impact: ""
       action: ""
@@ -101,11 +85,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48289
-        - https://github.com/elastic/beats/pull/48322
-        - https://github.com/elastic/beats/pull/48324
-        - https://github.com/elastic/beats/pull/48325
-        - https://github.com/elastic/beats/pull/47873
+        - https://github.com/elastic/beats/pull/47916
       issue: []
       impact: ""
       action: ""
@@ -131,11 +111,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48289
-        - https://github.com/elastic/beats/pull/48322
-        - https://github.com/elastic/beats/pull/48324
-        - https://github.com/elastic/beats/pull/48325
-        - https://github.com/elastic/beats/pull/47873
+        - https://github.com/elastic/beats/pull/448135
       issue: []
       impact: ""
       action: ""
@@ -148,11 +124,7 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/48289
-        - https://github.com/elastic/beats/pull/48322
-        - https://github.com/elastic/beats/pull/48324
-        - https://github.com/elastic/beats/pull/48325
-        - https://github.com/elastic/beats/pull/47873
+        - https://github.com/elastic/beats/pull/48229
       issue: []
       impact: ""
       action: ""
