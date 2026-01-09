@@ -1048,7 +1048,7 @@ Memory-specific statistics per process.
 
 
 **`system.process.memory.swap`**
-:   The swap memory the process uses (supported only on Linux kernel version 2.6.34+).
+:   The swap memory used by the process (supported only on Linux kernel version 2.6.34+).
 
     type: long
 
