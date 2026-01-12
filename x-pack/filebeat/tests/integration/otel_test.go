@@ -1161,3 +1161,73 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 
 	require.Equal(t, resp.StatusCode, http.StatusOK, "incorrect response code")
 }
+
+func BenchmarkFilebeatOTelCollector(b *testing.B) {
+	numReceivers := 4
+
+	for b.Loop() {
+		b.StopTimer()
+		tmpDir := b.TempDir()
+
+		type receiverConfig struct {
+			Index    int
+			PathHome string
+		}
+
+		configData := struct {
+			Receivers []receiverConfig
+		}{
+			Receivers: make([]receiverConfig, numReceivers),
+		}
+
+		for i := range numReceivers {
+			configData.Receivers[i] = receiverConfig{
+				Index:    i + 1,
+				PathHome: filepath.Join(tmpDir, strconv.Itoa(i+1)),
+			}
+		}
+
+		cfgTemplate := `receivers:
+{{range .Receivers}}
+  filebeatreceiver/{{.Index}}:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: 1
+    path.home: {{.PathHome}}
+    queue.mem.flush.timeout: 0s
+{{end}}
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+{{range .Receivers}}
+        - filebeatreceiver/{{.Index}}
+{{end}}
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`
+
+		var configBuffer bytes.Buffer
+		require.NoError(b, template.Must(template.New("config").Parse(cfgTemplate)).Execute(&configBuffer, configData))
+
+		b.StartTimer()
+
+		col := oteltestcol.New(b, configBuffer.String())
+		require.NotNil(b, col)
+		require.Eventually(b, func() bool {
+			return col.ObservedLogs().
+				FilterMessageSnippet("Publish event").Len() == numReceivers
+		}, 30*time.Second, 1*time.Millisecond, "expected all receivers to publish events")
+		col.Shutdown()
+	}
+}
