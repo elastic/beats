@@ -1,6 +1,6 @@
 import unittest
 import os
-import yaml
+import base64
 from shutil import copytree, copyfile
 
 from filebeat import BaseTest
@@ -14,6 +14,10 @@ class Test(BaseTest):
         self.elasticsearch_url = self.get_elasticsearch_url()
         print("Using elasticsearch: {}".format(self.elasticsearch_url))
         self.es = self.get_elasticsearch_instance()
+        self.username = os.getenv("ES_USER", "")
+        self.password = os.getenv("ES_PASS", "")
+        self.auth_value = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
+        self.headers = {"Authorization": f"Basic {self.auth_value}"}
 
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
@@ -42,7 +46,7 @@ class Test(BaseTest):
 
         version = self.get_beat_version()
         pipeline_name = "filebeat-" + version + "-template-test-module-test-pipeline"
-        pipeline = self.es.transport.perform_request("GET", "/_ingest/pipeline/" + pipeline_name)
+        pipeline = self.es.transport.perform_request("GET", "/_ingest/pipeline/" + pipeline_name, headers=self.headers)
 
         assert "date" in pipeline[pipeline_name]["processors"][0]
         assert "remove" in pipeline[pipeline_name]["processors"][1]

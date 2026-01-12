@@ -945,7 +945,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if security:
             username = user or os.getenv("ES_USER", "")
             password = os.getenv("ES_PASS", "")
-            es_instance = Elasticsearch([url], http_auth=(username, password))
+            es_instance = Elasticsearch([url], basic_auth=(username, password))
         else:
             es_instance = Elasticsearch([url])
         return es_instance

@@ -1,19 +1,24 @@
+import base64
 from filebeat import BaseTest
 from beat.beat import INTEGRATION_TESTS
 import os
 import unittest
 import json
 import logging
-
+from elasticsearch import Elasticsearch
 
 class Test(BaseTest):
 
     def init(self):
         self.elasticsearch_url = self.get_elasticsearch_url()
         self.kibana_url = self.get_kibana_url()
-        self.es = self.get_elasticsearch_instance()
+        self.es : Elasticsearch = self.get_elasticsearch_instance()
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
+        self.username = os.getenv("ES_USER", "")
+        self.password = os.getenv("ES_PASS", "")
+        self.auth_value = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
+        self.headers = {"Authorization": f"Basic {self.auth_value}", "Content-Type": "application/json"}
 
         self.modules_path = os.path.abspath(self.working_dir +
                                             "/../../../../module")
@@ -41,7 +46,7 @@ class Test(BaseTest):
             self.es.indices.delete(index=index_name)
         except BaseException:
             pass
-        self.wait_until(lambda: not self.es.indices.exists(index_name))
+        self.wait_until(lambda: not self.es.indices.exists(index=index_name))
 
         elasticsearch_config = {
             'host': self.elasticsearch_url,
@@ -69,7 +74,8 @@ class Test(BaseTest):
 
         # put pipeline
         self.es.transport.perform_request("PUT", "/_ingest/pipeline/test",
-                                          body={
+                                           headers=self.headers,
+                                           body={
                                               "processors": [{
                                                   "set": {
                                                       "field": "x-pipeline",
@@ -80,7 +86,7 @@ class Test(BaseTest):
         filebeat = self.start_beat()
 
         # Wait until the event is in ES
-        self.wait_until(lambda: self.es.indices.exists(index_name))
+        self.wait_until(lambda: self.es.indices.exists(index=index_name))
 
         def search_objects():
             try:

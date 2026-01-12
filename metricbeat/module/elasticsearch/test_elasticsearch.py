@@ -1,3 +1,4 @@
+import base64
 import json
 import metricbeat
 import os
@@ -5,10 +6,7 @@ import re
 import semver
 import sys
 import unittest
-import urllib.error
-import urllib.parse
-import urllib.request
-from elasticsearch import Elasticsearch, TransportError, client
+from elasticsearch import Elasticsearch
 from parameterized import parameterized
 
 
@@ -20,7 +18,11 @@ class Test(metricbeat.BaseTest):
     def setUp(self):
         super(Test, self).setUp()
         self.es = Elasticsearch(self.get_hosts())
-        self.ml_es = client.ml.MlClient(self.es)
+        self.username = os.getenv("ES_USER", "")
+        self.password = os.getenv("ES_PASS", "")
+        self.auth_value = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
+        self.getHeaders = {"Authorization": f"Basic {self.auth_value}"}
+        self.postHeaders = {"Authorization": f"Basic {self.auth_value}", "Content-Type": "application/json"}
 
         es_version = self.get_version()
         if es_version["major"] < 7:
@@ -153,7 +155,7 @@ class Test(metricbeat.BaseTest):
 
     def create_ml_job(self):
         # Check if an ml job already exists
-        response = self.ml_es.get_jobs()
+        response = self.es.ml.get_jobs()
         if response["count"] > 0:
             return
 
@@ -163,15 +165,15 @@ class Test(metricbeat.BaseTest):
         with open(file, 'r') as f:
             body = json.load(f)
 
-        self.ml_es.put_job(job_id='test', body=body)
+        self.es.ml.put_job(job_id='test', body=body)
 
     def delete_ml_job(self):
-        response = self.ml_es.get_jobs()
+        response = self.es.ml.get_jobs()
         if response["count"] == 0:
             return
 
-        self.ml_es.delete_job(job_id='test')
-
+        self.es.ml.delete_job(job_id='test')
+        
     def create_ccr_stats(self):
         self.setup_ccr_remote()
         self.create_ccr_leader_index()
@@ -186,7 +188,7 @@ class Test(metricbeat.BaseTest):
             body = json.load(f)
 
         path = "/_cluster/settings"
-        self.es.transport.perform_request('PUT', path, body=body)
+        self.es.transport.perform_request('PUT', path, body=body, headers=self.postHeaders)
 
     def create_ccr_leader_index(self):
         file = os.path.join(self.beat_path, "module", "elasticsearch", "ccr", "_meta", "test", "test_leader_index.json")
@@ -196,7 +198,7 @@ class Test(metricbeat.BaseTest):
             body = json.load(f)
 
         path = "/pied_piper"
-        self.es.transport.perform_request('PUT', path, body=body)
+        self.es.transport.perform_request('PUT', path, body=body, headers=self.postHeaders)
 
     def create_ccr_follower_index(self):
         file = os.path.join(self.beat_path, "module", "elasticsearch", "ccr",
@@ -207,16 +209,16 @@ class Test(metricbeat.BaseTest):
             body = json.load(f)
 
         path = "/rats/_ccr/follow"
-        self.es.transport.perform_request('PUT', path, body=body)
+        self.es.transport.perform_request('PUT', path, body=body, headers=self.postHeaders)
 
     def ccr_unfollow_index(self):
         exists = self.es.indices.exists('rats')
         if not exists:
             return
 
-        self.es.transport.perform_request('POST', '/rats/_ccr/pause_follow')
+        self.es.transport.perform_request('POST', '/rats/_ccr/pause_follow', headers=self.postHeaders)
         self.es.indices.close('rats')
-        self.es.transport.perform_request('POST', '/rats/_ccr/unfollow')
+        self.es.transport.perform_request('POST', '/rats/_ccr/unfollow', headers=self.postHeaders  )
 
     def create_enrich_stats(self):
         self.create_enrich_source_index()
@@ -244,12 +246,11 @@ class Test(metricbeat.BaseTest):
             policy = json.load(f)
 
         policy_url = '/_enrich/policy/users-policy'
-        self.es.transport.perform_request(method='PUT', url=policy_url, body=policy)
+        self.es.transport.perform_request(method='PUT', url=policy_url, body=policy, headers=self.postHeaders)
 
     def execute_enrich_policy(self):
         execute_url = '/_enrich/policy/users-policy/_execute'
-        self.es.transport.perform_request('POST', execute_url)
-
+        self.es.transport.perform_request('POST', execute_url, headers=self.postHeaders)
     def create_enrich_ingest_pipeline(self):
         file = os.path.join(self.beat_path, 'module', 'elasticsearch', 'enrich',
                             '_meta', 'test', 'ingest_pipeline.json')
@@ -275,7 +276,7 @@ class Test(metricbeat.BaseTest):
         if not exists:
             return
 
-        self.es.transport.perform_request('DELETE', '/_enrich/policy/users-policy')
+        self.es.transport.perform_request('DELETE', '/_enrich/policy/users-policy', headers=self.getHeaders)
 
     def delete_enrich_ingest_pipeline(self):
         exists = self.es.indices.exists('my_index')
@@ -286,25 +287,25 @@ class Test(metricbeat.BaseTest):
 
     def start_trial(self):
         # Check if trial is already enabled
-        response = self.es.transport.perform_request('GET', self.license_url)
+        response = self.es.transport.perform_request('GET', self.license_url, self.getHeaders)
         if response["license"]["type"] == "trial":
             return
 
         # Enable xpack trial
         try:
-            self.es.transport.perform_request('POST', self.license_url + "/start_trial?acknowledge=true")
+            self.es.transport.perform_request('POST', self.license_url + "/start_trial?acknowledge=true", headers=self.postHeaders)
         except BaseException:
             e = sys.exc_info()[0]
             print("Trial already enabled. Error: {}".format(e))
 
     def start_basic(self):
         # Check if basic license is already enabled
-        response = self.es.transport.perform_request('GET', self.license_url)
+        response = self.es.transport.perform_request('GET', self.license_url, self.getHeaders)
         if response["license"]["type"] == "basic":
             return
 
         try:
-            self.es.transport.perform_request('POST', self.license_url + "/start_basic?acknowledge=true")
+            self.es.transport.perform_request('POST', self.license_url + "/start_basic?acknowledge=true", headers=self.postHeaders)
         except BaseException:
             e = sys.exc_info()[0]
             print("Basic license already enabled. Error: {}".format(e))

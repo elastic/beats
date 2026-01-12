@@ -1,10 +1,10 @@
+import base64
 import logging
 import os
 import pytest
 import unittest
 
 from base import BaseTest
-from elasticsearch import RequestError
 from idxmgmt import IdxMgmt
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
@@ -25,10 +25,13 @@ class TestCommandSetupIndexManagement(BaseTest):
 
         self.custom_policy = self.beat_name + "_bar"
         self.custom_template = self.beat_name + "_foobar"
+        self.username = os.getenv("ES_USER", "")
+        self.password = os.getenv("ES_PASS", "")
+        self.auth_value = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
+        self.headers = {"Authorization": f"Basic {self.auth_value}"}
 
-        self.es = self.es_client()
         self.es = self.get_elasticsearch_instance()
-        self.idxmgmt = IdxMgmt(self.es, self.data_stream)
+        self.idxmgmt = IdxMgmt(self.es, self.data_stream, self.headers)
         self.idxmgmt.delete(indices=[],
                             policies=[self.policy_name, self.custom_policy],
                             data_streams=[self.data_stream])
@@ -119,8 +122,9 @@ class TestCommandSetupIndexManagement(BaseTest):
         Test setup --index-management respects overwrite configuration
         """
         policy_name = "mockbeat-test"
+        newHeaders = {"Authorization": f"Basic {self.auth_value}", 'Content-Type': 'application/json'}
         # update policy to verify overwrite behaviour
-        self.es.transport.perform_request('PUT', '/_ilm/policy/' + policy_name,
+        self.es.transport.perform_request('PUT', '/_ilm/policy/' + policy_name, headers=newHeaders,
                                           body={
                                               "policy": {
                                                  "phases": {
@@ -132,9 +136,9 @@ class TestCommandSetupIndexManagement(BaseTest):
                                                  }
                                               }
                                           })
-        resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + policy_name)
-        assert "delete" in resp[policy_name]["policy"]["phases"]
-        assert "hot" not in resp[policy_name]["policy"]["phases"]
+        resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + policy_name, headers=self.headers)
+        assert "delete" in resp.body[policy_name]["policy"]["phases"]
+        assert "hot" not in resp.body[policy_name]["policy"]["phases"]
 
         # ensure ilm policy is not overwritten
         self.render_config()
@@ -144,9 +148,9 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.ilm.overwrite=false",
                                               "-E", "setup.ilm.policy_name=" + policy_name])
         assert exit_code == 0
-        resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + policy_name)
-        assert "delete" in resp[policy_name]["policy"]["phases"]
-        assert "hot" not in resp[policy_name]["policy"]["phases"]
+        resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + policy_name, headers=self.headers)
+        assert "delete" in resp.body[policy_name]["policy"]["phases"]
+        assert "hot" not in resp.body[policy_name]["policy"]["phases"]
 
         # ensure ilm policy is overwritten
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
@@ -155,9 +159,9 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.ilm.overwrite=true",
                                               "-E", "setup.ilm.policy_name=" + policy_name])
         assert exit_code == 0
-        resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + policy_name)
-        assert "delete" not in resp[policy_name]["policy"]["phases"]
-        assert "hot" in resp[policy_name]["policy"]["phases"]
+        resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + policy_name, headers=self.headers)
+        assert "delete" not in resp.body[policy_name]["policy"]["phases"]
+        assert "hot" in resp.body[policy_name]["policy"]["phases"]
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
@@ -194,9 +198,9 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_index_template_loaded(self.data_stream)
 
         # check that settings are overwritten
-        resp = self.es.transport.perform_request('GET', '/_index_template/' + self.data_stream)
+        resp = self.es.transport.perform_request('GET', '/_index_template/' + self.data_stream, headers=self.headers)
         found = False
-        for index_template in resp["index_templates"]:
+        for index_template in resp.body["index_templates"]:
             if self.data_stream == index_template["name"]:
                 found = True
                 index = index_template["index_template"]["template"]["settings"]["index"]
@@ -232,10 +236,10 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_index_template_loaded(self.custom_template)
         self.idxmgmt.assert_policy_created(self.policy_name)
         # check that template was overwritten
-        resp = self.es.transport.perform_request('GET', '/_index_template/' + self.custom_template)
+        resp = self.es.transport.perform_request('GET', '/_index_template/' + self.custom_template, headers=self.headers)
 
         found = False
-        for index_template in resp["index_templates"]:
+        for index_template in resp.body["index_templates"]:
             if index_template["name"] == self.custom_template:
                 found = True
                 index = index_template["index_template"]["template"]["settings"]["index"]

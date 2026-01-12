@@ -1,15 +1,16 @@
 import datetime
 import unittest
 import pytest
-from elasticsearch import NotFoundError
+from elasticsearch import NotFoundError,  Elasticsearch
 
 
 class IdxMgmt(unittest.TestCase):
 
-    def __init__(self, client, index):
+    def __init__(self, client: Elasticsearch, index, headers={}):
         self._client = client
         self._index = index if index != '' and index != '*' else 'mockbeat'
         self.patterns = [self.default_pattern(), "1", datetime.datetime.now().strftime("%Y.%m.%d")]
+        self.headers = headers
 
     def needs_init(self, s):
         return s == '' or s == '*'
@@ -26,7 +27,7 @@ class IdxMgmt(unittest.TestCase):
 
     def delete_data_stream(self, data_stream):
         try:
-            resp = self._client.transport.perform_request('DELETE', '/_data_stream/' + data_stream)
+            resp = self._client.transport.perform_request('DELETE', '/_data_stream/' + data_stream, headers=self.headers)
         except NotFoundError:
             pass
 
@@ -47,56 +48,57 @@ class IdxMgmt(unittest.TestCase):
             template = self._index
 
         try:
-            self._client.transport.perform_request('DELETE', "/_index_template/" + template)
+            self._client.transport.perform_request('DELETE', "/_index_template/" + template, headers=self.headers)
         except NotFoundError:
             pass
 
     def delete_policy(self, policy):
         # Delete any existing policy starting with given policy
-        policies = self._client.transport.perform_request('GET', "/_ilm/policy")
-        for p, _ in policies.items():
+        policies = self._client.transport.perform_request('GET', "/_ilm/policy", headers=self.headers)
+        for p, _ in policies.body.items():
             if not p.startswith(policy):
                 continue
             try:
-                self._client.transport.perform_request('DELETE', "/_ilm/policy/" + p)
+                self._client.transport.perform_request('DELETE', "/_ilm/policy/" + p, headers=self.headers)
             except NotFoundError:
                 pass
 
     def assert_index_template_not_loaded(self, template):
-        with pytest.raises(NotFoundError):
-            self._client.transport.perform_request('GET', '/_index_template/' + template)
+            resp = self._client.transport.perform_request('GET', '/_index_template/' + template, headers=self.headers)
+            assert resp.body["status"] == 404
 
     def assert_index_template_loaded(self, template):
-        resp = self._client.transport.perform_request('GET', '/_index_template/' + template)
+        resp = self._client.transport.perform_request('GET', '/_index_template/' + template, headers=self.headers)
         found = False
-        for index_template in resp['index_templates']:
+        for index_template in resp.body['index_templates']:
             if index_template['name'] == template:
                 found = True
         assert found
 
     def assert_data_stream_created(self, data_stream):
         try:
-            resp = self._client.transport.perform_request('GET', '/_data_stream/' + data_stream)
+            resp = self._client.transport.perform_request('GET', '/_data_stream/' + data_stream, headers=self.headers)
+            assert resp.body.data_streams[0]['name'] == data_stream
         except NotFoundError:
             assert False
 
     def assert_index_template_index_pattern(self, template, index_pattern):
-        resp = self._client.transport.perform_request('GET', '/_index_template/' + template)
-        for index_template in resp['index_templates']:
+        resp = self._client.transport.perform_request('GET', '/_index_template/' + template, headers=self.headers)
+        for index_template in resp.body['index_templates']:
             if index_template['name'] == template:
                 assert index_pattern == index_template['index_template']['index_patterns']
                 found = True
         assert found
 
     def assert_policy_not_created(self, policy):
-        with pytest.raises(NotFoundError):
-            self._client.transport.perform_request('GET', '/_ilm/policy/' + policy)
+            resp = self._client.transport.perform_request('GET', '/_ilm/policy/' + policy, headers=self.headers)
+            assert policy not in resp.body, f"Policy {policy} should not exist, but it does {list(resp.body.keys())}"
 
     def assert_policy_created(self, policy):
-        resp = self._client.transport.perform_request('GET', '/_ilm/policy/' + policy)
-        assert policy in resp
-        assert resp[policy]["policy"]["phases"]["hot"]["actions"]["rollover"]["max_primary_shard_size"] == "50gb"
-        assert resp[policy]["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d"
+        resp = self._client.transport.perform_request('GET', '/_ilm/policy/' + policy, headers=self.headers)
+        assert policy in resp.body
+        assert resp.body[policy]["policy"]["phases"]["hot"]["actions"]["rollover"]["max_primary_shard_size"] == "50gb"
+        assert resp.body[policy]["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d"
 
     def assert_docs_written_to_data_stream(self, data_stream):
         # Refresh the indices to guarantee all documents are available
