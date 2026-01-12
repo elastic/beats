@@ -126,51 +126,30 @@ func GenerateMetricbeatAllInOneFieldsGo() error {
 
 // GenerateFieldsGo generates a .go file containing the fields.yml data.
 func GenerateFieldsGo(fieldsYML, out string) error {
-	const assetCmdPath = "dev-tools/cmd/asset/asset.go"
-
-	beatsDir, err := ElasticBeatsDir()
-	if err != nil {
-		return err
-	}
-
-	cmd := []string{"run",
-		"-mod=readonly",
-		filepath.Join(beatsDir, assetCmdPath),
+	args := []string{
 		"-pkg", "include",
 		"-in", fieldsYML,
 		"-out", CreateDir(out),
 		"-license", toLibbeatLicenseName(BeatLicense),
 		BeatName,
 	}
-	assetCmd := sh.RunCmd("go", cmd...)
-
-	return assetCmd()
+	return RunDevTool("asset", "dev-tools/cmd/asset/asset.go", args...)
 }
 
 // GenerateModuleFieldsGo generates a fields.go file containing a copy of the
 // each module's field.yml data in a format that can be embedded in Beat's
 // binary.
 func GenerateModuleFieldsGo(moduleDir string) error {
-	const moduleFieldsCmdPath = "dev-tools/cmd/module_fields/module_fields.go"
-
-	beatsDir, err := ElasticBeatsDir()
-	if err != nil {
-		return err
-	}
-
 	if !filepath.IsAbs(moduleDir) {
 		moduleDir = CWD(moduleDir)
 	}
 
-	cmd := []string{"run",
-		filepath.Join(beatsDir, moduleFieldsCmdPath),
+	args := []string{
 		"-beat", BeatName,
 		"-license", toLibbeatLicenseName(BeatLicense),
 		moduleDir,
 	}
-	moduleFieldsCmd := sh.RunCmd("go", cmd...)
-
-	return moduleFieldsCmd()
+	return RunDevTool("module_fields", "dev-tools/cmd/module_fields/module_fields.go", args...)
 }
 
 // GenerateModuleIncludeListGo generates an include/list.go file containing
@@ -183,26 +162,17 @@ func GenerateModuleIncludeListGo() error {
 // for the packages that match the paths (or globs) in importDirs (optional)
 // and moduleDirs (optional).
 func GenerateIncludeListGo(options IncludeListOptions) error {
-	const moduleIncludeListCmdPath = "dev-tools/cmd/module_include_list/module_include_list.go"
-
-	beatsDir, err := ElasticBeatsDir()
-	if err != nil {
-		return err
-	}
-
-	cmd := []string{"run",
-		filepath.Join(beatsDir, moduleIncludeListCmdPath),
+	// Build all args upfront
+	args := []string{
 		"-license", toLibbeatLicenseName(BeatLicense),
-		"-out", options.Outfile, "-buildTags", options.BuildTags,
+		"-out", options.Outfile,
+		"-buildTags", options.BuildTags,
 		"-pkg", options.Pkg,
 	}
 	if options.SkipInitModule {
-		cmd = append(cmd, "-skip-init-module")
+		args = append(args, "-skip-init-module")
 	}
 
-	includeListCmd := sh.RunCmd("go", cmd...)
-
-	var args []string
 	for _, dir := range options.ImportDirs {
 		if !filepath.IsAbs(dir) {
 			dir = CWD(dir)
@@ -221,7 +191,8 @@ func GenerateIncludeListGo(options IncludeListOptions) error {
 		}
 		args = append(args, "-moduleExcludeDirs", dir)
 	}
-	return includeListCmd(args...)
+
+	return RunDevTool("module_include_list", "dev-tools/cmd/module_include_list/module_include_list.go", args...)
 }
 
 // toLibbeatLicenseName translates the license type used in packages to
