@@ -19,6 +19,7 @@ package mage
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -74,7 +75,7 @@ func (docsBuilder) FieldDocs(fieldsYML string) error {
 		return err
 	}
 
-	python, err := LookVirtualenvPath(ve, pythonExe)
+	python, err := LookVirtualenvPath(ve, filepath.Base(getPythonExe()))
 	if err != nil {
 		return err
 	}
@@ -112,6 +113,9 @@ func (b docsBuilder) AsciidocBook(opts ...DocsOption) error {
 	repo, err := GetProjectRepoInfo()
 	if err != nil {
 		return err
+	}
+	if repo == nil {
+		return errors.New("project repo info is nil")
 	}
 
 	cloneDir := CreateDir(filepath.Join(repo.RootDir, "build/elastic_docs_repo"))

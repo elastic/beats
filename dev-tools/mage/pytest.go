@@ -20,7 +20,6 @@ package mage
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -68,14 +67,76 @@ var (
 	// environment can be used to modify the executable used.
 	// On Windows this defaults to python and on all other platforms this
 	// defaults to python3.
-	pythonExe = EnvOr("PYTHON_EXE", "python3")
+	pythonExe     string
+	pythonExeOnce sync.Once
 )
 
 func init() {
-	// The python installer for Windows does not setup a python3 alias.
-	if runtime.GOOS == "windows" {
-		pythonExe = EnvOr("PYTHON_EXE", "python")
+	// Lazy initialization - only detect Python when actually needed
+	pythonExe = os.Getenv("PYTHON_EXE")
+}
+
+// getPythonExe returns the Python executable, detecting it lazily if needed.
+func getPythonExe() string {
+	pythonExeOnce.Do(func() {
+		if pythonExe != "" {
+			return
+		}
+
+		defaultPython := "python3"
+		if runtime.GOOS == "windows" {
+			defaultPython = "python"
+		}
+
+		pythonExe = findCompatiblePython(defaultPython)
+	})
+	return pythonExe
+}
+
+// findCompatiblePython finds a compatible Python version (3.9 <= version < 3.14).
+// Optimized to check default python3 first and use fast version check.
+func findCompatiblePython(defaultPython string) string {
+	// Fast path: check if default Python is compatible
+	if isPythonCompatible(defaultPython) {
+		return defaultPython
 	}
+
+	// Build candidate list based on OS
+	var candidates []string
+	if runtime.GOOS == "darwin" {
+		// macOS: prefer Homebrew Python (most common for developers)
+		candidates = []string{
+			"/opt/homebrew/opt/python@3.13/bin/python3.13",
+			"/opt/homebrew/opt/python@3.12/bin/python3.12",
+			"/usr/local/opt/python@3.13/bin/python3.13",
+			"/usr/local/opt/python@3.12/bin/python3.12",
+		}
+	}
+	// Add generic versioned Python (works on all platforms)
+	candidates = append(candidates, "python3.13", "python3.12", "python3.11", "python3.10")
+
+	for _, candidate := range candidates {
+		if isPythonCompatible(candidate) {
+			// Only print message if verbose mode or first detection
+			if mg.Verbose() {
+				fmt.Printf(">> Using Python: %s (auto-detected compatible version)\n", candidate)
+			}
+			return candidate
+		}
+	}
+
+	// Fall back to default
+	fmt.Printf(">> Warning: No compatible Python (3.9-3.13) found, using: %s\n", defaultPython)
+	return defaultPython
+}
+
+// isPythonCompatible checks if Python exists and has version 3.9 <= v < 3.14.
+// Uses a single Python command for speed.
+func isPythonCompatible(pythonPath string) bool {
+	// Use Python itself to check version compatibility in one command
+	cmd := exec.Command(pythonPath, "-c",
+		"import sys; exit(0 if 9 <= sys.version_info.minor < 14 and sys.version_info.major == 3 else 1)")
+	return cmd.Run() == nil
 }
 
 // PythonTestArgs are the arguments used for the "python*Test" targets and they
@@ -235,17 +296,38 @@ func PythonVirtualenv(forceCreate bool) (string, error) {
 	}
 
 	reqs := expandVirtualenvReqs()
+	// Use a marker file instead of activate to track when packages are fully installed.
+	// The activate script is created before packages are installed, causing race conditions.
+	readyMarker := filepath.Join(ve, ".packages_installed")
 
-	// Only execute if requirements.txt is newer than the virtualenv activate
-	// script.
-	activate := virtualenvPath(ve, "activate")
-	if !forceCreate && IsUpToDate(activate, reqs...) {
+	// Use file-based locking for cross-process synchronization during parallel builds.
+	lockFile := filepath.Join(filepath.Dir(ve), ".python_venv.lock")
+	if err := os.MkdirAll(filepath.Dir(lockFile), 0755); err != nil {
+		return "", err
+	}
+
+	// Fast path: if virtualenv is already up-to-date (marker newer than requirements)
+	if !forceCreate && IsUpToDate(readyMarker, reqs...) {
+		return pythonVirtualenvDir, nil
+	}
+
+	// Need to create/update virtualenv - acquire exclusive lock using a simple
+	// file-based locking mechanism that works cross-platform.
+	unlock, err := acquireFileLock(lockFile, 60*time.Second)
+	if err != nil {
+		return "", fmt.Errorf("failed to acquire virtualenv lock: %w", err)
+	}
+	defer unlock()
+
+	// Re-check after acquiring lock (another process may have created it)
+	if !forceCreate && IsUpToDate(readyMarker, reqs...) {
 		return pythonVirtualenvDir, nil
 	}
 
 	// Create a virtual environment only if the dir does not exist.
+	pyExe := getPythonExe()
 	if _, err := os.Stat(ve); err != nil {
-		if err := sh.Run(pythonExe, "-m", "venv", ve); err != nil {
+		if err := sh.Run(pyExe, "-m", "venv", ve); err != nil {
 			return "", err
 		}
 	}
@@ -255,7 +337,7 @@ func PythonVirtualenv(forceCreate bool) (string, error) {
 		"VIRTUAL_ENV": ve,
 	}
 
-	vePython := virtualenvPath(ve, pythonExe)
+	vePython := virtualenvPath(ve, filepath.Base(pyExe))
 	// Ensure we are using the latest pip version.
 	// use method described at https://pip.pypa.io/en/stable/installation/#upgrading-pip
 	if err = sh.RunWith(env, vePython, "-m", "pip", "install", "--upgrade", "pip"); err != nil {
@@ -284,10 +366,10 @@ func PythonVirtualenv(forceCreate bool) (string, error) {
 		return "", err
 	}
 
-	// Touch activate script.
-	mtime := time.Now()
-	if err := os.Chtimes(activate, mtime, mtime); err != nil {
-		log.Fatal(err)
+	// Create/touch the ready marker file to indicate packages are fully installed.
+	// This is used by IsUpToDate check to avoid race conditions in parallel builds.
+	if err := os.WriteFile(readyMarker, []byte(time.Now().String()), 0644); err != nil {
+		return "", fmt.Errorf("failed to create ready marker: %w", err)
 	}
 
 	return ve, nil
@@ -365,4 +447,47 @@ func expandVirtualenvReqs() []string {
 		out = append(out, MustExpand(path))
 	}
 	return out
+}
+
+// acquireFileLock acquires an exclusive file lock using a simple cross-platform
+// mechanism. It creates a lock file with O_EXCL and retries until successful
+// or timeout. Returns an unlock function to release the lock.
+func acquireFileLock(lockFile string, timeout time.Duration) (func(), error) {
+	deadline := time.Now().Add(timeout)
+	retryDelay := 100 * time.Millisecond
+
+	for {
+		// Try to create the lock file exclusively
+		f, err := os.OpenFile(lockFile, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
+		if err == nil {
+			// Successfully acquired lock
+			f.WriteString(fmt.Sprintf("pid=%d\ntime=%s\n", os.Getpid(), time.Now()))
+			f.Close()
+
+			// Return unlock function that removes the lock file
+			return func() {
+				os.Remove(lockFile)
+			}, nil
+		}
+
+		// Check if lock file is stale (older than 5 minutes = probably crashed process)
+		if info, statErr := os.Stat(lockFile); statErr == nil {
+			if time.Since(info.ModTime()) > 5*time.Minute {
+				// Stale lock, remove and retry
+				os.Remove(lockFile)
+				continue
+			}
+		}
+
+		// Check timeout
+		if time.Now().After(deadline) {
+			return nil, fmt.Errorf("timeout waiting for lock file %s", lockFile)
+		}
+
+		// Wait and retry
+		time.Sleep(retryDelay)
+		if retryDelay < 2*time.Second {
+			retryDelay *= 2
+		}
+	}
 }
