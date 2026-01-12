@@ -233,3 +233,70 @@ func TestAppendStringField(t *testing.T) {
 		})
 	}
 }
+
+// TestErrorCases will test that the processor handles errors according to its config
+func TestErrorCases(t *testing.T) {
+	invalidMessage := "not a valid syslog message"
+
+	tests := map[string]struct {
+		cfg       map[string]interface{}
+		wantEvent bool
+		wantErr   bool
+	}{
+		"default": {
+			cfg:       map[string]interface{}{},
+			wantEvent: true,
+			wantErr:   true,
+		},
+		"ignore_failure only": {
+			cfg:       map[string]interface{}{"ignore_failure": true},
+			wantEvent: true,
+			wantErr:   false,
+		},
+		"drop_failed only": {
+			cfg:       map[string]interface{}{"drop_failed": true},
+			wantEvent: false,
+			wantErr:   true,
+		},
+		"ignore_failure takes precedence over drop_failed": {
+			cfg:       map[string]interface{}{"ignore_failure": true, "drop_failed": true},
+			wantEvent: true,
+			wantErr:   false,
+		},
+	}
+
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			cfg, err := conf.NewConfigFrom(tc.cfg)
+			assert.NoError(t, err)
+
+			p, err := New(cfg, logptest.NewTestingLogger(t, ""))
+			assert.NoError(t, err)
+
+			event := &beat.Event{
+				Fields: mapstr.M{
+					"message": invalidMessage,
+				},
+			}
+
+			got, gotErr := p.Run(event)
+
+			// Check error
+			if tc.wantErr {
+				assert.Error(t, gotErr)
+			} else {
+				assert.NoError(t, gotErr)
+			}
+
+			// Check event returned
+			if tc.wantEvent {
+				assert.NotNil(t, got, "expected event to be returned")
+			} else {
+				assert.Nil(t, got, "expected event to be dropped")
+			}
+		})
+	}
+}

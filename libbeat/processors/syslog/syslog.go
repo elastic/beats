@@ -53,6 +53,7 @@ type config struct {
 	OverwriteKeys bool              `config:"overwrite_keys"`
 	IgnoreMissing bool              `config:"ignore_missing"`
 	IgnoreFailure bool              `config:"ignore_failure"`
+	DropFailed    bool              `config:"drop_failed"`
 	Tag           string            `config:"tag"`
 }
 
@@ -88,6 +89,7 @@ func init() {
 				"overwrite_keys",
 				"ignore_missing",
 				"ignore_failure",
+				"drop_failed",
 				"tag",
 				"when",
 			),
@@ -142,6 +144,9 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	if err := p.run(event); err != nil && !p.IgnoreFailure {
 		err = fmt.Errorf(procName+" failed to process field %q: %w", p.Field, err)
 		appendStringField(event.Fields, "error.message", err.Error())
+		if p.DropFailed {
+			return nil, err
+		}
 		return event, err
 	}
 
@@ -173,6 +178,7 @@ func (p *processor) run(event *beat.Event) error {
 	fields, ts, err := syslog.ParseMessage(data, p.Format, p.TimeZone.Location())
 	if err != nil {
 		p.stats.Failure.Inc()
+		return err
 	} else {
 		p.stats.Success.Inc()
 	}

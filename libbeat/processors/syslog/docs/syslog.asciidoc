@@ -39,6 +39,9 @@ when a specified field does not exist. Defaults to `false`.
 `ignore_failure`:: (Optional) Ignore all errors produced by the processor.
 Defaults to `false`.
 
+`drop_failed`:: (Optional) When set, if messages contain errors which cause them to be unparsable,
+the processor will drop the message completely. Defaults to `false`.
+
 `tag`:: (Optional) An identifier for this processor. Useful for debugging.
 
 Example:
