@@ -116,8 +116,13 @@ func (ef *MetricsExporterFactory) GetExporter(ctx context.Context, global bool) 
 		ef.lock.Lock()
 	}
 
+	defer func() {
+		if global {
+			ef.lock.Unlock()
+		}
+	}()
+
 	if global && ef.globalMetricsExporter != nil {
-		ef.lock.Unlock()
 		return ef.globalMetricsExporter, exporterType, nil
 	}
 
@@ -138,7 +143,6 @@ func (ef *MetricsExporterFactory) GetExporter(ctx context.Context, global bool) 
 
 	if global {
 		ef.globalMetricsExporter = exporter
-		ef.lock.Unlock()
 	}
 	return exporter, exporterType, err
 }

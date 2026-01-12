@@ -6,24 +6,25 @@ package otel
 
 import (
 	"context"
-	"os"
-	"sync"
 	"testing"
+
+	"golang.org/x/sync/errgroup"
 )
 
 func TestExporterFactoryRace(t *testing.T) {
-	os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
+	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
 	factory := NewMetricsExporterFactory(GetDefaultMetricExporterOptions())
+	g, ctx := errgroup.WithContext(t.Context())
 
-	var wg sync.WaitGroup
-	for i := 0; i < 100; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			factory.GetExporter(context.Background(), true) // global=true
-		}()
+	for range 100 {
+		g.Go(func() error {
+			_, _, err := factory.GetExporter(ctx, true) // global=true
+			return err
+		})
 	}
-	wg.Wait()
+	if err := g.Wait(); err != nil {
+		t.Errorf("GetExporter returned error: %v", err)
+	}
 }
 
 func TestGetGlobalExporterFactory(t *testing.T) {
@@ -40,7 +41,7 @@ func TestGetGlobalExporterFactory(t *testing.T) {
 }
 
 func TestExporterFactory(t *testing.T) {
-	os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
+	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
 	options := GetDefaultMetricExporterOptions()
 	factory := NewMetricsExporterFactory(options)
 	if factory == nil {
@@ -88,7 +89,7 @@ func TestExporterFactory(t *testing.T) {
 }
 
 func TestExporterFactoryNoMetricsEnvironment(t *testing.T) {
-	os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
+	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
 	options := GetDefaultMetricExporterOptions()
 	factory := NewMetricsExporterFactory(options)
 	if factory == nil {
@@ -110,7 +111,7 @@ func TestExporterFactoryNoMetricsEnvironment(t *testing.T) {
 }
 
 func TestGetGlobalExporterNoneType(t *testing.T) {
-	os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
+	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
 	factory := GetGlobalMetricsExporterFactory()
 	exporter, _, err := factory.GetExporter(context.Background(), true)
 	if err != nil {
@@ -125,7 +126,7 @@ func TestGetGlobalExporterNoneType(t *testing.T) {
 }
 
 func TestGetGlobalExporterGRPCType(t *testing.T) {
-	os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
+	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
 	factory := GetGlobalMetricsExporterFactory()
 	exporter, _, err := factory.GetExporter(context.Background(), true)
 	if err != nil {
@@ -171,31 +172,27 @@ func TestGetExporterFromEnvironment(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		if tc.metricsExporter == "" {
-			os.Unsetenv("OTEL_METRICS_EXPORTER")
-		} else {
-			os.Setenv("OTEL_METRICS_EXPORTER", tc.metricsExporter)
-		}
-		if tc.endpoint == "" {
-			os.Unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT")
-		} else {
-			os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", tc.endpoint)
-		}
-		if tc.protocol == "" {
-			os.Unsetenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL")
-		} else {
-			os.Setenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL", tc.protocol)
-		}
-		exporter, etype, err := factory.GetExporter(context.Background(), false)
-		if err != nil {
-			t.Errorf("%s: GetExporter returned error: %v", tc.name, err)
-		}
-		if (exporter == nil) != tc.isNil {
-			t.Errorf("%s, exporter unexpected: got nil=%v, want nil=%v", tc.name, exporter == nil, tc.isNil)
-		}
-		if etype != ExporterType(tc.eType) {
-			t.Errorf("%s, exporter type unexpected: got %v, want %v", tc.name, etype, ExporterType(tc.eType))
-		}
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.metricsExporter != "" {
+				t.Setenv("OTEL_METRICS_EXPORTER", tc.metricsExporter)
+			}
+			if tc.endpoint != "" {
+				t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", tc.endpoint)
+			}
+			if tc.protocol != "" {
+				t.Setenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL", tc.protocol)
+			}
+			exporter, etype, err := factory.GetExporter(context.Background(), false)
+			if err != nil {
+				t.Errorf("%s: GetExporter returned error: %v", tc.name, err)
+			}
+			if (exporter == nil) != tc.isNil {
+				t.Errorf("%s, exporter unexpected: got nil=%v, want nil=%v", tc.name, exporter == nil, tc.isNil)
+			}
+			if etype != ExporterType(tc.eType) {
+				t.Errorf("%s, exporter type unexpected: got %v, want %v", tc.name, etype, ExporterType(tc.eType))
+			}
+		})
 
 	}
 }
