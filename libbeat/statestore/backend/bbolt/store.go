@@ -79,11 +79,11 @@ type jsonDecoder struct {
 }
 
 func (d jsonDecoder) Decode(to any) error {
-	var tmp any
+	var tmp map[string]interface{}
 	if err := json.Unmarshal(d.raw, &tmp); err != nil {
 		return err
 	}
-	return typeconv.Convert(to, tmp)
+	return typeconv.Convert(to, d.raw)
 }
 
 func openStore(logger *logp.Logger, path string, settings Settings) (*store, error) {
@@ -117,7 +117,7 @@ func openStore(logger *logp.Logger, path string, settings Settings) (*store, err
 
 	s := &store{
 		db:       db,
-		logger:   logger,
+		logger:   logger.Named("bbolt"),
 		now:      time.Now,
 		name:     filepath.Base(path),
 		path:     path,
