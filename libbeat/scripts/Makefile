@@ -94,11 +94,38 @@ DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} ES_BEATS=${ES_BEATS} 
 DOCKER_CACHE?=1 ## @miscellaneous If set to 0, all docker images are created without cache
 DOCKER_PULL?=1 ## @miscellaneous If set to 0, disable the force pull on docker-compose build
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
-PYTHON_EXE?=python3
+
+# Python version detection with caching for speed
+PYTHON_CACHE_FILE=${BUILD_DIR}/.python_exe_cache
+PYTHON_EXE?=$(shell \
+	if [ -f "$(PYTHON_CACHE_FILE)" ]; then cat "$(PYTHON_CACHE_FILE)"; \
+	else \
+		py=python3; \
+		ver=$$($$py -c 'import sys; print(sys.version_info.minor)' 2>/dev/null || echo 99); \
+		if [ "$$ver" -ge 9 ] && [ "$$ver" -lt 14 ]; then echo $$py; \
+		else \
+			for py in python3.13 python3.12 python3.11 python3.10 \
+				/opt/homebrew/opt/python@3.13/bin/python3.13 \
+				/opt/homebrew/opt/python@3.12/bin/python3.12; do \
+				if $$py -c 'import sys; exit(0 if 9<=sys.version_info.minor<14 else 1)' 2>/dev/null; then \
+					echo $$py; break; \
+				fi; \
+			done; \
+		fi; \
+	fi)
+ifeq ($(PYTHON_EXE),)
+PYTHON_EXE=python3
+endif
+
 PYTHON_ENV?=${BUILD_DIR}/python-env
 PYTHON_ENV_EXE=${PYTHON_ENV}/bin/$(notdir ${PYTHON_EXE})
 PIP_INSTALL_PARAMS?=
 BUILDID?=$(shell git rev-parse HEAD) ## @Building The build ID
+
+# Pre-compiled asset tool for faster builds (falls back to go run if not available)
+DEV_TOOLS_BIN=${ES_BEATS}/build/dev-tools-bin
+ASSET_TOOL_PRECOMPILED=$(DEV_TOOLS_BIN)/asset
+ASSET_CMD=$(shell if [ -x "$(ASSET_TOOL_PRECOMPILED)" ]; then echo "$(ASSET_TOOL_PRECOMPILED)"; else echo "go run ${INSTALL_FLAG} ${ES_BEATS}/dev-tools/cmd/asset/asset.go"; fi)
 VENV_PARAMS?=
 INTEGRATION_TESTS?=
 FIND?=. ${PYTHON_ENV}/bin/activate; find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
@@ -338,7 +365,7 @@ update: python-env fields collect config ## @build Update expects the most recen
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	mkdir -p include
-	go run ${INSTALL_FLAG} ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license $(LICENSE) -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
+	$(ASSET_CMD) -license $(LICENSE) -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
 endif
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
