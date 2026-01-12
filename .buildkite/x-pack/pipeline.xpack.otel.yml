@@ -33,7 +33,7 @@ steps:
         agents:
           image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
           cpu: "4000m"
-          memory: "8Gi"
+          memory: "12Gi"
           # 10GB storage was not enough for check/update.
           ephemeralStorage: "50G"
           useCustomGlobalHooks: true
