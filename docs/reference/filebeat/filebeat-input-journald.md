@@ -12,8 +12,6 @@ applies_to:
 
 :::{warning}
 The Wolfi-based Docker image does not contain the `journalctl` binary.
-
-{applies_to}`stack: ga 9.3.0` To use the `journald` input type with Wolfi images, you must configure the [`chroot`](#filebeat-input-journald-chroot) option to use the host's `journalctl` binary.
 :::
 
 :::{important}
