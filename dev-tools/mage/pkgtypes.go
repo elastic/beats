@@ -22,6 +22,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"compress/gzip"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -826,6 +827,9 @@ func addUidGidEnvArgs(args []string) ([]string, error) {
 	info, err := GetDockerInfo()
 	if err != nil {
 		return args, fmt.Errorf("failed to get docker info: %w", err)
+	}
+	if info == nil {
+		return args, errors.New("docker info is nil")
 	}
 
 	uid, gid := os.Getuid(), os.Getgid()

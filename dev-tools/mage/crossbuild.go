@@ -285,6 +285,9 @@ func (b GolangCrossBuilder) Build() error {
 	if err != nil {
 		return fmt.Errorf("failed to determine repo root and package sub dir: %w", err)
 	}
+	if repoInfo == nil {
+		return errors.New("project repo info is nil")
+	}
 
 	mountPoint := filepath.ToSlash(filepath.Join("/go", "src", repoInfo.CanonicalRootImportPath))
 	// use custom dir for build if given, subdir if not:

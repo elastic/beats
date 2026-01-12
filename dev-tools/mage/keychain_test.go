@@ -43,8 +43,9 @@ func TestGetAppleSigningInfo(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	if assert.NotNil(t, signingInfo) {
-		assert.False(t, signingInfo.Sign)
+	if signingInfo == nil {
+		t.Fatal("GetAppleSigningInfo returned nil")
 	}
+
+	assert.False(t, signingInfo.Sign)
 }

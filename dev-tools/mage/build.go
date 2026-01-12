@@ -188,6 +188,9 @@ func GolangCrossBuild(params BuildArgs) error {
 	if err != nil {
 		return err
 	}
+	if repoInfo == nil {
+		return errors.New("failed to get project repo info")
+	}
 
 	// TODO: Support custom build dir/subdir
 	projectMountPoint := filepath.ToSlash(filepath.Join("/go", "src", repoInfo.CanonicalRootImportPath))
