@@ -184,7 +184,7 @@ This section contains detailed information about the metric collecting modules c
         title = details["title"]
         applies_to = details["applies_to"]
         module_list_output += "* [{}](/reference/auditbeat/auditbeat-module-{}.md)".format(title, m)
-        if applies_to and applies_to is not "ga":
+        if applies_to and applies_to != "ga":
             module_list_output += " {{applies_to}}`stack: {}`".format(applies_to)
         module_list_output += "\n"
 
