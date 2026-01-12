@@ -27,23 +27,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/iobuf"
 )
 
-<<<<<<< HEAD
-=======
-type Priority int32
-
-const (
-	Highest          Priority = 1
-	ECSFieldsPri     Priority = 5
-	LibbeatFieldsPri Priority = 10
-	BeatFieldsPri    Priority = 50
-	ModuleFieldsPri  Priority = 100
-	Lowest           Priority = math.MaxInt32
-)
-
 var beatFieldsCacheMu sync.Mutex
 var beatFieldsCache = map[string][]byte{}
 
->>>>>>> aa318d416 (libbeat: memoize asset decoding per beat (#48296))
 // FieldsRegistry contains a list of fields.yml files
 // As each entry is an array of bytes multiple fields.yml can be added under one path.
 // This can become useful as we don't have to generate anymore the fields.yml but can
