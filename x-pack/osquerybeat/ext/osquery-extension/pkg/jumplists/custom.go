@@ -1,6 +1,6 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
+// you may not use this filecept in compliance with the Elastic License.
 
 //go:build windows
 
@@ -14,15 +14,15 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-// ParseCustomJumplistFile parses a custom jump list file into a Jumplist object.
+// parseCustomJumplistFile parses a custom jump list file into a Jumplist object.
 // It returns a Jumplist object and an error if the file cannot be read or parsed.
 // Custom jumplists are comprised of some metadata and a collection of Lnk objects.
 // The lnk objects have to be carved out of the file and there may be multiple of them per file
-func ParseCustomJumplistFile(filePath string, userProfile *UserProfile, log *logger.Logger) (*Jumplist, error) {
+func parseCustomJumplistFile(filePath string, userProfile *UserProfile, log *logger.Logger) (*Jumplist, error) {
 	// Read the file into a byte slice
 	fileBytes, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read")
+		return nil, fmt.Errorf("read %s: %w", filePath, err)
 	}
 
 	// Carve out the Lnk objects from the file
@@ -36,7 +36,7 @@ func ParseCustomJumplistFile(filePath string, userProfile *UserProfile, log *log
 	// Look up the application id and create the metadata
 	jumpListMeta := &JumplistMeta{
 		UserProfile:   userProfile,
-		ApplicationId: GetAppIdFromFileName(filePath, log),
+		ApplicationID: getAppIdFromFileName(filePath, log),
 		JumplistType:  JumplistTypeCustom,
 		Path:          filePath,
 	}
@@ -74,7 +74,7 @@ func carveLnkFiles(fileBytes []byte, log *logger.Logger) []*Lnk {
 
 		if nextSigIndex == -1 {
 			// This is the last Lnk in the file
-			lnk, err := NewLnkFromBytes(fileBytes, log)
+			lnk, err := newLnkFromBytes(fileBytes, log)
 			if err == nil {
 				lnks = append(lnks, lnk)
 			}
@@ -85,7 +85,7 @@ func carveLnkFiles(fileBytes []byte, log *logger.Logger) []*Lnk {
 		// nextSigIndex is a relative index to the start of the fileBytes buffer
 		// so we need to add the sigLen to get the absolute index
 		cutPoint := nextSigIndex + sigLen
-		lnk, err := NewLnkFromBytes(fileBytes[:cutPoint], log)
+		lnk, err := newLnkFromBytes(fileBytes[:cutPoint], log)
 		if err == nil {
 			lnks = append(lnks, lnk)
 		}

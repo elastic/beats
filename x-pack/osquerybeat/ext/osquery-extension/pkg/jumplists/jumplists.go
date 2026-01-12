@@ -31,7 +31,7 @@ const (
 // have osquery tags defined in their object definitions, and our encoding package
 // will automatically marshal the fields to the correct JSON format.
 type JumplistMeta struct {
-	*ApplicationId
+	*ApplicationID
 	*UserProfile
 	JumplistType JumplistType `osquery:"jumplist_type"`
 	Path         string       `osquery:"source_file_path"`
@@ -97,12 +97,12 @@ func matchesFilters(row JumplistRow, filters []filters.Filter) bool {
 // getAllJumplists is a helper function that gets all the jumplists for all the user profiles.
 func getAllJumplists(log *logger.Logger) ([]*Jumplist, error) {
 	var jumplists []*Jumplist
-	userProfiles, err := GetUserProfiles(log)
+	userProfiles, err := getUserProfiles(log)
 	if err != nil {
 		return nil, err
 	}
 	for _, userProfile := range userProfiles {
-		jumplists = append(jumplists, userProfile.GetJumplists(log)...)
+		jumplists = append(jumplists, userProfile.getJumplists(log)...)
 	}
 	return jumplists, nil
 }

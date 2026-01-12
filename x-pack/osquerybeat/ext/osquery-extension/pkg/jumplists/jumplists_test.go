@@ -16,7 +16,6 @@ import (
 )
 
 func TestCustomJumplists(t *testing.T) {
-
 	type testCase struct {
 		name         string
 		filePath     string
@@ -59,7 +58,7 @@ func TestCustomJumplists(t *testing.T) {
 	log := logger.New(os.Stdout, true)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			jumplist, err := ParseCustomJumplistFile(test.filePath, &UserProfile{Username: "test", Domain: "test", Sid: "test"}, log)
+			jumplist, err := parseCustomJumplistFile(test.filePath, &UserProfile{Username: "test", Domain: "test", Sid: "test"}, log)
 			if test.expectError {
 				assert.Error(t, err, "expected error when parsing custom jumplist")
 				assert.Nil(t, jumplist, "expected nil jumplist when parsing custom jumplist")
@@ -114,7 +113,7 @@ func TestLnk(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			bytes, err := os.ReadFile(tt.args.filePath)
 			assert.NoError(t, err, "expected no error when reading LNK file")
-			got, err := NewLnkFromBytes(bytes, log)
+			got, err := newLnkFromBytes(bytes, log)
 			if tt.wantErr {
 				assert.Error(t, err, "expected error when parsing LNK file")
 				assert.Nil(t, got, "expected nil LNK when parsing LNK file")
@@ -128,17 +127,17 @@ func TestLnk(t *testing.T) {
 
 func TestGetUserProfiles(t *testing.T) {
 	log := logger.New(os.Stdout, true)
-	userProfiles, err := GetUserProfiles(log)
+	userProfiles, err := getUserProfiles(log)
 	assert.NoError(t, err, "expected no error when getting user profiles")
 	assert.NotEmpty(t, userProfiles, "expected non-empty user profiles")
 }
 
 func TestGetJumplists(t *testing.T) {
 	log := logger.New(os.Stdout, true)
-	userProfiles, err := GetUserProfiles(log)
+	userProfiles, err := getUserProfiles(log)
 	assert.NoError(t, err, "expected no error when getting user profiles")
 	for _, userProfile := range userProfiles {
-		jumplists := userProfile.GetJumplists(log)
+		jumplists := userProfile.getJumplists(log)
 		for _, jumplist := range jumplists {
 			log.Infof("found jumplist: %s, username: %s, domain: %s, sid: %s", jumplist.Path, userProfile.Username, userProfile.Domain, userProfile.Sid)
 		}

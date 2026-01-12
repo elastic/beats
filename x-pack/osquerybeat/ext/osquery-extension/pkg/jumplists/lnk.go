@@ -49,9 +49,9 @@ type Lnk struct {
 	Name                   string    `osquery:"name"`
 }
 
-// NewLnkFromBytes creates a new Lnk object from a byte slice.
+// newLnkFromBytes creates a new Lnk object from a byte slice.
 // It is used to create a new Lnk object from a byte slice.
-func NewLnkFromBytes(data []byte, log *logger.Logger) (*Lnk, error) {
+func newLnkFromBytes(data []byte, log *logger.Logger) (*Lnk, error) {
 	if len(data) < MinLnkSize {
 		return nil, fmt.Errorf("data is too short to contain a valid LNK file")
 	}

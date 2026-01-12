@@ -13,35 +13,35 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-// LookupApplicationId looks up the application name for a given application id.
+// lookupApplicationID looks up the application name for a given application id.
 // knownAppIds is a map of application ids to application names, and is generated using go generate
 // the generate directive is in the jumplists.go file
-func LookupApplicationId(appId string) string {
-	if _, ok := knownAppIds[appId]; ok {
-		return knownAppIds[appId]
+func lookupApplicationID(appID string) string {
+	if _, ok := knownAppIDs[appID]; ok {
+		return knownAppIDs[appID]
 	}
 	return ""
 }
 
-// ApplicationId is a struct that contains the application id and name.
+// ApplicationID is a struct that contains the application id and name.
 // It is used to store the application id and name for a given jumplist.
-type ApplicationId struct {
-	Id   string `osquery:"application_id"`
+type ApplicationID struct {
+	ID   string `osquery:"application_id"`
 	Name string `osquery:"application_name"`
 }
 
-// NewApplicationId creates a new ApplicationId object.
-func NewApplicationId(id string) *ApplicationId {
-	return &ApplicationId{Id: id, Name: LookupApplicationId(id)}
+// newApplicationID creates a new ApplicationId object.
+func newApplicationID(id string) *ApplicationID {
+	return &ApplicationID{ID: id, Name: lookupApplicationID(id)}
 }
 
-// GetAppIdFromFileName extracts the application id from the file name.
+// getAppIdFromFileName extracts the application id from the file name.
 // It is used to create a new ApplicationId object from the file name.
-func GetAppIdFromFileName(filePath string, log *logger.Logger) *ApplicationId {
+func getAppIdFromFileName(filePath string, log *logger.Logger) *ApplicationID {
 	fileName := filepath.Base(filePath)
 	dotIndex := strings.Index(fileName, ".")
 	if dotIndex != -1 {
-		return NewApplicationId(fileName[:dotIndex])
+		return newApplicationID(fileName[:dotIndex])
 	}
-	return NewApplicationId("")
+	return newApplicationID("")
 }
