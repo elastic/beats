@@ -45,9 +45,6 @@ func getFilesInDirectory(directory string, log *logger.Logger) ([]string, error)
 		if entry.IsDir() {
 			continue
 		}
-		if !strings.HasSuffix(entry.Name(), ".customDestinations-ms") {
-			continue
-		}
 		files[i] = filepath.Join(directory, entry.Name())
 	}
 	return files, nil
@@ -74,6 +71,9 @@ func (u *UserProfile) getJumplists(log *logger.Logger) []*Jumplist {
 		switch jumplistType {
 		case JumplistTypeCustom:
 			for _, file := range files {
+				if !strings.HasSuffix(file, ".customDestinations-ms") {
+					continue
+				}
 				jumpList, err := parseCustomJumplistFile(file, u, log)
 				if err != nil {
 					log.Errorf("failed to parse custom jump list file %s: %v", file, err)
