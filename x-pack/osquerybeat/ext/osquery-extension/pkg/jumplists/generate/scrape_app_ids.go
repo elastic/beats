@@ -16,14 +16,14 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-const appIdSourceUrl = "https://raw.githubusercontent.com/EricZimmerman/Jumplist/refs/heads/master/Jumplist/Resources/AppIDs.txt"
+const appIdSourceUrl = "https://raw.githubusercontent.com/EricZimmerman/JumpList/refs/heads/master/JumpList/Resources/AppIDs.txt"
 
 // scrapeJumplistAppIDs pulls the app ids from appSourceUrl and returns a map of app ids to app names.
 // the app ids are in the format of a hex string, and the app names are in the format of a string.
 func scrapeJumplistAppIDs(log *logger.Logger) (map[string]string, error) {
 	appIDs := make(map[string]string)
 	valueRegex := regexp.MustCompile(`.*"(.*)"`)
-	bodyString, err := downloadPage(appIdSourceUrl, log)
+	bodyString, err := downloadPage(appIdSourceUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -76,9 +76,9 @@ func writeAppIdGeneratedFile(outputFile string, log *logger.Logger) error {
 	// Build the Go map literal string
 	var sb strings.Builder
 	writeCopyrightHeader(&sb)
-	sb.WriteString("// knownAppIds is a lookup table for known windows AppIDs.\n")
+	sb.WriteString("// knownAppIDs is a lookup table for known windows AppIDs.\n")
 	sb.WriteString(fmt.Sprintf("// Source: %s\n", appIdSourceUrl))
-	sb.WriteString("var knownAppIds = map[string]string{\n")
+	sb.WriteString("var knownAppIDs = map[string]string{\n")
 
 	// Sort keys for consistent output
 	keys := make([]string, 0, len(appIDs))
