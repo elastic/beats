@@ -236,7 +236,8 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_index_template_loaded(self.custom_template)
         self.idxmgmt.assert_policy_created(self.policy_name)
         # check that template was overwritten
-        resp = self.es.transport.perform_request('GET', '/_index_template/' + self.custom_template, headers=self.headers)
+        resp = self.es.transport.perform_request('GET', '/_index_template/' +
+                                                 self.custom_template, headers=self.headers)
 
         found = False
         for index_template in resp.body["index_templates"]:

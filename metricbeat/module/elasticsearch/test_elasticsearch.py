@@ -173,7 +173,7 @@ class Test(metricbeat.BaseTest):
             return
 
         self.es.ml.delete_job(job_id='test')
-        
+
     def create_ccr_stats(self):
         self.setup_ccr_remote()
         self.create_ccr_leader_index()
@@ -218,7 +218,7 @@ class Test(metricbeat.BaseTest):
 
         self.es.transport.perform_request('POST', '/rats/_ccr/pause_follow', headers=self.postHeaders)
         self.es.indices.close('rats')
-        self.es.transport.perform_request('POST', '/rats/_ccr/unfollow', headers=self.postHeaders  )
+        self.es.transport.perform_request('POST', '/rats/_ccr/unfollow', headers=self.postHeaders)
 
     def create_enrich_stats(self):
         self.create_enrich_source_index()
@@ -251,6 +251,7 @@ class Test(metricbeat.BaseTest):
     def execute_enrich_policy(self):
         execute_url = '/_enrich/policy/users-policy/_execute'
         self.es.transport.perform_request('POST', execute_url, headers=self.postHeaders)
+
     def create_enrich_ingest_pipeline(self):
         file = os.path.join(self.beat_path, 'module', 'elasticsearch', 'enrich',
                             '_meta', 'test', 'ingest_pipeline.json')
@@ -293,7 +294,8 @@ class Test(metricbeat.BaseTest):
 
         # Enable xpack trial
         try:
-            self.es.transport.perform_request('POST', self.license_url + "/start_trial?acknowledge=true", headers=self.postHeaders)
+            self.es.transport.perform_request('POST', self.license_url +
+                                              "/start_trial?acknowledge=true", headers=self.postHeaders)
         except BaseException:
             e = sys.exc_info()[0]
             print("Trial already enabled. Error: {}".format(e))
@@ -305,7 +307,8 @@ class Test(metricbeat.BaseTest):
             return
 
         try:
-            self.es.transport.perform_request('POST', self.license_url + "/start_basic?acknowledge=true", headers=self.postHeaders)
+            self.es.transport.perform_request('POST', self.license_url +
+                                              "/start_basic?acknowledge=true", headers=self.postHeaders)
         except BaseException:
             e = sys.exc_info()[0]
             print("Basic license already enabled. Error: {}".format(e))

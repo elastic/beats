@@ -29,7 +29,7 @@ class Test(BaseTest):
     def setUp(self):
         super(BaseTest, self).setUp()
         if INTEGRATION_TESTS:
-            self.es:Elasticsearch = self.get_elasticsearch_instance()
+            self.es: Elasticsearch = self.get_elasticsearch_instance()
             self.username = os.getenv("ES_USER", "")
             self.password = os.getenv("ES_PASS", "")
             self.auth_value = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()

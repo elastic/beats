@@ -7,12 +7,13 @@ import json
 import logging
 from elasticsearch import Elasticsearch
 
+
 class Test(BaseTest):
 
     def init(self):
         self.elasticsearch_url = self.get_elasticsearch_url()
         self.kibana_url = self.get_kibana_url()
-        self.es : Elasticsearch = self.get_elasticsearch_instance()
+        self.es: Elasticsearch = self.get_elasticsearch_instance()
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
         self.username = os.getenv("ES_USER", "")
@@ -74,8 +75,8 @@ class Test(BaseTest):
 
         # put pipeline
         self.es.transport.perform_request("PUT", "/_ingest/pipeline/test",
-                                           headers=self.headers,
-                                           body={
+                                          headers=self.headers,
+                                          body={
                                               "processors": [{
                                                   "set": {
                                                       "field": "x-pipeline",

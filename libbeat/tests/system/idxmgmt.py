@@ -27,7 +27,8 @@ class IdxMgmt(unittest.TestCase):
 
     def delete_data_stream(self, data_stream):
         try:
-            resp = self._client.transport.perform_request('DELETE', '/_data_stream/' + data_stream, headers=self.headers)
+            resp = self._client.transport.perform_request(
+                'DELETE', '/_data_stream/' + data_stream, headers=self.headers)
         except NotFoundError:
             pass
 
@@ -64,8 +65,8 @@ class IdxMgmt(unittest.TestCase):
                 pass
 
     def assert_index_template_not_loaded(self, template):
-            resp = self._client.transport.perform_request('GET', '/_index_template/' + template, headers=self.headers)
-            assert resp.body["status"] == 404
+        resp = self._client.transport.perform_request('GET', '/_index_template/' + template, headers=self.headers)
+        assert resp.body["status"] == 404
 
     def assert_index_template_loaded(self, template):
         resp = self._client.transport.perform_request('GET', '/_index_template/' + template, headers=self.headers)
@@ -91,8 +92,8 @@ class IdxMgmt(unittest.TestCase):
         assert found
 
     def assert_policy_not_created(self, policy):
-            resp = self._client.transport.perform_request('GET', '/_ilm/policy/' + policy, headers=self.headers)
-            assert policy not in resp.body, f"Policy {policy} should not exist, but it does {list(resp.body.keys())}"
+        resp = self._client.transport.perform_request('GET', '/_ilm/policy/' + policy, headers=self.headers)
+        assert policy not in resp.body, f"Policy {policy} should not exist, but it does {list(resp.body.keys())}"
 
     def assert_policy_created(self, policy):
         resp = self._client.transport.perform_request('GET', '/_ilm/policy/' + policy, headers=self.headers)
