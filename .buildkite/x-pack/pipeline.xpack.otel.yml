@@ -62,6 +62,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:

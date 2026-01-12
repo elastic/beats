@@ -92,6 +92,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
@@ -117,6 +118,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
@@ -144,6 +146,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
@@ -171,6 +174,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_RHEL9_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
@@ -196,6 +200,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_2022}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
@@ -223,6 +228,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_2025}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
@@ -250,6 +256,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_2016}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
@@ -282,6 +289,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_2019}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
@@ -309,6 +317,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_10}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
@@ -336,6 +345,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_11}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
@@ -407,6 +417,7 @@ steps:
         timeout_in_minutes: 20
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
@@ -446,6 +457,7 @@ steps:
         timeout_in_minutes: 20
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
