@@ -19,10 +19,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-type JumplistType uint32
+type JumplistType string
 
 const (
-	JumplistTypeCustom JumplistType = 1
+	JumplistTypeCustom JumplistType = "custom"
 )
 
 // JumplistMeta is the metadata for a jump list.

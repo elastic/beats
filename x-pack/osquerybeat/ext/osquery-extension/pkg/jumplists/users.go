@@ -41,11 +41,11 @@ func getFilesInDirectory(directory string, log *logger.Logger) ([]string, error)
 		return nil, err
 	}
 	files := make([]string, len(fileEntries))
-	for i, entry := range fileEntries {
+	for _, entry := range fileEntries {
 		if entry.IsDir() {
 			continue
 		}
-		files[i] = filepath.Join(directory, entry.Name())
+		files = append(files, filepath.Join(directory, entry.Name()))
 	}
 	return files, nil
 }
