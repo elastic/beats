@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build integration && !agentbeat
+//go:build integration
 
 package gcppubsub_test
 
@@ -18,10 +18,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcppubsub/testutil"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/oteltestcol"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )

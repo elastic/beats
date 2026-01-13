@@ -34,6 +34,10 @@ var (
 	mutex          sync.Mutex
 )
 
+// mongoHeaderSize is the minimum size of a MongoDB wire protocol message header.
+// Header consists of: messageLength (4) + requestID (4) + responseTo (4) + opCode (4) = 16 bytes.
+const mongoHeaderSize = 16
+
 func mongodbMessageParser(s *stream) (bool, bool) {
 	d := newDecoder(s.data)
 
@@ -41,6 +45,11 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	if err != nil {
 		// Not even enough data to parse length of message
 		return true, false
+	}
+
+	if length < mongoHeaderSize {
+		debugf("Invalid MongoDB message length: %d", length)
+		return false, false
 	}
 
 	if int(length) > len(s.data) {
@@ -138,6 +147,19 @@ func opReplyParse(d *decoder, m *mongodbMessage) (bool, bool) {
 		logp.Err("An error occurred while parsing OP_REPLY message: %s", err)
 		return false, false
 	}
+
+	if numberReturned < 0 {
+		debugf("OP_REPLY has invalid negative numberReturned: %d", numberReturned)
+		return false, false
+	}
+	remainingBytes := len(d.in) - d.i
+	maxPossibleDocs := remainingBytes / minBSONDocSize
+	if int(numberReturned) > maxPossibleDocs {
+		debugf("OP_REPLY numberReturned (%d) exceeds maximum possible documents (%d) in remaining %d bytes",
+			numberReturned, maxPossibleDocs, remainingBytes)
+		return false, false
+	}
+
 	m.event["numberReturned"] = numberReturned
 
 	debugf("Prepare to read %d document from reply", m.event["numberReturned"])
@@ -284,8 +306,16 @@ func opQueryParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	}
 
 	query, err := d.readDocument()
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_QUERY message: %s", err)
+		return false, false
+	}
 	if d.i < len(d.in) {
 		m.event["returnFieldsSelector"], err = d.readDocumentStr()
+		if err != nil {
+			logp.Err("An error occurred while parsing OP_QUERY returnFieldsSelector: %s", err)
+			return false, false
+		}
 	}
 
 	// Actual method is either a 'find' or a command passing through a query
@@ -311,11 +341,6 @@ func opQueryParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	}
 
 	m.params = query
-
-	if err != nil {
-		logp.Err("An error occurred while parsing OP_QUERY message: %s", err)
-		return false, false
-	}
 
 	return true, true
 }
@@ -407,6 +432,17 @@ func opMsgParse(d *decoder, m *mongodbMessage) (bool, bool) {
 			logp.Err("An error occurred while parsing OP_MSG message: %s", err)
 			return false, false
 		}
+
+		if size < 0 {
+			debugf("OP_MSG has invalid negative document sequence size: %d", size)
+			return false, false
+		}
+		end := start + int(size)
+		if end < start || end > len(d.in) {
+			debugf("OP_MSG document sequence size %d exceeds buffer bounds", size)
+			return false, false
+		}
+
 		cstring, err := d.readCStr()
 		if err != nil {
 			logp.Err("An error occurred while parsing OP_MSG message: %s", err)
@@ -480,6 +516,7 @@ func (d *decoder) readInt32() (int32, error) {
 		return 0, err
 	}
 
+	//nolint:gosec // G115: intentional uint32->int32 conversion for BSON signed integer decoding
 	return int32((uint32(b[0]) << 0) |
 		(uint32(b[1]) << 8) |
 		(uint32(b[2]) << 16) |
@@ -492,6 +529,7 @@ func (d *decoder) readInt64() (int64, error) {
 		return 0, err
 	}
 
+	//nolint:gosec // G115: intentional uint64->int64 conversion for BSON signed integer decoding
 	return int64((uint64(b[0]) << 0) |
 		(uint64(b[1]) << 8) |
 		(uint64(b[2]) << 16) |
@@ -502,28 +540,38 @@ func (d *decoder) readInt64() (int64, error) {
 		(uint64(b[7]) << 56)), nil
 }
 
+// minBSONDocSize is the minimum valid BSON document size.
+// A BSON document has at least: length (4 bytes) + null terminator (1 byte) = 5 bytes.
+const minBSONDocSize = 5
+
 func (d *decoder) readDocument() (bson.M, error) {
 	start := d.i
 	documentLength, err := d.readInt32()
 	if err != nil {
 		return nil, err
 	}
-	d.i = start + int(documentLength)
-	if len(d.in) < d.i {
+
+	if documentLength < minBSONDocSize {
+		return nil, errors.New("invalid BSON document length")
+	}
+
+	end := start + int(documentLength)
+	if end < start || end > len(d.in) {
 		return nil, errors.New("document out of bounds")
 	}
 
 	documentMap := bson.M{}
 
 	debugf("Parse %d bytes document from remaining %d bytes", documentLength, len(d.in)-start)
-	err = bson.Unmarshal(d.in[start:d.i], documentMap)
+	err = bson.Unmarshal(d.in[start:end], documentMap)
 
 	if err != nil {
 		debugf("Unmarshall error %v", err)
 		return nil, err
 	}
 
-	return documentMap, err
+	d.i = end
+	return documentMap, nil
 }
 
 func doc2str(documentMap interface{}) (string, error) {
@@ -541,10 +589,13 @@ func (d *decoder) readDocumentStr() (string, error) {
 }
 
 func (d *decoder) readBytes(length int32) ([]byte, error) {
+	if length < 0 {
+		return nil, errors.New("invalid negative length")
+	}
 	start := d.i
 	d.i += int(length)
 	if d.i > len(d.in) {
-		return *new([]byte), errors.New("no byte to read")
+		return nil, errors.New("no byte to read")
 	}
 	return d.in[start : start+int(length)], nil
 }

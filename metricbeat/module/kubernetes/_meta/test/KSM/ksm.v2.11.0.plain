@@ -551,8 +551,10 @@ kube_pod_container_state_started{namespace="kube-system",pod="etcd-kind-control-
 kube_pod_container_state_started{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="39e5dda5-91e4-4182-a154-42ff953d6f71",container="kube-controller-manager"} 1.713862178e+09
 # HELP kube_pod_container_status_last_terminated_reason Describes the last reason the container was in terminated state.
 # TYPE kube_pod_container_status_last_terminated_reason gauge
+kube_pod_container_status_last_terminated_reason{namespace="default",pod="failpodloop",uid="a67536f5-5f43-4f43-8cea-ae304364c76f",container="fail",reason="Error"} 1
 # HELP kube_pod_container_status_last_terminated_exitcode Describes the exit code for the last container in terminated state.
 # TYPE kube_pod_container_status_last_terminated_exitcode gauge
+kube_pod_container_status_last_terminated_exitcode{namespace="default",pod="failpodloop",uid="a67536f5-5f43-4f43-8cea-ae304364c76f",container="fail"} 42
 # HELP kube_pod_container_status_ready [STABLE] Describes whether the containers readiness check succeeded.
 # TYPE kube_pod_container_status_ready gauge
 kube_pod_container_status_ready{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="82154115-17ff-4943-8088-879d4d045b52",container="kube-scheduler"} 1
