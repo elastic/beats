@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.uber.org/zap"
 )
@@ -102,7 +103,7 @@ func benchmarkBeatProcessor(b *testing.B, logCount int, tc testCase) {
 		}
 
 		for b.Loop() {
-			beatProcessor.ConsumeLogs(context.Background(), logs)
+			_, _ = beatProcessor.ConsumeLogs(context.Background(), logs)
 		}
 	})
 }
