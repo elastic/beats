@@ -33,13 +33,9 @@ steps:
         agents:
           image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
           cpu: "4000m"
-<<<<<<< HEAD
-          memory: "8Gi"
-=======
           memory: "12Gi"
           # 10GB storage was not enough for check/update.
           ephemeralStorage: "50G"
->>>>>>> be94b2a43 (ci: tentative fix for agent lost in x-pack otel check pipeline (#48387))
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
