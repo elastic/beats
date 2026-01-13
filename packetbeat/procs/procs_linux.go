@@ -255,13 +255,8 @@ func hexToIpv4(word string) (net.IP, error) {
 
 func hexToIpv6(word string) (net.IP, error) {
 	p := make(net.IP, net.IPv6len)
-	if len(word) < 32 {
-		return nil, fmt.Errorf("got ip6 address of invalid length: %d", len(word))
-	}
 	for i := 0; i < 4; i++ {
-		start := i * 8
-		end := (i + 1) * 8
-		part, err := strconv.ParseUint(word[start:end], 16, 32)
+		part, err := strconv.ParseUint(word[i*8:(i+1)*8], 16, 32)
 		if err != nil {
 			return nil, err
 		}
