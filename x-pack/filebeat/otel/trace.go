@@ -6,7 +6,9 @@ package otel
 
 import (
 	"context"
+	"net/http"
 	"os"
+	"strings"
 	"sync"
 
 	"go.opentelemetry.io/contrib/exporters/autoexport"
@@ -14,6 +16,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -70,4 +73,60 @@ func newTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyVa
 	)
 
 	return tp, nil
+}
+
+var _ http.RoundTripper = (*ExtraSpanAttribsRoundTripper)(nil)
+
+func NewExtraSpanAttribsRoundTripper(next http.RoundTripper) *ExtraSpanAttribsRoundTripper {
+	return &ExtraSpanAttribsRoundTripper{
+		next: next,
+	}
+}
+
+type ExtraSpanAttribsRoundTripper struct {
+	next http.RoundTripper
+}
+
+func (rt ExtraSpanAttribsRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
+
+	span := trace.SpanFromContext(r.Context())
+	if span != nil && span.SpanContext().IsValid() {
+		for h := range r.Header {
+			addHeaderAttr(span, "http.request.header.", h, r.Header)
+		}
+	}
+
+	resp, err := rt.next.RoundTrip(r)
+	if err != nil {
+		return resp, err
+	}
+
+	if span != nil && span.SpanContext().IsValid() && resp != nil {
+		for h := range resp.Header {
+			addHeaderAttr(span, "http.response.header.", h, resp.Header)
+		}
+	}
+
+	return resp, nil
+}
+
+func addHeaderAttr(span trace.Span, prefix string, name string, headers http.Header) {
+	const maxVals = 10
+	const maxValLen = 1024
+
+	values := headers.Values(name)
+	if values == nil {
+		return
+	}
+	if len(values) > maxVals {
+		values = values[:maxVals]
+	}
+	for i, v := range values {
+		if len(v) > maxValLen {
+			values[i] = v[:maxValLen]
+		}
+	}
+
+	key := prefix + strings.ToLower(name)
+	span.SetAttributes(attribute.StringSlice(key, values))
 }
