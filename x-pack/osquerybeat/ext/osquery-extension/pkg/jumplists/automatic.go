@@ -18,12 +18,11 @@ import (
 )
 
 func ParseAutomaticJumpListFile(filePath string, userProfile *UserProfile, log *logger.Logger) (*Jumplist, error) {
-
 	// Create a minimal JumpList object to return if there is an error.
 	automaticJumpList := &Jumplist{
 		JumplistMeta: &JumplistMeta{
 			UserProfile:   userProfile,
-			ApplicationId: GetAppIdFromFileName(filePath, log),
+			ApplicationID: getAppIdFromFileName(filePath, log),
 			JumplistType:  JumplistTypeAutomatic,
 			Path:          filePath,
 		},
@@ -108,7 +107,7 @@ func ParseAutomaticJumpListFile(filePath string, userProfile *UserProfile, log *
 		}
 
 		// Parse the LNK stream into a Lnk object.
-		lnk, err := NewLnkFromBytes(streamBuffer, log)
+		lnk, err := newLnkFromBytes(streamBuffer, log)
 		if err != nil {
 			log.Infof("failed to parse LNK stream %s for path %s: %v", entry.Name, filePath, err)
 			continue

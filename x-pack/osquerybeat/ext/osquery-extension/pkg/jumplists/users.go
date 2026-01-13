@@ -38,28 +38,29 @@ const profileListKey = `SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList
 func getFilesInDirectory(directory string, log *logger.Logger) ([]string, error) {
 	fileEntries, err := os.ReadDir(directory)
 	if err != nil {
-		log.Errorf("failed to get files in directory %s: %v", directory, err)
 		return nil, err
 	}
 	files := make([]string, len(fileEntries))
-	for i, entry := range fileEntries {
-		files[i] = filepath.Join(directory, entry.Name())
+	for _, entry := range fileEntries {
+		if entry.IsDir() {
+			continue
+		}
+		files = append(files, filepath.Join(directory, entry.Name()))
 	}
 	return files, nil
 }
 
-// GetJumplists returns a list of constructedjumplists for a given user profile and jumplist type.
-func (u *UserProfile) GetJumplists(log *logger.Logger) []*Jumplist {
-
+// getJumplists returns a list of constructedjumplists for a given user profile and jumplist type.
+func (u *UserProfile) getJumplists(log *logger.Logger) []*Jumplist {
 	var jumplists []*Jumplist
 
-	var JumplistDirectories = map[JumplistType]string{
-		JumplistTypeCustom: filepath.Join(u.recentDirectory, "CustomDestinations"),
+	jumplistDirectories := map[JumplistType]string{
+		JumplistTypeCustom:    filepath.Join(u.recentDirectory, "CustomDestinations"),
 		JumplistTypeAutomatic: filepath.Join(u.recentDirectory, "AutomaticDestinations"),
 	}
 
 	// Collect and parse all jumplist files for each jumplist type
-	for JumplistType, directory := range JumplistDirectories {
+	for jumplistType, directory := range jumplistDirectories {
 		files, err := getFilesInDirectory(directory, log)
 		if err != nil {
 			log.Errorf("failed to get files in directory %s: %v", directory, err)
@@ -67,10 +68,13 @@ func (u *UserProfile) GetJumplists(log *logger.Logger) []*Jumplist {
 		}
 
 		// Parse the jumplist files for the given jumplist type
-		switch JumplistType {
+		switch jumplistType {
 		case JumplistTypeCustom:
 			for _, file := range files {
-				jumpList, err := ParseCustomJumplistFile(file, u, log)
+				if !strings.HasSuffix(file, ".customDestinations-ms") {
+					continue
+				}
+				jumpList, err := parseCustomJumplistFile(file, u, log)
 				if err != nil {
 					log.Errorf("failed to parse custom jump list file %s: %v", file, err)
 					continue
@@ -80,6 +84,9 @@ func (u *UserProfile) GetJumplists(log *logger.Logger) []*Jumplist {
 		case JumplistTypeAutomatic:
 			for _, file := range files {
 				jumpList, err := ParseAutomaticJumpListFile(file, u, log)
+				if !strings.HasSuffix(file, ".automaticDestinations-ms") {
+					continue
+				}
 				if err != nil {
 					log.Errorf("failed to parse automatic jump list file %s: %v", file, err)
 					continue
@@ -93,7 +100,6 @@ func (u *UserProfile) GetJumplists(log *logger.Logger) []*Jumplist {
 
 // resolveSid looks up the username and domain for a given SID.
 func resolveSid(sid string, log *logger.Logger) (string, string) {
-
 	// corrupted or temporary profile keys may have a .bak suffix
 	// lets make a best effort to resolve those as well
 	sid = strings.TrimSuffix(sid, ".bak")
@@ -126,12 +132,11 @@ func resolveSid(sid string, log *logger.Logger) (string, string) {
 	return username, domain
 }
 
-// GetUserProfiles returns a list of user profiles on the system.
-func GetUserProfiles(log *logger.Logger) ([]*UserProfile, error) {
+// getUserProfiles returns a list of user profiles on the system.
+func getUserProfiles(log *logger.Logger) ([]*UserProfile, error) {
 	// Open the ProfileList key in HKEY_LOCAL_MACHINE
 	k, err := registry.OpenKey(registry.LOCAL_MACHINE, profileListKey, registry.ENUMERATE_SUB_KEYS|registry.QUERY_VALUE)
 	if err != nil {
-		log.Errorf("Error opening ProfileList key: %v", err)
 		return nil, err
 	}
 	defer k.Close()
@@ -139,7 +144,6 @@ func GetUserProfiles(log *logger.Logger) ([]*UserProfile, error) {
 	// Get all subkey names (User SIDs)
 	sids, err := k.ReadSubKeyNames(-1)
 	if err != nil {
-		log.Errorf("Error reading subkeys: %v", err)
 		return nil, err
 	}
 
@@ -189,7 +193,7 @@ func GetUserProfiles(log *logger.Logger) ([]*UserProfile, error) {
 			continue
 		}
 
-		//At this point we have a valid user profile with a valid recent directory
+		// At this point we have a valid user profile with a valid recent directory
 		userProfile := &UserProfile{
 			Username:        username,
 			Domain:          domain,

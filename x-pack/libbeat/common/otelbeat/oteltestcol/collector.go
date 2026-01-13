@@ -32,6 +32,7 @@ import (
 	"go.opentelemetry.io/collector/confmap/provider/fileprovider"
 	"go.opentelemetry.io/collector/exporter/debugexporter"
 	"go.opentelemetry.io/collector/otelcol"
+	"go.opentelemetry.io/collector/service/telemetry/otelconftelemetry"
 )
 
 type Collector struct {
@@ -131,6 +132,7 @@ func getComponent() (otelcol.Factories, error) {
 		Processors: processors,
 		Exporters:  exporters,
 		Extensions: extensions,
+		Telemetry:  otelconftelemetry.NewFactory(),
 	}, nil
 
 }

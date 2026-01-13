@@ -26,15 +26,27 @@ import (
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
-func TestRegisterCloudConnectedCluster(t *testing.T) {
-	t.Cleanup(utils.ClearResourceID)
+func writeCloudConnectedResource(w http.ResponseWriter, id string, supported bool, minimumStackVersion string, validLicenses []string) error {
+	return json.NewEncoder(w).Encode(cloudConnectedResource{
+		ID: id,
+		Services: cloudConnectedServices{
+			AutoOps: cloudConnectedService{
+				Support: cloudConnectedServiceSupport{
+					Supported:           supported,
+					MinimumStackVersion: minimumStackVersion,
+					ValidLicenseTypes:   validLicenses,
+				},
+			},
+		},
+	})
+}
 
-	v := version.MustNew("8.0.0")
+func TestRegisterCloudConnectedCluster(t *testing.T) {
 	clusterInfo := &utils.ClusterInfo{
 		ClusterID:   "test-cluster-id",
 		ClusterName: "test-cluster-name",
 		Version: utils.ClusterInfoVersion{
-			Number: v,
+			Number: version.MustNew("8.0.0"),
 		},
 	}
 	lic := &license{
@@ -92,18 +104,83 @@ func TestRegisterCloudConnectedCluster(t *testing.T) {
 
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
-				_, err = w.Write([]byte(`{"id": "registered-cluster-id"}`))
-				assert.NoError(t, err)
+				assert.NoError(t, writeCloudConnectedResource(w, "registered-cluster-id", true, "123.4.5", []string{}))
 			},
 			expectError:   false,
 			expectedResID: "registered-cluster-id",
+		},
+		{
+			name:   "success with 201 created",
+			apiKey: "test-api-key-201",
+			serverHandler: func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, http.MethodPost, r.Method)
+				assert.Equal(t, "/api/v1/cloud-connected/clusters", r.URL.Path)
+				assert.Equal(t, "ApiKey test-api-key-201", r.Header.Get("Authorization"))
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				assert.NoError(t, writeCloudConnectedResource(w, "created-cluster-id", true, "123.4.5", []string{"unchecked"}))
+			},
+			expectError:   false,
+			expectedResID: "created-cluster-id",
+		},
+		{
+			name:   "success but unsupported because of minimum stack version",
+			apiKey: "test-api-key-201",
+			serverHandler: func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, http.MethodPost, r.Method)
+				assert.Equal(t, "/api/v1/cloud-connected/clusters", r.URL.Path)
+				assert.Equal(t, "ApiKey test-api-key-201", r.Header.Get("Authorization"))
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				assert.NoError(t, writeCloudConnectedResource(w, "unsupported-version", false, "9.0.0", []string{lic.Type}))
+			},
+			expectError: true,
+		},
+		{
+			name:   "success but unsupported because of license type",
+			apiKey: "test-api-key-201",
+			serverHandler: func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, http.MethodPost, r.Method)
+				assert.Equal(t, "/api/v1/cloud-connected/clusters", r.URL.Path)
+				assert.Equal(t, "ApiKey test-api-key-201", r.Header.Get("Authorization"))
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				assert.NoError(t, writeCloudConnectedResource(w, "unsupported-license", false, "9.0.0", []string{"enterprise"}))
+			},
+			expectError: true,
+		},
+		{
+			name:   "success but unsupported for unknown reason with malformed version",
+			apiKey: "test-api-key-201",
+			serverHandler: func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, http.MethodPost, r.Method)
+				assert.Equal(t, "/api/v1/cloud-connected/clusters", r.URL.Path)
+				assert.Equal(t, "ApiKey test-api-key-201", r.Header.Get("Authorization"))
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				assert.NoError(t, writeCloudConnectedResource(w, "unsupported-cluster-id", false, "xyz", []string{lic.Type}))
+			},
+			expectError: true,
+		},
+		{
+			name:   "success but unsupported for unknown reason",
+			apiKey: "test-api-key-201",
+			serverHandler: func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, http.MethodPost, r.Method)
+				assert.Equal(t, "/api/v1/cloud-connected/clusters", r.URL.Path)
+				assert.Equal(t, "ApiKey test-api-key-201", r.Header.Get("Authorization"))
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				assert.NoError(t, writeCloudConnectedResource(w, "unsupported-cluster-id", false, "7.17.0", []string{lic.Type}))
+			},
+			expectError: true,
 		},
 		{
 			name:   "api error",
 			apiKey: "test-api-key",
 			serverHandler: func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
-				_, err := w.Write([]byte(`{"error": "internal server error"}`))
+				_, err := w.Write([]byte(`{"errors":[{"code":"service_unavailable","message":"internal server error"}]`))
 				assert.NoError(t, err)
 			},
 			expectError: true,
@@ -126,21 +203,6 @@ func TestRegisterCloudConnectedCluster(t *testing.T) {
 			expectError:   true,
 		},
 		{
-			name:   "success with 201 created",
-			apiKey: "test-api-key-201",
-			serverHandler: func(w http.ResponseWriter, r *http.Request) {
-				assert.Equal(t, http.MethodPost, r.Method)
-				assert.Equal(t, "/api/v1/cloud-connected/clusters", r.URL.Path)
-				assert.Equal(t, "ApiKey test-api-key-201", r.Header.Get("Authorization"))
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusCreated)
-				_, err := w.Write([]byte(`{"id": "created-cluster-id"}`))
-				assert.NoError(t, err)
-			},
-			expectError:   false,
-			expectedResID: "created-cluster-id",
-		},
-		{
 			name:   "api error 401 unauthorized",
 			apiKey: "test-api-key-unauth",
 			serverHandler: func(w http.ResponseWriter, r *http.Request) {
@@ -152,7 +214,7 @@ func TestRegisterCloudConnectedCluster(t *testing.T) {
 			expectError: true,
 		},
 		{
-			name:   "success but missing id in response",
+			name:   "'success' but missing id in response",
 			apiKey: "test-api-key-no-id-resp",
 			serverHandler: func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
@@ -160,8 +222,7 @@ func TestRegisterCloudConnectedCluster(t *testing.T) {
 				_, err := w.Write([]byte(`{"message": "Request processed, but no specific resource ID generated"}`))
 				assert.NoError(t, err)
 			},
-			expectError:   false,
-			expectedResID: "",
+			expectError: true,
 		},
 		{
 			name:   "empty api key",
@@ -179,7 +240,7 @@ func TestRegisterCloudConnectedCluster(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			utils.ClearResourceID()
+			t.Cleanup(utils.ClearResourceID)
 
 			var server *httptest.Server
 
@@ -199,6 +260,7 @@ func TestRegisterCloudConnectedCluster(t *testing.T) {
 				assert.Empty(t, utils.GetResourceID(), "Resource ID should not be set on error")
 			} else {
 				assert.NoError(t, err)
+				assert.NotEmpty(t, utils.GetResourceID(), "Resource ID should not be empty")
 				assert.Equal(t, tc.expectedResID, utils.GetResourceID(), "Resource ID mismatch")
 			}
 		})
@@ -313,24 +375,44 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 			expectError:               true,
 		},
 		{
-			name:                      "unsupported license",
+			name:                      "success for basic license",
 			clusterInfoStatusCode:     200,
 			clusterInfo:               clusterInfoForVersion("8.0.0"),
 			clusterSettingsStatusCode: 200,
 			clusterSettings:           noDisplayName,
 			licenseStatusCode:         200,
 			license:                   licenseForType("basic", "active"),
-			expectError:               true,
+			expectError:               false,
 		},
 		{
-			name:                      "unsupported license (7.x)",
+			name:                      "success for basic license (7.x)",
 			clusterInfoStatusCode:     200,
 			clusterInfo:               clusterInfoForVersion("7.17.0"),
 			clusterSettingsStatusCode: 200,
 			clusterSettings:           noDisplayName,
 			licenseStatusCode:         200,
 			license:                   licenseForType("basic", "active"),
-			expectError:               true,
+			expectError:               false,
+		},
+		{
+			name:                      "success for platinum license",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("8.0.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           noDisplayName,
+			licenseStatusCode:         200,
+			license:                   licenseForType("basic", "active"),
+			expectError:               false,
+		},
+		{
+			name:                      "success for platinum license (7.x)",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("7.17.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           noDisplayName,
+			licenseStatusCode:         200,
+			license:                   licenseForType("basic", "active"),
+			expectError:               false,
 		},
 		{
 			name:                      "success for enterprise",
@@ -527,7 +609,7 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
 
-				_, err := w.Write([]byte(`{"id": "registered-cluster-id"}`))
+				_, err := w.Write([]byte(`{"id": "registered-cluster-id", "services": {"auto_ops": {"support": {"supported": true}}}}`))
 				assert.NoError(t, err)
 			}))
 

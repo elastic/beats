@@ -290,7 +290,6 @@ func parseTimestamp(t []byte) time.Time {
 }
 
 func NewDestListEntry(data []byte, version int32, log *logger.Logger) (*DestListEntry, error) {
-
 	var interactionCount int32
 	var unknown3 int32
 	var unknown4 int32
