@@ -8,7 +8,7 @@
 **Filebeat**
 
 * Add client secret authentication method for Azure Event Hub and storage in Filebeat. [#47256](https://github.com/elastic/beats/pull/47256)
-* Azure-eventhub-v2-add-support-for-amqp-over-websocket-and-https-proxy. [#47956](https://github.com/elastic/beats/pull/47956) [#47823](https://github.com/elastic/beats/issues/47823)
+* Add support for AMQP-over-WebSocket transport in the processor v2. [#47956](https://github.com/elastic/beats/pull/47956) [#47823](https://github.com/elastic/beats/issues/47823)
 
 **Metricbeat**
 
@@ -20,7 +20,7 @@
 
 **All**
 
-* AUpgrade opentelemtry-collector-contrib to 0.141.0 and opentelemetry-collector to 1.47.0. [#48122](https://github.com/elastic/beats/pull/48122)
+* Upgrade opentelemtry-collector-contrib to 0.141.0 and opentelemetry-collector to 1.47.0. [#48122](https://github.com/elastic/beats/pull/48122)
 * Add msync syscall to seccomp whitelist for BadgerDB persistent cache. [#48229](https://github.com/elastic/beats/pull/48229)
 
 **Metricbeat**
