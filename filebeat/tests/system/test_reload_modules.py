@@ -97,7 +97,7 @@ class Test(BaseTest):
 
         # Check pipeline is present
         self.wait_until(lambda: any(re.match("filebeat-.*-test-test-default", key)
-                                    for key in self.es.transport.perform_request("GET", "/_ingest/pipeline/", headers=self.headers).keys()))
+                                    for key in self.es.transport.perform_request("GET", "/_ingest/pipeline/", headers=self.headers).body.keys()))
         proc.check_kill_and_wait()
 
     def test_no_es_connection(self):

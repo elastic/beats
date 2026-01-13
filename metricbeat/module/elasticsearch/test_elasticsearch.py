@@ -288,7 +288,7 @@ class Test(metricbeat.BaseTest):
     def start_trial(self):
         # Check if trial is already enabled
         response = self.es.transport.perform_request('GET', self.license_url, headers=self.getHeaders)
-        if response["license"]["type"] == "trial":
+        if response.body["license"]["type"] == "trial":
             return
 
         # Enable xpack trial
@@ -302,7 +302,7 @@ class Test(metricbeat.BaseTest):
     def start_basic(self):
         # Check if basic license is already enabled
         response = self.es.transport.perform_request('GET', self.license_url, headers=self.getHeaders)
-        if response["license"]["type"] == "basic":
+        if response.body["license"]["type"] == "basic":
             return
 
         try:

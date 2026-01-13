@@ -48,8 +48,8 @@ class Test(BaseTest):
         pipeline_name = "filebeat-" + version + "-template-test-module-test-pipeline"
         pipeline = self.es.transport.perform_request("GET", "/_ingest/pipeline/" + pipeline_name, headers=self.headers)
 
-        assert "date" in pipeline[pipeline_name]["processors"][0]
-        assert "remove" in pipeline[pipeline_name]["processors"][1]
+        assert "date" in pipeline.body[pipeline_name]["processors"][0]
+        assert "remove" in pipeline.body[pipeline_name]["processors"][1]
 
     def _setup_dummy_module(self):
         modules_d_path = self.working_dir + "/modules.d"

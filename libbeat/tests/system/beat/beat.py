@@ -444,8 +444,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
         while not cond():
             if datetime.now() - start > timedelta(seconds=max_timeout):
                 print("Test has failed, here are the Beat logs")
-                for l in self.get_log_lines():
-                    print(l)
                 if self.output_lines() == 0:
                     print("\n\nBeat had no output file")
                 else:
@@ -482,10 +480,14 @@ class TestCase(unittest.TestCase, ComposeMixin):
         """
         if logfile is None:
             logfile = self.beat_name + "-" + self.today + ".ndjson"
-
-        with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
+        
+        data = []
+        try:
+          with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
             data = f.readlines()
-
+        except IOError:
+            pass
+        
         return data
 
     def wait_log_contains(self, msg, logfile=None,
