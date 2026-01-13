@@ -68,6 +68,25 @@ remote_write:
         #insecure_skip_verify: true
 ```
 
+## Request size limits [_request_size_limits]
+
+```{applies_to}
+stack: ga 9.2.5, ga 9.3.1, ga 9.4
+```
+
+To protect against resource exhaustion from malicious or oversized payloads, the remote_write metricset enforces configurable size limits on incoming requests:
+
+* `max_compressed_body_bytes`: Maximum size of the compressed (snappy-encoded) request body in bytes. Requests exceeding this limit are rejected with HTTP 413 before being read into memory. Default: 2 MB (2097152 bytes).
+* `max_decoded_body_bytes`: Maximum size of the decompressed request body in bytes. The server checks the declared decoded size in the snappy header before allocating memory for decompression, preventing decompression bomb attacks. Default: 10 MB (10485760 bytes).
+
+```yaml
+- module: prometheus
+  metricsets: ["remote_write"]
+  host: "localhost"
+  port: "9201"
+  max_compressed_body_bytes: 2097152    # 2 MB (default)
+  max_decoded_body_bytes: 10485760      # 10 MB (default)
+```
 
 ## Histograms and types [_histograms_and_types_2]
 

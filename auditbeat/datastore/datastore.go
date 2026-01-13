@@ -35,10 +35,10 @@ var (
 // OpenBucket returns a new Bucket that stores data in {path.data}/beat.db.
 // The returned Bucket must be closed when finished to ensure all resources
 // are released.
-func OpenBucket(name string) (Bucket, error) {
+func OpenBucket(name string, p *paths.Path) (Bucket, error) {
 	initDatastoreOnce.Do(func() {
 		ds = &boltDatastore{
-			path: paths.Resolve(paths.Data, "beat.db"),
+			path: p.Resolve(paths.Data, "beat.db"),
 			mode: 0o600,
 		}
 	})
@@ -49,10 +49,10 @@ func OpenBucket(name string) (Bucket, error) {
 // Update executes a function within the context of a read-write managed transaction.
 // If no error is returned from the function then the transaction is committed. If an
 // error is returned then the entire transaction is rolled back.
-func Update(fn func(tx *bolt.Tx) error) error {
+func Update(fn func(tx *bolt.Tx) error, p *paths.Path) error {
 	initDatastoreOnce.Do(func() {
 		ds = &boltDatastore{
-			path: paths.Resolve(paths.Data, "beat.db"),
+			path: p.Resolve(paths.Data, "beat.db"),
 			mode: 0o600,
 		}
 	})
