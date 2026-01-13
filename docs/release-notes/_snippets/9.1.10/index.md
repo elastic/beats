@@ -8,7 +8,7 @@
 **Filebeat**
 
 * Add client secret authentication method for Azure Event Hub and storage in Filebeat. [#47256](https://github.com/elastic/beats/pull/47256)
-* Improving input error reporting to Elastic Agent, specially when pipeline configurations are incorrect. [#47905](https://github.com/elastic/beats/pull/47905) [#45649](https://github.com/elastic/beats/issues/45649)
+* Improve input error reporting to Elastic Agent, especially when pipeline configurations are incorrect. [#47905](https://github.com/elastic/beats/pull/47905) [#45649](https://github.com/elastic/beats/issues/45649)
 * Support for AMQP-over-WebSocket transport in the azure-eventhub processor v2. [#47956](https://github.com/elastic/beats/pull/47956) [#47823](https://github.com/elastic/beats/issues/47823)
 
 **Metricbeat**
