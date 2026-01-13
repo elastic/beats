@@ -287,7 +287,7 @@ class Test(metricbeat.BaseTest):
 
     def start_trial(self):
         # Check if trial is already enabled
-        response = self.es.transport.perform_request('GET', self.license_url, self.getHeaders)
+        response = self.es.transport.perform_request('GET', self.license_url, headers=self.getHeaders)
         if response["license"]["type"] == "trial":
             return
 
@@ -301,7 +301,7 @@ class Test(metricbeat.BaseTest):
 
     def start_basic(self):
         # Check if basic license is already enabled
-        response = self.es.transport.perform_request('GET', self.license_url, self.getHeaders)
+        response = self.es.transport.perform_request('GET', self.license_url, headers=self.getHeaders)
         if response["license"]["type"] == "basic":
             return
 
