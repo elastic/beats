@@ -86,11 +86,11 @@ filebeat.inputs:
 In order to use this integration, users need to create a new Salesforce Application using OAuth. Follow the steps below to create a connected application in Salesforce:
 
 ::::{note}
-**OAuth Token Limit**
+**OAuth token limit**
 
-Salesforce enforces a limit of [five concurrent access tokens](https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_request_manage.htm&type=5) per user, per Connected App. If you configure more than five inputs using the same Connected App credentials, generating a new token will automatically revoke the oldest one, causing errors.
+Salesforce enforces a limit of [5 concurrent access tokens](https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_request_manage.htm&type=5) per user, per connected app. If you configure more than 5 inputs using the same connected app credentials, generating a new token will automatically revoke the oldest one, causing errors.
 
-To avoid this, you must distribute your inputs across multiple Connected Apps. We recommend assigning a maximum of 5 inputs to each Connected App to ensure stability.
+To avoid this, you must distribute your inputs across multiple connected apps. We recommend assigning a maximum of 5 inputs to each connected app to ensure stability.
 
 ::::
 
