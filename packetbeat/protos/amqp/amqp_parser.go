@@ -26,37 +26,37 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (amqp *amqpPlugin) amqpMessageParser(stream *amqpStream) (ok bool, complete bool) {
-	for stream.parseOffset < len(stream.data) {
+func (amqp *amqpPlugin) amqpMessageParser(s *amqpStream) (ok bool, complete bool) {
+	for s.parseOffset < len(s.data) {
 
-		if len(stream.data[stream.parseOffset:]) < 8 {
+		if len(s.data[s.parseOffset:]) < 8 {
 			logp.Warn("AMQP message smaller than a frame, waiting for more data")
 			return true, false
 		}
 
-		yes, version := isProtocolHeader(stream.data[stream.parseOffset:])
+		yes, version := isProtocolHeader(s.data[s.parseOffset:])
 		if yes {
 			debugf("Client header detected, version %d.%d.%d",
 				version[0], version[1], version[2])
-			stream.parseOffset += 8
+			s.parseOffset += 8
 		}
 
-		frame, err := readFrameHeader(stream.data[stream.parseOffset:])
+		f, err := readFrameHeader(s.data[s.parseOffset:])
 		if err {
 			// incorrect header
 			return false, false
-		} else if frame == nil {
+		} else if f == nil {
 			// header not complete
 			return true, false
 		}
 
-		switch frame.Type {
+		switch f.Type {
 		case methodType:
-			ok, complete = amqp.decodeMethodFrame(stream, frame.content)
+			ok, complete = amqp.decodeMethodFrame(s, f.content)
 		case headerType:
-			ok = amqp.decodeHeaderFrame(stream, frame.content)
+			ok = amqp.decodeHeaderFrame(s, f.content)
 		case bodyType:
-			ok, complete = stream.decodeBodyFrame(frame.content)
+			ok, complete = s.decodeBodyFrame(f.content)
 		case heartbeatType:
 			detailedf("Heartbeat frame received")
 		default:
@@ -65,7 +65,7 @@ func (amqp *amqpPlugin) amqpMessageParser(stream *amqpStream) (ok bool, complete
 		}
 
 		// cast should be safe because f.size should not be bigger than tcp.TCP_MAX_DATA_IN_STREAM
-		stream.parseOffset += 8 + int(frame.size)
+		s.parseOffset += 8 + int(f.size)
 		if !ok {
 			return false, false
 		}
@@ -118,7 +118,7 @@ The Method Payload, according to official doc :
   short       short       ...
 */
 
-func (amqp *amqpPlugin) decodeMethodFrame(stream *amqpStream, buf []byte) (bool, bool) {
+func (amqp *amqpPlugin) decodeMethodFrame(s *amqpStream, buf []byte) (bool, bool) {
 	if len(buf) < 4 {
 		logp.Warn("Method frame too small, waiting for more data")
 		return true, false
@@ -126,8 +126,8 @@ func (amqp *amqpPlugin) decodeMethodFrame(stream *amqpStream, buf []byte) (bool,
 	class := codeClass(binary.BigEndian.Uint16(buf[0:2]))
 	method := codeMethod(binary.BigEndian.Uint16(buf[2:4]))
 	arguments := buf[4:]
-	stream.message.parseArguments = amqp.parseArguments
-	stream.message.bodySize = uint64(len(buf[4:]))
+	s.message.parseArguments = amqp.parseArguments
+	s.message.bodySize = uint64(len(buf[4:]))
 
 	debugf("Received frame of class %d and method %d", class, method)
 
@@ -137,7 +137,7 @@ func (amqp *amqpPlugin) decodeMethodFrame(stream *amqpStream, buf []byte) (bool,
 		return false, false
 	}
 
-	return fn(stream.message, arguments)
+	return fn(s.message, arguments)
 }
 
 /*
@@ -149,16 +149,16 @@ Structure of a content header, according to official doc :
   short      short   long long        short         remainder...
 */
 
-func (amqp *amqpPlugin) decodeHeaderFrame(stream *amqpStream, buf []byte) bool {
+func (amqp *amqpPlugin) decodeHeaderFrame(s *amqpStream, buf []byte) bool {
 	if len(buf) < 14 {
 		logp.Warn("Header frame too small, waiting for mode data")
 		return true
 	}
-	stream.message.bodySize = binary.BigEndian.Uint64(buf[4:12])
-	debugf("Received Header frame. A message of %d bytes is expected", stream.message.bodySize)
+	s.message.bodySize = binary.BigEndian.Uint64(buf[4:12])
+	debugf("Received Header frame. A message of %d bytes is expected", s.message.bodySize)
 
 	if amqp.parseHeaders {
-		err := getMessageProperties(stream, buf[12:])
+		err := getMessageProperties(s, buf[12:])
 		if err {
 			return false
 		}
@@ -189,8 +189,8 @@ func hasProperty(prop, flag byte) bool {
 }
 
 // function to get message content-type and content-encoding
-func getMessageProperties(stream *amqpStream, data []byte) bool {
-	msg := stream.message
+func getMessageProperties(s *amqpStream, data []byte) bool {
+	m := s.message
 
 	// properties are coded in the two first bytes
 	prop1 := data[0]
@@ -198,13 +198,9 @@ func getMessageProperties(stream *amqpStream, data []byte) bool {
 	var offset uint32 = 2
 
 	// while last bit set, we have another property flag field
-	for lastBit := 1; data[lastBit]&1 == 1; {
-		lastBit += 2
+	for lastbit := 1; data[lastbit]&1 == 1; {
+		lastbit += 2
 		offset += 2
-	}
-
-	if msg.fields == nil {
-		msg.fields = mapstr.M{}
 	}
 
 	if hasProperty(prop1, contentTypeProp) {
@@ -213,7 +209,7 @@ func getMessageProperties(stream *amqpStream, data []byte) bool {
 			logp.Warn("Failed to get content type in header frame")
 			return true
 		}
-		msg.fields["content-type"] = contentType
+		m.fields["content-type"] = contentType
 		offset = next
 	}
 
@@ -223,7 +219,7 @@ func getMessageProperties(stream *amqpStream, data []byte) bool {
 			logp.Warn("Failed to get content encoding in header frame")
 			return true
 		}
-		msg.fields["content-encoding"] = contentEncoding
+		m.fields["content-encoding"] = contentEncoding
 		offset = next
 	}
 
@@ -231,7 +227,7 @@ func getMessageProperties(stream *amqpStream, data []byte) bool {
 		headers := mapstr.M{}
 		next, err, exists := getTable(headers, data, offset)
 		if !err && exists {
-			msg.fields["headers"] = headers
+			m.fields["headers"] = headers
 		} else if err {
 			logp.Warn("Failed to get headers")
 			return true
@@ -242,15 +238,15 @@ func getMessageProperties(stream *amqpStream, data []byte) bool {
 	if hasProperty(prop1, deliveryModeProp) {
 		switch data[offset] {
 		case 1:
-			msg.fields["delivery-mode"] = "non-persistent"
+			m.fields["delivery-mode"] = "non-persistent"
 		case 2:
-			msg.fields["delivery-mode"] = "persistent"
+			m.fields["delivery-mode"] = "persistent"
 		}
 		offset++
 	}
 
 	if hasProperty(prop1, priorityProp) {
-		msg.fields["priority"] = data[offset]
+		m.fields["priority"] = data[offset]
 		offset++
 	}
 
@@ -260,7 +256,7 @@ func getMessageProperties(stream *amqpStream, data []byte) bool {
 			logp.Warn("Failed to get correlation-id in header frame")
 			return true
 		}
-		msg.fields["correlation-id"] = correlationID
+		m.fields["correlation-id"] = correlationID
 		offset = next
 	}
 
@@ -270,7 +266,7 @@ func getMessageProperties(stream *amqpStream, data []byte) bool {
 			logp.Warn("Failed to get reply-to in header frame")
 			return true
 		}
-		msg.fields["reply-to"] = replyTo
+		m.fields["reply-to"] = replyTo
 		offset = next
 	}
 
@@ -280,7 +276,7 @@ func getMessageProperties(stream *amqpStream, data []byte) bool {
 			logp.Warn("Failed to get expiration in header frame")
 			return true
 		}
-		msg.fields["expiration"] = expiration
+		m.fields["expiration"] = expiration
 		offset = next
 	}
 
@@ -290,13 +286,13 @@ func getMessageProperties(stream *amqpStream, data []byte) bool {
 			logp.Warn("Failed to get message id in header frame")
 			return true
 		}
-		msg.fields["message-id"] = messageID
+		m.fields["message-id"] = messageID
 		offset = next
 	}
 
 	if hasProperty(prop2, timestampProp) {
 		t := time.Unix(int64(binary.BigEndian.Uint64(data[offset:offset+8])), 0)
-		msg.fields["timestamp"] = t.Format(amqpTimeLayout)
+		m.fields["timestamp"] = t.Format(amqpTimeLayout)
 		offset += 8
 	}
 
@@ -306,7 +302,7 @@ func getMessageProperties(stream *amqpStream, data []byte) bool {
 			logp.Warn("Failed to get message type in header frame")
 			return true
 		}
-		msg.fields["type"] = msgType
+		m.fields["type"] = msgType
 		offset = next
 	}
 
@@ -316,7 +312,7 @@ func getMessageProperties(stream *amqpStream, data []byte) bool {
 			logp.Warn("Failed to get user id in header frame")
 			return true
 		}
-		msg.fields["user-id"] = userID
+		m.fields["user-id"] = userID
 		offset = next
 	}
 
@@ -326,7 +322,7 @@ func getMessageProperties(stream *amqpStream, data []byte) bool {
 			logp.Warn("Failed to get app-id in header frame")
 			return true
 		}
-		msg.fields["app-id"] = appID
+		m.fields["app-id"] = appID
 	}
 	return false
 }

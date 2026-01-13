@@ -238,7 +238,7 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 		}
 
 		done := d.process(&packet, currentType)
-		if done == nil {
+		if done {
 			d.logger.Debugf("processed")
 			break
 		}
@@ -396,7 +396,7 @@ type fragment struct {
 	expire time.Time
 }
 
-func (d *Decoder) process(packet *protos.Packet, layerType gopacket.LayerType) error {
+func (d *Decoder) process(packet *protos.Packet, layerType gopacket.LayerType) (done bool) {
 	withFlow := d.flowID != nil
 
 	switch layerType {
@@ -441,25 +441,25 @@ func (d *Decoder) process(packet *protos.Packet, layerType gopacket.LayerType) e
 	case layers.LayerTypeICMPv4:
 		d.logger.Debugf("ICMPv4 packet")
 		d.onICMPv4(packet)
-		return nil
+		return true
 
 	case layers.LayerTypeICMPv6:
 		d.logger.Debugf("ICMPv6 packet")
 		d.onICMPv6(packet)
-		return nil
+		return true
 
 	case layers.LayerTypeUDP:
 		d.logger.Debugf("UDP packet")
 		d.onUDP(packet)
-		return nil
+		return true
 
 	case layers.LayerTypeTCP:
 		d.logger.Debugf("TCP packet")
 		d.onTCP(packet)
-		return nil
+		return true
 	}
 
-	return nil
+	return false
 }
 
 func (d *Decoder) onICMPv4(packet *protos.Packet) {
