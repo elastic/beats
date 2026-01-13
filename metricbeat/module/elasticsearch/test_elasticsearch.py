@@ -2,7 +2,6 @@ import base64
 import json
 import metricbeat
 import os
-import re
 import semver
 import sys
 import unittest
@@ -17,9 +16,9 @@ class Test(metricbeat.BaseTest):
 
     def setUp(self):
         super(Test, self).setUp()
-        self.es = Elasticsearch(self.get_hosts())
         self.username = os.getenv("ES_USER", "")
         self.password = os.getenv("ES_PASS", "")
+        self.es = Elasticsearch([self.get_elasticsearch_url()], basic_auth=(self.username, self.password))
         self.auth_value = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
         self.getHeaders = {"Authorization": f"Basic {self.auth_value}"}
         self.postHeaders = {"Authorization": f"Basic {self.auth_value}", "Content-Type": "application/json"}

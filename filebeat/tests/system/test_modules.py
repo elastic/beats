@@ -8,6 +8,7 @@ import subprocess
 import json
 import logging
 from parameterized import parameterized
+from elasticsearch import Elasticsearch
 from deepdiff import DeepDiff
 
 # datasets for which @timestamp is removed due to date missing
@@ -121,7 +122,7 @@ def load_fileset_test_cases():
 class Test(BaseTest):
 
     def init(self):
-        self.es = self.get_elasticsearch_instance(user='admin')
+        self.es: Elasticsearch = self.get_elasticsearch_instance(user='admin')
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
@@ -166,10 +167,10 @@ class Test(BaseTest):
         self.assert_explicit_ecs_version_set(module, fileset)
 
         try:
-            self.es.indices.delete_data_stream(self.index_name)
+            self.es.indices.delete_data_stream(index=self.index_name)
         except BaseException:
             pass
-        self.wait_until(lambda: not self.es.indices.exists(self.index_name))
+        self.wait_until(lambda: not self.es.indices.exists(index=self.index_name))
 
         cmd = [
             self.filebeat, "--systemTest",
@@ -258,7 +259,7 @@ class Test(BaseTest):
             error_line)
 
         # Make sure index exists
-        self.wait_until(lambda: self.es.indices.exists(self.index_name),
+        self.wait_until(lambda: self.es.indices.exists(index=self.index_name),
                         name="indices present for {}".format(test_file))
 
         self.es.indices.refresh(index=self.index_name)

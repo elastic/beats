@@ -1,6 +1,5 @@
 import datetime
 import unittest
-import pytest
 from elasticsearch import NotFoundError,  Elasticsearch
 
 
@@ -77,11 +76,12 @@ class IdxMgmt(unittest.TestCase):
         assert found
 
     def assert_data_stream_created(self, data_stream):
-        try:
-            resp = self._client.transport.perform_request('GET', '/_data_stream/' + data_stream, headers=self.headers)
-            assert resp.body.data_streams[0]['name'] == data_stream
-        except NotFoundError:
-            assert False
+        found = False
+        resp = self._client.transport.perform_request('GET', '/_data_stream/' + data_stream, headers=self.headers)
+        for ds in resp.body["data_streams"]:
+            if ds["name"] == data_stream:
+                found = True
+        assert found
 
     def assert_index_template_index_pattern(self, template, index_pattern):
         resp = self._client.transport.perform_request('GET', '/_index_template/' + template, headers=self.headers)
@@ -104,10 +104,10 @@ class IdxMgmt(unittest.TestCase):
     def assert_docs_written_to_data_stream(self, data_stream):
         # Refresh the indices to guarantee all documents are available
         # through the _search API.
-        self._client.transport.perform_request('POST', '/_refresh')
+        self._client.transport.perform_request('POST', '/_refresh', headers=self.headers)
 
-        data = self._client.transport.perform_request('GET', '/' + data_stream + '/_search')
-        self.assertGreater(data["hits"]["total"]["value"], 0)
+        data = self._client.transport.perform_request('GET', '/' + data_stream + '/_search', headers=self.headers)
+        self.assertGreater(data.body["hits"]["total"]["value"], 0)
 
     def default_pattern(self):
         d = datetime.datetime.now().strftime("%Y.%m.%d")
