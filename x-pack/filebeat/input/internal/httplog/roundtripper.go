@@ -17,6 +17,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -24,12 +25,6 @@ import (
 )
 
 var _ http.RoundTripper = (*LoggingRoundTripper)(nil)
-
-// TraceIDKey is key used to add a trace.id value to the context of HTTP
-// requests. The value will be logged by LoggingRoundTripper.
-const TraceIDKey = contextKey("trace.id")
-
-type contextKey string
 
 // NewLoggingRoundTripper returns a LoggingRoundTripper that logs requests and
 // responses to the provided logger. Transaction creation is logged to log.
@@ -88,10 +83,11 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		zap.String("transaction.id", txID),
 	)
 
-	if v := req.Context().Value(TraceIDKey); v != nil {
-		if traceID, ok := v.(string); ok {
-			log = log.With(zap.String("trace.id", traceID))
-		}
+	if sc := trace.SpanFromContext(req.Context()).SpanContext(); sc.IsValid() {
+		log = log.With(
+			zap.String("trace.id", sc.TraceID().String()),
+			zap.String("span.id", sc.SpanID().String()),
+		)
 	}
 
 	req, respParts, errorsMessages := logRequest(log, req, rt.maxBodyLen)
