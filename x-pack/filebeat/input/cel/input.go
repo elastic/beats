@@ -1090,7 +1090,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}
 	}
 
-	c.Transport = otel.NewExtraSpanAttribsRoundTripper(c.Transport)
+	c.Transport = otel.NewExtraSpanAttribsRoundTripper(c.Transport, cfg.OTelTraceConfig)
 
 	if reg != nil {
 		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg, log)
