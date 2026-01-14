@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"unicode"
 
 	"go.opentelemetry.io/contrib/exporters/autoexport"
 	"go.opentelemetry.io/otel"
@@ -118,6 +119,9 @@ func addHeaderAttr(span trace.Span, prefix string, name string, headers http.Hea
 	if values == nil {
 		return
 	}
+	if SensitiveName(name) {
+		values = []string{"REDACTED"}
+	}
 	if len(values) > maxVals {
 		values = values[:maxVals]
 	}
@@ -129,4 +133,104 @@ func addHeaderAttr(span trace.Span, prefix string, name string, headers http.Hea
 
 	key := prefix + strings.ToLower(name)
 	span.SetAttributes(attribute.StringSlice(key, values))
+}
+
+// SensitiveName returns true if the given header or parameter name includes a
+// word that suggests it may contain secret data.
+func SensitiveName(name string) bool {
+	words := splitToWords(name)
+	for _, word := range words {
+		if _, ok := sensitiveWords[word]; ok {
+			return true
+		}
+	}
+	return false
+}
+
+var sensitiveWords = map[string]struct{}{
+	"access":        {},
+	"apikey":        {},
+	"assertion":     {},
+	"auth":          {},
+	"authorization": {},
+	"bearer":        {},
+	"code":          {},
+	"cookie":        {},
+	"credential":    {},
+	"creds":         {},
+	"hmac":          {},
+	"jwt":           {},
+	"key":           {},
+	"nonce":         {},
+	"passphrase":    {},
+	"passwd":        {},
+	"password":      {},
+	"pwd":           {},
+	"saml":          {},
+	"secret":        {},
+	"session":       {},
+	"sid":           {},
+	"sig":           {},
+	"signature":     {},
+	"sso":           {},
+	"token":         {},
+}
+
+// splitToWords splits a string into words.
+// It splits on separators, digit boundaries and case boundaries.
+// The returned words are normalized to lowercase.
+func splitToWords(s string) (words []string) {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return words
+	}
+
+	// common separators
+	parts := strings.FieldsFunc(s, func(r rune) bool {
+		return r == '-' || r == '_' || r == '.' || r == ':' || r == '/' || unicode.IsSpace(r)
+	})
+
+	for _, p := range parts {
+		rs := []rune(p)
+		if len(rs) == 0 {
+			continue
+		}
+
+		start := 0
+		emit := func(i int) {
+			if i > start {
+				words = append(words, strings.ToLower(string(rs[start:i])))
+				start = i
+			}
+		}
+
+		for i := 1; i < len(rs); i++ {
+			a, b := rs[i-1], rs[i]
+			var c rune
+			if i+1 < len(rs) {
+				c = rs[i+1]
+			}
+
+			// letter-digit boundary
+			if (unicode.IsLetter(a) && unicode.IsDigit(b)) || (unicode.IsDigit(a) && unicode.IsLetter(b)) {
+				emit(i)
+				continue
+			}
+
+			// case boundary: camelCase => camel Case
+			if unicode.IsLower(a) && unicode.IsUpper(b) {
+				emit(i)
+				continue
+			}
+
+			// case boundary, acronym: APIKey => API Key
+			if unicode.IsUpper(a) && unicode.IsUpper(b) && c != 0 && unicode.IsLower(c) {
+				emit(i)
+				continue
+			}
+		}
+
+		emit(len(rs))
+	}
+	return words
 }
