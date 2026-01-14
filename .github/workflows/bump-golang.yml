@@ -14,12 +14,9 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    strategy:
-      fail-fast: false
-      matrix:
-        file: ['bump-golang.yml', 'bump-golang-7.17.yml']
     steps:
 
+<<<<<<< HEAD
       - uses: actions/checkout@v4
 
       - name: Install Updatecli in the runner
@@ -27,6 +24,16 @@ jobs:
 
       - name: Run Updatecli in Apply mode
         run: updatecli --experimental apply --config .github/workflows/updatecli.d/${{ matrix.file }} --values .github/workflows/updatecli.d/values.d/scm.yml
+=======
+      - uses: elastic/oblt-actions/updatecli/run-and-notify@v1
+        with:
+          command: --experimental apply --config .github/workflows/updatecli.d/bump-golang.yml --values .github/workflows/updatecli.d/values.d/scm.yml
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          slack-channel-id: "#ingest-notifications"
+          slack-message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, @robots-ci please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
+          slack-send-when: "failure"
+          version-file: .updatecli-version
+>>>>>>> 7e90e2cbc (7.17 reached EoL (#48364))
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
