@@ -72,7 +72,7 @@ filebeat.inputs:
 ## Reading GZIP files [reading-gzip-files]
 
 ```{applies_to}
-stack: ga 9.3.0, beta 9.2.0
+stack: ga 9.3+, beta =9.2
 ```
 
 The `filestream` input can ingest GZIP files.
@@ -723,7 +723,7 @@ See [Reading GZIP files](#reading-gzip-files) for more details on GZIP support.
 ### `gzip_experimental` (deprecated) [filebeat-input-filestream-gzip-experimental]
 
 ```{applies_to}
-stack: removed 9.3.0, beta 9.2.0
+stack: removed 9.3+, beta =9.2
 ```
 
 :::{note}
