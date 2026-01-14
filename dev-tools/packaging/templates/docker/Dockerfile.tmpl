@@ -172,9 +172,9 @@ RUN for iter in {1..10}; do \
     dbus-glib libicu mesa-libGL unzip \
     findutils shadow-utils ca-certificates gawk libcap xz tar -y && \
     mkdir -p /usr/share/fonts/google-noto && \
-    curl -LO https://noto-website-2.storage.googleapis.com/pkgs/NotoSansCJKjp-hinted.zip && \
-    unzip NotoSansCJKjp-hinted.zip -d /usr/share/fonts/google-noto && \
-    rm -f NotoSansCJKjp-hinted.zip && \
+    curl -L -o NotoSansCJKjp.zip https://github.com/notofonts/noto-cjk/releases/download/Sans2.004/06_NotoSansCJKjp.zip && \
+    unzip NotoSansCJKjp.zip -d /usr/share/fonts/google-noto && \
+    rm -f NotoSansCJKjp.zip && \
     microdnf -y remove unzip && \
     curl -LO https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf && \
     mv NotoSans-Regular.ttf /usr/share/fonts/google-noto && \
