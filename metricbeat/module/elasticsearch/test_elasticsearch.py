@@ -71,7 +71,7 @@ class Test(metricbeat.BaseTest):
         """
         elasticsearch metricset tests
         """
-    
+
         self.check_skip(metricset)
 
         if metricset == "ml_job":
@@ -174,7 +174,8 @@ class Test(metricbeat.BaseTest):
         with open(file, 'r') as f:
             body = json.load(f)
 
-        self.es.ml.put_job(job_id='test', data_description=body["data_description"], analysis_config=body["analysis_config"], description=body["description"])
+        self.es.ml.put_job(job_id='test', data_description=body["data_description"],
+                           analysis_config=body["analysis_config"], description=body["description"])
 
     def delete_ml_job(self):
         response = self.es.ml.get_jobs()
@@ -268,7 +269,8 @@ class Test(metricbeat.BaseTest):
         with open(file, 'r') as f:
             pipeline = json.load(f)
 
-        self.es.ingest.put_pipeline(id='user_lookup', description=pipeline['description'], processors=pipeline['processors'])
+        self.es.ingest.put_pipeline(
+            id='user_lookup', description=pipeline['description'], processors=pipeline['processors'])
 
     def ingest_and_enrich_doc(self):
         file = os.path.join(self.beat_path, 'module', 'elasticsearch', 'enrich',
@@ -297,15 +299,13 @@ class Test(metricbeat.BaseTest):
     def start_trial(self):
         # Check if trial is already enabled
         response = self.es.transport.perform_request('GET', self.license_url, headers=self.getHeaders)
-        print(response.body, "this is another resp")
         if response.body["license"]["type"] == "trial":
             return
 
         # Enable xpack trial
         try:
             resp = self.es.transport.perform_request('POST', self.license_url +
-                                              "/start_trial?acknowledge=true", headers=self.postHeaders)
-            print("Trial license started.", resp.body)
+                                                     "/start_trial?acknowledge=true", headers=self.postHeaders)
         except BaseException:
             e = sys.exc_info()[0]
             print("Trial already enabled. Error: {}".format(e))
