@@ -5,7 +5,7 @@ import os
 import semver
 import sys
 import unittest
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, NotFoundError
 from parameterized import parameterized
 
 
@@ -32,15 +32,27 @@ class Test(metricbeat.BaseTest):
             self.ml_anomaly_detectors_url = "/_ml/anomaly_detectors"
 
         self.start_trial()
+
+        try:
+            self.es.indices.delete(index='test_index')
+        except NotFoundError:
+            pass
+
         self.es.indices.create(index='test_index')
 
     def tearDown(self):
         self.ccr_unfollow_index()
-        self.es.indices.delete(index='test_index,pied_piper,rats', ignore_unavailable=True)
+        try:
+            self.es.indices.delete(index='test_index,pied_piper,rats')
+        except NotFoundError:
+            pass
         self.delete_ml_job()
         self.delete_enrich_ingest_pipeline()
         self.delete_enrich_policy()
-        self.es.indices.delete(index='users,my_index', ignore_unavailable=True)
+        try:
+            self.es.indices.delete(index='users,my_index')
+        except NotFoundError:
+            pass
         super(Test, self).tearDown()
 
     @parameterized.expand([
@@ -59,7 +71,7 @@ class Test(metricbeat.BaseTest):
         """
         elasticsearch metricset tests
         """
-
+    
         self.check_skip(metricset)
 
         if metricset == "ml_job":
@@ -69,7 +81,7 @@ class Test(metricbeat.BaseTest):
         if metricset == "enrich":
             self.create_enrich_stats()
 
-        self.check_metricset("elasticsearch", metricset, self.get_hosts(), self.FIELDS +
+        self.check_metricset("elasticsearch", metricset, [self.get_elasticsearch_url()], self.FIELDS +
                              ["service"], extras={"index_recovery.active_only": "false"})
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -96,7 +108,7 @@ class Test(metricbeat.BaseTest):
                 "ml_job",
                 "shard"
             ],
-            "hosts": self.get_hosts(),
+            "hosts": self.get_elasticsearch_url(),
             "period": "1s",
             "extras": {
                 "xpack.enabled": "true"
@@ -114,8 +126,6 @@ class Test(metricbeat.BaseTest):
         elasticsearch-xpack module test for type:cluster_stats
         """
 
-        self.start_basic()
-
         self.render_config_template(modules=[{
             "name": "elasticsearch",
             "metricsets": [
@@ -129,7 +139,7 @@ class Test(metricbeat.BaseTest):
                 "node_stats",
                 "shard"
             ],
-            "hosts": self.get_hosts(),
+            "hosts": self.get_elasticsearch_url(),
             "period": "1s",
             "extras": {
                 "xpack.enabled": "true"
@@ -155,7 +165,7 @@ class Test(metricbeat.BaseTest):
     def create_ml_job(self):
         # Check if an ml job already exists
         response = self.es.ml.get_jobs()
-        if response["count"] > 0:
+        if response.body["count"] > 0:
             return
 
         file = os.path.join(self.beat_path, "module", "elasticsearch", "ml_job", "_meta", "test", "test_job.json")
@@ -164,11 +174,11 @@ class Test(metricbeat.BaseTest):
         with open(file, 'r') as f:
             body = json.load(f)
 
-        self.es.ml.put_job(job_id='test', body=body)
+        self.es.ml.put_job(job_id='test', data_description=body["data_description"], analysis_config=body["analysis_config"], description=body["description"])
 
     def delete_ml_job(self):
         response = self.es.ml.get_jobs()
-        if response["count"] == 0:
+        if response.body["count"] == 0:
             return
 
         self.es.ml.delete_job(job_id='test')
@@ -211,12 +221,11 @@ class Test(metricbeat.BaseTest):
         self.es.transport.perform_request('PUT', path, body=body, headers=self.postHeaders)
 
     def ccr_unfollow_index(self):
-        exists = self.es.indices.exists('rats')
+        exists = self.es.indices.exists(index='rats')
         if not exists:
             return
 
         self.es.transport.perform_request('POST', '/rats/_ccr/pause_follow', headers=self.postHeaders)
-        self.es.indices.close('rats')
         self.es.transport.perform_request('POST', '/rats/_ccr/unfollow', headers=self.postHeaders)
 
     def create_enrich_stats(self):
@@ -234,7 +243,7 @@ class Test(metricbeat.BaseTest):
         with open(file, 'r') as f:
             source_doc = json.load(f)
 
-        self.es.index(index='users', id='1', doc_type='_doc', body=source_doc, refresh='wait_for')
+        self.es.index(index='users', id='1', document=source_doc, refresh='wait_for')
 
     def create_enrich_policy(self):
         file = os.path.join(self.beat_path, 'module', 'elasticsearch', 'enrich',
@@ -245,7 +254,7 @@ class Test(metricbeat.BaseTest):
             policy = json.load(f)
 
         policy_url = '/_enrich/policy/users-policy'
-        self.es.transport.perform_request(method='PUT', url=policy_url, body=policy, headers=self.postHeaders)
+        self.es.transport.perform_request(method='PUT', target=policy_url, body=policy, headers=self.postHeaders)
 
     def execute_enrich_policy(self):
         execute_url = '/_enrich/policy/users-policy/_execute'
@@ -259,7 +268,7 @@ class Test(metricbeat.BaseTest):
         with open(file, 'r') as f:
             pipeline = json.load(f)
 
-        self.es.ingest.put_pipeline(id='user_lookup', body=pipeline)
+        self.es.ingest.put_pipeline(id='user_lookup', description=pipeline['description'], processors=pipeline['processors'])
 
     def ingest_and_enrich_doc(self):
         file = os.path.join(self.beat_path, 'module', 'elasticsearch', 'enrich',
@@ -269,17 +278,17 @@ class Test(metricbeat.BaseTest):
         with open(file, 'r') as f:
             target_doc = json.load(f)
 
-        self.es.index(index='my_index', id='my_id', doc_type='_doc', body=target_doc, pipeline='user_lookup')
+        self.es.index(index='my_index', id='my_id', document=target_doc, pipeline='user_lookup')
 
     def delete_enrich_policy(self):
-        exists = self.es.indices.exists('my_index')
+        exists = self.es.indices.exists(index='my_index')
         if not exists:
             return
 
         self.es.transport.perform_request('DELETE', '/_enrich/policy/users-policy', headers=self.getHeaders)
 
     def delete_enrich_ingest_pipeline(self):
-        exists = self.es.indices.exists('my_index')
+        exists = self.es.indices.exists(index='my_index')
         if not exists:
             return
 
@@ -288,13 +297,15 @@ class Test(metricbeat.BaseTest):
     def start_trial(self):
         # Check if trial is already enabled
         response = self.es.transport.perform_request('GET', self.license_url, headers=self.getHeaders)
+        print(response.body, "this is another resp")
         if response.body["license"]["type"] == "trial":
             return
 
         # Enable xpack trial
         try:
-            self.es.transport.perform_request('POST', self.license_url +
+            resp = self.es.transport.perform_request('POST', self.license_url +
                                               "/start_trial?acknowledge=true", headers=self.postHeaders)
+            print("Trial license started.", resp.body)
         except BaseException:
             e = sys.exc_info()[0]
             print("Trial already enabled. Error: {}".format(e))

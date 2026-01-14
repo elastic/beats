@@ -5,7 +5,7 @@ import os
 import unittest
 import json
 import logging
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, NotFoundError
 
 
 class Test(BaseTest):
@@ -43,10 +43,12 @@ class Test(BaseTest):
         """
         self.init()
         index_name = "filebeat-test-input"
+
         try:
-            self.es.indices.delete(index=index_name)
-        except BaseException:
+            resp = self.es.indices.delete_data_stream(name=index_name)
+        except NotFoundError:
             pass
+
         self.wait_until(lambda: not self.es.indices.exists(index=index_name))
 
         elasticsearch_config = {
@@ -92,9 +94,8 @@ class Test(BaseTest):
         def search_objects():
             try:
                 self.es.indices.refresh(index=index_name)
-                res = self.es.search(index=index_name,
-                                     body={"query": {"match_all": {}}})
-                return [o["_source"] for o in res["hits"]["hits"]]
+                res = self.es.search(index=index_name, query={"match_all": {}})
+                return [o["_source"] for o in res.body["hits"]["hits"]]
             except BaseException:
                 return []
 
