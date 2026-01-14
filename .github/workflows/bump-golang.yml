@@ -18,7 +18,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-<<<<<<< HEAD
       - name: Install Updatecli in the runner
         uses: updatecli/updatecli-action@704a64517239e0993c5e3bf6749a063b8f950d9f # v0.76.1
 
