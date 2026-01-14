@@ -266,7 +266,7 @@ Host environment variables are made available via the global map `env`. Only env
 The CEL environment enables the [optional types](https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#OptionalTypesVersion) and the [two-variable comprehensions extensions](https://pkg.go.dev/github.com/google/cel-go/ext#TwoVarComprehensions) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#TwoVarComprehensionVersion).
 
 * Optional types
-* Two-variable comprehensions {applies_to}`stack: ga 9.1.0+`
+* Two-variable comprehensions {applies_to}`stack: ga 9.1+`
 
 Additionally, it supports authentication via:
 
