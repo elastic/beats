@@ -22,7 +22,7 @@ jobs:
         uses: updatecli/updatecli-action@704a64517239e0993c5e3bf6749a063b8f950d9f # v0.76.1
 
       - name: Run Updatecli in Apply mode
-        run: updatecli --experimental apply --config .github/workflows/updatecli.d/${{ matrix.file }} --values .github/workflows/updatecli.d/values.d/scm.yml
+        run: updatecli --experimental apply --config .github/workflows/updatecli.d/bump-golang.yml --values .github/workflows/updatecli.d/values.d/scm.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
