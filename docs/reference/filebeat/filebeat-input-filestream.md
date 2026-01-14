@@ -347,14 +347,14 @@ the new syntax if possible.
 To take over files from a `log` input, enable take over mode
 and make sure the files you want this input to take over match the configured globs in `paths`.
 
-::::{tab-set}
-:::{tab-item} 9.1.0
+::::{applies-switch}
+:::{applies-item} stack: ga 9.1+
 ```yaml
 take_over:
   enabled: true
 ```
 :::
-:::{tab-item} 9.0.0
+:::{applies-item} stack: ga =9.0
 ```yaml
 take_over: true
 ```
