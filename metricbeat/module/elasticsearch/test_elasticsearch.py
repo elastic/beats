@@ -32,7 +32,7 @@ class Test(metricbeat.BaseTest):
             self.ml_anomaly_detectors_url = "/_ml/anomaly_detectors"
 
         self.start_trial()
-        self.es.indices.create(index='test_index', ignore=400)
+        self.es.indices.create(index='test_index')
 
     def tearDown(self):
         self.ccr_unfollow_index()

@@ -167,7 +167,7 @@ class Test(BaseTest):
 
         self.assert_explicit_ecs_version_set(module, fileset)
 
-        try: 
+        try:
             resp = self.es.indices.delete_data_stream(name=self.index_name)
         except NotFoundError:
             pass

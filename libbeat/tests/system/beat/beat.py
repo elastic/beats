@@ -480,14 +480,14 @@ class TestCase(unittest.TestCase, ComposeMixin):
         """
         if logfile is None:
             logfile = self.beat_name + "-" + self.today + ".ndjson"
-        
+
         data = []
         try:
-          with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
-            data = f.readlines()
+            with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
+                data = f.readlines()
         except IOError:
             pass
-        
+
         return data
 
     def wait_log_contains(self, msg, logfile=None,
