@@ -42,6 +42,7 @@ const (
 	fleetEnrollmentAPIKeysAPI    = "/api/fleet/enrollment_api_keys" //nolint:gosec // no API key being leaked here
 	fleetFleetServerHostsAPI     = "/api/fleet/fleet_server_hosts"
 	fleetPackagePoliciesAPI      = "/api/fleet/package_policies"
+	fleetAgentPrivilegeChangeAPI = "/api/fleet/agents/%s/privilege_level_change"
 	fleetUnEnrollAgentAPI        = "/api/fleet/agents/%s/unenroll"
 	fleetUninstallTokensAPI      = "/api/fleet/uninstall_tokens" //nolint:gosec // NOT the "Potential hardcoded credentials"
 	fleetUpgradeAgentAPI         = "/api/fleet/agents/%s/upgrade"
@@ -308,6 +309,39 @@ func (client *Client) DeletePolicy(ctx context.Context, id string) error {
 			return fmt.Errorf("unable to delete policy; API returned status code [%d] and error reading response: %w", resp.StatusCode, err)
 		}
 		return fmt.Errorf("unable to delete policy; API returned status code [%d] and body [%s]", resp.StatusCode, string(respBody))
+	}
+	return nil
+}
+
+// AgentPrivilegeLevelChangeRequest is the JSON object for requesting an agent privilege level change
+type AgentPrivilegeLevelChangeRequest struct {
+	UserInfo *struct {
+		Groupname string `json:"groupname"`
+		Password  string `json:"password"`
+		Username  string `json:"username"`
+	} `json:"user_info"`
+}
+
+// AgentPrivilegeLevelChange changes the privilege level of the given agent
+func (client *Client) AgentPrivilegeLevelChange(ctx context.Context, agentID string, request AgentPrivilegeLevelChangeRequest) error {
+	reqBody, err := json.Marshal(request)
+	if err != nil {
+		return fmt.Errorf("unable to marshal agent privilege level change request into JSON: %w", err)
+	}
+
+	apiURL := fmt.Sprintf(fleetAgentPrivilegeChangeAPI, agentID)
+	resp, err := client.SendWithContext(ctx, http.MethodPost, apiURL, nil, nil, bytes.NewReader(reqBody))
+	if err != nil {
+		return fmt.Errorf("error calling agent privilege level change API: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("unable to change agent privilege level; API returned status code [%d] and error reading response: %w", resp.StatusCode, err)
+		}
+		return fmt.Errorf("unable to change agent privilege level; API returned status code [%d] and body [%s]", resp.StatusCode, string(respBody))
 	}
 	return nil
 }

@@ -313,6 +313,28 @@ func TestFleetUpgradeAgent(t *testing.T) {
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
+		case fmt.Sprintf(fleetAgentPrivilegeChangeAPI, agentID):
+			_, _ = w.Write([]byte(`{}`))
+		}
+	}
+
+	client, err := createTestServerAndClient(handler)
+	require.NoError(t, err)
+	require.NotNil(t, client)
+
+	req := AgentPrivilegeLevelChangeRequest{}
+	err = client.AgentPrivilegeLevelChange(ctx, agentID, req)
+	require.NoError(t, err)
+}
+
+func TestFleetPrivilegeLevelChange(t *testing.T) {
+	const agentID = "f512f36f-bf78-4285-aff0-baeafbcdf21e"
+
+	ctx, cn := context.WithCancel(context.Background())
+	defer cn()
+
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
 		case fmt.Sprintf(fleetUpgradeAgentAPI, agentID):
 			_, _ = w.Write([]byte(`{}`))
 		}
