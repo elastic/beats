@@ -108,12 +108,14 @@ class Test(metricbeat.BaseTest):
                 "ml_job",
                 "shard"
             ],
-            "hosts": self.get_elasticsearch_url(),
+            "hosts": [self.get_elasticsearch_url()],
             "period": "1s",
             "extras": {
                 "xpack.enabled": "true"
             }
         }])
+
+        self.start_basic()
 
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
@@ -139,7 +141,7 @@ class Test(metricbeat.BaseTest):
                 "node_stats",
                 "shard"
             ],
-            "hosts": self.get_elasticsearch_url(),
+            "hosts": [self.get_elasticsearch_url()],
             "period": "1s",
             "extras": {
                 "xpack.enabled": "true"
