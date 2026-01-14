@@ -76,16 +76,42 @@ func newTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyVa
 	return tp, nil
 }
 
+type TraceConfig struct {
+	// Redacted is a list of headers and query string parameters that should have their values redacted in span attributes.
+	Redacted []string `config:"redacted"`
+	// Unredacted is a list of headers and query string parameters that should not have their values redacted in span attributes.
+	Unredacted []string `config:"unredacted"`
+}
+
 var _ http.RoundTripper = (*ExtraSpanAttribsRoundTripper)(nil)
 
-func NewExtraSpanAttribsRoundTripper(next http.RoundTripper) *ExtraSpanAttribsRoundTripper {
+func NewExtraSpanAttribsRoundTripper(next http.RoundTripper, traceCfg *TraceConfig) *ExtraSpanAttribsRoundTripper {
+	redacted := make(map[string]bool)
+	unredacted := make(map[string]bool)
+	if traceCfg != nil {
+		for _, name := range traceCfg.Redacted {
+			redacted[strings.ToLower(name)] = true
+		}
+		for _, name := range traceCfg.Unredacted {
+			unredacted[strings.ToLower(name)] = true
+		}
+	}
 	return &ExtraSpanAttribsRoundTripper{
-		next: next,
+		next:       next,
+		redacted:   redacted,
+		unredacted: unredacted,
 	}
 }
 
 type ExtraSpanAttribsRoundTripper struct {
-	next http.RoundTripper
+	next       http.RoundTripper
+	redacted   map[string]bool
+	unredacted map[string]bool
+}
+
+func (rt ExtraSpanAttribsRoundTripper) shouldRedact(name string) bool {
+	key := strings.ToLower(name)
+	return rt.redacted[key] || (SensitiveName(name) && !rt.unredacted[key])
 }
 
 func (rt ExtraSpanAttribsRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
@@ -93,7 +119,7 @@ func (rt ExtraSpanAttribsRoundTripper) RoundTrip(r *http.Request) (*http.Respons
 	span := trace.SpanFromContext(r.Context())
 	if span != nil && span.SpanContext().IsValid() {
 		for h := range r.Header {
-			addHeaderAttr(span, "http.request.header.", h, r.Header)
+			addHeaderAttr(span, "http.request.header.", h, r.Header, rt.shouldRedact)
 		}
 	}
 
@@ -104,14 +130,14 @@ func (rt ExtraSpanAttribsRoundTripper) RoundTrip(r *http.Request) (*http.Respons
 
 	if span != nil && span.SpanContext().IsValid() && resp != nil {
 		for h := range resp.Header {
-			addHeaderAttr(span, "http.response.header.", h, resp.Header)
+			addHeaderAttr(span, "http.response.header.", h, resp.Header, rt.shouldRedact)
 		}
 	}
 
 	return resp, nil
 }
 
-func addHeaderAttr(span trace.Span, prefix string, name string, headers http.Header) {
+func addHeaderAttr(span trace.Span, prefix string, name string, headers http.Header, shouldRedact func(string) bool) {
 	const maxVals = 10
 	const maxValLen = 1024
 
@@ -119,7 +145,7 @@ func addHeaderAttr(span trace.Span, prefix string, name string, headers http.Hea
 	if values == nil {
 		return
 	}
-	if SensitiveName(name) {
+	if shouldRedact(name) {
 		values = []string{"REDACTED"}
 	}
 	if len(values) > maxVals {
@@ -136,7 +162,8 @@ func addHeaderAttr(span trace.Span, prefix string, name string, headers http.Hea
 }
 
 // SensitiveName returns true if the given header or parameter name includes a
-// word that suggests it may contain secret data.
+// word that suggests it may contain secret data. This is the default redaction
+// logic.
 func SensitiveName(name string) bool {
 	words := splitToWords(name)
 	for _, word := range words {
