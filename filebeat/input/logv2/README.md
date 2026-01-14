@@ -1,6 +1,6 @@
 # Log v2
 The LogV2 input is used as an entrypoint to select whether to run the
-Log input or (as normally done) or the Filestream input as part of
+Log input or (as normally done) the Filestream input as part of
 the effort to fully deprecate and remove the Log input.
 
 Currently there are two ways to run the Filestream input in place of
