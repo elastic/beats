@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/log"
+	"github.com/elastic/beats/v7/filebeat/input/logv2"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -84,5 +85,5 @@ func NewInput(
 		context.Meta["stream"] = config.Stream
 	}
 
-	return log.NewInput(cfg, outletFactory, context, logger)
+	return logv2.NewV1Input(cfg, outletFactory, context, logger)
 }
