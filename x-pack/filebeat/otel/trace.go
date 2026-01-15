@@ -217,12 +217,10 @@ func SensitiveName(name string) bool {
 }
 
 var sensitiveWords = map[string]struct{}{
-	"access":        {},
 	"apikey":        {},
 	"assertion":     {},
 	"auth":          {},
 	"authorization": {},
-	"bearer":        {},
 	"code":          {},
 	"cookie":        {},
 	"credential":    {},
