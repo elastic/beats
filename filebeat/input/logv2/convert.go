@@ -109,6 +109,8 @@ var logInputExclusiveKeys = []string{
 	"recursive_glob.enabled",
 	"scan",
 	"scan_frequency",
+	"stream",
+	"format",
 	"symlinks",
 	"tail_files",
 }
@@ -330,51 +332,47 @@ func handleJSON(logger *logp.Logger, cfg *config.C, parsers *[]any) error {
 	return nil
 }
 
-func handleDockerJson(logger *logp.Logger, cfg, newCfg *config.C, parsers *[]any) error {
-	hasDockerJson, err := cfg.Has("docker-json", -1)
+func handleContainerInput(cfg, newCfg *config.C, parsers *[]any) error {
+	inputType, err := cfg.String("type", -1)
 	if err != nil {
-		return fmt.Errorf("cannot read 'docker-json': %w", err)
+		return fmt.Errorf("cannot read 'type' as string: %s", err)
 	}
 
-	if !hasDockerJson {
+	if inputType != "container" {
 		return nil
 	}
 
-	dockerJson, err := cfg.Child("docker-json", -1)
-	if err != nil {
-		logger.Warnf("cannot read 'docker-json' as map: %s, ignoring malformed config entry ", err)
-		return nil
+	stream := "all"
+	if cfg.HasField("stream") {
+		value, err := cfg.String("stream", -1)
+		if err != nil {
+			return fmt.Errorf("cannot read 'stream' as string: %w", err)
+		}
+		stream = value
 	}
 
-	newContainerCfg := config.NewConfig()
-	for _, key := range []string{"stream", "format"} {
-		has, err := dockerJson.Has(key, -1)
+	format := "auto"
+	if cfg.HasField("format") {
+		value, err := cfg.String("format", -1)
 		if err != nil {
-			return fmt.Errorf("cannot read 'docker-json.%s': %w", key, err)
+			return fmt.Errorf("cannot read 'format' as string: %w", err)
 		}
+		format = value
+	}
 
-		if !has {
-			continue
-		}
-
-		child, err := dockerJson.String(key, -1)
-		if err != nil {
-			return fmt.Errorf("cannot read 'docker-json.%s as string: %w", key, err)
-		}
-
-		newContainerCfg.SetString(key, -1, child)
+	containerCfg := config.NewConfig()
+	if err := containerCfg.SetString("stream", -1, stream); err != nil {
+		return fmt.Errorf("cannot set container stream: %w", err)
+	}
+	if err := containerCfg.SetString("format", -1, format); err != nil {
+		return fmt.Errorf("cannot set container format: %w", err)
 	}
 
 	*parsers = append(*parsers, map[string]any{
-		"container": newContainerCfg,
+		"container": containerCfg,
 	})
 
-	symlinks, err := dockerJson.Bool("symlinks", -1)
-	if err != nil {
-		return fmt.Errorf("cannot read 'docker-json.symlinks as boolean: %w", err)
-	}
-
-	if err := newCfg.SetBool("prospector.scanner.symlinks", -1, symlinks); err != nil {
+	if err := newCfg.SetBool("prospector.scanner.symlinks", -1, true); err != nil {
 		return fmt.Errorf("cannot set 'prospector.scanner.symlinks': %w", err)
 	}
 
@@ -422,7 +420,7 @@ func handleParsers(logger *logp.Logger, cfg, newCfg *config.C) error {
 		return err
 	}
 
-	if err := handleDockerJson(logger, cfg, newCfg, &parsers); err != nil {
+	if err := handleContainerInput(cfg, newCfg, &parsers); err != nil {
 		return err
 	}
 

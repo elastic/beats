@@ -58,50 +58,48 @@ func TestConvertHandlesSpecialCases(t *testing.T) {
 		logYamlCfg      string
 		expectedJsonCfg string
 	}{
-		"container input": {
+		"container input is converted to container parser": {
 			logYamlCfg: `
+type: container
 id: container-id
 paths:
  - /var/log/containers/*.log
-docker-json:
-  stream: stdout
-  format: docker
-  symlinks: true
 `,
 			expectedJsonCfg: `
 {
-              "file_identity": {
-                "native": null
-              },
-              "id": "container-id",
-              "parsers": [
-                {
-                  "container": {
-                    "format": "docker",
-                    "stream": "stdout"
-                  }
-                }
-              ],
-              "paths": [
-                "/var/log/containers/*.log"
-              ],
-              "prospector": {
-                "scanner": {
-                  "symlinks": true,
-                  "fingerprint": {
-                    "enabled": false
-                  }
-                }
-              },
-              "take_over": {
-                "enabled": true
-              },
-              "type": "filestream"
-            }
+  "file_identity": {
+    "native": null
+  },
+  "id": "container-id",
+  "parsers": [
+    {
+      "container": {
+        "format": "auto",
+        "stream": "all"
+      }
+    }
+  ],
+  "paths": [
+    "/var/log/containers/*.log"
+  ],
+  "prospector": {
+    "scanner": {
+      "fingerprint": {
+        "enabled": false
+      },
+      "symlinks": true
+    }
+  },
+  "take_over": {
+    "enabled": true
+  },
+  "type": "filestream"
+}
 `,
 		},
 		"file_identity is not set": {
 			logYamlCfg: `
+type: log
 id: foo
 paths:
   - /tmp/foo
@@ -132,6 +130,7 @@ paths:
 
 		"file_identiy is non default": {
 			logYamlCfg: `
+type: log
 id: foo
 paths:
    - /tmp/foo
@@ -163,6 +162,7 @@ file_identity.path: ~
 
 		"file_identiy is fingerprint": {
 			logYamlCfg: `
+type: log
 id: foo
 paths:
  - /tmp/foo
@@ -187,6 +187,7 @@ file_identity.fingerprint: ~
 
 		"parsers are correctly added": {
 			logYamlCfg: `
+type: log
 id: foo
 paths:
   - /tmp/foo
@@ -224,6 +225,7 @@ parsers:
 
 		"parsers are added after json": {
 			logYamlCfg: `
+type: log
 id: foo
 paths:
   - /tmp/foo
@@ -268,6 +270,7 @@ parsers:
 
 		"parsers are added after multiine": {
 			logYamlCfg: `
+type: log
 id: foo
 paths:
   - /tmp/foo
@@ -311,6 +314,7 @@ parsers:
 
 		"parsers are added after json and multiine": {
 			logYamlCfg: `
+type: log
 id: foo
 paths:
   - /tmp/foo
@@ -360,6 +364,7 @@ parsers:
 		},
 		"empty values are ignored for all types": {
 			logYamlCfg: `
+type: log
 # Bool
 close_eof:
 # String
@@ -395,6 +400,7 @@ multiline:
 		},
 		"invalid types are ignored": {
 			logYamlCfg: `
+type: log
 # Bool
 close_eof: 42
 # String
