@@ -93,6 +93,10 @@ func (c *Collector) ObservedLogs() *observer.ObservedLogs {
 	return c.observer
 }
 
+func (c *Collector) Shutdown() {
+	c.collector.Shutdown()
+}
+
 func getComponent() (otelcol.Factories, error) {
 	receivers, err := otelcol.MakeFactoryMap(
 		fbreceiver.NewFactory(),
