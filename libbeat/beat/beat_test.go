@@ -24,15 +24,14 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type testManager struct {
 	isUnpriv  bool
-	mgmtMode  proto.AgentManagedMode
+	mgmtMode  management.AgentManagedMode
 	isEnabled bool
 }
 
@@ -40,15 +39,15 @@ func (tm testManager) UpdateStatus(_ status.Status, _ string) {}
 func (tm testManager) Enabled() bool                          { return tm.isEnabled }
 func (tm testManager) Start() error                           { return nil }
 func (tm testManager) Stop()                                  {}
-func (tm testManager) AgentInfo() client.AgentInfo {
-	return client.AgentInfo{Unprivileged: tm.isUnpriv, ManagedMode: tm.mgmtMode}
+func (tm testManager) AgentInfo() management.AgentInfo {
+	return management.AgentInfo{Unprivileged: tm.isUnpriv, ManagedMode: tm.mgmtMode}
 }
-func (tm testManager) SetStopCallback(_ func())            {}
-func (tm testManager) CheckRawConfig(_ *config.C) error    { return nil }
-func (tm testManager) RegisterAction(_ client.Action)      {}
-func (tm testManager) UnregisterAction(_ client.Action)    {}
-func (tm testManager) SetPayload(_ map[string]interface{}) {}
-func (tm testManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ client.DiagnosticHook) {
+func (tm testManager) SetStopCallback(_ func())             {}
+func (tm testManager) CheckRawConfig(_ *config.C) error     { return nil }
+func (tm testManager) RegisterAction(_ management.Action)   {}
+func (tm testManager) UnregisterAction(_ management.Action) {}
+func (tm testManager) SetPayload(_ map[string]interface{})  {}
+func (tm testManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ management.DiagnosticHook) {
 }
 
 func TestUserAgentString(t *testing.T) {
@@ -60,26 +59,36 @@ func TestUserAgentString(t *testing.T) {
 		{
 			name: "managed-unprivileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
-				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: proto.AgentManagedMode_MANAGED}},
+				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: management.AgentManagedMode_MANAGED}},
 			expectedComments: []string{"Managed", "Unprivileged"},
 		},
 		{
 			name: "managed-privileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
-				Manager: testManager{isEnabled: true, isUnpriv: false, mgmtMode: proto.AgentManagedMode_MANAGED}},
+				Manager: testManager{isEnabled: true, isUnpriv: false, mgmtMode: management.AgentManagedMode_MANAGED}},
 			expectedComments: []string{"Managed"},
 		},
 		{
 			name: "unmanaged-privileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
+<<<<<<< HEAD
 				Manager: testManager{isEnabled: true, isUnpriv: false, mgmtMode: proto.AgentManagedMode_STANDALONE}},
 			expectedComments: []string{"Standalone"},
+=======
+				Manager: testManager{isEnabled: true, isUnpriv: false, mgmtMode: management.AgentManagedMode_STANDALONE}},
+			expectedComments: []string{"Unmanaged"},
+>>>>>>> adc57ca64 (Remove use of github.com/elastic/elastic-agent-client from OSS Beats (#48353))
 		},
 		{
 			name: "unmanaged-unprivileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
+<<<<<<< HEAD
 				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: proto.AgentManagedMode_STANDALONE}},
 			expectedComments: []string{"Standalone", "Unprivileged"},
+=======
+				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: management.AgentManagedMode_STANDALONE}},
+			expectedComments: []string{"Unmanaged", "Unprivileged"},
+>>>>>>> adc57ca64 (Remove use of github.com/elastic/elastic-agent-client from OSS Beats (#48353))
 		},
 		{
 			name: "management-disabled",

@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -92,6 +91,38 @@ type Beat struct {
 	Paths    *paths.Path      // per beat paths definition
 }
 
+<<<<<<< HEAD
+=======
+func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
+	if beat.Manager == nil {
+		return useragent.AgentManagementModeUnknown
+	}
+	if !beat.Manager.Enabled() {
+		return useragent.AgentManagementModeStandalone
+	}
+
+	info := beat.Manager.AgentInfo()
+	switch info.ManagedMode {
+	case management.AgentManagedMode_MANAGED:
+		return useragent.AgentManagementModeManaged
+	case management.AgentManagedMode_STANDALONE:
+		return useragent.AgentManagementModeUnmanaged
+	}
+	// this is probably not reachable
+	return useragent.AgentManagementModeUnknown
+}
+
+func (beat *Beat) userAgentUnprivilegedMode() useragent.AgentUnprivilegedMode {
+	if beat.Manager == nil || !beat.Manager.Enabled() {
+		return useragent.AgentUnprivilegedModeUnknown
+	}
+	if beat.Manager.AgentInfo().Unprivileged {
+		return useragent.AgentUnprivilegedModeUnprivileged
+	}
+	return useragent.AgentUnprivilegedModePrivileged
+}
+
+>>>>>>> adc57ca64 (Remove use of github.com/elastic/elastic-agent-client from OSS Beats (#48353))
 // GenerateUserAgent populates the UserAgent field on the beat.Info struct
 func (beat *Beat) GenerateUserAgent() {
 	// if we're in fleet mode, construct some additional elements for the UA comment field
