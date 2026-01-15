@@ -26,13 +26,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-const (
-	cfClientID        = "test-client"
-	cfClientSecret    = "test-secret"
-	fingerprintOffset = 0
-	fingerprintLength = 64
-)
-
 const filebeatConfigTemplate = `
 filebeat.inputs:
   - type: filestream
@@ -44,14 +37,14 @@ filebeat.inputs:
       - ndjson:
           keys_under_root: true
           add_error_key: true
-    prospector.scanner.fingerprint.offset: {{.fingerprint_offset}}
-    prospector.scanner.fingerprint.length: {{.fingerprint_length}}
+    prospector.scanner.fingerprint.offset: 0
+    prospector.scanner.fingerprint.length: 64
 
 processors:
   - add_cloudfoundry_metadata:
       api_address: {{.api_address}}
-      client_id: {{.client_id}}
-      client_secret: {{.client_secret}}
+      client_id: test-client
+      client_secret: test-secret
       ssl:
         verification_mode: none
 
@@ -64,8 +57,6 @@ output.file:
 
 logging.level: debug
 `
-
-var filebeatConfigTmpl = template.Must(template.New("filebeatConfig").Parse(filebeatConfigTemplate))
 
 func TestAddCloudFoundryMetadataProcessor(t *testing.T) {
 	// Create test apps
@@ -459,14 +450,12 @@ func mustEncode(w io.Writer, v any) {
 func renderFilebeatConfig(t *testing.T, logPath, apiAddress, pathHome string) string {
 	t.Helper()
 	cfgSB := strings.Builder{}
-	require.NoError(t, filebeatConfigTmpl.Execute(&cfgSB, map[string]any{
-		"log_path":           logPath,
-		"api_address":        apiAddress,
-		"path_home":          pathHome,
-		"client_id":          cfClientID,
-		"client_secret":      cfClientSecret,
-		"fingerprint_offset": fingerprintOffset,
-		"fingerprint_length": fingerprintLength,
+	tmpl, err := template.New("filebeatConfig").Parse(filebeatConfigTemplate)
+	require.NoError(t, err)
+	require.NoError(t, tmpl.Execute(&cfgSB, map[string]any{
+		"log_path":    logPath,
+		"api_address": apiAddress,
+		"path_home":   pathHome,
 	}))
 	return cfgSB.String()
 }
