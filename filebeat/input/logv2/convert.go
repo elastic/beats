@@ -99,6 +99,7 @@ var logInputExclusiveKeys = []string{
 	"close_removed",
 	"close_renamed",
 	"close_timeout",
+	"docker-json",
 	"exclude_files",
 	"harvester_buffer_size",
 	"json",
@@ -329,6 +330,57 @@ func handleJSON(logger *logp.Logger, cfg *config.C, parsers *[]any) error {
 	return nil
 }
 
+func handleDockerJson(logger *logp.Logger, cfg, newCfg *config.C, parsers *[]any) error {
+	hasDockerJson, err := cfg.Has("docker-json", -1)
+	if err != nil {
+		return fmt.Errorf("cannot read 'docker-json': %w", err)
+	}
+
+	if !hasDockerJson {
+		return nil
+	}
+
+	dockerJson, err := cfg.Child("docker-json", -1)
+	if err != nil {
+		logger.Warnf("cannot read 'docker-json' as map: %s, ignoring malformed config entry ", err)
+		return nil
+	}
+
+	newContainerCfg := config.NewConfig()
+	for _, key := range []string{"stream", "format"} {
+		has, err := dockerJson.Has(key, -1)
+		if err != nil {
+			return fmt.Errorf("cannot read 'docker-json.%s': %w", key, err)
+		}
+
+		if !has {
+			continue
+		}
+
+		child, err := dockerJson.String(key, -1)
+		if err != nil {
+			return fmt.Errorf("cannot read 'docker-json.%s as string: %w", key, err)
+		}
+
+		newContainerCfg.SetString(key, -1, child)
+	}
+
+	*parsers = append(*parsers, map[string]any{
+		"container": newContainerCfg,
+	})
+
+	symlinks, err := dockerJson.Bool("symlinks", -1)
+	if err != nil {
+		return fmt.Errorf("cannot read 'docker-json.symlinks as boolean: %w", err)
+	}
+
+	if err := newCfg.SetBool("prospector.scanner.symlinks", -1, symlinks); err != nil {
+		return fmt.Errorf("cannot set 'prospector.scanner.symlinks': %w", err)
+	}
+
+	return nil
+}
+
 // copyParsers copies any existing 'parsers' from cfg into parsersCfg.
 // offset is the offset in parsersCfg to start adding the new ones.
 func copyParsers(cfg, parsersCfg *config.C, offset int) error {
@@ -367,6 +419,10 @@ func handleParsers(logger *logp.Logger, cfg, newCfg *config.C) error {
 	}
 
 	if err := handleJSON(logger, cfg, &parsers); err != nil {
+		return err
+	}
+
+	if err := handleDockerJson(logger, cfg, newCfg, &parsers); err != nil {
 		return err
 	}
 

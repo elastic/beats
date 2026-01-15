@@ -58,6 +58,48 @@ func TestConvertHandlesSpecialCases(t *testing.T) {
 		logYamlCfg      string
 		expectedJsonCfg string
 	}{
+		"container input": {
+			logYamlCfg: `
+id: container-id
+paths:
+ - /var/log/containers/*.log
+docker-json:
+  stream: stdout
+  format: docker
+  symlinks: true
+`,
+			expectedJsonCfg: `
+{
+              "file_identity": {
+                "native": null
+              },
+              "id": "container-id",
+              "parsers": [
+                {
+                  "container": {
+                    "format": "docker",
+                    "stream": "stdout"
+                  }
+                }
+              ],
+              "paths": [
+                "/var/log/containers/*.log"
+              ],
+              "prospector": {
+                "scanner": {
+                  "symlinks": true,
+                  "fingerprint": {
+                    "enabled": false
+                  }
+                }
+              },
+              "take_over": {
+                "enabled": true
+              },
+              "type": "filestream"
+            }
+`,
+		},
 		"file_identity is not set": {
 			logYamlCfg: `
 id: foo
