@@ -170,25 +170,6 @@ func NewStandardBeat(t *testing.T, beatName, binary string, args ...string) *Bea
 	return b
 }
 
-// NewAgentBeat creates a new agentbeat process that runs the beatName as a subcommand.
-// See `NewBeat` for options and information for the parameters.
-func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
-	b := NewBeat(t, beatName, binary, args...)
-
-	// Remove the first two arguments: beatName and --systemTest
-	baseArgs := b.baseArgs[2:]
-	// Add the agentbeat argumet and re-organise the others
-	b.baseArgs = append(
-		[]string{
-			"agentbeat",
-			"--systemTest",
-			beatName,
-		},
-		baseArgs...)
-
-	return b
-}
-
 // Start starts the Beat process
 // args are extra arguments to be passed to the Beat.
 func (b *BeatProc) Start(args ...string) {
@@ -1227,9 +1208,10 @@ func StartMockES(
 		addr = "localhost:0"
 	}
 
-	l, err := net.Listen("tcp", addr)
+	lc := net.ListenConfig{}
+	l, err := lc.Listen(t.Context(), "tcp", addr)
 	if err != nil {
-		if l, err = net.Listen("tcp6", addr); err != nil {
+		if l, err = lc.Listen(t.Context(), "tcp6", addr); err != nil {
 			t.Fatalf("failed to listen on a port: %v", err)
 		}
 	}
@@ -1270,14 +1252,10 @@ func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
 	t := b.t
 	t.Helper()
 
-	msg := strings.Builder{}
 	path := filepath.Join(b.TempDir(), "output-*.ndjson")
-	assert.Eventually(t, func() bool {
-		got := b.CountFileLines(path)
-		msg.Reset()
-		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
-		return got == events
-	}, timeout, 200*time.Millisecond, &msg)
+	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		assert.Equal(collect, events, b.CountFileLines(path))
+	}, timeout, 200*time.Millisecond)
 }
 
 // GetEventsFromFileOutput reads all events from file output. If n > 0,

@@ -41,7 +41,7 @@ func newProspector(
 	log *logp.Logger,
 	srci *loginp.SourceIdentifier) (loginp.Prospector, error) {
 
-	logger := log.Named("filestream").With("filestream_id", config.ID)
+	logger := log.Named("filestream").With("id", config.ID)
 	err := checkConfigCompatibility(config)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func newProspector(
 		logger,
 		config.Paths,
 		config.FileWatcher,
-		config.GZIPExperimental,
+		config.Compression,
 		config.Delete.Enabled,
 		identifier,
 		srci,

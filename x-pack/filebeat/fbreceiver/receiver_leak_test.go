@@ -6,8 +6,6 @@ package fbreceiver
 
 import (
 	"errors"
-	"path/filepath"
-	"runtime"
 	"testing"
 	"time"
 
@@ -21,17 +19,11 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 )
 
 func TestLeak(t *testing.T) {
-	monitorSocket := genSocketPath()
-	var monitorHost string
-	if runtime.GOOS == "windows" {
-		monitorHost = "npipe:///" + filepath.Base(monitorSocket)
-	} else {
-		monitorHost = "unix://" + monitorSocket
-	}
+	monitorHost := hostFromSocket(genSocketPath(t))
 	config := Config{
 		Beatconfig: map[string]any{
 			"filebeat": map[string]any{
@@ -81,7 +73,6 @@ func TestLeak(t *testing.T) {
 		consumeLogs := oteltest.DummyConsumer{ConsumeError: errors.New("cannot publish data")}
 		startAndStopReceiver(t, factory, &consumeLogs, &config)
 	})
-
 }
 
 // StartAndStopReceiver creates a receiver using the provided parameters, starts it, verifies that the expected logs

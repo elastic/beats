@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -67,13 +68,13 @@ func TestConsumeLogs(t *testing.T) {
 
 func TestCreateProcessor(t *testing.T) {
 	t.Run("nil config returns nil processor", func(t *testing.T) {
-		processor, err := createProcessor(nil)
+		processor, err := createProcessor(nil, testLogger())
 		require.NoError(t, err)
 		assert.Nil(t, processor)
 	})
 
 	t.Run("empty config returns nil processor", func(t *testing.T) {
-		processor, err := createProcessor(map[string]any{})
+		processor, err := createProcessor(map[string]any{}, testLogger())
 		require.NoError(t, err)
 		assert.Nil(t, processor)
 	})
@@ -82,7 +83,7 @@ func TestCreateProcessor(t *testing.T) {
 		_, err := createProcessor(map[string]any{
 			"add_host_metadata": map[string]any{},
 			"another_key":       map[string]any{},
-		})
+		}, testLogger())
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "expected single processor name")
 	})
@@ -90,19 +91,63 @@ func TestCreateProcessor(t *testing.T) {
 	t.Run("unknown processor returns error", func(t *testing.T) {
 		_, err := createProcessor(map[string]any{
 			"unknown_processor": map[string]any{},
-		})
+		}, testLogger())
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "invalid processor name 'unknown_processor'")
+	})
+
+	t.Run("valid add_cloud_metadata processor config returns processor", func(t *testing.T) {
+		processor, err := createProcessor(map[string]any{
+			"add_cloud_metadata": map[string]any{},
+		}, testLogger())
+		require.NoError(t, err)
+		require.NotNil(t, processor)
+		assert.Equal(t, "add_cloud_metadata", processor.String()[:len("add_cloud_metadata")])
+	})
+
+	t.Run("valid add_docker_metadata processor config returns processor", func(t *testing.T) {
+		processor, err := createProcessor(map[string]any{
+			"add_docker_metadata": map[string]any{},
+		}, testLogger())
+		require.NoError(t, err)
+		require.NotNil(t, processor)
+		assert.Equal(t, "add_docker_metadata", processor.String()[:len("add_docker_metadata")])
+	})
+
+	t.Run("valid add_fields processor config returns processor", func(t *testing.T) {
+		processor, err := createProcessor(map[string]any{
+			"add_fields": map[string]any{
+				"fields": map[string]any{
+					"env": "staging",
+				},
+			},
+		}, testLogger())
+		require.NoError(t, err)
+		require.NotNil(t, processor)
+		assert.Equal(t, "add_fields", processor.String()[:len("add_fields")])
 	})
 
 	t.Run("valid add_host_metadata processor config returns processor", func(t *testing.T) {
 		processor, err := createProcessor(map[string]any{
 			"add_host_metadata": map[string]any{},
-		})
+		}, testLogger())
 		require.NoError(t, err)
 		require.NotNil(t, processor)
 		assert.Equal(t, "add_host_metadata", processor.String()[:len("add_host_metadata")])
 	})
+
+	t.Run("valid add_kubernetes_metadata processor config returns processor", func(t *testing.T) {
+		processor, err := createProcessor(map[string]any{
+			"add_kubernetes_metadata": map[string]any{},
+		}, testLogger())
+		require.NoError(t, err)
+		require.NotNil(t, processor)
+		assert.Equal(t, "add_kubernetes_metadata", processor.String()[:len("add_kubernetes_metadata")])
+	})
+}
+
+func testLogger() *logp.Logger {
+	return logp.NewNopLogger()
 }
 
 type mockProcessor struct {
