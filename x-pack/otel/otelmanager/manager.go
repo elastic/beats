@@ -8,7 +8,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -48,14 +47,14 @@ func (n *OtelManager) Stop() {}
 
 // Enabled returns false because many places inside beats call manager.Enabled() for various purposes
 // Returning true might lead to side effects.
-func (n *OtelManager) Enabled() bool                         { return false }
-func (n *OtelManager) AgentInfo() client.AgentInfo           { return client.AgentInfo{} }
-func (n *OtelManager) Start() error                          { return nil }
-func (n *OtelManager) CheckRawConfig(cfg *config.C) error    { return nil }
-func (n *OtelManager) RegisterAction(action client.Action)   {}
-func (n *OtelManager) UnregisterAction(action client.Action) {}
-func (n *OtelManager) SetPayload(map[string]interface{})     {}
-func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filename string, contentType string, hook client.DiagnosticHook) {
+func (n *OtelManager) Enabled() bool                             { return false }
+func (n *OtelManager) AgentInfo() management.AgentInfo           { return management.AgentInfo{} }
+func (n *OtelManager) Start() error                              { return nil }
+func (n *OtelManager) CheckRawConfig(cfg *config.C) error        { return nil }
+func (n *OtelManager) RegisterAction(action management.Action)   {}
+func (n *OtelManager) UnregisterAction(action management.Action) {}
+func (n *OtelManager) SetPayload(map[string]interface{})         {}
+func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filename string, contentType string, hook management.DiagnosticHook) {
 	if n.ext != nil {
 		n.ext.RegisterDiagnosticHook(n.receiverName, description, filename, contentType, hook)
 	}
