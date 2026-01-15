@@ -525,9 +525,9 @@
                         - name: disk_total
                           type: alias
                           path: beat.stats.apm_server.sampling.tail.storage.disk_total
-                        - name: disk_usage_threshold
+                        - name: disk_usage_threshold_pct
                           type: alias
-                          path: beat.stats.apm_server.sampling.tail.storage.disk_usage_threshold
+                          path: beat.stats.apm_server.sampling.tail.storage.disk_usage_threshold_pct
                 - name: transactions_dropped
                   type: alias
                   path: beat.stats.apm_server.sampling.transactions_dropped

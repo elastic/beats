@@ -394,8 +394,8 @@
                       type: long
                     - name: disk_total
                       type: long
-                    - name: disk_usage_threshold
-                      type: long
+                    - name: disk_usage_threshold_pct
+                      type: float
             - name: transactions_dropped
               type: long
         - name: server

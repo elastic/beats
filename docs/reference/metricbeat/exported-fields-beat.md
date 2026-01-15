@@ -767,10 +767,10 @@ Beat module
     alias to: beat.stats.apm_server.sampling.tail.storage.disk_total
 
 
-**`beats_stats.apm-server.sampling.tail.storage.disk_usage_threshold`**
+**`beats_stats.apm-server.sampling.tail.storage.disk_usage_threshold_pct`**
 :   type: alias
 
-    alias to: beat.stats.apm_server.sampling.tail.storage.disk_usage_threshold
+    alias to: beat.stats.apm_server.sampling.tail.storage.disk_usage_threshold_pct
 
 
 **`beats_stats.apm-server.sampling.transactions_dropped`**
@@ -2069,8 +2069,8 @@ Beat stats
 :   type: long
 
 
-**`beat.stats.apm_server.sampling.tail.storage.disk_usage_threshold`**
-:   type: long
+**`beat.stats.apm_server.sampling.tail.storage.disk_usage_threshold_pct`**
+:   type: float
 
 
 **`beat.stats.apm_server.sampling.transactions_dropped`**

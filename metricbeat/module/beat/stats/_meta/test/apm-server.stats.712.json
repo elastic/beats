@@ -267,7 +267,7 @@
                     "storage_limit": 0,
                     "disk_used": 107374182400,
                     "disk_total": 214748364800,
-                    "disk_usage_threshold": 80
+                    "disk_usage_threshold_pct": 80.2
                 }
             },
             "transactions_dropped": 0
