@@ -7,6 +7,7 @@ package otel
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"sync"
@@ -83,6 +84,10 @@ type TraceConfig struct {
 	Unredacted []string `config:"unredacted"`
 }
 
+// redactionReplacement is a string that can replace redacted values.
+// Uses no characters that would require encoding in a URL.
+const redactionReplacement = "REDACTED"
+
 var _ http.RoundTripper = (*ExtraSpanAttribsRoundTripper)(nil)
 
 func NewExtraSpanAttribsRoundTripper(next http.RoundTripper, traceCfg *TraceConfig) *ExtraSpanAttribsRoundTripper {
@@ -128,13 +133,50 @@ func (rt ExtraSpanAttribsRoundTripper) RoundTrip(r *http.Request) (*http.Respons
 		return resp, err
 	}
 
-	if span != nil && span.SpanContext().IsValid() && resp != nil {
-		for h := range resp.Header {
-			addHeaderAttr(span, "http.response.header.", h, resp.Header, rt.shouldRedact)
+	if span != nil && span.SpanContext().IsValid() {
+		if resp != nil {
+			for h := range resp.Header {
+				addHeaderAttr(span, "http.response.header.", h, resp.Header, rt.shouldRedact)
+			}
 		}
+
+		span.SetAttributes(attribute.StringSlice(
+			"url.full",
+			[]string{sanitizedURLString(r.URL, rt.shouldRedact)},
+		))
 	}
 
 	return resp, nil
+}
+
+func sanitizedURLString(u *url.URL, shouldRedact func(string) bool) string {
+	if u.RawQuery == "" {
+		return u.String()
+	}
+	sanitized := *u
+	sanitized.RawQuery = redactRawQuery(u.RawQuery, shouldRedact)
+	return sanitized.String()
+}
+
+func redactRawQuery(raw string, shouldRedact func(name string) bool) string {
+	replacementEnc := url.QueryEscape(redactionReplacement)
+
+	parts := strings.Split(raw, "&")
+	for i, part := range parts {
+		if part == "" {
+			continue
+		}
+
+		nameEnc, _, hasEq := strings.Cut(part, "=")
+		if hasEq {
+			name, err := url.QueryUnescape(nameEnc)
+			if err == nil && shouldRedact(name) {
+				parts[i] = nameEnc + "=" + replacementEnc
+			}
+		}
+	}
+
+	return strings.Join(parts, "&")
 }
 
 func addHeaderAttr(span trace.Span, prefix string, name string, headers http.Header, shouldRedact func(string) bool) {
