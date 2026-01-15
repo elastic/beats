@@ -9,7 +9,7 @@ trap 'ech_down' EXIT
 
 # TEMPORARY FIX: Use a fixed snapshot version until the snapshot versioning is fixed.
 # STACK_VERSION="$(./dev-tools/get_version)-SNAPSHOT"
-STACK_VERSION="9.2.4-SNAPSHOT"
+STACK_VERSION="9.2.4"
 
 ech_up $STACK_VERSION
 
