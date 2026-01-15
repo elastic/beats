@@ -312,15 +312,9 @@ func newMockCFAPIServer(apps []mockCFApp) *mockCFAPIServer {
 	mux.HandleFunc("/v2/info", func(w http.ResponseWriter, r *http.Request) {
 		serverURL := "http://" + r.Host
 		info := map[string]any{
-			"name":                     "mock-cf",
-			"build":                    "mock-1.0.0",
-			"support":                  serverURL,
-			"version":                  2,
-			"authorization_endpoint":   serverURL,
-			"token_endpoint":           serverURL,
-			"doppler_logging_endpoint": "wss://" + r.Host,
-			"routing_endpoint":         serverURL + "/routing",
-			"logging_endpoint":         "wss://" + r.Host,
+			"name":                   "mock-cf",
+			"authorization_endpoint": serverURL,
+			"token_endpoint":         serverURL,
 		}
 		w.Header().Set("Content-Type", "application/json")
 		mustEncode(w, info)
@@ -329,12 +323,9 @@ func newMockCFAPIServer(apps []mockCFApp) *mockCFAPIServer {
 	// OAuth token endpoint
 	mux.HandleFunc("/oauth/token", func(w http.ResponseWriter, r *http.Request) {
 		token := map[string]any{
-			"access_token":  "mock-access-token-" + uuid.Must(uuid.NewV4()).String(),
-			"token_type":    "bearer",
-			"expires_in":    3600,
-			"refresh_token": "mock-refresh-token",
-			"scope":         "cloud_controller.admin_read_only doppler.firehose",
-			"jti":           uuid.Must(uuid.NewV4()).String(),
+			"access_token": "mock-access-token-" + uuid.Must(uuid.NewV4()).String(),
+			"token_type":   "bearer",
+			"expires_in":   3600,
 		}
 		w.Header().Set("Content-Type", "application/json")
 		mustEncode(w, token)
@@ -358,42 +349,7 @@ func newMockCFAPIServer(apps []mockCFApp) *mockCFAPIServer {
 		}
 
 		// cfclient expects inline space and org data when inline-relations-depth=2
-		response := map[string]any{
-			"metadata": map[string]any{
-				"guid":       app.GUID,
-				"created_at": "2023-01-01T00:00:00Z",
-				"updated_at": "2023-01-01T00:00:00Z",
-			},
-			"entity": map[string]any{
-				"name":       app.Name,
-				"space_guid": app.SpaceGUID,
-				"space_url":  "/v2/spaces/" + app.SpaceGUID,
-				// Inline space data (for inline-relations-depth >= 1)
-				"space": map[string]any{
-					"metadata": map[string]any{
-						"guid":       app.SpaceGUID,
-						"created_at": "2023-01-01T00:00:00Z",
-						"updated_at": "2023-01-01T00:00:00Z",
-					},
-					"entity": map[string]any{
-						"name":              app.SpaceName,
-						"organization_guid": app.OrgGUID,
-						"organization_url":  "/v2/organizations/" + app.OrgGUID,
-						// Inline org data (for inline-relations-depth >= 2)
-						"organization": map[string]any{
-							"metadata": map[string]any{
-								"guid":       app.OrgGUID,
-								"created_at": "2023-01-01T00:00:00Z",
-								"updated_at": "2023-01-01T00:00:00Z",
-							},
-							"entity": map[string]any{
-								"name": app.OrgName,
-							},
-						},
-					},
-				},
-			},
-		}
+		response := cfAppResponse(app)
 		w.Header().Set("Content-Type", "application/json")
 		mustEncode(w, response)
 	})
@@ -408,6 +364,41 @@ func (m *mockCFAPIServer) URL() string {
 
 func (m *mockCFAPIServer) Close() {
 	m.server.Close()
+}
+
+func cfMetadata(guid string) map[string]any {
+	return map[string]any{"guid": guid}
+}
+
+func cfOrgEntity(app mockCFApp) map[string]any {
+	return map[string]any{
+		"metadata": cfMetadata(app.OrgGUID),
+		"entity": map[string]any{
+			"name": app.OrgName,
+		},
+	}
+}
+
+func cfSpaceEntity(app mockCFApp) map[string]any {
+	return map[string]any{
+		"metadata": cfMetadata(app.SpaceGUID),
+		"entity": map[string]any{
+			"name":              app.SpaceName,
+			"organization_guid": app.OrgGUID,
+			"organization":      cfOrgEntity(app),
+		},
+	}
+}
+
+func cfAppResponse(app mockCFApp) map[string]any {
+	return map[string]any{
+		"metadata": cfMetadata(app.GUID),
+		"entity": map[string]any{
+			"name":       app.Name,
+			"space_guid": app.SpaceGUID,
+			"space":      cfSpaceEntity(app),
+		},
+	}
 }
 
 type CFEvent struct {
