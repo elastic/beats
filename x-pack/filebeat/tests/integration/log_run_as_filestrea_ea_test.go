@@ -9,7 +9,6 @@
 package integration
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -112,7 +111,7 @@ func TestLogAsFilestreamEA(t *testing.T) {
 		if ev.Input.Type != "log" {
 			t.Errorf("Event %d expecting type 'log', got %q", i, ev.Input.Type)
 		}
-		if !slices.Contains(ev.Tags, "take-over") {
+		if !slices.Contains(ev.Tags, "take_over") {
 			t.Errorf("Event %d does not contain 'take_over' tag", i)
 		}
 	}
@@ -128,7 +127,7 @@ func TestContainerAsFilestreamEA(t *testing.T) {
 	}
 
 	logfile := filepath.Join(logDir, "container.log")
-	writeDockerJSONLog(t, logfile, eventsCount)
+	integration.WriteDockerJSONLog(t, logfile, eventsCount, "stdout")
 
 	output := proto.UnitExpected{
 		Id:             "output-unit",
@@ -224,26 +223,4 @@ type BeatEvent struct {
 		} `json:"file"`
 	} `json:"log"`
 	Tags []string
-}
-
-func writeDockerJSONLog(t *testing.T, path string, events int) {
-	t.Helper()
-
-	file, err := os.Create(path)
-	if err != nil {
-		t.Fatalf("cannot create docker log file: %s", err)
-	}
-	defer file.Close()
-
-	writer := bufio.NewWriter(file)
-	for i := range events {
-		timestamp := time.Now().UTC().Add(time.Duration(i) * time.Millisecond).Format(time.RFC3339Nano)
-		if _, err := fmt.Fprintf(writer, `{"log":"message %d\n","stream":"stdout","time":"%s"}`+"\n", i, timestamp); err != nil {
-			t.Fatalf("cannot write docker log line: %s", err)
-		}
-	}
-
-	if err := writer.Flush(); err != nil {
-		t.Fatalf("cannot flush docker log file: %s", err)
-	}
 }

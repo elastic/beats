@@ -22,7 +22,6 @@
 package integration
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -131,7 +130,7 @@ func TestContainerAsFilestreamRunsContainerInput(t *testing.T) {
 	}
 
 	logfile := filepath.Join(logDir, "container.log")
-	writeDockerJSONLog(t, logfile, eventsCount)
+	integration.WriteDockerJSONLog(t, logfile, eventsCount, "stdout")
 
 	cfg := getConfig(
 		t,
@@ -274,28 +273,6 @@ func TestLogAsFilestreamCanMigrateState(t *testing.T) {
 	integration.WriteLogFile(t, logfile, 10, true)
 	// Ensure only the new events are ingested
 	filebeat.WaitPublishedEvents(15*time.Second, 60)
-}
-
-func writeDockerJSONLog(t *testing.T, path string, events int) {
-	file, err := os.Create(path)
-	if err != nil {
-		t.Fatalf("cannot create docker log file: %s", err)
-	}
-	defer file.Close()
-
-	now := time.Now().UTC()
-	writer := bufio.NewWriter(file)
-	for i := range events {
-		timestamp := now.Add(time.Duration(i) * time.Millisecond).Format(time.RFC3339Nano)
-		_, err := fmt.Fprintf(writer, `{"log":"message %d\n","stream":"stdout","time":"%s"}`+"\n", i, timestamp)
-		if err != nil {
-			t.Fatalf("cannot write docker log line: %s", err)
-		}
-	}
-
-	if err := writer.Flush(); err != nil {
-		t.Fatalf("cannot flush docker log file: %s", err)
-	}
 }
 
 type BeatEvent struct {
