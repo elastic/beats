@@ -71,24 +71,14 @@ func TestUserAgentString(t *testing.T) {
 		{
 			name: "unmanaged-privileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
-<<<<<<< HEAD
-				Manager: testManager{isEnabled: true, isUnpriv: false, mgmtMode: proto.AgentManagedMode_STANDALONE}},
-			expectedComments: []string{"Standalone"},
-=======
 				Manager: testManager{isEnabled: true, isUnpriv: false, mgmtMode: management.AgentManagedMode_STANDALONE}},
-			expectedComments: []string{"Unmanaged"},
->>>>>>> adc57ca64 (Remove use of github.com/elastic/elastic-agent-client from OSS Beats (#48353))
+			expectedComments: []string{"Standalone"},
 		},
 		{
 			name: "unmanaged-unprivileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
-<<<<<<< HEAD
-				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: proto.AgentManagedMode_STANDALONE}},
-			expectedComments: []string{"Standalone", "Unprivileged"},
-=======
 				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: management.AgentManagedMode_STANDALONE}},
-			expectedComments: []string{"Unmanaged", "Unprivileged"},
->>>>>>> adc57ca64 (Remove use of github.com/elastic/elastic-agent-client from OSS Beats (#48353))
+			expectedComments: []string{"Standalone", "Unprivileged"},
 		},
 		{
 			name: "management-disabled",
