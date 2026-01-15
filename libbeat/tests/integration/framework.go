@@ -1253,8 +1253,17 @@ func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
 	t.Helper()
 
 	path := filepath.Join(b.TempDir(), "output-*.ndjson")
+
+	// Ensure the output file exists. This avoid us calling assert.Eventually
+	// inside an assert.Eventually, which causes the test to fail with a generic
+	// "Condition never satisfied" message.
+	if got := b.CountFileLines(path); got == events {
+		return
+	}
+
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
-		assert.Equal(collect, events, b.CountFileLines(path))
+		got := b.CountFileLines(path)
+		assert.Equalf(collect, events, got, "expecting %d events, got %d", events, got)
 	}, timeout, 200*time.Millisecond)
 }
 
