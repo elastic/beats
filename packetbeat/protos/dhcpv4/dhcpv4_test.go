@@ -72,6 +72,8 @@ var (
 		// options added to test
 		0x02, 0x04, 0x00, 0x00, 0x1c, 0x20, // OptionTimeOffset
 		0x03, 0x4 * 2, 0xc0, 0xa8, 0x01, 0x01, 0xc0, 0xa8, 0x01, 0x02, // Router
+		// VIVC, RFC3925
+		0x7c, 0x0b, 0x00, 0x00, 0x00, 0x0c, 0x06, 0xde, 0xad, 0xbe, 0xef, 0x00, 0x00,
 		// end of Options
 		0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -184,7 +186,7 @@ func TestParseDHCPACK(t *testing.T) {
 			"source": mapstr.M{
 				"ip":    "192.168.0.1",
 				"port":  67,
-				"bytes": 316,
+				"bytes": 329,
 			},
 			"destination": mapstr.M{
 				"ip":   "192.168.0.10",
@@ -197,7 +199,7 @@ func TestParseDHCPACK(t *testing.T) {
 			"server": mapstr.M{
 				"ip":    "192.168.0.1",
 				"port":  67,
-				"bytes": 316,
+				"bytes": 329,
 			},
 			"event": mapstr.M{
 				"category": []string{"network"},
@@ -211,7 +213,7 @@ func TestParseDHCPACK(t *testing.T) {
 				"direction":    "unknown",
 				"transport":    "udp",
 				"protocol":     "dhcpv4",
-				"bytes":        316,
+				"bytes":        329,
 				"community_id": "1:VbRSZnvQqvLiQRhYHLrdVI17sLQ=",
 			},
 			"related": mapstr.M{
@@ -234,6 +236,12 @@ func TestParseDHCPACK(t *testing.T) {
 					"server_identifier":         "192.168.0.1",
 					"subnet_mask":               "255.255.255.0",
 					"utc_time_offset_sec":       7200,
+					"vendor_identifying_options": []any{
+						mapstr.M{
+							"data": "deadbeef0000",
+							"id":   12,
+						},
+					},
 					"router": []string{
 						"192.168.1.1",
 						"192.168.1.2",
@@ -257,13 +265,13 @@ func assertEqual(t testing.TB, expected, actual beat.Event) {
 	assert.EqualValues(t, normalizeEvent(t, expected), normalizeEvent(t, actual))
 }
 
-func normalizeEvent(t testing.TB, event beat.Event) interface{} {
+func normalizeEvent(t testing.TB, event beat.Event) any {
 	data, err := json.Marshal(event)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	var out interface{}
+	var out any
 	if err := json.Unmarshal(data, &out); err != nil {
 		t.Fatal(err)
 	}

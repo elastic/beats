@@ -76,6 +76,7 @@ func optionsToMap(dhcp *dhcpv4.DHCPv4) (mapstr.M, error) {
 		opts.Put("dns_servers", dnsServerStr)
 	}
 
+	// see RFC3925
 	if vivc := dhcp.VIVC(); vivc != nil {
 		var subOptions []mapstr.M
 		for _, subOpt := range vivc {
