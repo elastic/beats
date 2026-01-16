@@ -267,11 +267,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]19
 - Add support for DPoP authentication for the CEL and HTTP JSON inputs. {pull}47441[47441]
 - Log unpublished event count and exit publish loop on input context cancellation. {issue}47717[47717] {pull}47730[47730]
-- Add proxy support to GCP Pub/Sub input. {pull}44892[44892]
-- Add Fleet status updating to Azure Blob Storage input. {issue}44268[44268] {pull}44945[44945]
-- Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
-- Segregated `max_workers` from `batch_size` in the azure-blob-storage input. {issue}44491[44491] {pull}44992[44992]
-- Add support for relationship expansion to EntraID entity analytics provider. {issue}43324[43324] {pull}44761[44761]
 - Added support for specifying custom content-types and encodings in gcs input. {issue}44628[44628] {pull}45088[45088]
 
 *Auditbeat*
