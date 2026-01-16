@@ -20,7 +20,6 @@
 package procs
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -120,7 +119,7 @@ func createFakeDirectoryStructure(prefix string, files []testProcFile) error {
 		}
 
 		if !file.isLink {
-			err = ioutil.WriteFile(filepath.Join(prefix, file.path),
+			err = os.WriteFile(filepath.Join(prefix, file.path),
 				[]byte(file.contents), 0o644)
 			if err != nil {
 				return err
