@@ -15,8 +15,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -77,12 +77,12 @@ func (m *testManager) Start() error {
 func (m *testManager) Stop()                               { m.stopped = true }
 func (m *testManager) SetPayload(map[string]any)           {}
 func (m *testManager) Enabled() bool                       { return true }
-func (m *testManager) AgentInfo() client.AgentInfo         { return client.AgentInfo{} }
+func (m *testManager) AgentInfo() management.AgentInfo     { return management.AgentInfo{} }
 func (m *testManager) SetStopCallback(func())              {}
 func (m *testManager) CheckRawConfig(*agentconfig.C) error { return nil }
-func (m *testManager) RegisterAction(client.Action)        {}
-func (m *testManager) UnregisterAction(client.Action)      {}
-func (m *testManager) RegisterDiagnosticHook(string, string, string, string, client.DiagnosticHook) {
+func (m *testManager) RegisterAction(management.Action)    {}
+func (m *testManager) UnregisterAction(management.Action)  {}
+func (m *testManager) RegisterDiagnosticHook(string, string, string, string, management.DiagnosticHook) {
 }
 
 // TestOsquerybeatStatusReporting_Lifecycle tests the full lifecycle status reporting
