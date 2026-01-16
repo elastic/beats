@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"testing"
 	"time"
 
@@ -117,7 +118,7 @@ func TestLogAsFilestreamEA(t *testing.T) {
 	}
 }
 
-func TestContainerAsFilestreamEA(t *testing.T) {
+func TestLogAsFilestreamContainerEA(t *testing.T) {
 	filebeat := NewFilebeat(t)
 
 	eventsCount := 50
@@ -126,8 +127,10 @@ func TestContainerAsFilestreamEA(t *testing.T) {
 		t.Fatalf("cannot create container logs directory: %s", err)
 	}
 
-	logfile := filepath.Join(logDir, "container.log")
-	integration.WriteDockerJSONLog(t, logfile, eventsCount, "stdout")
+	stdoutFile := filepath.Join(logDir, "container-stdout.log")
+	stderrFile := filepath.Join(logDir, "container-stderr.log")
+	integration.WriteDockerJSONLog(t, stdoutFile, eventsCount, "stdout")
+	integration.WriteDockerJSONLog(t, stderrFile, eventsCount, "stderr")
 
 	output := proto.UnitExpected{
 		Id:             "output-unit",
@@ -200,14 +203,36 @@ func TestContainerAsFilestreamEA(t *testing.T) {
 		"Filestream input did not start",
 	)
 
-	events := integration.GetEventsFromFileOutput[BeatEvent](filebeat, eventsCount, true)
+	events := integration.GetEventsFromFileOutput[BeatEvent](filebeat, eventsCount*2, true)
+	streamCounts := map[string]int{
+		"stdout": 0,
+		"stderr": 0,
+	}
 	for i, ev := range events {
 		if ev.Input.Type != "container" {
 			t.Errorf("Event %d expecting type 'container', got %q", i, ev.Input.Type)
 		}
+
+		if !strings.HasPrefix(ev.Message, "message ") {
+			t.Errorf("Event %d: unexpected message %q", i, ev.Message)
+		}
+
+		if _, ok := streamCounts[ev.Stream]; !ok {
+			t.Errorf("Event %d: unexpected stream %q", i, ev.Stream)
+		} else {
+			streamCounts[ev.Stream]++
+		}
+
 		if !slices.Contains(ev.Tags, "take_over") {
 			t.Errorf("Event %d does not contain 'take_over' tag. %v", i, ev.Tags)
 		}
+	}
+
+	if streamCounts["stdout"] != eventsCount {
+		t.Errorf("expecting %d events from stdout, got %d", eventsCount, streamCounts["stdout"])
+	}
+	if streamCounts["stderr"] != eventsCount {
+		t.Errorf("expecting %d events from stderr, got %d", eventsCount, streamCounts["stderr"])
 	}
 }
 
