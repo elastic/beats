@@ -21,10 +21,11 @@ package node
 
 import (
 	"encoding/base64"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -42,7 +43,7 @@ func TestFetch(t *testing.T) {
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			response, err := ioutil.ReadFile(f)
+			response, err := os.ReadFile(f)
 			require.NoError(t, err)
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -95,10 +96,52 @@ func TestFetch(t *testing.T) {
 				w.Header().Set("Content-Type", "application/json;")
 				w.Write([]byte([]byte("{}")))
 
+<<<<<<< HEAD
 			case "/":
 				apiKey := r.Header.Get("Authorization")
 				if apiKey != expectedHeader {
 					t.Errorf("expected api key to be %s but got %s", expectedHeader, apiKey)
+=======
+				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.RequestURI {
+					case "/_nodes/_local":
+						apiKey := r.Header.Get("Authorization")
+						if apiKey != expectedHeader {
+							t.Errorf("expected api key to be %s but got %s", expectedHeader, apiKey)
+						}
+						w.WriteHeader(200)
+						w.Header().Set("Content-Type", "application/json;")
+						w.Write([]byte([]byte("{}")))
+
+					case "/":
+						apiKey := r.Header.Get("Authorization")
+						if apiKey != expectedHeader {
+							t.Errorf("expected api key to be %s but got %s", expectedHeader, apiKey)
+						}
+
+						w.WriteHeader(200)
+						w.Header().Set("Content-Type", "application/json")
+						w.Write([]byte("{}"))
+
+					default:
+						t.FailNow()
+					}
+
+				}))
+				defer server.Close()
+
+				serverURL := server.URL
+
+				// for an arbitrary request, try configuring with an extra trailing slash
+				if strings.HasPrefix(tt.name, "from config") {
+					serverURL = server.URL + "/"
+				}
+
+				config := map[string]any{
+					"module":     "elasticsearch",
+					"metricsets": []string{"node"},
+					"hosts":      []string{serverURL},
+>>>>>>> 6638446b3 ([Stack Monitoring] Trim Trailing `/` After Host URI (#48430))
 				}
 
 				w.WriteHeader(200)
