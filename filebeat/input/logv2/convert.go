@@ -99,7 +99,6 @@ var logInputExclusiveKeys = []string{
 	"close_removed",
 	"close_renamed",
 	"close_timeout",
-	"docker-json",
 	"exclude_files",
 	"harvester_buffer_size",
 	"json",
@@ -335,7 +334,7 @@ func handleJSON(logger *logp.Logger, cfg *config.C, parsers *[]any) error {
 func handleContainerInput(cfg, newCfg *config.C, parsers *[]any) error {
 	inputType, err := cfg.String("type", -1)
 	if err != nil {
-		return fmt.Errorf("cannot read 'type' as string: %s", err)
+		return fmt.Errorf("cannot read 'type' as string: %w", err)
 	}
 
 	if inputType != "container" {
