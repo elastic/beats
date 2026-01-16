@@ -204,6 +204,12 @@ func startHarvester(
 ) func(context.Context) error {
 	srcID := hg.identifier.ID(src)
 	if !restart && hg.readers.hasID(srcID) {
+		// A harvester is already running for this source, no need to start another.
+		// This check must happen here, before task.Group.Go spawns a goroutine.
+		// When harvester_limit is set, the spawned goroutine blocks on a semaphore
+		// until a slot is available. Without this early check, repeated file events
+		// would spawn goroutines that wait on the semaphore only to discover (after
+		// acquiring it) that a harvester is already running, causing a goroutine leak.
 		return nil
 	}
 

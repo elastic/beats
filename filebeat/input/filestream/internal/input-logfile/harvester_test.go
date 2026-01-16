@@ -24,6 +24,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -394,6 +395,60 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		wg.Wait()
 
 		require.Equal(t, 2, mockHarvester.getRunCount())
+	})
+
+	t.Run("assert repeated start for same source does not leak goroutines with harvester_limit", func(t *testing.T) {
+		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
+		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		// Set harvester_limit to 1 - this creates the semaphore that caused the leak
+		hg.tg = task.NewGroup(1, time.Second, logp.L(), "")
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+
+		goroutinesChecker := resources.NewGoroutinesChecker()
+
+		// Start the first harvester - this should spawn exactly 1 goroutine
+		hg.Start(inputCtx, source)
+
+		// Wait for the harvester to be running
+		require.EventuallyWithT(t,
+			func(c *assert.CollectT) {
+				assert.Equal(c, 1, mockHarvester.getRunCount())
+			},
+			5*time.Second,
+			10*time.Millisecond,
+			"harvester should be running")
+
+		// Record goroutine count after first harvester starts
+		goroutinesChecker.WaitUntilIncreased(1)
+		afterFirstStart := runtime.NumGoroutine()
+
+		// Simulate repeated file events by calling Start multiple times
+		const repeatCount = 10
+		for range repeatCount {
+			hg.Start(inputCtx, source)
+		}
+
+		// Give time for any leaked goroutines to be spawned
+		// Check that goroutine count hasn't grown significantly
+		// With the fix: should still be ~afterFirstStart (no new goroutines)
+		// Without the fix: would be afterFirstStart + repeatCount (goroutines waiting on semaphore)
+		assert.Never(t, func() bool {
+			currentGoroutines := runtime.NumGoroutine()
+			goroutineGrowth := currentGoroutines - afterFirstStart
+			return goroutineGrowth > 2
+		}, 50*time.Millisecond, 10*time.Millisecond, "goroutine count should not grow significantly after repeated Start calls")
+
+		// Cleanup
+		hg.Stop(source)
+		require.NoError(t, hg.StopHarvesters())
+
+		// Verify only 1 harvester actually ran
+		require.Equal(t, 1, mockHarvester.getRunCount(),
+			"only one harvester should have run despite multiple Start calls")
+
+		// Ensure all goroutines are cleaned up
+		_, err := goroutinesChecker.WaitUntilOriginalCount()
+		require.NoError(t, err, "all goroutines should be cleaned up")
 	})
 }
 
