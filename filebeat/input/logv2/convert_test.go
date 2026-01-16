@@ -97,6 +97,52 @@ paths:
 }
 `,
 		},
+		"container input and multiline in correct order": {
+			logYamlCfg: `
+type: container
+id: container-id
+paths:
+ - /var/log/containers/*.log
+multiline.type: count
+`,
+			expectedJsonCfg: `
+{
+  "file_identity": {
+    "native": null
+  },
+  "id": "container-id",
+  "parsers": [
+    {
+      "container": {
+        "format": "auto",
+        "stream": "all"
+      }
+    },
+    {
+      "multiline": {
+        "type": "count"
+      }
+    }
+  ],
+  "paths": [
+    "/var/log/containers/*.log"
+  ],
+  "prospector": {
+    "scanner": {
+      "fingerprint": {
+        "enabled": false
+      },
+      "symlinks": true
+    }
+  },
+  "take_over": {
+    "enabled": true
+  },
+  "type": "filestream"
+}
+`,
+		},
+
 		"file_identity is not set": {
 			logYamlCfg: `
 type: log
@@ -331,14 +377,14 @@ parsers:
 		  "id": "foo",
           "parsers": [
             {
-              "multiline": {
-                "type": "count"
-              }
-            },
-            {
               "ndjson": {
                 "expand_keys": true,
                 "target": "json"
+              }
+            },
+            {
+              "multiline": {
+                "type": "count"
               }
             },
             {

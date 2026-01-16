@@ -411,7 +411,8 @@ func copyParsers(cfg, parsersCfg *config.C, offset int) error {
 // and finally copies any other parsers, if any, at the end of the array.
 func handleParsers(logger *logp.Logger, cfg, newCfg *config.C) error {
 	parsers := []any{}
-	if err := handleMultiline(logger, cfg, &parsers); err != nil {
+
+	if err := handleContainerInput(cfg, newCfg, &parsers); err != nil {
 		return err
 	}
 
@@ -419,7 +420,7 @@ func handleParsers(logger *logp.Logger, cfg, newCfg *config.C) error {
 		return err
 	}
 
-	if err := handleContainerInput(cfg, newCfg, &parsers); err != nil {
+	if err := handleMultiline(logger, cfg, &parsers); err != nil {
 		return err
 	}
 
