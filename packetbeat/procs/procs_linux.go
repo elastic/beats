@@ -235,7 +235,7 @@ func hexToIPPort(str []byte, ipv6 bool) (net.IP, uint16, error) {
 		return nil, 0, err
 	}
 
-	return ip, uint16(port), nil //nolint: gosec // ParseInt converts to u16
+	return ip, uint16(port), nil
 }
 
 func hexToIP(word string, ipv6 bool) (net.IP, error) {
