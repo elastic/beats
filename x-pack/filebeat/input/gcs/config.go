@@ -41,12 +41,9 @@ type config struct {
 	ProjectId string `config:"project_id" validate:"required"`
 	// Auth - Defines the authentication mechanism to be used for accessing the gcs bucket.
 	Auth authConfig `config:"auth"`
-<<<<<<< HEAD
-=======
 	// BatchSize - Defines the maximum number of objects that will be fetched from the bucket in a single request.
 	// This value can be set globally or overridden at the bucket level.
 	BatchSize int `config:"batch_size"`
->>>>>>> 045d0d83a ([filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#45088))
 	// MaxWorkers - Defines the maximum number of go routines that will be spawned.
 	// This value can be set globally or overridden at the bucket level.
 	MaxWorkers int `config:"max_workers" validate:"max=5000"`
@@ -83,17 +80,6 @@ type config struct {
 
 // bucket contains the config for each specific object storage bucket in the root account
 type bucket struct {
-<<<<<<< HEAD
-	Name                     string               `config:"name" validate:"required"`
-	MaxWorkers               *int                 `config:"max_workers" validate:"max=5000"`
-	Poll                     *bool                `config:"poll"`
-	PollInterval             *time.Duration       `config:"poll_interval"`
-	ParseJSON                *bool                `config:"parse_json"`
-	FileSelectors            []fileSelectorConfig `config:"file_selectors"`
-	ReaderConfig             readerConfig         `config:",inline"`
-	TimeStampEpoch           *int64               `config:"timestamp_epoch"`
-	ExpandEventListFromField string               `config:"expand_event_list_from_field"`
-=======
 	// Name - Defines the name of the bucket in Google Cloud Storage.
 	Name string `config:"name" validate:"required"`
 	// BatchSize - Defines the maximum number of objects that will be fetched from the bucket in a single request.
@@ -125,7 +111,6 @@ type bucket struct {
 	// This is useful when the event is a list of events, and you want to expand it into separate events.
 	// This value overrides the global ExpandEventListFromField setting.
 	ExpandEventListFromField string `config:"expand_event_list_from_field"`
->>>>>>> 045d0d83a ([filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#45088))
 }
 
 // fileSelectorConfig helps filter out GCS objects based on a regex pattern.

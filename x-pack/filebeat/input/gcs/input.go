@@ -86,8 +86,6 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	if b.MaxWorkers == nil {
 		b.MaxWorkers = &cfg.MaxWorkers
 	}
-<<<<<<< HEAD
-=======
 
 	if b.BatchSize == nil && cfg.BatchSize != 0 {
 		// If the global batch size is set, use it
@@ -99,7 +97,6 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 		b.BatchSize = b.MaxWorkers
 	}
 
->>>>>>> 045d0d83a ([filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#45088))
 	if b.Poll == nil {
 		b.Poll = &cfg.Poll
 	}
@@ -151,7 +148,8 @@ func (input *gcsInput) Test(src cursor.Source, ctx v2.TestContext) error {
 }
 
 func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
-	cursor cursor.Cursor, publisher cursor.Publisher) error {
+	cursor cursor.Cursor, publisher cursor.Publisher,
+) error {
 	st := newState()
 	currentSource := src.(*Source)
 

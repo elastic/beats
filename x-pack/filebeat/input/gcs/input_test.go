@@ -595,9 +595,6 @@ func Test_StorageClient(t *testing.T) {
 			isError:     errors.New("requires value >= 1.1 accessing 'retry.backoff_multiplier'"),
 		},
 		{
-<<<<<<< HEAD
-			name: "ReadCSV",
-=======
 			name: "BatchSizeGlobal",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
@@ -643,7 +640,6 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadCSVRootLevel",
->>>>>>> 045d0d83a ([filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#45088))
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
