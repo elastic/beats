@@ -17,7 +17,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
+=======
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -126,7 +129,11 @@ type readerConfig struct {
 	// Parsers contains the configuration for different content parsers (e.g., JSON, XML, CSV).
 	Parsers parser.Config `config:",inline"`
 	// Decoding specifies options for decoding the content, such as compression.
+<<<<<<< HEAD
 	Decoding decoder.Config `config:"decoding"`
+=======
+	Decoding decoderConfig `config:"decoding"`
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 	// ContentType hints the MIME type of the object content, aiding in parsing.
 	ContentType string `config:"content_type"`
 	// Encoding specifies the character encoding of the object content (e.g., "UTF-8", "gzip").

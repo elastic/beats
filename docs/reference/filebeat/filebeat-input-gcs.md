@@ -2,8 +2,11 @@
 navigation_title: "Google Cloud Storage"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-gcs.html
+<<<<<<< HEAD
 applies_to:
   stack: ga
+=======
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 ---
 
 # Google Cloud Storage Input [filebeat-input-gcs]
@@ -39,24 +42,41 @@ filebeat.inputs:
   parse_json: true
   buckets:
   - name: gcs-test-new
+<<<<<<< HEAD
     batch_size: 100 <1>
+=======
+    batch_size: 100
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
     max_workers: 3
     poll: true
     poll_interval: 15s
   - name: gcs-test-old
+<<<<<<< HEAD
     batch_size: 50 <1>
+=======
+    batch_size: 50
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
     max_workers: 3
     poll: true
     poll_interval: 10s
 ```
+<<<<<<< HEAD
 1. {applies_to}`stack: ga 9.1.0`
 
 **Explanation :** This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. Each of these buckets have their own attributes such as `name`, `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes-gcs). For now lets try to understand how this config works.
+=======
+
+**Explanation :** This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. Each of these buckets have their own attributes such as `name`, `batch_size`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes-gcs). For now lets try to understand how this config works.
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 
 For google cloud storage input to identify the files it needs to read and process, it will require the bucket names to be specified. We can have as many buckets as we deem fit. We are also able to configure the attributes `max_workers`, `poll` and `poll_interval` at the root level, which will then be applied to all buckets which do not specify any of these attributes explicitly.
 
 ::::{note}
+<<<<<<< HEAD
 If the attributes `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval` are specified at the root level, these can still be overridden at the bucket level with different values, thus offering extensive flexibility and customization. Examples [below](#bucket-overrides) show this behavior.
+=======
+If the attributes `batch_size`, `max_workers`, `poll` and `poll_interval` are specified at the root level, these can still be overridden at the bucket level with different values, thus offering extensive flexibility and customization. Examples [below](#bucket-overrides) show this behavior.
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 ::::
 
 
@@ -140,16 +160,28 @@ As we can see from the response above, the `message` field contains the original
 5. **gcs.storage.object.content_type** : Content type of the file/object. You can find the supported content types [here](#supported-types-gcs) .
 6. **gcs.storage.object.json_data** :  Objectified json file data, representing the contents of the file.
 
+<<<<<<< HEAD
 ## Supported Attributes [supported-attributes-gcs]
 
 Now let’s explore the configuration attributes a bit more elaborately.
 
+=======
+Now let’s explore the configuration attributes a bit more elaborately.
+
+$$$supported-attributes-gcs$$$
+**Supported Attributes :-**
+
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 1. [project_id](#attrib-project-id)
 2. [auth.credentials_json.account_key](#attrib-auth-credentials-json)
 3. [auth.credentials_file.path](#attrib-auth-credentials-file)
 4. [buckets](#attrib-buckets)
 5. [name](#attrib-bucket-name)
+<<<<<<< HEAD
 6. [batch_size](#attrib-batch_size-gcs) {applies_to}`stack: ga 9.1.0`
+=======
+6. [batch_size](#attrib-batch_size-gcs)
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 7. [max_workers](#attrib-max_workers-gcs)
 8. [poll](#attrib-poll-gcs)
 9. [poll_interval](#attrib-poll_interval-gcs)
@@ -158,7 +190,11 @@ Now let’s explore the configuration attributes a bit more elaborately.
 12. [expand_event_list_from_field](#attrib-expand_event_list_from_field-gcs)
 13. [timestamp_epoch](#attrib-timestamp_epoch-gcs)
 14. [retry](#attrib-retry-gcs)
+<<<<<<< HEAD
 15. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.2.0`
+=======
+15. [custom_properties](#attrib-custom-properties)
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 
 
 ### `project_id` [attrib-project-id]
@@ -191,9 +227,12 @@ This attribute contains the details about a specific bucket like `name`, `max_wo
 This is a specific subfield of a bucket. It specifies the bucket name.
 
 ### `batch_size` [attrib-batch_size-gcs]
+<<<<<<< HEAD
 ```{applies_to}
   stack: ga 9.1
 ```
+=======
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 
 This attribute specifies the `page size` for the response. In earlier versions, this value was derived from `max_workers`, but with the latest update, `batch_size` is now an independent setting. For backward compatibility, if `batch_size` is not explicitly defined, it will default to a value based on `max_workers`. This attribute can be configured at both the root and bucket levels. When defined at both levels, the bucket-level setting takes precedence.
 
@@ -202,7 +241,11 @@ This attribute specifies the `page size` for the response. In earlier versions, 
 This attribute defines the maximum number of workers (goroutines / lightweight threads) are allocated in the worker pool (thread pool) for processing jobs which read the contents of files. This attribute can be specified both at the root level of the configuration and at the bucket level. Bucket level values override the root level values if both are specified. Larger number of workers do not necessarily improve of throughput, and this should be carefully tuned based on the number of files, the size of the files being processed and resources available. Increasing `max_workers` to very high values may cause resource utilization problems and can lead to a bottleneck in processing. Usually a maximum cap of `2000` workers is recommended. A very low `max_worker` count will drastically increase the number of network calls required to fetch the objects, which can cause a bottleneck in processing.
 
 ::::{note}
+<<<<<<< HEAD
 The `batch_size` {applies_to}`stack: ga 9.1.0` and `max_workers` attributes are decoupled but functionally related. `batch_size` determines how many objects are fetched in a single API call (i.e., the pagination size), while `max_workers` controls the number of concurrent goroutines used to process the fetched objects. Although these values are independent, they should be configured thoughtfully to ensure efficient workload distribution and optimal performance. For example, setting `batch_size=100` and `max_workers=10` means each pagination request fetches `100` objects, which are then processed by `10` concurrent goroutines. The appropriate value for `max_workers` depends on factors such as the number of files to be processed, available system resources, and network bandwidth.
+=======
+The `batch_size` and `max_workers` attributes are decoupled but functionally related. `batch_size` determines how many objects are fetched in a single API call (i.e., the pagination size), while `max_workers` controls the number of concurrent goroutines used to process the fetched objects. Although these values are independent, they should be configured thoughtfully to ensure efficient workload distribution and optimal performance. For example, setting `batch_size=100` and `max_workers=10` means each pagination request fetches `100` objects, which are then processed by `10` concurrent goroutines. The appropriate value for `max_workers` depends on factors such as the number of files to be processed, available system resources, and network bandwidth.
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 ::::
 
 
@@ -377,10 +420,13 @@ filebeat.inputs:
 
 ### Custom properties [attrib-custom-properties]
 
+<<<<<<< HEAD
 ```{applies_to}
 stack: ga 9.2.0
 ```
 
+=======
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 Some object properties can be **set** or **overridden** at the input level with the help of certain configuration options. Allowing users to set or override custom object properties provides more flexibility when reading objects from a remote storage where the user might only have read access.
 
 **The supported custom properties are:**
@@ -388,11 +434,19 @@ Some object properties can be **set** or **overridden** at the input level with 
 - [`content_type`](#attrib-content-type)
 - [`encoding`](#attrib-encoding)
 
+<<<<<<< HEAD
 #### `content_type` [attrib-content-type]
 
 Use the `content_type` configuration attribute to set a user-defined content type for the object property. Setting a custom content type only sets the `content-type` property of a object if it's missing or empty. If you want to override an already existing `content-type` value, set the `override_content_type` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Container level definitions always take precedence.
 
 ##### Example configuration
+=======
+### `content_type` [attrib-content-type]
+
+Use the `content_type` configuration attribute to set a user-defined content type for the object property. Setting a custom content type only sets the `content-type` property of a object if it's missing or empty. If you want to override an already existing `content-type` value, set the `override_content_type` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Container level definitions always take precedence.
+
+### Example configuration
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 
 This is a sample configuration at root level:
 
@@ -426,11 +480,19 @@ filebeat.inputs:
     override_content_type: true
 ```
 
+<<<<<<< HEAD
 #### `encoding` [attrib-encoding]
 
 Use the `encoding` configuration attribute to set a user-defined encoding for the object property. Setting a custom encoding only sets the `encoding` property of a object if it's missing or empty. If you want to override an already existing encoding value, set the `override_encoding` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Container level definitions always take precedence.
 
 ##### Example configuration
+=======
+### `encoding` [attrib-encoding]
+
+Use the `encoding` configuration attribute to set a user-defined encoding for the object property. Setting a custom encoding only sets the `encoding` property of a object if it's missing or empty. If you want to override an already existing encoding value, set the `override_encoding` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Container level definitions always take precedence.
+
+### Example configuration
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 
 This is a sample configuration at root level:
 
@@ -468,8 +530,11 @@ filebeat.inputs:
 Custom property configurations are affected by input restrictions. For example, you can set an unsupported content-type or encoding but the input will reject it and report an error.
 ::::
 
+<<<<<<< HEAD
 ### Sample configs
 
+=======
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 $$$bucket-overrides$$$
 **The sample configs below will explain the bucket level overriding of attributes a bit further :-**
 
@@ -551,7 +616,13 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 
 ## Common input options [_common_input_options]
 
+<<<<<<< HEAD
 $$$filebeat-input-gcs-common-options$$$
+=======
+
+
+## Common options [filebeat-input-gcs-common-options]
+>>>>>>> 5ccf2d9de ([8.19](backport #45088) [filebeat][GCS] - Relax content-type restrictions along with some basic cleanup and refactor (#47966))
 
 The following configuration options are supported by all inputs.
 
