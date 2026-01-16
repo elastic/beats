@@ -95,8 +95,8 @@ func runAsFilestream(logger *logp.Logger, cfg *config.C) (bool, error) {
 
 // NewV1Input instantiates the Log input. If Log input is supposed to run as
 // Filestream, then v2.ErrUnknownInput is returned so the Filestream input
-// can be instantiated by the V2.Plugin returned by [LogPluginV2]. Otherwise
-// the Log input is instantiated.
+// can be instantiated by the V2.Plugin returned by [LogPluginV2] or
+// [ContainerPluginV2]. Otherwise the Log input is instantiated.
 func NewV1Input(
 	cfg *config.C,
 	outlet channel.Connector,
@@ -142,7 +142,7 @@ func ContainerPluginV2(logger *logp.Logger, store statestore.States) v2.Plugin {
 
 // pluginV2 returns a v2.Plugin with a manager that can convert
 // the Log/Container input configuration to Filestream and run the Filestream
-// input instead of the Log input.
+// input instead of the Log or Container input.
 func pluginV2(logger *logp.Logger, store statestore.States, pluginName string) v2.Plugin {
 	// The InputManager for Filestream input is from an internal package, so we
 	// cannot instantiate it directly here. To circumvent that, we instantiate
