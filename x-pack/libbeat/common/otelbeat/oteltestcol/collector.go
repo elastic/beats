@@ -31,6 +31,7 @@ import (
 	"go.opentelemetry.io/collector/confmap/provider/fileprovider"
 	"go.opentelemetry.io/collector/exporter/debugexporter"
 	"go.opentelemetry.io/collector/otelcol"
+	"go.opentelemetry.io/collector/service/telemetry/otelconftelemetry"
 )
 
 type Collector struct {
@@ -93,6 +94,10 @@ func (c *Collector) ObservedLogs() *observer.ObservedLogs {
 	return c.observer
 }
 
+func (c *Collector) Shutdown() {
+	c.collector.Shutdown()
+}
+
 func getComponent() (otelcol.Factories, error) {
 	receivers, err := otelcol.MakeFactoryMap(
 		fbreceiver.NewFactory(),
@@ -129,6 +134,7 @@ func getComponent() (otelcol.Factories, error) {
 		Processors: processors,
 		Exporters:  exporters,
 		Extensions: extensions,
+		Telemetry:  otelconftelemetry.NewFactory(),
 	}, nil
 
 }

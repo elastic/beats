@@ -234,17 +234,25 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 // Beats central management interface implementation
 // ================================
 
-func (cm *BeatV2Manager) AgentInfo() client.AgentInfo {
+func (cm *BeatV2Manager) AgentInfo() lbmanagement.AgentInfo {
 	if cm.client.AgentInfo() == nil {
-		return client.AgentInfo{}
+		return lbmanagement.AgentInfo{}
 	}
 
-	return *cm.client.AgentInfo()
+	info := *cm.client.AgentInfo()
+
+	return lbmanagement.AgentInfo{
+		ID:           info.ID,
+		Version:      info.Version,
+		Snapshot:     info.Snapshot,
+		ManagedMode:  lbmanagement.AgentManagedMode(info.ManagedMode),
+		Unprivileged: info.Unprivileged,
+	}
 }
 
 // RegisterDiagnosticHook will register a diagnostic callback function when elastic-agent asks for a diagnostics dump
-func (cm *BeatV2Manager) RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook) {
-	cm.client.RegisterDiagnosticHook(name, description, filename, contentType, hook)
+func (cm *BeatV2Manager) RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook lbmanagement.DiagnosticHook) {
+	cm.client.RegisterDiagnosticHook(name, description, filename, contentType, client.DiagnosticHook(hook))
 }
 
 // UpdateStatus updates the manager with the current status for the beat.
@@ -314,7 +322,7 @@ func (cm *BeatV2Manager) CheckRawConfig(_ *conf.C) error {
 }
 
 // RegisterAction adds a V2 client action
-func (cm *BeatV2Manager) RegisterAction(action client.Action) {
+func (cm *BeatV2Manager) RegisterAction(action lbmanagement.Action) {
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
 
@@ -329,7 +337,7 @@ func (cm *BeatV2Manager) RegisterAction(action client.Action) {
 }
 
 // UnregisterAction removes a V2 client action
-func (cm *BeatV2Manager) UnregisterAction(action client.Action) {
+func (cm *BeatV2Manager) UnregisterAction(action lbmanagement.Action) {
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
 
@@ -608,7 +616,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 		}
 		if expected.Features != nil {
 			// unit is expected to update its feature flags
-			featuresCfg, err := features.NewConfigFromProto(expected.Features)
+			featuresCfg, err := NewConfigFromProto(expected.Features)
 			if err != nil {
 				unitErrors[unit.ID()] = append(unitErrors[unit.ID()], err)
 			}

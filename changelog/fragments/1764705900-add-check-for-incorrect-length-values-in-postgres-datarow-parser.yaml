@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Prevent panic during startup if dissect processor has invalid field name in tokenizer
+summary: Add check for incorrect length values in postgres datarow parser
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
@@ -28,7 +28,7 @@ summary: Prevent panic during startup if dissect processor has invalid field nam
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: filebeat
+component: packetbeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs

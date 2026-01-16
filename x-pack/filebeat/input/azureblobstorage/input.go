@@ -2,12 +2,15 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package azureblobstorage
 
 import (
 	"context"
 	"fmt"
 	"net/url"
+	"reflect"
 	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -101,6 +104,7 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		}
 		c.MaxWorkers = &maxWorkers
 	}
+
 	if c.Poll == nil {
 		var poll bool
 		if cfg.Poll != nil {
@@ -108,6 +112,7 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		}
 		c.Poll = &poll
 	}
+
 	if c.PollInterval == nil {
 		interval := time.Second * 300
 		if cfg.PollInterval != nil {
@@ -115,16 +120,27 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		}
 		c.PollInterval = &interval
 	}
+
 	if c.TimeStampEpoch == nil {
 		c.TimeStampEpoch = cfg.TimeStampEpoch
 	}
+
 	if c.ExpandEventListFromField == "" {
 		c.ExpandEventListFromField = cfg.ExpandEventListFromField
 	}
+
 	if len(c.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
 		c.FileSelectors = cfg.FileSelectors
 	}
-	c.ReaderConfig = cfg.ReaderConfig
+	// If the container level ReaderConfig matches the default config ReaderConfig state,
+	// use the global ReaderConfig. Matching the default ReaderConfig state
+	// means that the container level ReaderConfig is not set, and we should use the
+	// global ReaderConfig. Partial definition of ReaderConfig at both the global
+	// and container level is not supported, it's an either or scenario.
+	if reflect.DeepEqual(c.ReaderConfig, defaultReaderConfig) {
+		c.ReaderConfig = cfg.ReaderConfig
+	}
+
 	return c
 }
 
@@ -157,12 +173,8 @@ func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cu
 func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state, publisher cursor.Publisher) error {
 	currentSource := src.(*Source)
 
-	stat := inputCtx.StatusReporter
-	if stat == nil {
-		stat = noopReporter{}
-	}
-	stat.UpdateStatus(status.Starting, "")
-	stat.UpdateStatus(status.Configuring, "")
+	inputCtx.UpdateStatus(status.Starting, "")
+	inputCtx.UpdateStatus(status.Configuring, "")
 
 	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container_name", currentSource.ContainerName)
 	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
@@ -173,27 +185,23 @@ func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		<-inputCtx.Cancelation.Done()
-		stat.UpdateStatus(status.Stopping, "")
+		inputCtx.UpdateStatus(status.Stopping, "")
 		cancel()
 	}()
 
 	serviceClient, credential, err := fetchServiceClientAndCreds(input.config, input.serviceURL, log)
 	if err != nil {
 		metrics.errorsTotal.Inc()
-		stat.UpdateStatus(status.Failed, "failed to get service client: "+err.Error())
+		inputCtx.UpdateStatus(status.Failed, "failed to get service client: "+err.Error())
 		return err
 	}
 	containerClient, err := fetchContainerClient(serviceClient, currentSource.ContainerName, log)
 	if err != nil {
 		metrics.errorsTotal.Inc()
-		stat.UpdateStatus(status.Failed, "failed to get container client: "+err.Error())
+		inputCtx.UpdateStatus(status.Failed, "failed to get container client: "+err.Error())
 		return err
 	}
 
-	scheduler := newScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, stat, metrics, log)
+	scheduler := newScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, inputCtx, metrics, log)
 	return scheduler.schedule(ctx)
 }
-
-type noopReporter struct{}
-
-func (noopReporter) UpdateStatus(status.Status, string) {}
