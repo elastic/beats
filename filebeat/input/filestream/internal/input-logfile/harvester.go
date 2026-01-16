@@ -162,7 +162,11 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 	sourceName := hg.identifier.ID(src)
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 
-	if err := hg.tg.Go(startHarvester(ctx, hg, src, false, hg.metrics, hg.inputID)); err != nil {
+	fn := startHarvester(ctx, hg, src, false, hg.metrics, hg.inputID)
+	if fn == nil {
+		return
+	}
+	if err := hg.tg.Go(fn); err != nil {
 		ctx.Logger.Warnf(
 			"tried to start harvester for %s with task group already closed",
 			ctx.ID)
@@ -199,6 +203,9 @@ func startHarvester(
 	inputID string,
 ) func(context.Context) error {
 	srcID := hg.identifier.ID(src)
+	if !restart && hg.readers.hasID(srcID) {
+		return nil
+	}
 
 	return func(canceler context.Context) (err error) {
 		defer func() {
@@ -225,7 +232,7 @@ func startHarvester(
 		harvesterCtx, cancelHarvester, err := hg.readers.newContext(srcID, canceler)
 		if err != nil {
 			// The only possible returned error is ErrHarvesterAlreadyRunning, which is a normal
-			// behaviour of the Filestream input, it's not really an error, it's just an situation.
+			// behaviour of the Filestream input, it's not really an error, it's just a situation.
 			// If the harvester is already running we don't need to start a new one.
 			// At the moment of writing even the returned error is ignored. So the
 			// only real effect of this branch is to not start a second harvester.
