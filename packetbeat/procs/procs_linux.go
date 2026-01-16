@@ -230,12 +230,12 @@ func hexToIPPort(str []byte, ipv6 bool) (net.IP, uint16, error) {
 		return nil, 0, err
 	}
 
-	port, err := strconv.ParseInt(string(words[1]), 16, 32)
+	port, err := strconv.ParseInt(string(words[1]), 16, 16)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	return ip, uint16(port), nil
+	return ip, uint16(port), nil //nolint:gosec
 }
 
 func hexToIP(word string, ipv6 bool) (net.IP, error) {
