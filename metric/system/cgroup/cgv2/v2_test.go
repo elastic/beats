@@ -21,6 +21,7 @@ package cgv2
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -264,10 +265,97 @@ func TestGetMemNoPressure(t *testing.T) {
 }
 
 func TestGetCPU(t *testing.T) {
-	cpu := CPUSubsystem{}
-	err := cpu.Get(v2Path)
-	assert.NoError(t, err, "error in Get")
+	tests := []struct {
+		name     string
+		setup    func(t *testing.T) string
+		expected CPUSubsystem
+	}{
+		{
+			name: "v2 path with pressure",
+			setup: func(*testing.T) string {
+				return v2Path
+			},
+			expected: CPUSubsystem{
+				ID:   "",
+				Path: "",
+				Pressure: map[string]cgcommon.Pressure{
+					"some": {
+						Ten:          opt.Pct{Pct: 4.30},
+						Sixty:        opt.Pct{Pct: 3.20},
+						ThreeHundred: opt.Pct{Pct: 1.11},
+						Total:        opt.UintWith(1676316),
+					},
+				},
+				Stats: CPUStats{
+					Usage: cgcommon.CPUUsage{
+						NS: 26772130245,
+					},
+					User: cgcommon.CPUUsage{
+						NS: 20979069928,
+					},
+					System: cgcommon.CPUUsage{
+						NS: 5793060316,
+					},
+					Periods: opt.UintWith(1),
+					Throttled: ThrottledField{
+						Periods: opt.UintWith(4),
+						Us:      opt.UintWith(10),
+					},
+				},
+			},
+		},
+		{
+			name: "empty directory",
+			setup: func(t *testing.T) string {
+				return t.TempDir()
+			},
+			expected: CPUSubsystem{
+				ID:       "",
+				Path:     "",
+				Pressure: map[string]cgcommon.Pressure{},
+				Stats:    CPUStats{},
+			},
+		},
+		{
+			name: "cpu.stat only",
+			setup: func(t *testing.T) string {
+				b, err := os.ReadFile(filepath.Join(v2Path, "cpu.stat"))
+				require.NoError(t, err)
+				dir := t.TempDir()
+				err = os.WriteFile(filepath.Join(dir, "cpu.stat"), b, 0644)
+				require.NoError(t, err)
+				return dir
+			},
+			expected: CPUSubsystem{
+				ID:       "",
+				Path:     "",
+				Pressure: map[string]cgcommon.Pressure{},
+				Stats: CPUStats{
+					Usage: cgcommon.CPUUsage{
+						NS: 26772130245,
+					},
+					User: cgcommon.CPUUsage{
+						NS: 20979069928,
+					},
+					System: cgcommon.CPUUsage{
+						NS: 5793060316,
+					},
+					Periods: opt.UintWith(1),
+					Throttled: ThrottledField{
+						Periods: opt.UintWith(4),
+						Us:      opt.UintWith(10),
+					},
+				},
+			},
+		},
+	}
 
-	assert.Equal(t, uint64(26772130245), cpu.Stats.Usage.NS)
-	assert.Equal(t, uint64(5793060316), cpu.Stats.System.NS)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			cpu := CPUSubsystem{}
+			err := cpu.Get(test.setup(t))
+			require.NoError(t, err, "error in Get")
+			assert.EqualValues(t, test.expected, cpu)
+		})
+	}
 }

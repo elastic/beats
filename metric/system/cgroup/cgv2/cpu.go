@@ -66,7 +66,7 @@ func (cpu *CPUSubsystem) Get(path string) error {
 	cpu.Pressure, err = cgcommon.GetPressure(filepath.Join(path, "cpu.pressure"))
 	// Not all systems have pressure stats. Treat this as a soft error.
 	if os.IsNotExist(err) {
-		return nil
+		err = nil
 	}
 	if err != nil {
 		return fmt.Errorf("error fetching Pressure data: %w", err)
