@@ -746,22 +746,10 @@ func (s *fileScanner) computeGrowingFingerprint(it *ingestTarget, fd loginp.File
 		}
 	}
 
-	// Determine how many bytes to read
-	maxLength := s.cfg.Fingerprint.MaxLength
-	fileSize := it.info.Size()
-	// TODO(AndersonQ): If the file is GZIP-compressed, we cannot use the compressed size
-	//   it needs to read until maxLength or EOF
-	toRead := fileSize
-	if toRead > maxLength {
-		toRead = maxLength
-	}
-	s.log.Infof("fileScanner: computeGrowingFingerprint: for file %s: %d/%d bytes",
-		fd.Filename, toRead, maxLength)
-
 	var r io.Reader = osFile
 	if fd.GZIP {
 		// fingerprint is computed on decompressed data
-		gzReader, err := newGzipSeekerReader(osFile, int(maxLength))
+		gzReader, err := newGzipSeekerReader(osFile, int(s.cfg.Fingerprint.MaxLength))
 		if err != nil {
 			return fd, fmt.Errorf("failed to create gzip reader for %q: %w", it.originalFilename, err)
 		}
@@ -769,10 +757,15 @@ func (s *fileScanner) computeGrowingFingerprint(it *ingestTarget, fd loginp.File
 		r = gzReader
 	}
 
-	n, err := io.ReadFull(r, s.growingBuffer[:toRead])
+	// because the file might gzipped, we do not know the size of the
+	// decompressed data in advance. Thus, the read the max length is read.
+	n, err := io.ReadFull(r, s.growingBuffer[:s.cfg.Fingerprint.MaxLength])
 	if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, io.ErrUnexpectedEOF) {
 		return fd, fmt.Errorf("failed to read %q for growing fingerprint: %w", it.originalFilename, err)
 	}
+	s.log.Infof("fileScanner: computeGrowingFingerprint: for file %s: %d/%d bytes",
+		fd.Filename, n, s.cfg.Fingerprint.MaxLength)
+
 	fd.Fingerprint = hex.EncodeToString(s.growingBuffer[:n])
 
 	return fd, nil
