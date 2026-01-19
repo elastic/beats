@@ -6,16 +6,22 @@ package otel
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
+	"time"
 	"unicode"
 
-	"go.opentelemetry.io/contrib/exporters/autoexport"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
@@ -26,12 +32,15 @@ var (
 	tracerProvider   *sdktrace.TracerProvider
 )
 
-// GetGlobalTracerProvider returns an existing or new global TracerProvider
+// GetGlobalTracerProvider returns an existing or new global TracerProvider.
+// It installs the provider as the OTel global provider exactly once.
 func GetGlobalTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyValue) (*sdktrace.TracerProvider, error) {
 	tracerProviderMu.Lock()
 	defer tracerProviderMu.Unlock()
 
 	if tracerProvider == nil {
+		// TODO it looks like these attributes may be specific to an input run, so maybe the tracer provider can't be a singleton.
+		// also, should the input defer a flush or shutdown of the tracer provider?
 		tp, err := newTracerProvider(ctx, resourceAttributes)
 		if err != nil {
 			return nil, err
@@ -44,20 +53,11 @@ func GetGlobalTracerProvider(ctx context.Context, resourceAttributes []attribute
 }
 
 func newTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyValue) (*sdktrace.TracerProvider, error) {
-	// Make "none" the default exporter (rather than "oltp")
-	const otelTracesExporterKey = "OTEL_TRACES_EXPORTER"
-	if _, ok := os.LookupEnv(otelTracesExporterKey); !ok {
-		os.Setenv(otelTracesExporterKey, "none")
-	}
-
-	// New exporter based on OTEL_TRACES_EXPORTER and OTEL_EXPORTER_OTLP_PROTOCOL
-	// TODO probably switch away from autoexport later to avoid unnecessary dependencies
-	exp, err := autoexport.NewSpanExporter(ctx)
+	exp, err := newSpanExporterFromEnv(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// Create a resource with attributes from various sources
 	res, err := resource.New(
 		ctx,
 		resource.WithFromEnv(),
@@ -69,12 +69,199 @@ func newTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyVa
 		return nil, err
 	}
 
-	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithSpanProcessor(sdktrace.NewBatchSpanProcessor(exp)),
+	opts := []sdktrace.TracerProviderOption{
 		sdktrace.WithResource(res),
-	)
+	}
 
-	return tp, nil
+	if exp != nil {
+		bsp := sdktrace.NewBatchSpanProcessor(exp)
+		opts = append(opts, sdktrace.WithSpanProcessor(bsp))
+	}
+
+	return sdktrace.NewTracerProvider(opts...), nil
+}
+
+// newSpanExporterFromEnv creates an exporter based on standard environment variables.
+// Returns (nil, nil) if the exporter is "none".
+// The environment variables considered are:
+// - OTEL_TRACES_EXPORTER (values: none|otlp|console, first supported wins, default: none)
+// - OTEL_EXPORTER_OTLP_TRACES_PROTOCOL / OTEL_EXPORTER_OTLP_PROTOCOL (values: grpc|http/protobuf, default: grpc)
+// - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT / OTEL_EXPORTER_OTLP_ENDPOINT (e.g. "http://otlp-receiver.example.com:4317")
+// - OTEL_EXPORTER_OTLP_TRACES_HEADERS  / OTEL_EXPORTER_OTLP_HEADERS  (e.g. "Authorization=Bearer abc123,X-Client-Version=1.2.3")
+// - OTEL_EXPORTER_OTLP_TRACES_TIMEOUT  / OTEL_EXPORTER_OTLP_TIMEOUT  (in ms)
+// - OTEL_EXPORTER_OTLP_TRACES_INSECURE / OTEL_EXPORTER_OTLP_INSECURE (values: true|false, default: true if http scheme used, otherwise false)
+func newSpanExporterFromEnv(ctx context.Context) (sdktrace.SpanExporter, error) {
+	raw := strings.TrimSpace(os.Getenv("OTEL_TRACES_EXPORTER"))
+	if raw == "" {
+		raw = "none"
+	}
+
+	candidates := splitCSV(raw)
+	for _, expName := range candidates {
+		switch strings.ToLower(expName) {
+		case "none":
+			return nil, nil
+		case "otlp":
+			return newOTLPTraceExporterFromEnv(ctx)
+		case "console":
+			return stdouttrace.New(stdouttrace.WithPrettyPrint())
+		default:
+			continue
+		}
+	}
+
+	return nil, fmt.Errorf("no supported trace exporter found in OTEL_TRACES_EXPORTER=%q (supported: none, otlp, console)", raw)
+}
+
+func newOTLPTraceExporterFromEnv(ctx context.Context) (*otlptrace.Exporter, error) {
+	proto := strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"))
+	if proto == "" {
+		proto = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL"))
+	}
+	if proto == "" {
+		proto = "grpc"
+	}
+	proto = strings.ToLower(proto)
+
+	insecure, hasInsecure, err := envBoolFirstFound(
+		"OTEL_EXPORTER_OTLP_TRACES_INSECURE",
+		"OTEL_EXPORTER_OTLP_INSECURE",
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	endpoint := strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"))
+	if endpoint == "" {
+		endpoint = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))
+	}
+	u, err := url.Parse(endpoint)
+	if err == nil && u.Host != "" {
+		if u.Scheme == "http" && !hasInsecure {
+			// Using a scheme of http rather than https indicates it will be insecure.
+			insecure = true
+		}
+		// The endpoint was a URL like http://localhost:4318 but the exporter wants host:port.
+		endpoint = u.Host
+	}
+
+	headers := strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS"))
+	if headers == "" {
+		headers = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_HEADERS"))
+	}
+	headerMap, err := parseOTLPHeaders(headers)
+	if err != nil {
+		return nil, err
+	}
+
+	timeout := envDurationMillis("OTEL_EXPORTER_OTLP_TRACES_TIMEOUT")
+	if timeout == 0 {
+		timeout = envDurationMillis("OTEL_EXPORTER_OTLP_TIMEOUT")
+	}
+	// 0 means "use exporter default"
+
+	switch proto {
+	case "grpc":
+		var opts []otlptracegrpc.Option
+
+		if endpoint != "" {
+			opts = append(opts, otlptracegrpc.WithEndpoint(endpoint))
+		}
+		if len(headerMap) > 0 {
+			opts = append(opts, otlptracegrpc.WithHeaders(headerMap))
+		}
+		if timeout > 0 {
+			opts = append(opts, otlptracegrpc.WithTimeout(timeout))
+		}
+		if insecure {
+			opts = append(opts, otlptracegrpc.WithInsecure())
+		}
+		return otlptracegrpc.New(ctx, opts...)
+
+	case "http/protobuf":
+		var opts []otlptracehttp.Option
+
+		if endpoint != "" {
+			opts = append(opts, otlptracehttp.WithEndpoint(endpoint))
+		}
+		if len(headerMap) > 0 {
+			opts = append(opts, otlptracehttp.WithHeaders(headerMap))
+		}
+		if timeout > 0 {
+			opts = append(opts, otlptracehttp.WithTimeout(timeout))
+		}
+		if insecure {
+			opts = append(opts, otlptracehttp.WithInsecure())
+		}
+		return otlptracehttp.New(ctx, opts...)
+
+	default:
+		return nil, fmt.Errorf("unsupported OTLP traces protocol %q (expected grpc or http/protobuf)", proto)
+	}
+}
+
+func splitCSV(s string) []string {
+	parts := strings.Split(s, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
+// parseOTLPHeaders parses `key=value,key2=value2` into a map.
+func parseOTLPHeaders(s string) (map[string]string, error) {
+	if strings.TrimSpace(s) == "" {
+		return nil, nil
+	}
+	m := make(map[string]string)
+	for _, part := range splitCSV(s) {
+		k, v, ok := strings.Cut(part, "=")
+		if !ok {
+			return nil, fmt.Errorf("invalid OTLP headers entry %q (expected key=value)", part)
+		}
+		k = strings.TrimSpace(k)
+		v = strings.TrimSpace(v)
+		if k == "" {
+			return nil, fmt.Errorf("invalid OTLP headers entry %q (empty key)", part)
+		}
+		m[k] = v
+	}
+	return m, nil
+}
+
+func envDurationMillis(key string) time.Duration {
+	v := strings.TrimSpace(os.Getenv(key))
+	if v == "" {
+		return 0
+	}
+	n, err := strconv.Atoi(v)
+	if err != nil {
+		return 0
+	}
+	if n < 0 {
+		return 0
+	}
+	return time.Duration(n) * time.Millisecond
+}
+
+func envBoolFirstFound(keys ...string) (val bool, found bool, err error) {
+	for _, k := range keys {
+		raw, ok := os.LookupEnv(k)
+		if !ok {
+			continue
+		}
+		found = true
+		b, err := strconv.ParseBool(strings.TrimSpace(raw))
+		if err != nil {
+			return false, true, fmt.Errorf("%s must be boolean: %w", k, err)
+		}
+		return b, true, nil
+	}
+	return false, false, nil
 }
 
 type TraceConfig struct {
