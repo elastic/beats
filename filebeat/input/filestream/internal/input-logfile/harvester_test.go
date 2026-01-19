@@ -23,11 +23,7 @@ package input_logfile
 import (
 	"context"
 	"fmt"
-<<<<<<< HEAD
-=======
-	"path/filepath"
 	"runtime"
->>>>>>> 3408a1767 (Fix goroutine leak in filestream input when `harvester_limit` is set. (#48445))
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -42,7 +38,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestReaderGroup(t *testing.T) {
