@@ -216,7 +216,7 @@ func (mr *MockS3APIMockRecorder) GetObject(ctx, region, bucket, key any) *gomock
 }
 
 // ListObjectsPaginator mocks base method.
-func (m *MockS3API) ListObjectsPaginator(log *logp.Logger, bucket, prefix string, startAfterKey string) s3Pager {
+func (m *MockS3API) ListObjectsPaginator(log *logp.Logger, bucket, prefix, startAfterKey string) s3Pager {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListObjectsPaginator", log, bucket, prefix, startAfterKey)
 	ret0, _ := ret[0].(s3Pager)
@@ -347,7 +347,7 @@ func (m *Mocks3Lister) EXPECT() *Mocks3ListerMockRecorder {
 }
 
 // ListObjectsPaginator mocks base method.
-func (m *Mocks3Lister) ListObjectsPaginator(log *logp.Logger, bucket, prefix string, startAfterKey string) s3Pager {
+func (m *Mocks3Lister) ListObjectsPaginator(log *logp.Logger, bucket, prefix, startAfterKey string) s3Pager {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListObjectsPaginator", log, bucket, prefix, startAfterKey)
 	ret0, _ := ret[0].(s3Pager)

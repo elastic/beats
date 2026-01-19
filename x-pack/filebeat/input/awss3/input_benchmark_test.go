@@ -157,7 +157,7 @@ func (c constantS3) DeleteObject(context.Context, string, string, string) (*s3.D
 	return nil, nil
 }
 
-func (c constantS3) ListObjectsPaginator(_ *logp.Logger, _, _ string, _ string) s3Pager {
+func (c constantS3) ListObjectsPaginator(_ *logp.Logger, _, _, _ string) s3Pager {
 	return c.pagerConstant
 }
 

@@ -73,8 +73,7 @@ func (s *states) IsProcessed(id string) bool {
 	s.statesLock.Lock()
 	defer s.statesLock.Unlock()
 	// Our in-memory table only stores completed objects
-	var ok bool
-	_, ok = s.states[id]
+	_, ok := s.states[id]
 	return ok
 }
 

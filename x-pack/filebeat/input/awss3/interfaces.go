@@ -73,7 +73,7 @@ type s3Mover interface {
 }
 
 type s3Lister interface {
-	ListObjectsPaginator(log *logp.Logger, bucket, prefix string, startAfterKey string) s3Pager
+	ListObjectsPaginator(log *logp.Logger, bucket, prefix, startAfterKey string) s3Pager
 }
 
 type s3Pager interface {
