@@ -115,7 +115,7 @@
           type: long
           format: bytes
           version:
-              ga: 9.4.0
+              ga: 8.19.11
           description: >
             The swap memory used by the process (supported only on Linux kernel version 2.6.34+).
     - name: io

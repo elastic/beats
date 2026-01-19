@@ -1047,7 +1047,7 @@ Memory-specific statistics per process.
     format: bytes
 
 
-**`system.process.memory.swap`** {applies_to}`stack: ga 9.4.0`
+**`system.process.memory.swap`** {applies_to}`stack: ga 8.19.11`
 :   The swap memory used by the process (supported only on Linux kernel version 2.6.34+).
 
     type: long
