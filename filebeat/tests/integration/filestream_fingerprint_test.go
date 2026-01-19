@@ -33,6 +33,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/testing/gziptest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -192,8 +193,9 @@ filebeat.inputs:
   - type: filestream
     id: test-growing-fingerprint
     enabled: true
+    compression: auto
     paths:
-      - %s/*.log
+      - %s/*.log*
     prospector.scanner:
       check_interval: 1s
       fingerprint:
@@ -221,6 +223,9 @@ logging:
 // which allows files of any size to be ingested immediately. The fingerprint
 // grows as the file grows, and the registry entry is migrated to the new key.
 //
+// This test includes both plain text and gzipped files to verify that growing
+// fingerprint works correctly with compressed files.
+//
 // This is the counterpart to TestFilestreamFingerprintSmallFiles which tests
 // the current fingerprint behavior where small files are not ingested.
 func TestFilestreamGrowingFingerprint(t *testing.T) {
@@ -239,6 +244,8 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 	file1 := filepath.Join(logDir, "file1.log")
 	file2 := filepath.Join(logDir, "file2.log")
 	file3 := filepath.Join(logDir, "file3.log")
+	file4 := filepath.Join(logDir, "file4.log.gz")
+	file5 := filepath.Join(logDir, "file5.log.gz")
 
 	filebeat.WriteConfigFile(fmt.Sprintf(growingFingerprintCfg, logDir, tempDir))
 	filebeat.Start()
@@ -246,48 +253,61 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 	filebeat.WaitLogsContains("Input 'filestream' starting",
 		10*time.Second, "filestream did not start")
 
-	// ===== Phase 1: Create 3 small files with same content =====
+	// ===== Phase 1: Create 4 small files with same content =====
 	// All files have identical content - this creates a COLLISION scenario
-	// where all 3 files have the same fingerprint
+	// where all 4 files have the same fingerprint (fingerprint is calculated
+	// on decompressed data for gzip files)
 	headerContent := generateLines("header line", 1)
 
 	appendToFile(t, file1, headerContent)
 	appendToFile(t, file2, headerContent)
 	appendToFile(t, file3, headerContent)
 
+	// Create gzipped file with same header content
+	headerGZ := gziptest.Compress(t,
+		[]byte(generateLines("gzip header line", 1)), gziptest.CorruptNone)
+	require.NoError(t, os.WriteFile(file4, headerGZ, 0644), "failed to write gzipped file")
+
 	// With growing_fingerprint, small files ARE ingested immediately (unlike regular fingerprint)
 	// Due to collision (same content = same fingerprint), only ONE file's entry is created
 	// but events ARE published. We wait for EOF on the first detected file.
 	filebeat.WaitLogsContains(
-		"End of file reached", // any of the 3 files might be the one ingested first
+		"End of file reached", // any of the 4 files might be the one ingested first
 		10*time.Second,
 		"file was not read to EOF",
 	)
 
 	// Only one event from whichever file was processed first
-	filebeat.WaitPublishedEvents(5*time.Second, 1)
+	filebeat.WaitPublishedEvents(5*time.Second, 2)
 
-	// ===== Phase 2: Grow all 3 files to make them diverge =====
+	// ===== Phase 2: Grow all 4 files to make them diverge =====
 	// Each file gets unique content so they each get a unique fingerprint.
 	// Due to collision handling:
 	// - The file that created the collision entry (first detected) will get migration
-	// - The other 2 files will be treated as NEW files (path doesn't match)
+	// - The other 3 files will be treated as NEW files (path doesn't match)
 	file1Content := generateLines("file1 unique line", 4)
 	file2Content := generateLines("file2 unique line", 4)
 	file3Content := generateLines("file3 unique line", 4)
+	file5Content := headerContent + generateLines("file5 unique line", 4)
 	appendToFile(t, file1, file1Content)
 	appendToFile(t, file2, file2Content)
 	appendToFile(t, file3, file3Content)
 
-	// TODO: why is ir commented out?
-	// // Wait for migration to occur (only ONE file will have migration - the collision owner)
-	// filebeat.WaitLogsContains(
-	// 	"migrated growing fingerprint entry",
-	// 	10*time.Second,
-	// 	"no migration occurred",
-	// )
+	// GZIP files should not grow. Thus create another file
+	file5ContentGZ := gziptest.Compress(t, []byte(file5Content), gziptest.CorruptNone)
+	require.NoError(t, os.WriteFile(file5, []byte(file5ContentGZ), 0644),
+		"failed to write gzipped file")
 
-	// Wait for all 3 files to be read to EOF
+	// TODO: why was it commented out?
+	// // Wait for migration to occur (only ONE file will have migration - the collision owner)
+	filebeat.WaitLogsContains(
+		"migrated growing fingerprint entry",
+		10*time.Second,
+		"no migration occurred",
+	)
+
+	// Wait for all 4 files to be read to EOF
+	// Note: gzipped files show "EOF has been reached. Closing." instead of "End of file reached"
 	filebeat.WaitLogsContainsAnyOrder(
 		[]string{
 			fmt.Sprintf("End of file reached: %s; Backoff now.", file1),
@@ -295,14 +315,21 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 			fmt.Sprintf("End of file reached: %s; Backoff now.", file3),
 		},
 		10*time.Second,
-		"files were not fully read after growth",
+		"plain files were not fully read after growth",
 	)
 
-	filebeat.WaitPublishedEvents(10*time.Second, 15)
+	// Wait for gzipped file separately as it has a different EOF log message
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("EOF has been reached. Closing. Path='%s'", file5),
+		10*time.Second,
+		"gzipped file was not fully read after growth",
+	)
+
+	// Total events: 4 files × 5 lines each = 20 events + 1 GZIP small file (1 line)
+	filebeat.WaitPublishedEvents(10*time.Second, 21)
 
 	// ===== Phase 3: Stop Filebeat =====
 	filebeat.Stop()
-
 }
 
 // TestFilestreamGrowingFingerprint_update_while_stopped tests the
