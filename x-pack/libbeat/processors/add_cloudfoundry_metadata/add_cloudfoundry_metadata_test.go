@@ -24,7 +24,7 @@ func TestNoClient(t *testing.T) {
 
 	evt := beat.Event{}
 	observed, err := p.Run(&evt)
-	assert.NoError(t, err)
+	assert.ErrorIs(t, err, errClientNotInitialized)
 	assert.Equal(t, evt, *observed)
 }
 
