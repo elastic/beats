@@ -194,6 +194,8 @@ func (s *states) AddState(st state) error {
 }
 
 func (s *states) GetOldestState() *state {
+	s.statesLock.Lock()
+	defer s.statesLock.Unlock()
 	return s.head
 }
 
@@ -310,7 +312,9 @@ func (s *states) SortStatesByLexicographicalOrdering(log *logp.Logger) {
 	}
 
 	s.trimAndBuildLinkedList(log, s.lexicographicalLookbackKeys)
-	log.Debugf("Sorted states by lexicographical ordering: state_count=%d, oldest_state=%s, newest_state=%s", len(s.states), s.head.IDWithLexicographicalOrdering(), s.tail.IDWithLexicographicalOrdering())
+	if s.head != nil && s.tail != nil {
+		log.Debugw("Sorted states by lexicographical ordering.", "state_count", len(s.states), "oldest_state", s.head.IDWithLexicographicalOrdering(), "newest_state", s.tail.IDWithLexicographicalOrdering())
+	}
 }
 
 // trimAndBuildLinkedList trims states to capacity and rebuilds the linked list.
@@ -340,6 +344,8 @@ func (s *states) trimAndBuildLinkedList(log *logp.Logger, capacity int) {
 
 // buildLinkedListFromKeys rebuilds the doubly linked list from sorted keys.
 func (s *states) buildLinkedListFromKeys(sortedKeys []string) {
+	s.head = nil // Reset before building
+	s.tail = nil
 	var prev *state
 	for i, key := range sortedKeys {
 		st := s.states[key]

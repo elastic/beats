@@ -466,7 +466,7 @@ When enabled, the input maintains a state of processed object keys and uses the 
 Default: `false`
 
 ::::{note}
-This option is only applicable when using S3 bucket polling (`bucket_arn` or `non_aws_bucket_name`). It has no effect when using SQS notifications.
+This option is only applicable when using S3 bucket polling (`bucket_arn` or `non_aws_bucket_name`). It has no effect when using SQS notifications. Using lexicographical ordering mode assumes that objects written to the bucket are immutable, and any changes to the object remains undetected.
 ::::
 
 

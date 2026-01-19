@@ -115,7 +115,6 @@ func (in *s3PollerInput) run(ctx context.Context) {
 	// Scan the bucket in a loop, delaying by the configured interval each
 	// iteration.
 	in.status.UpdateStatus(status.Running, "Input is running")
-	var numRuns int
 	for ctx.Err() == nil {
 		runStartTime := time.Now()
 
@@ -129,7 +128,6 @@ func (in *s3PollerInput) run(ctx context.Context) {
 		runElapsedTime := time.Since(runStartTime)
 		in.metrics.s3PollingRunTime.Update(runElapsedTime.Nanoseconds())
 		in.metrics.s3PollingRunTimeTotal.Add(uint64(runElapsedTime.Nanoseconds()))
-		numRuns++
 
 		_ = timed.Wait(ctx, in.config.BucketListInterval)
 	}
