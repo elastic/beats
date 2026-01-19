@@ -409,8 +409,8 @@ github.com/elastic/go-quark v0.3.0 h1:d4vokx0psEJo+93fnhvWpTJMggPd9rfMJSleoLva4x
 github.com/elastic/go-quark v0.3.0/go.mod h1:bO/XIGZBUJGxyiJ9FTsSYn9YlfOTRJnmOP+iBE2FyjA=
 github.com/elastic/go-seccomp-bpf v1.5.0 h1:gJV+U1iP+YC70ySyGUUNk2YLJW5/IkEw4FZBJfW8ZZY=
 github.com/elastic/go-seccomp-bpf v1.5.0/go.mod h1:umdhQ/3aybliBF2jjiZwS492I/TOKz+ZRvsLT3hVe1o=
-github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727 h1:yuiN60oaQUz2PtNpNhDI2H6zrCdfiiptmNdwV5WUaKA=
-github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727/go.mod h1:sw1pzz4pIqzDQxFWt3dFoG2uIUFAfThxlMfWpjH590E=
+github.com/elastic/go-sfdc v0.0.0-20251207194532-c5aadd4a4e06 h1:TEeq+uvg9+B0f+8JdaqzAdtmhgz9KX/OGtKyQAKA4ac=
+github.com/elastic/go-sfdc v0.0.0-20251207194532-c5aadd4a4e06/go.mod h1:sw1pzz4pIqzDQxFWt3dFoG2uIUFAfThxlMfWpjH590E=
 github.com/elastic/go-structform v0.0.12 h1:HXpzlAKyej8T7LobqKDThUw7BMhwV6Db24VwxNtgxCs=
 github.com/elastic/go-structform v0.0.12/go.mod h1:CZWf9aIRYY5SuKSmOhtXScE5uQiLZNqAFnwKR4OrIM4=
 github.com/elastic/go-sysinfo v1.15.3 h1:W+RnmhKFkqPTCRoFq2VCTmsT4p/fwpo+3gKNQsn1XU0=
