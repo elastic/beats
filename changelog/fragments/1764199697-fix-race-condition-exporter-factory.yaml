@@ -13,7 +13,9 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Harden Prometheus metrics parser against panics caused by malformed input data
+summary:
+  Fixed an issue in the initialization of exporters for input metrics that could cause an unexpected number of exporter
+  connections to be created.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
@@ -28,7 +30,7 @@ summary: Harden Prometheus metrics parser against panics caused by malformed inp
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: metricbeat
+component: filebeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs

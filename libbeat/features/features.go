@@ -22,7 +22,6 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -41,32 +40,6 @@ type fflags struct {
 	fqdnCallbacks map[string]boolValueOnChangeCallback
 
 	logRunAsFilestream atomic.Bool
-}
-
-// NewConfigFromProto converts the given *proto.Features object to
-// a *config.C object.
-func NewConfigFromProto(f *proto.Features) (*conf.C, error) {
-	if f == nil {
-		return nil, nil
-	}
-
-	var beatCfg struct {
-		Features *proto.Features `config:"features"`
-	}
-
-	beatCfg.Features = f
-
-	c, err := conf.NewConfigFrom(&beatCfg)
-	if err != nil {
-		return nil, fmt.Errorf("unable to parse feature flags message into beat configuration: %w", err)
-	}
-
-	_, err = c.Remove("features.source", -1)
-	if err != nil {
-		return nil, fmt.Errorf("unable to convert feature flags message to beat configuration: %w", err)
-	}
-
-	return c, nil
 }
 
 // UpdateFromConfig updates the feature flags configuration. If c is nil UpdateFromConfig is no-op.
