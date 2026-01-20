@@ -319,7 +319,7 @@ func (a *awsS3API) clientFor(region string) *s3.Client {
 	return cli
 }
 
-func (a *awsS3API) ListObjectsPaginator(log *logp.Logger, bucket, prefix string, startAfterKey string) s3Pager {
+func (a *awsS3API) ListObjectsPaginator(log *logp.Logger, bucket, prefix, startAfterKey string) s3Pager {
 	input := &s3.ListObjectsV2Input{
 		Bucket: awssdk.String(bucket),
 		Prefix: awssdk.String(prefix),

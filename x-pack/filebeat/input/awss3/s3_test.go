@@ -44,7 +44,7 @@ func TestS3Poller(t *testing.T) {
 			mockAPI.EXPECT().
 				ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key"), gomock.Any()).
 				Times(1).
-				DoAndReturn(func(_ *logp.Logger, _, _ string, _ string) s3Pager {
+				DoAndReturn(func(_ *logp.Logger, _, _, _ string) s3Pager {
 					return mockPager
 				}),
 		)
@@ -175,14 +175,14 @@ func TestS3Poller(t *testing.T) {
 			mockS3.EXPECT().
 				ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key"), gomock.Any()).
 				Times(1).
-				DoAndReturn(func(_ *logp.Logger, _, _ string, _ string) s3Pager {
+				DoAndReturn(func(_ *logp.Logger, _, _, _ string) s3Pager {
 					return mockErrorPager
 				}),
 			// After waiting for pollInterval, it retries.
 			mockS3.EXPECT().
 				ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key"), gomock.Any()).
 				Times(1).
-				DoAndReturn(func(_ *logp.Logger, _, _ string, _ string) s3Pager {
+				DoAndReturn(func(_ *logp.Logger, _, _, _ string) s3Pager {
 					return mockSuccessPager
 				}),
 		)
@@ -332,7 +332,7 @@ func TestS3Poller(t *testing.T) {
 		mockAPI.EXPECT().
 			ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Eq("existing-key")).
 			Times(1).
-			DoAndReturn(func(_ *logp.Logger, _, _ string, startAfterKey string) s3Pager {
+			DoAndReturn(func(_ *logp.Logger, _, _, startAfterKey string) s3Pager {
 				require.Equal(t, "existing-key", startAfterKey)
 				return mockPager
 			})
@@ -419,7 +419,7 @@ func TestS3Poller(t *testing.T) {
 		mockAPI.EXPECT().
 			ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Eq("")).
 			Times(1).
-			DoAndReturn(func(_ *logp.Logger, _, _ string, startAfterKey string) s3Pager {
+			DoAndReturn(func(_ *logp.Logger, _, _, startAfterKey string) s3Pager {
 				require.Equal(t, "", startAfterKey)
 				return mockPager
 			})
@@ -503,7 +503,7 @@ func TestS3Poller(t *testing.T) {
 		mockAPI.EXPECT().
 			ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Eq("")).
 			Times(1).
-			DoAndReturn(func(_ *logp.Logger, _, _ string, startAfterKey string) s3Pager {
+			DoAndReturn(func(_ *logp.Logger, _, _, startAfterKey string) s3Pager {
 				require.Equal(t, "", startAfterKey)
 				return mockPager
 			})
@@ -585,7 +585,7 @@ func TestS3Poller(t *testing.T) {
 		mockAPI.EXPECT().
 			ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Any()).
 			Times(1).
-			DoAndReturn(func(_ *logp.Logger, _, _ string, _ string) s3Pager {
+			DoAndReturn(func(_ *logp.Logger, _, _, _ string) s3Pager {
 				return mockPager
 			})
 
@@ -893,7 +893,7 @@ func Test_S3StateHandling(t *testing.T) {
 				mockS3API.EXPECT().
 					ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Any()).
 					AnyTimes().
-					DoAndReturn(func(_ *logp.Logger, _, _ string, _ string) s3Pager {
+					DoAndReturn(func(_ *logp.Logger, _, _, _ string) s3Pager {
 						return mockS3Pager
 					}),
 			)
