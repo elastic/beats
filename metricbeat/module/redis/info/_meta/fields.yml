@@ -82,19 +82,50 @@
           type: long
           format: bytes
           description: >
-            Used memory by the Lua engine.
+            Used memory by the Lua engine. Deprecated in Redis 7.0; use vm.eval instead.
           version:
-           deprecated: 9.4.0
+            deprecated: 9.4.0
         - name: used.scripts
           type: long
           format: bytes
           description: >
-            Used memory by Lua scripts.
+            Combined memory overhead from EVAL scripts and Functions (part of used_memory). Added in Redis 7.0.
+        - name: used.scripts_eval
+          type: long
+          format: bytes
+          description: >
+            Memory overhead from EVAL scripts (part of used_memory). Added in Redis 7.0.
+        - name: used.functions
+          type: long
+          format: bytes
+          description: >
+            Memory overhead from Functions (part of used_memory). Added in Redis 7.0.
         - name: used.dataset
           type: long
           format: bytes
           description: >
-            The size in bytes of the dataset
+            The size in bytes of the dataset (used_memory minus used_memory_overhead). Added in Redis 4.0.
+
+        - name: vm
+          type: group
+          description: >
+            Redis 7.0+ VM memory stats. VM memory is NOT part of used_memory.
+          fields:
+            - name: eval
+              type: long
+              format: bytes
+              description: >
+                Number of bytes used by the script VM engines for EVAL framework. This is the replacement for used_memory_lua. Added in Redis 7.0.
+            - name: functions
+              type: long
+              format: bytes
+              description: >
+                Number of bytes used by the script VM engines for Functions framework. Added in Redis 7.0.
+            - name: total
+              type: long
+              format: bytes
+              description: >
+                Total VM memory (vm.eval + vm.functions). Added in Redis 7.0.
 
         - name: total_system
           type: long
@@ -451,7 +482,17 @@
         - name: number_of_cached_scripts
           type: long
           description: >
-            Number of cached scripts.
+            Number of EVAL scripts cached by the server. Added in Redis 7.0.
+
+        - name: number_of_functions
+          type: long
+          description: >
+            Number of Functions loaded. Added in Redis 7.0.
+
+        - name: number_of_libraries
+          type: long
+          description: >
+            Number of Function libraries loaded. Added in Redis 7.0.
 
     - name: stats
       type: group
@@ -569,20 +610,20 @@
         - name: tracking
           type: group
           description: >
-            Redis client side caching tracking stats.
+            Redis client-side caching tracking stats. Added in Redis 6.0.
           fields:
             - name: total_keys
               type: long
               description: >
-                Total number of keys being tracked.
+                Number of keys being tracked by the server.
             - name: total_items
               type: long
               description: >
-                Total number of tracked items.
+                Number of items (sum of clients per tracked key).
             - name: total_prefixes
               type: long
               description: >
-                Total number of tracked prefixes.
+                Number of tracked prefixes in the server's prefix table (broadcast mode only).
 
     - name: slowlog.count
       type: long

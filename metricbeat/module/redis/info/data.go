@@ -50,14 +50,20 @@ var (
 				"value":   c.Int("used_memory"), // As it is a top key, this goes into value
 				"rss":     c.Int("used_memory_rss"),
 				"peak":    c.Int("used_memory_peak"),
-				"lua":     c.Int("used_memory_lua", s.Optional),
-				"dataset": c.Int("used_memory_dataset"),
+				"lua":     c.Int("used_memory_lua", s.Optional),     // Deprecated in Redis 7.0, use vm.eval instead
+				"dataset": c.Int("used_memory_dataset", s.Optional), // Added in Redis 4.0
 
-				// Redis 7.x/8.x
-				"scripts": c.Int("used_memory_scripts", s.Optional),
+				// Added in Redis 7.0
+				"scripts":      c.Int("used_memory_scripts", s.Optional),
+				"scripts_eval": c.Int("used_memory_scripts_eval", s.Optional),
+				"functions":    c.Int("used_memory_functions", s.Optional),
 			},
-
-			// Redis 7.x/8.x
+			"vm": s.Object{
+				// Added in Redis 7.0 - VM memory is NOT part of used_memory
+				"eval":      c.Int("used_memory_vm_eval", s.Optional), // Replacement for used_memory_lua
+				"functions": c.Int("used_memory_vm_functions", s.Optional),
+				"total":     c.Int("used_memory_vm_total", s.Optional),
+			},
 			"total_system": c.Int("total_system_memory", s.Optional),
 			"max": s.Object{
 				"value":  c.Int("maxmemory"),
@@ -188,8 +194,10 @@ var (
 			"lru_clock":        c.Int("lru_clock"),
 			"config_file":      c.Str("config_file"),
 
-			// Redis 7.x/8.x
+			// Added in Redis 7.0
 			"number_of_cached_scripts": c.Int("number_of_cached_scripts", s.Optional),
+			"number_of_functions":      c.Int("number_of_functions", s.Optional),
+			"number_of_libraries":      c.Int("number_of_libraries", s.Optional),
 		},
 		"stats": s.Object{
 			"connections": s.Object{
@@ -239,7 +247,7 @@ var (
 				"key_misses": c.Int("active_defrag_key_misses"),
 			},
 
-			// Redis 7.x/8.x
+			// Client-side caching tracking stats (added in Redis 6.0)
 			"tracking": s.Object{
 				"total_keys":     c.Int("tracking_total_keys", s.Optional),
 				"total_items":    c.Int("tracking_total_items", s.Optional),
