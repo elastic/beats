@@ -1233,7 +1233,7 @@ func StartMockES(
 			if err != nil {
 				return false
 			}
-			//nolint: errcheck // We're just draining the body, we can ignore the error
+			// nolint: errcheck // We're just draining the body, we can ignore the error
 			io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 			return true
@@ -1254,7 +1254,7 @@ func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
 
 	path := filepath.Join(b.TempDir(), "output-*.ndjson")
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
-		assert.Equal(collect, events, b.CountFileLines(path))
+		assert.Equal(collect, events, b.CountFileLines(path), "unexpected number of published events")
 	}, timeout, 200*time.Millisecond)
 }
 

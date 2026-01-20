@@ -50,6 +50,16 @@ type StateMetadataUpdater interface {
 	// ResetCursor resets the cursor in the registry and drops previous state
 	// updates that are not yet ACKed.
 	ResetCursor(s Source, cur interface{}) error
+
+	// IterateOnPrefix iterates over all entries that match this input's prefix.
+	// The callback receives the key and cursor metadata for each entry.
+	// Return false from the callback to stop iteration.
+	IterateOnPrefix(fn func(key string, meta interface{}) bool)
+
+	// UpdateKey updates an entry from oldKey to newKey with updated metadata.
+	// This is used by growing_fingerprint to update the registry key when
+	// a file's fingerprint grows.
+	UpdateKey(oldKey, newKey string, meta interface{}) error
 }
 
 // StoreUpdater allows manipulation of the state store
