@@ -12,11 +12,9 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 	"unicode"
 
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -27,32 +25,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-var (
-	tracerProviderMu sync.Mutex
-	tracerProvider   *sdktrace.TracerProvider
-)
-
-// GetGlobalTracerProvider returns an existing or new global TracerProvider.
-// It installs the provider as the OTel global provider exactly once.
-func GetGlobalTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyValue) (*sdktrace.TracerProvider, error) {
-	tracerProviderMu.Lock()
-	defer tracerProviderMu.Unlock()
-
-	if tracerProvider == nil {
-		// TODO it looks like these attributes may be specific to an input run, so maybe the tracer provider can't be a singleton.
-		// also, should the input defer a flush or shutdown of the tracer provider?
-		tp, err := newTracerProvider(ctx, resourceAttributes)
-		if err != nil {
-			return nil, err
-		}
-		otel.SetTracerProvider(tp)
-		tracerProvider = tp
-	}
-
-	return tracerProvider, nil
-}
-
-func newTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyValue) (*sdktrace.TracerProvider, error) {
+func NewTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyValue) (*sdktrace.TracerProvider, error) {
 	exp, err := newSpanExporterFromEnv(ctx)
 	if err != nil {
 		return nil, err
