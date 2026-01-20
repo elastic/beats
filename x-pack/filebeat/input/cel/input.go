@@ -174,7 +174,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	metrics, reg := newInputMetrics(env.MetricsRegistry, env.Logger)
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
-	otelTracerProvider, err := otel.GetGlobalTracerProvider(ctx, getResourceAttributes(env, cfg))
+	otelTracerProvider, err := otel.NewTracerProvider(ctx, getResourceAttributes(env, cfg))
 	if err != nil {
 		return err
 	}
