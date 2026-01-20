@@ -210,6 +210,7 @@ func startHarvester(
 		// until a slot is available. Without this early check, repeated file events
 		// would spawn goroutines that wait on the semaphore only to discover (after
 		// acquiring it) that a harvester is already running, causing a goroutine leak.
+		ctx.Logger.Debug("Harvester already running")
 		return nil
 	}
 
