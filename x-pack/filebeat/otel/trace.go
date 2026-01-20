@@ -25,8 +25,8 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func NewTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyValue) (*sdktrace.TracerProvider, error) {
-	exp, err := newSpanExporterFromEnv(ctx)
+func NewTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyValue, inputName string) (*sdktrace.TracerProvider, error) {
+	exp, err := newSpanExporterFromEnv(ctx, inputName)
 	if err != nil {
 		return nil, err
 	}
@@ -57,19 +57,27 @@ func NewTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyVa
 // newSpanExporterFromEnv creates an exporter based on standard environment variables.
 // Returns (nil, nil) if the exporter is "none".
 // The environment variables considered are:
-// - OTEL_TRACES_EXPORTER (values: none|otlp|console, first supported wins, default: none)
+// - BEATS_OTEL_TRACES_DISABLE (CSV values: cel,httpjson, default: (none))
+// - OTEL_TRACES_EXPORTER (CSV values: none,otlp,console, first supported wins, default: none)
 // - OTEL_EXPORTER_OTLP_TRACES_PROTOCOL / OTEL_EXPORTER_OTLP_PROTOCOL (values: grpc|http/protobuf, default: grpc)
 // - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT / OTEL_EXPORTER_OTLP_ENDPOINT (e.g. "http://otlp-receiver.example.com:4317")
 // - OTEL_EXPORTER_OTLP_TRACES_HEADERS  / OTEL_EXPORTER_OTLP_HEADERS  (e.g. "Authorization=Bearer abc123,X-Client-Version=1.2.3")
 // - OTEL_EXPORTER_OTLP_TRACES_TIMEOUT  / OTEL_EXPORTER_OTLP_TIMEOUT  (in ms)
 // - OTEL_EXPORTER_OTLP_TRACES_INSECURE / OTEL_EXPORTER_OTLP_INSECURE (values: true|false, default: true if http scheme used, otherwise false)
-func newSpanExporterFromEnv(ctx context.Context) (sdktrace.SpanExporter, error) {
-	raw := strings.TrimSpace(os.Getenv("OTEL_TRACES_EXPORTER"))
-	if raw == "" {
-		raw = "none"
+func newSpanExporterFromEnv(ctx context.Context, inputName string) (sdktrace.SpanExporter, error) {
+	rawExporter := strings.TrimSpace(os.Getenv("OTEL_TRACES_EXPORTER"))
+	if rawExporter == "" {
+		rawExporter = "none"
 	}
 
-	candidates := splitCSV(raw)
+	rawDisable := strings.TrimSpace(os.Getenv("BEATS_OTEL_TRACES_DISABLE"))
+	for _, disabledInput := range splitCSV(rawDisable) {
+		if disabledInput == inputName {
+			rawExporter = "none"
+		}
+	}
+
+	candidates := splitCSV(rawExporter)
 	for _, expName := range candidates {
 		switch strings.ToLower(expName) {
 		case "none":
@@ -83,7 +91,7 @@ func newSpanExporterFromEnv(ctx context.Context) (sdktrace.SpanExporter, error) 
 		}
 	}
 
-	return nil, fmt.Errorf("no supported trace exporter found in OTEL_TRACES_EXPORTER=%q (supported: none, otlp, console)", raw)
+	return nil, fmt.Errorf("no supported trace exporter found in OTEL_TRACES_EXPORTER=%q (supported: none, otlp, console)", rawExporter)
 }
 
 func newOTLPTraceExporterFromEnv(ctx context.Context) (*otlptrace.Exporter, error) {
