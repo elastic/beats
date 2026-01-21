@@ -1,0 +1,112 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package awss3
+
+import (
+	"github.com/elastic/elastic-agent-libs/logp"
+)
+
+// pollingStrategy defines the strategy interface for S3 polling behavior.
+// It is added to support normal mode vs lexicographical ordering mode.
+type pollingStrategy interface {
+	// PrePollSetup is called before each polling run to perform any necessary setup.
+	PrePollSetup(log *logp.Logger, registry stateRegistry)
+
+	// GetStartAfterKey returns the S3 key to start listing from (for StartAfter parameter).
+	GetStartAfterKey(registry stateRegistry) string
+
+	// ShouldSkipObject determines if an object should be skipped based on state validation.
+	ShouldSkipObject(log *logp.Logger, state state, isStateValid func(*logp.Logger, state) bool) bool
+
+	// GetStateID returns the appropriate state ID for the given state.
+	GetStateID(state state) string
+
+	// ShouldSkipProcessed determines if already processed objects should be skipped.
+	ShouldSkipProcessed(registry stateRegistry, id string) bool
+}
+
+// normalPollingStrategy implements the default (non-lexicographical) polling behavior.
+// In this mode:
+// - All objects are listed from the beginning each poll cycle
+// - PrePollSetup - not required
+// - GetStartAfterKey - always returns empty string
+// - ShouldSkipObject - skips objects that don't pass the validity filter
+// - GetStateID - returns the state ID (etag and last modified time for change detection)
+// - ShouldSkipProcessed - skips already processed objects
+type normalPollingStrategy struct{}
+
+func newNormalPollingStrategy() pollingStrategy {
+	return &normalPollingStrategy{}
+}
+
+func (s *normalPollingStrategy) PrePollSetup(log *logp.Logger, registry stateRegistry) {
+	// No setup needed for normal mode
+}
+
+func (s *normalPollingStrategy) GetStartAfterKey(registry stateRegistry) string {
+	// Doesn't use StartAfter - lists from beginning each poll cycle
+	return ""
+}
+
+func (s *normalPollingStrategy) ShouldSkipObject(log *logp.Logger, state state, isStateValid func(*logp.Logger, state) bool) bool {
+	return !isStateValid(log, state)
+}
+
+func (s *normalPollingStrategy) GetStateID(state state) string {
+	return state.ID()
+}
+
+func (s *normalPollingStrategy) ShouldSkipProcessed(registry stateRegistry, id string) bool {
+	return registry.IsProcessed(id)
+}
+
+// lexicographicalPollingStrategy implements the lexicographical ordering behavior.
+// In this mode:
+// - Listing starts from the oldest known key (StartAfter parameter)
+// - PrePollSetup - sorts states to ensure the linked list is properly ordered before polling
+// - GetStartAfterKey - returns the oldest state's key as the starting point for S3 listing
+// - ShouldSkipObject - doesn't filter by state validity
+// - GetStateID - returns the state ID with a lexicographical suffix for isolation
+// - ShouldSkipProcessed - processes all listed objects (no skip for already processed)
+type lexicographicalPollingStrategy struct{}
+
+func newLexicographicalPollingStrategy() pollingStrategy {
+	return &lexicographicalPollingStrategy{}
+}
+
+func (s *lexicographicalPollingStrategy) PrePollSetup(log *logp.Logger, registry stateRegistry) {
+	// Checks if the registry is a lexicographical registry before sorting
+	if lexicoRegistry, ok := registry.(*lexicographicalStateRegistry); ok {
+		lexicoRegistry.SortStates(log)
+	}
+}
+
+func (s *lexicographicalPollingStrategy) GetStartAfterKey(registry stateRegistry) string {
+	oldestState := registry.GetLeastState()
+	if oldestState != nil {
+		return oldestState.Key
+	}
+	return ""
+}
+
+func (s *lexicographicalPollingStrategy) ShouldSkipObject(log *logp.Logger, state state, isStateValid func(*logp.Logger, state) bool) bool {
+	return false
+}
+
+func (s *lexicographicalPollingStrategy) GetStateID(state state) string {
+	return state.IDWithLexicographicalOrdering()
+}
+
+func (s *lexicographicalPollingStrategy) ShouldSkipProcessed(registry stateRegistry, id string) bool {
+	return false
+}
+
+// newPollingStrategy creates the appropriate polling strategy based on configuration flag.
+func newPollingStrategy(lexicographicalOrdering bool) pollingStrategy {
+	if lexicographicalOrdering {
+		return newLexicographicalPollingStrategy()
+	}
+	return newNormalPollingStrategy()
+}

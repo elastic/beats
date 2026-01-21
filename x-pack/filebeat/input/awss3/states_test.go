@@ -17,10 +17,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestStatesAddStateAndIsProcessed(t *testing.T) {
+// ============================================================================
+// Tests for normalStateRegistry
+// ============================================================================
+
+func TestNormalStateRegistry_AddStateAndIsProcessed(t *testing.T) {
 	type stateTestCase struct {
 		// An initialization callback to invoke on the (initially empty) states.
-		statesEdit func(states *states) error
+		statesEdit func(registry stateRegistry) error
 
 		// The state to call IsProcessed on and the expected result
 		state               state
@@ -35,47 +39,47 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 	testState1 := newState("bucket", "key", "etag", lastModified)
 	testState2 := newState("bucket1", "key1", "etag1", lastModified)
 	tests := map[string]stateTestCase{
-		"with empty states": {
+		"with empty registry": {
 			state:               testState1,
 			expectedIsProcessed: false,
 		},
 		"not existing state": {
-			statesEdit: func(states *states) error {
-				return states.AddState(testState2)
+			statesEdit: func(registry stateRegistry) error {
+				return registry.AddState(testState2)
 			},
 			state:               testState1,
 			expectedIsProcessed: false,
 		},
 		"existing state": {
-			statesEdit: func(states *states) error {
-				return states.AddState(testState1)
+			statesEdit: func(registry stateRegistry) error {
+				return registry.AddState(testState1)
 			},
 			state:               testState1,
 			expectedIsProcessed: true,
 		},
 		"existing stored state is persisted": {
-			statesEdit: func(states *states) error {
+			statesEdit: func(registry stateRegistry) error {
 				state := testState1
 				state.Stored = true
-				return states.AddState(state)
+				return registry.AddState(state)
 			},
 			state:               testState1,
 			shouldReload:        true,
 			expectedIsProcessed: true,
 		},
 		"existing failed state is persisted": {
-			statesEdit: func(states *states) error {
+			statesEdit: func(registry stateRegistry) error {
 				state := testState1
 				state.Failed = true
-				return states.AddState(state)
+				return registry.AddState(state)
 			},
 			state:               testState1,
 			shouldReload:        true,
 			expectedIsProcessed: true,
 		},
 		"existing unprocessed state is not persisted": {
-			statesEdit: func(states *states) error {
-				return states.AddState(testState1)
+			statesEdit: func(registry stateRegistry) error {
+				return registry.AddState(testState1)
 			},
 			state:               testState1,
 			shouldReload:        true,
@@ -87,24 +91,24 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 		test := test
 		t.Run(name, func(t *testing.T) {
 			store := openTestStatestore()
-			states, err := newStates(nil, store, "", false, 0)
-			require.NoError(t, err, "states creation must succeed")
+			registry, err := newStateRegistry(nil, store, "", false, 0)
+			require.NoError(t, err, "registry creation must succeed")
 			if test.statesEdit != nil {
-				err = test.statesEdit(states)
-				require.NoError(t, err, "states edit must succeed")
+				err = test.statesEdit(registry)
+				require.NoError(t, err, "registry edit must succeed")
 			}
 			if test.shouldReload {
-				states, err = newStates(nil, store, "", false, 0)
-				require.NoError(t, err, "states creation must succeed")
+				registry, err = newStateRegistry(nil, store, "", false, 0)
+				require.NoError(t, err, "registry creation must succeed")
 			}
 
-			isProcessed := states.IsProcessed(test.state.ID())
+			isProcessed := registry.IsProcessed(test.state.ID())
 			assert.Equal(t, test.expectedIsProcessed, isProcessed)
 		})
 	}
 }
 
-func TestStatesCleanUp(t *testing.T) {
+func TestNormalStateRegistry_CleanUp(t *testing.T) {
 	bucketName := "test-bucket"
 	lModifiedTime := time.Unix(0, 0)
 	stateA := newState(bucketName, "a", "a-etag", lModifiedTime)
@@ -146,57 +150,56 @@ func TestStatesCleanUp(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			store := openTestStatestore()
-			statesInstance, err := newStates(nil, store, "", false, 0)
-			require.NoError(t, err, "states creation must succeed")
+			registry, err := newStateRegistry(nil, store, "", false, 0)
+			require.NoError(t, err, "registry creation must succeed")
 
 			for _, s := range test.initStates {
-				err := statesInstance.AddState(s)
+				err := registry.AddState(s)
 				require.NoError(t, err, "state initialization must succeed")
 			}
 
 			// perform cleanup
-			err = statesInstance.CleanUp(test.knownIDs)
+			err = registry.CleanUp(test.knownIDs)
 			require.NoError(t, err, "state cleanup must succeed")
 
 			// validate
+			normalRegistry := registry.(*normalStateRegistry)
 			for _, id := range test.expectIDs {
 				// must be in local state
-				_, ok := statesInstance.states[id]
+				_, ok := normalRegistry.states[id]
 				require.True(t, ok, fmt.Errorf("expected id %s in state, but got missing", id))
-
 				// must be in store
-				ok, err := statesInstance.store.Has(getStoreKey(id))
+				ok, err = normalRegistry.store.Has(getStoreKey(id))
 				require.NoError(t, err, "state has must succeed")
 				require.True(t, ok, fmt.Errorf("expected id %s in store, but got missing", id))
 			}
 		})
 	}
-
 }
 
-func TestStatesPrefixHandling(t *testing.T) {
+func TestNormalStateRegistry_PrefixHandling(t *testing.T) {
 	logger := logp.NewLogger("state-prefix-testing")
 
 	t.Run("if prefix was set, accept only states with prefix", func(t *testing.T) {
 		// given
-		registry := openTestStatestore()
+		store := openTestStatestore()
 
 		// when - registry with prefix
-		st, err := newStates(logger, registry, "staging-", false, 0)
+		registry, err := newStateRegistry(logger, store, "staging-", false, 0)
 		require.NoError(t, err)
 
 		// then - fail for non prefixed
-		err = st.AddState(newState("bucket", "production-logA", "etag", time.Now()))
+		err = registry.AddState(newState("bucket", "production-logA", "etag", time.Now()))
 		require.Error(t, err)
 
 		// then - pass for correctly prefixed
-		err = st.AddState(newState("bucket", "staging-logA", "etag", time.Now()))
+		err = registry.AddState(newState("bucket", "staging-logA", "etag", time.Now()))
 		require.NoError(t, err)
 	})
 
-	t.Run("states store only load entries matching the given prefix", func(t *testing.T) {
+	t.Run("registry only loads entries matching the given prefix", func(t *testing.T) {
 		// given
-		registry := openTestStatestore()
+		store := openTestStatestore()
 
 		sA := newState("bucket", "A", "etag", time.Unix(1733221244, 0))
 		sA.Stored = true
@@ -208,18 +211,18 @@ func TestStatesPrefixHandling(t *testing.T) {
 		sSpace.Stored = true
 
 		// add various states first with no prefix
-		st, err := newStates(logger, registry, "", false, 0)
+		registry, err := newStateRegistry(logger, store, "", false, 0)
 		require.NoError(t, err)
 
-		_ = st.AddState(sA)
-		_ = st.AddState(sStagingA)
-		_ = st.AddState(sProdB)
-		_ = st.AddState(sSpace)
+		_ = registry.AddState(sA)
+		_ = registry.AddState(sStagingA)
+		_ = registry.AddState(sProdB)
+		_ = registry.AddState(sSpace)
 
 		// Reload states and validate
 
 		// when - no prefix reload
-		stNoPrefix, err := newStates(logger, registry, "", false, 0)
+		stNoPrefix, err := newStateRegistry(logger, store, "", false, 0)
 		require.NoError(t, err)
 
 		require.True(t, stNoPrefix.IsProcessed(sA.ID()))
@@ -228,48 +231,63 @@ func TestStatesPrefixHandling(t *testing.T) {
 		require.True(t, stNoPrefix.IsProcessed(sSpace.ID()))
 
 		// when - with prefix `staging-`
-		st, err = newStates(logger, registry, "staging-", false, 0)
+		stStaging, err := newStateRegistry(logger, store, "staging-", false, 0)
 		require.NoError(t, err)
 
-		require.False(t, st.IsProcessed(sA.ID()))
-		require.True(t, st.IsProcessed(sStagingA.ID()))
-		require.False(t, st.IsProcessed(sProdB.ID()))
-		require.False(t, st.IsProcessed(sSpace.ID()))
+		require.False(t, stStaging.IsProcessed(sA.ID()))
+		require.True(t, stStaging.IsProcessed(sStagingA.ID()))
+		require.False(t, stStaging.IsProcessed(sProdB.ID()))
+		require.False(t, stStaging.IsProcessed(sSpace.ID()))
 
 		// when - with prefix `production/`
-		st, err = newStates(logger, registry, "production/", false, 0)
+		stProd, err := newStateRegistry(logger, store, "production/", false, 0)
 		require.NoError(t, err)
 
-		require.False(t, st.IsProcessed(sA.ID()))
-		require.False(t, st.IsProcessed(sStagingA.ID()))
-		require.True(t, st.IsProcessed(sProdB.ID()))
-		require.False(t, st.IsProcessed(sSpace.ID()))
+		require.False(t, stProd.IsProcessed(sA.ID()))
+		require.False(t, stProd.IsProcessed(sStagingA.ID()))
+		require.True(t, stProd.IsProcessed(sProdB.ID()))
+		require.False(t, stProd.IsProcessed(sSpace.ID()))
 	})
-
 }
 
-func TestStatesLexicographicalMode(t *testing.T) {
-	logger := logp.NewLogger("states-lexicographical-test")
+func TestNormalStateRegistry_GetOldestState(t *testing.T) {
+	store := openTestStatestore()
+	registry, err := newStateRegistry(nil, store, "", false, 0)
+	require.NoError(t, err)
 
-	t.Run("AddState with lexicographical ordering uses IDWithLexicographicalOrdering", func(t *testing.T) {
+	// Normal mode doesn't track ordering
+	oldest := registry.GetLeastState()
+	require.Nil(t, oldest, "normal registry should return nil for GetOldestState")
+}
+
+// ============================================================================
+// Tests for lexicographicalStateRegistry
+// ============================================================================
+
+func TestLexicographicalStateRegistry_AddStateAndIsProcessed(t *testing.T) {
+	logger := logp.NewLogger("lexicographical-registry-test")
+
+	t.Run("AddState uses IDWithLexicographicalOrdering", func(t *testing.T) {
 		store := openTestStatestore()
-		states, err := newStates(logger, store, "", true, 10)
+		registry, err := newStateRegistry(logger, store, "", true, 10)
 		require.NoError(t, err)
 
 		state1 := newState("bucket", "key1", "etag1", time.Unix(1000, 0))
 		state1.Stored = true
-		err = states.AddState(state1)
+		err = registry.AddState(state1)
 		require.NoError(t, err)
 
-		require.True(t, states.IsProcessed(state1.IDWithLexicographicalOrdering()))
-		require.False(t, states.IsProcessed(state1.ID()))
+		require.True(t, registry.IsProcessed(state1.IDWithLexicographicalOrdering()))
+		require.False(t, registry.IsProcessed(state1.ID()))
 	})
 
 	t.Run("AddState evicts oldest state when at capacity", func(t *testing.T) {
 		store := openTestStatestore()
 		capacity := 3
-		states, err := newStates(logger, store, "", true, capacity)
+		registry, err := newStateRegistry(logger, store, "", true, capacity)
 		require.NoError(t, err)
+
+		lexicoRegistry := registry.(*lexicographicalStateRegistry)
 
 		stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
 		stateA.Stored = true
@@ -280,27 +298,27 @@ func TestStatesLexicographicalMode(t *testing.T) {
 		stateD := newState("bucket", "d", "etag", time.Unix(4000, 0))
 		stateD.Stored = true
 
-		err = states.AddState(stateA)
+		err = registry.AddState(stateA)
 		require.NoError(t, err)
-		err = states.AddState(stateB)
+		err = registry.AddState(stateB)
 		require.NoError(t, err)
-		err = states.AddState(stateC)
+		err = registry.AddState(stateC)
 		require.NoError(t, err)
 
-		require.True(t, states.IsProcessed(stateA.IDWithLexicographicalOrdering()))
-		require.True(t, states.IsProcessed(stateB.IDWithLexicographicalOrdering()))
-		require.True(t, states.IsProcessed(stateC.IDWithLexicographicalOrdering()))
+		require.True(t, registry.IsProcessed(stateA.IDWithLexicographicalOrdering()))
+		require.True(t, registry.IsProcessed(stateB.IDWithLexicographicalOrdering()))
+		require.True(t, registry.IsProcessed(stateC.IDWithLexicographicalOrdering()))
 
 		// This should evict stateA (lexicographically oldest)
-		err = states.AddState(stateD)
+		err = registry.AddState(stateD)
 		require.NoError(t, err)
 
-		require.False(t, states.IsProcessed(stateA.IDWithLexicographicalOrdering()))
-		require.True(t, states.IsProcessed(stateB.IDWithLexicographicalOrdering()))
-		require.True(t, states.IsProcessed(stateC.IDWithLexicographicalOrdering()))
-		require.True(t, states.IsProcessed(stateD.IDWithLexicographicalOrdering()))
+		require.False(t, registry.IsProcessed(stateA.IDWithLexicographicalOrdering()))
+		require.True(t, registry.IsProcessed(stateB.IDWithLexicographicalOrdering()))
+		require.True(t, registry.IsProcessed(stateC.IDWithLexicographicalOrdering()))
+		require.True(t, registry.IsProcessed(stateD.IDWithLexicographicalOrdering()))
 
-		ok, err := states.store.Has(getStoreKey(stateA.IDWithLexicographicalOrdering()))
+		ok, err := lexicoRegistry.store.Has(getStoreKey(stateA.IDWithLexicographicalOrdering()))
 		require.NoError(t, err)
 		require.False(t, ok, "stateA should be removed from store")
 	})
@@ -308,52 +326,59 @@ func TestStatesLexicographicalMode(t *testing.T) {
 	t.Run("AddState updates existing state without eviction", func(t *testing.T) {
 		store := openTestStatestore()
 		capacity := 2
-		states, err := newStates(logger, store, "", true, capacity)
+		registry, err := newStateRegistry(logger, store, "", true, capacity)
 		require.NoError(t, err)
+
+		lexicoRegistry := registry.(*lexicographicalStateRegistry)
 
 		state1 := newState("bucket", "key1", "etag", time.Unix(1000, 0))
 		state2 := newState("bucket", "key2", "etag", time.Unix(2000, 0))
 
-		err = states.AddState(state1)
+		err = registry.AddState(state1)
 		require.NoError(t, err)
-		err = states.AddState(state2)
+		err = registry.AddState(state2)
 		require.NoError(t, err)
 
 		// Update state1 (should not trigger eviction)
 		state1Updated := newState("bucket", "key1", "etag", time.Unix(1000, 0))
 		state1Updated.Stored = true
-		err = states.AddState(state1Updated)
+		err = registry.AddState(state1Updated)
 		require.NoError(t, err)
 
-		require.True(t, states.IsProcessed(state1.IDWithLexicographicalOrdering()))
-		require.True(t, states.IsProcessed(state2.IDWithLexicographicalOrdering()))
-		require.Equal(t, 2, len(states.states))
+		require.True(t, registry.IsProcessed(state1.IDWithLexicographicalOrdering()))
+		require.True(t, registry.IsProcessed(state2.IDWithLexicographicalOrdering()))
+		require.Equal(t, 2, len(lexicoRegistry.states))
 	})
+}
 
-	t.Run("GetOldestState returns head of linked list", func(t *testing.T) {
+func TestLexicographicalStateRegistry_GetOldestState(t *testing.T) {
+	logger := logp.NewLogger("lexicographical-registry-test")
+	store := openTestStatestore()
+	registry, err := newStateRegistry(logger, store, "", true, 10)
+	require.NoError(t, err)
+
+	stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
+	stateB := newState("bucket", "b", "etag", time.Unix(2000, 0))
+	stateC := newState("bucket", "c", "etag", time.Unix(3000, 0))
+
+	err = registry.AddState(stateC)
+	require.NoError(t, err)
+	err = registry.AddState(stateA)
+	require.NoError(t, err)
+	err = registry.AddState(stateB)
+	require.NoError(t, err)
+
+	oldest := registry.GetLeastState()
+	require.NotNil(t, oldest)
+	require.Equal(t, "c", oldest.Key)
+}
+
+func TestLexicographicalStateRegistry_CleanUp(t *testing.T) {
+	logger := logp.NewLogger("lexicographical-registry-test")
+
+	t.Run("CleanUp preserves newest state", func(t *testing.T) {
 		store := openTestStatestore()
-		states, err := newStates(logger, store, "", true, 10)
-		require.NoError(t, err)
-
-		stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
-		stateB := newState("bucket", "b", "etag", time.Unix(2000, 0))
-		stateC := newState("bucket", "c", "etag", time.Unix(3000, 0))
-
-		err = states.AddState(stateC)
-		require.NoError(t, err)
-		err = states.AddState(stateA)
-		require.NoError(t, err)
-		err = states.AddState(stateB)
-		require.NoError(t, err)
-
-		oldest := states.GetOldestState()
-		require.NotNil(t, oldest)
-		require.Equal(t, "c", oldest.Key)
-	})
-
-	t.Run("CleanUp preserves newest state in lexicographical mode", func(t *testing.T) {
-		store := openTestStatestore()
-		states, err := newStates(logger, store, "", true, 10)
+		registry, err := newStateRegistry(logger, store, "", true, 10)
 		require.NoError(t, err)
 
 		stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
@@ -363,27 +388,29 @@ func TestStatesLexicographicalMode(t *testing.T) {
 		stateC := newState("bucket", "c", "etag", time.Unix(3000, 0))
 		stateC.Stored = true
 
-		err = states.AddState(stateA)
+		err = registry.AddState(stateA)
 		require.NoError(t, err)
-		err = states.AddState(stateB)
+		err = registry.AddState(stateB)
 		require.NoError(t, err)
-		err = states.AddState(stateC)
+		err = registry.AddState(stateC)
 		require.NoError(t, err)
 
-		err = states.CleanUp([]string{})
+		err = registry.CleanUp([]string{})
 		require.NoError(t, err)
 
 		// stateC (lexicographically greatest) should be preserved
 		// Atleast one state should be preserved for startAfterKey
-		require.False(t, states.IsProcessed(stateA.IDWithLexicographicalOrdering()))
-		require.False(t, states.IsProcessed(stateB.IDWithLexicographicalOrdering()))
-		require.True(t, states.IsProcessed(stateC.IDWithLexicographicalOrdering()))
+		require.False(t, registry.IsProcessed(stateA.IDWithLexicographicalOrdering()))
+		require.False(t, registry.IsProcessed(stateB.IDWithLexicographicalOrdering()))
+		require.True(t, registry.IsProcessed(stateC.IDWithLexicographicalOrdering()))
 	})
 
 	t.Run("CleanUp removes states not in known list", func(t *testing.T) {
 		store := openTestStatestore()
-		states, err := newStates(logger, store, "", true, 10)
+		registry, err := newStateRegistry(logger, store, "", true, 10)
 		require.NoError(t, err)
+
+		lexicoRegistry := registry.(*lexicographicalStateRegistry)
 
 		stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
 		stateA.Stored = true
@@ -392,103 +419,221 @@ func TestStatesLexicographicalMode(t *testing.T) {
 		stateC := newState("bucket", "c", "etag", time.Unix(3000, 0))
 		stateC.Stored = true
 
-		err = states.AddState(stateA)
+		err = registry.AddState(stateA)
 		require.NoError(t, err)
-		err = states.AddState(stateB)
+		err = registry.AddState(stateB)
 		require.NoError(t, err)
-		err = states.AddState(stateC)
-		require.NoError(t, err)
-
-		err = states.CleanUp([]string{stateA.IDWithLexicographicalOrdering()})
+		err = registry.AddState(stateC)
 		require.NoError(t, err)
 
-		require.True(t, states.IsProcessed(stateA.IDWithLexicographicalOrdering()))
-		require.False(t, states.IsProcessed(stateB.IDWithLexicographicalOrdering()))
-		require.False(t, states.IsProcessed(stateC.IDWithLexicographicalOrdering()))
-		require.Equal(t, 1, len(states.states))
+		err = registry.CleanUp([]string{stateA.IDWithLexicographicalOrdering()})
+		require.NoError(t, err)
+
+		require.True(t, registry.IsProcessed(stateA.IDWithLexicographicalOrdering()))
+		require.False(t, registry.IsProcessed(stateB.IDWithLexicographicalOrdering()))
+		require.False(t, registry.IsProcessed(stateC.IDWithLexicographicalOrdering()))
+		require.Equal(t, 1, len(lexicoRegistry.states))
+	})
+}
+
+func TestLexicographicalStateRegistry_TrimsOnLoad(t *testing.T) {
+	logger := logp.NewLogger("lexicographical-registry-test")
+	store := openTestStatestore()
+
+	registry1, err := newStateRegistry(logger, store, "", false, 0)
+	require.NoError(t, err)
+
+	normalRegistry1 := registry1.(*normalStateRegistry)
+
+	stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
+	stateA.Stored = true
+	stateB := newState("bucket", "b", "etag", time.Unix(2000, 0))
+	stateB.Stored = true
+	stateC := newState("bucket", "c", "etag", time.Unix(3000, 0))
+	stateC.Stored = true
+	stateD := newState("bucket", "d", "etag", time.Unix(4000, 0))
+	stateD.Stored = true
+
+	// Store using lexicographical IDs to simulate previous lexicographical mode data
+	err = normalRegistry1.store.Set(getStoreKey(stateA.IDWithLexicographicalOrdering()), stateA)
+	require.NoError(t, err)
+	err = normalRegistry1.store.Set(getStoreKey(stateB.IDWithLexicographicalOrdering()), stateB)
+	require.NoError(t, err)
+	err = normalRegistry1.store.Set(getStoreKey(stateC.IDWithLexicographicalOrdering()), stateC)
+	require.NoError(t, err)
+	err = normalRegistry1.store.Set(getStoreKey(stateD.IDWithLexicographicalOrdering()), stateD)
+	require.NoError(t, err)
+
+	// Now reload with lexicographical mode and capacity of 2
+	capacity := 2
+	registry2, err := newStateRegistry(logger, store, "", true, capacity)
+	require.NoError(t, err)
+
+	lexicoRegistry2 := registry2.(*lexicographicalStateRegistry)
+
+	// Should only have the 2 newest (lexicographically greatest) states: c and d
+	require.Equal(t, capacity, len(lexicoRegistry2.states))
+	require.False(t, registry2.IsProcessed(stateA.IDWithLexicographicalOrdering()))
+	require.False(t, registry2.IsProcessed(stateB.IDWithLexicographicalOrdering()))
+	require.True(t, registry2.IsProcessed(stateC.IDWithLexicographicalOrdering()))
+	require.True(t, registry2.IsProcessed(stateD.IDWithLexicographicalOrdering()))
+
+	// Verify trimmed states are also removed from store
+	ok, err := lexicoRegistry2.store.Has(getStoreKey(stateA.IDWithLexicographicalOrdering()))
+	require.NoError(t, err)
+	require.False(t, ok, "stateA should be removed from store during trim")
+	ok, err = lexicoRegistry2.store.Has(getStoreKey(stateB.IDWithLexicographicalOrdering()))
+	require.NoError(t, err)
+	require.False(t, ok, "stateB should be removed from store during trim")
+}
+
+func TestLexicographicalStateRegistry_SortStates(t *testing.T) {
+	logger := logp.NewLogger("lexicographical-registry-test")
+	store := openTestStatestore()
+	registry, err := newStateRegistry(logger, store, "", true, 10)
+	require.NoError(t, err)
+
+	lexicoRegistry := registry.(*lexicographicalStateRegistry)
+
+	stateC := newState("bucket", "c", "etag", time.Unix(3000, 0))
+	stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
+	stateB := newState("bucket", "b", "etag", time.Unix(2000, 0))
+
+	err = registry.AddState(stateC)
+	require.NoError(t, err)
+	err = registry.AddState(stateA)
+	require.NoError(t, err)
+	err = registry.AddState(stateB)
+	require.NoError(t, err)
+
+	lexicoRegistry.SortStates(log)
+
+	// After sorting, verify the linked list structure: nil <- (head) a <-> b <-> c (tail) -> nil
+	require.NotNil(t, lexicoRegistry.head)
+	require.Equal(t, "a", lexicoRegistry.head.Key)
+
+	require.NotNil(t, lexicoRegistry.tail)
+	require.Equal(t, "c", lexicoRegistry.tail.Key)
+
+	require.NotNil(t, lexicoRegistry.head.next)
+	require.Equal(t, "b", lexicoRegistry.head.next.Key)
+	require.NotNil(t, lexicoRegistry.head.next.next)
+	require.Equal(t, "c", lexicoRegistry.head.next.next.Key)
+	require.Nil(t, lexicoRegistry.head.next.next.next)
+
+	require.Nil(t, lexicoRegistry.head.prev)
+	require.Equal(t, lexicoRegistry.head, lexicoRegistry.head.next.prev)
+	require.Equal(t, lexicoRegistry.head.next, lexicoRegistry.tail.prev)
+	require.Nil(t, lexicoRegistry.tail.next)
+}
+
+// ============================================================================
+// Tests for newStateRegistry factory function
+// ============================================================================
+
+func TestNewStateRegistry(t *testing.T) {
+	t.Run("returns normalStateRegistry when lexicographical ordering is false", func(t *testing.T) {
+		store := openTestStatestore()
+		registry, err := newStateRegistry(nil, store, "", false, 0)
+		require.NoError(t, err)
+
+		_, ok := registry.(*normalStateRegistry)
+		assert.True(t, ok, "expected normalStateRegistry")
 	})
 
-	t.Run("newStates trims loaded states to capacity", func(t *testing.T) {
+	t.Run("returns lexicographicalStateRegistry when lexicographical ordering is true", func(t *testing.T) {
 		store := openTestStatestore()
+		registry, err := newStateRegistry(nil, store, "", true, 10)
+		require.NoError(t, err)
 
-		states1, err := newStates(logger, store, "", false, 0)
+		_, ok := registry.(*lexicographicalStateRegistry)
+		assert.True(t, ok, "expected lexicographicalStateRegistry")
+	})
+}
+
+// ============================================================================
+// Tests documenting behavioral differences between implementations
+// ============================================================================
+
+func TestStateRegistryBehaviorDifferences(t *testing.T) {
+	logger := logp.NewLogger("state-registry-diff-test")
+
+	t.Run("ID format differs between implementations", func(t *testing.T) {
+		normalStore := openTestStatestore()
+		lexicoStore := openTestStatestore()
+
+		normalRegistry, err := newStateRegistry(logger, normalStore, "", false, 0)
+		require.NoError(t, err)
+
+		lexicoRegistry, err := newStateRegistry(logger, lexicoStore, "", true, 10)
+		require.NoError(t, err)
+
+		state := newState("bucket", "key", "etag", time.Unix(1000, 0))
+		state.Stored = true
+
+		err = normalRegistry.AddState(state)
+		require.NoError(t, err)
+		err = lexicoRegistry.AddState(state)
+		require.NoError(t, err)
+
+		require.True(t, normalRegistry.IsProcessed(state.ID()))
+		require.False(t, normalRegistry.IsProcessed(state.IDWithLexicographicalOrdering()))
+
+		require.False(t, lexicoRegistry.IsProcessed(state.ID()))
+		require.True(t, lexicoRegistry.IsProcessed(state.IDWithLexicographicalOrdering()))
+	})
+
+	t.Run("GetOldestState behavior differs", func(t *testing.T) {
+		normalStore := openTestStatestore()
+		lexicoStore := openTestStatestore()
+
+		normalRegistry, err := newStateRegistry(logger, normalStore, "", false, 0)
+		require.NoError(t, err)
+
+		lexicoRegistry, err := newStateRegistry(logger, lexicoStore, "", true, 10)
+		require.NoError(t, err)
+
+		state := newState("bucket", "key", "etag", time.Unix(1000, 0))
+
+		err = normalRegistry.AddState(state)
+		require.NoError(t, err)
+		err = lexicoRegistry.AddState(state)
+		require.NoError(t, err)
+
+		require.Nil(t, normalRegistry.GetLeastState())
+		require.NotNil(t, lexicoRegistry.GetLeastState())
+	})
+
+	t.Run("Capacity limiting only applies to lexicographical", func(t *testing.T) {
+		normalStore := openTestStatestore()
+		lexicoStore := openTestStatestore()
+
+		normalRegistry, err := newStateRegistry(logger, normalStore, "", false, 2)
+		require.NoError(t, err)
+
+		lexicoRegistry, err := newStateRegistry(logger, lexicoStore, "", true, 2)
 		require.NoError(t, err)
 
 		stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
-		stateA.Stored = true
 		stateB := newState("bucket", "b", "etag", time.Unix(2000, 0))
-		stateB.Stored = true
 		stateC := newState("bucket", "c", "etag", time.Unix(3000, 0))
-		stateC.Stored = true
-		stateD := newState("bucket", "d", "etag", time.Unix(4000, 0))
-		stateD.Stored = true
 
-		// Store using lexicographical IDs to simulate previous lexicographical mode data
-		err = states1.store.Set(getStoreKey(stateA.IDWithLexicographicalOrdering()), stateA)
-		require.NoError(t, err)
-		err = states1.store.Set(getStoreKey(stateB.IDWithLexicographicalOrdering()), stateB)
-		require.NoError(t, err)
-		err = states1.store.Set(getStoreKey(stateC.IDWithLexicographicalOrdering()), stateC)
-		require.NoError(t, err)
-		err = states1.store.Set(getStoreKey(stateD.IDWithLexicographicalOrdering()), stateD)
-		require.NoError(t, err)
+		for _, s := range []state{stateA, stateB, stateC} {
+			err = normalRegistry.AddState(s)
+			require.NoError(t, err)
+			err = lexicoRegistry.AddState(s)
+			require.NoError(t, err)
+		}
 
-		// Now reload with lexicographical mode and capacity of 2
-		capacity := 2
-		states2, err := newStates(logger, store, "", true, capacity)
-		require.NoError(t, err)
+		// Normal keeps all 3
+		require.True(t, normalRegistry.IsProcessed(stateA.ID()))
+		require.True(t, normalRegistry.IsProcessed(stateB.ID()))
+		require.True(t, normalRegistry.IsProcessed(stateC.ID()))
 
-		// Should only have the 2 newest (lexicographically greatest) states: c and d
-		require.Equal(t, capacity, len(states2.states))
-		require.False(t, states2.IsProcessed(stateA.IDWithLexicographicalOrdering()))
-		require.False(t, states2.IsProcessed(stateB.IDWithLexicographicalOrdering()))
-		require.True(t, states2.IsProcessed(stateC.IDWithLexicographicalOrdering()))
-		require.True(t, states2.IsProcessed(stateD.IDWithLexicographicalOrdering()))
-
-		// Verify trimmed states are also removed from store
-		ok, err := states2.store.Has(getStoreKey(stateA.IDWithLexicographicalOrdering()))
-		require.NoError(t, err)
-		require.False(t, ok, "stateA should be removed from store during trim")
-		ok, err = states2.store.Has(getStoreKey(stateB.IDWithLexicographicalOrdering()))
-		require.NoError(t, err)
-		require.False(t, ok, "stateB should be removed from store during trim")
-	})
-
-	t.Run("SortStatesByLexicographicalOrdering rebuilds linked list", func(t *testing.T) {
-		store := openTestStatestore()
-		states, err := newStates(logger, store, "", true, 10)
-		require.NoError(t, err)
-
-		stateC := newState("bucket", "c", "etag", time.Unix(3000, 0))
-		stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
-		stateB := newState("bucket", "b", "etag", time.Unix(2000, 0))
-
-		err = states.AddState(stateC)
-		require.NoError(t, err)
-		err = states.AddState(stateA)
-		require.NoError(t, err)
-		err = states.AddState(stateB)
-		require.NoError(t, err)
-
-		states.SortStatesByLexicographicalOrdering(logger)
-
-		// After sorting, verify the linked list structure: nil <- (head) a <-> b <-> c (tail) -> nil
-		require.NotNil(t, states.head)
-		require.Equal(t, "a", states.head.Key)
-
-		require.NotNil(t, states.tail)
-		require.Equal(t, "c", states.tail.Key)
-
-		require.NotNil(t, states.head.next)
-		require.Equal(t, "b", states.head.next.Key)
-		require.NotNil(t, states.head.next.next)
-		require.Equal(t, "c", states.head.next.next.Key)
-		require.Nil(t, states.head.next.next.next)
-
-		require.Nil(t, states.head.prev)
-		require.Equal(t, states.head, states.head.next.prev)
-		require.Equal(t, states.head.next, states.tail.prev)
-		require.Nil(t, states.tail.next)
+		// Lexicographical removes A, keeps only 2
+		require.False(t, lexicoRegistry.IsProcessed(stateA.IDWithLexicographicalOrdering()))
+		require.True(t, lexicoRegistry.IsProcessed(stateB.IDWithLexicographicalOrdering()))
+		require.True(t, lexicoRegistry.IsProcessed(stateC.IDWithLexicographicalOrdering()))
 	})
 }
 

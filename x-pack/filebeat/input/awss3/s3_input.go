@@ -38,8 +38,9 @@ type s3PollerInput struct {
 	s3              s3API
 	metrics         *inputMetrics
 	s3ObjectHandler s3ObjectHandlerFactory
-	states          *states
+	registry        stateRegistry
 	filterProvider  *filterProvider
+	strategy        pollingStrategy
 
 	// health status reporting
 	status status.StatusReporter
@@ -78,13 +79,13 @@ func (in *s3PollerInput) Run(
 	var err error
 
 	// Load the persistent S3 polling state.
-	in.states, err = newStates(in.log, in.store, in.config.BucketListPrefix, in.config.LexicographicalOrdering, in.config.LexicographicalLookbackKeys)
+	in.registry, err = newStateRegistry(in.log, in.store, in.config.BucketListPrefix, in.config.LexicographicalOrdering, in.config.LexicographicalLookbackKeys)
 	if err != nil {
 		err = fmt.Errorf("can not start persistent store: %w", err)
 		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failure: %s", err.Error()))
 		return err
 	}
-	defer in.states.Close()
+	defer in.registry.Close()
 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 	in.status.UpdateStatus(status.Configuring, "Configuring input")
@@ -106,6 +107,8 @@ func (in *s3PollerInput) Run(
 		in.log,
 	)
 
+	in.strategy = newPollingStrategy(in.config.LexicographicalOrdering)
+
 	in.run(ctx)
 	in.status.UpdateStatus(status.Stopped, "Input execution ended")
 	return nil
@@ -118,10 +121,7 @@ func (in *s3PollerInput) run(ctx context.Context) {
 	for ctx.Err() == nil {
 		runStartTime := time.Now()
 
-		// In lexicographical ordering mode, sort states before running the poll
-		if in.config.LexicographicalOrdering {
-			in.states.SortStatesByLexicographicalOrdering(in.log)
-		}
+		in.strategy.PrePollSetup(in.log, in.registry)
 
 		in.runPoll(ctx)
 
@@ -158,7 +158,7 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 	}
 
 	// Perform state cleanup operation
-	err := in.states.CleanUp(ids)
+	err := in.registry.CleanUp(ids)
 	if err != nil {
 		in.log.Errorf("failed to cleanup states: %v", err.Error())
 		in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Input state cleanup failure: %s", err.Error()))
@@ -224,7 +224,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 
 		// Add the cleanup handling to the acks helper
 		acks.Add(publishCount, func() {
-			err := in.states.AddState(state)
+			err := in.registry.AddState(state)
 			if err != nil {
 				in.log.Errorf("saving completed object state: %v", err.Error())
 				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failure checkpointing (saving completed object state): %s", err.Error()))
@@ -249,13 +249,9 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 
 	errorBackoff := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 	circuitBreaker := 0
-	var startAfterKey string
-	if in.config.LexicographicalOrdering {
-		oldestState := in.states.GetOldestState()
-		if oldestState != nil {
-			startAfterKey = oldestState.Key
-		}
-	}
+
+	startAfterKey := in.strategy.GetStartAfterKey(in.registry)
+
 	paginator := in.s3.ListObjectsPaginator(in.log, bucketName, in.config.BucketListPrefix, startAfterKey)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -288,19 +284,17 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 		in.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Contents {
 			state := newState(bucketName, *object.Key, *object.ETag, *object.LastModified)
-			if !in.config.LexicographicalOrdering && !isStateValid(in.log, state) {
+
+			if in.strategy.ShouldSkipObject(in.log, state, isStateValid) {
 				continue
 			}
 
-			var id string
-			if in.config.LexicographicalOrdering {
-				id = state.IDWithLexicographicalOrdering()
-			} else {
-				id = state.ID()
-			}
-			// add to known states only if valid for processing
+			id := in.strategy.GetStateID(state)
+
+			// Add to known states for cleanup tracking
 			knownStateIDSlice = append(knownStateIDSlice, id)
-			if !in.config.LexicographicalOrdering && in.states.IsProcessed(id) {
+
+			if in.strategy.ShouldSkipProcessed(in.registry, id) {
 				in.log.Debugw("skipping state processing as already processed.", "state", state)
 				continue
 			}

@@ -342,8 +342,8 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				s3API.pagerConstant = newS3PagerConstant(curConfig.BucketListPrefix)
 				store := openTestStatestore()
 
-				states, err := newStates(nil, store, "", false, 0)
-				assert.NoError(t, err, "states creation should succeed")
+				registry, err := newStateRegistry(nil, store, "", false, 0)
+				assert.NoError(t, err, "registry creation should succeed")
 
 				s3EventHandlerFactory := newS3ObjectProcessorFactory(metrics, s3API, config.FileSelectors, backupConfig{}, logp.NewNopLogger())
 				s3Poller := &s3PollerInput{
@@ -353,9 +353,10 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					s3:              s3API,
 					pipeline:        pipeline,
 					s3ObjectHandler: s3EventHandlerFactory,
-					states:          states,
+					registry:        registry,
 					provider:        "provider",
 					filterProvider:  newFilterProvider(&config),
+					strategy:        newPollingStrategy(config.LexicographicalOrdering),
 					status:          &statusReporterHelperMock{},
 				}
 

@@ -129,8 +129,8 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{}, logp.NewNopLogger())
-		states, err := newStates(nil, store, listPrefix, false, 0)
-		require.NoError(t, err, "states creation must succeed")
+		registry, err := newStateRegistry(nil, store, listPrefix, false, 0)
+		require.NoError(t, err, "registry creation must succeed")
 
 		cfg := config{
 			NumberOfWorkers:    numberOfWorkers,
@@ -145,10 +145,11 @@ func TestS3Poller(t *testing.T) {
 			s3:              mockAPI,
 			pipeline:        pipeline,
 			s3ObjectHandler: s3ObjProc,
-			states:          states,
+			registry:        registry,
 			provider:        "provider",
 			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
+			strategy:        newPollingStrategy(cfg.LexicographicalOrdering),
 			status:          &statusReporterHelperMock{},
 		}
 		poller.runPoll(ctx)
@@ -271,8 +272,8 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{}, logp.NewNopLogger())
-		states, err := newStates(nil, store, listPrefix, false, 0)
-		require.NoError(t, err, "states creation must succeed")
+		registry, err := newStateRegistry(nil, store, listPrefix, false, 0)
+		require.NoError(t, err, "registry creation must succeed")
 
 		cfg := config{
 			NumberOfWorkers:    numberOfWorkers,
@@ -294,10 +295,11 @@ func TestS3Poller(t *testing.T) {
 			s3:              mockS3,
 			pipeline:        pipeline,
 			s3ObjectHandler: s3ObjProc,
-			states:          states,
+			registry:        registry,
 			provider:        "provider",
 			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
+			strategy:        newPollingStrategy(false),
 			status:          &statusReporterHelperMock{},
 		}
 		poller.run(ctx)
@@ -315,16 +317,16 @@ func TestS3Poller(t *testing.T) {
 		mockPager := NewMockS3Pager(ctrl)
 		pipeline := newFakePipeline()
 
-		states, err := newStates(nil, store, "", true, 100)
-		require.NoError(t, err, "states creation must succeed")
+		registry, err := newStateRegistry(nil, store, "", true, 100)
+		require.NoError(t, err, "registry creation must succeed")
 
 		// This will be used as startAfterKey
 		existingState := newState(bucket, "existing-key", "etag", time.Unix(1000, 0))
 		existingState.Stored = true
-		err = states.AddState(existingState)
+		err = registry.AddState(existingState)
 		require.NoError(t, err, "state add must succeed")
 
-		oldestState := states.GetOldestState()
+		oldestState := registry.GetLeastState()
 		require.NotNil(t, oldestState)
 		require.Equal(t, "existing-key", oldestState.Key)
 
@@ -387,10 +389,11 @@ func TestS3Poller(t *testing.T) {
 			s3:              mockAPI,
 			pipeline:        pipeline,
 			s3ObjectHandler: s3ObjProc,
-			states:          states,
+			registry:        registry,
 			provider:        "provider",
 			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
+			strategy:        newPollingStrategy(cfg.LexicographicalOrdering),
 			status:          &statusReporterHelperMock{},
 		}
 		poller.runPoll(ctx)
@@ -408,11 +411,11 @@ func TestS3Poller(t *testing.T) {
 		mockPager := NewMockS3Pager(ctrl)
 		pipeline := newFakePipeline()
 
-		// Create empty states
-		states, err := newStates(nil, store, "", true, 100)
-		require.NoError(t, err, "states creation must succeed")
+		// Create empty registry
+		registry, err := newStateRegistry(nil, store, "", true, 100)
+		require.NoError(t, err, "registry creation must succeed")
 
-		oldestState := states.GetOldestState()
+		oldestState := registry.GetLeastState()
 		require.Nil(t, oldestState)
 
 		// Expect ListObjectsPaginator to be called with empty startAfterKey
@@ -474,10 +477,11 @@ func TestS3Poller(t *testing.T) {
 			s3:              mockAPI,
 			pipeline:        pipeline,
 			s3ObjectHandler: s3ObjProc,
-			states:          states,
+			registry:        registry,
 			provider:        "provider",
 			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
+			strategy:        newPollingStrategy(cfg.LexicographicalOrdering),
 			status:          &statusReporterHelperMock{},
 		}
 		poller.runPoll(ctx)
@@ -496,8 +500,8 @@ func TestS3Poller(t *testing.T) {
 		pipeline := newFakePipeline()
 
 		// Non-lexicographical mode
-		states, err := newStates(nil, store, "", false, 0)
-		require.NoError(t, err, "states creation must succeed")
+		registry, err := newStateRegistry(nil, store, "", false, 0)
+		require.NoError(t, err, "registry creation must succeed")
 
 		// Expect ListObjectsPaginator to be called with empty startAfterKey
 		mockAPI.EXPECT().
@@ -557,10 +561,11 @@ func TestS3Poller(t *testing.T) {
 			s3:              mockAPI,
 			pipeline:        pipeline,
 			s3ObjectHandler: s3ObjProc,
-			states:          states,
+			registry:        registry,
 			provider:        "provider",
 			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
+			strategy:        newPollingStrategy(cfg.LexicographicalOrdering),
 			status:          &statusReporterHelperMock{},
 		}
 		poller.runPoll(ctx)
@@ -578,8 +583,8 @@ func TestS3Poller(t *testing.T) {
 		mockPager := NewMockS3Pager(ctrl)
 		pipeline := newFakePipeline()
 
-		states, err := newStates(nil, store, "", false, 0)
-		require.NoError(t, err, "states creation must succeed")
+		registry, err := newStateRegistry(nil, store, "", false, 0)
+		require.NoError(t, err, "registry creation must succeed")
 
 		// Expect ListObjectsPaginator to be called
 		mockAPI.EXPECT().
@@ -693,10 +698,11 @@ func TestS3Poller(t *testing.T) {
 			s3:              mockAPI,
 			pipeline:        pipeline,
 			s3ObjectHandler: s3ObjProc,
-			states:          states,
+			registry:        registry,
 			provider:        "provider",
 			metrics:         inputMetrics,
 			filterProvider:  newFilterProvider(&cfg),
+			strategy:        newPollingStrategy(cfg.LexicographicalOrdering),
 			status:          &statusReporterHelperMock{},
 		}
 
@@ -918,12 +924,12 @@ func Test_S3StateHandling(t *testing.T) {
 				})
 
 			store := openTestStatestore()
-			s3States, err := newStates(logger, store, "", false, 0)
-			require.NoError(t, err, "States creation must succeed")
+			s3Registry, err := newStateRegistry(logger, store, "", false, 0)
+			require.NoError(t, err, "Registry creation must succeed")
 
 			// Note - add init states as if we are deriving them from registry
 			for _, st := range test.initStates {
-				err := s3States.AddState(st)
+				err := s3Registry.AddState(st)
 				require.NoError(t, err, "State add should not error")
 			}
 
@@ -933,9 +939,10 @@ func Test_S3StateHandling(t *testing.T) {
 				s3:              mockS3API,
 				pipeline:        newFakePipeline(),
 				s3ObjectHandler: mockObjHandler,
-				states:          s3States,
+				registry:        s3Registry,
 				metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 				filterProvider:  newFilterProvider(test.config),
+				strategy:        newPollingStrategy(test.config.LexicographicalOrdering),
 				status:          &statusReporterHelperMock{},
 			}
 
@@ -948,9 +955,10 @@ func Test_S3StateHandling(t *testing.T) {
 			// then - desired state entries
 
 			// state must only contain expected state IDs
-			require.Equal(t, len(test.expectStateIDs), len(s3States.states))
+			normalRegistry := s3Registry.(*normalStateRegistry)
+			require.Equal(t, len(test.expectStateIDs), len(normalRegistry.states))
 			for _, id := range test.expectStateIDs {
-				if s3States.states[id] == nil {
+				if normalRegistry.states[id] == nil {
 					t.Errorf("state with ID %s should exist", id)
 				}
 			}
