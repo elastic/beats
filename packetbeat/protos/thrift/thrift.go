@@ -1096,8 +1096,16 @@ func (thrift *thriftPlugin) publishTransactions() {
 		evt, pbf := pb.NewBeatEvent(t.ts)
 		pbf.SetSource(&t.src)
 		pbf.SetDestination(&t.dst)
-		pbf.Source.Bytes = int64(min(t.bytesIn, math.MaxInt64))
-		pbf.Destination.Bytes = int64(min(t.bytesOut, math.MaxInt64))
+		if t.bytesIn > math.MaxInt64 {
+			pbf.Source.Bytes = math.MaxInt64
+		} else {
+			pbf.Source.Bytes = int64(t.bytesIn)
+		}
+		if t.bytesOut > math.MaxInt64 {
+			pbf.Destination.Bytes = math.MaxInt64
+		} else {
+			pbf.Destination.Bytes = int64(t.bytesOut)
+		}
 		pbf.Event.Dataset = "thrift"
 		pbf.Network.Transport = "tcp"
 		pbf.Network.Protocol = pbf.Event.Dataset
