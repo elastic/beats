@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -123,6 +124,32 @@ type graphConf struct {
 type tracerConfig struct {
 	Enabled           *bool `config:"enabled"`
 	lumberjack.Logger `config:",inline"`
+}
+
+func (c *tracerConfig) Validate() error {
+	// This is required due to circularity.
+	const inputName = "azure-ad"
+
+	if c == nil {
+		return nil
+	}
+	if c.Filename == "" {
+		return errors.New("request tracer must have a filename if used")
+	}
+	if c.MaxSize == 0 {
+		// By default Lumberjack caps file sizes at 100MB which
+		// is excessive for a debugging logger, so default to 1MB
+		// which is the minimum.
+		c.MaxSize = 1
+	}
+	ok, err := httplog.IsPathInLogsFor(inputName, c.Filename)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
+	}
+	return nil
 }
 
 func (t *tracerConfig) enabled() bool {
