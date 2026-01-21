@@ -173,13 +173,8 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.8.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.0
-<<<<<<< HEAD
-	github.com/elastic/elastic-agent-libs v0.26.0
-	github.com/elastic/elastic-agent-system-metrics v0.13.4
-=======
 	github.com/elastic/elastic-agent-libs v0.31.0
 	github.com/elastic/elastic-agent-system-metrics v0.13.6
->>>>>>> 90844ec02 ([metricbeat][system] add swap field to system.process.memory metricset (#48334))
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.3.0
@@ -331,7 +326,6 @@ require (
 	github.com/elastic/elastic-transport-go/v8 v8.7.0 // indirect
 	github.com/elastic/go-docappender/v2 v2.11.0 // indirect
 	github.com/elastic/go-windows v1.0.2 // indirect
-	github.com/elastic/pkcs8 v1.0.0 // indirect
 	github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 // indirect
 	github.com/elazarl/goproxy/ext v0.0.0-20240909085733-6741dbfc16a1 // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
