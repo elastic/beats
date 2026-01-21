@@ -83,8 +83,6 @@
           format: bytes
           description: >
             Used memory by the Lua engine. Deprecated in Redis 7.0; use vm.eval instead.
-          version:
-            deprecated: 9.4.0
         - name: used.scripts
           type: long
           format: bytes
@@ -115,17 +113,17 @@
               type: long
               format: bytes
               description: >
-                Number of bytes used by the script VM engines for EVAL framework. This is the replacement for used_memory_lua. Added in Redis 7.0.
+                Number of bytes used by the script VM engines for EVAL framework. This is the replacement for used_memory_lua.
             - name: functions
               type: long
               format: bytes
               description: >
-                Number of bytes used by the script VM engines for Functions framework. Added in Redis 7.0.
+                Number of bytes used by the script VM engines for Functions framework.
             - name: total
               type: long
               format: bytes
               description: >
-                Total VM memory (vm.eval + vm.functions). Added in Redis 7.0.
+                Total VM memory (vm.eval + vm.functions).
 
         - name: total_system
           type: long

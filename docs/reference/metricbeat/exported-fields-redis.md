@@ -113,7 +113,7 @@ Redis memory stats.
     format: bytes
 
 
-**`redis.info.memory.used.lua`** {applies_to}`stack: deprecated 9.4.0`
+**`redis.info.memory.used.lua`**
 :   Used memory by the Lua engine. Deprecated in Redis 7.0; use vm.eval instead.
 
     type: long
@@ -158,7 +158,7 @@ Redis memory stats.
 Redis 7.0+ VM memory stats. VM memory is NOT part of used_memory.
 
 **`redis.info.memory.vm.eval`**
-:   Number of bytes used by the script VM engines for EVAL framework. This is the replacement for used_memory_lua. Added in Redis 7.0.
+:   Number of bytes used by the script VM engines for EVAL framework. This is the replacement for used_memory_lua.
 
     type: long
 
@@ -166,7 +166,7 @@ Redis 7.0+ VM memory stats. VM memory is NOT part of used_memory.
 
 
 **`redis.info.memory.vm.functions`**
-:   Number of bytes used by the script VM engines for Functions framework. Added in Redis 7.0.
+:   Number of bytes used by the script VM engines for Functions framework.
 
     type: long
 
@@ -174,7 +174,7 @@ Redis 7.0+ VM memory stats. VM memory is NOT part of used_memory.
 
 
 **`redis.info.memory.vm.total`**
-:   Total VM memory (vm.eval + vm.functions). Added in Redis 7.0.
+:   Total VM memory (vm.eval + vm.functions).
 
     type: long
 
