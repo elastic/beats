@@ -140,6 +140,18 @@ func (l *winEventLog) isForwarded() bool {
 	return (c.Forwarded != nil && *c.Forwarded) || (c.Forwarded == nil && c.Name == "ForwardedEvents")
 }
 
+// hasQueryFilters returns true if any filtering is applied that would cause non-sequential record IDs
+func (l *winEventLog) hasQueryFilters() bool {
+	// Custom XML query might have filters
+	if l.config.XMLQuery != "" {
+		return true
+	}
+
+	// Check simple query filters
+	sq := l.config.SimpleQuery
+	return sq.EventID != "" || sq.Level != "" || len(sq.Provider) > 0
+}
+
 // Name returns the name of the event log (i.e. Application, Security, etc.).
 func (l *winEventLog) Name() string {
 	return l.id
@@ -162,6 +174,16 @@ func (l *winEventLog) IgnoreMissingChannel() bool {
 
 func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
 	l.lastRead = state
+
+	hasFilters := l.hasQueryFilters()
+	l.log.Infow("Opening Windows Event Log",
+		"channel", l.channelName,
+		"start_record_id", state.RecordNumber,
+		"has_bookmark", len(state.Bookmark) > 0,
+		"batch_read_size", l.maxRead,
+		"has_query_filters", hasFilters,
+		"gap_detection_enabled", !hasFilters)
+
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
 	if l.metrics == nil && l.id != "" {
@@ -174,6 +196,13 @@ func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *moni
 			return l.open(l.lastRead)
 		}),
 		win.WithBatchSize(l.maxRead))
+
+	if err != nil {
+		l.log.Errorw("Failed to create event iterator", "error", err)
+	} else {
+		l.log.Debugw("Event iterator created successfully", "batch_size", l.maxRead)
+	}
+
 	return err
 }
 
@@ -263,11 +292,22 @@ func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) 
 
 	switch err { //nolint:errorlint // This is an errno or nil.
 	case nil:
+		l.log.Debugw("Subscription created successfully",
+			"subscription_handle", uintptr(h),
+			"flags", uint32(flags))
 		return h, nil
 	case win.ERROR_NOT_FOUND, win.ERROR_EVT_QUERY_RESULT_STALE, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION:
 		// The bookmarked event was not found, we retry the subscription from the start.
+		l.log.Warnw("Bookmark error - subscription recreating from oldest record",
+			"error", err,
+			"last_read_record_id", l.lastRead.RecordNumber,
+			"bookmark_was_set", bookmark > 0)
 		incrementMetric(readErrors, err)
-		return win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
+		h, err = win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
+		if err != nil {
+			l.log.Errorw("Failed to recreate subscription from oldest", "error", err)
+		}
+		return h, err
 	default:
 		return 0, err
 	}
@@ -340,9 +380,31 @@ func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 		RecordNumber: r.RecordID,
 		Timestamp:    r.TimeCreated.SystemTime,
 	}
+
+	prevRecordID := l.lastRead.RecordNumber
 	if r.Offset.Bookmark, err = l.createBookmarkFromEvent(h); err != nil {
 		l.metrics.logError(err)
-		l.log.Warnw("Failed creating bookmark.", "error", err)
+		l.log.Warnw("Failed creating bookmark.",
+			"error", err,
+			"record_id", r.RecordID)
+	}
+
+	// Detect record ID gaps (potential event loss)
+	// Only check for gaps when NO query filters are active, otherwise gaps are expected
+	if !l.hasQueryFilters() {
+		// Record IDs should be sequential for the same channel when reading all events
+		if prevRecordID > 0 && r.RecordID > prevRecordID+1 {
+			gapSize := r.RecordID - prevRecordID - 1
+
+			// Log at ERROR level for visibility - this indicates definite event loss
+			l.log.Errorw("⚠️  RECORD ID GAP DETECTED - Events were LOST",
+				"channel", l.channelName,
+				"previous_record_id", prevRecordID,
+				"current_record_id", r.RecordID,
+				"missing_events", gapSize,
+				"gap_range", fmt.Sprintf("[%d-%d]", prevRecordID+1, r.RecordID-1),
+				"timestamp", r.TimeCreated.SystemTime)
+		}
 	}
 	l.lastRead = r.Offset
 	return r, nil

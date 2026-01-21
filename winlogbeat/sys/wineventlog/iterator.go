@@ -25,12 +25,19 @@ import (
 	"sync"
 
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
 	evtNextMaxHandles     = 1024
 	evtNextDefaultHandles = 512
 )
+
+// osThreadID returns the OS thread id for the current goroutine's thread.
+func osThreadID() int {
+	return int(windows.GetCurrentThreadId())
+}
 
 // EventIterator provides an iterator to read events from a log. It takes the
 // place of calling EvtNext directly.
@@ -42,6 +49,8 @@ type EventIterator struct {
 	lastErr             error                        // Last error returned by EvtNext.
 	active              []EvtHandle                  // Slice of the handles array containing the valid unread handles.
 	mutex               sync.Mutex                   // Mutex to enable parallel iteration.
+	logger              *logp.Logger
+	threadID            int // Logger for this iterator.
 
 	// For testing purposes to be able to mock EvtNext.
 	evtNext func(resultSet EvtHandle, eventArraySize uint32, eventArray *EvtHandle, timeout uint32, flags uint32, numReturned *uint32) (err error)
@@ -90,6 +99,7 @@ func NewEventIterator(opts ...EventIteratorOption) (*EventIterator, error) {
 	itr := &EventIterator{
 		batchSize: evtNextDefaultHandles,
 		evtNext:   _EvtNext,
+		logger:    logp.NewLogger("wineventlog.iterator"),
 	}
 
 	for _, opt := range opts {
@@ -144,10 +154,24 @@ func (itr *EventIterator) empty() bool {
 func (itr *EventIterator) moreHandles() bool {
 	batchSize := itr.batchSize
 
+	if itr.threadID == 0 {
+		itr.threadID = osThreadID()
+	}
 	for batchSize > 0 {
 		var numReturned uint32
 
 		err := itr.evtNext(itr.subscription, batchSize, &itr.handles[0], 0, 0, &numReturned)
+
+		if err != nil || osThreadID() != itr.threadID {
+			itr.logger.Debugw("EvtNext called",
+				"requested_batch", batchSize,
+				"returned_count", numReturned,
+				"error", err,
+				"subscription_handle", uintptr(itr.subscription),
+				"os_thread_id", itr.threadID)
+			itr.threadID = osThreadID()
+		}
+
 		switch err { //nolint:errorlint // Bad linter! This is always errno or nil.
 		case nil:
 			itr.lastErr = nil
@@ -160,11 +184,16 @@ func (itr *EventIterator) moreHandles() bool {
 				itr.subscription, err = itr.subscriptionFactory()
 				if err != nil {
 					itr.lastErr = fmt.Errorf("failed in EvtNext while trying to recover from RPC_S_INVALID_BOUND error: %w", err)
+					itr.logger.Errorw("Failed to recreate subscription during RPC_S_INVALID_BOUND recovery",
+						"error", err)
 					return false
 				}
 
 				// Reduce batch size and try again.
 				batchSize = batchSize / 2
+				itr.logger.Infow("Subscription recreated after RPC_S_INVALID_BOUND",
+					"new_subscription_handle", uintptr(itr.subscription),
+					"new_batch_size", batchSize)
 				continue
 			} else {
 				itr.lastErr = fmt.Errorf("failed in EvtNext (try reducing the batch size or providing a subscription factory for automatic recovery): %w", err)
