@@ -33,8 +33,9 @@ func TestClientCacheWrap(t *testing.T) {
 	}
 	fakeClient := &fakeCFClient{app, 0}
 	logger := logptest.NewTestingLogger(t, "")
-	cache, err := newClientCacheWrap(fakeClient, "test", ttl, ttl, logger.Named("cloudfoundry"))
+	cache, err := newClientCacheWrap(fakeClient, "test", ttl, ttl, logger.Named("cloudfoundry"), t.TempDir())
 	require.NoError(t, err)
+	t.Cleanup(func() { _ = cache.Close() })
 
 	missingAppGuid := mustCreateFakeGuid()
 

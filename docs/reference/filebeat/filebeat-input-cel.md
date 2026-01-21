@@ -23,6 +23,7 @@ This input supports:
     * Digest
     * {applies_to}`stack: ga 9.3.0` File
     * OAuth2
+    * {applies_to}`stack: ga 9.3.0` AWS
 
 * Retrieval at a configurable interval
 * Pagination
@@ -275,6 +276,7 @@ Additionally, it supports authentication via:
 * OAuth2
 * file-based headers {applies_to}`stack: ga 9.3.0`
 * token authentication {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
+* AWS Authentication {applies_to}`stack: ga 9.3.0`
 
 As described in Mito's [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) documentation, configuration for Basic Authentication or token authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication, file-based headers or OAuth2 will be used for all requests made from CEL.
 
@@ -346,6 +348,24 @@ filebeat.inputs:
     type: Token
     value: supersecret_token
   resource.url: http://localhost
+```
+
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.aws:
+    access_key_id:     "AKIAIOSFODNN7EXAMPLE"
+    secret_access_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  request.url: https://guardduty.us-east-1.amazonaws.com/detector/abc123/findings
+```
+
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.aws:
+    credential_profile_name: fb-aws
+    shared_credential_file: /etc/filebeat/aws_credentials
+  request.url: https://guardduty.us-east-1.amazonaws.com/detector/abc123/findings
 ```
 
 ## Input state [input-state-cel]
@@ -828,6 +848,118 @@ The type of token to authenticate with, for example "Token" or "Bearer".
 
 The token value to use.
 
+
+### `auth.aws.enabled` [_auth_aws_enabled]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `false`, disables the file AWS auth configuration. Default: `true`.
+
+::::{note}
+AWS auth settings are disabled if either `enabled` is set to `false` or the `auth.aws` section is missing.
+::::
+
+### `auth.aws.access_key_id` [_auth_aws_access_key_id]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS access key ID. It should be used with [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key).
+
+### `auth.aws.secret_access_key` [_auth_aws_secret_access_key]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS secret access key. It should be used with [`auth.aws.access_key_id`](#_auth_aws_access_key_id).
+
+::::{note}
+Use either direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) or a shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)). If both are set, the direct keys take precedence.
+
+If neither the direct keys nor the shared credentials file is set, AWS SDK [LoadDefaultConfig](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config#LoadDefaultConfig) will be used.
+::::
+
+### `auth.aws.session_token` [_auth_aws_session_token]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS session token that can be optionally set when direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) are used.
+
+### `auth.aws.shared_credential_file` [_auth_aws_shared_credential_file]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The path of the AWS shared credentials file.
+
+::::{note}
+Use either direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) or a shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)). If both are set, the direct keys take precedence.
+
+If neither the direct keys nor the shared credentials file is set, AWS SDK [LoadDefaultConfig](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config#LoadDefaultConfig) will be used.
+::::
+
+### `auth.aws.credential_profile_name` [_auth_aws_credential_profile_name]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The profile name of the AWS shared credentials file. This is optional and can be used with [`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file).
+
+### `auth.aws.role_arn` [_auth_aws_role_arn]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The IAM Role ARN to assume. Assume-role authentication is layered on top of the base credentials, which may come from a direct access key, a shared credentials file, or the default SDK configuration. The assume-role request will use whichever credentials have already been established.
+
+### `auth.aws.external_id` [_auth_aws_external_id]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the external ID to use for every IAM assume-role request. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.assume_role.duration` [_auth_aws_assume_role_duration]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the duration of the credentials retrieved by the IAM assume-role. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.assume_role.expiry_window` [_auth_aws_assume_expiry_window]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the credentials retrieved by the IAM assume-role to trigger refreshing prior to the credentials actually expiring. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.service_name` [_auth_aws_service_name]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the AWS service name that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
+
+### `auth.aws.default_region` [_auth_aws_default_region]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the AWS region that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
 
 
 ### `resource.url` [resource-parameters]

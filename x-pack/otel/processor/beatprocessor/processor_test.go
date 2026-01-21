@@ -114,6 +114,19 @@ func TestCreateProcessor(t *testing.T) {
 		assert.Equal(t, "add_docker_metadata", processor.String()[:len("add_docker_metadata")])
 	})
 
+	t.Run("valid add_fields processor config returns processor", func(t *testing.T) {
+		processor, err := createProcessor(map[string]any{
+			"add_fields": map[string]any{
+				"fields": map[string]any{
+					"env": "staging",
+				},
+			},
+		}, testLogger())
+		require.NoError(t, err)
+		require.NotNil(t, processor)
+		assert.Equal(t, "add_fields", processor.String()[:len("add_fields")])
+	})
+
 	t.Run("valid add_host_metadata processor config returns processor", func(t *testing.T) {
 		processor, err := createProcessor(map[string]any{
 			"add_host_metadata": map[string]any{},

@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //nolint:errcheck // It's a test file
 package input_logfile
 
@@ -22,6 +24,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -116,7 +119,8 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		defer goroutinesChecker.WaitUntilOriginalCount()
 
 		wg.Add(1)
-		hg.Start(input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}, source)
+		ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg.Start(ctx, source)
 
 		// wait until harvester.Run is done
 		wg.Wait()
@@ -159,7 +163,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 			wg:    &wg,
 		}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
-		hg.tg = task.NewGroup(1, time.Second, &logp.Logger{}, "")
+		hg.tg = task.NewGroup(1, time.Second, logptest.NewTestingLogger(t, ""), "")
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
@@ -167,12 +171,9 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		source1 := &testSource{name: "/path/to/test/1"}
 		source2 := &testSource{name: "/path/to/test/2"}
 		wg.Add(2)
-		hg.Start(
-			input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}},
-			source1)
-		hg.Start(
-			input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}},
-			source2)
+		ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg.Start(ctx, source1)
+		hg.Start(ctx, source2)
 
 		assert.Eventually(t,
 			func() bool {
@@ -222,7 +223,8 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 
-		hg.Start(input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}, source)
+		ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg.Start(ctx, source)
 
 		goroutinesChecker.WaitUntilIncreased(1)
 		// wait until harvester is started
@@ -242,7 +244,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	t.Run("assert a harvester for same source cannot be started", func(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}
+		inputCtx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
@@ -275,7 +277,8 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 
-		hg.Start(input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}, source)
+		ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg.Start(ctx, source)
 
 		// wait until harvester is stopped
 		goroutinesChecker.WaitUntilOriginalCount()
@@ -296,7 +299,8 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
 
-		hg.Start(input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}, source)
+		ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg.Start(ctx, source)
 
 		goroutinesChecker.WaitUntilOriginalCount()
 
@@ -312,7 +316,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		var wg sync.WaitGroup
 		mockHarvester := &mockHarvester{onRun: correctOnRun, wg: &wg}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}
+		inputCtx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
 
 		r, err := lock(inputCtx, hg.store, hg.identifier.ID(source))
 		if err != nil {
@@ -347,7 +351,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: correctOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 		hg.tg = task.NewGroup(0, 50*time.Millisecond, testLog, "")
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}
+		inputCtx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
@@ -370,7 +374,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		var wg sync.WaitGroup
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun, wg: &wg}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context(), StatusReporter: mockStatusReporter{}}
+		inputCtx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
@@ -391,6 +395,60 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		wg.Wait()
 
 		require.Equal(t, 2, mockHarvester.getRunCount())
+	})
+
+	t.Run("assert repeated start for same source does not leak goroutines with harvester_limit", func(t *testing.T) {
+		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
+		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		// Set harvester_limit to 1 - this creates the semaphore that caused the leak
+		hg.tg = task.NewGroup(1, time.Second, logptest.NewTestingLogger(t, ""), "")
+		inputCtx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+
+		goroutinesChecker := resources.NewGoroutinesChecker()
+
+		// Start the first harvester - this should spawn exactly 1 goroutine
+		hg.Start(inputCtx, source)
+
+		// Wait for the harvester to be running
+		require.EventuallyWithT(t,
+			func(c *assert.CollectT) {
+				assert.Equal(c, 1, mockHarvester.getRunCount())
+			},
+			5*time.Second,
+			10*time.Millisecond,
+			"harvester should be running")
+
+		// Record goroutine count after first harvester starts
+		goroutinesChecker.WaitUntilIncreased(1)
+		afterFirstStart := runtime.NumGoroutine()
+
+		// Simulate repeated file events by calling Start multiple times
+		const repeatCount = 10
+		for range repeatCount {
+			hg.Start(inputCtx, source)
+		}
+
+		// Give time for any leaked goroutines to be spawned
+		// Check that goroutine count hasn't grown significantly
+		// With the fix: should still be ~afterFirstStart (no new goroutines)
+		// Without the fix: would be afterFirstStart + repeatCount (goroutines waiting on semaphore)
+		assert.Never(t, func() bool {
+			currentGoroutines := runtime.NumGoroutine()
+			goroutineGrowth := currentGoroutines - afterFirstStart
+			return goroutineGrowth > 2
+		}, 50*time.Millisecond, 10*time.Millisecond, "goroutine count should not grow significantly after repeated Start calls")
+
+		// Cleanup
+		hg.Stop(source)
+		require.NoError(t, hg.StopHarvesters())
+
+		// Verify only 1 harvester actually ran
+		require.Equal(t, 1, mockHarvester.getRunCount(),
+			"only one harvester should have run despite multiple Start calls")
+
+		// Ensure all goroutines are cleaned up
+		_, err := goroutinesChecker.WaitUntilOriginalCount()
+		require.NoError(t, err, "all goroutines should be cleaned up")
 	})
 }
 
@@ -530,7 +588,7 @@ func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHa
 		harvester:  mockHarvester,
 		store:      testOpenStore(t, "test", nil),
 		identifier: &SourceIdentifier{"filestream::.global::"},
-		tg:         task.NewGroup(0, time.Second, logp.L(), ""),
+		tg:         task.NewGroup(0, time.Second, logptest.NewTestingLogger(t, ""), ""),
 	}
 }
 
