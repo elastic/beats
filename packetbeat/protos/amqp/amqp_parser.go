@@ -319,11 +319,12 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	}
 
 	if hasProperty(prop2, timestampProp) {
-		if int(offset+8) > len(data) {
+		timeInt, err := getIntegerAt[int64](data, offset)
+		if err {
 			logp.Debug("amqp", "Malformed packet: unexpected end of data")
 			return true
 		}
-		t := time.Unix(int64(binary.BigEndian.Uint64(data[offset:offset+8])), 0)
+		t := time.Unix(timeInt, 0)
 		m.fields["timestamp"] = t.Format(amqpTimeLayout)
 		offset += 8
 	}

@@ -484,7 +484,7 @@ func exchangeDeclareMethod(m *amqpMessage, args []byte) (bool, bool) {
 		"durable":       params[1],
 		"no-wait":       params[4],
 	}
-	if uint32(len(args)) <= offset+1 {
+	if len(args) <= int(offset+1) {
 		logp.Debug("amqp", "Error getting name of routing key in exchange declare")
 		return false, false
 	}
@@ -1017,7 +1017,7 @@ func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short s
 		return "", lengthSize, false
 	}
 
-	if offset+lengthSize+strlen > uint32(len(data)) {
+	if int(offset+lengthSize+strlen) > len(data) {
 		logp.Debug("amqp", "Not enough data for string")
 		return "", 0, true
 	}
@@ -1029,10 +1029,10 @@ func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short s
 // The returned integer is meaningless if err == true
 func getIntegerAt[T uint8 | uint16 | uint32 | uint64 | int8 | int16 | int32 | int64](data []byte, offset uint32) (integer T, err bool) {
 	var value T
-	size := int(unsafe.Sizeof(value))
+	size := uint32(unsafe.Sizeof(value))
 
 	// If there's not enough bytes to read the requested integer type
-	if offset+uint32(size) > uint32(len(data)) {
+	if int(offset+size) > len(data) {
 		return T(0), true
 	}
 
@@ -1040,19 +1040,19 @@ func getIntegerAt[T uint8 | uint16 | uint32 | uint64 | int8 | int16 | int32 | in
 	case uint8:
 		return T(data[offset]), false
 	case uint16:
-		return T(binary.BigEndian.Uint16(data[offset : offset+uint32(size)])), false
+		return T(binary.BigEndian.Uint16(data[offset : offset+size])), false
 	case uint32:
-		return T(binary.BigEndian.Uint32(data[offset : offset+uint32(size)])), false
+		return T(binary.BigEndian.Uint32(data[offset : offset+size])), false
 	case uint64:
-		return T(binary.BigEndian.Uint64(data[offset : offset+uint32(size)])), false
+		return T(binary.BigEndian.Uint64(data[offset : offset+size])), false
 	case int8:
 		return T(data[offset]), false
 	case int16:
-		return T(binary.BigEndian.Uint16(data[offset : offset+uint32(size)])), false
+		return T(binary.BigEndian.Uint16(data[offset : offset+size])), false
 	case int32:
-		return T(binary.BigEndian.Uint32(data[offset : offset+uint32(size)])), false
+		return T(binary.BigEndian.Uint32(data[offset : offset+size])), false
 	case int64:
-		return T(binary.BigEndian.Uint64(data[offset : offset+uint32(size)])), false
+		return T(binary.BigEndian.Uint64(data[offset : offset+size])), false
 	}
 	return T(0), true
 }
