@@ -124,6 +124,18 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		reportDeviceMetrics(reporter, org, devices)
 		reportUplinkMetrics(reporter, org, devices)
 		reportSwitchportMetrics(reporter, org, devices)
+
+		// Fetch and report sensor readings history
+		sensorService := &SensorServiceWrapper{
+			service: m.client.Sensor,
+		}
+		sensorReadings, err := getSensorReadingsHistory(sensorService, org, collectionPeriod, m.logger)
+		if err != nil {
+			m.logger.Errorf("getSensorReadingsHistory failed; %v", err)
+			// continue so we still report the rest of the device health metrics
+		} else {
+			reportSensorReadings(reporter, org, sensorReadings, devices)
+		}
 	}
 
 	return nil
