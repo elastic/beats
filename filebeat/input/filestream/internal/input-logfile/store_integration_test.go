@@ -81,7 +81,7 @@ func openTestStoreFromFiles(t *testing.T, rootDir, name string) sourceStore {
 		Store: store,
 	}
 
-	ss, err := openStore(logger.Logger, tstore, "foo")
+	ss, err := openStore(logger.Logger, tstore, "filestream")
 	if err != nil {
 		t.Fatalf("cannot open store: %s", err)
 	}
