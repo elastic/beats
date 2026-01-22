@@ -336,11 +336,20 @@ func reportDeviceMetrics(reporter mb.ReporterV2, organizationID string, devices 
 
 		if device.bandUtilization != nil {
 			for band, v := range device.bandUtilization {
+				if v == nil {
+					continue
+				}
 				// Avoid nested object mappings
 				metricBand := strings.ReplaceAll(band, ".", "_")
-				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_80211", metricBand)] = v.Wifi.Percentage
-				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_non_80211", metricBand)] = v.NonWifi.Percentage
-				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_total", metricBand)] = v.Total.Percentage
+				if v.Wifi != nil {
+					metric[fmt.Sprintf("device.channel_utilization.%s.utilization_80211", metricBand)] = v.Wifi.Percentage
+				}
+				if v.NonWifi != nil {
+					metric[fmt.Sprintf("device.channel_utilization.%s.utilization_non_80211", metricBand)] = v.NonWifi.Percentage
+				}
+				if v.Total != nil {
+					metric[fmt.Sprintf("device.channel_utilization.%s.utilization_total", metricBand)] = v.Total.Percentage
+				}
 			}
 		}
 

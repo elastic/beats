@@ -16,6 +16,7 @@ import (
 	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/extension"
 	"go.opentelemetry.io/collector/extension/extensionauth"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/credentials"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
@@ -50,7 +51,7 @@ type authenticator struct {
 
 func newAuthenticator(cfg *Config, telemetry component.TelemetrySettings) (*authenticator, error) {
 	// logp.NewZapLogger essentially never returns an error; look within the implementation
-	logger, err := logp.NewZapLogger(telemetry.Logger)
+	logger, err := logp.NewZapLogger(telemetry.Logger.WithOptions(zap.AddCallerSkip(1)))
 	if err != nil {
 		return nil, err
 	}

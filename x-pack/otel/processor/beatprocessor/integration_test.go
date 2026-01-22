@@ -17,8 +17,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 
 	"github.com/gofrs/uuid/v5"
@@ -77,8 +77,6 @@ receivers:
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    output:
-      otelconsumer:
     processors:
       # Configure a processor to prevent enabling default processors
       - add_fields:
@@ -161,8 +159,6 @@ receivers:
           fields:
             custom_field: "custom_value"
       - add_host_metadata:
-    output:
-      otelconsumer:
     logging:
       level: info
       selectors:

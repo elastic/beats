@@ -32,10 +32,10 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/oteltestcol"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
@@ -65,8 +65,6 @@ func TestFilebeatOTelE2E(t *testing.T) {
             - %s
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    output:
-      otelconsumer:
     processors:
       - add_host_metadata: ~
       - add_cloud_metadata: ~
@@ -112,7 +110,7 @@ service:
 	writeEventsToLogFile(t, logFilePath, numEvents)
 	oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
 
-	var beatsCfgFile = `
+	beatsCfgFile := `
 filebeat.inputs:
   - type: filestream
     id: filestream-input-id
@@ -186,18 +184,13 @@ http.port: %d
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
-		// only present in beats receivers
-		"agent.otelcol.component.id",
-		"agent.otelcol.component.kind",
 		"log.file.device_id", // changes value between filebeat and otel receiver
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 
-	assert.Equal(t, "filebeatreceiver", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
-	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in filebeat log record")
-	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in filebeat log record")
+	assert.Equal(t, "filebeat", otelDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in otel docs")
+	assert.Equal(t, "filebeat", filebeatDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in filebeat docs")
 	assertMonitoring(t, otelMonitoringPort)
 }
 
@@ -250,8 +243,6 @@ processors:
         - type: httpjson
           id: httpjson-e2e-otel
           request.url: http://localhost:8090/test
-    output:
-      otelconsumer:
     processors:
       - add_host_metadata: ~
       - add_cloud_metadata: ~
@@ -371,9 +362,6 @@ service:
 		"agent.ephemeral_id",
 		"agent.id",
 		"event.created",
-		// only present in beats receivers
-		"agent.otelcol.component.id",
-		"agent.otelcol.component.kind",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
@@ -450,8 +438,6 @@ func TestFilebeatOTelReceiverE2E(t *testing.T) {
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    output:
-      otelconsumer:
     logging:
       level: info
       selectors:
@@ -578,17 +564,13 @@ http.port: %d
 		"log.file.inode",
 		"log.file.path",
 		// only present in beats receivers
-		"agent.otelcol.component.id",
-		"agent.otelcol.component.kind",
 		"log.file.device_id", // changes value between filebeat and otel receiver
 		"container.id",       // only present in filebeat
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-	assert.Equal(t, "filebeatreceiver/filestream", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
-	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in filebeat log record")
-	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in filebeat log record")
+	assert.Equal(t, "filebeat", otelDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in otel docs")
+	assert.Equal(t, "filebeat", filebeatDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in filebeat docs")
 	assertMonitoring(t, otelConfig.MonitoringPort)
 	assertMonitoring(t, filebeatMonitoringPort) // filebeat
 }
@@ -641,8 +623,6 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
             - {{$receiver.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    output:
-      otelconsumer:
     logging:
       level: info
       selectors:
@@ -880,8 +860,6 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    output:
-      otelconsumer:
     logging:
       level: debug
     queue.mem.flush.timeout: 0s
@@ -1016,7 +994,6 @@ service:
 }
 
 func TestFileBeatKerberos(t *testing.T) {
-
 	wantEvents := 1
 	krbURL := "http://localhost:9203" // this is kerberos client - we've hardcoded the URL here
 	tempFile := t.TempDir()
@@ -1063,8 +1040,6 @@ func TestFileBeatKerberos(t *testing.T) {
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    output:
-      otelconsumer:
     queue.mem.flush.timeout: 0s
     management.otel.enabled: true
     path.home: {{.PathHome}}	
@@ -1125,7 +1100,6 @@ service:
 			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, wantEvents, "expected at least %d events, got %d", wantEvents, otelDocs.Hits.Total.Value)
 		},
 		2*time.Minute, 1*time.Second)
-
 }
 
 func TestFilebeatOTelBeatProcessorE2E(t *testing.T) {
@@ -1171,13 +1145,8 @@ receivers:
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    processors:
-      # Configure a processor to prevent enabling default processors
-      - add_fields:
-          fields:
-            custom_field: "custom_value"
-    output:
-      otelconsumer:
+    # Clear the list of default processors
+    processors: []
     logging:
       level: info
       selectors:
@@ -1187,6 +1156,11 @@ receivers:
 processors:
   beat:
     processors:
+      - add_cloud_metadata:
+      - add_docker_metadata:
+      - add_fields:
+          fields:
+            custom_field: "CustomValue"
       - add_host_metadata:
 exporters:
   debug:
@@ -1242,12 +1216,12 @@ receivers:
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
     processors:
+      - add_cloud_metadata:
+      - add_docker_metadata:
       - add_fields:
           fields:
-            custom_field: "custom_value"
+            custom_field: "CustomValue"
       - add_host_metadata:
-    output:
-      otelconsumer:
     logging:
       level: info
       selectors:
@@ -1325,7 +1299,6 @@ exporters:
 
 // setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
 func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -1359,5 +1332,74 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 	defer resp.Body.Close()
 
 	require.Equal(t, resp.StatusCode, http.StatusOK, "incorrect response code")
+}
 
+func BenchmarkFilebeatOTelCollector(b *testing.B) {
+	numReceivers := 4
+
+	for b.Loop() {
+		b.StopTimer()
+		tmpDir := b.TempDir()
+
+		type receiverConfig struct {
+			Index    int
+			PathHome string
+		}
+
+		configData := struct {
+			Receivers []receiverConfig
+		}{
+			Receivers: make([]receiverConfig, numReceivers),
+		}
+
+		for i := range numReceivers {
+			configData.Receivers[i] = receiverConfig{
+				Index:    i + 1,
+				PathHome: filepath.Join(tmpDir, strconv.Itoa(i+1)),
+			}
+		}
+
+		cfgTemplate := `receivers:
+{{range .Receivers}}
+  filebeatreceiver/{{.Index}}:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: 1
+    path.home: {{.PathHome}}
+    queue.mem.flush.timeout: 0s
+{{end}}
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+{{range .Receivers}}
+        - filebeatreceiver/{{.Index}}
+{{end}}
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`
+
+		var configBuffer bytes.Buffer
+		require.NoError(b, template.Must(template.New("config").Parse(cfgTemplate)).Execute(&configBuffer, configData))
+
+		b.StartTimer()
+
+		col := oteltestcol.New(b, configBuffer.String())
+		require.NotNil(b, col)
+		require.Eventually(b, func() bool {
+			return col.ObservedLogs().
+				FilterMessageSnippet("Publish event").Len() == numReceivers
+		}, 30*time.Second, 1*time.Millisecond, "expected all receivers to publish events")
+		col.Shutdown()
+	}
 }

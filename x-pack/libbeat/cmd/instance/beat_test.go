@@ -14,7 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
+	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 )
 
 func TestManager(t *testing.T) {
@@ -29,9 +29,6 @@ func TestManager(t *testing.T) {
 					"count":   10,
 				},
 			},
-		},
-		"output": map[string]any{
-			"otelconsumer": map[string]any{},
 		},
 		"path.home": tmpDir,
 	}

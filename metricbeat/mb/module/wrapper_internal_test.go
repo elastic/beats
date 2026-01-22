@@ -32,6 +32,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const mockModuleName = "MockModule"
@@ -309,7 +310,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 
 				monitoring := beat.NewMonitoring()
 
-				aModule, metricSets, err := mb.NewModule(tc.config, r, logptest.NewTestingLogger(t, ""))
+				aModule, metricSets, err := mb.NewModule(tc.config, r, paths.New(), logptest.NewTestingLogger(t, ""))
 				require.NoError(t, err)
 
 				// Set the mock status reporter
@@ -539,7 +540,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 
 				monitoring := beat.NewMonitoring()
 
-				aModule, metricSets, err := mb.NewModule(tc.config, r, logptest.NewTestingLogger(t, ""))
+				aModule, metricSets, err := mb.NewModule(tc.config, r, paths.New(), logptest.NewTestingLogger(t, ""))
 				require.NoError(t, err)
 
 				// Set the mock status reporter

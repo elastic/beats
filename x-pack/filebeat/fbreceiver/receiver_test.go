@@ -7,11 +7,10 @@ package fbreceiver
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
-	"math/rand/v2"
 	"net"
 	"net/http"
 	"net/url"
@@ -21,8 +20,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/gofrs/uuid/v5"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -32,16 +31,14 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
+
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNewReceiver(t *testing.T) {
-	monitorSocket := genSocketPath()
-	var monitorHost string
-	if runtime.GOOS == "windows" {
-		monitorHost = "npipe:///" + filepath.Base(monitorSocket)
-	} else {
-		monitorHost = "unix://" + monitorSocket
-	}
+	monitorSocket := genSocketPath(t)
+	monitorHost := hostFromSocket(monitorSocket)
 	config := Config{
 		Beatconfig: map[string]any{
 			"filebeat": map[string]any{
@@ -59,9 +56,6 @@ func TestNewReceiver(t *testing.T) {
 						"paths":   []string{"none"},
 					},
 				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
 			},
 			"logging": map[string]any{
 				"level": "debug",
@@ -89,8 +83,7 @@ func TestNewReceiver(t *testing.T) {
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
 			require.Lenf(c, logs["r1"], 1, "expected 1 log, got %d", len(logs["r1"]))
-			assert.Equal(c, "filebeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+			assert.Equal(c, "test", logs["r1"][0].Flatten()["message"], "expected message field to contain string 'test'")
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket, "stats")
@@ -135,9 +128,6 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": level.String(),
 				"selectors": []string{
@@ -167,135 +157,207 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 	}
 }
 
-func TestMultipleReceivers(t *testing.T) {
-	t.Skip("flaky test, see https://github.com/elastic/beats/issues/43832")
-	// This test verifies that multiple receivers can be instantiated
-	// in isolation, started, and can ingest logs without interfering
-	// with each other.
-
-	// Receivers need distinct home directories so wrap the config in a function.
-	config := func(monitorSocket string) *Config {
-		var monitorHost string
-		if runtime.GOOS == "windows" {
-			monitorHost = "npipe:///" + filepath.Base(monitorSocket)
-		} else {
-			monitorHost = "unix://" + monitorSocket
-		}
-		return &Config{
-			Beatconfig: map[string]any{
-				"filebeat": map[string]any{
-					"inputs": []map[string]any{
-						{
-							"type":    "benchmark",
-							"enabled": true,
-							"message": "test",
-							"count":   1,
-						},
-						{
-							"type":    "filestream",
-							"enabled": true,
-							"id":      "must-be-unique",
-							"paths":   []string{"none"},
+// multiReceiverConfig creates a Config for testing multiple receivers.
+// Each receiver gets a unique home path and a JavaScript processor that loads from its own path.config directory.
+func multiReceiverConfig(helper multiReceiverHelper) *Config {
+	return &Config{
+		Beatconfig: map[string]any{
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
+					{
+						"type":    "benchmark",
+						"enabled": true,
+						"message": "test",
+						"count":   1,
+						// Each receiver gets a JavaScript processor that loads from its own
+						// path.config directory, adding a unique marker field to verify isolation.
+						"processors": []map[string]any{
+							{
+								"script": map[string]any{
+									"lang": "javascript",
+									"file": "processor.js",
+									"tag":  "js-" + helper.jsMarker,
+								},
+							},
 						},
 					},
-				},
-				"output": map[string]any{
-					"otelconsumer": map[string]any{},
-				},
-				"logging": map[string]any{
-					"level": "info",
-					"selectors": []string{
-						"*",
+					{
+						"type":                 "filestream",
+						"enabled":              true,
+						"id":                   "must-be-unique",
+						"paths":                []string{helper.ingest},
+						"file_identity.native": nil,
 					},
 				},
-				"path.home":    t.TempDir(),
-				"http.enabled": true,
-				"http.host":    monitorHost,
 			},
+			"logging": map[string]any{
+				"level": "info",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home":    helper.home,
+			"http.enabled": true,
+			"http.host":    hostFromSocket(helper.monitorSocket),
+		},
+	}
+}
+
+type multiReceiverHelper struct {
+	name          string
+	home          string
+	ingest        string
+	jsMarker      string
+	monitorSocket string
+}
+
+func newMultiReceiverHelper(t *testing.T, number int) multiReceiverHelper {
+	const (
+		scriptFormat = `function process(event) { event.Put("js_marker", %q); return event; }`
+	)
+
+	home := t.TempDir()
+
+	// Create JavaScript processor files in each receiver's home directory.
+	// Each script adds a unique marker field to verify path isolation.
+	jsMarker := fmt.Sprintf("receiver%d", number)
+	writeFile(t, filepath.Join(home, "processor.js"), fmt.Sprintf(scriptFormat, jsMarker))
+
+	return multiReceiverHelper{
+		name:          fmt.Sprintf("r%d", number),
+		home:          home,
+		ingest:        filepath.Join(t.TempDir(), fmt.Sprintf("test%d.log", number)),
+		jsMarker:      jsMarker,
+		monitorSocket: genSocketPath(t),
+	}
+}
+
+// TestMultipleReceivers verifies that multiple receivers can be instantiated in isolation, started, and can ingest logs
+// without interfering with each other.
+func TestMultipleReceivers(t *testing.T) {
+	const nReceivers = 2
+
+	factory := NewFactory()
+
+	helpers := make([]multiReceiverHelper, nReceivers)
+	configs := make([]oteltest.ReceiverConfig, nReceivers)
+	for i := range helpers {
+		helper := newMultiReceiverHelper(t, i)
+		helpers[i] = helper
+		configs[i] = oteltest.ReceiverConfig{
+			Name:    helper.name,
+			Beat:    "filebeat",
+			Config:  multiReceiverConfig(helper),
+			Factory: factory,
 		}
 	}
 
-	factory := NewFactory()
-	monitorSocket1 := genSocketPath()
-	monitorSocket2 := genSocketPath()
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
-		T: t,
-		Receivers: []oteltest.ReceiverConfig{
-			{
-				Name:    "r1",
-				Config:  config(monitorSocket1),
-				Beat:    "filebeat",
-				Factory: factory,
-			},
-			{
-				Name:    "r2",
-				Config:  config(monitorSocket2),
-				Beat:    "filebeat",
-				Factory: factory,
-			},
-		},
+		T:           t,
+		NumRestarts: 5,
+		Receivers:   configs,
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
-			require.Greater(c, len(logs["r1"]), 0, "receiver r1 does not have any logs")
-			require.Greater(c, len(logs["r2"]), 0, "receiver r2 does not have any logs")
+			allMetaData := make([]string, 0, nReceivers)
+			allRegData := make([]string, 0, nReceivers)
+			for _, helper := range helpers {
+				writeFile(c, helper.ingest, "A log line")
 
-			assert.Equal(c, "filebeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r1 log record")
-			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r1 log record")
-			assert.Equal(c, "filebeatreceiver/r2", logs["r2"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r2 log record")
-			assert.Equal(c, "receiver", logs["r2"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r2 log record")
+				require.Greaterf(c, len(logs[helper.name]), 0, "receiver %v does not have any logs", helper)
+				assert.Equal(c, "test", logs[helper.name][0].Flatten()["message"], "expected message field to contain string 'test'")
 
-			// Make sure that each receiver has a separate logger
-			// instance and does not interfere with others. Previously, the
-			// logger in Beats was global, causing logger fields to be
-			// overwritten when multiple receivers started in the same process.
-			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r1"))
-			assert.Equal(c, 1, r1StartLogs.Len(), "r1 should have a single start log")
-			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r2"))
-			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
-			var lastError strings.Builder
-			assert.Conditionf(c, func() bool {
-				return getFromSocket(t, &lastError, monitorSocket1, "stats")
-			}, "failed to connect to monitoring socket1, stats endpoint, last error was: %s", &lastError)
-			assert.Conditionf(c, func() bool {
-				return getFromSocket(t, &lastError, monitorSocket1, "inputs")
-			}, "failed to connect to monitoring socket1, inputs endpoint, last error was: %s", &lastError)
-			assert.Conditionf(c, func() bool {
-				return getFromSocket(t, &lastError, monitorSocket2, "stats")
-			}, "failed to connect to monitoring socket2, stats endpoint, last error was: %s", &lastError)
-			assert.Conditionf(c, func() bool {
-				return getFromSocket(t, &lastError, monitorSocket2, "inputs")
-			}, "failed to connect to monitoring socket2, inputs endpoint, last error was: %s", &lastError)
+				// Verify that each receiver used its own JavaScript processor script.
+				// This demonstrates path isolation: each receiver loads processor.js from its own path.config.
+				assert.Equalf(c, helper.jsMarker, logs[helper.name][0].Flatten()["js_marker"], "expected %v to have js_marker from its own script", helper)
+
+				// Make sure that each receiver has a separate logger
+				// instance and does not interfere with others. Previously, the
+				// logger in Beats was global, causing logger fields to be
+				// overwritten when multiple receivers started in the same process.
+				startLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+helper.name))
+				assert.Equalf(c, 1, startLogs.Len(), "%v should have a single start log", helper)
+
+				metaPath := filepath.Join(helper.home, "/data/meta.json")
+				assert.FileExistsf(c, metaPath, "%s of %v should exist", metaPath, helper)
+				metaData, err := os.ReadFile(metaPath)
+				assert.NoError(c, err)
+				allMetaData = append(allMetaData, string(metaData))
+
+				var lastError strings.Builder
+				assert.Conditionf(c, func() bool {
+					return getFromSocket(t, &lastError, helper.monitorSocket, "stats")
+				}, "failed to connect to monitoring socket of %v, stats endpoint, last error was: %s", helper, &lastError)
+				assert.Conditionf(c, func() bool {
+					return getFromSocket(t, &lastError, helper.monitorSocket, "inputs")
+				}, "failed to connect to monitoring socket of %v, inputs endpoint, last error was: %s", helper, &lastError)
+
+				ingestJson, err := json.Marshal(helper.ingest)
+				assert.NoError(c, err)
+
+				regPath := filepath.Join(helper.home, "/data/registry/filebeat/log.json")
+				assert.FileExistsf(c, regPath, "receiver %v filebeat registry should exist", helper)
+				regData, err := os.ReadFile(regPath)
+				allRegData = append(allRegData, string(regData))
+				assert.NoError(c, err)
+				assert.Containsf(c, string(regData), string(ingestJson), "receiver %v registry should contain '%s', but was: %s", helper, string(ingestJson), string(regData))
+			}
+
+			for i := range nReceivers {
+				for j := range nReceivers {
+					if i == j {
+						continue
+					}
+					h1 := helpers[i]
+					h2 := helpers[j]
+					assert.NotEqualf(c, allMetaData[i], allMetaData[j], "meta data files between %v and %v should be different", h1, h2)
+					assert.NotContainsf(c, allRegData[i], allRegData[j], "receiver %v registry should not contain data from %v registry", h1, h2)
+				}
+			}
 		},
 	})
 }
 
-func TestReceiverDegraded(t *testing.T) {
+func TestReceiverStatus(t *testing.T) {
+	benchmarkInputId := "benchmark-id"
+	inputStatusAttributes := func(state string, msg string) pcommon.Map {
+		eventAttributes := pcommon.NewMap()
+		inputStatuses := eventAttributes.PutEmptyMap("inputs")
+		benchmarkStatus := inputStatuses.PutEmptyMap(benchmarkInputId)
+		benchmarkStatus.PutStr("status", state)
+		benchmarkStatus.PutStr("error", msg)
+		return eventAttributes
+	}
+	expectedDegradedErrorMessage := "benchmark input degraded"
+	expectedFailedErrorMessage := "benchmark input failed"
 	testCases := []struct {
 		name            string
-		status          oteltest.ExpectedStatus
+		status          *componentstatus.Event
 		benchmarkStatus string
 	}{
 		{
 			name: "failed input",
-			status: oteltest.ExpectedStatus{
-				Status: componentstatus.StatusPermanentError,
-				Error:  "benchmark input failed",
-			},
+			status: componentstatus.NewEvent(
+				componentstatus.StatusPermanentError,
+				componentstatus.WithError(errors.New(expectedFailedErrorMessage)),
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusPermanentError.String(), expectedFailedErrorMessage)),
+			),
 			benchmarkStatus: "failed",
 		},
 		{
 			name: "degraded input",
-			status: oteltest.ExpectedStatus{
-				Status: componentstatus.StatusRecoverableError,
-				Error:  "benchmark input degraded",
-			},
+			status: componentstatus.NewEvent(
+				componentstatus.StatusRecoverableError,
+				componentstatus.WithError(errors.New(expectedDegradedErrorMessage)),
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusRecoverableError.String(), expectedDegradedErrorMessage)),
+			),
 			benchmarkStatus: "degraded",
 		},
 		{
 			name: "running input",
-			status: oteltest.ExpectedStatus{
-				Status: componentstatus.StatusOK,
-				Error:  "",
-			},
+			status: componentstatus.NewEvent(componentstatus.StatusOK,
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusOK.String(), ""))),
 		},
 	}
 
@@ -306,6 +368,7 @@ func TestReceiverDegraded(t *testing.T) {
 					"filebeat": map[string]any{
 						"inputs": []map[string]any{
 							{
+								"id":      benchmarkInputId,
 								"type":    "benchmark",
 								"enabled": true,
 								"message": "test",
@@ -313,9 +376,6 @@ func TestReceiverDegraded(t *testing.T) {
 								"status":  test.benchmarkStatus,
 							},
 						},
-					},
-					"output": map[string]any{
-						"otelconsumer": map[string]any{},
 					},
 					"logging": map[string]any{
 						"level": "debug",
@@ -342,14 +402,14 @@ func TestReceiverDegraded(t *testing.T) {
 	}
 }
 
-func genSocketPath() string {
-	randData := make([]byte, 16)
-	for i := range len(randData) {
-		randData[i] = uint8(rand.UintN(255)) //nolint:gosec // 0-255 fits in a uint8
-	}
-	socketName := base64.URLEncoding.EncodeToString(randData) + ".sock"
-	socketDir := os.TempDir()
-	return filepath.Join(socketDir, socketName)
+func genSocketPath(t *testing.T) string {
+	t.Helper()
+	socketName, err := uuid.NewV4()
+	require.NoError(t, err)
+	// Use os.TempDir() for short Unix socket paths
+	sockPath := filepath.Join(os.TempDir(), socketName.String()+".sock")
+	t.Cleanup(func() { _ = os.Remove(sockPath) })
+	return sockPath
 }
 
 func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoint string) bool {
@@ -359,8 +419,8 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 	}
 	client := http.Client{
 		Transport: &http.Transport{
-			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-				return net.Dial("unix", socketPath)
+			DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+				return (&net.Dialer{}).DialContext(ctx, "unix", socketPath)
 			},
 		},
 	}
@@ -442,9 +502,6 @@ func TestReceiverHook(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"management.otel.enabled": true,
 			"path.home":               t.TempDir(),
 		},
@@ -458,4 +515,19 @@ func TestReceiverHook(t *testing.T) {
 	// For filebeatreceiver, we expect 3 hooks to be registered:
 	// 	one for beat metrics, one for input metrics and one for getting the registry.
 	oteltest.TestReceiverHook(t, &cfg, NewFactory(), receiverSettings, 3)
+}
+
+func hostFromSocket(socket string) string {
+	if runtime.GOOS == "windows" {
+		return "npipe:///" + filepath.Base(socket)
+	}
+	return "unix://" + socket
+}
+
+func writeFile(t require.TestingT, path string, data string) {
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	require.NoErrorf(t, err, "Could not open file %s", path)
+	defer f.Close()
+	_, err = f.WriteString(data + "\n")
+	require.NoErrorf(t, err, "Could not write %s to file %s", data, path)
 }

@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"math/rand/v2"
@@ -21,13 +22,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componentstatus"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/receiver"
 
 	"go.uber.org/zap"
@@ -55,9 +57,6 @@ func TestNewReceiver(t *testing.T) {
 						"metricsets": []string{"cpu"},
 					},
 				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
 			},
 			"logging": map[string]any{
 				"level": "debug",
@@ -87,8 +86,8 @@ func TestNewReceiver(t *testing.T) {
 			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0
 			}, "expected at least one ingest log, got logs: %v", logs["r1"])
-			assert.Equal(c, "metricbeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+			assert.Equal(c, "metricbeat", logs["r1"][0].Flatten()["agent.type"], "expected agent.type field in to be 'metricbeat'")
+
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket, "stats")
@@ -139,9 +138,6 @@ func TestMultipleReceivers(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
@@ -166,9 +162,6 @@ func TestMultipleReceivers(t *testing.T) {
 						"metricsets": []string{"cpu"},
 					},
 				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
 			},
 			"logging": map[string]any{
 				"level": "debug",
@@ -204,10 +197,8 @@ func TestMultipleReceivers(t *testing.T) {
 			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 			}, "expected at least one ingest log for each receiver, got logs: %v", logs)
-			assert.Equal(c, "metricbeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r1 log record")
-			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r1 log record")
-			assert.Equal(c, "metricbeatreceiver/r2", logs["r2"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r2 log record")
-			assert.Equal(c, "receiver", logs["r2"][0].Flatten()["agent.otelcol.component.kind"], "expected otelcol.component.kind field in r2 log record")
+			assert.Equal(c, "metricbeat", logs["r1"][0].Flatten()["agent.type"], "expected agent.type field to be 'metricbeat' in r1")
+			assert.Equal(c, "metricbeat", logs["r2"][0].Flatten()["agent.type"], "expected agent.type field to be 'metricbeat' in r2")
 
 			// Make sure that each receiver has a separate logger
 			// instance and does not interfere with others. Previously, the
@@ -336,9 +327,6 @@ func BenchmarkFactory(b *testing.B) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "info",
 				"selectors": []string{
@@ -368,26 +356,37 @@ func BenchmarkFactory(b *testing.B) {
 	}
 }
 
-func TestReceiverDegraded(t *testing.T) {
+func TestReceiverStatus(t *testing.T) {
+	benchmarkInputId := "benchmark-id"
+	inputStatusAttributes := func(state string, msg string) pcommon.Map {
+		eventAttributes := pcommon.NewMap()
+		inputStatuses := eventAttributes.PutEmptyMap("inputs")
+		benchmarkStatus := inputStatuses.PutEmptyMap(benchmarkInputId)
+		benchmarkStatus.PutStr("status", state)
+		benchmarkStatus.PutStr("error", msg)
+		return eventAttributes
+	}
+	expectedDegradedErrorMessage := "Error fetching data for metricset benchmark.info: benchmark input degraded"
 	testCases := []struct {
 		name    string
-		status  oteltest.ExpectedStatus
+		status  *componentstatus.Event
 		degrade bool
 	}{
 		{
 			name: "degraded input",
-			status: oteltest.ExpectedStatus{
-				Status: componentstatus.StatusRecoverableError,
-				Error:  "benchmark input degraded",
-			},
+			status: componentstatus.NewEvent(
+				componentstatus.StatusRecoverableError,
+				componentstatus.WithError(errors.New(expectedDegradedErrorMessage)),
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusRecoverableError.String(), expectedDegradedErrorMessage)),
+			),
 			degrade: true,
 		},
 		{
 			name: "running input",
-			status: oteltest.ExpectedStatus{
-				Status: componentstatus.StatusOK,
-				Error:  "",
-			},
+			status: componentstatus.NewEvent(componentstatus.StatusOK,
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusOK.String(), ""))),
 		},
 	}
 
@@ -399,6 +398,7 @@ func TestReceiverDegraded(t *testing.T) {
 						"max_start_delay": "0s",
 						"modules": []map[string]any{
 							{
+								"id":         benchmarkInputId,
 								"module":     "benchmark",
 								"enabled":    true,
 								"period":     "1s",
@@ -406,9 +406,6 @@ func TestReceiverDegraded(t *testing.T) {
 								"metricsets": []string{"info"},
 							},
 						},
-					},
-					"output": map[string]any{
-						"otelconsumer": map[string]any{},
 					},
 					"path.home": t.TempDir(),
 				},
@@ -444,10 +441,7 @@ func TestReceiverHook(t *testing.T) {
 				},
 			},
 			"management.otel.enabled": true,
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
-			"path.home": t.TempDir(),
+			"path.home":               t.TempDir(),
 		},
 	}
 	receiverSettings := receiver.Settings{

@@ -29,6 +29,8 @@ import (
 	"text/template"
 
 	"github.com/magefile/mage/sh"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/dev-tools/mage"
@@ -83,7 +85,10 @@ var funcMap = template.FuncMap{
 	"getBeatName": func() string {
 		return mage.BeatName
 	},
-	"title": strings.Title,
+	"title": func(s string) string {
+		caser := cases.Title(language.English)
+		return caser.String(s)
+	},
 }
 
 // checkXpack checks to see if the module belongs to x-pack.
@@ -108,7 +113,7 @@ func getRelease(rel string) (string, error) {
 	case "ga", "beta", "experimental":
 		return rel, nil
 	case "":
-		return "", fmt.Errorf("Missing a release string")
+		return "", fmt.Errorf("missing a release string")
 	default:
 		return "", fmt.Errorf("unknown release tag %s", rel)
 	}
@@ -133,9 +138,9 @@ func testIfDocsInDir(moduleDir string) bool {
 // This is done so a compile-time issue in metricbeat doesn't break the docs build
 func getDefaultMetricsets() (map[string][]string, error) {
 
-	runpaths := []string{
-		mage.OSSBeatDir("scripts/msetlists/cmd/main.go"),
-		mage.XPackBeatDir("scripts/msetlists/main.go"),
+	runpaths := [][]string{
+		{"run", mage.OSSBeatDir("scripts/msetlists/cmd/main.go")},
+		{"run", mage.XPackBeatDir("scripts/msetlists/main.go"), "--module", mage.XPackBeatDir("module")},
 	}
 
 	var masterMap = make(map[string][]string)
@@ -145,11 +150,10 @@ func getDefaultMetricsets() (map[string][]string, error) {
 		return masterMap, nil
 	}
 
-	cmd := []string{"run"}
 	for _, dir := range runpaths {
-		rawMap, err := sh.OutCmd("go", append(cmd, dir)...)()
+		rawMap, err := sh.OutCmd("go", dir...)()
 		if err != nil {
-			return nil, fmt.Errorf("Error running subcommand to get metricsets: %w", err)
+			return nil, fmt.Errorf("error running subcommand to get metricsets: %w", err)
 		}
 		var msetMap = make(map[string][]string)
 		err = json.Unmarshal([]byte(rawMap), &msetMap)
