@@ -87,14 +87,29 @@ func WriteLogFile(t *testing.T, path string, count int, append bool, prefix ...s
 // WriteDockerJSONLog writes Docker JSON log lines to path.
 // streams must contain one or two elements to select the container 'stream'.
 // If streams contains two elements they will be rotated in a round-robin fashion.
-func WriteDockerJSONLog(t *testing.T, path string, count int, streams []string) {
-	file, err := os.Create(path)
-	if err != nil {
-		t.Fatalf("cannot create docker log file: %s", err)
+// If append is true, data is appended to the file; otherwise the file is truncated.
+func WriteDockerJSONLog(t *testing.T, path string, count int, streams []string, append bool) {
+	var file *os.File
+	var err error
+	if !append {
+		file, err = os.Create(path)
+		if err != nil {
+			t.Fatalf("cannot create docker log file: %s", err)
+		}
+	} else {
+		file, err = os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+		if err != nil {
+			t.Fatalf("cannot open or create docker log file: %s", err)
+		}
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
 			t.Fatalf("cannot close docker log file: %s", err)
+		}
+	}()
+	defer func() {
+		if err := file.Sync(); err != nil {
+			t.Fatalf("cannot flush docker log file: %s", err)
 		}
 	}()
 
@@ -127,9 +142,6 @@ func WriteDockerJSONLog(t *testing.T, path string, count int, streams []string) 
 		}
 	}
 
-	if err := file.Sync(); err != nil {
-		t.Fatalf("cannot flush docker log file: %s", err)
-	}
 }
 
 // WriteNLogFiles generates nFiles with nLines in each. The lines are a

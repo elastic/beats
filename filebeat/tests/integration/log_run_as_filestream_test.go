@@ -131,8 +131,8 @@ func TestLogAsFilestreamContainerInput(t *testing.T) {
 
 	stdoutFile := filepath.Join(logDir, "container-stdout.log")
 	stderrFile := filepath.Join(logDir, "container-stderr.log")
-	integration.WriteDockerJSONLog(t, stdoutFile, eventsCount, []string{"stdout"})
-	integration.WriteDockerJSONLog(t, stderrFile, eventsCount, []string{"stderr"})
+	integration.WriteDockerJSONLog(t, stdoutFile, eventsCount, []string{"stdout"}, false)
+	integration.WriteDockerJSONLog(t, stderrFile, eventsCount, []string{"stderr"}, false)
 
 	cfg := getConfig(
 		t,
@@ -199,26 +199,38 @@ func TestLogAsFilestreamContainerInputMixedFile(t *testing.T) {
 	}
 
 	inputFile := filepath.Join(logDir, "container-stdout.log")
-	integration.WriteDockerJSONLog(t, inputFile, eventsCount, []string{"stdout", "stderr"})
+	integration.WriteDockerJSONLog(t, inputFile, eventsCount, []string{"stdout", "stderr"}, false)
 
-	cfg := getConfig(
-		t,
-		map[string]any{
-			"logfile":    filepath.Join(logDir, "*.log"),
-			"filestream": false,
-		},
-		filepath.Join("run_as_filestream"),
-		"container_mixed.yml")
+	cfgMap := map[string]any{
+		"logfile":    filepath.Join(logDir, "*.log"),
+		"filestream": false,
+	}
+
+	cfgStr := getConfig(t, cfgMap, "run_as_filestream", "run_as_container_mixed.yml")
 
 	// Write configuration file and start Filebeat
-	filebeat.WriteConfigFile(cfg)
+	filebeat.WriteConfigFile(cfgStr)
 	filebeat.Start()
 
 	assertContainerEvents(t, filebeat, eventsCount/2, eventsCount/2, false)
 
+	filebeat.Stop()
+
+	filebeat.RemoveLogFiles()
+	cfgMap["filestream"] = true
+	cfgStr = getConfig(t, cfgMap, "run_as_filestream", "run_as_container_mixed.yml")
+
+	integration.WriteDockerJSONLog(t, inputFile, eventsCount, []string{"stdout", "stderr"}, true)
+
+	filebeat.Start()
+
+	filebeat.WaitLogsContains("End of file reached", 5*time.Second, "")
+	assertContainerEvents(t, filebeat, eventsCount, eventsCount, false)
+
 	// Expected offsets:
 	// stdout: 3969
 	// stderr: 4050
+	// t.Fatal("keep the logs")
 }
 
 func assertContainerEvents(
@@ -227,7 +239,10 @@ func assertContainerEvents(
 	stderrEvents, stdoutEvents int,
 	containsTakeOverTag bool,
 ) {
+	t.Helper()
 	eventsCount := stderrEvents + stdoutEvents
+
+	filebeat.WaitPublishedEvents(5*time.Second, eventsCount)
 	events := integration.GetEventsFromFileOutput[BeatEvent](filebeat, eventsCount, true)
 	streamCounts := map[string]int{
 		"stdout": 0,
@@ -276,8 +291,8 @@ func TestLogAsFilestreamContainerInputNoFeatureFlag(t *testing.T) {
 
 	stdoutFile := filepath.Join(logDir, "container-stdout.log")
 	stderrFile := filepath.Join(logDir, "container-stderr.log")
-	integration.WriteDockerJSONLog(t, stdoutFile, eventsCount, []string{"stdout"})
-	integration.WriteDockerJSONLog(t, stderrFile, eventsCount, []string{"stderr"})
+	integration.WriteDockerJSONLog(t, stdoutFile, eventsCount, []string{"stdout"}, false)
+	integration.WriteDockerJSONLog(t, stderrFile, eventsCount, []string{"stderr"}, false)
 
 	cfg := getConfig(
 		t,
