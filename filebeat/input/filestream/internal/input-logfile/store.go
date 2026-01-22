@@ -491,10 +491,11 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 }
 
 type logInputState struct {
-	ID     string        `json:"id"`
-	Offset int64         `json:"offset"`
-	TTL    time.Duration `json:"ttl" struct:"ttl"`
-	key    string        `json:"-"`
+	ID     string            `json:"id"`
+	Offset int64             `json:"offset"`
+	TTL    time.Duration     `json:"ttl" struct:"ttl"`
+	key    string            `json:"-"`
+	Meta   map[string]string `json:"meta"`
 
 	// This matches the filestream.fileMeta struct
 	// and are used by UnpackCursorMeta

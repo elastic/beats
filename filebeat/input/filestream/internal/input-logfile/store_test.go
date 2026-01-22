@@ -20,17 +20,21 @@ package input_logfile
 
 import (
 	"errors"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	cp "github.com/otiai10/copy"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-concert/unison"
@@ -533,6 +537,70 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		checkEqualStoreState(t, want, storeMemorySnapshot(s))
 		checkEqualStoreState(t, want, storeInSyncSnapshot(s))
 	})
+}
+
+func TestTakeOverCanReadLogInputStatesWithMeta(t *testing.T) {
+	rootDir, err := filepath.Abs(filepath.Join("..", "..", "..", "..", "build", "integration-tests"))
+	if err != nil {
+		t.Fatalf("cannot get abs path: %s", err)
+	}
+	tmpDir := integration.CreateTempDir(
+		t,
+		rootDir,
+	)
+	name := "filebeat"
+	storePath := filepath.Join(tmpDir, name)
+
+	// Copy a real example for testing
+	err = cp.Copy(filepath.Join("testdata", "container-store"), storePath)
+	if err != nil {
+		t.Fatalf("cannot copy store files: %s", err)
+	}
+
+	store := openTestStoreFromFiles(t, tmpDir, name)
+
+	count := 0
+	store.TakeOver(func(v Value) (string, any) {
+		// Count the states successfully read
+		count++
+		return "", nil
+	})
+
+	// Ensure we read all states
+	if count != 2 {
+		t.Fatalf("could not read/convert Log input states, look the error logs at %s", tmpDir)
+	}
+}
+
+func openTestStoreFromFiles(t *testing.T, rootDir, name string) sourceStore {
+	logger := logptest.NewFileLogger(t, rootDir)
+	reg, err := memlog.New(logger.Logger, memlog.Settings{
+		Root: rootDir,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	storeReg := statestore.NewRegistry(reg)
+	store, err := storeReg.Get(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tstore := testStateStore{
+		Store: store,
+	}
+
+	ss, err := openStore(logger.Logger, tstore, "foo")
+	if err != nil {
+		t.Fatalf("cannot open store: %s", err)
+	}
+	realStroe := sourceStore{
+		identifier: &SourceIdentifier{
+			prefix: "filestream" + "::" + "input-id" + "::",
+		},
+		store: ss,
+	}
+
+	return realStroe
 }
 
 func closeStoreWith(fn func(s *store)) func() {
