@@ -19,14 +19,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-type JumplistType uint32
+type JumplistType string
 
 const (
-	JumplistTypeCustom    JumplistType = 1
-	JumplistTypeAutomatic JumplistType = 2
+	JumplistTypeCustom JumplistType = "custom"
 )
 
-// JumplistMeta is the metadata for a jump list.
 // JumplistMeta is the metadata for a jump list.
 // It contains the application ID, jump list type, path to the jump list file,
 // and any jumplist type specific metadata.  The embedded fields
@@ -40,13 +38,13 @@ type JumplistMeta struct {
 }
 
 // JumplistEntry is a single entry in a jump list.
+// TODO: Automatic jumplists will add additional fields to the JumplistEntry object.
 type JumplistEntry struct {
-	*DestListEntry
 	*Lnk
 }
 
 // Jumplist is a collection of Lnk objects that represent a single jump list.
-// It contains the metadata for the jump list and the Entries (Lnk objects).
+// It contains the metadata for the jump list and the entries (Lnk objects).
 // This is a generic object that can represent either a custom jumplist
 // or an automatic jumplist. It is comprised of a JumplistMeta object and a slice of Lnk objects.
 type Jumplist struct {
@@ -60,8 +58,8 @@ type Jumplist struct {
 // This object using embedded pointers so that multiple rows can share the same metadata.
 // each embedded field has osquery tags defined in their object definitions
 type JumplistRow struct {
-	*JumplistMeta  // The metadata for the jump list
-	*JumplistEntry // The JumplistEntry object that represents a single jump list entry
+	*JumplistMeta // The metadata for the jump list
+	*Lnk          // The Lnk object that represents a single jump list entry
 }
 
 // ToRows converts the Jumplist to a slice of JumplistRow objects.
@@ -69,8 +67,8 @@ func (j *Jumplist) ToRows() []JumplistRow {
 	var rows []JumplistRow
 	for _, entry := range j.entries {
 		rows = append(rows, JumplistRow{
-			JumplistMeta:  j.JumplistMeta,
-			JumplistEntry: entry,
+			JumplistMeta: j.JumplistMeta,
+			Lnk:          entry.Lnk,
 		})
 	}
 	return rows
@@ -86,8 +84,6 @@ func GetColumns() []table.ColumnDefinition {
 	return columns
 }
 
-// GetGenerateFunc returns a function that can be used to generate a table of JumplistRow objects.
-// It returns a function that can be used to generate a table of JumplistRow objects.
 // matchesFilters is a helper function that checks if a row matches the given filters.
 func matchesFilters(row JumplistRow, filters []filters.Filter) bool {
 	for _, filter := range filters {

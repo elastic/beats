@@ -170,25 +170,6 @@ func NewStandardBeat(t *testing.T, beatName, binary string, args ...string) *Bea
 	return b
 }
 
-// NewAgentBeat creates a new agentbeat process that runs the beatName as a subcommand.
-// See `NewBeat` for options and information for the parameters.
-func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
-	b := NewBeat(t, beatName, binary, args...)
-
-	// Remove the first two arguments: beatName and --systemTest
-	baseArgs := b.baseArgs[2:]
-	// Add the agentbeat argumet and re-organise the others
-	b.baseArgs = append(
-		[]string{
-			"agentbeat",
-			"--systemTest",
-			beatName,
-		},
-		baseArgs...)
-
-	return b
-}
-
 // Start starts the Beat process
 // args are extra arguments to be passed to the Beat.
 func (b *BeatProc) Start(args ...string) {
@@ -1272,8 +1253,17 @@ func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
 	t.Helper()
 
 	path := filepath.Join(b.TempDir(), "output-*.ndjson")
+
+	// Ensure the output file exists. This avoid us calling assert.Eventually
+	// inside an assert.Eventually, which causes the test to fail with a generic
+	// "Condition never satisfied" message.
+	if got := b.CountFileLines(path); got == events {
+		return
+	}
+
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
-		assert.Equal(collect, events, b.CountFileLines(path))
+		got := b.CountFileLines(path)
+		assert.Equalf(collect, events, got, "expecting %d events, got %d", events, got)
 	}, timeout, 200*time.Millisecond)
 }
 

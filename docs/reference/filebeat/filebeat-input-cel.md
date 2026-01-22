@@ -23,6 +23,7 @@ This input supports:
     * Digest
     * {applies_to}`stack: ga 9.3.0` File
     * OAuth2
+    * {applies_to}`stack: ga 9.3.0` AWS
 
 * Retrieval at a configurable interval
 * Pagination
@@ -138,56 +139,56 @@ The CEL input will log the complete state after evaluation when logging at the D
 
 As noted above the `cel` input provides functions, macros, and global variables to extend the language.
 
-* [AWS v4 request signing]({{mito_docs}}@{{mito_version}}/lib#AWS) {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
+* [AWS v4 request signing]({{mito_docs}}@{{mito_version}}/lib#AWS) {applies_to}`stack: ga 9.1+`
 
     * [Sign AWS from env]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_env-AWS)
     * [Sign AWS from shared credentials]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_shared_credentials-AWS)
     * [Sign AWS from static credentials]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_static_credentials-AWS)
 
-* [Collections]({{mito_docs}}@{{mito_version}}/lib#Collections) {applies_to}`stack: ga 8.6.0`
+* [Collections]({{mito_docs}}@{{mito_version}}/lib#Collections)
 
     * [Collate]({{mito_docs}}@{{mito_version}}/lib#hdr-Collate-Collections)
     * [Drop]({{mito_docs}}@{{mito_version}}/lib#hdr-Drop-Collections)
     * [Drop Empty]({{mito_docs}}@{{mito_version}}/lib#hdr-Drop_Empty-Collections)
     * [Flatten]({{mito_docs}}@{{mito_version}}/lib#hdr-Flatten-Collections)
-    * [Front]({{mito_docs}}@{{mito_version}}/lib#hdr-Front-Collections) {applies_to}`stack: ga 8.18.0`
-    * [Keys]({{mito_docs}}@{{mito_version}}/lib#hdr-Keys-Collections) {applies_to}`stack: ga 8.13.0`
+    * [Front]({{mito_docs}}@{{mito_version}}/lib#hdr-Front-Collections)
+    * [Keys]({{mito_docs}}@{{mito_version}}/lib#hdr-Keys-Collections)
     * [Max]({{mito_docs}}@{{mito_version}}/lib#hdr-Max-Collections)
         * list maximum
-        * pair maximum {applies_to}`stack: ga 8.18.0`
+        * pair maximum
     * [Min]({{mito_docs}}@{{mito_version}}/lib#hdr-Min-Collections)
         * list minimum
-        * pair minimum {applies_to}`stack: ga 8.18.0`
-    * [Sum]({{mito_docs}}@{{mito_version}}/lib#hdr-Sum-Collections) {applies_to}`stack: ga 8.18.0`
+        * pair minimum
+    * [Sum]({{mito_docs}}@{{mito_version}}/lib#hdr-Sum-Collections)
     * [Tail]({{mito_docs}}@{{mito_version}}/lib#hdr-Tail-Collections)
-        * one parameter {applies_to}`stack: ga 8.15.0`
-        * two parameter {applies_to}`stack: ga 8.18.0`
-    * [Values]({{mito_docs}}@{{mito_version}}/lib#hdr-Values-Collections) {applies_to}`stack: ga 8.13.0`
+        * one parameter
+        * two parameter
+    * [Values]({{mito_docs}}@{{mito_version}}/lib#hdr-Values-Collections)
     * [With]({{mito_docs}}@{{mito_version}}/lib#hdr-With-Collections)
     * [With Replace]({{mito_docs}}@{{mito_version}}/lib#hdr-With_Replace-Collections)
     * [With Update]({{mito_docs}}@{{mito_version}}/lib#hdr-With_Update-Collections)
-    * [Zip]({{mito_docs}}@{{mito_version}}/lib#hdr-Zip-Collections) {applies_to}`stack: ga 8.9.2`
+    * [Zip]({{mito_docs}}@{{mito_version}}/lib#hdr-Zip-Collections)
 
-* [Crypto]({{mito_docs}}@{{mito_version}}/lib#Crypto) {applies_to}`stack: ga 8.6.0`
+* [Crypto]({{mito_docs}}@{{mito_version}}/lib#Crypto)
 
     * [Base64]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64-Crypto)
-    * [Base64 Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Decode-Crypto) {applies_to}`stack: ga 8.14.0`
+    * [Base64 Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Decode-Crypto)
     * [Base64 Raw]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Raw-Crypto)
-    * [Base64 Raw Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Raw_Decode-Crypto) {applies_to}`stack: ga 8.14.0`
+    * [Base64 Raw Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Raw_Decode-Crypto)
     * [Hex]({{mito_docs}}@{{mito_version}}/lib#hdr-Hex-Crypto)
-    * [Hex Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Hex_Decode-Crypto) {applies_to}`stack: ga 8.18.1`
+    * [Hex Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Hex_Decode-Crypto)
     * [MD5]({{mito_docs}}@{{mito_version}}/lib#hdr-MD5-Crypto)
     * [SHA-1]({{mito_docs}}@{{mito_version}}/lib#hdr-SHA_1-Crypto)
     * [SHA-256]({{mito_docs}}@{{mito_version}}/lib#hdr-SHA_256-Crypto)
     * [HMAC]({{mito_docs}}@{{mito_version}}/lib#hdr-HMAC-Crypto)
     * [UUID]({{mito_docs}}@{{mito_version}}/lib#hdr-UUID-Crypto)
 
-* [File]({{mito_docs}}@{{mito_version}}/lib#File) — the file extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader). {applies_to}`stack: ga 8.6.0`
+* [File]({{mito_docs}}@{{mito_version}}/lib#File) — the file extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader).
 
     * [Dir]({{mito_docs}}@{{mito_version}}/lib#hdr-Dir-File)
     * [File]({{mito_docs}}@{{mito_version}}/lib#hdr-File-File)
 
-* [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) {applies_to}`stack: ga 8.6.0`
+* [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP)
 
     * [HEAD]({{mito_docs}}@{{mito_version}}/lib#hdr-HEAD-HTTP)
     * [GET]({{mito_docs}}@{{mito_version}}/lib#hdr-GET-HTTP)
@@ -195,33 +196,33 @@ As noted above the `cel` input provides functions, macros, and global variables 
     * [POST]({{mito_docs}}@{{mito_version}}/lib#hdr-POST-HTTP)
     * [POST Request]({{mito_docs}}@{{mito_version}}/lib#hdr-POST_Request-HTTP)
     * [Request]({{mito_docs}}@{{mito_version}}/lib#hdr-Request-HTTP)
-    * [Basic Authentication]({{mito_docs}}@{{mito_version}}/lib#hdr-Basic_Authentication-HTTP) {applies_to}`stack: ga 8.7.0`
+    * [Basic Authentication]({{mito_docs}}@{{mito_version}}/lib#hdr-Basic_Authentication-HTTP)
     * [Do Request]({{mito_docs}}@{{mito_version}}/lib#hdr-Do_Request-HTTP)
     * [Parse URL]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_URL-HTTP)
     * [Format URL]({{mito_docs}}@{{mito_version}}/lib#hdr-Format_URL-HTTP)
     * [Parse Query]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_Query-HTTP)
     * [Format Query]({{mito_docs}}@{{mito_version}}/lib#hdr-Format_Query-HTTP)
 
-* [JSON]({{mito_docs}}@{{mito_version}}/lib#JSON) {applies_to}`stack: ga 8.6.0`
+* [JSON]({{mito_docs}}@{{mito_version}}/lib#JSON)
 
     * [Encode JSON]({{mito_docs}}@{{mito_version}}/lib#hdr-Encode_JSON-JSON)
     * [Decode JSON]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON-JSON)
     * [Decode JSON Stream]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON_Stream-JSON)
 
-* [XML]({{mito_docs}}@{{mito_version}}/lib#XML) — the XML extension is initialized with XML schema definitions provided via the `xsd` configuration option.  {applies_to}`stack: ga 8.9.0`
+* [XML]({{mito_docs}}@{{mito_version}}/lib#XML) — the XML extension is initialized with XML schema definitions provided via the `xsd` configuration option.
 
     * [Decode XML]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_XML-XML)
-        * Optional XSD definition in one-parameter form. {applies_to}`stack: ga 8.18.1`
+        * Optional XSD definition in one-parameter form.
 
-* [Limit]({{mito_docs}}@{{mito_version}}/lib#Limit) — the rate limit extension is initialized with [Okta (as "okta")]({{mito_docs}}@{{mito_version}}/lib#OktaRateLimit) and the [Draft Rate Limit (as "draft")]({{mito_docs}}@{{mito_version}}/lib#DraftRateLimit) policies. {applies_to}`stack: ga 8.6.0`
+* [Limit]({{mito_docs}}@{{mito_version}}/lib#Limit) — the rate limit extension is initialized with [Okta (as "okta")]({{mito_docs}}@{{mito_version}}/lib#OktaRateLimit) and the [Draft Rate Limit (as "draft")]({{mito_docs}}@{{mito_version}}/lib#DraftRateLimit) policies.
 
     * [Rate Limit]({{mito_docs}}@{{mito_version}}/lib#hdr-Rate_Limit-Limit)
 
-* [MIME]({{mito_docs}}@{{mito_version}}/lib#MIME) — the MIME extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader). {applies_to}`stack: ga 8.6.0`
+* [MIME]({{mito_docs}}@{{mito_version}}/lib#MIME) — the MIME extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader).
 
     * [MIME]({{mito_docs}}@{{mito_version}}/lib#hdr-MIME-MIME)
 
-* [Regexp]({{mito_docs}}@{{mito_version}}/lib#Regexp) — the regular expression extension is initialized with the patterns specified in the user input configuration via the `regexp` field. {applies_to}`stack: ga 8.6.0`
+* [Regexp]({{mito_docs}}@{{mito_version}}/lib#Regexp) — the regular expression extension is initialized with the patterns specified in the user input configuration via the `regexp` field.
 
     * [RE Match]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Match)
     * [RE Find]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Find)
@@ -234,27 +235,27 @@ As noted above the `cel` input provides functions, macros, and global variables 
 
     * [Sprintf]({{mito_docs}}@{{mito_version}}/lib#hdr-Sprintf-Printf)
 
-* [Strings]({{mito_docs}}@{{mito_version}}/lib#Strings) {applies_to}`stack: ga 8.7.0`
+* [Strings]({{mito_docs}}@{{mito_version}}/lib#Strings)
 
     * [String Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-String_Methods-Strings)
     * [String List Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-String_List_Methods-Strings)
-    * [Bytes Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-Bytes_Methods-Strings) {applies_to}`stack: ga 8.15.0`
+    * [Bytes Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-Bytes_Methods-Strings)
 
-* [Time]({{mito_docs}}@{{mito_version}}/lib#Time) {applies_to}`stack: ga 8.6.0`
+* [Time]({{mito_docs}}@{{mito_version}}/lib#Time)
 
     * [Format]({{mito_docs}}@{{mito_version}}/lib#hdr-Format-Time)
     * [Parse Time]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_Time-Time)
-    * [Round]({{mito_docs}}@{{mito_version}}/lib#hdr-Round-Time) {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
-    * [Truncate]({{mito_docs}}@{{mito_version}}/lib#hdr-Truncate-Time) {applies_to}`stack: ga 9.3.0`
+    * [Round]({{mito_docs}}@{{mito_version}}/lib#hdr-Round-Time) {applies_to}`stack: ga 9.1+`
+    * [Truncate]({{mito_docs}}@{{mito_version}}/lib#hdr-Truncate-Time) {applies_to}`stack: ga 9.3+`
     * [Global Variables]({{mito_docs}}@{{mito_version}}/lib#hdr-Global_Variables-Time)
-        * Support for [`DateOnly`](https://pkg.go.dev/time#DateOnly), [`DateTime`](https://pkg.go.dev/time#DateTime) and [`TimeOnly`](https://pkg.go.dev/time#TimeOnly) time formats. {applies_to}`stack: ga 8.15.0`
+        * Support for [`DateOnly`](https://pkg.go.dev/time#DateOnly), [`DateTime`](https://pkg.go.dev/time#DateTime) and [`TimeOnly`](https://pkg.go.dev/time#TimeOnly) time formats.
 
-* [Try]({{mito_docs}}@{{mito_version}}/lib#Try) {applies_to}`stack: ga 8.6.0`
+* [Try]({{mito_docs}}@{{mito_version}}/lib#Try)
 
     * [Try]({{mito_docs}}@{{mito_version}}/lib#hdr-Try-Try)
     * [Is Error]({{mito_docs}}@{{mito_version}}/lib#hdr-Is_Error-Try)
 
-* [Debug]({{mito_docs}}@{{mito_version}}/lib#Debug) — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger. {applies_to}`stack: ga 8.10.3`
+* [Debug]({{mito_docs}}@{{mito_version}}/lib#Debug) — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger.
 
     * [Debug]({{mito_docs}}@{{mito_version}}/lib#hdr-Debug)
 
@@ -265,16 +266,17 @@ Host environment variables are made available via the global map `env`. Only env
 
 The CEL environment enables the [optional types](https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#OptionalTypesVersion) and the [two-variable comprehensions extensions](https://pkg.go.dev/github.com/google/cel-go/ext#TwoVarComprehensions) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#TwoVarComprehensionVersion).
 
-* Optional types {applies_to}`stack: ga 8.12.0`
-* Two-variable comprehensions {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
+* Optional types
+* Two-variable comprehensions {applies_to}`stack: ga 9.1+`
 
 Additionally, it supports authentication via:
 
 * Basic Authentication
-* Digest Authentication {applies_to}`stack: ga 8.12.0`
+* Digest Authentication
 * OAuth2
-* file-based headers {applies_to}`stack: ga 9.3.0`
-* token authentication {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
+* file-based headers {applies_to}`stack: ga 9.3+`
+* token authentication {applies_to}`stack: ga 9.1+`
+* AWS Authentication {applies_to}`stack: ga 9.3+`
 
 As described in Mito's [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) documentation, configuration for Basic Authentication or token authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication, file-based headers or OAuth2 will be used for all requests made from CEL.
 
@@ -348,6 +350,24 @@ filebeat.inputs:
   resource.url: http://localhost
 ```
 
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.aws:
+    access_key_id:     "AKIAIOSFODNN7EXAMPLE"
+    secret_access_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  request.url: https://guardduty.us-east-1.amazonaws.com/detector/abc123/findings
+```
+
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.aws:
+    credential_profile_name: fb-aws
+    shared_credential_file: /etc/filebeat/aws_credentials
+  request.url: https://guardduty.us-east-1.amazonaws.com/detector/abc123/findings
+```
+
 ## Input state [input-state-cel]
 
 The `cel` input keeps a runtime state between requests. This state can be accessed by the CEL program and may contain arbitrary objects.
@@ -365,7 +385,7 @@ This can either be calculated explicitly in CEL code, or by using the
 
 If the `rate_limit` extension is used, calculated rate limits are applied directly to the HTTP client
 used by the CEL input. This includes uses of `rate_limit` that do not return their results from the
-CEL context. {applies_to}`stack: ga 9.3.0`
+CEL context. {applies_to}`stack: ga 9.3+`
 
 
 ## CEL input and handling numbers [_cel_input_and_numbers]
@@ -404,7 +424,7 @@ The CEL program that is executed each polling period. This field is required.
 
 `max_executions` is the maximum number of times a CEL program can request to be re-run with a `want_more` field. This is used to ensure that accidental infinite loops do not halt processing. When the execution budget is exceeded, execution will be restarted at the next interval and a warning will be written into the logs. Default: 1000.
 
-The number of executions remaining in the execution budget after the completion of the current evaluation is available within the CEL program by referencing the `remaining_executions` global variable. {applies_to}`stack: ga 9.2.0`
+The number of executions remaining in the execution budget after the completion of the current evaluation is available within the CEL program by referencing the `remaining_executions` global variable. {applies_to}`stack: ga 9.2+`
 
 ### `state` [state-cel]
 
@@ -503,7 +523,7 @@ filebeat.inputs:
                      <xs:element name="company" type="xs:string"/>
 ```
 
-The `xsd` for an XML document structure may be omitted. {applies_to}`stack: ga 8.18.1`
+The `xsd` for an XML document structure may be omitted.
 
 
 ### `auth.basic.enabled` [_auth_basic_enabled]
@@ -829,6 +849,118 @@ The type of token to authenticate with, for example "Token" or "Bearer".
 The token value to use.
 
 
+### `auth.aws.enabled` [_auth_aws_enabled]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `false`, disables the file AWS auth configuration. Default: `true`.
+
+::::{note}
+AWS auth settings are disabled if either `enabled` is set to `false` or the `auth.aws` section is missing.
+::::
+
+### `auth.aws.access_key_id` [_auth_aws_access_key_id]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS access key ID. It should be used with [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key).
+
+### `auth.aws.secret_access_key` [_auth_aws_secret_access_key]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS secret access key. It should be used with [`auth.aws.access_key_id`](#_auth_aws_access_key_id).
+
+::::{note}
+Use either direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) or a shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)). If both are set, the direct keys take precedence.
+
+If neither the direct keys nor the shared credentials file is set, AWS SDK [LoadDefaultConfig](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config#LoadDefaultConfig) will be used.
+::::
+
+### `auth.aws.session_token` [_auth_aws_session_token]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS session token that can be optionally set when direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) are used.
+
+### `auth.aws.shared_credential_file` [_auth_aws_shared_credential_file]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The path of the AWS shared credentials file.
+
+::::{note}
+Use either direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) or a shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)). If both are set, the direct keys take precedence.
+
+If neither the direct keys nor the shared credentials file is set, AWS SDK [LoadDefaultConfig](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config#LoadDefaultConfig) will be used.
+::::
+
+### `auth.aws.credential_profile_name` [_auth_aws_credential_profile_name]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The profile name of the AWS shared credentials file. This is optional and can be used with [`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file).
+
+### `auth.aws.role_arn` [_auth_aws_role_arn]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The IAM Role ARN to assume. Assume-role authentication is layered on top of the base credentials, which may come from a direct access key, a shared credentials file, or the default SDK configuration. The assume-role request will use whichever credentials have already been established.
+
+### `auth.aws.external_id` [_auth_aws_external_id]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the external ID to use for every IAM assume-role request. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.assume_role.duration` [_auth_aws_assume_role_duration]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the duration of the credentials retrieved by the IAM assume-role. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.assume_role.expiry_window` [_auth_aws_assume_expiry_window]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the credentials retrieved by the IAM assume-role to trigger refreshing prior to the credentials actually expiring. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.service_name` [_auth_aws_service_name]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the AWS service name that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
+
+### `auth.aws.default_region` [_auth_aws_default_region]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the AWS region that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
+
 
 ### `resource.url` [resource-parameters]
 
@@ -964,14 +1096,14 @@ The maximum burst size. Burst is the maximum number of resource requests that ca
 
 It is possible to log HTTP requests and responses in a CEL program to a local file-system for debugging configurations. This option is enabled by setting `resource.tracer.enabled` to true and setting the `resource.tracer.filename` value. Additional options are available to tune log rotation behavior. To delete existing logs, set `resource.tracer.enabled` to false without unsetting the filename option.
 
-Enabling this option compromises security and should only be used for debugging. {applies_to}`stack: ga 8.15.0`
+Enabling this option compromises security and should only be used for debugging.
 
 
 ### `resource.tracer.filename` [_resource_tracer_filename]
 
 To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
 
-Setting `resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching the filename option to be deleted. {applies_to}`stack: ga 8.15.0`
+Setting `resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching the filename option to be deleted.
 
 
 ### `resource.tracer.maxsize` [_resource_tracer_maxsize]
