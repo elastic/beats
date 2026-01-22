@@ -14,6 +14,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+// This file was contributed to by generative AI
 
 //nolint:errcheck // It's a test file
 package filestream
@@ -115,33 +116,71 @@ func TestTakeOverFnSuccess(t *testing.T) {
 	newID := func(src loginp.Source) string {
 		return "filestream::current-id::" + src.Name()
 	}
-	value := &mockUnpackValue{
-		key: "filestream::previous-id::path::/path/to/file",
-		fileMeta: fileMeta{
-			Source:         path,
-			IdentifierName: pathName,
+
+	testCases := map[string]struct {
+		stream     string
+		metaStream string
+		expectKey  string
+	}{
+		"empty stream migrates when meta stream empty": {
+			stream:     "",
+			metaStream: "",
+			expectKey:  "filestream::current-id::fingerprint::===-mock-fingerpint-===",
+		},
+		"matching stream migrates": {
+			stream:     "stdout",
+			metaStream: "stdout",
+			expectKey:  "filestream::current-id::fingerprint::===-mock-fingerpint-===",
+		},
+		"mismatching stream does not migrate": {
+			stream:     "stderr",
+			metaStream: "stdout",
+			expectKey:  "",
+		},
+		"stream all does not migrate when meta stream empty": {
+			stream:     "all",
+			metaStream: "",
+			expectKey:  "",
 		},
 	}
 
-	newKey, meta := takeOverFn(
-		logp.NewNopLogger(),
-		value,
-		files,
-		identifier.Name(),
-		identifier,
-		newID,
-	)
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			value := &mockUnpackValue{
+				key: "filestream::previous-id::path::/path/to/file",
+				fileMeta: fileMeta{
+					Source:         path,
+					IdentifierName: pathName,
+					Meta: struct {
+						Stream string `json:"stream" struct:"stream"`
+					}{
+						Stream: tc.metaStream,
+					},
+				},
+			}
 
-	require.Equal(
-		t,
-		"filestream::current-id::fingerprint::===-mock-fingerpint-===",
-		newKey,
-		"new key should match target input")
-	require.IsType(t, fileMeta{}, meta, "returned meta should be fileMeta")
+			newKey, meta := takeOverFn(
+				logp.NewNopLogger(),
+				value,
+				files,
+				identifier.Name(),
+				tc.stream,
+				identifier,
+				newID,
+			)
 
-	got := meta.(fileMeta)
-	require.Equal(t, path, got.Source, "source should be preserved")
-	require.Equal(t, identifier.Name(), got.IdentifierName, "identifier name should be updated")
+			require.Equal(t, tc.expectKey, newKey, "unexpected migrated key")
+			if tc.expectKey == "" {
+				require.IsType(t, fileMeta{}, meta, "returned meta should be fileMeta")
+				return
+			}
+
+			require.IsType(t, fileMeta{}, meta, "returned meta should be fileMeta")
+			got := meta.(fileMeta)
+			require.Equal(t, path, got.Source, "source should be preserved")
+			require.Equal(t, identifier.Name(), got.IdentifierName, "identifier name should be updated")
+		})
+	}
 }
 
 func TestProspector_InitUpdateIdentifiers(t *testing.T) {

@@ -346,6 +346,10 @@ type TakeOverConfig struct {
 	Enabled bool `config:"enabled"`
 	// Filestream IDs to take over states
 	FromIDs []string `config:"from_ids"`
+	// Stream from the container input to take over from.
+	// Valid values: stderr, stdout or it can be empty. An empty stream means
+	// all streams.
+	Stream string `config:"stream"`
 
 	// legacyFormat is set to true when `Unpack` detects
 	// the legacy configuration format. It is used by
@@ -365,6 +369,10 @@ func (t *TakeOverConfig) Unpack(value any) error {
 			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as bool", rawEnabled)
 		}
 		t.Enabled = enabled
+
+		if stream, ok := v["stream"].(string); ok {
+			t.Stream = stream
+		}
 
 		rawFromIDs, exists := v["from_ids"]
 		if !exists {

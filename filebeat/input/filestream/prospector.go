@@ -88,7 +88,7 @@ func takeOverFn(
 	logger *logp.Logger,
 	v loginp.Value,
 	files map[string]loginp.FileDescriptor,
-	identifierName string,
+	identifierName, stream string,
 	identifier fileIdentifier,
 	newID func(loginp.Source) string,
 ) (string, any) {
@@ -152,8 +152,15 @@ func takeOverFn(
 		return "", fm
 	}
 
-	// ==================================================
-	// If necessary check meta, and "migrate it"
+	// Container input special handling.
+	// The container input uses meta.stream to separate the state so two Log
+	// inputs can harvester the same file. This field is only set when the input
+	// is harvesting one stream (stdout or stderr).
+
+	// For migrating this state it always need to match
+	if fm.Meta.Stream != stream {
+		return "", fm
+	}
 
 	newKey := newID(identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 	fm.IdentifierName = identifierName
@@ -286,7 +293,7 @@ func (p *fileProspector) Init(
 
 	// Take over states from other Filestream inputs or the log input
 	prospectorStore.TakeOver(func(v loginp.Value) (string, any) {
-		return takeOverFn(p.logger, v, files, identifierName, p.identifier, newID)
+		return takeOverFn(p.logger, v, files, identifierName, p.takeOver.Stream, p.identifier, newID)
 	})
 
 	return nil

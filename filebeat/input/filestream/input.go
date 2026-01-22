@@ -56,6 +56,13 @@ type state struct {
 type fileMeta struct {
 	Source         string `json:"source" struct:"source"`
 	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
+
+	// Meta used by the container input
+	// The field in the state is defied in State at input/file/state.go as a
+	// map[string]string, so it is safe to decode it here as a struct.
+	Meta struct {
+		Stream string `json:"stream" struct:"stream"`
+	} `json:"meta" struct:"meta"`
 }
 
 // filestream is the input for reading from files which
