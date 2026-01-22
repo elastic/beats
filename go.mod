@@ -173,11 +173,11 @@ require (
 	github.com/elastic/ebpfevents v0.8.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.0
 	github.com/elastic/elastic-agent-libs v0.31.0
-	github.com/elastic/elastic-agent-system-metrics v0.13.5
+	github.com/elastic/elastic-agent-system-metrics v0.13.6
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.3.0
-	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
+	github.com/elastic/go-sfdc v0.0.0-20251207194532-c5aadd4a4e06
 	github.com/elastic/mito v1.24.0
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20251224062803-313637a62841
@@ -237,6 +237,7 @@ require (
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/forensicanalysis/fslib v0.15.2
 	github.com/mattn/go-sqlite3 v1.14.32
+	github.com/parsiya/golnk v0.0.0-20251207220015-443df11fe4fb
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
 	go.opentelemetry.io/collector/client v1.47.0
 	go.opentelemetry.io/collector/component/componenttest v0.141.0
@@ -399,6 +400,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-ieproxy v0.0.1 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mileusna/useragent v1.3.5 // indirect
 	github.com/minio/asm2plan9s v0.0.0-20200509001527-cdd76441f9d8 // indirect
 	github.com/minio/c2goasm v0.0.0-20190812172519-36a3d3bbc4f3 // indirect
@@ -418,6 +420,7 @@ require (
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
+	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.141.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.141.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
@@ -428,6 +431,7 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/prometheus/client_golang v1.23.2 // indirect
 	github.com/prometheus/otlptranslator v1.0.0 // indirect
+	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/rs/cors v1.11.1 // indirect
 	github.com/segmentio/fasthash v1.0.3 // indirect

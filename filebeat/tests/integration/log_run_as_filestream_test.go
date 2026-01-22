@@ -15,14 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build integration
 
 package integration
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"testing"
 	"time"
 
@@ -109,6 +113,138 @@ func TestLogAsFilestreamFeatureFlag(t *testing.T) {
 		if !slices.Contains(ev.Tags, "take_over") {
 			t.Errorf("Event %d: 'take_over' tag not present", i)
 		}
+	}
+}
+
+func TestLogAsFilestreamContainerInput(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	eventsCount := 50
+	logDir := filepath.Join(filebeat.TempDir(), "containers")
+	if err := os.MkdirAll(logDir, 0o755); err != nil {
+		t.Fatalf("cannot create container logs directory: %s", err)
+	}
+
+	stdoutFile := filepath.Join(logDir, "container-stdout.log")
+	stderrFile := filepath.Join(logDir, "container-stderr.log")
+	integration.WriteDockerJSONLog(t, stdoutFile, eventsCount, "stdout")
+	integration.WriteDockerJSONLog(t, stderrFile, eventsCount, "stderr")
+
+	cfg := getConfig(
+		t,
+		map[string]any{
+			"logfile": filepath.Join(logDir, "*.log"),
+		},
+		filepath.Join("run_as_filestream"),
+		"run_as_container.yml")
+
+	// Write configuration file and start Filebeat
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	filebeat.WaitLogsContains(
+		"Log input (deprecated) running as Filestream input",
+		10*time.Second,
+		"Filestream input did not start",
+	)
+
+	events := integration.GetEventsFromFileOutput[BeatEvent](filebeat, eventsCount*2, true)
+	streamCounts := map[string]int{
+		"stdout": 0,
+		"stderr": 0,
+	}
+	for i, ev := range events {
+		if ev.Input.Type != "container" {
+			t.Errorf("Event %d expecting type 'container', got %q", i, ev.Input.Type)
+		}
+
+		if !strings.HasPrefix(ev.Message, "message ") {
+			t.Errorf("Event %d: unexpected message %q", i, ev.Message)
+		}
+
+		if _, ok := streamCounts[ev.Stream]; !ok {
+			t.Errorf("Event %d: unexpected stream %q", i, ev.Stream)
+		} else {
+			streamCounts[ev.Stream]++
+		}
+
+		if !slices.Contains(ev.Tags, "take_over") {
+			t.Errorf("Event %d: 'take_over' tag not present", i)
+		}
+	}
+
+	if streamCounts["stdout"] != eventsCount {
+		t.Errorf("expecting %d events from stdout, got %d", eventsCount, streamCounts["stdout"])
+	}
+	if streamCounts["stderr"] != eventsCount {
+		t.Errorf("expecting %d events from stderr, got %d", eventsCount, streamCounts["stderr"])
+	}
+}
+
+func TestLogAsFilestreamContainerInputNoFeatureFlag(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	eventsCount := 50
+	logDir := filepath.Join(filebeat.TempDir(), "containers")
+	if err := os.MkdirAll(logDir, 0o755); err != nil {
+		t.Fatalf("cannot create container logs directory: %s", err)
+	}
+
+	stdoutFile := filepath.Join(logDir, "container-stdout.log")
+	stderrFile := filepath.Join(logDir, "container-stderr.log")
+	integration.WriteDockerJSONLog(t, stdoutFile, eventsCount, "stdout")
+	integration.WriteDockerJSONLog(t, stderrFile, eventsCount, "stderr")
+
+	cfg := getConfig(
+		t,
+		map[string]any{
+			"logfile": filepath.Join(logDir, "*.log"),
+		},
+		filepath.Join("run_as_filestream"),
+		"run_as_container_no_feature_flag.yml")
+
+	// Write configuration file and start Filebeat
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	events := integration.GetEventsFromFileOutput[BeatEvent](filebeat, eventsCount*2, true)
+	streamCounts := map[string]int{
+		"stdout": 0,
+		"stderr": 0,
+	}
+	for i, ev := range events {
+		if ev.Input.Type != "container" {
+			t.Errorf("Event %d expecting type 'container', got %q", i, ev.Input.Type)
+		}
+
+		if !strings.HasPrefix(ev.Message, "message ") {
+			t.Errorf("Event %d: unexpected message %q", i, ev.Message)
+		}
+
+		if _, ok := streamCounts[ev.Stream]; !ok {
+			t.Errorf("Event %d: unexpected stream %q", i, ev.Stream)
+		} else {
+			streamCounts[ev.Stream]++
+		}
+
+		if slices.Contains(ev.Tags, "take_over") {
+			t.Errorf("Event %d: 'take_over' tag must not be present", i)
+		}
+	}
+
+	if streamCounts["stdout"] != eventsCount {
+		t.Errorf("expecting %d events from stdout, got %d", eventsCount, streamCounts["stdout"])
+	}
+	if streamCounts["stderr"] != eventsCount {
+		t.Errorf("expecting %d events from stderr, got %d", eventsCount, streamCounts["stderr"])
 	}
 }
 
@@ -221,7 +357,9 @@ type BeatEvent struct {
 	Input struct {
 		Type string `json:"type"`
 	} `json:"input"`
-	Log struct {
+	Message string `json:"message"`
+	Stream  string `json:"stream"`
+	Log     struct {
 		File struct {
 			Fingerprint string `json:"fingerprint"`
 		} `json:"file"`
