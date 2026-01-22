@@ -276,6 +276,13 @@ The maximum number of events to bulk in a single Kafka request. The default is 2
 
 Duration to wait before sending bulk Kafka request. 0 is no delay. The default is 0.
 
+### `bulk_flush_bytes` [_bulk_flush_bytes]
+
+The best-effort number of bytes needed to trigger a flush. If the batch reaches this size, it will be sent immediately. 0 means disabled. The default is 0.
+
+### `bulk_flush_messages` [bulk_flush_messages]
+
+The best-effort number of messages needed to trigger a flush. If the batch reaches this count, it will be sent immediately. 0 means disabled. The default is 0.
 
 ### `timeout` [_timeout_4]
 

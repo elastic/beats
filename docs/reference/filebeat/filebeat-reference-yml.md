@@ -2052,6 +2052,14 @@ output.elasticsearch:
   # is 0.
   #bulk_flush_frequency: 0s
 
+  # The best-effort number of bytes needed to trigger a flush. If the batch reaches 
+  # this size, it will be sent immediately. 0 means disabled. The default is 0.
+  #bulk_flush_bytes: 0
+
+  # The best-effort number of messages needed to trigger a flush. If the batch reaches
+  # this count, it will be sent immediately. 0 means disabled. The default is 0.
+  #bulk_flush_messages: 0
+
   # The number of seconds to wait for responses from the Kafka brokers before
   # timing out. The default is 30s.
   #timeout: 30s
