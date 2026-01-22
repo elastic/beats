@@ -74,8 +74,6 @@ func (b *baseStateRegistry) validateKeyPrefix(key string) error {
 }
 
 func (b *baseStateRegistry) persistState(id string, st state) error {
-	b.storeLock.Lock()
-	defer b.storeLock.Unlock()
 	return b.store.Set(getStoreKey(id), st)
 }
 
@@ -121,6 +119,8 @@ func (r *normalStateRegistry) AddState(st state) error {
 	r.statesLock.Unlock()
 
 	// Persist to the registry
+	r.storeLock.Lock()
+	defer r.storeLock.Unlock()
 	return r.persistState(id, st)
 }
 
@@ -242,7 +242,7 @@ func (r *lexicographicalStateRegistry) AddState(st state) error {
 		}
 	}
 
-	return r.store.Set(getStoreKey(id), st)
+	return r.persistState(id, st)
 }
 
 func (r *lexicographicalStateRegistry) CleanUp(knownIDs []string) error {
