@@ -85,12 +85,12 @@ type fileProspector struct {
 }
 
 func takeOverFn(
+	logger *logp.Logger,
 	v loginp.Value,
 	files map[string]loginp.FileDescriptor,
 	identifierName string,
 	identifier fileIdentifier,
 	newID func(loginp.Source) string,
-	logger *logp.Logger,
 ) (string, any) {
 	var fm fileMeta
 	err := v.UnpackCursorMeta(&fm)
@@ -151,6 +151,9 @@ func takeOverFn(
 	if idFromPreviousIdentity != idFromRegistry {
 		return "", fm
 	}
+
+	// ==================================================
+	// If necessary check meta, and "migrate it"
 
 	newKey := newID(identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 	fm.IdentifierName = identifierName
@@ -282,8 +285,8 @@ func (p *fileProspector) Init(
 	}
 
 	// Take over states from other Filestream inputs or the log input
-	prospectorStore.TakeOver(func(v loginp.Value) (string, interface{}) {
-		return takeOverFn(v, files, identifierName, p.identifier, newID, p.logger)
+	prospectorStore.TakeOver(func(v loginp.Value) (string, any) {
+		return takeOverFn(p.logger, v, files, identifierName, p.identifier, newID)
 	})
 
 	return nil

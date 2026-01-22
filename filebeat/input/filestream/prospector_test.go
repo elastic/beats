@@ -124,12 +124,12 @@ func TestTakeOverFnSuccess(t *testing.T) {
 	}
 
 	newKey, meta := takeOverFn(
+		logp.NewNopLogger(),
 		value,
 		files,
 		identifier.Name(),
 		identifier,
 		newID,
-		logp.NewNopLogger(),
 	)
 
 	require.Equal(
