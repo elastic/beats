@@ -22,8 +22,8 @@
 package integration
 
 import (
-	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -86,10 +86,9 @@ func WriteLogFile(t *testing.T, path string, count int, append bool, prefix ...s
 }
 
 // WriteDockerJSONLog writes Docker JSON log lines to path.
-// Stream is written as the "stream" field in each line.
-func WriteDockerJSONLog(t *testing.T, path string, count int, stream string) {
-	t.Helper()
-
+// streams must contain one or two elements to select the container 'stream'.
+// If streams contains two elements they will be rotated in a round-robin fashion.
+func WriteDockerJSONLog(t *testing.T, path string, count int, streams []string) {
 	file, err := os.Create(path)
 	if err != nil {
 		t.Fatalf("cannot create docker log file: %s", err)
@@ -100,23 +99,56 @@ func WriteDockerJSONLog(t *testing.T, path string, count int, stream string) {
 		}
 	}()
 
+	nextStream := func(t *testing.T, streams []string) func() string {
+		switch len(streams) {
+		case 1:
+			return func() string { return streams[0] }
+		case 2:
+			i := 0
+			return func() string {
+				s := streams[i%2]
+				i++
+				return s
+			}
+		default:
+			t.Fatalf("streams must have one or two elements, got %d", len(streams))
+			return nil // make compiler happy
+		}
+	}
+
 	now := time.Now().UTC()
-	writer := bufio.NewWriter(file)
+	writeDockerLogs(t, file, count, nextStream(t, streams), now)
+
+	// for i := range count {
+	// 	timestamp := now.Add(time.Duration(i) * time.Millisecond).Format(time.RFC3339Nano)
+	// 	if _, err := fmt.Fprintf(
+	// 		file,
+	// 		`{"log":"message %d\n","stream":"%s","time":"%s"}`+"\n",
+	// 		i,
+	// 		nextStream(),
+	// 		timestamp,
+	// 	); err != nil {
+	// 		t.Fatalf("cannot write docker log line: %s", err)
+	// 	}
+	// }
+
+	if err := file.Sync(); err != nil {
+		t.Fatalf("cannot flush docker log file: %s", err)
+	}
+}
+
+func writeDockerLogs(t *testing.T, writer io.Writer, count int, stream func() string, now time.Time) {
 	for i := range count {
 		timestamp := now.Add(time.Duration(i) * time.Millisecond).Format(time.RFC3339Nano)
 		if _, err := fmt.Fprintf(
 			writer,
 			`{"log":"message %d\n","stream":"%s","time":"%s"}`+"\n",
 			i,
-			stream,
+			stream(),
 			timestamp,
 		); err != nil {
 			t.Fatalf("cannot write docker log line: %s", err)
 		}
-	}
-
-	if err := writer.Flush(); err != nil {
-		t.Fatalf("cannot flush docker log file: %s", err)
 	}
 }
 

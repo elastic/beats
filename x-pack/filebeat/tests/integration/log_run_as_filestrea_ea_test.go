@@ -129,8 +129,8 @@ func TestLogAsFilestreamContainerEA(t *testing.T) {
 
 	stdoutFile := filepath.Join(logDir, "container-stdout.log")
 	stderrFile := filepath.Join(logDir, "container-stderr.log")
-	integration.WriteDockerJSONLog(t, stdoutFile, eventsCount, "stdout")
-	integration.WriteDockerJSONLog(t, stderrFile, eventsCount, "stderr")
+	integration.WriteDockerJSONLog(t, stdoutFile, eventsCount, []string{"stdout"})
+	integration.WriteDockerJSONLog(t, stderrFile, eventsCount, []string{"stderr"})
 
 	output := proto.UnitExpected{
 		Id:             "output-unit",
