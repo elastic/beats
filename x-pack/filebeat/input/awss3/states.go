@@ -208,16 +208,12 @@ func (r *lexicographicalStateRegistry) AddState(st state) error {
 	id := st.IDWithLexicographicalOrdering()
 	var leastState *state
 
-	r.statesLock.Lock()
+	// Update in-memory state
+	func() {
+		r.statesLock.Lock()
+		defer r.statesLock.Unlock()
 
-	// Check if state already exists
-	if existing, exists := r.states[id]; exists {
-		// Update existing state and move to back (newest position)
-		existing.Stored = st.Stored
-		existing.Failed = st.Failed
-		r.moveToBack(existing)
-	} else {
-		// New state: check capacity and evict if necessary
+		// Check capacity and evict if necessary
 		if len(r.states) >= r.capacity {
 			leastState = r.findLexicographicallyLeast()
 			if leastState != nil {
@@ -228,9 +224,7 @@ func (r *lexicographicalStateRegistry) AddState(st state) error {
 		// Add new state to the back (newest position)
 		r.states[id] = &st
 		r.addToBack(&st)
-	}
-
-	r.statesLock.Unlock()
+	}()
 
 	// Persist changes to store
 	r.storeLock.Lock()
@@ -338,15 +332,6 @@ func (r *lexicographicalStateRegistry) remove(st *state) {
 	}
 	st.prev = nil
 	st.next = nil
-}
-
-// moveToBack moves an existing state to the tail (newest position)
-func (r *lexicographicalStateRegistry) moveToBack(st *state) {
-	if st == r.tail {
-		return // already at back
-	}
-	r.remove(st)
-	r.addToBack(st)
 }
 
 // findLexicographicallyLeast finds the state with the smallest key.

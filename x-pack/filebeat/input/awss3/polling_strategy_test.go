@@ -70,26 +70,6 @@ func TestNormalPollingStrategy(t *testing.T) {
 		assert.Equal(t, st.ID(), id)
 		assert.NotContains(t, id, "::lexicographical")
 	})
-
-	t.Run("ShouldSkipProcessed returns true for processed objects", func(t *testing.T) {
-		store := openTestStatestore()
-		registry, err := newStateRegistry(nil, store, "", false, 0)
-		require.NoError(t, err)
-
-		st := state{Bucket: "bucket", Key: "key1", Etag: "etag1", LastModified: time.Now(), Stored: true}
-		err = registry.AddState(st)
-		require.NoError(t, err)
-
-		assert.True(t, strategy.ShouldSkipProcessed(registry, st.ID()), "should skip processed objects")
-	})
-
-	t.Run("ShouldSkipProcessed returns false for unprocessed objects", func(t *testing.T) {
-		store := openTestStatestore()
-		registry, err := newStateRegistry(nil, store, "", false, 0)
-		require.NoError(t, err)
-
-		assert.False(t, strategy.ShouldSkipProcessed(registry, "unknown-id"), "should not skip unprocessed objects")
-	})
 }
 
 func TestLexicographicalPollingStrategy(t *testing.T) {
@@ -172,19 +152,6 @@ func TestLexicographicalPollingStrategy(t *testing.T) {
 		assert.Equal(t, st.IDWithLexicographicalOrdering(), id)
 		assert.Contains(t, id, "::lexicographical")
 	})
-
-	t.Run("ShouldSkipProcessed always returns false", func(t *testing.T) {
-		store := openTestStatestore()
-		registry, err := newStateRegistry(log, store, "", true, 100)
-		require.NoError(t, err)
-
-		st := state{Bucket: "bucket", Key: "key1", Etag: "etag1", LastModified: time.Now(), Stored: true}
-		err = registry.AddState(st)
-		require.NoError(t, err)
-
-		// lexicographical mode should never skip
-		assert.False(t, strategy.ShouldSkipProcessed(registry, st.IDWithLexicographicalOrdering()), "lexicographical mode should never skip based on processed status")
-	})
 }
 
 func TestPollingStrategyBehaviorDifferences(t *testing.T) {
@@ -236,27 +203,5 @@ func TestPollingStrategyBehaviorDifferences(t *testing.T) {
 		assert.NotEqual(t, normalID, lexicoID, "IDs should be different between modes")
 		assert.NotContains(t, normalID, "::lexicographical")
 		assert.Contains(t, lexicoID, "::lexicographical")
-	})
-
-	t.Run("Processed object skip handling differs", func(t *testing.T) {
-		normalStore := openTestStatestore()
-		lexicoStore := openTestStatestore()
-
-		normalRegistry, err := newStateRegistry(log, normalStore, "", false, 0)
-		require.NoError(t, err)
-
-		lexicoRegistry, err := newStateRegistry(log, lexicoStore, "", true, 100)
-		require.NoError(t, err)
-
-		st := state{Bucket: "bucket", Key: "key1", Etag: "etag1", LastModified: time.Now(), Stored: true}
-
-		err = normalRegistry.AddState(st)
-		require.NoError(t, err)
-		err = lexicoRegistry.AddState(st)
-		require.NoError(t, err)
-
-		assert.True(t, normalStrategy.ShouldSkipProcessed(normalRegistry, st.ID()))
-		// Lexicographical mode doesn't skip processed
-		assert.False(t, lexicoStrategy.ShouldSkipProcessed(lexicoRegistry, st.IDWithLexicographicalOrdering()))
 	})
 }

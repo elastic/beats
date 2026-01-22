@@ -323,32 +323,6 @@ func TestLexicographicalStateRegistry_AddStateAndIsProcessed(t *testing.T) {
 		require.False(t, ok, "stateA should be removed from store")
 	})
 
-	t.Run("AddState updates existing state without eviction", func(t *testing.T) {
-		store := openTestStatestore()
-		capacity := 2
-		registry, err := newStateRegistry(logger, store, "", true, capacity)
-		require.NoError(t, err)
-
-		lexicoRegistry := registry.(*lexicographicalStateRegistry)
-
-		state1 := newState("bucket", "key1", "etag", time.Unix(1000, 0))
-		state2 := newState("bucket", "key2", "etag", time.Unix(2000, 0))
-
-		err = registry.AddState(state1)
-		require.NoError(t, err)
-		err = registry.AddState(state2)
-		require.NoError(t, err)
-
-		// Update state1 (should not trigger eviction)
-		state1Updated := newState("bucket", "key1", "etag", time.Unix(1000, 0))
-		state1Updated.Stored = true
-		err = registry.AddState(state1Updated)
-		require.NoError(t, err)
-
-		require.True(t, registry.IsProcessed(state1.IDWithLexicographicalOrdering()))
-		require.True(t, registry.IsProcessed(state2.IDWithLexicographicalOrdering()))
-		require.Equal(t, 2, len(lexicoRegistry.states))
-	})
 }
 
 func TestLexicographicalStateRegistry_GetOldestState(t *testing.T) {

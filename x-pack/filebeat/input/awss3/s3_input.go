@@ -294,7 +294,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 			// Add to known states for cleanup tracking
 			knownStateIDSlice = append(knownStateIDSlice, id)
 
-			if in.strategy.ShouldSkipProcessed(in.registry, id) {
+			if in.registry.IsProcessed(id) {
 				in.log.Debugw("skipping state processing as already processed.", "state", state)
 				continue
 			}

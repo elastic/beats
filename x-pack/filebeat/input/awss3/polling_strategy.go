@@ -22,9 +22,6 @@ type pollingStrategy interface {
 
 	// GetStateID returns the appropriate state ID for the given state.
 	GetStateID(state state) string
-
-	// ShouldSkipProcessed determines if already processed objects should be skipped.
-	ShouldSkipProcessed(registry stateRegistry, id string) bool
 }
 
 // normalPollingStrategy implements the default (non-lexicographical) polling behavior.
@@ -34,7 +31,6 @@ type pollingStrategy interface {
 // - GetStartAfterKey - always returns empty string
 // - ShouldSkipObject - skips objects that don't pass the validity filter
 // - GetStateID - returns the state ID (etag and last modified time for change detection)
-// - ShouldSkipProcessed - skips already processed objects
 type normalPollingStrategy struct{}
 
 func newNormalPollingStrategy() pollingStrategy {
@@ -58,10 +54,6 @@ func (s *normalPollingStrategy) GetStateID(state state) string {
 	return state.ID()
 }
 
-func (s *normalPollingStrategy) ShouldSkipProcessed(registry stateRegistry, id string) bool {
-	return registry.IsProcessed(id)
-}
-
 // lexicographicalPollingStrategy implements the lexicographical ordering behavior.
 // In this mode:
 // - Listing starts from the oldest known key (StartAfter parameter)
@@ -69,7 +61,6 @@ func (s *normalPollingStrategy) ShouldSkipProcessed(registry stateRegistry, id s
 // - GetStartAfterKey - returns the oldest state's key as the starting point for S3 listing
 // - ShouldSkipObject - doesn't filter by state validity
 // - GetStateID - returns the state ID with a lexicographical suffix for isolation
-// - ShouldSkipProcessed - processes all listed objects (no skip for already processed)
 type lexicographicalPollingStrategy struct{}
 
 func newLexicographicalPollingStrategy() pollingStrategy {
@@ -97,10 +88,6 @@ func (s *lexicographicalPollingStrategy) ShouldSkipObject(log *logp.Logger, stat
 
 func (s *lexicographicalPollingStrategy) GetStateID(state state) string {
 	return state.IDWithLexicographicalOrdering()
-}
-
-func (s *lexicographicalPollingStrategy) ShouldSkipProcessed(registry stateRegistry, id string) bool {
-	return false
 }
 
 // newPollingStrategy creates the appropriate polling strategy based on configuration flag.
