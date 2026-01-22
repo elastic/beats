@@ -375,6 +375,10 @@ func handleContainerInput(cfg, newCfg *config.C, parsers *[]any) error {
 		return fmt.Errorf("cannot set 'prospector.scanner.symlinks': %w", err)
 	}
 
+	if err := newCfg.SetString("take_over.stream", -1, stream); err != nil {
+		return fmt.Errorf("cannot set 'take_over.stream': %w", err)
+	}
+
 	return nil
 }
 

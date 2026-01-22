@@ -91,7 +91,8 @@ paths:
     }
   },
   "take_over": {
-    "enabled": true
+    "enabled": true,
+    "stream": "all"
   },
   "type": "filestream"
 }
@@ -136,7 +137,8 @@ multiline.type: count
     }
   },
   "take_over": {
-    "enabled": true
+    "enabled": true,
+    "stream": "all"
   },
   "type": "filestream"
 }
