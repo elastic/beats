@@ -100,6 +100,50 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 	}
 }
 
+func TestTakeOverFnSuccess(t *testing.T) {
+	path := "/path/to/file"
+	files := map[string]loginp.FileDescriptor{
+		path: {
+			Info:        file.ExtendFileInfo(&testFileInfo{}),
+			Fingerprint: "===-mock-fingerpint-===",
+			Filename:    "filename",
+		},
+	}
+
+	identifier, err := newFingerprintIdentifier(nil, logp.NewNopLogger())
+	require.NoError(t, err, "fingerprint identifier should be created")
+	newID := func(src loginp.Source) string {
+		return "filestream::current-id::" + src.Name()
+	}
+	value := &mockUnpackValue{
+		key: "filestream::previous-id::path::/path/to/file",
+		fileMeta: fileMeta{
+			Source:         path,
+			IdentifierName: pathName,
+		},
+	}
+
+	newKey, meta := takeOverFn(
+		value,
+		files,
+		identifier.Name(),
+		identifier,
+		newID,
+		logp.NewNopLogger(),
+	)
+
+	require.Equal(
+		t,
+		"filestream::current-id::fingerprint::===-mock-fingerpint-===",
+		newKey,
+		"new key should match target input")
+	require.IsType(t, fileMeta{}, meta, "returned meta should be fileMeta")
+
+	got := meta.(fileMeta)
+	require.Equal(t, path, got.Source, "source should be preserved")
+	require.Equal(t, identifier.Name(), got.IdentifierName, "identifier name should be updated")
+}
+
 func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 	f, err := os.CreateTemp(t.TempDir(), "existing_file")
 	if err != nil {

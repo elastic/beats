@@ -14,6 +14,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+// This file was contributed to by generative AI
 
 package filestream
 
@@ -81,6 +82,80 @@ type fileProspector struct {
 	cleanRemoved        bool
 	stateChangeCloser   stateChangeCloserConfig
 	takeOver            loginp.TakeOverConfig
+}
+
+func takeOverFn(
+	v loginp.Value,
+	files map[string]loginp.FileDescriptor,
+	identifierName string,
+	identifier fileIdentifier,
+	newID func(loginp.Source) string,
+	logger *logp.Logger,
+) (string, any) {
+	var fm fileMeta
+	err := v.UnpackCursorMeta(&fm)
+	if err != nil {
+		return "", nil
+	}
+
+	fd, ok := files[fm.Source]
+	if !ok {
+		return "", fm
+	}
+
+	// Return early (do nothing) if:
+	//  - The old identifier is neither native, path or fingerprint
+	oldIdentifierName := fm.IdentifierName
+	if oldIdentifierName != nativeName &&
+		oldIdentifierName != pathName &&
+		oldIdentifierName != fingerprintName {
+		return "", nil
+	}
+
+	// Our current file (source) is in the registry, now we need to ensure
+	// this registry entry (resource) actually refers to our file. Sources
+	// are identified by path, however as log files rotate the same path
+	// can point to different files.
+	//
+	// So to ensure we're dealing with the resource from our current file,
+	// we use the old identifier to generate a registry key for the current
+	// file we're trying to migrate, if this key matches with the key in the
+	// registry, then we proceed to update the registry.
+	oldIdentifier, ok := identifiersMap[oldIdentifierName]
+	if !ok {
+		// This should never happen, but just in case we properly handle it.
+		// If we cannot find the identifier, move on to the next entry
+		// some identifiers cannot be migrated
+		logger.Errorf(
+			"old file identity '%s' not found while taking over old states, "+
+				"new file identity '%s'. If the file still exists, it will be re-ingested",
+			oldIdentifierName,
+			identifierName,
+		)
+		return "", nil
+	}
+
+	fsEvent := loginp.FSEvent{
+		NewPath:    fm.Source,
+		Descriptor: fd,
+	}
+	split := strings.Split(v.Key(), "::")
+	if len(split) != 4 {
+		// This should never happen.
+		logger.Errorf("registry key '%s' is in the wrong format, cannot migrate state", v.Key())
+		return "", fm
+	}
+
+	idFromRegistry := strings.Join(split[2:], "::")
+	idFromPreviousIdentity := oldIdentifier.GetSource(fsEvent).Name()
+	if idFromPreviousIdentity != idFromRegistry {
+		return "", fm
+	}
+
+	newKey := newID(identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
+	fm.IdentifierName = identifierName
+	logger.Infof("Taking over state: '%s' -> '%s'", v.Key(), newKey)
+	return newKey, fm
 }
 
 func (p *fileProspector) Init(
@@ -208,70 +283,7 @@ func (p *fileProspector) Init(
 
 	// Take over states from other Filestream inputs or the log input
 	prospectorStore.TakeOver(func(v loginp.Value) (string, interface{}) {
-		var fm fileMeta
-		err := v.UnpackCursorMeta(&fm)
-		if err != nil {
-			return "", nil
-		}
-
-		fd, ok := files[fm.Source]
-		if !ok {
-			return "", fm
-		}
-
-		// Return early (do nothing) if:
-		//  - The old identifier is neither native, path or fingerprint
-		oldIdentifierName := fm.IdentifierName
-		if oldIdentifierName != nativeName &&
-			oldIdentifierName != pathName &&
-			oldIdentifierName != fingerprintName {
-			return "", nil
-		}
-
-		// Our current file (source) is in the registry, now we need to ensure
-		// this registry entry (resource) actually refers to our file. Sources
-		// are identified by path, however as log files rotate the same path
-		// can point to different files.
-		//
-		// So to ensure we're dealing with the resource from our current file,
-		// we use the old identifier to generate a registry key for the current
-		// file we're trying to migrate, if this key matches with the key in the
-		// registry, then we proceed to update the registry.
-		oldIdentifier, ok := identifiersMap[oldIdentifierName]
-		if !ok {
-			// This should never happen, but just in case we properly handle it.
-			// If we cannot find the identifier, move on to the next entry
-			// some identifiers cannot be migrated
-			p.logger.Errorf(
-				"old file identity '%s' not found while taking over old states, "+
-					"new file identity '%s'. If the file still exists, it will be re-ingested",
-				oldIdentifierName,
-				identifierName,
-			)
-			return "", nil
-		}
-
-		fsEvent := loginp.FSEvent{
-			NewPath:    fm.Source,
-			Descriptor: fd,
-		}
-		split := strings.Split(v.Key(), "::")
-		if len(split) != 4 {
-			// This should never happen.
-			p.logger.Errorf("registry key '%s' is in the wrong format, cannot migrate state", v.Key())
-			return "", fm
-		}
-
-		idFromRegistry := strings.Join(split[2:], "::")
-		idFromPreviousIdentity := oldIdentifier.GetSource(fsEvent).Name()
-		if idFromPreviousIdentity != idFromRegistry {
-			return "", fm
-		}
-
-		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
-		fm.IdentifierName = identifierName
-		p.logger.Infof("Taking over state: '%s' -> '%s'", v.Key(), newKey)
-		return newKey, fm
+		return takeOverFn(v, files, identifierName, p.identifier, newID, p.logger)
 	})
 
 	return nil
