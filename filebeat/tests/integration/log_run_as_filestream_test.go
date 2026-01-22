@@ -185,6 +185,82 @@ func TestLogAsFilestreamContainerInput(t *testing.T) {
 	}
 }
 
+func TestLogAsFilestreamContainerInputMixedFile(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	eventsCount := 50
+	logDir := filepath.Join(filebeat.TempDir(), "containers")
+	if err := os.MkdirAll(logDir, 0o755); err != nil {
+		t.Fatalf("cannot create container logs directory: %s", err)
+	}
+
+	inputFile := filepath.Join(logDir, "container-stdout.log")
+	integration.WriteDockerJSONLog(t, inputFile, eventsCount, []string{"stdout", "stderr"})
+
+	cfg := getConfig(
+		t,
+		map[string]any{
+			"logfile":    filepath.Join(logDir, "*.log"),
+			"filestream": false,
+		},
+		filepath.Join("run_as_filestream"),
+		"container_mixed.yml")
+
+	// Write configuration file and start Filebeat
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	assertContainerEvents(t, filebeat, eventsCount/2, eventsCount/2, false)
+
+	// Expected offsets:
+	// stdout: 3969
+	// stderr: 4050
+}
+
+func assertContainerEvents(
+	t *testing.T,
+	filebeat *integration.BeatProc,
+	stderrEvents, stdoutEvents int,
+	containsTakeOverTag bool,
+) {
+	eventsCount := stderrEvents + stdoutEvents
+	events := integration.GetEventsFromFileOutput[BeatEvent](filebeat, eventsCount, true)
+	streamCounts := map[string]int{
+		"stdout": 0,
+		"stderr": 0,
+	}
+	for i, ev := range events {
+		if ev.Input.Type != "container" {
+			t.Errorf("Event %d expecting type 'container', got %q", i, ev.Input.Type)
+		}
+
+		if !strings.HasPrefix(ev.Message, "message ") {
+			t.Errorf("Event %d: unexpected message %q", i, ev.Message)
+		}
+
+		if _, ok := streamCounts[ev.Stream]; !ok {
+			t.Errorf("Event %d: unexpected stream %q", i, ev.Stream)
+		} else {
+			streamCounts[ev.Stream]++
+		}
+
+		if slices.Contains(ev.Tags, "take_over") != containsTakeOverTag {
+			t.Errorf("TODO: IMPORVE IT: Event %d: 'take_over': %t. Tags: %v", i, containsTakeOverTag, ev.Tags)
+		}
+	}
+
+	if streamCounts["stdout"] != stdoutEvents {
+		t.Errorf("expecting %d events from stdout, got %d", stdoutEvents, streamCounts["stdout"])
+	}
+	if streamCounts["stderr"] != stderrEvents {
+		t.Errorf("expecting %d events from stderr, got %d", stderrEvents, streamCounts["stderr"])
+	}
+}
+
 func TestLogAsFilestreamContainerInputNoFeatureFlag(t *testing.T) {
 	filebeat := integration.NewBeat(
 		t,

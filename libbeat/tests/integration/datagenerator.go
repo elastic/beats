@@ -23,7 +23,6 @@ package integration
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -99,56 +98,37 @@ func WriteDockerJSONLog(t *testing.T, path string, count int, streams []string) 
 		}
 	}()
 
-	nextStream := func(t *testing.T, streams []string) func() string {
-		switch len(streams) {
-		case 1:
-			return func() string { return streams[0] }
-		case 2:
-			i := 0
-			return func() string {
-				s := streams[i%2]
-				i++
-				return s
-			}
-		default:
-			t.Fatalf("streams must have one or two elements, got %d", len(streams))
-			return nil // make compiler happy
+	var nextStream func() string
+	switch len(streams) {
+	case 1:
+		nextStream = func() string { return streams[0] }
+	case 2:
+		i := 0
+		nextStream = func() string {
+			s := streams[i%2]
+			i++
+			return s
 		}
+	default:
+		t.Fatalf("streams must have one or two elements, got %d", len(streams))
 	}
 
 	now := time.Now().UTC()
-	writeDockerLogs(t, file, count, nextStream(t, streams), now)
-
-	// for i := range count {
-	// 	timestamp := now.Add(time.Duration(i) * time.Millisecond).Format(time.RFC3339Nano)
-	// 	if _, err := fmt.Fprintf(
-	// 		file,
-	// 		`{"log":"message %d\n","stream":"%s","time":"%s"}`+"\n",
-	// 		i,
-	// 		nextStream(),
-	// 		timestamp,
-	// 	); err != nil {
-	// 		t.Fatalf("cannot write docker log line: %s", err)
-	// 	}
-	// }
-
-	if err := file.Sync(); err != nil {
-		t.Fatalf("cannot flush docker log file: %s", err)
-	}
-}
-
-func writeDockerLogs(t *testing.T, writer io.Writer, count int, stream func() string, now time.Time) {
 	for i := range count {
 		timestamp := now.Add(time.Duration(i) * time.Millisecond).Format(time.RFC3339Nano)
 		if _, err := fmt.Fprintf(
-			writer,
-			`{"log":"message %d\n","stream":"%s","time":"%s"}`+"\n",
+			file,
+			`{"log":"message %02d\n","stream":"%s","time":"%s"}`+"\n",
 			i,
-			stream(),
+			nextStream(),
 			timestamp,
 		); err != nil {
 			t.Fatalf("cannot write docker log line: %s", err)
 		}
+	}
+
+	if err := file.Sync(); err != nil {
+		t.Fatalf("cannot flush docker log file: %s", err)
 	}
 }
 
