@@ -396,9 +396,9 @@ func parseCommaSeparatedList(s common.NetString) (list []string) {
 }
 
 func parseBody(pi *parsingInfo, m *message) (ok, complete bool) {
-	nbytes := len(pi.data)
-	if nbytes >= m.contentLength-pi.bodyReceived {
-		wanted := m.contentLength - pi.bodyReceived
+	numBytes := len(pi.data)
+	wanted := m.contentLength - pi.bodyReceived
+	if numBytes >= wanted && wanted > 0 {
 		m.body = append(m.body, pi.data[:wanted]...)
 		pi.bodyReceived = m.contentLength
 		m.size += uint64(wanted)
@@ -407,8 +407,8 @@ func parseBody(pi *parsingInfo, m *message) (ok, complete bool) {
 	}
 	m.body = append(m.body, pi.data...)
 	pi.data = nil
-	pi.bodyReceived += nbytes
-	m.size += uint64(nbytes)
+	pi.bodyReceived += numBytes
+	m.size += uint64(numBytes)
 	if isDebug {
 		debugf("bodyReceived: %d", pi.bodyReceived)
 	}
