@@ -150,7 +150,7 @@ $$$supported-attributes-gcs$$$
 3. [auth.credentials_file.path](#attrib-auth-credentials-file)
 4. [buckets](#attrib-buckets)
 5. [name](#attrib-bucket-name)
-6. [batch_size](#attrib-batch_size-gcs) {applies_to}`stack: ga 9.1.0`
+6. [batch_size](#attrib-batch_size-gcs) {applies_to}`stack: ga 9.1+`
 7. [max_workers](#attrib-max_workers-gcs)
 8. [poll](#attrib-poll-gcs)
 9. [poll_interval](#attrib-poll_interval-gcs)
@@ -159,6 +159,10 @@ $$$supported-attributes-gcs$$$
 12. [expand_event_list_from_field](#attrib-expand_event_list_from_field-gcs)
 13. [timestamp_epoch](#attrib-timestamp_epoch-gcs)
 14. [retry](#attrib-retry-gcs)
+<<<<<<< HEAD
+=======
+15. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.2+`
+>>>>>>> 5e37672f2 (Refine `applies_to` syntax (#48333))
 
 
 ### `project_id` [attrib-project-id]
