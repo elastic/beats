@@ -246,7 +246,10 @@ As noted above the `cel` input provides functions, macros, and global variables 
     * [Format]({{mito_docs}}@{{mito_version}}/lib#hdr-Format-Time)
     * [Parse Time]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_Time-Time)
     * [Round]({{mito_docs}}@{{mito_version}}/lib#hdr-Round-Time) {applies_to}`stack: ga 9.1+`
+<<<<<<< HEAD
     * [Truncate]({{mito_docs}}@{{mito_version}}/lib#hdr-Truncate-Time) {applies_to}`stack: ga 9.3+`
+=======
+>>>>>>> fcf6c3f20 ([9.1](backport #48333) Refine `applies_to` syntax (#48509))
     * [Global Variables]({{mito_docs}}@{{mito_version}}/lib#hdr-Global_Variables-Time)
         * Support for [`DateOnly`](https://pkg.go.dev/time#DateOnly), [`DateTime`](https://pkg.go.dev/time#DateTime) and [`TimeOnly`](https://pkg.go.dev/time#TimeOnly) time formats.
 
@@ -274,9 +277,13 @@ Additionally, it supports authentication via:
 * Basic Authentication
 * Digest Authentication
 * OAuth2
+<<<<<<< HEAD
 * file-based headers {applies_to}`stack: ga 9.3+`
 * token authentication {applies_to}`stack: ga 9.1+`
 * AWS Authentication {applies_to}`stack: ga 9.3+`
+=======
+* token authentication {applies_to}`stack: ga 9.1+`
+>>>>>>> fcf6c3f20 ([9.1](backport #48333) Refine `applies_to` syntax (#48509))
 
 As described in Mito's [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) documentation, configuration for Basic Authentication or token authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication, file-based headers or OAuth2 will be used for all requests made from CEL.
 
