@@ -91,8 +91,48 @@ paths:
     }
   },
   "take_over": {
+    "enabled": true
+  },
+  "type": "filestream"
+}
+`,
+		},
+		"container input with streams set": {
+			logYamlCfg: `
+type: container
+id: container-id
+stream: stderr
+paths:
+ - /var/log/containers/*.log
+`,
+			expectedJsonCfg: `
+{
+  "file_identity": {
+    "native": null
+  },
+  "id": "container-id",
+  "parsers": [
+    {
+      "container": {
+        "format": "auto",
+        "stream": "stderr"
+      }
+    }
+  ],
+  "paths": [
+    "/var/log/containers/*.log"
+  ],
+  "prospector": {
+    "scanner": {
+      "fingerprint": {
+        "enabled": false
+      },
+      "symlinks": true
+    }
+  },
+  "take_over": {
     "enabled": true,
-    "stream": "all"
+    "stream": "stderr"
   },
   "type": "filestream"
 }
@@ -137,8 +177,7 @@ multiline.type: count
     }
   },
   "take_over": {
-    "enabled": true,
-    "stream": "all"
+    "enabled": true
   },
   "type": "filestream"
 }
