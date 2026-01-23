@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 package input_logfile
 
 import (
@@ -508,13 +510,18 @@ type logInputState struct {
 func logInputStateFromMapM(m mapstr.M) (logInputState, error) {
 	state := logInputState{}
 
-	// typeconf.Convert kept failing with an "unsupported" error because
-	// FileStateOS was present, we don't need it, so just delete it.
-	m.Delete("FileStateOS") // We need this and it keeps breaking
+	var fileStateOS file.StateOS
+	if rawFileStateOS, ok := m["FileStateOS"]; ok {
+		if err := typeconv.Convert(&fileStateOS, rawFileStateOS); err != nil {
+			return logInputState{}, fmt.Errorf("cannot convert Log input FileStateOS: %w", err)
+		}
+		m.Delete("FileStateOS")
+	}
 	if err := typeconv.Convert(&state, m); err != nil {
 		return logInputState{}, fmt.Errorf("cannot convert Log input state: %w", err)
 	}
 
+	state.FileStateOS = fileStateOS
 	return state, nil
 }
 
