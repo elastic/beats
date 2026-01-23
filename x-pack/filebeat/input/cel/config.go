@@ -15,6 +15,7 @@ import (
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/mito/lib"
@@ -74,6 +75,10 @@ type config struct {
 	// Package contains information about the integration package.
 	// name and version are expected.
 	Package map[string]string `config:"package"`
+
+	// OTel configuration for which headers and request parameters should be
+	// redacted or unredacted in span attributes.
+	OTelTraceConfig *otel.TraceConfig `config:"otel.trace"`
 }
 
 func (c config) GetPackageData(key string) string {
@@ -126,7 +131,7 @@ func (c config) Validate() error {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
 	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
-	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, lib.HTTPOptions{}, patterns, c.XSDs, logp.NewNopLogger(), nil, wantDump, false)
+	_, _, _, err = newProgram(context.Background, c.Program, root, nil, &http.Client{}, nil, lib.HTTPOptions{}, patterns, c.XSDs, logp.NewNopLogger(), nil, wantDump, false)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
