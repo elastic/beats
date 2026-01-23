@@ -21,12 +21,14 @@ package filestream
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/gohugoio/hashstructure"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
@@ -84,12 +86,9 @@ type fileProspector struct {
 	takeOver            loginp.TakeOverConfig
 }
 
-func takeOverFn(
-	logger *logp.Logger,
+func (p *fileProspector) takeOverFn(
 	v loginp.Value,
 	files map[string]loginp.FileDescriptor,
-	identifierName, stream string,
-	identifier fileIdentifier,
 	newID func(loginp.Source) string,
 ) (string, any) {
 	var fm fileMeta
@@ -126,11 +125,11 @@ func takeOverFn(
 		// This should never happen, but just in case we properly handle it.
 		// If we cannot find the identifier, move on to the next entry
 		// some identifiers cannot be migrated
-		logger.Errorf(
+		p.logger.Errorf(
 			"old file identity '%s' not found while taking over old states, "+
 				"new file identity '%s'. If the file still exists, it will be re-ingested",
 			oldIdentifierName,
-			identifierName,
+			p.identifier.Name(),
 		)
 		return "", nil
 	}
@@ -142,29 +141,36 @@ func takeOverFn(
 	split := strings.Split(v.Key(), "::")
 	if len(split) != 4 {
 		// This should never happen.
-		logger.Errorf("registry key '%s' is in the wrong format, cannot migrate state", v.Key())
+		p.logger.Errorf("registry key '%s' is in the wrong format, cannot migrate state", v.Key())
 		return "", fm
 	}
 
 	idFromRegistry := strings.Join(split[2:], "::")
 	idFromPreviousIdentity := oldIdentifier.GetSource(fsEvent).Name()
-	if idFromPreviousIdentity != idFromRegistry {
-		return "", fm
-	}
 
+	// ==================================================
 	// Container input special handling.
 	// The container input uses meta.stream to separate the state so two Log
 	// inputs can harvester the same file. This field is only set when the input
 	// is harvesting one stream (stdout or stderr).
+	//
+	// Whenever meta is set, it is used by the Log input file identity to prepend
+	// a hash to the identifier, we replicate the same logic here.
+	if fm.Meta != nil {
+		hashValue, _ := hashstructure.Hash(fm.Meta, nil)
+		hash := strconv.FormatUint(hashValue, 16)
+		idFromPreviousIdentity = hash + "-" + idFromPreviousIdentity
+	}
 
-	// For migrating this state it always need to match
-	if fm.Meta.Stream != stream {
+	// ==================================================
+
+	if idFromPreviousIdentity != idFromRegistry {
 		return "", fm
 	}
 
-	newKey := newID(identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
-	fm.IdentifierName = identifierName
-	logger.Infof("Taking over state: '%s' -> '%s'", v.Key(), newKey)
+	newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
+	fm.IdentifierName = p.identifier.Name()
+	p.logger.Infof("Taking over state: '%s' -> '%s'", v.Key(), newKey)
 	return newKey, fm
 }
 
@@ -293,7 +299,7 @@ func (p *fileProspector) Init(
 
 	// Take over states from other Filestream inputs or the log input
 	prospectorStore.TakeOver(func(v loginp.Value) (string, any) {
-		return takeOverFn(p.logger, v, files, identifierName, p.takeOver.Stream, p.identifier, newID)
+		return p.takeOverFn(v, files, newID)
 	})
 
 	return nil
