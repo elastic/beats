@@ -60,11 +60,7 @@ type fileMeta struct {
 	// Meta used by the container (log) input
 	// The field in the state is defied in State at input/file/state.go as a
 	// map[string]string, so it is safe to decode it here as a struct.
-	Meta logInputMeta `json:"meta,omitempty" struct:"meta,omit"`
-}
-
-type logInputMeta struct {
-	Stream string `json:"stream,omitempty" struct:"stream,omit"`
+	Meta map[string]string `json:"meta,omitempty" struct:"meta,omitempty"`
 }
 
 // filestream is the input for reading from files which

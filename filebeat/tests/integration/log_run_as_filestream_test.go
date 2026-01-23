@@ -232,7 +232,10 @@ func TestLogAsFilestreamContainerInputMixedFile(t *testing.T) {
 
 	integration.WriteDockerJSONLog(t, inputFile, eventsCount, []string{"stdout", "stderr"}, true)
 
+	filebeat.WaitLogsContains("End of file reached", 5*time.Second, "did not read file til end")
 	filebeat.WaitPublishedEvents(2*time.Second, eventsCount)
+	// TODO: ensure there aren't any extra events!
+	time.Sleep(2 * time.Second)
 	assertContainerEvents(t, filebeat, eventsCount/2, eventsCount/2, true)
 
 	// Expected offsets:
