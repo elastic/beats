@@ -159,10 +159,6 @@ $$$supported-attributes-gcs$$$
 12. [expand_event_list_from_field](#attrib-expand_event_list_from_field-gcs)
 13. [timestamp_epoch](#attrib-timestamp_epoch-gcs)
 14. [retry](#attrib-retry-gcs)
-<<<<<<< HEAD
-=======
-15. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.2+`
->>>>>>> 5e37672f2 (Refine `applies_to` syntax (#48333))
 
 
 ### `project_id` [attrib-project-id]
