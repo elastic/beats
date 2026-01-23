@@ -72,11 +72,7 @@ filebeat.inputs:
 ## Reading GZIP files
 
 ```{applies_to}
-<<<<<<< HEAD
 stack: beta 9.2.0
-=======
-stack: ga 9.3+, beta =9.2
->>>>>>> 5e37672f2 (Refine `applies_to` syntax (#48333))
 ```
 
 ::::{warning}
@@ -634,26 +630,6 @@ Currently if a new harvester can be started again, the harvester is picked rando
 
 This configuration option applies per input. You can use this option to indirectly set higher priorities on certain inputs by assigning a higher limit of harvesters.
 
-<<<<<<< HEAD
-=======
-### `include_file_owner_name` [filestream-input-include_file_owner_name]
-```yaml {applies_to}
-stack: ga 9.3
-```
-
-Includes the log file owner to `log.file` metadata.
-This option is not supported on Windows.
-
-### `include_file_owner_group_name` [filestream-input-include_file_owner_group_name]
-```yaml {applies_to}
-stack: ga 9.3
-```
-
-Includes the log file group to `log.file` metadata.
-This option is not supported on Windows.
-
-
->>>>>>> 5e37672f2 (Refine `applies_to` syntax (#48333))
 ### `exclude_lines` [filebeat-input-filestream-exclude-lines]
 
 A list of regular expressions to match the lines that you want Filebeat to exclude. Filebeat drops any lines that match a regular expression in the list. By default, no lines are dropped. Empty lines are ignored.
@@ -703,48 +679,6 @@ See [Regular expression support](/reference/filebeat/regexp-support.md) for a li
 
 The size in bytes of the buffer that each harvester uses when fetching a file. The default is 16384.
 
-<<<<<<< HEAD
-=======
-### `compression` [filebeat-input-filestream-compression]
-```{applies_to}
-stack: ga 9.3.0
-```
-
-Specifies how file compression is handled. Valid values are:
-
-**`""` (empty string or not set)**
-:   Disables compression handling. All files are treated as plain text. This is the default.
-
-**`gzip`**
-:   Treats all files as GZIP compressed. Use this when you know all files matching your `paths` are GZIP files.
-
-**`auto`**
-:   Auto-detects GZIP files. Files are checked for GZIP magic bytes, and decompression is applied only to actual GZIP files. Plain text files are read normally.
-
-```yaml
-filebeat.inputs:
-  - type: filestream
-    id: "my-filestream"
-    paths:
-      - /var/log/app/*.log*
-    compression: auto
-```
-
-See [Reading GZIP files](#reading-gzip-files) for more details on GZIP support.
-
-### `gzip_experimental` (deprecated) [filebeat-input-filestream-gzip-experimental]
-
-```{applies_to}
-stack: removed 9.3+, beta =9.2
-```
-
-:::{note}
-`gzip_experimental` was removed. Use [`compression`](#filebeat-input-filestream-compression) instead.
-:::
-
-When set to `true`, enables GZIP file reading with auto-detection.
-
->>>>>>> 5e37672f2 (Refine `applies_to` syntax (#48333))
 ### `message_max_bytes` [_message_max_bytes]
 
 The maximum number of bytes that a single log message can have. All bytes after `message_max_bytes` are discarded and not sent. The default is 10MB (10485760).
