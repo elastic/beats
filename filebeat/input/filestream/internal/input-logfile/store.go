@@ -495,7 +495,7 @@ type logInputState struct {
 	Offset int64             `json:"offset"`
 	TTL    time.Duration     `json:"ttl" struct:"ttl"`
 	key    string            `json:"-"`
-	Meta   map[string]string `json:"meta"`
+	Meta   map[string]string `json:"meta,omitempty"`
 
 	// This matches the filestream.fileMeta struct
 	// and are used by UnpackCursorMeta
