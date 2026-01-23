@@ -27,13 +27,6 @@ type state struct {
 	// so that users upgrading from old versions aren't prevented from
 	// retrying old download failures.
 	Failed bool `json:"failed" struct:"failed"`
-
-	// prev and next are used to maintain the lexicographical ordering of the states in the registry
-	// when lexicographicalOrdering is true.
-	// prev is the previous state in the linked list.
-	// next is the next state in the linked list.
-	prev *state
-	next *state
 }
 
 // ID is used to identify the state in the store, and it is composed by

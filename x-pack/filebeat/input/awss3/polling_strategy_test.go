@@ -76,12 +76,10 @@ func TestLexicographicalPollingStrategy(t *testing.T) {
 	strategy := newLexicographicalPollingStrategy()
 	log := logp.NewLogger("lexicographical_polling_strategy_test")
 
-	t.Run("PrePollSetup sorts states", func(t *testing.T) {
+	t.Run("PrePollSetup is a no-op (heap maintains order)", func(t *testing.T) {
 		store := openTestStatestore()
 		registry, err := newStateRegistry(log, store, "", true, 100)
 		require.NoError(t, err)
-
-		lexicoRegistry := registry.(*lexicographicalStateRegistry)
 
 		// Add states in random order
 		st1 := state{Bucket: "bucket", Key: "key-c", Etag: "etag1", LastModified: time.Now()}
@@ -97,36 +95,28 @@ func TestLexicographicalPollingStrategy(t *testing.T) {
 
 		strategy.PrePollSetup(log, registry)
 
-		// Verify sorting occurred ("key-a" should be head, "key-c" should be tail)
-		require.NotNil(t, lexicoRegistry.head)
-		require.NotNil(t, lexicoRegistry.tail)
-		assert.Equal(t, "key-a", lexicoRegistry.head.Key, "head should be lexicographically smallest")
-		assert.Equal(t, "key-c", lexicoRegistry.tail.Key, "tail should be lexicographically largest")
-
-		// Verify traversal order
-		keys := []string{}
-		for current := lexicoRegistry.head; current != nil; current = current.next {
-			keys = append(keys, current.Key)
-		}
-		assert.Equal(t, []string{"key-a", "key-b", "key-c"}, keys)
+		// Heap should always return the lexicographically smallest key
+		leastState := registry.GetLeastState()
+		require.NotNil(t, leastState)
+		assert.Equal(t, "key-a", leastState.Key, "GetLeastState should return lexicographically smallest key")
 	})
 
-	t.Run("GetStartAfterKey returns oldest state key", func(t *testing.T) {
+	t.Run("GetStartAfterKey returns lexicographically smallest key", func(t *testing.T) {
 		store := openTestStatestore()
 		registry, err := newStateRegistry(log, store, "", true, 100)
 		require.NoError(t, err)
 
-		st1 := state{Bucket: "bucket", Key: "key-oldest", Etag: "etag1", LastModified: time.Now()}
-		st2 := state{Bucket: "bucket", Key: "key-newest", Etag: "etag2", LastModified: time.Now()}
+		st1 := state{Bucket: "bucket", Key: "aaa-first", Etag: "etag1", LastModified: time.Now()}
+		st2 := state{Bucket: "bucket", Key: "zzz-last", Etag: "etag2", LastModified: time.Now()}
 
-		err = registry.AddState(st1)
-		require.NoError(t, err)
 		err = registry.AddState(st2)
 		require.NoError(t, err)
+		err = registry.AddState(st1)
+		require.NoError(t, err)
 
-		// Should return head (key-oldest)
+		// Should return lexicographically smallest key
 		startKey := strategy.GetStartAfterKey(registry)
-		assert.Equal(t, "key-oldest", startKey)
+		assert.Equal(t, "aaa-first", startKey)
 	})
 
 	t.Run("GetStartAfterKey returns empty string when no states", func(t *testing.T) {

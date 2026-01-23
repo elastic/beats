@@ -325,7 +325,7 @@ func TestLexicographicalStateRegistry_AddStateAndIsProcessed(t *testing.T) {
 
 }
 
-func TestLexicographicalStateRegistry_GetOldestState(t *testing.T) {
+func TestLexicographicalStateRegistry_GetLeastState(t *testing.T) {
 	logger := logp.NewLogger("lexicographical-registry-test")
 	store := openTestStatestore()
 	registry, err := newStateRegistry(logger, store, "", true, 10)
@@ -335,6 +335,7 @@ func TestLexicographicalStateRegistry_GetOldestState(t *testing.T) {
 	stateB := newState("bucket", "b", "etag", time.Unix(2000, 0))
 	stateC := newState("bucket", "c", "etag", time.Unix(3000, 0))
 
+	// Add states in non-sorted order
 	err = registry.AddState(stateC)
 	require.NoError(t, err)
 	err = registry.AddState(stateA)
@@ -342,9 +343,10 @@ func TestLexicographicalStateRegistry_GetOldestState(t *testing.T) {
 	err = registry.AddState(stateB)
 	require.NoError(t, err)
 
-	oldest := registry.GetLeastState()
-	require.NotNil(t, oldest)
-	require.Equal(t, "c", oldest.Key)
+	// Heap should return lexicographically smallest key
+	leastState := registry.GetLeastState()
+	require.NotNil(t, leastState)
+	require.Equal(t, "a", leastState.Key, "GetLeastState should return lexicographically smallest key")
 }
 
 func TestLexicographicalStateRegistry_CleanUp(t *testing.T) {
@@ -461,14 +463,13 @@ func TestLexicographicalStateRegistry_TrimsOnLoad(t *testing.T) {
 	require.False(t, ok, "stateB should be removed from store during trim")
 }
 
-func TestLexicographicalStateRegistry_SortStates(t *testing.T) {
+func TestLexicographicalStateRegistry_HeapOrder(t *testing.T) {
 	logger := logp.NewLogger("lexicographical-registry-test")
 	store := openTestStatestore()
 	registry, err := newStateRegistry(logger, store, "", true, 10)
 	require.NoError(t, err)
 
-	lexicoRegistry := registry.(*lexicographicalStateRegistry)
-
+	// Add states in non-sorted order
 	stateC := newState("bucket", "c", "etag", time.Unix(3000, 0))
 	stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
 	stateB := newState("bucket", "b", "etag", time.Unix(2000, 0))
@@ -480,25 +481,10 @@ func TestLexicographicalStateRegistry_SortStates(t *testing.T) {
 	err = registry.AddState(stateB)
 	require.NoError(t, err)
 
-	lexicoRegistry.SortStates(log)
-
-	// After sorting, verify the linked list structure: nil <- (head) a <-> b <-> c (tail) -> nil
-	require.NotNil(t, lexicoRegistry.head)
-	require.Equal(t, "a", lexicoRegistry.head.Key)
-
-	require.NotNil(t, lexicoRegistry.tail)
-	require.Equal(t, "c", lexicoRegistry.tail.Key)
-
-	require.NotNil(t, lexicoRegistry.head.next)
-	require.Equal(t, "b", lexicoRegistry.head.next.Key)
-	require.NotNil(t, lexicoRegistry.head.next.next)
-	require.Equal(t, "c", lexicoRegistry.head.next.next.Key)
-	require.Nil(t, lexicoRegistry.head.next.next.next)
-
-	require.Nil(t, lexicoRegistry.head.prev)
-	require.Equal(t, lexicoRegistry.head, lexicoRegistry.head.next.prev)
-	require.Equal(t, lexicoRegistry.head.next, lexicoRegistry.tail.prev)
-	require.Nil(t, lexicoRegistry.tail.next)
+	// The heap should always return the lexicographically smallest key
+	leastState := registry.GetLeastState()
+	require.NotNil(t, leastState)
+	require.Equal(t, "a", leastState.Key, "GetLeastState should return lexicographically smallest key")
 }
 
 // ============================================================================

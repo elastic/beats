@@ -57,7 +57,7 @@ func (s *normalPollingStrategy) GetStateID(state state) string {
 // lexicographicalPollingStrategy implements the lexicographical ordering behavior.
 // In this mode:
 // - Listing starts from the oldest known key (StartAfter parameter)
-// - PrePollSetup - sorts states to ensure the linked list is properly ordered before polling
+// - PrePollSetup - no setup needed, heap maintains order automatically
 // - GetStartAfterKey - returns the oldest state's key as the starting point for S3 listing
 // - ShouldSkipObject - doesn't filter by state validity
 // - GetStateID - returns the state ID with a lexicographical suffix for isolation
@@ -68,10 +68,7 @@ func newLexicographicalPollingStrategy() pollingStrategy {
 }
 
 func (s *lexicographicalPollingStrategy) PrePollSetup(log *logp.Logger, registry stateRegistry) {
-	// Checks if the registry is a lexicographical registry before sorting
-	if lexicoRegistry, ok := registry.(*lexicographicalStateRegistry); ok {
-		lexicoRegistry.SortStates(log)
-	}
+	// No setup needed - heap maintains order automatically
 }
 
 func (s *lexicographicalPollingStrategy) GetStartAfterKey(registry stateRegistry) string {
