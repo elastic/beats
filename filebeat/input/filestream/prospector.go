@@ -21,15 +21,14 @@ package filestream
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/gohugoio/hashstructure"
-
+	libbeatfile "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
@@ -76,14 +75,44 @@ func init() {
 // The FS events then trigger either new Harvester runs or updates
 // the statestore.
 type fileProspector struct {
-	logger              *logp.Logger
-	filewatcher         loginp.FSWatcher
-	identifier          fileIdentifier
-	ignoreOlder         time.Duration
-	ignoreInactiveSince ignoreInactiveType
-	cleanRemoved        bool
-	stateChangeCloser   stateChangeCloserConfig
-	takeOver            loginp.TakeOverConfig
+	logger                *logp.Logger
+	filewatcher           loginp.FSWatcher
+	identifier            fileIdentifier
+	ignoreOlder           time.Duration
+	ignoreInactiveSince   ignoreInactiveType
+	cleanRemoved          bool
+	stateChangeCloser     stateChangeCloserConfig
+	takeOver              loginp.TakeOverConfig
+	filestreamIdentifiers map[string]fileIdentifier
+	logIdentifiers        map[string]file.StateIdentifier
+}
+
+func (p *fileProspector) previousID(name string, fm fileMeta, fd loginp.FileDescriptor, v loginp.Value) string {
+	if p.takeOver.FromFilestream() {
+		fsEvent := loginp.FSEvent{
+			NewPath:    fm.Source,
+			Descriptor: fd,
+		}
+
+		return p.filestreamIdentifiers[name].GetSource(fsEvent).Name()
+	}
+
+	type fileStateOSGetter interface {
+		GetFileStateOS() libbeatfile.StateOS
+	}
+
+	getter, ok := v.(fileStateOSGetter)
+	if !ok {
+		return ""
+	}
+
+	state := file.State{
+		FileStateOS: getter.GetFileStateOS(),
+		Source:      fm.Source,
+	}
+
+	id, _ := p.logIdentifiers[name].GenerateID(state)
+	return id
 }
 
 func (p *fileProspector) takeOverFn(
@@ -120,24 +149,24 @@ func (p *fileProspector) takeOverFn(
 	// we use the old identifier to generate a registry key for the current
 	// file we're trying to migrate, if this key matches with the key in the
 	// registry, then we proceed to update the registry.
-	oldIdentifier, ok := identifiersMap[oldIdentifierName]
-	if !ok {
-		// This should never happen, but just in case we properly handle it.
-		// If we cannot find the identifier, move on to the next entry
-		// some identifiers cannot be migrated
-		p.logger.Errorf(
-			"old file identity '%s' not found while taking over old states, "+
-				"new file identity '%s'. If the file still exists, it will be re-ingested",
-			oldIdentifierName,
-			p.identifier.Name(),
-		)
-		return "", nil
-	}
+	// oldIdentifier, ok := identifiersMap[oldIdentifierName]
+	// if !ok {
+	// 	// This should never happen, but just in case we properly handle it.
+	// 	// If we cannot find the identifier, move on to the next entry
+	// 	// some identifiers cannot be migrated
+	// 	p.logger.Errorf(
+	// 		"old file identity '%s' not found while taking over old states, "+
+	// 			"new file identity '%s'. If the file still exists, it will be re-ingested",
+	// 		oldIdentifierName,
+	// 		p.identifier.Name(),
+	// 	)
+	// 	return "", nil
+	// }
 
-	fsEvent := loginp.FSEvent{
-		NewPath:    fm.Source,
-		Descriptor: fd,
-	}
+	// fsEvent := loginp.FSEvent{
+	// 	NewPath:    fm.Source,
+	// 	Descriptor: fd,
+	// }
 	split := strings.Split(v.Key(), "::")
 	if len(split) != 4 {
 		// This should never happen.
@@ -146,7 +175,8 @@ func (p *fileProspector) takeOverFn(
 	}
 
 	idFromRegistry := strings.Join(split[2:], "::")
-	idFromPreviousIdentity := oldIdentifier.GetSource(fsEvent).Name()
+	idFromPreviousIdentity := p.previousID(oldIdentifierName, fm, fd, v)
+	// idFromPreviousIdentity := oldIdentifier.GetSource(fsEvent).Name()
 
 	// ==================================================
 	// Container input special handling.
@@ -156,11 +186,11 @@ func (p *fileProspector) takeOverFn(
 	//
 	// Whenever meta is set, it is used by the Log input file identity to prepend
 	// a hash to the identifier, we replicate the same logic here.
-	if fm.Meta != nil {
-		hashValue, _ := hashstructure.Hash(fm.Meta, nil)
-		hash := strconv.FormatUint(hashValue, 16)
-		idFromPreviousIdentity = hash + "-" + idFromPreviousIdentity
-	}
+	// if fm.Meta != nil {
+	// 	hashValue, _ := hashstructure.Hash(fm.Meta, nil)
+	// 	hash := strconv.FormatUint(hashValue, 16)
+	// 	idFromPreviousIdentity = hash + "-" + idFromPreviousIdentity
+	// }
 
 	// ==================================================
 

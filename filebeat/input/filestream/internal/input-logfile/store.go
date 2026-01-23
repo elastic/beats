@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 
@@ -491,11 +492,12 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 }
 
 type logInputState struct {
-	ID     string            `json:"id"`
-	Offset int64             `json:"offset"`
-	TTL    time.Duration     `json:"ttl" struct:"ttl"`
-	key    string            `json:"-"`
-	Meta   map[string]string `json:"meta,omitempty"`
+	ID          string            `json:"id"`
+	Offset      int64             `json:"offset"`
+	TTL         time.Duration     `json:"ttl" struct:"ttl"`
+	key         string            `json:"-"`
+	Meta        map[string]string `json:"meta,omitempty"`
+	FileStateOS file.StateOS      `json:"FileStateOS" struct:"-"`
 
 	// This matches the filestream.fileMeta struct
 	// and are used by UnpackCursorMeta
@@ -508,7 +510,7 @@ func logInputStateFromMapM(m mapstr.M) (logInputState, error) {
 
 	// typeconf.Convert kept failing with an "unsupported" error because
 	// FileStateOS was present, we don't need it, so just delete it.
-	m.Delete("FileStateOS")
+	m.Delete("FileStateOS") // We need this and it keeps breaking
 	if err := typeconv.Convert(&state, m); err != nil {
 		return logInputState{}, fmt.Errorf("cannot convert Log input state: %w", err)
 	}
@@ -524,6 +526,10 @@ func (l logInputState) UnpackCursorMeta(to any) error {
 // Key returns the resource's key
 func (l logInputState) Key() string {
 	return l.key
+}
+
+func (l logInputState) GetFileStateOS() file.StateOS {
+	return l.FileStateOS
 }
 
 func (s *store) Retain() { s.refCount.Retain() }

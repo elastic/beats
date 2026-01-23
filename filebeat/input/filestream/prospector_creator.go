@@ -22,8 +22,10 @@ import (
 	"regexp"
 	"sync"
 
+	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -35,6 +37,65 @@ const (
 )
 
 var experimentalWarning sync.Once
+
+// Supported File identities:
+// - fingerprint
+// - native
+// - path
+
+var supportedFileIdentities = []string{"path", "native", "fingerprint"}
+
+// getIdentifierNSs returns a slice containing a conf.Namespace for each
+// supported identifier
+func getIdentifierNSs(logger *logp.Logger) []*conf.Namespace {
+	ret := make([]*conf.Namespace, 0, len(supportedFileIdentities))
+	for _, fi := range supportedFileIdentities {
+		ns := &conf.Namespace{}
+
+		// Create a yaml like:
+		// fingerprint: ~
+		// It will always succeed as everything is hard coded.
+		cfg := conf.MustNewConfigFrom(fi + ": ~")
+		if err := ns.Unpack(cfg); err != nil {
+			logger.Errorf("cannot create config.Namespace for '%s': %s, skipping it", fi, err)
+			continue
+		}
+
+		ret = append(ret, ns)
+	}
+
+	return ret
+}
+
+func filestreamFileIdentifiers(logger *logp.Logger, stream string) map[string]fileIdentifier {
+	m := map[string]fileIdentifier{}
+	for _, ns := range getIdentifierNSs(logger) {
+		identifier, err := newFileIdentifier(ns, stream, logger)
+		if err != nil {
+			logger.Errorf("cannot create %s file identifier: '%s', skipping it", ns.Name(), err)
+			continue
+		}
+
+		m[ns.Name()] = identifier
+	}
+
+	return m
+}
+
+func logFileIdentifiers(logger *logp.Logger) map[string]file.StateIdentifier {
+	m := map[string]file.StateIdentifier{}
+	for _, ns := range getIdentifierNSs(logger) {
+		identifier, err := file.NewStateIdentifier(ns, logger)
+		if err != nil {
+			logger.Errorf("cannot create %s file identifier: '%s', skipping it", ns.Name(), err)
+			continue
+		}
+
+		m[ns.Name()] = identifier
+	}
+
+	return m
+}
 
 func newProspector(
 	config config,
@@ -70,14 +131,16 @@ func newProspector(
 	}
 
 	fileprospector := fileProspector{
-		filewatcher:         filewatcher,
-		identifier:          identifier,
-		ignoreOlder:         config.IgnoreOlder,
-		ignoreInactiveSince: config.IgnoreInactive,
-		cleanRemoved:        config.CleanRemoved,
-		stateChangeCloser:   config.Close.OnStateChange,
-		logger:              logger.Named("prospector"),
-		takeOver:            config.TakeOver,
+		filewatcher:           filewatcher,
+		identifier:            identifier,
+		ignoreOlder:           config.IgnoreOlder,
+		ignoreInactiveSince:   config.IgnoreInactive,
+		cleanRemoved:          config.CleanRemoved,
+		stateChangeCloser:     config.Close.OnStateChange,
+		logger:                logger.Named("prospector"),
+		takeOver:              config.TakeOver,
+		filestreamIdentifiers: filestreamFileIdentifiers(logger, config.Reader.Encoding),
+		logIdentifiers:        logFileIdentifiers(logger),
 	}
 	if config.Rotation == nil {
 		return &fileprospector, nil

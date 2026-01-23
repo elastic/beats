@@ -398,8 +398,12 @@ func (t *TakeOverConfig) Unpack(value any) error {
 	return nil
 }
 
-func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
+func (t TakeOverConfig) LogWarnings(logger *logp.Logger) {
 	if t.legacyFormat {
 		logger.Warn("using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'")
 	}
+}
+
+func (t TakeOverConfig) FromFilestream() bool {
+	return len(t.FromIDs) != 0
 }
