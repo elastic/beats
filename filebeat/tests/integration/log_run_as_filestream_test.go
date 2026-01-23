@@ -212,20 +212,28 @@ func TestLogAsFilestreamContainerInputMixedFile(t *testing.T) {
 	filebeat.WriteConfigFile(cfgStr)
 	filebeat.Start()
 
+	filebeat.WaitPublishedEvents(2*time.Second, eventsCount)
 	assertContainerEvents(t, filebeat, eventsCount/2, eventsCount/2, false)
-
 	filebeat.Stop()
 
 	filebeat.RemoveLogFiles()
+	filebeat.RemoveOutputFile()
+
 	cfgMap["filestream"] = true
 	cfgStr = getConfig(t, cfgMap, "run_as_filestream", "run_as_container_mixed.yml")
+	filebeat.WriteConfigFile(cfgStr)
+
+	filebeat.Start()
+	filebeat.WaitLogsContains(
+		"Log input (deprecated) running as Filestream",
+		10*time.Second,
+		"Filestream input did not start",
+	)
 
 	integration.WriteDockerJSONLog(t, inputFile, eventsCount, []string{"stdout", "stderr"}, true)
 
-	filebeat.Start()
-
-	filebeat.WaitLogsContains("End of file reached", 5*time.Second, "")
-	assertContainerEvents(t, filebeat, eventsCount, eventsCount, false)
+	filebeat.WaitPublishedEvents(2*time.Second, eventsCount)
+	assertContainerEvents(t, filebeat, eventsCount/2, eventsCount/2, true)
 
 	// Expected offsets:
 	// stdout: 3969
