@@ -36,7 +36,7 @@ func filterSwitchportsByStatus(switchports []*switchport, statusesToReport []str
 
 	var filtered []*switchport
 	for _, sp := range switchports {
-		if sp.portStatus == nil {
+		if sp == nil || sp.portStatus == nil {
 			continue
 		}
 		if _, ok := allowedStatuses[strings.ToLower(sp.portStatus.Status)]; ok {
@@ -87,6 +87,9 @@ func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map
 			}
 
 			// match status to the port attributes found earlier using the shared port ID
+			if statuses == nil {
+				continue
+			}
 			for i := range *statuses {
 				status := (*statuses)[i]
 				for _, switchport := range switchports {
