@@ -85,7 +85,10 @@ func testPackage(t testing.TB, pack func(PackageSpec) error) {
 func TestRepoRoot(t *testing.T) {
 	repo, err := GetProjectRepoInfo()
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
+	}
+	if repo == nil {
+		t.Fatal("GetProjectRepoInfo returned nil")
 	}
 
 	assert.Equal(t, "github.com/elastic/beats/v7", repo.RootImportPath)

@@ -108,13 +108,6 @@ func expandTemplate(name, tmpl string, funcs template.FuncMap, args ...map[strin
 }
 
 func joinMaps(args ...map[string]interface{}) map[string]interface{} {
-	switch len(args) {
-	case 0:
-		return nil
-	case 1:
-		return args[0]
-	}
-
 	out := map[string]interface{}{}
 	for _, m := range args {
 		for k, v := range m {
@@ -182,6 +175,9 @@ type DockerInfo struct {
 
 // IsBoot2Docker returns true if the Docker OS is boot2docker.
 func (info *DockerInfo) IsBoot2Docker() bool {
+	if info == nil {
+		return false
+	}
 	return strings.Contains(strings.ToLower(info.OperatingSystem), "boot2docker")
 }
 
@@ -639,8 +635,8 @@ func numParallel() int {
 
 	info, err := GetDockerInfo()
 	// Check that info.NCPU != 0 since docker info doesn't return with an
-	// error status if communcation with the daemon failed.
-	if err == nil && info.NCPU != 0 && info.NCPU < maxParallel {
+	// error status if communication with the daemon failed.
+	if err == nil && info != nil && info.NCPU != 0 && info.NCPU < maxParallel {
 		maxParallel = info.NCPU
 	}
 
@@ -904,6 +900,9 @@ func DocsDir() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to get project repo info: %w", err)
 	}
+	if repoInfo == nil {
+		return "", errors.New("project repo info is nil")
+	}
 	return filepath.Join(repoInfo.RootDir, "docs"), nil
 }
 
@@ -964,6 +963,29 @@ func CreateDir(file string) string {
 		}
 	}
 	return file
+}
+
+// RunDevTool runs a dev tool, preferring a pre-compiled binary if available.
+// toolName is the base name of the tool (e.g., "asset", "module_fields").
+// toolGoPath is the path to the .go file relative to the beats directory.
+// args are the arguments to pass to the tool.
+func RunDevTool(toolName, toolGoPath string, args ...string) error {
+	beatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		return err
+	}
+
+	// Check for pre-compiled binary first
+	precompiledPath := filepath.Join(beatsDir, "build", "dev-tools-bin", toolName)
+	if _, err := os.Stat(precompiledPath); err == nil {
+		// Use pre-compiled binary
+		return sh.Run(precompiledPath, args...)
+	}
+
+	// Fall back to go run
+	goArgs := []string{"run", "-mod=readonly", filepath.Join(beatsDir, toolGoPath)}
+	goArgs = append(goArgs, args...)
+	return sh.Run("go", goArgs...)
 }
 
 // binaryExtension returns the appropriate file extension based on GOOS.
@@ -1073,6 +1095,10 @@ func ReadGLIBCRequirement(elfFile string) (*SemanticVersion, error) {
 	var versions []SemanticVersion
 	for ver := range versionSet {
 		versions = append(versions, ver)
+	}
+
+	if len(versions) == 0 {
+		return nil, errors.New("no GLIBC versions found")
 	}
 
 	sort.Slice(versions, func(i, j int) bool {

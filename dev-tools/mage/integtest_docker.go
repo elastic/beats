@@ -19,6 +19,7 @@ package mage
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"go/build"
 	"io"
@@ -94,6 +95,9 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 	repo, err := GetProjectRepoInfo()
 	if err != nil {
 		return err
+	}
+	if repo == nil {
+		return errors.New("project repo info is nil")
 	}
 	magePath := filepath.Join("/go/src", repo.CanonicalRootImportPath, repo.SubDir, "build/mage-linux-"+GOARCH)
 	goPkgCache := filepath.Join(filepath.SplitList(build.Default.GOPATH)[0], "pkg/mod")
@@ -173,6 +177,9 @@ const dockerServiceHostname = "localhost"
 // WithGoIntegTestHostEnv adds the integeration testing environment variables needed when running Go
 // test from the host system with GoIntegTestFromHost().
 func WithGoIntegTestHostEnv(env map[string]string) map[string]string {
+	if env == nil {
+		env = make(map[string]string)
+	}
 	env["ES_HOST"] = dockerServiceHostname
 	env["ES_USER"] = "beats"
 	env["ES_PASS"] = "testing"

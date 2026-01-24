@@ -4,7 +4,30 @@ BEATS?=auditbeat filebeat heartbeat metricbeat packetbeat winlogbeat x-pack/audi
 PROJECTS=libbeat x-pack/libbeat $(BEATS)
 PROJECTS_ENV=libbeat filebeat metricbeat
 PYTHON_ENV?=$(BUILD_DIR)/python-env
-PYTHON_EXE?=python3
+
+# Python version detection with caching for speed
+# Checks if default python3 is compatible first, only searches alternatives if needed
+PYTHON_CACHE_FILE=$(BUILD_DIR)/.python_exe_cache
+PYTHON_EXE?=$(shell \
+	if [ -f "$(PYTHON_CACHE_FILE)" ]; then cat "$(PYTHON_CACHE_FILE)"; \
+	else \
+		py=python3; \
+		ver=$$($$py -c 'import sys; print(sys.version_info.minor)' 2>/dev/null || echo 99); \
+		if [ "$$ver" -ge 9 ] && [ "$$ver" -lt 14 ]; then echo $$py; \
+		else \
+			for py in python3.13 python3.12 python3.11 python3.10 \
+				/opt/homebrew/opt/python@3.13/bin/python3.13 \
+				/opt/homebrew/opt/python@3.12/bin/python3.12; do \
+				if $$py -c 'import sys; exit(0 if 9<=sys.version_info.minor<14 else 1)' 2>/dev/null; then \
+					echo $$py; break; \
+				fi; \
+			done; \
+		fi; \
+	fi)
+ifeq ($(PYTHON_EXE),)
+PYTHON_EXE=python3
+endif
+
 PYTHON_ENV_EXE=${PYTHON_ENV}/bin/$(notdir ${PYTHON_EXE})
 VENV_PARAMS?=
 FIND=find . -type f -not -path "*/build/*" -not -path "*/.git/*"
@@ -26,6 +49,24 @@ PROJECTS_XPACK_MAGE=$(PROJECTS_XPACK_PKG) x-pack/libbeat
 # Includes
 #
 include dev-tools/make/mage-install.mk
+
+#
+# Pre-compiled dev tools for faster builds
+#
+DEV_TOOLS_BIN=$(BUILD_DIR)/dev-tools-bin
+
+## dev-tools-bin : Pre-compiles dev tools for faster builds.
+.PHONY: dev-tools-bin
+dev-tools-bin:
+	@mkdir -p $(DEV_TOOLS_BIN)
+	@for tool in asset module_fields module_include_list; do \
+		src="dev-tools/cmd/$${tool}/$${tool}.go"; \
+		bin="$(DEV_TOOLS_BIN)/$${tool}"; \
+		if [ ! -f "$$bin" ] || [ "$$src" -nt "$$bin" ]; then \
+			echo ">> Compiling $$src..."; \
+			go build -o "$$bin" "./$${src}"; \
+		fi; \
+	done
 
 ## help : Show this help.
 help: Makefile
@@ -65,18 +106,62 @@ coverage-report:
 	@go tool cover -html=./$(COVERAGE_DIR)/full.cov -o $(COVERAGE_DIR)/full.html
 	@echo "Generated coverage report $(COVERAGE_DIR)/full.html"
 
-## update : TBD.
+## update : Updates all beats. Use UPDATE_PARALLEL=1 for parallel builds (faster).
+# OSS beats that don't have x-pack counterparts running in parallel
+OSS_BEATS_ONLY=heartbeat packetbeat winlogbeat
+# OSS beats with x-pack counterparts (must not run in parallel with x-pack version)
+OSS_BEATS_WITH_XPACK=auditbeat filebeat metricbeat
+# X-pack only beats
+XPACK_BEATS_ONLY=x-pack/agentbeat x-pack/dockerlogbeat x-pack/osquerybeat
+
 .PHONY: update
 update: notice
+ifeq ($(UPDATE_PARALLEL),1)
+	@JOBS=$$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4); \
+	START=$$(date +%s); \
+	echo ">> Running parallel update ($$JOBS jobs)..."; \
+	go build ./dev-tools/mage/... 2>/dev/null || true; \
+	echo ">> Step 1/3: Updating libbeat (in parallel)..."; \
+	echo "libbeat x-pack/libbeat" | tr ' ' '\n' | \
+		xargs -P 2 -I {} sh -c '$(MAKE) -C {} update || exit 255' && \
+	echo ">> Step 2/3: Updating OSS beats + x-pack-only beats in parallel..." && \
+	echo "$(OSS_BEATS_ONLY) $(OSS_BEATS_WITH_XPACK) $(XPACK_BEATS_ONLY)" | tr ' ' '\n' | \
+		xargs -P $$JOBS -I {} sh -c '$(MAKE) -C {} update || exit 255' && \
+	echo ">> Step 3/3: Updating x-pack beats with OSS counterparts + Kubernetes manifests (in parallel)..." && \
+	( echo "x-pack/auditbeat x-pack/filebeat x-pack/heartbeat x-pack/metricbeat x-pack/packetbeat x-pack/winlogbeat" | tr ' ' '\n' | \
+		xargs -P $$JOBS -I {} sh -c '$(MAKE) -C {} update || exit 255' ) & \
+	XPACK_PID=$$!; \
+	$(MAKE) -C deploy/kubernetes all >/dev/null 2>&1 & \
+	K8S_PID=$$!; \
+	wait $$XPACK_PID $$K8S_PID && \
+	echo ">> Complete!"
+else
 	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) update || exit 1;)
 	@$(MAKE) -C deploy/kubernetes all
+endif
 
-## clean : Clean target.
+## update-fast : Parallel update with caching optimizations.
+.PHONY: update-fast
+update-fast: dev-tools-bin
+	@$(MAKE) UPDATE_PARALLEL=1 SKIP_NOTICE=1 update
+
+## clean : Clean target. Use CLEAN_PARALLEL=1 for parallel clean (faster).
 .PHONY: clean
 clean: mage
 	@rm -rf build
+ifeq ($(CLEAN_PARALLEL),1)
+	@echo "$(PROJECTS) $(PROJECTS_XPACK_MAGE)" | tr ' ' '\n' | \
+		xargs -P $$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4) -I {} \
+		sh -c '$(MAKE) -C {} clean 2>/dev/null || true'
+else
 	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) clean || exit 1;)
+endif
 	@-mage -clean
+
+## clean-fast : Alias for parallel clean.
+.PHONY: clean-fast
+clean-fast:
+	@$(MAKE) CLEAN_PARALLEL=1 clean
 
 ## check : TBD.
 .PHONY: check
@@ -101,15 +186,28 @@ check-default:
 	@$(MAKE) check-go
 	@$(MAKE) check-no-changes
 
-## ccheck-go : Check there is no changes in Go modules.
-.PHONY: check-go
-check-go:
-	@go mod tidy
+## go-mod-tidy : Runs go mod tidy with caching to avoid redundant runs.
+# Uses a marker file to skip if go.mod/go.sum haven't changed since last tidy.
+GO_MOD_TIDY_MARKER=$(BUILD_DIR)/.go_mod_tidy_done
+.PHONY: go-mod-tidy
+go-mod-tidy:
+	@mkdir -p $(BUILD_DIR)
+	@if [ ! -f "$(GO_MOD_TIDY_MARKER)" ] || \
+	   [ go.mod -nt "$(GO_MOD_TIDY_MARKER)" ] || \
+	   [ go.sum -nt "$(GO_MOD_TIDY_MARKER)" ]; then \
+		echo ">> Running go mod tidy..."; \
+		go mod tidy && touch "$(GO_MOD_TIDY_MARKER)"; \
+	else \
+		echo ">> go mod tidy is up-to-date (skipping)"; \
+	fi
 
-## ccheck-no-changes : Check there is no local changes.
+## check-go : Check there is no changes in Go modules.
+.PHONY: check-go
+check-go: go-mod-tidy
+
+## check-no-changes : Check there is no local changes.
 .PHONY: check-no-changes
-check-no-changes:
-	@go mod tidy
+check-no-changes: go-mod-tidy
 	@git diff | cat
 	@git update-index --refresh
 	@git diff-index --exit-code HEAD --
@@ -142,12 +240,24 @@ misspell:
 		-name '*' \
 		-exec misspell -w {} \;
 
-## fmt : TBD.
+## fmt : Formats code. Use FMT_PARALLEL=1 for parallel formatting (faster).
 .PHONY: fmt
 fmt: add-headers python-env
+ifeq ($(FMT_PARALLEL),1)
+	@JOBS=$$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4); \
+	echo ">> Running parallel fmt ($$JOBS jobs)..."; \
+	echo "$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE)" | tr ' ' '\n' | \
+		xargs -P $$JOBS -I {} sh -c '$(MAKE) -C {} fmt 2>/dev/null || true'
+else
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) fmt || exit 1;)
+endif
 	@# Cleans also python files which are not part of the beats
 	@$(FIND) -name "*.py" -exec $(PYTHON_ENV)/bin/autopep8 --in-place --max-line-length 120 {} \;
+
+## fmt-fast : Alias for parallel fmt.
+.PHONY: fmt-fast
+fmt-fast:
+	@$(MAKE) FMT_PARALLEL=1 fmt
 
 ## docs : Builds the documents for each beat
 .PHONY: docs
@@ -155,11 +265,25 @@ docs:
 	@$(foreach var,$(PROJECTS),BUILD_DIR=${BUILD_DIR} $(MAKE) -C $(var) docs || exit 1;)
 	sh ./script/build_docs.sh dev-guide github.com/elastic/beats/docs/devguide ${BUILD_DIR}
 
-## notice : Generates the NOTICE file.
+## notice : Generates the NOTICE file. Use SKIP_NOTICE=1 to skip if up-to-date.
 .PHONY: notice
-notice:
+notice: go-mod-tidy
+ifeq ($(SKIP_NOTICE),1)
+	@if [ -f NOTICE.txt ] && [ NOTICE.txt -nt go.mod ] && [ NOTICE.txt -nt go.sum ]; then \
+		echo ">> NOTICE.txt is up-to-date (skipping)"; \
+	else \
+		echo "Generating NOTICE"; \
+		go mod download && \
+		go list -m -json all | go run go.elastic.co/go-licence-detector \
+			-includeIndirect \
+			-rules dev-tools/notice/rules.json \
+			-overrides dev-tools/notice/overrides.json \
+			-noticeTemplate dev-tools/notice/NOTICE.txt.tmpl \
+			-noticeOut NOTICE.txt \
+			-depsOut ""; \
+	fi
+else
 	@echo "Generating NOTICE"
-	go mod tidy
 	go mod download
 	go list -m -json all | go run go.elastic.co/go-licence-detector \
 		-includeIndirect \
@@ -168,16 +292,24 @@ notice:
 		-noticeTemplate dev-tools/notice/NOTICE.txt.tmpl \
 		-noticeOut NOTICE.txt \
 		-depsOut ""
+endif
 
 
 ## python-env : Sets up the virtual python environment.
 .PHONY: python-env
 python-env:
+	@mkdir -p $(BUILD_DIR)
+	@echo "$(PYTHON_EXE)" > $(PYTHON_CACHE_FILE)
 	@test -f $(PYTHON_ENV)/bin/activate || ${PYTHON_EXE} -m venv $(VENV_PARAMS) $(PYTHON_ENV)
 	@. $(PYTHON_ENV)/bin/activate; \
 	${PYTHON_EXE} -m pip install -q --upgrade pip autopep8==1.5.4 pylint==2.4.4; \
 	find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
+
+## clean-python-cache : Clears the cached Python executable path (forces re-detection)
+.PHONY: clean-python-cache
+clean-python-cache:
+	@rm -f $(PYTHON_CACHE_FILE)
 
 ## test-apm : Tests if apm works with the current code
 .PHONY: test-apm

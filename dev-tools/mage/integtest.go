@@ -110,10 +110,16 @@ func (steps IntegrationTestSteps) Setup(env map[string]string) error {
 // previous steps teardown is still called. This guarantees that teardown
 // will always be called for each step.
 func (steps IntegrationTestSteps) Teardown(env map[string]string) error {
+	if len(steps) == 0 {
+		return nil
+	}
 	return steps.teardownFrom(len(steps)-1, env)
 }
 
 func (steps IntegrationTestSteps) teardownFrom(start int, env map[string]string) error {
+	if len(steps) == 0 || start < 0 {
+		return nil
+	}
 	var errs []error
 	for i := start; i >= 0; i-- {
 		if mg.Verbose() {
