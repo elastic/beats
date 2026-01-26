@@ -624,7 +624,7 @@ func (thrift *thriftPlugin) readStruct(data []byte) (value string, ok bool, comp
 			return "", false, false, 0
 		}
 
-		if len(data) < 1 || len(data) <= offset {
+		if len(data) <= offset {
 			return "", true, false, 0
 		}
 
