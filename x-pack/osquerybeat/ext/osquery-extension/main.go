@@ -37,10 +37,10 @@ import (
 	"time"
 
 	"github.com/osquery/osquery-go"
-	osquerygen "github.com/osquery/osquery-go/gen/osquery"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/utils"
 )
 
 var (
@@ -72,12 +72,11 @@ func main() {
 	}
 
 	// Create a client to query osqueryd configuration
-	client, err := osquery.NewClient(*socket, timeoutD)
+	client, err := utils.NewResilientClient(*socket, timeoutD, log)
+	options, err := client.Options()
 	if err != nil {
-		log.Warningf("Could not create client to query osqueryd options: %s", err)
+		log.Warningf("Could not retrieve osqueryd options: %s", err)
 	} else {
-		options := getOsqueryOptions(client, log)
-		client.Close()
 		log.UpdateWithOsqueryOptions(options)
 	}
 
@@ -101,7 +100,7 @@ func main() {
 	// Register the tables available for the specific platform build
 	// Any module that needs to execute a post hook should register the hook
 	// within this function
-	RegisterTables(server, log, hooks)
+	RegisterTables(server, log, hooks, client)
 
 	// Execute all post hooks to create any views required for the specific platform build
 	go hooks.Execute(socket, log)
@@ -116,15 +115,6 @@ func main() {
 
 	// Execute all shutdown hooks to clean up any resources
 	hooks.Shutdown(socket, log)
-}
-
-func getOsqueryOptions(client *osquery.ExtensionManagerClient, log *logger.Logger) osquerygen.InternalOptionList {
-	options, err := client.Options()
-	if err != nil {
-		log.Warningf("Failed to query osqueryd options: %s", err)
-		return nil
-	}
-	return options
 }
 
 // waitForSocket waits for the socket/pipe to become available
