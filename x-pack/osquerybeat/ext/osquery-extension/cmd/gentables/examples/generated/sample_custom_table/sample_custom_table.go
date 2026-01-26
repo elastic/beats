@@ -8,10 +8,45 @@
 package samplecustomtable
 
 import (
+	"context"
+	"errors"
+	"sync"
 	"time"
 
 	"github.com/osquery/osquery-go/plugin/table"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables"
 )
+
+var (
+	generateFunc func(context.Context, table.QueryContext, *logger.Logger) ([]Result, error)
+	registerOnce sync.Once
+)
+
+// RegisterGenerateFunc registers the generate function for this table.
+// This should be called once from the implementation package's init() function.
+func RegisterGenerateFunc(f func(context.Context, table.QueryContext, *logger.Logger) ([]Result, error)) {
+	registerOnce.Do(func() {
+		generateFunc = f
+	})
+}
+
+// GetGenerateFunc returns the osquery table.GenerateFunc for this table.
+// It wraps the registered generate function and handles marshaling of results.
+func GetGenerateFunc(log *logger.Logger) (table.GenerateFunc, error) {
+	if generateFunc == nil {
+		return nil, errors.New("generate function not registered for sample_custom_table")
+	}
+	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
+		results, err := generateFunc(ctx, queryContext, log)
+		if err != nil {
+			return nil, err
+		}
+		return encoding.MarshalToMaps(results)
+	}, nil
+}
 
 // Result represents a row from the sample_custom_table table.
 type Result struct {
@@ -44,3 +79,14 @@ func Columns() []table.ColumnDefinition {
 
 // TableName is the name of the sample_custom_table table.
 const TableName = "sample_custom_table"
+
+func init() {
+	tables.RegisterTableSpec(tables.TableSpec{
+		Name:         "sample_custom_table",
+		Description:  "Example table showing the generator capabilities with multiple data types",
+		Platforms:    []string{"linux", "darwin", "windows"},
+		TableName:    TableName,
+		Columns:      Columns,
+		GenerateFunc: GetGenerateFunc,
+	})
+}

@@ -73,15 +73,17 @@ The generator creates individual packages for each table/view with better encaps
 
 ### Directory Structure
 ```
-pkg/tables/generated/
-├── registry.go                    # Registry of all tables
-└── sample_custom_table/           # Directory: descriptive with underscores
-    └── sample_custom_table.go     # Package: samplecustomtable (idiomatic)
+pkg/tables/
+├── registry.go                    # STATIC - registry of all tables
+└── generated/
+    └── sample_custom_table/           # Directory: descriptive with underscores
+        └── sample_custom_table.go     # Package: samplecustomtable (idiomatic)
 
-pkg/views/generated/
-├── registry.go                    # Registry of all views
-└── sample_combined_resources/     # Directory: descriptive with underscores
-    └── sample_combined_resources.go  # Package: samplecombinedresources (idiomatic)
+pkg/views/
+├── registry.go                    # STATIC - registry of all views
+└── generated/
+    └── sample_combined_resources/     # Directory: descriptive with underscores
+        └── sample_combined_resources.go  # Package: samplecombinedresources (idiomatic)
 ```
 
 **Package Naming Convention:**
@@ -107,16 +109,18 @@ columns := samplecustomtable.Columns()
 name := samplecustomtable.TableName
 ```
 
-**Registry imports are automatic:**
+**Registry registration is automatic via init():**
 ```go
-// In registry.go
-import (
-    samplecustomtable "github.com/.../pkg/tables/generated/sample_custom_table"
-)
-
-// Usage in registry
-TableName: samplecustomtable.TableName,
-Columns:   samplecustomtable.Columns,
+// Each generated table calls RegisterTableSpec in its init() function
+// In pkg/tables/generated/sample_custom_table/sample_custom_table.go
+func init() {
+    tables.RegisterTableSpec(tables.TableSpec{
+        Name:         "sample_custom_table",
+        TableName:    TableName,
+        Columns:      Columns,
+        GenerateFunc: GetGenerateFunc,
+    })
+}
 ```
 
 ## Osquery Struct Tags

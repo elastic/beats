@@ -169,15 +169,8 @@ func run() error {
 		}
 	}
 
-	// Generate table registry
-	if err := writeRegistryFile(tableSpecs, *outDir, "table", "TableSpec", "AllTables", false); err != nil {
-		return fmt.Errorf("failed to write table registry: %w", err)
-	}
-
-	// Generate view registry
-	if err := writeRegistryFile(viewSpecs, *viewsOut, "view", "ViewSpec", "AllViews", true); err != nil {
-		return fmt.Errorf("failed to write view registry: %w", err)
-	}
+	// Note: registry files are now static and not generated
+	// They live in pkg/tables/registry.go and pkg/views/registry.go
 
 	if *verbose {
 		fmt.Println("Code generation completed successfully")
@@ -253,11 +246,48 @@ func generateTableCode(s spec, outDir string) error {
 
 	// Generate imports
 	b.WriteString("import (\n")
+	b.WriteString("\t\"context\"\n")
+	b.WriteString("\t\"errors\"\n")
+	b.WriteString("\t\"sync\"\n")
 	if needsTimeImport {
-		b.WriteString("\t\"time\"\n\n")
+		b.WriteString("\t\"time\"\n")
 	}
+	b.WriteString("\n")
 	b.WriteString("\t\"github.com/osquery/osquery-go/plugin/table\"\n")
+	b.WriteString("\n")
+	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding\"\n")
+	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger\"\n")
+	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables\"\n")
 	b.WriteString(")\n\n")
+
+	// Generate generate function registration
+	b.WriteString("var (\n")
+	b.WriteString("\tgenerateFunc func(context.Context, table.QueryContext, *logger.Logger) ([]Result, error)\n")
+	b.WriteString("\tregisterOnce sync.Once\n")
+	b.WriteString(")\n\n")
+
+	b.WriteString("// RegisterGenerateFunc registers the generate function for this table.\n")
+	b.WriteString("// This should be called once from the implementation package's init() function.\n")
+	b.WriteString("func RegisterGenerateFunc(f func(context.Context, table.QueryContext, *logger.Logger) ([]Result, error)) {\n")
+	b.WriteString("\tregisterOnce.Do(func() {\n")
+	b.WriteString("\t\tgenerateFunc = f\n")
+	b.WriteString("\t})\n")
+	b.WriteString("}\n\n")
+
+	b.WriteString("// GetGenerateFunc returns the osquery table.GenerateFunc for this table.\n")
+	b.WriteString("// It wraps the registered generate function and handles marshaling of results.\n")
+	b.WriteString("func GetGenerateFunc(log *logger.Logger) (table.GenerateFunc, error) {\n")
+	b.WriteString("\tif generateFunc == nil {\n")
+	fmt.Fprintf(&b, "\t\treturn nil, errors.New(\"generate function not registered for %s\")\n", s.Name)
+	b.WriteString("\t}\n")
+	b.WriteString("\treturn func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {\n")
+	b.WriteString("\t\tresults, err := generateFunc(ctx, queryContext, log)\n")
+	b.WriteString("\t\tif err != nil {\n")
+	b.WriteString("\t\t\treturn nil, err\n")
+	b.WriteString("\t\t}\n")
+	b.WriteString("\t\treturn encoding.MarshalToMaps(results)\n")
+	b.WriteString("\t}, nil\n")
+	b.WriteString("}\n\n")
 
 	// Generate result struct
 	fmt.Fprintf(&b, "// Result represents a row from the %s table.\n", s.Name)
@@ -288,6 +318,25 @@ func generateTableCode(s spec, outDir string) error {
 	// Generate table metadata
 	fmt.Fprintf(&b, "// TableName is the name of the %s table.\n", s.Name)
 	fmt.Fprintf(&b, "const TableName = \"%s\"\n\n", s.Name)
+
+	// Generate init function to register table spec
+	b.WriteString("func init() {\n")
+	b.WriteString("\ttables.RegisterTableSpec(tables.TableSpec{\n")
+	fmt.Fprintf(&b, "\t\tName:         \"%s\",\n", s.Name)
+	fmt.Fprintf(&b, "\t\tDescription:  \"%s\",\n", strings.ReplaceAll(s.Description, "\"", "\\\""))
+	b.WriteString("\t\tPlatforms:    []string{")
+	for i, p := range s.Platforms {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		fmt.Fprintf(&b, "\"%s\"", p)
+	}
+	b.WriteString("},\n")
+	b.WriteString("\t\tTableName:    TableName,\n")
+	b.WriteString("\t\tColumns:      Columns,\n")
+	b.WriteString("\t\tGenerateFunc: GetGenerateFunc,\n")
+	b.WriteString("\t})\n")
+	b.WriteString("}\n")
 
 	// Create subdirectory for this table
 	tableDir := filepath.Join(outDir, s.Name)
@@ -357,101 +406,6 @@ func generateDocumentation(s spec, docsDir string) error {
 	return writeFile(filename, b.String())
 }
 
-// writeRegistryFile writes a single registry file
-func writeRegistryFile(specs []spec, outDir, specType, typeName, funcName string, includeRequiredTables bool) error {
-	var b strings.Builder
-
-	// Elastic copyright header
-	b.WriteString(elasticCopyrightHeader)
-
-	// Code generation notice
-	b.WriteString(codeGeneratedNotice)
-	b.WriteString("\n")
-	b.WriteString("package generated\n\n")
-
-	// Generate imports
-	b.WriteString("import (\n")
-	if specType == "table" {
-		b.WriteString("\t\"github.com/osquery/osquery-go/plugin/table\"\n\n")
-	} else {
-		b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks\"\n\n")
-	}
-
-	// Import all individual packages
-	for _, s := range specs {
-		pkgName := toPackageName(s.Name)
-		if specType == "table" {
-			fmt.Fprintf(&b, "\t%s \"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/%s\"\n", pkgName, s.Name)
-		} else {
-			fmt.Fprintf(&b, "\t%s \"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/%s\"\n", pkgName, s.Name)
-		}
-	}
-	b.WriteString(")\n\n")
-
-	// Generate struct
-	fmt.Fprintf(&b, "// %s contains metadata and references for a generated %s.\n", typeName, specType)
-	fmt.Fprintf(&b, "type %s struct {\n", typeName)
-	b.WriteString("\tName        string\n")
-	b.WriteString("\tDescription string\n")
-	b.WriteString("\tPlatforms   []string\n")
-
-	if specType == "table" {
-		b.WriteString("\tTableName string\n")
-		b.WriteString("\tColumns   func() []table.ColumnDefinition\n")
-	} else {
-		b.WriteString("\tRequiredTables []string\n")
-		b.WriteString("\tView           func() *hooks.View\n")
-	}
-	b.WriteString("}\n\n")
-
-	// Generate function
-	fmt.Fprintf(&b, "// %s returns metadata and references for all generated %ss.\n", funcName, specType)
-	fmt.Fprintf(&b, "func %s() []%s {\n", funcName, typeName)
-	fmt.Fprintf(&b, "\treturn []%s{\n", typeName)
-
-	for _, s := range specs {
-		pkgName := toPackageName(s.Name)
-		b.WriteString("\t\t{\n")
-		fmt.Fprintf(&b, "\t\t\tName:        \"%s\",\n", s.Name)
-		fmt.Fprintf(&b, "\t\t\tDescription: \"%s\",\n",
-			strings.ReplaceAll(s.Description, "\"", "\\\""))
-		b.WriteString("\t\t\tPlatforms:   []string{")
-		for i, p := range s.Platforms {
-			if i > 0 {
-				b.WriteString(", ")
-			}
-			fmt.Fprintf(&b, "\"%s\"", p)
-		}
-		b.WriteString("},\n")
-
-		if specType == "table" {
-			fmt.Fprintf(&b, "\t\t\tTableName: %s.TableName,\n", pkgName)
-			fmt.Fprintf(&b, "\t\t\tColumns:   %s.Columns,\n", pkgName)
-		} else {
-			b.WriteString("\t\t\tRequiredTables: []string{")
-			for i, t := range s.RequiredTables {
-				if i > 0 {
-					b.WriteString(", ")
-				}
-				fmt.Fprintf(&b, "\"%s\"", t)
-			}
-			b.WriteString("},\n")
-			fmt.Fprintf(&b, "\t\t\tView: %s.View,\n", pkgName)
-		}
-
-		b.WriteString("\t\t},\n")
-	}
-
-	b.WriteString("\t}\n")
-	b.WriteString("}\n")
-
-	filename := filepath.Join(outDir, "registry.go")
-	if err := os.WriteFile(filename, []byte(b.String()), 0644); err != nil {
-		return err
-	}
-
-	return nil
-}
 
 func osqueryTypeToGoMethod(osqueryType string) string {
 	switch osqueryType {
@@ -631,11 +585,28 @@ func generateViewCode(s spec, outDir string) error {
 
 	// Generate imports
 	b.WriteString("import (\n")
+	b.WriteString("\t\"sync\"\n")
 	if needsTimeImport {
-		b.WriteString("\t\"time\"\n\n")
+		b.WriteString("\t\"time\"\n")
 	}
+	b.WriteString("\n")
 	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks\"\n")
+	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views\"\n")
 	b.WriteString(")\n\n")
+
+	// Generate hooks registration
+	b.WriteString("var (\n")
+	b.WriteString("\thooksFunc    func(*hooks.HookManager)\n")
+	b.WriteString("\tregisterOnce sync.Once\n")
+	b.WriteString(")\n\n")
+
+	b.WriteString("// RegisterHooksFunc registers the hooks function for this view (optional).\n")
+	b.WriteString("// This can be called to register any hooks that should be set up for this view.\n")
+	b.WriteString("func RegisterHooksFunc(f func(*hooks.HookManager)){\n")
+	b.WriteString("\tregisterOnce.Do(func() {\n")
+	b.WriteString("\t\thooksFunc = f\n")
+	b.WriteString("\t})\n")
+	b.WriteString("}\n\n")
 
 	// Generate result struct
 	fmt.Fprintf(&b, "// Result represents a row from the %s view.\n", s.Name)
@@ -648,7 +619,7 @@ func generateViewCode(s spec, outDir string) error {
 	}
 	b.WriteString("}\n\n")
 
-	// Generate view function
+	// Generate default view function (as a reference/helper)
 	fmt.Fprintf(&b, "// View returns the view definition for %s.\n", s.Name)
 	fmt.Fprintf(&b, "// %s\n", s.Description)
 	b.WriteString("//\n")
@@ -675,6 +646,32 @@ func generateViewCode(s spec, outDir string) error {
 	createViewSQL := fmt.Sprintf("CREATE VIEW %s AS\n%s", s.Name, strings.TrimSpace(s.Query))
 	b.WriteString("\t\t`" + createViewSQL + "`,\n")
 	b.WriteString("\t)\n")
+	b.WriteString("}\n\n")
+
+	// Generate init function to register view spec
+	b.WriteString("func init() {\n")
+	b.WriteString("\tviews.RegisterViewSpec(views.ViewSpec{\n")
+	fmt.Fprintf(&b, "\t\tName:         \"%s\",\n", s.Name)
+	fmt.Fprintf(&b, "\t\tDescription:  \"%s\",\n", strings.ReplaceAll(s.Description, "\"", "\\\""))
+	b.WriteString("\t\tPlatforms:    []string{")
+	for i, p := range s.Platforms {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		fmt.Fprintf(&b, "\"%s\"", p)
+	}
+	b.WriteString("},\n")
+	b.WriteString("\t\tRequiredTables: []string{")
+	for i, table := range s.RequiredTables {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		fmt.Fprintf(&b, "\"%s\"", table)
+	}
+	b.WriteString("},\n")
+	b.WriteString("\t\tView:         View,\n")
+	b.WriteString("\t\tHooksFunc:    hooksFunc,\n")
+	b.WriteString("\t})\n")
 	b.WriteString("}\n")
 
 	// Create subdirectory for this view

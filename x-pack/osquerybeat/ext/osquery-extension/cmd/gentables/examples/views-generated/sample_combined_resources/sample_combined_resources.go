@@ -8,8 +8,24 @@
 package samplecombinedresources
 
 import (
+	"sync"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views"
 )
+
+var (
+	hooksFunc    func(*hooks.HookManager)
+	registerOnce sync.Once
+)
+
+// RegisterHooksFunc registers the hooks function for this view (optional).
+// This can be called to register any hooks that should be set up for this view.
+func RegisterHooksFunc(f func(*hooks.HookManager)) {
+	registerOnce.Do(func() {
+		hooksFunc = f
+	})
+}
 
 // Result represents a row from the sample_combined_resources view.
 type Result struct {
@@ -76,4 +92,15 @@ SELECT
 FROM sample_custom_table
 WHERE status = 'archived' AND updated_time > (strftime('%s', 'now') - 2592000);`,
 	)
+}
+
+func init() {
+	views.RegisterViewSpec(views.ViewSpec{
+		Name:           "sample_combined_resources",
+		Description:    "View combining active and archived resources with calculated fields and UNION",
+		Platforms:      []string{"linux", "darwin", "windows"},
+		RequiredTables: []string{"sample_custom_table"},
+		View:           View,
+		HooksFunc:      hooksFunc,
+	})
 }

@@ -48,15 +48,17 @@ go generate ./...
 Each table/view is generated into its own package:
 
 ```
-pkg/tables/generated/
-├── registry.go                      # Metadata registry for all tables
-└── sample_custom_table/             # Directory (descriptive)
-    └── sample_custom_table.go       # package samplecustomtable (idiomatic)
+pkg/tables/
+├── registry.go                      # STATIC - metadata registry for all tables
+└── generated/
+    └── sample_custom_table/             # Directory (descriptive)
+        └── sample_custom_table.go       # package samplecustomtable (idiomatic)
 
-pkg/views/generated/
-├── registry.go                      # Metadata registry for all views
-└── sample_combined_resources/       # Directory (descriptive)
-    └── sample_combined_resources.go # package samplecombinedresources (idiomatic)
+pkg/views/
+├── registry.go                      # STATIC - metadata registry for all views
+└── generated/
+    └── sample_combined_resources/       # Directory (descriptive)
+        └── sample_combined_resources.go # package samplecombinedresources (idiomatic)
 ```
 
 **Package Naming:**
