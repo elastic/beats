@@ -383,12 +383,12 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 			"test::key2": { // Unchanged
 				Updated: s.ephemeralStore.table["test::key2"].internalState.Updated,
 				TTL:     0 * time.Second,
-				Meta:    map[string]interface{}{"identifiername": "method"},
+				Meta:    map[string]interface{}{"identifier_name": "method"},
 			},
 			"test::key1::updated": { // Updated resource
 				Updated: s.ephemeralStore.table["test::key1::updated"].internalState.Updated,
 				TTL:     60 * time.Second,
-				Meta:    map[string]interface{}{"identifiername": "something"},
+				Meta:    map[string]interface{}{"identifier_name": "something"},
 			},
 		}
 		s.ephemeralStore.mu.Unlock()
