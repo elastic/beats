@@ -9,18 +9,48 @@ This directory contains sample table and view specifications to demonstrate the 
 
 ## Testing the Generator
 
-To test the generator with these samples:
+To test the generator with these samples, you have two options:
+
+### Option 1: From the gentables directory
 
 ```bash
-# Generate from the sample specs
-go run ../main.go \
-  -spec-dir . \
-  -out-dir ./generated \
-  -views-out-dir ./views-generated \
-  -docs-dir ./docs \
-  -views-docs-dir ./views-docs \
+cd /path/to/cmd/gentables
+go run . \
+  -spec-dir examples \
+  -out-dir examples/generated \
+  -views-out-dir examples/views-generated \
+  -docs-dir examples/docs \
+  -views-docs-dir examples/views-docs \
   -verbose
 ```
+
+### Option 2: From the examples directory
+
+```bash
+cd /path/to/cmd/gentables/examples
+go run ../main.go \
+  -spec-dir . \
+  -out-dir generated \
+  -views-out-dir views-generated \
+  -docs-dir docs \
+  -views-docs-dir views-docs \
+  -verbose
+```
+
+### What Gets Generated
+
+The generator will create:
+- `generated/` - Table code packages
+  - `sample_custom_table/sample_custom_table.go` - Generated table code
+  - `tables_linux.go`, `tables_darwin.go`, `tables_windows.go` - Platform-specific imports
+- `views-generated/` - View code packages
+  - `sample_combined_resources/sample_combined_resources.go` - Generated view code
+- `docs/` - Table documentation
+  - `sample_custom_table.md` - Generated table documentation
+- `views-docs/` - View documentation
+  - `sample_combined_resources.md` - Generated view documentation
+
+**Note**: Import paths in the generated platform files are calculated automatically based on the output directory locations and the module path detected from `go.mod`.
 
 ## Unified Spec Format
 
@@ -33,6 +63,7 @@ type: table|view                    # Required: "table" or "view"
 name: spec_name                     # Required: table or view name
 description: Brief description      # Required: brief description
 platforms: [linux, darwin, windows] # Optional: defaults to all platforms
+implementation_package: pkg/path    # Optional: for tables only, enables automatic registration
 
 columns:                            # Required: column definitions
   - name: column_name               # Required: column name
@@ -122,6 +153,38 @@ func init() {
     })
 }
 ```
+
+## Automatic Registration
+
+### implementation_package Field (Tables Only)
+
+For tables with custom implementations, you can specify the `implementation_package` field to enable **fully automatic registration** without any manual main file changes:
+
+```yaml
+type: table
+name: my_table
+platforms: [linux, darwin, windows]
+
+# Automatic registration - zero manual work required!
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/myimpl
+
+columns:
+  - name: id
+    type: BIGINT
+    description: Unique identifier
+  # ... more columns
+```
+
+**How it works:**
+
+1. **Generator creates platform import files** - Automatically adds imports to `tables_linux.go`, etc.
+2. **Implementation init() registers** - Your package's `init()` calls `RegisterGenerateFunc()`
+3. **Generated init() registers spec** - Generated package's `init()` calls `RegisterTableSpec()`
+4. **Main files stay clean** - No manual imports or registration calls needed
+
+**When to omit:**
+
+- Tables where implementation is in the same package as generated code
 
 ## Osquery Struct Tags
 
@@ -272,6 +335,9 @@ This allows you to write minimal specs for cross-platform tables/views without r
 - ⚪ `columns[].timezone` - Timezone hint for osquery tags (e.g., "UTC")
 - ⚪ `documentation.related_tables` - Defaults to empty array
 - ⚪ `required_tables` - Only applies to views; optional
+
+### Optional for TABLES only:
+- ⚪ `implementation_package` - Import path for automatic registration (highly recommended)
 
 ### View-specific required:
 - ✅ `query` - Must contain SELECT statement(s) only

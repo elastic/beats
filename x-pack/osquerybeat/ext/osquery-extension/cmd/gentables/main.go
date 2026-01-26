@@ -30,12 +30,13 @@ import (
 
 // spec represents a unified specification for both tables and views
 type spec struct {
-	Type          string              `yaml:"type"` // "table" or "view"
-	Name          string              `yaml:"name"`
-	Description   string              `yaml:"description"`
-	Platforms     []string            `yaml:"platforms"`
-	Columns       []columnSpec        `yaml:"columns"`
-	Documentation documentationConfig `yaml:"documentation"`
+	Type                  string              `yaml:"type"` // "table" or "view"
+	Name                  string              `yaml:"name"`
+	Description           string              `yaml:"description"`
+	Platforms             []string            `yaml:"platforms"`
+	Columns               []columnSpec        `yaml:"columns"`
+	Documentation         documentationConfig `yaml:"documentation"`
+	ImplementationPackage string              `yaml:"implementation_package,omitempty"`
 
 	// View-specific fields
 	Query          string   `yaml:"query,omitempty"`
@@ -307,7 +308,7 @@ func generateTableCode(s spec, outDir string) error {
 	// Generate result struct
 	fmt.Fprintf(&b, "// Result represents a row from the %s table.\n", s.Name)
 	b.WriteString("type Result struct {\n")
-	
+
 	for _, col := range s.Columns {
 		goType := osqueryTypeToGoType(col)
 		fieldName := toGoFieldName(col.Name)
@@ -422,7 +423,6 @@ func generateDocumentation(s spec, docsDir string) error {
 	return writeFile(filename, b.String())
 }
 
-
 func osqueryTypeToGoMethod(osqueryType string) string {
 	switch osqueryType {
 	case "TEXT":
@@ -444,7 +444,7 @@ func osqueryTypeToGoType(col columnSpec) string {
 	if col.GoType != "" {
 		return col.GoType
 	}
-	
+
 	// Otherwise use default mapping based on osquery type
 	switch col.Type {
 	case "TEXT":
@@ -748,50 +748,93 @@ func formatGeneratedFiles(dirs ...string) error {
 // for all tables and views that support each platform.
 func generatePlatformImports(tableSpecs, viewSpecs []spec, tablesDir, viewsDir string) error {
 	platforms := []string{"linux", "darwin", "windows"}
-	
+
+	// Convert output directories to import paths using go list
+	tablesImportPath, err := getImportPath(tablesDir)
+	if err != nil {
+		return fmt.Errorf("failed to get import path for tables dir: %w", err)
+	}
+
+	viewsImportPath, err := getImportPath(viewsDir)
+	if err != nil {
+		return fmt.Errorf("failed to get import path for views dir: %w", err)
+	}
+
 	for _, platform := range platforms {
-		if err := generatePlatformImportFile(tableSpecs, viewSpecs, tablesDir, viewsDir, platform); err != nil {
+		if err := generatePlatformImportFile(tableSpecs, viewSpecs, tablesDir, tablesImportPath, viewsImportPath, platform); err != nil {
 			return fmt.Errorf("failed to generate imports for %s: %w", platform, err)
 		}
 	}
-	
+
 	return nil
 }
 
 // generatePlatformImportFile generates a single platform-specific import file
-func generatePlatformImportFile(tableSpecs, viewSpecs []spec, tablesDir, viewsDir, platform string) error {
+func generatePlatformImportFile(tableSpecs, viewSpecs []spec, tablesDir, tablesImportPath, viewsImportPath, platform string) error {
 	var b strings.Builder
-	
+
 	// Header
 	b.WriteString(elasticCopyrightHeader)
 	b.WriteString(codeGeneratedNotice)
 	fmt.Fprintf(&b, "// Source: gentables - platform-specific imports for %s\n\n", platform)
-	
+
 	// Build tag
 	fmt.Fprintf(&b, "//go:build %s\n\n", platform)
-	
+
 	// Package
 	b.WriteString("package generated\n\n")
-	
+
 	// Imports section
 	b.WriteString("import (\n")
-	
-	// Add naked imports for tables that support this platform
+
+	// Collect imports
+	var implImports []string
+	var tableImports []string
+	var viewImports []string
+
+	// Add implementation packages first (to trigger their init())
+	for _, s := range tableSpecs {
+		if containsPlatform(s.Platforms, platform) && s.ImplementationPackage != "" {
+			implImports = append(implImports, s.ImplementationPackage)
+		}
+	}
+
+	// Then collect generated tables (which register the table specs)
 	for _, s := range tableSpecs {
 		if containsPlatform(s.Platforms, platform) {
-			fmt.Fprintf(&b, "\t_ \"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/%s\"\n", s.Name)
+			tableImports = append(tableImports, fmt.Sprintf("%s/%s", tablesImportPath, s.Name))
 		}
 	}
-	
-	// Add naked imports for views that support this platform
+
+	// Collect views that support this platform
 	for _, s := range viewSpecs {
 		if containsPlatform(s.Platforms, platform) {
-			fmt.Fprintf(&b, "\t_ \"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/%s\"\n", s.Name)
+			viewImports = append(viewImports, fmt.Sprintf("%s/%s", viewsImportPath, s.Name))
 		}
 	}
+
+	// Write imports in correct order: impl, tables, views
+	// Use blank lines to separate groups - gofmt will preserve groups while sorting within each
+	for _, imp := range implImports {
+		fmt.Fprintf(&b, "\t_ \"%s\"\n", imp)
+	}
+	if len(implImports) > 0 && (len(tableImports) > 0 || len(viewImports) > 0) {
+		b.WriteString("\n")
+	}
 	
+	for _, imp := range tableImports {
+		fmt.Fprintf(&b, "\t_ \"%s\"\n", imp)
+	}
+	if len(tableImports) > 0 && len(viewImports) > 0 {
+		b.WriteString("\n")
+	}
+	
+	for _, imp := range viewImports {
+		fmt.Fprintf(&b, "\t_ \"%s\"\n", imp)
+	}
+
 	b.WriteString(")\n")
-	
+
 	// Write to file
 	filename := filepath.Join(tablesDir, fmt.Sprintf("tables_%s.go", platform))
 	return writeFile(filename, b.String())
@@ -805,6 +848,54 @@ func containsPlatform(platforms []string, platform string) bool {
 		}
 	}
 	return false
+}
+
+// getImportPath returns the Go import path for a directory using go list
+func getImportPath(dir string) (string, error) {
+	// Get absolute path
+	absDir, err := filepath.Abs(dir)
+	if err != nil {
+		return "", fmt.Errorf("failed to get absolute path: %w", err)
+	}
+
+	// Ensure directory exists
+	if err := os.MkdirAll(absDir, 0755); err != nil {
+		return "", fmt.Errorf("failed to create directory %s: %w", absDir, err)
+	}
+
+	// Try to use go list on the directory
+	// We need to traverse up until we find a directory that go list can work with
+	currentDir := absDir
+	pathComponents := []string{}
+	
+	for {
+		cmd := exec.Command("go", "list", "-f", "{{.ImportPath}}", ".")
+		cmd.Dir = currentDir
+		output, err := cmd.Output()
+		
+		if err == nil {
+			// Success! Build the full import path
+			baseImportPath := strings.TrimSpace(string(output))
+			
+			// Append any subdirectories we collected
+			for i := len(pathComponents) - 1; i >= 0; i-- {
+				baseImportPath = baseImportPath + "/" + pathComponents[i]
+			}
+			
+			return baseImportPath, nil
+		}
+		
+		// Move up one directory
+		parentDir := filepath.Dir(currentDir)
+		if parentDir == currentDir {
+			// Reached filesystem root without finding a valid Go package
+			return "", fmt.Errorf("could not find Go module for directory %s", absDir)
+		}
+		
+		// Remember this directory component
+		pathComponents = append(pathComponents, filepath.Base(currentDir))
+		currentDir = parentDir
+	}
 }
 
 // validateViewColumns validates that the columns specified in the view spec

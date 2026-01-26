@@ -6,6 +6,12 @@ platforms:
   - darwin
   - windows
 
+# Optional: Specify the implementation package for automatic registration
+# When set, the generator will automatically import this package in platform-specific files
+# The implementation package should have an init() function that calls RegisterGenerateFunc()
+# Example: implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/sampleimpl
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/sampleimpl
+
 columns:
   - name: id
     type: BIGINT
