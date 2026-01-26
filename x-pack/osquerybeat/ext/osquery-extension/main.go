@@ -41,6 +41,8 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views"
 )
 
 var (
@@ -102,6 +104,10 @@ func main() {
 	// Any module that needs to execute a post hook should register the hook
 	// within this function
 	RegisterTables(server, log, hooks)
+
+	// Register tables and views generated from the specs
+	tables.RegisterTables(server, log)
+	views.RegisterViews(hooks)
 
 	// Execute all post hooks to create any views required for the specific platform build
 	go hooks.Execute(socket, log)

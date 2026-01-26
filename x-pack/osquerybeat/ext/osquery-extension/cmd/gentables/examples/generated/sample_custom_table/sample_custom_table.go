@@ -44,7 +44,17 @@ func GetGenerateFunc(log *logger.Logger) (table.GenerateFunc, error) {
 		if err != nil {
 			return nil, err
 		}
-		return encoding.MarshalToMaps(results)
+
+		// Convert results to maps
+		rows := make([]map[string]string, len(results))
+		for i, result := range results {
+			row, err := encoding.MarshalToMap(result)
+			if err != nil {
+				return nil, err
+			}
+			rows[i] = row
+		}
+		return rows, nil
 	}, nil
 }
 
@@ -64,17 +74,15 @@ type Result struct {
 // Columns returns the column definitions for the sample_custom_table table.
 // Example table showing the generator capabilities with multiple data types
 func Columns() []table.ColumnDefinition {
-	return []table.ColumnDefinition{
-		table.BigIntColumn("id"),
-		table.TextColumn("name"),
-		table.TextColumn("status"),
-		table.BigIntColumn("created_time"),
-		table.BigIntColumn("updated_time"),
-		table.DoubleColumn("value"),
-		table.IntegerColumn("enabled"),
-		table.TextColumn("category"),
-		table.IntegerColumn("priority"),
+	// Generate column definitions automatically from the Result struct using reflection.
+	// This ensures the columns always match the struct definition and prevents drift.
+	columns, err := encoding.GenerateColumnDefinitions(Result{})
+	if err != nil {
+		// This should never happen in practice since we control the struct definition,
+		// but if it does, panic to catch it during development/testing.
+		panic("failed to generate sample_custom_table columns: " + err.Error())
 	}
+	return columns
 }
 
 // TableName is the name of the sample_custom_table table.

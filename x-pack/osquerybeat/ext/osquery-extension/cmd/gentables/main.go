@@ -172,6 +172,11 @@ func run() error {
 	// Note: registry files are now static and not generated
 	// They live in pkg/tables/registry.go and pkg/views/registry.go
 
+	// Generate platform-specific import files
+	if err := generatePlatformImports(tableSpecs, viewSpecs, *outDir, *viewsOut); err != nil {
+		return fmt.Errorf("failed to generate platform imports: %w", err)
+	}
+
 	if *verbose {
 		fmt.Println("Code generation completed successfully")
 		fmt.Println("Formatting generated code...")
@@ -285,7 +290,17 @@ func generateTableCode(s spec, outDir string) error {
 	b.WriteString("\t\tif err != nil {\n")
 	b.WriteString("\t\t\treturn nil, err\n")
 	b.WriteString("\t\t}\n")
-	b.WriteString("\t\treturn encoding.MarshalToMaps(results)\n")
+	b.WriteString("\t\t\n")
+	b.WriteString("\t\t// Convert results to maps\n")
+	b.WriteString("\t\trows := make([]map[string]string, len(results))\n")
+	b.WriteString("\t\tfor i, result := range results {\n")
+	b.WriteString("\t\t\trow, err := encoding.MarshalToMap(result)\n")
+	b.WriteString("\t\t\tif err != nil {\n")
+	b.WriteString("\t\t\t\treturn nil, err\n")
+	b.WriteString("\t\t\t}\n")
+	b.WriteString("\t\t\trows[i] = row\n")
+	b.WriteString("\t\t}\n")
+	b.WriteString("\t\treturn rows, nil\n")
 	b.WriteString("\t}, nil\n")
 	b.WriteString("}\n\n")
 
@@ -305,14 +320,15 @@ func generateTableCode(s spec, outDir string) error {
 	fmt.Fprintf(&b, "// Columns returns the column definitions for the %s table.\n", s.Name)
 	fmt.Fprintf(&b, "// %s\n", s.Description)
 	b.WriteString("func Columns() []table.ColumnDefinition {\n")
-	b.WriteString("\treturn []table.ColumnDefinition{\n")
-
-	for _, col := range s.Columns {
-		goType := osqueryTypeToGoMethod(col.Type)
-		fmt.Fprintf(&b, "\t\ttable.%s(\"%s\"),\n", goType, col.Name)
-	}
-
+	b.WriteString("\t// Generate column definitions automatically from the Result struct using reflection.\n")
+	b.WriteString("\t// This ensures the columns always match the struct definition and prevents drift.\n")
+	b.WriteString("\tcolumns, err := encoding.GenerateColumnDefinitions(Result{})\n")
+	b.WriteString("\tif err != nil {\n")
+	b.WriteString("\t\t// This should never happen in practice since we control the struct definition,\n")
+	b.WriteString("\t\t// but if it does, panic to catch it during development/testing.\n")
+	fmt.Fprintf(&b, "\t\tpanic(\"failed to generate %s columns: \" + err.Error())\n", s.Name)
 	b.WriteString("\t}\n")
+	b.WriteString("\treturn columns\n")
 	b.WriteString("}\n\n")
 
 	// Generate table metadata
@@ -726,6 +742,69 @@ func formatGeneratedFiles(dirs ...string) error {
 	}
 
 	return nil
+}
+
+// generatePlatformImports generates platform-specific files with naked imports
+// for all tables and views that support each platform.
+func generatePlatformImports(tableSpecs, viewSpecs []spec, tablesDir, viewsDir string) error {
+	platforms := []string{"linux", "darwin", "windows"}
+	
+	for _, platform := range platforms {
+		if err := generatePlatformImportFile(tableSpecs, viewSpecs, tablesDir, viewsDir, platform); err != nil {
+			return fmt.Errorf("failed to generate imports for %s: %w", platform, err)
+		}
+	}
+	
+	return nil
+}
+
+// generatePlatformImportFile generates a single platform-specific import file
+func generatePlatformImportFile(tableSpecs, viewSpecs []spec, tablesDir, viewsDir, platform string) error {
+	var b strings.Builder
+	
+	// Header
+	b.WriteString(elasticCopyrightHeader)
+	b.WriteString(codeGeneratedNotice)
+	fmt.Fprintf(&b, "// Source: gentables - platform-specific imports for %s\n\n", platform)
+	
+	// Build tag
+	fmt.Fprintf(&b, "//go:build %s\n\n", platform)
+	
+	// Package
+	b.WriteString("package generated\n\n")
+	
+	// Imports section
+	b.WriteString("import (\n")
+	
+	// Add naked imports for tables that support this platform
+	for _, s := range tableSpecs {
+		if containsPlatform(s.Platforms, platform) {
+			fmt.Fprintf(&b, "\t_ \"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/%s\"\n", s.Name)
+		}
+	}
+	
+	// Add naked imports for views that support this platform
+	for _, s := range viewSpecs {
+		if containsPlatform(s.Platforms, platform) {
+			fmt.Fprintf(&b, "\t_ \"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/%s\"\n", s.Name)
+		}
+	}
+	
+	b.WriteString(")\n")
+	
+	// Write to file
+	filename := filepath.Join(tablesDir, fmt.Sprintf("tables_%s.go", platform))
+	return writeFile(filename, b.String())
+}
+
+// containsPlatform checks if a platform is in the list of platforms
+func containsPlatform(platforms []string, platform string) bool {
+	for _, p := range platforms {
+		if p == platform {
+			return true
+		}
+	}
+	return false
 }
 
 // validateViewColumns validates that the columns specified in the view spec
