@@ -281,7 +281,6 @@ func generateTableCode(s spec, outDir string) error {
 	b.WriteString("\n")
 	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding\"\n")
 	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger\"\n")
-	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables\"\n")
 	b.WriteString(")\n\n")
 
 	// Generate generate function registration
@@ -606,6 +605,7 @@ func generateViewCode(s spec, outDir string) error {
 
 	// Generate imports
 	b.WriteString("import (\n")
+	b.WriteString("\t\"fmt\"\n")
 	b.WriteString("\t\"sync\"\n")
 	if needsTimeImport {
 		b.WriteString("\t\"time\"\n")
@@ -626,6 +626,16 @@ func generateViewCode(s spec, outDir string) error {
 	b.WriteString("\tregisterOnce.Do(func() {\n")
 	b.WriteString("\t\thooksFunc = f\n")
 	b.WriteString("\t})\n")
+	b.WriteString("}\n\n")
+
+	// Add GetHooksFunc to retrieve registered hooks function
+	b.WriteString("// GetHooksFunc returns the registered hooks function for this view.\n")
+	b.WriteString("// Returns an error if no hooks function has been registered.\n")
+	b.WriteString("func GetHooksFunc() (func(*hooks.HookManager), error) {\n")
+	b.WriteString("\tif hooksFunc == nil {\n")
+	fmt.Fprintf(&b, "\t\treturn nil, fmt.Errorf(\"no hooks function registered for %s\")\n", s.Name)
+	b.WriteString("\t}\n")
+	b.WriteString("\treturn hooksFunc, nil\n")
 	b.WriteString("}\n\n")
 
 	// Generate result struct
@@ -822,51 +832,101 @@ func generateStaticTablesRegistry(tableSpecs []spec, outDir string) error {
 }
 
 // generateStaticViewsRegistry generates a static registry file with all view specs
+// generateStaticViewsRegistry generates platform-specific static registry files with view specs
 func generateStaticViewsRegistry(viewSpecs []spec, outDir string) error {
-	var b strings.Builder
-
-	// Header
-	b.WriteString(elasticCopyrightHeader)
-	b.WriteString(codeGeneratedNotice)
-	b.WriteString("// Source: gentables - static registry of all views\n\n")
-	b.WriteString("package generated\n\n")
-
-	// Imports
-	b.WriteString("import (\n")
-	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks\"\n")
-
-	// Import all view packages
+	// Group views by platform
+	platformViews := make(map[string][]spec)
+	
 	for _, s := range viewSpecs {
-		pkgName := toPackageName(s.Name)
-		fmt.Fprintf(&b, "\t%s \"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/%s\"\n", pkgName, s.Name)
-	}
-	b.WriteString(")\n\n")
-
-	// Generate RegisterViews function
-	b.WriteString("// RegisterViews registers all generated views with the hook manager.\n")
-	b.WriteString("// This function is called from main.go after all init() functions have run.\n")
-	b.WriteString("func RegisterViews(hookManager *hooks.HookManager) {\n")
-
-	for _, s := range viewSpecs {
-		pkgName := toPackageName(s.Name)
-		b.WriteString("\t{\n")
-		fmt.Fprintf(&b, "\t\t// %s\n", s.Description)
-		fmt.Fprintf(&b, "\t\thooksFunc, err := %s.GetHooksFunc()\n", pkgName)
-		b.WriteString("\t\tif err != nil {\n")
-		fmt.Fprintf(&b, "\t\t\t// View %s has no hooks function\n", s.Name)
-		b.WriteString("\t\t} else {\n")
-		fmt.Fprintf(&b, "\t\t\thook := hooksFunc()\n")
-		b.WriteString("\t\t\thookManager.Register(hook)\n")
-		b.WriteString("\t\t}\n")
-		b.WriteString("\t}\n\n")
+		for _, platform := range s.Platforms {
+			platformViews[platform] = append(platformViews[platform], s)
+		}
 	}
 
-	b.WriteString("}\n")
+	// Generate a registry file for each platform
+	for _, platform := range []string{"linux", "darwin", "windows"} {
+		views := platformViews[platform]
 
-	// Write to file
-	filename := filepath.Join(outDir, "registry.go")
-	return writeFile(filename, b.String())
+		var b strings.Builder
+
+		// Header
+		b.WriteString(elasticCopyrightHeader)
+		b.WriteString(codeGeneratedNotice)
+		fmt.Fprintf(&b, "// Source: gentables - static registry of %s views\n\n", platform)
+		fmt.Fprintf(&b, "//go:build %s\n\n", platform)
+		b.WriteString("package generated\n\n")
+
+		if len(views) == 0 {
+			// Generate empty registry for platforms with no views
+			b.WriteString("import (\n")
+			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks\"\n")
+			b.WriteString(")\n\n")
+			b.WriteString("// RegisterViews registers all generated views with the hook manager.\n")
+			b.WriteString("// This function is called from main.go after all init() functions have run.\n")
+			b.WriteString("// No views are defined for this platform.\n")
+			b.WriteString("func RegisterViews(hookManager *hooks.HookManager) {\n")
+			b.WriteString("\t// No views to register for this platform\n")
+			b.WriteString("}\n")
+		} else {
+			// Collect implementation packages for this platform
+			implPackages := make(map[string]bool)
+			for _, s := range views {
+				if s.ImplementationPackage != "" {
+					implPackages[s.ImplementationPackage] = true
+				}
+			}
+
+			// Imports
+			b.WriteString("import (\n")
+			
+			// Naked imports for implementation packages (to trigger their init() functions)
+			if len(implPackages) > 0 {
+				for pkg := range implPackages {
+					fmt.Fprintf(&b, "\t_ \"%s\"\n", pkg)
+				}
+				b.WriteString("\n")
+			}
+			
+			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks\"\n")
+
+			// Import view packages for this platform
+			for _, s := range views {
+				pkgName := toPackageName(s.Name)
+				fmt.Fprintf(&b, "\t%s \"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/%s\"\n", pkgName, s.Name)
+			}
+			b.WriteString(")\n\n")
+
+			// Generate RegisterViews function
+			b.WriteString("// RegisterViews registers all generated views with the hook manager.\n")
+			b.WriteString("// This function is called from main.go after all init() functions have run.\n")
+			b.WriteString("func RegisterViews(hookManager *hooks.HookManager) {\n")
+
+			for _, s := range views {
+				pkgName := toPackageName(s.Name)
+				b.WriteString("\t{\n")
+				fmt.Fprintf(&b, "\t\t// %s\n", s.Description)
+				fmt.Fprintf(&b, "\t\thooksFunc, err := %s.GetHooksFunc()\n", pkgName)
+				b.WriteString("\t\tif err != nil {\n")
+				fmt.Fprintf(&b, "\t\t\t// View %s has no hooks function\n", s.Name)
+				b.WriteString("\t\t} else {\n")
+				b.WriteString("\t\t\thooksFunc(hookManager)\n")
+				b.WriteString("\t\t}\n")
+				b.WriteString("\t}\n\n")
+			}
+
+			b.WriteString("}\n")
+		}
+
+		// Write to platform-specific file
+		filename := filepath.Join(outDir, fmt.Sprintf("registry_%s.go", platform))
+		if err := writeFile(filename, b.String()); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
+
 
 // getImportPath returns the Go import path for a directory using go list
 func getImportPath(dir string) (string, error) {

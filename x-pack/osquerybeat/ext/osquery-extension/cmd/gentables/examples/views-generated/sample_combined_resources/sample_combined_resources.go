@@ -8,6 +8,7 @@
 package samplecombinedresources
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
@@ -24,6 +25,15 @@ func RegisterHooksFunc(f func(*hooks.HookManager)) {
 	registerOnce.Do(func() {
 		hooksFunc = f
 	})
+}
+
+// GetHooksFunc returns the registered hooks function for this view.
+// Returns an error if no hooks function has been registered.
+func GetHooksFunc() (func(*hooks.HookManager), error) {
+	if hooksFunc == nil {
+		return nil, fmt.Errorf("no hooks function registered for sample_combined_resources")
+	}
+	return hooksFunc, nil
 }
 
 // Result represents a row from the sample_combined_resources view.
