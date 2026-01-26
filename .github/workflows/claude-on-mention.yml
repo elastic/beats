@@ -36,7 +36,7 @@ jobs:
       - uses: elastic/ai-github-actions/workflows/mention@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          claude-oauth-token: ${{ secrets.CLAUDE_OAUTH_TOKEN }}
+          claude-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           allowed-tools: "Edit,Write,Bash(mage build),Bash(mage unitTest),Bash(mage fmt),Bash(make update),Bash(mage llc)"
           additional-instructions: |
             `make mage` has already been run.
