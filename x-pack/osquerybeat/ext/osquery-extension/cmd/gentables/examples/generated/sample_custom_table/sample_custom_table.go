@@ -17,7 +17,6 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables"
 )
 
 var (
@@ -87,14 +86,3 @@ func Columns() []table.ColumnDefinition {
 
 // TableName is the name of the sample_custom_table table.
 const TableName = "sample_custom_table"
-
-func init() {
-	tables.RegisterTableSpec(tables.TableSpec{
-		Name:         "sample_custom_table",
-		Description:  "Example table showing the generator capabilities with multiple data types",
-		Platforms:    []string{"linux", "darwin", "windows"},
-		TableName:    TableName,
-		Columns:      Columns,
-		GenerateFunc: GetGenerateFunc,
-	})
-}

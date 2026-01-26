@@ -178,6 +178,15 @@ func run() error {
 		return fmt.Errorf("failed to generate platform imports: %w", err)
 	}
 
+	// Generate static registry files
+	if err := generateStaticTablesRegistry(tableSpecs, *outDir); err != nil {
+		return fmt.Errorf("failed to generate static tables registry: %w", err)
+	}
+
+	if err := generateStaticViewsRegistry(viewSpecs, *viewsOut); err != nil {
+		return fmt.Errorf("failed to generate static views registry: %w", err)
+	}
+
 	if *verbose {
 		fmt.Println("Code generation completed successfully")
 		fmt.Println("Formatting generated code...")
@@ -334,26 +343,7 @@ func generateTableCode(s spec, outDir string) error {
 
 	// Generate table metadata
 	fmt.Fprintf(&b, "// TableName is the name of the %s table.\n", s.Name)
-	fmt.Fprintf(&b, "const TableName = \"%s\"\n\n", s.Name)
-
-	// Generate init function to register table spec
-	b.WriteString("func init() {\n")
-	b.WriteString("\ttables.RegisterTableSpec(tables.TableSpec{\n")
-	fmt.Fprintf(&b, "\t\tName:         \"%s\",\n", s.Name)
-	fmt.Fprintf(&b, "\t\tDescription:  \"%s\",\n", strings.ReplaceAll(s.Description, "\"", "\\\""))
-	b.WriteString("\t\tPlatforms:    []string{")
-	for i, p := range s.Platforms {
-		if i > 0 {
-			b.WriteString(", ")
-		}
-		fmt.Fprintf(&b, "\"%s\"", p)
-	}
-	b.WriteString("},\n")
-	b.WriteString("\t\tTableName:    TableName,\n")
-	b.WriteString("\t\tColumns:      Columns,\n")
-	b.WriteString("\t\tGenerateFunc: GetGenerateFunc,\n")
-	b.WriteString("\t})\n")
-	b.WriteString("}\n")
+	fmt.Fprintf(&b, "const TableName = \"%s\"\n", s.Name)
 
 	// Create subdirectory for this table
 	tableDir := filepath.Join(outDir, s.Name)
@@ -607,7 +597,6 @@ func generateViewCode(s spec, outDir string) error {
 	}
 	b.WriteString("\n")
 	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks\"\n")
-	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views\"\n")
 	b.WriteString(")\n\n")
 
 	// Generate hooks registration
@@ -662,32 +651,6 @@ func generateViewCode(s spec, outDir string) error {
 	createViewSQL := fmt.Sprintf("CREATE VIEW %s AS\n%s", s.Name, strings.TrimSpace(s.Query))
 	b.WriteString("\t\t`" + createViewSQL + "`,\n")
 	b.WriteString("\t)\n")
-	b.WriteString("}\n\n")
-
-	// Generate init function to register view spec
-	b.WriteString("func init() {\n")
-	b.WriteString("\tviews.RegisterViewSpec(views.ViewSpec{\n")
-	fmt.Fprintf(&b, "\t\tName:         \"%s\",\n", s.Name)
-	fmt.Fprintf(&b, "\t\tDescription:  \"%s\",\n", strings.ReplaceAll(s.Description, "\"", "\\\""))
-	b.WriteString("\t\tPlatforms:    []string{")
-	for i, p := range s.Platforms {
-		if i > 0 {
-			b.WriteString(", ")
-		}
-		fmt.Fprintf(&b, "\"%s\"", p)
-	}
-	b.WriteString("},\n")
-	b.WriteString("\t\tRequiredTables: []string{")
-	for i, table := range s.RequiredTables {
-		if i > 0 {
-			b.WriteString(", ")
-		}
-		fmt.Fprintf(&b, "\"%s\"", table)
-	}
-	b.WriteString("},\n")
-	b.WriteString("\t\tView:         View,\n")
-	b.WriteString("\t\tHooksFunc:    hooksFunc,\n")
-	b.WriteString("\t})\n")
 	b.WriteString("}\n")
 
 	// Create subdirectory for this view
@@ -848,6 +811,102 @@ func containsPlatform(platforms []string, platform string) bool {
 		}
 	}
 	return false
+}
+
+// generateStaticTablesRegistry generates a static registry file with all table specs
+func generateStaticTablesRegistry(tableSpecs []spec, outDir string) error {
+	var b strings.Builder
+
+	// Header
+	b.WriteString(elasticCopyrightHeader)
+	b.WriteString(codeGeneratedNotice)
+	b.WriteString("// Source: gentables - static registry of all tables\n\n")
+	b.WriteString("package generated\n\n")
+
+	// Imports
+	b.WriteString("import (\n")
+	b.WriteString("\t\"github.com/osquery/osquery-go\"\n")
+	b.WriteString("\t\"github.com/osquery/osquery-go/plugin/table\"\n\n")
+	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger\"\n")
+
+	// Import all table packages
+	for _, s := range tableSpecs {
+		pkgName := toPackageName(s.Name)
+		fmt.Fprintf(&b, "\t%s \"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/%s\"\n", pkgName, s.Name)
+	}
+	b.WriteString(")\n\n")
+
+	// Generate RegisterTables function
+	b.WriteString("// RegisterTables registers all generated tables with the osquery extension server.\n")
+	b.WriteString("// This function is called from main.go after all init() functions have run.\n")
+	b.WriteString("func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {\n")
+
+	for _, s := range tableSpecs {
+		pkgName := toPackageName(s.Name)
+		b.WriteString("\t{\n")
+		fmt.Fprintf(&b, "\t\t// %s\n", s.Description)
+		fmt.Fprintf(&b, "\t\tgenFunc, err := %s.GetGenerateFunc(log)\n", pkgName)
+		b.WriteString("\t\tif err != nil {\n")
+		fmt.Fprintf(&b, "\t\t\tlog.Errorf(\"Failed to get generate function for %s: %%v\", err)\n", s.Name)
+		b.WriteString("\t\t} else {\n")
+		fmt.Fprintf(&b, "\t\t\tserver.RegisterPlugin(table.NewPlugin(%q, %s.Columns(), genFunc))\n", s.Name, pkgName)
+		fmt.Fprintf(&b, "\t\t\tlog.Infof(\"Registered table: %s\")\n", s.Name)
+		b.WriteString("\t\t}\n")
+		b.WriteString("\t}\n\n")
+	}
+
+	b.WriteString("}\n")
+
+	// Write to file
+	filename := filepath.Join(outDir, "registry.go")
+	return writeFile(filename, b.String())
+}
+
+// generateStaticViewsRegistry generates a static registry file with all view specs
+func generateStaticViewsRegistry(viewSpecs []spec, outDir string) error {
+	var b strings.Builder
+
+	// Header
+	b.WriteString(elasticCopyrightHeader)
+	b.WriteString(codeGeneratedNotice)
+	b.WriteString("// Source: gentables - static registry of all views\n\n")
+	b.WriteString("package generated\n\n")
+
+	// Imports
+	b.WriteString("import (\n")
+	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks\"\n")
+
+	// Import all view packages
+	for _, s := range viewSpecs {
+		pkgName := toPackageName(s.Name)
+		fmt.Fprintf(&b, "\t%s \"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/%s\"\n", pkgName, s.Name)
+	}
+	b.WriteString(")\n\n")
+
+	// Generate RegisterViews function
+	b.WriteString("// RegisterViews registers all generated views with the hook manager.\n")
+	b.WriteString("// This function is called from main.go after all init() functions have run.\n")
+	b.WriteString("func RegisterViews(hookManager *hooks.HookManager) {\n")
+
+	for _, s := range viewSpecs {
+		pkgName := toPackageName(s.Name)
+		b.WriteString("\t{\n")
+		fmt.Fprintf(&b, "\t\t// %s\n", s.Description)
+		fmt.Fprintf(&b, "\t\thooksFunc, err := %s.GetHooksFunc()\n", pkgName)
+		b.WriteString("\t\tif err != nil {\n")
+		fmt.Fprintf(&b, "\t\t\t// View %s has no hooks function\n", s.Name)
+		b.WriteString("\t\t} else {\n")
+		fmt.Fprintf(&b, "\t\t\thook := hooksFunc()\n")
+		b.WriteString("\t\t\thookManager.Register(hook)\n")
+		b.WriteString("\t\t}\n")
+		b.WriteString("\t}\n\n")
+	}
+
+	b.WriteString("}\n")
+
+	// Write to file
+	filename := filepath.Join(outDir, "registry.go")
+	return writeFile(filename, b.String())
 }
 
 // getImportPath returns the Go import path for a directory using go list

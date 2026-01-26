@@ -140,25 +140,16 @@ columns := samplecustomtable.Columns()
 name := samplecustomtable.TableName
 ```
 
-**Registry registration is automatic via init():**
-```go
-// Each generated table calls RegisterTableSpec in its init() function
-// In pkg/tables/generated/sample_custom_table/sample_custom_table.go
-func init() {
-    tables.RegisterTableSpec(tables.TableSpec{
-        Name:         "sample_custom_table",
-        TableName:    TableName,
-        Columns:      Columns,
-        GenerateFunc: GetGenerateFunc,
-    })
-}
-```
+**Registry registration is automatic via generated registry files:**
+- Tables are registered in `pkg/tables/generated/registry.go`
+- Views are registered in `pkg/views/generated/registry.go`
+- No `init()` functions or manual registration needed
 
 ## Automatic Registration
 
 ### implementation_package Field (Tables Only)
 
-For tables with custom implementations, you can specify the `implementation_package` field to enable **fully automatic registration** without any manual main file changes:
+For tables with custom implementations, specify the `implementation_package` field:
 
 ```yaml
 type: table
@@ -179,8 +170,8 @@ columns:
 
 1. **Generator creates platform import files** - Automatically adds imports to `tables_linux.go`, etc.
 2. **Implementation init() registers** - Your package's `init()` calls `RegisterGenerateFunc()`
-3. **Generated init() registers spec** - Generated package's `init()` calls `RegisterTableSpec()`
-4. **Main files stay clean** - No manual imports or registration calls needed
+3. **Static registry registers tables** - Generated `registry.go` calls all table registrations
+4. **Main.go calls registry** - Simply calls `tables.RegisterTables()` and `views.RegisterViews()`
 
 **When to omit:**
 
