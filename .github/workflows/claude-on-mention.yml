@@ -28,7 +28,7 @@ jobs:
       - name: Install Mage
         run: make mage
 
-      - uses: elastic/ai-github-actions/workflows/mention
+      - uses: elastic/ai-github-actions/workflows/mention@main
         with:
           claude-oauth-token: ${{ secrets.CLAUDE_OAUTH_TOKEN }}
           allowed-tools: "Edit,Write,Bash(mage build),Bash(mage unitTest),Bash(mage fmt),Bash(make update),Bash(mage llc)"
