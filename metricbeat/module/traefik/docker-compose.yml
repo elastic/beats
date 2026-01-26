@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   traefik:
     image: docker.elastic.co/integrations-ci/beats-traefik:${TRAEFIK_VERSION:-1.6}-1

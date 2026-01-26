@@ -54,10 +54,12 @@ func createEvent(logEvent types.FilteredLogEvent, logGroupId string, regionName 
 				"id":       *logEvent.EventId,
 				"ingested": time.Now(),
 			},
-			"aws.cloudwatch": mapstr.M{
-				"log_group":      logGroupId,
-				"log_stream":     *logEvent.LogStreamName,
-				"ingestion_time": time.UnixMilli(*logEvent.IngestionTime),
+			"aws": mapstr.M{
+				"cloudwatch": mapstr.M{
+					"log_group":      logGroupId,
+					"log_stream":     *logEvent.LogStreamName,
+					"ingestion_time": time.UnixMilli(*logEvent.IngestionTime),
+				},
 			},
 			"cloud": mapstr.M{
 				"provider": "aws",

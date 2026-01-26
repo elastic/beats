@@ -1,0 +1,35 @@
+name: Claude Issue Triage
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: read
+  issues: write
+  id-token: write
+
+jobs:
+  triage:
+    concurrency:
+      group: claude-triage-${{ github.event.issue.number }}
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'claude-plz-triage'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .go-version
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+
+      - name: Install Mage
+        run: make mage
+
+      - uses: elastic/ai-github-actions/workflows/issue-triage@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          claude-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional-instructions: |
+            `make mage` has already been run.

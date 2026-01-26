@@ -1,11 +1,24 @@
 # Module: elasticsearch
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-elasticsearch.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-elasticsearch.html
 
 - module: elasticsearch
+  #metricsets:
+  #  - ccr
+  #  - cluster_stats
+  #  - enrich
+  #  - index
+  #  - index_recovery
+  #  - index_summary
+  #  - ingest_pipeline
+  #  - ml_job
+  #  - node
+  #  - node_stats
+  #  - pending_tasks
+  #  - shard
   xpack.enabled: true
   period: 10s
   hosts: ["http://localhost:9200"]
   #username: "user"
   #password: "secret"
   #api_key: "foo:bar"
-
+  #scope: node

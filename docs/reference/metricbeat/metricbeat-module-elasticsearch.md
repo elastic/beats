@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-elasticsearch.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -25,7 +27,6 @@ The `elasticsearch` module collects metrics about {{es}}.
 ## Compatibility [_compatibility_18]
 
 The `elasticsearch` module works with {{es}} 6.7.0 and later.
-
 
 ## Usage for {{stack}} Monitoring [_usage_for_stack_monitoring_2]
 
@@ -54,6 +55,13 @@ Like other Metricbeat modules, the `elasticsearch` module accepts a `hosts` conf
 
 * If `scope` is set to `node` (default), each entry in the `hosts` list indicates a distinct node in an {{es}} cluster.
 * If `scope` is set to `cluster`, each entry in the `hosts` list indicates a single endpoint for a distinct {{es}} cluster (for example, a load-balancing proxy fronting the cluster).
+
+Also like some other modules, the `elasticsearch` module accepts either a `username`/`password` pair of settings or a single `api_key` setting. You cannot specify the `username`/`password` settings _and_ `api_key` at the same time.
+
+When used, the `api_key`  configuration can be specified as:
+
+* {applies_to}`stack: ga 9.1.4` The unencoded `id:api_key` format (`api_key: "foo:bar"`) or the Base64-encoded `id:api_key` format (`api_key: "Zm9vOmJhcgo="`).
+* All earlier releases can only use the unencoded `id:api_key` format (`api_key: "foo:bar"`).
 
 
 ## Example configuration [_example_configuration]

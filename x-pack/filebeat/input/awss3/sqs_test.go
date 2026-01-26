@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const testTimeout = 10 * time.Second
@@ -95,7 +96,7 @@ func TestSQSReceiver(t *testing.T) {
 				})
 
 		// Execute sqsReader and verify calls/state.
-		sqsReader := newSQSReaderInput(config{NumberOfWorkers: workerCount}, aws.Config{})
+		sqsReader := newSQSReaderInput(config{NumberOfWorkers: workerCount}, aws.Config{}, paths.New())
 		sqsReader.log = logger
 		sqsReader.sqs = mockSQS
 		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger())
@@ -144,7 +145,7 @@ func TestSQSReceiver(t *testing.T) {
 			}).AnyTimes()
 
 		// Execute SQSReader and verify calls/state.
-		sqsReader := newSQSReaderInput(config{NumberOfWorkers: workerCount}, aws.Config{})
+		sqsReader := newSQSReaderInput(config{NumberOfWorkers: workerCount}, aws.Config{}, paths.New())
 		sqsReader.log = logp.NewLogger(inputName)
 		sqsReader.sqs = mockSQS
 		sqsReader.msgHandler = mockMsgHandler

@@ -25,6 +25,8 @@ import (
 	c "github.com/elastic/elastic-agent-libs/config"
 )
 
+const DefaultEvents = 3200
+
 type config struct {
 	Events int `config:"events" validate:"min=32"`
 	// This field is named MaxGetRequest because its logical effect is to give
@@ -36,7 +38,7 @@ type config struct {
 }
 
 var defaultConfig = config{
-	Events:        3200,
+	Events:        DefaultEvents,
 	MaxGetRequest: 1600,
 	FlushTimeout:  10 * time.Second,
 }

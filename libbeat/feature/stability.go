@@ -28,4 +28,5 @@ const (
 	Stable
 	Beta
 	Experimental
+	Preview
 )

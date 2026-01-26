@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
@@ -151,17 +150,17 @@ func makeClusterToPipelinesMap(pipelines []logstash.PipelineState, overrideClust
 	}
 
 	for _, pipeline := range pipelines {
-		clusterUUIDs := common.StringSet{}
+		clusterUUIDs := make(map[string]struct{})
 		for _, vertex := range pipeline.Graph.Graph.Vertices {
 			clusterUUID := logstash.GetVertexClusterUUID(vertex, overrideClusterUUID)
 			if clusterUUID != "" {
-				clusterUUIDs.Add(clusterUUID)
+				clusterUUIDs[clusterUUID] = struct{}{}
 			}
 		}
 
 		// If no cluster UUID was found in this pipeline, assign it a blank one
 		if len(clusterUUIDs) == 0 {
-			clusterUUIDs.Add("")
+			clusterUUIDs[""] = struct{}{}
 		}
 
 		for clusterUUID := range clusterUUIDs {

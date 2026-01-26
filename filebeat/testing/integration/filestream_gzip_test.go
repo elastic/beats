@@ -90,7 +90,7 @@ filebeat.inputs:
     id: "test-filestream"
     paths:
       - %s
-    gzip_experimental: true
+    compression: auto
 output.file:
   enabled: true
   path: %s
@@ -126,8 +126,7 @@ output.file:
 			})
 		}
 	})
-
-	t.Run("TechPreviewWarning", func(t *testing.T) {
+	t.Run("GzipExperimentalDeprecationWarning", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
@@ -162,8 +161,50 @@ output.console:
 			WithReportOptions(reportOptions).
 			ExpectStart().
 			ExpectOutput(
-				"EXPERIMENTAL: filestream: experimental gzip support enabled").
-			Start(ctx).Wait()
+				"'gzip_experimental' is deprecated and ignored, set 'compression' instead").
+			Start(ctx).
+			Wait()
+	})
+
+	t.Run("GzipExperimentalDeprecationWarningWithCompressionSet", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		td := t.TempDir()
+		logPath := filepath.Join(td, "input.log.gz")
+
+		var gzBuff bytes.Buffer
+		gw := gzip.NewWriter(&gzBuff)
+		_, err := gw.Write([]byte("hello world"))
+		require.NoError(t, err)
+		require.NoError(t, gw.Close())
+
+		err = os.WriteFile(logPath, gzBuff.Bytes(), 0644)
+		require.NoError(t, err)
+
+		config := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+      - %s
+    compression: auto
+    gzip_experimental: true
+output.console:
+  enabled: true
+`, logPath)
+
+		test := NewTest(t, TestOptions{
+			Config: config,
+		})
+
+		test.
+			WithReportOptions(reportOptions).
+			ExpectStart().
+			ExpectOutput(
+				"'gzip_experimental' is deprecated and ignored. 'compression' is set, using it instead").
+			Start(ctx).
+			Wait()
 	})
 }
 

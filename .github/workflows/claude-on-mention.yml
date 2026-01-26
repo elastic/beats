@@ -1,0 +1,44 @@
+name: Claude Assistant
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  claude:
+    concurrency:
+      group: claude-mention-${{ github.event_name }}-${{ github.event.issue.number || github.event.pull_request.number || github.event.comment.issue_id || github.event.comment.pull_request_id }}-${{ github.event.comment.id || github.event.issue.id }}
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'issues' && contains(github.event.issue.body, '@claude'))
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .go-version
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+
+      - name: Install Mage
+        run: make mage
+
+      - uses: elastic/ai-github-actions/workflows/mention@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          claude-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          allowed-tools: "Edit,Write,Bash(mage build),Bash(mage unitTest),Bash(mage fmt),Bash(make update),Bash(mage llc)"
+          additional-instructions: |
+            `make mage` has already been run.

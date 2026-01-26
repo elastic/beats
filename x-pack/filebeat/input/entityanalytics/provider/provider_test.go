@@ -11,14 +11,15 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestRegistry(t *testing.T) {
-	err := Register("test", func(logger *logp.Logger) (Provider, error) {
+	err := Register("test", func(logger *logp.Logger, _ *paths.Path) (Provider, error) {
 		return nil, errors.New("test error")
 	})
 	require.NoError(t, err)
-	err = Register("test", func(logger *logp.Logger) (Provider, error) {
+	err = Register("test", func(logger *logp.Logger, _ *paths.Path) (Provider, error) {
 		return nil, errors.New("test error")
 	})
 	require.ErrorIs(t, err, ErrExists)
@@ -33,6 +34,6 @@ func TestRegistry(t *testing.T) {
 	factoryFn, err := Get("test")
 	require.NoError(t, err)
 
-	_, err = factoryFn(logp.L())
+	_, err = factoryFn(logp.NewNopLogger(), paths.New())
 	require.ErrorContains(t, err, "test error")
 }

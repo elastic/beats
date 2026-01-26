@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/metricset-details.html
+applies_to:
+  stack: ga
 ---
 
 # Metricset Details [metricset-details]

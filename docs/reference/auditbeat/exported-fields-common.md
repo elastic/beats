@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/exported-fields-common.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -69,6 +71,12 @@ The SELinux identity of the file.
     type: keyword
 
     example: s0
+
+
+**`file.extended_attributes`** {applies_to}`stack: preview 9.2.0`
+:   Extended file attributes. Contains NTFS Extended Attributes (EAs) on Windows systems. Extended Attributes are name-value pairs that can be attached to files and directories to store additional metadata beyond standard file attributes. The object contains key-value pairs where keys are EA names and values are their corresponding values. This field is only populated on Windows and only when the file has extended attributes.
+
+    type: flattened
 
 
 ## user [_user]

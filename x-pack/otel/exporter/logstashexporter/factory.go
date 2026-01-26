@@ -8,43 +8,22 @@ import (
 	"context"
 
 	"go.opentelemetry.io/collector/component"
-	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/exporter"
-	"go.opentelemetry.io/collector/exporter/exporterhelper"
-	"go.opentelemetry.io/collector/pdata/plog"
 )
 
 var (
-	Name              = "logstash"
+	Type              = component.MustNewType("logstash")
 	LogStabilityLevel = component.StabilityLevelDevelopment
 )
 
 func NewFactory() exporter.Factory {
 	return exporter.NewFactory(
-		component.MustNewType(Name),
+		Type,
 		createDefaultConfig,
-		exporter.WithLogs(createLogsExporter, LogStabilityLevel),
+		exporter.WithLogs(createLogExporter, LogStabilityLevel),
 	)
 }
 
-func createDefaultConfig() component.Config {
-	return &Config{}
-}
-
-func createLogsExporter(
-	ctx context.Context,
-	settings exporter.Settings,
-	config component.Config,
-) (exporter.Logs, error) {
-	return exporterhelper.NewLogs(
-		ctx,
-		settings,
-		config,
-		pushLogData,
-		exporterhelper.WithCapabilities(consumer.Capabilities{MutatesData: false}),
-	)
-}
-
-func pushLogData(context.Context, plog.Logs) error {
-	return nil
+func createLogExporter(_ context.Context, settings exporter.Settings, cfg component.Config) (exporter.Logs, error) {
+	return newLogstashExporter(settings, cfg)
 }

@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -58,7 +59,7 @@ type adInput struct {
 }
 
 // New creates a new instance of an Active Directory identity provider.
-func New(logger *logp.Logger) (provider.Provider, error) {
+func New(logger *logp.Logger, path *paths.Path) (provider.Provider, error) {
 	p := adInput{
 		cfg: defaultConfig(),
 	}
@@ -66,6 +67,7 @@ func New(logger *logp.Logger) (provider.Provider, error) {
 		Logger:    logger,
 		Type:      FullName,
 		Configure: p.configure,
+		Path:      path,
 	}
 
 	return &p, nil
@@ -116,11 +118,8 @@ func (*adInput) Test(v2.TestContext) error { return nil }
 
 // Run will start data collection on this provider.
 func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
-	stat := inputCtx.StatusReporter
-	if stat == nil {
-		stat = noopReporter{}
-	}
-	stat.UpdateStatus(status.Starting, "")
+	inputCtx.UpdateStatus(status.Starting, "")
+
 	p.logger = inputCtx.Logger.With("provider", Name, "domain", p.cfg.URL)
 	p.metrics = newMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
 
@@ -135,7 +134,7 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 	p.cfg.UserAttrs = withMandatory(p.cfg.UserAttrs, "distinguishedName", "whenChanged")
 	p.cfg.GrpAttrs = withMandatory(p.cfg.GrpAttrs, "distinguishedName", "whenChanged")
 
-	stat.UpdateStatus(status.Running, "")
+	inputCtx.UpdateStatus(status.Running, "")
 	var (
 		last time.Time
 		err  error
@@ -145,20 +144,20 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 		case <-inputCtx.Cancelation.Done():
 			if !errors.Is(inputCtx.Cancelation.Err(), context.Canceled) {
 				err := inputCtx.Cancelation.Err()
-				stat.UpdateStatus(status.Stopping, err.Error())
+				inputCtx.UpdateStatus(status.Stopping, err.Error())
 				return err
 			}
-			stat.UpdateStatus(status.Stopping, "Deadline passed")
+			inputCtx.UpdateStatus(status.Stopping, "Deadline passed")
 			return nil
 		case start := <-syncTimer.C:
 			last, err = p.runFullSync(inputCtx, store, client)
 			if err != nil {
 				msg := "Error running full sync"
 				p.logger.Errorw(msg, "error", err)
-				stat.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.syncError.Inc()
 			} else {
-				stat.UpdateStatus(status.Running, "Successful full sync")
+				inputCtx.UpdateStatus(status.Running, "Successful full sync")
 			}
 			p.metrics.syncTotal.Inc()
 			p.metrics.syncProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -179,10 +178,10 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 			if err != nil {
 				msg := "Error running incremental update"
 				p.logger.Errorw(msg, "error", err)
-				stat.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.updateError.Inc()
 			} else {
-				stat.UpdateStatus(status.Running, "Successful incremental update")
+				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
 			}
 			p.metrics.updateTotal.Inc()
 			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -191,10 +190,6 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 		}
 	}
 }
-
-type noopReporter struct{}
-
-func (noopReporter) UpdateStatus(status.Status, string) {}
 
 // withMandatory adds the required attribute names to attr unless attr is empty.
 func withMandatory(attr []string, include ...string) []string {

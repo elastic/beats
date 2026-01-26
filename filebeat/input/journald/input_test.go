@@ -15,11 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build linux
 
 package journald
 
 import (
+	"bytes"
 	"compress/gzip"
 	"context"
 	_ "embed"
@@ -31,6 +34,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
@@ -38,6 +42,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -364,14 +369,263 @@ func TestInputCanReportStatus(t *testing.T) {
 	})
 }
 
+var expectedBinaryMessges = [][]byte{
+	{
+		0, 2, 4, 8, 10, 12, 14, 16, 18,
+	},
+	{
+		0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100,
+	},
+	{
+		0xED, 0xA0, 0xBC, 0xED, 0xBF, 0xA0, 0xED, 0xA0, 0xBD, 0xED, 0xB1, 0x81,
+		0xEF, 0xB8, 0x8F, 0xED, 0xA0, 0xBE, 0xED, 0xBA, 0xB5, 0xED, 0xA0, 0xBE,
+		0xED, 0xBA, 0xB5, 0xED, 0xA0, 0xBD, 0xED, 0xBF, 0xA0, 0xE2, 0xA0, 0x80,
+		0xED, 0xA0, 0xBC, 0xED, 0xBC, 0x8A, 0xED, 0xA0, 0xBD, 0xED, 0xBF, 0xA0,
+		0xED, 0xA0, 0xBC, 0xED, 0xBE, 0x80, 0xED, 0xA0, 0xBE, 0xED, 0xBA, 0xB5,
+		0xED, 0xA0, 0xBD, 0xED, 0xB2, 0xA7, 0xE2, 0x9D, 0x97,
+	},
+	[]byte(`FOO\nBAR\nFOO`),
+	{
+		240, 159, 143, 160, 240, 159, 145, 129, 239, 184, 143, 240, 159, 170,
+		181, 240, 159, 170, 181, 240, 159, 159, 160, 226, 160, 128, 240, 159,
+		140, 138, 240, 159, 159, 160, 240, 159, 142, 128, 240, 159, 170, 181,
+		240, 159, 146, 167, 226, 157, 151,
+	},
+	{
+		27, 91, 63, 50, 48, 48, 52, 104, 114, 111, 111, 116, 64, 55, 97, 97,
+		56, 48, 97, 98, 54, 101, 97, 99, 52, 58, 47, 35, 32, 101, 99, 104, 111,
+		32, 102, 111, 111, 32, 98, 97, 114, 13,
+	},
+	{
+		27, 91, 63, 50, 48, 48, 52, 108, 13, 102, 111, 111, 32, 98, 97, 114, 13,
+	},
+	{
+		27, 91, 63, 50, 48, 48, 52, 104, 114, 111, 111, 116, 64, 55, 97, 97, 56,
+		48, 97, 98, 54, 101, 97, 99, 52, 58, 47, 35, 32, 101, 120, 105, 116, 13,
+	},
+	{
+		27, 91, 63, 50, 48, 48, 52, 108, 13, 101, 120, 105, 116, 13,
+	},
+}
+
+func TestBinaryDataIsCorrectlyHandled(t *testing.T) {
+	out := decompress(t, filepath.Join("testdata", "binary.journal.gz"))
+
+	env := newInputTestingEnvironment(t)
+	cfg := mapstr.M{
+		"paths": []string{out},
+	}
+	inp := env.mustCreateInput(cfg)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	t.Cleanup(cancelInput)
+
+	env.startInput(ctx, inp)
+	env.waitUntilEventCount(len(expectedBinaryMessges))
+	events := env.pipeline.GetAllEvents()
+	for i, evt := range events {
+		msg := []byte(evt.Fields["message"].(string)) //nolint:errcheck // we know it's a string.
+		if !bytes.Equal(expectedBinaryMessges[i], msg) {
+			t.Errorf("expecting entry %d to be:\n%#v\ngot:\n%#v", i, expectedBinaryMessges[i], msg)
+		}
+	}
+}
+
+// TestPathIsFolder ensures the Journald input works when a folder is passed
+// in paths. The desired behaviour is that the input will ingest all entries
+// from existing files and new files that might appear in the future.
+//
+// This is implemented by using `--directory` when a directory is in the paths
+// setting. Because the way journalctl works, by default, it only reads entries
+// from a single journal, so if manually testing or modifying the files used by
+// this test, ensure all journal files belong to the same journal and new files
+// have entries that are ahead in time from old files.
+func TestPathIsFolder(t *testing.T) {
+	srcDir := decompressAll(t, filepath.Join("testdata", "journal*.journal.gz"))
+	dstDir := t.TempDir()
+
+	srcFiles := []string{}
+	dstFiles := []string{}
+	for i := range 3 {
+		fName := fmt.Sprintf("journal%d.journal", i+1)
+		srcFiles = append(srcFiles, filepath.Join(srcDir, fName))
+		dstFiles = append(dstFiles, filepath.Join(dstDir, fName))
+	}
+
+	env := newInputTestingEnvironment(t)
+	cfg := mapstr.M{
+		"paths": []string{dstDir},
+	}
+	inp := env.mustCreateInput(cfg)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	t.Cleanup(cancelInput)
+
+	env.startInput(ctx, inp)
+
+	for i := range 3 {
+		if err := os.Rename(srcFiles[i], dstFiles[i]); err != nil {
+			t.Fatalf("cannot move file: %s", err)
+		}
+
+		env.waitUntilEventCount(10 + i*10)
+	}
+}
+
+func TestDoubleStarCanBeUsed(t *testing.T) {
+	srcDir := decompressAll(t, filepath.Join("testdata", "journal*.journal.gz"))
+	dstDir := t.TempDir()
+
+	srcFiles := []string{}
+	dstFiles := []string{}
+	for i := range 3 {
+		fName := fmt.Sprintf("journal%d.journal", i+1)
+		srcFiles = append(srcFiles, filepath.Join(srcDir, fName))
+		dstFiles = append(dstFiles, filepath.Join(t.TempDir(), fName))
+	}
+
+	// We want to test a glob in the format:
+	// /tmp/TestFoo/*/*
+	// To match files like
+	//   - /tmp/TestFoo/001/journal1.journal
+	//   - /tmp/TestFoo/001/journal2.journal
+	// So we construct the glob from dstDir
+
+	split := strings.Split(dstDir, "/")
+	split = split[:len(split)-1]
+	split = append(split, "*", "*")
+	path := filepath.Join(split...)
+	path = string(filepath.Separator) + path // Add the leading separator
+
+	env := newInputTestingEnvironment(t)
+	cfg := mapstr.M{
+		"paths": []string{path},
+	}
+
+	inp := env.mustCreateInput(cfg)
+	ctx, cancelInput := context.WithCancel(context.Background())
+	t.Cleanup(cancelInput)
+
+	for i := range len(srcFiles) {
+		if err := os.Rename(srcFiles[i], dstFiles[i]); err != nil {
+			t.Fatalf("cannot move file: %s", err)
+		}
+	}
+
+	env.startInput(ctx, inp)
+	env.waitUntilEventCount(len(srcFiles) * 10)
+}
+
+func TestConfigureJournalctlPath(t *testing.T) {
+	t.Run("default path without chroot", func(t *testing.T) {
+		cfg := conf.MustNewConfigFrom(mapstr.M{})
+		_, inp, err := Configure(cfg, logp.NewNopLogger())
+		require.NoError(t, err, "Configure should succeed without chroot")
+		jd, ok := inp.(*journald)
+		require.True(t, ok, "input should be of type *journald")
+		assert.Equal(t, defaultJournalCtlPath, jd.JournalctlPath, "should use default journalctl path when chroot is not set")
+	})
+
+	t.Run("chroot with default path auto-switches to chroot default", func(t *testing.T) {
+		chrootDir := t.TempDir()
+		cfg := conf.MustNewConfigFrom(mapstr.M{
+			"chroot": chrootDir,
+		})
+		_, _, err := Configure(cfg, logp.NewNopLogger())
+		require.Error(t, err, "Configure should fail when journalctl binary doesn't exist in chroot")
+		assert.Contains(t, err.Error(), "cannot stat journalctl binary in chroot", "error should indicate journalctl binary is missing")
+	})
+
+	t.Run("chroot with relative path returns error", func(t *testing.T) {
+		chrootDir := t.TempDir()
+		cfg := conf.MustNewConfigFrom(mapstr.M{
+			"chroot":          chrootDir,
+			"journalctl_path": "relative/path/journalctl",
+		})
+		_, _, err := Configure(cfg, logp.NewNopLogger())
+		require.Error(t, err, "Configure should fail with relative path when chroot is set")
+		assert.Contains(t, err.Error(), "journalctl_path must be an absolute path when chroot is set", "error should indicate path must be absolute")
+	})
+
+	t.Run("chroot with absolute path", func(t *testing.T) {
+		chrootDir := t.TempDir()
+		journalctlPath := "/usr/bin/journalctl"
+		cfg := conf.MustNewConfigFrom(mapstr.M{
+			"chroot":          chrootDir,
+			"journalctl_path": journalctlPath,
+		})
+		_, inp, err := Configure(cfg, logp.NewNopLogger())
+		require.Error(t, err, "Configure should fail when journalctl binary doesn't exist in chroot")
+		assert.Contains(t, err.Error(), "cannot stat journalctl binary in chroot", "error should indicate journalctl binary is missing")
+		jd, ok := inp.(*journald)
+		if ok {
+			assert.Equal(t, journalctlPath, jd.JournalctlPath, "journalctl path should be set correctly even when binary doesn't exist")
+		}
+	})
+
+	t.Run("chroot auto-switches default to chroot default", func(t *testing.T) {
+		chrootDir := t.TempDir()
+		cfg := conf.MustNewConfigFrom(mapstr.M{
+			"chroot": chrootDir,
+		})
+		_, inp, err := Configure(cfg, logp.NewNopLogger())
+		require.Error(t, err, "Configure should fail when journalctl binary doesn't exist in chroot")
+		assert.Contains(t, err.Error(), "cannot stat journalctl binary in chroot", "error should indicate journalctl binary is missing")
+		jd, ok := inp.(*journald)
+		if ok {
+			assert.Equal(t, defaultJournalCtlPathChroot, jd.JournalctlPath, "should auto-switch to chroot default")
+		}
+	})
+
+	t.Run("chroot with non-existent directory returns error", func(t *testing.T) {
+		cfg := conf.MustNewConfigFrom(mapstr.M{
+			"chroot":          "/nonexistent/directory",
+			"journalctl_path": "/usr/bin/journalctl",
+		})
+		_, _, err := Configure(cfg, logp.NewNopLogger())
+		require.Error(t, err, "Configure should fail when chroot directory doesn't exist")
+		assert.Contains(t, err.Error(), "cannot stat chroot", "error should indicate chroot directory is missing")
+	})
+
+	t.Run("chroot with file instead of directory returns error", func(t *testing.T) {
+		tmpFile := filepath.Join(t.TempDir(), "notadir")
+		require.NoError(t, os.WriteFile(tmpFile, []byte("test"), 0o644), "should create temp file")
+		cfg := conf.MustNewConfigFrom(mapstr.M{
+			"chroot":          tmpFile,
+			"journalctl_path": "/usr/bin/journalctl",
+		})
+		_, _, err := Configure(cfg, logp.NewNopLogger())
+		require.Error(t, err, "Configure should fail when chroot path is a file")
+		assert.Contains(t, err.Error(), "is not a directory", "error should indicate chroot path is not a directory")
+	})
+}
+
 func decompress(t *testing.T, namegz string) string {
+	return decompressGz(t, t.TempDir(), namegz)
+}
+
+func decompressAll(t *testing.T, globGz string) string {
+	dir := t.TempDir()
+	files, err := filepath.Glob(globGz)
+	if err != nil {
+		t.Fatalf("could not resolve glob: %s", err)
+	}
+
+	for _, f := range files {
+		decompressGz(t, dir, f)
+	}
+
+	return dir
+}
+
+func decompressGz(t *testing.T, dir, namegz string) string {
 	t.Helper()
 
 	ingz, err := os.Open(namegz)
 	require.NoError(t, err)
 	defer ingz.Close()
 
-	out := filepath.Join(t.TempDir(), strings.TrimSuffix(filepath.Base(namegz), ".gz"))
+	out := filepath.Join(dir, strings.TrimSuffix(filepath.Base(namegz), ".gz"))
 
 	dst, err := os.Create(out)
 	require.NoError(t, err)

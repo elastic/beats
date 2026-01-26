@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/python-beats.html
+applies_to:
+  stack: ga
 ---
 
 # Python in Beats [python-beats]

@@ -20,6 +20,8 @@
 package kprobes
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/auditbeat/tracing"
 
 	tkbtf "github.com/elastic/tk-btf"
@@ -61,34 +63,34 @@ type probeManager struct {
 	getSymbolInfoRuntime func(symbolName string) (runtimeSymbolInfo, error)
 }
 
-func newProbeManager(e executor) (*probeManager, error) {
-	fs := &probeManager{
+func newProbeManager(exec executor) (*probeManager, error) {
+	probeMgr := &probeManager{
 		symbols:              nil,
 		buildChecks:          nil,
 		getSymbolInfoRuntime: getSymbolInfoRuntime,
 	}
 
-	if err := loadFsNotifySymbol(fs); err != nil {
-		return nil, err
+	if err := loadFsNotifySymbol(probeMgr); err != nil {
+		return nil, fmt.Errorf("error loading fsnotify symbol: %w", err)
 	}
 
-	if err := loadFsNotifyParentSymbol(fs); err != nil {
-		return nil, err
+	if err := loadFsNotifyParentSymbol(probeMgr); err != nil {
+		return nil, fmt.Errorf("error loading fsnotify parent symbol: %w", err)
 	}
 
-	if err := loadFsNotifyNameRemoveSymbol(fs); err != nil {
-		return nil, err
+	if err := loadFsNotifyNameRemoveSymbol(probeMgr); err != nil {
+		return nil, fmt.Errorf("error loading fsnotify_nameremove symbol: %w", err)
 	}
 
-	if err := loadVFSGetAttrSymbol(fs, e); err != nil {
-		return nil, err
+	if err := loadVFSGetAttrSymbol(probeMgr, exec); err != nil {
+		return nil, fmt.Errorf("error loading vfs_getattr_nosec symbol: %w", err)
 	}
 
-	return fs, nil
+	return probeMgr, nil
 }
 
-func (fs *probeManager) shouldBuild(spec *tkbtf.Spec) bool {
-	for _, check := range fs.buildChecks {
+func (probeMgr *probeManager) shouldBuild(spec *tkbtf.Spec) bool {
+	for _, check := range probeMgr.buildChecks {
 		if !check(spec) {
 			return false
 		}
@@ -97,13 +99,13 @@ func (fs *probeManager) shouldBuild(spec *tkbtf.Spec) bool {
 	return true
 }
 
-func (fs *probeManager) build(spec *tkbtf.Spec) (map[tracing.Probe]tracing.AllocateFn, error) {
+func (probeMgr *probeManager) build(spec *tkbtf.Spec) (map[tracing.Probe]tracing.AllocateFn, error) {
 	trProbesMap := make(map[tracing.Probe]tracing.AllocateFn)
 
-	for _, s := range fs.symbols {
-		probesWithAlloc, err := s.buildProbes(spec)
+	for _, sym := range probeMgr.symbols {
+		probesWithAlloc, err := sym.buildProbes(spec)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error building probe: %w", err)
 		}
 
 		for _, p := range probesWithAlloc {
@@ -127,9 +129,9 @@ func (fs *probeManager) build(spec *tkbtf.Spec) (map[tracing.Probe]tracing.Alloc
 	return trProbesMap, nil
 }
 
-func (fs *probeManager) onErr(err error) bool {
+func (probeMgr *probeManager) onErr(err error) bool {
 	repeat := false
-	for _, s := range fs.symbols {
+	for _, s := range probeMgr.symbols {
 		if s.onErr(err) {
 			repeat = true
 		}

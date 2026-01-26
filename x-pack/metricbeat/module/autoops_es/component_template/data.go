@@ -67,6 +67,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 	if err != nil {
 		err = fmt.Errorf("failed applying component template schema %w", err)
 		events.LogAndSendErrorEventWithRandomTransactionId(err, info, r, ComponentTemplateMetricSet, ComponentTemplatePath)
+		return nil
 	}
 
 	return nil

@@ -71,12 +71,12 @@ func TestNewMetadata(t *testing.T) {
 		} else if meta.Owner == `BUILTIN\Administrators` {
 			// Well-known SID for BUILTIN_ADMINISTRATORS.
 			assert.Equal(t, "S-1-5-32-544", meta.SID)
+			assert.Equal(t, `BUILTIN\Administrators`, meta.Group)
 		} else {
 			t.Error("unexpected owner", meta.Owner)
 		}
 		assert.Zero(t, meta.UID)
 		assert.Zero(t, meta.GID)
-		assert.Empty(t, meta.Group)
 	} else {
 		group, err := user.LookupGroupId(u.Gid)
 		if err != nil {

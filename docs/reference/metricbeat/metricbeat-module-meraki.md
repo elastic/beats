@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-meraki.html
+applies_to:
+  stack: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -27,6 +29,7 @@ metricbeat.modules:
   period: 300s
   apiKey: "Meraki dashboard API key"
   organizations: ["Meraki organization ID"]
+  switchport_statuses: ["connected"]
 ```
 
 

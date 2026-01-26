@@ -22,6 +22,7 @@ package kubernetes
 import (
 	"context"
 	"fmt"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -109,13 +110,13 @@ func TestNewLeaderElectionManager(t *testing.T) {
 	require.NoError(t, err)
 
 	waitForNewLeader := make(chan string)
-	var loosingLeader = ""
+	var loosingLeader atomic.Pointer[string]
 
 	startLeadingFunc := func(uuid string, eventID string) {
 		waitForNewLeader <- eventID
 	}
 	stopLeadingFunc := func(uuid string, eventID string) {
-		loosingLeader = eventID
+		loosingLeader.Store(&eventID)
 	}
 	logger := logptest.NewTestingLogger(t, "kubernetes-test")
 
@@ -170,7 +171,7 @@ func TestNewLeaderElectionManager(t *testing.T) {
 			t.Fatalf("The new leader produced the same event id as the previous one.")
 		}
 
-		_, exists = expectedLoosingEventIds[loosingLeader]
+		_, exists = expectedLoosingEventIds[*loosingLeader.Load()]
 		if !exists {
 			t.Fatalf("The loosing leader used an unexpected event id %s.", eventId)
 		}

@@ -20,6 +20,7 @@
 package kprobes
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
@@ -36,7 +37,7 @@ type perfChannel interface {
 func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponent int, bufferSize int, pid int) (*tracing.PerfChannel, error) {
 	tfs, err := tracing.NewTraceFS()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating traceFS handler: %w", err)
 	}
 
 	pChannel, err := tracing.NewPerfChannel(
@@ -48,28 +49,30 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 		tracing.WithWakeUpEvents(500),
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating perf channel: %w", err)
 	}
 
 	for probe, allocFn := range probes {
+		// NOTE: we do not check the error here as we'll get an error if the probe does not exist;
+		// we just do this if there's an old probe hanging around.
 		_ = tfs.RemoveKProbe(probe)
 
 		err := tfs.AddKProbe(probe)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error adding %s probe: %w", probe.Name, err)
 		}
 		desc, err := tfs.LoadProbeFormat(probe)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error loading %s probe format data: %w", probe.Name, err)
 		}
 
 		decoder, err := tracing.NewStructDecoder(desc, allocFn)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error creating decoder for %s: %w", probe.Name, err)
 		}
 
 		if err := pChannel.MonitorProbe(desc, decoder); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error monitoring %s probe: %w", probe.Name, err)
 		}
 	}
 

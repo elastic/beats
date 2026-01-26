@@ -29,8 +29,8 @@ import (
 )
 
 // LoadKeystore returns the appropriate keystore based on the configuration.
-func LoadKeystore(cfg *config.C, name string) (keystore.Keystore, error) {
+func LoadKeystore(cfg *config.C, name string, beatPaths *paths.Path) (keystore.Keystore, error) {
 	keystoreCfg, _ := cfg.Child("keystore", -1)
-	defaultPathConfig := paths.Resolve(paths.Data, fmt.Sprintf("%s.keystore", name))
+	defaultPathConfig := beatPaths.Resolve(paths.Data, fmt.Sprintf("%s.keystore", name))
 	return keystore.Factory(keystoreCfg, defaultPathConfig, common.IsStrictPerms())
 }

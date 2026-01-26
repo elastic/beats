@@ -110,6 +110,9 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
+	// log warning about any unsupported params
+	config.checkUnsupportedParams(logger)
+
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		return nil, errWrap(err)

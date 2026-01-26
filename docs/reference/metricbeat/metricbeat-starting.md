@@ -68,9 +68,11 @@ sudo ./metricbeat -e
 PS C:\Program Files\metricbeat> Start-Service metricbeat
 ```
 
-The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Metricbeat-Data\logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\metricbeat\logs`
+By default Windows log files are stored in `C:\Program Files\Metricbeat-Data\logs`.
+
+:::{note}
+In versions before 9.0.6, the default location for Windows log files was `C:\ProgramData\metricbeat\logs`.
+:::
 
 ::::{note}
 On Windows, statistics about system load and swap usage are currently not captured

@@ -22,6 +22,8 @@ package journald
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -57,7 +59,9 @@ type journald struct {
 	Facilities         []int
 	SaveRemoteHostname bool
 	Parsers            parser.Config
-	Journalctl         bool
+	Merge              bool
+	Chroot             string
+	JournalctlPath     string
 }
 
 type checkpoint struct {
@@ -111,6 +115,32 @@ func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, erro
 		sources[i] = pathSource(p)
 	}
 
+	if config.Chroot != "" {
+		// When using chroot we need absolute paths for the journalctl binary
+		// (see https://github.com/golang/go/issues/39341). However for a
+		// normal operation we look for 'journalctl' in the PATH.
+		// So if chroot is set, change the default value.
+		if config.JournalctlPath == defaultJournalCtlPath {
+			config.JournalctlPath = defaultJournalCtlPathChroot
+		}
+		chrootStat, err := os.Stat(config.Chroot)
+		if err != nil {
+			return nil, nil, fmt.Errorf("cannot stat chroot:  %w", err)
+		}
+		if !chrootStat.IsDir() {
+			return nil, nil, fmt.Errorf("provided chroot (%s) is not a directory", config.Chroot)
+		}
+
+		if !filepath.IsAbs(config.JournalctlPath) {
+			return nil, nil, errors.New("journalctl_path must be an absolute path when chroot is set")
+		}
+
+		fullPath := filepath.Join(config.Chroot, config.JournalctlPath)
+		if _, err := os.Stat(fullPath); err != nil {
+			return nil, nil, fmt.Errorf("cannot stat journalctl binary in chroot: %w", err)
+		}
+	}
+
 	return sources, &journald{
 		ID:                 config.ID,
 		Since:              config.Since,
@@ -122,6 +152,9 @@ func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, erro
 		Facilities:         config.Facilities,
 		SaveRemoteHostname: config.SaveRemoteHostname,
 		Parsers:            config.Parsers,
+		Merge:              config.Merge,
+		Chroot:             config.Chroot,
+		JournalctlPath:     config.JournalctlPath,
 	}, nil
 }
 
@@ -140,7 +173,8 @@ func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 		"",
 		inp.Since,
 		src.Name(),
-		journalctl.Factory,
+		inp.Merge,
+		journalctl.NewFactory(inp.Chroot, inp.JournalctlPath),
 	)
 	if err != nil {
 		return err
@@ -175,7 +209,8 @@ func (inp *journald) Run(
 		pos,
 		inp.Since,
 		src.Name(),
-		journalctl.Factory,
+		inp.Merge,
+		journalctl.NewFactory(inp.Chroot, inp.JournalctlPath),
 	)
 	if err != nil {
 		wrappedErr := fmt.Errorf("could not start journal reader: %w", err)
@@ -268,23 +303,51 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 	// Journald documents that 'MESSAGE' is always a string,
 	// see https://www.man7.org/linux/man-pages/man7/systemd.journal-fields.7.html.
 	// However while testing 'journalctl -o json' outputs the 'MESSAGE'
-	// like [1, 2, 3, 4]. Which seems to be the result of a binary encoding
-	// of a journal field (see https://systemd.io/JOURNAL_NATIVE_PROTOCOL/).
+	// like [1, 2, 3, 4]. Which is the result of a binary encoding of a journal
+	// field (see https://systemd.io/JOURNAL_NATIVE_PROTOCOL/).
 	//
-	// Trying to be smart and convert the contents into string
-	// byte by byte did not work well because one test case contained
-	// control characters and new line characters.
-	// To avoid issues later in the ingestion pipeline we just convert
-	// the whole thing to a string using fmt.Sprint.
+	// The binary encoding is used when a '\n' is present in the field or when
+	// some unprintable bytes are part of the message.
+	//
+	// When outputting as JSON journalctl already parses the binary
+	// representation and gives us only the data, the size is not present
+	// any more.
+	//
+	// So in order to not send slices of bytes in the message, we check if
+	// 'MESSAGE' is a string or a slice, if it is a slice, we
+	// safely convert it to a []byte, then convert it to a string.
 	//
 	// Look at 'pkg/journalctl/testdata/corner-cases.json'
-	// for some real world examples.
-	msg := data.Fields["MESSAGE"]
-	msgStr, isString := msg.(string)
-	if !isString {
-		msgStr = fmt.Sprint(msg)
+	// for some real world examples or at testdata/binary.export for some
+	// hand crafted ones.
+	var content []byte
+	failed := false
+	switch msg := data.Fields["MESSAGE"].(type) {
+	case string:
+		content = []byte(msg)
+	case []any:
+		// MESSAGE can be a byte array, in its JSON representation, it is a
+		// []any where all elements are float64.
+		// Safely convert it to a []byte
+		content = make([]byte, len(msg))
+		for i, v := range msg {
+			if b, ok := v.(float64); ok {
+				content[i] = byte(b)
+			} else {
+				failed = true
+				break
+			}
+		}
+	default:
+		// This should never happen, but just in case we fall back to just
+		// getting a string representation using the `fmt` package.
+		failed = true
 	}
-	content := []byte(msgStr)
+
+	if failed {
+		content = fmt.Append([]byte{}, data.Fields["MESSAGE"])
+	}
+
 	delete(data.Fields, "MESSAGE")
 
 	fields := r.converter.Convert(data.Fields)

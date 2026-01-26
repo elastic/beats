@@ -36,7 +36,12 @@ func defaultConfig() config {
 				"symlinks":            true,
 			},
 		},
-		"file_identity.fingerprint": nil,
+		// Prevent partial ingestion when containers stop.
+		// Kubernetes is too eager to remove the log files, so Filebeat,
+		// sometimes, does not have enough time to ingest the whole file
+		// before it is removed.
+		"close.on_state_change.removed": false,
+		"file_identity.fingerprint":     nil,
 		// Enable take over mode to migrate state from the previous
 		// configuration version. This prevents re-ingestion of existing
 		// files.

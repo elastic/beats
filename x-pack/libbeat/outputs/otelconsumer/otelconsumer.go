@@ -11,13 +11,12 @@ import (
 	"runtime"
 	"time"
 
-	"go.opentelemetry.io/collector/client"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/x-pack/otel/otelctx"
+	"github.com/elastic/beats/v7/x-pack/otel/otelmap"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -32,8 +31,6 @@ import (
 const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
-	beatNameCtxKey        = "beat_name"
-	beatVersionCtxtKey    = "beat_version"
 )
 
 func init() {
@@ -124,7 +121,14 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 		}
 
-		beatEvent := event.Content.Fields
+		// if pipeline field is set on event metadata
+		if pipeline, err := event.Content.Meta.GetValue("pipeline"); err == nil {
+			if s, ok := pipeline.(string); ok {
+				logRecord.Attributes().PutStr("elasticsearch.ingest_pipeline", s)
+			}
+		}
+
+		beatEvent := event.Content.Fields.Clone()
 		if beatEvent == nil {
 			beatEvent = mapstr.M{}
 		}
@@ -167,7 +171,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 	}
 
-	err := out.logsConsumer.ConsumeLogs(out.newConsumerContext(ctx), pLogs)
+	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
 	if err != nil {
 		// Permanent errors shouldn't be retried. This tipically means
 		// the data cannot be serialized by the exporter that is attached
@@ -183,7 +187,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Retry()
 		}
 
-		out.log.Errorf("failed to send batch events to otel collector: %v", err)
+		out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
 		return nil
 	}
 
@@ -191,19 +195,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	st.NewBatch(len(events))
 	st.AckedEvents(len(events))
 	return nil
-}
-
-// newConsumerContext creates a new context.Context adding the beats metadata
-// to the client.Info. This is used to pass the beat name and version to the
-// Collector, so it can be used by the components to access that data.
-func (out *otelConsumer) newConsumerContext(ctx context.Context) context.Context {
-	clientInfo := client.Info{
-		Metadata: client.NewMetadata(map[string][]string{
-			beatNameCtxKey:     {out.beatInfo.Beat},
-			beatVersionCtxtKey: {out.beatInfo.Version},
-		}),
-	}
-	return client.NewContext(ctx, clientInfo)
 }
 
 func (out *otelConsumer) String() string {

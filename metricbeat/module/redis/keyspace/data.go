@@ -56,9 +56,10 @@ func findKeyspaceStats(info map[string]string) map[string]string {
 }
 
 var schema = s.Schema{
-	"keys":    c.Int("keys"),
-	"expires": c.Int("expires"),
-	"avg_ttl": c.Int("avg_ttl"),
+	"keys":      c.Int("keys"),
+	"expires":   c.Int("expires"),
+	"avg_ttl":   c.Int("avg_ttl"),
+	"subexpiry": c.Int("subexpiry"),
 }
 
 // parseKeyspaceStats resolves the overloaded value string that Redis returns for keyspace
@@ -70,7 +71,7 @@ func parseKeyspaceStats(keyspaceMap map[string]string) map[string]mapstr.M {
 		// fmt: info[db0] = keys=795341,expires=0,avg_ttl=0
 		dbInfo := redis.ParseRedisLine(v, ",")
 
-		if len(dbInfo) == 3 {
+		if len(dbInfo) == 3 || len(dbInfo) == 4 {
 			db := map[string]interface{}{}
 			for _, dbEntry := range dbInfo {
 				stats := redis.ParseRedisLine(dbEntry, "=")
@@ -78,6 +79,9 @@ func parseKeyspaceStats(keyspaceMap map[string]string) map[string]mapstr.M {
 				if len(stats) == 2 {
 					db[stats[0]] = stats[1]
 				}
+			}
+			if _, exists := db["subexpiry"]; !exists {
+				db["subexpiry"] = "0"
 			}
 			data, _ := schema.Apply(db)
 			keyspace[k] = data

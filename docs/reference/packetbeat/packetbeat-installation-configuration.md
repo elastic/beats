@@ -26,15 +26,15 @@ This guide describes how to get started quickly with network packets analytics. 
 
 * You need {{es}} for storing and searching your data, and {{kib}} for visualizing and managing it.
 
-    :::::::{tab-set}
+    :::::::{applies-switch}
     :group: deployment
 
-    ::::::{tab-item} {{ech}}
+    ::::::{applies-item} ess: ga
     :sync: hosted
     To get started quickly, spin up a deployment of [{{ech}}](https://www.elastic.co/cloud). The {{ech}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
     ::::::
 
-    ::::::{tab-item} Self-managed
+    ::::::{applies-item} self: ga
     :sync: self
     To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
     ::::::
@@ -141,9 +141,8 @@ If script execution is disabled on your system, you need to set the execution po
 :::
 
 :::{important}
-```{applies_to}
-stack: ga 9.1.0, ga 9.0.6
-```
+:applies_to: stack: ga 9.0.6+!
+
 The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
 because the latter has stricter permissions. The home path (base for
 state and logs) is now `C:\Program Files\Packetbeat-Data`.
@@ -173,10 +172,10 @@ Connections to {{es}} and {{kib}} are required to set up Packetbeat.
 
 Set the connection information in `packetbeat.yml`. To locate this configuration file, see [Directory layout](/reference/packetbeat/directory-layout.md).
 
-:::::::{tab-set}
+:::::::{applies-switch}
 :group: deployment
 
-::::::{tab-item} {{ech}}
+::::::{applies-item} ess: ga
 :sync: hosted
 Specify the [cloud.id](/reference/packetbeat/configure-cloud-id.md) of your {{ech}} deployment, and set [cloud.auth](/reference/packetbeat/configure-cloud-id.md) to a user who is authorized to set up Packetbeat. For example:
 
@@ -188,7 +187,7 @@ cloud.auth: "packetbeat_setup:YOUR_PASSWORD" <1>
 1. This examples shows a hard-coded password, but you should store sensitive values in the [secrets keystore](/reference/packetbeat/keystore.md).
 ::::::
 
-::::::{tab-item} Self-managed
+::::::{applies-item} self: ga
 :sync: self
 1. Set the host and port where Packetbeat can find the {{es}} installation, and set the username and password of a user who is authorized to set up Packetbeat. For example:
 
@@ -402,9 +401,11 @@ Packetbeat comes with predefined assets for parsing, indexing, and visualizing y
 
     `-e` is optional and sends output to standard error instead of the configured log output.
 
-The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Packetbeat-Data\logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\packetbeat\logs`
+By default Windows log files are stored in `C:\Program Files\Packetbeat-Data\logs`.
+
+:::{note}
+In versions before 9.0.6, the default location for Windows log files was `C:\ProgramData\packetbeat\logs`.
+:::
 
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to Elasticsearch and deploys the sample dashboards for visualizing the data in Kibana.
 
@@ -475,9 +476,11 @@ sudo ./packetbeat -e
 PS C:\Program Files\packetbeat> Start-Service packetbeat
 ```
 
-The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Packetbeat-Data\logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\packetbeat\logs`
+By default Windows log files are stored in `C:\Program Files\Packetbeat-Data\logs`.
+
+:::{note}
+In versions before 9.0.6, the default location for Windows log files was `C:\ProgramData\packetbeat\logs`.
+:::
 ::::::
 
 :::::::
@@ -492,14 +495,14 @@ To open the dashboards:
 
 1. Launch {{kib}}:
 
-    :::::::{tab-set}
+    :::::::{applies-switch}
     :group: deployment
-    ::::::{tab-item} {{ech}}
+    ::::::{applies-item} ess: ga
     :sync: hosted
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
     ::::::
-    ::::::{tab-item} Self-managed
+    ::::::{applies-item} self: ga
     :sync: self
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
     ::::::

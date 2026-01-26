@@ -9,6 +9,7 @@ import (
 	"io"
 
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/parquet"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // parquetDecoder is a decoder for parquet data.
@@ -18,11 +19,11 @@ type parquetDecoder struct {
 
 // newParquetDecoder creates a new parquet decoder. It uses the libbeat parquet reader under the hood.
 // It returns an error if the parquet reader cannot be created.
-func NewParquetDecoder(config ParquetCodecConfig, r io.Reader) (Decoder, error) {
+func NewParquetDecoder(config ParquetCodecConfig, r io.Reader, logger *logp.Logger) (Decoder, error) {
 	reader, err := parquet.NewBufferedReader(r, &parquet.Config{
 		ProcessParallel: config.ProcessParallel,
 		BatchSize:       config.BatchSize,
-	})
+	}, logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create parquet decoder: %w", err)
 	}

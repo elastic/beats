@@ -59,6 +59,10 @@ func Run(
 	defer cancelFn()
 
 	openErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
+		if mustIgnoreError(err, api) {
+			log.Warnw("ignoring open error", "error", err, "channel", api.Channel())
+			return true
+		}
 		if IsRecoverable(err, api.IsFile()) {
 			reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to open %s: %v", api.Channel(), err))
 			log.Errorw("encountered recoverable error when opening Windows Event Log", "error", err)
@@ -68,15 +72,22 @@ func Run(
 	})
 
 	readErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
+		var mustRetry bool
+		if mustIgnoreError(err, api) {
+			log.Warnw("ignoring read error", "error", err, "channel", api.Channel())
+			mustRetry = true
+		}
 		if IsRecoverable(err, api.IsFile()) {
 			reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to read from %s: %v", api.Channel(), err))
 			log.Errorw("encountered recoverable error when reading from Windows Event Log", "error", err)
+			mustRetry = true
+		}
+		if mustRetry {
 			if resetErr := api.Reset(); resetErr != nil {
 				log.Errorw("error resetting Windows Event Log handle", "error", resetErr)
 			}
-			return true
 		}
-		return false
+		return mustRetry
 	})
 
 runLoop:

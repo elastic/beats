@@ -7,6 +7,8 @@ package decoder
 import (
 	"fmt"
 	"io"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // decoder is an interface for decoding data from an io.Reader.
@@ -35,7 +37,7 @@ type ValueDecoder interface {
 // newDecoder creates a new decoder based on the codec type.
 // It returns a decoder type and an error if the codec type is not supported.
 // If the reader config codec option is not set, it returns a nil decoder and nil error.
-func NewDecoder(cfg Config, r io.Reader) (Decoder, error) {
+func NewDecoder(cfg Config, r io.Reader, logger *logp.Logger) (Decoder, error) {
 	codec := cfg.Codec
 
 	if cfg.Codec == nil {
@@ -51,7 +53,7 @@ func NewDecoder(cfg Config, r io.Reader) (Decoder, error) {
 		result, _ = NewCSVDecoder(*csv, r)
 	case cfg.Codec.Parquet != nil:
 		pqt := codec.Parquet
-		result, _ = NewParquetDecoder(*pqt, r)
+		result, _ = NewParquetDecoder(*pqt, r, logger)
 	default:
 		return nil, fmt.Errorf("unsupported config value: %v", cfg)
 	}
