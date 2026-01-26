@@ -646,7 +646,6 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		if err != nil {
 			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
 		}
-		defer osFile.Close()
 
 		fd.GZIP, err = IsGZIP(osFile)
 		if err != nil {
@@ -694,7 +693,6 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		if err != nil {
 			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
 		}
-		defer osFile.Close()
 		file = newPlainFile(osFile)
 	}
 
