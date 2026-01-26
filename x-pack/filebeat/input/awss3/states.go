@@ -39,13 +39,14 @@ type stateRegistry interface {
 // baseStateRegistry contains shared functionality between registry implementations.
 type baseStateRegistry struct {
 	// Completed S3 object states, indexed by state ID.
-	// statesLock must be held to access states.
-	states     map[string]*state
+	states map[string]*state
+	// statesLock protects access to states map
 	statesLock sync.Mutex
 
 	// The store used to persist state changes to the registry.
-	// storeLock must be held to access store.
-	store     *statestore.Store
+	store *statestore.Store
+	// storeLock protects access to store.
+	// Callers must hold this lock when calling persistState or removeFromStore.
 	storeLock sync.Mutex
 
 	// Accepted prefixes of state keys of this registry
@@ -72,10 +73,14 @@ func (b *baseStateRegistry) validateKeyPrefix(key string) error {
 	return nil
 }
 
+// persistState saves the state to the persistent store.
+// Caller must hold storeLock.
 func (b *baseStateRegistry) persistState(id string, st state) error {
 	return b.store.Set(getStoreKey(id), st)
 }
 
+// removeFromStore removes the state from the persistent store.
+// Caller must hold storeLock.
 func (b *baseStateRegistry) removeFromStore(id string) error {
 	return b.store.Remove(getStoreKey(id))
 }
@@ -174,71 +179,6 @@ type lexicographicalStateRegistry struct {
 	capacity int
 }
 
-// stateHeap implements heap.Interface for states ordered by lexicographical key.
-// It also maintains an index map for O(1) lookup.
-type stateHeap struct {
-	items []*state
-	index map[string]int
-}
-
-func newStateHeap() *stateHeap {
-	return &stateHeap{
-		items: make([]*state, 0),
-		index: make(map[string]int),
-	}
-}
-
-func (h *stateHeap) Len() int { return len(h.items) }
-
-func (h *stateHeap) Less(i, j int) bool {
-	return h.items[i].Key < h.items[j].Key
-}
-
-// Swap swaps the items and updates the index map.
-func (h *stateHeap) Swap(i, j int) {
-	h.items[i], h.items[j] = h.items[j], h.items[i]
-	h.index[h.items[i].IDWithLexicographicalOrdering()] = i
-	h.index[h.items[j].IDWithLexicographicalOrdering()] = j
-}
-
-func (h *stateHeap) Push(x any) {
-	st := x.(*state)
-	h.index[st.IDWithLexicographicalOrdering()] = len(h.items)
-	h.items = append(h.items, st)
-}
-
-func (h *stateHeap) Pop() any {
-	old := h.items
-	n := len(old)
-	st := old[n-1]
-	old[n-1] = nil // avoid memory leak
-	h.items = old[0 : n-1]
-	delete(h.index, st.IDWithLexicographicalOrdering())
-	return st
-}
-
-// Contains returns true if the heap contains a state with the given ID.
-func (h *stateHeap) Contains(id string) bool {
-	_, ok := h.index[id]
-	return ok
-}
-
-// Remove removes a state by ID and returns it, or nil if not found.
-func (h *stateHeap) Remove(id string) *state {
-	idx, ok := h.index[id]
-	if !ok {
-		return nil
-	}
-	return heap.Remove(h, idx).(*state)
-}
-
-func (h *stateHeap) Peek() *state {
-	if len(h.items) == 0 {
-		return nil
-	}
-	return h.items[0]
-}
-
 // newLexicographicalStateRegistry creates a new lexicographical state registry.
 func newLexicographicalStateRegistry(log *logp.Logger, store *statestore.Store, keyPrefix string, capacity int) (*lexicographicalStateRegistry, error) {
 	stateTable, err := loadS3StatesFromRegistry(log, store, keyPrefix, true)
@@ -281,7 +221,7 @@ func (r *lexicographicalStateRegistry) initHeapFromStates(log *logp.Logger) {
 
 	// Trim to capacity
 	for r.heap.Len() > r.capacity {
-		smallestState := heap.Pop(r.heap).(*state)
+		smallestState := r.heap.pop()
 		id := smallestState.IDWithLexicographicalOrdering()
 		delete(r.states, id)
 		if err := r.removeFromStore(id); err != nil && log != nil {
@@ -307,19 +247,19 @@ func (r *lexicographicalStateRegistry) AddState(st state) error {
 		if r.heap.Len() >= r.capacity {
 			// Only add if the new key is larger than the current minimum.
 			// This ensures we keep the N largest keys.
-			minState := r.heap.Peek()
+			minState := r.heap.peek()
 			if minState != nil && st.Key <= minState.Key {
 				return
 			}
 			// Evict the smallest key
-			evicted := heap.Pop(r.heap).(*state)
+			evicted := r.heap.pop()
 			evictedID = evicted.IDWithLexicographicalOrdering()
 			delete(r.states, evictedID)
 		}
 
 		// Add new state to states map and heap
 		r.states[id] = &st
-		heap.Push(r.heap, &st)
+		r.heap.push(&st)
 		shouldPersist = true
 	}()
 
@@ -384,7 +324,7 @@ func (r *lexicographicalStateRegistry) CleanUp(knownIDs []string) error {
 
 	// Remove the states from heap, map, and store
 	for _, id := range idsToRemove {
-		r.heap.Remove(id)
+		r.heap.remove(id)
 		delete(r.states, id)
 		if err := r.removeFromStore(id); err != nil {
 			return fmt.Errorf("error while removing the state for ID %s: %w", id, err)
@@ -397,7 +337,79 @@ func (r *lexicographicalStateRegistry) CleanUp(knownIDs []string) error {
 func (r *lexicographicalStateRegistry) GetLeastState() *state {
 	r.statesLock.Lock()
 	defer r.statesLock.Unlock()
-	return r.heap.Peek()
+	return r.heap.peek()
+}
+
+// stateHeap implements heap.Interface for states ordered by lexicographical key.
+// It also maintains an index map for O(1) lookup.
+type stateHeap struct {
+	items []*state
+	index map[string]int
+}
+
+func newStateHeap() *stateHeap {
+	return &stateHeap{
+		items: make([]*state, 0),
+		index: make(map[string]int),
+	}
+}
+
+func (h *stateHeap) Len() int { return len(h.items) }
+
+func (h *stateHeap) Less(i, j int) bool {
+	return h.items[i].Key < h.items[j].Key
+}
+
+// Swap swaps the items and updates the index map.
+func (h *stateHeap) Swap(i, j int) {
+	h.items[i], h.items[j] = h.items[j], h.items[i]
+	h.index[h.items[i].IDWithLexicographicalOrdering()] = i
+	h.index[h.items[j].IDWithLexicographicalOrdering()] = j
+}
+
+func (h *stateHeap) Push(x any) {
+	st := x.(*state)
+	h.index[st.IDWithLexicographicalOrdering()] = len(h.items)
+	h.items = append(h.items, st)
+}
+
+func (h *stateHeap) Pop() any {
+	old := h.items
+	n := len(old)
+	st := old[n-1]
+	old[n-1] = nil // avoid memory leak
+	h.items = old[0 : n-1]
+	delete(h.index, st.IDWithLexicographicalOrdering())
+	return st
+}
+
+// pop removes and returns the smallest state from the heap.
+func (h *stateHeap) pop() *state {
+	if h.Len() == 0 {
+		return nil
+	}
+	return heap.Pop(h).(*state)
+}
+
+// push adds a state to the heap.
+func (h *stateHeap) push(st *state) {
+	heap.Push(h, st)
+}
+
+// remove removes a state by ID and returns it, or nil if not found.
+func (h *stateHeap) remove(id string) *state {
+	idx, ok := h.index[id]
+	if !ok {
+		return nil
+	}
+	return heap.Remove(h, idx).(*state)
+}
+
+func (h *stateHeap) peek() *state {
+	if len(h.items) == 0 {
+		return nil
+	}
+	return h.items[0]
 }
 
 // newStateRegistry creates the appropriate state registry based on configuration.
