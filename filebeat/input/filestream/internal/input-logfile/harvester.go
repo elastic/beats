@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -129,6 +130,7 @@ type defaultHarvesterGroup struct {
 	tg           *task.Group
 	metrics      *Metrics
 	notifyChan   chan HarvesterStatus
+	inputID      string
 }
 
 // HarvesterStatus is used to notify an observer that the harvester for the ID
@@ -162,7 +164,11 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 	ctx.Logger.Debug("Starting harvester for file")
 
-	if err := hg.tg.Go(startHarvester(ctx, hg, src, false, hg.metrics)); err != nil {
+	fn := startHarvester(ctx, hg, src, false, hg.metrics, hg.inputID)
+	if fn == nil {
+		return
+	}
+	if err := hg.tg.Go(fn); err != nil {
 		ctx.Logger.Warnf(
 			"tried to start harvester for %s with task group already closed",
 			ctx.ID)
@@ -179,7 +185,7 @@ func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 	ctx.Logger.Debug("Restarting harvester for file")
 
-	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics)); err != nil {
+	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics, hg.inputID)); err != nil {
 		ctx.Logger.Warnf(
 			"input %s tried to restart harvester with task group already closed",
 			ctx.ID)
@@ -196,15 +202,34 @@ func startHarvester(
 	src Source,
 	restart bool,
 	metrics *Metrics,
+	inputID string,
 ) func(context.Context) error {
 	srcID := hg.identifier.ID(src)
+	if !restart && hg.readers.hasID(srcID) {
+		// A harvester is already running for this source, no need to start another.
+		// This check must happen here, before task.Group.Go spawns a goroutine.
+		// When harvester_limit is set, the spawned goroutine blocks on a semaphore
+		// until a slot is available. Without this early check, repeated file events
+		// would spawn goroutines that wait on the semaphore only to discover (after
+		// acquiring it) that a harvester is already running, causing a goroutine leak.
+		ctx.Logger.Debug("Harvester already running")
+		return nil
+	}
 
-	return func(canceler context.Context) error {
+	return func(canceler context.Context) (err error) {
 		defer func() {
 			if v := recover(); v != nil {
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
 				ctx.Logger.Errorf("Harvester crashed with: %+v", err)
 				hg.readers.remove(srcID)
+			}
+
+			// Report any harvester error as a degraded state for the input
+			if err != nil {
+				ctx.UpdateStatus(
+					status.Degraded,
+					fmt.Sprintf("Harvester for Filestream input %q failed: %s", inputID, err),
+				)
 			}
 		}()
 
@@ -217,7 +242,7 @@ func startHarvester(
 		harvesterCtx, cancelHarvester, err := hg.readers.newContext(srcID, canceler)
 		if err != nil {
 			// The only possible returned error is ErrHarvesterAlreadyRunning, which is a normal
-			// behaviour of the Filestream input, it's not really an error, it's just an situation.
+			// behaviour of the Filestream input, it's not really an error, it's just a situation.
 			// If the harvester is already running we don't need to start a new one.
 			// At the moment of writing even the returned error is ignored. So the
 			// only real effect of this branch is to not start a second harvester.

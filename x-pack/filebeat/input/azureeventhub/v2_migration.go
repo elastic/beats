@@ -57,7 +57,7 @@ func newMigrationAssistant(config azureInputConfig, log *logp.Logger, consumerCl
 
 // checkAndMigrate checks if the v1 checkpoint information for the partitions
 // exists and migrates it to v2 if it does.
-func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnectionString, consumerGroup string) error {
+func (m *migrationAssistant) checkAndMigrate(ctx context.Context, consumerGroup string) error {
 	// Fetching event hub information
 	eventHubProperties, err := m.consumerClient.GetEventHubProperties(ctx, nil)
 	if err != nil {
@@ -78,9 +78,10 @@ func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnec
 		return err
 	}
 
-	connectionStringProperties, err := parseConnectionString(m.config.ConnectionString)
+	// Determine the fully qualified namespace based on the auth type
+	fullyQualifiedNamespace, err := m.config.GetFullyQualifiedEventHubNamespace()
 	if err != nil {
-		return fmt.Errorf("migration assistant: failed to parse connection string: %w", err)
+		return fmt.Errorf("migration assistant: %w", err)
 	}
 
 	for _, partitionID := range eventHubProperties.PartitionIDs {
@@ -88,7 +89,7 @@ func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnec
 			ctx,
 			blobs,
 			partitionID,
-			connectionStringProperties.FullyQualifiedNamespace,
+			fullyQualifiedNamespace,
 			eventHubProperties.Name,
 			consumerGroup,
 		)

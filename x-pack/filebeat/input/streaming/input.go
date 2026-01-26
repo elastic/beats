@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package streaming
 
 import (
@@ -101,9 +103,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	// want to be a registry. Until then, let's keep this simple.
 	switch cfg.Type {
 	case "", "websocket":
-		s, err = NewWebsocketFollower(ctx, env, cfg, cursor, pub, env.StatusReporter, log, i.time)
+		s, err = NewWebsocketFollower(ctx, env, cfg, cursor, pub, env, log, i.time)
 	case "crowdstrike":
-		s, err = NewFalconHoseFollower(ctx, env, cfg, cursor, pub, env.StatusReporter, log, i.time)
+		s, err = NewFalconHoseFollower(ctx, env, cfg, cursor, pub, env, log, i.time)
 	}
 	if err != nil {
 		return err
