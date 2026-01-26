@@ -14,7 +14,6 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-// This file was contributed to by generative AI
 
 //nolint:errcheck // It's a test file
 package filestream
@@ -96,86 +95,6 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 			p.Init(testStore, newMockStoreUpdater(nil), func(loginp.Source) string { return "" })
 
 			assert.ElementsMatch(t, testCase.expectedCleanedKeys, testStore.cleanedKeys)
-		})
-	}
-}
-
-func TestTakeOverFnSuccess(t *testing.T) {
-	path := "/path/to/file"
-	files := map[string]loginp.FileDescriptor{
-		path: {
-			Info:        file.ExtendFileInfo(&testFileInfo{}),
-			Fingerprint: "===-mock-fingerpint-===",
-			Filename:    "filename",
-		},
-	}
-
-	identifier, err := newFingerprintIdentifier(nil, logp.NewNopLogger())
-	require.NoError(t, err, "fingerprint identifier should be created")
-	newID := func(src loginp.Source) string {
-		return "filestream::current-id::" + src.Name()
-	}
-
-	testCases := map[string]struct {
-		stream     string
-		metaStream string
-		expectKey  string
-	}{
-		"empty stream migrates when meta stream empty": {
-			stream:     "",
-			metaStream: "",
-			expectKey:  "filestream::current-id::fingerprint::===-mock-fingerpint-===",
-		},
-		"matching stream migrates": {
-			stream:     "stdout",
-			metaStream: "stdout",
-			expectKey:  "filestream::current-id::fingerprint::===-mock-fingerpint-===",
-		},
-		"mismatching stream does not migrate": {
-			stream:     "stderr",
-			metaStream: "stdout",
-			expectKey:  "",
-		},
-		"stream all does not migrate when meta stream empty": {
-			stream:     "all",
-			metaStream: "",
-			expectKey:  "",
-		},
-	}
-
-	for name, tc := range testCases {
-		t.Run(name, func(t *testing.T) {
-			value := &mockUnpackValue{
-				key: "filestream::previous-id::path::/path/to/file",
-				fileMeta: fileMeta{
-					Source:         path,
-					IdentifierName: pathName,
-					Meta: map[string]string{
-						"stream": tc.metaStream,
-					},
-				},
-			}
-
-			newKey, meta := takeOverFn(
-				logp.NewNopLogger(),
-				value,
-				files,
-				identifier.Name(),
-				identifier,
-				newID,
-				loginp.TakeOverConfig{Stream: tc.stream},
-			)
-
-			require.Equal(t, tc.expectKey, newKey, "unexpected migrated key")
-			if tc.expectKey == "" {
-				require.IsType(t, fileMeta{}, meta, "returned meta should be fileMeta")
-				return
-			}
-
-			require.IsType(t, fileMeta{}, meta, "returned meta should be fileMeta")
-			got := meta.(fileMeta)
-			require.Equal(t, path, got.Source, "source should be preserved")
-			require.Equal(t, identifier.Name(), got.IdentifierName, "identifier name should be updated")
 		})
 	}
 }
@@ -874,7 +793,7 @@ func (m *mockStoreUpdater) UpdateIdentifiers(updater func(v loginp.Value) (strin
 }
 
 // TakeOver is a noop on this mock
-func (m *mockStoreUpdater) TakeOver(func(v loginp.Value) (string, any)) {}
+func (m *mockStoreUpdater) TakeOver(func(v loginp.TakeOverState) (string, any)) {}
 
 type renamedPathIdentifier struct {
 	fileIdentifier

@@ -186,7 +186,6 @@ func TestLogAsFilestreamContainerInput(t *testing.T) {
 }
 
 func TestLogAsFilestreamContainerInputMixedFile(t *testing.T) {
-	t.Skip("Not ready yet")
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",

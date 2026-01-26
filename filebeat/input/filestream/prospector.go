@@ -87,10 +87,10 @@ type fileProspector struct {
 	logIdentifiers        map[string]file.StateIdentifier
 }
 
-func (p *fileProspector) previousID(name string, fm fileMeta, fd loginp.FileDescriptor, v loginp.Value) string {
+func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v loginp.TakeOverState) string {
 	if p.takeOver.FromFilestream() {
 		fsEvent := loginp.FSEvent{
-			NewPath:    fm.Source,
+			NewPath:    v.Source,
 			Descriptor: fd,
 		}
 
@@ -98,17 +98,12 @@ func (p *fileProspector) previousID(name string, fm fileMeta, fd loginp.FileDesc
 	}
 
 	type fileStateOSGetter interface {
-		GetFileStateOS() libbeatfile.StateOS
-	}
-
-	getter, ok := v.(fileStateOSGetter)
-	if !ok {
-		return ""
+		FileStateOS() libbeatfile.StateOS
 	}
 
 	state := file.State{
-		FileStateOS: getter.GetFileStateOS(),
-		Source:      fm.Source,
+		FileStateOS: v.FileStateOS,
+		Source:      v.Source,
 	}
 
 	id, _ := p.logIdentifiers[name].GenerateID(state)
@@ -116,14 +111,13 @@ func (p *fileProspector) previousID(name string, fm fileMeta, fd loginp.FileDesc
 }
 
 func (p *fileProspector) takeOverFn(
-	v loginp.Value,
+	v loginp.TakeOverState,
 	files map[string]loginp.FileDescriptor,
 	newID func(loginp.Source) string,
 ) (string, any) {
-	var fm fileMeta
-	err := v.UnpackCursorMeta(&fm)
-	if err != nil {
-		return "", nil
+	fm := fileMeta{
+		Source:         v.Source,
+		IdentifierName: v.IdentifierName,
 	}
 
 	fd, ok := files[fm.Source]
@@ -175,24 +169,7 @@ func (p *fileProspector) takeOverFn(
 	}
 
 	idFromRegistry := strings.Join(split[2:], "::")
-	idFromPreviousIdentity := p.previousID(oldIdentifierName, fm, fd, v)
-	// idFromPreviousIdentity := oldIdentifier.GetSource(fsEvent).Name()
-
-	// ==================================================
-	// Container input special handling.
-	// The container input uses meta.stream to separate the state so two Log
-	// inputs can harvester the same file. This field is only set when the input
-	// is harvesting one stream (stdout or stderr).
-	//
-	// Whenever meta is set, it is used by the Log input file identity to prepend
-	// a hash to the identifier, we replicate the same logic here.
-	// if fm.Meta != nil {
-	// 	hashValue, _ := hashstructure.Hash(fm.Meta, nil)
-	// 	hash := strconv.FormatUint(hashValue, 16)
-	// 	idFromPreviousIdentity = hash + "-" + idFromPreviousIdentity
-	// }
-
-	// ==================================================
+	idFromPreviousIdentity := p.previousID(oldIdentifierName, fd, v)
 
 	if idFromPreviousIdentity != idFromRegistry {
 		return "", fm
@@ -328,7 +305,7 @@ func (p *fileProspector) Init(
 	}
 
 	// Take over states from other Filestream inputs or the log input
-	prospectorStore.TakeOver(func(v loginp.Value) (string, any) {
+	prospectorStore.TakeOver(func(v loginp.TakeOverState) (string, any) {
 		return p.takeOverFn(v, files, newID)
 	})
 

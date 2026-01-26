@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //nolint:errcheck // Some errors are not checked on tests/helper functions
 package input_logfile
 
@@ -337,7 +339,7 @@ func TestStore_ResetCursor(t *testing.T) {
 }
 
 type testMeta struct {
-	IdentifierName string
+	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
 }
 
 func TestSourceStore_UpdateIdentifiers(t *testing.T) {
@@ -416,19 +418,12 @@ func TestSourceStoreTakeOver(t *testing.T) {
 		store:                 s,
 	}
 
-	store.TakeOver(func(v Value) (string, any) {
-		r, ok := v.(*resource)
-		if !ok {
-			t.Fatalf("expecting v of type '*input_logfile.resource', got '%T' instead", v)
+	store.TakeOver(func(v TakeOverState) (string, any) {
+		m := testMeta{
+			IdentifierName: v.IdentifierName,
 		}
 
-		var m testMeta
-		err := v.UnpackCursorMeta(&m)
-		if err != nil {
-			t.Fatalf("cannot unpack meta: %v", err)
-		}
-
-		newID := strings.ReplaceAll(r.key, "previous-id", "current-id")
+		newID := strings.ReplaceAll(v.resourceKey, "previous-id", "current-id")
 
 		return newID, m
 	})
@@ -443,12 +438,12 @@ func TestSourceStoreTakeOver(t *testing.T) {
 	want := map[string]state{
 		"filestream::another-input::key2": { // Unchanged
 			TTL:  60 * time.Second,
-			Meta: map[string]interface{}{"identifiername": "test-file-identity"},
+			Meta: map[string]interface{}{"identifier_name": "test-file-identity"},
 		},
 		"filestream::current-id::key1": { // Updated resource
 			Updated: s.ephemeralStore.table["filestream::current-id::key1"].internalState.Updated,
 			TTL:     60 * time.Second,
-			Meta:    map[string]interface{}{"identifiername": "test-file-identity"},
+			Meta:    map[string]interface{}{"identifier_name": "test-file-identity"},
 		},
 	}
 	s.ephemeralStore.mu.Unlock()
