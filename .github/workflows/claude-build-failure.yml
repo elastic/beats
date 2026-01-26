@@ -1,7 +1,7 @@
 name: Claude Build Failure Analysis
 on:
   workflow_run:
-    workflows: ["CI"]
+    workflows: ["check-default", "pre-commit", "golangci-lint", "check-docs", "check-dev-tools"]
     types: [completed]
 
 permissions:
@@ -13,22 +13,92 @@ permissions:
 
 jobs:
   analyze:
+    concurrency:
+      group: claude-build-failure-${{ github.event.workflow_run.id }}
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Check if all required workflows have completed
+        id: check-workflows
+        if: github.event.workflow_run.event == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pullRequests = ${{ toJSON(github.event.workflow_run.pull_requests) }};
+            const prNumber = pullRequests && pullRequests.length > 0 ? pullRequests[0].number : null;
+            
+            if (!prNumber) {
+              core.info('Not a PR-triggered workflow or could not determine PR number. Running analysis.');
+              core.setOutput('should_run', 'true');
+              return;
+            }
+            
+            const requiredWorkflows = ['check-default', 'pre-commit', 'golangci-lint', 'check-docs', 'check-dev-tools'];
+            const { data: checks } = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/pull/${prNumber}/head`,
+            });
+            
+            const workflowRuns = checks.check_runs.filter(run => 
+              requiredWorkflows.some(wf => run.name.includes(wf))
+            );
+            
+            // Log status of all workflows
+            workflowRuns.forEach(run => {
+              core.info(`Workflow ${run.name}: status=${run.status}, conclusion=${run.conclusion || 'none'}`);
+            });
+            
+            const allCompleted = workflowRuns.length >= requiredWorkflows.length && 
+              workflowRuns.every(run => run.status === 'completed');
+            
+            if (!allCompleted) {
+              const pending = workflowRuns.filter(run => run.status !== 'completed');
+              core.info(`Not all required workflows have completed yet. Pending: ${pending.map(r => r.name).join(', ')}`);
+              core.setOutput('should_run', 'false');
+            } else {
+              // Check for any failures (failure, cancelled, or neutral that indicates a problem)
+              const anyFailed = workflowRuns.some(run => 
+                run.conclusion === 'failure' || 
+                run.conclusion === 'cancelled' ||
+                (run.conclusion === 'neutral' && run.status === 'completed')
+              );
+              
+              if (anyFailed) {
+                const failed = workflowRuns.filter(run => 
+                  run.conclusion === 'failure' || run.conclusion === 'cancelled'
+                );
+                core.info(`Found failed workflows: ${failed.map(r => `${r.name} (${r.conclusion})`).join(', ')}`);
+                core.setOutput('should_run', 'true');
+              } else {
+                const conclusions = workflowRuns.map(r => `${r.name}: ${r.conclusion || 'success'}`).join(', ');
+                core.info(`All workflows completed successfully. Conclusions: ${conclusions}`);
+                core.setOutput('should_run', 'false');
+              }
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/setup-go@v5
+      - name: Checkout
+        if: steps.check-workflows.outputs.should_run != 'false'
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        if: steps.check-workflows.outputs.should_run != 'false'
+        uses: actions/setup-go@v5
         with:
           go-version-file: .go-version
 
       - name: Install system dependencies
+        if: steps.check-workflows.outputs.should_run != 'false'
         run: sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
 
       - name: Install Mage
+        if: steps.check-workflows.outputs.should_run != 'false'
         run: make mage
 
       - uses: elastic/ai-github-actions/workflows/build-failure@main
+        if: steps.check-workflows.outputs.should_run != 'false'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           claude-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}

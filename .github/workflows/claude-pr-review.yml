@@ -10,6 +10,8 @@ permissions:
 
 jobs:
   review:
+    concurrency:
+      group: claude-pr-review-${{ github.event.pull_request.number }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

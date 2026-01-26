@@ -1,7 +1,7 @@
 name: Claude Issue Triage
 on:
   issues:
-    types: [opened, labeled]
+    types: [labeled]
 
 permissions:
   contents: read
@@ -10,10 +10,10 @@ permissions:
 
 jobs:
   triage:
+    concurrency:
+      group: claude-triage-${{ github.event.issue.number }}
     runs-on: ubuntu-latest
-    if: |
-      (github.event.action == 'opened' && contains(join(github.event.issue.labels.*.name, ','), 'claude-plz-triage')) ||
-      (github.event.action == 'labeled' && github.event.label.name == 'claude-plz-triage')
+    if: github.event.label.name == 'claude-plz-triage'
     steps:
       - uses: actions/checkout@v4
 

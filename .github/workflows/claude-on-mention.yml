@@ -15,6 +15,8 @@ permissions:
 
 jobs:
   claude:
+    concurrency:
+      group: claude-mention-${{ github.event_name }}-${{ github.event.issue.number || github.event.pull_request.number || github.event.comment.issue_id || github.event.comment.pull_request_id }}-${{ github.event.comment.id || github.event.issue.id }}
     runs-on: ubuntu-latest
     if: |
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
