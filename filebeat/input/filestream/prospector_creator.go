@@ -38,8 +38,7 @@ const (
 
 var experimentalWarning sync.Once
 
-// getNamespaces returns a slice containing a conf.Namespace for each
-// supported identifier
+// getNamespaces returns a slice containing a conf.Namespace for each key
 func getNamespaces(logger *logp.Logger, keys []string) []*conf.Namespace {
 	ret := make([]*conf.Namespace, 0, len(keys))
 	for _, fi := range keys {

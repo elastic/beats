@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// This file was contributed to by generative AI
-
 package input_logfile
 
 import (
@@ -356,6 +354,7 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 					// This should never happen. newTakeOverState can only fail if
 					// Filestream state format has changed and when using the
 					// Log input state, the Filestream one is ignored
+					s.store.log.Errorf("cannot initialise TakeOver state: %s", err)
 					return true, err
 				}
 
@@ -428,6 +427,7 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 		if err != nil {
 			// This should never happen. newTakeOverState can only fail if
 			// Filestream state format has changed
+			s.store.log.Errorf("cannot initialise TakeOver state: %s", err)
 			continue
 		}
 		newKey, updatedMeta := fn(st)
@@ -508,13 +508,12 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 
 // TakeOverState is the state of a file whose state is being taken over.
 // [newTakeOverState] correctly populates the fields according to the source
-// state (Log or Filestream). Only the required outside of this package is
-// exported.
+// state (Log or Filestream). Only the fields required outside of this package
+// are exported.
 type TakeOverState struct {
 	FileStateOS    file.StateOS
 	IdentifierName string
 	Key            string
-	Meta           map[string]string
 	Source         string
 
 	logInpOffset int64
@@ -528,11 +527,11 @@ func newTakeOverState(logSt inpFile.State, filestreamSt *resource) (TakeOverStat
 	st := TakeOverState{}
 
 	if filestreamSt != nil {
+		// This struct matches the fileMeta defined at input/filestream/input.go
 		meta := struct {
 			IdentifierName string `json:"identifier_name" struct:"identifier_name"`
 			Source         string `json:"source" struct:"source"`
 		}{}
-
 		if err := filestreamSt.UnpackCursorMeta(&meta); err != nil {
 			return st, err
 		}
@@ -545,7 +544,6 @@ func newTakeOverState(logSt inpFile.State, filestreamSt *resource) (TakeOverStat
 	}
 
 	st.Source = logSt.Source
-	st.Meta = logSt.Meta
 	st.IdentifierName = logSt.IdentifierName
 	st.FileStateOS = logSt.FileStateOS
 	st.logInpOffset = logSt.Offset

@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// This file was contributed to by generative AI
-
 //nolint:errcheck // Some errors are not checked on tests/helper functions
 package input_logfile
 

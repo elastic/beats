@@ -14,7 +14,6 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-// This file was contributed to by generative AI
 
 package filestream
 
@@ -28,7 +27,6 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	libbeatfile "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
@@ -97,10 +95,6 @@ func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v log
 		return p.filestreamIdentifiers[name].GetSource(fsEvent).Name()
 	}
 
-	type fileStateOSGetter interface {
-		FileStateOS() libbeatfile.StateOS
-	}
-
 	state := file.State{
 		FileStateOS: v.FileStateOS,
 		Source:      v.Source,
@@ -151,24 +145,6 @@ func (p *fileProspector) takeOverFn(
 	// we use the old identifier to generate a registry key for the current
 	// file we're trying to migrate, if this key matches with the key in the
 	// registry, then we proceed to update the registry.
-	// oldIdentifier, ok := identifiersMap[oldIdentifierName]
-	// if !ok {
-	// 	// This should never happen, but just in case we properly handle it.
-	// 	// If we cannot find the identifier, move on to the next entry
-	// 	// some identifiers cannot be migrated
-	// 	p.logger.Errorf(
-	// 		"old file identity '%s' not found while taking over old states, "+
-	// 			"new file identity '%s'. If the file still exists, it will be re-ingested",
-	// 		oldIdentifierName,
-	// 		p.identifier.Name(),
-	// 	)
-	// 	return "", nil
-	// }
-
-	// fsEvent := loginp.FSEvent{
-	// 	NewPath:    fm.Source,
-	// 	Descriptor: fd,
-	// }
 	split := strings.Split(v.Key, "::")
 	if len(split) != 4 {
 		// This should never happen.

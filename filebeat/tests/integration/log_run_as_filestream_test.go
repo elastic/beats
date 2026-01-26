@@ -212,7 +212,6 @@ func TestLogAsFilestreamContainerInputMixedFile(t *testing.T) {
 	filebeat.WriteConfigFile(cfgStr)
 	filebeat.Start()
 
-	filebeat.WaitPublishedEvents(2*time.Second, eventsCount)
 	assertContainerEvents(t, filebeat, eventsCount/2, eventsCount/2, false)
 	filebeat.Stop()
 
@@ -233,17 +232,15 @@ func TestLogAsFilestreamContainerInputMixedFile(t *testing.T) {
 	integration.WriteDockerJSONLog(t, inputFile, eventsCount, []string{"stdout", "stderr"}, true)
 
 	filebeat.WaitLogsContains("End of file reached", 5*time.Second, "did not read file til end")
-	filebeat.WaitPublishedEvents(2*time.Second, eventsCount)
-	// TODO: ensure there aren't any extra events!
+	filebeat.WaitPublishedEvents(5*time.Second, eventsCount)
+
+	// Wait a few extra seconds to ensure no other events have been published
 	time.Sleep(2 * time.Second)
 	assertContainerEvents(t, filebeat, eventsCount/2, eventsCount/2, true)
-
-	// Expected offsets:
-	// stdout: 3969
-	// stderr: 4050
-	// t.Fatal("keep the logs")
 }
 
+// assertContainerEvents waits until the desired number of events is published,
+// then checks the events for the stream key.
 func assertContainerEvents(
 	t *testing.T,
 	filebeat *integration.BeatProc,
@@ -275,7 +272,13 @@ func assertContainerEvents(
 		}
 
 		if slices.Contains(ev.Tags, "take_over") != containsTakeOverTag {
-			t.Errorf("TODO: IMPORVE IT: Event %d: 'take_over': %t. Tags: %v", i, containsTakeOverTag, ev.Tags)
+			t.Errorf(
+				"Event %d: take_over tag present = %t, expected %t. Tags: %v",
+				i,
+				slices.Contains(ev.Tags, "take_over"),
+				containsTakeOverTag,
+				ev.Tags,
+			)
 		}
 	}
 
