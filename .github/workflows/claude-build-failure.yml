@@ -1,25 +1,20 @@
-name: Claude Assistant
+name: Claude Build Failure Analysis
 on:
-  issue_comment:
-    types: [created]
-  pull_request_review_comment:
-    types: [created]
-  issues:
-    types: [opened, assigned]
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+  actions: read
   issues: write
+  pull-requests: write
   id-token: write
 
 jobs:
-  claude:
+  analyze:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest
-    if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'issues' && contains(github.event.issue.body, '@claude'))
     steps:
       - uses: actions/checkout@v4
 
@@ -33,7 +28,7 @@ jobs:
       - name: Install Mage
         run: make mage
 
-      - uses: elastic/ai-github-actions/workflows/mention@main
+      - uses: elastic/ai-github-actions/workflows/build-failure@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           claude-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
