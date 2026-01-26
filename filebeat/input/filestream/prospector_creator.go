@@ -132,7 +132,7 @@ func newProspector(
 		stateChangeCloser:     config.Close.OnStateChange,
 		logger:                logger.Named("prospector"),
 		takeOver:              config.TakeOver,
-		filestreamIdentifiers: filestreamFileIdentifiers(logger, config.Reader.Encoding),
+		filestreamIdentifiers: filestreamFileIdentifiers(logger, config.Reader.Parsers.Suffix),
 		logIdentifiers:        logFileIdentifiers(logger),
 	}
 	if config.Rotation == nil {

@@ -473,6 +473,10 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 	for k, v := range fromLogInput {
 		newKey, updatedMeta := fn(v)
 
+		if len(newKey) == 0 {
+			continue
+		}
+
 		// Find or create a resource. It should always create a new one.
 		res := s.store.ephemeralStore.unsafeFind(newKey, true)
 		res.cursorMeta = updatedMeta

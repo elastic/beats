@@ -106,6 +106,14 @@ func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v log
 		Source:      v.Source,
 	}
 
+	// The stream field is used when generating the ID, so if takeOver has
+	// a stream set, we use it, so the ID matches the input we're taking over.
+	if p.takeOver.Stream == "stdout" || p.takeOver.Stream == "stderr" {
+		state.Meta = map[string]string{
+			"stream": p.takeOver.Stream,
+		}
+	}
+
 	id, _ := p.logIdentifiers[name].GenerateID(state)
 	return id
 }
