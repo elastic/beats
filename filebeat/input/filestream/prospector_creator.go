@@ -38,18 +38,11 @@ const (
 
 var experimentalWarning sync.Once
 
-// Supported File identities:
-// - fingerprint
-// - native
-// - path
-
-var supportedFileIdentities = []string{"path", "native", "fingerprint"}
-
-// getIdentifierNSs returns a slice containing a conf.Namespace for each
+// getNamespaces returns a slice containing a conf.Namespace for each
 // supported identifier
-func getIdentifierNSs(logger *logp.Logger) []*conf.Namespace {
-	ret := make([]*conf.Namespace, 0, len(supportedFileIdentities))
-	for _, fi := range supportedFileIdentities {
+func getNamespaces(logger *logp.Logger, keys []string) []*conf.Namespace {
+	ret := make([]*conf.Namespace, 0, len(keys))
+	for _, fi := range keys {
 		ns := &conf.Namespace{}
 
 		// Create a yaml like:
@@ -69,7 +62,7 @@ func getIdentifierNSs(logger *logp.Logger) []*conf.Namespace {
 
 func filestreamFileIdentifiers(logger *logp.Logger, stream string) map[string]fileIdentifier {
 	m := map[string]fileIdentifier{}
-	for _, ns := range getIdentifierNSs(logger) {
+	for _, ns := range getNamespaces(logger, []string{"path", "native", "fingerprint"}) {
 		identifier, err := newFileIdentifier(ns, stream, logger)
 		if err != nil {
 			logger.Errorf("cannot create %s file identifier: '%s', skipping it", ns.Name(), err)
@@ -84,7 +77,7 @@ func filestreamFileIdentifiers(logger *logp.Logger, stream string) map[string]fi
 
 func logFileIdentifiers(logger *logp.Logger) map[string]file.StateIdentifier {
 	m := map[string]file.StateIdentifier{}
-	for _, ns := range getIdentifierNSs(logger) {
+	for _, ns := range getNamespaces(logger, []string{"path", "native"}) {
 		identifier, err := file.NewStateIdentifier(ns, logger)
 		if err != nil {
 			logger.Errorf("cannot create %s file identifier: '%s', skipping it", ns.Name(), err)

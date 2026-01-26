@@ -161,10 +161,10 @@ func (p *fileProspector) takeOverFn(
 	// 	NewPath:    fm.Source,
 	// 	Descriptor: fd,
 	// }
-	split := strings.Split(v.Key(), "::")
+	split := strings.Split(v.Key, "::")
 	if len(split) != 4 {
 		// This should never happen.
-		p.logger.Errorf("registry key '%s' is in the wrong format, cannot migrate state", v.Key())
+		p.logger.Errorf("registry key '%s' is in the wrong format, cannot migrate state", v.Key)
 		return "", fm
 	}
 
@@ -177,7 +177,7 @@ func (p *fileProspector) takeOverFn(
 
 	newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 	fm.IdentifierName = p.identifier.Name()
-	p.logger.Infof("Taking over state: '%s' -> '%s'", v.Key(), newKey)
+	p.logger.Infof("Taking over state: '%s' -> '%s'", v.Key, newKey)
 	return newKey, fm
 }
 

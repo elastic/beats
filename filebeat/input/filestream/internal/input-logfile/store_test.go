@@ -423,7 +423,7 @@ func TestSourceStoreTakeOver(t *testing.T) {
 			IdentifierName: v.IdentifierName,
 		}
 
-		newID := strings.ReplaceAll(v.resourceKey, "previous-id", "current-id")
+		newID := strings.ReplaceAll(v.Key, "previous-id", "current-id")
 
 		return newID, m
 	})

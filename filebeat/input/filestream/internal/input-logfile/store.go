@@ -350,7 +350,13 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 					return true, err
 				}
 
-				st := newTakeOverState(logSt, nil)
+				st, err := newTakeOverState(logSt, nil)
+				if err != nil {
+					// This should never happen. newTakeOverState can only fail if
+					// Filestream state format has changed and when using the
+					// Log input state, the Filestream one is ignored
+					return true, err
+				}
 
 				// That is a workaround for the problems with the
 				// Log input Registrar (`filebeat/registrar`) and the way it
@@ -390,7 +396,7 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 				if logSt.TTL == -2 {
 					return true, nil
 				}
-				st.key = key
+				st.Key = key
 				fromLogInput[key] = st
 			}
 
@@ -417,7 +423,12 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			continue
 		}
 
-		st := newTakeOverState(inpFile.State{}, res)
+		st, err := newTakeOverState(inpFile.State{}, res)
+		if err != nil {
+			// This should never happen. newTakeOverState can only fail if
+			// Filestream state format has changed
+			continue
+		}
 		newKey, updatedMeta := fn(st)
 		if len(newKey) > 0 {
 			// If the new key already exists in the store, do nothing.
