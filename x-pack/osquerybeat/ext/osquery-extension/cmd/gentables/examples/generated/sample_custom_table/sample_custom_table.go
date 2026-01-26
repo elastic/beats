@@ -8,20 +8,22 @@
 package samplecustomtable
 
 import (
+	"time"
+
 	"github.com/osquery/osquery-go/plugin/table"
 )
 
 // Result represents a row from the sample_custom_table table.
 type Result struct {
-	Id          int64   `osquery:"id"`                                  // Unique identifier for the resource
-	Name        string  `osquery:"name"`                                // Resource name or label
-	Status      string  `osquery:"status"`                              // Current status (active, inactive, pending, archived)
-	CreatedTime int64   `osquery:"created_time" format:"unix" tz:"UTC"` // Creation timestamp in UNIX epoch seconds
-	UpdatedTime int64   `osquery:"updated_time" format:"unix" tz:"UTC"` // Last update timestamp in UNIX epoch seconds
-	Value       float64 `osquery:"value"`                               // Associated numeric value or metric
-	Enabled     int32   `osquery:"enabled"`                             // Whether the resource is enabled (1=yes, 0=no)
-	Category    string  `osquery:"category"`                            // Resource category (system, user, application)
-	Priority    int32   `osquery:"priority"`                            // Priority level (1=low, 2=medium, 3=high, 4=critical)
+	Id          int64     `osquery:"id"`                                  // Unique identifier for the resource
+	Name        string    `osquery:"name"`                                // Resource name or label
+	Status      string    `osquery:"status"`                              // Current status (active, inactive, pending, archived)
+	CreatedTime time.Time `osquery:"created_time" format:"unix" tz:"UTC"` // Creation timestamp in UNIX epoch seconds
+	UpdatedTime time.Time `osquery:"updated_time" format:"unix" tz:"UTC"` // Last update timestamp in UNIX epoch seconds
+	Value       float64   `osquery:"value"`                               // Associated numeric value or metric
+	Enabled     int32     `osquery:"enabled"`                             // Whether the resource is enabled (1=yes, 0=no)
+	Category    string    `osquery:"category"`                            // Resource category (system, user, application)
+	Priority    int32     `osquery:"priority"`                            // Priority level (1=low, 2=medium, 3=high, 4=critical)
 }
 
 // Columns returns the column definitions for the sample_custom_table table.

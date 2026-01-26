@@ -22,12 +22,14 @@ columns:
   - name: created_time
     type: BIGINT
     description: Creation timestamp in UNIX epoch seconds
+    go_type: time.Time
     format: unix
     timezone: UTC
 
   - name: updated_time
     type: BIGINT
     description: Last update timestamp in UNIX epoch seconds
+    go_type: time.Time
     format: unix
     timezone: UTC
 

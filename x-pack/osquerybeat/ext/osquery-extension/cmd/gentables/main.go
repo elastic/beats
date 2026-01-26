@@ -48,6 +48,7 @@ type columnSpec struct {
 	Description string `yaml:"description"`
 	Format      string `yaml:"format,omitempty"`   // Optional: "unix", "rfc3339"
 	Timezone    string `yaml:"timezone,omitempty"` // Optional: "UTC", etc.
+	GoType      string `yaml:"go_type,omitempty"`  // Optional: explicit Go type override (e.g., "time.Time")
 }
 
 type documentationConfig struct {
@@ -240,15 +241,30 @@ func generateTableCode(s spec, outDir string) error {
 
 	writeGoFileHeader(&b, toPackageName(s.Name), "tables", s.Name, s.Platforms)
 
+	// Check if we need to import time package
+	needsTimeImport := false
+	for _, col := range s.Columns {
+		goType := osqueryTypeToGoType(col)
+		if goType == "time.Time" {
+			needsTimeImport = true
+			break
+		}
+	}
+
+	// Generate imports
 	b.WriteString("import (\n")
+	if needsTimeImport {
+		b.WriteString("\t\"time\"\n\n")
+	}
 	b.WriteString("\t\"github.com/osquery/osquery-go/plugin/table\"\n")
 	b.WriteString(")\n\n")
 
 	// Generate result struct
 	fmt.Fprintf(&b, "// Result represents a row from the %s table.\n", s.Name)
 	b.WriteString("type Result struct {\n")
+	
 	for _, col := range s.Columns {
-		goType := osqueryTypeToGoType(col.Type)
+		goType := osqueryTypeToGoType(col)
 		fieldName := toGoFieldName(col.Name)
 		structTag := buildStructTag(col)
 		fmt.Fprintf(&b, "\t%s %s %s // %s\n", fieldName, goType, structTag, col.Description)
@@ -380,11 +396,11 @@ func writeRegistryFile(specs []spec, outDir, specType, typeName, funcName string
 	b.WriteString("\tPlatforms   []string\n")
 
 	if specType == "table" {
-		b.WriteString("\tTableName   string\n")
-		b.WriteString("\tColumns     func() []table.ColumnDefinition\n")
+		b.WriteString("\tTableName string\n")
+		b.WriteString("\tColumns   func() []table.ColumnDefinition\n")
 	} else {
 		b.WriteString("\tRequiredTables []string\n")
-		b.WriteString("\tView        func() *hooks.View\n")
+		b.WriteString("\tView           func() *hooks.View\n")
 	}
 	b.WriteString("}\n\n")
 
@@ -409,8 +425,8 @@ func writeRegistryFile(specs []spec, outDir, specType, typeName, funcName string
 		b.WriteString("},\n")
 
 		if specType == "table" {
-			fmt.Fprintf(&b, "\t\t\tTableName:   %s.TableName,\n", pkgName)
-			fmt.Fprintf(&b, "\t\t\tColumns:     %s.Columns,\n", pkgName)
+			fmt.Fprintf(&b, "\t\t\tTableName: %s.TableName,\n", pkgName)
+			fmt.Fprintf(&b, "\t\t\tColumns:   %s.Columns,\n", pkgName)
 		} else {
 			b.WriteString("\t\t\tRequiredTables: []string{")
 			for i, t := range s.RequiredTables {
@@ -420,7 +436,7 @@ func writeRegistryFile(specs []spec, outDir, specType, typeName, funcName string
 				fmt.Fprintf(&b, "\"%s\"", t)
 			}
 			b.WriteString("},\n")
-			fmt.Fprintf(&b, "\t\t\tView:        %s.View,\n", pkgName)
+			fmt.Fprintf(&b, "\t\t\tView: %s.View,\n", pkgName)
 		}
 
 		b.WriteString("\t\t},\n")
@@ -453,8 +469,14 @@ func osqueryTypeToGoMethod(osqueryType string) string {
 }
 
 // osqueryTypeToGoType maps osquery column types to Go types for result structs
-func osqueryTypeToGoType(osqueryType string) string {
-	switch osqueryType {
+func osqueryTypeToGoType(col columnSpec) string {
+	// If explicit go_type is specified, use it
+	if col.GoType != "" {
+		return col.GoType
+	}
+	
+	// Otherwise use default mapping based on osquery type
+	switch col.Type {
 	case "TEXT":
 		return "string"
 	case "INTEGER":
@@ -597,7 +619,21 @@ func generateViewCode(s spec, outDir string) error {
 
 	writeGoFileHeader(&b, toPackageName(s.Name), "views", s.Name, s.Platforms)
 
+	// Check if we need to import time package
+	needsTimeImport := false
+	for _, col := range s.Columns {
+		goType := osqueryTypeToGoType(col)
+		if goType == "time.Time" {
+			needsTimeImport = true
+			break
+		}
+	}
+
+	// Generate imports
 	b.WriteString("import (\n")
+	if needsTimeImport {
+		b.WriteString("\t\"time\"\n\n")
+	}
 	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks\"\n")
 	b.WriteString(")\n\n")
 
@@ -605,7 +641,7 @@ func generateViewCode(s spec, outDir string) error {
 	fmt.Fprintf(&b, "// Result represents a row from the %s view.\n", s.Name)
 	b.WriteString("type Result struct {\n")
 	for _, col := range s.Columns {
-		goType := osqueryTypeToGoType(col.Type)
+		goType := osqueryTypeToGoType(col)
 		fieldName := toGoFieldName(col.Name)
 		structTag := buildStructTag(col)
 		fmt.Fprintf(&b, "\t%s %s %s // %s\n", fieldName, goType, structTag, col.Description)

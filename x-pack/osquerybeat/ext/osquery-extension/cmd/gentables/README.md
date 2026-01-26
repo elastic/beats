@@ -37,6 +37,7 @@ go generate ./...
 
 - **Unified Spec Format**: Single directory with both tables and views
 - **Result Types**: Generates typed structs with osquery tags for query results
+- **time.Time Support**: Use `go_type: time.Time` for proper timestamp handling
 - **SQL Validation**: Uses AST-based parsing to validate view queries without a database
 - **Column Validation**: Ensures view columns match SELECT output
 - **Sensible Defaults**: Automatically applies defaults for common fields

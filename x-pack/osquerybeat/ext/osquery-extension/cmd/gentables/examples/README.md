@@ -38,6 +38,7 @@ columns:                            # Required: column definitions
   - name: column_name               # Required: column name
     type: TEXT|INTEGER|BIGINT|DOUBLE # Required: osquery column type
     description: Column description # Required: column description
+    go_type: string|int32|int64|float64|time.Time # Optional: override Go type
     format: unix|rfc3339            # Optional: format hint for struct tags
     timezone: UTC                   # Optional: timezone hint for struct tags
 
@@ -161,6 +162,30 @@ type Result struct {
 
 These tags are used by the osquery encoding package for proper serialization and deserialization of query results.
 
+### Using time.Time in Result Structs
+
+For timestamp fields, you can use `go_type: time.Time` to generate `time.Time` fields instead of int64/string:
+
+**YAML Spec:**
+```yaml
+columns:
+  - name: timestamp
+    type: BIGINT
+    description: Event timestamp
+    go_type: time.Time    # Override default int64 with time.Time
+    format: unix
+    timezone: UTC
+```
+
+**Generated Go:**
+```go
+type Result struct {
+    Timestamp time.Time `osquery:"timestamp" format:"unix" tz:"UTC"`
+}
+```
+
+The encoding package automatically converts between `time.Time` and the appropriate format based on the tags.
+
 ## Column Documentation for Views
 
 Both tables and views must document their columns in the spec. For views, this is especially important because:
@@ -238,6 +263,7 @@ This allows you to write minimal specs for cross-platform tables/views without r
 
 ### Optional for ALL specs:
 - ⚪ `platforms` - Defaults to `["linux", "darwin", "windows"]`
+- ⚪ `columns[].go_type` - Explicit Go type override (e.g., "time.Time")
 - ⚪ `columns[].format` - Format hint for osquery tags (e.g., "unix", "rfc3339")
 - ⚪ `columns[].timezone` - Timezone hint for osquery tags (e.g., "UTC")
 - ⚪ `documentation.related_tables` - Defaults to empty array
