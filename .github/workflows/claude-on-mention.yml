@@ -1,0 +1,36 @@
+name: Claude Assistant
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  claude:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .go-version
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+
+      - name: Install Mage
+        run: make mage
+
+      - uses: elastic/ai-github-actions/workflows/mention
+        with:
+          claude-oauth-token: ${{ secrets.CLAUDE_OAUTH_TOKEN }}
+          allowed-tools: "Edit,Write,Bash(mage build),Bash(mage unitTest),Bash(mage fmt),Bash(make update),Bash(mage llc)"
+          additional-instructions: |
+            `make mage` has already been run.
