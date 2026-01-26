@@ -173,11 +173,6 @@ func run() error {
 	// Note: registry files are now static and not generated
 	// They live in pkg/tables/registry.go and pkg/views/registry.go
 
-	// Generate platform-specific import files
-	if err := generatePlatformImports(tableSpecs, viewSpecs, *outDir, *viewsOut); err != nil {
-		return fmt.Errorf("failed to generate platform imports: %w", err)
-	}
-
 	// Generate static registry files
 	if err := generateStaticTablesRegistry(tableSpecs, *outDir); err != nil {
 		return fmt.Errorf("failed to generate static tables registry: %w", err)
@@ -707,159 +702,86 @@ func formatGeneratedFiles(dirs ...string) error {
 	return nil
 }
 
-// generatePlatformImports generates platform-specific files with naked imports
-// for all tables and views that support each platform.
-func generatePlatformImports(tableSpecs, viewSpecs []spec, tablesDir, viewsDir string) error {
-	platforms := []string{"linux", "darwin", "windows"}
-
-	// Convert output directories to import paths using go list
-	tablesImportPath, err := getImportPath(tablesDir)
-	if err != nil {
-		return fmt.Errorf("failed to get import path for tables dir: %w", err)
+// generateStaticTablesRegistry generates platform-specific static registry files with table specs
+func generateStaticTablesRegistry(tableSpecs []spec, outDir string) error {
+	// Group tables by platform
+	platformTables := make(map[string][]spec)
+	
+	for _, s := range tableSpecs {
+		for _, platform := range s.Platforms {
+			platformTables[platform] = append(platformTables[platform], s)
+		}
 	}
 
-	viewsImportPath, err := getImportPath(viewsDir)
-	if err != nil {
-		return fmt.Errorf("failed to get import path for views dir: %w", err)
-	}
+	// Generate a registry file for each platform
+	for _, platform := range []string{"linux", "darwin", "windows"} {
+		tables := platformTables[platform]
 
-	for _, platform := range platforms {
-		if err := generatePlatformImportFile(tableSpecs, viewSpecs, tablesDir, tablesImportPath, viewsImportPath, platform); err != nil {
-			return fmt.Errorf("failed to generate imports for %s: %w", platform, err)
+		var b strings.Builder
+
+		// Header
+		b.WriteString(elasticCopyrightHeader)
+		b.WriteString(codeGeneratedNotice)
+		fmt.Fprintf(&b, "// Source: gentables - static registry of %s tables\n\n", platform)
+		fmt.Fprintf(&b, "//go:build %s\n\n", platform)
+		b.WriteString("package generated\n\n")
+
+		if len(tables) == 0 {
+			// Generate empty registry for platforms with no tables
+			b.WriteString("import (\n")
+			b.WriteString("\t\"github.com/osquery/osquery-go\"\n\n")
+			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger\"\n")
+			b.WriteString(")\n\n")
+			b.WriteString("// RegisterTables registers all generated tables with the osquery extension server.\n")
+			b.WriteString("// This function is called from main.go after all init() functions have run.\n")
+			b.WriteString("// No tables are defined for this platform.\n")
+			b.WriteString("func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {\n")
+			b.WriteString("\t// No tables to register for this platform\n")
+			b.WriteString("}\n")
+		} else {
+			// Imports
+			b.WriteString("import (\n")
+			b.WriteString("\t\"github.com/osquery/osquery-go\"\n")
+			b.WriteString("\t\"github.com/osquery/osquery-go/plugin/table\"\n\n")
+			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger\"\n")
+
+			// Import table packages for this platform
+			for _, s := range tables {
+				pkgName := toPackageName(s.Name)
+				fmt.Fprintf(&b, "\t%s \"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/%s\"\n", pkgName, s.Name)
+			}
+			b.WriteString(")\n\n")
+
+			// Generate RegisterTables function
+			b.WriteString("// RegisterTables registers all generated tables with the osquery extension server.\n")
+			b.WriteString("// This function is called from main.go after all init() functions have run.\n")
+			b.WriteString("func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {\n")
+
+			for _, s := range tables {
+				pkgName := toPackageName(s.Name)
+				b.WriteString("\t{\n")
+				fmt.Fprintf(&b, "\t\t// %s\n", s.Description)
+				fmt.Fprintf(&b, "\t\tgenFunc, err := %s.GetGenerateFunc(log)\n", pkgName)
+				b.WriteString("\t\tif err != nil {\n")
+				fmt.Fprintf(&b, "\t\t\tlog.Errorf(\"Failed to get generate function for %s: %%v\", err)\n", s.Name)
+				b.WriteString("\t\t} else {\n")
+				fmt.Fprintf(&b, "\t\t\tserver.RegisterPlugin(table.NewPlugin(%q, %s.Columns(), genFunc))\n", s.Name, pkgName)
+				fmt.Fprintf(&b, "\t\t\tlog.Infof(\"Registered table: %s\")\n", s.Name)
+				b.WriteString("\t\t}\n")
+				b.WriteString("\t}\n\n")
+			}
+
+			b.WriteString("}\n")
+		}
+
+		// Write to platform-specific file
+		filename := filepath.Join(outDir, fmt.Sprintf("registry_%s.go", platform))
+		if err := writeFile(filename, b.String()); err != nil {
+			return err
 		}
 	}
 
 	return nil
-}
-
-// generatePlatformImportFile generates a single platform-specific import file
-func generatePlatformImportFile(tableSpecs, viewSpecs []spec, tablesDir, tablesImportPath, viewsImportPath, platform string) error {
-	var b strings.Builder
-
-	// Header
-	b.WriteString(elasticCopyrightHeader)
-	b.WriteString(codeGeneratedNotice)
-	fmt.Fprintf(&b, "// Source: gentables - platform-specific imports for %s\n\n", platform)
-
-	// Build tag
-	fmt.Fprintf(&b, "//go:build %s\n\n", platform)
-
-	// Package
-	b.WriteString("package generated\n\n")
-
-	// Imports section
-	b.WriteString("import (\n")
-
-	// Collect imports
-	var implImports []string
-	var tableImports []string
-	var viewImports []string
-
-	// Add implementation packages first (to trigger their init())
-	for _, s := range tableSpecs {
-		if containsPlatform(s.Platforms, platform) && s.ImplementationPackage != "" {
-			implImports = append(implImports, s.ImplementationPackage)
-		}
-	}
-
-	// Then collect generated tables (which register the table specs)
-	for _, s := range tableSpecs {
-		if containsPlatform(s.Platforms, platform) {
-			tableImports = append(tableImports, fmt.Sprintf("%s/%s", tablesImportPath, s.Name))
-		}
-	}
-
-	// Collect views that support this platform
-	for _, s := range viewSpecs {
-		if containsPlatform(s.Platforms, platform) {
-			viewImports = append(viewImports, fmt.Sprintf("%s/%s", viewsImportPath, s.Name))
-		}
-	}
-
-	// Write imports in correct order: impl, tables, views
-	// Use blank lines to separate groups - gofmt will preserve groups while sorting within each
-	for _, imp := range implImports {
-		fmt.Fprintf(&b, "\t_ \"%s\"\n", imp)
-	}
-	if len(implImports) > 0 && (len(tableImports) > 0 || len(viewImports) > 0) {
-		b.WriteString("\n")
-	}
-	
-	for _, imp := range tableImports {
-		fmt.Fprintf(&b, "\t_ \"%s\"\n", imp)
-	}
-	if len(tableImports) > 0 && len(viewImports) > 0 {
-		b.WriteString("\n")
-	}
-	
-	for _, imp := range viewImports {
-		fmt.Fprintf(&b, "\t_ \"%s\"\n", imp)
-	}
-
-	b.WriteString(")\n")
-
-	// Write to file
-	filename := filepath.Join(tablesDir, fmt.Sprintf("tables_%s.go", platform))
-	return writeFile(filename, b.String())
-}
-
-// containsPlatform checks if a platform is in the list of platforms
-func containsPlatform(platforms []string, platform string) bool {
-	for _, p := range platforms {
-		if p == platform {
-			return true
-		}
-	}
-	return false
-}
-
-// generateStaticTablesRegistry generates a static registry file with all table specs
-func generateStaticTablesRegistry(tableSpecs []spec, outDir string) error {
-	var b strings.Builder
-
-	// Header
-	b.WriteString(elasticCopyrightHeader)
-	b.WriteString(codeGeneratedNotice)
-	b.WriteString("// Source: gentables - static registry of all tables\n\n")
-	b.WriteString("package generated\n\n")
-
-	// Imports
-	b.WriteString("import (\n")
-	b.WriteString("\t\"github.com/osquery/osquery-go\"\n")
-	b.WriteString("\t\"github.com/osquery/osquery-go/plugin/table\"\n\n")
-	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger\"\n")
-
-	// Import all table packages
-	for _, s := range tableSpecs {
-		pkgName := toPackageName(s.Name)
-		fmt.Fprintf(&b, "\t%s \"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/%s\"\n", pkgName, s.Name)
-	}
-	b.WriteString(")\n\n")
-
-	// Generate RegisterTables function
-	b.WriteString("// RegisterTables registers all generated tables with the osquery extension server.\n")
-	b.WriteString("// This function is called from main.go after all init() functions have run.\n")
-	b.WriteString("func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {\n")
-
-	for _, s := range tableSpecs {
-		pkgName := toPackageName(s.Name)
-		b.WriteString("\t{\n")
-		fmt.Fprintf(&b, "\t\t// %s\n", s.Description)
-		fmt.Fprintf(&b, "\t\tgenFunc, err := %s.GetGenerateFunc(log)\n", pkgName)
-		b.WriteString("\t\tif err != nil {\n")
-		fmt.Fprintf(&b, "\t\t\tlog.Errorf(\"Failed to get generate function for %s: %%v\", err)\n", s.Name)
-		b.WriteString("\t\t} else {\n")
-		fmt.Fprintf(&b, "\t\t\tserver.RegisterPlugin(table.NewPlugin(%q, %s.Columns(), genFunc))\n", s.Name, pkgName)
-		fmt.Fprintf(&b, "\t\t\tlog.Infof(\"Registered table: %s\")\n", s.Name)
-		b.WriteString("\t\t}\n")
-		b.WriteString("\t}\n\n")
-	}
-
-	b.WriteString("}\n")
-
-	// Write to file
-	filename := filepath.Join(outDir, "registry.go")
-	return writeFile(filename, b.String())
 }
 
 // generateStaticViewsRegistry generates a static registry file with all view specs
