@@ -66,7 +66,7 @@ For example, configuration below only utilize `aws` metadata retrival mechanism,
 processors:
   - add_cloud_metadata:
       providers:
-        aws
+        - aws
 ```
 
 The third optional configuration setting is `overwrite`. When `overwrite` is `true`, `add_cloud_metadata` overwrites existing `cloud.*` fields (`false` by default).

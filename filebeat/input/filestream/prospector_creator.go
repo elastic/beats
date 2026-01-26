@@ -36,26 +36,38 @@ const (
 
 var experimentalWarning sync.Once
 
-func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
-	logger := log.With("filestream_id", config.ID)
+func newProspector(
+	config config,
+	log *logp.Logger,
+	srci *loginp.SourceIdentifier) (loginp.Prospector, error) {
+
+	logger := log.Named("filestream").With("id", config.ID)
 	err := checkConfigCompatibility(config)
 	if err != nil {
 		return nil, err
 	}
 
-	filewatcher, err := newFileWatcher(
-		logger, config.Paths, config.FileWatcher, config.GZIPExperimental, config.Delete.Enabled)
-	if err != nil {
-		return nil, fmt.Errorf("error while creating filewatcher %w", err)
-	}
-
-	identifier, err := newFileIdentifier(config.FileIdentity, config.Reader.Parsers.Suffix, log)
+	identifier, err := newFileIdentifier(
+		config.FileIdentity,
+		config.Reader.Parsers.Suffix,
+		logger)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating file identifier: %w", err)
 	}
-
-	logger = logger.Named("filestream")
 	logger.Debugf("file identity is set to %s", identifier.Name())
+
+	filewatcher, err := newFileWatcher(
+		logger,
+		config.Paths,
+		config.FileWatcher,
+		config.Compression,
+		config.Delete.Enabled,
+		identifier,
+		srci,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error while creating filewatcher %w", err)
+	}
 
 	fileprospector := fileProspector{
 		filewatcher:         filewatcher,
@@ -118,22 +130,10 @@ func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 }
 
 func checkConfigCompatibility(config config) error {
-	var fwCfg struct {
-		Fingerprint struct {
-			Enabled bool `config:"enabled"`
-		} `config:"fingerprint"`
-	}
-
-	if config.FileWatcher != nil &&
-		config.FileIdentity != nil &&
-		config.FileIdentity.Name() == fingerprintName {
-		err := config.FileWatcher.Config().Unpack(&fwCfg)
-		if err != nil {
-			return fmt.Errorf("failed to parse file watcher configuration: %w", err)
-		}
-		if !fwCfg.Fingerprint.Enabled {
-			return fmt.Errorf("fingerprint file identity can be used only when fingerprint is enabled in the scanner")
-		}
+	if config.FileIdentity != nil &&
+		config.FileIdentity.Name() == fingerprintName &&
+		!config.FileWatcher.Scanner.Fingerprint.Enabled {
+		return fmt.Errorf("fingerprint file identity can be used only when fingerprint is enabled in the scanner")
 	}
 
 	return nil

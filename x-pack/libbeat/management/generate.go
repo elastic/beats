@@ -6,13 +6,17 @@ package management
 
 import (
 	"fmt"
+	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 )
+
+const celInputPrefix = "cel-"
 
 // DefaultNamespaceName is the fallback default namespace for data stream info
 var DefaultNamespaceName = "default"
@@ -83,7 +87,7 @@ func handleSimpleConfig(raw *proto.UnitExpectedConfig) (map[string]any, error) {
 }
 
 // CreateInputsFromStreams breaks down the raw Expected config into an array of individual inputs/modules from the Streams values
-// that can later be formatted into the reloader's ConfigWithMetaData and sent to an indvidual beat/
+// that can later be formatted into the reloader's ConfigWithMetaData and sent to an individual beat/
 // This also performs the basic task of inserting module-level add_field processors into the inputs/modules.
 func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) ([]map[string]interface{}, error) {
 	// If there are no streams, we fall into the 'simple input config' case,
@@ -112,6 +116,17 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamTyp
 			return nil, fmt.Errorf("error creating stream rules: %w", err)
 		}
 
+		// integration package data resides in the raw.Meta field.
+		// Add this data to cel inputs
+		id, ok := streamSource["id"].(string)
+		if ok && id != "" && strings.HasPrefix(id, celInputPrefix) {
+			if raw.Meta != nil && raw.Meta.Package != nil {
+				packageData := make(map[string]string)
+				packageData["name"] = raw.Meta.Package.Name
+				packageData["version"] = raw.Meta.Package.Version
+				streamSource["package"] = packageData
+			}
+		}
 		inputs[iter] = streamSource
 	}
 
@@ -348,7 +363,7 @@ func metadataFromDatastreamValues(defaultDataStreamType string, expected *proto.
 	if newNamespace := streamExpected.GetDataStream().GetNamespace(); newNamespace != "" {
 		setNamespace = newNamespace
 	}
-	if newNamespace := expected.GetDataStream().GetNamespace(); newNamespace != "" && newNamespace != DefaultDatasetName {
+	if newNamespace := expected.GetDataStream().GetNamespace(); newNamespace != "" && newNamespace != DefaultNamespaceName {
 		setNamespace = newNamespace
 	}
 

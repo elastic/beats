@@ -24,6 +24,10 @@ const defaultMaxExecutions = 1000
 
 // config is the top-level configuration for a cel input.
 type config struct {
+	// DataStream holds the data_stream.dataset name if it
+	// was available on configuration.
+	DataStream string
+
 	// Interval is the period interval between runs of the input.
 	Interval time.Duration `config:"interval" validate:"required"`
 
@@ -66,6 +70,21 @@ type config struct {
 	// RecordCoverage indicates whether a program should
 	// record and log execution coverage.
 	RecordCoverage bool `config:"record_coverage"`
+
+	// Package contains information about the integration package.
+	// name and version are expected.
+	Package map[string]string `config:"package"`
+}
+
+func (c config) GetPackageData(key string) string {
+	if c.Package == nil {
+		return "unknown"
+	}
+	value, ok := c.Package[key]
+	if !ok {
+		return "unknown"
+	}
+	return value
 }
 
 type redact struct {
@@ -107,7 +126,7 @@ func (c config) Validate() error {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
 	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
-	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, lib.HTTPOptions{}, patterns, c.XSDs, logp.L().Named("input.cel"), nil, wantDump, false)
+	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, lib.HTTPOptions{}, patterns, c.XSDs, logp.NewNopLogger(), nil, wantDump, false)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}

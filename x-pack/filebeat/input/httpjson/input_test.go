@@ -12,6 +12,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -589,6 +590,69 @@ var testCases = []struct {
 		},
 		handler:  oauth2Handler,
 		expected: []string{`{"hello": "world"}`},
+	},
+	{
+		name: "aws auth",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":                   1,
+			"request.method":             http.MethodGet,
+			"auth.aws.access_key_id":     "AKIAIOSFODNN7EXAMPLE",
+			"auth.aws.secret_access_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+			"auth.aws.default_region":    "us-east-1",
+			"auth.aws.service_name":      "guardduty",
+		},
+		handler:  awsAuthHandler("AKIAIOSFODNN7EXAMPLE", defaultHandler(http.MethodGet, "", "")),
+		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
+	{
+		name: "file_auth_default_header",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			dir := t.TempDir()
+			secret := "file-secret"
+			path := filepath.Join(dir, "auth_token")
+			if err := os.WriteFile(path, []byte(secret+"\n"), 0o600); err != nil {
+				t.Fatalf("failed to write auth token: %v", err)
+			}
+			config["auth.file.path"] = path
+			config["auth.file.prefix"] = "Bearer "
+			config["auth.file.refresh_interval"] = "100ms"
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+		},
+		handler:  tokenAuthHandler("Bearer file-secret", "", defaultHandler(http.MethodGet, "", "")),
+		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
+	{
+		name: "file_auth_custom_header",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			dir := t.TempDir()
+			tokenPath := filepath.Join(dir, "api_token")
+			if err := os.WriteFile(tokenPath, []byte("secret-api-token\n"), 0o600); err != nil {
+				t.Fatalf("failed to write token file: %v", err)
+			}
+			config["auth.file.path"] = tokenPath
+			config["auth.file.header"] = "X-API-Key"
+			config["auth.file.prefix"] = "ApiToken "
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+		},
+		handler:  tokenAuthHandler("ApiToken secret-api-token", "X-API-Key", defaultHandler(http.MethodGet, "", "")),
+		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 	},
 	{
 		name: "request_transforms_can_access_state_from_previous_transforms",
@@ -1697,6 +1761,38 @@ func defaultHandler(expectedMethod, expectedBody, msg string) http.HandlerFunc {
 		}
 
 		_, _ = w.Write([]byte(msg))
+	}
+}
+
+func awsAuthHandler(expectedTokenID string, handle http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if !strings.HasPrefix(authHeader, fmt.Sprintf("AWS4-HMAC-SHA256 Credential=%s/", expectedTokenID)) {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
+			return
+		}
+
+		amzDate := r.Header.Get("X-Amz-Date")
+		if amzDate == "" {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
+			return
+		}
+
+		handle(w, r)
+	}
+}
+
+func tokenAuthHandler(expectedValue, headerName string, handle http.HandlerFunc) http.HandlerFunc {
+	if headerName == "" {
+		headerName = "Authorization"
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		value := r.Header.Get(headerName)
+		if value != expectedValue {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusUnauthorized)
+			return
+		}
+		handle(w, r)
 	}
 }
 

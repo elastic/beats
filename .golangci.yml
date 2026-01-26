@@ -37,6 +37,8 @@ linters:
           deny:
             - pkg: github.com/elastic/beats/v7/x-pack
               desc: Apache 2.0 licensed code cannot depend on Elastic licensed code (x-pack/).
+            - pkg: github.com/elastic/elastic-agent-client
+              desc: Apache 2.0 licensed code cannot depend on Elastic licensed code (elastic-agent-client).
         main:
           list-mode: lax
           deny:
@@ -83,6 +85,10 @@ linters:
                 - errors
                 - fmt
               reason: This package is deprecated, use `fmt.Errorf` with `%w` instead
+          - go.uber.org/multierr:
+              recommendations:
+                - errors
+              reason: This package is deprecated, use `errors.Join` instead
           - gotest.tools/v3:
               recommendations:
                 - github.com/stretchr/testify

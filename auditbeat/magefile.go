@@ -20,11 +20,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"go.uber.org/multierr"
 
 	auditbeat "github.com/elastic/beats/v7/auditbeat/scripts/mage"
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
@@ -59,7 +59,7 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return multierr.Combine(
+	return errors.Join(
 		devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs()),
 		devtools.TestLinuxForCentosGLIBC(),
 	)

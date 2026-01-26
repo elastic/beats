@@ -349,7 +349,7 @@ steps:
       - label: ":ubuntu: Packetbeat: Packaging Linux arm64"
         key: "packaging-arm"
         env:
-          PLATFORMS: "+all linux/arm64 darwin/arm64"
+          PLATFORMS: "+all linux/arm64 darwin/arm64 windows/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh packetbeat
         retry:

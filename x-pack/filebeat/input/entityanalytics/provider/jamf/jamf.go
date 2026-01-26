@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 // Package jamf provides a computer asset provider for Jamf.
 package jamf
 
@@ -33,6 +35,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -66,7 +69,7 @@ type jamfInput struct {
 }
 
 // New creates a new instance of an Jamf entity provider.
-func New(logger *logp.Logger) (provider.Provider, error) {
+func New(logger *logp.Logger, path *paths.Path) (provider.Provider, error) {
 	p := jamfInput{
 		cfg: defaultConfig(),
 	}
@@ -74,6 +77,7 @@ func New(logger *logp.Logger) (provider.Provider, error) {
 		Logger:    logger,
 		Type:      FullName,
 		Configure: p.configure,
+		Path:      path,
 	}
 
 	return &p, nil
@@ -97,11 +101,7 @@ func (*jamfInput) Test(v2.TestContext) error { return nil }
 
 // Run will start data collection on this provider.
 func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
-	stat := inputCtx.StatusReporter
-	if stat == nil {
-		stat = noopReporter{}
-	}
-	stat.UpdateStatus(status.Starting, "")
+	inputCtx.UpdateStatus(status.Starting, "")
 	p.logger = inputCtx.Logger.With("provider", Name, "tenant", p.cfg.JamfTenant)
 	p.metrics = newMetrics(inputCtx.MetricsRegistry, p.logger)
 
@@ -124,26 +124,26 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		return err
 	}
 
-	stat.UpdateStatus(status.Running, "")
+	inputCtx.UpdateStatus(status.Running, "")
 	for {
 		select {
 		case <-inputCtx.Cancelation.Done():
 			if !errors.Is(inputCtx.Cancelation.Err(), context.Canceled) {
 				err := inputCtx.Cancelation.Err()
-				stat.UpdateStatus(status.Stopping, err.Error())
+				inputCtx.UpdateStatus(status.Stopping, err.Error())
 				return err
 			}
-			stat.UpdateStatus(status.Stopping, "Deadline passed")
+			inputCtx.UpdateStatus(status.Stopping, "Deadline passed")
 			return nil
 		case <-syncTimer.C:
 			start := time.Now()
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
 				msg := "Error running full sync"
 				p.logger.Errorw(msg, "error", err)
-				stat.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.syncError.Inc()
 			} else {
-				stat.UpdateStatus(status.Running, "Successful full sync")
+				inputCtx.UpdateStatus(status.Running, "Successful full sync")
 			}
 			p.metrics.syncTotal.Inc()
 			p.metrics.syncProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -164,10 +164,10 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
 				msg := "Error running incremental update"
 				p.logger.Errorw(msg, "error", err)
-				stat.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.updateError.Inc()
 			} else {
-				stat.UpdateStatus(status.Running, "Successful incremental update")
+				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
 			}
 			p.metrics.updateTotal.Inc()
 			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -176,10 +176,6 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		}
 	}
 }
-
-type noopReporter struct{}
-
-func (noopReporter) UpdateStatus(status.Status, string) {}
 
 func newClient(ctx context.Context, cfg conf, log *logp.Logger) (*http.Client, error) {
 	c, err := cfg.Request.Transport.Client(clientOptions(cfg.Request.KeepAlive.settings(), log)...)

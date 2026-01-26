@@ -101,10 +101,10 @@ func newOutputController(
 	return controller, nil
 }
 
-func (c *outputController) WaitClose(timeout time.Duration) error {
+func (c *outputController) WaitClose(timeout time.Duration, force bool) error {
 	// First: signal the queue that we're shutting down, and wait up to the
 	// given duration for it to drain and process ACKs.
-	c.closeQueue(timeout)
+	c.closeQueue(timeout, force)
 
 	// We've drained the queue as much as we can, signal eventConsumer to
 	// close, and wait for it to finish. After consumer.close returns,
@@ -189,14 +189,18 @@ func (c *outputController) Reload(
 
 // Close the queue, waiting up to the specified timeout for pending events
 // to complete.
-func (c *outputController) closeQueue(timeout time.Duration) {
+func (c *outputController) closeQueue(timeout time.Duration, force bool) {
 	c.queueLock.Lock()
 	defer c.queueLock.Unlock()
 	if c.queue != nil {
-		c.queue.Close()
+		c.queue.Close(false)
 		select {
 		case <-c.queue.Done():
 		case <-time.After(timeout):
+			if force {
+				c.queue.Close(force)
+				<-c.queue.Done()
+			}
 		}
 	}
 	for _, req := range c.pendingRequests {

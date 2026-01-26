@@ -44,3 +44,18 @@ func TestUnpackCopiesDefault(t *testing.T) {
 
 	assert.NotEqual(t, cfg1.DefaultConfig, cfg2.DefaultConfig)
 }
+
+func TestDefaultConfigContainsCloseRemovedFalse(t *testing.T) {
+	cfg := defaultConfig()
+	closeRemoved, err := cfg.DefaultConfig.Bool("close.on_state_change.removed", -1)
+	if err != nil {
+		t.Fatalf("cannot get 'close.on_state_change.removed': %s", err)
+	}
+
+	// 'close.on_state_change.removed' to prevent missing log lines at the
+	// end of files when using autodiscover, this is specially common on
+	// Kubernetes.
+	if closeRemoved {
+		t.Fatalf("'close.on_state_change.removed' must be false")
+	}
+}

@@ -9,9 +9,19 @@ env:
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
   PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
-  PLATFORMS_ARM: "+all linux/arm64 darwin/arm64"
+  PLATFORMS_ARM: "+all linux/arm64 darwin/arm64 windows/arm64"
   PLATFORMS_AMD64_FIPS: "+all linux/amd64"
   PLATFORMS_ARM64_FIPS: "+all linux/arm64"
+
+# This section is used to define the plugins that will be used in the pipeline.
+# See https://buildkite.com/docs/pipelines/integrations/plugins/using#using-yaml-anchors-with-plugins
+common:
+  - dockerhub_login_plugin: &dockerhub_login_plugin
+      elastic/vault-docker-login#v0.6.0:
+        secret_path: 'kv/ci-shared/observability-github-secrets/shared/docker/dockerhub/observabilityrobots'
+  - docker_elastic_login_plugin: &docker_elastic_login_plugin
+      elastic/vault-docker-login#v0.6.0:
+        secret_path: 'kv/ci-shared/platform-ingest/elastic_docker_registry'
 
 steps:
   # we use concurrency gates (https://buildkite.com/blog/concurrency-gates)
@@ -107,6 +117,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - auditbeat
           - filebeat
@@ -123,7 +136,7 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "SNAPSHOT: {{matrix}} Linux/arm64 and Darwin/arm64"
+      - label: "SNAPSHOT: {{matrix}} Linux/arm64, Darwin/arm64, and Windows/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
           SNAPSHOT: true
@@ -140,39 +153,24 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - auditbeat
           - filebeat
           - heartbeat
           - metricbeat
           - packetbeat
+          - winlogbeat
           - x-pack/auditbeat
           - x-pack/dockerlogbeat
           - x-pack/filebeat
           - x-pack/heartbeat
           - x-pack/metricbeat
-          - x-pack/packetbeat
           - x-pack/osquerybeat
-          - x-pack/agentbeat
-
-      ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "SNAPSHOT: x-pack/agentbeat all artifacts apart from linux/arm64 and darwin/arm64"
-        env:
-          PLATFORMS: "${PLATFORMS}"
-          SNAPSHOT: true
-          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
-          DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
-        agents:
-          provider: gcp
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
-        timeout_in_minutes: 40
-        retry:
-          automatic:
-            - limit: 1
-        artifact_paths:
-          - build/distributions/**/*
+          - x-pack/packetbeat
+          - x-pack/winlogbeat
 
       - label: "SNAPSHOT: {{matrix}} Linux/amd64 FIPS"
         env:
@@ -192,6 +190,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - x-pack/auditbeat
           - x-pack/filebeat
@@ -215,31 +216,13 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - x-pack/auditbeat
           - x-pack/filebeat
           - x-pack/metricbeat
-          - x-pack/agentbeat
-
-      ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "SNAPSHOT: x-pack/agentbeat Linux/amd64 FIPS"
-        env:
-          PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
-          SNAPSHOT: true
-          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
-          DEV: false
-          FIPS: true
-        command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
-        agents:
-          provider: gcp
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
-        timeout_in_minutes: 40
-        retry:
-          automatic:
-            - limit: 1
-        artifact_paths:
-          - build/distributions/**/*
 
   - group: Packaging Staging
     key: packaging-staging
@@ -265,6 +248,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - auditbeat
           - filebeat
@@ -281,7 +267,7 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "STAGING: {{matrix}} Linux/arm64 and Darwin/arm64"
+      - label: "STAGING: {{matrix}} Linux/arm64, Darwin/arm64, and Windows/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
           SNAPSHOT: false
@@ -299,40 +285,24 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - auditbeat
           - filebeat
           - heartbeat
           - metricbeat
           - packetbeat
+          - winlogbeat
           - x-pack/auditbeat
           - x-pack/dockerlogbeat
           - x-pack/filebeat
           - x-pack/heartbeat
           - x-pack/metricbeat
-          - x-pack/packetbeat
           - x-pack/osquerybeat
-          - x-pack/agentbeat
-
-        ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "STAGING: x-pack/agentbeat all artifacts apart from linux/arm64 and darwin/arm64"
-        env:
-          PLATFORMS: "${PLATFORMS}"
-          SNAPSHOT: false
-          DEV: false
-        command: |
-          source .buildkite/scripts/version_qualifier.sh
-          .buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat
-        agents:
-          provider: gcp
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
-        timeout_in_minutes: 40
-        retry:
-          automatic:
-            - limit: 1
-        artifact_paths:
-          - build/distributions/**/*
+          - x-pack/packetbeat
+          - x-pack/winlogbeat
 
       - label: "STAGING: {{matrix}} Linux/amd64 FIPS"
         env:
@@ -354,6 +324,9 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - x-pack/auditbeat
           - x-pack/filebeat
@@ -379,33 +352,13 @@ steps:
             - limit: 1
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         matrix:
           - x-pack/auditbeat
           - x-pack/filebeat
           - x-pack/metricbeat
-          - x-pack/agentbeat
-
-        ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "STAGING: x-pack/agentbeat Linux/amd64 FIPS"
-        env:
-          PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
-          SNAPSHOT: false
-          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
-          DEV: false
-          FIPS: true
-        command: |
-          source .buildkite/scripts/version_qualifier.sh
-          .buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat
-        agents:
-          provider: gcp
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
-        timeout_in_minutes: 40
-        retry:
-          automatic:
-            - limit: 1
-        artifact_paths:
-          - build/distributions/**/*
 
   - group: DRA publish
     key: dra
@@ -428,6 +381,8 @@ steps:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        plugins:
+          - *docker_elastic_login_plugin
 
       - label: DRA Staging
         # TODO remove OR clause below (see earlier comment)
@@ -448,6 +403,8 @@ steps:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        plugins:
+          - *docker_elastic_login_plugin
 
   - wait
 

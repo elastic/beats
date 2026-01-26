@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package awss3
 
 import (
@@ -70,8 +72,7 @@ func (in *s3PollerInput) Run(
 
 	in.log = inputContext.Logger.Named("s3")
 
-	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log, "S3")
-	defer in.status.UpdateStatus(status.Stopped, "")
+	in.status = statusreporterhelper.New(inputContext, in.log, "S3")
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
 	in.pipeline = pipeline
@@ -107,7 +108,7 @@ func (in *s3PollerInput) Run(
 	)
 
 	in.run(ctx)
-
+	in.status.UpdateStatus(status.Stopped, "Input execution ended")
 	return nil
 }
 

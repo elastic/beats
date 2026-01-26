@@ -95,7 +95,7 @@ func PythonIntegTest() {
 }
 
 func GoIntegTest(ctx context.Context) error {
-	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
+	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs(ctx))
 }
 
 func Fields() error {

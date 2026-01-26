@@ -15,11 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build integration
 
 package integration
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -30,9 +33,10 @@ import (
 	"github.com/brianvoe/gofakeit"
 )
 
-// WriteLogFile writes count lines to path
-// Each line contains the current time (RFC3339) and a counter
-// Prefix is added instead of current time if it exists
+// WriteLogFile writes count lines to path.
+// Each line contains the current time (RFC3339) and a counter.
+// Prefix is added instead of current time if it exists.
+// If no prefix is passed, each line is 50 bytes long
 func WriteLogFile(t *testing.T, path string, count int, append bool, prefix ...string) {
 	var file *os.File
 	var err error
@@ -78,6 +82,41 @@ func WriteLogFile(t *testing.T, path string, count int, append bool, prefix ...s
 		if _, err := fmt.Fprintf(file, "%s           %13d\n", now, i); err != nil {
 			t.Fatalf("could not write line %d to file: %s", count+1, err)
 		}
+	}
+}
+
+// WriteDockerJSONLog writes Docker JSON log lines to path.
+// Stream is written as the "stream" field in each line.
+func WriteDockerJSONLog(t *testing.T, path string, count int, stream string) {
+	t.Helper()
+
+	file, err := os.Create(path)
+	if err != nil {
+		t.Fatalf("cannot create docker log file: %s", err)
+	}
+	defer func() {
+		if err := file.Close(); err != nil {
+			t.Fatalf("cannot close docker log file: %s", err)
+		}
+	}()
+
+	now := time.Now().UTC()
+	writer := bufio.NewWriter(file)
+	for i := range count {
+		timestamp := now.Add(time.Duration(i) * time.Millisecond).Format(time.RFC3339Nano)
+		if _, err := fmt.Fprintf(
+			writer,
+			`{"log":"message %d\n","stream":"%s","time":"%s"}`+"\n",
+			i,
+			stream,
+			timestamp,
+		); err != nil {
+			t.Fatalf("cannot write docker log line: %s", err)
+		}
+	}
+
+	if err := writer.Flush(); err != nil {
+		t.Fatalf("cannot flush docker log file: %s", err)
 	}
 }
 

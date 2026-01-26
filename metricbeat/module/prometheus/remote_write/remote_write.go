@@ -18,6 +18,8 @@
 package remote_write
 
 import (
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -56,44 +58,25 @@ type RemoteWriteEventsGeneratorFactory func(ms mb.BaseMetricSet, opts ...RemoteW
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	server          serverhelper.Server
-	events          chan mb.Event
-	promEventsGen   RemoteWriteEventsGenerator
-	eventGenStarted bool
-}
-
-func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := defaultConfig()
-	err := base.Module().UnpackConfig(&config)
-	if err != nil {
-		return nil, err
-	}
-
-	promEventsGen, err := DefaultRemoteWriteEventsGeneratorFactory(base, WithCountMetrics(config.MetricsCount))
-	if err != nil {
-		return nil, err
-	}
-
-	m := &MetricSet{
-		BaseMetricSet:   base,
-		events:          make(chan mb.Event),
-		promEventsGen:   promEventsGen,
-		eventGenStarted: false,
-	}
-
-	svc, err := httpserver.NewHttpServerWithHandler(base, m.handleFunc)
-	if err != nil {
-		return nil, err
-	}
-	m.server = svc
-	return m, nil
+	server                 serverhelper.Server
+	events                 chan mb.Event
+	promEventsGen          RemoteWriteEventsGenerator
+	eventGenStarted        bool
+	maxCompressedBodyBytes int64
+	maxDecodedBodyBytes    int64
 }
 
 // MetricSetBuilder returns a builder function for a new Prometheus remote_write metricset using
 // the given namespace and event generator
 func MetricSetBuilder(genFactory RemoteWriteEventsGeneratorFactory) func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	return MetricSetBuilderWithConfig(genFactory, defaultConfig())
+}
+
+// MetricSetBuilderWithConfig returns a builder function for a new Prometheus remote_write metricset using
+// the given namespace, event generator, and a base config that will be merged with module config
+func MetricSetBuilderWithConfig(genFactory RemoteWriteEventsGeneratorFactory, baseConfig Config) func(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return func(base mb.BaseMetricSet) (mb.MetricSet, error) {
-		config := defaultConfig()
+		config := baseConfig
 		err := base.Module().UnpackConfig(&config)
 		if err != nil {
 			return nil, err
@@ -105,10 +88,12 @@ func MetricSetBuilder(genFactory RemoteWriteEventsGeneratorFactory) func(base mb
 		}
 
 		m := &MetricSet{
-			BaseMetricSet:   base,
-			events:          make(chan mb.Event),
-			promEventsGen:   promEventsGen,
-			eventGenStarted: false,
+			BaseMetricSet:          base,
+			events:                 make(chan mb.Event),
+			promEventsGen:          promEventsGen,
+			eventGenStarted:        false,
+			maxCompressedBodyBytes: config.MaxCompressedBodyBytes,
+			maxDecodedBodyBytes:    config.MaxDecodedBodyBytes,
 		}
 
 		svc, err := httpserver.NewHttpServerWithHandler(base, m.handleFunc)
@@ -150,10 +135,32 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 		m.eventGenStarted = true
 	}
 
+	// Limit the size of the compressed request body to prevent resource exhaustion
+	req.Body = http.MaxBytesReader(writer, req.Body, m.maxCompressedBodyBytes)
+
 	compressed, err := io.ReadAll(req.Body)
 	if err != nil {
+		var maxBytesError *http.MaxBytesError
+		if errors.As(err, &maxBytesError) {
+			m.Logger().Warnf("Request body too large: exceeds %d bytes limit", m.maxCompressedBodyBytes)
+			http.Error(writer, fmt.Sprintf("request body too large: exceeds %d bytes limit", m.maxCompressedBodyBytes), http.StatusRequestEntityTooLarge)
+			return
+		}
 		m.Logger().Errorf("Read error %v", err)
 		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Check decoded length before allocating memory to prevent
+	decodedLen, err := snappy.DecodedLen(compressed)
+	if err != nil {
+		m.Logger().Errorf("Decoded length error: %v", err)
+		http.Error(writer, "Decoded length error", http.StatusBadRequest)
+		return
+	}
+	if int64(decodedLen) > m.maxDecodedBodyBytes {
+		m.Logger().Warnf("Decoded length too large: %d bytes exceeds %d max decoded bytes limit (maxDecodedBodyBytes)", decodedLen, m.maxDecodedBodyBytes)
+		http.Error(writer, fmt.Sprintf("decoded length too large: %d bytes exceeds %d max decoded bytes limit (maxDecodedBodyBytes)", decodedLen, m.maxDecodedBodyBytes), http.StatusRequestEntityTooLarge)
 		return
 	}
 

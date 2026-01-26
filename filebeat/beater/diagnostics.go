@@ -39,12 +39,12 @@ func getRegexpsForRegistryFiles() ([]*regexp.Regexp, error) {
 
 	registryFileRegExps := []*regexp.Regexp{}
 	preFilesList := [][]string{
-		[]string{"^registry$"},
-		[]string{"^registry", "filebeat$"},
-		[]string{"^registry", "filebeat", "meta\\.json$"},
-		[]string{"^registry", "filebeat", "log\\.json$"},
-		[]string{"^registry", "filebeat", "active\\.dat$"},
-		[]string{"^registry", "filebeat", "[[:digit:]]*\\.json$"},
+		{"^registry$"},
+		{"^registry", "filebeat$"},
+		{"^registry", "filebeat", "meta\\.json$"},
+		{"^registry", "filebeat", "log\\.json$"},
+		{"^registry", "filebeat", "active\\.dat$"},
+		{"^registry", "filebeat", "[[:digit:]]*\\.json$"},
 	}
 
 	for _, lst := range preFilesList {
@@ -70,12 +70,12 @@ func getRegexpsForRegistryFiles() ([]*regexp.Regexp, error) {
 	return registryFileRegExps, nil
 }
 
-func gzipRegistry(logger *logp.Logger) func() []byte {
+func gzipRegistry(logger *logp.Logger, beatPaths *paths.Path) func() []byte {
 	logger = logger.Named("diagnostics")
 
 	return func() []byte {
 		buf := bytes.Buffer{}
-		dataPath := paths.Resolve(paths.Data, "")
+		dataPath := beatPaths.Resolve(paths.Data, "")
 		registryPath := filepath.Join(dataPath, "registry")
 		f, err := os.CreateTemp("", "filebeat-registry-*.tar")
 		if err != nil {

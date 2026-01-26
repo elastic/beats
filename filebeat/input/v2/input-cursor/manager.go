@@ -124,7 +124,15 @@ func (cim *InputManager) Init(group unison.Group) error {
 	store := cim.store
 	cleaner := &cleaner{log: log}
 	store.Retain()
+	// TL;DR: If Filebeat shuts down too quickly, the function passed to
+	// `group.Go` will never run, therefore this instance of store will
+	// never be released, locking Filebeat's shutdown process.
+	//
+	// To circumvent that, we wait for `group.Go` to start our function.
+	// See https://github.com/elastic/beats/issues/45034#issuecomment-3238261126
+	waitRunning := make(chan struct{})
 	err := group.Go(func(canceler context.Context) error {
+		waitRunning <- struct{}{}
 		defer cim.shutdown()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()
@@ -140,6 +148,7 @@ func (cim *InputManager) Init(group unison.Group) error {
 		return fmt.Errorf("Can not start registry cleanup process: %w", err)
 	}
 
+	<-waitRunning
 	return nil
 }
 

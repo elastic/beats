@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/community-beats.html
+applies_to:
+  stack: ga
 ---
 
 # Community {{beats}} [community-beats]

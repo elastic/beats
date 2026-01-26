@@ -93,7 +93,7 @@ type ConnectionSettings struct {
 	Transport httpcommon.HTTPTransportSettings
 
 	// UserAgent can be used to report the agent running mode
-	// to ES via the User Agent string. If running under Agent (fleetmode.Enabled() == true)
+	// to ES via the User Agent string. If running under Agent (management.UnderAgent() == true)
 	// then this string will be appended to the user agent.
 	UserAgent string
 }
@@ -176,7 +176,7 @@ func NewConnection(s ConnectionSettings, log *logp.Logger) (*Connection, error) 
 
 	esClient := esHTTPClient(httpClient)
 	if s.Kerberos.IsEnabled() {
-		esClient, err = kerberos.NewClient(s.Kerberos, httpClient, s.URL)
+		esClient, err = kerberos.NewClient(s.Kerberos, httpClient)
 		if err != nil {
 			return nil, err
 		}
@@ -227,7 +227,6 @@ func NewClients(cfg *cfg.C, beatname string, log *logp.Logger) ([]Connection, er
 			return nil, err
 		}
 
-		// TODO: use local logger here
 		client, err := NewConnection(ConnectionSettings{
 			URL:              esURL,
 			Beatname:         beatname,
@@ -354,7 +353,7 @@ func (conn *Connection) Test(d testing.Driver) {
 				}
 
 				netDialer := transport.NetDialer(conn.Transport.Timeout)
-				tlsDialer := transport.TestTLSDialer(d, netDialer, tls, conn.Transport.Timeout)
+				tlsDialer := transport.TestTLSDialer(d, netDialer, tls, conn.Transport.Timeout, conn.log)
 				_, err = tlsDialer.Dial("tcp", address)
 				d.Fatal("dial up", err)
 			})
@@ -444,13 +443,14 @@ func (conn *Connection) getVersion() error {
 		conn.version = *v
 	}
 
-	if versionData.Version.BuildFlavor == "serverless" {
+	switch versionData.Version.BuildFlavor {
+	case "serverless":
 		conn.log.Info("build flavor of es is serverless, marking connection as serverless")
 		conn.isServerless = true
-	} else if versionData.Version.BuildFlavor == "default" {
+	case "default":
 		conn.isServerless = false
 		// not sure if this is even possible, just being defensive
-	} else {
+	default:
 		conn.log.Infof("Got unexpected build flavor '%s'", versionData.Version.BuildFlavor)
 	}
 

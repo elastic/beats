@@ -638,7 +638,7 @@
               description: >
                 Identifies the source that an event refers to in an IP network.
                 The format should be a fully qualified domain name (FQDN) associated with the source node, when a
-                mode is available. Examples: 'host' or 'host.domain.com'.
+                mode is available. Examples: 'host' or 'host.example.com'.
 
             - name: sourceMacAddress
               type: keyword

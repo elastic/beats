@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-iis.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -27,7 +29,7 @@ The `iis` module will periodically retrieve IIS related metrics using performanc
 * IIS performance counters like Web Service: Bytes Received/Sec, Web Service: Bytes Sent/Sec, etc, which are helpful to track to identify potential spikes in traffic.
 * Web Service Cache counters in order to monitor user mode cache and output cache.
 
-The `iis` module mericsets are `webserver`, `website` and `application_pool`.
+The `iis` module metricsets are `webserver`, `website` and `application_pool`.
 
 ```yaml
 - module: iis

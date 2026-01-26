@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   uwsgi_tcp:
     image: docker.elastic.co/integrations-ci/beats-uwsgi:${UWSGI_VERSION:-2.0.18}-py${UWSGI_PYTHON_VERSION:-3.8}-1

@@ -1,0 +1,297 @@
+version: 9.2.0
+entries:
+    - kind: feature
+      summary: TCP and UDP inputs now support multiple pipeline workers configured via `number_of_workers`. Increasing the number of workers improves performance when slow processors are used by decoupling reading from the network connection and publishing.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/45124
+      issue:
+        - https://github.com/elastic/beats/issues/43674
+      impact: ""
+      action: ""
+      timestamp: 1759439212
+    - kind: feature
+      summary: Add beta GZIP file ingestion in filestream.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/45301
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439213
+    - kind: feature
+      summary: Updated the `parse_aws_vpc_flow_log` processor to handle AWS VPC flow log v6, v7, and v8 fields.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/45746
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439214
+    - kind: feature
+      summary: "The following output latency_delta metrics are now included when `logging.metrics` is enabled: `output.latency_delta.{count, max, median, min, p99}`. This only includes data since the last internal metrics was logged."
+      description: ""
+      component: all
+      pr:
+        -  https://github.com/elastic/beats/pull/45749
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439215
+    - kind: feature
+      summary: Add OAuth2 support for Okta provider in Entity Analytics input.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/45753
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439216
+    - kind: feature
+      summary: Add new ETW FIM backend for Windows.
+      description: ""
+      component: auditbeat
+      pr:
+        -  https://github.com/elastic/beats/pull/45887
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439217
+    - kind: feature
+      summary: Improve error reporting for schemeless URLs in HTTP JSON input.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/45953
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439218
+    - kind: feature
+      summary: Add `remaining_executions` global to the CEL input evaluation context.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/46210
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439219
+    - kind: breaking-change
+      summary: Change `aws.cloudwatch.*` field in awscloudwatch input to nested object.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/46357
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439220
+    - kind: bug-fix
+      summary: Make data updates in `add_host_metadata` processor synchronous.
+      description: ""
+      component: all
+      pr:
+        -  https://github.com/elastic/beats/pull/46546
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439221
+    - kind: feature
+      summary: Upgrade osquery version to 5.18.1.
+      description: ""
+      component: osquerybeat
+      pr:
+        -  https://github.com/elastic/beats/pull/46624
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439222
+    - kind: feature
+      summary: Journald input now supports reading from multiple journals, including remote ones.
+      description: ""
+      component: filebeat
+      pr:
+        -  https://github.com/elastic/beats/pull/46722
+      issue:
+        - https://github.com/elastic/beats/issues/46656
+      impact: ""
+      action: ""
+      timestamp: 1759439223
+    - kind: feature
+      summary: Bump Windows Npcap version to v1.83.
+      description: ""
+      component: packetbeat
+      pr:
+        -  https://github.com/elastic/beats/pull/46809
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439224
+    - kind: bug-fix
+      summary: Fix defer usage for stopped status reporting.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/46916
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1759439225
+      file:
+        name: 1759439225-chore-fix-defer-usage-for-stopped-status-reporting.yaml
+        checksum: 6712ef7e1be0322e61e26589856f7a95336c1650
+    - kind: bug-fix
+      summary: Prevent panic in logstash output when trying to send events while shutting down.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/46960
+      issue:
+        - https://github.com/elastic/beats/issues/46889
+      impact: ""
+      action: ""
+      timestamp: 1759848602
+      file:
+        name: 1759848602-fix-prevent-panic-in-logstash-output.yaml
+        checksum: b954bb7421248bc306792d101e638e2b9486ff1f
+    - kind: bug-fix
+      summary: Fix missing AWS cloudwatch metrics with linked accounts and same dimensions.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/46978
+      issue:
+        - https://github.com/elastic/integrations/issues/15362
+      impact: ""
+      action: ""
+      timestamp: 1759878363
+      file:
+        name: 1759878363-bugfix-fix-missing-cloudwatch-metrics-with-linked-accounts-and-same-dimensions.yaml
+        checksum: bee797c7a7568cbb2b57c4988b9924c2527c5441
+    - kind: bug-fix
+      summary: Prevent panic in replace processor for non-string values.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47009
+      issue:
+        - https://github.com/elastic/beats/issues/42308
+      impact: ""
+      action: ""
+      timestamp: 1760026886
+      file:
+        name: 1760026886-fix-replace-processor-panic.yaml
+        checksum: beef9eec545644d462230640a17d486f3aaca8a4
+    - kind: bug-fix
+      summary: Add a fix to handle blank content-type headers in HTTP responses for Prometheus.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47027
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1760103378
+      file:
+        name: 1760103378-bugfix-add-a-fix-to-handle-blank-content-typ.yaml
+        checksum: 588a42ea73a583c9d988357f92977557c1768203
+    - kind: bug-fix
+      summary: Autodiscover now correctly updates Kubernetes metadata on node and pod label changes.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47034
+      issue:
+        - https://github.com/elastic/beats/issues/46979
+      impact: ""
+      action: ""
+      timestamp: 1760107537
+      file:
+        name: 1760107537-fix-kubernetes-autodiscover-label-update.yaml
+        checksum: d16b49ddbc781fdeef75bb7791bd52a2703a59f6
+    - kind: bug-fix
+      summary: Add pagination support to the device health metricset in the meraki module.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/46938
+      issue:
+        - https://github.com/elastic/integrations/issues/15551
+      impact: ""
+      action: ""
+      timestamp: 1760358970
+      file:
+        name: 1760358970-add-meraki-device-health-pagination-support.yaml
+        checksum: 084baa64adb51a365aa3470896a85524b2323368
+    - kind: bug-fix
+      summary: Prevent 3s startup delay when add_cloud_metadata is used with debug logs.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47058
+      issue:
+        - https://github.com/elastic/beats/issues/44203
+      impact: ""
+      action: ""
+      timestamp: 1760359519
+      file:
+        name: 1760359519-fix-44203-add_cloud_metadata-delay.yaml
+        checksum: 6960cb943c44a3607220a5a0fe8086bc1e246911
+    - kind: other
+      summary: Bump Golang version to 1.24.9
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47051
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1760423464
+      file:
+        name: 1760423464-bump-Golang-version-to-1.24.9.yaml
+        checksum: 201826a845b8769280a9fef9ef9b59fe19c5e57b
+    - kind: bug-fix
+      summary: Update elastic-agent-system-metrics version to v0.13.3.
+      description: Removes "Accurate CPU counts not available on platform" log spam at the debug log level.
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47104
+      issue:
+        - https://github.com/elastic/beats/issues/47054
+      impact: ""
+      action: ""
+      timestamp: 1760463673
+      file:
+        name: 1760463673-update-elastic-agent-system-metrics-to-v0.13.3..yaml
+        checksum: 535706decb436975980ec4b6144025c939c38501
+    - kind: enhancement
+      summary: Improve the Prometheus helper to handle multiple content types including blank and invalid headers.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47085
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1760507204
+      file:
+        name: 1760507204-bugfix-add-a-fix-to-handle-multiple-content-types-including-blank-and-invalid-headers.yaml
+        checksum: 9edac2df33c8e82d6ee8d848c6cbd136cfbdd760
+    - kind: bug-fix
+      summary: Allows users to customize their data stream namespace to "generic".
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47140
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1760572941
+      file:
+        name: 1760572941-fix-ds-namespace.yaml
+        checksum: d7721f51af64ce6cd8dfd12808320668d7fb0d15

@@ -1,0 +1,79 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "moved"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "change"
+        ]
+      },
+      "file": {
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesfsnotifyrename-file1730013624\\001\\mainfile.txt"
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-08-11T09:48:49.0140988Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 350400,
+    "Period": 0,
+    "DisableTimeSeries": false
+  },
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "created"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "creation"
+        ]
+      },
+      "file": {
+        "accessed": "2025-08-11T09:48:41.013697Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-08-11T09:48:41.013697Z",
+        "ctime": "2025-08-11T09:48:41.013697Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "inode": "9851624185342702",
+        "mtime": "2025-08-11T09:48:41.013697Z",
+        "name": "renamed-file.txt",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesfsnotifyrename-file1730013624\\001\\renamed-file.txt",
+        "size": 0,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-08-11T09:48:49.0140988Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 504900,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]

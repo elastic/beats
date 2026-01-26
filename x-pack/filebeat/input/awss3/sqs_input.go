@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package awss3
 
 import (
@@ -21,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type sqsReaderInput struct {
@@ -49,15 +52,18 @@ type sqsReaderInput struct {
 
 	// health status reporting
 	status status.StatusReporter
+
+	path *paths.Path
 }
 
 // Simple wrapper to handle creation of internal channels
-func newSQSReaderInput(config config, awsConfig awssdk.Config) *sqsReaderInput {
+func newSQSReaderInput(config config, awsConfig awssdk.Config, p *paths.Path) *sqsReaderInput {
 	return &sqsReaderInput{
 		config:           config,
 		awsConfig:        awsConfig,
 		workRequestChan:  make(chan struct{}, config.NumberOfWorkers),
 		workResponseChan: make(chan types.Message),
+		path:             p,
 	}
 }
 
@@ -71,8 +77,7 @@ func (in *sqsReaderInput) Run(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 ) error {
-	in.status = statusreporterhelper.New(inputContext.StatusReporter, inputContext.Logger, "S3 via SQS")
-	defer in.status.UpdateStatus(status.Stopped, "")
+	in.status = statusreporterhelper.New(inputContext, inputContext.Logger, "S3 via SQS")
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
 	// Initialize everything for this run
@@ -86,6 +91,7 @@ func (in *sqsReaderInput) Run(
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 	in.run(ctx)
 	in.cleanup()
+	in.status.UpdateStatus(status.Stopped, "Input execution ended")
 
 	return nil
 }
@@ -355,7 +361,7 @@ func (in *sqsReaderInput) createEventProcessor() (sqsProcessor, error) {
 	fileSelectors := in.config.getFileSelectors()
 	s3EventHandlerFactory := newS3ObjectProcessorFactory(in.metrics, in.s3, fileSelectors, in.config.BackupConfig, in.log)
 
-	script, err := newScriptFromConfig(in.log.Named("sqs_script"), in.config.SQSScript)
+	script, err := newScriptFromConfig(in.log.Named("sqs_script"), in.config.SQSScript, in.path)
 	if err != nil {
 		return nil, err
 	}

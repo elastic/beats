@@ -31,16 +31,17 @@ type fsNotifyParentSymbol struct {
 	filter     string
 }
 
-func loadFsNotifyParentSymbol(s *probeManager) error {
-	symbolInfo, err := s.getSymbolInfoRuntime("__fsnotify_parent")
+func loadFsNotifyParentSymbol(probeMgr *probeManager) error {
+	symbolInfo, err := probeMgr.getSymbolInfoRuntime("__fsnotify_parent")
 	if err != nil {
 		if !errors.Is(err, ErrSymbolNotFound) {
-			return err
+			return fmt.Errorf("__fsnotify_parent symbol does not exist: %w", err)
 		}
+		// TODO: log
 
-		symbolInfo, err = s.getSymbolInfoRuntime("fsnotify_parent")
+		symbolInfo, err = probeMgr.getSymbolInfoRuntime("fsnotify_parent")
 		if err != nil {
-			return err
+			return fmt.Errorf("fsnotify_parent symbol does not exist: %w", err)
 		}
 	}
 
@@ -48,11 +49,11 @@ func loadFsNotifyParentSymbol(s *probeManager) error {
 		return fmt.Errorf("symbol %s is optimised", symbolInfo.symbolName)
 	}
 
-	s.buildChecks = append(s.buildChecks, func(spec *tkbtf.Spec) bool {
+	probeMgr.buildChecks = append(probeMgr.buildChecks, func(spec *tkbtf.Spec) bool {
 		return spec.ContainsSymbol(symbolInfo.symbolName)
 	})
 
-	s.symbols = append(s.symbols, &fsNotifyParentSymbol{
+	probeMgr.symbols = append(probeMgr.symbols, &fsNotifyParentSymbol{
 		symbolName: symbolInfo.symbolName,
 		filter:     "(mc==1 || md==1 || ma==1 || mm==1)",
 	})

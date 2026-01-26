@@ -23,7 +23,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -52,7 +52,7 @@ func InitSystemModule(base mb.BaseModule) (mb.Module, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error fetching config value: %w", err)
 	}
-	if fleetmode.Enabled() {
+	if management.UnderAgent() {
 		logger.Infof("initializing HostFS values under agent: %s", hostfs)
 		return fleetInit(base, hostfs, userSet)
 	}
