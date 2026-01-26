@@ -30,5 +30,6 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           claude-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          extra-allowed-tools: "mage,build,unitTest,fmt,make,update,llc"
           additional-instructions: |
             `make mage` has already been run.
