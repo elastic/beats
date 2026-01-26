@@ -41,6 +41,9 @@ type spec struct {
 	// View-specific fields
 	Query          string   `yaml:"query,omitempty"`
 	RequiredTables []string `yaml:"required_tables,omitempty"`
+
+	// Internal field to track source file (not from YAML)
+	sourceFile string
 }
 
 type columnSpec struct {
@@ -200,11 +203,20 @@ func run() error {
 }
 
 func loadSpecs(dir string) ([]spec, error) {
-	pattern := filepath.Join(dir, "*.yaml")
-	files, err := filepath.Glob(pattern)
+	// Support both .yaml and .yml extensions
+	var files []string
+	
+	yamlFiles, err := filepath.Glob(filepath.Join(dir, "*.yaml"))
 	if err != nil {
 		return nil, err
 	}
+	files = append(files, yamlFiles...)
+	
+	ymlFiles, err := filepath.Glob(filepath.Join(dir, "*.yml"))
+	if err != nil {
+		return nil, err
+	}
+	files = append(files, ymlFiles...)
 
 	var specs []spec
 	for _, file := range files {
@@ -218,6 +230,8 @@ func loadSpecs(dir string) ([]spec, error) {
 			return nil, fmt.Errorf("failed to parse %s: %w", file, err)
 		}
 
+		// Store the source file path for reference
+		s.sourceFile = file
 		applyDefaults(&s)
 		specs = append(specs, s)
 	}
@@ -242,7 +256,7 @@ func applyDefaults(s *spec) {
 func generateTableCode(s spec, outDir string) error {
 	var b strings.Builder
 
-	writeGoFileHeader(&b, toPackageName(s.Name), "tables", s.Name, s.Platforms)
+	writeGoFileHeader(&b, toPackageName(s.Name), "tables", s.sourceFile, s.Platforms)
 
 	// Check if we need to import time package
 	needsTimeImport := false
@@ -506,10 +520,16 @@ func containsAll(slice []string, items []string) bool {
 }
 
 // writeGoFileHeader writes the common header for generated Go files.
-func writeGoFileHeader(b *strings.Builder, packageName, sourceType, name string, platforms []string) {
+func writeGoFileHeader(b *strings.Builder, packageName, sourceType, sourceFile string, platforms []string) {
 	b.WriteString(elasticCopyrightHeader)
 	b.WriteString(codeGeneratedNotice)
-	fmt.Fprintf(b, "// Source: %s/%s.yaml\n\n", sourceType, name)
+	// Show the actual source file path (just the filename, not full path)
+	if sourceFile != "" {
+		fmt.Fprintf(b, "// Source: %s/%s\n\n", sourceType, filepath.Base(sourceFile))
+	} else {
+		fmt.Fprintf(b, "// Source: %s (generated)\n\n", sourceType)
+	}
+
 
 	// Build tags for platform-specific files
 	if len(platforms) > 0 && !containsAll(platforms, []string{"linux", "darwin", "windows"}) {
@@ -572,7 +592,7 @@ func writeFile(filename string, content string) error {
 func generateViewCode(s spec, outDir string) error {
 	var b strings.Builder
 
-	writeGoFileHeader(&b, toPackageName(s.Name), "views", s.Name, s.Platforms)
+	writeGoFileHeader(&b, toPackageName(s.Name), "views", s.sourceFile, s.Platforms)
 
 	// Check if we need to import time package
 	needsTimeImport := false

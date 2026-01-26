@@ -7,6 +7,8 @@ This directory contains sample table and view specifications to demonstrate the 
 - `sample_table.yaml` - Example table specification with multiple columns and comprehensive documentation
 - `sample_view.yaml` - Example view specification demonstrating UNION ALL, CASE expressions, and date calculations
 
+**Note:** The generator accepts both `.yaml` and `.yml` file extensions. You can use whichever you prefer, and both can coexist in the same directory.
+
 ## Testing the Generator
 
 To test the generator with these samples, you have two options:

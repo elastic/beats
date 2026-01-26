@@ -11,84 +11,13 @@ package generated
 
 import (
 	"github.com/osquery/osquery-go"
-	"github.com/osquery/osquery-go/plugin/table"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	elasticamcacheapplication "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_amcache_application"
-	elasticamcacheapplicationfile "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_amcache_application_file"
-	elasticamcacheapplicationshortcut "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_amcache_application_shortcut"
-	elasticamcachedevicepnp "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_amcache_device_pnp"
-	elasticamcachedriverbinary "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_amcache_driver_binary"
-	elasticamcachedriverpackage "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_amcache_driver_package"
 )
 
 // RegisterTables registers all generated tables with the osquery extension server.
 // This function is called from main.go after all init() functions have run.
+// No tables are defined for this platform.
 func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
-	{
-		// Windows Amcache application inventory from the InventoryApplication registry hive
-		genFunc, err := elasticamcacheapplication.GetGenerateFunc(log)
-		if err != nil {
-			log.Errorf("Failed to get generate function for elastic_amcache_application: %v", err)
-		} else {
-			server.RegisterPlugin(table.NewPlugin("elastic_amcache_application", elasticamcacheapplication.Columns(), genFunc))
-			log.Infof("Registered table: elastic_amcache_application")
-		}
-	}
-
-	{
-		// Windows Amcache application file inventory from the InventoryApplicationFile registry hive
-		genFunc, err := elasticamcacheapplicationfile.GetGenerateFunc(log)
-		if err != nil {
-			log.Errorf("Failed to get generate function for elastic_amcache_application_file: %v", err)
-		} else {
-			server.RegisterPlugin(table.NewPlugin("elastic_amcache_application_file", elasticamcacheapplicationfile.Columns(), genFunc))
-			log.Infof("Registered table: elastic_amcache_application_file")
-		}
-	}
-
-	{
-		// Windows Amcache application shortcuts from the InventoryApplicationShortcut registry hive
-		genFunc, err := elasticamcacheapplicationshortcut.GetGenerateFunc(log)
-		if err != nil {
-			log.Errorf("Failed to get generate function for elastic_amcache_application_shortcut: %v", err)
-		} else {
-			server.RegisterPlugin(table.NewPlugin("elastic_amcache_application_shortcut", elasticamcacheapplicationshortcut.Columns(), genFunc))
-			log.Infof("Registered table: elastic_amcache_application_shortcut")
-		}
-	}
-
-	{
-		// Windows Amcache Plug and Play device inventory from the InventoryDevicePnp registry hive
-		genFunc, err := elasticamcachedevicepnp.GetGenerateFunc(log)
-		if err != nil {
-			log.Errorf("Failed to get generate function for elastic_amcache_device_pnp: %v", err)
-		} else {
-			server.RegisterPlugin(table.NewPlugin("elastic_amcache_device_pnp", elasticamcachedevicepnp.Columns(), genFunc))
-			log.Infof("Registered table: elastic_amcache_device_pnp")
-		}
-	}
-
-	{
-		// Windows Amcache driver binary inventory from the InventoryDriverBinary registry hive
-		genFunc, err := elasticamcachedriverbinary.GetGenerateFunc(log)
-		if err != nil {
-			log.Errorf("Failed to get generate function for elastic_amcache_driver_binary: %v", err)
-		} else {
-			server.RegisterPlugin(table.NewPlugin("elastic_amcache_driver_binary", elasticamcachedriverbinary.Columns(), genFunc))
-			log.Infof("Registered table: elastic_amcache_driver_binary")
-		}
-	}
-
-	{
-		// Windows Amcache driver package inventory from the InventoryDriverPackage registry hive
-		genFunc, err := elasticamcachedriverpackage.GetGenerateFunc(log)
-		if err != nil {
-			log.Errorf("Failed to get generate function for elastic_amcache_driver_package: %v", err)
-		} else {
-			server.RegisterPlugin(table.NewPlugin("elastic_amcache_driver_package", elasticamcachedriverpackage.Columns(), genFunc))
-			log.Infof("Registered table: elastic_amcache_driver_package")
-		}
-	}
-
+	// No tables to register for this platform
 }
