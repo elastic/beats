@@ -356,7 +356,7 @@ func (pgsql *pgsqlPlugin) parseExtReq(s *pgsqlStream, length int) (bool, bool) {
 		return false, false
 	}
 
-	query, err := common.ReadString(s.data[queryRequestPoint+6:])
+	query, err := common.ReadString(s.data[queryRequestPoint:])
 	if err != nil {
 		pgsql.detailf("Invalid extended query request")
 		return false, false
