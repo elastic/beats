@@ -11,10 +11,15 @@ permissions:
   contents: write
   pull-requests: write
   issues: write
+  id-token: write
 
 jobs:
   claude:
     runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'issue_comment' && (contains(github.event.comment.body, '@claude') || contains(github.event.comment.body, 'claude-plz-triage'))) ||
+      (github.event_name == 'pull_request_review_comment' && (contains(github.event.comment.body, '@claude') || contains(github.event.comment.body, 'claude-plz-triage'))) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.body, 'claude-plz-triage')))
     steps:
       - uses: actions/checkout@v4
 
