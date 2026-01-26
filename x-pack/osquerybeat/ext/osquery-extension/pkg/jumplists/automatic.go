@@ -22,7 +22,7 @@ func ParseAutomaticJumpListFile(filePath string, userProfile *UserProfile, log *
 	automaticJumpList := &Jumplist{
 		JumplistMeta: &JumplistMeta{
 			UserProfile:   userProfile,
-			ApplicationID: getAppIdFromFileName(filePath, log),
+			ApplicationID: getAppIdFromFileName(filePath),
 			JumplistType:  JumplistTypeAutomatic,
 			Path:          filePath,
 		},
