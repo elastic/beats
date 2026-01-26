@@ -759,8 +759,25 @@ func generateStaticTablesRegistry(tableSpecs []spec, outDir string) error {
 			b.WriteString("\t// No tables to register for this platform\n")
 			b.WriteString("}\n")
 		} else {
+			// Collect implementation packages for this platform
+			implPackages := make(map[string]bool)
+			for _, s := range tables {
+				if s.ImplementationPackage != "" {
+					implPackages[s.ImplementationPackage] = true
+				}
+			}
+
 			// Imports
 			b.WriteString("import (\n")
+			
+			// Naked imports for implementation packages (to trigger their init() functions)
+			if len(implPackages) > 0 {
+				for pkg := range implPackages {
+					fmt.Fprintf(&b, "\t_ \"%s\"\n", pkg)
+				}
+				b.WriteString("\n")
+			}
+			
 			b.WriteString("\t\"github.com/osquery/osquery-go\"\n")
 			b.WriteString("\t\"github.com/osquery/osquery-go/plugin/table\"\n\n")
 			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger\"\n")

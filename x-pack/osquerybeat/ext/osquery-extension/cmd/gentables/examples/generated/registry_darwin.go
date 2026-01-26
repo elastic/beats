@@ -10,6 +10,8 @@
 package generated
 
 import (
+	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/sampleimpl"
+
 	"github.com/osquery/osquery-go"
 	"github.com/osquery/osquery-go/plugin/table"
 
