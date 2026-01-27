@@ -24,6 +24,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -1056,6 +1057,9 @@ func TestFileProspector_previousID(t *testing.T) {
 }
 
 func TestFileProspector_takeOverFn(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("not supported on Windows because inode marker is used")
+	}
 	testFileInfo := &testFileInfo{
 		name: "/path/to/file",
 		size: 100,
