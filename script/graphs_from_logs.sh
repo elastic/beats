@@ -113,17 +113,16 @@ echo "${GRAPHS}" | while IFS='\n' read GRAPH; do
 	   
 	cat <<EOF > "${FILENAME}".gp
 reset
+set terminal push
+set terminal svg background "white"
+set termoption font "Arial"
+set output "${FILENAME}.svg"
 set title "${TITLE}"
 set xdata time
 set timefmt "%Y-%m-%dT%H:%M:%S"
 set xlabel "Date/Time"
 set ylabel "${YLABEL}"
 ${PLOT}
-set terminal push
-set terminal svg background "white"
-set termoption font "Arial"
-set output "${FILENAME}.svg"
-replot
 set terminal pop
 set output
 EOF
