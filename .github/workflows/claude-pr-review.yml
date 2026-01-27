@@ -20,6 +20,10 @@ jobs:
         with:
           go-version-file: .go-version
 
+      - uses: actions/setup-python@v6
+        with:
+          python-version-file: .python-version
+
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
 
@@ -32,4 +36,10 @@ jobs:
           claude-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           extra-allowed-tools: "mage,build,unitTest,fmt,make,update,llc"
           additional-instructions: |
-            `make mage` has already been run.
+            Environment setup:
+            - `make mage` has already been run (mage binary is available)
+            - Go and Python are configured
+            - System dependencies (libpcap-dev, librpm-dev, python3-venv) are installed
+            
+            If you need to generate files (configs, fields.yml, etc.), run `mage update` in the specific beat directory.
+            You can build and test individual beats with `mage build` and `mage unitTest` in their respective directories.
