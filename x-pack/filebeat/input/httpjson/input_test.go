@@ -35,8 +35,8 @@ var testCases = []struct {
 	expected       []string
 	expectedFile   string
 	expectedNoFile string
-
-	skipReason string
+	isStringArray  bool
+	skipReason     string
 }{
 	{
 		name:        "simple_GET_request",
@@ -71,6 +71,18 @@ var testCases = []struct {
 		},
 		handler:  rateLimitHandler(),
 		expected: []string{`{"hello":"world"}`},
+	},
+	{
+		name:        "simple_HTTPS_GET_request returns array of strings",
+		setupServer: newTestServer(httptest.NewServer),
+		baseConfig: map[string]interface{}{
+			"interval":                      1,
+			"request.method":                http.MethodGet,
+			"request.ssl.verification_mode": "none",
+		},
+		handler:       stringArrayHandler(""),
+		expected:      []string{`{"text":["123","456"]}`},
+		isStringArray: true,
 	},
 	{
 		name:        "request_retries_when_failed",
@@ -1558,7 +1570,11 @@ func TestInput(t *testing.T) {
 				case got := <-chanClient.Channel:
 					val, err := got.Fields.GetValue("message")
 					assert.NoError(t, err)
-					assert.JSONEq(t, test.expected[receivedCount], val.(string))
+					if test.isStringArray {
+						assert.Equal(t, val.(string), test.expected[receivedCount])
+					} else {
+						assert.JSONEq(t, test.expected[receivedCount], val.(string))
+					}
 					receivedCount += 1
 					if receivedCount == len(test.expected) {
 						cancel()
@@ -1758,6 +1774,16 @@ func defaultHandler(expectedMethod, expectedBody, msg string) http.HandlerFunc {
 				w.WriteHeader(http.StatusBadRequest)
 				msg = fmt.Sprintf(`{"error":"expected body was %q, but got %q"}`, expectedBody, body)
 			}
+		}
+
+		_, _ = w.Write([]byte(msg))
+	}
+}
+
+func stringArrayHandler(msg string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if msg == "" {
+			msg = `["123", "456"]`
 		}
 
 		_, _ = w.Write([]byte(msg))
