@@ -20,6 +20,8 @@ This input supports:
   * Basic
   * {applies_to}`stack: ga 9.3.0` File
   * OAuth2
+  * {applies_to}`stack: ga 9.3.0` AWS
+
 
 * Retrieval at a configurable interval
 * Pagination
@@ -66,7 +68,8 @@ Additionally, it supports authentication via:
 * Basic auth
 * {applies_to}`stack: ga 9.3.0` File-based headers (`auth.file`)
 * HTTP headers
-* OAauth2
+* OAuth2
+* {applies_to}`stack: ga 9.3.0` AWS Authentication (`auth.aws`)
 
 Example configurations with authentication:
 
@@ -110,6 +113,24 @@ filebeat.inputs:
     prefix: "Bearer "
     refresh_interval: 10m
   request.url: http://localhost
+```
+
+```yaml
+filebeat.inputs:
+- type: httpjson
+  auth.aws:
+    access_key_id:     "AKIAIOSFODNN7EXAMPLE"
+    secret_access_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  request.url: https://guardduty.us-east-1.amazonaws.com/detector/abc123/findings
+```
+
+```yaml
+filebeat.inputs:
+- type: httpjson
+  auth.aws:
+    credential_profile_name: fb-aws
+    shared_credential_file: /etc/filebeat/aws_credentials
+  request.url: https://guardduty.us-east-1.amazonaws.com/detector/abc123/findings
 ```
 
 ## Input state [input-state]
@@ -236,7 +257,7 @@ Some built-in helper functions are provided to work with the input state inside 
 * `parseTimestamp`: parses a timestamp in seconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732]]` returns `2020-11-05 13:25:32 +0000 UTC`.
 * `replaceAll(old, new, s)`: replaces all non-overlapping instances of `old` with `new` in `s`. Example: `[[ replaceAll "some" "my" "some value" ]]` returns `my value`.
 * `sprintf`: formats according to a format specifier and returns the resulting string. Refer to [the Go docs](https://pkg.go.dev/fmt#Sprintf) for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
-* `terminate`: exits the template without falling back to the default value and without causing an error. It takes a single string argument that is logged in debug logging. {applies_to}`stack: ga 9.1.2` {applies_to}`stack: ga 9.0.6` {applies_to}`stack: ga 8.19.2` {applies_to}`stack: ga 8.18.6`
+* `terminate`: exits the template without falling back to the default value and without causing an error. It takes a single string argument that is logged in debug logging. {applies_to}`stack: ga 9.0.6+`
 * `toInt`: converts a value of any type to an integer when possible. Returns 0 if the conversion fails.
 * `toJSON`: converts a value to a JSON string. This can be used with `value_type: json` to create an object from a template. Example: `[[ toJSON .last_response.body.pagingIdentifiers ]]`.
 * `urlEncode`: URL encodes the supplied string. Example `[[urlEncode "string1"]]`. Example `[[urlEncode "<string1>"]]` will return `%3Cstring1%3E`.
@@ -504,6 +525,119 @@ The Demonstrating Proof-of-Possession private key PEM block for your Okta authen
 ### `auth.oauth2.google.delegated_account` [_auth_oauth2_google_delegated_account_2]
 
 Email of the delegated account used to create the credentials (usually an admin). Used in combination with `auth.oauth2.google.jwt_file`, `auth.oauth2.google.jwt_json`, and when defaulting to use ADC.
+
+
+### `auth.aws.enabled` [_auth_aws_enabled]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `false`, disables the file AWS auth configuration. Default: `true`.
+
+::::{note}
+AWS auth settings are disabled if either `enabled` is set to `false` or the `auth.aws` section is missing.
+::::
+
+### `auth.aws.access_key_id` [_auth_aws_access_key_id]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS access key ID. It should be used with [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key).
+
+### `auth.aws.secret_access_key` [_auth_aws_secret_access_key]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS secret access key. It should be used with [`auth.aws.access_key_id`](#_auth_aws_access_key_id).
+
+::::{note}
+Use either direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) or a shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)). If both are set, the direct keys take precedence.
+
+If neither the direct keys nor the shared credentials file is set, AWS SDK [LoadDefaultConfig](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config#LoadDefaultConfig) will be used.
+::::
+
+### `auth.aws.session_token` [_auth_aws_session_token]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS session token that can be optionally set when direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) are used.
+
+### `auth.aws.shared_credential_file` [_auth_aws_shared_credential_file]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The path of the AWS shared credentials file.
+
+::::{note}
+Use either direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) or a shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)). If both are set, the direct keys take precedence.
+
+If neither the direct keys nor the shared credentials file is set, AWS SDK [LoadDefaultConfig](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config#LoadDefaultConfig) will be used.
+::::
+
+### `auth.aws.credential_profile_name` [_auth_aws_credential_profile_name]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The profile name of the AWS shared credentials file. This is optional and can be used with [`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file).
+
+### `auth.aws.role_arn` [_auth_aws_role_arn]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The IAM Role ARN to assume. Assume-role authentication is layered on top of the base credentials, which may come from a direct access key, a shared credentials file, or the default SDK configuration. The assume-role request will use whichever credentials have already been established.
+
+### `auth.aws.external_id` [_auth_aws_external_id]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the external ID to use for every IAM assume-role request. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.assume_role.duration` [_auth_aws_assume_role_duration]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the duration of the credentials retrieved by the IAM assume-role. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.assume_role.expiry_window` [_auth_aws_assume_expiry_window]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the credentials retrieved by the IAM assume-role to trigger refreshing prior to the credentials actually expiring. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.service_name` [_auth_aws_service_name]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the AWS service name that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
+
+### `auth.aws.default_region` [_auth_aws_default_region]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the AWS region that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
 
 
 ### `request.url` [request-parameters]
@@ -1564,7 +1698,7 @@ Each cursor entry is formed by:
 * A `value` template, which will define the value to store when evaluated.
 * A `default` template, which will define the value to store when the value template fails or is empty.
 * An `ignore_empty_value` flag. When set to `true`, will not store empty values, preserving the previous one, if any. Default: `true`.
-* A `do_not_log_failure` flag. When set to `true`, will not signal a degraded Fleet health status. Default: `true`. {applies_to}`stack: ga 9.1.4` {applies_to}`stack: ga 9.0.7` {applies_to}`stack: ga 8.19.4` {applies_to}`stack: ga 8.18.7`
+* A `do_not_log_failure` flag. When set to `true`, will not signal a degraded Fleet health status. Default: `true`. {applies_to}`stack: ga 9.0.7+`
 
 Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`].
 

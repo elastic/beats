@@ -114,11 +114,19 @@ func TestGetConstraintFilters(t *testing.T) {
 	}
 }
 
+type EmbeddedStruct struct {
+	EmbeddedString string  `osquery:"embedded_string"`
+	EmbeddedInt    int     `osquery:"embedded_int"`
+	EmbeddedFloat  float64 `osquery:"embedded_float"`
+	EmbeddedBool   bool    `osquery:"embedded_bool"`
+}
+
 type MockEntry struct {
 	StringValue string  `osquery:"string_value"`
 	IntValue    int     `osquery:"int_value"`
 	FloatValue  float64 `osquery:"float_value"`
 	BoolValue   bool    `osquery:"bool_value"`
+	EmbeddedStruct
 }
 
 type FilterTestCase struct {
@@ -205,6 +213,38 @@ func TestFilter_Equals(t *testing.T) {
 			filter: Filter{ColumnName: "bool_value", Operator: table.OperatorEquals, Expression: "false"},
 			want:   false,
 		},
+		{
+			name: "bool_equals_embedded_string",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedString: "embeddedString"},
+			},
+			filter: Filter{ColumnName: "embedded_string", Operator: table.OperatorEquals, Expression: "embeddedString"},
+			want:   true,
+		},
+		{
+			name: "bool_equals_embedded_int",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedInt: 42},
+			},
+			filter: Filter{ColumnName: "embedded_int", Operator: table.OperatorEquals, Expression: "42"},
+			want:   true,
+		},
+		{
+			name: "bool_equals_embedded_float",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedFloat: 3.14},
+			},
+			filter: Filter{ColumnName: "embedded_float", Operator: table.OperatorEquals, Expression: "3.14"},
+			want:   true,
+		},
+		{
+			name: "bool_equals_embedded_bool",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedBool: true},
+			},
+			filter: Filter{ColumnName: "embedded_bool", Operator: table.OperatorEquals, Expression: "true"},
+			want:   true,
+		},
 	}
 	RunFilterTests(t, tests)
 }
@@ -279,6 +319,30 @@ func TestFilter_GreaterThan(t *testing.T) {
 				StringValue: "101",
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorGreaterThan, Expression: "100"},
+			want:   false,
+		},
+		{
+			name:   "embedded_int_greater_than_true",
+			entry:  MockEntry{EmbeddedStruct: EmbeddedStruct{EmbeddedInt: 200}},
+			filter: Filter{ColumnName: "embedded_int", Operator: table.OperatorGreaterThan, Expression: "100"},
+			want:   true,
+		},
+		{
+			name:   "embedded_int_greater_than_false",
+			entry:  MockEntry{EmbeddedStruct: EmbeddedStruct{EmbeddedInt: 50}},
+			filter: Filter{ColumnName: "embedded_int", Operator: table.OperatorGreaterThan, Expression: "100"},
+			want:   false,
+		},
+		{
+			name:   "embedded_float_greater_than_true",
+			entry:  MockEntry{EmbeddedStruct: EmbeddedStruct{EmbeddedFloat: 150.5}},
+			filter: Filter{ColumnName: "embedded_float", Operator: table.OperatorGreaterThan, Expression: "100.0"},
+			want:   true,
+		},
+		{
+			name:   "embedded_float_greater_than_false",
+			entry:  MockEntry{EmbeddedStruct: EmbeddedStruct{EmbeddedFloat: 75.25}},
+			filter: Filter{ColumnName: "embedded_float", Operator: table.OperatorGreaterThan, Expression: "100.0"},
 			want:   false,
 		},
 	}
@@ -357,6 +421,24 @@ func TestFilter_LessThan(t *testing.T) {
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorLessThan, Expression: "100"},
 			want:   false,
 		},
+		{
+			name:   "embedded_int_less_than_true",
+			entry:  MockEntry{EmbeddedStruct: EmbeddedStruct{EmbeddedInt: 50}},
+			filter: Filter{ColumnName: "embedded_int", Operator: table.OperatorLessThan, Expression: "100"},
+			want:   true,
+		},
+		{
+			name:   "embedded_int_less_than_false",
+			entry:  MockEntry{EmbeddedStruct: EmbeddedStruct{EmbeddedInt: 200}},
+			filter: Filter{ColumnName: "embedded_int", Operator: table.OperatorLessThan, Expression: "100"},
+			want:   false,
+		},
+		{
+			name:   "embedded_float_less_than_true",
+			entry:  MockEntry{EmbeddedStruct: EmbeddedStruct{EmbeddedFloat: 75.25}},
+			filter: Filter{ColumnName: "embedded_float", Operator: table.OperatorLessThan, Expression: "100.0"},
+			want:   true,
+		},
 	}
 	RunFilterTests(t, tests)
 }
@@ -409,6 +491,38 @@ func TestGreaterThanOrEquals(t *testing.T) {
 				FloatValue: 99.99,
 			},
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorGreaterThanOrEquals, Expression: "100.0"},
+			want:   false,
+		},
+		{
+			name: "embedded_int_greater_than_or_equals_true_equals",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedInt: 100},
+			},
+			filter: Filter{ColumnName: "embedded_int", Operator: table.OperatorGreaterThanOrEquals, Expression: "100"},
+			want:   true,
+		},
+		{
+			name: "embedded_int_greater_than_or_equals_false",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedInt: 99},
+			},
+			filter: Filter{ColumnName: "embedded_int", Operator: table.OperatorGreaterThanOrEquals, Expression: "100"},
+			want:   false,
+		},
+		{
+			name: "embedded_float_greater_than_or_equals_true_equals",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedFloat: 100.0},
+			},
+			filter: Filter{ColumnName: "embedded_float", Operator: table.OperatorGreaterThanOrEquals, Expression: "100.0"},
+			want:   true,
+		},
+		{
+			name: "embedded_float_greater_than_or_equals_false",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedFloat: 99.99},
+			},
+			filter: Filter{ColumnName: "embedded_float", Operator: table.OperatorGreaterThanOrEquals, Expression: "100.0"},
 			want:   false,
 		},
 	}
@@ -465,6 +579,38 @@ func TestLessThanOrEquals(t *testing.T) {
 			filter: Filter{ColumnName: "float_value", Operator: table.OperatorLessThanOrEquals, Expression: "100.0"},
 			want:   false,
 		},
+		{
+			name: "embedded_int_less_than_or_equals_true_equals",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedInt: 100},
+			},
+			filter: Filter{ColumnName: "embedded_int", Operator: table.OperatorLessThanOrEquals, Expression: "100"},
+			want:   true,
+		},
+		{
+			name: "embedded_int_less_than_or_equals_false",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedInt: 101},
+			},
+			filter: Filter{ColumnName: "embedded_int", Operator: table.OperatorLessThanOrEquals, Expression: "100"},
+			want:   false,
+		},
+		{
+			name: "embedded_float_less_than_or_equals_true_equals",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedFloat: 100.0},
+			},
+			filter: Filter{ColumnName: "embedded_float", Operator: table.OperatorLessThanOrEquals, Expression: "100.0"},
+			want:   true,
+		},
+		{
+			name: "embedded_float_less_than_or_equals_false",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedFloat: 100.01},
+			},
+			filter: Filter{ColumnName: "embedded_float", Operator: table.OperatorLessThanOrEquals, Expression: "100.0"},
+			want:   false,
+		},
 	}
 	RunFilterTests(t, tests)
 }
@@ -518,6 +664,22 @@ func TestLike(t *testing.T) {
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorLike, Expression: "Moc_ Entry"},
 			want:   true,
+		},
+		{
+			name: "embedded_string_like_true",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedString: "EmbeddedValue"},
+			},
+			filter: Filter{ColumnName: "embedded_string", Operator: table.OperatorLike, Expression: "Embedded%"},
+			want:   true,
+		},
+		{
+			name: "embedded_string_like_false",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedString: "EmbeddedValue"},
+			},
+			filter: Filter{ColumnName: "embedded_string", Operator: table.OperatorLike, Expression: "Other%"},
+			want:   false,
 		},
 	}
 	RunFilterTests(t, tests)
@@ -580,6 +742,22 @@ func TestGlob(t *testing.T) {
 			},
 			filter: Filter{ColumnName: "string_value", Operator: table.OperatorGlob, Expression: "M*k E*y"},
 			want:   true,
+		},
+		{
+			name: "embedded_string_glob_true",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedString: "EmbeddedValue"},
+			},
+			filter: Filter{ColumnName: "embedded_string", Operator: table.OperatorGlob, Expression: "Embedded*"},
+			want:   true,
+		},
+		{
+			name: "embedded_string_glob_false",
+			entry: MockEntry{
+				EmbeddedStruct: EmbeddedStruct{EmbeddedString: "EmbeddedValue"},
+			},
+			filter: Filter{ColumnName: "embedded_string", Operator: table.OperatorGlob, Expression: "Other*"},
+			want:   false,
 		},
 	}
 	RunFilterTests(t, tests)
