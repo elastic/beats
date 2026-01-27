@@ -33,6 +33,19 @@ exporters:
       initial_interval: 1s
       max_interval: 1m0s
       max_retries: 3
+      retry_on_status:
+        - 429
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        - 506
+        - 507
+        - 508
+        - 510
+        - 511
     user: elastic
     max_conns_per_host: 1
     logs_dynamic_pipeline:
@@ -197,6 +210,19 @@ exporters:
       initial_interval: 1s
       max_interval: 1m0s
       max_retries: 3
+      retry_on_status:
+        - 429
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        - 506
+        - 507
+        - 508
+        - 510
+        - 511
     user: elastic-cloud
     logs_dynamic_pipeline:
       enabled: true
@@ -668,6 +694,19 @@ exporters:
       initial_interval: 1s
       max_interval: 1m0s
       max_retries: 3
+      retry_on_status:
+        - 429
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        - 506
+        - 507
+        - 508
+        - 510
+        - 511
     logs_index: some-index
     password: changeme
     user: elastic

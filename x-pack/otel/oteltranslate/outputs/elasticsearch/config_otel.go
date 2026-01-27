@@ -11,6 +11,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"net/http"
 	"reflect"
 	"strings"
 
@@ -26,9 +27,10 @@ type esToOTelOptions struct {
 	elasticsearch.ElasticsearchConfig `config:",inline"`
 	outputs.HostWorkerCfg             `config:",inline"`
 
-	Index    string `config:"index"`
-	Pipeline string `config:"pipeline"`
-	Preset   string `config:"preset"`
+	Index         string `config:"index"`
+	Pipeline      string `config:"pipeline"`
+	Preset        string `config:"preset"`
+	RetryOnStatus []int  `config:"retry_on_status"`
 }
 
 var defaultOptions = esToOTelOptions{
@@ -39,6 +41,22 @@ var defaultOptions = esToOTelOptions{
 	Preset:   "custom", // default is custom if not set
 	HostWorkerCfg: outputs.HostWorkerCfg{
 		Workers: 1,
+	},
+	RetryOnStatus: []int{
+		// 429
+		http.StatusTooManyRequests,
+		// 5xx
+		http.StatusInternalServerError,
+		http.StatusNotImplemented,
+		http.StatusBadGateway,
+		http.StatusServiceUnavailable,
+		http.StatusGatewayTimeout,
+		http.StatusHTTPVersionNotSupported,
+		http.StatusVariantAlsoNegotiates,
+		http.StatusInsufficientStorage,
+		http.StatusLoopDetected,
+		http.StatusNotExtended,
+		http.StatusNetworkAuthenticationRequired,
 	},
 }
 
@@ -105,6 +123,7 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 			"initial_interval": escfg.Backoff.Init, // backoff.init
 			"max_interval":     escfg.Backoff.Max,  // backoff.max
 			"max_retries":      escfg.MaxRetries,   // max_retries
+			"retry_on_status":  escfg.RetryOnStatus,
 		},
 
 		"sending_queue": map[string]any{
