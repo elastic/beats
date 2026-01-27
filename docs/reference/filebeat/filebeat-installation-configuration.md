@@ -23,15 +23,15 @@ This guide describes how to get started quickly with log collection. You’ll le
 
 You need {{es}} for storing and searching your data, and {{kib}} for visualizing and managing it.
 
-:::::::{tab-set}
+:::::::{applies-switch}
 :group: deployment
 
-::::::{tab-item} {{ech}}
+::::::{applies-item} ess: ga
 :sync: hosted
 To get started quickly, spin up an [{{ech}}](https://www.elastic.co/cloud?page=docs&placement=docs-body) deployment. {{ech}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
 ::::::
 
-::::::{tab-item} Self-managed
+::::::{applies-item} self: ga
 :sync: self
 To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
 ::::::
@@ -100,7 +100,7 @@ If script execution is disabled on your system, you need to set the execution po
 :::
 
 :::{important}
-{applies_to}`stack: ga 9.1.0` {applies_to}`stack: ga 9.0.6`
+:applies_to: stack: ga 9.0.6+!
 
 The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
 because the latter has stricter permissions. The home path (base for
@@ -132,10 +132,11 @@ Connections to {{es}} and {{kib}} are required to set up Filebeat.
 
 Set the connection information in `filebeat.yml`. To locate this configuration file, see [Directory layout](/reference/filebeat/directory-layout.md).
 
-:::::::{tab-set}
+:::::::{applies-switch}
 :group: deployment
 
-::::::{tab-item} {{ech}}
+
+::::::{applies-item} ess: ga
 :sync: hosted
 Specify the [cloud.id](/reference/filebeat/configure-cloud-id.md) of your {{ech}} deployment, and set [cloud.auth](/reference/filebeat/configure-cloud-id.md) to a user who is authorized to set up Filebeat. For example:
 
@@ -147,7 +148,7 @@ cloud.auth: "filebeat_setup:YOUR_PASSWORD" <1>
 1. This examples shows a hard-coded password, but you should store sensitive values in the [secrets keystore](/reference/filebeat/keystore.md).
 ::::::
 
-::::::{tab-item} Self-managed
+::::::{applies-item} self: ga
 :sync: self
 1. Set the host and port where Filebeat can find the {{es}} installation, and set the username and password of a user who is authorized to set up Filebeat. For example:
 
@@ -370,9 +371,11 @@ visualizing your data. To load these assets:
 
     `-e` is optional and sends output to standard error instead of the configured log output.
 
-The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Filebeat-Data\logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\logs`
+By default Windows log files are stored in `C:\Program Files\Filebeat-Data\logs`.
+
+:::{note}
+In versions before 9.0.6, the default location for Windows log files was `C:\ProgramData\filebeat\logs`.
+:::
 
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to {{es}} and deploys the sample dashboards for visualizing the data in {{kib}}.
 
@@ -454,9 +457,11 @@ sudo ./filebeat -e
 PS C:\Program Files\filebeat> Start-Service filebeat
 ```
 
-The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Filebeat-Data\logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\logs`
+By default Windows log files are stored in `C:\Program Files\Filebeat-Data\logs`.
+
+:::{note}
+In versions before 9.0.6, the default location for Windows log files was `C:\ProgramData\filebeat\logs`.
+:::
 ::::::
 
 :::::::
@@ -471,14 +476,14 @@ To open the dashboards:
 
 1. Launch {{kib}}:
 
-    :::::::{tab-set}
+    :::::::{applies-switch}
     :group: deployment
-    ::::::{tab-item} {{ech}}
+    ::::::{applies-item} ess: ga
     :sync: hosted
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
     ::::::
-    ::::::{tab-item} Self-managed
+    ::::::{applies-item} self: ga
     :sync: self
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
     ::::::
