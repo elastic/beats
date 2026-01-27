@@ -279,6 +279,9 @@ By default the input expects the incoming POST to include a Content-Type of `app
 
 The total sum of request body lengths that are allowed at any given time. If non-zero, the input will compare this value to the sum of in-flight request body lengths from requests that include a `wait_for_completion_timeout` request query and will return a 503 HTTP status code, along with a Retry-After header configured with the `retry_after` option. The default value for this option is zero, no limit.
 
+### `max_body_bytes` [_max_body_bytes]
+
+The maximum body length allowed for a single request. If present, the input will truncate request bodies at the configured limit. The default value for this option is unset, no limit.
 
 ### `retry_after` [_retry_after]
 
