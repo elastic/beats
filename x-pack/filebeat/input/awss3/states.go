@@ -46,7 +46,7 @@ type baseStateRegistry struct {
 	// The store used to persist state changes to the registry.
 	store *statestore.Store
 	// storeLock protects access to store.
-	// Callers must hold this lock when calling persistState or removeFromStore.
+	// Callers of unexported stateRegistry methods that read or write store must hold this lock.
 	storeLock sync.Mutex
 
 	// Accepted prefixes of state keys of this registry
@@ -354,35 +354,6 @@ func newStateHeap() *stateHeap {
 	}
 }
 
-func (h *stateHeap) Len() int { return len(h.items) }
-
-func (h *stateHeap) Less(i, j int) bool {
-	return h.items[i].Key < h.items[j].Key
-}
-
-// Swap swaps the items and updates the index map.
-func (h *stateHeap) Swap(i, j int) {
-	h.items[i], h.items[j] = h.items[j], h.items[i]
-	h.index[h.items[i].IDWithLexicographicalOrdering()] = i
-	h.index[h.items[j].IDWithLexicographicalOrdering()] = j
-}
-
-func (h *stateHeap) Push(x any) {
-	st := x.(*state)
-	h.index[st.IDWithLexicographicalOrdering()] = len(h.items)
-	h.items = append(h.items, st)
-}
-
-func (h *stateHeap) Pop() any {
-	old := h.items
-	n := len(old)
-	st := old[n-1]
-	old[n-1] = nil // avoid memory leak
-	h.items = old[0 : n-1]
-	delete(h.index, st.IDWithLexicographicalOrdering())
-	return st
-}
-
 // pop removes and returns the smallest state from the heap.
 func (h *stateHeap) pop() *state {
 	if h.Len() == 0 {
@@ -405,11 +376,40 @@ func (h *stateHeap) remove(id string) *state {
 	return heap.Remove(h, idx).(*state)
 }
 
+// peek returns the smallest state without removing it.
 func (h *stateHeap) peek() *state {
 	if len(h.items) == 0 {
 		return nil
 	}
 	return h.items[0]
+}
+
+func (h *stateHeap) Len() int { return len(h.items) }
+
+func (h *stateHeap) Less(i, j int) bool {
+	return h.items[i].Key < h.items[j].Key
+}
+
+func (h *stateHeap) Swap(i, j int) {
+	h.items[i], h.items[j] = h.items[j], h.items[i]
+	h.index[h.items[i].IDWithLexicographicalOrdering()] = i
+	h.index[h.items[j].IDWithLexicographicalOrdering()] = j
+}
+
+func (h *stateHeap) Push(x any) {
+	st := x.(*state)
+	h.index[st.IDWithLexicographicalOrdering()] = len(h.items)
+	h.items = append(h.items, st)
+}
+
+func (h *stateHeap) Pop() any {
+	old := h.items
+	n := len(old)
+	st := old[n-1]
+	old[n-1] = nil // avoid memory leak
+	h.items = old[0 : n-1]
+	delete(h.index, st.IDWithLexicographicalOrdering())
+	return st
 }
 
 // newStateRegistry creates the appropriate state registry based on configuration.
