@@ -604,6 +604,21 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 			expectedIngestedEventIDs: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, // All events eventually ingested after request retries
 		},
 		{
+			name:                     "request 429 exhausts retries",
+			maxRetries:               2,
+			requestLevelFailure:      true,    // Request-level failures
+			bulkErrorCode:            "429",   // Entire HTTP request fails with 429
+			expectedIngestedEventIDs: []int{}, // No events ingested (exhausted request retries)
+		},
+		{
+			name:                     "request 503 exhausts retries",
+			maxRetries:               2,
+			requestLevelFailure:      true,    // Request-level failures
+			bulkErrorCode:            "503",   // Entire HTTP request fails with 503
+			retryOnStatus:            "503",   // Explicitly enable 503 retries
+			expectedIngestedEventIDs: []int{}, // No events ingested (exhausted request retries)
+		},
+		{
 			name:                     "request 400 permanent failure",
 			maxRetries:               3,
 			requestLevelFailure:      true,    // Request-level failures
