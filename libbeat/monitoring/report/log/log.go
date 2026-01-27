@@ -90,14 +90,12 @@ var strConsts = map[string]bool{
 	"beat.info.version":      true,
 }
 
-// StartTime is the time that the process was started.
-var StartTime = time.Now()
-
 type Reporter struct {
 	config
 	wg         sync.WaitGroup
 	done       chan struct{}
 	registries map[string]*monitoring.Registry
+	startTime  time.Time
 
 	// output
 	logger *logp.Logger
@@ -118,6 +116,7 @@ func MakeReporter(beat beat.Info, cfg *conf.C, info, state, stats, inputs *monit
 		config:     config,
 		done:       make(chan struct{}),
 		logger:     beat.Logger.Named("monitoring"),
+		startTime:  time.Now(),
 		registries: map[string]*monitoring.Registry{},
 	}
 
@@ -206,7 +205,7 @@ func (r *Reporter) logSnapshot(snaps map[string]monitoring.FlatSnapshot) {
 
 func (r *Reporter) logTotals(snaps map[string]monitoring.FlatSnapshot) {
 	r.logger.Infow("Total metrics", toKeyValuePairs(snaps)...)
-	r.logger.Infof("Uptime: %v", time.Since(StartTime))
+	r.logger.Infof("Uptime: %v", time.Since(r.startTime))
 }
 
 func makeSnapshot(R *monitoring.Registry) monitoring.FlatSnapshot {
