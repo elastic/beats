@@ -52,7 +52,7 @@ func TestTakeOverCanReadLogInputStatesWithMeta(t *testing.T) {
 	store := openTestStoreFromFiles(t, tmpDir, name)
 
 	count := 0
-	store.TakeOver(func(v Value) (string, any) {
+	store.TakeOver(func(v TakeOverState) (string, any) {
 		// Count the states successfully read
 		count++
 		return "", nil
