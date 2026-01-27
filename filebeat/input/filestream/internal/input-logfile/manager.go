@@ -139,7 +139,7 @@ func (cim *InputManager) Init(group unison.Group) error {
 	if err != nil {
 		store.Release()
 		cim.shutdown()
-		return fmt.Errorf("Can not start registry cleanup process: %w", err)
+		return fmt.Errorf("can not start registry cleanup process: %w", err)
 	}
 	<-waitRunning
 	return nil
