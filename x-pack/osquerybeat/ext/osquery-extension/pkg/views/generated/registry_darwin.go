@@ -11,11 +11,12 @@ package generated
 
 import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 // RegisterViews registers all generated views with the hook manager.
 // This function is called from main.go after all init() functions have run.
 // No views are defined for this platform.
-func RegisterViews(hookManager *hooks.HookManager) {
+func RegisterViews(hookManager *hooks.HookManager, log *logger.Logger) {
 	// No views to register for this platform
 }

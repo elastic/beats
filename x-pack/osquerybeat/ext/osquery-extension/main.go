@@ -107,7 +107,7 @@ func main() {
 
 	// Register tables and views generated from the specs
 	tables.RegisterTables(server, log)
-	views.RegisterViews(hooks)
+	views.RegisterViews(hooks, log)
 
 	// Execute all post hooks to create any views required for the specific platform build
 	go hooks.Execute(socket, log)

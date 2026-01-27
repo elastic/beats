@@ -860,11 +860,12 @@ func generateStaticViewsRegistry(viewSpecs []spec, outDir string) error {
 			// Generate empty registry for platforms with no views
 			b.WriteString("import (\n")
 			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks\"\n")
+			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger\"\n")
 			b.WriteString(")\n\n")
 			b.WriteString("// RegisterViews registers all generated views with the hook manager.\n")
 			b.WriteString("// This function is called from main.go after all init() functions have run.\n")
 			b.WriteString("// No views are defined for this platform.\n")
-			b.WriteString("func RegisterViews(hookManager *hooks.HookManager) {\n")
+			b.WriteString("func RegisterViews(hookManager *hooks.HookManager, log *logger.Logger) {\n")
 			b.WriteString("\t// No views to register for this platform\n")
 			b.WriteString("}\n")
 		} else {
@@ -888,6 +889,7 @@ func generateStaticViewsRegistry(viewSpecs []spec, outDir string) error {
 			}
 			
 			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks\"\n")
+			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger\"\n")
 
 			// Import view packages for this platform
 			for _, s := range views {
@@ -899,7 +901,7 @@ func generateStaticViewsRegistry(viewSpecs []spec, outDir string) error {
 			// Generate RegisterViews function
 			b.WriteString("// RegisterViews registers all generated views with the hook manager.\n")
 			b.WriteString("// This function is called from main.go after all init() functions have run.\n")
-			b.WriteString("func RegisterViews(hookManager *hooks.HookManager) {\n")
+			b.WriteString("func RegisterViews(hookManager *hooks.HookManager, log *logger.Logger) {\n")
 
 			for _, s := range views {
 				pkgName := toPackageName(s.Name)
@@ -907,9 +909,10 @@ func generateStaticViewsRegistry(viewSpecs []spec, outDir string) error {
 				fmt.Fprintf(&b, "\t\t// %s\n", s.Description)
 				fmt.Fprintf(&b, "\t\thooksFunc, err := %s.GetHooksFunc()\n", pkgName)
 				b.WriteString("\t\tif err != nil {\n")
-				fmt.Fprintf(&b, "\t\t\t// View %s has no hooks function\n", s.Name)
+				fmt.Fprintf(&b, "\t\t\tlog.Errorf(\"Failed to get hooks function for %s: %%v\", err)\n", s.Name)
 				b.WriteString("\t\t} else {\n")
 				b.WriteString("\t\t\thooksFunc(hookManager)\n")
+				fmt.Fprintf(&b, "\t\t\tlog.Infof(\"Registered view: %s\")\n", s.Name)
 				b.WriteString("\t\t}\n")
 				b.WriteString("\t}\n\n")
 			}

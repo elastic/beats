@@ -11,19 +11,21 @@ package generated
 
 import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	samplecombinedresources "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/sample_combined_resources"
 )
 
 // RegisterViews registers all generated views with the hook manager.
 // This function is called from main.go after all init() functions have run.
-func RegisterViews(hookManager *hooks.HookManager) {
+func RegisterViews(hookManager *hooks.HookManager, log *logger.Logger) {
 	{
 		// View combining active and archived resources with calculated fields and UNION
 		hooksFunc, err := samplecombinedresources.GetHooksFunc()
 		if err != nil {
-			// View sample_combined_resources has no hooks function
+			log.Errorf("Failed to get hooks function for sample_combined_resources: %v", err)
 		} else {
 			hooksFunc(hookManager)
+			log.Infof("Registered view: sample_combined_resources")
 		}
 	}
 
