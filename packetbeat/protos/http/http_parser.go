@@ -262,7 +262,7 @@ func parseResponseStatus(s []byte) (uint16, []byte, error) {
 	}
 	statusCode, err := parseInt(s[0:p])
 	if err != nil {
-		return 0, nil, fmt.Errorf("Unable to parse status code from [%s]", s)
+		return 0, nil, fmt.Errorf("unable to parse status code from [%s]", s)
 	}
 	if statusCode > math.MaxUint16 || statusCode < 0 {
 		return 0, nil, fmt.Errorf("invalid status code %v", statusCode)
@@ -280,7 +280,7 @@ func parseVersion(s []byte) (uint8, uint8, error) {
 	if major > 1 || minor > 2 {
 		return 0, 0, errors.New("unsupported version")
 	}
-	return uint8(major), uint8(minor), nil
+	return major, minor, nil
 }
 
 func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bool) {
@@ -516,7 +516,7 @@ func (*parser) eatBody(s *stream, m *message, size int) (ok, complete bool) {
 			debugf("http conn close, received %d", size)
 		}
 		if size < 0 {
-			debugf("invalid body size %d", size)
+			logp.Warn("invalid body size in packet")
 			return false, true
 		}
 		m.size += uint64(size)
@@ -526,7 +526,12 @@ func (*parser) eatBody(s *stream, m *message, size int) (ok, complete bool) {
 	} else if size >= m.contentLength-s.bodyReceived {
 		wanted := m.contentLength - s.bodyReceived
 		s.bodyReceived += wanted
-		m.size = uint64(len(m.rawHeaders) + m.contentLength)
+		bodySize := len(m.rawHeaders) + m.contentLength
+		if bodySize < 0 {
+			logp.Warn("invalid body size in packet")
+			return false, true
+		}
+		m.size = uint64(bodySize)
 		return true, true
 	} else {
 		s.bodyReceived += size
@@ -553,6 +558,11 @@ func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete 
 	m.chunkedLength = int(chunkLength)
 
 	s.data = s.data[i+2:] //+ \r\n
+	newSize := i + 2
+	if newSize < 0 {
+		logp.Warn("Invalid body size while parsing message")
+		return false, false, false
+	}
 	m.size += uint64(i + 2)
 
 	if m.chunkedLength == 0 {
@@ -581,8 +591,13 @@ func (*parser) parseBodyChunked(s *stream, m *message) (cont, ok, complete bool)
 		if m.saveBody {
 			m.body = append(m.body, s.data[:wanted]...)
 		}
-		m.size += uint64(wanted + 2)
-		s.data = s.data[wanted+2:]
+		newSize := wanted + 2
+		if newSize < 0 {
+			logp.Warn("invalid body size in http body")
+			return false, false, false
+		}
+		m.size += uint64(newSize)
+		s.data = s.data[newSize:]
 		m.contentLength += m.chunkedLength
 		s.parseState = stateBodyChunkedStart
 		return true, true, false
