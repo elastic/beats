@@ -102,11 +102,3 @@ func (c *GoroutinesChecker) WaitUntilOriginalCount() (int, error) {
 	}
 	return after, ErrTimeout
 }
-
-// WaitUntilIncreased waits till the number of goroutines is n plus the number
-// before creating the checker.
-func (c *GoroutinesChecker) WaitUntilIncreased(n int) {
-	for runtime.NumGoroutine() < c.before+n {
-		time.Sleep(10 * time.Millisecond)
-	}
-}
