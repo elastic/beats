@@ -38,6 +38,12 @@ type ldapClient struct {
 	mu   sync.Mutex
 	conn *ldap.Conn
 
+	// Circuit breaker for SSPI bind attempts to prevent goroutine leaks.
+	// sspiAttempted ensures SSPI bind is only attempted once per client instance.
+	// sspiErr stores the result of the SSPI attempt (protected by sync.Once).
+	sspiAttempted sync.Once
+	sspiErr       error
+
 	log *logp.Logger
 }
 
