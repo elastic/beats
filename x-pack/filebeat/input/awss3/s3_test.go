@@ -956,11 +956,19 @@ func Test_S3StateHandling(t *testing.T) {
 
 			// state must only contain expected state IDs
 			normalRegistry := s3Registry.(*normalStateRegistry)
-			require.Equal(t, len(test.expectStateIDs), len(normalRegistry.states))
+			normalRegistry.statesLock.Lock()
+			statesLen := len(normalRegistry.states)
+			var missingIDs []string
 			for _, id := range test.expectStateIDs {
 				if normalRegistry.states[id] == nil {
-					t.Errorf("state with ID %s should exist", id)
+					missingIDs = append(missingIDs, id)
 				}
+			}
+			normalRegistry.statesLock.Unlock()
+
+			require.Equal(t, len(test.expectStateIDs), statesLen)
+			for _, id := range missingIDs {
+				t.Errorf("state with ID %s should exist", id)
 			}
 		})
 	}
