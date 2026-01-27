@@ -73,11 +73,15 @@ func main() {
 
 	// Create a client to query osqueryd configuration
 	client, err := utils.NewResilientClient(*socket, timeoutD, log)
-	options, err := client.Options()
 	if err != nil {
-		log.Warningf("Could not retrieve osqueryd options: %s", err)
+		log.Warningf("Could not create resilient client: %s", err)
 	} else {
-		log.UpdateWithOsqueryOptions(options)
+		options, err := client.Options()
+		if err != nil {
+			log.Warningf("Could not retrieve osqueryd options: %s", err)
+		} else {
+			log.UpdateWithOsqueryOptions(options)
+		}
 	}
 
 	serverTimeout := osquery.ServerTimeout(timeoutD)

@@ -46,7 +46,7 @@ func (rc *ResilientClient) connect() error {
 
 	client, err := osquery.NewClient(rc.socketPath, rc.timeout)
 	if err != nil {
-		return fmt.Errorf("Could not create osquery client: %s", err)
+		return fmt.Errorf("Could not create osquery client: %w", err)
 	}
 
 	rc.client = client
