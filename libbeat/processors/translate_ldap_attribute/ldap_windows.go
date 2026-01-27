@@ -47,6 +47,7 @@ func (client *ldapClient) bindPlatformSpecific(conn *ldap.Conn, spn string) erro
 
 	go func() {
 		defer close(resultCh)
+		defer client.sspiTimedout.Store(false)
 
 		client.log.Debug("Creating SSPI client")
 		sspiClient, err := gssapi.NewSSPIClient()
