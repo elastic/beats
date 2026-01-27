@@ -540,17 +540,24 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 		name                     string
 		maxRetries               int
 		failuresPerEvent         int
-		bulkErrorCode            string
+		requestStatusCode        string
+		bulkDocStatusCode        string
 		retryOnStatus            string
 		eventIDsToFail           []int
 		expectedIngestedEventIDs []int
 		requestLevelFailure      bool
 	}{
 		{
+			name:                     "bulk 200 succeed without retries",
+			maxRetries:               0,
+			bulkDocStatusCode:        "200",                               // 200 OK for all documents
+			expectedIngestedEventIDs: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, // All events ingested
+		},
+		{
 			name:                     "bulk 429 retries until success",
 			maxRetries:               3,
 			failuresPerEvent:         2,                                   // Each failing event fails 2 times, succeeds on 3rd attempt
-			bulkErrorCode:            "429",                               // Document-level 429 errors in bulk response
+			bulkDocStatusCode:        "429",                               // Document-level 429 errors in bulk response
 			eventIDsToFail:           []int{1, 3, 5, 7},                   // These specific events will fail initially
 			expectedIngestedEventIDs: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, // All events eventually ingested after retries
 		},
@@ -558,72 +565,79 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 			name:                     "bulk 503 retry_on_status retries until success",
 			maxRetries:               3,
 			failuresPerEvent:         2,                                   // Each failing event fails 2 times, succeeds on 3rd attempt
-			bulkErrorCode:            "503",                               // Document-level 503 errors in bulk response
+			bulkDocStatusCode:        "503",                               // Document-level 503 errors in bulk response
 			retryOnStatus:            "503",                               // retry 503 errors
 			eventIDsToFail:           []int{1, 3, 5, 7},                   // These specific events will fail initially
 			expectedIngestedEventIDs: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, // All events eventually ingested after retries
 		},
 		{
-			name:                     "bulk 503 exhausts retries",
+			name:                     "bulk 503 retry_on_status exhausts retries",
 			maxRetries:               2,
-			failuresPerEvent:         3,                             // Each failing event fails 3 times (exceeds maxRetries=2)
-			bulkErrorCode:            "503",                         // Document-level 503 errors in bulk response
+			failuresPerEvent:         3,                             // Each failing event fails 3 times (total attempts = 1 initial + 2 retries = 3)
+			bulkDocStatusCode:        "503",                         // Document-level 503 errors in bulk response
 			retryOnStatus:            "503",                         // Explicitly enable 503 retries
-			eventIDsToFail:           []int{0, 9},                   // First and last events will permanently fail
+			eventIDsToFail:           []int{0, 9},                   // First and last events will permanently fail after exhausting retries
 			expectedIngestedEventIDs: []int{1, 2, 3, 4, 5, 6, 7, 8}, // Only non-failing events ingested
 		},
 		{
 			name:                     "bulk 429 exhausts retries",
 			maxRetries:               2,
-			failuresPerEvent:         3,                       // Each failing event fails 3 times (exceeds maxRetries)
-			bulkErrorCode:            "429",                   // Document-level 429 errors in bulk response
-			eventIDsToFail:           []int{2, 4, 6, 8},       // These events will permanently fail
+			failuresPerEvent:         3,                       // Each failing event fails 3 times
+			bulkDocStatusCode:        "429",                   // Document-level 429 errors in bulk response
+			eventIDsToFail:           []int{2, 4, 6, 8},       // These events will permanently fail after exhausting retries
 			expectedIngestedEventIDs: []int{0, 1, 3, 5, 7, 9}, // Only non-failing events ingested
 		},
 		{
 			name:                     "bulk 400 permanent failure",
 			maxRetries:               3,
 			failuresPerEvent:         0,                          // Always fail (permanent error)
-			bulkErrorCode:            "400",                      // Document-level 400 errors in bulk response
+			bulkDocStatusCode:        "400",                      // Document-level 400 errors in bulk response
 			eventIDsToFail:           []int{1, 4, 8},             // These events have permanent mapping errors
 			expectedIngestedEventIDs: []int{0, 2, 3, 5, 6, 7, 9}, // Only non-failing events ingested (no retries for 400)
 		},
 		{
 			name:                     "request 429 retries until success",
 			maxRetries:               3,
-			bulkErrorCode:            "429",                               // Entire HTTP request fails with 429
+			failuresPerEvent:         2,                                   // Request fails 2 times, succeeds on 3rd attempt
+			requestStatusCode:        "429",                               // Entire HTTP request fails with 429
+			bulkDocStatusCode:        "200",                               // Documents succeed when forwarded to handler
 			expectedIngestedEventIDs: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, // All events eventually ingested after request retries
 			requestLevelFailure:      true,                                // Request-level failures
 		},
 		{
 			name:                     "request 503 retry_on_status retries until success",
 			maxRetries:               3,
+			failuresPerEvent:         3,                                   // Request fails 2 times, succeeds on 3rd attempt
 			requestLevelFailure:      true,                                // Request-level failures
-			bulkErrorCode:            "503",                               // Entire HTTP request fails with 503
+			requestStatusCode:        "503",                               // Entire HTTP request fails with 503
+			bulkDocStatusCode:        "200",                               // Documents succeed when forwarded to handler
 			retryOnStatus:            "503",                               // Explicitly enable 503 retries
 			expectedIngestedEventIDs: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, // All events eventually ingested after request retries
 		},
 		{
 			name:                     "request 429 exhausts retries",
 			maxRetries:               2,
+			failuresPerEvent:         3,       // Request fails 3 times
 			requestLevelFailure:      true,    // Request-level failures
-			bulkErrorCode:            "429",   // Entire HTTP request fails with 429
-			expectedIngestedEventIDs: []int{}, // No events ingested (exhausted request retries)
+			requestStatusCode:        "429",   // Entire HTTP request fails with 429
+			expectedIngestedEventIDs: []int{}, // No events ingested (exhausted all attempts without success)
 		},
 		{
-			name:                     "request 503 exhausts retries",
+			name:                     "request 503 retry_on_status exhausts retries",
 			maxRetries:               2,
+			failuresPerEvent:         3,       // Request fails 3 times
 			requestLevelFailure:      true,    // Request-level failures
-			bulkErrorCode:            "503",   // Entire HTTP request fails with 503
+			requestStatusCode:        "503",   // Entire HTTP request fails with 503
 			retryOnStatus:            "503",   // Explicitly enable 503 retries
-			expectedIngestedEventIDs: []int{}, // No events ingested (exhausted request retries)
+			expectedIngestedEventIDs: []int{}, // No events ingested (exhausted all attempts without success)
 		},
 		{
 			name:                     "request 400 permanent failure",
-			maxRetries:               3,
+			maxRetries:               0,
+			failuresPerEvent:         1,       // fail request once
 			requestLevelFailure:      true,    // Request-level failures
-			bulkErrorCode:            "400",   // Entire HTTP request fails with 400
-			expectedIngestedEventIDs: []int{}, // No events ingested (permanent request failure, no retries)
+			requestStatusCode:        "400",   // Entire HTTP request fails with 400
+			expectedIngestedEventIDs: []int{}, // No events ingested
 		},
 	}
 
@@ -647,7 +661,7 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 					eventIDStr := string(matches[1])
 					eventID, err := strconv.Atoi(eventIDStr)
 					if err != nil {
-						return http.StatusInternalServerError
+						return http.StatusBadRequest
 					}
 
 					eventKey := "Line " + eventIDStr
@@ -662,7 +676,7 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 						// This event is configured to fail
 						failureCount := eventFailureCounts[eventKey]
 
-						switch tt.bulkErrorCode {
+						switch tt.bulkDocStatusCode {
 						case "400":
 							// Permanent errors always fail
 							shouldFail = true
@@ -672,14 +686,11 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 							// Temporary errors fail until failuresPerEvent threshold
 							shouldFail = failureCount < tt.failuresPerEvent
 						}
-					} else {
-						// Events not in the fail list always succeed
-						shouldFail = false
 					}
 
 					if shouldFail {
 						eventFailureCounts[eventKey] = eventFailureCounts[eventKey] + 1
-						switch tt.bulkErrorCode {
+						switch tt.bulkDocStatusCode {
 						case "503":
 							return http.StatusServiceUnavailable
 						case "429":
@@ -703,7 +714,7 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 					return http.StatusOK
 				}
 
-				return http.StatusOK
+				return http.StatusBadRequest
 			}
 
 			reader := metric.NewManualReader()
@@ -729,30 +740,25 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 				mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 					currentAttempt := atomic.AddInt64(&attemptCount, 1)
 
-					// For retryable status codes (429, 503), fail for the first maxRetries attempts, then succeed
+					// For retryable status codes (429, 503), fail for failuresPerEvent times, then forward to deterministic handler
 					// For non-retryable status codes (400), always fail
 					var shouldFail bool
-					if tt.bulkErrorCode == "400" {
+					switch tt.requestStatusCode {
+					case "400":
 						// 400 is never retryable, always fail
 						shouldFail = true
-					} else {
-						// For 429/503, fail for first maxRetries attempts, then succeed
-						shouldFail = currentAttempt <= int64(tt.maxRetries)
+					case "503", "429":
+						shouldFail = currentAttempt <= int64(tt.failuresPerEvent)
 					}
 
 					if shouldFail {
-						switch tt.bulkErrorCode {
-						case "503":
-							http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
-						case "429":
-							http.Error(w, "Too Many Requests", http.StatusTooManyRequests)
-						default:
-							http.Error(w, "Bad Request", http.StatusBadRequest)
-						}
+						status, err := strconv.Atoi(tt.requestStatusCode)
+						assert.NoError(t, err)
+						http.Error(w, "", status)
 						return
 					}
 
-					// Success case - let the deterministic handler handle the response
+					// Success case - forward to the deterministic handler
 					baseHandler.ServeHTTP(w, r)
 				})
 			} else {
@@ -771,7 +777,6 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 				ESEndpoint     string
 				MaxRetries     int
 				MonitoringPort int
-				BulkErrorCode  string
 				RetryOnStatus  string
 			}{
 				Index:          index,
@@ -779,7 +784,6 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 				ESEndpoint:     server.URL,
 				MaxRetries:     tt.maxRetries,
 				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
-				BulkErrorCode:  tt.bulkErrorCode,
 				RetryOnStatus:  tt.retryOnStatus,
 			}
 
@@ -824,7 +828,7 @@ exporters:
     sending_queue:
       batch:
         flush_timeout: 10s
-        max_size: 1600
+        max_size: 1
         min_size: 0
         sizer: items
       block_on_overflow: true
@@ -920,8 +924,10 @@ service:
 
 				m = m.Flatten()
 
+				assert.Equal(ct, float64(numTestEvents), m["libbeat.pipeline.events.published"], "expected total events published to pipeline to match")
+
 				// For non-retryable errors like 400, events are dropped by the exporter
-				if tt.requestLevelFailure && tt.bulkErrorCode == "400" {
+				if tt.requestLevelFailure && tt.requestStatusCode == "400" {
 					assert.Equal(ct, float64(0), m["libbeat.output.events.acked"], "expected no events to be acked (400 errors drop events)")
 				} else {
 					// For retryable errors or successful cases, events are eventually acked
