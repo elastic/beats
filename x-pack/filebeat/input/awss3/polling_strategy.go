@@ -24,6 +24,14 @@ type pollingStrategy interface {
 	GetStateID(state state) string
 }
 
+// newPollingStrategy creates the appropriate polling strategy based on configuration flag.
+func newPollingStrategy(lexicographicalOrdering bool) pollingStrategy {
+	if lexicographicalOrdering {
+		return newLexicographicalPollingStrategy()
+	}
+	return newNormalPollingStrategy()
+}
+
 // normalPollingStrategy implements the default (non-lexicographical) polling behavior.
 // In this mode:
 // - All objects are listed from the beginning each poll cycle
@@ -85,12 +93,4 @@ func (lexicographicalPollingStrategy) ShouldSkipObject(log *logp.Logger, state s
 
 func (lexicographicalPollingStrategy) GetStateID(state state) string {
 	return state.IDWithLexicographicalOrdering()
-}
-
-// newPollingStrategy creates the appropriate polling strategy based on configuration flag.
-func newPollingStrategy(lexicographicalOrdering bool) pollingStrategy {
-	if lexicographicalOrdering {
-		return newLexicographicalPollingStrategy()
-	}
-	return newNormalPollingStrategy()
 }
