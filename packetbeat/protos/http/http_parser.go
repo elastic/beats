@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"math"
 	"strconv"
 	"time"
 	"unicode"
@@ -263,12 +264,15 @@ func parseResponseStatus(s []byte) (uint16, []byte, error) {
 	if err != nil {
 		return 0, nil, fmt.Errorf("Unable to parse status code from [%s]", s)
 	}
+	if statusCode > math.MaxUint16 || statusCode < 0 {
+		return 0, nil, fmt.Errorf("invalid status code %v", statusCode)
+	}
 	return uint16(statusCode), phrase, nil
 }
 
 func parseVersion(s []byte) (uint8, uint8, error) {
 	if len(s) < 3 {
-		return 0, 0, errors.New("Invalid version")
+		return 0, 0, errors.New("invalid version")
 	}
 
 	major := s[0] - '0'
@@ -283,7 +287,11 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 	if len(s.data)-s.parseOffset >= 2 &&
 		bytes.Equal(s.data[s.parseOffset:s.parseOffset+2], []byte("\r\n")) {
 		// EOH
-		m.size = uint64(s.parseOffset + 2)
+		offset := s.parseOffset + 2
+		if offset < 0 {
+			debugf("invalid byte offset for headers: %v", offset)
+		}
+		m.size = uint64(offset)
 		m.rawHeaders = s.data[:m.size]
 		s.data = s.data[m.size:]
 		s.parseOffset = 0
@@ -469,6 +477,10 @@ func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
 		return true, false
 	} else if nbytes >= m.contentLength-s.bodyReceived {
 		wanted := m.contentLength - s.bodyReceived
+		if wanted < 0 {
+			debugf("http body length wrong. Ignoring")
+			return false, true
+		}
 		if m.saveBody {
 			m.body = append(m.body, s.data[:wanted]...)
 		}
@@ -502,6 +514,10 @@ func (*parser) eatBody(s *stream, m *message, size int) (ok, complete bool) {
 		// HTTP/1.0 no content length. Add until the end of the connection
 		if isDebug {
 			debugf("http conn close, received %d", size)
+		}
+		if size < 0 {
+			debugf("invalid body size %d", size)
+			return false, true
 		}
 		m.size += uint64(size)
 		s.bodyReceived += size
@@ -546,7 +562,7 @@ func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete 
 		}
 		m.size += 2
 		if s.data[0] != '\r' || s.data[1] != '\n' {
-			logp.Warn("Expected CRLF sequence at end of message")
+			logp.Warn("expected CRLF sequence at end of message")
 			return false, false, false
 		}
 		s.data = s.data[2:]
