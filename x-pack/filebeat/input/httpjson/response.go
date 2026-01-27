@@ -61,15 +61,32 @@ func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Log
 
 	switch tresp := resp.body.(type) {
 	case []interface{}:
-		for _, v := range tresp {
-			m, ok := v.(map[string]interface{})
-			if !ok {
-				msg := fmt.Sprintf("events must be JSON objects, but got %T: skipping", v)
+		if len(tresp) > 0 {
+			values := []string{}
+			for _, v := range tresp {
+				m, ok := v.(map[string]interface{})
+				if !ok {
+					if _, ok := v.(string); ok {
+						values = append(values, v.(string))
+					} else {
+						msg := fmt.Sprintf("events must be JSON objects, but got %T: skipping", v)
+						log.Debug(msg)
+						stat.UpdateStatus(status.Degraded, msg)
+					}
+					continue
+				}
+				convertAndAppend(m)
+			}
+			// all the values were strings.
+			if len(values) == len(tresp) {
+				convertAndAppend(map[string]interface{}{
+					"text": tresp,
+				})
+			} else if len(values) > 0 {
+				msg := fmt.Sprintf("events must be JSON objects, but got strings: skipping %v", values)
 				log.Debug(msg)
 				stat.UpdateStatus(status.Degraded, msg)
-				continue
 			}
-			convertAndAppend(m)
 		}
 	case map[string]interface{}:
 		convertAndAppend(tresp)
@@ -77,7 +94,6 @@ func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Log
 		stat.UpdateStatus(status.Degraded, "response is not a valid JSON")
 		log.Debugf("response is not a valid JSON")
 	}
-
 	return ts
 }
 
