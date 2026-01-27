@@ -1056,7 +1056,6 @@ func TestFileProspector_previousID(t *testing.T) {
 }
 
 func TestFileProspector_takeOverFn(t *testing.T) {
-	t.SkipNow()
 	testFileInfo := &testFileInfo{
 		name: "/path/to/file",
 		size: 100,

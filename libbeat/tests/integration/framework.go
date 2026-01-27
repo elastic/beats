@@ -1273,7 +1273,7 @@ func (b *BeatProc) RemoveOutputFile() {
 	t := b.t
 	outputFiles, err := filepath.Glob(filepath.Join(b.TempDir(), "output*.ndjson"))
 	if err != nil {
-		t.Fatalf("cannot get glob for output file(s): %s", err)
+		t.Fatalf("failed to match glob pattern for output files: %s", err)
 	}
 
 	for _, file := range outputFiles {

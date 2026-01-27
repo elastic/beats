@@ -85,12 +85,12 @@ func openTestStoreFromFiles(t *testing.T, rootDir, name string) sourceStore {
 	if err != nil {
 		t.Fatalf("cannot open store: %s", err)
 	}
-	realStroe := sourceStore{
+	realStore := sourceStore{
 		identifier: &SourceIdentifier{
 			prefix: "filestream" + "::" + "input-id" + "::",
 		},
 		store: ss,
 	}
 
-	return realStroe
+	return realStore
 }
