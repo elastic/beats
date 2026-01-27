@@ -17,13 +17,13 @@ import (
 func TestNewPollingStrategy(t *testing.T) {
 	t.Run("returns normalPollingStrategy when lexicographical ordering is false", func(t *testing.T) {
 		strategy := newPollingStrategy(false)
-		_, ok := strategy.(*normalPollingStrategy)
+		_, ok := strategy.(normalPollingStrategy)
 		assert.True(t, ok, "expected normalPollingStrategy")
 	})
 
 	t.Run("returns lexicographicalPollingStrategy when lexicographical ordering is true", func(t *testing.T) {
 		strategy := newPollingStrategy(true)
-		_, ok := strategy.(*lexicographicalPollingStrategy)
+		_, ok := strategy.(lexicographicalPollingStrategy)
 		assert.True(t, ok, "expected lexicographicalPollingStrategy")
 	})
 }

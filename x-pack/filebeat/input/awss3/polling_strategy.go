@@ -34,23 +34,23 @@ type pollingStrategy interface {
 type normalPollingStrategy struct{}
 
 func newNormalPollingStrategy() pollingStrategy {
-	return &normalPollingStrategy{}
+	return normalPollingStrategy{}
 }
 
-func (s *normalPollingStrategy) PrePollSetup(log *logp.Logger, registry stateRegistry) {
+func (normalPollingStrategy) PrePollSetup(log *logp.Logger, registry stateRegistry) {
 	// No setup needed for normal mode
 }
 
-func (s *normalPollingStrategy) GetStartAfterKey(registry stateRegistry) string {
+func (normalPollingStrategy) GetStartAfterKey(registry stateRegistry) string {
 	// Doesn't use StartAfter - lists from beginning each poll cycle
 	return ""
 }
 
-func (s *normalPollingStrategy) ShouldSkipObject(log *logp.Logger, state state, isStateValid func(*logp.Logger, state) bool) bool {
+func (normalPollingStrategy) ShouldSkipObject(log *logp.Logger, state state, isStateValid func(*logp.Logger, state) bool) bool {
 	return !isStateValid(log, state)
 }
 
-func (s *normalPollingStrategy) GetStateID(state state) string {
+func (normalPollingStrategy) GetStateID(state state) string {
 	return state.ID()
 }
 
@@ -64,14 +64,14 @@ func (s *normalPollingStrategy) GetStateID(state state) string {
 type lexicographicalPollingStrategy struct{}
 
 func newLexicographicalPollingStrategy() pollingStrategy {
-	return &lexicographicalPollingStrategy{}
+	return lexicographicalPollingStrategy{}
 }
 
-func (s *lexicographicalPollingStrategy) PrePollSetup(log *logp.Logger, registry stateRegistry) {
+func (lexicographicalPollingStrategy) PrePollSetup(log *logp.Logger, registry stateRegistry) {
 	// No setup needed - heap maintains order automatically
 }
 
-func (s *lexicographicalPollingStrategy) GetStartAfterKey(registry stateRegistry) string {
+func (lexicographicalPollingStrategy) GetStartAfterKey(registry stateRegistry) string {
 	oldestState := registry.GetLeastState()
 	if oldestState != nil {
 		return oldestState.Key
@@ -79,11 +79,11 @@ func (s *lexicographicalPollingStrategy) GetStartAfterKey(registry stateRegistry
 	return ""
 }
 
-func (s *lexicographicalPollingStrategy) ShouldSkipObject(log *logp.Logger, state state, isStateValid func(*logp.Logger, state) bool) bool {
+func (lexicographicalPollingStrategy) ShouldSkipObject(log *logp.Logger, state state, isStateValid func(*logp.Logger, state) bool) bool {
 	return false
 }
 
-func (s *lexicographicalPollingStrategy) GetStateID(state state) string {
+func (lexicographicalPollingStrategy) GetStateID(state state) string {
 	return state.IDWithLexicographicalOrdering()
 }
 

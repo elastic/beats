@@ -729,7 +729,7 @@ func TestPaginatorListPrefix(t *testing.T) {
 	}
 
 	var objects []string
-	paginator := s3API.ListObjectsPaginator(nil, tfConfig.BucketName, "log", "")
+	paginator := s3API.ListObjectsPaginator(logp.NewNopLogger(), tfConfig.BucketName, "log", "")
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(context.Background())
 		assert.NoError(t, err)

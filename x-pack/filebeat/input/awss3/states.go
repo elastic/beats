@@ -7,6 +7,7 @@ package awss3
 import (
 	"container/heap"
 	"fmt"
+	"slices"
 	"strings"
 	"sync"
 
@@ -55,8 +56,8 @@ type baseStateRegistry struct {
 
 func (b *baseStateRegistry) IsProcessed(id string) bool {
 	b.statesLock.Lock()
-	defer b.statesLock.Unlock()
 	_, ok := b.states[id]
+	b.statesLock.Unlock()
 	return ok
 }
 
@@ -306,12 +307,7 @@ func (r *lexicographicalStateRegistry) CleanUp(knownIDs []string) error {
 	// If removing all states, preserve at least one (the greatest key for startAfterKey)
 	if len(r.states)-len(idsToRemove) < 1 && len(idsToRemove) > 0 {
 		// Find the greatest key to preserve
-		var greatestID string
-		for _, id := range idsToRemove {
-			if greatestID == "" || id > greatestID {
-				greatestID = id
-			}
-		}
+		greatestID := slices.Max(idsToRemove)
 		// Remove greatestID from idsToRemove
 		filtered := make([]string, 0, len(idsToRemove)-1)
 		for _, id := range idsToRemove {

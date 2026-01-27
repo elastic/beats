@@ -36,7 +36,7 @@ type config struct {
 	BucketListPrefix            string               `config:"bucket_list_prefix"`
 	FileSelectors               []fileSelectorConfig `config:"file_selectors"`
 	IgnoreOlder                 time.Duration        `config:"ignore_older"`
-	LexicographicalOrdering     bool                 `config:"lexicographical_ordering"`
+	LexicographicalOrdering     bool                 `config:"lexical_ordering"`
 	LexicographicalLookbackKeys int                  `config:"lexicographical_lookback_keys"`
 	NonAWSBucketName            string               `config:"non_aws_bucket_name"`
 	NumberOfWorkers             int                  `config:"number_of_workers"`
@@ -99,7 +99,7 @@ func (c *config) Validate() error {
 	}
 
 	if c.LexicographicalOrdering && c.BucketARN == "" && c.AccessPointARN == "" && c.NonAWSBucketName == "" {
-		return errors.New("lexicographical_ordering can only be used when polling AWS S3, S3 Access Point, or non-AWS S3 bucket")
+		return errors.New("lexical_ordering can only be used when polling AWS S3, S3 Access Point, or non-AWS S3 bucket")
 	}
 
 	if c.LexicographicalOrdering && c.LexicographicalLookbackKeys <= 0 {
