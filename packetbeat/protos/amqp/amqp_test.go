@@ -77,7 +77,8 @@ func expectTransaction(t *testing.T, e *eventStore) mapstr.M {
 }
 
 func TestAmqp_UnknownMethod(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed")) //nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
+	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
 	assert.NoError(t, err)
@@ -96,7 +97,8 @@ func TestAmqp_UnknownMethod(t *testing.T) {
 }
 
 func TestAmqp_FrameSize(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed")) //nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
+	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
 	assert.NoError(t, err)
@@ -141,6 +143,7 @@ func TestAmqp_PartialFrameSize(t *testing.T) {
 }
 
 func TestAmqp_WrongShortStringSize(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
@@ -159,6 +162,7 @@ func TestAmqp_WrongShortStringSize(t *testing.T) {
 }
 
 func TestAmqp_QueueDeclaration(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
@@ -192,6 +196,7 @@ func TestAmqp_QueueDeclaration(t *testing.T) {
 }
 
 func TestAmqp_ExchangeDeclaration(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
@@ -226,6 +231,7 @@ func TestAmqp_ExchangeDeclaration(t *testing.T) {
 }
 
 func TestAmqp_BasicConsume(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
@@ -260,6 +266,7 @@ func TestAmqp_BasicConsume(t *testing.T) {
 }
 
 func TestAmqp_ExchangeDeletion(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
@@ -289,6 +296,7 @@ func TestAmqp_ExchangeDeletion(t *testing.T) {
 
 // this method is exclusive to RabbitMQ
 func TestAmqp_ExchangeBind(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
@@ -323,6 +331,7 @@ func TestAmqp_ExchangeBind(t *testing.T) {
 
 // this method is exclusive to RabbitMQ
 func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	results, amqp, err := amqpModForTests()
@@ -358,8 +367,8 @@ func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
 	assert.Equal(t, false, fields["no-wait"])
 }
 
-// FIXME: failing
 func TestAmqp_PublishMessage(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	results, amqp, err := amqpModForTests()
@@ -409,8 +418,8 @@ func TestAmqp_PublishMessage(t *testing.T) {
 	assert.Equal(t, false, fields["mandatory"])
 }
 
-// FIXME: failing
 func TestAmqp_DeliverMessage(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	results, amqp, err := amqpModForTests()
@@ -457,8 +466,8 @@ func TestAmqp_DeliverMessage(t *testing.T) {
 	assert.Equal(t, false, fields["redelivered"])
 }
 
-// FIXME: failing
 func TestAmqp_MessagePropertiesFields(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
@@ -504,6 +513,7 @@ func TestAmqp_MessagePropertiesFields(t *testing.T) {
 }
 
 func TestAmqp_ChannelError(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
@@ -552,6 +562,7 @@ func TestAmqp_ChannelError(t *testing.T) {
 }
 
 func TestAmqp_NoWaitQueueDeleteMethod(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	results, amqp, err := amqpModForTests()
@@ -585,6 +596,7 @@ func TestAmqp_NoWaitQueueDeleteMethod(t *testing.T) {
 }
 
 func TestAmqp_RejectMessage(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	results, amqp, err := amqpModForTests()
@@ -616,6 +628,7 @@ func TestAmqp_RejectMessage(t *testing.T) {
 }
 
 func TestAmqp_GetEmptyMethod(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	results, amqp, err := amqpModForTests()
@@ -643,8 +656,8 @@ func TestAmqp_GetEmptyMethod(t *testing.T) {
 	assert.Equal(t, common.OK_STATUS, trans["status"])
 }
 
-// FIXME: failing
 func TestAmqp_GetMethod(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	results, amqp, err := amqpModForTests()
@@ -677,8 +690,8 @@ func TestAmqp_GetMethod(t *testing.T) {
 	assert.Equal(t, "Get me if you dare", trans["response"])
 }
 
-// FIXME: failing
 func TestAmqp_MaxBodyLength(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	results, amqp, err := amqpModForTests()
@@ -749,6 +762,7 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 }
 
 func TestAmqp_HideArguments(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	results, amqp, err := amqpModForTests()
@@ -811,6 +825,7 @@ func TestAmqp_HideArguments(t *testing.T) {
 }
 
 func TestAmqp_RecoverMethod(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	results, amqp, err := amqpModForTests()
@@ -840,6 +855,7 @@ func TestAmqp_RecoverMethod(t *testing.T) {
 
 // this is a specific rabbitMQ method
 func TestAmqp_BasicNack(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
@@ -864,6 +880,7 @@ func TestAmqp_BasicNack(t *testing.T) {
 }
 
 func TestAmqp_GetTable(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
@@ -923,8 +940,8 @@ func TestAmqp_GetTable(t *testing.T) {
 	assert.Equal(t, "TestHeader", m.request)
 }
 
-// FIXME: failing
 func TestAmqp_TableInception(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
@@ -977,8 +994,8 @@ func TestAmqp_TableInception(t *testing.T) {
 	assert.Equal(t, "Saito", limbo["limbo2"])
 }
 
-// FIXME: failing
 func TestAmqp_ArrayFields(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
@@ -1057,6 +1074,7 @@ func TestAmqp_ArrayFields(t *testing.T) {
 }
 
 func TestAmqp_WrongTable(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	_, amqp, err := amqpModForTests()
@@ -1130,6 +1148,7 @@ func TestAmqp_isError(t *testing.T) {
 }
 
 func TestAmqp_ChannelCloseErrorMethod(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	results, amqp, err := amqpModForTests()
@@ -1160,6 +1179,7 @@ func TestAmqp_ChannelCloseErrorMethod(t *testing.T) {
 }
 
 func TestAmqp_ConnectionCloseNoError(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	results, amqp, err := amqpModForTests()
@@ -1193,6 +1213,7 @@ func TestAmqp_ConnectionCloseNoError(t *testing.T) {
 }
 
 func TestAmqp_MultipleBodyFrames(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
 	results, amqp, err := amqpModForTests()
