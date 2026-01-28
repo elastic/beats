@@ -27,6 +27,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -103,9 +104,9 @@ logging.level: info
 	))
 
 	// Write test data to all log files
-	integration.WriteLogFile(t, logFile1, 10, false)
-	integration.WriteLogFile(t, logFile2, 10, false)
-	integration.WriteLogFile(t, logFile3, 10, false)
+	testhelpers.WriteLogFile(t, logFile1, 10, false)
+	testhelpers.WriteLogFile(t, logFile2, 10, false)
+	testhelpers.WriteLogFile(t, logFile3, 10, false)
 
 	filebeat.Start()
 	filebeat.WaitPublishedEvents(30*time.Second, 30)

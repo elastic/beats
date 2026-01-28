@@ -31,6 +31,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -58,7 +59,7 @@ func TestFilebeatRunsAndLogsJSONToFile(t *testing.T) {
 	logFilePath := path.Join(tempDir, "log.log")
 
 	// 2. Create the log file
-	integration.WriteLogFile(t, logFilePath, 10, false)
+	testhelpers.WriteLogFile(t, logFilePath, 10, false)
 
 	// 3. Write configuration file and start Filebeat
 	filebeat.WriteConfigFile(fmt.Sprintf(filebeatBasicConfig, logFilePath, tempDir))

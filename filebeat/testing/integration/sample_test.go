@@ -26,6 +26,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/testing/integration"
 )
 
@@ -82,15 +83,15 @@ output.console:
 
 		tcs := map[string]struct {
 			configTemplate     string
-			GenerateLogFilesFn func(t *testing.T, files, lines int, generator LogGenerator) (path string, filenames []string)
+			GenerateLogFilesFn func(t *testing.T, files, lines int, generator testhelpers.LineGenerator) (path string, filenames []string)
 		}{
 			"plain": {
 				configTemplate:     configPlainTemplate,
-				GenerateLogFilesFn: GenerateLogFiles,
+				GenerateLogFilesFn: testhelpers.GenerateLogFiles,
 			},
 			"GZIP": {
 				configTemplate:     configGZIPTemplate,
-				GenerateLogFilesFn: GenerateGZIPLogFiles,
+				GenerateLogFilesFn: testhelpers.GenerateGZIPLogFiles,
 			},
 		}
 		for name, tc := range tcs {
@@ -100,7 +101,7 @@ output.console:
 					ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 					defer cancel()
 
-					generator := NewPlainTextGenerator(messagePrefix)
+					generator := testhelpers.NewPlainTextGenerator(messagePrefix)
 					path, files := tc.GenerateLogFilesFn(t, fileCount, lineCount, generator)
 					config := fmt.Sprintf(tc.configTemplate, path)
 					test := NewTest(t, TestOptions{
@@ -126,7 +127,7 @@ output.console:
 					ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 					defer cancel()
 
-					generator := NewJSONGenerator(messagePrefix)
+					generator := testhelpers.NewJSONGenerator(messagePrefix)
 					path, files := tc.GenerateLogFilesFn(t, fileCount, lineCount, generator)
 					config := fmt.Sprintf(tc.configTemplate, path)
 					test := NewTest(t, TestOptions{

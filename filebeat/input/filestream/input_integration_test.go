@@ -37,6 +37,7 @@ import (
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -1178,7 +1179,7 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 	// Escape windows path separator
 	logFilePathStr := strings.ReplaceAll(logFilePath, `\`, `\\`)
 
-	integration.WriteLogFile(t, logFilePath, 50, false)
+	testhelpers.WriteLogFile(t, logFilePath, 50, false)
 
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	// The duration used to configure the input need to obey
@@ -1218,7 +1219,7 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 
 	// Add more data to the file while the reader is blocked
 	// on its backoff and its context has been cancelled.
-	integration.WriteLogFile(t, logFilePath, 5, true)
+	testhelpers.WriteLogFile(t, logFilePath, 5, true)
 
 	// Ensure the FileWatcher detected the new data and sent a write event
 	env.WaitLogsContains(

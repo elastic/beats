@@ -37,6 +37,7 @@ import (
 	"github.com/go-ldap/ldap/v3"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -99,7 +100,7 @@ func TestTranslateGUIDWithLDAP(t *testing.T) {
 
 	// 1. Generate the log file path
 	logFilePath := path.Join(tempDir, "log.log")
-	integration.WriteLogFile(t, logFilePath, 1, false)
+	testhelpers.WriteLogFile(t, logFilePath, 1, false, nil)
 
 	// 2. Write configuration file and start Filebeat
 	filebeat.WriteConfigFile(
