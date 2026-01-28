@@ -37,6 +37,8 @@ import (
 	wininfo "github.com/elastic/go-sysinfo/providers/windows"
 )
 
+var ErrGapDetected = errors.New("record ID gap detected - events were lost")
+
 // winEventLog implements the EventLog interface for reading from the Windows
 // Event Log API.
 type winEventLog struct {
@@ -182,7 +184,8 @@ func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *moni
 		"has_bookmark", len(state.Bookmark) > 0,
 		"batch_read_size", l.maxRead,
 		"has_query_filters", hasFilters,
-		"gap_detection_enabled", !hasFilters)
+		"gap_detection_enabled", !hasFilters,
+		"stop_if_gap_found", l.config.StopIfGapFound)
 
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
@@ -323,6 +326,12 @@ func (l *winEventLog) Read() ([]Record, error) {
 	for h, ok := l.iterator.Next(); ok; h, ok = l.iterator.Next() {
 		record, err := l.processHandle(h)
 		if err != nil {
+			// Check if this is a gap detection error that should stop the beat
+			if errors.Is(err, ErrGapDetected) {
+				l.metrics.logError(err)
+				return records, err
+			}
+			// For other errors, log and drop the event
 			l.metrics.logError(err)
 			l.log.Warnw("Dropping event due to rendering error.", "error", err)
 			l.metrics.logDropped(err)
@@ -404,6 +413,13 @@ func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 				"missing_events", gapSize,
 				"gap_range", fmt.Sprintf("[%d-%d]", prevRecordID+1, r.RecordID-1),
 				"timestamp", r.TimeCreated.SystemTime)
+
+			// If configured to stop on gap, return error to stop the beat
+			if l.config.StopIfGapFound {
+				l.lastRead = r.Offset
+				return r, fmt.Errorf("%w: channel=%s, previous_record_id=%d, current_record_id=%d, missing_events=%d",
+					ErrGapDetected, l.channelName, prevRecordID, r.RecordID, gapSize)
+			}
 		}
 	}
 	l.lastRead = r.Offset
