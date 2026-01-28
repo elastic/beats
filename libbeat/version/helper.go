@@ -25,7 +25,7 @@ import (
 
 var (
 	packageVersion atomic.Value
-	vcsRevision    string
+	vcsRevision    = "unknown"
 	vcsTime        time.Time
 	qualifier      = ""
 )
