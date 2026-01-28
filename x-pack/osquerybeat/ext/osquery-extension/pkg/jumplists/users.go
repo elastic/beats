@@ -83,7 +83,7 @@ func getUserProfiles(log *logger.Logger, client ClientInterface) ([]*UserProfile
 	var userProfiles []*UserProfile
 	response, err := client.Query("SELECT * from users WHERE type != 'special' AND directory != '';")
 	if err != nil {
-		return nil, fmt.Errorf("failed to query users table: %v", err)
+		return nil, fmt.Errorf("failed to query users table: %w", err)
 	}
 
 	for _, userRow := range response.Response {

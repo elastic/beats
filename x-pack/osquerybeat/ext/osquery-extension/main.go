@@ -40,7 +40,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/utils"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 )
 
 var (
@@ -72,7 +72,7 @@ func main() {
 	}
 
 	// Create a client to query osqueryd configuration
-	client, err := utils.NewResilientClient(*socket, timeoutD, log)
+	client, err := client.NewResilientClient(*socket, timeoutD, log)
 	if err != nil {
 		log.Warningf("Could not create resilient client: %s", err)
 	} else {
