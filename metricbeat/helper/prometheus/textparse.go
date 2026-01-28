@@ -482,7 +482,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 	// Fallback to text/plain if content type is blank or unrecognized.
 	parser, err := textparse.New(b, contentType, labels.NewSymbolTable(), textparse.ParserOptions{
 		KeepClassicOnClassicAndNativeHistograms: false,
-		OpenMetricsSkipCTSeries:                 false,
+		OpenMetricsSkipSTSeries:                 false,
 		EnableTypeAndUnitLabels:                 false,
 		FallbackContentType:                     textMediaType,
 	})

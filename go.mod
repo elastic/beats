@@ -201,7 +201,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.144.0
 	github.com/pierrec/lz4/v4 v4.1.23
 	github.com/pkg/xattr v0.4.9
-	github.com/prometheus/prometheus v0.307.1
+	github.com/prometheus/prometheus v0.309.1
 	github.com/shirou/gopsutil/v4 v4.25.12
 	github.com/teambition/rrule-go v1.8.2
 	github.com/tklauser/go-sysconf v0.3.16
