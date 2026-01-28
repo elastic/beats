@@ -222,9 +222,12 @@ func (mysql *mysqlPlugin) setFromConfig(config *mysqlConfig) {
 
 func (mysql *mysqlPlugin) getTransaction(k common.HashableTCPTuple) *mysqlTransaction {
 	v := mysql.transactions.Get(k)
-	if trans, ok := v.(*mysqlTransaction); ok && v != nil {
-		return trans
+	if v != nil {
+		if trans, ok := v.(*mysqlTransaction); ok {
+			return trans
+		}
 	}
+
 	return nil
 }
 
@@ -238,9 +241,12 @@ type mysqlStmtMap map[int]*mysqlStmtData
 
 func (mysql *mysqlPlugin) getStmtsMap(k common.HashableTCPTuple) mysqlStmtMap {
 	v := mysql.prepareStatements.Get(k)
-	if stmtMap, ok := v.(mysqlStmtMap); ok && v != nil {
-		return stmtMap
+	if v != nil {
+		if stmtMap, ok := v.(mysqlStmtMap); ok {
+			return stmtMap
+		}
 	}
+
 	return nil
 }
 
@@ -383,7 +389,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				// string[1] sql state marker
 				// string[5] sql state
 				// string<EOF> error message
-				if (m.start + 13) > len(s.data) {
+				if (m.start + 13) >= len(s.data) {
 					logp.Warn("MySql Error code is the wrong size. Ignoring.")
 					return false, false
 				}
@@ -1195,9 +1201,13 @@ func (mysql *mysqlPlugin) publishTransaction(t *mysqlTransaction) {
 	pbf.AddIP(t.dst.IP)
 	if t.bytesIn < math.MaxInt64 {
 		pbf.Source.Bytes = int64(t.bytesIn)
+	} else {
+		pbf.Source.Bytes = math.MaxInt64
 	}
 	if t.bytesOut < math.MaxInt64 {
 		pbf.Destination.Bytes = int64(t.bytesOut)
+	} else {
+		pbf.Destination.Bytes = math.MaxInt64
 	}
 
 	pbf.Event.Dataset = "mysql"
