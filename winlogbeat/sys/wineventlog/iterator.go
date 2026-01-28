@@ -162,7 +162,8 @@ func (itr *EventIterator) moreHandles() bool {
 
 		err := itr.evtNext(itr.subscription, batchSize, &itr.handles[0], 0, 0, &numReturned)
 
-		if (err != nil && !errors.Is(err, windows.ERROR_NO_MORE_ITEMS)) || osThreadID() != itr.threadID {
+		if (err != nil && !errors.Is(err, windows.ERROR_NO_MORE_ITEMS) && !errors.Is(err, windows.ERROR_INVALID_OPERATION)) ||
+			osThreadID() != itr.threadID {
 			itr.logger.Debugw("EvtNext called",
 				"requested_batch", batchSize,
 				"returned_count", numReturned,
