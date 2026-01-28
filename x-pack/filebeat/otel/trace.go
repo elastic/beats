@@ -16,7 +16,6 @@ import (
 	"unicode"
 
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
@@ -26,7 +25,11 @@ import (
 )
 
 func NewTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyValue, inputName string) (*sdktrace.TracerProvider, error) {
-	exp, err := newSpanExporterFromEnv(ctx, inputName)
+	cfg, err := newExporterCfgFromEnv(inputName)
+	if err != nil {
+		return nil, err
+	}
+	exp, err := newExporterFromCfg(ctx, cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +57,67 @@ func NewTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyVa
 	return sdktrace.NewTracerProvider(opts...), nil
 }
 
-// newSpanExporterFromEnv creates an exporter based on standard environment variables.
-// Returns (nil, nil) if the exporter is "none".
+// newSpanExporterFromEnv creates a new exporter from configuration.
+// It returns (nil, nil) if the exporter is "none".
+func newExporterFromCfg(ctx context.Context, cfg *exporterCfg) (sdktrace.SpanExporter, error) {
+	if cfg.disabled {
+		return nil, nil
+	}
+
+	switch cfg.exporter {
+	case "console":
+		return stdouttrace.New(stdouttrace.WithPrettyPrint())
+	case "otlp":
+		switch cfg.protocol {
+		case "grpc":
+			var opts []otlptracegrpc.Option
+			if cfg.endpoint != "" {
+				opts = append(opts, otlptracegrpc.WithEndpoint(cfg.endpoint))
+			}
+			if len(cfg.headers) > 0 {
+				opts = append(opts, otlptracegrpc.WithHeaders(cfg.headers))
+			}
+			if cfg.timeout > 0 {
+				opts = append(opts, otlptracegrpc.WithTimeout(cfg.timeout))
+			}
+			if cfg.insecure {
+				opts = append(opts, otlptracegrpc.WithInsecure())
+			}
+			return otlptracegrpc.New(ctx, opts...)
+		case "http/protobuf":
+			var opts []otlptracehttp.Option
+			if cfg.endpoint != "" {
+				opts = append(opts, otlptracehttp.WithEndpoint(cfg.endpoint))
+			}
+			if len(cfg.headers) > 0 {
+				opts = append(opts, otlptracehttp.WithHeaders(cfg.headers))
+			}
+			if cfg.timeout > 0 {
+				opts = append(opts, otlptracehttp.WithTimeout(cfg.timeout))
+			}
+			if cfg.insecure {
+				opts = append(opts, otlptracehttp.WithInsecure())
+			}
+			return otlptracehttp.New(ctx, opts...)
+		default:
+			return nil, fmt.Errorf("unsupported OTLP traces protocol %q (expected grpc or http/protobuf)", cfg.protocol)
+		}
+	}
+
+	return nil, nil
+}
+
+type exporterCfg struct {
+	disabled bool
+	exporter string
+	protocol string
+	endpoint string
+	headers  map[string]string
+	timeout  time.Duration
+	insecure bool
+}
+
+// newExporterCfgFromEnv loads exporter configuration data from standard environment variables, in a form ready to use for exporter creation.
 // The environment variables considered are:
 // - BEATS_OTEL_TRACES_DISABLE (CSV values: cel,httpjson, default: (none))
 // - OTEL_TRACES_EXPORTER (CSV values: none,otlp,console, first supported wins, default: none)
@@ -64,47 +126,46 @@ func NewTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyVa
 // - OTEL_EXPORTER_OTLP_TRACES_HEADERS  / OTEL_EXPORTER_OTLP_HEADERS  (e.g. "Authorization=Bearer abc123,X-Client-Version=1.2.3")
 // - OTEL_EXPORTER_OTLP_TRACES_TIMEOUT  / OTEL_EXPORTER_OTLP_TIMEOUT  (in ms)
 // - OTEL_EXPORTER_OTLP_TRACES_INSECURE / OTEL_EXPORTER_OTLP_INSECURE (values: true|false, default: true if http scheme used, otherwise false)
-func newSpanExporterFromEnv(ctx context.Context, inputName string) (sdktrace.SpanExporter, error) {
-	rawExporter := strings.TrimSpace(os.Getenv("OTEL_TRACES_EXPORTER"))
-	if rawExporter == "" {
-		rawExporter = "none"
-	}
+func newExporterCfgFromEnv(inputName string) (*exporterCfg, error) {
+	cfg := exporterCfg{}
 
 	rawDisable := strings.TrimSpace(os.Getenv("BEATS_OTEL_TRACES_DISABLE"))
 	for _, disabledInput := range splitCSV(rawDisable) {
 		if disabledInput == inputName {
-			rawExporter = "none"
+			cfg.disabled = true
 		}
 	}
 
-	candidates := splitCSV(rawExporter)
-	for _, expName := range candidates {
-		switch strings.ToLower(expName) {
-		case "none":
-			return nil, nil
-		case "otlp":
-			return newOTLPTraceExporterFromEnv(ctx)
-		case "console":
-			return stdouttrace.New(stdouttrace.WithPrettyPrint())
-		default:
-			continue
+	rawExporter := strings.TrimSpace(os.Getenv("OTEL_TRACES_EXPORTER"))
+	for _, rawName := range splitCSV(rawExporter) {
+		name := strings.ToLower(rawName)
+		switch name {
+		case "none", "otlp", "console":
+			cfg.exporter = name
+		}
+		if cfg.exporter != "" {
+			break
 		}
 	}
-
-	return nil, fmt.Errorf("no supported trace exporter found in OTEL_TRACES_EXPORTER=%q (supported: none, otlp, console)", rawExporter)
-}
-
-func newOTLPTraceExporterFromEnv(ctx context.Context) (*otlptrace.Exporter, error) {
-	proto := strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"))
-	if proto == "" {
-		proto = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL"))
+	if rawExporter != "" && cfg.exporter == "" {
+		return nil, fmt.Errorf("only unsupported trace exporter(s) found in OTEL_TRACES_EXPORTER=%q (supported: none, otlp, console)", rawExporter)
 	}
-	if proto == "" {
-		proto = "grpc"
+	if cfg.exporter == "" {
+		cfg.exporter = "none" // default
 	}
-	proto = strings.ToLower(proto)
 
-	insecure, hasInsecure, err := envBoolFirstFound(
+	cfg.protocol = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"))
+	if cfg.protocol == "" {
+		cfg.protocol = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL"))
+	}
+	if cfg.protocol == "" {
+		cfg.protocol = "grpc" // default
+	}
+	cfg.protocol = strings.ToLower(cfg.protocol)
+
+	var err error
+	var hasInsecure bool
+	cfg.insecure, hasInsecure, err = envBoolFirstFound(
 		"OTEL_EXPORTER_OTLP_TRACES_INSECURE",
 		"OTEL_EXPORTER_OTLP_INSECURE",
 	)
@@ -112,73 +173,36 @@ func newOTLPTraceExporterFromEnv(ctx context.Context) (*otlptrace.Exporter, erro
 		return nil, err
 	}
 
-	endpoint := strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"))
-	if endpoint == "" {
-		endpoint = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))
+	cfg.endpoint = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"))
+	if cfg.endpoint == "" {
+		cfg.endpoint = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))
 	}
-	u, err := url.Parse(endpoint)
+	u, err := url.Parse(cfg.endpoint)
 	if err == nil && u.Host != "" {
 		if u.Scheme == "http" && !hasInsecure {
 			// Using a scheme of http rather than https indicates it will be insecure.
-			insecure = true
+			cfg.insecure = true
 		}
-		// The endpoint was a URL like http://localhost:4318 but the exporter wants host:port.
-		endpoint = u.Host
+		// The endpoint was a URL like http://localhost:4318 but the exporter wants localhost:4318.
+		cfg.endpoint = u.Host
 	}
 
-	headers := strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS"))
-	if headers == "" {
-		headers = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_HEADERS"))
+	headersStr := strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS"))
+	if headersStr == "" {
+		headersStr = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_HEADERS"))
 	}
-	headerMap, err := parseOTLPHeaders(headers)
+	cfg.headers, err = parseOTLPHeaders(headersStr)
 	if err != nil {
 		return nil, err
 	}
 
-	timeout := envDurationMillis("OTEL_EXPORTER_OTLP_TRACES_TIMEOUT")
-	if timeout == 0 {
-		timeout = envDurationMillis("OTEL_EXPORTER_OTLP_TIMEOUT")
+	cfg.timeout = envDurationMillis("OTEL_EXPORTER_OTLP_TRACES_TIMEOUT")
+	if cfg.timeout == 0 {
+		cfg.timeout = envDurationMillis("OTEL_EXPORTER_OTLP_TIMEOUT")
 	}
 	// 0 means "use exporter default"
 
-	switch proto {
-	case "grpc":
-		var opts []otlptracegrpc.Option
-
-		if endpoint != "" {
-			opts = append(opts, otlptracegrpc.WithEndpoint(endpoint))
-		}
-		if len(headerMap) > 0 {
-			opts = append(opts, otlptracegrpc.WithHeaders(headerMap))
-		}
-		if timeout > 0 {
-			opts = append(opts, otlptracegrpc.WithTimeout(timeout))
-		}
-		if insecure {
-			opts = append(opts, otlptracegrpc.WithInsecure())
-		}
-		return otlptracegrpc.New(ctx, opts...)
-
-	case "http/protobuf":
-		var opts []otlptracehttp.Option
-
-		if endpoint != "" {
-			opts = append(opts, otlptracehttp.WithEndpoint(endpoint))
-		}
-		if len(headerMap) > 0 {
-			opts = append(opts, otlptracehttp.WithHeaders(headerMap))
-		}
-		if timeout > 0 {
-			opts = append(opts, otlptracehttp.WithTimeout(timeout))
-		}
-		if insecure {
-			opts = append(opts, otlptracehttp.WithInsecure())
-		}
-		return otlptracehttp.New(ctx, opts...)
-
-	default:
-		return nil, fmt.Errorf("unsupported OTLP traces protocol %q (expected grpc or http/protobuf)", proto)
-	}
+	return &cfg, nil
 }
 
 func splitCSV(s string) []string {
