@@ -10,7 +10,7 @@ applies_to:
 
 
 ::::{note}
-Only available for MacOS.
+Only available for macOS.
 ::::
 
 
