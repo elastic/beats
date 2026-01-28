@@ -373,6 +373,8 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 			optionsStatus:  c.OptionsStatus,
 		},
 		maxInFlight:           c.MaxInFlight,
+		highWaterInFlight:     c.HighWaterInFlight,
+		lowWaterInFlight:      c.LowWaterInFlight,
 		retryAfter:            c.RetryAfter,
 		program:               prg,
 		messageField:          c.Prefix,
@@ -382,6 +384,8 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 		preserveOriginalEvent: c.PreserveOriginalEvent,
 		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
 	}
+	// Initialize accepting to true so we start by accepting requests.
+	h.accepting.Store(true)
 	if h.status == nil {
 		h.status = noopReporter{}
 	}
