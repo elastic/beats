@@ -290,6 +290,7 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 		offset := s.parseOffset + 2
 		if offset < 0 {
 			debugf("invalid byte offset for headers: %v", offset)
+			return false, false, true
 		}
 		m.size = uint64(offset)
 		m.rawHeaders = s.data[:m.size]
