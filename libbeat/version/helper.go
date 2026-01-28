@@ -18,16 +18,40 @@
 package version
 
 import (
+	"runtime/debug"
 	"sync/atomic"
 	"time"
 )
 
 var (
 	packageVersion atomic.Value
-	buildTime      = "unknown"
-	commit         = "unknown"
+	vcsRevision    string
+	vcsTime        time.Time
 	qualifier      = ""
 )
+
+func init() {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, setting := range info.Settings {
+			switch setting.Key {
+			case "vcs.time":
+				vcsTime, _ = time.Parse(time.RFC3339, setting.Value)
+			case "vcs.revision":
+				vcsRevision = setting.Value
+			}
+		}
+	}
+}
+
+// VCSRevision returns the hash of the git commit used for the build.
+func VCSRevision() string {
+	return vcsRevision
+}
+
+// VCSTime returns the timestamp of the commit used for the build.
+func VCSTime() time.Time {
+	return vcsTime
+}
 
 // GetDefaultVersion returns the current version.
 // If running in stand-alone mode, it's the libbeat version. If running in
@@ -49,17 +73,17 @@ func GetDefaultVersion() string {
 
 // BuildTime exposes the compile-time build time information.
 // It will represent the zero time instant if parsing fails.
+//
+// Deprecated: Use VCSTime
 func BuildTime() time.Time {
-	t, err := time.Parse(time.RFC3339, buildTime)
-	if err != nil {
-		return time.Time{}
-	}
-	return t
+	return VCSTime()
 }
 
 // Commit exposes the compile-time commit hash.
+//
+// Deprecated: Use VCSRevision
 func Commit() string {
-	return commit
+	return VCSRevision()
 }
 
 // SetPackageVersion sets the package version, overriding the defaultBeatVersion.
