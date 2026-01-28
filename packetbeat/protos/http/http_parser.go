@@ -563,7 +563,7 @@ func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete 
 		logp.Warn("Invalid body size while parsing message")
 		return false, false, false
 	}
-	m.size += uint64(i + 2)
+	m.size += uint64(newSize)
 
 	if m.chunkedLength == 0 {
 		if len(s.data) < 2 {
