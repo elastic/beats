@@ -15,7 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package integration
+// This file was contributed to by generative AI
+
+package testhelpers
 
 import (
 	"bufio"
@@ -32,7 +34,7 @@ import (
 // false is returned. It will fail the test on any error reading/parsing
 // the registry file.
 func AssertLastOffset(t *testing.T, path string, offset int) bool {
-	entries, _ := readFilestreamRegistryLog(t, path)
+	entries, _ := ReadFilestreamRegistryLog(t, path)
 	lastEntry := entries[len(entries)-1]
 	if lastEntry.Offset != offset {
 		t.Errorf("expecting offset %d got %d instead", offset, lastEntry.Offset)
@@ -53,7 +55,7 @@ func AssertLastOffset(t *testing.T, path string, offset int) bool {
 	return true
 }
 
-type registryEntry struct {
+type RegistryEntry struct {
 	Key      string
 	Offset   int
 	EOF      bool
@@ -63,13 +65,14 @@ type registryEntry struct {
 	Removed  bool
 }
 
-func readFilestreamRegistryLog(t *testing.T, path string) ([]registryEntry, map[string]string) {
+func ReadFilestreamRegistryLog(t *testing.T, path string) ([]RegistryEntry, map[string]string) {
 	file, err := os.Open(path)
 	if err != nil {
 		t.Fatalf("could not open file '%s': %s", path, err)
 	}
+	defer file.Close()
 
-	var entries []registryEntry
+	var entries []RegistryEntry
 	fileNameToNative := map[string]string{}
 	s := bufio.NewScanner(file)
 
@@ -89,7 +92,7 @@ func readFilestreamRegistryLog(t *testing.T, path string) ([]registryEntry, map[
 			continue
 		}
 		// Filestream entry
-		et := registryEntry{
+		et := RegistryEntry{
 			Key:      e.Key,
 			Offset:   e.Value.Cursor.Offset,
 			EOF:      e.Value.Cursor.EOF,

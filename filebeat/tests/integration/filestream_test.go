@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build integration
 
 package integration
@@ -35,6 +37,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -701,8 +704,8 @@ func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {
 	t.Helper()
 
 	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
-	entries, _ := readFilestreamRegistryLog(t, registryFile)
-	inputEntries := []registryEntry{}
+	entries, _ := testhelpers.ReadFilestreamRegistryLog(t, registryFile)
+	inputEntries := []testhelpers.RegistryEntry{}
 	for _, currentEntry := range entries {
 		if strings.Contains(currentEntry.Key, identity) {
 			inputEntries = append(inputEntries, currentEntry)
@@ -757,8 +760,8 @@ func createFileAndWaitIngestion(
 	requirePublishedEvents(t, fb, outputTotal, outputFilepath)
 }
 
-func parseRegistry(entries []registryEntry) map[string]registryEntry {
-	registry := map[string]registryEntry{}
+func parseRegistry(entries []testhelpers.RegistryEntry) map[string]testhelpers.RegistryEntry {
+	registry := map[string]testhelpers.RegistryEntry{}
 
 	for _, e := range entries {
 		switch e.Op {
@@ -791,13 +794,13 @@ func assertRegistry(t *testing.T, workDir, testdataDir, registry, msg string) {
 		data = bytes.ReplaceAll(data, []byte(`/`), []byte(`\`))
 		data = bytes.ReplaceAll(data, []byte(`\`), []byte(`\\`))
 	}
-	expectedRegistry := map[string]registryEntry{}
+	expectedRegistry := map[string]testhelpers.RegistryEntry{}
 	if err := json.Unmarshal(data, &expectedRegistry); err != nil {
 		t.Fatalf("cannot unmarshal expected registry file: %s", err)
 	}
 
 	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
-	entries, nameToInode := readFilestreamRegistryLog(t, registryFile)
+	entries, nameToInode := testhelpers.ReadFilestreamRegistryLog(t, registryFile)
 	reg := parseRegistry(entries)
 
 	// More Windows workarounds.
