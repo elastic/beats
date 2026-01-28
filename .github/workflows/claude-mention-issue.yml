@@ -1,20 +1,26 @@
-name: Claude PR Review
+name: Claude Mention (Issue)
 on:
-  pull_request:
-    types: [opened, synchronize]
+  issue_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
 
 permissions:
-  contents: read
-  pull-requests: write
+  contents: write
+  issues: write
   id-token: write
 
 jobs:
-  review:
+  respond:
     concurrency:
-      group: claude-pr-review-${{ github.event.pull_request.number }}
+      group: claude-mention-issue-${{ github.event.issue.number }}-${{ github.event.comment.id || github.event.issue.id }}
     runs-on: ubuntu-latest
+    if: |
+      ((github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && github.event.issue.pull_request == null) ||
+       (github.event_name == 'issues' && contains(github.event.issue.body, '@claude'))) &&
+      contains(fromJSON('["strawgate","AlexanderWert","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia"]'), github.actor)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-go@v5
         with:
@@ -30,16 +36,12 @@ jobs:
       - name: Install Mage
         run: make mage
 
-      - uses: elastic/ai-github-actions/workflows/pr-review@main
+      - uses: elastic/ai-github-actions/workflows/mention-in-issue/rwxp@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           claude-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          extra-allowed-tools: "mage,build,unitTest,fmt,make,update,llc"
           additional-instructions: |
             Environment setup:
             - `make mage` has already been run (mage binary is available)
             - Go and Python are configured
             - System dependencies (libpcap-dev, librpm-dev, python3-venv) are installed
-            
-            If you need to generate files (configs, fields.yml, etc.), run `mage update` in the specific beat directory.
-            You can build and test individual beats with `mage build` and `mage unitTest` in their respective directories.

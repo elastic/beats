@@ -15,7 +15,9 @@ jobs:
   analyze:
     concurrency:
       group: claude-build-failure-${{ github.event.workflow_run.id }}
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    if: |
+      github.event.workflow_run.conclusion == 'failure' &&
+      contains(fromJSON('["strawgate","AlexanderWert","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia"]'), github.actor)
     runs-on: ubuntu-latest
     steps:
       - name: Check if all required workflows have completed
@@ -81,7 +83,7 @@ jobs:
 
       - name: Checkout
         if: steps.check-workflows.outputs.should_run != 'false'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Go
         if: steps.check-workflows.outputs.should_run != 'false'
@@ -103,17 +105,13 @@ jobs:
         if: steps.check-workflows.outputs.should_run != 'false'
         run: make mage
 
-      - uses: elastic/ai-github-actions/workflows/build-failure-github-actions@main
+      - uses: elastic/ai-github-actions/workflows/build-failure-github-actions/rwx@main
         if: steps.check-workflows.outputs.should_run != 'false'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           claude-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          extra-allowed-tools: "mage,build,unitTest,fmt,make,update,llc"
           additional-instructions: |
             Environment setup:
             - `make mage` has already been run (mage binary is available)
             - Go and Python are configured
             - System dependencies (libpcap-dev, librpm-dev, python3-venv) are installed
-            
-            If you need to generate files (configs, fields.yml, etc.), run `mage update` in the specific beat directory.
-            You can build and test individual beats with `mage build` and `mage unitTest` in their respective directories.

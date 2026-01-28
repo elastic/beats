@@ -1,20 +1,24 @@
-name: Claude Issue Triage
+name: Claude Mention (PR)
 on:
-  issues:
-    types: [labeled]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
   issues: write
   id-token: write
 
 jobs:
-  triage:
+  respond:
     concurrency:
-      group: claude-triage-${{ github.event.issue.number }}
+      group: claude-mention-pr-${{ github.event.issue.number }}-${{ github.event.comment.id }}
     runs-on: ubuntu-latest
     if: |
-      github.event.label.name == 'claude-plz-triage' &&
+      ((github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && github.event.issue.pull_request != null) ||
+       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude'))) &&
       contains(fromJSON('["strawgate","AlexanderWert","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia"]'), github.actor)
     steps:
       - uses: actions/checkout@v6
@@ -33,7 +37,7 @@ jobs:
       - name: Install Mage
         run: make mage
 
-      - uses: elastic/ai-github-actions/workflows/issue-triage/ro@main
+      - uses: elastic/ai-github-actions/workflows/mention-in-pr/rwxp@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           claude-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
