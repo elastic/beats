@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: allows an array of strings in an HTTP response in a chained configuration
+summary: Does not degrade input when an array of strings is an HTTP response in a chained configuration
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
