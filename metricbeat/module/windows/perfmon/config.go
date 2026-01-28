@@ -29,13 +29,14 @@ var allowedFormats = []string{"float", "large", "long"}
 
 // Config for the windows perfmon metricset.
 type Config struct {
-	Period                  time.Duration `config:"period" validate:"required"`
-	IgnoreNECounters        bool          `config:"perfmon.ignore_non_existent_counters"`
-	GroupMeasurements       bool          `config:"perfmon.group_measurements_by_instance"`
-	RefreshWildcardCounters bool          `config:"perfmon.refresh_wildcard_counters"`
-	Queries                 []Query       `config:"perfmon.queries"`
-	GroupAllCountersTo      string        `config:"perfmon.group_all_counter"`
-	MatchByParentInstance   *bool         `config:"perfmon.match_by_parent_instance"`
+	Period                   time.Duration `config:"period" validate:"required"`
+	IgnoreNECounters         bool          `config:"perfmon.ignore_non_existent_counters"`
+	GroupMeasurements        bool          `config:"perfmon.group_measurements_by_instance"`
+	RefreshWildcardCounters  bool          `config:"perfmon.refresh_wildcard_counters"`
+	Queries                  []Query       `config:"perfmon.queries"`
+	GroupAllCountersTo       string        `config:"perfmon.group_all_counter"`
+	MatchByParentInstance    *bool         `config:"perfmon.match_by_parent_instance"`
+	ExtractObjectFromCounter *bool         `config:"perfmon.extract_object_from_counter"`
 }
 
 // QueryConfig for perfmon queries. This will be used as the new configuration format

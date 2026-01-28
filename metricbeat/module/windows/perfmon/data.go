@@ -30,9 +30,11 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"go.uber.org/zap"
 )
 
 var processRegexp = regexp.MustCompile(`(.+?[^\s])(?:#\d+|$)`)
+var objectNameWithoutInstanceRegexp = regexp.MustCompile(`\\\\[^\\]+\\([^\\]+)\\`)
 
 func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Event {
 	eventMap := make(map[string]*mb.Event)
@@ -91,9 +93,19 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 			} else {
 				eventMap[eventKey].MetricSetFields.Put(counter.QueryField, 0)
 			}
-
+			fmt.Println(counterPath)
 			if counter.ObjectField != "" {
-				eventMap[eventKey].MetricSetFields.Put(counter.ObjectField, counter.ObjectName)
+				if re.config.ExtractObjectFromCounter != nil && *re.config.ExtractObjectFromCounter {
+					matches := objectNameWithoutInstanceRegexp.FindStringSubmatch(counterPath)
+					if len(matches) == 2 {
+						eventMap[eventKey].MetricSetFields.Put(counter.ObjectField, matches[1])
+					} else {
+						re.log.Warnw("failed to extract the object from counter path", zap.String("counter_path", counterPath))
+						eventMap[eventKey].MetricSetFields.Put(counter.ObjectField, counter.ObjectName)
+					}
+				} else {
+					eventMap[eventKey].MetricSetFields.Put(counter.ObjectField, counter.ObjectName)
+				}
 			}
 		}
 	}
