@@ -229,6 +229,7 @@ type TunnelsResult struct {
 
 type TunnelsEntry struct {
 	ID        int    `xml:"id"`
+	State     string `xml:"state"`
 	Name      string `xml:"name"`
 	GW        string `xml:"gw"`
 	TSiIP     string `xml:"TSi_ip"`

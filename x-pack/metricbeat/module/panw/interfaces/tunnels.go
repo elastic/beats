@@ -51,6 +51,7 @@ func formatIPSecTunnelEvents(m *MetricSet, entries []TunnelsEntry) []mb.Event {
 			Timestamp: timestamp,
 			MetricSetFields: mapstr.M{
 				"ipsec_tunnel.id":         entry.ID,
+				"ipsec_tunnel.state":      entry.State,
 				"ipsec_tunnel.name":       entry.Name,
 				"ipsec_tunnel.gw":         entry.GW,
 				"ipsec_tunnel.TSi_ip":     entry.TSiIP,
