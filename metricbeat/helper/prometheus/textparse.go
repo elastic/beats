@@ -628,7 +628,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		var labelPairs = []*labels.Label{}
 		var qv string // value of le or quantile label
 		lset.Range(func(l labels.Label) {
-			if l.Name == labels.MetricName {
+			if l.Name == model.MetricNameLabel {
 				return
 			}
 
@@ -685,7 +685,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 			}
 
 			var counter = &Counter{Value: &v}
-			mn := lset.Get(labels.MetricName)
+			mn := lset.Get(model.MetricNameLabel)
 			metric = &OpenMetric{Name: &mn, Counter: counter, Label: labelPairs}
 			if contentType == OpenMetricsType {
 				// Remove the two possible suffixes, _created and _total
