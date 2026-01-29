@@ -21,6 +21,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"io"
 	"net"
 	"net/http"
@@ -182,6 +183,56 @@ func TestProxy(t *testing.T) {
 				if assert.NotEmpty(t, proxy.ProxiedRequests(), "proxy should have captured at least 1 request") {
 					assert.Contains(t, proxy.ProxiedRequests()[0], "/some/path/here")
 				}
+			},
+		},
+		{
+			name: "Basic scenario, request verifier passes",
+			setup: setup{
+				fakeBackendServer:      createFakeBackendServer(),
+				generateTestHTTPClient: nil,
+			},
+			proxyOptions: []Option{WithVerifyRequest(func(r *http.Request) error {
+				if r.Method == http.MethodGet {
+					return nil
+				}
+				return errors.New("unsupported method")
+			})},
+			proxyStartTLS: false,
+			request: testRequest{
+				method: http.MethodGet,
+				url:    "http://somehost:1234/some/path/here",
+				body:   nil,
+			},
+			wantErr: assert.NoError,
+			assertFunc: func(t *testing.T, proxy *Proxy, resp *http.Response) {
+				assert.Equal(t, http.StatusOK, resp.StatusCode)
+				if assert.NotEmpty(t, proxy.ProxiedRequests(), "proxy should have captured at least 1 request") {
+					assert.Contains(t, proxy.ProxiedRequests()[0], "/some/path/here")
+				}
+			},
+		},
+		{
+			name: "Basic scenario, request verifier fails",
+			setup: setup{
+				fakeBackendServer:      createFakeBackendServer(),
+				generateTestHTTPClient: nil,
+			},
+			proxyOptions: []Option{WithVerifyRequest(func(r *http.Request) error {
+				if r.Method == http.MethodPost {
+					return nil
+				}
+				return errors.New("unsupported method")
+			})},
+			proxyStartTLS: false,
+			request: testRequest{
+				method: http.MethodGet,
+				url:    "http://somehost:1234/some/path/here",
+				body:   nil,
+			},
+			wantErr: assert.NoError,
+			assertFunc: func(t *testing.T, proxy *Proxy, resp *http.Response) {
+				assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+				assert.Empty(t, proxy.ProxiedRequests(), "proxy does not capture unverified request")
 			},
 		},
 	}
@@ -392,7 +443,12 @@ func prepareMTLSProxyAndTargetServer(t *testing.T, targetHost string) (*Proxy, h
 
 func createFakeBackendServer() *httptest.Server {
 	handlerF := func(writer http.ResponseWriter, request *http.Request) {
-		// always return HTTP 200
+		if h := request.Header.Get("Forwarded"); h == "" {
+			// return 400 if the proxy has not added the Forwarded header.
+			writer.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		// return HTTP 200 otherwise
 		writer.WriteHeader(http.StatusOK)
 	}
 

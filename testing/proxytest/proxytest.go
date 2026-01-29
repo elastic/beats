@@ -63,9 +63,10 @@ type Proxy struct {
 type Option func(o *options)
 
 type options struct {
-	addr        string
-	rewriteHost func(string) string
-	rewriteURL  func(u *url.URL)
+	addr          string
+	rewriteHost   func(string) string
+	rewriteURL    func(u *url.URL)
+	verifyRequest func(r *http.Request) error
 	// logFn if set will be used to log every request.
 	logFn           func(format string, a ...any)
 	verbose         bool
@@ -131,6 +132,14 @@ func WithRewrite(old, new string) Option {
 func WithRewriteFn(f func(u *url.URL)) Option {
 	return func(o *options) {
 		o.rewriteURL = f
+	}
+}
+
+// WithVerifyRequest calls f on the request before the proxy request is made.
+// If the verification returns an error, the proxy returns an HTTP 500 (for http proxy), or HTTP 502 (https)
+func WithVerifyRequest(f func(r *http.Request) error) Option {
+	return func(o *options) {
+		o.verifyRequest = f
 	}
 }
 
@@ -212,10 +221,10 @@ func New(t *testing.T, optns ...Option) *Proxy {
 				requestID, w.statusCode, r.Method, r.URL, r.Proto, r.RemoteAddr))
 		}),
 	)
-	p.Server.Listener = l
+	p.Listener = l
 
 	if opts.serverTLSConfig != nil {
-		p.Server.TLS = opts.serverTLSConfig
+		p.TLS = opts.serverTLSConfig
 	}
 
 	u, err := url.Parse(p.URL)
@@ -302,6 +311,12 @@ func (p *Proxy) serveHTTP(w http.ResponseWriter, r *http.Request) {
 func (p *Proxy) processRequest(r *http.Request) (*http.Response, error) {
 	origURL := r.URL.String()
 
+	if p.opts.verifyRequest != nil {
+		if err := p.opts.verifyRequest(r); err != nil {
+			return nil, err
+		}
+	}
+
 	switch {
 	case p.opts.rewriteURL != nil:
 		p.opts.rewriteURL(r.URL)
@@ -325,6 +340,14 @@ func (p *Proxy) processRequest(r *http.Request) (*http.Response, error) {
 	// when modifying the request, RequestURI isn't updated, and it isn't
 	// needed anyway, so remove it.
 	r.RequestURI = ""
+
+	// Add a Forwarded header
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		p.opts.logFn("[ERROR] could not parse remote address %q: %v", r.RemoteAddr, err)
+	} else {
+		r.Header.Add("Forwarded", "for="+host)
+	}
 
 	return p.client.Do(r)
 }
