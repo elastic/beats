@@ -110,15 +110,9 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
-<<<<<<< HEAD
-	github.com/shopspring/decimal v1.3.1 // indirect
-	github.com/spf13/cobra v1.10.1
-	github.com/spf13/pflag v1.0.9
-=======
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
->>>>>>> cc7fbeaab (Update otel dependencies to v0.144.0/v1.50.0 (#48580))
 	github.com/stretchr/testify v1.11.1
 	github.com/ugorji/go/codec v1.1.8
 	github.com/vmware/govmomi v0.52.0
@@ -191,7 +185,7 @@ require (
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/go-ldap/ldap/v3 v3.4.6
 	github.com/go-ole/go-ole v1.3.0
-	github.com/go-resty/resty/v2 v2.17.0
+	github.com/go-resty/resty/v2 v2.17.1
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/cel-go v0.25.0
@@ -202,17 +196,10 @@ require (
 	github.com/icholy/digest v0.1.22
 	github.com/klauspost/compress v1.18.2
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-<<<<<<< HEAD
-	github.com/microsoft/go-mssqldb v1.9.4
-	github.com/microsoft/wmi v0.34.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.141.0
-	github.com/pierrec/lz4/v4 v4.1.22
-=======
 	github.com/microsoft/go-mssqldb v1.9.5
 	github.com/microsoft/wmi v0.38.3
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.144.0
 	github.com/pierrec/lz4/v4 v4.1.23
->>>>>>> cc7fbeaab (Update otel dependencies to v0.144.0/v1.50.0 (#48580))
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/prometheus v0.309.1
 	github.com/shirou/gopsutil/v4 v4.25.12
@@ -443,14 +430,8 @@ require (
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
-<<<<<<< HEAD
-	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.141.0 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.141.0 // indirect
-=======
-	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.144.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.144.0 // indirect
->>>>>>> cc7fbeaab (Update otel dependencies to v0.144.0/v1.50.0 (#48580))
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
