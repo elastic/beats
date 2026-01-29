@@ -1,12 +1,11 @@
 version: 9.3.0
 entries:
     - kind: feature
-      summary: Add browser_history table to Osquery extension for cross-platform browser history analysis
+      summary: Add browser_history table to Osquery extension for cross-platform browser history analysis.
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47117
       issue: []
       impact: ""
       action: ""
@@ -15,12 +14,11 @@ entries:
         name: 1729027800-add-browser-history-table-osquery-extension.yaml
         checksum: bf21dba3532a11f1ff8716a298a1749853a24cac
     - kind: feature
-      summary: Add status reporter interface to packetbeat
+      summary: Add status reporter interface to packetbeat.
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/45732
       issue: []
       impact: ""
       action: ""
@@ -33,8 +31,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/46953
       issue: []
       impact: ""
       action: ""
@@ -47,8 +44,7 @@ entries:
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/46996
       issue: []
       impact: ""
       action: ""
@@ -57,12 +53,11 @@ entries:
         name: 1761073445-add-amcache-support-to-osquery-extension.yaml
         checksum: ead67f8626b3a83e90cad9c5805c42294a095b4a
     - kind: deprecation
-      summary: change-azure-eventhub-processor-version
+      summary: Change Azure Event Hub input processor version default from v1 to v2.
       description: This PR is to change Filebeat azure eventhub input to use processor V2 as default instead of V1. Since we've decided to retire processor v1, we plan to set processor v2 as the default option in the next release, and completely remove v1 in the following release.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47292
       issue: []
       impact: Users of the Azure Event Hub input who were relying on processor v1 as the default behavior will now automatically use processor v2, which may have different behavior or performance characteristics.
       action: |
@@ -92,8 +87,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47260
       issue: []
       impact: ""
       action: ""
@@ -102,12 +96,11 @@ entries:
         name: 1761377900-input-auth-method-aws.yaml
         checksum: f17f75cfd1b34bc4238985d61c888eac75f80eb7
     - kind: enhancement
-      summary: Adds 'process.args_count' to winlogbeat windows security ingest pipeline
+      summary: Add 'process.args_count' to winlogbeat windows security ingest pipeline
       description: ""
       component: winlogbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47266
       issue: []
       impact: ""
       action: ""
@@ -120,8 +113,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47256
       issue: []
       impact: ""
       action: ""
@@ -130,12 +122,11 @@ entries:
         name: 1761678237-feat-add-client-secret-auth-for-azure-eventhub.yaml
         checksum: bd410e43c8c12c2ac8bbd67d4ef6a086a462a024
     - kind: enhancement
-      summary: Add record filtering/scoping support to the osquery extension
+      summary: Add record filtering/scoping support to the osquery extension.
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47396
       issue: []
       impact: ""
       action: ""
@@ -144,12 +135,11 @@ entries:
         name: 1761768958-osquery-extension-filters.yaml
         checksum: ab0d4c8416da4a7abd65853ede994003cd3365a3
     - kind: feature
-      summary: Add status reporting for osquerybeat lifecycle and osqueryd management
+      summary: Add status reporting for osquerybeat lifecycle and osqueryd management.
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47472
       issue: []
       impact: ""
       action: ""
@@ -158,12 +148,11 @@ entries:
         name: 1762336299-add-osquerybeat-status-reporter.yaml
         checksum: e7fe973780301ee18560c23cea88425ea217ce74
     - kind: feature
-      summary: Add osqueryd process health monitoring with metrics exposed via beats monitoring endpoint
+      summary: Add osqueryd process health monitoring with metrics exposed via beats monitoring endpoint.
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47474
       issue: []
       impact: ""
       action: ""
@@ -194,8 +183,7 @@ entries:
         a configurable interval without requiring restarts.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47507
       issue:
         - https://github.com/elastic/beats/issues/47506
       impact: ""
@@ -205,12 +193,11 @@ entries:
         name: 1762465899-file-auth-httpjson-cel.yaml
         checksum: 690841f48e9c8a56603e61feca6e4233c7ae685f
     - kind: feature
-      summary: Add client address and name to submitted Redis slowlogs
+      summary: Add client address and name to submitted Redis slowlogs.
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/41507
       issue: []
       impact: ""
       action: ""
@@ -223,8 +210,7 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47587
       issue: []
       impact: ""
       action: ""
@@ -237,8 +223,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47730
       issue: []
       impact: ""
       action: ""
@@ -247,12 +232,11 @@ entries:
         name: 1763583500-47717-cel.yaml
         checksum: b34afe96a584707b408ae01da45e69f12f406f63
     - kind: enhancement
-      summary: updates documentation for the amcache tables in the osquery extension
+      summary: Update documentation for the amcache tables in the osquery extension.
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47748
       issue: []
       impact: ""
       action: ""
@@ -261,12 +245,11 @@ entries:
         name: 1763678063-amcache_doc_update.yaml
         checksum: 4a28c896645832e21d59f16f77d27a981322034c
     - kind: enhancement
-      summary: add marshalling support for embedded structs in the osquery extension
+      summary: Add marshalling support for embedded structs in the osquery extension.
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47746
       issue: []
       impact: ""
       action: ""
@@ -275,12 +258,11 @@ entries:
         name: 1763678719-encoding_embedded_struct.yaml
         checksum: f96d25055751ec6bd61ae1b888f7c7db7cf7f76f
     - kind: enhancement
-      summary: update column definition encoding to support embedded structs
+      summary: Update column definition encoding to support embedded structs.
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47758
       issue: []
       impact: ""
       action: ""
@@ -289,12 +271,11 @@ entries:
         name: 1763767432-embedded_struct_column_definitions.yaml
         checksum: 1763a343f1add7a923cd7f935780ff042db155ad
     - kind: feature
-      summary: Upgrade CEL mito library to v1.24.0.
+      summary: Upgrade CEL mito library version to v1.24.0.
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47762
       issue: []
       impact: ""
       action: ""
@@ -316,7 +297,7 @@ entries:
         name: 1764010000-translate-ldap-guid-inference.yaml
         checksum: aa9ce67f45b2535ca514f922f2a3526ca057c93e
     - kind: bug-fix
-      summary: rpc_fragment_sanitization
+      summary: RPC fragment bounds checking and sanitization.
       description: ""
       component: packetbeat
       pr:
@@ -329,12 +310,11 @@ entries:
         name: 1764181634-rpc_fragment_sanitization.yaml
         checksum: ba005922d6bfc94a433cfdef282f58c05f46a88e
     - kind: feature
-      summary: add OTEL metrics to CEL inputs
+      summary: Add OTEL metrics to CEL inputs.
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47014
       issue: []
       impact: ""
       action: ""
@@ -343,12 +323,11 @@ entries:
         name: 1764199697-add-cel-input-otel-metrics.yaml
         checksum: 4d1844d86a593a4d4f8a4f6f4b22e7050452a589
     - kind: bug-fix
-      summary: Fixed an issue in the initialization of exporters for input metrics that could cause an unexpected number of exporter connections to be created.
+      summary: Fix an issue in the initialization of exporters for input metrics that could cause an unexpected number of exporter connections to be created.
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/48321
       issue: []
       impact: ""
       action: ""
@@ -357,12 +336,11 @@ entries:
         name: 1764199697-fix-race-condition-exporter-factory.yaml
         checksum: 27f634ec4f8f612901453c00015620d7527267c4
     - kind: feature
-      summary: k8s_container_allocatable
-      description: Updates kubernetes cpu and memory metrics to use allocatable values instead of capacity values.
+      summary: Change calculation of CPU/Memory for Kubernetes to allocatable values.
+      description: Update kubernetes cpu and memory metrics to use allocatable values instead of capacity values.
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47815
       issue: []
       impact: ""
       action: ""
@@ -375,8 +353,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47839
       issue: []
       impact: ""
       action: ""
@@ -385,12 +362,11 @@ entries:
         name: 1764614942-fix-panic-in-dissect-processor-with-invalid-field-name.yaml
         checksum: 8be30cc83742127414dac9c61a2d353fd4fa2697
     - kind: bug-fix
-      summary: Add check for incorrect length values in postgres datarow parser
+      summary: Add check for incorrect length values in PostgreSQL datarow parser.
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47872
       issue: []
       impact: ""
       action: ""
@@ -399,12 +375,11 @@ entries:
         name: 1764705900-add-check-for-incorrect-length-values-in-postgres-datarow-parser.yaml
         checksum: 29b1bc792c4927f4427176524041317a8fdb0fd1
     - kind: bug-fix
-      summary: verify and cap memcache udp fragment counts
+      summary: Verify and cap memcache UDP fragment counts.
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47874
       issue: []
       impact: ""
       action: ""
@@ -413,12 +388,11 @@ entries:
         name: 1764710604-memcache-udp-fragment-check.yaml
         checksum: e19d129d24d0ca9e4d588172491b4c11e5e5e812
     - kind: bug-fix
-      summary: fixes zero time encoding for unix timestamps
+      summary: Fix zero time encoding for Unix timestamps.
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47970
       issue: []
       impact: ""
       action: ""
@@ -440,12 +414,11 @@ entries:
         name: 1764715502-bump-golang-12411.yaml
         checksum: 4438acc3725f02b150683ea72ef7cf1f1f9a1ecb
     - kind: enhancement
-      summary: add resource pool id to vsphere cluster metricset
+      summary: Add resource pool id to vsphere cluster metricset.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47883
       issue: []
       impact: ""
       action: ""
@@ -454,12 +427,11 @@ entries:
         name: 1764752046-add-resource-pool-id-to-vsphere-cluster-metricset.yaml
         checksum: 781432879d428026b3ed9798caa8d5d24e95852c
     - kind: bug-fix
-      summary: fix bounds checking in MongoDB protocol parser to prevent panics
+      summary: Fix bounds checking in MongoDB protocol parser to prevent panics.
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47925
       issue: []
       impact: ""
       action: ""
@@ -468,12 +440,11 @@ entries:
         name: 1764865514-fix-mongodb-parser-bounds-checking.yaml
         checksum: c1b5c5b19eca5066fa146031e239d09cc100ec7b
     - kind: bug-fix
-      summary: Improve defensive checks to prevent panics in meraki module
+      summary: Improve defensive checks to prevent panics in meraki module.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47950
       issue: []
       impact: ""
       action: ""
@@ -486,8 +457,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47963
       issue: []
       impact: ""
       action: ""
@@ -496,7 +466,7 @@ entries:
         name: 1765186407-remove-gcp-billing-timestamp-functions.yaml
         checksum: 83a916ecfa88b034f55e8213af2c3e3b8bcb834a
     - kind: feature
-      summary: Improving input error reporting to Elastic Agent, specially when pipeline configurations are incorrect.
+      summary: Improve input error reporting to Elastic Agent, specially when pipeline configurations are incorrect.
       description: ""
       component: filebeat
       pr:
@@ -510,21 +480,7 @@ entries:
         name: 1765204121-Correctly-report-V2-inputs-as-failed-to-the-Manager.yaml
         checksum: b29fc353572f21e3500e9563be8ef4e7c1a6bd78
     - kind: feature
-      summary: ipfrag2
-      description: ""
-      component: packetbeat
-      pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
-      issue: []
-      impact: ""
-      action: ""
-      timestamp: 1765279149
-      file:
-        name: 1765279149-ipfrag2.yaml
-        checksum: db1ac94f13ebff3eb9df1481079e84265025dc0f
-    - kind: feature
-      summary: azure-eventhub-v2-add-support-for-amqp-over-websocket-and-https-proxy
+      summary: Azure EventHub input v2 - Add support for AMQP over WebSocket and HTTPS proxy.
       description: ""
       component: filebeat
       pr:
@@ -566,8 +522,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47968
       issue: []
       impact: ""
       action: ""
@@ -576,12 +531,11 @@ entries:
         name: 1765359658-k8s_status_last_terminated_exitcode.yaml
         checksum: 600b993725f8c24ec0310d1ab63aafa90869237b
     - kind: feature
-      summary: Make beats receivers emit status for their subcomponents
+      summary: Make beats receivers emit status for their subcomponents.
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/48015
       issue: []
       impact: ""
       action: ""
@@ -590,12 +544,11 @@ entries:
         name: 1765389915-beat-receiver-subcomponent-status.yaml
         checksum: 105897a8cfd767d1eac0497a8f0116d27f61d1b7
     - kind: feature
-      summary: Upgrade osquery to 5.19.0
+      summary: Upgrade osquery version to 5.19.0.
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/48040
       issue: []
       impact: ""
       action: ""
@@ -619,12 +572,11 @@ entries:
         name: 1765529609-ingesting-GZIP-files-is-GA.yaml
         checksum: 6ac8b6c349f6de7a6dba6bf4013f42331326025e
     - kind: bug-fix
-      summary: Harden Prometheus metrics parser against panics caused by malformed input data
+      summary: Harden Prometheus metrics parser against panics caused by malformed input data.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47914
       issue: []
       impact: ""
       action: ""
@@ -633,12 +585,11 @@ entries:
         name: 1765545606-prometheus-parser-panic-fix.yaml
         checksum: 11eb2d7c75f886ada31683f02737942cfb6f3197
     - kind: bug-fix
-      summary: Add bounds checking to Zookeeper server module to prevent index-out-of-range panics
+      summary: Add bounds checking to Zookeeper server module to prevent index-out-of-range panics.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47915
       issue: []
       impact: ""
       action: ""
@@ -647,12 +598,11 @@ entries:
         name: 1765545791-zookeeper-panic-fix.yaml
         checksum: 1e5ec03a5573800254df1442fb80f811b85cfe4d
     - kind: bug-fix
-      summary: Fix panic in graphite server metricset when metric has fewer parts than template expects
+      summary: Fix panic in graphite server metricset when metric has fewer parts than template expects.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/47916
       issue: []
       impact: ""
       action: ""
@@ -661,7 +611,7 @@ entries:
         name: 1765545902-graphite-panic-fix.yaml
         checksum: c6edc712a38fda9e12000af1cbb607f43470c214
     - kind: enhancement
-      summary: Add `events.failure_store` metric to track events sent to Elasticsearch failure store
+      summary: Add `events.failure_store` metric to track events sent to Elasticsearch failure store.
       description: ""
       component: all
       pr:
@@ -689,12 +639,11 @@ entries:
         name: 1765780037-filebeat-deploy-k8s-use-compression.yaml
         checksum: 7dfa08c5d42e4faee766371033b2ba8c52020d25
     - kind: enhancement
-      summary: Report memory pressure stall information (PSI) for cgroup v2
+      summary: Report memory pressure stall information (PSI) for cgroup v2.
       description: Add memory PSI metrics to system.process.cgroup, complementing existing CPU and IO pressure metrics for cgroupv2
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/48054
       issue: []
       impact: ""
       action: ""
@@ -716,12 +665,11 @@ entries:
         name: 1765934075-upgrade-opentelemtry-collector-contrib-to-0.141.0-and-opentelemetry-collector-to-1.47.0.yaml
         checksum: 1296886e0c350aa506ded72a720005212e329c6b
     - kind: bug-fix
-      summary: Skip regions with no permission to query for AWS CloudWatch metrics
+      summary: Skip regions with no permission to query for AWS CloudWatch metrics.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/48135
       issue: []
       impact: ""
       action: ""
@@ -730,12 +678,11 @@ entries:
         name: 1765999977-aws-cloudwatch-skip-region.yaml
         checksum: aebf66827410e12721468fbe19c7d15f10a715af
     - kind: bug-fix
-      summary: Enforces configurable size limits on incoming requests for remote_write metricset (max_compressed_body_bytes, max_decoded_body_bytes)
+      summary: Enforce configurable size limits on incoming requests for remote_write metricset (max_compressed_body_bytes, max_decoded_body_bytes)
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/48218
       issue: []
       impact: ""
       action: ""
@@ -744,12 +691,11 @@ entries:
         name: 1766493789-prometheus_remotew_maxdecodinglenght.yaml
         checksum: bb651157c1653c5ea4e60125d0774406831b17c7
     - kind: bug-fix
-      summary: Add msync syscall to seccomp whitelist for BadgerDB persistent cache
+      summary: Add msync syscall to seccomp whitelist for BadgerDB persistent cache.
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/48229
       issue: []
       impact: ""
       action: ""
@@ -758,12 +704,11 @@ entries:
         name: 1766514675-badger-msync.yaml
         checksum: 99e96030a447b1f3a801890ce393ed6c08e25d7b
     - kind: bug-fix
-      summary: Fix windows install script to properly migrate legacy state data
+      summary: Fix windows install script to properly migrate legacy state data.
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/48293
       issue: []
       impact: ""
       action: ""
@@ -772,12 +717,11 @@ entries:
         name: 1767358805-fix-windows-install-script-state-migration.yaml
         checksum: 57f8502fbc577d358504910d7c4aa4a5105f0e78
     - kind: bug-fix
-      summary: autoops agent to shutdown when it can't recover from the http errors
+      summary: Autoops agent to shutdown when it can't recover from the http errors.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/48292
       issue: []
       impact: ""
       action: ""
@@ -786,12 +730,11 @@ entries:
         name: 1767768061-autoops-agent-shutdown-on-non-recovering-http-error.yaml
         checksum: e2d3477414f97f7e4568abc0c1a5e2054748a353
     - kind: bug-fix
-      summary: added missing vector metrics in autoops agent
+      summary: Add missing vector metrics in Autoops agent.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/48365
       issue: []
       impact: ""
       action: ""
@@ -813,7 +756,7 @@ entries:
         name: 1767906742-remove-use-of-github.com-elastic-elastic-agent-client-from-oss-beats.yaml
         checksum: 2d0b79871378511592c2bcf4ecd14e1fe624c864
     - kind: bug-fix
-      summary: Fix AD Entity Analytics failing to fetch users when Base DN contains a group CN
+      summary: Fix AD Entity Analytics failing to fetch users when Base DN contains a group CN.
       description: ""
       component: filebeat
       pr:
@@ -830,8 +773,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/48430
       issue:
         - https://github.com/elastic/beats/issues/48426
       impact: ""
@@ -841,12 +783,11 @@ entries:
         name: 1768435100-stack-monitoring-trim-host-trailing-slash.yaml
         checksum: 7f352de8b5c9f97e48051daabbef19bc4665630e
     - kind: bug-fix
-      summary: Fix filebeat goroutine leak when using harvester_limit
+      summary: Fix filebeat goroutine leak when using harvester_limit.
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/48445
       issue: []
       impact: ""
       action: ""
@@ -855,12 +796,11 @@ entries:
         name: 1768571944-fix-goroutine-leak-startharvester.yaml
         checksum: be2f16a1052162efa480f72c5c19c0c080b2bbe4
     - kind: bug-fix
-      summary: Flatten AutoOps Cluster Settings to avoid unnecessary nesting and information
+      summary: Flatten AutoOps Cluster Settings to avoid unnecessary nesting and information.
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/48508
-        - https://github.com/elastic/beats/pull/48480
+        - https://github.com/elastic/beats/pull/48454
       issue:
         - https://github.com/elastic/beats/issues/48453
       impact: ""

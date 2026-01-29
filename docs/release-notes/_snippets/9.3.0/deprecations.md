@@ -3,10 +3,10 @@
 
 **Filebeat**
 
-::::{dropdown} Change-azure-eventhub-processor-version.
+::::{dropdown} Change Azure Event Hub input processor version default from v1 to v2.
 This PR is to change Filebeat azure eventhub input to use processor V2 as default instead of V1. Since we&#39;ve decided to retire processor v1, we plan to set processor v2 as the default option in the next release, and completely remove v1 in the following release.
 
-For more information, check [#48508](https://github.com/elastic/beats/pull/48508) [#48480](https://github.com/elastic/beats/pull/48480).
+For more information, check [#47292](https://github.com/elastic/beats/pull/47292).
 
 **Impact**<br>Users of the Azure Event Hub input who were relying on processor v1 as the default behavior will now automatically use processor v2, which may have different behavior or performance characteristics.
 
