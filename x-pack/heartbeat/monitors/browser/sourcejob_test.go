@@ -6,6 +6,7 @@
 package browser
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -46,7 +47,7 @@ func TestValidLocal(t *testing.T) {
 		},
 		"timeout": timeout,
 	})
-	_, e := NewSourceJob(cfg)
+	_, e := NewSourceJob(context.Background(), cfg)
 	require.Error(t, e)
 }
 
@@ -68,7 +69,7 @@ func TestValidInline(t *testing.T) {
 		},
 		"timeout": timeout,
 	})
-	s, e := NewSourceJob(cfg)
+	s, e := NewSourceJob(context.Background(), cfg)
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	require.Equal(t, script, s.browserCfg.Source.Inline.Script)
@@ -88,7 +89,7 @@ func TestNameRequired(t *testing.T) {
 			},
 		},
 	})
-	_, e := NewSourceJob(cfg)
+	_, e := NewSourceJob(context.Background(), cfg)
 	require.Regexp(t, ErrNameRequired, e)
 }
 
@@ -101,7 +102,7 @@ func TestIDRequired(t *testing.T) {
 			},
 		},
 	})
-	_, e := NewSourceJob(cfg)
+	_, e := NewSourceJob(context.Background(), cfg)
 	require.Regexp(t, ErrIdRequired, e)
 }
 
@@ -109,7 +110,7 @@ func TestEmptySource(t *testing.T) {
 	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"source": mapstr.M{},
 	})
-	s, e := NewSourceJob(cfg)
+	s, e := NewSourceJob(context.Background(), cfg)
 
 	require.Regexp(t, ErrBadConfig(source.ErrInvalidSource), e)
 	require.Nil(t, s)
@@ -250,7 +251,7 @@ func TestEmptyTimeout(t *testing.T) {
 			},
 		},
 	})
-	s, e := NewSourceJob(cfg)
+	s, e := NewSourceJob(context.Background(), cfg)
 
 	require.NoError(t, e)
 	require.NotNil(t, s)
@@ -372,7 +373,7 @@ func TestSourceDecoding(t *testing.T) {
 		},
 		"timeout": timeout,
 	})
-	s, e := NewSourceJob(cfg)
+	s, e := NewSourceJob(context.Background(), cfg)
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	require.Equal(t, script, s.browserCfg.Source.Inline.Script)
@@ -396,7 +397,7 @@ func TestDisabledSourceDecoding(t *testing.T) {
 		},
 		"timeout": timeout,
 	})
-	s, e := NewSourceJob(cfg)
+	s, e := NewSourceJob(context.Background(), cfg)
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	require.Equal(t, encoded, s.browserCfg.Source.Inline.Script)
