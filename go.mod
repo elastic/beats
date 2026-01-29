@@ -101,12 +101,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/magefile/mage v1.15.0
 	github.com/mattn/go-colorable v0.1.13 // indirect
-<<<<<<< HEAD
-	github.com/miekg/dns v1.1.68
-	github.com/mitchellh/gox v1.0.1
-=======
 	github.com/miekg/dns v1.1.69
->>>>>>> cc7fbeaab (Update otel dependencies to v0.144.0/v1.50.0 (#48580))
 	github.com/osquery/osquery-go v0.0.0-20231108163517-e3cde127e724
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
@@ -116,15 +111,9 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
-<<<<<<< HEAD
-	github.com/shopspring/decimal v1.3.1 // indirect
-	github.com/spf13/cobra v1.10.1
-	github.com/spf13/pflag v1.0.9
-=======
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
->>>>>>> cc7fbeaab (Update otel dependencies to v0.144.0/v1.50.0 (#48580))
 	github.com/stretchr/testify v1.11.1
 	github.com/ugorji/go/codec v1.1.8
 	github.com/vmware/govmomi v0.52.0
@@ -197,7 +186,7 @@ require (
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/go-ldap/ldap/v3 v3.4.6
 	github.com/go-ole/go-ole v1.3.0
-	github.com/go-resty/resty/v2 v2.16.5
+	github.com/go-resty/resty/v2 v2.17.1
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/cel-go v0.25.0
@@ -208,17 +197,10 @@ require (
 	github.com/icholy/digest v0.1.22
 	github.com/klauspost/compress v1.18.2
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-<<<<<<< HEAD
-	github.com/microsoft/go-mssqldb v1.9.2
-	github.com/microsoft/wmi v0.34.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.141.0
-	github.com/pierrec/lz4/v4 v4.1.22
-=======
 	github.com/microsoft/go-mssqldb v1.9.5
 	github.com/microsoft/wmi v0.38.3
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.144.0
 	github.com/pierrec/lz4/v4 v4.1.23
->>>>>>> cc7fbeaab (Update otel dependencies to v0.144.0/v1.50.0 (#48580))
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/prometheus v0.309.1
 	github.com/shirou/gopsutil/v4 v4.25.12
@@ -254,27 +236,8 @@ require (
 	github.com/cilium/ebpf v0.20.0
 	github.com/coder/websocket v1.8.14
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
+	github.com/mitchellh/gox v1.0.1
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
-<<<<<<< HEAD
-	go.opentelemetry.io/collector/client v1.47.0
-	go.opentelemetry.io/collector/component/componenttest v0.141.0
-	go.opentelemetry.io/collector/config/configauth v1.47.0
-	go.opentelemetry.io/collector/config/confighttp v0.141.0
-	go.opentelemetry.io/collector/config/configoptional v1.47.0
-	go.opentelemetry.io/collector/confmap/xconfmap v0.141.0
-	go.opentelemetry.io/collector/consumer/consumertest v0.141.0
-	go.opentelemetry.io/collector/exporter v1.47.0
-	go.opentelemetry.io/collector/exporter/exportertest v0.141.0
-	go.opentelemetry.io/collector/extension v1.47.0
-	go.opentelemetry.io/collector/extension/extensionauth v1.47.0
-	go.opentelemetry.io/collector/extension/extensiontest v0.141.0
-	go.opentelemetry.io/collector/pipeline v1.47.0
-	go.opentelemetry.io/collector/processor v1.47.0
-	go.opentelemetry.io/collector/processor/processorhelper v0.141.0
-	go.opentelemetry.io/collector/receiver/receivertest v0.141.0
-	go.opentelemetry.io/collector/service v0.141.0
-	go.opentelemetry.io/otel/sdk/metric v1.38.0
-=======
 	go.opentelemetry.io/collector/client v1.50.0
 	go.opentelemetry.io/collector/component/componenttest v0.144.0
 	go.opentelemetry.io/collector/config/configauth v1.50.0
@@ -292,15 +255,7 @@ require (
 	go.opentelemetry.io/collector/processor/processorhelper v0.144.0
 	go.opentelemetry.io/collector/receiver/receivertest v0.144.0
 	go.opentelemetry.io/collector/service v0.144.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.64.0
-	go.opentelemetry.io/otel v1.39.0
-	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.38.0
-	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.38.0
-	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.38.0
-	go.opentelemetry.io/otel/metric v1.39.0
-	go.opentelemetry.io/otel/sdk v1.39.0
 	go.opentelemetry.io/otel/sdk/metric v1.39.0
->>>>>>> cc7fbeaab (Update otel dependencies to v0.144.0/v1.50.0 (#48580))
 	go.uber.org/goleak v1.3.0
 	sigs.k8s.io/kind v0.29.0
 )
@@ -424,12 +379,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
-<<<<<<< HEAD
-	github.com/hashicorp/go-version v1.7.0 // indirect
-=======
 	github.com/hashicorp/go-version v1.8.0 // indirect
-	github.com/hashicorp/golang-lru v0.6.0 // indirect
->>>>>>> cc7fbeaab (Update otel dependencies to v0.144.0/v1.50.0 (#48580))
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
@@ -471,14 +421,8 @@ require (
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
-<<<<<<< HEAD
-	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.141.0 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.141.0 // indirect
-=======
-	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.144.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.144.0 // indirect
->>>>>>> cc7fbeaab (Update otel dependencies to v0.144.0/v1.50.0 (#48580))
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
@@ -536,38 +480,25 @@ require (
 	go.opentelemetry.io/contrib/bridges/otelzap v0.13.0 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.38.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.61.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.64.0 // indirect
 	go.opentelemetry.io/contrib/otelconf v0.18.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.38.0 // indirect
-<<<<<<< HEAD
-	go.opentelemetry.io/ebpf-profiler v0.0.202547 // indirect
-	go.opentelemetry.io/otel v1.38.0 // indirect
+	go.opentelemetry.io/ebpf-profiler v0.0.202601 // indirect
+	go.opentelemetry.io/otel v1.39.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.14.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.14.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.38.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.38.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.38.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.38.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.38.0 // indirect
-=======
-	go.opentelemetry.io/ebpf-profiler v0.0.202601 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.14.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.14.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.39.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.39.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.39.0 // indirect
->>>>>>> cc7fbeaab (Update otel dependencies to v0.144.0/v1.50.0 (#48580))
 	go.opentelemetry.io/otel/exporters/prometheus v0.60.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdoutlog v0.14.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.38.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.38.0 // indirect
-<<<<<<< HEAD
-	go.opentelemetry.io/otel/log v0.14.0 // indirect
-	go.opentelemetry.io/otel/metric v1.38.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.38.0 // indirect
-=======
 	go.opentelemetry.io/otel/log v0.15.0 // indirect
->>>>>>> cc7fbeaab (Update otel dependencies to v0.144.0/v1.50.0 (#48580))
+	go.opentelemetry.io/otel/metric v1.39.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.39.0 // indirect
 	go.opentelemetry.io/otel/sdk/log v0.14.0 // indirect
 	go.opentelemetry.io/otel/trace v1.39.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.9.0 // indirect
