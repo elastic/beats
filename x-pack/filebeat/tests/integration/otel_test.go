@@ -97,8 +97,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 service:
   pipelines:
     logs:
@@ -262,8 +260,6 @@ exporters:
     endpoints:
       - {{ .ESURL }}
     logs_index: logs-integration-{{ .Namespace }}
-    mapping:
-      mode: bodymap
     max_conns_per_host: 1
     password: {{ .Password }}
     retry:
@@ -479,8 +475,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 service:
   pipelines:
     logs:
@@ -813,8 +807,6 @@ exporters:
     endpoints:
       - {{.ESEndpoint}}
     logs_index: {{.Index}}
-    mapping:
-      mode: bodymap
     max_conns_per_host: 1
     password: testing
     retry:
@@ -1008,8 +1000,6 @@ exporters:
     endpoints:
       - {{.Endpoint}}
     logs_index: {{.Index}}
-    mapping:
-      mode: bodymap
     auth:
      authenticator: beatsauth
 service:
@@ -1126,8 +1116,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 `
 	var renderedConfig bytes.Buffer
 	require.NoError(t, template.Must(template.New("config").Parse(configTemplate)).Execute(&renderedConfig, configParameters))
@@ -1192,8 +1180,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 `
 	logFilePath := filepath.Join(t.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, wantEvents)
