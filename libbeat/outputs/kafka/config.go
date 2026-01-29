@@ -59,6 +59,8 @@ type kafkaConfig struct {
 	Partition          map[string]*config.C      `config:"partition"`
 	KeepAlive          time.Duration             `config:"keep_alive"          validate:"min=0"`
 	MaxMessageBytes    *int                      `config:"max_message_bytes"   validate:"min=1"`
+	BulkFlushBytes     int                       `config:"bulk_flush_bytes"`
+	BulkFlushMessages  int                       `config:"bulk_flush_messages"`
 	RequiredACKs       *int                      `config:"required_acks"       validate:"min=-1"`
 	BrokerTimeout      time.Duration             `config:"broker_timeout"      validate:"min=1"`
 	Compression        string                    `config:"compression"`
@@ -298,6 +300,13 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	if config.BulkFlushFrequency > 0 {
 		k.Producer.Flush.Frequency = config.BulkFlushFrequency
 	}
+	if config.BulkFlushBytes > 0 {
+		k.Producer.Flush.Bytes = config.BulkFlushBytes
+	}
+	if config.BulkFlushMessages > 0 {
+		k.Producer.Flush.Messages = config.BulkFlushMessages
+	}
+
 
 	// configure client ID
 	k.ClientID = config.ClientID
