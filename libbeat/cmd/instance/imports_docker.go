@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux || darwin || windows
+//go:build !libbeatnoautoimports && (linux || darwin || windows)
 
 package instance
 
