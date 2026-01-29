@@ -35,8 +35,8 @@ var testCases = []struct {
 	expected       []string
 	expectedFile   string
 	expectedNoFile string
-
-	skipReason string
+	isStringArray  bool
+	skipReason     string
 }{
 	{
 		name:        "simple_GET_request",
@@ -58,6 +58,16 @@ var testCases = []struct {
 		},
 		handler:  defaultHandler(http.MethodGet, "", ""),
 		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
+	{
+		name:        "simple_GET_request_returns_an_array_of_strings_no_events",
+		setupServer: newTestServer(httptest.NewServer),
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+		},
+		handler:  defaultHandler(http.MethodGet, "", `["123", "456"]`),
+		expected: nil,
 	},
 	{
 		name:        "request_honors_rate_limit",
@@ -1068,6 +1078,114 @@ var testCases = []struct {
 		},
 	},
 	{
+		name: "replace_with_clause_with_values_from_string_array",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/":
+					fmt.Fprintln(w, `{"text":["1", "2"]}`)
+				case "/2212/1":
+					fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+				case "/2212/2":
+					fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+				}
+			})
+			server := httptest.NewServer(r)
+			config["request.url"] = server.URL
+			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.text[:]"
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.method": http.MethodGet,
+						"replace":        "$.text[:]",
+						"replace_with":   "$.exportId,2212",
+					},
+				},
+			},
+		},
+		expected: []string{
+			`{"hello":{"world":"moon"}}`,
+			`{"space":{"cake":"pumpkin"}}`,
+		},
+	},
+	{
+		name: "replace_clause_with_string_from_string_array",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/":
+					fmt.Fprintln(w, `["1", "2"]`)
+				case "/2212/1":
+					fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+				case "/2212/2":
+					fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+				}
+			})
+			server := httptest.NewServer(r)
+			config["request.url"] = server.URL
+			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$[:]"
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.method": http.MethodGet,
+						"replace":        "$[:]",
+						"replace_with":   "$.exportId,2212",
+					},
+				},
+			},
+		},
+		expected: []string{
+			`{"hello":{"world":"moon"}}`,
+			`{"space":{"cake":"pumpkin"}}`,
+		},
+	},
+	{
+		name: "replace_clause_with_int_from_int_array",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/":
+					fmt.Fprintln(w, `[1, 2]`)
+				case "/2212/1":
+					fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+				case "/2212/2":
+					fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+				}
+			})
+			server := httptest.NewServer(r)
+			config["request.url"] = server.URL
+			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$[:]"
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.method": http.MethodGet,
+						"replace":        "$[:]",
+						"replace_with":   "$.exportId,2212",
+					},
+				},
+			},
+		},
+		expected: []string{
+			`{"hello":{"world":"moon"}}`,
+			`{"space":{"cake":"pumpkin"}}`,
+		},
+	},
+	{
 		name: "replace_with_clause_with_hardcoded_value_(no_dot_prefix)",
 		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -1249,7 +1367,7 @@ var testCases = []struct {
 				switch r.URL.Path {
 				case "/":
 					fmt.Fprintf(w, `{"files":[{"id":"1"},{"id":"2"}],"exportId":"2212", "createdAt":"22/02/2022",
-						"nextLink":"%s/link1"}`, serverURL)
+									"nextLink":"%s/link1"}`, serverURL)
 				case "/link1":
 					fmt.Fprintln(w, `{"files":[{"id":"3"},{"id":"4"}], "exportId":"2213", "createdAt":"24/04/2022"}`)
 				case "/2212/1":
@@ -1325,7 +1443,7 @@ var testCases = []struct {
 				switch r.URL.Path {
 				case "/":
 					fmt.Fprintf(w, `{"files":[{"id":"1"},{"id":"2"}],"exportId":"2212","time":[{"timeStamp":"22/02/2022"}],
-						"nextLink":"%s/link1"}`, serverURL)
+									"nextLink":"%s/link1"}`, serverURL)
 				case "/link1":
 					fmt.Fprintln(w, `{"files":[{"id":"3"},{"id":"4"}], "exportId":"2213","time":[{"timeStamp":"24/04/2022"}]}`)
 				case "/2212/1":
@@ -1403,24 +1521,24 @@ var testCases = []struct {
 		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				const text = `<?xml version="1.0" encoding="UTF-8"?>
-<order orderid="56733" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="sales.xsd">
-  <sender>Ástríðr Ragnar</sender>
-  <address>
-    <name>Joord Lennart</name>
-    <company>Sydøstlige Gruppe</company>
-    <address>Beekplantsoen 594, 2 hoog, 6849 IG</address>
-    <city>Boekend</city>
-    <country>Netherlands</country>
-  </address>
-  <item>
-    <name>Egil's Saga</name>
-    <note>Free Sample</note>
-    <number>1</number>
-    <cost>99.95</cost>
-    <sent>FALSE</sent>
-  </item>
-</order>
-`
+			<order orderid="56733" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="sales.xsd">
+			  <sender>Ástríðr Ragnar</sender>
+			  <address>
+			    <name>Joord Lennart</name>
+			    <company>Sydøstlige Gruppe</company>
+			    <address>Beekplantsoen 594, 2 hoog, 6849 IG</address>
+			    <city>Boekend</city>
+			    <country>Netherlands</country>
+			  </address>
+			  <item>
+			    <name>Egil's Saga</name>
+			    <note>Free Sample</note>
+			    <number>1</number>
+			    <cost>99.95</cost>
+			    <sent>FALSE</sent>
+			  </item>
+			</order>
+			`
 				io.ReadAll(r.Body)
 				r.Body.Close()
 				w.Write([]byte(text))
@@ -1433,39 +1551,39 @@ var testCases = []struct {
 			"interval":       1,
 			"request.method": http.MethodGet,
 			"response.xsd": `<?xml version="1.0" encoding="UTF-8" ?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:element name="order">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element name="sender" type="xs:string"/>
-        <xs:element name="address">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="name" type="xs:string"/>
-              <xs:element name="company" type="xs:string"/>
-              <xs:element name="address" type="xs:string"/>
-              <xs:element name="city" type="xs:string"/>
-              <xs:element name="country" type="xs:string"/>
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="item" maxOccurs="unbounded">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="name" type="xs:string"/>
-              <xs:element name="note" type="xs:string" minOccurs="0"/>
-              <xs:element name="number" type="xs:positiveInteger"/>
-              <xs:element name="cost" type="xs:decimal"/>
-              <xs:element name="sent" type="xs:boolean"/>
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
-      </xs:sequence>
-      <xs:attribute name="orderid" type="xs:string" use="required"/>
-    </xs:complexType>
-  </xs:element>
-</xs:schema>
-`,
+			<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+			  <xs:element name="order">
+			    <xs:complexType>
+			      <xs:sequence>
+			        <xs:element name="sender" type="xs:string"/>
+			        <xs:element name="address">
+			          <xs:complexType>
+			            <xs:sequence>
+			              <xs:element name="name" type="xs:string"/>
+			              <xs:element name="company" type="xs:string"/>
+			              <xs:element name="address" type="xs:string"/>
+			              <xs:element name="city" type="xs:string"/>
+			              <xs:element name="country" type="xs:string"/>
+			            </xs:sequence>
+			          </xs:complexType>
+			        </xs:element>
+			        <xs:element name="item" maxOccurs="unbounded">
+			          <xs:complexType>
+			            <xs:sequence>
+			              <xs:element name="name" type="xs:string"/>
+			              <xs:element name="note" type="xs:string" minOccurs="0"/>
+			              <xs:element name="number" type="xs:positiveInteger"/>
+			              <xs:element name="cost" type="xs:decimal"/>
+			              <xs:element name="sent" type="xs:boolean"/>
+			            </xs:sequence>
+			          </xs:complexType>
+			        </xs:element>
+			      </xs:sequence>
+			      <xs:attribute name="orderid" type="xs:string" use="required"/>
+			    </xs:complexType>
+			  </xs:element>
+			</xs:schema>
+			`,
 		},
 		handler: defaultHandler(http.MethodGet, "", ""),
 		expected: []string{mapstr.M{
@@ -1558,7 +1676,11 @@ func TestInput(t *testing.T) {
 				case got := <-chanClient.Channel:
 					val, err := got.Fields.GetValue("message")
 					assert.NoError(t, err)
-					assert.JSONEq(t, test.expected[receivedCount], val.(string))
+					if test.isStringArray {
+						assert.Equal(t, val.(string), test.expected[receivedCount])
+					} else {
+						assert.JSONEq(t, test.expected[receivedCount], val.(string))
+					}
 					receivedCount += 1
 					if receivedCount == len(test.expected) {
 						cancel()
@@ -1758,6 +1880,16 @@ func defaultHandler(expectedMethod, expectedBody, msg string) http.HandlerFunc {
 				w.WriteHeader(http.StatusBadRequest)
 				msg = fmt.Sprintf(`{"error":"expected body was %q, but got %q"}`, expectedBody, body)
 			}
+		}
+
+		_, _ = w.Write([]byte(msg))
+	}
+}
+
+func stringArrayHandler(msg string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if msg == "" {
+			msg = `["123", "456"]`
 		}
 
 		_, _ = w.Write([]byte(msg))
