@@ -34,6 +34,7 @@ output.file:
   rotate_on_startup: false
 
 filebeat.registry:
+  type: memlog
   cleanup_interval: 5s
   flush: 1s
 

@@ -438,6 +438,7 @@ filebeat.inputs:
       - %s
     compression: auto
 path.home: %s
+filebeat.registry.type: memlog
 filebeat.registry.flush: 1s
 output.discard:
   enabled: true

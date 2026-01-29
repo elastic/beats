@@ -19,6 +19,7 @@ package beater
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/config"
@@ -26,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/bbolt"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -44,6 +46,9 @@ type filebeatStore struct {
 	// which is available only after the beat runtime manager connects to the Agent
 	// and receives the output configuration
 	notifier *es.Notifier
+
+	// For debug access
+	bboltRegistry *bbolt.Registry
 }
 
 func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry, beatPaths *paths.Path) (*filebeatStore, error) {
@@ -60,10 +65,43 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 		esreg = es.New(ctx, logger, notifier)
 	}
 
-	reg, err = memlog.New(logger, memlog.Settings{
-		Root:     beatPaths.Resolve(paths.Data, cfg.Path),
-		FileMode: cfg.Permissions,
-	})
+	if err := cfg.ValidateConfig(); err != nil {
+		return nil, err
+	}
+
+	switch cfg.NormalizedType() {
+	case "bbolt":
+		bboltReg, err := bbolt.New(logger, bbolt.Settings{
+			Root:           beatPaths.Resolve(paths.Data, cfg.Path),
+			FileMode:       cfg.BBolt.FileMode,
+			DiskTTL:        cfg.BBolt.DiskTTL,
+			Timeout:        cfg.BBolt.Timeout,
+			NoGrowSync:     cfg.BBolt.NoGrowSync,
+			NoFreelistSync: cfg.BBolt.NoFreelistSync,
+		})
+		if err != nil {
+			return nil, err
+		}
+		reg = bboltReg
+		store := &filebeatStore{
+			registry:      statestore.NewRegistry(reg),
+			storeName:     info.Beat,
+			cleanInterval: cfg.CleanInterval,
+			notifier:      notifier,
+			bboltRegistry: bboltReg,
+		}
+		if esreg != nil {
+			store.esRegistry = statestore.NewRegistry(esreg)
+		}
+		return store, nil
+	case "memlog":
+		reg, err = memlog.New(logger, memlog.Settings{
+			Root:     beatPaths.Resolve(paths.Data, cfg.Path),
+			FileMode: cfg.Permissions,
+		})
+	default:
+		return nil, fmt.Errorf("unknown registry backend type: %q", cfg.Type)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -96,4 +134,9 @@ func (s *filebeatStore) StoreFor(typ string) (*statestore.Store, error) {
 
 func (s *filebeatStore) CleanupInterval() time.Duration {
 	return s.cleanInterval
+}
+
+// BBoltRegistry returns the underlying bbolt registry for debug access.
+func (s *filebeatStore) BBoltRegistry() *bbolt.Registry {
+	return s.bboltRegistry
 }
