@@ -11,18 +11,19 @@ package jumplists
 
 import (
 	"context"
-	"fmt"
+
 	"github.com/osquery/osquery-go/plugin/table"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/interfaces"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 type JumplistType string
 
 const (
-	JumplistTypeCustom JumplistType = "custom"
+	JumplistTypeCustom    JumplistType = "custom"
 	JumplistTypeAutomatic JumplistType = "automatic"
 )
 
@@ -60,7 +61,7 @@ type Jumplist struct {
 // This object using embedded pointers so that multiple rows can share the same metadata.
 // each embedded field has osquery tags defined in their object definitions
 type JumplistRow struct {
-	*JumplistMeta // The metadata for the jump list 1Code has alerts. Press enter to view.
+	*JumplistMeta  // The metadata for the jump list 1Code has alerts. Press enter to view.
 	*JumplistEntry // The JumplistEntry object that represents a single jump list entry
 }
 
@@ -69,13 +70,12 @@ func (j *Jumplist) ToRows() []JumplistRow {
 	var rows []JumplistRow
 	for _, entry := range j.entries {
 		rows = append(rows, JumplistRow{
-			JumplistMeta: j.JumplistMeta,
+			JumplistMeta:  j.JumplistMeta,
 			JumplistEntry: entry,
 		})
 	}
 	return rows
 }
-
 
 // GetColumns returns the column definitions for the JumplistRow object.
 // It returns a slice of table.ColumnDefinition objects.
@@ -91,40 +91,42 @@ func GetColumns() []table.ColumnDefinition {
 func matchesFilters(row JumplistRow, filters []filters.Filter) bool {
 	for _, filter := range filters {
 		if !filter.Matches(row) {
-			fmt.Printf("does not match\n");
 			return false
 		}
-		fmt.Printf("matches\n");
 	}
-	fmt.Printf("matches all filters");
 	return true
 }
 
+type ClientInterface interface {
+	interfaces.QueryExecutor
+}
+
 // getAllJumplists is a helper function that gets all the jumplists for all the user profiles.
-func getAllJumplists(log *logger.Logger) ([]*Jumplist, error) {
+func getAllJumplists(log *logger.Logger, client ClientInterface) ([]*Jumplist, error) {
 	var jumplists []*Jumplist
-	userProfiles, err := getUserProfiles(log)
+
+	userProfiles, err := getUserProfiles(log, client)
 	if err != nil {
 		return nil, err
 	}
 	for _, userProfile := range userProfiles {
 		jumplists = append(jumplists, userProfile.getJumplists(log)...)
 	}
+
 	return jumplists, nil
 }
 
 // GetGenerateFunc returns a function that can be used to generate a table of JumplistRow objects.
 // It returns a function that can be used to generate a table of JumplistRow objects.
-func GetGenerateFunc(log *logger.Logger) table.GenerateFunc {
+func GetGenerateFunc(log *logger.Logger, client ClientInterface) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		jumplists, err := getAllJumplists(log)
+		jumplists, err := getAllJumplists(log, client)
 		if err != nil {
 			return nil, err
 		}
 		// Convert the jumplists to a slice of map[string]string objects that will
 		var marshalledRows []map[string]string
 		filters := filters.GetConstraintFilters(queryContext)
-		fmt.Printf("filters %v", filters);
 		for _, jumpList := range jumplists {
 			for _, row := range jumpList.ToRows() {
 				if matchesFilters(row, filters) {

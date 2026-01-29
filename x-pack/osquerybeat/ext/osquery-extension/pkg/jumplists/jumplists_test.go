@@ -7,10 +7,11 @@
 package jumplists
 
 import (
-	"fmt"
 	"os"
+	"path/filepath"
 	"testing"
 
+	osquerygen "github.com/osquery/osquery-go/gen/osquery"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
@@ -59,7 +60,7 @@ func TestCustomJumplists(t *testing.T) {
 	log := logger.New(os.Stdout, true)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			jumplist, err := parseCustomJumplistFile(test.filePath, &UserProfile{Username: "test", Domain: "test", Sid: "test"}, log)
+			jumplist, err := parseCustomJumplistFile(test.filePath, &UserProfile{Username: "test", Sid: "test"}, log)
 			if test.expectError {
 				assert.Error(t, err, "expected error when parsing custom jumplist")
 				assert.Nil(t, jumplist, "expected nil jumplist when parsing custom jumplist")
@@ -77,9 +78,6 @@ func TestGetColumns(t *testing.T) {
 	columns := GetColumns()
 	assert.NotNil(t, columns, "expected non-nil columns")
 	assert.Greater(t, len(columns), 0, "expected at least 1 column")
-	for _, column := range columns {
-		fmt.Printf("column: %+v\n", column)
-	}
 }
 
 func TestLnk(t *testing.T) {
@@ -135,6 +133,39 @@ func TestLnk(t *testing.T) {
 	}
 }
 
+type MockClient struct {
+	t *testing.T
+}
+
+func (m *MockClient) Query(sql string) (*osquerygen.ExtensionResponse, error) {
+	_ = sql
+	profileDir := m.t.TempDir()
+	recentDir := filepath.Join(profileDir, "AppData", "Roaming", "Microsoft", "Windows", "Recent")
+	assert.NoError(m.t, os.MkdirAll(recentDir, 0o755))
+
+	customJumplistDir := filepath.Join(recentDir, "CustomDestinations")
+	assert.NoError(m.t, os.MkdirAll(customJumplistDir, 0o755))
+	bytes, err := os.ReadFile("./testdata/custom/590aee7bdd69b59b.customDestinations-ms")
+	assert.NoError(m.t, err, "expected no error when reading custom jumplist test file")
+	assert.NoError(m.t, os.WriteFile(filepath.Join(customJumplistDir, "590aee7bdd69b59b.customDestinations-ms"), bytes, 0o644))
+
+	automaticJumplistDir := filepath.Join(recentDir, "AutomaticDestinations")
+	assert.NoError(m.t, os.MkdirAll(automaticJumplistDir, 0o755))
+	bytes, err = os.ReadFile("./testdata/automatic/4db07e3587413f4d.automaticDestinations-ms")
+	assert.NoError(m.t, err, "expected no error when reading automatic jumplist test file")
+	assert.NoError(m.t, os.WriteFile(filepath.Join(automaticJumplistDir, "4db07e3587413f4d.automaticDestinations-ms"), bytes, 0o644))
+
+	return &osquerygen.ExtensionResponse{
+		Response: []map[string]string{
+			{
+				"username":  "testuser",
+				"uuid":      "S-1-5-21-1234567890-123456789-1234567890-1001",
+				"directory": profileDir,
+			},
+		},
+	}, nil
+}
+
 func TestAutomaticJumpList(t *testing.T) {
 	type testCase struct {
 		name        string
@@ -142,90 +173,60 @@ func TestAutomaticJumpList(t *testing.T) {
 		expectError bool
 	}
 	tests := []testCase{
-		// {
-		// 	name:        "test_olecfb_1",
-		// 	filePath:    "./testdata/automatic/4db07e3587413f4d.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
-		// {
-		// 	name:        "test_olecfb_2",
-		// 	filePath:    "./testdata/automatic/5f7b5f1e01b83767.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
-		// {
-		// 	name:        "test_olecfb_3",
-		// 	filePath:    "./testdata/automatic/6cbc8013911ed22e.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
+		{
+			name:        "test_olecfb_2",
+			filePath:    "./testdata/automatic/5f7b5f1e01b83767.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_3",
+			filePath:    "./testdata/automatic/6cbc8013911ed22e.automaticDestinations-ms",
+			expectError: false,
+		},
 		{
 			name:        "test_olecfb_4",
 			filePath:    "./testdata/automatic/7e4dca80246863e3.automaticDestinations-ms",
 			expectError: false,
 		},
-		// {
-		// 	name:        "test_olecfb_5",
-		// 	filePath:    "./testdata/automatic/9b9cdc69c1c24e2b.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
-		// {
-		// 	name:        "test_olecfb_6",
-		// 	filePath:    "./testdata/automatic/13d57d9bec61a0b3.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
-		// {
-		// 	name:        "test_olecfb_7",
-		// 	filePath:    "./testdata/automatic/47c6675663a92f2a.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
-		// {
-		// 	name:        "test_olecfb_8",
-		// 	filePath:    "./testdata/automatic/607c8cee3ce959c.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
-		// {
-		// 	name:        "test_olecfb_9",
-		// 	filePath:    "./testdata/automatic/918e0ecb43d17e23.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
-		// {
-		// 	name:        "test_olecfb_10",
-		// 	filePath:    "./testdata/automatic/292870913bb56cc1.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
-		// {
-		// 	name:        "test_olecfb_11",
-		// 	filePath:    "./testdata/automatic/befe8a0a7d3eeb43.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
-		// {
-		// 	name:        "test_olecfb_12",
-		// 	filePath:    "./testdata/automatic/ccba5a5986c77e43.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
-		// {
-		// 	name:        "test_olecfb_13",
-		// 	filePath:    "./testdata/automatic/cf02284227526d80.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
-		// {
-		// 	name:        "test_olecfb_14",
-		// 	filePath:    "./testdata/automatic/d06c94537ecaee12.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
-		// {
-		// 	name:        "test_olecfb_15",
-		// 	filePath:    "./testdata/automatic/db9172b310c92fa6.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
-		// {
-		// 	name:        "test_olecfb_16",
-		// 	filePath:    "./testdata/automatic/f01b4d95cf55d32a.automaticDestinations-ms",
-		// 	expectError: false,
-		// },
+		{
+			name:        "test_olecfb_5",
+			filePath:    "./testdata/automatic/9b9cdc69c1c24e2b.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_7",
+			filePath:    "./testdata/automatic/47c6675663a92f2a.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_8",
+			filePath:    "./testdata/automatic/607c8cee3ce959c.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_11",
+			filePath:    "./testdata/automatic/befe8a0a7d3eeb43.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_12",
+			filePath:    "./testdata/automatic/ccba5a5986c77e43.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_15",
+			filePath:    "./testdata/automatic/db9172b310c92fa6.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_16",
+			filePath:    "./testdata/automatic/f01b4d95cf55d32a.automaticDestinations-ms",
+			expectError: false,
+		},
 	}
 	log := logger.New(os.Stdout, true)
 	for _, test := range tests {
-		automaticJumpList, err := ParseAutomaticJumpListFile(test.filePath, &UserProfile{Username: "test", Domain: "test", Sid: "test"}, log)
+		automaticJumpList, err := ParseAutomaticJumpListFile(test.filePath, &UserProfile{Username: "test", Sid: "test"}, log)
 		if err != nil {
 			t.Fatalf("%s %s ParseAutomaticJumpListFile() returned error: %v", test.filePath, test.name, err)
 		}
@@ -256,19 +257,19 @@ func TestAutomaticJumpList(t *testing.T) {
 
 func TestGetUserProfiles(t *testing.T) {
 	log := logger.New(os.Stdout, true)
-	userProfiles, err := getUserProfiles(log)
+	userProfiles, err := getUserProfiles(log, &MockClient{t: t})
 	assert.NoError(t, err, "expected no error when getting user profiles")
 	assert.NotEmpty(t, userProfiles, "expected non-empty user profiles")
 }
 
 func TestGetJumplists(t *testing.T) {
 	log := logger.New(os.Stdout, true)
-	userProfiles, err := getUserProfiles(log)
+	userProfiles, err := getUserProfiles(log, &MockClient{t: t})
 	assert.NoError(t, err, "expected no error when getting user profiles")
 	for _, userProfile := range userProfiles {
 		jumplists := userProfile.getJumplists(log)
 		for _, jumplist := range jumplists {
-			log.Infof("found jumplist: %s, username: %s, domain: %s, sid: %s", jumplist.Path, userProfile.Username, userProfile.Domain, userProfile.Sid)
+			log.Infof("found jumplist: %s, username: %s, sid: %s", jumplist.Path, userProfile.Username, userProfile.Sid)
 		}
 	}
 }

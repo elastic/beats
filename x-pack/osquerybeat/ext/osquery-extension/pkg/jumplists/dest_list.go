@@ -48,7 +48,7 @@ type DestListEntry struct {
 	Hostname         string `osquery:"hostname"`
 	EntryNumber      int32  `osquery:"entry_number"`
 	unknown0         int32
-	AccessCount      float32
+	AccessCount      float32   `osquery:"access_count"`
 	LastModifiedTime time.Time `osquery:"last_modified_time"`
 	PinStatus        bool      `osquery:"is_pinned"`
 	InteractionCount int32     `osquery:"interaction_count"`
