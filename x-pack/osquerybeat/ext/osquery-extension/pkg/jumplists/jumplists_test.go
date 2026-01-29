@@ -141,7 +141,7 @@ func (m *MockClient) Query(sql string) (*osquerygen.ExtensionResponse, error) {
 	assert.NoError(m.t, os.MkdirAll(customJumplistDir, 0o755))
 	bytes, err := os.ReadFile("./testdata/custom/590aee7bdd69b59b.customDestinations-ms")
 	assert.NoError(m.t, err, "expected no error when reading custom jumplist test file")
-	os.WriteFile(filepath.Join(customJumplistDir, "590aee7bdd69b59b.customDestinations-ms"), bytes, 0o644)
+	assert.NoError(m.t, os.WriteFile(filepath.Join(customJumplistDir, "590aee7bdd69b59b.customDestinations-ms"), bytes, 0o644))
 
 	return &osquerygen.ExtensionResponse{
 		Response: []map[string]string{
