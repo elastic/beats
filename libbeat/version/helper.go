@@ -43,16 +43,6 @@ func init() {
 	}
 }
 
-// VCSRevision returns the hash of the git commit used for the build.
-func VCSRevision() string {
-	return vcsRevision
-}
-
-// VCSTime returns the timestamp of the commit used for the build.
-func VCSTime() time.Time {
-	return vcsTime
-}
-
 // GetDefaultVersion returns the current version.
 // If running in stand-alone mode, it's the libbeat version. If running in
 // managed mode, a.k.a under the agent, it's the package version set using
@@ -73,17 +63,13 @@ func GetDefaultVersion() string {
 
 // BuildTime exposes the compile-time build time information.
 // It will represent the zero time instant if parsing fails.
-//
-// Deprecated: Use VCSTime
 func BuildTime() time.Time {
-	return VCSTime()
+	return vcsTime
 }
 
 // Commit exposes the compile-time commit hash.
-//
-// Deprecated: Use VCSRevision
 func Commit() string {
-	return VCSRevision()
+	return vcsRevision
 }
 
 // SetPackageVersion sets the package version, overriding the defaultBeatVersion.
