@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -98,9 +97,9 @@ func (beat *Beat) GenerateUserAgent() {
 	comments := []string{}
 	if beat.Manager != nil && beat.Manager.Enabled() {
 		info := beat.Manager.AgentInfo()
-		if info.ManagedMode == proto.AgentManagedMode_MANAGED {
+		if info.ManagedMode == management.AgentManagedMode_MANAGED {
 			comments = append(comments, "Managed")
-		} else if info.ManagedMode == proto.AgentManagedMode_STANDALONE {
+		} else if info.ManagedMode == management.AgentManagedMode_STANDALONE {
 			comments = append(comments, "Standalone")
 		}
 
