@@ -37,6 +37,7 @@ const (
 	StatusUp       StateStatus = "up"
 	StatusDown     StateStatus = "down"
 	StatusFlapping StateStatus = "flap"
+	StatusSkipped  StateStatus = "skipped"
 	// Nil, essentially
 	StatusEmpty StateStatus = ""
 )

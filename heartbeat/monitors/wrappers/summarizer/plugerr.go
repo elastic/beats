@@ -62,6 +62,15 @@ func (esp *BrowserErrPlugin) EachEvent(event *beat.Event, eventErr error) EachEv
 		esp.journeyEndRcvd = true
 	}
 
+	// Handle the skip error and mark it as a finish event
+	var ecrErr *ecserr.ECSErr
+	if errors.As(eventErr, &ecrErr) && ecrErr.Type == ecserr.TYPE_SKIPPED {
+		event.PutValue("internal.synthetics.skipped_reason", ecrErr.Message)
+		esp.summaryErr = fmt.Errorf("%s", ecrErr.Message)
+		esp.journeyEndRcvd = true
+		return DropErrEvent
+	}
+
 	// Nothing else to do if there's no error
 	if eventErr == nil {
 		return 0
