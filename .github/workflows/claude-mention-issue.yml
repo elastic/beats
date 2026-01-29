@@ -1,0 +1,48 @@
+name: Claude Mention (Issue)
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+  id-token: write
+
+jobs:
+  respond:
+    concurrency:
+      group: claude-mention-issue-${{ github.event.issue.number }}-${{ github.event.comment.id }}
+    runs-on: ubuntu-latest
+    if: |
+      contains(github.event.comment.body, '@claude') &&
+      github.event.issue.pull_request == null &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) &&
+      contains(fromJSON('["strawgate","AlexanderWert","perk","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia"]'), github.actor)
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .go-version
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version-file: .python-version
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+
+      - name: Install Mage
+        run: make mage
+
+      - uses: elastic/ai-github-actions/workflows/mention-in-issue/rwxp@v0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          claude-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional-instructions: |
+            Environment setup:
+            - `make mage` has already been run (mage binary is available)
+            - Go and Python are configured
+            - System dependencies (libpcap-dev, librpm-dev, python3-venv) are installed
