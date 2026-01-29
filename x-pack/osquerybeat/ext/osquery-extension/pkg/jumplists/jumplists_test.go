@@ -7,6 +7,7 @@
 package jumplists
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -72,6 +73,15 @@ func TestCustomJumplists(t *testing.T) {
 	}
 }
 
+func TestGetColumns(t *testing.T) {
+	columns := GetColumns()
+	assert.NotNil(t, columns, "expected non-nil columns")
+	assert.Greater(t, len(columns), 0, "expected at least 1 column")
+	for _, column := range columns {
+		fmt.Printf("column: %+v\n", column)
+	}
+}
+
 func TestLnk(t *testing.T) {
 	type args struct {
 		filePath string
@@ -122,6 +132,125 @@ func TestLnk(t *testing.T) {
 			assert.NoError(t, err, "expected no error when parsing LNK file")
 			assert.NotNil(t, got, "expected non-nil LNK when parsing LNK file")
 		})
+	}
+}
+
+func TestAutomaticJumpList(t *testing.T) {
+	type testCase struct {
+		name        string
+		filePath    string
+		expectError bool
+	}
+	tests := []testCase{
+		// {
+		// 	name:        "test_olecfb_1",
+		// 	filePath:    "./testdata/automatic/4db07e3587413f4d.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+		// {
+		// 	name:        "test_olecfb_2",
+		// 	filePath:    "./testdata/automatic/5f7b5f1e01b83767.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+		// {
+		// 	name:        "test_olecfb_3",
+		// 	filePath:    "./testdata/automatic/6cbc8013911ed22e.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+		{
+			name:        "test_olecfb_4",
+			filePath:    "./testdata/automatic/7e4dca80246863e3.automaticDestinations-ms",
+			expectError: false,
+		},
+		// {
+		// 	name:        "test_olecfb_5",
+		// 	filePath:    "./testdata/automatic/9b9cdc69c1c24e2b.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+		// {
+		// 	name:        "test_olecfb_6",
+		// 	filePath:    "./testdata/automatic/13d57d9bec61a0b3.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+		// {
+		// 	name:        "test_olecfb_7",
+		// 	filePath:    "./testdata/automatic/47c6675663a92f2a.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+		// {
+		// 	name:        "test_olecfb_8",
+		// 	filePath:    "./testdata/automatic/607c8cee3ce959c.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+		// {
+		// 	name:        "test_olecfb_9",
+		// 	filePath:    "./testdata/automatic/918e0ecb43d17e23.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+		// {
+		// 	name:        "test_olecfb_10",
+		// 	filePath:    "./testdata/automatic/292870913bb56cc1.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+		// {
+		// 	name:        "test_olecfb_11",
+		// 	filePath:    "./testdata/automatic/befe8a0a7d3eeb43.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+		// {
+		// 	name:        "test_olecfb_12",
+		// 	filePath:    "./testdata/automatic/ccba5a5986c77e43.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+		// {
+		// 	name:        "test_olecfb_13",
+		// 	filePath:    "./testdata/automatic/cf02284227526d80.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+		// {
+		// 	name:        "test_olecfb_14",
+		// 	filePath:    "./testdata/automatic/d06c94537ecaee12.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+		// {
+		// 	name:        "test_olecfb_15",
+		// 	filePath:    "./testdata/automatic/db9172b310c92fa6.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+		// {
+		// 	name:        "test_olecfb_16",
+		// 	filePath:    "./testdata/automatic/f01b4d95cf55d32a.automaticDestinations-ms",
+		// 	expectError: false,
+		// },
+	}
+	log := logger.New(os.Stdout, true)
+	for _, test := range tests {
+		automaticJumpList, err := ParseAutomaticJumpListFile(test.filePath, &UserProfile{Username: "test", Domain: "test", Sid: "test"}, log)
+		if err != nil {
+			t.Fatalf("%s %s ParseAutomaticJumpListFile() returned error: %v", test.filePath, test.name, err)
+		}
+		if test.expectError {
+			assert.Error(t, err, "expected error when parsing Automatic Jump List")
+			assert.Nil(t, automaticJumpList, "expected nil Automatic Jump List when parsing Automatic Jump List")
+			return
+		}
+		assert.NoError(t, err, "expected no error when parsing Automatic Jump List")
+		assert.NotNil(t, automaticJumpList, "expected non-nil Automatic Jump List when parsing Automatic Jump List")
+		rows := automaticJumpList.ToRows()
+		assert.Greater(t, len(rows), 0, "expected at least 1 row in the Automatic Jump List")
+
+		// If an automatic jumplist has only one row, it could mean that the jumplist is empty.
+		// or it could mean that the jumplist has only one entry.  If the jumplist is empty,
+		// both the DestListEntry and the Lnk will be nil.  If the jumplist has only one entry,
+		// the DestListEntry will be non-nil and the Lnk will be non-nil.
+		if len(rows) == 1 && rows[0].DestListEntry == nil {
+			assert.Nil(t, rows[0].Lnk, "expected nil LNK when parsing Automatic Jump List")
+		} else {
+			for _, row := range rows {
+				assert.NotNil(t, row.Lnk, "expected non-nil LNK when parsing Automatic Jump List")
+				assert.NotNil(t, row.DestListEntry, "expected non-nil DestListEntry when parsing Automatic Jump List")
+			}
+		}
 	}
 }
 
