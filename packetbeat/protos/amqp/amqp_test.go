@@ -39,16 +39,18 @@ type eventStore struct {
 }
 
 func (e *eventStore) publish(event beat.Event) {
-	publish.MarshalPacketbeatFields(&event, nil, nil)
-	e.events = append(e.events, event)
+	_, err := publish.MarshalPacketbeatFields(&event, nil, nil)
+	if err == nil {
+		e.events = append(e.events, event)
+	}
 }
 
-func amqpModForTests() (*eventStore, *amqpPlugin) {
+func amqpModForTests() (*eventStore, *amqpPlugin, error) {
 	var amqp amqpPlugin
 	results := &eventStore{}
 	config := defaultConfig
-	amqp.init(results.publish, &procs.ProcessesWatcher{}, &config)
-	return results, &amqp
+	err := amqp.init(results.publish, &procs.ProcessesWatcher{}, &config)
+	return results, &amqp, err
 }
 
 func testTCPTuple() *common.TCPTuple {
@@ -75,9 +77,11 @@ func expectTransaction(t *testing.T, e *eventStore) mapstr.M {
 }
 
 func TestAmqp_UnknownMethod(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	data, err := hex.DecodeString("0100010000000f006e000c0000075465737447657401ce")
 	assert.NoError(t, err)
@@ -93,9 +97,11 @@ func TestAmqp_UnknownMethod(t *testing.T) {
 }
 
 func TestAmqp_FrameSize(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	// incomplete frame
 	data, err := hex.DecodeString("0100000000000c000a001fffff000200")
@@ -115,9 +121,11 @@ func TestAmqp_FrameSize(t *testing.T) {
 // Test that the parser doesn't panic on a partial message that includes
 // a client header
 func TestAmqp_PartialFrameSize(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	// incomplete frame
 	data, err := hex.DecodeString("414d515000060606010000000000")
@@ -135,9 +143,11 @@ func TestAmqp_PartialFrameSize(t *testing.T) {
 }
 
 func TestAmqp_WrongShortStringSize(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	data, err := hex.DecodeString("02000100000019003c000000000000000000058000ac" +
 		"746578742f706c61696ece")
@@ -152,9 +162,11 @@ func TestAmqp_WrongShortStringSize(t *testing.T) {
 }
 
 func TestAmqp_QueueDeclaration(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	data, err := hex.DecodeString("0100010000001a0032000a00000e5468697320697" +
 		"3206120544553541800000000ce")
@@ -184,9 +196,11 @@ func TestAmqp_QueueDeclaration(t *testing.T) {
 }
 
 func TestAmqp_ExchangeDeclaration(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	data, err := hex.DecodeString("0100010000001c0028000a00000a6c6f67735f746f7" +
 		"0696305746f7069630200000000ce")
@@ -217,9 +231,11 @@ func TestAmqp_ExchangeDeclaration(t *testing.T) {
 }
 
 func TestAmqp_BasicConsume(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	data, err := hex.DecodeString("01000100000028003c001400000e4957616e74" +
 		"546f436f6e73756d650d6d6973746572436f6e73756d650300000000ce")
@@ -250,9 +266,11 @@ func TestAmqp_BasicConsume(t *testing.T) {
 }
 
 func TestAmqp_ExchangeDeletion(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	data, err := hex.DecodeString("010001000000100028001400000844656c65746" +
 		"54d6501ce")
@@ -278,9 +296,11 @@ func TestAmqp_ExchangeDeletion(t *testing.T) {
 
 // this method is exclusive to RabbitMQ
 func TestAmqp_ExchangeBind(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	data, err := hex.DecodeString("0100010000001c0028001e0000057465737431" +
 		"057465737432044d5346540000000000ce")
@@ -311,9 +331,11 @@ func TestAmqp_ExchangeBind(t *testing.T) {
 
 // this method is exclusive to RabbitMQ
 func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	results, amqp := amqpModForTests()
+	results, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("0100010000001c00280028000005746573743105" +
@@ -346,9 +368,11 @@ func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
 }
 
 func TestAmqp_PublishMessage(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	results, amqp := amqpModForTests()
+	results, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("0100010000001b003c002800000a6c6f67735f746f70" +
@@ -395,9 +419,11 @@ func TestAmqp_PublishMessage(t *testing.T) {
 }
 
 func TestAmqp_DeliverMessage(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	results, amqp := amqpModForTests()
+	results, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 	amqp.sendResponse = true
 
 	data, err := hex.DecodeString("01000100000034003c003c0d6d6973746572436f6e73" +
@@ -441,9 +467,11 @@ func TestAmqp_DeliverMessage(t *testing.T) {
 }
 
 func TestAmqp_MessagePropertiesFields(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 	amqp.sendResponse = true
 
 	data, err := hex.DecodeString("01000100000013003c00280000000a546573744865" +
@@ -485,9 +513,11 @@ func TestAmqp_MessagePropertiesFields(t *testing.T) {
 }
 
 func TestAmqp_ChannelError(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	data1, err := hex.DecodeString("0100010000009000140028019685505245434f4e444" +
 		"954494f4e5f4641494c4544202d20696e6571756976616c656e74206172672027617574" +
@@ -532,9 +562,11 @@ func TestAmqp_ChannelError(t *testing.T) {
 }
 
 func TestAmqp_NoWaitQueueDeleteMethod(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	results, amqp := amqpModForTests()
+	results, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("010001000000120032002800000a546573745468" +
@@ -564,9 +596,11 @@ func TestAmqp_NoWaitQueueDeleteMethod(t *testing.T) {
 }
 
 func TestAmqp_RejectMessage(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	results, amqp := amqpModForTests()
+	results, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("0100010000000d003c005a000000000000000101ce")
@@ -594,9 +628,11 @@ func TestAmqp_RejectMessage(t *testing.T) {
 }
 
 func TestAmqp_GetEmptyMethod(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	results, amqp := amqpModForTests()
+	results, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("01000100000013003c004600000b526f626269" +
@@ -621,9 +657,11 @@ func TestAmqp_GetEmptyMethod(t *testing.T) {
 }
 
 func TestAmqp_GetMethod(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	results, amqp := amqpModForTests()
+	results, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 	amqp.sendRequest = true
 	amqp.sendResponse = true
 
@@ -653,9 +691,11 @@ func TestAmqp_GetMethod(t *testing.T) {
 }
 
 func TestAmqp_MaxBodyLength(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	results, amqp := amqpModForTests()
+	results, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 	amqp.maxBodyLength = 10
 	amqp.sendRequest = true
 
@@ -722,9 +762,11 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 }
 
 func TestAmqp_HideArguments(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	results, amqp := amqpModForTests()
+	results, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 	amqp.sendRequest = true
 	amqp.parseHeaders = false
 	amqp.parseArguments = false
@@ -783,9 +825,11 @@ func TestAmqp_HideArguments(t *testing.T) {
 }
 
 func TestAmqp_RecoverMethod(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	results, amqp := amqpModForTests()
+	results, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("01000100000005003c006e01ce")
@@ -811,9 +855,11 @@ func TestAmqp_RecoverMethod(t *testing.T) {
 
 // this is a specific rabbitMQ method
 func TestAmqp_BasicNack(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	data1, err := hex.DecodeString("0100010000000d003c0078000000000000000102ce")
 	assert.NoError(t, err)
@@ -834,9 +880,11 @@ func TestAmqp_BasicNack(t *testing.T) {
 }
 
 func TestAmqp_GetTable(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	data, err := hex.DecodeString("010001000000890032000a00000a5465737448656164" +
 		"657218000000730974696d657374616d70540000000055f7e40903626974620507646563" +
@@ -893,9 +941,11 @@ func TestAmqp_GetTable(t *testing.T) {
 }
 
 func TestAmqp_TableInception(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	data, err := hex.DecodeString("010001000000860028000a000005746573743105" +
 		"746f706963020000006f09696e63657074696f6e460000005006696e636570315300" +
@@ -945,9 +995,11 @@ func TestAmqp_TableInception(t *testing.T) {
 }
 
 func TestAmqp_ArrayFields(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	// byte array, rabbitMQ specific field
 	data, err := hex.DecodeString("010001000000260028000a0000057465737431057" +
@@ -1022,9 +1074,11 @@ func TestAmqp_ArrayFields(t *testing.T) {
 }
 
 func TestAmqp_WrongTable(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	_, amqp := amqpModForTests()
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	// declared table size too big
 	data, err := hex.DecodeString("010001000000890032000a00000a54657374486561646" +
@@ -1094,9 +1148,11 @@ func TestAmqp_isError(t *testing.T) {
 }
 
 func TestAmqp_ChannelCloseErrorMethod(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	results, amqp := amqpModForTests()
+	results, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 
 	data, err := hex.DecodeString("0100010000009000140028019685505245434f4e444" +
 		"954494f4e5f4641494c4544202d20696e6571756976616c656e74206172672027617574" +
@@ -1123,9 +1179,11 @@ func TestAmqp_ChannelCloseErrorMethod(t *testing.T) {
 }
 
 func TestAmqp_ConnectionCloseNoError(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	results, amqp := amqpModForTests()
+	results, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 	amqp.hideConnectionInformation = false
 
 	data, err := hex.DecodeString("01000000000012000a003200c8076b74687862616900000000ce")
@@ -1155,9 +1213,11 @@ func TestAmqp_ConnectionCloseNoError(t *testing.T) {
 }
 
 func TestAmqp_MultipleBodyFrames(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
-	results, amqp := amqpModForTests()
+	results, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
 	amqp.sendRequest = true
 	data, err := hex.DecodeString("0100010000000e003c00280000000568656c6c6f00ce" +
 		"02000100000021003c0000000000000000002a80400a746578742f706c61696e00000000" +
