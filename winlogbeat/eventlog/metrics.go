@@ -21,7 +21,9 @@ package eventlog
 
 import (
 	"expvar"
+	"fmt"
 	"strconv"
+	"sync"
 	"syscall"
 	"time"
 
@@ -66,19 +68,26 @@ type inputMetrics struct {
 	batchSize   metrics.Sample     // histogram of the number of events in each non-zero batch
 	sourceLag   metrics.Sample     // histogram of the difference between timestamped event's creation and reading
 	batchPeriod metrics.Sample     // histogram of the elapsed time between non-zero batch reads
+
+	// Event ID counters
+	eventIDCounters map[uint32]*monitoring.Uint // count of events per event ID
+	eventIDMu       sync.RWMutex                 // protects eventIDCounters map
+	registry        *monitoring.Registry         // registry for dynamic metric registration
 }
 
 // newInputMetrics returns an input metric for windows event logs. If id is empty
 // a nil inputMetric is returned.
 func newInputMetrics(name string, reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	out := &inputMetrics{
-		name:        monitoring.NewString(reg, "provider"),
-		events:      monitoring.NewUint(reg, "received_events_total"),
-		dropped:     monitoring.NewUint(reg, "discarded_events_total"),
-		errors:      monitoring.NewUint(reg, "errors_total"),
-		batchSize:   metrics.NewUniformSample(1024),
-		sourceLag:   metrics.NewUniformSample(1024),
-		batchPeriod: metrics.NewUniformSample(1024),
+		name:            monitoring.NewString(reg, "provider"),
+		events:          monitoring.NewUint(reg, "received_events_total"),
+		dropped:         monitoring.NewUint(reg, "discarded_events_total"),
+		errors:          monitoring.NewUint(reg, "errors_total"),
+		batchSize:       metrics.NewUniformSample(1024),
+		sourceLag:       metrics.NewUniformSample(1024),
+		batchPeriod:     metrics.NewUniformSample(1024),
+		eventIDCounters: make(map[uint32]*monitoring.Uint),
+		registry:        reg,
 	}
 	out.name.Set(name)
 	_ = adapter.NewGoMetrics(reg, "received_events_count", logger, adapter.Accept).
@@ -110,7 +119,39 @@ func (m *inputMetrics) log(batch []Record) {
 	m.batchSize.Update(int64(len(batch)))
 	for _, r := range batch {
 		m.sourceLag.Update(now.Sub(r.TimeCreated.SystemTime).Nanoseconds())
+		// Count events by event ID
+		m.incrementEventID(r.EventIdentifier.ID)
 	}
+}
+
+// incrementEventID increments the counter for the given event ID.
+// It lazily creates the counter if it doesn't exist.
+func (m *inputMetrics) incrementEventID(eventID uint32) {
+	m.eventIDMu.RLock()
+	counter, exists := m.eventIDCounters[eventID]
+	m.eventIDMu.RUnlock()
+
+	if exists {
+		counter.Inc()
+		return
+	}
+
+	// Counter doesn't exist, create it (with write lock)
+	m.eventIDMu.Lock()
+	defer m.eventIDMu.Unlock()
+
+	// Double-check in case another goroutine created it
+	counter, exists = m.eventIDCounters[eventID]
+	if exists {
+		counter.Inc()
+		return
+	}
+
+	// Create new counter for this event ID
+	metricName := fmt.Sprintf("event_id_%d_total", eventID)
+	counter = monitoring.NewUint(m.registry, metricName)
+	m.eventIDCounters[eventID] = counter
+	counter.Inc()
 }
 
 // logError logs error metrics. Nil errors do not increment the error
