@@ -22,7 +22,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -56,7 +55,7 @@ type Manager interface {
 	Stop()
 
 	// AgentInfo returns the information of the agent to which the manager is connected.
-	AgentInfo() client.AgentInfo
+	AgentInfo() AgentInfo
 
 	// SetStopCallback accepts a function that need to be called when the manager want to shutdown the
 	// beats. This is needed when you want your beats to be gracefully shutdown remotely by the Elastic Agent
@@ -67,16 +66,16 @@ type Manager interface {
 	CheckRawConfig(cfg *config.C) error
 
 	// RegisterAction registers action handler with the client
-	RegisterAction(action client.Action)
+	RegisterAction(action Action)
 
 	// UnregisterAction unregisters action handler with the client
-	UnregisterAction(action client.Action)
+	UnregisterAction(action Action)
 
 	// SetPayload Allows to add additional metadata to future requests made by the manager.
 	SetPayload(map[string]interface{})
 
 	// RegisterDiagnosticHook registers a callback for elastic-agent diagnostics
-	RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook)
+	RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook DiagnosticHook)
 }
 
 // ManagerFactory is the factory type for creating a config manager
@@ -162,12 +161,12 @@ func (n *FallbackManager) Stop() {
 // the nilManager is still used for shutdown on some cases,
 // but that does not mean the Beat is being managed externally,
 // hence it will always return false.
-func (n *FallbackManager) Enabled() bool                         { return false }
-func (n *FallbackManager) AgentInfo() client.AgentInfo           { return client.AgentInfo{} }
-func (n *FallbackManager) Start() error                          { return nil }
-func (n *FallbackManager) CheckRawConfig(cfg *config.C) error    { return nil }
-func (n *FallbackManager) RegisterAction(action client.Action)   {}
-func (n *FallbackManager) UnregisterAction(action client.Action) {}
-func (n *FallbackManager) SetPayload(map[string]interface{})     {}
-func (n *FallbackManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ client.DiagnosticHook) {
+func (n *FallbackManager) Enabled() bool                      { return false }
+func (n *FallbackManager) AgentInfo() AgentInfo               { return AgentInfo{} }
+func (n *FallbackManager) Start() error                       { return nil }
+func (n *FallbackManager) CheckRawConfig(cfg *config.C) error { return nil }
+func (n *FallbackManager) RegisterAction(action Action)       {}
+func (n *FallbackManager) UnregisterAction(action Action)     {}
+func (n *FallbackManager) SetPayload(map[string]interface{})  {}
+func (n *FallbackManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ DiagnosticHook) {
 }
