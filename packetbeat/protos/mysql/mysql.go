@@ -21,6 +21,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -126,7 +127,7 @@ const (
 	mysqlStateEatFields
 	mysqlStateEatRows
 
-	mysqlStateMax
+	mysqlStateMax //nolint: unused // used by tests
 )
 
 var stateStrings = []string{
@@ -222,8 +223,11 @@ func (mysql *mysqlPlugin) setFromConfig(config *mysqlConfig) {
 func (mysql *mysqlPlugin) getTransaction(k common.HashableTCPTuple) *mysqlTransaction {
 	v := mysql.transactions.Get(k)
 	if v != nil {
-		return v.(*mysqlTransaction)
+		if trans, ok := v.(*mysqlTransaction); ok {
+			return trans
+		}
 	}
+
 	return nil
 }
 
@@ -238,8 +242,11 @@ type mysqlStmtMap map[int]*mysqlStmtData
 func (mysql *mysqlPlugin) getStmtsMap(k common.HashableTCPTuple) mysqlStmtMap {
 	v := mysql.prepareStatements.Get(k)
 	if v != nil {
-		return v.(mysqlStmtMap)
+		if stmtMap, ok := v.(mysqlStmtMap); ok {
+			return stmtMap
+		}
 	}
+
 	return nil
 }
 
@@ -256,7 +263,7 @@ func (stream *mysqlStream) prepareForNewMessage() {
 
 func (mysql *mysqlPlugin) isServerPort(port uint16) bool {
 	for _, sPort := range mysql.ports {
-		if uint16(sPort) == port {
+		if uint16(sPort) == port { //nolint: gosec // only used to eval a bool
 			return true
 		}
 	}
@@ -342,8 +349,16 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			if m.isRequest {
 				// get the statement id
 				if m.typ == mysqlCmdStmtExecute || m.typ == mysqlCmdStmtClose {
+					if len(s.data[m.start+5:]) < 4 {
+						logp.Warn("MySQL statementID data too short. Ignoring")
+						return false, false
+					}
 					m.statementID = int(binary.LittleEndian.Uint32(s.data[m.start+5:]))
 				} else {
+					if m.start+5 > m.end || m.end > len(s.data) {
+						logp.Warn("MySQL query data too short. Ignoring.")
+						return false, false
+					}
 					m.query = string(s.data[m.start+5 : m.end])
 				}
 			} else if m.isOK {
@@ -374,11 +389,20 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				// string[1] sql state marker
 				// string[5] sql state
 				// string<EOF> error message
+				if (m.start + 13) >= len(s.data) {
+					logp.Warn("MySql Error code is the wrong size. Ignoring.")
+					return false, false
+				}
 				m.errorCode = binary.LittleEndian.Uint16(s.data[m.start+5 : m.start+7])
 
 				m.errorInfo = string(s.data[m.start+8:m.start+13]) + ": " + string(s.data[m.start+13:])
 			}
-			m.size = uint64(m.end - m.start)
+			msgSize := m.end - m.start
+			if msgSize < 0 {
+				logp.Warn("MySQL message size invalid. Ignoring.")
+				return false, false
+			}
+			m.size = uint64(msgSize)
 			logp.Debug("mysqldetailed", "Message complete. remaining=%d",
 				len(s.data[s.parseOffset:]))
 
@@ -408,7 +432,10 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 
 			if len(s.data[s.parseOffset:]) >= int(m.packetLength)+4 {
 				s.parseOffset += 4 // header
-
+				if len(s.data) <= s.parseOffset {
+					logp.Warn("MySQL packet has no data after header. Ignoring.")
+					return false, false
+				}
 				if s.data[s.parseOffset] == 0xfe {
 					logp.Debug("mysqldetailed", "Received EOF packet")
 					// EOF marker
@@ -474,6 +501,10 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			}
 
 			s.parseOffset += 4 // header
+			if len(s.data) <= s.parseOffset {
+				logp.Warn("MySQL packet has no data after header. Ignoring.")
+				return false, false
+			}
 
 			if s.data[s.parseOffset] == 0xfe {
 				logp.Debug("mysqldetailed", "Received EOF packet")
@@ -489,7 +520,12 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 					// in case the response was sent successfully
 					m.isOK = true
 				}
-				m.size = uint64(m.end - m.start)
+				bodySize := m.end - m.start
+				if bodySize < 0 {
+					logp.Warn("MySQL message body size invalid. Ignoring.")
+					return false, false
+				}
+				m.size = uint64(bodySize)
 				return true, true
 			}
 
@@ -845,11 +881,11 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		}
 		// First call or rebound (1)
 		for stmtPos := 0; stmtPos < nparam; stmtPos++ {
-			paramType = uint8(data[offset])
+			paramType = data[offset]
 			offset++
 			nparamType = append(nparamType, paramType)
 			logp.Debug("mysqldetailed", "type = %d", paramType)
-			paramUnsigned = uint8(data[offset])
+			paramUnsigned = data[offset]
 			offset++
 			if paramUnsigned != 0 {
 				logp.Debug("mysql", "Illegal param unsigned")
@@ -912,7 +948,8 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 				logp.Debug("mysql", "Data too small")
 				return nil
 			}
-			valueString := strconv.FormatInt(int64(binary.LittleEndian.Uint64(data[paramOffset:paramOffset+8])), 10)
+			valueInt := binary.LittleEndian.Uint64(data[paramOffset : paramOffset+8])
+			valueString := strconv.FormatInt(int64(valueInt), 10) //nolint: gosec // we're casting it to a string
 			paramString = append(paramString, valueString)
 			paramOffset += 8
 		// FIELD_TYPE_TIMESTAMP
@@ -1097,7 +1134,7 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 
 			if data[offset+4] == 0xfe {
 				// EOF
-				offset += length + 4 // ineffassign
+				offset += length + 4 //nolint: ineffassign,wastedassign // offset defined outside the break statement
 				break
 			}
 
@@ -1111,6 +1148,9 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 			for off < start+length {
 				var text []byte
 
+				if off >= len(data) {
+					return fields, rows
+				}
 				if data[off] == 0xfb {
 					text = []byte("NULL")
 					off++
@@ -1159,8 +1199,17 @@ func (mysql *mysqlPlugin) publishTransaction(t *mysqlTransaction) {
 	pbf.AddIP(t.src.IP)
 	pbf.SetDestination(&t.dst)
 	pbf.AddIP(t.dst.IP)
-	pbf.Source.Bytes = int64(t.bytesIn)
-	pbf.Destination.Bytes = int64(t.bytesOut)
+	if t.bytesIn < math.MaxInt64 {
+		pbf.Source.Bytes = int64(t.bytesIn)
+	} else {
+		pbf.Source.Bytes = math.MaxInt64
+	}
+	if t.bytesOut < math.MaxInt64 {
+		pbf.Destination.Bytes = int64(t.bytesOut)
+	} else {
+		pbf.Destination.Bytes = math.MaxInt64
+	}
+
 	pbf.Event.Dataset = "mysql"
 	pbf.Event.Start = t.ts
 	pbf.Event.End = t.endTime
@@ -1201,7 +1250,8 @@ func readLstring(data []byte, offset int) ([]byte, int, bool, error) {
 	if err != nil {
 		return nil, 0, false, err
 	}
-	if !complete || len(data[off:]) < int(length) {
+
+	if !complete || length > math.MaxInt || len(data[off:]) < int(length) {
 		return nil, 0, false, nil
 	}
 
