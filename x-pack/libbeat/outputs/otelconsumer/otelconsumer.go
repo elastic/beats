@@ -88,6 +88,10 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	pLogs := plog.NewLogs()
 	resourceLogs := pLogs.ResourceLogs().AppendEmpty()
 	sourceLogs := resourceLogs.ScopeLogs().AppendEmpty()
+
+	// add bodymap mapping mode on scope attributes
+	sourceLogs.Scope().Attributes().PutStr("elastic.mapping.mode", "bodymap")
+
 	logRecords := sourceLogs.LogRecords()
 
 	// Convert the batch of events to Otel plog.Logs. The encoding we

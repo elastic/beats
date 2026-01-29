@@ -99,8 +99,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 service:
   pipelines:
     logs:
@@ -318,8 +316,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 service:
   pipelines:
     logs:
