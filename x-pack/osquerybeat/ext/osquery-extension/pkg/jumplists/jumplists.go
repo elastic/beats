@@ -16,6 +16,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/interfaces"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
@@ -94,24 +95,31 @@ func matchesFilters(row JumplistRow, filters []filters.Filter) bool {
 	return true
 }
 
+type ClientInterface interface {
+	interfaces.QueryExecutor
+}
+
 // getAllJumplists is a helper function that gets all the jumplists for all the user profiles.
-func getAllJumplists(log *logger.Logger) ([]*Jumplist, error) {
+func getAllJumplists(log *logger.Logger, client ClientInterface) ([]*Jumplist, error) {
 	var jumplists []*Jumplist
-	userProfiles, err := getUserProfiles(log)
+
+	userProfiles, err := getUserProfiles(log, client)
 	if err != nil {
 		return nil, err
 	}
 	for _, userProfile := range userProfiles {
+		log.Infof("processing user profile: %v", userProfile)
 		jumplists = append(jumplists, userProfile.getJumplists(log)...)
 	}
+
 	return jumplists, nil
 }
 
 // GetGenerateFunc returns a function that can be used to generate a table of JumplistRow objects.
 // It returns a function that can be used to generate a table of JumplistRow objects.
-func GetGenerateFunc(log *logger.Logger) table.GenerateFunc {
+func GetGenerateFunc(log *logger.Logger, client ClientInterface) table.GenerateFunc {
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		jumplists, err := getAllJumplists(log)
+		jumplists, err := getAllJumplists(log, client)
 		if err != nil {
 			return nil, err
 		}
