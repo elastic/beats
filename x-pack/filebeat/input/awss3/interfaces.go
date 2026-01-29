@@ -73,7 +73,7 @@ type s3Mover interface {
 }
 
 type s3Lister interface {
-	ListObjectsPaginator(bucket, prefix string) s3Pager
+	ListObjectsPaginator(log *logp.Logger, bucket, prefix, startAfterKey string) s3Pager
 }
 
 type s3Pager interface {
@@ -319,11 +319,16 @@ func (a *awsS3API) clientFor(region string) *s3.Client {
 	return cli
 }
 
-func (a *awsS3API) ListObjectsPaginator(bucket, prefix string) s3Pager {
-	pager := s3.NewListObjectsV2Paginator(a.client, &s3.ListObjectsV2Input{
+func (a *awsS3API) ListObjectsPaginator(log *logp.Logger, bucket, prefix, startAfterKey string) s3Pager {
+	input := &s3.ListObjectsV2Input{
 		Bucket: awssdk.String(bucket),
 		Prefix: awssdk.String(prefix),
-	})
+	}
+	if startAfterKey != "" {
+		input.StartAfter = awssdk.String(startAfterKey)
+		log.Debugw("Listing objects with startAfterKey.", "start_after_key", startAfterKey)
+	}
+	pager := s3.NewListObjectsV2Paginator(a.client, input)
 
 	return pager
 }

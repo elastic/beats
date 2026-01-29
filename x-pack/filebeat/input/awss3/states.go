@@ -5,7 +5,9 @@
 package awss3
 
 import (
+	"container/heap"
 	"fmt"
+	"slices"
 	"strings"
 	"sync"
 
@@ -15,114 +17,418 @@ import (
 
 const awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
 
-// states handles list of s3 object state. One must use newStates to instantiate a
-// file states registry. Using the zero-value is not safe.
-type states struct {
+// stateRegistry defines the interface for managing S3 object states.
+// This allows different implementations for normal mode vs lexicographical ordering mode.
+type stateRegistry interface {
+	// IsProcessed returns true if the object with the given ID has been processed.
+	IsProcessed(id string) bool
+
+	// AddState adds or updates a state in the registry.
+	AddState(st state) error
+
+	// CleanUp removes states that are not in the provided knownIDs list.
+	CleanUp(knownIDs []string) error
+
+	// GetLeastState returns the least/smallest key state in the registry (used for startAfterKey).
+	// Returns nil if no states exist.
+	GetLeastState() *state
+
+	// Close closes the underlying store.
+	Close()
+}
+
+// baseStateRegistry contains shared functionality between registry implementations.
+type baseStateRegistry struct {
 	// Completed S3 object states, indexed by state ID.
-	// statesLock must be held to access states.
-	states     map[string]*state
+	states map[string]*state
+	// statesLock protects access to states map
 	statesLock sync.Mutex
 
 	// The store used to persist state changes to the registry.
-	// storeLock must be held to access store.
-	store     *statestore.Store
+	store *statestore.Store
+	// storeLock protects access to store.
+	// Callers of unexported stateRegistry methods that read or write store must hold this lock.
 	storeLock sync.Mutex
 
 	// Accepted prefixes of state keys of this registry
 	keyPrefix string
 }
 
-// newStates generates a new states registry.
-func newStates(log *logp.Logger, stateStore statestore.States, listPrefix string) (*states, error) {
-	store, err := stateStore.StoreFor("")
-	if err != nil {
-		return nil, fmt.Errorf("can't access persistent store: %w", err)
-	}
-
-	stateTable, err := loadS3StatesFromRegistry(log, store, listPrefix)
-	if err != nil {
-		return nil, fmt.Errorf("loading S3 input state: %w", err)
-	}
-
-	return &states{
-		store:     store,
-		states:    stateTable,
-		keyPrefix: listPrefix,
-	}, nil
-}
-
-func (s *states) IsProcessed(state state) bool {
-	s.statesLock.Lock()
-	defer s.statesLock.Unlock()
-	// Our in-memory table only stores completed objects
-	_, ok := s.states[state.ID()]
+func (b *baseStateRegistry) IsProcessed(id string) bool {
+	b.statesLock.Lock()
+	_, ok := b.states[id]
+	b.statesLock.Unlock()
 	return ok
 }
 
-func (s *states) AddState(state state) error {
-	if !strings.HasPrefix(state.Key, s.keyPrefix) {
-		// Note - This failure should not happen since we create a dedicated state instance per input.
-		// Yet, this is here to avoid any wiring errors within the component.
-		return fmt.Errorf("expected prefix %s in key %s, skipping state registering", s.keyPrefix, state.Key)
-	}
+func (b *baseStateRegistry) Close() {
+	b.storeLock.Lock()
+	b.store.Close()
+	b.storeLock.Unlock()
+}
 
-	id := state.ID()
-	// Update in-memory copy
-	s.statesLock.Lock()
-	s.states[id] = &state
-	s.statesLock.Unlock()
-
-	// Persist to the registry
-	s.storeLock.Lock()
-	defer s.storeLock.Unlock()
-	if err := s.store.Set(getStoreKey(id), state); err != nil {
-		return err
+func (b *baseStateRegistry) validateKeyPrefix(key string) error {
+	if !strings.HasPrefix(key, b.keyPrefix) {
+		return fmt.Errorf("expected prefix %s in key %s, skipping state registering", b.keyPrefix, key)
 	}
 	return nil
 }
 
-// CleanUp performs state and store cleanup based on provided knownIDs.
-// knownIDs must contain valid currently tracked state IDs that must be known by this state registry.
-// State and underlying storage will be cleaned if ID is no longer present in knownIDs set.
-func (s *states) CleanUp(knownIDs []string) error {
-	knownIDHashSet := map[string]struct{}{}
+// persistState saves the state to the persistent store.
+// Caller must hold storeLock.
+func (b *baseStateRegistry) persistState(id string, st state) error {
+	return b.store.Set(getStoreKey(id), st)
+}
+
+// removeFromStore removes the state from the persistent store.
+// Caller must hold storeLock.
+func (b *baseStateRegistry) removeFromStore(id string) error {
+	return b.store.Remove(getStoreKey(id))
+}
+
+// normalStateRegistry implements the default (non-lexicographical) state management.
+// In this mode:
+// - States are stored indefinitely (no capacity limit)
+// - State ID includes etag and last modified for change detection
+// - No ordering is maintained
+type normalStateRegistry struct {
+	baseStateRegistry
+}
+
+// newNormalStateRegistry creates a new normal state registry.
+func newNormalStateRegistry(log *logp.Logger, store *statestore.Store, keyPrefix string) (*normalStateRegistry, error) {
+	stateTable, err := loadS3StatesFromRegistry(log, store, keyPrefix, false)
+	if err != nil {
+		return nil, fmt.Errorf("loading S3 input state: %w", err)
+	}
+
+	return &normalStateRegistry{
+		baseStateRegistry: baseStateRegistry{
+			store:     store,
+			states:    stateTable,
+			keyPrefix: keyPrefix,
+		},
+	}, nil
+}
+
+func (r *normalStateRegistry) AddState(st state) error {
+	if err := r.validateKeyPrefix(st.Key); err != nil {
+		return err
+	}
+
+	id := st.ID()
+
+	// Update in-memory copy
+	r.statesLock.Lock()
+	r.states[id] = &st
+	r.statesLock.Unlock()
+
+	// Persist to the registry
+	r.storeLock.Lock()
+	defer r.storeLock.Unlock()
+	return r.persistState(id, st)
+}
+
+func (r *normalStateRegistry) CleanUp(knownIDs []string) error {
+	knownIDHashSet := make(map[string]struct{}, len(knownIDs))
 	for _, id := range knownIDs {
 		knownIDHashSet[id] = struct{}{}
 	}
 
-	s.storeLock.Lock()
-	defer s.storeLock.Unlock()
-	s.statesLock.Lock()
-	defer s.statesLock.Unlock()
+	r.storeLock.Lock()
+	defer r.storeLock.Unlock()
+	r.statesLock.Lock()
+	defer r.statesLock.Unlock()
 
-	for id := range s.states {
+	// Collect IDs to remove
+	var idsToRemove []string
+	for id := range r.states {
 		if _, contains := knownIDHashSet[id]; !contains {
-			// remove from sate & store as ID is no longer seen in known ID set
-			delete(s.states, id)
-			err := s.store.Remove(getStoreKey(id))
-			if err != nil {
-				return fmt.Errorf("error while removing the state for ID %s: %w", id, err)
-			}
+			idsToRemove = append(idsToRemove, id)
+		}
+	}
+
+	// Remove the states
+	for _, id := range idsToRemove {
+		delete(r.states, id)
+		if err := r.removeFromStore(id); err != nil {
+			return fmt.Errorf("error while removing the state for ID %s: %w", id, err)
 		}
 	}
 
 	return nil
 }
 
-func (s *states) Close() {
-	s.storeLock.Lock()
-	s.store.Close()
-	s.storeLock.Unlock()
+func (r *normalStateRegistry) GetLeastState() *state {
+	// Normal mode doesn't track ordering, return nil
+	return nil
 }
 
-// getStoreKey is a helper to generate the key used by underlying persistent storage
+// lexicographicalStateRegistry implements lexicographical ordering state management.
+// In this mode:
+// - States are limited to a configurable capacity (lookbackKeys)
+// - States are maintained in a min-heap ordered by lexicographical key
+// - The least/smallest key state is used as startAfterKey for S3 listing
+// - State ID includes a lexicographical suffix for isolation
+type lexicographicalStateRegistry struct {
+	baseStateRegistry
+
+	// Min-heap for efficient access to the least key
+	heap *stateHeap
+
+	// Maximum number of states to keep
+	capacity int
+}
+
+// newLexicographicalStateRegistry creates a new lexicographical state registry.
+func newLexicographicalStateRegistry(log *logp.Logger, store *statestore.Store, keyPrefix string, capacity int) (*lexicographicalStateRegistry, error) {
+	stateTable, err := loadS3StatesFromRegistry(log, store, keyPrefix, true)
+	if err != nil {
+		return nil, fmt.Errorf("loading S3 input state: %w", err)
+	}
+
+	h := newStateHeap()
+
+	r := &lexicographicalStateRegistry{
+		baseStateRegistry: baseStateRegistry{
+			store:     store,
+			states:    stateTable,
+			keyPrefix: keyPrefix,
+		},
+		heap:     h,
+		capacity: capacity,
+	}
+
+	// Build heap from loaded states and trim to capacity
+	if len(stateTable) > 0 {
+		r.initHeapFromStates(log)
+	}
+
+	return r, nil
+}
+
+// initHeapFromStates builds the heap from the states map and trims to capacity.
+func (r *lexicographicalStateRegistry) initHeapFromStates(log *logp.Logger) {
+	r.storeLock.Lock()
+	defer r.storeLock.Unlock()
+	r.statesLock.Lock()
+	defer r.statesLock.Unlock()
+
+	for _, st := range r.states {
+		r.heap.items = append(r.heap.items, st)
+		r.heap.index[st.IDWithLexicographicalOrdering()] = len(r.heap.items) - 1
+	}
+	heap.Init(r.heap)
+
+	// Trim to capacity
+	for r.heap.Len() > r.capacity {
+		smallestState := r.heap.pop()
+		id := smallestState.IDWithLexicographicalOrdering()
+		delete(r.states, id)
+		if err := r.removeFromStore(id); err != nil && log != nil {
+			log.Warnf("failed to evict least state from store: %v", err)
+		}
+	}
+}
+
+func (r *lexicographicalStateRegistry) AddState(st state) error {
+	if err := r.validateKeyPrefix(st.Key); err != nil {
+		return err
+	}
+
+	id := st.IDWithLexicographicalOrdering()
+	var evictedID string
+	var shouldPersist bool
+
+	// Update in-memory state
+	func() {
+		r.statesLock.Lock()
+		defer r.statesLock.Unlock()
+
+		if r.heap.Len() >= r.capacity {
+			// Only add if the new key is larger than the current minimum.
+			// This ensures we keep the N largest keys.
+			minState := r.heap.peek()
+			if minState != nil && st.Key <= minState.Key {
+				return
+			}
+			// Evict the smallest key
+			evicted := r.heap.pop()
+			evictedID = evicted.IDWithLexicographicalOrdering()
+			delete(r.states, evictedID)
+		}
+
+		// Add new state to states map and heap
+		r.states[id] = &st
+		r.heap.push(&st)
+		shouldPersist = true
+	}()
+
+	if !shouldPersist {
+		return nil
+	}
+
+	// Persist changes to store
+	r.storeLock.Lock()
+	defer r.storeLock.Unlock()
+
+	if evictedID != "" {
+		if err := r.removeFromStore(evictedID); err != nil {
+			return fmt.Errorf("error while removing evicted state: %w", err)
+		}
+	}
+
+	return r.persistState(id, st)
+}
+
+func (r *lexicographicalStateRegistry) CleanUp(knownIDs []string) error {
+	knownIDHashSet := make(map[string]struct{}, len(knownIDs))
+	for _, id := range knownIDs {
+		knownIDHashSet[id] = struct{}{}
+	}
+
+	r.storeLock.Lock()
+	defer r.storeLock.Unlock()
+	r.statesLock.Lock()
+	defer r.statesLock.Unlock()
+
+	// Collect IDs to remove
+	var idsToRemove []string
+	for id := range r.states {
+		if _, contains := knownIDHashSet[id]; !contains {
+			idsToRemove = append(idsToRemove, id)
+		}
+	}
+
+	if len(idsToRemove) == 0 {
+		return nil
+	}
+
+	// If removing all states, preserve at least one (the greatest key for startAfterKey)
+	if len(r.states)-len(idsToRemove) < 1 && len(idsToRemove) > 0 {
+		// Find the greatest key to preserve
+		greatestID := slices.Max(idsToRemove)
+		// Remove greatestID from idsToRemove
+		filtered := make([]string, 0, len(idsToRemove)-1)
+		for _, id := range idsToRemove {
+			if id != greatestID {
+				filtered = append(filtered, id)
+			}
+		}
+		idsToRemove = filtered
+	}
+
+	// Remove the states from heap, map, and store
+	for _, id := range idsToRemove {
+		r.heap.remove(id)
+		delete(r.states, id)
+		if err := r.removeFromStore(id); err != nil {
+			return fmt.Errorf("error while removing the state for ID %s: %w", id, err)
+		}
+	}
+
+	return nil
+}
+
+func (r *lexicographicalStateRegistry) GetLeastState() *state {
+	r.statesLock.Lock()
+	defer r.statesLock.Unlock()
+	return r.heap.peek()
+}
+
+// stateHeap implements heap.Interface for states ordered by lexicographical key.
+// It also maintains an index map for O(1) lookup.
+type stateHeap struct {
+	items []*state
+	index map[string]int
+}
+
+func newStateHeap() *stateHeap {
+	return &stateHeap{
+		items: make([]*state, 0),
+		index: make(map[string]int),
+	}
+}
+
+// pop removes and returns the smallest state from the heap.
+func (h *stateHeap) pop() *state {
+	if h.Len() == 0 {
+		return nil
+	}
+	return heap.Pop(h).(*state)
+}
+
+// push adds a state to the heap.
+func (h *stateHeap) push(st *state) {
+	heap.Push(h, st)
+}
+
+// remove removes a state by ID and returns it, or nil if not found.
+func (h *stateHeap) remove(id string) *state {
+	idx, ok := h.index[id]
+	if !ok {
+		return nil
+	}
+	return heap.Remove(h, idx).(*state)
+}
+
+// peek returns the smallest state without removing it.
+func (h *stateHeap) peek() *state {
+	if len(h.items) == 0 {
+		return nil
+	}
+	return h.items[0]
+}
+
+func (h *stateHeap) Len() int { return len(h.items) }
+
+func (h *stateHeap) Less(i, j int) bool {
+	return h.items[i].Key < h.items[j].Key
+}
+
+func (h *stateHeap) Swap(i, j int) {
+	h.items[i], h.items[j] = h.items[j], h.items[i]
+	h.index[h.items[i].IDWithLexicographicalOrdering()] = i
+	h.index[h.items[j].IDWithLexicographicalOrdering()] = j
+}
+
+func (h *stateHeap) Push(x any) {
+	st := x.(*state)
+	h.index[st.IDWithLexicographicalOrdering()] = len(h.items)
+	h.items = append(h.items, st)
+}
+
+func (h *stateHeap) Pop() any {
+	old := h.items
+	n := len(old)
+	st := old[n-1]
+	old[n-1] = nil // avoid memory leak
+	h.items = old[0 : n-1]
+	delete(h.index, st.IDWithLexicographicalOrdering())
+	return st
+}
+
+// newStateRegistry creates the appropriate state registry based on configuration.
+func newStateRegistry(log *logp.Logger, stateStore statestore.States, keyPrefix string, lexicographicalOrdering bool, lexicographicalLookbackKeys int) (stateRegistry, error) {
+	store, err := stateStore.StoreFor("")
+	if err != nil {
+		return nil, fmt.Errorf("can't access persistent store: %w", err)
+	}
+
+	if lexicographicalOrdering {
+		return newLexicographicalStateRegistry(log, store, keyPrefix, lexicographicalLookbackKeys)
+	}
+	return newNormalStateRegistry(log, store, keyPrefix)
+}
+
+// getStoreKey generates the key used by underlying persistent storage
 func getStoreKey(stateID string) string {
 	return awsS3ObjectStatePrefix + stateID
 }
 
 // loadS3StatesFromRegistry loads a copy of the registry states.
 // If prefix is set, entries will match the provided prefix(including empty prefix)
-func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix string) (map[string]*state, error) {
+func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix string, lexicographicalOrdering bool) (map[string]*state, error) {
 	stateTable := map[string]*state{}
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
 		if !strings.HasPrefix(key, awsS3ObjectStatePrefix) {
@@ -148,12 +454,13 @@ func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix 
 
 		// filter based on prefix and add entry to local copy
 		if strings.HasPrefix(st.Key, prefix) {
-			stateTable[st.ID()] = &st
+			if lexicographicalOrdering {
+				stateTable[st.IDWithLexicographicalOrdering()] = &st
+			} else {
+				stateTable[st.ID()] = &st
+			}
 		}
 		return true, nil
 	})
-	if err != nil {
-		return nil, err
-	}
-	return stateTable, nil
+	return stateTable, err
 }
