@@ -603,10 +603,8 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 }
 
 func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescriptor, err error) {
-
 	fd.Filename = it.filename
 	fd.Info = it.info
-	var osFile *os.File
 	var file File
 
 	if !s.cfg.Fingerprint.Enabled {
@@ -614,11 +612,29 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	}
 	minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
 
-	osFile, err = os.Open(it.originalFilename)
-	if err != nil {
-		return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+	// opener is used to open the file only once
+	opener := struct {
+		Open func() (*os.File, error)
+		f    *os.File
+	}{}
+	opener.Open = func() (*os.File, error) {
+		if opener.f != nil {
+			return opener.f, nil
+		}
+
+		opener.f, err = os.Open(it.originalFilename)
+		if err != nil {
+			return nil, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+
+		}
+		return opener.f, err
 	}
-	defer osFile.Close()
+
+	defer func() {
+		if opener.f != nil {
+			opener.f.Close()
+		}
+	}()
 
 	switch s.compression {
 	case CompressionNone:
@@ -626,6 +642,11 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	case CompressionGZIP:
 		fd.GZIP = true
 	case CompressionAuto:
+		osFile, err := opener.Open()
+		if err != nil {
+			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+		}
+
 		fd.GZIP, err = IsGZIP(osFile)
 		if err != nil {
 			return fd, fmt.Errorf("failed to check if %q is gzip: %w",
@@ -636,6 +657,11 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	// Check there is enough data
 	var dataSize int64
 	if fd.GZIP {
+		osFile, err := opener.Open()
+		if err != nil {
+			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+		}
+
 		// Check if there is enough *decompressed* data for fingerprint
 		file, err = newGzipSeekerReader(osFile, int(minSize))
 		if err != nil {
@@ -663,6 +689,10 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		}
 
 		// there is enough data wrap it on File
+		osFile, err := opener.Open()
+		if err != nil {
+			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+		}
 		file = newPlainFile(osFile)
 	}
 
