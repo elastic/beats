@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: synthetics-add-playwright-dependency-on-wolfi
+summary: Adds a missing dependency for Synthetics on wolfi docker image
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
@@ -28,7 +28,7 @@ summary: synthetics-add-playwright-dependency-on-wolfi
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: Adds a missing dependency for Synthetics on wolfi docker image
+component: heartbeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
