@@ -199,6 +199,13 @@ func TestNormalizeConfig(t *testing.T) {
 			wantEnabled: false,
 		},
 		{
+			name: "native identity disables scanner fingerprint by default",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{"native": nil},
+			},
+			wantEnabled: false,
+		},
+		{
 			name: "explicit scanner fingerprint true is preserved",
 			cfg: map[string]interface{}{
 				"file_identity": map[string]interface{}{"path": nil},
