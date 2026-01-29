@@ -19,7 +19,7 @@ jobs:
     if: |
       contains(github.event.comment.body, '@claude') &&
       contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) &&
-      contains(fromJSON('["strawgate","AlexanderWert","perk","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia"]'), github.actor) &&
+      contains(fromJSON('["strawgate","AlexanderWert","perk","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia","pierrehilbert","bturquet"]'), github.actor) &&
       ((github.event_name == 'issue_comment' && github.event.issue.pull_request != null) ||
        github.event_name == 'pull_request_review_comment')
     steps:

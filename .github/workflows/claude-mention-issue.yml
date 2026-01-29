@@ -17,7 +17,7 @@ jobs:
       contains(github.event.comment.body, '@claude') &&
       github.event.issue.pull_request == null &&
       contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) &&
-      contains(fromJSON('["strawgate","AlexanderWert","perk","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia"]'), github.actor)
+      contains(fromJSON('["strawgate","AlexanderWert","perk","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia","pierrehilbert","bturquet"]'), github.actor)
     steps:
       - uses: actions/checkout@v6
         with:
