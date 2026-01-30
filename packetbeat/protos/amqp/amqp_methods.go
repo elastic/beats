@@ -1028,7 +1028,7 @@ func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short s
 }
 
 // Attempts to get an integer from a byte slice. Returns the integer and an err boolean.
-// The err is true if there were not enough bytes to successfully reqd the integer type.
+// The err is true if there were not enough bytes to successfully read the integer type.
 // The returned integer is meaningless if err == true
 func getIntegerAt[T uint8 | uint16 | uint32 | uint64 | int8 | int16 | int32 | int64](data []byte, offset uint32) (integer T, err bool) {
 	var value T
