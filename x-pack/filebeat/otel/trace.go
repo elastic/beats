@@ -59,62 +59,62 @@ func NewTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyVa
 
 // newSpanExporterFromEnv creates a new exporter from configuration.
 // It returns (nil, nil) if the exporter is "none".
-func newExporterFromCfg(ctx context.Context, cfg *exporterCfg) (sdktrace.SpanExporter, error) {
-	if cfg.disabled {
+func newExporterFromCfg(ctx context.Context, cfg *ExporterCfg) (sdktrace.SpanExporter, error) {
+	if cfg.Disabled {
 		return nil, nil
 	}
 
-	switch cfg.exporter {
+	switch cfg.Exporter {
 	case "console":
 		return stdouttrace.New(stdouttrace.WithPrettyPrint())
 	case "otlp":
-		switch cfg.protocol {
+		switch cfg.Protocol {
 		case "grpc":
 			var opts []otlptracegrpc.Option
-			if cfg.endpoint != "" {
-				opts = append(opts, otlptracegrpc.WithEndpoint(cfg.endpoint))
+			if cfg.Endpoint != "" {
+				opts = append(opts, otlptracegrpc.WithEndpoint(cfg.Endpoint))
 			}
-			if len(cfg.headers) > 0 {
-				opts = append(opts, otlptracegrpc.WithHeaders(cfg.headers))
+			if len(cfg.Headers) > 0 {
+				opts = append(opts, otlptracegrpc.WithHeaders(cfg.Headers))
 			}
-			if cfg.timeout > 0 {
-				opts = append(opts, otlptracegrpc.WithTimeout(cfg.timeout))
+			if cfg.Timeout > 0 {
+				opts = append(opts, otlptracegrpc.WithTimeout(cfg.Timeout))
 			}
-			if cfg.insecure {
+			if cfg.Insecure {
 				opts = append(opts, otlptracegrpc.WithInsecure())
 			}
 			return otlptracegrpc.New(ctx, opts...)
 		case "http/protobuf":
 			var opts []otlptracehttp.Option
-			if cfg.endpoint != "" {
-				opts = append(opts, otlptracehttp.WithEndpoint(cfg.endpoint))
+			if cfg.Endpoint != "" {
+				opts = append(opts, otlptracehttp.WithEndpoint(cfg.Endpoint))
 			}
-			if len(cfg.headers) > 0 {
-				opts = append(opts, otlptracehttp.WithHeaders(cfg.headers))
+			if len(cfg.Headers) > 0 {
+				opts = append(opts, otlptracehttp.WithHeaders(cfg.Headers))
 			}
-			if cfg.timeout > 0 {
-				opts = append(opts, otlptracehttp.WithTimeout(cfg.timeout))
+			if cfg.Timeout > 0 {
+				opts = append(opts, otlptracehttp.WithTimeout(cfg.Timeout))
 			}
-			if cfg.insecure {
+			if cfg.Insecure {
 				opts = append(opts, otlptracehttp.WithInsecure())
 			}
 			return otlptracehttp.New(ctx, opts...)
 		default:
-			return nil, fmt.Errorf("unsupported OTLP traces protocol %q (expected grpc or http/protobuf)", cfg.protocol)
+			return nil, fmt.Errorf("unsupported OTLP traces protocol %q (expected grpc or http/protobuf)", cfg.Protocol)
 		}
 	}
 
 	return nil, nil
 }
 
-type exporterCfg struct {
-	disabled bool
-	exporter string
-	protocol string
-	endpoint string
-	headers  map[string]string
-	timeout  time.Duration
-	insecure bool
+type ExporterCfg struct {
+	Disabled bool
+	Exporter string
+	Protocol string
+	Endpoint string
+	Headers  map[string]string
+	Timeout  time.Duration
+	Insecure bool
 }
 
 // newExporterCfgFromEnv loads exporter configuration data from standard environment variables, in a form ready to use for exporter creation.
@@ -126,13 +126,13 @@ type exporterCfg struct {
 // - OTEL_EXPORTER_OTLP_TRACES_HEADERS  / OTEL_EXPORTER_OTLP_HEADERS  (e.g. "Authorization=Bearer abc123,X-Client-Version=1.2.3")
 // - OTEL_EXPORTER_OTLP_TRACES_TIMEOUT  / OTEL_EXPORTER_OTLP_TIMEOUT  (in ms)
 // - OTEL_EXPORTER_OTLP_TRACES_INSECURE / OTEL_EXPORTER_OTLP_INSECURE (values: true|false, default: true if http scheme used, otherwise false)
-func newExporterCfgFromEnv(inputName string) (*exporterCfg, error) {
-	cfg := exporterCfg{}
+func newExporterCfgFromEnv(inputName string) (*ExporterCfg, error) {
+	cfg := ExporterCfg{}
 
 	rawDisable := strings.TrimSpace(os.Getenv("BEATS_OTEL_TRACES_DISABLE"))
 	for _, disabledInput := range splitCSV(rawDisable) {
 		if disabledInput == inputName {
-			cfg.disabled = true
+			cfg.Disabled = true
 		}
 	}
 
@@ -141,31 +141,31 @@ func newExporterCfgFromEnv(inputName string) (*exporterCfg, error) {
 		name := strings.ToLower(rawName)
 		switch name {
 		case "none", "otlp", "console":
-			cfg.exporter = name
+			cfg.Exporter = name
 		}
-		if cfg.exporter != "" {
+		if cfg.Exporter != "" {
 			break
 		}
 	}
-	if rawExporter != "" && cfg.exporter == "" {
+	if rawExporter != "" && cfg.Exporter == "" {
 		return nil, fmt.Errorf("only unsupported trace exporter(s) found in OTEL_TRACES_EXPORTER=%q (supported: none, otlp, console)", rawExporter)
 	}
-	if cfg.exporter == "" {
-		cfg.exporter = "none" // default
+	if cfg.Exporter == "" {
+		cfg.Exporter = "none" // default
 	}
 
-	cfg.protocol = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"))
-	if cfg.protocol == "" {
-		cfg.protocol = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL"))
+	cfg.Protocol = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"))
+	if cfg.Protocol == "" {
+		cfg.Protocol = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL"))
 	}
-	if cfg.protocol == "" {
-		cfg.protocol = "grpc" // default
+	if cfg.Protocol == "" {
+		cfg.Protocol = "grpc" // default
 	}
-	cfg.protocol = strings.ToLower(cfg.protocol)
+	cfg.Protocol = strings.ToLower(cfg.Protocol)
 
 	var err error
 	var hasInsecure bool
-	cfg.insecure, hasInsecure, err = envBoolFirstFound(
+	cfg.Insecure, hasInsecure, err = envBoolFirstFound(
 		"OTEL_EXPORTER_OTLP_TRACES_INSECURE",
 		"OTEL_EXPORTER_OTLP_INSECURE",
 	)
@@ -173,32 +173,32 @@ func newExporterCfgFromEnv(inputName string) (*exporterCfg, error) {
 		return nil, err
 	}
 
-	cfg.endpoint = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"))
-	if cfg.endpoint == "" {
-		cfg.endpoint = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))
+	cfg.Endpoint = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"))
+	if cfg.Endpoint == "" {
+		cfg.Endpoint = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))
 	}
-	u, err := url.Parse(cfg.endpoint)
+	u, err := url.Parse(cfg.Endpoint)
 	if err == nil && u.Host != "" {
 		if u.Scheme == "http" && !hasInsecure {
 			// Using a scheme of http rather than https indicates it will be insecure.
-			cfg.insecure = true
+			cfg.Insecure = true
 		}
 		// The endpoint was a URL like http://localhost:4318 but the exporter wants localhost:4318.
-		cfg.endpoint = u.Host
+		cfg.Endpoint = u.Host
 	}
 
 	headersStr := strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS"))
 	if headersStr == "" {
 		headersStr = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_HEADERS"))
 	}
-	cfg.headers, err = parseOTLPHeaders(headersStr)
+	cfg.Headers, err = parseOTLPHeaders(headersStr)
 	if err != nil {
 		return nil, err
 	}
 
-	cfg.timeout = envDurationMillis("OTEL_EXPORTER_OTLP_TRACES_TIMEOUT")
-	if cfg.timeout == 0 {
-		cfg.timeout = envDurationMillis("OTEL_EXPORTER_OTLP_TIMEOUT")
+	cfg.Timeout = envDurationMillis("OTEL_EXPORTER_OTLP_TRACES_TIMEOUT")
+	if cfg.Timeout == 0 {
+		cfg.Timeout = envDurationMillis("OTEL_EXPORTER_OTLP_TIMEOUT")
 	}
 	// 0 means "use exporter default"
 
@@ -416,6 +416,7 @@ var sensitiveWords = map[string]struct{}{
 	"code":          {},
 	"cookie":        {},
 	"credential":    {},
+	"credentials":   {},
 	"creds":         {},
 	"hmac":          {},
 	"jwt":           {},
