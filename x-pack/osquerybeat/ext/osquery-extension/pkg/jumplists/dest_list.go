@@ -45,8 +45,8 @@ type DestListEntry struct {
 	fileDroid        *GUID
 	volumeBirthDroid *GUID
 	fileBirthDroid   *GUID
-	Hostname         string    `osquery:"hostname"`
-	EntryNumber      int32     `osquery:"entry_number"`
+	Hostname         string `osquery:"hostname"`
+	EntryNumber      int32  `osquery:"entry_number"`
 	unknown0         int32
 	AccessCount      float32   `osquery:"access_count"`
 	LastModifiedTime time.Time `osquery:"last_modified_time"`

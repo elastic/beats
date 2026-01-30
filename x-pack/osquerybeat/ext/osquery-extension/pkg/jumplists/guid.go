@@ -96,7 +96,6 @@ func (g *GUID) AsFileTime() time.Time {
 		timestamp100ns = int64(uVal)
 	}
 
-
 	// 'uuidEpochOffset' is the number of 100-ns intervals
 	// between the UUID epoch (Oct 15, 1582) and the Go/Unix epoch (Jan 1, 1970).
 	const uuidEpochOffset = 122192928000000000
