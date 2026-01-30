@@ -91,6 +91,7 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 		var processors []beat.Processor
 		for _, c := range r.cfgs {
 			processors = append(processors, c.Processing.Processor.All()...)
+			defer c.Processing.Processor.Close()
 		}
 
 		require.NotEmptyf(t, processors, "for this test the list of processors cannot be empty")
