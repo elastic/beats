@@ -32,6 +32,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -185,7 +186,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 	}
 
-	client, trace, otelMetrics, err := newClient(ctx, cfg, log, reg, env)
+	client, trace, otelMetrics, err := newClient(ctx, cfg, log, reg, env, otelTracerProvider)
 	if err != nil {
 		return err
 	}
@@ -997,7 +998,7 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 // https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
-func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry, env v2.Context) (*http.Client, *httplog.LoggingRoundTripper, *otelCELMetrics, error) {
+func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry, env v2.Context, tp *sdktrace.TracerProvider) (*http.Client, *httplog.LoggingRoundTripper, *otelCELMetrics, error) {
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings(), log)...)
 	if err != nil {
 		return nil, nil, nil, err
@@ -1096,7 +1097,8 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg, log)
 	}
 
-	otelMetrics, otelTransport, err := createOTELMetrics(ctx, cfg, log, env, c.Transport)
+	extraOpts := []otelhttp.Option{otelhttp.WithTracerProvider(tp)}
+	otelMetrics, otelTransport, err := createOTELMetrics(ctx, cfg, log, env, c.Transport, extraOpts)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -1133,7 +1135,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	return c, trace, otelMetrics, nil
 }
 
-func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2.Context, tripper http.RoundTripper) (*otelCELMetrics, *otelhttp.Transport, error) {
+func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2.Context, tripper http.RoundTripper, extraOpts []otelhttp.Option) (*otelCELMetrics, *otelhttp.Transport, error) {
 	resource := resource.NewWithAttributes(
 		semconv.SchemaURL, getResourceAttributes(env, cfg)...,
 	)
@@ -1144,7 +1146,8 @@ func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2
 		log.Errorw("failed to get exporter", "error", err)
 	}
 	log.Infof("created OTEL cel input exporter %s for input %s", exporterType, env.IDWithoutName)
-	return newOTELCELMetrics(log, *resource, tripper, exporter)
+
+	return newOTELCELMetrics(log, *resource, tripper, exporter, extraOpts)
 }
 
 func getResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
