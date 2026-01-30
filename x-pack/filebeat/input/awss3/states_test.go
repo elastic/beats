@@ -255,9 +255,9 @@ func TestNormalStateRegistry_GetOldestState(t *testing.T) {
 	registry, err := newStateRegistry(nil, store, "", false, 0)
 	require.NoError(t, err)
 
-	// Normal mode doesn't track ordering
-	oldest := registry.GetLeastState()
-	require.Nil(t, oldest, "normal registry should return nil for GetOldestState")
+	// Normal mode doesn't use startAfterKey
+	startAfterKey := registry.GetStartAfterKey()
+	require.Empty(t, startAfterKey, "normal registry should return empty string for GetStartAfterKey")
 }
 
 // ============================================================================
@@ -325,28 +325,75 @@ func TestLexicographicalStateRegistry_AddStateAndIsProcessed(t *testing.T) {
 
 }
 
-func TestLexicographicalStateRegistry_GetLeastState(t *testing.T) {
+func TestLexicographicalStateRegistry_TailTracking(t *testing.T) {
 	logger := logp.NewLogger("lexicographical-registry-test")
-	store := openTestStatestore()
-	registry, err := newStateRegistry(logger, store, "", true, 10)
-	require.NoError(t, err)
 
-	stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
-	stateB := newState("bucket", "b", "etag", time.Unix(2000, 0))
-	stateC := newState("bucket", "c", "etag", time.Unix(3000, 0))
+	t.Run("GetStartAfterKey returns persisted tail", func(t *testing.T) {
+		store := openTestStatestore()
+		registry, err := newStateRegistry(logger, store, "", true, 10)
+		require.NoError(t, err)
 
-	// Add states in non-sorted order
-	err = registry.AddState(stateC)
-	require.NoError(t, err)
-	err = registry.AddState(stateA)
-	require.NoError(t, err)
-	err = registry.AddState(stateB)
-	require.NoError(t, err)
+		// Initially no tail
+		require.Empty(t, registry.GetStartAfterKey())
 
-	// Heap should return lexicographically smallest key
-	leastState := registry.GetLeastState()
-	require.NotNil(t, leastState)
-	require.Equal(t, "a", leastState.Key, "GetLeastState should return lexicographically smallest key")
+		// Mark object in-flight - tail should be set
+		err = registry.MarkObjectInFlight("b")
+		require.NoError(t, err)
+		require.Equal(t, "b", registry.GetStartAfterKey())
+
+		// Mark smaller key in-flight - tail should update
+		err = registry.MarkObjectInFlight("a")
+		require.NoError(t, err)
+		require.Equal(t, "a", registry.GetStartAfterKey())
+
+		// Unmark "a" - tail should move to "b"
+		err = registry.UnmarkObjectInFlight("a")
+		require.NoError(t, err)
+		require.Equal(t, "b", registry.GetStartAfterKey())
+
+		// Unmark "b" - no more in-flight, tail should be empty
+		err = registry.UnmarkObjectInFlight("b")
+		require.NoError(t, err)
+		require.Empty(t, registry.GetStartAfterKey())
+	})
+
+	t.Run("Tail considers both in-flight and completed states", func(t *testing.T) {
+		store := openTestStatestore()
+		registry, err := newStateRegistry(logger, store, "", true, 10)
+		require.NoError(t, err)
+
+		// Add completed state
+		stateC := newState("bucket", "c", "etag", time.Unix(1000, 0))
+		stateC.Stored = true
+		err = registry.AddState(stateC)
+		require.NoError(t, err)
+
+		// Mark "a" in-flight (smaller than "c")
+		err = registry.MarkObjectInFlight("a")
+		require.NoError(t, err)
+		require.Equal(t, "a", registry.GetStartAfterKey())
+
+		// Unmark "a" - tail should now be "c" (smallest completed)
+		err = registry.UnmarkObjectInFlight("a")
+		require.NoError(t, err)
+		require.Equal(t, "c", registry.GetStartAfterKey())
+	})
+
+	t.Run("Tail persists and survives registry reload", func(t *testing.T) {
+		store := openTestStatestore()
+
+		// Create first registry and set a tail
+		registry1, err := newStateRegistry(logger, store, "", true, 10)
+		require.NoError(t, err)
+		err = registry1.MarkObjectInFlight("a")
+		require.NoError(t, err)
+		require.Equal(t, "a", registry1.GetStartAfterKey())
+
+		// Create new registry from same store - should load persisted tail
+		registry2, err := newStateRegistry(logger, store, "", true, 10)
+		require.NoError(t, err)
+		require.Equal(t, "a", registry2.GetStartAfterKey())
+	})
 }
 
 func TestLexicographicalStateRegistry_CleanUp(t *testing.T) {
@@ -481,10 +528,14 @@ func TestLexicographicalStateRegistry_HeapOrder(t *testing.T) {
 	err = registry.AddState(stateB)
 	require.NoError(t, err)
 
-	// The heap should always return the lexicographically smallest key
-	leastState := registry.GetLeastState()
-	require.NotNil(t, leastState)
-	require.Equal(t, "a", leastState.Key, "GetLeastState should return lexicographically smallest key")
+	// After adding completed states, the tail should be computed from them
+	// Mark an object in-flight to establish a tail
+	err = registry.MarkObjectInFlight("z")
+	require.NoError(t, err)
+	// Unmark it - now tail should be the smallest completed key
+	err = registry.UnmarkObjectInFlight("z")
+	require.NoError(t, err)
+	require.Equal(t, "a", registry.GetStartAfterKey(), "GetStartAfterKey should return lexicographically smallest key")
 }
 
 // ============================================================================
@@ -543,7 +594,7 @@ func TestStateRegistryBehaviorDifferences(t *testing.T) {
 		require.True(t, lexicoRegistry.IsProcessed(state.IDWithLexicographicalOrdering()))
 	})
 
-	t.Run("GetOldestState behavior differs", func(t *testing.T) {
+	t.Run("GetStartAfterKey behavior differs", func(t *testing.T) {
 		normalStore := openTestStatestore()
 		lexicoStore := openTestStatestore()
 
@@ -560,8 +611,13 @@ func TestStateRegistryBehaviorDifferences(t *testing.T) {
 		err = lexicoRegistry.AddState(state)
 		require.NoError(t, err)
 
-		require.Nil(t, normalRegistry.GetLeastState())
-		require.NotNil(t, lexicoRegistry.GetLeastState())
+		require.Empty(t, normalRegistry.GetStartAfterKey())
+		// Mark and unmark to establish tail from completed state
+		err = lexicoRegistry.MarkObjectInFlight("z")
+		require.NoError(t, err)
+		err = lexicoRegistry.UnmarkObjectInFlight("z")
+		require.NoError(t, err)
+		require.NotEmpty(t, lexicoRegistry.GetStartAfterKey())
 	})
 
 	t.Run("Capacity limiting only applies to lexicographical", func(t *testing.T) {

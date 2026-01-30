@@ -326,9 +326,14 @@ func TestS3Poller(t *testing.T) {
 		err = registry.AddState(existingState)
 		require.NoError(t, err, "state add must succeed")
 
-		oldestState := registry.GetLeastState()
-		require.NotNil(t, oldestState)
-		require.Equal(t, "existing-key", oldestState.Key)
+		// Mark an object in-flight and unmark it to trigger tail computation from completed state
+		err = registry.MarkObjectInFlight("zzz-temp")
+		require.NoError(t, err)
+		err = registry.UnmarkObjectInFlight("zzz-temp")
+		require.NoError(t, err)
+
+		startAfterKey := registry.GetStartAfterKey()
+		require.Equal(t, "existing-key", startAfterKey)
 
 		// Expect ListObjectsPaginator to be called with startAfterKey = "existing-key"
 		mockAPI.EXPECT().
@@ -415,8 +420,8 @@ func TestS3Poller(t *testing.T) {
 		registry, err := newStateRegistry(nil, store, "", true, 100)
 		require.NoError(t, err, "registry creation must succeed")
 
-		oldestState := registry.GetLeastState()
-		require.Nil(t, oldestState)
+		startAfterKey := registry.GetStartAfterKey()
+		require.Empty(t, startAfterKey)
 
 		// Expect ListObjectsPaginator to be called with empty startAfterKey
 		mockAPI.EXPECT().
@@ -968,7 +973,7 @@ func Test_S3StateHandling(t *testing.T) {
 
 			require.Equal(t, len(test.expectStateIDs), statesLen)
 			for _, id := range missingIDs {
-				t.Errorf("state with ID %s should exist", id)
+					t.Errorf("state with ID %s should exist", id)
 			}
 		})
 	}

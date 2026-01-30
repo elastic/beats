@@ -32,14 +32,6 @@ func TestNormalPollingStrategy(t *testing.T) {
 	strategy := newNormalPollingStrategy()
 	log := logp.NewLogger("normal_polling_strategy_test")
 
-	t.Run("PrePollSetup does nothing", func(t *testing.T) {
-		store := openTestStatestore()
-		registry, err := newStateRegistry(nil, store, "", false, 0)
-		require.NoError(t, err)
-
-		strategy.PrePollSetup(log, registry)
-	})
-
 	t.Run("GetStartAfterKey returns empty string", func(t *testing.T) {
 		store := openTestStatestore()
 		registry, err := newStateRegistry(nil, store, "", false, 0)
@@ -49,7 +41,7 @@ func TestNormalPollingStrategy(t *testing.T) {
 		err = registry.AddState(st)
 		require.NoError(t, err)
 
-		startKey := strategy.GetStartAfterKey(registry)
+		startKey := registry.GetStartAfterKey()
 		assert.Empty(t, startKey, "normal mode should always return empty startAfterKey")
 	})
 
@@ -76,31 +68,6 @@ func TestLexicographicalPollingStrategy(t *testing.T) {
 	strategy := newLexicographicalPollingStrategy()
 	log := logp.NewLogger("lexicographical_polling_strategy_test")
 
-	t.Run("PrePollSetup is a no-op (heap maintains order)", func(t *testing.T) {
-		store := openTestStatestore()
-		registry, err := newStateRegistry(log, store, "", true, 100)
-		require.NoError(t, err)
-
-		// Add states in random order
-		st1 := state{Bucket: "bucket", Key: "key-c", Etag: "etag1", LastModified: time.Now()}
-		st2 := state{Bucket: "bucket", Key: "key-a", Etag: "etag2", LastModified: time.Now()}
-		st3 := state{Bucket: "bucket", Key: "key-b", Etag: "etag3", LastModified: time.Now()}
-
-		err = registry.AddState(st1)
-		require.NoError(t, err)
-		err = registry.AddState(st2)
-		require.NoError(t, err)
-		err = registry.AddState(st3)
-		require.NoError(t, err)
-
-		strategy.PrePollSetup(log, registry)
-
-		// Heap should always return the lexicographically smallest key
-		leastState := registry.GetLeastState()
-		require.NotNil(t, leastState)
-		assert.Equal(t, "key-a", leastState.Key, "GetLeastState should return lexicographically smallest key")
-	})
-
 	t.Run("GetStartAfterKey returns lexicographically smallest key", func(t *testing.T) {
 		store := openTestStatestore()
 		registry, err := newStateRegistry(log, store, "", true, 100)
@@ -114,8 +81,14 @@ func TestLexicographicalPollingStrategy(t *testing.T) {
 		err = registry.AddState(st1)
 		require.NoError(t, err)
 
+		// Mark and unmark to trigger tail computation from completed states
+		err = registry.MarkObjectInFlight("zzz-temp")
+		require.NoError(t, err)
+		err = registry.UnmarkObjectInFlight("zzz-temp")
+		require.NoError(t, err)
+
 		// Should return lexicographically smallest key
-		startKey := strategy.GetStartAfterKey(registry)
+		startKey := registry.GetStartAfterKey()
 		assert.Equal(t, "aaa-first", startKey)
 	})
 
@@ -124,7 +97,7 @@ func TestLexicographicalPollingStrategy(t *testing.T) {
 		registry, err := newStateRegistry(log, store, "", true, 100)
 		require.NoError(t, err)
 
-		startKey := strategy.GetStartAfterKey(registry)
+		startKey := registry.GetStartAfterKey()
 		assert.Empty(t, startKey)
 	})
 
@@ -171,8 +144,8 @@ func TestPollingStrategyBehaviorDifferences(t *testing.T) {
 		err = lexicoRegistry.AddState(st2)
 		require.NoError(t, err)
 
-		assert.Empty(t, normalStrategy.GetStartAfterKey(normalRegistry))
-		assert.Equal(t, "key1", lexicoStrategy.GetStartAfterKey(lexicoRegistry))
+		assert.Empty(t, normalRegistry.GetStartAfterKey())
+		assert.Equal(t, "key1", lexicoRegistry.GetStartAfterKey())
 	})
 
 	t.Run("Object filtering behavior differs", func(t *testing.T) {

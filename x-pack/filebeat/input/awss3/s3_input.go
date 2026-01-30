@@ -121,8 +121,6 @@ func (in *s3PollerInput) run(ctx context.Context) {
 	for ctx.Err() == nil {
 		runStartTime := time.Now()
 
-		in.strategy.PrePollSetup(in.log, in.registry)
-
 		in.runPoll(ctx)
 
 		runElapsedTime := time.Since(runStartTime)
@@ -180,11 +178,21 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 	rateLimitWaiter := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 	for _state := range workChan {
 		state := _state
+
+		// Only used in lexicographical mode; no-op in normal mode.
+		if err := in.registry.MarkObjectInFlight(state.Key); err != nil {
+			in.log.Errorf("failed to mark object in-flight: %v", err)
+		}
+
 		event := in.s3EventForState(state)
 
 		objHandler := in.s3ObjectHandler.Create(ctx, event)
 		if objHandler == nil {
 			in.log.Debugw("empty s3 processor (no matching reader configs).", "state", state)
+			// Only used in lexicographical mode; no-op in normal mode.
+			if err := in.registry.UnmarkObjectInFlight(state.Key); err != nil {
+				in.log.Errorf("failed to unmark object in-flight: %v", err)
+			}
 			continue
 		}
 
@@ -202,6 +210,9 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			in.status.UpdateStatus(status.Degraded,
 				fmt.Sprintf("S3 download failure for object key '%s' in bucket '%s': %s",
 					state.Key, state.Bucket, err.Error()))
+			if err := in.registry.UnmarkObjectInFlight(state.Key); err != nil {
+				in.log.Errorf("failed to unmark object in-flight: %v", err)
+			}
 			rateLimitWaiter.Wait()
 			continue
 		}
@@ -250,7 +261,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 	errorBackoff := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 	circuitBreaker := 0
 
-	startAfterKey := in.strategy.GetStartAfterKey(in.registry)
+	startAfterKey := in.registry.GetStartAfterKey()
 
 	paginator := in.s3.ListObjectsPaginator(in.log, bucketName, in.config.BucketListPrefix, startAfterKey)
 	for paginator.HasMorePages() {
