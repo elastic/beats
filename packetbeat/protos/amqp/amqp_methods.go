@@ -21,6 +21,9 @@ import (
 	"encoding/binary"
 	"strconv"
 	"strings"
+	// unsafe is used only for unsafe.Sizeof in generic helpers to calculate
+	// type sizes. No pointer arithmetic or other unsafe memory operations
+	// are performed.
 	"unsafe"
 
 	"github.com/elastic/elastic-agent-libs/logp"
