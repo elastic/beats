@@ -993,7 +993,7 @@ func okMethod(m *amqpMessage, args []byte) (bool, bool) {
 // of the length key. It sends back an error if slice is too short for declared
 // length and string, or if the offset itself is out of bounds. if length == 0
 // the function sends back an empty string. bytesConsumed represents the number
-// of bytes of the returend string + 1 for the length itself,
+// of bytes of the returned string + 1 for the length itself,
 func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short string, bytesConsumed uint32, err bool) {
 	var length T
 	if len(data) == 0 {
