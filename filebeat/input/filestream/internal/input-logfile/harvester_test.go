@@ -43,6 +43,23 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+const (
+	eventuallyTimeout  = 5 * time.Second
+	eventuallyInterval = 10 * time.Millisecond
+)
+
+// requireEventually wraps require.Eventually with consistent timeout and polling interval.
+func requireEventually(t *testing.T, condition func() bool, msgAndArgs ...any) {
+	t.Helper()
+	require.Eventually(t, condition, eventuallyTimeout, eventuallyInterval, msgAndArgs...)
+}
+
+// requireEventuallyWithT wraps require.EventuallyWithT with consistent timeout and polling interval.
+func requireEventuallyWithT(t *testing.T, condition func(c *assert.CollectT), msgAndArgs ...any) {
+	t.Helper()
+	require.EventuallyWithT(t, condition, eventuallyTimeout, eventuallyInterval, msgAndArgs...)
+}
+
 func TestReaderGroup(t *testing.T) {
 	requireGroupSuccess := func(t *testing.T, ctx context.Context, cf context.CancelFunc, err error) {
 		require.NotNil(t, ctx)
@@ -100,25 +117,17 @@ func TestReaderGroup(t *testing.T) {
 func TestDefaultHarvesterGroup(t *testing.T) {
 	source := &testSource{name: "/path/to/test"}
 
-	requireSourceAddedToBookkeeper := func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
-		require.True(t, hg.readers.hasID(hg.identifier.ID(s)))
-	}
-
-	requireSourceRemovedFromBookkeeper := func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
-		require.False(t, hg.readers.hasID(hg.identifier.ID(s)))
-	}
-
 	t.Run("assert a harvester is started in a goroutine", func(t *testing.T) {
 		var wg sync.WaitGroup
 
 		mockHarvester := &mockHarvester{onRun: correctOnRun, wg: &wg}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		hg := testDefaultHarvesterGroup(t, mockHarvester, 0)
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
 
 		wg.Add(1)
-		ctx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
 		hg.Start(ctx, source)
 
 		// wait until harvester.Run is done
@@ -128,7 +137,10 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		require.Equal(t, 1, mockHarvester.getRunCount())
 
-		requireSourceRemovedFromBookkeeper(t, hg, source)
+		// Wait for source to be removed from bookkeeper.
+		requireEventually(t,
+			func() bool { return !hg.readers.hasID(hg.identifier.ID(source)) },
+			"source should be removed from bookkeeper")
 		// stopped source can be stopped
 		require.Nil(t, hg.StopHarvesters())
 	})
@@ -161,8 +173,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 			onRun: harvesterRun,
 			wg:    &wg,
 		}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
-		hg.tg = task.NewGroup(1, time.Second, &logp.Logger{}, "")
+		hg := testDefaultHarvesterGroup(t, mockHarvester, 1)
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
@@ -170,7 +181,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		source1 := &testSource{name: "/path/to/test/1"}
 		source2 := &testSource{name: "/path/to/test/2"}
 		wg.Add(2)
-		ctx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
 		hg.Start(ctx, source1)
 		hg.Start(ctx, source2)
 
@@ -209,8 +220,13 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		require.Equal(t, 2, mockHarvester.getRunCount())
 
-		requireSourceRemovedFromBookkeeper(t, hg, source1)
-		requireSourceRemovedFromBookkeeper(t, hg, source2)
+		// Wait for sources to be removed from bookkeeper.
+		requireEventually(t,
+			func() bool {
+				return !hg.readers.hasID(hg.identifier.ID(source1)) &&
+					!hg.readers.hasID(hg.identifier.ID(source2))
+			},
+			"sources should be removed from bookkeeper")
 
 		// stopped source can be stopped
 		require.Nil(t, hg.StopHarvesters())
@@ -218,44 +234,70 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 	t.Run("assert a harvester can be stopped and removed from bookkeeper", func(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
-
-		goroutinesChecker := resources.NewGoroutinesChecker()
-
-		ctx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
-		hg.Start(ctx, source)
-
-		goroutinesChecker.WaitUntilIncreased(1)
-		// wait until harvester is started
-		require.Eventually(t,
-			func() bool { return mockHarvester.getRunCount() == 1 },
-			5*time.Second,
-			10*time.Millisecond,
-			"run count must equal one")
-		requireSourceAddedToBookkeeper(t, hg, source)
-		// after started, stop it
-		hg.Stop(source)
-		_, err := goroutinesChecker.WaitUntilOriginalCount()
-		require.NoError(t, err)
-		requireSourceRemovedFromBookkeeper(t, hg, source)
-	})
-
-	t.Run("assert a harvester for same source cannot be started", func(t *testing.T) {
-		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg := testDefaultHarvesterGroup(t, mockHarvester, 0)
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
 
-		hg.Start(inputCtx, source)
-		hg.Start(inputCtx, source)
+		ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg.Start(ctx, source)
 
-		goroutinesChecker.WaitUntilIncreased(2)
-		// error is expected as a harvester group was expected to start twice for the same source
-		for !hg.readers.hasID(hg.identifier.ID(source)) {
+		// Wait until harvester is started and registered in bookkeeper.
+		requireEventually(t,
+			func() bool {
+				return mockHarvester.getRunCount() == 1 && hg.readers.hasID(hg.identifier.ID(source))
+			},
+			"harvester should be running and registered")
+		// after started, stop it
+		hg.Stop(source)
+		// Wait for source to be removed from bookkeeper.
+		requireEventually(t,
+			func() bool { return !hg.readers.hasID(hg.identifier.ID(source)) },
+			"source should be removed from bookkeeper")
+		// StopHarvesters waits for all goroutines to fully complete, including deferred logging.
+		require.NoError(t, hg.StopHarvesters())
+	})
+
+	sameSourceTest := func(t *testing.T, limit uint64) {
+		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
+		hg := testDefaultHarvesterGroup(t, mockHarvester, limit)
+		inputCtx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+
+		goroutinesChecker := resources.NewGoroutinesChecker()
+		defer goroutinesChecker.WaitUntilOriginalCount()
+
+		// Start first harvester and wait for it to be registered
+		hg.Start(inputCtx, source)
+		requireEventually(t,
+			func() bool { return hg.readers.hasID(hg.identifier.ID(source)) },
+			"first harvester should be registered")
+		// To avoid any kind of race, wait for the mock harvester to be running as well since that happens _after_ the
+		// source ID is registered
+		requireEventuallyWithT(t,
+			func(c *assert.CollectT) {
+				assert.Equal(c, 1, mockHarvester.getRunCount())
+			},
+			"one mock harvester should be running")
+
+		// Repeatedly try to start additional harvesters for the same source
+		// None of them should succeed because one is already running
+		done := make(chan struct{})
+		go func() {
+			defer close(done)
+			for range 20 {
+				hg.Start(inputCtx, source)
+				time.Sleep(time.Millisecond / 4)
+			}
+		}()
+
+		// Verify runCount stays at 1 while we start new harvesters
+		for { // Check at least once
+			assert.Equal(t, 1, mockHarvester.getRunCount())
+			if isClosed(done) {
+				break
+			}
+			time.Sleep(time.Millisecond / 10) // tiny sleep to not monopolize the CPU
 		}
-		time.Sleep(3 * time.Millisecond)
 
 		hg.Stop(source)
 
@@ -263,11 +305,18 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, 1, mockHarvester.getRunCount())
+	}
+	t.Run("assert a harvester for same source cannot be started", func(t *testing.T) {
+		for _, limit := range []uint64{0, 1, 100} {
+			t.Run(fmt.Sprintf("limit=%d", limit), func(t *testing.T) {
+				sameSourceTest(t, limit)
+			})
+		}
 	})
 
 	t.Run("assert a harvester panic is handled", func(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: panicOnRun}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		hg := testDefaultHarvesterGroup(t, mockHarvester, 0)
 		defer func() {
 			if v := recover(); v != nil {
 				t.Errorf("did not recover from harvester panic in defaultHarvesterGroup")
@@ -275,16 +324,21 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		}()
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
+		defer goroutinesChecker.WaitUntilOriginalCount()
 
-		ctx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
 		hg.Start(ctx, source)
 
-		// wait until harvester is stopped
-		goroutinesChecker.WaitUntilOriginalCount()
+		// First wait for the harvester to run (runCount increases when Run is called,
+		// before the panic occurs).
+		requireEventually(t,
+			func() bool { return mockHarvester.getRunCount() == 1 },
+			"harvester should have run once")
 
-		// make sure harvester had run once
-		require.Equal(t, 1, mockHarvester.getRunCount())
-		requireSourceRemovedFromBookkeeper(t, hg, source)
+		// Then wait for source to be removed from bookkeeper after panic recovery.
+		requireEventually(t,
+			func() bool { return !hg.readers.hasID(hg.identifier.ID(source)) },
+			"source should be removed from bookkeeper after panic")
 
 		require.Nil(t, hg.StopHarvesters())
 	})
@@ -292,18 +346,18 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	t.Run("assert a harvester error is handled", func(t *testing.T) {
 		testLog := &testLogger{}
 		mockHarvester := &mockHarvester{onRun: errorOnRun}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
-		hg.tg = task.NewGroup(0, 100*time.Millisecond, testLog, "")
+		hg := testDefaultHarvesterGroupWithLogger(t, mockHarvester, 0, testLog)
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
 
-		ctx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
 		hg.Start(ctx, source)
 
-		goroutinesChecker.WaitUntilOriginalCount()
-
-		requireSourceRemovedFromBookkeeper(t, hg, source)
+		// Wait for the harvester to be removed from the bookkeeper after the error.
+		requireEventually(t,
+			func() bool { return !hg.readers.hasID(hg.identifier.ID(source)) },
+			"source should be removed from bookkeeper after error")
 
 		err := hg.StopHarvesters()
 		assert.NoError(t, err)
@@ -314,8 +368,8 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	t.Run("assert already locked resource has to wait", func(t *testing.T) {
 		var wg sync.WaitGroup
 		mockHarvester := &mockHarvester{onRun: correctOnRun, wg: &wg}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg := testDefaultHarvesterGroup(t, mockHarvester, 0)
+		inputCtx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
 
 		r, err := lock(inputCtx, hg.store, hg.identifier.ID(source))
 		if err != nil {
@@ -327,15 +381,11 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		wg.Add(1)
 		hg.Start(inputCtx, source)
 
-		goroutinesChecker.WaitUntilIncreased(1)
-		ok := false
-		for !ok {
-			// wait until harvester is added to the bookeeper
-			ok = hg.readers.hasID(hg.identifier.ID(source))
-			if ok {
-				releaseResource(r)
-			}
-		}
+		// Wait until harvester is added to the bookkeeper.
+		requireEventually(t,
+			func() bool { return hg.readers.hasID(hg.identifier.ID(source)) },
+			"harvester should be registered in readers table")
+		releaseResource(r)
 
 		// wait until harvester.Run is done
 		wg.Wait()
@@ -348,9 +398,8 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	t.Run("assert already locked resource has no problem when harvestergroup is cancelled", func(t *testing.T) {
 		testLog := &testLogger{}
 		mockHarvester := &mockHarvester{onRun: correctOnRun}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
-		hg.tg = task.NewGroup(0, 50*time.Millisecond, testLog, "")
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg := testDefaultHarvesterGroupWithLogger(t, mockHarvester, 0, testLog)
+		inputCtx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
@@ -363,7 +412,11 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		hg.Start(inputCtx, source)
 
-		goroutinesChecker.WaitUntilIncreased(1)
+		// Wait for the harvester to be registered in the readers table.
+		requireEventually(t,
+			func() bool { return hg.readers.hasID(hg.identifier.ID(source)) },
+			"harvester should be registered in readers table")
+
 		assert.NoError(t, hg.StopHarvesters())
 
 		assert.Equal(t, 0, mockHarvester.getRunCount())
@@ -372,8 +425,8 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	t.Run("assert harvester can be restarted", func(t *testing.T) {
 		var wg sync.WaitGroup
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun, wg: &wg}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg := testDefaultHarvesterGroup(t, mockHarvester, 0)
+		inputCtx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
@@ -424,7 +477,7 @@ func TestCursorAllEventsPublished(t *testing.T) {
 
 	var cursor Cursor
 	mockHarvester := &mockHarvester{onRun: runFn, wg: &wg}
-	hg := testDefaultHarvesterGroup(t, mockHarvester)
+	hg := testDefaultHarvesterGroup(t, mockHarvester, 0)
 	hg.pipeline = &MockPipeline{
 		// Define the callback that will be called before each event is
 		// published/acknowledged, when this callback is called, the
@@ -526,14 +579,18 @@ func TestCursorAllEventsPublished(t *testing.T) {
 		"once the harvester is done, the resource must be unlocked, 'pending' must be 0")
 }
 
-func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHarvesterGroup {
+func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester, limit uint64) *defaultHarvesterGroup {
+	return testDefaultHarvesterGroupWithLogger(t, mockHarvester, limit, logptest.NewTestingLogger(t, ""))
+}
+
+func testDefaultHarvesterGroupWithLogger(t *testing.T, mockHarvester Harvester, limit uint64, logger task.Logger) *defaultHarvesterGroup {
 	return &defaultHarvesterGroup{
 		readers:    newReaderGroup(),
 		pipeline:   &MockPipeline{},
 		harvester:  mockHarvester,
 		store:      testOpenStore(t, "test", nil),
 		identifier: &SourceIdentifier{"filestream::.global::"},
-		tg:         task.NewGroup(0, time.Second, logp.L(), ""),
+		tg:         task.NewGroup(limit, 5*time.Second, logger, ""),
 	}
 }
 
@@ -690,4 +747,13 @@ type mockStatusReporter struct{}
 
 // UpdateStatus is a no-op
 func (m mockStatusReporter) UpdateStatus(status status.Status, msg string) {
+}
+
+func isClosed(done chan struct{}) bool {
+	select {
+	case <-done:
+		return true
+	default:
+	}
+	return false
 }

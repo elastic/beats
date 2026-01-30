@@ -72,7 +72,7 @@ filebeat.inputs:
 ## Reading GZIP files [reading-gzip-files]
 
 ```{applies_to}
-stack: ga 9.3.0, beta 9.2.0
+stack: ga 9.3+, beta =9.2
 ```
 
 The `filestream` input can ingest GZIP files.
@@ -117,10 +117,10 @@ and both size and checksum validations happens. If either validation fails,
 
 ### Performance impact
 
-Our benchmarks indicate that reading GZIP files has a negligible impact on the 
+Our benchmarks indicate that reading GZIP files has a negligible impact on the
 throughput of Filebeat and its CPU usage.
 
-However, each harvester reading a GZIP file consumes approximately 100KB of 
+However, each harvester reading a GZIP file consumes approximately 100KB of
 additional memory. You should consider this memory increase when configuring the
 `harvester_limit`.
 
@@ -333,8 +333,8 @@ harvested by this input are taken over.
 
 The syntax for enabling take over mode varies by version:
 
-* {applies_to}`stack: beta 9.0.0` Use `take_over: true`.
-* {applies_to}`stack: beta 9.1.0` Use `take_over.enabled: true`.
+* {applies_to}`stack: beta 9.1+` Use `take_over.enabled: true`.
+* {applies_to}`stack: beta =9.0` Use `take_over: true`.
 
 :::{note}
 While `take_over: true` is still supported to migrate state from the `log` input to
@@ -347,14 +347,14 @@ the new syntax if possible.
 To take over files from a `log` input, enable take over mode
 and make sure the files you want this input to take over match the configured globs in `paths`.
 
-::::{tab-set}
-:::{tab-item} 9.1.0
+::::{applies-switch}
+:::{applies-item} stack: ga 9.1+
 ```yaml
 take_over:
   enabled: true
 ```
 :::
-:::{tab-item} 9.0.0
+:::{applies-item} stack: ga =9.0
 ```yaml
 take_over: true
 ```
@@ -642,7 +642,7 @@ stack: ga 9.3
 
 Includes the log file group to `log.file` metadata.
 This option is not supported on Windows.
- 
+
 
 ### `exclude_lines` [filebeat-input-filestream-exclude-lines]
 
@@ -723,7 +723,7 @@ See [Reading GZIP files](#reading-gzip-files) for more details on GZIP support.
 ### `gzip_experimental` (deprecated) [filebeat-input-filestream-gzip-experimental]
 
 ```{applies_to}
-stack: removed 9.3.0, beta 9.2.0
+stack: removed 9.3+, beta =9.2
 ```
 
 :::{note}
