@@ -88,7 +88,9 @@ func (g *GUID) AsFileTime() time.Time {
 
 	// Re-assemble the 60-bit timestamp
 	// (time_hi << 48) | (time_mid << 32) | time_low
-	timestamp100ns := int64((timeHi << 48) | (timeMid << 32) | timeLow)
+	// Use uint64 for the calculation to avoid G115 overflow warnings
+	uVal := uint64((timeHi << 48) | (timeMid << 32) | timeLow)
+	timestamp100ns := int64(uVal)
 
 	// 'uuidEpochOffset' is the number of 100-ns intervals
 	// between the UUID epoch (Oct 15, 1582) and the Go/Unix epoch (Jan 1, 1970).

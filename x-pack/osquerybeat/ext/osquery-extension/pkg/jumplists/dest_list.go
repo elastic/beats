@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -118,19 +119,33 @@ func NewDestList(data []byte, log *logger.Logger) (*DestList, error) {
 	return destList, nil
 }
 
+func readInt32(b []byte) int32 {
+	val := binary.LittleEndian.Uint32(b)
+	if val > math.MaxInt32 {
+		return -1
+	}
+	return int32(val)
+}
+
+func readFloat32(b []byte) float32 {
+	bits := binary.LittleEndian.Uint32(b)
+	return math.Float32frombits(bits)
+}
+
 func NewDestListHeader(data []byte) (*DestListHeader, error) {
 	if len(data) < 32 {
 		return nil, fmt.Errorf("data is too short to contain a DestListHeader")
 	}
+
 	header := &DestListHeader{
-		Version:               int32(binary.LittleEndian.Uint32(data[0:4])),
-		NumberOfEntries:       int32(binary.LittleEndian.Uint32(data[4:8])),
-		NumberOfPinnedEntries: int32(binary.LittleEndian.Uint32(data[8:12])),
-		UnknownCounter:        float32(binary.LittleEndian.Uint32(data[12:16])),
-		LastEntryNumber:       int32(binary.LittleEndian.Uint32(data[16:20])),
-		Unknown1:              int32(binary.LittleEndian.Uint32(data[20:24])),
-		LastRevisionNumber:    int32(binary.LittleEndian.Uint32(data[24:28])),
-		Unknown2:              int32(binary.LittleEndian.Uint32(data[28:32])),
+		Version:               readInt32(data[0:4]),
+		NumberOfEntries:       readInt32(data[4:8]),
+		NumberOfPinnedEntries: readInt32(data[8:12]),
+		UnknownCounter:        readFloat32(data[12:16]),
+		LastEntryNumber:       readInt32(data[16:20]),
+		Unknown1:              readInt32(data[20:24]),
+		LastRevisionNumber:    readInt32(data[24:28]),
+		Unknown2:              readInt32(data[28:32]),
 	}
 	return header, nil
 }
@@ -301,9 +316,9 @@ func NewDestListEntry(data []byte, version int32, log *logger.Logger) (*DestList
 			return nil, fmt.Errorf("data is too short to contain a version %d DestListEntry", version)
 		}
 
-		interactionCount = int32(binary.LittleEndian.Uint32(data[116:120]))
-		unknown3 = int32(binary.LittleEndian.Uint32(data[120:124]))
-		unknown4 = int32(binary.LittleEndian.Uint32(data[124:128]))
+		interactionCount = readInt32(data[116:120])
+		unknown3 = readInt32(data[120:124])
+		unknown4 = readInt32(data[124:128])
 
 		pathLength := int(binary.LittleEndian.Uint16(data[128:130]))
 		if len(data) < 130+(pathLength*2) {
@@ -338,12 +353,12 @@ func NewDestListEntry(data []byte, version int32, log *logger.Logger) (*DestList
 	volumeBirthDroid := NewGUID(data[40:56])
 	fileBirthDroid := NewGUID(data[56:72])
 	hostname := parseHostname(data[72:88])
-	entryNumber := int32(binary.LittleEndian.Uint32(data[88:92]))
+	entryNumber := readInt32(data[88:92])
 	name := fmt.Sprintf("%x", entryNumber)
-	unknown0 := int32(binary.LittleEndian.Uint32(data[92:96]))
-	accessCount := float32(binary.LittleEndian.Uint32(data[96:100]))
+	unknown0 := readInt32(data[92:96])
+	accessCount := readFloat32(data[96:100])
 	lastModifiedTime := parseTimestamp(data[100:108])
-	pinStatus := int32(binary.LittleEndian.Uint32(data[108:112]))
+	pinStatus := readInt32(data[108:112])
 	macAddress := fileDroid.AsMacAddress()
 	creationTime := fileDroid.AsFileTime()
 	path := string(utf16.Decode(rawPath))
