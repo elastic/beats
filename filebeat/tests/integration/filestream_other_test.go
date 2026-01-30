@@ -31,6 +31,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -43,7 +44,7 @@ func TestFilestreamHasOwnerAndGroup(t *testing.T) {
 	tempDir := filebeat.TempDir()
 	logFilePath := filepath.Join(tempDir, "input.log")
 
-	integration.WriteLogFile(t, logFilePath, 25, false)
+	testhelpers.WriteLogFile(t, logFilePath, 25, false)
 
 	cfg := fmt.Sprintf(`
 filebeat.inputs:

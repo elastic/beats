@@ -31,6 +31,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -64,7 +65,7 @@ func testLargeScaleFilestreamDelete(t *testing.T, timeout time.Duration, nFiles,
 	fb := integration.NewBeat(t, "filebeat", "../../filebeat.test")
 	start := time.Now()
 
-	dir := integration.WriteNLogFiles(t, fb.TempDir(), nFiles, lines)
+	dir := testhelpers.WriteNLogFiles(t, fb.TempDir(), nFiles, lines)
 	elapsed := time.Since(start)
 
 	t.Logf("%d files with %d lines each generated in %s", nFiles, lines, elapsed)

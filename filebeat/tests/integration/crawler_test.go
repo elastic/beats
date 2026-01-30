@@ -29,6 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -68,7 +69,7 @@ output.file:
 	filebeat.Start()
 
 	// 3. Create the log file
-	integration.WriteLogFile(t, filepath.Join(tempDir, "log.log"), 10, false)
+	testhelpers.WriteLogFile(t, filepath.Join(tempDir, "log.log"), 10, false)
 
 	// wait for output file to exist
 	var outputFile string
@@ -107,7 +108,7 @@ output.file:
 	}
 
 	// Add one more line to make sure it keeps reading
-	integration.WriteLogFile(t, filepath.Join(tempDir, "log.log"), 1, true)
+	testhelpers.WriteLogFile(t, filepath.Join(tempDir, "log.log"), 1, true)
 
 	// Ensure all logs are ingested
 	integration.WaitLineCountInFile(t, outputFile, 12)
@@ -117,7 +118,7 @@ output.file:
 
 	// using 6 events to have a separate log line that we can
 	// grep for.
-	integration.WriteLogFile(t, filepath.Join(tempDir, "newlog.log"), 6, true)
+	testhelpers.WriteLogFile(t, filepath.Join(tempDir, "newlog.log"), 6, true)
 
 	// Ensure all logs are ingested
 	integration.WaitLineCountInFile(t, outputFile, 18)
@@ -159,9 +160,9 @@ output.file:
 
 	// 3. Create the log file
 	iterations := 20
-	integration.WriteLogFile(t, logFilePath, iterations, false, "DBG: a simple debug message")
-	integration.WriteLogFile(t, logFilePath, iterations, true, "ERR: a simple error message")
-	integration.WriteLogFile(t, logFilePath, iterations, true, "WARNING: a simple warning message")
+	testhelpers.WriteLogFile(t, logFilePath, iterations, false, "DBG: a simple debug message")
+	testhelpers.WriteLogFile(t, logFilePath, iterations, true, "ERR: a simple error message")
+	testhelpers.WriteLogFile(t, logFilePath, iterations, true, "WARNING: a simple warning message")
 
 	// wait for output file to exist
 	var outputFile string
@@ -214,9 +215,9 @@ output.file:
 
 	// 3. Create the log file
 	iterations := 20
-	integration.WriteLogFile(t, logFilePath, iterations, false, "DBG: a simple debug message")
-	integration.WriteLogFile(t, logFilePath, iterations, true, "ERR: a simple error message")
-	integration.WriteLogFile(t, logFilePath, iterations, true, "WARNING: a simple warning message")
+	testhelpers.WriteLogFile(t, logFilePath, iterations, false, "DBG: a simple debug message")
+	testhelpers.WriteLogFile(t, logFilePath, iterations, true, "ERR: a simple error message")
+	testhelpers.WriteLogFile(t, logFilePath, iterations, true, "WARNING: a simple warning message")
 
 	// wait for output file to exist
 	var outputFile string

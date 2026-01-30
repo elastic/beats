@@ -27,6 +27,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/testing/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -45,8 +46,8 @@ func TestCustomFields(t *testing.T) {
 		PrintConfigOnFail: true,
 	}
 
-	generator := NewPlainTextGenerator(messagePrefix)
-	path, file := GenerateLogFiles(t, fileCount, lineCount, generator)
+	generator := testhelpers.NewPlainTextGenerator(messagePrefix)
+	path, file := testhelpers.GenerateLogFiles(t, fileCount, lineCount, generator)
 
 	t.Run("tests that custom fields show up in the output dict and  agent.name defaults to hostname", func(t *testing.T) {
 

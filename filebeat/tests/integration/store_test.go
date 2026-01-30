@@ -29,6 +29,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -85,7 +86,7 @@ func TestStore(t *testing.T) {
 
 	for i := 0; i < numLogFiles; i++ {
 		logFile := path.Join(logsFolder, fmt.Sprintf("log-%d.log", i))
-		integration.WriteLogFile(t, logFile, 10, false)
+		testhelpers.WriteLogFile(t, logFile, 10, false)
 	}
 	logsFolderGlob := filepath.Join(logsFolder, "*")
 	filebeat.WriteConfigFile(fmt.Sprintf(testStoreCfg, logsFolderGlob, tempDir))

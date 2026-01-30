@@ -29,6 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -79,7 +80,7 @@ logging.level: debug
 	filebeat.WriteConfigFile(fmt.Sprintf(configTemplate, inputs, tempDir))
 
 	// 3. Create the log file
-	integration.WriteLogFile(t, logFilePath, 10, false)
+	testhelpers.WriteLogFile(t, logFilePath, 10, false)
 
 	assert.NoError(t, os.WriteFile(filepath.Join(inputs, "filestream.yml"), []byte(fmt.Sprintf(inputConfig, logFilePath)), 0666))
 
@@ -105,7 +106,7 @@ logging.level: debug
 	filebeat.WaitLogsContains("Runner: 'filestream' has stopped", 2*time.Minute)
 
 	logFilePath2 := filepath.Join(tempDir, "log2.log")
-	integration.WriteLogFile(t, logFilePath2, 10, false)
+	testhelpers.WriteLogFile(t, logFilePath2, 10, false)
 	// bring another file up
 	assert.NoError(t, os.WriteFile(filepath.Join(inputs, "secondInput.yml"), []byte(fmt.Sprintf(inputConfig, logFilePath2)), 0666))
 

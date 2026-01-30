@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build integration
 
 package integration
@@ -35,6 +37,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -100,7 +103,7 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	filebeat.Start()
 
 	// 3. Create the log file
-	integration.WriteLogFile(t, logFilePath, 10, false)
+	testhelpers.WriteLogFile(t, logFilePath, 10, false)
 
 	// 4. Wait for Filebeat to start scanning for files
 	filebeat.WaitLogsContains(
@@ -376,7 +379,7 @@ logging:
 			if runtime.GOOS == "windows" {
 				msgLogFilepath = strings.ReplaceAll(logFilepath, `\`, `\\`)
 			}
-			integration.WriteLogFile(t, logFilepath, 25, false)
+			testhelpers.WriteLogFile(t, logFilepath, 25, false)
 
 			cfgYAML := fmt.Sprintf(cfgTemplate, logFilepath, tc.oldIdentityCfg, workDir)
 			filebeat.WriteConfigFile(cfgYAML)
@@ -406,7 +409,7 @@ logging:
 				requirePublishedEvents(t, filebeat, 25, outputFile)
 
 				// Ingest more data to ensure the offset was migrated
-				integration.WriteLogFile(t, logFilepath, 17, true)
+				testhelpers.WriteLogFile(t, logFilepath, 17, true)
 				filebeat.WaitLogsContains(eofMsg, time.Second*5, "EOF was not reached the third time")
 
 				requirePublishedEvents(t, filebeat, 42, outputFile)
@@ -427,7 +430,7 @@ logging:
 			requirePublishedEvents(t, filebeat, 50, outputFile)
 
 			// Ingest more data to ensure the offset is correctly tracked
-			integration.WriteLogFile(t, logFilepath, 10, true)
+			testhelpers.WriteLogFile(t, logFilepath, 10, true)
 			filebeat.WaitLogsContains(eofMsg, time.Second*5, "EOF was not reached the third time")
 			requirePublishedEvents(t, filebeat, 60, outputFile)
 		})
@@ -516,7 +519,7 @@ logging:
 
 	requirePublishedEvents(t, filebeat, 200, outputFile)
 	// Ingest more data to ensure the offset was migrated
-	integration.WriteLogFile(t, logFilepath, 20, true)
+	testhelpers.WriteLogFile(t, logFilepath, 20, true)
 	filebeat.WaitLogsContains(eofMsg, time.Second*5, "EOF was not reached after adding data")
 
 	requirePublishedEvents(t, filebeat, 220, outputFile)
@@ -701,8 +704,8 @@ func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {
 	t.Helper()
 
 	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
-	entries, _ := readFilestreamRegistryLog(t, registryFile)
-	inputEntries := []registryEntry{}
+	entries, _ := testhelpers.ReadFilestreamRegistryLog(t, registryFile)
+	inputEntries := []testhelpers.RegistryEntry{}
 	for _, currentEntry := range entries {
 		if strings.Contains(currentEntry.Key, identity) {
 			inputEntries = append(inputEntries, currentEntry)
@@ -746,7 +749,7 @@ func createFileAndWaitIngestion(
 		}
 	}
 
-	integration.WriteLogFile(t, logFilepath, n, false)
+	testhelpers.WriteLogFile(t, logFilepath, n, false)
 	msgLogFilepath := logFilepath
 	if runtime.GOOS == "windows" {
 		msgLogFilepath = strings.ReplaceAll(logFilepath, `\`, `\\`)
@@ -757,8 +760,8 @@ func createFileAndWaitIngestion(
 	requirePublishedEvents(t, fb, outputTotal, outputFilepath)
 }
 
-func parseRegistry(entries []registryEntry) map[string]registryEntry {
-	registry := map[string]registryEntry{}
+func parseRegistry(entries []testhelpers.RegistryEntry) map[string]testhelpers.RegistryEntry {
+	registry := map[string]testhelpers.RegistryEntry{}
 
 	for _, e := range entries {
 		switch e.Op {
@@ -791,13 +794,13 @@ func assertRegistry(t *testing.T, workDir, testdataDir, registry, msg string) {
 		data = bytes.ReplaceAll(data, []byte(`/`), []byte(`\`))
 		data = bytes.ReplaceAll(data, []byte(`\`), []byte(`\\`))
 	}
-	expectedRegistry := map[string]registryEntry{}
+	expectedRegistry := map[string]testhelpers.RegistryEntry{}
 	if err := json.Unmarshal(data, &expectedRegistry); err != nil {
 		t.Fatalf("cannot unmarshal expected registry file: %s", err)
 	}
 
 	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
-	entries, nameToInode := readFilestreamRegistryLog(t, registryFile)
+	entries, nameToInode := testhelpers.ReadFilestreamRegistryLog(t, registryFile)
 	reg := parseRegistry(entries)
 
 	// More Windows workarounds.
@@ -925,7 +928,7 @@ func TestCleanInactiveLegacyBehaviour(t *testing.T) {
 	)
 
 	logFilePath := filepath.Join(filebeat.TempDir(), "log.log")
-	integration.WriteLogFile(t, logFilePath, 42, false)
+	testhelpers.WriteLogFile(t, logFilePath, 42, false)
 	cfg := getConfig(
 		t,
 		map[string]any{

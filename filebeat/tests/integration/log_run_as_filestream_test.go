@@ -30,6 +30,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/testhelpers"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -41,7 +42,7 @@ func TestLogAsFilestreamRunsLogInput(t *testing.T) {
 	)
 
 	logfile := filepath.Join(filebeat.TempDir(), "log.log")
-	integration.WriteLogFile(t, logfile, 50, false, "")
+	testhelpers.WriteLogFile(t, logfile, 50, false, "")
 
 	cfg := getConfig(
 		t,
@@ -83,7 +84,7 @@ func TestLogAsFilestreamFeatureFlag(t *testing.T) {
 
 	eventsCount := 50
 	logfile := filepath.Join(filebeat.TempDir(), "log.log")
-	integration.WriteLogFile(t, logfile, eventsCount, false, "")
+	testhelpers.WriteLogFile(t, logfile, eventsCount, false, "")
 
 	cfg := getConfig(
 		t,
@@ -256,7 +257,7 @@ func TestLogAsFilestreamSupportsFingerprint(t *testing.T) {
 	)
 
 	logfile := filepath.Join(filebeat.TempDir(), "log.log")
-	integration.WriteLogFile(t, logfile, 50, false, "")
+	testhelpers.WriteLogFile(t, logfile, 50, false, "")
 
 	cfg := getConfig(
 		t,
@@ -301,7 +302,7 @@ func TestLogAsFilestreamCanMigrateState(t *testing.T) {
 	)
 
 	logfile := filepath.Join(filebeat.TempDir(), "log.log")
-	integration.WriteLogFile(t, logfile, 50, false, "")
+	testhelpers.WriteLogFile(t, logfile, 50, false, "")
 
 	cfg := getConfig(
 		t,
@@ -348,7 +349,7 @@ func TestLogAsFilestreamCanMigrateState(t *testing.T) {
 	filebeat.WaitPublishedEvents(time.Second, 50)
 
 	// Write more events
-	integration.WriteLogFile(t, logfile, 10, true)
+	testhelpers.WriteLogFile(t, logfile, 10, true)
 	// Ensure only the new events are ingested
 	filebeat.WaitPublishedEvents(15*time.Second, 60)
 }
