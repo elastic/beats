@@ -488,25 +488,6 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 			res.Release()
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, res.cursor)
 		}
-<<<<<<< HEAD
-
-		// Write to disk
-		s.store.writeState(res)
-
-		// Update in-memory store
-		s.store.ephemeralStore.table[newKey] = res
-
-		// "remove" from the disk store.
-		// It will add a remove entry in the log file for this key, however
-		// the Registrar used by the Log input will write to disk all states
-		// it read when Filebeat was starting, thus "overriding" this delete.
-		// We keep it here because when we remove the Log input we will ensure
-		// the entry is actually remove from the disk store.
-		s.store.persistentStore.Remove(k)
-		res.Release()
-		s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, res.cursor)
-=======
->>>>>>> b2790a640 (Fix take over from Log input (#48570))
 	}
 }
 
