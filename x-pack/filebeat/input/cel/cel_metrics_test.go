@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
@@ -63,7 +64,7 @@ func TestOTELCELMetrics(t *testing.T) {
 		t.Fatalf("failed to create exporter: %v", err)
 	}
 
-	otelCELMetrics, transport, err := newOTELCELMetrics(log, *resource, client.Transport, metricExporter)
+	otelCELMetrics, transport, err := newOTELCELMetrics(log, *resource, client.Transport, metricExporter, []otelhttp.Option{})
 	if err != nil {
 		t.Fatalf("failed to create otelCELMetrics: %v", err)
 	}
