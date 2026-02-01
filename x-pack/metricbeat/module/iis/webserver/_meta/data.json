@@ -1,57 +1,68 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "@timestamp": "2026-01-31T00:26:01.417Z",
     "event": {
         "dataset": "iis.webserver",
-        "duration": 115000,
-        "module": "iis"
+        "module": "iis",
+        "duration": 1008973300
     },
     "iis": {
         "webserver": {
-            "asp_net": {
-                "application_restarts": 0,
-                "request_wait_time": 0
+            "process": {
+                "virtual_bytes": 2203429777408,
+                "page_faults_per_sec": 0,
+                "io_write_operations_per_sec": 0.9948381826057318,
+                "working_set": 19296256,
+                "cpu_usage_perc": 1.5542392185533886,
+                "private_bytes": 6021120,
+                "handle_count": 239,
+                "thread_count": 22,
+                "io_read_operations_per_sec": 0.9948381826057318
             },
-            "asp_net_application": {
-                "pipeline_instance_count": 3,
-                "requests_executing": 0,
-                "requests_in_application_queue": 0
-            },
-            "cache": {
-                "current_file_cache_memory_usage": 696,
-                "current_files_cached": 2,
-                "current_uris_cached": 0,
-                "file_cache_hits": 1,
-                "file_cache_misses": 7,
-                "maximum_file_cache_memory_usage": 696,
-                "output_cache_current_items": 0,
-                "output_cache_current_memory_usage": 0,
-                "output_cache_total_hits": 0,
-                "output_cache_total_misses": 8,
-                "total_files_cached": 2,
-                "total_uris_cached": 1,
-                "uri_cache_hits": 0,
-                "uri_cache_misses": 8
+            "host": {
+                "cpu_number": 16
             },
             "network": {
+                "total_connection_attempts": 6,
+                "anonymous_users_per_sec": 196.9779601559349,
+                "current_connections": 1,
+                "total_bytes_sent": 342999814,
+                "bytes_received_per_sec": 25607.134820271538,
                 "current_anonymous_users": 0,
-                "current_connections": 0,
-                "current_nonanonymous_users": 0,
-                "maximum_connections": 3,
-                "service_uptime": 343447,
-                "total_anonymous_users": 6,
-                "total_bytes_received": 2715,
-                "total_bytes_sent": 89432,
-                "total_connection_attempts": 4,
+                "total_post_requests": 0,
+                "delete_requests_per_sec": 0,
+                "total_non_anonymous_users": 0,
+                "post_requests_per_sec": 0,
+                "total_bytes_received": 48402066,
+                "current_non_anonymous_users": 0,
+                "get_requests_per_sec": 196.9779601559349,
+                "maximum_connections": 1,
+                "total_anonymous_users": 372311,
+                "bytes_sent_per_sec": 181416.70130361605,
                 "total_delete_requests": 0,
-                "total_get_requests": 6,
-                "total_nonanonymous_users": 0,
-                "total_post_requests": 0
+                "service_uptime": 82841,
+                "total_get_requests": 372311
+            },
+            "cache": {
+                "output_cache_current_items": 0,
+                "output_cache_total_hits": 0,
+                "total_files_cached": 9,
+                "uri_cache_misses": 24,
+                "maximum_file_cache_memory_usage": 696,
+                "current_file_cache_memory_usage": 696,
+                "current_files_cached": 2,
+                "uri_cache_hits": 744596,
+                "file_cache_misses": 1489252,
+                "current_uris_cached": 2,
+                "output_cache_current_memory_usage": 0,
+                "output_cache_total_misses": 744620,
+                "file_cache_hits": 744615,
+                "total_uris_cached": 10
             }
         }
     },
     "metricset": {
-        "name": "webserver",
-        "period": 10000
+        "period": 10000,
+        "name": "webserver"
     },
     "service": {
         "type": "iis"

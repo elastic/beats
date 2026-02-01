@@ -4,6 +4,10 @@
   description: >
     Website related metrics.
   fields:
+    - name: host.cpu_number
+      type: long
+      description: >
+        Number of CPUs host have
     - name: name
       type: keyword
       description: >

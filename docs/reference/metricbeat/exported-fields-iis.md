@@ -19,6 +19,12 @@ iis module
 
 Application pool process stats.
 
+**`iis.application_pool.host.cpu_number`**
+:   Number of CPUs host have
+
+    type: long
+
+
 **`iis.application_pool.name`**
 :   application pool name
 
@@ -206,6 +212,12 @@ LocksAndThreads overview.
 ## webserver [_webserver]
 
 Webserver related metrics.
+
+**`iis.webserver.host.cpu_number`**
+:   Number of CPUs host have
+
+    type: long
+
 
 ## process [_process]
 
@@ -530,6 +542,12 @@ The network related stats.
 ## website [_website]
 
 Website related metrics.
+
+**`iis.website.host.cpu_number`**
+:   Number of CPUs host have
+
+    type: long
+
 
 **`iis.website.name`**
 :   website name

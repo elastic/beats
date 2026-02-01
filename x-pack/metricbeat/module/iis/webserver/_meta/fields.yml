@@ -4,6 +4,10 @@
   description: >
     Webserver related metrics.
   fields:
+    - name: host.cpu_number
+      type: long
+      description: >
+        Number of CPUs host have
     - name: process
       type: group
       description: >
