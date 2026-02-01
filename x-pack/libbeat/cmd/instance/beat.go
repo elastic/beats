@@ -290,7 +290,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 // setLogger configures a logp logger and sets it on b.Info.Logger
 func setLogger(b *instance.Beat, receiverConfig map[string]any, core zapcore.Core) error {
-
 	var err error
 	logpConfig := logp.Config{}
 	logpConfig.AddCaller = true
