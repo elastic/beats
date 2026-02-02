@@ -306,12 +306,12 @@ type ExtraSpanAttribsRoundTripper struct {
 	unredacted map[string]bool
 }
 
-func (rt ExtraSpanAttribsRoundTripper) shouldRedact(name string) bool {
+func (rt *ExtraSpanAttribsRoundTripper) shouldRedact(name string) bool {
 	key := strings.ToLower(name)
 	return rt.redacted[key] || (SensitiveName(name) && !rt.unredacted[key])
 }
 
-func (rt ExtraSpanAttribsRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
+func (rt *ExtraSpanAttribsRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
 
 	span := trace.SpanFromContext(r.Context())
 	if span != nil && span.SpanContext().IsValid() {
