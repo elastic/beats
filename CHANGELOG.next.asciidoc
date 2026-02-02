@@ -142,6 +142,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove erroneous status reporting to Elastic-Agent from the Filestream input {pull}42435[42435]
 - Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
 - Fixed issue for "Root level readerConfig no longer respected" in azureblobstorage input. {issue}44812[44812] {pull}44873[44873]
+- Update github.com/elastic/mito to v1.22.1 to fix issue with rate limit calculation. {pull}48500[48500]
 
 *Heartbeat*
 
@@ -268,6 +269,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]19
 - Add support for DPoP authentication for the CEL and HTTP JSON inputs. {pull}47441[47441]
 - Log unpublished event count and exit publish loop on input context cancellation. {issue}47717[47717] {pull}47730[47730]
+- Added support for specifying custom content-types and encodings in gcs input. {issue}44628[44628] {pull}45088[45088]
 - Added support for specifying custom content-types and encodings in azureblobstorage input. {issue}44330[44330] {pull}44402[44402]
 
 *Auditbeat*
