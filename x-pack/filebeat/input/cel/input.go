@@ -186,7 +186,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 	}
 
-	client, trace, otelMetrics, err := newClient(ctx, cfg, log, reg, env, otelTracerProvider)
+	client, trace, otelMetrics, contextInjector, err := newClient(ctx, cfg, log, reg, env, otelTracerProvider)
 	if err != nil {
 		return err
 	}
@@ -359,7 +359,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			metricsRecorder.AddProgramExecution(execCtx)
 			start := i.now().In(time.UTC)
 
-			state, err = evalWith(execCtx, prg, ast, state, start, wantDump, budget-1)
+			state, err = evalWith(execCtx, contextInjector, prg, ast, state, start, wantDump, budget-1)
 			metricsRecorder.AddCELDuration(execCtx, time.Since(start))
 			execLog.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
@@ -998,10 +998,10 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 // https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
-func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry, env v2.Context, tp *sdktrace.TracerProvider) (*http.Client, *httplog.LoggingRoundTripper, *otelCELMetrics, error) {
+func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry, env v2.Context, tp *sdktrace.TracerProvider) (*http.Client, *httplog.LoggingRoundTripper, *otelCELMetrics, *otel.ContextInjector, error) {
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings(), log)...)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	if cfg.Auth.Digest.isEnabled() {
@@ -1021,13 +1021,13 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		tr, err := aws.InitializeSignerTransport(*cfg.Auth.AWS, log, c.Transport)
 		if err != nil {
 			log.Errorw("failed to initialize aws config failed for signer", "error", err)
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 		c.Transport = tr
 	} else if cfg.Auth.File.isEnabled() {
 		tr, err := newFileAuthTransport(cfg.Auth.File, c.Transport)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 		c.Transport = tr
 	}
@@ -1091,6 +1091,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}
 	}
 
+	// inside the otel RoundTripper
 	c.Transport = otel.NewExtraSpanAttribsRoundTripper(c.Transport, cfg.OTelTraceConfig)
 
 	if reg != nil {
@@ -1100,11 +1101,15 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	extraOpts := []otelhttp.Option{otelhttp.WithTracerProvider(tp)}
 	otelMetrics, otelTransport, err := createOTELMetrics(ctx, cfg, log, env, c.Transport, extraOpts)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	c.Transport = otelTransport
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
+
+	// outside the otel RoundTripper
+	contextInjector := otel.NewContextInjector(c.Transport, ctx)
+	c.Transport = contextInjector
 
 	if cfg.Resource.Retry.getMaxAttempts() > 1 {
 		maxAttempts := cfg.Resource.Retry.getMaxAttempts()
@@ -1123,7 +1128,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	if cfg.Auth.OAuth2.isEnabled() {
 		c, err = cfg.Auth.OAuth2.client(ctx, c)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 	}
 
@@ -1132,7 +1137,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		Transport: c.Transport,
 	}
 
-	return c, trace, otelMetrics, nil
+	return c, trace, otelMetrics, contextInjector, nil
 }
 
 func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2.Context, tripper http.RoundTripper, extraOpts []otelhttp.Option) (*otelCELMetrics, *otelhttp.Transport, error) {
@@ -1446,7 +1451,8 @@ func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, an
 	}
 }
 
-func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time, details bool, budget int) (map[string]interface{}, error) {
+func evalWith(ctx context.Context, contextInjector *otel.ContextInjector, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time, details bool, budget int) (map[string]interface{}, error) {
+	contextInjector.SetContext(ctx)
 	out, det, err := prg.ContextEval(ctx, map[string]interface{}{
 		// Replace global program "now" with current time. This is necessary
 		// as the lib.Time now global is static at program instantiation time
