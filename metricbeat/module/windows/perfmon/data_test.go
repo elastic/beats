@@ -395,11 +395,9 @@ func TestExtractObjectFromCounter(t *testing.T) {
 	_false := false
 
 	reader := Reader{
-		query: pdh.Query{},
-		log:   nil,
-		config: Config{
-			ExtractObjectFromCounter: &_true,
-		},
+		query:  pdh.Query{},
+		log:    nil,
+		config: Config{},
 		counters: []PerfCounter{
 			{
 				QueryField:    "working_set",
@@ -421,8 +419,23 @@ func TestExtractObjectFromCounter(t *testing.T) {
 			},
 		},
 	}
+	// unset
+	{
+		events := reader.groupToEvents(counters)
+		assert.NotNil(t, events)
+		assert.Equal(t, 1, len(events))
+
+		ok, err := events[0].MetricSetFields.HasKey("object")
+		assert.NoError(t, err)
+		assert.True(t, ok)
+
+		val, err := events[0].MetricSetFields.GetValue("object")
+		assert.NoError(t, err)
+		assert.Equal(t, "Process", val)
+	}
 
 	// ExtractObjectFromCounter = true
+	reader.config.ExtractObjectFromCounter = &_true
 	{
 		events := reader.groupToEvents(counters)
 		assert.NotNil(t, events)
