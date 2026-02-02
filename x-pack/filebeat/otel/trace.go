@@ -269,6 +269,32 @@ func envBoolFirstFound(keys ...string) (val bool, found bool, err error) {
 	return false, false, nil
 }
 
+var _ http.RoundTripper = (*ContextInjector)(nil)
+
+func NewContextInjector(next http.RoundTripper, initialCtx context.Context) *ContextInjector {
+	return &ContextInjector{
+		next: next,
+		ctx:  initialCtx,
+	}
+}
+
+// ContextInjector is a RoundTripper that will pass requests forward with a different context.
+// It is not safe for concurrent use.
+// This is used to get eval-time context into requests made from CEL, which
+// would otherwise use the context from when the CEL program was compiled.
+type ContextInjector struct {
+	next http.RoundTripper
+	ctx  context.Context
+}
+
+func (ci *ContextInjector) SetContext(ctx context.Context) {
+	ci.ctx = ctx
+}
+
+func (ci *ContextInjector) RoundTrip(r *http.Request) (*http.Response, error) {
+	return ci.next.RoundTrip(r.WithContext(ci.ctx))
+}
+
 type TraceConfig struct {
 	// Redacted is a list of headers and query string parameters that should have their values redacted in span attributes.
 	Redacted []string `config:"redacted"`
