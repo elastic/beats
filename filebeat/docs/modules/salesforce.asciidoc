@@ -118,7 +118,6 @@ Example config:
         client.username: "my.email@here.com"
         client.key_path: client_key.pem
         url: https://login.salesforce.com
-        token_url: "<custom-token-url>"
       user_password_flow:
         enabled: true
         client.id: "my-client-id"
@@ -168,10 +167,6 @@ Path to the client key file for JWT authentication.
 *`var.authentication.jwt_bearer_flow.url`*::
 
 The audience URL for JWT authentication.
-
-*`var.authentication.jwt_bearer_flow.token_url`*::
-
-The Salesforce OAuth token endpoint for JWT authentication. This endpoint is used for JWT Bearer flow and defaults to `var.authentication.jwt_bearer_flow.url` if empty. Only use a custom value if you have a custom domain and don't allow default endpoints such as `https://login.salesforce.com` or `https://test.salesforce.com`.
 
 *`var.authentication.user_password_flow.enabled`*::
 
@@ -241,7 +236,6 @@ Example config:
         client.username: "my.email@here.com"
         client.key_path: client_key.pem
         url: https://login.salesforce.com
-        token_url: "<custom-token-url>"
       user_password_flow:
         enabled: true
         client.id: "my-client-id"
@@ -291,10 +285,6 @@ Path to the client key file for JWT authentication.
 *`var.authentication.jwt_bearer_flow.url`*::
 
 The audience URL for JWT authentication.
-
-*`var.authentication.jwt_bearer_flow.token_url`*::
-
-The Salesforce OAuth token endpoint for JWT authentication. This endpoint is used for JWT Bearer flow and defaults to `var.authentication.jwt_bearer_flow.url` if empty. Only use a custom value if you have a custom domain and don't allow default endpoints such as `https://login.salesforce.com` or `https://test.salesforce.com`.
 
 *`var.authentication.user_password_flow.enabled`*::
 
@@ -364,7 +354,6 @@ Example config:
         client.username: "my.email@here.com"
         client.key_path: client_key.pem
         url: https://login.salesforce.com
-        token_url: "<custom-token-url>"
       user_password_flow:
         enabled: true
         client.id: "my-client-id"
@@ -410,10 +399,6 @@ Path to the client key file for JWT authentication.
 *`var.authentication.jwt_bearer_flow.url`*::
 
 The audience URL for JWT authentication.
-
-*`var.authentication.jwt_bearer_flow.token_url`*::
-
-The Salesforce OAuth token endpoint for JWT authentication. This endpoint is used for JWT Bearer flow and defaults to `var.authentication.jwt_bearer_flow.url` if empty. Only use a custom value if you have a custom domain and don't allow default endpoints such as `https://login.salesforce.com` or `https://test.salesforce.com`.
 
 *`var.authentication.user_password_flow.enabled`*::
 
@@ -472,7 +457,6 @@ Example config:
         client.username: "my.email@here.com"
         client.key_path: client_key.pem
         url: https://login.salesforce.com
-        token_url: "<custom-token-url>"
       user_password_flow:
         enabled: true
         client.id: "my-client-id"
@@ -519,10 +503,6 @@ Path to the client key file for JWT authentication.
 *`var.authentication.jwt_bearer_flow.url`*::
 
 The audience URL for JWT authentication.
-
-*`var.authentication.jwt_bearer_flow.token_url`*::
-
-The Salesforce OAuth token endpoint for JWT authentication. This endpoint is used for JWT Bearer flow and defaults to `var.authentication.jwt_bearer_flow.url` if empty. Only use a custom value if you have a custom domain and don't allow default endpoints such as `https://login.salesforce.com` or `https://test.salesforce.com`.
 
 *`var.authentication.user_password_flow.enabled`*::
 
