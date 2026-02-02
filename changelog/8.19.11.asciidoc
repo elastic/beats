@@ -29,22 +29,21 @@ Review important information about the  8.19.11 release.
 
 **All**
 
-* Fix windows install script to properly migrate legacy state data. https://github.com/elastic/beats/pull/48230[#48230] https://github.com/elastic/beats/pull/48498[#48498] https://github.com/elastic/beats/pull/48494[#48494] https://github.com/elastic/beats/pull/48603[#48603] https://github.com/elastic/beats/pull/48605[#48605] https://github.com/elastic/beats/pull/48606[#48606] https://github.com/elastic/beats/pull/48563[#48563] https://github.com/elastic/beats/pull/48543[#48543] https://github.com/elastic/beats/issues/47665[#47665]
+* Fix windows install script to properly migrate legacy state data. https://github.com/elastic/beats/pull/48293[#48293]
 * Remove use of github.com/elastic/elastic-agent-client from OSS Beats. https://github.com/elastic/beats/pull/48353[#48353] 
 
 
 **Filebeat**
 
 * Fix AD Entity Analytics failing to fetch users when Base DN contains a group CN. https://github.com/elastic/beats/pull/48395[#48395] 
-* Fix filebeat goroutine leak when using harvester_limit. https://github.com/elastic/beats/pull/48230[#48230] https://github.com/elastic/beats/pull/48498[#48498] https://github.com/elastic/beats/pull/48494[#48494] https://github.com/elastic/beats/pull/48603[#48603] https://github.com/elastic/beats/pull/48605[#48605] https://github.com/elastic/beats/pull/48606[#48606] https://github.com/elastic/beats/pull/48563[#48563] https://github.com/elastic/beats/pull/48543[#48543] https://github.com/elastic/beats/issues/47665[#47665]
+* Fix Filebeat goroutine leak when using harvester_limit. https://github.com/elastic/beats/pull/48445[#48445]
 
 
 **Packetbeat**
 
-* Add check for incorrect length values in postgres datarow parser. https://github.com/elastic/beats/pull/48230[#48230] https://github.com/elastic/beats/pull/48498[#48498] https://github.com/elastic/beats/pull/48494[#48494] https://github.com/elastic/beats/pull/48603[#48603] https://github.com/elastic/beats/pull/48605[#48605] https://github.com/elastic/beats/pull/48606[#48606] https://github.com/elastic/beats/pull/48563[#48563] https://github.com/elastic/beats/pull/48543[#48543] https://github.com/elastic/beats/issues/47665[#47665]
-* Fix procfs network parsers. https://github.com/elastic/beats/pull/48230[#48230] https://github.com/elastic/beats/pull/48498[#48498] https://github.com/elastic/beats/pull/48494[#48494] https://github.com/elastic/beats/pull/48603[#48603] https://github.com/elastic/beats/pull/48605[#48605] https://github.com/elastic/beats/pull/48606[#48606] https://github.com/elastic/beats/pull/48563[#48563] https://github.com/elastic/beats/pull/48543[#48543] https://github.com/elastic/beats/issues/47665[#47665]
-* Fix Thrift struct parser oob bug. https://github.com/elastic/beats/pull/48230[#48230] https://github.com/elastic/beats/pull/48498[#48498] https://github.com/elastic/beats/pull/48494[#48494] https://github.com/elastic/beats/pull/48603[#48603] https://github.com/elastic/beats/pull/48605[#48605] https://github.com/elastic/beats/pull/48606[#48606] https://github.com/elastic/beats/pull/48563[#48563] https://github.com/elastic/beats/pull/48543[#48543] https://github.com/elastic/beats/issues/47665[#47665]
-* Clean up and add checks to SIP parser. https://github.com/elastic/beats/pull/48230[#48230] https://github.com/elastic/beats/pull/48498[#48498] https://github.com/elastic/beats/pull/48494[#48494] https://github.com/elastic/beats/pull/48603[#48603] https://github.com/elastic/beats/pull/48605[#48605] https://github.com/elastic/beats/pull/48606[#48606] https://github.com/elastic/beats/pull/48563[#48563] https://github.com/elastic/beats/pull/48543[#48543] https://github.com/elastic/beats/issues/47665[#47665]
-* Fix potential array access panics &amp; infinite loops in postgres parser. https://github.com/elastic/beats/pull/48230[#48230] https://github.com/elastic/beats/pull/48498[#48498] https://github.com/elastic/beats/pull/48494[#48494] https://github.com/elastic/beats/pull/48603[#48603] https://github.com/elastic/beats/pull/48605[#48605] https://github.com/elastic/beats/pull/48606[#48606] https://github.com/elastic/beats/pull/48563[#48563] https://github.com/elastic/beats/pull/48543[#48543] https://github.com/elastic/beats/issues/47665[#47665]
-
+* Add check for incorrect length values in PostgreSQL datarow parser. https://github.com/elastic/beats/pull/47872[#47872]
+* Fix procfs network parsers. https://github.com/elastic/beats/pull/48428[#48428]
+* Fix Thrift struct parser oob bug. https://github.com/elastic/beats/pull/48498[#48498]
+* Clean up and add checks to SIP parser. https://github.com/elastic/beats/pull/48514[#48514]
+* Fix potential array access panics &amp; infinite loops in PostgreSQL parser. https://github.com/elastic/beats/pull/48528[#48528]
 // end 8.19.11 relnotes
