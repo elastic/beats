@@ -27,7 +27,9 @@
             },
             "name": "Default Web Site",
             "host": {
-                "cpu_number": 16
+                "cpu": {
+                    "count": 16
+                }
             }
         }
     },

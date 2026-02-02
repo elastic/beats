@@ -4,7 +4,7 @@
   description: >
     Application pool process stats.
   fields:
-    - name: host.cpu_number
+    - name: host.cpu.count
       type: long
       description: >
         Number of CPUs host have

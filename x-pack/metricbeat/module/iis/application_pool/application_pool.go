@@ -78,7 +78,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	for _, event := range events {
-		event.MetricSetFields.Put("host.cpu_number", runtime.NumCPU())
+		event.MetricSetFields.Put("host.cpu.count", runtime.NumCPU())
 		isOpen := report.Event(event)
 		if !isOpen {
 			break

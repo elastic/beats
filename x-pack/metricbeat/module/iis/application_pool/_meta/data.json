@@ -20,7 +20,9 @@
                 "io_read_operations_per_sec": 0.500673761687841
             },
             "host": {
-                "cpu_number": 16
+                "cpu": {
+                    "count": 16
+                }
             }
         }
     },
