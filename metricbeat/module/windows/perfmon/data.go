@@ -26,11 +26,12 @@ import (
 	"strconv"
 	"strings"
 
+	"go.uber.org/zap"
+
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"go.uber.org/zap"
 )
 
 var processRegexp = regexp.MustCompile(`(.+?[^\s])(?:#\d+|$)`)
