@@ -133,7 +133,7 @@ Further configuration can be done as in the following example:
 	OTEL_EXPORTER_OTLP_TRACES_TIMEOUT="5000"
 	OTEL_EXPORTER_OTLP_TRACES_INSECURE="false"
 
-If any of those trace-specific environment varaibles are not set, the generic
+If any of those trace-specific environment variables are not set, the generic
 equivalent (with "_TRACES" removed from the name) will be checked.
 
 Span resource attributes will include any values set in the
