@@ -114,6 +114,13 @@ func TestGetConstraintFilters(t *testing.T) {
 	}
 }
 
+type (
+	CustomInt    int
+	CustomFloat  float64
+	CustomBool   bool
+	CustomString string
+)
+
 type EmbeddedStruct struct {
 	EmbeddedString string  `osquery:"embedded_string"`
 	EmbeddedInt    int     `osquery:"embedded_int"`
@@ -122,10 +129,15 @@ type EmbeddedStruct struct {
 }
 
 type MockEntry struct {
-	StringValue string  `osquery:"string_value"`
-	IntValue    int     `osquery:"int_value"`
-	FloatValue  float64 `osquery:"float_value"`
-	BoolValue   bool    `osquery:"bool_value"`
+	StringValue       string       `osquery:"string_value"`
+	IntValue          int          `osquery:"int_value"`
+	FloatValue        float64      `osquery:"float_value"`
+	BoolValue         bool         `osquery:"bool_value"`
+	CustomIntValue    CustomInt    `osquery:"custom_int_value"`
+	CustomFloatValue  CustomFloat  `osquery:"custom_float_value"`
+	CustomBoolValue   CustomBool   `osquery:"custom_bool_value"`
+	CustomStringValue CustomString `osquery:"custom_string_value"`
+
 	EmbeddedStruct
 }
 
@@ -758,6 +770,85 @@ func TestGlob(t *testing.T) {
 			},
 			filter: Filter{ColumnName: "embedded_string", Operator: table.OperatorGlob, Expression: "Other*"},
 			want:   false,
+		},
+	}
+	RunFilterTests(t, tests)
+}
+
+func TestFilter_CustomTypes(t *testing.T) {
+	tests := []FilterTestCase{
+		{
+			name: "int_less_than_true",
+			entry: MockEntry{
+				CustomIntValue: 100,
+			},
+			filter: Filter{ColumnName: "custom_int_value", Operator: table.OperatorLessThan, Expression: "101"},
+			want:   true,
+		},
+		{
+			name: "float_greater_than_true",
+			entry: MockEntry{
+				CustomFloatValue: 100.0,
+			},
+			filter: Filter{ColumnName: "custom_float_value", Operator: table.OperatorGreaterThan, Expression: "99.0"},
+			want:   true,
+		},
+		{
+			name: "string_equals_true",
+			entry: MockEntry{
+				CustomStringValue: "Mock Entry",
+			},
+			filter: Filter{ColumnName: "custom_string_value", Operator: table.OperatorEquals, Expression: "Mock Entry"},
+			want:   true,
+		},
+		{
+			name: "string_equals_false",
+			entry: MockEntry{
+				CustomStringValue: "Mock Entry",
+			},
+			filter: Filter{ColumnName: "custom_string_value", Operator: table.OperatorEquals, Expression: "Other Entry"},
+			want:   false,
+		},
+
+		{
+			name: "bool_equals_true",
+			entry: MockEntry{
+				CustomBoolValue: true,
+			},
+			filter: Filter{ColumnName: "custom_bool_value", Operator: table.OperatorEquals, Expression: "true"},
+			want:   true,
+		},
+		{
+			name: "bool_equals_false",
+			entry: MockEntry{
+				CustomBoolValue: false,
+			},
+			filter: Filter{ColumnName: "custom_bool_value", Operator: table.OperatorEquals, Expression: "false"},
+			want:   true,
+		},
+		{
+			name: "string_glob_true_wildcard",
+			entry: MockEntry{
+				CustomStringValue: "Value123",
+			},
+			filter: Filter{ColumnName: "custom_string_value", Operator: table.OperatorGlob, Expression: "Value*"},
+			want:   true,
+		},
+		{
+			name: "string_like_false",
+			entry: MockEntry{
+				CustomStringValue: "Value123",
+			},
+			filter: Filter{ColumnName: "custom_string_value", Operator: table.OperatorLike, Expression: "%Value4%"},
+			want:   false,
+		},
+		{
+			name: "string_like_true",
+			entry: MockEntry{
+				CustomStringValue: "Value123",
+			},
+			filter: Filter{ColumnName: "custom_string_value", Operator: table.OperatorLike, Expression: "%Value%"},
+			want:   true,
 		},
 	}
 	RunFilterTests(t, tests)
