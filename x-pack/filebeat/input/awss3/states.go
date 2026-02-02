@@ -222,6 +222,9 @@ func newLexicographicalStateRegistry(log *logp.Logger, store *statestore.Store, 
 	var persistedTail string
 	if err := store.Get(awsS3TailKey, &persistedTail); err != nil {
 		// Key doesn't exist or can't be decoded - start fresh
+		if log != nil {
+			log.Infof("No valid persisted tail found (key=%s), starting fresh: %v", awsS3TailKey, err)
+		}
 		persistedTail = ""
 	}
 
@@ -240,16 +243,14 @@ func newLexicographicalStateRegistry(log *logp.Logger, store *statestore.Store, 
 	}
 
 	// Build heap from loaded states and trim to capacity
-	if len(stateTable) > 0 {
-		r.initHeapFromStates(log)
-	}
+	r.initHeapFromStates(log)
 
 	// If no persisted tail but we have states, compute initial tail from heap minimum
 	if r.persistedTail == "" && r.heap.Len() > 0 {
 		if minState := r.heap.peek(); minState != nil {
 			r.persistedTail = minState.Key
 			if err := store.Set(awsS3TailKey, r.persistedTail); err != nil {
-				return nil, fmt.Errorf("persisting initial tail: %w", err)
+				return nil, fmt.Errorf("failed to persist initial tail key to store (key=%q): %w", r.persistedTail, err)
 			}
 		}
 	}
@@ -263,6 +264,10 @@ func (r *lexicographicalStateRegistry) initHeapFromStates(log *logp.Logger) {
 	defer r.storeLock.Unlock()
 	r.statesLock.Lock()
 	defer r.statesLock.Unlock()
+
+	if len(r.states) == 0 {
+		return
+	}
 
 	for _, st := range r.states {
 		r.heap.items = append(r.heap.items, st)
@@ -289,37 +294,7 @@ func (r *lexicographicalStateRegistry) AddState(st state) error {
 	}
 
 	id := st.IDWithLexicographicalOrdering()
-	var evictedID string
-	var shouldPersist bool
-
-	// Update in-memory state: remove from in-flight and add to completed atomically
-	func() {
-		r.inFlightLock.Lock()
-		defer r.inFlightLock.Unlock()
-		r.statesLock.Lock()
-		defer r.statesLock.Unlock()
-
-		// Remove from in-flight
-		delete(r.inFlight, st.Key)
-
-		if r.heap.Len() >= r.capacity {
-			// Only add if the new key is larger than the current minimum.
-			// This ensures we keep the N largest keys.
-			minState := r.heap.peek()
-			if minState != nil && st.Key <= minState.Key {
-				return
-			}
-			// Evict the smallest key
-			evicted := r.heap.pop()
-			evictedID = evicted.IDWithLexicographicalOrdering()
-			delete(r.states, evictedID)
-		}
-
-		// Add new state to states map and heap
-		r.states[id] = &st
-		r.heap.push(&st)
-		shouldPersist = true
-	}()
+	evictedID, shouldPersist := r.updateInMemoryState(id, st)
 
 	if !shouldPersist {
 		return nil
@@ -347,7 +322,58 @@ func (r *lexicographicalStateRegistry) AddState(st state) error {
 	return err
 }
 
+// updateInMemoryState removes the key from in-flight tracking and adds the state
+// to the completed states map and heap.
+// Returns the evicted state ID (if any) and whether the state should be persisted.
+func (r *lexicographicalStateRegistry) updateInMemoryState(id string, st state) (evictedID string, shouldPersist bool) {
+	r.inFlightLock.Lock()
+	defer r.inFlightLock.Unlock()
+	r.statesLock.Lock()
+	defer r.statesLock.Unlock()
+
+	// Remove from in-flight
+	delete(r.inFlight, st.Key)
+
+	if r.heap.Len() >= r.capacity {
+		// Only add if the new key is larger than the current minimum.
+		// This ensures we keep the N largest keys.
+		minState := r.heap.peek()
+		if minState != nil && st.Key <= minState.Key {
+			return "", false
+		}
+		// Evict the smallest key
+		evicted := r.heap.pop()
+		evictedID = evicted.IDWithLexicographicalOrdering()
+		delete(r.states, evictedID)
+	}
+
+	// Add new state to states map and heap
+	r.states[id] = &st
+	r.heap.push(&st)
+	return evictedID, true
+}
+
 func (r *lexicographicalStateRegistry) CleanUp(knownIDs []string) error {
+	removed, err := r.removeUnknownStates(knownIDs)
+	if err != nil {
+		return err
+	}
+
+	if !removed {
+		return nil
+	}
+
+	// Recompute and persist tail after cleanup
+	r.inFlightLock.Lock()
+	err = r.recomputeAndPersistTail()
+	r.inFlightLock.Unlock()
+
+	return err
+}
+
+// removeUnknownStates removes states not in knownIDs from heap, map, and store.
+// Returns true if any states were removed.
+func (r *lexicographicalStateRegistry) removeUnknownStates(knownIDs []string) (removed bool, err error) {
 	knownIDHashSet := make(map[string]struct{}, len(knownIDs))
 	for _, id := range knownIDs {
 		knownIDHashSet[id] = struct{}{}
@@ -367,7 +393,7 @@ func (r *lexicographicalStateRegistry) CleanUp(knownIDs []string) error {
 	}
 
 	if len(idsToRemove) == 0 {
-		return nil
+		return false, nil
 	}
 
 	// If removing all states, preserve at least one (the greatest key for startAfterKey)
@@ -389,11 +415,11 @@ func (r *lexicographicalStateRegistry) CleanUp(knownIDs []string) error {
 		r.heap.remove(id)
 		delete(r.states, id)
 		if err := r.removeFromStore(id); err != nil {
-			return fmt.Errorf("error while removing the state for ID %s: %w", id, err)
+			return false, fmt.Errorf("error while removing the state for ID %s: %w", id, err)
 		}
 	}
 
-	return nil
+	return true, nil
 }
 
 func (r *lexicographicalStateRegistry) GetStartAfterKey() string {
