@@ -93,7 +93,7 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 			} else {
 				eventMap[eventKey].MetricSetFields.Put(counter.QueryField, 0)
 			}
-			fmt.Println(counterPath)
+
 			if counter.ObjectField != "" {
 				if re.config.ExtractObjectFromCounter != nil && *re.config.ExtractObjectFromCounter {
 					matches := objectNameWithoutInstanceRegexp.FindStringSubmatch(counterPath)

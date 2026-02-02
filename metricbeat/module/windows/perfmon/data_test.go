@@ -389,3 +389,67 @@ func TestMatchesParentProcess(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, val, "svchost (test) another #54")
 }
+
+func TestExtractObjectFromCounter(t *testing.T) {
+	_true := true
+	_false := false
+
+	reader := Reader{
+		query: pdh.Query{},
+		log:   nil,
+		config: Config{
+			ExtractObjectFromCounter: &_true,
+		},
+		counters: []PerfCounter{
+			{
+				QueryField:    "working_set",
+				QueryName:     `\Process(*)\Working Set`,
+				Format:        "float",
+				ObjectName:    "Process",
+				ObjectField:   "object",
+				InstanceName:  "*",
+				InstanceField: "instance",
+			},
+		},
+	}
+
+	counters := map[string][]pdh.CounterValue{
+		`\Process(chrome)\Working Set`: {
+			{
+				Instance:    "chrome",
+				Measurement: 123,
+			},
+		},
+	}
+
+	// ExtractObjectFromCounter = true
+	{
+		events := reader.groupToEvents(counters)
+		assert.NotNil(t, events)
+		assert.Equal(t, 1, len(events))
+
+		ok, err := events[0].MetricSetFields.HasKey("object")
+		assert.NoError(t, err)
+		assert.True(t, ok)
+
+		val, err := events[0].MetricSetFields.GetValue("object")
+		assert.NoError(t, err)
+		assert.Equal(t, "Process(chrome)", val)
+	}
+
+	// ExtractObjectFromCounter = false
+	reader.config.ExtractObjectFromCounter = &_false
+	{
+		events := reader.groupToEvents(counters)
+		assert.NotNil(t, events)
+		assert.Equal(t, 1, len(events))
+
+		ok, err := events[0].MetricSetFields.HasKey("object")
+		assert.NoError(t, err)
+		assert.True(t, ok)
+
+		val, err := events[0].MetricSetFields.GetValue("object")
+		assert.NoError(t, err)
+		assert.Equal(t, "Process", val)
+	}
+}
