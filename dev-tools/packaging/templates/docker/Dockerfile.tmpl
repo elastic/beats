@@ -133,13 +133,8 @@ USER root
 # Install required dependencies from wolfi repository
 RUN for iter in {1..10}; do \
         apk update && \
-<<<<<<< HEAD
-        apk add --no-interactive --no-progress --no-cache nodejs-22=22.20.0-r0 npm=11.4.2-r1 glib dbus-glib libatk-1.0 \
-        libatk-bridge-2.0 cups-libs libxcomposite libxdamage libxrandr libxkbcommon pango alsa-lib \
-=======
         apk add --no-interactive --no-progress --no-cache nodejs-22=22.22.0-r0 npm=11.4.2-r1 glib dbus-glib libatk-1.0 \
         libatk-bridge-2.0 cups-libs libxcomposite libxdamage libxfixes libxrandr libxkbcommon pango alsa-lib \
->>>>>>> d282e8bd0 (fix(synthetics): chromium dependencies for Synthetics monitor (#48569))
         font-opensans fontconfig gtk icu-data-full libnss mesa font-noto-cjk font-noto-emoji && \
         exit_code=0 && break || exit_code=$? && echo "apk error: retry $iter in 10s" && sleep 10; \
     done; \
