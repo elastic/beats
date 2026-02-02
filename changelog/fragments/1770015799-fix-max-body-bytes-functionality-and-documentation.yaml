@@ -13,12 +13,15 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Fix missing documentation for the max_body_bytes setting in the Filebeat HTTP Endpoint input.
+summary: Fix max_body_bytes setting not working without HMAC and add missing documentation configuration options in HTTP Endpoint input.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# description:
+description: |
+  Previously, the max_body_bytes setting was only applied during HMAC validation, meaning it had no effect on requests that didn't use HMAC authentication.
+  This fix ensures that body size limiting is applied to all incoming requests regardless of authentication method.
+  Additionally, restored missing documentation for the max_body_bytes setting in the HTTP Endpoint input.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
