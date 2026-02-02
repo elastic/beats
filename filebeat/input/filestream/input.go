@@ -164,6 +164,9 @@ func configure(
 	return prospector, filestream, nil
 }
 
+// normalizeConfig reconciles filestream defaults with file_identity semantics.
+// In 9.x, scanner fingerprinting defaults to enabled, but non-fingerprint
+// identities should turn it off unless the user explicitly sets it.
 func normalizeConfig(cfg *conf.C, c *config) error {
 	if c.FileIdentity == nil {
 		return nil
@@ -171,10 +174,6 @@ func normalizeConfig(cfg *conf.C, c *config) error {
 
 	name := c.FileIdentity.Name()
 	if name == fingerprintName {
-		return nil
-	}
-
-	if name != nativeName && name != pathName && name != inodeMarkerName {
 		return nil
 	}
 

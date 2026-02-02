@@ -192,7 +192,7 @@ func TestNormalizeConfig(t *testing.T) {
 		wantEnabled bool
 	}{
 		{
-			name: "non-fingerprint identity disables scanner fingerprint by default",
+			name: "path identity disables prospector.scanner.fingerprint by default",
 			cfg: map[string]interface{}{
 				"file_identity": map[string]interface{}{"path": nil},
 			},
