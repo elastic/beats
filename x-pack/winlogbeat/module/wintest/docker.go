@@ -91,7 +91,7 @@ func saveLogs(env map[string]string, root, target string) error {
 
 const (
 	composeFile = "docker-compose.yaml"
-	compose     = `version: '2.3'
+	compose     = `---
 services:
   # This is a proxy used to block beats until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
@@ -109,7 +109,7 @@ services:
       retries: 300
       interval: 1s
     ports:
-      - 9200:9200
+      - 127.0.0.1:9200:9200
 `
 )
 

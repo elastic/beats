@@ -27,10 +27,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -130,10 +130,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -234,10 +234,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -342,10 +342,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -446,10 +446,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -556,10 +556,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -656,10 +656,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -763,10 +763,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -859,10 +859,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -968,10 +968,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -1113,10 +1113,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -1220,10 +1220,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -1322,10 +1322,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -1430,10 +1430,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -1526,10 +1526,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -1633,10 +1633,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -1737,10 +1737,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -1840,10 +1840,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -1970,10 +1970,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -2085,10 +2085,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -2241,10 +2241,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -2394,10 +2394,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -2550,10 +2550,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -2672,10 +2672,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -2824,10 +2824,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -2986,10 +2986,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -3095,10 +3095,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -3238,10 +3238,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -3349,10 +3349,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -3493,10 +3493,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -3600,10 +3600,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -3698,10 +3698,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -3835,10 +3835,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -3969,10 +3969,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -4073,10 +4073,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -4206,10 +4206,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -4361,10 +4361,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -4520,10 +4520,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -4628,10 +4628,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -4776,10 +4776,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -4928,10 +4928,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -5035,10 +5035,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -5129,10 +5129,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -5239,10 +5239,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -5380,10 +5380,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -5530,10 +5530,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -5645,10 +5645,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -5796,10 +5796,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -5913,10 +5913,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -6042,10 +6042,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -6150,10 +6150,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -6249,10 +6249,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -6334,10 +6334,10 @@
       }
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -6415,10 +6415,10 @@
       }
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -6554,10 +6554,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -6670,10 +6670,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -6770,10 +6770,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -6913,10 +6913,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -7029,10 +7029,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -7174,10 +7174,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -7281,10 +7281,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -7394,10 +7394,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -7510,10 +7510,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -7612,10 +7612,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -7755,10 +7755,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -7912,10 +7912,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -8071,10 +8071,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -8224,10 +8224,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -8340,10 +8340,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -8455,10 +8455,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -8556,10 +8556,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -8699,10 +8699,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -8861,10 +8861,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -9014,10 +9014,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -9125,10 +9125,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -9274,10 +9274,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -9386,10 +9386,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -9535,10 +9535,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -9688,10 +9688,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -9818,10 +9818,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -9972,10 +9972,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -10105,10 +10105,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -10204,10 +10204,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -10346,10 +10346,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -10468,10 +10468,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -10564,10 +10564,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -10706,10 +10706,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -10859,10 +10859,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -10991,10 +10991,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -11139,10 +11139,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -11280,10 +11280,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -11419,10 +11419,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -11579,10 +11579,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -11734,10 +11734,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -11880,10 +11880,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -12031,10 +12031,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -12183,10 +12183,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -12294,10 +12294,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -12436,10 +12436,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -12547,10 +12547,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -12661,10 +12661,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -12767,10 +12767,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -12871,10 +12871,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -12974,10 +12974,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -13078,10 +13078,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -13177,10 +13177,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -13284,10 +13284,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -13388,10 +13388,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -13495,10 +13495,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -13599,10 +13599,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -13702,10 +13702,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -13805,10 +13805,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -13955,10 +13955,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -14078,10 +14078,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -14185,10 +14185,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -14330,10 +14330,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -14433,10 +14433,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -14534,10 +14534,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -14683,10 +14683,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -14791,10 +14791,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -14893,10 +14893,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -15040,10 +15040,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -15202,10 +15202,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -15315,10 +15315,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -15464,10 +15464,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -15623,10 +15623,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -15777,10 +15777,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -15925,10 +15925,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -16082,10 +16082,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -16445,10 +16445,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -16659,10 +16659,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -16770,10 +16770,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -16876,10 +16876,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -16963,10 +16963,10 @@
       }
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -17061,10 +17061,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -17211,10 +17211,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -17370,10 +17370,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -17482,10 +17482,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -17626,10 +17626,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -17778,10 +17778,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -17929,10 +17929,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -18069,10 +18069,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -18178,10 +18178,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -18281,10 +18281,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -18425,10 +18425,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -18548,10 +18548,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -18701,10 +18701,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -18809,10 +18809,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -18911,10 +18911,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -19010,10 +19010,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -19095,10 +19095,10 @@
       }
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -19173,10 +19173,10 @@
       }
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -19251,10 +19251,10 @@
       }
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -19353,10 +19353,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -19453,10 +19453,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
@@ -19585,10 +19585,10 @@
       ]
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Dns query (rule: DnsQuery)",
+      "action": "DNSEvent (DNS query)",
       "category": [
         "network"
       ],
