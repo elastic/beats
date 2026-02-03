@@ -74,7 +74,7 @@ func (counter *QueryCounter) Validate() error {
 
 func (conf *Config) Validate() error {
 	if len(conf.Queries) == 0 {
-		return errors.New("No perfmon queries have been configured. Please follow documentation on allowed configuration settings (perfmon.counters configuration option has been deprecated and is removed in 8.0, perfmon.queries configuration option can be used instead). ")
+		return errors.New("no perfmon queries have been configured. Please follow documentation on allowed configuration settings (perfmon.counters configuration option has been deprecated and is removed in 8.0, perfmon.queries configuration option can be used instead). ")
 	}
 	return nil
 }
