@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -52,7 +53,14 @@ var fqdnOnce = sync.OnceValues(func() (string, error) {
 })
 
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
-func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, consumer consumer.Logs, componentID string, core zapcore.Core) (*instance.Beat, error) {
+func NewBeatForReceiver(
+	settings instance.Settings,
+	receiverConfig map[string]any,
+	consumer consumer.Logs,
+	componentID string,
+	core zapcore.Core,
+	tracerProvider trace.TracerProvider,
+) (*instance.Beat, error) {
 	b, err := instance.NewBeat(settings.Name,
 		settings.IndexPrefix,
 		settings.Version,
@@ -71,6 +79,8 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	b.InputQueueSize = settings.InputQueueSize
+
+	b.Info.TracerProvider = tracerProvider
 
 	cfOpts := []ucfg.Option{
 		ucfg.PathSep("."),

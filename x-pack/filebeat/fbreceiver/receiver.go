@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"sync"
 
+	fbOtel "github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 
 	"go.opentelemetry.io/collector/component"
@@ -38,5 +39,10 @@ func (fb *filebeatReceiver) Shutdown(ctx context.Context) error {
 		return fmt.Errorf("error stopping filebeat receiver: %w", err)
 	}
 	fb.wg.Wait()
+
+	if err := fbOtel.ShutdownTracing(ctx); err != nil {
+		fb.Logger.Error("failed to shutdown OpenTelemetry tracing", zap.Error(err))
+	}
+
 	return nil
 }

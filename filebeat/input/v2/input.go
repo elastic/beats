@@ -23,6 +23,8 @@ import (
 	"context"
 	"time"
 
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
@@ -86,6 +88,9 @@ type Context struct {
 	// Logger provides a structured logger to inputs. The logger is initialized
 	// with labels that will identify logs for the input.
 	Logger *logp.Logger
+
+	// TracerProvider provides the OpenTelemetry TracerProvider for creating tracers.
+	TracerProvider trace.TracerProvider
 
 	// The input ID.
 	ID string

@@ -23,6 +23,9 @@ import (
 
 	"github.com/hashicorp/go-retryablehttp"
 	"go.elastic.co/ecszap"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -199,13 +202,14 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	}
 
 	metrics := newInputMetrics(reg, ctx.Logger)
-	client, err := newHTTPClient(stdCtx, cfg.Auth, cfg.Request, ctx, log, reg, nil)
+	client, err := newHTTPClient(stdCtx, cfg.Auth, cfg.Request, ctx, log, reg, nil, ctx.TracerProvider)
 	if err != nil {
 		ctx.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
 		return err
 	}
 
-	requestFactory, err := newRequestFactory(stdCtx, cfg, ctx, log, metrics, reg)
+	noop.NewTracerProvider()
+	requestFactory, err := newRequestFactory(stdCtx, cfg, ctx, log, metrics, reg, ctx.TracerProvider)
 	if err != nil {
 		log.Errorf("Error while creating requestFactory: %v", err)
 		ctx.UpdateStatus(status.Failed, "failed to create request factory: "+err.Error())
@@ -228,6 +232,8 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	trCtx.cursor = newCursor(cfg.Cursor, ctx, log)
 	trCtx.cursor.load(crsr)
 
+	tracer := otelTracer(ctx)
+
 	doFunc := func() error {
 		defer func() {
 			// Clear response bodies between evaluations.
@@ -238,6 +244,9 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		log.Info("Process another repeated request.")
 
 		startTime := time.Now()
+
+		stdCtx, span := tracer.Start(stdCtx, "httpson_input_request")
+		defer span.End()
 
 		var err error
 		if err = requester.doRequest(stdCtx, trCtx, pub); err != nil {
@@ -291,14 +300,14 @@ func sanitizeFileName(name string) string {
 // sharing common OAuth2 client if it is configured. If authCfg.OAuth2.isEnabled() is true
 // and there is no prepared OAuth2 client, one will be constructed and cached in the
 // authCfg.OAuth2.prepared field, otherwise the existing cached client will be used.
-func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, stat status.StatusReporter, log *logp.Logger, reg *monitoring.Registry, p *Policy) (*httpClient, error) {
+func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, stat status.StatusReporter, log *logp.Logger, reg *monitoring.Registry, p *Policy, tracerProvider trace.TracerProvider) (*httpClient, error) {
 	var (
 		client *http.Client
 		err    error
 	)
 	switch {
 	case authCfg.AWS.IsEnabled():
-		client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
+		client, err = newNetHTTPClient(ctx, requestCfg, log, reg, tracerProvider)
 		if err != nil {
 			log.Errorw("creation of initial http client failed", "error", err)
 			return nil, err
@@ -312,7 +321,7 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 		}
 		client.Transport = tr
 	case authCfg.File.isEnabled():
-		client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
+		client, err = newNetHTTPClient(ctx, requestCfg, log, reg, tracerProvider)
 		if err != nil {
 			return nil, err
 		}
@@ -324,7 +333,7 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 	case authCfg.OAuth2.isEnabled():
 		client = authCfg.OAuth2.prepared
 		if client == nil {
-			client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
+			client, err = newNetHTTPClient(ctx, requestCfg, log, reg, tracerProvider)
 			if err != nil {
 				return nil, err
 			}
@@ -335,7 +344,7 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 			authCfg.OAuth2.prepared = client
 		}
 	default:
-		client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
+		client, err = newNetHTTPClient(ctx, requestCfg, log, reg, tracerProvider)
 		if err != nil {
 			return nil, err
 		}
@@ -368,7 +377,8 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 // https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
-func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger, reg *monitoring.Registry) (*http.Client, error) {
+func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger, reg *monitoring.Registry, traceProvider trace.TracerProvider) (*http.Client, error) {
+	// Keep the existing transport settings, but do not use APM instrumentation.
 	netHTTPClient, err := cfg.Transport.Client(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings(), log)...)
 	if err != nil {
 		return nil, err
@@ -415,13 +425,16 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 		netHTTPClient.Transport = httpmon.NewMetricsRoundTripper(netHTTPClient.Transport, reg, log)
 	}
 
+	// add OTel HTTP client spans.
+	if traceProvider != nil {
+		netHTTPClient.Transport = otelhttp.NewTransport(netHTTPClient.Transport, otelhttp.WithTracerProvider(traceProvider))
+	}
+
 	netHTTPClient.CheckRedirect = checkRedirect(cfg, log)
 
 	return netHTTPClient, nil
 }
 
-// clientOption returns constructed client configuration options, including
-// setting up http+unix and http+npipe transports if requested.
 func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings, logger *logp.Logger) []httpcommon.TransportOption {
 	scheme, trans, ok := strings.Cut(u.Scheme, "+")
 	var dialer transport.Dialer
@@ -431,7 +444,6 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings, logge
 	case !ok:
 		return []httpcommon.TransportOption{
 			httpcommon.WithLogger(logger),
-			httpcommon.WithAPMHTTPInstrumentation(),
 			keepalive,
 		}
 
@@ -449,7 +461,6 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings, logge
 	}
 	u.Scheme = scheme
 	return []httpcommon.TransportOption{
-		httpcommon.WithAPMHTTPInstrumentation(),
 		keepalive,
 		httpcommon.WithBaseDialer(dialer),
 	}
@@ -513,4 +524,11 @@ func makeEvent(body mapstr.M) (beat.Event, error) {
 		Timestamp: now,
 		Fields:    fields,
 	}, nil
+}
+
+func otelTracer(ctx v2.Context) trace.Tracer {
+	if ctx.TracerProvider == nil {
+		return noop.Tracer{}
+	}
+	return ctx.TracerProvider.Tracer("httpjson_input_run")
 }

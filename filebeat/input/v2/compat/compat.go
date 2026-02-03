@@ -156,6 +156,7 @@ func (r *runner) Start() {
 			Cancelation:     r.sig,
 			MetricsRegistry: reg,
 			Logger:          log,
+			TracerProvider:  r.agent.TracerProvider,
 		}
 		ctx = ctx.WithStatusReporter(r.statusReporter)
 

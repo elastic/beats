@@ -8,12 +8,17 @@ import (
 	"context"
 	"fmt"
 
+	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
+	"go.uber.org/zap"
+
 	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
+	fbOtel "github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -45,7 +50,17 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 	settings.ElasticLicensed = true
 	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 
-	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core())
+
+	// Initialize the OpenTelemetry tracer provider to enable tracing if configured.
+	var tracerProvider trace.TracerProvider
+	if tracerProvider, err = fbOtel.TracerProvider(ctx, set.BuildInfo.Version); err != nil {
+		set.Logger.Error("failed to initialize OpenTelemetry tracing  %+v", zap.Error(err))
+	} else if tracerProvider == nil {
+		set.Logger.Info("OpenTelemetry tracing is disabled")
+		tracerProvider = noop.TracerProvider{}
+	}
+
+	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core(), tracerProvider)
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}

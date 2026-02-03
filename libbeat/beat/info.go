@@ -22,6 +22,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -42,9 +43,10 @@ type Info struct {
 	UserAgent        string    // A string of the user-agent that can be passed to any outputs or network connections
 	FIPSDistribution bool      // If the beat was compiled as a FIPS distribution.
 
-	LogConsumer consumer.Logs // otel log consumer
-	ComponentID string        // otel component id from the collector config e.g. "filebeatreceiver/logs"
-	Logger      *logp.Logger
+	LogConsumer    consumer.Logs // otel log consumer
+	ComponentID    string        // otel component id from the collector config e.g. "filebeatreceiver/logs"
+	Logger         *logp.Logger
+	TracerProvider trace.TracerProvider // otel tracer provider
 }
 
 func (i Info) FQDNAwareHostname(useFQDN bool) string {

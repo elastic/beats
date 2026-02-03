@@ -11,6 +11,8 @@ import (
 	"io"
 	"time"
 
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -34,6 +36,7 @@ type BeatReceiver struct {
 	beater   beat.Beater
 	reporter *log.Reporter
 	Logger   *logp.Logger
+	Tracer   trace.Tracer
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
