@@ -79,6 +79,5 @@ targets:
         - .buildkite/x-pack/pipeline.xpack.otel.yml
         - .buildkite/x-pack/pipeline.xpack.packetbeat.yml
         - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
-        - .buildkite/x-pack/elastic-agent/pipeline.xpack.elastic-agent.yml
       matchpattern: '(IMAGE_.+): "platform-ingest-beats-(.+)-(.+)"'
       replacepattern: '$1: "platform-ingest-beats-$2-{{ source "latestVersion" }}"'
