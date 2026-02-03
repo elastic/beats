@@ -3,12 +3,22 @@ name: "beats-libbeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-1768449671-aarch64-1768449671"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+<<<<<<< HEAD
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+=======
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1768449671"
+  IMAGE_WIN_10: "platform-ingest-beats-windows-10-1768449671"
+  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1768449671"
+  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1768449671"
+  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1768449671"
+  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1768449671"
+>>>>>>> b1b83ea48 (ci: pin versions for the BK VM images (#48666))
   IMAGE_UBUNTU_X86_64_FIPS: "platform-ingest-beats-ubuntu-2204-fips"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
@@ -93,7 +103,7 @@ steps:
             - limit: 1
         agents:
           provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_X86_64_FIPS}"
+          image: "${IMAGE_UBUNTU_X86_64_FIPS}"
           instanceType: "m5.xlarge"
         env:
           FIPS: "true"
@@ -244,7 +254,7 @@ steps:
             - limit: 1
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          image: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - "libbeat/build/*.xml"
