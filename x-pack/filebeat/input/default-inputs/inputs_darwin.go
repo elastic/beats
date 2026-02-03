@@ -10,6 +10,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/akamai"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage"
@@ -33,6 +34,7 @@ import (
 
 func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States, p *paths.Path) []v2.Plugin {
 	return []v2.Plugin{
+		akamai.Plugin(log, store),
 		azureblobstorage.Plugin(log, store),
 		azureeventhub.Plugin(log),
 		cel.Plugin(log, store),
