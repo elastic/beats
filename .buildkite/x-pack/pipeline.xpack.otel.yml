@@ -3,7 +3,7 @@ name: "beats-xpack-otel"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1768449671"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1769918490"
 
   IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1768449671"
 
