@@ -68,7 +68,7 @@ sources:
   golangImageVersion:
     dependson:
       - latestGoVersion
-    name: Get golang version with bookworm suffix
+    name: Get the golang image version used in Dockerfiles
     kind: shell
     spec:
       command: echo {{ source "latestGoVersion" }}-bookworm
