@@ -42,9 +42,9 @@ conditions:
   latestVersion-check:
     name: Check if defined latest version differs
     kind: shell
-    sourceid: latestVersion
+    disablesourceinput: true
     spec:
-      command: 'grep -q -v {{ source "latestVersion" }} .buildkite/pipeline.yml #'
+      command: 'grep -q -v {{ source "latestVersion" }} .buildkite/packaging.pipeline.yml'
 
 # NOTE: if you add a new target file, please update the .mergify.yml file
 #       to include the new file for the approval and automatic merge
@@ -57,10 +57,7 @@ targets:
     spec:
       files:
         - .buildkite/aws-tests-pipeline.yml
-        - .buildkite/ironbank-validation.yml
         - .buildkite/packaging.pipeline.yml
-        - .buildkite/pipeline.yml
-        - .buildkite/pipeline-scheduler.yml
         - .buildkite/auditbeat/auditbeat-pipeline.yml
         - .buildkite/filebeat/filebeat-pipeline.yml
         - .buildkite/heartbeat/heartbeat-pipeline.yml
