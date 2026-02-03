@@ -12,7 +12,7 @@
                 }
             },
             "metadata": {
-                "display_name": "my-cluster"
+                "display_name": "my-overridden-cluster-name"
             },
             "max_shards_per_node": "4000"
         },
@@ -23,11 +23,21 @@
         },
         "action": {
             "auto_create_index": ".ent-search-*-logs-*,-.ent-search-*,+*"
+        },
+        "serverless": {
+            "search": {
+                "search_power_min": "3"
+            }
         }
     },
     "transient": {
         "action": {
             "auto_create_index": ".ent-search-*-logs-*,-.ent-search-*,+*"
+        },
+        "cluster": {
+            "metadata": {
+                "display_name": "my-cluster"
+            }
         }
     },
     "defaults": {

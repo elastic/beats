@@ -1,5 +1,25 @@
 {
     "tasks": {
+        "persistent:1": {
+            "node": "node1",
+            "id": 70238705,
+            "type": "persistent",
+            "action": "geoip-downloader[c]",
+            "status": {
+            "successful_downloads": 141,
+            "failed_downloads": 0,
+            "total_download_time": 573780,
+            "databases_count": 3,
+            "skipped_updates": 0,
+            "expired_databases": 0
+            },
+            "start_time_in_millis": 1757650794568,
+            "running_time_in_nanos": 11996035542195824,
+            "cancellable": true,
+            "cancelled": false,
+            "parent_task_id": "cluster:211",
+            "headers": {}
+        },
         "node1:45": {
             "node": "node1",
             "id": 45,
