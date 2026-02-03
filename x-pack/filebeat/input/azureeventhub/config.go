@@ -476,7 +476,7 @@ func (conf *azureInputConfig) GetFullyQualifiedEventHubNamespace() (string, erro
 			return "", fmt.Errorf("failed to parse connection string: %w", err)
 		}
 		return connectionStringProperties.FullyQualifiedNamespace, nil
-	case AuthTypeClientSecret:
+	case AuthTypeClientSecret, AuthTypeManagedIdentity:
 		// When using client_secret auth, use EventHubNamespace directly
 		if conf.EventHubNamespace == "" {
 			return "", fmt.Errorf("eventhub_namespace is required when using client_secret authentication")
