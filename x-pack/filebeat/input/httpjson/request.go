@@ -104,7 +104,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
 				p := newPublisher(trCtx, publisher, true, r.metrics, r.status, r.log)
-				r.responseProcessors[i].startProcessing(ctx, trCtx, finalResps, true, p, true)
+				r.responseProcessors[i].startProcessing(ctx, trCtx, finalResps, true, p, false)
 				n = p.eventCount()
 				continue
 			}
@@ -141,7 +141,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 			}
 			// we avoid unnecessary pagination here since chaining is present, thus avoiding any unexpected updates to cursor values
 			p := newPublisher(trCtx, publisher, false, r.metrics, r.status, r.log)
-			r.responseProcessors[i].startProcessing(ctx, trCtx, finalResps, false, p, false)
+			r.responseProcessors[i].startProcessing(ctx, trCtx, finalResps, false, p, true)
 			n = p.eventCount()
 		} else {
 			if len(ids) == 0 {
@@ -218,7 +218,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 
 			p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.metrics, r.status, r.log)
 			if rf.isChain {
-				rf.chainResponseProcessor.startProcessing(ctx, chainTrCtx, resps, true, p, false)
+				rf.chainResponseProcessor.startProcessing(ctx, chainTrCtx, resps, true, p, true)
 			} else {
 				r.responseProcessors[i].startProcessing(ctx, trCtx, resps, true, p, false)
 			}
@@ -759,7 +759,7 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 			resps = intermediateResps
 		}
 		p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.metrics, r.status, r.log)
-		rf.chainResponseProcessor.startProcessing(ctx, chainTrCtx, resps, true, p, false)
+		rf.chainResponseProcessor.startProcessing(ctx, chainTrCtx, resps, true, p, true)
 		n += p.eventCount()
 	}
 

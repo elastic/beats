@@ -48,7 +48,7 @@ func (resp *response) clone() *response {
 	return clone
 }
 
-func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Logger, failStringArray bool) []transformable {
+func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Logger, allowStringArray bool) []transformable {
 	var ts []transformable
 
 	convertAndAppend := func(m map[string]interface{}) {
@@ -61,7 +61,6 @@ func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Log
 
 	switch tresp := resp.body.(type) {
 	case []interface{}:
-		{
 			values := []string{}
 			for _, v := range tresp {
 				m, ok := v.(map[string]interface{})
@@ -78,12 +77,11 @@ func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Log
 				convertAndAppend(m)
 			}
 
-			if len(values) > 0 && (len(values) != len(tresp) || failStringArray ) {
+			if len(values) > 0 && (len(values) != len(tresp) || !allowStringArray ) {
 					msg := fmt.Sprintf("events must be JSON objects, but got strings in a non-chained configuration %v", values)
 					log.Debug(msg)
 					stat.UpdateStatus(status.Degraded, msg)
 			}
-		}
 	case map[string]interface{}:
 		convertAndAppend(tresp)
 	default:
@@ -206,7 +204,7 @@ type handler interface {
 	handleError(error)
 }
 
-func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, h handler, failStringArray bool) {
+func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, h handler, allowStringArray bool) {
 	trCtx.clearIntervalData()
 
 	var npages int64
@@ -227,7 +225,7 @@ func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transfo
 				return
 			}
 
-			respTrs := page.asTransformables(rp.status, rp.log, failStringArray)
+			respTrs := page.asTransformables(rp.status, rp.log, allowStringArray)
 
 			if len(respTrs) == 0 {
 				return
