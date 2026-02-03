@@ -15,14 +15,11 @@ The automation tracks the latest VM image builds from the Google Cloud Storage a
 
 ### Files Updated
 
-The automation updates 24 Buildkite pipeline files across the beats repository:
+The automation updates 18 Buildkite pipeline files across the beats repository:
 
 **Root Level Pipelines:**
 - `.buildkite/aws-tests-pipeline.yml`
-- `.buildkite/ironbank-validation.yml`
 - `.buildkite/packaging.pipeline.yml`
-- `.buildkite/pipeline.yml`
-- `.buildkite/pipeline-scheduler.yml`
 
 **Beat-Specific Pipelines:**
 - `.buildkite/auditbeat/auditbeat-pipeline.yml`
@@ -44,7 +41,6 @@ The automation updates 24 Buildkite pipeline files across the beats repository:
 - `.buildkite/x-pack/pipeline.xpack.otel.yml`
 - `.buildkite/x-pack/pipeline.xpack.packetbeat.yml`
 - `.buildkite/x-pack/pipeline.xpack.winlogbeat.yml`
-- `.buildkite/x-pack/elastic-agent/pipeline.xpack.elastic-agent.yml`
 
 **Deploy Pipelines:**
 - `.buildkite/deploy/kubernetes/deploy-k8s-pipeline.yml`
