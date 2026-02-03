@@ -153,7 +153,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, f
 	if err != nil || !stat.IsDir() {
 		log := beatInfo.Logger.Named(logName)
 		if !management.UnderAgent() {
-			// When run under agent via agentbeat there is no modules directory and this is expected.
+			// When run under bundled in elastic-otel-collector via elastic-agent there is no modules directory and this is expected.
 			log.Errorf("Not loading modules. Module directory not found: %s", modulesPath)
 		}
 		return &ModuleRegistry{log: log, beatPaths: beatPaths}, nil

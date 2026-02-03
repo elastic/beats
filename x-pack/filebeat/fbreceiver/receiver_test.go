@@ -36,7 +36,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -105,6 +105,10 @@ func TestNewReceiver(t *testing.T) {
 				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
 				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
+			assert.Condition(c, func() bool {
+				metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
+				return assert.NotEmpty(t, metricsStarted.All(), "metrics logging not started")
+			}, "failed to check metrics logging")
 		},
 	})
 }
@@ -280,6 +284,9 @@ func TestMultipleReceivers(t *testing.T) {
 				// overwritten when multiple receivers started in the same process.
 				startLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+helper.name))
 				assert.Equalf(c, 1, startLogs.Len(), "%v should have a single start log", helper)
+
+				startMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+helper.name))
+				assert.Equalf(c, 1, startMetricsLogs.Len(), "%v should have a single start metrircs logging every 30s", helper)
 
 				metaPath := filepath.Join(helper.home, "/data/meta.json")
 				assert.FileExistsf(c, metaPath, "%s of %v should exist", metaPath, helper)

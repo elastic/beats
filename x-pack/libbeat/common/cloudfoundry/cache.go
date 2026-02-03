@@ -33,9 +33,10 @@ type clientCacheWrap struct {
 }
 
 // newClientCacheWrap creates a new cache for application data.
-func newClientCacheWrap(client cfClient, cacheName string, ttl time.Duration, errorTTL time.Duration, log *logp.Logger) (*clientCacheWrap, error) {
+func newClientCacheWrap(client cfClient, cacheName string, ttl time.Duration, errorTTL time.Duration, log *logp.Logger, rootPath string) (*clientCacheWrap, error) {
 	options := persistentcache.Options{
-		Timeout: ttl,
+		Timeout:  ttl,
+		RootPath: rootPath,
 	}
 
 	name := "cloudfoundry"

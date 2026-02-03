@@ -63,10 +63,33 @@ The `translate_ldap_attribute` processor has the following configuration setting
 Beats attempts LDAP authentication in the following order:
 
 . Simple bind using `ldap_bind_user` and `ldap_bind_password` when both are supplied.
-. Automatic bind when both values are empty. On Windows Beats creates an SSPI (Kerberos/NTLM) client for the SPN `ldap/<hostname derived from ldap_address>`, which works for Local System services and gMSA accounts. Other platforms do not yet implement automatic authentication.
+. Automatic bind when both values are empty. On Windows Beats creates an SSPI (Kerberos/NTLM) client for the SPN `ldap/<hostname derived from ldap_address>`. Other platforms do not yet implement automatic authentication and fall back to unauthenticated bind immediately.
 . If automatic authentication is unavailable or fails, Beats issues an unauthenticated bind. When `ldap_bind_user` is set without a password that identity is used; otherwise Beats binds anonymously.
 
 Always prefer specifying `ldap_address` as an FQDN (for example `ldap://dc1.example.com:389`) so the SPN built for SSPI matches the controller's service principal and TLS certificates.
+
+==== Windows SSPI requirements
+
+SSPI (Security Support Provider Interface) enables passwordless authentication to Active Directory by using the credentials of the Windows process identity. However, SSPI only works when the Beat runs under an account that has valid Kerberos credentials.
+
+.Windows account types and SSPI compatibility
+[options="header"]
+|======
+| Account Type | SSPI Works | Reason
+| Local System (`NT AUTHORITY\SYSTEM`) | Yes | Uses the computer account's domain credentials on domain-joined machines.
+| Network Service (`NT AUTHORITY\NETWORK SERVICE`) | Yes | Uses the computer account's domain credentials on domain-joined machines.
+| Domain user account | Yes | Uses the domain user's Kerberos credentials.
+| Group Managed Service Account (gMSA) | Yes | Domain account with AD-managed password. Ideal for services.
+| Local user account | *No* | Local accounts have no Active Directory identity and cannot obtain Kerberos tickets.
+|======
+
+IMPORTANT: When running {beatname_uc} as a local user account, SSPI authentication will not work. You must either:
+
+* Provide explicit credentials using `ldap_bind_user` and `ldap_bind_password`.
+* Configure the LDAP server to allow unauthenticated/anonymous queries for the required attributes.
+* Run the Beat under a domain account, gMSA, or Local System instead of a local user.
+
+For domain accounts or gMSA, ensure the account has read permissions on the LDAP objects being queried.
 
 ==== Server auto-discovery
 

@@ -111,6 +111,17 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 		require.EqualValues(t, 24175874622, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.write.completed"))
 		require.EqualValues(t, 1, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.threads"))
 		require.EqualValues(t, 383009, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.completed"))
+	} else if data.Version == "9.2.0" {
+		require.Equal(t, 1, len(nodeStatsEvents))
+		require.EqualValues(t, 1, nodeStatsEvents[0].ModuleFields["total_amount_of_fractions"])
+
+		// metricset fields
+		require.Equal(t, "172.23.176.224", node1MetricSet["host"])
+		require.Equal(t, false, node1MetricSet["is_elected_master"])
+		require.ElementsMatch(t, []string{"data_content", "data_hot", "ingest", "master", "remote_cluster_client", "transform"}, node1MetricSet["roles"])
+		require.EqualValues(t, 2902603, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.docs.count"))
+		require.EqualValues(t, 2818360, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.dense_vector.count"))
+		require.EqualValues(t, 4510292000, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.dense_vector.off_heap.total_size_bytes"))
 	}
 
 	// some ignored values

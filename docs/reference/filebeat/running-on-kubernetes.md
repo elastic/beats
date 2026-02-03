@@ -91,7 +91,7 @@ container.
 
 1. All `filestream` inputs require a unique ID.
 2. Container logs use symlinks, so they need to be enabled.
-3. A path for each container, so the input will only ingest the logs from its 
+3. A path for each container, so the input will only ingest the logs from its
 container.
 
 ::::
@@ -156,8 +156,8 @@ If you are using Red Hat OpenShift, you need to specify additional settings in t
 ## Log rotation [_logrotation]
 
 Filebeat supports reading from rotating log files, [including GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
-However, some log rotation strategies can result in lost or duplicate events 
-when using Filebeat to forward messages. For more information, refer to 
+However, some log rotation strategies can result in lost or duplicate events
+when using Filebeat to forward messages. For more information, refer to
 [Log rotation results in lost or duplicate events](/reference/filebeat/file-log-rotation.md).
 
 Kubernetes stores logs on `/var/log/pods` and uses symlinks on `/var/log/containers`
@@ -259,7 +259,7 @@ metadata, you must consider using autodiscover instead. Refer to the
                          resource_type: "pod" <3>
 ```
 
-1. {applies_to}`stack: beta 9.2.0, removed 9.3.0` Enable gzip decompression. Refer to [Reading GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
+1. {applies_to}`stack: removed 9.3+, beta =9.2` Enable gzip decompression. Refer to [Reading GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
 
 2. `/var/log/pods/` contains the active log files as well as the rotated log files.
 
@@ -328,7 +328,7 @@ container.
         file_identity.fingerprint: ~
 ```
 
-1. {applies_to}`stack: beta 9.2.0, removed 9.3.0` Enable gzip decompression. Refer to [Reading GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
+1. {applies_to}`stack: removed 9.3+, beta =9.2` Enable gzip decompression. Refer to [Reading GZIP files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files).
 
 2. `/var/log/pods/` contains the active log files as well as the rotated log files.
    The input is configured to only read logs from the container it's for.

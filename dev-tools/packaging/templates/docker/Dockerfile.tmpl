@@ -133,8 +133,8 @@ USER root
 # Install required dependencies from wolfi repository
 RUN for iter in {1..10}; do \
         apk update && \
-        apk add --no-interactive --no-progress --no-cache nodejs-22=22.20.0-r0 npm=11.4.2-r1 glib dbus-glib libatk-1.0 \
-        libatk-bridge-2.0 cups-libs libxcomposite libxdamage libxrandr libxkbcommon pango alsa-lib \
+        apk add --no-interactive --no-progress --no-cache nodejs-22=22.22.0-r0 npm=11.4.2-r1 glib dbus-glib libatk-1.0 \
+        libatk-bridge-2.0 cups-libs libxcomposite libxdamage libxfixes libxrandr libxkbcommon pango alsa-lib \
         font-opensans fontconfig gtk icu-data-full libnss mesa font-noto-cjk font-noto-emoji && \
         exit_code=0 && break || exit_code=$? && echo "apk error: retry $iter in 10s" && sleep 10; \
     done; \
@@ -172,9 +172,9 @@ RUN for iter in {1..10}; do \
     dbus-glib libicu mesa-libGL unzip \
     findutils shadow-utils ca-certificates gawk libcap xz tar -y && \
     mkdir -p /usr/share/fonts/google-noto && \
-    curl -LO https://noto-website-2.storage.googleapis.com/pkgs/NotoSansCJKjp-hinted.zip && \
-    unzip NotoSansCJKjp-hinted.zip -d /usr/share/fonts/google-noto && \
-    rm -f NotoSansCJKjp-hinted.zip && \
+    curl -L -o NotoSansCJKjp.zip https://github.com/notofonts/noto-cjk/releases/download/Sans2.004/06_NotoSansCJKjp.zip && \
+    unzip NotoSansCJKjp.zip -d /usr/share/fonts/google-noto && \
+    rm -f NotoSansCJKjp.zip && \
     microdnf -y remove unzip && \
     curl -LO https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf && \
     mv NotoSans-Regular.ttf /usr/share/fonts/google-noto && \
@@ -198,7 +198,7 @@ RUN echo \
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV TZ=UTC
-ENV NODE_VERSION=22.20.0
+ENV NODE_VERSION=22.22.0
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites

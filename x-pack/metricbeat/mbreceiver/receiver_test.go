@@ -22,15 +22,14 @@ import (
 	"strings"
 	"testing"
 
-	"go.opentelemetry.io/collector/pdata/pcommon"
-
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componentstatus"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/receiver"
 
 	"go.uber.org/zap"
@@ -107,6 +106,10 @@ func TestNewReceiver(t *testing.T) {
 				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
 				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
+			assert.Condition(c, func() bool {
+				metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
+				return assert.NotEmpty(t, metricsStarted.All(), "metrics logging not started")
+			}, "failed to check metrics logging")
 		},
 	})
 }
@@ -209,6 +212,11 @@ func TestMultipleReceivers(t *testing.T) {
 			assert.Equal(c, 1, r1StartLogs.Len(), "r1 should have a single start log")
 			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r2"))
 			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
+
+			r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
+			assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single start metrircs logging every 30s")
+			r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
+			assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single start metrircs logging every 30s")
 
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {

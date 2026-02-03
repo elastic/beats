@@ -10,11 +10,12 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	"github.com/elastic/beats/v7/libbeat/processors/add_docker_metadata"
 	"github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
 	"github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
+	"github.com/elastic/beats/v7/x-pack/otel/otelmap"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -87,6 +88,8 @@ func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Log
 			processorInstance, createProcessorError = add_cloud_metadata.New(processorConfig, logpLogger)
 		case "add_docker_metadata":
 			processorInstance, createProcessorError = add_docker_metadata.New(processorConfig, logpLogger)
+		case "add_fields":
+			processorInstance, createProcessorError = addfields.CreateAddFields(processorConfig, logpLogger)
 		case "add_host_metadata":
 			processorInstance, createProcessorError = add_host_metadata.New(processorConfig, logpLogger)
 		case "add_kubernetes_metadata":
