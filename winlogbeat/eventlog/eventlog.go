@@ -18,6 +18,7 @@
 package eventlog
 
 import (
+	"context"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -37,6 +38,10 @@ type EventLog interface {
 	// Read records from the event log. If io.EOF is returned you should stop
 	// reading and close the log.
 	Read() ([]Record, error)
+
+	// WaitForEvents blocks until new events are available or context is canceled.
+	// Returns nil when events may be available, or context error if canceled.
+	WaitForEvents(ctx context.Context) error
 
 	// Reset closes the event log channel to allow recovering from recoverable
 	// errors. Open must be successfully called after a Reset before Read may

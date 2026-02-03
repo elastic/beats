@@ -177,24 +177,29 @@ func (itr *EventIterator) moreHandles() bool {
 		case nil:
 			itr.lastErr = nil
 			itr.active = itr.handles[:numReturned]
-		case windows.ERROR_NO_MORE_ITEMS, windows.ERROR_INVALID_OPERATION:
-		case windows.RPC_S_INVALID_BOUND:
+		case windows.ERROR_NO_MORE_ITEMS:
+		case windows.ERROR_INVALID_OPERATION, windows.RPC_S_INVALID_BOUND:
 			// Attempt automated recovery if we have a factory.
 			if itr.subscriptionFactory != nil {
 				itr.subscription.Close()
 				itr.subscription, err = itr.subscriptionFactory()
 				if err != nil {
-					itr.lastErr = fmt.Errorf("failed in EvtNext while trying to recover from RPC_S_INVALID_BOUND error: %w", err)
-					itr.logger.Errorw("Failed to recreate subscription during RPC_S_INVALID_BOUND recovery",
+					itr.lastErr = fmt.Errorf("failed in EvtNext while trying to recover: %w", err)
+					itr.logger.Errorw("Failed to recreate subscription during recovery",
 						"error", err)
 					return false
 				}
 
-				// Reduce batch size and try again.
-				batchSize = batchSize / 2
-				itr.logger.Infow("Subscription recreated after RPC_S_INVALID_BOUND",
-					"new_subscription_handle", uintptr(itr.subscription),
-					"new_batch_size", batchSize)
+				// Only reduce batch size for RPC_S_INVALID_BOUND
+				if errors.Is(err, windows.RPC_S_INVALID_BOUND) {
+					batchSize = batchSize / 2
+					itr.logger.Infow("Subscription recreated after RPC_S_INVALID_BOUND",
+						"new_subscription_handle", uintptr(itr.subscription),
+						"new_batch_size", batchSize)
+				} else {
+					itr.logger.Infow("Subscription recreated after ERROR_INVALID_OPERATION",
+						"new_subscription_handle", uintptr(itr.subscription))
+				}
 				continue
 			} else {
 				itr.lastErr = fmt.Errorf("failed in EvtNext (try reducing the batch size or providing a subscription factory for automatic recovery): %w", err)

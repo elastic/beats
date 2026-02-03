@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"runtime"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -30,7 +31,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/timed"
 )
 
 type Publisher interface {
@@ -46,6 +46,10 @@ func Run(
 	publisher Publisher,
 	log *logp.Logger,
 ) error {
+	// Pin runner to a single OS thread to satisfy Windows Event Log threading requirements.
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	reporter.UpdateStatus(status.Starting, fmt.Sprintf("Starting to read from %s", api.Channel()))
 	// setup closing the API if either the run function is signaled asynchronously
 	// to shut down or when returning after io.EOF
@@ -133,7 +137,9 @@ runLoop:
 			}
 
 			if len(records) == 0 {
-				_ = timed.Wait(cancelCtx, time.Second)
+				if waitErr := api.WaitForEvents(cancelCtx); waitErr != nil && cancelCtx.Err() == nil {
+					log.Warnw("error while waiting for events", "error", waitErr)
+				}
 				continue
 			}
 

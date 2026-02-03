@@ -20,12 +20,14 @@
 package eventlog
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"golang.org/x/sys/windows"
 
@@ -54,7 +56,8 @@ type winEventLog struct {
 	iterator *win.EventIterator
 	renderer win.EventRenderer
 
-	metrics *inputMetrics
+	metrics     *inputMetrics
+	signalEvent windows.Handle
 }
 
 // newWinEventLog creates and returns a new EventLog for reading event logs
@@ -270,7 +273,7 @@ func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) 
 	if err != nil {
 		return win.NilHandle, err
 	}
-	defer windows.CloseHandle(signalEvent) //nolint:errcheck // This is just a resource release.
+	l.signalEvent = signalEvent
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
@@ -309,9 +312,11 @@ func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) 
 		h, err = win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
 		if err != nil {
 			l.log.Errorw("Failed to recreate subscription from oldest", "error", err)
+			l.closeSignalEvent()
 		}
 		return h, err
 	default:
+		l.closeSignalEvent()
 		return 0, err
 	}
 }
@@ -442,6 +447,7 @@ func (l *winEventLog) Reset() error {
 	// unnecessarily recreating render contexts. The renderer's
 	// systemContext and userContext should remain valid across
 	// session resets since they were created independently.
+	defer l.closeSignalEvent()
 	if l.iterator == nil {
 		return nil
 	}
@@ -457,6 +463,7 @@ func (l *winEventLog) Close() error {
 }
 
 func (l *winEventLog) close() error {
+	defer l.closeSignalEvent()
 	if l.iterator == nil {
 		return l.renderer.Close()
 	}
@@ -480,4 +487,58 @@ func (l *winEventLog) skipQueryFilters() bool {
 		return false
 	}
 	return l.isForwarded() && strings.Contains(osinfo.Name, "2025")
+}
+
+// WaitForEvents blocks until the Windows Event Log signal is triggered or context is canceled.
+// Uses a 1 second timeout - if timeout occurs, treats it as signaled to check for events.
+// Falls back to timer if no signal event is available (file-based logs).
+func (l *winEventLog) WaitForEvents(ctx context.Context) error {
+	// Fall back to timer if no signal event (e.g., reading from file)
+	if l.signalEvent == 0 {
+		return l.waitWithTimer(ctx)
+	}
+
+	// Wait for signal with 10 second timeout
+	for {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+
+		status, err := windows.WaitForSingleObject(l.signalEvent, 10000)
+		switch {
+		case status == windows.WAIT_OBJECT_0:
+			// Signaled - events available
+			return nil
+		case errors.Is(err, windows.ERROR_TIMEOUT):
+			// Timeout treated as signal - check for events
+			return nil
+		case status == windows.WAIT_ABANDONED:
+			return errors.New("wait for signal event returned WAIT_ABANDONED")
+		case err != nil:
+			return fmt.Errorf("wait for signal event failed: %w", err)
+		default:
+			return fmt.Errorf("wait for signal event failed with status %d", status)
+		}
+	}
+}
+
+func (l *winEventLog) waitWithTimer(ctx context.Context) error {
+	timer := time.NewTimer(time.Second)
+	defer timer.Stop()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-timer.C:
+		return nil
+	}
+}
+
+func (l *winEventLog) closeSignalEvent() {
+	handle := l.signalEvent
+	if handle == 0 {
+		return
+	}
+	l.signalEvent = 0
+	_ = windows.CloseHandle(handle)
 }
