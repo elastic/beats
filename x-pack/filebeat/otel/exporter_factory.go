@@ -187,30 +187,26 @@ func GetExporterTypeFromEnv() ExporterType {
 			http/json to use OTLP/HTTP + JSON (not available in golang)
 	*/
 
-	// this is the expected setup for agentless
-	exporter, ok := os.LookupEnv("OTEL_METRICS_EXPORTER")
-	if ok && exporter == "console" {
+	switch os.Getenv("OTEL_METRICS_EXPORTER") {
+	case "console":
 		return console
-	}
-	if ok && exporter == "none" {
-		return None
-	}
-	if ok && exporter == "prometheus" {
-		return None
-	}
+	case "otlp":
+		if os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT") == "" {
+			return None
+		}
 
-	_, ok = os.LookupEnv("OTEL_EXPORTER_OTLP_ENDPOINT")
-	if ok {
-		protocol, ok := os.LookupEnv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL")
-		if !ok {
+		switch strings.ToLower(os.Getenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL")) {
+		case "", string(GRPC):
+			// default to gRPC if protocol is unset
 			return GRPC
-		}
-		if strings.Contains(strings.ToLower(protocol), string(GRPC)) {
-			return GRPC
-		}
-		if strings.ToLower(protocol) == "http/protobuf" {
+		case "http/protobuf":
 			return HTTP
+		default:
+			// unknown protocol
+			return None
 		}
+	default:
+		// exporter is none, prometheus, (unknown), (unset)
+		return None
 	}
-	return None
 }
