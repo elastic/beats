@@ -53,6 +53,9 @@ type LoggingRoundTripper struct {
 //
 // Fields logged in requests:
 //
+//	transaction.id
+//	trace.id
+//	span.id
 //	url.original
 //	url.scheme
 //	url.path
@@ -69,12 +72,18 @@ type LoggingRoundTripper struct {
 //
 // Fields logged in responses:
 //
+//	transaction.id
+//	trace.id
+//	span.id
 //	http.response.status_code
 //	http.response.body.content
 //	http.response.body.truncated
 //	http.response.body.bytes
 //	http.response.mime_type
 //	http.response.header
+//
+// The trace.id and span.id fields are populated with IDs from the OTel span in
+// context.
 func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Create a child logger for this request.
 	txID := rt.nextTxID()
