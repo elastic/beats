@@ -78,10 +78,10 @@ func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Log
 				convertAndAppend(m)
 			}
 
-			if len(values) > 0 && (len(values) != len(tresp) || failStringArray ) {
-					msg := fmt.Sprintf("events must be JSON objects, but got strings in a non-chained configuration %v", values)
-					log.Debug(msg)
-					stat.UpdateStatus(status.Degraded, msg)
+			if len(values) > 0 && (len(values) != len(tresp) || failStringArray) {
+				msg := fmt.Sprintf("events must be JSON objects, but got strings in a non-chained configuration %v", values)
+				log.Debug(msg)
+				stat.UpdateStatus(status.Degraded, msg)
 			}
 		}
 	case map[string]interface{}:

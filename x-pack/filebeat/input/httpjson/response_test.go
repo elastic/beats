@@ -55,7 +55,7 @@ func TestTransformable(t *testing.T) {
 		expectStatusUpdates    bool
 		statusUpdate           status.Status
 		expectLogs             bool
-		degradeOnStringArray        bool
+		degradeOnStringArray   bool
 	}{
 		{
 			name:                   "array of strings allowed",
@@ -109,7 +109,7 @@ func TestTransformable(t *testing.T) {
 			expectStatusUpdates:    true,
 			expectLogs:             true,
 			statusUpdate:           status.Degraded,
-			degradeOnStringArray: true,
+			degradeOnStringArray:   true,
 		},
 		{
 			name:                   "array of 1 string causes degrade",
@@ -118,9 +118,8 @@ func TestTransformable(t *testing.T) {
 			expectStatusUpdates:    true,
 			expectLogs:             true,
 			statusUpdate:           status.Degraded,
-			degradeOnStringArray: true,
+			degradeOnStringArray:   true,
 		},
-
 	}
 
 	for _, tt := range tests {
