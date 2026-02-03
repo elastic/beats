@@ -114,6 +114,10 @@ runLoop:
 		// read loop
 		for cancelCtx.Err() == nil {
 			reporter.UpdateStatus(status.Running, fmt.Sprintf("Reading from %s", api.Channel()))
+			if waitErr := api.WaitForEvents(cancelCtx); waitErr != nil && cancelCtx.Err() == nil {
+				log.Warnw("error while waiting for events", "error", waitErr)
+				continue
+			}
 			records, readErr := api.Read()
 			if readErr != nil {
 				if readErrHandler.backoff(cancelCtx, readErr) {
@@ -137,9 +141,6 @@ runLoop:
 			}
 
 			if len(records) == 0 {
-				if waitErr := api.WaitForEvents(cancelCtx); waitErr != nil && cancelCtx.Err() == nil {
-					log.Warnw("error while waiting for events", "error", waitErr)
-				}
 				continue
 			}
 
