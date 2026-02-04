@@ -71,8 +71,8 @@ func newExporterFromCfg(ctx context.Context, cfg *ExporterCfg) (sdktrace.SpanExp
 		switch cfg.Protocol {
 		case "grpc":
 			var opts []otlptracegrpc.Option
-			if cfg.Endpoint != "" {
-				opts = append(opts, otlptracegrpc.WithEndpoint(cfg.Endpoint))
+			if cfg.EndpointURL != "" {
+				opts = append(opts, otlptracegrpc.WithEndpointURL(cfg.EndpointURL))
 			}
 			if len(cfg.Headers) > 0 {
 				opts = append(opts, otlptracegrpc.WithHeaders(cfg.Headers))
@@ -86,8 +86,8 @@ func newExporterFromCfg(ctx context.Context, cfg *ExporterCfg) (sdktrace.SpanExp
 			return otlptracegrpc.New(ctx, opts...)
 		case "http/protobuf":
 			var opts []otlptracehttp.Option
-			if cfg.Endpoint != "" {
-				opts = append(opts, otlptracehttp.WithEndpoint(cfg.Endpoint))
+			if cfg.EndpointURL != "" {
+				opts = append(opts, otlptracehttp.WithEndpointURL(cfg.EndpointURL))
 			}
 			if len(cfg.Headers) > 0 {
 				opts = append(opts, otlptracehttp.WithHeaders(cfg.Headers))
@@ -108,21 +108,21 @@ func newExporterFromCfg(ctx context.Context, cfg *ExporterCfg) (sdktrace.SpanExp
 }
 
 type ExporterCfg struct {
-	Disabled bool
-	Exporter string
-	Protocol string
-	Endpoint string
-	Headers  map[string]string
-	Timeout  time.Duration
-	Insecure bool
+	Disabled    bool
+	Exporter    string
+	Protocol    string
+	EndpointURL string
+	Headers     map[string]string
+	Timeout     time.Duration
+	Insecure    bool
 }
 
 // newExporterCfgFromEnv loads exporter configuration data from standard environment variables, in a form ready to use for exporter creation.
 // The environment variables considered are:
 // - BEATS_OTEL_TRACES_DISABLE (CSV values: cel,httpjson, default: (none))
 // - OTEL_TRACES_EXPORTER (CSV values: none,otlp,console, first supported wins, default: none)
+// - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT / OTEL_EXPORTER_OTLP_ENDPOINT (e.g. "http://otlp-receiver.example.com:4317/v1/traces")
 // - OTEL_EXPORTER_OTLP_TRACES_PROTOCOL / OTEL_EXPORTER_OTLP_PROTOCOL (values: grpc|http/protobuf, default: grpc)
-// - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT / OTEL_EXPORTER_OTLP_ENDPOINT (e.g. "http://otlp-receiver.example.com:4317")
 // - OTEL_EXPORTER_OTLP_TRACES_HEADERS  / OTEL_EXPORTER_OTLP_HEADERS  (e.g. "Authorization=Bearer abc123,X-Client-Version=1.2.3")
 // - OTEL_EXPORTER_OTLP_TRACES_TIMEOUT  / OTEL_EXPORTER_OTLP_TIMEOUT  (in ms)
 // - OTEL_EXPORTER_OTLP_TRACES_INSECURE / OTEL_EXPORTER_OTLP_INSECURE (values: true|false, default: true if http scheme used, otherwise false)
@@ -173,19 +173,31 @@ func newExporterCfgFromEnv(inputName string) (*ExporterCfg, error) {
 		return nil, err
 	}
 
-	cfg.Endpoint = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"))
-	if cfg.Endpoint == "" {
-		cfg.Endpoint = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))
+	cfg.EndpointURL = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"))
+	if cfg.EndpointURL == "" {
+		cfg.EndpointURL = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))
 	}
-	u, err := url.Parse(cfg.Endpoint)
-	if err == nil && u.Host != "" {
-		if u.Scheme == "http" && !hasInsecure {
-			// Using a scheme of http rather than https indicates it will be insecure.
-			cfg.Insecure = true
-		}
-		// The endpoint was a URL like http://localhost:4318 but the exporter wants localhost:4318.
-		cfg.Endpoint = u.Host
+	u, err := urlParsePossiblySchemaless(cfg.EndpointURL)
+	if err != nil {
+		return nil, fmt.Errorf("can't parse OLTP endpoint URL: %w", err)
 	}
+	if u.Path == "" {
+		// Add default path if none is present.
+		// In other implementations only OTEL_EXPORTER_OTLP_ENDPOINT values get the
+		// path added and OTEL_EXPORTER_OTLP_TRACES_ENDPOINT is expected to be
+		// complete, but here we'll do the same thing for both. Any path, including
+		// root ('/') will avoid using the default.
+		u.Path = "/v1/traces"
+	}
+	if u.Scheme == "" {
+		// Add default schema if none is present.
+		u.Scheme = "https"
+	}
+	if u.Scheme == "http" && !hasInsecure {
+		// Using a scheme of http rather than https indicates it will be insecure.
+		cfg.Insecure = true
+	}
+	cfg.EndpointURL = u.String()
 
 	headersStr := strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS"))
 	if headersStr == "" {
@@ -215,6 +227,20 @@ func splitCSV(s string) []string {
 		}
 	}
 	return out
+}
+
+func urlParsePossiblySchemaless(s string) (*url.URL, error) {
+	u, err := url.Parse(s)
+	if err != nil {
+		return nil, err
+	}
+
+	// If it parsed as scheme:opaque, treat as host
+	if u.Scheme != "" && u.Host == "" {
+		return url.Parse("//" + s)
+	}
+
+	return u, nil
 }
 
 // parseOTLPHeaders parses `key=value,key2=value2` into a map.
