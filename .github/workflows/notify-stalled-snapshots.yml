@@ -78,7 +78,11 @@ jobs:
 
       - if: ${{ contains(steps.search.outputs.found, 'true') }}
         name: Report obsoleted branches (email)
+<<<<<<< HEAD
         uses: dawidd6/action-send-mail@2cea9617b09d79a095af21254fbcb7ae95903dde
+=======
+        uses: dawidd6/action-send-mail@afe978662944c6805dd197bac88b27acb0bda55a
+>>>>>>> ca3262c56 (build(deps): bump the github-actions group across 1 directory with 2 updates (#48639))
         with:
           server_address: ${{ secrets.MAIL_SERVER }}
           username: ${{ secrets.MAIL_USERNAME }}
