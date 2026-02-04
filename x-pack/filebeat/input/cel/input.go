@@ -651,8 +651,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if err != nil {
 					hadPublicationError = true
 					pubLog.Errorw("error publishing event", "error", err)
-					msg := "error publishing event: " + err.Error()
-					health.UpdateStatus(status.Degraded, msg)
+					health.UpdateStatus(status.Degraded, "error publishing event: "+err.Error())
 					errorSpans(err, pubSpan)
 					isDegraded = true
 					cursors = nil // We are lost, so retry with this event's cursor,
