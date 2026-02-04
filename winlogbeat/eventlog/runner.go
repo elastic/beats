@@ -94,6 +94,18 @@ func Run(
 		return mustRetry
 	})
 
+	waitErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
+		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+			return false
+		}
+		log.Warnw("error while waiting for events", "error", err)
+		reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to read from %s: %v", api.Channel(), err))
+		if resetErr := api.Reset(); resetErr != nil {
+			log.Errorw("error resetting Windows Event Log handle", "error", resetErr)
+		}
+		return true
+	})
+
 runLoop:
 	for cancelCtx.Err() == nil {
 		openErr := api.Open(evtCheckpoint, metricsRegistry)
@@ -114,9 +126,15 @@ runLoop:
 		// read loop
 		for cancelCtx.Err() == nil {
 			reporter.UpdateStatus(status.Running, fmt.Sprintf("Reading from %s", api.Channel()))
-			if waitErr := api.WaitForEvents(cancelCtx); waitErr != nil && cancelCtx.Err() == nil {
-				log.Warnw("error while waiting for events", "error", waitErr)
-				continue
+			if waitErr := api.WaitForEvents(cancelCtx); waitErr != nil {
+				if waitErrHandler.backoff(cancelCtx, waitErr) {
+					continue runLoop
+				}
+				//nolint:nilerr // only log error if we are not shutting down
+				if cancelCtx.Err() != nil {
+					break runLoop
+				}
+				return waitErr
 			}
 			records, readErr := api.Read()
 			if readErr != nil {

@@ -269,6 +269,10 @@ func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.Book
 func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) {
 	// Using a pull subscription to receive events. See:
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
+
+	// on resubscribe errors we need to close the signal event handle
+	l.closeSignalEvent()
+
 	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
 	if err != nil {
 		return win.NilHandle, err
@@ -489,8 +493,11 @@ func (l *winEventLog) skipQueryFilters() bool {
 	return l.isForwarded() && strings.Contains(osinfo.Name, "2025")
 }
 
+const waitTimeout = 0x00000102
+
+var errWaitAbandoned = errors.New("wait abandoned")
+
 // WaitForEvents blocks until the Windows Event Log signal is triggered or context is canceled.
-// Uses a 1 second timeout - if timeout occurs, treats it as signaled to check for events.
 // Falls back to timer if no signal event is available (file-based logs).
 func (l *winEventLog) WaitForEvents(ctx context.Context) error {
 	// Fall back to timer if no signal event (e.g., reading from file)
@@ -498,27 +505,32 @@ func (l *winEventLog) WaitForEvents(ctx context.Context) error {
 		return l.waitWithTimer(ctx)
 	}
 
-	// Wait for signal with 10 second timeout
-	for {
-		if err := ctx.Err(); err != nil {
-			return err
-		}
-
+	// Run the blocking wait in a goroutine so we can select on context
+	resultCh := make(chan error, 1)
+	go func() {
+		// Wait with 10 second timeout
 		status, err := windows.WaitForSingleObject(l.signalEvent, 10000)
 		switch {
-		case status == windows.WAIT_OBJECT_0:
-			// Signaled - events available
-			return nil
-		case errors.Is(err, windows.ERROR_TIMEOUT):
-			// Timeout treated as signal - check for events
-			return nil
+		case status == windows.WAIT_OBJECT_0,
+			status == waitTimeout,
+			errors.Is(err, windows.ERROR_TIMEOUT):
+			// Signaled or timed out - events might be available
+			resultCh <- nil
 		case status == windows.WAIT_ABANDONED:
-			return errors.New("wait for signal event returned WAIT_ABANDONED")
+			resultCh <- errWaitAbandoned
 		case err != nil:
-			return fmt.Errorf("wait for signal event failed: %w", err)
+			resultCh <- fmt.Errorf("wait for signal event failed: %w", err)
 		default:
-			return fmt.Errorf("wait for signal event failed with status %d", status)
+			resultCh <- fmt.Errorf("wait for signal event failed with status %d", status)
 		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		// Context cancelled - return immediately without waiting for goroutine
+		return ctx.Err()
+	case err := <-resultCh:
+		return err
 	}
 }
 
