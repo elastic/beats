@@ -260,7 +260,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 			logp.Debug("amqp", "Failed to get byte array in table")
 			return true
 		}
-		table[name] = bodyToByteArray(data[offset+1+size : offset+5+size])
+		table[name] = bodyToByteArray(data[offset+5 : offset+5+size])
 		offset += 5 + size
 	default:
 		// unknown field
