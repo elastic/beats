@@ -34,6 +34,7 @@ func NewOtelManager(cfg *config.C, registry *reload.Registry, logger *logp.Logge
 type OtelManager struct {
 	ext          DiagnosticExtension
 	receiverName string
+	stopFn       func()
 }
 
 func (n *OtelManager) UpdateStatus(_ status.Status, _ string) {
@@ -41,10 +42,15 @@ func (n *OtelManager) UpdateStatus(_ status.Status, _ string) {
 	// TODO(@VihasMakwana): Explore the option to tidy and refactor the status reporting for beatsreceivers.
 }
 
-func (n *OtelManager) SetStopCallback(func()) {
+func (n *OtelManager) SetStopCallback(fn func()) {
+	n.stopFn = fn
 }
 
-func (n *OtelManager) Stop() {}
+func (n *OtelManager) Stop() {
+	if n.stopFn != nil {
+		n.stopFn()
+	}
+}
 
 // Enabled returns false because many places inside beats call manager.Enabled() for various purposes
 // Returning true might lead to side effects.
