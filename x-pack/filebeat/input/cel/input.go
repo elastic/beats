@@ -1078,8 +1078,8 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg, log)
 	}
 
-	extraOpts := []otelhttp.Option{otelhttp.WithTracerProvider(tp)}
-	otelMetrics, otelTransport, err := createOTELMetrics(ctx, cfg, log, env, c.Transport, extraOpts)
+	otelhttpOptions := []otelhttp.Option{otelhttp.WithTracerProvider(tp)}
+	otelMetrics, otelTransport, err := createOTELMetrics(ctx, cfg, log, env, c.Transport, otelhttpOptions)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
@@ -1120,7 +1120,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	return c, trace, otelMetrics, contextInjector, nil
 }
 
-func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2.Context, tripper http.RoundTripper, extraOpts []otelhttp.Option) (*otelCELMetrics, *otelhttp.Transport, error) {
+func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2.Context, tripper http.RoundTripper, otelhttpOptions []otelhttp.Option) (*otelCELMetrics, *otelhttp.Transport, error) {
 	resource := resource.NewWithAttributes(
 		semconv.SchemaURL, getResourceAttributes(env, cfg)...,
 	)
@@ -1132,7 +1132,7 @@ func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2
 	}
 	log.Infof("created OTEL cel input exporter %s for input %s", exporterType, env.IDWithoutName)
 
-	return newOTELCELMetrics(log, *resource, tripper, exporter, extraOpts)
+	return newOTELCELMetrics(log, *resource, tripper, exporter, otelhttpOptions)
 }
 
 func getResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
