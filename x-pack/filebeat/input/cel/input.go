@@ -731,10 +731,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 }
 
 func logWithTracingIds(log *logp.Logger, span trace.Span) *logp.Logger {
-	spanCtx := span.SpanContext()
+	ctx := span.SpanContext()
 	return log.With(
-		"trace.id", spanCtx.TraceID().String(),
-		"span.id", spanCtx.SpanID().String(),
+		"trace.id", ctx.TraceID().String(),
+		"span.id", ctx.SpanID().String(),
 	)
 }
 
