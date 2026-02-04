@@ -20,10 +20,11 @@
 package input_logfile
 
 import (
+	"io"
+	"io/fs"
+	"os"
 	"path/filepath"
 	"testing"
-
-	cp "github.com/otiai10/copy"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
@@ -44,11 +45,7 @@ func TestTakeOverCanReadLogInputStatesWithMeta(t *testing.T) {
 	storePath := filepath.Join(tmpDir, name)
 
 	// Copy a real example for testing
-	err = cp.Copy(filepath.Join("testdata", "container-store"), storePath)
-	if err != nil {
-		t.Fatalf("cannot copy store files: %s", err)
-	}
-
+	copyFolder(t, filepath.Join("testdata", "container-store"), storePath)
 	store := openTestStoreFromFiles(t, tmpDir, name)
 
 	count := 0
@@ -93,4 +90,53 @@ func openTestStoreFromFiles(t *testing.T, rootDir, name string) sourceStore {
 	}
 
 	return realStore
+}
+
+func copy(t *testing.T, src, dst string) error {
+	srcFile, err := os.Open(src)
+	if err != nil {
+		t.Fatalf("cannot open source file: %s", err)
+	}
+	defer srcFile.Close()
+
+	st, err := srcFile.Stat()
+	if err != nil {
+		t.Fatalf("cannot stat source file: %s", err)
+	}
+
+	dstFile, err := os.OpenFile(dst, os.O_RDWR|os.O_CREATE|os.O_TRUNC, st.Mode().Perm())
+	if err != nil {
+		t.Fatalf("cannot open dst file: %s", err)
+	}
+	defer func() {
+		if err := dstFile.Sync(); err != nil {
+			t.Fatalf("cannot sync dst file: %s", err)
+		}
+		if err := dstFile.Close(); err != nil {
+			t.Fatalf("cannot close dst file: %s", err)
+		}
+	}()
+
+	if _, err := io.Copy(dstFile, srcFile); err != nil {
+		t.Fatalf("cannot copy file: %s", err)
+	}
+
+	return nil
+}
+
+func copyFolder(t *testing.T, src, dst string) {
+	if err := os.MkdirAll(dst, 0o777); err != nil {
+		t.Fatalf("cannot create dst folder: %s", err)
+	}
+
+	filepath.WalkDir(src, func(path string, d fs.DirEntry, err error) error {
+		// Only copy files
+		if d.IsDir() {
+			return nil
+		}
+
+		base := filepath.Base(path)
+		copy(t, path, filepath.Join(dst, base))
+		return nil
+	})
 }
