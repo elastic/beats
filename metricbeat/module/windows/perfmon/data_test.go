@@ -401,18 +401,19 @@ func TestExtractObjectFromCounter(t *testing.T) {
 		counters: []PerfCounter{
 			{
 				QueryField:    "working_set",
-				QueryName:     `\Process(*)\Working Set`,
+				QueryName:     `\Process(*)\% Processor Time`,
 				Format:        "float",
 				ObjectName:    "Process",
 				ObjectField:   "object",
 				InstanceName:  "*",
 				InstanceField: "instance",
+				ChildQueries:  []string{`\Process(chrome)\% Processor Time`},
 			},
 		},
 	}
 
 	counters := map[string][]pdh.CounterValue{
-		`\Process(chrome)\Working Set`: {
+		`\Process(chrome)\% Processor Time`: {
 			{
 				Instance:    "chrome",
 				Measurement: 123,
