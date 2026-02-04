@@ -19,7 +19,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+<<<<<<< HEAD
       - uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
+=======
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+>>>>>>> ca3262c56 (build(deps): bump the github-actions group across 1 directory with 2 updates (#48639))
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
