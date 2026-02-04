@@ -142,7 +142,7 @@ type LoggingRoundTripper struct {
 //	http.response.header
 //
 // The trace.id and span.id fields are populated with IDs from the OTel span in
-// context.
+// context if it exists.
 func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Create a child logger for this request.
 	txID := rt.nextTxID()
