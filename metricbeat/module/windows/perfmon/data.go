@@ -35,7 +35,7 @@ import (
 )
 
 var processRegexp = regexp.MustCompile(`(.+?[^\s])(?:#\d+|$)`)
-var objectNameWithoutInstanceRegexp = regexp.MustCompile(`\\\\[^\\]+\\([^\\]+)\\`)
+var objectNameWithoutInstanceRegexp = regexp.MustCompile(`(?:^\\\\[^\\]+\\|^\\)([^\\]+)`)
 
 func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Event {
 	eventMap := make(map[string]*mb.Event)
