@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
@@ -29,9 +30,10 @@ import (
 
 // BaseReceiver holds common configurations for beatreceivers.
 type BeatReceiver struct {
-	beat   *instance.Beat
-	beater beat.Beater
-	Logger *logp.Logger
+	beat     *instance.Beat
+	beater   beat.Beater
+	reporter *log.Reporter
+	Logger   *logp.Logger
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -127,6 +129,18 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		}
 	}
 
+	if br.beat.Config.MetricLogging == nil || br.beat.Config.MetricLogging.Enabled() {
+		r, err := log.MakeReporter(br.beat.Info, br.beat.Config.MetricLogging, br.beat.Monitoring.InfoRegistry(), br.beat.Monitoring.StateRegistry(), br.beat.Monitoring.StateRegistry(), br.beat.Monitoring.InfoRegistry())
+		if err != nil {
+			return fmt.Errorf("error creating metric reporter: %w", err)
+		}
+		rep, ok := r.(*log.Reporter)
+		if !ok {
+			return fmt.Errorf("error creating metric log reporter")
+		}
+		br.reporter = rep
+	}
+
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
 		// set beatreceiver status
 		groupReporter.UpdateStatus(status.Failed, err.Error())
@@ -155,6 +169,11 @@ func (br *BeatReceiver) Shutdown() error {
 	if err := br.stopMonitoring(); err != nil {
 		return fmt.Errorf("error stopping monitoring server: %w", err)
 	}
+
+	if br.reporter != nil {
+		br.reporter.Stop()
+	}
+
 	if err := br.beat.Info.Logger.Close(); err != nil {
 		return fmt.Errorf("error closing beat receiver logging: %w", err)
 	}
