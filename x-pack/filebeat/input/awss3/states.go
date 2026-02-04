@@ -293,33 +293,45 @@ func (r *lexicographicalStateRegistry) AddState(st state) error {
 		return err
 	}
 
+	persisted, err := r.addState(st)
+	if err != nil {
+		return err
+	}
+
+	if !persisted {
+		return nil
+	}
+
+	// Recompute and persist tail
+	r.inFlightLock.Lock()
+	err = r.recomputeAndPersistTail()
+	r.inFlightLock.Unlock()
+
+	return err
+}
+
+// addState updates the in-memory state and persists it to the store.
+// Returns true if the state was persisted, false if it was skipped (e.g., smaller than current minimum).
+func (r *lexicographicalStateRegistry) addState(st state) (bool, error) {
 	id := st.IDWithLexicographicalOrdering()
 	evictedID, shouldPersist := r.updateInMemoryState(id, st)
 
 	if !shouldPersist {
-		return nil
+		return false, nil
 	}
 
-	// Persist state changes to store
 	r.storeLock.Lock()
+	defer r.storeLock.Unlock()
+
 	if evictedID != "" {
 		if err := r.removeFromStore(evictedID); err != nil {
-			r.storeLock.Unlock()
-			return fmt.Errorf("error while removing evicted state: %w", err)
+			return false, fmt.Errorf("error while removing evicted state: %w", err)
 		}
 	}
 	if err := r.persistState(id, st); err != nil {
-		r.storeLock.Unlock()
-		return err
+		return false, err
 	}
-	r.storeLock.Unlock()
-
-	// Recompute and persist tail
-	r.inFlightLock.Lock()
-	err := r.recomputeAndPersistTail()
-	r.inFlightLock.Unlock()
-
-	return err
+	return true, nil
 }
 
 // updateInMemoryState removes the key from in-flight tracking and adds the state
