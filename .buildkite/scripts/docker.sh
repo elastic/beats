@@ -31,6 +31,8 @@ docker_info() {
   # see https://stackoverflow.com/a/47580834
   if docker login; then
     echo "✅ Logged in to Docker Hub"
+    # NOTE: for testing whether running twice produce different output
+    docker login || true
   else
     echo "⚠ Not logged in to Docker Hub"
   fi
