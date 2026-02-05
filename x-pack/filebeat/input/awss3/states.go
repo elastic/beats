@@ -49,6 +49,19 @@ type stateRegistry interface {
 	Close()
 }
 
+// newStateRegistry creates the appropriate state registry based on configuration.
+func newStateRegistry(log *logp.Logger, stateStore statestore.States, keyPrefix string, lexicographicalOrdering bool, lexicographicalLookbackKeys int) (stateRegistry, error) {
+	store, err := stateStore.StoreFor("")
+	if err != nil {
+		return nil, fmt.Errorf("can't access persistent store: %w", err)
+	}
+
+	if lexicographicalOrdering {
+		return newLexicographicalStateRegistry(log, store, keyPrefix, lexicographicalLookbackKeys)
+	}
+	return newNormalStateRegistry(log, store, keyPrefix)
+}
+
 // baseStateRegistry contains shared functionality between registry implementations.
 type baseStateRegistry struct {
 	// Completed S3 object states, indexed by state ID.
@@ -204,12 +217,12 @@ type lexicographicalStateRegistry struct {
 	// inFlight tracks keys currently being processed (dispatched but not completed).
 	// This is used to compute the tail = min(inFlight keys, completed keys).
 	inFlight map[string]struct{}
-	// inFlightLock protects access to inFlight map
-	inFlightLock sync.Mutex
-
 	// persistedTail is the tail key stored in the persistent store.
 	// This survives crashes and is used as startAfterKey on restart.
 	persistedTail string
+
+	// inFlightLock protects access to inFlight map and persistedTail
+	inFlightLock sync.Mutex
 }
 
 // newLexicographicalStateRegistry creates a new lexicographical state registry.
@@ -258,13 +271,81 @@ func newLexicographicalStateRegistry(log *logp.Logger, store *statestore.Store, 
 	return r, nil
 }
 
-// initHeapFromStates builds the heap from the states map and trims to capacity.
-func (r *lexicographicalStateRegistry) initHeapFromStates(log *logp.Logger) {
-	r.storeLock.Lock()
-	defer r.storeLock.Unlock()
-	r.statesLock.Lock()
-	defer r.statesLock.Unlock()
+// AddState removes the object from in-flight tracking and adds it to completed states,
+// then recomputes and persists the tail once.
+func (r *lexicographicalStateRegistry) AddState(st state) error {
+	if err := r.validateKeyPrefix(st.Key); err != nil {
+		return err
+	}
 
+	persisted, err := r.updateState(st)
+	if err != nil {
+		return err
+	}
+
+	if !persisted {
+		return nil
+	}
+
+	// Recompute and persist tail
+	return r.recomputeAndPersistTail()
+}
+
+func (r *lexicographicalStateRegistry) CleanUp(knownIDs []string) error {
+	removed, err := r.removeUnknownStates(knownIDs)
+	if err != nil {
+		return err
+	}
+
+	if !removed {
+		return nil
+	}
+
+	// Recompute and persist tail after cleanup
+	return r.recomputeAndPersistTail()
+}
+
+func (r *lexicographicalStateRegistry) GetStartAfterKey() string {
+	r.inFlightLock.Lock()
+	defer r.inFlightLock.Unlock()
+	return r.persistedTail
+}
+
+// MarkObjectInFlight marks an object as in-flight and updates the persisted tail
+// to ensure we don't skip this object if a crash occurs during processing.
+func (r *lexicographicalStateRegistry) MarkObjectInFlight(key string) error {
+	r.inFlightLock.Lock()
+	defer r.inFlightLock.Unlock()
+
+	r.inFlight[key] = struct{}{}
+
+	// Update tail if smaller than current tail
+	if r.persistedTail == "" || key < r.persistedTail {
+		r.persistedTail = key
+		r.storeLock.Lock()
+		err := r.store.Set(awsS3TailKey, key)
+		r.storeLock.Unlock()
+		if err != nil {
+			return fmt.Errorf("failed to persist tail key: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func (r *lexicographicalStateRegistry) UnmarkObjectInFlight(key string) error {
+	// Remove from in-flight tracking
+	r.inFlightLock.Lock()
+	delete(r.inFlight, key)
+	r.inFlightLock.Unlock()
+
+	// Recompute and persist tail if needed
+	return r.recomputeAndPersistTail()
+}
+
+// initHeapFromStates builds the heap from the states map and trims to capacity.
+// No locks needed as this must be only called during initialization.
+func (r *lexicographicalStateRegistry) initHeapFromStates(log *logp.Logger) {
 	if len(r.states) == 0 {
 		return
 	}
@@ -286,33 +367,9 @@ func (r *lexicographicalStateRegistry) initHeapFromStates(log *logp.Logger) {
 	}
 }
 
-// AddState removes the object from in-flight tracking and adds it
-// to completed states, then recomputes and persists the tail once.
-func (r *lexicographicalStateRegistry) AddState(st state) error {
-	if err := r.validateKeyPrefix(st.Key); err != nil {
-		return err
-	}
-
-	persisted, err := r.addState(st)
-	if err != nil {
-		return err
-	}
-
-	if !persisted {
-		return nil
-	}
-
-	// Recompute and persist tail
-	r.inFlightLock.Lock()
-	err = r.recomputeAndPersistTail()
-	r.inFlightLock.Unlock()
-
-	return err
-}
-
-// addState updates the in-memory state and persists it to the store.
+// updateState updates the in-memory state and persists it to the store.
 // Returns true if the state was persisted, false if it was skipped (e.g., smaller than current minimum).
-func (r *lexicographicalStateRegistry) addState(st state) (bool, error) {
+func (r *lexicographicalStateRegistry) updateState(st state) (bool, error) {
 	id := st.IDWithLexicographicalOrdering()
 	evictedID, shouldPersist := r.updateInMemoryState(id, st)
 
@@ -322,7 +379,6 @@ func (r *lexicographicalStateRegistry) addState(st state) (bool, error) {
 
 	r.storeLock.Lock()
 	defer r.storeLock.Unlock()
-
 	if evictedID != "" {
 		if err := r.removeFromStore(evictedID); err != nil {
 			return false, fmt.Errorf("error while removing evicted state: %w", err)
@@ -334,8 +390,7 @@ func (r *lexicographicalStateRegistry) addState(st state) (bool, error) {
 	return true, nil
 }
 
-// updateInMemoryState removes the key from in-flight tracking and adds the state
-// to the completed states map and heap.
+// updateInMemoryState removes the key from in-flight tracking and adds the state to the completed states map and heap.
 // Returns the evicted state ID (if any) and whether the state should be persisted.
 func (r *lexicographicalStateRegistry) updateInMemoryState(id string, st state) (evictedID string, shouldPersist bool) {
 	r.inFlightLock.Lock()
@@ -363,24 +418,6 @@ func (r *lexicographicalStateRegistry) updateInMemoryState(id string, st state) 
 	r.states[id] = &st
 	r.heap.push(&st)
 	return evictedID, true
-}
-
-func (r *lexicographicalStateRegistry) CleanUp(knownIDs []string) error {
-	removed, err := r.removeUnknownStates(knownIDs)
-	if err != nil {
-		return err
-	}
-
-	if !removed {
-		return nil
-	}
-
-	// Recompute and persist tail after cleanup
-	r.inFlightLock.Lock()
-	err = r.recomputeAndPersistTail()
-	r.inFlightLock.Unlock()
-
-	return err
 }
 
 // removeUnknownStates removes states not in knownIDs from heap, map, and store.
@@ -434,46 +471,13 @@ func (r *lexicographicalStateRegistry) removeUnknownStates(knownIDs []string) (r
 	return true, nil
 }
 
-func (r *lexicographicalStateRegistry) GetStartAfterKey() string {
+// recomputeAndPersistTail recomputes the tail from in-flight and completed states, and persists it if changed.
+func (r *lexicographicalStateRegistry) recomputeAndPersistTail() error {
 	r.inFlightLock.Lock()
 	defer r.inFlightLock.Unlock()
-	return r.persistedTail
-}
+	r.storeLock.Lock()
+	defer r.storeLock.Unlock()
 
-// MarkObjectInFlight marks an object as in-flight and updates the persisted tail
-// to ensure we don't skip this object if a crash occurs during processing.
-func (r *lexicographicalStateRegistry) MarkObjectInFlight(key string) error {
-	r.inFlightLock.Lock()
-	defer r.inFlightLock.Unlock()
-
-	r.inFlight[key] = struct{}{}
-
-	// Update tail if smaller than current tail
-	if r.persistedTail == "" || key < r.persistedTail {
-		r.persistedTail = key
-		r.storeLock.Lock()
-		err := r.store.Set(awsS3TailKey, key)
-		r.storeLock.Unlock()
-		if err != nil {
-			return fmt.Errorf("failed to persist tail key: %w", err)
-		}
-	}
-
-	return nil
-}
-
-func (r *lexicographicalStateRegistry) UnmarkObjectInFlight(key string) error {
-	r.inFlightLock.Lock()
-	defer r.inFlightLock.Unlock()
-
-	delete(r.inFlight, key)
-
-	return r.recomputeAndPersistTail()
-}
-
-// computeTail returns the tail key, which is the minimum(in-flight keys, completed keys).
-// Called by recomputeAndPersistTail; inFlightLock must be held by the caller chain.
-func (r *lexicographicalStateRegistry) computeTail() string {
 	var minInFlight string
 	for key := range r.inFlight {
 		if minInFlight == "" || key < minInFlight {
@@ -481,45 +485,37 @@ func (r *lexicographicalStateRegistry) computeTail() string {
 		}
 	}
 
-	r.statesLock.Lock()
 	heapMin := r.heap.peek()
-	r.statesLock.Unlock()
 
 	var minCompleted string
 	if heapMin != nil {
 		minCompleted = heapMin.Key
 	}
 
-	// Return smaller of in-flight and completed keys.
+	// Compute the smaller of in-flight and completed keys.
+	var newTail string
 	switch {
 	case minInFlight == "":
-		return minCompleted
+		newTail = minCompleted
 	case minCompleted == "" || minInFlight < minCompleted:
-		return minInFlight
+		newTail = minInFlight
 	default:
-		return minCompleted
+		newTail = minCompleted
 	}
-}
-
-// recomputeAndPersistTail recomputes the tail from in-flight and completed states,
-// and persists it if changed.
-// Caller must hold inFlightLock.
-func (r *lexicographicalStateRegistry) recomputeAndPersistTail() error {
-	newTail := r.computeTail()
 
 	if newTail == r.persistedTail {
+		// No change
 		return nil
 	}
 
 	r.persistedTail = newTail
-	r.storeLock.Lock()
+
 	var err error
 	if newTail == "" {
 		err = r.store.Remove(awsS3TailKey)
 	} else {
 		err = r.store.Set(awsS3TailKey, newTail)
 	}
-	r.storeLock.Unlock()
 
 	if err != nil {
 		return fmt.Errorf("failed to persist tail key: %w", err)
@@ -546,7 +542,8 @@ func (h *stateHeap) pop() *state {
 	if h.Len() == 0 {
 		return nil
 	}
-	return heap.Pop(h).(*state)
+	st, _ := heap.Pop(h).(*state)
+	return st
 }
 
 // push adds a state to the heap.
@@ -560,7 +557,8 @@ func (h *stateHeap) remove(id string) *state {
 	if !ok {
 		return nil
 	}
-	return heap.Remove(h, idx).(*state)
+	st, _ := heap.Remove(h, idx).(*state)
+	return st
 }
 
 // peek returns the smallest state without removing it.
@@ -597,19 +595,6 @@ func (h *stateHeap) Pop() any {
 	h.items = old[0 : n-1]
 	delete(h.index, st.IDWithLexicographicalOrdering())
 	return st
-}
-
-// newStateRegistry creates the appropriate state registry based on configuration.
-func newStateRegistry(log *logp.Logger, stateStore statestore.States, keyPrefix string, lexicographicalOrdering bool, lexicographicalLookbackKeys int) (stateRegistry, error) {
-	store, err := stateStore.StoreFor("")
-	if err != nil {
-		return nil, fmt.Errorf("can't access persistent store: %w", err)
-	}
-
-	if lexicographicalOrdering {
-		return newLexicographicalStateRegistry(log, store, keyPrefix, lexicographicalLookbackKeys)
-	}
-	return newNormalStateRegistry(log, store, keyPrefix)
 }
 
 // getStoreKey generates the key used by underlying persistent storage
