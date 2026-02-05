@@ -107,7 +107,7 @@ steps:
               context: "heartbeat: RHEL9 Unit Tests"
 
       - label: ":windows: Heartbeat: Win 2016 Unit Tests"
-        key: "windows-2016-1768449671"
+        key: "windows-2016"
         command: |
           Set-Location -Path heartbeat
           mage build unitTest
@@ -127,7 +127,7 @@ steps:
               context: "heartbeat: Win 2016 Unit Tests"
 
       - label: ":windows: Heartbeat: Win 2022 Unit Test"
-        key: "windows-2022-1768449671"
+        key: "windows-2022"
         command: |
           Set-Location -Path heartbeat
           mage build unitTest
