@@ -8,8 +8,10 @@ package jumplists
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
+	osquerygen "github.com/osquery/osquery-go/gen/osquery"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
@@ -58,7 +60,7 @@ func TestCustomJumplists(t *testing.T) {
 	log := logger.New(os.Stdout, true)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			jumplist, err := parseCustomJumplistFile(test.filePath, &UserProfile{Username: "test", Domain: "test", Sid: "test"}, log)
+			jumplist, err := parseCustomJumplistFile(test.filePath, &UserProfile{Username: "test", Sid: "test"}, log)
 			if test.expectError {
 				assert.Error(t, err, "expected error when parsing custom jumplist")
 				assert.Nil(t, jumplist, "expected nil jumplist when parsing custom jumplist")
@@ -125,21 +127,48 @@ func TestLnk(t *testing.T) {
 	}
 }
 
+type MockClient struct {
+	t *testing.T
+}
+
+func (m *MockClient) Query(sql string) (*osquerygen.ExtensionResponse, error) {
+	_ = sql
+	profileDir := m.t.TempDir()
+	recentDir := filepath.Join(profileDir, "AppData", "Roaming", "Microsoft", "Windows", "Recent")
+	assert.NoError(m.t, os.MkdirAll(recentDir, 0o755))
+
+	customJumplistDir := filepath.Join(recentDir, "CustomDestinations")
+	assert.NoError(m.t, os.MkdirAll(customJumplistDir, 0o755))
+	bytes, err := os.ReadFile("./testdata/custom/590aee7bdd69b59b.customDestinations-ms")
+	assert.NoError(m.t, err, "expected no error when reading custom jumplist test file")
+	assert.NoError(m.t, os.WriteFile(filepath.Join(customJumplistDir, "590aee7bdd69b59b.customDestinations-ms"), bytes, 0o644))
+
+	return &osquerygen.ExtensionResponse{
+		Response: []map[string]string{
+			{
+				"username":  "testuser",
+				"uuid":      "S-1-5-21-1234567890-123456789-1234567890-1001",
+				"directory": profileDir,
+			},
+		},
+	}, nil
+}
+
 func TestGetUserProfiles(t *testing.T) {
 	log := logger.New(os.Stdout, true)
-	userProfiles, err := getUserProfiles(log)
+	userProfiles, err := getUserProfiles(log, &MockClient{t: t})
 	assert.NoError(t, err, "expected no error when getting user profiles")
 	assert.NotEmpty(t, userProfiles, "expected non-empty user profiles")
 }
 
 func TestGetJumplists(t *testing.T) {
 	log := logger.New(os.Stdout, true)
-	userProfiles, err := getUserProfiles(log)
+	userProfiles, err := getUserProfiles(log, &MockClient{t: t})
 	assert.NoError(t, err, "expected no error when getting user profiles")
 	for _, userProfile := range userProfiles {
 		jumplists := userProfile.getJumplists(log)
 		for _, jumplist := range jumplists {
-			log.Infof("found jumplist: %s, username: %s, domain: %s, sid: %s", jumplist.Path, userProfile.Username, userProfile.Domain, userProfile.Sid)
+			log.Infof("found jumplist: %s, username: %s, sid: %s", jumplist.Path, userProfile.Username, userProfile.Sid)
 		}
 	}
 }
