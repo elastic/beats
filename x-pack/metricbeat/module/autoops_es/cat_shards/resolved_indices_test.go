@@ -15,6 +15,48 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
 )
 
+func TestTruncateAliasesDoesTruncate(t *testing.T) {
+	aliases := []string{"alias1", "alias2", "alias3", "alias4", "alias5"}
+
+	truncated := truncateAliases(aliases, 3)
+	require.Equal(t, 3, len(truncated))
+	require.Equal(t, []string{"alias1", "alias2", "alias3"}, truncated)
+}
+
+func TestTruncateAliasesLeavesSmallerLengthNotTruncated(t *testing.T) {
+	aliases := []string{"alias1", "alias2", "alias3", "alias4", "alias5"}
+
+	notTruncated := truncateAliases(aliases, 10)
+	require.Equal(t, 5, len(notTruncated))
+	require.Equal(t, []string{"alias1", "alias2", "alias3", "alias4", "alias5"}, notTruncated)
+}
+
+func TestDataStreamAndAliasesCombined(t *testing.T) {
+	empty := dataStreamAndAliasesCombined("", nil, 5)
+	require.Equal(t, 0, len(empty))
+	require.Nil(t, empty)
+
+	truncated := dataStreamAndAliasesCombined("my-data-stream", []string{"alias1", "alias2", "alias3"}, 2)
+	require.Equal(t, 3, len(truncated))
+	require.Equal(t, []string{"my-data-stream", "alias1", "alias2"}, truncated)
+
+	noDataStream := dataStreamAndAliasesCombined("", []string{"alias1", "alias2"}, 5)
+	require.Equal(t, 2, len(noDataStream))
+	require.Equal(t, []string{"alias1", "alias2"}, noDataStream)
+
+	noAliases := dataStreamAndAliasesCombined("my-data-stream", nil, 5)
+	require.Equal(t, 1, len(noAliases))
+	require.Equal(t, []string{"my-data-stream"}, noAliases)
+
+	dropsAliases := dataStreamAndAliasesCombined("my-data-stream", []string{"ignored"}, 0)
+	require.Equal(t, 1, len(dropsAliases))
+	require.Equal(t, []string{"my-data-stream"}, dropsAliases)
+
+	noDataStreamDropsAliases := dataStreamAndAliasesCombined("", []string{"alias1", "alias2"}, 0)
+	require.Equal(t, 0, len(noDataStreamDropsAliases))
+	require.Nil(t, noDataStreamDropsAliases)
+}
+
 func TestGetResolvedIndicesReturnsResponse(t *testing.T) {
 	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/cat_shards.*.json", setupSuccessfulServer, useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[[]JSONShard]) {
 		require.NoError(t, data.Error)
@@ -22,22 +64,22 @@ func TestGetResolvedIndicesReturnsResponse(t *testing.T) {
 }
 
 func TestParseResolvedIndicesResponseReturnsEmpty(t *testing.T) {
-	emptyResponse := ResolvedApiResponse{Indices: []ResolvedIndices{}}
+	emptyResponse := resolvedApiResponse{Indices: []resolvedIndices{}}
 
 	require.Equal(t, 0, len(parseResolvedIndicesResponse(&emptyResponse)))
 }
 
 func TestParseResolvedIndicesResponse(t *testing.T) {
-	response := ResolvedApiResponse{Indices: []ResolvedIndices{
+	response := resolvedApiResponse{Indices: []resolvedIndices{
 		{Name: "my-index-1"},
 		{Name: "my-index-2", Attributes: []string{"open"}},
 		{Name: "my-index-3", Attributes: []string{"open", "system"}},
 		{Name: "my-index-4", Attributes: []string{"hidden", "open", "system"}},
 		{Name: "my-index-5", Attributes: []string{"hidden", "open"}},
-		{Name: "my-index-6", DataStreams: "my-data-stream-1", Attributes: []string{"open"}},
-		{Name: "my-index-7", DataStreams: []string{"my-data-stream-2"}, Attributes: []string{"open"}},
-		{Name: "my-index-8", DataStreams: []string{"my-data-stream-3"}, Aliases: "alias-1", Attributes: []string{"open"}},
-		{Name: "my-index-9", DataStreams: []string{"my-data-stream-4"}, Aliases: []string{"alias-1", "alias-2"}, Attributes: []string{"open"}},
+		{Name: "my-index-6", DataStream: "my-data-stream-1", Attributes: []string{"open"}},
+		{Name: "my-index-7", DataStream: "my-data-stream-2", Attributes: []string{"open"}},
+		{Name: "my-index-8", DataStream: "my-data-stream-3", Aliases: []string{"alias-1"}, Attributes: []string{"open"}},
+		{Name: "my-index-9", DataStream: "my-data-stream-4", Aliases: []string{"alias-1", "alias-2"}, Attributes: []string{"open"}},
 		{Name: "my-index-10", Aliases: []string{"alias-1", "alias-2"}, Attributes: []string{"open"}},
 		{Name: "my-index-11", Attributes: []string{"xyz"}},
 		{Name: "my-index-12", Attributes: []string{"abc", "open"}},
