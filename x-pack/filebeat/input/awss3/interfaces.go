@@ -118,7 +118,7 @@ func (a *awsSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]type
 
 	receiveMessageOutput, err := a.client.ReceiveMessage(ctx, &sqs.ReceiveMessageInput{
 		QueueUrl:            awssdk.String(a.queueURL),
-		MaxNumberOfMessages: int32(min(maxMessages, sqsMaxNumberOfMessagesLimit)),
+		MaxNumberOfMessages: int32(min(maxMessages, sqsMaxNumberOfMessagesLimit)), //nolint:gosec // value is bounded by sqsMaxNumberOfMessagesLimit (10)
 		VisibilityTimeout:   int32(a.visibilityTimeout.Seconds()),
 		WaitTimeSeconds:     int32(a.longPollWaitTime.Seconds()),
 		AttributeNames:      []types.QueueAttributeName{sqsApproximateReceiveCountAttribute, sqsSentTimestampAttribute},
@@ -232,7 +232,7 @@ func (a *awsS3API) GetObject(ctx context.Context, region, bucket, key string) (*
 					out middleware.FinalizeOutput, metadata middleware.Metadata, err error,
 				) {
 					out, metadata, err = next.HandleFinalize(ctx, in)
-					requestURL, parseErr := url.Parse(in.Request.(*smithyhttp.Request).URL.String())
+					requestURL, parseErr := url.Parse(in.Request.(*smithyhttp.Request).URL.String()) //nolint:errcheck // type assertion is guaranteed by AWS SDK
 					if parseErr != nil {
 						return out, metadata, err
 					}

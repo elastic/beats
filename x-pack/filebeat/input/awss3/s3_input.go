@@ -125,7 +125,7 @@ func (in *s3PollerInput) run(ctx context.Context) {
 
 		runElapsedTime := time.Since(runStartTime)
 		in.metrics.s3PollingRunTime.Update(runElapsedTime.Nanoseconds())
-		in.metrics.s3PollingRunTimeTotal.Add(uint64(max(runElapsedTime.Nanoseconds(), 0)))
+		in.metrics.s3PollingRunTimeTotal.Add(uint64(runElapsedTime.Nanoseconds())) //nolint:gosec // runElapsedTime is non-negative from time.Since
 
 		_ = timed.Wait(ctx, in.config.BucketListInterval)
 	}

@@ -163,7 +163,8 @@ func TestNormalStateRegistry_CleanUp(t *testing.T) {
 			require.NoError(t, err, "state cleanup must succeed")
 
 			// validate
-			normalRegistry := registry.(*normalStateRegistry)
+			normalRegistry, ok := registry.(*normalStateRegistry)
+			require.True(t, ok, "expected normalStateRegistry type")
 			for _, id := range test.expectIDs {
 				// must be in local state
 				_, ok := normalRegistry.states[id]

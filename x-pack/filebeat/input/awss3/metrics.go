@@ -231,7 +231,7 @@ func newMonitoredReader(r io.Reader, metric *monitoring.Uint) *monitoredReader {
 
 func (m *monitoredReader) Read(p []byte) (int, error) {
 	n, err := m.reader.Read(p)
-	m.totalBytesReadMetric.Add(uint64(n))
+	m.totalBytesReadMetric.Add(uint64(n)) //nolint:gosec // n is non-negative from io.Reader contract
 	m.totalBytesReadCurrent += int64(n)
 	return n, err
 }
