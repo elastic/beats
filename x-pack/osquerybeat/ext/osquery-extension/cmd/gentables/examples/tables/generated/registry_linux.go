@@ -32,5 +32,4 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 			log.Infof("Registered table: sample_custom_table")
 		}
 	}
-
 }

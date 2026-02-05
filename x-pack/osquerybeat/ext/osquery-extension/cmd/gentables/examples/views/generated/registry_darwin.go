@@ -28,5 +28,4 @@ func RegisterViews(hookManager *hooks.HookManager, log *logger.Logger) {
 			log.Infof("Registered view: sample_combined_resources")
 		}
 	}
-
 }

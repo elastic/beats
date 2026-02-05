@@ -4,8 +4,8 @@ This directory contains sample table and view specifications to demonstrate the 
 
 ## Sample Files
 
-- `sample_table.yaml` - Example table specification with multiple columns and comprehensive documentation
-- `sample_view.yaml` - Example view specification demonstrating UNION ALL, CASE expressions, and date calculations
+- `tables/sample_table.yaml` - Example table specification with multiple columns and comprehensive documentation
+- `views/sample_view.yaml` - Example view specification demonstrating UNION ALL, CASE expressions, and date calculations
 
 **Note:** The generator accepts both `.yaml` and `.yml` file extensions. You can use whichever you prefer, and both can coexist in the same directory.
 
@@ -17,12 +17,13 @@ To test the generator with these samples, you have two options:
 
 ```bash
 cd /path/to/cmd/gentables
+
 go run . \
-  -spec-dir examples \
-  -out-dir examples/generated \
-  -views-out-dir examples/views-generated \
+  -spec-dir examples/tables,examples/views \
+  -out-dir examples/tables/generated \
   -docs-dir examples/docs \
-  -views-docs-dir examples/views-docs \
+  -views-out-dir examples/views/generated \
+  -views-docs-dir examples/docs \
   -verbose
 ```
 
@@ -30,26 +31,28 @@ go run . \
 
 ```bash
 cd /path/to/cmd/gentables/examples
+
 go run ../main.go \
-  -spec-dir . \
-  -out-dir generated \
-  -views-out-dir views-generated \
-  -docs-dir docs \
-  -views-docs-dir views-docs \
+  -spec-dir tables,views \
+  -out-dir tables/generated \
+  -docs-dir tables/docs \
+  -views-out-dir views/generated \
+  -views-docs-dir views/docs \
   -verbose
 ```
 
 ### What Gets Generated
 
 The generator will create:
-- `generated/` - Table code packages
+- `tables/generated/` - Table code packages
   - `sample_custom_table/sample_custom_table.go` - Generated table code
-  - `tables_linux.go`, `tables_darwin.go`, `tables_windows.go` - Platform-specific imports
-- `views-generated/` - View code packages
+  - `registry_*.go` - Platform-specific registries
+- `views/generated/` - View code packages
   - `sample_combined_resources/sample_combined_resources.go` - Generated view code
-- `docs/` - Table documentation
+  - `registry_*.go` - Platform-specific registries
+- `tables/docs/` - Table documentation
   - `sample_custom_table.md` - Generated table documentation
-- `views-docs/` - View documentation
+- `views/docs/` - View documentation
   - `sample_combined_resources.md` - Generated view documentation
 
 **Note**: Import paths in the generated platform files are calculated automatically based on the output directory locations and the module path detected from `go.mod`.
@@ -66,6 +69,7 @@ name: spec_name                     # Required: table or view name
 description: Brief description      # Required: brief description
 platforms: [linux, darwin, windows] # Optional: defaults to all platforms
 implementation_package: pkg/path    # Optional: for tables only, enables automatic registration
+group: my_group                     # Optional: scopes shared types for this spec
 
 columns:                            # Required: column definitions
   - name: column_name               # Required: column name
@@ -328,6 +332,7 @@ This allows you to write minimal specs for cross-platform tables/views without r
 - ⚪ `columns[].timezone` - Timezone hint for osquery tags (e.g., "UTC")
 - ⚪ `documentation.related_tables` - Defaults to empty array
 - ⚪ `required_tables` - Only applies to views; optional
+- ⚪ `group` - Required if `shared_types` is set
 
 ### Optional for TABLES only:
 - ⚪ `implementation_package` - Import path for automatic registration (highly recommended)

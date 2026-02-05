@@ -37,7 +37,6 @@ recent resources with human-readable priority levels and calculated age fields.
 ## Required Tables
 
 This view requires the following tables to be available:
-
 - `sample_custom_table`
 
 ## View Definition
@@ -82,7 +81,6 @@ WHERE status = 'archived' AND updated_time > (strftime('%s', 'now') - 2592000);
 ```
 
 ## Examples
-
 ### Find critical resources requiring attention
 
 ```sql
@@ -92,7 +90,6 @@ WHERE priority_level = 'critical'
   AND last_modified_days > 7
 ORDER BY last_modified_days DESC;
 ```
-
 ### Analyze resource distribution by category and priority
 
 ```sql
@@ -101,7 +98,6 @@ FROM sample_combined_resources
 GROUP BY category, priority_level
 ORDER BY category, priority_level;
 ```
-
 ### Identify aging resources by status
 
 ```sql
@@ -114,7 +110,6 @@ GROUP BY status;
 ```
 
 ## Notes
-
 - This view uses UNION ALL to combine active and recently archived resources
 - CASE expressions require explicit AS aliases for column names
 - All date calculations are performed using SQLite date functions
@@ -123,7 +118,5 @@ GROUP BY status;
 - Priority levels are converted to human-readable text for easier interpretation
 
 ## Related Tables
-
 - `sample_custom_table`
 - `sample_resource_history`
-

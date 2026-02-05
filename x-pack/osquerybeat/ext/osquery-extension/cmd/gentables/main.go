@@ -7,12 +7,17 @@
 package main
 
 import (
+	"bytes"
+	"embed"
 	"flag"
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
+	"sort"
 	"strings"
+	"text/template"
 
 	"github.com/pingcap/parser"
 	"github.com/pingcap/parser/ast"
@@ -34,7 +39,10 @@ type spec struct {
 	Name                  string              `yaml:"name"`
 	Description           string              `yaml:"description"`
 	Platforms             []string            `yaml:"platforms"`
+	Group                 string              `yaml:"group,omitempty"`
 	Columns               []columnSpec        `yaml:"columns"`
+	EmbeddedTypes         []sharedTypeSpec    `yaml:"-"`                      // Shared types resolved from shared_types specs
+	SharedTypes           []string            `yaml:"shared_types,omitempty"` // References to shared type names from shared types spec
 	Documentation         documentationConfig `yaml:"documentation"`
 	ImplementationPackage string              `yaml:"implementation_package,omitempty"`
 
@@ -47,12 +55,35 @@ type spec struct {
 }
 
 type columnSpec struct {
-	Name        string `yaml:"name"`
-	Type        string `yaml:"type"`
-	Description string `yaml:"description"`
-	Format      string `yaml:"format,omitempty"`   // Optional: "unix", "rfc3339"
-	Timezone    string `yaml:"timezone,omitempty"` // Optional: "UTC", etc.
-	GoType      string `yaml:"go_type,omitempty"`  // Optional: explicit Go type override (e.g., "time.Time")
+	Name         string `yaml:"name"`
+	Type         string `yaml:"type"`
+	Description  string `yaml:"description"`
+	Format       string `yaml:"format,omitempty"`        // Optional: "unix", "rfc3339"
+	Timezone     string `yaml:"timezone,omitempty"`      // Optional: "UTC", etc.
+	GoType       string `yaml:"go_type,omitempty"`       // Optional: explicit Go type override (e.g., "time.Time")
+	EmbeddedType string `yaml:"embedded_type,omitempty"` // Optional: reference to an embedded type name
+}
+
+// sharedTypeSpec defines a reusable shared struct type across specs
+type sharedTypeSpec struct {
+	Name        string       `yaml:"name"`                  // Go struct name (e.g., "ApplicationID")
+	Description string       `yaml:"description,omitempty"` // Optional description
+	Pointer     bool         `yaml:"pointer,omitempty"`     // Whether to embed as pointer (*Type vs Type)
+	Columns     []columnSpec `yaml:"columns"`               // Column definitions for the embedded type
+}
+
+// sharedTypesFile represents the shared types spec format
+type sharedTypesFile struct {
+	Type       string           `yaml:"type,omitempty"` // Optional: "shared_types" when defined in a spec file
+	Group      string           `yaml:"group"`          // Required group name (scopes types to a table/view group)
+	Types      []sharedTypeSpec `yaml:"types"`
+	sourceFile string           `yaml:"-"`
+}
+
+type sharedTypesConfig struct {
+	TypesByGroup       map[string]map[string]sharedTypeSpec
+	ImportPathByGroup  map[string]string
+	PackageNameByGroup map[string]string
 }
 
 type documentationConfig struct {
@@ -77,7 +108,7 @@ const (
 )
 
 var (
-	specDir  = flag.String("spec-dir", "../../specs", "Directory containing YAML specifications (tables and views)")
+	specDir  = flag.String("spec-dir", "../../specs", "Comma-separated directories containing YAML specifications (tables and views)")
 	outDir   = flag.String("out-dir", "../../pkg/tables/generated", "Output directory for generated table Go files")
 	viewsOut = flag.String("views-out-dir", "../../pkg/views/generated", "Output directory for generated view Go files")
 	docsDir  = flag.String("docs-dir", "../../docs/tables", "Output directory for generated table documentation")
@@ -95,8 +126,21 @@ func main() {
 }
 
 func run() error {
-	// Load all YAML spec files
-	specs, err := loadSpecs(*specDir)
+	// Load all files once and categorize them
+	specDirs := splitSpecDirs(*specDir)
+	specFiles, sharedTypeFiles, err := loadAllFiles(specDirs)
+	if err != nil {
+		return fmt.Errorf("failed to load files: %w", err)
+	}
+
+	// Parse shared types first (needed for spec resolution)
+	sharedTypesConfig, err := loadSharedTypes(sharedTypeFiles)
+	if err != nil {
+		return fmt.Errorf("failed to load shared types: %w", err)
+	}
+
+	// Parse all YAML spec files
+	specs, err := loadSpecs(specFiles, sharedTypesConfig)
 	if err != nil {
 		return fmt.Errorf("failed to load specs: %w", err)
 	}
@@ -129,6 +173,13 @@ func run() error {
 		return fmt.Errorf("failed to create views docs directory: %w", err)
 	}
 
+	// Generate shared types packages per group (after specs loaded)
+	if sharedTypesConfig != nil {
+		if err := generateSharedTypesPackages(sharedTypesConfig, *outDir, specs); err != nil {
+			return fmt.Errorf("failed to generate shared types packages: %w", err)
+		}
+	}
+
 	var tableSpecs, viewSpecs []spec
 
 	// Generate code and documentation for each spec
@@ -147,7 +198,7 @@ func run() error {
 		case "table":
 			tableSpecs = append(tableSpecs, s)
 			// Generate Go code
-			if err := generateTableCode(s, *outDir); err != nil {
+			if err := generateTableCode(s, *outDir, sharedTypesConfig); err != nil {
 				return fmt.Errorf("failed to generate code for %s: %w", s.Name, err)
 			}
 
@@ -159,7 +210,7 @@ func run() error {
 		case "view":
 			viewSpecs = append(viewSpecs, s)
 			// Generate Go code
-			if err := generateViewCode(s, *viewsOut); err != nil {
+			if err := generateViewCode(s, *viewsOut, sharedTypesConfig); err != nil {
 				return fmt.Errorf("failed to generate view code for %s: %w", s.Name, err)
 			}
 
@@ -176,7 +227,7 @@ func run() error {
 	// Note: registry files are now static and not generated
 	// They live in pkg/tables/registry.go and pkg/views/registry.go
 
-	// Generate static registry files
+	// Generate static registry files (including empty registries)
 	if err := generateStaticTablesRegistry(tableSpecs, *outDir); err != nil {
 		return fmt.Errorf("failed to generate static tables registry: %w", err)
 	}
@@ -202,41 +253,163 @@ func run() error {
 	return nil
 }
 
-func loadSpecs(dir string) ([]spec, error) {
-	// Support both .yaml and .yml extensions
-	var files []string
-	
-	yamlFiles, err := filepath.Glob(filepath.Join(dir, "*.yaml"))
-	if err != nil {
-		return nil, err
-	}
-	files = append(files, yamlFiles...)
-	
-	ymlFiles, err := filepath.Glob(filepath.Join(dir, "*.yml"))
-	if err != nil {
-		return nil, err
-	}
-	files = append(files, ymlFiles...)
+// fileContent holds a file's path and its pre-read data
+type fileContent struct {
+	path string
+	data []byte
+}
 
-	var specs []spec
+// loadAllFiles reads all spec files once and categorizes them
+func loadAllFiles(dirs []string) (specs []fileContent, sharedTypes []fileContent, err error) {
+	files, err := collectSpecFiles(dirs)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	for _, file := range files {
 		data, err := os.ReadFile(file)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read %s: %w", file, err)
+			return nil, nil, fmt.Errorf("failed to read %s: %w", file, err)
 		}
 
+		// Quick parse to check type field
+		var header struct {
+			Type string `yaml:"type"`
+		}
+		if err := yaml.Unmarshal(data, &header); err != nil {
+			return nil, nil, fmt.Errorf("failed to parse %s: %w", file, err)
+		}
+
+		fc := fileContent{path: file, data: data}
+		if header.Type == "shared_types" {
+			sharedTypes = append(sharedTypes, fc)
+		} else {
+			specs = append(specs, fc)
+		}
+	}
+
+	return specs, sharedTypes, nil
+}
+
+func loadSpecs(specFiles []fileContent, sharedTypesConfig *sharedTypesConfig) ([]spec, error) {
+	specs := make([]spec, 0, len(specFiles))
+	for _, fc := range specFiles {
 		var s spec
-		if err := yaml.Unmarshal(data, &s); err != nil {
-			return nil, fmt.Errorf("failed to parse %s: %w", file, err)
+		if err := yaml.Unmarshal(fc.data, &s); err != nil {
+			return nil, fmt.Errorf("failed to parse %s: %w", fc.path, err)
 		}
 
 		// Store the source file path for reference
-		s.sourceFile = file
+		s.sourceFile = fc.path
 		applyDefaults(&s)
+
+		// Resolve shared type references
+		if err := resolveSharedTypes(&s, sharedTypesConfig); err != nil {
+			return nil, fmt.Errorf("failed to resolve shared types for %s: %w", fc.path, err)
+		}
+
 		specs = append(specs, s)
 	}
 
 	return specs, nil
+}
+
+// loadSharedTypes loads shared types from pre-read file contents.
+func loadSharedTypes(sharedTypeFiles []fileContent) (*sharedTypesConfig, error) {
+	if len(sharedTypeFiles) == 0 {
+		return nil, nil
+	}
+
+	sharedFiles := make([]sharedTypesFile, 0, len(sharedTypeFiles))
+	for _, fc := range sharedTypeFiles {
+		var stf sharedTypesFile
+		if err := yaml.Unmarshal(fc.data, &stf); err != nil {
+			return nil, fmt.Errorf("failed to parse %s: %w", fc.path, err)
+		}
+		stf.sourceFile = fc.path
+		sharedFiles = append(sharedFiles, stf)
+	}
+
+	merged, err := mergeSharedTypesFiles(sharedFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	if *verbose {
+		fmt.Printf("Loaded %d shared types from %d shared types spec(s)\n", countSharedTypes(merged.TypesByGroup), len(sharedFiles))
+	}
+
+	return merged, nil
+}
+
+func splitSpecDirs(value string) []string {
+	parts := strings.Split(value, ",")
+	var dirs []string
+	for _, part := range parts {
+		trimmed := strings.TrimSpace(part)
+		if trimmed == "" {
+			continue
+		}
+		dirs = append(dirs, trimmed)
+	}
+	return dirs
+}
+
+func collectSpecFiles(dirs []string) ([]string, error) {
+	fileSet := make(map[string]bool)
+	var files []string
+
+	for _, dir := range dirs {
+		for _, ext := range []string{"*.yaml", "*.yml"} {
+			matches, err := filepath.Glob(filepath.Join(dir, ext))
+			if err != nil {
+				return nil, err
+			}
+			for _, f := range matches {
+				if !fileSet[f] {
+					fileSet[f] = true
+					files = append(files, f)
+				}
+			}
+		}
+	}
+
+	return files, nil
+}
+
+func countSharedTypes(byGroup map[string]map[string]sharedTypeSpec) int {
+	total := 0
+	for _, types := range byGroup {
+		total += len(types)
+	}
+	return total
+}
+
+
+// resolveSharedTypes adds shared type definitions to the spec based on shared_types references.
+func resolveSharedTypes(s *spec, cfg *sharedTypesConfig) error {
+	if cfg == nil {
+		return nil
+	}
+	if len(s.SharedTypes) > 0 && s.Group == "" {
+		return fmt.Errorf("shared_types requires 'group' to be set on %s", s.Name)
+	}
+
+	groupTypes := cfg.TypesByGroup[s.Group]
+
+	for _, typeName := range s.SharedTypes {
+		if groupTypes != nil {
+			if sharedType, ok := groupTypes[typeName]; ok {
+				s.EmbeddedTypes = append(s.EmbeddedTypes, sharedType)
+				continue
+			}
+		}
+		if s.Group != "" {
+			return fmt.Errorf("shared type %q not found in group %q", typeName, s.Group)
+		}
+		return fmt.Errorf("shared type %q not found", typeName)
+	}
+	return nil
 }
 
 // applyTableDefaults applies sensible defaults to table spec fields
@@ -253,187 +426,359 @@ func applyDefaults(s *spec) {
 	}
 }
 
-func generateTableCode(s spec, outDir string) error {
-	var b strings.Builder
+type resultField struct {
+	IsEmbedded  bool
+	Comment     string
+	TypeName    string
+	Pointer     bool
+	Name        string
+	Type        string
+	Tag         string
+	Description string
+}
 
-	writeGoFileHeader(&b, toPackageName(s.Name), "tables", s.sourceFile, s.Platforms)
+type tableTemplateData struct {
+	CopyrightHeader     string
+	CodeGeneratedNotice string
+	SourceLine          string
+	BuildTagLine        string
+	PackageName         string
+	NeedsTimeImport     bool
+	NeedsSharedImport   bool
+	SharedImport        string
+	Name                string
+	Description         string
+	ResultFields        []resultField
+}
 
-	// Check if we need to import time package
-	needsTimeImport := false
+type viewTemplateData struct {
+	CopyrightHeader     string
+	CodeGeneratedNotice string
+	SourceLine          string
+	BuildTagLine        string
+	PackageName         string
+	NeedsTimeImport     bool
+	NeedsSharedImport   bool
+	SharedImport        string
+	Name                string
+	Description         string
+	ResultFields        []resultField
+	ColumnsComment      []string
+	RequiredTables      string
+	ViewSQL             string
+}
+
+type structField struct {
+	Name        string
+	Type        string
+	Tag         string
+	Description string
+}
+
+type sharedTypeTemplate struct {
+	Name        string
+	Description string
+	Fields      []structField
+}
+
+type sharedTypesTemplateData struct {
+	CodeGeneratedNotice string
+	PackageName         string
+	NeedsTimeImport     bool
+	Types               []sharedTypeTemplate
+}
+
+type schemaRow struct {
+	Name        string
+	Type        string
+	Description string
+}
+
+type docTemplateData struct {
+	Name            string
+	Description     string
+	PlatformLines   []string
+	LongDescription string
+	SchemaRows      []schemaRow
+	IsView          bool
+	RequiredTables  []string
+	ViewDefinition  string
+	CodeFence       string
+	CodeQuote       string
+	Examples        []exampleQuery
+	Notes           []string
+	RelatedTables   []string
+}
+
+type importEntry struct {
+	Alias string
+	Path  string
+}
+
+type tableRegistryData struct {
+	Header       string
+	HasTables    bool
+	ImplImports  []string
+	TableImports []importEntry
+	Entries      []registryEntry
+}
+
+type viewRegistryData struct {
+	Header      string
+	HasViews    bool
+	ViewImports []importEntry
+	Entries     []registryEntry
+}
+
+type registryEntry struct {
+	Name         string
+	Description  string
+	PackageAlias string
+}
+
+//go:embed templates/*.tmpl
+var templatesFS embed.FS
+
+func renderTemplate(name, templatePath string, data any) (string, error) {
+	content, err := templatesFS.ReadFile(templatePath)
+	if err != nil {
+		return "", err
+	}
+	t, err := template.New(name).Parse(string(content))
+	if err != nil {
+		return "", err
+	}
+	var buf bytes.Buffer
+	if err := t.Execute(&buf, data); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+}
+
+
+func buildSourceLine(sourceType, sourceFile string) string {
+	if sourceFile != "" {
+		return fmt.Sprintf("// Source: %s/%s\n\n", sourceType, filepath.Base(sourceFile))
+	}
+	return fmt.Sprintf("// Source: %s (generated)\n\n", sourceType)
+}
+
+func buildBuildTagLine(platforms []string) string {
+	if len(platforms) > 0 && !containsAll(platforms, []string{"linux", "darwin", "windows"}) {
+		return "//go:build " + strings.Join(platforms, " || ") + "\n\n"
+	}
+	return ""
+}
+
+func needsTimeImportForSpec(s spec) bool {
 	for _, col := range s.Columns {
-		goType := osqueryTypeToGoType(col)
-		if goType == "time.Time" {
-			needsTimeImport = true
-			break
+		if osqueryTypeToGoType(col) == "time.Time" {
+			return true
 		}
 	}
-
-	// Generate imports
-	b.WriteString("import (\n")
-	b.WriteString("\t\"context\"\n")
-	b.WriteString("\t\"errors\"\n")
-	b.WriteString("\t\"sync\"\n")
-	if needsTimeImport {
-		b.WriteString("\t\"time\"\n")
+	for _, et := range s.EmbeddedTypes {
+		for _, col := range et.Columns {
+			if osqueryTypeToGoType(col) == "time.Time" {
+				return true
+			}
+		}
 	}
-	b.WriteString("\n")
-	b.WriteString("\t\"github.com/osquery/osquery-go/plugin/table\"\n")
-	b.WriteString("\n")
-	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding\"\n")
-	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger\"\n")
-	b.WriteString(")\n\n")
+	return false
+}
 
-	// Generate generate function registration
-	b.WriteString("var (\n")
-	b.WriteString("\tgenerateFunc func(context.Context, table.QueryContext, *logger.Logger) ([]Result, error)\n")
-	b.WriteString("\tregisterOnce sync.Once\n")
-	b.WriteString(")\n\n")
-
-	b.WriteString("// RegisterGenerateFunc registers the generate function for this table.\n")
-	b.WriteString("// This should be called once from the implementation package's init() function.\n")
-	b.WriteString("func RegisterGenerateFunc(f func(context.Context, table.QueryContext, *logger.Logger) ([]Result, error)) {\n")
-	b.WriteString("\tregisterOnce.Do(func() {\n")
-	b.WriteString("\t\tgenerateFunc = f\n")
-	b.WriteString("\t})\n")
-	b.WriteString("}\n\n")
-
-	b.WriteString("// GetGenerateFunc returns the osquery table.GenerateFunc for this table.\n")
-	b.WriteString("// It wraps the registered generate function and handles marshaling of results.\n")
-	b.WriteString("func GetGenerateFunc(log *logger.Logger) (table.GenerateFunc, error) {\n")
-	b.WriteString("\tif generateFunc == nil {\n")
-	fmt.Fprintf(&b, "\t\treturn nil, errors.New(\"generate function not registered for %s\")\n", s.Name)
-	b.WriteString("\t}\n")
-	b.WriteString("\treturn func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {\n")
-	b.WriteString("\t\tresults, err := generateFunc(ctx, queryContext, log)\n")
-	b.WriteString("\t\tif err != nil {\n")
-	b.WriteString("\t\t\treturn nil, err\n")
-	b.WriteString("\t\t}\n")
-	b.WriteString("\t\t\n")
-	b.WriteString("\t\t// Convert results to maps\n")
-	b.WriteString("\t\trows := make([]map[string]string, len(results))\n")
-	b.WriteString("\t\tfor i, result := range results {\n")
-	b.WriteString("\t\t\trow, err := encoding.MarshalToMap(result)\n")
-	b.WriteString("\t\t\tif err != nil {\n")
-	b.WriteString("\t\t\t\treturn nil, err\n")
-	b.WriteString("\t\t\t}\n")
-	b.WriteString("\t\t\trows[i] = row\n")
-	b.WriteString("\t\t}\n")
-	b.WriteString("\t\treturn rows, nil\n")
-	b.WriteString("\t}, nil\n")
-	b.WriteString("}\n\n")
-
-	// Generate result struct
-	fmt.Fprintf(&b, "// Result represents a row from the %s table.\n", s.Name)
-	b.WriteString("type Result struct {\n")
-
+func buildResultFields(s spec, typeMap map[string]sharedTypeSpec, needsSharedImport bool, sharedPkgName string) ([]resultField, error) {
+	fields := make([]resultField, 0, len(s.Columns))
 	for _, col := range s.Columns {
-		goType := osqueryTypeToGoType(col)
-		fieldName := toGoFieldName(col.Name)
-		structTag := buildStructTag(col)
-		fmt.Fprintf(&b, "\t%s %s %s // %s\n", fieldName, goType, structTag, col.Description)
+		if col.EmbeddedType != "" {
+			et, ok := typeMap[col.EmbeddedType]
+			if !ok {
+				return nil, fmt.Errorf("column %s references unknown embedded type %s", col.Name, col.EmbeddedType)
+			}
+			typeName := et.Name
+			if needsSharedImport && sharedPkgName != "" {
+				typeName = sharedPkgName + "." + et.Name
+			}
+			fields = append(fields, resultField{
+				IsEmbedded: true,
+				Comment:    et.Description,
+				TypeName:   typeName,
+				Pointer:    et.Pointer,
+			})
+			continue
+		}
+
+		fields = append(fields, resultField{
+			Name:        toCamelCase(col.Name),
+			Type:        osqueryTypeToGoType(col),
+			Tag:         buildStructTag(col),
+			Description: col.Description,
+		})
 	}
-	b.WriteString("}\n\n")
+	return fields, nil
+}
 
-	// Generate column function
-	fmt.Fprintf(&b, "// Columns returns the column definitions for the %s table.\n", s.Name)
-	fmt.Fprintf(&b, "// %s\n", s.Description)
-	b.WriteString("func Columns() []table.ColumnDefinition {\n")
-	b.WriteString("\t// Generate column definitions automatically from the Result struct using reflection.\n")
-	b.WriteString("\t// This ensures the columns always match the struct definition and prevents drift.\n")
-	b.WriteString("\tcolumns, err := encoding.GenerateColumnDefinitions(Result{})\n")
-	b.WriteString("\tif err != nil {\n")
-	b.WriteString("\t\t// This should never happen in practice since we control the struct definition,\n")
-	b.WriteString("\t\t// but if it does, panic to catch it during development/testing.\n")
-	fmt.Fprintf(&b, "\t\tpanic(\"failed to generate %s columns: \" + err.Error())\n", s.Name)
-	b.WriteString("\t}\n")
-	b.WriteString("\treturn columns\n")
-	b.WriteString("}\n\n")
+// sharedTypesInfo holds resolved shared types information for code generation
+type sharedTypesInfo struct {
+	EmbeddedTypeMap    map[string]sharedTypeSpec
+	NeedsImport        bool
+	ImportPath         string
+	PackageName        string
+	NeedsTimeImport    bool
+	ResultFields       []resultField
+}
 
-	// Generate table metadata
-	fmt.Fprintf(&b, "// TableName is the name of the %s table.\n", s.Name)
-	fmt.Fprintf(&b, "const TableName = \"%s\"\n", s.Name)
+// resolveSharedTypesInfo resolves shared types information needed for code generation
+func resolveSharedTypesInfo(s spec, cfg *sharedTypesConfig) (*sharedTypesInfo, error) {
+	info := &sharedTypesInfo{
+		EmbeddedTypeMap: make(map[string]sharedTypeSpec),
+		NeedsTimeImport: needsTimeImportForSpec(s),
+	}
+
+	for _, et := range s.EmbeddedTypes {
+		info.EmbeddedTypeMap[et.Name] = et
+	}
+
+	info.NeedsImport = cfg != nil && len(s.SharedTypes) > 0
+	if info.NeedsImport {
+		importPath, ok := cfg.ImportPathByGroup[s.Group]
+		if !ok || importPath == "" {
+			return nil, fmt.Errorf("shared types import path not found for group %q", s.Group)
+		}
+		packageName, ok := cfg.PackageNameByGroup[s.Group]
+		if !ok || packageName == "" {
+			return nil, fmt.Errorf("shared types package name not found for group %q", s.Group)
+		}
+		info.ImportPath = importPath
+		info.PackageName = packageName
+	}
+
+	resultFields, err := buildResultFields(s, info.EmbeddedTypeMap, info.NeedsImport, info.PackageName)
+	if err != nil {
+		return nil, err
+	}
+	info.ResultFields = resultFields
+
+	return info, nil
+}
+
+func generateTableCode(s spec, outDir string, sharedTypesConfig *sharedTypesConfig) error {
+	info, err := resolveSharedTypesInfo(s, sharedTypesConfig)
+	if err != nil {
+		return err
+	}
+
+	data := tableTemplateData{
+		CopyrightHeader:     elasticCopyrightHeader,
+		CodeGeneratedNotice: codeGeneratedNotice,
+		SourceLine:          buildSourceLine("tables", s.sourceFile),
+		BuildTagLine:        buildBuildTagLine(s.Platforms),
+		PackageName:         toPackageName(s.Name),
+		NeedsTimeImport:     info.NeedsTimeImport,
+		NeedsSharedImport:   info.NeedsImport,
+		SharedImport:        info.ImportPath,
+		Name:                s.Name,
+		Description:         s.Description,
+		ResultFields:        info.ResultFields,
+	}
+
+	content, err := renderTemplate("table", "templates/table.tmpl", data)
+	if err != nil {
+		return err
+	}
 
 	// Create subdirectory for this table
 	tableDir := filepath.Join(outDir, s.Name)
+	if s.Group != "" {
+		tableDir = filepath.Join(outDir, s.Group, s.Name)
+	}
 	if err := os.MkdirAll(tableDir, 0755); err != nil {
 		return fmt.Errorf("failed to create directory %s: %w", tableDir, err)
 	}
 
 	// Write to file in subdirectory
 	filename := filepath.Join(tableDir, s.Name+".go")
-	return writeFile(filename, b.String())
+	return writeFile(filename, content)
 }
 
 // generateDocumentation generates documentation for both tables and views
 func generateDocumentation(s spec, docsDir string) error {
-	var b strings.Builder
-
-	writeDocumentationHeader(&b, s.Name, s.Description, s.Platforms)
-
-	// Additional detailed description (required for both tables and views)
-	if s.Documentation.Description != "" {
-		b.WriteString("## Description\n\n")
-		b.WriteString(strings.TrimSpace(s.Documentation.Description) + "\n\n")
+	// Build a map of shared types for quick lookup
+	embeddedTypeMap := make(map[string]sharedTypeSpec)
+	for _, et := range s.EmbeddedTypes {
+		embeddedTypeMap[et.Name] = et
 	}
 
-	// Schema
-	b.WriteString("## Schema\n\n")
-	b.WriteString("| Column | Type | Description |\n")
-	b.WriteString("|--------|------|-------------|\n")
+	var schemaRows []schemaRow
 	for _, col := range s.Columns {
-		fmt.Fprintf(&b, "| `%s` | `%s` | %s |\n",
-			col.Name, col.Type, col.Description)
-	}
-	b.WriteString("\n")
-
-	// Required tables (views only)
-	if s.Type == "view" && len(s.RequiredTables) > 0 {
-		b.WriteString("## Required Tables\n\n")
-		b.WriteString("This view requires the following tables to be available:\n\n")
-		for _, table := range s.RequiredTables {
-			b.WriteString("- `" + table + "`\n")
+		if col.EmbeddedType != "" {
+			if et, ok := embeddedTypeMap[col.EmbeddedType]; ok {
+				for _, embeddedCol := range et.Columns {
+					schemaRows = append(schemaRows, schemaRow{
+						Name:        embeddedCol.Name,
+						Type:        embeddedCol.Type,
+						Description: embeddedCol.Description,
+					})
+				}
+			}
+			continue
 		}
-		b.WriteString("\n")
+		schemaRows = append(schemaRows, schemaRow{
+			Name:        col.Name,
+			Type:        col.Type,
+			Description: col.Description,
+		})
 	}
 
-	// View definition (views only)
+	var platformLines []string
+	platformMap := map[string]bool{
+		"linux":   false,
+		"darwin":  false,
+		"windows": false,
+	}
+	for _, p := range s.Platforms {
+		platformMap[p] = true
+	}
+	platformLines = append(platformLines, fmt.Sprintf("%s Linux", checkmark(platformMap["linux"])))
+	platformLines = append(platformLines, fmt.Sprintf("%s macOS", checkmark(platformMap["darwin"])))
+	platformLines = append(platformLines, fmt.Sprintf("%s Windows", checkmark(platformMap["windows"])))
+
+	longDescription := strings.TrimSpace(s.Documentation.Description)
+	viewDefinition := ""
 	if s.Type == "view" {
-		b.WriteString("## View Definition\n\n")
-		b.WriteString("```sql\n")
-		createViewSQL := fmt.Sprintf("CREATE VIEW %s AS\n%s", s.Name, strings.TrimSpace(s.Query))
-		b.WriteString(createViewSQL + "\n")
-		b.WriteString("```\n\n")
+		viewDefinition = fmt.Sprintf("CREATE VIEW %s AS\n%s", s.Name, strings.TrimSpace(s.Query))
 	}
 
-	writeExamplesSection(&b, s.Documentation.Examples)
-	writeNotesSection(&b, s.Documentation.Notes)
+	examples := make([]exampleQuery, 0, len(s.Documentation.Examples))
+	for _, example := range s.Documentation.Examples {
+		examples = append(examples, exampleQuery{
+			Title: example.Title,
+			Query: strings.TrimSpace(example.Query),
+		})
+	}
 
-	// Related tables
-	if len(s.Documentation.RelatedTables) > 0 {
-		b.WriteString("## Related Tables\n\n")
-		for _, table := range s.Documentation.RelatedTables {
-			b.WriteString("- `" + table + "`\n")
-		}
-		b.WriteString("\n")
+	data := docTemplateData{
+		Name:            s.Name,
+		Description:     s.Description,
+		PlatformLines:   platformLines,
+		LongDescription: longDescription,
+		SchemaRows:      schemaRows,
+		IsView:          s.Type == "view",
+		RequiredTables:  s.RequiredTables,
+		ViewDefinition:  viewDefinition,
+		CodeFence:       "```",
+		CodeQuote:       "`",
+		Examples:        examples,
+		Notes:           s.Documentation.Notes,
+		RelatedTables:   s.Documentation.RelatedTables,
+	}
+
+	content, err := renderTemplate("docs", "templates/docs.tmpl", data)
+	if err != nil {
+		return err
 	}
 
 	filename := filepath.Join(docsDir, s.Name+".md")
-	return writeFile(filename, b.String())
-}
-
-func osqueryTypeToGoMethod(osqueryType string) string {
-	switch osqueryType {
-	case "TEXT":
-		return "TextColumn"
-	case "INTEGER":
-		return "IntegerColumn"
-	case "BIGINT":
-		return "BigIntColumn"
-	case "DOUBLE":
-		return "DoubleColumn"
-	default:
-		return "TextColumn" // Default fallback
-	}
+	return writeFile(filename, content)
 }
 
 // osqueryTypeToGoType maps osquery column types to Go types for result structs
@@ -458,10 +803,6 @@ func osqueryTypeToGoType(col columnSpec) string {
 	}
 }
 
-// toGoFieldName converts snake_case to CamelCase for Go struct field names
-func toGoFieldName(snakeCase string) string {
-	return toCamelCase(snakeCase)
-}
 
 // buildStructTag builds the osquery struct tag with optional format and timezone
 func buildStructTag(col columnSpec) string {
@@ -481,6 +822,229 @@ func buildStructTag(col columnSpec) string {
 	}
 
 	return "`" + strings.Join(parts, " ") + "`"
+}
+
+// generateSharedTypesPackage generates a Go package with all shared type definitions
+func generateSharedTypesPackage(types []sharedTypeSpec, packageName, outDir string) error {
+	if len(types) == 0 {
+		return nil
+	}
+
+	needsTimeImport := false
+	for _, et := range types {
+		for _, col := range et.Columns {
+			if osqueryTypeToGoType(col) == "time.Time" {
+				needsTimeImport = true
+				break
+			}
+		}
+		if needsTimeImport {
+			break
+		}
+	}
+
+	sharedTypes := make([]sharedTypeTemplate, 0, len(types))
+	for _, et := range types {
+		fields := make([]structField, 0, len(et.Columns))
+		for _, col := range et.Columns {
+			fields = append(fields, structField{
+				Name:        toCamelCase(col.Name),
+				Type:        osqueryTypeToGoType(col),
+				Tag:         buildStructTag(col),
+				Description: col.Description,
+			})
+		}
+		sharedTypes = append(sharedTypes, sharedTypeTemplate{
+			Name:        et.Name,
+			Description: et.Description,
+			Fields:      fields,
+		})
+	}
+
+	data := sharedTypesTemplateData{
+		CodeGeneratedNotice: codeGeneratedNotice,
+		PackageName:         packageName,
+		NeedsTimeImport:     needsTimeImport,
+		Types:               sharedTypes,
+	}
+
+	content, err := renderTemplate("sharedTypes", "templates/shared_types.tmpl", data)
+	if err != nil {
+		return err
+	}
+
+	// Create output directory
+	if err := os.MkdirAll(outDir, 0755); err != nil {
+		return fmt.Errorf("failed to create shared types directory %s: %w", outDir, err)
+	}
+
+	// Write to file
+	filename := filepath.Join(outDir, "types.go")
+	return writeFile(filename, content)
+}
+
+func resolveSharedTypesOutput(outDir, group, moduleDir, modulePath string) (string, string, error) {
+	absOutDir, err := filepath.Abs(outDir)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to resolve output directory: %w", err)
+	}
+	if moduleDir == "" || modulePath == "" {
+		return "", "", fmt.Errorf("module info is required to resolve shared types output")
+	}
+	if group == "" {
+		return "", "", fmt.Errorf("shared types require a group")
+	}
+
+	rel, err := filepath.Rel(moduleDir, absOutDir)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to resolve output directory relative to module: %w", err)
+	}
+	if strings.HasPrefix(rel, "..") {
+		return "", "", fmt.Errorf("output directory %s is outside module %s", absOutDir, moduleDir)
+	}
+
+	sharedDir := filepath.Join(absOutDir, group)
+	relImport := path.Clean(filepath.ToSlash(filepath.Join(rel, group)))
+	importPath := modulePath + "/" + relImport
+	return sharedDir, importPath, nil
+}
+
+func mergeSharedTypesFiles(files []sharedTypesFile) (*sharedTypesConfig, error) {
+	merged := &sharedTypesConfig{
+		TypesByGroup: make(map[string]map[string]sharedTypeSpec),
+	}
+	typeNamesByGroup := make(map[string]map[string]bool)
+
+	for _, file := range files {
+		if len(file.Types) == 0 {
+			continue
+		}
+		if file.Group == "" {
+			return nil, fmt.Errorf("%s: shared types require 'group' to be set", file.sourceFile)
+		}
+
+		group := file.Group
+		if _, ok := merged.TypesByGroup[group]; !ok {
+			merged.TypesByGroup[group] = make(map[string]sharedTypeSpec)
+		}
+		if _, ok := typeNamesByGroup[group]; !ok {
+			typeNamesByGroup[group] = make(map[string]bool)
+		}
+
+		for _, t := range file.Types {
+			if typeNamesByGroup[group][t.Name] {
+				return nil, fmt.Errorf("shared type %q is defined multiple times in group %q", t.Name, group)
+			}
+			typeNamesByGroup[group][t.Name] = true
+			merged.TypesByGroup[group][t.Name] = t
+		}
+	}
+
+	return merged, nil
+}
+
+func findGoModDir(startDir string) (string, error) {
+	dir := startDir
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir, nil
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return "", fmt.Errorf("could not find go.mod starting from %s", startDir)
+		}
+		dir = parent
+	}
+}
+
+func getModulePath(moduleDir string) (string, error) {
+	cmd := exec.Command("go", "list", "-m", "-f", "{{.Path}}")
+	cmd.Dir = moduleDir
+	modulePathBytes, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve module path from %s: %w", moduleDir, err)
+	}
+	return strings.TrimSpace(string(modulePathBytes)), nil
+}
+
+func buildSharedTypesForGroup(typesByGroup map[string]map[string]sharedTypeSpec, group string) []sharedTypeSpec {
+	var combined []sharedTypeSpec
+	if group == "" {
+		return combined
+	}
+	if scoped, ok := typesByGroup[group]; ok {
+		for _, t := range scoped {
+			combined = append(combined, t)
+		}
+	}
+	return combined
+}
+
+func collectSharedTypesGroups(specs []spec) map[string]bool {
+	groups := make(map[string]bool)
+	for _, s := range specs {
+		if len(s.SharedTypes) == 0 {
+			continue
+		}
+		groups[s.Group] = true
+	}
+	return groups
+}
+
+func generateSharedTypesPackages(cfg *sharedTypesConfig, outDir string, specs []spec) error {
+	if cfg == nil {
+		return nil
+	}
+	if len(cfg.TypesByGroup) == 0 {
+		return nil
+	}
+
+	groupSet := collectSharedTypesGroups(specs)
+	if len(groupSet) == 0 {
+		return nil
+	}
+
+	absOutDir, err := filepath.Abs(outDir)
+	if err != nil {
+		return fmt.Errorf("failed to resolve output directory: %w", err)
+	}
+	moduleDir, err := findGoModDir(absOutDir)
+	if err != nil {
+		return err
+	}
+	modulePath, err := getModulePath(moduleDir)
+	if err != nil {
+		return err
+	}
+
+	cfg.ImportPathByGroup = make(map[string]string)
+	cfg.PackageNameByGroup = make(map[string]string)
+
+	for group := range groupSet {
+		types := buildSharedTypesForGroup(cfg.TypesByGroup, group)
+		if len(types) == 0 {
+			return fmt.Errorf("shared types requested for group %q but no shared types are defined", group)
+		}
+
+		sharedDir, importPath, err := resolveSharedTypesOutput(outDir, group, moduleDir, modulePath)
+		if err != nil {
+			return err
+		}
+		if err := os.MkdirAll(sharedDir, 0755); err != nil {
+			return fmt.Errorf("failed to create shared types directory: %w", err)
+		}
+		packageName := toPackageName(group)
+		if err := generateSharedTypesPackage(types, packageName, sharedDir); err != nil {
+			return err
+		}
+		cfg.ImportPathByGroup[group] = importPath
+		cfg.PackageNameByGroup[group] = packageName
+	}
+
+	if *verbose {
+		fmt.Printf("Generated shared types packages for %d group(s)\n", len(groupSet))
+	}
+	return nil
 }
 
 // toPackageName converts a table/view name to an idiomatic Go package name
@@ -518,175 +1082,68 @@ func containsAll(slice []string, items []string) bool {
 	return true
 }
 
-// writeGoFileHeader writes the common header for generated Go files.
-func writeGoFileHeader(b *strings.Builder, packageName, sourceType, sourceFile string, platforms []string) {
-	b.WriteString(elasticCopyrightHeader)
-	b.WriteString(codeGeneratedNotice)
-	// Show the actual source file path (just the filename, not full path)
-	if sourceFile != "" {
-		fmt.Fprintf(b, "// Source: %s/%s\n\n", sourceType, filepath.Base(sourceFile))
-	} else {
-		fmt.Fprintf(b, "// Source: %s (generated)\n\n", sourceType)
-	}
-
-
-	// Build tags for platform-specific files
-	if len(platforms) > 0 && !containsAll(platforms, []string{"linux", "darwin", "windows"}) {
-		b.WriteString("//go:build " + strings.Join(platforms, " || ") + "\n\n")
-	}
-
-	fmt.Fprintf(b, "package %s\n\n", packageName)
-}
-
-// writeDocumentationHeader writes the common header for documentation files.
-func writeDocumentationHeader(b *strings.Builder, name, description string, platforms []string) {
-	// Title
-	b.WriteString("# " + name + "\n\n")
-	b.WriteString(description + "\n\n")
-
-	// Platforms
-	b.WriteString("## Platforms\n\n")
-	platformMap := map[string]bool{
-		"linux":   false,
-		"darwin":  false,
-		"windows": false,
-	}
-	for _, p := range platforms {
-		platformMap[p] = true
-	}
-	fmt.Fprintf(b, "- %s Linux\n", checkmark(platformMap["linux"]))
-	fmt.Fprintf(b, "- %s macOS\n", checkmark(platformMap["darwin"]))
-	fmt.Fprintf(b, "- %s Windows\n\n", checkmark(platformMap["windows"]))
-}
-
-// writeExamplesSection writes the examples section for documentation.
-func writeExamplesSection(b *strings.Builder, examples []exampleQuery) {
-	if len(examples) > 0 {
-		b.WriteString("## Examples\n\n")
-		for _, example := range examples {
-			b.WriteString("### " + example.Title + "\n\n")
-			b.WriteString("```sql\n")
-			b.WriteString(strings.TrimSpace(example.Query) + "\n")
-			b.WriteString("```\n\n")
-		}
-	}
-}
-
-// writeNotesSection writes the notes section for documentation.
-func writeNotesSection(b *strings.Builder, notes []string) {
-	if len(notes) > 0 {
-		b.WriteString("## Notes\n\n")
-		for _, note := range notes {
-			b.WriteString("- " + note + "\n")
-		}
-		b.WriteString("\n")
-	}
-}
-
 // writeFile writes content to a file with standard permissions.
 func writeFile(filename string, content string) error {
 	return os.WriteFile(filename, []byte(content), 0644)
 }
 
-func generateViewCode(s spec, outDir string) error {
-	var b strings.Builder
+func generateViewCode(s spec, outDir string, sharedTypesConfig *sharedTypesConfig) error {
+	info, err := resolveSharedTypesInfo(s, sharedTypesConfig)
+	if err != nil {
+		return err
+	}
 
-	writeGoFileHeader(&b, toPackageName(s.Name), "views", s.sourceFile, s.Platforms)
-
-	// Check if we need to import time package
-	needsTimeImport := false
+	columnsComment := make([]string, 0, len(s.Columns))
 	for _, col := range s.Columns {
-		goType := osqueryTypeToGoType(col)
-		if goType == "time.Time" {
-			needsTimeImport = true
-			break
+		columnsComment = append(columnsComment, fmt.Sprintf("%s (%s): %s", col.Name, col.Type, col.Description))
+	}
+
+	requiredTables := "[]string{}"
+	if len(s.RequiredTables) > 0 {
+		quoted := make([]string, 0, len(s.RequiredTables))
+		for _, table := range s.RequiredTables {
+			quoted = append(quoted, fmt.Sprintf("%q", table))
 		}
+		requiredTables = "[]string{" + strings.Join(quoted, ", ") + "}"
 	}
 
-	// Generate imports
-	b.WriteString("import (\n")
-	b.WriteString("\t\"fmt\"\n")
-	b.WriteString("\t\"sync\"\n")
-	if needsTimeImport {
-		b.WriteString("\t\"time\"\n")
+	viewSQL := fmt.Sprintf("CREATE VIEW %s AS\n%s", s.Name, strings.TrimSpace(s.Query))
+	viewSQLLiteral := "`" + viewSQL + "`"
+
+	data := viewTemplateData{
+		CopyrightHeader:     elasticCopyrightHeader,
+		CodeGeneratedNotice: codeGeneratedNotice,
+		SourceLine:          buildSourceLine("views", s.sourceFile),
+		BuildTagLine:        buildBuildTagLine(s.Platforms),
+		PackageName:         toPackageName(s.Name),
+		NeedsTimeImport:     info.NeedsTimeImport,
+		NeedsSharedImport:   info.NeedsImport,
+		SharedImport:        info.ImportPath,
+		Name:                s.Name,
+		Description:         s.Description,
+		ResultFields:        info.ResultFields,
+		ColumnsComment:      columnsComment,
+		RequiredTables:      requiredTables,
+		ViewSQL:             viewSQLLiteral,
 	}
-	b.WriteString("\n")
-	b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks\"\n")
-	b.WriteString(")\n\n")
 
-	// Generate hooks registration
-	b.WriteString("var (\n")
-	b.WriteString("\thooksFunc    func(*hooks.HookManager)\n")
-	b.WriteString("\tregisterOnce sync.Once\n")
-	b.WriteString(")\n\n")
-
-	b.WriteString("// RegisterHooksFunc registers the hooks function for this view (optional).\n")
-	b.WriteString("// This can be called to register any hooks that should be set up for this view.\n")
-	b.WriteString("func RegisterHooksFunc(f func(*hooks.HookManager)){\n")
-	b.WriteString("\tregisterOnce.Do(func() {\n")
-	b.WriteString("\t\thooksFunc = f\n")
-	b.WriteString("\t})\n")
-	b.WriteString("}\n\n")
-
-	// Add GetHooksFunc to retrieve registered hooks function
-	b.WriteString("// GetHooksFunc returns the registered hooks function for this view.\n")
-	b.WriteString("// Returns an error if no hooks function has been registered.\n")
-	b.WriteString("func GetHooksFunc() (func(*hooks.HookManager), error) {\n")
-	b.WriteString("\tif hooksFunc == nil {\n")
-	fmt.Fprintf(&b, "\t\treturn nil, fmt.Errorf(\"no hooks function registered for %s\")\n", s.Name)
-	b.WriteString("\t}\n")
-	b.WriteString("\treturn hooksFunc, nil\n")
-	b.WriteString("}\n\n")
-
-	// Generate result struct
-	fmt.Fprintf(&b, "// Result represents a row from the %s view.\n", s.Name)
-	b.WriteString("type Result struct {\n")
-	for _, col := range s.Columns {
-		goType := osqueryTypeToGoType(col)
-		fieldName := toGoFieldName(col.Name)
-		structTag := buildStructTag(col)
-		fmt.Fprintf(&b, "\t%s %s %s // %s\n", fieldName, goType, structTag, col.Description)
+	content, err := renderTemplate("view", "templates/view.tmpl", data)
+	if err != nil {
+		return err
 	}
-	b.WriteString("}\n\n")
-
-	// Generate default view function (as a reference/helper)
-	fmt.Fprintf(&b, "// View returns the view definition for %s.\n", s.Name)
-	fmt.Fprintf(&b, "// %s\n", s.Description)
-	b.WriteString("//\n")
-	b.WriteString("// Columns:\n")
-	for _, col := range s.Columns {
-		fmt.Fprintf(&b, "//   - %s (%s): %s\n", col.Name, col.Type, col.Description)
-	}
-	b.WriteString("func View() *hooks.View {\n")
-	b.WriteString("\treturn hooks.NewView(\n")
-	fmt.Fprintf(&b, "\t\t\"%s\",\n", s.Name)
-
-	// Required tables
-	b.WriteString("\t\t[]string{")
-	for i, table := range s.RequiredTables {
-		if i > 0 {
-			b.WriteString(", ")
-		}
-		b.WriteString(fmt.Sprintf("\"%s\"", table))
-	}
-	b.WriteString("},\n")
-
-	// Generate the full CREATE VIEW statement from the SELECT query
-	// The s.Query contains just the SELECT, we wrap it in CREATE VIEW
-	createViewSQL := fmt.Sprintf("CREATE VIEW %s AS\n%s", s.Name, strings.TrimSpace(s.Query))
-	b.WriteString("\t\t`" + createViewSQL + "`,\n")
-	b.WriteString("\t)\n")
-	b.WriteString("}\n")
 
 	// Create subdirectory for this view
 	viewDir := filepath.Join(outDir, s.Name)
+	if s.Group != "" {
+		viewDir = filepath.Join(outDir, s.Group, s.Name)
+	}
 	if err := os.MkdirAll(viewDir, 0755); err != nil {
 		return fmt.Errorf("failed to create directory %s: %w", viewDir, err)
 	}
 
 	// Write to file in subdirectory
 	filename := filepath.Join(viewDir, s.Name+".go")
-	return writeFile(filename, b.String())
+	return writeFile(filename, content)
 }
 
 // formatGeneratedFiles runs goimports and gofmt on all generated Go files.
@@ -736,7 +1193,7 @@ func formatGeneratedFiles(dirs ...string) error {
 func generateStaticTablesRegistry(tableSpecs []spec, outDir string) error {
 	// Group tables by platform
 	platformTables := make(map[string][]spec)
-	
+
 	for _, s := range tableSpecs {
 		for _, platform := range s.Platforms {
 			platformTables[platform] = append(platformTables[platform], s)
@@ -746,84 +1203,51 @@ func generateStaticTablesRegistry(tableSpecs []spec, outDir string) error {
 	// Generate a registry file for each platform
 	for _, platform := range []string{"linux", "darwin", "windows"} {
 		tables := platformTables[platform]
+		header := elasticCopyrightHeader +
+			codeGeneratedNotice +
+			fmt.Sprintf("// Source: gentables - static registry of %s tables\n\n", platform) +
+			fmt.Sprintf("//go:build %s\n\n", platform)
 
-		var b strings.Builder
+		data := tableRegistryData{
+			Header:    header,
+			HasTables: len(tables) > 0,
+		}
 
-		// Header
-		b.WriteString(elasticCopyrightHeader)
-		b.WriteString(codeGeneratedNotice)
-		fmt.Fprintf(&b, "// Source: gentables - static registry of %s tables\n\n", platform)
-		fmt.Fprintf(&b, "//go:build %s\n\n", platform)
-		b.WriteString("package generated\n\n")
-
-		if len(tables) == 0 {
-			// Generate empty registry for platforms with no tables
-			b.WriteString("import (\n")
-			b.WriteString("\t\"github.com/osquery/osquery-go\"\n\n")
-			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger\"\n")
-			b.WriteString(")\n\n")
-			b.WriteString("// RegisterTables registers all generated tables with the osquery extension server.\n")
-			b.WriteString("// This function is called from main.go after all init() functions have run.\n")
-			b.WriteString("// No tables are defined for this platform.\n")
-			b.WriteString("func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {\n")
-			b.WriteString("\t// No tables to register for this platform\n")
-			b.WriteString("}\n")
-		} else {
-			// Collect implementation packages for this platform
+		if len(tables) > 0 {
 			implPackages := make(map[string]bool)
 			for _, s := range tables {
 				if s.ImplementationPackage != "" {
 					implPackages[s.ImplementationPackage] = true
 				}
 			}
-
-			// Imports
-			b.WriteString("import (\n")
-			
-			// Naked imports for implementation packages (to trigger their init() functions)
-			if len(implPackages) > 0 {
-				for pkg := range implPackages {
-					fmt.Fprintf(&b, "\t_ \"%s\"\n", pkg)
+			for pkg := range implPackages {
+				data.ImplImports = append(data.ImplImports, pkg)
+			}
+			sort.Strings(data.ImplImports)
+			for _, s := range tables {
+				pkgName := toPackageName(s.Name)
+				importPath := fmt.Sprintf("github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/%s", s.Name)
+				if s.Group != "" {
+					importPath = fmt.Sprintf("github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/%s/%s", s.Group, s.Name)
 				}
-				b.WriteString("\n")
+				data.TableImports = append(data.TableImports, importEntry{
+					Alias: pkgName,
+					Path:  importPath,
+				})
+				data.Entries = append(data.Entries, registryEntry{
+					Name:         s.Name,
+					Description:  s.Description,
+					PackageAlias: pkgName,
+				})
 			}
-			
-			b.WriteString("\t\"github.com/osquery/osquery-go\"\n")
-			b.WriteString("\t\"github.com/osquery/osquery-go/plugin/table\"\n\n")
-			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger\"\n")
-
-			// Import table packages for this platform
-			for _, s := range tables {
-				pkgName := toPackageName(s.Name)
-				fmt.Fprintf(&b, "\t%s \"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/%s\"\n", pkgName, s.Name)
-			}
-			b.WriteString(")\n\n")
-
-			// Generate RegisterTables function
-			b.WriteString("// RegisterTables registers all generated tables with the osquery extension server.\n")
-			b.WriteString("// This function is called from main.go after all init() functions have run.\n")
-			b.WriteString("func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {\n")
-
-			for _, s := range tables {
-				pkgName := toPackageName(s.Name)
-				b.WriteString("\t{\n")
-				fmt.Fprintf(&b, "\t\t// %s\n", s.Description)
-				fmt.Fprintf(&b, "\t\tgenFunc, err := %s.GetGenerateFunc(log)\n", pkgName)
-				b.WriteString("\t\tif err != nil {\n")
-				fmt.Fprintf(&b, "\t\t\tlog.Errorf(\"Failed to get generate function for %s: %%v\", err)\n", s.Name)
-				b.WriteString("\t\t} else {\n")
-				fmt.Fprintf(&b, "\t\t\tserver.RegisterPlugin(table.NewPlugin(%q, %s.Columns(), genFunc))\n", s.Name, pkgName)
-				fmt.Fprintf(&b, "\t\t\tlog.Infof(\"Registered table: %s\")\n", s.Name)
-				b.WriteString("\t\t}\n")
-				b.WriteString("\t}\n\n")
-			}
-
-			b.WriteString("}\n")
 		}
 
-		// Write to platform-specific file
+		content, err := renderTemplate("registryTables", "templates/registry_tables.tmpl", data)
+		if err != nil {
+			return err
+		}
 		filename := filepath.Join(outDir, fmt.Sprintf("registry_%s.go", platform))
-		if err := writeFile(filename, b.String()); err != nil {
+		if err := writeFile(filename, content); err != nil {
 			return err
 		}
 	}
@@ -831,12 +1255,11 @@ func generateStaticTablesRegistry(tableSpecs []spec, outDir string) error {
 	return nil
 }
 
-// generateStaticViewsRegistry generates a static registry file with all view specs
 // generateStaticViewsRegistry generates platform-specific static registry files with view specs
 func generateStaticViewsRegistry(viewSpecs []spec, outDir string) error {
 	// Group views by platform
 	platformViews := make(map[string][]spec)
-	
+
 	for _, s := range viewSpecs {
 		for _, platform := range s.Platforms {
 			platformViews[platform] = append(platformViews[platform], s)
@@ -846,137 +1269,46 @@ func generateStaticViewsRegistry(viewSpecs []spec, outDir string) error {
 	// Generate a registry file for each platform
 	for _, platform := range []string{"linux", "darwin", "windows"} {
 		views := platformViews[platform]
+		header := elasticCopyrightHeader +
+			codeGeneratedNotice +
+			fmt.Sprintf("// Source: gentables - static registry of %s views\n\n", platform) +
+			fmt.Sprintf("//go:build %s\n\n", platform)
 
-		var b strings.Builder
-
-		// Header
-		b.WriteString(elasticCopyrightHeader)
-		b.WriteString(codeGeneratedNotice)
-		fmt.Fprintf(&b, "// Source: gentables - static registry of %s views\n\n", platform)
-		fmt.Fprintf(&b, "//go:build %s\n\n", platform)
-		b.WriteString("package generated\n\n")
-
-		if len(views) == 0 {
-			// Generate empty registry for platforms with no views
-			b.WriteString("import (\n")
-			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks\"\n")
-			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger\"\n")
-			b.WriteString(")\n\n")
-			b.WriteString("// RegisterViews registers all generated views with the hook manager.\n")
-			b.WriteString("// This function is called from main.go after all init() functions have run.\n")
-			b.WriteString("// No views are defined for this platform.\n")
-			b.WriteString("func RegisterViews(hookManager *hooks.HookManager, log *logger.Logger) {\n")
-			b.WriteString("\t// No views to register for this platform\n")
-			b.WriteString("}\n")
-		} else {
-			// Collect implementation packages for this platform
-			implPackages := make(map[string]bool)
-			for _, s := range views {
-				if s.ImplementationPackage != "" {
-					implPackages[s.ImplementationPackage] = true
-				}
-			}
-
-			// Imports
-			b.WriteString("import (\n")
-			
-			// Naked imports for implementation packages (to trigger their init() functions)
-			if len(implPackages) > 0 {
-				for pkg := range implPackages {
-					fmt.Fprintf(&b, "\t_ \"%s\"\n", pkg)
-				}
-				b.WriteString("\n")
-			}
-			
-			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks\"\n")
-			b.WriteString("\t\"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger\"\n")
-
-			// Import view packages for this platform
-			for _, s := range views {
-				pkgName := toPackageName(s.Name)
-				fmt.Fprintf(&b, "\t%s \"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/%s\"\n", pkgName, s.Name)
-			}
-			b.WriteString(")\n\n")
-
-			// Generate RegisterViews function
-			b.WriteString("// RegisterViews registers all generated views with the hook manager.\n")
-			b.WriteString("// This function is called from main.go after all init() functions have run.\n")
-			b.WriteString("func RegisterViews(hookManager *hooks.HookManager, log *logger.Logger) {\n")
-
-			for _, s := range views {
-				pkgName := toPackageName(s.Name)
-				b.WriteString("\t{\n")
-				fmt.Fprintf(&b, "\t\t// %s\n", s.Description)
-				fmt.Fprintf(&b, "\t\thooksFunc, err := %s.GetHooksFunc()\n", pkgName)
-				b.WriteString("\t\tif err != nil {\n")
-				fmt.Fprintf(&b, "\t\t\tlog.Errorf(\"Failed to get hooks function for %s: %%v\", err)\n", s.Name)
-				b.WriteString("\t\t} else {\n")
-				b.WriteString("\t\t\thooksFunc(hookManager)\n")
-				fmt.Fprintf(&b, "\t\t\tlog.Infof(\"Registered view: %s\")\n", s.Name)
-				b.WriteString("\t\t}\n")
-				b.WriteString("\t}\n\n")
-			}
-
-			b.WriteString("}\n")
+		data := viewRegistryData{
+			Header:   header,
+			HasViews: len(views) > 0,
 		}
 
-		// Write to platform-specific file
+		if len(views) > 0 {
+			for _, s := range views {
+				pkgName := toPackageName(s.Name)
+				importPath := fmt.Sprintf("github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/%s", s.Name)
+				if s.Group != "" {
+					importPath = fmt.Sprintf("github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/%s/%s", s.Group, s.Name)
+				}
+				data.ViewImports = append(data.ViewImports, importEntry{
+					Alias: pkgName,
+					Path:  importPath,
+				})
+				data.Entries = append(data.Entries, registryEntry{
+					Name:         s.Name,
+					Description:  s.Description,
+					PackageAlias: pkgName,
+				})
+			}
+		}
+
+		content, err := renderTemplate("registryViews", "templates/registry_views.tmpl", data)
+		if err != nil {
+			return err
+		}
 		filename := filepath.Join(outDir, fmt.Sprintf("registry_%s.go", platform))
-		if err := writeFile(filename, b.String()); err != nil {
+		if err := writeFile(filename, content); err != nil {
 			return err
 		}
 	}
 
 	return nil
-}
-
-
-// getImportPath returns the Go import path for a directory using go list
-func getImportPath(dir string) (string, error) {
-	// Get absolute path
-	absDir, err := filepath.Abs(dir)
-	if err != nil {
-		return "", fmt.Errorf("failed to get absolute path: %w", err)
-	}
-
-	// Ensure directory exists
-	if err := os.MkdirAll(absDir, 0755); err != nil {
-		return "", fmt.Errorf("failed to create directory %s: %w", absDir, err)
-	}
-
-	// Try to use go list on the directory
-	// We need to traverse up until we find a directory that go list can work with
-	currentDir := absDir
-	pathComponents := []string{}
-	
-	for {
-		cmd := exec.Command("go", "list", "-f", "{{.ImportPath}}", ".")
-		cmd.Dir = currentDir
-		output, err := cmd.Output()
-		
-		if err == nil {
-			// Success! Build the full import path
-			baseImportPath := strings.TrimSpace(string(output))
-			
-			// Append any subdirectories we collected
-			for i := len(pathComponents) - 1; i >= 0; i-- {
-				baseImportPath = baseImportPath + "/" + pathComponents[i]
-			}
-			
-			return baseImportPath, nil
-		}
-		
-		// Move up one directory
-		parentDir := filepath.Dir(currentDir)
-		if parentDir == currentDir {
-			// Reached filesystem root without finding a valid Go package
-			return "", fmt.Errorf("could not find Go module for directory %s", absDir)
-		}
-		
-		// Remember this directory component
-		pathComponents = append(pathComponents, filepath.Base(currentDir))
-		currentDir = parentDir
-	}
 }
 
 // validateViewColumns validates that the columns specified in the view spec

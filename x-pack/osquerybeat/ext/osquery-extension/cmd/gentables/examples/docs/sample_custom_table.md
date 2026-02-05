@@ -29,7 +29,6 @@ specifications and showcases proper documentation practices.
 | `priority` | `INTEGER` | Priority level (1=low, 2=medium, 3=high, 4=critical) |
 
 ## Examples
-
 ### List all active resources sorted by priority
 
 ```sql
@@ -38,7 +37,6 @@ FROM sample_custom_table
 WHERE status = 'active'
 ORDER BY priority DESC, created_time DESC;
 ```
-
 ### Count resources by status and category
 
 ```sql
@@ -47,7 +45,6 @@ FROM sample_custom_table
 GROUP BY status, category
 ORDER BY status, category;
 ```
-
 ### Find high-priority enabled resources updated recently
 
 ```sql
@@ -58,7 +55,6 @@ WHERE enabled = 1
   AND updated_time > (strftime('%s', 'now') - 86400)
 ORDER BY priority DESC;
 ```
-
 ### Calculate average value by category for active resources
 
 ```sql
@@ -72,7 +68,6 @@ GROUP BY category;
 ```
 
 ## Notes
-
 - This is a sample table to demonstrate the code generator's capabilities
 - The generator creates Go code with column definitions and table metadata
 - Platform-specific build tags are automatically added based on the platforms field
@@ -80,8 +75,6 @@ GROUP BY category;
 - Status values should be validated at query time using WHERE clauses
 
 ## Related Tables
-
 - `sample_resource_history`
 - `sample_resource_tags`
 - `system_info`
-
