@@ -94,7 +94,28 @@ func configure(
 		return nil, nil, err
 	}
 
+<<<<<<< HEAD
 	prospector, err := newProspector(config, log, src)
+=======
+	if err := normalizeConfig(cfg, &c); err != nil {
+		return nil, nil, err
+	}
+
+	// zero must also disable clean_inactive, see:
+	// https://github.com/elastic/beats/issues/45601
+	// for more details. At the same time we need to allow
+	// users to keep the old behaviour.
+	if !c.LegacyCleanInactive && c.CleanInactive == 0 {
+		c.CleanInactive = -1
+	}
+
+	// log warning if deprecated params are set
+	c.checkUnsupportedParams(log)
+
+	c.TakeOver.LogWarnings(log)
+
+	prospector, err := newProspector(c, log, src)
+>>>>>>> bc7c4e146 ([filebeat] Honor non-fingerprint file_identity defaults (#48579))
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
@@ -113,6 +134,30 @@ func configure(
 	}
 
 	return prospector, filestream, nil
+}
+
+// normalizeConfig reconciles filestream defaults with file_identity semantics.
+// In 9.x, scanner fingerprinting defaults to enabled, but non-fingerprint
+// identities should turn it off unless the user explicitly sets it.
+func normalizeConfig(cfg *conf.C, c *config) error {
+	if c.FileIdentity == nil {
+		return nil
+	}
+
+	name := c.FileIdentity.Name()
+	if name == fingerprintName {
+		return nil
+	}
+
+	hasScannerFingerprint, err := cfg.Has("prospector.scanner.fingerprint.enabled", -1)
+	if err != nil {
+		return fmt.Errorf("cannot read 'prospector.scanner.fingerprint.enabled': %w", err)
+	}
+	if !hasScannerFingerprint {
+		c.FileWatcher.Scanner.Fingerprint.Enabled = false
+	}
+
+	return nil
 }
 
 func (inp *filestream) Name() string { return pluginName }
