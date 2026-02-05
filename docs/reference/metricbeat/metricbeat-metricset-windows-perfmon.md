@@ -57,7 +57,7 @@ You must configure queries for the Windows performance counters that you wish to
 value of `svchost`. If set to `false` they keep the original values (`svchost`, `svchost#1`, and so on). Defaults to `true`.
 
 **`extract_object_from_counter`**
-:   A boolean flag that enables extracting the object name directly from the counter path. This is useful when the object name includes a wildcard and you want the resulting event to contain the resolved (expanded) object name. It is unset by default. Set it to `true` if you want to extract object names from counter path.
+:   A boolean flag that enables extracting the object name directly from the counter path. This is useful when the object name includes a wildcard and you want the resulting event to contain the resolved (expanded) object name. It is unset by default. Set it to `true` if you want to extract object names from the counter path.
 
 
 ### Query Configuration [_query_configuration]
