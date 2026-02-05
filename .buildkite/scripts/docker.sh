@@ -22,4 +22,27 @@ EOF
   sudo systemctl restart docker
 }
 
+# Print docker login information for debugging purposes
+# See https://docs.docker.com/docker-hub/usage/pulls/#view-pull-rate-and-limit
+docker_info() {
+  echo "~~~ Docker Login Status and Rate Limits"
+
+  # Check if we're logged in to Docker Hub
+  if docker info 2>/dev/null | grep -q "Username:"; then
+    echo "✅ Logged in to Docker Hub"
+  else
+    echo "⚠ Not logged in to Docker Hub"
+  fi
+
+  # Get authentication token (works for both authenticated and anonymous)
+  TOKEN=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:ratelimitpreview/test:pull" | jq -r .token 2>/dev/null || echo "")
+
+  if [ -n "$TOKEN" ]; then
+    curl -s --head -H "Authorization: Bearer $TOKEN" https://registry-1.docker.io/v2/ratelimitpreview/test/manifests/latest | grep -i "rate"
+  else
+    echo "⚠ Unable to authenticate with Docker Hub to check rate limits"
+  fi
+}
+
 docker_disable_containerd_snapshotter
+docker_info
