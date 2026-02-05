@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -35,12 +36,20 @@ func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config
 	}
 
 	for eventIdentifier := range events {
-		eventIdentifierComponents := strings.Split(eventIdentifier, "-")
-		potentialInstanceID := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
+		// Get instance ID from dimension value
+		var instanceIDForMatching string
+		if dimInstanceID, err := events[eventIdentifier].RootFields.GetValue("aws.dimensions.InstanceId"); err == nil {
+			instanceIDForMatching = dimInstanceID.(string)
+			_, _ = events[eventIdentifier].RootFields.Put("cloud.instance.id", dimInstanceID)
+		} else {
+			// Fallback: parse eventIdentifier, stripping account ID prefix if present
+			// Format: {accountId}-{resourceId}-{index} or {resourceId}-{index}
+			instanceIDForMatching = metadata.ExtractResourceID(eventIdentifier)
+		}
 
 		// add host cpu/network/disk fields and host.id and rate metrics for all instances from both the monitoring
 		// account and linked source accounts if include_linked_accounts is set to true
-		addHostFields(events[eventIdentifier], potentialInstanceID)
+		addHostFields(events[eventIdentifier], instanceIDForMatching)
 		period, err := events[eventIdentifier].RootFields.GetValue(aws.CloudWatchPeriodName)
 		if err != nil {
 			logger.Warnf("can't get period information for instance %s, skipping rate calculation", eventIdentifier)
@@ -48,13 +57,8 @@ func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config
 			calculateRate(events[eventIdentifier], period.(int))
 		}
 
-		// add instance ID from dimension value
-		if dimInstanceID, err := events[eventIdentifier].RootFields.GetValue("aws.dimensions.InstanceId"); err == nil {
-			_, _ = events[eventIdentifier].RootFields.Put("cloud.instance.id", dimInstanceID)
-		}
-
 		for instanceID, output := range instancesOutputs {
-			if instanceID != potentialInstanceID {
+			if instanceID != instanceIDForMatching {
 				continue
 			}
 			for _, tag := range output.Tags {
