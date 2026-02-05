@@ -1300,7 +1300,7 @@ service:
 		defer wg.Done()
 		logFile, err := os.Create(logFilePath)
 		if err != nil {
-			t.Fatalf("could not create file '%s': %s", logFilePath, err)
+			require.NoErrorf(t, err, "could not create file '%s'", logFilePath)
 		}
 		defer logFile.Close()
 
@@ -1429,6 +1429,7 @@ func checkDuplicates(t *testing.T, index string) {
 
 	aggResults := map[string]any{}
 	err = json.Unmarshal(resultBuf, &aggResults)
+	require.NoError(t, err)
 	aggs, ok := aggResults["aggregations"].(map[string]any)
 	require.Truef(t, ok, "'aggregations' wasn't a map[string]any, result was %s", string(resultBuf))
 	dups, ok := aggs["duplicates"].(map[string]any)
