@@ -5,6 +5,8 @@
 package otelmanager
 
 import (
+	"sync"
+
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -35,6 +37,7 @@ type OtelManager struct {
 	ext          DiagnosticExtension
 	receiverName string
 	stopFn       func()
+	stopOnce     sync.Once
 }
 
 func (n *OtelManager) UpdateStatus(_ status.Status, _ string) {
@@ -48,7 +51,7 @@ func (n *OtelManager) SetStopCallback(fn func()) {
 
 func (n *OtelManager) Stop() {
 	if n.stopFn != nil {
-		n.stopFn()
+		n.stopOnce.Do(n.stopFn)
 	}
 }
 
