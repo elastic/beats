@@ -614,7 +614,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			metricsRecorder.AddPublishDuration(ctx, time.Since(pubStart))
 			// Advance the cursor to the final state if there was no error during
 			// publications. This is needed to transition to the next set of events.
-			if !hadPublicationError {
+			if !hadPublicationError && !isDegraded {
 				goodCursor = cursor
 				metricsRecorder.AddProgramSuccessExecution(ctx)
 			}

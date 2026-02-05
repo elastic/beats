@@ -102,6 +102,14 @@ func NewMetricsExporterFactory(exporterOptions MetricExporterOptions) *MetricsEx
 	}
 }
 
+// SetGlobalMetricsExporter sets the global metrics exporter.
+// This is used for testing.
+func (ef *MetricsExporterFactory) SetGlobalMetricsExporter(exporter sdkmetric.Exporter) {
+	ef.lock.Lock()
+	defer ef.lock.Unlock()
+	ef.globalMetricsExporter = exporter
+}
+
 // GetExporter returns a metrics exporter based on the current environment
 // configuration.
 //
