@@ -76,7 +76,7 @@ filebeat.inputs:
 
 1. All `filestream` inputs require a unique ID.
 2. Container logs use symlinks, so they need to be enabled.
-3. A path for each container, so the input will only ingest the logs from its 
+3. A path for each container, so the input will only ingest the logs from its
 container.
 
 ## Settings [_settings]
