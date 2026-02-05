@@ -2,7 +2,7 @@
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1768449671"
 
   #  TEST_TAGS should be reviewed and updated: https://github.com/elastic/ingest-dev/issues/3476
   TEST_TAGS: "aws"
@@ -31,7 +31,7 @@ steps:
       mage build test goIntegTest
     agents:
       provider: "aws"
-      imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+      image: "${AWS_IMAGE_UBUNTU_ARM_64}"
       instanceType: "${AWS_ARM_INSTANCE_TYPE}"
     artifact_paths:
       - "x-pack/filebeat/build/*.xml"
@@ -56,7 +56,7 @@ steps:
       mage build test goIntegTest
     agents:
       provider: "aws"
-      imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+      image: "${AWS_IMAGE_UBUNTU_ARM_64}"
       instanceType: "${AWS_ARM_INSTANCE_TYPE}"
     artifact_paths:
       - "x-pack/metricbeat/build/*.xml"
