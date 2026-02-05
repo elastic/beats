@@ -283,6 +283,10 @@ The total sum of request body lengths that are allowed at any given time. If non
 
 The maximum body length allowed for a single request. If present, the input will truncate request bodies at the configured limit. The default value for this option is unset, no limit.
 
+:::{note}
+In Filebeat versions prior to 9.4.0, `max_body_bytes` was only enforced for HMAC-authenticated requests. In Filebeat 9.4.0 and later, the limit applies to all HTTP endpoint requests regardless of the authentication method.
+:::
+
 ### `retry_after` [_retry_after]
 
 If a request has exceeded the `max_in_flight_bytes` limit, the response to the client will include a Retry-After header specifying how many seconds the client should wait to retry again. The default value for this option is 10 seconds.
