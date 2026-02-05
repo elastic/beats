@@ -91,7 +91,7 @@ func TestPublish(t *testing.T) {
 		assert.EqualValues(t, 0, checkEventsActive(reg), "initial total events should be zero")
 		// Run Publish asynchronously so we can check the metrics while it is still in progress
 		go func() {
-			otelConsumer.Publish(ctx, batch)
+			_ = otelConsumer.Publish(ctx, batch)
 			// Signal that Publish has completed
 			publishDone <- struct{}{}
 		}()
