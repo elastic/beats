@@ -1294,9 +1294,15 @@ service:
 	logFilePath := filepath.Join(tmpdir, "log.log")
 	writenLines := make([]string, 0)
 	stopChan := make(chan struct{}, 1)
+
 	var wg sync.WaitGroup
+
 	wg.Add(1)
 	go func() {
+		// create a log file and keep writing to it until the test finishes.
+		// This is to ensure that the filebeat receiver is continuously processing
+		// new lines and creating new events, which increases the chances of
+		// hitting edge cases that could cause duplicates on restart.
 		defer wg.Done()
 		logFile, err := os.Create(logFilePath)
 		if err != nil {
