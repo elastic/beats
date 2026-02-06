@@ -362,8 +362,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				switch {
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
 					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-					errorSpans(err, runSpan, execSpan)
-					execSpan.End()
+					errorSpans(err, runSpan, end{execSpan})
 					return err
 				case errors.As(err, &dump):
 					path := strings.ReplaceAll(cfg.FailureDump.Filename, "*", sanitizeFileName(env.IDWithoutName))
@@ -473,8 +472,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			ok, waitUntil, err = handleResponse(execLog, state, limiter)
 			if err != nil {
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-				errorSpans(err, execSpan, runSpan)
-				execSpan.End()
+				errorSpans(err, end{execSpan}, runSpan)
 				return err
 			}
 			if !ok {
@@ -491,8 +489,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			e, ok := state["events"]
 			if !ok {
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-				errorSpans(err, execSpan, runSpan)
-				execSpan.End()
+				errorSpans(err, end{execSpan}, runSpan)
 				return errors.New("unexpected missing events array from evaluation")
 			}
 			var events []interface{}
@@ -501,8 +498,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if len(e) == 0 {
 					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 					metricsRecorder.AddProgramSuccessExecution(execCtx)
-					okSpans(execSpan)
-					execSpan.End()
+					okSpans(end{execSpan})
 					return nil
 				}
 				events = e
@@ -510,8 +506,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if e == nil {
 					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 					metricsRecorder.AddProgramSuccessExecution(execCtx)
-					okSpans(execSpan)
-					execSpan.End()
+					okSpans(end{execSpan})
 					return nil
 				}
 				if _, ok := e["error"]; ok {
@@ -541,8 +536,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			default:
 				err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-				errorSpans(err, execSpan, runSpan)
-				execSpan.End()
+				errorSpans(err, end{execSpan}, runSpan)
 				return err
 			}
 
@@ -593,8 +587,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				event, ok := e.(map[string]interface{})
 				if !ok {
 					err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
-					errorSpans(err, pubSpan, execSpan, runSpan)
-					endSpans(pubSpan, execSpan)
+					errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
 					return err
 				}
 				var pubCursor interface{}
@@ -608,8 +601,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 							if !ok {
 								err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
 								metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
-								errorSpans(err, pubSpan, execSpan, runSpan)
-								endSpans(pubSpan, execSpan)
+								errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
 								return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
 							}
 							pubCursor = cursor
@@ -620,8 +612,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 						if !ok {
 							err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
 							metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
-							errorSpans(err, pubSpan, runSpan)
-							pubSpan.End()
+							errorSpans(err, end{pubSpan}, runSpan)
 							return err
 						}
 						pubCursor = cursor
@@ -672,8 +663,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				err = pubCtx.Err()
 				if err != nil {
 					metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
-					errorSpans(err, pubSpan, execSpan, runSpan)
-					endSpans(pubSpan, execSpan)
+					errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
 					return err
 				}
 			}
@@ -690,7 +680,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				metricsRecorder.AddProgramSuccessExecution(pubCtx)
 				okSpans(pubSpan)
 			}
-
 			pubSpan.End()
 
 			// Replace the last known good cursor.
@@ -698,8 +687,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 			if more, _ := state["want_more"].(bool); !more {
 				execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
-				okSpans(execSpan, runSpan)
-				execSpan.End()
+				okSpans(end{execSpan}, runSpan)
 				return nil
 			}
 			execSpan.SetAttributes(attribute.Bool("cel.program.want_more", true))
@@ -720,8 +708,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				return nil
 			}
 
-			okSpans(execSpan)
-			execSpan.End()
+			okSpans(end{execSpan})
 		}
 	})
 	switch {
@@ -740,22 +727,27 @@ func logWithTracingIds(log *logp.Logger, span trace.Span) *logp.Logger {
 	)
 }
 
+// end is a tag type indicating spans in errorSpans and okSpans should be ended.
+type end struct {
+	trace.Span
+}
+
 func errorSpans(err error, spans ...trace.Span) {
 	for _, sp := range spans {
 		sp.RecordError(err)
 		sp.SetStatus(codes.Error, err.Error())
+		if e, ok := sp.(end); ok {
+			e.End()
+		}
 	}
 }
 
 func okSpans(spans ...trace.Span) {
 	for _, sp := range spans {
 		sp.SetStatus(codes.Ok, "")
-	}
-}
-
-func endSpans(spans ...trace.Span) {
-	for _, sp := range spans {
-		sp.End()
+		if e, ok := sp.(end); ok {
+			e.End()
+		}
 	}
 }
 
