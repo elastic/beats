@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 )
 
 var (
@@ -31,7 +32,7 @@ type profile struct {
 }
 
 type historyParser interface {
-	parse(ctx context.Context, queryContext table.QueryContext, filters []filters.Filter) ([]*visit, error)
+	parse(ctx context.Context, queryContext table.QueryContext, filters []filters.Filter) ([]elasticbrowserhistory.Result, error)
 }
 
 func initParsers() {
