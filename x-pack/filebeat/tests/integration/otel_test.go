@@ -1452,6 +1452,8 @@ func TestNoDuplicates(t *testing.T) {
           enabled: true
           paths:
             - %s
+    output:
+      otelconsumer:
     processors:
       - add_host_metadata: ~
       - add_cloud_metadata: ~
