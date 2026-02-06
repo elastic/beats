@@ -61,27 +61,27 @@ func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Log
 
 	switch tresp := resp.body.(type) {
 	case []interface{}:
-			values := []string{}
-			for _, v := range tresp {
-				m, ok := v.(map[string]interface{})
-				if !ok {
-					if _, ok = v.(string); ok {
-						values = append(values, v.(string))
-					} else {
-						msg := fmt.Sprintf("events must be JSON objects, but got %T: skipping", v)
-						log.Debug(msg)
-						stat.UpdateStatus(status.Degraded, msg)
-					}
-					continue
-				}
-				convertAndAppend(m)
-			}
-
-			if len(values) > 0 && (len(values) != len(tresp) || !allowStringArray ) {
-					msg := fmt.Sprintf("events must be JSON objects, but got strings in a non-chained configuration %v", values)
+		values := []string{}
+		for _, v := range tresp {
+			m, ok := v.(map[string]interface{})
+			if !ok {
+				if _, ok = v.(string); ok {
+					values = append(values, v.(string))
+				} else {
+					msg := fmt.Sprintf("events must be JSON objects, but got %T: skipping", v)
 					log.Debug(msg)
 					stat.UpdateStatus(status.Degraded, msg)
+				}
+				continue
 			}
+			convertAndAppend(m)
+		}
+
+		if len(values) > 0 && (len(values) != len(tresp) || !allowStringArray ) {
+				msg := fmt.Sprintf("events must be JSON objects, but got strings in a non-chained configuration %v", values)
+				log.Debug(msg)
+				stat.UpdateStatus(status.Degraded, msg)
+		}
 	case map[string]interface{}:
 		convertAndAppend(tresp)
 	default:
