@@ -802,6 +802,31 @@ For an mssql instance, by default only four databases are present namely — `ma
 }
 ```
 
+### Example: Use cursor for incremental data fetching
+
+The cursor feature enables incremental data fetching by tracking the last fetched row value. This is useful for fetching audit logs or events that are continuously appended:
+
+```yaml
+- module: sql
+  metricsets:
+    - query
+  period: 30s
+  hosts: ["postgres://user:pass@localhost:5432/mydb?sslmode=disable"]
+  driver: "postgres"
+  sql_query: "SELECT id, event_type, payload, created_at FROM audit_events WHERE id > :cursor ORDER BY id ASC LIMIT 500"
+  sql_response_format: table
+  raw_data.enabled: true
+  cursor:
+    enabled: true
+    column: id
+    type: integer
+    default: "0"
+```
+
+The cursor tracks the maximum (or minimum, for descending scans) value of the specified column across all fetched rows and uses it as a filter for subsequent queries. Supported cursor types are `integer`, `timestamp`, `date`, `float`, and `decimal`.
+
+**Important:** Use `>` with unique columns (auto-increment IDs) and `>=` with columns that may have duplicate values (timestamps) to prevent data loss. See the query metricset documentation for full cursor configuration details, including driver-specific notes and boundary handling guidance.
+
 ### Host Setup
 
 Some drivers require additional configuration to work. Find here instructions for these drivers.
