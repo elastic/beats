@@ -152,8 +152,8 @@ func (c *tracerConfig) Validate() error {
 	return nil
 }
 
-func (t *tracerConfig) enabled() bool {
-	return t != nil && (t.Enabled == nil || *t.Enabled)
+func (c *tracerConfig) enabled() bool {
+	return c != nil && (c.Enabled == nil || *c.Enabled)
 }
 
 type selection struct {
