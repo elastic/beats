@@ -60,6 +60,26 @@ Use `sql_queries` or `sql_query` depending on the use-case.
 `sql_query` (`Backward Compatibility`)
 :   Single query you want to run. Also, provide corresponding `sql_response_format` (value: `variables` or `table`) similar to `sql_queries`'s `response_format`.
 
+`cursor`
+:   Optional configuration block for cursor-based incremental data fetching. When `cursor.enabled` is set to `true`, the module tracks the last fetched row value and retrieves only new data on subsequent collection cycles. The query must use `sql_query` (not `sql_queries`), `sql_response_format: table`, and include a `:cursor` placeholder. Supported sub-fields:
+
+    `cursor.enabled`
+    :   Set to `true` to enable cursor-based fetching. Default: `false`.
+
+    `cursor.column`
+    :   The column name to track for cursor state. Must be present in query results.
+
+    `cursor.type`
+    :   Data type of the cursor column: `integer`, `timestamp`, `date`, `float`, or `decimal`.
+
+    `cursor.default`
+    :   Initial cursor value used on first run (before any state is persisted).
+
+    `cursor.direction`
+    :   Scan direction: `asc` (default, tracks max value) or `desc` (tracks min value).
+
+    Cursor is not compatible with `sql_queries` (multiple queries) or `fetch_from_all_databases`. See the [query metricset documentation](/reference/metricbeat/metricbeat-metricset-sql-query.md) for full details.
+
 
 ## Example [_example_4]
 
@@ -979,6 +999,17 @@ metricbeat.modules:
   driver: "postgres"
   sql_query: "select now()"
   sql_response_format: table
+
+  # Cursor-based incremental data fetching. When enabled, the cursor tracks the
+  # last fetched row value and uses it to retrieve only new data on subsequent
+  # collection cycles. Requires sql_response_format: table and a single sql_query
+  # with exactly one :cursor placeholder.
+  #cursor:
+  #  enabled: true
+  #  column: id
+  #  type: integer
+  #  default: "0"
+  #  #direction: asc
 
   # List of root certificates for SSL/TLS server verification
   # ssl.certificate_authorities: ["/path/to/ca.pem"]
