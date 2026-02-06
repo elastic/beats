@@ -1,3 +1,5 @@
+% This file is generated! See ext/osquery-extension/cmd/gentables.
+
 # sample_jumplists
 
 Windows Jump Lists containing recently accessed files and pinned items
@@ -21,10 +23,20 @@ LNK (shortcut) file data with rich forensic information.
 
 | Column | Type | Description |
 |--------|------|-------------|
-| `ApplicationID` | `EMBEDDED` |  |
-| `UserProfile` | `EMBEDDED` |  |
-| `LnkMetadata` | `EMBEDDED` |  |
-| `JumplistMeta` | `EMBEDDED` |  |
+| `application_id` | `TEXT` | The application ID (hash of the application path) |
+| `application_name` | `TEXT` | The resolved application name from known IDs |
+| `username` | `TEXT` | The username |
+| `domain` | `TEXT` | The domain or computer name |
+| `sid` | `TEXT` | The Windows Security Identifier (SID) |
+| `local_path` | `TEXT` | Target local path |
+| `file_size` | `INTEGER` | Target file size in bytes |
+| `hot_key` | `TEXT` | Assigned hotkey combination |
+| `command_line_arguments` | `TEXT` | Command line arguments for the target |
+| `icon_location` | `TEXT` | Path to the icon file |
+| `volume_serial_number` | `TEXT` | Volume serial number (format XXXX-XXXX) |
+| `volume_label` | `TEXT` | Volume label |
+| `jumplist_type` | `TEXT` | Type of jumplist (custom or automatic) |
+| `source_file_path` | `TEXT` | Path to the jumplist file |
 | `entry_index` | `INTEGER` | Index of the entry within the jumplist |
 
 ## Examples

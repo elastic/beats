@@ -1,3 +1,5 @@
+% This file is generated! See ext/osquery-extension/cmd/gentables.
+
 # sample_custom_table
 
 Example table showing the generator capabilities with multiple data types

@@ -18,6 +18,8 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/cmd/gentables/examples/tables/generated/jumplists"
 )
 
 var (
@@ -60,11 +62,15 @@ func GetGenerateFunc(log *logger.Logger) (table.GenerateFunc, error) {
 
 // Result represents a row from the sample_jumplists table.
 type Result struct {
-	Applicationid string `osquery:"ApplicationID"` //
-	Userprofile   string `osquery:"UserProfile"`   //
-	Lnkmetadata   string `osquery:"LnkMetadata"`   //
-	Jumplistmeta  string `osquery:"JumplistMeta"`  //
-	EntryIndex    int32  `osquery:"entry_index"`   // Index of the entry within the jumplist
+	// Application identification metadata
+	*jumplists.ApplicationID
+	// Windows user profile information
+	*jumplists.UserProfile
+	// Windows LNK (shortcut) file metadata
+	*jumplists.LnkMetadata
+	// Jump list specific metadata
+	*jumplists.JumplistMeta
+	EntryIndex int32 `osquery:"entry_index"` // Index of the entry within the jumplist
 }
 
 // Columns returns the column definitions for the sample_jumplists table.

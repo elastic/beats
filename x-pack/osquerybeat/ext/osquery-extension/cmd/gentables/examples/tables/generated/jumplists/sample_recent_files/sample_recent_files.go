@@ -18,6 +18,8 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/cmd/gentables/examples/tables/generated/jumplists"
 )
 
 var (
@@ -60,11 +62,14 @@ func GetGenerateFunc(log *logger.Logger) (table.GenerateFunc, error) {
 
 // Result represents a row from the sample_recent_files table.
 type Result struct {
-	Userprofile    string `osquery:"UserProfile"`    //
-	Lnkmetadata    string `osquery:"LnkMetadata"`    //
-	Filetimestamps string `osquery:"FileTimestamps"` //
-	LnkFilePath    string `osquery:"lnk_file_path"`  // Path to the LNK file in the Recent folder
-	TargetExists   int32  `osquery:"target_exists"`  // Whether the target file still exists (1=yes, 0=no)
+	// Windows user profile information
+	*jumplists.UserProfile
+	// Windows LNK (shortcut) file metadata
+	*jumplists.LnkMetadata
+	// Standard file timestamp fields
+	jumplists.FileTimestamps
+	LnkFilePath  string `osquery:"lnk_file_path"` // Path to the LNK file in the Recent folder
+	TargetExists int32  `osquery:"target_exists"` // Whether the target file still exists (1=yes, 0=no)
 }
 
 // Columns returns the column definitions for the sample_recent_files table.

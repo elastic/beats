@@ -1,3 +1,5 @@
+% This file is generated! See ext/osquery-extension/cmd/gentables.
+
 # sample_combined_resources
 
 View combining active and archived resources with calculated fields and UNION

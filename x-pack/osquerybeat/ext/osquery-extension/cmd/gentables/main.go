@@ -62,6 +62,7 @@ type columnSpec struct {
 	Timezone     string `yaml:"timezone,omitempty"`      // Optional: "UTC", etc.
 	GoType       string `yaml:"go_type,omitempty"`       // Optional: explicit Go type override (e.g., "time.Time")
 	EmbeddedType string `yaml:"embedded_type,omitempty"` // Optional: reference to an embedded type name
+	SharedType   string `yaml:"shared_type,omitempty"`   // Optional: same as embedded_type, used in table YAML
 }
 
 // sharedTypeSpec defines a reusable shared struct type across specs
@@ -385,7 +386,6 @@ func countSharedTypes(byGroup map[string]map[string]sharedTypeSpec) int {
 	return total
 }
 
-
 // resolveSharedTypes adds shared type definitions to the spec based on shared_types references.
 func resolveSharedTypes(s *spec, cfg *sharedTypesConfig) error {
 	if cfg == nil {
@@ -555,7 +555,6 @@ func renderTemplate(name, templatePath string, data any) (string, error) {
 	return buf.String(), nil
 }
 
-
 func buildSourceLine(sourceType, sourceFile string) string {
 	if sourceFile != "" {
 		return fmt.Sprintf("// Source: %s/%s\n\n", sourceType, filepath.Base(sourceFile))
@@ -589,10 +588,11 @@ func needsTimeImportForSpec(s spec) bool {
 func buildResultFields(s spec, typeMap map[string]sharedTypeSpec, needsSharedImport bool, sharedPkgName string) ([]resultField, error) {
 	fields := make([]resultField, 0, len(s.Columns))
 	for _, col := range s.Columns {
-		if col.EmbeddedType != "" {
-			et, ok := typeMap[col.EmbeddedType]
+		typeName := embeddedTypeName(col)
+		if typeName != "" {
+			et, ok := typeMap[typeName]
 			if !ok {
-				return nil, fmt.Errorf("column %s references unknown embedded type %s", col.Name, col.EmbeddedType)
+				return nil, fmt.Errorf("column %s references unknown embedded type %s", col.Name, typeName)
 			}
 			typeName := et.Name
 			if needsSharedImport && sharedPkgName != "" {
@@ -619,12 +619,12 @@ func buildResultFields(s spec, typeMap map[string]sharedTypeSpec, needsSharedImp
 
 // sharedTypesInfo holds resolved shared types information for code generation
 type sharedTypesInfo struct {
-	EmbeddedTypeMap    map[string]sharedTypeSpec
-	NeedsImport        bool
-	ImportPath         string
-	PackageName        string
-	NeedsTimeImport    bool
-	ResultFields       []resultField
+	EmbeddedTypeMap map[string]sharedTypeSpec
+	NeedsImport     bool
+	ImportPath      string
+	PackageName     string
+	NeedsTimeImport bool
+	ResultFields    []resultField
 }
 
 // resolveSharedTypesInfo resolves shared types information needed for code generation
@@ -700,7 +700,22 @@ func generateTableCode(s spec, outDir string, sharedTypesConfig *sharedTypesConf
 	return writeFile(filename, content)
 }
 
-// generateDocumentation generates documentation for both tables and views
+// embeddedTypeName returns the name of the embedded/shared type for a column, or empty if not embedded.
+func embeddedTypeName(col columnSpec) string {
+	if col.EmbeddedType != "" {
+		return col.EmbeddedType
+	}
+	if col.SharedType != "" {
+		return col.SharedType
+	}
+	if col.Type == "EMBEDDED" && col.Name != "" {
+		return col.Name
+	}
+	return ""
+}
+
+// generateDocumentation generates documentation for both tables and views.
+// Customer-facing docs show flattened columns only (embedded types are expanded to their constituent columns).
 func generateDocumentation(s spec, docsDir string) error {
 	// Build a map of shared types for quick lookup
 	embeddedTypeMap := make(map[string]sharedTypeSpec)
@@ -710,8 +725,10 @@ func generateDocumentation(s spec, docsDir string) error {
 
 	var schemaRows []schemaRow
 	for _, col := range s.Columns {
-		if col.EmbeddedType != "" {
-			if et, ok := embeddedTypeMap[col.EmbeddedType]; ok {
+		typeName := embeddedTypeName(col)
+		if typeName != "" {
+			if et, ok := embeddedTypeMap[typeName]; ok {
+				// Expand to flattened columns so docs match what users see in queries (e.g. application_name, username).
 				for _, embeddedCol := range et.Columns {
 					schemaRows = append(schemaRows, schemaRow{
 						Name:        embeddedCol.Name,
@@ -719,9 +736,10 @@ func generateDocumentation(s spec, docsDir string) error {
 						Description: embeddedCol.Description,
 					})
 				}
+				continue
 			}
-			continue
 		}
+		// Regular column (or unknown embedded type — show as-is)
 		schemaRows = append(schemaRows, schemaRow{
 			Name:        col.Name,
 			Type:        col.Type,
@@ -802,7 +820,6 @@ func osqueryTypeToGoType(col columnSpec) string {
 		return "string" // Default fallback
 	}
 }
-
 
 // buildStructTag builds the osquery struct tag with optional format and timezone
 func buildStructTag(col columnSpec) string {

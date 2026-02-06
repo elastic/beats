@@ -1,3 +1,5 @@
+% This file is generated! See ext/osquery-extension/cmd/gentables.
+
 # sample_recent_files
 
 Windows Recent Files tracking user file access history
@@ -22,9 +24,19 @@ related tables.
 
 | Column | Type | Description |
 |--------|------|-------------|
-| `UserProfile` | `EMBEDDED` |  |
-| `LnkMetadata` | `EMBEDDED` |  |
-| `FileTimestamps` | `EMBEDDED` |  |
+| `username` | `TEXT` | The username |
+| `domain` | `TEXT` | The domain or computer name |
+| `sid` | `TEXT` | The Windows Security Identifier (SID) |
+| `local_path` | `TEXT` | Target local path |
+| `file_size` | `INTEGER` | Target file size in bytes |
+| `hot_key` | `TEXT` | Assigned hotkey combination |
+| `command_line_arguments` | `TEXT` | Command line arguments for the target |
+| `icon_location` | `TEXT` | Path to the icon file |
+| `volume_serial_number` | `TEXT` | Volume serial number (format XXXX-XXXX) |
+| `volume_label` | `TEXT` | Volume label |
+| `created_time` | `BIGINT` | File creation timestamp |
+| `modified_time` | `BIGINT` | File modification timestamp |
+| `accessed_time` | `BIGINT` | File last access timestamp |
 | `lnk_file_path` | `TEXT` | Path to the LNK file in the Recent folder |
 | `target_exists` | `INTEGER` | Whether the target file still exists (1=yes, 0=no) |
 
