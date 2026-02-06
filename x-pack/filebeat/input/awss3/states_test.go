@@ -288,7 +288,7 @@ func TestLexicographicalStateRegistry_AddStateAndIsProcessed(t *testing.T) {
 		registry, err := newStateRegistry(logger, store, "", true, capacity)
 		require.NoError(t, err)
 
-		lexicoRegistry := registry.(*lexicographicalStateRegistry)
+		lexicoRegistry := registry.(*lexicographicalStateRegistry) //nolint:errcheck // type assertion is safe in test
 
 		stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
 		stateA.Stored = true
@@ -434,7 +434,7 @@ func TestLexicographicalStateRegistry_CleanUp(t *testing.T) {
 		registry, err := newStateRegistry(logger, store, "", true, 10)
 		require.NoError(t, err)
 
-		lexicoRegistry := registry.(*lexicographicalStateRegistry)
+		lexicoRegistry := registry.(*lexicographicalStateRegistry) //nolint:errcheck // type assertion is safe in test
 
 		stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
 		stateA.Stored = true
@@ -467,7 +467,7 @@ func TestLexicographicalStateRegistry_TrimsOnLoad(t *testing.T) {
 	registry1, err := newStateRegistry(logger, store, "", false, 0)
 	require.NoError(t, err)
 
-	normalRegistry1 := registry1.(*normalStateRegistry)
+	normalRegistry1 := registry1.(*normalStateRegistry) //nolint:errcheck // type assertion is safe in test
 
 	stateA := newState("bucket", "a", "etag", time.Unix(1000, 0))
 	stateA.Stored = true
@@ -493,7 +493,7 @@ func TestLexicographicalStateRegistry_TrimsOnLoad(t *testing.T) {
 	registry2, err := newStateRegistry(logger, store, "", true, capacity)
 	require.NoError(t, err)
 
-	lexicoRegistry2 := registry2.(*lexicographicalStateRegistry)
+	lexicoRegistry2 := registry2.(*lexicographicalStateRegistry) //nolint:errcheck // type assertion is safe in test
 
 	// Should only have the 2 newest (lexicographically greatest) states: c and d
 	require.Equal(t, capacity, len(lexicoRegistry2.states))

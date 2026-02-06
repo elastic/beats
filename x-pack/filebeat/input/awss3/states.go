@@ -582,7 +582,7 @@ func (h *stateHeap) Swap(i, j int) {
 }
 
 func (h *stateHeap) Push(x any) {
-	st := x.(*state)
+	st := x.(*state) //nolint:errcheck // type assertion is guaranteed by heap.Interface contract
 	h.index[st.IDWithLexicographicalOrdering()] = len(h.items)
 	h.items = append(h.items, st)
 }
