@@ -127,20 +127,6 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		}
 	}
 
-<<<<<<< HEAD
-=======
-	if br.beat.Config.MetricLogging == nil || br.beat.Config.MetricLogging.Enabled() {
-		r, err := log.MakeReporter(br.beat.Info, br.beat.Config.MetricLogging, br.beat.Monitoring.InfoRegistry(), br.beat.Monitoring.StateRegistry(), br.beat.Monitoring.StateRegistry(), br.beat.Monitoring.InfoRegistry())
-		if err != nil {
-			return fmt.Errorf("error creating metric reporter: %w", err)
-		}
-		rep, ok := r.(*log.Reporter)
-		if !ok {
-			return fmt.Errorf("error creating metric log reporter")
-		}
-		br.reporter = rep
-	}
-
 	br.beat.Manager.SetStopCallback(func() {
 		if c, ok := br.beat.Publisher.(io.Closer); ok {
 			if err := c.Close(); err != nil {
@@ -150,7 +136,6 @@ func (br *BeatReceiver) Start(host component.Host) error {
 
 	})
 
->>>>>>> eea200369 ([beatreceiver] - Fix potential duplicates (#48683))
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
 		// set beatreceiver status
 		groupReporter.UpdateStatus(status.Failed, err.Error())
@@ -162,7 +147,6 @@ func (br *BeatReceiver) Start(host component.Host) error {
 
 // BeatReceiver.Stop() stops beat receiver.
 func (br *BeatReceiver) Shutdown() error {
-	br.beater.Stop()
 
 	br.beat.Instrumentation.Tracer().Close()
 	proc := br.beat.GetProcessors()
