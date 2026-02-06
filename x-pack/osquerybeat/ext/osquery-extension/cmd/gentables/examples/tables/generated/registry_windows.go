@@ -25,6 +25,16 @@ import (
 // This function is called from main.go after all init() functions have run.
 func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
 	{
+		// Example table showing the generator capabilities with multiple data types
+		genFunc, err := samplecustomtable.GetGenerateFunc(log)
+		if err != nil {
+			log.Errorf("Failed to get generate function for sample_custom_table: %v", err)
+		} else {
+			server.RegisterPlugin(table.NewPlugin("sample_custom_table", samplecustomtable.Columns(), genFunc))
+			log.Infof("Registered table: sample_custom_table")
+		}
+	}
+	{
 		// Windows Jump Lists containing recently accessed files and pinned items
 		genFunc, err := samplejumplists.GetGenerateFunc(log)
 		if err != nil {
@@ -42,16 +52,6 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 		} else {
 			server.RegisterPlugin(table.NewPlugin("sample_recent_files", samplerecentfiles.Columns(), genFunc))
 			log.Infof("Registered table: sample_recent_files")
-		}
-	}
-	{
-		// Example table showing the generator capabilities with multiple data types
-		genFunc, err := samplecustomtable.GetGenerateFunc(log)
-		if err != nil {
-			log.Errorf("Failed to get generate function for sample_custom_table: %v", err)
-		} else {
-			server.RegisterPlugin(table.NewPlugin("sample_custom_table", samplecustomtable.Columns(), genFunc))
-			log.Infof("Registered table: sample_custom_table")
 		}
 	}
 }

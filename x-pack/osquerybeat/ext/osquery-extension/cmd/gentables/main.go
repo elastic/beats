@@ -482,6 +482,7 @@ type sharedTypeTemplate struct {
 }
 
 type sharedTypesTemplateData struct {
+	CopyrightHeader     string
 	CodeGeneratedNotice string
 	PackageName         string
 	NeedsTimeImport     bool
@@ -847,6 +848,9 @@ func generateSharedTypesPackage(types []sharedTypeSpec, packageName, outDir stri
 		return nil
 	}
 
+	// Sort types by name for deterministic output.
+	sort.Slice(types, func(i, j int) bool { return types[i].Name < types[j].Name })
+
 	needsTimeImport := false
 	for _, et := range types {
 		for _, col := range et.Columns {
@@ -879,6 +883,7 @@ func generateSharedTypesPackage(types []sharedTypeSpec, packageName, outDir stri
 	}
 
 	data := sharedTypesTemplateData{
+		CopyrightHeader:     elasticCopyrightHeader,
 		CodeGeneratedNotice: codeGeneratedNotice,
 		PackageName:         packageName,
 		NeedsTimeImport:     needsTimeImport,
@@ -994,6 +999,7 @@ func buildSharedTypesForGroup(typesByGroup map[string]map[string]sharedTypeSpec,
 			combined = append(combined, t)
 		}
 	}
+	sort.Slice(combined, func(i, j int) bool { return combined[i].Name < combined[j].Name })
 	return combined
 }
 
@@ -1021,6 +1027,12 @@ func generateSharedTypesPackages(cfg *sharedTypesConfig, outDir string, specs []
 		return nil
 	}
 
+	groups := make([]string, 0, len(groupSet))
+	for g := range groupSet {
+		groups = append(groups, g)
+	}
+	sort.Strings(groups)
+
 	absOutDir, err := filepath.Abs(outDir)
 	if err != nil {
 		return fmt.Errorf("failed to resolve output directory: %w", err)
@@ -1037,7 +1049,7 @@ func generateSharedTypesPackages(cfg *sharedTypesConfig, outDir string, specs []
 	cfg.ImportPathByGroup = make(map[string]string)
 	cfg.PackageNameByGroup = make(map[string]string)
 
-	for group := range groupSet {
+	for _, group := range groups {
 		types := buildSharedTypesForGroup(cfg.TypesByGroup, group)
 		if len(types) == 0 {
 			return fmt.Errorf("shared types requested for group %q but no shared types are defined", group)
@@ -1220,6 +1232,8 @@ func generateStaticTablesRegistry(tableSpecs []spec, outDir string) error {
 	// Generate a registry file for each platform
 	for _, platform := range []string{"linux", "darwin", "windows"} {
 		tables := platformTables[platform]
+		sort.Slice(tables, func(i, j int) bool { return tables[i].Name < tables[j].Name })
+
 		header := elasticCopyrightHeader +
 			codeGeneratedNotice +
 			fmt.Sprintf("// Source: gentables - static registry of %s tables\n\n", platform) +
@@ -1237,10 +1251,12 @@ func generateStaticTablesRegistry(tableSpecs []spec, outDir string) error {
 					implPackages[s.ImplementationPackage] = true
 				}
 			}
+			implPkgList := make([]string, 0, len(implPackages))
 			for pkg := range implPackages {
-				data.ImplImports = append(data.ImplImports, pkg)
+				implPkgList = append(implPkgList, pkg)
 			}
-			sort.Strings(data.ImplImports)
+			sort.Strings(implPkgList)
+			data.ImplImports = implPkgList
 			for _, s := range tables {
 				pkgName := toPackageName(s.Name)
 				importPath := fmt.Sprintf("github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/%s", s.Name)
@@ -1286,6 +1302,8 @@ func generateStaticViewsRegistry(viewSpecs []spec, outDir string) error {
 	// Generate a registry file for each platform
 	for _, platform := range []string{"linux", "darwin", "windows"} {
 		views := platformViews[platform]
+		sort.Slice(views, func(i, j int) bool { return views[i].Name < views[j].Name })
+
 		header := elasticCopyrightHeader +
 			codeGeneratedNotice +
 			fmt.Sprintf("// Source: gentables - static registry of %s views\n\n", platform) +
