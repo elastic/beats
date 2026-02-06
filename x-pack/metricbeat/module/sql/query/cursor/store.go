@@ -49,7 +49,7 @@ func NewStore(beatPaths *paths.Path, logger *logp.Logger) (*Store, error) {
 
 	reg, err := memlog.New(logger.Named("memlog"), memlog.Settings{
 		Root:     dataPath,
-		FileMode: 0600,
+		FileMode: 0o600,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create memlog registry: %w", err)

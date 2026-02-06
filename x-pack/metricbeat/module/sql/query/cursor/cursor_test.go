@@ -820,8 +820,8 @@ func TestManagerUpdateFromResults_ParseErrors(t *testing.T) {
 	defer cleanup()
 
 	rows := []mapstr.M{
-		{"id": "not-a-number", "data": "bad1"},   // parse error
-		{"id": int64(100), "data": "good"},        // valid
+		{"id": "not-a-number", "data": "bad1"},      // parse error
+		{"id": int64(100), "data": "good"},          // valid
 		{"id": "also-not-a-number", "data": "bad2"}, // parse error
 	}
 
@@ -849,13 +849,13 @@ func TestManagerUpdateFromResults_MixedNullAndMissingAndValid(t *testing.T) {
 	defer cleanup()
 
 	rows := []mapstr.M{
-		{"id": nil, "data": "null row"},             // NULL
-		{"other_col": int64(999)},                    // missing column
-		{"id": "not-a-number"},                       // parse error
-		{"id": int64(50), "data": "valid 1"},         // valid
-		{"id": nil},                                  // NULL
-		{"id": int64(75), "data": "valid 2"},         // valid — the max
-		{"id": "garbage"},                            // parse error
+		{"id": nil, "data": "null row"},      // NULL
+		{"other_col": int64(999)},            // missing column
+		{"id": "not-a-number"},               // parse error
+		{"id": int64(50), "data": "valid 1"}, // valid
+		{"id": nil},                          // NULL
+		{"id": int64(75), "data": "valid 2"}, // valid — the max
+		{"id": "garbage"},                    // parse error
 	}
 
 	err := mgr.UpdateFromResults(rows)
