@@ -840,10 +840,10 @@ The clause `.parent_last_response.` should only be used from within chain steps 
           replace_with: '$.exportId,.parent_last_response.body.exportId'
 ```
 
-Here we can see that the chain step uses `.parent_last_response.body.exportId` only because `response.pagination` is present for the parent (root) request. If `response.pagination` was not present in the parent (root) request, `replace_with` clause should have used `.first_response.body.exportId`. This is because when pagination does not exist at the parent level `parent_last_response` object is not populated with required values for performance reasons, but the `first_response` object always stores the very first response in the process chain.
+Here we can see that the chain step uses `.parent_last_response.body.exportId` only because `response.pagination` is present for the parent (root) request. If `response.pagination` was not present in the parent (root) request, `replace_with` clause should have used `.first_response.body.exportId`. This is because when pagination does not exist at the parent level `parent_last_response` object is not populated with required values for performance reasons, but the `first_response` object always stores the first response in the process chain.
 
 ::::{note}
-The `first_response` object at the moment can only store flat JSON structures. There is no support for NDJSON or Gzipped JSON. Arrays are not supported except when the response is chained. In this case, an array of strings is accepted when they are an array of ids to be used in later requests. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
+The `first_response` object at the moment can only store flat JSON structures. There is no support for NDJSON or Gzipped JSON. Arrays are not supported unless the response is chained. In this case, an array of strings is accepted when they are an array of ids to be used in later requests. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
 ::::
 
 

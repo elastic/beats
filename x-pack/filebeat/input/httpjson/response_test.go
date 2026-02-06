@@ -55,7 +55,7 @@ func TestTransformable(t *testing.T) {
 		expectStatusUpdates    bool
 		statusUpdate           status.Status
 		expectLogs             bool
-		allowStrings                bool
+		allowStrings           bool
 	}{
 		{
 			name:                   "array_of_strings_allowed",
