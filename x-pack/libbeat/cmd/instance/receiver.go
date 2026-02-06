@@ -127,6 +127,30 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		}
 	}
 
+<<<<<<< HEAD
+=======
+	if br.beat.Config.MetricLogging == nil || br.beat.Config.MetricLogging.Enabled() {
+		r, err := log.MakeReporter(br.beat.Info, br.beat.Config.MetricLogging, br.beat.Monitoring.InfoRegistry(), br.beat.Monitoring.StateRegistry(), br.beat.Monitoring.StateRegistry(), br.beat.Monitoring.InfoRegistry())
+		if err != nil {
+			return fmt.Errorf("error creating metric reporter: %w", err)
+		}
+		rep, ok := r.(*log.Reporter)
+		if !ok {
+			return fmt.Errorf("error creating metric log reporter")
+		}
+		br.reporter = rep
+	}
+
+	br.beat.Manager.SetStopCallback(func() {
+		if c, ok := br.beat.Publisher.(io.Closer); ok {
+			if err := c.Close(); err != nil {
+				br.Logger.Errorf("error closing beat receiver publisher: %v", err)
+			}
+		}
+
+	})
+
+>>>>>>> eea200369 ([beatreceiver] - Fix potential duplicates (#48683))
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
 		// set beatreceiver status
 		groupReporter.UpdateStatus(status.Failed, err.Error())
@@ -144,12 +168,6 @@ func (br *BeatReceiver) Shutdown() error {
 	proc := br.beat.GetProcessors()
 	if err := proc.Close(); err != nil {
 		br.beat.Info.Logger.Warnf("failed to close global processing: %s", err)
-	}
-
-	if c, ok := br.beat.Publisher.(io.Closer); ok {
-		if err := c.Close(); err != nil {
-			return fmt.Errorf("error closing beat receiver publisher: %w", err)
-		}
 	}
 
 	if err := br.stopMonitoring(); err != nil {
