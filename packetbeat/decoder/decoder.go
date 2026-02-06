@@ -481,7 +481,7 @@ func (d *Decoder) onICMPv6(packet *protos.Packet) {
 		d.icmpV6TypeCode.Set(flow, uint64(d.icmp6.TypeCode))
 	}
 
-	if d.icmp6Proc != nil {
+	if d.icmp6Proc != nil && len(d.icmp6.Payload) >= 4 {
 		// google/gopacket treats the first four bytes
 		// after the typo, code and checksum as part of
 		// the payload. So drop those bytes.
