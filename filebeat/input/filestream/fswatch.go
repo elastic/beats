@@ -27,6 +27,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/go-concert/unison"
@@ -396,12 +397,22 @@ func defaultFileScannerConfig() fileScannerConfig {
 // fileScanner looks for files which match the patterns in paths.
 // It is able to exclude files and symlinks.
 type fileScanner struct {
+<<<<<<< HEAD
 	paths       []string
 	cfg         fileScannerConfig
 	log         *logp.Logger
 	hasher      hash.Hash
 	readBuffer  []byte
 	gzipAllowed bool
+=======
+	smallFilesWarned atomic.Bool
+	paths            []string
+	cfg              fileScannerConfig
+	log              *logp.Logger
+	hasher           hash.Hash
+	readBuffer       []byte
+	compression      string
+>>>>>>> 215703758 (Don't print warning about small files on each file system scan (#48704))
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, gzipAllowed bool) (*fileScanner, error) {
@@ -480,7 +491,6 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 	// used to filter out duplicate matches
 	uniqueFiles := map[string]struct{}{}
 
-	tooSmallFiles := 0
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
 		if err != nil {
@@ -503,7 +513,14 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 
 			fd, err := s.toFileDescriptor(&it)
 			if errors.Is(err, errFileTooSmall) {
-				tooSmallFiles++
+				if s.smallFilesWarned.CompareAndSwap(false, true) {
+					s.log.Warnf("ingestion from some files will be delayed, files need to be at "+
+						"least %d in size for ingestion to start. To change this "+
+						"behaviour set 'prospector.scanner.fingerprint.length' and "+
+						"'prospector.scanner.fingerprint.offset'. "+
+						"Enable debug logging to see all file names of delayed files.",
+						s.cfg.Fingerprint.Offset+s.cfg.Fingerprint.Length)
+				}
 				s.log.Debugf("cannot start ingesting from file %q: %s", filename, err)
 				continue
 			}
@@ -520,22 +537,6 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 			uniqueIDs[fileID] = fd.Filename
 			fdByName[filename] = fd
 		}
-	}
-
-	if tooSmallFiles > 0 {
-		prefix := "%d files are "
-		if tooSmallFiles == 1 {
-			prefix = "%d file is "
-		}
-		s.log.Warnf(
-			prefix+"too small to be ingested, files need to be at "+
-				"least %d in size for ingestion to start. To change this "+
-				"behaviour set 'prospector.scanner.fingerprint.length' and "+
-				"'prospector.scanner.fingerprint.offset'. "+
-				"Enable debug logging to see all file names.",
-			tooSmallFiles,
-			s.cfg.Fingerprint.Offset+s.cfg.Fingerprint.Length,
-		)
 	}
 
 	return fdByName
