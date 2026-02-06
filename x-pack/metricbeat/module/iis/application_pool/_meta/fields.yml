@@ -7,7 +7,7 @@
     - name: host.cpu.count
       type: long
       description: >
-        Number of CPUs host have
+        Number of CPUs the host has
     - name: name
       type: keyword
       description: >
