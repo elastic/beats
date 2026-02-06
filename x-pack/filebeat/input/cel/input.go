@@ -68,6 +68,8 @@ import (
 	"github.com/elastic/mito/lib"
 )
 
+//go:generate ./gen_import_path.sh
+
 const (
 	// inputName is the name of the input processor.
 	inputName = "cel"
@@ -181,7 +183,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	if err != nil {
 		return err
 	}
-	otelTracer := otelTracerProvider.Tracer("github.com/elastic/beats/v7/x-pack/filebeat/input/cel")
+	otelTracer := otelTracerProvider.Tracer(importPath)
 
 	if cfg.Resource.Tracer != nil {
 		id := sanitizeFileName(env.IDWithoutName)
