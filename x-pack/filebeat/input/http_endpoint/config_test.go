@@ -5,10 +5,12 @@
 package http_endpoint
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"gopkg.in/natefinch/lumberjack.v2"
 
 	confpkg "github.com/elastic/elastic-agent-libs/config"
 )
@@ -17,7 +19,7 @@ func Test_validateConfig(t *testing.T) {
 	testCases := []struct {
 		name      string // Sub-test name.
 		config    config // Load config parameters.
-		wantError string // Expected error
+		wantError error  // Expected error
 	}{
 		{
 			name: "empty URL",
@@ -26,7 +28,7 @@ func Test_validateConfig(t *testing.T) {
 				ResponseBody: `{"message": "success"}`,
 				Method:       http.MethodPost,
 			},
-			wantError: "string value is not set accessing 'url'",
+			wantError: errors.New("string value is not set accessing 'url'"),
 		},
 		{
 			name: "invalid method",
@@ -35,7 +37,7 @@ func Test_validateConfig(t *testing.T) {
 				ResponseBody: `{"message": "success"}`,
 				Method:       "random",
 			},
-			wantError: "method must be POST, PUT or PATCH: random",
+			wantError: errors.New("method must be POST, PUT or PATCH: random accessing config"),
 		},
 		{
 			name: "invalid ResponseBody",
@@ -44,7 +46,26 @@ func Test_validateConfig(t *testing.T) {
 				ResponseBody: "",
 				Method:       http.MethodPost,
 			},
-			wantError: "response_body must be valid JSON",
+			wantError: errors.New("response_body must be valid JSON accessing config"),
+		},
+		{
+			name: "valid log destination",
+			config: config{
+				URL:          "/",
+				ResponseBody: `{"message": "success"}`,
+				Method:       http.MethodPost,
+				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "http_endpoint/log"}},
+			},
+		},
+		{
+			name: "invalid log destination",
+			config: config{
+				URL:          "/",
+				ResponseBody: `{"message": "success"}`,
+				Method:       http.MethodPost,
+				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "/var/log"}},
+			},
+			wantError: fmt.Errorf(`request tracer path must be within %q path accessing config`, inputName),
 		},
 	}
 
@@ -54,10 +75,22 @@ func Test_validateConfig(t *testing.T) {
 			config := defaultConfig()
 			err := c.Unpack(&config)
 
-			// Validate responses
-			if assert.Error(t, err) {
-				assert.Contains(t, err.Error(), tc.wantError)
+			if !sameError(err, tc.wantError) {
+				t.Errorf("unexpected error from validation: got:%s want:%s", err, tc.wantError)
 			}
 		})
 	}
 }
+
+func sameError(a, b error) bool {
+	switch {
+	case a == nil && b == nil:
+		return true
+	case a == nil, b == nil:
+		return false
+	default:
+		return a.Error() == b.Error()
+	}
+}
+
+func ptrTo[T any](v T) *T { return &v }
