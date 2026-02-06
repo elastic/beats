@@ -1,0 +1,4 @@
+kind: enhancement
+summary: Allow configuration of OTLP histogram aggregation via OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION environment variable in CEL input.
+component: filebeat
+issue: https://github.com/elastic/beats/issues/48730
