@@ -218,7 +218,7 @@ different databases on the same server.
 
 **Important:** Changing any of these components (module ID, DSN, query, or cursor column) produces a
 different state key, which effectively resets the cursor to its `default` value. This is by design —
-if you modify the query, the old cursor position may no longer be valid for the new query.
+if you modify the query, the old cursor position might no longer be valid for the new query.
 
 ### Important: Choosing `>` vs `>=` for Cursor Queries
 
@@ -230,8 +230,8 @@ The choice of comparison operator in your WHERE clause affects data completeness
 - Example: `WHERE id > :cursor ORDER BY id ASC`
 
 **Use `>=` (greater than or equal) when:**
-- The cursor column may have duplicate values (timestamps, dates, scores)
-- Late-arriving rows may be inserted with the same value as the current cursor
+- The cursor column can have duplicate values (timestamps, dates, scores)
+- Late-arriving rows might be inserted with the same value as the current cursor
 - Example: `WHERE created_at >= :cursor ORDER BY created_at ASC`
 
 The `>=` operator causes the last row from each batch to be re-fetched on the next cycle (a duplicate), but ensures no data is lost when multiple rows share the same cursor value. If using `>=`, configure Elasticsearch document IDs or use an ingest pipeline to deduplicate.
@@ -250,7 +250,7 @@ The cursor feature follows an "at-least-once" delivery model:
 - Events are emitted **before** the cursor state is updated
 - If a failure occurs after emitting events but before updating state, those events will be
   re-fetched on the next cycle
-- This ensures no data loss, but may result in occasional duplicates
+- This ensures no data loss, but can result in occasional duplicates
 
 ### Driver-specific Notes
 
@@ -260,12 +260,12 @@ correctly handles `time.Time` parameters:
 hosts: ["root:pass@tcp(localhost:3306)/mydb?parseTime=true"]
 ```
 
-**Oracle:** Set the session timezone to UTC for timestamp cursors. The `godror` driver may convert
+**Oracle:** Set the session timezone to UTC for timestamp cursors. The `godror` driver can convert
 Go UTC timestamps to the Oracle session timezone, causing incorrect comparisons. Use the
 `alterSession` DSN parameter or consult the Oracle integration documentation.
 
 **MSSQL:** Use `TOP` instead of `LIMIT` to restrict results per cycle. The driver uses `@p1` as the
-parameter placeholder. Use `driver: mssql` in your configuration; it is automatically mapped to the
+parameter placeholder. Use `driver: mssql` in your configuration. It is automatically mapped to the
 modern `sqlserver` driver internally.
 
 **Decimal columns:** The `decimal` cursor type passes the cursor value as a string to the database

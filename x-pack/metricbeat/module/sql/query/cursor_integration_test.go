@@ -132,7 +132,7 @@ func TestMySQLCursor(t *testing.T) {
 	db, err := sql.Open("mysql", dsn)
 	require.NoError(t, err)
 	defer db.Close()
-	defer db.Exec("DROP DATABASE IF EXISTS cursor_test")
+	defer func() { _, _ = db.Exec("DROP DATABASE IF EXISTS cursor_test") }()
 
 	setupMySQLTestTable(t, db)
 	defer cleanupTestTable(t, db, "mysql")
@@ -182,7 +182,7 @@ func setupPostgresTestTable(t *testing.T, db *sql.DB) {
 	insertSQL := fmt.Sprintf(`INSERT INTO %s (event_data, created_at, score, price) VALUES ($1, $2, $3, $4)`, testTableName)
 	now := time.Now().UTC()
 	for i := 0; i < 5; i++ {
-		score := float64(i+1) * 1.5  // 1.5, 3.0, 4.5, 6.0, 7.5
+		score := float64(i+1) * 1.5   // 1.5, 3.0, 4.5, 6.0, 7.5
 		price := float64(i+1) * 10.25 // 10.25, 20.50, 30.75, 41.00, 51.25
 		_, err := db.Exec(insertSQL, fmt.Sprintf("event-%d", i), now.Add(time.Duration(i)*time.Second), score, price)
 		require.NoError(t, err)
@@ -689,7 +689,7 @@ func TestCursorNullValues(t *testing.T) {
 		)
 	`, tableName))
 	require.NoError(t, err)
-	defer db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", tableName))
+	defer func() { _, _ = db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", tableName)) }()
 
 	// Insert data with NULL timestamps
 	now := time.Now().UTC()
@@ -986,7 +986,7 @@ func testOracleDateCursor(t *testing.T, dsn string) {
 	}
 }
 
-// Note: Oracle helper functions (GetOracleConnectionDetails, GetOracleEnvServiceName, 
+// Note: Oracle helper functions (GetOracleConnectionDetails, GetOracleEnvServiceName,
 // GetOracleEnvUsername, GetOracleEnvPassword, GetOracleConnectString, waitForOracleConnection)
 // are defined in query_integration_test.go and shared with these tests.
 

@@ -203,7 +203,7 @@ func parseIntegerFromDB(dbVal interface{}) (*Value, error) {
 		if uint64(v) > math.MaxInt64 {
 			return nil, fmt.Errorf("uint overflow: %d exceeds max int64", v)
 		}
-		intVal = int64(v)
+		intVal = int64(uint64(v)) //nolint:gosec // overflow checked above
 	case uint32:
 		intVal = int64(v)
 	case uint64:
