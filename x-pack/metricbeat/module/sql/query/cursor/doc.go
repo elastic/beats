@@ -15,7 +15,7 @@
 // # Solution
 //
 // The cursor package provides state management that persists the value of a
-// designated cursor column (e.g., an auto-increment ID or timestamp) across
+// designated cursor column (for example, an auto-increment ID or timestamp) across
 // collection cycles. On each run, the persisted value is substituted into a
 // parameterized query via the :cursor placeholder, so only rows beyond the
 // last checkpoint are fetched.
