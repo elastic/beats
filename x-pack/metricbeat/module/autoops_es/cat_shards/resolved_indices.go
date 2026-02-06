@@ -11,35 +11,52 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 )
 
-type ResolvedIndices struct {
-	Name        string      `json:"name"`
-	Attributes  []string    `json:"attributes,omitempty"`
-	DataStreams interface{} `json:"data_stream,omitempty"`
-	Aliases     interface{} `json:"aliases,omitempty"`
+// Limit aliases reported for an index to reduce event size
+// Note: Setting this to 0 will drop all aliases from the event
+const MAX_ALIASES_PER_INDEX_NAME string = "MAX_ALIASES_PER_INDEX"
+
+type resolvedIndices struct {
+	Name       string   `json:"name"`
+	Attributes []string `json:"attributes,omitempty"`
+	DataStream string   `json:"data_stream,omitempty"`
+	Aliases    []string `json:"aliases,omitempty"`
 }
 
-type ResolvedApiResponse struct {
-	Indices []ResolvedIndices `json:"indices"`
+type resolvedApiResponse struct {
+	Indices []resolvedIndices `json:"indices"`
 }
 
 func getResolvedIndices(m *elasticsearch.MetricSet) (map[string]IndexMetadata, error) {
-	if response, err := utils.FetchAPIData[ResolvedApiResponse](m, ResolveIndexPath); err != nil {
+	if response, err := utils.FetchAPIData[resolvedApiResponse](m, resolveIndexPath); err != nil {
 		return nil, err
 	} else {
 		return parseResolvedIndicesResponse(response), nil
 	}
 }
 
-func parseResolvedIndicesResponse(response *ResolvedApiResponse) map[string]IndexMetadata {
+func truncateAliases(aliases []string, maxAliases int) []string {
+	if len(aliases) > maxAliases {
+		return aliases[:maxAliases]
+	}
+	return aliases
+}
+
+func dataStreamAndAliasesCombined(dataStream string, aliases []string, maxAliasesPerIndex int) []string {
+	var result []string
+	if dataStream != "" {
+		result = []string{dataStream}
+	}
+	return append(result, truncateAliases(aliases, maxAliasesPerIndex)...)
+}
+
+func parseResolvedIndicesResponse(response *resolvedApiResponse) map[string]IndexMetadata {
+	maxAliasesPerIndex := utils.GetIntEnvParam(MAX_ALIASES_PER_INDEX_NAME, 5)
 	indexMetadata := make(map[string]IndexMetadata, len(response.Indices))
 
 	for _, index := range response.Indices {
 		typeOfIndex := "index"
 
-		aliases := utils.GetStringArrayFromArrayOrSingleValue(index.Aliases)
-		dataStreams := utils.GetStringArrayFromArrayOrSingleValue(index.DataStreams)
-
-		if len(dataStreams) > 0 {
+		if index.DataStream != "" {
 			typeOfIndex = "data_stream"
 		}
 
@@ -58,7 +75,7 @@ func parseResolvedIndicesResponse(response *ResolvedApiResponse) map[string]Inde
 			open:       isOpen,
 			system:     isSystem,
 			hidden:     isHidden,
-			aliases:    append(dataStreams, aliases...),
+			aliases:    dataStreamAndAliasesCombined(index.DataStream, index.Aliases, maxAliasesPerIndex),
 			attributes: attributes,
 		}
 	}

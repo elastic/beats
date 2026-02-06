@@ -1,0 +1,108 @@
+type: table
+name: sample_custom_table
+description: Example table showing the generator capabilities with multiple data types
+platforms:
+  - linux
+  - darwin
+  - windows
+
+# Required: Import path of the package that implements this table.
+# The generator imports this package in platform-specific registry files so its init() runs.
+# That package must call RegisterGenerateFunc() in init() to register the table.
+# Use a dedicated package (as here) or the generated table package when impl lives with generated code.
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/sampleimpl
+
+columns:
+  - name: id
+    type: BIGINT
+    description: Unique identifier for the resource
+
+  - name: name
+    type: TEXT
+    description: Resource name or label
+
+  - name: status
+    type: TEXT
+    description: Current status (active, inactive, pending, archived)
+
+  - name: created_time
+    type: BIGINT
+    description: Creation timestamp in UNIX epoch seconds
+    go_type: time.Time
+    format: unix
+    timezone: UTC
+
+  - name: updated_time
+    type: BIGINT
+    description: Last update timestamp in UNIX epoch seconds
+    go_type: time.Time
+    format: unix
+    timezone: UTC
+
+  - name: value
+    type: DOUBLE
+    description: Associated numeric value or metric
+
+  - name: enabled
+    type: INTEGER
+    description: Whether the resource is enabled (1=yes, 0=no)
+
+  - name: category
+    type: TEXT
+    description: Resource category (system, user, application)
+
+  - name: priority
+    type: INTEGER
+    description: Priority level (1=low, 2=medium, 3=high, 4=critical)
+
+documentation:
+  description: |
+    This table demonstrates the code generator's capabilities with various data types
+    and comprehensive examples. It serves as a reference for creating new table
+    specifications and showcases proper documentation practices.
+  
+  examples:
+    - title: List all active resources sorted by priority
+      query: |
+        SELECT id, name, priority, created_time
+        FROM sample_custom_table
+        WHERE status = 'active'
+        ORDER BY priority DESC, created_time DESC;
+
+    - title: Count resources by status and category
+      query: |
+        SELECT status, category, COUNT(*) as count
+        FROM sample_custom_table
+        GROUP BY status, category
+        ORDER BY status, category;
+
+    - title: Find high-priority enabled resources updated recently
+      query: |
+        SELECT name, priority, value, updated_time
+        FROM sample_custom_table
+        WHERE enabled = 1 
+          AND priority >= 3
+          AND updated_time > (strftime('%s', 'now') - 86400)
+        ORDER BY priority DESC;
+
+    - title: Calculate average value by category for active resources
+      query: |
+        SELECT category, 
+               COUNT(*) as total_count,
+               AVG(value) as avg_value,
+               MAX(value) as max_value
+        FROM sample_custom_table
+        WHERE status = 'active'
+        GROUP BY category;
+
+  notes:
+    - This is a sample table to demonstrate the code generator's capabilities
+    - The generator creates Go code with column definitions and table metadata
+    - Platform-specific build tags are automatically added based on the platforms field
+    - All timestamps are stored as UNIX epoch seconds for cross-platform compatibility
+    - Status values should be validated at query time using WHERE clauses
+
+  related_tables:
+    - sample_resource_history
+    - sample_resource_tags
+    - system_info

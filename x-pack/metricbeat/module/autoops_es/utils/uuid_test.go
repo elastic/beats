@@ -13,9 +13,23 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestNewUUID(t *testing.T) {
+	uuid := NewUUID()
+
+	require.NotEmpty(t, uuid)
+	require.NotEqual(t, uuid, NewUUID())
+}
+
 func TestNewUUIDV4(t *testing.T) {
 	uuid := NewUUIDV4()
 
 	require.NotEmpty(t, uuid)
 	require.NotEqual(t, uuid, NewUUIDV4())
+}
+
+func TestNewUUIDV7(t *testing.T) {
+	uuid := NewUUIDV7()
+
+	require.NotEmpty(t, uuid)
+	require.NotEqual(t, uuid, NewUUIDV7())
 }
