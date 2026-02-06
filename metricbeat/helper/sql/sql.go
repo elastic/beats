@@ -73,6 +73,17 @@ func (d *DbClient) FetchTableMode(ctx context.Context, q string) ([]mapstr.M, er
 	return d.fetchTableMode(rows)
 }
 
+// FetchTableModeWithParams executes a parameterized query and returns results in table format.
+// This is similar to FetchTableMode but accepts query parameters for safe parameter substitution.
+// Use this for cursor-based queries where the cursor value is passed as a parameter.
+func (d *DbClient) FetchTableModeWithParams(ctx context.Context, q string, args ...interface{}) ([]mapstr.M, error) {
+	rows, err := d.QueryContext(ctx, q, args...)
+	if err != nil {
+		return nil, err
+	}
+	return d.fetchTableMode(rows)
+}
+
 // fetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
 func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 	// Extracted from
@@ -206,6 +217,10 @@ func SwitchDriverName(d string) string {
 		return "postgres"
 	case "postgresql":
 		return "postgres"
+	case "mssql":
+		// Use the modern sqlserver driver instead of the deprecated mssql driver.
+		// The sqlserver driver uses native @Name or @p1..@pN parameter syntax.
+		return "sqlserver"
 	}
 
 	return d

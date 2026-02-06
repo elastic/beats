@@ -49,6 +49,26 @@ Use `sql_queries` or `sql_query` depending on the use-case.
 `sql_query` (`Backward Compatibility`)
 :   Single query you want to run. Also, provide corresponding `sql_response_format` (value: `variables` or `table`) similar to `sql_queries`'s `response_format`.
 
+`cursor`
+:   Optional configuration block for cursor-based incremental data fetching. When `cursor.enabled` is set to `true`, the module tracks the last fetched row value and retrieves only new data on subsequent collection cycles. The query must use `sql_query` (not `sql_queries`), `sql_response_format: table`, and include a `:cursor` placeholder. Supported sub-fields:
+
+    `cursor.enabled`
+    :   Set to `true` to enable cursor-based fetching. Default: `false`.
+
+    `cursor.column`
+    :   The column name to track for cursor state. Must be present in query results.
+
+    `cursor.type`
+    :   Data type of the cursor column: `integer`, `timestamp`, `date`, `float`, or `decimal`.
+
+    `cursor.default`
+    :   Initial cursor value used on first run (before any state is persisted).
+
+    `cursor.direction`
+    :   Scan direction: `asc` (default, tracks max value) or `desc` (tracks min value).
+
+    Cursor is not compatible with `sql_queries` (multiple queries) or `fetch_from_all_databases`. Each cursor-based fetch is protected by the module's `timeout` setting (which defaults to `period`) to prevent hung queries from blocking indefinitely. See the [query metricset documentation](/reference/metricbeat/metricbeat-metricset-sql-query.md) for full details.
+
 
 ## Example [_example_4]
 
@@ -790,6 +810,31 @@ For an mssql instance, by default only four databases are present namely — `ma
     }
 }
 ```
+
+### Example: Use cursor for incremental data fetching
+
+The cursor feature enables incremental data fetching by tracking the last fetched row value. This is useful for fetching audit logs or events that are continuously appended:
+
+```yaml
+- module: sql
+  metricsets:
+    - query
+  period: 30s
+  hosts: ["postgres://user:pass@localhost:5432/mydb?sslmode=disable"]
+  driver: "postgres"
+  sql_query: "SELECT id, event_type, payload, created_at FROM audit_events WHERE id > :cursor ORDER BY id ASC LIMIT 500"
+  sql_response_format: table
+  raw_data.enabled: true
+  cursor:
+    enabled: true
+    column: id
+    type: integer
+    default: "0"
+```
+
+The cursor tracks the maximum (or minimum, for descending scans) value of the specified column across all fetched rows and uses it as a filter for subsequent queries. Supported cursor types are `integer`, `timestamp`, `date`, `float`, and `decimal`.
+
+**Important:** Use `>` with unique columns (auto-increment IDs) and `>=` with columns that may have duplicate values (timestamps) to prevent data loss. See the query metricset documentation for full cursor configuration details, including driver-specific notes and boundary handling guidance.
 
 ### Host Setup
 

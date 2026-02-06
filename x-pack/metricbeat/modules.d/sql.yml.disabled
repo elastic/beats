@@ -16,6 +16,17 @@
   sql_query: "select now()"
   sql_response_format: table
 
+  # Cursor-based incremental data fetching. When enabled, the cursor tracks the
+  # last fetched row value and uses it to retrieve only new data on subsequent
+  # collection cycles. Requires sql_response_format: table and a single sql_query
+  # with exactly one :cursor placeholder.
+  #cursor:
+  #  enabled: true
+  #  column: id
+  #  type: integer
+  #  default: "0"
+  #  #direction: asc
+
   # List of root certificates for SSL/TLS server verification
   # ssl.certificate_authorities: ["/path/to/ca.pem"]
 

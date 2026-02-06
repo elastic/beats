@@ -305,10 +305,19 @@ func assertFieldContainsFloat64(field string, limit float64) func(t *testing.T, 
 	}
 }
 
+// GetOracleConnectionDetails returns the Oracle connection DSN.
+// It sets the session timezone to UTC to ensure consistent timestamp handling
+// between Go (which uses UTC) and Oracle.
 func GetOracleConnectionDetails(t *testing.T, host string, port string) string {
 	connectString := GetOracleConnectString(host, port)
 	params, err := godror.ParseDSN(connectString)
 	require.NoError(t, err, "Failed to parse Oracle DSN: %s", connectString)
+	// Set session timezone to UTC on every connection.
+	// Without this, the godror driver may convert Go's UTC time.Time values
+	// to Oracle's session timezone when binding query parameters, causing
+	// timestamp comparisons to fail if the session TZ differs from UTC.
+	params.AlterSession = append(params.AlterSession, [2]string{"TIME_ZONE", "UTC"})
+	params.Timezone = time.UTC
 	return params.StringWithPassword()
 }
 
@@ -356,6 +365,7 @@ func GetOracleConnectString(host string, port string) string {
 		if GetOracleEnvUsername() == "sys" {
 			connectString += "?sysdba=1"
 		}
+
 	}
 	return connectString
 }
