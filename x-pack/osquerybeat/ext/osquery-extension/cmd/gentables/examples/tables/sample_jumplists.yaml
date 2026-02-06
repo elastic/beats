@@ -5,6 +5,8 @@ platforms:
   - windows
 group: jumplists
 
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/sampleimpl
+
 # Reference shared types from shared_types.yaml
 # These will be merged into shared embedded types during loading
 shared_types:

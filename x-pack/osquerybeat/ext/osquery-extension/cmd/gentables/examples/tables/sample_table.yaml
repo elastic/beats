@@ -6,10 +6,10 @@ platforms:
   - darwin
   - windows
 
-# Optional: Specify the implementation package for automatic registration
-# When set, the generator will automatically import this package in platform-specific files
-# The implementation package should have an init() function that calls RegisterGenerateFunc()
-# Example: implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/sampleimpl
+# Required: Import path of the package that implements this table.
+# The generator imports this package in platform-specific registry files so its init() runs.
+# That package must call RegisterGenerateFunc() in init() to register the table.
+# Use a dedicated package (as here) or the generated table package when impl lives with generated code.
 implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/sampleimpl
 
 columns:

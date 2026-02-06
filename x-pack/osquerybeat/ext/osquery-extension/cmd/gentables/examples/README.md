@@ -68,7 +68,7 @@ type: table|view                    # Required: "table" or "view"
 name: spec_name                     # Required: table or view name
 description: Brief description      # Required: brief description
 platforms: [linux, darwin, windows] # Optional: defaults to all platforms
-implementation_package: pkg/path    # Optional: for tables only, enables automatic registration
+implementation_package: pkg/path    # Required for tables: import path of package that registers this table
 group: my_group                     # Optional: scopes shared types for this spec
 
 columns:                            # Required: column definitions
@@ -153,16 +153,17 @@ name := samplecustomtable.TableName
 
 ## Automatic Registration
 
-### implementation_package Field (Tables Only)
+### implementation_package Field (Tables Only, Required)
 
-For tables with custom implementations, specify the `implementation_package` field:
+Every table must specify `implementation_package`: the import path of the Go package that registers the table (via `RegisterGenerateFunc()` in `init()`). This guarantees each table has a single, explicit registration point.
+
+**Example 1 – dedicated implementation package** (implementation lives in a separate package):
 
 ```yaml
 type: table
 name: my_table
 platforms: [linux, darwin, windows]
 
-# Automatic registration - zero manual work required!
 implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/myimpl
 
 columns:
@@ -172,16 +173,25 @@ columns:
   # ... more columns
 ```
 
+**Example 2 – implementation in generated package** (implementation lives alongside generated code in the same package):
+
+```yaml
+type: table
+name: sample_jumplists
+group: jumplists
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/jumplists/sample_jumplists
+
+columns:
+  # ...
+```
+
 **How it works:**
 
-1. **Generator creates platform import files** - Automatically adds imports to `tables_linux.go`, etc.
-2. **Implementation init() registers** - Your package's `init()` calls `RegisterGenerateFunc()`
-3. **Static registry registers tables** - Generated `registry.go` calls all table registrations
-4. **Main.go calls registry** - Simply calls `tables.RegisterTables()` and `views.RegisterViews()`
-
-**When to omit:**
-
-- Tables where implementation is in the same package as generated code
+1. **Generator creates platform import files** – Imports `implementation_package` in `registry_linux.go`, etc.
+2. **Package init() registers** – That package’s `init()` calls `RegisterGenerateFunc()`
+3. **Static registry registers tables** – Generated `registry.go` calls all table registrations
+4. **Main.go calls registry** – Calls `tables.RegisterTables()` and `views.RegisterViews()`
 
 ## Osquery Struct Tags
 
@@ -325,17 +335,17 @@ This allows you to write minimal specs for cross-platform tables/views without r
 - ✅ `documentation.examples` - At least one example query
 - ✅ `documentation.notes` - At least one note
 
+### Required for TABLES only:
+- ✅ `implementation_package` - Import path of the package that registers this table (via `RegisterGenerateFunc()` in `init()`)
+
 ### Optional for ALL specs:
 - ⚪ `platforms` - Defaults to `["linux", "darwin", "windows"]`
-- ⚪ `columns[].go_type` - Explicit Go type override (e.g., "time.Time")
-- ⚪ `columns[].format` - Format hint for osquery tags (e.g., "unix", "rfc3339")
-- ⚪ `columns[].timezone` - Timezone hint for osquery tags (e.g., "UTC")
+- ⚪ `columns[].go_type` - Explicit Go type override (for example, "time.Time")
+- ⚪ `columns[].format` - Format hint for osquery tags (for example, "unix", "rfc3339")
+- ⚪ `columns[].timezone` - Timezone hint for osquery tags (for example, "UTC")
 - ⚪ `documentation.related_tables` - Defaults to empty array
 - ⚪ `required_tables` - Only applies to views; optional
 - ⚪ `group` - Required if `shared_types` is set
-
-### Optional for TABLES only:
-- ⚪ `implementation_package` - Import path for automatic registration (highly recommended)
 
 ### View-specific required:
 - ✅ `query` - Must contain SELECT statement(s) only

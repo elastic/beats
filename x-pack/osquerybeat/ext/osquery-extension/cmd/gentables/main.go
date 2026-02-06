@@ -609,7 +609,7 @@ func buildResultFields(s spec, typeMap map[string]sharedTypeSpec, needsSharedImp
 		}
 
 		fields = append(fields, resultField{
-			Name:        toCamelCase(col.Name),
+			Name:        toTitleCase(col.Name),
 			Type:        osqueryTypeToGoType(col),
 			Tag:         buildStructTag(col),
 			Description: col.Description,
@@ -869,7 +869,7 @@ func generateSharedTypesPackage(types []sharedTypeSpec, packageName, outDir stri
 		fields := make([]structField, 0, len(et.Columns))
 		for _, col := range et.Columns {
 			fields = append(fields, structField{
-				Name:        toCamelCase(col.Name),
+				Name:        toTitleCase(col.Name),
 				Type:        osqueryTypeToGoType(col),
 				Tag:         buildStructTag(col),
 				Description: col.Description,
@@ -1083,7 +1083,7 @@ func toPackageName(name string) string {
 	return strings.ReplaceAll(strings.ToLower(name), "_", "")
 }
 
-func toCamelCase(s string) string {
+func toTitleCase(s string) string {
 	parts := strings.Split(s, "_")
 	for i := range parts {
 		parts[i] = cases.Title(language.English).String(parts[i])
@@ -1438,6 +1438,10 @@ func validateSpec(s spec) error {
 		// Tables must not have query field
 		if strings.TrimSpace(s.Query) != "" {
 			return fmt.Errorf("query field is only valid for views, not tables")
+		}
+		// Every table must declare its implementation package for registration
+		if strings.TrimSpace(s.ImplementationPackage) == "" {
+			return fmt.Errorf("tables must specify implementation_package (the import path of the package that registers this table via RegisterGenerateFunc)")
 		}
 
 	case "view":
