@@ -14,33 +14,19 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/osquery/osquery-go/plugin/table"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 )
 
-func GetColumns() []table.ColumnDefinition {
-	// Generate column definitions automatically from the visit struct using reflection.
-	// This ensures the columns always match the struct definition and prevents drift.
-	columns, err := encoding.GenerateColumnDefinitions(visit{})
-	if err != nil {
-		// This should never happen in practice since we control the struct definition,
-		// but if it does, panic to catch it during development/testing.
-		panic("failed to generate browser_history columns: " + err.Error())
-	}
-	return columns
+func init() {
+	elasticbrowserhistory.RegisterGenerateFunc(getResults)
 }
 
-func GetGenerateFunc(log *logger.Logger) table.GenerateFunc {
-	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		return GetTableRows(ctx, queryContext, log)
-	}
-}
-
-func GetTableRows(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]map[string]string, error) {
+func getResults(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elasticbrowserhistory.Result, error) {
 	once.Do(initParsers)
 
-	results := make([]map[string]string, 0)
+	var results []elasticbrowserhistory.Result
 
 	allFilters := filters.GetConstraintFilters(queryContext)
 	locations, err := getSearchLocations(queryContext, log)
@@ -55,23 +41,11 @@ func GetTableRows(ctx context.Context, queryContext table.QueryContext, log *log
 		}
 		log.Infof("Parsing browser history for location: %#v", location)
 		for _, parser := range parsers {
-			visits, err := parser.parse(ctx, queryContext, allFilters)
+			res, err := parser.parse(ctx, queryContext, allFilters)
 			if err != nil {
 				merr = errors.Join(merr, err)
 			}
-			if len(visits) == 0 {
-				continue
-			}
-			rows := make([]map[string]string, len(visits))
-			for i, visit := range visits {
-				mvisit, err := encoding.MarshalToMap(visit)
-				if err != nil {
-					merr = errors.Join(merr, err)
-					continue
-				}
-				rows[i] = mvisit
-			}
-			results = append(results, rows...)
+			results = append(results, res...)
 		}
 	}
 

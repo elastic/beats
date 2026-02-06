@@ -10,14 +10,26 @@
 package generated
 
 import (
+	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/browserhistory"
+
 	"github.com/osquery/osquery-go"
+	"github.com/osquery/osquery-go/plugin/table"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 )
 
 // RegisterTables registers all generated tables with the osquery extension server.
 // This function is called from main.go after all init() functions have run.
-// No tables are defined for this platform.
 func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
-	// No tables to register for this platform
+	{
+		// Browser history from multiple browsers (Chrome, Edge, Firefox, Safari) with unified schema
+		genFunc, err := elasticbrowserhistory.GetGenerateFunc(log)
+		if err != nil {
+			log.Errorf("Failed to get generate function for elastic_browser_history: %v", err)
+		} else {
+			server.RegisterPlugin(table.NewPlugin("elastic_browser_history", elasticbrowserhistory.Columns(), genFunc))
+			log.Infof("Registered table: elastic_browser_history")
+		}
+	}
 }

@@ -19,6 +19,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 )
 
 var _ historyParser = &firefoxParser{}
@@ -77,10 +78,10 @@ func inferFirefoxBrowserName(path string) string {
 	return "firefox_custom"
 }
 
-func (parser *firefoxParser) parse(ctx context.Context, queryContext table.QueryContext, allFilters []filters.Filter) ([]*visit, error) {
+func (parser *firefoxParser) parse(ctx context.Context, queryContext table.QueryContext, allFilters []filters.Filter) ([]elasticbrowserhistory.Result, error) {
 	var (
 		merr   error
-		visits []*visit
+		visits []elasticbrowserhistory.Result
 	)
 	for _, profile := range parser.profiles {
 		// Check if profile matches the filters
@@ -97,7 +98,7 @@ func (parser *firefoxParser) parse(ctx context.Context, queryContext table.Query
 	return visits, merr
 }
 
-func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]*visit, error) {
+func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]elasticbrowserhistory.Result, error) {
 	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", profile.HistoryPath)
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
@@ -138,7 +139,7 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 	}
 	defer rows.Close()
 
-	var entries []*visit
+	var entries []elasticbrowserhistory.Result
 	rowCount := 0
 	for rows.Next() {
 		rowCount++
@@ -177,19 +178,19 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 			continue
 		}
 
-		entry := newVisit("firefox", profile, firefoxTimeToUnix(visitTime.Int64))
-		entry.URL = url.String
+		entry := newResult("firefox", profile, firefoxTimeToUnix(visitTime.Int64))
+		entry.Url = url.String
 		entry.Title = title.String
 		entry.Scheme, entry.Hostname, entry.Domain = extractSchemeHostAndTLDPPlusOne(url.String)
 		entry.TransitionType = mapFirefoxTransitionType(transition)
-		entry.ReferringURL = referringURL.String
-		entry.VisitID = visitID.Int64
-		entry.FromVisitID = fromVisitID.Int64
+		entry.ReferringUrl = referringURL.String
+		entry.VisitId = visitID.Int64
+		entry.FromVisitId = fromVisitID.Int64
 		entry.VisitSource = mapFirefoxVisitSource(visitSource)
 		entry.IsHidden = func(v int64) bool { return v != 0 }(isHidden.Int64)
-		entry.UrlID = urlID.Int64
-		entry.FfSessionID = int(ffSessionID.Int64)
-		entry.FfFrecency = int(ffFrecency.Int64)
+		entry.UrlId = urlID.Int64
+		entry.FfSessionId = int32(ffSessionID.Int64)
+		entry.FfFrecency = int32(ffFrecency.Int64)
 
 		entries = append(entries, entry)
 	}
