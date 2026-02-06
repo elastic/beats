@@ -840,10 +840,10 @@ The clause `.parent_last_response.` should only be used from within chain steps 
           replace_with: '$.exportId,.parent_last_response.body.exportId'
 ```
 
-Here we can see that the chain step uses `.parent_last_response.body.exportId` only because `response.pagination` is present for the parent (root) request. However if `response.pagination` was not present in the parent (root) request, `replace_with` clause should have used `.first_response.body.exportId`. This is because when pagination does not exist at the parent level `parent_last_response` object is not populated with required values for performance reasons, but the `first_response` object always stores the very first response in the process chain.
+Here we can see that the chain step uses `.parent_last_response.body.exportId` only because `response.pagination` is present for the parent (root) request. If `response.pagination` was not present in the parent (root) request, `replace_with` clause should have used `.first_response.body.exportId`. This is because when pagination does not exist at the parent level `parent_last_response` object is not populated with required values for performance reasons, but the `first_response` object always stores the first response in the process chain.
 
 ::::{note}
-The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having array at root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where the this is the case. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
+The `first_response` object at the moment can only store flat JSON structures. There is no support for NDJSON or Gzipped JSON. Arrays are not supported unless the response is chained. In this case, an array of strings is accepted when they are an array of ids to be used in later requests. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
 ::::
 
 
@@ -1505,9 +1505,10 @@ Example:
 
 1. If you want the `value` to be treated as an expression to be evaluated for data extraction from context variables, it should always have a **single *.* (dot) prefix**. Example: `replace_with: '$.exportId,.first_response.body.exportId'`. Anything more or less will have the internal processor treat it as a hard coded value, `replace_with: '$.exportId,..first_response.body.exportId'` (more than one *.* (dot) as prefix) or `replace_with:'$.exportId,first_response.body.exportId'` (no *.* dot as prefix)
 2. Incomplete `value expressions` will cause an error while processing. Example: `replace_with: '$.exportId,.first_response.'`, `replace_with: '$.exportId,.last_response.'` etc. These expressions are incomplete because they do not evaluate down to a valid key that can be extracted from the context variables. The value expression: `.first_response.`, on processing, will result in an array `[first_response ""]` where the key to be extrated becomes `"" (an empty string)`, which has no definition within any context variable.
+3. The first response in a chain is allowed to be an array of strings where each string is an id.  The replace expression to access the id is `replace: $[:]`.
 
 ::::{note}
-Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching. The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having array at root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where the this is the case. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
+Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching. The `first_response` object can only store flat JSON structures (no support for NDJSON or Gzipped JSON), except for chained configurations where an array of strings is allowed. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
 ::::
 
 

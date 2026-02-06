@@ -35,8 +35,8 @@ var testCases = []struct {
 	expected       []string
 	expectedFile   string
 	expectedNoFile string
-
-	skipReason string
+	skipReason     string
+	isStringArray  bool
 }{
 	{
 		name:        "simple_GET_request",
@@ -58,6 +58,16 @@ var testCases = []struct {
 		},
 		handler:  defaultHandler(http.MethodGet, "", ""),
 		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
+	{
+		name:        "simple_GET_request_returns_an_array_of_strings_no_events",
+		setupServer: newTestServer(httptest.NewServer),
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+		},
+		handler:  defaultHandler(http.MethodGet, "", `["123", "456"]`),
+		expected: nil,
 	},
 	{
 		name:        "request_honors_rate_limit",
@@ -1068,6 +1078,114 @@ var testCases = []struct {
 		},
 	},
 	{
+		name: "replace_with_clause_with_values_from_string_array",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/":
+					fmt.Fprintln(w, `{"text":["1", "2"]}`)
+				case "/2212/1":
+					fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+				case "/2212/2":
+					fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+				}
+			})
+			server := httptest.NewServer(r)
+			config["request.url"] = server.URL
+			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.text[:]"
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.method": http.MethodGet,
+						"replace":        "$.text[:]",
+						"replace_with":   "$.exportId,2212",
+					},
+				},
+			},
+		},
+		expected: []string{
+			`{"hello":{"world":"moon"}}`,
+			`{"space":{"cake":"pumpkin"}}`,
+		},
+	},
+	{
+		name: "replace_clause_with_string_from_string_array",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/":
+					fmt.Fprintln(w, `["1", "2"]`)
+				case "/2212/1":
+					fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+				case "/2212/2":
+					fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+				}
+			})
+			server := httptest.NewServer(r)
+			config["request.url"] = server.URL
+			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$[:]"
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.method": http.MethodGet,
+						"replace":        "$[:]",
+						"replace_with":   "$.exportId,2212",
+					},
+				},
+			},
+		},
+		expected: []string{
+			`{"hello":{"world":"moon"}}`,
+			`{"space":{"cake":"pumpkin"}}`,
+		},
+	},
+	{
+		name: "replace_clause_with_int_from_int_array",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/":
+					fmt.Fprintln(w, `[1, 2]`)
+				case "/2212/1":
+					fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+				case "/2212/2":
+					fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+				}
+			})
+			server := httptest.NewServer(r)
+			config["request.url"] = server.URL
+			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$[:]"
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.method": http.MethodGet,
+						"replace":        "$[:]",
+						"replace_with":   "$.exportId,2212",
+					},
+				},
+			},
+		},
+		expected: []string{
+			`{"hello":{"world":"moon"}}`,
+			`{"space":{"cake":"pumpkin"}}`,
+		},
+	},
+	{
 		name: "replace_with_clause_with_hardcoded_value_(no_dot_prefix)",
 		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -1558,7 +1676,11 @@ func TestInput(t *testing.T) {
 				case got := <-chanClient.Channel:
 					val, err := got.Fields.GetValue("message")
 					assert.NoError(t, err)
-					assert.JSONEq(t, test.expected[receivedCount], val.(string))
+					if test.isStringArray {
+						assert.Equal(t, val.(string), test.expected[receivedCount])
+					} else {
+						assert.JSONEq(t, test.expected[receivedCount], val.(string))
+					}
 					receivedCount += 1
 					if receivedCount == len(test.expected) {
 						cancel()

@@ -48,7 +48,7 @@ func (resp *response) clone() *response {
 	return clone
 }
 
-func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Logger) []transformable {
+func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Logger, allowStringArray bool) []transformable {
 	var ts []transformable
 
 	convertAndAppend := func(m map[string]interface{}) {
@@ -61,15 +61,26 @@ func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Log
 
 	switch tresp := resp.body.(type) {
 	case []interface{}:
+		values := []string{}
 		for _, v := range tresp {
 			m, ok := v.(map[string]interface{})
 			if !ok {
-				msg := fmt.Sprintf("events must be JSON objects, but got %T: skipping", v)
-				log.Debug(msg)
-				stat.UpdateStatus(status.Degraded, msg)
+				if _, ok = v.(string); ok {
+					values = append(values, v.(string))
+				} else {
+					msg := fmt.Sprintf("events must be JSON objects, but got %T: skipping", v)
+					log.Debug(msg)
+					stat.UpdateStatus(status.Degraded, msg)
+				}
 				continue
 			}
 			convertAndAppend(m)
+		}
+
+		if len(values) > 0 && (len(values) != len(tresp) || !allowStringArray ) {
+				msg := fmt.Sprintf("events must be JSON objects, but got strings in a non-chained configuration %v", values)
+				log.Debug(msg)
+				stat.UpdateStatus(status.Degraded, msg)
 		}
 	case map[string]interface{}:
 		convertAndAppend(tresp)
@@ -77,7 +88,6 @@ func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Log
 		stat.UpdateStatus(status.Degraded, "response is not a valid JSON")
 		log.Debugf("response is not a valid JSON")
 	}
-
 	return ts
 }
 
@@ -194,7 +204,7 @@ type handler interface {
 	handleError(error)
 }
 
-func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, h handler) {
+func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, h handler, allowStringArray bool) {
 	trCtx.clearIntervalData()
 
 	var npages int64
@@ -215,7 +225,7 @@ func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transfo
 				return
 			}
 
-			respTrs := page.asTransformables(rp.status, rp.log)
+			respTrs := page.asTransformables(rp.status, rp.log, allowStringArray)
 
 			if len(respTrs) == 0 {
 				return
