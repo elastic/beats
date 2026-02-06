@@ -31,6 +31,8 @@ To enable cursor-based fetching, add a `cursor` configuration block to your metr
     default: "0"
 ```
 
+Note: `raw_data.enabled: true` in the examples above is optional and controls the event output format, not the cursor. It is shown here because raw mode is commonly used with cursor-based fetching.
+
 ### Cursor Configuration Options
 
 | Option | Required | Description |
@@ -46,7 +48,7 @@ To enable cursor-based fetching, add a `cursor` configuration block to your metr
 | Type | Description | Default Format Example |
 |------|-------------|----------------------|
 | `integer` | Integer values (auto-incrementing IDs, sequence numbers) | `"0"` |
-| `timestamp` | Timestamp with timezone (RFC3339 format) | `"2024-01-01T00:00:00Z"` |
+| `timestamp` | Timestamp values (TIMESTAMP, DATETIME). Accepts RFC3339, `YYYY-MM-DD HH:MM:SS[.nnnnnnnnn]`, and date-only formats. Stored internally as nanoseconds in UTC. | `"2024-01-01T00:00:00Z"` |
 | `date` | Date values (YYYY-MM-DD format) | `"2024-01-01"` |
 | `float` | Floating-point values (FLOAT, DOUBLE, REAL). IEEE 754 precision limits apply. | `"0.0"` |
 | `decimal` | Exact decimal values (DECIMAL, NUMERIC). Arbitrary precision, no data loss. | `"0.00"` |
@@ -66,7 +68,10 @@ When cursor is enabled, your SQL query must:
 
 1. **Include the `:cursor` placeholder** exactly once in the query WHERE clause
 2. **Include an ORDER BY clause** on the cursor column matching the configured direction
-3. **Use `sql_response_format: table`** - cursor requires table mode
+3. **Use `sql_response_format: table`** — cursor requires table mode
+4. **Use `sql_query` (single query mode)** — cursor is not supported with `sql_queries` (multiple queries)
+
+Cursor is also not compatible with `fetch_from_all_databases`. Use a separate module block for each database if you need both features.
 
 ### Example Configurations
 
@@ -157,6 +162,25 @@ When cursor is enabled, your SQL query must:
 
 Note: Float cursors use IEEE 754 `float64` representation. For exact precision at boundaries (for example, financial data), use the `decimal` type instead.
 
+#### MSSQL cursor (with TOP instead of LIMIT)
+
+MSSQL does not support `LIMIT`. Use `TOP` to restrict the number of rows per cycle:
+
+```yaml
+- module: sql
+  metricsets: [query]
+  hosts: ["sqlserver://sa:YourPassword@localhost:1433?database=mydb"]
+  driver: mssql
+  sql_query: "SELECT TOP 500 id, event_type, payload FROM audit_log WHERE id > :cursor ORDER BY id ASC"
+  sql_response_format: table
+  raw_data.enabled: true
+  cursor:
+    enabled: true
+    column: id
+    type: integer
+    default: "0"
+```
+
 #### Descending scan (processing historical data backwards)
 
 ```yaml
@@ -191,6 +215,10 @@ from where it left off. State is keyed by a hash of:
 
 This ensures that different query configurations maintain separate cursor states, including
 different databases on the same server.
+
+**Important:** Changing any of these components (module ID, DSN, query, or cursor column) produces a
+different state key, which effectively resets the cursor to its `default` value. This is by design —
+if you modify the query, the old cursor position may no longer be valid for the new query.
 
 ### Important: Choosing `>` vs `>=` for Cursor Queries
 
@@ -235,6 +263,10 @@ hosts: ["root:pass@tcp(localhost:3306)/mydb?parseTime=true"]
 **Oracle:** Set the session timezone to UTC for timestamp cursors. The `godror` driver may convert
 Go UTC timestamps to the Oracle session timezone, causing incorrect comparisons. Use the
 `alterSession` DSN parameter or consult the Oracle integration documentation.
+
+**MSSQL:** Use `TOP` instead of `LIMIT` to restrict results per cycle. The driver uses `@p1` as the
+parameter placeholder. Use `driver: mssql` in your configuration; it is automatically mapped to the
+modern `sqlserver` driver internally.
 
 **Decimal columns:** The `decimal` cursor type passes the cursor value as a string to the database
 driver. Most drivers (PostgreSQL, MySQL, MSSQL) implicitly cast strings to DECIMAL for comparison.
