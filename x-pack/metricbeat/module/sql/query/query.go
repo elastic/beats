@@ -405,7 +405,25 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (fetchErr
 
 // fetchWithCursor executes the query with cursor-based incremental fetching.
 // It uses the cursor manager to track the last fetched row and only retrieves new data.
+//
+// The context is wrapped with the module's configured timeout to prevent hung queries
+// from blocking indefinitely and causing all subsequent collection cycles to be skipped
+// via fetchMutex.TryLock(). The timeout defaults to the module's period if not set.
+//
+// Note: the timeout is applied here (cursor path only) rather than in Fetch() because
+// the non-cursor path has never enforced a timeout. Applying it there would be a
+// breaking change for existing users whose queries legitimately take longer than their
+// configured period.
 func (m *MetricSet) fetchWithCursor(ctx context.Context, reporter mb.ReporterV2) error {
+	// Apply the module's configured timeout (defaults to period) to prevent hung queries.
+	// Without this, a hung query blocks the goroutine indefinitely and all future
+	// collection cycles are skipped via fetchMutex.TryLock().
+	if timeout := m.Module().Config().Timeout; timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, timeout)
+		defer cancel()
+	}
+
 	cursorVal := m.cursorManager.GetCurrentValue()
 
 	m.Logger().Debugf("Executing query with cursor=%s", m.cursorManager.GetCurrentValueString())

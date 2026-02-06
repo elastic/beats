@@ -67,7 +67,7 @@ Use `sql_queries` or `sql_query` depending on the use-case.
     `cursor.direction`
     :   Scan direction: `asc` (default, tracks max value) or `desc` (tracks min value).
 
-    Cursor is not compatible with `sql_queries` (multiple queries) or `fetch_from_all_databases`. See the [query metricset documentation](/reference/metricbeat/metricbeat-metricset-sql-query.md) for full details.
+    Cursor is not compatible with `sql_queries` (multiple queries) or `fetch_from_all_databases`. Each cursor-based fetch is protected by the module's `timeout` setting (which defaults to `period`) to prevent hung queries from blocking indefinitely. See the [query metricset documentation](/reference/metricbeat/metricbeat-metricset-sql-query.md) for full details.
 
 
 ## Example [_example_4]

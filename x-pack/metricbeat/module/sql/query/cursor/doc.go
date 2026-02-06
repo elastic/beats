@@ -94,12 +94,24 @@
 //   - The cursor value is only updated if at least one valid value was found
 //   - Float cursors reject NaN and Inf values at both config validation and DB result parsing
 //
-// # Concurrency
+// # Concurrency and Query Timeout
 //
 // The [Manager] is safe for concurrent use. All cursor reads and writes are
 // protected by a mutex. The MetricSet uses a separate fetchMutex with TryLock
 // to prevent overlapping collection cycles when a query takes longer than the
 // configured period.
+//
+// Each cursor-based fetch is wrapped with context.WithTimeout using the
+// module's configured timeout (which defaults to period). This prevents hung
+// queries (e.g., table locks, network partitions) from blocking the goroutine
+// indefinitely and causing all subsequent collection cycles to be skipped
+// via fetchMutex.TryLock(). When a query exceeds the timeout, the context is
+// cancelled, the database driver aborts the query, and the cursor remains
+// unchanged (no data loss).
+//
+// The timeout is applied only to the cursor path. The non-cursor path does
+// not enforce a timeout for backward compatibility with existing users whose
+// queries may legitimately take longer than their configured period.
 //
 // # Resource Cleanup
 //

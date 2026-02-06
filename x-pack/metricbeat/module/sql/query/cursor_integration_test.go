@@ -1352,6 +1352,153 @@ func TestCursorStateIsolation(t *testing.T) {
 	t.Log("Cursor state isolation verified - different queries maintain separate cursor states")
 }
 
+// ============================================================================
+// QUERY TIMEOUT TEST
+// ============================================================================
+
+// TestCursorQueryTimeout verifies that a hung query is cancelled after the
+// module's configured timeout. Uses PostgreSQL's pg_sleep() to simulate a
+// query that takes longer than the timeout.
+func TestCursorQueryTimeout(t *testing.T) {
+	service := compose.EnsureUp(t, "postgresql")
+	host, port, err := net.SplitHostPort(service.Host())
+	require.NoError(t, err)
+
+	user := postgresql.GetEnvUsername()
+	password := postgresql.GetEnvPassword()
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port)
+
+	// Ensure test table exists (we need a valid cursor query structure)
+	db, err := sql.Open("postgres", dsn)
+	require.NoError(t, err)
+	defer db.Close()
+
+	setupPostgresTestTable(t, db)
+	defer cleanupTestTable(t, db, "postgres")
+
+	testPaths := createTestPaths(t)
+
+	// Query that sleeps for 30 seconds — well beyond the 2s timeout we'll set.
+	// pg_sleep returns void, so we wrap it in a subquery that also selects from
+	// our real table so the cursor column ("id") is present.
+	// Using a CTE: the sleep executes, then we return rows from the real table.
+	slowQuery := fmt.Sprintf(
+		"SELECT id, event_data FROM %s WHERE id > :cursor AND pg_sleep(30) IS NOT NULL ORDER BY id ASC LIMIT 3",
+		testTableName,
+	)
+
+	cfg := map[string]interface{}{
+		"module":              "sql",
+		"metricsets":          []string{"query"},
+		"hosts":               []string{dsn},
+		"driver":              "postgres",
+		"period":              "60s",
+		"timeout":             "2s", // Very short timeout — query should be cancelled
+		"sql_query":           slowQuery,
+		"sql_response_format": tableResponseFormat,
+		"raw_data.enabled":    true,
+		"cursor.enabled":      true,
+		"cursor.column":       "id",
+		"cursor.type":         cursor.CursorTypeInteger,
+		"cursor.default":      "0",
+	}
+
+	ms := newMetricSetWithPaths(t, cfg, testPaths)
+
+	// Measure the time taken — should be roughly the timeout, not 30s
+	start := time.Now()
+	_, errs := fetchEvents(t, ms)
+	elapsed := time.Since(start)
+
+	// Should have an error (context deadline exceeded)
+	require.NotEmpty(t, errs, "Expected an error from the timed-out query")
+	t.Logf("Query timeout error: %v", errs[0])
+
+	// Verify it contains a context-related error
+	errMsg := errs[0].Error()
+	assert.True(t,
+		strings.Contains(errMsg, "context deadline exceeded") ||
+			strings.Contains(errMsg, "context canceled") ||
+			strings.Contains(errMsg, "canceling statement due to user request"),
+		"Error should indicate context cancellation, got: %s", errMsg)
+
+	// Verify it completed quickly (within ~5s) rather than waiting 30s
+	assert.Less(t, elapsed, 10*time.Second,
+		"Query should have been cancelled by timeout, not waited for pg_sleep(30)")
+	t.Logf("Query was cancelled after %v (timeout was 2s)", elapsed)
+
+	// Verify cursor was NOT advanced (it should remain at default "0")
+	queryMs, ok := ms.(*MetricSet)
+	require.True(t, ok, "MetricSet should be of type *MetricSet")
+	assert.Equal(t, "0", queryMs.cursorManager.GetCurrentValueString(),
+		"Cursor should remain at default after timeout")
+
+	if closer, ok := ms.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+}
+
+// TestCursorNormalQueryCompletesWithinTimeout verifies that a normal (fast)
+// query completes successfully even with a timeout configured.
+func TestCursorNormalQueryCompletesWithinTimeout(t *testing.T) {
+	service := compose.EnsureUp(t, "postgresql")
+	host, port, err := net.SplitHostPort(service.Host())
+	require.NoError(t, err)
+
+	user := postgresql.GetEnvUsername()
+	password := postgresql.GetEnvPassword()
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port)
+
+	db, err := sql.Open("postgres", dsn)
+	require.NoError(t, err)
+	defer db.Close()
+
+	setupPostgresTestTable(t, db)
+	defer cleanupTestTable(t, db, "postgres")
+
+	testPaths := createTestPaths(t)
+
+	query := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 3", testTableName)
+
+	cfg := map[string]interface{}{
+		"module":              "sql",
+		"metricsets":          []string{"query"},
+		"hosts":               []string{dsn},
+		"driver":              "postgres",
+		"period":              "60s",
+		"timeout":             "30s", // Generous timeout — query should complete well within
+		"sql_query":           query,
+		"sql_response_format": tableResponseFormat,
+		"raw_data.enabled":    true,
+		"cursor.enabled":      true,
+		"cursor.column":       "id",
+		"cursor.type":         cursor.CursorTypeInteger,
+		"cursor.default":      "0",
+	}
+
+	// First fetch - should work fine and return 3 rows
+	ms1 := newMetricSetWithPaths(t, cfg, testPaths)
+	events1, errs1 := fetchEvents(t, ms1)
+	require.Empty(t, errs1, "Normal query should succeed with timeout configured")
+	require.Len(t, events1, 3, "First fetch should return 3 events")
+
+	if closer, ok := ms1.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Second fetch - should get remaining 2 rows (cursor persisted correctly)
+	ms2 := newMetricSetWithPaths(t, cfg, testPaths)
+	events2, errs2 := fetchEvents(t, ms2)
+	require.Empty(t, errs2, "Second fetch should succeed")
+	require.Len(t, events2, 2, "Second fetch should return 2 events")
+
+	if closer, ok := ms2.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	t.Log("Normal query completes successfully with timeout configured")
+}
+
 // containsOracleClientError checks if the error message indicates Oracle Instant Client is missing
 func containsOracleClientError(errMsg string) bool {
 	oracleClientErrors := []string{
