@@ -378,21 +378,12 @@ func defaultFileScannerConfig() fileScannerConfig {
 // fileScanner looks for files which match the patterns in paths.
 // It is able to exclude files and symlinks.
 type fileScanner struct {
-<<<<<<< HEAD
-	paths      []string
-	cfg        fileScannerConfig
-	log        *logp.Logger
-	hasher     hash.Hash
-	readBuffer []byte
-=======
 	smallFilesWarned atomic.Bool
 	paths            []string
 	cfg              fileScannerConfig
 	log              *logp.Logger
 	hasher           hash.Hash
 	readBuffer       []byte
-	compression      string
->>>>>>> 215703758 (Don't print warning about small files on each file system scan (#48704))
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig) (*fileScanner, error) {
