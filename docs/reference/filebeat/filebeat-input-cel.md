@@ -967,7 +967,7 @@ Specifies the AWS region that will be used in the v4 signing process. This is op
 stack: ga 9.3.1
 ```
 
-OpenTelemetry tracing is activated using OTel-standard environment variables. Input settings can be used to override the default span attribute redaction behavior.
+OpenTelemetry tracing is activated using OTel-standard environment variables. You can use input settings to override the default span attribute redaction behavior.
 
 By default, the value of a HTTP header or query string parameter will be redacted in span attributes if its name includes a word suggesting sensitive data, based on a fixed list of words. The settings here can override that behavior for specific full names.
 
