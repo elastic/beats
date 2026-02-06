@@ -17,6 +17,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -24,12 +25,6 @@ import (
 )
 
 var _ http.RoundTripper = (*LoggingRoundTripper)(nil)
-
-// TraceIDKey is key used to add a trace.id value to the context of HTTP
-// requests. The value will be logged by LoggingRoundTripper.
-const TraceIDKey = contextKey("trace.id")
-
-type contextKey string
 
 // NewLoggingRoundTripper returns a LoggingRoundTripper that logs requests and
 // responses to the provided logger. Transaction creation is logged to log.
@@ -58,6 +53,9 @@ type LoggingRoundTripper struct {
 //
 // Fields logged in requests:
 //
+//	transaction.id
+//	trace.id
+//	span.id
 //	url.original
 //	url.scheme
 //	url.path
@@ -74,12 +72,18 @@ type LoggingRoundTripper struct {
 //
 // Fields logged in responses:
 //
+//	transaction.id
+//	trace.id
+//	span.id
 //	http.response.status_code
 //	http.response.body.content
 //	http.response.body.truncated
 //	http.response.body.bytes
 //	http.response.mime_type
 //	http.response.header
+//
+// The trace.id and span.id fields are populated with IDs from the OTel span in
+// context if it exists.
 func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Create a child logger for this request.
 	txID := rt.nextTxID()
@@ -88,10 +92,11 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		zap.String("transaction.id", txID),
 	)
 
-	if v := req.Context().Value(TraceIDKey); v != nil {
-		if traceID, ok := v.(string); ok {
-			log = log.With(zap.String("trace.id", traceID))
-		}
+	if sc := trace.SpanFromContext(req.Context()).SpanContext(); sc.IsValid() {
+		log = log.With(
+			zap.String("trace.id", sc.TraceID().String()),
+			zap.String("span.id", sc.SpanID().String()),
+		)
 	}
 
 	req, respParts, errorsMessages := logRequest(log, req, rt.maxBodyLen)
