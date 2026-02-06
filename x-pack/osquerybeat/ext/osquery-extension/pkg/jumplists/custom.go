@@ -36,7 +36,7 @@ func parseCustomJumplistFile(filePath string, userProfile *UserProfile, log *log
 	// Look up the application id and create the metadata
 	jumpListMeta := &JumplistMeta{
 		UserProfile:   userProfile,
-		ApplicationID: getAppIdFromFileName(filePath, log),
+		ApplicationID: getAppIdFromFileName(filePath),
 		JumplistType:  JumplistTypeCustom,
 		Path:          filePath,
 	}
