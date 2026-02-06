@@ -238,74 +238,107 @@ func newOTELCELMetrics(log *logp.Logger,
 
 	meter := meterProvider.Meter("github.com/elastic/beats/x-pack/filebeat/otel/cel_metrics.go")
 
-	periodicRunCount, err := meter.Int64Counter("input.cel.periodic.run")
+	periodicRunCount, err := meter.Int64Counter("input.cel.periodic.run",
+		metric.WithDescription("Number of times a periodic run was started."),
+		metric.WithUnit("{run}"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.run: %w", err)
 	}
-	programRunStartedCount, err := meter.Int64Counter("input.cel.periodic.program.run.started")
+	programRunStartedCount, err := meter.Int64Counter("input.cel.periodic.program.run.started",
+		metric.WithDescription("Number of times a CEL program was started in a periodic run."),
+		metric.WithUnit("{run}"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.program.run.started: %w", err)
 	}
-	programRunSuccessCount, err := meter.Int64Counter("input.cel.periodic.program.run.success")
+	programRunSuccessCount, err := meter.Int64Counter("input.cel.periodic.program.run.success",
+		metric.WithDescription("Number of times a CEL program terminated without an error in a periodic run."),
+		metric.WithUnit("{run}"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.program.success: %w", err)
 	}
-	periodicBatchCount, err := meter.Int64Counter("input.cel.periodic.batch.received")
+	periodicBatchCount, err := meter.Int64Counter("input.cel.periodic.batch.received",
+		metric.WithDescription("Number of event batches generated in a periodic run."),
+		metric.WithUnit("{batch}"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.batch.received: %w", err)
 	}
-	periodicPublishedBatchCount, err := meter.Int64Counter("input.cel.periodic.batch.published")
+	periodicPublishedBatchCount, err := meter.Int64Counter("input.cel.periodic.batch.published",
+		metric.WithDescription("Number of event batches successfully published in a periodic run."),
+		metric.WithUnit("{batch}"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.batch.published: %w", err)
 	}
-	periodicEventCount, err := meter.Int64Counter("input.cel.periodic.event.received")
+	periodicEventCount, err := meter.Int64Counter("input.cel.periodic.event.received",
+		metric.WithDescription("Number of events generated in a periodic run."),
+		metric.WithUnit("{event}"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.event.received: %w", err)
 	}
-	periodicPublishedEventCount, err := meter.Int64Counter("input.cel.periodic.event.published")
+	periodicPublishedEventCount, err := meter.Int64Counter("input.cel.periodic.event.published",
+		metric.WithDescription("Number of events published in a periodic run."),
+		metric.WithUnit("{event}"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.event.published: %w", err)
 	}
-	periodicTotalDuration, err := meter.Float64Counter("input.cel.periodic.run.duration")
+	periodicTotalDuration, err := meter.Float64Counter("input.cel.periodic.run.duration",
+		metric.WithDescription("Total time spent in a periodic run."),
+		metric.WithUnit("s"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.run.duration: %w", err)
 	}
-	periodicCELDuration, err := meter.Float64Counter("input.cel.periodic.cel.duration")
+	periodicCELDuration, err := meter.Float64Counter("input.cel.periodic.cel.duration",
+		metric.WithDescription("Total time spent processing CEL programs in a periodic run."),
+		metric.WithUnit("s"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.cel.duration: %w", err)
 	}
-	periodicPublishDuration, err := meter.Float64Counter("input.cel.periodic.event.publish.duration")
+	periodicPublishDuration, err := meter.Float64Counter("input.cel.periodic.event.publish.duration",
+		metric.WithDescription("Total time spent publishing events in a periodic run."),
+		metric.WithUnit("s"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.event.publish.duration: %w", err)
 	}
 
-	programBatchProcessed, err := meter.Int64Histogram("input.cel.program.batch.received")
+	programBatchProcessed, err := meter.Int64Histogram("input.cel.program.batch.received",
+		metric.WithDescription("Number of event batches the CEL program has generated."),
+		metric.WithUnit("{batch}"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.program.batch.received: %w", err)
 	}
-	programBatchPublished, err := meter.Int64Histogram("input.cel.program.batch.published")
+	programBatchPublished, err := meter.Int64Histogram("input.cel.program.batch.published",
+		metric.WithDescription("Number of event batches the CEL program has published."),
+		metric.WithUnit("{batch}"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.program.batch.published: %w", err)
 	}
-	programEventGenerated, err := meter.Int64Histogram("input.cel.program.event.received")
+	programEventGenerated, err := meter.Int64Histogram("input.cel.program.event.received",
+		metric.WithDescription("Number of events the CEL program has generated."),
+		metric.WithUnit("{event}"))
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed"+
-			" to create input.cel.program.event.received: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.program.event.received: %w", err)
 	}
-	programEventPublished, err := meter.Int64Histogram("input.cel.program.event.published")
+	programEventPublished, err := meter.Int64Histogram("input.cel.program.event.published",
+		metric.WithDescription("Number of events the CEL program has published."),
+		metric.WithUnit("{event}"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.program.event.published: %w", err)
 	}
 
-	programRunDuration, err := meter.Float64Histogram("input.cel.program.run.duration")
+	programRunDuration, err := meter.Float64Histogram("input.cel.program.run.duration",
+		metric.WithDescription("Time spent executing the CEL program."),
+		metric.WithUnit("s"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.program.run.duration: %w", err)
 	}
-	programCELDuration, err := meter.Float64Histogram("input.cel.program.cel.duration")
+	programCELDuration, err := meter.Float64Histogram("input.cel.program.cel.duration",
+		metric.WithDescription("Time spent processing the CEL program."),
+		metric.WithUnit("s"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.program.cel.duration: %w", err)
 	}
-	programPublishDuration, err := meter.Float64Histogram("input.cel.program.publish.duration")
+	programPublishDuration, err := meter.Float64Histogram("input.cel.program.publish.duration",
+		metric.WithDescription("Time spent publishing events in the CEL program."),
+		metric.WithUnit("s"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create input.cel.program.publish.duration: %w", err)
 	}
