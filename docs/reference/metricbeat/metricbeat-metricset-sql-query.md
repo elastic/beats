@@ -295,8 +295,11 @@ If your driver doesn't, use an explicit cast: `WHERE price > CAST(:cursor AS DEC
   usage (recommended: 500-5000 rows per cycle). For wide rows with large text columns, use a lower LIMIT
 - Float cursors are subject to IEEE 754 precision limits. For exact boundary comparisons
   (for example, financial data), use the `decimal` type instead
-- If a collection cycle takes longer than the configured `period`, subsequent cycles are skipped
-  until the current one completes
+- Each cursor-based fetch is protected by the module's `timeout` setting (which defaults to
+  `period`). Hung queries are cancelled after the timeout expires, the cursor remains unchanged,
+  and the next collection cycle can proceed normally
+- If a cursor collection cycle takes longer than `period` but completes within `timeout`,
+  subsequent cycles are skipped until the current one completes
 
 ## Fields [_fields]
 
