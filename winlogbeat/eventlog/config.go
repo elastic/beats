@@ -64,6 +64,7 @@ type config struct {
 	NoMoreEvents         NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
 	EventLanguage        uint32             `config:"language"`
 	IgnoreMissingChannel *bool              `config:"ignore_missing_channel"` // Ignore missing channels and continue reading.
+	StopIfGapFound       bool               `config:"stop_if_gap_found"`      // Stop the beat if a gap in record IDs is detected.
 
 	// FIXME: This is for a WS2025 known issue so we can bypass the workaround
 	// and will be removed in the future.

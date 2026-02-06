@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"runtime"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -30,7 +31,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/timed"
 )
 
 type Publisher interface {
@@ -46,6 +46,10 @@ func Run(
 	publisher Publisher,
 	log *logp.Logger,
 ) error {
+	// Pin runner to a single OS thread to satisfy Windows Event Log threading requirements.
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	reporter.UpdateStatus(status.Starting, fmt.Sprintf("Starting to read from %s", api.Channel()))
 	// setup closing the API if either the run function is signaled asynchronously
 	// to shut down or when returning after io.EOF
@@ -90,6 +94,18 @@ func Run(
 		return mustRetry
 	})
 
+	waitErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
+		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+			return false
+		}
+		log.Warnw("error while waiting for events", "error", err)
+		reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to read from %s: %v", api.Channel(), err))
+		if resetErr := api.Reset(); resetErr != nil {
+			log.Errorw("error resetting Windows Event Log handle", "error", resetErr)
+		}
+		return true
+	})
+
 runLoop:
 	for cancelCtx.Err() == nil {
 		openErr := api.Open(evtCheckpoint, metricsRegistry)
@@ -110,6 +126,16 @@ runLoop:
 		// read loop
 		for cancelCtx.Err() == nil {
 			reporter.UpdateStatus(status.Running, fmt.Sprintf("Reading from %s", api.Channel()))
+			if waitErr := api.WaitForEvents(cancelCtx); waitErr != nil {
+				if waitErrHandler.backoff(cancelCtx, waitErr) {
+					continue runLoop
+				}
+				//nolint:nilerr // only log error if we are not shutting down
+				if cancelCtx.Err() != nil {
+					break runLoop
+				}
+				return waitErr
+			}
 			records, readErr := api.Read()
 			if readErr != nil {
 				if readErrHandler.backoff(cancelCtx, readErr) {
@@ -133,7 +159,6 @@ runLoop:
 			}
 
 			if len(records) == 0 {
-				_ = timed.Wait(cancelCtx, time.Second)
 				continue
 			}
 
