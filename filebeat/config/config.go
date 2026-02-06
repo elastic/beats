@@ -18,6 +18,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"sort"
 	"time"
@@ -49,6 +50,41 @@ type Registry struct {
 	FlushTimeout  time.Duration `config:"flush"`
 	CleanInterval time.Duration `config:"cleanup_interval"`
 	MigrateFile   string        `config:"migrate_file"`
+
+	// Type selects the registry backend implementation.
+	// Supported values: "bbolt" (default), "memlog".
+	Type string `config:"type"`
+
+	// BBolt holds bbolt-specific configuration.
+	BBolt BBoltConfig `config:"bbolt"`
+
+	// DebugPort enables a read-only web interface for debugging the registry.
+	// Set to 0 to disable. Default: 8000.
+	DebugPort int `config:"debug_port"`
+}
+
+type BBoltConfig struct {
+	// DiskTTL is the inactivity duration after which entries are considered stale.
+	// If 0, disk GC is disabled.
+	DiskTTL time.Duration `config:"disk_ttl"`
+
+	// CacheTTL is reserved for Phase 2 (in-memory cache). Not used yet.
+	CacheTTL time.Duration `config:"cache_ttl"`
+
+	// GCBatchSize is reserved for Phase 3 (incremental GC). Not used yet.
+	GCBatchSize int `config:"gc_batch_size"`
+
+	// FileMode is used as the file mode for newly created bbolt DB files.
+	FileMode os.FileMode `config:"file_permissions"`
+
+	// Timeout sets the bbolt open timeout.
+	Timeout time.Duration `config:"timeout"`
+
+	// NoGrowSync disables the grow sync behavior in bbolt.
+	NoGrowSync bool `config:"no_grow_sync"`
+
+	// NoFreelistSync disables freelist syncing in bbolt.
+	NoFreelistSync bool `config:"no_freelist_sync"`
 }
 
 var DefaultConfig = Config{
@@ -58,9 +94,58 @@ var DefaultConfig = Config{
 		MigrateFile:   "",
 		CleanInterval: 5 * time.Minute,
 		FlushTimeout:  time.Second,
+		Type:          "bbolt",
+		DebugPort:     8000,
+		BBolt: BBoltConfig{
+			DiskTTL:        30 * 24 * time.Hour,
+			CacheTTL:       1 * time.Hour,
+			GCBatchSize:    50_000,
+			FileMode:       0o600,
+			Timeout:        1 * time.Second,
+			NoGrowSync:     false,
+			NoFreelistSync: true,
+		},
 	},
 	ShutdownTimeout:    0,
 	OverwritePipelines: false,
+}
+
+func (r Registry) NormalizedType() string {
+	if r.Type == "" {
+		return "bbolt"
+	}
+	return r.Type
+}
+
+func (r Registry) ValidateConfig() error {
+	switch r.NormalizedType() {
+	case "bbolt", "memlog":
+	default:
+		return fmt.Errorf("unknown filebeat.registry.type: %q", r.Type)
+	}
+
+	if r.Path == "" {
+		return fmt.Errorf("filebeat.registry.path is empty")
+	}
+
+	if r.BBolt.Timeout < 0 {
+		return fmt.Errorf("filebeat.registry.bbolt.timeout must be >= 0 (got %v)", r.BBolt.Timeout)
+	}
+	if r.BBolt.DiskTTL < 0 {
+		return fmt.Errorf("filebeat.registry.bbolt.disk_ttl must be >= 0 (got %v)", r.BBolt.DiskTTL)
+	}
+	if r.BBolt.CacheTTL < 0 {
+		return fmt.Errorf("filebeat.registry.bbolt.cache_ttl must be >= 0 (got %v)", r.BBolt.CacheTTL)
+	}
+	if r.BBolt.GCBatchSize < 0 {
+		return fmt.Errorf("filebeat.registry.bbolt.gc_batch_size must be >= 0 (got %d)", r.BBolt.GCBatchSize)
+	}
+
+	if r.DebugPort < 0 || r.DebugPort > 65535 {
+		return fmt.Errorf("filebeat.registry.debug_port must be between 0 and 65535 (got %d)", r.DebugPort)
+	}
+
+	return nil
 }
 
 // ListEnabledInputs returns a list of enabled inputs sorted by alphabetical order.

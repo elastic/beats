@@ -46,6 +46,9 @@ func TestNewReceiver(t *testing.T) {
 	config := Config{
 		Beatconfig: map[string]any{
 			"filebeat": map[string]any{
+				"registry": map[string]any{
+					"type": "memlog",
+				},
 				"inputs": []map[string]any{
 					{
 						"type":    "benchmark",
@@ -127,6 +130,9 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 	cfg := &Config{
 		Beatconfig: map[string]any{
 			"filebeat": map[string]any{
+				"registry": map[string]any{
+					"type": "memlog",
+				},
 				"inputs": []map[string]any{
 					{
 						"type":    "benchmark",
@@ -171,6 +177,9 @@ func multiReceiverConfig(helper multiReceiverHelper) *Config {
 	return &Config{
 		Beatconfig: map[string]any{
 			"filebeat": map[string]any{
+				"registry": map[string]any{
+					"type": "memlog",
+				},
 				"inputs": []map[string]any{
 					{
 						"type":    "benchmark",
@@ -378,6 +387,9 @@ func TestReceiverStatus(t *testing.T) {
 			config := Config{
 				Beatconfig: map[string]any{
 					"filebeat": map[string]any{
+						"registry": map[string]any{
+							"type": "memlog",
+						},
 						"inputs": []map[string]any{
 							{
 								"id":      benchmarkInputId,
@@ -572,6 +584,9 @@ func TestConsumeContract(t *testing.T) {
 		Beatconfig: map[string]any{
 			"queue.mem.flush.timeout": "0s",
 			"filebeat": map[string]any{
+				"registry": map[string]any{
+					"type": "memlog",
+				},
 				"inputs": []map[string]any{
 					{
 						"type":    "filestream",
@@ -623,6 +638,9 @@ func TestReceiverHook(t *testing.T) {
 	cfg := Config{
 		Beatconfig: map[string]any{
 			"filebeat": map[string]any{
+				"registry": map[string]any{
+					"type": "memlog",
+				},
 				"inputs": []map[string]any{
 					{
 						"type":    "benchmark",

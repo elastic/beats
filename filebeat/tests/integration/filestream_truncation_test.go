@@ -55,6 +55,7 @@ queue.mem:
   flush:
     timeout: 1s
     min_events: 32
+filebeat.registry.type: memlog
 filebeat.registry.flush: 1s
 path.home: %s
 logging:
