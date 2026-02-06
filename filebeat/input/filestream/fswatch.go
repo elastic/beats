@@ -398,12 +398,12 @@ func defaultFileScannerConfig() fileScannerConfig {
 // It is able to exclude files and symlinks.
 type fileScanner struct {
 	smallFilesWarned atomic.Bool
-	paths       []string
-	cfg         fileScannerConfig
-	log         *logp.Logger
-	hasher      hash.Hash
-	readBuffer  []byte
-	gzipAllowed bool
+	paths            []string
+	cfg              fileScannerConfig
+	log              *logp.Logger
+	hasher           hash.Hash
+	readBuffer       []byte
+	gzipAllowed      bool
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, gzipAllowed bool) (*fileScanner, error) {
