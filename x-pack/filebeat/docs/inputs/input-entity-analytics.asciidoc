@@ -650,6 +650,7 @@ Enabling this option compromises security and should only be used for debugging.
 
 To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the
 filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+The path must point to a target in the azure-ad directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 [id="provider-jamf"]
 ==== Jamf Computer Management (`jamf`)
@@ -827,6 +828,7 @@ Enabling this option compromises security and should only be used for debugging.
 
 To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the
 filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+The path must point to a target in the jamf directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 [id="provider-okta"]
 ==== Okta User Identities (`okta`)
@@ -1162,6 +1164,7 @@ Enabling this option compromises security and should only be used for debugging.
 
 To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the
 filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+The path must point to a target in the okta directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 [float]
 ==== `tracer.maxsize`
