@@ -127,6 +127,15 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		}
 	}
 
+	br.beat.Manager.SetStopCallback(func() {
+		if c, ok := br.beat.Publisher.(io.Closer); ok {
+			if err := c.Close(); err != nil {
+				br.Logger.Errorf("error closing beat receiver publisher: %v", err)
+			}
+		}
+
+	})
+
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
 		// set beatreceiver status
 		groupReporter.UpdateStatus(status.Failed, err.Error())
@@ -138,18 +147,11 @@ func (br *BeatReceiver) Start(host component.Host) error {
 
 // BeatReceiver.Stop() stops beat receiver.
 func (br *BeatReceiver) Shutdown() error {
-	br.beater.Stop()
 
 	br.beat.Instrumentation.Tracer().Close()
 	proc := br.beat.GetProcessors()
 	if err := proc.Close(); err != nil {
 		br.beat.Info.Logger.Warnf("failed to close global processing: %s", err)
-	}
-
-	if c, ok := br.beat.Publisher.(io.Closer); ok {
-		if err := c.Close(); err != nil {
-			return fmt.Errorf("error closing beat receiver publisher: %w", err)
-		}
 	}
 
 	if err := br.stopMonitoring(); err != nil {
