@@ -841,6 +841,7 @@ To differentiate the trace files generated from different input instances, a pla
 filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. Setting
 `resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching
 the filename option to be deleted.
+The path must point to a target in the cel directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 [float]
 ==== `resource.tracer.maxsize`
