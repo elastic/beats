@@ -90,7 +90,7 @@ type PythonTestArgs struct {
 }
 
 func makePythonTestArgs(name string) PythonTestArgs {
-	fileName := fmt.Sprintf("build/TEST-python-%s", strings.Replace(strings.ToLower(name), " ", "_", -1))
+	fileName := fmt.Sprintf("build/TEST-python-%s", strings.ReplaceAll(strings.ToLower(name), " ", "_"))
 
 	params := PythonTestArgs{
 		TestName:        name,
@@ -272,8 +272,16 @@ func PythonVirtualenv(forceCreate bool) (string, error) {
 		return "", err
 	}
 
-	// Execute pip to install the dependencies.
-	args := []string{"install"}
+	// Pin setuptools to a version that still includes pkg_resources
+	// (removed in setuptools >=78). The docker-compose dependency is built
+	// from source and its setup.py imports pkg_resources.
+	if err := sh.RunWith(env, pip, "install", "setuptools<78"); err != nil {
+		return "", err
+	}
+
+	// Execute pip to install the dependencies. Use --no-build-isolation so
+	// that packages built from source use the virtualenv's setuptools.
+	args := []string{"install", "--no-build-isolation"}
 	if !mg.Verbose() {
 		args = append(args, "--quiet")
 	}
