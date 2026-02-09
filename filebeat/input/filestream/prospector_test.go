@@ -24,6 +24,8 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -35,6 +37,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
@@ -794,7 +797,7 @@ func (m *mockStoreUpdater) UpdateIdentifiers(updater func(v loginp.Value) (strin
 }
 
 // TakeOver is a noop on this mock
-func (m *mockStoreUpdater) TakeOver(func(v loginp.Value) (string, any)) {}
+func (m *mockStoreUpdater) TakeOver(func(v loginp.TakeOverState) (string, any)) {}
 
 type renamedPathIdentifier struct {
 	fileIdentifier
@@ -905,4 +908,339 @@ func createTestFileDescriptorWithInfo(fi fs.FileInfo) loginp.FileDescriptor {
 		Fingerprint: "fingerprint",
 		Filename:    "filename",
 	}
+}
+
+func TestFileProspector_previousID(t *testing.T) {
+	testFileInfo := &testFileInfo{
+		name: "/path/to/file",
+		size: 100,
+		time: time.Now(),
+		sys:  nil,
+	}
+	fd := loginp.FileDescriptor{
+		Filename:    "/path/to/file",
+		Info:        file.ExtendFileInfo(testFileInfo),
+		Fingerprint: "test-fingerprint",
+	}
+
+	tests := map[string]struct {
+		takeOverConfig loginp.TakeOverConfig
+		identifierName string
+		takeOverState  loginp.TakeOverState
+		validateID     func(t *testing.T, id string)
+	}{
+		"from filestream - native identifier": {
+			takeOverConfig: loginp.TakeOverConfig{
+				Enabled: true,
+				FromIDs: []string{"some-id"},
+			},
+			identifierName: nativeName,
+			takeOverState: loginp.TakeOverState{
+				Source:         "/path/to/file",
+				IdentifierName: nativeName,
+			},
+			validateID: func(t *testing.T, id string) {
+				// native identifier is OS specific, so we cannot hard code the expected result
+				assert.Contains(t, id, nativeName+identitySep, "ID should contain native identifier prefix")
+				assert.Contains(t, id, fd.Info.GetOSState().Identifier(), "ID should contain OS identifier")
+			},
+		},
+		"from filestream - path identifier": {
+			takeOverConfig: loginp.TakeOverConfig{
+				Enabled: true,
+				FromIDs: []string{"some-id"},
+			},
+			identifierName: pathName,
+			takeOverState: loginp.TakeOverState{
+				Source:         "/path/to/file",
+				IdentifierName: pathName,
+			},
+			validateID: func(t *testing.T, id string) {
+				assert.Equal(t, pathName+identitySep+"/path/to/file", id, "ID should match path identifier format")
+			},
+		},
+		"from filestream input with stderr stream": {
+			takeOverConfig: loginp.TakeOverConfig{
+				Enabled: true,
+				FromIDs: []string{"some-id"},
+				Stream:  "stderr",
+			},
+			identifierName: nativeName,
+			takeOverState: loginp.TakeOverState{
+				Source: "/path/to/file",
+				Key:    "test-key",
+			},
+			validateID: func(t *testing.T, id string) {
+				assert.Contains(t, id, nativeName+identitySep, "ID should contain native identifier prefix")
+				if !strings.HasSuffix(id, "stderr") {
+					t.Errorf("ID must end in 'stderr' (take_over.stream), got: %s", id)
+				}
+				assert.NotEqual(t, nativeName+identitySep+fd.Info.GetOSState().Identifier(), id, "ID with stream metadata should have hash prefix")
+			},
+		},
+		"from log input - native identifier": {
+			takeOverConfig: loginp.TakeOverConfig{
+				Enabled: true,
+			},
+			identifierName: nativeName,
+			takeOverState: loginp.TakeOverState{
+				Source:      "/path/to/file",
+				FileStateOS: fd.Info.GetOSState(),
+			},
+			validateID: func(t *testing.T, id string) {
+				assert.Contains(t, id, nativeName+identitySep, "ID should contain native identifier prefix")
+				assert.Contains(t, id, fd.Info.GetOSState().Identifier(), "ID should contain OS identifier")
+			},
+		},
+		"from log input - path identifier": {
+			takeOverConfig: loginp.TakeOverConfig{
+				Enabled: true,
+			},
+			identifierName: pathName,
+			takeOverState: loginp.TakeOverState{
+				Source:      "/path/to/file",
+				FileStateOS: fd.Info.GetOSState(),
+				Key:         "test-key",
+			},
+			validateID: func(t *testing.T, id string) {
+				assert.Equal(t, pathName+identitySep+"/path/to/file", id, "ID should match path identifier format")
+			},
+		},
+		"from log input - native with stdout stream": {
+			takeOverConfig: loginp.TakeOverConfig{
+				Enabled: true,
+				Stream:  "stdout",
+			},
+			identifierName: nativeName,
+			takeOverState: loginp.TakeOverState{
+				Source:      "/path/to/file",
+				FileStateOS: fd.Info.GetOSState(),
+			},
+			validateID: func(t *testing.T, id string) {
+				assert.Contains(t, id, nativeName+identitySep, "ID should contain native identifier prefix")
+				assert.Containsf(t, id, "1b59052b95e61943", "ID should contain the meta hash '1b59052b95e61943'")
+				assert.NotEqual(t, nativeName+identitySep+fd.Info.GetOSState().Identifier(), id, "ID with stream metadata should have hash prefix")
+			},
+		},
+		"from log input with stderr stream": {
+			takeOverConfig: loginp.TakeOverConfig{
+				Enabled: true,
+				Stream:  "stderr",
+			},
+			identifierName: nativeName,
+			takeOverState: loginp.TakeOverState{
+				Source:      "/path/to/file",
+				FileStateOS: fd.Info.GetOSState(),
+				Key:         "test-key",
+			},
+			validateID: func(t *testing.T, id string) {
+				assert.Contains(t, id, nativeName+identitySep, "ID should contain native identifier prefix")
+				assert.Containsf(t, id, "d35e05a633229937", "ID should contain the meta hash 'd35e05a633229937'")
+				assert.NotEqual(t, nativeName+identitySep+fd.Info.GetOSState().Identifier(), id, "ID with stream metadata should have hash prefix")
+			},
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			p := &fileProspector{
+				logger:                logp.NewNopLogger(),
+				takeOver:              tc.takeOverConfig,
+				filestreamIdentifiers: filestreamFileIdentifiers(logp.NewNopLogger(), tc.takeOverConfig.Stream),
+				logIdentifiers:        logFileIdentifiers(logp.NewNopLogger()),
+			}
+
+			id := p.previousID(tc.identifierName, fd, tc.takeOverState)
+			tc.validateID(t, id)
+		})
+	}
+}
+
+func TestFileProspector_takeOverFn(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("not supported on Windows because inode marker is used")
+	}
+	testFileInfo := &testFileInfo{
+		name: "/path/to/file",
+		size: 100,
+		time: time.Now(),
+		sys:  nil,
+	}
+	fd := loginp.FileDescriptor{
+		Filename:    "/path/to/file",
+		Info:        file.ExtendFileInfo(testFileInfo),
+		Fingerprint: "test-fingerprint",
+	}
+
+	tests := map[string]struct {
+		identifier     fileIdentifier
+		takeOverState  loginp.TakeOverState
+		files          map[string]loginp.FileDescriptor
+		newIDFunc      func(loginp.Source) string
+		expectedNewKey string
+		expectedMeta   any
+		shouldTakeOver bool
+	}{
+		"file not on disk": {
+			identifier: mustIdentifier(t, pathName),
+			takeOverState: loginp.TakeOverState{
+				Source:         "/missing/file",
+				IdentifierName: pathName,
+				Key:            "filestream::test-id::path::/missing/file",
+			},
+			files:          map[string]loginp.FileDescriptor{},
+			newIDFunc:      func(s loginp.Source) string { return "filestream::new-id::" + s.Name() },
+			expectedNewKey: "",
+			expectedMeta: fileMeta{
+				Source:         "/missing/file",
+				IdentifierName: pathName,
+			},
+			shouldTakeOver: false,
+		},
+		"unsupported old identifier": {
+			identifier: mustInodeMarker(t),
+			takeOverState: loginp.TakeOverState{
+				Source:         "/path/to/file",
+				IdentifierName: inodeMarkerName,
+				Key:            "filestream::test-id::inode_marker::/path/to/file",
+			},
+			files: map[string]loginp.FileDescriptor{
+				"/path/to/file": fd,
+			},
+			newIDFunc:      func(s loginp.Source) string { return "filestream::new-id::" + s.Name() },
+			expectedNewKey: "",
+			expectedMeta:   nil,
+			shouldTakeOver: false,
+		},
+		"registry key format invalid": {
+			identifier: mustIdentifier(t, pathName),
+			takeOverState: loginp.TakeOverState{
+				Source:         "/path/to/file",
+				IdentifierName: pathName,
+				Key:            "invalid::format",
+			},
+			files: map[string]loginp.FileDescriptor{
+				"/path/to/file": fd,
+			},
+			newIDFunc:      func(s loginp.Source) string { return "filestream::new-id::" + s.Name() },
+			expectedNewKey: "",
+			expectedMeta: fileMeta{
+				Source:         "/path/to/file",
+				IdentifierName: pathName,
+			},
+			shouldTakeOver: false,
+		},
+		"previous ID does not match registry ID": {
+			identifier: mustIdentifier(t, pathName),
+			takeOverState: loginp.TakeOverState{
+				Source:         "/path/to/file",
+				IdentifierName: pathName,
+				Key:            "filestream::test-id::path::/different/path",
+			},
+			files: map[string]loginp.FileDescriptor{
+				"/path/to/file": fd,
+			},
+			newIDFunc:      func(s loginp.Source) string { return "filestream::new-id::" + s.Name() },
+			expectedNewKey: "",
+			expectedMeta: fileMeta{
+				Source:         "/path/to/file",
+				IdentifierName: pathName,
+			},
+			shouldTakeOver: false,
+		},
+		"successful takeover - native to fingerprint": {
+			identifier: mustIdentifier(t, fingerprintName),
+			takeOverState: loginp.TakeOverState{
+				Source:         "/path/to/file",
+				IdentifierName: nativeName,
+				Key:            "filestream::test-id::native::" + fd.Info.GetOSState().Identifier(),
+				FileStateOS:    fd.Info.GetOSState(),
+			},
+			files: map[string]loginp.FileDescriptor{
+				"/path/to/file": fd,
+			},
+			newIDFunc: func(s loginp.Source) string { return "filestream::new-id::" + s.Name() },
+			expectedNewKey: func() string {
+				fingerprintIdent := mustIdentifier(t, fingerprintName)
+				source := fingerprintIdent.GetSource(loginp.FSEvent{NewPath: "/path/to/file", Descriptor: fd})
+				return "filestream::new-id::" + source.Name()
+			}(),
+			expectedMeta: fileMeta{
+				Source:         "/path/to/file",
+				IdentifierName: fingerprintName,
+			},
+			shouldTakeOver: true,
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			p := &fileProspector{
+				logger:     logp.NewNopLogger(),
+				identifier: tc.identifier,
+				takeOver: loginp.TakeOverConfig{
+					Enabled: true,
+				},
+				filestreamIdentifiers: filestreamFileIdentifiers(logp.NewNopLogger(), ""),
+				logIdentifiers:        logFileIdentifiers(logp.NewNopLogger()),
+			}
+
+			newKey, meta := p.takeOverFn(tc.takeOverState, tc.files, tc.newIDFunc)
+
+			if tc.shouldTakeOver {
+				assert.Equal(t, tc.expectedNewKey, newKey, "new key does not match expected")
+				assert.Equal(t, tc.expectedMeta, meta, "returned meta does not match expected")
+			} else {
+				assert.Empty(t, newKey, "expected empty key for non-takeover")
+				if tc.expectedMeta == nil {
+					assert.Nil(t, meta, "expected nil meta")
+				} else {
+					assert.Equal(t, tc.expectedMeta, meta, "returned meta does not match expected")
+				}
+			}
+		})
+	}
+}
+
+// mustIdentifier creates a fileIdentifier or fails the test
+func mustIdentifier(t *testing.T, name string) fileIdentifier {
+	t.Helper()
+	factory, ok := identifierFactories[name]
+	require.True(t, ok, "identifier factory not found: %s", name)
+
+	identifier, err := factory(nil, logp.NewNopLogger())
+	require.NoError(t, err, "failed to create identifier: %s", name)
+
+	return identifier
+}
+
+func mustInodeMarker(t *testing.T) fileIdentifier {
+	f, err := os.CreateTemp(t.TempDir(), "inode-marker")
+	if err != nil {
+		t.Fatalf("cannot create inode marker: %s", err)
+	}
+
+	fullPath, err := filepath.Abs(f.Name())
+	if err != nil {
+		t.Fatalf("cannot get full path from file: %s", err)
+	}
+
+	if _, err := fmt.Fprint(f, "foo-bar"); err != nil {
+		t.Fatalf("cannot write to inode-marker file: %s", err)
+	}
+
+	if err := f.Sync(); err != nil {
+		t.Fatalf("cannot sync file: %s", err)
+	}
+
+	if err := f.Close(); err != nil {
+		t.Fatalf("cannot close file: %s", err)
+	}
+
+	cfg := conf.MustNewConfigFrom("path: " + fullPath)
+	identifier, err := newINodeMarkerIdentifier(cfg, logp.NewNopLogger())
+	if err != nil {
+		t.Fatalf("cannot create inode marker identifier: %s", err)
+	}
+	return identifier
 }

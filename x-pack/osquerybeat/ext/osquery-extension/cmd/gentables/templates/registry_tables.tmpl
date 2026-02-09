@@ -1,0 +1,49 @@
+{{.Header}}
+package generated
+
+{{- if .HasTables}}
+import (
+{{- range .ImplImports}}
+	_ "{{.}}"
+{{- end}}
+
+	"github.com/osquery/osquery-go"
+	"github.com/osquery/osquery-go/plugin/table"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+{{- range .TableImports}}
+	{{.Alias}} "{{.Path}}"
+{{- end}}
+)
+{{- else}}
+import (
+	"github.com/osquery/osquery-go"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+)
+{{- end}}
+
+// RegisterTables registers all generated tables with the osquery extension server.
+// This function is called from main.go after all init() functions have run.
+{{- if not .HasTables}}
+// No tables are defined for this platform.
+{{- end}}
+func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
+{{- if not .HasTables}}
+	// No tables to register for this platform
+{{- else}}
+{{- range .Entries}}
+	{
+		// {{.Description}}
+		genFunc, err := {{.PackageAlias}}.GetGenerateFunc(log)
+		if err != nil {
+			log.Errorf("Failed to get generate function for {{.Name}}: %v", err)
+		} else {
+			server.RegisterPlugin(table.NewPlugin("{{.Name}}", {{.PackageAlias}}.Columns(), genFunc))
+			log.Infof("Registered table: {{.Name}}")
+		}
+	}
+
+{{- end}}
+{{- end}}
+}

@@ -1,0 +1,67 @@
+type: table
+name: sample_recent_files
+description: Windows Recent Files tracking user file access history
+platforms:
+  - windows
+group: jumplists
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/sampleimpl
+
+# Reference shared types - notice we reuse UserProfile and LnkMetadata
+# but NOT ApplicationID (different from jumplists)
+shared_types:
+  - UserProfile
+  - LnkMetadata
+  - FileTimestamps
+
+columns:
+  # Shared types
+  - name: UserProfile
+    type: EMBEDDED
+    shared_type: UserProfile
+
+  - name: LnkMetadata
+    type: EMBEDDED
+    shared_type: LnkMetadata
+
+  - name: FileTimestamps
+    type: EMBEDDED
+    shared_type: FileTimestamps
+
+  # Table-specific columns
+  - name: lnk_file_path
+    type: TEXT
+    description: Path to the LNK file in the Recent folder
+
+  - name: target_exists
+    type: INTEGER
+    description: Whether the target file still exists (1=yes, 0=no)
+
+documentation:
+  description: |
+    Windows maintains LNK files in the Recent folder to track recently accessed
+    files for each user. This table parses these LNK files to provide forensic
+    information about file access history.
+    
+    This table shares the UserProfile and LnkMetadata types with sample_jumplists,
+    demonstrating how shared types enable consistent column definitions across
+    related tables.
+
+  examples:
+    - title: Find recent files accessed by a user
+      query: |
+        SELECT username, local_path, modified_time
+        FROM sample_recent_files
+        WHERE username = 'john.doe'
+        ORDER BY modified_time DESC;
+
+    - title: Find files accessed from removable drives
+      query: |
+        SELECT username, local_path, volume_serial_number, volume_label
+        FROM sample_recent_files
+        WHERE volume_label LIKE '%USB%';
+
+  notes:
+    - Shares UserProfile and LnkMetadata types with sample_jumplists table
+    - Uses FileTimestamps for standard timestamp fields
+    - LNK files persist even after the target file is deleted
