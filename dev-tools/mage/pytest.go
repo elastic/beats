@@ -90,7 +90,7 @@ type PythonTestArgs struct {
 }
 
 func makePythonTestArgs(name string) PythonTestArgs {
-	fileName := fmt.Sprintf("build/TEST-python-%s", strings.Replace(strings.ToLower(name), " ", "_", -1))
+	fileName := fmt.Sprintf("build/TEST-python-%s", strings.ReplaceAll(strings.ToLower(name), " ", "_"))
 
 	params := PythonTestArgs{
 		TestName:        name,
