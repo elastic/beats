@@ -273,7 +273,8 @@ func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) 
 	// on resubscribe errors we need to close the signal event handle
 	l.closeSignalEvent()
 
-	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
+	const initialSignaled = 1
+	signalEvent, err := windows.CreateEvent(nil, 0, initialSignaled, nil)
 	if err != nil {
 		return win.NilHandle, err
 	}

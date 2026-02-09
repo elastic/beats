@@ -123,7 +123,7 @@ runLoop:
 
 		log.Debug("windows event log opened successfully")
 
-		// read loop
+		// read loop: wait for signal (or timeout), then drain the channel
 		for cancelCtx.Err() == nil {
 			reporter.UpdateStatus(status.Running, fmt.Sprintf("Reading from %s", api.Channel()))
 			if waitErr := api.WaitForEvents(cancelCtx); waitErr != nil {
@@ -136,35 +136,38 @@ runLoop:
 				}
 				return waitErr
 			}
-			records, readErr := api.Read()
-			if readErr != nil {
-				if readErrHandler.backoff(cancelCtx, readErr) {
-					continue runLoop
+			// Empty the channel on each signal (or after timeout): read until no more records
+			for {
+				records, readErr := api.Read()
+				if readErr != nil {
+					if readErrHandler.backoff(cancelCtx, readErr) {
+						continue runLoop
+					}
+
+					if errors.Is(readErr, io.EOF) {
+						log.Debugw("end of Winlog event stream reached", "error", readErr)
+						break runLoop
+					}
+
+					//nolint:nilerr // only log error if we are not shutting down
+					if cancelCtx.Err() != nil {
+						break runLoop
+					}
+
+					reporter.UpdateStatus(status.Failed, fmt.Sprintf("Failed to read from %s: %v", api.Channel(), readErr))
+					log.Errorw("error occurred while reading from Windows Event Log", "error", readErr)
+
+					return readErr
 				}
 
-				if errors.Is(readErr, io.EOF) {
-					log.Debugw("end of Winlog event stream reached", "error", readErr)
-					break runLoop
+				if len(records) == 0 {
+					break // drained, go back to WaitForEvents
 				}
 
-				//nolint:nilerr // only log error if we are not shutting down
-				if cancelCtx.Err() != nil {
-					break runLoop
+				if err := publisher.Publish(records); err != nil {
+					reporter.UpdateStatus(status.Failed, fmt.Sprintf("Publisher error: %v", err))
+					return err
 				}
-
-				reporter.UpdateStatus(status.Failed, fmt.Sprintf("Failed to read from %s: %v", api.Channel(), readErr))
-				log.Errorw("error occurred while reading from Windows Event Log", "error", readErr)
-
-				return readErr
-			}
-
-			if len(records) == 0 {
-				continue
-			}
-
-			if err := publisher.Publish(records); err != nil {
-				reporter.UpdateStatus(status.Failed, fmt.Sprintf("Publisher error: %v", err))
-				return err
 			}
 		}
 	}
