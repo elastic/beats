@@ -24,6 +24,11 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+// NewTracerProvider constructs and configures an OpenTelemetry TracerProvider
+// for a given input.
+//
+// It loads exporter configuration from environment variables and adds the
+// provided resource attributes in a tracer provider option.
 func NewTracerProvider(ctx context.Context, resourceAttributes []attribute.KeyValue, inputName string) (*sdktrace.TracerProvider, error) {
 	cfg, err := newExporterCfgFromEnv(inputName)
 	if err != nil {
