@@ -5,6 +5,7 @@
 package httplog
 
 import (
+	"runtime"
 	"testing"
 )
 
@@ -215,6 +216,10 @@ var symlinkTests = []struct {
 }
 
 func TestResolveSymlinks(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("tested only with Unix-compatible paths")
+		return
+	}
 	for _, test := range symlinkTests {
 		t.Run(test.path, func(t *testing.T) {
 			got, err := resolveSymlinks(test.path)
