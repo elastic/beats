@@ -250,7 +250,8 @@ class ComposeMixin(object):
         def positivehash(x):
             return hash(x) % ((sys.maxsize + 1) * 2)
 
-        return "%s_%X" % (basename, positivehash(frozenset(cls.COMPOSE_ENV.items())))
+        # Docker Compose V2 requires project names to be lowercase.
+        return ("%s_%x" % (basename, positivehash(frozenset(cls.COMPOSE_ENV.items())))).lower()
 
     @classmethod
     def compose_project(cls):
