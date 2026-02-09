@@ -203,7 +203,7 @@ func (e *inMemoryExporter) Export(_ context.Context, metrics *metricdata.Resourc
 	return nil
 }
 
-func (e *inMemoryExporter) Shutdown(context.Context) error   { return nil }
+func (e *inMemoryExporter) Shutdown(context.Context) error     { return nil }
 func (e *inMemoryExporter) ForceFlush(_ context.Context) error { return nil }
 
 func (e *inMemoryExporter) Temporality(_ sdkmetric.InstrumentKind) metricdata.Temporality {
