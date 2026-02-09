@@ -82,7 +82,7 @@
           type: long
           format: bytes
           description: >
-            Used memory by the Lua engine. Deprecated in Redis 7.0; use vm.eval instead.
+            Memory used by the Lua engine. Deprecated in Redis 7.0; use vm.eval instead.
         - name: used.scripts
           type: long
           format: bytes
