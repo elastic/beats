@@ -68,9 +68,9 @@ func (d *DockerIntegrationTester) Use(dir string) (bool, error) {
 	return false, nil
 }
 
-// HasRequirements ensures that the required docker is installed.
+// HasRequirements ensures that docker and the docker compose plugin are installed.
 func (d *DockerIntegrationTester) HasRequirements() error {
-	if err := HaveDocker(); err != nil {
+	if err := HaveDockerCompose(); err != nil {
 		return err
 	}
 	return nil

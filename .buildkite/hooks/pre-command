@@ -28,6 +28,14 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \
   export BUILDKITE_ANALYTICS_TOKEN
 fi
 
+# Ensure docker compose plugin is available when Docker is installed.
+# The old standalone docker-compose binary is deprecated; all usage now
+# requires the "docker compose" CLI plugin.
+if command -v docker &>/dev/null && ! docker compose version &>/dev/null; then
+  echo "--- Installing docker-compose-plugin"
+  sudo apt-get update -q -y && sudo apt-get install -q -y docker-compose-plugin
+fi
+
 CPU_ARCH=$(uname -m)
 PLATFORM_TYPE=$(uname)
 
