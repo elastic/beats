@@ -192,8 +192,8 @@ func newOTELCELMetrics(log *logp.Logger,
 
 		// By default, we force the use of base2_exponential_bucket_histogram for
 		// efficiency. However, some backends (like Elastic APM Server) do not
-		// support them yet. We allow users to opt-out and use the default
-		// explicit_bucket_histogram by setting
+		// support them yet. So we allow users to opt-out and use the default
+		// explicit_bucket_histogram only by setting
 		// OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=explicit_bucket_histogram.
 		//
 		// Ref: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/otlp/
@@ -212,7 +212,7 @@ func newOTELCELMetrics(log *logp.Logger,
 					},
 				},
 			)
-			views = append(views, exponentialView)
+			views = []sdkmetric.View{exponentialView}
 		}
 
 		sdkMeterProvider := sdkmetric.NewMeterProvider(
