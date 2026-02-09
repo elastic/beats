@@ -12,6 +12,8 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -40,6 +42,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/elastic/go-elasticsearch/v8/esapi"
 	"github.com/elastic/mock-es/pkg/api"
 )
 
@@ -1429,6 +1432,226 @@ exporters:
 	}
 
 	oteltest.AssertMapsEqual(t, receiverDoc, processorDoc, ignoredFields, "expected documents to be equal")
+}
+
+func TestNoDuplicates(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	tmpdir := t.TempDir()
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbOtelIndex := "logs-integration-" + namespace
+
+	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
+
+	otelCfgFile := `receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-input-id
+          enabled: true
+          paths:
+            - %s
+    output:
+      otelconsumer:
+    processors:
+      - add_host_metadata: ~
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
+      - add_kubernetes_metadata: ~
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    path.home: %s
+    http.enabled: true
+    http.host: localhost
+    http.port: %d
+    management.otel.enabled: true
+exporters:
+  elasticsearch/log:
+    endpoints:
+      - http://localhost:9200
+    compression: none
+    user: admin
+    password: testing
+    logs_index: %s
+    tls:
+      insecure_skip_verify: true
+    sending_queue:
+      enabled: true
+      batch:
+        flush_timeout: 1s
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - elasticsearch/log
+`
+	logFilePath := filepath.Join(tmpdir, "log.log")
+	writenLines := make([]string, 0)
+	stopChan := make(chan struct{}, 1)
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		// create a log file and keep writing to it until the test finishes.
+		// This is to ensure that the filebeat receiver is continuously processing
+		// new lines and creating new events, which increases the chances of
+		// hitting edge cases that could cause duplicates on restart.
+		defer wg.Done()
+		logFile, err := os.Create(logFilePath)
+		if err != nil {
+			require.NoErrorf(t, err, "could not create file '%s'", logFilePath)
+		}
+		defer logFile.Close()
+
+		ticker := time.NewTicker(50 * time.Millisecond)
+		defer ticker.Stop()
+		i := 0
+		for range ticker.C {
+			select {
+			case <-stopChan:
+				return
+			default:
+			}
+			msg := fmt.Sprintf("This is spam message %d: %v", i, uuid.Must(uuid.NewV4()))
+			_, err := logFile.Write([]byte(msg + "\n"))
+			require.NoErrorf(t, err, "failed to write line %d to temp file", i)
+			writenLines = append(writenLines, msg)
+			i++
+		}
+	}()
+	t.Cleanup(func() {
+		close(stopChan)
+		wg.Wait()
+	})
+	collector := oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
+
+	require.EventuallyWithT(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err := estools.GetAllLogsForIndexWithContext(findCtx, integration.GetESClient(t, "http"), ".ds-"+fbOtelIndex+"*")
+			assert.NoError(ct, err)
+			assert.Greater(ct, otelDocs.Hits.Total.Value, 100)
+		},
+		1*time.Minute, 1*time.Second, "expected more than 0 events, got none",
+	)
+
+	collector.Shutdown()
+
+	// wait for 8888 port to be free (an indication that previous collector has exited)
+	require.Eventually(t,
+		func() bool {
+			ln, err := net.Listen("tcp", "localhost:8888")
+			if err != nil {
+				return false
+			}
+			ln.Close()
+			return true
+		},
+		10*time.Second,
+		100*time.Millisecond,
+		"port 8888 never became available",
+	)
+
+	// restart the collector process
+	collector = oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
+	t.Cleanup(func() {
+		collector.Shutdown()
+	})
+
+	// wait for more docs to be published.
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err := estools.GetAllLogsForIndexWithContext(findCtx, integration.GetESClient(t, "http"), ".ds-"+fbOtelIndex+"*")
+			assert.NoError(ct, err)
+			assert.Greater(ct, otelDocs.Hits.Total.Value, 300)
+		},
+		1*time.Minute, 1*time.Second, "expected more than 300 events, got less",
+	)
+	checkDuplicates(t, ".ds-"+fbOtelIndex+"*")
+}
+
+func checkDuplicates(t *testing.T, index string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// duplicate check
+	rawQuery := map[string]any{
+		"runtime_mappings": map[string]any{
+			"log.offset": map[string]any{
+				"type": "keyword",
+			},
+			"log.file.fingerprint": map[string]any{
+				"type": "keyword",
+			},
+		},
+		"query": map[string]any{
+			"bool": map[string]any{
+				"must": []map[string]any{
+					{"match": map[string]any{"_index": index}},
+				},
+			},
+		},
+		"aggs": map[string]any{
+			"duplicates": map[string]any{
+				"multi_terms": map[string]any{
+					"size":          500,
+					"min_doc_count": 2,
+					"terms": []map[string]any{
+						{"field": "log.file.fingerprint"},
+						{"field": "log.offset"},
+					},
+				},
+			},
+		},
+	}
+	var buf bytes.Buffer
+	err := json.NewEncoder(&buf).Encode(rawQuery)
+	require.NoError(t, err)
+
+	es := esapi.New(integration.GetESClient(t, "http"))
+	res, err := es.Search(
+		es.Search.WithIndex(index),
+		es.Search.WithSize(0),
+		es.Search.WithBody(&buf),
+		es.Search.WithPretty(),
+		es.Search.WithContext(ctx),
+	)
+	require.NoError(t, err)
+	require.Falsef(t, (res.StatusCode >= http.StatusMultipleChoices || res.StatusCode < http.StatusOK), "status should be 2xx was: %d", res.StatusCode)
+	resultBuf, err := io.ReadAll(res.Body)
+	require.NoError(t, err)
+
+	aggResults := map[string]any{}
+	err = json.Unmarshal(resultBuf, &aggResults)
+	require.NoError(t, err)
+	aggs, ok := aggResults["aggregations"].(map[string]any)
+	require.Truef(t, ok, "'aggregations' wasn't a map[string]any, result was %s", string(resultBuf))
+	dups, ok := aggs["duplicates"].(map[string]any)
+	require.Truef(t, ok, "'duplicates' wasn't a map[string]any, result was %s", string(resultBuf))
+	buckets, ok := dups["buckets"].([]any)
+	require.Truef(t, ok, "'buckets' wasn't a []any, result was %s", string(resultBuf))
+
+	hits, ok := aggResults["hits"].(map[string]any)
+	require.Truef(t, ok, "'hits' wasn't a map[string]any, result was %s", string(resultBuf))
+	total, ok := hits["total"].(map[string]any)
+	require.Truef(t, ok, "'total' wasn't a map[string]any, result was %s", string(resultBuf))
+	value, ok := total["value"].(float64)
+	require.Truef(t, ok, "'total' wasn't an int, result was %s", string(resultBuf))
+
+	require.Equalf(t, 0, len(buckets), "len(buckets): %d, hits.total.value: %d, result was %s", len(buckets), value, string(resultBuf))
 }
 
 // setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
