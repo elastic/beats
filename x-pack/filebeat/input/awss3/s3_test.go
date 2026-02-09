@@ -569,22 +569,7 @@ func TestCreateS3API(t *testing.T) {
 		require.Equal(t, cfg.RegionName, input.awsConfig.Region)
 	})
 
-	t.Run("non-AWS bucket without region", func(t *testing.T) {
-		ctx := context.Background()
-		cfg := config{
-			NonAWSBucketName: "my-bucket",
-		}
-		input := &s3PollerInput{
-			config:    cfg,
-			awsConfig: aws.Config{},
-		}
-
-		api, err := input.createS3API(ctx)
-		require.Error(t, err)
-		require.Nil(t, api)
-		require.Contains(t, err.Error(), "region must be configured when using non_aws_bucket_name")
-	})
-
+	// "non-AWS bucket without region" is invalid and rejected by config.Validate();
 	t.Run("non-AWS bucket with configured region, aws region and configured region mismatch", func(t *testing.T) {
 		ctx := context.Background()
 		cfg := config{

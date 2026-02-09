@@ -21,12 +21,9 @@ func (in *s3PollerInput) createS3API(ctx context.Context) (*awsS3API, error) {
 	var regionName string
 	var err error
 
-	// For non-AWS buckets: skip region detection and use the user-configured region
+	// For non-AWS buckets: use the user-configured region (validated in config.Validate).
 	if in.config.NonAWSBucketName != "" {
 		regionName = in.config.RegionName
-		if regionName == "" {
-			return nil, fmt.Errorf("region must be configured when using non_aws_bucket_name")
-		}
 	} else {
 		// For AWS buckets: call getRegionForBucket for AWS buckets to determine the correct region
 		// even if the region is already configured in in.config.RegionName, it will be ignored
