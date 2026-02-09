@@ -1,4 +1,0 @@
-kind: bug-fix
-summary: verify and cap memcache udp fragment counts
-component: packetbeat
-PR URL: https://github.com/elastic/beats/pull/47874
