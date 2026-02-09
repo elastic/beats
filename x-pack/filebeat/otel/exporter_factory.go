@@ -106,8 +106,8 @@ func NewMetricsExporterFactory(exporterOptions MetricExporterOptions) *MetricsEx
 // This is used for testing.
 func (ef *MetricsExporterFactory) SetGlobalMetricsExporter(exporter sdkmetric.Exporter) {
 	ef.lock.Lock()
-	defer ef.lock.Unlock()
 	ef.globalMetricsExporter = exporter
+	ef.lock.Unlock()
 }
 
 // GetExporter returns a metrics exporter based on the current environment

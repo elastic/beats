@@ -194,14 +194,16 @@ type inMemoryExporter struct {
 	metrics []metricdata.ResourceMetrics
 }
 
+var _ sdkmetric.Exporter = (*inMemoryExporter)(nil)
+
 func (e *inMemoryExporter) Export(_ context.Context, metrics *metricdata.ResourceMetrics) error {
 	e.mu.Lock()
-	defer e.mu.Unlock()
 	e.metrics = append(e.metrics, *metrics)
+	e.mu.Unlock()
 	return nil
 }
 
-func (e *inMemoryExporter) Shutdown(_ context.Context) error   { return nil }
+func (e *inMemoryExporter) Shutdown(context.Context) error   { return nil }
 func (e *inMemoryExporter) ForceFlush(_ context.Context) error { return nil }
 
 func (e *inMemoryExporter) Temporality(_ sdkmetric.InstrumentKind) metricdata.Temporality {
