@@ -30,7 +30,9 @@ env:
 # Concurrency definition
 CONCURRENCY_GROUP: "orka-concurrency-group"
 CONCURRENCY_COUNT: 10
-CONCURRENCY_METHOD: eager
+  CONCURRENCY_GROUP: "orka-concurrency-group"
+  CONCURRENCY_COUNT: 10
+  CONCURRENCY_METHOD: eager
 
 # This section is used to define the plugins that will be used in the pipeline.
 # See https://buildkite.com/docs/pipelines/integrations/plugins/using#using-yaml-anchors-with-plugins
