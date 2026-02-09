@@ -1101,7 +1101,7 @@ Enabling this option compromises security and should only be used for debugging.
 
 ### `resource.tracer.filename` [_resource_tracer_filename]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. The path must point to a target in the cel directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 Setting `resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching the filename option to be deleted.
 

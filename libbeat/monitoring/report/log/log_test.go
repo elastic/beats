@@ -59,7 +59,7 @@ var (
 // Smoke test.
 func TestStartStop(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-	r, err := MakeReporter(beat.Info{Logger: logger}, conf.NewConfig())
+	r, err := MakeReporter(beat.Info{Logger: logger}, conf.NewConfig(), nil, nil, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +80,7 @@ func TestMakeDeltaSnapshot(t *testing.T) {
 func TestReporterLog(t *testing.T) {
 	logger, zapLogs := logptest.NewTestingLoggerWithObserver(t, "")
 
-	reporter := reporter{config: defaultConfig(), logger: logger.Named("monitoring")}
+	reporter := Reporter{config: defaultConfig(), logger: logger.Named("monitoring")}
 
 	reporter.logSnapshot(map[string]monitoring.FlatSnapshot{})
 	logs := zapLogs.TakeAll()
@@ -90,7 +90,7 @@ func TestReporterLog(t *testing.T) {
 
 	reporter.logSnapshot(
 		map[string]monitoring.FlatSnapshot{
-			"metrics": monitoring.FlatSnapshot{
+			"metrics": {
 				Bools: map[string]bool{
 					"running": true,
 				},
@@ -113,7 +113,7 @@ func TestReporterLog(t *testing.T) {
 	}
 }
 
-func assertMapHas(t *testing.T, m map[string]interface{}, key string, expectedValue interface{}) {
+func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any) {
 	t.Helper()
 	v, err := mapstr.M(m).GetValue(key)
 	if err != nil {

@@ -96,16 +96,15 @@ func TestNewReceiver(t *testing.T) {
 				return getFromSocket(t, &lastError, monitorSocket, "inputs")
 			}, "failed to connect to monitoring socket inputs endpoint, last error was: %s", &lastError)
 			assert.Condition(c, func() bool {
-				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
-					FilterMessageSnippet("add_host_metadata").
-					FilterMessageSnippet("add_cloud_metadata").
-					FilterMessageSnippet("add_docker_metadata").
-					FilterMessageSnippet("add_kubernetes_metadata").
-					Len() == 1
-				assert.True(c, processorsLoaded, "processors not loaded")
-				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
-				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
+				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").Len() > 0
+				assert.False(c, processorsLoaded, "processors loaded but none expected")
+				// Check that add_host_metadata enrichment is not done.
+				return assert.NotContains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
+			assert.Condition(c, func() bool {
+				metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
+				return assert.NotEmpty(t, metricsStarted.All(), "metrics logging not started")
+			}, "failed to check metrics logging")
 		},
 	})
 }
@@ -208,6 +207,11 @@ func TestMultipleReceivers(t *testing.T) {
 			assert.Equal(c, 1, r1StartLogs.Len(), "r1 should have a single start log")
 			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r2"))
 			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
+
+			r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
+			assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single start metrircs logging every 30s")
+			r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
+			assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single start metrircs logging every 30s")
 
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
