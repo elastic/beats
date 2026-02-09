@@ -1,0 +1,87 @@
+{{.CopyrightHeader}}{{.CodeGeneratedNotice}}{{.SourceLine}}{{.BuildTagLine}}package {{.PackageName}}
+
+import (
+	"context"
+	"errors"
+	"sync"
+{{if .NeedsTimeImport}}
+	"time"
+{{end}}
+
+	"github.com/osquery/osquery-go/plugin/table"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+{{if .NeedsSharedImport}}
+	"{{.SharedImport}}"
+{{end}}
+)
+
+var (
+	generateFunc func(context.Context, table.QueryContext, *logger.Logger) ([]Result, error)
+	registerOnce sync.Once
+)
+
+// RegisterGenerateFunc registers the generate function for this table.
+// This should be called once from the implementation package's init() function.
+func RegisterGenerateFunc(f func(context.Context, table.QueryContext, *logger.Logger) ([]Result, error)) {
+	registerOnce.Do(func() {
+		generateFunc = f
+	})
+}
+
+// GetGenerateFunc returns the osquery table.GenerateFunc for this table.
+// It wraps the registered generate function and handles marshaling of results.
+func GetGenerateFunc(log *logger.Logger) (table.GenerateFunc, error) {
+	if generateFunc == nil {
+		return nil, errors.New("generate function not registered for {{.Name}}")
+	}
+	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
+		results, err := generateFunc(ctx, queryContext, log)
+		if err != nil {
+			return nil, err
+		}
+
+		// Convert results to maps
+		rows := make([]map[string]string, len(results))
+		for i, result := range results {
+			row, err := encoding.MarshalToMap(result)
+			if err != nil {
+				return nil, err
+			}
+			rows[i] = row
+		}
+		return rows, nil
+	}, nil
+}
+
+// Result represents a row from the {{.Name}} table.
+type Result struct {
+{{- range .ResultFields }}
+{{- if .IsEmbedded }}
+{{- if .Comment }}
+	// {{.Comment}}
+{{- end }}
+	{{if .Pointer}}*{{end}}{{.TypeName}}
+{{- else }}
+	{{.Name}} {{.Type}} {{.Tag}} // {{.Description}}
+{{- end }}
+{{- end }}
+}
+
+// Columns returns the column definitions for the {{.Name}} table.
+// {{.Description}}
+func Columns() []table.ColumnDefinition {
+	// Generate column definitions automatically from the Result struct using reflection.
+	// This ensures the columns always match the struct definition and prevents drift.
+	columns, err := encoding.GenerateColumnDefinitions(Result{})
+	if err != nil {
+		// This should never happen in practice since we control the struct definition,
+		// but if it does, panic to catch it during development/testing.
+		panic("failed to generate {{.Name}} columns: " + err.Error())
+	}
+	return columns
+}
+
+// TableName is the name of the {{.Name}} table.
+const TableName = "{{.Name}}"
