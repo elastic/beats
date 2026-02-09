@@ -13,7 +13,7 @@ kind: other
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Bump golang version to 1.24.12.
+summary: Bump golang version to 1.24.13.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
