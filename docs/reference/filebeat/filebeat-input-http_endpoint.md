@@ -303,7 +303,7 @@ This option works together with `high_water_in_flight_bytes` and `low_water_in_f
 
 ### `high_water_in_flight_bytes` [_high_water_in_flight_bytes]
 
-The soft limit threshold for in-flight bytes. When in-flight bytes exceed this value, new requests are rejected with a 503 Service Unavailable response (with a `Retry-After` header). Once in-flight bytes drop below `low_water_in_flight_bytes`, new requests are accepted again.
+{applies_to}`stack: ga 9.2+` {applies_to}`stack: ga 8.19+` The soft limit threshold for in-flight bytes. When in-flight bytes exceed this value, new requests are rejected with a 503 Service Unavailable response (with a `Retry-After` header). Once in-flight bytes drop below `low_water_in_flight_bytes`, new requests are accepted again.
 
 This hysteresis mechanism prevents rapid oscillation between accepting and rejecting requests when the system is near capacity.
 
@@ -312,7 +312,7 @@ If not specified and `max_in_flight_bytes` is set, this defaults to 50% of `max_
 
 ### `low_water_in_flight_bytes` [_low_water_in_flight_bytes]
 
-The threshold below which new requests are accepted again after being rejected due to exceeding `high_water_in_flight_bytes`. This creates a hysteresis band that prevents rapid state transitions.
+{applies_to}`stack: ga 9.2+` {applies_to}`stack: ga 8.19+` The threshold below which new requests are accepted again after being rejected due to exceeding `high_water_in_flight_bytes`. This creates a hysteresis band that prevents rapid state transitions.
 
 If not specified and `max_in_flight_bytes` is set, this defaults to the lesser of 80% of `high_water_in_flight_bytes` or `high_water_in_flight_bytes` minus 64kB.
 
@@ -328,7 +328,7 @@ In Filebeat versions prior to 9.4.0, `max_body_bytes` was only enforced for HMAC
 
 ### `retry_after` [_retry_after]
 
-When a request is rejected due to exceeding `high_water_in_flight_bytes`, the response includes a `Retry-After` header specifying how many seconds the client should wait before retrying. The default value is 10 seconds.
+{applies_to}`stack: ga 9.2+` {applies_to}`stack: ga 8.19+` When a request is rejected due to exceeding `high_water_in_flight_bytes`, the response includes a `Retry-After` header specifying how many seconds the client should wait before retrying. The default value is 10 seconds.
 
 
 ### `program` [_program]
