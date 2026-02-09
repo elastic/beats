@@ -12,6 +12,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -164,6 +166,94 @@ func TestStoreOperations(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, loadedState)
 	assert.Equal(t, "67890", loadedState.CursorValue)
+}
+
+func TestNewStoreFromRegistry(t *testing.T) {
+	// Skip if running in short mode
+	if testing.Short() {
+		t.Skip("skipping store test in short mode")
+	}
+
+	tmpDir := t.TempDir()
+
+	// Create paths configuration pointing to temp dir
+	beatPaths := &paths.Path{
+		Home:   tmpDir,
+		Config: tmpDir,
+		Data:   tmpDir,
+		Logs:   tmpDir,
+	}
+
+	logger := logp.NewLogger("test-cursor-store-shared")
+	dataPath := beatPaths.Resolve(paths.Data, "sql-cursor")
+
+	// Create a shared memlog registry (simulating what ModuleBuilder does)
+	reg, err := memlog.New(logger.Named("memlog"), memlog.Settings{
+		Root:     dataPath,
+		FileMode: 0o600,
+	})
+	require.NoError(t, err)
+
+	registry := statestore.NewRegistry(reg)
+	defer registry.Close()
+
+	// Create two stores from the same registry (simulating 2 MetricSets)
+	store1, err := NewStoreFromRegistry(registry, logger.Named("store1"))
+	require.NoError(t, err)
+	require.NotNil(t, store1)
+
+	store2, err := NewStoreFromRegistry(registry, logger.Named("store2"))
+	require.NoError(t, err)
+	require.NotNil(t, store2)
+
+	// Store1 writes a key
+	testState := &State{
+		Version:     StateVersion,
+		CursorType:  CursorTypeInteger,
+		CursorValue: "100",
+		UpdatedAt:   time.Now().UTC(),
+	}
+	err = store1.Save("key-from-store1", testState)
+	require.NoError(t, err)
+
+	// Store2 can read the same key (shared backend)
+	loaded, err := store2.Load("key-from-store1")
+	require.NoError(t, err)
+	require.NotNil(t, loaded)
+	assert.Equal(t, "100", loaded.CursorValue)
+
+	// Store2 writes a different key
+	testState2 := &State{
+		Version:     StateVersion,
+		CursorType:  CursorTypeTimestamp,
+		CursorValue: "2026-01-01T00:00:00Z",
+		UpdatedAt:   time.Now().UTC(),
+	}
+	err = store2.Save("key-from-store2", testState2)
+	require.NoError(t, err)
+
+	// Store1 can read it
+	loaded2, err := store1.Load("key-from-store2")
+	require.NoError(t, err)
+	require.NotNil(t, loaded2)
+	assert.Equal(t, "2026-01-01T00:00:00Z", loaded2.CursorValue)
+
+	// Close stores — should NOT close the shared registry
+	require.NoError(t, store1.Close())
+	require.NoError(t, store2.Close())
+
+	// Registry is still usable (not closed by stores)
+	store3, err := NewStoreFromRegistry(registry, logger.Named("store3"))
+	require.NoError(t, err)
+	require.NotNil(t, store3)
+
+	// Can still read previously written data
+	loaded3, err := store3.Load("key-from-store1")
+	require.NoError(t, err)
+	require.NotNil(t, loaded3)
+	assert.Equal(t, "100", loaded3.CursorValue)
+
+	require.NoError(t, store3.Close())
 }
 
 func TestStoreClose(t *testing.T) {

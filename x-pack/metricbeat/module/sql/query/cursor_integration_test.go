@@ -32,6 +32,7 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/mysql"
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
+	sqlmod "github.com/elastic/beats/v7/x-pack/metricbeat/module/sql"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/sql/query/cursor"
 )
 
@@ -1350,6 +1351,146 @@ func TestCursorStateIsolation(t *testing.T) {
 	}
 
 	t.Log("Cursor state isolation verified - different queries maintain separate cursor states")
+}
+
+// TestCursorRegistrySharing verifies that multiple SQL module instances share
+// the same statestore.Registry pointer, preventing file lock conflicts.
+//
+// This test ensures the ModuleBuilder closure pattern correctly shares the
+// registry across all module instances, which is critical for avoiding the
+// original bug where multiple independent stores operated on the same files.
+func TestCursorRegistrySharing(t *testing.T) {
+	service := compose.EnsureUp(t, "postgresql")
+	host, port, err := net.SplitHostPort(service.Host())
+	require.NoError(t, err)
+
+	user := postgresql.GetEnvUsername()
+	password := postgresql.GetEnvPassword()
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port)
+
+	// Setup test database
+	db, err := sql.Open("postgres", dsn)
+	require.NoError(t, err)
+	defer db.Close()
+
+	setupPostgresTestTable(t, db)
+	defer cleanupTestTable(t, db, "postgres")
+
+	// Insert test data: 10 rows
+	insertTestData(t, db, "postgres", 10)
+
+	// Create shared test paths - both MetricSets will use same data directory
+	testPaths := createTestPaths(t)
+
+	// Configuration for first MetricSet - query with LIMIT 2
+	cfg1 := map[string]interface{}{
+		"module":              "sql",
+		"metricsets":          []string{"query"},
+		"hosts":               []string{dsn},
+		"driver":              "postgres",
+		"period":              "10s",
+		"sql_query":           fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 2", testTableName),
+		"sql_response_format": tableResponseFormat,
+		"raw_data.enabled":    true,
+		"cursor": map[string]interface{}{
+			"enabled": true,
+			"column":  "id",
+			"type":    "integer",
+		},
+	}
+
+	// Configuration for second MetricSet - different query with LIMIT 3
+	cfg2 := map[string]interface{}{
+		"module":              "sql",
+		"metricsets":          []string{"query"},
+		"hosts":               []string{dsn},
+		"driver":              "postgres",
+		"period":              "10s",
+		"sql_query":           fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 3", testTableName),
+		"sql_response_format": tableResponseFormat,
+		"raw_data.enabled":    true,
+		"cursor": map[string]interface{}{
+			"enabled": true,
+			"column":  "id",
+			"type":    "integer",
+		},
+	}
+
+	// Create two MetricSet instances using the same paths
+	ms1 := newMetricSetWithPaths(t, cfg1, testPaths)
+	ms2 := newMetricSetWithPaths(t, cfg2, testPaths)
+
+	// Extract the underlying modules
+	metricSet1, ok := ms1.(*MetricSet)
+	require.True(t, ok, "MetricSet should be *query.MetricSet")
+
+	metricSet2, ok := ms2.(*MetricSet)
+	require.True(t, ok, "MetricSet should be *query.MetricSet")
+
+	// Type-assert to sql.Module interface to access GetCursorRegistry
+	mod1, ok := metricSet1.BaseMetricSet.Module().(sqlmod.Module)
+	require.True(t, ok, "Module should implement sqlmod.Module interface")
+
+	mod2, ok := metricSet2.BaseMetricSet.Module().(sqlmod.Module)
+	require.True(t, ok, "Module should implement sqlmod.Module interface")
+
+	// Get registry from both modules
+	registry1, err1 := mod1.GetCursorRegistry()
+	require.NoError(t, err1, "GetCursorRegistry should not error")
+	require.NotNil(t, registry1, "Registry should not be nil")
+
+	registry2, err2 := mod2.GetCursorRegistry()
+	require.NoError(t, err2, "GetCursorRegistry should not error")
+	require.NotNil(t, registry2, "Registry should not be nil")
+
+	// CRITICAL ASSERTION: Verify they're the SAME pointer (shared instance)
+	// This is the core of the fix - if pointers differ, multiple stores will
+	// try to access the same files, causing lock conflicts
+	assert.Same(t, registry1, registry2,
+		"Both module instances MUST share the exact same registry pointer to avoid file conflicts")
+
+	t.Logf("✓ Registry sharing verified: both modules use registry at %p", registry1)
+
+	// Also verify state isolation works correctly with the shared registry
+	// Each query should maintain its own cursor state via unique state keys
+
+	// Fetch from ms1 (gets 2 rows: id=1, id=2)
+	events1, err := fetchEvents(t, ms1)
+	require.NoError(t, err)
+	require.Len(t, events1, 2, "First fetch from ms1 should return 2 rows")
+	assert.Equal(t, int64(1), events1[0]["id"])
+	assert.Equal(t, int64(2), events1[1]["id"])
+
+	// Fetch from ms2 (gets 3 rows: id=1, id=2, id=3)
+	// This should have separate state from ms1
+	events2, err := fetchEvents(t, ms2)
+	require.NoError(t, err)
+	require.Len(t, events2, 3, "First fetch from ms2 should return 3 rows")
+	assert.Equal(t, int64(1), events2[0]["id"])
+	assert.Equal(t, int64(2), events2[1]["id"])
+	assert.Equal(t, int64(3), events2[2]["id"])
+
+	// Fetch from ms1 again (continues from id=2, gets id=3, id=4)
+	events3, err := fetchEvents(t, ms1)
+	require.NoError(t, err)
+	require.Len(t, events3, 2, "Second fetch from ms1 should return next 2 rows")
+	assert.Equal(t, int64(3), events3[0]["id"])
+	assert.Equal(t, int64(4), events3[1]["id"])
+
+	// Fetch from ms2 again (continues from id=3, gets id=4, id=5, id=6)
+	events4, err := fetchEvents(t, ms2)
+	require.NoError(t, err)
+	require.Len(t, events4, 3, "Second fetch from ms2 should return next 3 rows")
+	assert.Equal(t, int64(4), events4[0]["id"])
+	assert.Equal(t, int64(5), events4[1]["id"])
+	assert.Equal(t, int64(6), events4[2]["id"])
+
+	// Cleanup
+	require.NoError(t, ms1.Close())
+	require.NoError(t, ms2.Close())
+
+	t.Log("✓ State isolation verified: different queries maintain separate cursor states despite shared registry")
+	t.Log("✓ Registry sharing test passed: single registry, no file conflicts, proper state isolation")
 }
 
 // ============================================================================

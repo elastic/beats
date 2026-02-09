@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	sqlmod "github.com/elastic/beats/v7/x-pack/metricbeat/module/sql"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/sql/query/cursor"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -145,9 +146,10 @@ func (m *MetricSet) initCursor(base mb.BaseMetricSet) error {
 	// Translate query placeholder for the driver
 	m.translatedQuery = cursor.TranslateQuery(m.Config.Query, m.Config.Driver)
 
-	// Create statestore using memlog backend
-	// Store path: {data.path}/sql-cursor/
-	store, err := cursor.NewStore(base.GetPath(), m.Logger().Named("cursor"))
+	// Get a cursor Store handle from the shared Module-level registry.
+	// This ensures a single memlog.Registry is shared across all SQL MetricSet
+	// instances, avoiding multiple independent stores operating on the same files.
+	store, err := m.openCursorStore(base)
 	if err != nil {
 		return fmt.Errorf("cursor store initialization failed: %w", err)
 	}
@@ -181,6 +183,31 @@ func (m *MetricSet) initCursor(base mb.BaseMetricSet) error {
 
 	m.cursorManager = mgr
 	return nil
+}
+
+// openCursorStore returns a cursor Store handle from the shared Module-level
+// statestore registry. The registry must be initialized via sql.ModuleBuilder
+// to ensure proper sharing across all SQL module instances.
+//
+// This method will fail if the module does not implement the sql.Module interface,
+// preventing the creation of multiple independent stores that could cause file
+// lock conflicts.
+func (m *MetricSet) openCursorStore(base mb.BaseMetricSet) (*cursor.Store, error) {
+	mod, ok := base.Module().(sqlmod.Module)
+	if !ok {
+		return nil, fmt.Errorf("cursor requires SQL module to implement registry interface; " +
+			"ensure module is initialized via sql.ModuleBuilder (not DefaultModuleFactory)")
+	}
+
+	registry, err := mod.GetCursorRegistry()
+	if err != nil {
+		return nil, err
+	}
+
+	// Debug log to verify registry sharing is working
+	m.Logger().Debugf("Using shared SQL cursor registry at %p", registry)
+
+	return cursor.NewStoreFromRegistry(registry, m.Logger().Named("cursor"))
 }
 
 // Close implements mb.Closer for proper resource cleanup.

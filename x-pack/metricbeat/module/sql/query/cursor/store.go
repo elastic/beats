@@ -18,6 +18,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
+// registryOwnership indicates whether the Store owns the registry lifecycle.
+type registryOwnership bool
+
+const (
+	ownsRegistry        registryOwnership = true
+	doesNotOwnRegistry  registryOwnership = false
+)
+
 // StateVersion is the current version of the state format.
 // Increment this when making breaking changes to the State struct.
 const StateVersion = 1
@@ -32,14 +40,34 @@ type State struct {
 
 // Store persists cursor state using libbeat/statestore with memlog backend.
 type Store struct {
-	registry *statestore.Registry
-	store    *statestore.Store
-	logger   *logp.Logger
+	registry     *statestore.Registry
+	ownsRegistry registryOwnership
+	store        *statestore.Store
+	logger       *logp.Logger
+}
+
+// NewStoreFromRegistry creates a Store using a shared statestore.Registry.
+// The registry is NOT owned by this Store — the caller (Module) manages its lifecycle.
+// Each call obtains a ref-counted Store handle from the shared registry.
+func NewStoreFromRegistry(registry *statestore.Registry, logger *logp.Logger) (*Store, error) {
+	store, err := registry.Get("cursor-state")
+	if err != nil {
+		return nil, fmt.Errorf("failed to open cursor store: %w", err)
+	}
+
+	return &Store{
+		registry:     nil, // not owned
+		ownsRegistry: doesNotOwnRegistry,
+		store:        store,
+		logger:       logger,
+	}, nil
 }
 
 // NewStore creates a memlog-backed store for cursor persistence.
 // The store is created at {data.path}/sql-cursor/
 // The caller is responsible for calling Close() when done.
+// This constructor creates and owns its own memlog registry — prefer
+// NewStoreFromRegistry with a shared registry when possible.
 func NewStore(beatPaths *paths.Path, logger *logp.Logger) (*Store, error) {
 	if beatPaths == nil {
 		beatPaths = paths.Paths
@@ -65,9 +93,10 @@ func NewStore(beatPaths *paths.Path, logger *logp.Logger) (*Store, error) {
 	}
 
 	return &Store{
-		registry: registry,
-		store:    store,
-		logger:   logger,
+		registry:     registry,
+		ownsRegistry: ownsRegistry,
+		store:        store,
+		logger:       logger,
 	}, nil
 }
 
@@ -102,6 +131,8 @@ func (s *Store) Save(key string, state *State) error {
 
 // Close releases store resources. Must be called when done.
 // Close is idempotent - calling it multiple times is safe.
+// If the Store was created via NewStoreFromRegistry, only the store handle is
+// closed (decrementing the ref count). The shared registry is not closed.
 func (s *Store) Close() error {
 	var errs []error
 
@@ -112,7 +143,9 @@ func (s *Store) Close() error {
 		s.store = nil
 	}
 
-	if s.registry != nil {
+	// Only close the registry if this Store owns it (created via NewStore).
+	// Stores created via NewStoreFromRegistry share a Module-level registry.
+	if s.ownsRegistry && s.registry != nil {
 		if err := s.registry.Close(); err != nil {
 			errs = append(errs, fmt.Errorf("failed to close registry: %w", err))
 		}
