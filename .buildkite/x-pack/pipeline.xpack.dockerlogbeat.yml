@@ -20,6 +20,16 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
+# This section is used to define the plugins that will be used in the pipeline.
+# See https://buildkite.com/docs/pipelines/integrations/plugins/using#using-yaml-anchors-with-plugins
+common:
+  - dockerhub_login_plugin: &dockerhub_login_plugin
+      elastic/vault-docker-login#v0.6.4:
+        secret_path: 'kv/ci-shared/observability-github-secrets/shared/docker/dockerhub/observabilityrobots'
+  - docker_elastic_login_plugin: &docker_elastic_login_plugin
+      elastic/vault-docker-login#v0.6.4:
+        secret_path: 'kv/ci-shared/platform-ingest/elastic_docker_registry'
+
 steps:
   - group: "Check/Update"
     key: "x-pack-dockerlogbeat-check-update"
@@ -144,6 +154,9 @@ steps:
           automatic:
             - limit: 1
         timeout_in_minutes: 20
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -162,6 +175,9 @@ steps:
           automatic:
             - limit: 1
         timeout_in_minutes: 20
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         agents:
           provider: "aws"
           image: "${AWS_IMAGE_UBUNTU_ARM_64}"
