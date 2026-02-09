@@ -33,10 +33,22 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
+<<<<<<< HEAD
   # Concurrency definition
   CONCURRENCY_GROUP: "orka-concurrency-group"
   CONCURRENCY_COUNT: 10
   CONCURRENCY_METHOD: eager
+=======
+# This section is used to define the plugins that will be used in the pipeline.
+# See https://buildkite.com/docs/pipelines/integrations/plugins/using#using-yaml-anchors-with-plugins
+common:
+  - dockerhub_login_plugin: &dockerhub_login_plugin
+      elastic/vault-docker-login#v0.6.4:
+        secret_path: 'kv/ci-shared/observability-github-secrets/shared/docker/dockerhub/observabilityrobots'
+  - docker_elastic_login_plugin: &docker_elastic_login_plugin
+      elastic/vault-docker-login#v0.6.4:
+        secret_path: 'kv/ci-shared/platform-ingest/elastic_docker_registry'
+>>>>>>> 42e4f7194 (packaging(docker): improve dockerhub dependency (#48709))
 
 steps:
   - group: "Check/Update"
@@ -468,6 +480,9 @@ steps:
           automatic:
             - limit: 1
         timeout_in_minutes: 20
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_2204_X86_64}"
@@ -486,6 +501,9 @@ steps:
           automatic:
             - limit: 1
         timeout_in_minutes: 20
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         agents:
           provider: "aws"
           image: "${IMAGE_UBUNTU_2204_ARM64}"
