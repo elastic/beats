@@ -240,27 +240,3 @@ steps:
         notify:
           - github_commit_status:
               context: "winlogbeat: Packaging Linux"
-<<<<<<< HEAD
-=======
-
-      - label: ":ubuntu: Winlogbeat: Packaging Windows arm64"
-        key: "winlogbeat-packaging-arm"
-        env:
-          PLATFORMS: "+all windows/arm64"
-        command: |
-          .buildkite/scripts/packaging/packaging.sh winlogbeat
-        retry:
-          automatic:
-            - limit: 1
-        timeout_in_minutes: 20
-        plugins:
-          - *dockerhub_login_plugin
-          - *docker_elastic_login_plugin
-        agents:
-          provider: "aws"
-          image: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        notify:
-          - github_commit_status:
-              context: "winlogbeat: Packaging Linux arm64"
->>>>>>> 42e4f7194 (packaging(docker): improve dockerhub dependency (#48709))
