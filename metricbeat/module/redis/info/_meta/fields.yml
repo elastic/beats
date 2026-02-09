@@ -113,7 +113,7 @@
               type: long
               format: bytes
               description: >
-                Number of bytes used by the script VM engines for EVAL framework. This is the replacement for used_memory_lua.
+                Number of bytes used by the script VM engines for EVAL framework. Replaces used_memory_lua.
             - name: functions
               type: long
               format: bytes
