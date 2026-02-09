@@ -177,14 +177,14 @@ func (d *wrapperDriver) Close() error {
 }
 
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
-	args := make([]string, 0, 4+len(d.Files)+len(arg)) // preallocate as much as possible
-	args = append(args, "--ansi", "never", "--project-name", d.Name)
+	args := make([]string, 0, 5+len(d.Files)+len(arg)) // preallocate as much as possible
+	args = append(args, "compose", "--ansi", "never", "--project-name", d.Name)
 	for _, f := range d.Files {
 		args = append(args, "--file", f)
 	}
 	args = append(args, command)
 	args = append(args, arg...)
-	cmd := exec.CommandContext(ctx, "docker-compose", args...)
+	cmd := exec.CommandContext(ctx, "docker", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if len(d.Environment) > 0 {
@@ -216,7 +216,7 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 	pull.Stdout = nil
 	pull.Stderr = &stderr
 	if err := pull.Run(); err != nil {
-		return fmt.Errorf("failed to pull images using docker-compose: %s: %w", stderr.String(), err)
+		return fmt.Errorf("failed to pull images using docker compose: %s: %w", stderr.String(), err)
 	}
 
 	err := d.cmd(ctx, "up", args...).Run()
