@@ -1,3 +1,4 @@
+import base64
 from filebeat import BaseTest, log_as_filestream, remove_filestream_fields
 from beat.beat import INTEGRATION_TESTS
 import os
@@ -8,6 +9,7 @@ import subprocess
 import json
 import logging
 from parameterized import parameterized
+from elasticsearch import Elasticsearch, NotFoundError
 from deepdiff import DeepDiff
 
 # datasets for which @timestamp is removed due to date missing
@@ -121,7 +123,7 @@ def load_fileset_test_cases():
 class Test(BaseTest):
 
     def init(self):
-        self.es = self.get_elasticsearch_instance(user='admin')
+        self.es: Elasticsearch = self.get_elasticsearch_instance(user='admin')
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
@@ -166,10 +168,11 @@ class Test(BaseTest):
         self.assert_explicit_ecs_version_set(module, fileset)
 
         try:
-            self.es.indices.delete_data_stream(self.index_name)
-        except BaseException:
+            resp = self.es.indices.delete_data_stream(name=self.index_name)
+        except NotFoundError:
             pass
-        self.wait_until(lambda: not self.es.indices.exists(self.index_name))
+
+        self.wait_until(lambda: not self.es.indices.exists(index=self.index_name))
 
         cmd = [
             self.filebeat, "--systemTest",
@@ -258,13 +261,13 @@ class Test(BaseTest):
             error_line)
 
         # Make sure index exists
-        self.wait_until(lambda: self.es.indices.exists(self.index_name),
+        self.wait_until(lambda: self.es.indices.exists(index=self.index_name),
                         name="indices present for {}".format(test_file))
 
         self.es.indices.refresh(index=self.index_name)
         # Loads the first 100 events to be checked
-        res = self.es.search(index=self.index_name,
-                             body={"query": {"match_all": {}}, "size": 100, "sort": {"log.offset": {"order": "asc"}}})
+        res = self.es.search(index=self.index_name, query={"match_all": {}},
+                             size=100, sort={"log.offset": {"order": "asc"}})
         objects = [o["_source"] for o in res["hits"]["hits"]]
         assert len(objects) > 0
         for obj in objects:

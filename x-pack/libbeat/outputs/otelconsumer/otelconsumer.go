@@ -13,10 +13,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/x-pack/otel/otelctx"
+	"github.com/elastic/beats/v7/x-pack/otel/otelmap"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -88,6 +88,10 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	pLogs := plog.NewLogs()
 	resourceLogs := pLogs.ResourceLogs().AppendEmpty()
 	sourceLogs := resourceLogs.ScopeLogs().AppendEmpty()
+
+	// add bodymap mapping mode on scope attributes
+	sourceLogs.Scope().Attributes().PutStr("elastic.mapping.mode", "bodymap")
+
 	logRecords := sourceLogs.LogRecords()
 
 	// Convert the batch of events to Otel plog.Logs. The encoding we

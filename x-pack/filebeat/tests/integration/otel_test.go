@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build integration && !agentbeat
+//go:build integration
 
 package integration
 
@@ -12,6 +12,8 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -21,6 +23,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"text/template"
 	"time"
@@ -32,13 +35,14 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/oteltestcol"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/elastic/go-elasticsearch/v8/esapi"
 	"github.com/elastic/mock-es/pkg/api"
 )
 
@@ -96,8 +100,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 service:
   pipelines:
     logs:
@@ -261,8 +263,6 @@ exporters:
     endpoints:
       - {{ .ESURL }}
     logs_index: logs-integration-{{ .Namespace }}
-    mapping:
-      mode: bodymap
     max_conns_per_host: 1
     password: {{ .Password }}
     retry:
@@ -478,8 +478,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 service:
   pipelines:
     logs:
@@ -539,33 +537,104 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 		name                     string
 		maxRetries               int
 		failuresPerEvent         int
-		bulkErrorCode            string
+		requestStatusCode        string
+		bulkDocStatusCode        string
+		retryOnStatus            string
 		eventIDsToFail           []int
 		expectedIngestedEventIDs []int
+		requestLevelFailure      bool
 	}{
 		{
-			name:                     "bulk 429 with retries",
-			maxRetries:               3,
-			failuresPerEvent:         2,     // Fail 2 times, succeed on 3rd attempt
-			bulkErrorCode:            "429", // retryable error
-			eventIDsToFail:           []int{1, 3, 5, 7},
-			expectedIngestedEventIDs: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, // All events should eventually be ingested
+			name:                     "bulk 200 succeed without retries",
+			maxRetries:               0,
+			bulkDocStatusCode:        "200",                               // 200 OK for all documents
+			expectedIngestedEventIDs: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, // All events ingested
 		},
 		{
-			name:                     "bulk exhausts retries",
+			name:                     "bulk 429 retries until success",
 			maxRetries:               3,
-			failuresPerEvent:         5, // Fail more than max_retries
-			bulkErrorCode:            "429",
-			eventIDsToFail:           []int{2, 4, 6, 8},
-			expectedIngestedEventIDs: []int{0, 1, 3, 5, 7, 9}, // Only non-failing events should be ingested
+			failuresPerEvent:         2,                                   // Each failing event fails 2 times, succeeds on 3rd attempt
+			bulkDocStatusCode:        "429",                               // Document-level 429 errors in bulk response
+			eventIDsToFail:           []int{1, 3, 5, 7},                   // These specific events will fail initially
+			expectedIngestedEventIDs: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, // All events eventually ingested after retries
 		},
 		{
-			name:                     "bulk with permanent mapping errors",
+			name:                     "bulk 503 retry_on_status retries until success",
 			maxRetries:               3,
-			failuresPerEvent:         0,                          // always fail
-			bulkErrorCode:            "400",                      // never retried
-			eventIDsToFail:           []int{1, 4, 8},             // Only specific events fail
-			expectedIngestedEventIDs: []int{0, 2, 3, 5, 6, 7, 9}, // Only non-failing events should be ingested
+			failuresPerEvent:         2,                                   // Each failing event fails 2 times, succeeds on 3rd attempt
+			bulkDocStatusCode:        "503",                               // Document-level 503 errors in bulk response
+			retryOnStatus:            "503",                               // retry 503 errors
+			eventIDsToFail:           []int{1, 3, 5, 7},                   // These specific events will fail initially
+			expectedIngestedEventIDs: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, // All events eventually ingested after retries
+		},
+		{
+			name:                     "bulk 503 retry_on_status exhausts retries",
+			maxRetries:               2,
+			failuresPerEvent:         3,                             // Each failing event fails 3 times (total attempts = 1 initial + 2 retries = 3)
+			bulkDocStatusCode:        "503",                         // Document-level 503 errors in bulk response
+			retryOnStatus:            "503",                         // Explicitly enable 503 retries
+			eventIDsToFail:           []int{0, 9},                   // First and last events will permanently fail after exhausting retries
+			expectedIngestedEventIDs: []int{1, 2, 3, 4, 5, 6, 7, 8}, // Only non-failing events ingested
+		},
+		{
+			name:                     "bulk 429 exhausts retries",
+			maxRetries:               2,
+			failuresPerEvent:         3,                       // Each failing event fails 3 times
+			bulkDocStatusCode:        "429",                   // Document-level 429 errors in bulk response
+			eventIDsToFail:           []int{2, 4, 6, 8},       // These events will permanently fail after exhausting retries
+			expectedIngestedEventIDs: []int{0, 1, 3, 5, 7, 9}, // Only non-failing events ingested
+		},
+		{
+			name:                     "bulk 400 permanent failure",
+			maxRetries:               3,
+			failuresPerEvent:         0,                          // Always fail (permanent error)
+			bulkDocStatusCode:        "400",                      // Document-level 400 errors in bulk response
+			eventIDsToFail:           []int{1, 4, 8},             // These events have permanent mapping errors
+			expectedIngestedEventIDs: []int{0, 2, 3, 5, 6, 7, 9}, // Only non-failing events ingested (no retries for 400)
+		},
+		{
+			name:                     "request 429 retries until success",
+			maxRetries:               3,
+			failuresPerEvent:         2,                                   // Request fails 2 times, succeeds on 3rd attempt
+			requestStatusCode:        "429",                               // Entire HTTP request fails with 429
+			bulkDocStatusCode:        "200",                               // Documents succeed when forwarded to handler
+			expectedIngestedEventIDs: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, // All events eventually ingested after request retries
+			requestLevelFailure:      true,                                // Request-level failures
+		},
+		{
+			name:                     "request 503 retry_on_status retries until success",
+			maxRetries:               3,
+			failuresPerEvent:         3,                                   // Request fails 2 times, succeeds on 3rd attempt
+			requestLevelFailure:      true,                                // Request-level failures
+			requestStatusCode:        "503",                               // Entire HTTP request fails with 503
+			bulkDocStatusCode:        "200",                               // Documents succeed when forwarded to handler
+			retryOnStatus:            "503",                               // Explicitly enable 503 retries
+			expectedIngestedEventIDs: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, // All events eventually ingested after request retries
+		},
+		{
+			name:                     "request 429 exhausts retries",
+			maxRetries:               2,
+			failuresPerEvent:         3,       // Request fails 3 times
+			requestLevelFailure:      true,    // Request-level failures
+			requestStatusCode:        "429",   // Entire HTTP request fails with 429
+			expectedIngestedEventIDs: []int{}, // No events ingested (exhausted all attempts without success)
+		},
+		{
+			name:                     "request 503 retry_on_status exhausts retries",
+			maxRetries:               2,
+			failuresPerEvent:         3,       // Request fails 3 times
+			requestLevelFailure:      true,    // Request-level failures
+			requestStatusCode:        "503",   // Entire HTTP request fails with 503
+			retryOnStatus:            "503",   // Explicitly enable 503 retries
+			expectedIngestedEventIDs: []int{}, // No events ingested (exhausted all attempts without success)
+		},
+		{
+			name:                     "request 400 permanent failure",
+			maxRetries:               0,
+			failuresPerEvent:         1,       // fail request once
+			requestLevelFailure:      true,    // Request-level failures
+			requestStatusCode:        "400",   // Entire HTTP request fails with 400
+			expectedIngestedEventIDs: []int{}, // No events ingested
 		},
 	}
 
@@ -589,7 +658,7 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 					eventIDStr := string(matches[1])
 					eventID, err := strconv.Atoi(eventIDStr)
 					if err != nil {
-						return http.StatusInternalServerError
+						return http.StatusBadRequest
 					}
 
 					eventKey := "Line " + eventIDStr
@@ -604,24 +673,26 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 						// This event is configured to fail
 						failureCount := eventFailureCounts[eventKey]
 
-						switch tt.bulkErrorCode {
+						switch tt.bulkDocStatusCode {
 						case "400":
 							// Permanent errors always fail
 							shouldFail = true
 						case "429":
+							fallthrough
+						case "503":
 							// Temporary errors fail until failuresPerEvent threshold
 							shouldFail = failureCount < tt.failuresPerEvent
 						}
-					} else {
-						// Events not in the fail list always succeed
-						shouldFail = false
 					}
 
 					if shouldFail {
 						eventFailureCounts[eventKey] = eventFailureCounts[eventKey] + 1
-						if tt.bulkErrorCode == "429" {
+						switch tt.bulkDocStatusCode {
+						case "503":
+							return http.StatusServiceUnavailable
+						case "429":
 							return http.StatusTooManyRequests
-						} else {
+						default:
 							return http.StatusBadRequest
 						}
 					}
@@ -640,14 +711,16 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 					return http.StatusOK
 				}
 
-				return http.StatusOK
+				return http.StatusBadRequest
 			}
 
 			reader := metric.NewManualReader()
 			provider := metric.NewMeterProvider(metric.WithReader(reader))
 
 			mux := http.NewServeMux()
-			mux.Handle("/", api.NewDeterministicAPIHandler(
+
+			// Create the base deterministic handler
+			baseHandler := api.NewDeterministicAPIHandler(
 				uuid.Must(uuid.NewV4()),
 				"",
 				provider,
@@ -655,7 +728,39 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 				0,
 				0,
 				deterministicHandler,
-			))
+			)
+
+			// If requestLevelFailure is true, wrap with request-level failure logic
+			if tt.requestLevelFailure {
+				// Request-level failures: entire HTTP request fails with the specified status code
+				var attemptCount int64
+				mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+					currentAttempt := atomic.AddInt64(&attemptCount, 1)
+
+					// For retryable status codes (429, 503), fail for failuresPerEvent times, then forward to deterministic handler
+					// For non-retryable status codes (400), always fail
+					var shouldFail bool
+					switch tt.requestStatusCode {
+					case "400":
+						// 400 is never retryable, always fail
+						shouldFail = true
+					case "503", "429":
+						shouldFail = currentAttempt <= int64(tt.failuresPerEvent)
+					}
+
+					if shouldFail {
+						status, err := strconv.Atoi(tt.requestStatusCode)
+						assert.NoError(t, err)
+						http.Error(w, "", status)
+						return
+					}
+
+					// Success case - forward to the deterministic handler
+					baseHandler.ServeHTTP(w, r)
+				})
+			} else {
+				mux.Handle("/", baseHandler)
+			}
 
 			server := httptest.NewServer(mux)
 			defer server.Close()
@@ -669,12 +774,14 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 				ESEndpoint     string
 				MaxRetries     int
 				MonitoringPort int
+				RetryOnStatus  string
 			}{
 				Index:          index,
 				InputFile:      filepath.Join(t.TempDir(), "log.log"),
 				ESEndpoint:     server.URL,
 				MaxRetries:     tt.maxRetries,
 				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
+				RetryOnStatus:  tt.retryOnStatus,
 			}
 
 			cfg := `receivers:
@@ -703,19 +810,20 @@ exporters:
     endpoints:
       - {{.ESEndpoint}}
     logs_index: {{.Index}}
-    mapping:
-      mode: bodymap
     max_conns_per_host: 1
     password: testing
     retry:
       enabled: true
-      initial_interval: 1s
-      max_interval: 1m0s
+      initial_interval: 500ms
+      max_interval: 30s
       max_retries: {{.MaxRetries}}
+{{if .RetryOnStatus}}
+      retry_on_status: [{{.RetryOnStatus}}]
+{{end}}
     sending_queue:
       batch:
         flush_timeout: 10s
-        max_size: 1600
+        max_size: 1
         min_size: 0
         sizer: items
       block_on_overflow: true
@@ -811,11 +919,19 @@ service:
 
 				m = m.Flatten()
 
-				// Currently, otelconsumer either ACKs or fails the entire batch and has no visibility into individual event failures within the exporter.
-				// From otelconsumer's perspective, the whole batch is considered successful as long as ConsumeLogs returns no error.
-				assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.total"], "expected total events sent to output to match")
-				assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.acked"], "expected total events acked to match")
-				assert.Equal(ct, float64(0), m["libbeat.output.events.dropped"], "expected total events dropped to match")
+				assert.Equal(ct, float64(numTestEvents), m["libbeat.pipeline.events.published"], "expected total events published to pipeline to match")
+
+				// For non-retryable errors like 400, events are dropped by the exporter
+				if tt.requestLevelFailure && tt.requestStatusCode == "400" {
+					assert.Equal(ct, float64(0), m["libbeat.output.events.acked"], "expected no events to be acked (400 errors drop events)")
+				} else {
+					// For retryable errors or successful cases, events are eventually acked
+					// Currently, otelconsumer either ACKs or fails the entire batch and has no visibility into individual event failures within the exporter.
+					// From otelconsumer's perspective, the whole batch is considered successful as long as ConsumeLogs returns no error.
+					assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.total"], "expected total events sent to output to match")
+					assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.acked"], "expected total events acked to match")
+					assert.Equal(ct, float64(0), m["libbeat.output.events.dropped"], "expected total events dropped to match")
+				}
 			}, 10*time.Second, 100*time.Millisecond, "expected output stats to be available in monitoring endpoint")
 		})
 	}
@@ -887,8 +1003,6 @@ exporters:
     endpoints:
       - {{.Endpoint}}
     logs_index: {{.Index}}
-    mapping:
-      mode: bodymap
     auth:
      authenticator: beatsauth
 service:
@@ -1005,8 +1119,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 `
 	var renderedConfig bytes.Buffer
 	require.NoError(t, template.Must(template.New("config").Parse(configTemplate)).Execute(&renderedConfig, configParameters))
@@ -1071,8 +1183,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 `
 	logFilePath := filepath.Join(t.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, wantEvents)
@@ -1125,6 +1235,224 @@ exporters:
 	oteltest.AssertMapsEqual(t, receiverDoc, processorDoc, ignoredFields, "expected documents to be equal")
 }
 
+func TestNoDuplicates(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	tmpdir := t.TempDir()
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbOtelIndex := "logs-integration-" + namespace
+
+	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
+
+	otelCfgFile := `receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-input-id
+          enabled: true
+          paths:
+            - %s
+    processors:
+      - add_host_metadata: ~
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
+      - add_kubernetes_metadata: ~
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    path.home: %s
+    http.enabled: true
+    http.host: localhost
+    http.port: %d
+    management.otel.enabled: true
+exporters:
+  elasticsearch/log:
+    endpoints:
+      - http://localhost:9200
+    compression: none
+    user: admin
+    password: testing
+    logs_index: %s
+    tls:
+      insecure_skip_verify: true
+    sending_queue:
+      enabled: true
+      batch:
+        flush_timeout: 1s
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - elasticsearch/log
+`
+	logFilePath := filepath.Join(tmpdir, "log.log")
+	writenLines := make([]string, 0)
+	stopChan := make(chan struct{}, 1)
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		// create a log file and keep writing to it until the test finishes.
+		// This is to ensure that the filebeat receiver is continuously processing
+		// new lines and creating new events, which increases the chances of
+		// hitting edge cases that could cause duplicates on restart.
+		defer wg.Done()
+		logFile, err := os.Create(logFilePath)
+		if err != nil {
+			require.NoErrorf(t, err, "could not create file '%s'", logFilePath)
+		}
+		defer logFile.Close()
+
+		ticker := time.NewTicker(50 * time.Millisecond)
+		defer ticker.Stop()
+		i := 0
+		for range ticker.C {
+			select {
+			case <-stopChan:
+				return
+			default:
+			}
+			msg := fmt.Sprintf("This is spam message %d: %v", i, uuid.Must(uuid.NewV4()))
+			_, err := logFile.Write([]byte(msg + "\n"))
+			require.NoErrorf(t, err, "failed to write line %d to temp file", i)
+			writenLines = append(writenLines, msg)
+			i++
+		}
+	}()
+	t.Cleanup(func() {
+		close(stopChan)
+		wg.Wait()
+	})
+	collector := oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
+
+	require.EventuallyWithT(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err := estools.GetAllLogsForIndexWithContext(findCtx, integration.GetESClient(t, "http"), ".ds-"+fbOtelIndex+"*")
+			assert.NoError(ct, err)
+			assert.Greater(ct, otelDocs.Hits.Total.Value, 100)
+		},
+		1*time.Minute, 1*time.Second, "expected more than 0 events, got none",
+	)
+
+	collector.Shutdown()
+
+	// wait for 8888 port to be free (an indication that previous collector has exited)
+	require.Eventually(t,
+		func() bool {
+			ln, err := net.Listen("tcp", "localhost:8888")
+			if err != nil {
+				return false
+			}
+			ln.Close()
+			return true
+		},
+		10*time.Second,
+		100*time.Millisecond,
+		"port 8888 never became available",
+	)
+
+	// restart the collector process
+	collector = oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
+	t.Cleanup(func() {
+		collector.Shutdown()
+	})
+
+	// wait for more docs to be published.
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err := estools.GetAllLogsForIndexWithContext(findCtx, integration.GetESClient(t, "http"), ".ds-"+fbOtelIndex+"*")
+			assert.NoError(ct, err)
+			assert.Greater(ct, otelDocs.Hits.Total.Value, 300)
+		},
+		1*time.Minute, 1*time.Second, "expected more than 300 events, got less",
+	)
+	checkDuplicates(t, ".ds-"+fbOtelIndex+"*")
+}
+
+func checkDuplicates(t *testing.T, index string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// duplicate check
+	rawQuery := map[string]any{
+		"runtime_mappings": map[string]any{
+			"log.offset": map[string]any{
+				"type": "keyword",
+			},
+			"log.file.fingerprint": map[string]any{
+				"type": "keyword",
+			},
+		},
+		"query": map[string]any{
+			"bool": map[string]any{
+				"must": []map[string]any{
+					{"match": map[string]any{"_index": index}},
+				},
+			},
+		},
+		"aggs": map[string]any{
+			"duplicates": map[string]any{
+				"multi_terms": map[string]any{
+					"size":          500,
+					"min_doc_count": 2,
+					"terms": []map[string]any{
+						{"field": "log.file.fingerprint"},
+						{"field": "log.offset"},
+					},
+				},
+			},
+		},
+	}
+	var buf bytes.Buffer
+	err := json.NewEncoder(&buf).Encode(rawQuery)
+	require.NoError(t, err)
+
+	es := esapi.New(integration.GetESClient(t, "http"))
+	res, err := es.Search(
+		es.Search.WithIndex(index),
+		es.Search.WithSize(0),
+		es.Search.WithBody(&buf),
+		es.Search.WithPretty(),
+		es.Search.WithContext(ctx),
+	)
+	require.NoError(t, err)
+	require.Falsef(t, (res.StatusCode >= http.StatusMultipleChoices || res.StatusCode < http.StatusOK), "status should be 2xx was: %d", res.StatusCode)
+	resultBuf, err := io.ReadAll(res.Body)
+	require.NoError(t, err)
+
+	aggResults := map[string]any{}
+	err = json.Unmarshal(resultBuf, &aggResults)
+	require.NoError(t, err)
+	aggs, ok := aggResults["aggregations"].(map[string]any)
+	require.Truef(t, ok, "'aggregations' wasn't a map[string]any, result was %s", string(resultBuf))
+	dups, ok := aggs["duplicates"].(map[string]any)
+	require.Truef(t, ok, "'duplicates' wasn't a map[string]any, result was %s", string(resultBuf))
+	buckets, ok := dups["buckets"].([]any)
+	require.Truef(t, ok, "'buckets' wasn't a []any, result was %s", string(resultBuf))
+
+	hits, ok := aggResults["hits"].(map[string]any)
+	require.Truef(t, ok, "'hits' wasn't a map[string]any, result was %s", string(resultBuf))
+	total, ok := hits["total"].(map[string]any)
+	require.Truef(t, ok, "'total' wasn't a map[string]any, result was %s", string(resultBuf))
+	value, ok := total["value"].(float64)
+	require.Truef(t, ok, "'total' wasn't an int, result was %s", string(resultBuf))
+
+	require.Equalf(t, 0, len(buckets), "len(buckets): %d, hits.total.value: %d, result was %s", len(buckets), value, string(resultBuf))
+}
+
 // setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
 func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -1160,4 +1488,74 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 	defer resp.Body.Close()
 
 	require.Equal(t, resp.StatusCode, http.StatusOK, "incorrect response code")
+}
+
+func BenchmarkFilebeatOTelCollector(b *testing.B) {
+	numReceivers := 4
+
+	for b.Loop() {
+		b.StopTimer()
+		tmpDir := b.TempDir()
+
+		type receiverConfig struct {
+			Index    int
+			PathHome string
+		}
+
+		configData := struct {
+			Receivers []receiverConfig
+		}{
+			Receivers: make([]receiverConfig, numReceivers),
+		}
+
+		for i := range numReceivers {
+			configData.Receivers[i] = receiverConfig{
+				Index:    i + 1,
+				PathHome: filepath.Join(tmpDir, strconv.Itoa(i+1)),
+			}
+		}
+
+		cfgTemplate := `receivers:
+{{range .Receivers}}
+  filebeatreceiver/{{.Index}}:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: 1
+    path.home: {{.PathHome}}
+    queue.mem.flush.timeout: 0s
+{{end}}
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+{{range .Receivers}}
+        - filebeatreceiver/{{.Index}}
+{{end}}
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`
+
+		var configBuffer bytes.Buffer
+		require.NoError(b, template.Must(template.New("config").Parse(cfgTemplate)).Execute(&configBuffer, configData))
+
+		b.StartTimer()
+
+		col := oteltestcol.New(b, configBuffer.String())
+		require.NotNil(b, col)
+		require.Eventually(b, func() bool {
+			return col.ObservedLogs().
+				FilterMessageSnippet("Publish event").Len() == numReceivers
+		}, 30*time.Second, 1*time.Millisecond, "expected all receivers to publish events")
+		col.Shutdown()
+	}
 }

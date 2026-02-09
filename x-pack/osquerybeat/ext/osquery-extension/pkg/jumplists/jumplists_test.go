@@ -1,0 +1,174 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+//go:build windows
+
+package jumplists
+
+import (
+	"os"
+	"path/filepath"
+	"testing"
+
+	osquerygen "github.com/osquery/osquery-go/gen/osquery"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+)
+
+func TestCustomJumplists(t *testing.T) {
+	type testCase struct {
+		name         string
+		filePath     string
+		expectError  bool
+		expectedRows int
+	}
+
+	tests := []testCase{
+		{
+			name:        "test_custom_jumplist_1",
+			filePath:    "./testdata/custom/7e4dca80246863e3.customDestinations-ms",
+			expectError: true,
+		},
+		{
+			name:         "test_custom_jumplist_2",
+			filePath:     "./testdata/custom/590aee7bdd69b59b.customDestinations-ms",
+			expectError:  false,
+			expectedRows: 3,
+		},
+		{
+			name:         "test_custom_jumplist_3",
+			filePath:     "./testdata/custom/ccba5a5986c77e43.customDestinations-ms",
+			expectError:  false,
+			expectedRows: 2,
+		},
+		{
+			name:         "test_custom_jumplist_4",
+			filePath:     "./testdata/custom/f4ed0c515fdbcbc.customDestinations-ms",
+			expectError:  false,
+			expectedRows: 3,
+		},
+		{
+			name:         "test_custom_jumplist_5",
+			filePath:     "./testdata/custom/ff99ba2fb2e34b73.customDestinations-ms",
+			expectError:  false,
+			expectedRows: 5,
+		},
+	}
+
+	log := logger.New(os.Stdout, true)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			jumplist, err := parseCustomJumplistFile(test.filePath, &UserProfile{Username: "test", Sid: "test"}, log)
+			if test.expectError {
+				assert.Error(t, err, "expected error when parsing custom jumplist")
+				assert.Nil(t, jumplist, "expected nil jumplist when parsing custom jumplist")
+				return
+			}
+			assert.NoError(t, err, "expected no error when parsing custom jumplist")
+			assert.NotNil(t, jumplist, "expected non-nil jumplist when parsing custom jumplist")
+			rows := jumplist.ToRows()
+			assert.Equal(t, test.expectedRows, len(rows), "expected %d rows in the jumplist", test.expectedRows)
+		})
+	}
+}
+
+func TestLnk(t *testing.T) {
+	type args struct {
+		filePath string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Lnk
+		wantErr bool
+	}{
+		{
+			name: "test_lnk_36.bin",
+			args: args{
+				filePath: "./testdata/lnks/lnk_36.bin",
+			},
+		},
+		{
+			name: "test_lnk_48.bin",
+			args: args{
+				filePath: "./testdata/lnks/lnk_48.bin",
+			},
+		},
+		{
+			name: "test_lnk_1332.bin",
+			args: args{
+				filePath: "./testdata/lnks/lnk_1332.bin",
+			},
+		},
+		{
+			name: "test_lnk_5312.bin",
+			args: args{
+				filePath: "./testdata/lnks/lnk_5312.bin",
+			},
+		},
+	}
+
+	log := logger.New(os.Stdout, true)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytes, err := os.ReadFile(tt.args.filePath)
+			assert.NoError(t, err, "expected no error when reading LNK file")
+			got, err := newLnkFromBytes(bytes, log)
+			if tt.wantErr {
+				assert.Error(t, err, "expected error when parsing LNK file")
+				assert.Nil(t, got, "expected nil LNK when parsing LNK file")
+				return
+			}
+			assert.NoError(t, err, "expected no error when parsing LNK file")
+			assert.NotNil(t, got, "expected non-nil LNK when parsing LNK file")
+		})
+	}
+}
+
+type MockClient struct {
+	t *testing.T
+}
+
+func (m *MockClient) Query(sql string) (*osquerygen.ExtensionResponse, error) {
+	_ = sql
+	profileDir := m.t.TempDir()
+	recentDir := filepath.Join(profileDir, "AppData", "Roaming", "Microsoft", "Windows", "Recent")
+	assert.NoError(m.t, os.MkdirAll(recentDir, 0o755))
+
+	customJumplistDir := filepath.Join(recentDir, "CustomDestinations")
+	assert.NoError(m.t, os.MkdirAll(customJumplistDir, 0o755))
+	bytes, err := os.ReadFile("./testdata/custom/590aee7bdd69b59b.customDestinations-ms")
+	assert.NoError(m.t, err, "expected no error when reading custom jumplist test file")
+	assert.NoError(m.t, os.WriteFile(filepath.Join(customJumplistDir, "590aee7bdd69b59b.customDestinations-ms"), bytes, 0o644))
+
+	return &osquerygen.ExtensionResponse{
+		Response: []map[string]string{
+			{
+				"username":  "testuser",
+				"uuid":      "S-1-5-21-1234567890-123456789-1234567890-1001",
+				"directory": profileDir,
+			},
+		},
+	}, nil
+}
+
+func TestGetUserProfiles(t *testing.T) {
+	log := logger.New(os.Stdout, true)
+	userProfiles, err := getUserProfiles(log, &MockClient{t: t})
+	assert.NoError(t, err, "expected no error when getting user profiles")
+	assert.NotEmpty(t, userProfiles, "expected non-empty user profiles")
+}
+
+func TestGetJumplists(t *testing.T) {
+	log := logger.New(os.Stdout, true)
+	userProfiles, err := getUserProfiles(log, &MockClient{t: t})
+	assert.NoError(t, err, "expected no error when getting user profiles")
+	for _, userProfile := range userProfiles {
+		jumplists := userProfile.getJumplists(log)
+		for _, jumplist := range jumplists {
+			log.Infof("found jumplist: %s, username: %s, sid: %s", jumplist.Path, userProfile.Username, userProfile.Sid)
+		}
+	}
+}

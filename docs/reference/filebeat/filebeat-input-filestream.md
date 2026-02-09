@@ -72,7 +72,7 @@ filebeat.inputs:
 ## Reading GZIP files [reading-gzip-files]
 
 ```{applies_to}
-stack: ga 9.3.0, beta 9.2.0
+stack: ga 9.3+, beta =9.2
 ```
 
 The `filestream` input can ingest GZIP files.
@@ -117,10 +117,10 @@ and both size and checksum validations happens. If either validation fails,
 
 ### Performance impact
 
-Our benchmarks indicate that reading GZIP files has a negligible impact on the 
+Our benchmarks indicate that reading GZIP files has a negligible impact on the
 throughput of Filebeat and its CPU usage.
 
-However, each harvester reading a GZIP file consumes approximately 100KB of 
+However, each harvester reading a GZIP file consumes approximately 100KB of
 additional memory. You should consider this memory increase when configuring the
 `harvester_limit`.
 
@@ -333,8 +333,8 @@ harvested by this input are taken over.
 
 The syntax for enabling take over mode varies by version:
 
-* {applies_to}`stack: beta 9.0.0` Use `take_over: true`.
-* {applies_to}`stack: beta 9.1.0` Use `take_over.enabled: true`.
+* {applies_to}`stack: beta 9.1+` Use `take_over.enabled: true`.
+* {applies_to}`stack: beta =9.0` Use `take_over: true`.
 
 :::{note}
 While `take_over: true` is still supported to migrate state from the `log` input to
@@ -347,14 +347,14 @@ the new syntax if possible.
 To take over files from a `log` input, enable take over mode
 and make sure the files you want this input to take over match the configured globs in `paths`.
 
-::::{tab-set}
-:::{tab-item} 9.1.0
+::::{applies-switch}
+:::{applies-item} stack: ga 9.1+
 ```yaml
 take_over:
   enabled: true
 ```
 :::
-:::{tab-item} 9.0.0
+:::{applies-item} stack: ga =9.0
 ```yaml
 take_over: true
 ```
@@ -402,6 +402,8 @@ Different `file_identity` methods can be configured to suit the environment wher
 
 Follow [this comprehensive guide](/reference/filebeat/file-identity.md) on how to choose a file identity option right for your use-case.
 
+In 9.x, scanner fingerprinting is enabled by default. When you explicitly configure a non-fingerprint `file_identity` (for example `native`, `path`, or `inode_marker`) and do not explicitly set `prospector.scanner.fingerprint.enabled`, Filebeat automatically disables scanner fingerprinting for that input.
+
 ::::{important}
 Changing `file_identity` is only supported from `native` or `path` to `fingerprint`. On those cases Filebeat will automatically migrate the state of the file when filestream starts.
 ::::
@@ -418,7 +420,7 @@ $$$filebeat-input-filestream-file-identity-fingerprint$$$
 :   The default behavior of Filebeat is to identify files based on content by hashing a specific range (0 to 1024 bytes by default).
 
 ::::{warning}
-In order to use this file identity option, you must enable the [fingerprint option in the scanner](#filebeat-input-filestream-scan-fingerprint). Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
+This file identity option uses file fingerprints produced by the [scanner](#filebeat-input-filestream-scan-fingerprint), which are enabled by default in 9.x. If you explicitly disable scanner fingerprinting, this file identity will not work. Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
 ::::
 
 
@@ -642,7 +644,7 @@ stack: ga 9.3
 
 Includes the log file group to `log.file` metadata.
 This option is not supported on Windows.
- 
+
 
 ### `exclude_lines` [filebeat-input-filestream-exclude-lines]
 
@@ -723,7 +725,7 @@ See [Reading GZIP files](#reading-gzip-files) for more details on GZIP support.
 ### `gzip_experimental` (deprecated) [filebeat-input-filestream-gzip-experimental]
 
 ```{applies_to}
-stack: removed 9.3.0, beta 9.2.0
+stack: removed 9.3+, beta =9.2
 ```
 
 :::{note}

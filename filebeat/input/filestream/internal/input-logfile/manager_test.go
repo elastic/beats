@@ -481,6 +481,16 @@ take_over:
 				FromIDs: []string{"foo", "bar"},
 			},
 		},
+		"stream set": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  stream: foo`,
+			expected: TakeOverConfig{
+				Enabled: true,
+				Stream:  "foo",
+			},
+		},
 		"take_over not defined": {
 			cfgYAML:   "",
 			expectErr: false,

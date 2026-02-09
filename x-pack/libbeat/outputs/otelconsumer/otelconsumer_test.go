@@ -22,9 +22,9 @@ import (
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/beats/v7/x-pack/otel/otelctx"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -111,13 +111,14 @@ func TestPublish(t *testing.T) {
 		}
 	})
 
-	t.Run("elasticsearch.ingest_pipeline fields are set on logrecord.Attribute", func(t *testing.T) {
+	t.Run("Test elasticsearch.ingest_pipeline and elastic.mapping.mode fields are set", func(t *testing.T) {
 		event1.Meta = mapstr.M{}
 		event1.Meta["pipeline"] = "error_pipeline"
 
 		batch := outest.NewBatch(event1)
 
 		var countLogs int
+		var scopeAttributes pcommon.Map
 		var attributes pcommon.Map
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			countLogs = countLogs + ld.LogRecordCount()
@@ -125,6 +126,7 @@ func TestPublish(t *testing.T) {
 				resourceLog := ld.ResourceLogs().At(i)
 				for j := 0; j < resourceLog.ScopeLogs().Len(); j++ {
 					scopeLog := resourceLog.ScopeLogs().At(j)
+					scopeAttributes = scopeLog.Scope().Attributes()
 					for k := 0; k < scopeLog.LogRecords().Len(); k++ {
 						LogRecord := scopeLog.LogRecords().At(k)
 						attributes = LogRecord.Attributes()
@@ -143,6 +145,11 @@ func TestPublish(t *testing.T) {
 		gotValue, ok := attributes.Get(dynamicAttributeKey)
 		require.True(t, ok, "dynamic pipeline attribute was not set")
 		assert.EqualValues(t, "error_pipeline", gotValue.AsString())
+
+		dynamicAttributeKey = "elastic.mapping.mode"
+		gotValue, ok = scopeAttributes.Get(dynamicAttributeKey)
+		require.True(t, ok, "elastic mapping mode was not set")
+		assert.EqualValues(t, "bodymap", gotValue.AsString())
 	})
 
 	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {

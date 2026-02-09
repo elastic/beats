@@ -25,6 +25,7 @@ import (
 	"net/url"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/go-ldap/ldap/v3"
 
@@ -37,6 +38,8 @@ type ldapClient struct {
 
 	mu   sync.Mutex
 	conn *ldap.Conn
+
+	sspiTimedout atomic.Bool
 
 	log *logp.Logger
 }

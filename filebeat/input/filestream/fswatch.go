@@ -27,6 +27,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/go-concert/unison"
@@ -396,12 +397,13 @@ func defaultFileScannerConfig() fileScannerConfig {
 // fileScanner looks for files which match the patterns in paths.
 // It is able to exclude files and symlinks.
 type fileScanner struct {
-	paths       []string
-	cfg         fileScannerConfig
-	log         *logp.Logger
-	hasher      hash.Hash
-	readBuffer  []byte
-	compression string
+	smallFilesWarned atomic.Bool
+	paths            []string
+	cfg              fileScannerConfig
+	log              *logp.Logger
+	hasher           hash.Hash
+	readBuffer       []byte
+	compression      string
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
@@ -480,7 +482,6 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 	// used to filter out duplicate matches
 	uniqueFiles := map[string]struct{}{}
 
-	tooSmallFiles := 0
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
 		if err != nil {
@@ -503,7 +504,14 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 
 			fd, err := s.toFileDescriptor(&it)
 			if errors.Is(err, errFileTooSmall) {
-				tooSmallFiles++
+				if s.smallFilesWarned.CompareAndSwap(false, true) {
+					s.log.Warnf("ingestion from some files will be delayed, files need to be at "+
+						"least %d in size for ingestion to start. To change this "+
+						"behaviour set 'prospector.scanner.fingerprint.length' and "+
+						"'prospector.scanner.fingerprint.offset'. "+
+						"Enable debug logging to see all file names of delayed files.",
+						s.cfg.Fingerprint.Offset+s.cfg.Fingerprint.Length)
+				}
 				s.log.Debugf("cannot start ingesting from file %q: %s", filename, err)
 				continue
 			}
@@ -520,22 +528,6 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 			uniqueIDs[fileID] = fd.Filename
 			fdByName[filename] = fd
 		}
-	}
-
-	if tooSmallFiles > 0 {
-		prefix := "%d files are "
-		if tooSmallFiles == 1 {
-			prefix = "%d file is "
-		}
-		s.log.Warnf(
-			prefix+"too small to be ingested, files need to be at "+
-				"least %d in size for ingestion to start. To change this "+
-				"behaviour set 'prospector.scanner.fingerprint.length' and "+
-				"'prospector.scanner.fingerprint.offset'. "+
-				"Enable debug logging to see all file names.",
-			tooSmallFiles,
-			s.cfg.Fingerprint.Offset+s.cfg.Fingerprint.Length,
-		)
 	}
 
 	return fdByName
@@ -603,10 +595,8 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 }
 
 func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescriptor, err error) {
-
 	fd.Filename = it.filename
 	fd.Info = it.info
-	var osFile *os.File
 	var file File
 
 	if !s.cfg.Fingerprint.Enabled {
@@ -614,11 +604,29 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	}
 	minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
 
-	osFile, err = os.Open(it.originalFilename)
-	if err != nil {
-		return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+	// opener is used to open the file only once
+	opener := struct {
+		Open func() (*os.File, error)
+		f    *os.File
+	}{}
+	opener.Open = func() (*os.File, error) {
+		if opener.f != nil {
+			return opener.f, nil
+		}
+
+		opener.f, err = os.Open(it.originalFilename)
+		if err != nil {
+			return nil, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+
+		}
+		return opener.f, err
 	}
-	defer osFile.Close()
+
+	defer func() {
+		if opener.f != nil {
+			opener.f.Close()
+		}
+	}()
 
 	switch s.compression {
 	case CompressionNone:
@@ -626,6 +634,11 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	case CompressionGZIP:
 		fd.GZIP = true
 	case CompressionAuto:
+		osFile, err := opener.Open()
+		if err != nil {
+			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+		}
+
 		fd.GZIP, err = IsGZIP(osFile)
 		if err != nil {
 			return fd, fmt.Errorf("failed to check if %q is gzip: %w",
@@ -636,6 +649,11 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	// Check there is enough data
 	var dataSize int64
 	if fd.GZIP {
+		osFile, err := opener.Open()
+		if err != nil {
+			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+		}
+
 		// Check if there is enough *decompressed* data for fingerprint
 		file, err = newGzipSeekerReader(osFile, int(minSize))
 		if err != nil {
@@ -663,6 +681,10 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		}
 
 		// there is enough data wrap it on File
+		osFile, err := opener.Open()
+		if err != nil {
+			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+		}
 		file = newPlainFile(osFile)
 	}
 

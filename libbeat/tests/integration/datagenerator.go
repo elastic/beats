@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build integration
 
 package integration
@@ -80,6 +82,66 @@ func WriteLogFile(t *testing.T, path string, count int, append bool, prefix ...s
 			t.Fatalf("could not write line %d to file: %s", count+1, err)
 		}
 	}
+}
+
+// WriteDockerJSONLog writes Docker JSON log lines to path.
+// streams must contain one or two elements to select the container 'stream'.
+// If streams contains two elements they will be rotated in a round-robin fashion.
+// If append is true, data is appended to the file; otherwise the file is truncated.
+func WriteDockerJSONLog(t *testing.T, path string, count int, streams []string, append bool) {
+	var file *os.File
+	var err error
+	if !append {
+		file, err = os.Create(path)
+		if err != nil {
+			t.Fatalf("cannot create docker log file: %s", err)
+		}
+	} else {
+		file, err = os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+		if err != nil {
+			t.Fatalf("cannot open or create docker log file: %s", err)
+		}
+	}
+	defer func() {
+		if err := file.Close(); err != nil {
+			t.Fatalf("cannot close docker log file: %s", err)
+		}
+	}()
+	defer func() {
+		if err := file.Sync(); err != nil {
+			t.Fatalf("cannot flush docker log file: %s", err)
+		}
+	}()
+
+	var nextStream func() string
+	switch len(streams) {
+	case 1:
+		nextStream = func() string { return streams[0] }
+	case 2:
+		i := 0
+		nextStream = func() string {
+			s := streams[i%2]
+			i++
+			return s
+		}
+	default:
+		t.Fatalf("streams must have one or two elements, got %d", len(streams))
+	}
+
+	now := time.Now().UTC()
+	for i := range count {
+		timestamp := now.Add(time.Duration(i) * time.Millisecond).Format(time.RFC3339Nano)
+		if _, err := fmt.Fprintf(
+			file,
+			`{"log":"message %02d\n","stream":"%s","time":"%s"}`+"\n",
+			i,
+			nextStream(),
+			timestamp,
+		); err != nil {
+			t.Fatalf("cannot write docker log line: %s", err)
+		}
+	}
+
 }
 
 // WriteNLogFiles generates nFiles with nLines in each. The lines are a
