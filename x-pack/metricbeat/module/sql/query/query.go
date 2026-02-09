@@ -154,12 +154,6 @@ func (m *MetricSet) initCursor(base mb.BaseMetricSet) error {
 		return fmt.Errorf("cursor store initialization failed: %w", err)
 	}
 
-	// Get module ID if configured (for state isolation)
-	moduleID := ""
-	if id := base.Module().Config().ID; id != "" {
-		moduleID = id
-	}
-
 	// Create cursor manager.
 	// We use the full URI (not just Host) for state key generation because
 	// Host often strips the database name (for example, "localhost:5432" for both
@@ -170,7 +164,6 @@ func (m *MetricSet) initCursor(base mb.BaseMetricSet) error {
 		store,
 		m.HostData().URI,
 		m.Config.Query, // use original query for state key
-		moduleID,
 		m.Logger(),
 	)
 	if err != nil {

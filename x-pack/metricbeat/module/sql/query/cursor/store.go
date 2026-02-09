@@ -172,23 +172,40 @@ func isKeyNotFoundError(err error) bool {
 // GenerateStateKey creates a unique key for cursor state persistence.
 // The key is based on module configuration to ensure separate state per unique config.
 //
-// Components:
-//   - inputType: "sql" (for namespacing)
-//   - moduleID: Optional module ID from config (for multi-instance support)
-//   - dsn: Full database URI/DSN (includes database name for proper isolation)
-//   - query: Full query string (no normalization - any change resets cursor)
-//   - cursorColumn: The column being tracked
+// IMPORTANT: Any change to the components below will cause the cursor to reset to
+// its default value and re-ingest all data from scratch. This includes:
 //
-// Any change to these components will result in a different key, effectively
-// resetting the cursor to its default value. The combined string is hashed
-// via xxhash, so no secrets are stored in the key itself.
-func GenerateStateKey(inputType, moduleID, dsn, query, cursorColumn string) string {
-	var keyParts []string
-	keyParts = append(keyParts, inputType) // "sql"
-	if moduleID != "" {
-		keyParts = append(keyParts, moduleID)
-	}
-	keyParts = append(keyParts, dsn, query, cursorColumn)
+// Components that trigger cursor reset:
+//   - inputType: "sql" (for namespacing) - hardcoded, never changes
+//   - dsn: Full database URI/DSN (NOT normalized)
+//     * Changing host (localhost → 127.0.0.1) resets cursor
+//     * Changing password in DSN resets cursor
+//     * Adding connection params (?sslmode=require) resets cursor
+//     * Includes database name for isolation (prod_db vs test_db on same server)
+//   - query: Full query string (NOT normalized - exact byte match)
+//     * Adding/removing whitespace resets cursor
+//     * Changing SQL capitalization (SELECT → select) resets cursor
+//     * Changing LIMIT value resets cursor
+//     * Modifying WHERE clause resets cursor
+//   - cursorColumn: The column name being tracked
+//     * Renaming cursor column resets cursor
+//   - direction: The cursor scan direction ("asc" or "desc")
+//     * Changing direction resets cursor (prevents using a max-tracked value
+//       as a min-tracking starting point, or vice versa)
+//
+// Design rationale:
+//   - Safety: Query changes could affect result set semantics. Better to start
+//     fresh than risk missing data or duplicates from incompatible queries.
+//   - Simplicity: SQL normalization is complex and database-specific. Avoiding
+//     SQL parsing keeps implementation simple and reliable.
+//   - Isolation: Different databases on same server (e.g., prod_db vs test_db)
+//     must have separate cursor states. Including full DSN ensures this.
+//   - Direction safety: A cursor value tracked as a maximum (asc) is semantically
+//     incompatible with minimum tracking (desc). Changing direction must reset.
+//
+// The combined string is hashed via xxhash, so no secrets appear in the stored key.
+func GenerateStateKey(inputType, dsn, query, cursorColumn, direction string) string {
+	keyParts := []string{inputType, dsn, query, cursorColumn, direction}
 
 	combined := strings.Join(keyParts, "|")
 	hash := xxhash.Sum64String(combined)

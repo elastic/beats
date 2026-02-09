@@ -34,11 +34,10 @@ type Manager struct {
 //   - store: State persistence store (memlog-backed)
 //   - dsn: Full database URI/DSN for state key generation (hashed, not stored in cleartext)
 //   - query: Original SQL query (before placeholder translation)
-//   - moduleID: Optional module ID from base.Module().Config().ID
 //   - logger: Logger instance for this cursor
 //
 // The manager takes ownership of the store and will close it when Close() is called.
-func NewManager(cfg Config, store *Store, dsn, query, moduleID string, logger *logp.Logger) (*Manager, error) {
+func NewManager(cfg Config, store *Store, dsn, query string, logger *logp.Logger) (*Manager, error) {
 	if err := cfg.Validate(); err != nil {
 		return nil, fmt.Errorf("cursor config validation failed: %w", err)
 	}
@@ -50,7 +49,7 @@ func NewManager(cfg Config, store *Store, dsn, query, moduleID string, logger *l
 	m := &Manager{
 		config:   cfg,
 		store:    store,
-		stateKey: GenerateStateKey("sql", moduleID, dsn, query, cfg.Column),
+		stateKey: GenerateStateKey("sql", dsn, query, cfg.Column, cfg.Direction),
 		logger:   logger,
 	}
 
