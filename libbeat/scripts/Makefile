@@ -379,7 +379,7 @@ $(.OVER)import-dashboards: update ${BEAT_NAME}
 # Builds the environment to test beat
 .PHONY: build-image
 build-image: write-environment
-	${DOCKER_COMPOSE} build ${DOCKER_NOCACHE} ${DOCKER_FORCE_PULL} --force-rm
+	${DOCKER_COMPOSE} build ${DOCKER_NOCACHE} ${DOCKER_FORCE_PULL}
 
 # Runs the environment so the redis and elasticsearch can also be used for local development
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.

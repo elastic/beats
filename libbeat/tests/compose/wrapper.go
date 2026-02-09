@@ -210,14 +210,12 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		args = append(args, service)
 	}
 
-	// Try to pull the image before building it
-	var stderr bytes.Buffer
-	pull := d.cmd(ctx, "pull", "--ignore-pull-failures", service)
+	// Try to pull the image before building it.
+	// Pull failures are not fatal because "up" will build images if needed.
+	pull := d.cmd(ctx, "pull", service)
 	pull.Stdout = nil
-	pull.Stderr = &stderr
-	if err := pull.Run(); err != nil {
-		return fmt.Errorf("failed to pull images using docker compose: %s: %w", stderr.String(), err)
-	}
+	pull.Stderr = nil
+	_ = pull.Run()
 
 	err := d.cmd(ctx, "up", args...).Run()
 	if err != nil {

@@ -121,7 +121,6 @@ func dockerCompose(env map[string]string, verbose bool) error {
 	args := []string{
 		"-p", devtools.DockerComposeProjectName(),
 		"build",
-		"--force-rm",
 	}
 	if _, noCache := os.LookupEnv("DOCKER_NOCACHE"); noCache {
 		args = append(args, "--no-cache")

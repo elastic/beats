@@ -289,7 +289,7 @@ func BuildIntegTestContainers() error {
 		return err
 	}
 
-	args := []string{"compose", "-p", DockerComposeProjectName(), "build", "--force-rm"}
+	args := []string{"compose", "-p", DockerComposeProjectName(), "build"}
 	if _, noCache := os.LookupEnv("DOCKER_NOCACHE"); noCache {
 		args = append(args, "--no-cache")
 	}
