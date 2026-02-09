@@ -208,15 +208,15 @@ Cursor state is persisted to disk using Metricbeat's statestore at:
 
 The state persists across Metricbeat restarts, allowing incremental fetching to continue
 from where it left off. State is keyed by a hash of:
-- Module ID
 - Full database URI/DSN (includes database name)
 - Query string
 - Cursor column name
+- Cursor direction (`asc` or `desc`)
 
 This ensures that different query configurations maintain separate cursor states, including
 different databases on the same server.
 
-**Important:** Changing any of these components (module ID, DSN, query, or cursor column) produces a
+**Important:** Changing any of these components (DSN, query, cursor column, or direction) produces a
 different state key, which effectively resets the cursor to its `default` value. This is by design —
 if you modify the query, the old cursor position might no longer be valid for the new query.
 
