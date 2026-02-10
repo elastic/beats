@@ -23,8 +23,7 @@ The following topics describe how to configure each supported output. If you’v
 * [Console](/reference/heartbeat/console-output.md)
 * [Discard](/reference/heartbeat/discard-output.md)
 
-::::{tip}
-When sending data to {{es-serverless}}, configure the [Elasticsearch output](/reference/heartbeat/elasticsearch-output.md) with your project's endpoint URL and an API key. Refer to [Beats with {{es-serverless}}](/reference/serverless/beats.md) for setup instructions.
+::::{include} /reference/_snippets/serverless-output-tip.md
 ::::
 
 
