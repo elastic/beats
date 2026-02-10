@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/freebsd-no-such-file.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # open /compat/linux/proc: no such file or directory error on FreeBSD [freebsd-no-such-file]

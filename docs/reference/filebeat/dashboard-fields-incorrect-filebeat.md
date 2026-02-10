@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/dashboard-fields-incorrect-filebeat.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Dashboard in Kibana is breaking up data fields incorrectly [dashboard-fields-incorrect-filebeat]

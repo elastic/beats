@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/configuration-protocols.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Configure which transaction protocols to monitor [configuration-protocols]
