@@ -1502,7 +1502,7 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 }
 
 func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {
-	const numTestEvents = 5
+	const numTestEvents = 100
 
 	tmpdir := t.TempDir()
 	logFilePath := filepath.Join(tmpdir, "log.log")
