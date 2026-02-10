@@ -113,39 +113,6 @@ PS > .\auditbeat.exe setup --index-management -E output.logstash.enabled=false -
 ```
 
 
-### Force Kibana to look at newest documents [force-kibana-new]
-
-If you’ve already used Auditbeat to index data into {{es}}, the index may contain old documents. After you load the index template, you can delete the old documents from `auditbeat-*` to force Kibana to look at the newest documents.
-
-Use this command:
-
-**deb and rpm:**
-
-```sh
-curl -XDELETE 'http://localhost:9200/auditbeat-*'
-```
-
-**mac:**
-
-```sh
-curl -XDELETE 'http://localhost:9200/auditbeat-*'
-```
-
-**linux:**
-
-```sh
-curl -XDELETE 'http://localhost:9200/auditbeat-*'
-```
-
-**win:**
-
-```sh
-PS > Invoke-RestMethod -Method Delete "http://localhost:9200/auditbeat-*"
-```
-
-This command deletes all indices that match the pattern `auditbeat`. Before running this command, make sure you want to delete all indices that match the pattern.
-
-
 ## Load the index template manually (alternate method) [load-template-manually-alternate]
 
 If the host running Auditbeat does not have direct connectivity to {{es}}, you can export the index template to a file, move it to a machine that does have connectivity, and then install the template manually.
