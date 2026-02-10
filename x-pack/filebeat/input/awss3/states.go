@@ -18,11 +18,6 @@ import (
 const awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
 const awsS3TailKey = "filebeat::aws-s3::tail"
 
-// persistedTailState is the struct used to persist the tail key in the state store.
-type persistedTailState struct {
-	Tail string `json:"tail"`
-}
-
 // stateRegistry defines the interface for managing S3 object states.
 // This allows different implementations for normal mode vs lexicographical ordering mode.
 type stateRegistry interface {
@@ -237,7 +232,9 @@ func newLexicographicalStateRegistry(log *logp.Logger, store *statestore.Store, 
 		return nil, fmt.Errorf("loading S3 input state: %w", err)
 	}
 
-	var persisted persistedTailState
+	var persisted struct {
+		Tail string `json:"tail"`
+	}
 	if err := store.Get(awsS3TailKey, &persisted); err != nil {
 		// Key doesn't exist or can't be decoded - start fresh
 		if log != nil {
@@ -267,7 +264,9 @@ func newLexicographicalStateRegistry(log *logp.Logger, store *statestore.Store, 
 	if r.persistedTail == "" && r.heap.Len() > 0 {
 		if minState := r.heap.peek(); minState != nil {
 			r.persistedTail = minState.Key
-			if err := store.Set(awsS3TailKey, persistedTailState{r.persistedTail}); err != nil {
+			if err := store.Set(awsS3TailKey, struct {
+				Tail string `json:"tail"`
+			}{r.persistedTail}); err != nil {
 				return nil, fmt.Errorf("failed to persist initial tail key to store (key=%q): %w", r.persistedTail, err)
 			}
 		}
@@ -328,7 +327,9 @@ func (r *lexicographicalStateRegistry) MarkObjectInFlight(key string) error {
 	if r.persistedTail == "" || key < r.persistedTail {
 		r.persistedTail = key
 		r.storeLock.Lock()
-		err := r.store.Set(awsS3TailKey, persistedTailState{key})
+		err := r.store.Set(awsS3TailKey, struct {
+			Tail string `json:"tail"`
+		}{key})
 		r.storeLock.Unlock()
 		if err != nil {
 			return fmt.Errorf("failed to persist tail key: %w", err)
@@ -519,7 +520,9 @@ func (r *lexicographicalStateRegistry) recomputeAndPersistTail() error {
 	if newTail == "" {
 		err = r.store.Remove(awsS3TailKey)
 	} else {
-		err = r.store.Set(awsS3TailKey, persistedTailState{newTail})
+		err = r.store.Set(awsS3TailKey, struct {
+			Tail string `json:"tail"`
+		}{newTail})
 	}
 
 	if err != nil {
