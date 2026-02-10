@@ -242,6 +242,7 @@ func TestSet(t *testing.T) {
 
 	const noQueriesConfig = `{
     "options": {
+        "schedule_max_drift": 60,
         "schedule_splay_percent": 10
     }
 }`

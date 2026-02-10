@@ -19,6 +19,7 @@ import (
 const (
 	configName                  = "osq_config"
 	defaultScheduleSplayPercent = 10
+	defaultScheduleMaxDrift     = 60 // seconds; osquery's default for splay drift compensation
 	maxECSMappingDepth          = 25 // Max ECS dot delimited key path, that is sufficient for the current ECS mapping
 
 	keyField = "field"
@@ -33,6 +34,12 @@ var (
 type QueryInfo struct {
 	Query      string
 	ECSMapping ecs.Mapping
+	// ActionID is the policy-defined action id for this query (optional)
+	ActionID string
+	// StartDate is the start date for native schedules (RFC3339); required for schedule_execution_count
+	StartDate string
+	// Interval is the schedule interval in seconds for native schedules; used to compute schedule_execution_count
+	Interval int
 }
 
 type queryInfoMap map[string]QueryInfo
@@ -145,9 +152,18 @@ func newOsqueryConfig(osqueryConfig *config.OsqueryConfig) *config.OsqueryConfig
 	if osqueryConfig.Options == nil {
 		osqueryConfig.Options = make(map[string]interface{})
 	}
+	// Apply native schedule splay defaults only when not explicitly set (so user values are not overwritten)
 	const scheduleSplayPercentKey = "schedule_splay_percent"
+	if osqueryConfig.ScheduleSplayPercent == nil {
 	if _, ok := osqueryConfig.Options[scheduleSplayPercentKey]; !ok {
 		osqueryConfig.Options[scheduleSplayPercentKey] = defaultScheduleSplayPercent
+		}
+	}
+	const scheduleMaxDriftKey = "schedule_max_drift"
+	if osqueryConfig.ScheduleMaxDrift == nil {
+		if _, ok := osqueryConfig.Options[scheduleMaxDriftKey]; !ok {
+			osqueryConfig.Options[scheduleMaxDriftKey] = defaultScheduleMaxDrift
+		}
 	}
 	return osqueryConfig
 }
@@ -213,6 +229,9 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		newQueryInfoMap[name] = QueryInfo{
 			Query:      qi.Query,
 			ECSMapping: ecsm,
+			ActionID:   qi.ActionID,
+			StartDate:  qi.StartDate,
+			Interval:   qi.Interval,
 		}
 		namespaces[name] = ns
 		queriesCount++
