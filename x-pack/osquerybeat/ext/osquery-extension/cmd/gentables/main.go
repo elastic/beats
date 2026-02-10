@@ -817,6 +817,8 @@ func osqueryTypeToGoType(col columnSpec) string {
 		return "int64"
 	case "DOUBLE":
 		return "float64"
+	case "BOOLEAN", "BOOL":
+		return "bool"
 	default:
 		return "string" // Default fallback
 	}
