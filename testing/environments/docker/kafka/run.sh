@@ -35,6 +35,7 @@ ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override log4j.logger.kafka=DEBUG,kafkaAppender \
     --override log.flush.interval.ms=200 \
     --override num.partitions=3 \
+    --override auto.leader.rebalance.enable=false \
     --override ssl.keystore.location=/broker.keystore.jks \
     --override ssl.keystore.password=KafkaTest \
     --override ssl.truststore.location=/broker.truststore.jks \
