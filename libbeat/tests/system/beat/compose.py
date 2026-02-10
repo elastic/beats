@@ -1,12 +1,9 @@
 import io
-import logging
 import os
 import subprocess
 import sys
 import tarfile
 import time
-
-from contextlib import contextmanager
 
 import docker as docker_sdk
 
