@@ -87,7 +87,7 @@ func TestPublish(t *testing.T) {
 			return fmt.Errorf("Some kind of error")
 		})
 		reg := monitoring.NewRegistry()
-		otelConsumer.observer = outputs.NewStats(reg, logp.NewLogger("testing"))
+		otelConsumer.observer = outputs.NewStats(reg, logptest.NewTestingLogger(t, "testing"))
 		assert.EqualValues(t, 0, checkEventsActive(reg), "initial total events should be zero")
 		// Run Publish asynchronously so we can check the metrics while it is still in progress
 		go func() {
