@@ -392,9 +392,7 @@ func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
 func appendEventsToLogFile(t *testing.T, filename string, startLine int, numEvents int) {
 	t.Helper()
 	logFile, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		t.Fatalf("could not open file '%s' for appending: %s", filename, err)
-	}
+	require.NoError(t, err)
 	// append events to log file
 	for i := startLine; i < startLine+numEvents; i++ {
 		msg := fmt.Sprintf("Line %d", i)
