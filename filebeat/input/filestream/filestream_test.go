@@ -22,6 +22,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -60,8 +61,8 @@ func TestLogFileTimedClosing(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			reader, err := newFileReader(
-				logptest.NewTestingLogger(t, ""),
-				context.TODO(),
+				logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests")).Logger,
+				t.Context(),
 				f,
 				readerConfig{},
 				closerConfig{

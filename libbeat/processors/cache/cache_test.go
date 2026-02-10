@@ -218,6 +218,87 @@ var cacheTests = []struct {
 		},
 	},
 	{
+		name: "get_missing_value",
+		configs: []testConfig{
+			{
+				when: func(e mapstr.M) bool {
+					return e["get"] == true
+				},
+				cfg: mapstr.M{
+					"backend": mapstr.M{
+						"memory": mapstr.M{
+							"id": "aidmaster",
+						},
+					},
+					"get": mapstr.M{
+						"key_field":    "crowdstrike.aid",
+						"target_field": "crowdstrike.metadata_new",
+					},
+				},
+			},
+		},
+		wantInitErr: nil,
+		steps: []cacheTestStep{
+			{
+				event: mapstr.M{
+					"get": true,
+					"crowdstrike": mapstr.M{
+						"aid": "one",
+					},
+				},
+				want: mapstr.M{
+					"get": true,
+					"crowdstrike": mapstr.M{
+						"aid": "one",
+					},
+				},
+				wantCacheVal: map[string]*CacheEntry{},
+				wantErr:      errors.New("metadata not found for 'one' in memory:aidmaster: metadata not found"),
+			},
+		},
+	},
+	{
+		name: "get_missing_value_ignore_error",
+		configs: []testConfig{
+			{
+				when: func(e mapstr.M) bool {
+					return e["get"] == true
+				},
+				cfg: mapstr.M{
+					"backend": mapstr.M{
+						"memory": mapstr.M{
+							"id": "aidmaster",
+						},
+					},
+					"get": mapstr.M{
+						"key_field":    "crowdstrike.aid",
+						"target_field": "crowdstrike.metadata_new",
+					},
+					"ignore_failure": true,
+				},
+			},
+		},
+		wantInitErr: nil,
+		steps: []cacheTestStep{
+			{
+				event: mapstr.M{
+					"get": true,
+					"crowdstrike": mapstr.M{
+						"aid": "one",
+					},
+				},
+				want: mapstr.M{
+					"get": true,
+					"crowdstrike": mapstr.M{
+						"aid": "one",
+					},
+				},
+				wantCacheVal: map[string]*CacheEntry{},
+				wantErr:      nil,
+			},
+		},
+	},
+	{
 		name: "put_and_get_value_reverse_config",
 		configs: []testConfig{
 			{

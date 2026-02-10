@@ -35,13 +35,24 @@ import (
 
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"
 )
 
-var beatsCfgFile = `
+func TestFilebeatOTelE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+	numEvents := 1
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbOtelIndex := "logs-integration-" + namespace
+	fbIndex := "logs-filebeat-" + namespace
+
+	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
+	filebeatMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
+
+	beatsCfgFile := `
 filebeat.inputs:
   - type: filestream
     id: filestream-input-id
@@ -69,28 +80,64 @@ http.host: localhost
 http.port: %d
 `
 
-func TestFilebeatOTelE2E(t *testing.T) {
-	integration.EnsureESIsRunning(t)
-	numEvents := 1
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbOtelIndex := "logs-integration-" + namespace
-	fbIndex := "logs-filebeat-" + namespace
+	otelCfgFile := `receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-input-id
+          enabled: true
+          paths:
+            - %s
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    output:
+      otelconsumer:
+    processors:
+      - add_host_metadata: ~
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
+      - add_kubernetes_metadata: ~
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    path.home: %s
+    http.enabled: true
+    http.host: localhost
+    http.port: %d
+exporters:
+  debug:
+    use_internal_logger: false
+    verbosity: detailed
+  elasticsearch/log:
+    endpoints:
+      - http://localhost:9200
+    compression: none
+    user: admin
+    password: testing
+    logs_index: %s
+    batcher:
+      enabled: true
+      flush_timeout: 1s
+    mapping:
+      mode: bodymap
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - elasticsearch/log
+        - debug
+`
 
-	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
-	filebeatMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
-
-	// start filebeat in otel mode
-	filebeatOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
-
-	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
-	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, fbOtelIndex, otelMonitoringPort))
+	tmpdir := t.TempDir()
+	logFilePath := filepath.Join(tmpdir, "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	filebeatOTel.Start()
+	oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
 
 	// start filebeat
 	filebeat := integration.NewBeat(
@@ -152,17 +199,14 @@ setup.template.pattern: logs-filebeat-default
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
-		// only present in beats receivers
-		"agent.otelcol.component.id",
-		"agent.otelcol.component.kind",
+		"log.file.device_id", // changes value between filebeat and otel receiver
+		"container.id",       // only present in filebeat
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 
-	assert.Equal(t, "filebeatreceiver", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
-	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in filebeat log record")
-	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in filebeat log record")
+	assert.Equal(t, "filebeat", otelDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in otel docs")
+	assert.Equal(t, "filebeat", filebeatDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in filebeat docs")
 	assertMonitoring(t, otelMonitoringPort)
 }
 
@@ -219,115 +263,6 @@ func assertMonitoring(t *testing.T, port int) {
 	r, err = http.Get(address + "/not-exist") //nolint:noctx,bodyclose // fine for tests
 	require.NoError(t, err)
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
-}
-
-func TestFilebeatOTelInspect(t *testing.T) {
-	filebeatOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
-
-	var beatsCfgFile = `
-filebeat.inputs:
-  - type: filestream
-    id: filestream-input-id
-    enabled: true
-    file_identity.native: ~
-    prospector.scanner.fingerprint.enabled: false
-    paths:
-      - /tmp/log.log
-output:
-  elasticsearch:
-    hosts:
-      - localhost:9200
-    username: admin
-    password: testing
-    index: index
-queue.mem.flush.timeout: 0s
-setup.template.enabled: false
-processors:
-    - add_host_metadata: ~
-    - add_cloud_metadata: ~
-    - add_docker_metadata: ~
-    - add_kubernetes_metadata: ~
-`
-	expectedExporter := `exporters:
-    elasticsearch:
-        auth:
-            authenticator: beatsauth
-        compression: gzip
-        compression_params:
-            level: 1
-        endpoints:
-            - http://localhost:9200
-        logs_index: index
-        mapping:
-            mode: bodymap
-        max_conns_per_host: 1
-        password: testing
-        retry:
-            enabled: true
-            initial_interval: 1s
-            max_interval: 1m0s
-            max_retries: 3
-        sending_queue:
-            batch:
-                flush_timeout: 10s
-                max_size: 1600
-                min_size: 0
-                sizer: items
-            block_on_overflow: true
-            enabled: true
-            num_consumers: 1
-            queue_size: 3200
-            wait_for_result: true
-        user: admin
-extensions:
-    beatsauth:
-        idle_connection_timeout: 3s
-        proxy_disable: false
-        timeout: 1m30s
-`
-
-	expectedReceiver := `receivers:
-    filebeatreceiver:
-        filebeat:
-            inputs:
-                - enabled: true
-                  file_identity:
-                    native: null
-                  id: filestream-input-id
-                  paths:
-                    - /tmp/log.log
-                  prospector:
-                    scanner:
-                        fingerprint:
-                            enabled: false
-                  type: filestream`
-	expectedService := `service:
-    extensions:
-        - beatsauth
-    pipelines:
-        logs:
-            exporters:
-                - elasticsearch
-            receivers:
-                - filebeatreceiver
-`
-	filebeatOTel.WriteConfigFile(beatsCfgFile)
-
-	filebeatOTel.Start("inspect")
-	defer filebeatOTel.Stop()
-
-	require.EventuallyWithT(t, func(collect *assert.CollectT) {
-		out, err := filebeatOTel.ReadStdout()
-		require.NoError(collect, err)
-		require.Contains(collect, out, expectedExporter)
-		require.Contains(collect, out, expectedReceiver)
-		require.Contains(collect, out, expectedService)
-	}, 10*time.Second, 500*time.Millisecond, "failed to get output of inspect command")
 }
 
 func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
@@ -456,13 +391,6 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 			server := httptest.NewServer(mux)
 			defer server.Close()
 
-			filebeatOTel := integration.NewBeat(
-				t,
-				"filebeat-otel",
-				"../../filebeat.test",
-				"otel",
-			)
-
 			namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 			index := "logs-integration-" + namespace
 
@@ -474,48 +402,92 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 				MonitoringPort int
 			}{
 				Index:          index,
-				InputFile:      filepath.Join(filebeatOTel.TempDir(), "log.log"),
+				InputFile:      filepath.Join(t.TempDir(), "log.log"),
 				ESEndpoint:     server.URL,
 				MaxRetries:     tt.maxRetries,
 				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
 			}
 
-			cfg := `
-filebeat.inputs:
-  - type: filestream
-    id: filestream-input-id
-    enabled: true
-    file_identity.native: ~
-    prospector.scanner.fingerprint.enabled: false
-    paths:
-      - {{.InputFile}}
-output:
+			cfg := `receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-input-id
+          enabled: true
+          paths:
+            - {{.InputFile}}
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    output:
+      otelconsumer:
+    logging:
+      level: debug
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    http.enabled: true
+    http.host: localhost
+    http.port: {{.MonitoringPort}}
+exporters:
   elasticsearch:
-    hosts:
+    auth:
+      authenticator: beatsauth
+    compression: none
+    endpoints:
       - {{.ESEndpoint}}
-    username: admin
+    logs_index: {{.Index}}
+    mapping:
+      mode: bodymap
+    max_conns_per_host: 1
     password: testing
-    index: {{.Index}}
-    compression_level: 0
-    max_retries: {{.MaxRetries}}
-logging.level: debug
-queue.mem.flush.timeout: 0s
-setup.template.enabled: false
-http.enabled: true
-http.host: localhost
-http.port: {{.MonitoringPort}}
+    retry:
+      enabled: true
+      initial_interval: 1s
+      max_interval: 1m0s
+      max_retries: {{.MaxRetries}}
+    sending_queue:
+      batch:
+        flush_timeout: 10s
+        max_size: 1600
+        min_size: 0
+        sizer: items
+      block_on_overflow: true
+      enabled: true
+      num_consumers: 1
+      queue_size: 3200
+      wait_for_result: true
+    user: admin
+extensions:
+  beatsauth:
+    idle_connection_timeout: 3s
+    proxy_disable: false
+    timeout: 1m30s
+service:
+  extensions:
+    - beatsauth
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - elasticsearch
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
 `
 			var configBuffer bytes.Buffer
 			require.NoError(t,
 				template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, beatsConfig))
 
-			filebeatOTel.WriteConfigFile(configBuffer.String())
+			collector := oteltestcol.New(t, configBuffer.String())
 			writeEventsToLogFile(t, beatsConfig.InputFile, numTestEvents)
-			filebeatOTel.Start()
-			defer filebeatOTel.Stop()
 
 			// Wait for file input to be fully read
-			filebeatOTel.WaitStdErrContains(fmt.Sprintf("End of file reached: %s; Backoff now.", beatsConfig.InputFile), 30*time.Second)
+			require.Eventually(t, func() bool {
+				return collector.ObservedLogs().FilterMessageSnippet(fmt.Sprintf("End of file reached: %s; Backoff now.", beatsConfig.InputFile)).Len() == 1
+			}, 30*time.Second, 100*time.Millisecond, "timed out waiting for file input to be fully read")
 
 			// Wait for expected events to be ingested
 			require.EventuallyWithT(t, func(ct *assert.CollectT) {
@@ -579,5 +551,77 @@ http.port: {{.MonitoringPort}}
 				assert.Equal(ct, float64(0), m["libbeat.output.events.dropped"], "expected total events dropped to match")
 			}, 10*time.Second, 100*time.Millisecond, "expected output stats to be available in monitoring endpoint")
 		})
+	}
+}
+
+func BenchmarkFilebeatOTelCollector(b *testing.B) {
+	numReceivers := 4
+
+	for b.Loop() {
+		b.StopTimer()
+		tmpDir := b.TempDir()
+
+		type receiverConfig struct {
+			Index    int
+			PathHome string
+		}
+
+		configData := struct {
+			Receivers []receiverConfig
+		}{
+			Receivers: make([]receiverConfig, numReceivers),
+		}
+
+		for i := range numReceivers {
+			configData.Receivers[i] = receiverConfig{
+				Index:    i + 1,
+				PathHome: filepath.Join(tmpDir, strconv.Itoa(i+1)),
+			}
+		}
+
+		cfgTemplate := `receivers:
+{{range .Receivers}}
+  filebeatreceiver/{{.Index}}:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: 1
+    output:
+      otelconsumer:
+    path.home: {{.PathHome}}
+    queue.mem.flush.timeout: 0s
+{{end}}
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+{{range .Receivers}}
+        - filebeatreceiver/{{.Index}}
+{{end}}
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`
+
+		var configBuffer bytes.Buffer
+		require.NoError(b, template.Must(template.New("config").Parse(cfgTemplate)).Execute(&configBuffer, configData))
+
+		b.StartTimer()
+
+		col := oteltestcol.New(b, configBuffer.String())
+		require.NotNil(b, col)
+		require.Eventually(b, func() bool {
+			return col.ObservedLogs().
+				FilterMessageSnippet("Publish event").Len() == numReceivers
+		}, 30*time.Second, 1*time.Millisecond, "expected all receivers to publish events")
+		col.Shutdown()
 	}
 }

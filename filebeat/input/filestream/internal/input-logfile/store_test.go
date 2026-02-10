@@ -356,7 +356,7 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
 		store := &sourceStore{
-			identifier: &sourceIdentifier{"test"},
+			identifier: &SourceIdentifier{"test"},
 			store:      s,
 		}
 
@@ -411,8 +411,8 @@ func TestSourceStoreTakeOver(t *testing.T) {
 	s := testOpenStore(t, "filestream", backend)
 	defer s.Release()
 	store := &sourceStore{
-		identifier:            &sourceIdentifier{"filestream::current-id::"},
-		identifiersToTakeOver: []*sourceIdentifier{{"filestream::previous-id::"}},
+		identifier:            &SourceIdentifier{"filestream::current-id::"},
+		identifiersToTakeOver: []*SourceIdentifier{{"filestream::previous-id::"}},
 		store:                 s,
 	}
 
@@ -471,7 +471,7 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
 		store := &sourceStore{
-			identifier: &sourceIdentifier{"test"},
+			identifier: &SourceIdentifier{"test"},
 			store:      s,
 		}
 
@@ -509,7 +509,7 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
 		store := &sourceStore{
-			identifier: &sourceIdentifier{"test"},
+			identifier: &SourceIdentifier{"test"},
 			store:      s,
 		}
 
