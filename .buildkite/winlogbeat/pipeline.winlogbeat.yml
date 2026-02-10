@@ -25,7 +25,7 @@ env:
   # Unit tests
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
-  # See docker.go. Sets --pull to docker-compose
+  # See docker.go. Sets --pull to docker compose
   DOCKER_PULL: 0
 
 # This section is used to define the plugins that will be used in the pipeline.
