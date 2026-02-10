@@ -155,8 +155,8 @@ func newOsqueryConfig(osqueryConfig *config.OsqueryConfig) *config.OsqueryConfig
 	// Apply native schedule splay defaults only when not explicitly set (so user values are not overwritten)
 	const scheduleSplayPercentKey = "schedule_splay_percent"
 	if osqueryConfig.ScheduleSplayPercent == nil {
-	if _, ok := osqueryConfig.Options[scheduleSplayPercentKey]; !ok {
-		osqueryConfig.Options[scheduleSplayPercentKey] = defaultScheduleSplayPercent
+		if _, ok := osqueryConfig.Options[scheduleSplayPercentKey]; !ok {
+			osqueryConfig.Options[scheduleSplayPercentKey] = defaultScheduleSplayPercent
 		}
 	}
 	const scheduleMaxDriftKey = "schedule_max_drift"

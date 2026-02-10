@@ -232,6 +232,9 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 				return ctx.Err()
 			case inputConfigs := <-inputConfigCh:
 				b.Manager.UpdateStatus(status.Configuring, "Received updated configuration")
+				if len(inputConfigs) == 0 {
+					bt.log.Warn("Osquery input unit was removed; osquery actions (live queries, scheduled packs) will not be available until an osquery input unit is received from Fleet. If the agent was moved to a new policy, ensure the destination policy includes Osquery Manager and that the policy was fully applied.")
+				}
 				err = bt.pub.Configure(inputConfigs)
 				if err != nil {
 					bt.log.Errorf("Failed to connect beat publisher client, err: %v", err)
@@ -309,6 +312,9 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		bt.handleQueryResult(ctx, cli, configPlugin, res)
 	})
 
+	// Create recurrence query handler for scheduling queries with RRULE expressions
+	var rruleHandler *recurrenceQueryHandler
+
 	// Run main loop
 	g.Go(func() error {
 		// Connect to osqueryd
@@ -317,6 +323,11 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 			return err
 		}
 		defer cli.Close()
+
+		// Initialize and start RRULE query handler after osqueryd connection is established
+		rruleHandler = newRecurrenceQueryHandler(bt.log, cli, configPlugin, bt.pub)
+		rruleHandler.Start(ctx)
+		defer rruleHandler.Stop()
 
 		// Start osqueryd health monitoring after connection is established
 		g.Go(func() error {
@@ -346,6 +357,13 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 					return err
 				}
 				cache.Resize(configPlugin.Count())
+
+				// Update RRULE-scheduled queries
+				if rruleHandler != nil && len(inputConfigs) > 0 && inputConfigs[0].Osquery != nil {
+					if err := rruleHandler.UpdateFromConfig(inputConfigs[0].Osquery); err != nil {
+						bt.log.Errorf("failed to update RRULE scheduled queries: %v", err)
+					}
+				}
 			}
 		}
 	})
