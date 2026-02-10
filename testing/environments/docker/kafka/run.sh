@@ -44,7 +44,15 @@ wait_for_port 9092
 
 echo "Kafka load status code $?"
 
+# Wait for all listeners to be ready
+echo "Waiting for OUTSIDE listener on port 9094"
+wait_for_port 9094
+
+echo "Waiting for SASL_SSL listener on port 9093"
+wait_for_port 9093
+
 # create a user beats with password KafkaTest, for use in client SASL authentication
+echo "Creating SASL users"
 /kafka/bin/kafka-configs.sh \
 	--bootstrap-server localhost:9092 \
 	--alter --add-config 'SCRAM-SHA-512=[password=KafkaTest]' \
@@ -56,6 +64,12 @@ echo "Kafka load status code $?"
 	--alter --add-config 'SCRAM-SHA-256=[password=KafkaTest]' \
 	--entity-type users \
 	--entity-name beats
+
+# Give Kafka time to propagate SASL configuration
+echo "Waiting for SASL configuration to propagate"
+sleep 2
+
+echo "Kafka is ready"
 
 # Make sure the container keeps running
 tail -f /dev/null

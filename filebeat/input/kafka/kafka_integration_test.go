@@ -360,6 +360,11 @@ func TestSASLAuthentication(t *testing.T) {
 			testTopic := createTestTopicName()
 			groupID := "filebeat"
 
+			// Give Kafka SASL configuration extra time to be fully ready
+			// This helps avoid "leadership election" errors when the SASL listener
+			// is still initializing
+			time.Sleep(1 * time.Second)
+
 			// Send test messages to the topic for the input to read.
 			messages := []testMessage{
 				{message: "testing"},
@@ -597,11 +602,27 @@ func writeToKafkaTopic(
 	config.Producer.Return.Successes = true
 	config.Producer.Partitioner = sarama.NewHashPartitioner
 	config.Version = sarama.V1_0_0_0
+	config.Producer.Retry.Max = 10
+	config.Producer.Retry.Backoff = 100 * time.Millisecond
 
 	hosts := []string{getTestKafkaHost()}
-	producer, err := sarama.NewSyncProducer(hosts, config)
+
+	// Retry producer creation to handle transient connection issues
+	var producer sarama.SyncProducer
+	var err error
+	maxAttempts := 5
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		producer, err = sarama.NewSyncProducer(hosts, config)
+		if err == nil {
+			break
+		}
+		if attempt < maxAttempts {
+			t.Logf("Failed to create producer (attempt %d/%d): %v, retrying...", attempt, maxAttempts, err)
+			time.Sleep(time.Duration(attempt) * time.Second)
+		}
+	}
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("Failed to create producer after %d attempts: %v", maxAttempts, err)
 	}
 	defer func() {
 		if err := producer.Close(); err != nil {
