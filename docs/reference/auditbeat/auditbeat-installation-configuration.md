@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-installation-configuration.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Auditbeat quick start: installation and configuration [auditbeat-installation-configuration]
@@ -31,6 +32,10 @@ To get started quickly, spin up an [{{ech}}](https://www.elastic.co/cloud?page=d
 
 ::::::{applies-item} self: ga
 To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
+::::::
+
+::::::{applies-item} serverless: ga
+Create an [{{es-serverless}}](https://cloud.elastic.co/serverless-registration?page=docs&placement=docs-body) project. {{es-serverless}} projects are available for Elasticsearch, Observability, and Security use cases.
 ::::::
 
 :::::::
@@ -171,6 +176,23 @@ cloud.auth: "auditbeat_setup:YOUR_PASSWORD" <1>
     1. The hostname and port of the machine where {{kib}} is running, for example, `mykibanahost:5601`. If you specify a path after the port number, include the scheme and port: `http://mykibanahost:5601/path`.
     2. The `username` and `password` settings for {{kib}} are optional. If you don’t specify credentials for {{kib}}, Auditbeat uses the `username` and `password` specified for the {{es}} output.
     3. To use the pre-built {{kib}} dashboards, this user must be authorized to view dashboards or have the `kibana_admin` [built-in role](elasticsearch://reference/elasticsearch/roles.md).
+
+::::::
+
+::::::{applies-item} serverless: ga
+Set the {{es}} endpoint and API key in `auditbeat.yml`. To find your project's endpoint and create an API key, refer to [connection details](docs-content://solutions/search/search-connection-details.md). For example:
+
+```yaml
+output.elasticsearch:
+  hosts: ["https://my-project-url.es.us-east-1.aws.elastic.cloud"]
+  api_key: "YOUR_API_KEY" <1>
+```
+
+1. This example shows a hard-coded API key, but you should store sensitive values in the [secrets keystore](/reference/auditbeat/keystore.md). Refer to [Grant access using API keys](/reference/filebeat/beats-api-keys.md) for more on API key configuration.
+
+::::{note}
+Do not use `cloud.id` or `cloud.auth` for {{es-serverless}} projects. Those settings are for [{{ech}}](/reference/auditbeat/configure-cloud-id.md) deployments only.
+::::
 
 ::::::
 :::::::
@@ -371,6 +393,11 @@ To open the dashboards:
     ::::::{applies-item} self: ga
     :sync: self
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
+    ::::::
+
+    ::::::{applies-item} serverless: ga
+    :sync: serverless
+    Navigate to your {{es-serverless}} project in the [Elastic Cloud console](https://cloud.elastic.co/).
     ::::::
 
     :::::::
