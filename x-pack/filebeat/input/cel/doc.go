@@ -17,6 +17,9 @@ Metrics export is disabled by default. Enable export to a OTLP/gRPC endpoint by 
   - OTEL_EXPORTER_OTLP_ENDPOINT: Required. The OTLP endpoint URL.
   - OTEL_EXPORTER_OTLP_HEADERS: Required if endpoint is authenticated.
   - OTEL_RESOURCE_ATTRIBUTES: Optional but recommended
+  - OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION: Optional. Set to "explicit_bucket_histogram" to use
+    explicit bucket histograms instead of the default exponential histograms. This is required for backends that
+    do not support exponential histograms (e.g. Elastic APM Server).
 
 See [otel.ExportFactory] for environment settings to run console or http/protobuf output.
 
