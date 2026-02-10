@@ -254,13 +254,6 @@ class ComposeMixin(object):
         return ("%s_%x" % (basename, positivehash(frozenset(cls.COMPOSE_ENV.items())))).lower()
 
     @classmethod
-    def compose_project(cls):
-        # This method is kept for backward compatibility.
-        # It no longer returns a compose Project object.
-        # Use _run_compose() or _get_project_containers() instead.
-        return cls
-
-    @classmethod
     def find_compose_path(cls):
         class_dir = os.path.abspath(os.path.dirname(sys.modules[cls.__module__].__file__))
         while True:
@@ -285,14 +278,3 @@ class ComposeMixin(object):
             if line.find(msg.encode("utf-8")) >= 0:
                 counter += 1
         return counter > 0
-
-
-@contextmanager
-def disabled_logger(name):
-    logger = logging.getLogger(name)
-    old_level = logger.getEffectiveLevel()
-    logger.setLevel(logging.CRITICAL)
-    try:
-        yield logger
-    finally:
-        logger.setLevel(old_level)

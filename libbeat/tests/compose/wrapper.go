@@ -215,7 +215,9 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 	pull := d.cmd(ctx, "pull", service)
 	pull.Stdout = nil
 	pull.Stderr = nil
-	_ = pull.Run()
+	if err := pull.Run(); err != nil {
+		d.logger.Warnf("pull failed for %s (will build if needed): %v", service, err)
+	}
 
 	err := d.cmd(ctx, "up", args...).Run()
 	if err != nil {
