@@ -25,7 +25,7 @@ The extension adds several custom tables to osquery that provide:
 
 Each table has detailed documentation in its own file:
 
-### 1. [elastic_browser_history](docs/elastic_browser_history.md)
+### 1. [elastic_browser_history](docs/tables/elastic_browser_history.md)
 Query browser history from multiple browsers (Chrome, Edge, Firefox, Safari) with unified schema and advanced filtering capabilities.
 
 **Platforms**: Linux, macOS, Windows
