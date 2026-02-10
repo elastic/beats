@@ -1656,9 +1656,7 @@ service:
 	}, 30*time.Second, 100*time.Millisecond, "timed out waiting for connection refused error")
 
 	// Verify no events were ingested yet (server down)
-	mu.Lock()
 	assert.Empty(t, ingestedEvents, "expected no events to be ingested while server is down")
-	mu.Unlock()
 
 	// Now start the mock ES instance
 	mockServer := createMockServer()
