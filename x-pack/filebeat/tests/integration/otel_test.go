@@ -368,43 +368,36 @@ service:
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 }
 
+func writeEventsToFile(t *testing.T, file *os.File, startLine, numEvents int) {
+	t.Helper()
+	for i := startLine; i < startLine+numEvents; i++ {
+		msg := fmt.Sprintf("Line %d", i)
+		_, err := file.Write([]byte(msg + "\n"))
+		require.NoErrorf(t, err, "failed to write line %d to temp file", i)
+	}
+
+	if err := file.Sync(); err != nil {
+		t.Fatalf("could not sync log file: %s", err)
+	}
+	if err := file.Close(); err != nil {
+		t.Fatalf("could not close log file: %s", err)
+	}
+}
+
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
 	t.Helper()
 	logFile, err := os.Create(filename)
 	if err != nil {
 		t.Fatalf("could not create file '%s': %s", filename, err)
 	}
-	// write events to log file
-	for i := 0; i < numEvents; i++ {
-		msg := fmt.Sprintf("Line %d", i)
-		_, err = logFile.Write([]byte(msg + "\n"))
-		require.NoErrorf(t, err, "failed to write line %d to temp file", i)
-	}
-
-	if err := logFile.Sync(); err != nil {
-		t.Fatalf("could not sync log file '%s': %s", filename, err)
-	}
-	if err := logFile.Close(); err != nil {
-		t.Fatalf("could not close log file '%s': %s", filename, err)
-	}
+	writeEventsToFile(t, logFile, 0, numEvents)
 }
 
 func appendEventsToLogFile(t *testing.T, filename string, startLine int, numEvents int) {
 	t.Helper()
 	logFile, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0600)
 	require.NoError(t, err)
-	// append events to log file
-	for i := startLine; i < startLine+numEvents; i++ {
-		msg := fmt.Sprintf("Line %d", i)
-		_, err = logFile.Write([]byte(msg + "\n"))
-		require.NoErrorf(t, err, "failed to write line %d to temp file", i)
-	}
-	if err := logFile.Sync(); err != nil {
-		t.Fatalf("could not sync log file '%s': %s", filename, err)
-	}
-	if err := logFile.Close(); err != nil {
-		t.Fatalf("could not close log file '%s': %s", filename, err)
-	}
+	writeEventsToFile(t, logFile, startLine, numEvents)
 }
 
 func assertMonitoring(t *testing.T, port int) {
@@ -1644,86 +1637,88 @@ service:
 
 	collector := oteltestcol.New(t, configBuffer.String())
 
-	// Wait for filebeat to read the file
-	require.Eventually(t, func() bool {
-		return collector.ObservedLogs().FilterMessageSnippet(fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath)).Len() >= 1
-	}, 30*time.Second, 100*time.Millisecond, "timed out waiting for file input to be fully read")
+	t.Run("delivers events when Elasticsearch is unavailable at startup", func(t *testing.T) {
+		// Wait for filebeat to read the file
+		require.Eventually(t, func() bool {
+			return collector.ObservedLogs().FilterMessageSnippet(fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath)).Len() >= 1
+		}, 30*time.Second, 100*time.Millisecond, "timed out waiting for file input to be fully read")
 
-	// Wait for a connection refused when the exporter tries to connect with ES and fails
-	require.Eventually(t, func() bool {
-		return collector.ObservedLogs().FilterMessageSnippet("connection refused").
-			FilterMessageSnippet(fmt.Sprintf(":%d", serverPort)).Len() >= 1
-	}, 30*time.Second, 100*time.Millisecond, "timed out waiting for connection refused error")
+		// Wait for a connection refused when the exporter tries to connect with ES and fails
+		require.Eventually(t, func() bool {
+			return collector.ObservedLogs().FilterMessageSnippet("connection refused").
+				FilterMessageSnippet(fmt.Sprintf(":%d", serverPort)).Len() >= 1
+		}, 30*time.Second, 100*time.Millisecond, "timed out waiting for connection refused error")
 
-	// Verify no events were ingested yet (server down)
-	assert.Empty(t, ingestedEvents, "expected no events to be ingested while server is down")
+		// Verify no events were ingested yet (server down)
+		assert.Empty(t, ingestedEvents, "expected no events to be ingested while server is down")
 
-	// Now start the mock ES instance
-	mockServer := createMockServer()
-	defer mockServer.Close()
+		// Mock ES starts
+		mockServer := createMockServer()
+		defer mockServer.Close()
 
-	// Wait for all events to be delivered
-	require.EventuallyWithT(t, func(ct *assert.CollectT) {
-		mu.Lock()
-		defer mu.Unlock()
-		assert.Len(ct, ingestedEvents, numTestEvents, "expected all events to be delivered after server starts")
+		// Wait for all events to be delivered
+		require.EventuallyWithT(t, func(ct *assert.CollectT) {
+			mu.Lock()
+			defer mu.Unlock()
+			assert.Len(ct, ingestedEvents, numTestEvents, "expected all events to be delivered after server starts")
 
-		// Verify we got the expected event content
-		for i := 0; i < numTestEvents; i++ {
-			expectedMsg := fmt.Sprintf("Line %d", i)
-			found := false
-			for _, ingested := range ingestedEvents {
-				if ingested == expectedMsg {
-					found = true
-					break
+			// Verify we got the expected event content
+			for i := 0; i < numTestEvents; i++ {
+				expectedMsg := fmt.Sprintf("Line %d", i)
+				found := false
+				for _, ingested := range ingestedEvents {
+					if ingested == expectedMsg {
+						found = true
+						break
+					}
 				}
+				assert.True(ct, found, "expected to find event: %s", expectedMsg)
 			}
-			assert.True(ct, found, "expected to find event: %s", expectedMsg)
-		}
-	}, 30*time.Second, 1*time.Second, "timed out waiting for events to be delivered")
+		}, 30*time.Second, 1*time.Second, "timed out waiting for events to be delivered")
+	})
 
-	mockServer.Close()
+	t.Run("continues delivering events after Elasticsearch failure", func(t *testing.T) {
+		// reset observed logs
+		collector.ObservedLogs().TakeAll()
 
-	// reset observed logs
-	collector.ObservedLogs().TakeAll()
+		// Append events to log file
+		appendEventsToLogFile(t, logFilePath, numTestEvents, numTestEvents)
 
-	// Append events to log file
-	appendEventsToLogFile(t, logFilePath, numTestEvents, numTestEvents)
+		// Confirm filebeat read the new lines
+		require.Eventually(t, func() bool {
+			return collector.ObservedLogs().FilterMessageSnippet(fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath)).Len() == 1
+		}, 30*time.Second, 100*time.Millisecond, "timed out waiting for file input to read new lines")
 
-	// Confirm filebeat read the new lines
-	require.Eventually(t, func() bool {
-		return collector.ObservedLogs().FilterMessageSnippet(fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath)).Len() == 1
-	}, 30*time.Second, 100*time.Millisecond, "timed out waiting for file input to read new lines")
+		// Confirm connection refused error
+		require.Eventually(t, func() bool {
+			return collector.ObservedLogs().FilterMessageSnippet("connection refused").
+				FilterMessageSnippet(fmt.Sprintf(":%d", serverPort)).Len() >= 1
+		}, 30*time.Second, 100*time.Millisecond, "timed out waiting for second connection refused error")
 
-	// Confirm connection refused error
-	require.Eventually(t, func() bool {
-		return collector.ObservedLogs().FilterMessageSnippet("connection refused").
-			FilterMessageSnippet(fmt.Sprintf(":%d", serverPort)).Len() >= 1
-	}, 30*time.Second, 100*time.Millisecond, "timed out waiting for second connection refused error")
+		// Mock ES restarts
+		mockServer := createMockServer()
+		defer mockServer.Close()
 
-	// Start mockes again
-	mockServer = createMockServer()
-	defer mockServer.Close()
+		// wait for new events to be delivered
+		totalExpectedEvents := numTestEvents * 2
+		require.EventuallyWithT(t, func(ct *assert.CollectT) {
+			mu.Lock()
+			defer mu.Unlock()
+			assert.Len(ct, ingestedEvents, totalExpectedEvents, "expected all events (original + additional) to be delivered after server restarts")
 
-	// wait for new events to be delivered
-	totalExpectedEvents := numTestEvents * 2
-	require.EventuallyWithT(t, func(ct *assert.CollectT) {
-		mu.Lock()
-		defer mu.Unlock()
-		assert.Len(ct, ingestedEvents, totalExpectedEvents, "expected all events (original + additional) to be delivered after server restarts")
-
-		for i := 0; i < totalExpectedEvents; i++ {
-			expectedMsg := fmt.Sprintf("Line %d", i)
-			found := false
-			for _, ingested := range ingestedEvents {
-				if ingested == expectedMsg {
-					found = true
-					break
+			for i := 0; i < totalExpectedEvents; i++ {
+				expectedMsg := fmt.Sprintf("Line %d", i)
+				found := false
+				for _, ingested := range ingestedEvents {
+					if ingested == expectedMsg {
+						found = true
+						break
+					}
 				}
+				assert.True(ct, found, "expected to find event: %s", expectedMsg)
 			}
-			assert.True(ct, found, "expected to find event: %s", expectedMsg)
-		}
-	}, 30*time.Second, 1*time.Second, "timed out waiting for all events to be delivered")
+		}, 30*time.Second, 1*time.Second, "timed out waiting for all events to be delivered")
+	})
 }
 
 func BenchmarkFilebeatOTelCollector(b *testing.B) {
