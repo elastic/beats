@@ -190,6 +190,11 @@ var pathTests = []struct {
 }
 
 func TestIsPathIn(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("tested only with Unix-compatible paths")
+		return
+	}
+
 	for _, test := range pathTests {
 		t.Run(test.name, func(t *testing.T) {
 			got, err := IsPathIn(test.root, test.path)
