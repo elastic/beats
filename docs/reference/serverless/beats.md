@@ -5,7 +5,7 @@ applies_to:
   serverless: ga
 ---
 
-# Beats [elasticsearch-ingest-data-through-beats]
+# Beats for {{es-serverless}} [elasticsearch-ingest-data-through-beats]
 
 {{beats}} are lightweight data shippers that send operational data to {{es}}. Elastic provides separate {{beats}} for different types of data, such as logs, metrics, and uptime. Depending on what data you want to collect, you might need to install multiple shippers on a single host.
 
@@ -28,8 +28,8 @@ To send data to an {{es-serverless}} project, configure your Beat to connect usi
 
 ### Step 1: Get your connection details [serverless-connection-details]
 
-1. Log in to your {{es-serverless}} project.
-2. Find your **{{es}} endpoint URL**. You can find this on your project's home page or under **Management > Connection details**.
+1. Log in to [Elastic Cloud](https://cloud.elastic.co/).
+2. Find your **{{es}} endpoint URL**. Select **Manage** next to your project, then find the {{es}} endpoint under **Application endpoints, cluster and component IDs**. Alternatively, open your project, select the help icon, then select **Connection details**.
 3. Create an **API key** with the appropriate privileges. Refer to [Create API key](docs-content://solutions/search/search-connection-details.md#create-an-api-key-serverless) for detailed steps. For information on the required privileges, refer to [Grant access using API keys](/reference/filebeat/beats-api-keys.md).
 
 ### Step 2: Configure the output [serverless-configure-output]
@@ -38,7 +38,7 @@ In your Beat configuration file (for example, `filebeat.yml`), set the `output.e
 
 ```yaml
 output.elasticsearch:
-  hosts: ["https://my-project-url.es.us-east-1.aws.elastic.cloud"]
+  hosts: ["ELASTICSEARCH_ENDPOINT_URL"]
   api_key: "YOUR_API_KEY"
 ```
 

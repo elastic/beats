@@ -4,7 +4,7 @@ Set the {{es}} endpoint and API key in your Beat configuration file. To find you
 
 ```yaml
 output.elasticsearch:
-  hosts: ["https://my-project-url.es.us-east-1.aws.elastic.cloud"]
+  hosts: ["ELASTICSEARCH_ENDPOINT_URL"]
   api_key: "YOUR_API_KEY" <1>
 ```
 
