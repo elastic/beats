@@ -329,7 +329,7 @@ This allows you to write minimal specs for cross-platform tables/views without r
 - ✅ `description` - Brief description
 - ✅ `columns` - At least one column with:
   - ✅ `name` - Column name
-  - ✅ `type` - Column type (TEXT, INTEGER, BIGINT, DOUBLE)
+  - ✅ `type` - Column type (TEXT, INTEGER, BIGINT, DOUBLE, BOOLEAN)
   - ✅ `description` - Column description
 - ✅ `documentation.description` - Detailed description
 - ✅ `documentation.examples` - At least one example query
