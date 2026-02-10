@@ -68,7 +68,7 @@ func TestActionHandlerExecute(t *testing.T) {
 	tests := []struct {
 		Name          string
 		QueryExecutor queryExecutor
-		Publisher     publisher
+		Publisher     queryResultPublisher
 
 		Request map[string]interface{}
 		Err     error

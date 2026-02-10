@@ -25,8 +25,17 @@ type actionResultPublisher interface {
 	PublishActionResult(req map[string]interface{}, res map[string]interface{})
 }
 
-type publisher interface {
+type queryResultPublisher interface {
 	Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
+}
+
+type scheduledResponsePublisher interface {
+	PublishScheduledResponse(actionID, responseID string, startedAt, completedAt time.Time, resultCount int, scheduleExecutionCount int64)
+}
+
+type scheduledQueryPublisher interface {
+	queryResultPublisher
+	scheduledResponsePublisher
 }
 
 type queryExecutor interface {
@@ -40,7 +49,7 @@ type namespaceProvider interface {
 type actionHandler struct {
 	log       *logp.Logger
 	inputType string
-	publisher publisher
+	publisher queryResultPublisher
 	queryExec queryExecutor
 	np        namespaceProvider
 }

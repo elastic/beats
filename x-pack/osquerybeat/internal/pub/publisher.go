@@ -143,13 +143,47 @@ func (p *Publisher) PublishActionResult(req map[string]interface{}, res map[stri
 	}
 
 	fields := actionResultToEvent(req, res)
-	event := beat.Event{
-		Timestamp: time.Now(),
-		Fields:    fields,
-	}
 
 	p.log.Debugf("Action response event is sent, fields: %#v", fields)
 
+	p.publishActionResponseEvent(fields, time.Now())
+}
+
+// PublishScheduledResponse publishes a synthetic response document for a scheduled query run (no action).
+// Used for both RRULE and native schedules. Includes schedule_execution_count (RRULE uses occurrence index;
+// native uses 1 + (run_time - start_date) / interval).
+func (p *Publisher) PublishScheduledResponse(actionID, responseID string, startedAt, completedAt time.Time, resultCount int, scheduleExecutionCount int64) {
+	p.mx.Lock()
+	defer p.mx.Unlock()
+
+	if p.actionResponsesClient == nil {
+		p.log.Debug("Action responses stream is not configured. Scheduled response is dropped.")
+		return
+	}
+
+	fields := map[string]interface{}{
+		"action_id":                actionID,
+		"response_id":              responseID,
+		"action_input_type":        "osquery_scheduled",
+		"started_at":               startedAt.Format(time.RFC3339Nano),
+		"completed_at":             completedAt.Format(time.RFC3339Nano),
+		"schedule_execution_count": scheduleExecutionCount,
+		"action_response": map[string]interface{}{
+			"osquery": map[string]interface{}{
+				"count": resultCount,
+			},
+		},
+	}
+
+	p.log.Debugf("Scheduled response event sent, action_id=%s, schedule_execution_count=%d", actionID, scheduleExecutionCount)
+	p.publishActionResponseEvent(fields, completedAt)
+}
+
+func (p *Publisher) publishActionResponseEvent(fields map[string]interface{}, timestamp time.Time) {
+	event := beat.Event{
+		Timestamp: timestamp,
+		Fields:    fields,
+	}
 	p.actionResponsesClient.Publish(event)
 }
 
