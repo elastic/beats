@@ -391,6 +391,27 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 	return g.Wait()
 }
 
+// nativeScheduleExecutionCount returns the 1-based execution count for a native (interval) schedule,
+// computed from start_date and interval so it is deterministic across agents.
+// Returns 0 if startDate is empty, interval <= 0, or runTime is before startDate.
+func nativeScheduleExecutionCount(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) int64 {
+	if startDateRFC3339 == "" || intervalSecs <= 0 {
+		return 0
+	}
+	startTime, err := time.Parse(time.RFC3339, startDateRFC3339)
+	if err != nil {
+		return 0
+	}
+
+	startUnix := startTime.Unix()
+	if runTimeUnix < startUnix {
+		return 0
+	}
+
+	elapsedSeconds := runTimeUnix - startUnix
+	return 1 + (elapsedSeconds / int64(intervalSecs))
+}
+
 func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res QueryResult) {
 	ns, ok := configPlugin.LookupNamespace(res.Name)
 	if !ok {
@@ -406,7 +427,21 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 		return
 	}
 
+	// Use policy action_id when set, otherwise query name
+	actionID := qi.ActionID
+	if actionID == "" {
+		actionID = res.Name
+	}
+	// Schedule execution count from start_date + interval (same across agents)
+	scheduleExecutionCount := nativeScheduleExecutionCount(qi.StartDate, qi.Interval, res.UnixTime)
+
+	var (
+		hits      []map[string]interface{}
+		totalHits int
+	)
+
 	responseID := uuid.Must(uuid.NewV4()).String()
+	runTime := time.Unix(res.UnixTime, 0)
 
 	if res.Action == "snapshot" {
 		snapshot, err := cli.ResolveResult(ctx, qi.Query, res.Hits)
@@ -414,8 +449,10 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 			bt.log.Errorf("failed to resolve snapshot query result types: %s", res.Name)
 			return
 		}
-		meta := queryResultMeta("snapshot", "", res)
-		bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, snapshot, qi.ECSMapping, nil)
+		hits = append(hits, snapshot...)
+		totalHits = len(hits)
+		meta := queryResultMeta("snapshot", "", res, scheduleExecutionCount)
+		bt.pub.Publish(config.Datastream(ns), actionID, responseID, meta, hits, qi.ECSMapping, nil)
 	} else {
 		if len(res.DiffResults.Added) > 0 {
 			added, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Added)
@@ -423,8 +460,9 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 				bt.log.Errorf(`failed to resolve diff query "added" result types: %s`, res.Name)
 				return
 			}
-			meta := queryResultMeta("diff", "added", res)
-			bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, added, qi.ECSMapping, nil)
+			hits = append(hits, added...)
+			meta := queryResultMeta("diff", "added", res, scheduleExecutionCount)
+			bt.pub.Publish(config.Datastream(ns), actionID, responseID, meta, hits, qi.ECSMapping, nil)
 		}
 		if len(res.DiffResults.Removed) > 0 {
 			removed, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Removed)
@@ -432,20 +470,24 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 				bt.log.Errorf(`failed to resolve diff query "removed" result types: %s`, res.Name)
 				return
 			}
-			meta := queryResultMeta("diff", "removed", res)
-			bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, removed, qi.ECSMapping, nil)
+			hits = append(hits, removed...)
+			meta := queryResultMeta("diff", "removed", res, scheduleExecutionCount)
+			bt.pub.Publish(config.Datastream(ns), actionID, responseID, meta, hits, qi.ECSMapping, nil)
 		}
+		totalHits = len(hits)
 	}
 
+	bt.pub.PublishScheduledResponse(actionID, responseID, runTime, runTime, totalHits, int64(scheduleExecutionCount))
 }
 
-func queryResultMeta(typ, action string, res QueryResult) map[string]interface{} {
+func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64) map[string]interface{} {
 	m := map[string]interface{}{
-		"type":          typ,
-		"calendar_type": res.CalendarTime,
-		"unix_time":     res.UnixTime,
-		"epoch":         res.Epoch,
-		"counter":       res.Counter,
+		"type":                     typ,
+		"calendar_type":            res.CalendarTime,
+		"unix_time":                res.UnixTime,
+		"epoch":                    res.Epoch,
+		"counter":                  res.Counter,
+		"schedule_execution_count": scheduleExecutionCount,
 	}
 
 	if action != "" {
