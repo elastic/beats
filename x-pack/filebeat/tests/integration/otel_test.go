@@ -1662,7 +1662,7 @@ service:
 	assert.Empty(t, ingestedEvents, "expected no events to be ingested while server is down")
 	mu.Unlock()
 
-	// Now start the mockes instance
+	// Now start the mock ES instance
 	mockServer := createMockServer()
 	defer mockServer.Close()
 
