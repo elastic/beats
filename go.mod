@@ -171,7 +171,7 @@ require (
 	github.com/dgraph-io/badger/v4 v4.6.0
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.8.0
-	github.com/elastic/elastic-agent-autodiscover v0.10.0
+	github.com/elastic/elastic-agent-autodiscover v0.10.2
 	github.com/elastic/elastic-agent-libs v0.31.0
 	github.com/elastic/elastic-agent-system-metrics v0.13.6
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
