@@ -25,7 +25,7 @@ The extension adds several custom tables to osquery that provide:
 
 Each table has detailed documentation in its own file:
 
-### 1. [elastic_browser_history](docs/elastic_browser_history.md)
+### 1. [elastic_browser_history](docs/tables/elastic_browser_history.md)
 Query browser history from multiple browsers (Chrome, Edge, Firefox, Safari) with unified schema and advanced filtering capabilities.
 
 **Platforms**: Linux, macOS, Windows
@@ -45,8 +45,8 @@ Query running process information from the host system when running in a contain
 
 **Platforms**: Linux
 
-### 5. [elastic_file_analysis](docs/elastic_file_analysis.md)
-Perform comprehensive security analysis of executable files on macOS. Extract code signing information, library dependencies, symbols, and strings from Mach-O binaries.
+### 5. [elastic_file_analysis](docs/tables/elastic_file_analysis.md)
+Comprehensive security analysis of executable files on macOS (file type, code signing, dependencies, symbols, strings). Query with a path constraint; uses `file`, `codesign`, `otool`, `nm`, and `strings`.
 
 **Platforms**: macOS
 

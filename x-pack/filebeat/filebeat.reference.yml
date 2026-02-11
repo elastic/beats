@@ -1796,6 +1796,9 @@ filebeat.modules:
     # The URL used for Threat Intel API calls.
     var.url: https://urlhaus-api.abuse.ch/v1/urls/recent/
 
+    # The Auth Key used for Threat Intel API calls.
+    var.api_token: API_TOKEN
+
     # The interval to poll the API for updates.
     var.interval: 10m
 
@@ -1808,6 +1811,9 @@ filebeat.modules:
     # The URL used for Threat Intel API calls.
     var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
 
+    # The Auth Key used for Threat Intel API calls.
+    var.api_token: API_TOKEN
+
     # The interval to poll the API for updates.
     var.interval: 10m
 
@@ -1819,6 +1825,9 @@ filebeat.modules:
 
     # The URL used for Threat Intel API calls.
     var.url: https://mb-api.abuse.ch/api/v1/
+
+    # The Auth Key used for Threat Intel API calls.
+    var.api_token: API_TOKEN
 
     # The interval to poll the API for updates.
     var.interval: 10m
@@ -3102,6 +3111,7 @@ filebeat.inputs:
   #access_point_arn: arn:aws:s3:us-east-1:123456789:accesspoint/my-accesspoint
 
   # Bucket Name used for polling non-AWS S3 buckets
+  # Note: `region` is required when non_aws_bucket_name is given.
   #non_aws_bucket_name: test-s3-bucket
 
   # Configures the AWS S3 API to use path style instead of virtual host style (default)
