@@ -194,7 +194,7 @@ require (
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/icholy/digest v0.1.22
-	github.com/klauspost/compress v1.18.2
+	github.com/klauspost/compress v1.18.3
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
 	github.com/microsoft/go-mssqldb v1.9.5
 	github.com/microsoft/wmi v0.38.3
@@ -208,9 +208,9 @@ require (
 	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80
 	github.com/xdg-go/scram v1.1.2
 	github.com/zyedidia/generic v1.2.1
-	go.elastic.co/apm/module/apmelasticsearch/v2 v2.7.1
-	go.elastic.co/apm/module/apmhttp/v2 v2.7.1
-	go.elastic.co/apm/v2 v2.7.1
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.7.2
+	go.elastic.co/apm/module/apmhttp/v2 v2.7.2
+	go.elastic.co/apm/v2 v2.7.2
 	go.mongodb.org/mongo-driver v1.17.6
 	go.opentelemetry.io/collector/component v1.51.0
 	go.opentelemetry.io/collector/component/componentstatus v0.145.0
@@ -334,7 +334,7 @@ require (
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/ebitengine/purego v0.9.1 // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.8.0 // indirect
-	github.com/elastic/go-docappender/v2 v2.12.0 // indirect
+	github.com/elastic/go-docappender/v2 v2.12.1 // indirect
 	github.com/elastic/go-windows v1.0.2 // indirect
 	github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 // indirect
 	github.com/elazarl/goproxy/ext v0.0.0-20240909085733-6741dbfc16a1 // indirect
@@ -403,7 +403,7 @@ require (
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/knadh/koanf/providers/confmap v1.0.0 // indirect
-	github.com/knadh/koanf/v2 v2.3.0 // indirect
+	github.com/knadh/koanf/v2 v2.3.2 // indirect
 	github.com/kortschak/utter v1.5.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/lestrrat-go/strftime v1.1.1 // indirect
