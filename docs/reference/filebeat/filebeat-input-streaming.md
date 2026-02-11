@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-streaming.html
 applies_to:
   stack: preview
+  serverless: ga
 ---
 
 # Streaming Input [filebeat-input-streaming]

@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/how-filebeat-works.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # How Filebeat works [how-filebeat-works]

@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/reading-from-evtx.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Not sure how to read from .evtx files [reading-from-evtx]
