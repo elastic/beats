@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/sarama"
 
@@ -610,20 +611,12 @@ func writeToKafkaTopic(
 	// Retry producer creation to handle transient connection issues
 	var producer sarama.SyncProducer
 	var err error
-	maxAttempts := 5
-	for attempt := 1; attempt <= maxAttempts; attempt++ {
+	require.EventuallyWithTf(t, func(ct *assert.CollectT) {
 		producer, err = sarama.NewSyncProducer(hosts, config)
-		if err == nil {
-			break
-		}
-		if attempt < maxAttempts {
-			t.Logf("Failed to create producer (attempt %d/%d): %v, retrying...", attempt, maxAttempts, err)
-			time.Sleep(time.Duration(attempt) * time.Second)
-		}
-	}
-	if err != nil {
-		t.Fatalf("Failed to create producer after %d attempts: %v", maxAttempts, err)
-	}
+		require.NoError(ct, err)
+		require.NotNil(ct, producer)
+	}, 30*time.Second, 1*time.Second, "failed to create producer: %v", err)
+
 	defer func() {
 		if err := producer.Close(); err != nil {
 			t.Fatal(err)
