@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -83,7 +82,7 @@ func testIngestPipeline(t *testing.T, pipeline, pattern string, p *params) {
 		t.Fatal(err)
 	}
 	if *wintest.KeepRunning {
-		fmt.Fprintln(os.Stdout, "Use this to manually cleanup containers: docker-compose", "-p", devtools.DockerComposeProjectName(), "rm", "--stop", "--force")
+		fmt.Fprintln(os.Stdout, "Use this to manually cleanup containers: docker", "compose", "-p", devtools.DockerComposeProjectName(), "rm", "--stop", "--force")
 	}
 	t.Cleanup(func() {
 		stop := !*wintest.KeepRunning
@@ -234,7 +233,7 @@ func writeGolden(t testing.TB, source, dir string, events []mapstr.M) {
 	}
 
 	outPath := filepath.Join(dir, filepath.Base(source)+".golden.json")
-	if err := ioutil.WriteFile(outPath, data, 0o644); err != nil {
+	if err := os.WriteFile(outPath, data, 0o644); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -242,7 +241,7 @@ func writeGolden(t testing.TB, source, dir string, events []mapstr.M) {
 func readGolden(t testing.TB, source, dir string) []mapstr.M {
 	inPath := filepath.Join(dir, filepath.Base(source)+".golden.json")
 
-	data, err := ioutil.ReadFile(inPath)
+	data, err := os.ReadFile(inPath)
 	if err != nil {
 		t.Fatal(err)
 	}

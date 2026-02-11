@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-installation-configuration.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Metricbeat quick start: installation and configuration [metricbeat-installation-configuration]

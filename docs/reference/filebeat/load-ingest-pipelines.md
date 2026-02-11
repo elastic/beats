@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/load-ingest-pipelines.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Load ingest pipelines [load-ingest-pipelines]
