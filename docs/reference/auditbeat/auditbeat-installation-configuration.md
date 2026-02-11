@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-installation-configuration.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Auditbeat quick start: installation and configuration [auditbeat-installation-configuration]

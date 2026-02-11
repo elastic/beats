@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/monitor-options.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Common monitor options [monitor-options]

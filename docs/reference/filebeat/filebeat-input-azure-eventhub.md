@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-azure-eventhub.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Azure eventhub input [filebeat-input-azure-eventhub]
