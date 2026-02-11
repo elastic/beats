@@ -18,5 +18,4 @@ import (
 
 func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, postHooks *hooks.HookManager, _ *client.ResilientClient) {
 	server.RegisterPlugin(table.NewPlugin("host_users", tables.HostUsersColumns(), tables.GetHostUsersGenerateFunc(log)))
-	server.RegisterPlugin(table.NewPlugin("host_groups", tables.HostGroupsColumns(), tables.GetHostGroupsGenerateFunc(log)))
 }
