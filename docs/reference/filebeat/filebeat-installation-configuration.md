@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-installation-configuration.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Filebeat quick start: installation and configuration [filebeat-installation-configuration]
