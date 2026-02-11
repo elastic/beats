@@ -7,6 +7,7 @@ sub:
   mito_version: v1.22.1
 applies_to:
   stack: ga 8.6.0
+  serverless: ga
 ---
 
 # Common Expression Language input [filebeat-input-cel]

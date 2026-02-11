@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/fields-not-indexed.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Fields are not indexed or usable in Kibana visualizations [fields-not-indexed]
