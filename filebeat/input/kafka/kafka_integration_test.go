@@ -597,9 +597,8 @@ func writeToKafkaTopic(
 	t *testing.T, topic string, message string,
 	headers []sarama.RecordHeader,
 ) {
-	t.Helper()
 	config := sarama.NewConfig()
-	config.Producer.RequiredAcks = sarama.WaitForAll
+	config.Producer.RequiredAcks = sarama.WaitForLocal
 	config.Producer.Return.Successes = true
 	config.Producer.Partitioner = sarama.NewHashPartitioner
 	config.Version = sarama.V1_0_0_0
@@ -619,7 +618,7 @@ func writeToKafkaTopic(
 
 	defer func() {
 		if err := producer.Close(); err != nil {
-			t.Fatal(err)
+			require.NoError(t, err)
 		}
 	}()
 
@@ -630,9 +629,7 @@ func writeToKafkaTopic(
 	}
 
 	_, _, err = producer.SendMessage(msg)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 }
 
 func run(t *testing.T, cfg *conf.C, client *beattest.ChanClient) (*kafkaInput, func()) {
