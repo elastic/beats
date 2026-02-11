@@ -7,6 +7,9 @@ if [ -z "$BEAT_DIR" ]; then
     exit 1
 fi
 
+# shellcheck source=/dev/null
+source .buildkite/scripts/docker.sh
+
 echo "~~~ Packaging : $BEAT_DIR"
 
 WORKSPACE=$(pwd)

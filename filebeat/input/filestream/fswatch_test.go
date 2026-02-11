@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 package filestream
 
 import (
@@ -28,6 +30,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zapcore"
 
@@ -949,36 +952,39 @@ scanner:
 		s := createScannerWithConfig(t, logger, paths, cfgStr, CompressionNone)
 		files := s.GetFiles()
 		require.Empty(t, files)
+		files = s.GetFiles()
+		require.Empty(t, files)
+		files = s.GetFiles()
+		require.Empty(t, files)
 
 		logs := parseLogs(buffer.String())
-		require.NotEmpty(t, logs, "fileScanner.GetFiles must log some warnings")
-
-		// The last log entry from s.GetFiles must be at warn level and
-		// in the format 'x files are too small"
-		lastEntry := logs[len(logs)-1]
-		require.Equal(t, "warn", lastEntry.level, "'x files are too small' must be at level warn")
-		require.Contains(t, lastEntry.message, "3 files are too small to be ingested")
+		require.NotEmpty(t, logs, "fileScanner.GetFiles must log messages")
 
 		// For each file that is too small to be ingested, s.GetFiles must log
-		// at debug level the filename and its size
-		expectedMsgs := []string{
-			fmt.Sprintf("cannot start ingesting from file %[1]q: filesize of %[1]q is 42 bytes", undersized1Filename),
-			fmt.Sprintf("cannot start ingesting from file %[1]q: filesize of %[1]q is 42 bytes", undersized2Filename),
-			fmt.Sprintf("cannot start ingesting from file %[1]q: filesize of %[1]q is 42 bytes", undersized3Filename),
+		// a summary warning (only once) and then an individual debug message per file
+		singleFileFormat := "cannot start ingesting from file %[1]q: filesize of %[1]q is 42 bytes"
+		expectedLogs := []struct {
+			level string
+			msg   string
+			count int
+		}{
+			{"warn", "ingestion from some files will be delayed", 1},
+			{"debug", fmt.Sprintf(singleFileFormat, undersized1Filename), 3},
+			{"debug", fmt.Sprintf(singleFileFormat, undersized2Filename), 3},
+			{"debug", fmt.Sprintf(singleFileFormat, undersized3Filename), 3},
 		}
 
-		for _, msg := range expectedMsgs {
-			found := false
-			for _, log := range logs {
-				if strings.HasPrefix(log.message, msg) {
-					found = true
-					break
+		for _, el := range expectedLogs {
+			found := 0
+			for _, log := range logs[1:] {
+				if !strings.HasPrefix(log.message, el.msg) {
+					continue
 				}
+				found++
+				assert.Equalf(t, el.level, log.level, "log level for %q does not match", el.msg)
 			}
 
-			if !found {
-				t.Errorf("did not find %q in the logs", msg)
-			}
+			assert.Equalf(t, el.count, found, "the amount of log lines %q does not match", el.msg)
 		}
 	})
 
@@ -1152,6 +1158,37 @@ func filenames(m map[string]loginp.FileDescriptor) (result string) {
 		result += filename + "\n"
 	}
 	return result
+}
+
+func TestToFileDescriptor_TooSmallFile_NoFileOpen(t *testing.T) {
+	dir := t.TempDir()
+	filename := filepath.Join(dir, "small.log")
+
+	fingerprintLength := int64(1024)
+
+	err := os.WriteFile(filename, []byte("a small file"), 0644)
+	require.NoError(t, err, "failed to create test file")
+
+	cfg := fileScannerConfig{
+		Fingerprint: fingerprintConfig{
+			Enabled: true,
+			Offset:  0,
+			Length:  fingerprintLength,
+		},
+	}
+
+	s, err := newFileScanner(logp.NewNopLogger(), []string{filename}, cfg, CompressionNone)
+	require.NoError(t, err, "failed to create scanner")
+	it, err := s.getIngestTarget(filename)
+	require.NoError(t, err, "getIngestTarget should succeed")
+
+	// Remove read permissions - if file is opened, we'll get permission denied
+	err = os.Chmod(filename, 0000)
+	require.NoError(t, err, "failed to chmod test file")
+
+	_, err = s.toFileDescriptor(&it)
+	require.ErrorIs(t, err, errFileTooSmall,
+		"expected errFileTooSmall, it probably tried to open the file")
 }
 
 func BenchmarkToFileDescriptor(b *testing.B) {
