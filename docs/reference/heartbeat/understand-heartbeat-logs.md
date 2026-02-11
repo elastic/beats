@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/understand-heartbeat-logs.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Understand metrics in Heartbeat logs [understand-heartbeat-logs]

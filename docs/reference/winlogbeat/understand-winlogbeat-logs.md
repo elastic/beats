@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/understand-winlogbeat-logs.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Understand metrics in Winlogbeat logs [understand-winlogbeat-logs]
