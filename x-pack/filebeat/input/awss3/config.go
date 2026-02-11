@@ -103,7 +103,7 @@ func (c *config) Validate() error {
 	}
 
 	if c.LexicographicalOrdering && c.LexicographicalLookbackKeys <= 0 {
-		return fmt.Errorf("lexicographical_lookback_keys <%v> must be greater than 0", c.LexicographicalLookbackKeys)
+		return fmt.Errorf("lexicographical_lookback_keys <%d> must be greater than 0", c.LexicographicalLookbackKeys)
 	}
 
 	if c.QueueURL != "" && (c.VisibilityTimeout <= 0 || c.VisibilityTimeout.Hours() > 12) {

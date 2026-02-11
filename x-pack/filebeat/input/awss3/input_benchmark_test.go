@@ -157,7 +157,7 @@ func (c constantS3) DeleteObject(context.Context, string, string, string) (*s3.D
 	return nil, nil
 }
 
-func (c constantS3) ListObjectsPaginator(_ *logp.Logger, _, _, _ string) s3Pager {
+func (c constantS3) ListObjectsPaginator(_, _, _ string) s3Pager {
 	return c.pagerConstant
 }
 
@@ -347,7 +347,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 
 				s3EventHandlerFactory := newS3ObjectProcessorFactory(metrics, s3API, config.FileSelectors, backupConfig{}, logp.NewNopLogger())
 				s3Poller := &s3PollerInput{
-					log:             logp.NewLogger(inputName),
+					log:             log,
 					config:          config,
 					metrics:         metrics,
 					s3:              s3API,
@@ -356,7 +356,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					registry:        registry,
 					provider:        "provider",
 					filterProvider:  newFilterProvider(&config),
-					strategy:        newPollingStrategy(config.LexicographicalOrdering),
+					strategy:        newPollingStrategy(config.LexicographicalOrdering, log),
 					status:          &statusReporterHelperMock{},
 				}
 

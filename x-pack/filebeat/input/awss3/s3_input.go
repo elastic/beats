@@ -107,7 +107,7 @@ func (in *s3PollerInput) Run(
 		in.log,
 	)
 
-	in.strategy = newPollingStrategy(in.config.LexicographicalOrdering)
+	in.strategy = newPollingStrategy(in.config.LexicographicalOrdering, in.log)
 
 	in.run(ctx)
 	in.status.UpdateStatus(status.Stopped, "Input execution ended")
@@ -263,7 +263,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 
 	startAfterKey := in.registry.GetStartAfterKey()
 
-	paginator := in.s3.ListObjectsPaginator(in.log, bucketName, in.config.BucketListPrefix, startAfterKey)
+	paginator := in.s3.ListObjectsPaginator(bucketName, in.config.BucketListPrefix, startAfterKey)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
 
@@ -296,7 +296,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 		for _, object := range page.Contents {
 			state := newState(bucketName, *object.Key, *object.ETag, *object.LastModified)
 
-			if in.strategy.ShouldSkipObject(in.log, state, isStateValid) {
+			if in.strategy.ShouldSkipObject(state, isStateValid) {
 				continue
 			}
 

@@ -27,7 +27,7 @@ func (in *s3PollerInput) createS3API(ctx context.Context) (*awsS3API, error) {
 		s3Client = s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier)
 	}
 
-	return newAWSs3API(s3Client), nil
+	return newAWSs3API(s3Client, in.log), nil
 }
 
 func createPipelineClient(pipeline beat.Pipeline, acks *awsACKHandler) (beat.Client, error) {

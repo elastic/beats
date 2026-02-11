@@ -15,22 +15,24 @@ import (
 )
 
 func TestNewPollingStrategy(t *testing.T) {
+	log := logp.NewLogger("new_polling_strategy_test")
+
 	t.Run("returns normalPollingStrategy when lexicographical ordering is false", func(t *testing.T) {
-		strategy := newPollingStrategy(false)
+		strategy := newPollingStrategy(false, log)
 		_, ok := strategy.(normalPollingStrategy)
 		assert.True(t, ok, "expected normalPollingStrategy")
 	})
 
 	t.Run("returns lexicographicalPollingStrategy when lexicographical ordering is true", func(t *testing.T) {
-		strategy := newPollingStrategy(true)
+		strategy := newPollingStrategy(true, log)
 		_, ok := strategy.(lexicographicalPollingStrategy)
 		assert.True(t, ok, "expected lexicographicalPollingStrategy")
 	})
 }
 
 func TestNormalPollingStrategy(t *testing.T) {
-	strategy := newNormalPollingStrategy()
 	log := logp.NewLogger("normal_polling_strategy_test")
+	strategy := newNormalPollingStrategy(log)
 
 	t.Run("GetStartAfterKey returns empty string", func(t *testing.T) {
 		store := openTestStatestore()
@@ -49,10 +51,10 @@ func TestNormalPollingStrategy(t *testing.T) {
 		st := state{Bucket: "bucket", Key: "key1", Etag: "etag1", LastModified: time.Now()}
 
 		acceptAll := func(log *logp.Logger, s state) bool { return true }
-		assert.False(t, strategy.ShouldSkipObject(log, st, acceptAll), "should not skip valid objects")
+		assert.False(t, strategy.ShouldSkipObject(st, acceptAll), "should not skip valid objects")
 
 		rejectAll := func(log *logp.Logger, s state) bool { return false }
-		assert.True(t, strategy.ShouldSkipObject(log, st, rejectAll), "should skip invalid objects")
+		assert.True(t, strategy.ShouldSkipObject(st, rejectAll), "should skip invalid objects")
 	})
 
 	t.Run("GetStateID returns ID without lexicographical suffix", func(t *testing.T) {
@@ -65,8 +67,8 @@ func TestNormalPollingStrategy(t *testing.T) {
 }
 
 func TestLexicographicalPollingStrategy(t *testing.T) {
-	strategy := newLexicographicalPollingStrategy()
 	log := logp.NewLogger("lexicographical_polling_strategy_test")
+	strategy := newLexicographicalPollingStrategy(log)
 
 	t.Run("GetStartAfterKey returns lexicographically smallest key", func(t *testing.T) {
 		store := openTestStatestore()
@@ -105,7 +107,7 @@ func TestLexicographicalPollingStrategy(t *testing.T) {
 		st := state{Bucket: "bucket", Key: "key1", Etag: "etag1", LastModified: time.Now()}
 
 		rejectAll := func(log *logp.Logger, s state) bool { return false }
-		assert.False(t, strategy.ShouldSkipObject(log, st, rejectAll), "lexicographical mode should never skip objects based on filter")
+		assert.False(t, strategy.ShouldSkipObject(st, rejectAll), "lexicographical mode should never skip objects based on filter")
 	})
 
 	t.Run("GetStateID returns ID with lexicographical suffix", func(t *testing.T) {
@@ -118,9 +120,9 @@ func TestLexicographicalPollingStrategy(t *testing.T) {
 }
 
 func TestPollingStrategyBehaviorDifferences(t *testing.T) {
-	normalStrategy := newNormalPollingStrategy()
-	lexicoStrategy := newLexicographicalPollingStrategy()
 	log := logp.NewLogger("polling_strategy_behavior_differences_test")
+	normalStrategy := newNormalPollingStrategy(log)
+	lexicoStrategy := newLexicographicalPollingStrategy(log)
 
 	t.Run("StartAfterKey behavior differs", func(t *testing.T) {
 		normalStore := openTestStatestore()
@@ -152,9 +154,9 @@ func TestPollingStrategyBehaviorDifferences(t *testing.T) {
 		st := state{Bucket: "bucket", Key: "key1", Etag: "etag1", LastModified: time.Now()}
 		rejectAll := func(log *logp.Logger, s state) bool { return false }
 
-		assert.True(t, normalStrategy.ShouldSkipObject(log, st, rejectAll))
+		assert.True(t, normalStrategy.ShouldSkipObject(st, rejectAll))
 		// Lexicographical mode ignores filter
-		assert.False(t, lexicoStrategy.ShouldSkipObject(log, st, rejectAll))
+		assert.False(t, lexicoStrategy.ShouldSkipObject(st, rejectAll))
 	})
 
 	t.Run("State ID format differs", func(t *testing.T) {

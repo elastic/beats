@@ -42,9 +42,9 @@ func TestS3Poller(t *testing.T) {
 
 		gomock.InOrder(
 			mockAPI.EXPECT().
-				ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key"), gomock.Any()).
+				ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq("key"), gomock.Any()).
 				Times(1).
-				DoAndReturn(func(_ *logp.Logger, _, _, _ string) s3Pager {
+				DoAndReturn(func(_, _, _ string) s3Pager {
 					return mockPager
 				}),
 		)
@@ -139,8 +139,9 @@ func TestS3Poller(t *testing.T) {
 			BucketListPrefix:   listPrefix,
 			RegionName:         "region",
 		}
+		log := logp.NewLogger(inputName)
 		poller := &s3PollerInput{
-			log:             logp.NewLogger(inputName),
+			log:             log,
 			config:          cfg,
 			s3:              mockAPI,
 			pipeline:        pipeline,
@@ -149,7 +150,7 @@ func TestS3Poller(t *testing.T) {
 			provider:        "provider",
 			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
-			strategy:        newPollingStrategy(cfg.LexicographicalOrdering),
+			strategy:        newPollingStrategy(cfg.LexicographicalOrdering, log),
 			status:          &statusReporterHelperMock{},
 		}
 		poller.runPoll(ctx)
@@ -174,16 +175,16 @@ func TestS3Poller(t *testing.T) {
 		gomock.InOrder(
 			// Initial ListObjectPaginator gets an error.
 			mockS3.EXPECT().
-				ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key"), gomock.Any()).
+				ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq("key"), gomock.Any()).
 				Times(1).
-				DoAndReturn(func(_ *logp.Logger, _, _, _ string) s3Pager {
+				DoAndReturn(func(_, _, _ string) s3Pager {
 					return mockErrorPager
 				}),
 			// After waiting for pollInterval, it retries.
 			mockS3.EXPECT().
-				ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key"), gomock.Any()).
+				ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq("key"), gomock.Any()).
 				Times(1).
-				DoAndReturn(func(_ *logp.Logger, _, _, _ string) s3Pager {
+				DoAndReturn(func(_, _, _ string) s3Pager {
 					return mockSuccessPager
 				}),
 		)
@@ -283,8 +284,9 @@ func TestS3Poller(t *testing.T) {
 			RegionName:         "region",
 		}
 
+		log := logp.NewLogger(inputName)
 		poller := &s3PollerInput{
-			log: logp.NewLogger(inputName),
+			log: log,
 			config: config{
 				NumberOfWorkers:    numberOfWorkers,
 				BucketListInterval: pollInterval,
@@ -299,7 +301,7 @@ func TestS3Poller(t *testing.T) {
 			provider:        "provider",
 			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
-			strategy:        newPollingStrategy(false),
+			strategy:        newPollingStrategy(false, log),
 			status:          &statusReporterHelperMock{},
 		}
 		poller.run(ctx)
@@ -337,9 +339,9 @@ func TestS3Poller(t *testing.T) {
 
 		// Expect ListObjectsPaginator to be called with startAfterKey = "existing-key"
 		mockAPI.EXPECT().
-			ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Eq("existing-key")).
+			ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq(""), gomock.Eq("existing-key")).
 			Times(1).
-			DoAndReturn(func(_ *logp.Logger, _, _, startAfterKey string) s3Pager {
+			DoAndReturn(func(_, _, startAfterKey string) s3Pager {
 				require.Equal(t, "existing-key", startAfterKey)
 				return mockPager
 			})
@@ -388,8 +390,9 @@ func TestS3Poller(t *testing.T) {
 			LexicographicalOrdering:     true,
 			LexicographicalLookbackKeys: 100,
 		}
+		log := logp.NewLogger(inputName)
 		poller := &s3PollerInput{
-			log:             logp.NewLogger(inputName),
+			log:             log,
 			config:          cfg,
 			s3:              mockAPI,
 			pipeline:        pipeline,
@@ -398,7 +401,7 @@ func TestS3Poller(t *testing.T) {
 			provider:        "provider",
 			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
-			strategy:        newPollingStrategy(cfg.LexicographicalOrdering),
+			strategy:        newPollingStrategy(cfg.LexicographicalOrdering, log),
 			status:          &statusReporterHelperMock{},
 		}
 		poller.runPoll(ctx)
@@ -425,9 +428,9 @@ func TestS3Poller(t *testing.T) {
 
 		// Expect ListObjectsPaginator to be called with empty startAfterKey
 		mockAPI.EXPECT().
-			ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Eq("")).
+			ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq(""), gomock.Eq("")).
 			Times(1).
-			DoAndReturn(func(_ *logp.Logger, _, _, startAfterKey string) s3Pager {
+			DoAndReturn(func(_, _, startAfterKey string) s3Pager {
 				require.Equal(t, "", startAfterKey)
 				return mockPager
 			})
@@ -476,8 +479,9 @@ func TestS3Poller(t *testing.T) {
 			LexicographicalOrdering:     true,
 			LexicographicalLookbackKeys: 100,
 		}
+		log := logp.NewLogger(inputName)
 		poller := &s3PollerInput{
-			log:             logp.NewLogger(inputName),
+			log:             log,
 			config:          cfg,
 			s3:              mockAPI,
 			pipeline:        pipeline,
@@ -486,7 +490,7 @@ func TestS3Poller(t *testing.T) {
 			provider:        "provider",
 			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
-			strategy:        newPollingStrategy(cfg.LexicographicalOrdering),
+			strategy:        newPollingStrategy(cfg.LexicographicalOrdering, log),
 			status:          &statusReporterHelperMock{},
 		}
 		poller.runPoll(ctx)
@@ -510,9 +514,9 @@ func TestS3Poller(t *testing.T) {
 
 		// Expect ListObjectsPaginator to be called with empty startAfterKey
 		mockAPI.EXPECT().
-			ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Eq("")).
+			ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq(""), gomock.Eq("")).
 			Times(1).
-			DoAndReturn(func(_ *logp.Logger, _, _, startAfterKey string) s3Pager {
+			DoAndReturn(func(_, _, startAfterKey string) s3Pager {
 				require.Equal(t, "", startAfterKey)
 				return mockPager
 			})
@@ -560,8 +564,9 @@ func TestS3Poller(t *testing.T) {
 			RegionName:              "region",
 			LexicographicalOrdering: false,
 		}
+		log := logp.NewLogger(inputName)
 		poller := &s3PollerInput{
-			log:             logp.NewLogger(inputName),
+			log:             log,
 			config:          cfg,
 			s3:              mockAPI,
 			pipeline:        pipeline,
@@ -570,7 +575,7 @@ func TestS3Poller(t *testing.T) {
 			provider:        "provider",
 			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
-			strategy:        newPollingStrategy(cfg.LexicographicalOrdering),
+			strategy:        newPollingStrategy(cfg.LexicographicalOrdering, log),
 			status:          &statusReporterHelperMock{},
 		}
 		poller.runPoll(ctx)
@@ -593,9 +598,9 @@ func TestS3Poller(t *testing.T) {
 
 		// Expect ListObjectsPaginator to be called
 		mockAPI.EXPECT().
-			ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Any()).
+			ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq(""), gomock.Any()).
 			Times(1).
-			DoAndReturn(func(_ *logp.Logger, _, _, _ string) s3Pager {
+			DoAndReturn(func(_, _, _ string) s3Pager {
 				return mockPager
 			})
 
@@ -697,8 +702,9 @@ func TestS3Poller(t *testing.T) {
 			BucketListPrefix:   "",
 			RegionName:         "region",
 		}
+		log := logp.NewLogger(inputName)
 		poller := &s3PollerInput{
-			log:             logp.NewLogger(inputName),
+			log:             log,
 			config:          cfg,
 			s3:              mockAPI,
 			pipeline:        pipeline,
@@ -707,7 +713,7 @@ func TestS3Poller(t *testing.T) {
 			provider:        "provider",
 			metrics:         inputMetrics,
 			filterProvider:  newFilterProvider(&cfg),
-			strategy:        newPollingStrategy(cfg.LexicographicalOrdering),
+			strategy:        newPollingStrategy(cfg.LexicographicalOrdering, log),
 			status:          &statusReporterHelperMock{},
 		}
 
@@ -902,9 +908,9 @@ func Test_S3StateHandling(t *testing.T) {
 
 			gomock.InOrder(
 				mockS3API.EXPECT().
-					ListObjectsPaginator(gomock.Any(), gomock.Eq(bucket), gomock.Eq(""), gomock.Any()).
+					ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq(""), gomock.Any()).
 					AnyTimes().
-					DoAndReturn(func(_ *logp.Logger, _, _, _ string) s3Pager {
+					DoAndReturn(func(_, _, _ string) s3Pager {
 						return mockS3Pager
 					}),
 			)
@@ -947,7 +953,7 @@ func Test_S3StateHandling(t *testing.T) {
 				registry:        s3Registry,
 				metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 				filterProvider:  newFilterProvider(test.config),
-				strategy:        newPollingStrategy(test.config.LexicographicalOrdering),
+				strategy:        newPollingStrategy(test.config.LexicographicalOrdering, logger),
 				status:          &statusReporterHelperMock{},
 			}
 

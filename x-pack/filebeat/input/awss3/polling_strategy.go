@@ -12,18 +12,18 @@ import (
 // It is added to support normal mode vs lexicographical ordering mode.
 type pollingStrategy interface {
 	// ShouldSkipObject determines if an object should be skipped based on state validation.
-	ShouldSkipObject(log *logp.Logger, state state, isStateValid func(*logp.Logger, state) bool) bool
+	ShouldSkipObject(state state, isStateValid func(*logp.Logger, state) bool) bool
 
 	// GetStateID returns the appropriate state ID for the given state.
 	GetStateID(state state) string
 }
 
 // newPollingStrategy creates the appropriate polling strategy based on configuration flag.
-func newPollingStrategy(lexicographicalOrdering bool) pollingStrategy {
+func newPollingStrategy(lexicographicalOrdering bool, log *logp.Logger) pollingStrategy {
 	if lexicographicalOrdering {
-		return newLexicographicalPollingStrategy()
+		return newLexicographicalPollingStrategy(log)
 	}
-	return newNormalPollingStrategy()
+	return newNormalPollingStrategy(log)
 }
 
 // normalPollingStrategy implements the default (non-lexicographical) polling behavior.
@@ -31,14 +31,16 @@ func newPollingStrategy(lexicographicalOrdering bool) pollingStrategy {
 // - All objects are listed from the beginning each poll cycle
 // - ShouldSkipObject - skips objects that don't pass the validity filter
 // - GetStateID - returns the state ID (etag and last modified time for change detection)
-type normalPollingStrategy struct{}
-
-func newNormalPollingStrategy() pollingStrategy {
-	return normalPollingStrategy{}
+type normalPollingStrategy struct {
+	log *logp.Logger
 }
 
-func (normalPollingStrategy) ShouldSkipObject(log *logp.Logger, state state, isStateValid func(*logp.Logger, state) bool) bool {
-	return !isStateValid(log, state)
+func newNormalPollingStrategy(log *logp.Logger) pollingStrategy {
+	return normalPollingStrategy{log: log}
+}
+
+func (s normalPollingStrategy) ShouldSkipObject(state state, isStateValid func(*logp.Logger, state) bool) bool {
+	return !isStateValid(s.log, state)
 }
 
 func (normalPollingStrategy) GetStateID(state state) string {
@@ -50,13 +52,15 @@ func (normalPollingStrategy) GetStateID(state state) string {
 // - Listing starts from the oldest known key (StartAfter parameter)
 // - ShouldSkipObject - doesn't filter by state validity
 // - GetStateID - returns the state ID with a lexicographical suffix for isolation
-type lexicographicalPollingStrategy struct{}
-
-func newLexicographicalPollingStrategy() pollingStrategy {
-	return lexicographicalPollingStrategy{}
+type lexicographicalPollingStrategy struct {
+	log *logp.Logger
 }
 
-func (lexicographicalPollingStrategy) ShouldSkipObject(log *logp.Logger, state state, isStateValid func(*logp.Logger, state) bool) bool {
+func newLexicographicalPollingStrategy(log *logp.Logger) pollingStrategy {
+	return lexicographicalPollingStrategy{log: log}
+}
+
+func (lexicographicalPollingStrategy) ShouldSkipObject(state state, isStateValid func(*logp.Logger, state) bool) bool {
 	return false
 }
 
