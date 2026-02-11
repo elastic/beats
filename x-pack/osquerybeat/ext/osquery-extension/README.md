@@ -14,9 +14,12 @@ The extension adds several custom tables to osquery that provide:
 | Table | Linux | macOS | Windows |
 |-------|-------|-------|---------|
 | `elastic_browser_history` | ✅ | ✅ | ✅ |
-| `host_groups` | ✅ | ✅ | ❌ |
-| `host_users` | ✅ | ✅ | ❌ |
-| `host_processes` | ✅ | ❌ | ❌ |
+| `elastic_host_groups` | ✅ | ✅ | ❌ |
+| `host_groups` (view) | ✅ | ✅ | ❌ |
+| `elastic_host_users` | ✅ | ✅ | ❌ |
+| `host_users` (view) | ✅ | ✅ | ❌ |
+| `elastic_host_processes` | ✅ | ❌ | ❌ |
+| `host_processes` (view) | ✅ | ❌ | ❌ |
 | `elastic_file_analysis` | ❌ | ✅ | ❌ |
 
 ---
@@ -25,28 +28,28 @@ The extension adds several custom tables to osquery that provide:
 
 Each table has detailed documentation in its own file:
 
-### 1. [elastic_browser_history](docs/elastic_browser_history.md)
+### 1. [elastic_browser_history](docs/tables/elastic_browser_history.md)
 Query browser history from multiple browsers (Chrome, Edge, Firefox, Safari) with unified schema and advanced filtering capabilities.
 
 **Platforms**: Linux, macOS, Windows
 
-### 2. [host_groups](docs/host_groups.md)
-Query host system group information when running in a container environment. Access the host's `/etc/group` file to enumerate all groups on the host system.
+### 2. [elastic_host_groups](docs/tables/elastic_host_groups.md)
+Query host system group information from the host's `/etc/group` (e.g. when running in a container with hostfs mounted). The [host_groups](docs/views/host_groups.md) view provides backward compatibility.
 
 **Platforms**: Linux, macOS
 
-### 3. [host_users](docs/host_users.md)
-Query host system user accounts when running in a container environment. Access the host's user database (passwd) to enumerate all user accounts on the host system.
+### 3. [elastic_host_users](docs/tables/elastic_host_users.md)
+Query host system user accounts from the host's `/etc/passwd` (e.g. when running in a container with hostfs mounted). The [host_users](docs/views/host_users.md) view provides backward compatibility.
 
 **Platforms**: Linux, macOS
 
-### 4. [host_processes](docs/host_processes.md)
-Query running process information from the host system when running in a container environment. Read from the host's `/proc` filesystem to inspect all processes running on the host.
+### 4. [elastic_host_processes](docs/tables/elastic_host_processes.md)
+Query running process information from the host's `/proc` when running in a container (Linux only). The [host_processes](docs/views/host_processes.md) view provides backward compatibility.
 
 **Platforms**: Linux
 
-### 5. [elastic_file_analysis](docs/elastic_file_analysis.md)
-Perform comprehensive security analysis of executable files on macOS. Extract code signing information, library dependencies, symbols, and strings from Mach-O binaries.
+### 5. [elastic_file_analysis](docs/tables/elastic_file_analysis.md)
+Comprehensive security analysis of executable files on macOS (file type, code signing, dependencies, symbols, strings). Query with a path constraint; uses `file`, `codesign`, `otool`, `nm`, and `strings`.
 
 **Platforms**: macOS
 

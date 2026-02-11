@@ -15,12 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//nolint:errcheck // All complaints are about mapstr.M puts.
 package dhcpv4
 
 import (
+	"encoding/binary"
 	"fmt"
-	"net"
 	"strings"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
@@ -81,7 +80,7 @@ type dhcpv4Plugin struct {
 }
 
 func (p *dhcpv4Plugin) GetPorts() []int {
-	return p.dhcpv4Config.Ports
+	return p.Ports
 }
 
 func (p *dhcpv4Plugin) ParseUDP(pkt *protos.Packet) {
@@ -108,7 +107,7 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 	pbf.SetDestination(&dst)
 	pbf.Source.Bytes = int64(len(pkt.Payload))
 
-	if v4.Opcode() == dhcpv4.OpcodeBootReply {
+	if v4.OpCode == dhcpv4.OpcodeBootReply {
 		// Reverse
 		client, server := ecs.Client(*pbf.Destination), ecs.Server(*pbf.Source)
 		pbf.Client = &client
@@ -128,38 +127,37 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 	fields["type"] = pbf.Event.Dataset
 	fields["status"] = "OK"
 
-	mac16 := v4.ClientHwAddr()
 	dhcpData := mapstr.M{
-		"op_code":        strings.ToLower(v4.OpcodeToString()),
-		"hardware_type":  v4.HwTypeToString(),
-		"hops":           v4.HopCount(), // Set to non-zero by relays.
-		"transaction_id": fmt.Sprintf("0x%08x", v4.TransactionID()),
-		"seconds":        v4.NumSeconds(),
+		"op_code":        strings.ToLower(v4.OpCode.String()),
+		"hardware_type":  v4.HWType.String(),
+		"hops":           v4.HopCount, // Set to non-zero by relays.
+		"transaction_id": fmt.Sprintf("0x%08x", binary.BigEndian.Uint32(v4.TransactionID[:])),
+		"seconds":        v4.NumSeconds,
 		"flags":          strings.ToLower(v4.FlagsToString()),
-		"client_mac":     formatHardwareAddr(net.HardwareAddr(mac16[:v4.HwAddrLen()])),
+		"client_mac":     p.formatHardwareAddr(v4),
 	}
 	fields["dhcpv4"] = dhcpData
 
-	if !v4.ClientIPAddr().IsUnspecified() {
-		dhcpData.Put("client_ip", v4.ClientIPAddr().String())
-		pbf.AddIP(v4.ClientIPAddr().String())
+	if !v4.ClientIPAddr.IsUnspecified() {
+		dhcpData.Put("client_ip", v4.ClientIPAddr.String())
+		pbf.AddIP(v4.ClientIPAddr.String())
 	}
-	if !v4.YourIPAddr().IsUnspecified() {
-		dhcpData.Put("assigned_ip", v4.YourIPAddr().String())
-		pbf.AddIP(v4.YourIPAddr().String())
+	if !v4.YourIPAddr.IsUnspecified() {
+		dhcpData.Put("assigned_ip", v4.YourIPAddr.String())
+		pbf.AddIP(v4.YourIPAddr.String())
 	}
-	if !v4.GatewayIPAddr().IsUnspecified() {
-		dhcpData.Put("relay_ip", v4.GatewayIPAddr().String())
-		pbf.AddIP(v4.GatewayIPAddr().String())
+	if !v4.GatewayIPAddr.IsUnspecified() {
+		dhcpData.Put("relay_ip", v4.GatewayIPAddr.String())
+		pbf.AddIP(v4.GatewayIPAddr.String())
 	}
-	if serverName := v4.ServerHostNameToString(); serverName != "" {
+	if serverName := v4.ServerHostName; serverName != "" {
 		dhcpData.Put("server_name", serverName)
 	}
-	if fileName := v4.BootFileNameToString(); fileName != "" {
+	if fileName := v4.BootFileName; fileName != "" {
 		dhcpData.Put("boot_file_name", fileName)
 	}
 
-	if opts, err := optionsToMap(v4.StrippedOptions()); err != nil {
+	if opts, err := optionsToMap(v4); err != nil {
 		p.log.Warnw("Failed converting DHCP options to map",
 			"dhcpv4", v4, "error", err)
 	} else if len(opts) > 0 {
@@ -170,9 +168,12 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 }
 
 // formatHardwareAddr formats hardware addresses according to the ECS spec.
-func formatHardwareAddr(addr net.HardwareAddr) string {
-	buf := make([]byte, 0, len(addr)*3-1)
-	for _, b := range addr {
+func (p *dhcpv4Plugin) formatHardwareAddr(dhcp *dhcpv4.DHCPv4) string {
+	addrBytes := dhcp.ClientHWAddr
+	// note: this is a duplicate of the HardwareAddr.String() method,
+	// as we format MAC addresses like 00-00-5E-00-53-23
+	buf := make([]byte, 0, len(addrBytes)*3-1)
+	for _, b := range addrBytes {
 		if len(buf) != 0 {
 			buf = append(buf, '-')
 		}

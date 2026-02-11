@@ -166,6 +166,10 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	defer body.Close()
 
+	if h.validator.maxBodySize >= 0 {
+		body = io.NopCloser(io.LimitReader(body, h.validator.maxBodySize))
+	}
+
 	if h.reqLogger != nil {
 		// If we are logging, keep a copy of the body for the logger.
 		// This is stashed in the r.Body field. This is only safe

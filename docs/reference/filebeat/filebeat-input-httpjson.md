@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-httpjson.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # HTTP JSON input [filebeat-input-httpjson]
@@ -857,7 +858,7 @@ Enabling this option compromises security and should only be used for debugging.
 
 ## `request.tracer.filename` [_request_tracer_filename]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. The path must point to a target in the httpjson directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 
 ### `request.tracer.maxsize` [_request_tracer_maxsize]

@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/bandwidth-throttling.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Filebeat uses too much bandwidth [bandwidth-throttling]
