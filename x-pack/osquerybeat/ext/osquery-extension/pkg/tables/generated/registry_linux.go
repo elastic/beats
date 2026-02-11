@@ -11,12 +11,14 @@ package generated
 
 import (
 	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/browserhistory"
+	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hostgroups"
 
 	"github.com/osquery/osquery-go"
 	"github.com/osquery/osquery-go/plugin/table"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
+	elastichostgroups "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_host_groups"
 )
 
 // RegisterTables registers all generated tables with the osquery extension server.
@@ -30,6 +32,16 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 		} else {
 			server.RegisterPlugin(table.NewPlugin("elastic_browser_history", elasticbrowserhistory.Columns(), genFunc))
 			log.Infof("Registered table: elastic_browser_history")
+		}
+	}
+	{
+		// Host system group information from /etc/group (e.g. when running in a container with hostfs mounted)
+		genFunc, err := elastichostgroups.GetGenerateFunc(log)
+		if err != nil {
+			log.Errorf("Failed to get generate function for elastic_host_groups: %v", err)
+		} else {
+			server.RegisterPlugin(table.NewPlugin("elastic_host_groups", elastichostgroups.Columns(), genFunc))
+			log.Infof("Registered table: elastic_host_groups")
 		}
 	}
 }

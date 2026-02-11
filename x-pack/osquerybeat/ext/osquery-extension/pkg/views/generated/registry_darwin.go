@@ -12,11 +12,20 @@ package generated
 import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	hostgroups "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/host_groups"
 )
 
 // RegisterViews registers all generated views with the hook manager.
 // This function is called from main.go after all init() functions have run.
-// No views are defined for this platform.
 func RegisterViews(hookManager *hooks.HookManager, log *logger.Logger) {
-	// No views to register for this platform
+	{
+		// (Deprecated.) Backward-compatible view over elastic_host_groups; use elastic_host_groups instead.
+		hooksFunc, err := hostgroups.GetHooksFunc()
+		if err != nil {
+			hostgroups.RegisterDefaultViewHook(hookManager)
+		} else {
+			hooksFunc(hookManager)
+		}
+		log.Infof("Registered view: host_groups")
+	}
 }

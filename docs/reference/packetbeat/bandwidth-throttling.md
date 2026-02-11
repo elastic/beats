@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/bandwidth-throttling.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Packetbeat uses too much bandwidth [bandwidth-throttling]
