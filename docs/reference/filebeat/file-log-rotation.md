@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/file-log-rotation.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Log rotation results in lost or duplicate events [file-log-rotation]
