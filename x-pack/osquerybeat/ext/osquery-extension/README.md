@@ -45,8 +45,8 @@ Query running process information from the host system when running in a contain
 
 **Platforms**: Linux
 
-### 5. [elastic_file_analysis](docs/elastic_file_analysis.md)
-Perform comprehensive security analysis of executable files on macOS. Extract code signing information, library dependencies, symbols, and strings from Mach-O binaries.
+### 5. [elastic_file_analysis](docs/tables/elastic_file_analysis.md)
+Comprehensive security analysis of executable files on macOS (file type, code signing, dependencies, symbols, strings). Query with a path constraint; uses `file`, `codesign`, `otool`, `nm`, and `strings`.
 
 **Platforms**: macOS
 
