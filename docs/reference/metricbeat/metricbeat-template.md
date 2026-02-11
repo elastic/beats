@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-template.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Load the Elasticsearch index template [metricbeat-template]

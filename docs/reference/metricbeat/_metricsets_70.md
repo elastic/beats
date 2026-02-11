@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/_metricsets_70.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Metricsets [_metricsets_70]
