@@ -147,6 +147,7 @@ func (br *BeatReceiver) Start(host component.Host) error {
 
 // BeatReceiver.Stop() stops beat receiver.
 func (br *BeatReceiver) Shutdown() error {
+	br.beater.Stop()
 
 	br.beat.Instrumentation.Tracer().Close()
 	proc := br.beat.GetProcessors()
