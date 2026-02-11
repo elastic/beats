@@ -139,6 +139,8 @@ def document_field(output, field, field_path):
 
 # Determine the serverless lifecycle from the stack applies_to list.
 # Serverless is unversioned, so we use the most advanced lifecycle state.
+
+
 def get_serverless_lifecycle(applies_to):
     lifecycle_order = ['preview', 'beta', 'ga', 'deprecated', 'removed']
     latest_idx = -1
