@@ -9,7 +9,11 @@ applies_to:
 
 {{beats}} are lightweight data shippers that send operational data to {{es}}. Elastic provides separate {{beats}} for different types of data, such as logs, metrics, and uptime. Depending on what data you want to collect, you might need to install multiple shippers on a single host.
 
-{{beats}} work with all {{es-serverless}} project types, including Elasticsearch, Observability, and Security projects.
+{{beats}} are not hosted by Elastic. You deploy and manage them on your own infrastructure, such as on-premises servers, virtual machines, or containers. {{beats}} work with all {{es-serverless}} project types, including Elasticsearch, Observability, and Security projects.
+
+::::{tip}
+If you're looking for a hosted data collection option that doesn't require managing infrastructure, consider [agentless integrations](docs-content://solutions/security/get-started/agentless-integrations.md), which run on Elastic's infrastructure and require no agent deployment or maintenance.
+::::
 
 | Data | {{beats}} |
 | --- | --- |
