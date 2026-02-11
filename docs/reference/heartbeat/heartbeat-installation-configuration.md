@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/heartbeat-installation-configuration.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Heartbeat quick start: installation and configuration [heartbeat-installation-configuration]

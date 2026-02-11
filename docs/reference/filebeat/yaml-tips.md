@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/yaml-tips.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Avoid YAML formatting problems [yaml-tips]
