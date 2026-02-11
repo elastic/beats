@@ -4,5 +4,5 @@
 :release-state: unreleased
 :python: 3.7
 :docker: 1.12
-:docker-compose: 1.11
+:docker-compose: 2.0
 :libpcap: 0.8
