@@ -1,17 +1,29 @@
 notify:
   - slack:
       channels:
-        - "#test-channel-for-plugin"
+        - "#ingest-notifications"
     if: (build.branch == 'main' || build.branch =~ /^[0-9]+\.[0-9x]+\$/) && (build.state == 'passed' || build.state == 'failed')
   - slack:
       channels:
-        - "#test-channel-for-plugin"
-      message: "🚦 Pipeline waiting for approval 🚦\n*Ready to fetch DRA artifacts - Please unblock when ready.*"
+        - "#ingest-notifications"
+      message: |
+        🚦 Pipeline waiting for approval 🚦
+        Ready to fetch DRA artifacts - please unblock when ready.
+        New version: `${NEW_VERSION}`
+        Branch: `${BRANCH}`
+        Workflow: `${WORKFLOW}`
+        ${BUILDKITE_BUILD_URL}
     if: build.state == "blocked"
 
 steps:
   - block: "Ready to fetch for DRA artifacts?"
-    prompt: "Unblock when your team is ready to proceed."
+    prompt: |
+      Unblock when your team is ready to proceed.
+
+      Trigger parameters:
+      - NEW_VERSION: ${NEW_VERSION}
+      - BRANCH: ${BRANCH}
+      - WORKFLOW: ${WORKFLOW}
     key: block-get-dra-artifacts
     blocked_state: running
 
@@ -37,10 +49,10 @@ steps:
       - elastic/json-watcher#v1.0.0:
           url: "${STAGING_URL}"
           field: "${FIELD}"
-          expected_value: "${EXPECTED_VALUE}"
+          expected_value: "${NEW_VERSION}"
           polling_interval: "${POLLING_INTERVAL}"
       - elastic/json-watcher#v1.0.0:
           url: "${SNAPSHOT_URL}"
           field: "${FIELD}"
-          expected_value: "${EXPECTED_VALUE}-SNAPSHOT"
+          expected_value: "${NEW_VERSION}-SNAPSHOT"
           polling_interval: "${POLLING_INTERVAL}"
