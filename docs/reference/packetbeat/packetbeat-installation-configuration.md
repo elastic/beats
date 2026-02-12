@@ -40,8 +40,11 @@ This guide describes how to get started quickly with network packets analytics. 
     To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
     ::::::
 
-::::{include} /reference/_snippets/serverless-before-you-begin.md
-::::
+    ::::::{applies-item} serverless: ga
+    :sync: serverless
+    ::::{include} /reference/_snippets/serverless-before-you-begin.md
+    ::::
+    ::::::
 
     :::::::
 
@@ -222,8 +225,11 @@ cloud.auth: "packetbeat_setup:YOUR_PASSWORD" <1>
     3. To use the pre-built {{kib}} dashboards, this user must be authorized to view dashboards or have the `kibana_admin` [built-in role](elasticsearch://reference/elasticsearch/roles.md).
 ::::::
 
+::::::{applies-item} serverless: ga
+:sync: serverless
 ::::{include} /reference/_snippets/serverless-connect.md
 ::::
+::::::
 
 :::::::
 To learn more about required roles and privileges, see [*Grant users access to secured resources*](/reference/packetbeat/feature-roles.md).
@@ -513,8 +519,11 @@ To open the dashboards:
     :sync: self
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
     ::::::
-::::{include} /reference/_snippets/serverless-view-data.md
-::::
+    ::::::{applies-item} serverless: ga
+    :sync: serverless
+    ::::{include} /reference/_snippets/serverless-view-data.md
+    ::::
+    ::::::
     :::::::
 
 2. In the side navigation, click **Discover**. To see Packetbeat data, make sure the predefined `packetbeat-*` data view is selected.

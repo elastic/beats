@@ -34,8 +34,11 @@ To get started quickly, spin up an [{{ech}}](https://www.elastic.co/cloud?page=d
 To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
 ::::::
 
+::::::{applies-item} serverless: ga
+:sync: serverless
 ::::{include} /reference/_snippets/serverless-before-you-begin.md
 ::::
+::::::
 
 :::::::
 
@@ -178,8 +181,11 @@ cloud.auth: "auditbeat_setup:YOUR_PASSWORD" <1>
 
 ::::::
 
+::::::{applies-item} serverless: ga
+:sync: serverless
 ::::{include} /reference/_snippets/serverless-connect.md
 ::::
+::::::
 :::::::
 
 To learn more about required roles and privileges, see [*Grant users access to secured resources*](/reference/auditbeat/feature-roles.md).
@@ -380,8 +386,11 @@ To open the dashboards:
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
     ::::::
 
-::::{include} /reference/_snippets/serverless-view-data.md
-::::
+    ::::::{applies-item} serverless: ga
+    :sync: serverless
+    ::::{include} /reference/_snippets/serverless-view-data.md
+    ::::
+    ::::::
 
     :::::::
 

@@ -31,13 +31,13 @@ If you're looking for a hosted data collection option that doesn't require manag
 
 To send data to an {{es-serverless}} project, configure your Beat to connect using the project's {{es}} endpoint URL and an API key.
 
-### Step 1: Get your connection details [serverless-connection-details]
+### Get your connection details [serverless-connection-details]
 
 1. Log in to [Elastic Cloud](https://cloud.elastic.co/).
 2. Find your **{{es}} endpoint URL**. Select **Manage** next to your project, then find the {{es}} endpoint under **Application endpoints, cluster and component IDs**. Alternatively, open your project, select the help icon, then select **Connection details**.
 3. Create an **API key** with the appropriate privileges. Refer to [Create API key](docs-content://solutions/search/search-connection-details.md#create-an-api-key-serverless) for detailed steps. For information on the required privileges, refer to [Grant access using API keys](/reference/filebeat/beats-api-keys.md).
 
-### Step 2: Configure the output [serverless-configure-output]
+### Configure the output [serverless-configure-output]
 
 In your Beat configuration file (for example, `filebeat.yml`), set the `output.elasticsearch` section with your endpoint URL and API key:
 
@@ -51,7 +51,7 @@ output.elasticsearch:
 Do not use `cloud.id` or `cloud.auth` for {{es-serverless}} projects. Those settings are for [{{ech}}](/reference/filebeat/configure-cloud-id.md) deployments only.
 ::::
 
-### Step 3: Install and start your Beat [serverless-install-start]
+### Install and start your Beat [serverless-install-start]
 
 Follow the quick start guide for the Beat you want to use:
 
@@ -62,7 +62,7 @@ Follow the quick start guide for the Beat you want to use:
 - [Packetbeat quick start](/reference/packetbeat/packetbeat-installation-configuration.md)
 - [Winlogbeat quick start](/reference/winlogbeat/winlogbeat-installation-configuration.md)
 
-When you reach the connection setup step, use the {{es-serverless}} configuration from [Step 2](#serverless-configure-output) instead of the `cloud.id` or `hosts` examples shown for other deployment types.
+When you reach the connection setup step, use the {{es-serverless}} configuration from [Configure the output](#serverless-configure-output) instead of the `cloud.id` or `hosts` examples shown for other deployment types.
 
 ## Differences from other deployment types [serverless-differences]
 

@@ -1,5 +1,3 @@
-::::::{applies-item} serverless: ga
-:sync: serverless
 Set the {{es}} endpoint and API key in your Beat configuration file. To find your project's endpoint and create an API key, refer to [connection details](docs-content://solutions/search/search-connection-details.md). For example:
 
 ```yaml
@@ -14,4 +12,3 @@ output.elasticsearch:
 Do not use `cloud.id` or `cloud.auth` for {{es-serverless}} projects. Those settings are for {{ech}} deployments only.
 ::::
 
-::::::

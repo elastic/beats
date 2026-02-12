@@ -38,8 +38,11 @@ To get started quickly, spin up an [{{ech}}](https://www.elastic.co/cloud?page=d
 To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
 ::::::
 
+::::::{applies-item} serverless: ga
+:sync: serverless
 ::::{include} /reference/_snippets/serverless-before-you-begin.md
 ::::
+::::::
 
 :::::::
 
@@ -183,8 +186,11 @@ cloud.auth: "heartbeat_setup:YOUR_PASSWORD" <1>
     3. To use the pre-built {{kib}} dashboards, this user must be authorized to view dashboards or have the `kibana_admin` [built-in role](elasticsearch://reference/elasticsearch/roles.md).
 ::::::
 
+::::::{applies-item} serverless: ga
+:sync: serverless
 ::::{include} /reference/_snippets/serverless-connect.md
 ::::
+::::::
 
 :::::::
 To learn more about required roles and privileges, see [*Grant users access to secured resources*](/reference/heartbeat/feature-roles.md).
@@ -415,8 +421,11 @@ To open the dashboards:
     :sync: self
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
     ::::::
-::::{include} /reference/_snippets/serverless-view-data.md
-::::
+    ::::::{applies-item} serverless: ga
+    :sync: serverless
+    ::::{include} /reference/_snippets/serverless-view-data.md
+    ::::
+    ::::::
     :::::::
 
 2. In the side navigation, click **Discover**. To see Heartbeat data, make sure the predefined `heartbeat-*` data view is selected.
