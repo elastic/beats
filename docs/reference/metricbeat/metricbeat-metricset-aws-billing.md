@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-aws-billing.html
 applies_to:
   stack: beta
-  serverless: ga
+  serverless: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py

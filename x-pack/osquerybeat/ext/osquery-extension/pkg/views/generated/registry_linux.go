@@ -13,6 +13,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	hostgroups "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/host_groups"
+	hostprocesses "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/host_processes"
+	hostusers "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/host_users"
 )
 
 // RegisterViews registers all generated views with the hook manager.
@@ -27,5 +29,25 @@ func RegisterViews(hookManager *hooks.HookManager, log *logger.Logger) {
 			hooksFunc(hookManager)
 		}
 		log.Infof("Registered view: host_groups")
+	}
+	{
+		// (Deprecated.) Backward-compatible view over elastic_host_processes; use elastic_host_processes instead.
+		hooksFunc, err := hostprocesses.GetHooksFunc()
+		if err != nil {
+			hostprocesses.RegisterDefaultViewHook(hookManager)
+		} else {
+			hooksFunc(hookManager)
+		}
+		log.Infof("Registered view: host_processes")
+	}
+	{
+		// (Deprecated.) Backward-compatible view over elastic_host_users; use elastic_host_users instead.
+		hooksFunc, err := hostusers.GetHooksFunc()
+		if err != nil {
+			hostusers.RegisterDefaultViewHook(hookManager)
+		} else {
+			hooksFunc(hookManager)
+		}
+		log.Infof("Registered view: host_users")
 	}
 }
