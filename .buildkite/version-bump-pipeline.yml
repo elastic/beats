@@ -8,6 +8,8 @@ notify:
         - "#ingest-notifications"
       message: |
         🚦 Pipeline waiting for approval 🚦
+        Product: `${PRODUCT}`
+
         Ready to fetch DRA artifacts - please unblock when ready.
         New version: `${NEW_VERSION}`
         Branch: `${BRANCH}`
