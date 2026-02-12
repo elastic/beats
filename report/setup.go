@@ -21,6 +21,7 @@ package report
 
 import (
 	"fmt"
+	"path/filepath"
 	"runtime"
 	"time"
 
@@ -68,6 +69,18 @@ func SetupMetricsOptions(opts MetricOptions) error {
 		CacheCmdLine: true,
 		IncludeTop:   process.IncludeTopConfig{},
 		Logger:       opts.Logger,
+
+		// Always use the local filesystem for self-monitoring metrics.
+		// Metricbeat will use the hostfs to set the environment variables:
+		// - HOST_PROC
+		// - HOST_SYS
+		// - HOST_ETC
+		// which are read by github.com/shirou/gopsutil/v4 and used when fetching metrics.
+		// This causes a miss match, because the PID we get does not take into consideration
+		// the hostfs, thus it cannot be used to get metrics from it.
+		// The hostfs configuration is read after this function is ran, so we cannot even
+		// rely on the environment variables set by Metricbeat.
+		Hostfs: localProcResolver{},
 	}
 
 	err := processStats.Init()
@@ -157,4 +170,21 @@ func setupPlatformSpecificMetrics(logger *logp.Logger, processStats *process.Sta
 	}
 
 	SetupLinuxBSDFDMetrics(logger, processMetrics, processStats)
+}
+
+// localProcResolver is a resolver that always resolves paths relative to the
+// local root filesystem.
+type localProcResolver struct{}
+
+func (t localProcResolver) ResolveHostFS(path string) string {
+	return filepath.Join("/", path)
+}
+
+func (t localProcResolver) Join(path ...string) string {
+	fullpath := append([]string{"/"}, path...)
+	return filepath.Join(fullpath...)
+}
+
+func (t localProcResolver) IsSet() bool {
+	return true
 }

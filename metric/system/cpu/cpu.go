@@ -20,6 +20,8 @@
 package cpu
 
 import (
+	"context"
+
 	"github.com/shirou/gopsutil/v4/load"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -38,6 +40,15 @@ func Load() (*LoadMetrics, error) {
 // periods.
 func LoadWithLogger(logger *logp.Logger) (*LoadMetrics, error) {
 	avg, err := load.Avg()
+	if err != nil {
+		return nil, err
+	}
+
+	return &LoadMetrics{avg, logger}, nil
+}
+
+func LoadWithContextAndLogger(ctx context.Context, logger *logp.Logger) (*LoadMetrics, error) {
+	avg, err := load.AvgWithContext(ctx)
 	if err != nil {
 		return nil, err
 	}

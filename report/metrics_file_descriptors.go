@@ -49,7 +49,7 @@ func FDUsageReporter(logger *logp.Logger, processStats *process.Stats) func(_ mo
 
 	ctx := context.Background()
 	if processStats != nil && processStats.Hostfs != nil && processStats.Hostfs.IsSet() {
-		ctx = context.WithValue(context.Background(), common.EnvKey, common.EnvMap{common.HostProcEnvKey: processStats.Hostfs.ResolveHostFS("")})
+		ctx = context.WithValue(context.Background(), common.EnvKey, common.EnvMap{common.HostProcEnvKey: processStats.Hostfs.ResolveHostFS("/proc")})
 	}
 
 	return func(_ monitoring.Mode, V monitoring.Visitor) {
@@ -58,13 +58,13 @@ func FDUsageReporter(logger *logp.Logger, processStats *process.Stats) func(_ mo
 
 		open, err := p.NumFDsWithContext(ctx)
 		if err != nil {
-			logger.Error("Error while retrieving open FDs information: %v", err)
+			logger.Errorf("Error while retrieving open FDs information: %v", err)
 			return
 		}
 
 		stats, err := p.RlimitWithContext(ctx)
 		if err != nil {
-			logger.Error("Error while retrieving FD stats information: %v", err)
+			logger.Errorf("Error while retrieving FD stats information: %v", err)
 			return
 		}
 

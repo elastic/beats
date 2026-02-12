@@ -64,7 +64,6 @@ func GetSelfPid(hostfs resolve.Resolver) (int, error) {
 		return 0, fmt.Errorf("error parsing int from `stat` while searching for our pid in a container: %w", err)
 	}
 	return int(pid), nil
-
 }
 
 // FetchPids is the linux implementation of FetchPids

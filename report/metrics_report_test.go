@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-func TestSystemMetricsReport(t *testing.T) {
+func testSystemMetricsReport(t *testing.T) {
 	systemMetrics := monitoring.NewRegistry()
 	processMetrics := monitoring.NewRegistry()
 	err := SetupMetricsOptions(MetricOptions{
@@ -43,7 +43,7 @@ func TestSystemMetricsReport(t *testing.T) {
 	require.NoError(t, err)
 
 	var gotCPU, gotMem, gotInfo atomic.Bool
-	testFunc := func(key string, val interface{}) {
+	testFunc := func(key string, val any) {
 		if key == "info.uptime.ms" {
 			gotInfo.Store(true)
 		}
@@ -62,7 +62,7 @@ func TestSystemMetricsReport(t *testing.T) {
 	var wait sync.WaitGroup
 	wait.Add(iter)
 	ch := make(chan struct{})
-	for i := 0; i < iter; i++ {
+	for range iter {
 		go func() {
 			<-ch
 			processMetrics.Do(monitoring.Full, testFunc)
@@ -75,4 +75,19 @@ func TestSystemMetricsReport(t *testing.T) {
 	assert.True(t, gotCPU.Load(), "Didn't find cpu.total.ticks")
 	assert.True(t, gotMem.Load(), "Didn't find memstats.rss")
 	assert.True(t, gotInfo.Load(), "Didn't find info.uptime.ms")
+}
+
+func TestSystemMetricsReport(t *testing.T) {
+	testSystemMetricsReport(t)
+}
+
+// TestSystemMetricsReportOnlyUseLocalProc ensures the metrics created by
+// [SetupMetricsOptions] are not affected by environment variables setting
+// the hostfs.
+func TestSystemMetricsReportOnlyUseLocalProc(t *testing.T) {
+	for _, key := range []string{"HOST_PROC", "HOST_SYS", "HOST_ETC"} {
+		t.Setenv(key, "/a/broken/path") // a inexistent path
+	}
+
+	testSystemMetricsReport(t)
 }
