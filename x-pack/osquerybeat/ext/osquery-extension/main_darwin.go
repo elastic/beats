@@ -29,25 +29,20 @@ import (
 	"github.com/macadmins/osquery-extension/tables/macosrsr"
 	"github.com/macadmins/osquery-extension/tables/mdm"
 	"github.com/macadmins/osquery-extension/tables/munki"
-	"github.com/macadmins/osquery-extension/tables/networkquality"
 	"github.com/macadmins/osquery-extension/tables/pendingappleupdates"
 	"github.com/macadmins/osquery-extension/tables/puppet"
-	"github.com/macadmins/osquery-extension/tables/sofa"
 	"github.com/macadmins/osquery-extension/tables/unifiedlog"
 	"github.com/macadmins/osquery-extension/tables/wifi_network"
 )
 
-// macadminsExtensionVersion is used for sofa user agent
-const macadminsExtensionVersion = "1.3.2"
+// Note: The following macadmins tables are intentionally NOT included:
+// - sofa_security_release_info, sofa_unpatched_cves: These fetch data from external
+//   URLs (sofafeed.macadmins.io) which adds external dependencies and privacy concerns.
+// - network_quality: This runs active network speed tests to Apple's servers, which
+//   generates network traffic and may take significant time to complete.
 
 func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, _ *hooks.HookManager, _ *client.ResilientClient) {
 	socketPath := *socket
-
-	// Build sofa options with user agent
-	useragent := sofa.BuildUserAgent(macadminsExtensionVersion)
-	sofaOpts := []sofa.Option{
-		sofa.WithUserAgent(useragent),
-	}
 
 	// Cross-platform tables from macadmins extension
 	server.RegisterPlugin(table.NewPlugin("puppet_info", puppet.PuppetInfoColumns(), puppet.PuppetInfoGenerate))
@@ -99,9 +94,6 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, 
 	server.RegisterPlugin(table.NewPlugin("munki_installs", munki.MunkiInstallsColumns(), munki.MunkiInstallsGenerate))
 	log.Infof("Registered macadmins table: munki_installs")
 
-	server.RegisterPlugin(table.NewPlugin("network_quality", networkquality.NetworkQualityColumns(), networkquality.NetworkQualityGenerate))
-	log.Infof("Registered macadmins table: network_quality")
-
 	server.RegisterPlugin(table.NewPlugin("pending_apple_updates", pendingappleupdates.PendingAppleUpdatesColumns(), pendingappleupdates.PendingAppleUpdatesGenerate))
 	log.Infof("Registered macadmins table: pending_apple_updates")
 
@@ -110,16 +102,6 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, 
 
 	server.RegisterPlugin(table.NewPlugin("macos_rsr", macosrsr.MacOSRsrColumns(), macosrsr.MacOSRsrGenerate))
 	log.Infof("Registered macadmins table: macos_rsr")
-
-	server.RegisterPlugin(table.NewPlugin("sofa_security_release_info", sofa.SofaSecurityReleaseInfoColumns(), func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		return sofa.SofaSecurityReleaseInfoGenerate(ctx, queryContext, socketPath, sofaOpts...)
-	}))
-	log.Infof("Registered macadmins table: sofa_security_release_info")
-
-	server.RegisterPlugin(table.NewPlugin("sofa_unpatched_cves", sofa.SofaUnpatchedCVEsColumns(), func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		return sofa.SofaUnpatchedCVEsGenerate(ctx, queryContext, socketPath, sofaOpts...)
-	}))
-	log.Infof("Registered macadmins table: sofa_unpatched_cves")
 
 	server.RegisterPlugin(table.NewPlugin("authdb", authdb.AuthDBColumns(), authdb.AuthDBGenerate))
 	log.Infof("Registered macadmins table: authdb")

@@ -21,9 +21,7 @@ import (
 	"github.com/macadmins/osquery-extension/tables/macosrsr"
 	"github.com/macadmins/osquery-extension/tables/mdm"
 	"github.com/macadmins/osquery-extension/tables/munki"
-	"github.com/macadmins/osquery-extension/tables/networkquality"
 	"github.com/macadmins/osquery-extension/tables/pendingappleupdates"
-	"github.com/macadmins/osquery-extension/tables/sofa"
 	"github.com/macadmins/osquery-extension/tables/unifiedlog"
 	"github.com/macadmins/osquery-extension/tables/wifi_network"
 )
@@ -31,6 +29,10 @@ import (
 // TestMacadminsDarwinTablesImport verifies that the macadmins darwin-only
 // extension tables can be imported and have the expected function signatures.
 // This is a build-time verification test.
+//
+// Note: The following tables are intentionally NOT included:
+// - sofa_security_release_info, sofa_unpatched_cves: External network dependencies
+// - network_quality: Runs active network speed tests
 func TestMacadminsDarwinTablesImport(t *testing.T) {
 	// Test that darwin-only tables have the expected function signatures
 	tables := []struct {
@@ -44,12 +46,9 @@ func TestMacadminsDarwinTablesImport(t *testing.T) {
 		{"mdm", mdm.MDMInfoColumns},
 		{"munki_info", munki.MunkiInfoColumns},
 		{"munki_installs", munki.MunkiInstallsColumns},
-		{"network_quality", networkquality.NetworkQualityColumns},
 		{"pending_apple_updates", pendingappleupdates.PendingAppleUpdatesColumns},
 		{"macadmins_unified_log", unifiedlog.UnifiedLogColumns},
 		{"macos_rsr", macosrsr.MacOSRsrColumns},
-		{"sofa_security_release_info", sofa.SofaSecurityReleaseInfoColumns},
-		{"sofa_unpatched_cves", sofa.SofaUnpatchedCVEsColumns},
 		{"authdb", authdb.AuthDBColumns},
 		{"wifi_network", wifi_network.WifiNetworkColumns},
 		{"alt_system_info", alt_system_info.AltSystemInfoColumns},
