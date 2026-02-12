@@ -315,6 +315,9 @@ func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *path
 		if err != nil {
 			return nil, err
 		}
+		if paths == nil {
+			panic("TODO: unexpected nil")
+		}
 		settings.Paths = paths
 		return diskqueue.FactoryForSettings(settings), nil
 	default:

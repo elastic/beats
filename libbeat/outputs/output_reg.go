@@ -107,6 +107,10 @@ func Load(
 		return Group{}, fmt.Errorf("output type %v undefined", name)
 	}
 
+	if paths == nil {
+		panic("unexpected nil paths")
+	}
+
 	if stats == nil {
 		stats = NewNilObserver()
 	}
