@@ -31,6 +31,13 @@ import (
 // Settings contains the configuration fields to create a new disk queue
 // or open an existing one.
 type Settings struct {
+	// Paths holds the per-beat paths definition. When set, it is used to
+	// resolve the default diskqueue directory instead of the global
+	// paths.Resolve. This is important for beat receivers where each beat
+	// needs its own data directory.
+	// If nil, the global paths.Resolve is used as a fallback.
+	Paths *paths.Path
+
 	// The path on disk of the queue's containing directory, which will be
 	// created if it doesn't exist. Within the directory, the queue's state
 	// is stored in state.dat and each segment's data is stored in
@@ -172,6 +179,9 @@ func SettingsForUserConfig(config *config.C) (Settings, error) {
 
 func (settings Settings) directoryPath() string {
 	if settings.Path == "" {
+		if settings.Paths != nil {
+			return settings.Paths.Resolve(paths.Data, "diskqueue")
+		}
 		return paths.Resolve(paths.Data, "diskqueue")
 	}
 	return settings.Path

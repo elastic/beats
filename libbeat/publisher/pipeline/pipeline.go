@@ -165,7 +165,7 @@ func New(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config())
+	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), settings.Paths)
 	if err != nil {
 		return nil, err
 	}
@@ -302,7 +302,7 @@ func (p *Pipeline) OutputReloader() OutputReloader {
 // This helper exists to frontload config parsing errors: if there is an
 // error in the queue config, we want it to show up as fatal during
 // initialization, even if the queue itself isn't created until later.
-func queueFactoryForUserConfig(queueType string, userConfig *conf.C) (queue.QueueFactory, error) {
+func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *paths.Path) (queue.QueueFactory, error) {
 	switch queueType {
 	case memqueue.QueueType:
 		settings, err := memqueue.SettingsForUserConfig(userConfig)
@@ -315,6 +315,7 @@ func queueFactoryForUserConfig(queueType string, userConfig *conf.C) (queue.Queu
 		if err != nil {
 			return nil, err
 		}
+		settings.Paths = paths
 		return diskqueue.FactoryForSettings(settings), nil
 	default:
 		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
