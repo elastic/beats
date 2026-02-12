@@ -10,7 +10,6 @@ permissions:
   contents: read
 
 env:
-  EMAIL: beats-contrib@elastic.co
   URL_QUERY: 'https://github.com/elastic/beats/pulls?q=is%3Apr+is%3Aopen+label%3ATeam%3ABeats-On-Call+update+elastic+stack'
 
 jobs:
