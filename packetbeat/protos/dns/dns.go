@@ -284,6 +284,10 @@ func (dns *dnsPlugin) deleteTransaction(k hashableDNSTuple) *dnsTransaction {
 	return nil
 }
 
+func (dns *dnsPlugin) Close() {
+	dns.transactions.StopJanitor()
+}
+
 func (dns *dnsPlugin) GetPorts() []int {
 	return dns.ports
 }

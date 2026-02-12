@@ -231,6 +231,10 @@ func (thrift *thriftPlugin) init(
 	return nil
 }
 
+func (thrift *thriftPlugin) Close() {
+	thrift.transactions.StopJanitor()
+}
+
 func (thrift *thriftPlugin) getTransaction(k common.HashableTCPTuple) *thriftTransaction {
 	v := thrift.transactions.Get(k)
 	if v != nil {

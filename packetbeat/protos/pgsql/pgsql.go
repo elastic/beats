@@ -184,6 +184,10 @@ func (pgsql *pgsqlPlugin) setFromConfig(config *pgsqlConfig) {
 	pgsql.transactionTimeout = config.TransactionTimeout
 }
 
+func (pgsql *pgsqlPlugin) Close() {
+	pgsql.transactions.StopJanitor()
+}
+
 func (pgsql *pgsqlPlugin) getTransaction(k common.HashableTCPTuple) []*pgsqlTransaction {
 	v := pgsql.transactions.Get(k)
 	if v != nil {

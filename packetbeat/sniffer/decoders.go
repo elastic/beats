@@ -44,6 +44,7 @@ func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *
 	return func(dl layers.LinkType, device string, idx int) (*decoder.Decoder, func(), error) {
 		var icmp4 icmp.ICMPv4Processor
 		var icmp6 icmp.ICMPv6Processor
+		var icmpCloser protos.PluginCloser
 		icmpCfg, err := cfg.ICMP()
 		if err != nil {
 			return nil, nil, err
@@ -54,13 +55,14 @@ func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *
 				return nil, nil, err
 			}
 
-			icmp, err := icmp.New(false, reporter, watcher, icmpCfg)
+			p, err := icmp.New(false, reporter, watcher, icmpCfg)
 			if err != nil {
 				return nil, nil, err
 			}
 
-			icmp4 = icmp
-			icmp6 = icmp
+			icmpCloser = p
+			icmp4 = p
+			icmp6 = p
 		}
 
 		tcp, err := tcp.NewTCP(protocols, id, device, idx)
@@ -83,6 +85,11 @@ func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *
 		}
 
 		cleanup := func() {
+			// Stop cache janitor goroutines in protocol plugins.
+			protocols.Close()
+			if icmpCloser != nil {
+				icmpCloser.Close()
+			}
 			// Close metric collection.
 			tcp.Close()
 			udp.Close()

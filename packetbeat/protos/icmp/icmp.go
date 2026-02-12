@@ -121,6 +121,10 @@ func (icmp *icmpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWa
 	return nil
 }
 
+func (icmp *icmpPlugin) Close() {
+	icmp.transactions.StopJanitor()
+}
+
 func (icmp *icmpPlugin) setFromConfig(config *icmpConfig) {
 	icmp.sendRequest = config.SendRequest
 	icmp.sendResponse = config.SendResponse

@@ -112,6 +112,11 @@ func (mongodb *mongodbPlugin) setFromConfig(config *mongodbConfig) {
 	mongodb.transactionTimeout = config.TransactionTimeout
 }
 
+func (mongodb *mongodbPlugin) Close() {
+	mongodb.requests.StopJanitor()
+	mongodb.responses.StopJanitor()
+}
+
 func (mongodb *mongodbPlugin) GetPorts() []int {
 	return mongodb.ports
 }

@@ -76,6 +76,13 @@ func validatePorts(ports []int) error {
 	return nil
 }
 
+// PluginCloser is an optional interface that protocol plugins can implement
+// to release resources (e.g. stop cache janitor goroutines) when the
+// protocol is no longer needed.
+type PluginCloser interface {
+	Close()
+}
+
 type Protocols interface {
 	BpfFilter(withVlans bool, withICMP bool) string
 	GetTCP(proto Protocol) TCPPlugin
@@ -265,6 +272,16 @@ func (s ProtocolsStruct) GetAllTCP() map[Protocol]TCPPlugin {
 
 func (s ProtocolsStruct) GetAllUDP() map[Protocol]UDPPlugin {
 	return s.udp
+}
+
+// Close releases resources held by all registered protocol plugins.
+// Plugins that implement PluginCloser will have their Close method called.
+func (s ProtocolsStruct) Close() {
+	for _, inst := range s.all {
+		if closer, ok := inst.plugin.(PluginCloser); ok {
+			closer.Close()
+		}
+	}
 }
 
 // BpfFilter returns a Berkeley Packer Filter (BFP) expression that

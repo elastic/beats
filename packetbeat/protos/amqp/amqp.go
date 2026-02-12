@@ -101,6 +101,10 @@ func (amqp *amqpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWa
 	return nil
 }
 
+func (amqp *amqpPlugin) Close() {
+	amqp.transactions.StopJanitor()
+}
+
 func (amqp *amqpPlugin) initMethodMap() {
 	amqp.methodMap = map[codeClass]map[codeMethod]amqpMethod{
 		connectionCode: {

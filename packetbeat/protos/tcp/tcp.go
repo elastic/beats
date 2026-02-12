@@ -271,6 +271,7 @@ func (tcp *TCP) findStream(k common.HashableIPPortTuple) *TCPConnection {
 }
 
 func (tcp *TCP) Close() {
+	tcp.streams.StopJanitor()
 	if tcp.metrics == nil {
 		return
 	}
