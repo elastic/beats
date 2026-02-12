@@ -22,8 +22,8 @@ import (
 type registryOwnership bool
 
 const (
-	ownsRegistry        registryOwnership = true
-	doesNotOwnRegistry  registryOwnership = false
+	ownsRegistry       registryOwnership = true
+	doesNotOwnRegistry registryOwnership = false
 )
 
 // StateVersion is the current version of the state format.
@@ -178,20 +178,20 @@ func isKeyNotFoundError(err error) bool {
 // Components that trigger cursor reset:
 //   - inputType: "sql" (for namespacing) - hardcoded, never changes
 //   - dsn: Full database URI/DSN (NOT normalized)
-//     * Changing host (localhost → 127.0.0.1) resets cursor
-//     * Changing password in DSN resets cursor
-//     * Adding connection params (?sslmode=require) resets cursor
-//     * Includes database name for isolation (prod_db vs test_db on same server)
+//   - Changing host (localhost → 127.0.0.1) resets cursor
+//   - Changing password in DSN resets cursor
+//   - Adding connection params (?sslmode=require) resets cursor
+//   - Includes database name for isolation (prod_db vs test_db on same server)
 //   - query: Full query string (NOT normalized - exact byte match)
-//     * Adding/removing whitespace resets cursor
-//     * Changing SQL capitalization (SELECT → select) resets cursor
-//     * Changing LIMIT value resets cursor
-//     * Modifying WHERE clause resets cursor
+//   - Adding/removing whitespace resets cursor
+//   - Changing SQL capitalization (SELECT → select) resets cursor
+//   - Changing LIMIT value resets cursor
+//   - Modifying WHERE clause resets cursor
 //   - cursorColumn: The column name being tracked
-//     * Renaming cursor column resets cursor
+//   - Renaming cursor column resets cursor
 //   - direction: The cursor scan direction ("asc" or "desc")
-//     * Changing direction resets cursor (prevents using a max-tracked value
-//       as a min-tracking starting point, or vice versa)
+//   - Changing direction resets cursor (prevents using a max-tracked value
+//     as a min-tracking starting point, or vice versa)
 //
 // Design rationale:
 //   - Safety: Query changes could affect result set semantics. Better to start

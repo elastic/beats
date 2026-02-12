@@ -23,7 +23,7 @@ type Value struct {
 
 // ParseValue creates a Value from a string representation.
 // This is used to parse the default value from config and stored state.
-func ParseValue(raw string, valueType string) (*Value, error) {
+func ParseValue(raw, valueType string) (*Value, error) {
 	v := &Value{Type: valueType, Raw: raw}
 
 	switch valueType {

@@ -112,7 +112,6 @@ func oracleParseDSN(config ConnectionDetails, host string) (mb.HostData, error) 
 
 func mysqlParseDSN(config ConnectionDetails, host string, logger *logp.Logger) (mb.HostData, error) {
 	c, err := mysql.ParseDSN(host)
-
 	if err != nil {
 		return mb.HostData{}, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
 	}

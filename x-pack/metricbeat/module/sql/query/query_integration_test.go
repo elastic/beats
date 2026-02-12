@@ -165,7 +165,6 @@ func TestPostgreSQL(t *testing.T) {
 			t.Run("fetch with URL", func(t *testing.T) {
 				testFetch(t, cfg)
 			})
-
 		})
 
 		t.Run("table mode", func(t *testing.T) {
@@ -189,7 +188,6 @@ func TestPostgreSQL(t *testing.T) {
 			t.Run("fetch with URL", func(t *testing.T) {
 				testFetch(t, cfg)
 			})
-
 		})
 
 		t.Run("merged mode", func(t *testing.T) {
@@ -197,8 +195,8 @@ func TestPostgreSQL(t *testing.T) {
 				config: config{
 					Driver: "postgres",
 					Queries: []query{
-						query{Query: "SELECT blks_hit FROM pg_stat_database limit 1;", ResponseFormat: "table"},
-						query{Query: "SELECT blks_read FROM pg_stat_database limit 1;", ResponseFormat: "table"},
+						{Query: "SELECT blks_hit FROM pg_stat_database limit 1;", ResponseFormat: "table"},
+						{Query: "SELECT blks_read FROM pg_stat_database limit 1;", ResponseFormat: "table"},
 					},
 					ResponseFormat: tableResponseFormat,
 					RawData: rawData{
@@ -221,7 +219,6 @@ func TestPostgreSQL(t *testing.T) {
 			t.Run("fetch with URL", func(t *testing.T) {
 				testFetch(t, cfg)
 			})
-
 		})
 	})
 }
@@ -308,7 +305,7 @@ func assertFieldContainsFloat64(field string, limit float64) func(t *testing.T, 
 // GetOracleConnectionDetails returns the Oracle connection DSN.
 // It sets the session timezone to UTC to ensure consistent timestamp handling
 // between Go (which uses UTC) and Oracle.
-func GetOracleConnectionDetails(t *testing.T, host string, port string) string {
+func GetOracleConnectionDetails(t *testing.T, host, port string) string {
 	connectString := GetOracleConnectString(host, port)
 	params, err := godror.ParseDSN(connectString)
 	require.NoError(t, err, "Failed to parse Oracle DSN: %s", connectString)
@@ -349,7 +346,7 @@ func GetOracleEnvPassword() string {
 }
 
 // GetOracleConnectString builds the Oracle connection string with proper format
-func GetOracleConnectString(host string, port string) string {
+func GetOracleConnectString(host, port string) string {
 	connectString := os.Getenv("ORACLE_CONNECT_STRING")
 	if len(connectString) == 0 {
 		// Use the recommended connection string format from godror documentation
