@@ -58,7 +58,7 @@ func formatPowerEvents(m *MetricSet, response *PowerResponse) []mb.Event {
 					"power.minimum_volts": entry.MinimumVolts,
 					"power.maximum_volts": entry.MaximumVolts,
 				},
-				RootFields: panw.MakeRootFields(m.config.HostIp),
+				RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 			}
 			events = append(events, event)
 		}

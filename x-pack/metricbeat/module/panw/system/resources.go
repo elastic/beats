@@ -126,7 +126,7 @@ func formatResourceEvents(m *MetricSet, input string) []mb.Event {
 				"available": swapInfo.Available,
 			},
 		},
-		RootFields: panw.MakeRootFields(m.config.HostIp),
+		RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 	}
 
 	events = append(events, event)

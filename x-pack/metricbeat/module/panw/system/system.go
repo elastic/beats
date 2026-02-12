@@ -25,9 +25,10 @@ const (
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config *panw.Config
-	logger *logp.Logger
-	client panw.PanwClient
+	config   *panw.Config
+	logger   *logp.Logger
+	client   panw.PanwClient
+	hostname string
 }
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -56,11 +57,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	// Fetch hostname from system info
+	hostname, err := panw.GetHostname(client)
+	if err != nil {
+		logger.Warnf("Failed to fetch hostname from firewall: %v. Using empty hostname.", err)
+		hostname = ""
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
 		logger:        logger,
 		client:        client,
+		hostname:      hostname,
 	}, nil
 }
 

@@ -129,7 +129,7 @@ func makeGroupEvent(m *MetricSet, input HAResult) *mb.Event {
 			"ha.peer_info.conn_ha1_backup.description": group.PeerInfo.ConnHA1Backup.Desc,
 			"ha.link_monitoring.enabled":               linkMonitoringEnabled,
 		},
-		RootFields: panw.MakeRootFields(m.config.HostIp),
+		RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 	}
 
 	return &event
@@ -170,7 +170,7 @@ func makeLinkMonitoringEvents(m *MetricSet, links HALinkMonitoring) []mb.Event {
 					"ha.link_monitoring.group.interface.name":    interface_entry.Name,
 					"ha.link_monitoring.group.interface.status":  interface_entry.Status,
 				},
-				RootFields: panw.MakeRootFields(m.config.HostIp),
+				RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 			}
 		}
 

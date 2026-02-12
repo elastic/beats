@@ -81,7 +81,7 @@ func formatIFInterfaceEvents(m *MetricSet, input InterfaceResult) []mb.Event {
 				"physical.full_state": entry.ST,
 				"physical.ae_member":  members,
 			},
-			RootFields: panw.MakeRootFields(m.config.HostIp),
+			RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 		}
 
 		events = append(events, event)
@@ -103,7 +103,7 @@ func formatIFInterfaceEvents(m *MetricSet, input InterfaceResult) []mb.Event {
 				"logical.dyn_addr": entry.DynAddr,
 				"logical.addr6":    entry.Addr6,
 			},
-			RootFields: panw.MakeRootFields(m.config.HostIp),
+			RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 		}
 
 		events = append(events, event)
