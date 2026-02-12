@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-benchmark.html
 applies_to:
   stack: beta
-  serverless: ga
+  serverless: beta
 ---
 
 # Benchmark input [filebeat-input-benchmark]
