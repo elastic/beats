@@ -55,7 +55,10 @@ func discoverLDAPAddress(configDomain string, log *logp.Logger) ([]string, error
 		candidates = append(candidates, lookupSRVServers(domain, false, log)...)
 	}
 
-	if len(candidates) == 0 {
+	if len(candidates) > 0 {
+		// For each discovered address, add the alternate scheme (ldap<->ldaps) so we try both.
+		candidates = expandCandidatesWithAlternateSchemes(candidates, log)
+	} else {
 		// 2. Fallback: LOGONSERVER environment variable,
 		// typically only available on Windows interactive sessions
 		log.Debug("attempting discovery via LOGONSERVER environment variable")
@@ -68,8 +71,6 @@ func discoverLDAPAddress(configDomain string, log *logp.Logger) ([]string, error
 		return nil, errNoLDAPServerFound
 	}
 
-	// For each discovered address, add the alternate scheme (ldap<->ldaps) so we try both.
-	candidates = expandCandidatesWithAlternateSchemes(candidates, log)
 	log.Infow("LDAP server auto-discovery completed", "total_candidates", len(candidates), "candidates", candidates)
 	return candidates, nil
 }
