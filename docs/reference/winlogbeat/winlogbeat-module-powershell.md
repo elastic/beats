@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-module-powershell.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # PowerShell Module [winlogbeat-module-powershell]

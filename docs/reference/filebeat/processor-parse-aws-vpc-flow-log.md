@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/processor-parse-aws-vpc-flow-log.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Parse AWS VPC Flow Log [processor-parse-aws-vpc-flow-log]

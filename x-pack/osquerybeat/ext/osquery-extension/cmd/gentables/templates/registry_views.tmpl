@@ -30,11 +30,11 @@ func RegisterViews(hookManager *hooks.HookManager, log *logger.Logger) {
 		// {{.Description}}
 		hooksFunc, err := {{.PackageAlias}}.GetHooksFunc()
 		if err != nil {
-			log.Errorf("Failed to get hooks function for {{.Name}}: %v", err)
+			{{.PackageAlias}}.RegisterDefaultViewHook(hookManager)
 		} else {
 			hooksFunc(hookManager)
-			log.Infof("Registered view: {{.Name}}")
 		}
+		log.Infof("Registered view: {{.Name}}")
 	}
 
 {{- end}}

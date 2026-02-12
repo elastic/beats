@@ -1,0 +1,76 @@
+type: table
+name: elastic_file_analysis
+description: Comprehensive security analysis of executable files on macOS (file type, code signing, dependencies, symbols, strings)
+platforms:
+  - darwin
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/fileanalysis
+
+columns:
+  - name: path
+    type: TEXT
+    description: Absolute path to the file being analyzed
+  - name: mode
+    type: TEXT
+    description: File permissions (e.g., 755)
+  - name: uid
+    type: BIGINT
+    description: File owner user ID
+  - name: gid
+    type: BIGINT
+    description: File owner group ID
+  - name: size
+    type: BIGINT
+    description: File size in bytes
+  - name: mtime
+    type: BIGINT
+    description: Last modification time (Unix timestamp)
+  - name: file_type
+    type: TEXT
+    description: File type and architecture from the file command
+  - name: code_sign
+    type: TEXT
+    description: Code signing information from codesign -dvvv
+  - name: dependencies
+    type: TEXT
+    description: Linked libraries from otool -L
+  - name: symbols
+    type: TEXT
+    description: Exported symbols from nm
+  - name: strings
+    type: TEXT
+    description: Printable strings from binary (>= 4 characters)
+
+documentation:
+  description: |
+    Perform comprehensive security analysis of executable files on macOS. This table combines
+    multiple macOS system tools to extract metadata, code signing information, library
+    dependencies, symbols, and embedded strings from binary files. Query with a path
+    constraint (e.g. WHERE path = '/usr/bin/ssh'). Useful for malware analysis, code
+    signing verification, security auditing, binary forensics, and supply chain assessment.
+  examples:
+    - title: Analyze a specific executable
+      query: |
+        SELECT * FROM elastic_file_analysis
+        WHERE path = '/Applications/Safari.app/Contents/MacOS/Safari';
+    - title: Analyze executables in a directory
+      query: |
+        SELECT path, file_type, size
+        FROM elastic_file_analysis
+        WHERE path LIKE '/usr/local/bin/%';
+    - title: Get metadata and code signing
+      query: |
+        SELECT path, file_type, code_sign FROM elastic_file_analysis WHERE path = '/usr/bin/sudo';
+    - title: List library dependencies
+      query: |
+        SELECT path, dependencies FROM elastic_file_analysis WHERE path = '/usr/bin/ssh';
+    - title: Extract strings from binary
+      query: |
+        SELECT path, strings FROM elastic_file_analysis WHERE path = '/usr/bin/curl';
+  notes:
+    - "macOS only. Requires path constraint; uses file, codesign, otool, nm, and strings."
+    - "Heavy operation: spawns multiple processes per row; use specific paths, avoid wildcards on large trees."
+    - "Input paths are validated; only regular files are accepted."
+  related_tables:
+    - file
+    - hash
