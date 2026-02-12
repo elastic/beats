@@ -32,6 +32,14 @@ https://github.com/elastic/beats/compare/v8.19.10\...v8.19.11[View commits]
 * Add array access checks to SIP parser. https://github.com/elastic/beats/pull/48514[#48514]
 * Fix potential array access panics and infinite loops in PostgreSQL parser. https://github.com/elastic/beats/pull/48528[#48528]
 
+[discrete]
+[[new-features-8.19.11]]
+==== New features
+
+**Osquerybeat**
+
+* Integrate macadmins/osquery-extension tables into osquerybeat extension. Adds cross-platform tables (puppet_info, puppet_logs, puppet_state, puppet_facts, google_chrome_profiles, file_lines), Linux/macOS tables (crowdstrike_falcon), and macOS-specific tables (energy_impact, filevault_users, local_network_permissions, macos_profiles, mdm, munki_info, munki_installs, network_quality, pending_apple_updates, macadmins_unified_log, macos_rsr, sofa_security_release_info, sofa_unpatched_cves, authdb, wifi_network, alt_system_info).
+
 // end 8.19.11 relnotes
 
 // begin 8.19.10 relnotes
