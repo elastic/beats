@@ -35,7 +35,6 @@ type Settings struct {
 	// resolve the default diskqueue directory instead of the global
 	// paths.Resolve. This is important for beat receivers where each beat
 	// needs its own data directory.
-	// If nil, the global paths.Resolve is used as a fallback.
 	Paths *paths.Path
 
 	// The path on disk of the queue's containing directory, which will be
@@ -123,7 +122,8 @@ func (c *userConfig) Validate() error {
 }
 
 // DefaultSettings returns a Settings object with reasonable default values
-// for all important fields.
+// for all important fields. Callers must set Paths when using default Path
+// resolution (i.e. when Settings.Path is empty).
 func DefaultSettings() Settings {
 	return Settings{
 		MaxSegmentSize: 100 * (1 << 20), // 100MiB
@@ -179,10 +179,7 @@ func SettingsForUserConfig(config *config.C) (Settings, error) {
 
 func (settings Settings) directoryPath() string {
 	if settings.Path == "" {
-		if settings.Paths != nil {
-			return settings.Paths.Resolve(paths.Data, "diskqueue")
-		}
-		return paths.Resolve(paths.Data, "diskqueue")
+		return settings.Paths.Resolve(paths.Data, "diskqueue")
 	}
 	return settings.Path
 }

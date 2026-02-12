@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -41,9 +42,10 @@ func makeLogstash(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *conf.C,
+	beatPaths *paths.Path,
 ) (outputs.Group, error) {
 	log := beat.Logger.Named("logstash")
-	return MakeLogstashClients(beat.Version, log, observer, cfg, beat.IndexPrefix)
+	return MakeLogstashClients(beat.Version, log, observer, cfg, beat.IndexPrefix, beatPaths)
 }
 
 func MakeLogstashClients(
@@ -52,6 +54,7 @@ func MakeLogstashClients(
 	observer outputs.Observer,
 	rawCfg *conf.C,
 	beatIndexPrefix string,
+	beatPaths *paths.Path,
 ) (outputs.Group, error) {
 	config, err := readConfig(rawCfg, beatIndexPrefix)
 	if err != nil {
@@ -97,5 +100,5 @@ func MakeLogstashClients(
 		clients[i] = client
 	}
 
-	return outputs.SuccessNet(config.Queue, config.LoadBalance, config.BulkMaxSize, config.MaxRetries, nil, logger, clients)
+	return outputs.SuccessNet(config.Queue, config.LoadBalance, config.BulkMaxSize, config.MaxRetries, nil, logger, beatPaths, clients)
 }

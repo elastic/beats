@@ -48,10 +48,6 @@ func TestDirectoryPath(t *testing.T) {
 			},
 			expected: filepath.Join("/beat/data", "diskqueue"),
 		},
-		"global paths fallback when both Path and Paths are empty": {
-			settings: Settings{},
-			expected: paths.Resolve(paths.Data, "diskqueue"),
-		},
 	}
 
 	for name, test := range tests {

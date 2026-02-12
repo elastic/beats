@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // load pipeline starts up a new pipeline with the given config
@@ -47,6 +48,12 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 		return nil, err
 	}
 
+	beatPaths := paths.New()
+	beatPaths.Home = "/tmp"
+	beatPaths.Config = "/tmp"
+	beatPaths.Data = "/tmp"
+	beatPaths.Logs = "/tmp"
+
 	processing, err := processing.MakeDefaultBeatSupport(true)(info, log, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("error in MakeDefaultSupport: %w", err)
@@ -64,6 +71,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 		WaitClose:     time.Second * 10,
 		WaitCloseMode: pipeline.WaitOnPipelineClose,
 		Processors:    processing,
+		Paths:         beatPaths,
 	}
 
 	pipeline, err := pipeline.LoadWithSettings(
@@ -76,7 +84,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 		pipelineCfg,
 		func(stat outputs.Observer) (string, outputs.Group, error) {
 			cfg := config.Output
-			out, err := outputs.Load(idxMgr, info, stat, cfg.Name(), cfg.Config())
+			out, err := outputs.Load(idxMgr, info, stat, cfg.Name(), cfg.Config(), beatPaths)
 			return cfg.Name(), out, err
 		},
 		settings,

@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestDiskQueueUnderAgent(t *testing.T) {
@@ -78,7 +79,10 @@ func TestDiskQueueUnderAgent(t *testing.T) {
 
 			management.SetUnderAgent(true)
 
-			actualGroup, err := Success(queueConfig, tt.args.batchSize, tt.args.retry, tt.args.encoderFactory, logp.NewNopLogger(), tt.args.clients...)
+			beatPaths := paths.New()
+			beatPaths.Data = tempDir
+
+			actualGroup, err := Success(queueConfig, tt.args.batchSize, tt.args.retry, tt.args.encoderFactory, logp.NewNopLogger(), beatPaths, tt.args.clients...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Success() error = %v, wantErr %v", err, tt.wantErr)
 				return

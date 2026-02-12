@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/sarama"
 )
 
@@ -42,6 +43,7 @@ func makeKafka(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
+	beatPaths *paths.Path,
 ) (outputs.Group, error) {
 	log := beat.Logger.Named(logSelector)
 	sarama.Logger = kafkaLogger{log: log}
@@ -82,7 +84,7 @@ func makeKafka(
 	if kConfig.MaxRetries < 0 {
 		retry = -1
 	}
-	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, nil, beat.Logger, client)
+	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, nil, beat.Logger, beatPaths, client)
 }
 
 // buildTopicSelector builds the topic selector for standalone Beat and when
