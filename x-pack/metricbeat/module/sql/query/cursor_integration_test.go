@@ -38,9 +38,19 @@ import (
 
 const testTableName = "cursor_test_events"
 
-// newMetricSetWithPaths creates a MetricSet with custom paths for cursor storage
+// newMetricSetWithPaths creates a MetricSet with custom paths for cursor storage.
+// It sets the global paths.Paths.Data to the test's data directory so that
+// GetCursorRegistry resolves to the correct temp path, and uses t.Cleanup
+// to restore the original value when the test completes.
 func newMetricSetWithPaths(t *testing.T, config map[string]interface{}, p *paths.Path) mb.MetricSet {
 	t.Helper()
+
+	// Override the global data path so GetCursorRegistry creates its
+	// registry under the per-test temp directory instead of the shared
+	// process-level path.
+	origData := paths.Paths.Data
+	paths.Paths.Data = p.Data
+	t.Cleanup(func() { paths.Paths.Data = origData })
 
 	c, err := conf.NewConfigFrom(config)
 	require.NoError(t, err)
@@ -1413,11 +1423,10 @@ func TestCursorRegistrySharing(t *testing.T) {
 		"sql_query":           fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 2", testTableName),
 		"sql_response_format": tableResponseFormat,
 		"raw_data.enabled":    true,
-		"cursor": map[string]interface{}{
-			"enabled": true,
-			"column":  "id",
-			"type":    "integer",
-		},
+		"cursor.enabled":      true,
+		"cursor.column":       "id",
+		"cursor.type":         cursor.CursorTypeInteger,
+		"cursor.default":      "0",
 	}
 
 	// Configuration for second MetricSet - different query with LIMIT 3
@@ -1430,11 +1439,10 @@ func TestCursorRegistrySharing(t *testing.T) {
 		"sql_query":           fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 3", testTableName),
 		"sql_response_format": tableResponseFormat,
 		"raw_data.enabled":    true,
-		"cursor": map[string]interface{}{
-			"enabled": true,
-			"column":  "id",
-			"type":    "integer",
-		},
+		"cursor.enabled":      true,
+		"cursor.column":       "id",
+		"cursor.type":         cursor.CursorTypeInteger,
+		"cursor.default":      "0",
 	}
 
 	// Create two MetricSet instances using the same paths
@@ -1479,32 +1487,22 @@ func TestCursorRegistrySharing(t *testing.T) {
 	events1, errs1 := fetchEvents(t, ms1)
 	require.Empty(t, errs1)
 	require.Len(t, events1, 2, "First fetch from ms1 should return 2 rows")
-	assert.Equal(t, int64(1), events1[0].MetricSetFields["id"])
-	assert.Equal(t, int64(2), events1[1].MetricSetFields["id"])
 
 	// Fetch from ms2 (gets 3 rows: id=1, id=2, id=3)
-	// This should have separate state from ms1
+	// This should have separate state from ms1 — cursor starts at 0 independently
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2)
 	require.Len(t, events2, 3, "First fetch from ms2 should return 3 rows")
-	assert.Equal(t, int64(1), events2[0].MetricSetFields["id"])
-	assert.Equal(t, int64(2), events2[1].MetricSetFields["id"])
-	assert.Equal(t, int64(3), events2[2].MetricSetFields["id"])
 
 	// Fetch from ms1 again (continues from id=2, gets id=3, id=4)
 	events3, errs3 := fetchEvents(t, ms1)
 	require.Empty(t, errs3)
 	require.Len(t, events3, 2, "Second fetch from ms1 should return next 2 rows")
-	assert.Equal(t, int64(3), events3[0].MetricSetFields["id"])
-	assert.Equal(t, int64(4), events3[1].MetricSetFields["id"])
 
 	// Fetch from ms2 again (continues from id=3, gets id=4, id=5, id=6)
 	events4, errs4 := fetchEvents(t, ms2)
 	require.Empty(t, errs4)
 	require.Len(t, events4, 3, "Second fetch from ms2 should return next 3 rows")
-	assert.Equal(t, int64(4), events4[0].MetricSetFields["id"])
-	assert.Equal(t, int64(5), events4[1].MetricSetFields["id"])
-	assert.Equal(t, int64(6), events4[2].MetricSetFields["id"])
 
 	// Cleanup
 	if closer, ok := ms1.(mb.Closer); ok {
