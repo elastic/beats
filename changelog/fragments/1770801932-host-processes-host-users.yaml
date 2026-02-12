@@ -1,0 +1,3 @@
+kind: feature
+summary: Add elastic_host_processes and elastic_host_users tables and host_processes, host_users views
+component: osquerybeat
