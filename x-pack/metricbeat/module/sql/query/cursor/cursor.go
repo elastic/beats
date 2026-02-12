@@ -87,16 +87,7 @@ func (m *Manager) loadState() error {
 		state = nil
 	}
 
-	// Check for missing state, version mismatch, or type mismatch
-	if state == nil || state.Version != StateVersion || state.CursorType != m.config.Type {
-		if state != nil && state.Version != StateVersion {
-			m.logger.Warnf("Unsupported cursor state version %d (expected %d), using default",
-				state.Version, StateVersion)
-		}
-		if state != nil && state.CursorType != m.config.Type {
-			m.logger.Warnf("Cursor type mismatch (state=%s, config=%s), using default",
-				state.CursorType, m.config.Type)
-		}
+	if !m.isStateValid(state) {
 		return m.initDefault()
 	}
 
@@ -110,6 +101,26 @@ func (m *Manager) loadState() error {
 	m.cursorValue = val
 	m.logger.Infof("Cursor loaded: value=%s", val.Raw)
 	return nil
+}
+
+// isStateValid checks whether the loaded state is compatible with the current
+// configuration. It returns false (and logs the reason) when the state is nil,
+// has a version mismatch, or a cursor-type mismatch.
+func (m *Manager) isStateValid(state *State) bool {
+	if state == nil {
+		return false
+	}
+	if state.Version != StateVersion {
+		m.logger.Warnf("Unsupported cursor state version %d (expected %d), using default",
+			state.Version, StateVersion)
+		return false
+	}
+	if state.CursorType != m.config.Type {
+		m.logger.Warnf("Cursor type mismatch (state=%s, config=%s), using default",
+			state.CursorType, m.config.Type)
+		return false
+	}
+	return true
 }
 
 // initDefault initializes the cursor with the default value from config.
