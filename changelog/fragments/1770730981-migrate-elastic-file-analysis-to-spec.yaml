@@ -1,0 +1,10 @@
+kind: enhancement
+summary: Migrate elastic_file_analysis table to osquery table spec and dedicated package
+
+description: |
+  The elastic_file_analysis osquery table (macOS) is now defined by the unified YAML spec
+  in ext/osquery-extension/specs/elastic_file_analysis.yaml. Implementation lives in
+  pkg/fileanalysis with generated table code in pkg/tables/generated/elastic_file_analysis.
+  Registration is via the generated darwin registry; no behavior change.
+
+component: osquerybeat
