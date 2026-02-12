@@ -24,9 +24,8 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
-	"time"
-
 	"strings"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -65,10 +64,10 @@ func NewDBClient(driver, uri string, l *logp.Logger) (*DbClient, error) {
 }
 
 // FetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
-func (d *DbClient) FetchTableMode(ctx context.Context, q string) ([]mapstr.M, error) {
-	rows, err := d.QueryContext(ctx, q)
+func (d *DbClient) FetchTableMode(ctx context.Context, query string) ([]mapstr.M, error) {
+	rows, err := d.QueryContext(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("query execution failed: %w", err)
 	}
 	return d.fetchTableMode(rows)
 }
@@ -76,10 +75,10 @@ func (d *DbClient) FetchTableMode(ctx context.Context, q string) ([]mapstr.M, er
 // FetchTableModeWithParams executes a parameterized query and returns results in table format.
 // This is similar to FetchTableMode but accepts query parameters for safe parameter substitution.
 // Use this for cursor-based queries where the cursor value is passed as a parameter.
-func (d *DbClient) FetchTableModeWithParams(ctx context.Context, q string, args ...interface{}) ([]mapstr.M, error) {
-	rows, err := d.QueryContext(ctx, q, args...)
+func (d *DbClient) FetchTableModeWithParams(ctx context.Context, query string, args ...interface{}) ([]mapstr.M, error) {
+	rows, err := d.QueryContext(ctx, query, args...)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parameterized query failed: %w", err)
 	}
 	return d.fetchTableMode(rows)
 }
@@ -128,10 +127,10 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 }
 
 // FetchVariableMode executes the provided SQL query and returns the results in a key/value format.
-func (d *DbClient) FetchVariableMode(ctx context.Context, q string) (mapstr.M, error) {
-	rows, err := d.QueryContext(ctx, q)
+func (d *DbClient) FetchVariableMode(ctx context.Context, query string) (mapstr.M, error) {
+	rows, err := d.QueryContext(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("query execution failed: %w", err)
 	}
 	return d.fetchVariableMode(rows)
 }

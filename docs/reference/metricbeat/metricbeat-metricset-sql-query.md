@@ -55,6 +55,10 @@ Note: `raw_data.enabled: true` in the examples above is optional and controls th
 | `cursor.default` | Yes (when enabled) | Initial cursor value used on first run (before any state is persisted) |
 | `cursor.direction` | No | Scan direction: `asc` (default, tracks max value) or `desc` (tracks min value) |
 
+::::{tip}
+For best performance, ensure the `cursor.column` has a database index. Without an index, the `WHERE column > :cursor ORDER BY column` clause will trigger a full table scan on every collection cycle, which can be slow on large tables.
+::::
+
 ### Supported Cursor Types
 
 | Type | Description | Default Format Example |

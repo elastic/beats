@@ -444,9 +444,9 @@ func (m *MetricSet) fetchWithCursor(ctx context.Context, reporter mb.ReporterV2)
 		defer cancel()
 	}
 
-	cursorVal := m.cursorManager.GetCurrentValue()
+	cursorVal := m.cursorManager.CursorValueForQuery()
 
-	m.Logger().Debugf("Executing query with cursor=%s", m.cursorManager.GetCurrentValueString())
+	m.Logger().Debugf("Executing query with cursor=%s", m.cursorManager.CursorValueString())
 
 	db, err := sql.NewDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
 	if err != nil {

@@ -54,10 +54,10 @@ func ParseValue(raw string, valueType string) (*Value, error) {
 		}
 		// Reject special IEEE 754 values that would break comparisons and query semantics.
 		if math.IsNaN(f) {
-			return nil, errors.New("cursor value is NaN")
+			return nil, errors.New("value is NaN")
 		}
 		if math.IsInf(f, 0) {
-			return nil, fmt.Errorf("cursor value is infinite: %f", f)
+			return nil, fmt.Errorf("value is infinite: %f", f)
 		}
 		// Normalize: re-format to ensure consistent representation
 		v.Raw = strconv.FormatFloat(f, 'g', -1, 64)
@@ -81,7 +81,7 @@ func ParseValue(raw string, valueType string) (*Value, error) {
 // This handles the various types that SQL drivers may return.
 func FromDatabaseValue(dbVal interface{}, valueType string) (*Value, error) {
 	if dbVal == nil {
-		return nil, errors.New("cursor column value is NULL")
+		return nil, errors.New("column value is NULL")
 	}
 
 	switch valueType {
@@ -277,10 +277,10 @@ func parseFloatFromDB(dbVal interface{}) (*Value, error) {
 	}
 
 	if math.IsNaN(floatVal) {
-		return nil, errors.New("cursor value is NaN")
+		return nil, errors.New("value is NaN")
 	}
 	if math.IsInf(floatVal, 0) {
-		return nil, fmt.Errorf("cursor value is infinite: %f", floatVal)
+		return nil, fmt.Errorf("value is infinite: %f", floatVal)
 	}
 
 	return &Value{
@@ -363,7 +363,7 @@ func parseTimestampFromDB(dbVal interface{}) (*Value, error) {
 		t = v.UTC()
 	case *time.Time:
 		if v == nil {
-			return nil, errors.New("cursor column value is NULL")
+			return nil, errors.New("column value is NULL")
 		}
 		t = v.UTC()
 	case []byte:
@@ -412,7 +412,7 @@ func parseDateFromDB(dbVal interface{}) (*Value, error) {
 		d = v.UTC()
 	case *time.Time:
 		if v == nil {
-			return nil, errors.New("cursor column value is NULL")
+			return nil, errors.New("column value is NULL")
 		}
 		d = v.UTC()
 	case []byte:

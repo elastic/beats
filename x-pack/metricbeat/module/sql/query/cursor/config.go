@@ -7,6 +7,7 @@ package cursor
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 // Cursor type constants
@@ -39,6 +40,15 @@ const (
 	CursorDirectionDesc = "desc"
 )
 
+// supportedCursorTypes lists all valid cursor types.
+var supportedCursorTypes = []string{
+	CursorTypeInteger,
+	CursorTypeTimestamp,
+	CursorTypeDate,
+	CursorTypeFloat,
+	CursorTypeDecimal,
+}
+
 // Config holds the cursor configuration from user's metricbeat.yml
 type Config struct {
 	Enabled   bool   `config:"enabled"`
@@ -61,7 +71,8 @@ func (c *Config) Validate() error {
 	}
 
 	if !isValidCursorType(c.Type) {
-		return fmt.Errorf("cursor.type must be one of 'integer', 'timestamp', 'date', 'float', 'decimal', got %q", c.Type)
+		return fmt.Errorf("cursor.type must be one of [%s], got %q",
+			strings.Join(supportedCursorTypes, ", "), c.Type)
 	}
 
 	if c.Default == "" {

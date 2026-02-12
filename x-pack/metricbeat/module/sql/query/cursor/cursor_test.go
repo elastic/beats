@@ -125,7 +125,7 @@ func TestNewManager(t *testing.T) {
 	}
 }
 
-func TestManagerGetCurrentValue(t *testing.T) {
+func TestManagerCursorValueForQuery(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping manager test in short mode")
 	}
@@ -141,11 +141,11 @@ func TestManagerGetCurrentValue(t *testing.T) {
 	defer cleanup()
 
 	// Should return the default value initially
-	val := mgr.GetCurrentValue()
+	val := mgr.CursorValueForQuery()
 	assert.Equal(t, int64(100), val)
 
 	// String version
-	assert.Equal(t, "100", mgr.GetCurrentValueString())
+	assert.Equal(t, "100", mgr.CursorValueString())
 }
 
 func TestManagerUpdateFromResults_Integer(t *testing.T) {
@@ -164,7 +164,7 @@ func TestManagerUpdateFromResults_Integer(t *testing.T) {
 	defer cleanup()
 
 	// Initial value
-	assert.Equal(t, "0", mgr.GetCurrentValueString())
+	assert.Equal(t, "0", mgr.CursorValueString())
 
 	// Update with results
 	rows := []mapstr.M{
@@ -177,7 +177,7 @@ func TestManagerUpdateFromResults_Integer(t *testing.T) {
 	require.NoError(t, err)
 
 	// Should have the max value (200)
-	assert.Equal(t, "200", mgr.GetCurrentValueString())
+	assert.Equal(t, "200", mgr.CursorValueString())
 }
 
 func TestManagerUpdateFromResults_Timestamp(t *testing.T) {
@@ -215,7 +215,7 @@ func TestManagerUpdateFromResults_Timestamp(t *testing.T) {
 	defer mgr.Close()
 
 	// Initial value
-	assert.Equal(t, "2024-01-01T00:00:00Z", mgr.GetCurrentValueString())
+	assert.Equal(t, "2024-01-01T00:00:00Z", mgr.CursorValueString())
 
 	// Update with results
 	t1 := time.Date(2024, 6, 15, 10, 0, 0, 0, time.UTC)
@@ -232,7 +232,7 @@ func TestManagerUpdateFromResults_Timestamp(t *testing.T) {
 	require.NoError(t, err)
 
 	// Should have the max timestamp
-	assert.Equal(t, "2024-06-15T12:00:00Z", mgr.GetCurrentValueString())
+	assert.Equal(t, "2024-06-15T12:00:00Z", mgr.CursorValueString())
 }
 
 func TestManagerUpdateFromResults_EmptyResults(t *testing.T) {
@@ -255,7 +255,7 @@ func TestManagerUpdateFromResults_EmptyResults(t *testing.T) {
 	require.NoError(t, err)
 
 	// Cursor should be unchanged
-	assert.Equal(t, "100", mgr.GetCurrentValueString())
+	assert.Equal(t, "100", mgr.CursorValueString())
 }
 
 func TestManagerUpdateFromResults_NullValues(t *testing.T) {
@@ -284,7 +284,7 @@ func TestManagerUpdateFromResults_NullValues(t *testing.T) {
 	require.NoError(t, err)
 
 	// Should use the valid value (100)
-	assert.Equal(t, "100", mgr.GetCurrentValueString())
+	assert.Equal(t, "100", mgr.CursorValueString())
 }
 
 func TestManagerUpdateFromResults_AllNullValues(t *testing.T) {
@@ -312,7 +312,7 @@ func TestManagerUpdateFromResults_AllNullValues(t *testing.T) {
 	require.NoError(t, err)
 
 	// Cursor should be unchanged
-	assert.Equal(t, "50", mgr.GetCurrentValueString())
+	assert.Equal(t, "50", mgr.CursorValueString())
 }
 
 func TestManagerUpdateFromResults_MissingColumn(t *testing.T) {
@@ -340,7 +340,7 @@ func TestManagerUpdateFromResults_MissingColumn(t *testing.T) {
 	require.NoError(t, err)
 
 	// Should use the value from the row that has the column
-	assert.Equal(t, "200", mgr.GetCurrentValueString())
+	assert.Equal(t, "200", mgr.CursorValueString())
 }
 
 func TestManagerUpdateFromResults_CaseInsensitiveColumn(t *testing.T) {
@@ -367,7 +367,7 @@ func TestManagerUpdateFromResults_CaseInsensitiveColumn(t *testing.T) {
 	require.NoError(t, err)
 
 	// Should match case-insensitively
-	assert.Equal(t, "100", mgr.GetCurrentValueString())
+	assert.Equal(t, "100", mgr.CursorValueString())
 }
 
 func TestManagerClose(t *testing.T) {
@@ -467,7 +467,7 @@ func TestManagerStatePersistence(t *testing.T) {
 	}
 	err = mgr1.UpdateFromResults(rows)
 	require.NoError(t, err)
-	assert.Equal(t, "500", mgr1.GetCurrentValueString())
+	assert.Equal(t, "500", mgr1.CursorValueString())
 
 	mgr1.Close()
 
@@ -480,7 +480,7 @@ func TestManagerStatePersistence(t *testing.T) {
 	defer mgr2.Close()
 
 	// Should have the persisted value
-	assert.Equal(t, "500", mgr2.GetCurrentValueString())
+	assert.Equal(t, "500", mgr2.CursorValueString())
 }
 
 // ============================================================================
@@ -536,7 +536,7 @@ func TestManagerUpdateFromResults_Descending(t *testing.T) {
 	defer cleanup()
 
 	// Initial value
-	assert.Equal(t, "99999", mgr.GetCurrentValueString())
+	assert.Equal(t, "99999", mgr.CursorValueString())
 
 	// Update with results - should track MINIMUM value (200)
 	rows := []mapstr.M{
@@ -549,7 +549,7 @@ func TestManagerUpdateFromResults_Descending(t *testing.T) {
 	require.NoError(t, err)
 
 	// Should have the min value (200) for descending scan
-	assert.Equal(t, "200", mgr.GetCurrentValueString())
+	assert.Equal(t, "200", mgr.CursorValueString())
 }
 
 func TestManagerUpdateFromResults_DescendingWithNulls(t *testing.T) {
@@ -580,7 +580,7 @@ func TestManagerUpdateFromResults_DescendingWithNulls(t *testing.T) {
 	require.NoError(t, err)
 
 	// Should have the min valid value (100)
-	assert.Equal(t, "100", mgr.GetCurrentValueString())
+	assert.Equal(t, "100", mgr.CursorValueString())
 }
 
 func TestManagerUpdateFromResults_AscendingDefault(t *testing.T) {
@@ -615,7 +615,7 @@ func TestManagerUpdateFromResults_AscendingDefault(t *testing.T) {
 	require.NoError(t, err)
 
 	// Ascending: should have the max value (500)
-	assert.Equal(t, "500", mgr.GetCurrentValueString())
+	assert.Equal(t, "500", mgr.CursorValueString())
 }
 
 // ============================================================================
@@ -651,7 +651,7 @@ func TestManagerLoadState_VersionMismatch(t *testing.T) {
 
 	err = mgr1.UpdateFromResults([]mapstr.M{{"id": int64(500)}})
 	require.NoError(t, err)
-	assert.Equal(t, "500", mgr1.GetCurrentValueString())
+	assert.Equal(t, "500", mgr1.CursorValueString())
 	mgr1.Close()
 
 	// Now tamper with the state: save a state with version=99
@@ -674,7 +674,7 @@ func TestManagerLoadState_VersionMismatch(t *testing.T) {
 	require.NoError(t, err)
 	defer mgr3.Close()
 
-	assert.Equal(t, "0", mgr3.GetCurrentValueString(), "Should fall back to default on version mismatch")
+	assert.Equal(t, "0", mgr3.CursorValueString(), "Should fall back to default on version mismatch")
 }
 
 func TestManagerLoadState_TypeMismatch(t *testing.T) {
@@ -724,7 +724,7 @@ func TestManagerLoadState_TypeMismatch(t *testing.T) {
 	require.NoError(t, err)
 	defer mgr.Close()
 
-	assert.Equal(t, "2024-01-01T00:00:00Z", mgr.GetCurrentValueString(), "Should fall back to default on type mismatch")
+	assert.Equal(t, "2024-01-01T00:00:00Z", mgr.CursorValueString(), "Should fall back to default on type mismatch")
 }
 
 func TestManagerLoadState_CorruptedValue(t *testing.T) {
@@ -772,7 +772,7 @@ func TestManagerLoadState_CorruptedValue(t *testing.T) {
 	require.NoError(t, err)
 	defer mgr.Close()
 
-	assert.Equal(t, "0", mgr.GetCurrentValueString(), "Should fall back to default on corrupted state value")
+	assert.Equal(t, "0", mgr.CursorValueString(), "Should fall back to default on corrupted state value")
 }
 
 // ============================================================================
@@ -804,7 +804,7 @@ func TestManagerUpdateFromResults_AllColumnsMissing(t *testing.T) {
 	require.NoError(t, err)
 
 	// Cursor unchanged — no valid column found
-	assert.Equal(t, "42", mgr.GetCurrentValueString())
+	assert.Equal(t, "42", mgr.CursorValueString())
 }
 
 func TestManagerUpdateFromResults_ParseErrors(t *testing.T) {
@@ -833,7 +833,7 @@ func TestManagerUpdateFromResults_ParseErrors(t *testing.T) {
 	require.NoError(t, err)
 
 	// Should use the one valid value
-	assert.Equal(t, "100", mgr.GetCurrentValueString())
+	assert.Equal(t, "100", mgr.CursorValueString())
 }
 
 func TestManagerUpdateFromResults_MixedNullAndMissingAndValid(t *testing.T) {
@@ -866,7 +866,7 @@ func TestManagerUpdateFromResults_MixedNullAndMissingAndValid(t *testing.T) {
 	require.NoError(t, err)
 
 	// Should find max among valid values: max(50, 75) = 75
-	assert.Equal(t, "75", mgr.GetCurrentValueString())
+	assert.Equal(t, "75", mgr.CursorValueString())
 }
 
 func TestManagerUpdateFromResults_FloatCursor(t *testing.T) {
@@ -896,7 +896,7 @@ func TestManagerUpdateFromResults_FloatCursor(t *testing.T) {
 	require.NoError(t, err)
 	defer mgr.Close()
 
-	assert.Equal(t, "0", mgr.GetCurrentValueString())
+	assert.Equal(t, "0", mgr.CursorValueString())
 
 	rows := []mapstr.M{
 		{"score": float64(1.5)},
@@ -905,10 +905,10 @@ func TestManagerUpdateFromResults_FloatCursor(t *testing.T) {
 	}
 	err = mgr.UpdateFromResults(rows)
 	require.NoError(t, err)
-	assert.Equal(t, "3.14", mgr.GetCurrentValueString())
+	assert.Equal(t, "3.14", mgr.CursorValueString())
 
 	// Verify driver arg is float64
-	val := mgr.GetCurrentValue()
+	val := mgr.CursorValueForQuery()
 	_, ok := val.(float64)
 	assert.True(t, ok, "float cursor should return float64 driver arg")
 }
@@ -940,7 +940,7 @@ func TestManagerUpdateFromResults_DecimalCursor(t *testing.T) {
 	require.NoError(t, err)
 	defer mgr.Close()
 
-	assert.Equal(t, "0", mgr.GetCurrentValueString())
+	assert.Equal(t, "0", mgr.CursorValueString())
 
 	// Simulate DB returning strings (common for DECIMAL columns via []byte -> string)
 	rows := []mapstr.M{
@@ -950,10 +950,10 @@ func TestManagerUpdateFromResults_DecimalCursor(t *testing.T) {
 	}
 	err = mgr.UpdateFromResults(rows)
 	require.NoError(t, err)
-	assert.Equal(t, "99.99", mgr.GetCurrentValueString())
+	assert.Equal(t, "99.99", mgr.CursorValueString())
 
 	// Verify driver arg is string (for decimal)
-	val := mgr.GetCurrentValue()
+	val := mgr.CursorValueForQuery()
 	_, ok := val.(string)
 	assert.True(t, ok, "decimal cursor should return string driver arg")
 }
@@ -987,7 +987,7 @@ func TestManagerUpdateFromResults_DecimalPersistenceRoundTrip(t *testing.T) {
 
 	err = mgr1.UpdateFromResults([]mapstr.M{{"price": "123456.789012"}})
 	require.NoError(t, err)
-	assert.Equal(t, "123456.789012", mgr1.GetCurrentValueString())
+	assert.Equal(t, "123456.789012", mgr1.CursorValueString())
 	mgr1.Close()
 
 	// Second manager: should load exact same value from store
@@ -997,7 +997,7 @@ func TestManagerUpdateFromResults_DecimalPersistenceRoundTrip(t *testing.T) {
 	require.NoError(t, err)
 	defer mgr2.Close()
 
-	assert.Equal(t, "123456.789012", mgr2.GetCurrentValueString(),
+	assert.Equal(t, "123456.789012", mgr2.CursorValueString(),
 		"Decimal value must survive store->load round trip with exact precision")
 }
 
@@ -1038,7 +1038,7 @@ func TestManagerUpdateFromResults_TimestampDescending(t *testing.T) {
 	defer mgr.Close()
 
 	// Initial value should be the high default
-	assert.Equal(t, "2099-12-31T23:59:59Z", mgr.GetCurrentValueString())
+	assert.Equal(t, "2099-12-31T23:59:59Z", mgr.CursorValueString())
 
 	// Update with results — descending should track MINIMUM timestamp
 	t1 := time.Date(2024, 6, 15, 10, 0, 0, 0, time.UTC) // min
@@ -1053,7 +1053,7 @@ func TestManagerUpdateFromResults_TimestampDescending(t *testing.T) {
 
 	err = mgr.UpdateFromResults(rows)
 	require.NoError(t, err)
-	assert.Equal(t, "2024-06-15T10:00:00Z", mgr.GetCurrentValueString(),
+	assert.Equal(t, "2024-06-15T10:00:00Z", mgr.CursorValueString(),
 		"descending cursor should track the minimum timestamp")
 
 	// Second batch — cursor should advance (decrease) further
@@ -1067,7 +1067,7 @@ func TestManagerUpdateFromResults_TimestampDescending(t *testing.T) {
 
 	err = mgr.UpdateFromResults(rows2)
 	require.NoError(t, err)
-	assert.Equal(t, "2024-06-15T08:00:00Z", mgr.GetCurrentValueString(),
+	assert.Equal(t, "2024-06-15T08:00:00Z", mgr.CursorValueString(),
 		"descending cursor should advance to the new minimum")
 }
 
@@ -1104,10 +1104,10 @@ func TestManagerTimestampPersistenceRoundTrip(t *testing.T) {
 		{"created_at": tsWithNanos, "data": "row1"},
 	})
 	require.NoError(t, err)
-	assert.Equal(t, "2024-06-15T10:30:00.123456789Z", mgr1.GetCurrentValueString())
+	assert.Equal(t, "2024-06-15T10:30:00.123456789Z", mgr1.CursorValueString())
 
 	// Verify ToDriverArg preserves nanoseconds
-	arg1 := mgr1.GetCurrentValue()
+	arg1 := mgr1.CursorValueForQuery()
 	tm1, ok := arg1.(time.Time)
 	require.True(t, ok)
 	assert.Equal(t, 123456789, tm1.Nanosecond())
@@ -1121,11 +1121,11 @@ func TestManagerTimestampPersistenceRoundTrip(t *testing.T) {
 	require.NoError(t, err)
 	defer mgr2.Close()
 
-	assert.Equal(t, "2024-06-15T10:30:00.123456789Z", mgr2.GetCurrentValueString(),
+	assert.Equal(t, "2024-06-15T10:30:00.123456789Z", mgr2.CursorValueString(),
 		"Timestamp with nanoseconds must survive store->load round trip")
 
 	// Verify ToDriverArg still produces the correct time.Time after reload
-	arg2 := mgr2.GetCurrentValue()
+	arg2 := mgr2.CursorValueForQuery()
 	tm2, ok := arg2.(time.Time)
 	require.True(t, ok)
 	assert.Equal(t, 123456789, tm2.Nanosecond(),

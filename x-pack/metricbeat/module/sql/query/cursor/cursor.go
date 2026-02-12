@@ -15,15 +15,16 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+const nilValuePlaceholder = "<nil>"
+
 // Manager handles cursor state lifecycle including loading, updating, and persisting cursor values.
 type Manager struct {
-	config          Config
-	store           *Store
-	stateKey        string
-	current         *Value
-	mu              sync.Mutex
-	logger          *logp.Logger
-	columnValidated bool // set after first fetch confirms cursor column exists in results
+	config      Config
+	store       *Store
+	stateKey    string
+	cursorValue *Value
+	mu          sync.Mutex
+	logger      *logp.Logger
 }
 
 // NewManager creates a new cursor manager.
@@ -106,7 +107,7 @@ func (m *Manager) loadState() error {
 		return m.initDefault()
 	}
 
-	m.current = val
+	m.cursorValue = val
 	m.logger.Infof("Cursor loaded: value=%s", val.Raw)
 	return nil
 }
@@ -119,33 +120,33 @@ func (m *Manager) initDefault() error {
 		return fmt.Errorf("invalid default cursor value: %w", err)
 	}
 
-	m.current = defaultVal
+	m.cursorValue = defaultVal
 	m.logger.Infof("Cursor initialized: column=%s, type=%s, default=%s",
 		m.config.Column, m.config.Type, defaultVal.Raw)
 	return nil
 }
 
-// GetCurrentValue returns the cursor value to use in the query.
+// CursorValueForQuery returns the cursor value converted to a driver-compatible argument.
 // The returned value is ready to be passed to db.QueryContext().
-func (m *Manager) GetCurrentValue() interface{} {
+func (m *Manager) CursorValueForQuery() interface{} {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	if m.current == nil {
+	if m.cursorValue == nil {
 		return nil
 	}
-	return m.current.ToDriverArg()
+	return m.cursorValue.ToDriverArg()
 }
 
-// GetCurrentValueString returns the cursor value as a string (for logging).
-func (m *Manager) GetCurrentValueString() string {
+// CursorValueString returns the cursor value as a string (for logging).
+func (m *Manager) CursorValueString() string {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	if m.current == nil {
-		return "<nil>"
+	if m.cursorValue == nil {
+		return nilValuePlaceholder
 	}
-	return m.current.Raw
+	return m.cursorValue.Raw
 }
 
 // UpdateFromResults processes query results and updates the cursor.
@@ -216,7 +217,7 @@ func (m *Manager) UpdateFromResults(rows []mapstr.M) error {
 
 		cmp, err := val.Compare(bestValue)
 		if err != nil {
-			m.logger.Errorf("Failed to compare cursor values: %v", err)
+			m.logger.Errorf("Failed to compare cursor values (a=%s, b=%s): %v", val.Raw, bestValue.Raw, err)
 			continue
 		}
 
@@ -229,12 +230,6 @@ func (m *Manager) UpdateFromResults(rows []mapstr.M) error {
 				bestValue = val
 			}
 		}
-	}
-
-	// Mark that the cursor column has been found at least once (even if all values were NULL/invalid).
-	// This suppresses the verbose "column not found" guidance on subsequent fetches.
-	if foundCount > 0 && !m.columnValidated {
-		m.columnValidated = true
 	}
 
 	if bestValue == nil {
@@ -252,8 +247,8 @@ func (m *Manager) UpdateFromResults(rows []mapstr.M) error {
 		return nil
 	}
 
-	previousValue := m.current
-	m.current = bestValue
+	previousValue := m.cursorValue
+	m.cursorValue = bestValue
 
 	// Persist the new state
 	state := &State{
@@ -270,11 +265,11 @@ func (m *Manager) UpdateFromResults(rows []mapstr.M) error {
 		// Revert in-memory state on save failure to keep consistency.
 		// We restore the exact previous *Value rather than re-parsing from string
 		// to avoid any edge-case parse issues.
-		m.current = previousValue
+		m.cursorValue = previousValue
 		return fmt.Errorf("failed to save cursor state: %w", err)
 	}
 
-	prevRaw := "<nil>"
+	prevRaw := nilValuePlaceholder
 	if previousValue != nil {
 		prevRaw = previousValue.Raw
 	}

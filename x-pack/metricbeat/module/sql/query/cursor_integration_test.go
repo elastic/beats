@@ -159,6 +159,27 @@ func TestMySQLCursor(t *testing.T) {
 	})
 }
 
+// insertTestData inserts n rows into the test table using the appropriate
+// placeholder syntax for the given driver.
+func insertTestData(t *testing.T, db *sql.DB, driver string, n int) {
+	t.Helper()
+
+	var insertSQL string
+	switch driver {
+	case "postgres":
+		insertSQL = fmt.Sprintf(`INSERT INTO %s (event_data) VALUES ($1)`, testTableName)
+	case "mysql":
+		insertSQL = fmt.Sprintf(`INSERT INTO %s (event_data) VALUES (?)`, testTableName)
+	default:
+		t.Fatalf("unsupported driver for insertTestData: %s", driver)
+	}
+
+	for i := 0; i < n; i++ {
+		_, err := db.Exec(insertSQL, fmt.Sprintf("event-%d", i))
+		require.NoError(t, err)
+	}
+}
+
 func setupPostgresTestTable(t *testing.T, db *sql.DB) {
 	t.Helper()
 
@@ -1455,39 +1476,43 @@ func TestCursorRegistrySharing(t *testing.T) {
 	// Each query should maintain its own cursor state via unique state keys
 
 	// Fetch from ms1 (gets 2 rows: id=1, id=2)
-	events1, err := fetchEvents(t, ms1)
-	require.NoError(t, err)
+	events1, errs1 := fetchEvents(t, ms1)
+	require.Empty(t, errs1)
 	require.Len(t, events1, 2, "First fetch from ms1 should return 2 rows")
-	assert.Equal(t, int64(1), events1[0]["id"])
-	assert.Equal(t, int64(2), events1[1]["id"])
+	assert.Equal(t, int64(1), events1[0].MetricSetFields["id"])
+	assert.Equal(t, int64(2), events1[1].MetricSetFields["id"])
 
 	// Fetch from ms2 (gets 3 rows: id=1, id=2, id=3)
 	// This should have separate state from ms1
-	events2, err := fetchEvents(t, ms2)
-	require.NoError(t, err)
+	events2, errs2 := fetchEvents(t, ms2)
+	require.Empty(t, errs2)
 	require.Len(t, events2, 3, "First fetch from ms2 should return 3 rows")
-	assert.Equal(t, int64(1), events2[0]["id"])
-	assert.Equal(t, int64(2), events2[1]["id"])
-	assert.Equal(t, int64(3), events2[2]["id"])
+	assert.Equal(t, int64(1), events2[0].MetricSetFields["id"])
+	assert.Equal(t, int64(2), events2[1].MetricSetFields["id"])
+	assert.Equal(t, int64(3), events2[2].MetricSetFields["id"])
 
 	// Fetch from ms1 again (continues from id=2, gets id=3, id=4)
-	events3, err := fetchEvents(t, ms1)
-	require.NoError(t, err)
+	events3, errs3 := fetchEvents(t, ms1)
+	require.Empty(t, errs3)
 	require.Len(t, events3, 2, "Second fetch from ms1 should return next 2 rows")
-	assert.Equal(t, int64(3), events3[0]["id"])
-	assert.Equal(t, int64(4), events3[1]["id"])
+	assert.Equal(t, int64(3), events3[0].MetricSetFields["id"])
+	assert.Equal(t, int64(4), events3[1].MetricSetFields["id"])
 
 	// Fetch from ms2 again (continues from id=3, gets id=4, id=5, id=6)
-	events4, err := fetchEvents(t, ms2)
-	require.NoError(t, err)
+	events4, errs4 := fetchEvents(t, ms2)
+	require.Empty(t, errs4)
 	require.Len(t, events4, 3, "Second fetch from ms2 should return next 3 rows")
-	assert.Equal(t, int64(4), events4[0]["id"])
-	assert.Equal(t, int64(5), events4[1]["id"])
-	assert.Equal(t, int64(6), events4[2]["id"])
+	assert.Equal(t, int64(4), events4[0].MetricSetFields["id"])
+	assert.Equal(t, int64(5), events4[1].MetricSetFields["id"])
+	assert.Equal(t, int64(6), events4[2].MetricSetFields["id"])
 
 	// Cleanup
-	require.NoError(t, ms1.Close())
-	require.NoError(t, ms2.Close())
+	if closer, ok := ms1.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+	if closer, ok := ms2.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
 
 	t.Log("✓ State isolation verified: different queries maintain separate cursor states despite shared registry")
 	t.Log("✓ Registry sharing test passed: single registry, no file conflicts, proper state isolation")
@@ -1571,7 +1596,7 @@ func TestCursorQueryTimeout(t *testing.T) {
 	// Verify cursor was NOT advanced (it should remain at default "0")
 	queryMs, ok := ms.(*MetricSet)
 	require.True(t, ok, "MetricSet should be of type *MetricSet")
-	assert.Equal(t, "0", queryMs.cursorManager.GetCurrentValueString(),
+	assert.Equal(t, "0", queryMs.cursorManager.CursorValueString(),
 		"Cursor should remain at default after timeout")
 
 	if closer, ok := ms.(mb.Closer); ok {
