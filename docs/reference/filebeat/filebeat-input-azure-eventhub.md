@@ -100,7 +100,9 @@ filebeat.inputs:
   storage_account_container: "your-storage-container"
 ```
 
-**Note:** When using `managed_identity` authentication, the managed identity must have the appropriate Azure RBAC permissions. See [Required permissions](#_required_permissions) for details.
+:::{note}
+When using `managed_identity` authentication, the managed identity must have the appropriate Azure RBAC permissions. Refer to [Required permissions](#_required_permissions) for details.
+:::
 
 ## Authentication [_authentication]
 
