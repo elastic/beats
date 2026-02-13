@@ -1,0 +1,49 @@
+type: table
+name: elastic_amcache_application_shortcut
+description: Windows Amcache inventory application shortcut entries (Root\InventoryApplicationShortcut)
+platforms:
+  - windows
+group: amcache
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache
+
+columns:
+  - name: timestamp
+    type: BIGINT
+    description: Last write time as Unix timestamp
+    go_type: time.Time
+    format: unix
+  - name: date_time
+    type: TEXT
+    description: Last write time in RFC3339
+    go_type: time.Time
+    format: rfc3339
+    timezone: UTC
+  - name: shortcut_path
+    type: TEXT
+    description: Shortcut path
+  - name: shortcut_target_path
+    type: TEXT
+    description: Shortcut target path
+  - name: shortcut_aumid
+    type: TEXT
+    description: Shortcut AUMID
+  - name: shortcut_program_id
+    type: TEXT
+    description: Shortcut program ID
+
+documentation:
+  description: |
+    Application shortcut inventory from Windows Amcache.
+    Queries Root\InventoryApplicationShortcut from the Amcache.hve registry hive.
+  examples:
+    - title: List all amcache application shortcuts
+      query: |
+        SELECT * FROM elastic_amcache_application_shortcut;
+    - title: Shortcuts by program ID
+      query: |
+        SELECT shortcut_path, shortcut_target_path, shortcut_program_id FROM elastic_amcache_application_shortcut;
+  notes:
+    - "Windows only. Requires Amcache.hve."
+  related_tables:
+    - elastic_amcache_application

@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/monitoring-internal-collection.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Use internal collection to send monitoring data [monitoring-internal-collection]

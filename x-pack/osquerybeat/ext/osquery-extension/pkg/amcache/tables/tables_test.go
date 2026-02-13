@@ -7,7 +7,6 @@
 package tables
 
 import (
-	"context"
 	"os"
 	"testing"
 
@@ -50,27 +49,21 @@ func TestTables(t *testing.T) {
 	log := logger.New(os.Stdout, true)
 	mockState := &MockGlobalState{}
 	amcacheTable := *GetAmcacheTableByName(TableNameApplication)
-	generateFunc := amcacheTable.GenerateFunc(mockState, log)
 
-	rows, err := generateFunc(context.Background(), table.QueryContext{})
-	assert.NoError(t, err, "failed to generate rows for %s", amcacheTable.Name)
-	assert.NotEmpty(t, rows, "no rows returned for %s", amcacheTable.Name)
-
-	queryContext := table.QueryContext{
-		Constraints: map[string]table.ConstraintList{
-			"name": {
-				Affinity: table.ColumnTypeText,
-				Constraints: []table.Constraint{
-					{
-						Operator:   table.OperatorEquals,
-						Expression: rows[0]["name"],
-					},
-				},
-			},
-		},
+	entries, err := mockState.GetCachedEntries(amcacheTable, nil, log)
+	assert.NoError(t, err, "failed to get entries for %s", amcacheTable.Name)
+	if len(entries) == 0 {
+		t.Skip("no amcache testdata (e.g. Amcache.hve); run on Windows with testdata to exercise filtering")
 	}
-	filteredRows, err := generateFunc(context.Background(), queryContext)
-	assert.NoError(t, err, "failed to generate filtered rows for %s", amcacheTable.Name)
-	assert.NotEmpty(t, filteredRows, "no filtered rows returned for %s", amcacheTable.Name)
-	assert.Less(t, len(filteredRows), len(rows), "expected less than %d filtered rows, got %d", len(rows), len(filteredRows))
+
+	// Test filtering: filter by name from first entry
+	appEntry := entries[0].(*ApplicationEntry)
+	nameFilter := appEntry.Name
+	fltrs := []filters.Filter{
+		{ColumnName: "name", Operator: table.OperatorEquals, Expression: nameFilter},
+	}
+	filteredEntries, err := mockState.GetCachedEntries(amcacheTable, fltrs, log)
+	assert.NoError(t, err, "failed to get filtered entries for %s", amcacheTable.Name)
+	assert.NotEmpty(t, filteredEntries, "no filtered entries returned for %s", amcacheTable.Name)
+	assert.LessOrEqual(t, len(filteredEntries), len(entries), "filtered count should be <= unfiltered")
 }

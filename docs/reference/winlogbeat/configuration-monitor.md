@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/configuration-monitor.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Settings for internal collection [configuration-monitor]

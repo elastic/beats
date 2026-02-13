@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-http_endpoint.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # HTTP Endpoint input [filebeat-input-http_endpoint]
@@ -279,6 +280,13 @@ By default the input expects the incoming POST to include a Content-Type of `app
 
 The total sum of request body lengths that are allowed at any given time. If non-zero, the input will compare this value to the sum of in-flight request body lengths from requests that include a `wait_for_completion_timeout` request query and will return a 503 HTTP status code, along with a Retry-After header configured with the `retry_after` option. The default value for this option is zero, no limit.
 
+### `max_body_bytes` [_max_body_bytes]
+
+The maximum body length allowed for a single request. If present, the input will truncate request bodies at the configured limit. The default value for this option is unset, no limit.
+
+:::{note}
+In Filebeat versions prior to 9.4.0, `max_body_bytes` was only enforced for HMAC-authenticated requests. In Filebeat 9.4.0 and later, the limit applies to all HTTP endpoint requests regardless of the authentication method.
+:::
 
 ### `retry_after` [_retry_after]
 
@@ -366,7 +374,7 @@ Enabling this option compromises security and should only be used for debugging.
 
 ### `tracer.filename` [_tracer_filename_4]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. The path must point to a target in the http_endpoint directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 
 ### `tracer.maxsize` [_tracer_maxsize_2]
