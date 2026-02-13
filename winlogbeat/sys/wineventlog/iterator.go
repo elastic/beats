@@ -178,7 +178,15 @@ func (itr *EventIterator) moreHandles() bool {
 			itr.lastErr = nil
 			itr.active = itr.handles[:numReturned]
 		case windows.ERROR_NO_MORE_ITEMS:
-		case windows.ERROR_INVALID_OPERATION, windows.RPC_S_INVALID_BOUND:
+		case windows.ERROR_INVALID_OPERATION:
+			// Windows sometimes returns ERROR_INVALID_OPERATION instead of
+			// ERROR_NO_MORE_ITEMS when there are no events to read (polling).
+			// See EventHandles() in wineventlog_windows.go. Treat as no more items.
+			if numReturned == 0 {
+				break
+			}
+			fallthrough
+		case windows.RPC_S_INVALID_BOUND:
 			// Attempt automated recovery if we have a factory.
 			if itr.subscriptionFactory != nil {
 				itr.subscription.Close()

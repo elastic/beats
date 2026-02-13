@@ -273,8 +273,15 @@ func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) 
 	// on resubscribe errors we need to close the signal event handle
 	l.closeSignalEvent()
 
-	const initialSignaled = 1
-	signalEvent, err := windows.CreateEvent(nil, 0, initialSignaled, nil)
+	// Manual-reset so we can explicitly reset after each wait. EvtSubscribe docs require
+	// "reset the object and wait for the service to signal again" to avoid the event
+	// staying signaled (e.g. on high-volume Security channel) and causing a tight loop
+	// and repeated resubscriptions.
+	const (
+		manualReset   = 1
+		initialSignaled = 1
+	)
+	signalEvent, err := windows.CreateEvent(nil, manualReset, initialSignaled, nil)
 	if err != nil {
 		return win.NilHandle, err
 	}
@@ -509,13 +516,35 @@ func (l *winEventLog) WaitForEvents(ctx context.Context) error {
 	// Run the blocking wait in a goroutine so we can select on context
 	resultCh := make(chan error, 1)
 	go func() {
-		// Wait with 10 second timeout
-		status, err := windows.WaitForSingleObject(l.signalEvent, 10000)
+		waitStart := time.Now()
+		// Wait with 60 second timeout (milliseconds)
+		status, err := windows.WaitForSingleObject(l.signalEvent, 60000)
+		waitDuration := time.Since(waitStart)
+
 		switch {
 		case status == windows.WAIT_OBJECT_0,
 			status == waitTimeout,
 			errors.Is(err, windows.ERROR_TIMEOUT):
-			// Signaled or timed out - events might be available
+			// Signaled or timed out - events might be available. Reset so the next
+			// wait blocks until the service signals again (EvtSubscribe poll model).
+			waitReason := "timeout"
+			if status == windows.WAIT_OBJECT_0 {
+				waitReason = "signaled"
+			}
+			resetErr := windows.ResetEvent(l.signalEvent)
+			if resetErr != nil {
+				l.log.Warnw("ResetEvent failed after wait",
+					"wait_reason", waitReason,
+					"wait_status", status,
+					"wait_duration_ms", waitDuration.Milliseconds(),
+					"wait_error", err,
+					"reset_error", resetErr)
+			} else {
+				l.log.Debugw("ResetEvent succeeded after wait",
+					"wait_reason", waitReason,
+					"wait_status", status,
+					"wait_duration_ms", waitDuration.Milliseconds())
+			}
 			resultCh <- nil
 		case status == windows.WAIT_ABANDONED:
 			resultCh <- errWaitAbandoned
