@@ -27,24 +27,20 @@ const (
 	defaultMaxAttempts      = 5
 	defaultWaitMin          = time.Second
 	defaultWaitMax          = time.Minute
+	defaultInvalidTSRetries = 2
 	maxInitialInterval      = 12 * time.Hour
 )
 
 // config is the top-level configuration for the akamai input.
 type config struct {
-	// APIHost is the Akamai API host URL (e.g., https://akzz-XXXXXXXX.luna.akamaiapis.net).
-	APIHost *urlConfig `config:"api_host" validate:"required"`
+	// Resource contains HTTP resource, transport and retry configuration.
+	Resource *resourceConfig `config:"resource" validate:"required"`
 
 	// ConfigIDs is a semicolon-separated list of security configuration IDs to monitor.
 	ConfigIDs string `config:"config_ids" validate:"required"`
 
 	// Auth contains the Akamai EdgeGrid authentication credentials.
 	Auth authConfig `config:"auth"`
-
-	// Legacy auth fields for backwards compatibility
-	ClientToken  string `config:"client_token"`
-	ClientSecret string `config:"client_secret"`
-	AccessToken  string `config:"access_token"`
 
 	// Interval is the polling interval for API requests.
 	Interval time.Duration `config:"interval"`
@@ -64,8 +60,9 @@ type config struct {
 	// NumberOfWorkers is the number of concurrent workers for processing events.
 	NumberOfWorkers int `config:"number_of_workers"`
 
-	// Resource contains HTTP transport and retry configuration.
-	Resource *resourceConfig `config:"resource"`
+	// InvalidTimestampRetries is the number of immediate retries for 400
+	// responses containing "invalid timestamp" before failing the request and entering recovery mode.
+	InvalidTimestampRetries int `config:"invalid_timestamp_retry.max_attempts"`
 
 	// Tracer configures request/response tracing for debugging.
 	Tracer *tracerConfig `config:"tracer"`
@@ -73,6 +70,7 @@ type config struct {
 
 // resourceConfig contains HTTP transport and retry configuration.
 type resourceConfig struct {
+	URL       *urlConfig                       `config:"url" validate:"required"`
 	Retry     retryConfig                      `config:"retry"`
 	Timeout   time.Duration                    `config:"timeout"`
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
@@ -196,11 +194,12 @@ func defaultConfig() config {
 	transport.Timeout = 60 * time.Second
 
 	return config{
-		Interval:         defaultInterval,
-		InitialInterval:  defaultInitialInterval,
-		RecoveryInterval: defaultRecoveryInterval,
-		EventLimit:       defaultEventLimit,
-		NumberOfWorkers:  defaultNumberOfWorkers,
+		Interval:                defaultInterval,
+		InitialInterval:         defaultInitialInterval,
+		RecoveryInterval:        defaultRecoveryInterval,
+		EventLimit:              defaultEventLimit,
+		NumberOfWorkers:         defaultNumberOfWorkers,
+		InvalidTimestampRetries: defaultInvalidTSRetries,
 		Resource: &resourceConfig{
 			Retry: retryConfig{
 				MaxAttempts: &maxAttempts,
@@ -214,33 +213,19 @@ func defaultConfig() config {
 }
 
 func (c *config) Validate() error {
-	if c.APIHost == nil || c.APIHost.URL == nil {
-		return errors.New("api_host is required")
+	if c.Resource == nil || c.Resource.URL == nil || c.Resource.URL.URL == nil {
+		return errors.New("resource.url is required")
 	}
-	if c.APIHost.Scheme != "https" && c.APIHost.Scheme != "http" {
-		return errors.New("api_host must use http or https scheme")
+	if c.Resource.URL.Scheme != "https" && c.Resource.URL.Scheme != "http" {
+		return errors.New("resource.url must use http or https scheme")
 	}
 
 	if c.ConfigIDs == "" {
 		return errors.New("config_ids is required")
 	}
 
-	// Check auth - either legacy fields or auth config
-	hasLegacyAuth := c.ClientToken != "" || c.ClientSecret != "" || c.AccessToken != ""
-	hasNewAuth := c.Auth.isEnabled()
-
-	if hasLegacyAuth && hasNewAuth {
-		return errors.New("cannot use both legacy auth fields (client_token, client_secret, access_token) and auth config")
-	}
-
-	if !hasLegacyAuth && !hasNewAuth {
-		return errors.New("authentication credentials are required: provide client_token, client_secret, and access_token")
-	}
-
-	if hasLegacyAuth {
-		if c.ClientToken == "" || c.ClientSecret == "" || c.AccessToken == "" {
-			return errors.New("all of client_token, client_secret, and access_token are required")
-		}
+	if err := c.Auth.Validate(); err != nil {
+		return err
 	}
 
 	if c.Interval <= 0 {
@@ -271,43 +256,13 @@ func (c *config) Validate() error {
 	if c.NumberOfWorkers <= 0 {
 		return errors.New("number_of_workers must be greater than 0")
 	}
+	if c.InvalidTimestampRetries < 0 {
+		return errors.New("invalid_timestamp_retry.max_attempts must be greater than or equal to 0")
+	}
 
 	if c.Tracer != nil && c.Tracer.enabled() && c.Tracer.Filename == "" {
 		return errors.New("tracer filename is required when tracer is enabled")
 	}
 
 	return nil
-}
-
-// getClientToken returns the client token from either legacy or new auth config.
-func (c *config) getClientToken() string {
-	if c.ClientToken != "" {
-		return c.ClientToken
-	}
-	if c.Auth.EdgeGrid != nil {
-		return c.Auth.EdgeGrid.ClientToken
-	}
-	return ""
-}
-
-// getClientSecret returns the client secret from either legacy or new auth config.
-func (c *config) getClientSecret() string {
-	if c.ClientSecret != "" {
-		return c.ClientSecret
-	}
-	if c.Auth.EdgeGrid != nil {
-		return c.Auth.EdgeGrid.ClientSecret
-	}
-	return ""
-}
-
-// getAccessToken returns the access token from either legacy or new auth config.
-func (c *config) getAccessToken() string {
-	if c.AccessToken != "" {
-		return c.AccessToken
-	}
-	if c.Auth.EdgeGrid != nil {
-		return c.Auth.EdgeGrid.AccessToken
-	}
-	return ""
 }

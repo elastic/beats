@@ -20,7 +20,11 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
+	"go.elastic.co/ecszap"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -67,6 +71,14 @@ type SIEMResponse struct {
 	Events     []SIEMEvent
 	LastOffset string
 	HasMore    bool
+}
+
+// offsetContext is the final context object returned by the SIEM API response.
+// It contains pagination metadata and should not be emitted as an event.
+type offsetContext struct {
+	Offset string `json:"offset"`
+	Total  int    `json:"total"`
+	Limit  int    `json:"limit"`
 }
 
 // FetchParams contains parameters for fetching events.
@@ -116,15 +128,31 @@ func NewClient(cfg config, log *logp.Logger, reg *monitoring.Registry, opts ...C
 
 	// Create the EdgeGrid signer
 	signer := NewEdgeGridSigner(
-		cfg.getClientToken(),
-		cfg.getClientSecret(),
-		cfg.getAccessToken(),
+		cfg.Auth.EdgeGrid.ClientToken,
+		cfg.Auth.EdgeGrid.ClientSecret,
+		cfg.Auth.EdgeGrid.AccessToken,
 	)
 
 	// Wrap transport with EdgeGrid authentication
 	httpClient.Transport = &EdgeGridTransport{
 		Transport: httpClient.Transport,
 		Signer:    signer,
+	}
+
+	// Add request/response tracing when enabled.
+	if cfg.Tracer != nil && cfg.Tracer.enabled() {
+		w := zapcore.AddSync(cfg.Tracer)
+		core := ecszap.NewCore(
+			ecszap.NewDefaultEncoderConfig(),
+			w,
+			zap.DebugLevel,
+		)
+		traceLogger := zap.New(core)
+		maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of log file size
+		if maxBodyLen <= 0 {
+			maxBodyLen = 100000
+		}
+		httpClient.Transport = httplog.NewLoggingRoundTripper(httpClient.Transport, traceLogger, maxBodyLen, log)
 	}
 
 	// Add metrics monitoring
@@ -149,7 +177,7 @@ func NewClient(cfg config, log *logp.Logger, reg *monitoring.Registry, opts ...C
 	client := &Client{
 		httpClient: httpClient,
 		signer:     signer,
-		baseURL:    cfg.APIHost.URL,
+		baseURL:    cfg.Resource.URL.URL,
 		configIDs:  cfg.ConfigIDs,
 		log:        log.Named("client"),
 	}
@@ -164,7 +192,15 @@ func NewClient(cfg config, log *logp.Logger, reg *monitoring.Registry, opts ...C
 // FetchEvents fetches events from the Akamai SIEM API.
 func (c *Client) FetchEvents(ctx context.Context, params FetchParams) (*SIEMResponse, error) {
 	reqURL := c.buildRequestURL(params)
-	c.log.Debugw("fetching events", "url", reqURL)
+	c.log.Debugw("fetching events",
+		"host", c.baseURL.Host,
+		"path", siemAPIPath+c.configIDs,
+		"mode", fetchMode(params),
+		"limit", params.Limit,
+		"offset", params.Offset,
+		"from", params.From,
+		"to", params.To,
+	)
 
 	if c.metrics != nil {
 		c.metrics.AddRequest()
@@ -230,6 +266,11 @@ func (c *Client) FetchEvents(ctx context.Context, params FetchParams) (*SIEMResp
 	if c.metrics != nil {
 		c.metrics.RecordRequestTime(time.Since(start))
 	}
+	c.log.Debugw("fetched SIEM response",
+		"events", len(response.Events),
+		"has_more", response.HasMore,
+		"next_offset", response.LastOffset,
+	)
 
 	return response, nil
 }
@@ -262,6 +303,7 @@ func (c *Client) parseResponse(body io.Reader, limit int) (*SIEMResponse, error)
 	response := &SIEMResponse{
 		Events: make([]SIEMEvent, 0),
 	}
+	var pageCtx offsetContext
 
 	scanner := bufio.NewScanner(body)
 	// Increase buffer size for potentially large events
@@ -274,30 +316,50 @@ func (c *Client) parseResponse(body io.Reader, limit int) (*SIEMResponse, error)
 		if line == "" {
 			continue
 		}
-
-		// Parse the event to extract offset
-		var event SIEMEvent
-		if err := json.Unmarshal([]byte(line), &event); err != nil {
-			c.log.Warnw("failed to parse event JSON", "error", err, "line", truncate(line, 200))
+		lineBytes := []byte(line)
+		var keys map[string]json.RawMessage
+		if err := json.Unmarshal(lineBytes, &keys); err != nil {
+			c.log.Warnw("failed to parse response JSON line", "error", err, "line", truncate(line, 200))
 			continue
 		}
 
-		// Store the raw JSON
-		event.Raw = json.RawMessage(line)
-		response.Events = append(response.Events, event)
-
-		// Track the last offset
-		if event.Offset != "" {
-			response.LastOffset = event.Offset
+		_, hasOffset := keys["offset"]
+		_, hasTotal := keys["total"]
+		_, hasLimit := keys["limit"]
+		if hasOffset && (hasTotal || hasLimit) {
+			if err := json.Unmarshal(lineBytes, &pageCtx); err != nil {
+				c.log.Warnw("failed to parse SIEM offset context line", "error", err, "line", truncate(line, 200))
+			}
+			continue
 		}
+
+		event := SIEMEvent{
+			Raw: json.RawMessage(append([]byte(nil), lineBytes...)),
+		}
+		if rawOffset, ok := keys["offset"]; ok {
+			_ = json.Unmarshal(rawOffset, &event.Offset)
+		}
+		response.Events = append(response.Events, event)
 	}
 
 	if err := scanner.Err(); err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
 
-	// Determine if there might be more events
-	response.HasMore = len(response.Events) >= limit
+	// Prefer API-provided offset context as the source of truth.
+	if pageCtx.Offset != "" {
+		response.LastOffset = pageCtx.Offset
+	} else if n := len(response.Events); n > 0 && response.Events[n-1].Offset != "" {
+		// Fallback for payloads missing context objects.
+		response.LastOffset = response.Events[n-1].Offset
+	}
+
+	// Determine if there might be more events. Context limit, when present, wins.
+	effectiveLimit := limit
+	if pageCtx.Limit > 0 {
+		effectiveLimit = pageCtx.Limit
+	}
+	response.HasMore = len(response.Events) >= effectiveLimit
 
 	return response, nil
 }

@@ -57,7 +57,10 @@ type source struct {
 
 // Name returns the name of the source (used as the cursor key).
 func (s *source) Name() string {
-	return s.cfg.APIHost.String() + "/siem/v1/configs/" + s.cfg.ConfigIDs
+	if s.cfg.Resource == nil || s.cfg.Resource.URL == nil {
+		return s.cfg.ConfigIDs
+	}
+	return s.cfg.Resource.URL.String() + "/siem/v1/configs/" + s.cfg.ConfigIDs
 }
 
 // Init initializes the input manager.

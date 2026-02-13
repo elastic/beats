@@ -25,46 +25,27 @@ type authConfig struct {
 	EdgeGrid *edgeGridConfig `config:"edgegrid"`
 }
 
-// isEnabled returns true if authentication is configured.
-func (a *authConfig) isEnabled() bool {
-	return a != nil && a.EdgeGrid != nil && a.EdgeGrid.isEnabled()
-}
-
-// Validate validates the authentication configuration.
-func (a *authConfig) Validate() error {
-	if a == nil || a.EdgeGrid == nil {
-		return nil
-	}
-	return a.EdgeGrid.Validate()
-}
-
 // edgeGridConfig holds EdgeGrid authentication credentials.
 type edgeGridConfig struct {
-	Enabled      *bool  `config:"enabled"`
 	ClientToken  string `config:"client_token"`
 	ClientSecret string `config:"client_secret"`
 	AccessToken  string `config:"access_token"`
 }
 
-// isEnabled returns true if EdgeGrid authentication is enabled.
-func (e *edgeGridConfig) isEnabled() bool {
-	return e != nil && (e.Enabled == nil || *e.Enabled)
-}
-
-// Validate validates the EdgeGrid configuration.
-func (e *edgeGridConfig) Validate() error {
-	if !e.isEnabled() {
-		return nil
+// Validate validates the authentication configuration.
+func (a *authConfig) Validate() error {
+	if a == nil || a.EdgeGrid == nil {
+		return errors.New("at least one auth method must be configured")
 	}
 
-	if e.ClientToken == "" {
-		return errors.New("edgegrid.client_token is required")
+	if a.EdgeGrid.ClientToken == "" {
+		return errors.New("auth.edgegrid.client_token is required")
 	}
-	if e.ClientSecret == "" {
-		return errors.New("edgegrid.client_secret is required")
+	if a.EdgeGrid.ClientSecret == "" {
+		return errors.New("auth.edgegrid.client_secret is required")
 	}
-	if e.AccessToken == "" {
-		return errors.New("edgegrid.access_token is required")
+	if a.EdgeGrid.AccessToken == "" {
+		return errors.New("auth.edgegrid.access_token is required")
 	}
 	return nil
 }
@@ -167,12 +148,10 @@ func (s *EdgeGridSigner) buildDataToSign(req *http.Request, authBase string) str
 
 // computeSignature computes the HMAC-SHA256 signature.
 func (s *EdgeGridSigner) computeSignature(data, key string) string {
-	keyBytes, err := base64.StdEncoding.DecodeString(key)
-	if err != nil {
-		// If decoding fails, use the key directly (shouldn't happen with proper signing key)
-		keyBytes = []byte(key)
-	}
-	mac := hmac.New(sha256.New, keyBytes)
+	// Keep parity with the proven CEL implementation:
+	// signature = base64(hmac(data, bytes(sig_key)))
+	// where sig_key is already the base64-encoded output of the first HMAC.
+	mac := hmac.New(sha256.New, []byte(key))
 	mac.Write([]byte(data))
 	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
 }

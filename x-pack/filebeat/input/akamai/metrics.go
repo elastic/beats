@@ -42,8 +42,13 @@ type inputMetrics struct {
 	batchesPublished    *monitoring.Uint   // number of event batches published
 	eventsReceived      *monitoring.Uint   // total events received
 	eventsPublished     *monitoring.Uint   // total events published
+	eventsPublishFailed *monitoring.Uint   // total failed event publishes
 	errorsTotal         *monitoring.Uint   // total errors
 	recoveryModeEntries *monitoring.Uint   // times recovery mode was entered
+	offsetExpired       *monitoring.Uint   // number of 416 offset expired responses
+	hmacRefreshes       *monitoring.Uint   // number of invalid timestamp retries
+	api400Fatal         *monitoring.Uint   // number of fatal 400 responses
+	cursorDrops         *monitoring.Uint   // number of cursor drops
 	workersActive       *monitoring.Uint   // currently active workers (gauge)
 	workerUtilization   *monitoring.Float  // worker utilization (0-1)
 
@@ -51,6 +56,7 @@ type inputMetrics struct {
 	requestProcessingTime metrics.Sample // histogram of request processing times
 	batchProcessingTime   metrics.Sample // histogram of batch processing times
 	eventsPerBatch        metrics.Sample // histogram of events per batch
+	failedEventsPerPage   metrics.Sample // histogram of failed events per page
 	responseLatency       metrics.Sample // histogram of API response latencies
 }
 
@@ -79,6 +85,11 @@ func newInputMetrics(reg *monitoring.Registry, maxWorkers int, log *logp.Logger)
 		eventsPublished:     monitoring.NewUint(reg, "events_published_total"),
 		errorsTotal:         monitoring.NewUint(reg, "errors_total"),
 		recoveryModeEntries: monitoring.NewUint(reg, "recovery_mode_entries_total"),
+		offsetExpired:       monitoring.NewUint(reg, "offset_expired_total"),
+		hmacRefreshes:       monitoring.NewUint(reg, "hmac_refresh_total"),
+		api400Fatal:         monitoring.NewUint(reg, "api_400_fatal_total"),
+		eventsPublishFailed: monitoring.NewUint(reg, "events_publish_failed_total"),
+		cursorDrops:         monitoring.NewUint(reg, "cursor_drops_total"),
 		workersActive:       monitoring.NewUint(reg, "workers_active_gauge"),
 		workerUtilization:   monitoring.NewFloat(reg, "worker_utilization"),
 
@@ -86,6 +97,7 @@ func newInputMetrics(reg *monitoring.Registry, maxWorkers int, log *logp.Logger)
 		requestProcessingTime: metrics.NewUniformSample(1024),
 		batchProcessingTime:   metrics.NewUniformSample(1024),
 		eventsPerBatch:        metrics.NewUniformSample(1024),
+		failedEventsPerPage:   metrics.NewUniformSample(1024),
 		responseLatency:       metrics.NewUniformSample(1024),
 	}
 
@@ -96,6 +108,8 @@ func newInputMetrics(reg *monitoring.Registry, maxWorkers int, log *logp.Logger)
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
 	_ = adapter.NewGoMetrics(reg, "events_per_batch", log, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.eventsPerBatch))
+	_ = adapter.NewGoMetrics(reg, "failed_events_per_page", log, adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.failedEventsPerPage))
 	_ = adapter.NewGoMetrics(reg, "response_latency", log, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.responseLatency))
 
@@ -191,6 +205,47 @@ func (m *inputMetrics) AddRecoveryModeEntry() {
 		return
 	}
 	m.recoveryModeEntries.Inc()
+}
+
+// AddOffsetExpired increments the 416 offset expired counter.
+func (m *inputMetrics) AddOffsetExpired() {
+	if m == nil {
+		return
+	}
+	m.offsetExpired.Inc()
+}
+
+// AddHMACRefresh increments the invalid timestamp retry counter.
+func (m *inputMetrics) AddHMACRefresh() {
+	if m == nil {
+		return
+	}
+	m.hmacRefreshes.Inc()
+}
+
+// AddAPI400Fatal increments the fatal 400 error counter.
+func (m *inputMetrics) AddAPI400Fatal() {
+	if m == nil {
+		return
+	}
+	m.api400Fatal.Inc()
+}
+
+// AddPartialPublishFailures increments the partial publish failures counter.
+func (m *inputMetrics) AddPartialPublishFailures(count uint64) {
+	if m == nil || count == 0 {
+		return
+	}
+	m.eventsPublishFailed.Add(count)
+	m.failedEventsPerPage.Update(int64(count))
+}
+
+// AddCursorDrop increments the cursor drop counter.
+func (m *inputMetrics) AddCursorDrop() {
+	if m == nil {
+		return
+	}
+	m.cursorDrops.Inc()
 }
 
 // RecordRequestTime records the request processing time.
