@@ -1,3 +1,0 @@
-kind: bugfix
-summary: Fix handling of symbolic link resolution on Windows in httplog path assessment.
-component: filebeat
