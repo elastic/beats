@@ -78,7 +78,7 @@ jobs:
 
       - if: ${{ contains(steps.search.outputs.found, 'true') }}
         name: Report obsoleted branches (email)
-        uses: dawidd6/action-send-mail@6e71c855c9a091d80a519621b9fd3e8d252ca40c
+        uses: dawidd6/action-send-mail@62a2d05b79935ad4fb90ce9079928099579c14ac
         with:
           server_address: ${{ secrets.MAIL_SERVER }}
           username: ${{ secrets.MAIL_USERNAME }}
