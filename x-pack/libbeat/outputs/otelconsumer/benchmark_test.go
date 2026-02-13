@@ -24,13 +24,17 @@ func makeTestOtelConsumer(t testing.TB, consumeFn func(ctx context.Context, ld p
 
 	logConsumer, err := consumer.NewLogs(consumeFn)
 	assert.NoError(t, err)
-	consumer := &otelConsumer{
+	q := New(func(ctx context.Context, data plog.Logs) error {
+		return logConsumer.ConsumeLogs(ctx, data)
+	})
+	oc := &otelConsumer{
 		observer:     outputs.NewNilObserver(),
 		logsConsumer: logConsumer,
 		beatInfo:     beat.Info{},
 		log:          logp.NewNopLogger(),
+		queue:        q,
 	}
-	return consumer
+	return oc
 }
 
 func BenchmarkPublish(b *testing.B) {

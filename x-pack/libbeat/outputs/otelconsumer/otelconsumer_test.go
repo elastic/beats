@@ -46,13 +46,17 @@ func TestPublish(t *testing.T) {
 		logger := logptest.NewTestingLogger(t, "")
 		logConsumer, err := consumer.NewLogs(consumeFn)
 		assert.NoError(t, err)
-		consumer := &otelConsumer{
+		q := New(func(ctx context.Context, data plog.Logs) error {
+			return logConsumer.ConsumeLogs(ctx, data)
+		})
+		oc := &otelConsumer{
 			observer:     outputs.NewNilObserver(),
 			logsConsumer: logConsumer,
 			beatInfo:     beatInfo,
 			log:          logger.Named("otelconsumer"),
+			queue:        q,
 		}
-		return consumer
+		return oc
 	}
 
 	t.Run("ack batch on consumer success", func(t *testing.T) {

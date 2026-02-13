@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -44,6 +43,7 @@ type otelConsumer struct {
 	logsConsumer   consumer.Logs
 	beatInfo       beat.Info
 	log            *logp.Logger
+	queue          *Queue
 	isReceiverTest bool // whether we are running in receivertest context
 }
 
@@ -55,23 +55,25 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 
 	isReceiverTest := os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1"
 
-	// Default to runtime.NumCPU() workers
-	clients := make([]outputs.Client, 0, runtime.NumCPU())
-	for range runtime.NumCPU() {
-		clients = append(clients, &otelConsumer{
-			observer:       observer,
-			logsConsumer:   beat.LogConsumer,
-			beatInfo:       beat,
-			log:            beat.Logger.Named("otelconsumer"),
-			isReceiverTest: isReceiverTest,
-		})
+	// Create an adaptive queue that bridges Beats' blocking-publish model
+	// with the OTel collector's immediate-reject queue model.
+	q := New(beat.LogConsumer.ConsumeLogs)
+
+	client := &otelConsumer{
+		observer:       observer,
+		logsConsumer:   beat.LogConsumer,
+		beatInfo:       beat,
+		log:            beat.Logger.Named("otelconsumer"),
+		queue:          q,
+		isReceiverTest: isReceiverTest,
 	}
 
-	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, clients...)
+	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, client)
 }
 
 // Close is a noop for otelconsumer
 func (out *otelConsumer) Close() error {
+	out.queue.Close()
 	return nil
 }
 
@@ -177,7 +179,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 	}
 
-	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
+	err := out.queue.PublishSync(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
 	if err != nil {
 		// Permanent errors shouldn't be retried. This tipically means
 		// the data cannot be serialized by the exporter that is attached
