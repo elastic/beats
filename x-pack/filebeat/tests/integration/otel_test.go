@@ -1776,6 +1776,8 @@ func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
+    output:
+      otelconsumer:
     logging:
       level: debug
     queue.mem.flush.timeout: 0s
