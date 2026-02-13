@@ -1277,13 +1277,8 @@ spec:
       skip_intermediate_builds: false
       provider_settings:
         build_branches: false
-        build_pull_request_forks: false
         build_pull_requests: false
-        build_tags: false
-        filter_condition: >-
-          build.branch =~ /^[0-9]+\.[0-9x]+$$/ || build.branch == "main"
-        filter_enabled: true
-        trigger_mode: code
+        trigger_mode: none
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
