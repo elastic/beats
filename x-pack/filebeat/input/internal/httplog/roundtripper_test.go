@@ -6,7 +6,6 @@ package httplog
 
 import (
 	"path/filepath"
-	"runtime"
 	"testing"
 )
 
@@ -191,11 +190,6 @@ var pathTests = []struct {
 }
 
 func TestIsPathIn(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("tested only with Unix-compatible paths")
-		return
-	}
-
 	for _, test := range pathTests {
 		t.Run(test.name, func(t *testing.T) {
 			got, err := IsPathIn(filepath.FromSlash(test.root), filepath.FromSlash(test.path))
@@ -222,10 +216,6 @@ var symlinkTests = []struct {
 }
 
 func TestResolveSymlinks(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("tested only with Unix-compatible paths")
-		return
-	}
 	for _, test := range symlinkTests {
 		t.Run(test.path, func(t *testing.T) {
 			got, err := resolveSymlinks(filepath.FromSlash(test.path))
