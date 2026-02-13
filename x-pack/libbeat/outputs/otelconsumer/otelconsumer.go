@@ -87,6 +87,9 @@ func (out *otelConsumer) Publish(ctx context.Context, batch publisher.Batch) err
 
 func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch) error {
 	st := out.observer
+	events := batch.Events()
+	st.NewBatch(len(events))
+
 	pLogs := plog.NewLogs()
 	resourceLogs := pLogs.ResourceLogs().AppendEmpty()
 	sourceLogs := resourceLogs.ScopeLogs().AppendEmpty()
@@ -103,7 +106,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	// destination, as long as the exporter allows it.
 	// For example, the elasticsearchexporter has an encoding specifically for this.
 	// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/35444.
-	events := batch.Events()
 	for _, event := range events {
 		logRecord := logRecords.AppendEmpty()
 
@@ -202,7 +204,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	}
 
 	batch.ACK()
-	st.NewBatch(len(events))
 	st.AckedEvents(len(events))
 	return nil
 }
