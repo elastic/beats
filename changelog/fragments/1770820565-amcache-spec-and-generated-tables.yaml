@@ -1,0 +1,11 @@
+kind: enhancement
+summary: Add amcache table and view specs and generated tables/view for osquery extension
+
+description: |
+  Amcache tables and the elastic_amcache_applications view are now defined by YAML specs
+  (ext/osquery-extension/specs/elastic_amcache_*.yaml) with group amcache. Generated table
+  and view code live in pkg/tables/generated/amcache and pkg/views/generated/amcache.
+  Glue (generate funcs, view hooks, cleanup) is in pkg/amcache/register_generated.go.
+  Unused methods and non-generated docs were removed.
+
+component: osquerybeat
