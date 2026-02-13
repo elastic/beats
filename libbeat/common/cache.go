@@ -257,6 +257,7 @@ func (c *Cache) StartJanitor(interval time.Duration) {
 func (c *Cache) StopJanitor() {
 	if c.janitorQuit != nil {
 		close(c.janitorQuit)
+		c.janitorQuit = nil
 	}
 }
 
