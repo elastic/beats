@@ -264,6 +264,7 @@ func newLexicographicalStateRegistry(log *logp.Logger, store *statestore.Store, 
 	if r.persistedTail == "" && r.heap.Len() > 0 {
 		if minState := r.heap.peek(); minState != nil {
 			r.persistedTail = minState.Key
+			_ = store.Remove(awsS3TailKey)
 			if err := store.Set(awsS3TailKey, struct {
 				Tail string `json:"tail"`
 			}{r.persistedTail}); err != nil {
@@ -327,6 +328,7 @@ func (r *lexicographicalStateRegistry) MarkObjectInFlight(key string) error {
 	if r.persistedTail == "" || key < r.persistedTail {
 		r.persistedTail = key
 		r.storeLock.Lock()
+		_ = r.store.Remove(awsS3TailKey)
 		err := r.store.Set(awsS3TailKey, struct {
 			Tail string `json:"tail"`
 		}{key})
@@ -516,17 +518,15 @@ func (r *lexicographicalStateRegistry) recomputeAndPersistTail() error {
 
 	r.persistedTail = newTail
 
-	var err error
-	if newTail == "" {
-		err = r.store.Remove(awsS3TailKey)
-	} else {
-		err = r.store.Set(awsS3TailKey, struct {
-			Tail string `json:"tail"`
-		}{newTail})
-	}
+	// Remove old tail entry first before setting new value to keep state store file clean.
+	_ = r.store.Remove(awsS3TailKey)
 
-	if err != nil {
-		return fmt.Errorf("failed to persist tail key: %w", err)
+	if newTail != "" {
+		if err := r.store.Set(awsS3TailKey, struct {
+			Tail string `json:"tail"`
+		}{newTail}); err != nil {
+			return fmt.Errorf("failed to persist tail key: %w", err)
+		}
 	}
 	return nil
 }
