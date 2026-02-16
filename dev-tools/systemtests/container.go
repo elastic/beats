@@ -181,6 +181,7 @@ func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context, apiClient *cli
 	// will be logged on failure or with -v
 	tr.Runner.Logf("stdout: %s", result.Stdout)
 	tr.Runner.Logf("stderr: %s", result.Stderr)
+	assert.NotContains(tr.Runner, result.Stdout, "no tests to run")
 
 	// iterate by lines to make this easier to read
 	for _, badLine := range tr.FatalLogMessages {
@@ -226,7 +227,7 @@ func (tr *DockerTestRunner) createTestContainer(ctx context.Context, logger *log
 
 	// set GOCACHE to /tmp to prevent permission issues with non root users
 	containerEnv := []string{fmt.Sprintf("HOSTFS=%s", mountPath), "GOCACHE=/tmp"}
-	// used by a few vendored libaries
+	// used by a few vendored libraries
 	containerEnv = append(containerEnv, "HOST_PROC=%s", mountPath)
 	if tr.Privileged {
 		containerEnv = append(containerEnv, "PRIVILEGED=1")
@@ -236,6 +237,9 @@ func (tr *DockerTestRunner) createTestContainer(ctx context.Context, logger *log
 	if tr.MonitorPID != 0 {
 		containerEnv = append(containerEnv, fmt.Sprintf("MONITOR_PID=%d", tr.MonitorPID))
 	}
+
+	// Propagate BUILDKITE_STEP_KEY for CI test expectations
+	containerEnv = append(containerEnv, fmt.Sprintf("BUILDKITE_STEP_KEY=%s", os.Getenv("BUILDKITE_STEP_KEY")))
 
 	gomodcacheCmd := exec.CommandContext(ctx, "go", "env", "GOMODCACHE")
 	gomodcacheValue, err := gomodcacheCmd.CombinedOutput()

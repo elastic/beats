@@ -46,3 +46,5 @@ Hugetlb:               0 kB
 DirectMap4k:     2092268 kB
 DirectMap2M:    51320832 kB
 DirectMap1G:     9437184 kB
+Zswap:           2952192 kB
+Zswapped:        4335680 kB

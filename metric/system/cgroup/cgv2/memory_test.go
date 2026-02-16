@@ -34,6 +34,8 @@ percpu 8192
 sock 4096
 vmalloc 2048
 shmem 1024
+zswap 129476127
+zswapped 361033728
 file_mapped 512
 file_dirty 256
 file_writeback 128
@@ -66,7 +68,10 @@ pgdeactivate 6000
 pglazyfree 7000
 pglazyfreed 8000
 thp_fault_alloc 100
-thp_collapse_alloc 50`
+thp_collapse_alloc 50
+zswpin 390473
+zswpout 635017
+zswpwb 11073`
 
 	tmpDir := b.TempDir()
 	memStatPath := filepath.Join(tmpDir, "memory.stat")

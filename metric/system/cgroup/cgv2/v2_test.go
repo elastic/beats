@@ -222,15 +222,11 @@ func TestGetMemPressure(t *testing.T) {
 	pressureContent := `some avg10=1.50 avg60=2.30 avg300=0.75 total=123456
 full avg10=0.80 avg60=1.20 avg300=0.40 total=78901
 `
-	err := os.WriteFile(tempDir+"/memory.pressure", []byte(pressureContent), 0644)
-	require.NoError(t, err)
-
-	// Create minimal required memory files
-	err = os.WriteFile(tempDir+"/memory.stat", []byte("anon 0\n"), 0644)
-	require.NoError(t, err)
+	writeFile(t, tempDir+"/memory.pressure", pressureContent)
+	writeFile(t, tempDir+"/memory.stat", "anon 0\n")
 
 	mem := MemorySubsystem{}
-	err = mem.Get(tempDir)
+	err := mem.Get(tempDir)
 	assert.NoError(t, err, "error in Get")
 
 	expectedPressure := map[string]cgcommon.Pressure{
@@ -255,11 +251,10 @@ func TestGetMemNoPressure(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// Create minimal required memory files but NOT memory.pressure
-	err := os.WriteFile(tempDir+"/memory.stat", []byte("anon 0\n"), 0644)
-	require.NoError(t, err)
+	writeFile(t, tempDir+"/memory.stat", "anon 0\n")
 
 	mem := MemorySubsystem{}
-	err = mem.Get(tempDir)
+	err := mem.Get(tempDir)
 	assert.NoError(t, err, "error in Get - should not fail if memory.pressure is missing")
 	assert.Empty(t, mem.Pressure, "Pressure should be empty when memory.pressure file doesn't exist")
 }
@@ -358,4 +353,133 @@ func TestGetCPU(t *testing.T) {
 			assert.EqualValues(t, test.expected, cpu)
 		})
 	}
+}
+
+func TestFillStatStructZswap(t *testing.T) {
+	// Based on /sys/fs/cgroup/user.slice/memory.stat (kernel 6.12.67-2).
+	// Zero values changed to non-zero, ensuring complete field coverage.
+	const statContent = `anon 4740431872
+file 10583662592
+kernel 2101587968
+kernel_stack 18071552
+pagetables 52617216
+sec_pagetables 8192
+percpu 947744
+sock 12288
+vmalloc 225280
+shmem 2948644864
+zswap 125829120
+zswapped 367001600
+file_mapped 862699520
+file_dirty 962560
+file_writeback 131072
+swapcached 2097152
+anon_thp 922746880
+file_thp 465567744
+shmem_thp 2321547264
+inactive_anon 177168384
+active_anon 4563263488
+inactive_file 4908941312
+active_file 3291152384
+unevictable 2434473984
+slab_reclaimable 1990437352
+slab_unreclaimable 36692632
+slab 2027129984
+workingset_refault_anon 1500
+workingset_refault_file 8500
+workingset_activate_anon 800
+workingset_activate_file 4200
+workingset_restore_anon 300
+workingset_restore_file 1800
+workingset_nodereclaim 5248
+pgdemote_kswapd 5000
+pgdemote_direct 1000
+pgdemote_khugepaged 200
+pgpromote_success 3500
+pgscan 911220
+pgsteal 911162
+pgscan_kswapd 860000
+pgscan_direct 46220
+pgscan_khugepaged 5000
+pgsteal_kswapd 865000
+pgsteal_direct 43162
+pgsteal_khugepaged 3000
+pgfault 35936410
+pgmajfault 4088
+pgrefill 61074
+pgactivate 85000
+pgdeactivate 45000
+pglazyfree 565444
+pglazyfreed 180000
+swpin_zero 500
+swpout_zero 800
+zswpin 450000
+zswpout 680000
+zswpwb 15000
+thp_fault_alloc 11356
+thp_collapse_alloc 519
+thp_swpout 350
+thp_swpout_fallback 150
+numa_pages_migrated 8500
+numa_pte_updates 12000
+numa_hint_faults 4500`
+	tmpDir := t.TempDir()
+	writeFile(t, filepath.Join(tmpDir, "memory.stat"), statContent)
+
+	stats, err := fillStatStruct(tmpDir)
+	require.NoError(t, err)
+
+	expected := MemoryStat{
+		Anon:                   opt.Bytes{Bytes: 4740431872},
+		File:                   opt.Bytes{Bytes: 10583662592},
+		KernelStack:            opt.Bytes{Bytes: 18071552},
+		Pagetables:             opt.Bytes{Bytes: 52617216},
+		PerCPU:                 opt.Bytes{Bytes: 947744},
+		Sock:                   opt.Bytes{Bytes: 12288},
+		Shmem:                  opt.Bytes{Bytes: 2948644864},
+		FileMapped:             opt.Bytes{Bytes: 862699520},
+		FileDirty:              opt.Bytes{Bytes: 962560},
+		FileWriteback:          opt.Bytes{Bytes: 131072},
+		SwapCached:             opt.Bytes{Bytes: 2097152},
+		AnonTHP:                opt.Bytes{Bytes: 922746880},
+		FileTHP:                opt.Bytes{Bytes: 465567744},
+		ShmemTHP:               opt.Bytes{Bytes: 2321547264},
+		InactiveAnon:           opt.Bytes{Bytes: 177168384},
+		ActiveAnon:             opt.Bytes{Bytes: 4563263488},
+		InactiveFile:           opt.Bytes{Bytes: 4908941312},
+		ActiveFile:             opt.Bytes{Bytes: 3291152384},
+		Unevictable:            opt.Bytes{Bytes: 2434473984},
+		SlabReclaimable:        opt.Bytes{Bytes: 1990437352},
+		SlabUnreclaimable:      opt.Bytes{Bytes: 36692632},
+		Slab:                   opt.Bytes{Bytes: 2027129984},
+		WorkingSetRefaultAnon:  1500,
+		WorkingSetRefaultFile:  8500,
+		WorkingSetActivateAnon: 800,
+		WorkingSetActivateFile: 4200,
+		WorkingSetRestoreAnon:  300,
+		WorkingSetRestoreFile:  1800,
+		WorkingSetNodeReclaim:  5248,
+		PageFaults:             35936410,
+		MajorPageFaults:        4088,
+		PageRefill:             61074,
+		PageScan:               911220,
+		PageSteal:              911162,
+		PageActivate:           85000,
+		PageDeactivate:         45000,
+		PageLazyFree:           565444,
+		PageLazyFreed:          180000,
+		THPFaultAlloc:          11356,
+		THPCollapseAlloc:       519,
+		Zswap:                  opt.Bytes{Bytes: 125829120},
+		Zswapped:               opt.Bytes{Bytes: 367001600},
+		Zswpin:                 450000,
+		Zswpout:                680000,
+		Zswpwb:                 15000,
+	}
+	assert.Equal(t, expected, stats)
+}
+
+func writeFile(t testing.TB, path, content string) {
+	t.Helper()
+	require.NoError(t, os.WriteFile(path, []byte(content), 0644))
 }

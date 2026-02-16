@@ -142,6 +142,16 @@ type MemoryStat struct {
 	THPFaultAlloc uint64 `json:"thp_fault_alloc" struct:"thp_fault_alloc" orig:"thp_fault_alloc"`
 	// Number of transparent hugepages which were allocated to allow collapsing an existing range of pages.
 	THPCollapseAlloc uint64 `json:"htp_collapse_alloc" struct:"htp_collapse_alloc" orig:"thp_collapse_alloc"`
+	// Zswap is the current amount of memory in zswap (bytes)
+	Zswap opt.Bytes `json:"zswap" struct:"zswap" orig:"zswap"`
+	// Zswapped is the original size of pages stored in zswap before compression (bytes)
+	Zswapped opt.Bytes `json:"zswapped" struct:"zswapped" orig:"zswapped"`
+	// Zswpin is the number of pages swapped in from zswap
+	Zswpin uint64 `json:"zswpin" struct:"zswpin" orig:"zswpin"`
+	// Zswpout is the number of pages swapped out to zswap
+	Zswpout uint64 `json:"zswpout" struct:"zswpout" orig:"zswpout"`
+	// Zswpwb is the number of pages written back from zswap
+	Zswpwb uint64 `json:"zswpwb" struct:"zswpwb" orig:"zswpwb"`
 }
 
 // Map of file key to setter function
@@ -186,6 +196,11 @@ var keySetters = map[string]func(*MemoryStat, uint64){
 	"pglazyfreed":              func(stats *MemoryStat, v uint64) { stats.PageLazyFreed = v },
 	"thp_fault_alloc":          func(stats *MemoryStat, v uint64) { stats.THPFaultAlloc = v },
 	"thp_collapse_alloc":       func(stats *MemoryStat, v uint64) { stats.THPCollapseAlloc = v },
+	"zswap":                    func(stats *MemoryStat, v uint64) { stats.Zswap = opt.Bytes{Bytes: v} },
+	"zswapped":                 func(stats *MemoryStat, v uint64) { stats.Zswapped = opt.Bytes{Bytes: v} },
+	"zswpin":                   func(stats *MemoryStat, v uint64) { stats.Zswpin = v },
+	"zswpout":                  func(stats *MemoryStat, v uint64) { stats.Zswpout = v },
+	"zswpwb":                   func(stats *MemoryStat, v uint64) { stats.Zswpwb = v },
 }
 
 // Get fetches memory subsystem metrics for V2 cgroups

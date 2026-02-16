@@ -35,25 +35,16 @@ func TestGetMemory(t *testing.T) {
 	assert.NotNil(t, mem)
 	assert.NoError(t, err)
 
+	assert.Greater(t, mem.Total.ValueOr(0), uint64(0))
+	assert.Greater(t, mem.Used.Bytes.ValueOr(0), uint64(0))
 	assert.True(t, mem.Total.Exists())
-	assert.True(t, (mem.Total.ValueOr(0) > 0))
-
-	assert.True(t, mem.Used.Bytes.Exists())
-	assert.True(t, (mem.Used.Bytes.ValueOr(0) > 0))
-
-	assert.True(t, mem.Free.Exists())
-	assert.True(t, (mem.Free.ValueOr(0) >= 0)) //nolint:staticcheck // we can return with zero
-
 	assert.True(t, mem.Actual.Free.Exists())
-	assert.True(t, (mem.Actual.Free.ValueOr(0) >= 0)) //nolint:staticcheck // we can return with zero
-
-	assert.True(t, mem.Actual.Used.Bytes.Exists())
-	assert.True(t, (mem.Actual.Used.Bytes.ValueOr(0) > 0))
+	assert.Greater(t, mem.Actual.Used.Bytes.ValueOr(0), uint64(0))
 }
 
 func TestGetSwap(t *testing.T) {
 	if runtime.GOOS == "freebsd" {
-		return //no load data on freebsd
+		t.Skip("Skip freebsd")
 	}
 
 	mem, err := Get(resolve.NewTestResolver(""))
@@ -62,13 +53,8 @@ func TestGetSwap(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.True(t, mem.Swap.Total.Exists())
-	assert.True(t, (mem.Swap.Total.ValueOr(0) >= 0)) //nolint:staticcheck // we can return with zero
-
 	assert.True(t, mem.Swap.Used.Bytes.Exists())
-	assert.True(t, (mem.Swap.Used.Bytes.ValueOr(0) >= 0)) //nolint:staticcheck // we can return with zero
-
 	assert.True(t, mem.Swap.Free.Exists())
-	assert.True(t, (mem.Swap.Free.ValueOr(0) >= 0)) //nolint:staticcheck // we can return with zero
 }
 
 func TestMemPercentage(t *testing.T) {
@@ -78,13 +64,13 @@ func TestMemPercentage(t *testing.T) {
 		Free:  opt.UintWith(2),
 	}
 	m.fillPercentages()
-	assert.Equal(t, m.Used.Pct.ValueOr(0), 0.7143)
+	assert.InDelta(t, 0.7143, m.Used.Pct.ValueOr(0), 0.0001)
 
 	m = Memory{
 		Total: opt.UintWith(0),
 	}
 	m.fillPercentages()
-	assert.Equal(t, m.Used.Pct.ValueOr(0), 0.0)
+	assert.Equal(t, 0.0, m.Used.Pct.ValueOr(0))
 }
 
 func TestActualMemPercentage(t *testing.T) {
@@ -97,27 +83,71 @@ func TestActualMemPercentage(t *testing.T) {
 	}
 
 	m.fillPercentages()
-	assert.Equal(t, m.Actual.Used.Pct.ValueOr(0), 0.7143)
-
+	assert.InDelta(t, 0.7143, m.Actual.Used.Pct.ValueOr(0), 0.0001)
 }
 
 func TestMeminfoParse(t *testing.T) {
-	// Make sure we're manually calculating Actual correctly on linux
-	if runtime.GOOS == "linux" {
-		mem, err := Get(resolve.NewTestResolver("./oldkern"))
-		assert.NoError(t, err)
-
-		assert.Equal(t, uint64(27307106304), mem.Cached.ValueOr(0))
-		assert.Equal(t, uint64(52983070720), mem.Actual.Free.ValueOr(0))
-		assert.Equal(t, uint64(10137726976), mem.Actual.Used.Bytes.ValueOr(0))
+	if runtime.GOOS != "linux" {
+		t.Skip("linux specific test")
 	}
+
+	mem, err := Get(resolve.NewTestResolver("./testdata/oldkern"))
+	assert.NoError(t, err)
+
+	expected := Memory{
+		Total:  opt.UintWith(63120797696),
+		Free:   opt.UintWith(25673170944),
+		Cached: opt.UintWith(27307106304),
+		Used: UsedMemStats{
+			Bytes: opt.UintWith(37447626752),
+			Pct:   opt.FloatWith(0.5933),
+		},
+		Actual: ActualMemoryMetrics{
+			Free: opt.UintWith(52983070720),
+			Used: UsedMemStats{
+				Bytes: opt.UintWith(10137726976),
+				Pct:   opt.FloatWith(0.1606),
+			},
+		},
+		Swap: SwapMetrics{
+			Total: opt.UintWith(8589930496),
+			Free:  opt.UintWith(8588095488),
+			Used: UsedMemStats{
+				Bytes: opt.UintWith(1835008),
+				Pct:   opt.FloatWith(0.0002),
+			},
+		},
+		Zswap: ZswapMetrics{
+			Compressed:   opt.UintWith(3023044608),
+			Uncompressed: opt.UintWith(4439736320),
+			Debug: ZswapDebugMetrics{
+				PoolLimitHit:        opt.NewUintNone(),
+				PoolTotalSize:       opt.NewUintNone(),
+				RejectAllocFail:     opt.NewUintNone(),
+				RejectCompressFail:  opt.NewUintNone(),
+				RejectCompressPoor:  opt.NewUintNone(),
+				RejectKmemcacheFail: opt.NewUintNone(),
+				RejectReclaimFail:   opt.NewUintNone(),
+				StoredPages:         opt.NewUintNone(),
+				WrittenBackPages:    opt.NewUintNone(),
+			},
+		},
+	}
+	assert.Equal(t, expected, mem)
 }
 
-func TestMeminfoPct(t *testing.T) {
-	if runtime.GOOS == "linux" {
-		memRaw, err := Get(resolve.NewTestResolver("./oldkern"))
-		assert.NoError(t, err)
-		assert.Equal(t, float64(0.1606), memRaw.Actual.Used.Pct.ValueOr(0))
-		assert.Equal(t, float64(0.5933), memRaw.Used.Pct.ValueOr(0))
-	}
+func TestZswapMetricsIsZero(t *testing.T) {
+	z := ZswapMetrics{}
+	assert.True(t, z.IsZero())
+
+	z.Compressed = opt.UintWith(0)
+	assert.False(t, z.IsZero())
+
+	z = ZswapMetrics{Uncompressed: opt.UintWith(200)}
+	assert.False(t, z.IsZero())
+
+	// Test with nested debug metrics
+	z = ZswapMetrics{}
+	z.Debug.StoredPages = opt.UintWith(50)
+	assert.False(t, z.IsZero())
 }

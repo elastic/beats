@@ -83,6 +83,14 @@ func get(rootfs resolve.Resolver) (Memory, error) {
 		memData.Swap.Used.Bytes = opt.UintWith(swapTotal - swapFree)
 	}
 
+	// Populate zswap data when zswap is enabled. Present in linux kernel 5.19+.
+	if zswap, ok := table["Zswap"]; ok {
+		memData.Zswap.Compressed = opt.UintWith(zswap)
+	}
+	if zswapped, ok := table["Zswapped"]; ok {
+		memData.Zswap.Uncompressed = opt.UintWith(zswapped)
+	}
+
 	return memData, nil
 
 }

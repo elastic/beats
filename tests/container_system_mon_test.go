@@ -162,3 +162,27 @@ func TestFilesystem(t *testing.T) {
 
 	baseRunner.RunTestsOnDocker(ctx, apiClient)
 }
+
+func TestMemoryZswap(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("test is linux-only")
+	}
+
+	ctx, cancel := context.WithTimeout(t.Context(), time.Minute*5)
+	defer cancel()
+
+	// Run memory integration tests from a container monitoring the host
+	// Tests zswap metrics from /proc/meminfo and optionally /sys/kernel/debug/zswap
+	baseRunner := systemtests.DockerTestRunner{
+		Runner:     t,
+		Basepath:   "./metric/memory",
+		Privileged: true, // Needed for debugfs access
+		Testname:   "TestMemoryFromContainer",
+	}
+
+	apiClient, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
+	require.NoError(t, err)
+	defer apiClient.Close()
+
+	baseRunner.RunTestsOnDocker(ctx, apiClient)
+}
