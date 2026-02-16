@@ -146,7 +146,6 @@ filebeat.autodiscover:
                 var.paths: ["/var/log/containers/*-${data.kubernetes.container.id}.log"]
               slowlog:
                 enabled: true
-                var.paths: ["/var/log/containers/*-${data.kubernetes.container.id}.log"]
                 var.hosts: ["${data.host}:6379"]
                 var.password: "${kubernetes.default.somesecret.value}"
 ```
