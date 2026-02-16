@@ -137,8 +137,8 @@ filebeat.autodiscover:
       templates:
         - condition:
             and:
-              - equals:
-                  kubernetes.labels.app: "redis"
+            - equals:
+                kubernetes.labels.app: "redis"
           config:
             - module: redis
               log:
