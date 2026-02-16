@@ -394,7 +394,7 @@ func TestConfig(t *testing.T) {
 			expectedCfg: nil,
 		},
 		{
-			name:           "input with defaults for non-AWS S3 Bucket",
+			name:           "input for non-AWS S3 Bucket without region specified",
 			queueURL:       "",
 			s3Bucket:       "",
 			s3AccessPoint:  "",
@@ -403,10 +403,25 @@ func TestConfig(t *testing.T) {
 				"non_aws_bucket_name": nonAWSS3Bucket,
 				"number_of_workers":   5,
 			},
+			expectedErr: "region must be configured when using non_aws_bucket_name",
+			expectedCfg: nil,
+		},
+		{
+			name:           "input for non-AWS S3 Bucket with region specified",
+			queueURL:       "",
+			s3Bucket:       "",
+			s3AccessPoint:  "",
+			nonAWSS3Bucket: nonAWSS3Bucket,
+			config: mapstr.M{
+				"non_aws_bucket_name": nonAWSS3Bucket,
+				"region":              "region",
+				"number_of_workers":   5,
+			},
 			expectedErr: "",
 			expectedCfg: func(queueURL, s3Bucket, s3AccessPoint, nonAWSS3Bucket string) config {
 				c := makeConfig("", "", "", nonAWSS3Bucket)
 				c.NumberOfWorkers = 5
+				c.RegionName = "region"
 				return c
 			},
 		},
@@ -495,6 +510,7 @@ func TestConfig(t *testing.T) {
 			nonAWSS3Bucket: nonAWSS3Bucket,
 			config: mapstr.M{
 				"non_aws_bucket_name":           nonAWSS3Bucket,
+				"region":                        "region",
 				"non_aws_backup_to_bucket_name": "bBucket",
 				"backup_to_bucket_prefix":       "backup",
 				"number_of_workers":             5,
@@ -506,6 +522,7 @@ func TestConfig(t *testing.T) {
 				c.BackupConfig.NonAWSBackupToBucketName = "bBucket"
 				c.BackupConfig.BackupToBucketPrefix = "backup"
 				c.NumberOfWorkers = 5
+				c.RegionName = "region"
 				return c
 			},
 		},
