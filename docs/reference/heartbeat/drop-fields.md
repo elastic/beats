@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/drop-fields.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Drop fields from events [drop-fields]

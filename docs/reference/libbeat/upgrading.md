@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/upgrading.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Upgrade [upgrading]

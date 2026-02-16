@@ -72,7 +72,11 @@ func IsPathIn(root, path string) (ok bool, err error) {
 func resolveSymlinks(path string) (string, error) {
 	targ, err := filepath.EvalSymlinks(path)
 	if err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
+		// If the path doesn't exist or has invalid syntax for opening
+		// (e.g. Windows rejects paths containing * or ? with
+		// ERROR_INVALID_NAME), resolve the directory and join the base
+		// so we still follow symlinks in the directory part.
+		if errors.Is(err, fs.ErrNotExist) || isInvalidWindowsName(err) {
 			targ, err := resolveSymlinks(filepath.Dir(path))
 			if err != nil {
 				return "", err

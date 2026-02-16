@@ -46,11 +46,11 @@ type azureInputConfig struct {
 
 	// AuthType specifies the authentication method to use for both Event Hub and Storage Account.
 	// If not specified, defaults to connection_string for backwards compatibility.
-	// Valid values: connection_string, client_secret
+	// Valid values: connection_string, client_secret, managed_identity
 	AuthType string `config:"auth_type"`
 
 	// EventHubNamespace is the fully qualified namespace for the Event Hub.
-	// Required when using client_secret authentication.
+	// Required when using credential-based authentication (client_secret, managed_identity).
 	EventHubNamespace string `config:"eventhub_namespace"`
 	// TenantID is the Azure Active Directory tenant ID.
 	// Required when using client_secret authentication.
@@ -64,6 +64,12 @@ type azureInputConfig struct {
 	// AuthorityHost is the Azure Active Directory authority host.
 	// Optional, defaults to Azure Public Cloud (https://login.microsoftonline.com).
 	AuthorityHost string `config:"authority_host"`
+
+	// ManagedIdentityClientID is the client ID for user-assigned managed identity.
+	// Optional. If not set, system-assigned managed identity is used.
+	// Only used when auth_type is managed_identity.
+	ManagedIdentityClientID string `config:"managed_identity_client_id"`
+
 	// LegacySanitizeOptions is a list of sanitization options to apply to messages.
 	//
 	// The supported options are:
@@ -237,8 +243,10 @@ func (conf *azureInputConfig) validateAuth() error {
 		return conf.validateConnectionStringAuth()
 	case AuthTypeClientSecret:
 		return conf.validateClientSecretAuth()
+	case AuthTypeManagedIdentity:
+		return conf.validateManagedIdentityAuth()
 	default:
-		return fmt.Errorf("unknown auth_type: %s (valid values: connection_string, client_secret)", conf.AuthType)
+		return fmt.Errorf("unknown auth_type: %s (valid values: connection_string, client_secret, managed_identity)", conf.AuthType)
 	}
 }
 
@@ -314,6 +322,22 @@ func (conf *azureInputConfig) validateStorageAccountAuthForClientSecret() error 
 		// The client_secret credentials are already validated above for Event Hub
 		// The storage account will use the same TenantID, ClientID, and ClientSecret as Event Hub
 	}
+	return nil
+}
+
+// validateManagedIdentityAuth validates managed identity authentication configuration.
+func (conf *azureInputConfig) validateManagedIdentityAuth() error {
+	// Validate Event Hub namespace is provided (required for credential-based auth)
+	if conf.EventHubNamespace == "" {
+		return errors.New("eventhub_namespace is required when using managed_identity authentication")
+	}
+
+	// ManagedIdentityClientID is optional:
+	// - If set, uses user-assigned managed identity
+	// - If empty, uses system-assigned managed identity
+
+	// For managed_identity, storage account uses the same credential as Event Hub
+	// No additional validation needed for processor v2
 	return nil
 }
 
@@ -452,7 +476,7 @@ func (conf *azureInputConfig) GetFullyQualifiedEventHubNamespace() (string, erro
 			return "", fmt.Errorf("failed to parse connection string: %w", err)
 		}
 		return connectionStringProperties.FullyQualifiedNamespace, nil
-	case AuthTypeClientSecret:
+	case AuthTypeClientSecret, AuthTypeManagedIdentity:
 		// When using client_secret auth, use EventHubNamespace directly
 		if conf.EventHubNamespace == "" {
 			return "", fmt.Errorf("eventhub_namespace is required when using client_secret authentication")
