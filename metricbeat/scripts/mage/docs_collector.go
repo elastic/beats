@@ -102,13 +102,7 @@ var funcMap = template.FuncMap{
 	"getBeatName": func() string {
 		return mage.BeatName
 	},
-<<<<<<< HEAD
 	"title": strings.Title,
-=======
-	"title": func(s string) string {
-		caser := cases.Title(language.English)
-		return caser.String(s)
-	},
 	// Determine the serverless lifecycle from the stack applies_to string.
 	// Serverless is unversioned, so we use the most advanced lifecycle state.
 	"serverlessLifecycle": func(appliesTo string) string {
@@ -131,7 +125,6 @@ var funcMap = template.FuncMap{
 		}
 		return "ga"
 	},
->>>>>>> 4b5c3ab6d ([docs] Fix `serverless` lifecycle to match `stack` in `applies_to` (#48793))
 }
 
 // checkXpack checks to see if the module belongs to x-pack.
