@@ -13,8 +13,6 @@ upgrade.
 * <<release-notes-9.0.0>>
 * <<release-notes-9.0.0-rc1>>
 * <<release-notes-9.0.0-beta1>>
-<<<<<<< HEAD
-=======
 * <<release-notes-8.19.10>>
 * <<release-notes-8.19.9>>
 * <<release-notes-8.19.8>>
@@ -30,7 +28,6 @@ upgrade.
 * <<release-notes-8.18.4>>
 * <<release-notes-8.18.3>>
 * <<release-notes-8.18.2>>
->>>>>>> 36b4056cd ([main](backport #48354) Add Beats 8.19.10 release notes (#48402))
 * <<release-notes-8.18.1>>
 * <<release-notes-8.18.0>>
 * <<release-notes-8.17.6>>
