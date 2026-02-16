@@ -1,17 +1,17 @@
 # Module: azure
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-azure.html
 
-- module: azure
-  metricsets:
-  - monitor
-  enabled: true
-  period: 300s
-  client_id: '${AZURE_CLIENT_ID:""}'
-  client_secret: '${AZURE_CLIENT_SECRET:""}'
-  tenant_id: '${AZURE_TENANT_ID:""}'
-  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-  refresh_list_interval: 600s
-  resources:
+# - module: azure
+#   metricsets:
+#   - monitor
+#   enabled: true
+#   period: 300s
+#   client_id: '${AZURE_CLIENT_ID:""}'
+#   client_secret: '${AZURE_CLIENT_SECRET:""}'
+#   tenant_id: '${AZURE_TENANT_ID:""}'
+#   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+#   refresh_list_interval: 600s
+#   resources:
 #  - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts'"
 #    metrics:
 #    - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
@@ -105,14 +105,17 @@
 #  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 #  refresh_list_interval: 600s
 
-#- module: azure
-#  metricsets:
-#    - app_insights
-#  enabled: true
-#  period: 300s
-#  application_id: ''
-#  api_key: ''
-#  metrics:
+# - module: azure
+#   metricsets:
+#     - app_insights
+#   enabled: true
+#   period: 60s
+#   application_id: '3f8f4e7e-5f42-461a-b0c2-c07034d51c28'
+#   tenant_id: '${AZURE_TENANT_ID:""}'
+#   client_id: '${AZURE_CLIENT_ID:""}'
+#   client_secret: '${AZURE_CLIENT_SECRET:""}'
+#   api_key: ''
+#   metrics:
 #   - id: ["requests/count", "requests/duration"]
 
 #- module: azure

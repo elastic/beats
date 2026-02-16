@@ -20,11 +20,40 @@ const metricsetName = "app_insights"
 
 // Config options
 type Config struct {
-	ApplicationId string        `config:"application_id"    validate:"required"`
-	ApiKey        string        `config:"api_key" validate:"required"`
+	ApplicationId string        `config:"application_id" validate:"required"`
 	Period        time.Duration `config:"period" validate:"nonzero,required"`
 	Metrics       []Metric      `config:"metrics" validate:"required"`
 	Namespace     string        `config:"namespace"`
+
+	// API Key authentication
+	ApiKey string `config:"api_key"`
+
+	// OAuth2 authentication
+	TenantId                string `config:"tenant_id"`
+	ClientId                string `config:"client_id"`
+	ClientSecret            string `config:"client_secret"`
+	ActiveDirectoryEndpoint string `config:"active_directory_endpoint"`
+}
+
+// Validate checks that exactly one authentication method is configured.
+func (c *Config) Validate() error {
+	hasOAuth2 := c.TenantId != "" && c.ClientId != "" && c.ClientSecret != ""
+	hasPartialOAuth2 := (c.TenantId != "" || c.ClientId != "" || c.ClientSecret != "") && !hasOAuth2
+	hasAPIKey := c.ApiKey != ""
+
+	if hasPartialOAuth2 {
+		return fmt.Errorf("incomplete MSI/MSEntra authentication configuration: tenant_id, client_id, and client_secret must all be provided")
+	}
+
+	if hasOAuth2 && hasAPIKey {
+		return fmt.Errorf("only one authentication method can be configured: use either OAuth2 (tenant_id, client_id, client_secret) or api_key")
+	}
+
+	if !hasOAuth2 && !hasAPIKey {
+		return fmt.Errorf("no MSI/MSEntra authentication configuration or api_key was provided")
+	}
+
+	return nil
 }
 
 // Metric struct used for configuration options
