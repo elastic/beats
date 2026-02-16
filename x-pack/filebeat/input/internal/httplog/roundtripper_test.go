@@ -5,6 +5,7 @@
 package httplog
 
 import (
+	"path/filepath"
 	"testing"
 )
 
@@ -191,7 +192,7 @@ var pathTests = []struct {
 func TestIsPathIn(t *testing.T) {
 	for _, test := range pathTests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := IsPathIn(test.root, test.path)
+			got, err := IsPathIn(filepath.FromSlash(test.root), filepath.FromSlash(test.path))
 			if !sameError(err, test.wantErr) {
 				t.Errorf("unexpected error from IsPathIn: got:%q want:%q", err, test.wantErr)
 			}
@@ -217,12 +218,12 @@ var symlinkTests = []struct {
 func TestResolveSymlinks(t *testing.T) {
 	for _, test := range symlinkTests {
 		t.Run(test.path, func(t *testing.T) {
-			got, err := resolveSymlinks(test.path)
+			got, err := resolveSymlinks(filepath.FromSlash(test.path))
 			if err != nil {
 				t.Fatalf("unexpected error calling resolveSymlinks: %v", err)
 			}
-			if got != test.want {
-				t.Errorf("unexpected result: got %q, want %q", got, test.want)
+			if got != filepath.FromSlash(test.want) {
+				t.Errorf("unexpected result: got %q, want %q", got, filepath.FromSlash(test.want))
 			}
 		})
 	}
