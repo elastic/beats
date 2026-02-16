@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-installation-script.html
 applies_to:
   stack: ga 9.0.6
+  serverless: ga
 ---
 
 # Installation script
