@@ -29,150 +29,124 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func optionsToMap(options []dhcpv4.Option) (mapstr.M, error) {
+func optionsToMap(dhcp *dhcpv4.DHCPv4) (mapstr.M, error) {
 	opts := mapstr.M{}
 
-	for _, opt := range options {
-		if opt.Code() == dhcpv4.OptionEnd {
-			break
+	if msgType := dhcp.MessageType(); msgType != dhcpv4.MessageTypeNone {
+		opts.Put("message_type", strings.ToLower(msgType.String()))
+	}
+
+	if reqList := dhcp.ParameterRequestList(); reqList != nil {
+		var optNames []string
+		for _, optCode := range reqList {
+			optNames = append(optNames, optCode.String())
 		}
+		opts.Put("parameter_request_list", optNames)
+	}
 
-		switch v := opt.(type) {
-		case *dhcpv4.OptMessageType:
-			mt, found := dhcpv4.MessageTypeToString[v.MessageType]
-			if !found {
-				mt = fmt.Sprintf("unknown (%v)", v.MessageType)
-			}
-			opts.Put("message_type", strings.ToLower(mt))
+	if reqIP := dhcp.RequestedIPAddress(); reqIP != nil {
+		opts.Put("requested_ip_address", reqIP.String())
+	}
 
-		case *dhcpv4.OptParameterRequestList:
-			var optNames []string
-			for _, ro := range v.RequestedOpts {
-				if name, ok := dhcpv4.OptionCodeToString[ro]; ok {
-					optNames = append(optNames, name)
-				} else {
-					optNames = append(optNames, fmt.Sprintf("Unknown (%v)", ro))
-				}
-			}
-			opts.Put("parameter_request_list", optNames)
+	if srvIP := dhcp.ServerIdentifier(); srvIP != nil {
+		opts.Put("server_identifier", srvIP.String())
+	}
 
-		case *dhcpv4.OptRequestedIPAddress:
-			opts.Put("requested_ip_address", v.RequestedAddr.String())
+	if broadcastIP := dhcp.BroadcastAddress(); broadcastIP != nil {
+		opts.Put("broadcast_address", broadcastIP.String())
+	}
 
-		case *dhcpv4.OptServerIdentifier:
-			opts.Put("server_identifier", v.ServerID.String())
+	if maxMsgSize, err := dhcp.MaxMessageSize(); err == nil {
+		opts.Put("max_dhcp_message_size", maxMsgSize)
+	}
 
-		case *dhcpv4.OptBroadcastAddress:
-			opts.Put("broadcast_address", v.BroadcastAddress.String())
+	if classID := dhcp.ClassIdentifier(); classID != "" {
+		opts.Put("class_identifier", classID)
+	}
 
-		case *dhcpv4.OptMaximumDHCPMessageSize:
-			opts.Put("max_dhcp_message_size", v.Size)
+	if domainName := dhcp.DomainName(); domainName != "" {
+		opts.Put("domain_name", domainName)
+	}
 
-		case *dhcpv4.OptClassIdentifier:
-			opts.Put("class_identifier", v.Identifier)
-
-		case *dhcpv4.OptDomainName:
-			opts.Put("domain_name", v.DomainName)
-
-		case *dhcpv4.OptDomainNameServer:
-			var dnsServers []string
-			for _, s := range v.NameServers {
-				dnsServers = append(dnsServers, s.String())
-			}
-			opts.Put("dns_servers", dnsServers)
-
-		case *dhcpv4.OptVIVC:
-			var subOptions []mapstr.M
-			for _, vendorOpt := range v.Identifiers {
-				subOptions = append(subOptions, mapstr.M{
-					"id":   vendorOpt.EntID,
-					"data": hex.EncodeToString(vendorOpt.Data),
-				})
-			}
-			opts.Put("vendor_identifying_options", subOptions)
-
-		case *dhcpv4.OptionGeneric:
-			// Generic options have just a []byte so we need to do extra parsing.
-			switch opt.Code() {
-			case dhcpv4.OptionSubnetMask:
-				if len(v.Data) >= 4 {
-					opts.Put("subnet_mask", net.IP(v.Data).String())
-				}
-
-			case dhcpv4.OptionTimeOffset:
-				if len(v.Data) >= 4 {
-					opts.Put("utc_time_offset_sec", int32(binary.BigEndian.Uint32(v.Data)))
-				}
-
-			case dhcpv4.OptionRouter:
-				ipOpt, err := ParseIPAddressOption(opt.ToBytes())
-				if err != nil {
-					return nil, err
-				}
-				opts.Put("router", ipOpt.IPAddress.String())
-
-			case dhcpv4.OptionTimeServer:
-				tsOpt, err := ParseIPAddressesOption(opt.ToBytes())
-				if err != nil {
-					return nil, err
-				}
-
-				var timeServers []string
-				for _, s := range tsOpt.IPAddresses {
-					timeServers = append(timeServers, s.String())
-				}
-				opts.Put("time_servers", timeServers)
-
-			case dhcpv4.OptionNTPServers:
-				tsOpt, err := ParseIPAddressesOption(opt.ToBytes())
-				if err != nil {
-					return nil, err
-				}
-
-				var timeServers []string
-				for _, s := range tsOpt.IPAddresses {
-					timeServers = append(timeServers, s.String())
-				}
-				opts.Put("ntp_servers", timeServers)
-
-			case dhcpv4.OptionHostName:
-				txt, err := ParseTextOption(opt.ToBytes())
-				if err != nil {
-					return nil, err
-				}
-				opts.Put("hostname", txt.Text)
-
-			case dhcpv4.OptionIPAddressLeaseTime:
-				if len(v.Data) >= 4 {
-					opts.Put("ip_address_lease_time_sec", binary.BigEndian.Uint32(v.Data))
-				}
-
-			case dhcpv4.OptionMessage:
-				txt, err := ParseTextOption(opt.ToBytes())
-				if err != nil {
-					return nil, err
-				}
-				opts.Put("message", txt.Text)
-
-			case dhcpv4.OptionRenewTimeValue:
-				if len(v.Data) >= 4 {
-					opts.Put("renewal_time_sec", binary.BigEndian.Uint32(v.Data))
-				}
-
-			case dhcpv4.OptionRebindingTimeValue:
-				if len(v.Data) >= 4 {
-					opts.Put("rebinding_time_sec", binary.BigEndian.Uint32(v.Data))
-				}
-
-			case dhcpv4.OptionBootfileName:
-				txt, err := ParseTextOption(opt.ToBytes())
-				if err != nil {
-					return nil, err
-				}
-				opts.Put("boot_file_name", txt.Text)
-
-			}
+	if dnsServers := dhcp.DNS(); dnsServers != nil {
+		var dnsServerStr []string
+		for _, srv := range dnsServers {
+			dnsServerStr = append(dnsServerStr, srv.String())
 		}
+		opts.Put("dns_servers", dnsServerStr)
+	}
+
+	// see RFC3925
+	if vivc := dhcp.VIVC(); vivc != nil {
+		var subOptions []mapstr.M
+		for _, subOpt := range vivc {
+			subOptions = append(subOptions, mapstr.M{
+				"id":   subOpt.EntID,
+				"data": hex.EncodeToString(subOpt.Data),
+			})
+		}
+		opts.Put("vendor_identifying_options", subOptions)
+	}
+
+	if mask := dhcp.SubnetMask(); mask != nil {
+		opts.Put("subnet_mask", net.IP(mask).String())
+	}
+
+	if offset := dhcp.GetOneOption(dhcpv4.OptionTimeOffset); offset != nil {
+		opts.Put("utc_time_offset_sec", int32(binary.BigEndian.Uint32(offset))) //nolint:gosec // RFC says it should be signed
+	}
+
+	if routerList := dhcp.Router(); routerList != nil {
+		var routersStr []string
+		for _, router := range routerList {
+			routersStr = append(routersStr, router.String())
+		}
+		// NOTE: this is a breaking change, but RFC2132 says router should be a *list*
+		opts.Put("router", routersStr)
+	}
+
+	if timeServer := dhcp.GetOneOption(dhcpv4.OptionTimeServer); timeServer != nil {
+		var ips dhcpv4.IPs
+		if err := ips.FromBytes(timeServer); err != nil {
+			return nil, fmt.Errorf("error parsing IP options for time servers: %w", err)
+		}
+		var timeServers []string
+		for _, s := range ips {
+			timeServers = append(timeServers, s.String())
+		}
+		opts.Put("time_servers", timeServers)
+	}
+
+	if ntpServers := dhcp.NTPServers(); ntpServers != nil {
+		var timeServers []string
+		for _, srv := range ntpServers {
+			timeServers = append(timeServers, srv.String())
+		}
+		opts.Put("ntp_servers", timeServers)
+	}
+
+	if hostname := dhcp.HostName(); hostname != "" {
+		opts.Put("hostname", hostname)
+	}
+
+	if leaseTime := dhcp.IPAddressLeaseTime(0); leaseTime != 0 {
+		opts.Put("ip_address_lease_time_sec", uint32(leaseTime.Seconds()))
+	}
+
+	if msg := dhcp.Message(); msg != "" {
+		opts.Put("message", msg)
+	}
+
+	if time := dhcp.IPAddressRenewalTime(0); time != 0 {
+		opts.Put("renewal_time_sec", uint32(time.Seconds()))
+	}
+
+	if time := dhcp.IPAddressRebindingTime(0); time != 0 {
+		opts.Put("rebinding_time_sec", uint32(time.Seconds()))
+	}
+
+	if bootFile := dhcp.BootFileNameOption(); bootFile != "" {
+		opts.Put("boot_file_name", bootFile)
 	}
 
 	if len(opts) > 0 {
