@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/monitors-scheduler.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Configure the task scheduler [monitors-scheduler]

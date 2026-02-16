@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-http_endpoint.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # HTTP Endpoint input [filebeat-input-http_endpoint]
@@ -366,7 +367,7 @@ Enabling this option compromises security and should only be used for debugging.
 
 ### `tracer.filename` [_tracer_filename_4]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. The path must point to a target in the http_endpoint directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 
 ### `tracer.maxsize` [_tracer_maxsize_2]

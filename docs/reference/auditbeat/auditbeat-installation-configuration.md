@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-installation-configuration.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Auditbeat quick start: installation and configuration [auditbeat-installation-configuration]
@@ -31,6 +32,12 @@ To get started quickly, spin up an [{{ech}}](https://www.elastic.co/cloud?page=d
 
 ::::::{applies-item} self: ga
 To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
+::::::
+
+::::::{applies-item} serverless: ga
+:sync: serverless
+::::{include} /reference/_snippets/serverless-before-you-begin.md
+::::
 ::::::
 
 :::::::
@@ -172,6 +179,12 @@ cloud.auth: "auditbeat_setup:YOUR_PASSWORD" <1>
     2. The `username` and `password` settings for {{kib}} are optional. If you don’t specify credentials for {{kib}}, Auditbeat uses the `username` and `password` specified for the {{es}} output.
     3. To use the pre-built {{kib}} dashboards, this user must be authorized to view dashboards or have the `kibana_admin` [built-in role](elasticsearch://reference/elasticsearch/roles.md).
 
+::::::
+
+::::::{applies-item} serverless: ga
+:sync: serverless
+::::{include} /reference/_snippets/serverless-connect.md
+::::
 ::::::
 :::::::
 
@@ -371,6 +384,12 @@ To open the dashboards:
     ::::::{applies-item} self: ga
     :sync: self
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
+    ::::::
+
+    ::::::{applies-item} serverless: ga
+    :sync: serverless
+    ::::{include} /reference/_snippets/serverless-view-data.md
+    ::::
     ::::::
 
     :::::::

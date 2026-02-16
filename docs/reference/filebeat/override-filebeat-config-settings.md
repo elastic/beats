@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/override-filebeat-config-settings.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Override configuration settings at the command line [override-filebeat-config-settings]
