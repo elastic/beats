@@ -1329,6 +1329,68 @@ filebeat.inputs:
 # point to the old registry file.
 #filebeat.registry.migrate_file: ${path.data}/registry
 
+# The storage backend for the registry. Supported values are "memlog" and
+# "bbolt". The default is "memlog", which uses an in-memory log with periodic
+# disk flushing. The "bbolt" backend uses a bbolt (BoltDB) database for
+# persistent on-disk storage with support for compaction and TTL-based cleanup.
+#filebeat.registry.backend: memlog
+
+# ----------------------- Bbolt backend settings -------------------------------
+# WARNING: The bbolt backend is EXPERIMENTAL and may change or be removed in
+# future releases. Do not use in production without understanding the risks.
+#
+# These settings apply only when filebeat.registry.backend is set to "bbolt".
+# The database files are stored under the registry.path directory.
+# Configuration parameter names are aligned with the OpenTelemetry
+# filestorage extension for future compatibility.
+
+# Timeout for obtaining a file lock on the bbolt database file. Default: 1s.
+#filebeat.registry.bbolt.timeout: 1s
+
+# If true, fsync is called after each database write. This ensures data is
+# flushed to disk but reduces write throughput. Default: false.
+#filebeat.registry.bbolt.fsync: false
+
+# How long entries are kept before being removed by periodic cleanup.
+# A zero value disables TTL-based cleanup. Works together with
+# bbolt.compaction.cleanup_interval. Default: 0 (disabled).
+#filebeat.registry.bbolt.ttl: 0
+
+# If true, database compaction runs on every start. Compaction rewrites the
+# database to reclaim unused disk space. Default: false.
+#filebeat.registry.bbolt.compaction.on_start: false
+
+# If true, enables online rebound compaction. When the database grows past
+# rebound_needed_threshold_mib and later shrinks below
+# rebound_trigger_threshold_mib, compaction is triggered automatically.
+# Default: false.
+#filebeat.registry.bbolt.compaction.on_rebound: false
+
+# Minimum total allocated database size (in MiB) to mark the need for
+# rebound compaction. Default: 100.
+#filebeat.registry.bbolt.compaction.rebound_needed_threshold_mib: 100
+
+# When rebound compaction is needed, it triggers once the live data size
+# drops below this value (in MiB). Default: 10.
+#filebeat.registry.bbolt.compaction.rebound_trigger_threshold_mib: 10
+
+# Maximum number of items copied per transaction during compaction.
+# Default: 65536.
+#filebeat.registry.bbolt.compaction.max_transaction_size: 65536
+
+# How often to check whether rebound compaction conditions are met.
+# Only used when on_rebound is true. Default: 5s.
+#filebeat.registry.bbolt.compaction.check_interval: 5s
+
+# If true, leftover temporary files from a previous compaction that was
+# interrupted (e.g. by a crash) are removed on start. Default: false.
+#filebeat.registry.bbolt.compaction.cleanup_on_start: false
+
+# How often to run TTL-based entry cleanup. Only effective when bbolt.ttl
+# is also set to a positive value. A zero value disables periodic cleanup.
+# Default: 0 (disabled).
+#filebeat.registry.bbolt.compaction.cleanup_interval: 0
+
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
 # every time a new Elasticsearch connection is established.

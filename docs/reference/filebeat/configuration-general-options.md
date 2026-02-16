@@ -80,6 +80,123 @@ filebeat.registry.migrate_file: /path/to/old/registry_file
 The registry will be migrated to the new location only if a registry using the directory format does not already exist.
 
 
+### `registry.backend` [_registry_backend]
+
+::::{warning}
+The bbolt backend is **experimental** and may change or be removed in future releases. Do not use in production without understanding the risks.
+::::
+
+The storage backend used for the registry. Supported values:
+
+- `memlog` (default): An in-memory log with periodic disk flushing. This is the original backend and is well-tested.
+- `bbolt`: A [bbolt (BoltDB)](https://github.com/etcd-io/bbolt) database for persistent on-disk storage with support for compaction and TTL-based entry cleanup.
+
+```yaml
+filebeat.registry.backend: bbolt
+```
+
+When set to `bbolt`, the database files are stored under the directory specified by `registry.path`. The bbolt-specific settings are configured under `registry.bbolt`.
+
+
+### `registry.bbolt.timeout` [_registry_bbolt_timeout]
+
+The amount of time to wait to obtain a file lock on the bbolt database file. Default: `1s`.
+
+```yaml
+filebeat.registry.bbolt.timeout: 1s
+```
+
+
+### `registry.bbolt.fsync` [_registry_bbolt_fsync]
+
+If `true`, fsync is called after each database write. This ensures data is flushed to disk at the cost of reduced write throughput. Default: `false`.
+
+```yaml
+filebeat.registry.bbolt.fsync: false
+```
+
+
+### `registry.bbolt.ttl` [_registry_bbolt_ttl]
+
+How long entries are kept in the store before being removed by periodic cleanup. A zero value disables TTL-based cleanup. Must be used together with `registry.bbolt.compaction.cleanup_interval`. Default: `0` (disabled).
+
+```yaml
+filebeat.registry.bbolt.ttl: 72h
+```
+
+
+### `registry.bbolt.compaction.on_start` [_registry_bbolt_compaction_on_start]
+
+If `true`, database compaction runs every time Filebeat starts. Compaction rewrites the database file to reclaim unused disk space. Default: `false`.
+
+```yaml
+filebeat.registry.bbolt.compaction.on_start: true
+```
+
+
+### `registry.bbolt.compaction.on_rebound` [_registry_bbolt_compaction_on_rebound]
+
+If `true`, enables online rebound compaction. When the total allocated database size exceeds `rebound_needed_threshold_mib` and the live data size later drops below `rebound_trigger_threshold_mib`, compaction is triggered automatically. The check runs at every `check_interval`. Default: `false`.
+
+```yaml
+filebeat.registry.bbolt.compaction.on_rebound: true
+```
+
+
+### `registry.bbolt.compaction.rebound_needed_threshold_mib` [_registry_bbolt_compaction_rebound_needed_threshold_mib]
+
+The minimum total allocated database size (in MiB) required to mark the database as needing rebound compaction. Default: `100`.
+
+```yaml
+filebeat.registry.bbolt.compaction.rebound_needed_threshold_mib: 100
+```
+
+
+### `registry.bbolt.compaction.rebound_trigger_threshold_mib` [_registry_bbolt_compaction_rebound_trigger_threshold_mib]
+
+When rebound compaction is needed, it triggers once the live data size drops below this value (in MiB). Default: `10`.
+
+```yaml
+filebeat.registry.bbolt.compaction.rebound_trigger_threshold_mib: 10
+```
+
+
+### `registry.bbolt.compaction.max_transaction_size` [_registry_bbolt_compaction_max_transaction_size]
+
+The maximum number of items copied per transaction during compaction and TTL cleanup. Default: `65536`.
+
+```yaml
+filebeat.registry.bbolt.compaction.max_transaction_size: 65536
+```
+
+
+### `registry.bbolt.compaction.check_interval` [_registry_bbolt_compaction_check_interval]
+
+How often to check whether rebound compaction conditions are met. Only used when `on_rebound` is `true`. Default: `5s`.
+
+```yaml
+filebeat.registry.bbolt.compaction.check_interval: 5s
+```
+
+
+### `registry.bbolt.compaction.cleanup_on_start` [_registry_bbolt_compaction_cleanup_on_start]
+
+If `true`, leftover temporary files from a previous compaction that was interrupted (for example, by a crash) are removed when Filebeat starts. Default: `false`.
+
+```yaml
+filebeat.registry.bbolt.compaction.cleanup_on_start: true
+```
+
+
+### `registry.bbolt.compaction.cleanup_interval` [_registry_bbolt_compaction_cleanup_interval]
+
+How often to run TTL-based entry cleanup. Only effective when `registry.bbolt.ttl` is also set to a positive value. A zero value disables periodic cleanup. Default: `0` (disabled).
+
+```yaml
+filebeat.registry.bbolt.compaction.cleanup_interval: 5m
+```
+
+
 ### `shutdown_timeout` [shutdown-timeout]
 
 How long Filebeat waits on shutdown for the publisher to finish sending events before Filebeat shuts down.
