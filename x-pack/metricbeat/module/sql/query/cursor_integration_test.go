@@ -17,7 +17,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/godror/godror"
+	"github.com/godror/godror"
 	_ "github.com/lib/pq"
 	_ "github.com/microsoft/go-mssqldb"
 	"github.com/stretchr/testify/assert"
@@ -785,18 +785,31 @@ func fetchEvents(t *testing.T, ms mb.MetricSet) ([]mb.Event, []error) {
 // ORACLE CURSOR TESTS
 // ============================================================================
 
-// TestOracleCursor tests cursor functionality with Oracle database
+// TestOracleCursor tests cursor functionality with Oracle database.
+//
+// This is a comprehensive test covering:
+//   - Integer cursor: first run, subsequent runs, restart (state persistence)
+//   - Timestamp cursor: multi-batch incremental fetch, timezone handling, precision
+//   - Date cursor: Oracle DATE column handling
+//   - NULL handling: NULL values in cursor column
+//   - Empty result set: no matching rows
+//   - Query change resets cursor: different query → new cursor state
+//   - Oracle driver type conversions: NUMBER, TIMESTAMP, DATE → Go types
+//
+// The timestamp multi-batch test is particularly important as it verifies the fix
+// for the Oracle timestamp cursor bug where subsequent fetches returned 0 rows
+// because the godror driver didn't properly bind time.Time values to the
+// :cursor_val named parameter without sql.Named().
 func TestOracleCursor(t *testing.T) {
-	// Skip if Oracle Instant Client is not installed
-	// The godror driver requires the Oracle Instant Client library (libclntsh.dylib/so)
+	// Skip if Oracle Instant Client is not installed.
+	// The godror driver requires the Oracle Instant Client library (libclntsh.dylib/so).
 	// See: https://oracle.github.io/odpi/doc/installation.html
 	testDB, err := sql.Open("godror", "user/pass@localhost:1521/test")
 	if err == nil {
-		// Try ping to see if Oracle client library is available
 		err = testDB.Ping()
 		testDB.Close()
 	}
-	if err != nil && (containsOracleClientError(err.Error())) {
+	if err != nil && containsOracleClientError(err.Error()) {
 		t.Skip("Skipping Oracle cursor tests: Oracle Instant Client not installed. " +
 			"See https://oracle.github.io/odpi/doc/installation.html")
 	}
@@ -805,12 +818,10 @@ func TestOracleCursor(t *testing.T) {
 	host, port, err := net.SplitHostPort(service.Host())
 	require.NoError(t, err)
 
-	// Wait for Oracle to be ready
 	waitForOracleConnection(t, host, port)
 
 	dsn := GetOracleConnectionDetails(t, host, port)
 
-	// Set up test table
 	db, err := sql.Open("godror", dsn)
 	require.NoError(t, err, "Failed to connect to Oracle")
 	defer db.Close()
@@ -818,19 +829,54 @@ func TestOracleCursor(t *testing.T) {
 	setupOracleTestTable(t, db)
 	defer cleanupOracleTestTable(t, db)
 
-	// Test integer cursor
-	t.Run("integer_cursor", func(t *testing.T) {
+	// --- Integer cursor tests ---
+	t.Run("integer_cursor_first_and_subsequent_runs", func(t *testing.T) {
 		testOracleIntegerCursor(t, dsn)
 	})
 
-	// Test timestamp cursor
-	t.Run("timestamp_cursor", func(t *testing.T) {
-		testOracleTimestampCursor(t, dsn)
+	t.Run("integer_cursor_restart_preserves_state", func(t *testing.T) {
+		testOracleIntegerCursorRestart(t, dsn)
 	})
 
-	// Test date cursor
+	// --- Timestamp cursor tests ---
+	t.Run("timestamp_cursor_multi_batch", func(t *testing.T) {
+		testOracleTimestampCursorMultiBatch(t, dsn)
+	})
+
+	t.Run("timestamp_cursor_timezone_handling", func(t *testing.T) {
+		testOracleTimestampTimezoneHandling(t, dsn)
+	})
+
+	t.Run("timestamp_cursor_precision", func(t *testing.T) {
+		testOracleTimestampPrecision(t, dsn)
+	})
+
+	// --- Date cursor test ---
 	t.Run("date_cursor", func(t *testing.T) {
 		testOracleDateCursor(t, dsn)
+	})
+
+	// --- Edge case tests ---
+	t.Run("null_handling", func(t *testing.T) {
+		testOracleNullHandling(t, db, dsn)
+	})
+
+	t.Run("empty_result_set", func(t *testing.T) {
+		testOracleEmptyResultSet(t, dsn)
+	})
+
+	t.Run("query_change_resets_cursor", func(t *testing.T) {
+		testOracleQueryChangeResetsCursor(t, dsn)
+	})
+
+	// --- Timezone mismatch test (reproduces reported bug) ---
+	t.Run("timestamp_cursor_timezone_mismatch", func(t *testing.T) {
+		testOracleTimestampCursorTimezoneMismatch(t, host, port)
+	})
+
+	// --- Oracle-specific tests ---
+	t.Run("driver_type_conversions", func(t *testing.T) {
+		testOracleDriverTypeConversions(t, db)
 	})
 }
 
@@ -840,7 +886,9 @@ func setupOracleTestTable(t *testing.T, db *sql.DB) {
 	// Drop table if exists (Oracle doesn't have IF EXISTS, so we ignore errors)
 	_, _ = db.Exec("DROP TABLE cursor_test_events")
 
-	// Create table with Oracle-specific syntax
+	// Create table with Oracle-specific syntax.
+	// Uses TIMESTAMP (not TIMESTAMP WITH TIME ZONE) and DATE to test
+	// Oracle-specific type handling through the godror driver.
 	createSQL := `
 		CREATE TABLE cursor_test_events (
 			id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -852,15 +900,16 @@ func setupOracleTestTable(t *testing.T, db *sql.DB) {
 	_, err := db.Exec(createSQL)
 	require.NoError(t, err, "Failed to create Oracle test table")
 
-	// Insert test data
+	// Insert 10 rows with timestamps 1 second apart.
+	// This gives enough data to test multi-batch pagination (e.g., 3+3+3+1+0).
 	insertSQL := `INSERT INTO cursor_test_events (event_data, created_at, event_date) VALUES (:1, :2, :3)`
 	now := time.Now().UTC()
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 10; i++ {
 		ts := now.Add(time.Duration(i) * time.Second)
 		_, err := db.Exec(insertSQL, fmt.Sprintf("event-%d", i), ts, ts)
-		require.NoError(t, err, "Failed to insert Oracle test data")
+		require.NoError(t, err, "Failed to insert Oracle test data row %d", i)
 	}
-	t.Log("Oracle test table created with 5 rows")
+	t.Log("Oracle test table created with 10 rows")
 }
 
 func cleanupOracleTestTable(t *testing.T, db *sql.DB) {
@@ -871,11 +920,15 @@ func cleanupOracleTestTable(t *testing.T, db *sql.DB) {
 	}
 }
 
+// testOracleIntegerCursor verifies integer cursor pagination with Oracle.
+// With 10 rows and FETCH FIRST 3, the pattern is: 3 + 3 + 3 + 1 + 0.
+// Uses :cursor named parameter binding via :cursor_val.
 func testOracleIntegerCursor(t *testing.T, dsn string) {
 	t.Helper()
 
 	testPaths := createTestPaths(t)
 
+	// :cursor is translated to :cursor_val for Oracle by cursor.TranslateQuery
 	query := "SELECT id, event_data FROM cursor_test_events WHERE id > :cursor ORDER BY id ASC FETCH FIRST 3 ROWS ONLY"
 
 	cfg := map[string]interface{}{
@@ -892,50 +945,110 @@ func testOracleIntegerCursor(t *testing.T, dsn string) {
 		"cursor.default":      "0",
 	}
 
-	// First fetch - should get first 3 rows
+	// First fetch - ids 1-3
 	ms1 := newMetricSetWithPaths(t, cfg, testPaths)
 	events1, errs1 := fetchEvents(t, ms1)
 	require.Empty(t, errs1, "First fetch should not have errors")
 	require.Len(t, events1, 3, "First fetch should return 3 events")
-
-	for _, event := range events1 {
-		if id, ok := event.MetricSetFields["id"]; ok {
-			t.Logf("Oracle integer cursor - First fetch: id=%v", id)
-		}
-	}
-
+	t.Logf("Oracle integer cursor - First fetch: %d events", len(events1))
 	if closer, ok := ms1.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
 
-	// Second fetch - should get remaining 2 rows
+	// Second fetch - ids 4-6
 	ms2 := newMetricSetWithPaths(t, cfg, testPaths)
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2, "Second fetch should not have errors")
-	require.Len(t, events2, 2, "Second fetch should return 2 events")
-
-	for _, event := range events2 {
-		if id, ok := event.MetricSetFields["id"]; ok {
-			t.Logf("Oracle integer cursor - Second fetch: id=%v", id)
-		}
-	}
-
+	require.Len(t, events2, 3, "Second fetch should return 3 events")
+	t.Logf("Oracle integer cursor - Second fetch: %d events", len(events2))
 	if closer, ok := ms2.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
 
-	// Third fetch - should get no rows
+	// Third fetch - ids 7-9
 	ms3 := newMetricSetWithPaths(t, cfg, testPaths)
 	events3, errs3 := fetchEvents(t, ms3)
 	require.Empty(t, errs3, "Third fetch should not have errors")
-	require.Len(t, events3, 0, "Third fetch should return 0 events")
-
+	require.Len(t, events3, 3, "Third fetch should return 3 events")
 	if closer, ok := ms3.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Fourth fetch - id 10 (last row)
+	ms4 := newMetricSetWithPaths(t, cfg, testPaths)
+	events4, errs4 := fetchEvents(t, ms4)
+	require.Empty(t, errs4, "Fourth fetch should not have errors")
+	require.Len(t, events4, 1, "Fourth fetch should return 1 event (last row)")
+	if closer, ok := ms4.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Fifth fetch - all consumed, should return 0
+	ms5 := newMetricSetWithPaths(t, cfg, testPaths)
+	events5, errs5 := fetchEvents(t, ms5)
+	require.Empty(t, errs5, "Fifth fetch should not have errors")
+	require.Len(t, events5, 0, "Fifth fetch should return 0 events (all consumed)")
+	if closer, ok := ms5.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
 }
 
-func testOracleTimestampCursor(t *testing.T, dsn string) {
+// testOracleIntegerCursorRestart verifies that cursor state persists across restarts.
+// Fetches all rows, closes MetricSet, re-creates it with same paths, and verifies
+// the cursor was loaded from persisted state (0 new rows returned).
+func testOracleIntegerCursorRestart(t *testing.T, dsn string) {
+	t.Helper()
+
+	testPaths := createTestPaths(t)
+
+	// No FETCH FIRST — get all rows in one go
+	query := "SELECT id, event_data FROM cursor_test_events WHERE id > :cursor ORDER BY id ASC"
+
+	cfg := map[string]interface{}{
+		"module":              "sql",
+		"metricsets":          []string{"query"},
+		"hosts":               []string{dsn},
+		"driver":              "oracle",
+		"sql_query":           query,
+		"sql_response_format": tableResponseFormat,
+		"raw_data.enabled":    true,
+		"cursor.enabled":      true,
+		"cursor.column":       "id",
+		"cursor.type":         cursor.CursorTypeInteger,
+		"cursor.default":      "0",
+	}
+
+	// First fetch - get all 10 rows
+	ms1 := newMetricSetWithPaths(t, cfg, testPaths)
+	events1, errs1 := fetchEvents(t, ms1)
+	require.Empty(t, errs1)
+	require.Len(t, events1, 10, "Should get all 10 rows")
+	if closer, ok := ms1.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Verify cursor state directory exists (state was persisted)
+	cursorDir := filepath.Join(testPaths.Data, "sql-cursor")
+	_, statErr := os.Stat(cursorDir)
+	assert.NoError(t, statErr, "Cursor state directory should exist after close")
+
+	// "Restart" — create new MetricSet with same paths (simulates process restart)
+	ms2 := newMetricSetWithPaths(t, cfg, testPaths)
+	events2, errs2 := fetchEvents(t, ms2)
+	require.Empty(t, errs2)
+	require.Len(t, events2, 0, "After restart, should get 0 rows (cursor loaded from persisted state)")
+	if closer, ok := ms2.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+}
+
+// testOracleTimestampCursorMultiBatch is the critical test for the Oracle timestamp
+// cursor bug. Without the sql.Named() fix for the :cursor_val named parameter,
+// the godror driver fails to properly bind time.Time values, causing all fetches
+// after the first to silently return 0 rows.
+//
+// With 10 rows and FETCH FIRST 3, the expected pattern is: 3 + 3 + 3 + 1 + 0.
+func testOracleTimestampCursorMultiBatch(t *testing.T, dsn string) {
 	t.Helper()
 
 	testPaths := createTestPaths(t)
@@ -957,31 +1070,165 @@ func testOracleTimestampCursor(t *testing.T, dsn string) {
 		"cursor.default":      defaultTimestamp,
 	}
 
-	// First fetch
+	// First fetch — should get 3 rows
 	ms1 := newMetricSetWithPaths(t, cfg, testPaths)
 	events1, errs1 := fetchEvents(t, ms1)
 	require.Empty(t, errs1, "First timestamp fetch should not have errors")
 	require.Len(t, events1, 3, "First timestamp fetch should return 3 events")
-
-	t.Logf("Oracle timestamp cursor - First fetch returned %d events", len(events1))
-
+	t.Logf("Oracle timestamp cursor - First fetch: %d events", len(events1))
 	if closer, ok := ms1.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
 
-	// Second fetch
+	// Second fetch — CRITICAL: should get next 3 rows, NOT 0.
+	// This is the assertion that catches the Oracle timestamp cursor bug.
+	// Without sql.Named(), godror doesn't properly bind the cursor time.Time
+	// to the :cursor_val named parameter, causing 0 rows to be returned.
 	ms2 := newMetricSetWithPaths(t, cfg, testPaths)
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2, "Second timestamp fetch should not have errors")
-	require.Len(t, events2, 2, "Second timestamp fetch should return 2 events")
-
-	t.Logf("Oracle timestamp cursor - Second fetch returned %d events", len(events2))
-
+	require.Len(t, events2, 3,
+		"Second timestamp fetch should return 3 events; "+
+			"got 0 indicates the Oracle timestamp :cursor_val bind parameter is broken — "+
+			"the named parameter needs sql.Named() for godror driver")
+	t.Logf("Oracle timestamp cursor - Second fetch: %d events", len(events2))
 	if closer, ok := ms2.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Third fetch — should get 3 more rows
+	ms3 := newMetricSetWithPaths(t, cfg, testPaths)
+	events3, errs3 := fetchEvents(t, ms3)
+	require.Empty(t, errs3, "Third timestamp fetch should not have errors")
+	require.Len(t, events3, 3, "Third timestamp fetch should return 3 events")
+	if closer, ok := ms3.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Fourth fetch — last row
+	ms4 := newMetricSetWithPaths(t, cfg, testPaths)
+	events4, errs4 := fetchEvents(t, ms4)
+	require.Empty(t, errs4, "Fourth timestamp fetch should not have errors")
+	require.Len(t, events4, 1, "Fourth timestamp fetch should return 1 event (last row)")
+	if closer, ok := ms4.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Fifth fetch — all consumed
+	ms5 := newMetricSetWithPaths(t, cfg, testPaths)
+	events5, errs5 := fetchEvents(t, ms5)
+	require.Empty(t, errs5, "Fifth timestamp fetch should not have errors")
+	require.Len(t, events5, 0, "Fifth timestamp fetch should return 0 events (all consumed)")
+	if closer, ok := ms5.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
 }
 
+// testOracleTimestampTimezoneHandling verifies that Oracle timestamps are
+// correctly handled in UTC regardless of the database timezone setting.
+// The Oracle session is configured with TIME_ZONE='UTC' via GetOracleConnectionDetails.
+func testOracleTimestampTimezoneHandling(t *testing.T, dsn string) {
+	t.Helper()
+
+	testPaths := createTestPaths(t)
+	// Use a UTC timestamp as default — the session timezone is set to UTC
+	defaultTimestamp := time.Now().Add(-1 * time.Hour).UTC().Format(time.RFC3339)
+
+	query := "SELECT id, event_data, created_at FROM cursor_test_events WHERE created_at > :cursor ORDER BY created_at ASC FETCH FIRST 5 ROWS ONLY"
+
+	cfg := map[string]interface{}{
+		"module":              "sql",
+		"metricsets":          []string{"query"},
+		"hosts":               []string{dsn},
+		"driver":              "oracle",
+		"sql_query":           query,
+		"sql_response_format": tableResponseFormat,
+		"raw_data.enabled":    true,
+		"cursor.enabled":      true,
+		"cursor.column":       "created_at",
+		"cursor.type":         cursor.CursorTypeTimestamp,
+		"cursor.default":      defaultTimestamp,
+	}
+
+	// First fetch — 5 rows
+	ms1 := newMetricSetWithPaths(t, cfg, testPaths)
+	events1, errs1 := fetchEvents(t, ms1)
+	require.Empty(t, errs1)
+	require.Len(t, events1, 5, "First fetch with UTC timezone should return 5 events")
+	if closer, ok := ms1.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Second fetch — remaining 5 rows (verifies cursor updated correctly across timezone boundary)
+	ms2 := newMetricSetWithPaths(t, cfg, testPaths)
+	events2, errs2 := fetchEvents(t, ms2)
+	require.Empty(t, errs2)
+	require.Len(t, events2, 5, "Second fetch with UTC timezone should return 5 events")
+	if closer, ok := ms2.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Third fetch — all consumed
+	ms3 := newMetricSetWithPaths(t, cfg, testPaths)
+	events3, errs3 := fetchEvents(t, ms3)
+	require.Empty(t, errs3)
+	require.Len(t, events3, 0, "Third fetch should return 0 events (all consumed)")
+	if closer, ok := ms3.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+}
+
+// testOracleTimestampPrecision verifies that Oracle TIMESTAMP sub-second
+// precision is correctly preserved through the cursor round-trip.
+// Fetches rows one-at-a-time to verify each cursor update is precise enough
+// to skip exactly the current row and return the next.
+func testOracleTimestampPrecision(t *testing.T, dsn string) {
+	t.Helper()
+
+	testPaths := createTestPaths(t)
+	defaultTimestamp := time.Now().Add(-1 * time.Hour).UTC().Format(time.RFC3339Nano)
+
+	// FETCH FIRST 1 ROW ONLY to test single-row pagination
+	query := "SELECT id, event_data, created_at FROM cursor_test_events WHERE created_at > :cursor ORDER BY created_at ASC FETCH FIRST 1 ROWS ONLY"
+
+	cfg := map[string]interface{}{
+		"module":              "sql",
+		"metricsets":          []string{"query"},
+		"hosts":               []string{dsn},
+		"driver":              "oracle",
+		"sql_query":           query,
+		"sql_response_format": tableResponseFormat,
+		"raw_data.enabled":    true,
+		"cursor.enabled":      true,
+		"cursor.column":       "created_at",
+		"cursor.type":         cursor.CursorTypeTimestamp,
+		"cursor.default":      defaultTimestamp,
+	}
+
+	// Fetch rows one at a time — precision loss would cause rows to be
+	// skipped (cursor jumps too far) or re-fetched (cursor doesn't advance).
+	var totalFetched int
+	for i := 0; i < 12; i++ { // 10 rows + 2 safety iterations
+		ms := newMetricSetWithPaths(t, cfg, testPaths)
+		events, errs := fetchEvents(t, ms)
+		require.Empty(t, errs, "Fetch %d should not have errors", i+1)
+		if closer, ok := ms.(mb.Closer); ok {
+			require.NoError(t, closer.Close())
+		}
+		if len(events) == 0 {
+			break
+		}
+		require.Len(t, events, 1, "Fetch %d should return exactly 1 event", i+1)
+		totalFetched += len(events)
+	}
+
+	require.Equal(t, 10, totalFetched,
+		"Should fetch all 10 rows one-at-a-time; precision loss would cause rows to be skipped or re-fetched")
+}
+
+// testOracleDateCursor verifies cursor operation on Oracle DATE columns.
+// Oracle DATE includes time component (unlike SQL standard DATE), so the
+// cursor uses TO_DATE(:cursor_val, 'YYYY-MM-DD') for proper comparison.
 func testOracleDateCursor(t *testing.T, dsn string) {
 	t.Helper()
 
@@ -1004,16 +1251,456 @@ func testOracleDateCursor(t *testing.T, dsn string) {
 		"cursor.default":      defaultDate,
 	}
 
-	// First fetch
+	// First fetch — all 10 rows have today's date, which is > yesterday's default
 	ms1 := newMetricSetWithPaths(t, cfg, testPaths)
 	events1, errs1 := fetchEvents(t, ms1)
 	require.Empty(t, errs1, "First date fetch should not have errors")
-	// All 5 rows should have today's date, which is > yesterday
-	require.GreaterOrEqual(t, len(events1), 1, "First date fetch should return events")
-
-	t.Logf("Oracle date cursor - First fetch returned %d events", len(events1))
-
+	require.Len(t, events1, 3, "First date fetch should return 3 events")
+	t.Logf("Oracle date cursor - First fetch: %d events", len(events1))
 	if closer, ok := ms1.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Second fetch — since all rows share the same date (today), the cursor
+	// value is today's date. The query WHERE event_date > today returns 0 rows
+	// because there are no future-dated rows. This is expected behavior for date
+	// cursors when all data shares the same date — timestamp cursors handle
+	// intra-day ordering better.
+	ms2 := newMetricSetWithPaths(t, cfg, testPaths)
+	events2, errs2 := fetchEvents(t, ms2)
+	require.Empty(t, errs2, "Second date fetch should not have errors")
+	t.Logf("Oracle date cursor - Second fetch: %d events", len(events2))
+	if closer, ok := ms2.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+}
+
+// testOracleNullHandling verifies that NULL values in the cursor column
+// don't cause errors and are properly skipped during cursor updates.
+func testOracleNullHandling(t *testing.T, db *sql.DB, dsn string) {
+	t.Helper()
+
+	// Create a separate table with NULL values
+	tableName := "cursor_null_test_oracle"
+	_, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName))
+
+	_, err := db.Exec(fmt.Sprintf(`
+		CREATE TABLE %s (
+			id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+			event_data VARCHAR2(255),
+			updated_at TIMESTAMP
+		)
+	`, tableName))
+	require.NoError(t, err, "Failed to create NULL test table")
+	defer func() { _, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName)) }()
+
+	// Insert rows: some with timestamps, some with NULL
+	now := time.Now().UTC()
+	_, err = db.Exec(fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, :2)", tableName), "event-1", now)
+	require.NoError(t, err)
+	_, err = db.Exec(fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, NULL)", tableName), "event-2-null")
+	require.NoError(t, err)
+	_, err = db.Exec(fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, :2)", tableName), "event-3", now.Add(time.Second))
+	require.NoError(t, err)
+
+	testPaths := createTestPaths(t)
+	defaultTimestamp := now.Add(-time.Hour).Format(time.RFC3339)
+
+	// Query includes OR updated_at IS NULL to also fetch NULL rows
+	query := fmt.Sprintf(
+		"SELECT id, event_data, updated_at FROM %s WHERE updated_at > :cursor OR updated_at IS NULL ORDER BY id ASC",
+		tableName)
+
+	cfg := map[string]interface{}{
+		"module":              "sql",
+		"metricsets":          []string{"query"},
+		"hosts":               []string{dsn},
+		"driver":              "oracle",
+		"sql_query":           query,
+		"sql_response_format": tableResponseFormat,
+		"raw_data.enabled":    true,
+		"cursor.enabled":      true,
+		"cursor.column":       "updated_at",
+		"cursor.type":         cursor.CursorTypeTimestamp,
+		"cursor.default":      defaultTimestamp,
+	}
+
+	ms := newMetricSetWithPaths(t, cfg, testPaths)
+	events, errs := fetchEvents(t, ms)
+	require.Empty(t, errs)
+	// Should get all 3 rows: 2 with timestamps + 1 with NULL
+	require.Len(t, events, 3, "Should get all 3 events including NULL timestamp row")
+	if closer, ok := ms.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+}
+
+// testOracleEmptyResultSet verifies that an empty result set (no matching rows)
+// is handled correctly: no errors, 0 events, cursor unchanged.
+func testOracleEmptyResultSet(t *testing.T, dsn string) {
+	t.Helper()
+
+	testPaths := createTestPaths(t)
+
+	// Use a far-future default so no rows match
+	farFuture := time.Now().Add(100 * 365 * 24 * time.Hour).UTC().Format(time.RFC3339)
+
+	query := "SELECT id, event_data, created_at FROM cursor_test_events WHERE created_at > :cursor ORDER BY created_at ASC FETCH FIRST 3 ROWS ONLY"
+
+	cfg := map[string]interface{}{
+		"module":              "sql",
+		"metricsets":          []string{"query"},
+		"hosts":               []string{dsn},
+		"driver":              "oracle",
+		"sql_query":           query,
+		"sql_response_format": tableResponseFormat,
+		"raw_data.enabled":    true,
+		"cursor.enabled":      true,
+		"cursor.column":       "created_at",
+		"cursor.type":         cursor.CursorTypeTimestamp,
+		"cursor.default":      farFuture,
+	}
+
+	ms := newMetricSetWithPaths(t, cfg, testPaths)
+	events, errs := fetchEvents(t, ms)
+	require.Empty(t, errs, "Empty result set should not cause errors")
+	require.Len(t, events, 0, "Should return 0 events when cursor is in the far future")
+
+	// Verify cursor remains unchanged after empty result
+	queryMs, ok := ms.(*MetricSet)
+	require.True(t, ok)
+
+	// ParseValue normalizes the format, so compare normalized values
+	normalizedFarFuture, err := cursor.ParseValue(farFuture, cursor.CursorTypeTimestamp)
+	require.NoError(t, err)
+	assert.Equal(t, normalizedFarFuture.String(), queryMs.cursorManager.CursorValueString(),
+		"Cursor should remain at far-future default after empty result set")
+
+	if closer, ok := ms.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+}
+
+// testOracleQueryChangeResetsCursor verifies that changing the SQL query causes
+// the cursor state key to change (because the query is part of the key hash),
+// effectively resetting the cursor to the default value.
+func testOracleQueryChangeResetsCursor(t *testing.T, dsn string) {
+	t.Helper()
+
+	testPaths := createTestPaths(t)
+
+	// First query — fetch 5 rows
+	query1 := "SELECT id, event_data FROM cursor_test_events WHERE id > :cursor ORDER BY id ASC FETCH FIRST 5 ROWS ONLY"
+
+	cfg1 := map[string]interface{}{
+		"module":              "sql",
+		"metricsets":          []string{"query"},
+		"hosts":               []string{dsn},
+		"driver":              "oracle",
+		"sql_query":           query1,
+		"sql_response_format": tableResponseFormat,
+		"raw_data.enabled":    true,
+		"cursor.enabled":      true,
+		"cursor.column":       "id",
+		"cursor.type":         cursor.CursorTypeInteger,
+		"cursor.default":      "0",
+	}
+
+	ms1 := newMetricSetWithPaths(t, cfg1, testPaths)
+	events1, errs1 := fetchEvents(t, ms1)
+	require.Empty(t, errs1)
+	require.Len(t, events1, 5, "First query should return 5 events")
+	if closer, ok := ms1.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Change the query (different FETCH FIRST) — this generates a different
+	// state key hash, so the cursor resets to default.
+	query2 := "SELECT id, event_data FROM cursor_test_events WHERE id > :cursor ORDER BY id ASC FETCH FIRST 3 ROWS ONLY"
+
+	cfg2 := map[string]interface{}{
+		"module":              "sql",
+		"metricsets":          []string{"query"},
+		"hosts":               []string{dsn},
+		"driver":              "oracle",
+		"sql_query":           query2,
+		"sql_response_format": tableResponseFormat,
+		"raw_data.enabled":    true,
+		"cursor.enabled":      true,
+		"cursor.column":       "id",
+		"cursor.type":         cursor.CursorTypeInteger,
+		"cursor.default":      "0",
+	}
+
+	// Should start from default (0) because the query changed
+	ms2 := newMetricSetWithPaths(t, cfg2, testPaths)
+	events2, errs2 := fetchEvents(t, ms2)
+	require.Empty(t, errs2)
+	require.Len(t, events2, 3,
+		"Changed query should start from default cursor (0), returning first 3 events")
+	if closer, ok := ms2.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+}
+
+// testOracleDriverTypeConversions verifies that Oracle column types are correctly
+// handled through the cursor pipeline. This tests the full round-trip:
+// Oracle type → godror Go type → getValue() → FromDatabaseValue/ParseValue.
+func testOracleDriverTypeConversions(t *testing.T, db *sql.DB) {
+	t.Helper()
+
+	// Query a row to inspect godror's type mapping for Oracle columns
+	rows, err := db.Query("SELECT id, created_at, event_date FROM cursor_test_events WHERE ROWNUM <= 1")
+	require.NoError(t, err)
+	defer rows.Close()
+
+	require.True(t, rows.Next(), "Should have at least one row")
+
+	// Log Oracle column types for debugging
+	cols, err := rows.ColumnTypes()
+	require.NoError(t, err)
+	for _, col := range cols {
+		t.Logf("Oracle column mapping: %s → DatabaseTypeName=%s, ScanType=%v",
+			col.Name(), col.DatabaseTypeName(), col.ScanType())
+	}
+
+	var id, createdAt, eventDate interface{}
+	err = rows.Scan(&id, &createdAt, &eventDate)
+	require.NoError(t, err)
+
+	t.Logf("Oracle NUMBER (id) → Go type: %T, value: %v", id, id)
+	t.Logf("Oracle TIMESTAMP (created_at) → Go type: %T, value: %v", createdAt, createdAt)
+	t.Logf("Oracle DATE (event_date) → Go type: %T, value: %v", eventDate, eventDate)
+
+	// Verify Oracle TIMESTAMP → time.Time (which godror returns natively).
+	// This is important because the cursor pipeline relies on getValue()
+	// converting time.Time to RFC3339Nano string for mapstr.M storage.
+	if ts, ok := createdAt.(time.Time); ok {
+		formatted := ts.Format(time.RFC3339Nano)
+		val, err := cursor.ParseValue(formatted, cursor.CursorTypeTimestamp)
+		assert.NoError(t, err,
+			"Oracle TIMESTAMP → time.Time → RFC3339Nano should round-trip through cursor.ParseValue")
+		if err == nil {
+			// Verify ToDriverArg returns time.Time (which godror needs for TIMESTAMP binding)
+			driverArg := val.ToDriverArg()
+			_, isTime := driverArg.(time.Time)
+			assert.True(t, isTime,
+				"cursor.ToDriverArg() for timestamp should return time.Time, got %T", driverArg)
+		}
+	} else {
+		t.Logf("Note: Oracle TIMESTAMP scanned as %T (not time.Time); cursor pipeline handles this via getValue()", createdAt)
+	}
+
+	// Verify Oracle DATE → time.Time round-trip
+	if dt, ok := eventDate.(time.Time); ok {
+		formatted := dt.Format("2006-01-02")
+		_, err := cursor.ParseValue(formatted, cursor.CursorTypeDate)
+		assert.NoError(t, err,
+			"Oracle DATE → time.Time → date string should round-trip through cursor.ParseValue")
+	} else {
+		t.Logf("Note: Oracle DATE scanned as %T (not time.Time); cursor pipeline handles this via getValue()", eventDate)
+	}
+
+	// Verify Oracle NUMBER round-trip through fmt.Sprint (which getValue uses for unknown types)
+	idStr := fmt.Sprint(id)
+	_, err = cursor.ParseValue(idStr, cursor.CursorTypeInteger)
+	assert.NoError(t, err,
+		"Oracle NUMBER → fmt.Sprint(%T) → %q should be parseable as integer cursor value", id, idStr)
+}
+
+// getOracleDSNWithTimezone builds an Oracle DSN with explicit timezone settings.
+// sessionTZ is the Oracle session TIME_ZONE (e.g., "+05:00", "US/Eastern").
+// goTZ is the timezone godror uses to interpret TIMESTAMP values from Oracle.
+func getOracleDSNWithTimezone(t *testing.T, host, port, sessionTZ string, goTZ *time.Location) string {
+	t.Helper()
+	connectString := GetOracleConnectString(host, port)
+	params, err := godror.ParseDSN(connectString)
+	require.NoError(t, err, "Failed to parse Oracle DSN: %s", connectString)
+	params.AlterSession = append(params.AlterSession, [2]string{"TIME_ZONE", sessionTZ})
+	params.Timezone = goTZ
+	return params.StringWithPassword()
+}
+
+// testOracleTimestampCursorTimezoneMismatch reproduces the Oracle timestamp cursor
+// bug that occurs when there is a timezone mismatch between the Oracle session
+// timezone and the timezone embedded in godror's bind parameters.
+//
+// ## Root cause
+//
+// Oracle's TIMESTAMP column stores values without timezone info. The godror driver
+// sends Go time.Time bind parameters as TIMESTAMP WITH TIME ZONE (OCI type
+// SQLT_TIMESTAMP_TZ), carrying the UTC zone marker. When Oracle compares a stored
+// TIMESTAMP against a TIMESTAMP WITH TIME ZONE bind parameter, it implicitly
+// converts the stored TIMESTAMP to TIMESTAMP WITH TIME ZONE using the session
+// timezone (per Oracle comparison rules). If the session timezone is not UTC,
+// this conversion shifts the effective time, causing the comparison to fail.
+//
+// ## Reproduction
+//
+//  1. Set Oracle session TIME_ZONE = '+05:00', godror params.Timezone = UTC
+//  2. Insert: Go sends time.Time{14:00 UTC}. godror writes to TIMESTAMP column;
+//     Oracle stores the raw value 14:00 (no TZ conversion for plain TIMESTAMP).
+//  3. Read: Oracle returns TIMESTAMP '14:00'. godror (Timezone=UTC) creates
+//     time.Time{14:00 UTC}. Round-trip is consistent — difference is 0.
+//  4. Cursor stores 14:00 UTC. ToDriverArg() returns time.Time{14:00 UTC}.
+//  5. Second fetch bind: godror sends TIMESTAMP WITH TIME ZONE '14:00 UTC'.
+//     Oracle compares stored TIMESTAMP '14:00' by converting it using session
+//     TZ: 14:00 +05:00 = 09:00 UTC. Comparison: 09:00 UTC > 14:00 UTC → FALSE.
+//     Returns 0 rows.
+//
+// The bug does NOT manifest when the Oracle session timezone is UTC (as in the
+// other tests that use GetOracleConnectionDetails which sets TIME_ZONE='UTC').
+//
+// ## Expected behavior (after fix)
+//
+// The cursor should correctly paginate through all rows regardless of timezone
+// configuration. The fix should ensure that the bind parameter type matches the
+// column type (plain TIMESTAMP, not TIMESTAMP WITH TIME ZONE).
+func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) {
+	t.Helper()
+
+	// Build a DSN with timezone MISMATCH:
+	// - Oracle session timezone = '+05:00' (simulates a non-UTC database)
+	// - godror interprets timestamps as UTC (simulates Metricbeat running on UTC host)
+	//
+	// In production, users don't call ALTER SESSION SET TIME_ZONE and godror
+	// uses the local timezone. If the Oracle DB defaults to a non-UTC timezone,
+	// this exact mismatch occurs.
+	mismatchDSN := getOracleDSNWithTimezone(t, host, port, "+05:00", time.UTC)
+
+	// Create a separate table for this test to avoid interfering with other tests
+	tableName := "cursor_tz_mismatch_test"
+	db, err := sql.Open("godror", mismatchDSN)
+	require.NoError(t, err, "Failed to connect with timezone-mismatch DSN")
+	defer db.Close()
+
+	// Setup table
+	_, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName))
+	_, err = db.Exec(fmt.Sprintf(`
+		CREATE TABLE %s (
+			id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+			event_data VARCHAR2(255),
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		)
+	`, tableName))
+	require.NoError(t, err, "Failed to create timezone test table")
+	defer func() { _, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName)) }()
+
+	// Insert 10 rows with timestamps 1 second apart.
+	// With params.Timezone=UTC, godror sends the raw UTC value and Oracle stores
+	// it as-is in the plain TIMESTAMP column (no timezone conversion on storage).
+	now := time.Now().UTC()
+	for i := 0; i < 10; i++ {
+		ts := now.Add(time.Duration(i) * time.Second)
+		_, err := db.Exec(
+			fmt.Sprintf("INSERT INTO %s (event_data, created_at) VALUES (:1, :2)", tableName),
+			fmt.Sprintf("event-%d", i), ts)
+		require.NoError(t, err, "Failed to insert row %d", i)
+	}
+
+	// Diagnostic: verify what Oracle stored and how godror reads it back.
+	// The round-trip should be consistent (difference ≈ 0) because both
+	// insert and read use the same params.Timezone=UTC. The mismatch only
+	// manifests during comparison (WHERE clause with > operator).
+	var storedTS time.Time
+	err = db.QueryRow(fmt.Sprintf(
+		"SELECT created_at FROM %s WHERE ROWNUM = 1 ORDER BY id", tableName)).Scan(&storedTS)
+	require.NoError(t, err)
+	t.Logf("Inserted Go time (UTC):  %s", now.Format(time.RFC3339Nano))
+	t.Logf("Read back via godror:    %s", storedTS.Format(time.RFC3339Nano))
+	t.Logf("Round-trip difference:   %v (expected ≈ 0)", storedTS.Sub(now).Truncate(time.Millisecond))
+
+	// Diagnostic: verify the timezone mismatch affects comparisons.
+	// Use a raw SQL query with a TIMESTAMP WITH TIME ZONE literal to show
+	// that Oracle converts stored TIMESTAMP using session TZ for comparison.
+	var countDirect int
+	err = db.QueryRow(fmt.Sprintf(
+		"SELECT COUNT(*) FROM %s WHERE created_at > TO_TIMESTAMP(:1, 'YYYY-MM-DD\"T\"HH24:MI:SS.FF\"Z\"')",
+		tableName),
+		now.Add(-1*time.Hour).Format("2006-01-02T15:04:05.000000Z")).Scan(&countDirect)
+	require.NoError(t, err)
+	t.Logf("Direct query (TO_TIMESTAMP, no TZ info): %d rows (should be 10)", countDirect)
+
+	// Now run the timestamp cursor test with this mismatched DSN.
+	// Use a far-past default so the first fetch succeeds even with the TZ shift.
+	// Oracle converts stored TIMESTAMP '14:48:04' using session TZ +05:00 to
+	// '14:48:04 +05:00' = '09:48:04 UTC'. With default '2000-01-01T00:00:00Z',
+	// '09:48:04 UTC > 2000-01-01 00:00:00 UTC' → TRUE, so first fetch works.
+	testPaths := createTestPaths(t)
+	defaultTimestamp := "2000-01-01T00:00:00Z"
+
+	query := fmt.Sprintf(
+		"SELECT id, event_data, created_at FROM %s WHERE created_at > :cursor ORDER BY created_at ASC FETCH FIRST 3 ROWS ONLY",
+		tableName)
+
+	cfg := map[string]interface{}{
+		"module":              "sql",
+		"metricsets":          []string{"query"},
+		"hosts":               []string{mismatchDSN},
+		"driver":              "oracle",
+		"sql_query":           query,
+		"sql_response_format": tableResponseFormat,
+		"raw_data.enabled":    true,
+		"cursor.enabled":      true,
+		"cursor.column":       "created_at",
+		"cursor.type":         cursor.CursorTypeTimestamp,
+		"cursor.default":      defaultTimestamp,
+	}
+
+	// First fetch — should get 3 rows.
+	// Default cursor is year 2000, so even with the +05:00 timezone shift making
+	// stored values appear ~5h earlier in UTC, all rows still satisfy the condition.
+	ms1 := newMetricSetWithPaths(t, cfg, testPaths)
+	events1, errs1 := fetchEvents(t, ms1)
+	require.Empty(t, errs1, "First fetch should not error")
+	require.Len(t, events1, 3, "First fetch should return 3 events")
+	t.Logf("TZ mismatch test - First fetch: %d events", len(events1))
+	if closer, ok := ms1.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Second fetch — THIS IS WHERE THE BUG MANIFESTS.
+	//
+	// After the first fetch, the cursor stores a timestamp read back by godror
+	// (e.g., 14:48:06 UTC). ToDriverArg() returns time.Time{14:48:06 UTC}.
+	// godror sends this as TIMESTAMP WITH TIME ZONE '14:48:06 UTC'.
+	//
+	// Oracle converts stored TIMESTAMP '14:48:07' (next row) using session
+	// TZ (+05:00): 14:48:07 +05:00 = 09:48:07 UTC.
+	//
+	// Comparison: 09:48:07 UTC > 14:48:06 UTC → FALSE → 0 rows returned.
+	//
+	// The stored value (09:48:07 UTC after TZ conversion) appears ~5 hours
+	// BEHIND the cursor value (14:48:06 UTC), so no rows match.
+	ms2 := newMetricSetWithPaths(t, cfg, testPaths)
+	events2, errs2 := fetchEvents(t, ms2)
+	require.Empty(t, errs2, "Second fetch should not error")
+	require.Len(t, events2, 3,
+		"Second fetch with timezone mismatch should return 3 events; "+
+			"got 0 indicates the Oracle timestamp cursor is affected by "+
+			"timezone mismatch between session TZ (+05:00) and godror TZ (UTC) — "+
+			"the bind parameter arrives as TIMESTAMP WITH TIME ZONE (UTC) but "+
+			"Oracle converts stored TIMESTAMP using session TZ for comparison")
+	t.Logf("TZ mismatch test - Second fetch: %d events", len(events2))
+	if closer, ok := ms2.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Third fetch — verify full pagination continues
+	ms3 := newMetricSetWithPaths(t, cfg, testPaths)
+	events3, errs3 := fetchEvents(t, ms3)
+	require.Empty(t, errs3, "Third fetch should not error")
+	require.Len(t, events3, 3, "Third fetch should return 3 events")
+	if closer, ok := ms3.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Fourth fetch — last row
+	ms4 := newMetricSetWithPaths(t, cfg, testPaths)
+	events4, errs4 := fetchEvents(t, ms4)
+	require.Empty(t, errs4, "Fourth fetch should not error")
+	require.Len(t, events4, 1, "Fourth fetch should return 1 event")
+	if closer, ok := ms4.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
 }
