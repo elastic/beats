@@ -1,4 +1,4 @@
-FROM golang:1.24.11-bookworm
+FROM golang:1.24.13-bookworm
 COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker  /usr/local/bin/
 COPY --from=docker:26.0.0-alpine3.19 /usr/local/libexec/docker/cli-plugins/docker-compose /usr/local/lib/docker/cli-plugins/docker-compose
 
