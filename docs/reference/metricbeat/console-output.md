@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/console-output.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Configure the Console output [console-output]
