@@ -17,14 +17,19 @@ import (
 )
 
 const (
-	configName                  = "osq_config"
-	defaultScheduleSplayPercent = 10
-	defaultScheduleMaxDrift     = 60 // seconds; osquery's default for splay drift compensation
-	maxECSMappingDepth          = 25 // Max ECS dot delimited key path, that is sufficient for the current ECS mapping
+	configName         = "osq_config"
+	maxECSMappingDepth = 25 // Max ECS dot delimited key path, that is sufficient for the current ECS mapping
 
 	keyField = "field"
 	keyValue = "value"
 )
+
+// nativeOsqueryOptionDefaults are applied to the options map when building the
+// config for osqueryd, only when each key is not already set in the native config.
+var nativeOsqueryOptionDefaults = map[string]interface{}{
+	"schedule_splay_percent": 10,
+	"schedule_max_drift":     60,
+}
 
 var (
 	ErrECSMappingIsInvalid = errors.New("ECS mapping is invalid")
@@ -34,8 +39,8 @@ var (
 type QueryInfo struct {
 	Query      string
 	ECSMapping ecs.Mapping
-	// ActionID is the policy-defined action id for this query (optional)
-	ActionID string
+	// ScheduleID is the policy-defined schedule id for this query (optional; from Kibana)
+	ScheduleID string
 	// StartDate is the start date for native schedules (RFC3339); required for schedule_execution_count
 	StartDate string
 	// Interval is the schedule interval in seconds for native schedules; used to compute schedule_execution_count
@@ -152,17 +157,10 @@ func newOsqueryConfig(osqueryConfig *config.OsqueryConfig) *config.OsqueryConfig
 	if osqueryConfig.Options == nil {
 		osqueryConfig.Options = make(map[string]interface{})
 	}
-	// Apply native schedule splay defaults only when not explicitly set (so user values are not overwritten)
-	const scheduleSplayPercentKey = "schedule_splay_percent"
-	if osqueryConfig.ScheduleSplayPercent == nil {
-		if _, ok := osqueryConfig.Options[scheduleSplayPercentKey]; !ok {
-			osqueryConfig.Options[scheduleSplayPercentKey] = defaultScheduleSplayPercent
-		}
-	}
-	const scheduleMaxDriftKey = "schedule_max_drift"
-	if osqueryConfig.ScheduleMaxDrift == nil {
-		if _, ok := osqueryConfig.Options[scheduleMaxDriftKey]; !ok {
-			osqueryConfig.Options[scheduleMaxDriftKey] = defaultScheduleMaxDrift
+	// Apply native osquery option defaults only when not already set in config
+	for k, v := range nativeOsqueryOptionDefaults {
+		if _, ok := osqueryConfig.Options[k]; !ok {
+			osqueryConfig.Options[k] = v
 		}
 	}
 	return osqueryConfig
@@ -229,7 +227,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		newQueryInfoMap[name] = QueryInfo{
 			Query:      qi.Query,
 			ECSMapping: ecsm,
-			ActionID:   qi.ActionID,
+			ScheduleID: qi.ScheduleID,
 			StartDate:  qi.StartDate,
 			Interval:   qi.Interval,
 		}
@@ -274,11 +272,11 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		}
 		for _, stream := range input.Streams {
 			qi := config.Query{
-				Query:      stream.Query,
-				Interval:   stream.Interval,
-				Platform:   stream.Platform,
-				Version:    stream.Version,
-				ECSMapping: stream.ECSMapping,
+				Query:          stream.Query,
+				NativeSchedule: config.NativeSchedule{Interval: stream.Interval},
+				Platform:       stream.Platform,
+				Version:        stream.Version,
+				ECSMapping:     stream.ECSMapping,
 			}
 
 			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi)

@@ -13,153 +13,23 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestOsqueryConfig_Render_ScheduleSplayPercent(t *testing.T) {
-	tests := []struct {
-		name           string
-		config         OsqueryConfig
-		expectedSplay  interface{}
-		expectedInJSON bool
-	}{
-		{
-			name:           "nil splay percent - not included in output",
-			config:         OsqueryConfig{},
-			expectedInJSON: false,
+func TestOsqueryConfig_Render_Options(t *testing.T) {
+	// Native osquery options (e.g. schedule_splay_percent, schedule_max_drift) are
+	// passed through in Options; defaults are applied when building config for osqueryd (beater).
+	rendered, err := OsqueryConfig{
+		Options: map[string]interface{}{
+			"schedule_splay_percent": 10,
+			"schedule_max_drift":     60,
 		},
-		{
-			name: "splay percent set to 10",
-			config: OsqueryConfig{
-				ScheduleSplayPercent: intPtr(10),
-			},
-			expectedSplay:  float64(10), // JSON unmarshals numbers as float64
-			expectedInJSON: true,
-		},
-		{
-			name: "splay percent set to 0 - disables splay",
-			config: OsqueryConfig{
-				ScheduleSplayPercent: intPtr(0),
-			},
-			expectedSplay:  float64(0),
-			expectedInJSON: true,
-		},
-		{
-			name: "splay percent does not override explicit options value",
-			config: OsqueryConfig{
-				Options: map[string]interface{}{
-					"schedule_splay_percent": 20,
-				},
-				ScheduleSplayPercent: intPtr(10),
-			},
-			expectedSplay:  float64(20), // The explicit options value should be preserved
-			expectedInJSON: true,
-		},
-		{
-			name: "splay percent with existing options map",
-			config: OsqueryConfig{
-				Options: map[string]interface{}{
-					"schedule_timeout": 300,
-				},
-				ScheduleSplayPercent: intPtr(15),
-			},
-			expectedSplay:  float64(15),
-			expectedInJSON: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			rendered, err := tt.config.Render()
-			require.NoError(t, err)
-
-			var result map[string]interface{}
-			err = json.Unmarshal(rendered, &result)
-			require.NoError(t, err)
-
-			if tt.expectedInJSON {
-				options, ok := result["options"].(map[string]interface{})
-				require.True(t, ok, "options should be present in rendered output")
-				assert.Equal(t, tt.expectedSplay, options["schedule_splay_percent"])
-			} else {
-				// Either no options or no schedule_splay_percent in options
-				if options, ok := result["options"].(map[string]interface{}); ok {
-					_, hasSplay := options["schedule_splay_percent"]
-					assert.False(t, hasSplay, "schedule_splay_percent should not be in options")
-				}
-			}
-		})
-	}
-}
-
-func TestOsqueryConfig_Render_ScheduleMaxDrift(t *testing.T) {
-	tests := []struct {
-		name           string
-		config         OsqueryConfig
-		expectedDrift  interface{}
-		expectedInJSON bool
-	}{
-		{
-			name:           "nil max drift - not included in output",
-			config:         OsqueryConfig{},
-			expectedInJSON: false,
-		},
-		{
-			name: "max drift set to 60",
-			config: OsqueryConfig{
-				ScheduleMaxDrift: intPtr(60),
-			},
-			expectedDrift:  float64(60),
-			expectedInJSON: true,
-		},
-		{
-			name: "max drift set to 0 - disables drift compensation",
-			config: OsqueryConfig{
-				ScheduleMaxDrift: intPtr(0),
-			},
-			expectedDrift:  float64(0),
-			expectedInJSON: true,
-		},
-		{
-			name: "max drift does not override explicit options value",
-			config: OsqueryConfig{
-				Options: map[string]interface{}{
-					"schedule_max_drift": 120,
-				},
-				ScheduleMaxDrift: intPtr(60),
-			},
-			expectedDrift:  float64(120),
-			expectedInJSON: true,
-		},
-		{
-			name: "both splay percent and max drift",
-			config: OsqueryConfig{
-				ScheduleSplayPercent: intPtr(15),
-				ScheduleMaxDrift:     intPtr(90),
-			},
-			expectedDrift:  float64(90),
-			expectedInJSON: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			rendered, err := tt.config.Render()
-			require.NoError(t, err)
-
-			var result map[string]interface{}
-			err = json.Unmarshal(rendered, &result)
-			require.NoError(t, err)
-
-			if tt.expectedInJSON {
-				options, ok := result["options"].(map[string]interface{})
-				require.True(t, ok, "options should be present in rendered output")
-				assert.Equal(t, tt.expectedDrift, options["schedule_max_drift"])
-			} else {
-				if options, ok := result["options"].(map[string]interface{}); ok {
-					_, hasDrift := options["schedule_max_drift"]
-					assert.False(t, hasDrift, "schedule_max_drift should not be in options")
-				}
-			}
-		})
-	}
+	}.Render()
+	require.NoError(t, err)
+	var result map[string]interface{}
+	err = json.Unmarshal(rendered, &result)
+	require.NoError(t, err)
+	options, ok := result["options"].(map[string]interface{})
+	require.True(t, ok)
+	assert.Equal(t, float64(10), options["schedule_splay_percent"])
+	assert.Equal(t, float64(60), options["schedule_max_drift"])
 }
 
 func TestRRuleScheduleConfig_IsEnabled(t *testing.T) {

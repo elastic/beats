@@ -21,11 +21,11 @@ func TestHitToEvent(t *testing.T) {
 	const maxMask = 0b1111111
 
 	type params struct {
-		index, eventType, actionID, responseID string
-		meta                                   map[string]interface{}
-		hit                                    map[string]interface{}
-		ecsm                                   ecs.Mapping
-		reqData                                interface{}
+		index, eventType, idValue, idFieldKey, responseID string
+		meta                                              map[string]interface{}
+		hit                                               map[string]interface{}
+		ecsm                                              ecs.Mapping
+		reqData                                           interface{}
 	}
 
 	genParams := func(mask int) (p params) {
@@ -36,7 +36,7 @@ func TestHitToEvent(t *testing.T) {
 			p.eventType = "osquery_manager"
 		}
 		if mask>>4&1 > 0 {
-			p.actionID = "uptime"
+			p.idValue = "uptime"
 		}
 		if mask>>3&1 > 0 {
 			p.responseID = uuid.Must(uuid.NewV4()).String()
@@ -63,7 +63,7 @@ func TestHitToEvent(t *testing.T) {
 
 	for i := 0; i < maxMask; i++ {
 		p := genParams(i)
-		ev := hitToEvent(p.index, p.eventType, p.actionID, p.responseID, p.meta, p.hit, p.ecsm, p.reqData)
+		ev := hitToEvent(p.index, p.eventType, p.idValue, p.idFieldKey, p.responseID, p.meta, p.hit, p.ecsm, p.reqData)
 
 		if p.index != "" {
 			diff := cmp.Diff(p.index, ev.Meta[events.FieldMetaRawIndex])
@@ -81,7 +81,7 @@ func TestHitToEvent(t *testing.T) {
 			t.Error(diff)
 		}
 
-		diff = cmp.Diff(p.actionID, ev.Fields["action_id"])
+		diff = cmp.Diff(p.idValue, ev.Fields[p.idFieldKey])
 		if diff != "" {
 			t.Error(diff)
 		}

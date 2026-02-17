@@ -145,12 +145,12 @@ func (h *recurrenceQueryHandler) createScheduledQuery(name string, q config.Quer
 		Query:    q.Query,
 		Timeout:  timeout,
 		Schedule: recurrenceSchedule,
-		ActionID: q.ActionID,
+		ScheduleID: q.ScheduleID,
 	}, nil
 }
 
 // executeQuery is called by the scheduler to execute a query
-func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int) error {
+func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, name, query string, timeout time.Duration, scheduleID string, executionIndex int) error {
 	h.log.Debugf("Executing RRULE-scheduled query '%s' (execution #%d)", name, executionIndex)
 
 	startedAt := time.Now()
@@ -176,9 +176,9 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, name, query s
 		ecsMapping = qi.ECSMapping
 	}
 
-	// Use policy action_id when provided
-	if actionID == "" {
-		actionID = name
+	// Use policy schedule_id when provided
+	if scheduleID == "" {
+		scheduleID = name
 	}
 
 	// Generate a response ID
@@ -193,10 +193,10 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, name, query s
 		"schedule_execution_count": executionIndex,
 	}
 
-	h.publisher.Publish(config.Datastream(ns), actionID, responseID, meta, hits, ecsMapping, nil)
+	h.publisher.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, meta, hits, ecsMapping, nil)
 
 	// Synthetic response document (no action) with execution count for correlation
-	h.publisher.PublishScheduledResponse(actionID, responseID, startedAt, completedAt, len(hits), int64(executionIndex))
+	h.publisher.PublishScheduledResponse(scheduleID, responseID, startedAt, completedAt, len(hits), int64(executionIndex))
 
 	h.log.Debugf("RRULE-scheduled query '%s' completed with %d results", name, len(hits))
 	return nil

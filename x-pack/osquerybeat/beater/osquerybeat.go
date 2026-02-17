@@ -445,10 +445,10 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 		return
 	}
 
-	// Use policy action_id when set, otherwise query name
-	actionID := qi.ActionID
-	if actionID == "" {
-		actionID = res.Name
+	// Use policy schedule_id when set, otherwise query name
+	scheduleID := qi.ScheduleID
+	if scheduleID == "" {
+		scheduleID = res.Name
 	}
 	// Schedule execution count from start_date + interval (same across agents)
 	scheduleExecutionCount := nativeScheduleExecutionCount(qi.StartDate, qi.Interval, res.UnixTime)
@@ -470,7 +470,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 		hits = append(hits, snapshot...)
 		totalHits = len(hits)
 		meta := queryResultMeta("snapshot", "", res, scheduleExecutionCount)
-		bt.pub.Publish(config.Datastream(ns), actionID, responseID, meta, hits, qi.ECSMapping, nil)
+		bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, meta, hits, qi.ECSMapping, nil)
 	} else {
 		if len(res.DiffResults.Added) > 0 {
 			added, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Added)
@@ -480,7 +480,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 			}
 			hits = append(hits, added...)
 			meta := queryResultMeta("diff", "added", res, scheduleExecutionCount)
-			bt.pub.Publish(config.Datastream(ns), actionID, responseID, meta, hits, qi.ECSMapping, nil)
+			bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, meta, hits, qi.ECSMapping, nil)
 		}
 		if len(res.DiffResults.Removed) > 0 {
 			removed, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Removed)
@@ -490,12 +490,12 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 			}
 			hits = append(hits, removed...)
 			meta := queryResultMeta("diff", "removed", res, scheduleExecutionCount)
-			bt.pub.Publish(config.Datastream(ns), actionID, responseID, meta, hits, qi.ECSMapping, nil)
+			bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, meta, hits, qi.ECSMapping, nil)
 		}
 		totalHits = len(hits)
 	}
 
-	bt.pub.PublishScheduledResponse(actionID, responseID, runTime, runTime, totalHits, int64(scheduleExecutionCount))
+	bt.pub.PublishScheduledResponse(scheduleID, responseID, runTime, runTime, totalHits, int64(scheduleExecutionCount))
 }
 
 func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64) map[string]interface{} {

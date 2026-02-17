@@ -26,11 +26,11 @@ type actionResultPublisher interface {
 }
 
 type queryResultPublisher interface {
-	Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
+	Publish(index, idValue, idFieldKey, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
 }
 
 type scheduledResponsePublisher interface {
-	PublishScheduledResponse(actionID, responseID string, startedAt, completedAt time.Time, resultCount int, scheduleExecutionCount int64)
+	PublishScheduledResponse(scheduleID, responseID string, startedAt, completedAt time.Time, resultCount int, scheduleExecutionCount int64)
 }
 
 type scheduledQueryPublisher interface {
@@ -117,7 +117,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	a.log.Debugf("Completed query in: %v", time.Since(start))
 
-	a.publisher.Publish(index, ac.ID, responseID, nil, hits, ac.ECSMapping, req["data"])
+	a.publisher.Publish(index, ac.ID, "action_id", responseID, nil, hits, ac.ECSMapping, req["data"])
 
 	return len(hits), nil
 }

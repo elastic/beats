@@ -15,9 +15,9 @@ import (
 )
 
 // QueryFunc is the function type for executing a query.
-// actionID is the policy-defined action id (may be empty, caller can use name).
+// scheduleID is the policy-defined schedule id (may be empty, caller can use name).
 // executionIndex is the 1-based schedule execution count for this run.
-type QueryFunc func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int) error
+type QueryFunc func(ctx context.Context, name, query string, timeout time.Duration, scheduleID string, executionIndex int) error
 
 // ScheduledQuery represents a query with its recurrence schedule
 type ScheduledQuery struct {
@@ -25,8 +25,8 @@ type ScheduledQuery struct {
 	Query    string
 	Timeout  time.Duration
 	Schedule *RecurrenceSchedule
-	// ActionID is the policy-defined action id for this scheduled query (optional)
-	ActionID string
+	// ScheduleID is the policy-defined schedule id for this scheduled query (optional)
+	ScheduleID string
 }
 
 // Scheduler manages cron-based query scheduling
@@ -283,11 +283,11 @@ func (s *Scheduler) executeQuery(ctx context.Context, sq *ScheduledQuery, runTim
 		defer cancel()
 	}
 
-	actionID := sq.ActionID
-	if actionID == "" {
-		actionID = sq.Name
+	scheduleID := sq.ScheduleID
+	if scheduleID == "" {
+		scheduleID = sq.Name
 	}
-	err := s.queryFunc(execCtx, sq.Name, sq.Query, sq.Timeout, actionID, executionIndex)
+	err := s.queryFunc(execCtx, sq.Name, sq.Query, sq.Timeout, scheduleID, executionIndex)
 	if err != nil {
 		s.log.Errorf("Error executing scheduled query '%s': %v", sq.Name, err)
 	} else {

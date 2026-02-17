@@ -32,8 +32,8 @@ osquerybeat:
 #        schedule:
 #          process_check:
 #            query: "select * from processes"
-#            # Optional: policy-defined action_id (stored in policy, used in results/responses)
-#            # action_id: "policy-action-uuid"
+#            # Optional: policy-defined schedule_id (from Kibana, used in results/responses)
+#            # schedule_id: "policy-schedule-uuid"
 #            # For native schedules: start_date (RFC3339) is optional. When set, it enables
 #            # consistent schedule_execution_count across agents (computed as 1 + (run_time - start_date) / interval).
 #            # start_date: "2024-01-01T00:00:00Z"
