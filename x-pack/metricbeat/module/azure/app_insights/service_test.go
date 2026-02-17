@@ -178,7 +178,7 @@ func TestTokenCredentialAuthorizer_WithAuthorization(t *testing.T) {
 		_, err := preparer.Prepare(req)
 
 		require.Error(t, err)
-		assert.Equal(t, prevErr, err)
+		assert.ErrorIs(t, err, prevErr)
 		assert.Empty(t, req.Header.Get("Authorization"), "Authorization header should not be set when previous preparer fails")
 	})
 
