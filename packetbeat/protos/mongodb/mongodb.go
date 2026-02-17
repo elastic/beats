@@ -249,7 +249,11 @@ func (mongodb *mongodbPlugin) onRequest(conn *mongodbConnectionData, msg *mongod
 
 	// try to find matching response potentially inserted before
 	if v := mongodb.responses.Delete(key); v != nil {
-		resp := v.(*mongodbMessage)
+		resp, ok := v.(*mongodbMessage)
+		if !ok {
+			debugf("Unexpected type in responses cache for key %+v", key)
+			return
+		}
 		mongodb.onTransComplete(msg, resp)
 		return
 	}
@@ -268,7 +272,11 @@ func (mongodb *mongodbPlugin) onResponse(conn *mongodbConnectionData, msg *mongo
 
 	// try to find matching request
 	if v := mongodb.requests.Delete(key); v != nil {
-		requ := v.(*mongodbMessage)
+		requ, ok := v.(*mongodbMessage)
+		if !ok {
+			debugf("Unexpected type in requests cache for key %+v", key)
+			return
+		}
 		mongodb.onTransComplete(requ, msg)
 		return
 	}
