@@ -1468,7 +1468,15 @@ func TestInput(t *testing.T) {
 
 			var tempDir string
 			if conf.Request.Tracer != nil {
-				tempDir = t.TempDir()
+				err := os.MkdirAll("httpjson", 0o700)
+				if err != nil {
+					t.Fatalf("failed to create root logging destination: %v", err)
+				}
+				tempDir, err = os.MkdirTemp("httpjson", "logs-*")
+				if err != nil {
+					t.Fatalf("failed to create logging destination: %v", err)
+				}
+				defer os.RemoveAll("httpjson")
 				conf.Request.Tracer.Filename = filepath.Join(tempDir, conf.Request.Tracer.Filename)
 			}
 
