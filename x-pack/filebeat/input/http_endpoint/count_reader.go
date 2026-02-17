@@ -55,7 +55,7 @@ func (m *countReader) Read(p []byte) (int, error) {
 }
 
 // Close closes the underlying reader and subtracts the bytes read by this reader
-// from the shared in-flight counter unless commit was called.
+// from the shared in-flight counter.
 func (m *countReader) Close() error {
 	if m.closed {
 		return nil
@@ -63,14 +63,4 @@ func (m *countReader) Close() error {
 	m.closed = true
 	m.inFlight.Add(-m.read)
 	return m.r.Close()
-}
-
-// commit returns the number of bytes read and resets the internal counter to zero.
-// This prevents Close from releasing the bytes, transferring responsibility for
-// releasing them to the caller. Use this when the bytes should be held in-flight
-// until some later event (e.g., ACK from Elasticsearch).
-func (m *countReader) commit() int64 {
-	n := m.read
-	m.read = 0
-	return n
 }

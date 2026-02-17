@@ -177,9 +177,8 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// If we are tracking in flight bytes, wrap body with countReader for
 	// just-in-time byte counting. The countReader tracks bytes as they are read.
-	// On error, Close releases the bytes. On success with ACK tracking, we call
-	// the countReader commit method to transfer responsibility for releasing
-	// bytes to the ACK handler.
+	// On return Close releases the bytes. In the error case this is immediate,
+	// and in the success case after any ACK wait completes.
 	var countedBody *countReader
 	if h.maxInFlight > 0 {
 		countedBody = newCountReader(body, &h.inFlight, h.maxInFlight)
@@ -267,19 +266,8 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// Non-ACK request: bytes will be released by defer body.Close()
 		h.sendResponse(w, respCode, respBody)
 	} else {
-		// ACK request: commit the bytes so Close() won't release them.
-		// We hold the bytes in-flight until ACK/timeout/cancel.
-		var committed int64
-		if countedBody != nil {
-			committed = countedBody.commit()
-		}
-		defer func() {
-			// Release the committed bytes when ACK wait completes.
-			if committed > 0 {
-				h.inFlight.Add(-committed)
-			}
-		}()
-
+		// ACK request: bytes will be released by defer body.Close()
+		// when the function returns after the select completes.
 		select {
 		case <-acked:
 			h.log.Debugw("request acked", "tx_id", txID)
