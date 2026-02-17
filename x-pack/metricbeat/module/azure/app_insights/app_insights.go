@@ -35,7 +35,7 @@ type Config struct {
 	ActiveDirectoryEndpoint string `config:"active_directory_endpoint"`
 }
 
-// Validate checks that exactly one authentication method is configured.
+// Validate checks that at least one authentication method is configured.
 func (c *Config) Validate() error {
 	hasOAuth2 := c.TenantId != "" && c.ClientId != "" && c.ClientSecret != ""
 	hasPartialOAuth2 := (c.TenantId != "" || c.ClientId != "" || c.ClientSecret != "") && !hasOAuth2
@@ -43,10 +43,6 @@ func (c *Config) Validate() error {
 
 	if hasPartialOAuth2 {
 		return fmt.Errorf("incomplete MSI/MSEntra authentication configuration: tenant_id, client_id, and client_secret must all be provided")
-	}
-
-	if hasOAuth2 && hasAPIKey {
-		return fmt.Errorf("only one authentication method can be configured: use either OAuth2 (tenant_id, client_id, client_secret) or api_key")
 	}
 
 	if !hasOAuth2 && !hasAPIKey {

@@ -89,17 +89,6 @@ func TestConfigValidate(t *testing.T) {
 			wantErr: "no MSI/MSEntra authentication configuration or api_key was provided",
 		},
 		{
-			name: "invalid config with both auth methods",
-			config: Config{
-				ApplicationId: "app-id",
-				ApiKey:        "test-api-key",
-				TenantId:      "tenant-id",
-				ClientId:      "client-id",
-				ClientSecret:  "client-secret",
-			},
-			wantErr: "only one authentication method can be configured",
-		},
-		{
 			name: "invalid config with partial OAuth2 - missing tenant_id",
 			config: Config{
 				ApplicationId: "app-id",
