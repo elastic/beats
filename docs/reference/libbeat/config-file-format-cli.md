@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/config-file-format-cli.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Command line arguments [config-file-format-cli]

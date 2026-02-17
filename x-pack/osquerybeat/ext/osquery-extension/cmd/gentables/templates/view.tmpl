@@ -8,6 +8,7 @@ import (
 {{end}}
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 {{if .NeedsSharedImport}}
 	"{{.SharedImport}}"
 {{end}}
@@ -18,8 +19,33 @@ var (
 	registerOnce sync.Once
 )
 
+func createViewHook(socket *string, log *logger.Logger, hookData any) error {
+	v, ok := hookData.(*hooks.View)
+	if !ok {
+		return fmt.Errorf("hook data is not a view")
+	}
+	return v.Create(socket, log)
+}
+
+func deleteViewHook(socket *string, log *logger.Logger, hookData any) error {
+	v, ok := hookData.(*hooks.View)
+	if !ok {
+		return fmt.Errorf("hook data is not a view")
+	}
+	return v.Delete(socket, log)
+}
+
+// RegisterDefaultViewHook registers only the create/delete view hook with the hook manager.
+// To add extra hooks, call RegisterHooksFunc with a function that calls RegisterDefaultViewHook(hm)
+// then registers additional hooks on hm.
+func RegisterDefaultViewHook(hm *hooks.HookManager) {
+	hm.Register(hooks.NewHook("{{.HookName}}", createViewHook, deleteViewHook, View()))
+}
+
 // RegisterHooksFunc registers the hooks function for this view (optional).
-// This can be called to register any hooks that should be set up for this view.
+// If called (e.g. from an implementation package), that function runs instead of the default.
+// To add extra hooks while keeping the default view hook, pass a function that calls
+// RegisterDefaultViewHook(hm) then registers additional hooks.
 func RegisterHooksFunc(f func(*hooks.HookManager)) {
 	registerOnce.Do(func() {
 		hooksFunc = f
