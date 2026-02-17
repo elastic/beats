@@ -298,6 +298,8 @@ The hard limit on the total sum of request body bytes that are allowed to be in-
 
 In-flight bytes are tracked from the moment they are read from the request body until the event is acknowledged by the output (for requests with `wait_for_completion_timeout`) or until the request completes (for requests without the timeout parameter).
 
+Note that in-flight byte tracking uses the raw request body size as a heuristic proxy for memory consumption. For requests without `wait_for_completion_timeout`, the byte count is released when the HTTP request completes, even though published events may still be queued in the output pipeline. This means the in-flight count can underestimate actual memory use under sustained load from non-ACK requests. Using `wait_for_completion_timeout` provides tighter accounting because the byte count is held until the output acknowledges the events.
+
 This option works together with `high_water_in_flight_bytes` and `low_water_in_flight_bytes` to implement hysteresis-based admission control. See those options for details.
 
 
