@@ -273,6 +273,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added support for specifying custom content-types and encodings in gcs input. {issue}44628[44628] {pull}45088[45088]
 - Added support for specifying custom content-types and encodings in azureblobstorage input. {issue}44330[44330] {pull}44402[44402]
 - Improve log path sanitization for request trace logging. {pull}48719[48719]
+- Tighten request trace logging destination path checks in CEL, Entity Analytics, HTTP Endpoint and HTTP JSON inputs. {pull}48863[48863]
 
 *Auditbeat*
 
