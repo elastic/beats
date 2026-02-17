@@ -1,0 +1,101 @@
+# OTel Collector config for benchmarking the otelconsumer adaptive queue.
+#
+# Usage:
+#   cd x-pack/otel
+#   ./build/otelcol-beats/otelcol-beats --config=file:benchmark-config.yaml
+#
+# The benchmark input generates events as fast as possible (no count or eps
+# limit) across multiple threads. Events flow through the filebeatreceiver's
+# otelconsumer queue into the debug exporter.
+#
+# The debug exporter is set to basic verbosity so it logs batch counts
+# without serialising every record — this keeps exporter overhead low and
+# lets the queue be the bottleneck.
+#
+# Watch the queue behaviour via the internal metrics endpoint at
+# http://localhost:8888/metrics (look for otelcol_* counters).
+
+receivers:
+  filebeatreceiver/1:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          message: "benchmark: the quick brown fox jumps over the lazy dog 0123456789"
+          threads: 1
+    processors: ~
+    logging:
+      level: warning
+    queue.mem:
+      enabled: false
+  filebeatreceiver/2:
+    filebeat:
+      inputs:
+      - type: benchmark
+        enabled: true
+        message: "benchmark: the quick brown fox jumps over the lazy dog 0123456789"
+        threads: 1
+    processors: ~
+    logging:
+      level: warning
+    queue.mem:
+      enabled: false
+  filebeatreceiver/3:
+    filebeat:
+      inputs:
+      - type: benchmark
+        enabled: true
+        message: "benchmark: the quick brown fox jumps over the lazy dog 0123456789"
+        threads: 1
+    processors: ~
+    logging:
+      level: warning
+    queue.mem:
+      enabled: false
+  filebeatreceiver/4:
+    filebeat:
+      inputs:
+      - type: benchmark
+        enabled: true
+        message: "benchmark: the quick brown fox jumps over the lazy dog 0123456789"
+        threads: 1
+    processors: ~
+    logging:
+      level: warning
+    queue.mem:
+      enabled: false
+
+exporters:
+  debug:
+    verbosity: basic
+    sampling_initial: 5
+    sampling_thereafter: 1000
+    sending_queue:
+      enabled: true
+      wait_for_result: true
+      queue_size: 10000
+      sizer: items
+      batch:
+        min_size: 1000
+
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver/1
+        - filebeatreceiver/2
+        - filebeatreceiver/3
+        - filebeatreceiver/4
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: warn
+    metrics:
+      level: detailed
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: 0.0.0.0
+                port: 8888
