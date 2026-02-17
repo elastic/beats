@@ -1,0 +1,4 @@
+{"op":"set","id":1}
+{"k":"filebeat::logs::1b59052b95e61943-native::13643776-64768","v":{"identifier_name":"native","ttl":-1,"meta":{"stream":"stdout"},"id":"1b59052b95e61943-native::13643776-64768","prev_id":"","source":"/home/elastic/beats/filebeat/contaner-log-file.log","offset":8900,"timestamp":[280187449934089,1769099693],"type":"container","FileStateOS":{"inode":13643776,"device":64768,"uid":1000,"gid":1000}}}
+{"op":"set","id":2}
+{"k":"filebeat::logs::d35e05a633229937-native::13643776-64768","v":{"id":"d35e05a633229937-native::13643776-64768","prev_id":"","offset":8990,"ttl":-1,"meta":{"stream":"stderr"},"FileStateOS":{"inode":13643776,"device":64768,"uid":1000,"gid":1000},"identifier_name":"native","source":"/home/elastic/beats/filebeat/contaner-log-file.log","timestamp":[280187449934089,1769099693],"type":"container"}}

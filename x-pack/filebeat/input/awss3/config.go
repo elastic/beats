@@ -27,41 +27,45 @@ import (
 )
 
 type config struct {
-	APITimeout         time.Duration        `config:"api_timeout"`
-	AWSConfig          awscommon.ConfigAWS  `config:",inline"`
-	AccessPointARN     string               `config:"access_point_arn"`
-	BackupConfig       backupConfig         `config:",inline"`
-	BucketARN          string               `config:"bucket_arn"`
-	BucketListInterval time.Duration        `config:"bucket_list_interval"`
-	BucketListPrefix   string               `config:"bucket_list_prefix"`
-	FileSelectors      []fileSelectorConfig `config:"file_selectors"`
-	IgnoreOlder        time.Duration        `config:"ignore_older"`
-	NonAWSBucketName   string               `config:"non_aws_bucket_name"`
-	NumberOfWorkers    int                  `config:"number_of_workers"`
-	PathStyle          bool                 `config:"path_style"`
-	ProviderOverride   string               `config:"provider"`
-	QueueURL           string               `config:"queue_url"`
-	ReaderConfig       readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
-	RegionName         string               `config:"region"`
-	SQSMaxReceiveCount int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
-	SQSScript          *scriptConfig        `config:"sqs.notification_parsing_script"`
-	SQSWaitTime        time.Duration        `config:"sqs.wait_time"`           // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
-	SQSGraceTime       time.Duration        `config:"sqs.shutdown_grace_time"` // The time that the processing loop will wait for messages before shutting down.
-	StartTimestamp     string               `config:"start_timestamp"`
-	VisibilityTimeout  time.Duration        `config:"visibility_timeout"`
+	APITimeout                  time.Duration        `config:"api_timeout"`
+	AWSConfig                   awscommon.ConfigAWS  `config:",inline"`
+	AccessPointARN              string               `config:"access_point_arn"`
+	BackupConfig                backupConfig         `config:",inline"`
+	BucketARN                   string               `config:"bucket_arn"`
+	BucketListInterval          time.Duration        `config:"bucket_list_interval"`
+	BucketListPrefix            string               `config:"bucket_list_prefix"`
+	FileSelectors               []fileSelectorConfig `config:"file_selectors"`
+	IgnoreOlder                 time.Duration        `config:"ignore_older"`
+	LexicographicalOrdering     bool                 `config:"lexicographical_ordering"`
+	LexicographicalLookbackKeys int                  `config:"lexicographical_lookback_keys"`
+	NonAWSBucketName            string               `config:"non_aws_bucket_name"`
+	NumberOfWorkers             int                  `config:"number_of_workers"`
+	PathStyle                   bool                 `config:"path_style"`
+	ProviderOverride            string               `config:"provider"`
+	QueueURL                    string               `config:"queue_url"`
+	ReaderConfig                readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
+	RegionName                  string               `config:"region"`
+	SQSMaxReceiveCount          int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
+	SQSScript                   *scriptConfig        `config:"sqs.notification_parsing_script"`
+	SQSWaitTime                 time.Duration        `config:"sqs.wait_time"`           // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
+	SQSGraceTime                time.Duration        `config:"sqs.shutdown_grace_time"` // The time that the processing loop will wait for messages before shutting down.
+	StartTimestamp              string               `config:"start_timestamp"`
+	VisibilityTimeout           time.Duration        `config:"visibility_timeout"`
 }
 
 func defaultConfig() config {
 	c := config{
-		APITimeout:         120 * time.Second,
-		VisibilityTimeout:  300 * time.Second,
-		BucketListInterval: 120 * time.Second,
-		BucketListPrefix:   "",
-		SQSWaitTime:        20 * time.Second,
-		SQSGraceTime:       20 * time.Second,
-		SQSMaxReceiveCount: 5,
-		NumberOfWorkers:    5,
-		PathStyle:          false,
+		APITimeout:                  120 * time.Second,
+		VisibilityTimeout:           300 * time.Second,
+		BucketListInterval:          120 * time.Second,
+		BucketListPrefix:            "",
+		LexicographicalOrdering:     false,
+		LexicographicalLookbackKeys: 100,
+		SQSWaitTime:                 20 * time.Second,
+		SQSGraceTime:                20 * time.Second,
+		SQSMaxReceiveCount:          5,
+		NumberOfWorkers:             5,
+		PathStyle:                   false,
 	}
 	c.ReaderConfig.InitDefaults()
 	return c
@@ -92,6 +96,14 @@ func (c *config) Validate() error {
 
 	if c.AccessPointARN != "" && !isValidAccessPointARN(c.AccessPointARN) {
 		return fmt.Errorf("invalid format for access_point_arn <%v>", c.AccessPointARN)
+	}
+
+	if c.LexicographicalOrdering && c.BucketARN == "" && c.AccessPointARN == "" && c.NonAWSBucketName == "" {
+		return errors.New("lexicographical_ordering can only be used when polling AWS S3, S3 Access Point, or non-AWS S3 bucket")
+	}
+
+	if c.LexicographicalOrdering && c.LexicographicalLookbackKeys <= 0 {
+		return fmt.Errorf("lexicographical_lookback_keys <%d> must be greater than 0", c.LexicographicalLookbackKeys)
 	}
 
 	if c.QueueURL != "" && (c.VisibilityTimeout <= 0 || c.VisibilityTimeout.Hours() > 12) {
@@ -149,6 +161,9 @@ func (c *config) Validate() error {
 				return errors.New("backup_to_bucket_prefix cannot be the same as bucket_list_prefix, this will create an infinite loop")
 			}
 		}
+	}
+	if c.NonAWSBucketName != "" && c.RegionName == "" {
+		return errors.New("region must be configured when using non_aws_bucket_name")
 	}
 
 	if c.StartTimestamp != "" {

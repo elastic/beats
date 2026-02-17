@@ -25,11 +25,12 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 
+	inpFile "github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert"
 	"github.com/elastic/go-concert/unison"
 )
@@ -306,7 +307,7 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, any)) {
 // there is a mechanism in place to detect this situation and avoid
 // migrating the same state over and over again.
 // See the comments on this method for more details.
-func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
+func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 	matchPreviousFilestreamIDs := func(key string) bool {
 		for _, identifier := range s.identifiersToTakeOver {
 			if identifier.MatchesInput(key) {
@@ -339,20 +340,24 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 	// That's the only way to access the log input states.
 	// We only iterate through the whole store if we're not migrating from
 	// a Filestream input
-	fromLogInput := map[string]logInputState{}
+	fromLogInput := map[string]TakeOverState{}
 	if len(s.identifiersToTakeOver) == 0 {
 		_ = s.store.persistentStore.Each(func(key string, value statestore.ValueDecoder) (bool, error) {
 			if strings.HasPrefix(key, "filebeat::logs::") {
-				m := mapstr.M{}
-				if err := value.Decode(&m); err != nil {
+				logSt := inpFile.State{}
+				if err := value.Decode(&logSt); err != nil {
 					return true, err
 				}
-				st, err := logInputStateFromMapM(m)
+
+				st, err := newTakeOverState(logSt, nil)
 				if err != nil {
-					// Log the error and continue
-					s.store.log.Errorf("cannot read Log input state: %s", err)
-					return true, nil
+					// This should never happen. newTakeOverState can only fail if
+					// Filestream state format has changed and when using the
+					// Log input state, the Filestream one is ignored
+					s.store.log.Errorf("cannot initialise TakeOver state: %s", err)
+					return true, err
 				}
+
 				// That is a workaround for the problems with the
 				// Log input Registrar (`filebeat/registrar`) and the way it
 				// handles states.
@@ -388,10 +393,10 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 				// The worst case that can happen is that we re-ingest the file
 				// once, which is still better than copying an old state with
 				// an incorrect offset every time Filebeat starts.
-				if st.TTL == -2 {
+				if logSt.TTL == -2 {
 					return true, nil
 				}
-				st.key = key
+				st.Key = key
 				fromLogInput[key] = st
 			}
 
@@ -418,7 +423,14 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 			continue
 		}
 
-		newKey, updatedMeta := fn(res)
+		st, err := newTakeOverState(inpFile.State{}, res)
+		if err != nil {
+			// This should never happen. newTakeOverState can only fail if
+			// Filestream state format has changed
+			s.store.log.Errorf("cannot initialise TakeOver state: %s", err)
+			continue
+		}
+		newKey, updatedMeta := fn(st)
 		if len(newKey) > 0 {
 			// If the new key already exists in the store, do nothing.
 			// Unlock the resource and return
@@ -469,7 +481,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 			res.cursor = struct {
 				Offset int64 `json:"offset" struct:"offset"`
 			}{
-				Offset: v.Offset,
+				Offset: v.logInpOffset,
 			}
 
 			// Write to disk
@@ -491,39 +503,50 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 	}
 }
 
-type logInputState struct {
-	ID     string        `json:"id"`
-	Offset int64         `json:"offset"`
-	TTL    time.Duration `json:"ttl" struct:"ttl"`
-	key    string        `json:"-"`
+// TakeOverState is the state of a file whose state is being taken over.
+// [newTakeOverState] correctly populates the fields according to the source
+// state (Log or Filestream). Only the fields required outside of this package
+// are exported.
+type TakeOverState struct {
+	FileStateOS    file.StateOS
+	IdentifierName string
+	Key            string
+	Source         string
 
-	// This matches the filestream.fileMeta struct
-	// and are used by UnpackCursorMeta
-	Source         string `json:"source" struct:"source"`
-	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
+	logInpOffset int64
 }
 
-func logInputStateFromMapM(m mapstr.M) (logInputState, error) {
-	state := logInputState{}
+// newTakeOverState creates a TakeOverState populated by the logSt or filestreamSt.
+// If filestreamSt is not nil, it is used, otherwise logSt is used.
+// An error is only returned if filestreamSt.UnpackCursorMeta fails, the only
+// reason for it to fail is if the data format in the store has changed.
+func newTakeOverState(logSt inpFile.State, filestreamSt *resource) (TakeOverState, error) {
+	st := TakeOverState{}
 
-	// typeconf.Convert kept failing with an "unsupported" error because
-	// FileStateOS was present, we don't need it, so just delete it.
-	m.Delete("FileStateOS")
-	if err := typeconv.Convert(&state, m); err != nil {
-		return logInputState{}, fmt.Errorf("cannot convert Log input state: %w", err)
+	if filestreamSt != nil {
+		// This struct matches the fileMeta defined at input/filestream/input.go
+		meta := struct {
+			IdentifierName string `json:"identifier_name" struct:"identifier_name"`
+			Source         string `json:"source" struct:"source"`
+		}{}
+		if err := filestreamSt.UnpackCursorMeta(&meta); err != nil {
+			return st, err
+		}
+
+		st.Source = meta.Source
+		st.IdentifierName = meta.IdentifierName
+		st.Key = filestreamSt.key
+
+		return st, nil
 	}
 
-	return state, nil
-}
+	st.Source = logSt.Source
+	st.IdentifierName = logSt.IdentifierName
+	st.FileStateOS = logSt.FileStateOS
+	st.logInpOffset = logSt.Offset
+	st.Key = logSt.Id
 
-// UnpackCursorMeta unpacks the cursor metadata's into the provided struct. TBD
-func (l logInputState) UnpackCursorMeta(to any) error {
-	return typeconv.Convert(to, l)
-}
-
-// Key returns the resource's key
-func (l logInputState) Key() string {
-	return l.key
+	return st, nil
 }
 
 func (s *store) Retain() { s.refCount.Retain() }
