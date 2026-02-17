@@ -206,7 +206,7 @@ MongoDB collection statistics metrics.
 
 
 **`mongodb.collstats.stats.scaleFactor`** {applies_to}`stack: ga 9.2.0`
-:   Scale factor applied to size-related metrics (e.g. 1 or 1024). Use to derive raw byte counts if metrics are scaled.
+:   Scale factor applied to size-related metrics (for example, 1 or 1024). Use to derive raw byte counts if metrics are scaled.
 
     type: long
 
