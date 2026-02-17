@@ -89,25 +89,6 @@ When cursor is enabled, your SQL query must:
 
 Cursor is also not compatible with `fetch_from_all_databases`. Use a separate module block for each database if you need both features.
 
-### State Persistence
-
-Cursor state is persisted to disk using Metricbeat's statestore at:
-`{data.path}/sql-cursor/`
-
-The state persists across Metricbeat restarts, allowing incremental fetching to continue
-from where it left off. State is keyed by a hash of:
-- Full database URI/DSN (includes database name)
-- Query string
-- Cursor column name
-- Cursor direction (`asc` or `desc`)
-
-This ensures that different query configurations maintain separate cursor states, including
-different databases on the same server.
-
-**Important:** Changing any of these components (DSN, query, cursor column, or direction) produces a
-different state key, which effectively resets the cursor to its `default` value. This is by design —
-if you modify the query, the old cursor position might no longer be valid for the new query.
-
 ### Example Configurations
 
 #### Integer cursor (auto-increment ID)
@@ -235,6 +216,25 @@ MSSQL does not support `LIMIT`. Use `TOP` to restrict the number of rows per cyc
 ```
 
 With `direction: desc`, the cursor tracks the minimum value from each batch, suitable for scanning data in reverse chronological order.
+
+### State Persistence
+
+Cursor state is persisted to disk using Metricbeat's statestore at:
+`{data.path}/sql-cursor/`
+
+The state persists across Metricbeat restarts, allowing incremental fetching to continue
+from where it left off. State is keyed by a hash of:
+- Full database URI/DSN (includes database name)
+- Query string
+- Cursor column name
+- Cursor direction (`asc` or `desc`)
+
+This ensures that different query configurations maintain separate cursor states, including
+different databases on the same server.
+
+**Important:** Changing any of these components (DSN, query, cursor column, or direction) produces a
+different state key, which effectively resets the cursor to its `default` value. This is by design —
+if you modify the query, the old cursor position might no longer be valid for the new query.
 
 ### Important: Choosing `>` vs `>=` for Cursor Queries
 
