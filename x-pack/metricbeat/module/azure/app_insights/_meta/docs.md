@@ -11,10 +11,29 @@ This metricset allows users to retrieve application insights metrics from specif
 ### Config options to identify resources [_config_options_to_identify_resources]
 
 `application_id`
-:   (*[]string*) ID of the application. This is Application ID from the API Access settings blade in the Azure portal.
+:   (*string*) ID of the application. This is Application ID from the API Access settings blade in the Azure portal.
+
+
+### Authentication [_authentication]
+
+Two authentication methods are supported: **OAuth2 (Microsoft Entra ID)** and **API key**. If both are provided, OAuth2 takes priority.
+
+`tenant_id`
+:   (*string*) The tenant ID of the Microsoft Entra ID (Azure Active Directory) instance. More on service principal authentication can be found here [https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal).
+
+`client_id`
+:   (*string*) The client/application ID of the service principal registered in Microsoft Entra ID.
+
+`client_secret`
+:   (*string*) The client secret associated with the service principal.
+
+`active_directory_endpoint`
+:   (*string*) Optional. The Active Directory authority host URL. Use this to override the default endpoint, for example when connecting to Azure Government or Azure China clouds.
+
+All three of `tenant_id`, `client_id`, and `client_secret` must be provided together.
 
 `api_key`
-:   (*[]string*) The API key which will be generated, more on the steps here [https://dev.applicationinsights.io/documentation/Authorization/API-key-and-App-ID](https://dev.applicationinsights.io/documentation/Authorization/API-key-and-App-ID).
+:   (*string*) The API key which will be generated, more on the steps here [https://dev.applicationinsights.io/documentation/Authorization/API-key-and-App-ID](https://dev.applicationinsights.io/documentation/Authorization/API-key-and-App-ID).
 
 
 ### App insights metric configurations [_app_insights_metric_configurations]
