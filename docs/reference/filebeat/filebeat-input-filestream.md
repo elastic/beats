@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-filestream.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # filestream input [filebeat-input-filestream]
@@ -402,6 +403,8 @@ Different `file_identity` methods can be configured to suit the environment wher
 
 Follow [this comprehensive guide](/reference/filebeat/file-identity.md) on how to choose a file identity option right for your use-case.
 
+In 9.x, scanner fingerprinting is enabled by default. When you explicitly configure a non-fingerprint `file_identity` (for example `native`, `path`, or `inode_marker`) and do not explicitly set `prospector.scanner.fingerprint.enabled`, Filebeat automatically disables scanner fingerprinting for that input.
+
 ::::{important}
 Changing `file_identity` is only supported from `native` or `path` to `fingerprint`. On those cases Filebeat will automatically migrate the state of the file when filestream starts.
 ::::
@@ -418,7 +421,7 @@ $$$filebeat-input-filestream-file-identity-fingerprint$$$
 :   The default behavior of Filebeat is to identify files based on content by hashing a specific range (0 to 1024 bytes by default).
 
 ::::{warning}
-In order to use this file identity option, you must enable the [fingerprint option in the scanner](#filebeat-input-filestream-scan-fingerprint). Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
+This file identity option uses file fingerprints produced by the [scanner](#filebeat-input-filestream-scan-fingerprint), which are enabled by default in 9.x. If you explicitly disable scanner fingerprinting, this file identity will not work. Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
 ::::
 
 

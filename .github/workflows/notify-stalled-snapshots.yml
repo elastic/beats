@@ -10,9 +10,7 @@ permissions:
   contents: read
 
 env:
-  EMAIL: beats-contrib@elastic.co
-  URL_QUERY: 'https://github.com/elastic/beats/pulls?q=is%3Apr+is%3Aopen+label%3ATeam%3ABeats-On-Call'
-  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+  URL_QUERY: 'https://github.com/elastic/beats/pulls?q=is%3Apr+is%3Aopen+label%3ATeam%3ABeats-On-Call+update+elastic+stack'
 
 jobs:
   filter:
@@ -54,37 +52,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - if: ${{ contains(steps.search.outputs.found, 'true') }}
-        name: Report obsoleted branches (slack)
-        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
+        uses: elastic/oblt-actions/slack/send@v1
         with:
-          method: chat.postMessage
-          token: ${{ secrets.SLACK_BOT_TOKEN }}
-          payload: |
-            {
-              "channel": "#ingest-notifications",
-              "text": "${{ env.MESSAGE }}",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "${{ env.SLACK_MESSAGE }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_MESSAGE: ":red_circle: Elastic Stack version for the `${{ matrix.branch }}` branch has not been updated for a while (`> 7 days`). Review the (<${{ env.URL_QUERY }}|open PRs>)"
-
-      - if: ${{ contains(steps.search.outputs.found, 'true') }}
-        name: Report obsoleted branches (email)
-        uses: dawidd6/action-send-mail@6e71c855c9a091d80a519621b9fd3e8d252ca40c
-        with:
-          server_address: ${{ secrets.MAIL_SERVER }}
-          username: ${{ secrets.MAIL_USERNAME }}
-          password: ${{ secrets.MAIL_PASSWORD }}
-          subject: '[${{ matrix.branch }}] ${{ steps.date.outputs.date }}: Elastic Stack version has not been updated recently.'
-          to: ${{ env.EMAIL }}
-          from: ${{ secrets.MAIL_FROM }}
-          reply_to: ${{ secrets.MAIL_REPLY }}
-          body: 'Elastic Stack version for the ${{ matrix.branch }} branch has not been updated for a while (> 7 days). Review the open PRs in ${{ env.URL_QUERY }}. Generated automatically with ${{ env.JOB_URL }}'
+          bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel-id: "#ingest-notifications"
+          message: ":red_circle: Elastic Stack version for the `${{ matrix.branch }}` branch has not been updated for a while (`> 7 days`). Review the (<${{ env.URL_QUERY }}|open PRs>)"

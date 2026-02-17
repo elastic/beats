@@ -1,5 +1,6 @@
-FROM golang:1.24.11-bookworm
+FROM golang:1.24.13-bookworm
 COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker  /usr/local/bin/
+COPY --from=docker:26.0.0-alpine3.19 /usr/local/libexec/docker/cli-plugins/docker-compose /usr/local/lib/docker/cli-plugins/docker-compose
 
 RUN \
     apt update \
@@ -27,7 +28,6 @@ RUN pip3 install --upgrade PyYAML==6.0.1
 RUN pip3 install requests==2.32.3
 RUN pip3 install urllib3==1.26.19
 RUN pip3 install docker==7.1.0
-RUN pip3 install git+https://github.com/pkoutsovasilis/compose@2c4d825881a624bd87c390a13f362ae76dcd6180
 
 # Oracle instant client
 RUN cd /usr/lib \

@@ -12,7 +12,6 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 
-	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd"
@@ -26,7 +25,6 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
 
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -43,11 +41,7 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		return nil, fmt.Errorf("could not convert otel config to metricbeat config")
 	}
 	settings := cmd.MetricbeatSettings(Name)
-	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
-	if err != nil {
-		return nil, fmt.Errorf("error making global processors: %w", err)
-	}
-	settings.Processing = processing.MakeDefaultSupport(true, globalProcs, processing.WithECS, processing.WithHost, processing.WithAgentMeta())
+	settings.Processing = processing.MakeDefaultSupport(true, nil, processing.WithECS, processing.WithHost, processing.WithAgentMeta())
 	settings.ElasticLicensed = true
 	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 
@@ -62,21 +56,6 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
 	return &metricbeatReceiver{BeatReceiver: br}, nil
-}
-
-// copied from metricbeat cmd.
-func defaultProcessors() []mapstr.M {
-	// processors:
-	//   - add_host_metadata: ~
-	//   - add_cloud_metadata: ~
-	//   - add_docker_metadata: ~
-	//   - add_kubernetes_metadata: ~
-	return []mapstr.M{
-		{"add_host_metadata": nil},
-		{"add_cloud_metadata": nil},
-		{"add_docker_metadata": nil},
-		{"add_kubernetes_metadata": nil},
-	}
 }
 
 func NewFactory() receiver.Factory {

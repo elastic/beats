@@ -5,6 +5,8 @@
 package otelmanager
 
 import (
+	"sync"
+
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -34,6 +36,8 @@ func NewOtelManager(cfg *config.C, registry *reload.Registry, logger *logp.Logge
 type OtelManager struct {
 	ext          DiagnosticExtension
 	receiverName string
+	stopFn       func()
+	stopOnce     sync.Once
 }
 
 func (n *OtelManager) UpdateStatus(_ status.Status, _ string) {
@@ -41,10 +45,15 @@ func (n *OtelManager) UpdateStatus(_ status.Status, _ string) {
 	// TODO(@VihasMakwana): Explore the option to tidy and refactor the status reporting for beatsreceivers.
 }
 
-func (n *OtelManager) SetStopCallback(func()) {
+func (n *OtelManager) SetStopCallback(fn func()) {
+	n.stopFn = fn
 }
 
-func (n *OtelManager) Stop() {}
+func (n *OtelManager) Stop() {
+	if n.stopFn != nil {
+		n.stopOnce.Do(n.stopFn)
+	}
+}
 
 // Enabled returns false because many places inside beats call manager.Enabled() for various purposes
 // Returning true might lead to side effects.
