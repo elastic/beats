@@ -17,7 +17,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 // authConfig holds authentication configuration for the Akamai API.
@@ -71,7 +71,11 @@ func NewEdgeGridSigner(clientToken, clientSecret, accessToken string) *EdgeGridS
 // https://techdocs.akamai.com/developer/docs/authenticate-with-edgegrid
 func (s *EdgeGridSigner) Sign(req *http.Request) error {
 	timestamp := time.Now().UTC().Format("20060102T15:04:05-0700")
-	nonce := uuid.New().String()
+	u, err := uuid.NewV4()
+	if err != nil {
+		return fmt.Errorf("failed to generate nonce: %w", err)
+	}
+	nonce := u.String()
 
 	// Build the authorization header base
 	authBase := fmt.Sprintf(

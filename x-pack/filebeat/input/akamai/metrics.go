@@ -171,8 +171,8 @@ func (m *inputMetrics) AddBatchReceived(eventCount int) {
 		return
 	}
 	m.batchesReceived.Inc()
-	m.eventsReceived.Add(uint64(eventCount))
-	m.eventsPerBatch.Update(int64(eventCount))
+	m.eventsReceived.Add(uint64(eventCount))   //nolint:gosec // eventCount is always positive
+	m.eventsPerBatch.Update(int64(eventCount)) //nolint:gosec // eventCount is bounded by event_limit (max 600000)
 }
 
 // AddBatchPublished increments the batches published counter.
@@ -237,7 +237,7 @@ func (m *inputMetrics) AddPartialPublishFailures(count uint64) {
 		return
 	}
 	m.eventsPublishFailed.Add(count)
-	m.failedEventsPerPage.Update(int64(count))
+	m.failedEventsPerPage.Update(int64(count)) //nolint:gosec // count is bounded by event_limit (max 600000), safe for int64
 }
 
 // AddCursorDrop increments the cursor drop counter.
