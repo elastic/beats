@@ -87,7 +87,7 @@ func (m *Manager) loadState() error {
 		state = nil
 	}
 
-	if !m.isStateValid(state) {
+	if state == nil || !m.isStateValid(state) {
 		return m.initDefault()
 	}
 

@@ -91,7 +91,6 @@ func TestPostgreSQLCursor(t *testing.T) {
 	defer db.Close()
 
 	setupPostgresTestTable(t, db)
-	defer cleanupTestTable(t, db, "postgres")
 
 	// Test integer cursor
 	t.Run("integer cursor", func(t *testing.T) {
@@ -192,6 +191,10 @@ func insertTestData(t *testing.T, db *sql.DB, driver string, n int) {
 
 func setupPostgresTestTable(t *testing.T, db *sql.DB) {
 	t.Helper()
+
+	t.Cleanup(func() {
+		cleanupTestTable(t, db, "postgres")
+	})
 
 	// Drop table if exists
 	_, err := db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", testTableName))
@@ -647,7 +650,6 @@ func TestCursorStatePersistence(t *testing.T) {
 	defer db.Close()
 
 	setupPostgresTestTable(t, db)
-	defer cleanupTestTable(t, db, "postgres")
 
 	// Set up temp paths - we need to track tmpDir to check file existence
 	testPaths := createTestPaths(t)
@@ -1449,6 +1451,16 @@ func testOracleQueryChangeResetsCursor(t *testing.T, dsn string) {
 func testOracleDriverTypeConversions(t *testing.T, db *sql.DB) {
 	t.Helper()
 
+	var debug []string
+	t.Cleanup(func() {
+		if !t.Failed() {
+			return
+		}
+		for _, msg := range debug {
+			t.Log(msg)
+		}
+	})
+
 	// Query a row to inspect godror's type mapping for Oracle columns
 	rows, err := db.Query("SELECT id, created_at, event_date FROM cursor_test_events WHERE ROWNUM <= 1")
 	require.NoError(t, err)
@@ -1460,17 +1472,19 @@ func testOracleDriverTypeConversions(t *testing.T, db *sql.DB) {
 	cols, err := rows.ColumnTypes()
 	require.NoError(t, err)
 	for _, col := range cols {
-		t.Logf("Oracle column mapping: %s → DatabaseTypeName=%s, ScanType=%v",
-			col.Name(), col.DatabaseTypeName(), col.ScanType())
+		debug = append(debug, fmt.Sprintf(
+			"Oracle column mapping: %s → DatabaseTypeName=%s, ScanType=%v",
+			col.Name(), col.DatabaseTypeName(), col.ScanType(),
+		))
 	}
 
 	var id, createdAt, eventDate interface{}
 	err = rows.Scan(&id, &createdAt, &eventDate)
 	require.NoError(t, err)
 
-	t.Logf("Oracle NUMBER (id) → Go type: %T, value: %v", id, id)
-	t.Logf("Oracle TIMESTAMP (created_at) → Go type: %T, value: %v", createdAt, createdAt)
-	t.Logf("Oracle DATE (event_date) → Go type: %T, value: %v", eventDate, eventDate)
+	debug = append(debug, fmt.Sprintf("Oracle NUMBER (id) → Go type: %T, value: %v", id, id))
+	debug = append(debug, fmt.Sprintf("Oracle TIMESTAMP (created_at) → Go type: %T, value: %v", createdAt, createdAt))
+	debug = append(debug, fmt.Sprintf("Oracle DATE (event_date) → Go type: %T, value: %v", eventDate, eventDate))
 
 	// Verify Oracle TIMESTAMP → time.Time (which godror returns natively).
 	// This is important because the cursor pipeline relies on getValue()
@@ -1488,7 +1502,10 @@ func testOracleDriverTypeConversions(t *testing.T, db *sql.DB) {
 				"cursor.ToDriverArg() for timestamp should return time.Time, got %T", driverArg)
 		}
 	} else {
-		t.Logf("Note: Oracle TIMESTAMP scanned as %T (not time.Time); cursor pipeline handles this via getValue()", createdAt)
+		debug = append(debug, fmt.Sprintf(
+			"Note: Oracle TIMESTAMP scanned as %T (not time.Time); cursor pipeline handles this via getValue()",
+			createdAt,
+		))
 	}
 
 	// Verify Oracle DATE → time.Time round-trip
@@ -1498,7 +1515,10 @@ func testOracleDriverTypeConversions(t *testing.T, db *sql.DB) {
 		assert.NoError(t, err,
 			"Oracle DATE → time.Time → date string should round-trip through cursor.ParseValue")
 	} else {
-		t.Logf("Note: Oracle DATE scanned as %T (not time.Time); cursor pipeline handles this via getValue()", eventDate)
+		debug = append(debug, fmt.Sprintf(
+			"Note: Oracle DATE scanned as %T (not time.Time); cursor pipeline handles this via getValue()",
+			eventDate,
+		))
 	}
 
 	// Verify Oracle NUMBER round-trip through fmt.Sprint (which getValue uses for unknown types)
@@ -2001,7 +2021,6 @@ func TestCursorStateIsolation(t *testing.T) {
 	defer db.Close()
 
 	setupPostgresTestTable(t, db)
-	defer cleanupTestTable(t, db, "postgres")
 
 	// Use shared paths so both MetricSets would share state if not properly isolated
 	testPaths := createTestPaths(t)
@@ -2092,9 +2111,8 @@ func TestCursorRegistrySharing(t *testing.T) {
 	defer db.Close()
 
 	setupPostgresTestTable(t, db)
-	defer cleanupTestTable(t, db, "postgres")
 
-	// Insert test data: 10 rows
+	// Insert additional test data: 10 rows (setupPostgresTestTable already inserts 5)
 	insertTestData(t, db, "postgres", 10)
 
 	// Create shared test paths - both MetricSets will use same data directory
@@ -2162,10 +2180,8 @@ func TestCursorRegistrySharing(t *testing.T) {
 	// CRITICAL ASSERTION: Verify they're the SAME pointer (shared instance)
 	// This is the core of the fix - if pointers differ, multiple stores will
 	// try to access the same files, causing lock conflicts
-	assert.Same(t, registry1, registry2,
+	require.Same(t, registry1, registry2,
 		"Both module instances MUST share the exact same registry pointer to avoid file conflicts")
-
-	t.Logf("✓ Registry sharing verified: both modules use registry at %p", registry1)
 
 	// Also verify state isolation works correctly with the shared registry
 	// Each query should maintain its own cursor state via unique state keys
@@ -2199,8 +2215,6 @@ func TestCursorRegistrySharing(t *testing.T) {
 		require.NoError(t, closer.Close())
 	}
 
-	t.Log("✓ State isolation verified: different queries maintain separate cursor states despite shared registry")
-	t.Log("✓ Registry sharing test passed: single registry, no file conflicts, proper state isolation")
 }
 
 // ============================================================================
@@ -2225,7 +2239,6 @@ func TestCursorQueryTimeout(t *testing.T) {
 	defer db.Close()
 
 	setupPostgresTestTable(t, db)
-	defer cleanupTestTable(t, db, "postgres")
 
 	testPaths := createTestPaths(t)
 
@@ -2305,7 +2318,6 @@ func TestCursorNormalQueryCompletesWithinTimeout(t *testing.T) {
 	defer db.Close()
 
 	setupPostgresTestTable(t, db)
-	defer cleanupTestTable(t, db, "postgres")
 
 	testPaths := createTestPaths(t)
 

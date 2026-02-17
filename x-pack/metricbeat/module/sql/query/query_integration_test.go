@@ -7,6 +7,7 @@
 package query
 
 import (
+	"database/sql"
 	"fmt"
 	"net"
 	"os"
@@ -224,6 +225,19 @@ func TestPostgreSQL(t *testing.T) {
 }
 
 func TestOracle(t *testing.T) {
+	// Skip if Oracle Instant Client is not installed.
+	// The godror driver requires the Oracle Instant Client library (libclntsh.dylib/so).
+	// See: https://oracle.github.io/odpi/doc/installation.html
+	testDB, err := sql.Open("godror", "user/pass@localhost:1521/test")
+	if err == nil {
+		err = testDB.Ping()
+		_ = testDB.Close()
+	}
+	if err != nil && containsOracleClientError(err.Error()) {
+		t.Skip("Skipping Oracle integration tests: Oracle Instant Client not installed. " +
+			"See https://oracle.github.io/odpi/doc/installation.html")
+	}
+
 	service := compose.EnsureUp(t, "oracle")
 	host, port, _ := net.SplitHostPort(service.Host())
 

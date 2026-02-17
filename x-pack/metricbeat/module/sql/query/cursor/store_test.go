@@ -127,7 +127,7 @@ func TestStoreOperations(t *testing.T) {
 	logger := logp.NewLogger("test-cursor-store")
 
 	// Test store creation
-	store, err := NewStore(beatPaths, logger)
+	store, err := newStore(beatPaths, logger)
 	require.NoError(t, err)
 	require.NotNil(t, store)
 	defer store.Close()
@@ -272,7 +272,7 @@ func TestStoreClose(t *testing.T) {
 
 	logger := logp.NewLogger("test-cursor-store")
 
-	store, err := NewStore(beatPaths, logger)
+	store, err := newStore(beatPaths, logger)
 	require.NoError(t, err)
 
 	// First close should succeed
@@ -290,7 +290,7 @@ func TestStoreOwnershipClosingBehavior(t *testing.T) {
 		t.Skip("skipping store test in short mode")
 	}
 
-	t.Run("NewStore closes registry when store closes", func(t *testing.T) {
+	t.Run("newStore closes registry when store closes", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		beatPaths := &paths.Path{
 			Home:   tmpDir,
@@ -301,8 +301,8 @@ func TestStoreOwnershipClosingBehavior(t *testing.T) {
 
 		logger := logp.NewLogger("test-ownership-owns")
 
-		// Create store via NewStore (owns registry)
-		store, err := NewStore(beatPaths, logger)
+		// Create store via newStore (owns registry)
+		store, err := newStore(beatPaths, logger)
 		require.NoError(t, err)
 		require.NotNil(t, store)
 		require.Equal(t, ownsRegistry, store.ownsRegistry)

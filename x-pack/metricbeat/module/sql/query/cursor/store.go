@@ -63,12 +63,13 @@ func NewStoreFromRegistry(registry *statestore.Registry, logger *logp.Logger) (*
 	}, nil
 }
 
-// NewStore creates a memlog-backed store for cursor persistence.
+// newStore creates a memlog-backed store for cursor persistence.
 // The store is created at {data.path}/sql-cursor/
-// The caller is responsible for calling Close() when done.
-// This constructor creates and owns its own memlog registry — prefer
-// NewStoreFromRegistry with a shared registry when possible.
-func NewStore(beatPaths *paths.Path, logger *logp.Logger) (*Store, error) {
+//
+// NOTE: This constructor creates and owns its own memlog registry. Production
+// code should prefer NewStoreFromRegistry with a shared registry to avoid
+// multiple registries operating on the same files.
+func newStore(beatPaths *paths.Path, logger *logp.Logger) (*Store, error) {
 	if beatPaths == nil {
 		beatPaths = paths.Paths
 	}
