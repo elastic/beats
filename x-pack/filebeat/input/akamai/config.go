@@ -20,7 +20,7 @@ import (
 const (
 	defaultInterval         = time.Minute
 	defaultInitialInterval  = 12 * time.Hour
-	defaultRecoveryInterval = 12 * time.Hour
+	defaultRecoveryInterval = 1 * time.Hour
 	defaultEventLimit       = 10000
 	maxEventLimit           = 600000
 	defaultNumberOfWorkers  = 3

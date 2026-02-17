@@ -29,7 +29,7 @@ import (
 func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
-		Stability:  feature.Stable,
+		Stability:  feature.Beta,
 		Deprecated: false,
 		Info:       "Akamai SIEM API Input",
 		Doc:        "Collect security events from Akamai SIEM API",
