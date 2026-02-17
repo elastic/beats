@@ -296,7 +296,7 @@ By default the input expects the incoming POST to include a Content-Type of `app
 
 The hard limit on the total sum of request body bytes that are allowed to be in-flight at any given time. If this limit is exceeded during body reading, the request is terminated with a 500 Internal Server Error. This serves as a safety valve to prevent memory exhaustion. The default value is zero, meaning no limit.
 
-In-flight bytes are tracked from the moment they are read from the request body until the event is acknowledged by Elasticsearch (for requests with `wait_for_completion_timeout`) or until the request completes (for requests without the timeout parameter).
+In-flight bytes are tracked from the moment they are read from the request body until the event is acknowledged by the output (for requests with `wait_for_completion_timeout`) or until the request completes (for requests without the timeout parameter).
 
 This option works together with `high_water_in_flight_bytes` and `low_water_in_flight_bytes` to implement hysteresis-based admission control. See those options for details.
 
