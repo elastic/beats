@@ -48,12 +48,6 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 		return nil, err
 	}
 
-	beatPaths := paths.New()
-	beatPaths.Home = "/tmp"
-	beatPaths.Config = "/tmp"
-	beatPaths.Data = "/tmp"
-	beatPaths.Logs = "/tmp"
-
 	processing, err := processing.MakeDefaultBeatSupport(true)(info, log, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("error in MakeDefaultSupport: %w", err)
@@ -66,6 +60,8 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 	}
 
 	idxMgr := newIndexSupporter(info)
+
+	beatPaths := paths.New()
 
 	settings := pipeline.Settings{
 		WaitClose:     time.Second * 10,
