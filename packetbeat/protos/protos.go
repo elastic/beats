@@ -290,15 +290,14 @@ func (s ProtocolsStruct) Close() {
 // and unencapsulated packets
 func (s ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string {
 	// Sort the protocol IDs so that the return value is consistent.
-	protos := make([]int, 0, len(s.all))
+	protos := make([]Protocol, 0, len(s.all))
 	for proto := range s.all {
-		protos = append(protos, int(proto))
+		protos = append(protos, proto)
 	}
-	sort.Ints(protos)
+	sort.Slice(protos, func(i, j int) bool { return protos[i] < protos[j] })
 
 	var expressions []string
-	for _, key := range protos {
-		proto := Protocol(key)
+	for _, proto := range protos {
 		plugin := s.all[proto].plugin
 		for _, port := range plugin.GetPorts() {
 			hasTCP := false

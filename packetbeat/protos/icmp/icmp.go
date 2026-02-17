@@ -18,7 +18,6 @@
 package icmp
 
 import (
-	"net"
 	"time"
 
 	"github.com/google/gopacket/layers"
@@ -40,8 +39,6 @@ type icmpPlugin struct {
 	sendRequest  bool
 	sendResponse bool
 
-	localIps []net.IP
-
 	// Active ICMP transactions.
 	// The map key is the hashableIcmpTuple associated with the request.
 	transactions       *common.Cache
@@ -58,12 +55,6 @@ type ICMPv4Processor interface {
 type ICMPv6Processor interface {
 	ProcessICMPv6(flowID *flows.FlowID, hdr *layers.ICMPv6, pkt *protos.Packet)
 }
-
-const (
-	directionLocalOnly = iota
-	directionFromInside
-	directionFromOutside
-)
 
 // Notes that are added to messages during exceptional conditions.
 const (
@@ -96,16 +87,23 @@ func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher
 func (icmp *icmpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *icmpConfig) error {
 	icmp.setFromConfig(config)
 
-	var err error
-	icmp.localIps, err = common.LocalIPAddrs()
+	localIPs, err := common.LocalIPAddrs()
 	if err != nil {
 		logp.Err("Error getting local IP addresses: %+v", err)
-		icmp.localIps = []net.IP{}
+		localIPs = nil
 	}
-	logp.Debug("icmp", "Local IP addresses: %s", icmp.localIps)
+	logp.Debug("icmp", "Local IP addresses: %v", localIPs)
 
 	removalListener := func(k common.Key, v common.Value) {
-		icmp.expireTransaction(k.(hashableIcmpTuple), v.(*icmpTransaction))
+		tuple, ok := k.(hashableIcmpTuple)
+		if !ok {
+			return
+		}
+		trans, ok := v.(*icmpTransaction)
+		if !ok {
+			return
+		}
+		icmp.expireTransaction(tuple, trans)
 	}
 
 	icmp.transactions = common.NewCacheWithRemovalListener(
@@ -136,8 +134,8 @@ func (icmp *icmpPlugin) ProcessICMPv4(
 	icmp4 *layers.ICMPv4,
 	pkt *protos.Packet,
 ) {
-	typ := uint8(icmp4.TypeCode >> 8)
-	code := uint8(icmp4.TypeCode)
+	typ := icmp4.TypeCode.Type()
+	code := icmp4.TypeCode.Code()
 	id, seq := extractTrackingData(4, typ, &icmp4.BaseLayer)
 
 	tuple := &icmpTuple{
@@ -172,8 +170,8 @@ func (icmp *icmpPlugin) ProcessICMPv6(
 	icmp6 *layers.ICMPv6,
 	pkt *protos.Packet,
 ) {
-	typ := uint8(icmp6.TypeCode >> 8)
-	code := uint8(icmp6.TypeCode)
+	typ := icmp6.TypeCode.Type()
+	code := icmp6.TypeCode.Code()
 	id, seq := extractTrackingData(6, typ, &icmp6.BaseLayer)
 	tuple := &icmpTuple{
 		icmpVersion: 6,
@@ -239,34 +237,12 @@ func (icmp *icmpPlugin) processResponse(tuple *icmpTuple, msg *icmpMessage) {
 	icmp.publishTransaction(trans)
 }
 
-func (icmp *icmpPlugin) direction(t *icmpTransaction) uint8 {
-	if !icmp.isLocalIP(t.tuple.srcIP) {
-		return directionFromOutside
-	}
-	if !icmp.isLocalIP(t.tuple.dstIP) {
-		return directionFromInside
-	}
-	return directionLocalOnly
-}
-
-func (icmp *icmpPlugin) isLocalIP(ip net.IP) bool {
-	if ip.IsLoopback() {
-		return true
-	}
-
-	for _, localIP := range icmp.localIps {
-		if ip.Equal(localIP) {
-			return true
-		}
-	}
-
-	return false
-}
-
 func (icmp *icmpPlugin) deleteTransaction(k hashableIcmpTuple) *icmpTransaction {
 	v := icmp.transactions.Delete(k)
 	if v != nil {
-		return v.(*icmpTransaction)
+		if trans, ok := v.(*icmpTransaction); ok {
+			return trans
+		}
 	}
 	return nil
 }

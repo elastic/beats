@@ -315,8 +315,8 @@ func (s *sniffer) sniffStatic(ctx context.Context, device string) error {
 // the same link type.
 func (s *sniffer) sniffDynamic(ctx context.Context, defaultRoute <-chan string, refresh chan<- struct{}) error {
 	var (
-		last layers.LinkType
-		dec  *decoder.Decoder
+		last    layers.LinkType
+		dec     *decoder.Decoder
 		cleanup func()
 	)
 	defer func() {
