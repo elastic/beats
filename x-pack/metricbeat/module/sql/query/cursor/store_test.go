@@ -420,3 +420,41 @@ func TestIsKeyNotFoundError(t *testing.T) {
 		})
 	}
 }
+
+// newStore creates a memlog-backed store for cursor persistence.
+// The store is created at {data.path}/sql-cursor/
+//
+// NOTE: This constructor creates and owns its own memlog registry. Production
+// code should prefer NewStoreFromRegistry with a shared registry to avoid
+// multiple registries operating on the same files.
+func newStore(beatPaths *paths.Path, logger *logp.Logger) (*Store, error) {
+	if beatPaths == nil {
+		beatPaths = paths.Paths
+	}
+
+	dataPath := beatPaths.Resolve(paths.Data, "sql-cursor")
+
+	reg, err := memlog.New(logger.Named("memlog"), memlog.Settings{
+		Root:     dataPath,
+		FileMode: 0o600,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create memlog registry: %w", err)
+	}
+
+	registry := statestore.NewRegistry(reg)
+	store, err := registry.Get("cursor-state")
+	if err != nil {
+		if closeErr := registry.Close(); closeErr != nil {
+			logger.Warnf("Failed to close registry after store creation error: %v", closeErr)
+		}
+		return nil, fmt.Errorf("failed to open cursor store: %w", err)
+	}
+
+	return &Store{
+		registry:     registry,
+		ownsRegistry: ownsRegistry,
+		store:        store,
+		logger:       logger,
+	}, nil
+}
