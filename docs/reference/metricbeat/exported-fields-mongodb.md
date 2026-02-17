@@ -146,7 +146,7 @@ MongoDB collection statistics metrics.
 
 
 **`mongodb.collstats.stats.size`**
-:   The total uncompressed size in memory of all records in a collection. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.size`.
+:   The total uncompressed memory size of all records in a collection. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.size`.
 
     type: long
 
