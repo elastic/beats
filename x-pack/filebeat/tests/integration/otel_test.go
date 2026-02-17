@@ -1783,6 +1783,7 @@ func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {
     http.enabled: true
     http.host: localhost
     http.port: {{.MonitoringPort}}
+    output.otelconsumer.enabled: true
 exporters:
   elasticsearch:
     auth:
