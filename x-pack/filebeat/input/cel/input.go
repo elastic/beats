@@ -54,7 +54,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+<<<<<<< HEAD
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+=======
+	"github.com/elastic/elastic-agent-libs/paths"
+>>>>>>> 8de6b1fe4 (x-pack/filebeat/input/internal/httplog: tighten request trace logging path checks (#48863))
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
@@ -175,7 +179,15 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 	if cfg.Resource.Tracer != nil {
 		id := sanitizeFileName(env.IDWithoutName)
-		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
+		path := strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
+		ok, err := httplog.IsPathInLogsFor(inputName, path)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+		}
+		cfg.Resource.Tracer.Filename = path
 	}
 
 	client, trace, err := newClient(ctx, cfg, log, reg)
