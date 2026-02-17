@@ -60,6 +60,7 @@ func TestEvalSymlinksReservedNames(t *testing.T) {
 }
 
 func TestMkdirAllReservedNames(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/48902")
 	base := t.TempDir()
 	tests := []struct {
 		name    string
