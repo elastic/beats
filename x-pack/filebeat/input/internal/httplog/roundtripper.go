@@ -66,7 +66,7 @@ func IsPathIn(root, path string) (ok bool, err error) {
 	if err != nil {
 		return false, err
 	}
-	return !strings.HasPrefix(traversal, ".."+string(filepath.Separator)), nil
+	return traversal != ".." && !strings.HasPrefix(traversal, ".."+string(filepath.Separator)), nil
 }
 
 func resolveSymlinks(path string) (string, error) {

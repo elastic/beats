@@ -126,9 +126,10 @@ type tracerConfig struct {
 	lumberjack.Logger `config:",inline"`
 }
 
+// This is required due to circularity.
+const inputName = "azure-ad"
+
 func (c *tracerConfig) Validate() error {
-	// This is required due to circularity.
-	const inputName = "azure-ad"
 
 	if c == nil {
 		return nil
@@ -393,7 +394,15 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 
 	if c.Tracer != nil {
 		id = sanitizeFileName(id)
-		c.Tracer.Filename = strings.ReplaceAll(c.Tracer.Filename, "*", id)
+		path := strings.ReplaceAll(c.Tracer.Filename, "*", id)
+		ok, err := httplog.IsPathInLogsFor(inputName, path)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			return nil, fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+		}
+		c.Tracer.Filename = path
 	}
 
 	client, err := c.Transport.Client(httpcommon.WithLogger(logger))
