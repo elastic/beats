@@ -185,20 +185,12 @@ func multiReceiverConfig(helper multiReceiverHelper) *Config {
 							},
 						},
 					},
-<<<<<<< HEAD
 					{
 						"type":                 "filestream",
 						"enabled":              true,
 						"id":                   "must-be-unique",
 						"paths":                []string{helper.ingest},
 						"file_identity.native": nil,
-=======
-				},
-				"logging": map[string]any{
-					"level": "info",
-					"selectors": []string{
-						"*",
->>>>>>> b80d1e914 ([beatreceiver] Do not require specifiying otelconsumer output (#47693))
 					},
 				},
 			},

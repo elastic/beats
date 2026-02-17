@@ -83,12 +83,9 @@ receivers:
       - add_host_metadata:
           netinfo:
             enabled: false
-<<<<<<< HEAD
 
 exporters:
   debug:
-=======
->>>>>>> b80d1e914 ([beatreceiver] Do not require specifiying otelconsumer output (#47693))
 ```
 
 is functionally equivalent to this one, using the Beat processor:
