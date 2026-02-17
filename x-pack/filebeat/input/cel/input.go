@@ -54,11 +54,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-<<<<<<< HEAD
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-=======
 	"github.com/elastic/elastic-agent-libs/paths"
->>>>>>> 8de6b1fe4 (x-pack/filebeat/input/internal/httplog: tighten request trace logging path checks (#48863))
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
