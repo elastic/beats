@@ -178,7 +178,8 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// If we are tracking in flight bytes, wrap body with countReader for
 	// just-in-time byte counting. The countReader tracks bytes as they are read.
 	// On error, Close releases the bytes. On success with ACK tracking, we call
-	// Commit to transfer responsibility for releasing bytes to the ACK handler.
+	// the countReader commit method to transfer responsibility for releasing
+	// bytes to the ACK handler.
 	var countedBody *countReader
 	if h.maxInFlight > 0 {
 		countedBody = newCountReader(body, &h.inFlight, h.maxInFlight)
