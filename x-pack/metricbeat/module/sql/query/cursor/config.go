@@ -98,12 +98,12 @@ func (c *Config) Validate() error {
 
 // isValidCursorType checks if the given type is a supported cursor type
 func isValidCursorType(t string) bool {
-	switch t {
-	case CursorTypeInteger, CursorTypeTimestamp, CursorTypeDate, CursorTypeFloat, CursorTypeDecimal:
-		return true
-	default:
-		return false
+	for _, valid := range supportedCursorTypes {
+		if t == valid {
+			return true
+		}
 	}
+	return false
 }
 
 // isValidDirection checks if the given direction is valid
