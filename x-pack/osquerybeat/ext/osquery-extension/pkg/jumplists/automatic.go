@@ -17,6 +17,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
+const (
+	sliceLimit = 1 * 1024 * 1024 * 1024 // 1 GB, arbitrary limit to prevent OOM from malformed files
+)
+
 func ParseAutomaticJumpListFile(filePath string, userProfile *UserProfile, log *logger.Logger) (*Jumplist, error) {
 	// Create a minimal JumpList object to return if there is an error.
 	automaticJumpList := &Jumplist{
@@ -67,6 +71,10 @@ func ParseAutomaticJumpListFile(filePath string, userProfile *UserProfile, log *
 		// Parse the DestList stream.
 		if strings.EqualFold(entry.Name, DestListStreamName) {
 			// Read the DestList stream into a byte slice.
+			if entry.Size == 0 || entry.Size > sliceLimit {
+				log.Infof("DestList stream size %d is invalid for path %s", entry.Size, filePath)
+				return automaticJumpList, nil
+			}
 			destListBytes := make([]byte, entry.Size)
 			if _, err := io.ReadFull(entry, destListBytes); err != nil {
 				log.Infof("failed to read DestList stream for path %s: %v", filePath, err)

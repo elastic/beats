@@ -16,6 +16,7 @@ import (
 	"time"
 	"unicode/utf16"
 
+	"github.com/Microsoft/go-winio/pkg/guid"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
@@ -41,14 +42,14 @@ type DestListHeader struct {
 
 type DestListEntry struct {
 	checksum         uint64
-	volumeDroid      *GUID
-	fileDroid        *GUID
-	volumeBirthDroid *GUID
-	fileBirthDroid   *GUID
+	volumeDroid      string
+	fileDroid        string
+	volumeBirthDroid string
+	fileBirthDroid   string
 	Hostname         string `osquery:"hostname"`
 	EntryNumber      int32  `osquery:"entry_number"`
 	unknown0         int32
-	AccessCount      float32   `osquery:"access_count"`
+	AccessCount      float32
 	LastModifiedTime time.Time `osquery:"last_modified_time"`
 	PinStatus        bool      `osquery:"is_pinned"`
 	InteractionCount int32     `osquery:"interaction_count"`
@@ -82,43 +83,54 @@ func NewDestList(data []byte, log *logger.Logger) (*DestList, error) {
 		Entries: make([]*DestListEntry, 0),
 	}
 
-	index := DestListHeaderSize
-
+	// Version 1 stores the path size at offset 112; later versions at offset 128.
+	pathSizeOffset := 128
 	if header.Version == 1 {
-		for i := 0; i < int(destList.Header.NumberOfEntries); i++ {
-			pathSize := binary.LittleEndian.Uint16(data[index+112:])
-			entrySize := 112 + 2 + (int(pathSize) * 2)
-			entryBytes := data[index : index+entrySize]
-			entry, err := NewDestListEntry(entryBytes, header.Version, log)
-			if err != nil {
-				return nil, fmt.Errorf("failed to parse DestList entry: %w", err)
-			}
-			destList.Entries = append(destList.Entries, entry)
-			index += entrySize
-		}
-	} else {
-		for i := 0; i < int(destList.Header.NumberOfEntries); i++ {
-			pathSize := binary.LittleEndian.Uint16(data[index+128:])
-			entrySize := 128 + 2 + (int(pathSize) * 2)
-			spsSize := binary.LittleEndian.Uint32(data[:index+entrySize])
-			entryStart := index
-			entryEnd := entryStart + entrySize + int(spsSize)
-			if entryEnd > len(data) {
-				return nil, fmt.Errorf("entry end is out of bounds")
-			}
-			entryBytes := data[entryStart:entryEnd]
-			entry, err := NewDestListEntry(entryBytes, header.Version, log)
-			if err != nil {
-				return nil, fmt.Errorf("failed to parse DestList entry: %w", err)
-			}
-			destList.Entries = append(destList.Entries, entry)
-			index = entryEnd
-		}
+		pathSizeOffset = 112
 	}
+
+	index := DestListHeaderSize
+	for i := range int(header.NumberOfEntries) {
+		entryStart := index
+
+		// Read the path size (uint16) at the version-dependent offset.
+		pathSizeEnd := index + pathSizeOffset + 2
+		if pathSizeEnd > len(data) {
+			return nil, fmt.Errorf("not enough data to read path size for entry %d", i)
+		}
+		pathSize := int(binary.LittleEndian.Uint16(data[index+pathSizeOffset : pathSizeEnd]))
+
+		// The entry extends past the path size field by pathSize UTF-16 code units.
+		entryEnd := pathSizeEnd + (pathSize * 2)
+
+		// Version 2+ entries have an additional Serialized Property Store after the path.
+		if header.Version > 1 {
+			if entryEnd+4 > len(data) {
+				return nil, fmt.Errorf("not enough data to read sps size for entry %d", i)
+			}
+			spsSize := int(binary.LittleEndian.Uint32(data[entryEnd : entryEnd+4]))
+			entryEnd += 4 + spsSize
+		}
+
+		if entryEnd > len(data) {
+			return nil, fmt.Errorf("not enough data to read entry %d", i)
+		}
+
+		entry, err := NewDestListEntry(data[entryStart:entryEnd], header.Version, log)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse DestList entry %d: %w", i, err)
+		}
+		destList.Entries = append(destList.Entries, entry)
+		index = entryEnd
+	}
+
 	return destList, nil
 }
 
 func readInt32(b []byte) int32 {
+	if len(b) < 4 {
+		return 0
+	}
 	val := binary.LittleEndian.Uint32(b)
 	if val > math.MaxInt32 {
 		return -1
@@ -127,6 +139,9 @@ func readInt32(b []byte) int32 {
 }
 
 func readFloat32(b []byte) float32 {
+	if len(b) < 4 {
+		return 0
+	}
 	bits := binary.LittleEndian.Uint32(b)
 	return math.Float32frombits(bits)
 }
@@ -303,6 +318,58 @@ func parseTimestamp(t []byte) time.Time {
 	return time.Unix(seconds, nanos)
 }
 
+func AsFileTime(g guid.GUID) time.Time {
+	// The 60-bit timestamp is stored across Data1, Data2, and Data3.
+	// Data1: time_low (32 bits)
+	// Data2: time_mid (16 bits)
+	// Data3: time_hi_and_version (16 bits)
+
+	// Extract the components into 64-bit types
+	timeLow := uint64(g.Data1)
+	timeMid := uint64(g.Data2)
+	timeHiAndVersion := uint64(g.Data3)
+
+	// The version is in the 4 highest bits of Data3.
+	// We must mask it out to get the 12-bit time_hi component.
+	// (e.g., 0x11D1 & 0x0FFF = 0x01D1)
+	timeHi := timeHiAndVersion & 0x0FFF
+
+	// Re-assemble the 60-bit timestamp
+	// (time_hi << 48) | (time_mid << 32) | time_low
+	// Use uint64 for the calculation to avoid G115 overflow warnings
+	uVal := (timeHi << 48) | (timeMid << 32) | timeLow
+	timestamp100ns := int64(0)
+	if uVal < math.MaxInt64 {
+		timestamp100ns = int64(uVal)
+	}
+
+	// 'uuidEpochOffset' is the number of 100-ns intervals
+	// between the UUID epoch (Oct 15, 1582) and the Go/Unix epoch (Jan 1, 1970).
+	const uuidEpochOffset = 122192928000000000
+
+	// Get the 100-ns intervals since the Go epoch
+	unixTimestamp100ns := timestamp100ns - uuidEpochOffset
+
+	// We divide by 10,000,000 to get seconds (10 million 100ns ticks per second)
+	seconds := unixTimestamp100ns / 10_000_000
+	// We take the remainder and multiply by 100 to get nanoseconds
+	nanos := (unixTimestamp100ns % 10_000_000) * 100
+
+	// Create the time.Time object in UTC
+	return time.Unix(seconds, nanos).UTC()
+}
+
+func AsMacAddress(g guid.GUID) string {
+	return fmt.Sprintf("%02X:%02X:%02X:%02X:%02X:%02X", g.Data4[2], g.Data4[3], g.Data4[4], g.Data4[5], g.Data4[6], g.Data4[7])
+}
+
+func LookupGuidMapping(guid string) (string, bool) {
+	if knownFolder, ok := knownFolderMappings[guid]; ok {
+		return knownFolder, true
+	}
+	return "", false
+}
+
 func NewDestListEntry(data []byte, version int32, log *logger.Logger) (*DestListEntry, error) {
 	var interactionCount int32
 	var unknown3 int32
@@ -334,23 +401,24 @@ func NewDestListEntry(data []byte, version int32, log *logger.Logger) (*DestList
 		if len(data) < 114 {
 			return nil, fmt.Errorf("data is too short to contain a version %d DestListEntry", version)
 		}
-		pathLength := int(binary.LittleEndian.Uint16(data[112:114]) * 2)
-		if len(data) < 114+pathLength {
+		pathLength := int(binary.LittleEndian.Uint16(data[112:114]))
+		byteLength := pathLength * 2
+		if len(data) < 114+byteLength {
 			return nil, fmt.Errorf("data is too short to contain a version %d DestListEntry", version)
 		}
 		u16s := make([]uint16, pathLength)
 		for i := range pathLength {
-			offset := 130 + (i * 2)
+			offset := 114 + (i * 2)
 			u16s[i] = binary.LittleEndian.Uint16(data[offset : offset+2])
 		}
 		rawPath = u16s
 	}
 
 	checksum := binary.LittleEndian.Uint64(data[0:8])
-	volumeDroid := NewGUID(data[8:24])
-	fileDroid := NewGUID(data[24:40])
-	volumeBirthDroid := NewGUID(data[40:56])
-	fileBirthDroid := NewGUID(data[56:72])
+	volumeDroid := guid.FromWindowsArray([16]byte(data[8:24]))
+	fileDroid := guid.FromWindowsArray([16]byte(data[24:40]))
+	volumeBirthDroid := guid.FromWindowsArray([16]byte(data[40:56]))
+	fileBirthDroid := guid.FromWindowsArray([16]byte(data[56:72]))
 	hostname := parseHostname(data[72:88])
 	entryNumber := readInt32(data[88:92])
 	name := fmt.Sprintf("%x", entryNumber)
@@ -358,17 +426,17 @@ func NewDestListEntry(data []byte, version int32, log *logger.Logger) (*DestList
 	accessCount := readFloat32(data[96:100])
 	lastModifiedTime := parseTimestamp(data[100:108])
 	pinStatus := readInt32(data[108:112])
-	macAddress := fileDroid.AsMacAddress()
-	creationTime := fileDroid.AsFileTime()
+	macAddress := AsMacAddress(fileDroid)
+	creationTime := AsFileTime(fileDroid)
 	path := string(utf16.Decode(rawPath))
 	resolvedPath := resolvePath(path)
 
 	return &DestListEntry{
 		checksum:         checksum,
-		volumeDroid:      volumeDroid,
-		fileDroid:        fileDroid,
-		volumeBirthDroid: volumeBirthDroid,
-		fileBirthDroid:   fileBirthDroid,
+		volumeDroid:      volumeDroid.String(),
+		fileDroid:        fileDroid.String(),
+		volumeBirthDroid: volumeBirthDroid.String(),
+		fileBirthDroid:   fileBirthDroid.String(),
 		Hostname:         hostname,
 		EntryNumber:      entryNumber,
 		unknown0:         unknown0,
