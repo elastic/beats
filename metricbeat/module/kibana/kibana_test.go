@@ -18,6 +18,9 @@
 package kibana_test
 
 import (
+	"io"
+	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -43,5 +46,35 @@ func TestIsStatsAPIAvailable(t *testing.T) {
 	for _, test := range tests {
 		actual := kibana.IsStatsAPIAvailable(version.MustNew(test.input))
 		require.Equal(t, test.expected, actual)
+	}
+}
+
+func TestReadBody(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		body       string
+		wantErr    bool
+	}{
+		{"200 returns body", 200, `{"status":"ok"}`, false},
+		{"503 returns body", 503, `{"status":"degraded"}`, false},
+		{"404 returns error", 404, "", true},
+		{"500 returns error", 500, "", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			resp := &http.Response{
+				StatusCode: tt.statusCode,
+				Body:       io.NopCloser(strings.NewReader(tt.body)),
+			}
+			body, err := kibana.ReadBody(resp)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, tt.body, string(body))
+		})
 	}
 }
