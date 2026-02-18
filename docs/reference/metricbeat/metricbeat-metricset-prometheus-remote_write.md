@@ -71,7 +71,7 @@ remote_write:
 ## Request size limits [_request_size_limits]
 
 ```{applies_to}
-stack: ga 8.19.3, ga 9.2.5, ga 9.3.1, ga 9.4
+stack: ga 8.19.13, ga 9.2.5, ga 9.3.1, ga 9.4
 ```
 
 To protect against resource exhaustion from malicious or oversized payloads, the remote_write metricset enforces configurable size limits on incoming requests:
