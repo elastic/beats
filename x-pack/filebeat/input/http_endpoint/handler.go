@@ -140,7 +140,6 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		if !accepting {
 			w.Header().Set("Content-Type", "application/json")
-			w.Header().Set(headerContentEncoding, "application/json")
 			w.Header().Set("Retry-After", strconv.Itoa(h.retryAfter))
 			w.WriteHeader(http.StatusServiceUnavailable)
 			_, err := fmt.Fprintf(w,
@@ -206,7 +205,6 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, errMaxInFlightExceeded) {
 			w.Header().Set("Content-Type", "application/json")
-			w.Header().Set(headerContentEncoding, "application/json")
 			w.Header().Set("Retry-After", strconv.Itoa(h.retryAfter*2))
 			w.WriteHeader(http.StatusServiceUnavailable)
 			_, werr := fmt.Fprintf(w,
