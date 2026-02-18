@@ -187,6 +187,13 @@ var pathTests = []struct {
 		want:    false,
 		wantErr: nil,
 	},
+	{
+		name:    "abs_root_is_parent_of_root",
+		root:    "/abs/path/to/root",
+		path:    "/abs/path/to",
+		want:    false,
+		wantErr: nil,
+	},
 }
 
 func TestIsPathIn(t *testing.T) {

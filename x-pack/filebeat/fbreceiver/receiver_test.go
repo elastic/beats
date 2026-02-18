@@ -61,9 +61,6 @@ func TestNewReceiver(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
@@ -134,9 +131,6 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 						"count":   10,
 					},
 				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
 			},
 			"logging": map[string]any{
 				"level": level.String(),
@@ -391,9 +385,6 @@ func TestReceiverStatus(t *testing.T) {
 							},
 						},
 					},
-					"output": map[string]any{
-						"otelconsumer": map[string]any{},
-					},
 					"logging": map[string]any{
 						"level": "debug",
 						"selectors": []string{
@@ -602,9 +593,6 @@ func TestConsumeContract(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
@@ -639,9 +627,6 @@ func TestReceiverHook(t *testing.T) {
 						"count":   1,
 					},
 				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
 			},
 			"management.otel.enabled": true,
 			"path.home":               t.TempDir(),
