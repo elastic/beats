@@ -459,3 +459,29 @@ Logon Process Name:  IKE"""
         self.assertIn("message", evts[0], msg=evts[0])
         self.assertNotIn("\\u000a", evts[0]["message"], msg=evts[0])
         self.assertEqual(str(msg), codecs.decode(evts[0]["message"], "unicode_escape"), msg=evts[0])
+
+    def test_registry_file_respects_path_data(self):
+        """
+        wineventlog - Registry file is written under configured path.data
+        """
+        self.write_event_log("Hello world!")
+
+        custom_data_dir = os.path.join(self.working_dir, "custom-data")
+        registry_file = "state/.winlogbeat.yml"
+        expected_registry_path = os.path.join(custom_data_dir, "state", ".winlogbeat.yml")
+        default_registry_path = os.path.join(self.working_dir, "data", ".winlogbeat.yml")
+
+        self.render_config_template(
+            path_data=custom_data_dir,
+            registry_file=registry_file,
+            event_logs=[{"name": self.providerName}],
+        )
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_has(1), name="1 event in output")
+        self.wait_until(lambda: os.path.isfile(expected_registry_path), name="registry file exists")
+        proc.check_kill_and_wait()
+
+        self.assertFalse(os.path.isfile(default_registry_path))
+
+        event_logs = self.read_registry(registry_path=expected_registry_path)
+        self.assertIn(self.providerName, event_logs)
