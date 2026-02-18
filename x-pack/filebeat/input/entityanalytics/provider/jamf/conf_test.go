@@ -59,7 +59,7 @@ var validateTests = []struct {
 				Logger:  lumberjack.Logger{Filename: "/var/logs/path.log"},
 			},
 		},
-		wantErr: nil,
+		wantErr: errors.New(`request tracer path must be within "jamf" path`),
 	},
 	{
 		name: "valid_path",

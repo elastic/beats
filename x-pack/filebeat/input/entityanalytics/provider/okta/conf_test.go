@@ -73,7 +73,7 @@ var validateTests = []struct {
 			}
 			return cfg
 		}(),
-		wantErr: nil,
+		wantErr: errors.New(`request tracer path must be within "okta" path`),
 	},
 	{
 		name: "valid_path",

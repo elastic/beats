@@ -617,7 +617,7 @@ var validateConfigTests = []struct {
 			"tracer.enabled":  false,
 			"tracer.filename": "/var/logs/path.log",
 		},
-		wantErr: nil,
+		wantErr: errors.New(`request tracer path must be within "azure-ad" path accessing 'tracer'`),
 	},
 	{
 		name: "valid_path",
