@@ -69,8 +69,6 @@ func TestFilebeatOTelE2E(t *testing.T) {
             - %s
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    output:
-      otelconsumer:
     processors:
       - add_host_metadata: ~
       - add_cloud_metadata: ~
@@ -249,8 +247,6 @@ processors:
         - type: httpjson
           id: httpjson-e2e-otel
           request.url: http://localhost:8090/test
-    output:
-      otelconsumer:
     processors:
       - add_host_metadata: ~
       - add_cloud_metadata: ~
@@ -457,8 +453,6 @@ func TestFilebeatOTelReceiverE2E(t *testing.T) {
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    output:
-      otelconsumer:
     logging:
       level: info
       selectors:
@@ -641,8 +635,6 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
             - {{$receiver.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    output:
-      otelconsumer:
     logging:
       level: info
       selectors:
@@ -989,8 +981,6 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    output:
-      otelconsumer:
     logging:
       level: debug
     queue.mem.flush.timeout: 0s
@@ -1182,8 +1172,6 @@ func TestFileBeatKerberos(t *testing.T) {
             - {{.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    output:
-      otelconsumer:
     queue.mem.flush.timeout: 0s
     management.otel.enabled: true
     path.home: {{.PathHome}}	
