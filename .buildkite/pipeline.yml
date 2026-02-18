@@ -104,9 +104,9 @@ steps:
     if_changed:
       include:
         - .go-version
-        - filebeat/**.go
-        - x-pack/filebeat/**.go
-        - x-pack/libbeat/**.go
+        - filebeat/**
+        - x-pack/filebeat/**
+        - x-pack/libbeat/**
         - .buildkite/x-pack/pipeline.xpack.filebeat.yml
         - .buildkite/pipeline.yml
         - .buildkite/scripts/**
@@ -116,8 +116,8 @@ steps:
         - go.mod
         - pytest.ini
         - dev-tools/**
-        - libbeat/**.go
-        - testing/**.go
+        - libbeat/**
+        - testing/**
     trigger: "beats-xpack-filebeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
