@@ -2376,15 +2376,7 @@ func TestInput(t *testing.T) {
 
 			var tempDir string
 			if conf.Resource.Tracer != nil {
-				err := os.MkdirAll("cel", 0o700)
-				if err != nil {
-					t.Fatalf("failed to create root logging destination: %v", err)
-				}
-				tempDir, err = os.MkdirTemp("cel", "logs-*")
-				if err != nil {
-					t.Fatalf("failed to create logging destination: %v", err)
-				}
-				defer os.RemoveAll("cel")
+				tempDir = t.TempDir()
 				conf.Resource.Tracer.Filename = filepath.Join(tempDir, conf.Resource.Tracer.Filename)
 			}
 

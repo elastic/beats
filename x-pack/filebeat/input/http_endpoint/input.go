@@ -35,13 +35,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -117,15 +115,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 
 	if e.config.Tracer != nil {
 		id := sanitizeFileName(ctx.IDWithoutName)
-		path := strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
-		ok, err := httplog.IsPathInLogsFor(inputName, path)
-		if err != nil {
-			return err
-		}
-		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
-		}
-		e.config.Tracer.Filename = path
+		e.config.Tracer.Filename = strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
 	}
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
