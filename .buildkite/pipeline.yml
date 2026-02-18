@@ -71,8 +71,8 @@ steps:
     if_changed:
       include:
         - .go-version
-        - filebeat/
-        - .buildkite/filebeat/
+        - filebeat/**
+        - .buildkite/filebeat/**
         # CI related scripts
         - .buildkite/pipeline.yml
         - .buildkite/scripts/**
@@ -104,8 +104,8 @@ steps:
     if_changed:
       include:
         - .go-version
-        - filebeat/
-        - x-pack/filebeat/
+        - filebeat/**
+        - x-pack/filebeat/**
         - x-pack/libbeat/**
         - .buildkite/x-pack/pipeline.xpack.filebeat.yml
         - .buildkite/pipeline.yml
@@ -139,7 +139,8 @@ steps:
     if_changed:
       include:
         - .go-version
-        - x-pack/dockerlogbeat/
+        - x-pack/dockerlogbeat/**
+        - x-pack/libbeat/**
         - .buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml
         - .buildkite/pipeline.yml
         - .buildkite/hooks/**
@@ -172,7 +173,7 @@ steps:
       include:
         - .go-version
         - metricbeat/**
-        - .buildkite/metricbeat/
+        - .buildkite/metricbeat/**
         - .buildkite/pipeline.yml
         - .buildkite/scripts/**
         - .buildkite/hooks/**
@@ -205,7 +206,7 @@ steps:
         - .go-version
         - metricbeat/**
         - x-pack/metricbeat/**
-        - x-pack/libbeat/common/aws
+        - x-pack/libbeat/**
         - .buildkite/x-pack/pipeline.xpack.metricbeat.yml
         - .buildkite/pipeline.yml
         - .buildkite/scripts/**
@@ -239,6 +240,7 @@ steps:
       include:
         - .go-version
         - x-pack/osquerybeat/**
+        - x-pack/libbeat/**
         - .buildkite/x-pack/pipeline.xpack.osquerybeat.yml
         - .buildkite/pipeline.yml
         - .buildkite/scripts/**
@@ -275,6 +277,7 @@ steps:
         - .go-version
         - winlogbeat/**
         - x-pack/winlogbeat/**
+        - x-pack/libbeat/**
         - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
         - .buildkite/pipeline.yml
         - .buildkite/scripts/**
@@ -429,6 +432,7 @@ steps:
         - .go-version
         - auditbeat/**
         - x-pack/auditbeat/
+        - x-pack/libbeat/**
         - .buildkite/x-pack/pipeline.xpack.auditbeat.yml
         - .buildkite/pipeline.yml
         - .buildkite/scripts/**
@@ -463,6 +467,7 @@ steps:
         - .go-version
         - heartbeat/**
         - x-pack/heartbeat/**
+        - x-pack/libbeat/**
         - .buildkite/x-pack/pipeline.xpack.heartbeat.yml
         - .buildkite/pipeline.yml
         - .buildkite/scripts/**
@@ -497,6 +502,7 @@ steps:
         - .go-version
         - packetbeat/**
         - x-pack/packetbeat/**
+        - x-pack/libbeat/**
         - .buildkite/x-pack/pipeline.xpack.packetbeat.yml
         - .buildkite/pipeline.yml
         - .buildkite/scripts/**
