@@ -139,9 +139,8 @@ func TestActionHandlerExecute(t *testing.T) {
 					if diff != "" {
 						t.Error(diff)
 					}
-					diff = cmp.Diff("", tc.Publisher.(*mockPublisher).responseID)
-					if diff != "" {
-						t.Error(diff)
+				if tc.Publisher.(*mockPublisher).responseID == "" {
+					t.Error("expected non-empty responseID")
 					}
 				}
 			} else {

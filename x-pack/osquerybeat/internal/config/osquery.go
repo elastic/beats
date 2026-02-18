@@ -98,7 +98,7 @@ func (c *RRuleScheduleConfig) IsEnabled() bool {
 // Embedded in Query so these appear at the same level in config (query, interval, schedule_id, start_date).
 type NativeSchedule struct {
 	Interval   int    `config:"interval" json:"interval"`
-	ScheduleID string `config:"schedule_id,omitempty" json:"schedule_id,omitempty"` // from Kibana; used in result/response docs
+	ScheduleID string `config:"schedule_id,omitempty" json:"schedule_id,omitempty"` // from Kibana; used in scheduled result/response docs
 	StartDate  string `config:"start_date,omitempty" json:"start_date,omitempty"`  // RFC3339; for schedule_execution_count
 }
 
@@ -133,10 +133,6 @@ type Pack struct {
 	Version   string           `config:"version" json:"version,omitempty"`
 	Shard     int              `config:"shard" json:"shard,omitempty"`
 	Queries   map[string]Query `config:"queries" json:"queries,omitempty"`
-
-	// RRuleSchedule provides pack-level RRULE scheduling that applies to all queries in the pack
-	// Individual query rrule_schedule settings override this pack-level setting
-	RRuleSchedule *RRuleScheduleConfig `config:"rrule_schedule,omitempty" json:"-"`
 }
 
 // > SELECT * FROM osquery_events where type = 'subscriber';

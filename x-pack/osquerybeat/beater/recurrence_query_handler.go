@@ -78,21 +78,13 @@ func (h *recurrenceQueryHandler) UpdateFromConfig(osqConfig *config.OsqueryConfi
 	// Process packs
 	for packName, pack := range osqConfig.Packs {
 		for queryName, q := range pack.Queries {
-			// Use query-level rrule schedule if set, otherwise fall back to pack-level
-			rruleConfig := q.RRuleSchedule
-			if rruleConfig == nil || !rruleConfig.IsEnabled() {
-				rruleConfig = pack.RRuleSchedule
-			}
-			if rruleConfig == nil || !rruleConfig.IsEnabled() {
+			// RRULE scheduling is query-level only.
+			if !q.RRuleSchedule.IsEnabled() {
 				continue
 			}
 
-			// Create a copy with the effective rrule config
-			queryCopy := q
-			queryCopy.RRuleSchedule = rruleConfig
-
 			fullName := getPackQueryName(packName, queryName)
-			sq, err := h.createScheduledQuery(fullName, queryCopy)
+			sq, err := h.createScheduledQuery(fullName, q)
 			if err != nil {
 				h.log.Errorf("Failed to create scheduled query '%s': %v", fullName, err)
 				continue
@@ -184,7 +176,7 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, name, query s
 	// Generate a response ID
 	responseID := uuid.Must(uuid.NewV4()).String()
 
-	// Publish results with schedule_execution_count (from RRULE + start_date)
+	// Publish results with response_id + schedule fields for parity across scheduled outputs.
 	meta := map[string]interface{}{
 		"type":                     "rrule_snapshot",
 		"unix_time":                completedAt.Unix(),

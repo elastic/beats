@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/action"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
@@ -62,12 +64,13 @@ func (a *actionHandler) Name() string {
 func (a *actionHandler) Execute(ctx context.Context, req map[string]interface{}) (map[string]interface{}, error) {
 
 	start := time.Now().UTC()
-	count, err := a.execute(ctx, req)
+	count, responseID, err := a.execute(ctx, req)
 	end := time.Now().UTC()
 
 	res := map[string]interface{}{
 		"started_at":   start.Format(time.RFC3339Nano),
 		"completed_at": end.Format(time.RFC3339Nano),
+		"response_id":  responseID,
 	}
 
 	if err != nil {
@@ -78,11 +81,12 @@ func (a *actionHandler) Execute(ctx context.Context, req map[string]interface{})
 	return res, nil
 }
 
-func (a *actionHandler) execute(ctx context.Context, req map[string]interface{}) (int, error) {
+func (a *actionHandler) execute(ctx context.Context, req map[string]interface{}) (int, string, error) {
 	ac, err := action.FromMap(req)
 	if err != nil {
-		return 0, fmt.Errorf("%w: %w", err, ErrQueryExecution)
+		return 0, "", fmt.Errorf("%w: %w", err, ErrQueryExecution)
 	}
+	responseID := uuid.Must(uuid.NewV4()).String()
 
 	var namespace string
 	if a.np != nil {
@@ -92,7 +96,11 @@ func (a *actionHandler) execute(ctx context.Context, req map[string]interface{})
 		namespace = config.DefaultNamespace
 	}
 
-	return a.executeQuery(ctx, config.Datastream(namespace), ac, "", req)
+	count, err := a.executeQuery(ctx, config.Datastream(namespace), ac, responseID, req)
+	if err != nil {
+		return 0, responseID, err
+	}
+	return count, responseID, nil
 }
 
 func (a *actionHandler) executeQuery(ctx context.Context, index string, ac action.Action, responseID string, req map[string]interface{}) (int, error) {

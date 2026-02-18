@@ -20,7 +20,7 @@ osquerybeat:
 # Valid examples: "FREQ=DAILY", "FREQ=WEEKLY;BYDAY=MO,WE,FR" (Mon/Wed/Fri)
 # Invalid examples: "FREQ=HOURLY", "FREQ=MINUTELY"
 #
-# RRULE scheduling can be configured at the query level or pack level:
+# RRULE scheduling is configured at the query level:
 #
 # Query-level RRULE scheduling:
 #  inputs:
@@ -32,10 +32,11 @@ osquerybeat:
 #        schedule:
 #          process_check:
 #            query: "select * from processes"
-#            # Optional: policy-defined schedule_id (from Kibana, used in results/responses)
+#            # Optional: policy-defined schedule_id (from Kibana, used in scheduled results/responses)
 #            # schedule_id: "policy-schedule-uuid"
 #            # For native schedules: start_date (RFC3339) is optional. When set, it enables
-#            # consistent schedule_execution_count across agents (computed as 1 + (run_time - start_date) / interval).
+#            # consistent schedule_execution_count in scheduled results/responses across agents
+#            # (computed as 1 + (run_time - start_date) / interval).
 #            # start_date: "2024-01-01T00:00:00Z"
 #            rrule_schedule:
 #              # RFC 5545 recurrence rule string
@@ -60,27 +61,6 @@ osquerybeat:
 #              splay: "0s"
 #              # Optional: Query timeout in seconds (default: 60)
 #              timeout: 120
-#
-# Pack-level RRULE scheduling (applies to all queries in the pack):
-#  inputs:
-#    - type: osquery
-#      osquery:
-#        packs:
-#          security_pack:
-#            rrule_schedule:
-#              rrule: "FREQ=DAILY"  # Daily
-#              start_date: "2024-01-01T00:00:00Z"
-#              splay: "1h"  # Up to 1 hour random delay
-#            queries:
-#              users:
-#                query: "select * from users"
-#              processes:
-#                query: "select * from processes"
-#                # Query-level rrule_schedule overrides pack-level
-#                rrule_schedule:
-#                  rrule: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR"  # Weekdays
-#                  start_date: "2024-01-01T00:00:00Z"
-#                  splay: "90s"  # Up to 90 seconds delay
 #
 # Splay Best Practices:
 # - Default is 0s (disabled); opt in to splay for most schedules

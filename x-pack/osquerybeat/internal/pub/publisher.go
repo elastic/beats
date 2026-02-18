@@ -198,6 +198,7 @@ func actionResultToEvent(req, res map[string]interface{}) map[string]interface{}
 
 	copyKey("started_at", res, m)
 	copyKey("completed_at", res, m)
+	copyKey("response_id", res, m)
 	copyKey("error", res, m)
 
 	if v, ok := res["count"]; ok {
@@ -282,7 +283,10 @@ func hitToEvent(index, eventType, idValue, idFieldKey, responseID string, meta, 
 	fields["event"] = evf
 
 	fields["type"] = eventType
-	fields[idFieldKey] = idValue // "action_id" for live actions, "schedule_id" for scheduled
+	// Add identifier only when requested by caller (for example action_id on live query results).
+	if idFieldKey != "" {
+		fields[idFieldKey] = idValue
+	}
 	fields["osquery"] = hit
 	if meta != nil {
 		fields["osquery_meta"] = meta

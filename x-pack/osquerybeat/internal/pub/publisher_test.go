@@ -37,6 +37,7 @@ func TestHitToEvent(t *testing.T) {
 		}
 		if mask>>4&1 > 0 {
 			p.idValue = "uptime"
+			p.idFieldKey = "schedule_id"
 		}
 		if mask>>3&1 > 0 {
 			p.responseID = uuid.Must(uuid.NewV4()).String()
@@ -81,9 +82,13 @@ func TestHitToEvent(t *testing.T) {
 			t.Error(diff)
 		}
 
-		diff = cmp.Diff(p.idValue, ev.Fields[p.idFieldKey])
-		if diff != "" {
-			t.Error(diff)
+		if p.idFieldKey != "" {
+			diff = cmp.Diff(p.idValue, ev.Fields[p.idFieldKey])
+			if diff != "" {
+				t.Error(diff)
+			}
+		} else if ev.Fields[p.idFieldKey] != nil {
+			t.Errorf("expected no id field when key is empty, got: %#v", ev.Fields[p.idFieldKey])
 		}
 
 		if p.responseID != "" {
