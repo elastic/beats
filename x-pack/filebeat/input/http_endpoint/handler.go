@@ -128,8 +128,8 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		current := h.inFlight.Load()
 		accepting := h.accepting.Load()
 
-		// Transition from rejecting to accepting when below low water mark.
-		if !accepting && current < h.lowWaterInFlight {
+		// Transition from rejecting to accepting when at or below low water mark.
+		if !accepting && current <= h.lowWaterInFlight {
 			accepting = true
 		}
 		// Transition from accepting to rejecting when at or above high water mark.
@@ -139,6 +139,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.accepting.Store(accepting)
 
 		if !accepting {
+			w.Header().Set("Content-Type", "application/json")
 			w.Header().Set(headerContentEncoding, "application/json")
 			w.Header().Set("Retry-After", strconv.Itoa(h.retryAfter))
 			w.WriteHeader(http.StatusServiceUnavailable)
@@ -204,14 +205,16 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	objs, code, err := httpReadJSON(body, h.program)
 	if err != nil {
 		if errors.Is(err, errMaxInFlightExceeded) {
+			w.Header().Set("Content-Type", "application/json")
 			w.Header().Set(headerContentEncoding, "application/json")
-			w.WriteHeader(http.StatusInternalServerError)
+			w.Header().Set("Retry-After", strconv.Itoa(h.retryAfter*2))
+			w.WriteHeader(http.StatusServiceUnavailable)
 			_, werr := fmt.Fprintf(w,
 				`{"error":"max in flight bytes exceeded during read","max_in_flight":%d,"in_flight":%d}`,
 				h.maxInFlight, h.inFlight.Load(),
 			)
 			if werr != nil {
-				h.log.Errorw("failed to write 500", "error", werr)
+				h.log.Errorw("failed to write 503", "error", werr)
 			}
 			h.status.UpdateStatus(status.Degraded, "max in flight bytes exceeded during read")
 			h.metrics.apiErrors.Add(1)

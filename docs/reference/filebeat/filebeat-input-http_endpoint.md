@@ -28,8 +28,8 @@ These are the possible response codes from the server.
 | 405 | Method Not Allowed | Returned if methods other than POST are used. |
 | 406 | Not Acceptable | Returned if the POST request does not contain a body. |
 | 415 | Unsupported Media Type | Returned if the Content-Type is not application/json. Or if Content-Encoding is present and is not gzip. |
-| 500 | Internal Server Error | Returned if an I/O error occurs reading the request, or if the hard limit `max_in_flight_bytes` is exceeded during body reading. |
-| 503 | Service Unavailable | Returned if the total in-flight bytes are above the `high_water_in_flight_bytes` threshold. The response includes a `Retry-After` header. |
+| 500 | Internal Server Error | Returned if an I/O error occurs reading the request. |
+| 503 | Service Unavailable | Returned if the hard limit `max_in_flight_bytes` is exceeded during body reading, or if the total in-flight bytes are above the `high_water_in_flight_bytes` threshold. The response includes a `Retry-After` header. |
 | 504 | Gateway Timeout | Returned if a request publication cannot be ACKed within the required timeout. |
 
 The endpoint will enforce end-to-end ACK when a URL query parameter `wait_for_completion_timeout` with a duration is provided. For example `http://localhost:8080/?wait_for_completion_timeout=1m` will wait up to 1 minute for the event to be published to the cluster and then return the user-defined response message. In the case that the publication does not complete within the timeout duration, the HTTP response will have a 504 Gateway Timeout status code. The syntax for durations is a number followed by units which may be h, m and s. No other HTTP query is accepted. If another query parameter is provided or duration syntax is incorrect, the request will fail with an HTTP 400 "Bad Request" status.
@@ -294,7 +294,7 @@ By default the input expects the incoming POST to include a Content-Type of `app
 
 ### `max_in_flight_bytes` [_max_in_flight_bytes]
 
-The hard limit on the total sum of request body bytes that are allowed to be in-flight at any given time. If this limit is exceeded during body reading, the request is terminated with a 500 Internal Server Error. This serves as a safety valve to prevent memory exhaustion. The default value is zero, meaning no limit.
+The hard limit on the total sum of request body bytes that are allowed to be in-flight at any given time. If this limit is exceeded during body reading, the request is terminated with a 503 Service Unavailable response and a `Retry-After` header. This serves as a safety valve to prevent memory exhaustion. The default value is zero, meaning no limit.
 
 In-flight bytes are tracked from the moment they are read from the request body until the event is acknowledged by the output (for requests with `wait_for_completion_timeout`) or until the request completes (for requests without the timeout parameter).
 
@@ -330,7 +330,7 @@ In Filebeat versions prior to 9.4.0, `max_body_bytes` was only enforced for HMAC
 
 ### `retry_after` [_retry_after]
 
-{applies_to}`stack: ga 9.2+` {applies_to}`stack: ga 8.19+` When a request is rejected due to exceeding `high_water_in_flight_bytes`, the response includes a `Retry-After` header specifying how many seconds the client should wait before retrying. The default value is 10 seconds.
+{applies_to}`stack: ga 9.2+` {applies_to}`stack: ga 8.19+` When a request is rejected due to exceeding `high_water_in_flight_bytes` or `max_in_flight_bytes`, the response includes a `Retry-After` header specifying how many seconds the client should wait before retrying. For `high_water_in_flight_bytes` rejection the configured value is used directly; for `max_in_flight_bytes` rejection 2x the configured value is used. The default value is 10 seconds.
 
 
 ### `program` [_program]

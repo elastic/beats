@@ -134,5 +134,4 @@ func TestCountReader(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, int64(0), inFlight.Load())
 	})
-
 }

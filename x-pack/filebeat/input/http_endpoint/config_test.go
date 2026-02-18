@@ -215,6 +215,27 @@ func TestValidateInFlightLimits(t *testing.T) {
 			lowWaterInFlight:  800,
 			wantError:         "low_water_in_flight_bytes (800) must be less than high_water_in_flight_bytes (800)",
 		},
+		{
+			name:              "high water without max",
+			highWaterInFlight: 500,
+			wantError:         "high_water_in_flight_bytes and low_water_in_flight_bytes require max_in_flight_bytes to be set",
+		},
+		{
+			name:             "low water without max",
+			lowWaterInFlight: 100,
+			wantError:        "high_water_in_flight_bytes and low_water_in_flight_bytes require max_in_flight_bytes to be set",
+		},
+		{
+			name:              "both water marks without max",
+			highWaterInFlight: 500,
+			lowWaterInFlight:  100,
+			wantError:         "high_water_in_flight_bytes and low_water_in_flight_bytes require max_in_flight_bytes to be set",
+		},
+		{
+			name:        "max too small",
+			maxInFlight: 1,
+			wantError:   "max_in_flight_bytes must be at least 2",
+		},
 	}
 
 	for _, tt := range tests {

@@ -186,7 +186,13 @@ func (c *config) validateInFlightLimits() error {
 	if c.LowWaterInFlight < 0 {
 		return fmt.Errorf("low_water_in_flight_bytes is negative: %d", c.LowWaterInFlight)
 	}
+	if c.MaxInFlight == 0 && (c.HighWaterInFlight != 0 || c.LowWaterInFlight != 0) {
+		return errors.New("high_water_in_flight_bytes and low_water_in_flight_bytes require max_in_flight_bytes to be set")
+	}
 	if c.MaxInFlight > 0 {
+		if c.MaxInFlight < 2 {
+			return fmt.Errorf("max_in_flight_bytes must be at least 2: currently set to %d", c.MaxInFlight)
+		}
 		if c.HighWaterInFlight >= c.MaxInFlight {
 			return fmt.Errorf("high_water_in_flight_bytes (%d) must be less than max_in_flight_bytes (%d)", c.HighWaterInFlight, c.MaxInFlight)
 		}
