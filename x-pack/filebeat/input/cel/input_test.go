@@ -1507,7 +1507,7 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval":                 1,
 			"resource.url":             "https://example.com/",
-			"resource.tracer.enabled":  false,
+			"resource.tracer.enabled":  true,
 			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
 			"state":                    map[string]interface{}{},
 			"program":                  "{}",
