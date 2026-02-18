@@ -15,7 +15,8 @@ jobs:
   run:
     if: >-
       startsWith(github.event.comment.body, '/ai') &&
-      (github.event.issue.pull_request != null || github.event_name == 'pull_request_review_comment')
+      (github.event.issue.pull_request != null || github.event_name == 'pull_request_review_comment') &&
+      contains(fromJSON('["strawgate","AlexanderWert","perk","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia","pierrehilbert","bturquet","teresaromero","mrodm","jsoriano","kpollich","andrewkroh","norrietaylor","ishleenk17","tommyers-elastic","lalit-satapathy","agithomas"]'), github.actor)
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-mention-in-pr.lock.yml@main
     with:
       setup-commands: |
