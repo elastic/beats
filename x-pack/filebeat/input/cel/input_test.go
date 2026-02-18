@@ -2384,6 +2384,10 @@ func TestInput(t *testing.T) {
 				if err != nil {
 					t.Fatalf("failed to create logging destination: %v", err)
 				}
+				tempDir, err = filepath.Abs(tempDir)
+				if err != nil {
+					t.Fatalf("failed to get absolute path for logging destination: %v", err)
+				}
 				defer os.RemoveAll("cel")
 				conf.Resource.Tracer.Filename = filepath.Join(tempDir, conf.Resource.Tracer.Filename)
 			}

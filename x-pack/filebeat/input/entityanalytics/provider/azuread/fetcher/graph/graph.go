@@ -142,14 +142,13 @@ func (c *tracerConfig) Validate() error {
 		// which is the minimum.
 		c.MaxSize = 1
 	}
-	resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, c.Filename)
+	ok, err := httplog.IsPathInLogsFor(inputName, c.Filename)
 	if err != nil {
 		return err
 	}
 	if !ok {
 		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
 	}
-	c.Filename = resolved
 	return nil
 }
 
