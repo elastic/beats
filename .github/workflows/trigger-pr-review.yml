@@ -1,0 +1,27 @@
+name: PR Review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  run:
+    if: >-
+      github.event.pull_request.draft == false &&
+      !contains(github.event.pull_request.labels.*.name, 'skip-auto-pr-review')
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-pr-review.lock.yml@main
+    with:
+      setup-commands: |
+        sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+        make mage
+      messages-footer: |
+        ---
+        [From workflow: ${{ github.workflow }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+        Give us feedback! React with 🚀 if perfect, 👍 if helpful, 👎 if not.
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

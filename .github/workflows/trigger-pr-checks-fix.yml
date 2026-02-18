@@ -1,0 +1,30 @@
+name: PR Checks Fix
+on:
+  workflow_run:
+    workflows: ["check-default", "pre-commit", "golangci-lint", "check-docs", "check-dev-tools"]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: write
+  discussions: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  run:
+    if: >-
+      github.event.workflow_run.conclusion == 'failure' &&
+      toJSON(github.event.workflow_run.pull_requests) != '[]'
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-pr-checks-fix.lock.yml@main
+    with:
+      setup-commands: |
+        sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+        make mage
+      messages-footer: |
+        ---
+        [From workflow: ${{ github.workflow }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+        Give us feedback! React with 🚀 if perfect, 👍 if helpful, 👎 if not.
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
