@@ -126,7 +126,7 @@ func (c *config) Validate() error {
 		return fmt.Errorf("max_body_bytes is negative: %d", *c.MaxBodySize)
 	}
 
-	if c.Tracer == nil {
+	if !c.Tracer.enabled() {
 		return nil
 	}
 	if c.Tracer.Filename == "" {
@@ -138,13 +138,14 @@ func (c *config) Validate() error {
 		// which is the minimum.
 		c.Tracer.MaxSize = 1
 	}
-	ok, err := httplog.IsPathInLogsFor(inputName, c.Tracer.Filename)
+	resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, c.Tracer.Filename)
 	if err != nil {
 		return err
 	}
 	if !ok {
 		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
 	}
+	c.Tracer.Filename = resolved
 
 	return nil
 }
