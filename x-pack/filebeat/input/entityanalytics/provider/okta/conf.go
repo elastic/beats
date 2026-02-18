@@ -199,21 +199,7 @@ func (c *conf) Validate() error {
 		return errors.New("dataset must be 'all', 'users', 'devices' or empty")
 	}
 
-<<<<<<< HEAD
-	if c.Tracer == nil {
-=======
-	// Validate authentication configuration
-	if c.OAuth2 != nil && c.OAuth2.isEnabled() {
-		err := c.OAuth2.Validate()
-		if err != nil {
-			return err
-		}
-	} else if c.OktaToken == "" {
-		return errors.New("either oauth2 configuration or okta_token must be provided")
-	}
-
 	if !c.Tracer.enabled() {
->>>>>>> f163d6b3b (x-pack/filebeat/input/{cel,httpjson,http_endpoint,entityanalytics}: fix request tracer path validation under managed agent (#48909))
 		return nil
 	}
 	if c.Tracer.Filename == "" {
