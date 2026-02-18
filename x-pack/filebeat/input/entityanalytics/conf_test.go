@@ -28,6 +28,11 @@ func TestConf_Validate(t *testing.T) {
 			},
 			WantErr: ErrProviderUnknown.Error(),
 		},
+		"err-provider-unknown-fail": {
+			In: conf{
+				Provider: "unknown",
+			},
+		},
 	}
 
 	for name, tc := range tests {
