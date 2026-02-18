@@ -80,7 +80,7 @@ steps:
         #OSS
         - go.mod
         - pytest.ini
-        - dev-tools
+        - dev-tools/**
         - libbeat/**
         - testing/**
     trigger: "filebeat"
@@ -245,9 +245,6 @@ steps:
         - .buildkite/pipeline.yml
         - .buildkite/scripts/**
         - .buildkite/hooks/**
-        # x-pack
-        - libbeat/**
-        - x-pack/libbeat/**
         #OSS
         - go.mod
         - pytest.ini
@@ -431,7 +428,7 @@ steps:
       include:
         - .go-version
         - auditbeat/**
-        - x-pack/auditbeat/
+        - x-pack/auditbeat/**
         - x-pack/libbeat/**
         - .buildkite/x-pack/pipeline.xpack.auditbeat.yml
         - .buildkite/pipeline.yml
@@ -443,7 +440,6 @@ steps:
         - dev-tools/**
         - libbeat/**
         - testing/**
-        - x-pack/libbeat/**
     trigger: "beats-xpack-auditbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -478,7 +474,6 @@ steps:
         - dev-tools/**
         - libbeat/**
         - testing/**
-        - x-pack/libbeat/**
     trigger: "beats-xpack-heartbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -513,7 +508,6 @@ steps:
         - dev-tools/**
         - libbeat/**
         - testing/**
-        - x-pack/libbeat/**
     trigger: "beats-xpack-packetbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
