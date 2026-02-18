@@ -1,4 +1,4 @@
-# Elastic Logging Plugin: a docker plugin for sending logs to elasticsearch
+# Elastic Logging Plugin: A Docker plugin for sending logs to Elasticsearch
 
 
 A [Docker logging plugin](https://docs.docker.com/engine/extend/plugins_logging/) that ships container logs to Elasticsearch.
@@ -91,12 +91,12 @@ Logging plugins work by starting up an HTTP server that reads over a unix socket
 
 
 
-## Debugging on MacOS.
+## Debugging on MacOS
 
-First, you need to shell into the VM that `runc` lives in. To do this, you need to find the tty for the VM. On newer versions of Docker For Mac, it's at: `~/Library/Containers/com.docker.docker/Data/vms/0/tty` On older versions, it's _somewhere_ else in `~/Library/Containers/com.docker.docker`.
+First, you need to shell into the VM that `runc` lives in. To do this, you need to find the tty for the VM. On later versions of Docker For Mac, it's at: `~/Library/Containers/com.docker.docker/Data/vms/0/tty` On earlier versions, it's _somewhere_ else in `~/Library/Containers/com.docker.docker`.
 
 
-Once you find it, just run `screen ~/Library/Containers/com.docker.docker/Data/vms/0/tty`
+Once you find it, run `screen ~/Library/Containers/com.docker.docker/Data/vms/0/tty`
 
 
 The location of the logs AND the container base directory in the docker docs is wrong.
