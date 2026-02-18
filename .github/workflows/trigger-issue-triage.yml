@@ -18,10 +18,5 @@ jobs:
       setup-commands: |
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
         make mage
-      messages-footer: |
-        ---
-        [From workflow: ${{ github.workflow }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-
-        Give us feedback! React with 🚀 if perfect, 👍 if helpful, 👎 if not.
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
