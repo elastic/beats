@@ -130,7 +130,8 @@ type tracerConfig struct {
 const inputName = "azure-ad"
 
 func (c *tracerConfig) Validate() error {
-	if !c.enabled() {
+
+	if c == nil {
 		return nil
 	}
 	if c.Filename == "" {
@@ -142,14 +143,13 @@ func (c *tracerConfig) Validate() error {
 		// which is the minimum.
 		c.MaxSize = 1
 	}
-	resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, c.Filename)
+	ok, err := httplog.IsPathInLogsFor(inputName, c.Filename)
 	if err != nil {
 		return err
 	}
 	if !ok {
 		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
 	}
-	c.Filename = resolved
 	return nil
 }
 
@@ -395,14 +395,14 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 	if c.Tracer != nil {
 		id = sanitizeFileName(id)
 		path := strings.ReplaceAll(c.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+		ok, err := httplog.IsPathInLogsFor(inputName, path)
 		if err != nil {
 			return nil, err
 		}
 		if !ok {
 			return nil, fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
 		}
-		c.Tracer.Filename = resolved
+		c.Tracer.Filename = path
 	}
 
 	client, err := c.Transport.Client(httpcommon.WithLogger(logger))

@@ -38,22 +38,7 @@ type contextKey string
 // IsPathInLogsFor returns whether path is a valid path for logs written by the
 // specified input after resolving symbolic links in path.
 func IsPathInLogsFor(input, path string) (ok bool, err error) {
-	root := paths.Resolve(paths.Logs, input)
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(root, path)
-	}
-	return IsPathIn(root, path)
-}
-
-// ResolvePathInLogsFor resolves path relative to the logs directory for the
-// specified input and reports whether the result is within that directory.
-func ResolvePathInLogsFor(input, path string) (resolved string, ok bool, err error) {
-	root := paths.Resolve(paths.Logs, input)
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(root, path)
-	}
-	ok, err = IsPathIn(root, path)
-	return path, ok, err
+	return IsPathIn(paths.Resolve(paths.Logs, input), path)
 }
 
 // IsPathIn returns whether path is a valid path within root after resolving

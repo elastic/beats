@@ -308,7 +308,7 @@ func (c *conf) Validate() error {
 		return errors.New("either oauth2 configuration or okta_token must be provided")
 	}
 
-	if !c.Tracer.enabled() {
+	if c.Tracer == nil {
 		return nil
 	}
 	if c.Tracer.Filename == "" {
@@ -320,14 +320,13 @@ func (c *conf) Validate() error {
 		// which is the minimum.
 		c.Tracer.MaxSize = 1
 	}
-	resolved, ok, err := httplog.ResolvePathInLogsFor(Name, c.Tracer.Filename)
+	ok, err := httplog.IsPathInLogsFor(Name, c.Tracer.Filename)
 	if err != nil {
 		return err
 	}
 	if !ok {
 		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, Name))
 	}
-	c.Tracer.Filename = resolved
 	return nil
 }
 

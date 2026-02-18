@@ -178,14 +178,14 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	if cfg.Resource.Tracer != nil {
 		id := sanitizeFileName(env.IDWithoutName)
 		path := strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+		ok, err := httplog.IsPathInLogsFor(inputName, path)
 		if err != nil {
 			return err
 		}
 		if !ok {
 			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
 		}
-		cfg.Resource.Tracer.Filename = resolved
+		cfg.Resource.Tracer.Filename = path
 	}
 
 	client, trace, otelMetrics, err := newClient(ctx, cfg, log, reg, env)

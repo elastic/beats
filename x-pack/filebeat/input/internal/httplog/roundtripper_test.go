@@ -5,11 +5,8 @@
 package httplog
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var pathTests = []struct {
@@ -238,94 +235,6 @@ func TestResolveSymlinks(t *testing.T) {
 		})
 	}
 
-}
-
-func TestResolvePathInLogsFor(t *testing.T) {
-	origLogs := paths.Paths.Logs
-	t.Cleanup(func() { paths.Paths.Logs = origLogs })
-
-	logsDir := filepath.Join(t.TempDir(), "logs")
-	paths.Paths.Logs = logsDir
-
-	const input = "cel"
-	root := filepath.Join(logsDir, input)
-	if err := os.MkdirAll(root, 0o755); err != nil {
-		t.Fatal(err)
-	}
-
-	tests := []struct {
-		name         string
-		path         string
-		wantResolved string
-		wantOK       bool
-	}{
-		{
-			name:         "bare_filename",
-			path:         "trace.ndjson",
-			wantResolved: filepath.Join(root, "trace.ndjson"),
-			wantOK:       true,
-		},
-		{
-			name:         "relative_subdir",
-			path:         "subdir/trace.ndjson",
-			wantResolved: filepath.Join(root, "subdir", "trace.ndjson"),
-			wantOK:       true,
-		},
-		{
-			name:         "relative_dotdot_stays_within",
-			path:         "subdir/../trace.ndjson",
-			wantResolved: filepath.Join(root, "trace.ndjson"),
-			wantOK:       true,
-		},
-		{
-			name:         "relative_dotdot_escapes",
-			path:         "../../etc/passwd",
-			wantResolved: filepath.Clean(filepath.Join(root, "../../etc/passwd")),
-			wantOK:       false,
-		},
-		{
-			name:         "absolute_within",
-			path:         filepath.Join(root, "trace.ndjson"),
-			wantResolved: filepath.Join(root, "trace.ndjson"),
-			wantOK:       true,
-		},
-		{
-			name:         "absolute_outside",
-			path:         "/var/log/other.log",
-			wantResolved: "/var/log/other.log",
-			wantOK:       false,
-		},
-		{
-			// This is the pattern used by Fleet integrations: the
-			// relative path climbs out and back through ../../logs/<input>/
-			// which collapses to the root when joined.
-			name:         "integration_relative_pattern",
-			path:         "../../logs/cel/http-request-trace-*.ndjson",
-			wantResolved: filepath.Join(root, "http-request-trace-*.ndjson"),
-			wantOK:       true,
-		},
-		{
-			name:         "dot_resolves_to_root",
-			path:         ".",
-			wantResolved: root,
-			wantOK:       true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			resolved, ok, err := ResolvePathInLogsFor(input, tt.path)
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-			if ok != tt.wantOK {
-				t.Errorf("unexpected ok: got:%t want:%t", ok, tt.wantOK)
-			}
-			if resolved != tt.wantResolved {
-				t.Errorf("unexpected resolved path: got:%q want:%q", resolved, tt.wantResolved)
-			}
-		})
-	}
 }
 
 func sameError(a, b error) bool {

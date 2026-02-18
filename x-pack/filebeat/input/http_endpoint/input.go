@@ -118,14 +118,14 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	if e.config.Tracer != nil {
 		id := sanitizeFileName(ctx.IDWithoutName)
 		path := strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+		ok, err := httplog.IsPathInLogsFor(inputName, path)
 		if err != nil {
 			return err
 		}
 		if !ok {
 			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
 		}
-		e.config.Tracer.Filename = resolved
+		e.config.Tracer.Filename = path
 	}
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
