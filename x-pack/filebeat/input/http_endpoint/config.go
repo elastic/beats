@@ -126,7 +126,7 @@ func (c *config) Validate() error {
 		return fmt.Errorf("max_body_bytes is negative: %d", *c.MaxBodySize)
 	}
 
-	if c.Tracer == nil {
+	if !c.Tracer.enabled() {
 		return nil
 	}
 	if c.Tracer.Filename == "" {
