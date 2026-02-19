@@ -240,7 +240,16 @@ func (c *Cache) Size() int {
 func (c *Cache) StartJanitor(interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	quit := make(chan struct{})
+
+	c.Lock()
+	oldQuit := c.janitorQuit
 	c.janitorQuit = quit
+	c.Unlock()
+
+	if oldQuit != nil {
+		close(oldQuit)
+	}
+
 	go func(quit <-chan struct{}) {
 		for {
 			select {
@@ -256,9 +265,12 @@ func (c *Cache) StartJanitor(interval time.Duration) {
 
 // StopJanitor stops the goroutine created by StartJanitor.
 func (c *Cache) StopJanitor() {
-	if c.janitorQuit != nil {
-		quit := c.janitorQuit
-		c.janitorQuit = nil
+	c.Lock()
+	quit := c.janitorQuit
+	c.janitorQuit = nil
+	c.Unlock()
+
+	if quit != nil {
 		close(quit)
 	}
 }
