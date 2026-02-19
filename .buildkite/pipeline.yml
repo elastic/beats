@@ -108,16 +108,9 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-<<<<<<< HEAD
-        - .go-version
-        - filebeat/**
-        - x-pack/filebeat/**
-        - x-pack/libbeat/**
-=======
         # Beat-specific paths
         - filebeat/**
         - x-pack/filebeat/**
->>>>>>> bcf182894 (Normalise and fix Buildkite `if_changed` globs and grouping across Beats (#48934))
         - .buildkite/x-pack/pipeline.xpack.filebeat.yml
         # Shared x-pack dependencies
         - x-pack/libbeat/**
