@@ -14,6 +14,7 @@ import (
 	"io"
 	"io/fs"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -38,7 +39,29 @@ type contextKey string
 // IsPathInLogsFor returns whether path is a valid path for logs written by the
 // specified input after resolving symbolic links in path.
 func IsPathInLogsFor(input, path string) (ok bool, err error) {
-	return IsPathIn(paths.Resolve(paths.Logs, input), path)
+	root := paths.Resolve(paths.Logs, input)
+	if !filepath.IsAbs(path) && !isRooted(path) {
+		path = filepath.Join(root, path)
+	}
+	return IsPathIn(root, path)
+}
+
+// ResolvePathInLogsFor resolves path relative to the logs directory for the
+// specified input and reports whether the result is within that directory.
+func ResolvePathInLogsFor(input, path string) (resolved string, ok bool, err error) {
+	root := paths.Resolve(paths.Logs, input)
+	if !filepath.IsAbs(path) && !isRooted(path) {
+		path = filepath.Join(root, path)
+	}
+	ok, err = IsPathIn(root, path)
+	return path, ok, err
+}
+
+// isRooted reports whether path begins with a path separator, i.e. it is
+// rooted at the filesystem root even if it is not absolute (no drive letter
+// on Windows). Such paths must not be joined to a base directory.
+func isRooted(path string) bool {
+	return len(path) > 0 && os.IsPathSeparator(path[0])
 }
 
 // IsPathIn returns whether path is a valid path within root after resolving
@@ -66,13 +89,17 @@ func IsPathIn(root, path string) (ok bool, err error) {
 	if err != nil {
 		return false, err
 	}
-	return !strings.HasPrefix(traversal, ".."+string(filepath.Separator)), nil
+	return traversal != ".." && !strings.HasPrefix(traversal, ".."+string(filepath.Separator)), nil
 }
 
 func resolveSymlinks(path string) (string, error) {
 	targ, err := filepath.EvalSymlinks(path)
 	if err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
+		// If the path doesn't exist or has invalid syntax for opening
+		// (e.g. Windows rejects paths containing * or ? with
+		// ERROR_INVALID_NAME), resolve the directory and join the base
+		// so we still follow symlinks in the directory part.
+		if errors.Is(err, fs.ErrNotExist) || isInvalidWindowsName(err) {
 			targ, err := resolveSymlinks(filepath.Dir(path))
 			if err != nil {
 				return "", err

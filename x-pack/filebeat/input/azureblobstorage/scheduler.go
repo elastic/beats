@@ -215,7 +215,6 @@ func (s *scheduler) fetchBlobPager(batchSize int32) *azruntime.Pager[azblob.List
 	listBlobsFlatOptions := azcontainer.ListBlobsFlatOptions{
 		Include: azcontainer.ListBlobsInclude{
 			Metadata: true,
-			Tags:     true,
 		},
 		MaxResults: &batchSize,
 	}
