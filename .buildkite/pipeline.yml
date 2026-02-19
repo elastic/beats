@@ -110,8 +110,8 @@ steps:
       include:
 <<<<<<< HEAD
         - .go-version
-        - filebeat/
-        - x-pack/filebeat/
+        - filebeat/**
+        - x-pack/filebeat/**
         - x-pack/libbeat/**
 =======
         # Beat-specific paths
