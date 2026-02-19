@@ -18,6 +18,7 @@
 package integration
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -91,6 +92,27 @@ func (g jsonGenerator) FileExtension() string {
 // Returns the path value to put in the Filebeat configuration and
 // filenames for all created files.
 func GenerateLogFiles(t *testing.T, files, lines int, generator LogGenerator) (path string, filenames []string) {
+<<<<<<< HEAD
+=======
+	return generateLogFiles(
+		t, files, lines, generator, GenerateLogFile)
+}
+
+// GenerateGZIPLogFiles is the same as GenerateLogFiles, but the files produced
+// are GZIP files.
+func GenerateGZIPLogFiles(t *testing.T, files, lines int, generator LogGenerator) (path string, filenames []string) {
+	return generateLogFiles(
+		t, files, lines, generator, GenerateGZIPLogFile)
+}
+
+func generateLogFiles(
+	t *testing.T,
+	files int,
+	lines int,
+	generator LogGenerator,
+	gen func(t *testing.T, filename string, lines int, generator LogGenerator)) (string, []string) {
+
+>>>>>>> e56b7d5e1 (Extend the integration testing framework (#48948))
 	t.Logf("generating %d log files with %d lines each...", files, lines)
 	logsPath := filepath.Join(t.TempDir(), "logs")
 	err := os.MkdirAll(logsPath, 0777)
@@ -99,7 +121,7 @@ func GenerateLogFiles(t *testing.T, files, lines int, generator LogGenerator) (p
 		return "", nil
 	}
 
-	filenames = make([]string, 0, files)
+	filenames := make([]string, 0, files)
 	for i := 0; i < files; i++ {
 		id, err := uuid.NewV4()
 		if err != nil {
@@ -126,7 +148,63 @@ func GenerateLogFile(t *testing.T, filename string, lines int, generator LogGene
 		return
 	}
 	defer file.Close()
+<<<<<<< HEAD
 	for i := 1; i <= lines; i++ {
+=======
+
+	writeLines(t, file, filename, 0, lines, generator)
+}
+
+// AppendLogFile appends a given line count to an existing file
+// using the given generator.
+//
+// This function counts the current lines in the file and makes sure to properly
+// continue line generation feeding the generator with next indices.
+func AppendLogFile(t *testing.T, filename string, lines int, generator LogGenerator) {
+	// `0666` is the default in `os.Create`, used for consistency
+	file, err := os.OpenFile(filename, os.O_RDWR, 0666)
+	if err != nil {
+		t.Fatalf("failed to open log file %q for appending: %s", filename, err)
+	}
+	defer file.Close()
+
+	// to continue generating numbered lines, we need to count the existing lines first
+	offset := 0
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		offset++
+	}
+
+	if err := scanner.Err(); err != nil {
+		t.Fatalf("failed to count lines in %q: %s", filename, err)
+	}
+
+	writeLines(t, file, filename, offset, lines, generator)
+}
+
+// GenerateGZIPLogFile generates a single gzip-compressed log file with the
+// given filename, lines, and generator. The file content is identical to the
+// one produced by GenerateLogFile, but compressed using gzip.
+func GenerateGZIPLogFile(t *testing.T, filename string, lines int, generator LogGenerator) {
+	file, err := os.Create(filename)
+	if err != nil {
+		t.Fatalf("failed to create a gzip log file: %q", filename)
+		return
+	}
+	defer file.Close()
+
+	gw := gzip.NewWriter(file)
+	defer gw.Close()
+
+	writeLines(t, gw, filename, 0, lines, generator)
+}
+
+// writeLines writes generated lines to the provided writer.
+// It is shared between GenerateLogFile and GenerateGZIPLogFile to
+// avoid duplicating the core writing logic.
+func writeLines(t *testing.T, w io.Writer, filename string, offset, lines int, generator LogGenerator) {
+	for i := offset + 1; i <= offset+lines; i++ {
+>>>>>>> e56b7d5e1 (Extend the integration testing framework (#48948))
 		line := generator.GenerateLine(filename, i) + "\n"
 		_, err := file.WriteString(line)
 		if err != nil {
