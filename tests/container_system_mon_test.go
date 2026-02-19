@@ -26,7 +26,6 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -73,8 +72,6 @@ func TestKernelProc(t *testing.T) {
 	}
 
 	t.Logf("monitoring kernel proc %d", testPid)
-	ctx, cancel := context.WithTimeout(t.Context(), time.Minute*5)
-	defer cancel()
 
 	runner := systemtests.DockerTestRunner{
 		Runner:           t,
@@ -89,42 +86,38 @@ func TestKernelProc(t *testing.T) {
 	require.NoError(t, err)
 	defer apiClient.Close()
 
-	runner.RunTestsOnDocker(ctx, apiClient)
+	runner.RunTestsOnDocker(t.Context(), apiClient)
 }
 
 func TestProcessMetricsElevatedPerms(t *testing.T) {
-	ctx, cancel := context.WithTimeout(t.Context(), time.Minute*5)
-	defer cancel()
 	// runs test cases where we do not expect any kind of permissions errors
 	baseRunner := systemtests.DockerTestRunner{
 		Runner:            t,
 		Basepath:          "./metric/system/process",
 		Privileged:        true,
 		Testname:          "TestSystemHostFromContainer",
-		CreateHostProcess: exec.CommandContext(ctx, "sleep", "240"),
+		CreateHostProcess: longSleep(t.Context()),
 		FatalLogMessages:  []string{"Error fetching PID info for", "Non-fatal error fetching"},
 	}
 
-	baseRunner.CreateAndRunPermissionMatrix(ctx, []container.CgroupnsMode{container.CgroupnsModeHost, container.CgroupnsModePrivate},
+	baseRunner.CreateAndRunPermissionMatrix(t.Context(), []container.CgroupnsMode{container.CgroupnsModeHost, container.CgroupnsModePrivate},
 		[]bool{}, []string{})
 }
 
 func TestProcessAllSettings(t *testing.T) {
-	ctx, cancel := context.WithTimeout(t.Context(), time.Minute*5)
-	defer cancel()
 	// runs test cases where we do not expect any kind of permissions errors
 	baseRunner := systemtests.DockerTestRunner{
 		Runner:            t,
 		Basepath:          "./metric/system/process",
 		Privileged:        true,
 		Testname:          "TestSystemHostFromContainer",
-		CreateHostProcess: exec.CommandContext(ctx, "sleep", "480"),
+		CreateHostProcess: longSleep(t.Context()),
 		FatalLogMessages:  []string{"Error fetching PID info for"},
 	}
 
 	// pick a user that has permission for its own home and GOMODCACHE dir
 	// 'nobody' has id 65534 on golang:alpine and has the same GOMODCACHE as root (/go/pkg/mod)
-	baseRunner.CreateAndRunPermissionMatrix(ctx, []container.CgroupnsMode{container.CgroupnsModeHost, container.CgroupnsModePrivate},
+	baseRunner.CreateAndRunPermissionMatrix(t.Context(), []container.CgroupnsMode{container.CgroupnsModeHost, container.CgroupnsModePrivate},
 		[]bool{true, false}, []string{"nobody", ""})
 }
 
@@ -145,9 +138,6 @@ func TestContainerProcess(t *testing.T) {
 }
 
 func TestFilesystem(t *testing.T) {
-	ctx, cancel := context.WithTimeout(t.Context(), time.Minute*5)
-	defer cancel()
-
 	// TODO: once https://github.com/elastic/elastic-agent-system-metrics/issues/141 is fixed, add a FatalLogMessages check for
 	// 'no such file or directory' or other messages
 	baseRunner := systemtests.DockerTestRunner{
@@ -160,16 +150,13 @@ func TestFilesystem(t *testing.T) {
 	require.NoError(t, err)
 	defer apiClient.Close()
 
-	baseRunner.RunTestsOnDocker(ctx, apiClient)
+	baseRunner.RunTestsOnDocker(t.Context(), apiClient)
 }
 
 func TestMemoryZswap(t *testing.T) {
 	if runtime.GOOS != "linux" {
 		t.Skip("test is linux-only")
 	}
-
-	ctx, cancel := context.WithTimeout(t.Context(), time.Minute*5)
-	defer cancel()
 
 	// Run memory integration tests from a container monitoring the host
 	// Tests zswap metrics from /proc/meminfo and optionally /sys/kernel/debug/zswap
@@ -184,5 +171,9 @@ func TestMemoryZswap(t *testing.T) {
 	require.NoError(t, err)
 	defer apiClient.Close()
 
-	baseRunner.RunTestsOnDocker(ctx, apiClient)
+	baseRunner.RunTestsOnDocker(t.Context(), apiClient)
+}
+
+func longSleep(ctx context.Context) *exec.Cmd {
+	return exec.CommandContext(ctx, "sleep", "1200") // 20 mins
 }

@@ -65,10 +65,10 @@ type DockerTestRunner struct {
 	FatalLogMessages []string
 	// MonitorPID will tell tests to specifically check the correctness of process-level monitoring for this PID
 	MonitorPID int
-	// CreateHostProcess: this will start a process with the following args outside of the container,
+	// CreateHostProcess: this will start a process with the following args outside the container,
 	// and use the integration tests to monitor it.
 	// Useful as "monitor random running processes" as a test heuristic tends to be flaky.
-	// This will overrite MonitorPID, so only set either this or MonitorPID.
+	// This will overwrite MonitorPID, so only set either this or MonitorPID.
 	CreateHostProcess *exec.Cmd
 }
 
