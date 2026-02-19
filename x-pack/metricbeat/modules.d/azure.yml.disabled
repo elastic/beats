@@ -105,17 +105,19 @@
 #  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 #  refresh_list_interval: 600s
 
-# - module: azure
-#   metricsets:
-#     - app_insights
-#   enabled: true
-#   period: 60s
-#   application_id: '3f8f4e7e-5f42-461a-b0c2-c07034d51c28'
-#   tenant_id: '${AZURE_TENANT_ID:""}'
-#   client_id: '${AZURE_CLIENT_ID:""}'
-#   client_secret: '${AZURE_CLIENT_SECRET:""}'
-#   api_key: ''
-#   metrics:
+#- module: azure
+#  metricsets:
+#    - app_insights
+#  enabled: true
+#  period: 300s
+#  application_id: ''
+#  # OAuth2 authentication
+#  client_id: '${AZURE_CLIENT_ID:""}'
+#  client_secret: '${AZURE_CLIENT_SECRET:""}'
+#  tenant_id: '${AZURE_TENANT_ID:""}'
+#  #active_directory_endpoint: ''
+#  #api_key: ''
+#  metrics:
 #   - id: ["requests/count", "requests/duration"]
 
 #- module: azure
