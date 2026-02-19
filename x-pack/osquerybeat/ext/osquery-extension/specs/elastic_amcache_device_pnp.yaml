@@ -1,0 +1,137 @@
+type: table
+name: elastic_amcache_device_pnp
+description: Windows Amcache inventory device PnP entries (Root\InventoryDevicePnp)
+platforms:
+  - windows
+group: amcache
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache
+
+columns:
+  - name: timestamp
+    type: BIGINT
+    description: Last write time as Unix timestamp
+    go_type: time.Time
+    format: unix
+  - name: date_time
+    type: TEXT
+    description: Last write time in RFC3339
+    go_type: time.Time
+    format: rfc3339
+    timezone: UTC
+  - name: model
+    type: TEXT
+    description: Device model
+  - name: manufacturer
+    type: TEXT
+    description: Manufacturer
+  - name: driver_name
+    type: TEXT
+    description: Driver name
+  - name: parent_id
+    type: TEXT
+    description: Parent device ID
+  - name: matching_id
+    type: TEXT
+    description: Matching ID
+  - name: class
+    type: TEXT
+    description: Device class
+  - name: class_guid
+    type: TEXT
+    description: Class GUID
+  - name: description
+    type: TEXT
+    description: Device description
+  - name: enumerator
+    type: TEXT
+    description: Enumerator
+  - name: service
+    type: TEXT
+    description: Service name
+  - name: install_state
+    type: TEXT
+    description: Install state
+  - name: device_state
+    type: TEXT
+    description: Device state
+  - name: inf
+    type: TEXT
+    description: INF path
+  - name: driver_ver_date
+    type: TEXT
+    description: Driver version date
+  - name: install_date
+    type: TEXT
+    description: Install date
+  - name: first_install_date
+    type: TEXT
+    description: First install date
+  - name: driver_package_strong_name
+    type: TEXT
+    description: Driver package strong name
+  - name: driver_ver_version
+    type: TEXT
+    description: Driver version
+  - name: container_id
+    type: TEXT
+    description: Container ID
+  - name: problem_code
+    type: TEXT
+    description: Problem code
+  - name: provider
+    type: TEXT
+    description: Provider
+  - name: driver_id
+    type: TEXT
+    description: Driver ID
+  - name: bus_reported_description
+    type: TEXT
+    description: Bus-reported description
+  - name: hw_id
+    type: TEXT
+    description: Hardware ID
+  - name: extended_infs
+    type: TEXT
+    description: Extended INFs
+  - name: compid
+    type: TEXT
+    description: Component ID
+  - name: stack_id
+    type: TEXT
+    description: Stack ID
+  - name: upper_class_filters
+    type: TEXT
+    description: Upper class filters
+  - name: lower_class_filters
+    type: TEXT
+    description: Lower class filters
+  - name: upper_filters
+    type: TEXT
+    description: Upper filters
+  - name: lower_filters
+    type: TEXT
+    description: Lower filters
+  - name: device_interface_classes
+    type: TEXT
+    description: Device interface classes
+  - name: location_paths
+    type: TEXT
+    description: Location paths
+
+documentation:
+  description: |
+    Device PnP inventory from Windows Amcache.
+    Queries Root\InventoryDevicePnp from the Amcache.hve registry hive.
+  examples:
+    - title: List all amcache device PnP entries
+      query: |
+        SELECT * FROM elastic_amcache_device_pnp;
+    - title: Devices by class
+      query: |
+        SELECT model, manufacturer, class, driver_name FROM elastic_amcache_device_pnp WHERE class != '';
+  notes:
+    - "Windows only. Requires Amcache.hve."
+  related_tables:
+    - elastic_amcache_driver_binary
+    - elastic_amcache_driver_package
