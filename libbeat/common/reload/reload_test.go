@@ -84,3 +84,13 @@ func TestReRegisterFails(t *testing.T) {
 	err = r.RegisterList("bar", reloadableList{})
 	assert.Error(t, err)
 }
+
+func TestReRegisterFailsReverseType(t *testing.T) {
+	r := NewRegistry()
+
+	err := r.RegisterList("name", reloadableList{})
+	assert.NoError(t, err)
+
+	err = r.Register("name", reloadable{})
+	assert.Error(t, err)
+}

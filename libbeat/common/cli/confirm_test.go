@@ -82,3 +82,23 @@ func TestConfirm(t *testing.T) {
 		})
 	}
 }
+
+func TestConfirmInvalidInputRetry(t *testing.T) {
+	var buf strings.Builder
+	r := strings.NewReader("maybe\ny\n")
+
+	result, err := confirm(r, &buf, ">", false)
+	assert.NoError(t, err)
+	assert.True(t, result)
+	assert.Equal(t, "> [y/N]:Please write 'y' or 'n'\n> [y/N]:", buf.String())
+}
+
+func TestConfirmInputError(t *testing.T) {
+	var buf strings.Builder
+	r := strings.NewReader("")
+
+	result, err := confirm(r, &buf, ">", false)
+	assert.False(t, result)
+	assert.EqualError(t, err, "error reading user input")
+	assert.Equal(t, "> [y/N]:", buf.String())
+}
