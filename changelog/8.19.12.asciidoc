@@ -1,0 +1,92 @@
+// begin 8.19.12 relnotes
+
+[[release-notes-8.19.12]]
+==  8.19.12
+
+Review important information about the  8.19.12 release.
+
+[discrete]
+[[security-updates-8.19.12]]
+=== Security updates
+
+
+
+
+**All**
+
+* Update elastic-agent-autodiscover to v0.10.2. https://github.com/elastic/beats/pull/45950[#45950] https://github.com/elastic/beats/pull/48816[#48816] https://github.com/elastic/beats/pull/48909[#48909] https://github.com/elastic/beats/pull/48939[#48939] https://github.com/elastic/beats/pull/48941[#48941] https://github.com/elastic/beats/pull/48942[#48942] https://github.com/elastic/beats/pull/48571[#48571] https://github.com/elastic/beats/issues/45897[#45897] https://github.com/elastic/beats/issues/48456[#48456]
+
+
+
+
+
+
+
+[discrete]
+[[new-features-8.19.12]]
+=== New features
+
+The 8.19.12 release adds the following new and notable features.
+
+
+
+
+**Filebeat**
+
+* Azure-eventhub-managed-identity. https://github.com/elastic/beats/pull/48655[#48655] https://github.com/elastic/beats/issues/48680[#48680]
+
+
+[discrete]
+[[enhancements-8.19.12]]
+=== Enhancements
+
+
+
+
+**Filebeat**
+
+* Don&#39;t print warning about small files on each file system scan. https://github.com/elastic/beats/pull/45950[#45950] https://github.com/elastic/beats/pull/48816[#48816] https://github.com/elastic/beats/pull/48909[#48909] https://github.com/elastic/beats/pull/48939[#48939] https://github.com/elastic/beats/pull/48941[#48941] https://github.com/elastic/beats/pull/48942[#48942] https://github.com/elastic/beats/pull/48571[#48571] https://github.com/elastic/beats/issues/45897[#45897] https://github.com/elastic/beats/issues/48456[#48456]
+
+
+
+
+[discrete]
+[[bug-fixes-8.19.12]]
+=== Bug fixes
+
+
+
+
+**Elastic agent**
+
+* Fix a bug that could report an invalid number of active &#34;otelconsumer&#34; events. https://github.com/elastic/beats/pull/45950[#45950] https://github.com/elastic/beats/pull/48816[#48816] https://github.com/elastic/beats/pull/48909[#48909] https://github.com/elastic/beats/pull/48939[#48939] https://github.com/elastic/beats/pull/48941[#48941] https://github.com/elastic/beats/pull/48942[#48942] https://github.com/elastic/beats/pull/48571[#48571] https://github.com/elastic/beats/issues/45897[#45897] https://github.com/elastic/beats/issues/48456[#48456]
+
+
+**Filebeat**
+
+* Enforce region configuration when non_aws_bucket_name is defined for awss3 input. https://github.com/elastic/beats/pull/45950[#45950] https://github.com/elastic/beats/pull/48816[#48816] https://github.com/elastic/beats/pull/48909[#48909] https://github.com/elastic/beats/pull/48939[#48939] https://github.com/elastic/beats/pull/48941[#48941] https://github.com/elastic/beats/pull/48942[#48942] https://github.com/elastic/beats/pull/48571[#48571] https://github.com/elastic/beats/issues/45897[#45897] https://github.com/elastic/beats/issues/48456[#48456]
+* Fix azure-blob-storage input failing with Storage Blob Data Reader RBAC role. https://github.com/elastic/beats/pull/48886[#48886] https://github.com/elastic/beats/issues/48890[#48890]
+
+
+**Heartbeat**
+
+* Adds a missing dependency for Synthetics on wolfi docker image. https://github.com/elastic/beats/pull/45950[#45950] https://github.com/elastic/beats/pull/48816[#48816] https://github.com/elastic/beats/pull/48909[#48909] https://github.com/elastic/beats/pull/48939[#48939] https://github.com/elastic/beats/pull/48941[#48941] https://github.com/elastic/beats/pull/48942[#48942] https://github.com/elastic/beats/pull/48571[#48571] https://github.com/elastic/beats/issues/45897[#45897] https://github.com/elastic/beats/issues/48456[#48456]
+
+
+**Metricbeat**
+
+* Enforces configurable size limits on incoming requests for remote_write metricset (max_compressed_body_bytes, max_decoded_body_bytes). https://github.com/elastic/beats/pull/45950[#45950] https://github.com/elastic/beats/pull/48816[#48816] https://github.com/elastic/beats/pull/48909[#48909] https://github.com/elastic/beats/pull/48939[#48939] https://github.com/elastic/beats/pull/48941[#48941] https://github.com/elastic/beats/pull/48942[#48942] https://github.com/elastic/beats/pull/48571[#48571] https://github.com/elastic/beats/issues/45897[#45897] https://github.com/elastic/beats/issues/48456[#48456]
+
+
+**Osquerybeat**
+
+* Fix differential results using wrong data source for removed events. https://github.com/elastic/beats/pull/45950[#45950] https://github.com/elastic/beats/pull/48816[#48816] https://github.com/elastic/beats/pull/48909[#48909] https://github.com/elastic/beats/pull/48939[#48939] https://github.com/elastic/beats/pull/48941[#48941] https://github.com/elastic/beats/pull/48942[#48942] https://github.com/elastic/beats/pull/48571[#48571] https://github.com/elastic/beats/issues/48427[#48427]
+
+
+**Packetbeat**
+
+* Refactor dhcpv4 parsers, fix numerous parsing bugs. The DHCP &#34;router&#34; field is now a list, as is specified in RFC2132. https://github.com/elastic/beats/pull/45950[#45950] https://github.com/elastic/beats/pull/48816[#48816] https://github.com/elastic/beats/pull/48909[#48909] https://github.com/elastic/beats/pull/48939[#48939] https://github.com/elastic/beats/pull/48941[#48941] https://github.com/elastic/beats/pull/48942[#48942] https://github.com/elastic/beats/pull/48571[#48571] https://github.com/elastic/beats/issues/45897[#45897] https://github.com/elastic/beats/issues/48456[#48456]
+* Clean int overflows and array access in mysql parsers. https://github.com/elastic/beats/pull/45950[#45950] https://github.com/elastic/beats/pull/48816[#48816] https://github.com/elastic/beats/pull/48909[#48909] https://github.com/elastic/beats/pull/48939[#48939] https://github.com/elastic/beats/pull/48941[#48941] https://github.com/elastic/beats/pull/48942[#48942] https://github.com/elastic/beats/pull/48571[#48571] https://github.com/elastic/beats/issues/45897[#45897] https://github.com/elastic/beats/issues/48456[#48456]
+* Add int overflow checks to http parser. https://github.com/elastic/beats/pull/45950[#45950] https://github.com/elastic/beats/pull/48816[#48816] https://github.com/elastic/beats/pull/48909[#48909] https://github.com/elastic/beats/pull/48939[#48939] https://github.com/elastic/beats/pull/48941[#48941] https://github.com/elastic/beats/pull/48942[#48942] https://github.com/elastic/beats/pull/48571[#48571] https://github.com/elastic/beats/issues/45897[#45897] https://github.com/elastic/beats/issues/48456[#48456]
+
+// end 8.19.12 relnotes
