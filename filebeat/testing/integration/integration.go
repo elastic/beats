@@ -21,12 +21,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-<<<<<<< HEAD
-=======
 	"os"
-	"regexp"
-	"strings"
->>>>>>> e56b7d5e1 (Extend the integration testing framework (#48948))
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/testing/integration"
