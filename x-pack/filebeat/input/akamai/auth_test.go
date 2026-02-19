@@ -43,7 +43,7 @@ func TestRetryNonceFreshness(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	signer := NewEdgeGridSigner("ct", "cs", "at")
+	signer := NewEdgeGridSigner("test-client-token", "test-client-secret-key", "test-access-token")
 	transport := &EdgeGridTransport{
 		Transport: http.DefaultTransport,
 		Signer:    signer,

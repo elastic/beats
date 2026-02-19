@@ -273,7 +273,7 @@ func (c *config) Validate() error {
 		return errors.New("channel_buffer_size must be greater than 0")
 	}
 	if c.ChannelBufferSize == 0 {
-		c.ChannelBufferSize = c.EventLimit / 2
+		c.ChannelBufferSize = c.NumberOfWorkers * 2
 		if c.ChannelBufferSize < 1 {
 			c.ChannelBufferSize = 1
 		}

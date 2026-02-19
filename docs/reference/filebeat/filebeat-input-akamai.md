@@ -114,7 +114,7 @@ The maximum age of a stored offset before it is proactively dropped to avoid a w
 
 ### `channel_buffer_size` [_channel_buffer_size_akamai]
 
-The size of the bounded channel used in the streaming event pipeline. Events are streamed from the API response body through this channel to worker goroutines. Higher values allow more buffering between the reader and publishers; lower values reduce memory usage. Default: `event_limit / 2`.
+The size of the bounded channel used in the streaming event pipeline. Events are streamed from the API response body through this channel to worker goroutines. Higher values allow more buffering between the reader and publishers; lower values reduce memory usage and keep backpressure responsive. Default: `number_of_workers * 2`.
 
 
 ### `invalid_timestamp_retry.max_attempts` [_invalid_timestamp_retry_max_attempts_akamai]

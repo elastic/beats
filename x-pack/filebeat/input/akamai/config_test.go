@@ -21,9 +21,9 @@ import (
 func TestConfigValidation(t *testing.T) {
 	edgeGridAuth := map[string]interface{}{
 		"edgegrid": map[string]interface{}{
-			"client_token":  "test-token",
-			"client_secret": "test-secret",
-			"access_token":  "test-access",
+			"client_token":  "test-client-token",
+			"client_secret": "test-client-secret",
+			"access_token":  "test-access-token",
 		},
 	}
 
@@ -193,11 +193,11 @@ func TestDefaultChannelBufferSize(t *testing.T) {
 
 	err := cfg.Validate()
 	require.NoError(t, err)
-	assert.Equal(t, cfg.EventLimit/2, cfg.ChannelBufferSize)
+	assert.Equal(t, cfg.NumberOfWorkers*2, cfg.ChannelBufferSize)
 }
 
 func TestEdgeGridSigner(t *testing.T) {
-	signer := NewEdgeGridSigner("client-token", "client-secret", "access-token")
+	signer := NewEdgeGridSigner("test-client-token", "test-client-secret", "test-access-token")
 	t.Run("createSigningKey", func(t *testing.T) {
 		key := signer.createSigningKey("20240101T12:00:00+0000")
 		assert.NotEmpty(t, key)
@@ -212,8 +212,8 @@ func TestEdgeGridSigner(t *testing.T) {
 
 		authHeader := req.Header.Get("Authorization")
 		assert.Contains(t, authHeader, "EG1-HMAC-SHA256")
-		assert.Contains(t, authHeader, "client_token=client-token")
-		assert.Contains(t, authHeader, "access_token=access-token")
+		assert.Contains(t, authHeader, "client_token=test-client-token")
+		assert.Contains(t, authHeader, "access_token=test-access-token")
 		assert.Contains(t, authHeader, "signature=")
 		assert.Contains(t, authHeader, "nonce=")
 		assert.Contains(t, authHeader, "timestamp=")
@@ -223,9 +223,9 @@ func TestEdgeGridSigner(t *testing.T) {
 func TestMaxRecoveryAttemptsValidation(t *testing.T) {
 	edgeGridAuth := map[string]interface{}{
 		"edgegrid": map[string]interface{}{
-			"client_token":  "test-token",
-			"client_secret": "test-secret",
-			"access_token":  "test-access",
+			"client_token":  "test-client-token",
+			"client_secret": "test-client-secret",
+			"access_token":  "test-access-token",
 		},
 	}
 
