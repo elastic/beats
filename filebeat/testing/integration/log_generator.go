@@ -26,7 +26,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
+	uuid "github.com/gofrs/uuid/v5"
 )
 
 // LogGenerator used for generating log files
@@ -61,7 +61,7 @@ func (g plainTextGenerator) FileExtension() string {
 	return ".log"
 }
 
-// NewJSONGenerator creates a JSON log line generator.
+// JSONLineGenerator creates a JSON log line generator.
 // Forms a JSON object with a message
 // prefixed by the given prefix and followed by the filename
 // and the line number, e.g. `filename:128`
@@ -93,17 +93,6 @@ func (g jsonGenerator) FileExtension() string {
 // Returns the path value to put in the Filebeat configuration and
 // filenames for all created files.
 func GenerateLogFiles(t *testing.T, files, lines int, generator LogGenerator) (path string, filenames []string) {
-	return generateLogFiles(
-		t, files, lines, generator, GenerateLogFile)
-}
-
-func generateLogFiles(
-	t *testing.T,
-	files int,
-	lines int,
-	generator LogGenerator,
-	gen func(t *testing.T, filename string, lines int, generator LogGenerator)) (string, []string) {
-
 	t.Logf("generating %d log files with %d lines each...", files, lines)
 	logsPath := filepath.Join(t.TempDir(), "logs")
 	err := os.MkdirAll(logsPath, 0777)
@@ -112,7 +101,7 @@ func generateLogFiles(
 		return "", nil
 	}
 
-	filenames := make([]string, 0, files)
+	filenames = make([]string, 0, files)
 	for i := 0; i < files; i++ {
 		id, err := uuid.NewV4()
 		if err != nil {
@@ -121,7 +110,7 @@ func generateLogFiles(
 		}
 		filename := filepath.Join(logsPath, id.String()+generator.FileExtension())
 		filenames = append(filenames, filename)
-		gen(t, filename, lines, generator)
+		GenerateLogFile(t, filename, lines, generator)
 	}
 
 	t.Logf("finished generating %d log files with %d lines each", files, lines)
