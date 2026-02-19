@@ -144,6 +144,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixed issue for "Root level readerConfig no longer respected" in azureblobstorage input. {issue}44812[44812] {pull}44873[44873]
 - Update github.com/elastic/mito to v1.22.1 to fix issue with rate limit calculation. {pull}48500[48500]
 - Fix handling of symbolic link resolution on Windows in httplog path assessment. {pull}48754[48754]
+- Fix request tracer path validation under managed agents. {pull}48909[48909]
 
 *Heartbeat*
 
@@ -273,6 +274,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added support for specifying custom content-types and encodings in gcs input. {issue}44628[44628] {pull}45088[45088]
 - Added support for specifying custom content-types and encodings in azureblobstorage input. {issue}44330[44330] {pull}44402[44402]
 - Improve log path sanitization for request trace logging. {pull}48719[48719]
+- Tighten request trace logging destination path checks in CEL, Entity Analytics, HTTP Endpoint and HTTP JSON inputs. {pull}48863[48863]
 
 *Auditbeat*
 

@@ -43,7 +43,7 @@ Specify the characters used to split the incoming events. The default is '\n'.
 [id="{beatname_lc}-input-{type}-tcp-max-connections"]
 ==== `max_connections`
 
-The at most number of connections to accept at any given point in time.
+The maximum number of concurrent connections to accept at any given point in time. The default is `0`, which means no limit on concurrent connections.
 
 [float]
 [id="{beatname_lc}-input-{type}-tcp-timeout"]
