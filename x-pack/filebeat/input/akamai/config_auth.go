@@ -107,27 +107,18 @@ func (s *EdgeGridSigner) createSigningKey(timestamp string) string {
 }
 
 // buildDataToSign builds the string that will be signed.
+// Format: Method\tScheme\tHost\tPath?Query\tHeaders\tContentHash\tAuthBase
 func (s *EdgeGridSigner) buildDataToSign(req *http.Request, authBase string) string {
-	var scheme, host, path, rawQuery string
-
-	if req.URL != nil {
-		scheme = strings.ToLower(req.URL.Scheme)
-		if scheme == "" {
-			scheme = "https"
-		}
-		host = strings.ToLower(req.URL.Host)
-		path = req.URL.Path
-		if path == "" {
-			path = "/"
-		}
-		rawQuery = req.URL.RawQuery
+	scheme := strings.ToLower(req.URL.Scheme)
+	if scheme == "" {
+		scheme = "https"
+	}
+	host := strings.ToLower(req.URL.Host)
+	path := req.URL.Path
+	if path == "" {
+		path = "/"
 	}
 
-	// For GET requests with no body, content hash is empty
-	contentHash := ""
-
-	// Build the data to sign
-	// Format: Method\tScheme\tHost\tPath?Query\tHeaders\tContentHash\tAuthBase
 	var sb strings.Builder
 	sb.WriteString(req.Method)
 	sb.WriteString("\t")
@@ -136,15 +127,11 @@ func (s *EdgeGridSigner) buildDataToSign(req *http.Request, authBase string) str
 	sb.WriteString(host)
 	sb.WriteString("\t")
 	sb.WriteString(path)
-	if rawQuery != "" {
+	if req.URL.RawQuery != "" {
 		sb.WriteString("?")
-		sb.WriteString(rawQuery)
+		sb.WriteString(req.URL.RawQuery)
 	}
-	sb.WriteString("\t")
-	sb.WriteString("") // No additional headers to sign
-	sb.WriteString("\t")
-	sb.WriteString(contentHash)
-	sb.WriteString("\t")
+	sb.WriteString("\t\t\t")
 	sb.WriteString(authBase)
 
 	return sb.String()

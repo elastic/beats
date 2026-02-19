@@ -43,9 +43,10 @@ type inputMetrics struct {
 	eventsReceived      *monitoring.Uint   // total events received
 	eventsPublished     *monitoring.Uint   // total events published
 	eventsPublishFailed *monitoring.Uint   // total failed event publishes
-	errorsTotal         *monitoring.Uint   // total errors
-	recoveryModeEntries *monitoring.Uint   // times recovery mode was entered
+	errorsTotal         *monitoring.Uint   // aggregate error count: requestsErrors + per-event publish failures
 	offsetExpired       *monitoring.Uint   // number of 416 offset expired responses
+	offsetTTLDrops      *monitoring.Uint   // proactive offset drops due to TTL expiry
+	fromClamped         *monitoring.Uint   // chain_from clamped to max lookback
 	hmacRefreshes       *monitoring.Uint   // number of invalid timestamp retries
 	api400Fatal         *monitoring.Uint   // number of fatal 400 responses
 	cursorDrops         *monitoring.Uint   // number of cursor drops
@@ -84,8 +85,9 @@ func newInputMetrics(reg *monitoring.Registry, maxWorkers int, log *logp.Logger)
 		eventsReceived:      monitoring.NewUint(reg, "events_received_total"),
 		eventsPublished:     monitoring.NewUint(reg, "events_published_total"),
 		errorsTotal:         monitoring.NewUint(reg, "errors_total"),
-		recoveryModeEntries: monitoring.NewUint(reg, "recovery_mode_entries_total"),
 		offsetExpired:       monitoring.NewUint(reg, "offset_expired_total"),
+		offsetTTLDrops:      monitoring.NewUint(reg, "offset_ttl_drops_total"),
+		fromClamped:         monitoring.NewUint(reg, "from_clamped_total"),
 		hmacRefreshes:       monitoring.NewUint(reg, "hmac_refresh_total"),
 		api400Fatal:         monitoring.NewUint(reg, "api_400_fatal_total"),
 		eventsPublishFailed: monitoring.NewUint(reg, "events_publish_failed_total"),
@@ -157,6 +159,7 @@ func (m *inputMetrics) AddRequestSuccess() {
 }
 
 // AddRequestError increments the failed request counter.
+// Also increments errorsTotal as a side-effect to keep the aggregate current.
 func (m *inputMetrics) AddRequestError() {
 	if m == nil {
 		return
@@ -191,20 +194,14 @@ func (m *inputMetrics) AddEventPublished(count uint64) {
 	m.eventsPublished.Add(count)
 }
 
-// AddError increments the error counter.
+// AddError increments errorsTotal for an individual event publish failure.
+// Called per-event in the worker loop; the aggregate publish failure count is
+// tracked separately by AddPartialPublishFailures at page boundary.
 func (m *inputMetrics) AddError() {
 	if m == nil {
 		return
 	}
 	m.errorsTotal.Inc()
-}
-
-// AddRecoveryModeEntry increments the recovery mode entry counter.
-func (m *inputMetrics) AddRecoveryModeEntry() {
-	if m == nil {
-		return
-	}
-	m.recoveryModeEntries.Inc()
 }
 
 // AddOffsetExpired increments the 416 offset expired counter.
@@ -246,6 +243,22 @@ func (m *inputMetrics) AddCursorDrop() {
 		return
 	}
 	m.cursorDrops.Inc()
+}
+
+// AddOffsetTTLDrop increments the proactive offset TTL drop counter.
+func (m *inputMetrics) AddOffsetTTLDrop() {
+	if m == nil {
+		return
+	}
+	m.offsetTTLDrops.Inc()
+}
+
+// AddFromClamped increments the from-clamped counter.
+func (m *inputMetrics) AddFromClamped() {
+	if m == nil {
+		return
+	}
+	m.fromClamped.Inc()
 }
 
 // RecordRequestTime records the request processing time.

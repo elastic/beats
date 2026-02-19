@@ -10,7 +10,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
+	"io"
 	"sync"
 	"time"
 
@@ -23,6 +23,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
+)
+
+const (
+	chainOverlap    = 10 * time.Second
+	maxLookback     = 12 * time.Hour
+	apiSafetyBuffer = 60 // seconds subtracted from "now" for the `to` parameter
 )
 
 // Plugin creates the akamai input plugin.
@@ -45,7 +51,6 @@ func (input) Name() string { return inputName }
 func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 	cfg := src.(*source).cfg //nolint:errcheck // If this assertion fails, the program is incorrect and should panic.
 
-	// Validate that we can build a URL
 	if cfg.Resource == nil || cfg.Resource.URL == nil || cfg.Resource.URL.URL == nil {
 		return errors.New("resource.url is required")
 	}
@@ -60,10 +65,9 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 
 	env.UpdateStatus(status.Starting, "")
 
-	// Unpack cursor
-	var cursor cursor
+	var cur cursor
 	if !crsr.IsNew() {
-		if err := crsr.Unpack(&cursor); err != nil {
+		if err := crsr.Unpack(&cur); err != nil {
 			env.UpdateStatus(status.Failed, "failed to unpack cursor: "+err.Error())
 			return err
 		}
@@ -71,14 +75,12 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
-	// Initialize metrics
 	metrics := newInputMetrics(env.MetricsRegistry, cfg.NumberOfWorkers, log)
 	if metrics != nil {
 		defer metrics.Close()
 		metrics.SetResource(cfg.Resource.URL.String() + siemAPIPath + cfg.ConfigIDs)
 	}
 
-	// Create API client
 	client, err := NewClient(cfg, log, env.MetricsRegistry, WithMetrics(metrics))
 	if err != nil {
 		env.UpdateStatus(status.Failed, "failed to create client: "+err.Error())
@@ -86,13 +88,12 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 	}
 	defer client.Close()
 
-	// Create and run the poller
 	poller := &siemPoller{
 		cfg:     cfg,
 		client:  client,
 		log:     log,
 		pub:     pub,
-		cursor:  cursor,
+		cursor:  cur,
 		metrics: metrics,
 		env:     env,
 	}
@@ -109,10 +110,22 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 	return nil
 }
 
-// cursor holds the state for resuming event collection.
+// cursor holds the chain-based state for resuming event collection.
 type cursor struct {
-	LastOffset   string `json:"last_offset,omitempty"`
-	RecoveryMode bool   `json:"recovery_mode,omitempty"`
+	ChainFrom        int64     `json:"chain_from,omitempty"`
+	ChainTo          int64     `json:"chain_to,omitempty"`
+	CaughtUp         bool      `json:"caught_up,omitempty"`
+	LastOffset       string    `json:"last_offset,omitempty"`
+	OffsetObtainedAt time.Time `json:"offset_obtained_at,omitempty"`
+}
+
+// isOffsetStale returns true if the stored offset has exceeded the given TTL.
+// Returns false if TTL is zero (disabled) or no offset exists.
+func (c *cursor) isOffsetStale(ttl time.Duration) bool {
+	if ttl == 0 || c.LastOffset == "" {
+		return false
+	}
+	return !c.OffsetObtainedAt.IsZero() && time.Since(c.OffsetObtainedAt) > ttl
 }
 
 // siemPoller handles polling the Akamai SIEM API.
@@ -126,19 +139,6 @@ type siemPoller struct {
 	env     v2.Context
 }
 
-// eventWork represents work to be processed by a worker.
-type eventWork struct {
-	index      int
-	event      SIEMEvent
-	pageCursor interface{}
-}
-
-type pagePublishSummary struct {
-	published uint64
-	failed    uint64
-	samples   []string
-}
-
 // run starts the polling loop.
 func (p *siemPoller) run(ctx context.Context) error {
 	p.log.Info("starting akamai SIEM poller")
@@ -148,20 +148,21 @@ func (p *siemPoller) run(ctx context.Context) error {
 	})
 }
 
-// poll performs a single polling iteration.
-// It continues fetching pages until the number of returned events is less than
-// the event_limit, indicating we've caught up with the available data.
+// poll performs a single polling iteration, fetching pages until the chain is
+// drained (events returned < event_limit).
 func (p *siemPoller) poll(ctx context.Context) error {
-	p.log.Debug("starting poll iteration")
 	start := time.Now()
-	p.log.Debugw("cursor state before poll",
+	p.log.Debugw("starting poll iteration",
+		"cursor.chain_from", p.cursor.ChainFrom,
+		"cursor.chain_to", p.cursor.ChainTo,
+		"cursor.caught_up", p.cursor.CaughtUp,
 		"cursor.last_offset", p.cursor.LastOffset,
-		"cursor.recovery_mode", p.cursor.RecoveryMode,
+		"cursor.offset_obtained_at", p.cursor.OffsetObtainedAt,
 	)
 
-	// Determine fetch parameters based on cursor state
 	params := p.buildFetchParams()
 	pageCount := 0
+	recoveryAttempts := 0
 
 	for {
 		select {
@@ -178,78 +179,51 @@ func (p *siemPoller) poll(ctx context.Context) error {
 			"has_offset", params.Offset != "",
 		)
 
-		response, err := p.fetchWithTimestampRetry(ctx, params)
+		body, err := p.fetchWithTimestampRetry(ctx, params)
 		if err != nil {
-			var apiErr *APIError
-			if errors.As(err, &apiErr) {
-				switch {
-				case apiErr.IsOffsetOutOfRange():
-					p.log.Warnw("received 416 offset expired; dropping cursor and entering recovery mode",
-						"cursor.last_offset", p.cursor.LastOffset,
-					)
-					p.cursor = cursor{RecoveryMode: true}
-					if p.metrics != nil {
-						p.metrics.AddRecoveryModeEntry()
-						p.metrics.AddOffsetExpired()
-						p.metrics.AddCursorDrop()
-					}
-					params = p.buildFetchParams()
-					continue
-				case apiErr.IsInvalidTimestamp():
-					p.log.Warnw("invalid timestamp persisted after retry attempts; dropping cursor and entering recovery mode",
-						"cursor.last_offset", p.cursor.LastOffset,
-						"retry_attempts", p.cfg.InvalidTimestampRetries,
-					)
-					p.cursor = cursor{RecoveryMode: true}
-					if p.metrics != nil {
-						p.metrics.AddRecoveryModeEntry()
-						p.metrics.AddCursorDrop()
-					}
-					params = p.buildFetchParams()
-					continue
-				case apiErr.StatusCode == 400:
-					p.log.Errorw("received non-recoverable 400 response from Akamai API", "error", apiErr)
-					if p.metrics != nil {
-						p.metrics.AddAPI400Fatal()
-					}
-					p.env.UpdateStatus(status.Degraded, "received 400 response from Akamai API: "+apiErr.Error())
-					return nil
-				}
+			if !p.handleFetchError(err, &params, pageCount) {
+				return nil
 			}
-			p.log.Errorw("failed to fetch events", "error", err)
-			p.env.UpdateStatus(status.Degraded, "failed to fetch events: "+err.Error())
-			return nil // Don't return error to allow retry on next interval
+			recoveryAttempts++
+			if p.cfg.MaxRecoveryAttempts > 0 && recoveryAttempts >= p.cfg.MaxRecoveryAttempts {
+				p.log.Errorw("max recovery attempts reached, ending poll cycle",
+					"recovery_attempts", recoveryAttempts,
+					"max_recovery_attempts", p.cfg.MaxRecoveryAttempts,
+					"cursor.chain_from", p.cursor.ChainFrom,
+					"cursor.chain_to", p.cursor.ChainTo,
+					"cursor.last_offset", p.cursor.LastOffset,
+				)
+				p.env.UpdateStatus(status.Degraded, "max recovery attempts reached")
+				return nil
+			}
+			continue
+		}
+		recoveryAttempts = 0
+
+		eventCount, pageCtx, processErr := p.processPage(ctx, body)
+		if processErr != nil {
+			p.log.Errorw("failed to process page",
+				"error", processErr,
+				"page", pageCount,
+				"mode", fetchMode(params),
+				"cursor.last_offset", p.cursor.LastOffset,
+			)
+			p.env.UpdateStatus(status.Degraded, "failed to process page: "+processErr.Error())
+			return nil
 		}
 
-		eventCount := len(response.Events)
 		if eventCount == 0 {
 			p.log.Debug("no events received, poll cycle complete")
 			break
 		}
 
-		p.log.Infow("received events", "count", eventCount, "page", pageCount)
+		p.log.Debugw("received events", "count", eventCount, "page", pageCount)
 
-		// Process events with workers
-		summary, err := p.processEvents(ctx, response)
-		if err != nil {
-			p.log.Errorw("failed to process events", "error", err)
-			p.env.UpdateStatus(status.Degraded, "failed to process events: "+err.Error())
-			return nil
-		}
-		if summary.failed > 0 {
-			p.log.Errorw("one or more events failed to publish in page",
-				"page", pageCount,
-				"failed_events", summary.failed,
-				"published_events", summary.published,
-				"samples", summary.samples,
-			)
-		}
-
-		// Update cursor
-		if response.LastOffset != "" {
+		// Update cursor with page offset
+		if pageCtx.Offset != "" {
 			prev := p.cursor.LastOffset
-			p.cursor.LastOffset = response.LastOffset
-			p.cursor.RecoveryMode = false
+			p.cursor.LastOffset = pageCtx.Offset
+			p.cursor.OffsetObtainedAt = time.Now()
 			p.log.Debugw("cursor advanced after page",
 				"page", pageCount,
 				"cursor.previous", prev,
@@ -257,15 +231,17 @@ func (p *siemPoller) poll(ctx context.Context) error {
 			)
 		}
 
-		// Stop if we received fewer events than the limit - we've caught up
+		// Drain detection: fewer events than limit means chain is drained
 		if eventCount < p.cfg.EventLimit {
-			p.log.Debugw("received fewer events than limit, poll cycle complete",
+			p.cursor.CaughtUp = true
+			p.log.Debugw("received fewer events than limit, chain drained",
 				"events", eventCount,
 				"limit", p.cfg.EventLimit,
 			)
 			break
 		}
-		if response.LastOffset == "" {
+
+		if pageCtx.Offset == "" {
 			p.log.Errorw("missing next offset in paginated response; ending current cycle",
 				"page", pageCount,
 				"events", eventCount,
@@ -274,25 +250,124 @@ func (p *siemPoller) poll(ctx context.Context) error {
 			break
 		}
 
-		// Continue with next page using the last offset
-		params.Offset = response.LastOffset
+		// Continue draining chain with next page
+		params.Offset = pageCtx.Offset
 		params.From = 0
 		params.To = 0
 	}
 
+	elapsed := time.Since(start)
+	if p.metrics != nil {
+		p.metrics.RecordRequestTime(elapsed)
+	}
 	p.log.Debugw("poll iteration complete",
-		"duration", time.Since(start),
+		"duration", elapsed,
 		"pages", pageCount,
 		"cursor.last_offset", p.cursor.LastOffset,
-		"cursor.recovery_mode", p.cursor.RecoveryMode,
+		"cursor.caught_up", p.cursor.CaughtUp,
 	)
 
 	return nil
 }
 
-func (p *siemPoller) fetchWithTimestampRetry(ctx context.Context, params FetchParams) (*SIEMResponse, error) {
+// handleFetchError processes API errors from a fetch attempt. Returns true if
+// the poll loop should continue (recoverable), false if it should stop.
+func (p *siemPoller) handleFetchError(err error, params *FetchParams, pageCount int) bool {
+	var apiErr *APIError
+	if !errors.As(err, &apiErr) {
+		p.log.Errorw("failed to fetch events",
+			"error", err,
+			"page", pageCount,
+			"mode", fetchMode(*params),
+			"cursor.chain_from", p.cursor.ChainFrom,
+			"cursor.chain_to", p.cursor.ChainTo,
+			"cursor.last_offset", p.cursor.LastOffset,
+		)
+		p.env.UpdateStatus(status.Degraded, "failed to fetch events: "+err.Error())
+		return false
+	}
+
+	switch {
+	case apiErr.IsOffsetOutOfRange():
+		p.log.Warnw("416 offset expired; clearing offset for chain replay",
+			"status_code", apiErr.StatusCode,
+			"page", pageCount,
+			"cursor.last_offset", p.cursor.LastOffset,
+			"cursor.chain_from", p.cursor.ChainFrom,
+			"cursor.chain_to", p.cursor.ChainTo,
+			"error.message", apiErr.Detail,
+			"error.body", apiErr.Body,
+		)
+		p.cursor.LastOffset = ""
+		p.cursor.OffsetObtainedAt = time.Time{}
+		if p.metrics != nil {
+			p.metrics.AddOffsetExpired()
+			p.metrics.AddCursorDrop()
+		}
+		*params = p.buildFetchParams()
+		return true
+
+	case apiErr.IsInvalidTimestamp():
+		p.log.Warnw("invalid timestamp after retries; clearing offset for chain replay",
+			"status_code", apiErr.StatusCode,
+			"page", pageCount,
+			"mode", fetchMode(*params),
+			"cursor.last_offset", p.cursor.LastOffset,
+			"retry_attempts", p.cfg.InvalidTimestampRetries,
+			"error.message", apiErr.Detail,
+			"error.body", apiErr.Body,
+		)
+		p.cursor.LastOffset = ""
+		p.cursor.OffsetObtainedAt = time.Time{}
+		if p.metrics != nil {
+			p.metrics.AddCursorDrop()
+		}
+		*params = p.buildFetchParams()
+		return true
+
+	case apiErr.IsFromTooOld():
+		p.log.Warnw("from timestamp too old, delegating to chain replay with clamp",
+			"status_code", apiErr.StatusCode,
+			"page", pageCount,
+			"cursor.chain_from", p.cursor.ChainFrom,
+			"cursor.chain_to", p.cursor.ChainTo,
+			"error.message", apiErr.Detail,
+			"error.body", apiErr.Body,
+		)
+		if p.metrics != nil {
+			p.metrics.AddFromClamped()
+		}
+		*params = p.buildFetchParams()
+		return true
+
+	case apiErr.StatusCode == 400:
+		p.log.Errorw("non-recoverable 400 response",
+			"status_code", apiErr.StatusCode,
+			"page", pageCount,
+			"error", apiErr,
+			"error.body", apiErr.Body,
+		)
+		if p.metrics != nil {
+			p.metrics.AddAPI400Fatal()
+		}
+		p.env.UpdateStatus(status.Degraded, "received 400 response from Akamai API: "+apiErr.Error())
+		return false
+
+	default:
+		p.log.Errorw("failed to fetch events",
+			"status_code", apiErr.StatusCode,
+			"page", pageCount,
+			"error", apiErr,
+			"error.body", apiErr.Body,
+		)
+		p.env.UpdateStatus(status.Degraded, "failed to fetch events: "+apiErr.Error())
+		return false
+	}
+}
+
+func (p *siemPoller) fetchWithTimestampRetry(ctx context.Context, params FetchParams) (io.ReadCloser, error) {
 	maxRetries := p.cfg.InvalidTimestampRetries
-	var err error
+	var lastErr error
 	for attempt := 0; attempt <= maxRetries; attempt++ {
 		if attempt > 0 {
 			if p.metrics != nil {
@@ -304,22 +379,22 @@ func (p *siemPoller) fetchWithTimestampRetry(ctx context.Context, params FetchPa
 			)
 		}
 
-		response, reqErr := p.client.FetchEvents(ctx, params)
-		if reqErr == nil {
-			return response, nil
+		body, err := p.client.FetchResponse(ctx, params)
+		if err == nil {
+			return body, nil
 		}
-		err = reqErr
+		lastErr = err
 
 		var apiErr *APIError
-		if errors.As(reqErr, &apiErr) && apiErr.IsInvalidTimestamp() && attempt < maxRetries {
+		if errors.As(err, &apiErr) && apiErr.IsInvalidTimestamp() && attempt < maxRetries {
 			continue
 		}
-		return nil, reqErr
+		return nil, err
 	}
-	return nil, err
+	return nil, lastErr
 }
 
-// buildFetchParams creates fetch parameters based on cursor state.
+// buildFetchParams creates fetch parameters using three-branch chain logic.
 func (p *siemPoller) buildFetchParams() FetchParams {
 	now := time.Now().Unix()
 
@@ -327,65 +402,109 @@ func (p *siemPoller) buildFetchParams() FetchParams {
 		Limit: p.cfg.EventLimit,
 	}
 
-	if p.cursor.RecoveryMode {
-		// Recovery mode: use time-based fetch
-		recoveryDuration := int64(p.cfg.RecoveryInterval.Seconds())
-		params.From = now - recoveryDuration
-		params.To = now - 60 // 1 minute buffer
-		p.log.Debugw("recovery mode fetch", "from", params.From, "to", params.To)
-	} else if p.cursor.LastOffset != "" {
-		// Continue from last offset
+	switch {
+	case !p.cursor.CaughtUp && p.cursor.LastOffset != "" && !p.cursor.isOffsetStale(p.cfg.OffsetTTL):
+		// Branch 1: Chain in progress, offset valid — continue draining.
 		params.Offset = p.cursor.LastOffset
-		p.log.Debugw("offset-based fetch", "offset", params.Offset)
-	} else {
-		// Initial fetch: use time-based
-		initialDuration := int64(p.cfg.InitialInterval.Seconds())
-		maxDuration := int64(maxInitialInterval.Seconds())
-		if initialDuration > maxDuration {
-			initialDuration = maxDuration
+		p.log.Debugw("offset-based fetch (chain draining)",
+			"offset", params.Offset,
+			"chain_from", p.cursor.ChainFrom,
+			"chain_to", p.cursor.ChainTo,
+		)
+
+	case !p.cursor.CaughtUp && p.cursor.ChainFrom != 0:
+		// Branch 2: Chain in progress but offset gone/stale — replay chain window.
+		if p.cursor.isOffsetStale(p.cfg.OffsetTTL) {
+			p.log.Warnw("offset stale, replaying chain window",
+				"offset_age", time.Since(p.cursor.OffsetObtainedAt),
+				"ttl", p.cfg.OffsetTTL,
+			)
+			if p.metrics != nil {
+				p.metrics.AddOffsetTTLDrop()
+			}
 		}
-		params.From = now - initialDuration
-		params.To = now - 60 // 1 minute buffer
-		p.log.Debugw("initial time-based fetch", "from", params.From, "to", params.To)
+		p.cursor.LastOffset = ""
+		p.cursor.OffsetObtainedAt = time.Time{}
+
+		from := p.cursor.ChainFrom - int64(chainOverlap.Seconds())
+		earliest := now - int64(maxLookback.Seconds())
+		if from < earliest {
+			p.log.Warnw("chain_from clamped to max lookback",
+				"original_from", p.cursor.ChainFrom,
+				"clamped_from", earliest,
+			)
+			from = earliest
+			if p.metrics != nil {
+				p.metrics.AddFromClamped()
+			}
+		}
+		params.From = from
+		params.To = p.cursor.ChainTo
+		p.log.Debugw("time-based fetch (chain replay)",
+			"from", params.From,
+			"to", params.To,
+		)
+
+	default:
+		// Branch 3: Caught up or first run — start a new chain.
+		var from int64
+		if p.cursor.ChainTo != 0 {
+			from = p.cursor.ChainTo - int64(chainOverlap.Seconds())
+		} else {
+			from = now - int64(p.cfg.InitialInterval.Seconds())
+		}
+		earliest := now - int64(maxLookback.Seconds())
+		if from < earliest {
+			from = earliest
+		}
+		to := now - apiSafetyBuffer
+
+		p.cursor.ChainFrom = from
+		p.cursor.ChainTo = to
+		p.cursor.CaughtUp = false
+		p.cursor.LastOffset = ""
+		p.cursor.OffsetObtainedAt = time.Time{}
+
+		params.From = from
+		params.To = to
+		p.log.Debugw("time-based fetch (new chain)",
+			"from", params.From,
+			"to", params.To,
+		)
 	}
 
 	return params
 }
 
-// processEvents processes events using workers.
-func (p *siemPoller) processEvents(ctx context.Context, response *SIEMResponse) (pagePublishSummary, error) {
-	var summary pagePublishSummary
-	if len(response.Events) == 0 {
-		return summary, nil
-	}
+// processPage streams events from body through a bounded channel to worker
+// goroutines. Returns event count and offset context. The body is always closed.
+func (p *siemPoller) processPage(ctx context.Context, body io.ReadCloser) (int, offsetContext, error) {
+	defer body.Close()
 
-	if p.metrics != nil {
-		p.metrics.AddBatchReceived(len(response.Events))
-	}
-
+	eventCh := make(chan json.RawMessage, p.cfg.ChannelBufferSize)
 	start := time.Now()
 
-	// Create work channel
-	workChan := make(chan eventWork, len(response.Events))
+	// Preliminary cursor carries chain state so events published before the
+	// offset context is known still persist enough state for restart recovery.
+	var pageCursorMu sync.Mutex
+	var pageCursor interface{} = cursor{
+		ChainFrom: p.cursor.ChainFrom,
+		ChainTo:   p.cursor.ChainTo,
+	}
 
-	// Create workers
+	getCursor := func() interface{} {
+		pageCursorMu.Lock()
+		defer pageCursorMu.Unlock()
+		return pageCursor
+	}
+
+	var publishMu sync.Mutex
+	var published, failed uint64
+	samples := make([]string, 0, 5)
+
+	// Start workers
 	var wg sync.WaitGroup
 	workerCount := p.cfg.NumberOfWorkers
-	if workerCount > len(response.Events) {
-		workerCount = len(response.Events)
-	}
-
-	// Track published/failed events
-	summary.samples = make([]string, 0, 5)
-	var publishMu sync.Mutex
-	var pageCursor interface{}
-	if response.LastOffset != "" {
-		pageCursor = cursor{
-			LastOffset:   response.LastOffset,
-			RecoveryMode: false,
-		}
-	}
-
 	for i := 0; i < workerCount; i++ {
 		wg.Add(1)
 		go func() {
@@ -395,22 +514,21 @@ func (p *siemPoller) processEvents(ctx context.Context, response *SIEMResponse) 
 				defer p.metrics.EndWorker(id)
 			}
 
-			for work := range workChan {
+			for raw := range eventCh {
 				select {
 				case <-ctx.Done():
 					return
 				default:
 				}
 
-				// Create event
-				event := p.createBeatEvent(work.event)
+				event := p.createBeatEvent(raw)
+				c := getCursor()
 
-				// Publish event
-				if err := p.pub.Publish(event, work.pageCursor); err != nil {
+				if err := p.pub.Publish(event, c); err != nil {
 					publishMu.Lock()
-					summary.failed++
-					if len(summary.samples) < cap(summary.samples) {
-						summary.samples = append(summary.samples, fmt.Sprintf("index=%d err=%v", work.index, err))
+					failed++
+					if len(samples) < cap(samples) {
+						samples = append(samples, err.Error())
 					}
 					publishMu.Unlock()
 					if p.metrics != nil {
@@ -420,9 +538,8 @@ func (p *siemPoller) processEvents(ctx context.Context, response *SIEMResponse) 
 				}
 
 				publishMu.Lock()
-				summary.published++
+				published++
 				publishMu.Unlock()
-
 				if p.metrics != nil {
 					p.metrics.AddEventPublished(1)
 				}
@@ -430,68 +547,58 @@ func (p *siemPoller) processEvents(ctx context.Context, response *SIEMResponse) 
 		}()
 	}
 
-	// Send work to workers
-	for i, event := range response.Events {
-		select {
-		case workChan <- eventWork{
-			index:      i,
-			event:      event,
-			pageCursor: pageCursor,
-		}:
-		case <-ctx.Done():
-			close(workChan)
-			wg.Wait()
-			return summary, ctx.Err()
+	// Producer: stream events from body into channel
+	pageCtx, eventCount, streamErr := StreamEvents(ctx, body, eventCh)
+
+	// Set cursor BEFORE closing channel so remaining events carry it
+	if pageCtx.Offset != "" {
+		pageCursorMu.Lock()
+		pageCursor = cursor{
+			ChainFrom:        p.cursor.ChainFrom,
+			ChainTo:          p.cursor.ChainTo,
+			LastOffset:       pageCtx.Offset,
+			OffsetObtainedAt: time.Now(),
 		}
+		pageCursorMu.Unlock()
 	}
 
-	close(workChan)
+	close(eventCh)
 	wg.Wait()
 
 	if p.metrics != nil {
+		p.metrics.AddBatchReceived(eventCount)
 		p.metrics.RecordBatchTime(time.Since(start))
-		if summary.published > 0 {
+		if published > 0 {
 			p.metrics.AddBatchPublished()
 		}
-		if summary.failed > 0 {
-			p.metrics.AddPartialPublishFailures(summary.failed)
+		if failed > 0 {
+			p.metrics.AddPartialPublishFailures(failed)
 		}
 	}
 
-	p.log.Infow("finished page publish",
-		"published_events", summary.published,
-		"failed_events", summary.failed,
+	logFields := []interface{}{
+		"published_events", published,
+		"failed_events", failed,
 		"duration", time.Since(start),
-	)
+	}
+	if failed > 0 {
+		logFields = append(logFields, "error_samples", samples)
+		p.log.Warnw("finished page publish with failures", logFields...)
+	} else {
+		p.log.Infow("finished page publish", logFields...)
+	}
 
-	return summary, nil
+	return eventCount, pageCtx, streamErr
 }
 
-// createBeatEvent creates a beat.Event from a SIEM event.
-func (p *siemPoller) createBeatEvent(event SIEMEvent) beat.Event {
-	// Parse the raw JSON into a map
-	var fields map[string]interface{}
-	if err := json.Unmarshal(event.Raw, &fields); err != nil {
-		// If parsing fails, store raw message
-		fields = map[string]interface{}{
-			"message": string(event.Raw),
-		}
-	}
-
-	// Add message field if not present (for downstream processing)
-	if _, ok := fields["message"]; !ok {
-		fields["message"] = string(event.Raw)
-	}
-
+// createBeatEvent creates a beat.Event from raw JSON with zero-copy passthrough.
+// The raw JSON is stored as the message field; field extraction is handled by
+// ingest pipelines downstream.
+func (p *siemPoller) createBeatEvent(raw json.RawMessage) beat.Event {
 	return beat.Event{
 		Timestamp: time.Now(),
-		Fields:    fields,
+		Fields: map[string]interface{}{
+			"message": string(raw),
+		},
 	}
-}
-
-func fetchMode(params FetchParams) string {
-	if params.Offset != "" {
-		return "offset"
-	}
-	return "time"
 }

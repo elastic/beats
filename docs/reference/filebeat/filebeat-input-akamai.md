@@ -19,9 +19,11 @@ This input supports:
 * EdgeGrid HMAC-SHA256 authentication
 * Time-based initial collection with configurable lookback
 * Offset-based pagination after the first page
-* Cursor-based checkpointing between runs
+* Chain-based cursor checkpointing with overlap to prevent data gaps
+* Proactive offset age tracking with configurable TTL
 * Automatic recovery when offsets expire or request timestamps become invalid
-* Concurrent worker-based event publishing
+* Streaming NDJSON pipeline with bounded channel and concurrent workers
+* Zero-copy event passthrough (field extraction deferred to ingest pipeline)
 * Rate limiting and retry with configurable backoff
 
 
@@ -39,10 +41,15 @@ filebeat.inputs:
 
   interval: 1m
   initial_interval: 12h
-  recovery_interval: 1h
   event_limit: 10000
   number_of_workers: 3
+  offset_ttl: 120s
   invalid_timestamp_retry.max_attempts: 2
+  max_recovery_attempts: 3
+
+  # Optional: rate-limit API requests
+  # resource.rate_limit.limit: 5.0
+  # resource.rate_limit.burst: 1
 ```
 
 
@@ -90,11 +97,6 @@ The polling interval between input cycles. Default: `1m`.
 The lookback duration used for the first request when no cursor exists (time-based mode). Cannot exceed `12h` (Akamai API limit). Default: `12h`.
 
 
-### `recovery_interval` [_recovery_interval_akamai]
-
-The lookback duration used when the input enters recovery mode (for example after an expired offset). Cannot exceed `12h` (Akamai API limit). Default: `1h`.
-
-
 ### `event_limit` [_event_limit_akamai]
 
 The maximum number of events requested per API page. Must be between `1` and `600000`. Default: `10000`.
@@ -105,14 +107,24 @@ The maximum number of events requested per API page. Must be between `1` and `60
 The number of concurrent workers used to publish events from a single fetched page. Must be greater than `0`. Default: `3`.
 
 
+### `offset_ttl` [_offset_ttl_akamai]
+
+The maximum age of a stored offset before it is proactively dropped to avoid a wasted `416` round-trip. Akamai offsets typically expire after approximately 2 minutes. Set to `0s` to disable proactive TTL checking (offsets will only be dropped when the API returns `416`). Default: `120s`.
+
+
+### `channel_buffer_size` [_channel_buffer_size_akamai]
+
+The size of the bounded channel used in the streaming event pipeline. Events are streamed from the API response body through this channel to worker goroutines. Higher values allow more buffering between the reader and publishers; lower values reduce memory usage. Default: `event_limit / 2`.
+
+
 ### `invalid_timestamp_retry.max_attempts` [_invalid_timestamp_retry_max_attempts_akamai]
 
-The number of immediate retries when Akamai responds with HTTP `400` containing `invalid timestamp` (indicating an expired HMAC). Each retry refreshes the HMAC signature before re-sending the request. After retries are exhausted, the input falls back to recovery mode. Default: `2`.
+The number of immediate retries when Akamai responds with HTTP `400` containing `invalid timestamp` (indicating an expired HMAC). Each retry refreshes the HMAC signature before re-sending the request. After retries are exhausted, the input clears the offset and replays the current chain window. Default: `2`.
 
 
-### `resource.timeout` [_resource_timeout_akamai]
+### `max_recovery_attempts` [_max_recovery_attempts_akamai]
 
-Duration before declaring that the HTTP client connection has timed out. Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`. Default: `60s`.
+The maximum number of consecutive recovery attempts (416 replays, timestamp retries exhausted, from-too-old clamps) within a single poll cycle before the input stops and waits for the next polling interval. Set to `0` to disable the cap (unlimited recovery attempts). Default: `3`.
 
 
 ### `resource.keep_alive.disable` [_resource_keep_alive_disable_akamai]
@@ -152,12 +164,12 @@ The maximum time to wait before a retry is attempted. Default: `60s`.
 
 ### `resource.rate_limit.limit` [_resource_rate_limit_limit_akamai]
 
-The value of the maximum overall resource request rate.
+The maximum API requests per second (float). For example, `0.5` means one request every 2 seconds. When set, the input uses a token-bucket rate limiter and waits before each request if the rate has been exceeded.
 
 
 ### `resource.rate_limit.burst` [_resource_rate_limit_burst_akamai]
 
-The maximum burst size. Burst is the maximum number of resource requests that can be made above the overall rate limit.
+The maximum number of requests that can be made in a single burst above the steady-state rate. Default: `1` when `resource.rate_limit.limit` is set.
 
 
 ### `tracer.enabled` [_tracer_enabled_akamai]
@@ -199,14 +211,27 @@ This determines whether rotated logs should be gzip compressed.
 
 ## Recovery behavior [_recovery_behavior_akamai]
 
-The input uses cursor-aware recovery logic to handle Akamai API error responses:
+The input uses a **chain-based** cursor model to track progress and recover from failures without data gaps.
+
+### Chain lifecycle
+
+Each poll cycle operates on a **chain** — a time window defined by `chain_from` and `chain_to`. The input pages through the chain using offset-based pagination until all events in the window are drained (`events returned < event_limit`). Once drained, the chain is marked as "caught up" and the next poll cycle starts a new chain from where the previous one ended (with a 10-second overlap to prevent boundary gaps).
+
+### Offset TTL
+
+Akamai offsets expire after approximately 2 minutes. The input tracks when each offset was obtained (`offset_obtained_at`) and proactively drops offsets older than `offset_ttl` before making an API request. This avoids a wasted round-trip that would result in a `416` response.
+
+### Recovery scenarios
 
 | Scenario | Behavior |
 | --- | --- |
-| `416` (offset expired) | Drops the cursor and switches to time-based recovery using `recovery_interval` as the lookback window. |
+| `416` (offset expired) | Clears the offset but keeps the chain window (`chain_from` / `chain_to`). The next fetch replays the same time window from the beginning. |
+| Proactive offset TTL expiry | Same as `416` — the offset is dropped before the request is made, and the chain window is replayed. The `offset_ttl_drops_total` metric is incremented. |
 | `400` with `invalid timestamp` | Refreshes the HMAC signature and retries immediately, up to `invalid_timestamp_retry.max_attempts` times. |
-| Invalid timestamp retries exhausted | Falls back to the same cursor-drop recovery path as `416`. |
+| Invalid timestamp retries exhausted | Clears the offset and replays the current chain window (same as `416`). |
+| `from` too old (beyond 12h lookback) | Clamps `chain_from` to `now - 12h`, logs the data gap boundary, increments `from_clamped_total`, and continues. |
 | Other `400` responses | Treated as non-recoverable for the current poll cycle. Logged and the input moves to the next polling interval. |
+| Max recovery attempts exceeded | Stops the current poll cycle and waits for the next polling interval. The `errors_total` metric is incremented. Controlled by the `max_recovery_attempts` setting. |
 
 
 ## Metrics [_metrics_akamai]
@@ -225,11 +250,12 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `events_published_total` | Total number of events published. |
 | `events_publish_failed_total` | Total number of individual event publish failures. |
 | `errors_total` | Total number of errors encountered. |
-| `recovery_mode_entries_total` | Number of times recovery mode was entered (offset expired or HMAC retries exhausted). |
 | `offset_expired_total` | Number of `416` offset-expired responses received. |
+| `offset_ttl_drops_total` | Number of proactive offset drops due to TTL expiry (before making the API request). |
+| `from_clamped_total` | Number of times `chain_from` was clamped to the 12-hour max lookback boundary. |
 | `hmac_refresh_total` | Number of HMAC signature refreshes triggered by invalid timestamp errors. |
 | `api_400_fatal_total` | Number of non-recoverable `400` responses received. |
-| `cursor_drops_total` | Number of times the cursor was dropped and reset. |
+| `cursor_drops_total` | Number of times the offset was cleared and the chain window replayed. |
 | `workers_active_gauge` | Number of currently active event-publishing workers. |
 | `worker_utilization` | Worker utilization ratio (`0`--`1`), updated every 5 seconds. |
 | `request_processing_time` | Histogram of request processing times in nanoseconds. |

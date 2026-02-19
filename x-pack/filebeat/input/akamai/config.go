@@ -20,15 +20,16 @@ import (
 const (
 	defaultInterval         = time.Minute
 	defaultInitialInterval  = 12 * time.Hour
-	defaultRecoveryInterval = 1 * time.Hour
 	defaultEventLimit       = 10000
 	maxEventLimit           = 600000
 	defaultNumberOfWorkers  = 3
 	defaultMaxAttempts      = 5
 	defaultWaitMin          = time.Second
 	defaultWaitMax          = time.Minute
-	defaultInvalidTSRetries = 2
-	maxInitialInterval      = 12 * time.Hour
+	defaultInvalidTSRetries    = 2
+	defaultMaxRecoveryAttempts = 3
+	maxInitialInterval         = 12 * time.Hour
+	defaultOffsetTTL           = 120 * time.Second
 )
 
 // config is the top-level configuration for the akamai input.
@@ -49,10 +50,6 @@ type config struct {
 	// Maximum is 12 hours as per Akamai API limits.
 	InitialInterval time.Duration `config:"initial_interval"`
 
-	// RecoveryInterval is the lookback period when in recovery mode.
-	// Maximum is 12 hours as per Akamai API limits.
-	RecoveryInterval time.Duration `config:"recovery_interval"`
-
 	// EventLimit is the maximum number of events per request.
 	// Default is 10000, maximum is 600000.
 	EventLimit int `config:"event_limit"`
@@ -64,6 +61,19 @@ type config struct {
 	// responses containing "invalid timestamp" before failing the request and entering recovery mode.
 	InvalidTimestampRetries int `config:"invalid_timestamp_retry.max_attempts"`
 
+	// MaxRecoveryAttempts caps consecutive recovery actions (416 replays, timestamp
+	// retries exhausted, from-too-old clamps) within a single poll cycle. Zero
+	// disables the cap.
+	MaxRecoveryAttempts int `config:"max_recovery_attempts"`
+
+	// OffsetTTL is the maximum age of a stored offset before it is proactively
+	// dropped to avoid a wasted 416 round-trip. Zero disables proactive TTL.
+	OffsetTTL time.Duration `config:"offset_ttl"`
+
+	// ChannelBufferSize is the bounded channel size for the streaming pipeline.
+	// Default is event_limit / 2. Must be > 0.
+	ChannelBufferSize int `config:"channel_buffer_size"`
+
 	// Tracer configures request/response tracing for debugging.
 	Tracer *tracerConfig `config:"tracer"`
 }
@@ -72,7 +82,6 @@ type config struct {
 type resourceConfig struct {
 	URL       *urlConfig                       `config:"url" validate:"required"`
 	Retry     retryConfig                      `config:"retry"`
-	Timeout   time.Duration                    `config:"timeout"`
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 	KeepAlive keepAliveConfig                  `config:"keep_alive"`
 	RateLimit *rateLimitConfig                 `config:"rate_limit"`
@@ -124,10 +133,10 @@ type rateLimitConfig struct {
 
 func (c rateLimitConfig) Validate() error {
 	if c.Limit != nil && *c.Limit <= 0 {
-		return errors.New("limit must be greater than zero")
+		return errors.New("rate_limit.limit must be greater than zero")
 	}
-	if c.Limit == nil && c.Burst != nil && *c.Burst <= 0 {
-		return errors.New("burst must be greater than zero if limit is not specified")
+	if c.Burst != nil && *c.Burst <= 0 {
+		return errors.New("rate_limit.burst must be greater than zero")
 	}
 	return nil
 }
@@ -196,17 +205,17 @@ func defaultConfig() config {
 	return config{
 		Interval:                defaultInterval,
 		InitialInterval:         defaultInitialInterval,
-		RecoveryInterval:        defaultRecoveryInterval,
 		EventLimit:              defaultEventLimit,
 		NumberOfWorkers:         defaultNumberOfWorkers,
 		InvalidTimestampRetries: defaultInvalidTSRetries,
+		MaxRecoveryAttempts:     defaultMaxRecoveryAttempts,
+		OffsetTTL:               defaultOffsetTTL,
 		Resource: &resourceConfig{
 			Retry: retryConfig{
 				MaxAttempts: &maxAttempts,
 				WaitMin:     &waitMin,
 				WaitMax:     &waitMax,
 			},
-			Timeout:   60 * time.Second,
 			Transport: transport,
 		},
 	}
@@ -239,13 +248,6 @@ func (c *config) Validate() error {
 		return fmt.Errorf("initial_interval cannot exceed %v (Akamai API limit)", maxInitialInterval)
 	}
 
-	if c.RecoveryInterval <= 0 {
-		return errors.New("recovery_interval must be greater than 0")
-	}
-	if c.RecoveryInterval > maxInitialInterval {
-		return fmt.Errorf("recovery_interval cannot exceed %v (Akamai API limit)", maxInitialInterval)
-	}
-
 	if c.EventLimit <= 0 {
 		return errors.New("event_limit must be greater than 0")
 	}
@@ -258,6 +260,23 @@ func (c *config) Validate() error {
 	}
 	if c.InvalidTimestampRetries < 0 {
 		return errors.New("invalid_timestamp_retry.max_attempts must be greater than or equal to 0")
+	}
+	if c.MaxRecoveryAttempts < 0 {
+		return errors.New("max_recovery_attempts must be non-negative")
+	}
+
+	if c.OffsetTTL < 0 {
+		return errors.New("offset_ttl must be non-negative")
+	}
+
+	if c.ChannelBufferSize < 0 {
+		return errors.New("channel_buffer_size must be greater than 0")
+	}
+	if c.ChannelBufferSize == 0 {
+		c.ChannelBufferSize = c.EventLimit / 2
+		if c.ChannelBufferSize < 1 {
+			c.ChannelBufferSize = 1
+		}
 	}
 
 	if c.Tracer != nil && c.Tracer.enabled() && c.Tracer.Filename == "" {

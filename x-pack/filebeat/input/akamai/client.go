@@ -10,7 +10,6 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -23,6 +22,7 @@ import (
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"golang.org/x/time/rate"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
@@ -60,17 +60,14 @@ func (e *APIError) IsOffsetOutOfRange() bool {
 	return e.StatusCode == 416
 }
 
-// SIEMEvent represents a single event from the Akamai SIEM API.
-type SIEMEvent struct {
-	Offset string          `json:"offset,omitempty"`
-	Raw    json.RawMessage `json:"-"`
-}
-
-// SIEMResponse represents the response from fetching events.
-type SIEMResponse struct {
-	Events     []SIEMEvent
-	LastOffset string
-	HasMore    bool
+// IsFromTooOld returns true if the error indicates the from parameter is too
+// old (beyond the Akamai max lookback window).
+func (e *APIError) IsFromTooOld() bool {
+	if e.StatusCode != 400 {
+		return false
+	}
+	lower := strings.ToLower(e.Detail)
+	return strings.Contains(lower, "out of range") || strings.Contains(lower, "too old")
 }
 
 // offsetContext is the final context object returned by the SIEM API response.
@@ -101,6 +98,7 @@ type Client struct {
 	configIDs  string
 	log        *logp.Logger
 	metrics    *inputMetrics
+	limiter    *rate.Limiter
 }
 
 // ClientOption is a functional option for configuring the client.
@@ -115,7 +113,6 @@ func WithMetrics(m *inputMetrics) ClientOption {
 
 // NewClient creates a new Akamai SIEM API client.
 func NewClient(cfg config, log *logp.Logger, reg *monitoring.Registry, opts ...ClientOption) (*Client, error) {
-	// Create the base HTTP client
 	transport := cfg.Resource.Transport
 	httpClient, err := transport.Client(
 		httpcommon.WithLogger(log),
@@ -126,20 +123,17 @@ func NewClient(cfg config, log *logp.Logger, reg *monitoring.Registry, opts ...C
 		return nil, fmt.Errorf("failed to create HTTP client: %w", err)
 	}
 
-	// Create the EdgeGrid signer
 	signer := NewEdgeGridSigner(
 		cfg.Auth.EdgeGrid.ClientToken,
 		cfg.Auth.EdgeGrid.ClientSecret,
 		cfg.Auth.EdgeGrid.AccessToken,
 	)
 
-	// Wrap transport with EdgeGrid authentication
 	httpClient.Transport = &EdgeGridTransport{
 		Transport: httpClient.Transport,
 		Signer:    signer,
 	}
 
-	// Add request/response tracing when enabled.
 	if cfg.Tracer != nil && cfg.Tracer.enabled() {
 		w := zapcore.AddSync(cfg.Tracer)
 		core := ecszap.NewCore(
@@ -148,19 +142,17 @@ func NewClient(cfg config, log *logp.Logger, reg *monitoring.Registry, opts ...C
 			zap.DebugLevel,
 		)
 		traceLogger := zap.New(core)
-		maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of log file size
+		maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10
 		if maxBodyLen <= 0 {
 			maxBodyLen = 100000
 		}
 		httpClient.Transport = httplog.NewLoggingRoundTripper(httpClient.Transport, traceLogger, maxBodyLen, log)
 	}
 
-	// Add metrics monitoring
 	if reg != nil {
 		httpClient.Transport = httpmon.NewMetricsRoundTripper(httpClient.Transport, reg, log)
 	}
 
-	// Configure retries
 	if cfg.Resource.Retry.getMaxAttempts() > 1 {
 		retryClient := &retryablehttp.Client{
 			HTTPClient:   httpClient,
@@ -174,12 +166,22 @@ func NewClient(cfg config, log *logp.Logger, reg *monitoring.Registry, opts ...C
 		httpClient = retryClient.StandardClient()
 	}
 
+	var limiter *rate.Limiter
+	if rl := cfg.Resource.RateLimit; rl != nil && rl.Limit != nil {
+		burst := 1
+		if rl.Burst != nil {
+			burst = *rl.Burst
+		}
+		limiter = rate.NewLimiter(rate.Limit(*rl.Limit), burst)
+	}
+
 	client := &Client{
 		httpClient: httpClient,
 		signer:     signer,
 		baseURL:    cfg.Resource.URL.URL,
 		configIDs:  cfg.ConfigIDs,
 		log:        log.Named("client"),
+		limiter:    limiter,
 	}
 
 	for _, opt := range opts {
@@ -189,8 +191,11 @@ func NewClient(cfg config, log *logp.Logger, reg *monitoring.Registry, opts ...C
 	return client, nil
 }
 
-// FetchEvents fetches events from the Akamai SIEM API.
-func (c *Client) FetchEvents(ctx context.Context, params FetchParams) (*SIEMResponse, error) {
+// FetchResponse makes the HTTP request and returns the response body for
+// streaming consumption. The caller must close the returned body. On error
+// (non-200 status), the body is consumed internally and an *APIError is
+// returned.
+func (c *Client) FetchResponse(ctx context.Context, params FetchParams) (io.ReadCloser, error) {
 	reqURL := c.buildRequestURL(params)
 	c.log.Debugw("fetching events",
 		"host", c.baseURL.Host,
@@ -204,6 +209,12 @@ func (c *Client) FetchEvents(ctx context.Context, params FetchParams) (*SIEMResp
 
 	if c.metrics != nil {
 		c.metrics.AddRequest()
+	}
+
+	if c.limiter != nil {
+		if err := c.limiter.Wait(ctx); err != nil {
+			return nil, fmt.Errorf("rate limiter wait: %w", err)
+		}
 	}
 
 	start := time.Now()
@@ -222,22 +233,21 @@ func (c *Client) FetchEvents(ctx context.Context, params FetchParams) (*SIEMResp
 		}
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
-	defer resp.Body.Close()
 
 	if c.metrics != nil {
 		c.metrics.RecordResponseLatency(time.Since(start))
 	}
 
-	// Handle error responses
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
+		resp.Body.Close()
+
 		apiErr := &APIError{
 			StatusCode: resp.StatusCode,
 			Status:     resp.Status,
 			Body:       string(body),
 		}
 
-		// Try to parse error detail
 		if len(body) > 0 {
 			var errResp struct {
 				Detail string `json:"detail"`
@@ -257,22 +267,7 @@ func (c *Client) FetchEvents(ctx context.Context, params FetchParams) (*SIEMResp
 		c.metrics.AddRequestSuccess()
 	}
 
-	// Parse the response (newline-delimited JSON)
-	response, err := c.parseResponse(resp.Body, params.Limit)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse response: %w", err)
-	}
-
-	if c.metrics != nil {
-		c.metrics.RecordRequestTime(time.Since(start))
-	}
-	c.log.Debugw("fetched SIEM response",
-		"events", len(response.Events),
-		"has_more", response.HasMore,
-		"next_offset", response.LastOffset,
-	)
-
-	return response, nil
+	return resp.Body, nil
 }
 
 // buildRequestURL constructs the request URL with query parameters.
@@ -298,84 +293,71 @@ func (c *Client) buildRequestURL(params FetchParams) string {
 	return u.String()
 }
 
-// parseResponse parses the newline-delimited JSON response.
-func (c *Client) parseResponse(body io.Reader, limit int) (*SIEMResponse, error) {
-	response := &SIEMResponse{
-		Events: make([]SIEMEvent, 0),
-	}
-	var pageCtx offsetContext
-
+// StreamEvents reads NDJSON lines from body, pushing event lines into eventCh
+// using a one-line delay. The last line is treated as the offset context and
+// unmarshalled rather than sent as an event. Returns the offset context, the
+// number of events sent, and any scanner error.
+//
+// The caller must close eventCh after StreamEvents returns.
+func StreamEvents(ctx context.Context, body io.Reader, eventCh chan<- json.RawMessage) (offsetContext, int, error) {
 	scanner := bufio.NewScanner(body)
-	// Increase buffer size for potentially large events
-	const maxTokenSize = 10 * 1024 * 1024 // 10MB
+	const maxTokenSize = 10 * 1024 * 1024
 	buf := make([]byte, 64*1024)
 	scanner.Buffer(buf, maxTokenSize)
 
+	var prev []byte
+	count := 0
+
 	for scanner.Scan() {
-		line := scanner.Text()
-		if line == "" {
-			continue
-		}
-		lineBytes := []byte(line)
-		var keys map[string]json.RawMessage
-		if err := json.Unmarshal(lineBytes, &keys); err != nil {
-			c.log.Warnw("failed to parse response JSON line", "error", err, "line", truncate(line, 200))
+		line := scanner.Bytes()
+		if len(line) == 0 {
 			continue
 		}
 
-		_, hasOffset := keys["offset"]
-		_, hasTotal := keys["total"]
-		_, hasLimit := keys["limit"]
-		if hasOffset && (hasTotal || hasLimit) {
-			if err := json.Unmarshal(lineBytes, &pageCtx); err != nil {
-				c.log.Warnw("failed to parse SIEM offset context line", "error", err, "line", truncate(line, 200))
+		current := make([]byte, len(line))
+		copy(current, line)
+
+		if prev != nil {
+			select {
+			case eventCh <- json.RawMessage(prev):
+				count++
+			case <-ctx.Done():
+				return offsetContext{}, count, ctx.Err()
 			}
-			continue
 		}
-
-		event := SIEMEvent{
-			Raw: json.RawMessage(append([]byte(nil), lineBytes...)),
-		}
-		if rawOffset, ok := keys["offset"]; ok {
-			_ = json.Unmarshal(rawOffset, &event.Offset)
-		}
-		response.Events = append(response.Events, event)
+		prev = current
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("error reading response: %w", err)
+		return offsetContext{}, count, fmt.Errorf("error reading response: %w", err)
 	}
 
-	// Prefer API-provided offset context as the source of truth.
-	if pageCtx.Offset != "" {
-		response.LastOffset = pageCtx.Offset
-	} else if n := len(response.Events); n > 0 && response.Events[n-1].Offset != "" {
-		// Fallback for payloads missing context objects.
-		response.LastOffset = response.Events[n-1].Offset
+	if prev == nil {
+		return offsetContext{}, 0, nil
 	}
 
-	// Determine if there might be more events. Context limit, when present, wins.
-	effectiveLimit := limit
-	if pageCtx.Limit > 0 {
-		effectiveLimit = pageCtx.Limit
+	// Last line: try to unmarshal as offset context. A valid offset context
+	// always contains a limit field (> 0), which distinguishes it from regular
+	// events that happen to have an "offset" key.
+	var pageCtx offsetContext
+	if err := json.Unmarshal(prev, &pageCtx); err == nil && pageCtx.Offset != "" && pageCtx.Limit > 0 {
+		return pageCtx, count, nil
 	}
-	response.HasMore = len(response.Events) >= effectiveLimit
 
-	return response, nil
+	// Last line was a regular event, not offset context.
+	select {
+	case eventCh <- json.RawMessage(prev):
+		count++
+	case <-ctx.Done():
+		return offsetContext{}, count, ctx.Err()
+	}
+	return offsetContext{}, count, nil
 }
 
-// Close closes the client.
+// Close releases resources held by the client.
 func (c *Client) Close() error {
-	// HTTP clients don't need explicit closing, but we might add cleanup later
+	c.httpClient.CloseIdleConnections()
 	return nil
-}
-
-// truncate truncates a string to the specified length.
-func truncate(s string, maxLen int) string {
-	if len(s) <= maxLen {
-		return s
-	}
-	return s[:maxLen] + "..."
 }
 
 // retryLogger implements the retryablehttp.LeveledLogger interface.
@@ -403,11 +385,9 @@ func (l *retryLogger) Warn(msg string, keysAndValues ...interface{}) {
 	l.log.Warnw(msg, keysAndValues...)
 }
 
-// IsRecoverableError returns true if the error should trigger recovery mode.
-func IsRecoverableError(err error) bool {
-	var apiErr *APIError
-	if errors.As(err, &apiErr) {
-		return apiErr.IsInvalidTimestamp() || apiErr.IsOffsetOutOfRange()
+func fetchMode(params FetchParams) string {
+	if params.Offset != "" {
+		return "offset"
 	}
-	return false
+	return "time"
 }
