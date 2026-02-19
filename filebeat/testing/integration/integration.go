@@ -96,7 +96,7 @@ func (fbt *test) ExpectEOF(files ...string) Test {
 	return fbt
 }
 
-// ExpectIngestedLines implements the Test interface.
+// ExpectIngestedToConsole implements the Test interface.
 func (fbt *test) ExpectIngestedToConsole(file string, offset, count int) Test {
 	f, err := os.Open(file)
 	if err != nil {

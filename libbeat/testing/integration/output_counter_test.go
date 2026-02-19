@@ -19,6 +19,7 @@ package integration
 
 import (
 	"regexp"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -30,7 +31,7 @@ func TestOutputCounter(t *testing.T) {
 			name      string
 			strs      []string
 			input     []string
-			expOutput int
+			expOutput int64
 		}{
 			{
 				name: "single line partially matches a single substring",
@@ -48,7 +49,7 @@ func TestOutputCounter(t *testing.T) {
 					"no line",
 				},
 				input: []string{
-					"some log line that would match",
+					"some log line that would not match",
 				},
 				expOutput: 0,
 			},
@@ -73,13 +74,13 @@ func TestOutputCounter(t *testing.T) {
 					"line bar",
 				},
 				input: []string{
-					"some log line that would match 1",
+					"some log line that would not match 1",
 					"line foo",
-					"some log line that would match 2",
+					"some log line that would not match 2",
 					"line bar",
-					"some log line that would match 3",
+					"some log line that would not match 3",
 					"line foo",
-					"some log line that would match 4",
+					"some log line that would not match 4",
 					"line bar",
 				},
 				expOutput: 2,
@@ -92,14 +93,14 @@ func TestOutputCounter(t *testing.T) {
 				},
 				input: []string{
 					"1 line bar",
-					"some log line that would match 1",
+					"some log line that would not match 1",
 					"2 line foo",
 					"3 line foo",
-					"some log line that would match 2",
+					"some log line that would not match 2",
 					"4 line bar",
-					"some log line that would match 3",
+					"some log line that would not match 3",
 					"5 line foo",
-					"some log line that would match 4",
+					"some log line that would not match 4",
 					"6 line bar",
 				},
 				expOutput: 2,
@@ -108,13 +109,13 @@ func TestOutputCounter(t *testing.T) {
 
 		for _, tc := range cases {
 			t.Run(tc.name, func(t *testing.T) {
-				var out int
-				w := NewCounter(&out, tc.strs...)
+				out := &atomic.Int64{}
+				w := NewCounter(out, tc.strs...)
 				for _, s := range tc.input {
 					w.Inspect(s)
 				}
 
-				require.Equal(t, tc.expOutput, out)
+				require.Equal(t, tc.expOutput, out.Load())
 			})
 		}
 	})
@@ -124,7 +125,7 @@ func TestOutputCounter(t *testing.T) {
 			name      string
 			exprs     []*regexp.Regexp
 			input     []string
-			expOutput int
+			expOutput int64
 		}{
 			{
 				name: "single line partially matches a single expression",
@@ -142,7 +143,7 @@ func TestOutputCounter(t *testing.T) {
 					regexp.MustCompile("no(.*)line"),
 				},
 				input: []string{
-					"some log line that would match",
+					"some log line that would not match",
 				},
 				expOutput: 0,
 			},
@@ -167,13 +168,13 @@ func TestOutputCounter(t *testing.T) {
 					regexp.MustCompile("line(.*)bar"),
 				},
 				input: []string{
-					"some log line that would match 1",
+					"some log line that would not match 1",
 					"line foo",
-					"some log line that would match 2",
+					"some log line that would not match 2",
 					"line bar",
-					"some log line that would match 3",
+					"some log line that would not match 3",
 					"line foo",
-					"some log line that would match 4",
+					"some log line that would not match 4",
 					"line bar",
 				},
 				expOutput: 2,
@@ -186,14 +187,14 @@ func TestOutputCounter(t *testing.T) {
 				},
 				input: []string{
 					"line bar",
-					"some log line that would match 1",
+					"some log line that would not match 1",
 					"line foo",
 					"line foo",
-					"some log line that would match 2",
+					"some log line that would not match 2",
 					"line bar",
-					"some log line that would match 3",
+					"some log line that would not match 3",
 					"line foo",
-					"some log line that would match 4",
+					"some log line that would not match 4",
 					"line bar",
 				},
 				expOutput: 2,
@@ -202,13 +203,13 @@ func TestOutputCounter(t *testing.T) {
 
 		for _, tc := range cases {
 			t.Run(tc.name, func(t *testing.T) {
-				var out int
-				w := NewRegexpCounter(&out, tc.exprs...)
+				out := &atomic.Int64{}
+				w := NewRegexpCounter(out, tc.exprs...)
 				for _, s := range tc.input {
 					w.Inspect(s)
 				}
 
-				require.Equal(t, tc.expOutput, out)
+				require.Equal(t, tc.expOutput, out.Load())
 			})
 		}
 	})

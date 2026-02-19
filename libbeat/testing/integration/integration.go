@@ -25,6 +25,7 @@ import (
 	"os/exec"
 	"regexp"
 	"sync"
+	"sync/atomic"
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -116,7 +117,7 @@ type BeatTest interface {
 	//
 	// This function should be used before `Start` because it's
 	// inspecting only new outputs.
-	CountOutput(out *int, strs ...string) BeatTest
+	CountOutput(out *atomic.Int64, strs ...string) BeatTest
 
 	// CountOutputRegex registers an output counter for the given regular expression.
 	//
@@ -129,7 +130,7 @@ type BeatTest interface {
 	//
 	// This function should be used before `Start` because it's
 	// inspecting only new outputs.
-	CountOutputRegex(out *int, exprs ...*regexp.Regexp) BeatTest
+	CountOutputRegex(out *atomic.Int64, exprs ...*regexp.Regexp) BeatTest
 
 	// PrintOutput prints last `limit` lines of the output
 	//
@@ -355,7 +356,7 @@ func (b *beatTest) ExpectOutputRegex(exprs ...*regexp.Regexp) BeatTest {
 }
 
 // CountOutput implements the BeatTest interface.
-func (b *beatTest) CountOutput(out *int, strs ...string) BeatTest {
+func (b *beatTest) CountOutput(out *atomic.Int64, strs ...string) BeatTest {
 	b.mtx.Lock()
 	defer b.mtx.Unlock()
 
@@ -374,7 +375,7 @@ func (b *beatTest) CountOutput(out *int, strs ...string) BeatTest {
 }
 
 // CountOutputRegex implements the BeatTest interface.
-func (b *beatTest) CountOutputRegex(out *int, exprs ...*regexp.Regexp) BeatTest {
+func (b *beatTest) CountOutputRegex(out *atomic.Int64, exprs ...*regexp.Regexp) BeatTest {
 	b.mtx.Lock()
 	defer b.mtx.Unlock()
 

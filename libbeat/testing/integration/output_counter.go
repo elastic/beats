@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"sync/atomic"
 )
 
 // NewCounter returns an output counter for the given substring.
@@ -29,7 +30,7 @@ import (
 // The first substring must match first, then second, etc.
 //
 // Only when all substrings match in order the counter gets incremented.
-func NewCounter(out *int, strs ...string) OutputInspector {
+func NewCounter(out *atomic.Int64, strs ...string) OutputInspector {
 	return &counter{
 		strs:    strs,
 		out:     out,
@@ -40,7 +41,7 @@ func NewCounter(out *int, strs ...string) OutputInspector {
 type counter struct {
 	strs    []string
 	matched int
-	out     *int
+	out     *atomic.Int64
 }
 
 func (c *counter) Inspect(line string) {
@@ -56,7 +57,7 @@ func (c *counter) Inspect(line string) {
 	// if we reached the end of the list, we reset and count the entire match
 	if c.matched == len(c.strs) {
 		c.matched = 0
-		*c.out++
+		c.out.Add(1)
 	}
 }
 
@@ -82,7 +83,7 @@ func (c *counter) String() string {
 // The first expression must match first, then second, etc.
 //
 // Only when all expressions match in order the counter gets incremented.
-func NewRegexpCounter(out *int, exprs ...*regexp.Regexp) OutputInspector {
+func NewRegexpCounter(out *atomic.Int64, exprs ...*regexp.Regexp) OutputInspector {
 	return &regexpCounter{
 		exprs:   exprs,
 		out:     out,
@@ -93,7 +94,7 @@ func NewRegexpCounter(out *int, exprs ...*regexp.Regexp) OutputInspector {
 type regexpCounter struct {
 	exprs   []*regexp.Regexp
 	matched int
-	out     *int
+	out     *atomic.Int64
 }
 
 func (c *regexpCounter) Inspect(line string) {
@@ -109,7 +110,7 @@ func (c *regexpCounter) Inspect(line string) {
 	// if we reached the end of the list, we reset and count the entire match
 	if c.matched == len(c.exprs) {
 		c.matched = 0
-		*c.out++
+		c.out.Add(1)
 	}
 }
 

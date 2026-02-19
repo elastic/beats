@@ -46,6 +46,9 @@ func (w *overallInspector) Inspect(line string) {
 }
 
 func (w *overallInspector) String() string {
+	if len(w.inspectors) == 0 {
+		return ""
+	}
 	inspectors := make([]string, 0, len(w.inspectors))
 	for _, inspector := range w.inspectors {
 		inspectors = append(inspectors, inspector.String())

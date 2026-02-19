@@ -155,7 +155,7 @@ func GenerateLogFile(t *testing.T, filename string, lines int, generator LogGene
 // using the given generator.
 //
 // This function counts the current lines in the file and makes sure to properly
-// continue line generation feeding the generator with next indecies.
+// continue line generation feeding the generator with next indices.
 func AppendLogFile(t *testing.T, filename string, lines int, generator LogGenerator) {
 	// `0666` is the default in `os.Create`, used for consistency
 	file, err := os.OpenFile(filename, os.O_RDWR, 0666)
