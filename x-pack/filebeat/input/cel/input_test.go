@@ -1478,7 +1478,7 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval":                 1,
 			"resource.url":             "https://example.com/",
-			"resource.tracer.enabled":  false,
+			"resource.tracer.enabled":  true,
 			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
 			"state":                    map[string]interface{}{},
 			"program":                  "{}",
@@ -2192,7 +2192,19 @@ func TestInput(t *testing.T) {
 
 			var tempDir string
 			if conf.Resource.Tracer != nil {
-				tempDir = t.TempDir()
+				err := os.MkdirAll("cel", 0o700)
+				if err != nil {
+					t.Fatalf("failed to create root logging destination: %v", err)
+				}
+				tempDir, err = os.MkdirTemp("cel", "logs-*")
+				if err != nil {
+					t.Fatalf("failed to create logging destination: %v", err)
+				}
+				tempDir, err = filepath.Abs(tempDir)
+				if err != nil {
+					t.Fatalf("failed to get absolute path for logging destination: %v", err)
+				}
+				defer os.RemoveAll("cel")
 				conf.Resource.Tracer.Filename = filepath.Join(tempDir, conf.Resource.Tracer.Filename)
 			}
 
