@@ -7,7 +7,6 @@ package streaming
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"flag"
 	"net/url"
 	"os"
@@ -91,8 +90,11 @@ func TestCrowdstrikeFalconHose(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error validating config: %v", err)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	time.AfterFunc(*timeout, func() {
+		cancel()
+	})
 	var cursor map[string]any
 	if *offset >= 0 {
 		cursor = map[string]any{"offset": *offset}
@@ -104,9 +106,6 @@ func TestCrowdstrikeFalconHose(t *testing.T) {
 		t.Fatalf("unexpected error constructing follower: %v", err)
 	}
 	err = s.FollowStream(ctx)
-	if errors.Is(err, context.DeadlineExceeded) {
-		err = nil
-	}
 	if err != nil {
 		t.Errorf("unexpected error following stream: %v", err)
 	}

@@ -92,6 +92,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				RootfsMountpoint:  sys,
 				IgnoreRootCgroups: true,
 			},
+			Logger: base.Logger(),
 		},
 		perCPU:           config.IncludePerCPU,
 		degradeOnPartial: degradedConf.DegradeOnPartial,

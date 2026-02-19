@@ -414,8 +414,10 @@ func evaluateResponse(expression *valueTpl, data []byte, stat status.StatusRepor
 
 	val, err := expression.Execute(paramCtx, tr, "response_evaluation", nil, stat, log)
 	if err != nil {
-
 		return false, fmt.Errorf("error while evaluating expression: %w", err)
+	}
+	if val == "" {
+		return false, nil
 	}
 	result, err := strconv.ParseBool(val)
 	if err != nil {

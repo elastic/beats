@@ -52,6 +52,7 @@ type GoTestArgs struct {
 	CoverageProfileFile string            // Test coverage profile file (enables -cover).
 	Dir                 string            // The directory the test should run from
 	Output              io.Writer         // Write stderr and stdout to Output if set
+	Timeout             string            // Timeout for tests (-timeout flag)
 }
 
 // TestBinaryArgs are the arguments used when building binary for testing.
@@ -128,7 +129,11 @@ func fetchGoPackages(module string) ([]string, error) {
 // environment variables, e.g: TEST_TAGS=aws,azure.
 // If the FIPS env var is set to true, the requirefips and ms_tls13kdf tags are injected.
 func testTagsFromEnv() []string {
-	tags := strings.Split(strings.Trim(os.Getenv("TEST_TAGS"), ", "), ",")
+	testTags := strings.Trim(os.Getenv("TEST_TAGS"), ", ")
+	var tags []string
+	if testTags != "" {
+		tags = strings.Split(testTags, ",")
+	}
 	if FIPSBuild {
 		tags = append(tags, "requirefips", "ms_tls13kdf")
 	}
@@ -147,17 +152,30 @@ func DefaultGoFIPSOnlyTestArgs() GoTestArgs {
 	return args
 }
 
+// DefaultGoWindowsTestIntegrationArgs returns a default set of arguments for running
+// windows integration tests. We tag integration test files with 'integration'.
+func DefaultGoWindowsTestIntegrationArgs() GoTestArgs {
+	args := makeGoTestArgs("Windows-Integration")
+	args.Tags = append(args.Tags, "win_integration")
+	args.ExtraFlags = append(args.ExtraFlags, "-count=1")
+	args.Packages = []string{"./tests/integration/windows"}
+	return args
+}
+
 // DefaultGoTestIntegrationArgs returns a default set of arguments for running
 // all integration tests. We tag integration test files with 'integration'.
-func DefaultGoTestIntegrationArgs() GoTestArgs {
+func DefaultGoTestIntegrationArgs(ctx context.Context) GoTestArgs {
 	args := makeGoTestArgs("Integration")
 	args.Tags = append(args.Tags, "integration")
 
-	synth := exec.Command("npx", "@elastic/synthetics", "-h")
+	cmdCtx, cmdCancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cmdCancel()
+
+	synth := exec.CommandContext(cmdCtx, "npx", "@elastic/synthetics", "-h")
 	if synth.Run() == nil {
 		// Run an empty journey to ensure playwright can be loaded
 		// catches situations like missing playwright deps
-		cmd := exec.Command("sh", "-c", "echo 'step(\"t\", () => { })' | elastic-synthetics --inline")
+		cmd := exec.CommandContext(cmdCtx, "sh", "-c", "echo 'step(\"t\", () => { })' | elastic-synthetics --inline")
 		var out strings.Builder
 		cmd.Stdout = &out
 		cmd.Stderr = &out
@@ -174,13 +192,14 @@ func DefaultGoTestIntegrationArgs() GoTestArgs {
 	// Use the non-cachable -count=1 flag to disable test caching when running integration tests.
 	// There are reasons to re-run tests even if the code is unchanged (e.g. Dockerfile changes).
 	args.ExtraFlags = append(args.ExtraFlags, "-count=1")
+	args.ExtraFlags = append(args.ExtraFlags, "-timeout=15m")
 	return args
 }
 
 // DefaultGoTestIntegrationFromHostArgs returns a default set of arguments for running
 // all integration tests from the host system (outside the docker network).
-func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
-	args := DefaultGoTestIntegrationArgs()
+func DefaultGoTestIntegrationFromHostArgs(ctx context.Context) GoTestArgs {
+	args := DefaultGoTestIntegrationArgs(ctx)
 	args.Env = WithGoIntegTestHostEnv(args.Env)
 	return args
 }
@@ -188,8 +207,8 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 // FIPSOnlyGoTestIngrationFromHostArgs returns a default set of arguments for running
 // all integration tests from the host system (outside the docker network) along
 // with the GODEBUG=fips140=only arg set.
-func FIPSOnlyGoTestIntegrationFromHostArgs() GoTestArgs {
-	args := DefaultGoTestIntegrationArgs()
+func FIPSOnlyGoTestIntegrationFromHostArgs(ctx context.Context) GoTestArgs {
+	args := DefaultGoTestIntegrationArgs(ctx)
 	args.Tags = append(args.Tags, "requirefips")
 	args.Env = WithGoIntegTestHostEnv(args.Env)
 	args.Env["GODEBUG"] = "fips140=only"
@@ -202,6 +221,9 @@ func GoTestIntegrationArgsForPackage(pkg string) GoTestArgs {
 	args := makeGoTestArgsForPackage("Integration", pkg)
 
 	args.Tags = append(args.Tags, "integration")
+	// some test build docker images which download artifacts, and it can take a
+	// long time.
+	args.Timeout = "2h"
 
 	// add the requirefips tag when doing fips140 testing
 	if v, ok := os.LookupEnv("GODEBUG"); ok && strings.Contains(v, "fips140=only") {
@@ -376,6 +398,9 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 			"-coverprofile="+params.CoverageProfileFile,
 		)
 	}
+	if params.Timeout != "" {
+		testArgs = append(testArgs, "-timeout="+params.Timeout)
+	}
 	testArgs = append(testArgs, params.ExtraFlags...)
 	testArgs = append(testArgs, params.Packages...)
 
@@ -476,13 +501,6 @@ func makeCommand(ctx context.Context, env map[string]string, cmd string, args ..
 // BuildSystemTestBinary runs BuildSystemTestGoBinary with default values.
 func BuildSystemTestBinary() error {
 	return BuildSystemTestGoBinary(DefaultTestBinaryArgs())
-}
-
-// BuildSystemTestOTelBinary builds beat binary that includes otel.
-func BuildSystemTestOTelBinary() error {
-	args := DefaultTestBinaryArgs()
-	args.ExtraFlags = []string{"-tags", "otelbeat"}
-	return BuildSystemTestGoBinary(args)
 }
 
 // BuildSystemTestGoBinary build a binary for testing that is instrumented for

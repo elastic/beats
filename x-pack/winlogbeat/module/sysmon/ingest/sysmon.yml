@@ -251,7 +251,7 @@ processors:
   - convert:
       field: winlog.record_id
       type: string
-      ignore_failure: true 
+      ignore_failure: true
       ignore_missing: true
 
   - rename:
@@ -297,11 +297,11 @@ processors:
           if (hash == "") {
             return true;
           }
-          
+
           Pattern emptyHashRegex = /^0*$/;
           def matcher = emptyHashRegex.matcher(hash);
-          
-          return matcher.matches(); 
+
+          return matcher.matches();
         }
 
         def hashes = new HashMap();
@@ -467,7 +467,7 @@ processors:
       description: Implements Windows-like SplitCommandLine
       lang: painless
       if: |-
-        (ctx.process?.command_line != null && ctx.process.command_line != "") || 
+        (ctx.process?.command_line != null && ctx.process.command_line != "") ||
         (ctx.process?.parent?.command_line != null && ctx.process.parent.command_line != "")
       source: |-
         // appendBSBytes appends n '\\' bytes to b and returns the resulting slice.
@@ -518,7 +518,7 @@ processors:
                 b.append(c);
             }
             return [
-                "arg":  appendBSBytes(b, nslash).toString(), 
+                "arg":  appendBSBytes(b, nslash).toString(),
                 "rest": ''
             ];
         }
@@ -1014,7 +1014,7 @@ processors:
       field: winlog.event_data._MemberAccountType
       ignore_missing: true
       ignore_failure: true
-      if: ctx.user?.roles != null && ctx.winlog?.event_data?._MemberAccountType != null && ctx.user.roles.contains(ctx.winlog.event_data._MemberAccountType)   
+      if: ctx.user?.roles != null && ctx.winlog?.event_data?._MemberAccountType != null && ctx.user.roles.contains(ctx.winlog.event_data._MemberAccountType)
 
 ## Sysmon fields
 

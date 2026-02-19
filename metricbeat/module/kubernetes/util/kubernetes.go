@@ -452,12 +452,12 @@ func addEventHandlersToWatcher(
 	nodeMetricsUpdateFunc := func(node *kubernetes.Node) {
 		nodeName := node.GetObjectMeta().GetName()
 		metrics := NewNodeMetrics()
-		if cpu, ok := node.Status.Capacity["cpu"]; ok {
+		if cpu, ok := node.Status.Allocatable["cpu"]; ok {
 			if q, err := k8sresource.ParseQuantity(cpu.String()); err == nil {
 				metrics.CoresAllocatable = NewFloat64Metric(float64(q.MilliValue()) / 1000)
 			}
 		}
-		if memory, ok := node.Status.Capacity["memory"]; ok {
+		if memory, ok := node.Status.Allocatable["memory"]; ok {
 			if q, err := k8sresource.ParseQuantity(memory.String()); err == nil {
 				metrics.MemoryAllocatable = NewFloat64Metric(float64(q.Value()))
 			}
@@ -871,7 +871,7 @@ func NewContainerMetadataEnricher(
 
 		pod, ok := r.(*kubernetes.Pod)
 		if !ok {
-			base.Logger().Debugf("Error while casting event: %s", ok)
+			base.Logger().Debugf("Error while casting event, got %T", r)
 		}
 		pmeta := metaGen.Generate(pod)
 
@@ -910,7 +910,7 @@ func NewContainerMetadataEnricher(
 		ids := make([]string, 0)
 		pod, ok := r.(*kubernetes.Pod)
 		if !ok {
-			base.Logger().Debugf("Error while casting event: %s", ok)
+			base.Logger().Debugf("Error while casting event, got %t", r)
 		}
 
 		for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
@@ -948,7 +948,6 @@ func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 
 	config, err = validateConfig(config)
 	if err != nil {
-		base.Logger().Errorf("Error while validating config: %v", err)
 		return nil, err
 	}
 	return config, nil

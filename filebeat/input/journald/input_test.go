@@ -20,6 +20,7 @@
 package journald
 
 import (
+	"bytes"
 	"compress/gzip"
 	"context"
 	_ "embed"
@@ -364,14 +365,179 @@ func TestInputCanReportStatus(t *testing.T) {
 	})
 }
 
+var expectedBinaryMessges = [][]byte{
+	{
+		0, 2, 4, 8, 10, 12, 14, 16, 18,
+	},
+	{
+		0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100,
+	},
+	{
+		0xED, 0xA0, 0xBC, 0xED, 0xBF, 0xA0, 0xED, 0xA0, 0xBD, 0xED, 0xB1, 0x81,
+		0xEF, 0xB8, 0x8F, 0xED, 0xA0, 0xBE, 0xED, 0xBA, 0xB5, 0xED, 0xA0, 0xBE,
+		0xED, 0xBA, 0xB5, 0xED, 0xA0, 0xBD, 0xED, 0xBF, 0xA0, 0xE2, 0xA0, 0x80,
+		0xED, 0xA0, 0xBC, 0xED, 0xBC, 0x8A, 0xED, 0xA0, 0xBD, 0xED, 0xBF, 0xA0,
+		0xED, 0xA0, 0xBC, 0xED, 0xBE, 0x80, 0xED, 0xA0, 0xBE, 0xED, 0xBA, 0xB5,
+		0xED, 0xA0, 0xBD, 0xED, 0xB2, 0xA7, 0xE2, 0x9D, 0x97,
+	},
+	[]byte(`FOO\nBAR\nFOO`),
+	{
+		240, 159, 143, 160, 240, 159, 145, 129, 239, 184, 143, 240, 159, 170,
+		181, 240, 159, 170, 181, 240, 159, 159, 160, 226, 160, 128, 240, 159,
+		140, 138, 240, 159, 159, 160, 240, 159, 142, 128, 240, 159, 170, 181,
+		240, 159, 146, 167, 226, 157, 151,
+	},
+	{
+		27, 91, 63, 50, 48, 48, 52, 104, 114, 111, 111, 116, 64, 55, 97, 97,
+		56, 48, 97, 98, 54, 101, 97, 99, 52, 58, 47, 35, 32, 101, 99, 104, 111,
+		32, 102, 111, 111, 32, 98, 97, 114, 13,
+	},
+	{
+		27, 91, 63, 50, 48, 48, 52, 108, 13, 102, 111, 111, 32, 98, 97, 114, 13,
+	},
+	{
+		27, 91, 63, 50, 48, 48, 52, 104, 114, 111, 111, 116, 64, 55, 97, 97, 56,
+		48, 97, 98, 54, 101, 97, 99, 52, 58, 47, 35, 32, 101, 120, 105, 116, 13,
+	},
+	{
+		27, 91, 63, 50, 48, 48, 52, 108, 13, 101, 120, 105, 116, 13,
+	},
+}
+
+func TestBinaryDataIsCorrectlyHandled(t *testing.T) {
+	out := decompress(t, filepath.Join("testdata", "binary.journal.gz"))
+
+	env := newInputTestingEnvironment(t)
+	cfg := mapstr.M{
+		"paths": []string{out},
+	}
+	inp := env.mustCreateInput(cfg)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	t.Cleanup(cancelInput)
+
+	env.startInput(ctx, inp)
+	env.waitUntilEventCount(len(expectedBinaryMessges))
+	events := env.pipeline.GetAllEvents()
+	for i, evt := range events {
+		msg := []byte(evt.Fields["message"].(string)) //nolint:errcheck // we know it's a string.
+		if !bytes.Equal(expectedBinaryMessges[i], msg) {
+			t.Errorf("expecting entry %d to be:\n%#v\ngot:\n%#v", i, expectedBinaryMessges[i], msg)
+		}
+	}
+}
+
+// TestPathIsFolder ensures the Journald input works when a folder is passed
+// in paths. The desired behaviour is that the input will ingest all entries
+// from existing files and new files that might appear in the future.
+//
+// This is implemented by using `--directory` when a directory is in the paths
+// setting. Because the way journalctl works, by default, it only reads entries
+// from a single journal, so if manually testing or modifying the files used by
+// this test, ensure all journal files belong to the same journal and new files
+// have entries that are ahead in time from old files.
+func TestPathIsFolder(t *testing.T) {
+	srcDir := decompressAll(t, filepath.Join("testdata", "journal*.journal.gz"))
+	dstDir := t.TempDir()
+
+	srcFiles := []string{}
+	dstFiles := []string{}
+	for i := range 3 {
+		fName := fmt.Sprintf("journal%d.journal", i+1)
+		srcFiles = append(srcFiles, filepath.Join(srcDir, fName))
+		dstFiles = append(dstFiles, filepath.Join(dstDir, fName))
+	}
+
+	env := newInputTestingEnvironment(t)
+	cfg := mapstr.M{
+		"paths": []string{dstDir},
+	}
+	inp := env.mustCreateInput(cfg)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	t.Cleanup(cancelInput)
+
+	env.startInput(ctx, inp)
+
+	for i := range 3 {
+		if err := os.Rename(srcFiles[i], dstFiles[i]); err != nil {
+			t.Fatalf("cannot move file: %s", err)
+		}
+
+		env.waitUntilEventCount(10 + i*10)
+	}
+}
+
+func TestDoubleStarCanBeUsed(t *testing.T) {
+	srcDir := decompressAll(t, filepath.Join("testdata", "journal*.journal.gz"))
+	dstDir := t.TempDir()
+
+	srcFiles := []string{}
+	dstFiles := []string{}
+	for i := range 3 {
+		fName := fmt.Sprintf("journal%d.journal", i+1)
+		srcFiles = append(srcFiles, filepath.Join(srcDir, fName))
+		dstFiles = append(dstFiles, filepath.Join(t.TempDir(), fName))
+	}
+
+	// We want to test a glob in the format:
+	// /tmp/TestFoo/*/*
+	// To match files like
+	//   - /tmp/TestFoo/001/journal1.journal
+	//   - /tmp/TestFoo/001/journal2.journal
+	// So we construct the glob from dstDir
+
+	split := strings.Split(dstDir, "/")
+	split = split[:len(split)-1]
+	split = append(split, "*", "*")
+	path := filepath.Join(split...)
+	path = string(filepath.Separator) + path // Add the leading separator
+
+	env := newInputTestingEnvironment(t)
+	cfg := mapstr.M{
+		"paths": []string{path},
+	}
+
+	inp := env.mustCreateInput(cfg)
+	ctx, cancelInput := context.WithCancel(context.Background())
+	t.Cleanup(cancelInput)
+
+	for i := range len(srcFiles) {
+		if err := os.Rename(srcFiles[i], dstFiles[i]); err != nil {
+			t.Fatalf("cannot move file: %s", err)
+		}
+	}
+
+	env.startInput(ctx, inp)
+	env.waitUntilEventCount(len(srcFiles) * 10)
+}
+
 func decompress(t *testing.T, namegz string) string {
+	return decompressGz(t, t.TempDir(), namegz)
+}
+
+func decompressAll(t *testing.T, globGz string) string {
+	dir := t.TempDir()
+	files, err := filepath.Glob(globGz)
+	if err != nil {
+		t.Fatalf("could not resolve glob: %s", err)
+	}
+
+	for _, f := range files {
+		decompressGz(t, dir, f)
+	}
+
+	return dir
+}
+
+func decompressGz(t *testing.T, dir, namegz string) string {
 	t.Helper()
 
 	ingz, err := os.Open(namegz)
 	require.NoError(t, err)
 	defer ingz.Close()
 
-	out := filepath.Join(t.TempDir(), strings.TrimSuffix(filepath.Base(namegz), ".gz"))
+	out := filepath.Join(dir, strings.TrimSuffix(filepath.Base(namegz), ".gz"))
 
 	dst, err := os.Create(out)
 	require.NoError(t, err)

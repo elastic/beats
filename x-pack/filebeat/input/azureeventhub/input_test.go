@@ -53,7 +53,7 @@ func TestGetAzureEnvironment(t *testing.T) {
 func TestProcessEvents(t *testing.T) {
 	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
 
-	metrics := newInputMetrics(monitoring.NewRegistry())
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 
 	fakePipelineClient := fakeClient{}
 

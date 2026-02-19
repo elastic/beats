@@ -49,12 +49,13 @@ output.elasticsearch:
   ssl:
     verification_mode: certificate
     certificate_authorities: %s
-    ca_sha256: FDFOtqdUyXZw74YgvAJUC+I67ED1WfcI1qK44Qy2WQM=
+    ca_sha256: GkPh2Lqh6eDoIatcr5AlZTAIKcIz/AWC61lrWgRwwe8=
 `
+
 	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.String(), caPath))
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
-	mockbeat.WaitForLogs("doBulkRequest: 1 events have been sent", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("doBulkRequest: 1 events have been sent", 60*time.Second)
 }
 
 func TestCAPinningBadSHA(t *testing.T) {
@@ -84,6 +85,6 @@ output.elasticsearch:
 `
 	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.String(), caPath))
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
-	mockbeat.WaitForLogs("provided CA certificate pins doesn't match any of the certificate authorities used to validate the certificate", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("provided CA certificate pins doesn't match any of the certificate authorities used to validate the certificate", 60*time.Second)
 }

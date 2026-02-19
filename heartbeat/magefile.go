@@ -98,7 +98,7 @@ func IntegTest() {
 
 func GoIntegTest(ctx context.Context) error {
 	if runtime.GOOS != "windows" {
-		return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
+		return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs(ctx))
 	}
 	return nil
 }

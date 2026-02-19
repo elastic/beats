@@ -40,8 +40,9 @@ type asyncClient struct {
 	client   *v2.AsyncClient
 	win      *window
 
-	connect func() error
+	connect func(ctx context.Context) error
 
+	// mutex protects client and connect/close/send
 	mutex sync.Mutex
 }
 
@@ -91,8 +92,8 @@ func newAsyncClient(
 		return nil, err
 	}
 
-	c.connect = func() error {
-		err := c.ConnectContext(context.Background())
+	c.connect = func(ctx context.Context) error {
+		err := c.ConnectContext(ctx)
 		if err == nil {
 			c.client, err = clientFactory(c.Client)
 		}
@@ -118,8 +119,11 @@ func makeClientFactory(
 }
 
 func (c *asyncClient) Connect(ctx context.Context) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	c.log.Debug("connect")
-	return c.connect()
+	return c.connect(ctx)
 }
 
 func (c *asyncClient) Close() error {
@@ -212,8 +216,10 @@ func (c *asyncClient) publishWindowed(
 }
 
 func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
-	client := c.getClient()
-	if client == nil {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	if c.client == nil {
 		return errors.New("connection closed")
 	}
 	window := make([]interface{}, len(events))
@@ -222,14 +228,7 @@ func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
 	}
 	ref.count.Add(1)
 
-	return client.Send(ref.customizedCallback(), window)
-}
-
-func (c *asyncClient) getClient() *v2.AsyncClient {
-	c.mutex.Lock()
-	client := c.client
-	c.mutex.Unlock()
-	return client
+	return c.client.Send(ref.customizedCallback(), window)
 }
 
 func (r *msgRef) customizedCallback() func(uint32, error) {

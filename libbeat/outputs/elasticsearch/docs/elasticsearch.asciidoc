@@ -87,6 +87,9 @@ If no port is specified, `9200` is used.
 NOTE: When a node is defined as an `IP:PORT`, the _scheme_ and _path_ are taken from the
 <<protocol-option,`protocol`>> and <<path-option,`path`>> config options.
 
+WARNING: All configured hosts must belong to the same Elasticsearch cluster; using nodes 
+from different clusters may result in split or inconsistent data.
+
 [source,yaml]
 ------------------------------------------------------------------------------
 output.elasticsearch:

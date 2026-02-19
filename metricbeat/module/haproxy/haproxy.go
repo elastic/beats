@@ -28,8 +28,8 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/gocarina/gocsv"
-	"github.com/mitchellh/mapstructure"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"

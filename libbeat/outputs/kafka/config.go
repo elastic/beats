@@ -313,6 +313,7 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	k.MetricRegistry = adapter.GetGoMetrics(
 		monitoring.Default,
 		"libbeat.outputs",
+		log,
 		adapter.Rename("incoming-byte-rate", "read.bytes"),
 		adapter.Rename("outgoing-byte-rate", "write.bytes"),
 		adapter.Rename("request-latency-in-ms", "write.latency"),

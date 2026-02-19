@@ -124,7 +124,7 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			LegacySanitizeOptions: tc.sanitizationOption,
 		}
 
-		metrics := newInputMetrics(monitoring.NewRegistry())
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 
 		fakeClient := fakeClient{}
 

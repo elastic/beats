@@ -1,0 +1,5 @@
+owner: elastic
+repo: beats
+rendered_changelog_destination: changelog
+file_type: asciidoc
+subsections: true

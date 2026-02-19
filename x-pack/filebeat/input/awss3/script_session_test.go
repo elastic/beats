@@ -11,16 +11,18 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestSessionScriptParams(t *testing.T) {
-	logp.TestingSetup()
+
+	path := paths.New()
 
 	t.Run("register method is optional", func(t *testing.T) {
-		_, err := newScriptFromConfig(log, &scriptConfig{Source: header + footer})
+		_, err := newScriptFromConfig(log, &scriptConfig{Source: header + footer}, path)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -31,7 +33,7 @@ func TestSessionScriptParams(t *testing.T) {
 			Source: header + footer, Params: map[string]interface{}{
 				"p1": 42,
 			},
-		})
+		}, path)
 		if assert.Error(t, err) {
 			assert.Contains(t, err.Error(), "params were provided")
 		}
@@ -52,13 +54,13 @@ func TestSessionScriptParams(t *testing.T) {
 			Params: map[string]interface{}{
 				"p1": 42,
 			},
-		})
+		}, path)
 		assert.NoError(t, err)
 	})
 }
 
 func TestSessionTestFunction(t *testing.T) {
-	logp.TestingSetup()
+	path := paths.New()
 
 	const script = `
 		var fail = false;
@@ -90,7 +92,7 @@ func TestSessionTestFunction(t *testing.T) {
 	t.Run("test method is optional", func(t *testing.T) {
 		_, err := newScriptFromConfig(log, &scriptConfig{
 			Source: header + footer,
-		})
+		}, path)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -102,7 +104,7 @@ func TestSessionTestFunction(t *testing.T) {
 			Params: map[string]interface{}{
 				"fail": false,
 			},
-		})
+		}, path)
 		assert.NoError(t, err)
 	})
 
@@ -112,13 +114,12 @@ func TestSessionTestFunction(t *testing.T) {
 			Params: map[string]interface{}{
 				"fail": true,
 			},
-		})
+		}, path)
 		assert.Error(t, err)
 	})
 }
 
 func TestSessionTimeout(t *testing.T) {
-	logp.TestingSetup()
 
 	const runawayLoop = `
 		var m = JSON.parse(n);
@@ -130,7 +131,7 @@ func TestSessionTimeout(t *testing.T) {
 	p, err := newScriptFromConfig(log, &scriptConfig{
 		Source:  header + runawayLoop + footer,
 		Timeout: 100 * time.Millisecond,
-	})
+	}, paths.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -161,7 +162,7 @@ func TestSessionParallel(t *testing.T) {
 
 	p, err := newScriptFromConfig(log, &scriptConfig{
 		Source: header + script + footer,
-	})
+	}, paths.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -244,7 +245,7 @@ func TestCreateS3EventsFromNotification(t *testing.T) {
 		return evts;
 	}
 `
-	s, err := newScriptFromConfig(log, &scriptConfig{Source: script})
+	s, err := newScriptFromConfig(log, &scriptConfig{Source: script}, paths.New())
 	require.NoError(t, err)
 
 	evts, err := s.run(n)
@@ -298,7 +299,7 @@ func TestParseXML(t *testing.T) {
 		return evts;
 	}
 `
-	s, err := newScriptFromConfig(log, &scriptConfig{Source: script})
+	s, err := newScriptFromConfig(log, &scriptConfig{Source: script}, paths.New())
 	require.NoError(t, err)
 
 	evts, err := s.run(n)

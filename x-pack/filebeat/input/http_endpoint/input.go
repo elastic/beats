@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package http_endpoint
 
 import (
@@ -33,11 +35,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -50,6 +54,7 @@ type httpEndpoint struct {
 	config    config
 	addr      string
 	tlsConfig *tls.Config
+	logger    *logp.Logger
 }
 
 func Plugin(log *logp.Logger) v2.Plugin {
@@ -90,6 +95,7 @@ func newHTTPEndpoint(config config, logger *logp.Logger) (*httpEndpoint, error) 
 		config:    config,
 		tlsConfig: tlsConfig,
 		addr:      addr,
+		logger:    logger,
 	}, nil
 }
 
@@ -107,11 +113,19 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	ctx.UpdateStatus(status.Starting, "")
 	ctx.UpdateStatus(status.Configuring, "")
 
-	metrics := newInputMetrics(ctx.MetricsRegistry)
+	metrics := newInputMetrics(ctx.MetricsRegistry, ctx.Logger)
 
 	if e.config.Tracer != nil {
 		id := sanitizeFileName(ctx.IDWithoutName)
-		e.config.Tracer.Filename = strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
+		path := strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+		}
+		e.config.Tracer.Filename = resolved
 	}
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
@@ -196,7 +210,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 			return err
 		}
 		log.Infof("Adding %s end point to server on %s", pattern, e.addr)
-		s.mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx.StatusReporter, log, metrics))
+		s.mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx, log, metrics))
 		s.idOf[pattern] = ctx.ID
 		p.mu.Unlock()
 		<-s.ctx.Done()
@@ -212,7 +226,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 		srv:  srv,
 	}
 	s.ctx, s.cancel = ctxtool.WithFunc(ctx.Cancelation, func() { srv.Close() })
-	mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx.StatusReporter, log, metrics))
+	mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx, log, metrics))
 	p.servers[e.addr] = s
 	p.mu.Unlock()
 
@@ -464,7 +478,7 @@ type inputMetrics struct {
 	batchACKTime        metrics.Sample     // histogram of the elapsed successful batch acking times in nanoseconds (time of handler start to time of ACK for non-empty batches).
 }
 
-func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
+func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	out := &inputMetrics{
 		bindAddr:            monitoring.NewString(reg, "bind_address"),
 		route:               monitoring.NewString(reg, "route"),
@@ -479,13 +493,13 @@ func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 		batchProcessingTime: metrics.NewUniformSample(1024),
 		batchACKTime:        metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "size", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "size", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.contentLength))
-	_ = adapter.NewGoMetrics(reg, "batch_size", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_size", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchSize))
-	_ = adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
-	_ = adapter.NewGoMetrics(reg, "batch_ack_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_ack_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchACKTime))
 
 	return out

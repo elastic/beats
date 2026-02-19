@@ -13,24 +13,26 @@ import (
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 )
 
 const inputName = "aws-s3"
 
-func Plugin(logger *logp.Logger, store statestore.States) v2.Plugin {
+func Plugin(logger *logp.Logger, store statestore.States, p *paths.Path) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "Collect logs from s3",
-		Manager:    &s3InputManager{store: store, logger: logger},
+		Manager:    &s3InputManager{store: store, logger: logger, path: p},
 	}
 }
 
 type s3InputManager struct {
 	store  statestore.States
 	logger *logp.Logger
+	path   *paths.Path
 }
 
 func (im *s3InputManager) Init(grp unison.Group) error {
@@ -55,7 +57,7 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	}
 
 	if config.QueueURL != "" {
-		return newSQSReaderInput(config, awsConfig), nil
+		return newSQSReaderInput(config, awsConfig, im.path), nil
 	}
 
 	if config.BucketARN != "" || config.AccessPointARN != "" || config.NonAWSBucketName != "" {

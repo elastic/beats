@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 //go:build !aix
 
 package azureeventhub
@@ -10,9 +12,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
+	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
+	"github.com/coder/websocket"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
@@ -25,6 +29,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -33,7 +39,7 @@ const (
 	// startPositionEarliest lets the processor start from the earliest
 	// available event from the event hub retention period.
 	startPositionEarliest = "earliest"
-	// startPositionEarliest lets the processor start from the latest
+	// startPositionLatest lets the processor start from the latest
 	// available event from the event hub retention period.
 	startPositionLatest = "latest"
 	// processorRestartBackoff is the initial backoff time before
@@ -42,6 +48,10 @@ const (
 	// processorRestartMaxBackoff is the maximum backoff time before
 	// restarting the processor.
 	processorRestartMaxBackoff = 120 * time.Second
+	// AMQP transport for Event Hub connection.
+	transportAmqp = "amqp"
+	// WebSocket transport for Event Hub connection.
+	transportWebsocket = "websocket"
 )
 
 // azureInputConfig the Azure Event Hub input v2,
@@ -55,15 +65,19 @@ type eventHubInputV2 struct {
 	pipeline           beat.Pipeline
 	messageDecoder     messageDecoder
 	migrationAssistant *migrationAssistant
+	setupFn            func(ctx context.Context) error
+	status             status.StatusReporter
 }
 
 // newEventHubInputV2 creates a new instance of the Azure Event Hub input v2,
 // that uses the modern Azure Event Hub SDK for Go.
 func newEventHubInputV2(config azureInputConfig, log *logp.Logger) (v2.Input, error) {
-	return &eventHubInputV2{
+	in := &eventHubInputV2{
 		config: config,
 		log:    log.Named(inputName),
-	}, nil
+	}
+	in.setupFn = in.setup
+	return in, nil
 }
 
 func (in *eventHubInputV2) Name() string {
@@ -81,15 +95,25 @@ func (in *eventHubInputV2) Run(
 ) error {
 	var err error
 
+	// Setting up the status reporter helper
+	in.status = statusreporterhelper.New(inputContext, in.log, "Azure Event Hub")
+
+	// When the input is initializing before attempting to connect to Azure Event Hub.
+	in.status.UpdateStatus(status.Starting, "Input starting")
+
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
 	// Setup input metrics
-	inputMetrics := newInputMetrics(inputContext.MetricsRegistry)
+	inputMetrics := newInputMetrics(inputContext.MetricsRegistry, in.log)
 	in.metrics = inputMetrics
 
+	// When setting up Azure Event Hub client and validating configuration.
+	in.status.UpdateStatus(status.Configuring, "Configuring input")
+
 	// Initialize the components needed to process events.
-	err = in.setup(ctx)
+	err = in.setupFn(ctx)
 	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Failed to set up input: %s", err.Error()))
 		return err
 	}
 	defer in.teardown(ctx)
@@ -99,9 +123,17 @@ func (in *eventHubInputV2) Run(
 	// partition.
 	in.pipeline = pipeline
 
-	// Start the main run loop
-	in.run(ctx)
-
+	// Start the main run loop (blocking call).
+	// Update input status to running.
+	in.status.UpdateStatus(status.Running, "Input is running")
+	err = in.run(ctx)
+	if err != nil {
+		// for future failures outside of the errored processor state
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Run failed: %s", err.Error()))
+		return err
+	}
+	// did not error out, but the run loop finished
+	in.status.UpdateStatus(status.Stopped, "")
 	return nil
 }
 
@@ -121,17 +153,17 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		sanitizers: sanitizers,
 	}
 
-	containerClient, err := container.NewClientFromConnectionString(
-		in.config.SAConnectionString,
-		in.config.SAContainer,
-		&container.ClientOptions{
-			ClientOptions: azcore.ClientOptions{
-				// FIXME: check more pipelineClient creation options.
-				Cloud: cloud.AzurePublic,
-			},
-		},
-	)
+	// Create the event hub consumer client
+	consumerClient, err := CreateEventHubConsumerClient(&in.config, in.log)
 	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating consumer client: %s", err.Error()))
+		return fmt.Errorf("failed to create consumer client: %w", err)
+	}
+
+	// Create the container client
+	containerClient, err := CreateStorageAccountContainerClient(&in.config, in.log)
+	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating blob container client: %s", err.Error()))
 		return fmt.Errorf("failed to create blob container client: %w", err)
 	}
 
@@ -144,6 +176,11 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	// We need to ensure it exists before we can use it.
 	err = in.ensureContainerExists(ctx, containerClient)
 	if err != nil {
+		var respError *azcore.ResponseError
+		if errors.As(err, &respError) && respError != nil && respError.StatusCode == 403 {
+			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed due to authentication error: %s", err.Error()))
+			return fmt.Errorf("authentication error: %w", err)
+		}
 		return fmt.Errorf("failed to ensure blob container exists: %w", err)
 	}
 
@@ -157,22 +194,12 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		return fmt.Errorf("failed to create checkpoint store: %w", err)
 	}
 	in.checkpointStore = checkpointStore
-
-	// Create the event hub consumerClient to receive events.
-	consumerClient, err := azeventhubs.NewConsumerClientFromConnectionString(
-		in.config.ConnectionString,
-		in.config.EventHubName,
-		in.config.ConsumerGroup,
-		nil,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create consumer client: %w", err)
-	}
 	in.consumerClient = consumerClient
 
 	// Manage the migration of the checkpoint information
 	// from the old Event Hub SDK to the new Event Hub SDK.
 	in.migrationAssistant = newMigrationAssistant(
+		in.config,
 		in.log,
 		consumerClient,
 		containerClient,
@@ -198,14 +225,12 @@ func (in *eventHubInputV2) teardown(ctx context.Context) {
 }
 
 // run starts the main loop for processing events.
-func (in *eventHubInputV2) run(ctx context.Context) {
+func (in *eventHubInputV2) run(ctx context.Context) error {
 	if in.config.MigrateCheckpoint {
 		in.log.Infow("checkpoint migration is enabled")
 		// Check if we need to migrate the checkpoint store.
 		err := in.migrationAssistant.checkAndMigrate(
 			ctx,
-			in.config.ConnectionString,
-			in.config.EventHubName,
 			in.config.ConsumerGroup,
 		)
 		if err != nil {
@@ -239,24 +264,34 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 		)
 		if err != nil {
 			in.log.Errorw("error creating processor", "error", err)
-			return
+			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Error creating processor. Error: %s", err))
+			return err
 		}
 
 		// Launch one goroutines for each partition
 		// to process events.
 		go in.workersLoop(ctx, processor)
 
-		// Run the processor to start processing events.
+		// Run the processor to start processing events (blocking call).
 		//
-		// This is a blocking call.
-		//
-		// It will return when the processor stops due to:
-		//  - an error
-		//	- when the context is cancelled.
+		// Run handles the load balancing loop, blocking until the passed in context
+		// is cancelled or it encounters an unrecoverable error.
 		//
 		// On cancellation, it will return a nil error.
 		if err := processor.Run(ctx); err != nil {
-			in.log.Errorw("processor exited with a non-nil error", "error", err)
+			// The processor encountered an unrecoverable error.
+			in.log.Errorw("processor encountered an unrecoverable error and needs to be restarted", "error", err)
+
+			// The underlying error type for authentication is internal so we can't cast to it.
+			// Instead, we'll check the error message for the status code.
+			if strings.Contains(err.Error(), "status code 401") {
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Authentication error: %s", err.Error()))
+			} else if strings.Contains(err.Error(), "no such host") {
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Event Hub not found, although cause could be network partition: %s", err.Error()))
+			} else {
+				// Update input status to degraded with a more generic issue
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Error in event processing: %s", err))
+			}
 
 			in.log.Infow("waiting before retrying starting the processor")
 
@@ -275,6 +310,7 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 			"context_error", ctx.Err(),
 		)
 	}
+	return nil
 }
 
 // createProcessorOptions creates the processor options using the input configuration.
@@ -371,7 +407,7 @@ func (in *eventHubInputV2) containerExists(ctx context.Context, blobContainerCli
 		return false, nil
 	}
 
-	return false, fmt.Errorf("failed to check if blob container exists: %w", err)
+	return false, err
 }
 
 // workersLoop starts a goroutine for each partition to process events.
@@ -385,6 +421,7 @@ func (in *eventHubInputV2) workersLoop(ctx context.Context, processor *azeventhu
 			// return `nil` (signals the processor has stopped).
 			break
 		}
+		in.status.UpdateStatus(status.Running, "Input is running")
 
 		partitionID := processorPartitionClient.PartitionID()
 
@@ -456,7 +493,6 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 
 				return nil
 			}
-
 			return err
 		}
 
@@ -591,4 +627,27 @@ func shutdownPartitionResources(ctx context.Context, partitionClient *azeventhub
 	// Closing the pipeline since we're done
 	// processing events for this partition.
 	defer pipelineClient.Close()
+}
+
+// newWebSocketConn creates a WebSocket connection for AMQP-over-WebSocket transport.
+//
+// This function is used when the transport configuration is set to "websocket".
+// It enables connectivity through HTTP proxies and firewalls that block the
+// standard AMQP port (5671) but allow HTTPS traffic on port 443.
+//
+// HTTP proxy configuration is automatically detected from environment variables:
+// - HTTP_PROXY / http_proxy
+// - HTTPS_PROXY / https_proxy
+// - NO_PROXY / no_proxy
+func newWebSocketConn(ctx context.Context, args azeventhubs.WebSocketConnParams) (net.Conn, error) {
+	opts := &websocket.DialOptions{
+		Subprotocols: []string{"amqp"},
+	}
+
+	wssConn, _, err := websocket.Dial(ctx, args.Host, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return websocket.NetConn(ctx, wssConn, websocket.MessageBinary), nil
 }

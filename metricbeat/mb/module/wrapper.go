@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/testing"
 )
 
@@ -89,8 +90,8 @@ type stats struct {
 }
 
 // NewWrapper creates a new module and its associated metricsets based on the given configuration.
-func NewWrapper(config *conf.C, r *mb.Register, logger *logp.Logger, monitoring beat.Monitoring, options ...Option) (*Wrapper, error) {
-	module, metricSets, err := mb.NewModule(config, r, logger)
+func NewWrapper(config *conf.C, r *mb.Register, logger *logp.Logger, monitoring beat.Monitoring, p *paths.Path, options ...Option) (*Wrapper, error) {
+	module, metricSets, err := mb.NewModule(config, r, p, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -462,7 +463,7 @@ func getMetricSetStats(mon beat.Monitoring, module, name string) *stats {
 		return s
 	}
 
-	reg := mon.StatsRegistry().NewRegistry(key)
+	reg := mon.StatsRegistry().GetOrCreateRegistry(key)
 	s := &stats{
 		key:                 key,
 		ref:                 1,

@@ -26,6 +26,8 @@ import (
 	"regexp"
 	"sync"
 	"testing"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -71,6 +73,24 @@ type BeatTest interface {
 	// inspecting only the new output lines.
 	ExpectOutput(...string) BeatTest
 
+	// ExpectJSONFields registers an output watch for the given key-value pair.
+	// The input to this method should look like
+	// mapstr.M{
+	// 	"key1.key2": []interface{}["20", "30", "40"],
+	// 	"key3": mapstr.M{
+	// 	  "key4": 5,
+	// 	  "key5": 6,
+	// 	},
+	// }
+	//
+	// It is useful when expecting key-value pair to exist in the output document/ JSON structured logs
+	//
+	// For `AND` behavior use this function multiple times.
+	//
+	// This function should be used before `Start` because it's
+	// inspecting only the new output lines.
+	ExpectJSONFields(mapstr.M) BeatTest
+
 	// ExpectOutputRegex registers an output watch for the given regular expression..
 	//
 	// Every future output line produced by the Beat will be matched
@@ -98,6 +118,9 @@ type BeatTest interface {
 
 	// WithReportOptions sets the reporting options for the test.
 	WithReportOptions(ReportOptions) BeatTest
+
+	// GetTempDir returns the home path where beat is running
+	GetTempDir() string
 }
 
 // ReportOptions describes all reporting options
@@ -126,8 +149,9 @@ type BeatTestOptions = RunBeatOptions
 // NewBeatTest creates a new integration test for a Beat.
 func NewBeatTest(t *testing.T, opts BeatTestOptions) BeatTest {
 	test := &beatTest{
-		t:    t,
-		opts: opts,
+		t:       t,
+		opts:    opts,
+		tempDir: t.TempDir(),
 	}
 
 	return test
@@ -141,6 +165,15 @@ type beatTest struct {
 	expectedExitCode *int
 	beat             *RunningBeat
 	mtx              sync.Mutex
+	tempDir          string
+}
+
+// GetTempDir implements the BeatTest interface.
+func (b *beatTest) GetTempDir() string {
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+
+	return b.tempDir
 }
 
 // Start implements the BeatTest interface.
@@ -156,7 +189,7 @@ func (b *beatTest) Start(ctx context.Context) BeatTest {
 	if b.reportOpts.PrintExpectationsBeforeStart {
 		b.printExpectations()
 	}
-	b.beat = RunBeat(ctx, b.t, b.opts, watcher)
+	b.beat = RunBeat(ctx, b.t, b.opts, watcher, b.tempDir)
 
 	return b
 }
@@ -173,8 +206,8 @@ func (b *beatTest) Wait() {
 
 	err := b.beat.Wait()
 	exitErr := &exec.ExitError{}
-	if !errors.As(err, &exitErr) {
-		b.t.Fatalf("unexpected error when stopping %s: %s", b.opts.Beatname, err)
+	if !errors.As(err, &exitErr) && err != nil {
+		b.t.Fatalf("unexpected error when stopping %s: %v", b.opts.Beatname, err)
 		return
 	}
 
@@ -232,6 +265,25 @@ func (b *beatTest) ExpectOutput(lines ...string) BeatTest {
 		watchers = append(watchers, NewStringWatcher(escaped))
 	}
 	b.expectations = append(b.expectations, NewInOrderWatcher(watchers))
+	return b
+}
+
+// ExpectJSONFields implements the BeatTest interface.
+func (b *beatTest) ExpectJSONFields(fields mapstr.M) BeatTest {
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+
+	if b.beat != nil {
+		b.t.Fatal(expectErrMsg)
+		return b
+	}
+
+	if len(fields) == 0 {
+		return b
+	}
+
+	b.expectations = append(b.expectations, NewJSONWatcher(fields))
+
 	return b
 }
 
@@ -344,7 +396,7 @@ func (b *beatTest) printExpectations() {
 	}
 }
 
-// we know that we're going to inpect the JSON output from the Beat
+// we know that we're going to inspect the JSON output from the Beat
 // so we must take care of the escaped characters,
 // e.g. backslashes in paths on Windows.
 func escapeJSONCharacters(s string) string {

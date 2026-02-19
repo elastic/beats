@@ -28,6 +28,7 @@ This section includes additional information on how to install, set up, and run
 
 * <<shutdown>>
 
+* <<{beatname_lc}-installation-script>>
 
 //MAINTAINERS: If you add a new file to this section, make sure you update the bulleted list ^^ too.
 
@@ -40,3 +41,5 @@ include::{libbeat-dir}/command-reference.asciidoc[]
 include::{libbeat-dir}/shared/start-beat.asciidoc[]
 
 include::{libbeat-dir}/shared/shutdown.asciidoc[]
+
+include::{libbeat-dir}/shared/installation-script.asciidoc[]
