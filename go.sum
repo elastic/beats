@@ -362,6 +362,7 @@ github.com/elastic/bayeux v1.0.5 h1:UceFq01ipmT3S8DzFK+uVAkbCdiPR0Bqei8qIGmUeY0=
 github.com/elastic/bayeux v1.0.5/go.mod h1:CSI4iP7qeo5MMlkznGvYKftp8M7qqP/3nzmVZoXHY68=
 github.com/elastic/ebpfevents v0.8.0 h1:rIrhj3SSsrwSOIv/MderZd0ZpbCLT4pudBtfnAbj3Oo=
 github.com/elastic/ebpfevents v0.8.0/go.mod h1:b6nLyQ8SA1RolRkP/nyGN6VAKqIObSJj8c2mhDGoNmg=
+<<<<<<< HEAD
 github.com/elastic/elastic-agent-autodiscover v0.10.0 h1:WJ4zl9uSfk1kHmn2B/0byQBLIL607Zt4LNfOgV7+XN0=
 github.com/elastic/elastic-agent-autodiscover v0.10.0/go.mod h1:Nf3zh9FcJ9nTTswTwDTUAqXmvQllOrNliM6xmORSxwE=
 github.com/elastic/elastic-agent-client/v7 v7.18.0 h1:zXdoErqECfvRjj1c+1Ko4VGuUnFtJfTiC9JJz4aQCHc=
@@ -370,6 +371,16 @@ github.com/elastic/elastic-agent-libs v0.26.2 h1:zwytPWmTWSJG80oa9/5FJ6zue47ysI2
 github.com/elastic/elastic-agent-libs v0.26.2/go.mod h1:fc2noLqosmQorIGbatJfVeh4CL77yiP8ot16/5umeoM=
 github.com/elastic/elastic-agent-system-metrics v0.13.4 h1:gX8VdlQyakPcPKFpD7uHv2QLRDyguuKfZgu0LE27V7c=
 github.com/elastic/elastic-agent-system-metrics v0.13.4/go.mod h1:lB8veYWYBlA9eF6TahmPN87G1IEgWlbep7QSqLSW90U=
+=======
+github.com/elastic/elastic-agent-autodiscover v0.10.2 h1:fzi+CIcK7FKUQlQHfKP+3Ixg1wbuEYacaChunmMAP38=
+github.com/elastic/elastic-agent-autodiscover v0.10.2/go.mod h1:qBoYxp3lX3qFRYjEgsOaROC+xL4ItG63GSvOg1SjjsQ=
+github.com/elastic/elastic-agent-client/v7 v7.18.0 h1:zXdoErqECfvRjj1c+1Ko4VGuUnFtJfTiC9JJz4aQCHc=
+github.com/elastic/elastic-agent-client/v7 v7.18.0/go.mod h1:ChFjpIfSsQOnhWT3se5Euw/o8P4Vf77FxeObE/vUfSc=
+github.com/elastic/elastic-agent-libs v0.32.2 h1:2CaO4TAMcZDy0qNxh48Ui1oMc+xExKL+JkpcyOxF7XA=
+github.com/elastic/elastic-agent-libs v0.32.2/go.mod h1:0xUg7alsNE/WhY9DZRIdTYW75nqSHC1octIAg//j/PQ=
+github.com/elastic/elastic-agent-system-metrics v0.14.0 h1:oqkUg5FZOJsfTptTYQcYh/wEMouYhosUJbNwi4z6OGA=
+github.com/elastic/elastic-agent-system-metrics v0.14.0/go.mod h1:JNfnZrC0viAjlJRUzQKKuMpDlXgjXBn4WdWEXQF7jcA=
+>>>>>>> 60bda9baf (Update elastic-agent-libs to v0.32.2 (#48857))
 github.com/elastic/elastic-transport-go/v8 v8.8.0 h1:7k1Ua+qluFr6p1jfJjGDl97ssJS/P7cHNInzfxgBQAo=
 github.com/elastic/elastic-transport-go/v8 v8.8.0/go.mod h1:YLHer5cj0csTzNFXoNQ8qhtGY1GTvSqPnKWKaqQE3Hk=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270 h1:cWPqxlPtir4RoQVCpGSRXmLqjEHpJKbR60rxh1nQZY4=
