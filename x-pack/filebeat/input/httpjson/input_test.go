@@ -440,7 +440,7 @@ var testCases = []struct {
 			"interval":                1,
 			"request.method":          http.MethodGet,
 			"request.url":             "https://example.com/",
-			"request.tracer.enabled":  false,
+			"request.tracer.enabled":  true,
 			"request.tracer.filename": "/var/log/http-request-trace-*.ndjson",
 		},
 		wantErr: fmt.Errorf(`request tracer path must be within %q path accessing 'request'`, inputName),
@@ -1475,6 +1475,10 @@ func TestInput(t *testing.T) {
 				tempDir, err = os.MkdirTemp("httpjson", "logs-*")
 				if err != nil {
 					t.Fatalf("failed to create logging destination: %v", err)
+				}
+				tempDir, err = filepath.Abs(tempDir)
+				if err != nil {
+					t.Fatalf("failed to get absolute path for logging destination: %v", err)
 				}
 				defer os.RemoveAll("httpjson")
 				conf.Request.Tracer.Filename = filepath.Join(tempDir, conf.Request.Tracer.Filename)
