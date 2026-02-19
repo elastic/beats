@@ -59,3 +59,13 @@ func TestReadInput(t *testing.T) {
 		})
 	}
 }
+
+func TestReadInputError(t *testing.T) {
+	var buf strings.Builder
+	r := strings.NewReader("")
+
+	result, err := input(r, &buf, "Question?")
+	assert.Equal(t, "", result)
+	assert.EqualError(t, err, "error reading user input")
+	assert.Equal(t, "Question? ", buf.String())
+}
