@@ -8,13 +8,7 @@ entries:
         2. Simplified code by removing unnecessary intermediate variable and publishing results directly
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/48444
-        - https://github.com/elastic/beats/pull/48414
-        - https://github.com/elastic/beats/pull/48804
-        - https://github.com/elastic/beats/pull/48784
-        - https://github.com/elastic/beats/pull/48818
-        - https://github.com/elastic/beats/pull/48816
-        - https://github.com/elastic/beats/pull/48815
+        - https://github.com/elastic/beats/pull/48438
       issue:
         - https://github.com/elastic/beats/issues/48427
       impact: ""
@@ -28,13 +22,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48444
-        - https://github.com/elastic/beats/pull/48414
-        - https://github.com/elastic/beats/pull/48804
-        - https://github.com/elastic/beats/pull/48784
-        - https://github.com/elastic/beats/pull/48818
-        - https://github.com/elastic/beats/pull/48816
-        - https://github.com/elastic/beats/pull/48815
+        - https://github.com/elastic/beats/pull/48719
       issue: []
       impact: ""
       action: ""
@@ -47,14 +35,9 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48444
-        - https://github.com/elastic/beats/pull/48414
-        - https://github.com/elastic/beats/pull/48804
-        - https://github.com/elastic/beats/pull/48784
-        - https://github.com/elastic/beats/pull/48818
-        - https://github.com/elastic/beats/pull/48816
-        - https://github.com/elastic/beats/pull/48815
-      issue: []
+        - https://github.com/elastic/beats/pull/48534
+      issue:
+        - https://github.com/elastic/beats/issues/47847
       impact: ""
       action: ""
       timestamp: 1769424344
@@ -66,13 +49,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/48444
-        - https://github.com/elastic/beats/pull/48414
-        - https://github.com/elastic/beats/pull/48804
-        - https://github.com/elastic/beats/pull/48784
-        - https://github.com/elastic/beats/pull/48818
-        - https://github.com/elastic/beats/pull/48816
-        - https://github.com/elastic/beats/pull/48815
+        - https://github.com/elastic/beats/pull/48543
       issue: []
       impact: ""
       action: ""
@@ -85,13 +62,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/48444
-        - https://github.com/elastic/beats/pull/48414
-        - https://github.com/elastic/beats/pull/48804
-        - https://github.com/elastic/beats/pull/48784
-        - https://github.com/elastic/beats/pull/48818
-        - https://github.com/elastic/beats/pull/48816
-        - https://github.com/elastic/beats/pull/48815
+        - https://github.com/elastic/beats/pull/48563
       issue: []
       impact: ""
       action: ""
@@ -117,13 +88,7 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/48444
-        - https://github.com/elastic/beats/pull/48414
-        - https://github.com/elastic/beats/pull/48804
-        - https://github.com/elastic/beats/pull/48784
-        - https://github.com/elastic/beats/pull/48818
-        - https://github.com/elastic/beats/pull/48816
-        - https://github.com/elastic/beats/pull/48815
+        - https://github.com/elastic/beats/pull/48580
       issue: []
       impact: ""
       action: ""
@@ -136,13 +101,7 @@ entries:
       description: ""
       component: heartbeat
       pr:
-        - https://github.com/elastic/beats/pull/48444
-        - https://github.com/elastic/beats/pull/48414
-        - https://github.com/elastic/beats/pull/48804
-        - https://github.com/elastic/beats/pull/48784
-        - https://github.com/elastic/beats/pull/48818
-        - https://github.com/elastic/beats/pull/48816
-        - https://github.com/elastic/beats/pull/48815
+        - https://github.com/elastic/beats/pull/48569
       issue: []
       impact: ""
       action: ""
@@ -169,14 +128,9 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48444
-        - https://github.com/elastic/beats/pull/48414
-        - https://github.com/elastic/beats/pull/48804
-        - https://github.com/elastic/beats/pull/48784
-        - https://github.com/elastic/beats/pull/48818
-        - https://github.com/elastic/beats/pull/48816
-        - https://github.com/elastic/beats/pull/48815
-      issue: []
+        - https://github.com/elastic/beats/pull/48704
+      issue:
+        - https://github.com/elastic/beats/issues/45642
       impact: ""
       action: ""
       timestamp: 1770299686
@@ -188,13 +142,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48444
-        - https://github.com/elastic/beats/pull/48414
-        - https://github.com/elastic/beats/pull/48804
-        - https://github.com/elastic/beats/pull/48784
-        - https://github.com/elastic/beats/pull/48818
-        - https://github.com/elastic/beats/pull/48816
-        - https://github.com/elastic/beats/pull/48815
+        - https://github.com/elastic/beats/pull/48754
       issue: []
       impact: ""
       action: ""
@@ -211,13 +159,7 @@ entries:
         to prevent malformed queries when group names contain LDAP filter metacharacters.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48444
-        - https://github.com/elastic/beats/pull/48414
-        - https://github.com/elastic/beats/pull/48804
-        - https://github.com/elastic/beats/pull/48784
-        - https://github.com/elastic/beats/pull/48818
-        - https://github.com/elastic/beats/pull/48816
-        - https://github.com/elastic/beats/pull/48815
+        - https://github.com/elastic/beats/pull/48395
       issue: []
       impact: ""
       action: ""
@@ -230,13 +172,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48444
-        - https://github.com/elastic/beats/pull/48414
-        - https://github.com/elastic/beats/pull/48804
-        - https://github.com/elastic/beats/pull/48784
-        - https://github.com/elastic/beats/pull/48818
-        - https://github.com/elastic/beats/pull/48816
-        - https://github.com/elastic/beats/pull/48815
+        - https://github.com/elastic/beats/pull/48863
       issue: []
       impact: ""
       action: ""
@@ -261,13 +197,7 @@ entries:
         use the user's transport configuration.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48444
-        - https://github.com/elastic/beats/pull/48414
-        - https://github.com/elastic/beats/pull/48804
-        - https://github.com/elastic/beats/pull/48784
-        - https://github.com/elastic/beats/pull/48818
-        - https://github.com/elastic/beats/pull/48816
-        - https://github.com/elastic/beats/pull/48815
+        - https://github.com/elastic/beats/pull/48866
       issue: []
       impact: ""
       action: ""
@@ -294,13 +224,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/48444
-        - https://github.com/elastic/beats/pull/48414
-        - https://github.com/elastic/beats/pull/48804
-        - https://github.com/elastic/beats/pull/48784
-        - https://github.com/elastic/beats/pull/48818
-        - https://github.com/elastic/beats/pull/48816
-        - https://github.com/elastic/beats/pull/48815
+        - https://github.com/elastic/beats/pull/48909
       issue: []
       impact: ""
       action: ""
