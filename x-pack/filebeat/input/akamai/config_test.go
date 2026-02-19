@@ -7,6 +7,7 @@
 package akamai
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"testing"
@@ -203,7 +204,7 @@ func TestEdgeGridSigner(t *testing.T) {
 	})
 
 	t.Run("Sign produces valid authorization header", func(t *testing.T) {
-		req, err := http.NewRequest(http.MethodGet, "https://test.luna.akamaiapis.net/siem/v1/configs/1?limit=100", nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "https://test.luna.akamaiapis.net/siem/v1/configs/1?limit=100", nil)
 		require.NoError(t, err)
 
 		err = signer.Sign(req)
@@ -253,10 +254,10 @@ func TestMaxRecoveryAttemptsValidation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cfgMap := map[string]interface{}{
-				"resource":               map[string]interface{}{"url": "https://test.luna.akamaiapis.net"},
-				"config_ids":             "12345",
-				"auth":                   edgeGridAuth,
-				"max_recovery_attempts":  tt.value,
+				"resource":              map[string]interface{}{"url": "https://test.luna.akamaiapis.net"},
+				"config_ids":            "12345",
+				"auth":                  edgeGridAuth,
+				"max_recovery_attempts": tt.value,
 			}
 			cfg, err := conf.NewConfigFrom(cfgMap)
 			require.NoError(t, err)

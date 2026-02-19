@@ -7,6 +7,7 @@
 package akamai
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
@@ -51,7 +52,9 @@ func TestRetryNonceFreshness(t *testing.T) {
 	client := &http.Client{Transport: transport}
 
 	for i := 0; i < 3; i++ {
-		resp, err := client.Get(srv.URL + "/test")
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, srv.URL+"/test", nil)
+		require.NoError(t, err)
+		resp, err := client.Do(req)
 		require.NoError(t, err)
 		resp.Body.Close()
 	}

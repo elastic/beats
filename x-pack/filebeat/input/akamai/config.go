@@ -18,14 +18,14 @@ import (
 )
 
 const (
-	defaultInterval         = time.Minute
-	defaultInitialInterval  = 12 * time.Hour
-	defaultEventLimit       = 10000
-	maxEventLimit           = 600000
-	defaultNumberOfWorkers  = 3
-	defaultMaxAttempts      = 5
-	defaultWaitMin          = time.Second
-	defaultWaitMax          = time.Minute
+	defaultInterval            = time.Minute
+	defaultInitialInterval     = 12 * time.Hour
+	defaultEventLimit          = 10000
+	maxEventLimit              = 600000
+	defaultNumberOfWorkers     = 3
+	defaultMaxAttempts         = 5
+	defaultWaitMin             = time.Second
+	defaultWaitMax             = time.Minute
 	defaultInvalidTSRetries    = 2
 	defaultMaxRecoveryAttempts = 3
 	maxInitialInterval         = 12 * time.Hour

@@ -174,8 +174,8 @@ func (m *inputMetrics) AddBatchReceived(eventCount int) {
 		return
 	}
 	m.batchesReceived.Inc()
-	m.eventsReceived.Add(uint64(eventCount))   //nolint:gosec // eventCount is always positive
-	m.eventsPerBatch.Update(int64(eventCount)) //nolint:gosec // eventCount is bounded by event_limit (max 600000)
+	m.eventsReceived.Add(uint64(eventCount)) //nolint:gosec // eventCount is always positive
+	m.eventsPerBatch.Update(int64(eventCount))
 }
 
 // AddBatchPublished increments the batches published counter.
