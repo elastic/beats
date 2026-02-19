@@ -80,24 +80,14 @@ func (r *Register) AddDefaultMatcherConfig(name string, config config.C) {
 func (r *Register) GetIndexer(name string) IndexerConstructor {
 	r.RLock()
 	defer r.RUnlock()
-	indexer, ok := r.indexers[name]
-	if ok {
-		return indexer
-	} else {
-		return nil
-	}
+	return r.indexers[name]
 }
 
 // GetMatcher from the register
 func (r *Register) GetMatcher(name string) MatcherConstructor {
 	r.RLock()
 	defer r.RUnlock()
-	matcher, ok := r.matchers[name]
-	if ok {
-		return matcher
-	} else {
-		return nil
-	}
+	return r.matchers[name]
 }
 
 // GetDefaultIndexerConfigs obtains the plugin configuration for the default indexer
