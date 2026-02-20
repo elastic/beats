@@ -24,6 +24,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/elastic/beats/v7/filebeat/beater/debug"
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
@@ -75,6 +76,7 @@ type Filebeat struct {
 	pipeline                 beat.PipelineConnector
 	logger                   *logp.Logger
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
+	debugServer              *debug.Server
 }
 
 type PluginFactory func(beat.Info, *logp.Logger, statestore.States, *paths.Path) []v2.Plugin
@@ -304,6 +306,25 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 	defer stateStore.Close()
+
+	// Start debug server if enabled
+	if config.Registry.DebugPort > 0 {
+		if bboltReg := stateStore.BBoltRegistry(); bboltReg != nil {
+			debugServer, err := debug.NewServer(
+				fb.logger,
+				config.Registry.DebugPort,
+				bboltReg,
+				b.Info.Beat,
+			)
+			if err != nil {
+				fb.logger.Warnf("Failed to start debug server: %v", err)
+			} else {
+				fb.debugServer = debugServer
+			}
+		} else {
+			fb.logger.Warnf("Debug port configured but bbolt registry not available (type: %s)", config.Registry.NormalizedType())
+		}
+	}
 
 	// If notifier is set, configure the listener for output configuration
 	// The notifier passes the elasticsearch output configuration down to the Elasticsearch backed state storage
@@ -539,6 +560,13 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 // Stop is called on exit to stop the crawling, spooling and registration processes.
 func (fb *Filebeat) Stop() {
 	fb.logger.Info("Stopping filebeat")
+
+	// Stop debug server if running
+	if fb.debugServer != nil {
+		if err := fb.debugServer.Stop(); err != nil {
+			fb.logger.Warnf("Error stopping debug server: %v", err)
+		}
+	}
 
 	// Stop Filebeat
 	fb.stopOnce.Do(func() { close(fb.done) })

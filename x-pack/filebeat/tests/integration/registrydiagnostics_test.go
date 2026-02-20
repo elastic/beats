@@ -132,6 +132,7 @@ func TestFilestreamRegistryIsInDiagnostics(t *testing.T) {
 		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
 		"-E", "management.enabled=true",
 		"-E", "queue.mem.flush.timeout=0",
+		"-E", "filebeat.registry.type=memlog",
 	)
 
 	<-testDone
@@ -226,6 +227,7 @@ func TestEmptyegistryIsInDiagnostics(t *testing.T) {
 		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
 		"-E", "management.enabled=true",
 		"-E", "queue.mem.flush.timeout=0",
+		"-E", "filebeat.registry.type=memlog",
 	)
 
 	<-testDone

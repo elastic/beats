@@ -4,6 +4,7 @@ filebeat.config.inputs:
 
 {% if not skip_registry_config %}
 filebeat.registry:
+  type: {{ registry_type|default("memlog") }}
   path: {{ beat.working_dir + '/' }}{{ registry_home|default("registry")}}
   file_permissions: {{ registry_file_permissions|default("0600") }}
   {% if registry_migrate_file %}

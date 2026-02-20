@@ -343,7 +343,7 @@ class Test(BaseTest):
         )
         with open(self.working_dir + "/test.log", "w") as testfile:
             testfile.write("test message\n")
-        filebeat = self.start_beat()
+        filebeat = self.start_beat(extra_args=["-E", "filebeat.registry.type=memlog"])
         self.wait_until(lambda: self.output_has(lines=1))
         filebeat.check_kill_and_wait()
 
