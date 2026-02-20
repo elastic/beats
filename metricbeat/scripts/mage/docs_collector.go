@@ -103,6 +103,28 @@ var funcMap = template.FuncMap{
 		return mage.BeatName
 	},
 	"title": strings.Title,
+	// Determine the serverless lifecycle from the stack applies_to string.
+	// Serverless is unversioned, so we use the most advanced lifecycle state.
+	"serverlessLifecycle": func(appliesTo string) string {
+		lifecycleOrder := []string{"preview", "beta", "ga", "deprecated", "removed"}
+		latestIdx := -1
+		for _, part := range strings.Split(appliesTo, ",") {
+			fields := strings.Fields(strings.TrimSpace(part))
+			if len(fields) == 0 {
+				continue
+			}
+			lifecycle := fields[0]
+			for i, l := range lifecycleOrder {
+				if lifecycle == l && i > latestIdx {
+					latestIdx = i
+				}
+			}
+		}
+		if latestIdx >= 0 {
+			return lifecycleOrder[latestIdx]
+		}
+		return "ga"
+	},
 }
 
 // checkXpack checks to see if the module belongs to x-pack.
