@@ -29,10 +29,10 @@ type SourceJob struct {
 	cancel     context.CancelFunc
 }
 
-func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
+func NewSourceJob(ctx context.Context, rawCfg *config.C) (*SourceJob, error) {
 	// Global browser context to cancel all jobs
 	// on close
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(ctx)
 
 	s := &SourceJob{
 		rawCfg:     rawCfg,

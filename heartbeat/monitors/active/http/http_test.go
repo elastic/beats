@@ -83,7 +83,7 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("tls", config)
+	p, err := create("tls", context.Background(), config)
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
@@ -323,7 +323,7 @@ func TestLargeResponse(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("largeresp", config)
+	p, err := create("largeresp", context.Background(), config)
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
@@ -439,7 +439,7 @@ func TestJsonBody(t *testing.T) {
 			config, err := conf.NewConfigFrom(configSrc)
 			require.NoError(t, err)
 
-			p, err := create("largeresp", config)
+			p, err := create("largeresp", context.Background(), config)
 			require.NoError(t, err)
 
 			sched, _ := schedule.Parse("@every 1s")
@@ -669,7 +669,7 @@ func TestRedirect(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("redirect", config)
+	p, err := create("redirect", context.Background(), config)
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
@@ -713,7 +713,7 @@ func TestNoHeaders(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("http", config)
+	p, err := create("http", context.Background(), config)
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
@@ -896,7 +896,7 @@ func TestUserAgentInject(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	p, err := create("ua", cfg)
+	p, err := create("ua", context.Background(), cfg)
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
