@@ -1469,19 +1469,18 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 func TestCreateConfigResolvesVariablesFromOptions(t *testing.T) {
 	testutils.SkipIfFIPSOnly(t, "keystore implementation does not use NewGCMWithRandomNonce.")
 
-	path := logsTestKeystorePath(t)
-	defer os.RemoveAll(filepath.Dir(path))
+	path := filepath.Join(t.TempDir(), "keystore")
 	opts := []ucfg.Option{ucfg.Resolve(keystore.ResolverWrap(logsTestKeystore(t, path, "secret")))}
 
-	cfg := conf.MustNewConfigFrom(map[string]interface{}{
-		"default_config": map[string]interface{}{
-			"type": "docker",
-			"containers": map[string]interface{}{"ids": []string{"${data.container.id}"}},
+	cfg := conf.MustNewConfigFrom(map[string]any{
+		"default_config": map[string]any{
+			"type":          "docker",
+			"containers":    map[string]any{"ids": []string{"${data.container.id}"}},
 			"close_timeout": "true",
 		},
 	})
 	event := bus.Event{
-		"host": "1.2.3.4",
+		"host":       "1.2.3.4",
 		"kubernetes": mapstr.M{"container": mapstr.M{"name": "foobar", "id": "abc"}},
 		"container":  mapstr.M{"name": "foobar", "id": "abc"},
 		"hints":      mapstr.M{"logs": mapstr.M{"raw": `[{"type":"docker","containers":{"ids":["${data.container.id}"]},"password":"${PASSWORD}"}]`}},
@@ -1495,13 +1494,6 @@ func TestCreateConfigResolvesVariablesFromOptions(t *testing.T) {
 	var out mapstr.M
 	require.NoError(t, cfgs[0].Unpack(&out))
 	assert.Equal(t, "secret", out["password"])
-}
-
-func logsTestKeystorePath(t *testing.T) string {
-	t.Helper()
-	dir, err := os.MkdirTemp("", "filebeat-hints-test")
-	require.NoError(t, err)
-	return filepath.Join(dir, "keystore")
 }
 
 func logsTestKeystore(t *testing.T, path, secret string) keystore.Keystore {
