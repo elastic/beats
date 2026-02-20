@@ -7,6 +7,7 @@ var:
     default: 60m
   - name: url
     default: "https://urlhaus-api.abuse.ch/v1/urls/recent/"
+  - name: api_token
   - name: ssl
   - name: tags
     default: [threatintel-abuseurls, forwarded]

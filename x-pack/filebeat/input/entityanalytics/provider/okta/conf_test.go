@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"gopkg.in/natefinch/lumberjack.v2"
+
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
@@ -59,16 +61,70 @@ var validateTests = []struct {
 		},
 		wantErr: errSyncBeforeUpdate,
 	},
+	{
+		name: "tracer_disabled",
+		cfg: func() conf {
+			cfg := defaultConfig()
+			cfg.OktaDomain = "test.okta.com"
+			cfg.OktaToken = "test-token"
+			cfg.Tracer = &tracerConfig{
+				Enabled: ptrTo(false),
+				Logger:  lumberjack.Logger{Filename: "/var/logs/path.log"},
+			}
+			return cfg
+		}(),
+		wantErr: nil,
+	},
+	{
+		name: "valid_path",
+		cfg: func() conf {
+			cfg := defaultConfig()
+			cfg.OktaDomain = "test.okta.com"
+			cfg.OktaToken = "test-token"
+			cfg.Tracer = &tracerConfig{
+				Enabled: ptrTo(true),
+				Logger:  lumberjack.Logger{Filename: "okta/logs/path.log"},
+			}
+			return cfg
+		}(),
+	},
+	{
+		name: "invalid_path",
+		cfg: func() conf {
+			cfg := defaultConfig()
+			cfg.OktaDomain = "test.okta.com"
+			cfg.OktaToken = "test-token"
+			cfg.Tracer = &tracerConfig{
+				Enabled: ptrTo(true),
+				Logger:  lumberjack.Logger{Filename: "/var/logs/path.log"},
+			}
+			return cfg
+		}(),
+		wantErr: errors.New(`request tracer path must be within "okta" path`),
+	},
 }
+
+func ptrTo[T any](v T) *T { return &v }
 
 func TestConfValidate(t *testing.T) {
 	for _, test := range validateTests {
 		t.Run(test.name, func(t *testing.T) {
 			err := test.cfg.Validate()
-			if err != test.wantErr {
+			if !sameError(err, test.wantErr) {
 				t.Errorf("unexpected error: got:%v want:%v", err, test.wantErr)
 			}
 		})
+	}
+}
+
+func sameError(a, b error) bool {
+	switch {
+	case a == nil && b == nil:
+		return true
+	case a == nil, b == nil:
+		return false
+	default:
+		return a.Error() == b.Error()
 	}
 }
 

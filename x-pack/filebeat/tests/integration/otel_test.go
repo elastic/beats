@@ -12,6 +12,8 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -40,6 +42,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/elastic/go-elasticsearch/v8/esapi"
 	"github.com/elastic/mock-es/pkg/api"
 )
 
@@ -365,25 +368,36 @@ service:
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 }
 
+func writeEventsToFile(t *testing.T, file *os.File, startLine, numEvents int) {
+	t.Helper()
+	for i := startLine; i < startLine+numEvents; i++ {
+		msg := fmt.Sprintf("Line %d", i)
+		_, err := file.Write([]byte(msg + "\n"))
+		require.NoErrorf(t, err, "failed to write line %d to temp file", i)
+	}
+
+	if err := file.Sync(); err != nil {
+		t.Fatalf("could not sync log file: %s", err)
+	}
+	if err := file.Close(); err != nil {
+		t.Fatalf("could not close log file: %s", err)
+	}
+}
+
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
 	t.Helper()
 	logFile, err := os.Create(filename)
 	if err != nil {
 		t.Fatalf("could not create file '%s': %s", filename, err)
 	}
-	// write events to log file
-	for i := 0; i < numEvents; i++ {
-		msg := fmt.Sprintf("Line %d", i)
-		_, err = logFile.Write([]byte(msg + "\n"))
-		require.NoErrorf(t, err, "failed to write line %d to temp file", i)
-	}
+	writeEventsToFile(t, logFile, 0, numEvents)
+}
 
-	if err := logFile.Sync(); err != nil {
-		t.Fatalf("could not sync log file '%s': %s", filename, err)
-	}
-	if err := logFile.Close(); err != nil {
-		t.Fatalf("could not close log file '%s': %s", filename, err)
-	}
+func appendEventsToLogFile(t *testing.T, filename string, startLine int, numEvents int) {
+	t.Helper()
+	logFile, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0600)
+	require.NoError(t, err)
+	writeEventsToFile(t, logFile, startLine, numEvents)
 }
 
 func assertMonitoring(t *testing.T, port int) {
@@ -925,7 +939,8 @@ service:
 					// For retryable errors or successful cases, events are eventually acked
 					// Currently, otelconsumer either ACKs or fails the entire batch and has no visibility into individual event failures within the exporter.
 					// From otelconsumer's perspective, the whole batch is considered successful as long as ConsumeLogs returns no error.
-					assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.total"], "expected total events sent to output to match")
+					// events.total can be larger than the acknowledged event count because it includes retrys.
+					assert.GreaterOrEqual(ct, m["libbeat.output.events.total"], float64(numTestEvents), "expected total events sent to output include all events")
 					assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.acked"], "expected total events acked to match")
 					assert.Equal(ct, float64(0), m["libbeat.output.events.dropped"], "expected total events dropped to match")
 				}
@@ -1232,6 +1247,224 @@ exporters:
 	oteltest.AssertMapsEqual(t, receiverDoc, processorDoc, ignoredFields, "expected documents to be equal")
 }
 
+func TestNoDuplicates(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	tmpdir := t.TempDir()
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbOtelIndex := "logs-integration-" + namespace
+
+	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
+
+	otelCfgFile := `receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-input-id
+          enabled: true
+          paths:
+            - %s
+    processors:
+      - add_host_metadata: ~
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
+      - add_kubernetes_metadata: ~
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    path.home: %s
+    http.enabled: true
+    http.host: localhost
+    http.port: %d
+    management.otel.enabled: true
+exporters:
+  elasticsearch/log:
+    endpoints:
+      - http://localhost:9200
+    compression: none
+    user: admin
+    password: testing
+    logs_index: %s
+    tls:
+      insecure_skip_verify: true
+    sending_queue:
+      enabled: true
+      batch:
+        flush_timeout: 1s
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - elasticsearch/log
+`
+	logFilePath := filepath.Join(tmpdir, "log.log")
+	writenLines := make([]string, 0)
+	stopChan := make(chan struct{}, 1)
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		// create a log file and keep writing to it until the test finishes.
+		// This is to ensure that the filebeat receiver is continuously processing
+		// new lines and creating new events, which increases the chances of
+		// hitting edge cases that could cause duplicates on restart.
+		defer wg.Done()
+		logFile, err := os.Create(logFilePath)
+		if err != nil {
+			require.NoErrorf(t, err, "could not create file '%s'", logFilePath)
+		}
+		defer logFile.Close()
+
+		ticker := time.NewTicker(50 * time.Millisecond)
+		defer ticker.Stop()
+		i := 0
+		for range ticker.C {
+			select {
+			case <-stopChan:
+				return
+			default:
+			}
+			msg := fmt.Sprintf("This is spam message %d: %v", i, uuid.Must(uuid.NewV4()))
+			_, err := logFile.Write([]byte(msg + "\n"))
+			require.NoErrorf(t, err, "failed to write line %d to temp file", i)
+			writenLines = append(writenLines, msg)
+			i++
+		}
+	}()
+	t.Cleanup(func() {
+		close(stopChan)
+		wg.Wait()
+	})
+	collector := oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
+
+	require.EventuallyWithT(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err := estools.GetAllLogsForIndexWithContext(findCtx, integration.GetESClient(t, "http"), ".ds-"+fbOtelIndex+"*")
+			assert.NoError(ct, err)
+			assert.Greater(ct, otelDocs.Hits.Total.Value, 100)
+		},
+		1*time.Minute, 1*time.Second, "expected more than 0 events, got none",
+	)
+
+	collector.Shutdown()
+
+	// wait for 8888 port to be free (an indication that previous collector has exited)
+	require.Eventually(t,
+		func() bool {
+			ln, err := net.Listen("tcp", "localhost:8888")
+			if err != nil {
+				return false
+			}
+			ln.Close()
+			return true
+		},
+		10*time.Second,
+		100*time.Millisecond,
+		"port 8888 never became available",
+	)
+
+	// restart the collector process
+	collector = oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
+	t.Cleanup(func() {
+		collector.Shutdown()
+	})
+
+	// wait for more docs to be published.
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err := estools.GetAllLogsForIndexWithContext(findCtx, integration.GetESClient(t, "http"), ".ds-"+fbOtelIndex+"*")
+			assert.NoError(ct, err)
+			assert.Greater(ct, otelDocs.Hits.Total.Value, 300)
+		},
+		1*time.Minute, 1*time.Second, "expected more than 300 events, got less",
+	)
+	checkDuplicates(t, ".ds-"+fbOtelIndex+"*")
+}
+
+func checkDuplicates(t *testing.T, index string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// duplicate check
+	rawQuery := map[string]any{
+		"runtime_mappings": map[string]any{
+			"log.offset": map[string]any{
+				"type": "keyword",
+			},
+			"log.file.fingerprint": map[string]any{
+				"type": "keyword",
+			},
+		},
+		"query": map[string]any{
+			"bool": map[string]any{
+				"must": []map[string]any{
+					{"match": map[string]any{"_index": index}},
+				},
+			},
+		},
+		"aggs": map[string]any{
+			"duplicates": map[string]any{
+				"multi_terms": map[string]any{
+					"size":          500,
+					"min_doc_count": 2,
+					"terms": []map[string]any{
+						{"field": "log.file.fingerprint"},
+						{"field": "log.offset"},
+					},
+				},
+			},
+		},
+	}
+	var buf bytes.Buffer
+	err := json.NewEncoder(&buf).Encode(rawQuery)
+	require.NoError(t, err)
+
+	es := esapi.New(integration.GetESClient(t, "http"))
+	res, err := es.Search(
+		es.Search.WithIndex(index),
+		es.Search.WithSize(0),
+		es.Search.WithBody(&buf),
+		es.Search.WithPretty(),
+		es.Search.WithContext(ctx),
+	)
+	require.NoError(t, err)
+	require.Falsef(t, (res.StatusCode >= http.StatusMultipleChoices || res.StatusCode < http.StatusOK), "status should be 2xx was: %d", res.StatusCode)
+	resultBuf, err := io.ReadAll(res.Body)
+	require.NoError(t, err)
+
+	aggResults := map[string]any{}
+	err = json.Unmarshal(resultBuf, &aggResults)
+	require.NoError(t, err)
+	aggs, ok := aggResults["aggregations"].(map[string]any)
+	require.Truef(t, ok, "'aggregations' wasn't a map[string]any, result was %s", string(resultBuf))
+	dups, ok := aggs["duplicates"].(map[string]any)
+	require.Truef(t, ok, "'duplicates' wasn't a map[string]any, result was %s", string(resultBuf))
+	buckets, ok := dups["buckets"].([]any)
+	require.Truef(t, ok, "'buckets' wasn't a []any, result was %s", string(resultBuf))
+
+	hits, ok := aggResults["hits"].(map[string]any)
+	require.Truef(t, ok, "'hits' wasn't a map[string]any, result was %s", string(resultBuf))
+	total, ok := hits["total"].(map[string]any)
+	require.Truef(t, ok, "'total' wasn't a map[string]any, result was %s", string(resultBuf))
+	value, ok := total["value"].(float64)
+	require.Truef(t, ok, "'total' wasn't an int, result was %s", string(resultBuf))
+
+	require.Equalf(t, 0, len(buckets), "len(buckets): %d, hits.total.value: %d, result was %s", len(buckets), value, string(resultBuf))
+}
+
 // setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
 func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -1267,6 +1500,226 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 	defer resp.Body.Close()
 
 	require.Equal(t, resp.StatusCode, http.StatusOK, "incorrect response code")
+}
+
+func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {
+	const numTestEvents = 100
+
+	tmpdir := t.TempDir()
+	logFilePath := filepath.Join(tmpdir, "log.log")
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	index := "logs-integration-" + namespace
+
+	serverPort := int(libbeattesting.MustAvailableTCP4Port(t))
+	serverURL := fmt.Sprintf("http://localhost:%d", serverPort)
+
+	var ingestedEvents []string
+	var mu sync.Mutex
+
+	handler := func(action api.Action, event []byte) int {
+		if action.Action == "create" {
+			mu.Lock()
+			defer mu.Unlock()
+
+			// Extract message from event
+			if matches := regexp.MustCompile(`"message":"([^"]+)"`).FindSubmatch(event); len(matches) > 1 {
+				message := string(matches[1])
+				ingestedEvents = append(ingestedEvents, message)
+			}
+		}
+		return http.StatusOK
+	}
+
+	createMockServer := func() *httptest.Server {
+		reader := metric.NewManualReader()
+		provider := metric.NewMeterProvider(metric.WithReader(reader))
+
+		mockServer := httptest.NewUnstartedServer(
+			api.NewDeterministicAPIHandler(
+				uuid.Must(uuid.NewV4()),
+				"",
+				provider,
+				time.Now().Add(24*time.Hour),
+				0,
+				0,
+				handler,
+			),
+		)
+
+		l, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", serverPort))
+		require.NoError(t, err)
+		mockServer.Listener = l
+		mockServer.Start()
+		return mockServer
+	}
+
+	beatsConfig := struct {
+		Index          string
+		InputFile      string
+		ESEndpoint     string
+		MonitoringPort int
+	}{
+		Index:          index,
+		InputFile:      logFilePath,
+		ESEndpoint:     serverURL,
+		MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
+	}
+
+	cfg := `receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-input-id
+          enabled: true
+          paths:
+            - {{.InputFile}}
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    logging:
+      level: debug
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    http.enabled: true
+    http.host: localhost
+    http.port: {{.MonitoringPort}}
+exporters:
+  elasticsearch:
+    auth:
+      authenticator: beatsauth
+    compression: none
+    endpoints:
+      - {{.ESEndpoint}}
+    logs_index: {{.Index}}
+    max_conns_per_host: 1
+    password: testing
+    retry:
+      enabled: true
+      initial_interval: 100ms
+      max_interval: 30s
+      max_retries: 100
+    sending_queue:
+      batch:
+        flush_timeout: 10s
+        max_size: 1
+        min_size: 0
+        sizer: items
+      block_on_overflow: true
+      enabled: true
+      num_consumers: 1
+      queue_size: 3200
+      wait_for_result: true
+    user: admin
+extensions:
+  beatsauth:
+    idle_connection_timeout: 3s
+    proxy_disable: false
+    timeout: 1m30s
+service:
+  extensions:
+    - beatsauth
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - elasticsearch
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`
+
+	var configBuffer bytes.Buffer
+	require.NoError(t, template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, beatsConfig))
+
+	writeEventsToLogFile(t, logFilePath, numTestEvents)
+
+	collector := oteltestcol.New(t, configBuffer.String())
+
+	t.Run("delivers events when Elasticsearch is unavailable at startup", func(t *testing.T) {
+		// Wait for filebeat to read the file
+		require.Eventually(t, func() bool {
+			return collector.ObservedLogs().FilterMessageSnippet(fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath)).Len() >= 1
+		}, 30*time.Second, 100*time.Millisecond, "timed out waiting for file input to be fully read")
+
+		// Wait for a connection refused when the exporter tries to connect with ES and fails
+		require.Eventually(t, func() bool {
+			return collector.ObservedLogs().FilterMessageSnippet("connection refused").
+				FilterMessageSnippet(fmt.Sprintf(":%d", serverPort)).Len() >= 1
+		}, 30*time.Second, 100*time.Millisecond, "timed out waiting for connection refused error")
+
+		// Verify no events were ingested yet (server down)
+		assert.Empty(t, ingestedEvents, "expected no events to be ingested while server is down")
+
+		// Mock ES starts
+		mockServer := createMockServer()
+		defer mockServer.Close()
+
+		// Wait for all events to be delivered
+		require.EventuallyWithT(t, func(ct *assert.CollectT) {
+			mu.Lock()
+			defer mu.Unlock()
+			assert.Len(ct, ingestedEvents, numTestEvents, "expected all events to be delivered after server starts")
+
+			// Verify we got the expected event content
+			for i := 0; i < numTestEvents; i++ {
+				expectedMsg := fmt.Sprintf("Line %d", i)
+				found := false
+				for _, ingested := range ingestedEvents {
+					if ingested == expectedMsg {
+						found = true
+						break
+					}
+				}
+				assert.True(ct, found, "expected to find event: %s", expectedMsg)
+			}
+		}, 30*time.Second, 1*time.Second, "timed out waiting for events to be delivered")
+	})
+
+	t.Run("continues delivering events after Elasticsearch failure", func(t *testing.T) {
+		// reset observed logs
+		collector.ObservedLogs().TakeAll()
+
+		// Append events to log file
+		appendEventsToLogFile(t, logFilePath, numTestEvents, numTestEvents)
+
+		// Confirm filebeat read the new lines
+		require.Eventually(t, func() bool {
+			return collector.ObservedLogs().FilterMessageSnippet(fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath)).Len() == 1
+		}, 30*time.Second, 100*time.Millisecond, "timed out waiting for file input to read new lines")
+
+		// Confirm connection refused error
+		require.Eventually(t, func() bool {
+			return collector.ObservedLogs().FilterMessageSnippet("connection refused").
+				FilterMessageSnippet(fmt.Sprintf(":%d", serverPort)).Len() >= 1
+		}, 30*time.Second, 100*time.Millisecond, "timed out waiting for second connection refused error")
+
+		// Mock ES restarts
+		mockServer := createMockServer()
+		defer mockServer.Close()
+
+		// wait for new events to be delivered
+		totalExpectedEvents := numTestEvents * 2
+		require.EventuallyWithT(t, func(ct *assert.CollectT) {
+			mu.Lock()
+			defer mu.Unlock()
+			assert.Len(ct, ingestedEvents, totalExpectedEvents, "expected all events (original + additional) to be delivered after server restarts")
+
+			for i := 0; i < totalExpectedEvents; i++ {
+				expectedMsg := fmt.Sprintf("Line %d", i)
+				found := false
+				for _, ingested := range ingestedEvents {
+					if ingested == expectedMsg {
+						found = true
+						break
+					}
+				}
+				assert.True(ct, found, "expected to find event: %s", expectedMsg)
+			}
+		}, 30*time.Second, 1*time.Second, "timed out waiting for all events to be delivered")
+	})
 }
 
 func BenchmarkFilebeatOTelCollector(b *testing.B) {

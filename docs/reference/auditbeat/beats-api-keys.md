@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/beats-api-keys.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Grant access using API keys [beats-api-keys]

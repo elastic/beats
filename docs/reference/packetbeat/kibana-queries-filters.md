@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/kibana-queries-filters.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Kibana queries and filters [kibana-queries-filters]

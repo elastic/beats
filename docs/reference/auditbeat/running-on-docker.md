@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/running-on-docker.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Run Auditbeat on Docker [running-on-docker]

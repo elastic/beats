@@ -1368,7 +1368,7 @@ var inputTests = []struct {
 		},
 		config: map[string]interface{}{
 			"interval":                 1,
-			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
 			"state": map[string]interface{}{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
@@ -1404,7 +1404,7 @@ var inputTests = []struct {
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
 		},
-		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization.ndjson"),
+		wantFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization.ndjson"),
 	},
 	{
 		name: "tracer_filename_sanitization_enabled",
@@ -1416,7 +1416,7 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval":                 1,
 			"resource.tracer.enabled":  true,
-			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
 			"state": map[string]interface{}{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
@@ -1452,7 +1452,7 @@ var inputTests = []struct {
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
 		},
-		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization_enabled.ndjson"),
+		wantFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_enabled.ndjson"),
 	},
 	{
 		name: "tracer_filename_sanitization_disabled",
@@ -1464,7 +1464,7 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval":                 1,
 			"resource.tracer.enabled":  false,
-			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
 			"state": map[string]interface{}{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
@@ -1500,7 +1500,19 @@ var inputTests = []struct {
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
 		},
-		wantNoFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
+		wantNoFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
+	},
+	{
+		name: "tracer_escaping_logs",
+		config: map[string]interface{}{
+			"interval":                 1,
+			"resource.url":             "https://example.com/",
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
+			"state":                    map[string]interface{}{},
+			"program":                  "{}",
+		},
+		wantErr: fmt.Errorf(`request tracer path must be within %q path accessing 'resource'`, inputName),
 	},
 	{
 		name:   "pagination_cursor_object",
@@ -2364,7 +2376,19 @@ func TestInput(t *testing.T) {
 
 			var tempDir string
 			if conf.Resource.Tracer != nil {
-				tempDir = t.TempDir()
+				err := os.MkdirAll("cel", 0o700)
+				if err != nil {
+					t.Fatalf("failed to create root logging destination: %v", err)
+				}
+				tempDir, err = os.MkdirTemp("cel", "logs-*")
+				if err != nil {
+					t.Fatalf("failed to create logging destination: %v", err)
+				}
+				tempDir, err = filepath.Abs(tempDir)
+				if err != nil {
+					t.Fatalf("failed to get absolute path for logging destination: %v", err)
+				}
+				defer os.RemoveAll("cel")
 				conf.Resource.Tracer.Filename = filepath.Join(tempDir, conf.Resource.Tracer.Filename)
 			}
 

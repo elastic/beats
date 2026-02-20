@@ -59,19 +59,28 @@ type handler struct {
 	txIDCounter atomic.Uint64 // Transaction ID counter that is incremented for each request.
 	status      status.StatusReporter
 
-	// inFlight is the sum of message body length
-	// that have been received but not yet ACKed
-	// or timed out or otherwise handled.
-	//
-	// Requests that do not request a timeout do
-	// not contribute to this value.
+	// inFlight is the sum of message body bytes that have been received
+	// but not yet fully processed (ACKed, timed out, or otherwise handled).
+	// This counter is updated atomically as bytes are read from request bodies.
 	inFlight atomic.Int64
-	// maxInFlight is the maximum value of inFligh
-	// that will be allowed for any messages received
-	// by the handler. If non-zero, inFlight may
-	// not exceed this value.
+
+	// maxInFlight is the hard limit for in-flight bytes. If exceeded during
+	// a read operation, the current request is cancelled with an error.
 	maxInFlight int64
-	retryAfter  int
+
+	// highWaterInFlight is the soft limit. When inFlight reaches this value,
+	// new requests are rejected with 503 Service Unavailable.
+	highWaterInFlight int64
+
+	// lowWaterInFlight is the resume threshold. When inFlight drops below
+	// this value after being in rejecting mode, new requests are accepted again.
+	lowWaterInFlight int64
+
+	// accepting tracks the hysteresis state. When true, new requests are accepted.
+	// When false (rejecting mode), new requests are rejected with 503.
+	accepting atomic.Bool
+
+	retryAfter int
 
 	reqLogger    *zap.Logger
 	host, scheme string
@@ -113,39 +122,40 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		acked   chan struct{}
 		timeout *time.Timer
 	)
-	if h.maxInFlight != 0 {
-		// Consider non-ACKing messages as well. These do not add
-		// to the sum of in-flight bytes, but we can still assess
-		// whether a message would take us over the limit.
-		inFlight := h.inFlight.Load() + r.ContentLength
-		if inFlight > h.maxInFlight {
-			w.Header().Set(headerContentEncoding, "application/json")
+
+	// Hysteresis-based admission control: check if we should accept new requests.
+	if h.highWaterInFlight != 0 {
+		current := h.inFlight.Load()
+		accepting := h.accepting.Load()
+
+		// Transition from rejecting to accepting when at or below low water mark.
+		if !accepting && current <= h.lowWaterInFlight {
+			accepting = true
+		}
+		// Transition from accepting to rejecting when at or above high water mark.
+		if accepting && current >= h.highWaterInFlight {
+			accepting = false
+		}
+		h.accepting.Store(accepting)
+
+		if !accepting {
+			w.Header().Set("Content-Type", "application/json")
 			w.Header().Set("Retry-After", strconv.Itoa(h.retryAfter))
 			w.WriteHeader(http.StatusServiceUnavailable)
 			_, err := fmt.Fprintf(w,
-				`{"warn":"max in flight message memory exceeded","max_in_flight":%d,"in_flight":%d}`,
-				h.maxInFlight, inFlight,
+				`{"warn":"in flight bytes above high water mark","high_water":%d,"in_flight":%d}`,
+				h.highWaterInFlight, current,
 			)
 			if err != nil {
 				h.log.Errorw("failed to write 503", "error", err)
 			}
-			h.status.UpdateStatus(status.Degraded, "exceeded max bytes in flight")
+			h.status.UpdateStatus(status.Degraded, "in flight bytes above high water mark")
 			return
 		}
 	}
 	if wait != 0 {
 		acked = make(chan struct{})
 		timeout = time.NewTimer(wait)
-		h.inFlight.Add(r.ContentLength)
-		defer func() {
-			// Any return will be a message handling completion and the
-			// the removal of the allocation from the queue assuming that
-			// the client has requested a timeout. Either we have an early
-			// error condition or timeout and the message is dropped, we
-			// have ACKed all the events in the request, or the input has
-			// been cancelled.
-			h.inFlight.Add(-r.ContentLength)
-		}()
 	}
 	start := time.Now()
 	acker := newBatchACKTracker(func() {
@@ -164,7 +174,21 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.metrics.apiErrors.Add(1)
 		return
 	}
+
+	// If we are tracking in flight bytes, wrap body with countReader for
+	// just-in-time byte counting. The countReader tracks bytes as they are read.
+	// On return Close releases the bytes. In the error case this is immediate,
+	// and in the success case after any ACK wait completes.
+	var countedBody *countReader
+	if h.maxInFlight > 0 {
+		countedBody = newCountReader(body, &h.inFlight, h.maxInFlight)
+		body = countedBody
+	}
 	defer body.Close()
+
+	if h.validator.maxBodySize >= 0 {
+		body = io.NopCloser(io.LimitReader(body, h.validator.maxBodySize))
+	}
 
 	if h.reqLogger != nil {
 		// If we are logging, keep a copy of the body for the logger.
@@ -173,12 +197,27 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// r.Body is not otherwise referenced by the non-logging logic
 		// after the call to getBodyReader above.
 		var buf bytes.Buffer
-		body = io.NopCloser(io.TeeReader(body, &buf))
+		body = readCloserWithTee(body, &buf)
 		r.Body = io.NopCloser(&buf)
 	}
 
 	objs, code, err := httpReadJSON(body, h.program)
 	if err != nil {
+		if errors.Is(err, errMaxInFlightExceeded) {
+			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set("Retry-After", strconv.Itoa(h.retryAfter*2))
+			w.WriteHeader(http.StatusServiceUnavailable)
+			_, werr := fmt.Fprintf(w,
+				`{"error":"max in flight bytes exceeded during read","max_in_flight":%d,"in_flight":%d}`,
+				h.maxInFlight, h.inFlight.Load(),
+			)
+			if werr != nil {
+				h.log.Errorw("failed to write 503", "error", werr)
+			}
+			h.status.UpdateStatus(status.Degraded, "max in flight bytes exceeded during read")
+			h.metrics.apiErrors.Add(1)
+			return
+		}
 		h.sendAPIErrorResponse(txID, w, r, h.log, code, err)
 		h.status.UpdateStatus(status.Degraded, "unable to read message JSON: "+err.Error())
 		h.metrics.apiErrors.Add(1)
@@ -225,8 +264,11 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	acker.Ready()
 	h.status.UpdateStatus(status.Running, "")
 	if acked == nil {
+		// Non-ACK request: bytes will be released by defer body.Close()
 		h.sendResponse(w, respCode, respBody)
 	} else {
+		// ACK request: bytes will be released by defer body.Close()
+		// when the function returns after the select completes.
 		select {
 		case <-acked:
 			h.log.Debugw("request acked", "tx_id", txID)
@@ -635,5 +677,25 @@ func getBodyReader(r *http.Request) (body io.ReadCloser, status int, err error) 
 		return r.Body, 0, nil
 	default:
 		return nil, http.StatusUnsupportedMediaType, fmt.Errorf("unsupported Content-Encoding type %q", enc)
+	}
+}
+
+// teeReadCloser wraps an io.ReadCloser with a TeeReader while preserving
+// the original Close behavior.
+type teeReadCloser struct {
+	io.Reader
+	closer io.Closer
+}
+
+func (t *teeReadCloser) Close() error {
+	return t.closer.Close()
+}
+
+// readCloserWithTee wraps an io.ReadCloser with a TeeReader that writes to w,
+// while preserving the Close behavior of the original reader.
+func readCloserWithTee(rc io.ReadCloser, w io.Writer) io.ReadCloser {
+	return &teeReadCloser{
+		Reader: io.TeeReader(rc, w),
+		closer: rc,
 	}
 }
