@@ -13,7 +13,7 @@
         Current state of Kibana.
     - name: meta
       type: object
-      object_type: keyword
+      dynamic: false
 
     - name: meta.req.headers
       type: flattened
