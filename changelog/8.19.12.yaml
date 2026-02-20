@@ -1,0 +1,186 @@
+version: 8.19.12
+entries:
+    - kind: bug-fix
+      summary: Enforces configurable size limits on incoming requests for remote_write metricset (max_compressed_body_bytes, max_decoded_body_bytes)
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48218
+      impact: ""
+      action: ""
+      timestamp: 1766493789
+      file:
+        name: 1766493789-prometheus_remotew_maxdecodinglenght.yaml
+        checksum: bb651157c1653c5ea4e60125d0774406831b17c7
+    - kind: bug-fix
+      summary: refactor dhcpv4 parsers, fix numerous parsing bugs. The DHCP "router" field is now a list, as is specified in RFC2132.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48414
+      impact: ""
+      action: ""
+      timestamp: 1768328474
+      file:
+        name: 1768328474-refactor-dhcpv4-fix-parsing-bugs.yaml
+        checksum: 8cadfb805eae0565f1336df64997ca20dcaa2666
+    - kind: bug-fix
+      summary: Fix differential results using wrong data source for removed events
+      description: |
+        Fixed two bugs in osquerybeat's differential results handling:
+        1. "removed" events incorrectly read from DiffResults.Added instead of DiffResults.Removed
+        2. Simplified code by removing unnecessary intermediate variable and publishing results directly
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/48438
+      issue:
+        - https://github.com/elastic/beats/issues/48427
+      impact: ""
+      action: ""
+      timestamp: 1768507395
+      file:
+        name: 1768507395-fix-osquerybeat-differential-results.yaml
+        checksum: e71638db7a9e4945c973a2bf7acb3e20600dfd31
+    - kind: bug-fix
+      summary: Enforce region configuration when non_aws_bucket_name is defined for awss3 input
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48534
+      issue:
+        - https://github.com/elastic/beats/issues/47847
+      impact: ""
+      action: ""
+      timestamp: 1769424344
+      file:
+        name: 1769424344-filebeat-awss3-input-fix-region-detection.yaml
+        checksum: 23dbc1a735a4ef42275f3f0184a683526d76c682
+    - kind: bug-fix
+      summary: Clean int overflows and array access in mysql parsers
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48543
+      impact: ""
+      action: ""
+      timestamp: 1769464841
+      file:
+        name: 1769464841-clean-up-mysql-parsers.yaml
+        checksum: ae5dd6835cd8dedd48b9945c4f4021eb01037b08
+    - kind: bug-fix
+      summary: Add int overflow checks to http parser
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48563
+      impact: ""
+      action: ""
+      timestamp: 1769534243
+      file:
+        name: 1769534243-add-int-checks-to-http-parser.yaml
+        checksum: e29cf5aca5360546fef3b4ec024bb2e0b2cbdf2f
+    - kind: other
+      summary: Update OpenTelemetry Collector libraries to v0.144.0/v1.50.0
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/48580
+      impact: ""
+      action: ""
+      timestamp: 1769611981
+      file:
+        name: 1769611981-update-otel-to-01440.yaml
+        checksum: e5ab92350af11608bb5c55971843007c5f765476
+    - kind: bug-fix
+      summary: Adds a missing dependency for Synthetics on wolfi docker image
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48569
+      impact: ""
+      action: ""
+      timestamp: 1769621371
+      file:
+        name: 1769621371-synthetics-add-playwright-dependency-on-wolfi.yaml
+        checksum: af7e1f0817970054e720bf7b42fd3695241c1256
+    - kind: other
+      summary: Bump golang version to 1.24.13.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/48467
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1770134229
+      file:
+        name: 1770134229-bump-golang-12412.yaml
+        checksum: 7f1c54ebd0c256e63cb78aa33bf27d759dff2d05
+    - kind: feature
+      summary: azure-eventhub-managed-identity
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48655
+      issue:
+        - https://github.com/elastic/beats/issues/48680
+      impact: ""
+      action: ""
+      timestamp: 1770154527
+      file:
+        name: 1770154527-azure-eventhub-managed-identity.yaml
+        checksum: 58362cec79498fa4eb84c964b1f68c329206fdb3
+    - kind: enhancement
+      summary: Don't print warning about small files on each file system scan
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48704
+      issue:
+        - https://github.com/elastic/beats/issues/45642
+      impact: ""
+      action: ""
+      timestamp: 1770299686
+      file:
+        name: 1770299686-remove-scan-fingerprint-warning.yaml
+        checksum: ed7bd6fdb447b3f231289df67257b97d20f17bee
+    - kind: bug-fix
+      summary: Fix condition which could report an invalid number of active "otelconsumer" events
+      description: ""
+      component: elastic-agent
+      pr:
+        - https://github.com/elastic/beats/pull/48720
+      issue:
+        - https://github.com/elastic/elastic-agent/issues/12515
+      impact: ""
+      action: ""
+      timestamp: 1770328496
+      file:
+        name: 1770328496-otelconsumer-active-events-fix.yaml
+        checksum: e92c9017910c9e7577365599a0e7e7f1a7c8cbf1
+    - kind: security
+      summary: Update elastic-agent-autodiscover to v0.10.2.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/48817
+      impact: ""
+      action: ""
+      timestamp: 1770853396
+      file:
+        name: 1770853396-bump-elastic-agent-autodiscover-to-v0.10.2.yaml
+        checksum: 6a8a92fcf7d510c121e8eb8e3674f0852a8189c5
+    - kind: bug-fix
+      summary: Fix azure-blob-storage input failing with Storage Blob Data Reader RBAC role
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48886
+      issue:
+        - https://github.com/elastic/beats/issues/48890
+      impact: ""
+      action: ""
+      timestamp: 1771316673
+      file:
+        name: 1771316673-azure-blob-storage-fix-rbac-tags-permission.yaml
+        checksum: a758e97e82f55554d994ec4964301ddfff7eb2a1
