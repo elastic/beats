@@ -43,3 +43,7 @@ func IsRecoverable(err error, isFile bool) bool {
 func mustIgnoreError(err error, api EventLog) bool {
 	return api.IgnoreMissingChannel() && errors.Is(err, win.ERROR_EVT_CHANNEL_NOT_FOUND)
 }
+
+func isChannelNotFound(err error) bool {
+	return errors.Is(err, win.ERROR_EVT_CHANNEL_NOT_FOUND)
+}
