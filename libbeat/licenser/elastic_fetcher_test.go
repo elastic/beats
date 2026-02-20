@@ -131,7 +131,7 @@ func TestParseJSON(t *testing.T) {
 
 		fetcher := NewElasticFetcher(c, logger)
 		_, err := fetcher.Fetch()
-		assert.Equal(t, err.Error(), "unauthorized access, could not connect to the xpack endpoint, verify your credentials")
+		assert.Equal(t, "unauthorized access, could not connect to the xpack endpoint, verify your credentials", err.Error())
 	})
 
 	t.Run("any error from the server", func(t *testing.T) {
@@ -172,7 +172,7 @@ func TestParseJSON(t *testing.T) {
 					return
 				}
 
-				assert.True(t, len(license.UUID) > 0)
+				assert.NotEmpty(t, license.UUID)
 
 				assert.NotNil(t, license.Type)
 				assert.NotNil(t, license.Status)

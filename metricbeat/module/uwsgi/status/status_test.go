@@ -61,14 +61,14 @@ func findItems(mp []mb.Event, key string) []mapstr.M {
 
 func assertTestData(t *testing.T, evt []mb.Event) {
 	totals := findItems(evt, "total")
-	assert.Equal(t, 1, len(totals))
+	assert.Len(t, totals, 1)
 	assert.Equal(t, 2042, totals[0]["requests"])
 	assert.Equal(t, 0, totals[0]["exceptions"])
 	assert.Equal(t, 34, totals[0]["write_errors"])
 	assert.Equal(t, 38, totals[0]["read_errors"])
 
 	workers := findItems(evt, "core")
-	assert.Equal(t, 4, len(workers))
+	assert.Len(t, workers, 4)
 }
 
 func TestFetchDataTCP(t *testing.T) {

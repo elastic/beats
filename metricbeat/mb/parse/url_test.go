@@ -56,8 +56,8 @@ func TestParseURL(t *testing.T) {
 			assert.Equal(t, "unix:///var/lib/docker.sock", hostData.URI)
 			assert.Equal(t, "unix:///var/lib/docker.sock", hostData.SanitizedURI)
 			assert.Equal(t, "/var/lib/docker.sock", hostData.Host)
-			assert.Equal(t, "", hostData.User)
-			assert.Equal(t, "", hostData.Password)
+			assert.Empty(t, hostData.User)
+			assert.Empty(t, hostData.Password)
 		}
 	})
 
@@ -71,8 +71,8 @@ func TestParseURL(t *testing.T) {
 			assert.Equal(t, "http://unix", hostData.URI)
 			assert.Equal(t, "http://unix", hostData.SanitizedURI)
 			assert.Equal(t, "unix", hostData.Host)
-			assert.Equal(t, "", hostData.User)
-			assert.Equal(t, "", hostData.Password)
+			assert.Empty(t, hostData.User)
+			assert.Empty(t, hostData.Password)
 		}
 	})
 
@@ -86,8 +86,8 @@ func TestParseURL(t *testing.T) {
 			assert.Equal(t, "http://unix/apath", hostData.URI)
 			assert.Equal(t, "http://unix/apath", hostData.SanitizedURI)
 			assert.Equal(t, "unix", hostData.Host)
-			assert.Equal(t, "", hostData.User)
-			assert.Equal(t, "", hostData.Password)
+			assert.Empty(t, hostData.User)
+			assert.Empty(t, hostData.Password)
 		}
 	})
 
@@ -101,8 +101,8 @@ func TestParseURL(t *testing.T) {
 			assert.Equal(t, "http://npipe", hostData.URI)
 			assert.Equal(t, "http://npipe", hostData.SanitizedURI)
 			assert.Equal(t, "npipe", hostData.Host)
-			assert.Equal(t, "", hostData.User)
-			assert.Equal(t, "", hostData.Password)
+			assert.Empty(t, hostData.User)
+			assert.Empty(t, hostData.Password)
 		}
 	})
 
@@ -116,8 +116,8 @@ func TestParseURL(t *testing.T) {
 			assert.Equal(t, "http://npipe/apath", hostData.URI)
 			assert.Equal(t, "http://npipe/apath", hostData.SanitizedURI)
 			assert.Equal(t, "npipe", hostData.Host)
-			assert.Equal(t, "", hostData.User)
-			assert.Equal(t, "", hostData.Password)
+			assert.Empty(t, hostData.User)
+			assert.Empty(t, hostData.Password)
 		}
 	})
 
@@ -131,8 +131,8 @@ func TestParseURL(t *testing.T) {
 			assert.Equal(t, "http://npipe/apath", hostData.URI)
 			assert.Equal(t, "http://npipe/apath", hostData.SanitizedURI)
 			assert.Equal(t, "npipe", hostData.Host)
-			assert.Equal(t, "", hostData.User)
-			assert.Equal(t, "", hostData.Password)
+			assert.Empty(t, hostData.User)
+			assert.Empty(t, hostData.Password)
 		}
 	})
 
@@ -143,8 +143,8 @@ func TestParseURL(t *testing.T) {
 			assert.Equal(t, "npipe://./pipe/docker_engine", hostData.URI)
 			assert.Equal(t, "npipe://./pipe/docker_engine", hostData.SanitizedURI)
 			assert.Equal(t, "/pipe/docker_engine", hostData.Host)
-			assert.Equal(t, "", hostData.User)
-			assert.Equal(t, "", hostData.Password)
+			assert.Empty(t, hostData.User)
+			assert.Empty(t, hostData.Password)
 		}
 	})
 
@@ -204,7 +204,7 @@ func TestParseURL(t *testing.T) {
 		if assert.NoError(t, err) {
 			assert.Equal(t, "http://admin:@localhost", h.URI)
 			assert.Equal(t, "admin", h.User)
-			assert.Equal(t, "", h.Password)
+			assert.Empty(t, h.Password)
 		}
 	})
 }

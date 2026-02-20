@@ -217,7 +217,7 @@ func (e *inputTestingEnvironment) requireRegistryEntryCount(expectedCount int) {
 		e.t.Fatalf("error while iterating through registry: %+v", err)
 	}
 
-	require.Equal(e.t, actual, expectedCount)
+	require.Equal(e.t, expectedCount, actual)
 }
 
 // requireOffsetInRegistry checks if the expected offset is set for a file.
@@ -497,7 +497,7 @@ func (e *inputTestingEnvironment) requireEventsReceived(events []string) {
 		}
 	}
 
-	require.Equal(e.t, 0, len(missingEvents),
+	require.Empty(e.t, missingEvents,
 		"following events are missing: %+v", missingEvents)
 }
 

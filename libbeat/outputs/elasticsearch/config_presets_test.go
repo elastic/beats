@@ -40,7 +40,7 @@ func TestApplyPresetNoConflicts(t *testing.T) {
 	// Apply the preset and make sure no conflicts are reported.
 	conflicts, _, err := ApplyPreset(presetThroughput, cfg)
 	require.NoError(t, err, "Valid preset must apply successfully")
-	assert.Equal(t, 0, len(conflicts), "ApplyPreset should report no conflicts from non-preset fields")
+	assert.Empty(t, conflicts, "ApplyPreset should report no conflicts from non-preset fields")
 
 	// Unpack the final config into elasticsearchConfig and verify that both user
 	// and preset fields are set correctly.
@@ -50,7 +50,7 @@ func TestApplyPresetNoConflicts(t *testing.T) {
 
 	// Check basic user params
 	assert.Equal(t, 5, esConfig.MaxRetries, "Non-preset fields should be unchanged by ApplyPreset")
-	assert.Equal(t, true, esConfig.LoadBalance, "Non-preset fields should be unchanged by ApplyPreset")
+	assert.True(t, esConfig.LoadBalance, "Non-preset fields should be unchanged by ApplyPreset")
 
 	// Check basic preset params
 	assert.Equal(t, 1600, esConfig.BulkMaxSize, "Preset fields should be set by ApplyPreset")
@@ -75,7 +75,7 @@ func TestApplyPresetNoConflicts(t *testing.T) {
 	// hosts for each configured worker (which for presetThroughput is 4).
 	hosts, err := outputs.ReadHostList(cfg)
 	require.NoError(t, err, "ReadHostList should succeed")
-	assert.Equal(t, 4, len(hosts), "'throughput' preset should create 4 workers per host")
+	assert.Len(t, hosts, 4, "'throughput' preset should create 4 workers per host")
 	for _, host := range hosts {
 		assert.Equal(t, testHost, host, "Computed hosts should match user config")
 	}
@@ -140,7 +140,7 @@ func TestApplyPresetWithConflicts(t *testing.T) {
 	// hosts for each configured worker (which for presetBalanced is 1).
 	hosts, err := outputs.ReadHostList(cfg)
 	require.NoError(t, err, "ReadHostList should succeed")
-	require.Equal(t, 1, len(hosts), "'balanced' preset should create 1 worker per host")
+	require.Len(t, hosts, 1, "'balanced' preset should create 1 worker per host")
 	assert.Equal(t, testHost, hosts[0])
 }
 
@@ -163,7 +163,7 @@ func TestApplyPresetCustom(t *testing.T) {
 	// Apply the preset and make sure no conflicts are reported.
 	conflicts, _, err := ApplyPreset(presetCustom, cfg)
 	require.NoError(t, err, "Custom preset must apply successfully")
-	assert.Equal(t, 0, len(conflicts), "ApplyPreset should report no conflicts when preset is 'custom'")
+	assert.Empty(t, conflicts, "ApplyPreset should report no conflicts when preset is 'custom'")
 
 	// Unpack the final config into elasticsearchConfig and verify that both user
 	// and preset fields are set correctly.
@@ -194,7 +194,7 @@ func TestApplyPresetCustom(t *testing.T) {
 	// hosts for each configured worker (which in this case means 2).
 	hosts, err := outputs.ReadHostList(cfg)
 	require.NoError(t, err, "ReadHostList should succeed")
-	assert.Equal(t, 2, len(hosts), "'custom' preset should leave worker count unchanged")
+	assert.Len(t, hosts, 2, "'custom' preset should leave worker count unchanged")
 	for _, host := range hosts {
 		assert.Equal(t, testHost, host, "Computed hosts should match user config")
 	}

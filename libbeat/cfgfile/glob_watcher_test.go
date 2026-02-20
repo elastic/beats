@@ -45,12 +45,12 @@ func TestGlobWatcher(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	files, changed, err := gcd.Scan()
-	assert.Equal(t, 2, len(files))
+	assert.Len(t, files, 2)
 	assert.NoError(t, err)
 	assert.True(t, changed)
 
 	files, changed, err = gcd.Scan()
-	assert.Equal(t, 2, len(files))
+	assert.Len(t, files, 2)
 	assert.NoError(t, err)
 	assert.False(t, changed)
 
@@ -58,7 +58,7 @@ func TestGlobWatcher(t *testing.T) {
 	assert.NoError(t, err)
 
 	files, changed, err = gcd.Scan()
-	assert.Equal(t, 3, len(files))
+	assert.Len(t, files, 3)
 	assert.NoError(t, err)
 	assert.True(t, changed)
 
@@ -66,7 +66,7 @@ func TestGlobWatcher(t *testing.T) {
 	assert.NoError(t, err)
 
 	files, changed, err = gcd.Scan()
-	assert.Equal(t, 2, len(files))
+	assert.Len(t, files, 2)
 	assert.NoError(t, err)
 	assert.True(t, changed)
 }

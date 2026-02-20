@@ -104,7 +104,7 @@ condition.equals:
 			appender.Append(test.event)
 
 			cfgs, _ := test.event["config"].([]*conf.C)
-			assert.Equal(t, len(cfgs), 1)
+			assert.Len(t, cfgs, 1)
 
 			out := mapstr.M{}
 			cfgs[0].Unpack(&out)

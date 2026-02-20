@@ -34,6 +34,6 @@ func TestNewClient(t *testing.T) {
 		AuthType:   authPassword,
 		ConfigPath: cfg.Name(),
 	}, http.DefaultClient)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.NotNil(t, c)
 }

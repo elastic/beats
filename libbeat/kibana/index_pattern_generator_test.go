@@ -188,7 +188,7 @@ func testGenerate(t *testing.T, tests []compare, sourceFilters bool) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			assert.Equal(t, len(fieldsExisting), len(fieldsCreated))
+			assert.Len(t, fieldsCreated, len(fieldsExisting))
 			for _, e := range fieldsExisting {
 				idx := find(fieldsCreated, "name", e["name"].(string))
 				assert.NotEqual(t, -1, idx)
@@ -206,7 +206,7 @@ func testGenerate(t *testing.T, tests []compare, sourceFilters bool) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				assert.Equal(t, len(sfExisting), len(sfCreated))
+				assert.Len(t, sfCreated, len(sfExisting))
 				for _, e := range sfExisting {
 					idx := find(sfCreated, "value", e["value"].(string))
 					assert.NotEqual(t, -1, idx)

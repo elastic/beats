@@ -27,7 +27,7 @@ func TestBuildPlatform(t *testing.T) {
 	bp := BuildPlatform{"windows/amd64", 0}
 	assert.Equal(t, "windows", bp.GOOS())
 	assert.Equal(t, "amd64", bp.GOARCH())
-	assert.Equal(t, "", bp.GOARM())
+	assert.Empty(t, bp.GOARM())
 	assert.Equal(t, "amd64", bp.Arch())
 
 	bp = BuildPlatform{"linux/armv7", 0}
@@ -44,15 +44,15 @@ func TestBuildPlatform(t *testing.T) {
 
 	bp = BuildPlatform{"linux", 0}
 	assert.Equal(t, "linux", bp.GOOS())
-	assert.Equal(t, "", bp.GOARCH())
-	assert.Equal(t, "", bp.GOARM())
-	assert.Equal(t, "", bp.Arch())
+	assert.Empty(t, bp.GOARCH())
+	assert.Empty(t, bp.GOARM())
+	assert.Empty(t, bp.Arch())
 	attrs = bp.Attributes()
 	assert.Equal(t, bp.Name, attrs.Name)
 	assert.Equal(t, "linux", attrs.GOOS)
-	assert.Equal(t, "", attrs.GOARCH)
-	assert.Equal(t, "", attrs.GOARM)
-	assert.Equal(t, "", attrs.Arch)
+	assert.Empty(t, attrs.GOARCH)
+	assert.Empty(t, attrs.GOARM)
+	assert.Empty(t, attrs.Arch)
 }
 
 func TestBuildPlatformsListRemove(t *testing.T) {
@@ -108,7 +108,7 @@ func TestBuildPlatformsListFilter(t *testing.T) {
 	assert.Len(t, BuildPlatforms.Filter("!linux/armv7"), len(BuildPlatforms)-1)
 
 	assert.Len(t, BuildPlatforms.Filter("solaris"), 1)
-	assert.Len(t, BuildPlatforms.Defaults().Filter("solaris"), 0)
+	assert.Empty(t, BuildPlatforms.Defaults().Filter("solaris"))
 
 	assert.Len(t, BuildPlatforms.Filter("windows"), 2)
 	assert.Len(t, BuildPlatforms.Filter("windows/386"), 1)
@@ -135,7 +135,7 @@ func TestBuildPlatformsListFilter(t *testing.T) {
 func TestNewPlatformList(t *testing.T) {
 	assert.Len(t, NewPlatformList("+all !linux/armv7"), len(BuildPlatforms)-1)
 	assert.Len(t, NewPlatformList("+solaris"), len(BuildPlatforms.Defaults())+1)
-	assert.Len(t, NewPlatformList("solaris"), 0)
+	assert.Empty(t, NewPlatformList("solaris"))
 	assert.Len(t, NewPlatformList("+all solaris"), 1)
 	assert.Len(t, NewPlatformList("+windows"), len(BuildPlatforms.Defaults()))
 	assert.Len(t, NewPlatformList("+linux/ppc64 !defaults"), 1)

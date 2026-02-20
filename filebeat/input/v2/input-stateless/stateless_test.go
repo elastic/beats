@@ -157,7 +157,7 @@ func TestStateless_Run(t *testing.T) {
 		}), nil)
 
 		err := input.Run(v2.Context{}, connector)
-		require.True(t, errors.Is(err, errOpps))
+		require.ErrorIs(t, err, errOpps)
 		require.Equal(t, int64(0), run.Load())
 	})
 }

@@ -128,7 +128,7 @@ func TestFQDNCallbacks(t *testing.T) {
 	RemoveFQDNOnChangeCallback("cb1")
 	require.Len(t, flags.fqdnCallbacks, 1)
 	RemoveFQDNOnChangeCallback("cb2")
-	require.Len(t, flags.fqdnCallbacks, 0)
+	require.Empty(t, flags.fqdnCallbacks)
 }
 
 func TestFQDNWHileCallbackBlocked(t *testing.T) {

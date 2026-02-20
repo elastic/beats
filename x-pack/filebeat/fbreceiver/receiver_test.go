@@ -97,7 +97,7 @@ func TestNewReceiver(t *testing.T) {
 			}, "failed to connect to monitoring socket, inputs endpoint, last error was: %s", &lastError)
 			assert.Condition(c, func() bool {
 				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors")
-				assert.Len(c, processorsLoaded.All(), 0, "processors loaded but none expected")
+				assert.Empty(c, processorsLoaded.All(), "processors loaded but none expected")
 				// Check that add_host_metadata enrichment is not done.
 				return assert.NotContains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
@@ -266,7 +266,7 @@ func TestMultipleReceivers(t *testing.T) {
 			for _, helper := range helpers {
 				writeFile(c, helper.ingest, "A log line")
 
-				require.Greaterf(c, len(logs[helper.name]), 0, "receiver %v does not have any logs", helper)
+				require.NotEmptyf(c, logs[helper.name], "receiver %v does not have any logs", helper)
 
 				assert.Equalf(c, "test", logs[helper.name][0].Flatten()["message"], "expected %v message field to be 'test'", helper)
 

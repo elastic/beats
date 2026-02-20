@@ -362,7 +362,7 @@ func TestDockerJSON(t *testing.T) {
 			}
 
 			if err == nil {
-				assert.EqualValues(t, test.expectedMessage, message)
+				assert.Equal(t, test.expectedMessage, message)
 			} else {
 				assert.Equal(t, test.expectedMessage.Bytes, message.Bytes)
 			}

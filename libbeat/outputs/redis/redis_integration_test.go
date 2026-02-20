@@ -297,7 +297,7 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 
 	// validate
 	assert.NoError(t, pubErr)
-	assert.Equal(t, total, len(messages))
+	assert.Len(t, messages, total)
 	for i, raw := range messages {
 		evt := struct{ Message int }{}
 		if _, hasFmt := cfg["codec.format.string"]; hasFmt {

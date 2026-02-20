@@ -116,7 +116,7 @@ func TestExcludeMetadata(t *testing.T) {
 
 	// verify that key1 is not included in the tasks metadata
 	exists, err := tasks[0].HasKey("key1")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.False(t, exists)
 }
 

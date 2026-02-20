@@ -210,7 +210,7 @@ output.console:
 
 func matchPublishedLines(t *testing.T, got []byte, want []string) {
 	gotLines := strings.Split(strings.TrimSpace(string(got)), "\n")
-	assert.Equal(t, len(want), len(gotLines), "unexpected number of events")
+	assert.Len(t, gotLines, len(want), "unexpected number of events")
 
 	linesToMatch := min(len(want), len(gotLines))
 

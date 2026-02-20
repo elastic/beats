@@ -230,7 +230,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	// count isn't negative.
 	time.Sleep(10 * time.Millisecond)
 	q.Close(false)
-	assert.False(t, activeEvents.Load() < 0, "active event count should never be negative")
+	assert.GreaterOrEqual(t, activeEvents.Load(), int64(0), "active event count should never be negative")
 }
 
 func TestDoubleClose(t *testing.T) {

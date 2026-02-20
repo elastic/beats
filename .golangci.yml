@@ -24,6 +24,7 @@ linters:
     - noctx
     - nolintlint
     - staticcheck
+    - testifylint
     - unconvert
     - unused
     - wastedassign
@@ -116,6 +117,10 @@ linters:
       checks:
         - -ST1005
         - all
+    testifylint:
+      disable:
+        - go-require # Disabled: too many false positives, can be used to exit a goroutine
+        - require-error # Disabled: using assert for error checks lets the test continue, maximizing context on failure
   exclusions:
     generated: lax
     presets:
