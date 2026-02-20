@@ -48,6 +48,7 @@ const (
 
 var (
 	errFileTooSmall = errors.New("file size is too small for ingestion")
+	errFileEmpty    = errors.New("file is empty")
 )
 
 // fileWatcherConfig is the prospector.scanner configuration
@@ -503,6 +504,9 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 			}
 
 			fd, err := s.toFileDescriptor(&it)
+			if errors.Is(err, errFileEmpty) {
+				continue
+			}
 			if errors.Is(err, errFileTooSmall) {
 				if s.smallFilesWarned.CompareAndSwap(false, true) {
 					s.log.Warnf("ingestion from some files will be delayed, files need to be at "+
@@ -663,6 +667,9 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 
 		dataSize, err = file.Seek(minSize, io.SeekStart)
 		if errors.Is(err, io.EOF) {
+			if dataSize == 0 {
+				return fd, errFileEmpty
+			}
 			return fd, fmt.Errorf(
 				"filesize is %d bytes, expected at least %d bytes for fingerprinting: %w",
 				dataSize, minSize, errFileTooSmall)
@@ -674,6 +681,9 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		}
 	} else {
 		dataSize = it.info.Size()
+		if dataSize == 0 {
+			return fd, errFileEmpty
+		}
 		if dataSize < minSize {
 			return fd, fmt.Errorf(
 				"filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w",
