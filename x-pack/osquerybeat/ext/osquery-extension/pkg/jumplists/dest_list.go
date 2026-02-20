@@ -17,6 +17,7 @@ import (
 	"unicode/utf16"
 
 	"github.com/Microsoft/go-winio/pkg/guid"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
