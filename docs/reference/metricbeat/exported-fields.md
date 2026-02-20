@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -65,7 +66,6 @@ This document describes the fields that are exported by Metricbeat. They are gro
 * [*MySQL fields*](/reference/metricbeat/exported-fields-mysql.md)
 * [*NATS fields*](/reference/metricbeat/exported-fields-nats.md)
 * [*Nginx fields*](/reference/metricbeat/exported-fields-nginx.md)
-* [*openai fields*](/reference/metricbeat/exported-fields-openai.md)
 * [*Openmetrics fields*](/reference/metricbeat/exported-fields-openmetrics.md)
 * [*Oracle fields*](/reference/metricbeat/exported-fields-oracle.md)
 * [*Panw fields*](/reference/metricbeat/exported-fields-panw.md)

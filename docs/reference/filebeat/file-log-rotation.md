@@ -3,11 +3,12 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/file-log-rotation.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Log rotation results in lost or duplicate events [file-log-rotation]
 
-Filebeat supports reading from rotating log files. However, some log rotation strategies can result in lost or duplicate events when using Filebeat to forward messages. To avoid this issue:
+Filebeat supports reading from rotating log files, [including GZIP compressed files](/reference/filebeat/filebeat-input-filestream.md#reading-gzip-files). However, some log rotation strategies can result in lost or duplicate events when using Filebeat to forward messages. To avoid this issue:
 
 * **Be careful when changing the default file identity of the `filestream` input**
 

@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // NewConditional returns a constructor suitable for registering when conditionals as a plugin.
@@ -77,6 +78,14 @@ func (r *WhenProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	return r.p.Run(event)
 }
 
+func (r *WhenProcessor) SetPaths(paths *paths.Path) error {
+	pathSetter, ok := r.p.(PathSetter)
+	if ok {
+		return pathSetter.SetPaths(paths)
+	}
+	return nil
+}
+
 func (r *WhenProcessor) String() string {
 	return fmt.Sprintf("%v, condition=%v", r.p.String(), r.condition.String())
 }
@@ -86,7 +95,7 @@ func (r *WhenProcessor) String() string {
 // processors, one with `Close` and one without.  The decision of
 // which to return is determined if the underlying processors require
 // `Close`.  This is useful because some places in the code base
-// (eg. javascript processors) require stateless processors (no Close
+// (e.g. javascript processors) require stateless processors (no Close
 // method).
 type ClosingWhenProcessor struct {
 	WhenProcessor
@@ -199,6 +208,27 @@ func (p *IfThenElseProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
+func (p *IfThenElseProcessor) SetPaths(paths *paths.Path) error {
+	var err error
+	for _, proc := range p.then.List {
+		if procWithSet, ok := proc.(PathSetter); ok {
+			err = errors.Join(err, procWithSet.SetPaths(paths))
+		}
+	}
+
+	if p.els == nil {
+		return err
+	}
+
+	for _, proc := range p.els.List {
+		if procWithSet, ok := proc.(PathSetter); ok {
+			err = errors.Join(err, procWithSet.SetPaths(paths))
+		}
+	}
+
+	return err
+}
+
 func (p *IfThenElseProcessor) String() string {
 	var sb strings.Builder
 	sb.WriteString("if ")
@@ -228,6 +258,10 @@ func (citep *ClosingIfThenElseProcessor) Close() error {
 	for _, proc := range citep.then.List {
 		err = errors.Join(err, Close(proc))
 	}
+	if citep.els == nil {
+		return err
+	}
+
 	for _, proc := range citep.els.List {
 		err = errors.Join(err, Close(proc))
 	}

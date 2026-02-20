@@ -6,6 +6,7 @@ package otelconsumer
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
@@ -13,16 +14,17 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/x-pack/otel/otelctx"
+	"github.com/elastic/beats/v7/x-pack/otel/otelmap"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
+	"go.opentelemetry.io/collector/exporter/exporterhelper"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver/receivertest"
@@ -31,10 +33,6 @@ import (
 const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
-	// otelComponentIDKey is the key used to store the Beat receiver's component id in the beat event.
-	otelComponentIDKey = "otelcol.component.id"
-	// otelComponentKindKey is the key used to store the Beat receiver's component kind in the beat event. This is always "receiver".
-	otelComponentKindKey = "otelcol.component.kind"
 )
 
 func init() {
@@ -89,9 +87,16 @@ func (out *otelConsumer) Publish(ctx context.Context, batch publisher.Batch) err
 
 func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch) error {
 	st := out.observer
+	events := batch.Events()
+	st.NewBatch(len(events))
+
 	pLogs := plog.NewLogs()
 	resourceLogs := pLogs.ResourceLogs().AppendEmpty()
 	sourceLogs := resourceLogs.ScopeLogs().AppendEmpty()
+
+	// add bodymap mapping mode on scope attributes
+	sourceLogs.Scope().Attributes().PutStr("elastic.mapping.mode", "bodymap")
+
 	logRecords := sourceLogs.LogRecords()
 
 	// Convert the batch of events to Otel plog.Logs. The encoding we
@@ -101,7 +106,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	// destination, as long as the exporter allows it.
 	// For example, the elasticsearchexporter has an encoding specifically for this.
 	// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/35444.
-	events := batch.Events()
 	for _, event := range events {
 		logRecord := logRecords.AppendEmpty()
 
@@ -125,7 +129,14 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 		}
 
-		beatEvent := event.Content.Fields
+		// if pipeline field is set on event metadata
+		if pipeline, err := event.Content.Meta.GetValue("pipeline"); err == nil {
+			if s, ok := pipeline.(string); ok {
+				logRecord.Attributes().PutStr("elasticsearch.ingest_pipeline", s)
+			}
+		}
+
+		beatEvent := event.Content.Fields.Clone()
 		if beatEvent == nil {
 			beatEvent = mapstr.M{}
 		}
@@ -145,15 +156,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 		}
 		logRecord.SetObservedTimestamp(observedTimestamp)
-
-		if agent, _ := beatEvent.GetValue("agent"); agent != nil {
-			switch agent := agent.(type) {
-			case mapstr.M:
-				agent[otelComponentIDKey] = out.beatInfo.ComponentID
-				agent[otelComponentKindKey] = "receiver"
-				beatEvent["agent"] = agent
-			}
-		}
 
 		otelmap.ConvertNonPrimitive(beatEvent)
 
@@ -193,12 +195,15 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Retry()
 		}
 
-		out.log.Errorf("failed to send batch events to otel collector: %v", err)
+		// Queue full errors are expected backpressure signals, not true errors.
+		// Skip logging to avoid log spam since we already track this via metrics.
+		if !errors.Is(err, exporterhelper.ErrQueueIsFull) {
+			out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
+		}
 		return nil
 	}
 
 	batch.ACK()
-	st.NewBatch(len(events))
 	st.AckedEvents(len(events))
 	return nil
 }

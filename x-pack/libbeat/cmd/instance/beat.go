@@ -7,6 +7,7 @@ package instance
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"go.opentelemetry.io/collector/consumer"
@@ -24,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
+	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -38,8 +39,20 @@ import (
 // input type.
 const receiverPublisherCloseTimeout = 5 * time.Second
 
+var fqdnOnce = sync.OnceValues(func() (string, error) {
+	h, err := sysinfo.Host()
+	if err != nil {
+		return "", fmt.Errorf("failed to get host information: %w", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	return h.FQDNWithContext(ctx)
+})
+
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
-func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, useDefaultProcessors bool, consumer consumer.Logs, componentID string, core zapcore.Core) (*instance.Beat, error) {
+func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, consumer consumer.Logs, componentID string, core zapcore.Core) (*instance.Beat, error) {
 	b, err := instance.NewBeat(settings.Name,
 		settings.IndexPrefix,
 		settings.Version,
@@ -63,6 +76,24 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		ucfg.PathSep("."),
 		ucfg.ResolveEnv,
 		ucfg.VarExp,
+	}
+
+	err = setLogger(b, receiverConfig, core)
+	if err != nil {
+		return nil, fmt.Errorf("error configuring beats logger: %w", err)
+	}
+
+	// extracting it here for ease of use
+	logger := b.Info.Logger
+
+	// if output is set and if output is not otelconsumer, inform users
+	if receiverConfig["output"] != nil && receiverConfig["output"].(map[string]any)["otelconsumer"] == nil { //nolint: errcheck // output will always be of map type
+		logger.Debugf("configured output does not work with beatreceiver, please use appropriate exporter instead")
+	}
+
+	// all beatreceivers will use otelconsumer output by default
+	receiverConfig["output"] = map[string]any{
+		"otelconsumer": map[string]any{},
 	}
 
 	tmp, err := ucfg.NewFrom(receiverConfig, cfOpts...)
@@ -129,35 +160,11 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, fmt.Errorf("error unpacking config data: %w", err)
 	}
 
-	logpConfig := logp.Config{}
-	logpConfig.AddCaller = true
-	logpConfig.Beat = b.Info.Beat
-	logpConfig.Files.MaxSize = 1
-
-	if b.Config.Logging == nil {
-		b.Config.Logging = config.NewConfig()
-	}
-
-	if err := b.Config.Logging.Unpack(&logpConfig); err != nil {
-		return nil, fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
-	}
-
-	b.Info.Logger, err = logp.ConfigureWithCoreLocal(logpConfig, core)
-	if err != nil {
-		return nil, fmt.Errorf("error configuring beats logp: %w", err)
-	}
-	// extracting it here for ease of use
-	logger := b.Info.Logger
-
 	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version, logger)
 	if err != nil {
 		return nil, fmt.Errorf("error setting up instrumentation: %w", err)
 	}
 	b.Instrumentation = instrumentation
-
-	if err := instance.PromoteOutputQueueSettings(b); err != nil {
-		return nil, fmt.Errorf("could not promote output queue settings: %w", err)
-	}
 
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return nil, fmt.Errorf("could not parse features: %w", err)
@@ -186,15 +193,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
 	// Try to get the host's FQDN and set it.
-	h, err := sysinfo.Host()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get host information: %w", err)
-	}
-
-	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
-
-	fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
+	fqdn, err := fqdnOnce()
 	if err != nil {
 		// FQDN lookup is "best effort".  We log the error, fallback to
 		// the OS-reported hostname, and move on.
@@ -250,7 +249,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, fmt.Errorf("error setting index supporter: %w", err)
 	}
 
-	b.Info.UseDefaultProcessors = useDefaultProcessors
 	processingFactory := settings.Processing
 	if processingFactory == nil {
 		processingFactory = processing.MakeDefaultBeatSupport(true)
@@ -261,17 +259,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, fmt.Errorf("error creating processors: %w", err)
 	}
 	b.SetProcessors(processors)
-
-	// This should be replaced with static config for otel consumer
-	// but need to figure out if we want the Queue settings from here.
-	outputEnabled := b.Config.Output.IsSet() && b.Config.Output.Config().Enabled()
-	if !outputEnabled {
-		if b.Manager.Enabled() {
-			logger.Info("Output is configured through Central Management")
-		} else {
-			return nil, fmt.Errorf("no outputs are defined, please define one under the output section")
-		}
-	}
 
 	reg := b.Monitoring.StatsRegistry().GetOrCreateRegistry("libbeat")
 
@@ -289,6 +276,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		InputQueueSize: b.InputQueueSize,
 		WaitCloseMode:  pipeline.WaitOnPipelineCloseThenForce,
 		WaitClose:      receiverPublisherCloseTimeout,
+		Paths:          b.Paths,
 	}
 	publisher, err := pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, pipelineSettings)
 	if err != nil {
@@ -298,4 +286,31 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	b.Publisher = publisher
 
 	return b, nil
+}
+
+// setLogger configures a logp logger and sets it on b.Info.Logger
+func setLogger(b *instance.Beat, receiverConfig map[string]any, core zapcore.Core) error {
+	var err error
+	logpConfig := logp.Config{}
+	logpConfig.AddCaller = true
+	logpConfig.Beat = b.Info.Beat
+	logpConfig.Files.MaxSize = 1
+
+	var logCfg *config.C
+	if _, ok := receiverConfig["logging"]; !ok {
+		logCfg = config.NewConfig()
+	} else {
+		logCfg = config.MustNewConfigFrom(receiverConfig["logging"])
+	}
+
+	if err := logCfg.Unpack(&logpConfig); err != nil {
+		return fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
+	}
+
+	b.Info.Logger, err = logp.ConfigureWithCoreLocal(logpConfig, core)
+	if err != nil {
+		return fmt.Errorf("error configuring beats logp: %w", err)
+	}
+
+	return nil
 }

@@ -16,10 +16,10 @@ import (
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
-// Docker starts docker-compose and waits for the services to be healthy. It returns
-// a clean-up function that will conditionally stop the services, and log the docker-compose
+// Docker starts docker compose and waits for the services to be healthy. It returns
+// a clean-up function that will conditionally stop the services, and log the docker compose
 // output to the directory specified by root, with filename TEST-elasticsearch-<target>.log.
-// If verbose is true, stderr from docker-compose is passed to the test process' stderr.
+// If verbose is true, stderr from docker compose is passed to the test process' stderr.
 // Docker is aware of STACK_ENVIRONMENT, DOCKER_NOCACHE and DOCKER_PULL.
 func Docker(root, target string, verbose bool) (done func(stop bool) error, env map[string]string, _ error) {
 	esBeatsDir, err := devtools.ElasticBeatsDir()
@@ -51,7 +51,7 @@ func Docker(root, target string, verbose bool) (done func(stop bool) error, env 
 
 		err = saveLogs(env, root, target)
 		if err != nil {
-			fmt.Fprintf(os.Stdout, "failed to save docker-compose logs: %s\n", err)
+			fmt.Fprintf(os.Stdout, "failed to save docker compose logs: %s\n", err)
 		}
 		if !stop {
 			return nil
@@ -78,13 +78,14 @@ func saveLogs(env map[string]string, root, target string) error {
 		env,
 		f, // stdout
 		f, // stderr
-		"docker-compose",
+		"docker",
+		"compose",
 		"-p", devtools.DockerComposeProjectName(),
 		"logs",
 		"--no-color",
 	)
 	if err != nil {
-		return fmt.Errorf("executing docker-compose logs: %w", err)
+		return fmt.Errorf("executing docker compose logs: %w", err)
 	}
 	return nil
 }
@@ -113,14 +114,13 @@ services:
 `
 )
 
-// dockerCompose runs docker-compose with the provided environment.
+// dockerCompose runs docker compose with the provided environment.
 // It is aware of DOCKER_NOCACHE and DOCKER_PULL. If verbose is true
-// the stderr output of docker-compose is written to the terminal.
+// the stderr output of docker compose is written to the terminal.
 func dockerCompose(env map[string]string, verbose bool) error {
 	args := []string{
 		"-p", devtools.DockerComposeProjectName(),
 		"build",
-		"--force-rm",
 	}
 	if _, noCache := os.LookupEnv("DOCKER_NOCACHE"); noCache {
 		args = append(args, "--no-cache")
@@ -140,7 +140,7 @@ func dockerCompose(env map[string]string, verbose bool) error {
 			env,
 			out,
 			os.Stderr,
-			"docker-compose", args...,
+			"docker", append([]string{"compose"}, args...)...,
 		)
 		if err == nil {
 			break

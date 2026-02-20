@@ -108,6 +108,8 @@ var logInputExclusiveKeys = []string{
 	"recursive_glob.enabled",
 	"scan",
 	"scan_frequency",
+	"stream",
+	"format",
 	"symlinks",
 	"tail_files",
 }
@@ -329,6 +331,59 @@ func handleJSON(logger *logp.Logger, cfg *config.C, parsers *[]any) error {
 	return nil
 }
 
+func handleContainerInput(cfg, newCfg *config.C, parsers *[]any) error {
+	inputType, err := cfg.String("type", -1)
+	if err != nil {
+		return fmt.Errorf("cannot read 'type' as string: %w", err)
+	}
+
+	if inputType != "container" {
+		return nil
+	}
+
+	stream := "all"
+	if cfg.HasField("stream") {
+		value, err := cfg.String("stream", -1)
+		if err != nil {
+			return fmt.Errorf("cannot read 'stream' as string: %w", err)
+		}
+		stream = value
+
+		if value != "all" {
+			if err := newCfg.SetString("take_over.stream", -1, stream); err != nil {
+				return fmt.Errorf("cannot set 'take_over.stream': %w", err)
+			}
+		}
+	}
+
+	format := "auto"
+	if cfg.HasField("format") {
+		value, err := cfg.String("format", -1)
+		if err != nil {
+			return fmt.Errorf("cannot read 'format' as string: %w", err)
+		}
+		format = value
+	}
+
+	containerCfg := config.NewConfig()
+	if err := containerCfg.SetString("stream", -1, stream); err != nil {
+		return fmt.Errorf("cannot set container stream: %w", err)
+	}
+	if err := containerCfg.SetString("format", -1, format); err != nil {
+		return fmt.Errorf("cannot set container format: %w", err)
+	}
+
+	*parsers = append(*parsers, map[string]any{
+		"container": containerCfg,
+	})
+
+	if err := newCfg.SetBool("prospector.scanner.symlinks", -1, true); err != nil {
+		return fmt.Errorf("cannot set 'prospector.scanner.symlinks': %w", err)
+	}
+
+	return nil
+}
+
 // copyParsers copies any existing 'parsers' from cfg into parsersCfg.
 // offset is the offset in parsersCfg to start adding the new ones.
 func copyParsers(cfg, parsersCfg *config.C, offset int) error {
@@ -362,11 +417,16 @@ func copyParsers(cfg, parsersCfg *config.C, offset int) error {
 // and finally copies any other parsers, if any, at the end of the array.
 func handleParsers(logger *logp.Logger, cfg, newCfg *config.C) error {
 	parsers := []any{}
-	if err := handleMultiline(logger, cfg, &parsers); err != nil {
+
+	if err := handleContainerInput(cfg, newCfg, &parsers); err != nil {
 		return err
 	}
 
 	if err := handleJSON(logger, cfg, &parsers); err != nil {
+		return err
+	}
+
+	if err := handleMultiline(logger, cfg, &parsers); err != nil {
 		return err
 	}
 

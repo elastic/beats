@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/osquery/osquery-go/plugin/table"
 )
 
 type EncodingFlag int
@@ -82,6 +84,34 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 			continue
 		}
 
+		tag := fieldType.Tag.Get("osquery")
+
+		// Handle embedded structs
+		// If a struct has an embedded struct, the field will be marked as anonymous
+		// and the tag will be empty.  We need to recurse into the embedded struct and merge the results.
+		if fieldType.Anonymous && tag == "" {
+			// Handle pointer to struct if necessary
+			if fieldValue.Kind() == reflect.Ptr {
+				if fieldValue.IsNil() {
+					continue
+				}
+				fieldValue = fieldValue.Elem()
+			}
+
+			// Only recurse if it's a struct
+			if fieldValue.Kind() == reflect.Struct {
+				embeddedMap, err := MarshalToMapWithFlags(fieldValue.Interface(), flags)
+				if err != nil {
+					return nil, err
+				}
+				// Merge the embedded results into the current map
+				for k, v := range embeddedMap {
+					result[k] = v
+				}
+				continue // Skip the rest of the loop for this field
+			}
+		}
+
 		key := fieldType.Tag.Get("osquery")
 		switch key {
 		case "-":
@@ -99,6 +129,118 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 	}
 
 	return result, nil
+}
+
+func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
+	if in == nil {
+		return nil, fmt.Errorf("input cannot be nil")
+	}
+
+	t := reflect.TypeOf(in)
+
+	var columns []table.ColumnDefinition
+
+	// Handle pointer types by unwrapping to get the underlying type
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
+	if t.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("unsupported type: %s, must be a struct or pointer to struct", t.Kind())
+	}
+
+	for i := 0; i < t.NumField(); i++ {
+		fieldType := t.Field(i)
+
+		if !fieldType.IsExported() {
+			continue
+		}
+
+		tag := fieldType.Tag
+		key := tag.Get("osquery")
+
+		// Handle embedded structs
+		// If a struct has an embedded struct, the field will be marked as anonymous
+		// and the tag will be empty. We need to recurse into the embedded struct and merge the results.
+		if fieldType.Anonymous && key == "" {
+			// Get the embedded struct type, handling pointer to struct if necessary
+			embeddedType := fieldType.Type
+			if embeddedType.Kind() == reflect.Ptr {
+				embeddedType = embeddedType.Elem()
+			}
+
+			// Only recurse if it's a struct
+			if embeddedType.Kind() == reflect.Struct {
+				// Create a zero value of the embedded type to pass to GenerateColumnDefinitions
+				// GenerateColumnDefinitions handles pointers, so we can pass either a pointer or value
+				embeddedValue := reflect.New(embeddedType).Elem().Interface()
+				embeddedColumns, err := GenerateColumnDefinitions(embeddedValue)
+				if err != nil {
+					return nil, err
+				}
+				// Append the embedded columns to the current columns list
+				columns = append(columns, embeddedColumns...)
+				continue // Skip the rest of the loop for this field
+			}
+		}
+
+		switch key {
+		case "-":
+			continue
+		case "":
+			key = fieldType.Name
+		}
+
+		// Determine column type based on Go type
+		var column table.ColumnDefinition
+		fieldKind := fieldType.Type.Kind()
+
+		// Handle pointer types by unwrapping to get the underlying type
+		if fieldKind == reflect.Ptr {
+			fieldKind = fieldType.Type.Elem().Kind()
+		}
+
+		switch fieldKind {
+		case reflect.String:
+			column = table.TextColumn(key)
+
+		case reflect.Bool:
+			column = table.IntegerColumn(key)
+
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32,
+			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32:
+			column = table.IntegerColumn(key)
+
+		case reflect.Int64, reflect.Uint64:
+			column = table.BigIntColumn(key)
+
+		case reflect.Float32, reflect.Float64:
+			column = table.DoubleColumn(key)
+
+		case reflect.Struct:
+			// Handle time.Time type
+			switch fieldType.Type {
+			case reflect.TypeOf(time.Time{}):
+				if timeFormat, ok := tag.Lookup("format"); ok {
+					switch strings.ToLower(timeFormat) {
+					case "unix", "unixnano", "unixmilli", "unixmicro":
+						column = table.BigIntColumn(key)
+					default:
+						column = table.TextColumn(key)
+					}
+				} else {
+					column = table.TextColumn(key)
+				}
+			}
+		default:
+			// we default to table.TextColumn for unsupported types
+			column = table.TextColumn(key)
+		}
+
+		columns = append(columns, column)
+	}
+
+	return columns, nil
 }
 
 // convertValueToStringWithTag converts a reflect.Value to a string, handling pointers,
@@ -171,78 +313,87 @@ func convertValueToStringWithTag(fieldValue reflect.Value, flag EncodingFlag, ta
 	}
 }
 
+var timeLayouts = map[string]string{
+	"rfc3339":     time.RFC3339,
+	"rfc3339nano": time.RFC3339Nano,
+	"rfc822":      time.RFC822,
+	"rfc822z":     time.RFC822Z,
+	"rfc850":      time.RFC850,
+	"rfc1123":     time.RFC1123,
+	"rfc1123z":    time.RFC1123Z,
+	"kitchen":     time.Kitchen,
+	"stamp":       time.Stamp,
+	"stampmilli":  time.StampMilli,
+	"stampmicro":  time.StampMicro,
+	"stampnano":   time.StampNano,
+}
+
 // formatTimeWithTagFormat formats a time.Time value with the specified format
 // and timezone conversion if specified in the tag.
 func formatTimeWithTagFormat(fieldValue reflect.Value, flag EncodingFlag, tag *reflect.StructTag) (string, error) {
-	// Check if the value is zero and the flag is not set to use numbers zero values
-	if !flag.has(EncodingFlagUseNumbersZeroValues) && fieldValue.IsZero() {
-		return "", nil
-	}
-
+	// Get the time.Time value from the field value
 	t, ok := fieldValue.Interface().(time.Time)
 	if !ok {
 		return "", fmt.Errorf("expected time.Time value but got %v", fieldValue.Type())
 	}
 
-	// If no tag is specified, use the default format
+	// If time is zero and the flag is not set to use numbers zero values, return empty string
+	if t.IsZero() && !flag.has(EncodingFlagUseNumbersZeroValues) {
+		return "", nil
+	}
+
+	// If no tag is specified, format the time using the default format
 	if tag == nil {
 		return t.Format(DefaultTimeFormat), nil
 	}
 
-	// Handle timezone conversion if specified in tag
+	// Get the timezone from the tag
+	timezone := DefaultTimezone
 	if tz, ok := tag.Lookup("tz"); ok {
-		loc, err := time.LoadLocation(tz)
-		if err != nil {
-			return "", fmt.Errorf("invalid timezone %s: %w", tz, err)
+		timezone = tz
+	}
+	loc, err := time.LoadLocation(timezone)
+	if err != nil {
+		return "", fmt.Errorf("invalid timezone %s: %w", timezone, err)
+	}
+	t = t.In(loc)
+
+	// if the format tag is specified, format the time using the specified format
+	if formatTag, ok := tag.Lookup("format"); ok {
+
+		// lower the format tag to make it case insensitive
+		format := strings.ToLower(formatTag)
+
+		// unix time formats require special handling, they are not a time layout
+		// and must be handled with a string conversion.
+		if strings.HasPrefix(format, "unix") {
+			// If the time is zero, return "0" for all unix time formats.
+			// Because osquery (sqlite) expects a zero unix timestamp to be represented as "0".
+			// If we don't handle this case, go will return the unix equivalent of go zero time (0001-01-01 00:00:00 +0000 UTC),
+			// which would result in a negative unix timestamp.
+			if t.IsZero() {
+				return "0", nil
+			}
+			switch format {
+			case "unix":
+				return strconv.FormatInt(t.Unix(), 10), nil
+			case "unixnano":
+				return strconv.FormatInt(t.UnixNano(), 10), nil
+			case "unixmilli":
+				return strconv.FormatInt(t.UnixMilli(), 10), nil
+			case "unixmicro":
+				return strconv.FormatInt(t.UnixMicro(), 10), nil
+			default:
+				return "", fmt.Errorf("unsupported unix time format: %s", format)
+			}
 		}
-		t = t.In(loc)
-	} else {
-		loc, err := time.LoadLocation(DefaultTimezone)
-		if err != nil {
-			return "", fmt.Errorf("invalid default timezone %s: %w", DefaultTimezone, err)
+
+		if layout, ok := timeLayouts[format]; ok {
+			return t.Format(layout), nil
 		}
-		t = t.In(loc)
+		return "", fmt.Errorf("unsupported time format: %s", format)
 	}
 
-	var result string
-	if timeFormat, ok := tag.Lookup("format"); ok {
-		switch strings.ToLower(timeFormat) {
-		case "unix":
-			result = strconv.FormatInt(t.Unix(), 10)
-		case "unixnano":
-			result = strconv.FormatInt(t.UnixNano(), 10)
-		case "unixmilli":
-			result = strconv.FormatInt(t.UnixMilli(), 10)
-		case "unixmicro":
-			result = strconv.FormatInt(t.UnixMicro(), 10)
-		case "rfc3339":
-			result = t.Format(time.RFC3339)
-		case "rfc3339nano":
-			result = t.Format(time.RFC3339Nano)
-		case "rfc822":
-			result = t.Format(time.RFC822)
-		case "rfc822z":
-			result = t.Format(time.RFC822Z)
-		case "rfc850":
-			result = t.Format(time.RFC850)
-		case "rfc1123":
-			result = t.Format(time.RFC1123)
-		case "rfc1123z":
-			result = t.Format(time.RFC1123Z)
-		case "kitchen":
-			result = t.Format(time.Stamp)
-		case "stampmilli":
-			result = t.Format(time.StampMilli)
-		case "stampmicro":
-			result = t.Format(time.StampMicro)
-		case "stampnano":
-			result = t.Format(time.StampNano)
-		default:
-			return "", fmt.Errorf("unsupported time format: %s", timeFormat)
-		}
-	} else {
-		result = t.Format(time.RFC3339)
-	}
-
-	return result, nil
+	// If no format is specified, format the time using the default format
+	return t.Format(DefaultTimeFormat), nil
 }

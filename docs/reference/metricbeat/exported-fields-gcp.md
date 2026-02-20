@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-gcp.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -85,6 +86,42 @@ Google Cloud Billing metrics
 :   The charged price for usage of the Google Cloud SKUs and SKU tiers. Reflects contract pricing if applicable, otherwise, it's the list price.
 
     type: float
+
+
+**`gcp.billing.usage_start_time`** {applies_to}`stack: beta 9.2.1`
+:   The start time of the usage period for this billing record.
+
+    type: date
+
+
+**`gcp.billing.usage_end_time`** {applies_to}`stack: beta 9.2.1`
+:   The end time of the usage period for this billing record.
+
+    type: date
+
+
+**`gcp.billing.location.region`** {applies_to}`stack: beta 9.2.1`
+:   The geographic region where the resource was used (e.g., us-central1, europe-west1).
+
+    type: keyword
+
+
+**`gcp.billing.location.zone`** {applies_to}`stack: beta 9.2.1`
+:   The specific zone within the region (e.g., us-central1-a).
+
+    type: keyword
+
+
+**`gcp.billing.location.country`** {applies_to}`stack: beta 9.2.1`
+:   The country code for the resource location (e.g., US, GB).
+
+    type: keyword
+
+
+**`gcp.billing.labels`** {applies_to}`stack: beta 9.2.1`
+:   Resource labels as key-value pairs. Labels are user-defined metadata that can be attached to GCP resources.
+
+    type: object
 
 
 ## carbon [_carbon]

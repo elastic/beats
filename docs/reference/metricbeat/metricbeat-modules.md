@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-modules.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -58,7 +59,6 @@ This section contains detailed information about the metric collecting modules c
 | [MySQL](/reference/metricbeat/metricbeat-module-mysql.md) | ![Prebuilt dashboards are available](images/icon-yes.png "") | [galera_status](/reference/metricbeat/metricbeat-metricset-mysql-galera_status.md) {applies_to}`stack: beta`<br>[performance](/reference/metricbeat/metricbeat-metricset-mysql-performance.md) {applies_to}`stack: beta`<br>[query](/reference/metricbeat/metricbeat-metricset-mysql-query.md) {applies_to}`stack: beta`<br>[status](/reference/metricbeat/metricbeat-metricset-mysql-status.md) |
 | [NATS](/reference/metricbeat/metricbeat-module-nats.md) | ![Prebuilt dashboards are available](images/icon-yes.png "") | [connection](/reference/metricbeat/metricbeat-metricset-nats-connection.md)<br>[connections](/reference/metricbeat/metricbeat-metricset-nats-connections.md)<br>[jetstream](/reference/metricbeat/metricbeat-metricset-nats-jetstream.md) {applies_to}`stack: beta 9.1.0`<br>[route](/reference/metricbeat/metricbeat-metricset-nats-route.md)<br>[routes](/reference/metricbeat/metricbeat-metricset-nats-routes.md)<br>[stats](/reference/metricbeat/metricbeat-metricset-nats-stats.md)<br>[subscriptions](/reference/metricbeat/metricbeat-metricset-nats-subscriptions.md) |
 | [Nginx](/reference/metricbeat/metricbeat-module-nginx.md) | ![Prebuilt dashboards are available](images/icon-yes.png "") | [stubstatus](/reference/metricbeat/metricbeat-metricset-nginx-stubstatus.md) |
-| [openai](/reference/metricbeat/metricbeat-module-openai.md) {applies_to}`stack: beta` | ![No prebuilt dashboards](images/icon-no.png "") | [usage](/reference/metricbeat/metricbeat-metricset-openai-usage.md) {applies_to}`stack: beta` |
 | [Openmetrics](/reference/metricbeat/metricbeat-module-openmetrics.md) {applies_to}`stack: beta` | ![No prebuilt dashboards](images/icon-no.png "") | [collector](/reference/metricbeat/metricbeat-metricset-openmetrics-collector.md) {applies_to}`stack: beta` |
 | [Oracle](/reference/metricbeat/metricbeat-module-oracle.md) | ![Prebuilt dashboards are available](images/icon-yes.png "") | [performance](/reference/metricbeat/metricbeat-metricset-oracle-performance.md)<br>[sysmetric](/reference/metricbeat/metricbeat-metricset-oracle-sysmetric.md) {applies_to}`stack: beta`<br>[tablespace](/reference/metricbeat/metricbeat-metricset-oracle-tablespace.md) |
 | [Panw](/reference/metricbeat/metricbeat-module-panw.md) {applies_to}`stack: beta` | ![No prebuilt dashboards](images/icon-no.png "") | [interfaces](/reference/metricbeat/metricbeat-metricset-panw-interfaces.md) {applies_to}`stack: beta`<br>[routing](/reference/metricbeat/metricbeat-metricset-panw-routing.md) {applies_to}`stack: beta`<br>[system](/reference/metricbeat/metricbeat-metricset-panw-system.md) {applies_to}`stack: beta`<br>[vpn](/reference/metricbeat/metricbeat-metricset-panw-vpn.md) {applies_to}`stack: beta` |

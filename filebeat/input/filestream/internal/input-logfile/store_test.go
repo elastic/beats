@@ -337,7 +337,7 @@ func TestStore_ResetCursor(t *testing.T) {
 }
 
 type testMeta struct {
-	IdentifierName string
+	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
 }
 
 func TestSourceStore_UpdateIdentifiers(t *testing.T) {
@@ -356,7 +356,7 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
 		store := &sourceStore{
-			identifier: &sourceIdentifier{"test"},
+			identifier: &SourceIdentifier{"test"},
 			store:      s,
 		}
 
@@ -383,12 +383,12 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 			"test::key2": { // Unchanged
 				Updated: s.ephemeralStore.table["test::key2"].internalState.Updated,
 				TTL:     0 * time.Second,
-				Meta:    map[string]interface{}{"identifiername": "method"},
+				Meta:    map[string]interface{}{"identifier_name": "method"},
 			},
 			"test::key1::updated": { // Updated resource
 				Updated: s.ephemeralStore.table["test::key1::updated"].internalState.Updated,
 				TTL:     60 * time.Second,
-				Meta:    map[string]interface{}{"identifiername": "something"},
+				Meta:    map[string]interface{}{"identifier_name": "something"},
 			},
 		}
 		s.ephemeralStore.mu.Unlock()
@@ -411,24 +411,17 @@ func TestSourceStoreTakeOver(t *testing.T) {
 	s := testOpenStore(t, "filestream", backend)
 	defer s.Release()
 	store := &sourceStore{
-		identifier:            &sourceIdentifier{"filestream::current-id::"},
-		identifiersToTakeOver: []*sourceIdentifier{{"filestream::previous-id::"}},
+		identifier:            &SourceIdentifier{"filestream::current-id::"},
+		identifiersToTakeOver: []*SourceIdentifier{{"filestream::previous-id::"}},
 		store:                 s,
 	}
 
-	store.TakeOver(func(v Value) (string, any) {
-		r, ok := v.(*resource)
-		if !ok {
-			t.Fatalf("expecting v of type '*input_logfile.resource', got '%T' instead", v)
+	store.TakeOver(func(v TakeOverState) (string, any) {
+		m := testMeta{
+			IdentifierName: v.IdentifierName,
 		}
 
-		var m testMeta
-		err := v.UnpackCursorMeta(&m)
-		if err != nil {
-			t.Fatalf("cannot unpack meta: %v", err)
-		}
-
-		newID := strings.ReplaceAll(r.key, "previous-id", "current-id")
+		newID := strings.ReplaceAll(v.Key, "previous-id", "current-id")
 
 		return newID, m
 	})
@@ -443,12 +436,12 @@ func TestSourceStoreTakeOver(t *testing.T) {
 	want := map[string]state{
 		"filestream::another-input::key2": { // Unchanged
 			TTL:  60 * time.Second,
-			Meta: map[string]interface{}{"identifiername": "test-file-identity"},
+			Meta: map[string]interface{}{"identifier_name": "test-file-identity"},
 		},
 		"filestream::current-id::key1": { // Updated resource
 			Updated: s.ephemeralStore.table["filestream::current-id::key1"].internalState.Updated,
 			TTL:     60 * time.Second,
-			Meta:    map[string]interface{}{"identifiername": "test-file-identity"},
+			Meta:    map[string]interface{}{"identifier_name": "test-file-identity"},
 		},
 	}
 	s.ephemeralStore.mu.Unlock()
@@ -471,7 +464,7 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
 		store := &sourceStore{
-			identifier: &sourceIdentifier{"test"},
+			identifier: &SourceIdentifier{"test"},
 			store:      s,
 		}
 
@@ -509,7 +502,7 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
 		store := &sourceStore{
-			identifier: &sourceIdentifier{"test"},
+			identifier: &SourceIdentifier{"test"},
 			store:      s,
 		}
 

@@ -117,7 +117,12 @@ type Total struct {
 // `args` will be passed as CLI arguments to the Beat
 func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "beat binary must exists")
-	tempDir := createTempDir(t)
+	rootDir, err := filepath.Abs(filepath.Join("..", "..", "build", "integration-tests"))
+	if err != nil {
+		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
+	}
+
+	tempDir := CreateTempDir(t, rootDir)
 	configFile := filepath.Join(tempDir, beatName+".yml")
 
 	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
@@ -163,46 +168,6 @@ func NewStandardBeat(t *testing.T, beatName, binary string, args ...string) *Bea
 	b := NewBeat(t, beatName, binary, args...)
 	b.baseArgs = append(b.baseArgs[:1], b.baseArgs[2:]...) // remove "--systemTest"
 	return b
-}
-
-// NewAgentBeat creates a new agentbeat process that runs the beatName as a subcommand.
-// See `NewBeat` for options and information for the parameters.
-func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
-	require.FileExistsf(t, binary, "agentbeat binary must exists")
-	tempDir := createTempDir(t)
-	configFile := filepath.Join(tempDir, beatName+".yml")
-
-	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
-	require.NoError(t, err, "error creating stdout file")
-	stderrFile, err := os.Create(filepath.Join(tempDir, "stderr"))
-	require.NoError(t, err, "error creating stderr file")
-
-	p := BeatProc{
-		Binary: binary,
-		baseArgs: append([]string{
-			"agentbeat",
-			"--systemTest",
-			beatName,
-			"--path.home", tempDir,
-			"--path.logs", tempDir,
-			"-E", "logging.to_files=true",
-			"-E", "logging.files.rotateeverybytes=104857600", // About 100MB
-			"-E", "logging.files.rotateonstartup=false",
-		}, args...),
-		tempDir:    tempDir,
-		beatName:   beatName,
-		configFile: configFile,
-		t:          t,
-		stdout:     stdoutFile,
-		stderr:     stderrFile,
-	}
-	t.Cleanup(func() {
-		if !t.Failed() {
-			return
-		}
-		reportErrors(t, tempDir, beatName)
-	})
-	return &p
 }
 
 // Start starts the Beat process
@@ -781,20 +746,20 @@ func (b *BeatProc) SetExpectedErrorCode(errorCode int) {
 	b.expectedErrorCode = errorCode
 }
 
-// createTempDir creates a temporary directory that will be
-// removed after the tests passes.
+// CreateTempDir creates a temporary directory that will be
+// removed after the tests passes. The temporary directory is
+// created on rootDir. If rootDir is empty, then os.TempDir() is used.
 //
 // If the test fails, the temporary directory is not removed.
 //
 // If the tests are run with -v, the temporary directory will
 // be logged.
-func createTempDir(t *testing.T) string {
-	rootDir, err := filepath.Abs("../../build/integration-tests")
-	if err != nil {
-		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
+func CreateTempDir(t *testing.T, rootDir string) string {
+	if rootDir == "" {
+		rootDir = os.TempDir()
 	}
-	err = os.MkdirAll(rootDir, 0o750)
-	if err != nil {
+
+	if err := os.MkdirAll(rootDir, 0o750); err != nil {
 		t.Fatalf("error making test dir: %s: %s", rootDir, err)
 	}
 	tempDir, err := os.MkdirTemp(rootDir, strings.ReplaceAll(t.Name(), "/", "-"))
@@ -1243,9 +1208,10 @@ func StartMockES(
 		addr = "localhost:0"
 	}
 
-	l, err := net.Listen("tcp", addr)
+	lc := net.ListenConfig{}
+	l, err := lc.Listen(t.Context(), "tcp", addr)
 	if err != nil {
-		if l, err = net.Listen("tcp6", addr); err != nil {
+		if l, err = lc.Listen(t.Context(), "tcp6", addr); err != nil {
 			t.Fatalf("failed to listen on a port: %v", err)
 		}
 	}
@@ -1286,14 +1252,35 @@ func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
 	t := b.t
 	t.Helper()
 
-	msg := strings.Builder{}
 	path := filepath.Join(b.TempDir(), "output-*.ndjson")
-	assert.Eventually(t, func() bool {
+
+	// Ensure the output file exists. This avoid us calling assert.Eventually
+	// inside an assert.Eventually, which causes the test to fail with a generic
+	// "Condition never satisfied" message.
+	if got := b.CountFileLines(path); got == events {
+		return
+	}
+
+	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		got := b.CountFileLines(path)
-		msg.Reset()
-		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
-		return got == events
-	}, timeout, 200*time.Millisecond, &msg)
+		assert.Equalf(collect, events, got, "expecting %d events, got %d", events, got)
+	}, timeout, 200*time.Millisecond)
+}
+
+// RemoveOutputFile removes all files matching output*.ndjson in the Beat
+// temporary folder. On error t.Fatal is called
+func (b *BeatProc) RemoveOutputFile() {
+	t := b.t
+	outputFiles, err := filepath.Glob(filepath.Join(b.TempDir(), "output*.ndjson"))
+	if err != nil {
+		t.Fatalf("failed to match glob pattern for output files: %s", err)
+	}
+
+	for _, file := range outputFiles {
+		if err := os.Remove(file); err != nil {
+			t.Fatalf("cannot remove file: %s", err)
+		}
+	}
 }
 
 // GetEventsFromFileOutput reads all events from file output. If n > 0,

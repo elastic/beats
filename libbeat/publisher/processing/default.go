@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // builder is used to create the event processing pipeline in Beats.  The
@@ -113,10 +114,9 @@ func MakeDefaultSupport(
 		// don't try to "merge" the two lists somehow, if the supportFactory caller requests its own processors, use those
 		// also makes it easier to disable global processors if needed, since they're otherwise hardcoded
 		var rawProcessors processors.PluginConfig
-		shouldLoadDefaultProcessors := info.UseDefaultProcessors || management.UnderAgent()
 
 		// don't check the array directly, use HasField, that way processors can easily be bypassed with -E processors=[]
-		if shouldLoadDefaultProcessors && !beatCfg.HasField("processors") {
+		if management.UnderAgent() && !beatCfg.HasField("processors") {
 			log.Debugf("In fleet/otel mode with no processors specified, defaulting to global processors")
 			rawProcessors = fleetDefaultProcessors
 
@@ -287,7 +287,7 @@ func (b *builder) Processors() []string {
 //  9. (P) timeseries mangling
 //  10. (P) (if publish/debug enabled) log event
 //  11. (P) (if output disabled) dropEvent
-func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error) {
+func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path) (beat.Processor, error) {
 	var (
 		// pipeline processors
 		processors = newGroup("processPipeline", b.log)
@@ -382,6 +382,12 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	// setup 8: pipeline processors list
 	if b.processors != nil {
+		// function processor hides implementation of processors.PathSetter
+		err := b.processors.SetPaths(paths)
+		if err != nil {
+			return nil, fmt.Errorf("failed setting paths for global processors: %w", err)
+		}
+
 		// Add the global pipeline as a function processor, so clients cannot close it
 		processors.add(newProcessor(b.processors.title, b.processors.Run))
 	}
@@ -399,6 +405,11 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	// setup 11: drop all events if outputs are disabled (P)
 	if drop {
 		processors.add(dropDisabledProcessor)
+	}
+
+	err := processors.SetPaths(paths)
+	if err != nil {
+		return nil, fmt.Errorf("failed to set paths for processing pipeline: %w", err)
 	}
 
 	return processors, nil

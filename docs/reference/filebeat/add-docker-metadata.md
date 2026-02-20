@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/add-docker-metadata.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Add Docker metadata [add-docker-metadata]
@@ -81,5 +82,5 @@ It has the following settings:
 :   (Optional) Specifies the mount point of the host’s filesystem, which can be used to monitor a host from within a container.
 
 `labels.dedot`
-:   (Optional) Default to be false. If set to true, replace dots in labels with `_`.
+:   (Optional) Defaults to true. When true, replaces dots (`.`) in labels with underscores (`_`).
 

@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add descriptions and units to CEL input OpenTelemetry metrics.
+component: filebeat

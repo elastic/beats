@@ -16,9 +16,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/status"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
+	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
@@ -28,9 +30,10 @@ import (
 
 // BaseReceiver holds common configurations for beatreceivers.
 type BeatReceiver struct {
-	beat   *instance.Beat
-	beater beat.Beater
-	Logger *logp.Logger
+	beat     *instance.Beat
+	beater   beat.Beater
+	reporter *log.Reporter
+	Logger   *logp.Logger
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -96,9 +99,10 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 
 // BeatReceiver.Start() starts the beat receiver.
 func (br *BeatReceiver) Start(host component.Host) error {
+	var groupReporter otelstatus.RunnerReporter
 	if w, ok := br.beater.(cfgfile.WithOtelFactoryWrapper); ok {
-		groupReporter := status.NewGroupStatusReporter(host)
-		w.WithOtelFactoryWrapper(status.StatusReporterFactory(groupReporter))
+		groupReporter = otelstatus.NewGroupStatusReporter(host)
+		w.WithOtelFactoryWrapper(otelstatus.StatusReporterFactory(groupReporter))
 	}
 
 	// We go through all extensions to find any that implement the DiagnosticExtension interface.
@@ -125,7 +129,30 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		}
 	}
 
+	if br.beat.Config.MetricLogging == nil || br.beat.Config.MetricLogging.Enabled() {
+		r, err := log.MakeReporter(br.beat.Info, br.beat.Config.MetricLogging, br.beat.Monitoring.InfoRegistry(), br.beat.Monitoring.StateRegistry(), br.beat.Monitoring.StateRegistry(), br.beat.Monitoring.InfoRegistry())
+		if err != nil {
+			return fmt.Errorf("error creating metric reporter: %w", err)
+		}
+		rep, ok := r.(*log.Reporter)
+		if !ok {
+			return fmt.Errorf("error creating metric log reporter")
+		}
+		br.reporter = rep
+	}
+
+	br.beat.Manager.SetStopCallback(func() {
+		if c, ok := br.beat.Publisher.(io.Closer); ok {
+			if err := c.Close(); err != nil {
+				br.Logger.Errorf("error closing beat receiver publisher: %v", err)
+			}
+		}
+
+	})
+
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
+		// set beatreceiver status
+		groupReporter.UpdateStatus(status.Failed, err.Error())
 		return fmt.Errorf("beat receiver run error: %w", err)
 	}
 
@@ -142,15 +169,14 @@ func (br *BeatReceiver) Shutdown() error {
 		br.beat.Info.Logger.Warnf("failed to close global processing: %s", err)
 	}
 
-	if c, ok := br.beat.Publisher.(io.Closer); ok {
-		if err := c.Close(); err != nil {
-			return fmt.Errorf("error closing beat receiver publisher: %w", err)
-		}
-	}
-
 	if err := br.stopMonitoring(); err != nil {
 		return fmt.Errorf("error stopping monitoring server: %w", err)
 	}
+
+	if br.reporter != nil {
+		br.reporter.Stop()
+	}
+
 	if err := br.beat.Info.Logger.Close(); err != nil {
 		return fmt.Errorf("error closing beat receiver logging: %w", err)
 	}

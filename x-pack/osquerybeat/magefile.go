@@ -67,7 +67,7 @@ func BuildExt() error {
 	params := devtools.DefaultBuildArgs()
 	params.InputFiles = []string{"./ext/osquery-extension/."}
 	params.Name = "osquery-extension"
-	params.CGO = false
+	params.CGO = true
 	err := devtools.Build(params)
 	if err != nil {
 		return err
@@ -119,9 +119,6 @@ func stripLinuxOsqueryd() error {
 	}
 
 	// Strip osqueryd only once when osquery-extension is built
-	// There are two build paths at the moment both through GolangCrossBuild
-	// 1. Standlone osquerybeat package (this function is called twice: for osquerybeat and osquery-extension)
-	// 2. Agentbeat package, this function is only called once for osquery-extension
 	if !strings.HasSuffix(cwd, "/osquery-extension") {
 		return nil
 	}
@@ -150,23 +147,13 @@ func stripLinuxOsqueryd() error {
 		}
 
 		// Strip osqueryd
-		// There are two scenarios where the build path is created depending on the type of build
-		// 1. Standlone osquerybeat build: the osqueryd binaries are downloaded into osquerybeat/build/data/install/[GOOS]/[GOARCH]
-		// 2. Agentbeat build: the osqueryd binaries are downloaded agentbeat/build/data/install/[GOOS]/[GOARCH]
 
 		// This returns something like build/data/install/linux/amd64/osqueryd
 		querydRelativePath := distro.OsquerydPath(distro.GetDataInstallDir(osarch))
 
-		// Checking and stripping osqueryd binary and both paths osquerybeat/build and agentbeat/build
-		// because at the moment it's unclear if this step was initiated from osquerybeat or agentbeat build
+		// Checking and stripping osqueryd binary
 		osquerybeatPath := filepath.Clean(filepath.Join(cwd, "../..", querydRelativePath))
 		err = strip(osquerybeatPath, osarch)
-		if err != nil {
-			return err
-		}
-
-		agentbeatPath := filepath.Clean(filepath.Join(cwd, "../../../agentbeat", querydRelativePath))
-		err = strip(agentbeatPath, osarch)
 		if err != nil {
 			return err
 		}

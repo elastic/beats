@@ -21,13 +21,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -63,7 +59,7 @@ var (
 // Smoke test.
 func TestStartStop(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-	r, err := MakeReporter(beat.Info{Logger: logger}, conf.NewConfig())
+	r, err := MakeReporter(beat.Info{Logger: logger}, conf.NewConfig(), nil, nil, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,11 +78,9 @@ func TestMakeDeltaSnapshot(t *testing.T) {
 }
 
 func TestReporterLog(t *testing.T) {
-	observed, zapLogs := observer.New(zapcore.DebugLevel)
-	logger, err := logp.ConfigureWithCoreLocal(logp.Config{}, observed)
-	require.NoError(t, err)
+	logger, zapLogs := logptest.NewTestingLoggerWithObserver(t, "")
 
-	reporter := reporter{config: defaultConfig(), logger: logger.Named("monitoring")}
+	reporter := Reporter{config: defaultConfig(), logger: logger.Named("monitoring")}
 
 	reporter.logSnapshot(map[string]monitoring.FlatSnapshot{})
 	logs := zapLogs.TakeAll()
@@ -96,7 +90,7 @@ func TestReporterLog(t *testing.T) {
 
 	reporter.logSnapshot(
 		map[string]monitoring.FlatSnapshot{
-			"metrics": monitoring.FlatSnapshot{
+			"metrics": {
 				Bools: map[string]bool{
 					"running": true,
 				},
@@ -119,7 +113,7 @@ func TestReporterLog(t *testing.T) {
 	}
 }
 
-func assertMapHas(t *testing.T, m map[string]interface{}, key string, expectedValue interface{}) {
+func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any) {
 	t.Helper()
 	v, err := mapstr.M(m).GetValue(key)
 	if err != nil {
