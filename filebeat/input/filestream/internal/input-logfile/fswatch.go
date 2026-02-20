@@ -126,7 +126,7 @@ func SameFile(log *logp.Logger, prev, current *FileDescriptor) bool {
 			prev.Filename == current.Filename
 
 		log.Infof("SameFile: %t: prev=%s, current=%s. prevPath: %s, currPath: %s",
-			same, prev.Fingerprint, current.Fingerprint, prev.Filename, current.Filename)
+			same, "growing-fingerprint", "growing-fingerprint", prev.Filename, current.Filename)
 		return same
 	}
 

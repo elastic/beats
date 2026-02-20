@@ -489,7 +489,13 @@ func (inp *filestream) open(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
+	// fs.desc.Fingerprint can be up to 2kb, thus better repeating the code than
+	// using a variable.
+	if fs.identifierGenerator == growingFingerprintName {
+		r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, "growing-fingerprint", offset)
+	} else {
+		r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
+	}
 
 	r = inp.parsers.Create(r, log)
 
