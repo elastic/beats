@@ -1,0 +1,443 @@
+version: 9.3.1
+entries:
+    - kind: bug-fix
+      summary: refactor dhcpv4 parsers, fix numerous parsing bugs. The DHCP "router" field is now a list, as is specified in RFC2132.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48414
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1768328474
+      file:
+        name: 1768328474-refactor-dhcpv4-fix-parsing-bugs.yaml
+        checksum: 8cadfb805eae0565f1336df64997ca20dcaa2666
+    - kind: bug-fix
+      summary: Fix differential results using wrong data source for removed events
+      description: |
+        Fixed two bugs in osquerybeat's differential results handling:
+        1. "removed" events incorrectly read from DiffResults.Added instead of DiffResults.Removed
+        2. Simplified code by removing unnecessary intermediate variable and publishing results directly
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/48438
+      issue:
+        - https://github.com/elastic/beats/issues/48427
+      impact: ""
+      action: ""
+      timestamp: 1768507395
+      file:
+        name: 1768507395-fix-osquerybeat-differential-results.yaml
+        checksum: e71638db7a9e4945c973a2bf7acb3e20600dfd31
+    - kind: bug-fix
+      summary: Add SSPI bind timeout and document Windows account requirements for translate_ldap_attribute processor
+      description: |
+        The translate_ldap_attribute processor SSPI bind could hang indefinitely when
+        running under a local user account (which cannot obtain Kerberos credentials).
+        This fix adds a 10-second timeout to prevent the hang and updates documentation
+        to clearly explain which Windows account types support SSPI authentication:
+        Local System, Network Service, domain users, and gMSA accounts work; local
+        user accounts do not.
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48444
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1768560871
+      file:
+        name: 1768560871-translate-ldap-sspi-timeout-docs.yaml
+        checksum: f42f63476355599770c16da3432b2a656bebcd24
+    - kind: bug-fix
+      summary: fix procfs network parsers
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48428
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1768584444
+      file:
+        name: 1768584444-fix-procfs-network-parsers.yaml
+        checksum: c0770e703a6407b265073bbcd4cef246d6febc1f
+    - kind: enhancement
+      summary: Improve log path sanitization for request trace logging.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48719
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1768960063
+      file:
+        name: 1768960063-st15454-httplog.yaml
+        checksum: 1a29a086bf2b7a3a1ed08025050c78816a6dddd8
+    - kind: bug-fix
+      summary: Fix Thrift struct parser oob bug
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48498
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769021837
+      file:
+        name: 1769021837-fix-thrift-struct-parser-oob-bug.yaml
+        checksum: c8a64ad82f3623fab9c4d3e8c0a9d8b8d4995a35
+    - kind: other
+      summary: heartbeat-upgrade-node-lts-22
+      description: Upgrade NodeJS to latest LTS v22.22
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48480
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769091139
+      file:
+        name: 1769091139-heartbeat-upgrade-node-lts-22.yaml
+        checksum: aea7266753875511c230613916aacddb977dfa7a
+    - kind: bug-fix
+      summary: clean up and add checks to SIP parser
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48514
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769107368
+      file:
+        name: 1769107368-clean-up-sip-parsers.yaml
+        checksum: 82764c16d63d44c58320ea156c9a56e6e3e56c25
+    - kind: bug-fix
+      summary: fix potential array access panics & infinite loops in postgres parser
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48528
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769202503
+      file:
+        name: 1769202503-clean-up-postgres-array-access.yaml
+        checksum: 453dafca8ceb6137c763d3b49ed64d9bfa933fb9
+    - kind: bug-fix
+      summary: Enforce region configuration when non_aws_bucket_name is defined for awss3 input
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48534
+      issue:
+        - https://github.com/elastic/beats/issues/47847
+      impact: ""
+      action: ""
+      timestamp: 1769424344
+      file:
+        name: 1769424344-filebeat-awss3-input-fix-region-detection.yaml
+        checksum: 23dbc1a735a4ef42275f3f0184a683526d76c682
+    - kind: bug-fix
+      summary: add 30s metric logging to beat receivers
+      description: ""
+      component: filebeat, metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48541
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769455635
+      file:
+        name: 1769455635-add-30s-metric-logging-to-beat-receivers.yaml
+        checksum: 0976c5c38f54b2c747b78aa182659aec96fca24d
+    - kind: bug-fix
+      summary: Clean int overflows and array access in mysql parsers
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48543
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769464841
+      file:
+        name: 1769464841-clean-up-mysql-parsers.yaml
+        checksum: ae5dd6835cd8dedd48b9945c4f4021eb01037b08
+    - kind: bug-fix
+      summary: Add int overflow checks to http parser
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48563
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769534243
+      file:
+        name: 1769534243-add-int-checks-to-http-parser.yaml
+        checksum: e29cf5aca5360546fef3b4ec024bb2e0b2cbdf2f
+    - kind: bug-fix
+      summary: Fix Log to Filestream state migration removing states from non-harvested files.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48570
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769548194
+      file:
+        name: 1769548194-fix-take-over.yaml
+        checksum: 441cb5325dc4791a84bedfd0322b53a7815c0780
+    - kind: other
+      summary: Update OpenTelemetry Collector libraries to v0.144.0/v1.50.0
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/48580
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769611981
+      file:
+        name: 1769611981-update-otel-to-01440.yaml
+        checksum: e5ab92350af11608bb5c55971843007c5f765476
+    - kind: bug-fix
+      summary: Adds a missing dependency for Synthetics on wolfi docker image
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48569
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769621371
+      file:
+        name: 1769621371-synthetics-add-playwright-dependency-on-wolfi.yaml
+        checksum: af7e1f0817970054e720bf7b42fd3695241c1256
+    - kind: other
+      summary: Bump golang version to 1.24.13.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/48467
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1770134229
+      file:
+        name: 1770134229-bump-golang-12412.yaml
+        checksum: 7f1c54ebd0c256e63cb78aa33bf27d759dff2d05
+    - kind: feature
+      summary: azure-eventhub-managed-identity
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48655
+      issue:
+        - https://github.com/elastic/beats/issues/48680
+      impact: ""
+      action: ""
+      timestamp: 1770154527
+      file:
+        name: 1770154527-azure-eventhub-managed-identity.yaml
+        checksum: 58362cec79498fa4eb84c964b1f68c329206fdb3
+    - kind: enhancement
+      summary: Add descriptions and units to CEL input OpenTelemetry metrics.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48684
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1770215700
+      file:
+        name: 1770215700-add-otel-metric-metadata-to-cel-input.yaml
+        checksum: 926ccd9081e0be0baec99165e862416cb861b5be
+    - kind: enhancement
+      summary: Don't print warning about small files on each file system scan
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48704
+      issue:
+        - https://github.com/elastic/beats/issues/45642
+      impact: ""
+      action: ""
+      timestamp: 1770299686
+      file:
+        name: 1770299686-remove-scan-fingerprint-warning.yaml
+        checksum: ed7bd6fdb447b3f231289df67257b97d20f17bee
+    - kind: bug-fix
+      summary: Fix a bug that could report an invalid number of active "otelconsumer" events
+      description: ""
+      component: elastic-agent
+      pr:
+        - https://github.com/elastic/beats/pull/48720
+      issue:
+        - https://github.com/elastic/elastic-agent/issues/12515
+      impact: ""
+      action: ""
+      timestamp: 1770328496
+      file:
+        name: 1770328496-otelconsumer-active-events-fix.yaml
+        checksum: e92c9017910c9e7577365599a0e7e7f1a7c8cbf1
+    - kind: enhancement
+      summary: Allow configuration of OTLP histogram aggregation via OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION environment variable in CEL input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48731
+      issue:
+        - https://github.com/elastic/beats/issues/48730
+      impact: ""
+      action: ""
+      timestamp: 1770391563
+      file:
+        name: 1770391563-allow-configuration-of-otlp-histogram-aggregation.yaml
+        checksum: a0eff02f968aea40d188fe94f73377b2547b774f
+    - kind: bug-fix
+      summary: Fix CEL input incorrectly counting degraded program runs as successful executions in OpenTelemetry metrics.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48734
+      issue:
+        - https://github.com/elastic/beats/issues/48714
+      impact: ""
+      action: ""
+      timestamp: 1770393750
+      file:
+        name: 1770393750-fix-cel-input-counting-degraded-runs-as-success.yaml
+        checksum: 8e3488573e8a2977df769041de897c85ed0abac5
+    - kind: unknown
+      summary: Fix handling of symbolic link resolution on Windows in httplog path assessment.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48754
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1770694969
+      file:
+        name: 1770694969-httplog_windows_fix.yaml
+        checksum: dea49ec772fad2bd8d7b2e1c6f22145cdfedea07
+    - kind: bug-fix
+      summary: Fix otelconsumer logging hundreds of errors per second when queue is full
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48807
+      issue:
+        - https://github.com/elastic/beats/issues/48803
+      impact: ""
+      action: ""
+      timestamp: 1770830279
+      file:
+        name: 1770830279-fix-otelconsumer-error-log.yaml
+        checksum: ef78add37e03a5ec71ed0738087f669c7b5b3126
+    - kind: bug-fix
+      summary: Fix AD entity analytics to resolve nested group membership and escape DN filter values
+      description: |
+        Use the LDAP_MATCHING_RULE_IN_CHAIN matching rule (OID 1.2.840.113556.1.4.1941)
+        in Active Directory entity analytics memberOf filters to resolve nested group
+        membership at query time. Also escape DN values in the changed-groups filter
+        to prevent malformed queries when group names contain LDAP filter metacharacters.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48815
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1770847369
+      file:
+        name: 1770847369-entityanalytics_ad_groups_lookup.yaml
+        checksum: a9a3f186ebbd4da44822da52b0a688f522689f0f
+    - kind: bug-fix
+      summary: translate_ldap_attribute discovery tries both LDAP and LDAPS per host, LDAPS first
+      description: |
+        When the translate_ldap_attribute processor discovers LDAP servers (via DNS SRV
+        or LOGONSERVER), it now adds the alternate scheme for each discovered address:
+        if LDAP is found it also tries LDAPS for that host, and if LDAPS is found it
+        also tries LDAP. For each host, LDAPS is tried before LDAP to prefer TLS.
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/48818
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1770852725
+      file:
+        name: 1770852725-translate-ldap-discovery-try-ldap-and-ldaps.yaml
+        checksum: 66f5d986f162cf66d5cad9abb69935ae3b70891f
+    - kind: enhancement
+      summary: Tighten request trace logging destination path checks in CEL, Entity Analytics, HTTP Endpoint and HTTP JSON inputs.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48863
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1771188539
+      file:
+        name: 1771188539-48719-httplog.yaml
+        checksum: 228c20fb8e75ba3c5a22b084eabe9d8c11f4b01d
+    - kind: bug-fix
+      summary: Fix Entity Analytics Okta OAuth2 token requests ignoring custom TLS/SSL configuration.
+      description: |
+        The OAuth2 authentication flow in the Okta entity analytics provider
+        was ignoring the user-configured HTTP client. Instead, it was using
+        Go's default HTTP client for all token-related requests
+        (initial token exchange, token refresh, and API calls).
+
+        This meant that any custom TLS/SSL or proxy settings configured by
+        the user were silently discarded, causing connection failures in
+        environments that rely on custom certificates or proxies.
+
+        This fix ensures the configured HTTP client is propagated through
+        all OAuth2 token operations, so that outgoing requests correctly
+        use the user's transport configuration.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48866
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1771228093
+      file:
+        name: 1771228093-fix-entityanalytics_okta-oauth-ssl.yaml
+        checksum: 3b8345d18b9b7d983e98eeaad29e6e2f2da3ee8f
+    - kind: bug-fix
+      summary: Fix azure-blob-storage input failing with Storage Blob Data Reader RBAC role
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48886
+      issue:
+        - https://github.com/elastic/beats/issues/48890
+      impact: ""
+      action: ""
+      timestamp: 1771316673
+      file:
+        name: 1771316673-azure-blob-storage-fix-rbac-tags-permission.yaml
+        checksum: a758e97e82f55554d994ec4964301ddfff7eb2a1
+    - kind: unknown
+      summary: Fix request tracer path validation under managed agents.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48909
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1771382418
+      file:
+        name: 1771382418-s6900-httplog.yaml
+        checksum: ac9796eaff46faa763f655812ad9aa911a9fc870
