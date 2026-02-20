@@ -31,29 +31,36 @@ import (
 // getTable updates fields with the table data at the given offset.
 // fields must be non_nil on entry.
 func getTable(fields mapstr.M, data []byte, offset uint32) (next uint32, err bool, exists bool) {
-	dataLen := uint32(len(data))
-	if offset > dataLen || 4 > dataLen-offset {
+	offset64 := int64(offset)
+	dataLen64 := int64(len(data))
+	if offset64 > dataLen64 || 4 > dataLen64-offset64 {
 		logp.Debug("amqp", "Error while parsing a field table")
 		return 0, true, false
 	}
-	length := binary.BigEndian.Uint32(data[offset : offset+4])
-	tableStart := offset + 4
+	offsetInt := int(offset64)
+	length := binary.BigEndian.Uint32(data[offsetInt : offsetInt+4])
+	tableStart64 := offset64 + 4
 
 	// size declared too big
-	if length > dataLen-tableStart {
+	if int64(length) > dataLen64-tableStart64 {
+		return 0, true, false
+	}
+	if length > ^uint32(0)-offset-4 {
 		return 0, true, false
 	}
 	if length > 0 {
 		exists = true
 		table := mapstr.M{}
-		err := fieldUnmarshal(table, data[tableStart:tableStart+length], 0, length, -1)
+		tableStartInt := int(tableStart64)
+		tableEndInt := tableStartInt + int(length)
+		err := fieldUnmarshal(table, data[tableStartInt:tableEndInt], 0, length, -1)
 		if err {
 			logp.Debug("amqp", "Error while parsing a field table")
 			return 0, true, false
 		}
 		fields.Update(table)
 	}
-	return tableStart + length, false, exists
+	return offset + 4 + length, false, exists
 }
 
 // getTable updates fields with the array data at the given offset.
@@ -64,27 +71,33 @@ func getArray(fields mapstr.M, data []byte, offset uint32) (next uint32, err boo
 		logp.Debug("amqp", "Error while parsing a field table")
 		return 0, true, false
 	}
-	dataLen := uint32(len(data))
+	offset64 := int64(offset)
+	dataLen64 := int64(len(data))
 
 	// less actual data than the transmitted length indicates
-	if offset > dataLen || 4 > dataLen-offset {
+	if offset64 > dataLen64 || 4 > dataLen64-offset64 {
 		return 0, true, false
 	}
-	arrayStart := offset + 4
-	if length > dataLen-arrayStart {
+	arrayStart64 := offset64 + 4
+	if int64(length) > dataLen64-arrayStart64 {
+		return 0, true, false
+	}
+	if length > ^uint32(0)-offset-4 {
 		return 0, true, false
 	}
 	if length > 0 {
 		exists = true
 		array := mapstr.M{}
-		err := fieldUnmarshal(array, data[arrayStart:arrayStart+length], 0, length, 0)
+		arrayStartInt := int(arrayStart64)
+		arrayEndInt := arrayStartInt + int(length)
+		err := fieldUnmarshal(array, data[arrayStartInt:arrayEndInt], 0, length, 0)
 		if err {
 			logp.Debug("amqp", "Error while parsing a field array")
 			return 0, true, false
 		}
 		fields.Update(array)
 	}
-	return arrayStart + length, false, exists
+	return offset + 4 + length, false, exists
 }
 
 // The index parameter, when set at -1, indicates that the entry is a field table.

@@ -1262,7 +1262,7 @@ func TestAmqp_BasicGetOkMethod_ParsesOffsets(t *testing.T) {
 	m := &amqpMessage{}
 	args := []byte{
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, // delivery-tag = 2
-		0x00, // redelivered bitset
+		0x00,                     // redelivered bitset
 		0x04, 'm', 'y', 'e', 'x', // exchange
 		0x03, 'a', 'b', 'c', // routing-key
 		0x00, 0x00, 0x00, 0x05, // message-count = 5
@@ -1281,7 +1281,7 @@ func TestAmqp_BasicGetOkMethod_ParsesOffsets(t *testing.T) {
 func TestAmqp_GetTable_EmptyTableAtEndOfData(t *testing.T) {
 	fields := mapstr.M{}
 	data := []byte{
-		0xaa, // ignored prefix byte
+		0xaa,                   // ignored prefix byte
 		0x00, 0x00, 0x00, 0x00, // table length = 0
 	}
 

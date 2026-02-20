@@ -1004,35 +1004,45 @@ func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short s
 	if len(data) == 0 {
 		return "", 0, true
 	}
-	dataLen := uint32(len(data))
 	lengthSize := uint32(unsafe.Sizeof(length))
+	offset64 := int64(offset)
+	lengthSize64 := int64(lengthSize)
+	dataLen64 := int64(len(data))
 
 	// If there's not enough data to read the length of the string return err
-	if offset > dataLen || lengthSize > dataLen-offset {
+	if offset64 > dataLen64 || lengthSize64 > dataLen64-offset64 {
 		return "", 0, true
 	}
+	offsetInt := int(offset64)
+	lengthSizeInt := int(lengthSize64)
 
 	switch any(length).(type) {
 	case uint8:
-		length = T(data[offset])
+		length = T(data[offsetInt])
 	case uint16:
-		length = T(binary.BigEndian.Uint16(data[offset : offset+lengthSize]))
+		length = T(binary.BigEndian.Uint16(data[offsetInt : offsetInt+lengthSizeInt]))
 	case uint32:
-		length = T(binary.BigEndian.Uint32(data[offset : offset+lengthSize]))
+		length = T(binary.BigEndian.Uint32(data[offsetInt : offsetInt+lengthSizeInt]))
 	}
 	strlen := uint32(length)
+	strlen64 := int64(strlen)
 
 	if strlen == 0 {
 		return "", lengthSize, false
 	}
 
-	start := offset + lengthSize
-	if strlen > dataLen-start {
+	start64 := offset64 + lengthSize64
+	if strlen64 > dataLen64-start64 {
 		logp.Debug("amqp", "Not enough data for string")
 		return "", 0, true
 	}
-	end := start + strlen
-	return string(data[start:end]), strlen + lengthSize, false
+	if strlen > ^uint32(0)-lengthSize {
+		return "", 0, true
+	}
+
+	startInt := int(start64)
+	endInt := startInt + int(strlen64)
+	return string(data[startInt:endInt]), strlen + lengthSize, false
 }
 
 // Attempts to get an integer from a byte slice. Returns the integer and an err boolean.
@@ -1040,31 +1050,35 @@ func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short s
 // The returned integer is meaningless if err == true
 func getIntegerAt[T uint8 | uint16 | uint32 | uint64 | int8 | int16 | int32 | int64](data []byte, offset uint32) (integer T, err bool) {
 	var value T
-	dataLen := uint32(len(data))
 	size := uint32(unsafe.Sizeof(value))
+	offset64 := int64(offset)
+	size64 := int64(size)
+	dataLen64 := int64(len(data))
 
 	// If there's not enough bytes to read the requested integer type
-	if offset > dataLen || size > dataLen-offset {
+	if offset64 > dataLen64 || size64 > dataLen64-offset64 {
 		return T(0), true
 	}
+	offsetInt := int(offset64)
+	sizeInt := int(size64)
 
 	switch any(value).(type) {
 	case uint8:
-		return T(data[offset]), false
+		return T(data[offsetInt]), false
 	case uint16:
-		return T(binary.BigEndian.Uint16(data[offset : offset+size])), false
+		return T(binary.BigEndian.Uint16(data[offsetInt : offsetInt+sizeInt])), false
 	case uint32:
-		return T(binary.BigEndian.Uint32(data[offset : offset+size])), false
+		return T(binary.BigEndian.Uint32(data[offsetInt : offsetInt+sizeInt])), false
 	case uint64:
-		return T(binary.BigEndian.Uint64(data[offset : offset+size])), false
+		return T(binary.BigEndian.Uint64(data[offsetInt : offsetInt+sizeInt])), false
 	case int8:
-		return T(data[offset]), false
+		return T(data[offsetInt]), false
 	case int16:
-		return T(binary.BigEndian.Uint16(data[offset : offset+size])), false
+		return T(binary.BigEndian.Uint16(data[offsetInt : offsetInt+sizeInt])), false
 	case int32:
-		return T(binary.BigEndian.Uint32(data[offset : offset+size])), false
+		return T(binary.BigEndian.Uint32(data[offsetInt : offsetInt+sizeInt])), false
 	case int64:
-		return T(binary.BigEndian.Uint64(data[offset : offset+size])), false
+		return T(binary.BigEndian.Uint64(data[offsetInt : offsetInt+sizeInt])), false
 	}
 	return T(0), true
 }
