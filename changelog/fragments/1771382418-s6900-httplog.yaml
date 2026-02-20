@@ -1,0 +1,3 @@
+kind: bugfix
+summary: Fix request tracer path validation under managed agents.
+component: filebeat
