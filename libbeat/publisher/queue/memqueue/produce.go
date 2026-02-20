@@ -18,6 +18,8 @@
 package memqueue
 
 import (
+	"sync"
+
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -39,6 +41,8 @@ type openState struct {
 	done         chan struct{}
 	queueClosing <-chan struct{}
 	events       chan pushRequest
+	mu           sync.Mutex
+	resp         chan queue.EntryID
 	encoder      queue.Encoder
 }
 
@@ -61,6 +65,7 @@ func newProducer(b *broker, cb ackHandler, encoder queue.Encoder) queue.Producer
 		done:         make(chan struct{}),
 		queueClosing: b.closingChan,
 		events:       b.pushChan,
+		resp:         make(chan queue.EntryID, 1),
 		encoder:      encoder,
 	}
 
@@ -73,17 +78,20 @@ func newProducer(b *broker, cb ackHandler, encoder queue.Encoder) queue.Producer
 }
 
 func (p *forgetfulProducer) makePushRequest(event queue.Entry) pushRequest {
-	resp := make(chan queue.EntryID, 1)
 	return pushRequest{
 		event: event,
-		resp:  resp}
+		resp:  p.openState.resp}
 }
 
 func (p *forgetfulProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
+	p.openState.mu.Lock()
+	defer p.openState.mu.Unlock()
 	return p.openState.publish(p.makePushRequest(event))
 }
 
 func (p *forgetfulProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
+	p.openState.mu.Lock()
+	defer p.openState.mu.Unlock()
 	return p.openState.tryPublish(p.makePushRequest(event))
 }
 
@@ -92,17 +100,18 @@ func (p *forgetfulProducer) Close() {
 }
 
 func (p *ackProducer) makePushRequest(event queue.Entry) pushRequest {
-	resp := make(chan queue.EntryID, 1)
 	return pushRequest{
 		event:    event,
 		producer: p,
 		// We add 1 to the id so the default lastACK of 0 is a
 		// valid initial state and 1 is the first real id.
 		producerID: producerID(p.producedCount + 1),
-		resp:       resp}
+		resp:       p.openState.resp}
 }
 
 func (p *ackProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
+	p.openState.mu.Lock()
+	defer p.openState.mu.Unlock()
 	id, published := p.openState.publish(p.makePushRequest(event))
 	if published {
 		p.producedCount++
@@ -111,6 +120,8 @@ func (p *ackProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
 }
 
 func (p *ackProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
+	p.openState.mu.Lock()
+	defer p.openState.mu.Unlock()
 	id, published := p.openState.tryPublish(p.makePushRequest(event))
 	if published {
 		p.producedCount++
