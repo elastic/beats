@@ -19,6 +19,7 @@ package actions
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -103,12 +104,7 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 	if err != nil {
 		f.logger.Debugf("could not fetch value for key: '%s'. Therefore, all the values will be appended in a new key %s.", target, target)
 	} else {
-		targetArr, ok := targetVal.([]interface{})
-		if ok {
-			arr = append(arr, targetArr...)
-		} else {
-			arr = append(arr, targetVal)
-		}
+		arr = append(arr, valueToArray(targetVal)...)
 	}
 
 	// append the values of all the fields listed under 'fields' section
@@ -120,12 +116,7 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 			}
 			return fmt.Errorf("could not fetch value for key: %s, Error: %w", field, err)
 		}
-		valArr, ok := val.([]interface{})
-		if ok {
-			arr = append(arr, valArr...)
-		} else {
-			arr = append(arr, val)
-		}
+		arr = append(arr, valueToArray(val)...)
 	}
 
 	// append all the static values from 'values' section
@@ -171,10 +162,49 @@ func cleanEmptyValues(dirtyArr []interface{}) (cleanArr []interface{}) {
 func removeDuplicates(dirtyArr []interface{}) (cleanArr []interface{}) {
 	set := make(map[interface{}]bool, 0)
 	for _, val := range dirtyArr {
-		if _, ok := set[val]; !ok {
+		valType := reflect.TypeOf(val)
+		if valType == nil || valType.Comparable() {
+			if _, ok := set[val]; ok {
+				continue
+			}
 			set[val] = true
+			cleanArr = append(cleanArr, val)
+			continue
+		}
+
+		isDuplicate := false
+		for _, existingVal := range cleanArr {
+			if reflect.DeepEqual(existingVal, val) {
+				isDuplicate = true
+				break
+			}
+		}
+
+		if !isDuplicate {
 			cleanArr = append(cleanArr, val)
 		}
 	}
 	return cleanArr
+}
+
+func valueToArray(val interface{}) []interface{} {
+	switch value := val.(type) {
+	case []interface{}:
+		return value
+	}
+
+	v := reflect.ValueOf(val)
+	if !v.IsValid() {
+		return []interface{}{val}
+	}
+
+	if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
+		arr := make([]interface{}, 0, v.Len())
+		for i := 0; i < v.Len(); i++ {
+			arr = append(arr, v.Index(i).Interface())
+		}
+		return arr
+	}
+
+	return []interface{}{val}
 }
