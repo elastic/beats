@@ -185,7 +185,8 @@ func (r *LineReader) advance() error {
 		// Try to read more bytes into buffer
 		n, err := r.reader.Read(r.tempBuffer)
 
-		if (errors.Is(err, io.EOF) || errors.Is(err, gzip.ErrChecksum)) && n > 0 {
+		isEOF := errors.Is(err, io.EOF) || errors.Is(err, gzip.ErrChecksum)
+		if isEOF && n > 0 {
 			// Continue processing the returned bytes. The next call will yield
 			// EOF with 0 bytes.
 			err = nil
@@ -193,6 +194,15 @@ func (r *LineReader) advance() error {
 
 		// Write to buffer also in case of err
 		_, _ = r.inBuffer.Write(r.tempBuffer[:n])
+
+		if isEOF && n > 0 && r.collectOnEOF {
+			// If no newline is present, report EOF immediately so Next can emit
+			// the buffered trailing line without requiring another read call.
+			idx = r.inBuffer.IndexFrom(r.inOffset, r.nl)
+			if idx == -1 {
+				return io.EOF
+			}
+		}
 
 		if err != nil {
 			return err
