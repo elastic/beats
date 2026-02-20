@@ -99,7 +99,13 @@
   enabled: true
   period: 300s
   application_id: ''
-  api_key: ''
+  # OAuth2 authentication
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  #active_directory_endpoint: ''
+  # API Key authentication
+  #api_key: ''
   metrics:
     - id: ["requests/count", "requests/duration"]
 
