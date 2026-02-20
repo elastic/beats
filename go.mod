@@ -233,6 +233,7 @@ require (
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
+	github.com/cilium/ebpf v0.20.0
 	github.com/coder/websocket v1.8.14
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/gorilla/mux v1.8.1
@@ -302,7 +303,6 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bluekeyes/go-gitdiff v0.7.1 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
-	github.com/cilium/ebpf v0.20.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.2.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20251022180443-0feb69152e9f // indirect
 	github.com/containerd/containerd/v2 v2.1.0 // indirect
