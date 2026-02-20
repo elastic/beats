@@ -147,17 +147,29 @@ func (b *Buffer) doAppend(data []byte, retainable bool, newCap int) error {
 			copy(b.data, data)
 		}
 	} else {
-		if newCap > 0 && cap(b.data[b.offset:]) < len(data) {
-			required := cap(b.data) + len(data)
-			if required < newCap {
-				tmp := make([]byte, len(b.data), newCap)
-				copy(tmp, b.data)
-				b.data = tmp
+		if cap(b.data)-len(b.data) < len(data) && b.mark > 0 {
+			unread := len(b.data) - b.mark
+			if unread+len(data) <= cap(b.data) {
+				copy(b.data[:unread], b.data[b.mark:])
+				b.data = b.data[:unread]
+				b.offset -= b.mark
+				b.mark = 0
 			}
 		}
-		tBuf := bytes.NewBuffer(b.data)
-		tBuf.Write(data)
-		b.data = tBuf.Bytes()
+		if cap(b.data)-len(b.data) < len(data) {
+			required := len(b.data) + len(data)
+			newCapacity := cap(b.data) * 2
+			if newCapacity < required {
+				newCapacity = required
+			}
+			if newCap > 0 && newCapacity < newCap {
+				newCapacity = newCap
+			}
+			tmp := make([]byte, len(b.data), newCapacity)
+			copy(tmp, b.data)
+			b.data = tmp
+		}
+		b.data = append(b.data, data...)
 	}
 	b.available += len(data)
 

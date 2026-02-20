@@ -191,6 +191,59 @@ func (r *LineReader) advance() error {
 			err = nil
 		}
 
+		if r.maxBytes != 0 && idx == -1 && n > 0 && r.inBuffer.Len()+n > r.maxBytes {
+			idxChunk := bytes.Index(r.tempBuffer[:n], r.nl)
+			if idxChunk == -1 || r.inBuffer.Len()+idxChunk > r.maxBytes {
+				skipped := r.inBuffer.Len()
+				_ = r.inBuffer.Advance(skipped)
+				r.inBuffer.Reset()
+				r.inOffset = 0
+
+				if idxChunk != -1 {
+					skipped += idxChunk + len(r.nl)
+					_, _ = r.inBuffer.Write(r.tempBuffer[idxChunk+len(r.nl) : n])
+				} else {
+					skipped += n
+					for idxChunk == -1 {
+						n, err = r.reader.Read(r.tempBuffer)
+						if (errors.Is(err, io.EOF) || errors.Is(err, gzip.ErrChecksum)) && n > 0 {
+							err = nil
+						}
+
+						if n > 0 {
+							idxChunk = bytes.Index(r.tempBuffer[:n], r.nl)
+							if idxChunk != -1 {
+								skipped += idxChunk + len(r.nl)
+								_, _ = r.inBuffer.Write(r.tempBuffer[idxChunk+len(r.nl) : n])
+							} else {
+								skipped += n
+							}
+						}
+
+						if err != nil {
+							r.logger.Warnf("Exceeded %d max bytes in line limit, skipped %d bytes line", r.maxBytes, skipped)
+							r.byteCount += skipped
+							return err
+						}
+
+						if n == 0 {
+							r.logger.Warnf("Exceeded %d max bytes in line limit, skipped %d bytes line", r.maxBytes, skipped)
+							r.byteCount += skipped
+							return streambuf.ErrNoMoreBytes
+						}
+					}
+				}
+
+				r.logger.Warnf("Exceeded %d max bytes in line limit, skipped %d bytes line", r.maxBytes, skipped)
+				r.byteCount += skipped
+				idx = r.inBuffer.IndexFrom(r.inOffset, r.nl)
+				if err != nil {
+					return err
+				}
+				continue
+			}
+		}
+
 		// Write to buffer also in case of err
 		_, _ = r.inBuffer.Write(r.tempBuffer[:n])
 
