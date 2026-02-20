@@ -87,7 +87,7 @@ It is possible to trigger some jobs by putting a comment on a GitHub PR.
 
 * [beats CI pipeline](https://buildkite.com/elastic/beats)
   * `/test` will kick off a default build.
-* [docs CI pipeline]([https://buildkite.com/elastic/beats](https://buildkite.com/elastic/docs-build-pr))
+* [docs CI pipeline](https://buildkite.com/elastic/docs-build-pr)
   * `run docs-build` will kick off a docs build.
 
 ### PR Labels

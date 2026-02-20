@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Fix CEL input incorrectly counting degraded program runs as successful executions in OpenTelemetry metrics.
+component: filebeat
+issue: https://github.com/elastic/beats/issues/48714

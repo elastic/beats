@@ -6,18 +6,20 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - ".go-version"
-        - "auditbeat/**"
-        - ".buildkite/auditbeat/**"
+        # Beat-specific paths
+        - auditbeat/**
+        - .buildkite/auditbeat/**
+        # Shared OSS dependencies
+        - .go-version
+        - go.mod
+        - pytest.ini
+        - dev-tools/**
+        - libbeat/**
+        - testing/**
+        # Shared CI infrastructure
         - .buildkite/pipeline.yml
-        - ".buildkite/scripts/**"
-        - ".buildkite/hooks/**"
-        #OSS
-        - "go.mod"
-        - "pytest.ini"
-        - "dev-tools/**"
-        - "libbeat/**"
-        - "testing/**"
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "auditbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -38,18 +40,20 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
+        # Beat-specific paths
         - heartbeat/**
         - .buildkite/heartbeat/**
-        - .buildkite/pipeline.yml
-        - .buildkite/scripts/**
-        - .buildkite/hooks/**
-        #OSS
+        # Shared OSS dependencies
+        - .go-version
         - go.mod
         - pytest.ini
         - dev-tools/**
         - libbeat/**
         - testing/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "heartbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -70,19 +74,20 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
+        # Beat-specific paths
+        - filebeat/**
+        - .buildkite/filebeat/**
+        # Shared OSS dependencies
         - .go-version
-        - filebeat/
-        - .buildkite/filebeat/
-        # CI related scripts
+        - go.mod
+        - pytest.ini
+        - dev-tools/**
+        - libbeat/**
+        - testing/**
+        # Shared CI infrastructure
         - .buildkite/pipeline.yml
         - .buildkite/scripts/**
         - .buildkite/hooks/**
-        #OSS
-        - go.mod
-        - pytest.ini
-        - dev-tools
-        - libbeat/**
-        - testing/**
     trigger: "filebeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -103,21 +108,24 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
-        - filebeat/
-        - x-pack/filebeat/
-        - x-pack/libbeat/**
+        # Beat-specific paths
+        - filebeat/**
+        - x-pack/filebeat/**
         - .buildkite/x-pack/pipeline.xpack.filebeat.yml
-        - .buildkite/pipeline.yml
-        - .buildkite/scripts/**
-        - .buildkite/hooks/**
-        - .buildkite/deploy/docker/docker-compose.yml
-        #OSS
+        # Shared x-pack dependencies
+        - x-pack/libbeat/**
+        # Shared OSS dependencies
+        - .go-version
         - go.mod
         - pytest.ini
         - dev-tools/**
         - libbeat/**
         - testing/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
+        - .buildkite/deploy/docker/docker-compose.yml
     trigger: "beats-xpack-filebeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -138,18 +146,22 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
-        - x-pack/dockerlogbeat/
+        # Beat-specific paths
+        - x-pack/dockerlogbeat/**
         - .buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml
-        - .buildkite/pipeline.yml
-        - .buildkite/hooks/**
-        - .buildkite/scripts/**
-        #OSS
+        # Shared x-pack dependencies
+        - x-pack/libbeat/**
+        # Shared OSS dependencies
+        - .go-version
         - go.mod
         - pytest.ini
         - dev-tools/**
         - libbeat/**
         - testing/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "beats-xpack-dockerlogbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -170,18 +182,20 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
+        # Beat-specific paths
         - metricbeat/**
-        - .buildkite/metricbeat/
-        - .buildkite/pipeline.yml
-        - .buildkite/scripts/**
-        - .buildkite/hooks/**
-        #OSS
+        - .buildkite/metricbeat/**
+        # Shared OSS dependencies
+        - .go-version
         - go.mod
         - pytest.ini
         - dev-tools/**
         - libbeat/**
         - testing/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "beats-metricbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -202,21 +216,24 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
+        # Beat-specific paths
         - metricbeat/**
         - x-pack/metricbeat/**
-        - x-pack/libbeat/common/aws
         - .buildkite/x-pack/pipeline.xpack.metricbeat.yml
-        - .buildkite/pipeline.yml
-        - .buildkite/scripts/**
-        - .buildkite/hooks/**
-        - .buildkite/deploy/docker/docker-compose.yml
-        #OSS
+        # Shared x-pack dependencies
+        - x-pack/libbeat/**
+        # Shared OSS dependencies
+        - .go-version
         - go.mod
         - pytest.ini
         - dev-tools/**
         - libbeat/**
         - testing/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
+        - .buildkite/deploy/docker/docker-compose.yml
     trigger: "beats-xpack-metricbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -237,21 +254,22 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
+        # Beat-specific paths
         - x-pack/osquerybeat/**
         - .buildkite/x-pack/pipeline.xpack.osquerybeat.yml
-        - .buildkite/pipeline.yml
-        - .buildkite/scripts/**
-        - .buildkite/hooks/**
-        # x-pack
-        - libbeat/**
+        # Shared x-pack dependencies
         - x-pack/libbeat/**
-        #OSS
+        # Shared OSS dependencies
+        - .go-version
         - go.mod
         - pytest.ini
         - dev-tools/**
         - libbeat/**
         - testing/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "beats-xpack-osquerybeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -272,19 +290,23 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
+        # Beat-specific paths
         - winlogbeat/**
         - x-pack/winlogbeat/**
         - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
-        - .buildkite/pipeline.yml
-        - .buildkite/scripts/**
-        - .buildkite/hooks/**
-        #OSS
+        # Shared x-pack dependencies
+        - x-pack/libbeat/**
+        # Shared OSS dependencies
+        - .go-version
         - go.mod
         - pytest.ini
         - dev-tools/**
         - libbeat/**
         - testing/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "beats-xpack-winlogbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -305,14 +327,17 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
-        - .buildkite/deploy/kubernetes/**
-        - .buildkite/pipeline.yml
-        - .buildkite/hooks/**
-        - .buildkite/scripts/**
+        # Beat-specific paths
         - deploy/kubernetes/**
         - metricbeat/module/kubernetes/**
+        # Shared OSS dependencies
+        - .go-version
         - libbeat/docs/version.asciidoc
+        # Shared CI infrastructure
+        - .buildkite/deploy/kubernetes/**
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "deploy-k8s"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -333,17 +358,19 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
+        # Beat-specific paths
         - libbeat/**
-        - .buildkite/libbeat/pipeline.libbeat.yml
-        - .buildkite/pipeline.yml
-        - .buildkite/scripts/**
-        - .buildkite/hooks/**
-        #OSS
+        - .buildkite/libbeat/**
+        # Shared OSS dependencies
+        - .go-version
         - go.mod
         - pytest.ini
         - dev-tools/**
         - testing/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "beats-libbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -364,19 +391,20 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
-        - libbeat/**
+        # Beat-specific paths
         - x-pack/libbeat/**
         - .buildkite/x-pack/pipeline.xpack.libbeat.yml
-        - .buildkite/pipeline.yml
-        - .buildkite/scripts/**
-        - .buildkite/hooks/**
-        # x-pack
+        # Shared OSS dependencies
+        - .go-version
+        - libbeat/**
         - go.mod
         - pytest.ini
         - dev-tools/**
-        - libbeat/**
         - testing/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "beats-xpack-libbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -397,15 +425,18 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
+        # Beat-specific paths
         - x-pack/otel/**
         - .buildkite/x-pack/pipeline.xpack.otel.yml
-        - .buildkite/pipeline.yml
-        - .buildkite/scripts/**
-        - .buildkite/hooks/**
+        # Shared OSS dependencies
+        - .go-version
         - go.mod
         - dev-tools/**
         - testing/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "beats-xpack-otel"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -426,20 +457,23 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
+        # Beat-specific paths
         - auditbeat/**
-        - x-pack/auditbeat/
+        - x-pack/auditbeat/**
         - .buildkite/x-pack/pipeline.xpack.auditbeat.yml
-        - .buildkite/pipeline.yml
-        - .buildkite/scripts/**
-        - .buildkite/hooks/**
-        # x-pack
+        # Shared x-pack dependencies
+        - x-pack/libbeat/**
+        # Shared OSS dependencies
+        - .go-version
         - go.mod
         - pytest.ini
         - dev-tools/**
         - libbeat/**
         - testing/**
-        - x-pack/libbeat/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "beats-xpack-auditbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -460,20 +494,23 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
+        # Beat-specific paths
         - heartbeat/**
         - x-pack/heartbeat/**
         - .buildkite/x-pack/pipeline.xpack.heartbeat.yml
-        - .buildkite/pipeline.yml
-        - .buildkite/scripts/**
-        - .buildkite/hooks/**
-        # x-pack
+        # Shared x-pack dependencies
+        - x-pack/libbeat/**
+        # Shared OSS dependencies
+        - .go-version
         - go.mod
         - pytest.ini
         - dev-tools/**
         - libbeat/**
         - testing/**
-        - x-pack/libbeat/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "beats-xpack-heartbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -494,20 +531,23 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
+        # Beat-specific paths
         - packetbeat/**
         - x-pack/packetbeat/**
         - .buildkite/x-pack/pipeline.xpack.packetbeat.yml
-        - .buildkite/pipeline.yml
-        - .buildkite/scripts/**
-        - .buildkite/hooks/**
-        # x-pack
+        # Shared x-pack dependencies
+        - x-pack/libbeat/**
+        # Shared OSS dependencies
+        - .go-version
         - go.mod
         - pytest.ini
         - dev-tools/**
         - libbeat/**
         - testing/**
-        - x-pack/libbeat/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "beats-xpack-packetbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -528,18 +568,20 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
+        # Beat-specific paths
         - winlogbeat/**
-        - .buildkite/winlogbeat/pipeline.winlogbeat.yml
-        - .buildkite/pipeline.yml
-        - .buildkite/scripts/**
-        - .buildkite/hooks/**
-        #OSS
+        - .buildkite/winlogbeat/**
+        # Shared OSS dependencies
+        - .go-version
         - go.mod
         - pytest.ini
         - dev-tools/**
         - libbeat/**
         - testing/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "beats-winlogbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
@@ -560,18 +602,20 @@ steps:
     if: build.pull_request.id != null
     if_changed:
       include:
-        - .go-version
+        # Beat-specific paths
         - packetbeat/**
-        - .buildkite/packetbeat/pipeline.packetbeat.yml
-        - .buildkite/pipeline.yml
-        - .buildkite/scripts/**
-        - .buildkite/hooks/**
-        #OSS
+        - .buildkite/packetbeat/**
+        # Shared OSS dependencies
+        - .go-version
         - go.mod
         - pytest.ini
         - dev-tools/**
         - libbeat/**
         - testing/**
+        # Shared CI infrastructure
+        - .buildkite/pipeline.yml
+        - .buildkite/scripts/**
+        - .buildkite/hooks/**
     trigger: "beats-packetbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
