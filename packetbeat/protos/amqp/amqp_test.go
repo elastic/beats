@@ -19,6 +19,7 @@ package amqp
 
 import (
 	"encoding/hex"
+	"math"
 	"net"
 	"testing"
 
@@ -1289,4 +1290,49 @@ func TestAmqp_GetTable_EmptyTableAtEndOfData(t *testing.T) {
 	assert.False(t, exists)
 	assert.Equal(t, uint32(5), next)
 	assert.Empty(t, fields)
+}
+
+func TestAmqp_OverflowValidation_GetLVStringUint32OffsetWrap(t *testing.T) {
+	// Regression: wrapped uint32 offset arithmetic must not panic and should
+	// return an error for malformed input.
+	data := []byte{0, 0, 0, 1, 'x'}
+	var err bool
+	assert.NotPanics(t, func() {
+		_, _, err = getLVString[uint32](data, math.MaxUint32-1)
+	})
+	assert.True(t, err)
+}
+
+func TestAmqp_OverflowValidation_GetTableOffsetWrap(t *testing.T) {
+	// Regression: getTable must reject overflowed offsets without panicking.
+	fields := mapstr.M{}
+	data := []byte{0, 0, 0, 0, 0}
+	var (
+		next   uint32
+		err    bool
+		exists bool
+	)
+	assert.NotPanics(t, func() {
+		next, err, exists = getTable(fields, data, math.MaxUint32-1)
+	})
+	assert.True(t, err)
+	assert.False(t, exists)
+	assert.Equal(t, uint32(0), next)
+}
+
+func TestAmqp_OverflowValidation_GetArrayOffsetWrap(t *testing.T) {
+	// Regression: getArray must reject overflowed offsets without panicking.
+	fields := mapstr.M{}
+	data := []byte{0, 0, 0, 0, 0}
+	var (
+		next   uint32
+		err    bool
+		exists bool
+	)
+	assert.NotPanics(t, func() {
+		next, err, exists = getArray(fields, data, math.MaxUint32-1)
+	})
+	assert.True(t, err)
+	assert.False(t, exists)
+	assert.Equal(t, uint32(0), next)
 }

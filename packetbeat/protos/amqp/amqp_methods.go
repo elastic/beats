@@ -1004,10 +1004,11 @@ func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short s
 	if len(data) == 0 {
 		return "", 0, true
 	}
+	dataLen := uint32(len(data))
 	lengthSize := uint32(unsafe.Sizeof(length))
 
 	// If there's not enough data to read the length of the string return err
-	if int(offset+lengthSize) > len(data) {
+	if offset > dataLen || lengthSize > dataLen-offset {
 		return "", 0, true
 	}
 
@@ -1025,11 +1026,13 @@ func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short s
 		return "", lengthSize, false
 	}
 
-	if int(offset+lengthSize+strlen) > len(data) {
+	start := offset + lengthSize
+	if strlen > dataLen-start {
 		logp.Debug("amqp", "Not enough data for string")
 		return "", 0, true
 	}
-	return string(data[offset+lengthSize : offset+lengthSize+strlen]), strlen + lengthSize, false
+	end := start + strlen
+	return string(data[start:end]), strlen + lengthSize, false
 }
 
 // Attempts to get an integer from a byte slice. Returns the integer and an err boolean.
@@ -1037,10 +1040,11 @@ func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short s
 // The returned integer is meaningless if err == true
 func getIntegerAt[T uint8 | uint16 | uint32 | uint64 | int8 | int16 | int32 | int64](data []byte, offset uint32) (integer T, err bool) {
 	var value T
+	dataLen := uint32(len(data))
 	size := uint32(unsafe.Sizeof(value))
 
 	// If there's not enough bytes to read the requested integer type
-	if int(offset+size) > len(data) {
+	if offset > dataLen || size > dataLen-offset {
 		return T(0), true
 	}
 

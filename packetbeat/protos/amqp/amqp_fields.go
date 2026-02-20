@@ -31,27 +31,29 @@ import (
 // getTable updates fields with the table data at the given offset.
 // fields must be non_nil on entry.
 func getTable(fields mapstr.M, data []byte, offset uint32) (next uint32, err bool, exists bool) {
-	if int(offset+4) > len(data) {
+	dataLen := uint32(len(data))
+	if offset > dataLen || 4 > dataLen-offset {
 		logp.Debug("amqp", "Error while parsing a field table")
 		return 0, true, false
 	}
 	length := binary.BigEndian.Uint32(data[offset : offset+4])
+	tableStart := offset + 4
 
 	// size declared too big
-	if len(data) < int(offset+4+length) {
+	if length > dataLen-tableStart {
 		return 0, true, false
 	}
 	if length > 0 {
 		exists = true
 		table := mapstr.M{}
-		err := fieldUnmarshal(table, data[offset+4:offset+4+length], 0, length, -1)
+		err := fieldUnmarshal(table, data[tableStart:tableStart+length], 0, length, -1)
 		if err {
 			logp.Debug("amqp", "Error while parsing a field table")
 			return 0, true, false
 		}
 		fields.Update(table)
 	}
-	return length + 4 + offset, false, exists
+	return tableStart + length, false, exists
 }
 
 // getTable updates fields with the array data at the given offset.
@@ -62,22 +64,27 @@ func getArray(fields mapstr.M, data []byte, offset uint32) (next uint32, err boo
 		logp.Debug("amqp", "Error while parsing a field table")
 		return 0, true, false
 	}
+	dataLen := uint32(len(data))
 
 	// less actual data than the transmitted length indicates
-	if len(data) < int(offset+4+length) {
+	if offset > dataLen || 4 > dataLen-offset {
+		return 0, true, false
+	}
+	arrayStart := offset + 4
+	if length > dataLen-arrayStart {
 		return 0, true, false
 	}
 	if length > 0 {
 		exists = true
 		array := mapstr.M{}
-		err := fieldUnmarshal(array, data[offset+4:offset+4+length], 0, length, 0)
+		err := fieldUnmarshal(array, data[arrayStart:arrayStart+length], 0, length, 0)
 		if err {
 			logp.Debug("amqp", "Error while parsing a field array")
 			return 0, true, false
 		}
 		fields.Update(array)
 	}
-	return length + 4 + offset, false, exists
+	return arrayStart + length, false, exists
 }
 
 // The index parameter, when set at -1, indicates that the entry is a field table.
