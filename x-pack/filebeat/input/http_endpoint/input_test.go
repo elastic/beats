@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -341,30 +342,42 @@ var serverPoolTests = []struct {
 		wantErr: invalidTLSStateErr{addr: "127.0.0.1:9001", reason: "configuration options do not agree"},
 	},
 	{
-		name:   "exceed_max_in_flight",
+		// Test that sequential requests properly release in-flight bytes after ACK.
+		// With sequential requests and immediate ACK, in-flight bytes return to 0
+		// between requests, so all requests succeed. This verifies byte tracking
+		// correctly adds bytes during read and releases them after ACK.
+		// (See TestConcurrentExceedMaxInFlight for concurrent rejection testing.)
+		name:   "sequential_in_flight_tracking",
 		method: http.MethodPost,
 		cfgs: []*httpEndpoint{{
 			addr: "127.0.0.1:9001",
 			config: config{
-				Method:        http.MethodPost,
-				ResponseCode:  http.StatusOK,
-				ResponseBody:  `{"message": "success"}`,
-				ListenAddress: "127.0.0.1",
-				ListenPort:    "9001",
-				URL:           "/",
-				Prefix:        "json",
-				MaxInFlight:   2,
-				RetryAfter:    10,
-				ContentType:   "application/json",
+				Method:            http.MethodPost,
+				ResponseCode:      http.StatusOK,
+				ResponseBody:      `{"message": "success"}`,
+				ListenAddress:     "127.0.0.1",
+				ListenPort:        "9001",
+				URL:               "/",
+				Prefix:            "json",
+				MaxInFlight:       100,
+				HighWaterInFlight: 50,
+				LowWaterInFlight:  25,
+				RetryAfter:        10,
+				ContentType:       "application/json",
 			},
 		}},
 		events: []target{
-			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"a":1}`, wantBody: `{"warn":"max in flight message memory exceeded","max_in_flight":2,"in_flight":7}`, wantHeader: http.Header{"Retry-After": {"10"}}},
-			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"b":2}`, wantBody: `{"warn":"max in flight message memory exceeded","max_in_flight":2,"in_flight":7}`, wantHeader: http.Header{"Retry-After": {"10"}}},
-			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"c":3}`, wantBody: `{"warn":"max in flight message memory exceeded","max_in_flight":2,"in_flight":7}`, wantHeader: http.Header{"Retry-After": {"10"}}},
+			// Sequential requests succeed because in-flight returns to 0 between requests
+			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"a":1}`, wantBody: `{"message": "success"}`},
+			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"b":2}`, wantBody: `{"message": "success"}`},
+			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"c":3}`, wantBody: `{"message": "success"}`},
 		},
-		wantStatus: http.StatusServiceUnavailable,
-		want:       nil,
+		wantStatus: http.StatusOK,
+		want: []mapstr.M{
+			{"json": mapstr.M{"a": int64(1)}},
+			{"json": mapstr.M{"b": int64(2)}},
+			{"json": mapstr.M{"c": int64(3)}},
+		},
 	},
 	{
 		name:   "not_exceed_max_in_flight",
@@ -507,6 +520,126 @@ func TestServerPool(t *testing.T) {
 			wg.Wait()
 		})
 	}
+}
+
+// TestConcurrentExceedMaxInFlight tests that concurrent requests are properly
+// rejected when in-flight bytes exceed the high water mark. This requires
+// holding bytes until ACK, which means we need a publisher that delays ACK.
+func TestConcurrentExceedMaxInFlight(t *testing.T) {
+	servers := pool{servers: make(map[string]*server)}
+
+	// delayedACKPublisher delays ACK to simulate slow Elasticsearch processing.
+	// This causes bytes to be held in-flight while waiting for ACK.
+	var (
+		mu         sync.Mutex
+		events     []mapstr.M
+		ackDelayed = make(chan struct{})
+	)
+	delayedPublish := func(e beat.Event) {
+		mu.Lock()
+		events = append(events, e.Fields)
+		acker := e.Private.(*batchACKTracker)
+		mu.Unlock()
+
+		// First event waits for signal before ACKing.
+		// This holds bytes in-flight during the wait.
+		<-ackDelayed
+		acker.ACK()
+	}
+
+	cfg := &httpEndpoint{
+		addr: "127.0.0.1:9010",
+		config: config{
+			Method:            http.MethodPost,
+			ResponseCode:      http.StatusOK,
+			ResponseBody:      `{"message": "success"}`,
+			ListenAddress:     "127.0.0.1",
+			ListenPort:        "9010",
+			URL:               "/",
+			Prefix:            "json",
+			MaxInFlight:       100,
+			HighWaterInFlight: 10, // Low threshold so small JSON exceeds it.
+			LowWaterInFlight:  5,
+			ContentType:       "application/json",
+		},
+	}
+
+	ctx, cancel := newCtx("concurrent_exceed_test", "test")
+	defer cancel()
+
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err := servers.serve(ctx, cfg, delayedPublish, metrics)
+		if err != nil && err != http.ErrServerClosed {
+			t.Errorf("unexpected serve error: %v", err)
+		}
+	}()
+	time.Sleep(500 * time.Millisecond) // Wait for server to start.
+
+	var reqWg sync.WaitGroup
+
+	// Send first request with wait_for_completion_timeout.
+	// This will hold bytes in-flight until ACK (which we delay).
+	var firstStatus int
+	reqWg.Add(1)
+	go func() {
+		defer reqWg.Done()
+		resp, err := doRequest(http.MethodPost,
+			"http://127.0.0.1:9010/?wait_for_completion_timeout=5s",
+			"application/json",
+			strings.NewReader(`{"first":"request with enough bytes to exceed high water"}`))
+		if err != nil {
+			t.Errorf("first request failed: %v", err)
+			return
+		}
+		firstStatus = resp.StatusCode
+		resp.Body.Close()
+	}()
+
+	// Wait a bit for first request to be processing (reading body, waiting for ACK).
+	time.Sleep(200 * time.Millisecond)
+
+	// Send second request while first is holding bytes.
+	var secondStatus int
+	reqWg.Add(1)
+	go func() {
+		defer reqWg.Done()
+		resp, err := doRequest(http.MethodPost,
+			"http://127.0.0.1:9010/?wait_for_completion_timeout=5s",
+			"application/json",
+			strings.NewReader(`{"second":"request"}`))
+		if err != nil {
+			t.Errorf("second request failed: %v", err)
+			return
+		}
+		secondStatus = resp.StatusCode
+		resp.Body.Close()
+	}()
+
+	// Wait for second request to complete (should be rejected quickly).
+	time.Sleep(200 * time.Millisecond)
+
+	// Now release the first request's ACK.
+	close(ackDelayed)
+
+	// Wait for both requests to complete.
+	reqWg.Wait()
+
+	// First request should succeed (it got in before high water).
+	if firstStatus != http.StatusOK {
+		t.Errorf("first request: got status %d, want %d", firstStatus, http.StatusOK)
+	}
+
+	// Second request should be rejected with 503 (high water exceeded).
+	if secondStatus != http.StatusServiceUnavailable {
+		t.Errorf("second request: got status %d, want %d", secondStatus, http.StatusServiceUnavailable)
+	}
+
+	cancel()
+	wg.Wait()
 }
 
 func TestNewHTTPEndpoint(t *testing.T) {
