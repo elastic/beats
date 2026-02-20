@@ -2,6 +2,7 @@
 
 # Write an event with a fabricated SID that has no corresponding account.
 write-event 'Unknown SID S-1-5-21-3623811015-3361044348-30300820-1013' --sid=S-1-5-21-3623811015-3361044348-30300820-1013
+wait-for-event-log 1
 exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 check-event-count output 1
 check-event-field output 0 message 'Unknown SID S-1-5-21-3623811015-3361044348-30300820-1013'

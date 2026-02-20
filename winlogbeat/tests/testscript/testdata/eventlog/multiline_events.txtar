@@ -1,6 +1,7 @@
 [!windows] skip 'requires Windows'
 
 write-multiline-event
+wait-for-event-log 1
 exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 check-event-count output 1
 check-event-field-exists output 0 message

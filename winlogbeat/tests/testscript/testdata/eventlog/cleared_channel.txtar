@@ -3,6 +3,7 @@
 # Write two events and consume them.
 write-event 'First event'
 write-event 'Second event'
+wait-for-event-log 2
 exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 check-event-count output 2
 
@@ -13,6 +14,7 @@ clear-event-log
 # Write a third event; winlogbeat should detect the stale bookmark and restart
 # from the beginning of the (now-empty then newly populated) channel.
 write-event 'Third event'
+wait-for-event-log 1
 exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 check-event-count output 1
 check-event-field output 0 message 'Third event'

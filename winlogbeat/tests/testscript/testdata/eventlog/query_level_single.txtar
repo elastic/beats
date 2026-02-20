@@ -4,6 +4,7 @@ write-event 'success' --level=success
 write-event 'error' --level=error
 write-event 'warning' --level=warning
 write-event 'information' --level=information
+wait-for-event-log 4
 exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 check-event-count output 1
 check-event-field output 0 log.level 'warning'

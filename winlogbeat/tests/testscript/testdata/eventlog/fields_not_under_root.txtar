@@ -1,6 +1,7 @@
 [!windows] skip 'requires Windows'
 
 write-event 'Add fields (not under root)'
+wait-for-event-log 1
 exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 check-event-count output 1
 check-event-field output 0 message 'Add fields (not under root)'

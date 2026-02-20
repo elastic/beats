@@ -52,6 +52,7 @@ func customCommands() map[string]func(*testscript.TestScript, bool, []string) {
 		"check-event-field-contains": cmdCheckEventFieldContains,
 		"sleep":                      cmdSleep,
 		"wait-for-event-count":       cmdWaitForEventCount,
+		"wait-for-event-log":         cmdWaitForEventLog,
 	}
 }
 
@@ -341,6 +342,74 @@ func cmdWaitForEventCount(script *testscript.TestScript, neg bool, args []string
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
+}
+
+// cmdWaitForEventLog implements: wait-for-event-log <count> [<timeout>]
+// Polls the Windows event log for $PROVIDER until at least <count> events
+// are visible, or times out. This ensures events written by write-event are
+// committed and readable before winlogbeat starts.
+func cmdWaitForEventLog(script *testscript.TestScript, neg bool, args []string) {
+	if len(args) < 1 || len(args) > 2 {
+		script.Fatalf("usage: wait-for-event-log <count> [<timeout>]")
+	}
+	want, err := strconv.Atoi(args[0])
+	if err != nil {
+		script.Fatalf("wait-for-event-log: invalid count %q: %v", args[0], err)
+	}
+	timeout := 30 * time.Second
+	if len(args) == 2 {
+		timeout, err = time.ParseDuration(args[1])
+		if err != nil {
+			script.Fatalf("wait-for-event-log: invalid timeout %q: %v", args[1], err)
+		}
+	}
+
+	provider := script.Getenv("PROVIDER")
+	if provider == "" {
+		script.Fatalf("wait-for-event-log: $PROVIDER not set")
+	}
+
+	deadline := time.Now().Add(timeout)
+	for {
+		n, err := countEventLogRecords(provider)
+		if err != nil {
+			script.Fatalf("wait-for-event-log: %v", err)
+		}
+		if n >= want {
+			return
+		}
+		if time.Now().After(deadline) {
+			script.Fatalf("wait-for-event-log: timed out after %v; got %d events in %q, want %d",
+				timeout, n, provider, want)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+}
+
+// countEventLogRecords queries the Windows event log channel and returns the
+// number of event records it contains.
+func countEventLogRecords(channel string) (int, error) {
+	h, err := wineventlog.EvtQuery(wineventlog.NilHandle, channel, "", wineventlog.EvtQueryChannelPath|wineventlog.EvtQueryForwardDirection)
+	if err != nil {
+		return 0, fmt.Errorf("EvtQuery(%q): %w", channel, err)
+	}
+	defer wineventlog.Close(h)
+
+	var count int
+	for {
+		handles, err := wineventlog.EventHandles(h, 100)
+		if err != nil {
+			if err == wineventlog.ERROR_NO_MORE_ITEMS { //nolint:errorlint // errno comparison
+				break
+			}
+			return 0, fmt.Errorf("EventHandles: %w", err)
+		}
+		count += len(handles)
+		for _, eh := range handles {
+			wineventlog.Close(eh)
+		}
+	}
+	return count, nil
 }
 
 // cmdSleep implements: sleep <duration>

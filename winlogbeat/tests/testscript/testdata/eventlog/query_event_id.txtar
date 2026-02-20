@@ -6,6 +6,7 @@ write-event 'event_id test case' --id=100
 write-event 'event_id test case' --id=150
 write-event 'event_id test case' --id=175
 write-event 'event_id test case' --id=200
+wait-for-event-log 6
 exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 check-event-count output 4
 check-event-field output 0 winlog.event_id '50'

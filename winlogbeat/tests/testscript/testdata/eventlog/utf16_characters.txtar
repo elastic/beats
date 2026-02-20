@@ -1,6 +1,7 @@
 [!windows] skip 'requires Windows'
 
 write-event '解凍したフォルダのインストールスクリプトを実施し象形字'
+wait-for-event-log 1
 exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 check-event-count output 1
 check-event-field output 0 message '解凍したフォルダのインストールスクリプトを実施し象形字'

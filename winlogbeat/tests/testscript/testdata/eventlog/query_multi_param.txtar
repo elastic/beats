@@ -3,6 +3,7 @@
 write-event 'selected' --source=$OTHER_APP_SOURCE --id=556 --level=error
 write-event 'filtered-level' --source=$OTHER_APP_SOURCE --id=556 --level=information
 write-event 'filtered-source' --id=556 --level=warning
+wait-for-event-log 3
 exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 check-event-count output 1
 check-event-field output 0 message 'selected'

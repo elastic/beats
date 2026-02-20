@@ -2,6 +2,7 @@
 
 write-event 'selected' --source=$OTHER_APP_SOURCE
 write-event 'filtered'
+wait-for-event-log 2
 exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 check-event-count output 1
 check-event-field output 0 message 'selected'

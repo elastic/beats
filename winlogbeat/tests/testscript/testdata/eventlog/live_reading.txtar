@@ -2,6 +2,7 @@
 
 # Write an event before winlogbeat starts so we verify it reads historical events.
 write-event 'Before start'
+wait-for-event-log 1
 
 # Start winlogbeat in the background. No no_more_events: stop — it keeps polling
 # the channel until the test ends and testscript kills the process.

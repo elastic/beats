@@ -2,6 +2,7 @@
 
 # First run: write one event to establish a valid bookmark.
 write-event 'First event'
+wait-for-event-log 1
 exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 check-event-count output 1
 check-event-field output 0 message 'First event'

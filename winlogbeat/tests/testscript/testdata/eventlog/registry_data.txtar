@@ -1,6 +1,7 @@
 [!windows] skip 'requires Windows'
 
 write-event 'Hello world!'
+wait-for-event-log 1
 exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 check-event-count output 1
 
