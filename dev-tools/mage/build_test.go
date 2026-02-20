@@ -66,7 +66,7 @@ func Test_BuildArgs_ParseBuildTags(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			args := BuildArgs{ExtraFlags: tc.input}
 			flags := args.ParseBuildTags()
-			assert.EqualValues(t, tc.expect, flags)
+			assert.Equal(t, tc.expect, flags)
 		})
 	}
 }

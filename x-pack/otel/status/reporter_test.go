@@ -27,26 +27,26 @@ func TestGroupStatus(t *testing.T) {
 	subReporter3.UpdateStatus(status.Running, "")
 
 	require.Equalf(t, componentstatus.StatusOK, m.Evt.Status(), "expected StatusOK, got %v", m.Evt.Status())
-	require.Nilf(t, m.Evt.Err(), "expected nil, got %v")
+	require.NoErrorf(t, m.Evt.Err(), "expected nil, got %v")
 
 	subReporter1.UpdateStatus(status.Degraded, "Degrade Runner1")
-	require.Equalf(t, m.Evt.Status(), componentstatus.StatusRecoverableError, "expected StatusDegraded, got %v", m.Evt.Status())
-	require.NotNil(t, m.Evt.Err(), "expected non-nil error, got nil")
-	require.Equalf(t, m.Evt.Err().Error(), "Degrade Runner1", "expected 'Degrade Runner1', got %v", m.Evt.Err())
+	require.Equalf(t, componentstatus.StatusRecoverableError, m.Evt.Status(), "expected StatusDegraded, got %v", m.Evt.Status())
+	require.Error(t, m.Evt.Err(), "expected non-nil error, got nil")
+	require.Equalf(t, "Degrade Runner1", m.Evt.Err().Error(), "expected 'Degrade Runner1', got %v", m.Evt.Err())
 
 	subReporter3.UpdateStatus(status.Degraded, "Degrade Runner3")
 	subReporter2.UpdateStatus(status.Failed, "Failed Runner2")
 
-	require.Equalf(t, m.Evt.Status(), componentstatus.StatusPermanentError, "expected StatusPermanentError, got %v", m.Evt.Status())
-	require.NotNil(t, m.Evt.Err(), "expected non-nil error, got nil")
-	require.Equalf(t, m.Evt.Err().Error(), "Failed Runner2", "expected 'Failed Runner1', got %v", m.Evt.Err())
+	require.Equalf(t, componentstatus.StatusPermanentError, m.Evt.Status(), "expected StatusPermanentError, got %v", m.Evt.Status())
+	require.Error(t, m.Evt.Err(), "expected non-nil error, got nil")
+	require.Equalf(t, "Failed Runner2", m.Evt.Err().Error(), "expected 'Failed Runner1', got %v", m.Evt.Err())
 
 	// group reporter is updated directly
 	reporter.UpdateStatus(status.Failed, "beatreceiver failed to start")
 
-	require.Equalf(t, m.Evt.Status(), componentstatus.StatusPermanentError, "expected StatusPermanentError, got %v", m.Evt.Status())
-	require.NotNil(t, m.Evt.Err(), "expected non-nil error, got nil")
-	require.Equalf(t, m.Evt.Err().Error(), "beatreceiver failed to start", "expected 'beatreceiver failed to start', got %v", m.Evt.Err())
+	require.Equalf(t, componentstatus.StatusPermanentError, m.Evt.Status(), "expected StatusPermanentError, got %v", m.Evt.Status())
+	require.Error(t, m.Evt.Err(), "expected non-nil error, got nil")
+	require.Equalf(t, "beatreceiver failed to start", m.Evt.Err().Error(), "expected 'beatreceiver failed to start', got %v", m.Evt.Err())
 }
 
 func TestToPdata(t *testing.T) {
@@ -173,7 +173,7 @@ func TestInputStatusesInEventAttributes(t *testing.T) {
 
 	runner1Error, ok := runner1Map.Get("error")
 	require.True(t, ok)
-	assert.Equal(t, "", runner1Error.Str())
+	assert.Empty(t, runner1Error.Str())
 
 	// Check runner-2 status
 	runner2Val, ok := inputsMap.Get("runner-2")

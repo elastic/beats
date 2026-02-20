@@ -73,8 +73,8 @@ func TestStore_OpenClose(t *testing.T) {
 	t.Run("load from empty", func(t *testing.T) {
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
-		require.Equal(t, 0, len(storeMemorySnapshot(store)))
-		require.Equal(t, 0, len(storeInSyncSnapshot(store)))
+		require.Empty(t, storeMemorySnapshot(store))
+		require.Empty(t, storeInSyncSnapshot(store))
 	})
 
 	t.Run("already available state is loaded", func(t *testing.T) {
@@ -256,9 +256,9 @@ func TestStore_ResetCursor(t *testing.T) {
 		res := store.Get("test::key")
 		require.Equal(t, uint(0), res.version)
 		require.Equal(t, uint(0), res.lockedVersion)
-		require.Equal(t, nil, res.cursor)
-		require.Equal(t, nil, res.pendingCursorValue)
-		require.Equal(t, nil, res.pendingUpdate)
+		require.Nil(t, res.cursor)
+		require.Nil(t, res.pendingCursorValue)
+		require.Nil(t, res.pendingUpdate)
 
 		store.resetCursor("test::key", cur{Offset: 10})
 
@@ -286,8 +286,8 @@ func TestStore_ResetCursor(t *testing.T) {
 		require.Equal(t, uint(0), res.version)
 		require.Equal(t, uint(0), res.lockedVersion)
 		require.Equal(t, map[string]interface{}{"offset": int64(6)}, res.cursor)
-		require.Equal(t, nil, res.pendingCursorValue)
-		require.Equal(t, nil, res.pendingUpdate)
+		require.Nil(t, res.pendingCursorValue)
+		require.Nil(t, res.pendingUpdate)
 
 		store.resetCursor("test::key", cur{Offset: 0})
 
@@ -331,8 +331,8 @@ func TestStore_ResetCursor(t *testing.T) {
 		require.Equal(t, uint(0), res.lockedVersion)
 		require.Equal(t, uint(0), res.activeCursorOperations)
 		require.Equal(t, map[string]interface{}{"offset": int64(0)}, res.cursor)
-		require.Equal(t, nil, res.pendingCursorValue)
-		require.Equal(t, nil, res.pendingUpdate)
+		require.Nil(t, res.pendingCursorValue)
+		require.Nil(t, res.pendingUpdate)
 	})
 }
 

@@ -52,7 +52,7 @@ func TestWatchTicks(t *testing.T) {
 
 	// Test that we've seen one lbl start, but none stop
 	assert.Equal(t, uuids, startUUIDs)
-	assert.Len(t, stopUUIDs, 0)
+	assert.Empty(t, stopUUIDs)
 	assert.Equal(t, lbls, startLbls)
 
 	// Stop the lbl and test that we see a single stop

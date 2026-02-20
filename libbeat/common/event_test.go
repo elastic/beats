@@ -195,7 +195,7 @@ func TestConvertNestedStruct(t *testing.T) {
 
 	g := NewGenericEventConverter(false, logptest.NewTestingLogger(t, ""))
 	for i, test := range tests {
-		assert.EqualValues(t, test.Output, g.Convert(test.Input), "Test case %v", i)
+		assert.Equal(t, test.Output, g.Convert(test.Input), "Test case %v", i)
 	}
 }
 
@@ -239,7 +239,7 @@ func TestConvertWithNullEmission(t *testing.T) {
 
 	g := NewGenericEventConverter(true, logptest.NewTestingLogger(t, ""))
 	for i, test := range tests {
-		assert.EqualValues(t, test.Output, g.Convert(test.Input), "Test case %v", i)
+		assert.Equal(t, test.Output, g.Convert(test.Input), "Test case %v", i)
 	}
 }
 
@@ -351,7 +351,7 @@ func TestNormalizeMapError(t *testing.T) {
 }
 
 func TestJoinKeys(t *testing.T) {
-	assert.Equal(t, "", joinKeys(""))
+	assert.Empty(t, joinKeys(""))
 	assert.Equal(t, "co", joinKeys("co"))
 	assert.Equal(t, "co.elastic", joinKeys("", "co", "elastic"))
 	assert.Equal(t, "co.elastic", joinKeys("co", "elastic"))
@@ -517,8 +517,8 @@ func TestDeDotJSON(t *testing.T) {
 	}
 	for _, test := range tests {
 		input, output := test.valuer(), test.valuer()
-		assert.Nil(t, json.Unmarshal(test.input, &input))
-		assert.Nil(t, json.Unmarshal(test.output, &output))
+		assert.NoError(t, json.Unmarshal(test.input, &input))
+		assert.NoError(t, json.Unmarshal(test.output, &output))
 		assert.Equal(t, output, DeDotJSON(input))
 		if _, ok := test.valuer().(map[string]interface{}); ok {
 			assert.Equal(t, mapstr.M(output.(map[string]interface{})), DeDotJSON(mapstr.M(input.(map[string]interface{}))))

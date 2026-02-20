@@ -41,7 +41,7 @@ func TestFetchTCP(t *testing.T) {
 
 	t.Log(events)
 	totals := findItems(events, "total")
-	assert.Equal(t, 1, len(totals))
+	assert.Len(t, totals, 1)
 }
 
 func TestData(t *testing.T) {
@@ -74,7 +74,7 @@ func TestFetchHTTP(t *testing.T) {
 
 	t.Log(events)
 	totals := findItems(events, "total")
-	assert.Equal(t, 1, len(totals))
+	assert.Len(t, totals, 1)
 }
 
 func getConfig(scheme string, host string) map[string]interface{} {

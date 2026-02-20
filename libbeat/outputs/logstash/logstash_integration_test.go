@@ -415,7 +415,7 @@ func testSendMultipleBatchesViaLogstash(
 
 	for _, batch := range batches {
 		ok := ls.BulkPublish(batch)
-		assert.Equal(t, true, ok)
+		assert.True(t, ok)
 	}
 
 	// wait for logstash event flush + elasticsearch
@@ -476,7 +476,7 @@ func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string,
 	}
 
 	// validate
-	assert.Equal(t, len(lsResp), len(esResp))
+	assert.Len(t, esResp, len(lsResp))
 	if len(lsResp) != 1 {
 		t.Fatalf("wrong number of results: %d", len(lsResp))
 	}
@@ -532,7 +532,7 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 
 	// validate
 	if len(lsResp) != len(esResp) {
-		assert.Equal(t, len(lsResp), len(esResp))
+		assert.Len(t, esResp, len(lsResp))
 		t.Fatalf("wrong number of results: es=%d, ls=%d",
 			len(esResp), len(lsResp))
 	}

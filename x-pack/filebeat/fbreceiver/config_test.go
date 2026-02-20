@@ -35,11 +35,11 @@ func TestValidate(t *testing.T) {
 	for name, tc := range tests {
 		err := tc.c.Validate()
 		if tc.hasError {
-			assert.NotNil(t, err, name)
+			assert.Error(t, err, name)
 			assert.Equal(t, err.Error(), tc.errorString, name)
 		}
 		if !tc.hasError {
-			assert.Nil(t, err, name)
+			assert.NoError(t, err, name)
 		}
 	}
 }

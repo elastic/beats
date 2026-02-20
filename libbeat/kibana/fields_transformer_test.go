@@ -159,7 +159,7 @@ func TestValidDuplicateField(t *testing.T) {
 	transformed, err := trans.transform()
 	require.NoError(t, err)
 	out := transformed["fields"].([]mapstr.M)[0]
-	assert.Equal(t, out, mapstr.M{
+	assert.Equal(t, mapstr.M{
 		"aggregatable": false,
 		"analyzed":     true,
 		"count":        2,
@@ -169,7 +169,7 @@ func TestValidDuplicateField(t *testing.T) {
 		"scripted":     false,
 		"searchable":   false,
 		"type":         "string",
-	})
+	}, out)
 }
 
 func TestInvalidVersion(t *testing.T) {
@@ -215,7 +215,7 @@ func TestTransformTypes(t *testing.T) {
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fields"].([]mapstr.M)[0]
-		assert.Equal(t, test.expected, out["type"], fmt.Sprintf("Failed for idx %v", idx))
+		assert.Equal(t, test.expected, out["type"], "Failed for idx %v", idx)
 	}
 }
 
@@ -260,9 +260,9 @@ func TestTransformGroup(t *testing.T) {
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fields"].([]mapstr.M)
-		assert.Equal(t, len(test.expected)+ctMetaData, len(out))
+		assert.Len(t, out, len(test.expected)+ctMetaData)
 		for i, e := range test.expected {
-			assert.Equal(t, e, out[i]["name"], fmt.Sprintf("Failed for idx %v", idx))
+			assert.Equal(t, e, out[i]["name"], "Failed for idx %v", idx)
 		}
 	}
 }
@@ -535,7 +535,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fieldFormatMap"]
-		assert.Equal(t, test.expected, out, fmt.Sprintf("Failed for idx %v", idx))
+		assert.Equal(t, test.expected, out, "Failed for idx %v", idx)
 	}
 }
 
@@ -603,9 +603,9 @@ func TestTransformGroupAndEnabled(t *testing.T) {
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fields"].([]mapstr.M)
-		assert.Equal(t, len(test.expected)+ctMetaData, len(out))
+		assert.Len(t, out, len(test.expected)+ctMetaData)
 		for i, e := range test.expected {
-			assert.Equal(t, e, out[i]["name"], fmt.Sprintf("Failed for idx %v", idx))
+			assert.Equal(t, e, out[i]["name"], "Failed for idx %v", idx)
 		}
 	}
 }

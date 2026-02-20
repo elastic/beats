@@ -410,7 +410,7 @@ logging.level: debug
 	path := filepath.Join(filebeat.TempDir(), "output-*.ndjson")
 	files, err := filepath.Glob(path)
 	require.NoError(t, err, "failed to glob output files")
-	require.Len(t, files, 0, "expected no output file to be created as no event should have been published")
+	require.Empty(t, files, "expected no output file to be created as no event should have been published")
 }
 
 // TestFilestreamGZIPEOF ensures, for GZIP files, filestream:
@@ -579,7 +579,7 @@ func TestFilestreamGZIPMetrics(t *testing.T) {
 	dataGZ := gziptest.Compress(t, gzPlainData, gziptest.CorruptNone)
 
 	// sanity check
-	require.Equal(t, len(dataPlain), len(gzPlainData),
+	require.Len(t, gzPlainData, len(dataPlain),
 		"data for both plain and gzip file should have the same size")
 
 	filebeat := integration.NewBeat(
@@ -1396,7 +1396,7 @@ func matchPublishedLinesFromFile(t *testing.T, outputFilePattern string, lines [
 
 func matchPublishedLines(t *testing.T, got []byte, want []string) {
 	gotLinesJSON := strings.Split(strings.TrimSpace(string(got)), "\n")
-	assert.Equal(t, len(want), len(gotLinesJSON), "unexpected number of events")
+	assert.Len(t, gotLinesJSON, len(want), "unexpected number of events")
 
 	gotLines := make([]string, len(gotLinesJSON))
 

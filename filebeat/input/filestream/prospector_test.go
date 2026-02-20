@@ -168,7 +168,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 			}
 			err := p.Init(testStore, newMockStoreUpdater(nil), func(loginp.Source) string { return testCase.newKey })
 			require.NoError(t, err, "prospector Init must succeed")
-			assert.EqualValues(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
+			assert.Equal(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
 		})
 	}
 }

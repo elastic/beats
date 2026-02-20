@@ -77,7 +77,7 @@ func TestCursor_Unpack(t *testing.T) {
 		cursor := makeCursor(store, store.Get("test::key"))
 
 		require.NoError(t, cursor.Unpack(&st))
-		require.Equal(t, "", st)
+		require.Empty(t, st)
 	})
 
 	t.Run("unpack fails if types are not compatible", func(t *testing.T) {

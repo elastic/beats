@@ -363,8 +363,8 @@ id: unique-ID
 				assert.ErrorContains(t, err, "filestream inputs with duplicated IDs")
 				assert.ErrorContains(t, err, "duplicated-id-1")
 				assert.ErrorContains(t, err, "duplicated-id-2")
-				assert.Equal(t, strings.Count(err.Error(), "duplicated-id-1"), 1, "each IDs should appear only once")
-				assert.Equal(t, strings.Count(err.Error(), "duplicated-id-2"), 1, "each IDs should appear only once")
+				assert.Equal(t, 1, strings.Count(err.Error(), "duplicated-id-1"), "each IDs should appear only once")
+				assert.Equal(t, 1, strings.Count(err.Error(), "duplicated-id-2"), "each IDs should appear only once")
 
 			},
 			assertLogs: func(t *testing.T, obs *observer.ObservedLogs) {

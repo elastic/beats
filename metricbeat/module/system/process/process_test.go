@@ -198,7 +198,7 @@ func requireGetSubMap(t *testing.T, m map[string]any, key string) map[string]any
 	t.Helper()
 	require.Contains(t, m, key)
 	rawValue := m[key]
-	require.IsType(t, rawValue, map[string]any{})
+	require.IsType(t, map[string]any{}, rawValue)
 	subMap, ok := rawValue.(map[string]any)
 	require.True(t, ok)
 	return subMap

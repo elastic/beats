@@ -136,7 +136,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 
 			p.Run(ctx, newMockMetadataUpdater(), hg)
 
-			require.Equal(t, len(test.expectedEvents), len(hg.events))
+			require.Len(t, hg.events, len(test.expectedEvents))
 			for i := 0; i < len(test.expectedEvents); i++ {
 				require.Equal(t, test.expectedEvents[i], hg.events[i])
 			}
@@ -146,7 +146,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 				if !ok {
 					t.Fatalf("cannot find %s in original files\n", originalFile)
 				}
-				require.Equal(t, len(rotatedFiles), len(rFile.rotated))
+				require.Len(t, rFile.rotated, len(rotatedFiles))
 				for i, rotatedFile := range rotatedFiles {
 					if rFile.rotated[i].path != rotatedFile {
 						t.Fatalf("%s is not a rotated file, instead %s is\n", rFile.rotated[i].path, rotatedFile)

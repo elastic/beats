@@ -526,9 +526,9 @@ func TestServiceEventer_NamespaceWatcher(t *testing.T) {
 			namespaceWatcher := eventer.(*service).namespaceWatcher
 
 			if test.expectedNil {
-				assert.Equalf(t, nil, namespaceWatcher, test.msg)
+				assert.Nilf(t, namespaceWatcher, test.msg)
 			} else {
-				assert.NotEqualf(t, nil, namespaceWatcher, test.msg)
+				assert.NotNilf(t, namespaceWatcher, test.msg)
 			}
 		})
 	}

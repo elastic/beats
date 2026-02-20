@@ -54,7 +54,7 @@ func TestWatchTicks(t *testing.T) {
 
 	// Test that we've seen one ec2 start, but none stop
 	assert.Equal(t, instanceIDs, startUUIDs)
-	assert.Len(t, stopUUIDs, 0)
+	assert.Empty(t, stopUUIDs)
 	assert.Equal(t, instances, startEC2s)
 
 	// Stop the ec2 and test that we see a single stop

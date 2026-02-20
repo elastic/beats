@@ -45,7 +45,7 @@ func TestJSONEncoderMarshalBeatEvent(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while marshaling beat.Event using JSONEncoder: %v", err)
 	}
-	assert.Equal(t, encoder.buf.String(), "{\"@timestamp\":\"2017-11-07T12:00:00.000Z\",\"field1\":\"value1\"}\n",
+	assert.JSONEq(t, "{\"@timestamp\":\"2017-11-07T12:00:00.000Z\",\"field1\":\"value1\"}\n", encoder.buf.String(),
 		"Unexpected marshaled format of beat.Event")
 }
 
@@ -62,7 +62,7 @@ func TestJSONEncoderMarshalMonitoringEvent(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while marshaling report.Event using JSONEncoder: %v", err)
 	}
-	assert.Equal(t, encoder.buf.String(), "{\"timestamp\":\"2017-11-07T12:00:00.000Z\",\"field1\":\"value1\"}\n",
+	assert.JSONEq(t, "{\"timestamp\":\"2017-11-07T12:00:00.000Z\",\"field1\":\"value1\"}\n", encoder.buf.String(),
 		"Unexpected marshaled format of report.Event")
 }
 

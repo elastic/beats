@@ -57,7 +57,7 @@ func TestSummarizeBufferInfo(t *testing.T) {
 		c, _ := common.RandomBytes(10000)
 		relativePos, surround := summarizeBufferInfo(200, c)
 		assert.Equal(t, 100, relativePos)
-		assert.Equal(t, 200, len(surround))
+		assert.Len(t, surround, 200)
 	})
 }
 
