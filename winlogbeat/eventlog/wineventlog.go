@@ -20,12 +20,14 @@
 package eventlog
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"golang.org/x/sys/windows"
 
@@ -36,6 +38,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	wininfo "github.com/elastic/go-sysinfo/providers/windows"
 )
+
+var ErrGapDetected = errors.New("record ID gap detected - events were lost")
 
 // winEventLog implements the EventLog interface for reading from the Windows
 // Event Log API.
@@ -52,7 +56,8 @@ type winEventLog struct {
 	iterator *win.EventIterator
 	renderer win.EventRenderer
 
-	metrics *inputMetrics
+	metrics     *inputMetrics
+	signalEvent windows.Handle
 }
 
 // newWinEventLog creates and returns a new EventLog for reading event logs
@@ -140,6 +145,18 @@ func (l *winEventLog) isForwarded() bool {
 	return (c.Forwarded != nil && *c.Forwarded) || (c.Forwarded == nil && c.Name == "ForwardedEvents")
 }
 
+// hasQueryFilters returns true if any filtering is applied that would cause non-sequential record IDs
+func (l *winEventLog) hasQueryFilters() bool {
+	// Custom XML query might have filters
+	if l.config.XMLQuery != "" {
+		return true
+	}
+
+	// Check simple query filters
+	sq := l.config.SimpleQuery
+	return sq.EventID != "" || sq.Level != "" || len(sq.Provider) > 0
+}
+
 // Name returns the name of the event log (i.e. Application, Security, etc.).
 func (l *winEventLog) Name() string {
 	return l.id
@@ -162,6 +179,17 @@ func (l *winEventLog) IgnoreMissingChannel() bool {
 
 func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
 	l.lastRead = state
+
+	hasFilters := l.hasQueryFilters()
+	l.log.Infow("Opening Windows Event Log",
+		"channel", l.channelName,
+		"start_record_id", state.RecordNumber,
+		"has_bookmark", len(state.Bookmark) > 0,
+		"batch_read_size", l.maxRead,
+		"has_query_filters", hasFilters,
+		"gap_detection_enabled", !hasFilters,
+		"stop_if_gap_found", l.config.StopIfGapFound)
+
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
 	if l.metrics == nil && l.id != "" {
@@ -174,6 +202,13 @@ func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *moni
 			return l.open(l.lastRead)
 		}),
 		win.WithBatchSize(l.maxRead))
+
+	if err != nil {
+		l.log.Errorw("Failed to create event iterator", "error", err)
+	} else {
+		l.log.Debugw("Event iterator created successfully", "batch_size", l.maxRead)
+	}
+
 	return err
 }
 
@@ -234,11 +269,23 @@ func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.Book
 func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) {
 	// Using a pull subscription to receive events. See:
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
-	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
+
+	// on resubscribe errors we need to close the signal event handle
+	l.closeSignalEvent()
+
+	// Manual-reset so we can explicitly reset after each wait. EvtSubscribe docs require
+	// "reset the object and wait for the service to signal again" to avoid the event
+	// staying signaled (e.g. on high-volume Security channel) and causing a tight loop
+	// and repeated resubscriptions.
+	const (
+		manualReset   = 1
+		initialSignaled = 1
+	)
+	signalEvent, err := windows.CreateEvent(nil, manualReset, initialSignaled, nil)
 	if err != nil {
 		return win.NilHandle, err
 	}
-	defer windows.CloseHandle(signalEvent) //nolint:errcheck // This is just a resource release.
+	l.signalEvent = signalEvent
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
@@ -263,12 +310,25 @@ func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) 
 
 	switch err { //nolint:errorlint // This is an errno or nil.
 	case nil:
+		l.log.Debugw("Subscription created successfully",
+			"subscription_handle", uintptr(h),
+			"flags", uint32(flags))
 		return h, nil
 	case win.ERROR_NOT_FOUND, win.ERROR_EVT_QUERY_RESULT_STALE, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION:
 		// The bookmarked event was not found, we retry the subscription from the start.
+		l.log.Warnw("Bookmark error - subscription recreating from oldest record",
+			"error", err,
+			"last_read_record_id", l.lastRead.RecordNumber,
+			"bookmark_was_set", bookmark > 0)
 		incrementMetric(readErrors, err)
-		return win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
+		h, err = win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
+		if err != nil {
+			l.log.Errorw("Failed to recreate subscription from oldest", "error", err)
+			l.closeSignalEvent()
+		}
+		return h, err
 	default:
+		l.closeSignalEvent()
 		return 0, err
 	}
 }
@@ -283,6 +343,12 @@ func (l *winEventLog) Read() ([]Record, error) {
 	for h, ok := l.iterator.Next(); ok; h, ok = l.iterator.Next() {
 		record, err := l.processHandle(h)
 		if err != nil {
+			// Check if this is a gap detection error that should stop the beat
+			if errors.Is(err, ErrGapDetected) {
+				l.metrics.logError(err)
+				return records, err
+			}
+			// For other errors, log and drop the event
 			l.metrics.logError(err)
 			l.log.Warnw("Dropping event due to rendering error.", "error", err)
 			l.metrics.logDropped(err)
@@ -340,9 +406,38 @@ func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 		RecordNumber: r.RecordID,
 		Timestamp:    r.TimeCreated.SystemTime,
 	}
+
+	prevRecordID := l.lastRead.RecordNumber
 	if r.Offset.Bookmark, err = l.createBookmarkFromEvent(h); err != nil {
 		l.metrics.logError(err)
-		l.log.Warnw("Failed creating bookmark.", "error", err)
+		l.log.Warnw("Failed creating bookmark.",
+			"error", err,
+			"record_id", r.RecordID)
+	}
+
+	// Detect record ID gaps (potential event loss)
+	// Only check for gaps when NO query filters are active, otherwise gaps are expected
+	if !l.hasQueryFilters() {
+		// Record IDs should be sequential for the same channel when reading all events
+		if prevRecordID > 0 && r.RecordID > prevRecordID+1 {
+			gapSize := r.RecordID - prevRecordID - 1
+
+			// Log at ERROR level for visibility - this indicates definite event loss
+			l.log.Errorw("⚠️  RECORD ID GAP DETECTED - Events were LOST",
+				"channel", l.channelName,
+				"previous_record_id", prevRecordID,
+				"current_record_id", r.RecordID,
+				"missing_events", gapSize,
+				"gap_range", fmt.Sprintf("[%d-%d]", prevRecordID+1, r.RecordID-1),
+				"timestamp", r.TimeCreated.SystemTime)
+
+			// If configured to stop on gap, return error to stop the beat
+			if l.config.StopIfGapFound {
+				l.lastRead = r.Offset
+				return r, fmt.Errorf("%w: channel=%s, previous_record_id=%d, current_record_id=%d, missing_events=%d",
+					ErrGapDetected, l.channelName, prevRecordID, r.RecordID, gapSize)
+			}
+		}
 	}
 	l.lastRead = r.Offset
 	return r, nil
@@ -364,6 +459,7 @@ func (l *winEventLog) Reset() error {
 	// unnecessarily recreating render contexts. The renderer's
 	// systemContext and userContext should remain valid across
 	// session resets since they were created independently.
+	defer l.closeSignalEvent()
 	if l.iterator == nil {
 		return nil
 	}
@@ -379,6 +475,7 @@ func (l *winEventLog) Close() error {
 }
 
 func (l *winEventLog) close() error {
+	defer l.closeSignalEvent()
 	if l.iterator == nil {
 		return l.renderer.Close()
 	}
@@ -402,4 +499,88 @@ func (l *winEventLog) skipQueryFilters() bool {
 		return false
 	}
 	return l.isForwarded() && strings.Contains(osinfo.Name, "2025")
+}
+
+const waitTimeout = 0x00000102
+
+var errWaitAbandoned = errors.New("wait abandoned")
+
+// WaitForEvents blocks until the Windows Event Log signal is triggered or context is canceled.
+// Falls back to timer if no signal event is available (file-based logs).
+func (l *winEventLog) WaitForEvents(ctx context.Context) error {
+	// Fall back to timer if no signal event (e.g., reading from file)
+	if l.signalEvent == 0 {
+		return l.waitWithTimer(ctx)
+	}
+
+	// Run the blocking wait in a goroutine so we can select on context
+	resultCh := make(chan error, 1)
+	go func() {
+		waitStart := time.Now()
+		// Wait with 60 second timeout (milliseconds)
+		status, err := windows.WaitForSingleObject(l.signalEvent, 60000)
+		waitDuration := time.Since(waitStart)
+
+		switch {
+		case status == windows.WAIT_OBJECT_0,
+			status == waitTimeout,
+			errors.Is(err, windows.ERROR_TIMEOUT):
+			// Signaled or timed out - events might be available. Reset so the next
+			// wait blocks until the service signals again (EvtSubscribe poll model).
+			waitReason := "timeout"
+			if status == windows.WAIT_OBJECT_0 {
+				waitReason = "signaled"
+			}
+			resetErr := windows.ResetEvent(l.signalEvent)
+			if resetErr != nil {
+				l.log.Warnw("ResetEvent failed after wait",
+					"wait_reason", waitReason,
+					"wait_status", status,
+					"wait_duration_ms", waitDuration.Milliseconds(),
+					"wait_error", err,
+					"reset_error", resetErr)
+			} else {
+				l.log.Debugw("ResetEvent succeeded after wait",
+					"wait_reason", waitReason,
+					"wait_status", status,
+					"wait_duration_ms", waitDuration.Milliseconds())
+			}
+			resultCh <- nil
+		case status == windows.WAIT_ABANDONED:
+			resultCh <- errWaitAbandoned
+		case err != nil:
+			resultCh <- fmt.Errorf("wait for signal event failed: %w", err)
+		default:
+			resultCh <- fmt.Errorf("wait for signal event failed with status %d", status)
+		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		// Context cancelled - return immediately without waiting for goroutine
+		return ctx.Err()
+	case err := <-resultCh:
+		return err
+	}
+}
+
+func (l *winEventLog) waitWithTimer(ctx context.Context) error {
+	timer := time.NewTimer(time.Second)
+	defer timer.Stop()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-timer.C:
+		return nil
+	}
+}
+
+func (l *winEventLog) closeSignalEvent() {
+	handle := l.signalEvent
+	if handle == 0 {
+		return
+	}
+	l.signalEvent = 0
+	_ = windows.CloseHandle(handle)
 }
