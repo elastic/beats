@@ -41,6 +41,19 @@ type fsNotifyReader struct {
 	parsers []FileParser
 }
 
+func newFSNotifyReader(c Config, l *logp.Logger) (EventProducer, error) {
+	// Test if fsnotify is available by trying to create a watcher
+	// This validates early that fsnotify can actually be used, allowing fallback to work
+	testWatcher, err := monitor.New(c.Recursive, c.IsExcludedPath)
+	if err != nil {
+		return nil, err
+	}
+	// Close the test watcher immediately - we'll create a new one in Start()
+	testWatcher.Close()
+
+	return &fsNotifyReader{config: c, log: l, parsers: FileParsers(c)}, nil
+}
+
 func (r *fsNotifyReader) Start(done <-chan struct{}) (<-chan Event, error) {
 	watcher, err := monitor.New(r.config.Recursive, r.config.IsExcludedPath)
 	if err != nil {

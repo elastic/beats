@@ -19,30 +19,12 @@
 
 package file_integrity
 
-import (
-	"errors"
+var autoBackendOrder = []Backend{
+	BackendETW,
+	BackendFSNotify,
+}
 
-	"github.com/elastic/elastic-agent-libs/logp"
-)
-
-func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
-	if c.Backend == BackendAuto || c.Backend == BackendFSNotify || c.Backend == "" {
-		// Auto and unset defaults to fsnotify
-		l := logger.Named("fsnotify")
-		l.Info("selected backend: fsnotify")
-		return &fsNotifyReader{
-			config:  c,
-			log:     l,
-			parsers: FileParsers(c),
-		}, nil
-	}
-
-	if c.Backend == BackendETW {
-		l := logger.Named("etw")
-		l.Info("selected backend: etw")
-		return newETWReader(c, l)
-	}
-
-	// unimplemented
-	return nil, errors.ErrUnsupported
+var supportedBackends = map[Backend]backendInitializer{
+	BackendETW:      newETWReader,
+	BackendFSNotify: newFSNotifyReader,
 }

@@ -45,7 +45,16 @@ type kProbesReader struct {
 	processor beat.Processor
 }
 
-func newKProbesReader(config Config, l *logp.Logger, parsers []FileParser) (*kProbesReader, error) {
+func newKProbesReader(config Config, l *logp.Logger) (EventProducer, error) {
+	// Test if kprobes is available by trying to create a monitor
+	// This validates early that kprobes can actually be used, allowing fallback to work
+	testMonitor, err := kprobes.New(config.Recursive, l)
+	if err != nil {
+		return nil, err
+	}
+	// Close the test monitor immediately - we'll create a new one in Start()
+	testMonitor.Close()
+
 	processor, err := add_process_metadata.NewWithConfig(
 		l,
 		add_process_metadata.ConfigOverwriteKeys(true),
@@ -59,7 +68,7 @@ func newKProbesReader(config Config, l *logp.Logger, parsers []FileParser) (*kPr
 		config:    config,
 		eventC:    make(chan Event),
 		log:       l,
-		parsers:   parsers,
+		parsers:   FileParsers(config),
 		processor: processor,
 	}, nil
 }

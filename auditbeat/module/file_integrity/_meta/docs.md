@@ -11,11 +11,10 @@ At startup this module will perform an initial scan of the configured files and 
 
 The operating system features that power this feature are as follows.
 
-* Linux - Multiple backends are supported: `auto`, `fsnotify`, `kprobes`, `ebpf`. By default, `fsnotify` is used, and therefore the kernel must have inotify support. Inotify was initially merged into the 2.6.13 Linux kernel. The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels. The `Kprobes` backend uses tracefs and supports 3.10+ kernels. FSNotify doesn’t have the ability to associate user data to file events. The preferred backend can be selected by specifying the `backend` config option. Since eBPF and Kprobes are in technical preview, `auto` will default to `fsnotify`.
+* Linux - Multiple backends are supported: `auto`, `fsnotify`, `kprobes`, `ebpf`. {applies_to}`stack: ga 9.3.0` By default, `auto` is used, which automatically selects the best available backend. The module tries `ebpf` first, falls back to `kprobes` if eBPF is not supported, and finally falls back to `fsnotify` if neither eBPF nor kprobes are available. The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels. The `Kprobes` backend uses tracefs and supports 3.10+ kernels. The `fsnotify` backend uses inotify (merged into Linux kernel 2.6.13) but doesn't have the ability to associate user data to file events. The backend can be explicitly selected by specifying the `backend` config option.
 * macOS (Darwin) - Uses the `FSEvents` API, present since macOS 10.5. This API coalesces multiple changes to a file into a single event. Auditbeat translates this coalesced changes into a meaningful sequence of actions. However, in rare situations the reported events may have a different ordering than what actually happened.
 * Windows:
-  * `ReadDirectoryChangesW` is used.
-  * {applies_to}`stack: preview 9.2.0` Multiple backends are supported: `auto`, `fsnotify`, `etw`. By default, `fsnotify` is used, which utilizes the `ReadDirectoryChangesW` Windows API. The `etw` backend uses Event Tracing for Windows (ETW) to monitor file system activities at the kernel level, supporting enhanced process context information. It requires Administrator privileges.
+  * {applies_to}`stack: preview 9.2.0` Multiple backends are supported: `auto`, `fsnotify`, `etw`. {applies_to}`stack: ga 9.3.0` By default, `auto` is used, which automatically tries the `etw` backend first, falling back to `fsnotify` if ETW is not available or supported. The `etw` backend uses Event Tracing for Windows (ETW) to monitor file system activities at the kernel level, supporting enhanced process context information and requires Administrator privileges. The `fsnotify` backend utilizes the `ReadDirectoryChangesW` Windows API. The backend can be explicitly selected by specifying the `backend` config option.
 
 The file integrity module should not be used to monitor paths on network file systems.
 
@@ -91,9 +90,11 @@ This module also supports the [standard configuration options](#module-standard-
 **`backend`**
 :   Select the backend that will be used to source events. The available backends vary by operating system:
     
-    * **Linux:** `auto`, `fsnotify`, `kprobes`, `ebpf`. Default: `fsnotify`.
-    * {applies_to}`stack: ga 9.2.0` **Windows:** `auto`, `fsnotify`, `etw`. Default: `fsnotify`.
-    * {applies_to}`stack: ga 9.2.0` **macOS:** Only `auto` and `fsnotify` are supported. Default: `fsnotify`
+    * **Linux:** `auto`, `fsnotify`, `kprobes`, `ebpf`. {applies_to}`stack: preview 9.3.0` Default: `auto`.
+    * {applies_to}`stack: ga 9.2.0` **Windows:** `auto`, `fsnotify`, `etw`. {applies_to}`stack: ga 9.3.0` Default: `auto`.
+    * {applies_to}`stack: ga 9.2.0` **macOS:** Only `auto` and `fsnotify` are supported. {applies_to}`stack: ga 9.3.0` Default: `auto`.
+    
+    {applies_to}`stack: ga 9.3.0` When `auto` is used (or when left unspecified), the module automatically selects the best available backend for the platform. See the "How it works" section for details on backend selection order.
 
 **`flush_interval`** {applies_to}`stack: ga 9.2.0`
 :   (**ETW backend only**) Controls how often the ETW backend flushes event correlation groups. The ETW backend groups related file operations (like create, write, close) to provide meaningful events. This setting determines how long to wait for related events before considering an operation complete and sending the event. Setting a shorter interval will send events more quickly but may break up related operations. Setting a longer interval will provide better event correlation but may delay event delivery and impact memory footprint. This option is ignored when using other backends. Default: `1m`.

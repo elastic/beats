@@ -88,8 +88,16 @@ var flagNames = map[fsevents.EventFlags]string{
 	fsevents.ItemIsSymlink:     "ItemIsSymlink",
 }
 
-// NewEventReader creates a new EventProducer backed by FSEvents macOS facility.
-func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
+var autoBackendOrder = []Backend{
+	BackendFSNotify,
+}
+
+var supportedBackends = map[Backend]backendInitializer{
+	BackendFSNotify: newFSEventsReader,
+}
+
+// newFSEventsReader creates a new EventProducer backed by FSEvents macOS facility.
+func newFSEventsReader(c Config, logger *logp.Logger) (EventProducer, error) {
 	stream := &fsevents.EventStream{
 		Paths: c.Paths,
 		// NoDefer: Ignore Latency field and send events as fast as possible.

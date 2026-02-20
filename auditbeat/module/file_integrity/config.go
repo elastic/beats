@@ -176,25 +176,14 @@ nextHash:
 		errs = append(errs, fmt.Errorf("invalid scan_rate_per_sec value: %w", err))
 	}
 
-	if c.Backend != "" {
-		switch runtime.GOOS {
-		case "linux":
-			if c.Backend == BackendETW {
-				errs = append(errs, errors.New("backend etw is not supported on linux"))
-			}
-		case "windows":
-			if c.Backend != BackendETW && c.Backend != BackendAuto {
-				errs = append(errs, errors.New("windows only supports etw or auto backend"))
-			}
-		default:
-			if c.Backend != BackendAuto {
-				errs = append(errs, errors.New("backend can only be specified on linux or windows"))
-			}
+	if c.Backend != "auto" && c.Backend != "" {
+		if _, found := supportedBackends[c.Backend]; !found {
+			errs = append(errs, fmt.Errorf("backend %v is not supported on %v", c.Backend, runtime.GOOS))
 		}
 	}
 
 	// Validate flush_interval for ETW backend
-	if c.Backend == BackendETW && c.FlushInterval < time.Second {
+	if runtime.GOOS == "windows" && (c.Backend == BackendETW || c.Backend == "auto" || c.Backend == "") && c.FlushInterval < time.Second {
 		errs = append(errs, fmt.Errorf("flush_interval must be at least 1 second, got %v", c.FlushInterval))
 	}
 
@@ -247,4 +236,9 @@ var defaultConfig = Config{
 	ScanAtStart:      true,
 	ScanRatePerSec:   "50 MiB",
 	FlushInterval:    time.Minute, // Default flush interval for ETW backend
+	// Backend is intentionally left empty (""), which triggers auto-selection.
+	// The auto-selection will choose the best available backend for the platform:
+	// - Linux: ebpf -> kprobes -> fsnotify
+	// - Windows: etw -> fsnotify
+	// - macOS: fsnotify
 }
