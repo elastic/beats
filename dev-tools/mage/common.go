@@ -991,20 +991,14 @@ var parseVersionRegex = regexp.MustCompile(`(?m)^[^\d]*(?P<major>\d+)\.(?P<minor
 // ParseVersion extracts the major, minor, and optional patch number from a
 // version string.
 func ParseVersion(version string) (major, minor, patch int, err error) {
-	names := parseVersionRegex.SubexpNames()
 	matches := parseVersionRegex.FindStringSubmatch(version)
 	if len(matches) == 0 {
-		err = fmt.Errorf("failed to parse version '%v'", version)
-		return major, minor, patch, err
+		return 0, 0, 0, fmt.Errorf("failed to parse version '%v'", version)
 	}
 
-	data := map[string]string{}
-	for i, match := range matches {
-		data[names[i]] = match
-	}
-	major, _ = strconv.Atoi(data["major"])
-	minor, _ = strconv.Atoi(data["minor"])
-	patch, _ = strconv.Atoi(data["patch"])
+	major, _ = strconv.Atoi(matches[1])
+	minor, _ = strconv.Atoi(matches[2])
+	patch, _ = strconv.Atoi(matches[3])
 	return major, minor, patch, nil
 }
 
