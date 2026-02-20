@@ -55,8 +55,8 @@ type ConfigAWS struct {
 }
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
-func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
-	awsConfig, _ := getAWSCredentials(beatsConfig)
+func InitializeAWSConfig(beatsConfig ConfigAWS, logger *logp.Logger) (awssdk.Config, error) {
+	awsConfig, _ := getAWSCredentials(beatsConfig, logger)
 	if awsConfig.Region == "" {
 		if beatsConfig.DefaultRegion != "" {
 			awsConfig.Region = beatsConfig.DefaultRegion
@@ -67,7 +67,7 @@ func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
 
 	// Assume IAM role if iam_role config parameter is given
 	if beatsConfig.RoleArn != "" {
-		addAssumeRoleProviderToAwsConfig(beatsConfig, &awsConfig)
+		addAssumeRoleProviderToAwsConfig(beatsConfig, &awsConfig, logger)
 	}
 
 	var proxy func(*http.Request) (*url.URL, error)
@@ -80,7 +80,7 @@ func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
 	}
 	var tlsConfig *tls.Config
 	if beatsConfig.TLS != nil {
-		TLSConfig, _ := tlscommon.LoadTLSConfig(beatsConfig.TLS)
+		TLSConfig, _ := tlscommon.LoadTLSConfig(beatsConfig.TLS, logger)
 		tlsConfig = TLSConfig.ToConfig()
 	}
 	awsConfig.HTTPClient = &http.Client{
@@ -97,13 +97,13 @@ func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
 // If access keys are not given, then load from AWS config file. If credential_profile_name is not
 // given, default profile will be used.
 // If role_arn is given, assume the IAM role either with access keys or default profile.
-func getAWSCredentials(beatsConfig ConfigAWS) (awssdk.Config, error) {
+func getAWSCredentials(beatsConfig ConfigAWS, logger *logp.Logger) (awssdk.Config, error) {
 	// Check if accessKeyID or secretAccessKey or sessionToken is given from configuration
 	if beatsConfig.AccessKeyID != "" || beatsConfig.SecretAccessKey != "" || beatsConfig.SessionToken != "" {
 		return getConfigForKeys(beatsConfig), nil
 	}
 
-	return getConfigSharedCredentialProfile(beatsConfig)
+	return getConfigSharedCredentialProfile(beatsConfig, logger)
 }
 
 // getConfigForKeys creates a default AWS config and adds a CredentialsProvider using the provided Beats config.
@@ -121,8 +121,8 @@ func getConfigForKeys(beatsConfig ConfigAWS) awssdk.Config {
 // then load from default config // Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
 //
 //	with more details. If credential_profile_name is empty, then default profile is used.
-func getConfigSharedCredentialProfile(beatsConfig ConfigAWS) (awssdk.Config, error) {
-	logger := logp.NewLogger("WithSharedConfigProfile")
+func getConfigSharedCredentialProfile(beatsConfig ConfigAWS, logger *logp.Logger) (awssdk.Config, error) {
+	logger = logger.Named("WithSharedConfigProfile")
 
 	var options []func(*awsConfig.LoadOptions) error
 	if beatsConfig.ProfileName != "" {
@@ -147,8 +147,8 @@ func getConfigSharedCredentialProfile(beatsConfig ConfigAWS) (awssdk.Config, err
 }
 
 // addAssumeRoleProviderToAwsConfig adds the credentials provider to the current AWS config by using the role ARN stored in Beats config
-func addAssumeRoleProviderToAwsConfig(config ConfigAWS, awsConfig *awssdk.Config) {
-	logger := logp.NewLogger("addAssumeRoleProviderToAwsConfig")
+func addAssumeRoleProviderToAwsConfig(config ConfigAWS, awsConfig *awssdk.Config, logger *logp.Logger) {
+	logger = logger.Named("addAssumeRoleProviderToAwsConfig")
 	logger.Debug("Switching credentials provider to AssumeRoleProvider")
 	stsSvc := sts.NewFromConfig(*awsConfig)
 	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn, func(aro *stscreds.AssumeRoleOptions) {

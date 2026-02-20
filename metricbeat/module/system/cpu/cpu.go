@@ -53,6 +53,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
+	// log config related warnings
+	config.checkUnsupportedConfig(base.Logger())
 
 	opts, err := config.Validate()
 	if err != nil {

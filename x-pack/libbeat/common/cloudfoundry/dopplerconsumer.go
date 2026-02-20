@@ -131,7 +131,7 @@ func filterLogs(e *events.Envelope) bool {
 
 func (c *DopplerConsumer) reportError(e EventError) {
 	if c.callbacks.Error == nil {
-		c.log.Debugf("No callback for errors, error received: %s", e)
+		c.log.Debugf("No callback for errors, error received: %v", e)
 		return
 	}
 	c.callbacks.Error(e)

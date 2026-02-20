@@ -51,7 +51,7 @@ func makeLogstash(
 		return outputs.Fail(err)
 	}
 
-	tls, err := tlscommon.LoadTLSConfig(lsConfig.TLS)
+	tls, err := tlscommon.LoadTLSConfig(lsConfig.TLS, beat.Logger)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -67,7 +67,7 @@ func makeLogstash(
 	for i, host := range hosts {
 		var client outputs.NetworkClient
 
-		conn, err := transport.NewClient(transp, "tcp", host, defaultPort)
+		conn, err := transport.NewClient(transp, "tcp", host, defaultPort, beat.Logger)
 		if err != nil {
 			return outputs.Fail(err)
 		}
@@ -85,5 +85,5 @@ func makeLogstash(
 		clients[i] = client
 	}
 
-	return outputs.SuccessNet(lsConfig.Queue, lsConfig.LoadBalance, lsConfig.BulkMaxSize, lsConfig.MaxRetries, nil, clients)
+	return outputs.SuccessNet(lsConfig.Queue, lsConfig.LoadBalance, lsConfig.BulkMaxSize, lsConfig.MaxRetries, nil, beat.Logger, clients)
 }

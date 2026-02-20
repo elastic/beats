@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	pubpipeline "github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // SetupFactory is for loading module assets when running setup subcommand.
@@ -30,21 +31,23 @@ type SetupFactory struct {
 	pipelineLoaderFactory PipelineLoaderFactory
 	overwritePipelines    bool
 	filesetOverrides      FilesetOverrides
+	beatPaths             *paths.Path
 }
 
 // NewSetupFactory creates a SetupFactory
-func NewSetupFactory(beatInfo beat.Info, pipelineLoaderFactory PipelineLoaderFactory, filesetOverrides FilesetOverrides) *SetupFactory {
+func NewSetupFactory(beatInfo beat.Info, pipelineLoaderFactory PipelineLoaderFactory, filesetOverrides FilesetOverrides, beatPaths *paths.Path) *SetupFactory {
 	return &SetupFactory{
 		beatInfo:              beatInfo,
 		pipelineLoaderFactory: pipelineLoaderFactory,
 		overwritePipelines:    true,
 		filesetOverrides:      filesetOverrides,
+		beatPaths:             beatPaths,
 	}
 }
 
 // Create creates a new SetupCfgRunner to setup module configuration.
 func (sf *SetupFactory) Create(_ beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
-	m, err := NewModuleRegistry([]*conf.C{c}, sf.beatInfo, false, sf.filesetOverrides)
+	m, err := NewModuleRegistry([]*conf.C{c}, sf.beatInfo, false, sf.filesetOverrides, sf.beatPaths)
 	if err != nil {
 		return nil, err
 	}

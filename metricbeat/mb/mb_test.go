@@ -29,6 +29,7 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Reporting V2 MetricSet
@@ -173,7 +174,7 @@ func TestNewModulesDuplicateHosts(t *testing.T) {
 		"hosts":      []string{"a", "b", "a"},
 	})
 
-	_, _, err := NewModule(c, r, logptest.NewTestingLogger(t, ""))
+	_, _, err := NewModule(c, r, paths.New(), logptest.NewTestingLogger(t, ""))
 	assert.Error(t, err)
 }
 
@@ -186,7 +187,7 @@ func TestNewModulesWithDefaultMetricSet(t *testing.T) {
 		"module": moduleName,
 	})
 
-	_, metricSets, err := NewModule(c, r, logptest.NewTestingLogger(t, ""))
+	_, metricSets, err := NewModule(c, r, paths.New(), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -338,7 +339,7 @@ func newTestRegistry(t testing.TB, metricSetOptions ...MetricSetOption) *Registe
 }
 
 func newTestMetricSet(t testing.TB, r *Register, config map[string]interface{}) MetricSet {
-	_, metricsets, err := NewModule(newConfig(t, config), r, logptest.NewTestingLogger(t, ""))
+	_, metricsets, err := NewModule(newConfig(t, config), r, paths.New(), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -425,7 +426,7 @@ func TestBaseModuleWithConfig(t *testing.T) {
 				MetricSets: []string{"foo", "bar"},
 			}
 
-			m, _, err := NewModule(conf.MustNewConfigFrom(initConfig), mockRegistry, logptest.NewTestingLogger(t, ""))
+			m, _, err := NewModule(conf.MustNewConfigFrom(initConfig), mockRegistry, paths.New(), logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			bm, ok := m.(*BaseModule)

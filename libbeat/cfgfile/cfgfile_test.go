@@ -20,11 +20,14 @@
 package cfgfile
 
 import (
+	"flag"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/management"
 )
 
 type TestConfig struct {
@@ -60,4 +63,27 @@ func TestRead(t *testing.T) {
 	assert.Equal(t, 9200, config.Output.Elasticsearch.Port)
 	assert.Equal(t, "test_value", config.Env)
 	assert.Equal(t, "default", config.EnvDefault)
+}
+
+func TestManagementFlag(t *testing.T) {
+	t.Run("management.enabled=true", func(t *testing.T) {
+		Initialize()
+		flag.Set("E", "management.enabled=true")
+		flag.Parse()
+		HandleFlags()
+		assert.True(t, management.UnderAgent())
+	})
+	t.Run("management.enabled=false", func(t *testing.T) {
+		Initialize()
+		flag.Set("E", "management.enabled=false")
+		flag.Parse()
+		HandleFlags()
+		assert.False(t, management.UnderAgent())
+	})
+	t.Run("management.enabled not set", func(t *testing.T) {
+		Initialize()
+		flag.Parse()
+		HandleFlags()
+		assert.False(t, management.UnderAgent())
+	})
 }

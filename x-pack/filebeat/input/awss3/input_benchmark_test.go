@@ -30,6 +30,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -219,10 +220,11 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 
 		config := makeBenchmarkConfig(t)
 		config.NumberOfWorkers = workerCount
-		sqsReader := newSQSReaderInput(config, aws.Config{})
+		sqsReader := newSQSReaderInput(config, aws.Config{}, paths.New())
 		sqsReader.log = log.Named("sqs")
+		sqsReader.status = &statusReporterHelperMock{}
 		sqsReader.pipeline = newFakePipeline()
-		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), workerCount)
+		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount, logp.NewNopLogger())
 		sqsReader.sqs = newConstantSQS()
 		require.NoError(t, err)
 		sqsReader.s3 = newConstantS3(t)
@@ -233,6 +235,7 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 		b.Cleanup(cancel)
 
 		go func() {
+			//nolint:gosec // not going to have anywhere near uint64 overflow number of received messages
 			for sqsReader.metrics.sqsMessagesReceivedTotal.Get() < uint64(b.N) {
 				time.Sleep(5 * time.Millisecond)
 			}
@@ -260,7 +263,6 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 }
 
 func TestBenchmarkInputSQS(t *testing.T) {
-	logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputSQS(t, 1),
@@ -305,8 +307,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		log := logp.NewLogger(inputName)
 		log.Infof("benchmark with %d number of workers", numberOfWorkers)
 
-		metricRegistry := monitoring.NewRegistry()
-		metrics := newInputMetrics("test_id", metricRegistry, numberOfWorkers)
+		metrics := newInputMetrics(monitoring.NewRegistry(), numberOfWorkers, logp.NewNopLogger())
 		pipeline := newFakePipeline()
 
 		config := makeBenchmarkConfig(t)
@@ -339,7 +340,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				states, err := newStates(nil, store, "")
 				assert.NoError(t, err, "states creation should succeed")
 
-				s3EventHandlerFactory := newS3ObjectProcessorFactory(metrics, s3API, config.FileSelectors, backupConfig{})
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(metrics, s3API, config.FileSelectors, backupConfig{}, logp.NewNopLogger())
 				s3Poller := &s3PollerInput{
 					log:             logp.NewLogger(inputName),
 					config:          config,
@@ -350,6 +351,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					states:          states,
 					provider:        "provider",
 					filterProvider:  newFilterProvider(&config),
+					status:          &statusReporterHelperMock{},
 				}
 
 				s3Poller.run(ctx)
@@ -390,7 +392,6 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 }
 
 func TestBenchmarkInputS3(t *testing.T) {
-	logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputS3(t, 1),

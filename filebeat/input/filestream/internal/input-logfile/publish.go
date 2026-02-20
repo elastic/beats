@@ -122,7 +122,7 @@ func (op *updateOp) Execute(store *store, n uint) {
 	resource.stateMutex.Lock()
 	defer resource.stateMutex.Unlock()
 
-	if resource.lockedVersion != op.resource.version || resource.isDeleted() {
+	if resource.lockedVersion != op.resource.version || resource.unsafeIsDeleted() {
 		return
 	}
 
@@ -134,7 +134,7 @@ func (op *updateOp) Execute(store *store, n uint) {
 	} else {
 		err := typeconv.Convert(&resource.cursor, op.delta)
 		if err != nil {
-			store.log.Errorf("failed to perform type conversion: %w", err)
+			store.log.Errorf("failed to perform type conversion: %v", err)
 		}
 	}
 

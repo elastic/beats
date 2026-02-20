@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -20,7 +21,6 @@ import (
 )
 
 func TestS3Poller(t *testing.T) {
-	logp.TestingSetup()
 
 	const bucket = "bucket"
 	const listPrefix = "key"
@@ -128,7 +128,7 @@ func TestS3Poller(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("2024-02-08T08:35:00+00:02.json.gz")).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{})
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{}, logp.NewNopLogger())
 		states, err := newStates(nil, store, listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 
@@ -147,8 +147,9 @@ func TestS3Poller(t *testing.T) {
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
-			metrics:         newInputMetrics("", nil, 0),
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
+			status:          &statusReporterHelperMock{},
 		}
 		poller.runPoll(ctx)
 	})
@@ -269,7 +270,7 @@ func TestS3Poller(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key5")).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{})
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{}, logp.NewNopLogger())
 		states, err := newStates(nil, store, listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 
@@ -280,6 +281,7 @@ func TestS3Poller(t *testing.T) {
 			BucketListPrefix:   "key",
 			RegionName:         "region",
 		}
+
 		poller := &s3PollerInput{
 			log: logp.NewLogger(inputName),
 			config: config{
@@ -294,8 +296,9 @@ func TestS3Poller(t *testing.T) {
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
-			metrics:         newInputMetrics("", nil, 0),
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
+			status:          &statusReporterHelperMock{},
 		}
 		poller.run(ctx)
 	})
@@ -524,8 +527,9 @@ func Test_S3StateHandling(t *testing.T) {
 				pipeline:        newFakePipeline(),
 				s3ObjectHandler: mockObjHandler,
 				states:          s3States,
-				metrics:         newInputMetrics("state-test: "+test.name, nil, 0),
+				metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 				filterProvider:  newFilterProvider(test.config),
+				status:          &statusReporterHelperMock{},
 			}
 
 			// when - run polling for desired time
@@ -545,4 +549,60 @@ func Test_S3StateHandling(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCreateS3API(t *testing.T) {
+	t.Run("non-AWS bucket with configured region", func(t *testing.T) {
+		ctx := context.Background()
+		cfg := config{
+			NonAWSBucketName: "my-bucket",
+			RegionName:       "cn-shenzhen",
+		}
+		input := &s3PollerInput{
+			config:    cfg,
+			awsConfig: aws.Config{},
+		}
+
+		api, err := input.createS3API(ctx)
+		require.NoError(t, err)
+		require.NotNil(t, api)
+		require.Equal(t, cfg.RegionName, input.awsConfig.Region)
+	})
+
+	// "non-AWS bucket without region" is invalid and rejected by config.Validate();
+	t.Run("non-AWS bucket with configured region, aws region and configured region mismatch", func(t *testing.T) {
+		ctx := context.Background()
+		cfg := config{
+			NonAWSBucketName: "my-bucket",
+			RegionName:       "us-west-2",
+		}
+		input := &s3PollerInput{
+			config: cfg,
+			awsConfig: aws.Config{
+				Region: "ap-southeast-1",
+			},
+		}
+
+		api, err := input.createS3API(ctx)
+		require.NoError(t, err)
+		require.NotNil(t, api)
+		require.Equal(t, cfg.RegionName, input.awsConfig.Region)
+	})
+
+	t.Run("access point ARN extracts region correctly", func(t *testing.T) {
+		ctx := context.Background()
+		cfg := config{
+			AccessPointARN: "arn:aws:s3:eu-west-1:1234567890:accesspoint/my-bucket",
+		}
+		input := &s3PollerInput{
+			config:    cfg,
+			awsConfig: aws.Config{},
+		}
+
+		api, err := input.createS3API(ctx)
+		require.NoError(t, err)
+		require.NotNil(t, api)
+		// Region should be extracted from ARN
+		require.Equal(t, "eu-west-1", input.awsConfig.Region)
+	})
 }

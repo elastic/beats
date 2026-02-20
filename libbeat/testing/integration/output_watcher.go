@@ -18,20 +18,21 @@
 package integration
 
 import (
+	"encoding/json"
 	"fmt"
+	"reflect"
 	"regexp"
 	"strings"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // OutputWatcher describes operations for watching output.
 type OutputWatcher interface {
-	// Inspect the line of the output and adjust the state accordingly.
-	Inspect(string)
+	OutputInspector
+
 	// Observed is `true` if every expected output has been observed.
 	Observed() bool
-	// String is the string representation of the current state.
-	// Describes what output is still expected.
-	String() string
 }
 
 // NewStringWatcher creates a new output watcher that watches for a
@@ -150,16 +151,16 @@ func (w *inOrderWatcher) String() string {
 // It's state marked as observed when all the nested watchers have
 // `Observed() == true`.
 func NewOverallWatcher(watchers []OutputWatcher) OutputWatcher {
-	return &metaWatcher{
+	return &overallWatcher{
 		active: watchers,
 	}
 }
 
-type metaWatcher struct {
+type overallWatcher struct {
 	active []OutputWatcher
 }
 
-func (w *metaWatcher) Inspect(line string) {
+func (w *overallWatcher) Inspect(line string) {
 	var active []OutputWatcher
 	for _, watcher := range w.active {
 		watcher.Inspect(line)
@@ -170,11 +171,11 @@ func (w *metaWatcher) Inspect(line string) {
 	w.active = active
 }
 
-func (w *metaWatcher) Observed() bool {
+func (w *overallWatcher) Observed() bool {
 	return len(w.active) == 0
 }
 
-func (w *metaWatcher) String() string {
+func (w *overallWatcher) String() string {
 	if w.Observed() {
 		return ""
 	}
@@ -184,4 +185,57 @@ func (w *metaWatcher) String() string {
 		expectations = append(expectations, watcher.String())
 	}
 	return " * " + strings.Join(expectations, "\n * ")
+}
+
+// NewJSONWatcher watches for existence of certain key-value pair in a JSON document
+func NewJSONWatcher(fields mapstr.M) OutputWatcher {
+	return &jsonWatcher{
+		fields: fields.Flatten(),
+	}
+}
+
+type jsonWatcher struct {
+	fields mapstr.M
+}
+
+func (w *jsonWatcher) Inspect(line string) {
+	if w.Observed() {
+		return
+	}
+
+	var outputDoc mapstr.M
+	err := json.Unmarshal([]byte(line), &outputDoc)
+	// If a line is not json type, we ignore the error and move ahead
+	if err != nil {
+		return
+	}
+
+	for key, value := range w.fields {
+		if v, err := outputDoc.GetValue(key); err == nil {
+			switch v.(type) {
+			case string, float64, bool, nil:
+				if v != value {
+					return
+				}
+			default:
+				if !reflect.DeepEqual(v, value) {
+					return
+				}
+
+			}
+		}
+	}
+
+	w.fields = nil
+}
+func (w *jsonWatcher) Observed() bool {
+	return w.fields == nil
+}
+
+func (w *jsonWatcher) String() string {
+	if w.Observed() {
+		return ""
+	}
+
+	return fmt.Sprintf("JSON document to contain following fields: %+v", w.fields)
 }

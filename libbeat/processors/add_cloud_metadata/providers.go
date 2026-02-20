@@ -124,7 +124,7 @@ func filterMetaProviders(filter func(string) bool, fetchers map[string]provider)
 	return out
 }
 
-func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher, error) {
+func setupFetchers(providers map[string]provider, c *conf.C, logger *logp.Logger) ([]metadataFetcher, error) {
 	mf := make([]metadataFetcher, 0, len(providers))
 	visited := map[string]bool{}
 

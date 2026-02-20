@@ -44,7 +44,7 @@ func AutodiscoverBuilder(
 	keystore keystore.Keystore,
 	log *logp.Logger,
 ) (autodiscover.Provider, error) {
-	cfgwarn.Experimental("aws_ec2 autodiscover is experimental")
+	log.Warn(cfgwarn.Experimental("aws_ec2 autodiscover is experimental"))
 
 	config := awsauto.DefaultConfig()
 	err := c.Unpack(&config)
@@ -58,7 +58,7 @@ func AutodiscoverBuilder(
 			SecretAccessKey: config.AWSConfig.SecretAccessKey,
 			SessionToken:    config.AWSConfig.SessionToken,
 			ProfileName:     config.AWSConfig.ProfileName,
-		})
+		}, log)
 
 	// Construct MetricSet with a full regions list if there is no region specified.
 	if config.Regions == nil {
@@ -81,7 +81,7 @@ func AutodiscoverBuilder(
 	clients := make([]ec2.DescribeInstancesAPIClient, 0, len(config.Regions))
 	for _, region := range config.Regions {
 		if err != nil {
-			log.Errorf("error loading AWS config for aws_ec2 autodiscover provider: %w", err)
+			log.Errorf("error loading AWS config for aws_ec2 autodiscover provider: %v", err)
 		}
 		awsCfg.Region = region
 		clients = append(clients, ec2.NewFromConfig(awsCfg, func(o *ec2.Options) {
@@ -103,7 +103,7 @@ func internalBuilder(
 	fetcher fetcher,
 	keystore keystore.Keystore,
 	log *logp.Logger) (*Provider, error) {
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil, log)
 	if err != nil {
 		return nil, err
 	}

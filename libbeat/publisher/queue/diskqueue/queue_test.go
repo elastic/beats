@@ -85,7 +85,7 @@ func makeTestQueue() queuetest.QueueFactory {
 	}
 }
 
-func (t testQueue) Close() error {
-	err := t.diskQueue.Close()
+func (t testQueue) Close(force bool) error {
+	err := t.diskQueue.Close(force)
 	return err
 }

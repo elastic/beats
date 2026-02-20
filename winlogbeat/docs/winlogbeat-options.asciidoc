@@ -34,11 +34,11 @@ The name of the file where {beatname_uc} stores information that it uses to resu
 monitoring after a restart. By default the file is stored as `.winlogbeat.yml`
 in the directory where the Beat was started. When you run the process as a
 Windows service, it's recommended that you set the value to
-`C:/ProgramData/winlogbeat/.winlogbeat.yml`.
+`C:/Program Files/winlogbeat/.winlogbeat.yml`.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yml
+winlogbeat.registry_file: C:/Program Files/winlogbeat/.winlogbeat.yml
 --------------------------------------------------------------------------------
 
 NOTE: The forward slashes (/) in the path are automatically changed to
@@ -375,6 +375,32 @@ winlogbeat.event_logs:
   - name: Microsoft-Windows-Windows Defender/Operational
     include_xml: true
 --------------------------------------------------------------------------------
+
+[float]
+==== `event_logs.ignore_missing_channel`
+
+Boolean option that controls whether Winlogbeat should ignore missing event log channels
+and continue monitoring other configured channels. When set to `true`, if a specified
+event log channel doesn't exist or cannot be accessed, Winlogbeat will log a warning and
+continue processing other event logs instead of stopping with an error. The default is `true`.
+
+This option is useful when deploying Winlogbeat configurations across multiple systems
+where certain event log channels may not be available on all machines,
+or when monitoring optional channels that may not always be present.
+
+Example:
+
+[source,yaml]
+--------------------------------------------------------------------------------
+winlogbeat.event_logs:
+  - name: Application
+  - name: System 
+  - name: Sysmon
+    ignore_missing_channel: false
+--------------------------------------------------------------------------------
+
+In this example, if the Sysmon channel is missing, Winlogbeat will stop with an error,
+which may be desired for critical monitoring components.
 
 [float]
 ==== `event_logs.tags`

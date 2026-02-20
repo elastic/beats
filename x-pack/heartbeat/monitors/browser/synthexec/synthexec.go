@@ -217,7 +217,7 @@ func runCmd(
 				break
 			}
 			if err != nil {
-				logp.L().Warnf("error decoding json for test json results: %w", err)
+				logp.L().Warnf("error decoding json for test json results: %v", err)
 			}
 
 			mpx.writeSynthEvent(&se)

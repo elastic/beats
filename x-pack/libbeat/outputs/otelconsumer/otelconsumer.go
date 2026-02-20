@@ -7,13 +7,16 @@ package otelconsumer
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"time"
+
+	"go.opentelemetry.io/collector/client"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/x-pack/otel/otelmap"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -27,6 +30,8 @@ import (
 const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
+	beatNameCtxKey        = "beat_name"
+	beatVersionCtxtKey    = "beat_version"
 )
 
 func init() {
@@ -41,19 +46,23 @@ type otelConsumer struct {
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
-
-	out := &otelConsumer{
-		observer:     observer,
-		logsConsumer: beat.LogConsumer,
-		beatInfo:     beat,
-		log:          beat.Logger.Named("otelconsumer"),
-	}
-
 	ocConfig := defaultConfig()
 	if err := cfg.Unpack(&ocConfig); err != nil {
 		return outputs.Fail(err)
 	}
-	return outputs.Success(ocConfig.Queue, -1, 0, nil, out)
+
+	// Default to runtime.NumCPU() workers
+	clients := make([]outputs.Client, 0, runtime.NumCPU())
+	for range runtime.NumCPU() {
+		clients = append(clients, &otelConsumer{
+			observer:     observer,
+			logsConsumer: beat.LogConsumer,
+			beatInfo:     beat,
+			log:          beat.Logger.Named("otelconsumer"),
+		})
+	}
+
+	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, clients...)
 }
 
 // Close is a noop for otelconsumer
@@ -73,9 +82,16 @@ func (out *otelConsumer) Publish(ctx context.Context, batch publisher.Batch) err
 
 func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch) error {
 	st := out.observer
+	events := batch.Events()
+	st.NewBatch(len(events))
+
 	pLogs := plog.NewLogs()
 	resourceLogs := pLogs.ResourceLogs().AppendEmpty()
 	sourceLogs := resourceLogs.ScopeLogs().AppendEmpty()
+
+	// add bodymap mapping mode on scope attributes
+	sourceLogs.Scope().Attributes().PutStr("elastic.mapping.mode", "bodymap")
+
 	logRecords := sourceLogs.LogRecords()
 
 	// Convert the batch of events to Otel plog.Logs. The encoding we
@@ -85,7 +101,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	// destination, as long as the exporter allows it.
 	// For example, the elasticsearchexporter has an encoding specifically for this.
 	// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/35444.
-	events := batch.Events()
 	for _, event := range events {
 		logRecord := logRecords.AppendEmpty()
 
@@ -102,7 +117,14 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 		}
 
-		beatEvent := event.Content.Fields
+		// if pipeline field is set on event metadata
+		if pipeline, err := event.Content.Meta.GetValue("pipeline"); err == nil {
+			if s, ok := pipeline.(string); ok {
+				logRecord.Attributes().PutStr("elasticsearch.ingest_pipeline", s)
+			}
+		}
+
+		beatEvent := event.Content.Fields.Clone()
 		if beatEvent == nil {
 			beatEvent = mapstr.M{}
 		}
@@ -145,7 +167,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 	}
 
-	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
+	err := out.logsConsumer.ConsumeLogs(out.newConsumerContext(ctx), pLogs)
 	if err != nil {
 		// Permanent errors shouldn't be retried. This tipically means
 		// the data cannot be serialized by the exporter that is attached
@@ -165,9 +187,21 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	}
 
 	batch.ACK()
-	st.NewBatch(len(events))
 	st.AckedEvents(len(events))
 	return nil
+}
+
+// newConsumerContext creates a new context.Context adding the beats metadata
+// to the client.Info. This is used to pass the beat name and version to the
+// Collector, so it can be used by the components to access that data.
+func (out *otelConsumer) newConsumerContext(ctx context.Context) context.Context {
+	clientInfo := client.Info{
+		Metadata: client.NewMetadata(map[string][]string{
+			beatNameCtxKey:     {out.beatInfo.Beat},
+			beatVersionCtxtKey: {out.beatInfo.Version},
+		}),
+	}
+	return client.NewContext(ctx, clientInfo)
 }
 
 func (out *otelConsumer) String() string {

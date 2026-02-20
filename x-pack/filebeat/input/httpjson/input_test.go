@@ -23,6 +23,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var testCases = []struct {
@@ -33,6 +34,7 @@ var testCases = []struct {
 	expected       []string
 	expectedFile   string
 	expectedNoFile string
+	wantErr        error
 
 	skipReason string
 }{
@@ -337,7 +339,7 @@ var testCases = []struct {
 					"value": `[[index .last_response.body "@timestamp"]]`,
 				},
 			},
-			"request.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"request.tracer.filename": "httpjson/logs/http-request-trace-*.ndjson",
 		},
 		handler: dateCursorHandler(),
 		expected: []string{
@@ -345,7 +347,7 @@ var testCases = []struct {
 			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 		},
-		expectedFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
+		expectedFile: filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
 	},
 	{
 		name: "tracer_filename_sanitization_enabled",
@@ -379,7 +381,7 @@ var testCases = []struct {
 				},
 			},
 			"request.tracer.enabled":  true,
-			"request.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"request.tracer.filename": "httpjson/logs/http-request-trace-*.ndjson",
 		},
 		handler: dateCursorHandler(),
 		expected: []string{
@@ -387,7 +389,7 @@ var testCases = []struct {
 			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 		},
-		expectedFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
+		expectedFile: filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
 	},
 	{
 		name: "tracer_filename_sanitization_disabled",
@@ -421,7 +423,7 @@ var testCases = []struct {
 				},
 			},
 			"request.tracer.enabled":  false,
-			"request.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"request.tracer.filename": "httpjson/logs/http-request-trace-*.ndjson",
 		},
 		handler: dateCursorHandler(),
 		expected: []string{
@@ -429,7 +431,19 @@ var testCases = []struct {
 			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 		},
-		expectedNoFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi*"),
+		expectedNoFile: filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi*"),
+	},
+	{
+		name:        "tracer_escaping_logs",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {},
+		baseConfig: map[string]interface{}{
+			"interval":                1,
+			"request.method":          http.MethodGet,
+			"request.url":             "https://example.com/",
+			"request.tracer.enabled":  true,
+			"request.tracer.filename": "/var/log/http-request-trace-*.ndjson",
+		},
+		wantErr: fmt.Errorf(`request tracer path must be within %q path accessing 'request'`, inputName),
 	},
 	{
 		name: "pagination",
@@ -1444,11 +1458,29 @@ func TestInput(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.baseConfig)
 
 			conf := defaultConfig()
-			assert.NoError(t, cfg.Unpack(&conf))
+			err := cfg.Unpack(&conf)
+			if err != nil {
+				if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+					t.Fatalf("unexpected error unpacking config: %v", err)
+				}
+				return
+			}
 
 			var tempDir string
 			if conf.Request.Tracer != nil {
-				tempDir = t.TempDir()
+				err := os.MkdirAll("httpjson", 0o700)
+				if err != nil {
+					t.Fatalf("failed to create root logging destination: %v", err)
+				}
+				tempDir, err = os.MkdirTemp("httpjson", "logs-*")
+				if err != nil {
+					t.Fatalf("failed to create logging destination: %v", err)
+				}
+				tempDir, err = filepath.Abs(tempDir)
+				if err != nil {
+					t.Fatalf("failed to get absolute path for logging destination: %v", err)
+				}
+				defer os.RemoveAll("httpjson")
 				conf.Request.Tracer.Filename = filepath.Join(tempDir, conf.Request.Tracer.Filename)
 			}
 
@@ -1659,10 +1691,11 @@ func newChainPaginationTestServer(
 func newV2Context(id string) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
-		Logger:        logp.NewLogger("httpjson_test"),
-		ID:            id,
-		IDWithoutName: id,
-		Cancelation:   ctx,
+		Logger:          logp.NewLogger("httpjson_test"),
+		ID:              id,
+		IDWithoutName:   id,
+		Cancelation:     ctx,
+		MetricsRegistry: monitoring.NewRegistry(),
 	}, cancel
 }
 

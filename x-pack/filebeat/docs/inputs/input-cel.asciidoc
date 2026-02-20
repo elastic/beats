@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :type: cel
-:mito_version: v1.22.0
+:mito_version: v1.23.1
 :mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
 
 [id="{beatname_lc}-input-{type}"]
@@ -258,6 +258,8 @@ The CEL environment enables the https://pkg.go.dev/github.com/google/cel-go/cel#
 
 Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2, or token authentication.
 
+As described in Mito's {mito_docs}/lib#HTTP[HTTP] documentation, configuration for Basic Authentication or token authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication or OAuth2 will be used for all requests made from CEL.
+
 Example configurations with authentication:
 
 ["source","yaml",subs="attributes"]
@@ -479,6 +481,9 @@ When set to `false`, disables the basic auth configuration. Default: `true`.
 NOTE: Basic auth settings are disabled if either `enabled` is set to `false` or
 the `auth.basic` section is missing.
 
+NOTE: Basic auth settings do not affect requests run with `.do_request()`, as
+explained in {mito_docs}/lib#HTTP[HTTP].
+
 [float]
 ==== `auth.basic.user`
 
@@ -666,11 +671,18 @@ The RSA JWK private key PEM block for your Okta Service App which is used for in
 NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
 
 [float]
+==== `auth.oauth2.okta.dpop_key_pem`
+
+The Demonstrating Proof-of-Possession private key PEM block for your Okta authentication token. When this key is provided, Okta authentication will make use of the https://www.okta.com/blog/product-innovation/a-leap-forward-in-token-security-okta-adds-support-for-dpop/[Okta DPoP authentication flow].
+
+[float]
 ==== `auth.token.enabled`
 
 When set to `false`, disables the token authentication configuration. Default: `true`.
 
 NOTE: Token authentication settings are disabled if either `enabled` is set to `false` or the `auth.token` section is missing.
+
+NOTE: Token authentication settings do not affect requests run with `.do_request()`, as explained in {mito_docs}/lib#HTTP[HTTP].
 
 [float]
 ==== `auth.token.type`
@@ -829,6 +841,7 @@ To differentiate the trace files generated from different input instances, a pla
 filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. Setting
 `resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching
 the filename option to be deleted.
+The path must point to a target in the cel directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 [float]
 ==== `resource.tracer.maxsize`

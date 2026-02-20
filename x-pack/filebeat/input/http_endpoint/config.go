@@ -14,6 +14,8 @@ import (
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -122,6 +124,26 @@ func (c *config) Validate() error {
 
 	if c.MaxBodySize != nil && *c.MaxBodySize < 0 {
 		return fmt.Errorf("max_body_bytes is negative: %d", *c.MaxBodySize)
+	}
+
+	if !c.Tracer.enabled() {
+		return nil
+	}
+	if c.Tracer.Filename == "" {
+		return errors.New("request tracer must have a filename if used")
+	}
+	if c.Tracer.MaxSize == 0 {
+		// By default Lumberjack caps file sizes at 100MB which
+		// is excessive for a debugging logger, so default to 1MB
+		// which is the minimum.
+		c.Tracer.MaxSize = 1
+	}
+	ok, err := httplog.IsPathInLogsFor(inputName, c.Tracer.Filename)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
 	}
 
 	return nil

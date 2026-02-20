@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-sysinfo/providers/windows"
 )
 
@@ -73,7 +74,7 @@ func testCollectionPipeline(t testing.TB, evtx string, p *params) {
 	}
 	defer log.Close()
 
-	if err = log.Open(checkpoint.EventLogState{}); err != nil {
+	if err = log.Open(checkpoint.EventLogState{}, monitoring.NewRegistry()); err != nil {
 		t.Fatal(err)
 	}
 

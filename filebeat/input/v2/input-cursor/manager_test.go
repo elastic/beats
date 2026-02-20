@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 package cursor
 
 import (
@@ -36,6 +38,7 @@ import (
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -131,7 +134,7 @@ func TestManager_Create(t *testing.T) {
 	})
 
 	t.Run("configuring inputs with overlapping sources is allowed", func(t *testing.T) {
-		manager := simpleManagerWithConfigure(t, func(cfg *conf.C) ([]Source, Input, error) {
+		manager := simpleManagerWithConfigure(t, func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error) {
 			config := struct{ Sources []string }{}
 			err := cfg.Unpack(&config)
 			return sourceList(config.Sources...), &fakeTestInput{}, err
@@ -286,7 +289,6 @@ func TestManager_InputsRun(t *testing.T) {
 			IDWithoutName:   id,
 			Name:            inp.Name(),
 			Cancelation:     cancelCtx,
-			StatusReporter:  nil,
 			MetricsRegistry: monitoring.NewRegistry(),
 			Logger:          manager.Logger,
 		}
@@ -317,7 +319,6 @@ func TestManager_InputsRun(t *testing.T) {
 			IDWithoutName:   id,
 			Name:            inp.Name(),
 			Cancelation:     cancelCtx,
-			StatusReporter:  nil,
 			MetricsRegistry: monitoring.NewRegistry(),
 			Logger:          manager.Logger,
 		}
@@ -353,7 +354,6 @@ func TestManager_InputsRun(t *testing.T) {
 				IDWithoutName:   id,
 				Name:            inp.Name(),
 				Cancelation:     cancelCtx,
-				StatusReporter:  nil,
 				MetricsRegistry: monitoring.NewRegistry(),
 				Logger:          manager.Logger,
 			}
@@ -374,7 +374,7 @@ func TestManager_InputsRun(t *testing.T) {
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
 
-		manager := simpleManagerWithConfigure(t, func(cfg *conf.C) ([]Source, Input, error) {
+		manager := simpleManagerWithConfigure(t, func(cfg *conf.C, _ *logp.Logger) ([]Source, Input, error) {
 			config := runConfig{}
 			if err := cfg.Unpack(&config); err != nil {
 				return nil, nil, err
@@ -418,7 +418,6 @@ func TestManager_InputsRun(t *testing.T) {
 			IDWithoutName:   id,
 			Name:            inp.Name(),
 			Cancelation:     context.Background(),
-			StatusReporter:  nil,
 			MetricsRegistry: monitoring.NewRegistry(),
 			Logger:          log,
 		}
@@ -433,7 +432,6 @@ func TestManager_InputsRun(t *testing.T) {
 			IDWithoutName:   id,
 			Name:            inp.Name(),
 			Cancelation:     context.Background(),
-			StatusReporter:  nil,
 			MetricsRegistry: monitoring.NewRegistry(),
 			Logger:          log,
 		}
@@ -498,7 +496,6 @@ func TestManager_InputsRun(t *testing.T) {
 				IDWithoutName:   id,
 				Name:            inp.Name(),
 				Cancelation:     cancelCtx,
-				StatusReporter:  nil,
 				MetricsRegistry: monitoring.NewRegistry(),
 				Logger:          manager.Logger,
 			}
@@ -597,7 +594,7 @@ func TestLockResource(t *testing.T) {
 
 func (s stringSource) Name() string { return string(s) }
 
-func simpleManagerWithConfigure(t *testing.T, configure func(*conf.C) ([]Source, Input, error)) *InputManager {
+func simpleManagerWithConfigure(t *testing.T, configure func(*conf.C, *logp.Logger) ([]Source, Input, error)) *InputManager {
 	return &InputManager{
 		Logger:     logptest.NewTestingLogger(t, "test"),
 		StateStore: createSampleStore(t, nil),
@@ -607,7 +604,7 @@ func simpleManagerWithConfigure(t *testing.T, configure func(*conf.C) ([]Source,
 }
 
 func constConfigureResult(t *testing.T, sources []Source, inp Input, err error) *InputManager {
-	return simpleManagerWithConfigure(t, func(cfg *conf.C) ([]Source, Input, error) {
+	return simpleManagerWithConfigure(t, func(cfg *conf.C, _ *logp.Logger) ([]Source, Input, error) {
 		return sources, inp, err
 	})
 }

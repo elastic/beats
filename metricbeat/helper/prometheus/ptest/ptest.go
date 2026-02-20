@@ -26,7 +26,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 
 	"github.com/stretchr/testify/assert"
 

@@ -123,7 +123,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func newSocketMetricset(config Config, base mb.BaseMetricSet) (*MetricSet, error) {
-	cfgwarn.Beta("The %s dataset is beta.", fullName)
+	base.Logger().Warn(cfgwarn.Beta("The %s dataset is beta.", fullName))
 	logger := base.Logger().Named(metricsetName)
 	sniffer, err := dns.NewSniffer(base, logger)
 	if err != nil {
@@ -295,7 +295,7 @@ func (m *MetricSet) Setup() (err error) {
 					continue
 				}
 				if tracing.IsTraceFSAvailable() != nil {
-					m.log.Warnf("Mounted %s but no kprobes available", mount, err)
+					m.log.Warnf("Mounted %s but no kprobes available: %v", mount, err)
 					mount.unmount()
 					continue
 				}

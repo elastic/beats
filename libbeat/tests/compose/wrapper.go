@@ -53,14 +53,15 @@ type wrapperDriver struct {
 	Environment []string
 
 	client *client.Client
+	logger *logp.Logger
 }
 
-func newWrapperDriver() (*wrapperDriver, error) {
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
+func newWrapperDriver(logger *logp.Logger) (*wrapperDriver, error) {
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logger)
 	if err != nil {
 		return nil, err
 	}
-	return &wrapperDriver{client: c}, nil
+	return &wrapperDriver{client: c, logger: logger}, nil
 }
 
 type wrapperContainer struct {
@@ -160,14 +161,14 @@ func (d *wrapperDriver) Close() error {
 }
 
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
-	args := make([]string, 0, 4+len(d.Files)+len(arg)) // preallocate as much as possible
-	args = append(args, "--ansi", "never", "--project-name", d.Name)
+	args := make([]string, 0, 5+len(d.Files)+len(arg)) // preallocate as much as possible
+	args = append(args, "compose", "--ansi", "never", "--project-name", d.Name)
 	for _, f := range d.Files {
 		args = append(args, "--file", f)
 	}
 	args = append(args, command)
 	args = append(args, arg...)
-	cmd := exec.CommandContext(ctx, "docker-compose", args...)
+	cmd := exec.CommandContext(ctx, "docker", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if len(d.Environment) > 0 {
@@ -193,13 +194,13 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		args = append(args, service)
 	}
 
-	// Try to pull the image before building it
-	var stderr bytes.Buffer
-	pull := d.cmd(ctx, "pull", "--ignore-pull-failures", service)
+	// Try to pull the image before building it.
+	// Pull failures are not fatal because "up" will build images if needed.
+	pull := d.cmd(ctx, "pull", service)
 	pull.Stdout = nil
-	pull.Stderr = &stderr
+	pull.Stderr = nil
 	if err := pull.Run(); err != nil {
-		return fmt.Errorf("failed to pull images using docker-compose: %s: %w", stderr.String(), err)
+		d.logger.Warnf("pull failed for %s (will build if needed): %v", service, err)
 	}
 
 	err := d.cmd(ctx, "up", args...).Run()
@@ -392,7 +393,7 @@ func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
 		if container.Running() && container.Old() {
 			err = d.client.ContainerRemove(ctx, container.info.ID, rmOpts)
 			if err != nil {
-				logp.Err("container remove: %v", err)
+				d.logger.Errorf("container remove: %v", err)
 			}
 		}
 	}

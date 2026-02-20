@@ -2,15 +2,18 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package gcs
 
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"time"
 
 	"cloud.google.com/go/storage"
-	gax "github.com/googleapis/gax-go/v2"
+	"github.com/googleapis/gax-go/v2"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -51,7 +54,7 @@ func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	}
 }
 
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+func configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
@@ -85,25 +88,49 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	if b.MaxWorkers == nil {
 		b.MaxWorkers = &cfg.MaxWorkers
 	}
+
+	if b.BatchSize == nil && cfg.BatchSize != 0 {
+		// If the global batch size is set, use it
+		b.BatchSize = &cfg.BatchSize
+	} else {
+		// If the global batch size is not set, use the local max_workers as the batch size
+		// since at this point we know `b.MaxWorkers` will be set to a non-nil value.
+		// This is to maintain backward compatibility with the old config.
+		b.BatchSize = b.MaxWorkers
+	}
+
 	if b.Poll == nil {
 		b.Poll = &cfg.Poll
 	}
+
 	if b.PollInterval == nil {
 		b.PollInterval = &cfg.PollInterval
 	}
+
 	if b.ParseJSON == nil {
 		b.ParseJSON = &cfg.ParseJSON
 	}
+
 	if b.TimeStampEpoch == nil {
 		b.TimeStampEpoch = cfg.TimeStampEpoch
 	}
+
 	if b.ExpandEventListFromField == "" {
 		b.ExpandEventListFromField = cfg.ExpandEventListFromField
 	}
+
 	if len(b.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
 		b.FileSelectors = cfg.FileSelectors
 	}
-	b.ReaderConfig = cfg.ReaderConfig
+
+	// If the bucket level ReaderConfig matches the default config ReaderConfig state,
+	// use the global ReaderConfig. Matching the default ReaderConfig state
+	// means that the bucket level ReaderConfig is not set, and we should use the
+	// global ReaderConfig. Partial definition of ReaderConfig at both the global
+	// and bucket level is not supported, it's an either or scenario.
+	if reflect.DeepEqual(b.ReaderConfig, defaultReaderConfig) {
+		b.ReaderConfig = cfg.ReaderConfig
+	}
 
 	return b
 }
@@ -123,29 +150,25 @@ func (input *gcsInput) Test(src cursor.Source, ctx v2.TestContext) error {
 }
 
 func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
-	cursor cursor.Cursor, publisher cursor.Publisher) error {
+	cursor cursor.Cursor, publisher cursor.Publisher,
+) error {
 	st := newState()
 	currentSource := src.(*Source)
 
-	stat := inputCtx.StatusReporter
-	if stat == nil {
-		stat = noopReporter{}
-	}
-	stat.UpdateStatus(status.Starting, "")
-	stat.UpdateStatus(status.Configuring, "")
+	inputCtx.UpdateStatus(status.Starting, "")
+	inputCtx.UpdateStatus(status.Configuring, "")
 
 	log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
 	log.Infof("Running google cloud storage for project: %s", input.config.ProjectId)
 	// create a new inputMetrics instance
-	metrics := newInputMetrics(inputCtx.ID+":"+currentSource.BucketName, nil)
+	metrics := newInputMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
 	metrics.url.Set("gs://" + currentSource.BucketName)
-	defer metrics.Close()
 
 	var cp *Checkpoint
 	if !cursor.IsNew() {
 		if err := cursor.Unpack(&cp); err != nil {
 			metrics.errorsTotal.Inc()
-			stat.UpdateStatus(status.Failed, "failed to configure input: "+err.Error())
+			inputCtx.UpdateStatus(status.Failed, "failed to configure input: "+err.Error())
 			return err
 		}
 
@@ -161,7 +184,7 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 	client, err := fetchStorageClient(ctx, input.config)
 	if err != nil {
 		metrics.errorsTotal.Inc()
-		stat.UpdateStatus(status.Failed, "failed to get storage client: "+err.Error())
+		inputCtx.UpdateStatus(status.Failed, "failed to get storage client: "+err.Error())
 		return err
 	}
 
@@ -178,11 +201,7 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 		// Since we are only reading, the operation is always idempotent
 		storage.WithPolicy(storage.RetryAlways),
 	)
-	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, stat, metrics, log)
+	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, &inputCtx, metrics, log)
 
 	return scheduler.schedule(ctx)
 }
-
-type noopReporter struct{}
-
-func (noopReporter) UpdateStatus(status.Status, string) {}

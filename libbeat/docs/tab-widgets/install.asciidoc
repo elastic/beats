@@ -102,6 +102,19 @@ execution policy for the current session to allow the script to run. For
 example:
 +PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-{beatname_lc}.ps1+.
 
+[IMPORTANT]
+=========================
+By default, Windows log files are stored in +C:{backslash}Program Files{backslash}{beatname_uc}-Data{backslash}logs+.
+The base folder has changed from +C:{backslash}ProgramData{backslash}+ to +C:{backslash}Program Files{backslash}+
+on version 8.19.3 because the latter has stricter permissions. The home path (base for
+state and logs) is now +C:{backslash}Program Files{backslash}{beatname_uc}-Data+.
+
+The install script (+install-service-{beatname_lc}.ps1+) will check whether
++C:{backslash}ProgramData{backslash}{beatname_lc}+ exits and move it to +C:{backslash}Program Files{backslash}{beatname_uc}-Data+.
+For more details on the installation script refer to: <<{beatname_lc}-installation-script>>.
+
+=========================
+
 endif::[]
 // end::win[]
 

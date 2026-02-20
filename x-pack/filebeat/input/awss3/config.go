@@ -149,6 +149,9 @@ func (c *config) Validate() error {
 			}
 		}
 	}
+	if c.NonAWSBucketName != "" && c.RegionName == "" {
+		return errors.New("region must be configured when using non_aws_bucket_name")
+	}
 
 	if c.StartTimestamp != "" {
 		_, err := time.Parse(time.RFC3339, c.StartTimestamp)
@@ -308,6 +311,8 @@ func (c config) s3ConfigModifier(o *s3.Options) {
 func (c config) sqsConfigModifier(o *sqs.Options) {
 	if c.AWSConfig.FIPSEnabled {
 		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		// Disable checksum validation temporarily till https://github.com/golang/go/issues/74630#issuecomment-3228203391 is implemented
+		o.DisableMessageChecksumValidation = true
 	}
 	if c.AWSConfig.Endpoint != "" {
 		//nolint:staticcheck // not changing through this PR

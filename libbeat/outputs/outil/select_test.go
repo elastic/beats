@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -286,7 +287,7 @@ func TestSelector(t *testing.T) {
 				settings = test.settings(settings)
 			}
 
-			sel, err := BuildSelectorFromConfig(cfg, settings)
+			sel, err := BuildSelectorFromConfig(cfg, settings, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -360,7 +361,7 @@ func TestSelectorInitFail(t *testing.T) {
 				MultiKey:         "keys",
 				EnableSingleOnly: true,
 				FailEmpty:        true,
-			})
+			}, logptest.NewTestingLogger(t, ""))
 
 			assert.Error(t, err)
 			t.Log(err)

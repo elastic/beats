@@ -103,13 +103,13 @@ type Reloader struct {
 }
 
 // NewReloader creates new Reloader instance for the given config
-func NewReloader(logger *logp.Logger, pipeline beat.PipelineConnector, cfg *config.C) *Reloader {
+func NewReloader(logger *logp.Logger, pipeline beat.PipelineConnector, cfg *config.C, beatPaths *paths.Path) *Reloader {
 	conf := DefaultDynamicConfig
 	_ = cfg.Unpack(&conf)
 
 	path := conf.Path
 	if !filepath.IsAbs(path) {
-		path = paths.Resolve(paths.Config, path)
+		path = beatPaths.Resolve(paths.Config, path)
 	}
 
 	return &Reloader{
@@ -265,7 +265,7 @@ func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error
 	result := []*reload.ConfigWithMeta{}
 	var errs multierror.Errors
 	for _, file := range files {
-		configs, err := LoadList(file)
+		configs, err := LoadList(file, rl.logger)
 		if err != nil {
 			errs = append(errs, err)
 			rl.logger.Errorf("Error loading config from file '%s', error %v", file, err)

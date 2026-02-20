@@ -33,6 +33,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
@@ -74,9 +75,10 @@ type TestResult struct {
 func newV2Context(id string) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
-		Logger:      logp.NewLogger("netflow_test"),
-		ID:          id,
-		Cancelation: ctx,
+		Logger:          logp.NewLogger("netflow_test"),
+		ID:              id,
+		Cancelation:     ctx,
+		MetricsRegistry: monitoring.NewRegistry(),
 	}, cancel
 }
 
@@ -96,6 +98,8 @@ func TestNetFlow(t *testing.T) {
 			pluginCfg, err := conf.NewConfigFrom(mapstr.M{})
 			require.NoError(t, err)
 			if isReversed {
+				t.Skip("Flaky test: https://github.com/elastic/beats/issues/43670")
+
 				// if pcap is reversed packet order we need to have multiple workers
 				// and thus enable the input packets lru
 				err = pluginCfg.SetInt("workers", -1, 2)

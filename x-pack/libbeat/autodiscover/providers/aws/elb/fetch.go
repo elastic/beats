@@ -61,6 +61,7 @@ func (amf *apiMultiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 // apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
 type apiFetcher struct {
 	client autodiscoverElbClient
+	logger *logp.Logger
 }
 
 type autodiscoverElbClient interface {
@@ -68,11 +69,12 @@ type autodiscoverElbClient interface {
 	elasticloadbalancingv2.DescribeLoadBalancersAPIClient
 }
 
-func newAPIFetcher(clients []autodiscoverElbClient) fetcher {
+func newAPIFetcher(clients []autodiscoverElbClient, logger *logp.Logger) fetcher {
 	fetchers := make([]fetcher, len(clients))
 	for idx, client := range clients {
 		fetchers[idx] = &apiFetcher{
 			client: client,
+			logger: logger,
 		}
 	}
 	return &apiMultiFetcher{fetchers}
@@ -94,7 +96,7 @@ func (f *apiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 		taskPool: sync.Pool{},
 		context:  ctx,
 		cancel:   cancel,
-		logger:   logp.NewLogger("autodiscover-elb-fetch"),
+		logger:   f.logger.Named("autodiscover-elb-fetch"),
 	}
 
 	// Limit concurrency against the AWS API by creating a pool of objects

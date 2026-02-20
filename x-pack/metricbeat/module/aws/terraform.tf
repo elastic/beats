@@ -79,4 +79,8 @@ data "aws_ami" "latest-amzn" {
       "amzn2-ami-hvm-*",
     ]
   }
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
 }

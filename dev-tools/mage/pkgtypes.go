@@ -30,12 +30,13 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 
+	"github.com/gohugoio/hashstructure"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/mitchellh/hashstructure"
 )
 
 const (
@@ -742,6 +743,23 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 		return err
 	}
 
+	// this snippet handles the package name metadata for the beats .deb or .rpm specs.
+	// If the FIPS-enabled spec is being built, add `-fips` suffix to the package name and list the non-FIPS package
+	// as a conflict in order to prevent having both packages installed at the same time.
+	// If a non FIPS-enabled spec is built but a FIPS-enabled package can be produced for the same beat, list the
+	// FIPS-enabled package as conflict as well.
+	packageName := spec.ServiceName
+	fipsPackageName := packageName + "-fips"
+	var conflicts []string
+	if spec.FIPS {
+		// add the non-FIPS package as conflict
+		conflicts = append(conflicts, packageName)
+		// change the package name to distinguish it from the non-FIPS variant
+		packageName = fipsPackageName
+	} else if slices.Contains(FIPSConfig.Beats, BeatName) {
+		// the beat is enabled for FIPS capable build, add the FIPS package as conflict
+		conflicts = append(conflicts, fipsPackageName)
+	}
 	args = append(args,
 		"--rm",
 		"-w", "/app",
@@ -750,9 +768,13 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 		"fpm", "--force",
 		"--input-type", "tar",
 		"--output-type", fpmPackageType,
-		"--name", spec.ServiceName,
+		"--name", packageName,
 		"--architecture", spec.Arch,
 	)
+	for _, conflict := range conflicts {
+		args = append(args, "--conflicts", conflict)
+	}
+
 	if packageType == RPM {
 		args = append(args,
 			"--rpm-rpmbuild-define", "_build_id_links none",

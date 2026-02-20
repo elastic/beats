@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type s3ObjectProcessorFactory struct {
@@ -65,10 +66,15 @@ const (
 // retry backoff until the connection is healthy again.
 var errS3DownloadFailed = errors.New("S3 download failure")
 
-func newS3ObjectProcessorFactory(metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
+func newS3ObjectProcessorFactory(metrics *inputMetrics,
+	s3 s3API,
+	sel []fileSelectorConfig,
+	backupConfig backupConfig,
+	logger *logp.Logger,
+) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
-		metrics = newInputMetrics("", nil, 0)
+		metrics = newInputMetrics(monitoring.NewRegistry(), 0, logger)
 	}
 	if len(sel) == 0 {
 		sel = []fileSelectorConfig{
@@ -159,7 +165,7 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	}
 
 	// try to create a dec from the using the codec config
-	dec, err := newDecoder(p.readerConfig.Decoding, streamReader)
+	dec, err := newDecoder(p.readerConfig.Decoding, streamReader, log)
 	if err != nil {
 		return err
 	}
@@ -394,7 +400,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader, logger *logp.Logger) error {
 		Terminator:   p.readerConfig.LineTerminator,
 		CollectOnEOF: true,
 		MaxBytes:     int(p.readerConfig.MaxBytes) * 4,
-	})
+	}, logger)
 	if err != nil {
 		return fmt.Errorf("failed to create encode reader: %w", err)
 	}

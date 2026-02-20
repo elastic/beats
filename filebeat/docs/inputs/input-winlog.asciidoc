@@ -351,6 +351,29 @@ Example:
 --------------------------------------------------------------------------------
 
 [float]
+==== `ignore_missing_channel`
+
+Boolean option that controls whether the input should ignore missing event log channels.
+When set to `true`, if a specified event log channel doesn't exist or cannot be accessed,
+it will log a warning instead of stopping with an error. The default is `true`.
+
+This option is useful when deploying configurations across multiple systems where certain
+event log channels may not be available on all machines, or when monitoring optional channels
+that may not always be present.
+
+Example:
+
+[source,yaml]
+--------------------------------------------------------------------------------
+- type: winlog
+  name: Sysmon
+  ignore_missing_channel: false
+--------------------------------------------------------------------------------
+
+In this example, if the Sysmon channel is missing, Winlogbeat will stop with an error,
+which may be desired for critical monitoring components.
+
+[float]
 ==== `tags`
 
 A list of tags that the Beat includes in the `tags` field of each published

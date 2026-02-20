@@ -36,8 +36,11 @@ import (
 // sourceStore is a store which can access resources using the Source
 // from an input.
 type sourceStore struct {
-	identifier *sourceIdentifier
-	store      *store
+	// identifier is the sourceIdentifier used to generate IDs fro this store.
+	identifier *SourceIdentifier
+	// store is the underlying store that encapsulates
+	// the in-memory and persistent store.
+	store *store
 }
 
 // store encapsulates the persistent store and the in memory state store, that
@@ -163,7 +166,10 @@ func openStore(log *logp.Logger, statestore statestore.States, prefix string) (*
 	}, nil
 }
 
-func newSourceStore(s *store, identifier *sourceIdentifier) *sourceStore {
+// newSourceStore store returns a souceStore that will operate on the provided
+// store. identifier is required and is used to generate the ID for the
+// resources stored on store.
+func newSourceStore(s *store, identifier *SourceIdentifier) *sourceStore {
 	return &sourceStore{
 		store:      s,
 		identifier: identifier,
@@ -388,7 +394,7 @@ func (s *store) UpdateTTL(resource *resource, ttl time.Duration) {
 
 	s.writeState(resource)
 
-	if resource.isDeleted() {
+	if resource.unsafeIsDeleted() {
 		// version must be incremented to make sure existing resource
 		// instances do not overwrite the removal of the entry
 		resource.version++
@@ -419,6 +425,10 @@ func (s *states) Find(key string, create bool) *resource {
 		key:    key,
 		lock:   unison.MakeMutex(),
 	}
+	// -1 means this resource will not be cleaned up due to a timeout.
+	// The zero-value for internalState.TTL means this resource is
+	// soft-deleted.
+	resource.internalState.TTL = -1
 	s.table[key] = resource
 	resource.Retain()
 	return resource
@@ -431,7 +441,17 @@ func (r *resource) IsNew() bool {
 	return r.pendingCursorValue == nil && r.pendingUpdate == nil && r.cursor == nil
 }
 
+// isDeleted locks stateMutex then checks whether [resource] is deleted.
 func (r *resource) isDeleted() bool {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+	return r.unsafeIsDeleted()
+}
+
+// unsafeIsDeleted DOES NOT LOCK THE RESOURCE!!!
+// Only call unsafeIsDeleted if you're currently holding the
+// lock from resource.stateMutex
+func (r *resource) unsafeIsDeleted() bool {
 	return !r.internalState.Updated.IsZero() && r.internalState.TTL == 0
 }
 

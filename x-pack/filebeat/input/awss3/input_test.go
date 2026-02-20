@@ -6,15 +6,50 @@ package awss3
 
 import (
 	"errors"
+	"sync"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/stretchr/testify/assert"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
+
+// statusReporterHelperMock is a thread-safe mock of a status reporter that
+// behaves like StatusReporterHelper
+type statusReporterHelperMock struct {
+	mu       sync.Mutex
+	statuses []mgmtStatusUpdate
+	current  status.Status
+}
+
+type mgmtStatusUpdate struct {
+	status status.Status
+	msg    string
+}
+
+func (r *statusReporterHelperMock) getStatuses() []mgmtStatusUpdate {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	s := make([]mgmtStatusUpdate, len(r.statuses))
+	copy(s, r.statuses)
+	return s
+}
+
+func (r *statusReporterHelperMock) UpdateStatus(s status.Status, msg string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	// Imitate behavior of statusReporterHelper. Only record if the new status is different.
+	if s != r.current {
+		r.current = s
+		r.statuses = append(r.statuses, mgmtStatusUpdate{status: s, msg: msg})
+	}
+}
 
 func TestGetProviderFromDomain(t *testing.T) {
 	tests := []struct {
@@ -147,12 +182,14 @@ func TestRegionSelection(t *testing.T) {
 				RegionName: test.regionName,
 				AWSConfig:  awscommon.ConfigAWS{Endpoint: test.endpoint},
 			}
-			in := newSQSReaderInput(config, awssdk.Config{})
+			in := newSQSReaderInput(config, awssdk.Config{}, paths.New())
 			inputCtx := v2.Context{
-				Logger: logp.NewLogger("awss3_test"),
-				ID:     "test_id",
+				Logger:          logp.NewLogger("awss3_test"),
+				ID:              "test_id",
+				MetricsRegistry: monitoring.NewRegistry(),
 			}
 
+			in.status = &statusReporterHelperMock{}
 			// Run setup and verify that it put the correct region in awsConfig.Region
 			err := in.setup(inputCtx, &fakePipeline{})
 			in.cleanup()

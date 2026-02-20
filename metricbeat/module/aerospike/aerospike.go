@@ -22,6 +22,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
 	as "github.com/aerospike/aerospike-client-go/v7"
@@ -47,10 +48,10 @@ func DefaultConfig() Config {
 	return Config{}
 }
 
-func ParseClientPolicy(config Config) (*as.ClientPolicy, error) {
+func ParseClientPolicy(config Config, logger *logp.Logger) (*as.ClientPolicy, error) {
 	clientPolicy := as.NewClientPolicy()
 	if config.TLS.IsEnabled() {
-		tlsconfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		tlsconfig, err := tlscommon.LoadTLSConfig(config.TLS, logger)
 		if err != nil {
 			return nil, fmt.Errorf("could not initialize TLS configurations %w", err)
 		}

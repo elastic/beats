@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"go.elastic.co/apm/v2/apmtest"
+	"go.uber.org/zap"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -37,6 +38,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -52,25 +54,22 @@ func TestClientPublishEvent(t *testing.T) {
 }
 
 func TestClientPublishEventKerberosAware(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/21295")
-
-	err := setupRoleMapping(t, eslegtest.GetEsKerberosHost())
+	kerberosURL := "http://localhost:9203"
+	err := setupRoleMapping(t, kerberosURL)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	index := "beat-int-pub-single-event-behind-kerb"
 	cfg := map[string]interface{}{
-		"hosts":    eslegtest.GetEsKerberosHost(),
-		"index":    index,
-		"username": "",
-		"password": "",
+		"hosts": kerberosURL,
+		"index": index,
 		"kerberos": map[string]interface{}{
 			"auth_type":   "password",
 			"config_path": "testdata/krb5.conf",
-			"username":    eslegtest.GetUser(),
-			"password":    eslegtest.GetPass(),
-			"realm":       "ELASTIC",
+			"username":    "beats",
+			"password":    "testing",
+			"realm":       "elastic",
 		},
 	}
 
@@ -79,7 +78,7 @@ func TestClientPublishEventKerberosAware(t *testing.T) {
 
 func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 	registry := monitoring.NewRegistry()
-	output, client := connectTestEs(t, cfg, outputs.NewStats(registry))
+	output, client := connectTestEs(t, cfg, outputs.NewStats(registry, logp.NewNopLogger()))
 
 	// drop old index preparing test
 	_, _, _ = client.conn.Delete(index, "", "", nil)
@@ -404,7 +403,7 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 		t.Fatal(err)
 	}
 
-	logger := logptest.NewTestingLogger(t, "elasticsearch")
+	logger := logptest.NewTestingLogger(t, "elasticsearch", zap.AddCallerSkip(1))
 	info := beat.Info{Beat: "libbeat", Logger: logger}
 	// disable ILM if using specified index name
 	im, _ := idxmgmt.DefaultSupport(info, conf.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))
@@ -430,12 +429,12 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 	return client, client
 }
 
-// setupRoleMapping sets up role mapping for the Kerberos user beats@ELASTIC
+// setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
 func setupRoleMapping(t *testing.T, host string) error {
 	_, client := connectTestEs(t, map[string]interface{}{
 		"hosts":    host,
-		"username": "elastic",
-		"password": "changeme",
+		"username": "admin",
+		"password": "testing",
 	}, nil)
 
 	roleMappingURL := client.conn.URL + "/_security/role_mapping/kerbrolemapping"
@@ -445,7 +444,7 @@ func setupRoleMapping(t *testing.T, host string) error {
 		"enabled": true,
 		"rules": map[string]interface{}{
 			"field": map[string]interface{}{
-				"username": "beats@ELASTIC",
+				"username": "beats@elastic",
 			},
 		},
 	})

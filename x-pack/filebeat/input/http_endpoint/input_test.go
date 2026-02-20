@@ -21,7 +21,9 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -431,8 +433,7 @@ func TestServerPool(t *testing.T) {
 				fails = make(chan error, 1)
 			)
 			ctx, cancel := newCtx("server_pool_test", test.name)
-			metrics := newInputMetrics("")
-			defer metrics.Close()
+			metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 			var wg sync.WaitGroup
 			for _, cfg := range test.cfgs {
 				cfg := cfg
@@ -515,7 +516,7 @@ func TestNewHTTPEndpoint(t *testing.T) {
 		ResponseBody:  "{}",
 		Method:        http.MethodPost,
 	}
-	h, err := newHTTPEndpoint(cfg)
+	h, err := newHTTPEndpoint(cfg, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	require.Equal(t, "[0:0:0:0:0:0:0:1]:9200", h.addr)
 }

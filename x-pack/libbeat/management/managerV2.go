@@ -117,6 +117,7 @@ type BeatV2Manager struct {
 	// trying to reload the configuration after an input not finished error
 	// happens
 	forceReloadDebounce time.Duration
+	wg                  sync.WaitGroup
 }
 
 // ================================
@@ -155,8 +156,8 @@ func init() {
 // NewV2AgentManager returns a remote config manager for the agent V2 protocol.
 // This is registered as the manager factory in init() so that calls to
 // lbmanagement.NewManager will be forwarded here.
-func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
-	logger := logp.NewLogger(lbmanagement.DebugK).Named("V2-manager")
+func NewV2AgentManager(config *conf.C, registry *reload.Registry, logger *logp.Logger) (lbmanagement.Manager, error) {
+	logger = logger.Named(lbmanagement.DebugK).Named("V2-manager")
 	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
@@ -194,12 +195,12 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 	// debug log messages are only outputted when running in trace mode
 	lbmanagement.SetUnderAgent(true)
 
-	return NewV2AgentManagerWithClient(c, registry, agentClient)
+	return NewV2AgentManagerWithClient(c, registry, agentClient, logger)
 }
 
 // NewV2AgentManagerWithClient actually creates the manager instance used by the rest of the beats.
-func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2, opts ...func(*BeatV2Manager)) (lbmanagement.Manager, error) {
-	log := logp.NewLogger(lbmanagement.DebugK)
+func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2, logger *logp.Logger, opts ...func(*BeatV2Manager)) (lbmanagement.Manager, error) {
+	log := logger.Named(lbmanagement.DebugK)
 	if config.RestartOnOutputChange {
 		log.Infof("Output reload is enabled, the beat will restart as needed on change of output config")
 	}
@@ -233,17 +234,25 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 // Beats central management interface implementation
 // ================================
 
-func (cm *BeatV2Manager) AgentInfo() client.AgentInfo {
+func (cm *BeatV2Manager) AgentInfo() lbmanagement.AgentInfo {
 	if cm.client.AgentInfo() == nil {
-		return client.AgentInfo{}
+		return lbmanagement.AgentInfo{}
 	}
 
-	return *cm.client.AgentInfo()
+	info := *cm.client.AgentInfo()
+
+	return lbmanagement.AgentInfo{
+		ID:           info.ID,
+		Version:      info.Version,
+		Snapshot:     info.Snapshot,
+		ManagedMode:  lbmanagement.AgentManagedMode(info.ManagedMode),
+		Unprivileged: info.Unprivileged,
+	}
 }
 
 // RegisterDiagnosticHook will register a diagnostic callback function when elastic-agent asks for a diagnostics dump
-func (cm *BeatV2Manager) RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook) {
-	cm.client.RegisterDiagnosticHook(name, description, filename, contentType, hook)
+func (cm *BeatV2Manager) RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook lbmanagement.DiagnosticHook) {
+	cm.client.RegisterDiagnosticHook(name, description, filename, contentType, client.DiagnosticHook(hook))
 }
 
 // UpdateStatus updates the manager with the current status for the beat.
@@ -287,6 +296,7 @@ func (cm *BeatV2Manager) Start() error {
 	}
 	ctx, canceller := context.WithCancel(ctx)
 	cm.errCanceller = canceller
+
 	go cm.watchErrChan(ctx)
 	cm.client.RegisterDiagnosticHook(
 		"beat-rendered-config",
@@ -312,7 +322,7 @@ func (cm *BeatV2Manager) CheckRawConfig(_ *conf.C) error {
 }
 
 // RegisterAction adds a V2 client action
-func (cm *BeatV2Manager) RegisterAction(action client.Action) {
+func (cm *BeatV2Manager) RegisterAction(action lbmanagement.Action) {
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
 
@@ -327,7 +337,7 @@ func (cm *BeatV2Manager) RegisterAction(action client.Action) {
 }
 
 // UnregisterAction removes a V2 client action
-func (cm *BeatV2Manager) UnregisterAction(action client.Action) {
+func (cm *BeatV2Manager) UnregisterAction(action lbmanagement.Action) {
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
 
@@ -469,7 +479,8 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 			if !errors.Is(context.Canceled, err) {
 				cm.logger.Errorf("elastic-agent-client error: %s", err)
 			}
-
+		case <-cm.stopChan:
+			return
 		}
 	}
 }
@@ -490,6 +501,7 @@ func (cm *BeatV2Manager) unitListen() {
 		// The stopChan channel comes from the Manager interface Stop() method
 		case <-cm.stopChan:
 			cm.stopBeat()
+			return
 		case sig := <-sigc:
 			// we can't duplicate the same logic used by stopChan here.
 			// A beat will also watch for sigint and shut down, if we call the stopFunc
@@ -606,7 +618,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 		}
 		if expected.Features != nil {
 			// unit is expected to update its feature flags
-			featuresCfg, err := features.NewConfigFromProto(expected.Features)
+			featuresCfg, err := NewConfigFromProto(expected.Features)
 			if err != nil {
 				unitErrors[unit.ID()] = append(unitErrors[unit.ID()], err)
 			}
@@ -760,7 +772,7 @@ func (cm *BeatV2Manager) reloadOutput(unit *agentUnit) (bool, error) {
 	if cm.stopOnOutputReload && cm.lastOutputCfg != nil {
 		cm.logger.Info("beat is restarting because output changed")
 		_ = unit.UpdateState(status.Stopping, "Restarting", nil)
-		cm.Stop()
+		cm.stopBeat()
 		return true, nil
 	}
 
@@ -993,7 +1005,7 @@ func (cm *BeatV2Manager) handleDebugYaml() []byte {
 
 	data, err := yaml.Marshal(beatCfg)
 	if err != nil {
-		cm.logger.Errorf("error generating YAML for input debug callback: %w", err)
+		cm.logger.Errorf("error generating YAML for input debug callback: %v", err)
 		return nil
 	}
 	return data

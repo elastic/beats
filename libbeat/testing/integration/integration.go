@@ -25,7 +25,10 @@ import (
 	"os/exec"
 	"regexp"
 	"sync"
+	"sync/atomic"
 	"testing"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -71,7 +74,25 @@ type BeatTest interface {
 	// inspecting only the new output lines.
 	ExpectOutput(...string) BeatTest
 
-	// ExpectOutputRegex registers an output watch for the given regular expression..
+	// ExpectJSONFields registers an output watch for the given key-value pair.
+	// The input to this method should look like
+	// mapstr.M{
+	// 	"key1.key2": []interface{}["20", "30", "40"],
+	// 	"key3": mapstr.M{
+	// 	  "key4": 5,
+	// 	  "key5": 6,
+	// 	},
+	// }
+	//
+	// It is useful when expecting key-value pair to exist in the output document/ JSON structured logs
+	//
+	// For `AND` behavior use this function multiple times.
+	//
+	// This function should be used before `Start` because it's
+	// inspecting only the new output lines.
+	ExpectJSONFields(mapstr.M) BeatTest
+
+	// ExpectOutputRegex registers an output watch for the given regular expression.
 	//
 	// Every future output line produced by the Beat will be matched
 	// against the given regular expression.
@@ -84,6 +105,32 @@ type BeatTest interface {
 	// This function should be used before `Start` because it's
 	// inspecting only new outputs.
 	ExpectOutputRegex(...*regexp.Regexp) BeatTest
+
+	// CountOutput registers an output counter for the given substring.
+	//
+	// Every future output line produced by the Beat will be matched
+	// against the given substring and counted.
+	//
+	// If given multiple substrings, they get checked in order.
+	// The first substring must match first, then second, etc.
+	// Only when all substrings match in order the counter gets incremented.
+	//
+	// This function should be used before `Start` because it's
+	// inspecting only new outputs.
+	CountOutput(out *atomic.Int64, strs ...string) BeatTest
+
+	// CountOutputRegex registers an output counter for the given regular expression.
+	//
+	// Every future output line produced by the Beat will be matched
+	// against the given regular expression and counted.
+	//
+	// If given multiple expressions, they get checked in order.
+	// The first expression must match first, then second, etc.
+	// Only when all expressions match in order the counter gets incremented.
+	//
+	// This function should be used before `Start` because it's
+	// inspecting only new outputs.
+	CountOutputRegex(out *atomic.Int64, exprs ...*regexp.Regexp) BeatTest
 
 	// PrintOutput prints last `limit` lines of the output
 	//
@@ -98,6 +145,12 @@ type BeatTest interface {
 
 	// WithReportOptions sets the reporting options for the test.
 	WithReportOptions(ReportOptions) BeatTest
+
+	// GetTempDir returns the home path where beat is running
+	GetTempDir() string
+
+	// T returns the current testing context.
+	T() *testing.T
 }
 
 // ReportOptions describes all reporting options
@@ -126,8 +179,9 @@ type BeatTestOptions = RunBeatOptions
 // NewBeatTest creates a new integration test for a Beat.
 func NewBeatTest(t *testing.T, opts BeatTestOptions) BeatTest {
 	test := &beatTest{
-		t:    t,
-		opts: opts,
+		t:       t,
+		opts:    opts,
+		tempDir: t.TempDir(),
 	}
 
 	return test
@@ -137,10 +191,20 @@ type beatTest struct {
 	t                *testing.T
 	opts             BeatTestOptions
 	reportOpts       ReportOptions
-	expectations     []OutputWatcher
+	inspectors       []OutputInspector
+	watchers         []OutputWatcher
 	expectedExitCode *int
 	beat             *RunningBeat
 	mtx              sync.Mutex
+	tempDir          string
+}
+
+// GetTempDir implements the BeatTest interface.
+func (b *beatTest) GetTempDir() string {
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+
+	return b.tempDir
 }
 
 // Start implements the BeatTest interface.
@@ -151,12 +215,13 @@ func (b *beatTest) Start(ctx context.Context) BeatTest {
 		b.t.Fatal("test cannot be startd multiple times")
 		return b
 	}
-	watcher := NewOverallWatcher(b.expectations)
+	watcher := NewOverallWatcher(b.watchers)
+	inspector := NewOverallInspector(b.inspectors)
 	b.t.Logf("running %s integration test...", b.opts.Beatname)
 	if b.reportOpts.PrintExpectationsBeforeStart {
 		b.printExpectations()
 	}
-	b.beat = RunBeat(ctx, b.t, b.opts, watcher)
+	b.beat = RunBeat(ctx, b.t, b.opts, watcher, inspector, b.tempDir)
 
 	return b
 }
@@ -173,8 +238,8 @@ func (b *beatTest) Wait() {
 
 	err := b.beat.Wait()
 	exitErr := &exec.ExitError{}
-	if !errors.As(err, &exitErr) {
-		b.t.Fatalf("unexpected error when stopping %s: %s", b.opts.Beatname, err)
+	if !errors.As(err, &exitErr) && err != nil {
+		b.t.Fatalf("unexpected error when stopping %s: %v", b.opts.Beatname, err)
 		return
 	}
 
@@ -222,7 +287,7 @@ func (b *beatTest) ExpectOutput(lines ...string) BeatTest {
 
 	if len(lines) == 1 {
 		l := escapeJSONCharacters(lines[0])
-		b.expectations = append(b.expectations, NewStringWatcher(l))
+		b.watchers = append(b.watchers, NewStringWatcher(l))
 		return b
 	}
 
@@ -231,7 +296,26 @@ func (b *beatTest) ExpectOutput(lines ...string) BeatTest {
 		escaped := escapeJSONCharacters(l)
 		watchers = append(watchers, NewStringWatcher(escaped))
 	}
-	b.expectations = append(b.expectations, NewInOrderWatcher(watchers))
+	b.watchers = append(b.watchers, NewInOrderWatcher(watchers))
+	return b
+}
+
+// ExpectJSONFields implements the BeatTest interface.
+func (b *beatTest) ExpectJSONFields(fields mapstr.M) BeatTest {
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+
+	if b.beat != nil {
+		b.t.Fatal(expectErrMsg)
+		return b
+	}
+
+	if len(fields) == 0 {
+		return b
+	}
+
+	b.watchers = append(b.watchers, NewJSONWatcher(fields))
+
 	return b
 }
 
@@ -250,7 +334,7 @@ func (b *beatTest) ExpectOutputRegex(exprs ...*regexp.Regexp) BeatTest {
 	}
 
 	if len(exprs) == 1 {
-		b.expectations = append(b.expectations, NewRegexpWatcher(exprs[0]))
+		b.watchers = append(b.watchers, NewRegexpWatcher(exprs[0]))
 		return b
 	}
 
@@ -258,7 +342,45 @@ func (b *beatTest) ExpectOutputRegex(exprs ...*regexp.Regexp) BeatTest {
 	for _, e := range exprs {
 		watchers = append(watchers, NewRegexpWatcher(e))
 	}
-	b.expectations = append(b.expectations, NewInOrderWatcher(watchers))
+	b.watchers = append(b.watchers, NewInOrderWatcher(watchers))
+
+	return b
+}
+
+// CountOutput implements the BeatTest interface.
+func (b *beatTest) CountOutput(out *atomic.Int64, strs ...string) BeatTest {
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+
+	if b.beat != nil {
+		b.t.Fatal(expectErrMsg)
+		return b
+	}
+
+	if len(strs) == 0 {
+		return b
+	}
+
+	b.inspectors = append(b.inspectors, NewCounter(out, strs...))
+
+	return b
+}
+
+// CountOutputRegex implements the BeatTest interface.
+func (b *beatTest) CountOutputRegex(out *atomic.Int64, exprs ...*regexp.Regexp) BeatTest {
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+
+	if b.beat != nil {
+		b.t.Fatal(expectErrMsg)
+		return b
+	}
+
+	if len(exprs) == 0 {
+		return b
+	}
+
+	b.inspectors = append(b.inspectors, NewRegexpCounter(out, exprs...))
 
 	return b
 }
@@ -274,7 +396,7 @@ func (b *beatTest) ExpectStart() BeatTest {
 	}
 
 	expectedLine := fmt.Sprintf("%s start running.", b.opts.Beatname)
-	b.expectations = append(b.expectations, NewStringWatcher(expectedLine))
+	b.watchers = append(b.watchers, NewStringWatcher(expectedLine))
 	return b
 }
 
@@ -333,9 +455,13 @@ func (b *beatTest) PrintExpectations() {
 	b.printExpectations()
 }
 
+func (b *beatTest) T() *testing.T {
+	return b.t
+}
+
 // lock-free, so it can be used inside a lock
 func (b *beatTest) printExpectations() {
-	overall := NewOverallWatcher(b.expectations)
+	overall := NewOverallWatcher(b.watchers)
 	b.t.Logf("set expectations:\n%s", overall)
 	if b.expectedExitCode != nil {
 		b.t.Logf("\nprocess is expected to exit with code %d\n\n", *b.expectedExitCode)
@@ -344,7 +470,7 @@ func (b *beatTest) printExpectations() {
 	}
 }
 
-// we know that we're going to inpect the JSON output from the Beat
+// we know that we're going to inspect the JSON output from the Beat
 // so we must take care of the escaped characters,
 // e.g. backslashes in paths on Windows.
 func escapeJSONCharacters(s string) string {

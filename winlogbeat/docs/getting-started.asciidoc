@@ -59,6 +59,19 @@ execution policy for the current session to allow the script to run. For example
 
 NOTE: To use a local non-Administrator account to run Winlogbeat, follow <<local-user-account-setup,these additional steps>>.
 
+[IMPORTANT]
+=========================
+By default, Windows log files are stored in +C:{backslash}Program Files{backslash}{beatname_uc}-Data{backslash}logs+.
+The base folder has changed from +C:{backslash}ProgramData{backslash}+ to +C:{backslash}Program Files{backslash}+
+on version 8.19.3 because the latter has stricter permissions. The home path (base for
+state and logs) is now +C:{backslash}Program Files{backslash}{beatname_uc}-Data+.
+
+The install script (+install-service-{beatname_lc}.ps1+) will check whether
++C:{backslash}ProgramData{backslash}{beatname_lc}+ exits and move it to +C:{backslash}Program Files{backslash}{beatname_uc}-Data+.
+For more details on the installation script refer to: <<{beatname_lc}-installation-script>>.
+
+=========================
+
 [float]
 [[set-connection]]
 === Step 2: Connect to the {stack}
@@ -92,7 +105,7 @@ For more information about this command, see the configuration details for
 ----
 logging.to_files: true
 logging.files:
-  path: C:\ProgramData\winlogbeat\Logs
+  path: C:{backslash}Program Files{backslash}{beatname_uc}-Data{backslash}logs
 logging.level: info
 ----
 
@@ -162,7 +175,7 @@ PS C:\Program Files\Winlogbeat> Start-Service winlogbeat
 
 {beatname_uc} should now be running. If you used the logging configuration
 described here, you can view the log file at
-`C:\ProgramData\winlogbeat\Logs\winlogbeat`.
++C:{backslash}Program Files{backslash}{beatname_uc}-Data{backslash}logs+.
 
 You can view the status of the service and control it from the Services
 management console in Windows. To launch the management console, run

@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const logName = "processors"
@@ -45,6 +46,12 @@ type Closer interface {
 	Close() error
 }
 
+// PathSetter is an interface for processors that support lazy initialization
+// with beat-specific paths. This method must be called before the processor can be used.
+type PathSetter interface {
+	SetPaths(*paths.Path) error
+}
+
 // Close closes a processor if it implements the Closer interface
 func Close(p beat.Processor) error {
 	if closer, ok := p.(Closer); ok {
@@ -56,9 +63,6 @@ func Close(p beat.Processor) error {
 // NewList creates a new empty processor list.
 // Additional processors can be added to the List field.
 func NewList(log *logp.Logger) *Processors {
-	if log == nil {
-		log = logp.NewLogger(logName)
-	}
 	return &Processors{log: log}
 }
 

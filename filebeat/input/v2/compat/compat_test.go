@@ -20,6 +20,7 @@ package compat
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"testing"
 
@@ -206,27 +207,36 @@ func TestGenerateCheckConfig(t *testing.T) {
 		cfg       *conf.C
 		want      *conf.C
 		wantErr   error
-		assertCfg func(t assert.TestingT, expected interface{}, actual interface{}, msgAndArgs ...interface{}) bool
+		assertCfg func(t assert.TestingT, expected any, actual *conf.C, msgAndArgs ...any)
 	}{
 		{
-			name:      "id is present",
-			cfg:       conf.MustNewConfigFrom("id: some-id"),
-			assertCfg: assert.NotEqual,
+			name: "id is present",
+			cfg:  conf.MustNewConfigFrom("id: some-id"),
+			assertCfg: func(t assert.TestingT, expect any, got *conf.C, msgAndArgs ...any) {
+				id, _ := got.String("id", -1)
+				if !strings.HasPrefix(id, "some-id") {
+					t.Errorf("'id' field must start with the original id, got %q", id)
+				}
+				assert.NotEqual(t, expect, got, msgAndArgs)
+			},
 		},
 		{
-			name:    "absent id",
-			cfg:     conf.MustNewConfigFrom(""),
-			wantErr: errors.New("failed to get 'id'"),
-			assertCfg: func(t assert.TestingT, _ interface{}, got interface{}, msgAndArgs ...interface{}) bool {
-				return assert.Nil(t, got, msgAndArgs...)
+			name: "absent id",
+			cfg:  conf.MustNewConfigFrom(""),
+			assertCfg: func(t assert.TestingT, expect any, got *conf.C, msgAndArgs ...any) {
+				if !got.HasField("id") {
+					t.Errorf("expecting 'id' to be present in %s", conf.DebugString(got, true))
+				}
+				assert.NotNil(t, got, msgAndArgs...)
+				assert.NotEqual(t, expect, got, msgAndArgs)
 			},
 		},
 		{
 			name:    "invalid config",
 			cfg:     nil,
 			wantErr: errors.New("failed to create new config"),
-			assertCfg: func(t assert.TestingT, _ interface{}, got interface{}, msgAndArgs ...interface{}) bool {
-				return assert.Nil(t, got, msgAndArgs...)
+			assertCfg: func(t assert.TestingT, _ any, got *conf.C, msgAndArgs ...any) {
+				assert.Nil(t, got, msgAndArgs...)
 			},
 		},
 	}

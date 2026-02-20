@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package o365audit
 
 import (
@@ -68,7 +70,7 @@ func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	}
 }
 
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+func configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, fmt.Errorf("reading config: %w", err)
@@ -108,21 +110,17 @@ func (inp *o365input) Test(src cursor.Source, ctx v2.TestContext) error {
 }
 
 func (inp *o365input) Run(ctx v2.Context, src cursor.Source, cursor cursor.Cursor, pub cursor.Publisher) error {
-	stat := ctx.StatusReporter
-	if stat == nil {
-		stat = noopReporter{}
-	}
-	stat.UpdateStatus(status.Starting, "")
+	ctx.UpdateStatus(status.Starting, "")
 
 	stream, ok := src.(*stream)
 	if !ok {
 		// This should never happen.
-		stat.UpdateStatus(status.Failed, "source is not an O365 stream")
+		ctx.UpdateStatus(status.Failed, "source is not an O365 stream")
 		return errors.New("source is not an O365 stream")
 	}
 
 	for ctx.Cancelation.Err() == nil {
-		err := inp.run(ctx, stream, cursor, pub, stat)
+		err := inp.run(ctx, stream, cursor, pub, ctx)
 		switch {
 		case err == nil, errors.Is(err, context.Canceled):
 			return nil
@@ -135,10 +133,10 @@ func (inp *o365input) Run(ctx v2.Context, src cursor.Source, cursor cursor.Curso
 				Fields:    msg,
 			}
 			if err := pub.Publish(event, nil); err != nil {
-				stat.UpdateStatus(status.Degraded, "failed to publish error: "+err.Error())
+				ctx.UpdateStatus(status.Degraded, "failed to publish error: "+err.Error())
 				ctx.Logger.Errorf("publisher.Publish failed: %v", err)
 			}
-			stat.UpdateStatus(status.Degraded, err.Error())
+			ctx.UpdateStatus(status.Degraded, err.Error())
 			ctx.Logger.Errorf("Input failed: %v", err)
 			ctx.Logger.Infof("Restarting in %v", inp.config.API.ErrorRetryInterval)
 			timed.Wait(ctx.Cancelation, inp.config.API.ErrorRetryInterval)
@@ -301,7 +299,3 @@ func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc mapstr.M) beat.Ev
 	}
 	return b
 }
-
-type noopReporter struct{}
-
-func (noopReporter) UpdateStatus(status.Status, string) {}

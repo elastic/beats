@@ -33,7 +33,6 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -227,7 +226,7 @@ func TestGenerateHints_Service(t *testing.T) {
 
 	s := service{
 		config: cfg,
-		logger: logp.NewLogger("kubernetes.service"),
+		logger: logptest.NewTestingLogger(t, "kubernetes.service"),
 	}
 	for _, test := range tests {
 		assert.Equal(t, s.GenerateHints(test.event), test.result)
@@ -392,9 +391,10 @@ func TestEmitEvent_Service(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
-			mapper, err := template.NewConfigMapper(nil, nil, nil)
+			mapper, err := template.NewConfigMapper(nil, nil, nil, logger)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -403,9 +403,9 @@ func TestEmitEvent_Service(t *testing.T) {
 
 			p := &Provider{
 				config:    defaultConfig(),
-				bus:       bus.New(logp.NewLogger("bus"), "test"),
+				bus:       bus.New(logger.Named("bus"), "test"),
 				templates: mapper,
-				logger:    logp.NewLogger("kubernetes"),
+				logger:    logger.Named("kubernetes"),
 			}
 
 			service := &service{
@@ -413,7 +413,7 @@ func TestEmitEvent_Service(t *testing.T) {
 				config:  defaultConfig(),
 				publish: p.publish,
 				uuid:    UUID,
-				logger:  logp.NewLogger("kubernetes.service"),
+				logger:  logger.Named("kubernetes.service"),
 			}
 
 			p.eventManager = NewMockServiceEventerManager(service)

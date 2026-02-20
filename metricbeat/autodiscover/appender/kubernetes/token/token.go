@@ -47,7 +47,7 @@ func InitializeModule() {
 // NewTokenAppender creates a token appender that can append a bearer token required to authenticate with
 // protected endpoints
 func NewTokenAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender, error) {
-	cfgwarn.Deprecate("7.0.0", "token appender is deprecated in favor of bearer_token_file config parameter")
+	logger.Warn(cfgwarn.Deprecate("7.0.0", "token appender is deprecated in favor of bearer_token_file config parameter"))
 	conf := defaultConfig()
 
 	err := cfg.Unpack(&conf)

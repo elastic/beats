@@ -79,12 +79,12 @@ func (h *Hub) Client() (*cfclient.Client, error) {
 	return cf, nil
 }
 
-func (h *Hub) ClientWithCache() (Client, error) {
+func (h *Hub) ClientWithCache(rootPath string) (Client, error) {
 	c, err := h.Client()
 	if err != nil {
 		return nil, err
 	}
-	return newClientCacheWrap(c, h.cfg.APIAddress, h.cfg.CacheDuration, h.cfg.CacheRetryDelay, h.log)
+	return newClientCacheWrap(c, h.cfg.APIAddress, h.cfg.CacheDuration, h.cfg.CacheRetryDelay, h.log, rootPath)
 }
 
 // RlpListener returns a listener client that calls the passed callback when the provided events are streamed through
@@ -129,7 +129,7 @@ func (h *Hub) DopplerConsumerFromClient(client *cfclient.Client, callbacks Doppl
 	if dopplerAddress == "" {
 		dopplerAddress = client.Endpoint.DopplerEndpoint
 	}
-	tlsConfig, err := tlscommon.LoadTLSConfig(h.cfg.Transport.TLS)
+	tlsConfig, err := tlscommon.LoadTLSConfig(h.cfg.Transport.TLS, h.log)
 	if err != nil {
 		return nil, fmt.Errorf("loading tls config: %w", err)
 	}
@@ -154,11 +154,11 @@ func (h *Hub) doerFromClient(client *cfclient.Client) (*authTokenDoer, error) {
 
 // httpClient returns an HTTP client configured with the configuration TLS.
 func (h *Hub) httpClient() (*http.Client, bool, error) {
-	httpClient, err := h.cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation())
+	httpClient, err := h.cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation(), httpcommon.WithLogger(h.log))
 	if err != nil {
 		return nil, false, err
 	}
 
-	tls, _ := tlscommon.LoadTLSConfig(h.cfg.Transport.TLS)
+	tls, _ := tlscommon.LoadTLSConfig(h.cfg.Transport.TLS, h.log)
 	return httpClient, tls.ToConfig().InsecureSkipVerify, nil
 }

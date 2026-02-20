@@ -32,6 +32,8 @@ import (
 	"strings"
 	"sync"
 	"testing"
+
+	"github.com/elastic/beats/v7/libbeat/common/proc"
 )
 
 var (
@@ -48,7 +50,9 @@ type RunningBeat struct {
 	output      []string
 	outputDone  chan struct{}
 	watcher     OutputWatcher
+	inspector   OutputInspector
 	keepRunning bool
+	t           *testing.T
 }
 
 // CollectOutput returns the last `limit` lines of the currently
@@ -84,7 +88,7 @@ func (b *RunningBeat) CollectOutput(limit int) string {
 	return builder.String()
 }
 
-// Wait until the Beat exists and all the output is processed
+// Wait until the Beat exits and all the output is processed
 func (b *RunningBeat) Wait() error {
 	err := b.c.Wait()
 	<-b.outputDone
@@ -97,6 +101,10 @@ func (b *RunningBeat) writeOutputLine(line string) {
 
 	b.output = append(b.output, line)
 
+	if b.inspector != nil {
+		b.inspector.Inspect(line)
+	}
+
 	if b.watcher == nil {
 		return
 	}
@@ -104,7 +112,9 @@ func (b *RunningBeat) writeOutputLine(line string) {
 	b.watcher.Inspect(line)
 	if b.watcher.Observed() {
 		if !b.keepRunning {
-			_ = b.c.Process.Kill()
+			if err := proc.StopCmd(b.c.Process); err != nil {
+				b.t.Logf("Cannot stop Beat: %s\n", err)
+			}
 		}
 		b.watcher = nil
 	}
@@ -128,14 +138,13 @@ type RunBeatOptions struct {
 
 // RunBeat runs a Beat binary with the given config and args.
 // Returns a `RunningBeat` that allow to collect the output and wait until the exit.
-func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher OutputWatcher) *RunningBeat {
+func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher OutputWatcher, inspector OutputInspector, homeDir string) *RunningBeat {
 	t.Logf("preparing to run %s...", opts.Beatname)
 
 	binaryFilename := findBeatBinaryPath(t, opts.Beatname)
-	dir := t.TempDir()
+
 	// create a temporary Beat config
-	cfgPath := filepath.Join(dir, fmt.Sprintf("%s.yml", opts.Beatname))
-	homePath := filepath.Join(dir, "home")
+	cfgPath := filepath.Join(homeDir, fmt.Sprintf("%s.yml", opts.Beatname))
 
 	err := os.WriteFile(cfgPath, []byte(opts.Config), 0644)
 	if err != nil {
@@ -152,7 +161,7 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 		// we want all the logs
 		"-E", "logging.level=debug",
 		// so we can run multiple Beats at the same time
-		"--path.home", homePath,
+		"--path.home", homeDir,
 	}
 	execArgs := make([]string, 0, len(baseArgs)+len(opts.Args))
 	execArgs = append(execArgs, baseArgs...)
@@ -160,6 +169,7 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 
 	t.Logf("running %s %s", binaryFilename, strings.Join(execArgs, " "))
 	c := exec.CommandContext(ctx, binaryFilename, execArgs...)
+	c.SysProcAttr = proc.GetSysProcAttr()
 
 	// we must use 2 pipes since writes are not aligned by lines
 	// part of the stdout output can end up in the middle of the stderr line
@@ -178,8 +188,10 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 	b := &RunningBeat{
 		c:           c,
 		watcher:     watcher,
+		inspector:   inspector,
 		keepRunning: opts.KeepRunning,
 		outputDone:  make(chan struct{}),
+		t:           t,
 	}
 
 	var wg sync.WaitGroup

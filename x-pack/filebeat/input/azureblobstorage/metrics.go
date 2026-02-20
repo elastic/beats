@@ -7,14 +7,13 @@ package azureblobstorage
 import (
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
 // inputMetrics handles the input's metric reporting.
 type inputMetrics struct {
-	unregister        func()
 	url               *monitoring.String // URL of the input resource.
 	errorsTotal       *monitoring.Uint   // Number of errors encountered.
 	decodeErrorsTotal *monitoring.Uint   // Number of decode errors encountered.
@@ -32,10 +31,8 @@ type inputMetrics struct {
 	sourceLagTime                   metrics.Sample   // Histogram of the time between the source (Updated) timestamp and the time the blob was read.
 }
 
-func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
+func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	out := &inputMetrics{
-		unregister:        unreg,
 		url:               monitoring.NewString(reg, "url"),
 		errorsTotal:       monitoring.NewUint(reg, "errors_total"),
 		decodeErrorsTotal: monitoring.NewUint(reg, "decode_errors_total"),
@@ -53,20 +50,16 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		sourceLagTime:                   metrics.NewUniformSample(1024),
 	}
 
-	adapter.NewGoMetrics(reg, "abs_blob_processing_time", adapter.Accept).
+	adapter.NewGoMetrics(reg, "abs_blob_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.absBlobProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "abs_blob_size_in_bytes", adapter.Accept).
+	adapter.NewGoMetrics(reg, "abs_blob_size_in_bytes", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.absBlobSizeInBytes)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "abs_events_per_blob", adapter.Accept).
+	adapter.NewGoMetrics(reg, "abs_events_per_blob", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.absEventsPerBlob)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "abs_jobs_scheduled_after_validation", adapter.Accept).
+	adapter.NewGoMetrics(reg, "abs_jobs_scheduled_after_validation", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.absJobsScheduledAfterValidation)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "source_lag_time", adapter.Accept).
+	adapter.NewGoMetrics(reg, "source_lag_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sourceLagTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	return out
-}
-
-func (m *inputMetrics) Close() {
-	m.unregister()
 }

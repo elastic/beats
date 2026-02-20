@@ -37,7 +37,6 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
@@ -86,13 +85,14 @@ func init() {
 }
 
 type winEventLogConfig struct {
-	ConfigCommon  `config:",inline"`
-	BatchReadSize int                `config:"batch_read_size"` // Maximum number of events that Read will return.
-	IncludeXML    bool               `config:"include_xml"`
-	Forwarded     *bool              `config:"forwarded"`
-	SimpleQuery   query              `config:",inline"`
-	NoMoreEvents  NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
-	EventLanguage uint32             `config:"language"`
+	ConfigCommon         `config:",inline"`
+	BatchReadSize        int                `config:"batch_read_size"` // Maximum number of events that Read will return.
+	IncludeXML           bool               `config:"include_xml"`
+	Forwarded            *bool              `config:"forwarded"`
+	SimpleQuery          query              `config:",inline"`
+	NoMoreEvents         NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
+	EventLanguage        uint32             `config:"language"`
+	IgnoreMissingChannel *bool              `config:"ignore_missing_channel"` // Ignore missing channels and continue reading.
 
 	// FIXME: This is for a WS2025 known issue so we can bypass the workaround
 	// and will be removed in the future.
@@ -325,13 +325,18 @@ func (l *winEventLog) IsFile() bool {
 	return l.file
 }
 
-func (l *winEventLog) Open(state checkpoint.EventLogState) error {
+// IgnoreMissingChannel returns true if missing channels should be ignored.
+func (l *winEventLog) IgnoreMissingChannel() bool {
+	return !l.file && (l.config.IgnoreMissingChannel == nil || *l.config.IgnoreMissingChannel)
+}
+
+func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
 	var bookmark win.EvtHandle
 	var err error
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
-	if l.metrics == nil {
-		l.metrics = newInputMetrics(l.channelName, l.id)
+	if l.metrics == nil && l.id != "" {
+		l.metrics = newInputMetrics(l.channelName, metricsRegistry, logp.NewLogger(""))
 	}
 	if len(state.Bookmark) > 0 {
 		bookmark, err = win.CreateBookmarkFromXML(state.Bookmark)
@@ -516,7 +521,7 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 		if err := l.Close(); err != nil {
 			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
 		}
-		if err := l.Open(l.lastRead); err != nil {
+		if err := l.Open(l.lastRead, nil); err != nil {
 			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
 		}
 		return l.eventHandles(maxRead / 2)
@@ -666,8 +671,6 @@ func incrementMetric(v *expvar.Map, key interface{}) {
 
 // inputMetrics handles event log metric reporting.
 type inputMetrics struct {
-	unregister func()
-
 	lastBatch time.Time
 
 	name        *monitoring.String // name of the provider being read
@@ -681,13 +684,8 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for windows event logs. If id is empty
 // a nil inputMetric is returned.
-func newInputMetrics(name, id string) *inputMetrics {
-	if id == "" {
-		return nil
-	}
-	reg, unreg := inputmon.NewInputRegistry("winlog", id, nil)
+func newInputMetrics(name string, reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	out := &inputMetrics{
-		unregister:  unreg,
 		name:        monitoring.NewString(reg, "provider"),
 		events:      monitoring.NewUint(reg, "received_events_total"),
 		dropped:     monitoring.NewUint(reg, "discarded_events_total"),
@@ -697,11 +695,11 @@ func newInputMetrics(name, id string) *inputMetrics {
 		batchPeriod: metrics.NewUniformSample(1024),
 	}
 	out.name.Set(name)
-	_ = adapter.NewGoMetrics(reg, "received_events_count", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "received_events_count", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchSize))
-	_ = adapter.NewGoMetrics(reg, "source_lag_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "source_lag_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sourceLag))
-	_ = adapter.NewGoMetrics(reg, "batch_read_period", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_read_period", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchPeriod))
 
 	return out
@@ -753,10 +751,6 @@ func (m *inputMetrics) logDropped(_ error) {
 }
 
 func (m *inputMetrics) close() {
-	if m == nil {
-		return
-	}
-	m.unregister()
 }
 
 // FIXME: Windows Server 2025 has a bug in the Windows Event Log API that causes

@@ -26,7 +26,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestCopyTruncateProspector_Create(t *testing.T) {
@@ -131,7 +131,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 				regexp.MustCompile(`\.\d$`),
 				&rotatedFilestreams{make(map[string]*rotatedFilestream), newNumericSorter()},
 			}
-			ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: context.Background()}
+			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 			hg := newTestHarvesterGroup()
 
 			p.Run(ctx, newMockMetadataUpdater(), hg)

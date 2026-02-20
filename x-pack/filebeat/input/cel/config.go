@@ -15,7 +15,9 @@ import (
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/mito/lib"
 )
@@ -24,6 +26,10 @@ const defaultMaxExecutions = 1000
 
 // config is the top-level configuration for a cel input.
 type config struct {
+	// DataStream holds the data_stream.dataset name if it
+	// was available on configuration.
+	DataStream string
+
 	// Interval is the period interval between runs of the input.
 	Interval time.Duration `config:"interval" validate:"required"`
 
@@ -91,14 +97,6 @@ func (t *dumpConfig) enabled() bool {
 }
 
 func (c config) Validate() error {
-	if c.RecordCoverage {
-		logp.L().Named("input.cel").Warn("execution coverage enabled: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-record-coverage")
-	}
-	if c.Redact == nil {
-		logp.L().Named("input.cel").Warn("missing recommended 'redact' configuration: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-state-redact")
-	}
 	if c.Interval <= 0 {
 		return errors.New("interval must be greater than 0")
 	}
@@ -115,7 +113,7 @@ func (c config) Validate() error {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
 	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
-	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, lib.HTTPOptions{}, patterns, c.XSDs, logp.L().Named("input.cel"), nil, wantDump, false)
+	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, lib.HTTPOptions{}, patterns, c.XSDs, logp.NewNopLogger(), nil, wantDump, false)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
@@ -280,7 +278,7 @@ func (u *urlConfig) Unpack(in string) error {
 }
 
 func (c *ResourceConfig) Validate() error {
-	if c.Tracer == nil {
+	if !c.Tracer.enabled() {
 		return nil
 	}
 	if c.Tracer.Filename == "" {
@@ -291,6 +289,13 @@ func (c *ResourceConfig) Validate() error {
 		// is excessive for a debugging logger, so default to 1MB
 		// which is the minimum.
 		c.Tracer.MaxSize = 1
+	}
+	ok, err := httplog.IsPathInLogsFor(inputName, c.Tracer.Filename)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
 	}
 	return nil
 }

@@ -18,6 +18,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -66,7 +67,7 @@ func newScheduler(publisher cursor.Publisher, client *azcontainer.Client,
 ) *scheduler {
 	if metrics == nil {
 		// metrics are optional, initialize a stub if not provided
-		metrics = newInputMetrics("", nil)
+		metrics = newInputMetrics(monitoring.NewRegistry(), log)
 	}
 	return &scheduler{
 		publisher:  publisher,
@@ -163,6 +164,22 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 		for i, job := range jobs {
 			id := fetchJobID(i, s.src.ContainerName, job.name())
 			job := job
+			// sets the content type and encoding for the job blob properties based on the reader configuration.
+			// If the override flags are set, it will use the provided content type and encoding. If not,
+			// it will only set them if they are not already defined.
+			readerCfg := s.src.ReaderConfig
+			if readerCfg.ContentType != "" {
+				if readerCfg.OverrideContentType || isStringUnset(job.blob.Properties.ContentType) {
+					job.blob.Properties.ContentType = &readerCfg.ContentType
+				}
+			}
+			if readerCfg.Encoding != "" {
+				if readerCfg.OverrideEncoding || isStringUnset(job.blob.Properties.ContentEncoding) {
+					job.blob.Properties.ContentEncoding = &readerCfg.Encoding
+				}
+			}
+			// acquire a worker thread from the limiter, and schedule the job
+			// to be executed in a goroutine.
 			s.limiter.acquire()
 			go func() {
 				defer s.limiter.release()
@@ -198,7 +215,6 @@ func (s *scheduler) fetchBlobPager(batchSize int32) *azruntime.Pager[azblob.List
 	pager := s.client.NewListBlobsFlatPager(&azcontainer.ListBlobsFlatOptions{
 		Include: azcontainer.ListBlobsInclude{
 			Metadata: true,
-			Tags:     true,
 		},
 		MaxResults: &batchSize,
 	})
@@ -231,4 +247,8 @@ func (s *scheduler) isFileSelected(name string) bool {
 		}
 	}
 	return false
+}
+
+func isStringUnset(s *string) bool {
+	return s == nil || *s == ""
 }

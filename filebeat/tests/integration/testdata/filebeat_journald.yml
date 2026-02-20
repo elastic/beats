@@ -1,6 +1,6 @@
 filebeat.inputs:
   - type: journald
-    id: filestream-input-id
+    id: journald-id
     enabled: true
     syslog_identifiers:
       - "%s"

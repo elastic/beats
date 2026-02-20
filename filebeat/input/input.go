@@ -86,6 +86,9 @@ func New(
 		return nil, err
 	}
 
+	// log config related warnings
+	input.config.checkUnsupportedConfig(logger)
+
 	var f Factory
 	f, err = GetFactory(input.config.Type)
 	if err != nil {

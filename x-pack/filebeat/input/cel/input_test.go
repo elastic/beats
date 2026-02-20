@@ -32,6 +32,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
@@ -1338,7 +1339,7 @@ var inputTests = []struct {
 		},
 		config: map[string]interface{}{
 			"interval":                 1,
-			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
 			"state": map[string]interface{}{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
@@ -1374,7 +1375,7 @@ var inputTests = []struct {
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
 		},
-		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization.ndjson"),
+		wantFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization.ndjson"),
 	},
 	{
 		name: "tracer_filename_sanitization_enabled",
@@ -1386,7 +1387,7 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval":                 1,
 			"resource.tracer.enabled":  true,
-			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
 			"state": map[string]interface{}{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
@@ -1422,7 +1423,7 @@ var inputTests = []struct {
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
 		},
-		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization_enabled.ndjson"),
+		wantFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_enabled.ndjson"),
 	},
 	{
 		name: "tracer_filename_sanitization_disabled",
@@ -1434,7 +1435,7 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval":                 1,
 			"resource.tracer.enabled":  false,
-			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
 			"state": map[string]interface{}{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
@@ -1470,7 +1471,19 @@ var inputTests = []struct {
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
 		},
-		wantNoFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
+		wantNoFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
+	},
+	{
+		name: "tracer_escaping_logs",
+		config: map[string]interface{}{
+			"interval":                 1,
+			"resource.url":             "https://example.com/",
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
+			"state":                    map[string]interface{}{},
+			"program":                  "{}",
+		},
+		wantErr: fmt.Errorf(`request tracer path must be within %q path accessing 'resource'`, inputName),
 	},
 	{
 		name:   "pagination_cursor_object",
@@ -2145,7 +2158,6 @@ func TestInput(t *testing.T) {
 		t.Fatalf("failed to remove failure_dumps directory: %v", err)
 	}
 
-	logp.TestingSetup()
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
 			if reason, skip := skipOnWindows[test.name]; runtime.GOOS == "windows" && skip {
@@ -2180,7 +2192,19 @@ func TestInput(t *testing.T) {
 
 			var tempDir string
 			if conf.Resource.Tracer != nil {
-				tempDir = t.TempDir()
+				err := os.MkdirAll("cel", 0o700)
+				if err != nil {
+					t.Fatalf("failed to create root logging destination: %v", err)
+				}
+				tempDir, err = os.MkdirTemp("cel", "logs-*")
+				if err != nil {
+					t.Fatalf("failed to create logging destination: %v", err)
+				}
+				tempDir, err = filepath.Abs(tempDir)
+				if err != nil {
+					t.Fatalf("failed to get absolute path for logging destination: %v", err)
+				}
+				defer os.RemoveAll("cel")
 				conf.Resource.Tracer.Filename = filepath.Join(tempDir, conf.Resource.Tracer.Filename)
 			}
 
@@ -2199,10 +2223,11 @@ func TestInput(t *testing.T) {
 
 			id := "test_id:" + test.name
 			v2Ctx := v2.Context{
-				Logger:        logp.NewLogger("cel_test"),
-				ID:            id,
-				IDWithoutName: id,
-				Cancelation:   ctx,
+				Logger:          logp.NewLogger("cel_test"),
+				ID:              id,
+				IDWithoutName:   id,
+				Cancelation:     ctx,
+				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
 			client.done = func() {
@@ -2210,7 +2235,7 @@ func TestInput(t *testing.T) {
 					cancel()
 				}
 			}
-			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client)
+			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
