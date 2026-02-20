@@ -247,6 +247,12 @@ require (
 	go.opentelemetry.io/collector/config/confighttp v0.144.0
 	go.opentelemetry.io/collector/config/configoptional v1.50.0
 	go.opentelemetry.io/collector/consumer/consumertest v0.144.0
+<<<<<<< HEAD
+=======
+	go.opentelemetry.io/collector/exporter v1.50.0
+	go.opentelemetry.io/collector/exporter/exporterhelper v0.144.0
+	go.opentelemetry.io/collector/exporter/exportertest v0.144.0
+>>>>>>> 5ab40e641 (fix: suppress queue full error logs to prevent log spam (#48807))
 	go.opentelemetry.io/collector/extension v1.50.0
 	go.opentelemetry.io/collector/extension/extensionauth v1.50.0
 	go.opentelemetry.io/collector/processor v1.49.0
@@ -456,8 +462,11 @@ require (
 	go.opentelemetry.io/collector/connector/xconnector v0.143.0 // indirect
 	go.opentelemetry.io/collector/consumer/consumererror/xconsumererror v0.144.0 // indirect
 	go.opentelemetry.io/collector/consumer/xconsumer v0.144.0 // indirect
+<<<<<<< HEAD
 	go.opentelemetry.io/collector/exporter v1.50.0 // indirect
 	go.opentelemetry.io/collector/exporter/exporterhelper v0.144.0 // indirect
+=======
+>>>>>>> 5ab40e641 (fix: suppress queue full error logs to prevent log spam (#48807))
 	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.144.0 // indirect
 	go.opentelemetry.io/collector/exporter/exportertest v0.144.0 // indirect
 	go.opentelemetry.io/collector/exporter/xexporter v0.144.0 // indirect
