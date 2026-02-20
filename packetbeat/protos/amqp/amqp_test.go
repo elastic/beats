@@ -1237,3 +1237,56 @@ func TestAmqp_MultipleBodyFrames(t *testing.T) {
 	assert.Equal(t, "basic.publish", trans["method"])
 	assert.Equal(t, "***hello I like to publish big messages***", trans["request"])
 }
+
+func TestAmqp_BasicReturnMethod_ParsesOffsets(t *testing.T) {
+	m := &amqpMessage{}
+	args := []byte{
+		0x01, 0x38, // reply code = 312
+		0x04, 'O', 'o', 'p', 's', // reply-text
+		0x02, 'e', 'x', // exchange
+		0x02, 'r', 'k', // routing-key
+	}
+
+	ok, complete := basicReturnMethod(m, args)
+	assert.True(t, ok)
+	assert.False(t, complete)
+	assert.Equal(t, "basic.return", m.method)
+	assert.Equal(t, "Oops", m.fields["reply-text"])
+	assert.Equal(t, uint16(312), m.fields["reply-code"])
+	assert.Equal(t, "ex", m.fields["exchange"])
+	assert.Equal(t, "rk", m.fields["routing-key"])
+}
+
+func TestAmqp_BasicGetOkMethod_ParsesOffsets(t *testing.T) {
+	m := &amqpMessage{}
+	args := []byte{
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, // delivery-tag = 2
+		0x00, // redelivered bitset
+		0x04, 'm', 'y', 'e', 'x', // exchange
+		0x03, 'a', 'b', 'c', // routing-key
+		0x00, 0x00, 0x00, 0x05, // message-count = 5
+	}
+
+	ok, complete := basicGetOkMethod(m, args)
+	assert.True(t, ok)
+	assert.False(t, complete)
+	assert.Equal(t, "basic.get-ok", m.method)
+	assert.Equal(t, uint64(2), m.fields["delivery-tag"])
+	assert.Equal(t, "myex", m.fields["exchange"])
+	assert.Equal(t, "abc", m.fields["routing-key"])
+	assert.Equal(t, uint32(5), m.fields["message-count"])
+}
+
+func TestAmqp_GetTable_EmptyTableAtEndOfData(t *testing.T) {
+	fields := mapstr.M{}
+	data := []byte{
+		0xaa, // ignored prefix byte
+		0x00, 0x00, 0x00, 0x00, // table length = 0
+	}
+
+	next, err, exists := getTable(fields, data, 1)
+	assert.False(t, err)
+	assert.False(t, exists)
+	assert.Equal(t, uint32(5), next)
+	assert.Empty(t, fields)
+}

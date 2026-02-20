@@ -31,7 +31,7 @@ import (
 // getTable updates fields with the table data at the given offset.
 // fields must be non_nil on entry.
 func getTable(fields mapstr.M, data []byte, offset uint32) (next uint32, err bool, exists bool) {
-	if int(offset+4) >= len(data) {
+	if int(offset+4) > len(data) {
 		logp.Debug("amqp", "Error while parsing a field table")
 		return 0, true, false
 	}
@@ -163,7 +163,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	case longLongInt:
 		v, err := getIntegerAt[int64](data, offset+1)
 		if err {
-			logp.Debug("amqp", "Failed to get uint64 in table")
+			logp.Debug("amqp", "Failed to get int64 in table")
 			return true
 		}
 		table[name] = v

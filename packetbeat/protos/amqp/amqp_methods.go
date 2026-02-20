@@ -759,7 +759,9 @@ func basicReturnMethod(m *amqpMessage, args []byte) (bool, bool) {
 		// not an error or exception ? not interesting
 		return true, false
 	}
-	replyText, offset, err := getLVString[uint8](args, 3)
+	offset := uint32(2)
+	replyText, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
 		logp.Debug("amqp", "Error getting name of reply text in basic return")
 		return false, false
@@ -854,7 +856,9 @@ func basicGetOkMethod(m *amqpMessage, args []byte) (bool, bool) {
 		return false, false
 
 	}
-	exchange, offset, err := getLVString[uint8](args, 9)
+	offset := uint32(9)
+	exchange, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
 		logp.Debug("amqp", "Failed to get queue in basic get-ok")
 		return false, false
