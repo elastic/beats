@@ -20,8 +20,10 @@
 package stats
 
 import (
+	"context"
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
+	"io"
 	"net/http"
 	"testing"
 
@@ -40,7 +42,9 @@ func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 570, "kibana")
 
 	config := mtest.GetConfig("stats", service.Host())
-	host := config["hosts"].([]string)[0]
+	hosts, ok := config["hosts"].([]string)
+	require.True(t, ok, "hosts must be a []string")
+	host := hosts[0]
 	version, err := getKibanaVersion(t, host)
 	require.NoError(t, err)
 
@@ -65,7 +69,9 @@ func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "kibana")
 
 	config := mtest.GetConfig("stats", service.Host())
-	host := config["hosts"].([]string)[0]
+	hosts, ok := config["hosts"].([]string)
+	require.True(t, ok, "hosts must be a []string")
+	host := hosts[0]
 	version, err := getKibanaVersion(t, host)
 	require.NoError(t, err)
 
@@ -82,13 +88,17 @@ func TestData(t *testing.T) {
 }
 
 func getKibanaVersion(t *testing.T, kibanaHostPort string) (*version.V, error) {
-	resp, err := http.Get("http://" + kibanaHostPort + "/" + kibana.StatusPath)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://"+kibanaHostPort+"/"+kibana.StatusPath, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -105,5 +115,9 @@ func getKibanaVersion(t *testing.T, kibanaHostPort string) (*version.V, error) {
 		return nil, err
 	}
 
-	return version.New(v.(string))
+	vStr, ok := v.(string)
+	if !ok {
+		return nil, fmt.Errorf("version.number is not a string: %v", v)
+	}
+	return version.New(vStr)
 }

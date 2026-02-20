@@ -130,6 +130,7 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2) error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	content, err = kibana.ReadBody(resp)
 	if err != nil {
