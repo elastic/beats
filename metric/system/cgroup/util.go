@@ -358,7 +358,7 @@ func guessContainerCgroupPath(v2Loc string, OurPid int) (string, error) {
 // foundMatchingPidInProcsFile is a helper for guessContainerCgroupPath
 // that tells us if we have a matching process in a cgroup.procs file
 func foundMatchingPidInProcsFile(ourPid int, fileData string) bool {
-	for _, rawPid := range strings.Split(fileData, "\n") {
+	for rawPid := range strings.SplitSeq(fileData, "\n") {
 		if len(rawPid) == 0 {
 			continue
 		}
@@ -548,8 +548,8 @@ the container as /sys/fs/cgroup/unified and start the system module with the hos
 			r.v2ControllerPathCache.Unlock()
 			// cgroup v1
 		} else {
-			subsystems := strings.Split(fields[1], ",")
-			for _, subsystem := range subsystems {
+			subsystems := strings.SplitSeq(fields[1], ",")
+			for subsystem := range subsystems {
 				fullPath := filepath.Join(r.cgroupMountpoints.V1Mounts[subsystem], path)
 				cPaths.V1[subsystem] = ControllerPath{ControllerPath: path, FullPath: fullPath, IsV2: false}
 			}

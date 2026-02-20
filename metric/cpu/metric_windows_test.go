@@ -46,10 +46,10 @@ func TestCounterLength(t *testing.T) {
 	require.Equal(t, len(kernelRawData), len(idleRawData))
 	require.Equal(t, len(userRawData), len(idleRawData))
 
-	for i := 0; i < len(userRawData); i++ {
+	for i := range userRawData {
 		require.Equal(t, userRawData[i].InstanceName, kernelRawData[i].InstanceName, "InstanceName should be equal")
 	}
-	for i := 0; i < len(kernelRawData); i++ {
+	for i := range kernelRawData {
 		require.Equal(t, kernelRawData[i].InstanceName, idleRawData[i].InstanceName, "InstanceName should be equal")
 	}
 }

@@ -137,8 +137,8 @@ func TestSystemHostFromContainer(t *testing.T) {
 		require.True(t, isNonFatal(err), fmt.Sprintf("Fatal error: %s", err))
 
 		for _, proc := range roots {
-			t.Logf("proc: %d: %s", proc["process"].(map[string]interface{})["pid"],
-				proc["process"].(map[string]interface{})["command_line"])
+			t.Logf("proc: %d: %s", proc["process"].(map[string]any)["pid"],
+				proc["process"].(map[string]any)["command_line"])
 		}
 	}
 }

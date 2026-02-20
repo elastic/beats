@@ -32,7 +32,7 @@ func parseMounts(path string, filter func(FSStat) bool) ([]FSStat, error) {
 		return nil, fmt.Errorf("error reading mount file %s: %w", path, err)
 	}
 	fsList := []FSStat{}
-	for _, line := range strings.Split(string(raw), "\n") {
+	for line := range strings.SplitSeq(string(raw), "\n") {
 		fields := strings.Fields(line)
 		if len(fields) == 0 {
 			continue

@@ -116,7 +116,7 @@ func parseStatLine(line string, resolveDevIDs bool) ([]string, IOStat, bool, err
 	// 7:7 7:6 7:5 7:4 rbytes=556032 wbytes=0 rios=78 wios=0 dbytes=0 dios=0
 	// we can also get lines without metrics, like
 	//  7:7 7:6 7:5 7:4
-	for _, component := range strings.Split(line, " ") {
+	for component := range strings.SplitSeq(line, " ") {
 		if strings.Contains(component, ":") {
 			var major, minor uint64
 			_, err := fmt.Sscanf(component, "%d:%d", &major, &minor)

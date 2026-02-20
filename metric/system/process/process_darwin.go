@@ -77,7 +77,7 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 	var wrappedErr error
 	var err error
 
-	for i := 0; i < num; i++ {
+	for range num {
 		if err := binary.Read(bbuf, binary.LittleEndian, &pid); err != nil {
 			procStats.Logger.Debugf("Errror reading from PROC_ALL_PIDS buffer: %s", err)
 			continue
@@ -247,12 +247,12 @@ func getProcArgs(pid int, filter func(string) bool) ([]string, string, mapstr.M,
 }
 
 func sysctl(mib []C.int, old *byte, oldlen *uintptr,
-	new *byte, newlen uintptr) (err error) {
+	newp *byte, newlen uintptr) (err error) {
 	p0 := unsafe.Pointer(&mib[0])
 	_, _, e1 := syscall.Syscall6(syscall.SYS___SYSCTL, uintptr(p0),
 		uintptr(len(mib)),
 		uintptr(unsafe.Pointer(old)), uintptr(unsafe.Pointer(oldlen)),
-		uintptr(unsafe.Pointer(new)), newlen)
+		uintptr(unsafe.Pointer(newp)), newlen)
 	if e1 != 0 {
 		err = e1
 	}

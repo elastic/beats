@@ -93,7 +93,7 @@ type SensorMetrics struct {
 // This is entirely so we can carry around a relatively simple struct that transforms into the more heavily nested event that's the standard for beats events.
 func (sm *SensorMetrics) Fold(v structform.ExtVisitor) error {
 	val := reflect.ValueOf(sm).Elem()
-	types := reflect.TypeOf(sm).Elem()
+	types := reflect.TypeFor[SensorMetrics]()
 
 	err := v.OnObjectStart(val.NumField(), structform.AnyType)
 	if err != nil {

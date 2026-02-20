@@ -25,6 +25,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -135,12 +136,7 @@ func DefaultIgnoredTypes(sys resolve.Resolver) []string {
 // BuildFilterWithList returns a filesystem filter with the given list of FS types
 func BuildFilterWithList(ignored []string) func(FSStat) bool {
 	return func(fs FSStat) bool {
-		for _, fsType := range ignored {
-			if fs.Type == fsType {
-				return false
-			}
-		}
-		return true
+		return !slices.Contains(ignored, fs.Type)
 	}
 }
 

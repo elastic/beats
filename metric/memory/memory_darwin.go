@@ -97,7 +97,7 @@ func getSwap() (SwapMetrics, error) {
 }
 
 // generic Sysctl buffer unmarshalling
-func sysctlbyname(name string, data interface{}) (err error) {
+func sysctlbyname(name string, data any) (err error) {
 	val, err := syscall.Sysctl(name)
 	if err != nil {
 		return err
@@ -108,7 +108,7 @@ func sysctlbyname(name string, data interface{}) (err error) {
 	switch v := data.(type) {
 	case *uint64:
 		*v = *(*uint64)(unsafe.Pointer(&buf[0]))
-		return
+		return nil
 	}
 
 	bbuf := bytes.NewBuffer([]byte(val))
@@ -119,7 +119,7 @@ func vmInfo(vmstat *C.vm_statistics_data_t) error {
 	var count C.mach_msg_type_number_t = C.HOST_VM_INFO_COUNT
 
 	status := C.host_statistics(
-		C.host_t(C.mach_host_self()),
+		C.mach_host_self(),
 		C.HOST_VM_INFO,
 		C.host_info_t(unsafe.Pointer(vmstat)),
 		&count)

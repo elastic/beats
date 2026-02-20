@@ -98,7 +98,7 @@ func (tc testCase) String() string {
 func (tr *DockerTestRunner) CreateAndRunPermissionMatrix(ctx context.Context,
 	cgroupNSValues []container.CgroupnsMode, privilegedValues []bool, runAsUserValues []string) {
 
-	cases := []testCase{}
+	cases := make([]testCase, 0, len(privilegedValues)*len(runAsUserValues)*len(cgroupNSValues))
 
 	if len(cgroupNSValues) == 0 {
 		cgroupNSValues = []container.CgroupnsMode{tr.CgroupNSMode}
@@ -185,7 +185,7 @@ func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context, apiClient *cli
 
 	// iterate by lines to make this easier to read
 	for _, badLine := range tr.FatalLogMessages {
-		for _, line := range strings.Split(result.Stdout, "\n") {
+		for line := range strings.SplitSeq(result.Stdout, "\n") {
 			// TODO: fix this
 			// See https://github.com/elastic/elastic-agent-system-metrics/issues/270
 			if strings.Contains(line, "Non-fatal error") {
@@ -193,7 +193,7 @@ func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context, apiClient *cli
 			}
 			assert.NotContains(tr.Runner, line, badLine)
 		}
-		for _, line := range strings.Split(result.Stderr, "\n") {
+		for line := range strings.SplitSeq(result.Stderr, "\n") {
 			// filter our the go mod package download messages
 			if !strings.Contains(line, "go: downloading") {
 				assert.NotContains(tr.Runner, line, badLine)

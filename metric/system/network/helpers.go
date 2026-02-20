@@ -46,8 +46,8 @@ func createMap(raw *sysinfotypes.NetworkCountersInfo, filter []string) mapstr.M 
 }
 
 // combineMap concatinates two given maps
-func combineMap(map1, map2 map[string]uint64, filter []string) map[string]interface{} {
-	var compMap = make(map[string]interface{})
+func combineMap(map1, map2 map[string]uint64, filter []string) map[string]any {
+	var compMap = make(map[string]any)
 
 	if len(filter) == 0 || filter[0] == "all" {
 		for k, v := range map1 {
@@ -73,7 +73,7 @@ func combineMap(map1, map2 map[string]uint64, filter []string) map[string]interf
 
 // checkMaxConn deals with the "oddball" MaxConn value, which is defined by RFC2012 as a integer
 // while the other values are going to be unsigned counters
-func checkMaxConn(inKey string, in uint64) interface{} {
+func checkMaxConn(inKey string, in uint64) any {
 
 	if inKey == "MaxConn" {
 		return int64(in)

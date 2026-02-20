@@ -165,7 +165,7 @@ func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState, filter fu
 // identified by pid from /proc/[PID]/stat
 func GetInfoForPid(hostFS resolve.Resolver, pid int) (ProcState, error) {
 	path := hostFS.Join("proc", strconv.Itoa(pid), "stat")
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // G703 — /proc path from integer PID
 	// Transform the error into a more sensible error in cases where the directory doesn't exist, i.e the process is gone
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -280,7 +280,7 @@ func getUser(hostfs resolve.Resolver, pid int) (string, error) {
 
 func getEnvData(hostfs resolve.Resolver, pid int, filter func(string) bool) (mapstr.M, error) {
 	path := hostfs.Join("proc", strconv.Itoa(pid), "environ")
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path)        //nolint:gosec // G703 — /proc path from integer PID
 	if errors.Is(err, os.ErrPermission) { // pass through permission errors
 		return nil, err
 	} else if err != nil {
@@ -288,8 +288,8 @@ func getEnvData(hostfs resolve.Resolver, pid int, filter func(string) bool) (map
 	}
 	env := mapstr.M{}
 
-	pairs := bytes.Split(data, []byte{0})
-	for _, kv := range pairs {
+	pairs := bytes.SplitSeq(data, []byte{0})
+	for kv := range pairs {
 		parts := bytes.SplitN(kv, []byte{'='}, 2)
 		if len(parts) != 2 {
 			continue
@@ -316,7 +316,7 @@ func getMemData(hostfs resolve.Resolver, pid int) (ProcMemInfo, error) {
 		state.Swap = swap
 	}
 	path := hostfs.Join("proc", strconv.Itoa(pid), "statm")
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // G703 — /proc path from integer PID
 	if err != nil {
 		return state, fmt.Errorf("error opening file %s: %w", path, err)
 	}
@@ -344,12 +344,12 @@ func getMemData(hostfs resolve.Resolver, pid int) (ProcMemInfo, error) {
 func getIOData(hostfs resolve.Resolver, pid int) (ProcIOInfo, error) {
 	state := ProcIOInfo{}
 	path := hostfs.Join("proc", strconv.Itoa(pid), "io")
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // G703 — /proc path from integer PID
 	if err != nil {
 		return state, fmt.Errorf("error fetching IO metrics: %w", err)
 	}
 
-	for _, metric := range strings.Split(string(data), "\n") {
+	for metric := range strings.SplitSeq(string(data), "\n") {
 		raw := strings.Split(metric, ": ")
 		if len(raw) < 2 {
 			continue
@@ -383,7 +383,7 @@ func getCPUTime(hostfs resolve.Resolver, pid int) (ProcCPUInfo, error) {
 	state := ProcCPUInfo{}
 
 	pathCPU := hostfs.Join("proc", strconv.Itoa(pid), "stat")
-	data, err := os.ReadFile(pathCPU)
+	data, err := os.ReadFile(pathCPU) //nolint:gosec // G703 — /proc path from integer PID
 	if err != nil {
 		return state, fmt.Errorf("error opening file %s: %w", pathCPU, err)
 	}
@@ -424,7 +424,7 @@ func getCPUTime(hostfs resolve.Resolver, pid int) (ProcCPUInfo, error) {
 
 func getArgs(hostfs resolve.Resolver, pid int) ([]string, error) {
 	path := hostfs.Join("proc", strconv.Itoa(pid), "cmdline")
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // G703 — /proc path from integer PID
 	if err != nil {
 		return nil, fmt.Errorf("error opening file %s: %w", path, err)
 	}
@@ -448,12 +448,12 @@ func getFDStats(hostfs resolve.Resolver, pid int) (ProcFDInfo, error) {
 	state := ProcFDInfo{}
 
 	path := hostfs.Join("proc", strconv.Itoa(pid), "limits")
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // G703 — /proc path from integer PID
 	if err != nil {
 		return state, fmt.Errorf("error opening file %s: %w", path, err)
 	}
 
-	for _, line := range strings.Split(string(data), "\n") {
+	for line := range strings.SplitSeq(string(data), "\n") {
 		if strings.HasPrefix(line, "Max open files") {
 			fields := strings.Fields(line)
 			if len(fields) == 6 {
@@ -493,14 +493,14 @@ func getLinuxBootTime(hostfs resolve.Resolver) (uint64, error) {
 
 	path := hostfs.Join("proc", "stat")
 	// grab system boot time
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // G703 — /proc path from integer PID
 	if err != nil {
 		return 0, fmt.Errorf("error opening file %s: %w", path, err)
 	}
 
-	statVals := strings.Split(string(data), "\n")
+	statVals := strings.SplitSeq(string(data), "\n")
 
-	for _, line := range statVals {
+	for line := range statVals {
 		if strings.HasPrefix(line, "btime") {
 			btime, err := strconv.ParseUint(line[6:], 10, 64)
 			if err != nil {
@@ -517,11 +517,11 @@ func getLinuxBootTime(hostfs resolve.Resolver) (uint64, error) {
 func getProcStatus(hostfs resolve.Resolver, pid int) (map[string]string, error) {
 	status := make(map[string]string, 42)
 	path := hostfs.Join("proc", strconv.Itoa(pid), "status")
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // G703 — path is constructed from an integer PID, no traversal risk
 	if err != nil {
 		return nil, fmt.Errorf("error opening file %s: %w", path, err)
 	}
-	for _, line := range strings.Split(string(data), "\n") {
+	for line := range strings.SplitSeq(string(data), "\n") {
 		fields := strings.SplitN(line, ":", 2)
 		if len(fields) == 2 {
 			status[fields[0]] = strings.TrimSpace(fields[1])

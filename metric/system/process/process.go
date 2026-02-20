@@ -381,10 +381,7 @@ func (procStats *Stats) includeTopProcesses(processes []ProcState) []ProcState {
 
 	var result []ProcState
 	if procStats.IncludeTop.ByCPU > 0 {
-		numProcs := procStats.IncludeTop.ByCPU
-		if len(processes) < procStats.IncludeTop.ByCPU {
-			numProcs = len(processes)
-		}
+		numProcs := min(len(processes), procStats.IncludeTop.ByCPU)
 
 		sort.Slice(processes, func(i, j int) bool {
 			return processes[i].CPU.Total.Pct.ValueOr(0) > processes[j].CPU.Total.Pct.ValueOr(0)
@@ -393,10 +390,7 @@ func (procStats *Stats) includeTopProcesses(processes []ProcState) []ProcState {
 	}
 
 	if procStats.IncludeTop.ByMemory > 0 {
-		numProcs := procStats.IncludeTop.ByMemory
-		if len(processes) < procStats.IncludeTop.ByMemory {
-			numProcs = len(processes)
-		}
+		numProcs := min(len(processes), procStats.IncludeTop.ByMemory)
 
 		sort.Slice(processes, func(i, j int) bool {
 			return processes[i].Memory.Rss.Bytes.ValueOr(0) > processes[j].Memory.Rss.Bytes.ValueOr(0)

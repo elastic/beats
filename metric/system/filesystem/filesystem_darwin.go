@@ -50,7 +50,7 @@ func parseMounts(path string, filter func(FSStat) bool) ([]FSStat, error) {
 
 	fslist := make([]FSStat, 0, num)
 
-	for i := 0; i < num; i++ {
+	for i := range num {
 		fs := FSStat{}
 		fs.Directory = byteListToString(buf[i].Mntonname[:])
 		fs.Device = byteListToString(buf[i].Mntfromname[:])

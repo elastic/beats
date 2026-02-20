@@ -48,14 +48,14 @@ func TestFilter(t *testing.T) {
 	// test with no filter
 	testAll := []string{"all"}
 	allMap := MapProcNetCountersWithFilter(exampleData, testAll)
-	require.Equal(t, len(exampleData.SNMP.ICMP)+len(exampleData.SNMP.ICMPMsg), len(allMap["icmp"].(map[string]interface{})))
-	require.Equal(t, len(exampleData.SNMP.TCP)+len(exampleData.Netstat.TCPExt), len(allMap["tcp"].(map[string]interface{})))
+	require.Equal(t, len(exampleData.SNMP.ICMP)+len(exampleData.SNMP.ICMPMsg), len(allMap["icmp"].(map[string]any)))
+	require.Equal(t, len(exampleData.SNMP.TCP)+len(exampleData.Netstat.TCPExt), len(allMap["tcp"].(map[string]any)))
 
 	//test With filter
 	testTwo := []string{"TCPAbortOnClose", "InBcastOctets"}
 	filteredMap := MapProcNetCountersWithFilter(exampleData, testTwo)
-	require.Equal(t, 1, len(filteredMap["tcp"].(map[string]interface{})))
-	require.Equal(t, uint64(0x6), filteredMap["tcp"].(map[string]interface{})["TCPAbortOnClose"])
+	require.Equal(t, 1, len(filteredMap["tcp"].(map[string]any)))
+	require.Equal(t, uint64(0x6), filteredMap["tcp"].(map[string]any)["TCPAbortOnClose"])
 
-	require.Equal(t, uint64(0x514d4c), filteredMap["ip"].(map[string]interface{})["InBcastOctets"])
+	require.Equal(t, uint64(0x514d4c), filteredMap["ip"].(map[string]any)["InBcastOctets"])
 }

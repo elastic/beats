@@ -19,6 +19,7 @@ linters:
     - importas # enforces consistent import aliases
     - ineffassign # detects when assignments to existing variables are not used
     - misspell # finds commonly misspelled English words in comments
+    - modernize # A suite of analyzers that suggest simplifications to Go code, using modern language and library features.
     - nakedret # finds naked returns in functions greater than a specified function length
     - nilerr # finds the code that returns nil even if it checks that the error is not nil.
     - nilnesserr # reports constructs that check for err != nil, but return a different nil value error
@@ -76,6 +77,10 @@ linters:
         - G401 # Detect the usage of DES, RC4, MD5 or SHA1: Used in non-crypto contexts.
         - G501 # Import blocklist: crypto/md5: Used in non-crypto contexts.
         - G505 # Import blocklist: crypto/sha1: Used in non-crypto contexts.
+    modernize:
+      disable:
+        # TODO: fix this issue separately
+        - omitzero
     nakedret:
       # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
       max-func-lines: 0
