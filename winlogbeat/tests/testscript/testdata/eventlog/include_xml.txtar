@@ -1,0 +1,26 @@
+[!windows] skip 'requires Windows'
+
+write-event 'Include raw XML event'
+wait-for-event-log 1
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 1
+check-event-field output 0 message 'Include raw XML event'
+check-event-field-exists output 0 event.original
+check-event-field-contains output 0 event.original '</Event>'
+
+-- winlogbeat.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    no_more_events: stop
+    include_xml: true
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false

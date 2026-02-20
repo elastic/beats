@@ -1,0 +1,29 @@
+[!windows] skip 'requires Windows'
+
+write-event 'selected' --source=$OTHER_APP_SOURCE --id=556 --level=error
+write-event 'filtered-level' --source=$OTHER_APP_SOURCE --id=556 --level=information
+write-event 'filtered-source' --id=556 --level=warning
+wait-for-event-log 3
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 1
+check-event-field output 0 message 'selected'
+
+-- winlogbeat.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    no_more_events: stop
+    event_id: '10-20, 30-40, -35, -18, 400-1000, -432'
+    level: 'warn, error'
+    provider:
+      - ${OTHER_APP_SOURCE:?missing OTHER_APP_SOURCE}
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false
