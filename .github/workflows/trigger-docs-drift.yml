@@ -16,5 +16,9 @@ jobs:
       setup-commands: |
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
         make mage
+      additional-instructions: |
+        Pay careful attention to backport labels and be sure to propose similar backports to the change
+        which caused the docs to drift in the first place.
+
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
