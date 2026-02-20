@@ -1,0 +1,12 @@
+kind: bug-fix
+summary: Restore suppression of repeated channel-not-found open errors in winlogbeat eventlog runner
+
+description: |
+  Reintroduces channel-not-found retry log suppression that was lost during the eventlog runner refactor.
+  The first channel-not-found open error is logged at WARN, subsequent retries are logged at DEBUG, and
+  the suppression state is reset after a successful open. This prevents repeated WARN/ERROR log noise
+  when a configured channel is missing.
+
+component: winlogbeat
+
+issue: https://github.com/elastic/beats/issues/48979
