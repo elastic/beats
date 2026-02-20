@@ -1,7 +1,7 @@
 name: Semantic Function Clustering
 on:
   schedule:
-    - cron: "0 12 * * 1-5"
+    - cron: "0 12 * * 5"
   workflow_dispatch:
 
 permissions:

@@ -1,7 +1,7 @@
 name: Docs New Contributor Review
 on:
   schedule:
-    - cron: "0 14 * * 1"
+    - cron: "0 14 * * 2"
   workflow_dispatch:
 
 permissions:
