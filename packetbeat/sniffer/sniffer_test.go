@@ -20,9 +20,15 @@
 package sniffer
 
 import (
+	"errors"
 	"testing"
 
+	"github.com/google/gopacket/layers"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/packetbeat/decoder"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestSniffer_afpacketComputeSize(t *testing.T) {
@@ -91,4 +97,86 @@ func Test_deviceNameFromIndex(t *testing.T) {
 
 	_, err = deviceNameFromIndex(3, devs)
 	assert.Error(t, err)
+}
+
+func TestEnsureDecoderLifecycle(t *testing.T) {
+	var created int
+	var firstCleanupCalls int
+	var secondCleanupCalls int
+
+	s := sniffer{
+		log: logp.NewLogger("sniffer_test"),
+		decoders: func(_ layers.LinkType, _ string, _ int) (*decoder.Decoder, func(), error) {
+			created++
+			switch created {
+			case 1:
+				return &decoder.Decoder{}, func() { firstCleanupCalls++ }, nil
+			case 2:
+				return &decoder.Decoder{}, func() { secondCleanupCalls++ }, nil
+			default:
+				t.Fatalf("unexpected decoder creation %d", created)
+				return nil, nil, nil
+			}
+		},
+	}
+
+	var (
+		last    layers.LinkType
+		dec     *decoder.Decoder
+		cleanup func()
+		err     error
+	)
+
+	last, dec, cleanup, err = s.ensureDecoder(layers.LinkTypeEthernet, "eth0", last, dec, cleanup)
+	require.NoError(t, err)
+	require.NotNil(t, dec)
+	require.NotNil(t, cleanup)
+	assert.Equal(t, 1, created)
+	assert.Equal(t, 0, firstCleanupCalls)
+
+	firstDec := dec
+	last, dec, cleanup, err = s.ensureDecoder(layers.LinkTypeEthernet, "eth1", last, dec, cleanup)
+	require.NoError(t, err)
+	assert.Same(t, firstDec, dec)
+	assert.Equal(t, 1, created)
+	assert.Equal(t, 0, firstCleanupCalls)
+
+	last, dec, cleanup, err = s.ensureDecoder(layers.LinkTypeLinuxSLL, "any", last, dec, cleanup)
+	require.NoError(t, err)
+	require.NotNil(t, dec)
+	require.NotNil(t, cleanup)
+	assert.Equal(t, 2, created)
+	assert.Equal(t, 1, firstCleanupCalls)
+	assert.Equal(t, 0, secondCleanupCalls)
+
+	cleanup()
+	assert.Equal(t, 1, secondCleanupCalls)
+}
+
+func TestEnsureDecoderReplaceErrorKeepsCurrentCleanup(t *testing.T) {
+	var created int
+	var cleanupCalls int
+
+	s := sniffer{
+		log: logp.NewLogger("sniffer_test"),
+		decoders: func(_ layers.LinkType, _ string, _ int) (*decoder.Decoder, func(), error) {
+			created++
+			if created == 1 {
+				return &decoder.Decoder{}, func() { cleanupCalls++ }, nil
+			}
+			return nil, nil, errors.New("boom")
+		},
+	}
+
+	last, dec, cleanup, err := s.ensureDecoder(layers.LinkTypeEthernet, "eth0", 0, nil, nil)
+	require.NoError(t, err)
+	require.NotNil(t, dec)
+	require.NotNil(t, cleanup)
+
+	_, _, cleanup, err = s.ensureDecoder(layers.LinkTypeLinuxSLL, "any", last, dec, cleanup)
+	require.Error(t, err)
+	assert.Equal(t, 0, cleanupCalls)
+
+	cleanup()
+	assert.Equal(t, 1, cleanupCalls)
 }
