@@ -1,0 +1,9 @@
+exec winlogbeat export index-pattern -c winlogbeat.yml
+stdout '"attributes"'
+stdout '"type": "index-pattern"'
+
+-- winlogbeat.yml --
+output.file:
+  path: ./output
+  filename: winlogbeat
+  rotate_every_kb: 1000

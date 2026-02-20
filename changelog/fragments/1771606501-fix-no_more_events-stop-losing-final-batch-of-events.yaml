@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Fix no_more_events stop losing final batch of events when io.EOF is returned alongside records.
+component: winlogbeat
+issue: https://github.com/elastic/beats/issues/47388
