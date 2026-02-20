@@ -13,12 +13,16 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Fix filebeat goroutine leak when using harvester_limit
+summary: Fix AD entity analytics to resolve nested group membership and escape DN filter values
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# description:
+description: |
+  Use the LDAP_MATCHING_RULE_IN_CHAIN matching rule (OID 1.2.840.113556.1.4.1941)
+  in Active Directory entity analytics memberOf filters to resolve nested group
+  membership at query time. Also escape DN values in the changed-groups filter
+  to prevent malformed queries when group names contain LDAP filter metacharacters.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:

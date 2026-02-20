@@ -49,8 +49,9 @@ output.elasticsearch:
   ssl:
     verification_mode: certificate
     certificate_authorities: %s
-    ca_sha256: FDFOtqdUyXZw74YgvAJUC+I67ED1WfcI1qK44Qy2WQM=
+    ca_sha256: GkPh2Lqh6eDoIatcr5AlZTAIKcIz/AWC61lrWgRwwe8=
 `
+
 	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.String(), caPath))
 	mockbeat.Start()
 	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)

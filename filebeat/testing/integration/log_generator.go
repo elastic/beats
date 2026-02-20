@@ -18,8 +18,10 @@
 package integration
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
@@ -126,11 +128,45 @@ func GenerateLogFile(t *testing.T, filename string, lines int, generator LogGene
 		return
 	}
 	defer file.Close()
-	for i := 1; i <= lines; i++ {
+
+	writeLines(t, file, filename, 0, lines, generator)
+}
+
+// AppendLogFile appends a given line count to an existing file
+// using the given generator.
+//
+// This function counts the current lines in the file and makes sure to properly
+// continue line generation feeding the generator with next indices.
+func AppendLogFile(t *testing.T, filename string, lines int, generator LogGenerator) {
+	// `0666` is the default in `os.Create`, used for consistency
+	file, err := os.OpenFile(filename, os.O_RDWR, 0666)
+	if err != nil {
+		t.Fatalf("failed to open log file %q for appending: %s", filename, err)
+	}
+	defer file.Close()
+
+	// to continue generating numbered lines, we need to count the existing lines first
+	offset := 0
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		offset++
+	}
+
+	if err := scanner.Err(); err != nil {
+		t.Fatalf("failed to count lines in %q: %s", filename, err)
+	}
+
+	writeLines(t, file, filename, offset, lines, generator)
+}
+
+// writeLines writes generated lines to the provided writer.
+// It is shared between GenerateLogFile and GenerateGZIPLogFile to
+// avoid duplicating the core writing logic.
+func writeLines(t *testing.T, w io.Writer, filename string, offset, lines int, generator LogGenerator) {
+	for i := offset + 1; i <= offset+lines; i++ {
 		line := generator.GenerateLine(filename, i) + "\n"
-		_, err := file.WriteString(line)
-		if err != nil {
-			t.Fatalf("cannot write a generated log line to %s", filename)
+		if _, err := w.Write([]byte(line)); err != nil {
+			t.Fatalf("cannot write a generated log line to %s: %s", filename, err)
 			return
 		}
 	}
