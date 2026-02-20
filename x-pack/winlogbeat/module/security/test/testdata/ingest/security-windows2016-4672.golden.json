@@ -2,7 +2,7 @@
   {
     "@timestamp": "2018-05-18T23:09:03.2086661Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in-special",

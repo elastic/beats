@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-12-18T16:22:12.3112534Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "added-computer-account",
@@ -53,9 +53,9 @@
         "HomePath": "-",
         "LogonHours": "\u003cvalue not set\u003e",
         "NewUACList": [
+          "USER_WORKSTATION_TRUST_ACCOUNT",
           "USER_ACCOUNT_DISABLED",
-          "USER_PASSWORD_NOT_REQUIRED",
-          "USER_WORKSTATION_TRUST_ACCOUNT"
+          "USER_PASSWORD_NOT_REQUIRED"
         ],
         "NewUacValue": "0x85",
         "OldUacValue": "0x0",

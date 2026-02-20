@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-04-02T14:34:08.8896056Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "service-installed",

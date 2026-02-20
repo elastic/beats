@@ -103,6 +103,7 @@ func TestDocker(t *testing.T) {
 			"powershell_operational",
 			"routing",
 			"security",
+			"security_standard",
 			"sysmon",
 		}
 		if len(loaded) != len(wantPipelines) {

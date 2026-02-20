@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-03-29T21:10:39.7868321Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -89,7 +89,7 @@
   {
     "@timestamp": "2019-03-29T21:10:40.2555609Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -176,7 +176,7 @@
   {
     "@timestamp": "2019-03-29T21:10:40.3805426Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -269,7 +269,7 @@
   {
     "@timestamp": "2019-03-29T21:10:40.5055514Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -356,7 +356,7 @@
   {
     "@timestamp": "2019-03-29T21:10:40.6305447Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -442,7 +442,7 @@
   {
     "@timestamp": "2019-03-29T21:10:53.6617957Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -528,7 +528,7 @@
   {
     "@timestamp": "2019-03-29T21:10:54.6618303Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -614,7 +614,7 @@
   {
     "@timestamp": "2019-03-29T21:10:55.4587259Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -700,7 +700,7 @@
   {
     "@timestamp": "2019-03-29T21:13:17.3025591Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -789,7 +789,7 @@
   {
     "@timestamp": "2019-03-29T21:13:17.5213056Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -876,7 +876,7 @@
   {
     "@timestamp": "2019-03-29T21:13:17.6149946Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -969,7 +969,7 @@
   {
     "@timestamp": "2019-03-29T21:13:18.7869259Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -1056,7 +1056,7 @@
   {
     "@timestamp": "2019-03-29T21:20:48.7402309Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -1143,7 +1143,7 @@
   {
     "@timestamp": "2019-03-29T21:20:48.7402309Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -1230,7 +1230,7 @@
   {
     "@timestamp": "2019-03-29T21:20:50.5840151Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -1317,7 +1317,7 @@
   {
     "@timestamp": "2019-03-29T21:23:42.5201798Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -1404,7 +1404,7 @@
   {
     "@timestamp": "2019-03-29T21:26:24.1764267Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logged-in",
@@ -1491,7 +1491,7 @@
   {
     "@timestamp": "2019-03-29T21:45:35.177054Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "logon-failed",

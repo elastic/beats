@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-04-06T06:39:04.5491199Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "privileged-service-called",
