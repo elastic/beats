@@ -18,8 +18,10 @@
 package integration
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -42,6 +44,13 @@ type Test interface {
 	// ExpectEOF sets an expectation that Filebeat will read the given
 	// files to EOF.
 	ExpectEOF(...string) Test
+	// ExpectIngestedToConsole sets an expectation that the given
+	// range of lines from a given file will be ingested and printed to the console.
+	//
+	// It's based on the `ExpectOutput` function, so use the `console` output
+	// when setting this expectation.
+	// Make sure `output.console.bulk_max_size` is set to `0`
+	ExpectIngestedToConsole(file string, offset, count int) Test
 }
 
 // TestOptions describes all available options for the test.
@@ -84,5 +93,37 @@ func (fbt *test) ExpectEOF(files ...string) Test {
 			fmt.Sprintf(`(%s|%s)`,
 				regexp.QuoteMeta(line1), regexp.QuoteMeta(line2))))
 	}
+	return fbt
+}
+
+// ExpectIngestedToConsole implements the Test interface.
+func (fbt *test) ExpectIngestedToConsole(file string, offset, count int) Test {
+	f, err := os.Open(file)
+	if err != nil {
+		fbt.T().Fatalf("failed to open %q: %s", file, err)
+	}
+	defer f.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		if offset != 0 {
+			offset--
+			continue
+		}
+		if count == 0 {
+			break
+		}
+
+		lines = append(lines, scanner.Text())
+		count--
+	}
+
+	if err := scanner.Err(); err != nil {
+		fbt.T().Fatalf("failed to read lines from %q: %s", file, err)
+	}
+
+	fbt.ExpectOutput(lines...)
+
 	return fbt
 }
