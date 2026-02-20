@@ -29,13 +29,10 @@ import (
 
 // OutputWatcher describes operations for watching output.
 type OutputWatcher interface {
-	// Inspect the line of the output and adjust the state accordingly.
-	Inspect(string)
+	OutputInspector
+
 	// Observed is `true` if every expected output has been observed.
 	Observed() bool
-	// String is the string representation of the current state.
-	// Describes what output is still expected.
-	String() string
 }
 
 // NewStringWatcher creates a new output watcher that watches for a
@@ -154,16 +151,16 @@ func (w *inOrderWatcher) String() string {
 // It's state marked as observed when all the nested watchers have
 // `Observed() == true`.
 func NewOverallWatcher(watchers []OutputWatcher) OutputWatcher {
-	return &metaWatcher{
+	return &overallWatcher{
 		active: watchers,
 	}
 }
 
-type metaWatcher struct {
+type overallWatcher struct {
 	active []OutputWatcher
 }
 
-func (w *metaWatcher) Inspect(line string) {
+func (w *overallWatcher) Inspect(line string) {
 	var active []OutputWatcher
 	for _, watcher := range w.active {
 		watcher.Inspect(line)
@@ -174,11 +171,11 @@ func (w *metaWatcher) Inspect(line string) {
 	w.active = active
 }
 
-func (w *metaWatcher) Observed() bool {
+func (w *overallWatcher) Observed() bool {
 	return len(w.active) == 0
 }
 
-func (w *metaWatcher) String() string {
+func (w *overallWatcher) String() string {
 	if w.Observed() {
 		return ""
 	}
