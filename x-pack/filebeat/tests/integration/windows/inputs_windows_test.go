@@ -92,6 +92,7 @@ output.console:
 }
 
 func TestWinlogIgnoreMissingChannel(t *testing.T) {
+	t.Skip("Flaky Test: https://github.com/elastic/beats/issues/49015")
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 	lbint.EnsureCompiled(ctx, t, "filebeat")
