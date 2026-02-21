@@ -10,6 +10,111 @@ osquerybeat:
 #          query: "select * from processes"
 #          interval: 60
 
+# ============================ RRULE Scheduling =================================
+# Osquerybeat supports RRULE-based scheduling as an alternative to osquery's
+# native interval-based scheduling. This allows for more flexible scheduling
+# using RFC 5545 recurrence rules, with a required start_date, optional end_date, and splay.
+#
+# IMPORTANT: RRULE schedules must have a minimum interval of 1 day (24 hours).
+# This is enforced and validated at configuration time.
+# Valid examples: "FREQ=DAILY", "FREQ=WEEKLY;BYDAY=MO,WE,FR" (Mon/Wed/Fri)
+# Invalid examples: "FREQ=HOURLY", "FREQ=MINUTELY"
+#
+# RRULE scheduling is configured at the query level:
+#
+# Query-level RRULE scheduling:
+#  inputs:
+#    - type: osquery
+#      osquery:
+#        # For native interval-based queries (no rrule_schedule), add:
+#        # schedule_splay_percent: 10
+#        # schedule_max_drift: 60
+#        schedule:
+#          process_check:
+#            query: "select * from processes"
+#            # Optional: policy-defined schedule_id (from Kibana, used in scheduled results/responses)
+#            # schedule_id: "policy-schedule-uuid"
+#            # For native schedules: start_date (RFC3339) is optional. When set, it enables
+#            # consistent schedule_execution_count in scheduled results/responses across agents
+#            # (computed as 1 + (run_time - start_date) / interval).
+#            # start_date: "2024-01-01T00:00:00Z"
+#            rrule_schedule:
+#              # RFC 5545 recurrence rule string
+#              # NOTE: DTSTART inside the rule is ignored; start_date is required and used as DTSTART.
+#              # Minimum interval: 1 day (24 hours)
+#              # Examples:
+#              #   "FREQ=DAILY"                         - Every day
+#              #   "FREQ=WEEKLY;BYDAY=MO,WE,FR"         - Mon, Wed, Fri
+#              #   "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO"    - Every 2 weeks on Monday
+#              #   "FREQ=MONTHLY;BYMONTHDAY=1"          - First day of each month
+#              #   "FREQ=YEARLY;BYMONTH=1;BYMONTHDAY=1" - Jan 1st every year
+#              rrule: "FREQ=DAILY"
+#              # Required: Only run after this date (RFC3339 format)
+#              start_date: "2024-01-01T00:00:00Z"
+#              # Optional: Stop running after this date (RFC3339 format)
+#              end_date: "2024-12-31T23:59:59Z"
+#              # Optional: Maximum splay duration to spread out query execution
+#              # and avoid thundering herd effects.
+#              # Uses Go duration format: "30s", "5m", "2h", "1h30m"
+#              # Range: 0s to 12h (maximum). Default: 0s (disabled)
+#              # Set to "0s" to disable splay.
+#              splay: "0s"
+#              # Optional: Query timeout in seconds (default: 60)
+#              timeout: 120
+#
+# Splay Best Practices:
+# - Default is 0s (disabled); opt in to splay for most schedules
+# - For daily queries, use 30m-2h splay
+# - For weekly queries, use 1h-6h splay
+# - Maximum splay is 12 hours (safe for minimum 1-day interval)
+#
+# Note: When both interval and rrule_schedule are set, rrule_schedule takes
+# precedence. Queries scheduled via RRULE are executed by osquerybeat directly,
+# bypassing osquery's native scheduler.
+#
+# For queries that use native 'interval' (no rrule_schedule), splay is controlled
+# by schedule_splay_percent and schedule_max_drift; see "Native Osquery Scheduling
+# Options" below.
+
+# ============================ Native Osquery Scheduling Options ===============
+# Splay for native scheduled queries (schedule/packs using 'interval' only).
+# Osquery supports these options; osquerybeat exposes them so you can tune
+# how much query run times are spread out (avoids thundering herd).
+# For RRULE-scheduled queries, use the splay field in rrule_schedule instead.
+#
+#  inputs:
+#    - type: osquery
+#      osquery:
+#        # Splay percentage for native interval-based scheduled queries (0-100)
+#        # Spreads execution by a random percentage of the query interval.
+#        # Default: 10. Set to 0 to disable splay for native queries.
+#        schedule_splay_percent: 10
+#
+#        # Max time drift in seconds for splay compensation (native scheduling)
+#        # Default: 60. Set to 0 to disable drift compensation.
+#        schedule_max_drift: 60
+#
+# ============================ Osquery Options =================================
+# Additional osquery options can be set in the options section. These are passed
+# directly to osqueryd. Some useful options:
+#
+#  inputs:
+#    - type: osquery
+#      osquery:
+#        options:
+#          # Global timeout for native scheduled queries (in seconds)
+#          # This applies to all queries using interval-based scheduling
+#          # Default is osquery's built-in default (no limit)
+#          schedule_timeout: 300
+#
+#          # Other common osquery options:
+#          # events_expiry: 3600           # Event expiration in seconds
+#          # verbose: false                # Enable verbose logging
+#          # worker_threads: 4             # Number of worker threads
+#
+# For a full list of osquery options, see:
+# https://osquery.readthedocs.io/en/stable/deployment/configuration/#options
+
 # ============================== Process Security ==============================
 # Disable seccomp system call filtering on Linux.
 # Otherwise osquerybeat can't fork osqueryd with the error: Failed to start osqueryd process: fork/exec ./osqueryd: operation not permitted

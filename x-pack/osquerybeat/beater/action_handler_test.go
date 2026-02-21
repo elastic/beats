@@ -40,9 +40,9 @@ type mockPublisher struct {
 	reqData    interface{}
 }
 
-func (p *mockPublisher) Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	p.index = index
-	p.actionID = actionID
+	p.actionID = idValue
 	p.responseID = responseID
 	p.meta = meta
 	p.hits = hits
@@ -68,7 +68,7 @@ func TestActionHandlerExecute(t *testing.T) {
 	tests := []struct {
 		Name          string
 		QueryExecutor queryExecutor
-		Publisher     publisher
+		Publisher     queryResultPublisher
 
 		Request map[string]interface{}
 		Err     error
@@ -139,9 +139,8 @@ func TestActionHandlerExecute(t *testing.T) {
 					if diff != "" {
 						t.Error(diff)
 					}
-					diff = cmp.Diff("", tc.Publisher.(*mockPublisher).responseID)
-					if diff != "" {
-						t.Error(diff)
+				if tc.Publisher.(*mockPublisher).responseID == "" {
+					t.Error("expected non-empty responseID")
 					}
 				}
 			} else {
