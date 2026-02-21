@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/sarama"
 
@@ -360,6 +361,11 @@ func TestSASLAuthentication(t *testing.T) {
 			testTopic := createTestTopicName()
 			groupID := "filebeat"
 
+			// Give Kafka SASL configuration extra time to be fully ready
+			// This helps avoid "leadership election" errors when the SASL listener
+			// is still initializing
+			time.Sleep(1 * time.Second)
+
 			// Send test messages to the topic for the input to read.
 			messages := []testMessage{
 				{message: "testing"},
@@ -591,21 +597,28 @@ func writeToKafkaTopic(
 	t *testing.T, topic string, message string,
 	headers []sarama.RecordHeader,
 ) {
-	t.Helper()
 	config := sarama.NewConfig()
-	config.Producer.RequiredAcks = sarama.WaitForAll
+	config.Producer.RequiredAcks = sarama.WaitForLocal
 	config.Producer.Return.Successes = true
 	config.Producer.Partitioner = sarama.NewHashPartitioner
 	config.Version = sarama.V1_0_0_0
+	config.Producer.Retry.Max = 10
+	config.Producer.Retry.Backoff = 100 * time.Millisecond
 
 	hosts := []string{getTestKafkaHost()}
-	producer, err := sarama.NewSyncProducer(hosts, config)
-	if err != nil {
-		t.Fatal(err)
-	}
+
+	// Retry producer creation to handle transient connection issues
+	var producer sarama.SyncProducer
+	var err error
+	require.EventuallyWithTf(t, func(ct *assert.CollectT) {
+		producer, err = sarama.NewSyncProducer(hosts, config)
+		require.NoError(ct, err)
+		require.NotNil(ct, producer)
+	}, 30*time.Second, 1*time.Second, "failed to create producer: %v", err)
+
 	defer func() {
 		if err := producer.Close(); err != nil {
-			t.Fatal(err)
+			require.NoError(t, err)
 		}
 	}()
 
@@ -616,9 +629,7 @@ func writeToKafkaTopic(
 	}
 
 	_, _, err = producer.SendMessage(msg)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 }
 
 func run(t *testing.T, cfg *conf.C, client *beattest.ChanClient) (*kafkaInput, func()) {
