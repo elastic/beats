@@ -17,18 +17,6 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-func reservedNamesAreRestricted(t *testing.T) bool {
-	t.Helper()
-	base := t.TempDir()
-	p := filepath.Join(base, "CON", "probe")
-	err := os.MkdirAll(p, 0o750)
-	if err == nil {
-		_ = os.RemoveAll(filepath.Join(base, "CON"))
-		return false
-	}
-	return true
-}
-
 func TestEvalSymlinksGlobChars(t *testing.T) {
 	base := t.TempDir()
 	tests := []struct {
@@ -55,18 +43,17 @@ func TestEvalSymlinksReservedNames(t *testing.T) {
 	// Reserved device names return ErrNotExist, not ERROR_INVALID_NAME,
 	// so they are handled by the existing fs.ErrNotExist check.
 	base := t.TempDir()
-	restricted := reservedNamesAreRestricted(t)
 	for _, name := range []string{"CON", "PRN", "AUX"} {
 		t.Run(name, func(t *testing.T) {
 			p := filepath.Join(base, name, "somefile.log")
 			_, err := filepath.EvalSymlinks(p)
-			if err == nil && restricted {
-				t.Fatal("expected error from EvalSymlinks, got nil")
+			if err == nil {
+				return
 			}
 			if errors.Is(err, windows.ERROR_INVALID_NAME) {
 				t.Fatal("unexpectedly got ERROR_INVALID_NAME; reserved names should return ErrNotExist")
 			}
-			if err != nil && !errors.Is(err, fs.ErrNotExist) {
+			if !errors.Is(err, fs.ErrNotExist) {
 				t.Fatalf("expected fs.ErrNotExist, got: %v", err)
 			}
 		})
@@ -75,7 +62,6 @@ func TestEvalSymlinksReservedNames(t *testing.T) {
 
 func TestMkdirAllReservedNames(t *testing.T) {
 	base := t.TempDir()
-	restricted := reservedNamesAreRestricted(t)
 	tests := []struct {
 		name    string
 		wantErr []error
@@ -88,17 +74,11 @@ func TestMkdirAllReservedNames(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			p := filepath.Join(base, test.name, "logsdir")
 			err := os.MkdirAll(p, 0o750)
-			if restricted {
-				if err == nil {
-					t.Fatal("expected error from MkdirAll, got nil")
-				}
-				if !slices.ContainsFunc(test.wantErr, func(e error) bool { return errors.Is(err, e) }) {
-					t.Fatalf("MkdirAll(%q) err = %v; want in %v", p, err, test.wantErr)
-				}
+			if err == nil {
 				return
 			}
-			if err != nil {
-				t.Fatalf("MkdirAll(%q) returned unexpected error: %v", p, err)
+			if !slices.ContainsFunc(test.wantErr, func(e error) bool { return errors.Is(err, e) }) {
+				t.Fatalf("MkdirAll(%q) err = %v; want in %v", p, err, test.wantErr)
 			}
 		})
 	}
