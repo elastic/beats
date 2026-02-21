@@ -187,14 +187,14 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	if cfg.Request.Tracer != nil {
 		id := sanitizeFileName(ctx.IDWithoutName)
 		path := strings.ReplaceAll(cfg.Request.Tracer.Filename, "*", id)
-		ok, err := httplog.IsPathInLogsFor(inputName, path)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
 		if err != nil {
 			return err
 		}
 		if !ok {
 			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
 		}
-		cfg.Request.Tracer.Filename = path
+		cfg.Request.Tracer.Filename = resolved
 
 		// Propagate tracer behaviour to all chain children.
 		for i, c := range cfg.Chain {

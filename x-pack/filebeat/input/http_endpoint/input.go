@@ -118,14 +118,14 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	if e.config.Tracer != nil {
 		id := sanitizeFileName(ctx.IDWithoutName)
 		path := strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
-		ok, err := httplog.IsPathInLogsFor(inputName, path)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
 		if err != nil {
 			return err
 		}
 		if !ok {
 			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
 		}
-		e.config.Tracer.Filename = path
+		e.config.Tracer.Filename = resolved
 	}
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
@@ -383,6 +383,8 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 			optionsStatus:  c.OptionsStatus,
 		},
 		maxInFlight:           c.MaxInFlight,
+		highWaterInFlight:     c.HighWaterInFlight,
+		lowWaterInFlight:      c.LowWaterInFlight,
 		retryAfter:            c.RetryAfter,
 		program:               prg,
 		messageField:          c.Prefix,
@@ -392,6 +394,8 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 		preserveOriginalEvent: c.PreserveOriginalEvent,
 		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
 	}
+	// Initialize accepting to true so we start by accepting requests.
+	h.accepting.Store(true)
 	if h.status == nil {
 		h.status = noopReporter{}
 	}

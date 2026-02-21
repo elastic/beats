@@ -516,6 +516,18 @@
                         - name: value_log_size
                           type: alias
                           path: beat.stats.apm_server.sampling.tail.storage.value_log_size
+                        - name: storage_limit
+                          type: alias
+                          path: beat.stats.apm_server.sampling.tail.storage.storage_limit
+                        - name: disk_used
+                          type: alias
+                          path: beat.stats.apm_server.sampling.tail.storage.disk_used
+                        - name: disk_total
+                          type: alias
+                          path: beat.stats.apm_server.sampling.tail.storage.disk_total
+                        - name: disk_usage_threshold_pct
+                          type: alias
+                          path: beat.stats.apm_server.sampling.tail.storage.disk_usage_threshold_pct
                 - name: transactions_dropped
                   type: alias
                   path: beat.stats.apm_server.sampling.transactions_dropped
