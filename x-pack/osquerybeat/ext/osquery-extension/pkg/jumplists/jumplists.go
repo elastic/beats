@@ -23,7 +23,8 @@ import (
 type JumplistType string
 
 const (
-	JumplistTypeCustom JumplistType = "custom"
+	JumplistTypeCustom    JumplistType = "custom"
+	JumplistTypeAutomatic JumplistType = "automatic"
 )
 
 // JumplistMeta is the metadata for a jump list.
@@ -41,6 +42,7 @@ type JumplistMeta struct {
 // JumplistEntry is a single entry in a jump list.
 // TODO: Automatic jumplists will add additional fields to the JumplistEntry object.
 type JumplistEntry struct {
+	*DestListEntry
 	*Lnk
 }
 
@@ -59,8 +61,8 @@ type Jumplist struct {
 // This object using embedded pointers so that multiple rows can share the same metadata.
 // each embedded field has osquery tags defined in their object definitions
 type JumplistRow struct {
-	*JumplistMeta // The metadata for the jump list
-	*Lnk          // The Lnk object that represents a single jump list entry
+	*JumplistMeta  // The metadata for the jump list 1Code has alerts. Press enter to view.
+	*JumplistEntry // The JumplistEntry object that represents a single jump list entry
 }
 
 // ToRows converts the Jumplist to a slice of JumplistRow objects.
@@ -68,8 +70,8 @@ func (j *Jumplist) ToRows() []JumplistRow {
 	var rows []JumplistRow
 	for _, entry := range j.entries {
 		rows = append(rows, JumplistRow{
-			JumplistMeta: j.JumplistMeta,
-			Lnk:          entry.Lnk,
+			JumplistMeta:  j.JumplistMeta,
+			JumplistEntry: entry,
 		})
 	}
 	return rows
@@ -108,7 +110,6 @@ func getAllJumplists(log *logger.Logger, client ClientInterface) ([]*Jumplist, e
 		return nil, err
 	}
 	for _, userProfile := range userProfiles {
-		log.Infof("processing user profile: %v", userProfile)
 		jumplists = append(jumplists, userProfile.getJumplists(log)...)
 	}
 

@@ -74,6 +74,12 @@ func TestCustomJumplists(t *testing.T) {
 	}
 }
 
+func TestGetColumns(t *testing.T) {
+	columns := GetColumns()
+	assert.NotNil(t, columns, "expected non-nil columns")
+	assert.Greater(t, len(columns), 0, "expected at least 1 column")
+}
+
 func TestLnk(t *testing.T) {
 	type args struct {
 		filePath string
@@ -143,6 +149,12 @@ func (m *MockClient) Query(sql string) (*osquerygen.ExtensionResponse, error) {
 	assert.NoError(m.t, err, "expected no error when reading custom jumplist test file")
 	assert.NoError(m.t, os.WriteFile(filepath.Join(customJumplistDir, "590aee7bdd69b59b.customDestinations-ms"), bytes, 0o644))
 
+	automaticJumplistDir := filepath.Join(recentDir, "AutomaticDestinations")
+	assert.NoError(m.t, os.MkdirAll(automaticJumplistDir, 0o755))
+	bytes, err = os.ReadFile("./testdata/automatic/4db07e3587413f4d.automaticDestinations-ms")
+	assert.NoError(m.t, err, "expected no error when reading automatic jumplist test file")
+	assert.NoError(m.t, os.WriteFile(filepath.Join(automaticJumplistDir, "4db07e3587413f4d.automaticDestinations-ms"), bytes, 0o644))
+
 	return &osquerygen.ExtensionResponse{
 		Response: []map[string]string{
 			{
@@ -152,6 +164,95 @@ func (m *MockClient) Query(sql string) (*osquerygen.ExtensionResponse, error) {
 			},
 		},
 	}, nil
+}
+
+func TestAutomaticJumpList(t *testing.T) {
+	type testCase struct {
+		name        string
+		filePath    string
+		expectError bool
+	}
+	tests := []testCase{
+		{
+			name:        "test_olecfb_2",
+			filePath:    "./testdata/automatic/5f7b5f1e01b83767.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_3",
+			filePath:    "./testdata/automatic/6cbc8013911ed22e.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_4",
+			filePath:    "./testdata/automatic/7e4dca80246863e3.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_5",
+			filePath:    "./testdata/automatic/9b9cdc69c1c24e2b.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_7",
+			filePath:    "./testdata/automatic/47c6675663a92f2a.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_8",
+			filePath:    "./testdata/automatic/607c8cee3ce959c.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_11",
+			filePath:    "./testdata/automatic/befe8a0a7d3eeb43.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_12",
+			filePath:    "./testdata/automatic/ccba5a5986c77e43.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_15",
+			filePath:    "./testdata/automatic/db9172b310c92fa6.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_16",
+			filePath:    "./testdata/automatic/f01b4d95cf55d32a.automaticDestinations-ms",
+			expectError: false,
+		},
+	}
+	log := logger.New(os.Stdout, true)
+	for _, test := range tests {
+		automaticJumpList, err := ParseAutomaticJumpListFile(test.filePath, &UserProfile{Username: "test", Sid: "test"}, log)
+		if err != nil {
+			t.Fatalf("%s %s ParseAutomaticJumpListFile() returned error: %v", test.filePath, test.name, err)
+		}
+		if test.expectError {
+			assert.Error(t, err, "expected error when parsing Automatic Jump List")
+			assert.Nil(t, automaticJumpList, "expected nil Automatic Jump List when parsing Automatic Jump List")
+			return
+		}
+		assert.NoError(t, err, "expected no error when parsing Automatic Jump List")
+		assert.NotNil(t, automaticJumpList, "expected non-nil Automatic Jump List when parsing Automatic Jump List")
+		rows := automaticJumpList.ToRows()
+		assert.Greater(t, len(rows), 0, "expected at least 1 row in the Automatic Jump List")
+
+		// If an automatic jumplist has only one row, it could mean that the jumplist is empty.
+		// or it could mean that the jumplist has only one entry.  If the jumplist is empty,
+		// both the DestListEntry and the Lnk will be nil.  If the jumplist has only one entry,
+		// the DestListEntry will be non-nil and the Lnk will be non-nil.
+		if len(rows) == 1 && rows[0].DestListEntry == nil {
+			assert.Nil(t, rows[0].Lnk, "expected nil LNK when parsing Automatic Jump List")
+		} else {
+			for _, row := range rows {
+				assert.NotNil(t, row.Lnk, "expected non-nil LNK when parsing Automatic Jump List")
+				assert.NotNil(t, row.DestListEntry, "expected non-nil DestListEntry when parsing Automatic Jump List")
+			}
+		}
+	}
 }
 
 func TestGetUserProfiles(t *testing.T) {
