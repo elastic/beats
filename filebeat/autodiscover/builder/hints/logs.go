@@ -102,7 +102,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		}
 		l.log.Debugf("Generated %d input configs from hint.", len(configs))
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs, l.log)
+		return template.ApplyConfigTemplate(event, configs, l.log, options...)
 	}
 
 	var configs []*conf.C //nolint:prealloc //breaks tests
@@ -199,7 +199,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		configs = append(configs, config)
 	}
 	// Apply information in event to the template to generate the final config
-	return template.ApplyConfigTemplate(event, configs, l.log)
+	return template.ApplyConfigTemplate(event, configs, l.log, options...)
 }
 
 func (l *logHints) getMultiline(hints mapstr.M) mapstr.M {

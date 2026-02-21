@@ -25,11 +25,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/go-ucfg"
 )
 
 func TestMain(m *testing.M) {
@@ -1459,4 +1462,48 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 		}
 
 	}
+}
+
+// TestCreateConfigResolvesVariablesFromOptions checks that variables in raw hint
+// configs are resolved using the options passed to CreateConfig (e.g. keystore resolver
+// from the Kubernetes autodiscover provider so ${kubernetes.namespace.secret.key} works).
+func TestCreateConfigResolvesVariablesFromOptions(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "keystore implementation does not use NewGCMWithRandomNonce.")
+
+	path := filepath.Join(t.TempDir(), "keystore")
+	opts := []ucfg.Option{ucfg.Resolve(keystore.ResolverWrap(logsTestKeystore(t, path, "secret")))}
+
+	cfg := conf.MustNewConfigFrom(map[string]any{
+		"default_config": map[string]any{
+			"type":          "docker",
+			"containers":    map[string]any{"ids": []string{"${data.container.id}"}},
+			"close_timeout": "true",
+		},
+	})
+	event := bus.Event{
+		"host":       "1.2.3.4",
+		"kubernetes": mapstr.M{"container": mapstr.M{"name": "foobar", "id": "abc"}},
+		"container":  mapstr.M{"name": "foobar", "id": "abc"},
+		"hints":      mapstr.M{"logs": mapstr.M{"raw": `[{"type":"docker","containers":{"ids":["${data.container.id}"]},"password":"${PASSWORD}"}]`}},
+	}
+
+	l, err := NewLogHints(cfg, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+	cfgs := l.CreateConfig(event, opts...)
+	require.Len(t, cfgs, 1)
+
+	var out mapstr.M
+	require.NoError(t, cfgs[0].Unpack(&out))
+	assert.Equal(t, "secret", out["password"])
+}
+
+func logsTestKeystore(t *testing.T, path, secret string) keystore.Keystore {
+	t.Helper()
+	ks, err := keystore.NewFileKeystore(path)
+	require.NoError(t, err)
+	w, err := keystore.AsWritableKeystore(ks)
+	require.NoError(t, err)
+	require.NoError(t, w.Store("PASSWORD", []byte(secret)))
+	require.NoError(t, w.Save())
+	return ks
 }
