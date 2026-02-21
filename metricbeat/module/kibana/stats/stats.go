@@ -126,7 +126,12 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2) error {
 		m.statsHTTP.SetURI(origURI + "&exclude_usage=true")
 	}
 
-	content, err = m.statsHTTP.FetchContent()
+	resp, err := m.statsHTTP.FetchResponse() //nolint:bodyclose // ReadBody closes the body
+	if err != nil {
+		return err
+	}
+
+	content, err = kibana.ReadBody(resp)
 	if err != nil {
 		return err
 	}

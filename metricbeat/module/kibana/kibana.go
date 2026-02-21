@@ -19,6 +19,9 @@ package kibana
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 	"net/url"
 	"strings"
 
@@ -133,9 +136,19 @@ func IsUsageExcludable(currentKibanaVersion *version.V) bool {
 		v7_0_1.LessThanOrEqual(false, currentKibanaVersion)
 }
 
-func fetchPath(http *helper.HTTP, currentPath, newPath string, apiKey string) ([]byte, error) {
-	currentURI := http.GetURI()
-	defer http.SetURI(currentURI) // Reset after this request
+// ReadBody reads the response body for responses from Kibana. It accepts both
+// 200 and 503 since Kibana returns valid status JSON on 503 (degraded state).
+func ReadBody(resp *http.Response) ([]byte, error) {
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 && resp.StatusCode != 503 {
+		return nil, fmt.Errorf("unexpected status code %d from Kibana", resp.StatusCode)
+	}
+	return io.ReadAll(resp.Body)
+}
+
+func fetchPath(h *helper.HTTP, currentPath, newPath string, apiKey string) ([]byte, error) {
+	currentURI := h.GetURI()
+	defer h.SetURI(currentURI) // Reset after this request
 
 	// Parse the URI to replace the path
 	u, err := url.Parse(currentURI)
@@ -147,9 +160,14 @@ func fetchPath(http *helper.HTTP, currentPath, newPath string, apiKey string) ([
 	u.RawQuery = ""
 
 	// Http helper includes the HostData with username and password
-	http.SetURI(u.String())
+	h.SetURI(u.String())
 	if apiKey != "" {
-		http.SetHeader("Authorization", "ApiKey "+apiKey)
+		h.SetHeader("Authorization", "ApiKey "+apiKey)
 	}
-	return http.FetchContent()
+
+	resp, err := h.FetchResponse()
+	if err != nil {
+		return nil, err
+	}
+	return ReadBody(resp)
 }
