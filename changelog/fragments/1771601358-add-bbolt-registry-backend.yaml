@@ -1,0 +1,12 @@
+kind: feature
+
+summary: Add experimental bbolt-based registry backend for Filebeat
+
+description: |
+  Add a new bbolt (BoltDB) storage backend for the Filebeat registry,
+  configurable via `filebeat.registry.backend: bbolt`. The bbolt backend
+  provides persistent on-disk storage with support for database compaction
+  and TTL-based entry cleanup.
+  This feature is experimental and may change or be removed in future releases.
+
+component: filebeat

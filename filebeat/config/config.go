@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	bboltst "github.com/elastic/beats/v7/libbeat/statestore/backend/bbolt"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -44,11 +45,13 @@ type Config struct {
 }
 
 type Registry struct {
-	Path          string        `config:"path"`
-	Permissions   os.FileMode   `config:"file_permissions"`
-	FlushTimeout  time.Duration `config:"flush"`
-	CleanInterval time.Duration `config:"cleanup_interval"`
-	MigrateFile   string        `config:"migrate_file"`
+	Path          string         `config:"path"`
+	Permissions   os.FileMode    `config:"file_permissions"`
+	FlushTimeout  time.Duration  `config:"flush"`
+	CleanInterval time.Duration  `config:"cleanup_interval"`
+	MigrateFile   string         `config:"migrate_file"`
+	Backend       string         `config:"backend"`
+	Bbolt         bboltst.Config `config:"bbolt"`
 }
 
 var DefaultConfig = Config{
@@ -58,6 +61,8 @@ var DefaultConfig = Config{
 		MigrateFile:   "",
 		CleanInterval: 5 * time.Minute,
 		FlushTimeout:  time.Second,
+		Backend:       "memlog",
+		Bbolt:         bboltst.DefaultConfig(),
 	},
 	ShutdownTimeout:    0,
 	OverwritePipelines: false,
