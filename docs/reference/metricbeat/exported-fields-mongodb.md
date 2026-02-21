@@ -146,50 +146,80 @@ MongoDB collection statistics metrics.
     type: long
 
 
-**`mongodb.collstats.stats.stats.size`**
-:   The total uncompressed size in memory of all records in a collection.
+**`mongodb.collstats.stats.size`**
+:   The total uncompressed memory size of all records in a collection. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.size`.
 
     type: long
 
 
-**`mongodb.collstats.stats.stats.count`**
-:   The number of objects or documents in this collection.
+**`mongodb.collstats.stats.count`**
+:   The number of objects or documents in this collection. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.count`.
 
     type: long
 
 
-**`mongodb.collstats.stats.stats.avgObjSize`**
-:   The average size of an object in the collection (in bytes).
+**`mongodb.collstats.stats.avgObjSize`**
+:   The average size of an object in the collection (in bytes). In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.avgObjSize`.
 
     type: long
 
 
-**`mongodb.collstats.stats.stats.storageSize`**
-:   The total amount of storage allocated to this collection for document storage (in bytes).
+**`mongodb.collstats.stats.storageSize`**
+:   The total amount of storage allocated to this collection for document storage (in bytes). In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.storageSize`.
 
     type: long
 
 
-**`mongodb.collstats.stats.stats.totalIndexSize`**
-:   The total size of all indexes (in bytes).
+**`mongodb.collstats.stats.totalIndexSize`**
+:   The total size of all indexes (in bytes). In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.totalIndexSize`.
 
     type: long
 
 
-**`mongodb.collstats.stats.stats.totalSize`**
-:   The sum of the storageSize and totalIndexSize (in bytes).
+**`mongodb.collstats.stats.totalSize`**
+:   The sum of the storageSize and totalIndexSize (in bytes). In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.totalSize`.
 
     type: long
 
 
-**`mongodb.collstats.stats.stats.max`**
-:   Shows the maximum number of documents that may be present in a capped collection.
+**`mongodb.collstats.stats.max`**
+:   Shows the maximum number of documents that may be present in a capped collection. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.max`.
 
     type: long
 
 
-**`mongodb.collstats.stats.stats.nindexes`**
-:   The number of indexes on the collection. All collections have at least one index on the _id field.
+**`mongodb.collstats.stats.nindexes`**
+:   The number of indexes on the collection. All collections have at least one index on the _id field. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.nindexes`.
+
+    type: long
+
+
+**`mongodb.collstats.stats.freeStorageSize`** {applies_to}`stack: ga 9.2.0`
+:   Unused but allocated space (in bytes) for the collection; can be used to estimate fragmentation. Present in newer MongoDB versions only.
+
+    type: long
+
+
+**`mongodb.collstats.stats.capped`** {applies_to}`stack: ga 9.2.0`
+:   Indicates whether the collection is capped (fixed-size, circular behavior).
+
+    type: boolean
+
+
+**`mongodb.collstats.stats.scaleFactor`** {applies_to}`stack: ga 9.2.0`
+:   Scale factor applied to size-related metrics (for example, 1 or 1024). Use to derive raw byte counts if metrics are scaled.
+
+    type: long
+
+
+**`mongodb.collstats.stats.shardCount`** {applies_to}`stack: ga 9.2.0`
+:   Number of shards for this collection (sharded collections only). Indicates how data is distributed across the cluster.
+
+    type: long
+
+
+**`mongodb.collstats.stats.numOrphanDocs`** {applies_to}`stack: ga 9.2.0`
+:   Number of orphaned documents in the collection (MongoDB 6.0+). Orphaned documents exist on shards but are not owned by those shards.
 
     type: long
 
