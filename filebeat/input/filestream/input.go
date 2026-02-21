@@ -71,6 +71,7 @@ type filestream struct {
 	compression               string
 	includeFileOwnerName      bool
 	includeFileOwnerGroupName bool
+	hasLineFilter             bool
 
 	// Function references for testing
 	waitGracePeriodFn func(
@@ -150,6 +151,7 @@ func configure(
 		compression:               c.Compression,
 		includeFileOwnerName:      c.IncludeFileOwnerName,
 		includeFileOwnerGroupName: c.IncludeFileOwnerGroupName,
+		hasLineFilter:             len(c.Reader.IncludeLines) > 0 || len(c.Reader.ExcludeLines) > 0,
 		deleterConfig:             c.Delete,
 		waitGracePeriodFn:         waitGracePeriod,
 		tickFn:                    time.Tick,
@@ -754,7 +756,7 @@ func (inp *filestream) readFromSource(
 		if isGZIP {
 			metrics.MessagesGZIPRead.Inc()
 		}
-		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
+		if message.IsEmpty() || (inp.hasLineFilter && inp.isDroppedLine(log, message.Content)) {
 			continue
 		}
 
@@ -795,7 +797,7 @@ func (inp *filestream) readFromSource(
 
 // isDroppedLine decides if the line is exported or not based on
 // the include_lines and exclude_lines options.
-func (inp *filestream) isDroppedLine(log *logp.Logger, line string) bool {
+func (inp *filestream) isDroppedLine(log *logp.Logger, line []byte) bool {
 	if len(inp.readerConfig.IncludeLines) > 0 {
 		if !matchAny(inp.readerConfig.IncludeLines, line) {
 			log.Debug("Drop line as it does not match any of the include patterns %s", line)
@@ -812,9 +814,9 @@ func (inp *filestream) isDroppedLine(log *logp.Logger, line string) bool {
 	return false
 }
 
-func matchAny(matchers []match.Matcher, text string) bool {
+func matchAny(matchers []match.Matcher, text []byte) bool {
 	for _, m := range matchers {
-		if m.MatchString(text) {
+		if m.Match(text) {
 			return true
 		}
 	}
