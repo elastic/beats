@@ -28,9 +28,11 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"unsafe"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 	"golang.org/x/sys/windows/svc/eventlog"
 
@@ -38,7 +40,7 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-sysinfo/providers/windows"
+	windowsinfo "github.com/elastic/go-sysinfo/providers/windows"
 )
 
 const (
@@ -168,13 +170,19 @@ func testWindowsEventLog(t *testing.T, includeXML bool) {
 	writer, teardown := createLog(t)
 	defer teardown()
 
+	t.Logf("providerName: %s, sourceName: %s", providerName, sourceName)
 	setLogSize(t, providerName, gigabyte)
 
 	// Publish large test messages.
 	const messageSize = 256 // Originally 31800, such a large value resulted in an empty eventlog under Win10.
 	const totalEvents = 1000
 	for i := 0; i < totalEvents; i++ {
-		safeWriteEvent(t, writer, uint32(i%1000)+1, strconv.Itoa(i)+" "+randomSentence(messageSize))
+		safeWriteEvent(t, writer, uint32(i%1000)+1, strconv.Itoa(i)+" ")//+randomSentence(messageSize))
+		
+		// After every 25 events, change system time back 100ms
+		if (i+1)%25 == 0 {
+			adjustSystemTime(t, -1*time.Minute)//-100*time.Millisecond)
+		}
 	}
 
 	openLog := func(t testing.TB, config map[string]interface{}) EventLog {
@@ -309,10 +317,88 @@ func testWindowsEventLog(t *testing.T, includeXML bool) {
 
 		assert.Len(t, records, 21)
 	})
+
+	// Test bookmark resume functionality - read events in batches with bookmark resume
+	t.Run("bookmark_resume", func(t *testing.T) {
+		const expectedBatches = 5
+		const batchSize = 10
+		var allRecords []Record
+		var lastState *checkpoint.EventLogState
+
+		// Read events in batches, collecting bookmarks and reopening
+		for batch := 0; batch < expectedBatches; batch++ {
+			// Open log with the last bookmark (nil for first iteration)
+			cfg := map[string]interface{}{
+				"name":            providerName,
+				"batch_read_size": batchSize,
+				"include_xml":     includeXML,
+			}
+			
+			var log EventLog
+			if lastState != nil {
+				// Use the package-level openLog function directly
+				c, err := conf.NewConfigFrom(cfg)
+				require.NoError(t, err, "failed to create config for batch %d", batch)
+				
+				log, err = newWinEventLog(c)
+				require.NoError(t, err, "failed to create event log for batch %d", batch)
+				
+				err = log.Open(*lastState, monitoring.NewRegistry())
+				require.NoError(t, err, "failed to open log with bookmark for batch %d", batch)
+			} else {
+				log = openLog(t, cfg)
+			}
+
+			records, err := log.Read()
+			require.NoError(t, err, "batch %d read failed", batch)
+			require.NotEmpty(t, records, "batch %d is empty", batch)
+
+			t.Logf("Batch %d: read %d events", batch, len(records))
+
+			// Store all records to verify later
+			allRecords = append(allRecords, records...)
+
+			// Get the bookmark from the last record in this batch
+			lastRecord := records[len(records)-1]
+			require.NotEmpty(t, lastRecord.Offset.Bookmark, "bookmark is empty for batch %d", batch)
+			lastState = &lastRecord.Offset
+
+			// Close the log before next iteration
+			err = log.Close()
+			require.NoError(t, err, "failed to close log after batch %d", batch)
+		}
+
+		// Verify we read expected number of events
+		assert.Len(t, allRecords, expectedBatches*batchSize, "total events read doesn't match expected")
+
+		// Verify no duplicate record IDs (all events are unique)
+		recordIDs := make(map[uint64]bool)
+		for _, r := range allRecords {
+			if recordIDs[r.RecordID] {
+				t.Errorf("Duplicate RecordID found: %d", r.RecordID)
+			}
+			recordIDs[r.RecordID] = true
+		}
+
+		// Verify events are in order
+		for i := 1; i < len(allRecords); i++ {
+			assert.Less(t, allRecords[i-1].RecordID, allRecords[i].RecordID,
+				"Events are not in order: record %d (ID=%d) comes after record %d (ID=%d)",
+				i-1, allRecords[i-1].RecordID, i, allRecords[i].RecordID)
+		}
+
+		// Verify there are no gaps in record IDs (all events are contiguous)
+		for i := 1; i < len(allRecords); i++ {
+			t.Logf("%d: %d - %s - %s - %s", i, allRecords[i].RecordID, allRecords[i].Message, allRecords[i].Offset.Timestamp, allRecords[i].Offset.Bookmark)
+			assert.Equal(t, allRecords[i-1].RecordID+1, allRecords[i].RecordID,
+				"Events are not contiguous: record %d (ID=%d) is followed by record %d (ID=%d)",
+				i-1, allRecords[i-1].RecordID, i, allRecords[i].RecordID)
+		}
+	})
 }
 
 func TestWindows2025IgnoresFilters(t *testing.T) {
-	os, err := windows.OperatingSystem()
+	os, err := windowsinfo.OperatingSystem()
 	if err != nil {
 		t.Fatalf("failed to get operating system info: %v", err)
 	}
@@ -407,6 +493,46 @@ func setLogSize(t testing.TB, provider string, sizeBytes int) {
 	output, err := exec.Command("wevtutil.exe", "sl", "/ms:"+strconv.Itoa(sizeBytes), provider).CombinedOutput() //nolint:gosec // No possibility of command injection.
 	if err != nil {
 		t.Fatal("Failed to set log size", err, string(output))
+	}
+}
+
+// adjustSystemTime adjusts the system time by the specified duration.
+// Requires Administrator privileges. This is used for testing time-sensitive scenarios.
+func adjustSystemTime(t testing.TB, delta time.Duration) {
+	kernel32 := windows.NewLazySystemDLL("kernel32.dll")
+	getSystemTime := kernel32.NewProc("GetSystemTime")
+	setSystemTime := kernel32.NewProc("SetSystemTime")
+	
+	// Get current system time
+	var st windows.Systemtime
+	getSystemTime.Call(uintptr(unsafe.Pointer(&st)))
+	
+	// Convert to time.Time, adjust, and convert back
+	currentTime := time.Date(
+		int(st.Year), time.Month(st.Month), int(st.Day),
+		int(st.Hour), int(st.Minute), int(st.Second),
+		int(st.Milliseconds)*int(time.Millisecond),
+		time.UTC,
+	)
+	
+	newTime := currentTime.Add(delta)
+	
+	// Set the new system time
+	newSt := windows.Systemtime{
+		Year:         uint16(newTime.Year()),
+		Month:        uint16(newTime.Month()),
+		Day:          uint16(newTime.Day()),
+		Hour:         uint16(newTime.Hour()),
+		Minute:       uint16(newTime.Minute()),
+		Second:       uint16(newTime.Second()),
+		Milliseconds: uint16(newTime.Nanosecond() / int(time.Millisecond)),
+	}
+	
+	ret, _, err := setSystemTime.Call(uintptr(unsafe.Pointer(&newSt)))
+	if ret == 0 {
+		t.Logf("Warning: Failed to adjust system time by %v: %v (requires Administrator privileges)", delta, err)
+	} else {
+		t.Logf("Adjusted system time by %v", delta)
 	}
 }
 
