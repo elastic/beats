@@ -10,9 +10,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	sqlmod "github.com/elastic/beats/v7/x-pack/metricbeat/module/sql"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/sql/query/cursor"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -54,6 +57,9 @@ type config struct {
 	// Support fetch response for given queries from all databases.
 	// NOTE: Currently, mssql driver only respects FetchFromAllDatabases.
 	FetchFromAllDatabases bool `config:"fetch_from_all_databases"`
+
+	// Cursor configuration for incremental data fetching
+	Cursor cursor.Config `config:"cursor"`
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -63,6 +69,11 @@ type config struct {
 type MetricSet struct {
 	mb.BaseMetricSet
 	Config config
+
+	// Cursor-related fields (only used when cursor is enabled)
+	cursorManager   *cursor.Manager
+	translatedQuery string     // Query with driver-specific placeholder
+	fetchMutex      sync.Mutex // Prevents concurrent fetch operations
 }
 
 // rawData is the minimum required set of fields to generate fully customized events with their own module key space
@@ -104,7 +115,101 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("both query inputs provided, must provide either sql_query or sql_queries")
 	}
 
+	// Initialize cursor if enabled
+	if b.Config.Cursor.Enabled {
+		if err := b.initCursor(base); err != nil {
+			return nil, err
+		}
+	}
+
 	return b, nil
+}
+
+// initCursor initializes the cursor manager if cursor is enabled.
+// This validates cursor configuration and sets up the state store.
+func (m *MetricSet) initCursor(base mb.BaseMetricSet) error {
+	// Cursor only works with single query mode
+	if len(m.Config.Queries) > 0 {
+		return errors.New("cursor is not supported with sql_queries (multiple queries)")
+	}
+
+	// Cursor is not compatible with fetch_from_all_databases
+	if m.Config.FetchFromAllDatabases {
+		return errors.New("cursor is not supported with fetch_from_all_databases")
+	}
+
+	// Cursor requires table response format
+	if m.Config.ResponseFormat != tableResponseFormat {
+		return errors.New("cursor requires sql_response_format: table")
+	}
+
+	// Translate query placeholder for the driver
+	m.translatedQuery = cursor.TranslateQuery(m.Config.Query, m.Config.Driver)
+
+	// Get a cursor Store handle from the shared Module-level registry.
+	// This ensures a single memlog.Registry is shared across all SQL MetricSet
+	// instances, avoiding multiple independent stores operating on the same files.
+	store, err := m.openCursorStore(base)
+	if err != nil {
+		return fmt.Errorf("cursor store initialization failed: %w", err)
+	}
+
+	// Create cursor manager.
+	// We use the full URI (not just Host) for state key generation because
+	// Host often strips the database name (for example, "localhost:5432" for both
+	// postgres://...localhost:5432/db_a and db_b). The URI is hashed via
+	// xxhash so there is no secret leakage risk in the stored key.
+	mgr, err := cursor.NewManager(
+		m.Config.Cursor,
+		store,
+		m.HostData().URI,
+		m.Config.Query, // use original query for state key
+		m.Logger(),
+	)
+	if err != nil {
+		// Cleanup store on error
+		if closeErr := store.Close(); closeErr != nil {
+			m.Logger().Warnf("Failed to close store after cursor manager creation error: %v", closeErr)
+		}
+		return fmt.Errorf("cursor initialization failed: %w", err)
+	}
+
+	m.cursorManager = mgr
+	return nil
+}
+
+// openCursorStore returns a cursor Store handle from the shared Module-level
+// statestore registry. The registry must be initialized via sql.ModuleBuilder
+// to ensure proper sharing across all SQL module instances.
+//
+// This method will fail if the module does not implement the sql.Module interface,
+// preventing the creation of multiple independent stores that could cause file
+// lock conflicts.
+func (m *MetricSet) openCursorStore(base mb.BaseMetricSet) (*cursor.Store, error) {
+	mod, ok := base.Module().(sqlmod.Module)
+	if !ok {
+		return nil, fmt.Errorf("cursor requires SQL module to implement registry interface; " +
+			"ensure module is initialized via sql.ModuleBuilder (not DefaultModuleFactory)")
+	}
+
+	registry, err := mod.GetCursorRegistry()
+	if err != nil {
+		return nil, err
+	}
+
+	// Debug log to verify registry sharing is working
+	m.Logger().Debugf("Using shared SQL cursor registry at %p", registry)
+
+	return cursor.NewStoreFromRegistry(registry, m.Logger().Named("cursor"))
+}
+
+// Close implements mb.Closer for proper resource cleanup.
+// This is called when the MetricSet is stopped.
+func (m *MetricSet) Close() error {
+	if m.cursorManager != nil {
+		return m.cursorManager.Close()
+	}
+	return nil
 }
 
 // queryDBNames returns the query to list databases present in a server
@@ -115,7 +220,7 @@ func queryDBNames(driver string) string {
 	// NOTE: Add support for other drivers in future as when the need arises.
 	// dbSelector function would also required to be modified in order to add
 	// support for a new driver.
-	case "mssql":
+	case "mssql", "sqlserver":
 		return "SELECT [name] FROM sys.databases WITH (NOLOCK) WHERE state = 0 AND HAS_DBACCESS([name]) = 1"
 		// case "mysql":
 		// 	return "SHOW DATABASES"
@@ -139,7 +244,7 @@ func dbSelector(driver, dbName string) string {
 	// queryDBNames function would also required to be modified in order to add
 	// support for a new driver.
 	//
-	case "mssql":
+	case "mssql", "sqlserver":
 		return fmt.Sprintf("USE [%s];", dbName)
 	}
 	return ""
@@ -219,6 +324,18 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (fetchErr
 	defer func() {
 		fetchErr = sql.SanitizeError(fetchErr, m.HostData().URI)
 	}()
+
+	// Handle cursor-enabled case with concurrent execution prevention
+	if m.cursorManager != nil {
+		// Try to acquire lock without blocking
+		if !m.fetchMutex.TryLock() {
+			m.Logger().Warn("Previous collection still in progress, skipping this cycle")
+			return nil
+		}
+		defer m.fetchMutex.Unlock()
+
+		return m.fetchWithCursor(ctx, reporter)
+	}
 
 	db, err := sql.NewDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
@@ -301,6 +418,66 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (fetchErr
 			m.Logger().Debug("error trying to emit event")
 			return nil
 		}
+	}
+
+	return nil
+}
+
+// fetchWithCursor executes the query with cursor-based incremental fetching.
+// It uses the cursor manager to track the last fetched row and only retrieves new data.
+//
+// The context is wrapped with the module's configured timeout to prevent hung queries
+// from blocking indefinitely and causing all subsequent collection cycles to be skipped
+// via fetchMutex.TryLock(). The timeout defaults to the module's period if not set.
+//
+// Note: the timeout is applied here (cursor path only) rather than in Fetch() because
+// the non-cursor path has never enforced a timeout. Applying it there would be a
+// breaking change for existing users whose queries legitimately take longer than their
+// configured period.
+func (m *MetricSet) fetchWithCursor(ctx context.Context, reporter mb.ReporterV2) error {
+	// Apply the module's configured timeout (defaults to period) to prevent hung queries.
+	// Without this, a hung query blocks the goroutine indefinitely and all future
+	// collection cycles are skipped via fetchMutex.TryLock().
+	if timeout := m.Module().Config().Timeout; timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, timeout)
+		defer cancel()
+	}
+
+	cursorVal := m.cursorManager.CursorValueForQuery()
+
+	m.Logger().Debugf("Executing query with cursor=%s", m.cursorManager.CursorValueString())
+
+	db, err := sql.NewDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
+	if err != nil {
+		return fmt.Errorf("cannot open connection: %w", err)
+	}
+	defer db.Close()
+
+	// Execute parameterized query with cursor value
+	rows, err := db.FetchTableModeWithParams(ctx, m.translatedQuery, cursorVal)
+	if err != nil {
+		return fmt.Errorf("fetch with cursor failed: %w", err)
+	}
+
+	m.Logger().Debugf("Query returned %d rows", len(rows))
+
+	if len(rows) == 0 {
+		return nil
+	}
+
+	// Report events BEFORE updating cursor (at-least-once delivery)
+	// This ensures we never lose data - if cursor update fails, we may
+	// have duplicates but no data loss.
+	for _, row := range rows {
+		m.reportEvent(row, reporter, m.Config.Query)
+	}
+
+	// Update cursor state
+	if err := m.cursorManager.UpdateFromResults(rows); err != nil {
+		m.Logger().Warnf("Failed to save cursor state: %v", err)
+		// Don't fail the fetch - events were already emitted
+		// Next run will re-fetch some data (duplicates are better than data loss)
 	}
 
 	return nil

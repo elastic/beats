@@ -37,11 +37,11 @@ func ParseDSN(mod mb.Module, host string) (_ mb.HostData, fetchErr error) {
 		fetchErr = sql.SanitizeError(fetchErr, host)
 	}()
 
-	logger := logp.NewLogger("")
-	// At the time of writing, mod always is of type *mb.BaseModule.
-	// If this assumption is ever broken, we use global logger then
-	sqlModule, ok := mod.(*mb.BaseModule)
-	if ok {
+	logger := logp.NewLogger("sql")
+	// The module may be *mb.BaseModule (DefaultModuleFactory) or a custom type
+	// embedding BaseModule (e.g., the sql.module from ModuleBuilder). In either
+	// case, try to get the module-scoped logger for better log context.
+	if sqlModule, ok := mod.(*mb.BaseModule); ok {
 		logger = sqlModule.Logger
 	}
 
@@ -112,7 +112,6 @@ func oracleParseDSN(config ConnectionDetails, host string) (mb.HostData, error) 
 
 func mysqlParseDSN(config ConnectionDetails, host string, logger *logp.Logger) (mb.HostData, error) {
 	c, err := mysql.ParseDSN(host)
-
 	if err != nil {
 		return mb.HostData{}, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
 	}

@@ -7,6 +7,7 @@
 package query
 
 import (
+	"database/sql"
 	"fmt"
 	"net"
 	"os"
@@ -165,7 +166,6 @@ func TestPostgreSQL(t *testing.T) {
 			t.Run("fetch with URL", func(t *testing.T) {
 				testFetch(t, cfg)
 			})
-
 		})
 
 		t.Run("table mode", func(t *testing.T) {
@@ -189,7 +189,6 @@ func TestPostgreSQL(t *testing.T) {
 			t.Run("fetch with URL", func(t *testing.T) {
 				testFetch(t, cfg)
 			})
-
 		})
 
 		t.Run("merged mode", func(t *testing.T) {
@@ -197,8 +196,8 @@ func TestPostgreSQL(t *testing.T) {
 				config: config{
 					Driver: "postgres",
 					Queries: []query{
-						query{Query: "SELECT blks_hit FROM pg_stat_database limit 1;", ResponseFormat: "table"},
-						query{Query: "SELECT blks_read FROM pg_stat_database limit 1;", ResponseFormat: "table"},
+						{Query: "SELECT blks_hit FROM pg_stat_database limit 1;", ResponseFormat: "table"},
+						{Query: "SELECT blks_read FROM pg_stat_database limit 1;", ResponseFormat: "table"},
 					},
 					ResponseFormat: tableResponseFormat,
 					RawData: rawData{
@@ -221,12 +220,24 @@ func TestPostgreSQL(t *testing.T) {
 			t.Run("fetch with URL", func(t *testing.T) {
 				testFetch(t, cfg)
 			})
-
 		})
 	})
 }
 
 func TestOracle(t *testing.T) {
+	// Skip if Oracle Instant Client is not installed.
+	// The godror driver requires the Oracle Instant Client library (libclntsh.dylib/so).
+	// See: https://oracle.github.io/odpi/doc/installation.html
+	testDB, err := sql.Open("godror", "user/pass@localhost:1521/test")
+	if err == nil {
+		err = testDB.Ping()
+		_ = testDB.Close()
+	}
+	if err != nil && containsOracleClientError(err.Error()) {
+		t.Skip("Skipping Oracle integration tests: Oracle Instant Client not installed. " +
+			"See https://oracle.github.io/odpi/doc/installation.html")
+	}
+
 	service := compose.EnsureUp(t, "oracle")
 	host, port, _ := net.SplitHostPort(service.Host())
 
@@ -305,10 +316,19 @@ func assertFieldContainsFloat64(field string, limit float64) func(t *testing.T, 
 	}
 }
 
-func GetOracleConnectionDetails(t *testing.T, host string, port string) string {
+// GetOracleConnectionDetails returns the Oracle connection DSN.
+// It sets the session timezone to UTC to ensure consistent timestamp handling
+// between Go (which uses UTC) and Oracle.
+func GetOracleConnectionDetails(t *testing.T, host, port string) string {
 	connectString := GetOracleConnectString(host, port)
 	params, err := godror.ParseDSN(connectString)
 	require.NoError(t, err, "Failed to parse Oracle DSN: %s", connectString)
+	// Set session timezone to UTC on every connection.
+	// Without this, the godror driver may convert Go's UTC time.Time values
+	// to Oracle's session timezone when binding query parameters, causing
+	// timestamp comparisons to fail if the session TZ differs from UTC.
+	params.AlterSession = append(params.AlterSession, [2]string{"TIME_ZONE", "UTC"})
+	params.Timezone = time.UTC
 	return params.StringWithPassword()
 }
 
@@ -340,7 +360,7 @@ func GetOracleEnvPassword() string {
 }
 
 // GetOracleConnectString builds the Oracle connection string with proper format
-func GetOracleConnectString(host string, port string) string {
+func GetOracleConnectString(host, port string) string {
 	connectString := os.Getenv("ORACLE_CONNECT_STRING")
 	if len(connectString) == 0 {
 		// Use the recommended connection string format from godror documentation
@@ -356,6 +376,7 @@ func GetOracleConnectString(host string, port string) string {
 		if GetOracleEnvUsername() == "sys" {
 			connectString += "?sysdba=1"
 		}
+
 	}
 	return connectString
 }
