@@ -47,6 +47,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -278,7 +279,7 @@ func TestKafkaPublish(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			logger := logptest.NewTestingLogger(t, "")
-			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg)
+			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg, paths.New())
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -396,7 +397,7 @@ func TestKafkaErrors(t *testing.T) {
 		logger, err := logp.ConfigureWithCoreLocal(logp.Config{}, observed)
 		require.NoError(t, err)
 
-		grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg)
+		grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg, paths.New())
 		if err != nil {
 			t.Fatal(err)
 		}

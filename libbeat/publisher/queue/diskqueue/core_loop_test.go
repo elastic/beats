@@ -440,9 +440,11 @@ func TestHandleReaderLoopResponse(t *testing.T) {
 
 	logger := logptest.NewTestingLogger(t, "")
 	for description, test := range testCases {
+		settings := DefaultSettings()
+		settings.Path = t.TempDir()
 		dq := &diskQueue{
 			logger:   logger,
-			settings: DefaultSettings(),
+			settings: settings,
 			segments: test.segments,
 		}
 		dq.handleReaderLoopResponse(test.response)

@@ -35,6 +35,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	v2 "github.com/elastic/go-lumber/server/v2"
 )
 
@@ -187,7 +188,7 @@ func newTestLumberjackOutput(
 
 	logger := logptest.NewTestingLogger(t, "")
 	cfg, _ := conf.NewConfigFrom(config)
-	grp, err := outputs.Load(nil, beat.Info{Logger: logger}, nil, "logstash", cfg)
+	grp, err := outputs.Load(nil, beat.Info{Logger: logger}, nil, "logstash", cfg, paths.New())
 	if err != nil {
 		t.Fatalf("init logstash output plugin failed: %v", err)
 	}

@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -52,6 +53,7 @@ func makeRedis(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
+	beatPaths *paths.Path,
 ) (outputs.Group, error) {
 
 	if !cfg.HasField("index") {
@@ -166,7 +168,7 @@ func makeRedis(
 		clients[i] = newBackoffClient(client, rConfig.Backoff.Init, rConfig.Backoff.Max)
 	}
 
-	return outputs.SuccessNet(rConfig.Queue, rConfig.LoadBalance, rConfig.BulkMaxSize, rConfig.MaxRetries, nil, beat.Logger, clients)
+	return outputs.SuccessNet(rConfig.Queue, rConfig.LoadBalance, rConfig.BulkMaxSize, rConfig.MaxRetries, nil, beat.Logger, beatPaths, clients)
 }
 
 func buildKeySelector(cfg *config.C, logger *logp.Logger) (outil.Selector, error) {

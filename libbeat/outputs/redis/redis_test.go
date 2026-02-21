@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type checker func(*testing.T, outputs.Group)
@@ -111,7 +112,7 @@ func TestMakeRedis(t *testing.T) {
 			beatInfo.Logger = logger
 			cfg, err := config.NewConfigFrom(test.config)
 			assert.NoError(t, err)
-			groups, err := makeRedis(nil, beatInfo, outputs.NewNilObserver(), cfg)
+			groups, err := makeRedis(nil, beatInfo, outputs.NewNilObserver(), cfg, paths.New())
 			assert.Equal(t, err == nil, test.valid)
 			if err != nil && test.valid {
 				t.Log(err)

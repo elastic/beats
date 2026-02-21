@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Fail helper can be used by output factories, to create a failure response when
@@ -41,6 +42,7 @@ func Success(
 	batchSize, retry int,
 	encoderFactory queue.EncoderFactory,
 	logger *logp.Logger,
+	beatPaths *paths.Path,
 	clients ...Client) (Group, error) {
 	var q queue.QueueFactory
 	if cfg.IsSet() && cfg.Config().Enabled() {
@@ -60,6 +62,10 @@ func Success(
 			if err != nil {
 				return Group{}, fmt.Errorf("unable to get disk queue settings: %w", err)
 			}
+			if beatPaths == nil {
+				panic("TODO: unexpected nil")
+			}
+			settings.Paths = beatPaths
 			q = diskqueue.FactoryForSettings(settings)
 		default:
 			return Group{}, fmt.Errorf("unknown queue type: %s", cfg.Name())
@@ -87,12 +93,12 @@ func NetworkClients(netclients []NetworkClient) []Client {
 // The first argument is expected to contain a queue config.Namespace.
 // The queue config is passed to assign the queue factory when
 // elastic-agent reloads the output.
-func SuccessNet(cfg config.Namespace, loadbalance bool, batchSize, retry int, encoderFactory queue.EncoderFactory, logger *logp.Logger, netclients []NetworkClient) (Group, error) {
+func SuccessNet(cfg config.Namespace, loadbalance bool, batchSize, retry int, encoderFactory queue.EncoderFactory, logger *logp.Logger, beatPaths *paths.Path, netclients []NetworkClient) (Group, error) {
 
 	if !loadbalance {
-		return Success(cfg, batchSize, retry, encoderFactory, logger, NewFailoverClient(netclients))
+		return Success(cfg, batchSize, retry, encoderFactory, logger, beatPaths, NewFailoverClient(netclients))
 	}
 
 	clients := NetworkClients(netclients)
-	return Success(cfg, batchSize, retry, encoderFactory, logger, clients...)
+	return Success(cfg, batchSize, retry, encoderFactory, logger, beatPaths, clients...)
 }

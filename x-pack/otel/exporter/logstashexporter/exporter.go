@@ -255,7 +255,7 @@ func (l *logstashExporter) makeLogstashWorkers(ctx context.Context) ([]internal.
 
 	beatVersion := otelctx.GetBeatVersion(ctx)
 	beatIndexPrefix := otelctx.GetBeatIndexPrefix(ctx)
-	group, err := logstash.MakeLogstashClients(beatVersion, l.logger, outputs.NewNilObserver(), l.rawConfig, beatIndexPrefix)
+	group, err := logstash.MakeLogstashClients(beatVersion, l.logger, outputs.NewNilObserver(), l.rawConfig, beatIndexPrefix, nil)
 	if err != nil {
 		return nil, err
 	}
