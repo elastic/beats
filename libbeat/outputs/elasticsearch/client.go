@@ -174,16 +174,16 @@ func NewClient(
 	pLogDeadLetter := periodic.NewDoer(10*time.Second,
 		func(count uint64, d time.Duration) {
 			logger.Errorf(
-				"Failed to deliver to dead letter index %d events in last %s. Look at the event log to view the event and cause.", count, d)
+				"Failed to deliver to dead letter index %d events in last %s. Check the event_data log (configured by logging.event_data.files.path) to view the event and cause.", count, d)
 		})
 	pLogIndex := periodic.NewDoer(10*time.Second, func(count uint64, d time.Duration) {
 		logger.Warnf(
-			"Failed to index %d events in last %s: events were dropped! Look at the event log to view the event and cause.",
+			"Failed to index %d events in last %s: events were dropped! Check the event_data log (configured by logging.event_data.files.path) to view the event and cause.",
 			count, d)
 	})
 	pLogIndexTryDeadLetter := periodic.NewDoer(10*time.Second, func(count uint64, d time.Duration) {
 		logger.Warnf(
-			"Failed to index %d events in last %s: tried dead letter index. Look at the event log to view the event and cause.",
+			"Failed to index %d events in last %s: tried dead letter index. Check the event_data log (configured by logging.event_data.files.path) to view the event and cause.",
 			count, d)
 	})
 
