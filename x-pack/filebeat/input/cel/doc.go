@@ -109,5 +109,42 @@ Cumulative HTTP metrics are collected through a wrapper on the HTTP transport.
 See https://www.elastic.co/guide/en/beats/filebeat/current/http-endpoint.html
 and https://www.elastic.co/docs/reference/fleet/monitor-elastic-agent for details
 on agent monitoring.
+
+# OpenTelemetry Traces
+
+The CEL Input can export OTel traces. This is off by default and can be
+activated and configured using OTel-standard environment variables.
+
+The trace root typically represents a CEL periodic run, with child spans for
+individual program executions, HTTP requests, publishing, and so forth.
+
+Trace and span ID values are included in relevant logging, including in
+regular request tracing logs, so that spans and traces can be correlated.
+
+The values of HTTP headers and query string parameters will be redacted
+if their names contain certain words. Specific names can be configured as
+redacted or unredacted in the input settings documented elsewhere.
+
+Setting OTEL_TRACES_EXPORTER="otlp" will activate export. Alternatively, a
+"console" exporter is available.
+
+Further configuration can be done as in the following example:
+
+	OTEL_EXPORTER_OTLP_TRACES_PROTOCOL="grpc"
+	OTEL_EXPORTER_OTLP_TRACES_ENDPOINT="http://otlp-receiver.example.com:4317"
+	OTEL_EXPORTER_OTLP_TRACES_HEADERS="Authorization=Bearer abc123"
+	OTEL_EXPORTER_OTLP_TRACES_TIMEOUT="5000"
+	OTEL_EXPORTER_OTLP_TRACES_INSECURE="false"
+
+If any of those trace-specific environment variables are not set, the generic
+equivalent (with "_TRACES" removed from the name) will be checked.
+
+Span resource attributes will include any values set in the
+OTEL_RESOURCE_ATTRIBUTES environment variable, as is done for OTel metrics.
+
+A special setting environment variable is available to override other settings
+and disable trace export for a whole input:
+
+	BEATS_OTEL_TRACES_DISABLE="cel"
 */
 package cel

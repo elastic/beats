@@ -16,6 +16,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
+	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -76,6 +77,10 @@ type config struct {
 	// Package contains information about the integration package.
 	// name and version are expected.
 	Package map[string]string `config:"package"`
+
+	// OTel configuration for which headers and request parameters should be
+	// redacted or unredacted in span attributes.
+	OTelTraceConfig *otel.TraceConfig `config:"otel.trace"`
 }
 
 func (c config) GetPackageData(key string) string {

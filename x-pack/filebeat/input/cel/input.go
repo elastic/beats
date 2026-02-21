@@ -30,8 +30,11 @@ import (
 	"go.elastic.co/ecszap"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/time/rate"
@@ -64,6 +67,8 @@ import (
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/mito/lib"
 )
+
+//go:generate ./gen_import_path.sh
 
 const (
 	// inputName is the name of the input processor.
@@ -174,6 +179,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	metrics, reg := newInputMetrics(env.MetricsRegistry, env.Logger)
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
+	otelTracerProvider, err := otel.NewTracerProvider(ctx, getResourceAttributes(env, cfg), i.Name())
+	if err != nil {
+		return err
+	}
+	otelTracer := otelTracerProvider.Tracer(importPath)
 
 	if cfg.Resource.Tracer != nil {
 		id := sanitizeFileName(env.IDWithoutName)
@@ -188,7 +198,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		cfg.Resource.Tracer.Filename = resolved
 	}
 
-	client, trace, otelMetrics, err := newClient(ctx, cfg, log, reg, env)
+	client, trace, otelMetrics, contextInjector, err := newClient(ctx, cfg, log, reg, env, otelTracerProvider)
 	if err != nil {
 		return err
 	}
@@ -282,10 +292,25 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
 	err = periodically(ctx, cfg.Interval, func() error {
-		log.Debug("Starting otel periodic")
-		metricsRecorder.StartPeriodic(ctx)
-		defer metricsRecorder.EndPeriodic(ctx)
-		log.Debug("process periodic request")
+		runSpanExecutionCount := 0
+		runSpanEventCount := 0
+		runCtx, runSpan := otelTracer.Start(ctx, "cel.periodic.run")
+		// set happy path attributes - overwritten in case of negative outcomes
+		runSpan.SetAttributes(attribute.Bool("cel.periodic.max_execution_limited", false))
+		defer func() {
+			runSpan.SetAttributes(
+				attribute.Int("cel.periodic.execution_count", runSpanExecutionCount),
+				attribute.Int("cel.periodic.event_count", runSpanEventCount),
+			)
+			runSpan.End()
+		}()
+
+		runLog := logWithTracingIds(log, runSpan)
+		runLog.Debug("Starting otel periodic")
+
+		metricsRecorder.StartPeriodic(runCtx)
+		defer metricsRecorder.EndPeriodic(runCtx)
+		runLog.Debug("process periodic request")
 		var (
 			budget    = *cfg.MaxExecutions
 			waitUntil time.Time
@@ -302,6 +327,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		}
 		for {
 			if wait := time.Until(waitUntil); wait > 0 {
+				waitCtx, waitSpan := otelTracer.Start(runCtx, "cel.periodic.run.ratelimitwait")
 				// We have a special-case wait for when we have a zero limit.
 				// x/time/rate allow a burst through even when the limit is zero
 				// so in order to ensure that we don't try until we are out of
@@ -309,31 +335,43 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				// the retry after for a 429 and rate limit headers if we have
 				// a zero rate quota. See handleResponse below.
 				select {
-				case <-ctx.Done():
-					return ctx.Err()
+				case <-waitCtx.Done():
+					runSpan.SetStatus(codes.Unset, waitCtx.Err().Error())
+					return waitCtx.Err()
 				case <-time.After(wait):
 				}
-			} else if err = ctx.Err(); err != nil {
+				waitSpan.End()
+			} else if err = runCtx.Err(); err != nil {
 				// Otherwise exit if we have been cancelled.
+				runSpan.SetStatus(codes.Unset, runCtx.Err().Error())
 				return err
 			}
 
+			runSpanExecutionCount++
+			execCtx, execSpan := otelTracer.Start(runCtx, "cel.program.execution")
+			execSpan.SetAttributes(
+				attribute.Int("cel.program.execution_number", runSpanExecutionCount),
+				attribute.Int("cel.program.event_count", 0), // to be overridden if there are events
+			)
+			execLog := logWithTracingIds(log, execSpan)
+
 			// Process a set of event requests.
 			if trace != nil {
-				log.Debugw("previous transaction", "transaction.id", trace.TxID())
+				execLog.Debugw("previous transaction", "transaction.id", trace.TxID())
 			}
-			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
-			metricsRecorder.AddProgramExecution(ctx)
+			execLog.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
+			metricsRecorder.AddProgramExecution(execCtx)
 			start := i.now().In(time.UTC)
 
-			state, err = evalWith(ctx, prg, ast, state, start, wantDump, budget-1)
-			metricsRecorder.AddCELDuration(ctx, time.Since(start))
-			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
+			state, err = evalWith(execCtx, contextInjector, prg, ast, state, start, wantDump, budget-1)
+			metricsRecorder.AddCELDuration(execCtx, time.Since(start))
+			execLog.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
 				var dump dumpError
 				switch {
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
-					metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+					errorSpans(err, runSpan, end{execSpan})
 					return err
 				case errors.As(err, &dump):
 					path := strings.ReplaceAll(cfg.FailureDump.Filename, "*", sanitizeFileName(env.IDWithoutName))
@@ -342,18 +380,18 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					ext := filepath.Ext(base)
 					prefix := strings.TrimSuffix(base, ext)
 					path = filepath.Join(dir, prefix+"-"+i.now().In(time.UTC).Format("2006-01-02T15-04-05.000")+ext)
-					log.Debugw("writing failure dump file", "path", path)
+					execLog.Debugw("writing failure dump file", "path", path)
 					err := dump.writeToFile(path)
 					if err != nil {
-						log.Errorw("failed to write failure dump", "path", path, "error", err)
+						execLog.Errorw("failed to write failure dump", "path", path, "error", err)
 					}
 				}
-				log.Errorw("failed evaluation", "error", err)
+				execLog.Errorw("failed evaluation", "error", err)
 				health.UpdateStatus(status.Degraded, "failed evaluation: "+err.Error())
 			}
 			isDegraded = err != nil
 			if trace != nil {
-				log.Debugw("final transaction", "transaction.id", trace.TxID())
+				execLog.Debugw("final transaction", "transaction.id", trace.TxID())
 			}
 
 			// On exit, state is expected to be in the shape:
@@ -440,56 +478,60 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// the lost events and potentially re-requesting e3.
 
 			var ok bool
-			ok, waitUntil, err = handleResponse(log, state, limiter)
+			ok, waitUntil, err = handleResponse(execLog, state, limiter)
 			if err != nil {
-				metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+				errorSpans(err, end{execSpan}, runSpan)
 				return err
 			}
 			if !ok {
-				metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 				continue
 			}
 
 			_, ok = state["url"]
 			if !ok && goodURL != "" {
 				state["url"] = goodURL
-				log.Debugw("adding missing url from last valid value: state did not contain a url", "last_valid_url", goodURL)
+				execLog.Debugw("adding missing url from last valid value: state did not contain a url", "last_valid_url", goodURL)
 			}
 
 			e, ok := state["events"]
 			if !ok {
-				metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+				errorSpans(err, end{execSpan}, runSpan)
 				return errors.New("unexpected missing events array from evaluation")
 			}
 			var events []interface{}
 			switch e := e.(type) {
 			case []interface{}:
 				if len(e) == 0 {
-					metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
-					metricsRecorder.AddProgramSuccessExecution(ctx)
+					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+					metricsRecorder.AddProgramSuccessExecution(execCtx)
+					okSpans(end{execSpan})
 					return nil
 				}
 				events = e
 			case map[string]interface{}:
 				if e == nil {
-					metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
-					metricsRecorder.AddProgramSuccessExecution(ctx)
+					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+					metricsRecorder.AddProgramSuccessExecution(execCtx)
+					okSpans(end{execSpan})
 					return nil
 				}
 				if _, ok := e["error"]; ok {
 					// If we have an error, log the complete object on the basis
 					// that it is ECS-conformant.
-					if log.Core().Enabled(zapcore.ErrorLevel) {
+					if execLog.Core().Enabled(zapcore.ErrorLevel) {
 						kv := make([]any, 0, 2*len(e))
 						for k := range maps.Keys(e) {
 							kv = append(kv, k, e[k])
 						}
-						log.Errorw("single event object returned by evaluation", kv...)
+						execLog.Errorw("single event object returned by evaluation", kv...)
 					}
 				} else {
 					// Otherwise, be consistent with the existing documented
 					// behaviour and log the entire object as the error.
-					log.Errorw("single event object returned by evaluation", "error", e)
+					execLog.Errorw("single event object returned by evaluation", "error", e)
 				}
 				if err, ok := e["error"]; ok {
 					health.UpdateStatus(status.Degraded, fmt.Sprintf("single event error object returned by evaluation: %s", mapstr.M{"error": err}))
@@ -501,13 +543,17 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				// Make sure the cursor is not updated.
 				delete(state, "cursor")
 			default:
-				metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
-				return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+				err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+				errorSpans(err, end{execSpan}, runSpan)
+				return err
 			}
 
 			// We have a non-empty batch of events to process.
-			metricsRecorder.AddReceivedBatch(ctx, 1)
-			metricsRecorder.AddReceivedEvents(ctx, uint(len(events)))
+			metricsRecorder.AddReceivedBatch(execCtx, 1)
+			metricsRecorder.AddReceivedEvents(execCtx, uint(len(events)))
+			runSpanEventCount += len(events)
+			execSpan.SetAttributes(attribute.Int("cel.program.event_count", len(events)))
 			// Drop events from state. If we fail during the publication,
 			// we will re-request these events.
 			delete(state, "events")
@@ -521,7 +567,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				cursors, ok = c.([]interface{})
 				if ok {
 					if len(cursors) != len(events) {
-						log.Errorw("unexpected cursor list length", "cursors", len(cursors), "events", len(events))
+						execLog.Errorw("unexpected cursor list length", "cursors", len(cursors), "events", len(events))
 						health.UpdateStatus(status.Degraded, "unexpected cursor list length")
 						isDegraded = true
 						// But try to continue.
@@ -540,11 +586,18 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			pubStart := time.Now()
 			var hadPublicationError bool
+
+			pubCtx, pubSpan := otelTracer.Start(execCtx, "cel.program.publish")
+			pubSpanEventCount := 0
+			pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount)) // to be overridden if there are events
+			pubLog := logWithTracingIds(log, pubSpan)
 		loop:
 			for i, e := range events {
 				event, ok := e.(map[string]interface{})
 				if !ok {
-					return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+					err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+					errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
+					return err
 				}
 				var pubCursor interface{}
 				if cursors != nil {
@@ -555,7 +608,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 							goodCursor = cursor
 							cursor, ok = cursors[0].(map[string]interface{})
 							if !ok {
-								metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+								err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
+								metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
+								errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
 								return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
 							}
 							pubCursor = cursor
@@ -564,8 +619,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 						goodCursor = cursor
 						cursor, ok = cursors[i].(map[string]interface{})
 						if !ok {
-							metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
-							return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
+							err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
+							metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
+							errorSpans(err, end{pubSpan}, runSpan)
+							return err
 						}
 						pubCursor = cursor
 					}
@@ -574,17 +631,17 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				// cursor.Publisher interface does not document the behaviour
 				// related to context cancellation and the context is not
 				// explicitly passed in, so favour this explicit clarity.
-				switch err := ctx.Err(); {
+				switch err := pubCtx.Err(); {
 				case err == nil:
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
-					log.Infow("context cancelled with unpublished events", "unpublished", len(events)-i)
+					pubLog.Infow("context cancelled with unpublished events", "unpublished", len(events)-i)
 					// Don't update status, since we are about to pass
 					// through the Running state and then fall through
 					// to the input exit with a change to Stopped.
 					break loop
 				default:
 					// This should never happen.
-					log.Warnw("failed with unpublished events", "error", err, "unpublished", len(events)-i)
+					pubLog.Warnw("failed with unpublished events", "error", err, "unpublished", len(events)-i)
 					health.UpdateStatus(status.Degraded, "error publishing events: "+err.Error())
 					isDegraded = true
 					break loop
@@ -595,8 +652,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				}, pubCursor)
 				if err != nil {
 					hadPublicationError = true
-					log.Errorw("error publishing event", "error", err)
+					pubLog.Errorw("error publishing event", "error", err)
 					health.UpdateStatus(status.Degraded, "error publishing event: "+err.Error())
+					errorSpans(err, pubSpan)
 					isDegraded = true
 					cursors = nil // We are lost, so retry with this event's cursor,
 					continue      // but continue with the events that we have without
@@ -605,13 +663,16 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					// correctly published cursor.
 				}
 				if i == 0 {
-					metricsRecorder.AddPublishedBatch(ctx, 1)
+					metricsRecorder.AddPublishedBatch(pubCtx, 1)
 				}
-				metricsRecorder.AddPublishedEvents(ctx, 1)
+				metricsRecorder.AddPublishedEvents(pubCtx, 1)
+				pubSpanEventCount++
+				pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount))
 
-				err = ctx.Err()
+				err = pubCtx.Err()
 				if err != nil {
-					metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+					metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
+					errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
 					return err
 				}
 			}
@@ -620,31 +681,43 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				health.UpdateStatus(status.Running, "")
 			}
 
-			metricsRecorder.AddPublishDuration(ctx, time.Since(pubStart))
+			metricsRecorder.AddPublishDuration(pubCtx, time.Since(pubStart))
 			// Advance the cursor to the final state if there was no error during
 			// publications. This is needed to transition to the next set of events.
 			if !hadPublicationError && !isDegraded {
 				goodCursor = cursor
-				metricsRecorder.AddProgramSuccessExecution(ctx)
+				metricsRecorder.AddProgramSuccessExecution(pubCtx)
+				okSpans(pubSpan)
 			}
+			pubSpan.End()
 
 			// Replace the last known good cursor.
 			state["cursor"] = goodCursor
-			metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+			metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 			if more, _ := state["want_more"].(bool); !more {
+				execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
+				okSpans(end{execSpan}, runSpan)
 				return nil
 			}
+			execSpan.SetAttributes(attribute.Bool("cel.program.want_more", true))
 
 			// Check we have a remaining execution budget.
 			budget--
 			if budget <= 0 {
-				log.Warnw("exceeding maximum number of CEL executions: will continue at next periodic evaluation",
+				msg := "reached maximum number of CEL executions"
+				execLog.Warnw(msg+": will continue at next periodic evaluation",
 					"limit", *cfg.MaxExecutions,
 					"next_eval_time", start.Add(cfg.Interval),
 				)
-				health.UpdateStatus(status.Degraded, "exceeding maximum number of CEL executions")
+				health.UpdateStatus(status.Degraded, msg)
+				execSpan.SetStatus(codes.Unset, msg)
+				execSpan.End()
+				runSpan.SetAttributes(attribute.Bool("cel.periodic.max_execution_limited", true))
+				runSpan.SetStatus(codes.Unset, msg)
 				return nil
 			}
+
+			okSpans(end{execSpan})
 		}
 	})
 	switch {
@@ -653,6 +726,38 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		err = nil
 	}
 	return err
+}
+
+func logWithTracingIds(log *logp.Logger, span trace.Span) *logp.Logger {
+	ctx := span.SpanContext()
+	return log.With(
+		"trace.id", ctx.TraceID().String(),
+		"span.id", ctx.SpanID().String(),
+	)
+}
+
+// end is a tag type indicating spans in errorSpans and okSpans should be ended.
+type end struct {
+	trace.Span
+}
+
+func errorSpans(err error, spans ...trace.Span) {
+	for _, sp := range spans {
+		sp.RecordError(err)
+		sp.SetStatus(codes.Error, err.Error())
+		if e, ok := sp.(end); ok {
+			e.End()
+		}
+	}
+}
+
+func okSpans(spans ...trace.Span) {
+	for _, sp := range spans {
+		sp.SetStatus(codes.Ok, "")
+		if e, ok := sp.(end); ok {
+			e.End()
+		}
+	}
 }
 
 func periodically(ctx context.Context, each time.Duration, fn func() error) error {
@@ -876,10 +981,10 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 // https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
-func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry, env v2.Context) (*http.Client, *httplog.LoggingRoundTripper, *otelCELMetrics, error) {
+func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry, env v2.Context, tp *sdktrace.TracerProvider) (*http.Client, *httplog.LoggingRoundTripper, *otelCELMetrics, *otel.ContextInjector, error) {
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings(), log)...)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	if cfg.Auth.Digest.isEnabled() {
@@ -899,13 +1004,13 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		tr, err := aws.InitializeSignerTransport(*cfg.Auth.AWS, log, c.Transport)
 		if err != nil {
 			log.Errorw("failed to initialize aws config failed for signer", "error", err)
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 		c.Transport = tr
 	} else if cfg.Auth.File.isEnabled() {
 		tr, err := newFileAuthTransport(cfg.Auth.File, c.Transport)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 		c.Transport = tr
 	}
@@ -969,17 +1074,25 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}
 	}
 
+	// inside the otel RoundTripper
+	c.Transport = otel.NewExtraSpanAttribsRoundTripper(c.Transport, cfg.OTelTraceConfig)
+
 	if reg != nil {
 		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg, log)
 	}
 
-	otelMetrics, otelTransport, err := createOTELMetrics(ctx, cfg, log, env, c.Transport)
+	otelhttpOptions := []otelhttp.Option{otelhttp.WithTracerProvider(tp)}
+	otelMetrics, otelTransport, err := createOTELMetrics(ctx, cfg, log, env, c.Transport, otelhttpOptions)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	c.Transport = otelTransport
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
+
+	// outside the otel RoundTripper
+	contextInjector := otel.NewContextInjector(c.Transport, ctx)
+	c.Transport = contextInjector
 
 	if cfg.Resource.Retry.getMaxAttempts() > 1 {
 		maxAttempts := cfg.Resource.Retry.getMaxAttempts()
@@ -998,7 +1111,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	if cfg.Auth.OAuth2.isEnabled() {
 		c, err = cfg.Auth.OAuth2.client(ctx, c)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 	}
 
@@ -1007,10 +1120,10 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		Transport: c.Transport,
 	}
 
-	return c, trace, otelMetrics, nil
+	return c, trace, otelMetrics, contextInjector, nil
 }
 
-func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2.Context, tripper http.RoundTripper) (*otelCELMetrics, *otelhttp.Transport, error) {
+func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2.Context, tripper http.RoundTripper, otelhttpOptions []otelhttp.Option) (*otelCELMetrics, *otelhttp.Transport, error) {
 	resource := resource.NewWithAttributes(
 		semconv.SchemaURL, getResourceAttributes(env, cfg)...,
 	)
@@ -1021,7 +1134,8 @@ func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2
 		log.Errorw("failed to get exporter", "error", err)
 	}
 	log.Infof("created OTEL cel input exporter %s for input %s", exporterType, env.IDWithoutName)
-	return newOTELCELMetrics(log, *resource, tripper, exporter)
+
+	return newOTELCELMetrics(log, *resource, tripper, exporter, otelhttpOptions)
 }
 
 func getResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
@@ -1320,7 +1434,8 @@ func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, an
 	}
 }
 
-func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time, details bool, budget int) (map[string]interface{}, error) {
+func evalWith(ctx context.Context, contextInjector *otel.ContextInjector, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time, details bool, budget int) (map[string]interface{}, error) {
+	contextInjector.SetContext(ctx)
 	out, det, err := prg.ContextEval(ctx, map[string]interface{}{
 		// Replace global program "now" with current time. This is necessary
 		// as the lib.Time now global is static at program instantiation time
