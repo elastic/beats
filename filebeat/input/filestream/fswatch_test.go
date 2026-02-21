@@ -988,6 +988,33 @@ scanner:
 		}
 	})
 
+	t.Run("silently ignores empty files", func(t *testing.T) {
+		cfgStr := `
+scanner:
+  fingerprint:
+    enabled: true
+    offset: 0
+    length: 1024
+`
+		empty1Filename := filepath.Join(dir, "empty-1.txt")
+		empty2Filename := filepath.Join(dir, "empty-2.txt")
+		require.NoError(t, os.WriteFile(empty1Filename, nil, 0777))
+		require.NoError(t, os.WriteFile(empty2Filename, nil, 0777))
+
+		logger, buffer := logp.NewInMemoryLocal("test-logger", zapcore.EncoderConfig{})
+		paths := []string{filepath.Join(dir, "empty-*.txt")}
+		s := createScannerWithConfig(t, logger, paths, cfgStr, CompressionNone)
+		require.Empty(t, s.GetFiles())
+		require.Empty(t, s.GetFiles())
+		require.Empty(t, s.GetFiles())
+
+		logs := parseLogs(buffer.String())
+		for _, log := range logs {
+			assert.False(t, strings.HasPrefix(log.message, "ingestion from some files will be delayed"))
+			assert.False(t, strings.HasPrefix(log.message, "cannot start ingesting from file"))
+		}
+	})
+
 	t.Run("returns error when creating scanner with a fingerprint too small", func(t *testing.T) {
 		cfg := fileWatcherConfig{
 			Scanner: fileScannerConfig{
