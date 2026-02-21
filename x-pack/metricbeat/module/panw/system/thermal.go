@@ -63,7 +63,7 @@ func formatThermalEvents(m *MetricSet, response *ThermalResponse) []mb.Event {
 					"thermal.minimum_temp":    entry.MinimumTemp,
 					"thermal.maximum_temp":    entry.MaximumTemp,
 				},
-				RootFields: panw.MakeRootFields(m.config.HostIp),
+				RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 			}
 
 			events = append(events, event)

@@ -28,11 +28,12 @@ func StringToBool(s string) (bool, error) {
 	return false, fmt.Errorf("invalid value: %s", s)
 }
 
-func MakeRootFields(HostIp string) mapstr.M {
+func MakeRootFields(hostIP string, hostname string) mapstr.M {
 	return mapstr.M{
-		"observer.ip":     HostIp,
-		"host.ip":         HostIp,
-		"observer.vendor": "Palo Alto",
-		"observer.type":   "firewall",
+		"observer.ip":       hostIP,
+		"observer.hostname": hostname,
+		"host.ip":           hostIP,
+		"observer.vendor":   "Palo Alto",
+		"observer.type":     "firewall",
 	}
 }
