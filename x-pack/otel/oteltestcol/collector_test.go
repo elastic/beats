@@ -21,8 +21,6 @@ func TestNew(t *testing.T) {
           message: "test message"
           count: 1
     processors: ~
-    output:
-      otelconsumer:
     logging:
       level: debug
     queue.mem.flush.timeout: 0s
