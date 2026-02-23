@@ -9,8 +9,6 @@ package jumplists
 import (
 	"path/filepath"
 	"strings"
-
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 // lookupApplicationID looks up the application name for a given application id.
@@ -37,7 +35,7 @@ func newApplicationID(id string) *ApplicationID {
 
 // getAppIdFromFileName extracts the application id from the file name.
 // It is used to create a new ApplicationId object from the file name.
-func getAppIdFromFileName(filePath string, log *logger.Logger) *ApplicationID {
+func getAppIdFromFileName(filePath string) *ApplicationID {
 	fileName := filepath.Base(filePath)
 	dotIndex := strings.Index(fileName, ".")
 	if dotIndex != -1 {
