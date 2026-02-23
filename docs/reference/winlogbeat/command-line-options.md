@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/command-line-options.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Winlogbeat command reference [command-line-options]

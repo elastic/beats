@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-httpjson.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # HTTP JSON input [filebeat-input-httpjson]

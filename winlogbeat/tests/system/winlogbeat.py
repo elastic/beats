@@ -116,9 +116,11 @@ class WriteReadTest(BaseTest):
         proc.check_kill_and_wait()
         return self.read_output()
 
-    def read_registry(self, requireBookmark=False):
-        f = open(os.path.join(self.working_dir, "data", ".winlogbeat.yml"), "r")
-        data = yaml.load(f, Loader=yaml.FullLoader)
+    def read_registry(self, requireBookmark=False, registry_path=None):
+        if registry_path is None:
+            registry_path = os.path.join(self.working_dir, "data", ".winlogbeat.yml")
+        with open(registry_path, "r") as f:
+            data = yaml.load(f, Loader=yaml.FullLoader)
         self.assertIn("update_time", data)
         self.assertIn("event_logs", data)
 
