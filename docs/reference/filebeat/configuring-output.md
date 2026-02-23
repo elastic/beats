@@ -23,9 +23,8 @@ The following topics describe how to configure each supported output. If you’v
 * [Console](/reference/filebeat/console-output.md)
 * [Discard](/reference/filebeat/discard-output.md)
 
-
-
-
+::::{include} /reference/_snippets/serverless-output-tip.md
+::::
 
 
 

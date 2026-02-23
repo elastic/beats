@@ -178,7 +178,7 @@ func (c *requestConfig) Validate() error {
 		}
 	}
 
-	if c.Tracer != nil {
+	if c.Tracer.enabled() {
 		if c.Tracer.Filename == "" {
 			return errors.New("request tracer must have a filename if used")
 		}

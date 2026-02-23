@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/otel/otelctx"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestPublish(t *testing.T) {
@@ -69,6 +70,40 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 		assert.Equal(t, len(batch.Events()), countLogs, "all events should be consumed")
+	})
+
+	t.Run("batches with errors report correct active event count", func(t *testing.T) {
+		blockChan := make(chan struct{})
+		defer close(blockChan)
+		publishDone := make(chan struct{})
+		batch := outest.NewBatch(event1, event2, event3)
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			// Read from the channel twice: once to synchronize with the testing code so
+			// we know the Publish call is waiting on the consume callback, then once
+			// more to unblock it and allow Publish to resume.
+			<-blockChan
+			<-blockChan
+			return fmt.Errorf("Some kind of error")
+		})
+		reg := monitoring.NewRegistry()
+		otelConsumer.observer = outputs.NewStats(reg, logptest.NewTestingLogger(t, "testing"))
+		assert.EqualValues(t, 0, checkEventsActive(reg), "initial total events should be zero")
+		// Run Publish asynchronously so we can check the metrics while it is still in progress
+		go func() {
+			_ = otelConsumer.Publish(ctx, batch)
+			// Signal that Publish has completed
+			publishDone <- struct{}{}
+		}()
+
+		// Wait until Publish has called consume
+		blockChan <- struct{}{}
+		assert.EqualValues(t, 3, checkEventsActive(reg), "total event count should be 3 while Publish is waiting on downstream consumer")
+
+		// Allow Publish to resume, and wait for it to finish
+		blockChan <- struct{}{}
+		<-publishDone
+
+		assert.EqualValues(t, 0, checkEventsActive(reg), "final total events should be zero")
 	})
 
 	t.Run("data_stream fields are set on logrecord.Attribute", func(t *testing.T) {
@@ -310,4 +345,9 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
+}
+
+func checkEventsActive(reg *monitoring.Registry) int64 {
+	outputSnapshot := monitoring.CollectFlatSnapshot(reg, monitoring.Full, true)
+	return outputSnapshot.Ints["events.active"]
 }

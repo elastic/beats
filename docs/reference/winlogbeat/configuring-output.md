@@ -23,9 +23,8 @@ The following topics describe how to configure each supported output. If you’v
 * [Console](/reference/winlogbeat/console-output.md)
 * [Discard](/reference/winlogbeat/discard-output.md)
 
-
-
-
+::::{include} /reference/_snippets/serverless-output-tip.md
+::::
 
 
 
