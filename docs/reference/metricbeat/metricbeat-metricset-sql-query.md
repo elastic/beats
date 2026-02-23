@@ -14,7 +14,7 @@ The sql `query` metricset collects rows returned by a query.
 
 Field names (columns) are returned as lowercase strings. Values are returned as numeric or string.
 
-## Cursor-based Incremental Data Fetching
+## Cursor-based incremental data fetching
 
 The cursor feature enables incremental data fetching by tracking the last fetched row value
 and using it to retrieve only new data on subsequent collection cycles. This is particularly
@@ -43,9 +43,11 @@ To enable cursor-based fetching, add a `cursor` configuration block to your metr
     default: "0"
 ```
 
-Note: `raw_data.enabled: true` in the examples above is optional and controls the event output format, not the cursor. It is shown here because raw mode is commonly used with cursor-based fetching.
+:::{note}
+`raw_data.enabled: true` in the previous examples is optional and controls the event output format, not the cursor. It is shown here because raw mode is commonly used with cursor-based fetching.
+:::
 
-### Cursor Configuration Options
+### Cursor configuration options
 
 | Option | Required | Description |
 |--------|----------|-------------|
@@ -59,7 +61,7 @@ Note: `raw_data.enabled: true` in the examples above is optional and controls th
 For best performance, ensure the `cursor.column` has a database index. Without an index, the `WHERE column > :cursor ORDER BY column` clause will trigger a full table scan on every collection cycle, which can be slow on large tables.
 ::::
 
-### Supported Cursor Types
+### Supported cursor types
 
 | Type | Description | Default Format Example |
 |------|-------------|----------------------|
@@ -69,7 +71,7 @@ For best performance, ensure the `cursor.column` has a database index. Without a
 | `float` | Floating-point values (FLOAT, DOUBLE, REAL). IEEE 754 precision limits apply. | `"0.0"` |
 | `decimal` | Exact decimal values (DECIMAL, NUMERIC). Arbitrary precision, no data loss. | `"0.00"` |
 
-### Scan Direction
+### Scan direction
 
 By default, the cursor tracks the maximum value from each batch (ascending scan). For descending scans, set `cursor.direction: desc`:
 
@@ -78,7 +80,7 @@ By default, the cursor tracks the maximum value from each batch (ascending scan)
 | `asc` (default) | `>` | `ASC` | Maximum value |
 | `desc` | `<` | `DESC` | Minimum value |
 
-### Query Requirements
+### Query requirements
 
 When cursor is enabled, your SQL query must:
 
@@ -89,7 +91,7 @@ When cursor is enabled, your SQL query must:
 
 Cursor is also not compatible with `fetch_from_all_databases`. Use a separate module block for each database if you need both features.
 
-### Example Configurations
+### Example configurations
 
 #### Integer cursor (auto-increment ID)
 
