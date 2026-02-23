@@ -18,13 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Setup Git
         uses: elastic/oblt-actions/git/setup@v1
 
       - name: Install Updatecli in the runner
-        uses: updatecli/updatecli-action@719e3592d124cbf826da704cbe557e1221dd4bba
+        uses: updatecli/updatecli-action@4fd2c16d992120bd5355264a03ad0cddec013e1b
 
       - name: Run Updatecli
         env:
