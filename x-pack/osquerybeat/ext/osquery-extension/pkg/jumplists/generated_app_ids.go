@@ -9,7 +9,8 @@
 package jumplists
 
 // knownAppIDs is a lookup table for known windows AppIDs.
-// Source: https://raw.githubusercontent.com/EricZimmerman/JumpList/refs/heads/master/JumpList/Resources/AppIDs.txt
+// Source Repo:         https://github.com/EricZimmerman/JumpList/
+// Source Repo License: MIT License (https://github.com/EricZimmerman/JumpList/blob/master/license)
 var knownAppIDs = map[string]string{
 	"0006f647f9488d7a": "AIM 7.5.11.9 (custom AppID + JL support)",
 	"00098b0ef1c84088": "fulDC 6.78",
