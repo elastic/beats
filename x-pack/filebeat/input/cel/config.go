@@ -293,7 +293,7 @@ func (u *urlConfig) Unpack(in string) error {
 }
 
 func (c *ResourceConfig) Validate() error {
-	if c.Tracer == nil {
+	if !c.Tracer.enabled() {
 		return nil
 	}
 	if c.Tracer.Filename == "" {

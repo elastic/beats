@@ -1,0 +1,44 @@
+type: table
+name: elastic_host_groups
+description: Host system group information from /etc/group (e.g. when running in a container with hostfs mounted)
+platforms:
+  - linux
+  - darwin
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hostgroups
+
+columns:
+  - name: gid
+    type: BIGINT
+    description: Unsigned int64 group ID
+  - name: gid_signed
+    type: BIGINT
+    description: Signed int64 version of gid
+  - name: groupname
+    type: TEXT
+    description: Canonical local group name
+
+documentation:
+  description: |
+    Query group information from the host system's /etc/group file when running in a container.
+    Reads from the path given by hostfs (default /hostfs); set ELASTIC_OSQUERY_HOSTFS to override.
+    Use for container security auditing, host inventory, and compliance checks.
+  examples:
+    - title: Get all host groups
+      query: |
+        SELECT * FROM elastic_host_groups;
+    - title: Find group by name
+      query: |
+        SELECT * FROM elastic_host_groups WHERE groupname = 'docker';
+    - title: Find group by GID
+      query: |
+        SELECT * FROM elastic_host_groups WHERE gid = 0;
+    - title: List system groups (GID < 1000)
+      query: |
+        SELECT groupname, gid FROM elastic_host_groups WHERE gid < 1000 ORDER BY gid;
+  notes:
+    - "Linux and macOS. Requires host filesystem mounted (e.g. -v /:/hostfs:ro)."
+    - "Use ELASTIC_OSQUERY_HOSTFS to override the hostfs root (default /hostfs)."
+  related_tables:
+    - host_users
+    - groups

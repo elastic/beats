@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-controllermanager.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py

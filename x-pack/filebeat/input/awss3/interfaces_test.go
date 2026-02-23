@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestAWSS3API_clientFor(t *testing.T) {
@@ -15,7 +17,7 @@ func TestAWSS3API_clientFor(t *testing.T) {
 	// custom notifications), then the default pre-made S3 client should be used.
 	t.Run("empty_region_uses_pre_made_client", func(t *testing.T) {
 		want := s3.New(s3.Options{Region: "us-east-1"})
-		api := newAWSs3API(want)
+		api := newAWSs3API(want, logp.NewNopLogger())
 		got := api.clientFor("")
 
 		if want != got {

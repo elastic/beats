@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/now.html
 applies_to:
   stack: ga 9.1.0
+  serverless: ga
 ---
 
 # Now [now]

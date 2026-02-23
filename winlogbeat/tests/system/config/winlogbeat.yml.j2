@@ -1,5 +1,9 @@
 ############################# Winlogbeat ######################################
 
+{%- if registry_file %}
+winlogbeat.registry_file: "{{ registry_file }}"
+{% endif %}
+
 {%- if event_logs %}
 winlogbeat.event_logs:
   {% for log in event_logs -%}
@@ -99,3 +103,8 @@ output.file:
   {% endif %}
   rotate_every_kb: 1000
 
+#================================ Paths =====================================
+{% if path_data %}
+path:
+  data: {{path_data}}
+{% endif %}

@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/ratelimit"
@@ -39,8 +40,9 @@ type s3PollerInput struct {
 	s3              s3API
 	metrics         *inputMetrics
 	s3ObjectHandler s3ObjectHandlerFactory
-	states          *states
+	registry        stateRegistry
 	filterProvider  *filterProvider
+	strategy        pollingStrategy
 
 	// health status reporting
 	status status.StatusReporter
@@ -79,13 +81,13 @@ func (in *s3PollerInput) Run(
 	var err error
 
 	// Load the persistent S3 polling state.
-	in.states, err = newStates(in.log, in.store, in.config.BucketListPrefix)
+	in.registry, err = newStateRegistry(in.log, in.store, in.config.BucketListPrefix, in.config.LexicographicalOrdering, in.config.LexicographicalLookbackKeys)
 	if err != nil {
 		err = fmt.Errorf("can not start persistent store: %w", err)
 		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failure: %s", err.Error()))
 		return err
 	}
-	defer in.states.Close()
+	defer in.registry.Close()
 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 	in.status.UpdateStatus(status.Configuring, "Configuring input")
@@ -107,6 +109,8 @@ func (in *s3PollerInput) Run(
 		in.log,
 	)
 
+	in.strategy = newPollingStrategy(in.config.LexicographicalOrdering, in.log)
+
 	in.run(ctx)
 	in.status.UpdateStatus(status.Stopped, "Input execution ended")
 	return nil
@@ -117,7 +121,14 @@ func (in *s3PollerInput) run(ctx context.Context) {
 	// iteration.
 	in.status.UpdateStatus(status.Running, "Input is running")
 	for ctx.Err() == nil {
+		runStartTime := time.Now()
+
 		in.runPoll(ctx)
+
+		runElapsedTime := time.Since(runStartTime)
+		in.metrics.s3PollingRunTime.Update(runElapsedTime.Nanoseconds())
+		in.metrics.s3PollingRunTimeTotal.Add(uint64(runElapsedTime.Nanoseconds())) //nolint:gosec // runElapsedTime is non-negative from time.Since
+
 		_ = timed.Wait(ctx, in.config.BucketListInterval)
 	}
 }
@@ -136,8 +147,10 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 	}
 
 	// Start reading data and wait for its processing to be done
-	ids, ok := in.readerLoop(ctx, workChan)
+	ids, numObjectsListed, ok := in.readerLoop(ctx, workChan)
 	workerWg.Wait()
+
+	in.metrics.s3ObjectsListedPerRun.Update(int64(numObjectsListed))
 
 	if !ok {
 		in.log.Warn("skipping state registry cleanup as object reading ended with a non-ok return")
@@ -145,7 +158,7 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 	}
 
 	// Perform state cleanup operation
-	err := in.states.CleanUp(ids)
+	err := in.registry.CleanUp(ids)
 	if err != nil {
 		in.log.Errorf("failed to cleanup states: %v", err.Error())
 		in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Input state cleanup failure: %s", err.Error()))
@@ -167,11 +180,21 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 	rateLimitWaiter := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 	for _state := range workChan {
 		state := _state
+
+		// Only used in lexicographical mode; no-op in normal mode.
+		if err := in.registry.MarkObjectInFlight(state.Key); err != nil {
+			in.log.Errorf("failed to mark object in-flight: %v", err)
+		}
+
 		event := in.s3EventForState(state)
 
 		objHandler := in.s3ObjectHandler.Create(ctx, event)
 		if objHandler == nil {
 			in.log.Debugw("empty s3 processor (no matching reader configs).", "state", state)
+			// Only used in lexicographical mode; no-op in normal mode.
+			if err := in.registry.UnmarkObjectInFlight(state.Key); err != nil {
+				in.log.Errorf("failed to unmark object in-flight: %v", err)
+			}
 			continue
 		}
 
@@ -189,6 +212,9 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			in.status.UpdateStatus(status.Degraded,
 				fmt.Sprintf("S3 download failure for object key '%s' in bucket '%s': %s",
 					state.Key, state.Bucket, err.Error()))
+			if err := in.registry.UnmarkObjectInFlight(state.Key); err != nil {
+				in.log.Errorf("failed to unmark object in-flight: %v", err)
+			}
 			rateLimitWaiter.Wait()
 			continue
 		}
@@ -211,7 +237,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 
 		// Add the cleanup handling to the acks helper
 		acks.Add(publishCount, func() {
-			err := in.states.AddState(state)
+			err := in.registry.AddState(state)
 			if err != nil {
 				in.log.Errorf("saving completed object state: %v", err.Error())
 				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failure checkpointing (saving completed object state): %s", err.Error()))
@@ -228,7 +254,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 // readerLoop performs the S3 object listing and emit state to work listeners if object needs to be processed.
 // Returns all tracked state IDs correlates to all tracked S3 objects iff listing is successful.
 // These IDs are intended to be used for state clean-up.
-func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) (knownStateIDSlice []string, ok bool) {
+func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) (knownStateIDSlice []string, numObjectsListed int, ok bool) {
 	defer close(workChan)
 	bucketName := getBucketNameFromARN(in.config.getBucketARN())
 
@@ -236,7 +262,10 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 
 	errorBackoff := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 	circuitBreaker := 0
-	paginator := in.s3.ListObjectsPaginator(bucketName, in.config.BucketListPrefix)
+
+	startAfterKey := in.registry.GetStartAfterKey()
+
+	paginator := in.s3.ListObjectsPaginator(bucketName, in.config.BucketListPrefix, startAfterKey)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
 
@@ -250,7 +279,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 				if circuitBreaker >= readerLoopMaxCircuitBreaker {
 					in.log.Warnw(fmt.Sprintf("%d consecutive error when paginating listing, breaking the circuit.", circuitBreaker), "error", err)
 					in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Too many consecutive errors (%d) in S3 pagination. Error: %s", circuitBreaker, err.Error()))
-					return nil, false
+					return nil, numObjectsListed, false
 				}
 			}
 			// add a backoff delay and try again
@@ -262,18 +291,23 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 		errorBackoff.Reset()
 
 		totListedObjects := len(page.Contents)
+		numObjectsListed += totListedObjects
 
 		// Metrics
 		in.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Contents {
 			state := newState(bucketName, *object.Key, *object.ETag, *object.LastModified)
-			if !isStateValid(in.log, state) {
+
+			if in.strategy.ShouldSkipObject(state, isStateValid) {
 				continue
 			}
 
-			// add to known states only if valid for processing
-			knownStateIDSlice = append(knownStateIDSlice, state.ID())
-			if in.states.IsProcessed(state) {
+			id := in.strategy.GetStateID(state)
+
+			// Add to known states for cleanup tracking
+			knownStateIDSlice = append(knownStateIDSlice, id)
+
+			if in.registry.IsProcessed(id) {
 				in.log.Debugw("skipping state processing as already processed.", "state", state)
 				continue
 			}
@@ -284,7 +318,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 		}
 	}
 
-	return knownStateIDSlice, true
+	return knownStateIDSlice, numObjectsListed, true
 }
 
 func (in *s3PollerInput) s3EventForState(state state) s3EventV2 {

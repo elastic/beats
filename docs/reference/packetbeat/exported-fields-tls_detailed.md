@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-tls_detailed.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
