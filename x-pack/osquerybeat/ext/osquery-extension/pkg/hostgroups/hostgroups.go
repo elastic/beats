@@ -31,7 +31,7 @@ func init() {
 	})
 }
 
-func getResults(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elastichostgroups.Result, error) {
+func getResults(_ context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elastichostgroups.Result, error) {
 	fn := hostfs.GetPath(groupFile)
 	log.Infof("reading group for path: %s", fn)
 	rows, err := hostfs.ReadGroup(fn)

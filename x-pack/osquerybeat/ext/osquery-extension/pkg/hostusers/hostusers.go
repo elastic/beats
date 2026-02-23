@@ -26,7 +26,7 @@ func init() {
 	})
 }
 
-func getResults(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elastichostusers.Result, error) {
+func getResults(_ context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elastichostusers.Result, error) {
 	fn := hostfs.GetPath(passwdFile)
 	log.Infof("reading passwd for path: %s", fn)
 	rows, err := hostfs.ReadPasswd(fn)

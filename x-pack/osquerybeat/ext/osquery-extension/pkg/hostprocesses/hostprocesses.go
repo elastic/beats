@@ -33,7 +33,7 @@ func init() {
 	})
 }
 
-func getResults(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elastichostprocesses.Result, error) {
+func getResults(_ context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elastichostprocesses.Result, error) {
 	root := hostfs.GetPath("")
 	log.Infof("generating host_processes table with root path: %s", root)
 	return genProcesses(root, queryContext)
