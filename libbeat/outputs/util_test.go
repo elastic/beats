@@ -20,6 +20,7 @@ package outputs
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -34,32 +35,38 @@ import (
 )
 
 func TestDiskQueueUnderAgent(t *testing.T) {
+	const (
+		batchSize = 10
+		retry     = 3
+	)
 
-	type args struct {
-		cfg            string
-		batchSize      int
-		retry          int
-		encoderFactory queue.EncoderFactory
-		clients        []Client
-	}
 	tests := []struct {
-		name    string
-		args    args
-		want    Group
-		wantErr bool
+		name           string
+		cfg            string
+		encoderFactory queue.EncoderFactory
+		pathsFunc      func(string) *paths.Path
+		needQueueDir   bool
 	}{
 		{
 			name: "Happy path",
-			args: args{
-				cfg: `
+			cfg: `
                     disk:
                         max_size: 100MB
                         path: %s
                 `,
-				clients:   []Client{},
-				batchSize: 10,
-				retry:     3,
+		},
+		{
+			name: "Use data paths",
+			cfg: `
+                    disk:
+                        max_size: 100MB
+                `,
+			pathsFunc: func(tempDir string) *paths.Path {
+				return &paths.Path{
+					Data: tempDir,
+				}
 			},
+			needQueueDir: true,
 		},
 	}
 	for _, tt := range tests {
@@ -72,7 +79,11 @@ func TestDiskQueueUnderAgent(t *testing.T) {
 			tempDir := t.TempDir()
 
 			queueConfig := config.Namespace{}
-			conf, err := config.NewConfigFrom(fmt.Sprintf(tt.args.cfg, tempDir))
+			cfg := tt.cfg
+			if strings.Contains(cfg, "%s") {
+				cfg = fmt.Sprintf(tt.cfg, tempDir)
+			}
+			conf, err := config.NewConfigFrom(cfg)
 			require.NoError(t, err, "error parsing queue config")
 			err = queueConfig.Unpack(conf)
 			require.NoError(t, err, "error unpacking queue config")
@@ -80,18 +91,12 @@ func TestDiskQueueUnderAgent(t *testing.T) {
 			management.SetUnderAgent(true)
 
 			beatPaths := paths.New()
-			beatPaths.Data = tempDir
-
-			actualGroup, err := Success(queueConfig, tt.args.batchSize, tt.args.retry, tt.args.encoderFactory, logp.NewNopLogger(), beatPaths, tt.args.clients...)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Success() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			if tt.pathsFunc != nil {
+				beatPaths = tt.pathsFunc(tempDir)
 			}
 
-			if tt.wantErr {
-				// if an error was expected, we need no more assertions: return
-				return
-			}
+			actualGroup, err := Success(queueConfig, batchSize, retry, nil, logp.NewNopLogger(), beatPaths)
+			require.NoError(t, err)
 
 			require.NotNil(t, actualGroup)
 			require.NotNil(t, actualGroup.QueueFactory)
@@ -101,7 +106,12 @@ func TestDiskQueueUnderAgent(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, actualQueue)
 			// assert that the file exists in the path we specified
-			assert.FileExists(t, filepath.Join(tempDir, "state.dat"))
+			parts := []string{tempDir}
+			if tt.needQueueDir {
+				parts = append(parts, "diskqueue")
+			}
+			parts = append(parts, "state.dat")
+			assert.FileExists(t, filepath.Join(parts...))
 		})
 	}
 }
