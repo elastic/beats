@@ -301,6 +301,7 @@ func (c *Client) buildRequestURL(params FetchParams) string {
 // The caller must close eventCh after StreamEvents returns.
 func StreamEvents(ctx context.Context, body io.Reader, eventCh chan<- json.RawMessage) (offsetContext, int, error) {
 	scanner := bufio.NewScanner(body)
+	// 10MB max token size for the scanner to avoid potential out of memory errors when reading large NDJSON files
 	const maxTokenSize = 10 * 1024 * 1024
 	buf := make([]byte, 64*1024)
 	scanner.Buffer(buf, maxTokenSize)
@@ -308,6 +309,10 @@ func StreamEvents(ctx context.Context, body io.Reader, eventCh chan<- json.RawMe
 	var prev []byte
 	count := 0
 
+	// 1 event delay pattern so that the last event is not published initially
+	// and we can parse the last event/line and check if it is an offset context.
+	// If it is, we return the offset context and the count of events
+	// if it is not, we publish the last event and return an empty offset context and the count of event
 	for scanner.Scan() {
 		line := scanner.Bytes()
 		if len(line) == 0 {

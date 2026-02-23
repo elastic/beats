@@ -125,24 +125,44 @@ func TestConfigValidation(t *testing.T) {
 			wantErr: "",
 		},
 		{
-			name: "explicit channel_buffer_size",
+			name: "explicit stream_buffer_size",
 			config: map[string]interface{}{
-				"resource":            map[string]interface{}{"url": "https://test.luna.akamaiapis.net"},
-				"config_ids":          "12345",
-				"auth":                edgeGridAuth,
-				"channel_buffer_size": 256,
+				"resource":           map[string]interface{}{"url": "https://test.luna.akamaiapis.net"},
+				"config_ids":         "12345",
+				"auth":               edgeGridAuth,
+				"stream_buffer_size": 256,
 			},
 			wantErr: "",
 		},
 		{
-			name: "negative channel_buffer_size",
+			name: "negative stream_buffer_size",
 			config: map[string]interface{}{
-				"resource":            map[string]interface{}{"url": "https://test.luna.akamaiapis.net"},
-				"config_ids":          "12345",
-				"auth":                edgeGridAuth,
-				"channel_buffer_size": -1,
+				"resource":           map[string]interface{}{"url": "https://test.luna.akamaiapis.net"},
+				"config_ids":         "12345",
+				"auth":               edgeGridAuth,
+				"stream_buffer_size": -1,
 			},
-			wantErr: "channel_buffer_size must be greater than 0",
+			wantErr: "stream_buffer_size must be non-negative",
+		},
+		{
+			name: "invalid batch_size zero",
+			config: map[string]interface{}{
+				"resource":   map[string]interface{}{"url": "https://test.luna.akamaiapis.net"},
+				"config_ids": "12345",
+				"auth":       edgeGridAuth,
+				"batch_size": 0,
+			},
+			wantErr: "batch_size must be greater than 0",
+		},
+		{
+			name: "valid batch_size",
+			config: map[string]interface{}{
+				"resource":   map[string]interface{}{"url": "https://test.luna.akamaiapis.net"},
+				"config_ids": "12345",
+				"auth":       edgeGridAuth,
+				"batch_size": 100,
+			},
+			wantErr: "",
 		},
 	}
 
@@ -174,6 +194,9 @@ func TestDefaultConfig(t *testing.T) {
 	assert.Equal(t, defaultInitialInterval, cfg.InitialInterval)
 	assert.Equal(t, defaultEventLimit, cfg.EventLimit)
 	assert.Equal(t, defaultNumberOfWorkers, cfg.NumberOfWorkers)
+	assert.Equal(t, 1, cfg.NumberOfWorkers)
+	assert.Equal(t, defaultBatchSize, cfg.BatchSize)
+	assert.Equal(t, 1000, cfg.BatchSize)
 	assert.Equal(t, defaultInvalidTSRetries, cfg.InvalidTimestampRetries)
 	assert.Equal(t, defaultMaxRecoveryAttempts, cfg.MaxRecoveryAttempts)
 	assert.Equal(t, defaultOffsetTTL, cfg.OffsetTTL)
@@ -182,7 +205,7 @@ func TestDefaultConfig(t *testing.T) {
 	assert.Equal(t, defaultMaxAttempts, *cfg.Resource.Retry.MaxAttempts)
 }
 
-func TestDefaultChannelBufferSize(t *testing.T) {
+func TestDefaultStreamBufferSize(t *testing.T) {
 	cfg := defaultConfig()
 	u, _ := url.Parse("https://test.luna.akamaiapis.net")
 	cfg.Resource.URL = &urlConfig{URL: u}
@@ -193,7 +216,7 @@ func TestDefaultChannelBufferSize(t *testing.T) {
 
 	err := cfg.Validate()
 	require.NoError(t, err)
-	assert.Equal(t, cfg.NumberOfWorkers*2, cfg.ChannelBufferSize)
+	assert.Equal(t, cfg.NumberOfWorkers*4, cfg.StreamBufferSize)
 }
 
 func TestEdgeGridSigner(t *testing.T) {

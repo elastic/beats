@@ -22,7 +22,8 @@ const (
 	defaultInitialInterval     = 12 * time.Hour
 	defaultEventLimit          = 10000
 	maxEventLimit              = 600000
-	defaultNumberOfWorkers     = 3
+	defaultNumberOfWorkers     = 1
+	defaultBatchSize           = 1000
 	defaultMaxAttempts         = 5
 	defaultWaitMin             = time.Second
 	defaultWaitMax             = time.Minute
@@ -57,6 +58,10 @@ type config struct {
 	// NumberOfWorkers is the number of concurrent workers for processing events.
 	NumberOfWorkers int `config:"number_of_workers"`
 
+	// BatchSize is the number of events accumulated per worker before calling
+	// PublishAll. Default is 1 (single-event publish).
+	BatchSize int `config:"batch_size"`
+
 	// InvalidTimestampRetries is the number of immediate retries for 400
 	// responses containing "invalid timestamp" before failing the request and entering recovery mode.
 	InvalidTimestampRetries int `config:"invalid_timestamp_retry.max_attempts"`
@@ -70,9 +75,9 @@ type config struct {
 	// dropped to avoid a wasted 416 round-trip. Zero disables proactive TTL.
 	OffsetTTL time.Duration `config:"offset_ttl"`
 
-	// ChannelBufferSize is the bounded channel size for the streaming pipeline.
-	// Default is event_limit / 2. Must be > 0.
-	ChannelBufferSize int `config:"channel_buffer_size"`
+	// StreamBufferSize is the bounded channel capacity for events flowing from
+	// the stream reader to batch workers. Default is NumberOfWorkers * 4.
+	StreamBufferSize int `config:"stream_buffer_size"`
 
 	// Tracer configures request/response tracing for debugging.
 	Tracer *tracerConfig `config:"tracer"`
@@ -207,6 +212,7 @@ func defaultConfig() config {
 		InitialInterval:         defaultInitialInterval,
 		EventLimit:              defaultEventLimit,
 		NumberOfWorkers:         defaultNumberOfWorkers,
+		BatchSize:               defaultBatchSize,
 		InvalidTimestampRetries: defaultInvalidTSRetries,
 		MaxRecoveryAttempts:     defaultMaxRecoveryAttempts,
 		OffsetTTL:               defaultOffsetTTL,
@@ -258,6 +264,9 @@ func (c *config) Validate() error {
 	if c.NumberOfWorkers <= 0 {
 		return errors.New("number_of_workers must be greater than 0")
 	}
+	if c.BatchSize <= 0 {
+		return errors.New("batch_size must be greater than 0")
+	}
 	if c.InvalidTimestampRetries < 0 {
 		return errors.New("invalid_timestamp_retry.max_attempts must be greater than or equal to 0")
 	}
@@ -269,13 +278,13 @@ func (c *config) Validate() error {
 		return errors.New("offset_ttl must be non-negative")
 	}
 
-	if c.ChannelBufferSize < 0 {
-		return errors.New("channel_buffer_size must be greater than 0")
+	if c.StreamBufferSize < 0 {
+		return errors.New("stream_buffer_size must be non-negative")
 	}
-	if c.ChannelBufferSize == 0 {
-		c.ChannelBufferSize = c.NumberOfWorkers * 2
-		if c.ChannelBufferSize < 1 {
-			c.ChannelBufferSize = 1
+	if c.StreamBufferSize == 0 {
+		c.StreamBufferSize = c.NumberOfWorkers * 4
+		if c.StreamBufferSize < 1 {
+			c.StreamBufferSize = 1
 		}
 	}
 

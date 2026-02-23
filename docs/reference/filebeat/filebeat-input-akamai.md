@@ -22,7 +22,8 @@ This input supports:
 * Chain-based cursor checkpointing with overlap to prevent data gaps
 * Proactive offset age tracking with configurable TTL
 * Automatic recovery when offsets expire or request timestamps become invalid
-* Streaming NDJSON pipeline with bounded channel and concurrent workers
+* Streaming NDJSON pipeline with batch publishing (`PublishAll`) and configurable workers
+* Decoupled cursor persistence — cursor is committed atomically via ACK callback, never at publish time
 * Zero-copy event passthrough (field extraction deferred to ingest pipeline)
 * Rate limiting and retry with configurable backoff
 
@@ -42,10 +43,14 @@ filebeat.inputs:
   interval: 1m
   initial_interval: 12h
   event_limit: 10000
-  number_of_workers: 3
   offset_ttl: 120s
   invalid_timestamp_retry.max_attempts: 2
   max_recovery_attempts: 3
+
+  # Batch publishing tuning (defaults below are optimal for most workloads)
+  # number_of_workers: 1
+  # batch_size: 1000
+  # stream_buffer_size: 4
 
   # Optional: rate-limit API requests
   # resource.rate_limit.limit: 5.0
@@ -104,17 +109,37 @@ The maximum number of events requested per API page. Must be between `1` and `60
 
 ### `number_of_workers` [_number_of_workers_akamai]
 
-The number of concurrent workers used to publish events from a single fetched page. Must be greater than `0`. Default: `3`.
+The number of concurrent worker goroutines used to batch and publish events from a single fetched page. Each worker accumulates events into batches of `batch_size` and publishes them via `PublishAll`. For most workloads, a single worker delivers the highest throughput because the per-event work is minimal (string copy and `beat.Event` construction). Increase workers only if profiling shows the output is the bottleneck (for example, with Elasticsearch or Kafka outputs). Must be greater than `0`. Default: `1`.
+
+
+### `batch_size` [_batch_size_akamai]
+
+The number of events each worker accumulates into a batch before calling `PublishAll`. Larger batches reduce pipeline lock acquisitions (one lock per batch instead of one per event) but increase per-worker memory usage. Values between `1000` and `2000` are optimal for most workloads. Must be greater than `0`. Default: `1000`.
+
+
+### `stream_buffer_size` [_stream_buffer_size_akamai]
+
+The capacity of the bounded channel used in the streaming event pipeline. Events are streamed line-by-line from the API response body through this channel to worker goroutines. Higher values allow more buffering between the stream reader and batch workers; lower values reduce memory usage and keep backpressure responsive. Default: `number_of_workers * 4`.
+
+
+### Performance tuning [_performance_tuning_akamai]
+
+::::{note}
+The default configuration (`number_of_workers: 1`, `batch_size: 1000`) delivers the highest sustained throughput for this input. Benchmarking with the Akamai SIEM API at `event_limit: 60000` showed:
+
+* **1 worker / batch_size 1000** — ~11,000 events/sec, 95% of pages under 5s, lowest memory (~103 MB RSS)
+* **10 workers / batch_size 2000** — ~9,600 events/sec, 84% of pages under 5s, moderate memory (~168 MB RSS)
+* **20 workers / batch_size 2000** — ~8,300 events/sec, 75% of pages under 5s, higher memory (~217 MB RSS)
+
+A single worker avoids goroutine scheduling overhead, cache thrashing, and queue contention from concurrent `PublishAll` calls. Adding workers only helps when the **output** introduces latency (for example, Elasticsearch or Kafka). For file or console outputs, 1 worker is optimal.
+
+When tuning, the general relationship is: `lock_acquisitions_per_page = event_limit / batch_size`. With `event_limit: 60000` and `batch_size: 1000`, there are 60 lock acquisitions per page — already negligible. Increasing `batch_size` beyond 2000 adds memory overhead without measurable throughput benefit. Increasing workers beyond 1 reduces throughput for this input because the per-event work (string copy + `beat.Event` construction) is too small to benefit from concurrency.
+::::
 
 
 ### `offset_ttl` [_offset_ttl_akamai]
 
 The maximum age of a stored offset before it is proactively dropped to avoid a wasted `416` round-trip. Akamai offsets typically expire after approximately 2 minutes. Set to `0s` to disable proactive TTL checking (offsets will only be dropped when the API returns `416`). Default: `120s`.
-
-
-### `channel_buffer_size` [_channel_buffer_size_akamai]
-
-The size of the bounded channel used in the streaming event pipeline. Events are streamed from the API response body through this channel to worker goroutines. Higher values allow more buffering between the reader and publishers; lower values reduce memory usage and keep backpressure responsive. Default: `number_of_workers * 2`.
 
 
 ### `invalid_timestamp_retry.max_attempts` [_invalid_timestamp_retry_max_attempts_akamai]
@@ -213,6 +238,14 @@ This determines whether rotated logs should be gzip compressed.
 
 The input uses a **chain-based** cursor model to track progress and recover from failures without data gaps.
 
+### Cursor persistence
+
+The cursor is **decoupled from event publishing**. Events are published to the pipeline without any cursor state attached. After all events from a page are acknowledged by the output, an ACK callback atomically persists the full cursor state (chain window + offset) to the registry. This ensures:
+
+* No partial cursor state is ever written
+* Exactly one cursor write per page (not per event)
+* If Filebeat crashes before all events from a page are ACKed, no cursor is persisted for that page, and it will be re-fetched on restart (at-least-once delivery)
+
 ### Chain lifecycle
 
 Each poll cycle operates on a **chain** — a time window defined by `chain_from` and `chain_to`. The input pages through the chain using offset-based pagination until all events in the window are drained (`events returned < event_limit`). Once drained, the chain is marked as "caught up" and the next poll cycle starts a new chain from where the previous one ended (with a 10-second overlap to prevent boundary gaps).
@@ -248,7 +281,6 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `batches_published_total` | Number of event batches successfully published. |
 | `events_received_total` | Total number of events received. |
 | `events_published_total` | Total number of events published. |
-| `events_publish_failed_total` | Total number of individual event publish failures. |
 | `errors_total` | Total number of errors encountered. |
 | `offset_expired_total` | Number of `416` offset-expired responses received. |
 | `offset_ttl_drops_total` | Number of proactive offset drops due to TTL expiry (before making the API request). |
@@ -261,7 +293,6 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `request_processing_time` | Histogram of request processing times in nanoseconds. |
 | `batch_processing_time` | Histogram of batch processing times in nanoseconds (receipt to ACK). |
 | `events_per_batch` | Histogram of the number of events per batch. |
-| `failed_events_per_page` | Histogram of the number of failed event publishes per page. |
 | `response_latency` | Histogram of API response latencies in nanoseconds. |
 
 

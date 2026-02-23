@@ -10,12 +10,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -43,34 +44,43 @@ func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	}
 }
 
-// input implements the akamai input.
-type input struct{}
+// akamaiInput implements the v2.Input interface.
+type akamaiInput struct {
+	cfg   config
+	store statestore.States
+}
 
-func (input) Name() string { return inputName }
+func (in *akamaiInput) Name() string { return inputName }
 
-func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
-	cfg := src.(*source).cfg //nolint:errcheck // If this assertion fails, the program is incorrect and should panic.
-
-	if cfg.Resource == nil || cfg.Resource.URL == nil || cfg.Resource.URL.URL == nil {
+func (in *akamaiInput) Test(_ v2.TestContext) error {
+	if in.cfg.Resource == nil || in.cfg.Resource.URL == nil || in.cfg.Resource.URL.URL == nil {
 		return errors.New("resource.url is required")
 	}
-
 	return nil
 }
 
 // Run starts the input and blocks until it completes.
-func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
-	cfg := src.(*source).cfg //nolint:errcheck // If this assertion fails, the program is incorrect and should panic.
+func (in *akamaiInput) Run(
+	env v2.Context,
+	pipeline beat.PipelineConnector,
+) error {
+	cfg := in.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL.String())
 
 	env.UpdateStatus(status.Starting, "")
 
-	var cur cursor
-	if !crsr.IsNew() {
-		if err := crsr.Unpack(&cur); err != nil {
-			env.UpdateStatus(status.Failed, "failed to unpack cursor: "+err.Error())
-			return err
-		}
+	stateKey := stateKeyFromConfig(cfg)
+	cs, err := newCursorStore(in.store, stateKey, log)
+	if err != nil {
+		env.UpdateStatus(status.Failed, "failed to create cursor store: "+err.Error())
+		return err
+	}
+	defer cs.Close()
+
+	cur, err := cs.Load()
+	if err != nil {
+		env.UpdateStatus(status.Failed, "failed to load cursor: "+err.Error())
+		return err
 	}
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
@@ -81,21 +91,37 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 		metrics.SetResource(cfg.Resource.URL.String() + siemAPIPath + cfg.ConfigIDs)
 	}
 
-	client, err := NewClient(cfg, log, env.MetricsRegistry, WithMetrics(metrics))
+	httpClient, err := NewClient(cfg, log, env.MetricsRegistry, WithMetrics(metrics))
 	if err != nil {
 		env.UpdateStatus(status.Failed, "failed to create client: "+err.Error())
 		return err
 	}
+	defer httpClient.Close()
+
+	acks := newACKHandler()
+	client, err := pipeline.ConnectWith(beat.ClientConfig{
+		EventListener: acks.pipelineEventListener(),
+		Processing: beat.ProcessingConfig{
+			EventNormalization: boolPtr(false),
+		},
+	})
+	if err != nil {
+		env.UpdateStatus(status.Failed, "failed to connect to pipeline: "+err.Error())
+		return err
+	}
 	defer client.Close()
+	defer acks.Close()
 
 	poller := &siemPoller{
-		cfg:     cfg,
-		client:  client,
-		log:     log,
-		pub:     pub,
-		cursor:  cur,
-		metrics: metrics,
-		env:     env,
+		cfg:         cfg,
+		httpClient:  httpClient,
+		log:         log,
+		client:      client,
+		acks:        acks,
+		cursorStore: cs,
+		cursor:      cur,
+		metrics:     metrics,
+		env:         env,
 	}
 
 	env.UpdateStatus(status.Running, "")
@@ -109,6 +135,15 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 	env.UpdateStatus(status.Stopped, "")
 	return nil
 }
+
+func stateKeyFromConfig(cfg config) string {
+	if cfg.Resource == nil || cfg.Resource.URL == nil {
+		return inputName + "::" + cfg.ConfigIDs
+	}
+	return inputName + "::" + cfg.Resource.URL.String() + "/siem/v1/configs/" + cfg.ConfigIDs
+}
+
+func boolPtr(b bool) *bool { return &b }
 
 // cursor holds the chain-based state for resuming event collection.
 type cursor struct {
@@ -130,13 +165,15 @@ func (c *cursor) isOffsetStale(ttl time.Duration) bool {
 
 // siemPoller handles polling the Akamai SIEM API.
 type siemPoller struct {
-	cfg     config
-	client  *Client
-	log     *logp.Logger
-	pub     inputcursor.Publisher
-	cursor  cursor
-	metrics *inputMetrics
-	env     v2.Context
+	cfg         config
+	httpClient  *Client
+	log         *logp.Logger
+	client      beat.Client
+	acks        *ackHandler
+	cursorStore *cursorStore
+	cursor      cursor
+	metrics     *inputMetrics
+	env         v2.Context
 }
 
 // run starts the polling loop.
@@ -219,7 +256,7 @@ func (p *siemPoller) poll(ctx context.Context) error {
 
 		p.log.Debugw("received events", "count", eventCount, "page", pageCount)
 
-		// Update cursor with page offset
+		// Update in-memory cursor with page offset for the next iteration.
 		if pageCtx.Offset != "" {
 			prev := p.cursor.LastOffset
 			p.cursor.LastOffset = pageCtx.Offset
@@ -379,7 +416,7 @@ func (p *siemPoller) fetchWithTimestampRetry(ctx context.Context, params FetchPa
 			)
 		}
 
-		body, err := p.client.FetchResponse(ctx, params)
+		body, err := p.httpClient.FetchResponse(ctx, params)
 		if err == nil {
 			return body, nil
 		}
@@ -477,34 +514,21 @@ func (p *siemPoller) buildFetchParams() FetchParams {
 }
 
 // processPage streams events from body through a bounded channel to worker
-// goroutines. Returns event count and offset context. The body is always closed.
+// goroutines that batch and publish via PublishAll. Returns event count and
+// offset context. The body is always closed. The cursor is persisted
+// atomically via the ACK handler after all events are acknowledged.
 func (p *siemPoller) processPage(ctx context.Context, body io.ReadCloser) (int, offsetContext, error) {
 	defer body.Close()
 
-	eventCh := make(chan json.RawMessage, p.cfg.ChannelBufferSize)
+	eventCh := make(chan json.RawMessage, p.cfg.StreamBufferSize)
 	start := time.Now()
 
-	// Preliminary cursor carries chain state so events published before the
-	// offset context is known still persist enough state for restart recovery.
-	var pageCursorMu sync.Mutex
-	var pageCursor interface{} = cursor{
-		ChainFrom: p.cursor.ChainFrom,
-		ChainTo:   p.cursor.ChainTo,
-	}
-
-	getCursor := func() interface{} {
-		pageCursorMu.Lock()
-		defer pageCursorMu.Unlock()
-		return pageCursor
-	}
-
-	var publishMu sync.Mutex
-	var published, failed uint64
-	samples := make([]string, 0, 5)
-
-	// Start workers
+	var publishCount atomic.Int64
 	var wg sync.WaitGroup
+
 	workerCount := p.cfg.NumberOfWorkers
+	batchSize := p.cfg.BatchSize
+
 	for i := 0; i < workerCount; i++ {
 		wg.Add(1)
 		go func() {
@@ -514,6 +538,7 @@ func (p *siemPoller) processPage(ctx context.Context, body io.ReadCloser) (int, 
 				defer p.metrics.EndWorker(id)
 			}
 
+			batch := make([]beat.Event, 0, batchSize)
 			for raw := range eventCh {
 				select {
 				case <-ctx.Done():
@@ -521,80 +546,64 @@ func (p *siemPoller) processPage(ctx context.Context, body io.ReadCloser) (int, 
 				default:
 				}
 
-				event := p.createBeatEvent(raw)
-				c := getCursor()
-
-				if err := p.pub.Publish(event, c); err != nil {
-					publishMu.Lock()
-					failed++
-					if len(samples) < cap(samples) {
-						samples = append(samples, err.Error())
-					}
-					publishMu.Unlock()
-					if p.metrics != nil {
-						p.metrics.AddError()
-					}
-					continue
+				batch = append(batch, createBeatEvent(raw))
+				if len(batch) >= batchSize {
+					p.client.PublishAll(batch)
+					publishCount.Add(int64(len(batch)))
+					batch = make([]beat.Event, 0, batchSize)
 				}
-
-				publishMu.Lock()
-				published++
-				publishMu.Unlock()
-				if p.metrics != nil {
-					p.metrics.AddEventPublished(1)
-				}
+			}
+			if len(batch) > 0 {
+				p.client.PublishAll(batch)
+				publishCount.Add(int64(len(batch)))
 			}
 		}()
 	}
 
-	// Producer: stream events from body into channel
 	pageCtx, eventCount, streamErr := StreamEvents(ctx, body, eventCh)
 
-	// Set cursor BEFORE closing channel so remaining events carry it
-	if pageCtx.Offset != "" {
-		pageCursorMu.Lock()
-		pageCursor = cursor{
+	close(eventCh)
+	wg.Wait()
+
+	totalPublished := int(publishCount.Load())
+
+	if totalPublished > 0 {
+		fullCursor := cursor{
 			ChainFrom:        p.cursor.ChainFrom,
 			ChainTo:          p.cursor.ChainTo,
 			LastOffset:       pageCtx.Offset,
 			OffsetObtainedAt: time.Now(),
 		}
-		pageCursorMu.Unlock()
+		p.acks.Add(totalPublished, func() {
+			if err := p.cursorStore.Save(fullCursor); err != nil {
+				p.log.Errorf("failed to persist cursor: %v", err)
+				p.env.UpdateStatus(status.Degraded, fmt.Sprintf("cursor persistence failure: %s", err.Error()))
+			} else {
+				p.env.UpdateStatus(status.Running, "")
+			}
+		})
 	}
-
-	close(eventCh)
-	wg.Wait()
 
 	if p.metrics != nil {
 		p.metrics.AddBatchReceived(eventCount)
 		p.metrics.RecordBatchTime(time.Since(start))
-		if published > 0 {
+		if totalPublished > 0 {
 			p.metrics.AddBatchPublished()
-		}
-		if failed > 0 {
-			p.metrics.AddPartialPublishFailures(failed)
+			p.metrics.AddEventPublished(uint64(totalPublished))
 		}
 	}
 
-	logFields := []interface{}{
-		"published_events", published,
-		"failed_events", failed,
+	p.log.Infow("finished page publish",
+		"published_events", totalPublished,
+		"event_count", eventCount,
 		"duration", time.Since(start),
-	}
-	if failed > 0 {
-		logFields = append(logFields, "error_samples", samples)
-		p.log.Warnw("finished page publish with failures", logFields...)
-	} else {
-		p.log.Infow("finished page publish", logFields...)
-	}
+	)
 
 	return eventCount, pageCtx, streamErr
 }
 
 // createBeatEvent creates a beat.Event from raw JSON with zero-copy passthrough.
-// The raw JSON is stored as the message field; field extraction is handled by
-// ingest pipelines downstream.
-func (p *siemPoller) createBeatEvent(raw json.RawMessage) beat.Event {
+func createBeatEvent(raw json.RawMessage) beat.Event {
 	return beat.Event{
 		Timestamp: time.Now(),
 		Fields: map[string]interface{}{

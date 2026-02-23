@@ -9,7 +9,6 @@ package akamai
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -27,24 +26,28 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-type mockPublisher struct {
-	mu           sync.Mutex
-	events       []beat.Event
-	cursors      []interface{}
-	failMessages map[string]bool
-	failCount    int
+// mockBeatClient implements beat.Client for testing.
+type mockBeatClient struct {
+	mu     sync.Mutex
+	events []beat.Event
 }
 
-func (m *mockPublisher) Publish(event beat.Event, cur interface{}) error {
+func (m *mockBeatClient) Publish(e beat.Event) {
+	m.PublishAll([]beat.Event{e})
+}
+
+func (m *mockBeatClient) PublishAll(es []beat.Event) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	if msg, ok := event.Fields["message"].(string); ok && m.failMessages[msg] {
-		m.failCount++
-		return errors.New("mock publish failure")
-	}
-	m.events = append(m.events, event)
-	m.cursors = append(m.cursors, cur)
-	return nil
+	m.events = append(m.events, es...)
+}
+
+func (m *mockBeatClient) Close() error { return nil }
+
+func (m *mockBeatClient) eventCount() int {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return len(m.events)
 }
 
 func baseTestConfig(serverURL string) config {
@@ -59,8 +62,9 @@ func baseTestConfig(serverURL string) config {
 	}
 	cfg.EventLimit = 2
 	cfg.NumberOfWorkers = 2
+	cfg.BatchSize = 1
 	cfg.InvalidTimestampRetries = 1
-	cfg.ChannelBufferSize = 2
+	cfg.StreamBufferSize = 4
 	return cfg
 }
 
@@ -197,11 +201,9 @@ type inputScenario struct {
 	retries             int
 	maxAttempts         *int
 	maxRecoveryAttempts *int
-	failMessages        map[string]bool
 	wantOffset          string
 	wantCaughtUp        bool
 	wantPublishedEvents int
-	wantPublishError    bool
 	verifyReqs          func(t *testing.T, reqs []url.Values)
 }
 
@@ -347,22 +349,6 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "advances cursor despite partial publish failures",
-			steps: []mockResponseStep{
-				{body: ndjson(`{"message":"ok-1"}`, `{"message":"drop-me"}`, `{"total":2,"offset":"off-pf","limit":2}`)},
-				{body: ndjson(`{"message":"ok-2"}`, `{"total":1,"offset":"off-pf-2","limit":2}`)},
-			},
-			failMessages:        map[string]bool{`{"message":"drop-me"}`: true},
-			wantOffset:          "off-pf-2",
-			wantCaughtUp:        true,
-			wantPublishedEvents: 2,
-			wantPublishError:    true,
-			verifyReqs: func(t *testing.T, reqs []url.Values) {
-				require.Len(t, reqs, 2)
-				assert.Equal(t, "off-pf", reqs[1].Get("offset"))
-			},
-		},
-		{
 			name: "from too old triggers chain replay with clamp",
 			steps: []mockResponseStep{
 				{status: http.StatusBadRequest, body: `{"detail":"from parameter is out of range","status":400}`},
@@ -445,18 +431,22 @@ func runInputScenario(t *testing.T, serverURL string, serverState *mockInputServ
 		cfg.MaxRecoveryAttempts = *tc.maxRecoveryAttempts
 	}
 
-	client, err := NewClient(cfg, logp.NewNopLogger(), monitoring.NewRegistry())
+	httpClient, err := NewClient(cfg, logp.NewNopLogger(), monitoring.NewRegistry())
 	require.NoError(t, err)
-	defer client.Close()
+	defer httpClient.Close()
 
-	pub := &mockPublisher{failMessages: tc.failMessages}
+	beatClient := &mockBeatClient{}
+	acks := newACKHandler()
+	defer acks.Close()
+
 	poller := &siemPoller{
-		cfg:    cfg,
-		client: client,
-		log:    logp.NewNopLogger(),
-		pub:    pub,
-		cursor: tc.initial,
-		env:    v2.Context{},
+		cfg:        cfg,
+		httpClient: httpClient,
+		log:        logp.NewNopLogger(),
+		client:     beatClient,
+		acks:       acks,
+		cursor:     tc.initial,
+		env:        v2.Context{},
 	}
 
 	err = poller.poll(context.Background())
@@ -466,8 +456,7 @@ func runInputScenario(t *testing.T, serverURL string, serverState *mockInputServ
 	tc.verifyReqs(t, reqs)
 	assert.Equal(t, tc.wantOffset, poller.cursor.LastOffset)
 	assert.Equal(t, tc.wantCaughtUp, poller.cursor.CaughtUp)
-	assert.Len(t, pub.events, tc.wantPublishedEvents)
-	assert.Equal(t, tc.wantPublishError, pub.failCount > 0)
+	assert.Equal(t, tc.wantPublishedEvents, beatClient.eventCount())
 }
 
 func ndjson(lines ...string) string {
@@ -482,7 +471,6 @@ func ndjson(lines ...string) string {
 func TestStreamEventsContextCancellation(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	// Channel size 1 to force blocking on second event
 	eventCh := make(chan json.RawMessage, 1)
 
 	raw := ndjson(
@@ -492,7 +480,6 @@ func TestStreamEventsContextCancellation(t *testing.T) {
 		`{"total":3,"offset":"off","limit":3}`,
 	)
 
-	// Cancel context after a short delay so the producer blocks on the full channel
 	go func() {
 		time.Sleep(50 * time.Millisecond)
 		cancel()
@@ -636,11 +623,70 @@ func TestBuildFetchParamsBranches(t *testing.T) {
 
 func TestCreateBeatEventZeroCopy(t *testing.T) {
 	raw := json.RawMessage(`{"attackData":{"rule":"1234"},"httpMessage":{"host":"example.com"}}`)
-	poller := &siemPoller{log: logp.NewNopLogger()}
-	event := poller.createBeatEvent(raw)
+	event := createBeatEvent(raw)
 
 	msg, ok := event.Fields["message"].(string)
 	require.True(t, ok)
 	assert.Equal(t, string(raw), msg)
 	assert.Len(t, event.Fields, 1, "only message field should exist, no unmarshal")
 }
+
+// --- Batch mode tests ---
+
+func TestProcessPageBatchPublish(t *testing.T) {
+	tests := []struct {
+		name       string
+		batchSize  int
+		workers    int
+		events     int
+		wantEvents int
+	}{
+		{name: "batch_size=1", batchSize: 1, workers: 1, events: 3, wantEvents: 3},
+		{name: "batch_size=2", batchSize: 2, workers: 1, events: 3, wantEvents: 3},
+		{name: "batch_size=10 larger than events", batchSize: 10, workers: 1, events: 3, wantEvents: 3},
+		{name: "multiple workers", batchSize: 1, workers: 3, events: 5, wantEvents: 5},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			beatClient := &mockBeatClient{}
+			acks := newACKHandler()
+			defer acks.Close()
+
+			cfg := baseTestConfig("http://localhost")
+			cfg.BatchSize = tt.batchSize
+			cfg.NumberOfWorkers = tt.workers
+			cfg.StreamBufferSize = tt.workers * 4
+
+			poller := &siemPoller{
+				cfg:    cfg,
+				log:    logp.NewNopLogger(),
+				client: beatClient,
+				acks:   acks,
+				cursor: cursor{ChainFrom: 100, ChainTo: 200},
+				env:    v2.Context{},
+			}
+
+			lines := make([]string, tt.events)
+			for i := range lines {
+				lines[i] = `{"event":"` + string(rune('a'+i)) + `"}`
+			}
+			lines = append(lines, `{"total":3,"offset":"test-off","limit":10}`)
+			body := strings.NewReader(ndjson(lines...))
+
+			eventCount, pageCtx, err := poller.processPage(context.Background(), nopReadCloser{body})
+			require.NoError(t, err)
+			assert.Equal(t, tt.events, eventCount)
+			assert.Equal(t, "test-off", pageCtx.Offset)
+			assert.Equal(t, tt.wantEvents, beatClient.eventCount())
+		})
+	}
+}
+
+// nopReadCloser wraps an io.Reader to satisfy io.ReadCloser.
+type nopReadCloser struct {
+	r interface{ Read([]byte) (int, error) }
+}
+
+func (n nopReadCloser) Read(p []byte) (int, error) { return n.r.Read(p) }
+func (n nopReadCloser) Close() error               { return nil }
