@@ -219,7 +219,7 @@ MSSQL does not support `LIMIT`. Use `TOP` to restrict the number of rows per cyc
 
 With `direction: desc`, the cursor tracks the minimum value from each batch, suitable for scanning data in reverse chronological order.
 
-### State Persistence
+### State persistence
 
 Cursor state is persisted to disk using Metricbeat's statestore at:
 `{data.path}/sql-cursor/`
@@ -238,7 +238,7 @@ different databases on the same server.
 different state key, which effectively resets the cursor to its `default` value. This is by design —
 if you modify the query, the old cursor position might no longer be valid for the new query.
 
-### Important: Choosing `>` vs `>=` for Cursor Queries
+### Choosing operators for cursor queries
 
 The choice of comparison operator in your WHERE clause affects data completeness:
 
@@ -262,7 +262,7 @@ sql_query: "SELECT id, data, created_at FROM events WHERE created_at >= :cursor 
 sql_query: "SELECT id, data FROM events WHERE id > :cursor ORDER BY id ASC LIMIT 500"
 ```
 
-### Error Handling
+### Error handling
 
 The cursor feature follows an "at-least-once" delivery model:
 - Events are emitted **before** the cursor state is updated
@@ -270,7 +270,7 @@ The cursor feature follows an "at-least-once" delivery model:
   re-fetched on the next cycle
 - This ensures no data loss, but can result in occasional duplicates
 
-### Driver-specific Notes
+### Driver-specific notes
 
 **MySQL:** When using timestamp cursors, include `parseTime=true` in your DSN to ensure the driver
 correctly handles `time.Time` parameters:
