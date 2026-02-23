@@ -112,12 +112,12 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 	return nil
 }
 
-func (p *Publisher) Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *Publisher) Publish(index, idValue, idFieldKey, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
 	for _, hit := range hits {
-		event := hitToEvent(index, p.b.Info.Name, actionID, responseID, meta, hit, ecsm, reqData)
+		event := hitToEvent(index, p.b.Info.Name, idValue, idFieldKey, responseID, meta, hit, ecsm, reqData)
 		p.client.Publish(event)
 	}
 	p.log.Infof("%d events sent to index %s", len(hits), index)
@@ -150,9 +150,9 @@ func (p *Publisher) PublishActionResult(req map[string]interface{}, res map[stri
 }
 
 // PublishScheduledResponse publishes a synthetic response document for a scheduled query run (no action).
-// Used for both RRULE and native schedules. Includes schedule_execution_count (RRULE uses occurrence index;
+// Includes schedule_execution_count;
 // native uses 1 + (run_time - start_date) / interval).
-func (p *Publisher) PublishScheduledResponse(actionID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
+func (p *Publisher) PublishScheduledResponse(scheduleID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -162,7 +162,7 @@ func (p *Publisher) PublishScheduledResponse(actionID, responseID string, starte
 	}
 
 	fields := map[string]interface{}{
-		"action_id":                actionID,
+		"schedule_id":              scheduleID,
 		"response_id":              responseID,
 		"action_input_type":        "osquery_scheduled",
 		"started_at":               startedAt.Format(time.RFC3339Nano),
@@ -176,7 +176,7 @@ func (p *Publisher) PublishScheduledResponse(actionID, responseID string, starte
 		},
 	}
 
-	p.log.Debugf("Scheduled response event sent, action_id=%s, schedule_execution_count=%d", actionID, scheduleExecutionCount)
+	p.log.Debugf("Scheduled response event sent, schedule_id=%s, schedule_execution_count=%d", scheduleID, scheduleExecutionCount)
 	p.publishActionResponseEvent(fields, completedAt)
 }
 
@@ -259,7 +259,7 @@ func (p *Publisher) processorsForInputConfig(inCfg config.InputConfig, defaultDa
 	return procs, nil
 }
 
-func hitToEvent(index, eventType, actionID, responseID string, meta, hit map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) beat.Event {
+func hitToEvent(index, eventType, idValue, idFieldKey, responseID string, meta, hit map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) beat.Event {
 	var fields mapstr.M
 
 	if len(ecsm) > 0 {
@@ -283,7 +283,9 @@ func hitToEvent(index, eventType, actionID, responseID string, meta, hit map[str
 	fields["event"] = evf
 
 	fields["type"] = eventType
-	fields["action_id"] = actionID
+	if idFieldKey != "" {
+		fields[idFieldKey] = idValue
+	}
 	fields["osquery"] = hit
 	if meta != nil {
 		fields["osquery_meta"] = meta
