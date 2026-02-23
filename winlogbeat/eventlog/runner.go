@@ -58,14 +58,32 @@ func Run(
 		})
 	defer cancelFn()
 
+	openChannelNotFoundErrDetected := false
+	logChannelNotFoundOpenRetry := func(err error) {
+		if !openChannelNotFoundErrDetected {
+			log.Warnw("encountered channel not found error when opening Windows Event Log, retrying", "error", err)
+		} else {
+			log.Debugw("encountered channel not found error when opening Windows Event Log, retrying", "error", err)
+		}
+		openChannelNotFoundErrDetected = true
+	}
+
 	openErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
 		if mustIgnoreError(err, api) {
-			log.Warnw("ignoring open error", "error", err, "channel", api.Channel())
+			if isChannelNotFound(err) {
+				logChannelNotFoundOpenRetry(err)
+			} else {
+				log.Warnw("ignoring open error", "error", err, "channel", api.Channel())
+			}
 			return true
 		}
 		if IsRecoverable(err, api.IsFile()) {
 			reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to open %s: %v", api.Channel(), err))
-			log.Errorw("encountered recoverable error when opening Windows Event Log", "error", err)
+			if isChannelNotFound(err) {
+				logChannelNotFoundOpenRetry(err)
+			} else {
+				log.Errorw("encountered recoverable error when opening Windows Event Log", "error", err)
+			}
 			return true
 		}
 		return false
@@ -106,6 +124,7 @@ runLoop:
 		}
 
 		log.Debug("windows event log opened successfully")
+		openChannelNotFoundErrDetected = false
 
 		// read loop
 		for cancelCtx.Err() == nil {
