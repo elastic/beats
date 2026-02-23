@@ -1,7 +1,7 @@
 name: Stale Issues
 on:
   schedule:
-    - cron: "0 15 * * 1-5"
+    - cron: "0 15 * * 1"
   workflow_dispatch:
 
 permissions:
@@ -16,5 +16,8 @@ jobs:
       setup-commands: |
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
         make mage
+      additional-instructions: |
+        Add a note to the issue indicating that you do not have permission to actually
+        close the issues and that a person with permission will need to do so.
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
