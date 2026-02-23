@@ -1,7 +1,7 @@
 name: Test Improvement
 on:
   schedule:
-    - cron: "0 9 * * 1"
+    - cron: "0 9 * * 3"
   workflow_dispatch:
 
 permissions:
