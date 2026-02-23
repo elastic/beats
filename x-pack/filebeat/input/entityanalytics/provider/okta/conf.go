@@ -199,7 +199,7 @@ func (c *conf) Validate() error {
 		return errors.New("dataset must be 'all', 'users', 'devices' or empty")
 	}
 
-	if c.Tracer == nil {
+	if !c.Tracer.enabled() {
 		return nil
 	}
 	if c.Tracer.Filename == "" {
