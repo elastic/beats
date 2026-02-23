@@ -152,7 +152,7 @@ func (p *Publisher) PublishActionResult(req map[string]interface{}, res map[stri
 // PublishScheduledResponse publishes a synthetic response document for a scheduled query run (no action).
 // Used for both RRULE and native schedules. Includes schedule_execution_count (RRULE uses occurrence index;
 // native uses 1 + (run_time - start_date) / interval).
-func (p *Publisher) PublishScheduledResponse(actionID, responseID string, startedAt, completedAt time.Time, resultCount int, scheduleExecutionCount int64) {
+func (p *Publisher) PublishScheduledResponse(actionID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -167,6 +167,7 @@ func (p *Publisher) PublishScheduledResponse(actionID, responseID string, starte
 		"action_input_type":        "osquery_scheduled",
 		"started_at":               startedAt.Format(time.RFC3339Nano),
 		"completed_at":             completedAt.Format(time.RFC3339Nano),
+		"planned_schedule_time":    plannedScheduleTime.Format(time.RFC3339Nano),
 		"schedule_execution_count": scheduleExecutionCount,
 		"action_response": map[string]interface{}{
 			"osquery": map[string]interface{}{
