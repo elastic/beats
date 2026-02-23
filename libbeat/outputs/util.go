@@ -62,9 +62,6 @@ func Success(
 			if err != nil {
 				return Group{}, fmt.Errorf("unable to get disk queue settings: %w", err)
 			}
-			if beatPaths == nil {
-				panic("TODO: unexpected nil")
-			}
 			settings.Paths = beatPaths
 			q = diskqueue.FactoryForSettings(settings)
 		default:
