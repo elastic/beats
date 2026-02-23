@@ -15,6 +15,7 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hostfs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/proc"
@@ -27,7 +28,9 @@ const (
 )
 
 func init() {
-	elastichostprocesses.RegisterGenerateFunc(getResults)
+	elastichostprocesses.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elastichostprocesses.Result, error) {
+		return getResults(ctx, queryContext, log)
+	})
 }
 
 func getResults(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elastichostprocesses.Result, error) {

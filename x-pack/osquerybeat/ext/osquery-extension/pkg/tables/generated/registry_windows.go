@@ -16,6 +16,7 @@ import (
 	"github.com/osquery/osquery-go"
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	elasticamcacheapplication "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_application"
 	elasticamcacheapplicationfile "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_application_file"
@@ -28,10 +29,10 @@ import (
 
 // RegisterTables registers all generated tables with the osquery extension server.
 // This function is called from main.go after all init() functions have run.
-func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
+func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, client *client.ResilientClient) {
 	{
 		// Windows Amcache inventory application entries (Root\InventoryApplication)
-		genFunc, err := elasticamcacheapplication.GetGenerateFunc(log)
+		genFunc, err := elasticamcacheapplication.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_amcache_application: %v", err)
 		} else {
@@ -41,7 +42,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Windows Amcache inventory application file entries (Root\InventoryApplicationFile)
-		genFunc, err := elasticamcacheapplicationfile.GetGenerateFunc(log)
+		genFunc, err := elasticamcacheapplicationfile.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_amcache_application_file: %v", err)
 		} else {
@@ -51,7 +52,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Windows Amcache inventory application shortcut entries (Root\InventoryApplicationShortcut)
-		genFunc, err := elasticamcacheapplicationshortcut.GetGenerateFunc(log)
+		genFunc, err := elasticamcacheapplicationshortcut.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_amcache_application_shortcut: %v", err)
 		} else {
@@ -61,7 +62,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Windows Amcache inventory device PnP entries (Root\InventoryDevicePnp)
-		genFunc, err := elasticamcachedevicepnp.GetGenerateFunc(log)
+		genFunc, err := elasticamcachedevicepnp.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_amcache_device_pnp: %v", err)
 		} else {
@@ -71,7 +72,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Windows Amcache inventory driver binary entries (Root\InventoryDriverBinary)
-		genFunc, err := elasticamcachedriverbinary.GetGenerateFunc(log)
+		genFunc, err := elasticamcachedriverbinary.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_amcache_driver_binary: %v", err)
 		} else {
@@ -81,7 +82,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Windows Amcache inventory driver package entries (Root\InventoryDriverPackage)
-		genFunc, err := elasticamcachedriverpackage.GetGenerateFunc(log)
+		genFunc, err := elasticamcachedriverpackage.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_amcache_driver_package: %v", err)
 		} else {
@@ -91,7 +92,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Browser history from multiple browsers (Chrome, Edge, Firefox, Safari) with unified schema
-		genFunc, err := elasticbrowserhistory.GetGenerateFunc(log)
+		genFunc, err := elasticbrowserhistory.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_browser_history: %v", err)
 		} else {
