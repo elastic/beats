@@ -35,11 +35,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -115,7 +117,15 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 
 	if e.config.Tracer != nil {
 		id := sanitizeFileName(ctx.IDWithoutName)
-		e.config.Tracer.Filename = strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
+		path := strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+		}
+		e.config.Tracer.Filename = resolved
 	}
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
@@ -373,6 +383,8 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 			optionsStatus:  c.OptionsStatus,
 		},
 		maxInFlight:           c.MaxInFlight,
+		highWaterInFlight:     c.HighWaterInFlight,
+		lowWaterInFlight:      c.LowWaterInFlight,
 		retryAfter:            c.RetryAfter,
 		program:               prg,
 		messageField:          c.Prefix,
@@ -382,6 +394,8 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 		preserveOriginalEvent: c.PreserveOriginalEvent,
 		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
 	}
+	// Initialize accepting to true so we start by accepting requests.
+	h.accepting.Store(true)
 	if h.status == nil {
 		h.status = noopReporter{}
 	}

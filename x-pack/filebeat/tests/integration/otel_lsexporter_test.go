@@ -103,8 +103,6 @@ processors:
             - %s
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    output:
-      otelconsumer:
     processors:
       - add_host_metadata: ~
       - add_fields:
@@ -207,8 +205,6 @@ func TestLogstashExporterProxyURL(t *testing.T) {
             - %s
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
-    output:
-      otelconsumer:
     processors:
       - add_host_metadata: ~
       - add_fields:
