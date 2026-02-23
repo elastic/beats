@@ -375,3 +375,7 @@ func sameError(a, b error) bool {
 		return a.Error() == b.Error()
 	}
 }
+
+func TestFoo(t *testing.T) {
+	t.Log("run the CI pipeline")
+}
