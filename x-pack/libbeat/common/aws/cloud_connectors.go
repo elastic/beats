@@ -87,7 +87,7 @@ func addCloudConnectorsCredentials(config ConfigAWS, cloudConnectorsConfig Cloud
 				func(aro *stscreds.AssumeRoleOptions) {
 					aro.Duration = config.AssumeRoleDuration
 					if config.ExternalID != "" {
-						aro.ExternalID = awssdk.String(CloudConnectorsExternalID(cloudConnectorsConfig.CloudResourceID, config.ExternalID))
+						aro.ExternalID = awssdk.String(cloudConnectorsExternalID(cloudConnectorsConfig.CloudResourceID, config.ExternalID))
 					}
 				},
 			)
@@ -100,7 +100,7 @@ func addCloudConnectorsCredentials(config ConfigAWS, cloudConnectorsConfig Cloud
 	)
 }
 
-func CloudConnectorsExternalID(resourceID, externalIDPart string) string {
+func cloudConnectorsExternalID(resourceID, externalIDPart string) string {
 	return fmt.Sprintf("%s-%s", resourceID, externalIDPart)
 }
 
