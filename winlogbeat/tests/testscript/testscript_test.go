@@ -30,7 +30,7 @@ import (
 
 var (
 	update       = flag.Bool("update", false, "update txtar scripts with actual output")
-	preserveWork = flag.Bool("preserve", false, "preserve testscript work directories after test")
+	keepWork = flag.Bool("keep", false, "keep testscript work directories after test")
 )
 
 func TestMain(m *testing.M) {
@@ -63,7 +63,7 @@ func TestScripts(t *testing.T) {
 			return setupTest(env)
 		},
 		UpdateScripts: *update,
-		TestWork:      *preserveWork,
+		TestWork:      *keepWork,
 	}
 	for _, sub := range []string{"export", "config", "eventlog", "evtx"} {
 		t.Run(sub, func(t *testing.T) {
