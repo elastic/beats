@@ -213,9 +213,9 @@ integration-tests-environment: prepare-tests build-image
 # Runs the system tests
 .PHONY: system-tests
 system-tests: ## @testing Runs the system tests
-system-tests: prepare-tests ${BEAT_NAME}.test python-env
+system-tests: prepare-tests ${BEAT_NAME}.test python-env mage
 	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} pytest ${PYTHON_TEST_FILES} ${PYTEST_OPTIONS}
-	${PYTHON_ENV_EXE} ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ${BUILD_DIR}/system-tests/run
+	@COV_OUT="${COVERAGE_DIR}/system.cov" COV_DIR="${BUILD_DIR}/system-tests/run" mage aggregateCoverage
 
 # Runs the system tests
 .PHONY: system-tests-environment
@@ -315,8 +315,8 @@ testsuite: clean update
 
 # Generates a coverage report from the existing coverage files
 .PHONY: coverage-report
-coverage-report: python-env
-	${PYTHON_ENV_EXE} ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/full.cov ${COVERAGE_DIR}
+coverage-report: mage
+	@COV_OUT="${COVERAGE_DIR}/full.cov" COV_DIR="${COVERAGE_DIR}" mage aggregateCoverage
 	go tool cover -html=${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 	test ! -s ${COVERAGE_DIR}/integration.cov   || go tool cover -html=${COVERAGE_DIR}/integration.cov   -o ${COVERAGE_DIR}/integration.html
 	test ! -s ${COVERAGE_DIR}/system.cov || go tool cover -html=${COVERAGE_DIR}/system.cov -o ${COVERAGE_DIR}/system.html
@@ -428,11 +428,11 @@ set_version: ## @packaging VERSION=x.y.z set the version of the beat to x.y.z
 get_version: ## @packaging get the version of the beat.
 	@${ES_BEATS}/dev-tools/get_version
 
-help: ## @help Show this help.
-	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py $(MAKEFILE_LIST)
+help: mage ## @help Show this help.
+	@MAKEFILE_LIST="$(MAKEFILE_LIST)" mage generateMakefileDoc
 
-help_variables: ## @help Show Makefile customizable variables.
-	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py --variables $(MAKEFILE_LIST)
+help_variables: mage ## @help Show Makefile customizable variables.
+	@MAKEFILE_LIST="$(MAKEFILE_LIST)" VARIABLES=true mage generateMakefileDoc
 
 # Generates a seccomp whitelist policy for the binary pointed to by
 # SECCOMP_BINARY.

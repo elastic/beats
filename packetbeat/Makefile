@@ -16,5 +16,5 @@ benchmark:
 	go test -short -bench=. ./... -cpu=2
 
 .PHONY: create-tcp-protocol
-create-tcp-protocol: python-env
-	@${PYTHON_ENV_EXE} ${ES_BEATS}/packetbeat/scripts/create_tcp_protocol.py
+create-tcp-protocol: mage
+	@mage createTcpProtocol

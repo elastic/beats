@@ -2,7 +2,7 @@
 # which were changed between 7.x and 8.0.
 #
 # This file will be used to generate breaking change documentation and migrate
-# Kibana dashboards. See script/renamed_fields.py and script/kibana-migration.py.
+# Kibana dashboards. See mage targets: renamedFields and kibanaMigration.
 #
 # The format of the file is as following:
 #

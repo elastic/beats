@@ -108,9 +108,8 @@ New Filebeat modules might not be compatible with Kibana 5.x. To export dashboar
 
 ```shell
 $ cd filebeat
-$ make python-env
 $ cd module/{module}/
-$ python ../../../dev-tools/export_5x_dashboards.py --regex {module} --dir _meta/kibana/5.x
+$ REGEX={module} OUTPUT_DIR=_meta/kibana/5.x mage export5xDashboards
 ```
 
 Where the `--regex` parameter should match the dashboard you want to export.

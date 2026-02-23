@@ -21,6 +21,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -129,4 +130,13 @@ func fieldDocs() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return devtools.KibanaDashboards("protos")
+}
+
+// CreateTcpProtocol scaffolds a new TCP protocol plugin from templates.
+// Replaces packetbeat/scripts/create_tcp_protocol.py.
+func CreateTcpProtocol() error {
+	return packetbeat.CreateTcpProtocol(
+		devtools.OSSBeatDir("scripts"),
+		os.Getenv("PROTOCOL"),
+	)
 }
