@@ -69,8 +69,6 @@ func TestMetricbeatOTelE2E(t *testing.T) {
           - '.*'
          metricsets:
           - cpu
-    output:
-      otelconsumer:
     processors:
       - add_host_metadata: ~
       - add_cloud_metadata: ~
@@ -259,8 +257,6 @@ func TestMetricbeatOTelReceiverE2E(t *testing.T) {
           - '.*'
          metricsets:
           - cpu
-    output:
-      otelconsumer:
     processors:
       - add_host_metadata: ~
       - add_cloud_metadata: ~
@@ -456,8 +452,6 @@ func TestMetricbeatOTelMultipleReceiversE2E(t *testing.T) {
           target: ''
           fields:
             receiverid: "{{$i}}"
-    output:
-      otelconsumer:
     logging:
       level: info
       selectors:

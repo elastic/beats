@@ -23,9 +23,8 @@ The following topics describe how to configure each supported output. If you’v
 * [Console](/reference/heartbeat/console-output.md)
 * [Discard](/reference/heartbeat/discard-output.md)
 
-
-
-
+::::{include} /reference/_snippets/serverless-output-tip.md
+::::
 
 
 

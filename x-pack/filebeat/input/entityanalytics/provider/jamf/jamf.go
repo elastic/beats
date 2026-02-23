@@ -115,7 +115,15 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 
 	if p.cfg.Tracer != nil {
 		id := sanitizeFileName(inputCtx.IDWithoutName)
-		p.cfg.Tracer.Filename = strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
+		path := strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(Name, path)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, Name))
+		}
+		p.cfg.Tracer.Filename = resolved
 	}
 
 	var err error

@@ -50,6 +50,7 @@ type RunningBeat struct {
 	output      []string
 	outputDone  chan struct{}
 	watcher     OutputWatcher
+	inspector   OutputInspector
 	keepRunning bool
 	t           *testing.T
 }
@@ -116,6 +117,10 @@ func (b *RunningBeat) writeOutputLine(line string) {
 
 	b.output = append(b.output, line)
 
+	if b.inspector != nil {
+		b.inspector.Inspect(line)
+	}
+
 	if b.watcher == nil {
 		return
 	}
@@ -149,7 +154,7 @@ type RunBeatOptions struct {
 
 // RunBeat runs a Beat binary with the given config and args.
 // Returns a `RunningBeat` that allow to collect the output and wait until the exit.
-func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher OutputWatcher, homeDir string) *RunningBeat {
+func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher OutputWatcher, inspector OutputInspector, homeDir string) *RunningBeat {
 	t.Logf("preparing to run %s...", opts.Beatname)
 
 	binaryFilename := findBeatBinaryPath(t, opts.Beatname)
@@ -199,6 +204,7 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 	b := &RunningBeat{
 		c:           c,
 		watcher:     watcher,
+		inspector:   inspector,
 		keepRunning: opts.KeepRunning,
 		outputDone:  make(chan struct{}),
 		t:           t,
