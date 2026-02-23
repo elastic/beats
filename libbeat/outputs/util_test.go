@@ -20,7 +20,6 @@ package outputs
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,7 +27,6 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -41,32 +39,54 @@ func TestDiskQueueUnderAgent(t *testing.T) {
 	)
 
 	tests := []struct {
-		name           string
-		cfg            string
-		encoderFactory queue.EncoderFactory
-		pathsFunc      func(string) *paths.Path
-		needQueueDir   bool
+		name          string
+		cfg           func(tempDir string) string
+		pathsFunc     func(tempDir string) *paths.Path
+		wantStatePath func(tempDir string) string
 	}{
 		{
-			name: "Happy path",
-			cfg: `
+			name: "explicit path in config",
+			cfg: func(tempDir string) string {
+				return fmt.Sprintf(`
                     disk:
                         max_size: 100MB
                         path: %s
-                `,
+                `, tempDir)
+			},
+			wantStatePath: func(tempDir string) string {
+				return filepath.Join(tempDir, "state.dat")
+			},
 		},
 		{
-			name: "Use data paths",
-			cfg: `
+			name: "falls back to beat data path",
+			cfg: func(_ string) string {
+				return `
                     disk:
                         max_size: 100MB
-                `,
-			pathsFunc: func(tempDir string) *paths.Path {
-				return &paths.Path{
-					Data: tempDir,
-				}
+                `
 			},
-			needQueueDir: true,
+			pathsFunc: func(tempDir string) *paths.Path {
+				return &paths.Path{Data: tempDir}
+			},
+			wantStatePath: func(tempDir string) string {
+				return filepath.Join(tempDir, "diskqueue", "state.dat")
+			},
+		},
+		{
+			name: "explicit path takes precedence over data path",
+			cfg: func(tempDir string) string {
+				return fmt.Sprintf(`
+                    disk:
+                        max_size: 100MB
+                        path: %s
+                `, filepath.Join(tempDir, "explicit"))
+			},
+			pathsFunc: func(tempDir string) *paths.Path {
+				return &paths.Path{Data: filepath.Join(tempDir, "data")}
+			},
+			wantStatePath: func(tempDir string) string {
+				return filepath.Join(tempDir, "explicit", "state.dat")
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -79,11 +99,7 @@ func TestDiskQueueUnderAgent(t *testing.T) {
 			tempDir := t.TempDir()
 
 			queueConfig := config.Namespace{}
-			cfg := tt.cfg
-			if strings.Contains(cfg, "%s") {
-				cfg = fmt.Sprintf(tt.cfg, tempDir)
-			}
-			conf, err := config.NewConfigFrom(cfg)
+			conf, err := config.NewConfigFrom(tt.cfg(tempDir))
 			require.NoError(t, err, "error parsing queue config")
 			err = queueConfig.Unpack(conf)
 			require.NoError(t, err, "error unpacking queue config")
@@ -95,23 +111,21 @@ func TestDiskQueueUnderAgent(t *testing.T) {
 				beatPaths = tt.pathsFunc(tempDir)
 			}
 
-			actualGroup, err := Success(queueConfig, batchSize, retry, nil, logp.NewNopLogger(), beatPaths)
+			successLogger, logBuf := logp.NewInMemoryLocal("test-diskqueue", zapcore.EncoderConfig{})
+			group, err := Success(queueConfig, batchSize, retry, nil, successLogger, beatPaths)
 			require.NoError(t, err)
+			require.NotNil(t, group)
+			require.NotNil(t, group.QueueFactory)
 
-			require.NotNil(t, actualGroup)
-			require.NotNil(t, actualGroup.QueueFactory)
+			assert.Contains(t, logBuf.String(), "unsupported and in technical preview")
 
-			testlogger, _ := logp.NewInMemoryLocal("test-diskqueue", zapcore.EncoderConfig{})
-			actualQueue, err := actualGroup.QueueFactory(testlogger, nil, 1, nil)
+			queueLogger, _ := logp.NewInMemoryLocal("test-diskqueue", zapcore.EncoderConfig{})
+			q, err := group.QueueFactory(queueLogger, nil, 1, nil)
 			require.NoError(t, err)
-			require.NotNil(t, actualQueue)
-			// assert that the file exists in the path we specified
-			parts := []string{tempDir}
-			if tt.needQueueDir {
-				parts = append(parts, "diskqueue")
-			}
-			parts = append(parts, "state.dat")
-			assert.FileExists(t, filepath.Join(parts...))
+			require.NotNil(t, q)
+			defer func() { require.NoError(t, q.Close(true)) }()
+
+			assert.FileExists(t, tt.wantStatePath(tempDir))
 		})
 	}
 }
