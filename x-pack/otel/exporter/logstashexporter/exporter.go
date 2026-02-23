@@ -224,7 +224,6 @@ func (l *logstashExporter) handleRetry(
 		return false, nil
 	}
 
-	//nolint:gosec //G115: MaxRetries is positive.
 	if l.config.MaxRetries > 0 && batch.NumRetries() >= uint64(l.config.MaxRetries) {
 		return true, consumererror.NewLogs(
 			fmt.Errorf("max number of retries exceeded: %d", l.config.MaxRetries),

@@ -142,7 +142,7 @@ func loadMeta(metaPath string) (uuid.UUID, error) {
 	//return the UUID if it exists
 	if err == nil {
 		m := meta{}
-		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF { //nolint:errorlint // keep old behaviour
+		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
 			f.Close()
 			return uuid.Nil, fmt.Errorf("error reading %s: %w", metaPath, err)
 		}

@@ -147,13 +147,13 @@ func SettingsForUserConfig(config *config.C) (Settings, error) {
 	settings := DefaultSettings()
 	settings.Path = userConfig.Path
 
-	settings.MaxBufferSize = uint64(userConfig.MaxSize)
+	settings.MaxBufferSize = uint64(userConfig.MaxSize) //nolint:gosec // G115 - Validate() ensures MaxSize >= 10MB
 	if userConfig.SegmentSize != nil {
-		settings.MaxSegmentSize = uint64(*userConfig.SegmentSize)
+		settings.MaxSegmentSize = uint64(*userConfig.SegmentSize) //nolint:gosec // G115 - Validate() ensures SegmentSize >= 1MB
 	} else {
 		// If no value is specified, default segment size is total queue size
 		// divided by 10.
-		settings.MaxSegmentSize = uint64(userConfig.MaxSize) / 10
+		settings.MaxSegmentSize = uint64(userConfig.MaxSize) / 10 //nolint:gosec // G115 - Validate() ensures MaxSize >= 10MB
 	}
 
 	if userConfig.ReadAheadLimit != nil {
