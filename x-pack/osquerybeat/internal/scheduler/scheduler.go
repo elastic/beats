@@ -17,7 +17,8 @@ import (
 // QueryFunc is the function type for executing a query.
 // scheduleID is the policy-defined schedule id (may be empty, caller can use name).
 // executionIndex is the 1-based schedule execution count for this run.
-type QueryFunc func(ctx context.Context, name, query string, timeout time.Duration, scheduleID string, executionIndex int) error
+// plannedScheduleTime is the intended schedule slot (before splay/jitter).
+type QueryFunc func(ctx context.Context, name, query string, timeout time.Duration, scheduleID string, executionIndex int, plannedScheduleTime time.Time) error
 
 // ScheduledQuery represents a query with its recurrence schedule
 type ScheduledQuery struct {
@@ -266,13 +267,13 @@ func (s *Scheduler) runJob(ctx context.Context, job *scheduledJob) {
 			if n, ok := schedule.ExecutionIndex(runTime); ok {
 				executionIndex = n
 			}
-			s.executeQuery(ctx, sq, runTime, executionIndex)
+			s.executeQuery(ctx, sq, runTime, nextRun, executionIndex)
 		}
 	}
 }
 
 // executeQuery executes a scheduled query
-func (s *Scheduler) executeQuery(ctx context.Context, sq *ScheduledQuery, runTime time.Time, executionIndex int) {
+func (s *Scheduler) executeQuery(ctx context.Context, sq *ScheduledQuery, runTime, plannedScheduleTime time.Time, executionIndex int) {
 	s.log.Debugf("Executing scheduled query '%s' (execution #%d)", sq.Name, executionIndex)
 
 	// Create a timeout context if specified
@@ -287,7 +288,7 @@ func (s *Scheduler) executeQuery(ctx context.Context, sq *ScheduledQuery, runTim
 	if scheduleID == "" {
 		scheduleID = sq.Name
 	}
-	err := s.queryFunc(execCtx, sq.Name, sq.Query, sq.Timeout, scheduleID, executionIndex)
+	err := s.queryFunc(execCtx, sq.Name, sq.Query, sq.Timeout, scheduleID, executionIndex, plannedScheduleTime)
 	if err != nil {
 		s.log.Errorf("Error executing scheduled query '%s': %v", sq.Name, err)
 	} else {

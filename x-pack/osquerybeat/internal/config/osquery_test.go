@@ -88,15 +88,9 @@ func TestRRuleScheduleConfig_GetSplay(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name:     "explicit 2h",
-			splay:    "2h",
-			expected: 2 * time.Hour,
-			wantErr:  false,
-		},
-		{
-			name:     "max splay 12h",
-			splay:    "12h",
-			expected: 12 * time.Hour,
+			name:     "max splay 1h",
+			splay:    "1h",
+			expected: time.Hour,
 			wantErr:  false,
 		},
 		{
@@ -107,7 +101,7 @@ func TestRRuleScheduleConfig_GetSplay(t *testing.T) {
 		},
 		{
 			name:    "exceeds max",
-			splay:   "13h",
+			splay:   "2h",
 			wantErr: true,
 		},
 		{

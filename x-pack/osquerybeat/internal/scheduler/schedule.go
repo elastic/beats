@@ -68,43 +68,45 @@ func (s *RecurrenceSchedule) Parse() error {
 
 	s.rule = rule
 
-	// Validate minimum interval
-	if err := s.validateMinInterval(); err != nil {
+	// Validate splay constraints
+	if err := s.ValidateSplay(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// validateMinInterval ensures the schedule doesn't run more often than once per day
-func (s *RecurrenceSchedule) validateMinInterval() error {
+// minimumInterval returns the smallest positive interval between consecutive
+// occurrences, sampled from upcoming executions.
+func (s *RecurrenceSchedule) minimumInterval() (time.Duration, bool) {
 	if s.rule == nil {
-		return nil
+		return 0, false
 	}
 
-	// Get the next 3 execution times and check intervals
-	now := time.Now()
-	times := s.rule.Between(now, now.Add(365*24*time.Hour), false)
+	current := s.rule.GetDTStart()
+	minInterval := time.Duration(1<<63 - 1)
+	found := false
 
-	if len(times) < 2 {
-		// Not enough occurrences to check interval - that's fine
-		return nil
-	}
-
-	// Check interval between consecutive executions (up to first 3)
-	checkCount := 3
-	if len(times) < checkCount {
-		checkCount = len(times)
-	}
-
-	for i := 1; i < checkCount; i++ {
-		interval := times[i].Sub(times[i-1])
-		if interval < MinInterval {
-			return ErrIntervalTooShort
+	// Sample a bounded number of upcoming occurrences to keep this validation cheap.
+	for i := 0; i < 16; i++ {
+		next := s.rule.After(current, false)
+		if next.IsZero() {
+			break
 		}
+
+		interval := next.Sub(current)
+		if interval > 0 && interval < minInterval {
+			minInterval = interval
+			found = true
+		}
+		current = next
 	}
 
-	return nil
+	if !found {
+		return 0, false
+	}
+
+	return minInterval, true
 }
 
 // Next returns the next execution time after the given time, considering the schedule window
@@ -167,8 +169,7 @@ func (s *RecurrenceSchedule) GetMaxSplayDuration() time.Duration {
 	return s.Splay
 }
 
-// ValidateSplay checks if splay configuration is valid
-// Since minimum interval is 1 day and max splay is 12h, splay is always safe
+// ValidateSplay checks if splay configuration is valid.
 func (s *RecurrenceSchedule) ValidateSplay() error {
 	if s.Splay < 0 {
 		return fmt.Errorf("splay cannot be negative: %v", s.Splay)
@@ -176,6 +177,20 @@ func (s *RecurrenceSchedule) ValidateSplay() error {
 	if s.Splay > MaxSplay {
 		return fmt.Errorf("splay cannot exceed %v, got: %v", MaxSplay, s.Splay)
 	}
+	if s.Splay == 0 {
+		return nil
+	}
+
+	minInterval, ok := s.minimumInterval()
+	if !ok {
+		return nil
+	}
+
+	maxAllowedSplay := minInterval / 2
+	if s.Splay > maxAllowedSplay {
+		return fmt.Errorf("splay must be at most %v (half of minimum interval %v), got: %v", maxAllowedSplay, minInterval, s.Splay)
+	}
+
 	return nil
 }
 

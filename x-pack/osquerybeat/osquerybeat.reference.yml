@@ -41,7 +41,6 @@ osquerybeat:
 #            rrule_schedule:
 #              # RFC 5545 recurrence rule string
 #              # NOTE: DTSTART inside the rule is ignored; start_date is required and used as DTSTART.
-#              # Minimum interval: 1 day (24 hours)
 #              # Examples:
 #              #   "FREQ=DAILY"                         - Every day
 #              #   "FREQ=WEEKLY;BYDAY=MO,WE,FR"         - Mon, Wed, Fri
@@ -56,7 +55,7 @@ osquerybeat:
 #              # Optional: Maximum splay duration to spread out query execution
 #              # and avoid thundering herd effects.
 #              # Uses Go duration format: "30s", "5m", "2h", "1h30m"
-#              # Range: 0s to 12h (maximum). Default: 0s (disabled)
+#              # Range: 0s to 1h (maximum). Default: 0s (disabled)
 #              # Set to "0s" to disable splay.
 #              splay: "0s"
 #              # Optional: Query timeout in seconds (default: 60)
@@ -64,9 +63,7 @@ osquerybeat:
 #
 # Splay Best Practices:
 # - Default is 0s (disabled); opt in to splay for most schedules
-# - For daily queries, use 30m-2h splay
-# - For weekly queries, use 1h-6h splay
-# - Maximum splay is 12 hours (safe for minimum 1-day interval)
+# - Maximum splay is 1 hour
 #
 # Note: When both interval and rrule_schedule are set, rrule_schedule takes
 # precedence. Queries scheduled via RRULE are executed by osquerybeat directly,

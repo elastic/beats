@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	// MaxSplay is the maximum allowed splay duration (12 hours)
-	MaxSplay = 12 * time.Hour
+	// MaxSplay is the maximum allowed splay duration.
+	MaxSplay = time.Hour
 	// DefaultSplay is the default splay duration (disabled)
 	DefaultSplay = 0
 )
@@ -35,7 +35,7 @@ type RRuleScheduleConfig struct {
 	// Splay is the maximum random delay before query execution.
 	// This helps spread out query execution times to avoid thundering herd effects.
 	// Accepts duration strings: "30s", "5m", "2h", etc.
-	// Range: 0s to 12h. Default: 0s (disabled).
+	// Range: 0s to 1h. Default: 0s (disabled).
 	Splay string `config:"splay,omitempty" json:"splay,omitempty"`
 
 	// Timeout is the query execution timeout in seconds
