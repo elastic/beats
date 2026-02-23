@@ -1,4 +1,5 @@
 # This file is generated! See ext/osquery-extension/cmd/gentables.
+<!-- DO NOT EDIT MANUALLY. Update specs/templates and re-run gentables. -->
 
 # Osquery Extension for Elastic
 
