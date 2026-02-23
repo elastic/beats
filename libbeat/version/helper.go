@@ -19,6 +19,7 @@ package version
 
 import (
 	"runtime/debug"
+	"sync"
 	"sync/atomic"
 	"time"
 )
@@ -28,9 +29,10 @@ var (
 	vcsRevision    = "unknown"
 	vcsTime        time.Time
 	qualifier      = ""
+	vcsOnce        sync.Once
 )
 
-func init() {
+func readInfo() {
 	if info, ok := debug.ReadBuildInfo(); ok {
 		for _, setting := range info.Settings {
 			switch setting.Key {
@@ -64,11 +66,13 @@ func GetDefaultVersion() string {
 // BuildTime exposes the compile-time build time information.
 // It will represent the zero time instant if parsing fails.
 func BuildTime() time.Time {
+	vcsOnce.Do(readInfo)
 	return vcsTime
 }
 
 // Commit exposes the compile-time commit hash.
 func Commit() string {
+	vcsOnce.Do(readInfo)
 	return vcsRevision
 }
 
