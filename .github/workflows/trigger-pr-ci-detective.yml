@@ -1,0 +1,26 @@
+name: PR CI Detective
+on:
+  workflow_run:
+    workflows: ["check-default", "pre-commit", "golangci-lint", "check-docs", "check-dev-tools"]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+  discussions: write
+  issues: write
+  pull-requests: write # required by gh-aw compiler for add-comment (github/gh-aw#16673)
+
+jobs:
+  run:
+    if: >-
+      github.event.workflow_run.conclusion == 'failure' &&
+      toJSON(github.event.workflow_run.pull_requests) != '[]' &&
+      contains(fromJSON('["strawgate","AlexanderWert","perk","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia","pierrehilbert","bturquet","teresaromero","mrodm","jsoriano","kpollich","andrewkroh","norrietaylor","ishleenk17","tommyers-elastic","lalit-satapathy","agithomas","belimawr","ycombinator","zmoog","MichaelKatsoulis","gizas","AndersonQ","chrisberkhout"]'), github.actor)
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-pr-ci-detective.lock.yml@v0
+    with:
+      setup-commands: |
+        sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+        make mage
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
