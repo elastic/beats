@@ -119,7 +119,6 @@ class Test(metricbeat.BaseTest):
             required_fields=["@timestamp"],
         )
 
-
         # one of the outputs will be an error event because we're running this test as a non-root user.
         # In this scenario, “permission denied” errors are expected, and the actual metrics will be captured in a separate event.
         found = False
