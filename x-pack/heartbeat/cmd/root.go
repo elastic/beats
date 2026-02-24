@@ -39,6 +39,7 @@ func TransformRawIn(rawIn *proto.UnitExpectedConfig) []map[string]interface{} {
 
 	for _, p := range rawInput {
 		delete(p, "policy")
+		delete(p, "revision")
 	}
 
 	return rawInput
