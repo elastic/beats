@@ -16,7 +16,9 @@ Field names (columns) are returned as lowercase strings. Values are returned as 
 
 ## Cursor-based incremental data fetching
 
-```{applies_to} stack: beta 9.4```
+```{applies_to}
+stack: beta 9.4
+```
 
 The cursor feature enables incremental data fetching by tracking the last fetched row value
 and using it to retrieve only new data on subsequent collection cycles. This is particularly
