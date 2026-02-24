@@ -693,6 +693,55 @@
               description: >
                 Memory that cannot be reclaimed, in bytes.
 
+            - name: pressure
+              type: group
+              description: Pressure (resource contention) stats.
+              version:
+                ga: 9.3.0
+              fields:
+                - name: some
+                  type: group
+                  description: Share of time in which at least some tasks are stalled on a given resource
+                  version:
+                    ga: 9.3.0
+                  fields:
+                    - name: 10.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 10 seconds
+                    - name: 60.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 60 seconds
+                    - name: 300.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 300 seconds
+                    - name: total
+                      type: long
+                      description: total Some pressure time
+                - name: full
+                  type: group
+                  description: Share of time in which all non-idle tasks are stalled on a given resource simultaneously
+                  version:
+                    ga: 9.3.0
+                  fields:
+                    - name: 10.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 10 seconds
+                    - name: 60.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 60 seconds
+                    - name: 300.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 300 seconds
+                    - name: total
+                      type: long
+                      description: total Full pressure time
+
         - name: blkio
           type: group
           description: Block IO metrics.
