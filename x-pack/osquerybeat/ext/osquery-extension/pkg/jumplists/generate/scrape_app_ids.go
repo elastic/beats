@@ -77,7 +77,8 @@ func writeAppIdGeneratedFile(outputFile string, log *logger.Logger) error {
 	var sb strings.Builder
 	writeCopyrightHeader(&sb)
 	sb.WriteString("// knownAppIDs is a lookup table for known windows AppIDs.\n")
-	sb.WriteString(fmt.Sprintf("// Source: %s\n", appIdSourceUrl))
+	sb.WriteString("// Source Repo:         https://github.com/EricZimmerman/JumpList/\n")
+	sb.WriteString("// Source Repo License: MIT License (https://github.com/EricZimmerman/JumpList/blob/master/license)\n")
 	sb.WriteString("var knownAppIDs = map[string]string{\n")
 
 	// Sort keys for consistent output
