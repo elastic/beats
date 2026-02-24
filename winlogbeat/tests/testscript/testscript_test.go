@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	update       = flag.Bool("update", false, "update txtar scripts with actual output")
+	update   = flag.Bool("update", false, "update txtar scripts with actual output")
 	keepWork = flag.Bool("keep", false, "keep testscript work directories after test")
 )
 
