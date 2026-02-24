@@ -75,7 +75,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if m.ApiKey != "" {
 		m.http.SetHeader("Authorization", "ApiKey "+m.ApiKey)
 	}
-	content, err := m.http.FetchContent()
+
+	resp, err := m.http.FetchResponse()
+	if err != nil {
+		return err
+	}
+
+	content, err := kibana.ReadBody(resp)
 	if err != nil {
 		return err
 	}
