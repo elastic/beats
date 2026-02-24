@@ -1722,6 +1722,92 @@ service:
 	})
 }
 
+func TestDiskQueuePerReceiverPaths(t *testing.T) {
+	tmpdir := t.TempDir()
+	logFilePath := filepath.Join(tmpdir, "input.log")
+	writeEventsToLogFile(t, logFilePath, 5)
+
+	type receiverConfig struct {
+		Index    int
+		PathHome string
+	}
+
+	receivers := []receiverConfig{
+		{Index: 0, PathHome: filepath.Join(tmpdir, "receiver-a")},
+		{Index: 1, PathHome: filepath.Join(tmpdir, "receiver-b")},
+	}
+
+	configData := struct {
+		Receivers []receiverConfig
+		InputFile string
+	}{
+		Receivers: receivers,
+		InputFile: logFilePath,
+	}
+
+	cfgTemplate := `receivers:
+{{range .Receivers}}
+  filebeatreceiver/{{.Index}}:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-diskqueue-{{.Index}}
+          enabled: true
+          paths:
+            - {{$.InputFile}}
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    path.home: {{.PathHome}}
+    queue.disk:
+      max_size: 100MB
+    queue.mem.flush.timeout: 0s
+{{end}}
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+{{range .Receivers}}
+        - filebeatreceiver/{{.Index}}
+{{end}}
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`
+
+	var configBuffer bytes.Buffer
+	require.NoError(t, template.Must(template.New("config").Parse(cfgTemplate)).Execute(&configBuffer, configData))
+	configContents := configBuffer.String()
+
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Config contents:\n%s", configContents)
+		}
+	})
+
+	col := oteltestcol.New(t, configContents)
+	_ = col
+
+	for _, r := range receivers {
+		diskqueueDir := filepath.Join(r.PathHome, "data", "diskqueue")
+		require.EventuallyWithT(t, func(ct *assert.CollectT) {
+			assert.FileExists(ct, filepath.Join(diskqueueDir, "state.dat"),
+				"receiver %d: expected diskqueue state.dat under %s", r.Index, diskqueueDir)
+		}, 30*time.Second, 500*time.Millisecond)
+	}
+
+	// Verify the two receivers have distinct diskqueue directories.
+	dirA := filepath.Join(receivers[0].PathHome, "data", "diskqueue")
+	dirB := filepath.Join(receivers[1].PathHome, "data", "diskqueue")
+	assert.NotEqual(t, dirA, dirB, "receivers must have different diskqueue paths")
+}
+
 func BenchmarkFilebeatOTelCollector(b *testing.B) {
 	numReceivers := 4
 
