@@ -263,7 +263,11 @@
                 },
                 "storage": {
                     "lsm_size": 525060325,
-                    "value_log_size": 12058435
+                    "value_log_size": 12058435,
+                    "storage_limit": 0,
+                    "disk_used": 107374182400,
+                    "disk_total": 214748364800,
+                    "disk_usage_threshold_pct": 0.802
                 }
             },
             "transactions_dropped": 0
