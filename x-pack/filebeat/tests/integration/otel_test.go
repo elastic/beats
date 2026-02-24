@@ -368,6 +368,26 @@ service:
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 }
 
+type multiReceiverConfig struct {
+	Index          int
+	PathHome       string
+	InputFile      string
+	MonitoringPort int
+}
+
+func renderOtelConfig(tb testing.TB, cfgTemplate string, data any) string {
+	tb.Helper()
+	var buf bytes.Buffer
+	require.NoError(tb, template.Must(template.New("config").Parse(cfgTemplate)).Execute(&buf, data))
+	cfg := buf.String()
+	tb.Cleanup(func() {
+		if tb.Failed() {
+			tb.Logf("OTel config:\n%s", cfg)
+		}
+	})
+	return cfg
+}
+
 func writeEventsToFile(t *testing.T, file *os.File, startLine, numEvents int) {
 	t.Helper()
 	for i := startLine; i < startLine+numEvents; i++ {
@@ -424,19 +444,13 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 	logFilePath := filepath.Join(tmpdir, "log.log")
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 
-	type receiverConfig struct {
-		MonitoringPort int
-		InputFile      string
-		PathHome       string
-	}
-
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	otelConfig := struct {
 		Index     string
-		Receivers []receiverConfig
+		Receivers []multiReceiverConfig
 	}{
 		Index: "logs-integration-" + namespace,
-		Receivers: []receiverConfig{
+		Receivers: []multiReceiverConfig{
 			{
 				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
 				InputFile:      logFilePath,
@@ -450,7 +464,7 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 		},
 	}
 
-	cfg := `receivers:
+	cfg := renderOtelConfig(t, `receivers:
 {{range $i, $receiver := .Receivers}}
   filebeatreceiver/{{$i}}:
     filebeat:
@@ -504,21 +518,11 @@ service:
       level: DEBUG
     metrics:
       level: none
-`
-	var configBuffer bytes.Buffer
-	require.NoError(t,
-		template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, otelConfig))
-	configContents := configBuffer.Bytes()
-
-	t.Cleanup(func() {
-		if t.Failed() {
-			t.Logf("Config contents:\n%s", configContents)
-		}
-	})
+`, otelConfig)
 
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 
-	oteltestcol.New(t, configBuffer.String())
+	oteltestcol.New(t, cfg)
 
 	es := integration.GetESClient(t, "http")
 
@@ -1727,25 +1731,12 @@ func TestDiskQueuePerReceiverPaths(t *testing.T) {
 	logFilePath := filepath.Join(tmpdir, "input.log")
 	writeEventsToLogFile(t, logFilePath, 5)
 
-	type receiverConfig struct {
-		Index    int
-		PathHome string
-	}
-
-	receivers := []receiverConfig{
+	receivers := []multiReceiverConfig{
 		{Index: 0, PathHome: filepath.Join(tmpdir, "receiver-a")},
 		{Index: 1, PathHome: filepath.Join(tmpdir, "receiver-b")},
 	}
 
-	configData := struct {
-		Receivers []receiverConfig
-		InputFile string
-	}{
-		Receivers: receivers,
-		InputFile: logFilePath,
-	}
-
-	cfgTemplate := `receivers:
+	cfg := renderOtelConfig(t, `receivers:
 {{range .Receivers}}
   filebeatreceiver/{{.Index}}:
     filebeat:
@@ -1779,20 +1770,12 @@ service:
       level: DEBUG
     metrics:
       level: none
-`
+`, struct {
+		Receivers []multiReceiverConfig
+		InputFile string
+	}{Receivers: receivers, InputFile: logFilePath})
 
-	var configBuffer bytes.Buffer
-	require.NoError(t, template.Must(template.New("config").Parse(cfgTemplate)).Execute(&configBuffer, configData))
-	configContents := configBuffer.String()
-
-	t.Cleanup(func() {
-		if t.Failed() {
-			t.Logf("Config contents:\n%s", configContents)
-		}
-	})
-
-	col := oteltestcol.New(t, configContents)
-	_ = col
+	oteltestcol.New(t, cfg)
 
 	for _, r := range receivers {
 		diskqueueDir := filepath.Join(r.PathHome, "data", "diskqueue")
@@ -1803,9 +1786,10 @@ service:
 	}
 
 	// Verify the two receivers have distinct diskqueue directories.
-	dirA := filepath.Join(receivers[0].PathHome, "data", "diskqueue")
-	dirB := filepath.Join(receivers[1].PathHome, "data", "diskqueue")
-	assert.NotEqual(t, dirA, dirB, "receivers must have different diskqueue paths")
+	assert.NotEqual(t,
+		filepath.Join(receivers[0].PathHome, "data", "diskqueue"),
+		filepath.Join(receivers[1].PathHome, "data", "diskqueue"),
+		"receivers must have different diskqueue paths")
 }
 
 func BenchmarkFilebeatOTelCollector(b *testing.B) {
@@ -1815,25 +1799,15 @@ func BenchmarkFilebeatOTelCollector(b *testing.B) {
 		b.StopTimer()
 		tmpDir := b.TempDir()
 
-		type receiverConfig struct {
-			Index    int
-			PathHome string
-		}
-
-		configData := struct {
-			Receivers []receiverConfig
-		}{
-			Receivers: make([]receiverConfig, numReceivers),
-		}
-
+		receivers := make([]multiReceiverConfig, numReceivers)
 		for i := range numReceivers {
-			configData.Receivers[i] = receiverConfig{
+			receivers[i] = multiReceiverConfig{
 				Index:    i + 1,
 				PathHome: filepath.Join(tmpDir, strconv.Itoa(i+1)),
 			}
 		}
 
-		cfgTemplate := `receivers:
+		cfg := renderOtelConfig(b, `receivers:
 {{range .Receivers}}
   filebeatreceiver/{{.Index}}:
     filebeat:
@@ -1861,14 +1835,11 @@ service:
       level: DEBUG
     metrics:
       level: none
-`
-
-		var configBuffer bytes.Buffer
-		require.NoError(b, template.Must(template.New("config").Parse(cfgTemplate)).Execute(&configBuffer, configData))
+`, struct{ Receivers []multiReceiverConfig }{Receivers: receivers})
 
 		b.StartTimer()
 
-		col := oteltestcol.New(b, configBuffer.String())
+		col := oteltestcol.New(b, cfg)
 		require.NotNil(b, col)
 		require.Eventually(b, func() bool {
 			return col.ObservedLogs().
