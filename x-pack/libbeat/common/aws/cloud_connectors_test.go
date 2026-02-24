@@ -134,7 +134,7 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 	require.Equal(t, 2, receivedCalls)
 }
 
-func TestcloudConnectorsExternalID(t *testing.T) {
+func TestCloudConnectorsExternalID(t *testing.T) {
 	assert.Equal(t, "resource1-ext-id", cloudConnectorsExternalID("resource1", "ext-id"))
 	assert.Equal(t, "abc123-external-id-456", cloudConnectorsExternalID("abc123", "external-id-456"))
 	assert.Equal(t, "single-", cloudConnectorsExternalID("single", "")) // format is always "resourceID-externalIDPart"
