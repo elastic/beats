@@ -58,7 +58,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.7.0
 	github.com/eclipse/paho.mqtt.golang v1.5.1
-	github.com/elastic/elastic-agent-client/v7 v7.15.0
+	github.com/elastic/elastic-agent-client/v7 v7.18.0
 	github.com/elastic/go-concert v0.3.0
 	github.com/elastic/go-libaudit/v2 v2.6.2
 	github.com/elastic/go-licenser v0.4.2
@@ -171,8 +171,8 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.8.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.2
-	github.com/elastic/elastic-agent-libs v0.26.2
-	github.com/elastic/elastic-agent-system-metrics v0.13.4
+	github.com/elastic/elastic-agent-libs v0.32.2
+	github.com/elastic/elastic-agent-system-metrics v0.14.0
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.3.0
