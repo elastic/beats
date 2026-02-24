@@ -166,10 +166,14 @@ func buildMemberOfFilter(groupDNs []string) string {
 	return "(|" + strings.Join(parts, "") + ")"
 }
 
-// Entry is an Active Directory user entry with associated group membership.
+// Entry is an Active Directory entry with associated group membership.
+// For user/device entries, User holds the entity attributes and Groups
+// holds resolved group memberships. For empty-group entries, Group holds
+// the group attributes and User and Groups are nil.
 type Entry struct {
 	ID          string         `json:"id"`
-	User        map[string]any `json:"user"`
+	User        map[string]any `json:"user,omitempty"`
+	Group       map[string]any `json:"group,omitempty"`
 	Groups      []any          `json:"groups,omitempty"`
 	WhenChanged time.Time      `json:"whenChanged"`
 }
@@ -338,6 +342,60 @@ func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, u
 		docs = append(docs, Entry{ID: id, User: user, Groups: groups, WhenChanged: whenChanged(user, groups)})
 	}
 	return docs, errors.Join(errs...)
+}
+
+// GetEmptyGroups returns groups that have no direct members from the Active
+// Directory at the given URL. If since is non-zero, only groups with
+// whenChanged since that time are returned. Each returned Entry has Group
+// set to the group's attributes and User set to nil.
+func GetEmptyGroups(url, user, pass string, base *ldap.DN, since time.Time, grpAttrs []string, pagingSize uint32, dialer *net.Dialer, tlsconfig *tls.Config) ([]Entry, error) {
+	if base == nil || len(base.RDNs) == 0 {
+		return nil, fmt.Errorf("%w: no path", ErrInvalidDistinguishedName)
+	}
+
+	var opts []ldap.DialOpt
+	if dialer != nil {
+		opts = append(opts, ldap.DialWithDialer(dialer))
+	}
+	if tlsconfig != nil {
+		opts = append(opts, ldap.DialWithTLSConfig(tlsconfig))
+	}
+	conn, err := ldap.DialURL(url, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = conn.Bind(user, pass)
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Unbind()
+
+	parsed := parseBaseDN(base)
+	baseDN := parsed.originalBaseDN
+	if len(parsed.potentialGroupDNs) > 0 {
+		baseDN = parsed.containerBaseDN
+	}
+
+	filter := "(&(objectClass=group)(!(member=*)))"
+	if !since.IsZero() {
+		const denseTimeLayout = "20060102150405.0Z"
+		filter = "(&(objectClass=group)(!(member=*))(whenChanged>=" + since.Format(denseTimeLayout) + "))"
+	}
+
+	result, err := search(conn, baseDN, filter, grpAttrs, pagingSize)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrGroups, err)
+	}
+
+	groups := collate(result, nil)
+	docs := make([]Entry, 0, len(groups.Entries))
+	for _, g := range groups.Entries {
+		dn, _ := g["distinguishedName"].(string)
+		wc, _ := g["whenChanged"].(time.Time)
+		docs = append(docs, Entry{ID: dn, Group: g, WhenChanged: wc})
+	}
+	return docs, nil
 }
 
 func whenChanged(user map[string]any, groups []any) time.Time {
