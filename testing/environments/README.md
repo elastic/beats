@@ -1,13 +1,13 @@
 # Testing environments
 
-These environments are intended for manual and automated testing. The docker-compose files can be combined to create the different environment.
+These environments are intended for manual and automated testing. The docker compose files can be combined to create the different environment.
 
 
 # Manual testing
 
 The different environments can be started with the following commands for manual testing. These environments expose ports of Elasticsearch, Logstash and Kibana on the Docker-Machine ip.
 
-Running the environment chains the following docker-compose files together
+Running the environment chains the following docker compose files together
 
 * local.yml: Definition of ports which have to be exposed for local testing including kibana
 * latest.yml: Latest version of elasticsearch, logstash, kibana
@@ -74,10 +74,10 @@ This will run the full testsuite but with latest environments instead of snapsho
 
 ## Defaults
 
-By default, elasticsearch, logstash and kibana are started. These are available at all time that these environments are used. Running the environment, chains the following docker-compose flies together:
+By default, elasticsearch, logstash and kibana are started. These are available at all time that these environments are used. Running the environment, chains the following docker compose files together:
 
 * snapshot.yml: Snapshot version of elasticsearch, logstash, kibana
-* docker-compose.yml: Local beat docker-compose file
+* docker-compose.yml: Local beat docker compose file
 
 
 ## Updating environments

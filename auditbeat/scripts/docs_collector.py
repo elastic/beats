@@ -61,6 +61,7 @@ mapped_pages:
         if applies_to != "":
             module_file += """applies_to:
   stack: {}
+  serverless: ga
 """.format(applies_to)
 
         module_file += """---
@@ -118,6 +119,7 @@ mapped_pages:
             if applies_to != "":
                 dataset_file += """applies_to:
   stack: {}
+  serverless: ga
 """.format(applies_to)
 
             dataset_file += """---
@@ -170,6 +172,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-modules.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py

@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-journald.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Journald input [filebeat-input-journald]
@@ -90,7 +91,7 @@ filebeat.inputs:
 A list of paths that will be crawled and fetched. A path can be either:
 
 * A file path
-* {applies_to}`stack: ga 9.1.5` {applies_to}`stack: ga 9.0.8` A directory path (to collect events from all journals in a directory). If you specify a directory, Filebeat merges all journals under the directory into a single journal and reads them.
+* {applies_to}`stack: ga 9.0.8+` A directory path (to collect events from all journals in a directory). If you specify a directory, Filebeat merges all journals under the directory into a single journal and reads them.
 
 If no paths are specified, Filebeat reads from the default journal.
 

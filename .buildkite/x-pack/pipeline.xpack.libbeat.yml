@@ -3,10 +3,10 @@ name: "beats-xpack-libbeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1768449671"
 
-  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1768449671"
+  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1768449671"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -206,7 +206,7 @@ steps:
             - limit: 1
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          image: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - "x-pack/libbeat/build/*.xml"

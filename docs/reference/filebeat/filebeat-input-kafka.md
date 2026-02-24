@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-kafka.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Kafka input [filebeat-input-kafka]

@@ -1,0 +1,80 @@
+# update-cli configuration for automated VM image version bumping
+---
+name: Bump vm-images to latest version
+pipelineid: 'updatecli-update-vm-images-{{ requiredEnv "BRANCH_NAME" }}'
+
+scms:
+  githubConfig:
+    kind: github
+    spec:
+      user: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      owner: '{{ .scm.owner }}'
+      repository: '{{ .scm.repository }}'
+      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      commitusingapi: true
+      branch: '{{ requiredEnv "BRANCH_NAME" }}'
+      force: false
+      submodules: false
+
+actions:
+  beats:
+    kind: github/pullrequest
+    scmid: githubConfig
+    sourceid: latestVersion
+    spec:
+      automerge: false
+      labels:
+        - dependencies
+        - backport-skip
+        - skip-changelog
+      title: '[{{ requiredEnv "BRANCH_NAME" }}][Automation] Bump VM Image version to {{ source "latestVersion" }}'
+
+sources:
+  latestVersion:
+    name: Get latest available build
+    kind: json
+    spec:
+      file: https://storage.googleapis.com/artifacts-api/vm-images/beats/latest.json
+      key: .date
+
+conditions:
+  latestVersion-check:
+    name: Check if defined latest version differs
+    kind: shell
+    disablesourceinput: true
+    spec:
+      command: 'grep -q -v {{ source "latestVersion" }} .buildkite/packaging.pipeline.yml'
+
+# NOTE: if you add a new target file, please update the .mergify.yml file
+#       to include the new file for the approval and automatic merge
+targets:
+  update-buildkite-pipelines:
+    name: "Update all Buildkite pipeline files"
+    sourceid: latestVersion
+    scmid: githubConfig
+    kind: file
+    spec:
+      files:
+        - .buildkite/aws-tests-pipeline.yml
+        - .buildkite/packaging.pipeline.yml
+        - .buildkite/auditbeat/auditbeat-pipeline.yml
+        - .buildkite/filebeat/filebeat-pipeline.yml
+        - .buildkite/heartbeat/heartbeat-pipeline.yml
+        - .buildkite/libbeat/pipeline.libbeat.yml
+        - .buildkite/metricbeat/pipeline.yml
+        - .buildkite/packetbeat/pipeline.packetbeat.yml
+        - .buildkite/winlogbeat/pipeline.winlogbeat.yml
+        - .buildkite/deploy/kubernetes/deploy-k8s-pipeline.yml
+        - .buildkite/x-pack/pipeline.xpack.auditbeat.yml
+        - .buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml
+        - .buildkite/x-pack/pipeline.xpack.filebeat.yml
+        - .buildkite/x-pack/pipeline.xpack.heartbeat.yml
+        - .buildkite/x-pack/pipeline.xpack.libbeat.yml
+        - .buildkite/x-pack/pipeline.xpack.metricbeat.yml
+        - .buildkite/x-pack/pipeline.xpack.osquerybeat.yml
+        - .buildkite/x-pack/pipeline.xpack.otel.yml
+        - .buildkite/x-pack/pipeline.xpack.packetbeat.yml
+        - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
+      matchpattern: '(IMAGE_.+): "platform-ingest-beats-(.+)-(.+)"'
+      replacepattern: '$1: "platform-ingest-beats-$2-{{ source "latestVersion" }}"'

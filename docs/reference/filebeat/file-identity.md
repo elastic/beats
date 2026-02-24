@@ -1,6 +1,7 @@
 ---
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # How to choose file identity for filestream [file-identity]

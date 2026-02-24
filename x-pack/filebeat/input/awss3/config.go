@@ -150,6 +150,9 @@ func (c *config) Validate() error {
 			}
 		}
 	}
+	if c.NonAWSBucketName != "" && c.RegionName == "" {
+		return errors.New("region must be configured when using non_aws_bucket_name")
+	}
 
 	if c.StartTimestamp != "" {
 		_, err := time.Parse(time.RFC3339, c.StartTimestamp)

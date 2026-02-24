@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/decode-csv-fields.html
 applies_to:
   stack: preview
+  serverless: ga
 ---
 
 # Decode CSV fields [decode-csv-fields]

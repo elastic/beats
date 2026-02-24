@@ -9,16 +9,16 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: bug-fix
+kind: enhancement
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Add check for incorrect length values in postgres datarow parser
+summary: tbs-monitoring
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# description:
+description: Add new TBS metrics to monitor mappings
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
@@ -28,7 +28,7 @@ summary: Add check for incorrect length values in postgres datarow parser
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: packetbeat
+component: metricbeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs

@@ -24,6 +24,7 @@ def document_fields(output, section, sections, path, beat):
             output.write('  stack: ')
             output.write(', '.join(applies_to))
             output.write('\n')
+            output.write('  serverless: ga\n')
         output.write('---\n\n')
         output.write('% This file is generated! See scripts/generate_fields_docs.py\n\n')
 
@@ -196,6 +197,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/{beat}/current/exported-fields.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py

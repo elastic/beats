@@ -92,10 +92,10 @@ GOX_FLAGS?= ## @building Additional flags to append to the gox command used by "
 TESTING_ENVIRONMENT?=snapshot## @testing The name of the environment under test
 BEAT_VERSION=$(shell head -n 1 ${ES_BEATS}/libbeat/docs/version.asciidoc | cut -c 17- )
 COMMIT_ID=$(shell git rev-parse HEAD)
-DOCKER_COMPOSE_PROJECT_NAME?=${BEAT_NAME}${TESTING_ENVIRONMENT//-}${BEAT_VERSION//-}${COMMIT_ID} ## @testing The name of the docker-compose project used by the integration and system tests
+DOCKER_COMPOSE_PROJECT_NAME?=${BEAT_NAME}${TESTING_ENVIRONMENT//-}${BEAT_VERSION//-}${COMMIT_ID} ## @testing The name of the docker compose project used by the integration and system tests
 DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} ES_BEATS=${ES_BEATS} docker compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f docker-compose.yml
 DOCKER_CACHE?=1 ## @miscellaneous If set to 0, all docker images are created without cache
-DOCKER_PULL?=1 ## @miscellaneous If set to 0, disable the force pull on docker-compose build
+DOCKER_PULL?=1 ## @miscellaneous If set to 0, disable the force pull on docker compose build
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
 PYTHON_EXE?=python3
 PYTHON_ENV?=${BUILD_DIR}/python-env
@@ -207,10 +207,10 @@ integration-tests: prepare-tests mage
 .PHONY: integration-tests-environment
 integration-tests-environment:  ## @testing Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 integration-tests-environment: prepare-tests build-image
-	# If you want to get logs on CI when the `docker-compose` fails, you can
+	# If you want to get logs on CI when `docker compose` fails, you can
 	# add  `|| ${DOCKER_COMPOSE} logs --tail 200` after the command.
 	#
-	# This will make docker-compose command to display the logs on stdout on error, It's not enabled
+	# This will make docker compose command to display the logs on stdout on error, It's not enabled
 	# by default because it can create noise if the test inside the container fails.
 	${DOCKER_COMPOSE} run \
 	  -e RACE_DETECTOR=$(RACE_DETECTOR) \
@@ -389,7 +389,7 @@ $(.OVER)import-dashboards: update ${BEAT_NAME}
 # Builds the environment to test beat
 .PHONY: build-image
 build-image: write-environment
-	${DOCKER_COMPOSE} build ${DOCKER_NOCACHE} ${DOCKER_FORCE_PULL} --force-rm
+	${DOCKER_COMPOSE} build ${DOCKER_NOCACHE} ${DOCKER_FORCE_PULL}
 
 # Runs the environment so the redis and elasticsearch can also be used for local development
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.

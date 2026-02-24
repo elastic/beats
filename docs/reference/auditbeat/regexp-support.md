@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/regexp-support.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Regular expression support [regexp-support]

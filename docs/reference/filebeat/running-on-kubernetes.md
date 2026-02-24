@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/running-on-kubernetes.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Run Filebeat on Kubernetes [running-on-kubernetes]
@@ -76,7 +77,7 @@ filebeat.inputs:
 
 1. All `filestream` inputs require a unique ID.
 2. Container logs use symlinks, so they need to be enabled.
-3. A path for each container, so the input will only ingest the logs from its 
+3. A path for each container, so the input will only ingest the logs from its
 container.
 
 ## Settings [_settings]

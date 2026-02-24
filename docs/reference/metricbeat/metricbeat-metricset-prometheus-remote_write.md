@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-prometheus-remote_write.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -71,7 +72,7 @@ remote_write:
 ## Request size limits [_request_size_limits]
 
 ```{applies_to}
-stack: ga 9.2.5, ga 9.3.1, ga 9.4
+stack: ga 9.2.5+
 ```
 
 To protect against resource exhaustion from malicious or oversized payloads, the remote_write metricset enforces configurable size limits on incoming requests:
