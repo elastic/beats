@@ -295,7 +295,7 @@ The suspicious activity fields from the debug data.
 
 
 **`okta.debug_context.debug_data.suspicious_activity.os`**
-:   The OS of the system from where the suspicious activity occured.
+:   The OS of the system from where the suspicious activity occurred.
 
     type: keyword
 
@@ -402,5 +402,4 @@ Fields that let you store information about the request, in the form of list of 
 :   List of ip_chain objects.
 
     type: flattened
-
 
