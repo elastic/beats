@@ -34,7 +34,7 @@ func TestEmpty(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, len(sl), 0)
 
-	// assumes non-root has no effective/permitted capabilities
+	// assumes non-root has no capabilities
 	if os.Geteuid() != 0 {
 		empty := cap.NewSet()
 		self := cap.GetProc()
