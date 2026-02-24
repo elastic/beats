@@ -141,19 +141,27 @@ func validateGroupDNs(conn *ldap.Conn, potentialGroupDNs []string) []string {
 
 // buildMemberOfFilter creates an LDAP memberOf filter from a list of group DNs.
 // Returns an empty string if no groups are provided.
+//
+// Use the LDAP_MATCHING_RULE_IN_CHAIN matching rule (OID 1.2.840.113556.1.4.1941)
+// to resolve nested membership at query time.
+//
+// See:
+//   - https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/4e638665-f466-4597-93c4-12f2ebfabab5
+//   - https://learn.microsoft.com/en-us/windows/win32/adsi/search-filter-syntax
+//   - https://ldapwiki.com/wiki/Wiki.jsp?page=LDAP_MATCHING_RULE_IN_CHAIN
 func buildMemberOfFilter(groupDNs []string) string {
 	if len(groupDNs) == 0 {
 		return ""
 	}
 
 	if len(groupDNs) == 1 {
-		return "(memberOf=" + ldap.EscapeFilter(groupDNs[0]) + ")"
+		return "(memberOf:1.2.840.113556.1.4.1941:=" + ldap.EscapeFilter(groupDNs[0]) + ")"
 	}
 
 	// Multiple groups: use OR filter.
 	var parts []string
 	for _, dn := range groupDNs {
-		parts = append(parts, "(memberOf="+ldap.EscapeFilter(dn)+")")
+		parts = append(parts, "(memberOf:1.2.840.113556.1.4.1941:="+ldap.EscapeFilter(dn)+")")
 	}
 	return "(|" + strings.Join(parts, "") + ")"
 }
@@ -288,7 +296,10 @@ func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, u
 			}
 			if len(modGrps) != 0 {
 				for i, u := range modGrps {
-					modGrps[i] = "(memberOf=" + u + ")"
+					// Use the LDAP_MATCHING_RULE_IN_CHAIN matching rule
+					// (OID 1.2.840.113556.1.4.1941) to resolve nested
+					// membership at query time.
+					modGrps[i] = "(memberOf:1.2.840.113556.1.4.1941:=" + ldap.EscapeFilter(u) + ")"
 				}
 				changedGrpFilter := "(&" + query + "(|" + strings.Join(modGrps, "") + "))"
 				// Also include the base DN membership filter if present.

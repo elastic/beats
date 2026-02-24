@@ -1,0 +1,24 @@
+name: Docs PR Review
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: write
+  checks: read
+  actions: read
+
+jobs:
+  run:
+    if: >-
+      github.event.issue.pull_request != null &&
+      startsWith(github.event.comment.body, '/docs-review')
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-docs-pr-review.lock.yml@v0
+    with:
+      setup-commands: |
+        sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+        make mage
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

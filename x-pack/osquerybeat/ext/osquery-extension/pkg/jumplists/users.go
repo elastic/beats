@@ -32,7 +32,7 @@ func getFilesInDirectory(directory string, log *logger.Logger) ([]string, error)
 	if err != nil {
 		return nil, err
 	}
-	files := make([]string, len(fileEntries))
+	files := []string{}
 	for _, entry := range fileEntries {
 		if entry.IsDir() {
 			continue
@@ -47,8 +47,8 @@ func (u *UserProfile) getJumplists(log *logger.Logger) []*Jumplist {
 	var jumplists []*Jumplist
 
 	jumplistDirectories := map[JumplistType]string{
-		JumplistTypeCustom: filepath.Join(u.recentDir, "CustomDestinations"),
-		// Follow on PR will add support for automatic jumplists
+		JumplistTypeCustom:    filepath.Join(u.recentDir, "CustomDestinations"),
+		JumplistTypeAutomatic: filepath.Join(u.recentDir, "AutomaticDestinations"),
 	}
 
 	// Collect and parse all jumplist files for each jumplist type
@@ -68,7 +68,16 @@ func (u *UserProfile) getJumplists(log *logger.Logger) []*Jumplist {
 				}
 				jumpList, err := parseCustomJumplistFile(file, u, log)
 				if err != nil {
-					log.Errorf("failed to parse custom jump list file %s: %v", file, err)
+					log.Errorf("%s", err)
+					continue
+				}
+				jumplists = append(jumplists, jumpList)
+			}
+		case JumplistTypeAutomatic:
+			for _, file := range files {
+				jumpList, err := ParseAutomaticJumpListFile(file, u, log)
+				if err != nil {
+					log.Errorf("%s", err)
 					continue
 				}
 				jumplists = append(jumplists, jumpList)

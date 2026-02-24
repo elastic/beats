@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/add-cached-metadata.html
 applies_to:
   stack: preview
+  serverless: preview
 ---
 
 # Add cached metadata [add-cached-metadata]

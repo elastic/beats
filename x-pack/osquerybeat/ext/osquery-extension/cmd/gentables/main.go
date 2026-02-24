@@ -461,6 +461,7 @@ type viewTemplateData struct {
 	NeedsSharedImport   bool
 	SharedImport        string
 	Name                string
+	HookName            string
 	Description         string
 	ResultFields        []resultField
 	ColumnsComment      []string
@@ -1151,6 +1152,7 @@ func generateViewCode(s spec, outDir string, sharedTypesConfig *sharedTypesConfi
 		NeedsSharedImport:   info.NeedsImport,
 		SharedImport:        info.ImportPath,
 		Name:                s.Name,
+		HookName:            "Create" + toTitleCase(s.Name) + "View",
 		Description:         s.Description,
 		ResultFields:        info.ResultFields,
 		ColumnsComment:      columnsComment,
