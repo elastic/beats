@@ -16,10 +16,7 @@ Field names (columns) are returned as lowercase strings. Values are returned as 
 
 ## Cursor-based incremental data fetching
 
-```{applies_to}
-stack: ga 9.4
-```
-
+```{applies_to} stack: beta 9.4```
 
 The cursor feature enables incremental data fetching by tracking the last fetched row value
 and using it to retrieve only new data on subsequent collection cycles. This is particularly
@@ -49,7 +46,9 @@ To enable cursor-based fetching, add a `cursor` configuration block to your metr
 ```
 
 :::{note}
-`raw_data.enabled: true` in the previous examples is optional and controls the event output format, not the cursor. It is shown here because raw mode is commonly used with cursor-based fetching.
+
+`raw_data.enabled: true` in the examples above is optional and controls the event output format, not the cursor. It is shown here because raw mode is commonly used with cursor-based fetching.
+
 :::
 
 ### Cursor configuration options
@@ -183,7 +182,11 @@ Cursor is also not compatible with `fetch_from_all_databases`. Use a separate mo
     default: "0.0"
 ```
 
-Note: Float cursors use IEEE 754 `float64` representation. For exact precision at boundaries (for example, financial data), use the `decimal` type instead.
+:::{note}
+
+Float cursors use IEEE 754 `float64` representation. For exact precision at boundaries (for example, financial data), use the `decimal` type instead.
+
+:::
 
 #### MSSQL cursor (with TOP instead of LIMIT)
 
@@ -243,7 +246,7 @@ different databases on the same server.
 different state key, which effectively resets the cursor to its `default` value. This is by design —
 if you modify the query, the old cursor position might no longer be valid for the new query.
 
-### Choosing operators for cursor queries
+### Choosing comparison operators for queries
 
 The choice of comparison operator in your WHERE clause affects data completeness:
 

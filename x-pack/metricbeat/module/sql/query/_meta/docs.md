@@ -2,7 +2,9 @@ The sql `query` metricset collects rows returned by a query.
 
 Field names (columns) are returned as lowercase strings. Values are returned as numeric or string.
 
-## Cursor-based Incremental Data Fetching
+## Cursor-based incremental data fetching
+
+```{applies_to} stack: beta 9.4```
 
 The cursor feature enables incremental data fetching by tracking the last fetched row value
 and using it to retrieve only new data on subsequent collection cycles. This is particularly
@@ -31,9 +33,13 @@ To enable cursor-based fetching, add a `cursor` configuration block to your metr
     default: "0"
 ```
 
-Note: `raw_data.enabled: true` in the examples above is optional and controls the event output format, not the cursor. It is shown here because raw mode is commonly used with cursor-based fetching.
+:::{note}
 
-### Cursor Configuration Options
+`raw_data.enabled: true` in the examples above is optional and controls the event output format, not the cursor. It is shown here because raw mode is commonly used with cursor-based fetching.
+
+:::
+
+### Cursor configuration options
 
 | Option | Required | Description |
 |--------|----------|-------------|
@@ -47,7 +53,7 @@ Note: `raw_data.enabled: true` in the examples above is optional and controls th
 For best performance, ensure the `cursor.column` has a database index. Without an index, the `WHERE column > :cursor ORDER BY column` clause will trigger a full table scan on every collection cycle, which can be slow on large tables.
 ::::
 
-### Supported Cursor Types
+### Supported cursor types
 
 | Type | Description | Default Format Example |
 |------|-------------|----------------------|
@@ -57,7 +63,7 @@ For best performance, ensure the `cursor.column` has a database index. Without a
 | `float` | Floating-point values (FLOAT, DOUBLE, REAL). IEEE 754 precision limits apply. | `"0.0"` |
 | `decimal` | Exact decimal values (DECIMAL, NUMERIC). Arbitrary precision, no data loss. | `"0.00"` |
 
-### Scan Direction
+### Scan direction
 
 By default, the cursor tracks the maximum value from each batch (ascending scan). For descending scans, set `cursor.direction: desc`:
 
@@ -66,7 +72,7 @@ By default, the cursor tracks the maximum value from each batch (ascending scan)
 | `asc` (default) | `>` | `ASC` | Maximum value |
 | `desc` | `<` | `DESC` | Minimum value |
 
-### Query Requirements
+### Query requirements
 
 When cursor is enabled, your SQL query must:
 
@@ -77,7 +83,7 @@ When cursor is enabled, your SQL query must:
 
 Cursor is also not compatible with `fetch_from_all_databases`. Use a separate module block for each database if you need both features.
 
-### Example Configurations
+### Example configurations
 
 #### Integer cursor (auto-increment ID)
 
@@ -164,7 +170,11 @@ Cursor is also not compatible with `fetch_from_all_databases`. Use a separate mo
     default: "0.0"
 ```
 
-Note: Float cursors use IEEE 754 `float64` representation. For exact precision at boundaries (for example, financial data), use the `decimal` type instead.
+:::{note}
+
+Float cursors use IEEE 754 `float64` representation. For exact precision at boundaries (for example, financial data), use the `decimal` type instead.
+
+:::
 
 #### MSSQL cursor (with TOP instead of LIMIT)
 
@@ -205,7 +215,7 @@ MSSQL does not support `LIMIT`. Use `TOP` to restrict the number of rows per cyc
 
 With `direction: desc`, the cursor tracks the minimum value from each batch, suitable for scanning data in reverse chronological order.
 
-### State Persistence
+### State persistence
 
 Cursor state is persisted to disk using Metricbeat's statestore at:
 `{data.path}/sql-cursor/`
@@ -224,7 +234,7 @@ different databases on the same server.
 different state key, which effectively resets the cursor to its `default` value. This is by design —
 if you modify the query, the old cursor position might no longer be valid for the new query.
 
-### Important: Choosing `>` vs `>=` for Cursor Queries
+### Choosing comparison operators for queries
 
 The choice of comparison operator in your WHERE clause affects data completeness:
 
@@ -248,7 +258,7 @@ sql_query: "SELECT id, data, created_at FROM events WHERE created_at >= :cursor 
 sql_query: "SELECT id, data FROM events WHERE id > :cursor ORDER BY id ASC LIMIT 500"
 ```
 
-### Error Handling
+### Error handling
 
 The cursor feature follows an "at-least-once" delivery model:
 - Events are emitted **before** the cursor state is updated
@@ -256,7 +266,7 @@ The cursor feature follows an "at-least-once" delivery model:
   re-fetched on the next cycle
 - This ensures no data loss, but can result in occasional duplicates
 
-### Driver-specific Notes
+### Driver-specific notes
 
 **MySQL:** When using timestamp cursors, include `parseTime=true` in your DSN to ensure the driver
 correctly handles `time.Time` parameters:
