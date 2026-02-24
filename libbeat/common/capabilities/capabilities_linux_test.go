@@ -34,7 +34,7 @@ func TestEmpty(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, len(sl), 0)
 
-	// assumes non root has no capabilities
+	// assumes non-root has no effective/permitted capabilities
 	if os.Geteuid() != 0 {
 		empty := cap.NewSet()
 		self := cap.GetProc()
@@ -42,7 +42,22 @@ func TestEmpty(t *testing.T) {
 		assert.Nil(t, err)
 		assert.False(t, d.Has(cap.Effective))
 		assert.False(t, d.Has(cap.Permitted))
-		assert.False(t, d.Has(cap.Inheritable))
+
+		if d.Has(cap.Inheritable) {
+			// CI runners have no physical seat, so pam_systemd won't grant any inheritable capabilities.
+			assert.NotEqual(t, os.Getenv("BUILDKITE"), "true", "no inheritable capabilities expected in CI")
+			assert.NotEqual(t, os.Getenv("CI"), "true", "no inheritable capabilities expected in CI")
+
+			// pam_systemd grants CAP_WAKE_ALARM (inheritable) to
+			// regular users on a physical seat since systemd v254:
+			// https://github.com/systemd/systemd/blob/1f7f2bc6105008add20e4c4888db69660eb563f4/src/login/pam_systemd.c#L793-L806%E2%80%8B
+			// Tolerate it, but fail on anything else.
+			expected := cap.NewSet()
+			assert.NoError(t, expected.SetFlag(cap.Inheritable, true, cap.WAKE_ALARM))
+			d2, err := self.Cf(expected)
+			assert.NoError(t, err)
+			assert.False(t, d2.Has(cap.Inheritable), "unexpected inheritable capabilities beyond CAP_WAKE_ALARM")
+		}
 	}
 }
 
