@@ -53,13 +53,14 @@ func TestDiskQueueUnderAgent(t *testing.T) {
                         path: %s
                 `, tempDir)
 			},
+			pathsFunc: func(string) *paths.Path { return paths.New() },
 			wantStatePath: func(tempDir string) string {
 				return filepath.Join(tempDir, "state.dat")
 			},
 		},
 		{
 			name: "falls back to beat data path",
-			cfg: func(_ string) string {
+			cfg: func(string) string {
 				return `
                     disk:
                         max_size: 100MB
@@ -106,10 +107,7 @@ func TestDiskQueueUnderAgent(t *testing.T) {
 
 			management.SetUnderAgent(true)
 
-			beatPaths := paths.New()
-			if tt.pathsFunc != nil {
-				beatPaths = tt.pathsFunc(tempDir)
-			}
+			beatPaths := tt.pathsFunc(tempDir)
 
 			successLogger, logBuf := logp.NewInMemoryLocal("test-diskqueue", zapcore.EncoderConfig{})
 			group, err := Success(queueConfig, batchSize, retry, nil, successLogger, beatPaths)
