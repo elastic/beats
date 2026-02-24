@@ -28,4 +28,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to write generated_app_ids.go: %v", err)
 	}
+
+	// Write the generated guid mappings file
+	guidMappingsFile := filepath.Join(wd, "generated_guid_mappings.go")
+	err = writeGuidMappingGeneratedFile(guidMappingsFile, log)
+	if err != nil {
+		log.Fatalf("failed to write generated_guid_mappings.go: %v", err)
+	}
 }
