@@ -4,6 +4,7 @@ on:
     types: [created]
 
 permissions:
+  actions: read
   contents: write
   discussions: write
   issues: write
