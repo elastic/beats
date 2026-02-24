@@ -1,0 +1,149 @@
+version: 9.1.9
+entries:
+    - kind: bug-fix
+      summary: '[Filestream] ensure harvester always restarts if the file has not been fully ingested.'
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47107
+      issue:
+        - https://github.com/elastic/beats/issues/46923
+      impact: ""
+      action: ""
+      timestamp: 1760488402
+      file:
+        name: 1760488402-Prevent-modified-files-close-due-to-inactivity.yaml
+        checksum: 962de2ae400dafee98806df52af667c8bef29363
+    - kind: breaking-change
+      summary: remove otel.component.id and otel.component.kind from beat receiver events
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47729
+      issue:
+        - https://github.com/elastic/beats/issues/47600
+      impact: ""
+      action: ""
+      timestamp: 1763578431
+      file:
+        name: 1763578431-remove-otel.component.id-and-otel.component.kind-from-beat-receiver-events.yaml
+        checksum: f6a4de941dd71dec7c27c922a4a047ef8742a2e4
+    - kind: feature
+      summary: Log unpublished event count and exit publish loop on input context cancellation.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47730
+      issue:
+        - https://github.com/elastic/beats/issues/47717
+      impact: ""
+      action: ""
+      timestamp: 1763583500
+      file:
+        name: 1763583500-47717-cel.yaml
+        checksum: b34afe96a584707b408ae01da45e69f12f406f63
+    - kind: bug-fix
+      summary: rpc_fragment_sanitization
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47803
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1764181634
+      file:
+        name: 1764181634-rpc_fragment_sanitization.yaml
+        checksum: ba005922d6bfc94a433cfdef282f58c05f46a88e
+    - kind: bug-fix
+      summary: Prevent panic during startup if dissect processor has invalid field name in tokenizer
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47839
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1764614942
+      file:
+        name: 1764614942-fix-panic-in-dissect-processor-with-invalid-field-name.yaml
+        checksum: 8be30cc83742127414dac9c61a2d353fd4fa2697
+    - kind: bug-fix
+      summary: verify and cap memcache udp fragment counts
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47874
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1764710604
+      file:
+        name: 1764710604-memcache-udp-fragment-check.yaml
+        checksum: e19d129d24d0ca9e4d588172491b4c11e5e5e812
+    - kind: other
+      summary: Bump golang version to 1.24.11.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47903
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1764715502
+      file:
+        name: 1764715502-bump-golang-12411.yaml
+        checksum: 4438acc3725f02b150683ea72ef7cf1f1f9a1ecb
+    - kind: enhancement
+      summary: add resource pool id to vsphere cluster metricset
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47883
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1764752046
+      file:
+        name: 1764752046-add-resource-pool-id-to-vsphere-cluster-metricset.yaml
+        checksum: 781432879d428026b3ed9798caa8d5d24e95852c
+    - kind: bug-fix
+      summary: Improve defensive checks to prevent panics in meraki module
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47950
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1765018492
+      file:
+        name: 1765018492-improve-meraki-defensive-checks.yaml
+        checksum: 04c94a42ea65cfa82cd66b03a165f006df1af796
+    - kind: bug-fix
+      summary: Remove GCP Billing timestamp functions.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47963
+      issue:
+        - https://github.com/elastic/beats/issues/47967
+      impact: ""
+      action: ""
+      timestamp: 1765186407
+      file:
+        name: 1765186407-remove-gcp-billing-timestamp-functions.yaml
+        checksum: 83a916ecfa88b034f55e8213af2c3e3b8bcb834a
+    - kind: feature
+      summary: ipfrag2
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47970
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1765279149
+      file:
+        name: 1765279149-ipfrag2.yaml
+        checksum: db1ac94f13ebff3eb9df1481079e84265025dc0f

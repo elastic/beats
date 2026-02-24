@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package http_endpoint
 
 import (
@@ -200,7 +202,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 			return err
 		}
 		log.Infof("Adding %s end point to server on %s", pattern, e.addr)
-		s.mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx.StatusReporter, log, metrics))
+		s.mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx, log, metrics))
 		s.idOf[pattern] = ctx.ID
 		p.mu.Unlock()
 		<-s.ctx.Done()
@@ -216,7 +218,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 		srv:  srv,
 	}
 	s.ctx, s.cancel = ctxtool.WithFunc(ctx.Cancelation, func() { srv.Close() })
-	mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx.StatusReporter, log, metrics))
+	mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx, log, metrics))
 	p.servers[e.addr] = s
 	p.mu.Unlock()
 

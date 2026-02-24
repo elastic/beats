@@ -22,8 +22,10 @@ import (
 	"time"
 
 	"github.com/prometheus/prometheus/model/labels"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -41,6 +43,39 @@ func uint64p(x uint64) *uint64 {
 
 func int64p(x int64) *int64 {
 	return &x
+}
+
+func TestParseMetricFamiliesMalformedInput(t *testing.T) {
+	logger := logp.NewLogger("test")
+
+	malformedInputs := [][]byte{
+		nil,
+		{},
+		[]byte("invalid"),
+		[]byte("metric_name{"),
+		[]byte("metric_name{label=}"),
+		[]byte("{A}0"),
+		[]byte("{A}00"),
+		[]byte("{A}000"),
+		[]byte("{A}0000"),
+		[]byte("{A} 1"),
+		[]byte("{A} 1\n"),
+		[]byte("{A}0\n"),
+		[]byte("{A}0 1"),
+		[]byte("{A}0 1\n"),
+		[]byte("{A}0\n000"),
+		[]byte("{A}00\n"),
+		[]byte("{A}00000"),
+		[]byte("{A}00 1"),
+		[]byte("{A}00 1\n"),
+		[]byte("{A}00\n000"),
+	}
+
+	for _, input := range malformedInputs {
+		assert.NotPanics(t, func() {
+			_, _ = ParseMetricFamilies(input, ContentTypeTextFormat, time.Now(), logger)
+		}, "ParseMetricFamilies should not panic on malformed input")
+	}
 }
 
 func TestCounterOpenMetrics(t *testing.T) {
@@ -962,6 +997,154 @@ process_cpu_total 4200722.46
 
 			require.NoError(t, err, "unexpected error for %s", tt.contentType)
 			require.ElementsMatch(t, expected, result)
+		})
+	}
+}
+
+func TestInfoGetters(t *testing.T) {
+	// nil receiver
+	var nilInfo *Info
+	assert.Equal(t, int64(0), nilInfo.GetValue())
+	assert.False(t, nilInfo.HasValidValue())
+
+	// valid Info with value 1
+	val := int64(1)
+	info := &Info{Value: &val}
+	assert.Equal(t, int64(1), info.GetValue())
+	assert.True(t, info.HasValidValue())
+
+	// Info with value 0
+	val0 := int64(0)
+	info0 := &Info{Value: &val0}
+	assert.Equal(t, int64(0), info0.GetValue())
+	assert.False(t, info0.HasValidValue())
+}
+
+func TestStatesetGetters(t *testing.T) {
+	// nil receiver
+	var nilStateset *Stateset
+	assert.Equal(t, int64(0), nilStateset.GetValue())
+	assert.False(t, nilStateset.HasValidValue())
+
+	// Stateset with value 1
+	val1 := int64(1)
+	ss1 := &Stateset{Value: &val1}
+	assert.Equal(t, int64(1), ss1.GetValue())
+	assert.True(t, ss1.HasValidValue())
+
+	// Stateset with value 0
+	val0 := int64(0)
+	ss0 := &Stateset{Value: &val0}
+	assert.Equal(t, int64(0), ss0.GetValue())
+	assert.True(t, ss0.HasValidValue())
+
+	// Stateset with invalid value
+	val2 := int64(2)
+	ss2 := &Stateset{Value: &val2}
+	assert.False(t, ss2.HasValidValue())
+}
+
+func TestUnknownGetters(t *testing.T) {
+	// nil receiver
+	var nilUnknown *Unknown
+	assert.Equal(t, float64(0), nilUnknown.GetValue())
+
+	// valid Unknown
+	val := 42.5
+	u := &Unknown{Value: &val}
+	assert.Equal(t, 42.5, u.GetValue())
+}
+
+func TestOpenMetricGetters(t *testing.T) {
+	// nil receiver
+	var nilMetric *OpenMetric
+	assert.Nil(t, nilMetric.GetName())
+	assert.Nil(t, nilMetric.GetInfo())
+	assert.Nil(t, nilMetric.GetStateset())
+	assert.Nil(t, nilMetric.GetUnknown())
+	assert.Nil(t, nilMetric.GetGaugeHistogram())
+	assert.Equal(t, int64(0), nilMetric.GetTimestampMs())
+
+	// OpenMetric with Info
+	name := "test_info"
+	val := int64(1)
+	metric := &OpenMetric{
+		Name: &name,
+		Info: &Info{Value: &val},
+	}
+	assert.Equal(t, &name, metric.GetName())
+	assert.NotNil(t, metric.GetInfo())
+
+	// OpenMetric with Stateset
+	ssVal := int64(1)
+	ssMetric := &OpenMetric{
+		Stateset: &Stateset{Value: &ssVal},
+	}
+	assert.NotNil(t, ssMetric.GetStateset())
+
+	// OpenMetric with Unknown
+	uVal := 42.0
+	uMetric := &OpenMetric{
+		Unknown: &Unknown{Value: &uVal},
+	}
+	assert.NotNil(t, uMetric.GetUnknown())
+
+	// OpenMetric with GaugeHistogram
+	ghMetric := &OpenMetric{
+		Histogram: &Histogram{IsGaugeHistogram: true},
+	}
+	assert.NotNil(t, ghMetric.GetGaugeHistogram())
+	assert.Nil(t, ghMetric.GetHistogram()) // regular GetHistogram should return nil for gauge histogram
+
+	// OpenMetric with timestamp
+	ts := int64(1234567890)
+	tsMetric := &OpenMetric{
+		TimestampMs: &ts,
+	}
+	assert.Equal(t, int64(1234567890), tsMetric.GetTimestampMs())
+}
+
+func TestMetricFamilyGetUnit(t *testing.T) {
+	// nil unit
+	mf := &MetricFamily{}
+	assert.Equal(t, "", mf.GetUnit())
+
+	// empty unit
+	empty := ""
+	mf2 := &MetricFamily{Unit: &empty}
+	assert.Equal(t, "", mf2.GetUnit())
+
+	// valid unit
+	unit := "bytes"
+	mf3 := &MetricFamily{Unit: &unit}
+	assert.Equal(t, "bytes", mf3.GetUnit())
+}
+
+func TestGetContentType(t *testing.T) {
+	tests := []struct {
+		name        string
+		contentType string
+		expected    string
+	}{
+		{"empty", "", ""},
+		{"text_plain", "text/plain", ContentTypeTextFormat},
+		{"text_plain_version", "text/plain; version=0.0.4", ContentTypeTextFormat},
+		{"text_plain_wrong_version", "text/plain; version=1.0.0", ""},
+		{"openmetrics", "application/openmetrics-text", OpenMetricsType},
+		{"openmetrics_delimited", "application/openmetrics-text; encoding=delimited", OpenMetricsType},
+		{"openmetrics_wrong_encoding", "application/openmetrics-text; encoding=protobuf", ""},
+		{"json", "application/json", ""},
+		{"invalid", "not a valid; content type", ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			header := make(map[string][]string)
+			if tt.contentType != "" {
+				header["Content-Type"] = []string{tt.contentType}
+			}
+			result := GetContentType(header)
+			assert.Equal(t, tt.expected, result)
 		})
 	}
 }

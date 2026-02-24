@@ -99,6 +99,7 @@ func init() {
 					"mkdirat",
 					"mmap",
 					"mprotect",
+					"msync",
 					"munmap",
 					"nanosleep",
 					"newfstatat",

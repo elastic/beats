@@ -127,15 +127,15 @@ $$$supported-attributes$$$
 5. [storage_url](#attrib-storage-url)
 6. [containers](#attrib-containers)
 7. [name](#attrib-container-name)
-8. [batch_size](#attrib-batch_size-abs) {applies_to}`stack: ga 9.1.0`
+8. [batch_size](#attrib-batch_size-abs) {applies_to}`stack: ga 9.1.0+`
 9. [max_workers](#attrib-max_workers)
 10. [poll](#attrib-poll)
 11. [poll_interval](#attrib-poll_interval)
 12. [file_selectors](#attrib-file_selectors)
 13. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
 14. [timestamp_epoch](#attrib-timestamp_epoch)
-15. [path_prefix](#attrib-path_prefix) {applies_to}`stack: ga 9.1.4`
-16. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.1.0`
+15. [path_prefix](#attrib-path_prefix) {applies_to}`stack: ga 9.1.4+`
+16. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.1.0+`
 
 ## `account_name` [attrib-account-name]
 

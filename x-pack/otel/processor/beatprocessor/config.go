@@ -4,4 +4,6 @@
 
 package beatprocessor
 
-type Config struct{}
+type Config struct {
+	Processors []map[string]any `mapstructure:"processors"`
+}

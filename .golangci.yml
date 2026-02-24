@@ -37,6 +37,8 @@ linters:
           deny:
             - pkg: github.com/elastic/beats/v7/x-pack
               desc: Apache 2.0 licensed code cannot depend on Elastic licensed code (x-pack/).
+            - pkg: github.com/elastic/elastic-agent-client
+              desc: Apache 2.0 licensed code cannot depend on Elastic licensed code (elastic-agent-client).
         main:
           list-mode: lax
           deny:
