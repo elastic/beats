@@ -172,8 +172,8 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.8.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.2
-	github.com/elastic/elastic-agent-libs v0.31.0
-	github.com/elastic/elastic-agent-system-metrics v0.14.0
+	github.com/elastic/elastic-agent-libs v0.32.2
+	github.com/elastic/elastic-agent-system-metrics v0.14.1
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.3.0
@@ -238,6 +238,7 @@ require (
 	github.com/forensicanalysis/fslib v0.15.2
 	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/parsiya/golnk v0.0.0-20251207220015-443df11fe4fb
+	github.com/richardlehane/mscfb v1.0.6
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
 	go.opentelemetry.io/collector/client v1.51.0
 	go.opentelemetry.io/collector/component/componenttest v0.145.0
@@ -443,6 +444,7 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/prometheus/client_golang v1.23.2 // indirect
 	github.com/prometheus/otlptranslator v1.0.0 // indirect
+	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/rs/cors v1.11.1 // indirect
