@@ -1,24 +1,20 @@
-name: Mention in Issue
+name: Duplicate Issue Detector
 on:
-  issue_comment:
-    types: [created]
+  issues:
+    types: [opened]
 
 permissions:
-  contents: write
+  contents: read
   discussions: write
   issues: write
-  pull-requests: write
+  pull-requests: read
 
 jobs:
   run:
     if: >-
-      github.event.issue.pull_request == null &&
-      (startsWith(github.event.comment.body, '/ai') || contains(github.event.comment.body, '@claude')) &&
       contains(fromJSON('["strawgate","AlexanderWert","perk","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia","pierrehilbert","bturquet","teresaromero","mrodm","jsoriano","kpollich","andrewkroh","norrietaylor","ishleenk17","tommyers-elastic","lalit-satapathy","agithomas","belimawr","ycombinator","zmoog","MichaelKatsoulis","gizas","AndersonQ","chrisberkhout","marc-gr","efd6","muthu-mps","ShourieG"]'), github.actor)
-    uses: elastic/ai-github-actions/.github/workflows/gh-aw-mention-in-issue.lock.yml@v0
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-duplicate-issue-detector.lock.yml@v0
     with:
-      setup-commands: |
-        sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
-        make mage
+      detect-related-issues: false
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

@@ -1,7 +1,7 @@
-name: Semantic Function Clustering
+name: Agent Suggestions
 on:
   schedule:
-    - cron: "0 12 * * 5"
+    - cron: "0 12 * * 1"
   workflow_dispatch:
 
 permissions:
@@ -11,9 +11,8 @@ permissions:
 
 jobs:
   run:
-    uses: elastic/ai-github-actions/.github/workflows/gh-aw-semantic-function-clustering.lock.yml@v0
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-agent-suggestions.lock.yml@v0
     with:
-      languages: "go,python,typescript"
       setup-commands: |
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
         make mage

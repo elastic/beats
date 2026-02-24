@@ -1,21 +1,22 @@
-name: Mention in Issue
+name: PR Actions Detective
 on:
-  issue_comment:
-    types: [created]
+  workflow_run:
+    workflows: ["check-default", "pre-commit", "golangci-lint", "check-docs", "check-dev-tools"]
+    types: [completed]
 
 permissions:
-  contents: write
-  discussions: write
+  actions: read
+  contents: read
   issues: write
-  pull-requests: write
+  pull-requests: read
 
 jobs:
   run:
     if: >-
-      github.event.issue.pull_request == null &&
-      (startsWith(github.event.comment.body, '/ai') || contains(github.event.comment.body, '@claude')) &&
+      github.event.workflow_run.conclusion == 'failure' &&
+      toJSON(github.event.workflow_run.pull_requests) != '[]' &&
       contains(fromJSON('["strawgate","AlexanderWert","perk","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia","pierrehilbert","bturquet","teresaromero","mrodm","jsoriano","kpollich","andrewkroh","norrietaylor","ishleenk17","tommyers-elastic","lalit-satapathy","agithomas","belimawr","ycombinator","zmoog","MichaelKatsoulis","gizas","AndersonQ","chrisberkhout","marc-gr","efd6","muthu-mps","ShourieG"]'), github.actor)
-    uses: elastic/ai-github-actions/.github/workflows/gh-aw-mention-in-issue.lock.yml@v0
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-pr-actions-detective.lock.yml@v0
     with:
       setup-commands: |
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv

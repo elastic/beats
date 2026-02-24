@@ -1,4 +1,4 @@
-name: Docs Drift
+name: Docs Patrol
 on:
   schedule:
     - cron: "0 14 * * 1-5"
@@ -11,14 +11,10 @@ permissions:
 
 jobs:
   run:
-    uses: elastic/ai-github-actions/.github/workflows/gh-aw-docs-drift.lock.yml@v0
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-docs-patrol.lock.yml@v0
     with:
       setup-commands: |
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
         make mage
-      additional-instructions: |
-        Pay careful attention to backport labels and be sure to propose similar backports to the change
-        which caused the docs to drift in the first place.
-
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
