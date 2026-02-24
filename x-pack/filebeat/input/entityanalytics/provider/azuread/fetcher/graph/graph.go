@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -125,8 +126,34 @@ type tracerConfig struct {
 	lumberjack.Logger `config:",inline"`
 }
 
-func (t *tracerConfig) enabled() bool {
-	return t != nil && (t.Enabled == nil || *t.Enabled)
+// This is required due to circularity.
+const inputName = "azure-ad"
+
+func (c *tracerConfig) Validate() error {
+	if !c.enabled() {
+		return nil
+	}
+	if c.Filename == "" {
+		return errors.New("request tracer must have a filename if used")
+	}
+	if c.MaxSize == 0 {
+		// By default Lumberjack caps file sizes at 100MB which
+		// is excessive for a debugging logger, so default to 1MB
+		// which is the minimum.
+		c.MaxSize = 1
+	}
+	ok, err := httplog.IsPathInLogsFor(inputName, c.Filename)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
+	}
+	return nil
+}
+
+func (c *tracerConfig) enabled() bool {
+	return c != nil && (c.Enabled == nil || *c.Enabled)
 }
 
 type selection struct {
@@ -366,7 +393,15 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 
 	if c.Tracer != nil {
 		id = sanitizeFileName(id)
-		c.Tracer.Filename = strings.ReplaceAll(c.Tracer.Filename, "*", id)
+		path := strings.ReplaceAll(c.Tracer.Filename, "*", id)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			return nil, fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+		}
+		c.Tracer.Filename = resolved
 	}
 
 	client, err := c.Transport.Client(httpcommon.WithLogger(logger))

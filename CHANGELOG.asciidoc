@@ -3,6 +3,37 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+// begin 8.19.11 relnotes
+
+[[release-notes-8.19.11]]
+=== Beats version 8.19.11
+
+https://github.com/elastic/beats/compare/v8.19.10\...v8.19.11[View commits]
+
+[discrete]
+[[bug-fixes-8.19.11]]
+==== Bug fixes
+
+**All**
+
+* Fix Windows install script to properly migrate legacy state data. https://github.com/elastic/beats/pull/48293[#48293]
+* Remove use of github.com/elastic/elastic-agent-client from OSS Beats. https://github.com/elastic/beats/pull/48353[#48353] 
+
+**Filebeat**
+
+* Fix Active Directory Entity Analytics failing to fetch users when Base DN contains a group CN. https://github.com/elastic/beats/pull/48395[#48395] 
+* Fix Filebeat goroutine leak when using `harvester_limit`. https://github.com/elastic/beats/pull/48445[#48445]
+
+**Packetbeat**
+
+* Add check for incorrect length values in PostgreSQL DataRow parser. https://github.com/elastic/beats/pull/47872[#47872]
+* Fix procfs network parsers. https://github.com/elastic/beats/pull/48428[#48428]
+* Fix a panic in the Thrift struct parser triggered by malformed packets. https://github.com/elastic/beats/pull/48498[#48498]
+* Add array access checks to SIP parser. https://github.com/elastic/beats/pull/48514[#48514]
+* Fix potential array access panics and infinite loops in PostgreSQL parser. https://github.com/elastic/beats/pull/48528[#48528]
+
+// end 8.19.11 relnotes
+
 // begin 8.19.10 relnotes
 
 [[release-notes-8.19.10]]

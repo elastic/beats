@@ -479,7 +479,8 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 			if !errors.Is(context.Canceled, err) {
 				cm.logger.Errorf("elastic-agent-client error: %s", err)
 			}
-
+		case <-cm.stopChan:
+			return
 		}
 	}
 }
@@ -500,6 +501,7 @@ func (cm *BeatV2Manager) unitListen() {
 		// The stopChan channel comes from the Manager interface Stop() method
 		case <-cm.stopChan:
 			cm.stopBeat()
+			return
 		case sig := <-sigc:
 			// we can't duplicate the same logic used by stopChan here.
 			// A beat will also watch for sigint and shut down, if we call the stopFunc
@@ -770,7 +772,7 @@ func (cm *BeatV2Manager) reloadOutput(unit *agentUnit) (bool, error) {
 	if cm.stopOnOutputReload && cm.lastOutputCfg != nil {
 		cm.logger.Info("beat is restarting because output changed")
 		_ = unit.UpdateState(status.Stopping, "Restarting", nil)
-		cm.Stop()
+		cm.stopBeat()
 		return true, nil
 	}
 

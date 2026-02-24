@@ -41,7 +41,7 @@ func TestSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 		host = os.Getenv("PUBSUB_EMULATOR_HOST")
 		if host == "" {
 			t.Skip("PUBSUB_EMULATOR_HOST is not set in environment. You can start " +
-				"the emulator with \"docker-compose up\" from the _meta directory. " +
+				"the emulator with \"docker compose up\" from the _meta directory. " +
 				"The default address is PUBSUB_EMULATOR_HOST=localhost:8432")
 		}
 	}

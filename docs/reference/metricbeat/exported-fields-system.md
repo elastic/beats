@@ -2621,5 +2621,3 @@ Logged-in user session data
 :   A remote host address for the session
 
     type: keyword
-
-
