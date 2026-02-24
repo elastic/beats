@@ -146,7 +146,10 @@ func (p *addCloudMetadata) String() string {
 
 func (p *addCloudMetadata) Close() error {
 	p.baseCtxCancel()
-	p.initOnce.Do(func() {})
+	p.initOnce.Do(func() {
+		close(p.initDone)
+	})
+	<-p.initDone
 	return nil
 }
 
