@@ -19,21 +19,12 @@ https://github.com/elastic/beats/compare/v8.19.11\...v8.19.12[View commits]
 * Update `elastic-agent-autodiscover` to v0.10.2. https://github.com/elastic/beats/pull/48817[#48817]
 
 [discrete]
-[[new-features-8.19.12]]
-==== New features
-
-The 8.19.12 release adds the following new and notable features.
+[[features-enhancements-8.19.12]]
+==== New features and enhancements
 
 **Filebeat**
 
 * Add support for managed identity authentication to the `azure-eventhub` input. https://github.com/elastic/beats/pull/48655[#48655] https://github.com/elastic/beats/issues/48680[#48680]
-
-[discrete]
-[[enhancements-8.19.12]]
-==== Enhancements
-
-**Filebeat**
-
 * Don't print warning about small files on each file system scan. https://github.com/elastic/beats/pull/48704[#48704] https://github.com/elastic/beats/issues/45642[#45642]
 
 [discrete]
