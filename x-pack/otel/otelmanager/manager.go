@@ -55,9 +55,8 @@ func (n *OtelManager) Stop() {
 	}
 }
 
-// Enabled returns false because many places inside beats call manager.Enabled() for various purposes
-// Returning true might lead to side effects.
-func (n *OtelManager) Enabled() bool                             { return false }
+// Enabled returns true as beat receivers always run under Elastic Agent.
+func (n *OtelManager) Enabled() bool                             { return true }
 func (n *OtelManager) AgentInfo() management.AgentInfo           { return management.AgentInfo{} }
 func (n *OtelManager) Start() error                              { return nil }
 func (n *OtelManager) CheckRawConfig(cfg *config.C) error        { return nil }
