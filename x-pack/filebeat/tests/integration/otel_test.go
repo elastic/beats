@@ -1751,7 +1751,6 @@ func TestDiskQueuePerReceiverPaths(t *testing.T) {
     path.home: {{.PathHome}}
     queue.disk:
       max_size: 100MB
-    queue.mem.flush.timeout: 0s
 {{end}}
 exporters:
   debug:
