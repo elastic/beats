@@ -66,10 +66,6 @@ echo "Creating SASL users"
 	--entity-type users \
 	--entity-name beats
 
-# Give Kafka time to propagate SASL configuration
-echo "Waiting for SASL configuration to propagate"
-sleep 2
-
 echo "Kafka is ready"
 
 # Make sure the container keeps running

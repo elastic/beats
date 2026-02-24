@@ -15,12 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
 //go:build integration
 
 package kafka
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand/v2"
 	"os"
@@ -361,10 +363,9 @@ func TestSASLAuthentication(t *testing.T) {
 			testTopic := createTestTopicName()
 			groupID := "filebeat"
 
-			// Give Kafka SASL configuration extra time to be fully ready
-			// This helps avoid "leadership election" errors when the SASL listener
-			// is still initializing
-			time.Sleep(1 * time.Second)
+			// Topic auto-creation is asynchronous; wait for leaders to avoid transient
+			// "no leader for this partition" write failures in CI.
+			ensureKafkaTopicReadyForWrites(t, testTopic)
 
 			// Send test messages to the topic for the input to read.
 			messages := []testMessage{
@@ -559,6 +560,49 @@ func getTestSASLKafkaHost() string {
 		getenv("KAFKA_HOST", kafkaDefaultHost),
 		getenv("KAFKA_SASL_PORT", kafkaDefaultSASLPort),
 	)
+}
+
+func ensureKafkaTopicReadyForWrites(t *testing.T, topic string) {
+	config := sarama.NewConfig()
+	config.Version = sarama.V1_0_0_0
+	hosts := []string{getTestKafkaHost()}
+
+	admin, err := sarama.NewClusterAdmin(hosts, config)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, admin.Close())
+	})
+
+	topicDetail := &sarama.TopicDetail{
+		NumPartitions:     3,
+		ReplicationFactor: 1,
+	}
+	require.EventuallyWithTf(t, func(ct *assert.CollectT) {
+		err = admin.CreateTopic(topic, topicDetail, false)
+		if err != nil && !errors.Is(err, sarama.ErrTopicAlreadyExists) {
+			require.NoError(ct, err)
+		}
+	}, 30*time.Second, 200*time.Millisecond, "failed to create topic %s", topic)
+
+	client, err := sarama.NewClient(hosts, config)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, client.Close())
+	})
+
+	require.EventuallyWithTf(t, func(ct *assert.CollectT) {
+		require.NoError(ct, client.RefreshMetadata(topic))
+
+		partitions, err := client.Partitions(topic)
+		require.NoError(ct, err)
+		require.NotEmpty(ct, partitions)
+
+		for _, partition := range partitions {
+			leader, err := client.Leader(topic, partition)
+			require.NoError(ct, err)
+			require.NotNil(ct, leader)
+		}
+	}, 30*time.Second, 200*time.Millisecond, "topic %s is not ready for writes", topic)
 }
 
 func assertOffset(t *testing.T, groupID, topic string, expected int64) {
