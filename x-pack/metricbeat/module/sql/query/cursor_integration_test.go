@@ -289,13 +289,6 @@ func testIntegerCursor(t *testing.T, driver, dsn string) {
 	require.Empty(t, errs1)
 	require.Len(t, events1, 3, "First fetch should return 3 events")
 
-	// Log the IDs
-	for _, event := range events1 {
-		if id, ok := event.MetricSetFields["id"]; ok {
-			t.Logf("First fetch: id=%v", id)
-		}
-	}
-
 	// Close the first metricset to persist state
 	if closer, ok := ms1.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
@@ -306,13 +299,6 @@ func testIntegerCursor(t *testing.T, driver, dsn string) {
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2)
 	require.Len(t, events2, 2, "Second fetch should return 2 events")
-
-	// Log the IDs
-	for _, event := range events2 {
-		if id, ok := event.MetricSetFields["id"]; ok {
-			t.Logf("Second fetch: id=%v", id)
-		}
-	}
 
 	// Close second metricset
 	if closer, ok := ms2.(mb.Closer); ok {
@@ -406,12 +392,6 @@ func testFloatCursor(t *testing.T, driver, dsn string) {
 	require.Empty(t, errs1)
 	require.Len(t, events1, 3, "First float fetch should return 3 events")
 
-	for _, event := range events1 {
-		if s, ok := event.MetricSetFields["score"]; ok {
-			t.Logf("Float cursor - First fetch: score=%v", s)
-		}
-	}
-
 	if closer, ok := ms1.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -421,12 +401,6 @@ func testFloatCursor(t *testing.T, driver, dsn string) {
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2)
 	require.Len(t, events2, 2, "Second float fetch should return 2 events")
-
-	for _, event := range events2 {
-		if s, ok := event.MetricSetFields["score"]; ok {
-			t.Logf("Float cursor - Second fetch: score=%v", s)
-		}
-	}
 
 	if closer, ok := ms2.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
@@ -472,12 +446,6 @@ func testDecimalCursor(t *testing.T, driver, dsn string) {
 	require.Empty(t, errs1)
 	require.Len(t, events1, 3, "First decimal fetch should return 3 events")
 
-	for _, event := range events1 {
-		if p, ok := event.MetricSetFields["price"]; ok {
-			t.Logf("Decimal cursor - First fetch: price=%v", p)
-		}
-	}
-
 	if closer, ok := ms1.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -487,12 +455,6 @@ func testDecimalCursor(t *testing.T, driver, dsn string) {
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2)
 	require.Len(t, events2, 2, "Second decimal fetch should return 2 events")
-
-	for _, event := range events2 {
-		if p, ok := event.MetricSetFields["price"]; ok {
-			t.Logf("Decimal cursor - Second fetch: price=%v", p)
-		}
-	}
 
 	if closer, ok := ms2.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
@@ -539,12 +501,6 @@ func testDescendingIntegerCursor(t *testing.T, driver, dsn string) {
 	require.Empty(t, errs1)
 	require.Len(t, events1, 3, "First descending fetch should return 3 events")
 
-	for _, event := range events1 {
-		if id, ok := event.MetricSetFields["id"]; ok {
-			t.Logf("Descending cursor - First fetch: id=%v", id)
-		}
-	}
-
 	if closer, ok := ms1.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -554,12 +510,6 @@ func testDescendingIntegerCursor(t *testing.T, driver, dsn string) {
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2)
 	require.Len(t, events2, 2, "Second descending fetch should return 2 events")
-
-	for _, event := range events2 {
-		if id, ok := event.MetricSetFields["id"]; ok {
-			t.Logf("Descending cursor - Second fetch: id=%v", id)
-		}
-	}
 
 	if closer, ok := ms2.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
@@ -952,7 +902,6 @@ func testOracleIntegerCursor(t *testing.T, dsn string) {
 	events1, errs1 := fetchEvents(t, ms1)
 	require.Empty(t, errs1, "First fetch should not have errors")
 	require.Len(t, events1, 3, "First fetch should return 3 events")
-	t.Logf("Oracle integer cursor - First fetch: %d events", len(events1))
 	if closer, ok := ms1.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -962,7 +911,6 @@ func testOracleIntegerCursor(t *testing.T, dsn string) {
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2, "Second fetch should not have errors")
 	require.Len(t, events2, 3, "Second fetch should return 3 events")
-	t.Logf("Oracle integer cursor - Second fetch: %d events", len(events2))
 	if closer, ok := ms2.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1078,7 +1026,6 @@ func testOracleTimestampCursorMultiBatch(t *testing.T, dsn string) {
 	events1, errs1 := fetchEvents(t, ms1)
 	require.Empty(t, errs1, "First timestamp fetch should not have errors")
 	require.Len(t, events1, 3, "First timestamp fetch should return 3 events")
-	t.Logf("Oracle timestamp cursor - First fetch: %d events", len(events1))
 	if closer, ok := ms1.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1093,7 +1040,6 @@ func testOracleTimestampCursorMultiBatch(t *testing.T, dsn string) {
 	require.Len(t, events2, 3,
 		"Second timestamp fetch should return 3 events; "+
 			"got 0 may indicate a timezone mismatch between session TZ and godror TZ")
-	t.Logf("Oracle timestamp cursor - Second fetch: %d events", len(events2))
 	if closer, ok := ms2.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1258,7 +1204,6 @@ func testOracleDateCursor(t *testing.T, dsn string) {
 	events1, errs1 := fetchEvents(t, ms1)
 	require.Empty(t, errs1, "First date fetch should not have errors")
 	require.Len(t, events1, 3, "First date fetch should return 3 events")
-	t.Logf("Oracle date cursor - First fetch: %d events", len(events1))
 	if closer, ok := ms1.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1271,7 +1216,7 @@ func testOracleDateCursor(t *testing.T, dsn string) {
 	ms2 := newMetricSetWithPaths(t, cfg, testPaths)
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2, "Second date fetch should not have errors")
-	t.Logf("Oracle date cursor - Second fetch: %d events", len(events2))
+	require.Len(t, events2, 0, "Second date fetch should return 0 events")
 	if closer, ok := ms2.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1674,7 +1619,6 @@ func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) 
 	events1, errs1 := fetchEvents(t, ms1)
 	require.Empty(t, errs1, "First fetch should not error")
 	require.Len(t, events1, 3, "First fetch should return 3 events")
-	t.Logf("TZ mismatch test - First fetch: %d events", len(events1))
 	if closer, ok := ms1.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1701,7 +1645,6 @@ func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) 
 			"timezone mismatch between session TZ (+05:00) and godror TZ (UTC) — "+
 			"the bind parameter arrives as TIMESTAMP WITH TIME ZONE (UTC) but "+
 			"Oracle converts stored TIMESTAMP using session TZ for comparison")
-	t.Logf("TZ mismatch test - Second fetch: %d events", len(events2))
 	if closer, ok := ms2.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1832,12 +1775,6 @@ func testMSSQLIntegerCursor(t *testing.T, dsn string) {
 	require.Empty(t, errs1, "First fetch should not have errors")
 	require.Len(t, events1, 3, "First fetch should return 3 events")
 
-	for _, event := range events1 {
-		if id, ok := event.MetricSetFields["id"]; ok {
-			t.Logf("MSSQL integer cursor - First fetch: id=%v", id)
-		}
-	}
-
 	if closer, ok := ms1.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1847,12 +1784,6 @@ func testMSSQLIntegerCursor(t *testing.T, dsn string) {
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2, "Second fetch should not have errors")
 	require.Len(t, events2, 2, "Second fetch should return 2 events")
-
-	for _, event := range events2 {
-		if id, ok := event.MetricSetFields["id"]; ok {
-			t.Logf("MSSQL integer cursor - Second fetch: id=%v", id)
-		}
-	}
 
 	if closer, ok := ms2.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
@@ -1895,8 +1826,6 @@ func testMSSQLTimestampCursor(t *testing.T, dsn string) {
 	require.Empty(t, errs1, "First timestamp fetch should not have errors")
 	require.Len(t, events1, 3, "First timestamp fetch should return 3 events")
 
-	t.Logf("MSSQL timestamp cursor - First fetch returned %d events", len(events1))
-
 	if closer, ok := ms1.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1906,8 +1835,6 @@ func testMSSQLTimestampCursor(t *testing.T, dsn string) {
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2, "Second timestamp fetch should not have errors")
 	require.Len(t, events2, 2, "Second timestamp fetch should return 2 events")
-
-	t.Logf("MSSQL timestamp cursor - Second fetch returned %d events", len(events2))
 
 	if closer, ok := ms2.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
@@ -1939,8 +1866,6 @@ func testMSSQLDateCursor(t *testing.T, dsn string) {
 	events1, errs1 := fetchEvents(t, ms1)
 	require.Empty(t, errs1, "First date fetch should not have errors")
 	require.GreaterOrEqual(t, len(events1), 1, "First date fetch should return events")
-
-	t.Logf("MSSQL date cursor - First fetch returned %d events", len(events1))
 
 	if closer, ok := ms1.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
