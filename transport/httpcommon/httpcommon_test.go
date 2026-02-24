@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -240,6 +241,200 @@ func BenchmarkReadAll(b *testing.B) {
 					})
 				})
 			}
+		})
+	}
+}
+
+func Test_HTTPTransportSettings_RoundTripper(t *testing.T) {
+	tests := []struct {
+		name     string
+		settings *HTTPTransportSettings
+		handler  http.Handler
+	}{{
+		name: "with basic auth",
+		settings: &HTTPTransportSettings{
+			Auth: &HTTPAuthorization{
+				Username: "test-user",
+				Password: "test-password",
+			},
+		},
+		handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			username, password, ok := req.BasicAuth()
+			if !ok || username != "test-user" || password != "test-password" {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+		}),
+	}, {
+		name: "with api key",
+		settings: &HTTPTransportSettings{
+			Auth: &HTTPAuthorization{
+				APIKey: "test-key",
+			},
+		},
+		handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.Header.Get("Authorization") != "ApiKey test-key" {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+		}),
+	}, {
+		name: "with additional headers",
+		settings: &HTTPTransportSettings{
+			Auth: &HTTPAuthorization{
+				Headers: []struct {
+					Key   string `config:"key" yaml:"key,omitempty" json:"key,omitempty"`
+					Value string `config:"value" yaml:"value,omitempty" json:"value,omitempty"`
+				}{{
+					Key:   "X-Authorization",
+					Value: "test-extra",
+				}, {
+					Key:   "Other-Header",
+					Value: "test-value",
+				}},
+			},
+		},
+		handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.Header.Get("X-Authorization") != "test-extra" || req.Header.Get("Other-Header") != "test-value" {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+		}),
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			rt, err := tc.settings.RoundTripper()
+			require.NoError(t, err)
+
+			server := httptest.NewServer(tc.handler)
+			defer server.Close()
+			req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, server.URL, nil)
+			require.NoError(t, err)
+
+			resp, err := rt.RoundTrip(req)
+			require.NoError(t, err)
+			defer resp.Body.Close()
+			require.Equal(t, http.StatusOK, resp.StatusCode)
+		})
+	}
+}
+
+func Test_HTTPAuthorization_ToMap(t *testing.T) {
+	tests := []struct {
+		name   string
+		auth   *HTTPAuthorization
+		expect map[string]string
+	}{{
+		name: "headers only",
+		auth: &HTTPAuthorization{
+			Headers: []struct {
+				Key   string `config:"key" yaml:"key,omitempty" json:"key,omitempty"`
+				Value string `config:"value" yaml:"value,omitempty" json:"value,omitempty"`
+			}{{
+				Key:   "header1",
+				Value: "val1",
+			}, {
+				Key:   "header2",
+				Value: "val2",
+			}},
+		},
+		expect: map[string]string{
+			"header1": "val1",
+			"header2": "val2",
+		},
+	}, {
+		name: "basic only",
+		auth: &HTTPAuthorization{
+			Username: "user",
+			Password: "pass",
+		},
+		expect: map[string]string{
+			"Authorization": "Basic dXNlcjpwYXNz",
+		},
+	}, {
+		name: "basic with headers",
+		auth: &HTTPAuthorization{
+			Headers: []struct {
+				Key   string `config:"key" yaml:"key,omitempty" json:"key,omitempty"`
+				Value string `config:"value" yaml:"value,omitempty" json:"value,omitempty"`
+			}{{
+				Key:   "header1",
+				Value: "val1",
+			}, {
+				Key:   "header2",
+				Value: "val2",
+			}},
+			Username: "user",
+			Password: "pass",
+		},
+		expect: map[string]string{
+			"header1":       "val1",
+			"header2":       "val2",
+			"Authorization": "Basic dXNlcjpwYXNz",
+		},
+	}, {
+		name: "api_key only",
+		auth: &HTTPAuthorization{
+			APIKey: "apiKeyVal",
+		},
+		expect: map[string]string{
+			"Authorization": "ApiKey apiKeyVal",
+		},
+	}, {
+		name: "api_key with headers",
+		auth: &HTTPAuthorization{
+			Headers: []struct {
+				Key   string `config:"key" yaml:"key,omitempty" json:"key,omitempty"`
+				Value string `config:"value" yaml:"value,omitempty" json:"value,omitempty"`
+			}{{
+				Key:   "header1",
+				Value: "val1",
+			}, {
+				Key:   "header2",
+				Value: "val2",
+			}},
+			APIKey: "apiKeyVal",
+		},
+		expect: map[string]string{
+			"header1":       "val1",
+			"header2":       "val2",
+			"Authorization": "ApiKey apiKeyVal",
+		},
+	}, {
+		name: "api_key preffered over basic",
+		auth: &HTTPAuthorization{
+			APIKey:   "apiKeyVal",
+			Username: "user",
+			Password: "pass",
+		},
+		expect: map[string]string{
+			"Authorization": "ApiKey apiKeyVal",
+		},
+	}, {
+		name: "api_key replaces Authorization custom header",
+		auth: &HTTPAuthorization{
+			Headers: []struct {
+				Key   string `config:"key" yaml:"key,omitempty" json:"key,omitempty"`
+				Value string `config:"value" yaml:"value,omitempty" json:"value,omitempty"`
+			}{{
+				Key:   "Authorization",
+				Value: "val1",
+			}},
+			APIKey: "apiKeyVal",
+		},
+		expect: map[string]string{
+			"Authorization": "ApiKey apiKeyVal",
+		},
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			results := tc.auth.ToMap()
+			require.EqualValues(t, tc.expect, results)
 		})
 	}
 }
