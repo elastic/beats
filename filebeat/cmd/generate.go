@@ -114,4 +114,3 @@ func genGenerateFieldsCmd() *cobra.Command {
 
 	return genFieldsCmd
 }
-
