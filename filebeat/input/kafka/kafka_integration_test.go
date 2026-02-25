@@ -515,7 +515,7 @@ func checkMatchingHeaders(
 	if !ok {
 		t.Fatal("event.Fields.kafka.headers isn't a []string")
 	}
-	assert.Equal(t, len(expected), len(headerArray))
+	assert.Len(t, headerArray, len(expected))
 	for i := 0; i < len(expected); i++ {
 		splitIndex := strings.Index(headerArray[i], ": ")
 		if splitIndex == -1 {

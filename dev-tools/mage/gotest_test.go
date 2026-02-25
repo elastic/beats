@@ -160,27 +160,27 @@ func TestGoTest_Helper_AssertOutput(t *testing.T) {
 	}
 
 	t.Run("assert fails", func(t *testing.T) {
-		assert.True(t, false)
+		assert.True(t, false) //nolint:testifylint // intentionally failing assertion to test output formatting
 	})
 
 	t.Run("assert with message", func(t *testing.T) {
-		assert.True(t, false, "My message")
+		assert.True(t, false, "My message") //nolint:testifylint // intentionally failing assertion to test output formatting
 	})
 
 	t.Run("assert with messagef", func(t *testing.T) {
-		assert.True(t, false, "My message with arguments: %v", 42)
+		assert.True(t, false, "My message with arguments: %v", 42) //nolint:testifylint // intentionally failing assertion to test output formatting
 	})
 
 	t.Run("require fails", func(t *testing.T) {
-		require.True(t, false)
+		require.True(t, false) //nolint:testifylint // intentionally failing assertion to test output formatting
 	})
 
 	t.Run("require with message", func(t *testing.T) {
-		require.True(t, false, "My message")
+		require.True(t, false, "My message") //nolint:testifylint // intentionally failing assertion to test output formatting
 	})
 
 	t.Run("require with messagef", func(t *testing.T) {
-		require.True(t, false, "My message with arguments: %v", 42)
+		require.True(t, false, "My message with arguments: %v", 42) //nolint:testifylint // intentionally failing assertion to test output formatting
 	})
 
 	t.Run("equals map", func(t *testing.T) {

@@ -68,7 +68,7 @@ func TestCompressionReader(t *testing.T) {
 		src := bytes.NewReader(tc.compressed)
 		cr := NewCompressionReader(io.NopCloser(src))
 		n, err := cr.Read(dst)
-		assert.Nil(t, err, name)
+		assert.NoError(t, err, name)
 		assert.Equal(t, len(tc.plaintext), n, name)
 		assert.Equal(t, tc.plaintext, dst, name)
 	}
@@ -97,7 +97,7 @@ func TestCompressionWriter(t *testing.T) {
 		cw := NewCompressionWriter(NopWriteCloseSyncer(NopWriteCloser(&dst)))
 		n, err := cw.Write(tc.plaintext)
 		cw.Close()
-		assert.Nil(t, err, name)
+		assert.NoError(t, err, name)
 		assert.Equal(t, len(tc.plaintext), n, name)
 		assert.Equal(t, tc.compressed, dst.Bytes(), name)
 	}
@@ -128,13 +128,13 @@ func TestCompressionRoundTrip(t *testing.T) {
 		go func() {
 			cw := NewCompressionWriter(NopWriteCloseSyncer(pw))
 			_, err := io.Copy(cw, src)
-			assert.Nil(t, err, name)
+			assert.NoError(t, err, name)
 			cw.Close()
 		}()
 
 		cr := NewCompressionReader(pr)
 		_, err := io.Copy(&dst, cr)
-		assert.Nil(t, err, name)
+		assert.NoError(t, err, name)
 		assert.Equal(t, tc.plaintext, dst.Bytes(), name)
 	}
 }
@@ -153,20 +153,20 @@ func TestCompressionSync(t *testing.T) {
 			cw := NewCompressionWriter(NopWriteCloseSyncer(pw))
 			src1 := bytes.NewReader(tc.plaintext)
 			_, err := io.Copy(cw, src1)
-			assert.Nil(t, err, name)
+			assert.NoError(t, err, name)
 			// prior to v4.1.15 of pierrec/lz4 there was a
 			// bug that prevented writing after a Flush.
 			// The call to Sync here exercises Flush.
 			err = cw.Sync()
-			assert.Nil(t, err, name)
+			assert.NoError(t, err, name)
 			src2 := bytes.NewReader(tc.plaintext)
 			_, err = io.Copy(cw, src2)
-			assert.Nil(t, err, name)
+			assert.NoError(t, err, name)
 			cw.Close()
 		}()
 		cr := NewCompressionReader(pr)
 		_, err := io.Copy(&dst, cr)
-		assert.Nil(t, err, name)
+		assert.NoError(t, err, name)
 		assert.Equal(t, tc.plaintext, dst.Bytes()[:len(tc.plaintext)], name)
 		assert.Equal(t, tc.plaintext, dst.Bytes()[len(tc.plaintext):], name)
 	}
