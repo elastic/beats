@@ -100,9 +100,36 @@ func TestLogFileTruncated(t *testing.T) {
 	_, err = reader.Read(buf)
 	assert.Nil(t, err)
 
+<<<<<<< HEAD
 	err = f.Truncate(0)
 	if err != nil {
 		t.Fatalf("error while truncating file: %+v", err)
+=======
+			fs := filestream{
+				readerConfig: readerConfig{BufferSize: 512},
+				compression:  CompressionAuto}
+
+			f, err := fs.newFile(osFile)
+			require.NoError(t, err, "could not create file for reading")
+
+			defer f.Close()
+			defer os.Remove(f.Name())
+
+			reader, err := newFileReader(
+				logp.NewNopLogger(), context.TODO(), f, fs.readerConfig, fs.closerConfig)
+			require.NoError(t, err, "error while creating logReader")
+
+			buf := make([]byte, 32)
+			_, err = reader.Read(buf)
+			assert.NoError(t, err)
+
+			err = tc.truncateFn(t, f)
+			require.NoError(t, err, "error while truncating file")
+
+			err = readUntilError(reader)
+			assert.ErrorIs(t, err, tc.wantErr)
+		})
+>>>>>>> 134036433 (golangci: Enable testifylint for data-plane owned code (#49008))
 	}
 
 	err = readUntilError(reader)

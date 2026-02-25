@@ -227,8 +227,8 @@ func TestAutodiscover(t *testing.T) {
 
 	requireRunningRunners(t, autodiscover, 1)
 	runners := adapter.Runners()
-	require.Equal(t, len(runners), 1)
-	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
+	require.Len(t, runners, 1)
+	require.Len(t, autodiscover.configs["mock:foo"], 1)
 	require.True(t, runners[0].started)
 	require.False(t, runners[0].stopped)
 
@@ -247,8 +247,8 @@ func TestAutodiscover(t *testing.T) {
 
 	requireRunningRunners(t, autodiscover, 1)
 	runners = adapter.Runners()
-	require.Equal(t, len(runners), 1)
-	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
+	require.Len(t, runners, 1)
+	require.Len(t, autodiscover.configs["mock:foo"], 1)
 	require.True(t, runners[0].started)
 	require.False(t, runners[0].stopped)
 
@@ -279,8 +279,8 @@ func TestAutodiscover(t *testing.T) {
 
 	requireRunningRunners(t, autodiscover, 1)
 	runners = adapter.Runners()
-	require.Equal(t, len(runners), 2)
-	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
+	require.Len(t, runners, 2)
+	require.Len(t, autodiscover.configs["mock:foo"], 1)
 	require.True(t, runners[0].stopped)
 	require.True(t, runners[1].started)
 	require.False(t, runners[1].stopped)
@@ -308,8 +308,8 @@ func TestAutodiscover(t *testing.T) {
 		"adapter.Runners()[1] has not stopped")
 
 	runners = adapter.Runners()
-	require.Equal(t, len(runners), 2)
-	require.Equal(t, len(autodiscover.configs["mock:foo"]), 0)
+	require.Len(t, runners, 2)
+	require.Empty(t, autodiscover.configs["mock:foo"])
 	require.False(t, runners[1].started)
 	require.True(t, runners[1].stopped)
 }
@@ -375,8 +375,8 @@ func TestAutodiscoverHash(t *testing.T) {
 	wait(t, func() bool { return len(adapter.Runners()) == 2 })
 
 	runners := adapter.Runners()
-	assert.Equal(t, len(runners), 2)
-	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
+	assert.Len(t, runners, 2)
+	assert.Len(t, autodiscover.configs["mock:foo"], 2)
 	assert.True(t, runners[0].started)
 	assert.False(t, runners[0].stopped)
 	assert.True(t, runners[1].started)
@@ -509,7 +509,7 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 
 	// As only the second config is valid, total runners will be 1
 	wait(t, func() bool { return len(adapter.Runners()) == 1 })
-	assert.Equal(t, 1, len(autodiscover.configs["mock:foo"]))
+	assert.Len(t, autodiscover.configs["mock:foo"], 1)
 }
 
 func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
@@ -577,8 +577,8 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	wait(t, func() bool { return len(adapter.Runners()) == 2 })
 
 	runners := adapter.Runners()
-	assert.Equal(t, len(runners), 2)
-	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
+	assert.Len(t, runners, 2)
+	assert.Len(t, autodiscover.configs["mock:foo"], 2)
 	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"x": "y"}), true, false)
 	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
 	// Test start event with changed configurations
@@ -602,8 +602,8 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	runners = adapter.Runners()
 	// Ensure the first config is the same as before
 	t.Log(runners)
-	assert.Equal(t, len(runners), 3)
-	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
+	assert.Len(t, runners, 3)
+	assert.Len(t, autodiscover.configs["mock:foo"], 2)
 	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
 
 	// Ensure that the runner for the stale config is stopped
@@ -788,6 +788,105 @@ func check(t *testing.T, runners []*mockRunner, expected *conf.C, started, stopp
 	t.Fatalf("expected cfg %v to be started=%v stopped=%v but have %v", out, started, stopped, runners)
 }
 
+<<<<<<< HEAD
+=======
+func TestErrNonReloadableIsNotRetried(t *testing.T) {
+	// Register mock autodiscover provider
+	busChan := make(chan bus.Bus, 1)
+	Registry = NewRegistry()
+	err := Registry.AddProvider(
+		"mock",
+		func(beatName string,
+			b bus.Bus,
+			uuid uuid.UUID,
+			c *conf.C,
+			k keystore.Keystore,
+			l *logp.Logger) (Provider, error) {
+
+			// intercept bus to mock events
+			busChan <- b
+
+			return &mockProvider{}, nil
+		})
+	if err != nil {
+		t.Fatalf("cannot add provider to registry: %s", err)
+	}
+
+	// Create a mock adapter, 'err_non_reloadable' will make its Create method
+	// to return a common.ErrNonReloadable.
+	adapter := mockAdapter{
+		configs: []*conf.C{
+			conf.MustNewConfigFrom(map[string]any{
+				"err_non_reloadable": true,
+			}),
+		},
+	}
+
+	// and settings:
+	providerConfig, _ := conf.NewConfigFrom(map[string]string{
+		"type": "mock",
+	})
+	config := Config{
+		Providers: []*conf.C{providerConfig},
+	}
+	k, _ := keystore.NewFileKeystore(filepath.Join(t.TempDir(), "keystore"))
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
+	// Create autodiscover manager
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// set the debounce period to something small in order to
+	// speed up the tests. This seems to be the sweet stop
+	// for the fastest test run
+	autodiscover.debouncePeriod = time.Millisecond
+
+	// Start it
+	autodiscover.Start()
+	defer autodiscover.Stop()
+	eventBus := <-busChan
+
+	// Send an event to the bus, the event itself is not important
+	// because the mockAdapter will return the same configs regardless
+	// of the event
+	eventBus.Publish(bus.Event{
+		// That's used in the last assertion, the config key is
+		// <provider name>:<id>
+		"id":       "foo",
+		"provider": "mock",
+		"start":    true,
+		"meta": mapstr.M{
+			"test_name": t.Name(),
+		},
+	})
+
+	// Ensure we logged the error about not retrying reloading input
+	require.Eventually(
+		t,
+		func() bool {
+			logs := observedLogs.TakeAll()
+			for _, log := range logs {
+				if log.Message == "all new inputs failed to start with a non-retriable error" && log.ContextMap()["error"] == "Error creating runner from config: ErrNonReloadable: a non reloadable error" {
+					return true
+				}
+			}
+			return false
+		},
+		time.Second*10,
+		time.Millisecond*10,
+		"foo error")
+
+	// Ensure nothing is running
+	requireRunningRunners(t, autodiscover, 0)
+	runners := adapter.Runners()
+	require.Empty(t, runners)
+
+	// Ensure the autodiscover got the config
+	require.Len(t, autodiscover.configs["mock:foo"], 1)
+}
+
+>>>>>>> 134036433 (golangci: Enable testifylint for data-plane owned code (#49008))
 // TestAutodiscoverMetadataCleanup tests that the worker properly cleans up metadata
 // for configurations that are no longer active.
 func TestAutodiscoverMetadataCleanup(t *testing.T) {
@@ -844,9 +943,9 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 	wait(t, func() bool { return len(adapter.Runners()) == 2 })
 
 	// check that configs and metadata exist
-	assert.Equal(t, 2, len(autodiscover.configs["mock:foo"]))
+	assert.Len(t, autodiscover.configs["mock:foo"], 2)
 	metaKeys := autodiscover.meta.Keys()
-	assert.Equal(t, 2, len(metaKeys), "Should have 2 metadata entries for id foo")
+	assert.Len(t, metaKeys, 2, "Should have 2 metadata entries for id foo")
 
 	// create another service "bar" with 2 configs
 	barConfig1, _ := conf.NewConfigFrom(map[string]string{
@@ -867,10 +966,10 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 	})
 	// Wait for configs to be processed
 	wait(t, func() bool { return len(adapter.Runners()) == 4 })
-	assert.Equal(t, 2, len(autodiscover.configs["mock:foo"]))
-	assert.Equal(t, 2, len(autodiscover.configs["mock:bar"]))
+	assert.Len(t, autodiscover.configs["mock:foo"], 2)
+	assert.Len(t, autodiscover.configs["mock:bar"], 2)
 	metaKeys = autodiscover.meta.Keys()
-	assert.Equal(t, 4, len(metaKeys), "Should have 4 metadata entries total")
+	assert.Len(t, metaKeys, 4, "Should have 4 metadata entries total")
 
 	// Stop first config
 	eventBus.Publish(bus.Event{
@@ -890,7 +989,7 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 
 	// Metadata should still exist right after stopping the config
 	metaKeys = autodiscover.meta.Keys()
-	assert.Equal(t, 4, len(metaKeys), "Should still have 4 metadata entries before cleanup")
+	assert.Len(t, metaKeys, 4, "Should still have 4 metadata entries before cleanup")
 
 	// Wait for debounce period so the worker can run the metadata GC
 	wait(t, func() bool {

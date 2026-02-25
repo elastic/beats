@@ -1115,6 +1115,7 @@ func TestGenerateHints(t *testing.T) {
 			t.Fatal(err)
 		}
 
+<<<<<<< HEAD
 		cfgs := l.CreateConfig(test.event)
 		assert.Equal(t, test.len, len(cfgs), test.msg)
 		configs := make([]mapstr.M, 0)
@@ -1124,6 +1125,19 @@ func TestGenerateHints(t *testing.T) {
 			ok := assert.Nil(t, err, test.msg)
 			if !ok {
 				break
+=======
+			cfgs := l.CreateConfig(test.event)
+			assert.Len(t, cfgs, test.len, test.msg)
+			configs := make([]mapstr.M, 0)
+			for _, cfg := range cfgs {
+				config := mapstr.M{}
+				err := cfg.Unpack(&config)
+				ok := assert.NoError(t, err, test.msg)
+				if !ok {
+					break
+				}
+				configs = append(configs, config)
+>>>>>>> 134036433 (golangci: Enable testifylint for data-plane owned code (#49008))
 			}
 			configs = append(configs, config)
 		}
@@ -1351,11 +1365,11 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 		}
 
 		cfgs := l.CreateConfig(test.event)
-		require.Equal(t, test.len, len(cfgs), test.msg)
+		require.Len(t, cfgs, test.len, test.msg)
 		if test.len != 0 {
 			config := mapstr.M{}
 			err := cfgs[0].Unpack(&config)
-			assert.Nil(t, err, test.msg)
+			assert.NoError(t, err, test.msg)
 
 			assert.Equal(t, test.result, config, test.msg)
 		}
