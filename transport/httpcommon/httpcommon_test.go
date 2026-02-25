@@ -83,6 +83,19 @@ ssl:
 				Timeout:         5 * time.Second,
 			},
 		},
+		"includes auth": {
+			input: `
+auth:
+  api_key: test-key
+timeout: 5s
+`,
+			expected: HTTPTransportSettings{
+				Auth: &HTTPAuthorization{
+					APIKey: "test-key",
+				},
+				Timeout: 5 * time.Second,
+			},
+		},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {

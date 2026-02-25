@@ -197,9 +197,10 @@ func DefaultHTTPTransportSettings() HTTPTransportSettings {
 // Unpack reads a config object into the settings.
 func (settings *HTTPTransportSettings) Unpack(cfg *config.C) error {
 	tmp := struct {
-		TLS             *tlscommon.Config `config:"ssl"`
-		Timeout         time.Duration     `config:"timeout"`
-		IdleConnTimeout time.Duration     `config:"idle_connection_timeout"`
+		TLS             *tlscommon.Config  `config:"ssl"`
+		Timeout         time.Duration      `config:"timeout"`
+		IdleConnTimeout time.Duration      `config:"idle_connection_timeout"`
+		Auth            *HTTPAuthorization `config:"auth"`
 	}{
 		Timeout:         settings.Timeout,
 		IdleConnTimeout: settings.IdleConnTimeout,
@@ -223,6 +224,7 @@ func (settings *HTTPTransportSettings) Unpack(cfg *config.C) error {
 
 	*settings = HTTPTransportSettings{
 		TLS:             tmp.TLS,
+		Auth:            tmp.Auth,
 		Timeout:         tmp.Timeout,
 		Proxy:           proxy,
 		IdleConnTimeout: tmp.IdleConnTimeout,
