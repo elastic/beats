@@ -106,7 +106,7 @@ func TestPublish(t *testing.T) {
 		subFields := []string{"dataset", "namespace", "type"}
 		for _, subField := range subFields {
 			gotValue, ok := attributes.Get("data_stream." + subField)
-			require.True(t, ok, fmt.Sprintf("data_stream.%s not found on log record attribute", subField))
+			require.True(t, ok, "data_stream.%s not found on log record attribute", subField)
 			assert.EqualValues(t, dataStreamField[subField], gotValue.AsRaw())
 		}
 	})
@@ -142,7 +142,16 @@ func TestPublish(t *testing.T) {
 		dynamicAttributeKey := "elasticsearch.ingest_pipeline"
 		gotValue, ok := attributes.Get(dynamicAttributeKey)
 		require.True(t, ok, "dynamic pipeline attribute was not set")
+<<<<<<< HEAD
 		assert.EqualValues(t, "error_pipeline", gotValue.AsString())
+=======
+		assert.Equal(t, "error_pipeline", gotValue.AsString())
+
+		dynamicAttributeKey = "elastic.mapping.mode"
+		gotValue, ok = scopeAttributes.Get(dynamicAttributeKey)
+		require.True(t, ok, "elastic mapping mode was not set")
+		assert.Equal(t, "bodymap", gotValue.AsString())
+>>>>>>> 134036433 (golangci: Enable testifylint for data-plane owned code (#49008))
 	})
 
 	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {

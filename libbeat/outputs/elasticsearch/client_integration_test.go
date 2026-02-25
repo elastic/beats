@@ -109,8 +109,8 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 	assert.Equal(t, 1, resp.Count)
 
 	outputSnapshot := monitoring.CollectFlatSnapshot(registry, monitoring.Full, true)
-	assert.Greater(t, outputSnapshot.Ints["write.bytes"], int64(0), "output.events.write.bytes must be greater than 0")
-	assert.Greater(t, outputSnapshot.Ints["read.bytes"], int64(0), "output.events.read.bytes must be greater than 0")
+	assert.Positive(t, outputSnapshot.Ints["write.bytes"], "output.events.write.bytes must be greater than 0")
+	assert.Positive(t, outputSnapshot.Ints["read.bytes"], "output.events.read.bytes must be greater than 0")
 	assert.Equal(t, int64(0), outputSnapshot.Ints["write.errors"])
 	assert.Equal(t, int64(0), outputSnapshot.Ints["read.errors"])
 }
@@ -367,7 +367,7 @@ func TestClientPublishTracer(t *testing.T) {
 	assert.Equal(t, "publishEvents", firstSpan.Name)
 	assert.Equal(t, "output", firstSpan.Type)
 	assert.Equal(t, [8]byte(firstSpan.TransactionID), [8]byte(tx.ID))
-	assert.True(t, len(firstSpan.Context.Tags) > 0, "no tags found")
+	assert.NotEmpty(t, firstSpan.Context.Tags, "no tags found")
 
 	secondSpan := spans[0]
 	assert.Contains(t, secondSpan.Name, "POST")

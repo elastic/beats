@@ -49,7 +49,7 @@ func executeTest(t *testing.T, cfgLogsPath string, source string, expectedResult
 	}
 
 	logMatcher, err := newLogsPathMatcher(*cfg, logp.NewNopLogger())
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	input := mapstr.M{
 		"log": mapstr.M{

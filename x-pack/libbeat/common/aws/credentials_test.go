@@ -32,8 +32,13 @@ func TestInitializeAWSConfig(t *testing.T) {
 
 	assert.Equal(t, inputConfig.AccessKeyID, retrievedAWSConfig.AccessKeyID)
 	assert.Equal(t, inputConfig.SecretAccessKey, retrievedAWSConfig.SecretAccessKey)
+<<<<<<< HEAD
 	assert.Equal(t, true, awsConfig.HTTPClient.(*http.Client).Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify)
 	assert.NotNil(t, awsConfig.HTTPClient.(*http.Client).Transport.(*http.Transport).Proxy)
+=======
+	assert.True(t, awsConfig.HTTPClient.(*http.Client).Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify) //nolint:errcheck // no need in test
+	assert.NotNil(t, awsConfig.HTTPClient.(*http.Client).Transport.(*http.Transport).Proxy)                            //nolint:errcheck // no need in test
+>>>>>>> 134036433 (golangci: Enable testifylint for data-plane owned code (#49008))
 }
 
 func TestGetAWSCredentials(t *testing.T) {
