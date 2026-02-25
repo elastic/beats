@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/{{getBeatName}}-metricset-{{.Mod.Base}}-{{.Metricset.Title}}.html
 {{if .Metricset.Applies_to }}applies_to:
   stack: {{ .Metricset.Applies_to }}
+  serverless: {{ serverlessLifecycle .Metricset.Applies_to }}
 {{end -}}
 ---
 

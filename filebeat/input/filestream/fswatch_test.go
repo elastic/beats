@@ -1127,7 +1127,7 @@ func createScannerWithConfig(t *testing.T, logger *logp.Logger, paths []string, 
 
 func requireEqualFiles(t *testing.T, expected, actual map[string]loginp.FileDescriptor) {
 	t.Helper()
-	require.Equalf(t, len(expected), len(actual), "amount of files does not match:\n\nexpected \n%v\n\n actual \n%v\n", filenames(expected), filenames(actual))
+	require.Lenf(t, actual, len(expected), "amount of files does not match:\n\nexpected \n%v\n\n actual \n%v\n", filenames(expected), filenames(actual))
 
 	for expFilename, expFD := range expected {
 		actFD, exists := actual[expFilename]

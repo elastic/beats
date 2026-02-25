@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/processor-timestamp.html
 applies_to:
   stack: beta
+  serverless: beta
 ---
 
 # Timestamp [processor-timestamp]

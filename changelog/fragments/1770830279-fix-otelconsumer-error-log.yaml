@@ -1,0 +1,20 @@
+# Kind can be one of:
+# - breaking-change: a change to previously-documented behavior
+# - deprecation: functionality that is being removed in a later release
+# - bug-fix: fixes a problem in a previous version
+# - enhancement: extends functionality but does not break or fix existing behavior
+# - feature: new functionality
+# - known-issue: problems that we are aware of in a given version
+# - security: impacts on the security of a product or a user's deployment.
+# - upgrade: important information for someone upgrading from a prior version
+# - other: does not fit into any of the other categories
+kind: bug-fix
+
+# Change summary; a 80ish characters long description of the change.
+summary: Fix otelconsumer logging hundreds of errors per second when queue is full
+
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: libbeat
+
+# Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
+issue: https://github.com/elastic/beats/issues/48803

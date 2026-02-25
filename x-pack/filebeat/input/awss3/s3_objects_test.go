@@ -445,11 +445,11 @@ func TestNewMockS3Pager(t *testing.T) {
 	defer ctrl.Finish()
 	mockS3Pager := newMockS3Pager(ctrl, 1, fakeObjects)
 	mockS3API := NewMockS3API(ctrl)
-	mockS3API.EXPECT().ListObjectsPaginator(gomock.Any(), "").Return(mockS3Pager)
+	mockS3API.EXPECT().ListObjectsPaginator(gomock.Any(), gomock.Eq(""), gomock.Any()).Return(mockS3Pager)
 
 	// Test the mock.
 	var keys []string
-	pager := mockS3API.ListObjectsPaginator("nombre", "")
+	pager := mockS3API.ListObjectsPaginator("nombre", "", "")
 	for pager.HasMorePages() {
 		listObjectsV2Output, err := pager.NextPage(ctx)
 		if err != nil {

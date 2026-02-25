@@ -61,7 +61,7 @@ func TestPodIndexer(t *testing.T) {
 	}
 
 	indexers := podIndexer.GetMetadata(&pod)
-	assert.Equal(t, len(indexers), 1)
+	assert.Len(t, indexers, 1)
 	assert.Equal(t, indexers[0].Index, fmt.Sprintf("%s/%s", ns, podName))
 
 	expected := mapstr.M{
@@ -84,7 +84,7 @@ func TestPodIndexer(t *testing.T) {
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
 
 	indices := podIndexer.GetIndexes(&pod)
-	assert.Equal(t, len(indices), 1)
+	assert.Len(t, indices, 1)
 	assert.Equal(t, indices[0], fmt.Sprintf("%s/%s", ns, podName))
 }
 
@@ -116,7 +116,7 @@ func TestPodUIDIndexer(t *testing.T) {
 	}
 
 	indexers := podUIDIndexer.GetMetadata(&pod)
-	assert.Equal(t, len(indexers), 1)
+	assert.Len(t, indexers, 1)
 	assert.Equal(t, indexers[0].Index, uid)
 
 	expected := mapstr.M{
@@ -139,7 +139,7 @@ func TestPodUIDIndexer(t *testing.T) {
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
 
 	indices := podUIDIndexer.GetIndexes(&pod)
-	assert.Equal(t, len(indices), 1)
+	assert.Len(t, indices, 1)
 	assert.Equal(t, indices[0], uid)
 }
 
@@ -175,8 +175,8 @@ func TestContainerIndexer(t *testing.T) {
 
 	indexers := conIndexer.GetMetadata(&pod)
 	indices := conIndexer.GetIndexes(&pod)
-	assert.Equal(t, len(indexers), 0)
-	assert.Equal(t, len(indices), 0)
+	assert.Empty(t, indexers)
+	assert.Empty(t, indices)
 	expected := mapstr.M{
 		"kubernetes": mapstr.M{
 			"pod": mapstr.M{
@@ -220,16 +220,16 @@ func TestContainerIndexer(t *testing.T) {
 	}
 
 	indexers = conIndexer.GetMetadata(&pod)
-	assert.Equal(t, len(indexers), 3)
-	assert.Equal(t, indexers[0].Index, "abcde")
-	assert.Equal(t, indexers[1].Index, "fghij")
-	assert.Equal(t, indexers[2].Index, "klmno")
+	assert.Len(t, indexers, 3)
+	assert.Equal(t, "abcde", indexers[0].Index)
+	assert.Equal(t, "fghij", indexers[1].Index)
+	assert.Equal(t, "klmno", indexers[2].Index)
 
 	indices = conIndexer.GetIndexes(&pod)
-	assert.Equal(t, len(indices), 3)
-	assert.Equal(t, indices[0], "abcde")
-	assert.Equal(t, indices[1], "fghij")
-	assert.Equal(t, indices[2], "klmno")
+	assert.Len(t, indices, 3)
+	assert.Equal(t, "abcde", indices[0])
+	assert.Equal(t, "fghij", indices[1])
+	assert.Equal(t, "klmno", indices[2])
 
 	expected.Put("kubernetes.container",
 		mapstr.M{
@@ -284,14 +284,14 @@ func TestFilteredGenMeta(t *testing.T) {
 	}
 
 	indexers := podIndexer.GetMetadata(&pod)
-	assert.Equal(t, len(indexers), 1)
+	assert.Len(t, indexers, 1)
 
 	rawLabels, _ := indexers[0].Data.GetValue("kubernetes.labels")
 	assert.NotNil(t, rawLabels)
 
 	labelMap, ok := rawLabels.(mapstr.M)
-	assert.Equal(t, ok, true)
-	assert.Equal(t, len(labelMap), 2)
+	assert.True(t, ok)
+	assert.Len(t, labelMap, 2)
 
 	rawAnnotations, _ := indexers[0].Data.GetValue("kubernetes.annotations")
 	assert.Nil(t, rawAnnotations)
@@ -308,27 +308,27 @@ func TestFilteredGenMeta(t *testing.T) {
 	assert.NoError(t, err)
 
 	indexers = podIndexer.GetMetadata(&pod)
-	assert.Equal(t, len(indexers), 1)
+	assert.Len(t, indexers, 1)
 
 	rawLabels, _ = indexers[0].Data.GetValue("kubernetes.labels")
 	assert.NotNil(t, rawLabels)
 
 	labelMap, ok = rawLabels.(mapstr.M)
-	assert.Equal(t, ok, true)
-	assert.Equal(t, len(labelMap), 1)
+	assert.True(t, ok)
+	assert.Len(t, labelMap, 1)
 
 	ok, _ = labelMap.HasKey("foo")
-	assert.Equal(t, ok, true)
+	assert.True(t, ok)
 
 	rawAnnotations, _ = indexers[0].Data.GetValue("kubernetes.annotations")
 	assert.NotNil(t, rawAnnotations)
 	annotationsMap, ok := rawAnnotations.(mapstr.M)
 
-	assert.Equal(t, ok, true)
-	assert.Equal(t, len(annotationsMap), 1)
+	assert.True(t, ok)
+	assert.Len(t, annotationsMap, 1)
 
 	ok, _ = annotationsMap.HasKey("a")
-	assert.Equal(t, ok, true)
+	assert.True(t, ok)
 }
 
 func TestFilteredGenMetaExclusion(t *testing.T) {
@@ -365,20 +365,20 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 	assert.NoError(t, err)
 
 	indexers := podIndexer.GetMetadata(&pod)
-	assert.Equal(t, len(indexers), 1)
+	assert.Len(t, indexers, 1)
 
 	rawLabels, _ := indexers[0].Data.GetValue("kubernetes.labels")
 	assert.NotNil(t, rawLabels)
 
 	labelMap, ok := rawLabels.(mapstr.M)
-	assert.Equal(t, ok, true)
-	assert.Equal(t, len(labelMap), 1)
+	assert.True(t, ok)
+	assert.Len(t, labelMap, 1)
 
 	ok, _ = labelMap.HasKey("foo")
-	assert.Equal(t, ok, true)
+	assert.True(t, ok)
 
 	ok, _ = labelMap.HasKey("x")
-	assert.Equal(t, ok, false)
+	assert.False(t, ok)
 }
 
 func TestIpPortIndexer(t *testing.T) {
@@ -416,8 +416,8 @@ func TestIpPortIndexer(t *testing.T) {
 	indexers := ipIndexer.GetMetadata(&pod)
 	indices := ipIndexer.GetIndexes(&pod)
 
-	assert.Equal(t, 1, len(indexers))
-	assert.Equal(t, 1, len(indices))
+	assert.Len(t, indexers, 1)
+	assert.Len(t, indices, 1)
 	assert.Equal(t, ip, indices[0])
 	assert.Equal(t, ip, indexers[0].Index)
 
@@ -466,12 +466,12 @@ func TestIpPortIndexer(t *testing.T) {
 	pod.Spec.NodeName = nodeName
 
 	indexers = ipIndexer.GetMetadata(&pod)
-	assert.Equal(t, 2, len(indexers))
+	assert.Len(t, indexers, 2)
 	assert.Equal(t, ip, indexers[0].Index)
 	assert.Equal(t, fmt.Sprintf("%s:%d", ip, port), indexers[1].Index)
 
 	indices = ipIndexer.GetIndexes(&pod)
-	assert.Equal(t, 2, len(indices))
+	assert.Len(t, indices, 2)
 	assert.Equal(t, ip, indices[0])
 	assert.Equal(t, fmt.Sprintf("%s:%d", ip, port), indices[1])
 
