@@ -379,8 +379,6 @@ github.com/elastic/elastic-agent-client/v7 v7.18.0 h1:zXdoErqECfvRjj1c+1Ko4VGuUn
 github.com/elastic/elastic-agent-client/v7 v7.18.0/go.mod h1:ChFjpIfSsQOnhWT3se5Euw/o8P4Vf77FxeObE/vUfSc=
 github.com/elastic/elastic-agent-libs v0.32.2 h1:2CaO4TAMcZDy0qNxh48Ui1oMc+xExKL+JkpcyOxF7XA=
 github.com/elastic/elastic-agent-libs v0.32.2/go.mod h1:0xUg7alsNE/WhY9DZRIdTYW75nqSHC1octIAg//j/PQ=
-github.com/elastic/elastic-agent-system-metrics v0.14.1 h1:XdV3KWbug/M1dkn8h9Yth9pfdyeFR2Z1iqaypX+ohBg=
-github.com/elastic/elastic-agent-system-metrics v0.14.1/go.mod h1:JNfnZrC0viAjlJRUzQKKuMpDlXgjXBn4WdWEXQF7jcA=
 github.com/elastic/elastic-transport-go/v8 v8.8.0 h1:7k1Ua+qluFr6p1jfJjGDl97ssJS/P7cHNInzfxgBQAo=
 github.com/elastic/elastic-transport-go/v8 v8.8.0/go.mod h1:YLHer5cj0csTzNFXoNQ8qhtGY1GTvSqPnKWKaqQE3Hk=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270 h1:cWPqxlPtir4RoQVCpGSRXmLqjEHpJKbR60rxh1nQZY4=
@@ -886,6 +884,8 @@ github.com/opencontainers/go-digest v1.0.0 h1:apOUWs51W5PlhuyGyz9FCeeBIOUDA/6nW8
 github.com/opencontainers/go-digest v1.0.0/go.mod h1:0JzlMkj0TRzQZfJkVvzbP0HBR3IKzErnv2BNG4W4MAM=
 github.com/opencontainers/image-spec v1.1.1 h1:y0fUlFfIZhPF1W537XOLg0/fcx6zcHCJwooC2xJA040=
 github.com/opencontainers/image-spec v1.1.1/go.mod h1:qpqAh3Dmcf36wStyyWU+kCeDgrGnAve2nCC8+7h8Q0M=
+github.com/orestisfl/elastic-agent-system-metrics v0.0.0-20260225081509-3cdacfb3739f h1:GOUyYWQy3qBDcAuoiAob4GC/vGgklj8+8Z7V+RfbX4U=
+github.com/orestisfl/elastic-agent-system-metrics v0.0.0-20260225081509-3cdacfb3739f/go.mod h1:JNfnZrC0viAjlJRUzQKKuMpDlXgjXBn4WdWEXQF7jcA=
 github.com/osquery/osquery-go v0.0.0-20231108163517-e3cde127e724 h1:z8XmnNQeCDZB3BwVoRxcqwo7MlDdsB6AJxqTap72S7w=
 github.com/osquery/osquery-go v0.0.0-20231108163517-e3cde127e724/go.mod h1:mLJRc1Go8uP32LRALGvWj2lVJ+hDYyIfxDzVa+C5Yo8=
 github.com/oxtoacart/bpool v0.0.0-20150712133111-4e1c5567d7c2 h1:CXwSGu/LYmbjEab5aMCs5usQRVBGThelUKBNnoSOuso=

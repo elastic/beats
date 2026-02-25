@@ -91,3 +91,72 @@
           format: percent
           description: >
             The percentage of used swap memory.
+
+    - name: zswap
+      type: group
+      description: >
+        zswap compressed swap cache metrics. Available on Linux when zswap is enabled.
+      fields:
+        - name: compressed
+          type: long
+          format: bytes
+          description: >
+            Current compressed size of data stored in zswap.
+
+        - name: uncompressed
+          type: long
+          format: bytes
+          description: >
+            Original uncompressed size of data stored in zswap.
+
+        - name: debug
+          type: group
+          description: >
+            Detailed zswap statistics from /sys/kernel/debug/zswap.
+            Requires debugfs to be mounted and accessible.
+          fields:
+            - name: pool_limit_hit
+              type: long
+              description: >
+                Number of times the pool limit was reached.
+
+            - name: pool_total_size
+              type: long
+              format: bytes
+              description: >
+                Total size of the zswap pool in bytes.
+
+            - name: reject_alloc_fail
+              type: long
+              description: >
+                Number of pages rejected due to zpool allocation failure.
+
+            - name: reject_compress_fail
+              type: long
+              description: >
+                Number of pages rejected due to compression failure.
+
+            - name: reject_compress_poor
+              type: long
+              description: >
+                Number of pages rejected due to poor compression ratio.
+
+            - name: reject_kmemcache_fail
+              type: long
+              description: >
+                Number of pages rejected due to kmemcache allocation failure.
+
+            - name: reject_reclaim_fail
+              type: long
+              description: >
+                Number of pages rejected due to reclaim failure.
+
+            - name: stored_pages
+              type: long
+              description: >
+                Number of pages currently stored in zswap.
+
+            - name: written_back_pages
+              type: long
+              description: >
+                Number of pages written back from zswap to swap.
