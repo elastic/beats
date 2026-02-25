@@ -92,21 +92,14 @@ func TestNewReceiver(t *testing.T) {
 				return getFromSocket(t, &lastError, monitorSocket, "inputs")
 			}, "failed to connect to monitoring socket, inputs endpoint, last error was: %s", &lastError)
 			assert.Condition(c, func() bool {
-<<<<<<< HEAD
 				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
 					FilterMessageSnippet("add_host_metadata").
 					FilterMessageSnippet("add_cloud_metadata").
 					FilterMessageSnippet("add_docker_metadata").
 					FilterMessageSnippet("add_kubernetes_metadata")
-				assert.Len(t, processorsLoaded.All(), 1, "processors not loaded")
+				assert.Len(c, processorsLoaded.All(), 1, "processors not loaded")
 				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
 				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
-=======
-				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors")
-				assert.Empty(c, processorsLoaded.All(), "processors loaded but none expected")
-				// Check that add_host_metadata enrichment is not done.
-				return assert.NotContains(c, logs["r1"][0].Flatten(), "host.architecture")
->>>>>>> 134036433 (golangci: Enable testifylint for data-plane owned code (#49008))
 			}, "failed to check processors loaded")
 		},
 	})
@@ -269,14 +262,8 @@ func TestMultipleReceivers(t *testing.T) {
 			for _, helper := range helpers {
 				writeFile(c, helper.ingest, "A log line")
 
-<<<<<<< HEAD
-				require.Greaterf(c, len(logs[helper.name]), 0, "receiver %v does not have any logs", helper)
-				assert.Equal(c, "test", logs[helper.name][0].Flatten()["message"], "expected message field to contain string 'test'")
-=======
 				require.NotEmptyf(c, logs[helper.name], "receiver %v does not have any logs", helper)
-
 				assert.Equalf(c, "test", logs[helper.name][0].Flatten()["message"], "expected %v message field to be 'test'", helper)
->>>>>>> 134036433 (golangci: Enable testifylint for data-plane owned code (#49008))
 
 				// Verify that each receiver used its own JavaScript processor script.
 				// This demonstrates path isolation: each receiver loads processor.js from its own path.config.
