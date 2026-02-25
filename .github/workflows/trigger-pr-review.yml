@@ -4,6 +4,7 @@ on:
     types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
 
 permissions:
+  actions: read
   contents: read
   issues: write
   pull-requests: write
