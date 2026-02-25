@@ -127,6 +127,29 @@ filebeat.autodiscover:
                     - /var/lib/docker/containers/${data.docker.container.id}/*.log
 ```
 
+Here is an example of how a configuration using Kubernetes secrets would look:
+
+```yaml
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: false
+      templates:
+        - condition:
+            and:
+            - equals:
+                kubernetes.labels.app: "redis"
+          config:
+            - module: redis
+              log:
+                enabled: true
+                var.paths: ["/var/log/containers/*-${data.kubernetes.container.id}.log"]
+              slowlog:
+                enabled: true
+                var.hosts: ["${data.host}:6379"]
+                var.password: "${kubernetes.default.somesecret.value}"
+```
+
 ::::{warning}
 When using autodiscover, you have to be careful when defining config templates, especially if they are reading from places holding information for several containers. For instance, under this file structure:
 
