@@ -14,6 +14,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+// This file was contributed to by generative AI
 
 package actions
 
@@ -187,24 +188,33 @@ func removeDuplicates(dirtyArr []interface{}) (cleanArr []interface{}) {
 	return cleanArr
 }
 
-func valueToArray(val interface{}) []interface{} {
+// valueToArray normalizes a value to []any so callers can append values
+// regardless of whether the input is a scalar, slice, or array.
+func valueToArray(val any) []any {
+	// Fast-path: keep []any as-is to avoid extra allocation/copy.
 	switch value := val.(type) {
-	case []interface{}:
+	case []any:
 		return value
 	}
 
 	v := reflect.ValueOf(val)
+	// Invalid reflect values (for example nil interface values) are treated as
+	// a single entry to keep behavior consistent with scalar inputs.
+	// This should never happen
 	if !v.IsValid() {
-		return []interface{}{val}
+		return []any{val}
 	}
 
+	// Normalize any concrete slice/array type (e.g. []string, []int, [N]T)
+	// into []any by copying each element in order.
 	if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
-		arr := make([]interface{}, 0, v.Len())
+		arr := make([]any, 0, v.Len())
 		for i := 0; i < v.Len(); i++ {
 			arr = append(arr, v.Index(i).Interface())
 		}
 		return arr
 	}
 
-	return []interface{}{val}
+	// Scalar values become a one-element array so callers can always append(...).
+	return []any{val}
 }
