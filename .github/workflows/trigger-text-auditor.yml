@@ -1,17 +1,18 @@
-name: Small Problem Fixer
+name: Text Auditor
 on:
   schedule:
-    - cron: "0 12 * * 1-5"
+    - cron: "0 13 * * 1-5"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  actions: read
+  contents: read
   issues: write
-  pull-requests: write
+  pull-requests: read
 
 jobs:
   run:
-    uses: elastic/ai-github-actions/.github/workflows/gh-aw-small-problem-fixer.lock.yml@v0
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-text-auditor.lock.yml@v0
     with:
       setup-commands: |
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
