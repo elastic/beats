@@ -776,6 +776,86 @@ This group contains statistics related to the swap memory usage on the system.
     format: percent
 
 
+## zswap [_zswap]
+
+zswap compressed swap cache metrics. Available on Linux when zswap is enabled.
+
+**`system.memory.zswap.compressed`**
+:   Current compressed size of data stored in zswap.
+
+    type: long
+
+    format: bytes
+
+
+**`system.memory.zswap.uncompressed`**
+:   Original uncompressed size of data stored in zswap.
+
+    type: long
+
+    format: bytes
+
+
+## debug [_debug]
+
+Detailed zswap statistics from /sys/kernel/debug/zswap. Requires debugfs to be mounted and accessible.
+
+**`system.memory.zswap.debug.pool_limit_hit`**
+:   Number of times the pool limit was reached.
+
+    type: long
+
+
+**`system.memory.zswap.debug.pool_total_size`**
+:   Total size of the zswap pool in bytes.
+
+    type: long
+
+    format: bytes
+
+
+**`system.memory.zswap.debug.reject_alloc_fail`**
+:   Number of pages rejected due to zpool allocation failure.
+
+    type: long
+
+
+**`system.memory.zswap.debug.reject_compress_fail`**
+:   Number of pages rejected due to compression failure.
+
+    type: long
+
+
+**`system.memory.zswap.debug.reject_compress_poor`**
+:   Number of pages rejected due to poor compression ratio.
+
+    type: long
+
+
+**`system.memory.zswap.debug.reject_kmemcache_fail`**
+:   Number of pages rejected due to kmemcache allocation failure.
+
+    type: long
+
+
+**`system.memory.zswap.debug.reject_reclaim_fail`**
+:   Number of pages rejected due to reclaim failure.
+
+    type: long
+
+
+**`system.memory.zswap.debug.stored_pages`**
+:   Number of pages currently stored in zswap.
+
+    type: long
+
+
+**`system.memory.zswap.debug.written_back_pages`**
+:   Number of pages written back from zswap to swap.
+
+    type: long
+
+
 ## network [_network]
 
 `network` contains network IO metrics for a single network interface.
