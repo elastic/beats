@@ -65,5 +65,5 @@ output.console:
 	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
 	stat, err := os.Stat(mockbeat.TempDir() + "/data/meta.json")
 	require.NoError(t, err)
-	require.Equal(t, stat.Mode().String(), "-rw-------")
+	require.Equal(t, "-rw-------", stat.Mode().String())
 }
