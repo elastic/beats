@@ -146,6 +146,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of symbolic link resolution on Windows in httplog path assessment. {pull}48754[48754]
 - Fix request tracer path validation under managed agents. {pull}48909[48909]
 - Improve in-flight byte accounting in the HTTP Endpoint input. {issue}48456[48456] {pull}48571[48571]
+- Fix handling of Crowdstrike streaming input state in retryable errors. {issue}49076[49076] {pull}49077[49077]
 
 *Heartbeat*
 
