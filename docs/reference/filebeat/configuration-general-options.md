@@ -92,7 +92,7 @@ The storage backend used for the registry. Supported values:
 - `bbolt`: A [bbolt (BoltDB)](https://github.com/etcd-io/bbolt) database for persistent on-disk storage with support for compaction and TTL-based entry cleanup.
 
 ```yaml
-filebeat.registry.backend: bbolt
+filebeat.registry.backend: memlog
 ```
 
 When set to `bbolt`, the database files are stored under the directory specified by `registry.path`. The bbolt-specific settings are configured under `registry.bbolt`.
@@ -151,7 +151,7 @@ filebeat.registry.bbolt.compaction.cleanup_on_start: false
 
 ### `registry.bbolt.retention.ttl` [_registry_bbolt_retention_ttl]
 
-How long entries are kept in the store before being removed. A zero value disables TTL-based removal. Must be used together with `registry.bbolt.retention.interval`. Default: `0` (disabled).
+How long entries are kept in the store before being removed. A zero value disables TTL-based removal. Expired entries become invisible to reads immediately, but are only physically deleted from disk when `registry.bbolt.retention.interval` is also set to a positive value. Default: `0` (disabled).
 
 ```yaml
 filebeat.registry.bbolt.retention.ttl: 0

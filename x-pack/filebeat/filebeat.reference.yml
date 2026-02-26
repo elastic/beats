@@ -3357,8 +3357,9 @@ filebeat.inputs:
 #filebeat.registry.bbolt.compaction.cleanup_on_start: false
 
 # How long entries are kept before being removed. A zero value disables
-# TTL-based removal. Works together with retention.interval.
-# Default: 0 (disabled).
+# TTL-based removal. Expired entries become invisible to reads immediately,
+# but are only physically deleted from disk when retention.interval is also
+# set to a positive value. Default: 0 (disabled).
 #filebeat.registry.bbolt.retention.ttl: 0
 
 # How often to remove expired entries from disk. Only effective when
