@@ -18,6 +18,8 @@
 package bbolt
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -328,6 +330,90 @@ func TestRegistryClosePreventsAccess(t *testing.T) {
 
 	_, err = reg.Access("test")
 	assert.ErrorIs(t, err, errRegClosed)
+}
+
+func TestCompactFailure_StoreStillWorks(t *testing.T) {
+	dir := t.TempDir()
+	logger := logptest.NewTestingLogger(t, "")
+	cfg := DefaultConfig()
+
+	dbPath := filepath.Join(dir, "test.db")
+	s, err := openStore(logger, dbPath, 0600, cfg)
+	require.NoError(t, err)
+	defer s.Close()
+
+	require.NoError(t, s.Set("key1", map[string]any{"value": "hello"}))
+
+	has, err := s.Has("key1")
+	require.NoError(t, err)
+	require.True(t, has)
+
+	// Make directory read-only so compact() fails at CreateTemp.
+	require.NoError(t, os.Chmod(dir, 0555))
+	defer os.Chmod(dir, 0755) //nolint:errcheck // restore for cleanup
+
+	err = s.compact()
+	require.Error(t, err)
+
+	// Store must still be fully functional after the failed compaction.
+	has, err = s.Has("key1")
+	require.NoError(t, err)
+	assert.True(t, has)
+
+	var got map[string]any
+	require.NoError(t, s.Get("key1", &got))
+	assert.Equal(t, "hello", got["value"])
+
+	// Restore permissions so Set can fsync.
+	require.NoError(t, os.Chmod(dir, 0755))
+
+	require.NoError(t, s.Set("key2", map[string]any{"value": "world"}))
+	has, err = s.Has("key2")
+	require.NoError(t, err)
+	assert.True(t, has)
+}
+
+func TestCompactReopenFailure_NoPanic(t *testing.T) {
+	dir := t.TempDir()
+	logger := logptest.NewTestingLogger(t, "")
+	cfg := DefaultConfig()
+
+	dbPath := filepath.Join(dir, "test.db")
+	s, err := openStore(logger, dbPath, 0600, cfg)
+	require.NoError(t, err)
+
+	require.NoError(t, s.Set("key1", map[string]any{"value": "hello"}))
+
+	// Simulate the state compact() leaves when bolt.Open fails to reopen:
+	// s.db is closed but not nil. Before the fix, bolt.Open would assign
+	// nil to s.db, causing nil-pointer panics in all subsequent operations.
+	s.compactionMu.Lock()
+	s.db.Close()
+	s.compactionMu.Unlock()
+
+	assert.NotPanics(t, func() {
+		_, err := s.Has("key1")
+		assert.Error(t, err)
+	})
+	assert.NotPanics(t, func() {
+		var v map[string]any
+		err := s.Get("key1", &v)
+		assert.Error(t, err)
+	})
+	assert.NotPanics(t, func() {
+		err := s.Set("key2", map[string]any{"x": 1})
+		assert.Error(t, err)
+	})
+	assert.NotPanics(t, func() {
+		err := s.Remove("key1")
+		assert.Error(t, err)
+	})
+	assert.NotPanics(t, func() {
+		err := s.Each(func(_ string, _ backend.ValueDecoder) (bool, error) {
+			return true, nil
+		})
+		assert.Error(t, err)
+	})
 }
 
 func TestMultipleStores(t *testing.T) {

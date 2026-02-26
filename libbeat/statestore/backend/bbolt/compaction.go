@@ -87,13 +87,14 @@ func (s *store) compact() error {
 
 	moveErr := moveFileWithFallback(compactedPath, dbPath)
 
-	s.db, err = bolt.Open(dbPath, s.fileMode, s.options)
+	newDB, err := bolt.Open(dbPath, s.fileMode, s.options)
 	if err != nil {
 		return errors.Join(
 			fmt.Errorf("failed to reopen db after compaction: %w", err),
 			moveErr,
 		)
 	}
+	s.db = newDB
 
 	if moveErr != nil {
 		var pathErr *os.PathError
