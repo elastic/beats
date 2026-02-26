@@ -138,10 +138,6 @@ func (s *store) runLoop(name string, interval time.Duration, fn func()) {
 // shouldCompact checks whether the conditions for online rebound compaction
 // are met based on the configured thresholds.
 func (s *store) shouldCompact() bool {
-	if !s.config.Compaction.OnRebound {
-		return false
-	}
-
 	s.compactionMu.RLock()
 	defer s.compactionMu.RUnlock()
 
