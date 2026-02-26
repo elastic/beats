@@ -557,6 +557,25 @@ func (e *inputTestingEnvironment) WaitLogsContains(s string, timeout time.Durati
 	e.testLogger.WaitLogsContains(e.t, s, timeout, msgAndArgs...)
 }
 
+// WaitLogsContainsFromBeginning retries the search from the beginning on each poll.
+// This avoids missing log lines when the underlying incremental matcher advances
+// the offset on partial reads.
+func (e *inputTestingEnvironment) WaitLogsContainsFromBeginning(s string, timeout time.Duration, msgAndArgs ...any) {
+	e.t.Helper()
+	require.EventuallyWithT(e.t, func(c *assert.CollectT) {
+		e.testLogger.ResetOffset()
+		found, err := e.testLogger.FindInLogs(s)
+		if err != nil {
+			c.Errorf("cannot check the log file: %s", err)
+			return
+		}
+
+		if !found {
+			c.Errorf("did not find '%s' in the logs", s)
+		}
+	}, timeout, 100*time.Millisecond, msgAndArgs...)
+}
+
 var _ statestore.States = (*testInputStore)(nil)
 
 type testInputStore struct {

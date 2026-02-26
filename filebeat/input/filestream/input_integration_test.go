@@ -1211,7 +1211,7 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 		1*time.Second)
 
 	// File is inactive, the reader context will be cancelled
-	env.WaitLogsContains(
+	env.WaitLogsContainsFromBeginning(
 		fmt.Sprintf("'%s' is inactive", logFilePathStr),
 		5*time.Second,
 		"missing 'file is inactive' logs")
