@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -117,7 +118,11 @@ func (f *httpMetadataFetcher) fetchRaw(
 		return
 	}
 
-	// Decode JSON.
+	if err := validateResponse(rsp, all); err != nil {
+		result.err = fmt.Errorf("unexpected %v metadata response: %w", f.provider, err)
+		return
+	}
+
 	err = responseHandler(all, result)
 	if err != nil {
 		result.err = err
@@ -164,4 +169,21 @@ func makeJSONPicker(provider string) responseHandler {
 		}
 		return nil
 	}
+}
+
+// validateResponse checks that the HTTP response looks like legitimate cloud
+// metadata rather than an intercepted response from a firewall or proxy.
+func validateResponse(rsp *http.Response, body []byte) error {
+	ct := rsp.Header.Get("Content-Type")
+	if ct != "" && strings.Contains(strings.ToLower(ct), "text/html") {
+		return fmt.Errorf("received HTML content type %q, expected metadata response", ct)
+	}
+
+	trimmed := strings.TrimSpace(string(body))
+	lower := strings.ToLower(trimmed)
+	if strings.HasPrefix(lower, "<!doctype") || strings.HasPrefix(lower, "<html") {
+		return fmt.Errorf("response body looks like HTML, not cloud metadata")
+	}
+
+	return nil
 }
