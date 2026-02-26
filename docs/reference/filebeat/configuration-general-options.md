@@ -127,7 +127,7 @@ filebeat.registry.bbolt.fsync: false
 If `true`, database compaction runs every time Filebeat starts. Compaction rewrites the database file to reclaim unused disk space. Default: `false`.
 
 ```yaml
-filebeat.registry.bbolt.compaction.on_start: true
+filebeat.registry.bbolt.compaction.on_start: false
 ```
 
 
@@ -145,7 +145,7 @@ filebeat.registry.bbolt.compaction.max_transaction_size: 65536
 If `true`, leftover temporary files from a previous compaction that was interrupted (for example, by a crash) are removed when Filebeat starts. Default: `false`.
 
 ```yaml
-filebeat.registry.bbolt.compaction.cleanup_on_start: true
+filebeat.registry.bbolt.compaction.cleanup_on_start: false
 ```
 
 
