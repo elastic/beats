@@ -47,7 +47,7 @@ func TestGetPipelinePath(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		assert.Equal(t, tc.count, len(paths))
+		assert.Len(t, paths, tc.count)
 	}
 
 	testCasesError := []string{
@@ -60,6 +60,6 @@ func TestGetPipelinePath(t *testing.T) {
 		if err == nil {
 			t.Fatal(paths)
 		}
-		assert.Equal(t, 0, len(paths))
+		assert.Empty(t, paths)
 	}
 }

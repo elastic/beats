@@ -216,7 +216,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 
 	eventGeoField, err := newEvent.GetValue("host.geo")
 	assert.Error(t, err)
-	assert.Equal(t, nil, eventGeoField)
+	assert.Nil(t, eventGeoField)
 }
 
 func TestEventWithReplaceFieldsFalse(t *testing.T) {
@@ -293,7 +293,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
 			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
 			if c.expectedHostFieldLength != -1 {
-				assert.Equal(t, c.expectedHostFieldLength, len(v.(mapstr.M)))
+				assert.Len(t, v.(mapstr.M), c.expectedHostFieldLength) //nolint:errcheck // already checked
 			}
 		})
 	}
