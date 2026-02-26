@@ -42,13 +42,13 @@ func getFilesInDirectory(directory string, log *logger.Logger) ([]string, error)
 	return files, nil
 }
 
-// getJumplists returns a list of constructedjumplists for a given user profile and jumplist type.
-func (u *UserProfile) getJumplists(log *logger.Logger) []*Jumplist {
-	var jumplists []*Jumplist
+// getJumplists returns a list of constructed jumplists for a given user profile.
+func (u *UserProfile) getJumplists(log *logger.Logger) []*jumplist {
+	var jumplists []*jumplist
 
-	jumplistDirectories := map[JumplistType]string{
-		JumplistTypeCustom:    filepath.Join(u.recentDir, "CustomDestinations"),
-		JumplistTypeAutomatic: filepath.Join(u.recentDir, "AutomaticDestinations"),
+	jumplistDirectories := map[jumplistType]string{
+		jumplistTypeCustom:    filepath.Join(u.recentDir, "CustomDestinations"),
+		jumplistTypeAutomatic: filepath.Join(u.recentDir, "AutomaticDestinations"),
 	}
 
 	// Collect and parse all jumplist files for each jumplist type
@@ -61,7 +61,7 @@ func (u *UserProfile) getJumplists(log *logger.Logger) []*Jumplist {
 
 		// Parse the jumplist files for the given jumplist type
 		switch jumplistType {
-		case JumplistTypeCustom:
+		case jumplistTypeCustom:
 			for _, file := range files {
 				if !strings.HasSuffix(file, ".customDestinations-ms") {
 					continue
@@ -73,9 +73,9 @@ func (u *UserProfile) getJumplists(log *logger.Logger) []*Jumplist {
 				}
 				jumplists = append(jumplists, jumpList)
 			}
-		case JumplistTypeAutomatic:
+		case jumplistTypeAutomatic:
 			for _, file := range files {
-				jumpList, err := ParseAutomaticJumpListFile(file, u, log)
+				jumpList, err := parseAutomaticJumpListFile(file, u, log)
 				if err != nil {
 					log.Errorf("%s", err)
 					continue

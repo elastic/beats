@@ -115,7 +115,6 @@ runLoop:
 			if openErrHandler.backoff(cancelCtx, openErr) {
 				continue runLoop
 			}
-			//nolint:nilerr // only log error if we are not shutting down
 			if cancelCtx.Err() != nil {
 				break runLoop
 			}
@@ -130,17 +129,25 @@ runLoop:
 		for cancelCtx.Err() == nil {
 			reporter.UpdateStatus(status.Running, fmt.Sprintf("Reading from %s", api.Channel()))
 			records, readErr := api.Read()
+
+			// io.EOF signals a clean end of stream (e.g. no_more_events: stop).
+			// Publish any records returned in the same batch before exiting.
+			if errors.Is(readErr, io.EOF) {
+				if len(records) > 0 {
+					if err := publisher.Publish(records); err != nil {
+						reporter.UpdateStatus(status.Failed, fmt.Sprintf("Publisher error: %v", err))
+						return err
+					}
+				}
+				log.Debugw("end of Winlog event stream reached", "error", readErr)
+				break runLoop
+			}
+
 			if readErr != nil {
 				if readErrHandler.backoff(cancelCtx, readErr) {
 					continue runLoop
 				}
 
-				if errors.Is(readErr, io.EOF) {
-					log.Debugw("end of Winlog event stream reached", "error", readErr)
-					break runLoop
-				}
-
-				//nolint:nilerr // only log error if we are not shutting down
 				if cancelCtx.Err() != nil {
 					break runLoop
 				}

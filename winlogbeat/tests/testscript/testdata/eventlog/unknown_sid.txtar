@@ -1,0 +1,27 @@
+[!windows] skip 'requires Windows'
+
+# Write an event with a fabricated SID that has no corresponding account.
+write-event 'Unknown SID S-1-5-21-3623811015-3361044348-30300820-1013' --sid=S-1-5-21-3623811015-3361044348-30300820-1013
+wait-for-event-log 1
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 1
+check-event-field output 0 message 'Unknown SID S-1-5-21-3623811015-3361044348-30300820-1013'
+check-event-field output 0 winlog.user.identifier 'S-1-5-21-3623811015-3361044348-30300820-1013'
+check-event-field-absent output 0 winlog.user.name
+check-event-field-absent output 0 winlog.user.type
+
+-- winlogbeat.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    no_more_events: stop
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false
