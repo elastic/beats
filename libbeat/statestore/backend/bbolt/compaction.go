@@ -44,15 +44,14 @@ func (s *store) compact() error {
 	if err != nil {
 		return fmt.Errorf("failed to create temp file for compaction: %w", err)
 	}
-	if err := file.Close(); err != nil {
-		return err
-	}
-
 	defer func() {
 		if removeErr := os.Remove(file.Name()); removeErr != nil && !errors.Is(removeErr, os.ErrNotExist) {
 			s.log.Errorf("Failed to remove temporary compaction file: %v", removeErr)
 		}
 	}()
+	if err := file.Close(); err != nil {
+		return err
+	}
 
 	s.compactionMu.Lock()
 	defer s.compactionMu.Unlock()
@@ -83,7 +82,7 @@ func (s *store) compact() error {
 	s.db.Close()
 	compactedDB.Close()
 
-	if err := moveFileWithFallback(compactedPath, dbPath); err != nil {
+	if err := moveFileWithFallback(compactedPath, dbPath, s.fileMode); err != nil {
 		var pathErr *os.PathError
 		if !errors.As(err, &pathErr) || pathErr.Op != "remove" {
 			// Move failed — the original file is still at dbPath, reopen it (was closed before the move).
@@ -256,7 +255,7 @@ func cleanupTempFiles(log *logp.Logger, dir string) {
 // moveFileWithFallback attempts os.Rename first. If it fails due to a
 // cross-device link error (EXDEV), it falls back to a streaming
 // copy-and-remove that avoids loading the entire file into memory.
-func moveFileWithFallback(src, dest string) error {
+func moveFileWithFallback(src, dest string, perm os.FileMode) error {
 	if err := os.Rename(src, dest); err == nil {
 		return nil
 	} else if !errors.Is(err, syscall.EXDEV) {
@@ -269,7 +268,7 @@ func moveFileWithFallback(src, dest string) error {
 	}
 	defer srcFile.Close()
 
-	destFile, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	destFile, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
 	if err != nil {
 		return err
 	}
