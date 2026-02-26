@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix handling of Crowdstrike streaming input state in retryable errors.
+component: filebeat
