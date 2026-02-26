@@ -416,6 +416,75 @@ func TestCompactReopenFailure_NoPanic(t *testing.T) {
 	})
 }
 
+func TestHasSkipsExpiredEntry(t *testing.T) {
+	dir := t.TempDir()
+	logger := logptest.NewTestingLogger(t, "")
+	cfg := DefaultConfig()
+	cfg.Retention.TTL = 100 * time.Millisecond
+
+	s, err := openStore(logger, filepath.Join(dir, "test.db"), 0600, cfg)
+	require.NoError(t, err)
+	defer s.Close()
+
+	require.NoError(t, s.Set("key", map[string]any{"v": 1}))
+
+	has, err := s.Has("key")
+	require.NoError(t, err)
+	assert.True(t, has, "key should be visible before TTL expires")
+
+	time.Sleep(150 * time.Millisecond)
+
+	has, err = s.Has("key")
+	require.NoError(t, err)
+	assert.False(t, has, "key should be invisible after TTL expires")
+}
+
+func TestGetSkipsExpiredEntry(t *testing.T) {
+	dir := t.TempDir()
+	logger := logptest.NewTestingLogger(t, "")
+	cfg := DefaultConfig()
+	cfg.Retention.TTL = 100 * time.Millisecond
+
+	s, err := openStore(logger, filepath.Join(dir, "test.db"), 0600, cfg)
+	require.NoError(t, err)
+	defer s.Close()
+
+	require.NoError(t, s.Set("key", map[string]any{"v": 1}))
+
+	var got map[string]any
+	require.NoError(t, s.Get("key", &got), "key should be readable before TTL expires")
+
+	time.Sleep(150 * time.Millisecond)
+
+	err = s.Get("key", &got)
+	assert.ErrorIs(t, err, errKeyUnknown, "expired key should return errKeyUnknown")
+}
+
+func TestEachSkipsExpiredEntries(t *testing.T) {
+	dir := t.TempDir()
+	logger := logptest.NewTestingLogger(t, "")
+	cfg := DefaultConfig()
+	cfg.Retention.TTL = 100 * time.Millisecond
+
+	s, err := openStore(logger, filepath.Join(dir, "test.db"), 0600, cfg)
+	require.NoError(t, err)
+	defer s.Close()
+
+	require.NoError(t, s.Set("old", map[string]any{"v": 1}))
+
+	time.Sleep(150 * time.Millisecond)
+
+	require.NoError(t, s.Set("new", map[string]any{"v": 2}))
+
+	var keys []string
+	err = s.Each(func(key string, dec backend.ValueDecoder) (bool, error) {
+		keys = append(keys, key)
+		return true, nil
+	})
+	require.NoError(t, err)
+	assert.Equal(t, []string{"new"}, keys, "Each should skip the expired entry")
+}
+
 func TestMultipleStores(t *testing.T) {
 	path := t.TempDir()
 	logger := logptest.NewTestingLogger(t, "")

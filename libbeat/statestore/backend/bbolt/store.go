@@ -64,6 +64,13 @@ func (d *valueDecoder) Decode(to any) error {
 	return typeconv.Convert(to, d.decoded)
 }
 
+func (e *storedEntry) isExpired(ttl time.Duration) bool {
+	if ttl <= 0 {
+		return false
+	}
+	return time.Now().UnixNano()-e.Timestamp > ttl.Nanoseconds()
+}
+
 // store implements backend.Store backed by a single bbolt database file.
 type store struct {
 	log      *logp.Logger
@@ -181,7 +188,7 @@ func (s *store) Close() error {
 	return nil
 }
 
-// Has checks if the key exists in the store.
+// Has checks if the key exists in the store. Returns false for expired entries.
 func (s *store) Has(key string) (bool, error) {
 	s.compactionMu.RLock()
 	defer s.compactionMu.RUnlock()
@@ -192,13 +199,22 @@ func (s *store) Has(key string) (bool, error) {
 		if bucket == nil {
 			return nil
 		}
-		found = bucket.Get([]byte(key)) != nil
+		data := bucket.Get([]byte(key))
+		if data == nil {
+			return nil
+		}
+		var entry storedEntry
+		if err := json.Unmarshal(data, &entry); err != nil {
+			return nil
+		}
+		found = !entry.isExpired(s.config.Retention.TTL)
 		return nil
 	})
 	return found, err
 }
 
 // Get decodes the value for the given key into the provided value.
+// Returns errKeyUnknown for missing or expired entries.
 func (s *store) Get(key string, to any) error {
 	s.compactionMu.RLock()
 	defer s.compactionMu.RUnlock()
@@ -217,6 +233,10 @@ func (s *store) Get(key string, to any) error {
 		var entry storedEntry
 		if err := json.Unmarshal(data, &entry); err != nil {
 			return fmt.Errorf("failed to decode stored entry for key %q: %w", key, err)
+		}
+
+		if entry.isExpired(s.config.Retention.TTL) {
+			return errKeyUnknown
 		}
 
 		dec := &valueDecoder{raw: entry.Value}
@@ -272,10 +292,12 @@ func (s *store) Remove(key string) error {
 	})
 }
 
-// Each iterates over all key-value pairs in the store.
+// Each iterates over all key-value pairs in the store, skipping expired entries.
 func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error {
 	s.compactionMu.RLock()
 	defer s.compactionMu.RUnlock()
+
+	ttl := s.config.Retention.TTL
 
 	err := s.db.View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket(defaultBucket)
@@ -287,6 +309,10 @@ func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error 
 			var entry storedEntry
 			if err := json.Unmarshal(v, &entry); err != nil {
 				return fmt.Errorf("failed to decode stored entry for key %q: %w", string(k), err)
+			}
+
+			if entry.isExpired(ttl) {
+				return nil
 			}
 
 			dec := &valueDecoder{raw: entry.Value}
