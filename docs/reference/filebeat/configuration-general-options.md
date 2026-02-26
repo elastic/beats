@@ -109,7 +109,13 @@ filebeat.registry.bbolt.timeout: 1s
 
 ### `registry.bbolt.fsync` [_registry_bbolt_fsync]
 
-If `true`, fsync is called after each database write. This ensures data is flushed to disk at the cost of reduced write throughput. Default: `false`.
+Controls whether the database calls `fdatasync()` after each write transaction commit. Default: `false`.
+
+When set to `false`, writes are buffered by the operating system and flushed to disk lazily. This provides significantly higher write throughput but means that recent writes can be lost if the machine crashes (power failure, kernel panic, etc.) because data may still be in the OS page cache. A normal Filebeat shutdown is not affected — the database is closed cleanly and all data is flushed.
+
+When set to `true`, every write transaction is synced to disk before returning. This guarantees durability at the cost of reduced write throughput, as each `Set` call must wait for the disk I/O to complete.
+
+For most deployments, the default (`false`) is recommended. The registry tracks file offsets, so the worst case after an unclean shutdown is re-reading a small amount of log data that was already sent but whose offset was not yet persisted to disk.
 
 ```yaml
 filebeat.registry.bbolt.fsync: false
@@ -253,4 +259,3 @@ Sets the maximum number of CPUs that can be executing simultaneously. The defaul
 ### `timestamp.precision` [_timestamp_precision]
 
 Configure the precision of all timestamps. By default it is set to millisecond. Available options: millisecond, microsecond, nanosecond
-

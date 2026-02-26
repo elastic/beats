@@ -1347,8 +1347,12 @@ filebeat.inputs:
 # Timeout for obtaining a file lock on the bbolt database file. Default: 1s.
 #filebeat.registry.bbolt.timeout: 1s
 
-# If true, fsync is called after each database write. This ensures data is
-# flushed to disk but reduces write throughput. Default: false.
+# Controls whether fdatasync is called after each write transaction commit.
+# When false (the default), writes are buffered by the OS and flushed lazily.
+# This is faster but recent writes can be lost on an unclean shutdown (power
+# failure, kernel panic). A normal Filebeat shutdown is not affected.
+# When true, every write is synced to disk before returning, guaranteeing
+# durability at the cost of reduced write throughput. Default: false.
 #filebeat.registry.bbolt.fsync: false
 
 # If true, database compaction runs on every start. Compaction rewrites the
