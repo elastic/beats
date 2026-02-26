@@ -18,6 +18,7 @@
 package bbolt
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -485,6 +486,67 @@ func TestEachSkipsExpiredEntries(t *testing.T) {
 	assert.Equal(t, []string{"new"}, keys, "Each should skip the expired entry")
 }
 
+func TestConfigValidate(t *testing.T) {
+	tests := []struct {
+		name    string
+		modify  func(*Config)
+		wantErr string
+	}{
+		{
+			name:   "valid default config",
+			modify: func(_ *Config) {},
+		},
+		{
+			name:    "negative timeout",
+			modify:  func(c *Config) { c.Timeout = -1 * time.Second },
+			wantErr: "timeout must not be negative",
+		},
+		{
+			name:    "negative max_transaction_size",
+			modify:  func(c *Config) { c.Compaction.MaxTransactionSize = -1 },
+			wantErr: "max_transaction_size must not be negative",
+		},
+		{
+			name:    "negative TTL",
+			modify:  func(c *Config) { c.Retention.TTL = -1 * time.Second },
+			wantErr: "TTL must not be negative",
+		},
+		{
+			name: "negative interval with positive TTL",
+			modify: func(c *Config) {
+				c.Retention.TTL = time.Hour
+				c.Retention.Interval = -1 * time.Second
+			},
+			wantErr: "interval must not be negative",
+		},
+		{
+			name: "zero interval with positive TTL is valid",
+			modify: func(c *Config) {
+				c.Retention.TTL = time.Hour
+				c.Retention.Interval = 0
+			},
+		},
+		{
+			name:   "zero max_transaction_size is valid",
+			modify: func(c *Config) { c.Compaction.MaxTransactionSize = 0 },
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := DefaultConfig()
+			tt.modify(&cfg)
+			err := cfg.Validate()
+			if tt.wantErr == "" {
+				assert.NoError(t, err)
+			} else {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestMultipleStores(t *testing.T) {
 	path := t.TempDir()
 	logger := logptest.NewTestingLogger(t, "")
@@ -509,4 +571,130 @@ func TestMultipleStores(t *testing.T) {
 	has, err := store2.Has("key")
 	require.NoError(t, err)
 	assert.False(t, has, "store2 should not see data from store1")
+}
+
+func TestCleanupOnStartRemovesTempFiles(t *testing.T) {
+	dir := t.TempDir()
+	logger := logptest.NewTestingLogger(t, "")
+
+	cfg := DefaultConfig()
+
+	// Create a store, write data, close it.
+	dbPath := filepath.Join(dir, "test.db")
+	s, err := openStore(logger, dbPath, 0600, cfg)
+	require.NoError(t, err)
+	require.NoError(t, s.Set("key", map[string]any{"v": 1}))
+	require.NoError(t, s.Close())
+
+	// Plant fake leftover temp files that simulate a crashed compaction.
+	for i := 0; i < 3; i++ {
+		f, err := os.CreateTemp(dir, tempDbPrefix)
+		require.NoError(t, err)
+		require.NoError(t, f.Close())
+	}
+
+	matches, err := filepath.Glob(filepath.Join(dir, tempDbPrefix+"*"))
+	require.NoError(t, err)
+	require.Len(t, matches, 3, "precondition: 3 temp files should exist")
+
+	// Reopen with CleanupOnStart enabled.
+	cfg.Compaction.CleanupOnStart = true
+	s2, err := openStore(logger, dbPath, 0600, cfg)
+	require.NoError(t, err)
+	defer s2.Close()
+
+	matches, err = filepath.Glob(filepath.Join(dir, tempDbPrefix+"*"))
+	require.NoError(t, err)
+	assert.Empty(t, matches, "all temp files should be removed on start")
+
+	has, err := s2.Has("key")
+	require.NoError(t, err)
+	assert.True(t, has, "original data should still be intact")
+}
+
+func TestCleanupExpiredBatching(t *testing.T) {
+	dir := t.TempDir()
+	logger := logptest.NewTestingLogger(t, "")
+
+	cfg := DefaultConfig()
+	cfg.Retention.TTL = 100 * time.Millisecond
+	cfg.Compaction.MaxTransactionSize = 3
+
+	dbPath := filepath.Join(dir, "test.db")
+	s, err := openStore(logger, dbPath, 0600, cfg)
+	require.NoError(t, err)
+	defer s.Close()
+
+	// Insert 10 keys that will all expire.
+	for i := 0; i < 10; i++ {
+		require.NoError(t, s.Set(fmt.Sprintf("key-%02d", i), map[string]any{"i": i}))
+	}
+
+	time.Sleep(150 * time.Millisecond)
+
+	// Insert 2 fresh keys that should survive.
+	require.NoError(t, s.Set("fresh-a", map[string]any{"v": 1}))
+	require.NoError(t, s.Set("fresh-b", map[string]any{"v": 2}))
+
+	require.NoError(t, s.cleanupExpired())
+
+	// Verify all expired keys are gone.
+	for i := 0; i < 10; i++ {
+		has, err := s.Has(fmt.Sprintf("key-%02d", i))
+		require.NoError(t, err)
+		assert.False(t, has, "expired key-%02d should be removed", i)
+	}
+
+	// Verify fresh keys survived.
+	has, err := s.Has("fresh-a")
+	require.NoError(t, err)
+	assert.True(t, has, "fresh-a should survive cleanup")
+
+	has, err = s.Has("fresh-b")
+	require.NoError(t, err)
+	assert.True(t, has, "fresh-b should survive cleanup")
+}
+
+func TestStoreDoubleClose(t *testing.T) {
+	dir := t.TempDir()
+	logger := logptest.NewTestingLogger(t, "")
+
+	s, err := openStore(logger, filepath.Join(dir, "test.db"), 0600, DefaultConfig())
+	require.NoError(t, err)
+
+	require.NoError(t, s.Set("key", map[string]any{"v": 1}))
+
+	require.NoError(t, s.Close())
+	require.NoError(t, s.Close(), "second Close should be a no-op and not return an error")
+}
+
+func TestOpenStoreResolvesSymlinks(t *testing.T) {
+	dir := t.TempDir()
+	logger := logptest.NewTestingLogger(t, "")
+
+	realDir := filepath.Join(dir, "real")
+	require.NoError(t, os.MkdirAll(realDir, 0755))
+
+	// Create the database via the real path first.
+	realDBPath := filepath.Join(realDir, "test.db")
+	s, err := openStore(logger, realDBPath, 0600, DefaultConfig())
+	require.NoError(t, err)
+	require.NoError(t, s.Set("key", map[string]any{"v": 1}))
+	require.NoError(t, s.Close())
+
+	// Create a symlink to the real directory.
+	linkDir := filepath.Join(dir, "link")
+	require.NoError(t, os.Symlink(realDir, linkDir))
+
+	// Reopen via the symlinked path. EvalSymlinks should resolve it.
+	dbViaLink := filepath.Join(linkDir, "test.db")
+	s2, err := openStore(logger, dbViaLink, 0600, DefaultConfig())
+	require.NoError(t, err)
+	defer s2.Close()
+
+	assert.Equal(t, realDBPath, s2.dbPath, "dbPath should be resolved through the symlink")
+
+	has, err := s2.Has("key")
+	require.NoError(t, err)
+	assert.True(t, has, "data written via real path should be accessible via resolved symlink")
 }
