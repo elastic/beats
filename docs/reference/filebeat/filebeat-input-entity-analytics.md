@@ -350,6 +350,10 @@ The datasets to collect from Active Directory. This can be one of "all", "users"
 
 #### `include_empty_groups` [_include_empty_groups]
 
+```{applies_to}
+stack: preview 9.4+
+```
+
 When set to `true`, the provider will also report groups that have no direct members. Each empty group is published as a separate document with `event.action` set to one of `group-discovered`, `group-modified`, or `group-deleted`. The group's attributes are available under `activedirectory.group` and the group's distinguished name is set in `group.id`. Defaults to `false`.
 
 This is useful for identifying legacy or unused groups in Active Directory that may need cleanup or that represent a security risk.
