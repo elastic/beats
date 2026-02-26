@@ -262,23 +262,36 @@ func moveFileWithFallback(src, dest string, perm os.FileMode) error {
 		return err
 	}
 
+	// Cross-device fallback: copy to a temp file on the same filesystem as
+	// dest, then rename over dest. This avoids truncating dest before the
+	// copy is complete, which would destroy the original data on failure.
+	tmpFile, err := os.CreateTemp(filepath.Dir(dest), tempDbPrefix)
+	if err != nil {
+		return err
+	}
+	tmpPath := tmpFile.Name()
+	defer os.Remove(tmpPath)
+
 	srcFile, err := os.Open(src)
 	if err != nil {
+		tmpFile.Close()
 		return err
 	}
 	defer srcFile.Close()
 
-	destFile, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
-	if err != nil {
+	if _, err := io.Copy(tmpFile, srcFile); err != nil {
+		tmpFile.Close()
+		return err
+	}
+	if err := tmpFile.Close(); err != nil {
 		return err
 	}
 
-	if _, err := io.Copy(destFile, srcFile); err != nil {
-		destFile.Close()
+	if err := os.Chmod(tmpPath, perm); err != nil {
 		return err
 	}
 
-	if err := destFile.Close(); err != nil {
+	if err := os.Rename(tmpPath, dest); err != nil {
 		return err
 	}
 
