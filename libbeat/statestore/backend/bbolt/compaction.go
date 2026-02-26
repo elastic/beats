@@ -77,20 +77,26 @@ func (s *store) compact() error {
 	s.db.Close()
 	compactedDB.Close()
 
+	// Ensure s.db is reopened from s.dbPath if anything below fails.
+	// On success, reopened is set to true and the defer is a no-op.
+	var reopened bool
+	defer func() {
+		if reopened {
+			return
+		}
+		newDB, err := bolt.Open(s.dbPath, s.fileMode, s.options)
+		if err != nil {
+			s.log.Errorf("Failed to reopen db after compaction failure: %v", err)
+			return
+		}
+		s.db = newDB
+	}()
+
 	if err := os.Chmod(file.Name(), s.fileMode); err != nil {
 		return fmt.Errorf("failed to set permissions on compacted db: %w", err)
 	}
 
 	if err := os.Rename(file.Name(), s.dbPath); err != nil {
-		// Rename failed — the original file is still at s.dbPath, reopen it (was closed before the rename).
-		newDB, openErr := bolt.Open(s.dbPath, s.fileMode, s.options)
-		if openErr != nil {
-			return errors.Join(
-				fmt.Errorf("failed to replace db with compacted file: %w", err),
-				fmt.Errorf("failed to reopen db: %w", openErr),
-			)
-		}
-		s.db = newDB
 		return fmt.Errorf("failed to replace db with compacted file: %w", err)
 	}
 
@@ -99,6 +105,7 @@ func (s *store) compact() error {
 		return fmt.Errorf("failed to reopen db after compaction: %w", err)
 	}
 	s.db = newDB
+	reopened = true
 
 	s.log.Debugf("Finished compaction in %v", time.Since(compactionStart))
 	return nil

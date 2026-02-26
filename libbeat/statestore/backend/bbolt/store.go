@@ -64,11 +64,11 @@ func (d *valueDecoder) Decode(to any) error {
 	return typeconv.Convert(to, d.decoded)
 }
 
-func (e *storedEntry) isExpired(ttl time.Duration) bool {
+func (e *storedEntry) isExpired(ttl time.Duration, nowNano int64) bool {
 	if ttl <= 0 {
 		return false
 	}
-	return time.Now().UnixNano()-e.Timestamp > ttl.Nanoseconds()
+	return nowNano-e.Timestamp > ttl.Nanoseconds()
 }
 
 // store implements backend.Store backed by a single bbolt database file.
@@ -207,7 +207,7 @@ func (s *store) Has(key string) (bool, error) {
 		if err := json.Unmarshal(data, &entry); err != nil {
 			return nil
 		}
-		found = !entry.isExpired(s.config.Retention.TTL)
+		found = !entry.isExpired(s.config.Retention.TTL, time.Now().UnixNano())
 		return nil
 	})
 	return found, err
@@ -235,7 +235,7 @@ func (s *store) Get(key string, to any) error {
 			return fmt.Errorf("failed to decode stored entry for key %q: %w", key, err)
 		}
 
-		if entry.isExpired(s.config.Retention.TTL) {
+		if entry.isExpired(s.config.Retention.TTL, time.Now().UnixNano()) {
 			return errKeyUnknown
 		}
 
@@ -298,6 +298,7 @@ func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error 
 	defer s.compactionMu.RUnlock()
 
 	ttl := s.config.Retention.TTL
+	nowNano := time.Now().UnixNano()
 
 	err := s.db.View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket(defaultBucket)
@@ -311,7 +312,7 @@ func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error 
 				return fmt.Errorf("failed to decode stored entry for key %q: %w", string(k), err)
 			}
 
-			if entry.isExpired(ttl) {
+			if entry.isExpired(ttl, nowNano) {
 				return nil
 			}
 
