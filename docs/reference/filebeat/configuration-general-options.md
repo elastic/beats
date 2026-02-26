@@ -134,48 +134,12 @@ filebeat.registry.bbolt.compaction.on_start: true
 ```
 
 
-### `registry.bbolt.compaction.on_rebound` [_registry_bbolt_compaction_on_rebound]
-
-If `true`, enables online rebound compaction. When the total allocated database size exceeds `rebound_needed_threshold_mib` and the live data size later drops below `rebound_trigger_threshold_mib`, compaction is triggered automatically. The check runs at every `check_interval`. Default: `false`.
-
-```yaml
-filebeat.registry.bbolt.compaction.on_rebound: true
-```
-
-
-### `registry.bbolt.compaction.rebound_needed_threshold_mib` [_registry_bbolt_compaction_rebound_needed_threshold_mib]
-
-The minimum total allocated database size (in MiB) required to mark the database as needing rebound compaction. Default: `100`.
-
-```yaml
-filebeat.registry.bbolt.compaction.rebound_needed_threshold_mib: 100
-```
-
-
-### `registry.bbolt.compaction.rebound_trigger_threshold_mib` [_registry_bbolt_compaction_rebound_trigger_threshold_mib]
-
-When rebound compaction is needed, it triggers once the live data size drops below this value (in MiB). Default: `10`.
-
-```yaml
-filebeat.registry.bbolt.compaction.rebound_trigger_threshold_mib: 10
-```
-
-
 ### `registry.bbolt.compaction.max_transaction_size` [_registry_bbolt_compaction_max_transaction_size]
 
 The maximum number of items copied per transaction during compaction and TTL cleanup. Default: `65536`.
 
 ```yaml
 filebeat.registry.bbolt.compaction.max_transaction_size: 65536
-```
-
-
-### `registry.bbolt.compaction.check_interval` [_registry_bbolt_compaction_check_interval]
-
-How often to check whether rebound compaction conditions are met. Only used when `on_rebound` is `true`. Default: `5s`.
-
-```yaml
-filebeat.registry.bbolt.compaction.check_interval: 5s
 ```
 
 

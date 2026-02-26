@@ -33,10 +33,7 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
-const (
-	oneMiB       = 1 << 20
-	tempDbPrefix = "tempdb"
-)
+const tempDbPrefix = "tempdb"
 
 // compact performs database compaction by copying data to a temporary database
 // and replacing the original. This reclaims unused disk space.
@@ -133,34 +130,6 @@ func (s *store) runLoop(name string, interval time.Duration, fn func()) {
 			}
 		}
 	}()
-}
-
-// shouldCompact checks whether the conditions for online rebound compaction
-// are met based on the configured thresholds.
-func (s *store) shouldCompact() bool {
-	s.compactionMu.RLock()
-	defer s.compactionMu.RUnlock()
-
-	var totalSize int64
-	err := s.db.View(func(tx *bolt.Tx) error {
-		totalSize = tx.Size()
-		return nil
-	})
-	if err != nil {
-		s.log.Errorf("Failed to get db size: %v", err)
-		return false
-	}
-
-	stats := s.db.Stats()
-	dataSize := totalSize - int64(stats.FreeAlloc)
-
-	if dataSize > s.config.Compaction.ReboundTriggerThresholdMiB*oneMiB ||
-		totalSize < s.config.Compaction.ReboundNeededThresholdMiB*oneMiB {
-		return false
-	}
-
-	s.log.Debugf("Rebound compaction triggered: totalSize=%d dataSize=%d", totalSize, dataSize)
-	return true
 }
 
 // cleanupExpired removes entries from the store whose timestamp is older

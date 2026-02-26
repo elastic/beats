@@ -3348,27 +3348,9 @@ filebeat.inputs:
 # database to reclaim unused disk space. Default: false.
 #filebeat.registry.bbolt.compaction.on_start: false
 
-# If true, enables online rebound compaction. When the database grows past
-# rebound_needed_threshold_mib and later shrinks below
-# rebound_trigger_threshold_mib, compaction is triggered automatically.
-# Default: false.
-#filebeat.registry.bbolt.compaction.on_rebound: false
-
-# Minimum total allocated database size (in MiB) to mark the need for
-# rebound compaction. Default: 100.
-#filebeat.registry.bbolt.compaction.rebound_needed_threshold_mib: 100
-
-# When rebound compaction is needed, it triggers once the live data size
-# drops below this value (in MiB). Default: 10.
-#filebeat.registry.bbolt.compaction.rebound_trigger_threshold_mib: 10
-
 # Maximum number of items copied per transaction during compaction.
 # Default: 65536.
 #filebeat.registry.bbolt.compaction.max_transaction_size: 65536
-
-# How often to check whether rebound compaction conditions are met.
-# Only used when on_rebound is true. Default: 5s.
-#filebeat.registry.bbolt.compaction.check_interval: 5s
 
 # If true, leftover temporary files from a previous compaction that was
 # interrupted (e.g. by a crash) are removed on start. Default: false.

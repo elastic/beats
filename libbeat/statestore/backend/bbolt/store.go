@@ -140,18 +140,6 @@ func openStore(log *logp.Logger, dbPath string, fileMode os.FileMode, cfg Config
 		}
 	}
 
-	if cfg.Compaction.OnRebound {
-		log.Debugf("Enabling rebound compaction: needed_threshold=%d MiB, trigger_threshold=%d MiB, check_interval=%v",
-			cfg.Compaction.ReboundNeededThresholdMiB, cfg.Compaction.ReboundTriggerThresholdMiB, cfg.Compaction.CheckInterval)
-		s.runLoop("compaction", cfg.Compaction.CheckInterval, func() {
-			if s.shouldCompact() {
-				if err := s.compact(); err != nil {
-					s.log.Errorf("Compaction failed: %v", err)
-				}
-			}
-		})
-	}
-
 	if cfg.TTL > 0 && cfg.Compaction.CleanupInterval > 0 {
 		log.Debugf("Enabling TTL cleanup: ttl=%v cleanup_interval=%v", cfg.TTL, cfg.Compaction.CleanupInterval)
 		s.runLoop("TTL cleanup", cfg.Compaction.CleanupInterval, func() {

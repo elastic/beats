@@ -23,11 +23,8 @@ import (
 )
 
 const (
-	defaultTimeout                       = time.Second
-	defaultMaxTransactionSize      int64 = 65536
-	defaultReboundTriggerMiB       int64 = 10
-	defaultReboundNeededMiB        int64 = 100
-	defaultCompactionCheckInterval       = 5 * time.Second
+	defaultTimeout                  = time.Second
+	defaultMaxTransactionSize int64 = 65536
 )
 
 // Config defines configuration for the bbolt storage backend.
@@ -56,25 +53,9 @@ type CompactionConfig struct {
 	// OnStart specifies that compaction is attempted each time on start.
 	OnStart bool `config:"on_start"`
 
-	// OnRebound specifies that compaction is attempted online when rebound
-	// conditions are met.
-	OnRebound bool `config:"on_rebound"`
-
-	// ReboundNeededThresholdMiB specifies the minimum total allocated size
-	// to mark the need for online compaction.
-	ReboundNeededThresholdMiB int64 `config:"rebound_needed_threshold_mib"`
-
-	// ReboundTriggerThresholdMiB is used when compaction is marked as
-	// needed. When allocated data size drops below the specified value,
-	// compaction starts.
-	ReboundTriggerThresholdMiB int64 `config:"rebound_trigger_threshold_mib"`
-
 	// MaxTransactionSize specifies the maximum number of items in a single
 	// compaction iteration.
 	MaxTransactionSize int64 `config:"max_transaction_size"`
-
-	// CheckInterval specifies the frequency of the rebound compaction check.
-	CheckInterval time.Duration `config:"check_interval"`
 
 	// CleanupOnStart specifies that leftover temporary compaction files are
 	// removed on start.
@@ -97,9 +78,6 @@ func (c *Config) Validate() error {
 	if c.Compaction.MaxTransactionSize < 0 {
 		return errors.New("bbolt compaction max_transaction_size must not be negative")
 	}
-	if c.Compaction.OnRebound && c.Compaction.CheckInterval <= 0 {
-		return errors.New("bbolt compaction check_interval must be positive when on_rebound is enabled")
-	}
 	if c.TTL > 0 && c.Compaction.CleanupInterval < 0 {
 		return errors.New("bbolt compaction cleanup_interval must not be negative when TTL is set")
 	}
@@ -110,17 +88,8 @@ func (c *Config) Validate() error {
 func DefaultConfig() Config {
 	return Config{
 		Timeout: defaultTimeout,
-		FSync:   false,
-		TTL:     0,
 		Compaction: CompactionConfig{
-			OnStart:                    false,
-			OnRebound:                  false,
-			ReboundNeededThresholdMiB:  defaultReboundNeededMiB,
-			ReboundTriggerThresholdMiB: defaultReboundTriggerMiB,
-			MaxTransactionSize:         defaultMaxTransactionSize,
-			CheckInterval:              defaultCompactionCheckInterval,
-			CleanupOnStart:             false,
-			CleanupInterval:            0,
+			MaxTransactionSize: defaultMaxTransactionSize,
 		},
 	}
 }
