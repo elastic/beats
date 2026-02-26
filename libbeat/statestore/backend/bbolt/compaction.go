@@ -38,6 +38,14 @@ const tempDbPrefix = "tempdb"
 // compact performs database compaction by copying data to a temporary database
 // and replacing the original. This reclaims unused disk space.
 func (s *store) compact() error {
+	s.compactionMu.Lock()
+	defer s.compactionMu.Unlock()
+
+	if s.closed {
+		s.log.Debug("Skipping compaction, store is already closed")
+		return nil
+	}
+
 	compactionDir := filepath.Dir(s.dbPath)
 
 	file, err := os.CreateTemp(compactionDir, tempDbPrefix)
@@ -51,14 +59,6 @@ func (s *store) compact() error {
 	}()
 	if err := file.Close(); err != nil {
 		return err
-	}
-
-	s.compactionMu.Lock()
-	defer s.compactionMu.Unlock()
-
-	if s.closed {
-		s.log.Debug("Skipping compaction, store is already closed")
-		return nil
 	}
 
 	s.log.Debugf("Starting compaction: path=%s temp=%s", s.dbPath, file.Name())
