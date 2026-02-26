@@ -34,16 +34,12 @@ One deterministic manner to install the proper Go version to work with Beats is 
 
 
 ```shell
+mkdir -p ${GOPATH}/src/github.com/elastic
+git clone https://github.com/elastic/beats ${GOPATH}/src/github.com/elastic/beats
+cd ${GOPATH}/src/github.com/elastic/beats
 GO_VERSION=$(awk '/^go /{print $2}' go.mod)
 gvm use "${GO_VERSION}"
 eval "$(gvm "${GO_VERSION}")"
-```
-
-Then you can clone Beats git repository:
-
-```shell
-mkdir -p ${GOPATH}/src/github.com/elastic
-git clone https://github.com/elastic/beats ${GOPATH}/src/github.com/elastic/beats
 ```
 
 ::::{note}
@@ -60,7 +56,7 @@ make mage
 Then you can compile a particular Beat by using Mage. For example, for Filebeat:
 
 ```shell
-cd beats/filebeat
+cd filebeat
 mage build
 ```
 
@@ -194,5 +190,4 @@ The following packages are required to run `go generate`:
 ## Changelog [changelog]
 
 To keep up to date with changes to the official Beats for community developers, follow the developer changelog [here](https://github.com/elastic/beats/blob/main/CHANGELOG-developer.next.asciidoc).
-
 
