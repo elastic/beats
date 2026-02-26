@@ -219,7 +219,7 @@ func (s *store) cleanupExpired() error {
 				var entry storedEntry
 				if err := json.Unmarshal(v, &entry); err != nil {
 					s.log.Warnf("Failed to decode entry for key %q during TTL re-check, skipping: %v", string(key), err)
-					continue //nolint:nilerr // corrupt entry is skipped
+					continue
 				}
 				if now-entry.Timestamp <= ttlNanos {
 					continue

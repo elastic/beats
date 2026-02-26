@@ -207,7 +207,7 @@ func (s *store) Has(key string) (bool, error) {
 		var entry storedEntry
 		if err := json.Unmarshal(data, &entry); err != nil {
 			s.log.Warnf("Failed to decode stored entry for key %q, treating as missing: %v", key, err)
-			return nil //nolint:nilerr // corrupt entry is treated as missing
+			return nil
 		}
 		found = !entry.isExpired(s.config.Retention.TTL, time.Now().UnixNano())
 		return nil
