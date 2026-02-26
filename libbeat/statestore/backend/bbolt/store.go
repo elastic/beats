@@ -92,6 +92,14 @@ func bboltOptions(timeout time.Duration, noSync bool) *bolt.Options {
 }
 
 func openStore(log *logp.Logger, dbPath string, fileMode os.FileMode, cfg Config) (*store, error) {
+	resolved, err := filepath.EvalSymlinks(dbPath)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return nil, fmt.Errorf("failed to resolve symlinks for %s: %w", dbPath, err)
+	}
+	if err == nil {
+		dbPath = resolved
+	}
+
 	log.Debugf("Opening bbolt database: path=%s timeout=%v fsync=%v", dbPath, cfg.Timeout, cfg.FSync)
 
 	options := bboltOptions(cfg.Timeout, !cfg.FSync)
