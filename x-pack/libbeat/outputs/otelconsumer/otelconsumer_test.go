@@ -7,7 +7,6 @@ package otelconsumer
 import (
 	"context"
 	"errors"
-	"fmt"
 	"testing"
 	"time"
 
