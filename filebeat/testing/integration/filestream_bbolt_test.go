@@ -92,7 +92,7 @@ logging:
 			Start(ctx).
 			Wait()
 
-		assert.Equalf(t, int64(lineCount), processedCount.Load(), "%d lines should be proccessed at this point", lineCount)
+		assert.Equalf(t, int64(lineCount), processedCount.Load(), "%d lines should be processed at this point", lineCount)
 	})
 
 	extraLineCount := 10
