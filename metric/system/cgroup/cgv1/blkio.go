@@ -35,11 +35,11 @@ import (
 //
 // https://www.kernel.org/doc/Documentation/cgroup-v1/blkio-controller.txt
 type BlockIOSubsystem struct {
-	ID     string   `json:"id,omitempty"`                     // ID of the cgroup.
-	Path   string   `json:"path,omitempty"`                   // Path to the cgroup relative to the cgroup subsystem's mountpoint.
-	Total  TotalIOs `json:"total,omitempty" struct:"total"`   // Throttle limits for upper IO rates and metrics.
-	Reads  TotalIOs `json:"reads,omitempty" struct:"reads"`   // Throttle limits for upper IO rates and metrics.
-	Writes TotalIOs `json:"writes,omitempty" struct:"writes"` // Throttle limits for upper IO rates and metrics.
+	ID     string   `json:"id,omitempty"`                    // ID of the cgroup.
+	Path   string   `json:"path,omitempty"`                  // Path to the cgroup relative to the cgroup subsystem's mountpoint.
+	Total  TotalIOs `json:"total,omitzero" struct:"total"`   // Throttle limits for upper IO rates and metrics.
+	Reads  TotalIOs `json:"reads,omitzero" struct:"reads"`   // Throttle limits for upper IO rates and metrics.
+	Writes TotalIOs `json:"writes,omitzero" struct:"writes"` // Throttle limits for upper IO rates and metrics.
 	//CFQ      CFQScheduler   `json:"cfq,omitempty"`          // Completely fair queue scheduler limits and metrics.
 }
 

@@ -40,7 +40,7 @@ type CPUAccountingSubsystem struct {
 	Total       cgcommon.CPUUsage `json:"total_nanos"`
 	UsagePerCPU map[string]uint64 `json:"percpu" struct:"percpu"`
 	// CPU time statistics for tasks in this cgroup.
-	Stats CPUAccountingStats `json:"stats,omitempty"`
+	Stats CPUAccountingStats `json:"stats,omitzero"`
 }
 
 // CPUAccountingStats contains the stats reported from the cpuacct subsystem.

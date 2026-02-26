@@ -77,10 +77,6 @@ linters:
         - G401 # Detect the usage of DES, RC4, MD5 or SHA1: Used in non-crypto contexts.
         - G501 # Import blocklist: crypto/md5: Used in non-crypto contexts.
         - G505 # Import blocklist: crypto/sha1: Used in non-crypto contexts.
-    modernize:
-      disable:
-        # TODO: fix this issue separately
-        - omitzero
     nakedret:
       # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
       max-func-lines: 0

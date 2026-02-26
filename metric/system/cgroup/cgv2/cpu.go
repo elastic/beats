@@ -41,8 +41,8 @@ type CPUSubsystem struct {
 // CPUStats carries the information from the cpu.stat cgroup file
 type CPUStats struct {
 	//The following three metrics are only available when the controller is enabled.
-	Throttled ThrottledField    `json:"throttled,omitempty" struct:"throttled,omitempty"`
-	Periods   opt.Uint          `json:"periods,omitempty" struct:"periods,omitempty"`
+	Throttled ThrottledField    `json:"throttled,omitzero" struct:"throttled,omitempty"`
+	Periods   opt.Uint          `json:"periods,omitzero" struct:"periods,omitempty"`
 	Usage     cgcommon.CPUUsage `json:"usage" struct:"usage"`
 	User      cgcommon.CPUUsage `json:"user" struct:"user"`
 	System    cgcommon.CPUUsage `json:"system" struct:"system"`
@@ -50,8 +50,8 @@ type CPUStats struct {
 
 // ThrottledField contains the `throttled` information for the CPU stats
 type ThrottledField struct {
-	Us      opt.Uint `json:"us,omitempty" struct:"us,omitempty"`
-	Periods opt.Uint `json:"periods,omitempty" struct:"periods,omitempty"`
+	Us      opt.Uint `json:"us,omitzero" struct:"us,omitempty"`
+	Periods opt.Uint `json:"periods,omitzero" struct:"periods,omitempty"`
 }
 
 // IsZero implements the IsZero interface for ThrottledField

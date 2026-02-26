@@ -35,11 +35,11 @@ type CPUSubsystem struct {
 	ID   string `json:"id,omitempty"`   // ID of the cgroup.
 	Path string `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
 	// Completely Fair Scheduler (CFS) settings.
-	CFS CFS `json:"cfs,omitempty"`
+	CFS CFS `json:"cfs,omitzero"`
 	// Real-time (RT) Scheduler settings.
-	RT RT `json:"rt,omitempty"`
+	RT RT `json:"rt,omitzero"`
 	// CPU time statistics for tasks in this cgroup.
-	Stats CPUStats `json:"stats,omitempty"`
+	Stats CPUStats `json:"stats,omitzero"`
 }
 
 // RT contains the tunable parameters for the real-time scheduler.

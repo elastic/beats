@@ -28,18 +28,18 @@ import (
 // CPUUsage wraps the CPU usage time values for the CPU controller metrics
 type CPUUsage struct {
 	NS   uint64     `json:"ns" struct:"ns"`
-	Pct  opt.Float  `json:"pct,omitempty" struct:"pct,omitempty"`
-	Norm opt.PctOpt `json:"norm,omitempty" struct:"norm,omitempty"`
+	Pct  opt.Float  `json:"pct,omitzero" struct:"pct,omitempty"`
+	Norm opt.PctOpt `json:"norm,omitzero" struct:"norm,omitempty"`
 }
 
 // Pressure contains load metrics for a controller,
 // Broken apart into 10, 60, and 300 second samples,
 // as well as a total time in US
 type Pressure struct {
-	Ten          opt.Pct  `json:"10,omitempty" struct:"10,omitempty"`
-	Sixty        opt.Pct  `json:"60,omitempty" struct:"60,omitempty"`
-	ThreeHundred opt.Pct  `json:"300,omitempty" struct:"300,omitempty"`
-	Total        opt.Uint `json:"total,omitempty" struct:"total,omitempty"`
+	Ten          opt.Pct  `json:"10,omitzero" struct:"10,omitempty"`
+	Sixty        opt.Pct  `json:"60,omitzero" struct:"60,omitempty"`
+	ThreeHundred opt.Pct  `json:"300,omitzero" struct:"300,omitempty"`
+	Total        opt.Uint `json:"total,omitzero" struct:"total,omitempty"`
 }
 
 // IsZero implements the IsZero interface for Pressure
