@@ -264,4 +264,3 @@ func cleanupTempFiles(log *logp.Logger, dir string) {
 		}
 	}
 }
-
