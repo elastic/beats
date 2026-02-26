@@ -23,6 +23,7 @@ import (
 	"io"
 	"os"
 	"slices"
+	"strings"
 	"time"
 
 	"golang.org/x/text/transform"
@@ -65,6 +66,7 @@ type filestream struct {
 	encodingFactory           encoding.EncodingFactory
 	closerConfig              closerConfig
 	deleterConfig             deleterConfig
+	fullContentConfig         fullContentConfig
 	parsers                   parser.Config
 	takeOver                  loginp.TakeOverConfig
 	scannerCheckInterval      time.Duration
@@ -118,6 +120,16 @@ func configure(
 		return nil, nil, err
 	}
 
+	if c.FullContent.Enabled {
+		hasParsers, err := cfg.Has("parsers", -1)
+		if err != nil {
+			return nil, nil, fmt.Errorf("cannot read 'parsers': %w", err)
+		}
+		if hasParsers {
+			return nil, nil, fmt.Errorf("full_content.enabled does not support parsers")
+		}
+	}
+
 	// zero must also disable clean_inactive, see:
 	// https://github.com/elastic/beats/issues/45601
 	// for more details. At the same time we need to allow
@@ -146,6 +158,7 @@ func configure(
 		encodingFactory:           encodingFactory,
 		closerConfig:              c.Close,
 		parsers:                   c.Reader.Parsers,
+		fullContentConfig:         c.FullContent,
 		takeOver:                  c.TakeOver,
 		compression:               c.Compression,
 		includeFileOwnerName:      c.IncludeFileOwnerName,
@@ -256,8 +269,13 @@ func (inp *filestream) Run(
 
 	// The caller of Run already reports the error and filters out errors that
 	// must not be reported, like 'context cancelled'.
-	err = inp.readFromSource(
-		ctx, log, r, fs.newPath, state, publisher, fs.desc.GZIP, metrics)
+	if inp.fullContentConfig.Enabled {
+		err = inp.readFromSourceFull(
+			ctx, log, r, fs.newPath, state, publisher, fs.desc.GZIP, metrics)
+	} else {
+		err = inp.readFromSource(
+			ctx, log, r, fs.newPath, state, publisher, fs.desc.GZIP, metrics)
+	}
 	if err != nil {
 		// First handle actual errors
 		if !errors.Is(err, io.EOF) && !errors.Is(err, ErrInactive) {
@@ -476,6 +494,9 @@ func (inp *filestream) open(
 	// if the file is archived, it means that it is not going to be updated in the future
 	// thus, when EOF is reached, it can be closed
 	closerCfg := inp.closerConfig
+	if inp.fullContentConfig.Enabled {
+		closerCfg.Reader.OnEOF = true
+	}
 	if fs.archived && !inp.closerConfig.Reader.OnEOF {
 		closerCfg = closerConfig{
 			Reader: readerCloserConfig{
@@ -791,6 +812,167 @@ func (inp *filestream) readFromSource(
 		}
 	}
 	return nil
+}
+
+func (inp *filestream) readFromSourceFull(
+	ctx input.Context,
+	log *logp.Logger,
+	r reader.Reader,
+	path string,
+	s state,
+	p loginp.Publisher,
+	isGZIP bool,
+	metrics *loginp.Metrics) error {
+	metrics.FilesOpened.Inc()
+	metrics.HarvesterOpenFiles.Inc()
+	metrics.HarvesterStarted.Inc()
+	defer metrics.FilesClosed.Inc()
+	defer metrics.HarvesterOpenFiles.Dec()
+	defer metrics.HarvesterClosed.Inc()
+
+	if isGZIP {
+		metrics.FilesGZIPOpened.Inc()
+		metrics.HarvesterOpenGZIPFiles.Inc()
+		metrics.HarvesterGZIPStarted.Inc()
+		defer metrics.FilesGZIPClosed.Inc()
+		defer metrics.HarvesterOpenGZIPFiles.Dec()
+		defer metrics.HarvesterGZIPClosed.Inc()
+	}
+
+	var (
+		content          strings.Builder
+		truncated        bool
+		modifiedByFilter bool
+		readerTruncated  bool
+		event            *reader.Message
+	)
+
+	for ctx.Cancelation.Err() == nil {
+		message, err := r.Next()
+		if err != nil {
+			if errors.Is(err, io.EOF) || errors.Is(err, ErrInactive) || errors.Is(err, ErrClosed) {
+				break
+			}
+			if errors.Is(err, ErrFileTruncate) {
+				log.Infof("File was truncated while taking full-content snapshot. Path='%s'", path)
+				break
+			}
+			log.Errorf("Read line error: %v", err)
+			metrics.ProcessingErrors.Inc()
+			if isGZIP {
+				metrics.ProcessingGZIPErrors.Inc()
+			}
+			return nil
+		}
+
+		// sate offset increase
+		s.Offset += int64(message.Bytes) + int64(message.Offset)
+		metrics.MessagesRead.Inc()
+		if isGZIP {
+			metrics.MessagesGZIPRead.Inc()
+		}
+
+		if hasTruncatedFlag(message.Fields) {
+			readerTruncated = true
+		}
+
+		if event == nil {
+			tmp := message
+			event = &tmp
+		}
+
+		if message.IsEmpty() {
+			continue
+		}
+		if inp.isDroppedLine(log, string(message.Content)) {
+			modifiedByFilter = true
+			continue
+		}
+
+		if content.Len() > 0 {
+			content.WriteByte('\n')
+		}
+
+		if content.Len()+len(message.Content) > inp.readerConfig.MaxBytes {
+			remaining := inp.readerConfig.MaxBytes - content.Len()
+			if remaining > 0 {
+				content.Write(message.Content[:remaining])
+			}
+			truncated = true
+			break
+		}
+		content.Write(message.Content)
+	}
+
+	if event == nil {
+		return nil
+	}
+
+	if modifiedByFilter || readerTruncated {
+		truncated = true
+	}
+
+	// Full-content mode emits a single snapshot event and marks the source as
+	// fully processed so unchanged files are not re-emitted on restart.
+	if stat, err := os.Stat(path); err == nil {
+		s.Offset = stat.Size()
+	}
+
+	evt := event.ToEvent()
+	evt.Fields["message"] = content.String()
+	if truncated {
+		addTruncatedFlag(evt.Fields)
+		metrics.MessagesTruncated.Add(1)
+		if isGZIP {
+			metrics.MessagesGZIPTruncated.Add(1)
+		}
+	}
+	if inp.takeOver.Enabled {
+		_ = mapstr.AddTags(evt.Fields, []string{"take_over"})
+	}
+
+	if err := p.Publish(evt, s); err != nil {
+		metrics.ProcessingErrors.Inc()
+		if isGZIP {
+			metrics.ProcessingGZIPErrors.Inc()
+		}
+		return err
+	}
+
+	metrics.EventsProcessed.Inc()
+	metrics.ProcessingTime.Update(time.Since(event.Ts).Nanoseconds())
+	if isGZIP {
+		metrics.EventsGZIPProcessed.Inc()
+		metrics.ProcessingGZIPTime.Update(time.Since(event.Ts).Nanoseconds())
+	}
+
+	return nil
+}
+
+func addTruncatedFlag(fields mapstr.M) {
+	flags, err := fields.GetValue("log.flags")
+	if err == nil {
+		if existing, ok := flags.([]string); ok {
+			if slices.Contains(existing, "truncated") { //nolint:typecheck,nolintlint
+				return
+			}
+			_, _ = fields.Put("log.flags", append(existing, "truncated"))
+			return
+		}
+	}
+	_, _ = fields.Put("log.flags", []string{"truncated"})
+}
+
+func hasTruncatedFlag(fields mapstr.M) bool {
+	flags, err := fields.GetValue("log.flags")
+	if err != nil {
+		return false
+	}
+	existing, ok := flags.([]string)
+	if !ok {
+		return false
+	}
+	return slices.Contains(existing, "truncated") //nolint:typecheck,nolintlint
 }
 
 // isDroppedLine decides if the line is exported or not based on

@@ -301,6 +301,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 	testCases := map[string]struct {
 		events         []loginp.FSEvent
 		ignoreOlder    time.Duration
+		fullContent    bool
 		expectedEvents []harvesterEvent
 	}{
 		"two new files": {
@@ -320,6 +321,16 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
+				harvesterGroupStop{},
+			},
+		},
+		"one updated file in full content mode restarts": {
+			events: []loginp.FSEvent{
+				{Op: loginp.OpWrite, NewPath: "/path/to/file", Descriptor: createTestFileDescriptor()},
+			},
+			fullContent: true,
+			expectedEvents: []harvesterEvent{
+				harvesterRestart("path::/path/to/file"),
 				harvesterGroupStop{},
 			},
 		},
@@ -379,10 +390,11 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
-				logger:      logp.L(),
-				filewatcher: newMockFileWatcher(test.events, len(test.events)),
-				identifier:  mustPathIdentifier(false),
-				ignoreOlder: test.ignoreOlder,
+				logger:          logp.L(),
+				filewatcher:     newMockFileWatcher(test.events, len(test.events)),
+				identifier:      mustPathIdentifier(false),
+				ignoreOlder:     test.ignoreOlder,
+				fullContentMode: test.fullContent,
 			}
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 			hg := newTestHarvesterGroup()
@@ -587,6 +599,135 @@ func TestProspectorRenamedFile(t *testing.T) {
 			assert.Equal(t, test.expectedEvents, hg.events)
 		})
 	}
+}
+
+func TestProspectorFullContentModeEventHandling(t *testing.T) {
+	t.Run("oncreate starts harvester", func(t *testing.T) {
+		events := []loginp.FSEvent{
+			{Op: loginp.OpCreate, NewPath: "/path/to/file", Descriptor: createTestFileDescriptor()},
+		}
+
+		p := fileProspector{
+			logger:          logp.L(),
+			filewatcher:     newMockFileWatcher(events, len(events)),
+			identifier:      mustPathIdentifier(false),
+			fullContentMode: true,
+		}
+		ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+		testStore := newMockMetadataUpdater()
+		hg := newTestHarvesterGroup()
+
+		p.Run(ctx, testStore, hg)
+
+		assert.Equal(t, []harvesterEvent{
+			harvesterStart("path::/path/to/file"),
+			harvesterGroupStop{},
+		}, hg.events)
+	})
+
+	t.Run("onwrite resets cursor and restarts harvester", func(t *testing.T) {
+		events := []loginp.FSEvent{
+			{Op: loginp.OpWrite, NewPath: "/path/to/file", Descriptor: createTestFileDescriptor()},
+		}
+
+		p := fileProspector{
+			logger:          logp.L(),
+			filewatcher:     newMockFileWatcher(events, len(events)),
+			identifier:      mustPathIdentifier(false),
+			fullContentMode: true,
+		}
+		ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+		testStore := newMockMetadataUpdater()
+		hg := newTestHarvesterGroup()
+
+		p.Run(ctx, testStore, hg)
+
+		assert.Equal(t, []harvesterEvent{
+			harvesterRestart("path::/path/to/file"),
+			harvesterGroupStop{},
+		}, hg.events)
+		assert.True(t, testStore.checkOffset("path::/path/to/file", 0), "write in full_content mode must reset cursor to 0")
+	})
+
+	t.Run("ontruncate resets cursor and restarts harvester", func(t *testing.T) {
+		events := []loginp.FSEvent{
+			{Op: loginp.OpTruncate, NewPath: "/path/to/file", Descriptor: createTestFileDescriptor()},
+		}
+
+		p := fileProspector{
+			logger:          logp.L(),
+			filewatcher:     newMockFileWatcher(events, len(events)),
+			identifier:      mustPathIdentifier(false),
+			fullContentMode: true,
+		}
+		ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+		testStore := newMockMetadataUpdater()
+		hg := newTestHarvesterGroup()
+
+		p.Run(ctx, testStore, hg)
+
+		assert.Equal(t, []harvesterEvent{
+			harvesterRestart("path::/path/to/file"),
+			harvesterGroupStop{},
+		}, hg.events)
+		assert.True(t, testStore.checkOffset("path::/path/to/file", 0), "truncate must reset cursor to 0")
+	})
+
+	t.Run("onrename keeps standard path identity behavior", func(t *testing.T) {
+		events := []loginp.FSEvent{
+			{
+				Op:         loginp.OpRename,
+				OldPath:    "/old/path/to/file",
+				NewPath:    "/new/path/to/file",
+				Descriptor: createTestFileDescriptor(),
+			},
+		}
+
+		p := fileProspector{
+			logger:            logp.L(),
+			filewatcher:       newMockFileWatcher(events, len(events)),
+			identifier:        mustPathIdentifier(false),
+			fullContentMode:   true,
+			stateChangeCloser: stateChangeCloserConfig{Renamed: false},
+		}
+		ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+		testStore := newMockMetadataUpdater()
+		testStore.set("path::/old/path/to/file")
+		hg := newTestHarvesterGroup()
+
+		p.Run(ctx, testStore, hg)
+
+		assert.Equal(t, []harvesterEvent{
+			harvesterStop("path::/old/path/to/file"),
+			harvesterStart("path::/new/path/to/file"),
+			harvesterGroupStop{},
+		}, hg.events)
+	})
+
+	t.Run("ondelete keeps standard clean_removed behavior", func(t *testing.T) {
+		events := []loginp.FSEvent{
+			{Op: loginp.OpDelete, OldPath: "/path/to/file", Descriptor: createTestFileDescriptor()},
+		}
+
+		p := fileProspector{
+			logger:          logp.L(),
+			filewatcher:     newMockFileWatcher(events, len(events)),
+			identifier:      mustPathIdentifier(false),
+			fullContentMode: true,
+			cleanRemoved:    true,
+		}
+		ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+		testStore := newMockMetadataUpdater()
+		testStore.set("path::/path/to/file")
+		hg := newTestHarvesterGroup()
+
+		p.Run(ctx, testStore, hg)
+
+		assert.Equal(t, []harvesterEvent{
+			harvesterGroupStop{},
+		}, hg.events)
+		assert.False(t, testStore.has("path::/path/to/file"), "delete with clean_removed must remove state")
+	})
 }
 
 type harvesterEvent interface{ String() string }

@@ -125,6 +125,7 @@ func newProspector(
 	fileprospector := fileProspector{
 		filewatcher:           filewatcher,
 		identifier:            identifier,
+		fullContentMode:       config.FullContent.Enabled,
 		ignoreOlder:           config.IgnoreOlder,
 		ignoreInactiveSince:   config.IgnoreInactive,
 		cleanRemoved:          config.CleanRemoved,

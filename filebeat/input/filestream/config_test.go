@@ -183,6 +183,43 @@ func TestConfigValidate(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("full content mode rejects compression", func(t *testing.T) {
+		tcs := []struct {
+			name        string
+			compression string
+			wantErr     bool
+		}{
+			{name: "none", compression: CompressionNone, wantErr: false},
+			{name: "gzip", compression: CompressionGZIP, wantErr: true},
+			{name: "auto", compression: CompressionAuto, wantErr: true},
+		}
+
+		for _, tc := range tcs {
+			t.Run(tc.name, func(t *testing.T) {
+				c := config{
+					Paths:       []string{"/foo/bar"},
+					Compression: tc.compression,
+					FullContent: fullContentConfig{Enabled: true},
+					FileIdentity: func() *conf.Namespace {
+						if tc.compression == CompressionNone {
+							return nil
+						}
+						cfg := conf.MustNewConfigFrom(map[string]interface{}{"fingerprint": nil})
+						ns := &conf.Namespace{}
+						require.NoError(t, cfg.Unpack(ns))
+						return ns
+					}(),
+				}
+				err := c.Validate()
+				if tc.wantErr {
+					assert.ErrorContains(t, err, "full_content.enabled does not support compression")
+					return
+				}
+				assert.NoError(t, err)
+			})
+		}
+	})
 }
 
 func TestNormalizeConfig(t *testing.T) {

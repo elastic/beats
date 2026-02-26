@@ -76,6 +76,7 @@ type fileProspector struct {
 	logger                *logp.Logger
 	filewatcher           loginp.FSWatcher
 	identifier            fileIdentifier
+	fullContentMode       bool
 	ignoreOlder           time.Duration
 	ignoreInactiveSince   ignoreInactiveType
 	cleanRemoved          bool
@@ -377,6 +378,15 @@ func (p *fileProspector) onFSEvent(
 			if err != nil {
 				log.Errorf("setting cursor for ignored file: %v", err)
 			}
+			return
+		}
+
+		if p.fullContentMode && event.Op == loginp.OpWrite {
+			err := updater.ResetCursor(src, state{Offset: 0})
+			if err != nil {
+				log.Errorf("resetting cursor in full_content mode on updated file: %v", err)
+			}
+			group.Restart(ctx, src)
 			return
 		}
 

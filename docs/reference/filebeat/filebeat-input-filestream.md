@@ -321,6 +321,51 @@ A list of glob-based paths that will be crawled and fetched. All patterns suppor
 
 Filebeat starts a harvester for each file that it finds under the specified paths. You can specify one path per line. Each line begins with a dash (-).
 
+### `full_content` [filebeat-input-filestream-full-content]
+
+```{applies_to}
+stack: beta
+```
+
+When `full_content.enabled` is `true`, filestream emits one event per file update
+whose `message` contains the current file snapshot instead of emitting one event
+per line.
+
+This mode has the following constraints:
+
+* `compression` must be disabled.
+* `parsers` are not supported.
+
+This mode can still modify emitted content in these cases:
+
+* `include_lines` / `exclude_lines` filter out lines.
+* reader-level truncation occurs due to `message_max_bytes`.
+
+When any of the above modifies the original content, filestream sets
+`log.flags: ["truncated"]` on the emitted event.
+
+Rewrite detection follows filestream file change detection:
+
+* size growth is detected as a write
+* size decrease is detected as truncation
+* file replacement/rotation is handled by filestream identity and rotation logic
+
+If a file is rewritten without changing its size, enable
+`prospector.scanner.resend_on_touch: true` so a modification time change
+still triggers a new full snapshot event.
+
+Configuration example:
+
+```yaml
+filebeat.inputs:
+- type: filestream
+  id: my-filestream-id
+  paths:
+    - /var/log/app.log
+  full_content.enabled: true
+  message_max_bytes: 10485760
+```
+
 ### `take_over` [filebeat-input-filestream-take-over]
 
 ```{applies_to}

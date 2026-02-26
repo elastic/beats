@@ -79,6 +79,7 @@ type config struct {
 	IgnoreInactive ignoreInactiveType `config:"ignore_inactive"`
 	Rotation       *conf.Namespace    `config:"rotation"`
 	Delete         deleterConfig      `config:"delete"`
+	FullContent    fullContentConfig  `config:"full_content"`
 
 	// TakeOver is also independently parsed by InputManager.Create
 	// (see internal/input-logfile/manager.go).
@@ -92,6 +93,10 @@ type config struct {
 	// effectively preserving the old, buggy, behaviour.
 	// (see internal/input-logfile/manager.go)
 	LegacyCleanInactive bool `config:"legacy_clean_inactive"`
+}
+
+type fullContentConfig struct {
+	Enabled bool `config:"enabled"`
 }
 
 type deleterConfig struct {
@@ -162,6 +167,13 @@ func defaultConfig() config {
 		IgnoreOlder:               0,
 		Delete:                    defaultDeleterConfig(),
 		FileWatcher:               defaultFileWatcherConfig(), // Config key: prospector.scanner
+		FullContent:               defaultFullContentConfig(),
+	}
+}
+
+func defaultFullContentConfig() fullContentConfig {
+	return fullContentConfig{
+		Enabled: false,
 	}
 }
 
@@ -243,6 +255,10 @@ func (c *config) Validate() error {
 			c.Compression, CompressionNone, CompressionGZIP, CompressionAuto)
 	}
 
+	if c.FullContent.Enabled && c.Compression != CompressionNone {
+		return errors.New("full_content.enabled does not support compression")
+	}
+
 	if c.ID == "" && c.TakeOver.Enabled {
 		return errors.New("'take_over' mode is only allowed if an input ID is set")
 	}
@@ -268,6 +284,11 @@ func (c config) checkUnsupportedParams(logger *logp.Logger) {
 				"",
 				"'gzip_experimental' is deprecated and ignored, set 'compression' instead"))
 		}
+	}
+	if c.FullContent.Enabled {
+		logger.Named("filestream").Warn(
+			cfgwarn.Beta("`full_content.enabled` in filestream is beta."),
+		)
 	}
 }
 

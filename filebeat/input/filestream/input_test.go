@@ -172,6 +172,116 @@ paths:
 	}
 }
 
+func TestFullContentModeSnapshot(t *testing.T) {
+	dir := t.TempDir()
+	filename := filepath.Join(dir, "snapshot.log")
+	err := os.WriteFile(filename, []byte("line-1\nline-2\nline-3\n"), 0o644)
+	require.NoError(t, err)
+
+	cfg := `
+type: filestream
+id: full-content-test
+prospector.scanner.check_interval: 1s
+prospector.scanner.fingerprint.enabled: false
+full_content.enabled: true
+message_max_bytes: 1024
+paths:
+  - ` + filename + `
+`
+
+	runner := createFilestreamTestRunner(context.Background(), t, "full-content-snapshot", cfg, 1, true)
+	events := runner(t)
+	require.Len(t, events, 1)
+
+	msg, err := events[0].GetValue("message")
+	require.NoError(t, err)
+	assert.Equal(t, "line-1\nline-2\nline-3", msg)
+}
+
+func TestFullContentModeRejectsGZIPCompression(t *testing.T) {
+	dir := t.TempDir()
+	filename := filepath.Join(dir, "snapshot.log.gz")
+	plain := "line-1\nline-2\nline-3\nline-4\nline-5\nline-6\nline-7\nline-8\nline-9\nline-10\n"
+	compressed := gziptest.Compress(t, []byte(plain), gziptest.CorruptNone)
+	err := os.WriteFile(filename, compressed, 0o644)
+	require.NoError(t, err)
+
+	cfg := `
+type: filestream
+id: full-content-test-gzip
+prospector.scanner.check_interval: 1s
+prospector.scanner.fingerprint.enabled: true
+prospector.scanner.fingerprint.length: 64
+file_identity.fingerprint: ~
+full_content.enabled: true
+compression: auto
+message_max_bytes: 1024
+paths:
+  - ` + filename + `
+`
+	c, err := conf.NewConfigWithYAML([]byte(cfg), cfg)
+	require.NoError(t, err)
+
+	p := Plugin(logp.L(), createTestStore(t))
+	_, err = p.Manager.Create(c)
+	require.ErrorContains(t, err, "full_content.enabled does not support compression")
+}
+
+func TestFullContentModeSetsTruncatedWhenFiltered(t *testing.T) {
+	dir := t.TempDir()
+	filename := filepath.Join(dir, "snapshot-filtered.log")
+	err := os.WriteFile(filename, []byte("keep-this\ndrop-this\n"), 0o644)
+	require.NoError(t, err)
+
+	cfg := `
+type: filestream
+id: full-content-test-filtered
+prospector.scanner.check_interval: 1s
+prospector.scanner.fingerprint.enabled: false
+full_content.enabled: true
+include_lines: ['^keep']
+message_max_bytes: 1024
+paths:
+  - ` + filename + `
+`
+
+	runner := createFilestreamTestRunner(context.Background(), t, "full-content-filtered", cfg, 1, true)
+	events := runner(t)
+	require.Len(t, events, 1)
+
+	msg, err := events[0].GetValue("message")
+	require.NoError(t, err)
+	assert.Equal(t, "keep-this", msg)
+
+	flags, err := events[0].GetValue("log.flags")
+	require.NoError(t, err)
+	assert.Equal(t, []string{"truncated"}, flags)
+}
+
+func TestFullContentModeRejectsParsers(t *testing.T) {
+	filename := generateFile(t, t.TempDir(), 3)
+	cfg := `
+type: filestream
+id: full-content-test-reject-parsers
+full_content.enabled: true
+prospector.scanner.fingerprint.enabled: false
+paths:
+  - ` + filename + `
+parsers:
+  - multiline:
+      type: pattern
+      pattern: ^\[
+      negate: false
+      match: after
+`
+	c, err := conf.NewConfigWithYAML([]byte(cfg), cfg)
+	require.NoError(t, err)
+
+	p := Plugin(logp.L(), createTestStore(t))
+	_, err = p.Manager.Create(c)
+	require.ErrorContains(t, err, "full_content.enabled does not support parsers")
+}
+
 func TestNewFile(t *testing.T) {
 	tempDir := t.TempDir()
 

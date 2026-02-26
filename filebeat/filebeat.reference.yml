@@ -910,6 +910,17 @@ filebeat.inputs:
   # This is especially useful for multiline log messages which can get large.
   #message_max_bytes: 10485760
 
+  # Emit one event per file update with full file snapshot in `message`.
+  # This feature is beta.
+  #full_content.enabled: false
+  #
+  # Constraints when full_content.enabled is true:
+  # - `compression` must be disabled.
+  # - `parsers` are not supported.
+  #
+  # If include_lines/exclude_lines filtering or reader truncation modifies the
+  # original file contents, Filebeat sets `log.flags: ["truncated"]`.
+
   # Characters that separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
   # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator,
   # null_terminator
