@@ -8,17 +8,10 @@
 # - security: impacts on the security of a product or a user's deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: bug-fix
+kind: security
 
 # Change summary; a 80ish characters long description of the change.
-summary: translate_ldap_attribute discovery tries both LDAP and LDAPS per host, LDAPS first
-
-# Long description; in case the summary is not enough to describe the change.
-description: |
-  When the translate_ldap_attribute processor discovers LDAP servers (via DNS SRV
-  or LOGONSERVER), it now adds the alternate scheme for each discovered address:
-  if LDAP is found it also tries LDAPS for that host, and if LDAPS is found it
-  also tries LDAP. For each host, LDAPS is tried before LDAP to prefer TLS.
+summary: Update elastic-agent-libs to v0.32.2.
 
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
 component: all
