@@ -27,7 +27,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/elastic-agent-libs/transform/typeconv"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgcommon"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/testhelpers"
 )
@@ -266,7 +268,7 @@ func TestGetCPU(t *testing.T) {
 		expected CPUSubsystem
 	}{
 		{
-			name: "v2 path with pressure",
+			name: "v2 path with pressure and CFS",
 			setup: func(*testing.T) string {
 				return v2Path
 			},
@@ -297,6 +299,12 @@ func TestGetCPU(t *testing.T) {
 						Us:      opt.UintWith(10),
 					},
 				},
+				CFS: CFS{
+					// cpu.max: "max 100000" => unlimited quota (0)
+					Quota:  UsOpt{Us: opt.UintWith(0)},
+					Period: UsOpt{Us: opt.UintWith(100000)},
+					Weight: opt.UintWith(100),
+				},
 			},
 		},
 		{
@@ -309,6 +317,7 @@ func TestGetCPU(t *testing.T) {
 				Path:     "",
 				Pressure: map[string]cgcommon.Pressure{},
 				Stats:    CPUStats{},
+				CFS:      CFS{},
 			},
 		},
 		{
@@ -341,6 +350,28 @@ func TestGetCPU(t *testing.T) {
 						Us:      opt.UintWith(10),
 					},
 				},
+				CFS: CFS{},
+			},
+		},
+		{
+			name: "cpu.max with quota limit",
+			setup: func(t *testing.T) string {
+				dir := t.TempDir()
+				// 50000/100000 => 50% CPU limit
+				writeFile(t, filepath.Join(dir, "cpu.max"), "50000 100000")
+				writeFile(t, filepath.Join(dir, "cpu.weight"), "200")
+				return dir
+			},
+			expected: CPUSubsystem{
+				ID:       "",
+				Path:     "",
+				Pressure: map[string]cgcommon.Pressure{},
+				Stats:    CPUStats{},
+				CFS: CFS{
+					Quota:  UsOpt{Us: opt.UintWith(50000)},
+					Period: UsOpt{Us: opt.UintWith(100000)},
+					Weight: opt.UintWith(200),
+				},
 			},
 		},
 	}
@@ -351,6 +382,179 @@ func TestGetCPU(t *testing.T) {
 			err := cpu.Get(test.setup(t))
 			require.NoError(t, err, "error in Get")
 			assert.EqualValues(t, test.expected, cpu)
+		})
+	}
+}
+
+func TestParseCPUMax(t *testing.T) {
+	tests := []struct {
+		name           string
+		content        string
+		expectedQuota  uint64
+		expectedPeriod uint64
+		expectError    assert.ErrorAssertionFunc
+	}{
+		{
+			name:           "unlimited quota",
+			content:        "max 100000",
+			expectedQuota:  0, // 0 represents unlimited
+			expectedPeriod: 100000,
+			expectError:    assert.NoError,
+		},
+		{
+			name:           "limited quota",
+			content:        "50000 100000",
+			expectedQuota:  50000,
+			expectedPeriod: 100000,
+			expectError:    assert.NoError,
+		},
+		{
+			name:        "invalid format - single value",
+			content:     "100000",
+			expectError: assert.Error,
+		},
+		{
+			name:        "invalid format - too many values",
+			content:     "50000 100000 extra",
+			expectError: assert.Error,
+		},
+		{
+			name:        "invalid quota value",
+			content:     "invalid 100000",
+			expectError: assert.Error,
+		},
+		{
+			name:        "invalid period value",
+			content:     "50000 invalid",
+			expectError: assert.Error,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			dir := t.TempDir()
+			writeFile(t, filepath.Join(dir, "cpu.max"), test.content)
+
+			quota, period, err := parseCPUMax(dir)
+
+			test.expectError(t, err)
+			assert.Equal(t, test.expectedQuota, quota)
+			assert.Equal(t, test.expectedPeriod, period)
+		})
+	}
+}
+
+func TestGetCFS(t *testing.T) {
+	tests := []struct {
+		name     string
+		files    map[string]string // filename -> content
+		expected CFS
+	}{
+		{
+			name: "both files present",
+			files: map[string]string{
+				"cpu.max":    "25000 100000",
+				"cpu.weight": "150",
+			},
+			expected: CFS{
+				Quota:  UsOpt{Us: opt.UintWith(25000)},
+				Period: UsOpt{Us: opt.UintWith(100000)},
+				Weight: opt.UintWith(150),
+			},
+		},
+		{
+			name: "only cpu.max present",
+			files: map[string]string{
+				"cpu.max": "max 100000",
+			},
+			expected: CFS{
+				Quota:  UsOpt{Us: opt.UintWith(0)},
+				Period: UsOpt{Us: opt.UintWith(100000)},
+			},
+		},
+		{
+			name: "only cpu.weight present - quota/period unset",
+			files: map[string]string{
+				"cpu.weight": "500",
+			},
+			expected: CFS{
+				Weight: opt.UintWith(500),
+			},
+		},
+		{
+			name:     "no files present",
+			files:    nil,
+			expected: CFS{},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			dir := t.TempDir()
+			for filename, content := range test.files {
+				writeFile(t, filepath.Join(dir, filename), content)
+			}
+			cfs, err := getCFS(dir)
+			require.NoError(t, err)
+			assert.Equal(t, test.expected, cfs)
+		})
+	}
+}
+
+func TestCFSSerialization(t *testing.T) {
+	tests := []struct {
+		name     string
+		cfs      CFS
+		expected mapstr.M
+	}{
+		{
+			name: "unlimited quota (cpu.max 'max 100000')",
+			cfs: CFS{
+				Quota:  UsOpt{Us: opt.UintWith(0)},
+				Period: UsOpt{Us: opt.UintWith(100000)},
+				Weight: opt.UintWith(100),
+			},
+			expected: mapstr.M{
+				"quota":  map[string]any{"us": uint64(0)},
+				"period": map[string]any{"us": uint64(100000)},
+				"weight": uint64(100),
+			},
+		},
+		{
+			name: "limited quota (cpu.max '50000 100000')",
+			cfs: CFS{
+				Quota:  UsOpt{Us: opt.UintWith(50000)},
+				Period: UsOpt{Us: opt.UintWith(100000)},
+				Weight: opt.UintWith(200),
+			},
+			expected: mapstr.M{
+				"quota":  map[string]any{"us": uint64(50000)},
+				"period": map[string]any{"us": uint64(100000)},
+				"weight": uint64(200),
+			},
+		},
+		{
+			name: "cpu.max missing - quota/period must be absent",
+			cfs: CFS{
+				Weight: opt.UintWith(100),
+			},
+			expected: mapstr.M{
+				"weight": uint64(100),
+			},
+		},
+		{
+			name:     "all files missing - everything omitted",
+			cfs:      CFS{},
+			expected: nil,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var got mapstr.M
+			err := typeconv.Convert(&got, test.cfs)
+			require.NoError(t, err)
+			assert.Equal(t, test.expected, got)
 		})
 	}
 }

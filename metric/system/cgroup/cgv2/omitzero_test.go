@@ -19,6 +19,8 @@ package cgv2
 
 import (
 	"encoding/json"
+	"maps"
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,78 +30,112 @@ import (
 )
 
 func TestOmitZeroJSON(t *testing.T) {
-	t.Run("CPUStats/zero struct fields omitted", func(t *testing.T) {
-		m := marshalToMap(t, CPUStats{})
-		assert.NotContains(t, m, "throttled")
-		assert.NotContains(t, m, "periods")
-	})
+	tests := []struct {
+		name     string
+		value    any
+		expected []string
+	}{
+		{
+			name:     "CPUStats/zero struct fields omitted",
+			value:    CPUStats{},
+			expected: []string{"system", "usage", "user"},
+		},
+		{
+			name: "CPUStats/non-zero struct fields present",
+			value: CPUStats{
+				Periods:   opt.UintWith(1),
+				Throttled: ThrottledField{Us: opt.UintWith(10)},
+			},
+			expected: []string{"periods", "system", "throttled", "usage", "user"},
+		},
+		{
+			name:     "ThrottledField/zero struct fields omitted",
+			value:    ThrottledField{},
+			expected: nil,
+		},
+		{
+			name: "ThrottledField/non-zero struct fields present",
+			value: ThrottledField{
+				Us:      opt.UintWith(10),
+				Periods: opt.UintWith(4),
+			},
+			expected: []string{"periods", "us"},
+		},
+		{
+			name:     "MemoryData/zero BytesOpt omitted",
+			value:    MemoryData{},
+			expected: []string{"events", "low", "usage"},
+		},
+		{
+			name: "MemoryData/non-zero BytesOpt present",
+			value: MemoryData{
+				High: opt.BytesOpt{Bytes: opt.UintWith(1024)},
+				Max:  opt.BytesOpt{Bytes: opt.UintWith(4096)},
+			},
+			expected: []string{"events", "high", "low", "max", "usage"},
+		},
+		{
+			name:     "Events/zero opt.Uint omitted",
+			value:    Events{},
+			expected: []string{"high", "max"},
+		},
+		{
+			name: "Events/non-zero opt.Uint present",
+			value: Events{
+				Low:     opt.UintWith(1),
+				OOM:     opt.UintWith(2),
+				OOMKill: opt.UintWith(3),
+				Fail:    opt.UintWith(4),
+			},
+			expected: []string{"fail", "high", "low", "max", "oom", "oom_kill"},
+		},
+		{
+			name:     "CPUSubsystem/zero CFS omitted",
+			value:    CPUSubsystem{},
+			expected: []string{"stats"},
+		},
+		{
+			name:     "CPUSubsystem/non-zero CFS present",
+			value:    CPUSubsystem{CFS: CFS{Weight: opt.UintWith(100)}},
+			expected: []string{"cfs", "stats"},
+		},
+		{
+			name:     "CFS/zero UsOpt fields omitted",
+			value:    CFS{},
+			expected: nil,
+		},
+		{
+			name: "CFS/non-zero UsOpt fields present",
+			value: CFS{
+				Period: UsOpt{Us: opt.UintWith(100000)},
+				Quota:  UsOpt{Us: opt.UintWith(50000)},
+				Weight: opt.UintWith(200),
+			},
+			expected: []string{"period", "quota", "weight"},
+		},
+		{
+			name: "CFS/unlimited quota 0 (max) still present",
+			value: CFS{
+				Period: UsOpt{Us: opt.UintWith(100000)},
+				Quota:  UsOpt{Us: opt.UintWith(0)},
+				Weight: opt.UintWith(200),
+			},
+			expected: []string{"period", "quota", "weight"},
+		},
+	}
 
-	t.Run("CPUStats/non-zero struct fields present", func(t *testing.T) {
-		m := marshalToMap(t, CPUStats{
-			Periods:   opt.UintWith(1),
-			Throttled: ThrottledField{Us: opt.UintWith(10)},
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.expected, marshalKeys(t, test.value))
 		})
-		assert.Contains(t, m, "throttled")
-		assert.Contains(t, m, "periods")
-	})
-
-	t.Run("ThrottledField/zero struct fields omitted", func(t *testing.T) {
-		m := marshalToMap(t, ThrottledField{})
-		assert.NotContains(t, m, "us")
-		assert.NotContains(t, m, "periods")
-	})
-
-	t.Run("ThrottledField/non-zero struct fields present", func(t *testing.T) {
-		m := marshalToMap(t, ThrottledField{
-			Us:      opt.UintWith(10),
-			Periods: opt.UintWith(4),
-		})
-		assert.Contains(t, m, "us")
-		assert.Contains(t, m, "periods")
-	})
-
-	t.Run("MemoryData/zero BytesOpt omitted", func(t *testing.T) {
-		m := marshalToMap(t, MemoryData{})
-		assert.NotContains(t, m, "high")
-		assert.NotContains(t, m, "max")
-	})
-
-	t.Run("MemoryData/non-zero BytesOpt present", func(t *testing.T) {
-		m := marshalToMap(t, MemoryData{
-			High: opt.BytesOpt{Bytes: opt.UintWith(1024)},
-			Max:  opt.BytesOpt{Bytes: opt.UintWith(4096)},
-		})
-		assert.Contains(t, m, "high")
-		assert.Contains(t, m, "max")
-	})
-
-	t.Run("Events/zero opt.Uint omitted", func(t *testing.T) {
-		m := marshalToMap(t, Events{})
-		assert.NotContains(t, m, "low")
-		assert.NotContains(t, m, "oom")
-		assert.NotContains(t, m, "oom_kill")
-		assert.NotContains(t, m, "fail")
-	})
-
-	t.Run("Events/non-zero opt.Uint present", func(t *testing.T) {
-		m := marshalToMap(t, Events{
-			Low:     opt.UintWith(1),
-			OOM:     opt.UintWith(2),
-			OOMKill: opt.UintWith(3),
-			Fail:    opt.UintWith(4),
-		})
-		assert.Contains(t, m, "low")
-		assert.Contains(t, m, "oom")
-		assert.Contains(t, m, "oom_kill")
-		assert.Contains(t, m, "fail")
-	})
+	}
 }
 
-func marshalToMap(t *testing.T, v any) map[string]json.RawMessage {
+func marshalKeys(t *testing.T, v any) []string {
 	t.Helper()
 	data, err := json.Marshal(v)
 	require.NoError(t, err)
 	var m map[string]json.RawMessage
 	require.NoError(t, json.Unmarshal(data, &m))
-	return m
+	return slices.Sorted(maps.Keys(m))
 }
