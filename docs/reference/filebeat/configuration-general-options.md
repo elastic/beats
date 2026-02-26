@@ -133,7 +133,7 @@ filebeat.registry.bbolt.compaction.on_start: true
 
 ### `registry.bbolt.compaction.max_transaction_size` [_registry_bbolt_compaction_max_transaction_size]
 
-The maximum number of items copied per transaction during compaction and cleanup. Default: `65536`.
+The maximum number of items processed per transaction during compaction and retention cleanup. Limiting the transaction size prevents a single large transaction from consuming excessive memory or holding a write lock for too long. A value of `0` disables batching, processing all items in a single transaction. Default: `65536`.
 
 ```yaml
 filebeat.registry.bbolt.compaction.max_transaction_size: 65536

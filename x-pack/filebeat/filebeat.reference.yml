@@ -3347,8 +3347,9 @@ filebeat.inputs:
 # database to reclaim unused disk space. Default: false.
 #filebeat.registry.bbolt.compaction.on_start: false
 
-# Maximum number of items copied per transaction during compaction
-# and cleanup. Default: 65536.
+# Maximum number of items processed per transaction during compaction and
+# retention cleanup. A value of 0 disables batching, processing all items
+# in a single transaction. Default: 65536.
 #filebeat.registry.bbolt.compaction.max_transaction_size: 65536
 
 # If true, leftover temporary files from a previous compaction that was
