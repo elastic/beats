@@ -26,7 +26,7 @@ import (
 	"sync"
 	"time"
 
-	bolt "go.etcd.io/bbolt"
+	"go.etcd.io/bbolt"
 
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
@@ -70,10 +70,10 @@ type store struct {
 	dbPath   string
 	fileMode os.FileMode
 	config   Config
-	options  *bolt.Options
+	options  *bbolt.Options
 
 	compactionMu sync.RWMutex
-	db           *bolt.DB
+	db           *bbolt.DB
 
 	stopCh chan struct{}
 	wg     sync.WaitGroup
@@ -82,12 +82,12 @@ type store struct {
 	closed  bool
 }
 
-func bboltOptions(timeout time.Duration, noSync bool) *bolt.Options {
-	return &bolt.Options{
+func bboltOptions(timeout time.Duration, noSync bool) *bbolt.Options {
+	return &bbolt.Options{
 		Timeout:        timeout,
 		NoSync:         noSync,
 		NoFreelistSync: true,
-		FreelistType:   bolt.FreelistMapType,
+		FreelistType:   bbolt.FreelistMapType,
 	}
 }
 
@@ -103,14 +103,14 @@ func openStore(log *logp.Logger, dbPath string, fileMode os.FileMode, cfg Config
 	log.Debugf("Opening bbolt database: path=%s timeout=%v fsync=%v", dbPath, cfg.Timeout, cfg.FSync)
 
 	options := bboltOptions(cfg.Timeout, !cfg.FSync)
-	db, err := bolt.Open(dbPath, fileMode, options)
+	db, err := bbolt.Open(dbPath, fileMode, options)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open bbolt database %s: %w", dbPath, err)
 	}
 
 	log.Debug("Ensuring default bucket exists")
 
-	if err := db.Update(func(tx *bolt.Tx) error {
+	if err := db.Update(func(tx *bbolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists(defaultBucket)
 		return err
 	}); err != nil {
@@ -187,7 +187,7 @@ func (s *store) Has(key string) (bool, error) {
 	defer s.compactionMu.RUnlock()
 
 	var found bool
-	err := s.db.View(func(tx *bolt.Tx) error {
+	err := s.db.View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket(defaultBucket)
 		if bucket == nil {
 			return nil
@@ -203,7 +203,7 @@ func (s *store) Get(key string, to any) error {
 	s.compactionMu.RLock()
 	defer s.compactionMu.RUnlock()
 
-	return s.db.View(func(tx *bolt.Tx) error {
+	return s.db.View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket(defaultBucket)
 		if bucket == nil {
 			return errKeyUnknown
@@ -249,7 +249,7 @@ func (s *store) Set(key string, value any) error {
 	s.compactionMu.RLock()
 	defer s.compactionMu.RUnlock()
 
-	return s.db.Update(func(tx *bolt.Tx) error {
+	return s.db.Update(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket(defaultBucket)
 		if bucket == nil {
 			return errNotInitialized
@@ -263,7 +263,7 @@ func (s *store) Remove(key string) error {
 	s.compactionMu.RLock()
 	defer s.compactionMu.RUnlock()
 
-	return s.db.Update(func(tx *bolt.Tx) error {
+	return s.db.Update(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket(defaultBucket)
 		if bucket == nil {
 			return nil
@@ -277,7 +277,7 @@ func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error 
 	s.compactionMu.RLock()
 	defer s.compactionMu.RUnlock()
 
-	err := s.db.View(func(tx *bolt.Tx) error {
+	err := s.db.View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket(defaultBucket)
 		if bucket == nil {
 			return nil
