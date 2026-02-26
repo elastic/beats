@@ -82,28 +82,32 @@ func (s *store) compact() error {
 	dbPath := s.db.Path()
 	compactedPath := compactedDB.Path()
 
+	// we have to close files before moving on Windows.
 	s.db.Close()
 	compactedDB.Close()
 
-	moveErr := moveFileWithFallback(compactedPath, dbPath)
+	if err := moveFileWithFallback(compactedPath, dbPath); err != nil {
+		var pathErr *os.PathError
+		if !errors.As(err, &pathErr) || pathErr.Op != "remove" {
+			// Move failed — the original file is still at dbPath, reopen it (was closed before the move).
+			newDB, openErr := bolt.Open(dbPath, s.fileMode, s.options)
+			if openErr != nil {
+				return errors.Join(
+					fmt.Errorf("failed to replace db with compacted file: %w", err),
+					fmt.Errorf("failed to reopen db: %w", openErr),
+				)
+			}
+			s.db = newDB
+			return fmt.Errorf("failed to replace db with compacted file: %w", err)
+		}
+		s.log.Warnf("Compaction succeeded but failed to remove temp file: %v", err)
+	}
 
 	newDB, err := bolt.Open(dbPath, s.fileMode, s.options)
 	if err != nil {
-		return errors.Join(
-			fmt.Errorf("failed to reopen db after compaction: %w", err),
-			moveErr,
-		)
+		return fmt.Errorf("failed to reopen db after compaction: %w", err)
 	}
 	s.db = newDB
-
-	if moveErr != nil {
-		var pathErr *os.PathError
-		if errors.As(moveErr, &pathErr) && pathErr.Op == "remove" {
-			s.log.Warnf("Compaction succeeded but failed to remove temp file: %v", moveErr)
-		} else {
-			return fmt.Errorf("failed to replace db with compacted file: %w", moveErr)
-		}
-	}
 
 	s.log.Debugf("Finished compaction in %v", time.Since(compactionStart))
 	return nil
