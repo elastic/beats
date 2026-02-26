@@ -66,7 +66,7 @@ func New(b *beat.Beat, _ *conf.C) (beat.Beater, error) {
 	log := logp.NewLogger("winlogbeat")
 
 	// resolve registry file path
-	config.RegistryFile = paths.Resolve(paths.Data, config.RegistryFile)
+	config.RegistryFile = b.Paths.Resolve(paths.Data, config.RegistryFile)
 	log.Infof("State will be read from and persisted to %s",
 		config.RegistryFile)
 
@@ -142,7 +142,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	}
 
 	if b.Config.Output.Name() == "elasticsearch" {
-		callback := func(esClient *eslegclient.Connection) error {
+		callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 			_, err := module.UploadPipelines(b.Info, esClient, eb.config.OverwritePipelines)
 			return err
 		}

@@ -53,7 +53,7 @@ func getNamedTemplates(transactionId string, info *utils.ClusterInfo, templates 
 			continue
 		}
 
-		template["templateName"] = templateData.Name
+		template["template_name"] = templateData.Name
 
 		reporter(transactionId, info, template)
 	}
@@ -78,8 +78,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 
 	if err != nil {
 		err = fmt.Errorf("failed applying index template schema: %w", err)
-		events.SendErrorEventWithRandomTransactionId(err, info, r, IndexTemplateMetricSet, IndexTemplatePath)
-		return err
+		events.LogAndSendErrorEventWithRandomTransactionId(err, info, r, IndexTemplateMetricSet, IndexTemplatePath)
 	}
 
 	return nil

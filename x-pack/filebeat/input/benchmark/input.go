@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -60,7 +61,7 @@ func (bi *benchmarkInput) Test(ctx v2.TestContext) error {
 // Run starts the data generation.
 func (bi *benchmarkInput) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	var wg sync.WaitGroup
-	metrics := newInputMetrics(ctx)
+	metrics := newInputMetrics(ctx.MetricsRegistry, ctx.Logger)
 
 	switch bi.cfg.Status {
 	case "degraded":
@@ -159,24 +160,19 @@ func publishEvt(publisher stateless.Publisher, msg string, line uint64, filename
 }
 
 type inputMetrics struct {
-	unregister func()
-
 	eventsPublished *monitoring.Uint // number of events published
 	publishingTime  metrics.Sample   // histogram of the elapsed times in nanoseconds (time of publisher.Publish)
 }
 
 // newInputMetrics returns an input metric for the benchmark processor.
-func newInputMetrics(ctx v2.Context) *inputMetrics {
+func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	out := &inputMetrics{
-		eventsPublished: monitoring.NewUint(ctx.MetricsRegistry, "events_published_total"),
+		eventsPublished: monitoring.NewUint(reg, "events_published_total"),
 		publishingTime:  metrics.NewUniformSample(1024),
 	}
 
-	_ = adapter.NewGoMetrics(ctx.MetricsRegistry, "publishing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "publishing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.publishingTime))
 
 	return out
-}
-
-func (m *inputMetrics) Close() {
 }

@@ -30,7 +30,7 @@ type nfs struct {
 	event beat.Event
 }
 
-func (nfs *nfs) getRequestInfo(xdr *xdr) mapstr.M {
+func (nfs *nfs) getRequestInfo(xdr *xdr) (mapstr.M, error) {
 	nfsInfo := mapstr.M{
 		"version": nfs.vers,
 	}
@@ -43,21 +43,35 @@ func (nfs *nfs) getRequestInfo(xdr *xdr) mapstr.M {
 		case 0:
 			nfsInfo["opcode"] = "NULL"
 		case 1:
-			tag := xdr.getDynamicOpaque()
+			tag, err := xdr.getDynamicOpaque()
+			if err != nil {
+				return nil, err
+			}
 			nfsInfo["tag"] = string(tag)
-			nfsInfo["minor_version"] = xdr.getUInt()
-			nfsInfo["opcode"] = nfs.findV4MainOpcode(xdr)
+			minor, err := xdr.getUInt()
+			if err != nil {
+				return nil, err
+			}
+			nfsInfo["minor_version"] = minor
+			opcode, err := nfs.findV4MainOpcode(xdr)
+			if err != nil {
+				return nil, err
+			}
+			nfsInfo["opcode"] = opcode
 		}
 	}
-	return nfsInfo
+	return nfsInfo, nil
 }
 
-func (nfs *nfs) getNFSReplyStatus(xdr *xdr) string {
+func (nfs *nfs) getNFSReplyStatus(xdr *xdr) (string, error) {
 	switch nfs.proc {
 	case 0:
-		return nfsStatus[0]
+		return nfsStatus[0], nil
 	default:
-		stat := int(xdr.getUInt())
-		return nfsStatus[stat]
+		stat, err := xdr.getUInt()
+		if err != nil {
+			return "", err
+		}
+		return nfsStatus[int(stat)], nil
 	}
 }

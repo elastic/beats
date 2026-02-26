@@ -1,10 +1,5 @@
-FROM debian:stretch
+FROM debian:bookworm
 ARG SDK_VERSION
-
-# TODO: use newer base
-RUN sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list \
-    && sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list \
-    && sed -i '/stretch-updates/d' /etc/apt/sources.list 
 
 RUN \
     apt-get update \
@@ -12,8 +7,8 @@ RUN \
 	    apt-transport-https \
 	    ca-certificates \
 	    curl \
-		python \
-		openjdk-8-jre \
+		python-is-python3 \
+		openjdk-17-jre \
 		gnupg2 \
 	&& rm -rf /var/lib/apt/lists/*
 

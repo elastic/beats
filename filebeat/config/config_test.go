@@ -27,10 +27,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
-func TestReadConfig2(t *testing.T) {
+func TestLoadConfig2(t *testing.T) {
 	// Tests with different params from config file
 	absPath, err := filepath.Abs("../tests/files/")
 
@@ -40,80 +39,10 @@ func TestReadConfig2(t *testing.T) {
 	config := &Config{}
 
 	// Reads second config file
-	err = cfgfile.Read(config, absPath+"/config2.yml")
+	cfg, err := cfgfile.Load(absPath+"/config2.yml", nil)
 	assert.NoError(t, err)
-}
-
-func TestGetConfigFiles_File(t *testing.T) {
-	absPath, err := filepath.Abs("../tests/files/")
-
-	assert.NotNil(t, absPath)
+	err = cfg.Unpack(config)
 	assert.NoError(t, err)
-
-	files, err := getConfigFiles(absPath + "/config.yml")
-
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(files))
-
-	assert.Equal(t, absPath+"/config.yml", files[0])
-}
-
-func TestGetConfigFiles_Dir(t *testing.T) {
-	absPath, err := filepath.Abs("../tests/files/")
-
-	assert.NotNil(t, absPath)
-	assert.NoError(t, err)
-
-	files, err := getConfigFiles(absPath)
-
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(files))
-
-	assert.Equal(t, filepath.Join(absPath, "/config.yml"), files[0])
-	assert.Equal(t, filepath.Join(absPath, "/config2.yml"), files[1])
-}
-
-func TestGetConfigFiles_EmptyDir(t *testing.T) {
-	absPath, err := filepath.Abs("../tests/files/")
-
-	assert.NotNil(t, absPath)
-	assert.NoError(t, err)
-
-	files, err := getConfigFiles(absPath + "/logs")
-
-	assert.NoError(t, err)
-	assert.Equal(t, 0, len(files))
-}
-
-func TestGetConfigFiles_Invalid(t *testing.T) {
-	absPath, err := filepath.Abs("../tests/files/")
-
-	assert.NotNil(t, absPath)
-	assert.NoError(t, err)
-
-	// Invalid directory
-	files, err := getConfigFiles(absPath + "/qwerwer")
-
-	assert.Error(t, err)
-	assert.Nil(t, files)
-}
-
-func TestMergeConfigFiles(t *testing.T) {
-	absPath, err := filepath.Abs("../tests/files/")
-
-	assert.NotNil(t, absPath)
-	assert.NoError(t, err)
-
-	files, err := getConfigFiles(absPath)
-
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(files))
-
-	config := &Config{}
-	err = mergeConfigFiles(files, config, logptest.NewTestingLogger(t, ""))
-	assert.NoError(t, err)
-
-	assert.Equal(t, 4, len(config.Inputs))
 }
 
 func TestEnabledInputs(t *testing.T) {

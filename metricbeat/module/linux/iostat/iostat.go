@@ -49,7 +49,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The linux iostat metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The linux iostat metricset is beta."))
 
 	config := struct {
 		IncludeDevices []string `config:"iostat.include_devices"`
@@ -69,7 +69,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	IOstats, err := diskio.IOCounters(m.includeDevices...)
+	IOstats, err := diskio.IOCounters(m.Logger(), m.includeDevices...)
 	if err != nil {
 		return fmt.Errorf("disk io counters: %w", err)
 	}

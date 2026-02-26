@@ -18,10 +18,12 @@
 package filestream
 
 import (
+	"compress/gzip"
 	"context"
 	"errors"
 	"io"
 	"os"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -43,7 +45,7 @@ var (
 
 // logFile contains all log related data
 type logFile struct {
-	file      *os.File
+	file      File
 	log       *logp.Logger
 	readerCtx ctxtool.CancelContext
 
@@ -57,17 +59,22 @@ type logFile struct {
 
 	isInactive atomic.Bool
 
+	// offsetMutx is a mutex to ensure 'offset' and 'lastTimeRead' are
+	// atomically updated. Atomically updating them prevents issues
+	// detecting when the file is inactive by [shouldBeClosed].
+	offsetMutx   sync.Mutex
 	offset       int64
 	lastTimeRead time.Time
-	backoff      backoff.Backoff
-	tg           *unison.TaskGroup
+
+	backoff backoff.Backoff
+	tg      *unison.TaskGroup
 }
 
 // newFileReader creates a new log instance to read log sources
 func newFileReader(
 	log *logp.Logger,
 	canceler input.Canceler,
-	f *os.File,
+	f File,
 	config readerConfig,
 	closerConfig closerConfig,
 ) (*logFile, error) {
@@ -111,8 +118,7 @@ func (f *logFile) Read(buf []byte) (int, error) {
 	for f.readerCtx.Err() == nil {
 		n, err := f.file.Read(buf)
 		if n > 0 {
-			f.offset += int64(n)
-			f.lastTimeRead = time.Now()
+			f.updateOffset(n)
 		}
 		totalN += n
 
@@ -158,7 +164,7 @@ func (f *logFile) startFileMonitoringIfNeeded() {
 			return nil
 		})
 		if err != nil {
-			f.log.Errorf("failed to start file monitoring: %w", err)
+			f.log.Errorf("failed to start file monitoring: %v", err)
 		}
 	}
 
@@ -168,7 +174,7 @@ func (f *logFile) startFileMonitoringIfNeeded() {
 			return nil
 		})
 		if err != nil {
-			f.log.Errorf("failed to schedule a file close: %w", err)
+			f.log.Errorf("failed to schedule a file close: %v", err)
 		}
 	}
 }
@@ -195,11 +201,14 @@ func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 
 func (f *logFile) shouldBeClosed() bool {
 	if f.closeInactive > 0 {
+		f.offsetMutx.Lock()
 		if time.Since(f.lastTimeRead) > f.closeInactive {
 			f.isInactive.Store(true)
 			f.log.Debugf("'%s' is inactive", f.file.Name())
+			f.offsetMutx.Unlock()
 			return true
 		}
+		f.offsetMutx.Unlock()
 	}
 
 	if !f.closeRemoved && !f.closeRenamed {
@@ -229,7 +238,7 @@ func (f *logFile) shouldBeClosed() bool {
 
 	if f.closeRemoved {
 		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
-		if file.IsRemoved(f.file) {
+		if file.IsRemoved(f.file.OSFile()) {
 			f.log.Debugf("close.on_state_change.removed is enabled and file %s has been removed", f.file.Name())
 			return true
 		}
@@ -251,7 +260,15 @@ func isSameFile(path string, info os.FileInfo) bool {
 // based on the config options.
 func (f *logFile) errorChecks(err error) error {
 	if !errors.Is(err, io.EOF) {
-		f.log.Error("Unexpected state reading from %s; error: %s", f.file.Name(), err)
+		f.log.Errorf("Unexpected state reading from %s; error: %s",
+			f.file.Name(), err)
+
+		// gzip.ErrChecksum happens after all data is read from a GZIP file, and
+		// it's recoverable, nothing else to do. Thus, we return EOF.
+		if errors.Is(err, gzip.ErrChecksum) {
+			return io.EOF
+		}
+
 		return err
 	}
 
@@ -259,11 +276,11 @@ func (f *logFile) errorChecks(err error) error {
 }
 
 func (f *logFile) handleEOF() error {
-	if f.closeOnEOF {
+	if f.closeOnEOF || f.file.IsGZIP() {
 		return io.EOF
 	}
 
-	// Refetch fileinfo to check if the file was truncated.
+	// Re-fetch fileinfo to check if the file was truncated.
 	// Errors if the file was removed/rotated after reading and before
 	// calling the stat function
 	info, statErr := f.file.Stat()
@@ -272,7 +289,6 @@ func (f *logFile) handleEOF() error {
 		return statErr
 	}
 
-	// check if file was truncated
 	if info.Size() < f.offset {
 		f.log.Debugf("File was truncated as offset (%d) > size (%d): %s", f.offset, info.Size(), f.file.Name())
 		return ErrFileTruncate
@@ -288,4 +304,12 @@ func (f *logFile) Close() error {
 	_ = f.tg.Stop() // Wait until all resources are released for sure.
 	f.log.Debugf("Closed reader. Path='%s'", f.file.Name())
 	return err
+}
+
+// updateOffset updates the offset and lastTimeRead atomically
+func (f *logFile) updateOffset(delta int) {
+	f.offsetMutx.Lock()
+	f.offset += int64(delta)
+	f.lastTimeRead = time.Now()
+	f.offsetMutx.Unlock()
 }

@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/heartbeat-geoip.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Enrich events with geoIP information [heartbeat-geoip]

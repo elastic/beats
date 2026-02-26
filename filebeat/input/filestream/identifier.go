@@ -114,7 +114,7 @@ func (i *inodeDeviceIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		fileID:              i.name + identitySep + e.Descriptor.Info.GetOSState().String(),
+		fileID:              i.name + identitySep + e.Descriptor.Info.GetOSState().Identifier(),
 		identifierGenerator: i.name,
 	}
 }
@@ -191,14 +191,3 @@ func (s *suffixIdentifier) Name() string {
 func (s *suffixIdentifier) Supports(f identifierFeature) bool {
 	return s.i.Supports(f)
 }
-
-// mockIdentifier is used for testing
-type MockIdentifier struct{}
-
-func (m *MockIdentifier) GetSource(e loginp.FSEvent) fileSource {
-	return fileSource{identifierGenerator: "mock"}
-}
-
-func (m *MockIdentifier) Name() string { return "mock" }
-
-func (m *MockIdentifier) Supports(_ identifierFeature) bool { return false }

@@ -21,7 +21,7 @@
             "status": "green",
             "host": {
                 "id": "host-32",
-                "hostname": "phx-w1c1-esxi04.com"
+                "hostname": "example.com"
             },
             "cpu": {
                 "free": {

@@ -72,7 +72,7 @@ func (n *input) Run(runCtx v2.Context, connector beat.PipelineConnector) (err er
 	}
 	defer client.Close()
 
-	dataDir := paths.Resolve(paths.Data, "kvstore")
+	dataDir := n.manager.Path.Resolve(paths.Data, "kvstore")
 	if err = os.MkdirAll(dataDir, 0700); err != nil {
 		return fmt.Errorf("kvstore: unable to make data directory: %w", err)
 	}

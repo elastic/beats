@@ -84,7 +84,12 @@ func (docsBuilder) FieldDocs(fieldsYML string) error {
 		return err
 	}
 
-	outputPath := filepath.Join(DocsDir(), "reference", BeatName)
+	docsDir, err := DocsDir()
+	if err != nil {
+		return err
+	}
+
+	outputPath := filepath.Join(docsDir, "reference", BeatName)
 
 	// TODO: Port this script to Go.
 	log.Println(">> Generating exported-fields.md for", BeatName)

@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 // Package okta provides a user identity asset provider for Okta.
 package okta
 
@@ -35,6 +37,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -68,7 +71,7 @@ type oktaInput struct {
 }
 
 // New creates a new instance of an Okta identity provider.
-func New(logger *logp.Logger) (provider.Provider, error) {
+func New(logger *logp.Logger, path *paths.Path) (provider.Provider, error) {
 	p := oktaInput{
 		cfg: defaultConfig(),
 	}
@@ -76,6 +79,7 @@ func New(logger *logp.Logger) (provider.Provider, error) {
 		Logger:    logger,
 		Type:      FullName,
 		Configure: p.configure,
+		Path:      path,
 	}
 
 	return &p, nil
@@ -99,14 +103,9 @@ func (*oktaInput) Test(v2.TestContext) error { return nil }
 
 // Run will start data collection on this provider.
 func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
-	stat := inputCtx.StatusReporter
-	if stat == nil {
-		stat = noopReporter{}
-	}
-	stat.UpdateStatus(status.Starting, "")
+	inputCtx.UpdateStatus(status.Starting, "")
 	p.logger = inputCtx.Logger.With("provider", Name, "domain", p.cfg.OktaDomain)
-	p.metrics = newMetrics(inputCtx.ID, nil)
-	defer p.metrics.Close()
+	p.metrics = newMetrics(inputCtx.MetricsRegistry, p.logger)
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.cfg.SyncInterval))
@@ -121,7 +120,15 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 
 	if p.cfg.Tracer != nil {
 		id := sanitizeFileName(inputCtx.IDWithoutName)
-		p.cfg.Tracer.Filename = strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
+		path := strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(Name, path)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, Name))
+		}
+		p.cfg.Tracer.Filename = resolved
 	}
 
 	var err error
@@ -130,26 +137,26 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		return err
 	}
 
-	stat.UpdateStatus(status.Running, "")
+	inputCtx.UpdateStatus(status.Running, "")
 	for {
 		select {
 		case <-inputCtx.Cancelation.Done():
 			if !errors.Is(inputCtx.Cancelation.Err(), context.Canceled) {
 				err := inputCtx.Cancelation.Err()
-				stat.UpdateStatus(status.Stopping, err.Error())
+				inputCtx.UpdateStatus(status.Stopping, err.Error())
 				return err
 			}
-			stat.UpdateStatus(status.Stopping, "Deadline passed")
+			inputCtx.UpdateStatus(status.Stopping, "Deadline passed")
 			return nil
 		case <-syncTimer.C:
 			start := time.Now()
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
 				msg := "Error running full sync"
 				p.logger.Errorw(msg, "error", err)
-				stat.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.syncError.Inc()
 			} else {
-				stat.UpdateStatus(status.Running, "Successful full sync")
+				inputCtx.UpdateStatus(status.Running, "Successful full sync")
 			}
 			p.metrics.syncTotal.Inc()
 			p.metrics.syncProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -170,10 +177,10 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
 				msg := "Error running incremental update"
 				p.logger.Errorw(msg, "error", err)
-				stat.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.updateError.Inc()
 			} else {
-				stat.UpdateStatus(status.Running, "Successful incremental update")
+				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
 			}
 			p.metrics.updateTotal.Inc()
 			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -183,12 +190,8 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	}
 }
 
-type noopReporter struct{}
-
-func (noopReporter) UpdateStatus(status.Status, string) {}
-
 func newClient(ctx context.Context, cfg conf, log *logp.Logger) (*http.Client, error) {
-	c, err := cfg.Request.Transport.Client(clientOptions(cfg.Request.KeepAlive.settings())...)
+	c, err := cfg.Request.Transport.Client(clientOptions(cfg.Request.KeepAlive.settings(), log)...)
 	if err != nil {
 		return nil, err
 	}
@@ -197,6 +200,16 @@ func newClient(ctx context.Context, cfg conf, log *logp.Logger) (*http.Client, e
 
 	c.CheckRedirect = checkRedirect(cfg.Request, log)
 
+	// If OAuth2 is configured, use OAuth2 client
+	if cfg.OAuth2 != nil && cfg.OAuth2.isEnabled() {
+		oauthClient, err := cfg.OAuth2.fetchOktaOauthClient(ctx, c)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create OAuth2 client: %w", err)
+		}
+		return oauthClient, nil
+	}
+
+	// Fall back to retryable HTTP client for API token authentication
 	client := &retryablehttp.Client{
 		HTTPClient:   c,
 		Logger:       newRetryLog(log),
@@ -272,8 +285,9 @@ func sanitizeFileName(name string) string {
 
 // clientOption returns constructed client configuration options, including
 // setting up http+unix and http+npipe transports if requested.
-func clientOptions(keepalive httpcommon.WithKeepaliveSettings) []httpcommon.TransportOption {
+func clientOptions(keepalive httpcommon.WithKeepaliveSettings, logger *logp.Logger) []httpcommon.TransportOption {
 	return []httpcommon.TransportOption{
+		httpcommon.WithLogger(logger),
 		httpcommon.WithAPMHTTPInstrumentation(),
 		keepalive,
 	}
@@ -481,7 +495,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 		lastUpdated time.Time
 	)
 	for {
-		batch, h, err := okta.GetUserDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", query, omit, p.lim, p.logger)
+		batch, h, err := okta.GetUserDetails(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), "", query, omit, p.lim, p.logger)
 		if err != nil {
 			p.logger.Debugf("received %d users from API", n)
 			return err
@@ -542,7 +556,7 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 		return su
 	}
 	if slices.Contains(p.cfg.EnrichWith, "groups") {
-		groups, _, err := okta.GetUserGroupDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.logger)
+		groups, _, err := okta.GetUserGroupDetails(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
 		if err != nil {
 			p.logger.Warnf("failed to get user group membership for %s: %v", u.ID, err)
 		} else {
@@ -550,7 +564,7 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 		}
 	}
 	if slices.Contains(p.cfg.EnrichWith, "factors") {
-		factors, _, err := okta.GetUserFactors(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.logger)
+		factors, _, err := okta.GetUserFactors(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
 		if err != nil {
 			p.logger.Warnf("failed to get user factors for %s: %v", u.ID, err)
 		} else {
@@ -558,7 +572,7 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 		}
 	}
 	if slices.Contains(p.cfg.EnrichWith, "roles") {
-		roles, _, err := okta.GetUserRoles(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.logger)
+		roles, _, err := okta.GetUserRoles(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
 		if err != nil {
 			p.logger.Warnf("failed to get user roles for %s: %v", u.ID, err)
 		} else {
@@ -618,7 +632,7 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 		lastUpdated time.Time
 	)
 	for {
-		batch, h, err := okta.GetDeviceDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", deviceQuery, p.lim, p.logger)
+		batch, h, err := okta.GetDeviceDetails(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), "", deviceQuery, p.lim, p.logger)
 		if err != nil {
 			p.logger.Debugf("received %d devices from API", n)
 			return err
@@ -637,7 +651,7 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 
 				const omit = okta.OmitCredentials | okta.OmitCredentialsLinks | okta.OmitTransitioningToStatus
 
-				users, h, err := okta.GetDeviceUsers(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, d.ID, userQuery, omit, p.lim, p.logger)
+				users, h, err := okta.GetDeviceUsers(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), d.ID, userQuery, omit, p.lim, p.logger)
 				if err != nil {
 					p.logger.Debugf("received %d device users from API", len(users))
 					return err
@@ -805,4 +819,15 @@ func (p *oktaInput) publishDevice(d *Device, state *stateStore, inputID string, 
 	p.logger.Debugf("Publishing device %q", d.ID)
 
 	client.Publish(event)
+}
+
+// getAuthToken returns the appropriate authentication token for API calls.
+// For OAuth2 authentication, it returns an empty string since the OAuth2 client
+// handles authentication automatically. For API token authentication, it returns
+// the configured token.
+func (p *oktaInput) getAuthToken() string {
+	if p.cfg.OAuth2 != nil && p.cfg.OAuth2.isEnabled() {
+		return ""
+	}
+	return p.cfg.OktaToken
 }

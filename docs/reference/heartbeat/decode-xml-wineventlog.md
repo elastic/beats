@@ -2,6 +2,9 @@
 navigation_title: "decode_xml_wineventlog"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/decode-xml-wineventlog.html
+applies_to:
+  stack: preview
+  serverless: preview
 ---
 
 # Decode XML Wineventlog [decode-xml-wineventlog]

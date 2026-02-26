@@ -73,3 +73,32 @@ v5-fields-ecs:
 v5-fields-ecs_and_original:
   <<: *v5-fields
   mode: ecs_and_original
+
+v6-fields-original: &v6-fields
+  mode: original
+  format: resource-type account-id tgw-id tgw-attachment-id tgw-src-vpc-account-id tgw-dst-vpc-account-id tgw-src-vpc-id tgw-dst-vpc-id tgw-src-subnet-id tgw-dst-subnet-id tgw-src-eni tgw-dst-eni tgw-src-az-id tgw-dst-az-id tgw-pair-attachment-id srcaddr dstaddr srcport dstport protocol packets bytes start end log-status type packets-lost-no-route packets-lost-blackhole packets-lost-mtu-exceeded packets-lost-ttl-expired tcp-flags region flow-direction pkt-src-aws-service pkt-dst-aws-service
+  samples:
+    - TransitGateway 123456789123 tgw-3b86d5e89ec8ebd55 tgw-attach-3e0bbb28e9ac7e3d8  123456789123  123456789123 vpc-3620ee62fdaf70d01 vpc-3da88d2d64d3e7d16 subnet-3fbc536e360c36caб subnet-3abc2577ee1022895 eni-008ffff1f06bf8d10 eni-309ffff1f06bf8d99 us-east-1a us-east-1b - 10.100.8.1 10.200.8.2 43228 53 6 1 1600 1766848875 1766848933 OK IPv4 1 0 2 0 2 us-east-1 egress - -
+
+v6-fields-ecs:
+  <<: *v6-fields
+  mode: ecs
+
+v6-fields-ecs_and_original:
+  <<: *v6-fields
+  mode: ecs_and_original
+
+# V7 fields using example from https://aws.amazon.com/blogs/networking-and-content-delivery/introducing-vpc-flow-logs-for-elastic-container-services/
+v7-fields-original: &v7-fields
+  mode: original
+  format: version account-id interface-id srcaddr dstaddr srcport dstport protocol packets bytes start end action log-status ecs-task-id ecs-task-arn ecs-task-definition-arn ecs-cluster-name ecs-cluster-arn ecs-container-instance-id ecs-container-instance-arn ecs-container-id ecs-second-container-id ecs-service-name
+  samples:
+    - 5 64111117617 eni-069xxxxxb7a490 89.160.20.156 10.200.0.0 50041 33004 17 52 1 1616729292 1616729349 REJECT OK b9ad2f8a90b24f7bbce4b0341034852f arn:aws:ecs:us-east-1:123456789012:task/DEMOGO-ECS/b9ad2f8a90b24f7bbce4b0341034852f arn:aws:ecs:us-east-1:123456789012:task-definition/catsdef:2 DEMOGO-ECS arn:aws:ecs:us-east-1:123456789012:cluster/DEMOGO-ECS 39623aba81594d79b596c0c5f556d47b arn:aws:ecs:us-east-1:123456789012:container-instance/DEMOGO-ECS/39623aba81594d79b596c0c5f556d47b 0c5c6db7540ca5c4dbc692a53c1d7bab0a4e17e9cf44fc9167659c8687fd13df - cats
+
+v7-fields-ecs:
+  <<: *v7-fields
+  mode: ecs
+
+v7-fields-ecs_and_original:
+  <<: *v7-fields
+  mode: ecs_and_original

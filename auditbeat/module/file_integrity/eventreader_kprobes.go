@@ -69,7 +69,7 @@ func (r kProbesReader) Processor() beat.Processor {
 }
 
 func (r kProbesReader) Start(done <-chan struct{}) (<-chan Event, error) {
-	watcher, err := kprobes.New(r.config.Recursive)
+	watcher, err := kprobes.New(r.config.Recursive, r.log)
 	if err != nil {
 		return nil, err
 	}

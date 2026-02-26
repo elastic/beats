@@ -2,6 +2,9 @@
 navigation_title: "Processors"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/filtering-and-enhancing-data.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Filter and enhance data with processors [filtering-and-enhancing-data]

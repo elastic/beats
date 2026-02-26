@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-awsfargate.html
+applies_to:
+  stack: beta
+  serverless: beta
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -14,6 +17,10 @@ Module for collecting container logs from Amazon ECS Fargate.
 Fields from Amazon ECS Fargate logs.
 
 ## log [_log]
+
+```{applies_to}
+stack: beta
+```
 
 Fields for Amazon Fargate container logs.
 

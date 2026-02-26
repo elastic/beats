@@ -2,6 +2,9 @@
 navigation_title: "MQTT"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-mqtt.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # MQTT input [filebeat-input-mqtt]

@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"math"
 	"strconv"
 	"time"
 	"unicode"
@@ -261,14 +262,17 @@ func parseResponseStatus(s []byte) (uint16, []byte, error) {
 	}
 	statusCode, err := parseInt(s[0:p])
 	if err != nil {
-		return 0, nil, fmt.Errorf("Unable to parse status code from [%s]", s)
+		return 0, nil, fmt.Errorf("unable to parse status code from [%s]", s)
+	}
+	if statusCode > math.MaxUint16 || statusCode < 0 {
+		return 0, nil, fmt.Errorf("invalid status code %v", statusCode)
 	}
 	return uint16(statusCode), phrase, nil
 }
 
 func parseVersion(s []byte) (uint8, uint8, error) {
 	if len(s) < 3 {
-		return 0, 0, errors.New("Invalid version")
+		return 0, 0, errors.New("invalid version")
 	}
 
 	major := s[0] - '0'
@@ -276,14 +280,19 @@ func parseVersion(s []byte) (uint8, uint8, error) {
 	if major > 1 || minor > 2 {
 		return 0, 0, errors.New("unsupported version")
 	}
-	return uint8(major), uint8(minor), nil
+	return major, minor, nil
 }
 
 func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bool) {
 	if len(s.data)-s.parseOffset >= 2 &&
 		bytes.Equal(s.data[s.parseOffset:s.parseOffset+2], []byte("\r\n")) {
 		// EOH
-		m.size = uint64(s.parseOffset + 2)
+		offset := s.parseOffset + 2
+		if offset < 0 {
+			debugf("invalid byte offset for headers: %v", offset)
+			return false, false, true
+		}
+		m.size = uint64(offset)
 		m.rawHeaders = s.data[:m.size]
 		s.data = s.data[m.size:]
 		s.parseOffset = 0
@@ -469,6 +478,10 @@ func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
 		return true, false
 	} else if nbytes >= m.contentLength-s.bodyReceived {
 		wanted := m.contentLength - s.bodyReceived
+		if wanted < 0 {
+			debugf("http body length wrong. Ignoring")
+			return false, true
+		}
 		if m.saveBody {
 			m.body = append(m.body, s.data[:wanted]...)
 		}
@@ -503,6 +516,10 @@ func (*parser) eatBody(s *stream, m *message, size int) (ok, complete bool) {
 		if isDebug {
 			debugf("http conn close, received %d", size)
 		}
+		if size < 0 {
+			logp.Warn("invalid body size in packet")
+			return false, true
+		}
 		m.size += uint64(size)
 		s.bodyReceived += size
 		m.contentLength += size
@@ -510,7 +527,12 @@ func (*parser) eatBody(s *stream, m *message, size int) (ok, complete bool) {
 	} else if size >= m.contentLength-s.bodyReceived {
 		wanted := m.contentLength - s.bodyReceived
 		s.bodyReceived += wanted
-		m.size = uint64(len(m.rawHeaders) + m.contentLength)
+		bodySize := len(m.rawHeaders) + m.contentLength
+		if bodySize < 0 {
+			logp.Warn("invalid body size in packet")
+			return false, true
+		}
+		m.size = uint64(bodySize)
 		return true, true
 	} else {
 		s.bodyReceived += size
@@ -537,7 +559,12 @@ func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete 
 	m.chunkedLength = int(chunkLength)
 
 	s.data = s.data[i+2:] //+ \r\n
-	m.size += uint64(i + 2)
+	newSize := i + 2
+	if newSize < 0 {
+		logp.Warn("Invalid body size while parsing message")
+		return false, false, false
+	}
+	m.size += uint64(newSize)
 
 	if m.chunkedLength == 0 {
 		if len(s.data) < 2 {
@@ -546,7 +573,7 @@ func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete 
 		}
 		m.size += 2
 		if s.data[0] != '\r' || s.data[1] != '\n' {
-			logp.Warn("Expected CRLF sequence at end of message")
+			logp.Warn("expected CRLF sequence at end of message")
 			return false, false, false
 		}
 		s.data = s.data[2:]
@@ -565,8 +592,13 @@ func (*parser) parseBodyChunked(s *stream, m *message) (cont, ok, complete bool)
 		if m.saveBody {
 			m.body = append(m.body, s.data[:wanted]...)
 		}
-		m.size += uint64(wanted + 2)
-		s.data = s.data[wanted+2:]
+		newSize := wanted + 2
+		if newSize < 0 {
+			logp.Warn("invalid body size in http body")
+			return false, false, false
+		}
+		m.size += uint64(newSize)
+		s.data = s.data[newSize:]
 		m.contentLength += m.chunkedLength
 		s.parseState = stateBodyChunkedStart
 		return true, true, false

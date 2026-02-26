@@ -25,7 +25,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
@@ -63,7 +62,7 @@ output:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
 }
 
 // Test that beat stops in case elasticsearch index is modified and pattern not
@@ -122,7 +121,7 @@ setup.template:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
 }
 
 // Test loading of json based template
@@ -154,6 +153,7 @@ logging:
 
 	// prepare the config
 	pwd, err := os.Getwd()
+	require.NoError(t, err, "cannot get work directory")
 	path := filepath.Join(pwd, "../files/template.json")
 	esUrl := GetESURL(t, "http")
 	user := esUrl.User.Username()
@@ -164,11 +164,11 @@ logging:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
 	msg := "Loading json template from file"
-	mockbeat.WaitForLogs(msg, 60*time.Second)
+	mockbeat.WaitLogsContains(msg, 60*time.Second)
 	msg = "Template with name \\\"bla\\\" loaded."
-	mockbeat.WaitForLogs(msg, 60*time.Second)
+	mockbeat.WaitLogsContains(msg, 60*time.Second)
 
 	// check effective changes in ES
 	indexURL, err := FormatIndexTemplateURL(t, esUrl, templateName)
@@ -180,7 +180,7 @@ logging:
 	var m IndexTemplateResult
 	err = json.Unmarshal(body, &m)
 	require.NoError(t, err)
-	require.Equal(t, len(m.IndexTemplates), 1)
+	require.Len(t, m.IndexTemplates, 1)
 }
 
 // Test run cmd with default settings for template
@@ -221,8 +221,8 @@ logging:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
-	mockbeat.WaitForLogs("Template with name \\\"mockbeat-9.9.9\\\" loaded.", 20*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("Template with name \\\"mockbeat-9.9.9\\\" loaded.", 20*time.Second)
 	require.Eventually(t, func() bool {
 		return mockbeat.LogMatch("doBulkRequest: [[:digit:]]+ events have been sent")
 	}, 20*time.Second, 100*time.Millisecond, "looking for PublishEvents")
@@ -235,24 +235,24 @@ logging:
 	err = json.Unmarshal(body, &m)
 	require.NoError(t, err)
 
-	require.Equal(t, len(m.IndexTemplates), 1)
+	require.Len(t, m.IndexTemplates, 1)
 	require.Equal(t, datastream, m.IndexTemplates[0].Name)
 
 	refreshURL := FormatRefreshURL(t, esUrl)
 	require.NoError(t, err)
-	status, body, err = HttpDo(t, http.MethodPost, refreshURL)
+	status, _, err = HttpDo(t, http.MethodPost, refreshURL)
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, status, "incorrect http status")
 
 	searchURL, err := FormatDataStreamSearchURL(t, esUrl, datastream)
 	require.NoError(t, err)
-	status, body, err = HttpDo(t, http.MethodGet, searchURL)
+	_, body, err = HttpDo(t, http.MethodGet, searchURL)
 	require.NoError(t, err)
 	var results SearchResult
 	err = json.Unmarshal(body, &results)
 	require.NoError(t, err)
 
-	require.True(t, results.Hits.Total.Value > 0)
+	require.Positive(t, results.Hits.Total.Value)
 }
 
 // Test run cmd does not load template when disabled in config
@@ -294,13 +294,17 @@ logging:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
 	require.Eventually(t, func() bool {
 		return mockbeat.LogMatch("doBulkRequest: [[:digit:]]+ events have been sent")
 	}, 20*time.Second, 100*time.Millisecond, "looking for PublishEvents")
 
 	u := fmt.Sprintf("%s/_index_template/%s", esUrl.String(), datastream)
-	r, _ := http.Get(u)
+	r, err := http.Get(u) //nolint:gosec,noctx // It's a test
+	if err != nil {
+		defer r.Body.Close()
+	}
+	require.NoError(t, err, "could not query the index template")
 	require.Equal(t, 404, r.StatusCode, "incorrect status code")
 }
 
@@ -372,9 +376,9 @@ logging:
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, status, "incorrect status code")
 
-	require.Truef(t, strings.Contains(string(body), "max_primary_shard_size\":\"50gb"), "primary shard not found in %s", string(body))
+	require.Containsf(t, string(body), "max_primary_shard_size\":\"50gb", "primary shard not found in %s", string(body))
 
-	require.Truef(t, strings.Contains(string(body), "max_age\":\"30d"), "max_age not found in %s", string(body))
+	require.Containsf(t, string(body), "max_age\":\"30d", "max_age not found in %s", string(body))
 }
 
 func TestSetupCmdTemplateDisabled(t *testing.T) {
@@ -429,17 +433,15 @@ setup:
 	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 
 	// check template didn't load
-	status, body, err := HttpDo(t, http.MethodGet, templateURL)
+	status, _, err := HttpDo(t, http.MethodGet, templateURL)
 	require.NoError(t, err)
 	require.Equal(t, http.StatusNotFound, status, "incorrect status code")
 
-	status, body, err = HttpDo(t, http.MethodGet, policyURL)
+	status, body, err := HttpDo(t, http.MethodGet, policyURL)
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, status, "incorrect status code")
-
-	require.Truef(t, strings.Contains(string(body), "max_primary_shard_size\":\"50gb"), "primary shard not found in %s", string(body))
-
-	require.Truef(t, strings.Contains(string(body), "max_age\":\"30d"), "max_age not found in %s", string(body))
+	require.Containsf(t, string(body), "max_primary_shard_size\":\"50gb", "primary shard not found in %s", string(body))
+	require.Containsf(t, string(body), "max_age\":\"30d", "max_age not found in %s", string(body))
 }
 
 func TestSetupCmdTemplateWithOpts(t *testing.T) {
@@ -494,7 +496,7 @@ logging:
 	status, body, err := HttpDo(t, http.MethodGet, templateURL)
 	require.NoError(t, err)
 	require.Equalf(t, http.StatusOK, status, "incorrect status code for :%s", templateURL.String())
-	require.Truef(t, strings.Contains(string(body), "number_of_shards\":\"2"), "number of shards not found in %s", string(body))
+	require.Containsf(t, string(body), "number_of_shards\":\"2", "number of shards not found in %s", string(body))
 }
 
 func TestTemplateCreatedOnIlmPolicyCreated(t *testing.T) {
@@ -562,7 +564,7 @@ logging:
 	require.Truef(t, found, "data stream should be in: %v", r.IndexTemplates)
 
 	// check policy not created
-	status, body, err = HttpDo(t, http.MethodGet, policyURL)
+	status, _, err = HttpDo(t, http.MethodGet, policyURL)
 	require.NoError(t, err)
 	require.Equalf(t, http.StatusNotFound, status, "incorrect status code for: %s", policyURL.String())
 
@@ -576,9 +578,9 @@ logging:
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, status, "incorrect status code")
 
-	require.Truef(t, strings.Contains(string(body), "max_primary_shard_size\":\"50gb"), "primary shard not found in %s", string(body))
+	require.Containsf(t, string(body), "max_primary_shard_size\":\"50gb", "primary shard not found in %s", string(body))
 
-	require.Truef(t, strings.Contains(string(body), "max_age\":\"30d"), "max_age not found in %s", string(body))
+	require.Containsf(t, string(body), "max_age\":\"30d", "max_age not found in %s", string(body))
 }
 
 func TestExportTemplate(t *testing.T) {

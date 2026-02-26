@@ -7,6 +7,8 @@ package cluster_settings
 import (
 	"fmt"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
@@ -213,16 +215,36 @@ var (
 	}
 )
 
+// flattenSettings merges transient, persistent, and defaults settings
+// with precedence: transient > persistent > defaults
+func flattenSettings(metricSetFields mapstr.M) mapstr.M {
+	result := mapstr.M{}
+
+	// Apply in reverse precedence order (defaults first, transient last)
+	if defaults, ok := metricSetFields["defaults"].(mapstr.M); ok {
+		result.DeepUpdate(defaults)
+	}
+	if persistent, ok := metricSetFields["persistent"].(mapstr.M); ok {
+		result.DeepUpdate(persistent)
+	}
+	if transient, ok := metricSetFields["transient"].(mapstr.M); ok {
+		result.DeepUpdate(transient)
+	}
+
+	return result
+}
+
 func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, settings *map[string]interface{}) error {
 	metricSetFields, err := schema.Apply(*settings)
 
 	if err != nil {
 		err = fmt.Errorf("failed applying cluster settings schema %w", err)
-		events.SendErrorEventWithRandomTransactionId(err, info, r, ClusterSettingsMetricSet, ClusterSettingsPath)
-		return err
+		events.LogAndSendErrorEventWithRandomTransactionId(err, info, r, ClusterSettingsMetricSet, ClusterSettingsPath)
+		return nil
 	}
 
-	r.Event(events.CreateEventWithRandomTransactionId(info, metricSetFields))
+	// Flatten settings with precedence: transient > persistent > defaults
+	r.Event(events.CreateEventWithRandomTransactionId(info, flattenSettings(metricSetFields)))
 
 	return nil
 }

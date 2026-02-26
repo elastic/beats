@@ -163,11 +163,11 @@ func summarizeBufferInfo(idx int, buf []byte) (int, []byte) {
 
 // AppendReaders look into the current enabled log selector and will add any debug reader that match
 // the selectors.
-func AppendReaders(reader io.ReadCloser) (io.ReadCloser, error) {
+func AppendReaders(reader io.ReadCloser, logger *logp.Logger) (io.ReadCloser, error) {
 	var err error
 
-	if logp.HasSelector("detect_null_bytes") || logp.HasSelector("*") {
-		log := logp.NewLogger("detect_null_bytes")
+	if logger.HasSelector("detect_null_bytes") || logger.HasSelector("*") {
+		log := logger.Named("detect_null_bytes")
 		if reader, err = NewReader(
 			log,
 			reader,

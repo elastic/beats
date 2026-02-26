@@ -76,29 +76,30 @@ type Monitor struct {
 	closeErr    error
 }
 
-func New(isRecursive bool) (*Monitor, error) {
-	ctx := context.TODO()
+func New(isRecursive bool, log *logp.Logger) (*Monitor, error) {
+	ctx := context.Background()
+	monLogger := log.With("monitor")
 
-	validatedProbes, exec, err := getVerifiedProbes(ctx, 5*time.Second)
+	validatedProbes, exec, err := getVerifiedProbes(ctx, 5*time.Second, monLogger)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting kprobes: %w", err)
 	}
 
 	pChannel, err := newPerfChannel(validatedProbes, 10, 4096, perf.AllThreads)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating perf channel for kprobes: %w", err)
 	}
 
-	return newMonitor(ctx, isRecursive, pChannel, exec)
+	return newMonitor(ctx, isRecursive, pChannel, exec, monLogger)
 }
 
-func newMonitor(ctx context.Context, isRecursive bool, pChannel perfChannel, exec executor) (*Monitor, error) {
+func newMonitor(ctx context.Context, isRecursive bool, pChannel perfChannel, exec executor, logger *logp.Logger) (*Monitor, error) {
 	mCtx, cancelFunc := context.WithCancel(ctx)
 
 	p, err := newPathMonitor(mCtx, exec, 0, isRecursive)
 	if err != nil {
 		cancelFunc()
-		return nil, err
+		return nil, fmt.Errorf("error creating path monitor: %w", err)
 	}
 
 	eventChannel := make(chan MonitorEvent, 512)
@@ -110,7 +111,7 @@ func newMonitor(ctx context.Context, isRecursive bool, pChannel perfChannel, exe
 		perfChannel: pChannel,
 		errC:        make(chan error, 1),
 		eProc:       eProc,
-		log:         logp.NewLogger("file_integrity"),
+		log:         logger,
 		ctx:         mCtx,
 		cancelFn:    cancelFunc,
 		isRecursive: isRecursive,
@@ -170,9 +171,9 @@ func (w *Monitor) Start() error {
 
 	if err := w.perfChannel.Run(); err != nil {
 		if closeErr := w.Close(); closeErr != nil {
-			w.log.Warnf("error at closing watcher: %v", closeErr)
+			w.log.Warnf("error closing watcher: %v", closeErr)
 		}
-		return err
+		return fmt.Errorf("error starting perf channel: %w", err)
 	}
 
 	go func() {
@@ -196,7 +197,7 @@ func (w *Monitor) Start() error {
 
 				switch eWithType := e.(type) {
 				case *ProbeEvent:
-					if err := w.eProc.process(w.ctx, eWithType); err != nil {
+					if err := w.eProc.process(eWithType); err != nil {
 						w.writeErr(err)
 						return
 					}

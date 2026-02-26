@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-coredns.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -16,16 +19,16 @@ coredns fields after normalization
 **`coredns.query.size`**
 :   size of the DNS query
 
-type: integer
+    type: integer
 
-format: bytes
+    format: bytes
 
 
 **`coredns.response.size`**
 :   size of the DNS response
 
-type: integer
+    type: integer
 
-format: bytes
+    format: bytes
 
 

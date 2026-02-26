@@ -2,6 +2,9 @@
 navigation_title: "Secure"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/securing-auditbeat.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Secure Auditbeat [securing-auditbeat]

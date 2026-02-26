@@ -50,6 +50,7 @@ const pluginName = "filestream"
 
 type state struct {
 	Offset int64 `json:"offset" struct:"offset"`
+	EOF    bool  `json:"eof" struct:"eof"`
 }
 
 type fileMeta struct {
@@ -60,13 +61,16 @@ type fileMeta struct {
 // filestream is the input for reading from files which
 // are actively written by other applications.
 type filestream struct {
-	readerConfig         readerConfig
-	encodingFactory      encoding.EncodingFactory
-	closerConfig         closerConfig
-	deleterConfig        deleterConfig
-	parsers              parser.Config
-	takeOver             loginp.TakeOverConfig
-	scannerCheckInterval time.Duration
+	readerConfig              readerConfig
+	encodingFactory           encoding.EncodingFactory
+	closerConfig              closerConfig
+	deleterConfig             deleterConfig
+	parsers                   parser.Config
+	takeOver                  loginp.TakeOverConfig
+	scannerCheckInterval      time.Duration
+	compression               string
+	includeFileOwnerName      bool
+	includeFileOwnerGroupName bool
 
 	// Function references for testing
 	waitGracePeriodFn func(
@@ -100,15 +104,34 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	}
 }
 
-func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvester, error) {
+func configure(
+	cfg *conf.C,
+	log *logp.Logger,
+	src *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
+
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, nil, err
 	}
 
+	if err := normalizeConfig(cfg, &c); err != nil {
+		return nil, nil, err
+	}
+
+	// zero must also disable clean_inactive, see:
+	// https://github.com/elastic/beats/issues/45601
+	// for more details. At the same time we need to allow
+	// users to keep the old behaviour.
+	if !c.LegacyCleanInactive && c.CleanInactive == 0 {
+		c.CleanInactive = -1
+	}
+
+	// log warning if deprecated params are set
+	c.checkUnsupportedParams(log)
+
 	c.TakeOver.LogWarnings(log)
 
-	prospector, err := newProspector(c, log)
+	prospector, err := newProspector(c, log, src)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
@@ -119,32 +142,50 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 	}
 
 	filestream := &filestream{
-		readerConfig:      c.Reader,
-		encodingFactory:   encodingFactory,
-		closerConfig:      c.Close,
-		parsers:           c.Reader.Parsers,
-		takeOver:          c.TakeOver,
-		deleterConfig:     c.Delete,
-		waitGracePeriodFn: waitGracePeriod,
-		tickFn:            time.Tick,
-		removeFn:          os.Remove,
-		statFn:            os.Stat,
+		readerConfig:              c.Reader,
+		encodingFactory:           encodingFactory,
+		closerConfig:              c.Close,
+		parsers:                   c.Reader.Parsers,
+		takeOver:                  c.TakeOver,
+		compression:               c.Compression,
+		includeFileOwnerName:      c.IncludeFileOwnerName,
+		includeFileOwnerGroupName: c.IncludeFileOwnerGroupName,
+		deleterConfig:             c.Delete,
+		waitGracePeriodFn:         waitGracePeriod,
+		tickFn:                    time.Tick,
+		removeFn:                  os.Remove,
+		statFn:                    os.Stat,
 	}
 
 	// Read the scan interval from the prospector so we can use during the
 	// grace period of the delete
-	if c.FileWatcher != nil {
-		tmpCfg := struct {
-			CheckInterval time.Duration `config:"check_interval"`
-		}{}
-		if err := c.FileWatcher.Config().Unpack(&tmpCfg); err != nil {
-			return nil, nil, fmt.Errorf("cannot unpack 'scanner.check_interval: %w'", err)
-		}
-
-		filestream.scannerCheckInterval = tmpCfg.CheckInterval
-	}
+	filestream.scannerCheckInterval = c.FileWatcher.Interval
 
 	return prospector, filestream, nil
+}
+
+// normalizeConfig reconciles filestream defaults with file_identity semantics.
+// In 9.x, scanner fingerprinting defaults to enabled, but non-fingerprint
+// identities should turn it off unless the user explicitly sets it.
+func normalizeConfig(cfg *conf.C, c *config) error {
+	if c.FileIdentity == nil {
+		return nil
+	}
+
+	name := c.FileIdentity.Name()
+	if name == fingerprintName {
+		return nil
+	}
+
+	hasScannerFingerprint, err := cfg.Has("prospector.scanner.fingerprint.enabled", -1)
+	if err != nil {
+		return fmt.Errorf("cannot read 'prospector.scanner.fingerprint.enabled': %w", err)
+	}
+	if !hasScannerFingerprint {
+		c.FileWatcher.Scanner.Fingerprint.Enabled = false
+	}
+
+	return nil
 }
 
 func (inp *filestream) Name() string { return pluginName }
@@ -176,6 +217,12 @@ func (inp *filestream) Run(
 
 	log := ctx.Logger.With("path", fs.newPath).With("state-id", src.Name())
 	state := initState(log, cursor, fs)
+	if state.EOF {
+		// TODO: change it to debug once GZIP isn't experimental anymore.
+		log.Infof("GZIP file already read to EOF, not reading it again, file name '%s'",
+			fs.newPath)
+		return nil
+	}
 
 	r, truncated, err := inp.open(log, ctx.Cancelation, fs, state.Offset)
 	if err != nil {
@@ -191,19 +238,26 @@ func (inp *filestream) Run(
 	metrics.HarvesterRunning.Inc()
 	defer metrics.FilesActive.Dec()
 	defer metrics.HarvesterRunning.Dec()
+	if fs.desc.GZIP {
+		metrics.FilesGZIPActive.Inc()
+		metrics.HarvesterGZIPRunning.Inc()
+		defer metrics.FilesGZIPActive.Dec()
+		defer metrics.HarvesterGZIPRunning.Dec()
+	}
 
 	_, streamCancel := ctxtool.WithFunc(ctx.Cancelation, func() {
 		log.Debug("Closing reader of filestream")
 		err := r.Close()
 		if err != nil {
-			log.Errorf("Error stopping filestream reader %v", err)
+			log.Errorf("Error stopping filestream reader: %v", err)
 		}
 	})
 	defer streamCancel()
 
-	// The caller of Run already reports the error and filters out
-	// 'context cancelled'.
-	err = inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
+	// The caller of Run already reports the error and filters out errors that
+	// must not be reported, like 'context cancelled'.
+	err = inp.readFromSource(
+		ctx, log, r, fs.newPath, state, publisher, fs.desc.GZIP, metrics)
 	if err != nil {
 		// First handle actual errors
 		if !errors.Is(err, io.EOF) && !errors.Is(err, ErrInactive) {
@@ -439,7 +493,7 @@ func (inp *filestream) open(
 		return nil, truncated, err
 	}
 
-	dbgReader, err := debug.AppendReaders(logReader)
+	dbgReader, err := debug.AppendReaders(logReader, log)
 	if err != nil {
 		return nil, truncated, err
 	}
@@ -456,18 +510,22 @@ func (inp *filestream) open(
 		BufferSize: inp.readerConfig.BufferSize,
 		Terminator: inp.readerConfig.LineTerminator,
 		MaxBytes:   encReaderMaxBytes,
-	})
+	}, log)
 	if err != nil {
 		return nil, truncated, err
 	}
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, fs.desc.Fingerprint, offset)
+	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
 
 	r = inp.parsers.Create(r, log)
 
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
+
+	if f.IsGZIP() {
+		r = NewEOFLookaheadReader(r, io.EOF)
+	}
 
 	ok = true // no need to close the file
 	return r, truncated, nil
@@ -478,13 +536,13 @@ func (inp *filestream) open(
 // is returned and the harvester is closed. The file will be picked up again the next time
 // the file system is scanned.
 //
-// openFile will also detect and hadle file truncation. If a file is truncated
+// openFile will also detect and handle file truncation. If a file is truncated
 // then the 3rd return value is true.
 func (inp *filestream) openFile(
 	log *logp.Logger,
 	path string,
 	offset int64,
-) (*os.File, encoding.Encoding, bool, error) {
+) (File, encoding.Encoding, bool, error) {
 	fi, err := os.Stat(path)
 	if err != nil {
 		return nil, nil, false, fmt.Errorf("failed to stat source file %s: %w", path, err)
@@ -496,10 +554,17 @@ func (inp *filestream) openFile(
 		return nil, nil, false, fmt.Errorf("failed to open file %s, named pipes are not supported", fi.Name())
 	}
 
-	f, err := file.ReadOpen(path)
+	rawFile, err := file.ReadOpen(path)
 	if err != nil {
 		return nil, nil, false, fmt.Errorf("failed opening %s: %w", path, err)
 	}
+
+	f, err := inp.newFile(rawFile)
+	if err != nil {
+		return nil, nil, false,
+			fmt.Errorf("failed to create a File from a os.File: %w", err)
+	}
+
 	ok := false
 	defer cleanup.IfNot(&ok, cleanup.IgnoreError(f.Close))
 
@@ -514,19 +579,30 @@ func (inp *filestream) openFile(
 	}
 
 	truncated := false
-	if fi.Size() < offset {
+	// GZIP files are considered static, they're not supposed to change or be
+	// truncated. Also:
+	//  - as the offset is tracked on the decompressed data, it's
+	// expected to see offset > fi.Size()
+	//  - it should not start reading GZIP files from the beginning if it
+	//  already started ingesting the file.
+	// The only situation a GZIP file should change is if it's still been
+	// written to disk when filebeat picks it up. It should only grow, not
+	// shrink.
+	// Therefore, only check truncation for plain files.
+	if !f.IsGZIP() && fi.Size() < offset {
 		// if the file was truncated we need to reset the offset and notify
 		// all callers so they can also reset their offsets
 		truncated = true
 		log.Infof("File was truncated. Reading file from offset 0. Path=%s", path)
 		offset = 0
 	}
+
 	err = inp.initFileOffset(f, offset)
 	if err != nil {
 		return nil, nil, truncated, err
 	}
 
-	encoding, err := inp.encodingFactory(f)
+	enc, err := inp.encodingFactory(f)
 	if err != nil {
 		if errors.Is(err, transform.ErrShortSrc) {
 			return nil, nil, truncated, fmt.Errorf("initialising encoding for '%v' failed due to file being too short", f)
@@ -535,7 +611,53 @@ func (inp *filestream) openFile(
 	}
 
 	ok = true // no need to close the file
-	return f, encoding, truncated, nil
+	return f, enc, truncated, nil
+}
+
+// newFile wraps the given os.File into an appropriate File interface implementation.
+//
+// The behavior depends on the compression setting:
+//   - "" (none): returns a plain file reader (plainFile)
+//   - "gzip": always creates a gzipSeekerReader (errors if file is not gzip)
+//   - "auto": auto-detects gzip files; returns gzipSeekerReader for gzip files,
+//     plainFile otherwise
+//
+// It returns an error if any happens.
+func (inp *filestream) newFile(rawFile *os.File) (File, error) {
+	switch inp.compression {
+	case CompressionNone:
+		return newPlainFile(rawFile), nil
+
+	case CompressionGZIP:
+		f, err := newGzipSeekerReader(rawFile, inp.readerConfig.BufferSize)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to create gzip reader for %s: %w", rawFile.Name(), err)
+		}
+		return f, nil
+
+	case CompressionAuto:
+		isGZIP, err := IsGZIP(rawFile)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"gzip detection error on %s: %w", rawFile.Name(), err)
+		}
+
+		if !isGZIP {
+			return newPlainFile(rawFile), nil
+		}
+
+		f, err := newGzipSeekerReader(rawFile, inp.readerConfig.BufferSize)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to create gzip reader for %s: %w", rawFile.Name(), err)
+		}
+		return f, nil
+
+	default:
+		// This should not happen as validation catches invalid values
+		return nil, fmt.Errorf("invalid compression mode: %q", inp.compression)
+	}
 }
 
 func checkFileBeforeOpening(fi os.FileInfo) error {
@@ -546,7 +668,7 @@ func checkFileBeforeOpening(fi os.FileInfo) error {
 	return nil
 }
 
-func (inp *filestream) initFileOffset(file *os.File, offset int64) error {
+func (inp *filestream) initFileOffset(file File, offset int64) error {
 	if offset > 0 {
 		_, err := file.Seek(offset, io.SeekCurrent)
 		return err
@@ -564,8 +686,9 @@ func (inp *filestream) readFromSource(
 	path string,
 	s state,
 	p loginp.Publisher,
-	metrics *loginp.Metrics,
-) error {
+	isGZIP bool,
+	metrics *loginp.Metrics) error {
+
 	metrics.FilesOpened.Inc()
 	metrics.HarvesterOpenFiles.Inc()
 	metrics.HarvesterStarted.Inc()
@@ -573,7 +696,17 @@ func (inp *filestream) readFromSource(
 	defer metrics.HarvesterOpenFiles.Dec()
 	defer metrics.HarvesterClosed.Inc()
 
+	if isGZIP {
+		metrics.FilesGZIPOpened.Inc()
+		metrics.HarvesterOpenGZIPFiles.Inc()
+		metrics.HarvesterGZIPStarted.Inc()
+		defer metrics.FilesGZIPClosed.Inc()
+		defer metrics.HarvesterOpenGZIPFiles.Dec()
+		defer metrics.HarvesterGZIPClosed.Inc()
+	}
+
 	for ctx.Cancelation.Err() == nil {
+		// next line - r needs to be reading from a gzipped file
 		message, err := r.Next()
 		if err != nil {
 			if errors.Is(err, ErrFileTruncate) {
@@ -591,11 +724,15 @@ func (inp *filestream) readFromSource(
 			} else {
 				log.Errorf("Read line error: %v", err)
 				metrics.ProcessingErrors.Inc()
+				if isGZIP {
+					metrics.ProcessingGZIPErrors.Inc()
+				}
 			}
 
 			return nil
 		}
 
+		// sate offset increase
 		s.Offset += int64(message.Bytes) + int64(message.Offset)
 
 		flags, err := message.Fields.GetValue("log.flags")
@@ -603,30 +740,55 @@ func (inp *filestream) readFromSource(
 			if flags, ok := flags.([]string); ok {
 				if slices.Contains(flags, "truncated") { //nolint:typecheck,nolintlint // linter fails to infer generics
 					metrics.MessagesTruncated.Add(1)
+					if isGZIP {
+						// Truncation shouldn't happen for GZIP files, but as
+						// there it the overall metric for filestream, this case
+						// is handled for completeness.
+						metrics.MessagesGZIPTruncated.Add(1)
+					}
 				}
 			}
 		}
 
 		metrics.MessagesRead.Inc()
+		if isGZIP {
+			metrics.MessagesGZIPRead.Inc()
+		}
 		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
 			continue
 		}
 
 		//nolint:gosec // message.Bytes is always positive
 		metrics.BytesProcessed.Add(uint64(message.Bytes))
+		if isGZIP {
+			//nolint:gosec // message.Bytes is always positive, no risk of overflow here
+			metrics.BytesGZIPProcessed.Add(uint64(message.Bytes))
+		}
 
 		// add "take_over" tag if `take_over` is set to true
 		if inp.takeOver.Enabled {
 			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
 		}
 
+		if isGZIP {
+			if err, ok := (message.Private).(error); ok && errors.Is(err, io.EOF) {
+				s.EOF = true
+			}
+		}
 		if err := p.Publish(message.ToEvent(), s); err != nil {
 			metrics.ProcessingErrors.Inc()
+			if isGZIP {
+				metrics.ProcessingGZIPErrors.Inc()
+			}
 			return err
 		}
 
 		metrics.EventsProcessed.Inc()
 		metrics.ProcessingTime.Update(time.Since(message.Ts).Nanoseconds())
+		if isGZIP {
+			metrics.EventsGZIPProcessed.Inc()
+			metrics.ProcessingGZIPTime.Update(time.Since(message.Ts).Nanoseconds())
+		}
 	}
 	return nil
 }

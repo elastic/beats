@@ -60,7 +60,7 @@ func (s *IdxSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, error)
 		FailEmpty:        true,
 	}
 
-	indexSel, err := outil.BuildSelectorFromConfig(bsCfg, buildSettings)
+	indexSel, err := outil.BuildSelectorFromConfig(bsCfg, buildSettings, s.beatInfo.Logger)
 	if err != nil {
 		return nil, fmt.Errorf("error creating build Selector: %w", err)
 	}

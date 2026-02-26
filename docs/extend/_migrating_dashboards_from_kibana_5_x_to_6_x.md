@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/_migrating_dashboards_from_kibana_5_x_to_6_x.html
+applies_to:
+  stack: ga
 ---
 
 # Migrating dashboards from Kibana 5.x to 6.x [_migrating_dashboards_from_kibana_5_x_to_6_x]

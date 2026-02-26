@@ -14,10 +14,8 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
-	libbeatversion "github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
@@ -183,39 +181,4 @@ func GetObjectValue(obj mapstr.M, key string) interface{} {
 	}
 
 	return value
-}
-
-func CheckEvent(t *testing.T, event mb.Event, info utils.ClusterInfo) {
-	require.Equal(t, info.ClusterID, GetObjectValue(event.ModuleFields, "cluster.id"))
-	require.Equal(t, info.ClusterName, GetObjectValue(event.ModuleFields, "cluster.name"))
-	require.Equal(t, info.Version.Number.String(), GetObjectValue(event.ModuleFields, "cluster.version"))
-
-	require.Equal(t, "autoops_es", GetObjectValue(event.RootFields, "service.name"))
-	require.Equal(t, libbeatversion.GetDefaultVersion(), GetObjectValue(event.RootFields, "metricbeatVersion"))
-	require.Equal(t, libbeatversion.Commit(), GetObjectValue(event.RootFields, "commit"))
-}
-
-func CheckEventWithTransactionId(t *testing.T, event mb.Event, info utils.ClusterInfo, transactionId string) {
-	CheckEvent(t, event, info)
-
-	// matching transaction ID
-	require.Equal(t, transactionId, GetObjectValue(event.ModuleFields, "transactionId"))
-}
-
-func CheckEventWithRandomTransactionId(t *testing.T, event mb.Event, info utils.ClusterInfo) {
-	CheckEvent(t, event, info)
-
-	// valid, random UUID
-	_, err := uuid.FromString(GetObjectValue(event.ModuleFields, "transactionId").(string))
-	require.NoError(t, err)
-}
-
-func CheckAllEventsUseSameTransactionId(t *testing.T, events []mb.Event) {
-	if len(events) > 1 {
-		transactionId := GetObjectValue(events[0].ModuleFields, "transactionId")
-
-		for _, event := range events {
-			require.Equal(t, transactionId, GetObjectValue(event.ModuleFields, "transactionId"))
-		}
-	}
 }

@@ -25,11 +25,10 @@ import (
 )
 
 // Verify checks if the connection endpoint is really Elasticsearch.
-func FetchAndVerify(client *eslegclient.Connection) error {
+func FetchAndVerify(client *eslegclient.Connection, logger *logp.Logger) error {
 	// Logger created earlier than this place are at risk of discarding any log statement.
-	log := logp.NewLogger("elasticsearch")
 
-	fetcher := NewElasticFetcher(client)
+	fetcher := NewElasticFetcher(client, logger)
 	license, err := fetcher.Fetch()
 	if err != nil {
 		return fmt.Errorf("could not connect to a compatible version of Elasticsearch: %w", err)
@@ -38,7 +37,7 @@ func FetchAndVerify(client *eslegclient.Connection) error {
 	// Only notify users if they have an Elasticsearch license that has been expired.
 	// We still will continue publish events as usual.
 	if IsExpired(license) {
-		log.Warn("Elasticsearch license is not active, please check Elasticsearch's licensing information at https://www.elastic.co/subscriptions.")
+		logger.Warn("Elasticsearch license is not active, please check Elasticsearch's licensing information at https://www.elastic.co/subscriptions.")
 	}
 
 	return nil

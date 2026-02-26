@@ -2,6 +2,9 @@
 navigation_title: "add_locale"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/add-locale.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Add the local time zone [add-locale]

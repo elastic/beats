@@ -2,15 +2,25 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !integration
+// +build !integration
+
 package events
 
 import (
 	"errors"
+	"net/http"
 	"testing"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestExtractPathAndQuery(t *testing.T) {
@@ -75,6 +85,7 @@ func TestGetHTTPResponseBodyInfo(t *testing.T) {
 			inputError: &utils.HTTPResponse{
 				StatusCode: 404,
 				Body:       "Not Found",
+				Err:        errors.New("Not Found"),
 			},
 			expectedStatus: 404,
 			expectedCode:   "HTTP_404",
@@ -104,14 +115,14 @@ func TestGetHTTPResponseBodyInfo(t *testing.T) {
 			inputError:     errors.New("some other error"),
 			expectedStatus: 0,
 			expectedCode:   "UNKNOWN_ERROR",
-			expectedBody:   "",
+			expectedBody:   "some other error",
 		},
 		{
 			name:           "Error is nil",
 			inputError:     nil,
 			expectedStatus: 0,
-			expectedCode:   "UNKNOWN_ERROR",
-			expectedBody:   "",
+			expectedCode:   "UNEXPECTED_ERROR",
+			expectedBody:   "unknown error",
 		},
 	}
 
@@ -133,32 +144,32 @@ func TestGetResourceID(t *testing.T) {
 		expectedValue string
 	}{
 		{
-			name: "DEPLOYMENT_ID is set",
+			name: "AUTOOPS_DEPLOYMENT_ID is set",
 			envVars: map[string]string{
-				"DEPLOYMENT_ID": "deployment-123",
+				"AUTOOPS_DEPLOYMENT_ID": "deployment-123",
 			},
 			expectedValue: "deployment-123",
 		},
 		{
-			name: "PROJECT_ID is set",
+			name: "AUTOOPS_PROJECT_ID is set",
 			envVars: map[string]string{
-				"PROJECT_ID": "project-456",
+				"AUTOOPS_PROJECT_ID": "project-456",
 			},
 			expectedValue: "project-456",
 		},
 		{
-			name: "RESOURCE_ID is set",
+			name: "AUTOOPS_RESOURCE_ID is set",
 			envVars: map[string]string{
-				"RESOURCE_ID": "resource-789",
+				"AUTOOPS_RESOURCE_ID": "resource-789",
 			},
 			expectedValue: "resource-789",
 		},
 		{
 			name: "No environment variables are set",
 			envVars: map[string]string{
-				"DEPLOYMENT_ID": "",
-				"PROJECT_ID":    "",
-				"RESOURCE_ID":   "",
+				"AUTOOPS_DEPLOYMENT_ID": "",
+				"AUTOOPS_PROJECT_ID":    "",
+				"AUTOOPS_RESOURCE_ID":   "",
 			},
 			expectedValue: "",
 		},
@@ -180,4 +191,175 @@ func TestGetResourceID(t *testing.T) {
 			assert.Equal(t, tt.expectedValue, result)
 		})
 	}
+}
+
+// MockReporter is a mock implementation of mb.ReporterV2
+type MockReporter struct {
+	mock.Mock
+}
+
+func (m *MockReporter) Event(event mb.Event) bool {
+	args := m.Called(event)
+	return args.Bool(0)
+}
+
+func (m *MockReporter) Error(err error) bool {
+	args := m.Called(err)
+	return args.Bool(0)
+}
+
+func TestLogAndSendErrorEventWithoutClusterInfoDefaultValues(t *testing.T) {
+	mockReporter := new(MockReporter)
+	mockReporter.On("Event", mock.Anything).Return(true)
+
+	err := errors.New("test error")
+	metricSetName := "test_metricset"
+
+	LogAndSendErrorEventWithoutClusterInfo(err, mockReporter, metricSetName)
+
+	mockReporter.AssertCalled(t, "Event", mock.MatchedBy(func(event mb.Event) bool {
+		errorField, ok := event.RootFields["error"].(mapstr.M)
+		require.True(t, ok)
+		require.Equal(t, "UNKNOWN_ERROR", auto_ops_testing.GetObjectValue(errorField, "code"))
+		require.Equal(t, "test error", auto_ops_testing.GetObjectValue(errorField, "message"))
+
+		urlField, ok := event.RootFields["url"].(mapstr.M)
+		require.True(t, ok)
+		require.Equal(t, "/", auto_ops_testing.GetObjectValue(urlField, "path"))
+		require.Equal(t, "", auto_ops_testing.GetObjectValue(urlField, "query"))
+
+		httpField, ok := event.RootFields["http"].(mapstr.M)
+		require.True(t, ok)
+		require.Equal(t, http.MethodGet, auto_ops_testing.GetObjectValue(httpField, "request.method"))
+		require.Equal(t, 0, auto_ops_testing.GetObjectValue(httpField, "response.status_code"))
+
+		assert.NotEmpty(t, auto_ops_testing.GetObjectValue(event.ModuleFields, "transaction_id"))
+
+		return true
+	}))
+}
+
+func TestLogAndSendErrorEventWithoutClusterInfoNonDefaultValues(t *testing.T) {
+	mockReporter := new(MockReporter)
+	mockReporter.On("Event", mock.Anything).Return(true)
+
+	err := &utils.HTTPResponse{
+		StatusCode: 500,
+		Status:     "HTTP_500",
+		Body:       "Internal Server Error",
+		Err:        errors.New("server encountered an unexpected condition"),
+	}
+	metricSetName := "custom_metricset"
+
+	LogAndSendErrorEventWithoutClusterInfo(err, mockReporter, metricSetName)
+
+	mockReporter.AssertCalled(t, "Event", mock.MatchedBy(func(event mb.Event) bool {
+		errorField, ok := event.RootFields["error"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, "HTTP_500", auto_ops_testing.GetObjectValue(errorField, "code"))
+		assert.Equal(t, "server encountered an unexpected condition", auto_ops_testing.GetObjectValue(errorField, "message"))
+
+		urlField, ok := event.RootFields["url"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, "/", auto_ops_testing.GetObjectValue(urlField, "path"))
+		assert.Equal(t, "", auto_ops_testing.GetObjectValue(urlField, "query"))
+
+		httpField, ok := event.RootFields["http"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, http.MethodGet, auto_ops_testing.GetObjectValue(httpField, "request.method"))
+		assert.Equal(t, 500, auto_ops_testing.GetObjectValue(httpField, "response.status_code"))
+
+		assert.NotEmpty(t, auto_ops_testing.GetObjectValue(event.ModuleFields, "transaction_id"))
+
+		return true
+	}))
+}
+
+func TestLogAndSendErrorEventDefaultValues(t *testing.T) {
+	mockReporter := new(MockReporter)
+	mockReporter.On("Event", mock.Anything).Return(true)
+
+	err := errors.New("test error")
+	clusterInfo := &utils.ClusterInfo{
+		ClusterName: "",
+		ClusterID:   "test-cluster-id",
+		Version: utils.ClusterInfoVersion{
+			Number: version.MustNew("8.0.0"),
+		},
+	}
+	metricSetName := "test_metricset"
+	path := "/test/path?query=string&other=param"
+
+	LogAndSendErrorEvent(err, clusterInfo, mockReporter, metricSetName, path, "test-transaction-id")
+
+	mockReporter.AssertCalled(t, "Event", mock.MatchedBy(func(event mb.Event) bool {
+		errorField, ok := event.RootFields["error"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, "UNKNOWN_ERROR", auto_ops_testing.GetObjectValue(errorField, "code"))
+		assert.Equal(t, "test error", auto_ops_testing.GetObjectValue(errorField, "message"))
+
+		urlField, ok := event.RootFields["url"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, "/test/path", auto_ops_testing.GetObjectValue(urlField, "path"))
+		assert.Equal(t, "query=string&other=param", auto_ops_testing.GetObjectValue(urlField, "query"))
+
+		httpField, ok := event.RootFields["http"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, http.MethodGet, auto_ops_testing.GetObjectValue(httpField, "request.method"))
+		assert.Equal(t, 0, auto_ops_testing.GetObjectValue(httpField, "response.status_code"))
+
+		assert.Equal(t, "test-transaction-id", auto_ops_testing.GetObjectValue(event.ModuleFields, "transaction_id"))
+
+		return true
+	}))
+}
+
+func TestLogAndSendErrorEventNonDefaultValues(t *testing.T) {
+	mockReporter := new(MockReporter)
+	mockReporter.On("Event", mock.Anything).Return(true)
+
+	err := &utils.HTTPResponse{
+		StatusCode: 404,
+		Status:     "HTTP_404",
+		Body:       "Page Not Found",
+		Err:        errors.New("error message is passed through"),
+	}
+	clusterInfo := &utils.ClusterInfo{
+		ClusterName: "custom-name",
+		ClusterID:   "custom-cluster-id",
+		Version: utils.ClusterInfoVersion{
+			Number: version.MustNew("8.0.0"),
+		},
+	}
+	metricSetName := "custom_metricset"
+	path := "/custom/path?param=value"
+
+	LogAndSendErrorEvent(err, clusterInfo, mockReporter, metricSetName, path, "custom-transaction-id")
+
+	mockReporter.AssertCalled(t, "Event", mock.MatchedBy(func(event mb.Event) bool {
+		clusterField, ok := event.ModuleFields["cluster"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, "custom-cluster-id", auto_ops_testing.GetObjectValue(clusterField, "id"))
+		assert.Equal(t, "custom-name", auto_ops_testing.GetObjectValue(clusterField, "name"))
+		assert.Equal(t, "8.0.0", auto_ops_testing.GetObjectValue(clusterField, "version"))
+
+		errorField, ok := event.RootFields["error"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, "HTTP_404", auto_ops_testing.GetObjectValue(errorField, "code"))
+		assert.Equal(t, "error message is passed through", auto_ops_testing.GetObjectValue(errorField, "message"))
+
+		urlField, ok := event.RootFields["url"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, "/custom/path", auto_ops_testing.GetObjectValue(urlField, "path"))
+		assert.Equal(t, "param=value", auto_ops_testing.GetObjectValue(urlField, "query"))
+
+		httpField, ok := event.RootFields["http"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, http.MethodGet, auto_ops_testing.GetObjectValue(httpField, "request.method"))
+		assert.Equal(t, 404, auto_ops_testing.GetObjectValue(httpField, "response.status_code"))
+
+		assert.Equal(t, "custom-transaction-id", auto_ops_testing.GetObjectValue(event.ModuleFields, "transaction_id"))
+
+		return true
+	}))
 }

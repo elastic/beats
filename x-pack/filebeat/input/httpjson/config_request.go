@@ -14,7 +14,9 @@ import (
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -116,7 +118,12 @@ func (u *urlConfig) Unpack(in string) error {
 	if err != nil {
 		return err
 	}
-
+	if parsed.Scheme == "" {
+		// Note that this will not catch cases like host.name:9001/path/to/endpoint
+		// which will see "host.name" as the scheme of an opaque URI. These will
+		// get caught later.
+		return fmt.Errorf("url %q is missing scheme", in)
+	}
 	*u = urlConfig{URL: parsed}
 
 	return nil
@@ -171,7 +178,7 @@ func (c *requestConfig) Validate() error {
 		}
 	}
 
-	if c.Tracer != nil {
+	if c.Tracer.enabled() {
 		if c.Tracer.Filename == "" {
 			return errors.New("request tracer must have a filename if used")
 		}
@@ -180,6 +187,14 @@ func (c *requestConfig) Validate() error {
 			// is excessive for a debugging logger, so default to 1MB
 			// which is the minimum.
 			c.Tracer.MaxSize = 1
+		}
+
+		ok, err := httplog.IsPathInLogsFor(inputName, c.Tracer.Filename)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
 		}
 	}
 

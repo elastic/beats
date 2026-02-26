@@ -22,7 +22,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -77,7 +77,7 @@ func newINodeDeviceIdentifier(_ *conf.C, _ *logp.Logger) (StateIdentifier, error
 }
 
 func (i *inodeDeviceIdentifier) GenerateID(s State) (id, identifierType string) {
-	stateID := i.name + identitySep + s.FileStateOS.String()
+	stateID := i.name + identitySep + s.FileStateOS.Identifier()
 	return genIDWithHash(s.Meta, stateID), i.name
 }
 
@@ -113,8 +113,3 @@ func genIDWithHash(meta map[string]string, fileID string) string {
 
 	return b.String()
 }
-
-// mockIdentifier is used for testing
-type MockIdentifier struct{}
-
-func (m *MockIdentifier) GenerateID(s State) (string, string) { return s.Id, "mock" }

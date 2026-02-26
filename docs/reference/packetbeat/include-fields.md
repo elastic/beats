@@ -2,6 +2,9 @@
 navigation_title: "include_fields"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/include-fields.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Keep fields from events [include-fields]

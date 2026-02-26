@@ -113,7 +113,7 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 		}
 		m.logger.Debugf("generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs, options...)
+		return template.ApplyConfigTemplate(event, configs, m.logger, options...)
 
 	}
 
@@ -195,7 +195,7 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 	// Apply information in event to the template to generate the final config
 	// This especially helps in a scenario where endpoints are configured as:
 	// co.elastic.metrics/hosts= "${data.host}:9090"
-	return template.ApplyConfigTemplate(event, configs, options...)
+	return template.ApplyConfigTemplate(event, configs, m.logger, options...)
 }
 
 func (m *metricHints) generateConfig(mod mapstr.M) *conf.C {
@@ -322,11 +322,11 @@ func (m *metricHints) getMetricsFilters(hints mapstr.M) mapstr.M {
 }
 
 func (m *metricHints) getModuleConfigs(hints mapstr.M) []mapstr.M {
-	return utils.GetHintAsConfigs(hints, m.Key)
+	return utils.GetHintAsConfigs(hints, m.Key, m.logger)
 }
 
 func (m *metricHints) getProcessors(hints mapstr.M) []mapstr.M {
-	return utils.GetProcessors(hints, m.Key)
+	return utils.GetProcessors(hints, m.Key, m.logger)
 
 }
 

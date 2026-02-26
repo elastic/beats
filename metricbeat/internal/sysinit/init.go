@@ -23,7 +23,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -52,7 +52,7 @@ func InitSystemModule(base mb.BaseModule) (mb.Module, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error fetching config value: %w", err)
 	}
-	if fleetmode.Enabled() {
+	if management.UnderAgent() {
 		logger.Infof("initializing HostFS values under agent: %s", hostfs)
 		return fleetInit(base, hostfs, userSet)
 	}
@@ -111,7 +111,7 @@ func findConfigValue(base mb.BaseModule) (string, bool, error) {
 		return "", false, fmt.Errorf("error unpacking legacy config: %w", err)
 	}
 	if legacyConfig.HostFS != "" {
-		cfgwarn.Deprecate("8.0.0", "The system.hostfs config value will be removed, use `hostfs` from within the module config.")
+		base.Logger.Warn(cfgwarn.Deprecate("8.0.0", "The system.hostfs config value will be removed, use `hostfs` from within the module config."))
 		// Only fallback to this if the user didn't set anything else
 		return legacyConfig.HostFS, true, nil
 	}

@@ -44,7 +44,7 @@ The `statsd` module has these additional config options:
 **`ttl`**
 :   It defines how long a metric will be reported after it was last recorded. Irrespective of the given ttl, metrics will be reported at least once. A ttl of zero means metrics will never expire.
 
-**`statsd.mapping`**
+**`statsd.mappings`**
 :   It defines how metrics will mapped from the original metric label to the event json. Here’s an example configuration:
 
 ```yaml

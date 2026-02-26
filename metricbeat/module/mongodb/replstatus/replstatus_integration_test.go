@@ -35,6 +35,7 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -107,7 +108,7 @@ func initiateReplicaSet(t *testing.T, host string) error {
 	uri := "mongodb://" + host
 	client, err := mongodb.NewClient(mongodb.ModuleConfig{
 		Hosts: []string{host},
-	}, uri, time.Second*5, readpref.PrimaryMode)
+	}, uri, time.Second*5, readpref.PrimaryMode, logp.NewNopLogger())
 	if err != nil {
 		return fmt.Errorf("could not create mongodb client: %w", err)
 	}

@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-rabbitmq.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -20,8 +23,8 @@ RabbitMQ log files
 **`rabbitmq.log.pid`**
 :   The Erlang process id
 
-type: keyword
+    type: keyword
 
-example: <0.222.0>
+    example: <0.222.0>
 
 

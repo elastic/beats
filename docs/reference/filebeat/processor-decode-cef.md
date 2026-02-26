@@ -2,6 +2,9 @@
 navigation_title: "decode_cef"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/processor-decode-cef.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Decode CEF [processor-decode-cef]

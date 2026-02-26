@@ -2,6 +2,9 @@
 navigation_title: "decode_xml"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/decode-xml.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Decode XML [decode-xml]

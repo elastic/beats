@@ -65,7 +65,7 @@ func (sj *schedJob) run() (startedAt time.Time) {
 		if err == nil {
 			defer sj.jobLimitSem.Release(1)
 		} else {
-			logp.L().Errorf("could not acquire semaphore: %w", err)
+			logp.L().Errorf("could not acquire semaphore: %v", err)
 		}
 	}
 

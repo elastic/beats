@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-template.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Load the Elasticsearch index template [auditbeat-template]
@@ -97,7 +100,7 @@ auditbeat setup --index-management -E output.logstash.enabled=false -E 'output.e
 **docker:**
 
 ```sh subs=true
-docker run --rm docker.elastic.co/beats/auditbeat:{{stack-version}} setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+docker run --rm docker.elastic.co/beats/auditbeat:{{version.stack}} setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ```
 
 **win:**
@@ -109,39 +112,6 @@ From the PowerShell prompt, change to the directory where you installed Auditbea
 ```sh
 PS > .\auditbeat.exe setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ```
-
-
-### Force Kibana to look at newest documents [force-kibana-new]
-
-If you’ve already used Auditbeat to index data into {{es}}, the index may contain old documents. After you load the index template, you can delete the old documents from `auditbeat-*` to force Kibana to look at the newest documents.
-
-Use this command:
-
-**deb and rpm:**
-
-```sh
-curl -XDELETE 'http://localhost:9200/auditbeat-*'
-```
-
-**mac:**
-
-```sh
-curl -XDELETE 'http://localhost:9200/auditbeat-*'
-```
-
-**linux:**
-
-```sh
-curl -XDELETE 'http://localhost:9200/auditbeat-*'
-```
-
-**win:**
-
-```sh
-PS > Invoke-RestMethod -Method Delete "http://localhost:9200/auditbeat-*"
-```
-
-This command deletes all indices that match the pattern `auditbeat`. Before running this command, make sure you want to delete all indices that match the pattern.
 
 
 ## Load the index template manually (alternate method) [load-template-manually-alternate]
@@ -171,7 +141,7 @@ auditbeat export template > auditbeat.template.json
 **win:**
 
 ```sh subs=true
-PS > .\auditbeat.exe export template --es.version {{stack-version}} | Out-File -Encoding UTF8 auditbeat.template.json
+PS > .\auditbeat.exe export template --es.version {{version.stack}} | Out-File -Encoding UTF8 auditbeat.template.json
 ```
 
 To install the template, run:
@@ -179,50 +149,50 @@ To install the template, run:
 **deb and rpm:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/auditbeat-{{stack-version}} -d@auditbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/auditbeat-{{version.stack}} -d@auditbeat.template.json
 ```
 
 **mac:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/auditbeat-{{stack-version}} -d@auditbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/auditbeat-{{version.stack}} -d@auditbeat.template.json
 ```
 
 **linux:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/auditbeat-{{stack-version}} -d@auditbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/auditbeat-{{version.stack}} -d@auditbeat.template.json
 ```
 
 **win:**
 
 ```sh subs=true
-PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile auditbeat.template.json -Uri http://localhost:9200/_index_template/auditbeat-{{stack-version}}
+PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile auditbeat.template.json -Uri http://localhost:9200/_index_template/auditbeat-{{version.stack}}
 ```
 
-Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on auditbeat-{{stack-version}} index.
+Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on auditbeat-{{version.stack}} index.
 
 **deb and rpm:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/auditbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/auditbeat-{{version.stack}}
 ```
 
 **mac:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/auditbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/auditbeat-{{version.stack}}
 ```
 
 **linux:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/auditbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/auditbeat-{{version.stack}}
 ```
 
 **win:**
 
 ```sh subs=true
-PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/auditbeat-{{stack-version}}
+PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/auditbeat-{{version.stack}}
 ```
 

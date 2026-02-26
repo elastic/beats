@@ -15,15 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package docker
 
 import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 
 	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
@@ -36,8 +38,8 @@ type Client struct {
 }
 
 // NewClient builds and returns a docker Client
-func NewClient() (Client, error) {
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
+func NewClient(logger *logp.Logger) (Client, error) {
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logger)
 	return Client{cli: c}, err
 }
 
@@ -68,7 +70,7 @@ func (c Client) ContainerStart(image string, cmd []string, labels map[string]str
 // imagePull pulls an image
 func (c Client) imagePull(img string) (err error) {
 	ctx := context.Background()
-	_, _, err = c.cli.ImageInspectWithRaw(ctx, img)
+	_, err = c.cli.ImageInspect(ctx, img)
 	if err == nil {
 		// Image already available, do nothing
 		return nil
@@ -82,7 +84,7 @@ func (c Client) imagePull(img string) (err error) {
 			defer respBody.Close()
 
 			// Read all the response, to be sure that the pull has finished before returning.
-			_, err = io.Copy(ioutil.Discard, respBody)
+			_, err = io.Copy(io.Discard, respBody)
 			if err != nil {
 				return fmt.Errorf("reading response for image %s: %w", img, err)
 			}

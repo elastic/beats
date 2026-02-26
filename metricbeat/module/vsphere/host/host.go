@@ -171,7 +171,7 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 
 		triggeredAlarm, err := getTriggeredAlarm(ctx, pc, hst[i].TriggeredAlarmState)
 		if err != nil {
-			m.Logger().Errorf("Failed to retrieve triggered alarms from host %s: %w", hst[i].Name, err)
+			m.Logger().Errorf("Failed to retrieve triggered alarms from host %s: %v", hst[i].Name, err)
 		}
 
 		reporter.Event(mb.Event{

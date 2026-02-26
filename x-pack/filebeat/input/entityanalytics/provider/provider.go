@@ -11,6 +11,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var (
@@ -26,7 +27,7 @@ type Provider interface {
 }
 
 // FactoryFunc defines a factory function for creating a new Provider.
-type FactoryFunc func(logger *logp.Logger) (Provider, error)
+type FactoryFunc func(logger *logp.Logger, p *paths.Path) (Provider, error)
 
 var (
 	registry   = map[string]FactoryFunc{}

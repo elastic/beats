@@ -107,6 +107,7 @@ func (s Selector) IsConst() bool {
 func BuildSelectorFromConfig(
 	cfg *config.C,
 	settings Settings,
+	logger *logp.Logger,
 ) (Selector, error) {
 	var sel []SelectorExpr
 
@@ -127,7 +128,7 @@ func BuildSelectorFromConfig(
 		}
 
 		for _, config := range table {
-			action, err := buildSingle(config, key, settings.Case)
+			action, err := buildSingle(config, key, settings.Case, logger)
 			if err != nil {
 				return Selector{}, err
 			}
@@ -256,7 +257,7 @@ func copyTable(selCase SelectorCase, table map[string]string) map[string]string 
 	return tmp
 }
 
-func buildSingle(cfg *config.C, key string, selCase SelectorCase) (SelectorExpr, error) {
+func buildSingle(cfg *config.C, key string, selCase SelectorCase, logger *logp.Logger) (SelectorExpr, error) {
 	// TODO: check for unknown fields
 
 	// 1. extract required key-word handler
@@ -307,8 +308,7 @@ func buildSingle(cfg *config.C, key string, selCase SelectorCase) (SelectorExpr,
 			return nil, err
 		}
 
-		// TODO: use a local logger here
-		tmp, err := conditions.NewCondition(&condConfig, logp.NewLogger(""))
+		tmp, err := conditions.NewCondition(&condConfig, logger)
 		if err != nil {
 			return nil, err
 		}

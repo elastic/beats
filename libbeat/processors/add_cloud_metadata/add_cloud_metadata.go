@@ -18,6 +18,7 @@
 package add_cloud_metadata
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -44,10 +45,13 @@ func init() {
 }
 
 type addCloudMetadata struct {
-	initOnce sync.Once
-	initData *initData
-	metadata mapstr.M
-	logger   *logp.Logger
+	baseCtx       context.Context
+	baseCtxCancel context.CancelFunc
+	initOnce      sync.Once
+	initData      *initData
+	initDone      chan struct{}
+	metadata      mapstr.M
+	logger        *logp.Logger
 }
 
 type initData struct {
@@ -64,16 +68,17 @@ func New(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, fmt.Errorf("failed to unpack add_cloud_metadata config: %w", err)
 	}
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, log)
 	if err != nil {
 		return nil, fmt.Errorf("TLS configuration load: %w", err)
 	}
 
 	initProviders := selectProviders(config.Providers, cloudMetaProviders)
-	fetchers, err := setupFetchers(initProviders, c)
+	fetchers, err := setupFetchers(initProviders, c, log)
 	if err != nil {
 		return nil, err
 	}
+	ctx, cancel := context.WithCancel(context.Background())
 	p := &addCloudMetadata{
 		initData: &initData{
 			fetchers:  fetchers,
@@ -81,7 +86,10 @@ func New(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 			tlsConfig: tlsConfig,
 			overwrite: config.Overwrite,
 		},
-		logger: log.Named("add_cloud_metadata"),
+		initDone:      make(chan struct{}),
+		logger:        log.Named("add_cloud_metadata"),
+		baseCtx:       ctx,
+		baseCtxCancel: cancel,
 	}
 
 	go p.init()
@@ -94,8 +102,9 @@ func (r result) String() string {
 }
 
 func (p *addCloudMetadata) init() {
-	p.initOnce.Do(func() {
-		result := p.fetchMetadata()
+	p.initOnce.Do(func() { // fetch metadata only once
+		defer close(p.initDone) // signal that init() completed
+		result := p.fetchMetadata(p.baseCtx)
 		if result == nil {
 			p.logger.Info("add_cloud_metadata: hosting provider type not detected.")
 			return
@@ -125,7 +134,20 @@ func (p *addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *addCloudMetadata) String() string {
-	return "add_cloud_metadata=" + p.getMeta().String()
+	metadataStr := "<uninitialized>"
+	select {
+	case <-p.initDone:
+		// init() completed
+		metadataStr = p.getMeta().String()
+	default:
+	}
+	return "add_cloud_metadata=" + metadataStr
+}
+
+func (p *addCloudMetadata) Close() error {
+	p.baseCtxCancel()
+	p.initOnce.Do(func() {})
+	return nil
 }
 
 func (p *addCloudMetadata) addMeta(event *beat.Event, meta mapstr.M) error {

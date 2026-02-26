@@ -2,6 +2,9 @@
 navigation_title: "convert"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/convert.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Convert [convert]

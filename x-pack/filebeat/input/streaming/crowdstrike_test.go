@@ -7,16 +7,17 @@ package streaming
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"flag"
 	"net/url"
 	"os"
 	"testing"
 	"time"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
@@ -89,20 +90,22 @@ func TestCrowdstrikeFalconHose(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error validating config: %v", err)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	time.AfterFunc(*timeout, func() {
+		cancel()
+	})
 	var cursor map[string]any
 	if *offset >= 0 {
 		cursor = map[string]any{"offset": *offset}
 	}
-	s, err := NewFalconHoseFollower(ctx, "crowdstrike_testing", cfg, cursor, &testPublisher{logger}, nil, logger, time.Now)
+	env := v2.Context{ID: "crowdstrike_testing",
+		MetricsRegistry: monitoring.NewRegistry()}
+	s, err := NewFalconHoseFollower(ctx, env, cfg, cursor, &testPublisher{logger}, nil, logger, time.Now)
 	if err != nil {
 		t.Fatalf("unexpected error constructing follower: %v", err)
 	}
 	err = s.FollowStream(ctx)
-	if errors.Is(err, context.DeadlineExceeded) {
-		err = nil
-	}
 	if err != nil {
 		t.Errorf("unexpected error following stream: %v", err)
 	}

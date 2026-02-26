@@ -2,6 +2,9 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-overview.html
   - https://www.elastic.co/guide/en/beats/metricbeat/current/index.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Metricbeat

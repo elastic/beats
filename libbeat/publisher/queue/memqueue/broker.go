@@ -66,7 +66,8 @@ type broker struct {
 	getChan chan getRequest
 
 	// Close triggers a queue close by sending to closeChan.
-	closeChan chan struct{}
+	// The value sent over this channel indicates if this is a force close.
+	closeChan chan bool
 
 	///////////////////////////
 	// internal channels
@@ -207,6 +208,8 @@ func newQueue(
 
 	if logger == nil {
 		logger = logp.NewLogger("memqueue")
+	} else {
+		logger = logger.Named("memqueue")
 	}
 
 	b := &broker{
@@ -220,7 +223,7 @@ func newQueue(
 		// broker API channels
 		pushChan:  make(chan pushRequest, chanSize),
 		getChan:   make(chan getRequest),
-		closeChan: make(chan struct{}),
+		closeChan: make(chan bool),
 
 		// internal runLoop and ackLoop channels
 		consumedChan: make(chan batchList),
@@ -237,8 +240,12 @@ func newQueue(
 	return b
 }
 
-func (b *broker) Close() error {
-	b.closeChan <- struct{}{}
+func (b *broker) Close(force bool) error {
+	select {
+	case b.closeChan <- force:
+	case <-b.ctx.Done():
+	}
+
 	return nil
 }
 

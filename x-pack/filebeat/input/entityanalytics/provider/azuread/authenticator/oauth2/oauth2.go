@@ -138,7 +138,7 @@ func New(cfg *config.C, logger *logp.Logger) (authenticator.Authenticator, error
 		return nil, fmt.Errorf("unable to unpack oauth2 Authenticator config: %w", err)
 	}
 
-	client, err := c.Transport.Client()
+	client, err := c.Transport.Client(httpcommon.WithLogger(logger))
 	if err != nil {
 		return nil, fmt.Errorf("unable to create HTTP client: %w", err)
 	}

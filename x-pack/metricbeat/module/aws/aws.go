@@ -135,7 +135,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		config.AWSConfig.FIPSEnabled = true
 	}
 
-	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
+	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig, base.Logger())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get aws credentials, please check AWS credential in config: %w", err)
 	}

@@ -49,7 +49,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The linux conntrack metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The linux conntrack metricset is beta."))
 
 	sys, ok := base.Module().(resolve.Resolver)
 	if !ok {
@@ -79,8 +79,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	summedEvents := procfs.ConntrackStatEntry{}
-	for _, conn := range conntrackStats {
-		summedEvents.Entries += conn.Entries
+	for i, conn := range conntrackStats {
+		// Entries represents the total number of connections in the conntrack table,
+		// but the value is reported once per CPU. Only add it from the first entry.
+		if i == 0 {
+			summedEvents.Entries = conn.Entries
+		}
 		summedEvents.Found += conn.Found
 		summedEvents.Invalid += conn.Invalid
 		summedEvents.Ignore += conn.Ignore

@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	libversion "github.com/elastic/elastic-agent-libs/version"
 )
@@ -113,7 +114,7 @@ func createTestTemplate(t *testing.T, beatVersion, esVersion string, config Temp
 	beatVersion = getVersion(beatVersion)
 	esVersion = getVersion(esVersion)
 	ver := libversion.MustNew(esVersion)
-	template, err := New(false, beatVersion, "testbeat", false, *ver, config, false)
+	template, err := New(false, beatVersion, "testbeat", false, *ver, config, false, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("Failed to create the template: %+v", err)
 	}

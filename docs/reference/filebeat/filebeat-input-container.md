@@ -2,6 +2,9 @@
 navigation_title: "Container"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-container.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Container input [filebeat-input-container]

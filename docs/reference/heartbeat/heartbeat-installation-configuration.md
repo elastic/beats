@@ -2,6 +2,9 @@
 navigation_title: "Quick start"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/heartbeat-installation-configuration.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Heartbeat quick start: installation and configuration [heartbeat-installation-configuration]
@@ -22,17 +25,23 @@ This guide describes how to get started quickly collecting uptime data about you
 
 You need {{es}} for storing and searching your data, and {{kib}} for visualizing and managing it.
 
-:::::::{tab-set}
+:::::::{applies-switch}
 :group: deployment
 
-::::::{tab-item} {{ech}}
+::::::{applies-item} ess: ga
 :sync: hosted
 To get started quickly, spin up an [{{ech}}](https://www.elastic.co/cloud?page=docs&placement=docs-body) deployment. {{ech}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
 ::::::
 
-::::::{tab-item} Self-managed
+::::::{applies-item} self: ga
 :sync: self
 To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
+::::::
+
+::::::{applies-item} serverless: ga
+:sync: serverless
+::::{include} /reference/_snippets/serverless-before-you-begin.md
+::::
 ::::::
 
 :::::::
@@ -49,38 +58,38 @@ To download and install Heartbeat, use the commands that work with your system:
 ::::::{tab-item} DEB
 :sync: deb
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-amd64.deb
-sudo dpkg -i heartbeat-{{stack-version}}-amd64.deb
+curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{version.stack}}-amd64.deb
+sudo dpkg -i heartbeat-{{version.stack}}-amd64.deb
 ```
 ::::::
 
 ::::::{tab-item} RPM
 :sync: rpm
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-x86_64.rpm
-sudo rpm -vi heartbeat-{{stack-version}}-x86_64.rpm
+curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{version.stack}}-x86_64.rpm
+sudo rpm -vi heartbeat-{{version.stack}}-x86_64.rpm
 ```
 ::::::
 
 ::::::{tab-item} MacOS
 :sync: macos
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-darwin-x86_64.tar.gz
-tar xzvf heartbeat-{{stack-version}}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{version.stack}}-darwin-x86_64.tar.gz
+tar xzvf heartbeat-{{version.stack}}-darwin-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Linux
 :sync: linux
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-linux-x86_64.tar.gz
-tar xzvf heartbeat-{{stack-version}}-linux-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{version.stack}}-linux-x86_64.tar.gz
+tar xzvf heartbeat-{{version.stack}}-linux-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Windows
 :sync: windows
-1. Download the [Heartbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-windows-x86_64.zip).
+1. Download the [Heartbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{version.stack}}-windows-x86_64.zip).
 
 2. Extract the contents of the zip file into `C:\Program Files`.
 
@@ -98,6 +107,20 @@ tar xzvf heartbeat-{{stack-version}}-linux-x86_64.tar.gz
 :::{note}
 If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-heartbeat.ps1`.
 :::
+
+:::{important}
+:applies_to: stack: ga 9.0.6+!
+
+The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
+because the latter has stricter permissions. The home path (base for
+state and logs) is now `C:\Program Files\Heartbeat-Data`.
+
+The install script (`install-service-heartbeat.ps1`) will check whether
+`C:\ProgramData\Heartbeat` exits and move it to `C:\Program Files\Heartbeat-Data`.
+For more details on the installation script refer to: [install script](/reference/heartbeat/heartbeat-installation-script.md).
+
+:::
+
 ::::::
 :::::::
 
@@ -117,10 +140,10 @@ Connections to {{es}} and {{kib}} are required to set up Heartbeat.
 
 Set the connection information in `heartbeat.yml`. To locate this configuration file, see [Directory layout](/reference/heartbeat/directory-layout.md).
 
-:::::::{tab-set}
+:::::::{applies-switch}
 :group: deployment
 
-::::::{tab-item} {{ech}}
+::::::{applies-item} ess: ga
 :sync: hosted
 Specify the [cloud.id](/reference/heartbeat/configure-cloud-id.md) of your {{ech}} deployment, and set [cloud.auth](/reference/heartbeat/configure-cloud-id.md) to a user who is authorized to set up Heartbeat. For example:
 
@@ -132,7 +155,7 @@ cloud.auth: "heartbeat_setup:YOUR_PASSWORD" <1>
 1. This examples shows a hard-coded password, but you should store sensitive values in the [secrets keystore](/reference/heartbeat/keystore.md).
 ::::::
 
-::::::{tab-item} Self-managed
+::::::{applies-item} self: ga
 :sync: self
 1. Set the host and port where Heartbeat can find the {{es}} installation, and set the username and password of a user who is authorized to set up Heartbeat. For example:
 
@@ -161,6 +184,12 @@ cloud.auth: "heartbeat_setup:YOUR_PASSWORD" <1>
     1. The hostname and port of the machine where {{kib}} is running, for example, `mykibanahost:5601`. If you specify a path after the port number, include the scheme and port: `http://mykibanahost:5601/path`.
     2. The `username` and `password` settings for {{kib}} are optional. If you don’t specify credentials for {{kib}}, Heartbeat uses the `username` and `password` specified for the {{es}} output.
     3. To use the pre-built {{kib}} dashboards, this user must be authorized to view dashboards or have the `kibana_admin` [built-in role](elasticsearch://reference/elasticsearch/roles.md).
+::::::
+
+::::::{applies-item} serverless: ga
+:sync: serverless
+::::{include} /reference/_snippets/serverless-connect.md
+::::
 ::::::
 
 :::::::
@@ -363,8 +392,11 @@ PS C:\Program Files\heartbeat> Start-Service heartbeat
 ::::::
 :::::::
 
-By default, Windows log files are stored under `C:\Program Files\Heartbeat-Data\logs`.
-For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\heartbeat\Logs`.
+By default Windows log files are stored in `C:\Program Files\Heartbeat-Data\logs`.
+
+:::{note}
+In versions before 9.0.6, the default location for Windows log files was `C:\ProgramData\heartbeat\logs`.
+:::
 
 Heartbeat is now ready to check the status of your services and send events to your defined output.
 
@@ -378,16 +410,21 @@ To open the dashboards:
 
 1. Launch {{kib}}:
 
-    :::::::{tab-set}
+    :::::::{applies-switch}
     :group: deployment
-    ::::::{tab-item} {{ech}}
+    ::::::{applies-item} ess: ga
     :sync: hosted
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
     ::::::
-    ::::::{tab-item} Self-managed
+    ::::::{applies-item} self: ga
     :sync: self
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
+    ::::::
+    ::::::{applies-item} serverless: ga
+    :sync: serverless
+    ::::{include} /reference/_snippets/serverless-view-data.md
+    ::::
     ::::::
     :::::::
 

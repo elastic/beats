@@ -2,6 +2,9 @@
 navigation_title: "Project paths"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/configuration-path.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Configure project paths [configuration-path]

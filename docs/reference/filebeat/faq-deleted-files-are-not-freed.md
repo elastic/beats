@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/faq-deleted-files-are-not-freed.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Filebeat keeps open file handlers of deleted files for a long time [faq-deleted-files-are-not-freed]

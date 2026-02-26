@@ -1,0 +1,22 @@
+{{.CopyrightHeader}}
+{{.CodeGeneratedNotice}}// This file contains shared type definitions used across multiple tables.
+
+package {{.PackageName}}
+
+{{- if .NeedsTimeImport}}
+import "time"
+
+{{- end}}
+{{- range .Types }}
+{{- if .Description}}
+// {{.Name}} {{.Description}}
+{{- else}}
+// {{.Name}} is a shared type used in the Result struct.
+{{- end}}
+type {{.Name}} struct {
+{{- range .Fields }}
+	{{.Name}} {{.Type}} {{.Tag}} // {{.Description}}
+{{- end }}
+}
+
+{{- end }}

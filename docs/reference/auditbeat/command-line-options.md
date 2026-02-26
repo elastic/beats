@@ -2,6 +2,9 @@
 navigation_title: "Command reference"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/command-line-options.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Auditbeat command reference [command-line-options]
@@ -91,7 +94,7 @@ Also see [Global flags](#global-flags).
 
 ```sh subs=true
 auditbeat export config
-auditbeat export template --es.version {{stack-version}}
+auditbeat export template --es.version {{version.stack}}
 auditbeat export dashboard --id="a7b35890-8baa-11e8-9676-ef67484126fb" > dashboard.json
 ```
 

@@ -17,6 +17,8 @@ import (
 	meraki "github.com/meraki/dashboard-api-go/v3/sdk"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestGetDeviceChannelUtilization(t *testing.T) {
@@ -40,16 +42,19 @@ func TestGetDeviceChannelUtilization(t *testing.T) {
 				},
 			},
 			validate: func(t *testing.T, devices map[Serial]*Device) {
-				assert.NotNil(t, devices["ABC123"].bandUtilization)
+				device, ok := devices["ABC123"]
+				require.True(t, ok, "device ABC123 should exist in the map")
+				require.NotNil(t, device, "device ABC123 should not be nil")
+				assert.NotNil(t, device.bandUtilization)
 
-				band1, ok := devices["ABC123"].bandUtilization["2.4"]
+				band1, ok := device.bandUtilization["2.4"]
 				assert.NotNil(t, band1)
 				assert.True(t, ok)
 				assert.Equal(t, 45.0, *band1.Wifi.Percentage)
 				assert.Equal(t, 10.0, *band1.NonWifi.Percentage)
 				assert.Equal(t, 55.0, *band1.Total.Percentage)
 
-				band2, ok := devices["ABC123"].bandUtilization["5"]
+				band2, ok := device.bandUtilization["5"]
 				assert.NotNil(t, band2)
 				assert.True(t, ok)
 				assert.Equal(t, 10.0, *band2.Wifi.Percentage)
@@ -169,4 +174,100 @@ func (m *GenericErrorMockNetworkHealthService) GetOrganizationWirelessDevicesCha
 		Body: io.NopCloser(bytes.NewBuffer(bodyContent)),
 	}
 	return r, fmt.Errorf("mock API error")
+}
+
+func TestGetDevices_Pagination(t *testing.T) {
+	logger := logp.NewLogger("test")
+
+	tests := []struct {
+		name            string
+		client          OrganizationsClient
+		expectedDevices int
+		expectedCalls   int
+		wantErr         bool
+	}{
+		{
+			name:            "single page",
+			client:          newMockOrganizationsClient(1, 2), // 1 page, 2 devices
+			expectedDevices: 2,
+			expectedCalls:   1,
+		},
+		{
+			name:            "multiple pages",
+			client:          newMockOrganizationsClient(3, 2), // 3 pages, 2 devices per page
+			expectedDevices: 6,
+			expectedCalls:   3,
+		},
+		{
+			name:            "max pages limit",
+			client:          newMockOrganizationsClient(101, 1), // 101 pages (exceeds MAX_PAGES)
+			expectedDevices: 100,                                // Should stop at MAX_PAGES
+			expectedCalls:   100,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			devices, err := getDevices(tt.client, "org123", logger)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			assert.Equal(t, tt.expectedDevices, len(devices))
+
+			// Verify the mock was called the expected number of times
+			if mock, ok := tt.client.(*mockOrganizationsClient); ok {
+				assert.Equal(t, tt.expectedCalls, mock.callCount)
+			}
+		})
+	}
+}
+
+// Mock implementation for pagination testing
+type mockOrganizationsClient struct {
+	totalPages     int
+	devicesPerPage int
+	callCount      int
+}
+
+func newMockOrganizationsClient(totalPages, devicesPerPage int) *mockOrganizationsClient {
+	return &mockOrganizationsClient{
+		totalPages:     totalPages,
+		devicesPerPage: devicesPerPage,
+	}
+}
+
+func (m *mockOrganizationsClient) GetOrganizationDevices(organizationID string, params *meraki.GetOrganizationDevicesQueryParams) (*meraki.ResponseOrganizationsGetOrganizationDevices, *resty.Response, error) {
+	m.callCount++
+
+	devices := make(meraki.ResponseOrganizationsGetOrganizationDevices, 0, m.devicesPerPage)
+	for i := 0; i < m.devicesPerPage; i++ {
+		serial := fmt.Sprintf("SERIAL-%d-%d", m.callCount, i)
+		devices = append(devices, meraki.ResponseItemOrganizationsGetOrganizationDevices{
+			Serial: serial,
+			Name:   fmt.Sprintf("Device %s", serial),
+		})
+	}
+
+	resp := &resty.Response{}
+	bodyBytes, _ := json.Marshal(devices)
+	resp.SetBody(bodyBytes)
+
+	headers := http.Header{}
+	if m.callCount < m.totalPages {
+		nextSerial := fmt.Sprintf("SERIAL-%d-%d", m.callCount, m.devicesPerPage-1)
+		linkHeader := fmt.Sprintf(`<https://api.meraki.com/api/v1/organizations/%s/devices?startingAfter=%s>; rel="next"`, organizationID, nextSerial)
+		headers.Set("Link", linkHeader)
+	}
+
+	resp.RawResponse = &http.Response{
+		StatusCode: 200,
+		Body:       io.NopCloser(bytes.NewBuffer(bodyBytes)),
+		Header:     headers,
+	}
+
+	return &devices, resp, nil
 }

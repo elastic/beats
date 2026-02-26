@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package compose
 
 import (
@@ -23,6 +25,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net"
 	"os"
 	"os/exec"
@@ -53,14 +56,15 @@ type wrapperDriver struct {
 	Environment []string
 
 	client *client.Client
+	logger *logp.Logger
 }
 
-func newWrapperDriver() (*wrapperDriver, error) {
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
+func newWrapperDriver(logger *logp.Logger) (*wrapperDriver, error) {
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logger)
 	if err != nil {
 		return nil, err
 	}
-	return &wrapperDriver{client: c}, nil
+	return &wrapperDriver{client: c, logger: logger}, nil
 }
 
 type wrapperContainer struct {
@@ -105,6 +109,7 @@ func (c *wrapperContainer) Old() bool {
 // running from the hoist network if the docker daemon runs natively.
 func (c *wrapperContainer) privateHost(port int) string {
 	var ip string
+	var shortPort uint16
 	for _, net := range c.info.NetworkSettings.Networks {
 		if len(net.IPAddress) > 0 {
 			ip = net.IPAddress
@@ -115,8 +120,13 @@ func (c *wrapperContainer) privateHost(port int) string {
 		return ""
 	}
 
+	if port >= 0 && port <= math.MaxUint16 {
+		shortPort = uint16(port)
+	} else {
+		return ""
+	}
 	for _, info := range c.info.Ports {
-		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == uint16(port)) {
+		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == shortPort) {
 			return net.JoinHostPort(ip, strconv.Itoa(int(info.PrivatePort)))
 		}
 	}
@@ -126,8 +136,15 @@ func (c *wrapperContainer) privateHost(port int) string {
 // exposedHost returns the exposed address in the host, can be used when the
 // test is run from the host network. Recommended when using docker machines.
 func (c *wrapperContainer) exposedHost(port int) string {
+	var shortPort uint16
+
+	if port >= 0 && port <= math.MaxUint16 {
+		shortPort = uint16(port)
+	} else {
+		return ""
+	}
 	for _, info := range c.info.Ports {
-		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == uint16(port)) {
+		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == shortPort) {
 			return net.JoinHostPort("localhost", strconv.Itoa(int(info.PublicPort)))
 		}
 	}
@@ -160,14 +177,14 @@ func (d *wrapperDriver) Close() error {
 }
 
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
-	args := make([]string, 0, 4+len(d.Files)+len(arg)) // preallocate as much as possible
-	args = append(args, "--ansi", "never", "--project-name", d.Name)
+	args := make([]string, 0, 5+len(d.Files)+len(arg)) // preallocate as much as possible
+	args = append(args, "compose", "--ansi", "never", "--project-name", d.Name)
 	for _, f := range d.Files {
 		args = append(args, "--file", f)
 	}
 	args = append(args, command)
 	args = append(args, arg...)
-	cmd := exec.CommandContext(ctx, "docker-compose", args...)
+	cmd := exec.CommandContext(ctx, "docker", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if len(d.Environment) > 0 {
@@ -193,13 +210,13 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		args = append(args, service)
 	}
 
-	// Try to pull the image before building it
-	var stderr bytes.Buffer
-	pull := d.cmd(ctx, "pull", "--ignore-pull-failures", service)
+	// Try to pull the image before building it.
+	// Pull failures are not fatal because "up" will build images if needed.
+	pull := d.cmd(ctx, "pull", service)
 	pull.Stdout = nil
-	pull.Stderr = &stderr
+	pull.Stderr = nil
 	if err := pull.Run(); err != nil {
-		return fmt.Errorf("failed to pull images using docker-compose: %s: %w", stderr.String(), err)
+		d.logger.Warnf("pull failed for %s (will build if needed): %v", service, err)
 	}
 
 	err := d.cmd(ctx, "up", args...).Run()
@@ -392,7 +409,7 @@ func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
 		if container.Running() && container.Old() {
 			err = d.client.ContainerRemove(ctx, container.info.ID, rmOpts)
 			if err != nil {
-				logp.Err("container remove: %v", err)
+				d.logger.Errorf("container remove: %v", err)
 			}
 		}
 	}

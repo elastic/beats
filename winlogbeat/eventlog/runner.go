@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
@@ -39,6 +40,7 @@ type Publisher interface {
 func Run(
 	reporter status.StatusReporter,
 	ctx context.Context,
+	metricsRegistry *monitoring.Registry,
 	api EventLog,
 	evtCheckpoint checkpoint.EventLogState,
 	publisher Publisher,
@@ -47,42 +49,72 @@ func Run(
 	reporter.UpdateStatus(status.Starting, fmt.Sprintf("Starting to read from %s", api.Channel()))
 	// setup closing the API if either the run function is signaled asynchronously
 	// to shut down or when returning after io.EOF
-	cancelCtx, cancelFn := ctxtool.WithFunc(ctx, func() {
-		if err := api.Close(); err != nil {
-			log.Errorw("error while closing Windows Event Log access", "error", err)
-		}
-	})
+	cancelCtx, cancelFn := ctxtool.WithFunc(
+		ctx,
+		func() {
+			if err := api.Close(); err != nil {
+				log.Errorw("error while closing Windows Event Log access", "error", err)
+			}
+		})
 	defer cancelFn()
 
+	openChannelNotFoundErrDetected := false
+	logChannelNotFoundOpenRetry := func(err error) {
+		if !openChannelNotFoundErrDetected {
+			log.Warnw("encountered channel not found error when opening Windows Event Log, retrying", "error", err)
+		} else {
+			log.Debugw("encountered channel not found error when opening Windows Event Log, retrying", "error", err)
+		}
+		openChannelNotFoundErrDetected = true
+	}
+
 	openErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
+		if mustIgnoreError(err, api) {
+			if isChannelNotFound(err) {
+				logChannelNotFoundOpenRetry(err)
+			} else {
+				log.Warnw("ignoring open error", "error", err, "channel", api.Channel())
+			}
+			return true
+		}
 		if IsRecoverable(err, api.IsFile()) {
 			reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to open %s: %v", api.Channel(), err))
-			log.Errorw("encountered recoverable error when opening Windows Event Log", "error", err)
+			if isChannelNotFound(err) {
+				logChannelNotFoundOpenRetry(err)
+			} else {
+				log.Errorw("encountered recoverable error when opening Windows Event Log", "error", err)
+			}
 			return true
 		}
 		return false
 	})
 
 	readErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
+		var mustRetry bool
+		if mustIgnoreError(err, api) {
+			log.Warnw("ignoring read error", "error", err, "channel", api.Channel())
+			mustRetry = true
+		}
 		if IsRecoverable(err, api.IsFile()) {
 			reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to read from %s: %v", api.Channel(), err))
 			log.Errorw("encountered recoverable error when reading from Windows Event Log", "error", err)
+			mustRetry = true
+		}
+		if mustRetry {
 			if resetErr := api.Reset(); resetErr != nil {
 				log.Errorw("error resetting Windows Event Log handle", "error", resetErr)
 			}
-			return true
 		}
-		return false
+		return mustRetry
 	})
 
 runLoop:
 	for cancelCtx.Err() == nil {
-		openErr := api.Open(evtCheckpoint)
+		openErr := api.Open(evtCheckpoint, metricsRegistry)
 		if openErr != nil {
 			if openErrHandler.backoff(cancelCtx, openErr) {
 				continue runLoop
 			}
-			//nolint:nilerr // only log error if we are not shutting down
 			if cancelCtx.Err() != nil {
 				break runLoop
 			}
@@ -91,22 +123,31 @@ runLoop:
 		}
 
 		log.Debug("windows event log opened successfully")
+		openChannelNotFoundErrDetected = false
 
 		// read loop
 		for cancelCtx.Err() == nil {
 			reporter.UpdateStatus(status.Running, fmt.Sprintf("Reading from %s", api.Channel()))
 			records, readErr := api.Read()
+
+			// io.EOF signals a clean end of stream (e.g. no_more_events: stop).
+			// Publish any records returned in the same batch before exiting.
+			if errors.Is(readErr, io.EOF) {
+				if len(records) > 0 {
+					if err := publisher.Publish(records); err != nil {
+						reporter.UpdateStatus(status.Failed, fmt.Sprintf("Publisher error: %v", err))
+						return err
+					}
+				}
+				log.Debugw("end of Winlog event stream reached", "error", readErr)
+				break runLoop
+			}
+
 			if readErr != nil {
 				if readErrHandler.backoff(cancelCtx, readErr) {
 					continue runLoop
 				}
 
-				if errors.Is(readErr, io.EOF) {
-					log.Debugw("end of Winlog event stream reached", "error", readErr)
-					break runLoop
-				}
-
-				//nolint:nilerr // only log error if we are not shutting down
 				if cancelCtx.Err() != nil {
 					break runLoop
 				}

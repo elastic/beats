@@ -2,6 +2,9 @@
 navigation_title: "add_network_direction"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/add-network-direction.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Add network direction [add-network-direction]

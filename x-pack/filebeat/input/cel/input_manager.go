@@ -34,12 +34,26 @@ func NewInputManager(log *logp.Logger, store statestore.States) InputManager {
 	}
 }
 
-func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
+func cursorConfigure(cfg *conf.C, logger *logp.Logger) ([]inputcursor.Source, inputcursor.Input, error) {
 	src := &source{cfg: defaultConfig()}
 	if err := cfg.Unpack(&src.cfg); err != nil {
 		return nil, nil, err
 	}
+	src.cfg.DataStream = dataStreamName(cfg)
+	src.cfg.checkUnsupportedParams(logger)
 	return []inputcursor.Source{src}, input{}, nil
+}
+
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
+	if c.RecordCoverage {
+		logger.Named("cel").Warn("execution coverage enabled: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-record-coverage")
+	}
+	if c.Redact == nil {
+		logger.Named("cel").Warn("missing recommended 'redact' configuration: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-state-redact")
+	}
 }
 
 type source struct{ cfg config }
@@ -57,5 +71,19 @@ func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
+	config.DataStream = dataStreamName(cfg)
 	return m.cursor.Create(cfg)
+}
+
+func dataStreamName(cfg *conf.C) string {
+	var probe struct {
+		DataStream struct {
+			Dataset string `config:"dataset"`
+		} `config:"data_stream"`
+	}
+	err := cfg.Unpack(&probe)
+	if err != nil {
+		return ""
+	}
+	return probe.DataStream.Dataset
 }

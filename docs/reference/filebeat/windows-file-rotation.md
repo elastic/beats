@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/windows-file-rotation.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Open file handlers cause issues with Windows file rotation [windows-file-rotation]

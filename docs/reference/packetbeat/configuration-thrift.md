@@ -2,6 +2,9 @@
 navigation_title: "Thrift"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/configuration-thrift.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Capture Thrift traffic [configuration-thrift]

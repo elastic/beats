@@ -30,6 +30,7 @@ import (
 	"github.com/miekg/dns"
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -56,6 +57,7 @@ type miekgResolver struct {
 	registry     *monitoring.Registry
 	nsStatsMutex sync.RWMutex
 	nsStats      map[string]*nameserverStats
+	logger       *logp.Logger
 }
 
 type nameserverStats struct {
@@ -66,7 +68,7 @@ type nameserverStats struct {
 
 // newMiekgResolver returns a new miekgResolver. It returns an error if no
 // nameserver are given and none can be read from /etc/resolv.conf.
-func newMiekgResolver(reg *monitoring.Registry, timeout time.Duration, transport string, servers ...string) (*miekgResolver, error) {
+func newMiekgResolver(reg *monitoring.Registry, timeout time.Duration, transport string, logger *logp.Logger, servers ...string) (*miekgResolver, error) {
 	// Use /etc/resolv.conf if no nameservers are given. (Won't work for Windows).
 	if len(servers) == 0 {
 		config, err := dns.ClientConfigFromFile(etcResolvConf)
@@ -118,6 +120,7 @@ func newMiekgResolver(reg *monitoring.Registry, timeout time.Duration, transport
 		servers:  servers,
 		registry: reg,
 		nsStats:  map[string]*nameserverStats{},
+		logger:   logger,
 	}, nil
 }
 
@@ -241,7 +244,7 @@ func (res *miekgResolver) getOrCreateNameserverStats(ns string) *nameserverStats
 	}
 
 	// Create stats for the nameserver.
-	reg := res.registry.NewRegistry(strings.Replace(ns, ".", "_", -1))
+	reg := res.registry.GetOrCreateRegistry(strings.Replace(ns, ".", "_", -1))
 	stats = &nameserverStats{
 		success:         monitoring.NewInt(reg, "success"),
 		failure:         monitoring.NewInt(reg, "failure"),
@@ -249,7 +252,7 @@ func (res *miekgResolver) getOrCreateNameserverStats(ns string) *nameserverStats
 	}
 
 	//nolint:errcheck // Register should never fail because this is a new empty registry.
-	adapter.NewGoMetrics(reg, "request_duration", adapter.Accept).
+	adapter.NewGoMetrics(reg, "request_duration", res.logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(stats.requestDuration))
 	res.nsStats[ns] = stats
 

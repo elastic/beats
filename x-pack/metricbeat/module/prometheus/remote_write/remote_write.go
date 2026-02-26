@@ -11,8 +11,16 @@ import (
 )
 
 func init() {
+	// Create base config with size limits from x-pack defaults
+	baseConfig := rw.Config{
+		Host:                   "localhost",
+		Port:                   9201,
+		MaxCompressedBodyBytes: defaultConfig.MaxCompressedBodyBytes,
+		MaxDecodedBodyBytes:    defaultConfig.MaxDecodedBodyBytes,
+	}
+
 	mb.Registry.MustAddMetricSet("prometheus", "remote_write",
-		rw.MetricSetBuilder(remoteWriteEventsGeneratorFactory),
+		rw.MetricSetBuilderWithConfig(remoteWriteEventsGeneratorFactory, baseConfig),
 		mb.WithHostParser(parse.EmptyHostParser),
 
 		// must replace ensures that we are replacing the oss implementation with this one

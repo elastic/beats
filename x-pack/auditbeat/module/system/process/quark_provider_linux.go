@@ -32,7 +32,7 @@ var quarkMetrics = struct {
 }{}
 
 func init() {
-	reg := monitoring.Default.NewRegistry("process@quark")
+	reg := monitoring.Default.GetOrCreateRegistry("process@quark")
 	quarkMetrics.insertions = monitoring.NewUint(reg, "insertions")
 	quarkMetrics.removals = monitoring.NewUint(reg, "removals")
 	quarkMetrics.aggregations = monitoring.NewUint(reg, "aggregations")

@@ -11,6 +11,7 @@ You must configure queries for the Windows performance counters that you wish to
   period: 10s
   perfmon.ignore_non_existent_counters: true
   perfmon.group_measurements_by_instance: true
+  perfmon.extract_object_from_counter: true
   perfmon.queries:
   - object: "Process"
     instance: ["svchost*", "conhost*"]
@@ -39,6 +40,13 @@ You must configure queries for the Windows performance counters that you wish to
 
 **`refresh_wildcard_counters`**
 :   A boolean option to refresh the counter list at each fetch. By default, the counter list will be retrieved at the starting time, to refresh the list at each fetch, users will have to enable this setting.
+
+**`match_by_parent_instance`**
+:   A boolean option that causes all instances of the same parent to have the same instance value. In the previous example, this causes metrics for `svchost`, `svchost#1`, and so on to have an `instance`
+value of `svchost`. If set to `false` they keep the original values (`svchost`, `svchost#1`, and so on). Defaults to `true`.
+
+**`extract_object_from_counter`**
+:   A boolean flag that enables extracting the object name directly from the counter path. This is useful when the object name includes a wildcard and you want the resulting event to contain the resolved (expanded) object name. It is unset by default. Set it to `true` if you want to extract object names from the counter path.
 
 
 ### Query Configuration [_query_configuration]

@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -46,6 +47,8 @@ var (
 	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true") //nolint:staticcheck //false positive (Elasticsearch should be capitalized)
 
 	errTooMany = errors.New("Elasticsearch returned error 429 Too Many Requests, throttling connection") //nolint:staticcheck //false positive (Elasticsearch should be capitalized)
+
+	HeaderEventCount = "X-Elastic-Event-Count"
 )
 
 // Client is an elasticsearch client.
@@ -84,12 +87,13 @@ type clientSettings struct {
 }
 
 type bulkResultStats struct {
-	acked        int // number of events ACKed by Elasticsearch
-	duplicates   int // number of events failed with `create` due to ID already being indexed
-	fails        int // number of events with retryable failures.
-	nonIndexable int // number of events with permanent failures.
-	deadLetter   int // number of failed events ingested to the dead letter index.
-	tooMany      int // number of events receiving HTTP 429 Too Many Requests
+	acked            int // number of events ACKed by Elasticsearch
+	duplicates       int // number of events failed with `create` due to ID already being indexed
+	fails            int // number of events with retryable failures.
+	nonIndexable     int // number of events with permanent failures.
+	deadLetter       int // number of failed events ingested to the dead letter index.
+	tooMany          int // number of events receiving HTTP 429 Too Many Requests
+	failureStoreUsed int // number of events sent to the Failure store
 }
 
 type bulkResult struct {
@@ -117,7 +121,7 @@ const (
 // Flags passed with the Bulk API request: we filter the response to include
 // only the fields we need for checking request/item state.
 var bulkRequestParams = map[string]string{
-	"filter_path": "errors,items.*.error,items.*.status",
+	"filter_path": "errors,items.*.error,items.*.status,items.*.failure_store",
 }
 
 // NewClient instantiates a new client.
@@ -141,7 +145,7 @@ func NewClient(
 		defer globalCallbackRegistry.mutex.Unlock()
 
 		for _, callback := range globalCallbackRegistry.callbacks {
-			err := callback(conn)
+			err := callback(conn, logger)
 			if err != nil {
 				return err
 			}
@@ -152,7 +156,7 @@ func NewClient(
 			defer onConnect.mutex.Unlock()
 
 			for _, callback := range onConnect.callbacks {
-				err := callback(conn)
+				err := callback(conn, logger)
 				if err != nil {
 					return err
 				}
@@ -304,8 +308,10 @@ func (client *Client) doBulkRequest(
 	// If we encoded any events, send the network request.
 	if len(result.events) > 0 {
 		begin := time.Now()
+		h := make(http.Header)
+		h.Set(HeaderEventCount, strconv.Itoa(len(result.events)))
 		result.status, result.response, result.connErr =
-			client.conn.Bulk(ctx, "", "", bulkRequestParams, bulkItems)
+			client.conn.Bulk(ctx, "", "", h, bulkRequestParams, bulkItems)
 		if result.connErr == nil {
 			duration := time.Since(begin)
 			client.observer.ReportLatency(duration)
@@ -461,7 +467,7 @@ func (client *Client) bulkCollectPublishFails(bulkResult bulkResult) ([]publishe
 	eventsToRetry := events[:0]
 	stats := bulkResultStats{}
 	for i := 0; i < count; i++ {
-		itemStatus, itemMessage, err := bulkReadItemStatus(client.log, reader)
+		itemStatus, itemMessage, failureStoreUsed, err := bulkReadItemStatus(client.log, reader)
 		if err != nil {
 			// The response json is invalid, mark the remaining events for retry.
 			stats.fails += count - i
@@ -472,6 +478,10 @@ func (client *Client) bulkCollectPublishFails(bulkResult bulkResult) ([]publishe
 		if client.applyItemStatus(events[i], itemStatus, itemMessage, &stats) {
 			eventsToRetry = append(eventsToRetry, events[i])
 			client.log.Debugf("Bulk item insert failed (i=%v, status=%v): %s", i, itemStatus, itemMessage)
+		}
+
+		if failureStoreUsed {
+			stats.failureStoreUsed += 1
 		}
 	}
 
@@ -565,6 +575,7 @@ func (stats bulkResultStats) reportToObserver(ob outputs.Observer) {
 	ob.PermanentErrors(stats.nonIndexable)
 	ob.DuplicateEvents(stats.duplicates)
 	ob.DeadLetterEvents(stats.deadLetter)
+	ob.FailureStoreEvents(stats.failureStoreUsed)
 
 	ob.ErrTooMany(stats.tooMany)
 }

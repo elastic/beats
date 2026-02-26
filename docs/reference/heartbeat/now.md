@@ -2,6 +2,9 @@
 navigation_title: "now"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/now.html
+applies_to:
+  stack: ga 9.1.0
+  serverless: ga
 ---
 
 # Now [now]

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/metricbeat-developer-guide.html
+applies_to:
+  stack: ga
 ---
 
 # Extending Metricbeat [metricbeat-developer-guide]

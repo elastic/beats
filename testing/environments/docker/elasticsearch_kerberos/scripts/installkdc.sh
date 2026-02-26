@@ -37,9 +37,6 @@ sed -i 's/${ELASTIC_ZONE}/'$ELASTIC_ZONE'/g' $LOCALSTATEDIR/krb5.conf
 mkdir -p $KDC_CONFIG/krb5kdc
 cp /config/kdc.conf.template $KDC_CONFIG/krb5kdc/kdc.conf
 sed -i 's/${REALM_NAME}/'$REALM_NAME'/g' $KDC_CONFIG/krb5kdc/kdc.conf
-sed -i 's/${KDC_NAME}/'$KDC_NAME'/g' $KDC_CONFIG/krb5kdc/kdc.conf
-sed -i 's/${BUILD_ZONE}/'$BUILD_ZONE'/g' $KDC_CONFIG/krb5kdc/kdc.conf
-sed -i 's/${ELASTIC_ZONE}/'$ELASTIC_ZONE'/g' $LOCALSTATEDIR/krb5.conf
 
 # Touch logging locations
 mkdir -p $LOGDIR
@@ -48,16 +45,14 @@ touch $LOGDIR/krb5kdc.log
 touch $LOGDIR/krb5lib.log
 
 # Update package manager
-yum update -qqy
-
-# Install krb5 packages
-yum install -qqy krb5-{server,libs,workstation} sudo
+apt update -qq
+apt install -y krb5-kdc krb5-admin-server krb5-user sudo
 
 # Create kerberos database with stash file and garbage password
-kdb5_util create -s -r $REALM_NAME -P zyxwvutsrpqonmlk9876
+kdb5_util create -s -r $REALM_NAME -P zyxwvutsrpqonmlk9876 
 
 # Set up admin acls
-cat << EOF > /var/kerberos/krb5kdc/kadm5.acl
+cat << EOF > /etc/krb5kdc/kadm5.acl
 */admin@$REALM_NAME	*
 *@$REALM_NAME   	*
 */*@$REALM_NAME	    i
@@ -67,12 +62,21 @@ EOF
 kadmin.local -q "addprinc -pw elastic admin/admin@$REALM_NAME"
 kadmin.local -q "ktadd -k /etc/admin.keytab admin/admin@$REALM_NAME"
 
-# set ownership for ES
+# set ownership for ES so that we can start krb5kdc in non-root mode
 chown -R elasticsearch:elasticsearch $LOGDIR
 chown -R elasticsearch:elasticsearch $KDC_CONFIG
-chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/krb5.conf
-chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/admin.keytab
 
+## ensure we can access database principle
+chown -R elasticsearch:elasticsearch /var/lib/krb5kdc/
+chown -R elasticsearch:elasticsearch /var/lib/krb5kdc/principal 
+
+## stash is where the master password is stored
+chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/krb5kdc/
+chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/krb5kdc/stash
+
+chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/krb5.conf
+chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/krb5kdc/kadm5.acl
+chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/admin.keytab
 
 # Create a link so addprinc.sh is on path
 ln -s /scripts/addprinc.sh /usr/bin/

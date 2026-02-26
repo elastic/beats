@@ -198,7 +198,7 @@ func (s *indexSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, erro
 		Case:             outil.SelectorLowerCase,
 	}
 
-	indexSel, err := outil.BuildSelectorFromConfig(selCfg, buildSettings)
+	indexSel, err := outil.BuildSelectorFromConfig(selCfg, buildSettings, s.log)
 	if err != nil {
 		return nil, err
 	}

@@ -19,7 +19,7 @@ steps:
       make -C ironbank validate-ironbank
     agents:
       provider: "gcp"
-      image: "family/platform-ingest-beats-ubuntu-2204"
+      image: "platform-ingest-beats-ubuntu-2204-1768449671"
       machineType: "n2-standard-8"
     artifact_paths:
       - "x-pack/heartbeat/build/distributions/*"

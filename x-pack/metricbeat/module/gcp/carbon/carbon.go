@@ -71,7 +71,7 @@ func (c config) Validate() error {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The gcp '%s' metricset is beta.", metricsetName)
+	base.Logger().Warn(cfgwarn.Beta("The gcp '%s' metricset is beta.", metricsetName))
 
 	m := &MetricSet{
 		BaseMetricSet: base,

@@ -216,6 +216,18 @@ func dockerInfo() (*DockerInfo, error) {
 	return &info, nil
 }
 
+// HaveDockerCompose returns an error if the docker compose plugin is unavailable.
+func HaveDockerCompose() error {
+	if err := HaveDocker(); err != nil {
+		return err
+	}
+	_, err := sh.Output("docker", "compose", "version")
+	if err != nil {
+		return fmt.Errorf("docker compose is not available: the docker compose plugin is not installed: %w", err)
+	}
+	return nil
+}
+
 // HaveKubectl returns an error if kind is not found on the PATH.
 func HaveKubectl() error {
 	_, err := exec.LookPath("kubectl")
@@ -899,13 +911,12 @@ func IsUpToDate(dst string, sources ...string) bool {
 	return err == nil && !execute
 }
 
-func DocsDir() string {
-	cwd := CWD()
-	// Check if we need to correct ossDir because it's in x-pack.
-	if parentDir := filepath.Base(filepath.Dir(cwd)); parentDir == "x-pack" {
-		return filepath.Join(cwd, "../..", "docs")
+func DocsDir() (string, error) {
+	repoInfo, err := GetProjectRepoInfo()
+	if err != nil {
+		return "", fmt.Errorf("failed to get project repo info: %w", err)
 	}
-	return filepath.Join(cwd, "..", "docs")
+	return filepath.Join(repoInfo.RootDir, "docs"), nil
 }
 
 // OSSBeatDir returns the OSS beat directory. You can pass paths and they will

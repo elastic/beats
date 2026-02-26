@@ -20,12 +20,19 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // all test files are read from the "testdata" directory
 const testDataPath = "testdata"
+
+type noopReporter struct{}
+
+// UpdateStatus is no-op
+func (n noopReporter) UpdateStatus(status status.Status, msg string) {}
 
 func TestDecoding(t *testing.T) {
 	logp.TestingSetup()
@@ -38,7 +45,7 @@ func TestDecoding(t *testing.T) {
 		contentType   string
 		numEvents     int
 		assertAgainst string
-		config        decoderConfig
+		config        decoder.Config
 	}{
 		{
 			name:          "gzip_csv",
@@ -46,11 +53,11 @@ func TestDecoding(t *testing.T) {
 			content:       "text/csv",
 			numEvents:     4,
 			assertAgainst: "txn.json",
-			config: decoderConfig{
-				Codec: &codecConfig{
-					CSV: &csvCodecConfig{
+			config: decoder.Config{
+				Codec: &decoder.CodecConfig{
+					CSV: &decoder.CSVCodecConfig{
 						Enabled: true,
-						Comma:   ptr[configRune](' '),
+						Comma:   ptr[decoder.Rune](' '),
 					},
 				},
 			},
@@ -61,11 +68,11 @@ func TestDecoding(t *testing.T) {
 			content:       "text/csv",
 			numEvents:     4,
 			assertAgainst: "txn.json",
-			config: decoderConfig{
-				Codec: &codecConfig{
-					CSV: &csvCodecConfig{
+			config: decoder.Config{
+				Codec: &decoder.CodecConfig{
+					CSV: &decoder.CSVCodecConfig{
 						Enabled: true,
-						Comma:   ptr[configRune](' '),
+						Comma:   ptr[decoder.Rune](' '),
 					},
 				},
 			},
@@ -142,7 +149,7 @@ func readJSONFromFile(t *testing.T, filepath string) []string {
 var codecConfigTests = []struct {
 	name    string
 	yaml    string
-	want    decoderConfig
+	want    decoder.Config
 	wantErr error
 }{
 	{
@@ -154,13 +161,14 @@ codec:
     comma: ' '
     comment: '#'
 `,
-		want: decoderConfig{&codecConfig{
-			CSV: &csvCodecConfig{
-				Enabled: true,
-				Comma:   ptr[configRune](' '),
-				Comment: '#',
-			},
-		}},
+		want: decoder.Config{
+			Codec: &decoder.CodecConfig{
+				CSV: &decoder.CSVCodecConfig{
+					Enabled: true,
+					Comma:   ptr[decoder.Rune](' '),
+					Comment: '#',
+				},
+			}},
 	},
 	{
 		name: "no_comma",
@@ -169,11 +177,12 @@ codec:
   csv:
     enabled: true
 `,
-		want: decoderConfig{&codecConfig{
-			CSV: &csvCodecConfig{
-				Enabled: true,
-			},
-		}},
+		want: decoder.Config{
+			Codec: &decoder.CodecConfig{
+				CSV: &decoder.CSVCodecConfig{
+					Enabled: true,
+				},
+			}},
 	},
 	{
 		name: "null_comma",
@@ -183,12 +192,13 @@ codec:
     enabled: true
     comma: "\u0000"
 `,
-		want: decoderConfig{&codecConfig{
-			CSV: &csvCodecConfig{
-				Enabled: true,
-				Comma:   ptr[configRune]('\x00'),
-			},
-		}},
+		want: decoder.Config{
+			Codec: &decoder.CodecConfig{
+				CSV: &decoder.CSVCodecConfig{
+					Enabled: true,
+					Comma:   ptr[decoder.Rune]('\x00'),
+				},
+			}},
 	},
 	{
 		name: "bad_rune",
@@ -210,7 +220,7 @@ func TestCodecConfig(t *testing.T) {
 				t.Fatalf("unexpected error unmarshaling config: %v", err)
 			}
 
-			var got decoderConfig
+			var got decoder.Config
 			err = c.Unpack(&got)
 			if !sameError(err, test.wantErr) {
 				t.Errorf("unexpected error unpacking config: got:%v want:%v", err, test.wantErr)

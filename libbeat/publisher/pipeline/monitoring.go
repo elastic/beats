@@ -78,10 +78,7 @@ type metricsObserverVars struct {
 }
 
 func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
-	reg := metrics.GetRegistry("pipeline")
-	if reg == nil {
-		reg = metrics.NewRegistry("pipeline")
-	}
+	reg := metrics.GetOrCreateRegistry("pipeline")
 
 	return &metricsObserver{
 		metrics: metrics,

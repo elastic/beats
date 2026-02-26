@@ -185,8 +185,9 @@ func (az *azureMetadataFetcher) fetchAzureClusterMeta(
 	ctx context.Context,
 	client http.Client,
 	result *result,
+	logger *logp.Logger,
 ) {
-	logger := logp.NewLogger("add_cloud_metadata")
+	logger = logger.Named("add_cloud_metadata")
 	subscriptionID, _ := az.httpMeta.GetValue("cloud.account.id")
 	resourceGroupName, _ := az.httpMeta.GetValue("cloud.resourcegroup")
 	strResourceGroupName := ""

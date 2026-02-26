@@ -15,9 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 package filestream
 
 import (
+	"bytes"
+	"compress/gzip"
 	"context"
 	"fmt"
 	"os"
@@ -26,14 +30,20 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/filebeat/testing/gziptest"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -162,6 +172,163 @@ paths:
 	}
 }
 
+func TestNewFile(t *testing.T) {
+	tempDir := t.TempDir()
+
+	plainFileContent := "this is a plain file"
+	plainFilePath := filepath.Join(tempDir, "plain.txt")
+	err := os.WriteFile(plainFilePath, []byte(plainFileContent), 0644)
+	require.NoError(t, err, "could not write plain file")
+
+	gzipFileContent := "this is a gzipped file"
+	var gzipBuf bytes.Buffer
+	gzipWriter := gzip.NewWriter(&gzipBuf)
+	_, err = gzipWriter.Write([]byte(gzipFileContent))
+	require.NoError(t, err)
+	err = gzipWriter.Close()
+	require.NoError(t, err)
+	gzippedFilePath := filepath.Join(tempDir, "test.gz")
+	err = os.WriteFile(gzippedFilePath, gzipBuf.Bytes(), 0644)
+	require.NoError(t, err)
+
+	testCases := map[string]struct {
+		compression   string
+		filePath      string
+		expectedType  interface{}
+		expectError   bool
+		errorContains string
+		setup         func(t *testing.T, filePath string) *os.File
+	}{
+		"compression_none_returns_plain_file": {
+			compression:  CompressionNone,
+			filePath:     plainFilePath,
+			expectedType: &plainFile{},
+		},
+		"compression_gzip_with_gzip_file_returns_gzip_reader": {
+			compression:  CompressionGZIP,
+			filePath:     gzippedFilePath,
+			expectedType: &gzipSeekerReader{},
+		},
+		"compression_gzip_with_plain_file_returns_error": {
+			compression:   CompressionGZIP,
+			filePath:      plainFilePath,
+			expectError:   true,
+			errorContains: "failed to create gzip reader",
+		},
+		"compression_auto_with_plain_file_returns_plain_file": {
+			compression:  CompressionAuto,
+			filePath:     plainFilePath,
+			expectedType: &plainFile{},
+		},
+		"compression_auto_with_gzip_file_returns_gzip_reader": {
+			compression:  CompressionAuto,
+			filePath:     gzippedFilePath,
+			expectedType: &gzipSeekerReader{},
+		},
+		"compression_auto_with_unreadable_file_returns_error": {
+			compression: CompressionAuto,
+			filePath:    plainFilePath, // content doesn't matter
+			setup: func(t *testing.T, filePath string) *os.File {
+				// Return a file that is already closed to trigger a read error
+				// in IsGZIP
+				f, err := os.Open(filePath)
+				require.NoError(t, err)
+				f.Close()
+				return f
+			},
+			expectError:   true,
+			errorContains: "gzip detection error",
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			inp := &filestream{
+				compression:  tc.compression,
+				readerConfig: defaultReaderConfig(),
+			}
+
+			var rawFile *os.File
+			if tc.setup != nil {
+				rawFile = tc.setup(t, tc.filePath)
+			} else {
+				var err error
+				rawFile, err = os.Open(tc.filePath)
+				require.NoError(t, err)
+			}
+			defer rawFile.Close()
+
+			file, err := inp.newFile(rawFile)
+
+			if tc.expectError {
+				require.Error(t, err)
+				if tc.errorContains != "" {
+					assert.Contains(t, err.Error(), tc.errorContains)
+				}
+				assert.Nil(t, file)
+			} else {
+				require.NoError(t, err)
+				assert.NotNil(t, file)
+				assert.IsType(t, tc.expectedType, file)
+			}
+		})
+	}
+}
+
+func TestOpenFile_GZIPNeverTruncated(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "", zap.AddStacktrace(zapcore.ErrorLevel+1))
+
+	tempDir := t.TempDir()
+	plainData := []byte("some plain data\n")
+
+	plainPath := filepath.Join(tempDir, "plain.txt")
+	err := os.WriteFile(plainPath, plainData, 0644)
+	require.NoError(t, err, "could not save plain file")
+
+	data := gziptest.Compress(t, plainData, gziptest.CorruptNone)
+	gzPath := filepath.Join(tempDir, "test.gz")
+	err = os.WriteFile(gzPath, data, 0644)
+	require.NoError(t, err, "could not save gzip file")
+
+	tcs := []struct {
+		name        string
+		compression string
+		path        string
+		want        bool
+		errMsg      string
+	}{
+		{
+			name:        "plain file is truncated",
+			compression: CompressionNone,
+			path:        plainPath,
+			want:        true,
+			errMsg:      "plain file should be considered truncated",
+		},
+		{
+			name:        "GZIP file is never truncated",
+			compression: CompressionAuto,
+			path:        gzPath,
+			want:        false,
+			errMsg:      "GZIP file skips truncated validation",
+		},
+	}
+
+	for _, tc := range tcs {
+		inp := filestream{
+			compression:     tc.compression,
+			encodingFactory: encoding.Plain,
+			readerConfig:    readerConfig{BufferSize: 32},
+		}
+
+		f, _, truncated, err := inp.openFile(
+			log, tc.path, int64(len(plainData)*2))
+		require.NoError(t, err, "unexpected error")
+		f.Close()
+
+		assert.Equal(t, tc.want, truncated, tc.errMsg)
+	}
+}
+
 // runFilestreamBenchmark runs the entire filestream input with the in-memory registry and the test pipeline.
 // `testID` must be unique for each test run
 // `cfg` must be a valid YAML string containing valid filestream configuration
@@ -201,7 +368,6 @@ func createFilestreamTestRunner(ctx context.Context, b testing.TB, testID string
 		Name:            "filestream-test",
 		Agent:           beat.Info{},
 		Cancelation:     ctx,
-		StatusReporter:  nil,
 		MetricsRegistry: monitoring.NewRegistry(),
 		Logger:          logger,
 	}

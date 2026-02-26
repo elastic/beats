@@ -5,12 +5,20 @@
 package okta
 
 import (
+	"bytes"
+	"crypto/x509"
+	"encoding/json"
+	"encoding/pem"
 	"errors"
+	"fmt"
+	"os"
 	"strings"
 	"time"
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -43,7 +51,10 @@ func defaultConfig() conf {
 // conf contains parameters needed to configure the input.
 type conf struct {
 	OktaDomain string `config:"okta_domain" validate:"required"`
-	OktaToken  string `config:"okta_token" validate:"required"`
+	OktaToken  string `config:"okta_token"`
+
+	// OAuth2 configuration for Okta
+	OAuth2 *oAuth2Config `config:"oauth2"`
 
 	// Dataset specifies the datasets to collect from
 	// the API. It can be ""/"all", "users", or
@@ -82,6 +93,97 @@ type conf struct {
 
 	// Tracer allows configuration of request trace logging.
 	Tracer *tracerConfig `config:"tracer"`
+}
+
+// oAuth2Config holds OAuth2 configuration for Okta authentication.
+type oAuth2Config struct {
+	Enabled      *bool    `config:"enabled"`
+	ClientID     string   `config:"client.id" validate:"required"`
+	ClientSecret string   `config:"client.secret"`
+	Scopes       []string `config:"scopes" validate:"required"`
+	TokenURL     string   `config:"token_url" validate:"required"`
+
+	// JWT-based authentication (private key)
+	OktaJWKFile string `config:"jwk_file"`
+	OktaJWKJSON []byte `config:"jwk_json"`
+	OktaJWKPEM  []byte `config:"jwk_pem"`
+}
+
+func (o *oAuth2Config) isEnabled() bool {
+	return o != nil && (o.Enabled == nil || *o.Enabled)
+}
+
+// Validate validates the OAuth2 configuration.
+func (o *oAuth2Config) Validate() error {
+	if o.ClientID == "" {
+		return errors.New("oauth2 validation error: client.id is required")
+	}
+	if len(o.Scopes) == 0 {
+		return errors.New("oauth2 validation error: scopes are required")
+	}
+	if o.TokenURL == "" {
+		return errors.New("oauth2 validation error: token_url is required")
+	}
+
+	// Determine authentication method based on provided credentials
+	hasClientSecret := o.ClientSecret != ""
+	hasJWTKeys := o.OktaJWKFile != "" || o.OktaJWKJSON != nil || o.OktaJWKPEM != nil
+
+	if hasClientSecret && hasJWTKeys {
+		return errors.New("oauth2 validation error: cannot use both client secret and JWT private keys")
+	}
+
+	if !hasClientSecret && !hasJWTKeys {
+		return errors.New("oauth2 validation error: must provide either client.secret or one of jwk_file, jwk_json, or jwk_pem")
+	}
+
+	// Validate JWT key format if using JWT authentication
+	if hasJWTKeys {
+		// Check that exactly one JWT key is provided
+		n := 0
+		if o.OktaJWKFile != "" {
+			n++
+		}
+		if o.OktaJWKJSON != nil {
+			n++
+		}
+		if o.OktaJWKPEM != nil {
+			n++
+		}
+		if n > 1 {
+			return errors.New("oauth2 validation error: only one of jwk_file, jwk_json, or jwk_pem should be provided")
+		}
+
+		// Validate JWT key format
+		if o.OktaJWKFile != "" {
+			if _, err := os.Stat(o.OktaJWKFile); errors.Is(err, os.ErrNotExist) {
+				return fmt.Errorf("oauth2 validation error: jwk file %q does not exist", o.OktaJWKFile)
+			}
+		}
+		if o.OktaJWKJSON != nil {
+			// Validate JWK format by attempting to parse it
+			var jwkData struct {
+				N    interface{} `json:"n"`
+				E    interface{} `json:"e"`
+				D    interface{} `json:"d"`
+				P    interface{} `json:"p"`
+				Q    interface{} `json:"q"`
+				Dp   interface{} `json:"dp"`
+				Dq   interface{} `json:"dq"`
+				Qinv interface{} `json:"qi"`
+			}
+			if err := json.Unmarshal(o.OktaJWKJSON, &jwkData); err != nil {
+				return fmt.Errorf("oauth2 validation error: invalid JWK JSON format: %w", err)
+			}
+		}
+		if o.OktaJWKPEM != nil {
+			if _, err := pemPKCS8PrivateKey(o.OktaJWKPEM); err != nil {
+				return fmt.Errorf("oauth2 validation error: %w", err)
+			}
+		}
+	}
+
+	return nil
 }
 
 type tracerConfig struct {
@@ -196,7 +298,17 @@ func (c *conf) Validate() error {
 		return errors.New("dataset must be 'all', 'users', 'devices' or empty")
 	}
 
-	if c.Tracer == nil {
+	// Validate authentication configuration
+	if c.OAuth2 != nil && c.OAuth2.isEnabled() {
+		err := c.OAuth2.Validate()
+		if err != nil {
+			return err
+		}
+	} else if c.OktaToken == "" {
+		return errors.New("either oauth2 configuration or okta_token must be provided")
+	}
+
+	if !c.Tracer.enabled() {
 		return nil
 	}
 	if c.Tracer.Filename == "" {
@@ -207,6 +319,13 @@ func (c *conf) Validate() error {
 		// is excessive for a debugging logger, so default to 1MB
 		// which is the minimum.
 		c.Tracer.MaxSize = 1
+	}
+	ok, err := httplog.IsPathInLogsFor(Name, c.Tracer.Filename)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, Name))
 	}
 	return nil
 }
@@ -227,4 +346,37 @@ func (c *conf) wantDevices() bool {
 	default:
 		return false
 	}
+}
+
+// populateJSONFromFile reads a JSON file and populates the destination.
+func populateJSONFromFile(file string, dst *[]byte) error {
+	_, err := os.Stat(file)
+	if errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("the file %q cannot be found", file)
+	}
+
+	b, err := os.ReadFile(file)
+	if err != nil {
+		return fmt.Errorf("the file %q cannot be read", file)
+	}
+
+	if !json.Valid(b) {
+		return fmt.Errorf("the file %q does not contain valid JSON", file)
+	}
+
+	*dst = b
+
+	return nil
+}
+
+// pemPKCS8PrivateKey parses a PKCS8 private key from PEM data.
+func pemPKCS8PrivateKey(pemdata []byte) (any, error) {
+	blk, rest := pem.Decode(pemdata)
+	if rest := bytes.TrimSpace(rest); len(rest) != 0 {
+		return nil, fmt.Errorf("PEM text has trailing data: %d bytes", len(rest))
+	}
+	if blk == nil {
+		return nil, errors.New("no PEM data")
+	}
+	return x509.ParsePKCS8PrivateKey(blk.Bytes)
 }

@@ -27,7 +27,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -57,8 +57,6 @@ func incrementMetric(v *expvar.Map, key interface{}) {
 
 // inputMetrics handles event log metric reporting.
 type inputMetrics struct {
-	unregister func()
-
 	lastBatch time.Time
 
 	name        *monitoring.String // name of the provider being read
@@ -72,13 +70,8 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for windows event logs. If id is empty
 // a nil inputMetric is returned.
-func newInputMetrics(name, id string) *inputMetrics {
-	if id == "" {
-		return nil
-	}
-	reg, unreg := inputmon.NewInputRegistry("winlog", id, nil)
+func newInputMetrics(name string, reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	out := &inputMetrics{
-		unregister:  unreg,
 		name:        monitoring.NewString(reg, "provider"),
 		events:      monitoring.NewUint(reg, "received_events_total"),
 		dropped:     monitoring.NewUint(reg, "discarded_events_total"),
@@ -88,11 +81,11 @@ func newInputMetrics(name, id string) *inputMetrics {
 		batchPeriod: metrics.NewUniformSample(1024),
 	}
 	out.name.Set(name)
-	_ = adapter.NewGoMetrics(reg, "received_events_count", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "received_events_count", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchSize))
-	_ = adapter.NewGoMetrics(reg, "source_lag_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "source_lag_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sourceLag))
-	_ = adapter.NewGoMetrics(reg, "batch_read_period", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_read_period", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchPeriod))
 
 	return out
@@ -144,8 +137,4 @@ func (m *inputMetrics) logDropped(_ error) {
 }
 
 func (m *inputMetrics) close() {
-	if m == nil {
-		return
-	}
-	m.unregister()
 }

@@ -107,7 +107,7 @@ func (f *fakePoll) deliverResult(t testing.TB, pl poll.Transaction, msg interfac
 	}
 	response := &http.Response{
 		StatusCode:    200,
-		Body:          io.NopCloser(bytes.NewReader(js)),
+		Body:          io.NopCloser(io.MultiReader(strings.NewReader("\xef\xbb\xbf"), bytes.NewReader(js))),
 		ContentLength: int64(len(js)),
 	}
 	if nextUrl != "" {

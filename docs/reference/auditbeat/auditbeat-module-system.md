@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-system.html
+applies_to:
+  stack: beta
+  serverless: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -191,7 +194,7 @@ auditbeat.modules:
 ```
 
 ## Datasets [_datasets]
-            
+
 The following datasets are available:
 
 * [host](/reference/auditbeat/auditbeat-dataset-system-host.md)

@@ -2,6 +2,9 @@
 navigation_title: "Create a _reader_ user"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/kibana-user-privileges.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Grant privileges and roles needed to read Metricbeat data from {{kib}} [kibana-user-privileges]

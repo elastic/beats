@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/how-metricbeat-works.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # How Metricbeat works [how-metricbeat-works]

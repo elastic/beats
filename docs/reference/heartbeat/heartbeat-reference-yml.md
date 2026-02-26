@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/heartbeat-reference-yml.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # heartbeat.reference.yml [heartbeat-reference-yml]

@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-airflow.html
+applies_to:
+  stack: beta
+  serverless: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -53,4 +56,4 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [statsd](/reference/metricbeat/metricbeat-metricset-airflow-statsd.md)
+* [statsd](/reference/metricbeat/metricbeat-metricset-airflow-statsd.md)  {applies_to}`stack: beta`

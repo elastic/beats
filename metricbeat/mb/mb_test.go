@@ -29,6 +29,7 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Reporting V2 MetricSet
@@ -47,22 +48,6 @@ type testMetricSet struct {
 }
 
 func (m *testMetricSet) Fetch(reporter ReporterV2) {}
-
-// ReportingFetcher
-
-type testMetricSetReportingFetcher struct {
-	BaseMetricSet
-}
-
-func (m *testMetricSetReportingFetcher) Fetch(r Reporter) {}
-
-// PushMetricSet
-
-type testPushMetricSet struct {
-	BaseMetricSet
-}
-
-func (m *testPushMetricSet) Run(r PushReporter) {}
 
 func TestModuleConfig(t *testing.T) {
 	tests := []struct {
@@ -173,7 +158,7 @@ func TestNewModulesDuplicateHosts(t *testing.T) {
 		"hosts":      []string{"a", "b", "a"},
 	})
 
-	_, _, err := NewModule(c, r, logptest.NewTestingLogger(t, ""))
+	_, _, err := NewModule(c, r, paths.New(), logptest.NewTestingLogger(t, ""))
 	assert.Error(t, err)
 }
 
@@ -186,7 +171,7 @@ func TestNewModulesWithDefaultMetricSet(t *testing.T) {
 		"module": moduleName,
 	})
 
-	_, metricSets, err := NewModule(c, r, logptest.NewTestingLogger(t, ""))
+	_, metricSets, err := NewModule(c, r, paths.New(), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -241,65 +226,6 @@ func TestNewModulesHostParser(t *testing.T) {
 	})
 }
 
-func TestNewModulesMetricSetTypes(t *testing.T) {
-	r := newTestRegistry(t)
-
-	factory := func(base BaseMetricSet) (MetricSet, error) {
-		return &testMetricSet{base}, nil
-	}
-
-	name := "ReportingMetricSetV2"
-	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
-		t.Fatal(err)
-	}
-
-	t.Run(name+" MetricSet", func(t *testing.T) {
-		ms := newTestMetricSet(t, r, map[string]interface{}{
-			"module":     moduleName,
-			"metricsets": []string{name},
-		})
-		_, ok := ms.(ReportingMetricSetV2)
-		assert.True(t, ok, name+" not implemented")
-	})
-
-	factory = func(base BaseMetricSet) (MetricSet, error) {
-		return &testMetricSetReportingFetcher{base}, nil
-	}
-
-	name = "ReportingFetcher"
-	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
-		t.Fatal(err)
-	}
-
-	t.Run(name+" MetricSet", func(t *testing.T) {
-		ms := newTestMetricSet(t, r, map[string]interface{}{
-			"module":     moduleName,
-			"metricsets": []string{name},
-		})
-
-		_, ok := ms.(ReportingMetricSet)
-		assert.True(t, ok, name+" not implemented")
-	})
-
-	factory = func(base BaseMetricSet) (MetricSet, error) {
-		return &testPushMetricSet{base}, nil
-	}
-
-	name = "Push"
-	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
-		t.Fatal(err)
-	}
-
-	t.Run(name+" MetricSet", func(t *testing.T) {
-		ms := newTestMetricSet(t, r, map[string]interface{}{
-			"module":     moduleName,
-			"metricsets": []string{name},
-		})
-		_, ok := ms.(PushMetricSet)
-		assert.True(t, ok, name+" not implemented")
-	})
-}
-
 // TestNewBaseModuleFromModuleConfigStruct tests the creation a new BaseModule.
 func TestNewBaseModuleFromModuleConfigStruct(t *testing.T) {
 	moduleConf := DefaultModuleConfig()
@@ -338,7 +264,7 @@ func newTestRegistry(t testing.TB, metricSetOptions ...MetricSetOption) *Registe
 }
 
 func newTestMetricSet(t testing.TB, r *Register, config map[string]interface{}) MetricSet {
-	_, metricsets, err := NewModule(newConfig(t, config), r, logptest.NewTestingLogger(t, ""))
+	_, metricsets, err := NewModule(newConfig(t, config), r, paths.New(), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -425,7 +351,7 @@ func TestBaseModuleWithConfig(t *testing.T) {
 				MetricSets: []string{"foo", "bar"},
 			}
 
-			m, _, err := NewModule(conf.MustNewConfigFrom(initConfig), mockRegistry, logptest.NewTestingLogger(t, ""))
+			m, _, err := NewModule(conf.MustNewConfigFrom(initConfig), mockRegistry, paths.New(), logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			bm, ok := m.(*BaseModule)

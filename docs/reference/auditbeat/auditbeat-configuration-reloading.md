@@ -2,6 +2,9 @@
 navigation_title: "Config file reloading"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-configuration-reloading.html
+applies_to:
+  stack: beta
+  serverless: beta
 ---
 
 # Reload the configuration dynamically [auditbeat-configuration-reloading]

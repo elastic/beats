@@ -31,8 +31,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -170,50 +170,6 @@ type Closer interface {
 	Close() error
 }
 
-// Reporter is used by a MetricSet to report events, errors, or errors with
-// metadata. The methods return false if and only if publishing failed because
-// the MetricSet is being closed.
-//
-// Deprecated: Use ReporterV2.
-type Reporter interface {
-	Event(event mapstr.M) bool               // Event reports a single successful event.
-	ErrorWith(err error, meta mapstr.M) bool // ErrorWith reports a single error event with the additional metadata.
-	Error(err error) bool                    // Error reports a single error event.
-}
-
-// ReportingMetricSet is a MetricSet that reports events or errors through the
-// Reporter interface. Fetch is called periodically to collect events.
-//
-// Deprecated: Use ReportingMetricSetV2.
-type ReportingMetricSet interface {
-	MetricSet
-	Fetch(r Reporter)
-}
-
-// PushReporter is used by a MetricSet to report events, errors, or errors with
-// metadata. It provides a done channel used to signal that reporter should
-// stop.
-//
-// Deprecated: Use PushReporterV2.
-type PushReporter interface {
-	Reporter
-
-	// Done returns a channel that's closed when work done on behalf of this
-	// reporter should be canceled.
-	Done() <-chan struct{}
-}
-
-// PushMetricSet is a MetricSet that pushes events (rather than pulling them
-// periodically via a Fetch callback). Run is invoked to start the event
-// subscription and it should block until the MetricSet is ready to stop or
-// the PushReporter's done channel is closed.
-//
-// Deprecated: Use PushMetricSetV2.
-type PushMetricSet interface {
-	MetricSet
-	Run(r PushReporter)
-}
-
 // V2 Interfaces
 
 // ReporterV2 is used by a MetricSet to report Events. The methods return false
@@ -310,6 +266,7 @@ type BaseMetricSet struct {
 	registration MetricSetRegistration
 	metrics      *monitoring.Registry
 	logger       *logp.Logger
+	paths        *paths.Path
 }
 
 func (b *BaseMetricSet) String() string {
@@ -370,6 +327,15 @@ func (b *BaseMetricSet) HostData() HostData {
 // registered with the registry.
 func (b *BaseMetricSet) Registration() MetricSetRegistration {
 	return b.registration
+}
+
+// GetPath returns the paths associated with this MetricSet or
+// the global if none was set.
+func (b *BaseMetricSet) GetPath() *paths.Path {
+	if b.paths != nil {
+		return b.paths
+	}
+	return paths.Paths
 }
 
 // Configuration types

@@ -124,7 +124,7 @@ func filterMetaProviders(filter func(string) bool, fetchers map[string]provider)
 	return out
 }
 
-func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher, error) {
+func setupFetchers(providers map[string]provider, c *conf.C, logger *logp.Logger) ([]metadataFetcher, error) {
 	mf := make([]metadataFetcher, 0, len(providers))
 	visited := map[string]bool{}
 
@@ -153,7 +153,7 @@ func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher,
 // hosting providers supported by this processor. It will wait for the results to
 // be returned or for a timeout to occur then returns the first result that
 // completed in time.
-func (p *addCloudMetadata) fetchMetadata() *result {
+func (p *addCloudMetadata) fetchMetadata(ctx context.Context) *result {
 	p.logger.Debugf("add_cloud_metadata: starting to fetch metadata, timeout=%v", p.initData.timeout)
 	start := time.Now()
 	defer func() {
@@ -174,7 +174,7 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 	}
 
 	// Create context to enable explicit cancellation of the http requests.
-	ctx, cancel := context.WithTimeout(context.TODO(), p.initData.timeout)
+	ctx, cancel := context.WithTimeout(ctx, p.initData.timeout)
 	defer cancel()
 
 	results := make(chan result)

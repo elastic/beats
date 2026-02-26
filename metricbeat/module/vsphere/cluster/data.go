@@ -41,6 +41,12 @@ func (m *ClusterMetricSet) mapEvent(cl mo.ClusterComputeResource, data *metricDa
 		"name": cl.Name,
 	}
 
+	if cl.ResourcePool != nil {
+		event["resourcepool"] = mapstr.M{
+			"id": cl.ResourcePool.Value,
+		}
+	}
+
 	if len(data.triggeredAlarms) > 0 {
 		event.Put("triggered_alarms", data.triggeredAlarms)
 	}

@@ -1,5 +1,3 @@
-version: "2.3"
-
 services:
   nginx:
     image: docker.elastic.co/integrations-ci/beats-nginx:${NGINX_VERSION:-1.23.2}-1

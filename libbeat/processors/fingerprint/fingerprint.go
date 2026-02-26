@@ -21,10 +21,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"slices"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -56,8 +56,8 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 
 	// The fields array must be sorted, to guarantee that we always
 	// get the same hash for a similar set of configured keys.
-	// The call `ToSlice` always returns a sorted slice.
-	fields := common.MakeStringSet(config.Fields...).ToSlice()
+	slices.Sort(config.Fields)
+	fields := slices.Compact(config.Fields)
 
 	p := &fingerprint{
 		config: config,

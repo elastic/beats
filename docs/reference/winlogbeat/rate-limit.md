@@ -2,6 +2,9 @@
 navigation_title: "rate_limit"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/rate-limit.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Rate limit the flow of events [rate-limit]

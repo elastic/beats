@@ -28,10 +28,15 @@ type cursorEntry struct {
 	Value            *valueTpl `config:"value"`
 	Default          *valueTpl `config:"default"`
 	IgnoreEmptyValue *bool     `config:"ignore_empty_value"`
+	DoNotLogFailure  *bool     `config:"do_not_log_failure"`
 }
 
 func (ce cursorEntry) mustIgnoreEmptyValue() bool {
 	return ce.IgnoreEmptyValue == nil || *ce.IgnoreEmptyValue
+}
+
+func (ce cursorEntry) doNotLogFailure() bool {
+	return ce.DoNotLogFailure == nil || *ce.DoNotLogFailure
 }
 
 func (c config) Validate() error {

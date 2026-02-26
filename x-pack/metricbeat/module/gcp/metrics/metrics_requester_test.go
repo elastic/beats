@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestGetTimeIntervalAligner(t *testing.T) {
@@ -76,9 +77,6 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 }
 
 func TestGetFilterForMetric(t *testing.T) {
-	logp.DevelopmentSetup(logp.ToObserverOutput())
-	var logger = logp.NewLogger("TestGetFilterForMetric")
-
 	cases := []struct {
 		title          string
 		s              string
@@ -90,68 +88,67 @@ func TestGetFilterForMetric(t *testing.T) {
 			"compute service with empty config",
 			gcp.ServiceCompute,
 			"",
-			metricsRequester{config: config{}, logger: logger},
+			metricsRequester{config: config{}},
 			"metric.type=\"dummy\"",
 		},
 		{
 			"compute service with configured region",
 			gcp.ServiceCompute,
 			"",
-			metricsRequester{config: config{Region: "foo"}, logger: logger},
+			metricsRequester{config: config{Region: "foo"}},
 			"metric.type=\"dummy\" AND resource.labels.zone = starts_with(\"foo\")",
 		},
 		{
 			"compute service with configured zone",
 			gcp.ServiceCompute,
 			"",
-			metricsRequester{config: config{Zone: "foo"}, logger: logger},
+			metricsRequester{config: config{Zone: "foo"}},
 			"metric.type=\"dummy\" AND resource.labels.zone = starts_with(\"foo\")",
 		},
 		{
 			"compute service with configured regions",
 			gcp.ServiceCompute,
 			"",
-			metricsRequester{config: config{Regions: []string{"foo", "bar"}}, logger: logger},
+			metricsRequester{config: config{Regions: []string{"foo", "bar"}}},
 			"metric.type=\"dummy\" AND (resource.labels.zone = starts_with(\"foo\") OR resource.labels.zone = starts_with(\"bar\"))",
 		},
 		{
 			"compute service with configured region and zone",
 			gcp.ServiceCompute,
 			"",
-			metricsRequester{config: config{Region: "foo", Zone: "bar"}, logger: logger},
+			metricsRequester{config: config{Region: "foo", Zone: "bar"}},
 			"metric.type=\"dummy\" AND resource.labels.zone = starts_with(\"foo\")",
 		},
 		{
 			"compute service with configured region and regions",
 			gcp.ServiceCompute,
 			"",
-			metricsRequester{config: config{Region: "foobar", Regions: []string{"foo", "bar"}}, logger: logger},
+			metricsRequester{config: config{Region: "foobar", Regions: []string{"foo", "bar"}}},
 			"metric.type=\"dummy\" AND resource.labels.zone = starts_with(\"foobar\")",
 		},
 		{
 			"aiplatform service with configured region and zone",
 			"aiplatform",
 			"",
-			metricsRequester{config: config{Region: "foo", Zone: "bar", LocationLabel: "resource.label.location"}, logger: logger},
+			metricsRequester{config: config{Region: "foo", Zone: "bar", LocationLabel: "resource.label.location"}},
 			"metric.type=\"dummy\" AND resource.label.location = starts_with(\"foo\")",
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
+			logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "TestGetFilterForMetric")
+			c.r.logger = logger
 			filter := c.r.getFilterForMetric(c.s, "dummy")
 			assert.Equal(t, c.expectedFilter, filter)
 
 			// NOTE: test that we output a log message with the filter value, as this is **extremely**
 			// useful to debug issues and we want to make sure is being done.
-			logs := logp.ObserverLogs().
+			logs := observedLogs.
 				FilterLevelExact(zapcore.DebugLevel). // we are OK it being logged at debug level
 				FilterMessageSnippet(filter).
 				Len()
 			assert.Equal(t, logs, 1)
-			// NOTE: cleanup observed logs at each iteration to start with no messages.
-			_ = logp.ObserverLogs().TakeAll()
-
 		})
 	}
 }

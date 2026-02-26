@@ -76,7 +76,7 @@ func TestLegacyMetrics(t *testing.T) {
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
 
-	filebeat.WaitForLogs("Metrics endpoint listening on:",
+	filebeat.WaitLogsContains("Metrics endpoint listening on:",
 		10*time.Second,
 		"metrics endpoint did not start")
 

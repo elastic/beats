@@ -34,10 +34,12 @@ func TestCreateEvent(t *testing.T) {
 				"path": "logGroup1" + "/" + *logEvent.LogStreamName,
 			},
 		},
-		"aws.cloudwatch": mapstr.M{
-			"log_group":      "logGroup1",
-			"log_stream":     *logEvent.LogStreamName,
-			"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
+		"aws": mapstr.M{
+			"cloudwatch": mapstr.M{
+				"log_group":      "logGroup1",
+				"log_stream":     *logEvent.LogStreamName,
+				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
+			},
 		},
 		"cloud": mapstr.M{
 			"provider": "aws",

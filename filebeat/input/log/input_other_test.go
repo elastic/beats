@@ -152,7 +152,7 @@ func TestInit(t *testing.T) {
 			},
 			states:              file.NewStates(logptest.NewTestingLogger(t, "")),
 			outlet:              inputtest.Outlet{},
-			fileStateIdentifier: &file.MockIdentifier{},
+			fileStateIdentifier: &mockIdentifier{},
 		}
 
 		// Set states to finished
@@ -166,3 +166,8 @@ func TestInit(t *testing.T) {
 		assert.Equal(t, test.count, p.states.Count())
 	}
 }
+
+// mockIdentifier is used for testing
+type mockIdentifier struct{}
+
+func (m *mockIdentifier) GenerateID(s file.State) (string, string) { return s.Id, "mock" }

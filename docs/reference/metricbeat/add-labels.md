@@ -2,6 +2,9 @@
 navigation_title: "add_labels"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/add-labels.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Add labels [add-labels]

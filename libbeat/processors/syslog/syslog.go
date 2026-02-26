@@ -122,7 +122,7 @@ func New(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 		log = log.With("tag", cfg.Tag)
 		registryName = logName + "." + cfg.Tag + "-" + strconv.Itoa(id)
 	}
-	registry := monitoring.Default.NewRegistry(registryName, monitoring.DoNotReport)
+	registry := monitoring.Default.GetOrCreateRegistry(registryName, monitoring.DoNotReport)
 
 	return &processor{
 		config: cfg,

@@ -70,7 +70,7 @@ func run() error {
 	flag.Parse()
 
 	files := flag.Args()
-	logger.Infof("load config files:", files)
+	logger.Infof("load config files: %v", files)
 
 	cfg, err := common.LoadFiles(files...)
 	if err != nil {

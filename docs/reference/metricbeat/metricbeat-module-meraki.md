@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-meraki.html
+applies_to:
+  stack: beta
+  serverless: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -27,6 +30,7 @@ metricbeat.modules:
   period: 300s
   apiKey: "Meraki dashboard API key"
   organizations: ["Meraki organization ID"]
+  switchport_statuses: ["connected"]
 ```
 
 
@@ -34,5 +38,5 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [device_health](/reference/metricbeat/metricbeat-metricset-meraki-device_health.md)
-* [network_health](/reference/metricbeat/metricbeat-metricset-meraki-network_health.md)
+* [device_health](/reference/metricbeat/metricbeat-metricset-meraki-device_health.md)  {applies_to}`stack: beta`
+* [network_health](/reference/metricbeat/metricbeat-metricset-meraki-network_health.md)  {applies_to}`stack: beta 9.1.0`

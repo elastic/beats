@@ -49,21 +49,21 @@ type Matchers struct {
 	matchers []Matcher
 }
 
-type MatcherConstructor func(config config.C) (Matcher, error)
+type MatcherConstructor func(config config.C, logger *logp.Logger) (Matcher, error)
 
-func NewMatchers(configs PluginConfig) *Matchers {
+func NewMatchers(configs PluginConfig, logger *logp.Logger) *Matchers {
 	matchers := []Matcher{}
 	for _, pluginConfigs := range configs {
 		for name, pluginConfig := range pluginConfigs {
 			matchFunc := Indexing.GetMatcher(name)
 			if matchFunc == nil {
-				logp.Warn("Unable to find matcher plugin %s", name)
+				logger.Warnf("Unable to find matcher plugin %s", name)
 				continue
 			}
 
-			matcher, err := matchFunc(pluginConfig)
+			matcher, err := matchFunc(pluginConfig, logger)
 			if err != nil {
-				logp.Warn("Unable to initialize matcher plugin %s due to error %v", name, err)
+				logger.Warnf("Unable to initialize matcher plugin %s due to error %v", name, err)
 				continue
 			}
 
@@ -98,7 +98,7 @@ type FieldMatcher struct {
 	Regexp      *regexp.Regexp
 }
 
-func NewFieldMatcher(cfg config.C) (Matcher, error) {
+func NewFieldMatcher(cfg config.C, _ *logp.Logger) (Matcher, error) {
 	matcherConfig := struct {
 		LookupFields []string `config:"lookup_fields"`
 		RegexPattern string   `config:"regex_pattern"`
@@ -161,7 +161,7 @@ type FieldFormatMatcher struct {
 	Codec codec.Codec
 }
 
-func NewFieldFormatMatcher(cfg config.C) (Matcher, error) {
+func NewFieldFormatMatcher(cfg config.C, _ *logp.Logger) (Matcher, error) {
 	config := struct {
 		Format string `config:"format"`
 	}{}

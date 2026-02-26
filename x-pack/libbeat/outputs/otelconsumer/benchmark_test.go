@@ -28,7 +28,7 @@ func makeTestOtelConsumer(t testing.TB, consumeFn func(ctx context.Context, ld p
 		observer:     outputs.NewNilObserver(),
 		logsConsumer: logConsumer,
 		beatInfo:     beat.Info{},
-		log:          logp.NewLogger("otelconsumer"),
+		log:          logp.NewNopLogger(),
 	}
 	return consumer
 }

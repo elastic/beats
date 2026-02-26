@@ -23,6 +23,149 @@ var (
 	ErrUsers                    = errors.New("failed to get user details")
 )
 
+// parsedBaseDN holds the result of parsing a base DN for potential group components.
+type parsedBaseDN struct {
+	// containerBaseDN is the container portion of the DN (OU/DC components).
+	containerBaseDN string
+	// potentialGroupDNs are CN components that might be groups (need validation).
+	potentialGroupDNs []string
+	// originalBaseDN is the original base DN string.
+	originalBaseDN string
+}
+
+// parseBaseDN analyzes a distinguished name and separates potential group (CN)
+// components from container components (OU, DC). CN components that appear
+// before container components are extracted as potential group references
+// that need to be validated against LDAP.
+//
+// For example, given:
+//
+//	CN=Admin Users,OU=Groups,DC=example,DC=com
+//
+// This returns:
+//   - containerBaseDN: "OU=Groups,DC=example,DC=com" (the container path)
+//   - potentialGroupDNs: ["CN=Admin Users,OU=Groups,DC=example,DC=com"]
+//
+// The potential groups must be validated with validateGroupDNs() to confirm
+// they are actually groups (objectClass=group) and not containers.
+func parseBaseDN(base *ldap.DN) parsedBaseDN {
+	result := parsedBaseDN{}
+	if base == nil || len(base.RDNs) == 0 {
+		return result
+	}
+
+	result.originalBaseDN = base.String()
+
+	// Find where container components (OU, DC) start.
+	// CN components before containers are treated as potential group references.
+	containerStart := -1
+	for i, rdn := range base.RDNs {
+		if len(rdn.Attributes) == 0 {
+			continue
+		}
+		attrType := strings.ToUpper(rdn.Attributes[0].Type)
+		if attrType == "OU" || attrType == "DC" {
+			containerStart = i
+			break
+		}
+	}
+
+	// If no container components found, or CN components don't precede them,
+	// use the base DN as-is.
+	if containerStart <= 0 {
+		result.containerBaseDN = result.originalBaseDN
+		return result
+	}
+
+	// Extract potential group DNs (CN components before container start).
+	for i := 0; i < containerStart; i++ {
+		rdn := base.RDNs[i]
+		if len(rdn.Attributes) == 0 {
+			continue
+		}
+		attrType := strings.ToUpper(rdn.Attributes[0].Type)
+		if attrType == "CN" {
+			// Build the full DN for this potential group by including it
+			// and all RDNs after it (the container path).
+			groupRDNs := base.RDNs[i:]
+			groupDN := &ldap.DN{RDNs: groupRDNs}
+			result.potentialGroupDNs = append(result.potentialGroupDNs, groupDN.String())
+		}
+	}
+
+	// Build the container base DN (starting from first OU or DC).
+	containerRDNs := base.RDNs[containerStart:]
+	containerBase := &ldap.DN{RDNs: containerRDNs}
+	result.containerBaseDN = containerBase.String()
+
+	return result
+}
+
+// validateGroupDNs queries LDAP to verify which of the potential group DNs
+// are actually groups (objectClass=group) vs containers or other object types.
+// Returns only the DNs that are confirmed to be groups.
+func validateGroupDNs(conn *ldap.Conn, potentialGroupDNs []string) []string {
+	if len(potentialGroupDNs) == 0 {
+		return nil
+	}
+
+	var confirmedGroups []string
+	for _, dn := range potentialGroupDNs {
+		// Query LDAP to check if this DN is a group.
+		srch := &ldap.SearchRequest{
+			BaseDN:       dn,
+			Scope:        ldap.ScopeBaseObject, // Only check this specific object
+			DerefAliases: ldap.NeverDerefAliases,
+			SizeLimit:    1,
+			TimeLimit:    0,
+			TypesOnly:    false,
+			Filter:       "(objectClass=group)",
+			Attributes:   []string{"objectClass"},
+			Controls:     nil,
+		}
+
+		result, err := conn.Search(srch)
+		if err != nil {
+			// If the search fails (e.g., object doesn't exist), skip this DN.
+			continue
+		}
+
+		// If we got a result, this DN is a group.
+		if len(result.Entries) > 0 {
+			confirmedGroups = append(confirmedGroups, dn)
+		}
+	}
+
+	return confirmedGroups
+}
+
+// buildMemberOfFilter creates an LDAP memberOf filter from a list of group DNs.
+// Returns an empty string if no groups are provided.
+//
+// Use the LDAP_MATCHING_RULE_IN_CHAIN matching rule (OID 1.2.840.113556.1.4.1941)
+// to resolve nested membership at query time.
+//
+// See:
+//   - https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/4e638665-f466-4597-93c4-12f2ebfabab5
+//   - https://learn.microsoft.com/en-us/windows/win32/adsi/search-filter-syntax
+//   - https://ldapwiki.com/wiki/Wiki.jsp?page=LDAP_MATCHING_RULE_IN_CHAIN
+func buildMemberOfFilter(groupDNs []string) string {
+	if len(groupDNs) == 0 {
+		return ""
+	}
+
+	if len(groupDNs) == 1 {
+		return "(memberOf:1.2.840.113556.1.4.1941:=" + ldap.EscapeFilter(groupDNs[0]) + ")"
+	}
+
+	// Multiple groups: use OR filter.
+	var parts []string
+	for _, dn := range groupDNs {
+		parts = append(parts, "(memberOf:1.2.840.113556.1.4.1941:="+ldap.EscapeFilter(dn)+")")
+	}
+	return "(|" + strings.Join(parts, "") + ")"
+}
+
 // Entry is an Active Directory user entry with associated group membership.
 type Entry struct {
 	ID          string         `json:"id"`
@@ -45,6 +188,12 @@ type Entry struct {
 // users or (&(objectClass=computer)(objectClass=user)) for computers. When
 // since is a non-zero time.Time, the query will be conjugated with
 // (whenChanged>="<SINCETIME>") into a new query.
+//
+// If the base DN contains group (CN) components along with container (OU/DC)
+// components, the search will automatically extract the group DNs and add
+// memberOf filters to find users who are members of those groups. This is
+// necessary because groups are leaf objects in LDAP and don't contain users
+// as children in the directory tree hierarchy.
 func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, userAttrs, grpAttrs []string, pagingSize uint32, dialer *net.Dialer, tlsconfig *tls.Config) ([]Entry, error) {
 	if base == nil || len(base.RDNs) == 0 {
 		return nil, fmt.Errorf("%w: no path", ErrInvalidDistinguishedName)
@@ -77,7 +226,25 @@ func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, u
 		sinceFmtd = since.Format(denseTimeLayout)
 	}
 
-	baseDN := base.String()
+	// Parse the base DN to extract any CN components that might be groups.
+	// Groups are leaf objects in LDAP, so we need to search from the
+	// container base and filter by group membership.
+	parsed := parseBaseDN(base)
+
+	// Validate which CN components are actually groups (vs containers like CN=Users).
+	confirmedGroups := validateGroupDNs(conn, parsed.potentialGroupDNs)
+
+	// Determine the effective base DN and membership filter.
+	var baseDN, memberOfFilter string
+	if len(confirmedGroups) > 0 {
+		// We have confirmed groups - search from container and filter by membership.
+		baseDN = parsed.containerBaseDN
+		memberOfFilter = buildMemberOfFilter(confirmedGroups)
+	} else {
+		// No groups found - use the original base DN as-is.
+		// This handles containers like CN=Users which should use subtree search.
+		baseDN = parsed.originalBaseDN
+	}
 
 	// Get groups in the directory. Get all groups independent of the
 	// since parameter as they may not have changed for changed users.
@@ -92,9 +259,14 @@ func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, u
 	}
 
 	// Get users in the directory...
+	// Build the user filter by combining the base query with any group
+	// membership filter (from CN components in base DN) and time filter.
 	userFilter := query
+	if memberOfFilter != "" {
+		userFilter = "(&" + query + memberOfFilter + ")"
+	}
 	if sinceFmtd != "" {
-		userFilter = "(&" + query + "(whenChanged>=" + sinceFmtd + "))"
+		userFilter = "(&" + userFilter + "(whenChanged>=" + sinceFmtd + "))"
 	}
 	usrs, err := search(conn, baseDN, userFilter, userAttrs, pagingSize)
 	if err != nil {
@@ -124,9 +296,17 @@ func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, u
 			}
 			if len(modGrps) != 0 {
 				for i, u := range modGrps {
-					modGrps[i] = "(memberOf=" + u + ")"
+					// Use the LDAP_MATCHING_RULE_IN_CHAIN matching rule
+					// (OID 1.2.840.113556.1.4.1941) to resolve nested
+					// membership at query time.
+					modGrps[i] = "(memberOf:1.2.840.113556.1.4.1941:=" + ldap.EscapeFilter(u) + ")"
 				}
-				usrs, err := search(conn, baseDN, "(&"+query+"(|"+strings.Join(modGrps, "")+")", userAttrs, pagingSize)
+				changedGrpFilter := "(&" + query + "(|" + strings.Join(modGrps, "") + "))"
+				// Also include the base DN membership filter if present.
+				if memberOfFilter != "" {
+					changedGrpFilter = "(&" + changedGrpFilter + memberOfFilter + ")"
+				}
+				usrs, err := search(conn, baseDN, changedGrpFilter, userAttrs, pagingSize)
 				if err != nil {
 					errs = append(errs, fmt.Errorf("failed to collect users of changed groups%w: %w", ErrUsers, err))
 				} else {

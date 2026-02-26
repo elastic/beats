@@ -418,7 +418,7 @@ func newInputMetrics(id, device string, ports map[uint16]protos.Protocol) *input
 		return nil
 	}
 	devID := fmt.Sprintf("%s-tcp%s::%s", id, portList(ports), device)
-	reg, unreg := inputmon.NewInputRegistry("tcp", devID, nil)
+	reg, unreg := inputmon.NewDeprecatedMetricsRegistry("tcp", devID, nil)
 	out := &inputMetrics{
 		unregister:     unreg,
 		device:         monitoring.NewString(reg, "device"),
@@ -439,9 +439,11 @@ func newInputMetrics(id, device string, ports map[uint16]protos.Protocol) *input
 		arrivalPeriod:  metrics.NewUniformSample(1024),
 		processingTime: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
+
+	//TODO: use local logger here
+	_ = adapter.NewGoMetrics(reg, "arrival_period", logp.NewLogger(""), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", logp.NewLogger(""), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	out.device.Set(device)

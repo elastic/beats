@@ -2,6 +2,9 @@
 navigation_title: "Elasticsearch index template"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-template.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Configure Elasticsearch index template loading [configuration-template]

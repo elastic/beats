@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-openmetrics.html
+applies_to:
+  stack: beta
+  serverless: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -59,4 +62,4 @@ This module supports TLS connections when using `ssl` config field, as described
 
 The following metricsets are available:
 
-* [collector](/reference/metricbeat/metricbeat-metricset-openmetrics-collector.md)
+* [collector](/reference/metricbeat/metricbeat-metricset-openmetrics-collector.md)  {applies_to}`stack: beta`

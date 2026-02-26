@@ -4,6 +4,21 @@ import yaml
 import six
 import glob
 
+
+# Determine the serverless lifecycle from the stack applies_to string.
+# Serverless is unversioned, so we use the most advanced lifecycle state.
+def get_serverless_lifecycle(applies_to_str):
+    lifecycle_order = ['preview', 'beta', 'ga', 'deprecated', 'removed']
+    latest_idx = -1
+    for part in applies_to_str.split(','):
+        lifecycle = part.strip().split()[0]
+        if lifecycle in lifecycle_order:
+            idx = lifecycle_order.index(lifecycle)
+            if idx > latest_idx:
+                latest_idx = idx
+    return lifecycle_order[latest_idx] if latest_idx >= 0 else 'ga'
+
+
 # Collects docs for all modules
 
 
@@ -33,24 +48,44 @@ def collect(beat_name):
         with open(beat_path + "/fields.yml", encoding='utf_8') as f:
             fields = yaml.load(f.read(), Loader=yaml.FullLoader)
             title = fields[0]["title"]
+            applies_to = ""
+            if "version" in fields[0]:
+                version = fields[0]["version"]
+                versions = []
+                for key, value in version.items():
+                    versions.append(f"{key} {value}")
+                applies_to = ", ".join(versions)
+            elif "release" in fields[0]:
+                applies_to = fields[0]["release"]
+            else:
+                applies_to = "ga"
 
         module_file = generated_note
 
         module_file += """---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-{}.html
----
+""".format(module)
+        if applies_to != "":
+            module_file += """applies_to:
+  stack: {}
+  serverless: {}
+""".format(applies_to, get_serverless_lifecycle(applies_to))
+
+        module_file += """---
 
 % This file is generated! See scripts/docs_collector.py
 
 # {} module [filebeat-module-{}]
 
-""".format(module, title, module)
+""".format(title, module)
 
         with open(module_doc, encoding='utf_8') as f:
             module_file += f.read()
 
-        modules_list[module] = title
+        modules_list[module] = {}
+        modules_list[module]["title"] = title
+        modules_list[module]["applies_to"] = applies_to
 
         module_file += """
 ## Fields [_fields]
@@ -67,6 +102,9 @@ For a description of each field in the module, see the [exported fields](/refere
     module_list_output = """---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Modules [filebeat-modules]
@@ -83,8 +121,13 @@ While {{filebeat}} modules are still supported, we recommend {{agent}} integrati
 * [*Modules overview*](/reference/filebeat/filebeat-modules-overview.md)
 """
 
-    for m, title in sorted(six.iteritems(modules_list)):
-        module_list_output += "* [*{} module*](/reference/filebeat/filebeat-module-{}.md)\n".format(title, m)
+    for m, details in sorted(six.iteritems(modules_list)):
+        title = details["title"]
+        applies_to = details["applies_to"]
+        module_list_output += "* [*{} module*](/reference/filebeat/filebeat-module-{}.md)".format(title, m)
+        if applies_to and applies_to != "ga":
+            module_list_output += " {{applies_to}}`stack: {}`".format(applies_to)
+        module_list_output += "\n"
 
     module_list_output += "\n"
 

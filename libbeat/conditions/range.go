@@ -117,7 +117,7 @@ func (c Range) Check(event ValuesMap) bool {
 
 		floatValue, err := ExtractFloat(value)
 		if err != nil {
-			c.logger.Named(logName).Warnf(err.Error())
+			c.logger.Named(logName).Warn(err.Error())
 			return false
 		}
 

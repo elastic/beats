@@ -58,7 +58,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 	log := logp.NewLogger("")
 	ctx := context.Background()
-	client, err := newHTTPClient(ctx, config, noopReporter{}, log, nil)
+	client, err := newHTTPClient(ctx, config.Auth, config.Request, noopReporter{}, log, nil, nil)
 	assert.NoError(t, err)
 
 	requestFactory, err := newRequestFactory(ctx, config, noopReporter{}, log, nil, nil)
@@ -216,7 +216,7 @@ func Test_newChainHTTPClient(t *testing.T) {
 		authCfg    *authConfig
 		requestCfg *requestConfig
 		log        *logp.Logger
-		p          []*Policy
+		p          *Policy
 	}
 	tests := []struct {
 		name string
@@ -235,7 +235,7 @@ func Test_newChainHTTPClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := newChainHTTPClient(tt.args.ctx, tt.args.authCfg, tt.args.requestCfg, noopReporter{}, tt.args.log, nil, tt.args.p...)
+			got, err := newHTTPClient(tt.args.ctx, tt.args.authCfg, tt.args.requestCfg, noopReporter{}, tt.args.log, nil, tt.args.p)
 			assert.NoError(t, err)
 			assert.NotNil(t, got)
 		})
@@ -351,4 +351,24 @@ func TestProcessExpression(t *testing.T) {
 		got := processExpression(test.in)
 		assert.Equal(t, test.want, got)
 	}
+}
+
+func defaultChainConfig() config {
+	chaincfg := defaultConfig()
+	chaincfg.Chain = []chainConfig{
+		{
+			While: &whileConfig{
+				Auth:     chaincfg.Auth,
+				Request:  chaincfg.Request,
+				Response: &responseChainConfig{},
+			},
+			Step: &stepConfig{
+				Auth:     chaincfg.Auth,
+				Request:  chaincfg.Request,
+				Response: &responseChainConfig{},
+			},
+		},
+	}
+
+	return chaincfg
 }

@@ -8,14 +8,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"runtime"
 	"strings"
 	"time"
-
-	"go.uber.org/multierr"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -52,11 +51,6 @@ func Build() error {
 	return devtools.Build(args)
 }
 
-// BuildOTel builds the Beat binary with OTel sub command
-func BuildOTel() error {
-	return devtools.BuildOTel()
-}
-
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
@@ -65,7 +59,7 @@ func GolangCrossBuild() error {
 	if isWindows32bitRunner() {
 		args.LDFlags = append(args.LDFlags, "-w")
 	}
-	return multierr.Combine(
+	return errors.Join(
 		devtools.GolangCrossBuild(args),
 		devtools.TestLinuxForCentosGLIBC(),
 	)
@@ -247,16 +241,18 @@ func GoIntegTest(ctx context.Context) error {
 	}
 
 	if !devtools.IsInIntegTestEnv() {
-		// build integration test binary with otel sub command
-		devtools.BuildSystemTestOTelBinary()
-		args := devtools.DefaultGoTestIntegrationFromHostArgs()
+		devtools.BuildSystemTestBinary()
+		args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 		// ES_USER must be admin in order for the Go Integration tests to function because they require
 		// indices:data/read/search
 		args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
 		args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
 		// run integration test from home directory
 		args.Packages = []string{"./tests/integration/"}
-		devtools.GoIntegTestFromHost(ctx, args)
+		err := devtools.GoIntegTestFromHost(ctx, args)
+		if err != nil {
+			return err
+		}
 
 		mg.SerialDeps(Fields, Dashboards)
 	}
@@ -308,4 +304,9 @@ func PythonIntegTest(ctx context.Context) error {
 
 func isWindows32bitRunner() bool {
 	return runtime.GOOS == "windows" && runtime.GOARCH == "386"
+}
+
+// FipsECHTest runs a smoke test using a FIPS enabled binary targetting an ECH deployment.
+func FipsECHTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultECHTestArgs())
 }

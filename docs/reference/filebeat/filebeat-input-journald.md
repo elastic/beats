@@ -2,6 +2,9 @@
 navigation_title: "journald"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-journald.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Journald input [filebeat-input-journald]
@@ -9,23 +12,28 @@ mapped_pages:
 [`journald`](https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html) is a system service that collects and stores logging data. The `journald` input reads this log data and the metadata associated with it. To read this log data Filebeat calls `journalctl` to read from the journal, therefore Filebeat needs permission to execute `journalctl`.
 
 :::{warning}
-The Wolfi-based Docker image does not contain the `journalctl` binary and the `journald` input type cannot be used with it.
+The Wolfi-based Docker image does not contain the `journalctl` binary.
+
+{applies_to}`stack: ga 9.3.0` To use the `journald` input type with Wolfi images, you must configure the [`chroot`](#filebeat-input-journald-chroot) option to use the host's `journalctl` binary.
 :::
 
 :::{important}
-When using the Journald input from a Docker container, make sure the
-`journalctl` binary in the container is compatible with your
-Systemd/journal version. To get the version of the `journalctl` binary
-in Filebeat's image run the following, adjusting the image name/tag
-according to the version that you are running:
+When using the Journald input from a Docker container, make sure that
+either:
+ - {applies_to}`stack: ga 9.3.0` [`chroot`](#filebeat-input-journald-chroot) is set.
+ - The `journalctl` binary in the container is compatible with your
+   Systemd/journal version. To get the version of the `journalctl` binary
+   in Filebeat's image run the following, adjusting the image name/tag
+   according to the version that you are running:
 
 
-```sh
-docker run --rm -it --entrypoint "journalctl" docker.elastic.co/beats/filebeat-wolfi:<VERSION> --version
-```
+   ```sh
+   docker run --rm -it --entrypoint "journalctl" docker.elastic.co/beats/filebeat:<VERSION> --version
+   ```
+   The container variants that contain `journalctl` are: `filebeat`,
+   `filebeat-oss` and `filebeat-ubi`.
+
 :::
-
-If the `journalctl` process exits unexpectedly the journald input will terminate with an error and Filebeat will need to be restarted to start reading from the journal again.
 
 The simplest configuration example is one that reads all logs from the default journal.
 
@@ -85,10 +93,69 @@ filebeat.inputs:
 
 ### `paths` [filebeat-input-journald-paths]
 
-A list of paths that will be crawled and fetched. Each path can be a directory path (to collect events from all journals in a directory), or a file path. If you specify a directory, Filebeat merges all journals under the directory into a single journal and reads them.
+A list of paths that will be crawled and fetched. A path can be either:
+
+* A file path
+* {applies_to}`stack: ga 9.0.8+` A directory path (to collect events from all journals in a directory). If you specify a directory, Filebeat merges all journals under the directory into a single journal and reads them.
 
 If no paths are specified, Filebeat reads from the default journal.
 
+For example, this configuration will ingest all journals and correctly handle the journald rotation:
+
+```yaml
+  - type: journald
+    id: journald-id
+    paths:
+      - /var/log/journal
+```
+
+
+:::{warning}
+If a glob (for example, `/var/log/journal/*/*.journal`) is used, the journald
+input will only ingest the journal files found when started. New
+files will not be ingested.
+:::
+
+### `chroot` [filebeat-input-journald-chroot]
+```{applies_to}
+stack: ga 9.3.0
+```
+A folder to be used as chroot when calling `journalctl`. This allows
+Filebeat to call the host's `journalctl` directly.
+
+When `chroot` is set, if
+[`journalctl_path`](#filebeat-input-journald-journalctl-path) is not
+explicitly configured, it defaults to `/usr/bin/journalctl`. If
+`journalctl_path` is explicitly set, it must be an absolute path from
+within the chroot directory.
+
+If using this option in a container, the container needs the capability
+`SYS_CHROOT` and {{filebeat}} needs to be running as root (uid 0) to
+start the chroot.
+{{filebeat}} also needs permissions to read the desired journals,
+usually being root or being added to `systemd-journal` group.
+
+### `journalctl_path` [filebeat-input-journald-journalctl-path]
+```{applies_to}
+stack: ga 9.3.0
+```
+The path for the `journalctl` binary. If not set, {{filebeat}} will
+look for `journalctl` in `PATH`. When using
+[`chroot`](#filebeat-input-journald-chroot), if `journalctl_path` is
+not explicitly set, it automatically defaults to
+`/usr/bin/journalctl`. If `journalctl_path` is explicitly set when
+`chroot` is configured, it must be an absolute path from within the
+chroot directory.
+
+
+### `merge` [filebeat-input-journald-merge]
+```{applies_to}
+stack: ga 9.2.0
+```
+
+When enabled, log entries will be ingested interleaved from all
+available journals, including remote ones. This option is disabled by
+default.
 
 ### `seek` [filebeat-input-journald-seek]
 
@@ -173,11 +240,11 @@ include_matches:
 ```
 
 The following include matches configuration is the equivalent of the following logical expression:
- 
+
  ```
  A=a OR (B=b AND C=c) OR (D=d AND B=1)
  ```
- 
+
 ```yaml
  include_matches:
    match:
@@ -188,7 +255,7 @@ The following include matches configuration is the equivalent of the following l
      - +
      - B=1
 ```
- 
+
 `include_matches` translates to `journalctl` `MATCHES`, its [documentation](https://www.man7.org/linux/man-pages/man1/journalctl.1.html)  is not clear about how multiple disjunctions are handled. The previous example was tested with journalctl version 257.
 
 To reference fields, use one of the following:
@@ -290,7 +357,7 @@ The following snippet configures Filebeat to read the `stdout` stream from all c
 
 #### `syslog` [_syslog_2]
 
-The `syslog` parser parses RFC 3146 and/or RFC 5424 formatted syslog messages.
+The `syslog` parser parses RFC 3164 and/or RFC 5424 formatted syslog messages.
 
 The supported configuration options are:
 

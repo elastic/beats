@@ -28,15 +28,6 @@ type queryConfigFrom string
 
 var defaultConfigQuery = queryConfigFrom("config")
 
-// EventConfigQuery creates an EventConfigurer that tries to cast the given event
-// field from from the buf event into a []*config.C.
-func EventConfigQuery(field string) EventConfigurer {
-	if field == "" || field == "config" {
-		return defaultConfigQuery
-	}
-	return queryConfigFrom(field)
-}
-
 // QueryConfig extract an array of *config.C from bus.Event.
 // The configurations are expected to be in the 'config' field.
 func QueryConfig() EventConfigurer { return defaultConfigQuery }

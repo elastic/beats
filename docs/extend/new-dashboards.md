@@ -2,6 +2,8 @@
 navigation_title: "Creating New Kibana Dashboards"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/new-dashboards.html
+applies_to:
+  stack: ga
 ---
 
 # Creating New Kibana Dashboards for a Beat or a Beat module [new-dashboards]

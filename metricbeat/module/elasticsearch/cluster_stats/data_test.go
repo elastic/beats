@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func createEsMuxer(license string) *http.ServeMux {
@@ -96,7 +97,7 @@ func TestMapper(t *testing.T) {
 		URI:          server.URL,
 		SanitizedURI: server.URL,
 		Host:         server.URL,
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	elasticsearch.TestMapperWithHttpHelper(t, "./_meta/test/cluster_stats.*.json",

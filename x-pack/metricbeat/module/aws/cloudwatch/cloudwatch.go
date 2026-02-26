@@ -149,8 +149,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// Get listMetricDetailTotal and namespaceDetailTotal from configuration
 	listMetricDetailTotal, namespaceDetailTotal := m.readCloudwatchConfig()
-	m.logger.Debugf("listMetricDetailTotal = %s", listMetricDetailTotal)
-	m.logger.Debugf("namespaceDetailTotal = %s", namespaceDetailTotal)
+	m.logger.Debugf("listMetricDetailTotal = %v", listMetricDetailTotal)
+	m.logger.Debugf("namespaceDetailTotal = %v", namespaceDetailTotal)
 
 	var config aws.Config
 	err = m.Module().UnpackConfig(&config)
@@ -168,18 +168,20 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// Create events based on listMetricDetailTotal from configuration
 	if len(listMetricDetailTotal.metricsWithStats) != 0 {
-		for _, regionName := range m.MetricSet.RegionsList {
+		for _, regionName := range m.RegionsList {
 			m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
-			beatsConfig := m.MetricSet.AwsConfig.Copy()
+			beatsConfig := m.AwsConfig.Copy()
 			beatsConfig.Region = regionName
 			APIClients, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
 			if err != nil {
-				m.Logger().Warn("skipping metrics list from region '%s'", regionName)
+				m.Logger().Warnf("skipping metrics list from region '%s': %v", regionName, err)
+				continue
 			}
 
 			eventsWithIdentifier, err := m.createEvents(APIClients.CloudWatchClient, APIClients.Resourcegroupstaggingapi, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, infoapi, regionName, startTime, endTime)
 			if err != nil {
-				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
+				m.Logger().Errorf("createEvents failed for region %s, skipping region: %v", regionName, err)
+				continue
 			}
 
 			m.logger.Debugf("Collected metrics of metrics = %d", len(eventsWithIdentifier))
@@ -192,9 +194,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	// Create events based on namespaceDetailTotal from configuration
-	for _, regionName := range m.MetricSet.RegionsList {
+	for _, regionName := range m.RegionsList {
 		m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
-		beatsConfig := m.MetricSet.AwsConfig.Copy()
+		beatsConfig := m.AwsConfig.Copy()
 		beatsConfig.Region = regionName
 
 		APIClients, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
@@ -209,13 +211,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		if len(namespaceDetailTotal) == 0 {
 			listMetricsOutput, err = aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, APIClients.CloudWatchClient)
 			if err != nil {
-				m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %w", regionName, "*", err)
+				m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %v", regionName, "*", err)
 			}
 		} else {
 			for namespace := range namespaceDetailTotal {
 				listMetricsOutputPerNamespace, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, APIClients.CloudWatchClient)
 				if err != nil {
-					m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %w", regionName, namespace, err)
+					m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %v", regionName, namespace, err)
 				}
 				listMetricsOutput = append(listMetricsOutput, listMetricsOutputPerNamespace...)
 			}
@@ -272,7 +274,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			}
 			eventsWithIdentifier, err := m.createEvents(APIClients.CloudWatchClient, APIClients.Resourcegroupstaggingapi, filteredMetricWithStatsTotal, resourceTypeTagFilters, infoapi, regionName, startTime, endTime)
 			if err != nil {
-				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
+				m.Logger().Errorf("createEvents failed for region %s and namespace %s, skipping: %v", regionName, namespace, err)
+				continue
 			}
 
 			m.logger.Debugf("Collected number of metrics = %d", len(eventsWithIdentifier))
@@ -420,14 +423,14 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 			}
 
 			if config.ResourceType != "" {
-				resourceTypesWithTags[config.ResourceType] = m.MetricSet.TagsFilter
+				resourceTypesWithTags[config.ResourceType] = m.TagsFilter
 			}
 			continue
 		}
 
 		configPerNamespace := namespaceDetail{
 			names:              config.MetricName,
-			tags:               m.MetricSet.TagsFilter,
+			tags:               m.TagsFilter,
 			statistics:         config.Statistic,
 			resourceTypeFilter: config.ResourceType,
 			dimensions:         cloudwatchDimensions,
@@ -579,7 +582,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 					continue
 				}
 
-				identifierValue := labels[aws.LabelConst.IdentifierValueIdx] + fmt.Sprint("-", valI)
+				identifierValue := labels[aws.LabelConst.AccountIdIdx] + "-" + labels[aws.LabelConst.IdentifierValueIdx] + fmt.Sprint("-", valI)
 				if _, ok := events[identifierValue]; !ok {
 					events[identifierValue] = aws.InitEvent(regionName, labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], metricDataResult.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
 				}
@@ -640,7 +643,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				}
 
 				identifierValue := labels[aws.LabelConst.IdentifierValueIdx]
-				uniqueIdentifierValue := identifierValue + fmt.Sprint("-", valI)
+				uniqueIdentifierValue := labels[aws.LabelConst.AccountIdIdx] + "-" + identifierValue + fmt.Sprint("-", valI)
 
 				// add tags to event based on identifierValue
 				// Check if identifier includes dimensionSeparator (comma in this case),
