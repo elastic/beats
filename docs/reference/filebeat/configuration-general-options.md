@@ -154,16 +154,16 @@ filebeat.registry.bbolt.compaction.cleanup_on_start: true
 How long entries are kept in the store before being removed. A zero value disables TTL-based removal. Must be used together with `registry.bbolt.retention.interval`. Default: `0` (disabled).
 
 ```yaml
-filebeat.registry.bbolt.retention.ttl: 72h
+filebeat.registry.bbolt.retention.ttl: 0
 ```
 
 
 ### `registry.bbolt.retention.interval` [_registry_bbolt_retention_interval]
 
-How often to remove expired entries. Only effective when `registry.bbolt.retention.ttl` is also set to a positive value. A zero value disables periodic removal. Default: `0` (disabled).
+How often to remove expired entries from disk. Only effective when `registry.bbolt.retention.ttl` is also set to a positive value. A zero value disables periodic removal. Default: `0` (disabled).
 
 ```yaml
-filebeat.registry.bbolt.retention.interval: 5m
+filebeat.registry.bbolt.retention.interval: 0
 ```
 
 

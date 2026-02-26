@@ -1373,8 +1373,9 @@ filebeat.inputs:
 # Default: 0 (disabled).
 #filebeat.registry.bbolt.retention.ttl: 0
 
-# How often to remove expired entries. Only effective when retention.ttl
-# is also set to a positive value. A zero value disables periodic removal.
+# How often to remove expired entries from disk. Only effective when
+# retention.ttl is also set to a positive value. A zero value disables
+# periodic removal.
 # Default: 0 (disabled).
 #filebeat.registry.bbolt.retention.interval: 0
 
