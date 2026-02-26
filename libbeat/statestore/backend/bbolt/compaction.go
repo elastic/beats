@@ -73,16 +73,17 @@ func (s *store) compact() error {
 		return fmt.Errorf("compaction failed: %w", err)
 	}
 
-	dbPath := s.db.Path()
-	compactedPath := compactedDB.Path()
-
-	// we have to close files before moving on Windows.
+	// We have to close files before moving on Windows.
 	s.db.Close()
 	compactedDB.Close()
 
-	if err := os.Rename(compactedPath, dbPath); err != nil {
-		// Rename failed — the original file is still at dbPath, reopen it (was closed before the rename).
-		newDB, openErr := bolt.Open(dbPath, s.fileMode, s.options)
+	if err := os.Chmod(file.Name(), s.fileMode); err != nil {
+		return fmt.Errorf("failed to set permissions on compacted db: %w", err)
+	}
+
+	if err := os.Rename(file.Name(), s.dbPath); err != nil {
+		// Rename failed — the original file is still at s.dbPath, reopen it (was closed before the rename).
+		newDB, openErr := bolt.Open(s.dbPath, s.fileMode, s.options)
 		if openErr != nil {
 			return errors.Join(
 				fmt.Errorf("failed to replace db with compacted file: %w", err),
@@ -93,7 +94,7 @@ func (s *store) compact() error {
 		return fmt.Errorf("failed to replace db with compacted file: %w", err)
 	}
 
-	newDB, err := bolt.Open(dbPath, s.fileMode, s.options)
+	newDB, err := bolt.Open(s.dbPath, s.fileMode, s.options)
 	if err != nil {
 		return fmt.Errorf("failed to reopen db after compaction: %w", err)
 	}
@@ -177,6 +178,7 @@ func (s *store) cleanupExpired() error {
 
 				var entry storedEntry
 				if err := json.Unmarshal(v, &entry); err != nil {
+					s.log.Warnf("Failed to decode entry for key %q during TTL cleanup, skipping: %v", string(k), err)
 					continue
 				}
 				if now-entry.Timestamp > ttlNanos {
@@ -202,17 +204,27 @@ func (s *store) cleanupExpired() error {
 				return nil
 			}
 			for _, key := range keysToDelete {
+				v := bucket.Get(key)
+				if v == nil {
+					continue
+				}
+				var entry storedEntry
+				if err := json.Unmarshal(v, &entry); err != nil {
+					continue
+				}
+				if now-entry.Timestamp <= ttlNanos {
+					continue
+				}
 				if err := bucket.Delete(key); err != nil {
 					return err
 				}
+				totalRemoved++
 			}
 			return nil
 		})
 		if err != nil {
 			return err
 		}
-
-		totalRemoved += len(keysToDelete)
 
 		if scannedAll {
 			break
