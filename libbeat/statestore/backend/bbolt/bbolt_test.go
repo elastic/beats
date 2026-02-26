@@ -387,9 +387,9 @@ func TestCompactReopenFailure_NoPanic(t *testing.T) {
 	// Simulate the state compact() leaves when bolt.Open fails to reopen:
 	// s.db is closed but not nil. Before the fix, bolt.Open would assign
 	// nil to s.db, causing nil-pointer panics in all subsequent operations.
-	s.compactionMu.Lock()
+	s.mu.Lock()
 	s.db.Close()
-	s.compactionMu.Unlock()
+	s.mu.Unlock()
 
 	assert.NotPanics(t, func() {
 		_, err := s.Has("key1")

@@ -19,6 +19,7 @@ package bbolt
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -36,8 +37,8 @@ const tempDbPrefix = "tempdb"
 // compact performs database compaction by copying data to a temporary database
 // and replacing the original. This reclaims unused disk space.
 func (s *store) compact() error {
-	s.compactionMu.Lock()
-	defer s.compactionMu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	if s.closed {
 		s.log.Debug("Skipping compaction, store is already closed")
@@ -112,8 +113,8 @@ func (s *store) compact() error {
 }
 
 // runLoop starts a background goroutine that calls fn on every tick of interval
-// and stops when the store's stopCh is closed.
-func (s *store) runLoop(name string, interval time.Duration, fn func()) {
+// and stops when ctx is cancelled.
+func (s *store) runLoop(ctx context.Context, name string, interval time.Duration, fn func()) {
 	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
@@ -125,7 +126,7 @@ func (s *store) runLoop(name string, interval time.Duration, fn func()) {
 			select {
 			case <-ticker.C:
 				fn()
-			case <-s.stopCh:
+			case <-ctx.Done():
 				s.log.Debugf("Shutting down %s loop", name)
 				return
 			}
@@ -144,8 +145,8 @@ func (s *store) cleanupExpired() error {
 
 	s.log.Debug("Running TTL cleanup")
 
-	s.compactionMu.RLock()
-	defer s.compactionMu.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	now := time.Now().UnixNano()
 	ttlNanos := s.config.Retention.TTL.Nanoseconds()

@@ -18,6 +18,7 @@
 package bbolt
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -79,14 +80,15 @@ type store struct {
 	config   Config
 	options  *bbolt.Options
 
-	compactionMu sync.RWMutex
-	db           *bbolt.DB
+	// mu guards db and closed. Read lock for normal operations (Has, Get,
+	// Set, Remove, Each, cleanupExpired). Write lock for compact and Close,
+	// which replace or close the db handle.
+	mu     sync.RWMutex
+	db     *bbolt.DB
+	closed bool
 
-	stopCh chan struct{}
+	cancel context.CancelFunc
 	wg     sync.WaitGroup
-
-	closeMu sync.Mutex
-	closed  bool
 }
 
 func bboltOptions(timeout time.Duration, noSync bool) *bbolt.Options {
@@ -125,6 +127,8 @@ func openStore(log *logp.Logger, dbPath string, fileMode os.FileMode, cfg Config
 		return nil, fmt.Errorf("failed to create default bucket: %w", err)
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+
 	s := &store{
 		log:      log,
 		dbPath:   dbPath,
@@ -132,7 +136,7 @@ func openStore(log *logp.Logger, dbPath string, fileMode os.FileMode, cfg Config
 		config:   cfg,
 		options:  options,
 		db:       db,
-		stopCh:   make(chan struct{}),
+		cancel:   cancel,
 	}
 
 	if cfg.Compaction.CleanupOnStart {
@@ -149,7 +153,7 @@ func openStore(log *logp.Logger, dbPath string, fileMode os.FileMode, cfg Config
 
 	if cfg.Retention.TTL > 0 && cfg.Retention.Interval > 0 {
 		log.Debugf("Enabling retention: ttl=%v interval=%v", cfg.Retention.TTL, cfg.Retention.Interval)
-		s.runLoop("retention", cfg.Retention.Interval, func() {
+		s.runLoop(ctx, "retention", cfg.Retention.Interval, func() {
 			if err := s.cleanupExpired(); err != nil {
 				s.log.Errorf("TTL cleanup failed: %v", err)
 			}
@@ -163,21 +167,18 @@ func openStore(log *logp.Logger, dbPath string, fileMode os.FileMode, cfg Config
 
 // Close stops background goroutines and closes the underlying bbolt database.
 func (s *store) Close() error {
-	s.closeMu.Lock()
-	defer s.closeMu.Unlock()
+	s.cancel()
+	s.wg.Wait()
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	if s.closed {
 		return nil
 	}
-
-	s.log.Debugf("Closing bbolt store: path=%s", s.dbPath)
-
-	close(s.stopCh)
-	s.wg.Wait()
 	s.closed = true
 
-	s.compactionMu.Lock()
-	defer s.compactionMu.Unlock()
+	s.log.Debugf("Closing bbolt store: path=%s", s.dbPath)
 
 	err := s.db.Close()
 	if err != nil {
@@ -190,8 +191,8 @@ func (s *store) Close() error {
 
 // Has checks if the key exists in the store. Returns false for expired entries.
 func (s *store) Has(key string) (bool, error) {
-	s.compactionMu.RLock()
-	defer s.compactionMu.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	var found bool
 	err := s.db.View(func(tx *bbolt.Tx) error {
@@ -216,8 +217,8 @@ func (s *store) Has(key string) (bool, error) {
 // Get decodes the value for the given key into the provided value.
 // Returns errKeyUnknown for missing or expired entries.
 func (s *store) Get(key string, to any) error {
-	s.compactionMu.RLock()
-	defer s.compactionMu.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	return s.db.View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket(defaultBucket)
@@ -266,8 +267,8 @@ func (s *store) Set(key string, value any) error {
 		return fmt.Errorf("failed to encode entry for key %q: %w", key, err)
 	}
 
-	s.compactionMu.RLock()
-	defer s.compactionMu.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	return s.db.Update(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket(defaultBucket)
@@ -280,8 +281,8 @@ func (s *store) Set(key string, value any) error {
 
 // Remove removes an entry from the store.
 func (s *store) Remove(key string) error {
-	s.compactionMu.RLock()
-	defer s.compactionMu.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	return s.db.Update(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket(defaultBucket)
@@ -294,8 +295,8 @@ func (s *store) Remove(key string) error {
 
 // Each iterates over all key-value pairs in the store, skipping expired entries.
 func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error {
-	s.compactionMu.RLock()
-	defer s.compactionMu.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	ttl := s.config.Retention.TTL
 	nowNano := time.Now().UnixNano()
