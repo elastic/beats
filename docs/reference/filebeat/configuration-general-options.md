@@ -116,15 +116,6 @@ filebeat.registry.bbolt.fsync: false
 ```
 
 
-### `registry.bbolt.ttl` [_registry_bbolt_ttl]
-
-How long entries are kept in the store before being removed by periodic cleanup. A zero value disables TTL-based cleanup. Must be used together with `registry.bbolt.compaction.cleanup_interval`. Default: `0` (disabled).
-
-```yaml
-filebeat.registry.bbolt.ttl: 72h
-```
-
-
 ### `registry.bbolt.compaction.on_start` [_registry_bbolt_compaction_on_start]
 
 If `true`, database compaction runs every time Filebeat starts. Compaction rewrites the database file to reclaim unused disk space. Default: `false`.
@@ -136,7 +127,7 @@ filebeat.registry.bbolt.compaction.on_start: true
 
 ### `registry.bbolt.compaction.max_transaction_size` [_registry_bbolt_compaction_max_transaction_size]
 
-The maximum number of items copied per transaction during compaction and TTL cleanup. Default: `65536`.
+The maximum number of items copied per transaction during compaction and cleanup. Default: `65536`.
 
 ```yaml
 filebeat.registry.bbolt.compaction.max_transaction_size: 65536
@@ -152,12 +143,21 @@ filebeat.registry.bbolt.compaction.cleanup_on_start: true
 ```
 
 
-### `registry.bbolt.compaction.cleanup_interval` [_registry_bbolt_compaction_cleanup_interval]
+### `registry.bbolt.retention.ttl` [_registry_bbolt_retention_ttl]
 
-How often to run TTL-based entry cleanup. Only effective when `registry.bbolt.ttl` is also set to a positive value. A zero value disables periodic cleanup. Default: `0` (disabled).
+How long entries are kept in the store before being removed. A zero value disables TTL-based removal. Must be used together with `registry.bbolt.retention.interval`. Default: `0` (disabled).
 
 ```yaml
-filebeat.registry.bbolt.compaction.cleanup_interval: 5m
+filebeat.registry.bbolt.retention.ttl: 72h
+```
+
+
+### `registry.bbolt.retention.interval` [_registry_bbolt_retention_interval]
+
+How often to remove expired entries. Only effective when `registry.bbolt.retention.ttl` is also set to a positive value. A zero value disables periodic removal. Default: `0` (disabled).
+
+```yaml
+filebeat.registry.bbolt.retention.interval: 5m
 ```
 
 

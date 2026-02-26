@@ -268,8 +268,8 @@ func TestStoreTTLCleanup(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 
 	cfg := DefaultConfig()
-	cfg.TTL = 200 * time.Millisecond
-	cfg.Compaction.CleanupInterval = 100 * time.Millisecond
+	cfg.Retention.TTL = 200 * time.Millisecond
+	cfg.Retention.Interval = 100 * time.Millisecond
 
 	reg, err := New(logger.Named("test"), Settings{Root: path, Config: cfg})
 	require.NoError(t, err)
@@ -296,8 +296,8 @@ func TestStoreTTLCleanupKeepsRecent(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 
 	cfg := DefaultConfig()
-	cfg.TTL = 5 * time.Second
-	cfg.Compaction.CleanupInterval = 100 * time.Millisecond
+	cfg.Retention.TTL = 5 * time.Second
+	cfg.Retention.Interval = 100 * time.Millisecond
 
 	reg, err := New(logger.Named("test"), Settings{Root: path, Config: cfg})
 	require.NoError(t, err)

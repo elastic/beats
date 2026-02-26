@@ -28,8 +28,6 @@ const (
 )
 
 // Config defines configuration for the bbolt storage backend.
-// Parameter names are aligned with the OTel filestorage extension
-// for future compatibility.
 type Config struct {
 	// Timeout is the amount of time to wait to obtain a file lock on the
 	// bbolt database file.
@@ -38,33 +36,37 @@ type Config struct {
 	// FSync specifies that fsync should be called after each database write.
 	FSync bool `config:"fsync"`
 
-	// TTL defines how long entries are kept in the store before being
-	// removed by the cleanup process. A zero value disables TTL-based cleanup.
-	TTL time.Duration `config:"ttl"`
-
-	// Compaction holds compaction and cleanup related configuration.
+	// Compaction holds compaction related configuration.
 	Compaction CompactionConfig `config:"compaction"`
+
+	// Retention holds TTL and periodic retention cleanup configuration.
+	Retention RetentionConfig `config:"retention"`
 }
 
-// CompactionConfig defines configuration for bbolt database compaction
-// and TTL-based entry cleanup. Parameter names are aligned with the
-// OTel filestorage extension for future compatibility.
+// CompactionConfig defines configuration for bbolt database compaction.
 type CompactionConfig struct {
 	// OnStart specifies that compaction is attempted each time on start.
 	OnStart bool `config:"on_start"`
 
 	// MaxTransactionSize specifies the maximum number of items in a single
-	// compaction iteration.
+	// compaction or cleanup iteration.
 	MaxTransactionSize int64 `config:"max_transaction_size"`
 
 	// CleanupOnStart specifies that leftover temporary compaction files are
 	// removed on start.
 	CleanupOnStart bool `config:"cleanup_on_start"`
+}
 
-	// CleanupInterval specifies how often TTL-based entry cleanup runs.
-	// Only effective when TTL is also configured. A zero value disables
-	// the periodic cleanup.
-	CleanupInterval time.Duration `config:"cleanup_interval"`
+// RetentionConfig defines configuration for TTL-based entry retention.
+type RetentionConfig struct {
+	// TTL defines how long entries are kept in the store before being
+	// removed. A zero value disables TTL-based removal.
+	TTL time.Duration `config:"ttl"`
+
+	// Interval specifies how often expired entries are removed.
+	// Only effective when TTL is also set. A zero value disables
+	// periodic removal.
+	Interval time.Duration `config:"interval"`
 }
 
 // Validate checks the configuration for invalid or contradictory values.
@@ -72,14 +74,14 @@ func (c *Config) Validate() error {
 	if c.Timeout < 0 {
 		return errors.New("bbolt timeout must not be negative")
 	}
-	if c.TTL < 0 {
-		return errors.New("bbolt TTL must not be negative")
-	}
 	if c.Compaction.MaxTransactionSize < 0 {
 		return errors.New("bbolt compaction max_transaction_size must not be negative")
 	}
-	if c.TTL > 0 && c.Compaction.CleanupInterval < 0 {
-		return errors.New("bbolt compaction cleanup_interval must not be negative when TTL is set")
+	if c.Retention.TTL < 0 {
+		return errors.New("bbolt retention TTL must not be negative")
+	}
+	if c.Retention.TTL > 0 && c.Retention.Interval < 0 {
+		return errors.New("bbolt retention interval must not be negative when TTL is set")
 	}
 	return nil
 }

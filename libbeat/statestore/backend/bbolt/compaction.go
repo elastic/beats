@@ -137,7 +137,7 @@ func (s *store) runLoop(name string, interval time.Duration, fn func()) {
 // limit memory usage and transaction duration. A cursor is used to resume
 // scanning from the last position between batches.
 func (s *store) cleanupExpired() error {
-	if s.config.TTL <= 0 {
+	if s.config.Retention.TTL <= 0 {
 		return nil
 	}
 
@@ -147,7 +147,7 @@ func (s *store) cleanupExpired() error {
 	defer s.compactionMu.RUnlock()
 
 	now := time.Now().UnixNano()
-	ttlNanos := s.config.TTL.Nanoseconds()
+	ttlNanos := s.config.Retention.TTL.Nanoseconds()
 	batchSize := s.config.Compaction.MaxTransactionSize
 	var totalRemoved int
 	var seekKey []byte

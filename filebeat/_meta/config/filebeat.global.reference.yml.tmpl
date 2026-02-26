@@ -47,27 +47,27 @@
 # flushed to disk but reduces write throughput. Default: false.
 #filebeat.registry.bbolt.fsync: false
 
-# How long entries are kept before being removed by periodic cleanup.
-# A zero value disables TTL-based cleanup. Works together with
-# bbolt.compaction.cleanup_interval. Default: 0 (disabled).
-#filebeat.registry.bbolt.ttl: 0
-
 # If true, database compaction runs on every start. Compaction rewrites the
 # database to reclaim unused disk space. Default: false.
 #filebeat.registry.bbolt.compaction.on_start: false
 
-# Maximum number of items copied per transaction during compaction.
-# Default: 65536.
+# Maximum number of items copied per transaction during compaction
+# and cleanup. Default: 65536.
 #filebeat.registry.bbolt.compaction.max_transaction_size: 65536
 
 # If true, leftover temporary files from a previous compaction that was
 # interrupted (e.g. by a crash) are removed on start. Default: false.
 #filebeat.registry.bbolt.compaction.cleanup_on_start: false
 
-# How often to run TTL-based entry cleanup. Only effective when bbolt.ttl
-# is also set to a positive value. A zero value disables periodic cleanup.
+# How long entries are kept before being removed. A zero value disables
+# TTL-based removal. Works together with retention.interval.
 # Default: 0 (disabled).
-#filebeat.registry.bbolt.compaction.cleanup_interval: 0
+#filebeat.registry.bbolt.retention.ttl: 0
+
+# How often to remove expired entries. Only effective when retention.ttl
+# is also set to a positive value. A zero value disables periodic removal.
+# Default: 0 (disabled).
+#filebeat.registry.bbolt.retention.interval: 0
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines

@@ -140,9 +140,9 @@ func openStore(log *logp.Logger, dbPath string, fileMode os.FileMode, cfg Config
 		}
 	}
 
-	if cfg.TTL > 0 && cfg.Compaction.CleanupInterval > 0 {
-		log.Debugf("Enabling TTL cleanup: ttl=%v cleanup_interval=%v", cfg.TTL, cfg.Compaction.CleanupInterval)
-		s.runLoop("TTL cleanup", cfg.Compaction.CleanupInterval, func() {
+	if cfg.Retention.TTL > 0 && cfg.Retention.Interval > 0 {
+		log.Debugf("Enabling retention: ttl=%v interval=%v", cfg.Retention.TTL, cfg.Retention.Interval)
+		s.runLoop("retention", cfg.Retention.Interval, func() {
 			if err := s.cleanupExpired(); err != nil {
 				s.log.Errorf("TTL cleanup failed: %v", err)
 			}
