@@ -90,7 +90,9 @@ func GenerateFieldsDocs(fieldsYMLPath, outputPath, beat string) error {
 	}
 
 	markKeyPresence(data, docs)
-	deduplicateFields(docs)
+	if err := deduplicateFields(docs); err != nil {
+		return err
+	}
 
 	if err := os.MkdirAll(outputPath, 0o755); err != nil {
 		return fmt.Errorf("failed to create output directory %s: %w", outputPath, err)
@@ -197,7 +199,7 @@ func parsePythonOnlyTimestamp(s string) (time.Time, bool) {
 	return time.Time{}, false
 }
 
-func deduplicateFields(docs []fieldsYAMLSection) {
+func deduplicateFields(docs []fieldsYAMLSection) error {
 	for i := range docs {
 		if len(docs[i].Fields) == 0 {
 			continue
@@ -206,6 +208,9 @@ func deduplicateFields(docs []fieldsYAMLSection) {
 		var deduped []fieldsYAMLField
 		for _, field := range docs[i].Fields {
 			if idx, ok := seen[field.Name]; ok {
+				if deduped[idx].Type != field.Type {
+					return fmt.Errorf("field %q in section %q redefined with different type %q (previously %q)", field.Name, docs[i].Key, field.Type, deduped[idx].Type)
+				}
 				deduped[idx] = field
 			} else {
 				seen[field.Name] = len(deduped)
@@ -214,6 +219,7 @@ func deduplicateFields(docs []fieldsYAMLSection) {
 		}
 		docs[i].Fields = deduped
 	}
+	return nil
 }
 
 func writeFieldsIndex(docs []fieldsYAMLSection, outputPath, beat string) error {
