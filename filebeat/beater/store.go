@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	bboltst "github.com/elastic/beats/v7/libbeat/statestore/backend/bbolt"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/bbolt"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -64,7 +64,7 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 
 	switch cfg.Backend {
 	case "bbolt":
-		reg, err = bboltst.New(logger, bboltst.Settings{
+		reg, err = bbolt.New(logger, bbolt.Settings{
 			Root:     beatPaths.Resolve(paths.Data, cfg.Path),
 			FileMode: cfg.Permissions,
 			Config:   cfg.Bbolt,
