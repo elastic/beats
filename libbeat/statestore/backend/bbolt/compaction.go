@@ -22,10 +22,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
-	"syscall"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -82,21 +80,17 @@ func (s *store) compact() error {
 	s.db.Close()
 	compactedDB.Close()
 
-	if err := moveFileWithFallback(compactedPath, dbPath, s.fileMode); err != nil {
-		var pathErr *os.PathError
-		if !errors.As(err, &pathErr) || pathErr.Op != "remove" {
-			// Move failed — the original file is still at dbPath, reopen it (was closed before the move).
-			newDB, openErr := bolt.Open(dbPath, s.fileMode, s.options)
-			if openErr != nil {
-				return errors.Join(
-					fmt.Errorf("failed to replace db with compacted file: %w", err),
-					fmt.Errorf("failed to reopen db: %w", openErr),
-				)
-			}
-			s.db = newDB
-			return fmt.Errorf("failed to replace db with compacted file: %w", err)
+	if err := os.Rename(compactedPath, dbPath); err != nil {
+		// Rename failed — the original file is still at dbPath, reopen it (was closed before the rename).
+		newDB, openErr := bolt.Open(dbPath, s.fileMode, s.options)
+		if openErr != nil {
+			return errors.Join(
+				fmt.Errorf("failed to replace db with compacted file: %w", err),
+				fmt.Errorf("failed to reopen db: %w", openErr),
+			)
 		}
-		s.log.Warnf("Compaction succeeded but failed to remove temp file: %v", err)
+		s.db = newDB
+		return fmt.Errorf("failed to replace db with compacted file: %w", err)
 	}
 
 	newDB, err := bolt.Open(dbPath, s.fileMode, s.options)
@@ -252,48 +246,3 @@ func cleanupTempFiles(log *logp.Logger, dir string) {
 	}
 }
 
-// moveFileWithFallback attempts os.Rename first. If it fails due to a
-// cross-device link error (EXDEV), it falls back to a streaming
-// copy-and-remove that avoids loading the entire file into memory.
-func moveFileWithFallback(src, dest string, perm os.FileMode) error {
-	if err := os.Rename(src, dest); err == nil {
-		return nil
-	} else if !errors.Is(err, syscall.EXDEV) {
-		return err
-	}
-
-	// Cross-device fallback: copy to a temp file on the same filesystem as
-	// dest, then rename over dest. This avoids truncating dest before the
-	// copy is complete, which would destroy the original data on failure.
-	tmpFile, err := os.CreateTemp(filepath.Dir(dest), tempDbPrefix)
-	if err != nil {
-		return err
-	}
-	tmpPath := tmpFile.Name()
-	defer os.Remove(tmpPath)
-
-	srcFile, err := os.Open(src)
-	if err != nil {
-		tmpFile.Close()
-		return err
-	}
-	defer srcFile.Close()
-
-	if _, err := io.Copy(tmpFile, srcFile); err != nil {
-		tmpFile.Close()
-		return err
-	}
-	if err := tmpFile.Close(); err != nil {
-		return err
-	}
-
-	if err := os.Chmod(tmpPath, perm); err != nil {
-		return err
-	}
-
-	if err := os.Rename(tmpPath, dest); err != nil {
-		return err
-	}
-
-	return os.Remove(src)
-}
