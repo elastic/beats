@@ -159,6 +159,7 @@ func (s *store) cleanupExpired() error {
 		err := s.db.View(func(tx *bolt.Tx) error {
 			bucket := tx.Bucket(defaultBucket)
 			if bucket == nil {
+				// the bucket does not exist, so nothing to delete
 				scannedAll = true
 				return nil
 			}
