@@ -105,8 +105,10 @@ func TestCrowdstrikeFalconHose(t *testing.T) {
 	if *offset >= 0 {
 		cursor = map[string]any{"offset": *offset}
 	}
-	env := v2.Context{ID: "crowdstrike_testing",
-		MetricsRegistry: monitoring.NewRegistry()}
+	env := v2.Context{
+		ID:              "crowdstrike_testing",
+		MetricsRegistry: monitoring.NewRegistry(),
+	}
 	s, err := NewFalconHoseFollower(ctx, env, cfg, cursor, &testPublisher{logger}, nil, logger, time.Now)
 	if err != nil {
 		t.Fatalf("unexpected error constructing follower: %v", err)
