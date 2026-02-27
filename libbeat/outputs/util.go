@@ -62,8 +62,7 @@ func Success(
 			if err != nil {
 				return Group{}, fmt.Errorf("unable to get disk queue settings: %w", err)
 			}
-			settings.Paths = beatPaths
-			q = diskqueue.FactoryForSettings(settings)
+			q = diskqueue.FactoryForSettings(settings, beatPaths)
 		default:
 			return Group{}, fmt.Errorf("unknown queue type: %s", cfg.Name())
 		}

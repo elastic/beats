@@ -315,8 +315,7 @@ func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *path
 		if err != nil {
 			return nil, err
 		}
-		settings.Paths = paths
-		return diskqueue.FactoryForSettings(settings), nil
+		return diskqueue.FactoryForSettings(settings, paths), nil
 	default:
 		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
 	}

@@ -29,22 +29,22 @@ import (
 func TestDirectoryPath(t *testing.T) {
 	tests := map[string]struct {
 		settings Settings
+		fallback *paths.Path
 		expected string
 	}{
 		"explicit path takes precedence": {
 			settings: Settings{
 				Path: "/custom/queue/path",
-				Paths: &paths.Path{
-					Data: "/beat/data",
-				},
+			},
+			fallback: &paths.Path{
+				Data: "/beat/data",
 			},
 			expected: "/custom/queue/path",
 		},
 		"per-beat paths used when Path is empty": {
-			settings: Settings{
-				Paths: &paths.Path{
-					Data: "/beat/data",
-				},
+			settings: Settings{},
+			fallback: &paths.Path{
+				Data: "/beat/data",
 			},
 			expected: filepath.Join("/beat/data", "diskqueue"),
 		},
@@ -52,7 +52,7 @@ func TestDirectoryPath(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			result := test.settings.directoryPath()
+			result := test.settings.directoryPath(test.fallback)
 			assert.Equal(t, test.expected, result)
 		})
 	}
