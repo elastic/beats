@@ -66,8 +66,10 @@ func (s *store) compact() error {
 	if err != nil {
 		return err
 	}
-	// We have to close files before moving on Windows.
-	s.db.Close()
+	// We have to close the db before renaming on Windows.
+	if err := s.db.Close(); err != nil {
+		return fmt.Errorf("failed to close db for compaction: %w", err)
+	}
 
 	// Ensure s.db is reopened from s.dbPath if anything below fails.
 	// On success, reopened is set to true and the defer is a no-op.
