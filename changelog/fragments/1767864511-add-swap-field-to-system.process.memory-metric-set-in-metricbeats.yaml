@@ -9,28 +9,16 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: bug-fix
+kind: enhancement
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Fix Entity Analytics Okta OAuth2 token requests ignoring custom TLS/SSL configuration.
+summary: add swap field to system.process.memory metric set in metricbeat
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-description: |
-  The OAuth2 authentication flow in the Okta entity analytics provider
-  was ignoring the user-configured HTTP client. Instead, it was using
-  Go's default HTTP client for all token-related requests
-  (initial token exchange, token refresh, and API calls).
-  
-  This meant that any custom TLS/SSL or proxy settings configured by
-  the user were silently discarded, causing connection failures in
-  environments that rely on custom certificates or proxies.
-
-  This fix ensures the configured HTTP client is propagated through
-  all OAuth2 token operations, so that outgoing requests correctly
-  use the user's transport configuration.
+# description:
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
@@ -40,7 +28,7 @@ description: |
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: filebeat
+component: metricbeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
