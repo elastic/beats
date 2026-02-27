@@ -6,7 +6,7 @@ applies_to:
   serverless: beta
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Consul fields [exported-fields-consul]
 

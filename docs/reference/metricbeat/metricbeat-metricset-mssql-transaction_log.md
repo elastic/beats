@@ -6,7 +6,7 @@ applies_to:
   serverless: ga
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # MSSQL transaction_log metricset [metricbeat-metricset-mssql-transaction_log]
 
