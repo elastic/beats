@@ -2,13 +2,12 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build windows
-
 package main
 
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
@@ -17,11 +16,17 @@ import (
 )
 
 const guidMappingSourceUrl = "https://github.com/EricZimmerman/GuidMapping/raw/refs/heads/master/Resources/GuidToName.txt"
+const guidMappingCachePath = "generate/sources/GuidToName.txt"
 
 // scrapeGuidMappings
-func scrapeGuidMappings(log *logger.Logger) (map[string]string, error) {
+func scrapeGuidMappings(opts generatorOptions, log *logger.Logger) (map[string]string, error) {
 	guidMappings := make(map[string]string)
-	bodyString, err := downloadPage(guidMappingSourceUrl)
+	bodyString, err := loadSourceText(
+		filepath.Join(opts.workingDir, guidMappingCachePath),
+		guidMappingSourceUrl,
+		opts.refreshSources,
+		log,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -42,8 +47,8 @@ func scrapeGuidMappings(log *logger.Logger) (map[string]string, error) {
 
 // writeGuidMappingGeneratedFile writes the guid mappings to a generated source file
 // that can be used to lookup guid names by guid.
-func writeGuidMappingGeneratedFile(outputFile string, log *logger.Logger) error {
-	guidMappings, err := scrapeGuidMappings(log)
+func writeGuidMappingGeneratedFile(outputFile string, opts generatorOptions, log *logger.Logger) error {
+	guidMappings, err := scrapeGuidMappings(opts, log)
 	if err != nil {
 		return err
 	}
