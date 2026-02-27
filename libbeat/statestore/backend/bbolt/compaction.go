@@ -121,22 +121,24 @@ func (s *store) compactTo(path string) error {
 	return nil
 }
 
-// runLoop starts a background goroutine that calls fn on every tick of interval
-// and stops when ctx is cancelled.
-func (s *store) runLoop(ctx context.Context, name string, interval time.Duration, fn func()) {
+// startRetentionLoop runs a background goroutine that periodically removes
+// expired entries. It stops when ctx is cancelled.
+func (s *store) startRetentionLoop(ctx context.Context) {
 	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
 
-		ticker := time.NewTicker(interval)
+		ticker := time.NewTicker(s.config.Retention.Interval)
 		defer ticker.Stop()
 
 		for {
 			select {
 			case <-ticker.C:
-				fn()
+				if err := s.cleanupExpired(); err != nil {
+					s.log.Errorf("TTL cleanup failed: %v", err)
+				}
 			case <-ctx.Done():
-				s.log.Debugf("Shutting down %s loop", name)
+				s.log.Debug("Shutting down retention loop")
 				return
 			}
 		}

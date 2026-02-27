@@ -152,11 +152,7 @@ func openStore(log *logp.Logger, dbPath string, fileMode os.FileMode, cfg Config
 
 	if cfg.Retention.TTL > 0 && cfg.Retention.Interval > 0 {
 		log.Debugf("Enabling retention: ttl=%v interval=%v", cfg.Retention.TTL, cfg.Retention.Interval)
-		s.runLoop(ctx, "retention", cfg.Retention.Interval, func() {
-			if err := s.cleanupExpired(); err != nil {
-				s.log.Errorf("TTL cleanup failed: %v", err)
-			}
-		})
+		s.startRetentionLoop(ctx)
 	}
 
 	log.Debugf("Store ready: path=%s", dbPath)
