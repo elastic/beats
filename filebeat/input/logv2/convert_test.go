@@ -97,6 +97,47 @@ paths:
 }
 `,
 		},
+		"container input with streams set": {
+			logYamlCfg: `
+type: container
+id: container-id
+stream: stderr
+paths:
+ - /var/log/containers/*.log
+`,
+			expectedJsonCfg: `
+{
+  "file_identity": {
+    "native": null
+  },
+  "id": "container-id",
+  "parsers": [
+    {
+      "container": {
+        "format": "auto",
+        "stream": "stderr"
+      }
+    }
+  ],
+  "paths": [
+    "/var/log/containers/*.log"
+  ],
+  "prospector": {
+    "scanner": {
+      "fingerprint": {
+        "enabled": false
+      },
+      "symlinks": true
+    }
+  },
+  "take_over": {
+    "enabled": true,
+    "stream": "stderr"
+  },
+  "type": "filestream"
+}
+`,
+		},
 		"container input and multiline in correct order": {
 			logYamlCfg: `
 type: container

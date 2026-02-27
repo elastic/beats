@@ -19,6 +19,28 @@ defaults:
       labels:
         - "backport"
 pull_request_rules:
+  - name: automatic approval for updatecli pull requests with changes in .buildkite
+    conditions:
+      - author=github-actions[bot]
+      - check-success=buildkite/beats
+      - or:
+        - modified-files~=^.buildkite/.*\.yml$
+      - head~=^updatecli_.*
+    actions:
+      review:
+        type: APPROVE
+        message: Automatically approving mergify
+  - name: automatic squash and merge with success checks and the files matching the regex .buildkite is modified.
+    conditions:
+      - author=github-actions[bot]
+      - check-success=buildkite/beats
+      - or:
+        - modified-files~=^.buildkite/.*\.yml$
+      - head~=^updatecli_.*
+      - "#approved-reviews-by>=1"
+    actions:
+      queue:
+        name: default
   - name: self-assign PRs
     conditions:
       - -merged

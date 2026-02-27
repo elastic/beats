@@ -96,15 +96,15 @@ func TestNewReceiver(t *testing.T) {
 				return getFromSocket(t, &lastError, monitorSocket, "inputs")
 			}, "failed to connect to monitoring socket, inputs endpoint, last error was: %s", &lastError)
 			assert.Condition(c, func() bool {
-				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
-					FilterMessageSnippet("add_host_metadata").
-					FilterMessageSnippet("add_cloud_metadata").
-					FilterMessageSnippet("add_docker_metadata").
-					FilterMessageSnippet("add_kubernetes_metadata")
-				assert.Len(t, processorsLoaded.All(), 1, "processors not loaded")
-				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
-				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
+				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors")
+				assert.Empty(c, processorsLoaded.All(), "processors loaded but none expected")
+				// Check that add_host_metadata enrichment is not done.
+				return assert.NotContains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
+			assert.Condition(c, func() bool {
+				metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
+				return assert.NotEmpty(t, metricsStarted.All(), "metrics logging not started")
+			}, "failed to check metrics logging")
 		},
 	})
 }
@@ -266,7 +266,7 @@ func TestMultipleReceivers(t *testing.T) {
 			for _, helper := range helpers {
 				writeFile(c, helper.ingest, "A log line")
 
-				require.Greaterf(c, len(logs[helper.name]), 0, "receiver %v does not have any logs", helper)
+				require.NotEmptyf(c, logs[helper.name], "receiver %v does not have any logs", helper)
 
 				assert.Equalf(c, "test", logs[helper.name][0].Flatten()["message"], "expected %v message field to be 'test'", helper)
 
@@ -280,6 +280,9 @@ func TestMultipleReceivers(t *testing.T) {
 				// overwritten when multiple receivers started in the same process.
 				startLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+helper.name))
 				assert.Equalf(c, 1, startLogs.Len(), "%v should have a single start log", helper)
+
+				startMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+helper.name))
+				assert.Equalf(c, 1, startMetricsLogs.Len(), "%v should have a single start metrircs logging every 30s", helper)
 
 				metaPath := filepath.Join(helper.home, "/data/meta.json")
 				assert.FileExistsf(c, metaPath, "%s of %v should exist", metaPath, helper)

@@ -19,7 +19,7 @@ The process for contributing to any of the Elastic repositories is similar.
 1. Please make sure you have signed our [Contributor License Agreement](https://www.elastic.co/contributor-agreement/). We are not asking you to assign copyright to us, but to give us the right to distribute your code without restriction. We ask this of all contributors in order to assure our users of the origin and continuing existence of the code. You only need to sign the CLA once.
 2. Send a pull request! Push your changes to your fork of the repository and [submit a pull request](https://help.github.com/articles/using-pull-requests) using our [pull request guidelines](/extend/pr-review.md). New PRs go to the main branch. The Beats core team will backport your PR if it is necessary.
 
-In the pull request, describe what your changes do and mention any bugs/issues related to the pull request. Please also add a changelog entry to [CHANGELOG.next.asciidoc](https://github.com/elastic/beats/blob/main/CHANGELOG.next.asciidoc).
+In the pull request, describe what your changes do and mention any bugs/issues related to the pull request. Please also add a changelog in `./changelog/fragments` using the [changelog tool](https://github.com/elastic/elastic-agent-changelog-tool/blob/main/docs/usage.md).
 
 
 ## Setting Up Your Dev Environment [setting-up-dev-environment]

@@ -73,7 +73,7 @@ type s3Mover interface {
 }
 
 type s3Lister interface {
-	ListObjectsPaginator(bucket, prefix string) s3Pager
+	ListObjectsPaginator(bucket, prefix, startAfterKey string) s3Pager
 }
 
 type s3Pager interface {
@@ -118,7 +118,7 @@ func (a *awsSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]type
 
 	receiveMessageOutput, err := a.client.ReceiveMessage(ctx, &sqs.ReceiveMessageInput{
 		QueueUrl:            awssdk.String(a.queueURL),
-		MaxNumberOfMessages: int32(min(maxMessages, sqsMaxNumberOfMessagesLimit)),
+		MaxNumberOfMessages: int32(min(maxMessages, sqsMaxNumberOfMessagesLimit)), //nolint:gosec // value is bounded by sqsMaxNumberOfMessagesLimit (10)
 		VisibilityTimeout:   int32(a.visibilityTimeout.Seconds()),
 		WaitTimeSeconds:     int32(a.longPollWaitTime.Seconds()),
 		AttributeNames:      []types.QueueAttributeName{sqsApproximateReceiveCountAttribute, sqsSentTimestampAttribute},
@@ -205,6 +205,7 @@ func (a *awsSQSAPI) GetQueueAttributes(ctx context.Context, attr []types.QueueAt
 
 type awsS3API struct {
 	client *s3.Client
+	log    *logp.Logger
 
 	// others is the set of other clients referred
 	// to by notifications seen by the API connection.
@@ -216,8 +217,8 @@ type awsS3API struct {
 
 const awsS3APIcacheMax = 100
 
-func newAWSs3API(cli *s3.Client) *awsS3API {
-	return &awsS3API{client: cli, others: make(map[string]*s3.Client)}
+func newAWSs3API(cli *s3.Client, log *logp.Logger) *awsS3API {
+	return &awsS3API{client: cli, log: log, others: make(map[string]*s3.Client)}
 }
 
 func (a *awsS3API) GetObject(ctx context.Context, region, bucket, key string) (*s3.GetObjectOutput, error) {
@@ -232,7 +233,7 @@ func (a *awsS3API) GetObject(ctx context.Context, region, bucket, key string) (*
 					out middleware.FinalizeOutput, metadata middleware.Metadata, err error,
 				) {
 					out, metadata, err = next.HandleFinalize(ctx, in)
-					requestURL, parseErr := url.Parse(in.Request.(*smithyhttp.Request).URL.String())
+					requestURL, parseErr := url.Parse(in.Request.(*smithyhttp.Request).URL.String()) //nolint:errcheck // type assertion is guaranteed by AWS SDK
 					if parseErr != nil {
 						return out, metadata, err
 					}
@@ -319,11 +320,16 @@ func (a *awsS3API) clientFor(region string) *s3.Client {
 	return cli
 }
 
-func (a *awsS3API) ListObjectsPaginator(bucket, prefix string) s3Pager {
-	pager := s3.NewListObjectsV2Paginator(a.client, &s3.ListObjectsV2Input{
+func (a *awsS3API) ListObjectsPaginator(bucket, prefix, startAfterKey string) s3Pager {
+	input := &s3.ListObjectsV2Input{
 		Bucket: awssdk.String(bucket),
 		Prefix: awssdk.String(prefix),
-	})
+	}
+	if startAfterKey != "" {
+		input.StartAfter = awssdk.String(startAfterKey)
+		a.log.Debugw("Listing objects with startAfterKey.", "start_after_key", startAfterKey)
+	}
+	pager := s3.NewListObjectsV2Paginator(a.client, input)
 
 	return pager
 }

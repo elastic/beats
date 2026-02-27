@@ -4,9 +4,9 @@
 env:
   ASDF_MAGE_VERSION: 1.15.0
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1768449671"
   GCP_DEFAULT_MACHINE_TYPE: "c2d-standard-8"
-  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1768449671"
 
   PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
   PLATFORMS_ARM: "+all linux/arm64 darwin/arm64 windows/arm64"
@@ -17,10 +17,10 @@ env:
 # See https://buildkite.com/docs/pipelines/integrations/plugins/using#using-yaml-anchors-with-plugins
 common:
   - dockerhub_login_plugin: &dockerhub_login_plugin
-      elastic/vault-docker-login#v0.6.0:
+      elastic/vault-docker-login#v0.6.4:
         secret_path: 'kv/ci-shared/observability-github-secrets/shared/docker/dockerhub/observabilityrobots'
   - docker_elastic_login_plugin: &docker_elastic_login_plugin
-      elastic/vault-docker-login#v0.6.0:
+      elastic/vault-docker-login#v0.6.4:
         secret_path: 'kv/ci-shared/platform-ingest/elastic_docker_registry'
 
 steps:
@@ -145,7 +145,7 @@ steps:
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          image: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         timeout_in_minutes: 40
         retry:
@@ -208,7 +208,7 @@ steps:
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          image: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         timeout_in_minutes: 40
         retry:
@@ -277,7 +277,7 @@ steps:
           .buildkite/scripts/packaging/package-dra.sh {{matrix}}
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          image: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         timeout_in_minutes: 40
         retry:
@@ -344,7 +344,7 @@ steps:
           .buildkite/scripts/packaging/package-dra.sh {{matrix}}
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          image: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         timeout_in_minutes: 40
         retry:

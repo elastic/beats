@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/understand-auditbeat-logs.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Understand metrics in Auditbeat logs [understand-auditbeat-logs]

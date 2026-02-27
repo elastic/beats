@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-syslog.html
 applies_to:
   stack: deprecated 8.14.0
+  serverless: deprecated
 ---
 
 # Syslog input [filebeat-input-syslog]

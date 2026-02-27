@@ -17,6 +17,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 )
 
 var _ historyParser = &safariParser{}
@@ -55,10 +56,10 @@ func inferSafariBrowserName(path string) string {
 	return "safari_custom"
 }
 
-func (parser *safariParser) parse(ctx context.Context, queryContext table.QueryContext, allFilters []filters.Filter) ([]*visit, error) {
+func (parser *safariParser) parse(ctx context.Context, queryContext table.QueryContext, allFilters []filters.Filter) ([]elasticbrowserhistory.Result, error) {
 	var (
 		merr   error
-		visits []*visit
+		visits []elasticbrowserhistory.Result
 	)
 	for _, profile := range parser.profiles {
 		// Check if profile matches the filters
@@ -75,7 +76,7 @@ func (parser *safariParser) parse(ctx context.Context, queryContext table.QueryC
 	return visits, merr
 }
 
-func (parser *safariParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]*visit, error) {
+func (parser *safariParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]elasticbrowserhistory.Result, error) {
 	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", profile.HistoryPath)
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
@@ -109,7 +110,7 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 	}
 	defer rows.Close()
 
-	var entries []*visit
+	var entries []elasticbrowserhistory.Result
 	rowCount := 0
 	for rows.Next() {
 		rowCount++
@@ -138,12 +139,12 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 			continue
 		}
 
-		entry := newVisit("safari", profile, safariTimeToUnix(visitTime.Float64))
-		entry.URL = url.String
+		entry := newResult("safari", profile, safariTimeToUnix(visitTime.Float64))
+		entry.Url = url.String
 		entry.Title = title.String
 		entry.Scheme, entry.Hostname, entry.Domain = extractSchemeHostAndTLDPPlusOne(url.String)
-		entry.VisitID = visitID.Int64
-		entry.UrlID = itemID.Int64
+		entry.VisitId = visitID.Int64
+		entry.UrlId = itemID.Int64
 		entry.SfDomainExpansion = domainExpansion.String
 		entry.SfLoadSuccessful = loadSuccessful.Bool
 

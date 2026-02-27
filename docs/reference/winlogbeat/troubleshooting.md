@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/troubleshooting.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Troubleshoot [troubleshooting]
