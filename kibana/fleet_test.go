@@ -439,6 +439,7 @@ func TestFleetDownloadSource(t *testing.T) {
 		require.Equal(t, id, resp.Item.ID)
 		require.Equal(t, name, resp.Item.Name)
 		require.NotEmpty(t, "http://test.local", resp.Item.Host)
+		require.Nil(t, resp.Item.Auth)
 	})
 	t.Run("update", func(t *testing.T) {
 		resp, err := client.UpdateDownloadSource(t.Context(), id, DownloadSource{
@@ -449,6 +450,7 @@ func TestFleetDownloadSource(t *testing.T) {
 		require.Equal(t, id, resp.Item.ID)
 		require.Equal(t, name, resp.Item.Name)
 		require.NotEmpty(t, "http://newtest.local", resp.Item.Host)
+		require.Nil(t, resp.Item.Auth)
 	})
 }
 

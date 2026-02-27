@@ -147,20 +147,29 @@ func (client *Client) CreatePolicy(ctx context.Context, request AgentPolicy) (r 
 	return polResp.Item, err
 }
 
+type DownloadSourceAuth struct {
+	APIKey   string      `json:"api_key,omitempty"`
+	Headers  interface{} `json:"headers,omitempty"`
+	Username string      `json:"username,omitempty"`
+	Password string      `json:"password,omitempty"`
+}
+
 type DownloadSource struct {
-	Name      string      `json:"name"`
-	Host      string      `json:"host"`
-	IsDefault bool        `json:"is_default"`
-	ProxyID   interface{} `json:"proxy_id"`
+	Name      string              `json:"name"`
+	Host      string              `json:"host"`
+	IsDefault bool                `json:"is_default"`
+	ProxyID   interface{}         `json:"proxy_id"`
+	Auth      *DownloadSourceAuth `json:"auth,omitempty"`
 }
 
 type DownloadSourceResponse struct {
 	Item struct {
-		ID        string `json:"id"`
-		Name      string `json:"name"`
-		Host      string `json:"host"`
-		IsDefault bool   `json:"is_default"`
-		ProxyID   string `json:"proxy_id"`
+		ID        string              `json:"id"`
+		Name      string              `json:"name"`
+		Host      string              `json:"host"`
+		IsDefault bool                `json:"is_default"`
+		ProxyID   string              `json:"proxy_id"`
+		Auth      *DownloadSourceAuth `json:"auth,omitempty"`
 	} `json:"item"`
 }
 
