@@ -522,7 +522,7 @@ func (inp *filestream) open(
 	if fs.identifierGenerator == growingFingerprintName {
 		r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, "growing-fingerprint", offset)
 	} else {
-		r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
+		r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, "static--fingerprint", offset)
 	}
 
 	r = inp.parsers.Create(r, log)
