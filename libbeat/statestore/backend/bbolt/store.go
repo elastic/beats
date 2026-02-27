@@ -123,8 +123,7 @@ func openStore(log *logp.Logger, dbPath string, fileMode os.FileMode, cfg Config
 		_, err := tx.CreateBucketIfNotExists(defaultBucket)
 		return err
 	}); err != nil {
-		db.Close()
-		return nil, fmt.Errorf("failed to create default bucket: %w", err)
+		return nil, errors.Join(fmt.Errorf("failed to create default bucket: %w", err), db.Close())
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
