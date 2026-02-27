@@ -11,7 +11,7 @@
 kind: security
 
 # Change summary; a 80ish characters long description of the change.
-summary: Update transient dependency filippo.io/edwards25519
+summary: Update transient dependency filippo.io/edwards25519 to v1.1.1
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
