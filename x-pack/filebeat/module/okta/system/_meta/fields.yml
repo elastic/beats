@@ -83,17 +83,17 @@
     - name: raw_user_agent
       type: keyword
       description: >
-        The raw informaton of the user agent.
+        The raw information of the user agent.
 
     - name: os
       type: keyword
       description: >
-        The OS informaton.
+        The OS information.
 
     - name: browser
       type: keyword
       description: >
-        The browser informaton of the client.
+        The browser information of the client.
 
   - name: zone
     type: keyword
@@ -351,7 +351,7 @@
   - name: external_session_id
     type: keyword
     description: >
-      The session identifer of the external session if any.
+      The session identifier of the external session if any.
 
   - name: interface
     type: keyword
