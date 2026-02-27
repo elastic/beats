@@ -11,84 +11,69 @@ package jumplists
 
 import (
 	"context"
+	"errors"
+	"math"
 
 	"github.com/osquery/osquery-go/plugin/table"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/interfaces"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	jumpliststypes "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/jumplists"
+	elasticjumplists "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/jumplists/elastic_jumplists"
 )
 
-type JumplistType string
-
-const (
-	JumplistTypeCustom    JumplistType = "custom"
-	JumplistTypeAutomatic JumplistType = "automatic"
-)
-
-// JumplistMeta is the metadata for a jump list.
-// It contains the application ID, jump list type, path to the jump list file,
-// and any jumplist type specific metadata.  The embedded fields
-// have osquery tags defined in their object definitions, and our encoding package
-// will automatically marshal the fields to the correct JSON format.
-type JumplistMeta struct {
-	*ApplicationID
-	*UserProfile
-	JumplistType JumplistType `osquery:"jumplist_type"`
-	Path         string       `osquery:"source_file_path"`
+func init() {
+	elasticjumplists.RegisterGenerateFunc(getResults)
 }
 
-// JumplistEntry is a single entry in a jump list.
-// TODO: Automatic jumplists will add additional fields to the JumplistEntry object.
-type JumplistEntry struct {
+type jumplistType string
+
+const (
+	jumplistTypeCustom    jumplistType = "custom"
+	jumplistTypeAutomatic jumplistType = "automatic"
+)
+
+// jumplistMeta is metadata shared by every entry from one jump list file.
+type jumplistMeta struct {
+	*jumpliststypes.ApplicationID
+	*jumpliststypes.UserProfile
+	*jumpliststypes.JumplistMeta
+}
+
+// jumplistEntry is a single entry in a jump list.
+type jumplistEntry struct {
 	*DestListEntry
 	*Lnk
 }
 
-// Jumplist is a collection of Lnk objects that represent a single jump list.
-// It contains the metadata for the jump list and the entries (Lnk objects).
-// This is a generic object that can represent either a custom jumplist
-// or an automatic jumplist. It is comprised of a JumplistMeta object and a slice of Lnk objects.
-type Jumplist struct {
-	*JumplistMeta
-	entries []*JumplistEntry
+// jumplist holds entries from one jump list source file.
+type jumplist struct {
+	*jumplistMeta
+	entries []*jumplistEntry
 }
 
-// JumplistRow is a single row in a jump list.
-// Each jumplist is a collection of LNK objects, but each LNK object in the jumplist
-// has the same metadata (application id, jumplist type, path, etc).
-// This object using embedded pointers so that multiple rows can share the same metadata.
-// each embedded field has osquery tags defined in their object definitions
-type JumplistRow struct {
-	*JumplistMeta  // The metadata for the jump list 1Code has alerts. Press enter to view.
-	*JumplistEntry // The JumplistEntry object that represents a single jump list entry
+// jumplistRow is one emitted row.
+type jumplistRow struct {
+	*jumplistMeta
+	*jumplistEntry
 }
 
-// ToRows converts the Jumplist to a slice of JumplistRow objects.
-func (j *Jumplist) ToRows() []JumplistRow {
-	var rows []JumplistRow
+// toRows converts a jump list to row objects.
+func (j *jumplist) toRows() []jumplistRow {
+	var rows []jumplistRow
 	for _, entry := range j.entries {
-		rows = append(rows, JumplistRow{
-			JumplistMeta:  j.JumplistMeta,
-			JumplistEntry: entry,
+		rows = append(rows, jumplistRow{
+			jumplistMeta:  j.jumplistMeta,
+			jumplistEntry: entry,
 		})
 	}
 	return rows
 }
 
-// GetColumns returns the column definitions for the JumplistRow object.
-// It returns a slice of table.ColumnDefinition objects.
-func GetColumns() []table.ColumnDefinition {
-	columns, err := encoding.GenerateColumnDefinitions(JumplistRow{})
-	if err != nil {
-		return nil
-	}
-	return columns
-}
-
 // matchesFilters is a helper function that checks if a row matches the given filters.
-func matchesFilters(row JumplistRow, filters []filters.Filter) bool {
+func matchesFilters(row jumplistRow, filters []filters.Filter) bool {
 	for _, filter := range filters {
 		if !filter.Matches(row) {
 			return false
@@ -102,8 +87,8 @@ type ClientInterface interface {
 }
 
 // getAllJumplists is a helper function that gets all the jumplists for all the user profiles.
-func getAllJumplists(log *logger.Logger, client ClientInterface) ([]*Jumplist, error) {
-	var jumplists []*Jumplist
+func getAllJumplists(log *logger.Logger, client ClientInterface) ([]*jumplist, error) {
+	var jumplists []*jumplist
 
 	userProfiles, err := getUserProfiles(log, client)
 	if err != nil {
@@ -116,28 +101,78 @@ func getAllJumplists(log *logger.Logger, client ClientInterface) ([]*Jumplist, e
 	return jumplists, nil
 }
 
-// GetGenerateFunc returns a function that can be used to generate a table of JumplistRow objects.
-// It returns a function that can be used to generate a table of JumplistRow objects.
-func GetGenerateFunc(log *logger.Logger, client ClientInterface) table.GenerateFunc {
-	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		jumplists, err := getAllJumplists(log, client)
-		if err != nil {
-			return nil, err
-		}
-		// Convert the jumplists to a slice of map[string]string objects that will
-		var marshalledRows []map[string]string
-		filters := filters.GetConstraintFilters(queryContext)
-		for _, jumpList := range jumplists {
-			for _, row := range jumpList.ToRows() {
-				if matchesFilters(row, filters) {
-					rowMap, err := encoding.MarshalToMapWithFlags(row, encoding.EncodingFlagUseNumbersZeroValues)
-					if err != nil {
-						return nil, err
-					}
-					marshalledRows = append(marshalledRows, rowMap)
-				}
+func getResults(_ context.Context, queryContext table.QueryContext, log *logger.Logger, resilientClient *client.ResilientClient) ([]elasticjumplists.Result, error) {
+	if resilientClient == nil {
+		return nil, errors.New("jumplists client is not configured")
+	}
+
+	jumplists, err := getAllJumplists(log, resilientClient)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []elasticjumplists.Result
+	constraintFilters := filters.GetConstraintFilters(queryContext)
+	for _, jumpList := range jumplists {
+		for _, row := range jumpList.toRows() {
+			if matchesFilters(row, constraintFilters) {
+				results = append(results, jumplistRowToResult(row))
 			}
 		}
-		return marshalledRows, nil
 	}
+	return results, nil
+}
+
+func jumplistRowToResult(row jumplistRow) elasticjumplists.Result {
+	result := elasticjumplists.Result{}
+
+	result.ApplicationID = row.ApplicationID
+	result.UserProfile = row.UserProfile
+	result.JumplistMeta = row.JumplistMeta
+
+	if row.DestListEntry != nil {
+		result.DestListEntry = &jumpliststypes.DestListEntry{
+			Hostname:              row.DestListEntry.Hostname,
+			EntryNumber:           row.DestListEntry.EntryNumber,
+			LastModifiedTime:      row.DestListEntry.LastModifiedTime,
+			IsPinned:              row.DestListEntry.PinStatus,
+			InteractionCount:      row.DestListEntry.InteractionCount,
+			DestEntryPath:         row.DestListEntry.Path,
+			DestEntryPathResolved: row.DestListEntry.ResolvedPath,
+			MacAddress:            row.DestListEntry.MacAddress,
+			CreationTime:          row.DestListEntry.CreationTime,
+		}
+	}
+
+	if row.Lnk != nil {
+		fileSize := int32(row.Lnk.FileSize)
+		if row.Lnk.FileSize > math.MaxInt32 {
+			fileSize = math.MaxInt32
+		}
+
+		volumeLabelOffset := int32(row.Lnk.VolumeLabelOffset)
+		if row.Lnk.VolumeLabelOffset > math.MaxInt32 {
+			volumeLabelOffset = math.MaxInt32
+		}
+
+		result.LnkMetadata = &jumpliststypes.LnkMetadata{
+			LocalPath:              row.Lnk.LocalPath,
+			FileSize:               fileSize,
+			HotKey:                 row.Lnk.HotKey,
+			IconIndex:              row.Lnk.IconIndex,
+			ShowWindow:             row.Lnk.ShowWindow,
+			IconLocation:           row.Lnk.IconLocation,
+			CommandLineArguments:   row.Lnk.CommandLineArguments,
+			TargetModificationTime: row.Lnk.TargetModificationDate,
+			TargetLastAccessedTime: row.Lnk.TargetLastAccessedDate,
+			TargetCreationTime:     row.Lnk.TargetCreationDate,
+			VolumeSerialNumber:     row.Lnk.VolumeSerialNumber,
+			VolumeType:             row.Lnk.VolumeType,
+			VolumeLabel:            row.Lnk.VolumeLabel,
+			VolumeLabelOffset:      volumeLabelOffset,
+			Name:                   row.Lnk.Name,
+		}
+	}
+
+	return result
 }

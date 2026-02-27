@@ -27,19 +27,19 @@ import (
 
 func TestEmpty(t *testing.T) {
 	sl, err := FromString("0", 16)
-	assert.Nil(t, err)
-	assert.Equal(t, len(sl), 0)
+	assert.NoError(t, err)
+	assert.Empty(t, sl)
 
 	sl, err = FromUint64(0)
-	assert.Nil(t, err)
-	assert.Equal(t, len(sl), 0)
+	assert.NoError(t, err)
+	assert.Empty(t, sl)
 
 	// assumes non-root has no capabilities
 	if os.Geteuid() != 0 {
 		empty := cap.NewSet()
 		self := cap.GetProc()
 		d, err := self.Cf(empty)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.False(t, d.Has(cap.Effective))
 		assert.False(t, d.Has(cap.Permitted))
 
@@ -63,8 +63,8 @@ func TestEmpty(t *testing.T) {
 
 func TestOverflow(t *testing.T) {
 	sl, err := FromUint64(^uint64(0))
-	assert.Nil(t, err)
-	assert.Equal(t, len(sl), 64)
+	assert.NoError(t, err)
+	assert.Len(t, sl, 64)
 
 	for _, cap := range []string{
 		"CAP_CHOWN",
@@ -98,5 +98,5 @@ func assertHasCap(t *testing.T, sl []string, s string) {
 		}
 	}
 
-	assert.Equal(t, found, 1, s)
+	assert.Equal(t, 1, found, s)
 }

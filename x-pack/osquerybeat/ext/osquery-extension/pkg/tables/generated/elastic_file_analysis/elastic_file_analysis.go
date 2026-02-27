@@ -16,18 +16,19 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 var (
-	generateFunc func(context.Context, table.QueryContext, *logger.Logger) ([]Result, error)
+	generateFunc func(context.Context, table.QueryContext, *logger.Logger, *client.ResilientClient) ([]Result, error)
 	registerOnce sync.Once
 )
 
 // RegisterGenerateFunc registers the generate function for this table.
 // This should be called once from the implementation package's init() function.
-func RegisterGenerateFunc(f func(context.Context, table.QueryContext, *logger.Logger) ([]Result, error)) {
+func RegisterGenerateFunc(f func(context.Context, table.QueryContext, *logger.Logger, *client.ResilientClient) ([]Result, error)) {
 	registerOnce.Do(func() {
 		generateFunc = f
 	})
@@ -35,12 +36,12 @@ func RegisterGenerateFunc(f func(context.Context, table.QueryContext, *logger.Lo
 
 // GetGenerateFunc returns the osquery table.GenerateFunc for this table.
 // It wraps the registered generate function and handles marshaling of results.
-func GetGenerateFunc(log *logger.Logger) (table.GenerateFunc, error) {
+func GetGenerateFunc(log *logger.Logger, client *client.ResilientClient) (table.GenerateFunc, error) {
 	if generateFunc == nil {
 		return nil, errors.New("generate function not registered for elastic_file_analysis")
 	}
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		results, err := generateFunc(ctx, queryContext, log)
+		results, err := generateFunc(ctx, queryContext, log, client)
 		if err != nil {
 			return nil, err
 		}
