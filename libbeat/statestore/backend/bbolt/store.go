@@ -126,6 +126,7 @@ func openStore(log *logp.Logger, dbPath string, fileMode os.FileMode, cfg Config
 		return nil, errors.Join(fmt.Errorf("failed to create default bucket: %w", err), db.Close())
 	}
 
+	// ctx is only used to control the retention loop's shutdown
 	ctx, cancel := context.WithCancel(context.Background())
 
 	s := &store{
