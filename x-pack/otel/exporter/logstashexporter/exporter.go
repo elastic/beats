@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/exporter"
@@ -33,13 +34,14 @@ const (
 )
 
 type logstashExporter struct {
-	config    *logstashOutputConfig
-	rawConfig *config.C
-	logger    *logp.Logger
-	workers   []internal.Worker
-	workQueue chan *internal.Work
-	settings  exporter.Settings
-	mu        sync.RWMutex
+	config        *logstashOutputConfig
+	rawConfig     *config.C
+	logger        *logp.Logger
+	workers       []internal.Worker
+	workQueue     chan *internal.Work
+	settings      exporter.Settings
+	mu            sync.RWMutex
+	componentHost component.Host
 }
 
 func newLogstashExporter(settings exporter.Settings, cfg component.Config) (*logstashExporter, error) {
@@ -67,10 +69,11 @@ func newLogstashExporter(settings exporter.Settings, cfg component.Config) (*log
 	}, nil
 }
 
-func (*logstashExporter) Start(context.Context, component.Host) error {
+func (l *logstashExporter) Start(_ context.Context, host component.Host) error {
 	// Clients are initialized on the first ConsumeLogs call and not here on purpose.
 	// The context passed to Start doesn't have the necessary values to create
 	// the Logstash clients.
+	l.componentHost = host
 	return nil
 }
 
@@ -184,6 +187,8 @@ func (l *logstashExporter) handleBatchResult(
 ) (bool, error) {
 	switch batchRes {
 	case internal.LogBatchResultACK:
+		// Report status OK
+		componentstatus.ReportStatus(l.componentHost, componentstatus.NewEvent(componentstatus.StatusOK))
 		// Batch was acknowledged, processing complete
 		return true, nil
 
@@ -192,6 +197,8 @@ func (l *logstashExporter) handleBatchResult(
 		return true, consumererror.NewPermanent(fmt.Errorf("batch was dropped: %w", workRes))
 
 	case internal.LogBatchResultCancelled:
+		// Check for any connectivity errors that may have caused batch cancellation
+		l.reportConnectivityStatus()
 		if err := l.enqueueWork(ctx, work); err != nil {
 			return true, consumererror.NewLogs(fmt.Errorf("failed to requeue cancelled batch: %w", err), ld)
 		}
@@ -202,6 +209,21 @@ func (l *logstashExporter) handleBatchResult(
 
 	default:
 		return true, consumererror.NewPermanent(fmt.Errorf("unexpected batch result: %v", batchRes))
+	}
+}
+
+func (l *logstashExporter) reportConnectivityStatus() {
+	// if not able to connect to all of the configured hosts - report degraded health
+	connected := false
+	for _, worker := range l.workers {
+		if err := worker.Connected(); err == nil {
+			connected = true
+			break
+		}
+	}
+
+	if !connected {
+		componentstatus.ReportStatus(l.componentHost, componentstatus.NewRecoverableErrorEvent(fmt.Errorf("Logstash request failed: %w", l.workers[0].Connected())))
 	}
 }
 
