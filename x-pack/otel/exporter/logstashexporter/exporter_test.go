@@ -86,7 +86,6 @@ func TestConsumeLogs(t *testing.T) {
 				batch.Drop()
 				return nil
 			},
-			wantEnqueued:      1,
 			wantErrPermanent:  true,
 			wantErrContaining: "batch was dropped",
 		},
