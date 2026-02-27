@@ -10,6 +10,7 @@ import (
 	"flag"
 	"net/url"
 	"os"
+	"sync/atomic"
 	"testing"
 	"time"
 
