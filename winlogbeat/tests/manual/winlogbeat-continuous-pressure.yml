@@ -1,0 +1,19 @@
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${PRESSURE_PROVIDER:WinlogbeatPressure}
+    batch_read_size: 1024
+    stop_if_gap_found: true
+
+output.file:
+  path: ${PRESSURE_OUTPUT_DIR:C:/tmp/winlogbeat-pressure-output}
+  filename: winlogbeat
+  rotate_every_kb: 50000
+  number_of_files: 20
+
+queue.mem:
+  events: 16384
+  flush.min_events: 256
+  flush.timeout: 0.1s
+
+logging.level: info
+logging.to_files: false
