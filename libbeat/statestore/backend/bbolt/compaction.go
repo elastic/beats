@@ -60,23 +60,14 @@ func (s *store) compact() error {
 		return err
 	}
 
-	s.log.Debugf("Starting compaction: path=%s temp=%s", s.dbPath, file.Name())
-
-	compactedDB, err := bolt.Open(file.Name(), s.fileMode, s.options)
-	if err != nil {
-		return fmt.Errorf("failed to open temp db for compaction: %w", err)
-	}
-
 	compactionStart := time.Now()
-
-	if err := bolt.Compact(compactedDB, s.db, s.config.Compaction.MaxTransactionSize); err != nil {
-		compactedDB.Close()
-		return fmt.Errorf("compaction failed: %w", err)
+	s.log.Debugf("Starting compaction: path=%s temp=%s", s.dbPath, file.Name())
+	err = s.compactTo(file.Name())
+	if err != nil {
+		return err
 	}
-
 	// We have to close files before moving on Windows.
 	s.db.Close()
-	compactedDB.Close()
 
 	// Ensure s.db is reopened from s.dbPath if anything below fails.
 	// On success, reopened is set to true and the defer is a no-op.
@@ -109,6 +100,22 @@ func (s *store) compact() error {
 	reopened = true
 
 	s.log.Debugf("Finished compaction in %v", time.Since(compactionStart))
+	return nil
+}
+
+// compactTo copies all data from the current database into a new database at
+// the given path using bolt.Compact. The new database is closed before returning.
+func (s *store) compactTo(path string) error {
+	compactedDB, err := bolt.Open(path, s.fileMode, s.options)
+	if err != nil {
+		return fmt.Errorf("failed to open temp db for compaction: %w", err)
+	}
+	defer compactedDB.Close()
+
+	if err := bolt.Compact(compactedDB, s.db, s.config.Compaction.MaxTransactionSize); err != nil {
+		return fmt.Errorf("compaction failed: %w", err)
+	}
+
 	return nil
 }
 
