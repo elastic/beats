@@ -223,7 +223,7 @@ func (l *logstashExporter) reportConnectivityStatus() {
 	}
 
 	if !connected {
-		componentstatus.ReportStatus(l.componentHost, componentstatus.NewRecoverableErrorEvent(fmt.Errorf("Logstash request failed: %w", l.workers[0].Connected())))
+		componentstatus.ReportStatus(l.componentHost, componentstatus.NewRecoverableErrorEvent(fmt.Errorf("logstash request failed: %w", l.workers[0].Connected())))
 	}
 }
 

@@ -47,8 +47,7 @@ type worker struct {
 
 type clientWorker struct {
 	worker
-	client    outputs.Client
-	connected error
+	client outputs.Client
 }
 
 type netClientWorker struct {

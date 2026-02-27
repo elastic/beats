@@ -520,8 +520,8 @@ func TestStatusReporting(t *testing.T) {
 		require.Error(t, err)
 		select {
 		case event := <-statusChan:
-			require.Equal(t, event.Status(), componentstatus.StatusRecoverableError)
-			require.Contains(t, event.Err().Error(), "Logstash request failed")
+			require.Equal(t, componentstatus.StatusRecoverableError, event.Status())
+			require.Contains(t, event.Err().Error(), "logstash request failed")
 		default:
 			t.Errorf("did not receive component status, expected degraded health")
 		}
@@ -552,7 +552,7 @@ func TestStatusReporting(t *testing.T) {
 		require.True(t, ok, "test timed out")
 		select {
 		case event := <-statusChan:
-			require.Equal(t, event.Status(), componentstatus.StatusOK)
+			require.Equal(t, componentstatus.StatusOK, event.Status())
 		default:
 			t.Errorf("did not receive component status, expected status OK")
 		}
