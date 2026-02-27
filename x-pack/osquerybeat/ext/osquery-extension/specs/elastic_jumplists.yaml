@@ -1,0 +1,59 @@
+type: table
+name: elastic_jumplists
+description: Windows Jump Lists containing recent and pinned items with LNK and destination metadata
+platforms:
+  - windows
+group: jumplists
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists
+
+shared_types:
+  - ApplicationID
+  - UserProfile
+  - JumplistMeta
+  - DestListEntry
+  - LnkMetadata
+
+columns:
+  - name: ApplicationID
+    type: EMBEDDED
+    shared_type: ApplicationID
+  - name: UserProfile
+    type: EMBEDDED
+    shared_type: UserProfile
+  - name: JumplistMeta
+    type: EMBEDDED
+    shared_type: JumplistMeta
+  - name: DestListEntry
+    type: EMBEDDED
+    shared_type: DestListEntry
+  - name: LnkMetadata
+    type: EMBEDDED
+    shared_type: LnkMetadata
+
+documentation:
+  description: |
+    Parse Windows Jump Lists for all non-special local user profiles and return one
+    row per embedded LNK entry with application, user, destination, and shortcut metadata.
+    Both custom destinations (pinned items) and automatic destinations (recent items)
+    are supported.
+  examples:
+    - title: List all Jump List entries
+      query: |
+        SELECT * FROM elastic_jumplists;
+    - title: Recent entries for a specific application ID
+      query: |
+        SELECT username, application_name, local_path, source_file_path
+        FROM elastic_jumplists
+        WHERE application_id = '590aee7bdd69b59b';
+    - title: Find pinned entries
+      query: |
+        SELECT username, application_name, local_path, is_pinned
+        FROM elastic_jumplists
+        WHERE is_pinned = 1;
+  notes:
+    - "Windows only. Reads per-user Recent\\AutomaticDestinations and Recent\\CustomDestinations directories."
+    - "One row is emitted per parsed LNK entry; application_name may be empty when application_id is unknown."
+    - "Automatic destination metadata fields (for example entry_number, dest_entry_path) may be empty for custom destination rows."
+  related_tables:
+    - users

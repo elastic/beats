@@ -4,6 +4,7 @@ on:
     types: [created]
 
 permissions:
+  actions: read
   contents: write
   discussions: write
   issues: write
@@ -14,7 +15,7 @@ jobs:
     if: >-
       github.event.issue.pull_request == null &&
       (startsWith(github.event.comment.body, '/ai') || contains(github.event.comment.body, '@claude')) &&
-      contains(fromJSON('["strawgate","AlexanderWert","perk","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia","pierrehilbert","bturquet","teresaromero","mrodm","jsoriano","kpollich","andrewkroh","norrietaylor","ishleenk17","tommyers-elastic","lalit-satapathy","agithomas","belimawr","ycombinator","zmoog","MichaelKatsoulis","gizas","AndersonQ","chrisberkhout"]'), github.actor)
+      contains(fromJSON('["strawgate","AlexanderWert","perk","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia","pierrehilbert","bturquet","teresaromero","mrodm","jsoriano","kpollich","andrewkroh","norrietaylor","ishleenk17","tommyers-elastic","lalit-satapathy","agithomas","belimawr","ycombinator","zmoog","MichaelKatsoulis","gizas","AndersonQ","chrisberkhout","marc-gr","efd6","muthu-mps","ShourieG"]'), github.actor)
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-mention-in-issue.lock.yml@v0
     with:
       setup-commands: |

@@ -12,6 +12,7 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hostfs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	elastichostusers "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_host_users"
@@ -20,10 +21,12 @@ import (
 const passwdFile = "/etc/passwd"
 
 func init() {
-	elastichostusers.RegisterGenerateFunc(getResults)
+	elastichostusers.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elastichostusers.Result, error) {
+		return getResults(ctx, queryContext, log)
+	})
 }
 
-func getResults(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elastichostusers.Result, error) {
+func getResults(_ context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elastichostusers.Result, error) {
 	fn := hostfs.GetPath(passwdFile)
 	log.Infof("reading passwd for path: %s", fn)
 	rows, err := hostfs.ReadPasswd(fn)
