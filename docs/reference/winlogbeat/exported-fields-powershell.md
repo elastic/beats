@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/exported-fields-powershell.html
 applies_to:
   stack: beta
-  serverless: ga
+  serverless: beta
 ---
 
 % This file is generated! See dev-tools/mage/generate_fields_docs.go
