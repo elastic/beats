@@ -34,7 +34,10 @@ func (w *Work) Result() chan error {
 }
 
 type Worker interface {
+	// Close closes the connection to the client and releases all resources
 	Close() error
+	// Connected returns nil if worker is able to connect to the server successfully.
+	Connected() error
 }
 
 type worker struct {
@@ -44,13 +47,16 @@ type worker struct {
 
 type clientWorker struct {
 	worker
-	client outputs.Client
+	client    outputs.Client
+	connected error
 }
 
 type netClientWorker struct {
 	worker
 	client outputs.NetworkClient
 	logger logp.Logger
+	// holds nil if we are able to connect, else err
+	connected error
 }
 
 func MakeClientWorker(workQueue chan *Work, client outputs.Client, logger logp.Logger) Worker {
@@ -84,6 +90,10 @@ func (w *clientWorker) Close() error {
 	return w.client.Close()
 }
 
+func (w *worker) Connected() error {
+	return nil
+}
+
 func (w *clientWorker) run(ctx context.Context) {
 	for {
 		select {
@@ -98,6 +108,10 @@ func (w *clientWorker) run(ctx context.Context) {
 func (w *netClientWorker) Close() error {
 	w.close()
 	return w.client.Close()
+}
+
+func (w *netClientWorker) Connected() error {
+	return w.connected
 }
 
 func (w *netClientWorker) run(ctx context.Context) {
@@ -127,9 +141,11 @@ func (w *netClientWorker) run(ctx context.Context) {
 				if connected {
 					w.logger.Infof("Connection to %v established", w.client)
 					reconnectAttempts = 0
+					w.connected = nil
 				} else {
 					w.logger.Errorf("Failed to connect to %v: %q", w.client, err)
 					reconnectAttempts++
+					w.connected = err
 				}
 
 				continue
