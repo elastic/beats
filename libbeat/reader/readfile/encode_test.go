@@ -50,7 +50,7 @@ func TestEncodeLines(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			r := ioutil.NopCloser(bytes.NewReader(testCase.Input))
 			codec, err := encFactory(r)
-			assert.Nil(t, err, "failed to initialize encoding: %v", err)
+			assert.NoError(t, err, "failed to initialize encoding: %v", err)
 
 			config := Config{
 				Codec:      codec,
@@ -58,7 +58,7 @@ func TestEncodeLines(t *testing.T) {
 				Terminator: LineFeed,
 			}
 			er, err := NewEncodeReader(r, config, logptest.NewTestingLogger(t, ""))
-			assert.Nil(t, err, "failed to create new encoder: %v", err)
+			assert.NoError(t, err, "failed to create new encoder: %v", err)
 
 			var output []string
 			for {
