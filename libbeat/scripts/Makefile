@@ -333,7 +333,7 @@ config: mage
 
 ifndef EXCLUDE_COMMON_UPDATE_TARGET
 .PHONY: update
-update: python-env fields collect config ## @build Update expects the most recent version of libbeat in the GOPATH
+update: fields collect config ## @build Update expects the most recent version of libbeat in the GOPATH
 	@echo "Updating generated files for ${BEAT_NAME}"
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
@@ -344,7 +344,7 @@ endif
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	@# Update docs
 	@mkdir -p docs
-	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD)/fields.yml ${BEAT_NAME} ${ES_BEATS} --output_path $(ES_BEATS)/docs/reference/${BEAT_NAME}
+	@mage fieldDocs
 endif
 
 	@mkdir -p $(PWD)/_meta/kibana.generated
