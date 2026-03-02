@@ -1060,8 +1060,8 @@ scanner:
 		require.NoError(t, err)
 
 		files := s.GetFiles()
-		assert.Len(t, files, 1, "empty_target.log must be excluded")
-		assert.Contains(t, files, nonEmptyLink, "nonempty_target.txt should be included")
+		assert.Len(t, files, 1, "empty_link.log must be excluded")
+		assert.Contains(t, files, nonEmptyLink, "nonempty_link.log should be included")
 		assert.NotContains(t, buff.String(), "GetFiles") // every line has a source prefix
 	})
 }
