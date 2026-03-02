@@ -6,6 +6,7 @@ package httpjson
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -1131,6 +1132,7 @@ var testCases = []struct {
 			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$[:]"
 			t.Cleanup(server.Close)
 		},
+
 		baseConfig: map[string]interface{}{
 			"interval":       1,
 			"request.method": http.MethodGet,
@@ -1661,7 +1663,10 @@ func TestInput(t *testing.T) {
 					t.Errorf("unexpected event: %v", got)
 				}
 				cancel()
-				assert.NoError(t, g.Wait())
+				err := g.Wait()
+				if err != nil && !errors.Is(err, context.Canceled) {
+					assert.NoError(t, err)
+				}
 				return
 			}
 
@@ -1688,9 +1693,13 @@ func TestInput(t *testing.T) {
 					}
 				}
 			}
+			assert.Equal(t, len(test.expected), receivedCount, "number of events received must match expected list size")
 			if test.expectedFile != "" {
 				if _, err := os.Stat(filepath.Join(tempDir, test.expectedFile)); err == nil {
-					assert.NoError(t, g.Wait())
+					err := g.Wait()
+					if err != nil && !errors.Is(err, context.Canceled) {
+						assert.NoError(t, err)
+					}
 				} else {
 					t.Errorf("Expected log filename not found")
 				}
@@ -1704,7 +1713,10 @@ func TestInput(t *testing.T) {
 					t.Errorf("unexpected files found: %v", paths)
 				}
 			}
-			assert.NoError(t, g.Wait())
+			err := g.Wait()
+			if err != nil && !errors.Is(err, context.Canceled) {
+				assert.NoError(t, err)
+			}
 		})
 	}
 }

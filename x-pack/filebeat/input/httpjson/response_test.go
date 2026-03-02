@@ -55,7 +55,6 @@ func TestTransformable(t *testing.T) {
 		expectStatusUpdates    bool
 		statusUpdate           status.Status
 		expectLogs             bool
-		allowStrings           bool
 	}{
 		{
 			name:                   "array_of_strings_allowed",
@@ -63,7 +62,6 @@ func TestTransformable(t *testing.T) {
 			expectedTransformables: 0,
 			expectStatusUpdates:    false,
 			expectLogs:             false,
-			allowStrings:           true,
 		},
 		{
 			name:                   "array_of_1_string_allowed",
@@ -71,7 +69,6 @@ func TestTransformable(t *testing.T) {
 			expectedTransformables: 0,
 			expectStatusUpdates:    false,
 			expectLogs:             false,
-			allowStrings:           true,
 		},
 		{
 			name:                   "array_of_mixed_strings_and_json_objects_should_cause_the_status_to_degrade",
@@ -80,7 +77,6 @@ func TestTransformable(t *testing.T) {
 			expectStatusUpdates:    true,
 			expectLogs:             true,
 			statusUpdate:           status.Degraded,
-			allowStrings:           true,
 		},
 		{
 			name:                   "array_of_ints_should_cause_the_status_to_degrade",
@@ -89,7 +85,6 @@ func TestTransformable(t *testing.T) {
 			expectStatusUpdates:    true,
 			expectLogs:             true,
 			statusUpdate:           status.Degraded,
-			allowStrings:           true,
 		},
 		{
 			name:                   "array_of_mixed_json_objects_and_strings_should_cause_the_status_to_degrade",
@@ -98,7 +93,6 @@ func TestTransformable(t *testing.T) {
 			expectStatusUpdates:    true,
 			expectLogs:             true,
 			statusUpdate:           status.Degraded,
-			allowStrings:           true,
 		},
 		{
 			name:                   "empty_array_should_be_ignored",
@@ -106,27 +100,7 @@ func TestTransformable(t *testing.T) {
 			expectedTransformables: 1,
 			expectStatusUpdates:    false,
 			expectLogs:             false,
-			allowStrings:           true,
 		},
-		{
-			name:                   "array_of_strings_causes_degrade",
-			message:                `["123456789abcdefgh8866123","123456789zxcvbnmas8a8q60"]`,
-			expectedTransformables: 0,
-			expectStatusUpdates:    true,
-			expectLogs:             true,
-			statusUpdate:           status.Degraded,
-			allowStrings:         false,
-		},
-		{
-			name:                   "array_of_1_string_causes_degrade",
-			message:                `["123456789abcdefgh8866123"]`,
-			expectedTransformables: 0,
-			expectStatusUpdates:    true,
-			expectLogs:             true,
-			statusUpdate:           status.Degraded,
-			allowStrings:           false,
-		},
-
 	}
 
 	for _, tt := range tests {
@@ -149,7 +123,7 @@ func TestTransformable(t *testing.T) {
 			stat := &mockStatusReporter{}
 
 			logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
-			transformables := resp.asTransformables(stat, logger, tt.allowStrings)
+			transformables := resp.asTransformables(stat, logger)
 
 			if tt.expectStatusUpdates {
 				assert.NotEmpty(t, stat.GetUpdates(), "expected status updates but got none")
