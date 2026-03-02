@@ -1557,7 +1557,7 @@ var testCases = []struct {
 `
 				_, err := io.ReadAll(r.Body)
 				r.Body.Close()
-				if err != nil {
+				if err == nil {
 					_, err = w.Write([]byte(text))
 				}
 				if err != nil {

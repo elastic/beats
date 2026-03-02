@@ -255,7 +255,7 @@ func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transfo
 
 				if err := rp.split.run(ctx, trCtx, tr, h); err != nil {
 					switch err { //nolint:errorlint run never returns a wrapped error.
-					case errEmptyField: 
+					case errEmptyField:
 						// nothing else to send for this page
 						rp.log.Debug("split operation finished")
 					case errEmptyRootField:
