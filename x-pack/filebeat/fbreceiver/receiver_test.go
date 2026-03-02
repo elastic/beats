@@ -269,7 +269,7 @@ func TestMultipleReceivers(t *testing.T) {
 			for _, helper := range helpers {
 				writeFile(c, helper.ingest, "A log line")
 
-				require.Greaterf(c, len(logs[helper.name]), 0, "receiver %v does not have any logs", helper)
+				require.NotEmptyf(c, logs[helper.name], "receiver %v does not have any logs", helper)
 
 				assert.Equalf(c, "test", logs[helper.name][0].Flatten()["message"], "expected %v message field to be 'test'", helper)
 
