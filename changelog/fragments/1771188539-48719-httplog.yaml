@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Tighten request trace logging destination path checks in CEL, Entity Analytics, HTTP Endpoint and HTTP JSON inputs.
-component: filebeat
