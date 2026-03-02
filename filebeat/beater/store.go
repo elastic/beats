@@ -128,16 +128,33 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 }
 
 func (s *filebeatStore) Close() {
-	globalMu.Lock()
-	defer globalMu.Unlock()
+	var shouldClose bool
 
+	// Remove from the global map under the lock so no new callers can
+	// discover these registries, but do NOT call Close on the registries
+	// while holding globalMu. Registry.Close() calls wg.Wait() which
+	// blocks until every Store opened via Registry.Get() has been closed.
+	// Holding the mutex during that wait would deadlock any concurrent
+	// openStateStore call.
+	//
+	// This is safe because openStateStore performs both its lookup and
+	// refCount++ under globalMu, so when refCount reaches 0 no other
+	// goroutine holds a reference. Deleting the entry from the map while
+	// still under the lock ensures new callers will create fresh registries
+	// rather than referencing the ones being closed below.
+	globalMu.Lock()
 	s.shared.refCount--
 	if s.shared.refCount == 0 {
+		delete(globalStores, s.storeKey)
+		shouldClose = true
+	}
+	globalMu.Unlock()
+
+	if shouldClose {
 		s.shared.registry.Close()
 		if s.shared.esRegistry != nil {
 			s.shared.esRegistry.Close()
 		}
-		delete(globalStores, s.storeKey)
 	}
 }
 
