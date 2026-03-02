@@ -8,20 +8,10 @@
 # - security: impacts on the security of a product or a user's deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: bug-fix
+kind: security
 
 # Change summary; a 80ish characters long description of the change.
-summary: Fix differential results using wrong data source for removed events
-
-# Long description; in case the summary is not enough to describe the change
-# this field accommodate a description without length limits.
-description: |
-  Fixed two bugs in osquerybeat's differential results handling:
-  1. "removed" events incorrectly read from DiffResults.Added instead of DiffResults.Removed
-  2. Simplified code by removing unnecessary intermediate variable and publishing results directly
+summary: Update elastic-agent-system-metrics to v0.14.0.
 
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: osquerybeat
-
-# Issue URL; the GitHub issue related to this changeset.
-issue: https://github.com/elastic/beats/issues/48427
+component: all
