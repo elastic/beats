@@ -53,7 +53,7 @@ type filebeatStore struct {
 	shared        *sharedRegistries
 	storeName     string
 	cleanInterval time.Duration
-	storeKey string // key into globalStores (path + backend)
+	storeKey      string // key into globalStores (path + backend)
 
 	// Notifies the Elasticsearch store about configuration change
 	// which is available only after the beat runtime manager connects to the Agent
