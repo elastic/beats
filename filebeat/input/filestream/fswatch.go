@@ -173,12 +173,6 @@ func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
 func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.log.Debug("Start next scan")
 
-	// prevKeys := make([]string, 0, len(w.prev))
-	// for k := range w.prev {
-	// 	prevKeys = append(prevKeys, k)
-	// }
-	// w.log.Debugf("Start next scan: prevs: %s", strings.Join(prevKeys, ","))
-
 	// file identity is updated in GetFiles
 	paths := w.scanner.GetFiles()
 
@@ -419,7 +413,7 @@ type fileScanner struct {
 	hasher           hash.Hash
 	readBuffer       []byte
 	compression      string
-	growingBuffer []byte // buffer for growing fingerprint mode
+	growingBuffer    []byte // buffer for growing fingerprint mode
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
