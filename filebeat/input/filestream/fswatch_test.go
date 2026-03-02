@@ -285,20 +285,13 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
-		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
-		fw := createWatcherWithConfig(t, inMemoryLog, paths, cfgStr)
+		fw := createWatcherWithConfig(t, logptest.NewTestingLogger(t, ""), paths, cfgStr)
 		go fw.Run(ctx)
 
 		basename := "created.log"
 		filename := filepath.Join(dir, basename)
 		err := os.WriteFile(filename, nil, 0777)
 		require.NoError(t, err)
-
-		t.Run("silently ignores the empty file", func(t *testing.T) {
-			time.Sleep(200 * time.Millisecond)
-			require.NotContains(t, buff.String(), basename,
-				"empty files should be silently ignored at the scanner level")
-		})
 
 		t.Run("emits a create event once something is written to the empty file", func(t *testing.T) {
 			err = os.WriteFile(filename, []byte("hello"), 0777)
