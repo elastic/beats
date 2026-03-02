@@ -35,7 +35,6 @@ type Query struct {
 	// A boolean to determine if "removed" actions should be logged, default true
 	// This is the same as osquery behavior
 	Removed *bool `config:"removed,omitempty" json:"removed,omitempty"`
-
 }
 
 type Pack struct {

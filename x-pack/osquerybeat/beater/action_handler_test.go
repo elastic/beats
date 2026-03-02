@@ -164,7 +164,6 @@ func TestActionHandlerExecute(t *testing.T) {
 					t.Fatal("Unexpected error, got none in the result")
 				}
 			}
-			_ = res
 		})
 	}
 }

@@ -11,6 +11,73 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNativeScheduleExecutionCount(t *testing.T) {
+	tests := []struct {
+		name      string
+		startDate string
+		interval  int
+		runTime   time.Time
+		expected  int64
+	}{
+		{
+			name:      "returns first execution at start",
+			startDate: "2024-01-01T00:00:00Z",
+			interval:  3600,
+			runTime:   time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+			expected:  1,
+		},
+		{
+			name:      "rounds down to current slot",
+			startDate: "2024-01-01T00:00:00Z",
+			interval:  3600,
+			runTime:   time.Date(2024, 1, 1, 2, 35, 0, 0, time.UTC),
+			expected:  3,
+		},
+		{
+			name:      "returns zero when before start",
+			startDate: "2024-01-01T05:00:00Z",
+			interval:  3600,
+			runTime:   time.Date(2024, 1, 1, 4, 30, 0, 0, time.UTC),
+			expected:  0,
+		},
+		{
+			name:      "returns zero when start date is empty",
+			startDate: "",
+			interval:  3600,
+			runTime:   time.Date(2024, 1, 1, 1, 23, 0, 0, time.UTC),
+			expected:  0,
+		},
+		{
+			name:      "returns zero when start date is invalid",
+			startDate: "not-a-date",
+			interval:  3600,
+			runTime:   time.Date(2024, 1, 1, 1, 23, 0, 0, time.UTC),
+			expected:  0,
+		},
+		{
+			name:      "returns zero when interval is invalid",
+			startDate: "2024-01-01T00:00:00Z",
+			interval:  0,
+			runTime:   time.Date(2024, 1, 1, 1, 23, 0, 0, time.UTC),
+			expected:  0,
+		},
+		{
+			name:      "handles non-utc offsets",
+			startDate: "2024-01-01T09:00:00+02:00",
+			interval:  3600,
+			runTime:   time.Date(2024, 1, 1, 8, 10, 0, 0, time.UTC),
+			expected:  2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := nativeScheduleExecutionCount(tt.startDate, tt.interval, tt.runTime.Unix())
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
 func TestNativePlannedScheduleTime(t *testing.T) {
 	tests := []struct {
 		name      string
@@ -92,4 +159,3 @@ func TestQueryResultMeta_PlannedScheduleTime(t *testing.T) {
 	assert.Equal(t, planned.Format(time.RFC3339Nano), meta["planned_schedule_time"])
 	assert.Equal(t, int64(7), meta["schedule_execution_count"])
 }
-

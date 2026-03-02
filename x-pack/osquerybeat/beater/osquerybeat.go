@@ -62,7 +62,7 @@ type osquerybeat struct {
 	b      *beat.Beat
 	config config.Config
 
-	pub *pub.Publisher
+	pub osquerybeatPublisher
 
 	log *logp.Logger
 
@@ -75,6 +75,15 @@ type osquerybeat struct {
 
 	osquerydFactory osqd.RunnerFactory
 }
+
+type osquerybeatPublisher interface {
+	scheduledQueryPublisher
+	actionResultPublisher
+	Configure(inputs []config.InputConfig) error
+	Close()
+}
+
+var _ osquerybeatPublisher = (*pub.Publisher)(nil)
 
 // New creates an instance of osquerybeat.
 func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
@@ -495,7 +504,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 		totalHits = len(hits)
 	}
 
-	bt.pub.PublishScheduledResponse(scheduleID, responseID, runTime, runTime, plannedScheduleTime, totalHits, int64(scheduleExecutionCount))
+	bt.pub.PublishScheduledResponse(scheduleID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
 }
 
 func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64, plannedScheduleTime time.Time) map[string]interface{} {
