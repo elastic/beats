@@ -232,6 +232,8 @@ changelog/fragments/
 /x-pack/metricbeat/module/awsfargate @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/azure @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/azure/billing @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/azure/app_insights @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/azure/app_state @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/cloudfoundry @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/cockroachdb @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/containerd/ @elastic/obs-ds-hosted-services

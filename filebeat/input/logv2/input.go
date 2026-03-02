@@ -35,11 +35,12 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-const pluginName = "log"
+const logPluginName = "log"
+const containerPluginName = "container"
 
 func init() {
 	// Register an input V1, to replace the Log input one.
-	if err := v1.Register(pluginName, newV1Input); err != nil {
+	if err := v1.Register(logPluginName, NewV1Input); err != nil {
 		panic(err)
 	}
 }
@@ -85,13 +86,6 @@ func runAsFilestream(logger *logp.Logger, cfg *config.C) (bool, error) {
 				return false, errors.New("'id' is required to run 'log' input as 'filestream'")
 			}
 
-			// This should never fail because the Log input configuration
-			// already reads 'type' and validates it is a string. Overriding
-			// the field should never fail.
-			if err := cfg.SetString("type", -1, "filestream"); err != nil {
-				return false, fmt.Errorf("cannot set 'type': %w", err)
-			}
-
 			return true, nil
 		}
 	}
@@ -99,11 +93,11 @@ func runAsFilestream(logger *logp.Logger, cfg *config.C) (bool, error) {
 	return false, nil
 }
 
-// newV1Input instantiates the Log input. If Log input is supposed to run as
+// NewV1Input instantiates the Log input. If Log input is supposed to run as
 // Filestream, then v2.ErrUnknownInput is returned so the Filestream input
-// can be instantiated by the V2.Plugin returned by [PluginV2]. Otherwise
-// the Log input is instantiated.
-func newV1Input(
+// can be instantiated by the V2.Plugin returned by [LogPluginV2] or
+// [ContainerPluginV2]. Otherwise the Log input is instantiated.
+func NewV1Input(
 	cfg *config.C,
 	outlet channel.Connector,
 	context v1.Context,
@@ -132,10 +126,24 @@ func newV1Input(
 	return inp, err
 }
 
-// PluginV2 returns a v2.Plugin with a manager that can convert
+// LogPluginV2 returns a v2.Plugin with a manager that can convert
 // the Log input configuration to Filestream and run the Filestream
 // input instead of the Log input.
-func PluginV2(logger *logp.Logger, store statestore.States) v2.Plugin {
+func LogPluginV2(logger *logp.Logger, store statestore.States) v2.Plugin {
+	return pluginV2(logger, store, logPluginName)
+}
+
+// ContainerPluginV2 returns a v2.Plugin with a manager that can convert
+// the Container input configuration to Filestream and run the Filestream
+// input instead of the Log input.
+func ContainerPluginV2(logger *logp.Logger, store statestore.States) v2.Plugin {
+	return pluginV2(logger, store, containerPluginName)
+}
+
+// pluginV2 returns a v2.Plugin with a manager that can convert
+// the Log/Container input configuration to Filestream and run the Filestream
+// input instead of the Log or Container input.
+func pluginV2(logger *logp.Logger, store statestore.States, pluginName string) v2.Plugin {
 	// The InputManager for Filestream input is from an internal package, so we
 	// cannot instantiate it directly here. To circumvent that, we instantiate
 	// the whole Filestream Plugin and get its manager.

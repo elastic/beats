@@ -24,6 +24,7 @@ linters:
     - noctx
     - nolintlint
     - staticcheck
+    - testifylint
     - unconvert
     - unused
     - wastedassign
@@ -37,6 +38,8 @@ linters:
           deny:
             - pkg: github.com/elastic/beats/v7/x-pack
               desc: Apache 2.0 licensed code cannot depend on Elastic licensed code (x-pack/).
+            - pkg: github.com/elastic/elastic-agent-client
+              desc: Apache 2.0 licensed code cannot depend on Elastic licensed code (elastic-agent-client).
         main:
           list-mode: lax
           deny:
@@ -114,6 +117,10 @@ linters:
       checks:
         - -ST1005
         - all
+    testifylint:
+      disable:
+        - go-require # Disabled: too many false positives, can be used to exit a goroutine
+        - require-error # Disabled: using assert for error checks lets the test continue, maximizing context on failure
   exclusions:
     generated: lax
     presets:

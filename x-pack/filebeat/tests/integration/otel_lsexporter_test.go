@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build integration && !agentbeat
+//go:build integration
 
 package integration
 
@@ -27,9 +27,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/oteltestcol"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -264,7 +264,7 @@ service:
 	otelEvents, err := readAllEvents(otelFilePath)
 
 	require.NoError(t, err, "failed to read otel events")
-	require.Equal(t, numEvents, len(otelEvents),
+	require.Len(t, otelEvents, numEvents,
 		"different number of events: sent=%d, get=%d", numEvents, len(otelEvents))
 }
 
@@ -360,7 +360,7 @@ func compareOutputFiles(t *testing.T, fbFilePath, otelFilePath string, ignoredFi
 	otelEvents, err := readAllEvents(otelFilePath)
 	require.NoError(t, err, "failed to read otel events")
 
-	require.Equal(t, len(fbEvents), len(otelEvents),
+	require.Len(t, otelEvents, len(fbEvents),
 		"different number of events: filebeat=%d, otel=%d", len(fbEvents), len(otelEvents))
 
 	sortEventsByID(fbEvents)
@@ -463,7 +463,7 @@ func checkURLHasContent(ct *assert.CollectT, url string) {
 		return
 	}
 
-	if !assert.Greater(ct, len(body), 0, "URL %s should have content", url) {
+	if !assert.NotEmpty(ct, body, "URL %s should have content", url) {
 		return
 	}
 }

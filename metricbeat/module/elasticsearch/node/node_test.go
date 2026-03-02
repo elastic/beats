@@ -21,10 +21,11 @@ package node
 
 import (
 	"encoding/base64"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -42,7 +43,7 @@ func TestFetch(t *testing.T) {
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			response, err := ioutil.ReadFile(f)
+			response, err := os.ReadFile(f)
 			require.NoError(t, err)
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -128,10 +129,17 @@ func TestFetch(t *testing.T) {
 				}))
 				defer server.Close()
 
+				serverURL := server.URL
+
+				// for an arbitrary request, try configuring with an extra trailing slash
+				if strings.HasPrefix(tt.name, "from config") {
+					serverURL = server.URL + "/"
+				}
+
 				config := map[string]any{
 					"module":     "elasticsearch",
 					"metricsets": []string{"node"},
-					"hosts":      []string{server.URL},
+					"hosts":      []string{serverURL},
 				}
 
 				apiKey := base64.StdEncoding.EncodeToString([]byte(tt.apiKey))

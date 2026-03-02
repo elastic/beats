@@ -168,7 +168,7 @@ func TestComplexExampleWithIntermediateConversion(t *testing.T) {
 	}
 	assert.Equal(t, time.Duration(1800000000000), st.Internal.TTL)
 	assert.Equal(t, testDecodeTimestamp(t, 515579904576, 1588432943), st.Internal.Updated)
-	require.True(t, st.Cursor != nil)
+	require.NotNil(t, st.Cursor)
 
 	var cp checkpoint
 	if err := Convert(&cp, st.Cursor); err != nil {

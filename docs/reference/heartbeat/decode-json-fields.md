@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/decode-json-fields.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Decode JSON fields [decode-json-fields]

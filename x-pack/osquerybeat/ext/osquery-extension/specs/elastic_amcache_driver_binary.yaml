@@ -1,0 +1,91 @@
+type: table
+name: elastic_amcache_driver_binary
+description: Windows Amcache inventory driver binary entries (Root\InventoryDriverBinary)
+platforms:
+  - windows
+group: amcache
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache
+
+columns:
+  - name: timestamp
+    type: BIGINT
+    description: Last write time as Unix timestamp
+    go_type: time.Time
+    format: unix
+  - name: date_time
+    type: TEXT
+    description: Last write time in RFC3339
+    go_type: time.Time
+    format: rfc3339
+    timezone: UTC
+  - name: driver_name
+    type: TEXT
+    description: Driver name
+  - name: inf
+    type: TEXT
+    description: INF path
+  - name: driver_version
+    type: TEXT
+    description: Driver version
+  - name: product
+    type: TEXT
+    description: Product name
+  - name: product_version
+    type: TEXT
+    description: Product version
+  - name: wdf_version
+    type: TEXT
+    description: WDF version
+  - name: driver_company
+    type: TEXT
+    description: Driver company
+  - name: driver_package_strong_name
+    type: TEXT
+    description: Driver package strong name
+  - name: service
+    type: TEXT
+    description: Service name
+  - name: driver_in_box
+    type: TEXT
+    description: In-box driver flag
+  - name: driver_signed
+    type: TEXT
+    description: Driver signed flag
+  - name: driver_is_kernel_mode
+    type: TEXT
+    description: Kernel mode driver flag
+  - name: driver_id
+    type: TEXT
+    description: Driver ID
+  - name: driver_last_write_time
+    type: TEXT
+    description: Driver last write time
+  - name: driver_type
+    type: BIGINT
+    description: Driver type
+  - name: driver_time_stamp
+    type: BIGINT
+    description: Driver timestamp
+  - name: driver_check_sum
+    type: BIGINT
+    description: Driver checksum
+  - name: image_size
+    type: BIGINT
+    description: Image size
+
+documentation:
+  description: |
+    Driver binary inventory from Windows Amcache.
+    Queries Root\InventoryDriverBinary from the Amcache.hve registry hive.
+  examples:
+    - title: List all amcache driver binaries
+      query: |
+        SELECT * FROM elastic_amcache_driver_binary;
+    - title: Signed drivers
+      query: |
+        SELECT driver_name, driver_version, driver_signed, driver_company FROM elastic_amcache_driver_binary WHERE driver_signed = '1';
+  notes:
+    - "Windows only. Requires Amcache.hve."
+  related_tables:
+    - elastic_amcache_driver_package

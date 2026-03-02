@@ -141,13 +141,13 @@ func findSocketsOfPid(prefix string, pid int) (inodes []uint64, err error) {
 		}
 
 		if strings.HasPrefix(link, "socket:[") {
-			inode, err := strconv.ParseInt(link[8:len(link)-1], 10, 64)
+			inode, err := strconv.ParseUint(link[8:len(link)-1], 10, 64)
 			if err != nil {
 				logp.Debug("procs", "%s", err.Error())
 				continue
 			}
 
-			inodes = append(inodes, uint64(inode))
+			inodes = append(inodes, inode)
 		}
 	}
 
@@ -204,10 +204,10 @@ func parseProcNetProto(input io.Reader, ipv6 bool) ([]*socketInfo, error) {
 			continue
 		}
 
-		uid, _ := strconv.Atoi(string(words[7]))
+		uid, _ := strconv.ParseUint(string(words[7]), 10, 32)
 		sock.uid = uint32(uid)
-		inode, _ := strconv.Atoi(string(words[9]))
-		sock.inode = uint64(inode)
+		inode, _ := strconv.ParseUint(string(words[9]), 10, 64)
+		sock.inode = inode
 
 		sockets = append(sockets, &sock)
 	}
@@ -230,7 +230,7 @@ func hexToIPPort(str []byte, ipv6 bool) (net.IP, uint16, error) {
 		return nil, 0, err
 	}
 
-	port, err := strconv.ParseInt(string(words[1]), 16, 32)
+	port, err := strconv.ParseUint(string(words[1]), 16, 16)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -255,8 +255,13 @@ func hexToIpv4(word string) (net.IP, error) {
 
 func hexToIpv6(word string) (net.IP, error) {
 	p := make(net.IP, net.IPv6len)
+	if len(word) < 32 {
+		return nil, fmt.Errorf("got ip6 address of invalid length: %d", len(word))
+	}
 	for i := 0; i < 4; i++ {
-		part, err := strconv.ParseUint(word[i*8:(i+1)*8], 16, 32)
+		start := i * 8
+		end := (i + 1) * 8
+		part, err := strconv.ParseUint(word[start:end], 16, 32)
 		if err != nil {
 			return nil, err
 		}

@@ -61,7 +61,6 @@ var (
 
 	// XPack are all x-pack beats projects, including libbeat
 	XPack = []string{
-		"agentbeat",
 		"auditbeat",
 		"dockerlogbeat",
 		"filebeat",
@@ -200,10 +199,6 @@ func UnitTest() error {
 		beats = append(beats, filepath.Join(wd, d))
 	}
 	for _, d := range XPack {
-		if d == "agentbeat" {
-			fmt.Println(">> skipping x-pack/agentbeat")
-			continue
-		}
 		beats = append(beats, filepath.Join(wd, "x-pack", d))
 	}
 

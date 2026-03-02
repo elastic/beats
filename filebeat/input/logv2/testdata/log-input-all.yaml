@@ -1,3 +1,4 @@
+type: log
 backoff: 20s
 max_backoff: 200s
 

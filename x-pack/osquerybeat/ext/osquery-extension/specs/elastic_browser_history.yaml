@@ -1,0 +1,218 @@
+type: table
+name: elastic_browser_history
+description: Browser history from multiple browsers (Chrome, Edge, Firefox, Safari) with unified schema
+platforms:
+  - linux
+  - darwin
+  - windows
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/browserhistory
+
+columns:
+  - name: timestamp
+    type: BIGINT
+    description: Unix timestamp in seconds (visit time)
+    go_type: time.Time
+    format: unix
+  - name: datetime
+    type: TEXT
+    description: Human-readable datetime in RFC3339 format (visit time)
+    go_type: time.Time
+    format: rfc3339
+    timezone: UTC
+  - name: url_id
+    type: BIGINT
+    description: Unique URL identifier
+  - name: scheme
+    type: TEXT
+    description: URL scheme or protocol (https, http, file, ftp)
+  - name: domain
+    type: TEXT
+    description: Registrable domain (eTLD+1) from hostname
+  - name: hostname
+    type: TEXT
+    description: Full hostname from URL
+  - name: url
+    type: TEXT
+    description: Full URL visited
+  - name: title
+    type: TEXT
+    description: Page title
+  - name: browser
+    type: TEXT
+    description: Browser name (chrome, edge, firefox, safari, brave)
+  - name: parser
+    type: TEXT
+    description: Parser used to extract the history
+  - name: user
+    type: TEXT
+    description: Username or profile owner
+  - name: profile_name
+    type: TEXT
+    description: Browser profile name
+  - name: transition_type
+    type: TEXT
+    description: Navigation method (TYPED, LINK, BOOKMARK, RELOAD, REDIRECT, etc.)
+  - name: referring_url
+    type: TEXT
+    description: URL that linked to this page when navigated via link
+  - name: visit_id
+    type: BIGINT
+    description: Unique visit identifier
+  - name: from_visit_id
+    type: BIGINT
+    description: Visit ID that led to this visit (navigation chain)
+  - name: visit_source
+    type: TEXT
+    description: Data origin (browsed/local, synced, imported, extension)
+  - name: is_hidden
+    type: INTEGER
+    description: Whether visit is hidden (1) or visible (0)
+    go_type: bool
+  - name: history_path
+    type: TEXT
+    description: Path to the browser history database file
+  - name: ch_visit_duration_ms
+    type: BIGINT
+    description: Duration of visit in milliseconds (Chromium only)
+  - name: ff_session_id
+    type: INTEGER
+    description: Firefox session tracking identifier
+  - name: ff_frecency
+    type: INTEGER
+    description: Firefox frecency score (frequency and recency)
+  - name: sf_domain_expansion
+    type: TEXT
+    description: Safari domain classification or expansion
+  - name: sf_load_successful
+    type: INTEGER
+    description: Whether page loaded successfully (1) or failed (0) (Safari)
+    go_type: bool
+  - name: custom_data_dir
+    type: TEXT
+    description: Custom data directory path for non-standard locations
+
+documentation:
+  description: |
+    Query browser history from multiple browsers with a unified schema. Supports Chrome,
+    Edge, Firefox, and Safari across Linux, macOS, and Windows. The table auto-discovers
+    browsers from standard user profile locations. Use the custom_data_dir constraint to
+    query history from non-standard paths (forensics, backups, or mounted drives).
+
+    **Supported browsers:** Chrome, Edge, Firefox on all platforms; Safari on macOS only.
+    **Auto-discovery paths:** Linux: ~/.config/google-chrome/, microsoft-edge/, ~/.mozilla/firefox/.
+    macOS: ~/Library/Application Support/ (Google/Chrome/, Microsoft Edge/, Firefox/, Safari/).
+    Windows: %LOCALAPPDATA% (Google\\Chrome\\User Data\\, Microsoft\\Edge\\User Data\\), %APPDATA%\\Mozilla\\Firefox\\.
+
+    **Data model:** One row per visit. The url_id column is unique per URL within a browser
+    profile; use url_id (with browser and profile_name when grouping across profiles) for
+    accurate visit counts. transition_type is how the user navigated (TYPED, LINK, BOOKMARK,
+    etc.); visit_source is where the data came from (browsed, synced, imported, extension).
+    Chromium-specific fields (ch_*), Firefox (ff_*), and Safari (sf_*) are only populated
+    for that browser. Database sources: Chrome/Edge/Brave use History (SQLite), Firefox uses
+    places.sqlite, Safari uses History.db.
+
+  examples:
+    - title: Get all history from all discovered browsers
+      query: |
+        SELECT * FROM elastic_browser_history;
+    - title: Get recent history (last 7 days)
+      query: |
+        SELECT url, title, browser, datetime
+        FROM elastic_browser_history
+        WHERE timestamp > (strftime('%s', 'now') - 604800)
+        ORDER BY timestamp DESC;
+    - title: Filter by browser and profile
+      query: |
+        SELECT browser, profile_name, url, title, datetime
+        FROM elastic_browser_history
+        WHERE browser = 'firefox' AND profile_name = 'default-release'
+        ORDER BY timestamp DESC;
+    - title: Filter by browser and domain
+      query: |
+        SELECT browser, profile_name, url, title, datetime
+        FROM elastic_browser_history
+        WHERE browser = 'chrome' AND domain = 'github.com'
+        ORDER BY timestamp DESC;
+    - title: Query from custom data directory
+      query: |
+        SELECT * FROM elastic_browser_history
+        WHERE custom_data_dir = '/mnt/backup/Users/john/AppData/Local/Google';
+    - title: Custom data directory with GLOB
+      query: |
+        SELECT * FROM elastic_browser_history
+        WHERE custom_data_dir GLOB '/forensics/users/*/Library/Application Support/Google';
+    - title: Search by domain and hostname
+      query: |
+        SELECT browser, domain, hostname, url, title
+        FROM elastic_browser_history
+        WHERE domain LIKE '%.google.com'
+        ORDER BY timestamp DESC;
+    - title: Find non-HTTPS visits
+      query: |
+        SELECT browser, url, title, datetime
+        FROM elastic_browser_history
+        WHERE scheme IN ('http', 'ftp')
+        ORDER BY timestamp DESC;
+    - title: Most visited URLs (group by url_id for consistency)
+      query: |
+        SELECT url, domain, COUNT(*) as visit_count
+        FROM elastic_browser_history
+        GROUP BY url_id
+        ORDER BY visit_count DESC
+        LIMIT 20;
+    - title: Most visited domains
+      query: |
+        SELECT domain, COUNT(*) as visits
+        FROM elastic_browser_history
+        WHERE domain != ''
+        GROUP BY domain
+        ORDER BY visits DESC
+        LIMIT 20;
+    - title: Most visited hostnames
+      query: |
+        SELECT hostname, COUNT(*) as visits
+        FROM elastic_browser_history
+        WHERE hostname != ''
+        GROUP BY hostname
+        ORDER BY visits DESC
+        LIMIT 20;
+    - title: Find typed URLs (direct navigation)
+      query: |
+        SELECT url, title, browser, datetime
+        FROM elastic_browser_history
+        WHERE transition_type = 'TYPED'
+        ORDER BY timestamp DESC;
+    - title: Find hidden entries
+      query: |
+        SELECT url, title, browser, datetime
+        FROM elastic_browser_history
+        WHERE is_hidden = 1;
+    - title: Filter by visit source (e.g. synced from other devices)
+      query: |
+        SELECT url, title, browser, visit_source
+        FROM elastic_browser_history
+        WHERE visit_source = 'synced'
+        ORDER BY timestamp DESC;
+    - title: Correct aggregation across profiles (include browser and profile_name)
+      query: |
+        SELECT browser, profile_name, url, COUNT(*) as visits
+        FROM elastic_browser_history
+        GROUP BY browser, profile_name, url_id
+        ORDER BY visits DESC
+        LIMIT 20;
+
+  notes:
+    - "Chrome, Edge, and Brave use Chromium parsers; Safari is macOS only. Universal columns are always populated; ch_*, ff_*, and sf_* only for that browser."
+    - "custom_data_dir must point to the browser base directory (not the profile directory); the table discovers all profiles under that path."
+    - "Use url_id for grouping visits to the same URL; url_id is only consistent within the same profile, so include browser and profile_name when grouping across profiles."
+    - "transition_type is how the user navigated (TYPED, LINK, BOOKMARK, RELOAD, etc.); visit_source is where the data came from (browsed, synced, imported, extension)."
+    - "Performance: use timestamp and browser/profile filters to limit results; custom_data_dir queries can be slower due to discovery. History databases can be large."
+    - "Security: requires read access to browser profile directories; data may be sensitive; consider retention and privacy regulations (e.g. GDPR, CCPA)."
+    - "Troubleshooting: if no results, check profile paths and read permissions; close the browser to avoid database locked errors, or query copies via custom_data_dir."
+
+  related_tables:
+    - users
+    - chrome_extensions
+    - firefox_addons
+    - safari_extensions

@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-system.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # System fields [exported-fields-system]
 
@@ -1041,6 +1042,14 @@ Memory-specific statistics per process.
 
 **`system.process.memory.share`**
 :   The shared memory the process uses.
+
+    type: long
+
+    format: bytes
+
+
+**`system.process.memory.swap`** {applies_to}`stack: ga 8.19.11`
+:   The swap memory used by the process (supported only on Linux kernel version 2.6.34+).
 
     type: long
 

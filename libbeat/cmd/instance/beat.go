@@ -494,7 +494,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	if b.Config.MetricLogging == nil || b.Config.MetricLogging.Enabled() {
-		reporter, err := log.MakeReporter(b.Info, b.Config.MetricLogging)
+		reporter, err := log.MakeReporter(b.Info, b.Config.MetricLogging, nil, nil, nil, nil)
 		if err != nil {
 			return err
 		}

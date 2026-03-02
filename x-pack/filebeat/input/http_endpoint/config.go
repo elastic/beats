@@ -14,6 +14,8 @@ import (
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -41,6 +43,8 @@ type config struct {
 	ContentType           string                  `config:"content_type"`
 	MaxBodySize           *int64                  `config:"max_body_bytes"`
 	MaxInFlight           int64                   `config:"max_in_flight_bytes"`
+	HighWaterInFlight     int64                   `config:"high_water_in_flight_bytes"`
+	LowWaterInFlight      int64                   `config:"low_water_in_flight_bytes"`
 	RetryAfter            int                     `config:"retry_after"`
 	Program               string                  `config:"program"`
 	SecretHeader          string                  `config:"secret.header"`
@@ -124,6 +128,78 @@ func (c *config) Validate() error {
 		return fmt.Errorf("max_body_bytes is negative: %d", *c.MaxBodySize)
 	}
 
+	// Apply defaults for in-flight byte limits and validate their relationships.
+	c.applyInFlightDefaults()
+	if err := c.validateInFlightLimits(); err != nil {
+		return err
+	}
+
+	if !c.Tracer.enabled() {
+		return nil
+	}
+	if c.Tracer.Filename == "" {
+		return errors.New("request tracer must have a filename if used")
+	}
+	if c.Tracer.MaxSize == 0 {
+		// By default Lumberjack caps file sizes at 100MB which
+		// is excessive for a debugging logger, so default to 1MB
+		// which is the minimum.
+		c.Tracer.MaxSize = 1
+	}
+	ok, err := httplog.IsPathInLogsFor(inputName, c.Tracer.Filename)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
+	}
+
+	return nil
+}
+
+// applyInFlightDefaults sets default values for high_water_in_flight_bytes and
+// low_water_in_flight_bytes based on max_in_flight_bytes if they are not explicitly set.
+func (c *config) applyInFlightDefaults() {
+	if c.MaxInFlight <= 0 {
+		return
+	}
+	if c.HighWaterInFlight == 0 {
+		// Default high water is half of maximum in flight.
+		// This is conservative.
+		c.HighWaterInFlight = c.MaxInFlight / 2
+	}
+	if c.LowWaterInFlight == 0 {
+		const kB = 1 << 10
+		// Low water is the lesser of 80% of high water or high water less 64kB clamped non-negative.
+		c.LowWaterInFlight = min(c.HighWaterInFlight*4/5, max(0, c.HighWaterInFlight-64*kB))
+	}
+}
+
+// validateInFlightLimits validates the relationships between the in-flight byte limits.
+func (c *config) validateInFlightLimits() error {
+	if c.MaxInFlight < 0 {
+		return fmt.Errorf("max_in_flight_bytes is negative: %d", c.MaxInFlight)
+	}
+	if c.HighWaterInFlight < 0 {
+		return fmt.Errorf("high_water_in_flight_bytes is negative: %d", c.HighWaterInFlight)
+	}
+	if c.LowWaterInFlight < 0 {
+		return fmt.Errorf("low_water_in_flight_bytes is negative: %d", c.LowWaterInFlight)
+	}
+	if c.MaxInFlight == 0 && (c.HighWaterInFlight != 0 || c.LowWaterInFlight != 0) {
+		return errors.New("high_water_in_flight_bytes and low_water_in_flight_bytes require max_in_flight_bytes to be set")
+	}
+	if c.MaxInFlight > 0 {
+		if c.MaxInFlight < 2 {
+			return fmt.Errorf("max_in_flight_bytes must be at least 2: currently set to %d", c.MaxInFlight)
+		}
+		if c.HighWaterInFlight >= c.MaxInFlight {
+			return fmt.Errorf("high_water_in_flight_bytes (%d) must be less than max_in_flight_bytes (%d)", c.HighWaterInFlight, c.MaxInFlight)
+		}
+		if c.LowWaterInFlight >= c.HighWaterInFlight {
+			return fmt.Errorf("low_water_in_flight_bytes (%d) must be less than high_water_in_flight_bytes (%d)", c.LowWaterInFlight, c.HighWaterInFlight)
+		}
+	}
 	return nil
 }
 

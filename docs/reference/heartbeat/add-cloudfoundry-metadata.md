@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/add-cloudfoundry-metadata.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Add Cloud Foundry metadata [add-cloudfoundry-metadata]

@@ -1,0 +1,106 @@
+type: view
+name: host_processes
+description: "(Deprecated.) Backward-compatible view over elastic_host_processes; use elastic_host_processes instead."
+platforms:
+  - linux
+
+required_tables:
+  - elastic_host_processes
+
+columns:
+  - name: pid
+    type: BIGINT
+    description: Process (or thread) ID
+  - name: name
+    type: TEXT
+    description: The process path or shorthand argv[0]
+  - name: path
+    type: TEXT
+    description: Path to executed binary
+  - name: cmdline
+    type: TEXT
+    description: Complete argv (command line arguments)
+  - name: state
+    type: TEXT
+    description: Process state (R=running, S=sleeping, D=disk sleep, Z=zombie, T=stopped)
+  - name: cwd
+    type: TEXT
+    description: Process current working directory
+  - name: root
+    type: TEXT
+    description: Process virtual root directory
+  - name: uid
+    type: BIGINT
+    description: Unsigned user ID (real UID)
+  - name: gid
+    type: BIGINT
+    description: Unsigned group ID (real GID)
+  - name: euid
+    type: BIGINT
+    description: Unsigned effective user ID
+  - name: egid
+    type: BIGINT
+    description: Unsigned effective group ID
+  - name: suid
+    type: BIGINT
+    description: Unsigned saved user ID
+  - name: sgid
+    type: BIGINT
+    description: Unsigned saved group ID
+  - name: on_disk
+    type: INTEGER
+    description: The process path exists; yes=1, no=0, unknown=-1
+  - name: wired_size
+    type: BIGINT
+    description: Bytes of unpageable memory (always 0 on Linux)
+  - name: resident_size
+    type: BIGINT
+    description: Bytes of private memory used by process (RSS)
+  - name: total_size
+    type: BIGINT
+    description: Total virtual memory size
+  - name: user_time
+    type: BIGINT
+    description: CPU time in milliseconds spent in user space
+  - name: system_time
+    type: BIGINT
+    description: CPU time in milliseconds spent in kernel space
+  - name: disk_bytes_read
+    type: BIGINT
+    description: Bytes read from disk
+  - name: disk_bytes_written
+    type: BIGINT
+    description: Bytes written to disk
+  - name: start_time
+    type: BIGINT
+    description: Process start time in seconds since Epoch, or -1 if error
+  - name: parent
+    type: BIGINT
+    description: Process parent's PID (PPID)
+  - name: pgroup
+    type: BIGINT
+    description: Process group ID
+  - name: threads
+    type: INTEGER
+    description: Number of threads used by process
+  - name: nice
+    type: INTEGER
+    description: Process nice level (-20 to 20, default 0)
+
+query: |
+  SELECT * FROM elastic_host_processes;
+
+documentation:
+  description: |
+    **Deprecated.** This view is deprecated in favor of the elastic_host_processes table.
+    It exists only for backward compatibility (SELECT * FROM elastic_host_processes).
+    Use elastic_host_processes directly in new use cases.
+  examples:
+    - title: Query host processes (same as elastic_host_processes)
+      query: |
+        SELECT * FROM host_processes;
+  notes:
+    - "Deprecated in favor of elastic_host_processes; use the table directly for new queries."
+  related_tables:
+    - elastic_host_processes
+    - elastic_host_users

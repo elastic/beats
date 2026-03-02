@@ -127,6 +127,8 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 	defer cli.CloseIdleConnections()
 
 	var err error
+	attempt := 0
+	const maxAttemptsUnconfigured = 10
 	for {
 		state, err = s.followSession(ctx, cli, state)
 		if err != nil {
@@ -138,24 +140,53 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 			if errors.Is(err, hardError{}) {
 				return err
 			}
+
+			attempt++
+
+			if s.cfg.Retry != nil && !s.cfg.Retry.InfiniteRetries && attempt >= s.cfg.Retry.MaxAttempts {
+				return fmt.Errorf("max retry attempts (%d) exceeded: %w", s.cfg.Retry.MaxAttempts, err)
+			} else if attempt >= maxAttemptsUnconfigured {
+				return fmt.Errorf("max retry attempts (%d unconfigured) exceeded: %w", maxAttemptsUnconfigured, err)
+			}
+
+			var waitTime time.Duration
+			if s.cfg.Retry != nil {
+				waitTime = calculateWaitTime(s.cfg.Retry.WaitMin, s.cfg.Retry.WaitMax, attempt, s.cfg.Retry.MaxAttempts)
+			} else {
+				s.log.Warnw("no retry configured: using linear back-off")
+				waitTime = min(time.Duration(attempt)*time.Second, 30*time.Second)
+			}
+
 			s.status.UpdateStatus(status.Degraded, err.Error())
-			s.log.Warnw("session warning", "error", err)
+			s.log.Warnw("session warning", "error", err, "attempt", attempt, "wait", waitTime.String())
+
+			select {
+			case <-ctx.Done():
+				return nil
+			case <-time.After(waitTime):
+			}
 			continue
 		}
+
+		// Reset for success.
+		attempt = 0
 		s.status.UpdateStatus(status.Running, "")
 	}
 }
 
+// followSession collects events from a crowdstrike stream, publishing them as
+// they are received. It always returns a valid state value unless the error
+// returned is a hardError.
 func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, state map[string]any) (map[string]any, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.discoverURL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to prepare discover stream request: %w", err)
+		return state, fmt.Errorf("failed to prepare discover stream request: %w", err)
 	}
 	resp, err := cli.Do(req)
 	if err != nil {
 		err = fmt.Errorf("failed GET to discover stream: %w", err)
 		s.status.UpdateStatus(status.Degraded, err.Error())
-		return nil, err
+		return state, err
 	}
 	defer resp.Body.Close()
 
@@ -163,7 +194,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		var buf bytes.Buffer
 		io.Copy(&buf, resp.Body)
 		s.log.Errorw("unsuccessful request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
-		return nil, fmt.Errorf("unsuccessful request: %s: %s", resp.Status, &buf)
+		return state, fmt.Errorf("unsuccessful request: %s: %s", resp.Status, &buf)
 	}
 
 	dec := json.NewDecoder(resp.Body)
