@@ -53,7 +53,7 @@ type filebeatStore struct {
 	shared        *sharedRegistries
 	storeName     string
 	cleanInterval time.Duration
-	path          string // resolved path, key into globalStores
+	storeKey string // key into globalStores (path + backend)
 
 	// Notifies the Elasticsearch store about configuration change
 	// which is available only after the beat runtime manager connects to the Agent
@@ -61,13 +61,21 @@ type filebeatStore struct {
 	notifier *es.Notifier
 }
 
+func storeKey(resolvedPath, backendName string) string {
+	if backendName == "" {
+		backendName = "memlog"
+	}
+	return backendName + "://" + resolvedPath
+}
+
 func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry, beatPaths *paths.Path) (*filebeatStore, error) {
 	resolvedPath := beatPaths.Resolve(paths.Data, cfg.Path)
+	key := storeKey(resolvedPath, cfg.Backend)
 
 	globalMu.Lock()
 	defer globalMu.Unlock()
 
-	shared, ok := globalStores[resolvedPath]
+	shared, ok := globalStores[key]
 	if !ok {
 		var (
 			reg backend.Registry
@@ -105,7 +113,7 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 			shared.esRegistry = statestore.NewRegistry(es.New(ctx, logger, shared.notifier))
 		}
 
-		globalStores[resolvedPath] = shared
+		globalStores[key] = shared
 	}
 
 	shared.refCount++
@@ -114,7 +122,7 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 		shared:        shared,
 		storeName:     info.Beat,
 		cleanInterval: cfg.CleanInterval,
-		path:          resolvedPath,
+		storeKey:      key,
 		notifier:      shared.notifier,
 	}, nil
 }
@@ -129,7 +137,7 @@ func (s *filebeatStore) Close() {
 		if s.shared.esRegistry != nil {
 			s.shared.esRegistry.Close()
 		}
-		delete(globalStores, s.path)
+		delete(globalStores, s.storeKey)
 	}
 }
 

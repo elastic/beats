@@ -94,21 +94,21 @@ func TestOpenStateStore_LastCloseRemovesFromGlobal(t *testing.T) {
 	dir := t.TempDir()
 
 	s1 := testOpenStore(t, dir)
-	resolvedPath := s1.path
+	resolvedKey := s1.storeKey
 
 	s2 := testOpenStore(t, dir)
 
 	s1.Close()
 
 	globalMu.Lock()
-	_, exists := globalStores[resolvedPath]
+	_, exists := globalStores[resolvedKey]
 	globalMu.Unlock()
 	assert.True(t, exists, "entry should still exist when refCount > 0")
 
 	s2.Close()
 
 	globalMu.Lock()
-	_, exists = globalStores[resolvedPath]
+	_, exists = globalStores[resolvedKey]
 	globalMu.Unlock()
 	assert.False(t, exists, "entry should be removed when last store is closed")
 }
@@ -149,9 +149,9 @@ func TestOpenStateStore_ConcurrentOpenClose(t *testing.T) {
 	}
 	wg.Wait()
 
-	resolvedPath := stores[0].path
+	resolvedKey := stores[0].storeKey
 	globalMu.Lock()
-	_, exists := globalStores[resolvedPath]
+	_, exists := globalStores[resolvedKey]
 	globalMu.Unlock()
 	assert.False(t, exists, "entry should be cleaned up after all stores are closed")
 }
