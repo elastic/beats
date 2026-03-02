@@ -17,10 +17,10 @@ env:
 # See https://buildkite.com/docs/pipelines/integrations/plugins/using#using-yaml-anchors-with-plugins
 common:
   - dockerhub_login_plugin: &dockerhub_login_plugin
-      elastic/vault-docker-login#v0.6.0:
+      elastic/vault-docker-login#v0.6.4:
         secret_path: 'kv/ci-shared/observability-github-secrets/shared/docker/dockerhub/observabilityrobots'
   - docker_elastic_login_plugin: &docker_elastic_login_plugin
-      elastic/vault-docker-login#v0.6.0:
+      elastic/vault-docker-login#v0.6.4:
         secret_path: 'kv/ci-shared/platform-ingest/elastic_docker_registry'
 
 steps:
