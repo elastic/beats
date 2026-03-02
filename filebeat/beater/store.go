@@ -19,6 +19,7 @@ package beater
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -26,6 +27,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/features"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/bbolt"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -66,10 +69,26 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 
 	shared, ok := globalStores[resolvedPath]
 	if !ok {
-		reg, err := memlog.New(logger, memlog.Settings{
-			Root:     resolvedPath,
-			FileMode: cfg.Permissions,
-		})
+		var (
+			reg backend.Registry
+			err error
+		)
+
+		switch cfg.Backend {
+		case "bbolt":
+			reg, err = bbolt.New(logger, bbolt.Settings{
+				Root:     resolvedPath,
+				FileMode: cfg.Permissions,
+				Config:   cfg.Bbolt,
+			})
+		case "memlog", "":
+			reg, err = memlog.New(logger, memlog.Settings{
+				Root:     resolvedPath,
+				FileMode: cfg.Permissions,
+			})
+		default:
+			return nil, fmt.Errorf("unknown registry backend: %q", cfg.Backend)
+		}
 		if err != nil {
 			return nil, err
 		}
