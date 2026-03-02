@@ -24,6 +24,7 @@ import (
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -1554,9 +1555,14 @@ var testCases = []struct {
   </item>
 </order>
 `
-				io.ReadAll(r.Body)
+				_, err := io.ReadAll(r.Body)
 				r.Body.Close()
-				w.Write([]byte(text))
+				if err != nil {
+					_, err = w.Write([]byte(text))
+				}
+				if err != nil {
+					t.Errorf("error reading response %s", err.Error())
+				}
 			})
 			server := httptest.NewServer(r)
 			config["request.url"] = server.URL
@@ -1629,7 +1635,7 @@ var testCases = []struct {
 }
 
 func TestInput(t *testing.T) {
-	logp.TestingSetup()
+	logptest.NewTestingLogger(t, "")
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
@@ -1712,10 +1718,12 @@ func TestInput(t *testing.T) {
 				case got := <-chanClient.Channel:
 					val, err := got.Fields.GetValue("message")
 					assert.NoError(t, err)
+					valStr, ok := val.(string)
+					assert.True(t, ok, "message field should be a string")
 					if test.isStringArray {
-						assert.Equal(t, val.(string), test.expected[receivedCount])
+						assert.Equal(t, valStr, test.expected[receivedCount]) //nolint:errcheck too strict for test
 					} else {
-						assert.JSONEq(t, test.expected[receivedCount], val.(string))
+						assert.JSONEq(t, test.expected[receivedCount], valStr) //nolint:errcheck too strict for test
 					}
 					receivedCount += 1
 					if receivedCount == len(test.expected) {

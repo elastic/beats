@@ -35,16 +35,16 @@ func TestTemplateValues(t *testing.T) {
 	v, _ := vals.GetValue("url.value")
 	assert.Equal(t, resp.url.String(), v)
 	v, _ = vals.GetValue("url.params")
-	assert.EqualValues(t, resp.url.Query(), v)
-	assert.EqualValues(t, resp.header, vals["header"])
-	assert.EqualValues(t, resp.body, vals["body"])
+	assert.Equal(t, resp.url.Query(), v)
+	assert.Equal(t, resp.header, vals["header"])
+	assert.Equal(t, resp.body, vals["body"])
 
 	resp = nil
 
 	vals = resp.templateValues()
 
 	assert.NotNil(t, vals)
-	assert.Equal(t, 0, len(vals))
+	assert.Empty(t, vals)
 }
 
 func TestTransformable(t *testing.T) {
