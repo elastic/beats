@@ -1,0 +1,43 @@
+[!windows] skip 'requires Windows'
+
+# First run: write one event to establish a valid bookmark.
+write-event 'First event'
+wait-for-event-log 1
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 1
+check-event-field output 0 message 'First event'
+
+# Overwrite the checkpoint with an invalid bookmark (future record number).
+envsubst invalid-checkpoint.yml
+cp invalid-checkpoint.yml $WORK/data/.winlogbeat.yml
+rm $WORK/output
+
+# Second run: winlogbeat should detect the stale bookmark and restart from the
+# beginning, re-reading the first event.
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 1
+check-event-field output 0 message 'First event'
+
+-- winlogbeat.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    no_more_events: stop
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false
+
+-- invalid-checkpoint.yml --
+update_time: 2100-01-01T00:00:00Z
+event_logs:
+  - name: $PROVIDER
+    record_number: 1000
+    timestamp: 2100-01-01T00:00:00Z
+    bookmark: "<BookmarkList>\r\n  <Bookmark Channel='$PROVIDER' RecordId='1000' IsCurrent='true'/>\r\n</BookmarkList>"
