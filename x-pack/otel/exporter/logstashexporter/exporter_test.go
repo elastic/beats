@@ -506,9 +506,8 @@ func (m *mockClientWorker) Close() error {
 
 func TestStatusReporting(t *testing.T) {
 
-	exp := newExporterWithDefaults(t)
-
 	t.Run("test recoverable error status on connectivity issue", func(t *testing.T) {
+		exp := newExporterWithDefaults(t)
 		clientCtx := newTestBeatsClientContext(t.Context())
 		statusChan := make(chan *componentstatus.Event, 1)
 		require.NoError(t, exp.Start(t.Context(), &testReporter{statusChan: statusChan}))
@@ -530,6 +529,7 @@ func TestStatusReporting(t *testing.T) {
 	})
 
 	t.Run("test status OK when batch is ACKed", func(t *testing.T) {
+		exp := newExporterWithDefaults(t)
 		clientCtx := newTestBeatsClientContext(t.Context())
 		statusChan := make(chan *componentstatus.Event, 1)
 		require.NoError(t, exp.Start(t.Context(), &testReporter{statusChan: statusChan}))
