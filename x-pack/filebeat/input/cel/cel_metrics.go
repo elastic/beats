@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -189,23 +190,35 @@ func newOTELCELMetrics(log *logp.Logger,
 	} else {
 		reader := sdkmetric.NewManualReader(sdkmetric.WithTemporalitySelector(otel.DeltaSelector))
 
-		exponentialView := sdkmetric.NewView(
-			sdkmetric.Instrument{
-				// captures every histogram that will produced by this provider
-				Name: "*",
-				Kind: sdkmetric.InstrumentKindHistogram,
-			},
-			sdkmetric.Stream{
-				Aggregation: sdkmetric.AggregationBase2ExponentialHistogram{
-					MaxSize:  160, // Optional: configure max buckets
-					MaxScale: 20,  // Optional: configure max scale
+		// By default, we force the use of base2_exponential_bucket_histogram for
+		// efficiency. However, some backends (like Elastic APM Server) do not
+		// support them yet. So we allow users to opt-out and use the default
+		// explicit_bucket_histogram only by setting
+		// OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=explicit_bucket_histogram.
+		//
+		// Ref: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/otlp/
+		var views []sdkmetric.View
+		if os.Getenv("OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION") != "explicit_bucket_histogram" {
+			exponentialView := sdkmetric.NewView(
+				sdkmetric.Instrument{
+					// captures every histogram that will produced by this provider
+					Name: "*",
+					Kind: sdkmetric.InstrumentKindHistogram,
 				},
-			},
-		)
+				sdkmetric.Stream{
+					Aggregation: sdkmetric.AggregationBase2ExponentialHistogram{
+						MaxSize:  160, // Optional: configure max buckets
+						MaxScale: 20,  // Optional: configure max scale
+					},
+				},
+			)
+			views = []sdkmetric.View{exponentialView}
+		}
+
 		sdkMeterProvider := sdkmetric.NewMeterProvider(
 			sdkmetric.WithReader(reader),
 			sdkmetric.WithResource(&resource),
-			sdkmetric.WithView(exponentialView))
+			sdkmetric.WithView(views...))
 		shutdownFuncs = append(shutdownFuncs, sdkMeterProvider.Shutdown)
 		meterProvider = sdkMeterProvider
 

@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-entity-analytics.html
 applies_to:
   stack: preview
+  serverless: preview
 ---
 
 # Entity Analytics Input [filebeat-input-entity-analytics]
@@ -654,7 +655,7 @@ Enabling this option compromises security and should only be used for debugging.
 
 ### `tracer.filename` [_tracer_filename]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. The path must point to a target in the azure-ad directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 
 ## Jamf Computer Management (`jamf`) [provider-jamf]
@@ -806,7 +807,7 @@ Enabling this option compromises security and should only be used for debugging.
 
 ### `tracer.filename` [_tracer_filename_2]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. The path must point to a target in the jamf directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 
 ## Okta User Identities (`okta`) [provider-okta]
@@ -1261,7 +1262,7 @@ Enabling this option compromises security and should only be used for debugging.
 
 #### `tracer.filename` [_tracer_filename_3]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. The path must point to a target in the okta directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 
 ### `tracer.maxsize` [_tracer_maxsize]

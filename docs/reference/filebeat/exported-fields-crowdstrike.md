@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-crowdstrike.html
 applies_to:
   stack: beta
+  serverless: beta
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # CrowdStrike fields [exported-fields-crowdstrike]
 

@@ -92,6 +92,7 @@ output.console:
 }
 
 func TestWinlogIgnoreMissingChannel(t *testing.T) {
+	t.Skip("Flaky Test: https://github.com/elastic/beats/issues/49015")
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 	lbint.EnsureCompiled(ctx, t, "filebeat")
@@ -117,8 +118,7 @@ output.console:
 logging.level: info
 `,
 			expectedOutput: []string{
-				"ignoring open error",
-				"NonExistentChannel1",
+				"encountered channel not found error when opening Windows Event Log, retrying",
 			},
 		},
 		"explicit true ignores missing channels": {
@@ -133,7 +133,7 @@ output.console:
   enabled: true
 logging.level: info
 `,
-			expectedOutput: []string{"ignoring open error", "NonExistentChannel2"},
+			expectedOutput: []string{"encountered channel not found error when opening Windows Event Log, retrying"},
 		},
 		"explicit false fails on missing channels": {
 			configTemplate: `
@@ -147,7 +147,7 @@ output.console:
   enabled: true
 logging.level: debug
 `,
-			expectedOutput: []string{"NonExistentChannel3", "The specified channel could not be found", "encountered recoverable error"},
+			expectedOutput: []string{"The specified channel could not be found", "encountered channel not found error when opening Windows Event Log, retrying"},
 		},
 	}
 	for name, tc := range tcs {

@@ -39,9 +39,9 @@ type Lnk struct {
 	ShowWindow             string    `osquery:"show_window"`
 	IconLocation           string    `osquery:"icon_location"`
 	CommandLineArguments   string    `osquery:"command_line_arguments"`
-	TargetModificationDate time.Time `osquery:"target_modification_time" format:"unix"`
-	TargetLastAccessedDate time.Time `osquery:"target_last_accessed_time" format:"unix"`
-	TargetCreationDate     time.Time `osquery:"target_creation_time" format:"unix"`
+	TargetModificationDate time.Time `osquery:"target_modification_time"`
+	TargetLastAccessedDate time.Time `osquery:"target_last_accessed_time"`
+	TargetCreationDate     time.Time `osquery:"target_creation_time"`
 	VolumeSerialNumber     string    `osquery:"volume_serial_number"`
 	VolumeType             string    `osquery:"volume_type"`
 	VolumeLabel            string    `osquery:"volume_label"`

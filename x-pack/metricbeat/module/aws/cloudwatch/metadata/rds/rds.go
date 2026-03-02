@@ -7,7 +7,6 @@ package rds
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
 
@@ -15,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata"
 )
 
 const metadataPrefix = "aws.rds.db_instance."
@@ -47,8 +47,8 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 
 	for dbInstanceIdentifier, output := range dbDetailsMap {
 		for eventIdentifier := range events {
-			eventIdentifierComponents := strings.Split(eventIdentifier, "-")
-			potentialDBInstanceIdentifier := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
+			// Extract DB instance identifier, stripping account ID prefix if present
+			potentialDBInstanceIdentifier := metadata.ExtractResourceID(eventIdentifier)
 			if dbInstanceIdentifier != potentialDBInstanceIdentifier {
 				continue
 			}

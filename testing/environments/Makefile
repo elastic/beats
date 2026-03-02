@@ -1,9 +1,9 @@
 ENV?=snapshot.yml
-BASE_COMMAND=docker-compose -f ${ENV} -f local.yml
+BASE_COMMAND=docker compose -f ${ENV} -f local.yml
 
 start:
 	# This is run every time to make sure the environment is up-to-date
-	${BASE_COMMAND} build --pull --force-rm
+	${BASE_COMMAND} build --pull
 	${BASE_COMMAND} run beat bash
 
 stop:
