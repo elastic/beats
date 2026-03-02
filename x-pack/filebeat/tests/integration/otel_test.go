@@ -1634,7 +1634,7 @@ func checkDuplicates(t *testing.T, index string) {
 	value, ok := total["value"].(float64)
 	require.Truef(t, ok, "'total' wasn't an int, result was %s", string(resultBuf))
 
-	require.Equalf(t, 0, len(buckets), "len(buckets): %d, hits.total.value: %d, result was %s", len(buckets), value, string(resultBuf))
+	require.Emptyf(t, buckets, "len(buckets): %d, hits.total.value: %d, result was %s", len(buckets), value, string(resultBuf))
 }
 
 // setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
@@ -1671,7 +1671,7 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 	require.NoError(t, err, "could not perform role mapping request")
 	defer resp.Body.Close()
 
-	require.Equal(t, resp.StatusCode, http.StatusOK, "incorrect response code")
+	require.Equal(t, http.StatusOK, resp.StatusCode, "incorrect response code")
 }
 
 func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {

@@ -11,7 +11,7 @@
 kind: security
 
 # Change summary; a 80ish characters long description of the change.
-summary: Update elastic-agent-autodiscover to v0.10.2.
+summary: Update elastic-agent-system-metrics to v0.14.0.
 
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
 component: all

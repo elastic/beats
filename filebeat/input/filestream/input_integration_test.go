@@ -331,7 +331,7 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 	env.waitUntilInputStops()
 
 	messages := env.getOutputMessages()
-	require.Equal(t, messages[0], "#Software: Microsoft Exchange Server")
+	require.Equal(t, "#Software: Microsoft Exchange Server", messages[0])
 }
 
 // test_boms from test_harvester.py
