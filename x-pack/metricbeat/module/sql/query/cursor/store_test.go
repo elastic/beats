@@ -124,7 +124,7 @@ func TestStoreOperations(t *testing.T) {
 		Logs:   tmpDir,
 	}
 
-	logger := logp.NewLogger("test-cursor-store")
+	logger := logp.NewNopLogger()
 
 	// Test store creation
 	store, err := newStore(beatPaths, logger)
