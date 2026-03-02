@@ -215,7 +215,12 @@ func (l *logstashExporter) handleBatchResult(
 func (l *logstashExporter) reportConnectivityStatus() {
 	// if not able to connect to all of the configured hosts - report degraded health
 	connected := false
-	for _, worker := range l.workers {
+	workers := l.getWorkers()
+	if len(workers) == 0 {
+		return
+	}
+
+	for _, worker := range workers {
 		if err := worker.Connected(); err == nil {
 			connected = true
 			break
@@ -223,7 +228,7 @@ func (l *logstashExporter) reportConnectivityStatus() {
 	}
 
 	if !connected {
-		componentstatus.ReportStatus(l.componentHost, componentstatus.NewRecoverableErrorEvent(fmt.Errorf("logstash request failed: %w", l.workers[0].Connected())))
+		componentstatus.ReportStatus(l.componentHost, componentstatus.NewRecoverableErrorEvent(fmt.Errorf("logstash request failed: %w", workers[0].Connected())))
 	}
 }
 

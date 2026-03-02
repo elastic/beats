@@ -7,6 +7,7 @@ package internal
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -55,7 +56,8 @@ type netClientWorker struct {
 	client outputs.NetworkClient
 	logger logp.Logger
 	// holds nil if we are able to connect, else err
-	connected error
+	connected   error
+	connectedMu sync.RWMutex
 }
 
 func MakeClientWorker(workQueue chan *Work, client outputs.Client, logger logp.Logger) Worker {
@@ -110,6 +112,8 @@ func (w *netClientWorker) Close() error {
 }
 
 func (w *netClientWorker) Connected() error {
+	w.connectedMu.Lock()
+	defer w.connectedMu.Unlock()
 	return w.connected
 }
 
@@ -140,11 +144,15 @@ func (w *netClientWorker) run(ctx context.Context) {
 				if connected {
 					w.logger.Infof("Connection to %v established", w.client)
 					reconnectAttempts = 0
+					w.connectedMu.Lock()
 					w.connected = nil
+					w.connectedMu.Unlock()
 				} else {
 					w.logger.Errorf("Failed to connect to %v: %q", w.client, err)
 					reconnectAttempts++
+					w.connectedMu.Lock()
 					w.connected = err
+					w.connectedMu.Unlock()
 				}
 
 				continue
