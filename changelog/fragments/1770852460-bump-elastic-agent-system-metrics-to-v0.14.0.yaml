@@ -8,13 +8,10 @@
 # - security: impacts on the security of a product or a user's deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: bug-fix
+kind: security
 
 # Change summary; a 80ish characters long description of the change.
-summary: Fix otelconsumer logging hundreds of errors per second when queue is full
+summary: Update elastic-agent-system-metrics to v0.14.0.
 
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: libbeat
-
-# Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
-issue: https://github.com/elastic/beats/issues/48803
+component: all

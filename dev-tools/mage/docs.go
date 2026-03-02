@@ -68,22 +68,6 @@ var Docs = docsBuilder{}
 
 // FieldDocs generates exported-fields.md from the specified fields.yml file.
 func (docsBuilder) FieldDocs(fieldsYML string) error {
-	// Run the docs_collector.py script.
-	ve, err := PythonVirtualenv(false)
-	if err != nil {
-		return err
-	}
-
-	python, err := LookVirtualenvPath(ve, pythonExe)
-	if err != nil {
-		return err
-	}
-
-	esBeats, err := ElasticBeatsDir()
-	if err != nil {
-		return err
-	}
-
 	docsDir, err := DocsDir()
 	if err != nil {
 		return err
@@ -91,13 +75,8 @@ func (docsBuilder) FieldDocs(fieldsYML string) error {
 
 	outputPath := filepath.Join(docsDir, "reference", BeatName)
 
-	// TODO: Port this script to Go.
 	log.Println(">> Generating exported-fields.md for", BeatName)
-	return sh.Run(python, LibbeatDir("scripts/generate_fields_docs.py"),
-		fieldsYML,                   // Path to fields.yml.
-		BeatName,                    // Beat title.
-		esBeats,                     // Path to general beats folder.
-		"--output_path", outputPath) // It writes to {output_path}/exported-fields.md.
+	return GenerateFieldsDocs(fieldsYML, outputPath, BeatName)
 }
 
 func (b docsBuilder) AsciidocBook(opts ...DocsOption) error {

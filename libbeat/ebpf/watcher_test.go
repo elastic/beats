@@ -33,11 +33,11 @@ func TestWatcherStartStop(t *testing.T) {
 	if err != nil {
 		t.Skipf("skipping ebpf watcher test: %v", err)
 	}
-	assert.Equal(t, gWatcher.status, stopped)
+	assert.Equal(t, stopped, gWatcher.status)
 	assert.Equal(t, 0, gWatcher.nclients())
 
 	_ = w.Subscribe("test-1", allEvents)
-	assert.Equal(t, gWatcher.status, started)
+	assert.Equal(t, started, gWatcher.status)
 	assert.Equal(t, 1, gWatcher.nclients())
 
 	_ = w.Subscribe("test-2", allEvents)
@@ -49,13 +49,13 @@ func TestWatcherStartStop(t *testing.T) {
 	w.Unsubscribe("dummy")
 	assert.Equal(t, 1, gWatcher.nclients())
 
-	assert.Equal(t, gWatcher.status, started)
+	assert.Equal(t, started, gWatcher.status)
 	w.Unsubscribe("test-1")
 	assert.Equal(t, 0, gWatcher.nclients())
-	assert.Equal(t, gWatcher.status, stopped)
+	assert.Equal(t, stopped, gWatcher.status)
 
 	_ = w.Subscribe("new", allEvents)
 	assert.Equal(t, 1, gWatcher.nclients())
-	assert.Equal(t, gWatcher.status, started)
+	assert.Equal(t, started, gWatcher.status)
 	w.Unsubscribe("new")
 }
