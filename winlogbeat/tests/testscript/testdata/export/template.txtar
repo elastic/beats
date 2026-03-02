@@ -1,0 +1,11 @@
+exec winlogbeat export template -c winlogbeat.yml
+stdout '"index_patterns"'
+stdout '"template"'
+stdout '"priority"'
+! stdout '"order"'
+
+-- winlogbeat.yml --
+output.file:
+  path: ./output
+  filename: winlogbeat
+  rotate_every_kb: 1000

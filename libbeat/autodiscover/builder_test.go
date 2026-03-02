@@ -66,7 +66,7 @@ func TestBuilderRegistry(t *testing.T) {
 	// Try to create a config with fake builder and assert length
 	// of configs returned is one
 	res := builder.CreateConfig(nil)
-	assert.Equal(t, len(res), 1)
+	assert.Len(t, res, 1)
 
 	builders := Builders{}
 	builders.builders = append(builders.builders, builder)
@@ -74,5 +74,5 @@ func TestBuilderRegistry(t *testing.T) {
 	// Try using builders object for the same as above and expect
 	// the same result
 	res = builders.GetConfig(nil)
-	assert.Equal(t, len(res), 1)
+	assert.Len(t, res, 1)
 }
