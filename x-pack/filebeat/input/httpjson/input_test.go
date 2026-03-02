@@ -1744,7 +1744,7 @@ func TestInput(t *testing.T) {
 					t.Errorf("unexpected files found: %v", paths)
 				}
 			}
-			err := g.Wait()
+			err = g.Wait()
 			if err != nil && !errors.Is(err, context.Canceled) {
 				assert.NoError(t, err)
 			}

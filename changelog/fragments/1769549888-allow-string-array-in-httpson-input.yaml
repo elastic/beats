@@ -13,7 +13,7 @@ kind: enhancement
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Accepts an array of strings in first response of a chained configuration.
+summary: Accepts an array of strings in a chained configuration.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
