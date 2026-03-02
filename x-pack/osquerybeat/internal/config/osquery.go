@@ -19,6 +19,8 @@ type Query struct {
 	// StartDate is the optional start date for native (interval-based) schedules (RFC3339).
 	// Used as the reference for schedule_execution_count.
 	StartDate string `config:"start_date,omitempty" json:"start_date,omitempty"`
+	// SpaceID is the optional policy space identifier for this scheduled query.
+	SpaceID string `config:"space_id,omitempty" json:"space_id,omitempty"`
 
 	Platform    string `config:"platform" json:"platform,omitempty"`
 	Version     string `config:"version" json:"version,omitempty"`

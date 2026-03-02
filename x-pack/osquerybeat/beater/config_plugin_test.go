@@ -422,3 +422,78 @@ func TestSet(t *testing.T) {
 		})
 	}
 }
+
+func TestSet_ScheduleMetadataIncludesSpaceID(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+	cfgp := NewConfigPlugin(logger)
+
+	const (
+		queryName   = "scheduled_query"
+		scheduleID  = "sched-123"
+		startDate   = "2026-02-01T00:00:00Z"
+		spaceID     = "space-abc"
+		querySQL    = "select * from uptime"
+		queryPeriod = 300
+	)
+
+	inputs := []config.InputConfig{
+		{
+			Name: "osquery-manager-1",
+			Type: "osquery",
+			Datastream: config.DatastreamConfig{
+				Namespace: "custom",
+			},
+			Osquery: &config.OsqueryConfig{
+				Schedule: map[string]config.Query{
+					queryName: {
+						Query:      querySQL,
+						Interval:   queryPeriod,
+						ScheduleID: scheduleID,
+						StartDate:  startDate,
+						SpaceID:    spaceID,
+					},
+				},
+			},
+		},
+	}
+
+	if err := cfgp.Set(inputs); err != nil {
+		t.Fatal(err)
+	}
+
+	// Query metadata becomes active after GenerateConfig.
+	cfg, err := cfgp.GenerateConfig(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rendered, ok := cfg[configName]
+	if !ok {
+		t.Fatalf("missing %v configuration name", configName)
+	}
+
+	if !strings.Contains(rendered, `"space_id": "space-abc"`) {
+		t.Fatalf("rendered config missing space_id: %s", rendered)
+	}
+
+	qi, ok := cfgp.LookupQueryInfo(queryName)
+	if !ok {
+		t.Fatalf("failed to resolve query info for %s", queryName)
+	}
+
+	if diff := cmp.Diff(querySQL, qi.Query); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff(scheduleID, qi.ScheduleID); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff(startDate, qi.StartDate); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff(spaceID, qi.SpaceID); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff(queryPeriod, qi.Interval); diff != "" {
+		t.Error(diff)
+	}
+}

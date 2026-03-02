@@ -38,6 +38,8 @@ type QueryInfo struct {
 	ScheduleID string
 	// StartDate is the start date for native schedules (RFC3339); required for schedule_execution_count
 	StartDate string
+	// SpaceID is the optional policy space identifier for this query.
+	SpaceID string
 	// Interval is the schedule interval in seconds for native schedules; used to compute schedule_execution_count
 	Interval int
 }
@@ -227,6 +229,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			ECSMapping: ecsm,
 			ScheduleID: qi.ScheduleID,
 			StartDate:  qi.StartDate,
+			SpaceID:    qi.SpaceID,
 			Interval:   qi.Interval,
 		}
 		namespaces[name] = ns
