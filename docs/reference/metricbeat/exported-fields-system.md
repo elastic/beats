@@ -1318,6 +1318,12 @@ cgroupv2 stats
     type: long
 
 
+**`system.process.cgroup.cpu.cfs.weight`**
+:   CPU weight for the cgroup (cgroupv2). Used by the CFS scheduler to determine the share of CPU time available to the cgroup. Range is 1 to 10000, default 100.
+
+    type: long
+
+
 **`system.process.cgroup.cpu.rt.period.us`**
 :   Period of time in microseconds for how regularly a cgroup's access to CPU resources is reallocated.
 
