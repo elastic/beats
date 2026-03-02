@@ -196,10 +196,10 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		prevDesc, ok := w.prev[path]
 		sfd := fd // to avoid memory aliasing
 		if !ok || !loginp.SameFile(w.log, &prevDesc, &sfd) {
-			if ok {
-				w.log.Infof("file %q has been replaced by a new file. Old ID %q, new ID %q",
-					path, prevDesc.FileID(), fd.FileID())
-			}
+			// if ok {
+			// 	w.log.Infof("file %q has been replaced by a new file. Old ID %q, new ID %q",
+			// 		path, prevDesc.FileID(), fd.FileID())
+			// }
 			newFilesByName[path] = &sfd
 			newFilesByID[fd.FileID()] = &sfd
 			continue
