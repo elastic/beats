@@ -294,11 +294,10 @@ scanner:
 		err := os.WriteFile(filename, nil, 0777)
 		require.NoError(t, err)
 
-		t.Run("issues a debug message in logs", func(t *testing.T) {
-			expLogMsg := fmt.Sprintf("file %q has no content yet, skipping", filename)
-			require.Eventually(t, func() bool {
-				return strings.Contains(buff.String(), expLogMsg)
-			}, time.Second, 10*time.Millisecond, "required a debug message %q but never found", expLogMsg)
+		t.Run("silently ignores the empty file", func(t *testing.T) {
+			time.Sleep(200 * time.Millisecond)
+			require.NotContains(t, buff.String(), basename,
+				"empty files should be silently ignored at the scanner level")
 		})
 
 		t.Run("emits a create event once something is written to the empty file", func(t *testing.T) {
@@ -1009,12 +1008,62 @@ scanner:
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
-}
 
-func mustFingerprintIdentifier() fileIdentifier {
-	fi, _ := newFingerprintIdentifier(nil, nil)
+	t.Run("empty regular files are silently excluded", func(t *testing.T) {
+		dir := t.TempDir()
+		empty := filepath.Join(dir, "empty.log")
+		err := os.WriteFile(empty, nil, 0644)
+		require.NoError(t, err)
 
-	return fi
+		nonEmpty := filepath.Join(dir, "nonempty.log")
+		err = os.WriteFile(nonEmpty, []byte("hello"), 0644)
+		require.NoError(t, err)
+
+		cfg := fileScannerConfig{
+			Symlinks:    false,
+			Fingerprint: fingerprintConfig{Enabled: false},
+		}
+		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
+		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
+		require.NoError(t, err)
+
+		files := s.GetFiles()
+		assert.Len(t, files, 1, "empty.log must be excluded")
+		assert.Contains(t, files, nonEmpty, "nonempty.log should be included")
+		assert.NotContains(t, buff.String(), "GetFiles") // every line has a source prefix
+	})
+
+	t.Run("symlinks to empty files are silently excluded", func(t *testing.T) {
+		dir := t.TempDir()
+		emptyTarget := filepath.Join(dir, "empty_target.txt")
+		err := os.WriteFile(emptyTarget, nil, 0644)
+		require.NoError(t, err)
+
+		emptyLink := filepath.Join(dir, "empty_link.log")
+		err = os.Symlink(emptyTarget, emptyLink)
+		require.NoError(t, err)
+
+		nonEmptyTarget := filepath.Join(dir, "nonempty_target.txt")
+		err = os.WriteFile(nonEmptyTarget, []byte("content"), 0644)
+		require.NoError(t, err)
+
+		nonEmptyLink := filepath.Join(dir, "nonempty_link.log")
+		err = os.Symlink(nonEmptyTarget, nonEmptyLink)
+		require.NoError(t, err)
+
+		cfg := fileScannerConfig{
+			Symlinks:    true,
+			Fingerprint: fingerprintConfig{Enabled: false},
+		}
+		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
+		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
+		require.NoError(t, err)
+
+		files := s.GetFiles()
+		assert.Len(t, files, 1, "empty_target.log must be excluded")
+		assert.Contains(t, files, nonEmptyLink, "nonempty_target.txt should be included")
+		assert.NotContains(t, buff.String(), "GetFiles") // every line has a source prefix
+	})
 }
 
 func mustSourceIdentifier(inputID string) *loginp.SourceIdentifier {
@@ -1158,6 +1207,47 @@ func filenames(m map[string]loginp.FileDescriptor) (result string) {
 		result += filename + "\n"
 	}
 	return result
+}
+
+func TestGetIngestTarget(t *testing.T) {
+	t.Run("empty regular file", func(t *testing.T) {
+		dir := t.TempDir()
+
+		filename := filepath.Join(dir, "empty.log")
+		err := os.WriteFile(filename, nil, 0644)
+		require.NoError(t, err)
+
+		cfg := fileScannerConfig{
+			Symlinks:    false,
+			Fingerprint: fingerprintConfig{Enabled: false},
+		}
+		s, err := newFileScanner(logp.NewNopLogger(), []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
+		require.NoError(t, err)
+
+		_, err = s.getIngestTarget(filename)
+		require.ErrorIs(t, err, errFileEmpty)
+	})
+
+	t.Run("symlink to an empty file", func(t *testing.T) {
+		dir := t.TempDir()
+		target := filepath.Join(dir, "empty_target.txt")
+		err := os.WriteFile(target, nil, 0644)
+		require.NoError(t, err)
+
+		link := filepath.Join(dir, "link.log")
+		err = os.Symlink(target, link)
+		require.NoError(t, err)
+
+		cfg := fileScannerConfig{
+			Symlinks:    true,
+			Fingerprint: fingerprintConfig{Enabled: false},
+		}
+		s, err := newFileScanner(logp.NewNopLogger(), []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
+		require.NoError(t, err)
+
+		_, err = s.getIngestTarget(link)
+		require.ErrorIs(t, err, errFileEmpty)
+	})
 }
 
 func TestToFileDescriptor_TooSmallFile_NoFileOpen(t *testing.T) {

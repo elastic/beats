@@ -216,3 +216,9 @@ func requireOperation(t *testing.T, evt loginp.FSEvent, op loginp.Operation) {
 		t.Fatalf("expecting operation %q, got: %q", op.String(), evt.Op.String())
 	}
 }
+
+func mustFingerprintIdentifier() fileIdentifier {
+	fi, _ := newFingerprintIdentifier(nil, nil)
+
+	return fi
+}
