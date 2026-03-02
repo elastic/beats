@@ -1107,12 +1107,12 @@ func TestOpenMetricGetters(t *testing.T) {
 func TestMetricFamilyGetUnit(t *testing.T) {
 	// nil unit
 	mf := &MetricFamily{}
-	assert.Equal(t, "", mf.GetUnit())
+	assert.Empty(t, mf.GetUnit())
 
 	// empty unit
 	empty := ""
 	mf2 := &MetricFamily{Unit: &empty}
-	assert.Equal(t, "", mf2.GetUnit())
+	assert.Empty(t, mf2.GetUnit())
 
 	// valid unit
 	unit := "bytes"
