@@ -1721,9 +1721,9 @@ func TestInput(t *testing.T) {
 					valStr, ok := val.(string)
 					assert.True(t, ok, "message field should be a string")
 					if test.isStringArray {
-						assert.Equal(t, valStr, test.expected[receivedCount]) //nolint:errcheck //too strict for test
+						assert.Equal(t, valStr, test.expected[receivedCount]) //nolint:errcheck,nolintlint // too strict for test
 					} else {
-						assert.JSONEq(t, test.expected[receivedCount], valStr) //nolint:errcheck //too strict for test
+						assert.JSONEq(t, test.expected[receivedCount], valStr) //nolint:errcheck,nolintlint // too strict for test
 					}
 					receivedCount += 1
 					if receivedCount == len(test.expected) {
