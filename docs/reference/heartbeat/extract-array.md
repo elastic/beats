@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/extract-array.html
 applies_to:
   stack: preview
-  serverless: ga
+  serverless: preview
 ---
 
 # Extract array [extract-array]

@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/add-nomad-metadata.html
 applies_to:
   stack: preview
-  serverless: ga
+  serverless: preview
 ---
 
 # Add Nomad metadata [add-nomad-metadata]
