@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
@@ -30,10 +31,11 @@ import (
 
 // BaseReceiver holds common configurations for beatreceivers.
 type BeatReceiver struct {
-	beat     *instance.Beat
-	beater   beat.Beater
-	reporter *log.Reporter
-	Logger   *logp.Logger
+	beat             *instance.Beat
+	beater           beat.Beater
+	reporter         *log.Reporter
+	Logger           *logp.Logger
+	storageExtension string
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -129,6 +131,20 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		}
 	}
 
+	if w, ok := br.beater.(backend.WithESStateStoreExtension); ok {
+		if present, err := br.beat.RawConfig.Has("storage", -1); present && err == nil {
+			storageExtension, err := br.beat.RawConfig.String("storage", -1)
+			if err != nil {
+				return fmt.Errorf("error reading storage extension from config: %w", err)
+			}
+			esStorageExtension, err := br.getESStateStoreExtension(host, storageExtension)
+			if err != nil {
+				return fmt.Errorf("error getting ES state store extension: %w", err)
+			}
+			w.WithESStateStoreExtension(esStorageExtension)
+		}
+	}
+
 	if br.beat.Config.MetricLogging == nil || br.beat.Config.MetricLogging.Enabled() {
 		r, err := log.MakeReporter(br.beat.Info, br.beat.Config.MetricLogging, br.beat.Monitoring.InfoRegistry(), br.beat.Monitoring.StateRegistry(), br.beat.Monitoring.StateRegistry(), br.beat.Monitoring.InfoRegistry())
 		if err != nil {
@@ -188,4 +204,21 @@ func (br *BeatReceiver) stopMonitoring() error {
 		return br.beat.API.Stop()
 	}
 	return nil
+}
+
+func (br *BeatReceiver) getESStateStoreExtension(host component.Host, storageExtension string) (backend.Registry, error) {
+	componentID := component.ID{}
+	err := componentID.UnmarshalText([]byte(storageExtension))
+	if err != nil {
+		return nil, fmt.Errorf("invalid component id for ES state store extension (%v): %w", []byte(storageExtension), err)
+	}
+	extension, ok := host.GetExtensions()[componentID]
+	if !ok {
+		return nil, fmt.Errorf("extension with id %s not found", componentID.String())
+	}
+	reg, ok := extension.(backend.Registry)
+	if !ok {
+		return nil, fmt.Errorf("extension '%s' is not a backend.Registry", componentID.String())
+	}
+	return reg, nil
 }
