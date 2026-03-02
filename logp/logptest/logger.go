@@ -185,18 +185,30 @@ func (l *Logger) FindInLogs(str string) (bool, error) {
 	for {
 		data, err := r.ReadBytes('\n')
 		line := string(data)
-		l.offset += int64(len(data))
+		n := int64(len(data))
+
+		// Even if we read a partial line, try to match it.
+		if strings.Contains(line, str) {
+			l.offset += n
+			return true, nil
+		}
 
 		if err != nil {
 			if !errors.Is(err, io.EOF) {
 				return false, fmt.Errorf("error reading log file '%s': %w", l.logFile.Name(), err)
 			}
-			break
+
+			// Keep offset unchanged on unmatched partial EOF so next poll can re-read
+			// and match when the line is completed.
+			if n == 0 {
+				break
+			}
+
+			continue
 		}
 
-		if strings.Contains(line, str) {
-			return true, nil
-		}
+		// No error, no match, advance offset.
+		l.offset += n
 	}
 
 	return false, nil

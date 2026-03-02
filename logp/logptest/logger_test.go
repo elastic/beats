@@ -80,6 +80,58 @@ func TestNewFileLogger(t *testing.T) {
 	})
 }
 
+func TestFindInLogsKeepsOffsetOnUnmatchedPartialLine(t *testing.T) {
+	logger := NewFileLogger(t, "")
+
+	const (
+		target     = "match"
+		firstChunk = "prefix mat"
+		lastChunk  = "ch suffix\n"
+	)
+
+	if _, err := logger.logFile.WriteString(firstChunk); err != nil {
+		t.Fatalf("cannot write first log chunk: %s", err)
+	}
+
+	if err := logger.logFile.Sync(); err != nil {
+		t.Fatalf("cannot sync first log chunk: %s", err)
+	}
+
+	found, err := logger.FindInLogs(target)
+	if err != nil {
+		t.Fatalf("did not expect an error from 'FindInLogs': %s", err)
+	}
+
+	if found {
+		t.Fatal("expecting 'FindInLogs' to return false for unmatched partial line")
+	}
+
+	if got, want := logger.offset, int64(0); got != want {
+		t.Fatalf("expecting offset to stay at %d after unmatched partial line, got %d", want, got)
+	}
+
+	if _, err := logger.logFile.WriteString(lastChunk); err != nil {
+		t.Fatalf("cannot write last log chunk: %s", err)
+	}
+
+	if err := logger.logFile.Sync(); err != nil {
+		t.Fatalf("cannot sync last log chunk: %s", err)
+	}
+
+	found, err = logger.FindInLogs(target)
+	if err != nil {
+		t.Fatalf("did not expect an error from 'FindInLogs': %s", err)
+	}
+
+	if !found {
+		t.Fatal("expecting 'FindInLogs' to return true when the line is completed")
+	}
+
+	if got, want := logger.offset, int64(len(firstChunk+lastChunk)); got != want {
+		t.Fatalf("expecting offset to advance to %d after matching complete line, got %d", want, got)
+	}
+}
+
 func assertLogFormat(t *testing.T, path string) {
 	t.Helper()
 
