@@ -18,7 +18,6 @@
 package beater
 
 import (
-	"context"
 	"sync"
 	"testing"
 	"time"
@@ -37,7 +36,7 @@ func testOpenStore(t *testing.T, dir string) *filebeatStore {
 	beatPaths := paths.New()
 	beatPaths.Data = dir
 
-	store, err := openStateStore(context.Background(), beat.Info{Beat: "test"}, logp.NewLogger("test"), config.Registry{
+	store, err := openStateStore(t.Context(), beat.Info{Beat: "test"}, logp.NewNopLogger(), config.Registry{
 		Path:          "",
 		Permissions:   0600,
 		CleanInterval: 5 * time.Second,
@@ -154,4 +153,46 @@ func TestOpenStateStore_ConcurrentOpenClose(t *testing.T) {
 	_, exists := globalStores[resolvedKey]
 	globalMu.Unlock()
 	assert.False(t, exists, "entry should be cleaned up after all stores are closed")
+}
+
+func TestOpenStateStore_CloseNoDeadlock(t *testing.T) {
+	dir := t.TempDir()
+
+	s1 := testOpenStore(t, dir)
+	key := s1.storeKey
+
+	// Open a backend store from the registry. This increments the registry's
+	// internal WaitGroup, so Registry.Close() will block until we close it.
+	backendStore, err := s1.shared.registry.Get("test")
+	require.NoError(t, err)
+
+	// Close the filebeatStore in a goroutine. It will remove the entry from
+	// globalStores under the lock, then release the lock and block on
+	// Registry.Close() -> wg.Wait() because backendStore is still open.
+	closeDone := make(chan struct{})
+	go func() {
+		s1.Close()
+		close(closeDone)
+	}()
+
+	// Wait for the entry to be removed from globalStores. This proves that
+	// Close() released globalMu before calling Registry.Close(), because
+	// Registry.Close() is still blocked on wg.Wait() at this point.
+	require.Eventually(t, func() bool {
+		globalMu.Lock()
+		defer globalMu.Unlock()
+		_, exists := globalStores[key]
+		return !exists
+	}, 5*time.Second, 10*time.Millisecond,
+		"entry should be removed from globalStores while registry close is still blocked")
+
+	// openStateStore must succeed even though the old registry close is
+	// still blocked. If Close held globalMu during Registry.Close this
+	// would deadlock.
+	s2 := testOpenStore(t, dir)
+	s2.Close()
+
+	// Unblock the old registry close.
+	backendStore.Close()
+	<-closeDone
 }
