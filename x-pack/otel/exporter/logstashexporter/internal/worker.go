@@ -35,7 +35,7 @@ func (w *Work) Result() chan error {
 }
 
 type Worker interface {
-	// Close closes the connection to the client and releases all resources
+	// Close closes the connection to the server and releases all resources
 	Close() error
 	// Connected returns nil if worker is able to connect to the server successfully.
 	Connected() error
