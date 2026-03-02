@@ -163,6 +163,8 @@ func (hg *defaultHarvesterGroup) SetObserver(c chan HarvesterStatus) {
 // be started. Start does not block.
 func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 	sourceName := hg.identifier.ID(src)
+
+	// TODO(AndersonQ): do we need it? it's 1k for the growing fingerprint
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 
 	fn := startHarvester(ctx, hg, src, false, hg.metrics, hg.inputID)
@@ -218,7 +220,13 @@ func startHarvester(
 	}
 
 	return func(canceler context.Context) (err error) {
-		ctx.Logger.Infof("harvester for file %s, srcID %s. %T", src.Name(), srcID, src)
+		// TODO(AndersonQ): decide what to do with this log. When harvesting
+		// a number of files in the order of 10k or even 100k this log is just
+		// too expensive and noisy. It has the fingerprint (1k for the growing
+		// fingerprint) 3 times.
+		// Perhaps it could log the file path.
+		// ctx.Logger.Infof("harvester for file %s, srcID %s. %T", src.Name(), srcID, src)
+		ctx.Logger.Infof("harvester for file started %s", srcID)
 		defer func() {
 			if v := recover(); v != nil {
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
