@@ -108,6 +108,43 @@ func TestManager_Init(t *testing.T) {
 	})
 }
 
+func TestManager_InitReusesStore(t *testing.T) {
+	// Verify that calling init() a second time (with an inputID) reuses
+	// the existing store opened during the first partial init, rather than
+	// creating a new one that would leak the *statestore.Store.
+	data := map[string]state{
+		"test::mykey": {Cursor: "value1"},
+	}
+	stateStore := createSampleStore(t, data)
+
+	manager := &InputManager{
+		Logger:              logptest.NewTestingLogger(t, "test"),
+		StateStore:          stateStore,
+		Type:                "test",
+		DefaultCleanTimeout: 30 * time.Minute,
+	}
+
+	// Simulate the first partial init (ES-backed inputs with fullInit=false).
+	log := logptest.NewTestingLogger(t, "test")
+	partialStore, err := openStore(log, stateStore, "test", "", false)
+	require.NoError(t, err)
+	manager.store = partialStore
+
+	origStore := manager.store
+	origPersistent := manager.store.persistentStore
+
+	require.Empty(t, storeMemorySnapshot(origStore))
+
+	err = manager.init("my-input-id")
+	require.NoError(t, err)
+
+	assert.Same(t, origStore, manager.store)
+	assert.Same(t, origPersistent, manager.store.persistentStore)
+	snap := storeMemorySnapshot(manager.store)
+	assert.Contains(t, snap, "test::mykey")
+	assert.Equal(t, "value1", snap["test::mykey"].Cursor)
+}
+
 func TestManager_Create(t *testing.T) {
 	t.Run("fail if no source is configured", func(t *testing.T) {
 		manager := constInput(t, nil, &fakeTestInput{})
