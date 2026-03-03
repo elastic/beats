@@ -33,14 +33,13 @@ type FileMetaReader struct {
 	fi           file.ExtendedFileInfo
 	includeOwner bool
 	includeGroup bool
-	fingerprint  string
 	offset       int64
 }
 
 // New creates a new Encode reader from input reader by applying
 // the given codec.
-func NewFilemeta(r reader.Reader, path string, fi file.ExtendedFileInfo, includeOwner bool, includeGroup bool, fingerprint string, offset int64) reader.Reader {
-	return &FileMetaReader{r, path, fi, includeOwner, includeGroup, fingerprint, offset}
+func NewFilemeta(r reader.Reader, path string, fi file.ExtendedFileInfo, includeOwner bool, includeGroup bool, offset int64) reader.Reader {
+	return &FileMetaReader{r, path, fi, includeOwner, includeGroup, offset}
 }
 
 // Next reads the next line from it's initial io.Reader
@@ -68,12 +67,6 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 		return message, fmt.Errorf("failed to set file system metadata: %w", err)
 	}
 
-	if r.fingerprint != "" {
-		_, err = message.Fields.Put("log.file.fingerprint", r.fingerprint)
-		if err != nil {
-			return message, fmt.Errorf("failed to set fingerprint: %w", err)
-		}
-	}
 	r.offset += int64(message.Bytes)
 
 	return message, err
