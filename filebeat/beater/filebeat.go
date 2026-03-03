@@ -76,7 +76,6 @@ type Filebeat struct {
 	pipeline                 beat.PipelineConnector
 	logger                   *logp.Logger
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
-	esStateStoreExtension    backend.Registry
 }
 
 type PluginFactory func(beat.Info, *logp.Logger, statestore.States, *paths.Path) []v2.Plugin
@@ -222,7 +221,7 @@ func (fb *Filebeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
 }
 
 func (fb *Filebeat) WithESStateStoreExtension(esStateStoreExtension backend.Registry) {
-	fb.esStateStoreExtension = esStateStoreExtension
+	fb.config.Registry.ESStorageExtension = esStateStoreExtension
 }
 
 // loadModulesPipelines is called when modules are configured to do the initial
@@ -306,7 +305,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		cn()
 	}()
 
-	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry, b.Paths, fb.esStateStoreExtension)
+	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry, b.Paths)
 	if err != nil {
 		fb.logger.Errorf("Failed to open state store: %+v", err)
 		return err

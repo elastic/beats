@@ -46,7 +46,7 @@ type filebeatStore struct {
 	notifier *es.Notifier
 }
 
-func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry, beatPaths *paths.Path, esStoreExtension backend.Registry) (*filebeatStore, error) {
+func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry, beatPaths *paths.Path) (*filebeatStore, error) {
 	var (
 		reg backend.Registry
 		err error
@@ -56,12 +56,12 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 	)
 
 	if features.IsElasticsearchStateStoreEnabled() {
-		switch esStoreExtension {
+		switch cfg.ESStorageExtension {
 		case nil:
 			notifier = es.NewNotifier()
 			esRegistry = statestore.NewRegistry(es.New(ctx, logger, notifier))
 		default:
-			esRegistry = statestore.NewRegistry(esStoreExtension)
+			esRegistry = statestore.NewRegistry(cfg.ESStorageExtension)
 		}
 	}
 

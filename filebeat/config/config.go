@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -44,11 +45,12 @@ type Config struct {
 }
 
 type Registry struct {
-	Path          string        `config:"path"`
-	Permissions   os.FileMode   `config:"file_permissions"`
-	FlushTimeout  time.Duration `config:"flush"`
-	CleanInterval time.Duration `config:"cleanup_interval"`
-	MigrateFile   string        `config:"migrate_file"`
+	Path               string           `config:"path"`
+	Permissions        os.FileMode      `config:"file_permissions"`
+	FlushTimeout       time.Duration    `config:"flush"`
+	CleanInterval      time.Duration    `config:"cleanup_interval"`
+	MigrateFile        string           `config:"migrate_file"`
+	ESStorageExtension backend.Registry `config:"-"`
 }
 
 var DefaultConfig = Config{

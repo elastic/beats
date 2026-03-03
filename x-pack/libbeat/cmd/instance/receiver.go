@@ -31,11 +31,10 @@ import (
 
 // BaseReceiver holds common configurations for beatreceivers.
 type BeatReceiver struct {
-	beat             *instance.Beat
-	beater           beat.Beater
-	reporter         *log.Reporter
-	Logger           *logp.Logger
-	storageExtension string
+	beat     *instance.Beat
+	beater   beat.Beater
+	reporter *log.Reporter
+	Logger   *logp.Logger
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -133,11 +132,11 @@ func (br *BeatReceiver) Start(host component.Host) error {
 
 	if w, ok := br.beater.(backend.WithESStateStoreExtension); ok {
 		if present, err := br.beat.RawConfig.Has("storage", -1); present && err == nil {
-			storageExtension, err := br.beat.RawConfig.String("storage", -1)
+			storageID, err := br.beat.RawConfig.String("storage", -1)
 			if err != nil {
 				return fmt.Errorf("error reading storage extension from config: %w", err)
 			}
-			esStorageExtension, err := br.getESStateStoreExtension(host, storageExtension)
+			esStorageExtension, err := br.getESStateStoreExtension(host, storageID)
 			if err != nil {
 				return fmt.Errorf("error getting ES state store extension: %w", err)
 			}
