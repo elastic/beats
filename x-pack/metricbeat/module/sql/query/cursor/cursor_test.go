@@ -29,8 +29,7 @@ func setupTestManager(t *testing.T, cfg Config) (*Manager, func()) {
 
 	logger := logp.NewNopLogger()
 
-	store, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store, _ := newTestStore(t, beatPaths, logger)
 
 	mgr, err := NewManager(
 		cfg,
@@ -108,8 +107,7 @@ func TestNewManager(t *testing.T) {
 			}
 
 			logger := logp.NewNopLogger()
-			store, err := newStore(beatPaths, logger)
-			require.NoError(t, err)
+			store, _ := newTestStore(t, beatPaths, logger)
 
 			mgr, err := NewManager(tt.cfg, store, "host", tt.query, logger)
 			if tt.wantErr {
@@ -194,8 +192,7 @@ func TestManagerUpdateFromResults_Timestamp(t *testing.T) {
 	}
 
 	logger := logp.NewNopLogger()
-	store, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store, _ := newTestStore(t, beatPaths, logger)
 
 	cfg := Config{
 		Enabled: true,
@@ -456,8 +453,7 @@ func TestManagerStatePersistence(t *testing.T) {
 	logger := logp.NewNopLogger()
 
 	// Create first manager and update cursor
-	store1, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store1, _ := newTestStore(t, beatPaths, logger)
 
 	mgr1, err := NewManager(cfg, store1, host, query, logger)
 	require.NoError(t, err)
@@ -472,8 +468,7 @@ func TestManagerStatePersistence(t *testing.T) {
 	mgr1.Close()
 
 	// Create second manager - should load persisted state
-	store2, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store2, _ := newTestStore(t, beatPaths, logger)
 
 	mgr2, err := NewManager(cfg, store2, host, query, logger)
 	require.NoError(t, err)
@@ -500,8 +495,7 @@ func setupTestManagerWithDirection(t *testing.T, cfg Config) (*Manager, func()) 
 
 	logger := logp.NewNopLogger()
 
-	store, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store, _ := newTestStore(t, beatPaths, logger)
 
 	mgr, err := NewManager(
 		cfg,
@@ -644,8 +638,7 @@ func TestManagerLoadState_VersionMismatch(t *testing.T) {
 	query := "SELECT * FROM t WHERE id > :cursor"
 
 	// First: create a manager, update cursor to 500, close
-	store1, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store1, _ := newTestStore(t, beatPaths, logger)
 	mgr1, err := NewManager(cfg, store1, host, query, logger)
 	require.NoError(t, err)
 
@@ -655,8 +648,7 @@ func TestManagerLoadState_VersionMismatch(t *testing.T) {
 	mgr1.Close()
 
 	// Now tamper with the state: save a state with version=99
-	store2, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store2, _ := newTestStore(t, beatPaths, logger)
 	key := GenerateStateKey("sql", host, query, "id", CursorDirectionAsc)
 	err = store2.Save(key, &State{
 		Version:     99, // Wrong version
@@ -668,8 +660,7 @@ func TestManagerLoadState_VersionMismatch(t *testing.T) {
 	store2.Close()
 
 	// Create a new manager — should detect version mismatch and use default
-	store3, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store3, _ := newTestStore(t, beatPaths, logger)
 	mgr3, err := NewManager(cfg, store3, host, query, logger)
 	require.NoError(t, err)
 	defer mgr3.Close()
@@ -705,21 +696,18 @@ func TestManagerLoadState_TypeMismatch(t *testing.T) {
 	// Validate to set direction default
 	require.NoError(t, cfg.Validate())
 
-	store1, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store1, _ := newTestStore(t, beatPaths, logger)
 	key := GenerateStateKey("sql", host, query, "ts", cfg.Direction)
-	err = store1.Save(key, &State{
+	require.NoError(t, store1.Save(key, &State{
 		Version:     StateVersion,
 		CursorType:  CursorTypeInteger, // Mismatch with config
 		CursorValue: "500",
 		UpdatedAt:   time.Now().UTC(),
-	})
-	require.NoError(t, err)
+	}))
 	store1.Close()
 
 	// Create manager with timestamp config — should detect type mismatch and use default
-	store2, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store2, _ := newTestStore(t, beatPaths, logger)
 	mgr, err := NewManager(cfg, store2, host, query, logger)
 	require.NoError(t, err)
 	defer mgr.Close()
@@ -753,21 +741,18 @@ func TestManagerLoadState_CorruptedValue(t *testing.T) {
 	require.NoError(t, cfg.Validate())
 
 	// Save state with an unparseable integer value
-	store1, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store1, _ := newTestStore(t, beatPaths, logger)
 	key := GenerateStateKey("sql", host, query, "id", cfg.Direction)
-	err = store1.Save(key, &State{
+	require.NoError(t, store1.Save(key, &State{
 		Version:     StateVersion,
 		CursorType:  CursorTypeInteger,
 		CursorValue: "not-a-number", // Corrupted
 		UpdatedAt:   time.Now().UTC(),
-	})
-	require.NoError(t, err)
+	}))
 	store1.Close()
 
 	// Create manager — should detect corrupt value and use default
-	store2, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store2, _ := newTestStore(t, beatPaths, logger)
 	mgr, err := NewManager(cfg, store2, host, query, logger)
 	require.NoError(t, err)
 	defer mgr.Close()
@@ -888,8 +873,7 @@ func TestManagerUpdateFromResults_FloatCursor(t *testing.T) {
 		Default: "0.0",
 	}
 
-	store, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store, _ := newTestStore(t, beatPaths, logger)
 
 	mgr, err := NewManager(cfg, store, "host",
 		"SELECT * FROM t WHERE score > :cursor ORDER BY score", logger)
@@ -932,8 +916,7 @@ func TestManagerUpdateFromResults_DecimalCursor(t *testing.T) {
 		Default: "0.00",
 	}
 
-	store, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store, _ := newTestStore(t, beatPaths, logger)
 
 	mgr, err := NewManager(cfg, store, "host",
 		"SELECT * FROM t WHERE price > :cursor ORDER BY price", logger)
@@ -980,8 +963,7 @@ func TestManagerUpdateFromResults_DecimalPersistenceRoundTrip(t *testing.T) {
 	query := "SELECT * FROM t WHERE price > :cursor ORDER BY price"
 
 	// First manager: update to a precise decimal value
-	store1, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store1, _ := newTestStore(t, beatPaths, logger)
 	mgr1, err := NewManager(cfg, store1, host, query, logger)
 	require.NoError(t, err)
 
@@ -991,8 +973,7 @@ func TestManagerUpdateFromResults_DecimalPersistenceRoundTrip(t *testing.T) {
 	mgr1.Close()
 
 	// Second manager: should load exact same value from store
-	store2, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store2, _ := newTestStore(t, beatPaths, logger)
 	mgr2, err := NewManager(cfg, store2, host, query, logger)
 	require.NoError(t, err)
 	defer mgr2.Close()
@@ -1016,8 +997,7 @@ func TestManagerUpdateFromResults_TimestampDescending(t *testing.T) {
 	}
 	logger := logp.NewNopLogger()
 
-	store, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store, _ := newTestStore(t, beatPaths, logger)
 
 	cfg := Config{
 		Enabled:   true,
@@ -1094,8 +1074,7 @@ func TestManagerTimestampPersistenceRoundTrip(t *testing.T) {
 	query := "SELECT * FROM logs WHERE created_at > :cursor ORDER BY created_at"
 
 	// --- First manager: update to a timestamp with nanosecond precision ---
-	store1, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store1, _ := newTestStore(t, beatPaths, logger)
 	mgr1, err := NewManager(cfg, store1, host, query, logger)
 	require.NoError(t, err)
 
@@ -1115,8 +1094,7 @@ func TestManagerTimestampPersistenceRoundTrip(t *testing.T) {
 	mgr1.Close()
 
 	// --- Second manager: should load exact same timestamp from store ---
-	store2, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store2, _ := newTestStore(t, beatPaths, logger)
 	mgr2, err := NewManager(cfg, store2, host, query, logger)
 	require.NoError(t, err)
 	defer mgr2.Close()

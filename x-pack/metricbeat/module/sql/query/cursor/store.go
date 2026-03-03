@@ -16,14 +16,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// registryOwnership indicates whether the Store owns the registry lifecycle.
-type registryOwnership bool
-
-const (
-	ownsRegistry       registryOwnership = true
-	doesNotOwnRegistry registryOwnership = false
-)
-
 // StateVersion is the current version of the state format.
 // Increment this when making breaking changes to the State struct.
 const StateVersion = 1
@@ -37,11 +29,10 @@ type State struct {
 }
 
 // Store persists cursor state using libbeat/statestore with memlog backend.
+// The Store does not own the registry — the caller (Module) manages its lifecycle.
 type Store struct {
-	registry     *statestore.Registry
-	ownsRegistry registryOwnership
-	store        *statestore.Store
-	logger       *logp.Logger
+	store  *statestore.Store
+	logger *logp.Logger
 }
 
 // NewStoreFromRegistry creates a Store using a shared statestore.Registry.
@@ -54,10 +45,8 @@ func NewStoreFromRegistry(registry *statestore.Registry, logger *logp.Logger) (*
 	}
 
 	return &Store{
-		registry:     nil, // not owned
-		ownsRegistry: doesNotOwnRegistry,
-		store:        store,
-		logger:       logger,
+		store:  store,
+		logger: logger,
 	}, nil
 }
 
@@ -90,30 +79,19 @@ func (s *Store) Save(key string, state *State) error {
 	return nil
 }
 
-// Close releases store resources. Must be called when done.
-// Close is idempotent - calling it multiple times is safe.
-// If the Store was created via NewStoreFromRegistry, only the store handle is
-// closed (decrementing the ref count). The shared registry is not closed.
+// Close releases the store handle. Must be called when done.
+// Close is idempotent — calling it multiple times is safe.
+// Only the store handle is closed (decrementing the ref count).
+// The shared registry is managed by the caller (Module).
 func (s *Store) Close() error {
-	var errs []error
-
 	if s.store != nil {
-		if err := s.store.Close(); err != nil {
-			errs = append(errs, fmt.Errorf("failed to close store: %w", err))
-		}
+		err := s.store.Close()
 		s.store = nil
-	}
-
-	// Only close the registry if this Store owns it (created via NewStore).
-	// Stores created via NewStoreFromRegistry share a Module-level registry.
-	if s.ownsRegistry && s.registry != nil {
-		if err := s.registry.Close(); err != nil {
-			errs = append(errs, fmt.Errorf("failed to close registry: %w", err))
+		if err != nil {
+			return fmt.Errorf("failed to close store: %w", err)
 		}
-		s.registry = nil
 	}
-
-	return errors.Join(errs...)
+	return nil
 }
 
 // isKeyNotFoundError checks if the error indicates a missing key.

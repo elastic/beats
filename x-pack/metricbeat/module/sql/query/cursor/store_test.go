@@ -127,9 +127,7 @@ func TestStoreOperations(t *testing.T) {
 	logger := logp.NewNopLogger()
 
 	// Test store creation
-	store, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
-	require.NotNil(t, store)
+	store, _ := newTestStore(t, beatPaths, logger)
 	defer store.Close()
 
 	// Test saving state
@@ -141,8 +139,7 @@ func TestStoreOperations(t *testing.T) {
 		UpdatedAt:   time.Now().UTC(),
 	}
 
-	err = store.Save(testKey, testState)
-	require.NoError(t, err)
+	require.NoError(t, store.Save(testKey, testState))
 
 	// Test loading state
 	loadedState, err := store.Load(testKey)
@@ -272,16 +269,13 @@ func TestStoreClose(t *testing.T) {
 
 	logger := logp.NewNopLogger()
 
-	store, err := newStore(beatPaths, logger)
-	require.NoError(t, err)
+	store, _ := newTestStore(t, beatPaths, logger)
 
 	// First close should succeed
-	err = store.Close()
-	require.NoError(t, err)
+	require.NoError(t, store.Close())
 
 	// Second close should also succeed (idempotent)
-	err = store.Close()
-	require.NoError(t, err)
+	require.NoError(t, store.Close())
 }
 
 func TestStoreOwnershipClosingBehavior(t *testing.T) {
@@ -290,44 +284,7 @@ func TestStoreOwnershipClosingBehavior(t *testing.T) {
 		t.Skip("skipping store test in short mode")
 	}
 
-	t.Run("newStore closes registry when store closes", func(t *testing.T) {
-		tmpDir := t.TempDir()
-		beatPaths := &paths.Path{
-			Home:   tmpDir,
-			Config: tmpDir,
-			Data:   tmpDir,
-			Logs:   tmpDir,
-		}
-
-		logger := logp.NewNopLogger()
-
-		// Create store via newStore (owns registry)
-		store, err := newStore(beatPaths, logger)
-		require.NoError(t, err)
-		require.NotNil(t, store)
-		require.Equal(t, ownsRegistry, store.ownsRegistry)
-
-		// Save some data
-		testState := &State{
-			Version:     StateVersion,
-			CursorType:  CursorTypeInteger,
-			CursorValue: "100",
-			UpdatedAt:   time.Now().UTC(),
-		}
-		err = store.Save("test-key", testState)
-		require.NoError(t, err)
-
-		// Close the store (should close the registry)
-		err = store.Close()
-		require.NoError(t, err)
-
-		// Verify the registry was closed by checking that store operations fail
-		err = store.Save("another-key", testState)
-		require.Error(t, err, "Store operations should fail after close")
-		assert.Contains(t, err.Error(), "store is closed")
-	})
-
-	t.Run("NewStoreFromRegistry does NOT close registry when store closes", func(t *testing.T) {
+	t.Run("store close does not close shared registry", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		beatPaths := &paths.Path{
 			Home:   tmpDir,
@@ -339,7 +296,6 @@ func TestStoreOwnershipClosingBehavior(t *testing.T) {
 		logger := logp.NewNopLogger()
 		dataPath := beatPaths.Resolve(paths.Data, "sql-cursor")
 
-		// Create a shared registry
 		reg, err := memlog.New(logger.Named("memlog"), memlog.Settings{
 			Root:     dataPath,
 			FileMode: 0o600,
@@ -349,39 +305,30 @@ func TestStoreOwnershipClosingBehavior(t *testing.T) {
 		registry := statestore.NewRegistry(reg)
 		defer registry.Close()
 
-		// Create store via NewStoreFromRegistry (does NOT own registry)
 		store, err := NewStoreFromRegistry(registry, logger)
 		require.NoError(t, err)
-		require.NotNil(t, store)
-		require.Equal(t, doesNotOwnRegistry, store.ownsRegistry)
-		require.Nil(t, store.registry, "Store should not hold registry reference when not owned")
 
-		// Save some data
 		testState := &State{
 			Version:     StateVersion,
 			CursorType:  CursorTypeInteger,
 			CursorValue: "200",
 			UpdatedAt:   time.Now().UTC(),
 		}
-		err = store.Save("test-key", testState)
-		require.NoError(t, err)
+		require.NoError(t, store.Save("test-key", testState))
+		require.NoError(t, store.Close())
 
-		// Close the store (should NOT close the registry)
-		err = store.Close()
-		require.NoError(t, err)
+		// Verify store operations fail after close
+		require.Error(t, store.Save("another-key", testState))
 
-		// Verify the registry is still open by creating another store
+		// Verify registry is still open — another store can be opened
 		store2, err := NewStoreFromRegistry(registry, logger)
 		require.NoError(t, err, "Registry should still be open after closing store")
-		require.NotNil(t, store2)
 
-		// Verify we can read the data written by the first store
 		loaded, err := store2.Load("test-key")
 		require.NoError(t, err)
 		require.NotNil(t, loaded)
 		assert.Equal(t, "200", loaded.CursorValue)
 
-		// Clean up
 		require.NoError(t, store2.Close())
 	})
 }
@@ -421,13 +368,15 @@ func TestIsKeyNotFoundError(t *testing.T) {
 	}
 }
 
-// newStore creates a memlog-backed store for cursor persistence.
-// The store is created at {data.path}/sql-cursor/
+// newTestStore creates a memlog-backed store for cursor persistence in tests.
+// It returns the Store and the Registry separately so the test can manage
+// the registry lifecycle (the Store itself does not own the registry).
 //
-// NOTE: This constructor creates and owns its own memlog registry. Production
-// code should prefer NewStoreFromRegistry with a shared registry to avoid
-// multiple registries operating on the same files.
-func newStore(beatPaths *paths.Path, logger *logp.Logger) (*Store, error) {
+// Production code should use NewStoreFromRegistry with a shared Module-level
+// registry to avoid multiple registries operating on the same files.
+func newTestStore(t *testing.T, beatPaths *paths.Path, logger *logp.Logger) (*Store, *statestore.Registry) {
+	t.Helper()
+
 	if beatPaths == nil {
 		beatPaths = paths.Paths
 	}
@@ -438,23 +387,13 @@ func newStore(beatPaths *paths.Path, logger *logp.Logger) (*Store, error) {
 		Root:     dataPath,
 		FileMode: 0o600,
 	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to create memlog registry: %w", err)
-	}
+	require.NoError(t, err, "failed to create memlog registry")
 
 	registry := statestore.NewRegistry(reg)
-	store, err := registry.Get("cursor-state")
-	if err != nil {
-		if closeErr := registry.Close(); closeErr != nil {
-			logger.Warnf("Failed to close registry after store creation error: %v", closeErr)
-		}
-		return nil, fmt.Errorf("failed to open cursor store: %w", err)
-	}
+	t.Cleanup(func() { registry.Close() })
 
-	return &Store{
-		registry:     registry,
-		ownsRegistry: ownsRegistry,
-		store:        store,
-		logger:       logger,
-	}, nil
+	store, err := NewStoreFromRegistry(registry, logger)
+	require.NoError(t, err, "failed to open cursor store")
+
+	return store, registry
 }
