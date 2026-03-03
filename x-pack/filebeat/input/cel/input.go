@@ -490,13 +490,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			var ok bool
 			ok, waitUntil, err = handleResponse(execLog, state, limiter)
-			if err != nil {
+			if err != nil || !ok {
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-				errorSpans(err, end{execSpan}, runSpan)
-				return err
-			}
-			if !ok {
-				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+				if err != nil {
+					errorSpans(err, end{execSpan}, runSpan)
+					return err
+				}
+				errorSpans(errors.New("invalid response"), end{execSpan})
 				continue
 			}
 
