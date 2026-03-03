@@ -1494,6 +1494,7 @@ filebeat.modules:
 # - enabled: Set to true to enable ingestion of Salesforce module fileset
 # - initial_interval: Initial interval for log collection. This setting determines the time period for which the logs will be initially collected when the ingestion process starts, i.e. 1d/h/m/s
 # - api_version: API version for Salesforce, version should be greater than 46.0
+# - url: URL for Salesforce instance
 
 # Authentication Configurations:
 # User-Password Authentication:
@@ -1510,6 +1511,7 @@ filebeat.modules:
 # - client.username: Username for JWT authentication
 # - client.key_path: Path to client key for JWT authentication
 # - url: Audience URL for JWT authentication
+# - token_url: Token URL for JWT authentication
 
 # Event Monitoring:
 # - real_time: Set to true to enable real-time logging using object type data collection
@@ -1541,6 +1543,7 @@ filebeat.modules:
         client.username: "<YourClientUsernameHere>"
         client.key_path: "<YourClientKeyPathHere>"
         url: "https://login.salesforce.com"
+        # token_url: "<YourTokenURLHere>"
 
     var.url: "https://instance_id.my.salesforce.com"
 
@@ -1567,6 +1570,7 @@ filebeat.modules:
         client.username: "<YourClientUsernameHere>"
         client.key_path: "<YourClientKeyPathHere>"
         url: "https://login.salesforce.com"
+        # token_url: "<YourTokenURLHere>"
 
     var.url: "https://instance_id.my.salesforce.com"
 
@@ -1596,6 +1600,7 @@ filebeat.modules:
         client.username: "<YourClientUsernameHere>"
         client.key_path: "<YourClientKeyPathHere>"
         url: "https://login.salesforce.com"
+        # token_url: "<YourTokenURLHere>"
 
     var.url: "https://instance_id.my.salesforce.com"
 
@@ -1625,11 +1630,13 @@ filebeat.modules:
         client.username: "<YourClientUsernameHere>"
         client.key_path: "<YourClientKeyPathHere>"
         url: "https://login.salesforce.com"
+        # token_url: "<YourTokenURLHere>"
 
     var.url: "https://instance_id.my.salesforce.com"
 
     var.real_time: true
     var.real_time_interval: 5m
+
 #----------------------------- Google Santa Module -----------------------------
 - module: santa
   log:
