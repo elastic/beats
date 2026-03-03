@@ -11,10 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"go.opentelemetry.io/collector/client"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/client"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -141,7 +140,7 @@ func TestPublish(t *testing.T) {
 		subFields := []string{"dataset", "namespace", "type"}
 		for _, subField := range subFields {
 			gotValue, ok := attributes.Get("data_stream." + subField)
-			require.True(t, ok, fmt.Sprintf("data_stream.%s not found on log record attribute", subField))
+			require.True(t, ok, "data_stream.%s not found on log record attribute", subField)
 			assert.EqualValues(t, dataStreamField[subField], gotValue.AsRaw())
 		}
 	})
@@ -177,7 +176,7 @@ func TestPublish(t *testing.T) {
 		dynamicAttributeKey := "elasticsearch.ingest_pipeline"
 		gotValue, ok := attributes.Get(dynamicAttributeKey)
 		require.True(t, ok, "dynamic pipeline attribute was not set")
-		assert.EqualValues(t, "error_pipeline", gotValue.AsString())
+		assert.Equal(t, "error_pipeline", gotValue.AsString())
 	})
 
 	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {
