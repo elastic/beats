@@ -180,6 +180,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 	otelTracerProvider, err := otel.NewTracerProvider(ctx, getResourceAttributes(env, cfg), i.Name())
+	defer otelTracerProvider.Shutdown(ctx)
 	if err != nil {
 		return err
 	}
