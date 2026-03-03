@@ -44,15 +44,17 @@ func getZswapDebugMetrics(rootfs resolve.Resolver) ZswapDebugMetrics {
 
 	// Read each metric file, ignoring errors for individual files
 	return ZswapDebugMetrics{
-		PoolLimitHit:        readUintFromFile(filepath.Join(basePath, "pool_limit_hit")),
-		PoolTotalSize:       readUintFromFile(filepath.Join(basePath, "pool_total_size")),
-		RejectAllocFail:     readUintFromFile(filepath.Join(basePath, "reject_alloc_fail")),
-		RejectCompressFail:  readUintFromFile(filepath.Join(basePath, "reject_compress_fail")),
-		RejectCompressPoor:  readUintFromFile(filepath.Join(basePath, "reject_compress_poor")),
-		RejectKmemcacheFail: readUintFromFile(filepath.Join(basePath, "reject_kmemcache_fail")),
-		RejectReclaimFail:   readUintFromFile(filepath.Join(basePath, "reject_reclaim_fail")),
-		StoredPages:         readUintFromFile(filepath.Join(basePath, "stored_pages")),
-		WrittenBackPages:    readUintFromFile(filepath.Join(basePath, "written_back_pages")),
+		DecompressFail:            readUintFromFile(filepath.Join(basePath, "decompress_fail")),
+		PoolLimitHit:              readUintFromFile(filepath.Join(basePath, "pool_limit_hit")),
+		PoolTotalSize:             readUintFromFile(filepath.Join(basePath, "pool_total_size")),
+		RejectAllocFail:           readUintFromFile(filepath.Join(basePath, "reject_alloc_fail")),
+		RejectCompressFail:        readUintFromFile(filepath.Join(basePath, "reject_compress_fail")),
+		RejectCompressPoor:        readUintFromFile(filepath.Join(basePath, "reject_compress_poor")),
+		RejectKmemcacheFail:       readUintFromFile(filepath.Join(basePath, "reject_kmemcache_fail")),
+		RejectReclaimFail:         readUintFromFile(filepath.Join(basePath, "reject_reclaim_fail")),
+		StoredIncompressiblePages: readUintFromFile(filepath.Join(basePath, "stored_incompressible_pages")),
+		StoredPages:               readUintFromFile(filepath.Join(basePath, "stored_pages")),
+		WrittenBackPages:          readUintFromFile(filepath.Join(basePath, "written_back_pages")),
 	}
 }
 

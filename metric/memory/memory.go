@@ -81,23 +81,27 @@ type ZswapMetrics struct {
 // ZswapDebugMetrics contains detailed zswap statistics from /sys/kernel/debug/zswap.
 // These metrics are optional and require debugfs to be mounted and accessible (typically requires root).
 type ZswapDebugMetrics struct {
-	// PoolLimitHit is the number of times the pool limit was reached
+	// DecompressFail counts loads or writebacks that failed due to decompression failure.
+	DecompressFail opt.Uint `struct:"decompress_fail,omitempty"`
+	// PoolLimitHit counts how many times the pool limit was hit (see zswap_max_pool_percent).
 	PoolLimitHit opt.Uint `struct:"pool_limit_hit,omitempty"`
-	// PoolTotalSize is the total size of the zswap pool in bytes
+	// PoolTotalSize is the total size of the zswap pool in bytes.
 	PoolTotalSize opt.Uint `struct:"pool_total_size,omitempty"`
-	// RejectAllocFail is the number of pages rejected due to zpool allocation failure
+	// RejectAllocFail counts stores that failed because the underlying allocator could not get memory.
 	RejectAllocFail opt.Uint `struct:"reject_alloc_fail,omitempty"`
-	// RejectCompressFail is the number of pages rejected due to compression failure
+	// RejectCompressFail counts stores that failed due to compression algorithm failure.
 	RejectCompressFail opt.Uint `struct:"reject_compress_fail,omitempty"`
-	// RejectCompressPoor is the number of pages rejected due to poor compression ratio
+	// RejectCompressPoor counts pages where the compressed result was too big for the allocator to optimally store.
 	RejectCompressPoor opt.Uint `struct:"reject_compress_poor,omitempty"`
-	// RejectKmemcacheFail is the number of pages rejected due to kmemcache allocation failure
+	// RejectKmemcacheFail counts stores that failed because the entry metadata could not be allocated (rare).
 	RejectKmemcacheFail opt.Uint `struct:"reject_kmemcache_fail,omitempty"`
-	// RejectReclaimFail is the number of pages rejected due to reclaim failure
+	// RejectReclaimFail counts stores that failed due to a reclaim failure after the pool limit was reached.
 	RejectReclaimFail opt.Uint `struct:"reject_reclaim_fail,omitempty"`
-	// StoredPages is the number of pages currently stored in zswap
+	// StoredIncompressiblePages is the number of incompressible pages currently stored in zswap.
+	StoredIncompressiblePages opt.Uint `struct:"stored_incompressible_pages,omitempty"`
+	// StoredPages is the number of pages currently stored in zswap.
 	StoredPages opt.Uint `struct:"stored_pages,omitempty"`
-	// WrittenBackPages is the number of pages written back from zswap to swap
+	// WrittenBackPages counts pages written back to swap when the pool limit was reached.
 	WrittenBackPages opt.Uint `struct:"written_back_pages,omitempty"`
 }
 
@@ -108,7 +112,9 @@ func (zswap ZswapMetrics) IsZero() bool {
 
 // IsZero implements the zeroer interface for structform's folders
 func (z ZswapDebugMetrics) IsZero() bool {
-	return z.StoredPages.IsZero() &&
+	return z.DecompressFail.IsZero() &&
+		z.StoredPages.IsZero() &&
+		z.StoredIncompressiblePages.IsZero() &&
 		z.PoolTotalSize.IsZero() &&
 		z.WrittenBackPages.IsZero() &&
 		z.RejectCompressPoor.IsZero() &&

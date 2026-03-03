@@ -39,15 +39,17 @@ func TestGetZswapDebugMetrics(t *testing.T) {
 
 	// Write test data
 	testData := map[string]string{
-		"stored_pages":          "1109442",
-		"pool_total_size":       "3095379968",
-		"written_back_pages":    "2489374",
-		"reject_compress_poor":  "1271198",
-		"reject_compress_fail":  "5531019",
-		"reject_kmemcache_fail": "0",
-		"reject_alloc_fail":     "0",
-		"reject_reclaim_fail":   "26833",
-		"pool_limit_hit":        "8353",
+		"decompress_fail":             "42",
+		"stored_incompressible_pages": "6040",
+		"stored_pages":                "1109442",
+		"pool_total_size":             "3095379968",
+		"written_back_pages":          "2489374",
+		"reject_compress_poor":        "1271198",
+		"reject_compress_fail":        "5531019",
+		"reject_kmemcache_fail":       "0",
+		"reject_alloc_fail":           "0",
+		"reject_reclaim_fail":         "26833",
+		"pool_limit_hit":              "8353",
 	}
 
 	for name, value := range testData {
@@ -57,15 +59,17 @@ func TestGetZswapDebugMetrics(t *testing.T) {
 	metrics := getZswapDebugMetrics(resolve.NewTestResolver(tmpDir))
 
 	expected := ZswapDebugMetrics{
-		StoredPages:         opt.UintWith(1109442),
-		PoolTotalSize:       opt.UintWith(3095379968),
-		WrittenBackPages:    opt.UintWith(2489374),
-		RejectCompressPoor:  opt.UintWith(1271198),
-		RejectCompressFail:  opt.UintWith(5531019),
-		RejectKmemcacheFail: opt.UintWith(0),
-		RejectAllocFail:     opt.UintWith(0),
-		RejectReclaimFail:   opt.UintWith(26833),
-		PoolLimitHit:        opt.UintWith(8353),
+		DecompressFail:            opt.UintWith(42),
+		StoredIncompressiblePages: opt.UintWith(6040),
+		StoredPages:               opt.UintWith(1109442),
+		PoolTotalSize:             opt.UintWith(3095379968),
+		WrittenBackPages:          opt.UintWith(2489374),
+		RejectCompressPoor:        opt.UintWith(1271198),
+		RejectCompressFail:        opt.UintWith(5531019),
+		RejectKmemcacheFail:       opt.UintWith(0),
+		RejectAllocFail:           opt.UintWith(0),
+		RejectReclaimFail:         opt.UintWith(26833),
+		PoolLimitHit:              opt.UintWith(8353),
 	}
 	assert.Equal(t, expected, metrics)
 }
@@ -133,15 +137,17 @@ func TestGetZswapDebugMetrics_RealTestdata(t *testing.T) {
 	metrics := getZswapDebugMetrics(resolve.NewTestResolver("./testdata"))
 
 	expected := ZswapDebugMetrics{
-		StoredPages:         opt.UintWith(17),
-		PoolTotalSize:       opt.UintWith(147456),
-		WrittenBackPages:    opt.UintWith(0),
-		RejectCompressPoor:  opt.UintWith(0),
-		RejectCompressFail:  opt.UintWith(0),
-		RejectKmemcacheFail: opt.UintWith(0),
-		RejectAllocFail:     opt.UintWith(0),
-		RejectReclaimFail:   opt.UintWith(0),
-		PoolLimitHit:        opt.UintWith(0),
+		DecompressFail:            opt.UintWith(0),
+		StoredIncompressiblePages: opt.UintWith(0),
+		StoredPages:               opt.UintWith(17),
+		PoolTotalSize:             opt.UintWith(147456),
+		WrittenBackPages:          opt.UintWith(0),
+		RejectCompressPoor:        opt.UintWith(0),
+		RejectCompressFail:        opt.UintWith(0),
+		RejectKmemcacheFail:       opt.UintWith(0),
+		RejectAllocFail:           opt.UintWith(0),
+		RejectReclaimFail:         opt.UintWith(0),
+		PoolLimitHit:              opt.UintWith(0),
 	}
 	assert.Equal(t, expected, metrics)
 }
