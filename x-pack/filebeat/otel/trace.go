@@ -182,27 +182,29 @@ func newExporterCfgFromEnv(inputName string) (*ExporterCfg, error) {
 	if cfg.EndpointURL == "" {
 		cfg.EndpointURL = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))
 	}
-	u, err := urlParsePossiblySchemaless(cfg.EndpointURL)
-	if err != nil {
-		return nil, fmt.Errorf("can't parse OLTP endpoint URL: %w", err)
+	if cfg.EndpointURL != "" {
+		u, err := urlParsePossiblySchemaless(cfg.EndpointURL)
+		if err != nil {
+			return nil, fmt.Errorf("can't parse OLTP endpoint URL: %w", err)
+		}
+		if u.Path == "" {
+			// Add default path if none is present.
+			// In other implementations only OTEL_EXPORTER_OTLP_ENDPOINT values get the
+			// path added and OTEL_EXPORTER_OTLP_TRACES_ENDPOINT is expected to be
+			// complete, but here we'll do the same thing for both. Any path, including
+			// root ('/') will avoid using the default.
+			u.Path = "/v1/traces"
+		}
+		if u.Scheme == "" {
+			// Add default schema if none is present.
+			u.Scheme = "https"
+		}
+		if u.Scheme == "http" && !hasInsecure {
+			// Using a scheme of http rather than https indicates it will be insecure.
+			cfg.Insecure = true
+		}
+		cfg.EndpointURL = u.String()
 	}
-	if u.Path == "" {
-		// Add default path if none is present.
-		// In other implementations only OTEL_EXPORTER_OTLP_ENDPOINT values get the
-		// path added and OTEL_EXPORTER_OTLP_TRACES_ENDPOINT is expected to be
-		// complete, but here we'll do the same thing for both. Any path, including
-		// root ('/') will avoid using the default.
-		u.Path = "/v1/traces"
-	}
-	if u.Scheme == "" {
-		// Add default schema if none is present.
-		u.Scheme = "https"
-	}
-	if u.Scheme == "http" && !hasInsecure {
-		// Using a scheme of http rather than https indicates it will be insecure.
-		cfg.Insecure = true
-	}
-	cfg.EndpointURL = u.String()
 
 	headersStr := strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS"))
 	if headersStr == "" {
