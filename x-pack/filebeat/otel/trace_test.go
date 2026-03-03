@@ -448,6 +448,9 @@ func findAttr(attrs []attribute.KeyValue, key attribute.Key) ([]string, bool) {
 			if vals, ok := kv.Value.AsInterface().([]string); ok {
 				return vals, true
 			}
+			if val, ok := kv.Value.AsInterface().(string); ok {
+				return []string{val}, true
+			}
 		}
 	}
 	return nil, false
