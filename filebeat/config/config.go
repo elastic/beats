@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	bboltst "github.com/elastic/beats/v7/libbeat/statestore/backend/bbolt"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -50,6 +51,8 @@ type Registry struct {
 	FlushTimeout       time.Duration    `config:"flush"`
 	CleanInterval      time.Duration    `config:"cleanup_interval"`
 	MigrateFile        string           `config:"migrate_file"`
+	Backend            string           `config:"backend"`
+	Bbolt              bboltst.Config   `config:"bbolt"`
 	ESStorageExtension backend.Registry `config:"-"`
 }
 
@@ -60,6 +63,8 @@ var DefaultConfig = Config{
 		MigrateFile:   "",
 		CleanInterval: 5 * time.Minute,
 		FlushTimeout:  time.Second,
+		Backend:       "memlog",
+		Bbolt:         bboltst.DefaultConfig(),
 	},
 	ShutdownTimeout:    0,
 	OverwritePipelines: false,

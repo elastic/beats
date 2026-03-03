@@ -256,7 +256,7 @@ func TestNetworkPrivate(t *testing.T) {
 			}
 
 			assert.True(t, network.IP.Equal(actual.IP))
-			assert.EqualValues(t, network.Mask, actual.Mask)
+			assert.Equal(t, network.Mask, actual.Mask)
 		}
 
 		equal("fd00::/8", privateIPv6)

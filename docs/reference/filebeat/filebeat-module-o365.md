@@ -6,7 +6,7 @@ applies_to:
   serverless: ga
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See filebeat/scripts/mage/docs.go
 
 # Office 365 module [filebeat-module-o365]
 
