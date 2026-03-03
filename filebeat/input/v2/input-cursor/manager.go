@@ -96,9 +96,37 @@ func (cim *InputManager) init(inputID string) error {
 	}
 
 	log := cim.Logger.With("input_type", cim.Type)
-	var store *store
 	useES := features.IsElasticsearchStateStoreEnabledForInput(cim.Type)
 	fullInit := !useES || inputID != ""
+
+	// If a store already exists from a prior partial init (ES-backed inputs
+	// defer full initialization until the inputID is known), reuse it.
+	// Creating a new store would leak the *statestore.Store opened on the
+	// first call, because the cleaner goroutine started in Init() already
+	// holds a Retain'd reference to the original store. The leaked store
+	// would prevent statestore.Registry.Close() from completing.
+	if cim.store != nil {
+		cim.store.persistentStore.SetID(inputID)
+		if fullInit {
+			states, err := readStates(log, cim.store.persistentStore, cim.Type, true)
+			if err != nil {
+				cim.initErr = err
+				return err
+			}
+			// Merge the newly-read states into the existing ephemeralStore
+			// under its lock, so the cleaner goroutine sees a consistent view.
+			existing := cim.store.ephemeralStore
+			existing.mu.Lock()
+			for k, v := range states.table {
+				existing.table[k] = v
+			}
+			existing.mu.Unlock()
+			cim.initedFull = true
+		}
+		return nil
+	}
+
+	var store *store
 	store, cim.initErr = openStore(log, cim.StateStore, cim.Type, inputID, fullInit)
 	if cim.initErr != nil {
 		return cim.initErr
