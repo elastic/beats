@@ -1010,7 +1010,9 @@ stack: ga 9.3.1
 
 OpenTelemetry tracing is activated using OTel-standard environment variables. You can use input settings to override the default span attribute redaction behavior.
 
-By default, the value of an HTTP header or query string parameter will be redacted in span attributes if its name contains a word that suggests sensitive data, based on a fixed list of words. The following settings can override that behavior for specific full names.
+By default, the value of an HTTP header or query string parameter will be redacted in span attributes if its name contains a word that suggests sensitive data and its full name isn't in a list of known-safe names.
+
+The following settings can override the default behavior for specific full names.
 
 ### `otel.trace.redacted` [_otel_trace_redacted]
 
@@ -1385,5 +1387,4 @@ Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might expand to `"file
 #### `publisher_pipeline.disable_host` [_publisher_pipeline_disable_host_4]
 
 By default, all events contain `host.name`. This option can be set to `true` to disable the addition of this field to all events. The default value is `false`.
-
 
