@@ -233,6 +233,9 @@ func (thrift *thriftPlugin) init(
 
 func (thrift *thriftPlugin) Close() {
 	thrift.transactions.StopJanitor()
+	if thrift.publishQueue != nil {
+		close(thrift.publishQueue)
+	}
 }
 
 func (thrift *thriftPlugin) getTransaction(k common.HashableTCPTuple) *thriftTransaction {
