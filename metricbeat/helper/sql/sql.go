@@ -69,6 +69,7 @@ func (d *DbClient) FetchTableMode(ctx context.Context, query string) ([]mapstr.M
 	if err != nil {
 		return nil, fmt.Errorf("query execution failed: %w", err)
 	}
+	defer rows.Close()
 	return d.fetchTableMode(rows)
 }
 
@@ -80,6 +81,7 @@ func (d *DbClient) FetchTableModeWithParams(ctx context.Context, query string, a
 	if err != nil {
 		return nil, fmt.Errorf("parameterized query failed: %w", err)
 	}
+	defer rows.Close()
 	return d.fetchTableMode(rows)
 }
 
@@ -132,6 +134,7 @@ func (d *DbClient) FetchVariableMode(ctx context.Context, query string) (mapstr.
 	if err != nil {
 		return nil, fmt.Errorf("query execution failed: %w", err)
 	}
+	defer rows.Close()
 	return d.fetchVariableMode(rows)
 }
 

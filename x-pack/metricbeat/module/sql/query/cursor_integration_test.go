@@ -145,7 +145,6 @@ func TestMySQLCursor(t *testing.T) {
 	defer func() { _, _ = db.Exec("DROP DATABASE IF EXISTS cursor_test") }()
 
 	setupMySQLTestTable(t, db)
-	defer cleanupTestTable(t, db, "mysql")
 
 	// Test integer cursor
 	t.Run("integer cursor", func(t *testing.T) {
@@ -226,6 +225,10 @@ func setupPostgresTestTable(t *testing.T, db *sql.DB) {
 
 func setupMySQLTestTable(t *testing.T, db *sql.DB) {
 	t.Helper()
+
+	t.Cleanup(func() {
+		cleanupTestTable(t, db, "mysql")
+	})
 
 	// Drop table if exists
 	_, err := db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", testTableName))
@@ -834,6 +837,10 @@ func TestOracleCursor(t *testing.T) {
 
 func setupOracleTestTable(t *testing.T, db *sql.DB) {
 	t.Helper()
+
+	t.Cleanup(func() {
+		cleanupTestTable(t, db, "oracle")
+	})
 
 	// Drop table if exists (Oracle doesn't have IF EXISTS, so we ignore errors)
 	_, _ = db.Exec("DROP TABLE cursor_test_events")
@@ -1712,6 +1719,10 @@ func TestMSSQLCursor(t *testing.T) {
 
 func setupMSSQLTestTable(t *testing.T, db *sql.DB) {
 	t.Helper()
+
+	t.Cleanup(func() {
+		cleanupTestTable(t, db, "mssql")
+	})
 
 	// Drop table if exists
 	_, _ = db.Exec("DROP TABLE IF EXISTS cursor_test_events")

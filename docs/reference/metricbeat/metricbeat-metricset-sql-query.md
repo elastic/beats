@@ -97,6 +97,30 @@ When cursor is enabled, your SQL query must:
 
 Cursor is also not compatible with `fetch_from_all_databases`. Use a separate module block for each database if you need both features.
 
+### Choosing operators for cursor queries
+
+The choice of comparison operator in your WHERE clause affects data completeness:
+
+**Use `>` (greater than) when:**
+- The cursor column has unique, monotonically increasing values (auto-increment IDs, sequences)
+- No two rows can share the same cursor value
+- Example: `WHERE id > :cursor ORDER BY id ASC`
+
+**Use `>=` (greater than or equal) when:**
+- The cursor column can have duplicate values (timestamps, dates, scores)
+- Late-arriving rows might be inserted with the same value as the current cursor
+- Example: `WHERE created_at >= :cursor ORDER BY created_at ASC`
+
+The `>=` operator causes the last row from each batch to be re-fetched on the next cycle (a duplicate), but ensures no data is lost when multiple rows share the same cursor value. If using `>=`, configure Elasticsearch document IDs or use an ingest pipeline to deduplicate.
+
+```yaml
+# Safe for timestamps -- accepts duplicates, prevents data loss
+sql_query: "SELECT id, data, created_at FROM events WHERE created_at >= :cursor ORDER BY created_at ASC LIMIT 500"
+
+# Safe for unique IDs -- no duplicates possible
+sql_query: "SELECT id, data FROM events WHERE id > :cursor ORDER BY id ASC LIMIT 500"
+```
+
 ### Example configurations
 
 #### Integer cursor (auto-increment ID)
@@ -247,30 +271,6 @@ different databases on the same server.
 **Important:** Changing any of these components (DSN, query, cursor column, or direction) produces a
 different state key, which effectively resets the cursor to its `default` value. This is by design —
 if you modify the query, the old cursor position might no longer be valid for the new query.
-
-### Choosing comparison operators for queries
-
-The choice of comparison operator in your WHERE clause affects data completeness:
-
-**Use `>` (greater than) when:**
-- The cursor column has unique, monotonically increasing values (auto-increment IDs, sequences)
-- No two rows can share the same cursor value
-- Example: `WHERE id > :cursor ORDER BY id ASC`
-
-**Use `>=` (greater than or equal) when:**
-- The cursor column can have duplicate values (timestamps, dates, scores)
-- Late-arriving rows might be inserted with the same value as the current cursor
-- Example: `WHERE created_at >= :cursor ORDER BY created_at ASC`
-
-The `>=` operator causes the last row from each batch to be re-fetched on the next cycle (a duplicate), but ensures no data is lost when multiple rows share the same cursor value. If using `>=`, configure Elasticsearch document IDs or use an ingest pipeline to deduplicate.
-
-```yaml
-# Safe for timestamps -- accepts duplicates, prevents data loss
-sql_query: "SELECT id, data, created_at FROM events WHERE created_at >= :cursor ORDER BY created_at ASC LIMIT 500"
-
-# Safe for unique IDs -- no duplicates possible
-sql_query: "SELECT id, data FROM events WHERE id > :cursor ORDER BY id ASC LIMIT 500"
-```
 
 ### Error handling
 

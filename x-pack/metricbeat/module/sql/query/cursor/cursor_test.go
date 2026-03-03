@@ -27,7 +27,7 @@ func setupTestManager(t *testing.T, cfg Config) (*Manager, func()) {
 		Logs:   tmpDir,
 	}
 
-	logger := logp.NewLogger("test-cursor-manager")
+	logger := logp.NewNopLogger()
 
 	store, err := newStore(beatPaths, logger)
 	require.NoError(t, err)
@@ -107,7 +107,7 @@ func TestNewManager(t *testing.T) {
 				Logs:   tmpDir,
 			}
 
-			logger := logp.NewLogger("test")
+			logger := logp.NewNopLogger()
 			store, err := newStore(beatPaths, logger)
 			require.NoError(t, err)
 
@@ -193,7 +193,7 @@ func TestManagerUpdateFromResults_Timestamp(t *testing.T) {
 		Logs:   tmpDir,
 	}
 
-	logger := logp.NewLogger("test")
+	logger := logp.NewNopLogger()
 	store, err := newStore(beatPaths, logger)
 	require.NoError(t, err)
 
@@ -453,7 +453,7 @@ func TestManagerStatePersistence(t *testing.T) {
 	host := "localhost:5432"
 	query := "SELECT * FROM logs WHERE id > :cursor ORDER BY id"
 
-	logger := logp.NewLogger("test")
+	logger := logp.NewNopLogger()
 
 	// Create first manager and update cursor
 	store1, err := newStore(beatPaths, logger)
@@ -498,7 +498,7 @@ func setupTestManagerWithDirection(t *testing.T, cfg Config) (*Manager, func()) 
 		Logs:   tmpDir,
 	}
 
-	logger := logp.NewLogger("test-cursor-manager-desc")
+	logger := logp.NewNopLogger()
 
 	store, err := newStore(beatPaths, logger)
 	require.NoError(t, err)
@@ -632,7 +632,7 @@ func TestManagerLoadState_VersionMismatch(t *testing.T) {
 	beatPaths := &paths.Path{
 		Home: tmpDir, Config: tmpDir, Data: tmpDir, Logs: tmpDir,
 	}
-	logger := logp.NewLogger("test")
+	logger := logp.NewNopLogger()
 
 	cfg := Config{
 		Enabled: true,
@@ -687,7 +687,7 @@ func TestManagerLoadState_TypeMismatch(t *testing.T) {
 	beatPaths := &paths.Path{
 		Home: tmpDir, Config: tmpDir, Data: tmpDir, Logs: tmpDir,
 	}
-	logger := logp.NewLogger("test")
+	logger := logp.NewNopLogger()
 
 	host := "localhost"
 	query := "SELECT * FROM t WHERE ts > :cursor"
@@ -737,7 +737,7 @@ func TestManagerLoadState_CorruptedValue(t *testing.T) {
 	beatPaths := &paths.Path{
 		Home: tmpDir, Config: tmpDir, Data: tmpDir, Logs: tmpDir,
 	}
-	logger := logp.NewLogger("test")
+	logger := logp.NewNopLogger()
 
 	host := "localhost"
 	query := "SELECT * FROM t WHERE id > :cursor"
@@ -879,7 +879,7 @@ func TestManagerUpdateFromResults_FloatCursor(t *testing.T) {
 	beatPaths := &paths.Path{
 		Home: tmpDir, Config: tmpDir, Data: tmpDir, Logs: tmpDir,
 	}
-	logger := logp.NewLogger("test")
+	logger := logp.NewNopLogger()
 
 	cfg := Config{
 		Enabled: true,
@@ -923,7 +923,7 @@ func TestManagerUpdateFromResults_DecimalCursor(t *testing.T) {
 	beatPaths := &paths.Path{
 		Home: tmpDir, Config: tmpDir, Data: tmpDir, Logs: tmpDir,
 	}
-	logger := logp.NewLogger("test")
+	logger := logp.NewNopLogger()
 
 	cfg := Config{
 		Enabled: true,
@@ -968,7 +968,7 @@ func TestManagerUpdateFromResults_DecimalPersistenceRoundTrip(t *testing.T) {
 	beatPaths := &paths.Path{
 		Home: tmpDir, Config: tmpDir, Data: tmpDir, Logs: tmpDir,
 	}
-	logger := logp.NewLogger("test")
+	logger := logp.NewNopLogger()
 
 	cfg := Config{
 		Enabled: true,
@@ -1014,7 +1014,7 @@ func TestManagerUpdateFromResults_TimestampDescending(t *testing.T) {
 	beatPaths := &paths.Path{
 		Home: tmpDir, Config: tmpDir, Data: tmpDir, Logs: tmpDir,
 	}
-	logger := logp.NewLogger("test")
+	logger := logp.NewNopLogger()
 
 	store, err := newStore(beatPaths, logger)
 	require.NoError(t, err)
@@ -1082,7 +1082,7 @@ func TestManagerTimestampPersistenceRoundTrip(t *testing.T) {
 	beatPaths := &paths.Path{
 		Home: tmpDir, Config: tmpDir, Data: tmpDir, Logs: tmpDir,
 	}
-	logger := logp.NewLogger("test")
+	logger := logp.NewNopLogger()
 
 	cfg := Config{
 		Enabled: true,

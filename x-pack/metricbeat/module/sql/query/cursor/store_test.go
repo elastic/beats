@@ -184,7 +184,7 @@ func TestNewStoreFromRegistry(t *testing.T) {
 		Logs:   tmpDir,
 	}
 
-	logger := logp.NewLogger("test-cursor-store-shared")
+	logger := logp.NewNopLogger()
 	dataPath := beatPaths.Resolve(paths.Data, "sql-cursor")
 
 	// Create a shared memlog registry (simulating what ModuleBuilder does)
@@ -270,7 +270,7 @@ func TestStoreClose(t *testing.T) {
 		Logs:   tmpDir,
 	}
 
-	logger := logp.NewLogger("test-cursor-store")
+	logger := logp.NewNopLogger()
 
 	store, err := newStore(beatPaths, logger)
 	require.NoError(t, err)
@@ -299,7 +299,7 @@ func TestStoreOwnershipClosingBehavior(t *testing.T) {
 			Logs:   tmpDir,
 		}
 
-		logger := logp.NewLogger("test-ownership-owns")
+		logger := logp.NewNopLogger()
 
 		// Create store via newStore (owns registry)
 		store, err := newStore(beatPaths, logger)
@@ -336,7 +336,7 @@ func TestStoreOwnershipClosingBehavior(t *testing.T) {
 			Logs:   tmpDir,
 		}
 
-		logger := logp.NewLogger("test-ownership-shared")
+		logger := logp.NewNopLogger()
 		dataPath := beatPaths.Resolve(paths.Data, "sql-cursor")
 
 		// Create a shared registry

@@ -62,6 +62,11 @@ Use `sql_queries` or `sql_query` depending on the use-case.
 :   Single query you want to run. Also, provide corresponding `sql_response_format` (value: `variables` or `table`) similar to `sql_queries`'s `response_format`.
 
 `cursor`
+
+```{applies_to}
+stack: beta 9.4
+```
+
 :   Optional configuration block for cursor-based incremental data fetching. When `cursor.enabled` is set to `true`, the module tracks the last fetched row value and retrieves only new data on subsequent collection cycles. The query must use `sql_query` (not `sql_queries`), `sql_response_format: table`, and include a `:cursor` placeholder. Supported sub-fields:
 
     `cursor.enabled`

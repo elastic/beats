@@ -466,18 +466,21 @@ func (m *MetricSet) fetchWithCursor(ctx context.Context, reporter mb.ReporterV2)
 		return nil
 	}
 
-	// Report events BEFORE updating cursor (at-least-once delivery)
-	// This ensures we never lose data - if cursor update fails, we may
-	// have duplicates but no data loss.
+	// Report events BEFORE updating cursor (at-least-once delivery).
+	// If the reporter rejects an event (returns false), stop immediately
+	// and do NOT advance the cursor so the same rows are re-fetched next cycle.
 	for _, row := range rows {
-		m.reportEvent(row, reporter, m.Config.Query)
+		if ok := m.reportEvent(row, reporter, m.Config.Query); !ok {
+			m.Logger().Warn("Reporter stopped accepting events; cursor will not advance to avoid data loss")
+			return nil
+		}
 	}
 
-	// Update cursor state
+	// Update cursor state — only reached when all events were accepted.
 	if err := m.cursorManager.UpdateFromResults(rows); err != nil {
 		m.Logger().Warnf("Failed to save cursor state: %v", err)
-		// Don't fail the fetch - events were already emitted
-		// Next run will re-fetch some data (duplicates are better than data loss)
+		// Don't fail the fetch - events were already emitted.
+		// Next run will re-fetch some data (duplicates are better than data loss).
 	}
 
 	return nil
