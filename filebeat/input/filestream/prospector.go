@@ -565,16 +565,30 @@ func (p *fileProspector) findGrowingFingerprintMatch(
 	// Use the IterateOnPrefix method to find potential matches
 	updater.IterateOnPrefix(func(key string, meta interface{}) bool {
 		// Only process growing_fingerprint keys
-		steps := strings.Split(key, identitySep)
-		if len(steps) > 4 {
-			return true // continue iteration
+		// key format: filestream::INPUT_ID::growing_fingerprint::FINGERPRINT
+		// Find '::' separator positions manually to avoid strings.Split allocation.
+		var seps [4]int
+		nSeps := 0
+		for i := 0; i < len(key)-1; i++ {
+			if key[i] == ':' && key[i+1] == ':' {
+				seps[nSeps] = i
+				nSeps++
+				if nSeps == 4 {
+					break
+				}
+				i++
+			}
 		}
-		if steps[2] != growingFingerprintName {
+		if nSeps != 3 {
 			return true // continue iteration
 		}
 
-		// Extract the fingerprint from the key
-		storedFingerprint := steps[3]
+		identityName := key[seps[1]+2 : seps[2]]
+		if identityName != growingFingerprintName {
+			return true // continue iteration
+		}
+
+		storedFingerprint := key[seps[2]+2:]
 		if storedFingerprint == "" {
 			return true // continue iteration - empty fingerprint
 		}
