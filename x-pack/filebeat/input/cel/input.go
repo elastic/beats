@@ -347,6 +347,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				select {
 				case <-waitCtx.Done():
 					runSpan.SetStatus(codes.Unset, waitCtx.Err().Error())
+					waitSpan.End()
 					return waitCtx.Err()
 				case <-time.After(wait):
 				}
