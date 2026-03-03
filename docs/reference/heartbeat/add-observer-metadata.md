@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/add-observer-metadata.html
 applies_to:
   stack: beta
+  serverless: beta
 ---
 
 # Add Observer metadata [add-observer-metadata]

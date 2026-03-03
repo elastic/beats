@@ -1,3 +1,6 @@
+# This file is generated! See ext/osquery-extension/cmd/gentables.
+<!-- DO NOT EDIT MANUALLY. Update specs/templates and re-run gentables. -->
+
 # Osquery Extension for Elastic
 
 This osquery extension provides additional custom tables that enhance osquery's capabilities with Elastic-specific functionality. The extension is designed to work seamlessly with Osquerybeat and provides deep system insights across Linux, macOS, and Windows platforms.
@@ -8,47 +11,51 @@ The extension adds several custom tables to osquery that provide:
 - Browser history analysis across multiple browsers
 - Host system information access from containers (groups, users, processes)
 - Deep file analysis and security auditing on macOS
+- Windows Amcache inventory and normalized application view
+- Windows Jump List parsing for recent and pinned entries
 
 ## Supported Platforms
 
-| Table | Linux | macOS | Windows |
-|-------|-------|-------|---------|
-| `elastic_browser_history` | ✅ | ✅ | ✅ |
-| `host_groups` | ✅ | ✅ | ❌ |
-| `host_users` | ✅ | ✅ | ❌ |
-| `host_processes` | ✅ | ❌ | ❌ |
-| `elastic_file_analysis` | ❌ | ✅ | ❌ |
+| Name | Type | Linux | macOS | Windows |
+|------|------|-------|-------|---------|
+| `elastic_amcache_application` | table | ❌ | ❌ | ✅ |
+| `elastic_amcache_application_file` | table | ❌ | ❌ | ✅ |
+| `elastic_amcache_application_shortcut` | table | ❌ | ❌ | ✅ |
+| `elastic_amcache_applications_view` | view | ❌ | ❌ | ✅ |
+| `elastic_amcache_device_pnp` | table | ❌ | ❌ | ✅ |
+| `elastic_amcache_driver_binary` | table | ❌ | ❌ | ✅ |
+| `elastic_amcache_driver_package` | table | ❌ | ❌ | ✅ |
+| `elastic_browser_history` | table | ✅ | ✅ | ✅ |
+| `elastic_file_analysis` | table | ❌ | ✅ | ❌ |
+| `elastic_host_groups` | table | ✅ | ✅ | ❌ |
+| `elastic_host_processes` | table | ✅ | ❌ | ❌ |
+| `elastic_host_users` | table | ✅ | ✅ | ❌ |
+| `elastic_jumplists` | table | ❌ | ❌ | ✅ |
+| `host_groups` | view | ✅ | ✅ | ❌ |
+| `host_processes` | view | ✅ | ❌ | ❌ |
+| `host_users` | view | ✅ | ✅ | ❌ |
 
 ---
 
 ## Tables
+- [elastic_amcache_application](docs/tables/elastic_amcache_application.md)
+- [elastic_amcache_application_file](docs/tables/elastic_amcache_application_file.md)
+- [elastic_amcache_application_shortcut](docs/tables/elastic_amcache_application_shortcut.md)
+- [elastic_amcache_device_pnp](docs/tables/elastic_amcache_device_pnp.md)
+- [elastic_amcache_driver_binary](docs/tables/elastic_amcache_driver_binary.md)
+- [elastic_amcache_driver_package](docs/tables/elastic_amcache_driver_package.md)
+- [elastic_browser_history](docs/tables/elastic_browser_history.md)
+- [elastic_file_analysis](docs/tables/elastic_file_analysis.md)
+- [elastic_host_groups](docs/tables/elastic_host_groups.md)
+- [elastic_host_processes](docs/tables/elastic_host_processes.md)
+- [elastic_host_users](docs/tables/elastic_host_users.md)
+- [elastic_jumplists](docs/tables/elastic_jumplists.md)
 
-Each table has detailed documentation in its own file:
-
-### 1. [elastic_browser_history](docs/tables/elastic_browser_history.md)
-Query browser history from multiple browsers (Chrome, Edge, Firefox, Safari) with unified schema and advanced filtering capabilities.
-
-**Platforms**: Linux, macOS, Windows
-
-### 2. [host_groups](docs/host_groups.md)
-Query host system group information when running in a container environment. Access the host's `/etc/group` file to enumerate all groups on the host system.
-
-**Platforms**: Linux, macOS
-
-### 3. [host_users](docs/host_users.md)
-Query host system user accounts when running in a container environment. Access the host's user database (passwd) to enumerate all user accounts on the host system.
-
-**Platforms**: Linux, macOS
-
-### 4. [host_processes](docs/host_processes.md)
-Query running process information from the host system when running in a container environment. Read from the host's `/proc` filesystem to inspect all processes running on the host.
-
-**Platforms**: Linux
-
-### 5. [elastic_file_analysis](docs/elastic_file_analysis.md)
-Perform comprehensive security analysis of executable files on macOS. Extract code signing information, library dependencies, symbols, and strings from Mach-O binaries.
-
-**Platforms**: macOS
+## Views
+- [elastic_amcache_applications_view](docs/views/elastic_amcache_applications_view.md)
+- [host_groups](docs/views/host_groups.md)
+- [host_processes](docs/views/host_processes.md)
+- [host_users](docs/views/host_users.md)
 
 ---
 
@@ -64,7 +71,7 @@ mage buildext
 
 # The extension binary will be created at:
 # Linux: ext/osquery-extension/build/linux/osquery-extension
-# macOS: ext/osquery-extension/build/darwin/osquery-extension  
+# macOS: ext/osquery-extension/build/darwin/osquery-extension
 # Windows: ext/osquery-extension/build/windows/osquery-extension.ext
 ```
 
