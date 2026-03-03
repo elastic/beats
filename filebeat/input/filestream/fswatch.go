@@ -48,6 +48,7 @@ const (
 
 var (
 	errFileTooSmall = errors.New("file size is too small for ingestion")
+	errFileEmpty    = errors.New("file is empty")
 )
 
 // fileWatcherConfig is the prospector.scanner configuration
@@ -302,12 +303,6 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 
 	// remaining files in newFiles are newly created files
 	for path, fd := range newFilesByName {
-		// no need to react on empty new files
-		if fd.Info.Size() == 0 {
-			w.log.Debugf("file %q has no content yet, skipping", fd.Filename)
-			delete(paths, path)
-			continue
-		}
 		select {
 		case <-ctx.Done():
 			return
@@ -498,7 +493,9 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 
 			it, err := s.getIngestTarget(filename)
 			if err != nil {
-				s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
+				if !errors.Is(err, errFileEmpty) {
+					s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
+				}
 				continue
 			}
 
@@ -556,13 +553,19 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 	if err != nil {
 		return it, fmt.Errorf("failed to lstat %q: %w", it.filename, err)
 	}
-	it.info = commonfile.ExtendFileInfo(info)
-
-	if it.info.IsDir() {
+	if info.IsDir() {
 		return it, fmt.Errorf("file %q is a directory", it.filename)
 	}
 
-	it.symlink = it.info.Mode()&os.ModeSymlink > 0
+	symlink := info.Mode()&os.ModeSymlink > 0
+
+	// we don't need to process empty files
+	if !symlink && info.Size() == 0 {
+		return it, errFileEmpty
+	}
+
+	it.info = commonfile.ExtendFileInfo(info)
+	it.symlink = symlink
 
 	if it.symlink {
 		if !s.cfg.Symlinks {
@@ -574,8 +577,12 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 		if err != nil {
 			return it, fmt.Errorf("failed to stat the symlink %q: %w", it.filename, err)
 		}
-		it.info = commonfile.ExtendFileInfo(info)
+		// we don't need to process empty files
+		if info.Size() == 0 {
+			return it, errFileEmpty
+		}
 
+		it.info = commonfile.ExtendFileInfo(info)
 		it.originalFilename, err = filepath.EvalSymlinks(it.filename)
 		if err != nil {
 			s.log.Debugf("finding path to original file has failed %s: %+v", it.filename, err)
