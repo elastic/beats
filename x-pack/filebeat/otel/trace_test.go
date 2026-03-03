@@ -267,6 +267,8 @@ func TestSensitiveName(t *testing.T) {
 		{"X-User-Session", true},
 		{"X-Xsrf-Token", true},
 		{"access_token", true},
+		{"Access-Control-Allow-Credentials", false},
+		{"access-control-allow-credentials", false},
 		{"api_key", true},
 		{"apikey", true},
 		{"apiKey", true},

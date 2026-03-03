@@ -449,9 +449,13 @@ func addHeaderAttr(span trace.Span, prefix, name string, headers http.Header, sh
 }
 
 // SensitiveName returns true if the given header or parameter name includes a
-// word that suggests it may contain secret data. This is the default redaction
-// logic.
+// word that suggests it may contain secret data, unless the full name is known
+// to be safe. This is the default redaction logic.
 func SensitiveName(name string) bool {
+	if _, ok := knownSafeNames[normalizedName(name)]; ok {
+		return false
+	}
+
 	words := splitToWords(name)
 	for _, word := range words {
 		if _, ok := sensitiveWords[word]; ok {
@@ -459,6 +463,10 @@ func SensitiveName(name string) bool {
 		}
 	}
 	return false
+}
+
+var knownSafeNames = map[string]struct{}{
+	"access-control-allow-credentials": {}, // CORS response header; not a secret.
 }
 
 var sensitiveWords = map[string]struct{}{
@@ -487,6 +495,10 @@ var sensitiveWords = map[string]struct{}{
 	"signature":     {},
 	"sso":           {},
 	"token":         {},
+}
+
+func normalizedName(s string) string {
+	return strings.ToLower(strings.TrimSpace(s))
 }
 
 // splitToWords splits a string into words.
