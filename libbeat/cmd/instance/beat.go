@@ -41,6 +41,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/asset"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/locks"
@@ -764,7 +765,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error loading config file: %w", err)
 	}
 
-	b.Monitoring = beat.NewGlobalMonitoring()
+	b.Monitoring = beatmonitoring.NewGlobalMonitoring()
 
 	if err := InitPaths(cfg); err != nil {
 		return err

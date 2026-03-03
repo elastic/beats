@@ -26,7 +26,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -187,7 +187,7 @@ type expectedMetrics struct {
 	ProcessingErrors  uint64
 }
 
-func checkMetrics(t *testing.T, mon beat.Monitoring, id string, expected expectedMetrics) {
+func checkMetrics(t *testing.T, mon beatmonitoring.Monitoring, id string, expected expectedMetrics) {
 	reg, ok := mon.InputsRegistry().Get(id).(*monitoring.Registry)
 	require.True(t, ok, "registry not found")
 

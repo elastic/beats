@@ -26,7 +26,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -303,7 +303,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 				})
 				require.NoError(t, err)
 
-				monitoring := beat.NewMonitoring()
+				monitoring := beatmonitoring.NewMonitoring()
 
 				aModule, metricSets, err := mb.NewModule(tc.config, r, paths.New(), logptest.NewTestingLogger(t, ""))
 				require.NoError(t, err)
@@ -533,7 +533,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 				})
 				require.NoError(t, err)
 
-				monitoring := beat.NewMonitoring()
+				monitoring := beatmonitoring.NewMonitoring()
 
 				aModule, metricSets, err := mb.NewModule(tc.config, r, paths.New(), logptest.NewTestingLogger(t, ""))
 				require.NoError(t, err)
