@@ -370,7 +370,7 @@ func (rt *ExtraSpanAttribsRoundTripper) shouldRedact(name string) bool {
 
 func (rt *ExtraSpanAttribsRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
 	span := trace.SpanFromContext(r.Context())
-	if span != nil && span.SpanContext().IsValid() {
+	if span.SpanContext().IsValid() {
 		for h := range r.Header {
 			addHeaderAttr(span, "http.request.header.", h, r.Header, rt.shouldRedact)
 		}
@@ -381,7 +381,7 @@ func (rt *ExtraSpanAttribsRoundTripper) RoundTrip(r *http.Request) (*http.Respon
 		return resp, err
 	}
 
-	if span != nil && span.SpanContext().IsValid() {
+	if span.SpanContext().IsValid() {
 		if resp != nil {
 			for h := range resp.Header {
 				addHeaderAttr(span, "http.response.header.", h, resp.Header, rt.shouldRedact)
