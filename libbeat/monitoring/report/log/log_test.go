@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -59,7 +60,7 @@ var (
 // Smoke test.
 func TestStartStop(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-	r, err := MakeReporter(beat.Info{Logger: logger}, conf.NewConfig(), nil, nil, nil, nil)
+	r, err := MakeReporter(beat.Info{Logger: logger}, conf.NewConfig(), beatmonitoring.NewGlobalMonitoring())
 	if err != nil {
 		t.Fatal(err)
 	}
