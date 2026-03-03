@@ -41,7 +41,7 @@ func GetTestUdpServer(host string, port int) (server.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	logger.Infof("Started listening for UDP on: %s:%d", host, port)
+	logger.Infof("Started listening for UDP on: %s", net.JoinHostPort(host, strconv.Itoa(port)))
 	return &UdpServer{
 		udpaddr:           addr,
 		receiveBufferSize: 1024,
