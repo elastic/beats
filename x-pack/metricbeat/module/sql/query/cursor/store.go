@@ -143,10 +143,14 @@ func isKeyNotFoundError(err error) bool {
 //     incompatible with minimum tracking (desc). Changing direction must reset.
 //
 // The combined string is hashed via xxhash, so no secrets appear in the stored key.
+// Each part is length-prefixed to avoid ambiguity when parts contain the delimiter.
 func GenerateStateKey(inputType, dsn, query, cursorColumn, direction string) string {
 	keyParts := []string{inputType, dsn, query, cursorColumn, direction}
 
-	combined := strings.Join(keyParts, "|")
-	hash := xxhash.Sum64String(combined)
+	var b strings.Builder
+	for _, p := range keyParts {
+		fmt.Fprintf(&b, "%d:%s|", len(p), p)
+	}
+	hash := xxhash.Sum64String(b.String())
 	return fmt.Sprintf("sql-cursor::%x", hash)
 }
