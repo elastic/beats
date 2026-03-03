@@ -31,12 +31,6 @@ import (
 
 var _ http.RoundTripper = (*LoggingRoundTripper)(nil)
 
-// TraceIDKey is key used to add a trace.id value to the context of HTTP
-// requests. The value will be logged by LoggingRoundTripper.
-const TraceIDKey = contextKey("trace.id")
-
-type contextKey string
-
 // IsPathInLogsFor returns whether path is a valid path for logs written by the
 // specified input after resolving symbolic links in path.
 func IsPathInLogsFor(input, path string) (ok bool, err error) {
