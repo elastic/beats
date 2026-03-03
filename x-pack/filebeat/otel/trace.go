@@ -388,10 +388,7 @@ func (rt *ExtraSpanAttribsRoundTripper) RoundTrip(r *http.Request) (*http.Respon
 			}
 		}
 
-		span.SetAttributes(attribute.StringSlice(
-			"url.full",
-			[]string{sanitizedURLString(r.URL, rt.shouldRedact)},
-		))
+		span.SetAttributes(attribute.String("url.full", sanitizedURLString(r.URL, rt.shouldRedact)))
 	}
 
 	return resp, nil
