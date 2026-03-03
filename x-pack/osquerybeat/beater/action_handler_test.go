@@ -41,7 +41,7 @@ type mockPublisher struct {
 	reqData    interface{}
 }
 
-func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	p.index = index
 	p.idValue = idValue
 	p.idFieldKey = idFieldKey
