@@ -1015,7 +1015,7 @@ scanner:
 			Fingerprint: fingerprintConfig{Enabled: false},
 		}
 		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
-		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
+		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, false)
 		require.NoError(t, err)
 
 		files := s.GetFiles()
@@ -1047,7 +1047,7 @@ scanner:
 			Fingerprint: fingerprintConfig{Enabled: false},
 		}
 		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
-		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
+		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, false)
 		require.NoError(t, err)
 
 		files := s.GetFiles()
@@ -1212,7 +1212,7 @@ func TestGetIngestTarget(t *testing.T) {
 			Symlinks:    false,
 			Fingerprint: fingerprintConfig{Enabled: false},
 		}
-		s, err := newFileScanner(logp.NewNopLogger(), []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
+		s, err := newFileScanner(logp.NewNopLogger(), []string{filepath.Join(dir, "*.log")}, cfg, false)
 		require.NoError(t, err)
 
 		_, err = s.getIngestTarget(filename)
@@ -1233,7 +1233,7 @@ func TestGetIngestTarget(t *testing.T) {
 			Symlinks:    true,
 			Fingerprint: fingerprintConfig{Enabled: false},
 		}
-		s, err := newFileScanner(logp.NewNopLogger(), []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
+		s, err := newFileScanner(logp.NewNopLogger(), []string{filepath.Join(dir, "*.log")}, cfg, false)
 		require.NoError(t, err)
 
 		_, err = s.getIngestTarget(link)
@@ -1258,7 +1258,7 @@ func TestToFileDescriptor_TooSmallFile_NoFileOpen(t *testing.T) {
 		},
 	}
 
-	s, err := newFileScanner(logp.NewNopLogger(), []string{filename}, cfg, CompressionNone)
+	s, err := newFileScanner(logp.NewNopLogger(), []string{filename}, cfg, false)
 	require.NoError(t, err, "failed to create scanner")
 	it, err := s.getIngestTarget(filename)
 	require.NoError(t, err, "getIngestTarget should succeed")
