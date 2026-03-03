@@ -6,7 +6,7 @@ applies_to:
   serverless: ga
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See auditbeat/scripts/mage/docs.go
 
 # File Integrity Module [auditbeat-module-file_integrity]
 

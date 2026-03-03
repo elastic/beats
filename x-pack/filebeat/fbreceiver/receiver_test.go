@@ -101,13 +101,13 @@ func TestNewReceiver(t *testing.T) {
 					FilterMessageSnippet("add_cloud_metadata").
 					FilterMessageSnippet("add_docker_metadata").
 					FilterMessageSnippet("add_kubernetes_metadata")
-				assert.Len(t, processorsLoaded.All(), 1, "processors not loaded")
+				assert.Len(c, processorsLoaded.All(), 1, "processors not loaded")
 				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
 				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
 			assert.Condition(c, func() bool {
 				metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
-				return assert.NotEmpty(t, metricsStarted.All(), "metrics logging not started")
+				return assert.NotEmpty(c, metricsStarted.All(), "metrics logging not started")
 			}, "failed to check metrics logging")
 		},
 	})
@@ -270,7 +270,7 @@ func TestMultipleReceivers(t *testing.T) {
 			for _, helper := range helpers {
 				writeFile(c, helper.ingest, "A log line")
 
-				require.Greaterf(c, len(logs[helper.name]), 0, "receiver %v does not have any logs", helper)
+				require.NotEmptyf(c, logs[helper.name], "receiver %v does not have any logs", helper)
 
 				assert.Equalf(c, "test", logs[helper.name][0].Flatten()["message"], "expected %v message field to be 'test'", helper)
 

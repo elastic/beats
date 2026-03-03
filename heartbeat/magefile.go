@@ -89,7 +89,7 @@ func GenerateModuleIncludeListGo() error {
 
 // Update updates the generated files (aka make update).
 func Update() {
-	mg.SerialDeps(Fields, FieldDocs, Config, GenerateModuleIncludeListGo)
+	mg.SerialDeps(Fields, common.FieldDocs, Config, GenerateModuleIncludeListGo)
 }
 
 func IntegTest() {
@@ -105,10 +105,6 @@ func GoIntegTest(ctx context.Context) error {
 
 func PythonIntegTest() {
 	// intentionally blank, CI runs this for every beat
-}
-
-func FieldDocs() error {
-	return devtools.Docs.FieldDocs("fields.yml")
 }
 
 // Config generates both the short/reference/docker configs.
