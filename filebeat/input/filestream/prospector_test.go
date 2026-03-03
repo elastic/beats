@@ -1231,6 +1231,176 @@ func mustIdentifier(t *testing.T, name string) fileIdentifier {
 	return identifier
 }
 
+func TestFindGrowingFingerprintMatch(t *testing.T) {
+	const currentPath = "/var/log/app.log"
+
+	testCases := map[string]struct {
+		storeEntries       map[string]interface{}
+		currentFingerprint string
+		currentPath        string
+		expectedKey        string
+		expectedFound      bool
+	}{
+		"empty current fingerprint returns immediately": {
+			storeEntries:       map[string]interface{}{},
+			currentFingerprint: "",
+			currentPath:        currentPath,
+			expectedFound:      false,
+		},
+		"valid prefix match": {
+			storeEntries: map[string]interface{}{
+				"filestream::my-input::growing_fingerprint::aabb": fileMeta{
+					Source:         currentPath,
+					IdentifierName: growingFingerprintName,
+				},
+			},
+			currentFingerprint: "aabbccdd",
+			currentPath:        currentPath,
+			expectedKey:        "filestream::my-input::growing_fingerprint::aabb",
+			expectedFound:      true,
+		},
+		"picks longest prefix among multiple matches": {
+			storeEntries: map[string]interface{}{
+				"filestream::my-input::growing_fingerprint::aa": fileMeta{
+					Source:         currentPath,
+					IdentifierName: growingFingerprintName,
+				},
+				"filestream::my-input::growing_fingerprint::aabb": fileMeta{
+					Source:         currentPath,
+					IdentifierName: growingFingerprintName,
+				},
+				"filestream::my-input::growing_fingerprint::aabbcc": fileMeta{
+					Source:         currentPath,
+					IdentifierName: growingFingerprintName,
+				},
+			},
+			currentFingerprint: "aabbccddee",
+			currentPath:        currentPath,
+			expectedKey:        "filestream::my-input::growing_fingerprint::aabbcc",
+			expectedFound:      true,
+		},
+		"skips non-growing_fingerprint identity": {
+			storeEntries: map[string]interface{}{
+				"filestream::my-input::fingerprint::aabb": fileMeta{
+					Source:         currentPath,
+					IdentifierName: fingerprintName,
+				},
+			},
+			currentFingerprint: "aabbccdd",
+			currentPath:        currentPath,
+			expectedFound:      false,
+		},
+		"skips key with too many separators": {
+			storeEntries: map[string]interface{}{
+				"filestream::my-input::growing_fingerprint::aabb::extra": fileMeta{
+					Source:         currentPath,
+					IdentifierName: growingFingerprintName,
+				},
+			},
+			currentFingerprint: "aabbccdd",
+			currentPath:        currentPath,
+			expectedFound:      false,
+		},
+		"skips key with too few separators": {
+			storeEntries: map[string]interface{}{
+				"filestream::growing_fingerprint": fileMeta{
+					Source:         currentPath,
+					IdentifierName: growingFingerprintName,
+				},
+			},
+			currentFingerprint: "aabbccdd",
+			currentPath:        currentPath,
+			expectedFound:      false,
+		},
+		"skips empty stored fingerprint": {
+			storeEntries: map[string]interface{}{
+				"filestream::my-input::growing_fingerprint::": fileMeta{
+					Source:         currentPath,
+					IdentifierName: growingFingerprintName,
+				},
+			},
+			currentFingerprint: "aabbccdd",
+			currentPath:        currentPath,
+			expectedFound:      false,
+		},
+		"skips stored fingerprint longer than current": {
+			storeEntries: map[string]interface{}{
+				"filestream::my-input::growing_fingerprint::aabbccddee": fileMeta{
+					Source:         currentPath,
+					IdentifierName: growingFingerprintName,
+				},
+			},
+			currentFingerprint: "aabb",
+			currentPath:        currentPath,
+			expectedFound:      false,
+		},
+		"skips stored fingerprint equal length to current": {
+			storeEntries: map[string]interface{}{
+				"filestream::my-input::growing_fingerprint::aabb": fileMeta{
+					Source:         currentPath,
+					IdentifierName: growingFingerprintName,
+				},
+			},
+			currentFingerprint: "aabb",
+			currentPath:        currentPath,
+			expectedFound:      false,
+		},
+		"skips non-prefix fingerprint": {
+			storeEntries: map[string]interface{}{
+				"filestream::my-input::growing_fingerprint::xxxx": fileMeta{
+					Source:         currentPath,
+					IdentifierName: growingFingerprintName,
+				},
+			},
+			currentFingerprint: "aabbccdd",
+			currentPath:        currentPath,
+			expectedFound:      false,
+		},
+		"skips path mismatch": {
+			storeEntries: map[string]interface{}{
+				"filestream::my-input::growing_fingerprint::aabb": fileMeta{
+					Source:         "/other/file.log",
+					IdentifierName: growingFingerprintName,
+				},
+			},
+			currentFingerprint: "aabbccdd",
+			currentPath:        currentPath,
+			expectedFound:      false,
+		},
+		"single colon in input ID is not a separator": {
+			storeEntries: map[string]interface{}{
+				"filestream::my:input::growing_fingerprint::aabb": fileMeta{
+					Source:         currentPath,
+					IdentifierName: growingFingerprintName,
+				},
+			},
+			currentFingerprint: "aabbccdd",
+			currentPath:        currentPath,
+			expectedKey:        "filestream::my:input::growing_fingerprint::aabb",
+			expectedFound:      true,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			store := newMockMetadataUpdater()
+			for k, v := range tc.storeEntries {
+				store.table[k] = v
+			}
+
+			p := &fileProspector{logger: logp.L()}
+			key, found := p.findGrowingFingerprintMatch(store, tc.currentFingerprint, tc.currentPath)
+
+			assert.Equal(t, tc.expectedFound, found, "found mismatch")
+			if tc.expectedFound {
+				assert.Equal(t, tc.expectedKey, key, "key mismatch")
+			} else {
+				assert.Empty(t, key)
+			}
+		})
+	}
+}
+
 func mustInodeMarker(t *testing.T) fileIdentifier {
 	f, err := os.CreateTemp(t.TempDir(), "inode-marker")
 	if err != nil {
