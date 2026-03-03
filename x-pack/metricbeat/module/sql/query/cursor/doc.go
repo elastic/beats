@@ -140,8 +140,9 @@
 // # Resource Cleanup
 //
 // The MetricSet implements mb.Closer. When the module stops, [Manager.Close]
-// is called, which closes the [Store], releasing file handles held by the
-// memlog backend and flushing any pending writes. Close is idempotent.
+// is called, which closes the [Store] handle (decrementing the ref count).
+// The shared memlog registry is managed by the Module and closed separately.
+// Close is idempotent.
 //
 // # Usage
 //
