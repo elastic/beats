@@ -162,7 +162,7 @@ func (ts *testSetup) sendTestEvent() {
 	}
 	c, _, err := ts.client.Request(http.MethodPut, "/"+ts.config.Name+"/_create/1", "", nil, evt)
 	require.NoError(ts.t, err)
-	require.Equal(ts.t, c, http.StatusCreated, "document must be created with id 1")
+	require.Equal(ts.t, http.StatusCreated, c, "document must be created with id 1")
 
 	// refresh index so the event becomes available immediately
 	_, _, err = ts.client.Request(http.MethodPost, "/"+ts.config.Name+"/_refresh", "", nil, nil)
@@ -261,7 +261,7 @@ func TestESLoader_Load(t *testing.T) {
 			err := setup.load(nil)
 			require.NoError(t, err)
 			tmpl := getTemplate(t, setup.client, setup.config.Name)
-			assert.Equal(t, true, tmpl.SourceEnabled())
+			assert.True(t, tmpl.SourceEnabled())
 		})
 
 		t.Run("enabled", func(t *testing.T) {
@@ -269,7 +269,7 @@ func TestESLoader_Load(t *testing.T) {
 			err := setup.load(nil)
 			require.NoError(t, err)
 			tmpl := getTemplate(t, setup.client, setup.config.Name)
-			assert.Equal(t, false, tmpl.SourceEnabled())
+			assert.False(t, tmpl.SourceEnabled())
 		})
 
 		t.Run("preserve existing data stream even if overwriting templates is allowed", func(t *testing.T) {
@@ -425,7 +425,7 @@ func TestTemplateSettings(t *testing.T) {
 	// Check that it contains the mapping
 	templateJSON := getTemplate(t, setup.client, setup.config.Name)
 	assert.Equal(t, 1, templateJSON.NumberOfShards())
-	assert.Equal(t, false, templateJSON.SourceEnabled())
+	assert.False(t, templateJSON.SourceEnabled())
 }
 
 var dataTests = []struct {
@@ -492,7 +492,7 @@ func TestTemplateWithData(t *testing.T) {
 func getTemplate(t *testing.T, client ESClient, templateName string) testTemplate {
 	status, body, err := client.Request("GET", "/_index_template/"+templateName, "", nil, nil)
 	require.NoError(t, err)
-	require.Equal(t, status, 200)
+	require.Equal(t, 200, status)
 
 	var response mapstr.M
 	err = json.Unmarshal(body, &response)

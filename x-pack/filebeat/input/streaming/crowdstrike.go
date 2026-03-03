@@ -174,16 +174,19 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 	}
 }
 
+// followSession collects events from a crowdstrike stream, publishing them as
+// they are received. It always returns a valid state value unless the error
+// returned is a hardError.
 func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, state map[string]any) (map[string]any, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.discoverURL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to prepare discover stream request: %w", err)
+		return state, fmt.Errorf("failed to prepare discover stream request: %w", err)
 	}
 	resp, err := cli.Do(req)
 	if err != nil {
 		err = fmt.Errorf("failed GET to discover stream: %w", err)
 		s.status.UpdateStatus(status.Degraded, err.Error())
-		return nil, err
+		return state, err
 	}
 	defer resp.Body.Close()
 
@@ -191,7 +194,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		var buf bytes.Buffer
 		io.Copy(&buf, resp.Body)
 		s.log.Errorw("unsuccessful request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
-		return nil, fmt.Errorf("unsuccessful request: %s: %s", resp.Status, &buf)
+		return state, fmt.Errorf("unsuccessful request: %s: %s", resp.Status, &buf)
 	}
 
 	dec := json.NewDecoder(resp.Body)
