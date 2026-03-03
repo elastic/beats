@@ -623,7 +623,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 								err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
 								metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 								errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
-								return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
+								return err
 							}
 							pubCursor = cursor
 						}
