@@ -807,7 +807,7 @@ Detailed zswap statistics from /sys/kernel/debug/zswap. Requires debugfs to be m
 
 
 **`system.memory.zswap.debug.pool_limit_hit`**
-:   Number of times the pool limit was hit (see zswap_max_pool_percent).
+:   Number of times the pool limit was reached (see zswap_max_pool_percent).
 
     type: long
 

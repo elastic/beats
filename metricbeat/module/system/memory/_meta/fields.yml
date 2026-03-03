@@ -123,7 +123,7 @@
             - name: pool_limit_hit
               type: long
               description: >
-                Number of times the pool limit was hit (see zswap_max_pool_percent).
+                Number of times the pool limit was reached (see zswap_max_pool_percent).
 
             - name: pool_total_size
               type: long
