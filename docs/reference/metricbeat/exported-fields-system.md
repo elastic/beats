@@ -800,8 +800,14 @@ zswap compressed swap cache metrics. Available on Linux when zswap is enabled.
 
 Detailed zswap statistics from /sys/kernel/debug/zswap. Requires debugfs to be mounted and accessible.
 
+**`system.memory.zswap.debug.decompress_fail`**
+:   Number of load or writeback attempts that failed due to decompression failure.
+
+    type: long
+
+
 **`system.memory.zswap.debug.pool_limit_hit`**
-:   Number of times the pool limit was reached.
+:   Number of times the pool limit was hit (see zswap_max_pool_percent).
 
     type: long
 
@@ -815,31 +821,37 @@ Detailed zswap statistics from /sys/kernel/debug/zswap. Requires debugfs to be m
 
 
 **`system.memory.zswap.debug.reject_alloc_fail`**
-:   Number of pages rejected due to zpool allocation failure.
+:   Number of store attempts that failed because the underlying allocator could not get memory.
 
     type: long
 
 
 **`system.memory.zswap.debug.reject_compress_fail`**
-:   Number of pages rejected due to compression failure.
+:   Number of store attempts that failed due to compression algorithm failure.
 
     type: long
 
 
 **`system.memory.zswap.debug.reject_compress_poor`**
-:   Number of pages rejected due to poor compression ratio.
+:   Number of store attempts rejected because the compressed page was too big for the allocator to optimally store.
 
     type: long
 
 
 **`system.memory.zswap.debug.reject_kmemcache_fail`**
-:   Number of pages rejected due to kmemcache allocation failure.
+:   Number of store attempts that failed because the entry metadata could not be allocated (rare).
 
     type: long
 
 
 **`system.memory.zswap.debug.reject_reclaim_fail`**
-:   Number of pages rejected due to reclaim failure.
+:   Number of store attempts that failed due to a reclaim failure after pool limit was reached.
+
+    type: long
+
+
+**`system.memory.zswap.debug.stored_incompressible_pages`**
+:   Number of incompressible pages currently stored in zswap.
 
     type: long
 
@@ -851,7 +863,7 @@ Detailed zswap statistics from /sys/kernel/debug/zswap. Requires debugfs to be m
 
 
 **`system.memory.zswap.debug.written_back_pages`**
-:   Number of pages written back from zswap to swap.
+:   Number of pages written back from zswap to swap when pool limit was reached.
 
     type: long
 
