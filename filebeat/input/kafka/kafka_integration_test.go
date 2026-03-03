@@ -479,15 +479,10 @@ func TestTest(t *testing.T) {
 	}
 }
 
-func createTestTopicName() string {
-	testTopic := fmt.Sprintf("Filebeat-TestInput-%d", rand.Int())
-	return testTopic
-}
-
 func createReadyTestTopic(t *testing.T) string {
 	t.Helper()
 
-	testTopic := createTestTopicName()
+	testTopic := fmt.Sprintf("Filebeat-TestInput-%d", rand.Int())
 	// Topic auto-creation is asynchronous; explicitly wait for leaders to avoid
 	// transient "no leader for this partition" write failures in CI.
 	ensureKafkaTopicReadyForWrites(t, testTopic)
