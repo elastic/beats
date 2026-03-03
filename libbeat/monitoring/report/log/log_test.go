@@ -71,10 +71,10 @@ func TestMakeDeltaSnapshot(t *testing.T) {
 	delta := makeDeltaSnapshot(prevSnap, curSnap)
 	assert.EqualValues(t, 10, delta.Ints["count"])
 	assert.EqualValues(t, 1, delta.Ints["new"])
-	assert.EqualValues(t, 1.2, delta.Floats["system.load.1"])
-	assert.EqualValues(t, 2, delta.Floats["float_counter"])
+	assert.InDelta(t, 1.2, delta.Floats["system.load.1"], 0.001)
+	assert.InDelta(t, 2, delta.Floats["float_counter"], 0.001)
 	assert.EqualValues(t, 5, delta.Ints["active_gauge"])
-	assert.EqualValues(t, 4.1, delta.Floats["foo.histogram.p99"])
+	assert.InDelta(t, 4.1, delta.Floats["foo.histogram.p99"], 0.001)
 	assert.NotContains(t, delta.Ints, "gone")
 }
 
@@ -120,5 +120,5 @@ func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.EqualValues(t, expectedValue, v)
+	assert.EqualValues(t, expectedValue, v) //nolint:testifylint // we don't care if types are different
 }

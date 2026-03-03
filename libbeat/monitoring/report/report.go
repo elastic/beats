@@ -122,7 +122,7 @@ func getReporterConfig(
 		}
 	}
 
-	return "", nil, errors.New("No monitoring reporter configured")
+	return "", nil, errors.New("no monitoring reporter configured")
 }
 
 func collectSubObject(cfg *conf.C) *conf.C {
