@@ -1116,7 +1116,8 @@ service:
 					// For retryable errors or successful cases, events are eventually acked
 					// Currently, otelconsumer either ACKs or fails the entire batch and has no visibility into individual event failures within the exporter.
 					// From otelconsumer's perspective, the whole batch is considered successful as long as ConsumeLogs returns no error.
-					assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.total"], "expected total events sent to output to match")
+					// events.total can be larger than the acknowledged event count because it includes retrys.
+					assert.GreaterOrEqual(ct, m["libbeat.output.events.total"], float64(numTestEvents), "expected total events sent to output include all events")
 					assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.acked"], "expected total events acked to match")
 					assert.Equal(ct, float64(0), m["libbeat.output.events.dropped"], "expected total events dropped to match")
 				}
@@ -1650,7 +1651,7 @@ func checkDuplicates(t *testing.T, index string) {
 	value, ok := total["value"].(float64)
 	require.Truef(t, ok, "'total' wasn't an int, result was %s", string(resultBuf))
 
-	require.Equalf(t, 0, len(buckets), "len(buckets): %d, hits.total.value: %d, result was %s", len(buckets), value, string(resultBuf))
+	require.Emptyf(t, buckets, "len(buckets): %d, hits.total.value: %d, result was %s", len(buckets), value, string(resultBuf))
 }
 
 // setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
@@ -1687,7 +1688,7 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 	require.NoError(t, err, "could not perform role mapping request")
 	defer resp.Body.Close()
 
-	require.Equal(t, resp.StatusCode, http.StatusOK, "incorrect response code")
+	require.Equal(t, http.StatusOK, resp.StatusCode, "incorrect response code")
 }
 
 func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {
