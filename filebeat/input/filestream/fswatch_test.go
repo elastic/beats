@@ -1200,8 +1200,6 @@ func filenames(m map[string]loginp.FileDescriptor) (result string) {
 	return result
 }
 
-<<<<<<< HEAD
-=======
 func TestGetIngestTarget(t *testing.T) {
 	t.Run("empty regular file", func(t *testing.T) {
 		dir := t.TempDir()
@@ -1274,7 +1272,6 @@ func TestToFileDescriptor_TooSmallFile_NoFileOpen(t *testing.T) {
 		"expected errFileTooSmall, it probably tried to open the file")
 }
 
->>>>>>> 404fb99fd (Silently ignore empty files in filestream (#49196))
 func BenchmarkToFileDescriptor(b *testing.B) {
 	dir := b.TempDir()
 	basename := "created.log"
