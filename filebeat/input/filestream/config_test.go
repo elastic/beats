@@ -185,6 +185,93 @@ func TestConfigValidate(t *testing.T) {
 	})
 }
 
+func TestNormalizeConfig(t *testing.T) {
+	tcs := []struct {
+		name        string
+		cfg         map[string]interface{}
+		wantEnabled bool
+	}{
+		{
+			name: "path identity disables prospector.scanner.fingerprint by default",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{"path": nil},
+			},
+			wantEnabled: false,
+		},
+		{
+			name: "native identity disables scanner fingerprint by default",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{"native": nil},
+			},
+			wantEnabled: false,
+		},
+		{
+			name: "explicit scanner fingerprint true is preserved",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{"path": nil},
+				"prospector": map[string]interface{}{
+					"scanner": map[string]interface{}{
+						"fingerprint": map[string]interface{}{"enabled": true},
+					},
+				},
+			},
+			wantEnabled: true,
+		},
+		{
+			name: "explicit scanner fingerprint false is preserved",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{"fingerprint": nil},
+				"prospector": map[string]interface{}{
+					"scanner": map[string]interface{}{
+						"fingerprint": map[string]interface{}{"enabled": false},
+					},
+				},
+			},
+			wantEnabled: false,
+		},
+		{
+			name: "fingerprint identity keeps default scanner fingerprint",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{"fingerprint": nil},
+			},
+			wantEnabled: true,
+		},
+		{
+			name: "non-fingerprint inode_marker disables scanner fingerprint by default",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{
+					"inode_marker": map[string]interface{}{"path": "/logs/.filebeat-marker"},
+				},
+			},
+			wantEnabled: false,
+		},
+		{
+			name:        "no file_identity keeps default scanner fingerprint",
+			cfg:         map[string]interface{}{},
+			wantEnabled: true,
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			c := defaultConfig()
+			cfg := map[string]interface{}{
+				"paths": []string{"/tmp/logs/*.log"},
+			}
+			for key, value := range tc.cfg {
+				cfg[key] = value
+			}
+			raw := conf.MustNewConfigFrom(cfg)
+			require.NoError(t, raw.Unpack(&c))
+
+			err := normalizeConfig(raw, &c)
+			require.NoError(t, err)
+
+			assert.Equal(t, tc.wantEnabled, c.FileWatcher.Scanner.Fingerprint.Enabled)
+		})
+	}
+}
+
 func TestValidateInputIDs(t *testing.T) {
 	tcs := []struct {
 		name       string
