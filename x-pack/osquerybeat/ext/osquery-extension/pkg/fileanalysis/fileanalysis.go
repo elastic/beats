@@ -17,13 +17,16 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	elasticfileanalysis "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_file_analysis"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 )
 
 func init() {
-	elasticfileanalysis.RegisterGenerateFunc(getResults)
+	elasticfileanalysis.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elasticfileanalysis.Result, error) {
+		return getResults(ctx, queryContext, log)
+	})
 }
 
 func executeStderr(ctx context.Context, name string, arg ...string) (out string, err error) {

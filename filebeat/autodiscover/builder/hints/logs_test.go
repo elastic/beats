@@ -1216,12 +1216,12 @@ func TestGenerateHints(t *testing.T) {
 			}
 
 			cfgs := l.CreateConfig(test.event)
-			assert.Equal(t, test.len, len(cfgs), test.msg)
+			assert.Len(t, cfgs, test.len, test.msg)
 			configs := make([]mapstr.M, 0)
 			for _, cfg := range cfgs {
 				config := mapstr.M{}
 				err := cfg.Unpack(&config)
-				ok := assert.Nil(t, err, test.msg)
+				ok := assert.NoError(t, err, test.msg)
 				if !ok {
 					break
 				}
@@ -1452,11 +1452,11 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 		}
 
 		cfgs := l.CreateConfig(test.event)
-		require.Equal(t, test.len, len(cfgs), test.msg)
+		require.Len(t, cfgs, test.len, test.msg)
 		if test.len != 0 {
 			config := mapstr.M{}
 			err := cfgs[0].Unpack(&config)
-			assert.Nil(t, err, test.msg)
+			assert.NoError(t, err, test.msg)
 
 			assert.Equal(t, test.result, config, test.msg)
 		}

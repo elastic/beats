@@ -4,6 +4,7 @@ on:
     types: [opened]
 
 permissions:
+  actions: read
   contents: read
   discussions: write
   issues: write
@@ -12,7 +13,7 @@ permissions:
 jobs:
   run:
     if: >-
-      contains(fromJSON('["strawgate","AlexanderWert","perk","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia","pierrehilbert","bturquet","teresaromero","mrodm","jsoriano","kpollich","andrewkroh","norrietaylor","ishleenk17","tommyers-elastic","lalit-satapathy","agithomas","belimawr","ycombinator","zmoog","MichaelKatsoulis","gizas","AndersonQ","chrisberkhout"]'), github.actor)
+      contains(fromJSON('["strawgate","AlexanderWert","perk","graphaelli","cmacknz","axw","theletterf","jlind23","nimarezainia","pierrehilbert","bturquet","teresaromero","mrodm","jsoriano","kpollich","andrewkroh","norrietaylor","ishleenk17","tommyers-elastic","lalit-satapathy","agithomas","belimawr","ycombinator","zmoog","MichaelKatsoulis","gizas","AndersonQ","chrisberkhout","marc-gr","efd6","muthu-mps","ShourieG"]'), github.actor)
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-issue-triage.lock.yml@v0
     with:
       setup-commands: |
