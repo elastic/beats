@@ -1,6 +1,7 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
+// This file was contributed to by generative AI
 
 package fbreceiver
 
@@ -21,6 +22,7 @@ import (
 	"strings"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -503,6 +505,7 @@ type logGenerator struct {
 	f           *os.File
 	sequenceNum int64
 	currentFile string
+	waitReady   func()
 }
 
 func newLogGenerator(t *testing.T, tmpDir string) *logGenerator {
@@ -524,6 +527,9 @@ func (g *logGenerator) Start() {
 	g.f = f
 	g.currentFile = filePath
 	atomic.StoreInt64(&g.sequenceNum, 0)
+	if g.waitReady != nil {
+		g.waitReady()
+	}
 }
 
 func (g *logGenerator) Stop() {
@@ -558,15 +564,28 @@ func TestConsumeContract(t *testing.T) {
 	defer oteltest.VerifyNoLeaks(t)
 
 	tmpDir := t.TempDir()
+	monitorSocket := genSocketPath(t)
 	const logsPerTest = 100
 
 	gen := newLogGenerator(t, tmpDir)
+	gen.waitReady = func() {
+		var lastError strings.Builder
+		require.Eventuallyf(t, func() bool {
+			if !getFromSocket(t, &lastError, monitorSocket, "stats") {
+				return false
+			}
+			return getFromSocket(t, &lastError, monitorSocket, "inputs")
+		}, 30*time.Second, 100*time.Millisecond, "receiver monitoring endpoints are not ready, last error: %s", &lastError)
+	}
 
 	t.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
+	// Disable AWS IMDS lookups to keep this contract test startup deterministic.
+	t.Setenv("AWS_EC2_METADATA_DISABLED", "true")
 
 	cfg := &Config{
 		Beatconfig: map[string]any{
 			"queue.mem.flush.timeout": "0s",
+			"processors":              []map[string]any{},
 			"filebeat": map[string]any{
 				"inputs": []map[string]any{
 					{
@@ -593,6 +612,8 @@ func TestConsumeContract(t *testing.T) {
 					},
 				},
 			},
+			"http.enabled": true,
+			"http.host":    hostFromSocket(monitorSocket),
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
