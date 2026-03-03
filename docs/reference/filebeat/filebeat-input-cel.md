@@ -133,7 +133,7 @@ The `status_code`, `header` and `rate_limit` values may be omitted if the progra
 
 ## Debug state logging [_debug_state_logging]
 
-The CEL input will log the complete state after evaluation when logging at the DEBUG level. This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object. See [`redact`](#cel-state-redact) configuration parameters for settings to exclude sensitive fields from DEBUG logs.
+The CEL input will log the complete state after evaluation when logging at the DEBUG level. This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object. Values under `state.secret` are always redacted automatically (see [`secret_state`](#secret-state-cel)). See [`redact`](#cel-state-redact) configuration parameters for settings to exclude other sensitive fields from DEBUG logs.
 
 
 ## CEL extension libraries [_cel_extension_libraries]
@@ -453,6 +453,45 @@ filebeat.inputs:
         "cursor": {"last_requested_at": now}
     })
 ```
+
+
+### `secret_state` [secret-state-cel]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+`secret_state` is an optional object holding secret key-value pairs. When configured in a Fleet integration package with `secret: true`, the values are stored encrypted by Fleet and decrypted before being passed to the input.
+
+At runtime, the contents of `secret_state` are placed at `state.secret`, making them available to the CEL program as `state.secret.<key>`. The key `secret` in the top-level `state` configuration is reserved — the input rejects any configuration where `state` contains a `secret` key, since values in `state` cannot be guaranteed to be encrypted in the stored configuration.
+
+`state.secret` is unconditionally added to the redaction list for debug logging, regardless of whether `secret_state` is configured. This means:
+
+- Secrets from `secret_state` are automatically redacted without any `redact` configuration.
+- CEL programs that stash sensitive runtime values (such as session tokens) into `state.secret` during execution will also have those values redacted in debug logs.
+- If `state.secret` is absent at log time, the redaction is a no-op.
+
+```yaml
+filebeat.inputs:
+- type: cel
+  interval: 1m
+  resource.url: https://api.example.com/data
+  secret_state:
+    api_key: "my-secret-api-key"
+  program: |
+    request("GET", state.url).with({
+        "Header": {"X-API-Key": [state.secret.api_key]}
+    }).do_request().as(resp, {
+        "events": [resp.Body.decode_json()],
+        "secret": state.secret,
+    })
+```
+
+In this example, `state.secret.api_key` holds the API key used in request headers. The `"secret": state.secret` line in the return value preserves the secret state across evaluation loops; like any other state field, it must be included in the program's return value to persist between evaluations.
+
+::::{note}
+Enabling `failure_dump` can write secrets (including `state.secret`) to disk, since the dump captures the full CEL evaluation state. This applies to any secrets in state, not only those from `secret_state`.
+::::
 
 
 ### `allowed_environment` [environ-cel]
@@ -1139,6 +1178,8 @@ stack: ga 8.7.0
 ```
 
 During debug level logging, the `state` object and the resulting evaluation result are included in logs. This may result in leaking of secrets. In order to prevent this, fields may be redacted or deleted from the logged `state`. The `redact` configuration allows users to configure this field redaction behavior. For safety reasons if the `redact` configuration is missing a warning is logged.
+
+The `state.secret` field is always redacted automatically (see [`secret_state`](#secret-state-cel)). When `secret_state` is configured and `redact` is not, the missing-redact warning is suppressed.
 
 In the case of no-required redaction an empty `redact.fields` configuration should be used to silence the logged warning.
 
