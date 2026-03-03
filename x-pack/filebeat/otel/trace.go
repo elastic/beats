@@ -284,7 +284,7 @@ func envDurationMillis(key string) time.Duration {
 	return time.Duration(n) * time.Millisecond
 }
 
-func envBoolFirstFound(keys ...string) (val bool, found bool, err error) {
+func envBoolFirstFound(keys ...string) (val, found bool, err error) {
 	for _, k := range keys {
 		raw, ok := os.LookupEnv(k)
 		if !ok {
@@ -369,7 +369,6 @@ func (rt *ExtraSpanAttribsRoundTripper) shouldRedact(name string) bool {
 }
 
 func (rt *ExtraSpanAttribsRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
-
 	span := trace.SpanFromContext(r.Context())
 	if span != nil && span.SpanContext().IsValid() {
 		for h := range r.Header {
@@ -428,7 +427,7 @@ func redactRawQuery(raw string, shouldRedact func(name string) bool) string {
 	return strings.Join(parts, "&")
 }
 
-func addHeaderAttr(span trace.Span, prefix string, name string, headers http.Header, shouldRedact func(string) bool) {
+func addHeaderAttr(span trace.Span, prefix, name string, headers http.Header, shouldRedact func(string) bool) {
 	const maxVals = 10
 	const maxValLen = 1024
 
