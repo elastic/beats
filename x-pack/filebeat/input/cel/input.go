@@ -509,8 +509,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			e, ok := state["events"]
 			if !ok {
 				metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+				err := errors.New("unexpected missing events array from evaluation")
 				errorSpans(err, end{execSpan}, runSpan)
-				return errors.New("unexpected missing events array from evaluation")
+				return err
 			}
 			var events []interface{}
 			switch e := e.(type) {
