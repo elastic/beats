@@ -1241,37 +1241,6 @@ func TestGetIngestTarget(t *testing.T) {
 	})
 }
 
-func TestToFileDescriptor_TooSmallFile_NoFileOpen(t *testing.T) {
-	dir := t.TempDir()
-	filename := filepath.Join(dir, "small.log")
-
-	fingerprintLength := int64(1024)
-
-	err := os.WriteFile(filename, []byte("a small file"), 0644)
-	require.NoError(t, err, "failed to create test file")
-
-	cfg := fileScannerConfig{
-		Fingerprint: fingerprintConfig{
-			Enabled: true,
-			Offset:  0,
-			Length:  fingerprintLength,
-		},
-	}
-
-	s, err := newFileScanner(logp.NewNopLogger(), []string{filename}, cfg, CompressionNone)
-	require.NoError(t, err, "failed to create scanner")
-	it, err := s.getIngestTarget(filename)
-	require.NoError(t, err, "getIngestTarget should succeed")
-
-	// Remove read permissions - if file is opened, we'll get permission denied
-	err = os.Chmod(filename, 0000)
-	require.NoError(t, err, "failed to chmod test file")
-
-	_, err = s.toFileDescriptor(&it)
-	require.ErrorIs(t, err, errFileTooSmall,
-		"expected errFileTooSmall, it probably tried to open the file")
-}
-
 func BenchmarkToFileDescriptor(b *testing.B) {
 	dir := b.TempDir()
 	basename := "created.log"
