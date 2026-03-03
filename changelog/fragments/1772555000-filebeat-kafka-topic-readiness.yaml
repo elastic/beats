@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Stabilize Filebeat Kafka input integration tests by waiting for topic write readiness.
-component: filebeat
