@@ -87,11 +87,12 @@ func TestRecordFilterMatch(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	assert.True(t, f.match(testRecord(time.Now().Add(-30*time.Minute), "myprovider", "", 3, 100)))
-	assert.True(t, f.match(testRecord(time.Now().Add(-30*time.Minute), "", "myprovider", 3, 201)))
+	assert.True(t, f.match(testRecord(time.Now().Add(-30*time.Minute), "MyProvider", "", 3, 100)))
 
 	assert.False(t, f.match(testRecord(time.Now().Add(-2*time.Hour), "myprovider", "", 3, 100)))
 	assert.False(t, f.match(testRecord(time.Now().Add(-30*time.Minute), "other", "", 3, 100)))
+	assert.False(t, f.match(testRecord(time.Now().Add(-30*time.Minute), "myprovider", "", 3, 100)))
+	assert.False(t, f.match(testRecord(time.Now().Add(-30*time.Minute), "", "MyProvider", 3, 201)))
 	assert.False(t, f.match(testRecord(time.Now().Add(-30*time.Minute), "myprovider", "", 2, 100)))
 	assert.False(t, f.match(testRecord(time.Now().Add(-30*time.Minute), "myprovider", "", 3, 300)))
 

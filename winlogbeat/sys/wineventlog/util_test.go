@@ -95,7 +95,7 @@ func safeWriteEvent(t testing.TB, log *eventlog.Log, eid uint32, msg string) {
 }
 
 // openLog opens an event log or .evtx file for reading.
-func openLog(t testing.TB, log string, eventIDFilters ...string) EvtHandle {
+func openLog(t testing.TB, log string) EvtHandle {
 	t.Helper()
 	var (
 		err   error
@@ -105,25 +105,16 @@ func openLog(t testing.TB, log string, eventIDFilters ...string) EvtHandle {
 
 	if info, err := os.Stat(log); err == nil && info.Mode().IsRegular() {
 		flags |= EvtQueryFilePath
-	} else {
-		flags |= EvtQueryChannelPath
-	}
-
-	var query string
-	if len(eventIDFilters) > 0 {
-		// Convert to URI.
 		abs, err := filepath.Abs(log)
 		if err != nil {
 			t.Fatal(err)
 		}
-		path = "file://" + filepath.ToSlash(abs)
-
-		query, err = Query{Log: path, EventID: strings.Join(eventIDFilters, ",")}.Build()
-		if err != nil {
-			t.Fatal(err)
-		}
-		path = ""
+		path = abs
+	} else {
+		flags |= EvtQueryChannelPath
 	}
+
+	query := "*"
 
 	h, err := EvtQuery(NilHandle, path, query, flags)
 	if err != nil {

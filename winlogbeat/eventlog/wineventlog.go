@@ -127,14 +127,13 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		l.query = c.XMLQuery
 	} else {
 		l.log = l.log.With("channel", c.Name)
-		queryLog := c.Name
 		if info, err := os.Stat(c.Name); err == nil && info.Mode().IsRegular() {
 			path, err := filepath.Abs(c.Name)
 			if err != nil {
 				return nil, err
 			}
 			l.file = true
-			queryLog = "file://" + path
+			l.channelName = path
 		}
 
 		l.filter, err = newRecordFilter(c.SimpleQuery)
@@ -142,13 +141,8 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 			return nil, err
 		}
 
-		// Always use an unfiltered subscription query and apply any configured
-		// filters in Go after events are read.
-		winQuery := win.Query{Log: queryLog}
-		l.query, err = winQuery.Build()
-		if err != nil {
-			return nil, err
-		}
+		// Always use an unfiltered query and apply configured filters in Go.
+		l.query = "*"
 	}
 
 	switch c.IncludeXML || l.isForwarded() {
@@ -287,10 +281,14 @@ func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) 
 	}
 
 	l.log.Debugw("Using subscription query.", "winlog.query", l.query)
+	channelPath := ""
+	if l.config.XMLQuery == "" {
+		channelPath = l.channelName
+	}
 	h, err := win.Subscribe(
 		0, // Session - nil for localhost
 		signalEvent,
-		"",                      // Channel - empty b/c channel is in the query
+		channelPath,
 		l.query,                 // Query - nil means all events
 		win.EvtHandle(bookmark), // Bookmark - for resuming from a specific event
 		flags)
@@ -301,7 +299,7 @@ func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) 
 	case win.ERROR_NOT_FOUND, win.ERROR_EVT_QUERY_RESULT_STALE, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION:
 		// The bookmarked event was not found, we retry the subscription from the start.
 		incrementMetric(readErrors, err)
-		return win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
+		return win.Subscribe(0, signalEvent, channelPath, l.query, 0, win.EvtSubscribeStartAtOldestRecord)
 	default:
 		return 0, err
 	}

@@ -51,9 +51,8 @@ func newRecordFilter(q query) (*recordFilter, error) {
 	if len(q.Provider) > 0 {
 		f.providers = make(map[string]struct{}, len(q.Provider))
 		for _, provider := range q.Provider {
-			p := strings.ToLower(strings.TrimSpace(provider))
-			if p != "" {
-				f.providers[p] = struct{}{}
+			if provider != "" {
+				f.providers[provider] = struct{}{}
 			}
 		}
 	}
@@ -88,12 +87,8 @@ func (f *recordFilter) match(r *Record) bool {
 	}
 
 	if len(f.providers) > 0 {
-		name := strings.ToLower(r.Provider.Name)
-		source := strings.ToLower(r.Provider.EventSourceName)
-		if _, ok := f.providers[name]; !ok {
-			if _, ok := f.providers[source]; !ok {
-				return false
-			}
+		if _, ok := f.providers[r.Provider.Name]; !ok {
+			return false
 		}
 	}
 
