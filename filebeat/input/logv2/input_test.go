@@ -20,6 +20,8 @@ package logv2
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -88,4 +90,57 @@ func TestRunAsFilestream(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestManagerRedirect(t *testing.T) {
+	setUnderAgent := func(t *testing.T, v bool) {
+		t.Helper()
+		prev := management.UnderAgent()
+		t.Cleanup(func() { management.SetUnderAgent(prev) })
+		management.SetUnderAgent(v)
+	}
+
+	t.Run("redirects_to_filestream", func(t *testing.T) {
+		setUnderAgent(t, true)
+		m := manager{logger: logp.NewNopLogger()}
+		cfg := config.MustNewConfigFrom(map[string]any{
+			"type":              "log",
+			"id":                "test-id",
+			"paths":             []string{"/var/log.log"},
+			"run_as_filestream": true,
+		})
+
+		target, translated, err := m.Redirect(cfg)
+		require.NoError(t, err)
+		require.Equal(t, "filestream", target)
+		require.NotNil(t, translated)
+
+		typ, err := translated.String("type", -1)
+		require.NoError(t, err)
+		require.Equal(t, "filestream", typ)
+	})
+
+	t.Run("no_redirect_when_flag_is_absent", func(t *testing.T) {
+		setUnderAgent(t, true)
+		m := manager{logger: logp.NewNopLogger()}
+		cfg := config.MustNewConfigFrom(map[string]any{
+			"type":  "log",
+			"paths": []string{"/var/log.log"},
+		})
+
+		target, translated, err := m.Redirect(cfg)
+		require.NoError(t, err)
+		require.Empty(t, target)
+		require.Nil(t, translated)
+	})
+
+	t.Run("error_on_invalid_config", func(t *testing.T) {
+		m := manager{logger: logp.NewNopLogger()}
+		cfg := config.NewConfig()
+
+		target, translated, err := m.Redirect(cfg)
+		require.Error(t, err)
+		require.Empty(t, target)
+		require.Nil(t, translated)
+	})
 }
