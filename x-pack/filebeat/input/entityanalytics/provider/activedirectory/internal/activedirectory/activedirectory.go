@@ -278,7 +278,7 @@ func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, u
 
 	// Also collect users that are members of groups that have changed.
 	if sinceFmtd != "" {
-		grps, err := search(conn, baseDN, "(&(objectClass=groups)(whenChanged>="+sinceFmtd+"))", grpAttrs, pagingSize)
+		grps, err := search(conn, baseDN, "(&(objectClass=group)(whenChanged>="+sinceFmtd+"))", grpAttrs, pagingSize)
 		if err != nil {
 			// Allow continuation if groups query fails, but warn.
 			errs = append(errs, fmt.Errorf("failed to collect changed groups: %w: %w", ErrGroups, err))
