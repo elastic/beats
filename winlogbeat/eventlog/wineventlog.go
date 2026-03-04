@@ -25,7 +25,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"golang.org/x/sys/windows"
 
@@ -34,7 +33,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	wininfo "github.com/elastic/go-sysinfo/providers/windows"
 )
 
 // winEventLog implements the EventLog interface for reading from the Windows
@@ -80,11 +78,6 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 	}
 
 	if c.XMLQuery != "" {
-		if l.skipQueryFilters() {
-			l.log.Warn("you are using a custom XML query with Windows Server 2025 and forwarded events, " +
-				"this is not recommended due to a known issue with that can crash the Event Log service if using" +
-				" query filters. Please use a custom query without filters or use the default query")
-		}
 		l.query = c.XMLQuery
 	} else {
 		l.log = l.log.With("channel", c.Name)
@@ -384,20 +377,4 @@ func (l *winEventLog) close() error {
 		l.iterator.Close(),
 		l.renderer.Close(),
 	)
-}
-
-// FIXME: Windows Server 2025 has a bug in the Windows Event Log API that causes
-// the Event Log Service to crash when using some combinations of filters with
-// forwarded events. This is a workaround to skip the query filters for
-// Windows Server 2025 in such scenarios.
-func (l *winEventLog) skipQueryFilters() bool {
-	if l.config.Bypass2025Workaround {
-		return false
-	}
-	osinfo, err := wininfo.OperatingSystem()
-	if err != nil {
-		l.log.Warnf("failed to get OS info: %v", err)
-		return false
-	}
-	return l.isForwarded() && strings.Contains(osinfo.Name, "2025")
 }

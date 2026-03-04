@@ -43,8 +43,8 @@ On 04/16/2025, a known issue was discovered that can cause a crash of the Event 
 **Workaround** 
 As a workaround, and to prevent crashes, Beats will ignore any filters provided when working with forwarded events on Windows Server 2025 until the issue is resolved.
 
-% **Resolved**
-% On [Month/Day/Year], this issue was resolved.
+**Resolved**
+This issue is resolved by always subscribing with an unfiltered `*` query and applying `ignore_older`, `provider`, `event_id`, and `level` filtering in Beats code after events are read, avoiding the problematic OS filter path. To apply the fix, please upgrade to version 9.2.7, 9.3.2, 9.4.0, or any subsequent release.
 :::
 
 
