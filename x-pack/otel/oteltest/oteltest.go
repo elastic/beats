@@ -188,8 +188,7 @@ func CheckReceivers(params CheckReceiversParams) {
 			require.NotNil(ct, host.getEvent(), "expected not nil, got nil")
 
 			if params.Status != nil {
-				assert.Equal(t, params.Status.Status(), params.Status.Status(), host.Evt.Status(),
-					"expected status to be %v, got %v", params.Status.Status(), host.Evt.Status())
+				assert.Equal(t, params.Status.Status(), host.Evt.Status())
 				assert.Equal(t, params.Status.Err(), host.Evt.Err())
 				assert.Equal(t, params.Status.Attributes().AsRaw(), host.Evt.Attributes().AsRaw())
 			}
