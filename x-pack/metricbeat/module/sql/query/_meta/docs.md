@@ -128,7 +128,7 @@ Cursor is also not compatible with `fetch_from_all_databases`. Use a separate mo
   metricsets: [query]
   hosts: ["oracle://user:pass@localhost:1521/MYDB"]
   driver: oracle
-  sql_query: "SELECT report_date, metrics FROM daily_reports WHERE report_date > :cursor ORDER BY report_date ASC"
+  sql_query: "SELECT report_date, metrics FROM daily_reports WHERE report_date > :cursor ORDER BY report_date ASC FETCH FIRST 500 ROWS ONLY"
   sql_response_format: table
   raw_data.enabled: true
   cursor:
