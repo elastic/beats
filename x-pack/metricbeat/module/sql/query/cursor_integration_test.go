@@ -1187,10 +1187,46 @@ func testOracleTimestampPrecision(t *testing.T, dsn string) {
 func testOracleDateCursor(t *testing.T, dsn string) {
 	t.Helper()
 
-	testPaths := createTestPaths(t)
-	defaultDate := time.Now().Add(-24 * time.Hour).UTC().Format("2006-01-02")
+	// Oracle DATE includes a time component, so TO_DATE('2026-03-03','YYYY-MM-DD')
+	// produces midnight. Rows on the same calendar date but with a non-zero time
+	// are still "greater than" midnight. To test date cursor pagination correctly
+	// we need rows spread across distinct calendar dates with their time component
+	// truncated to midnight.
+	tableName := "cursor_date_test_oracle"
+	db, err := sql.Open("godror", dsn)
+	require.NoError(t, err)
+	defer db.Close()
 
-	query := "SELECT id, event_data, event_date FROM cursor_test_events WHERE event_date > TO_DATE(:cursor, 'YYYY-MM-DD') ORDER BY event_date ASC, id ASC FETCH FIRST 3 ROWS ONLY"
+	_, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName))
+	_, err = db.Exec(fmt.Sprintf(`
+		CREATE TABLE %s (
+			id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+			event_data VARCHAR2(255),
+			event_date DATE
+		)
+	`, tableName))
+	require.NoError(t, err, "Failed to create date cursor test table")
+	defer func() { _, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName)) }()
+
+	// Insert 6 rows across 6 distinct dates (today-5 .. today), all at midnight
+	// so TO_DATE comparison works cleanly.
+	today := time.Now().UTC().Truncate(24 * time.Hour)
+	for i := 0; i < 6; i++ {
+		d := today.AddDate(0, 0, i-5) // today-5, today-4, ..., today
+		_, err := db.Exec(
+			fmt.Sprintf("INSERT INTO %s (event_data, event_date) VALUES (:1, :2)", tableName),
+			fmt.Sprintf("event-%d", i), d,
+		)
+		require.NoError(t, err, "Failed to insert date cursor test row %d", i)
+	}
+
+	testPaths := createTestPaths(t)
+	defaultDate := today.AddDate(0, 0, -6).Format("2006-01-02") // day before oldest row
+
+	query := fmt.Sprintf(
+		"SELECT id, event_data, event_date FROM %s WHERE event_date > TO_DATE(:cursor, 'YYYY-MM-DD') ORDER BY event_date ASC, id ASC FETCH FIRST 3 ROWS ONLY",
+		tableName,
+	)
 
 	cfg := map[string]interface{}{
 		"module":              "sql",
@@ -1206,7 +1242,8 @@ func testOracleDateCursor(t *testing.T, dsn string) {
 		"cursor.default":      defaultDate,
 	}
 
-	// First fetch — all 10 rows have today's date, which is > yesterday's default
+	// First fetch — returns 3 oldest rows (dates today-5, today-4, today-3)
+	// Cursor advances to today-3.
 	ms1 := newMetricSetWithPaths(t, cfg, testPaths)
 	events1, errs1 := fetchEvents(t, ms1)
 	require.Empty(t, errs1, "First date fetch should not have errors")
@@ -1215,16 +1252,22 @@ func testOracleDateCursor(t *testing.T, dsn string) {
 		require.NoError(t, closer.Close())
 	}
 
-	// Second fetch — since all rows share the same date (today), the cursor
-	// value is today's date. The query WHERE event_date > today returns 0 rows
-	// because there are no future-dated rows. This is expected behavior for date
-	// cursors when all data shares the same date — timestamp cursors handle
-	// intra-day ordering better.
+	// Second fetch — returns next 3 rows (dates today-2, today-1, today)
+	// Cursor advances to today.
 	ms2 := newMetricSetWithPaths(t, cfg, testPaths)
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2, "Second date fetch should not have errors")
-	require.Len(t, events2, 0, "Second date fetch should return 0 events")
+	require.Len(t, events2, 3, "Second date fetch should return 3 events")
 	if closer, ok := ms2.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Third fetch — no rows remain after today
+	ms3 := newMetricSetWithPaths(t, cfg, testPaths)
+	events3, errs3 := fetchEvents(t, ms3)
+	require.Empty(t, errs3, "Third date fetch should not have errors")
+	require.Empty(t, events3, "Third date fetch should return 0 events")
+	if closer, ok := ms3.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
 }
