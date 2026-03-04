@@ -244,4 +244,32 @@ func Test(t *testing.T) {
 		}
 		t.Logf("user: %s", b)
 	})
+
+	t.Run("empty_groups", func(t *testing.T) {
+		groups, err := GetEmptyGroups(url, user, pass, base, time.Time{}, nil, 0, nil, nil)
+		if err != nil {
+			t.Fatalf("unexpected error from GetEmptyGroups: %v", err)
+		}
+
+		for _, g := range groups {
+			if g.Group == nil {
+				t.Errorf("expected Group to be set for entry %q", g.ID)
+			}
+			if g.User != nil {
+				t.Errorf("expected User to be nil for entry %q", g.ID)
+			}
+			if g.ID == "" {
+				t.Error("expected non-empty ID")
+			}
+		}
+
+		if !*logResponses {
+			return
+		}
+		b, err := json.MarshalIndent(groups, "", "\t")
+		if err != nil {
+			t.Errorf("failed to marshal groups for logging: %v", err)
+		}
+		t.Logf("empty groups: %s", b)
+	})
 }
