@@ -21,9 +21,12 @@ import (
 	"errors"
 	"os"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type deleterLoop struct {
+	paths *paths.Path
 	// The settings for the queue that created this loop.
 	settings Settings
 
@@ -47,8 +50,9 @@ type deleterLoopResponse struct {
 	results []error
 }
 
-func newDeleterLoop(settings Settings) *deleterLoop {
+func newDeleterLoop(settings Settings, paths *paths.Path) *deleterLoop {
 	return &deleterLoop{
+		paths:    paths,
 		settings: settings,
 
 		requestChan:  make(chan deleterLoopRequest, 1),
@@ -67,7 +71,7 @@ func (dl *deleterLoop) run() {
 		results := []error{}
 		deletedCount := 0
 		for _, segment := range request.segments {
-			path := dl.settings.segmentPath(segment.id)
+			path := dl.settings.segmentPath(segment.id, dl.paths)
 			err := os.Remove(path)
 			// We ignore errors caused by the file not existing: this shouldn't
 			// happen, but it is still safe to report it as successfully removed.
