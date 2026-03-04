@@ -111,7 +111,7 @@ func (r *HBRunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 
 		if _, ok := r.runners[hash]; ok {
 			delete(stopList, hash)
-			updateList[hash] = config
+			updateList[hash] = config // We need to check if the runner takes updates
 		} else {
 			startList[hash] = config
 		}
@@ -124,29 +124,21 @@ func (r *HBRunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	// Update existing runners. This should come before other cycles, if there're
 	// any errors updating, we resort to normal stop/star cycle
 	for hash, cfg := range updateList {
-		wg.Add(1)
 		runner := r.runners[hash]
-		go func(runner cfgfile.Runner) {
-			defer wg.Done()
-			r.logger.Debugf("Runner updating: %s", runner)
-			if runner, ok := runner.(UpdatableRunner); ok {
-				c, _ := config.NewConfigFrom(cfg.Config)
-				if err := runner.Update(c); err != nil {
-					r.logger.Errorf("error updating runner, moving to start/stop: %w", err)
-					stopList[hash] = runner
-					startList[hash] = cfg
-				} else {
-					r.logger.Debugf("Runner: '%s' has been updated", runner)
-				}
-			} else {
-				r.logger.Errorf("non-updatable runner, moving to start/stop: %s", runner)
+		r.logger.Debugf("Runner updating: %s", runner)
+		if ur, ok := runner.(UpdatableRunner); ok {
+			c, _ := config.NewConfigFrom(cfg.Config)
+			if err := ur.Update(c); err != nil {
+				r.logger.Errorf("error updating runner, moving to start/stop: %v", err)
 				stopList[hash] = runner
 				startList[hash] = cfg
+			} else {
+				r.logger.Debugf("Runner: '%s' has been updated", runner)
 			}
-		}(runner)
+		} else {
+			r.logger.Errorf("non-updatable runner, skipping: %s", runner)
+		}
 	}
-
-	wg.Wait()
 
 	// Stop removed runners
 	for hash, runner := range stopList {
