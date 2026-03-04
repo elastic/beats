@@ -60,15 +60,10 @@ func genGenerateModuleCmd() *cobra.Command {
 		}),
 	}
 
-<<<<<<< HEAD
-	genModuleCmd.Flags().String("modules-path", defaultHomePath, "Path to modules directory")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("modules-path")
-	genModuleCmd.Flags().String("es-beats", defaultHomePath, "Path to Elastic Beats")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("es-beats")
-=======
 	genModuleCmd.Flags().String("modules-path", ".", "Path to modules directory")
+	cfgfile.AddAllowedBackwardsCompatibleFlag("modules-path")
 	genModuleCmd.Flags().String("es-beats", ".", "Path to Elastic Beats")
->>>>>>> dc2e6c4f2 (Replace global paths.Resolve in filebeat generate command (#49097))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("es-beats")
 
 	return genModuleCmd
 }
@@ -92,15 +87,10 @@ func genGenerateFilesetCmd() *cobra.Command {
 		}),
 	}
 
-<<<<<<< HEAD
-	genFilesetCmd.Flags().String("modules-path", defaultHomePath, "Path to modules directory")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("modules-path")
-	genFilesetCmd.Flags().String("es-beats", defaultHomePath, "Path to Elastic Beats")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("es-beats")
-=======
 	genFilesetCmd.Flags().String("modules-path", ".", "Path to modules directory")
+	cfgfile.AddAllowedBackwardsCompatibleFlag("modules-path")
 	genFilesetCmd.Flags().String("es-beats", ".", "Path to Elastic Beats")
->>>>>>> dc2e6c4f2 (Replace global paths.Resolve in filebeat generate command (#49097))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("es-beats")
 
 	return genFilesetCmd
 }
@@ -124,12 +114,8 @@ func genGenerateFieldsCmd() *cobra.Command {
 		}),
 	}
 
-<<<<<<< HEAD
-	genFieldsCmd.Flags().String("es-beats", defaultHomePath, "Path to Elastic Beats")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("es-beats")
-=======
 	genFieldsCmd.Flags().String("es-beats", ".", "Path to Elastic Beats")
->>>>>>> dc2e6c4f2 (Replace global paths.Resolve in filebeat generate command (#49097))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("es-beats")
 	genFieldsCmd.Flags().Bool("without-documentation", false, "Do not add description fields")
 	cfgfile.AddAllowedBackwardsCompatibleFlag("without-documentation")
 
