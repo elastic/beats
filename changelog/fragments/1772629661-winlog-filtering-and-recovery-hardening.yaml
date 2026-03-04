@@ -1,0 +1,11 @@
+kind: bug-fix
+summary: Move winlog filtering to Go-side evaluation and harden recovery paths.
+
+description: |
+  Winlogbeat and Filebeat winlog input now subscribe with unfiltered queries for non-custom configurations
+  and apply ignore_older, provider, event_id, and level filtering in code. This avoids unreliable Windows
+  query-filter behavior in affected environments while preserving custom xml_query passthrough. The change
+  also improves read/iterator recovery behavior, keeps final-batch publish semantics on EOF, and adds a
+  retry circuit-breaker for persistent render failures without partial events.
+
+component: winlogbeat
