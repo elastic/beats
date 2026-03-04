@@ -39,7 +39,6 @@ import (
 
 var errRecordIDGap = errors.New("record ID gap detected")
 var errRenderNoEvent = errors.New("rendering error without partial event")
-var errRenderNoEventNoBookmark = errors.New("rendering error without partial event and without bookmark")
 
 const renderNoEventRetryLimit = 3
 const recordIDGapRetryLimit = 3
@@ -408,8 +407,12 @@ func (l *winEventLog) handleProcessError(err error) error {
 		if bookmark := renderErr.Bookmark(); bookmark != "" {
 			l.lastRead.Bookmark = bookmark
 		} else {
+			l.log.Errorw("Dropping poison event without bookmark after repeated render failures.",
+				"channel", l.channelName,
+				"retry_count", retryCount,
+				"retry_limit", renderNoEventRetryLimit)
 			l.resetRenderNoEventRetry()
-			return fmt.Errorf("%w: %v", errRenderNoEventNoBookmark, err)
+			return nil
 		}
 		// We advanced by bookmark only; clear record number so gap detection
 		// does not compare against stale numeric state.
