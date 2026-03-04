@@ -39,13 +39,16 @@ import (
 
 var errRecordIDGap = errors.New("record ID gap detected")
 var errRenderNoEvent = errors.New("rendering error without partial event")
+var errRenderNoEventNoBookmark = errors.New("rendering error without partial event and without bookmark")
 
-const renderNoEventRetryLimit = 5
+const renderNoEventRetryLimit = 3
+const recordIDGapRetryLimit = 3
 
 type gapDetectedError struct {
 	channel  string
 	previous uint64
 	current  uint64
+	bookmark string
 }
 
 func (e *gapDetectedError) Error() string {
@@ -54,6 +57,13 @@ func (e *gapDetectedError) Error() string {
 }
 
 func (e *gapDetectedError) Unwrap() error { return errRecordIDGap }
+func (e *gapDetectedError) Bookmark() string {
+	return e.bookmark
+}
+
+func (e *gapDetectedError) RetryKey() string {
+	return fmt.Sprintf("%s:%d:%d", e.channel, e.previous, e.current)
+}
 
 type renderNoEventError struct {
 	cause    error
@@ -70,6 +80,13 @@ func (e *renderNoEventError) Error() string {
 func (e *renderNoEventError) Unwrap() error { return errRenderNoEvent }
 func (e *renderNoEventError) Bookmark() string {
 	return e.bookmark
+}
+
+func (e *renderNoEventError) RetryKey() string {
+	if e.bookmark != "" {
+		return e.bookmark
+	}
+	return fmt.Sprintf("no-bookmark:%v", e.cause)
 }
 
 func (l *winEventLog) newRenderNoEventError(handle win.EvtHandle, cause error) *renderNoEventError {
@@ -100,6 +117,8 @@ type winEventLog struct {
 
 	renderNoEventKey   string
 	renderNoEventCount int
+	gapRetryKey        string
+	gapRetryCount      int
 }
 
 // newWinEventLog creates and returns a new EventLog for reading event logs
@@ -316,6 +335,9 @@ func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) 
 	case win.ERROR_NOT_FOUND, win.ERROR_EVT_QUERY_RESULT_STALE, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION:
 		// The bookmarked event was not found, we retry the subscription from the start.
 		incrementMetric(readErrors, err)
+		// Clear persisted checkpoint fields before restarting at oldest so stale
+		// state does not produce synthetic gap checks on the next records.
+		l.resetLastRead()
 		return win.Subscribe(0, signalEvent, channelPath, l.query, 0, win.EvtSubscribeStartAtOldestRecord)
 	default:
 		return 0, err
@@ -338,6 +360,8 @@ func (l *winEventLog) Read() ([]Record, error) {
 			continue
 		}
 		l.resetRenderNoEventRetry()
+		// Any successfully processed event breaks a previous gap retry streak.
+		l.resetGapRetry()
 		if l.filter != nil && !l.filter.match(record) {
 			continue
 		}
@@ -366,8 +390,11 @@ func (l *winEventLog) Read() ([]Record, error) {
 func (l *winEventLog) handleProcessError(err error) error {
 	var renderErr *renderNoEventError
 	if errors.As(err, &renderErr) {
+		// Render-no-event and gap retries are independent counters; reset gap
+		// state while handling render failures to avoid cross-error pollution.
+		l.resetGapRetry()
 		l.metrics.logError(err)
-		retryCount := l.incrementRenderNoEventRetry(renderErr.Bookmark())
+		retryCount := l.incrementRenderNoEventRetry(renderErr.RetryKey())
 		if retryCount <= renderNoEventRetryLimit {
 			return err
 		}
@@ -380,12 +407,50 @@ func (l *winEventLog) handleProcessError(err error) error {
 		incrementMetric(dropReasons, errRenderNoEvent.Error())
 		if bookmark := renderErr.Bookmark(); bookmark != "" {
 			l.lastRead.Bookmark = bookmark
+		} else {
+			l.resetRenderNoEventRetry()
+			return fmt.Errorf("%w: %v", errRenderNoEventNoBookmark, err)
 		}
+		// We advanced by bookmark only; clear record number so gap detection
+		// does not compare against stale numeric state.
+		l.lastRead.RecordNumber = 0
 		l.resetRenderNoEventRetry()
 		return nil
 	}
 
 	l.resetRenderNoEventRetry()
+	var gapErr *gapDetectedError
+	if errors.As(err, &gapErr) {
+		// Gap errors are retried first (runner reset + backoff) because in-flight
+		// events can arrive and fill the gap shortly after detection.
+		l.metrics.logError(err)
+		retryCount := l.incrementGapRetry(gapErr.RetryKey())
+		if retryCount <= recordIDGapRetryLimit {
+			return err
+		}
+
+		// After repeated retries on the same gap boundary, accept the gap and
+		// advance state to avoid an infinite reset loop.
+		l.log.Errorw("Accepting record ID gap after repeated retries.",
+			"channel", l.channelName,
+			"retry_count", retryCount,
+			"retry_limit", recordIDGapRetryLimit,
+			"previous_record_id", gapErr.previous,
+			"current_record_id", gapErr.current,
+			"missing", gapErr.current-gapErr.previous-1)
+		l.metrics.logDropped(err)
+		incrementMetric(dropReasons, errRecordIDGap.Error())
+		if bookmark := gapErr.Bookmark(); bookmark != "" {
+			l.lastRead.Bookmark = bookmark
+		}
+		l.lastRead.RecordNumber = gapErr.current
+		// Gap was handled (accepted/dropped), so clear retry state for the next boundary.
+		l.resetGapRetry()
+		return nil
+	}
+
+	// Different/non-gap error path; discard any stale gap retry context.
+	l.resetGapRetry()
 	if errors.Is(err, errRecordIDGap) || errors.Is(err, errRenderNoEvent) {
 		l.metrics.logError(err)
 		return err
@@ -423,17 +488,15 @@ func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 	}
 
 	prevRecordID := l.lastRead.RecordNumber
-	if prevRecordID > 0 && r.RecordID > prevRecordID+1 {
+	if !l.file && prevRecordID > 0 && r.RecordID > prevRecordID+1 {
+		// Gap detection is channel-only. File reads can legitimately contain
+		// non-contiguous record IDs and should not trigger recovery.
 		l.log.Warnw("Record ID gap detected, resetting subscription.",
 			"channel", l.channelName,
 			"previous_record_id", prevRecordID,
 			"current_record_id", r.RecordID,
 			"missing", r.RecordID-prevRecordID-1)
-		return nil, &gapDetectedError{
-			channel:  l.channelName,
-			previous: prevRecordID,
-			current:  r.RecordID,
-		}
+		return nil, l.newGapDetectedError(h, prevRecordID, r.RecordID)
 	}
 
 	r.Offset = checkpoint.EventLogState{
@@ -447,6 +510,23 @@ func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 	}
 	l.lastRead = r.Offset
 	return r, nil
+}
+
+func (l *winEventLog) newGapDetectedError(handle win.EvtHandle, previousRecordID, currentRecordID uint64) *gapDetectedError {
+	// Capture the current event bookmark so the gap circuit-breaker can skip
+	// this boundary if retries are exhausted.
+	bookmark, err := l.createBookmarkFromEvent(handle)
+	if err != nil {
+		l.metrics.logError(err)
+		l.log.Warnw("Failed creating bookmark for record ID gap recovery.", "error", err)
+	}
+
+	return &gapDetectedError{
+		channel:  l.channelName,
+		previous: previousRecordID,
+		current:  currentRecordID,
+		bookmark: bookmark,
+	}
 }
 
 func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
@@ -503,4 +583,26 @@ func (l *winEventLog) incrementRenderNoEventRetry(bookmark string) int {
 func (l *winEventLog) resetRenderNoEventRetry() {
 	l.renderNoEventKey = ""
 	l.renderNoEventCount = 0
+}
+
+func (l *winEventLog) incrementGapRetry(key string) int {
+	if key == l.gapRetryKey && l.gapRetryCount > 0 {
+		l.gapRetryCount++
+		return l.gapRetryCount
+	}
+
+	l.gapRetryKey = key
+	l.gapRetryCount = 1
+	return l.gapRetryCount
+}
+
+func (l *winEventLog) resetGapRetry() {
+	l.gapRetryKey = ""
+	l.gapRetryCount = 0
+}
+
+func (l *winEventLog) resetLastRead() {
+	// Keep this scoped to fields used by resubscribe/gap logic.
+	l.lastRead.Bookmark = ""
+	l.lastRead.RecordNumber = 0
 }

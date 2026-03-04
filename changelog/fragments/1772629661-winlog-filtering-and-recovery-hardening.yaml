@@ -1,4 +1,4 @@
-kind: bug-fix
+kind: enhancement
 summary: Move winlog filtering to Go-side evaluation and harden recovery paths.
 
 description: |
