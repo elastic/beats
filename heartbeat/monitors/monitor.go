@@ -284,7 +284,7 @@ func (m *Monitor) Update(config *conf.C) error {
 
 	m.updateStatus(status.Configuring, "updating runner config")
 	m.plugin.Update(config)
-	m.updateStatus(status.Running, "runned updated")
+	m.updateStatus(status.Running, "runner updated")
 
 	return nil
 }

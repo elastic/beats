@@ -162,7 +162,7 @@ func Register(name string, make PluginMake, aliases ...string) {
 
 func RegisterWithHashFunc(name string, hashConfig HashConfigFunc, make PluginMake, aliases ...string) {
 	stats := statsForPlugin(name)
-	if err := GlobalPluginsReg.Add(PluginFactory{name, aliases, make, stats, nil}); err != nil {
+	if err := GlobalPluginsReg.Add(PluginFactory{name, aliases, make, stats, hashConfig}); err != nil {
 		panic(err)
 	}
 }

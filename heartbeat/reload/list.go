@@ -45,9 +45,9 @@ type HBRunnerList struct {
 	logger   *logp.Logger
 }
 
-// UpdateableRunner (optional) If a Runner implements this, the reload logic
+// UpdatableRunner (optional) If a Runner implements this, the reload logic
 // may call Update when config for the same integration changes.
-type UpdateableRunner interface {
+type UpdatableRunner interface {
 	cfgfile.Runner
 	Update(newConfig *config.C) error
 }
@@ -125,21 +125,28 @@ func (r *HBRunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	// any errors updating, we resort to normal stop/star cycle
 	for hash, cfg := range updateList {
 		wg.Add(1)
-
-		if hbrunner, ok := r.runners[hash].(UpdateableRunner); ok {
-			r.logger.Debugf("updating runner: %s", hbrunner)
-
-			c, _ := config.NewConfigFrom(cfg.Config)
-			if err := hbrunner.Update(c); err != nil {
-				r.logger.Errorf("error updating runner, moving to start/stop: %v", err)
-				stopList[hash] = hbrunner
-				startList[hash] = cfg
+		runner := r.runners[hash]
+		go func(runner cfgfile.Runner) {
+			defer wg.Done()
+			r.logger.Debugf("Runner updating: %s", runner)
+			if runner, ok := runner.(UpdatableRunner); ok {
+				c, _ := config.NewConfigFrom(cfg.Config)
+				if err := runner.Update(c); err != nil {
+					r.logger.Errorf("error updating runner, moving to start/stop: %w", err)
+					stopList[hash] = runner
+					startList[hash] = cfg
+				} else {
+					r.logger.Debugf("Runner: '%s' has been updated", runner)
+				}
 			} else {
-				r.logger.Debugf("runner updated successfully")
+				r.logger.Errorf("non-updatable runner, moving to start/stop: %s", runner)
+				stopList[hash] = runner
+				startList[hash] = cfg
 			}
-		}
-
+		}(runner)
 	}
+
+	wg.Wait()
 
 	// Stop removed runners
 	for hash, runner := range stopList {

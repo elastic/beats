@@ -101,7 +101,7 @@ func (sj *SourceJob) Update(c *config.C) error {
 	var cfg Config
 	err := c.Unpack(&cfg)
 	if err != nil {
-		return fmt.Errorf("error unpacking brwoser config for update: %w", err)
+		return fmt.Errorf("error unpacking browser config for update: %w", err)
 	}
 
 	// Selectively update fields
