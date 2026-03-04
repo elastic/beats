@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	cfg "github.com/elastic/elastic-agent-libs/config"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/extension"

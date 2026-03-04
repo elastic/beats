@@ -6,6 +6,7 @@ package elasticstorage
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/otel/extension/elasticstorage/internal/metadata"
 
@@ -18,5 +19,9 @@ func NewFactory() extension.Factory {
 }
 
 func newExtension(ctx context.Context, set extension.Settings, cfg component.Config) (extension.Extension, error) {
-	return &elasticStorage{cfg: cfg.(*Config), logger: set.Logger.Named("elasticstorage")}, nil
+	config, ok := cfg.(*Config)
+	if !ok {
+		return nil, fmt.Errorf("could not convert otel config to elasticstorage config")
+	}
+	return &elasticStorage{cfg: config, logger: set.Logger.Named("elasticstorage")}, nil
 }
