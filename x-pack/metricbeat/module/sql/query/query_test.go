@@ -8,6 +8,7 @@ package query
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -41,32 +42,32 @@ type fakeDBClient struct {
 	withParamArgs    [][]interface{}
 	closed           bool
 
-	fetchTableFn          func(query string) ([]mapstr.M, error)
-	fetchVariableFn       func(query string) (mapstr.M, error)
-	fetchTableWithParamFn func(query string, args ...interface{}) ([]mapstr.M, error)
+	fetchTableFn          func(ctx context.Context, query string) ([]mapstr.M, error)
+	fetchVariableFn       func(ctx context.Context, query string) (mapstr.M, error)
+	fetchTableWithParamFn func(ctx context.Context, query string, args ...interface{}) ([]mapstr.M, error)
 }
 
-func (f *fakeDBClient) FetchTableMode(_ context.Context, query string) ([]mapstr.M, error) {
+func (f *fakeDBClient) FetchTableMode(ctx context.Context, query string) ([]mapstr.M, error) {
 	f.tableQueries = append(f.tableQueries, query)
 	if f.fetchTableFn != nil {
-		return f.fetchTableFn(query)
+		return f.fetchTableFn(ctx, query)
 	}
 	return f.tableRows, f.tableErr
 }
 
-func (f *fakeDBClient) FetchTableModeWithParams(_ context.Context, query string, args ...interface{}) ([]mapstr.M, error) {
+func (f *fakeDBClient) FetchTableModeWithParams(ctx context.Context, query string, args ...interface{}) ([]mapstr.M, error) {
 	f.withParamQueries = append(f.withParamQueries, query)
 	f.withParamArgs = append(f.withParamArgs, args)
 	if f.fetchTableWithParamFn != nil {
-		return f.fetchTableWithParamFn(query, args...)
+		return f.fetchTableWithParamFn(ctx, query, args...)
 	}
 	return f.tableWithParamRows, f.tableWithParamErr
 }
 
-func (f *fakeDBClient) FetchVariableMode(_ context.Context, query string) (mapstr.M, error) {
+func (f *fakeDBClient) FetchVariableMode(ctx context.Context, query string) (mapstr.M, error) {
 	f.variableQueries = append(f.variableQueries, query)
 	if f.fetchVariableFn != nil {
-		return f.fetchVariableFn(query)
+		return f.fetchVariableFn(ctx, query)
 	}
 	return f.variableRows, f.variableErr
 }
@@ -154,8 +155,18 @@ func withFakeDBClientFactory(t *testing.T, db dbClient) {
 	})
 }
 
+func withTempDataPath(t *testing.T) {
+	t.Helper()
+	origData := paths.Paths.Data
+	paths.Paths.Data = t.TempDir()
+	t.Cleanup(func() {
+		paths.Paths.Data = origData
+	})
+}
+
 func instantiateMetricSetWithConfig(t *testing.T, cfg map[string]interface{}) error {
 	t.Helper()
+	withTempDataPath(t)
 
 	c, err := conf.NewConfigFrom(cfg)
 	require.NoError(t, err)
@@ -230,6 +241,104 @@ func TestFetch_CursorPath_DoesNotAdvanceWhenReporterStops(t *testing.T) {
 	assert.Equal(t, "0", ms.cursorManager.CursorValueString(), "cursor must not advance when reporting stops")
 }
 
+func TestFetch_CursorPath_ZeroRowsLeavesCursorUnchanged(t *testing.T) {
+	ms := newTestMetricSet(t, testMetricSetConfig("SELECT id FROM t WHERE id > :cursor ORDER BY id ASC"))
+	ms.cursorManager = newTestCursorManager(t, "42")
+	ms.translatedQuery = cursor.TranslateQuery(ms.Config.Query, ms.Config.Driver)
+
+	fakeDB := &fakeDBClient{tableWithParamRows: []mapstr.M{}}
+	withFakeDBClientFactory(t, fakeDB)
+
+	reporter := &mbtest.CapturingReporterV2{}
+	err := ms.Fetch(context.Background(), reporter)
+	require.NoError(t, err)
+	assert.Equal(t, "42", ms.cursorManager.CursorValueString())
+	assert.Len(t, reporter.GetEvents(), 0)
+}
+
+func TestFetch_CursorPath_QueryErrorPropagates(t *testing.T) {
+	ms := newTestMetricSet(t, testMetricSetConfig("SELECT id FROM t WHERE id > :cursor ORDER BY id ASC"))
+	ms.cursorManager = newTestCursorManager(t, "0")
+	ms.translatedQuery = cursor.TranslateQuery(ms.Config.Query, ms.Config.Driver)
+
+	fakeDB := &fakeDBClient{
+		tableWithParamErr: errors.New("db query failed"),
+	}
+	withFakeDBClientFactory(t, fakeDB)
+
+	err := ms.Fetch(context.Background(), &mbtest.CapturingReporterV2{})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "fetch with cursor failed")
+}
+
+func TestFetch_CursorPath_AppliesTimeoutContext(t *testing.T) {
+	cfg := testMetricSetConfig("SELECT id FROM t WHERE id > :cursor ORDER BY id ASC")
+	cfg["timeout"] = "50ms"
+	ms := newTestMetricSet(t, cfg)
+	ms.cursorManager = newTestCursorManager(t, "0")
+	ms.translatedQuery = cursor.TranslateQuery(ms.Config.Query, ms.Config.Driver)
+
+	deadlineSeen := false
+	fakeDB := &fakeDBClient{
+		fetchTableWithParamFn: func(ctx context.Context, _ string, _ ...interface{}) ([]mapstr.M, error) {
+			_, ok := ctx.Deadline()
+			deadlineSeen = ok
+			return []mapstr.M{}, nil
+		},
+	}
+	withFakeDBClientFactory(t, fakeDB)
+
+	err := ms.Fetch(context.Background(), &mbtest.CapturingReporterV2{})
+	require.NoError(t, err)
+	assert.True(t, deadlineSeen, "cursor fetch path should apply module timeout")
+}
+
+func TestFetch_CursorPath_SkipsWhenPreviousFetchInProgress(t *testing.T) {
+	ms := newTestMetricSet(t, testMetricSetConfig("SELECT id FROM t WHERE id > :cursor ORDER BY id ASC"))
+	ms.cursorManager = newTestCursorManager(t, "0")
+	ms.translatedQuery = cursor.TranslateQuery(ms.Config.Query, ms.Config.Driver)
+
+	fakeDB := &fakeDBClient{
+		tableWithParamRows: []mapstr.M{{"id": int64(1)}},
+	}
+	withFakeDBClientFactory(t, fakeDB)
+
+	ms.fetchMutex.Lock()
+	defer ms.fetchMutex.Unlock()
+
+	err := ms.Fetch(context.Background(), &mbtest.CapturingReporterV2{})
+	require.NoError(t, err)
+	assert.Len(t, fakeDB.withParamQueries, 0, "DB should not be called when TryLock fails")
+}
+
+func TestFetch_NonCursorPath_DBOpenError(t *testing.T) {
+	ms := newTestMetricSet(t, testMetricSetConfig("SELECT id FROM t"))
+
+	orig := newDBClient
+	newDBClient = func(_, _ string, _ *logp.Logger) (dbClient, error) {
+		return nil, errors.New("open failed")
+	}
+	t.Cleanup(func() { newDBClient = orig })
+
+	err := ms.Fetch(context.Background(), &mbtest.CapturingReporterV2{})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "cannot open connection")
+}
+
+func TestFetch_NonCursorPath_ReporterStopDoesNotError(t *testing.T) {
+	ms := newTestMetricSet(t, testMetricSetConfig("SELECT id FROM t ORDER BY id"))
+
+	fakeDB := &fakeDBClient{
+		tableRows: []mapstr.M{{"id": int64(1)}},
+	}
+	withFakeDBClientFactory(t, fakeDB)
+
+	reporter := &stopReporter{}
+	err := ms.Fetch(context.Background(), reporter)
+	require.NoError(t, err)
+	assert.Equal(t, 1, reporter.events)
+}
+
 func TestFetch_MergeResultsRejectsMultipleRowsPerQuery(t *testing.T) {
 	ms := &MetricSet{
 		Config: config{
@@ -249,6 +358,101 @@ func TestFetch_MergeResultsRejectsMultipleRowsPerQuery(t *testing.T) {
 	})
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "cannot merge query resulting with more than one rows")
+}
+
+func TestFetch_TableAndVariableErrorsAreWrapped(t *testing.T) {
+	ms := &MetricSet{Config: config{}}
+
+	_, err := ms.fetch(context.Background(), &fakeDBClient{
+		tableErr: errors.New("table err"),
+	}, &mbtest.CapturingReporterV2{}, []query{
+		{Query: "SELECT id FROM t", ResponseFormat: tableResponseFormat},
+	})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "fetch table mode failed")
+
+	_, err = ms.fetch(context.Background(), &fakeDBClient{
+		variableErr: errors.New("var err"),
+	}, &mbtest.CapturingReporterV2{}, []query{
+		{Query: "SHOW STATUS", ResponseFormat: variableResponseFormat},
+	})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "fetch variable mode failed")
+}
+
+func TestFetch_MergeResults_OverwritesDuplicateKeys(t *testing.T) {
+	ms := newTestMetricSet(t, testMetricSetConfig("SELECT id FROM t"))
+	ms.Config.MergeResults = true
+	ms.Config.Driver = "postgres"
+
+	fakeDB := &fakeDBClient{
+		fetchTableFn: func(_ context.Context, query string) ([]mapstr.M, error) {
+			// one row/query so merge mode accepts it
+			if strings.Contains(query, "table_a") {
+				return []mapstr.M{{"dup": int64(1), "a": "x"}}, nil
+			}
+			if strings.Contains(query, "table_b") {
+				return []mapstr.M{{"dup": int64(2), "b": "y"}}, nil
+			}
+			return nil, nil
+		},
+		fetchVariableFn: func(_ context.Context, _ string) (mapstr.M, error) {
+			// duplicate key with table result to exercise overwrite path.
+			return mapstr.M{"dup": int64(3), "var": "ok"}, nil
+		},
+	}
+
+	reporter := &mbtest.CapturingReporterV2{}
+	ok, err := ms.fetch(context.Background(), fakeDB, reporter, []query{
+		{Query: "SELECT * FROM table_a", ResponseFormat: tableResponseFormat},
+		{Query: "SELECT * FROM table_b", ResponseFormat: tableResponseFormat},
+		{Query: "SHOW STATUS", ResponseFormat: variableResponseFormat},
+	})
+	require.NoError(t, err)
+	assert.True(t, ok)
+	assert.Len(t, reporter.GetEvents(), 1)
+}
+
+func TestFetch_NonMerge_ReportsEachQueryResult(t *testing.T) {
+	ms := &MetricSet{
+		Config: config{
+			MergeResults: false,
+			Driver:       "postgres",
+		},
+	}
+
+	fakeDB := &fakeDBClient{
+		fetchTableFn: func(_ context.Context, _ string) ([]mapstr.M, error) {
+			return []mapstr.M{
+				{"id": int64(1)},
+				{"id": int64(2)},
+			}, nil
+		},
+		fetchVariableFn: func(_ context.Context, _ string) (mapstr.M, error) {
+			return mapstr.M{"status": "ok"}, nil
+		},
+	}
+
+	reporter := &mbtest.CapturingReporterV2{}
+	ok, err := ms.fetch(context.Background(), fakeDB, reporter, []query{
+		{Query: "SELECT id FROM t", ResponseFormat: tableResponseFormat},
+		{Query: "SHOW STATUS", ResponseFormat: variableResponseFormat},
+	})
+	require.NoError(t, err)
+	assert.True(t, ok)
+	assert.Len(t, reporter.GetEvents(), 3, "2 table rows + 1 variable result")
+}
+
+func TestFetch_NonCursorPath_FetchErrorIsSwallowed(t *testing.T) {
+	ms := newTestMetricSet(t, testMetricSetConfig("SELECT id FROM t"))
+
+	withFakeDBClientFactory(t, &fakeDBClient{
+		tableErr: errors.New("query failed"),
+	})
+
+	// Fetch logs and swallows per-query fetch errors in non-cursor path.
+	err := ms.Fetch(context.Background(), &mbtest.CapturingReporterV2{})
+	require.NoError(t, err)
 }
 
 func TestFetch_VariableMode_MergeResultsSuccess(t *testing.T) {
@@ -277,6 +481,7 @@ func TestFetch_VariableMode_MergeResultsSuccess(t *testing.T) {
 }
 
 func TestInitCursorAndClose(t *testing.T) {
+	withTempDataPath(t)
 	ms := newTestMetricSet(t, testMetricSetConfig("SELECT id FROM t WHERE id > :cursor ORDER BY id ASC"))
 	ms.Config.Cursor = cursor.Config{
 		Enabled: true,
@@ -355,13 +560,27 @@ func TestFetch_FetchFromAllDatabases_NoDatabaseNames(t *testing.T) {
 	assert.Contains(t, err.Error(), "no database names found")
 }
 
+func TestFetch_FetchFromAllDatabases_DBNamesQueryError(t *testing.T) {
+	ms := newTestMetricSet(t, testMetricSetConfig("SELECT id FROM t"))
+	ms.Config.FetchFromAllDatabases = true
+	ms.Config.Driver = "mssql"
+
+	withFakeDBClientFactory(t, &fakeDBClient{
+		tableErr: errors.New("list dbs failed"),
+	})
+
+	err := ms.Fetch(context.Background(), &mbtest.CapturingReporterV2{})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "cannot fetch database names")
+}
+
 func TestFetch_FetchFromAllDatabases_MSSQLSuccess(t *testing.T) {
 	ms := newTestMetricSet(t, testMetricSetConfig("SELECT id FROM metrics_table"))
 	ms.Config.FetchFromAllDatabases = true
 	ms.Config.Driver = "mssql"
 
 	fakeDB := &fakeDBClient{
-		fetchTableFn: func(query string) ([]mapstr.M, error) {
+		fetchTableFn: func(_ context.Context, query string) ([]mapstr.M, error) {
 			if strings.Contains(query, "sys.databases") {
 				return []mapstr.M{{"name": "db1"}}, nil
 			}
@@ -377,6 +596,78 @@ func TestFetch_FetchFromAllDatabases_MSSQLSuccess(t *testing.T) {
 	err := ms.Fetch(context.Background(), reporter)
 	require.NoError(t, err)
 	assert.Len(t, reporter.GetEvents(), 1)
+}
+
+func TestFetch_FetchFromAllDatabases_SkipsRowsWithoutStringName(t *testing.T) {
+	ms := newTestMetricSet(t, testMetricSetConfig("SELECT id FROM metrics_table"))
+	ms.Config.FetchFromAllDatabases = true
+	ms.Config.Driver = "mssql"
+
+	fakeDB := &fakeDBClient{
+		fetchTableFn: func(_ context.Context, query string) ([]mapstr.M, error) {
+			if strings.Contains(query, "sys.databases") {
+				return []mapstr.M{
+					{},                 // missing "name"
+					{"name": int64(1)}, // wrong type
+				}, nil
+			}
+			return nil, nil
+		},
+	}
+	withFakeDBClientFactory(t, fakeDB)
+
+	err := ms.Fetch(context.Background(), &mbtest.CapturingReporterV2{})
+	require.NoError(t, err)
+}
+
+func TestFetch_FetchFromAllDatabases_InnerFetchErrorStopsCycle(t *testing.T) {
+	ms := newTestMetricSet(t, testMetricSetConfig("SELECT id FROM metrics_table"))
+	ms.Config.FetchFromAllDatabases = true
+	ms.Config.Driver = "mssql"
+
+	fakeDB := &fakeDBClient{
+		fetchTableFn: func(_ context.Context, query string) ([]mapstr.M, error) {
+			if strings.Contains(query, "sys.databases") {
+				return []mapstr.M{{"name": "db1"}}, nil
+			}
+			// Per-database query fails inside m.fetch().
+			if strings.Contains(query, "USE [db1];") {
+				return nil, errors.New("db-specific failure")
+			}
+			return nil, nil
+		},
+	}
+	withFakeDBClientFactory(t, fakeDB)
+
+	// Current behavior: logs warning and returns nil when reporting/fetch fails for a DB.
+	err := ms.Fetch(context.Background(), &mbtest.CapturingReporterV2{})
+	require.NoError(t, err)
+}
+
+func TestOpenCursorStore_RequiresSQLModuleInterface(t *testing.T) {
+	ms := &MetricSet{}
+	_, err := ms.openCursorStore(mb.BaseMetricSet{})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "cursor requires SQL module to implement registry interface")
+}
+
+func TestInitCursor_PropagatesStoreInitError(t *testing.T) {
+	ms := &MetricSet{
+		Config: config{
+			ResponseFormat: tableResponseFormat,
+			Query:          "SELECT id FROM t WHERE id > :cursor",
+			Cursor: cursor.Config{
+				Enabled: true,
+				Column:  "id",
+				Type:    cursor.CursorTypeInteger,
+				Default: "0",
+			},
+		},
+	}
+
+	err := ms.initCursor(mb.BaseMetricSet{})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "cursor store initialization failed")
 }
 
 func TestNew_ConfigValidationErrors(t *testing.T) {
@@ -451,6 +742,28 @@ func TestNew_ConfigValidationErrors(t *testing.T) {
 			},
 			wantErr: "cursor requires sql_response_format: table",
 		},
+		{
+			name: "invalid response format in sql_queries",
+			overrides: map[string]interface{}{
+				"sql_query": "",
+				"sql_queries": []map[string]interface{}{
+					{"query": "SELECT 1", "response_format": "invalid"},
+				},
+			},
+			wantErr: "invalid sql_response_format value: invalid",
+		},
+		{
+			name: "cursor query missing placeholder",
+			overrides: map[string]interface{}{
+				"sql_query":           "SELECT id FROM t",
+				"sql_response_format": "table",
+				"cursor.enabled":      true,
+				"cursor.column":       "id",
+				"cursor.type":         "integer",
+				"cursor.default":      "0",
+			},
+			wantErr: "query must contain :cursor placeholder when cursor is enabled",
+		},
 	}
 
 	for _, tt := range tests {
@@ -468,6 +781,13 @@ func TestNew_ConfigValidationErrors(t *testing.T) {
 			assert.Contains(t, err.Error(), tt.wantErr)
 		})
 	}
+}
+
+func TestNew_DefaultsResponseFormatWhenEmpty(t *testing.T) {
+	cfg := testMetricSetConfig("SELECT id FROM t")
+	delete(cfg, "sql_response_format")
+	err := instantiateMetricSetWithConfig(t, cfg)
+	require.NoError(t, err)
 }
 
 func TestInferTypeFromMetricsAndDriverHelpers(t *testing.T) {

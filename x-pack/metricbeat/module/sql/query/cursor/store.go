@@ -56,15 +56,20 @@ func (s *Store) Load(key string) (*State, error) {
 	if s.store == nil {
 		return nil, errors.New("store is closed")
 	}
-	var state State
-	err := s.store.Get(key, &state)
+
+	exists, err := s.store.Has(key)
 	if err != nil {
-		// Check if key doesn't exist (not a real error)
-		if isKeyNotFoundError(err) {
-			return nil, nil
-		}
+		return nil, fmt.Errorf("failed to check cursor state existence: %w", err)
+	}
+	if !exists {
+		return nil, nil
+	}
+
+	var state State
+	if err := s.store.Get(key, &state); err != nil {
 		return nil, fmt.Errorf("failed to load cursor state: %w", err)
 	}
+
 	return &state, nil
 }
 
@@ -92,20 +97,6 @@ func (s *Store) Close() error {
 		}
 	}
 	return nil
-}
-
-// isKeyNotFoundError checks if the error indicates a missing key.
-// The memlog backend returns "key unknown" when a key is not found,
-// which gets wrapped by statestore's ErrorOperation.
-func isKeyNotFoundError(err error) bool {
-	if err == nil {
-		return false
-	}
-	// memlog backend returns errKeyUnknown ("key unknown") for missing keys,
-	// wrapped by statestore's ErrorOperation as:
-	// "failed in get operation on store 'cursor-state': key unknown"
-	errStr := err.Error()
-	return strings.Contains(errStr, "key unknown")
 }
 
 // GenerateStateKey creates a unique key for cursor state persistence.

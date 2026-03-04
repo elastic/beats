@@ -5,7 +5,6 @@
 package cursor
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -331,41 +330,6 @@ func TestStoreOwnershipClosingBehavior(t *testing.T) {
 
 		require.NoError(t, store2.Close())
 	})
-}
-
-func TestIsKeyNotFoundError(t *testing.T) {
-	tests := []struct {
-		name string
-		err  error
-		want bool
-	}{
-		{
-			name: "nil error",
-			err:  nil,
-			want: false,
-		},
-		{
-			name: "key unknown error",
-			err:  fmt.Errorf("failed in get operation on store 'cursor-state': key unknown"),
-			want: true,
-		},
-		{
-			name: "other error containing key word",
-			err:  fmt.Errorf("primary key constraint violated"),
-			want: false,
-		},
-		{
-			name: "generic error",
-			err:  fmt.Errorf("connection refused"),
-			want: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, isKeyNotFoundError(tt.err))
-		})
-	}
 }
 
 // newTestStore creates a memlog-backed store for cursor persistence in tests.
