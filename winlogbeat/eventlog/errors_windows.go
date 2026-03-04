@@ -36,6 +36,7 @@ func IsRecoverable(err error, isFile bool) bool {
 		err == win.ERROR_INVALID_PARAMETER ||
 		err == win.ERROR_EVT_PUBLISHER_DISABLED ||
 		errors.Is(err, errRecordIDGap) ||
+		errors.Is(err, errRenderNoEvent) ||
 		(!isFile && errors.Is(err, win.ERROR_EVT_CHANNEL_NOT_FOUND))
 }
 

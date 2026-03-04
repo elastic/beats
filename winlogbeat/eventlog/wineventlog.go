@@ -36,6 +36,9 @@ import (
 )
 
 var errRecordIDGap = errors.New("record ID gap detected")
+var errRenderNoEvent = errors.New("rendering error without partial event")
+
+const renderNoEventRetryLimit = 5
 
 type gapDetectedError struct {
 	channel  string
@@ -49,6 +52,31 @@ func (e *gapDetectedError) Error() string {
 }
 
 func (e *gapDetectedError) Unwrap() error { return errRecordIDGap }
+
+type renderNoEventError struct {
+	cause    error
+	bookmark string
+}
+
+func (e *renderNoEventError) Error() string {
+	if e.cause == nil {
+		return errRenderNoEvent.Error()
+	}
+	return fmt.Sprintf("%v: %v", errRenderNoEvent, e.cause)
+}
+
+func (e *renderNoEventError) Unwrap() error { return errRenderNoEvent }
+func (e *renderNoEventError) Bookmark() string {
+	return e.bookmark
+}
+
+func (l *winEventLog) newRenderNoEventError(handle win.EvtHandle, cause error) *renderNoEventError {
+	bookmark, bookmarkErr := l.createBookmarkFromEvent(handle)
+	return &renderNoEventError{
+		cause:    errors.Join(cause, bookmarkErr),
+		bookmark: bookmark,
+	}
+}
 
 // winEventLog implements the EventLog interface for reading from the Windows
 // Event Log API.
@@ -67,6 +95,9 @@ type winEventLog struct {
 	renderer win.EventRenderer
 
 	metrics *inputMetrics
+
+	renderNoEventKey   string
+	renderNoEventCount int
 }
 
 // newWinEventLog creates and returns a new EventLog for reading event logs
@@ -286,16 +317,12 @@ func (l *winEventLog) Read() ([]Record, error) {
 	for h, ok := l.iterator.Next(); ok; h, ok = l.iterator.Next() {
 		record, err := l.processHandle(h)
 		if err != nil {
-			if errors.Is(err, errRecordIDGap) {
-				l.metrics.logError(err)
-				return records, err
+			if returnErr := l.handleProcessError(err); returnErr != nil {
+				return records, returnErr
 			}
-			l.metrics.logError(err)
-			l.log.Warnw("Dropping event due to rendering error.", "error", err)
-			l.metrics.logDropped(err)
-			incrementMetric(dropReasons, err)
 			continue
 		}
+		l.resetRenderNoEventRetry()
 		if l.filter != nil && !l.filter.match(record) {
 			continue
 		}
@@ -321,13 +348,48 @@ func (l *winEventLog) Read() ([]Record, error) {
 	return records, nil
 }
 
+func (l *winEventLog) handleProcessError(err error) error {
+	var renderErr *renderNoEventError
+	if errors.As(err, &renderErr) {
+		l.metrics.logError(err)
+		retryCount := l.incrementRenderNoEventRetry(renderErr.Bookmark())
+		if retryCount <= renderNoEventRetryLimit {
+			return err
+		}
+
+		l.log.Errorw("Dropping poison event after repeated render failures.",
+			"channel", l.channelName,
+			"retry_count", retryCount,
+			"retry_limit", renderNoEventRetryLimit)
+		l.metrics.logDropped(err)
+		incrementMetric(dropReasons, errRenderNoEvent.Error())
+		if bookmark := renderErr.Bookmark(); bookmark != "" {
+			l.lastRead.Bookmark = bookmark
+		}
+		l.resetRenderNoEventRetry()
+		return nil
+	}
+
+	l.resetRenderNoEventRetry()
+	if errors.Is(err, errRecordIDGap) || errors.Is(err, errRenderNoEvent) {
+		l.metrics.logError(err)
+		return err
+	}
+
+	l.metrics.logError(err)
+	l.log.Warnw("Dropping event due to rendering error.", "error", err)
+	l.metrics.logDropped(err)
+	incrementMetric(dropReasons, err)
+	return nil
+}
+
 func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 	defer h.Close()
 
 	// NOTE: Render can return an error and a partial event.
 	evt, xml, err := l.renderer.Render(h)
 	if evt == nil {
-		return nil, err
+		return nil, l.newRenderNoEventError(h, err)
 	}
 	if err != nil {
 		evt.RenderErr = append(evt.RenderErr, err.Error())
@@ -410,4 +472,20 @@ func (l *winEventLog) close() error {
 		l.iterator.Close(),
 		l.renderer.Close(),
 	)
+}
+
+func (l *winEventLog) incrementRenderNoEventRetry(bookmark string) int {
+	if bookmark == l.renderNoEventKey && l.renderNoEventCount > 0 {
+		l.renderNoEventCount++
+		return l.renderNoEventCount
+	}
+
+	l.renderNoEventKey = bookmark
+	l.renderNoEventCount = 1
+	return l.renderNoEventCount
+}
+
+func (l *winEventLog) resetRenderNoEventRetry() {
+	l.renderNoEventKey = ""
+	l.renderNoEventCount = 0
 }
