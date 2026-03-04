@@ -21,6 +21,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
+	oteltelemetry "github.com/elastic/beats/v7/x-pack/otel/telemetry"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
@@ -34,10 +35,11 @@ type BeatReceiver struct {
 	beater   beat.Beater
 	reporter *log.Reporter
 	Logger   *logp.Logger
+	bridge   *oteltelemetry.RegistryBridge
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
-func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator) (BeatReceiver, error) {
+func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator, ts component.TelemetrySettings) (BeatReceiver, error) {
 	beatConfig, err := b.BeatConfig()
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error getting beat config: %w", err)
@@ -90,10 +92,17 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error getting %s creator:%w", b.Info.Beat, err)
 	}
+
+	bridge, err := oteltelemetry.NewRegistryBridge(ts, b.Monitoring.StatsRegistry(), b.Monitoring.InputsRegistry())
+	if err != nil {
+		return BeatReceiver{}, fmt.Errorf("error creating registry bridge: %w", err)
+	}
+
 	return BeatReceiver{
 		beat:   b,
 		beater: beater,
 		Logger: b.Info.Logger,
+		bridge: bridge,
 	}, nil
 }
 
@@ -161,6 +170,9 @@ func (br *BeatReceiver) Start(host component.Host) error {
 
 // BeatReceiver.Stop() stops beat receiver.
 func (br *BeatReceiver) Shutdown() error {
+	if br.bridge != nil {
+		br.bridge.Shutdown()
+	}
 	br.beater.Stop()
 
 	br.beat.Instrumentation.Tracer().Close()
