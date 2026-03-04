@@ -67,7 +67,7 @@ func recordHeader(key, value string) sarama.RecordHeader {
 }
 
 func TestInput(t *testing.T) {
-	testTopic := createTestTopicName()
+	testTopic := createReadyTestTopic(t)
 	groupID := "filebeat"
 
 	// Send test messages to the topic for the input to read.
@@ -155,7 +155,7 @@ func TestInput(t *testing.T) {
 }
 
 func TestInputWithMultipleEvents(t *testing.T) {
-	testTopic := createTestTopicName()
+	testTopic := createReadyTestTopic(t)
 
 	// Send test messages to the topic for the input to read.
 	message := testMessage{
@@ -211,7 +211,7 @@ func TestInputWithMultipleEvents(t *testing.T) {
 }
 
 func TestInputWithJsonPayload(t *testing.T) {
-	testTopic := createTestTopicName()
+	testTopic := createReadyTestTopic(t)
 
 	// Send test message to the topic for the input to read.
 	message := testMessage{
@@ -273,7 +273,7 @@ func TestInputWithJsonPayload(t *testing.T) {
 }
 
 func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
-	testTopic := createTestTopicName()
+	testTopic := createReadyTestTopic(t)
 
 	// Send test messages to the topic for the input to read.
 	message := testMessage{
@@ -360,12 +360,8 @@ func TestSASLAuthentication(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			testTopic := createTestTopicName()
+			testTopic := createReadyTestTopic(t)
 			groupID := "filebeat"
-
-			// Topic auto-creation is asynchronous; wait for leaders to avoid transient
-			// "no leader for this partition" write failures in CI.
-			ensureKafkaTopicReadyForWrites(t, testTopic)
 
 			// Send test messages to the topic for the input to read.
 			messages := []testMessage{
@@ -452,7 +448,7 @@ func TestSASLAuthentication(t *testing.T) {
 }
 
 func TestTest(t *testing.T) {
-	testTopic := createTestTopicName()
+	testTopic := createReadyTestTopic(t)
 
 	// Send test messages to the topic for the input to read.
 	message := testMessage{
@@ -483,8 +479,13 @@ func TestTest(t *testing.T) {
 	}
 }
 
-func createTestTopicName() string {
+func createReadyTestTopic(t *testing.T) string {
+	t.Helper()
+
 	testTopic := fmt.Sprintf("Filebeat-TestInput-%d", rand.Int())
+	// Topic auto-creation is asynchronous; explicitly wait for leaders to avoid
+	// transient "no leader for this partition" write failures in CI.
+	ensureKafkaTopicReadyForWrites(t, testTopic)
 	return testTopic
 }
 
