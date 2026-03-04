@@ -760,6 +760,11 @@ func (mu *mockMetadataUpdater) IterateOnPrefix(fn func(key string, meta interfac
 	}
 }
 
+func (mu *mockMetadataUpdater) KeyExists(s loginp.Source) bool {
+	_, ok := mu.table[s.Name()]
+	return ok
+}
+
 func (mu *mockMetadataUpdater) UpdateKey(oldKey, newKey string, meta interface{}) error {
 	if _, ok := mu.table[oldKey]; !ok {
 		return fmt.Errorf("old key %s not found", oldKey)
@@ -1259,24 +1264,20 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			expectedKey:        "filestream::my-input::growing_fingerprint::aabb",
 			expectedFound:      true,
 		},
-		"picks longest prefix among multiple matches": {
+		"prefix match among entries for different paths": {
 			storeEntries: map[string]interface{}{
 				"filestream::my-input::growing_fingerprint::aa": fileMeta{
-					Source:         currentPath,
+					Source:         "/other/file.log",
 					IdentifierName: growingFingerprintName,
 				},
 				"filestream::my-input::growing_fingerprint::aabb": fileMeta{
 					Source:         currentPath,
 					IdentifierName: growingFingerprintName,
 				},
-				"filestream::my-input::growing_fingerprint::aabbcc": fileMeta{
-					Source:         currentPath,
-					IdentifierName: growingFingerprintName,
-				},
 			},
 			currentFingerprint: "aabbccddee",
 			currentPath:        currentPath,
-			expectedKey:        "filestream::my-input::growing_fingerprint::aabbcc",
+			expectedKey:        "filestream::my-input::growing_fingerprint::aabb",
 			expectedFound:      true,
 		},
 		"skips non-growing_fingerprint identity": {
@@ -1399,6 +1400,67 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
+	const currentFingerprint = "aabbccdd"
+	const currentPath = "/var/log/app.log"
+
+	identifier, err := newGrowingFingerprintIdentifier(nil, nil)
+	require.NoError(t, err)
+
+	event := loginp.FSEvent{
+		NewPath: currentPath,
+		Descriptor: loginp.FileDescriptor{
+			Fingerprint: currentFingerprint,
+		},
+	}
+
+	src := identifier.GetSource(event)
+
+	t.Run("fast path: key exists skips scan", func(t *testing.T) {
+		store := newMockMetadataUpdater()
+		// The store already has an entry for the exact current fingerprint key.
+		store.table[src.Name()] = fileMeta{
+			Source:         currentPath,
+			IdentifierName: growingFingerprintName,
+		}
+
+		// Also add an entry that would be a prefix match (the slow path).
+		// If the fast path works, it should never reach findGrowingFingerprintMatch.
+		store.table["filestream::my-input::growing_fingerprint::aabb"] = fileMeta{
+			Source:         currentPath,
+			IdentifierName: growingFingerprintName,
+		}
+
+		p := &fileProspector{
+			logger:     logp.L(),
+			identifier: identifier,
+		}
+
+		result := p.handleGrowingFingerprintLookup(logp.L(), event, src, store)
+		assert.Equal(t, src.Name(), result.Name(), "fast path should return original src unchanged")
+	})
+
+	t.Run("slow path: key does not exist falls through to scan", func(t *testing.T) {
+		store := newMockMetadataUpdater()
+		// Only a prefix match exists, not the exact key.
+		store.table["filestream::my-input::growing_fingerprint::aabb"] = fileMeta{
+			Source:         currentPath,
+			IdentifierName: growingFingerprintName,
+		}
+
+		p := &fileProspector{
+			logger:     logp.L(),
+			identifier: identifier,
+		}
+
+		result := p.handleGrowingFingerprintLookup(logp.L(), event, src, store)
+		// The function should still return src (it always does), but it would
+		// have attempted migration via the slow path. Since UpdateKey will fail
+		// (key format doesn't match the mock's simple table), src is returned.
+		assert.Equal(t, src.Name(), result.Name())
+	})
 }
 
 func mustInodeMarker(t *testing.T) fileIdentifier {

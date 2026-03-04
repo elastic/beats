@@ -529,6 +529,12 @@ func (p *fileProspector) handleGrowingFingerprintLookup(
 		return src
 	}
 
+	// Fast path: if the current fingerprint key already exists, no migration
+	// needed.
+	if updater.KeyExists(src) {
+		return src
+	}
+
 	// Try to find a prefix match (file may have grown)
 	oldKey, found := p.findGrowingFingerprintMatch(updater, event.Descriptor.Fingerprint, event.NewPath)
 	if !found {
@@ -618,13 +624,11 @@ func (p *fileProspector) findGrowingFingerprintMatch(
 			return true // continue iteration - different file
 		}
 
-		// Found a match - keep track of the largest (most specific) match
-		if len(storedFingerprint) > bestMatchLen {
-			bestMatchKey = key
-			bestMatchLen = len(storedFingerprint)
-		}
-
-		return true // continue iteration
+		// There is at most one registry entry per path (migration replaces
+		// the old key), so the first path-matching prefix is the answer.
+		bestMatchKey = key
+		bestMatchLen = len(storedFingerprint)
+		return false // stop iteration
 	})
 
 	if bestMatchKey != "" {

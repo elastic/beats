@@ -60,6 +60,10 @@ type StateMetadataUpdater interface {
 	// This is used by growing_fingerprint to update the registry key when
 	// a file's fingerprint grows.
 	UpdateKey(oldKey, newKey string, meta interface{}) error
+
+	// KeyExists returns true if the given Source already has an entry in the
+	// store. This is a fast O(1) lookup with no side effects (no Retain/Release).
+	KeyExists(src Source) bool
 }
 
 // StoreUpdater allows manipulation of the state store
