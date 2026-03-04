@@ -195,6 +195,139 @@ func TestStateStore(t *testing.T) {
 	})
 }
 
+func TestStoreGroup(t *testing.T) {
+	t.Run("discover", func(t *testing.T) {
+		dbFilename := "TestStoreGroup_Discover.db"
+		store := testSetupStore(t, dbFilename)
+		t.Cleanup(func() {
+			testCleanupStore(store, dbFilename)
+		})
+
+		ss, err := newStateStore(store)
+		if err != nil {
+			t.Fatalf("failed to make new store: %v", err)
+		}
+		defer ss.close(false)
+
+		entry := activedirectory.Entry{ID: "cn=EmptyGroup,dc=example,dc=com"}
+		got := ss.storeGroup(entry)
+		if got.State != Discovered {
+			t.Errorf("expected state Discovered, got %v", got.State)
+		}
+		if got.ID != entry.ID {
+			t.Errorf("expected ID %q, got %q", entry.ID, got.ID)
+		}
+	})
+
+	t.Run("modify", func(t *testing.T) {
+		dbFilename := "TestStoreGroup_Modify.db"
+		store := testSetupStore(t, dbFilename)
+		t.Cleanup(func() {
+			testCleanupStore(store, dbFilename)
+		})
+
+		ss, err := newStateStore(store)
+		if err != nil {
+			t.Fatalf("failed to make new store: %v", err)
+		}
+		defer ss.close(false)
+
+		entry := activedirectory.Entry{ID: "cn=EmptyGroup,dc=example,dc=com"}
+		ss.storeGroup(entry)
+		got := ss.storeGroup(entry)
+		if got.State != Modified {
+			t.Errorf("expected state Modified, got %v", got.State)
+		}
+	})
+}
+
+func TestGroupPersistence(t *testing.T) {
+	dbFilename := "TestGroupPersistence.db"
+	store := testSetupStore(t, dbFilename)
+	t.Cleanup(func() {
+		testCleanupStore(store, dbFilename)
+	})
+
+	wantGroups := map[string]*User{
+		"cn=EmptyGroup,dc=example,dc=com": {
+			State: Discovered,
+			Entry: activedirectory.Entry{
+				ID: "cn=EmptyGroup,dc=example,dc=com",
+			},
+		},
+	}
+
+	ss, err := newStateStore(store)
+	if err != nil {
+		t.Fatalf("failed to make new store: %v", err)
+	}
+	ss.groups = wantGroups
+
+	err = ss.close(true)
+	if err != nil {
+		t.Fatalf("unexpected error closing: %v", err)
+	}
+
+	// Reopen and verify groups were persisted.
+	ss2, err := newStateStore(store)
+	if err != nil {
+		t.Fatalf("failed to reopen store: %v", err)
+	}
+	defer ss2.close(false)
+
+	if !cmp.Equal(wantGroups, ss2.groups) {
+		t.Errorf("unexpected groups after round-trip:\n- want\n+ got\n%s", cmp.Diff(wantGroups, ss2.groups))
+	}
+}
+
+func TestGroupDeletion(t *testing.T) {
+	dbFilename := "TestGroupDeletion.db"
+	store := testSetupStore(t, dbFilename)
+	t.Cleanup(func() {
+		testCleanupStore(store, dbFilename)
+	})
+
+	// First, persist a group.
+	ss, err := newStateStore(store)
+	if err != nil {
+		t.Fatalf("failed to make new store: %v", err)
+	}
+	ss.groups = map[string]*User{
+		"cn=EmptyGroup,dc=example,dc=com": {
+			State: Discovered,
+			Entry: activedirectory.Entry{
+				ID: "cn=EmptyGroup,dc=example,dc=com",
+			},
+		},
+	}
+	err = ss.close(true)
+	if err != nil {
+		t.Fatalf("unexpected error closing: %v", err)
+	}
+
+	// Now reopen and mark the group as deleted.
+	ss2, err := newStateStore(store)
+	if err != nil {
+		t.Fatalf("failed to reopen store: %v", err)
+	}
+	ss2.groups["cn=EmptyGroup,dc=example,dc=com"].State = Deleted
+	err = ss2.close(true)
+	if err != nil {
+		t.Fatalf("unexpected error closing: %v", err)
+	}
+
+	// Reopen and verify the group was removed.
+	ss3, err := newStateStore(store)
+	if err != nil {
+		t.Fatalf("failed to reopen store: %v", err)
+	}
+	defer ss3.close(false)
+
+	if len(ss3.groups) != 0 {
+		t.Errorf("expected no groups after deletion, got %d", len(ss3.groups))
+	}
+}
+
 func TestErrIsItemFound(t *testing.T) {
 	tests := []struct {
 		name string
