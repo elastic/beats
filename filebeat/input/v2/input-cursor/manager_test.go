@@ -121,7 +121,7 @@ func TestManager_InitDefersStoreForES(t *testing.T) {
 	stateStore := createSampleStore(t, data)
 
 	var grp unison.TaskGroup
-	defer grp.Stop() //nolint:errcheck
+	defer grp.Stop() //nolint:errcheck // We don't need the error from grp.Stop()
 
 	manager := &InputManager{
 		Logger:              logptest.NewTestingLogger(t, "test"),
