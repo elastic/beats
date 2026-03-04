@@ -171,7 +171,7 @@
 //  1. The current cursor value is loaded (from store or default).
 //  2. The query executes with the cursor value as a parameterized argument.
 //  3. All returned rows are emitted as events.
-//  4. The maximum cursor column value from the batch is persisted.
+//  4. The cursor value from the batch is persisted (max for asc, min for desc).
 //
 // # Boundary Behavior: > vs >=
 //
@@ -196,7 +196,8 @@
 //   - Single query only (not sql_queries with multiple queries)
 //   - Single cursor column (no composite cursors)
 //   - String, UUID, and ULID columns are not supported as cursor types (Phase 3)
-//   - :cursor in SQL string literals will be incorrectly replaced
+//   - MySQL backslash-escaped strings (for example, 'it\'s :cursor') may cause
+//     :cursor inside the literal to be misdetected; standard SQL '' escaping is handled
 //   - ORDER BY must match the cursor column and the configured direction
 //   - The cursor column must be included in the SELECT clause
 //   - All matching rows are loaded into memory; use LIMIT (500-5000 recommended)

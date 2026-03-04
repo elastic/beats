@@ -57,6 +57,42 @@ func TestValidateQueryHasCursor(t *testing.T) {
 			wantErr: true,
 			errMsg:  "query must contain :cursor placeholder",
 		},
+		{
+			name:    "ignore placeholder inside single-quoted string",
+			query:   "SELECT * FROM logs WHERE note = ':cursor' AND id > :cursor",
+			wantErr: false,
+		},
+		{
+			name:    "ignore placeholder inside line comment",
+			query:   "SELECT * FROM logs -- :cursor\nWHERE id > :cursor",
+			wantErr: false,
+		},
+		{
+			name:    "ignore placeholder inside block comment",
+			query:   "SELECT * FROM logs /* :cursor */ WHERE id > :cursor",
+			wantErr: false,
+		},
+		{
+			name:    "only placeholder in comment is invalid",
+			query:   "SELECT * FROM logs /* :cursor */ WHERE id > 0",
+			wantErr: true,
+			errMsg:  "query must contain :cursor placeholder",
+		},
+		{
+			name:    "ignore placeholder inside double-quoted identifier",
+			query:   `SELECT * FROM "my:cursor" WHERE id > :cursor`,
+			wantErr: false,
+		},
+		{
+			name:    "ignore placeholder inside backtick-quoted identifier",
+			query:   "SELECT * FROM `my:cursor` WHERE id > :cursor",
+			wantErr: false,
+		},
+		{
+			name:    "escaped single quote does not break out of string",
+			query:   "SELECT * FROM t WHERE note = 'it''s :cursor' AND id > :cursor",
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -148,6 +184,13 @@ func TestTranslateQuery(t *testing.T) {
 			assert.Equal(t, tt.want, result)
 		})
 	}
+
+	t.Run("does not replace placeholder inside string or comments", func(t *testing.T) {
+		query := "SELECT ':cursor' AS s /* :cursor */ FROM logs -- :cursor\nWHERE id > :cursor"
+		got := TranslateQuery(query, "postgres")
+		want := "SELECT ':cursor' AS s /* :cursor */ FROM logs -- :cursor\nWHERE id > $1"
+		assert.Equal(t, want, got)
+	})
 }
 
 func TestCountPlaceholders(t *testing.T) {
@@ -175,6 +218,26 @@ func TestCountPlaceholders(t *testing.T) {
 			name:  "cursor_value not matched",
 			query: "SELECT * FROM logs WHERE id > :cursor_value",
 			want:  0,
+		},
+		{
+			name:  "ignore placeholders in string and comments",
+			query: "SELECT ':cursor' /* :cursor */ FROM logs -- :cursor\nWHERE id > :cursor",
+			want:  1,
+		},
+		{
+			name:  "ignore placeholder in double-quoted identifier",
+			query: `SELECT * FROM "my:cursor" WHERE id > :cursor`,
+			want:  1,
+		},
+		{
+			name:  "ignore placeholder in backtick-quoted identifier",
+			query: "SELECT * FROM `my:cursor` WHERE id > :cursor",
+			want:  1,
+		},
+		{
+			name:  "escaped single quote does not break string",
+			query: "SELECT * FROM t WHERE note = 'it''s :cursor' AND id > :cursor",
+			want:  1,
 		},
 	}
 

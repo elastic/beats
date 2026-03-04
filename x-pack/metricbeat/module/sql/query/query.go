@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	sqlmod "github.com/elastic/beats/v7/x-pack/metricbeat/module/sql"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/sql/query/cursor"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -80,6 +81,19 @@ type MetricSet struct {
 // and their own metricset key space.
 type rawData struct {
 	Enabled bool `config:"enabled"`
+}
+
+// dbClient captures the subset of DB operations used by the query metricset.
+// It allows unit tests to exercise fetch paths without real DB connections.
+type dbClient interface {
+	FetchTableMode(ctx context.Context, query string) ([]mapstr.M, error)
+	FetchTableModeWithParams(ctx context.Context, query string, args ...interface{}) ([]mapstr.M, error)
+	FetchVariableMode(ctx context.Context, query string) (mapstr.M, error)
+	Close() error
+}
+
+var newDBClient = func(driver, dsn string, logger *logp.Logger) (dbClient, error) {
+	return sql.NewDBClient(driver, dsn, logger)
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -250,7 +264,7 @@ func dbSelector(driver, dbName string) string {
 	return ""
 }
 
-func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.ReporterV2, queries []query) (_ bool, fetchErr error) {
+func (m *MetricSet) fetch(ctx context.Context, db dbClient, reporter mb.ReporterV2, queries []query) (_ bool, fetchErr error) {
 	defer func() {
 		fetchErr = sql.SanitizeError(fetchErr, m.HostData().URI)
 	}()
@@ -337,7 +351,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (fetchErr
 		return m.fetchWithCursor(ctx, reporter)
 	}
 
-	db, err := sql.NewDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
+	db, err := newDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
 		return fmt.Errorf("cannot open connection: %w", err)
 	}
@@ -448,7 +462,7 @@ func (m *MetricSet) fetchWithCursor(ctx context.Context, reporter mb.ReporterV2)
 
 	m.Logger().Debugf("Executing query with cursor=%s", m.cursorManager.CursorValueString())
 
-	db, err := sql.NewDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
+	db, err := newDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
 		return fmt.Errorf("cannot open connection: %w", err)
 	}
