@@ -57,6 +57,14 @@ func requireEventuallyWithT(t *testing.T, condition func(c *assert.CollectT), ms
 	require.EventuallyWithT(t, condition, eventuallyTimeout, eventuallyInterval, msgAndArgs...)
 }
 
+// hasID is only used in tests to check if a source is registered in the reader group.
+func (r *readerGroup) hasID(id string) bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	return r.table[id] != nil
+}
+
 func TestReaderGroup(t *testing.T) {
 	requireGroupSuccess := func(t *testing.T, ctx context.Context, cf context.CancelFunc, err error) {
 		require.NotNil(t, ctx)
@@ -90,6 +98,30 @@ func TestReaderGroup(t *testing.T) {
 
 		newCtx, newCf, err := rg.newContext("test-id", context.Background())
 		requireGroupError(t, newCtx, newCf, err)
+	})
+
+	t.Run("assert reserve allows newContext to upgrade the reservation", func(t *testing.T) {
+		rg := newReaderGroup()
+
+		assert.True(t, rg.reserve("test-id"), "first reserve should succeed")
+
+		ctx, cf, err := rg.newContext("test-id", context.Background())
+		requireGroupSuccess(t, ctx, cf, err)
+
+		// A second newContext should fail since a real harvester is now registered.
+		newCtx, newCf, err := rg.newContext("test-id", context.Background())
+		requireGroupError(t, newCtx, newCf, err)
+	})
+
+	t.Run("assert remove on a reserved entry and allows re-reserve", func(t *testing.T) {
+		rg := newReaderGroup()
+
+		assert.True(t, rg.reserve("test-id"), "first reserve should succeed")
+		assert.False(t, rg.reserve("test-id"), "second reserve for same id should fail")
+		rg.remove("test-id")
+		assert.Empty(t, rg.table)
+
+		assert.True(t, rg.reserve("test-id"), "reserve should succeed after remove")
 	})
 
 	t.Run("assert new key is added, can be removed and its context is cancelled", func(t *testing.T) {
