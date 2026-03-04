@@ -33,20 +33,27 @@ import (
 	"github.com/elastic/beats/v7/libbeat/plugin"
 )
 
-// PluginFactory represents an uninstantiated plug in instance generated from a monitor config. Invoking the Make function creates a plug-in instance.
-type PluginFactory struct {
-	Name    string
-	Aliases []string
-	Make    PluginMake
-	Stats   RegistryRecorder
-}
+// HashConfigFunc (optional) when set on a PluginFactory, overrides the config hash calculation
+// to prevent a start/stop cycle for select fields updates
+type HashConfigFunc func(cfg *conf.C) (uint64, error)
 
 type PluginMake func(string, *conf.C) (p Plugin, err error)
+type PluginUpdate func(string, *conf.C) (p Plugin, err error)
+
+// PluginFactory represents an uninstantiated plug in instance generated from a monitor config. Invoking the Make function creates a plug-in instance.
+type PluginFactory struct {
+	Name       string
+	Aliases    []string
+	Make       PluginMake
+	Stats      RegistryRecorder
+	HashConfig HashConfigFunc
+}
 
 // Plugin describes a configured instance of a plug-in with its jobs already instantiated.
 type Plugin struct {
 	Jobs      []jobs.Job
 	DoClose   func() error
+	DoUpdate  func(*conf.C) error
 	Endpoints int
 }
 
@@ -54,6 +61,14 @@ type Plugin struct {
 func (p Plugin) Close() error {
 	if p.DoClose != nil {
 		return p.DoClose()
+	}
+	return nil
+}
+
+// Update selective updates the plugin if the underlying type supports it
+func (p Plugin) Update(c *conf.C) error {
+	if p.DoUpdate != nil {
+		return p.DoUpdate(c)
 	}
 	return nil
 }
@@ -113,7 +128,7 @@ func init() {
 		}
 
 		stats := statsForPlugin(p.Name)
-		return GlobalPluginsReg.Register(PluginFactory{p.Name, p.Aliases, p.Make, stats})
+		return GlobalPluginsReg.Register(PluginFactory{p.Name, p.Aliases, p.Make, stats, p.HashConfig})
 	})
 }
 
@@ -142,8 +157,12 @@ func NewPluginsReg() *PluginsReg {
 
 // Register registers a new active (as opposed to passive) monitor.
 func Register(name string, make PluginMake, aliases ...string) {
+	RegisterWithHashFunc(name, nil, make, aliases...)
+}
+
+func RegisterWithHashFunc(name string, hashConfig HashConfigFunc, make PluginMake, aliases ...string) {
 	stats := statsForPlugin(name)
-	if err := GlobalPluginsReg.Add(PluginFactory{name, aliases, make, stats}); err != nil {
+	if err := GlobalPluginsReg.Add(PluginFactory{name, aliases, make, stats, nil}); err != nil {
 		panic(err)
 	}
 }

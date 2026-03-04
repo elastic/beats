@@ -97,6 +97,19 @@ func (sj *SourceJob) Close() error {
 	return nil
 }
 
+func (sj *SourceJob) Update(c *config.C) error {
+	var cfg Config
+	err := c.Unpack(&cfg)
+	if err != nil {
+		return fmt.Errorf("error unpacking brwoser config for update: %w", err)
+	}
+
+	// Selectively update fields
+	sj.browserCfg.Params = cfg.Params
+
+	return nil
+}
+
 // Dev flags + expected number of params, math.MaxInt32 for variadic flags
 var filterMap = map[string]int{
 	"--dry-run":         0,
@@ -195,6 +208,7 @@ func (sj *SourceJob) plugin() plugin.Plugin {
 	return plugin.Plugin{
 		Jobs:      sj.jobs(),
 		DoClose:   sj.Close,
+		DoUpdate:  sj.Update,
 		Endpoints: 1,
 	}
 }

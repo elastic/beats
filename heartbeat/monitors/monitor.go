@@ -57,7 +57,7 @@ type Monitor struct {
 	enabled        bool
 	state          int
 	// endpoints is a count of endpoints this monitor measures.
-	endpoints int
+	// endpoints int
 	// internalsMtx is used to synchronize access to critical
 	// internal datastructures
 	internalsMtx sync.Mutex
@@ -73,6 +73,7 @@ type Monitor struct {
 
 	monitorStateTracker *monitorstate.Tracker
 	statusReporter      status.StatusReporter
+	plugin              plugin.Plugin
 }
 
 func (m *Monitor) SetStatusReporter(statusReporter status.StatusReporter) {
@@ -196,7 +197,7 @@ func newMonitorUnsafe(
 		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader)
 	}
 
-	m.endpoints = p.Endpoints
+	m.plugin = p
 
 	m.configuredJobs, err = m.makeTasks(config, wrappedJobs)
 	if err != nil {
@@ -244,7 +245,7 @@ func (m *Monitor) Start() {
 		t.Start(m.pubClient)
 	}
 
-	m.stats.StartMonitor(int64(m.endpoints))
+	m.stats.StartMonitor(int64(m.plugin.Endpoints))
 	m.state = MON_STARTED
 	m.updateStatus(status.Running, "")
 }
@@ -270,9 +271,22 @@ func (m *Monitor) Stop() {
 		}
 	}
 
-	m.stats.StopMonitor(int64(m.endpoints))
+	m.stats.StopMonitor(int64(m.plugin.Endpoints))
 	m.state = MON_STOPPED
 	m.updateStatus(status.Stopped, "")
+}
+
+// Stop stops the monitor without freeing it in global dedup
+// needed by dedup itself to avoid a reentrant lock.
+func (m *Monitor) Update(config *conf.C) error {
+	m.internalsMtx.Lock()
+	defer m.internalsMtx.Unlock()
+
+	m.updateStatus(status.Configuring, "updating runner config")
+	m.plugin.Update(config)
+	m.updateStatus(status.Running, "runned updated")
+
+	return nil
 }
 
 func (m *Monitor) updateStatus(status status.Status, msg string) {
