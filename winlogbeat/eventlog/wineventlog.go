@@ -25,6 +25,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"golang.org/x/sys/windows"
 
@@ -33,6 +34,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	wininfo "github.com/elastic/go-sysinfo/providers/windows"
 )
 
 var errRecordIDGap = errors.New("record ID gap detected")
@@ -124,6 +126,9 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 	}
 
 	if c.XMLQuery != "" {
+		if l.hasWin2025ForwardedBugRisk() {
+			l.log.Warn("using a custom XML query with Windows Server 2025 forwarded events can hit a known Event Log API issue")
+		}
 		l.query = c.XMLQuery
 	} else {
 		l.log = l.log.With("channel", c.Name)
@@ -166,6 +171,18 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 func (l *winEventLog) isForwarded() bool {
 	c := l.config
 	return (c.Forwarded != nil && *c.Forwarded) || (c.Forwarded == nil && c.Name == "ForwardedEvents")
+}
+
+func (l *winEventLog) hasWin2025ForwardedBugRisk() bool {
+	if !l.isForwarded() {
+		return false
+	}
+	osinfo, err := wininfo.OperatingSystem()
+	if err != nil {
+		l.log.Warnf("failed to get OS info while checking known issue conditions: %v", err)
+		return false
+	}
+	return strings.Contains(osinfo.Name, "2025")
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
