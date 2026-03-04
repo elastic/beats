@@ -41,6 +41,11 @@ type conf struct {
 	UserQuery   string `config:"user_query"`
 	DeviceQuery string `config:"device_query"`
 
+	// IncludeEmptyGroups controls whether groups with
+	// no direct members are reported as individual
+	// documents.
+	IncludeEmptyGroups bool `config:"include_empty_groups"`
+
 	UserAttrs []string `config:"user_attributes"`
 	GrpAttrs  []string `config:"group_attributes"`
 
@@ -102,4 +107,8 @@ func (c *conf) wantDevices() bool {
 	default:
 		return false
 	}
+}
+
+func (c *conf) wantEmptyGroups() bool {
+	return c.IncludeEmptyGroups
 }
