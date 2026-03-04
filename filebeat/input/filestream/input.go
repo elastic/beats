@@ -114,6 +114,10 @@ func configure(
 		return nil, nil, err
 	}
 
+	if err := normalizeConfig(cfg, &c); err != nil {
+		return nil, nil, err
+	}
+
 	// zero must also disable clean_inactive, see:
 	// https://github.com/elastic/beats/issues/45601
 	// for more details. At the same time we need to allow
@@ -158,6 +162,30 @@ func configure(
 	filestream.scannerCheckInterval = c.FileWatcher.Interval
 
 	return prospector, filestream, nil
+}
+
+// normalizeConfig reconciles filestream defaults with file_identity semantics.
+// In 9.x, scanner fingerprinting defaults to enabled, but non-fingerprint
+// identities should turn it off unless the user explicitly sets it.
+func normalizeConfig(cfg *conf.C, c *config) error {
+	if c.FileIdentity == nil {
+		return nil
+	}
+
+	name := c.FileIdentity.Name()
+	if name == fingerprintName {
+		return nil
+	}
+
+	hasScannerFingerprint, err := cfg.Has("prospector.scanner.fingerprint.enabled", -1)
+	if err != nil {
+		return fmt.Errorf("cannot read 'prospector.scanner.fingerprint.enabled': %w", err)
+	}
+	if !hasScannerFingerprint {
+		c.FileWatcher.Scanner.Fingerprint.Enabled = false
+	}
+
+	return nil
 }
 
 func (inp *filestream) Name() string { return pluginName }

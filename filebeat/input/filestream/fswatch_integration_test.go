@@ -31,7 +31,7 @@ import (
 
 func TestFileWatcherNotifications(t *testing.T) {
 	testCases := map[string]func(t *testing.T, fw *fileWatcher, evt loginp.FSEvent, dir, logFilePath string){
-		"Partially ingested file": func(t *testing.T, fw *fileWatcher, evt loginp.FSEvent, dir, logFilePath string) {
+		"Partially ingested file": func(t *testing.T, fw *fileWatcher, _ loginp.FSEvent, dir, logFilePath string) {
 			// Tests the case:
 			//  - watch runs and sees a new file, it sends a create event
 			//  - data is added to the file
@@ -43,7 +43,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 			// Write to the file, so we get a write operation
 			integration.WriteLogFile(t, logFilePath, 10, true)
 			fw.watch(t.Context())
-			evt = <-fw.events
+			evt := <-fw.events
 			requireOperation(t, evt, loginp.OpWrite)
 
 			// Check the filewatcher state
@@ -215,4 +215,10 @@ func requireOperation(t *testing.T, evt loginp.FSEvent, op loginp.Operation) {
 	if evt.Op != op {
 		t.Fatalf("expecting operation %q, got: %q", op.String(), evt.Op.String())
 	}
+}
+
+func mustFingerprintIdentifier() fileIdentifier {
+	fi, _ := newFingerprintIdentifier(nil, nil)
+
+	return fi
 }
