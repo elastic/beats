@@ -119,6 +119,11 @@
 //   - The cursor value is only updated if at least one valid value was found
 //   - Float cursors reject NaN and Inf values at both config validation and DB result parsing
 //
+// NULL cursor values are never used to advance state. If your WHERE clause
+// explicitly includes NULL rows (for example, "updated_at > :cursor OR updated_at IS NULL"),
+// those NULL rows can be emitted repeatedly across collection cycles and restarts.
+// This is expected at-least-once behavior; use downstream deduplication if needed.
+//
 // # Concurrency and Query Timeout
 //
 // The [Manager] is safe for concurrent use. All cursor reads and writes are
@@ -188,6 +193,9 @@
 //     driver correctly handles time.Time query parameters.
 //   - Oracle: set session timezone to UTC for timestamp cursors via the godror
 //     alterSession DSN parameter, or timestamp comparisons may silently fail.
+//     Preflight: the host running Metricbeat must have Oracle Instant Client
+//     installed and libclntsh discoverable (macOS: DYLD_LIBRARY_PATH,
+//     Linux: LD_LIBRARY_PATH), otherwise startup/fetch will fail with DPI-1047.
 //   - Decimal: ToDriverArg returns string. Most drivers implicitly cast to
 //     DECIMAL, but if not, the user can add CAST(:cursor AS DECIMAL) in SQL.
 //

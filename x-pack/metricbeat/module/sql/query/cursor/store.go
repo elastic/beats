@@ -20,6 +20,9 @@ import (
 // Increment this when making breaking changes to the State struct.
 const StateVersion = 1
 
+// stateStoreName is the statestore bucket name used for cursor entries.
+const stateStoreName = "cursor-state"
+
 // State represents the persisted cursor state (versioned for future migrations)
 type State struct {
 	Version     int       `json:"version"`
@@ -39,7 +42,7 @@ type Store struct {
 // The registry is NOT owned by this Store — the caller (Module) manages its lifecycle.
 // Each call obtains a ref-counted Store handle from the shared registry.
 func NewStoreFromRegistry(registry *statestore.Registry, logger *logp.Logger) (*Store, error) {
-	store, err := registry.Get("cursor-state")
+	store, err := registry.Get(stateStoreName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open cursor store: %w", err)
 	}

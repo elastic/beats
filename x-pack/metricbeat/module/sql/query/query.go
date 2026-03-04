@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
@@ -94,6 +95,26 @@ type dbClient interface {
 
 var newDBClient = func(driver, dsn string, logger *logp.Logger) (dbClient, error) {
 	return sql.NewDBClient(driver, dsn, logger)
+}
+
+// maybeWrapOracleClientError enriches Oracle client-library load failures with
+// an actionable preflight hint for operators.
+func maybeWrapOracleClientError(driver string, err error) error {
+	if err == nil {
+		return nil
+	}
+
+	if sql.SwitchDriverName(driver) != "godror" {
+		return err
+	}
+
+	errMsg := err.Error()
+	if !strings.Contains(errMsg, "DPI-1047") && !strings.Contains(errMsg, "Cannot locate a 64-bit Oracle Client library") {
+		return err
+	}
+
+	return fmt.Errorf("%w. Oracle preflight check failed: install Oracle Instant Client and make libclntsh discoverable "+
+		"(macOS: DYLD_LIBRARY_PATH, Linux: LD_LIBRARY_PATH). See https://oracle.github.io/odpi/doc/installation.html", err)
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -343,7 +364,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (fetchErr
 	if m.cursorManager != nil {
 		// Try to acquire lock without blocking
 		if !m.fetchMutex.TryLock() {
-			m.Logger().Warn("Previous collection still in progress, skipping this cycle")
+			m.Logger().Warnf("Previous collection still in progress, skipping this cycle (driver=%s)", m.Config.Driver)
 			return nil
 		}
 		defer m.fetchMutex.Unlock()
@@ -353,7 +374,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (fetchErr
 
 	db, err := newDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
-		return fmt.Errorf("cannot open connection: %w", err)
+		return fmt.Errorf("cannot open connection: %w", maybeWrapOracleClientError(m.Config.Driver, err))
 	}
 	defer db.Close()
 
@@ -449,22 +470,27 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (fetchErr
 // breaking change for existing users whose queries legitimately take longer than their
 // configured period.
 func (m *MetricSet) fetchWithCursor(ctx context.Context, reporter mb.ReporterV2) error {
+	timeout := m.Module().Config().Timeout
+
 	// Apply the module's configured timeout (defaults to period) to prevent hung queries.
 	// Without this, a hung query blocks the goroutine indefinitely and all future
 	// collection cycles are skipped via fetchMutex.TryLock().
-	if timeout := m.Module().Config().Timeout; timeout > 0 {
+	if timeout > 0 {
 		var cancel context.CancelFunc
 		ctx, cancel = context.WithTimeout(ctx, timeout)
 		defer cancel()
 	}
 
 	cursorVal := m.cursorManager.CursorValueForQuery()
+	cursorBefore := m.cursorManager.CursorValueString()
+	stateKey := m.cursorManager.GetStateKey()
 
-	m.Logger().Debugf("Executing query with cursor=%s", m.cursorManager.CursorValueString())
+	m.Logger().Debugf("Cursor fetch start: driver=%s timeout=%s state_key=%s cursor=%s",
+		m.Config.Driver, timeout, stateKey, cursorBefore)
 
 	db, err := newDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
-		return fmt.Errorf("cannot open connection: %w", err)
+		return fmt.Errorf("cannot open connection: %w", maybeWrapOracleClientError(m.Config.Driver, err))
 	}
 	defer db.Close()
 
@@ -477,6 +503,7 @@ func (m *MetricSet) fetchWithCursor(ctx context.Context, reporter mb.ReporterV2)
 	m.Logger().Debugf("Query returned %d rows", len(rows))
 
 	if len(rows) == 0 {
+		m.Logger().Debugf("Cursor unchanged (state_key=%s, cursor=%s): no rows matched", stateKey, cursorBefore)
 		return nil
 	}
 
@@ -485,17 +512,22 @@ func (m *MetricSet) fetchWithCursor(ctx context.Context, reporter mb.ReporterV2)
 	// and do NOT advance the cursor so the same rows are re-fetched next cycle.
 	for _, row := range rows {
 		if ok := m.reportEvent(row, reporter, m.Config.Query); !ok {
-			m.Logger().Warn("Reporter stopped accepting events; cursor will not advance to avoid data loss")
+			m.Logger().Warnf("Reporter stopped accepting events; cursor unchanged (state_key=%s, cursor=%s) to avoid data loss",
+				stateKey, cursorBefore)
 			return nil
 		}
 	}
 
 	// Update cursor state — only reached when all events were accepted.
 	if err := m.cursorManager.UpdateFromResults(rows); err != nil {
-		m.Logger().Warnf("Failed to save cursor state: %v", err)
+		m.Logger().Warnf("Failed to save cursor state (state_key=%s, cursor_before=%s, rows=%d): %v",
+			stateKey, cursorBefore, len(rows), err)
 		// Don't fail the fetch - events were already emitted.
 		// Next run will re-fetch some data (duplicates are better than data loss).
+		return nil
 	}
+	m.Logger().Debugf("Cursor fetch completed: state_key=%s cursor_before=%s cursor_after=%s rows=%d",
+		stateKey, cursorBefore, m.cursorManager.CursorValueString(), len(rows))
 
 	return nil
 }

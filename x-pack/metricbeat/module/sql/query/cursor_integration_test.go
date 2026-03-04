@@ -1985,6 +1985,83 @@ func waitForMSSQLConnection(t *testing.T, host string) {
 // MULTI-DATABASE CURSOR STATE ISOLATION TEST
 // ============================================================================
 
+// TestCursorQueryChangeResetsState verifies that changing the SQL query text
+// causes a new cursor state key to be used, so fetching restarts from the
+// configured default cursor. This mirrors binary restart behavior where the
+// same path.data is reused across process restarts.
+func TestCursorQueryChangeResetsState(t *testing.T) {
+	service := compose.EnsureUp(t, "postgresql")
+	host, port, err := net.SplitHostPort(service.Host())
+	require.NoError(t, err)
+
+	user := postgresql.GetEnvUsername()
+	password := postgresql.GetEnvPassword()
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port)
+
+	db, err := sql.Open("postgres", dsn)
+	require.NoError(t, err)
+	defer db.Close()
+
+	setupPostgresTestTable(t, db)
+
+	testPaths := createTestPaths(t)
+
+	query1 := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 2", testTableName)
+	query2 := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 3", testTableName)
+
+	cfgBase := map[string]interface{}{
+		"module":              "sql",
+		"metricsets":          []string{"query"},
+		"hosts":               []string{dsn},
+		"driver":              "postgres",
+		"sql_response_format": tableResponseFormat,
+		"raw_data.enabled":    true,
+		"cursor.enabled":      true,
+		"cursor.column":       "id",
+		"cursor.type":         cursor.CursorTypeInteger,
+		"cursor.default":      "0",
+	}
+
+	cfg1 := map[string]interface{}{}
+	for k, v := range cfgBase {
+		cfg1[k] = v
+	}
+	cfg1["sql_query"] = query1
+
+	cfg2 := map[string]interface{}{}
+	for k, v := range cfgBase {
+		cfg2[k] = v
+	}
+	cfg2["sql_query"] = query2
+
+	// First run with query1 advances cursor to id=2.
+	ms1 := newMetricSetWithPaths(t, cfg1, testPaths)
+	events1, errs1 := fetchEvents(t, ms1)
+	require.Empty(t, errs1)
+	require.Len(t, events1, 2, "First query should return 2 events")
+	if closer, ok := ms1.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Second run with same query1 resumes from persisted state (ids 3,4).
+	ms1Again := newMetricSetWithPaths(t, cfg1, testPaths)
+	events1Again, errs1Again := fetchEvents(t, ms1Again)
+	require.Empty(t, errs1Again)
+	require.Len(t, events1Again, 2, "Second run with same query should continue from previous cursor")
+	if closer, ok := ms1Again.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+
+	// Changing query text should use a different state key and reset to default.
+	ms2 := newMetricSetWithPaths(t, cfg2, testPaths)
+	events2, errs2 := fetchEvents(t, ms2)
+	require.Empty(t, errs2)
+	require.Len(t, events2, 3, "Changed query should reset cursor and return first 3 rows")
+	if closer, ok := ms2.(mb.Closer); ok {
+		require.NoError(t, closer.Close())
+	}
+}
+
 // TestCursorStateIsolation verifies that cursor states are isolated per database/query
 func TestCursorStateIsolation(t *testing.T) {
 	service := compose.EnsureUp(t, "postgresql")
