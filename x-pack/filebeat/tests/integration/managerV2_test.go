@@ -890,7 +890,7 @@ func checkFilebeatLogs(t *testing.T, filebeat *integration.BeatProc, contains st
 		func() bool { return filebeat.LogContains(contains) },
 		waitDeadlineOr5Min(t),
 		tick,
-		fmt.Sprintf("String '%s' not found on Filebeat logs", contains),
+		"String '%s' not found on Filebeat logs", contains,
 	)
 }
 

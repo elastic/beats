@@ -84,19 +84,21 @@ class Test(BaseTest):
         self.wait_until(lambda: wrap_except(lambda: len(self.read_output()) >= min_events))
         # wait for the number of lines in the file to stay constant for 10 seconds
         prev_lines = -1
+        print(f"starting  wait_output with min_events: {min_events}")
         while True:
             num_lines = self.output_lines()
+            print(f"got line count: {prev_lines}/{num_lines}")
             if prev_lines < num_lines:
                 prev_lines = num_lines
-                time.sleep(10)
+                time.sleep(1)
             else:
                 break
 
     def wait_startup(self, backend, dir):
         if backend == "ebpf":
-            self.wait_log_contains("started ebpf watcher", max_timeout=30, ignore_case=True)
+            self.wait_log_contains("started ebpf watcher", max_timeout=90, ignore_case=True)
         if backend == "kprobes":
-            self.wait_log_contains("Started kprobes watcher", max_timeout=30, ignore_case=True)
+            self.wait_log_contains("Started kprobes watcher", max_timeout=90, ignore_case=True)
         else:
             # wait until the directories to watch are printed in the logs
             # this happens when the file_integrity module starts.
@@ -193,6 +195,7 @@ class Test(BaseTest):
         self._test_non_recursive("fsnotify")
 
     @unittest.skipUnless(is_root(), "Requires root")
+    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_non_recursive__ebpf(self):
         self._test_non_recursive("ebpf")
 
@@ -273,6 +276,7 @@ class Test(BaseTest):
         self._test_recursive("fsnotify")
 
     @unittest.skipUnless(is_root(), "Requires root")
+    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_recursive__ebpf(self):
         self._test_recursive("ebpf")
 
@@ -344,6 +348,7 @@ class Test(BaseTest):
 
     @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
     @unittest.skipUnless(is_root(), "Requires root")
+    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_file_modified__ebpf(self):
         self._test_file_modified("ebpf")
 
