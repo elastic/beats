@@ -44,7 +44,7 @@ On 04/16/2025, a known issue was discovered that can cause a crash of the Event 
 As a workaround, and to prevent crashes, avoid custom `xml_query` filters when working with forwarded events on Windows Server 2025.
 
 **Resolved**
-This issue is resolved for non-custom queries by always subscribing with an unfiltered `*` query and applying `ignore_older`, `provider`, `event_id`, and `level` filtering in Beats code after events are read, avoiding the problematic OS filter path. Custom `xml_query` inputs are still subject to the Windows Server 2025 forwarded-events limitation. To apply the fix, please upgrade to version 9.2.7, 9.3.2, 9.4.0, or any subsequent release.
+This issue is resolved for non-custom queries by always subscribing with an unfiltered `*` query and applying `ignore_older`, `provider`, `event_id`, and `level` filtering in Beats code after events are read, avoiding the problematic OS filter path. Custom `xml_query` inputs are still subject to the Windows Server 2025 forwarded-events limitation. To apply the fix, upgrade to version 9.2.7, 9.3.2, 9.4.0, or any later release.
 :::
 
 
