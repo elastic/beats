@@ -470,7 +470,7 @@ At runtime, the contents of `secret_state` are placed at `state.secret`, making 
 - Secrets from `secret_state` are automatically redacted without any `redact` configuration.
 - CEL programs that stash sensitive runtime values (such as session tokens) into `state.secret` during execution will also have those values redacted in debug logs.
 - If `state.secret` is absent at log time, the redaction is a no-op.
-- Values explicitly emitted via CEL `debug()` may include secrets.
+- Values explicitly emitted by CEL `debug()` may include secrets.
 
 ```yaml
 filebeat.inputs:
