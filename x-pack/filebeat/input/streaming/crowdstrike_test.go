@@ -184,6 +184,7 @@ func TestFollowSessionRefreshDoesNotSpinForShortIntervals(t *testing.T) {
 		t.Fatal("timed out waiting for refresh loop shutdown")
 	}
 }
+
 func TestRefreshSessionWait(t *testing.T) {
 	t.Parallel()
 
