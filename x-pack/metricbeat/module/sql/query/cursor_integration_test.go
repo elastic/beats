@@ -312,7 +312,7 @@ func testIntegerCursor(t *testing.T, driver, dsn string) {
 	ms3 := newMetricSetWithPaths(t, cfg, testPaths)
 	events3, errs3 := fetchEvents(t, ms3)
 	require.Empty(t, errs3)
-	require.Len(t, events3, 0, "Third fetch should return 0 events")
+	require.Empty(t, events3, "Third fetch should return 0 events")
 
 	if closer, ok := ms3.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
@@ -413,7 +413,7 @@ func testFloatCursor(t *testing.T, driver, dsn string) {
 	ms3 := newMetricSetWithPaths(t, cfg, testPaths)
 	events3, errs3 := fetchEvents(t, ms3)
 	require.Empty(t, errs3)
-	require.Len(t, events3, 0, "Third float fetch should return 0 events")
+	require.Empty(t, events3, "Third float fetch should return 0 events")
 
 	if closer, ok := ms3.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
@@ -467,7 +467,7 @@ func testDecimalCursor(t *testing.T, driver, dsn string) {
 	ms3 := newMetricSetWithPaths(t, cfg, testPaths)
 	events3, errs3 := fetchEvents(t, ms3)
 	require.Empty(t, errs3)
-	require.Len(t, events3, 0, "Third decimal fetch should return 0 events")
+	require.Empty(t, events3, "Third decimal fetch should return 0 events")
 
 	if closer, ok := ms3.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
@@ -2098,10 +2098,10 @@ func TestCursorRegistrySharing(t *testing.T) {
 	require.True(t, ok, "MetricSet should be *query.MetricSet")
 
 	// Type-assert to sql.Module interface to access GetCursorRegistry
-	mod1, ok := metricSet1.BaseMetricSet.Module().(sqlmod.Module)
+	mod1, ok := metricSet1.Module().(sqlmod.Module)
 	require.True(t, ok, "Module should implement sqlmod.Module interface")
 
-	mod2, ok := metricSet2.BaseMetricSet.Module().(sqlmod.Module)
+	mod2, ok := metricSet2.Module().(sqlmod.Module)
 	require.True(t, ok, "Module should implement sqlmod.Module interface")
 
 	// Get registry from both modules

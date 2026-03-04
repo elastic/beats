@@ -26,8 +26,10 @@ func TestModuleBuilderSharesState(t *testing.T) {
 	mod2, err := factory(mb.BaseModule{})
 	require.NoError(t, err)
 
-	m1 := mod1.(*module)
-	m2 := mod2.(*module)
+	m1, ok := mod1.(*module)
+	require.True(t, ok, "mod1 should be *module")
+	m2, ok := mod2.(*module)
+	require.True(t, ok, "mod2 should be *module")
 
 	assert.Same(t, m1.shared, m2.shared,
 		"All module instances from the same ModuleBuilder must share the same sharedRegistryState")
@@ -50,11 +52,15 @@ func TestGetCursorRegistryReturnsSamePointer(t *testing.T) {
 	mod2, err := factory(mb.BaseModule{})
 	require.NoError(t, err)
 
-	reg1, err := mod1.(Module).GetCursorRegistry()
+	sqlMod1, ok := mod1.(Module)
+	require.True(t, ok, "mod1 should implement sql.Module")
+	reg1, err := sqlMod1.GetCursorRegistry()
 	require.NoError(t, err)
 	require.NotNil(t, reg1)
 
-	reg2, err := mod2.(Module).GetCursorRegistry()
+	sqlMod2, ok := mod2.(Module)
+	require.True(t, ok, "mod2 should implement sql.Module")
+	reg2, err := sqlMod2.GetCursorRegistry()
 	require.NoError(t, err)
 	require.NotNil(t, reg2)
 
@@ -172,6 +178,6 @@ func TestModuleImplementsInterface(t *testing.T) {
 	_, ok := mod.(Module)
 	assert.True(t, ok, "module must implement the sql.Module interface")
 
-	_, ok = mod.(mb.Module)
-	assert.True(t, ok, "module must implement mb.Module")
+	// mod is already mb.Module (the return type of factory), so no assertion needed.
+	assert.NotNil(t, mod, "module must not be nil")
 }
