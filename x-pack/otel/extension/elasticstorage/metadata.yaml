@@ -1,0 +1,9 @@
+type: elastic_storage
+github_project: elastic/elastic-agent
+
+status:
+  class: extension
+  stability:
+    development: [extension]
+  codeowners:
+    active: [VihasMakwana]
