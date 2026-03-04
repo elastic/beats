@@ -35,6 +35,21 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
+var errRecordIDGap = errors.New("record ID gap detected")
+
+type gapDetectedError struct {
+	channel  string
+	previous uint64
+	current  uint64
+}
+
+func (e *gapDetectedError) Error() string {
+	return fmt.Sprintf("%v in channel %q (previous=%d current=%d)",
+		errRecordIDGap, e.channel, e.previous, e.current)
+}
+
+func (e *gapDetectedError) Unwrap() error { return errRecordIDGap }
+
 // winEventLog implements the EventLog interface for reading from the Windows
 // Event Log API.
 type winEventLog struct {
@@ -271,6 +286,10 @@ func (l *winEventLog) Read() ([]Record, error) {
 	for h, ok := l.iterator.Next(); ok; h, ok = l.iterator.Next() {
 		record, err := l.processHandle(h)
 		if err != nil {
+			if errors.Is(err, errRecordIDGap) {
+				l.metrics.logError(err)
+				return records, err
+			}
 			l.metrics.logError(err)
 			l.log.Warnw("Dropping event due to rendering error.", "error", err)
 			l.metrics.logDropped(err)
@@ -324,6 +343,20 @@ func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 
 	if l.file {
 		r.File = l.id
+	}
+
+	prevRecordID := l.lastRead.RecordNumber
+	if prevRecordID > 0 && r.RecordID > prevRecordID+1 {
+		l.log.Warnw("Record ID gap detected, resetting subscription.",
+			"channel", l.channelName,
+			"previous_record_id", prevRecordID,
+			"current_record_id", r.RecordID,
+			"missing", r.RecordID-prevRecordID-1)
+		return nil, &gapDetectedError{
+			channel:  l.channelName,
+			previous: prevRecordID,
+			current:  r.RecordID,
+		}
 	}
 
 	r.Offset = checkpoint.EventLogState{

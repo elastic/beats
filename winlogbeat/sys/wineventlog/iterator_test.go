@@ -264,5 +264,54 @@ func TestEventIterator(t *testing.T) {
 			assert.Greater(t, numFactoryInvocations, 1)
 			assert.EqualValues(t, eventCount, iterateCount)
 		})
+
+		t.Run("invalid_operation_no_handles", func(t *testing.T) {
+			itr, err := NewEventIterator(WithSubscription(log), WithBatchSize(10))
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer func() { assert.NoError(t, itr.Close()) }()
+
+			itr.evtNext = func(resultSet EvtHandle, eventArraySize uint32, eventArray *EvtHandle, timeout uint32, flags uint32, numReturned *uint32) (err error) {
+				*numReturned = 0
+				return windows.ERROR_INVALID_OPERATION
+			}
+
+			h, ok := itr.Next()
+			assert.False(t, ok)
+			assert.Zero(t, h)
+			assert.NoError(t, itr.Err())
+		})
+
+		t.Run("invalid_operation_with_handles_recovery", func(t *testing.T) {
+			var numFactoryInvocations int
+			factory := func() (handle EvtHandle, err error) {
+				numFactoryInvocations++
+				return openLog(t, winlogbeatTestLogName), nil
+			}
+
+			itr, err := NewEventIterator(WithSubscriptionFactory(factory), WithBatchSize(10))
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer func() { assert.NoError(t, itr.Close()) }()
+
+			calls := 0
+			itr.evtNext = func(resultSet EvtHandle, eventArraySize uint32, eventArray *EvtHandle, timeout uint32, flags uint32, numReturned *uint32) (err error) {
+				calls++
+				if calls == 1 {
+					*numReturned = 1
+					return windows.ERROR_INVALID_OPERATION
+				}
+				return _EvtNext(resultSet, eventArraySize, eventArray, timeout, flags, numReturned)
+			}
+
+			h, ok := itr.Next()
+			assert.True(t, ok)
+			assert.NotZero(t, h)
+			h.Close()
+			assert.NoError(t, itr.Err())
+			assert.Greater(t, numFactoryInvocations, 1)
+		})
 	})
 }
