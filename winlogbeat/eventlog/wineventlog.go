@@ -42,6 +42,7 @@ import (
 type winEventLog struct {
 	config      config
 	query       string
+	filter      *recordFilter
 	id          string                   // Identifier of this event log.
 	channelName string                   // Name of the channel from which to read.
 	file        bool                     // Reading from file rather than channel.
@@ -97,20 +98,14 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 			queryLog = "file://" + path
 		}
 
-		winQuery := win.Query{
-			Log: queryLog,
+		l.filter, err = newRecordFilter(c.SimpleQuery)
+		if err != nil {
+			return nil, err
 		}
 
-		if !l.skipQueryFilters() {
-			winQuery.IgnoreOlder = c.SimpleQuery.IgnoreOlder
-			winQuery.Level = c.SimpleQuery.Level
-			winQuery.EventID = c.SimpleQuery.EventID
-			winQuery.Provider = c.SimpleQuery.Provider
-		} else {
-			l.log.Warn("skipping query filters for Windows Server 2025 due to known issue" +
-				" with Event Log API and forwarded events")
-		}
-
+		// Always use an unfiltered subscription query and apply any configured
+		// filters in Go after events are read.
+		winQuery := win.Query{Log: queryLog}
 		l.query, err = winQuery.Build()
 		if err != nil {
 			return nil, err
@@ -287,6 +282,9 @@ func (l *winEventLog) Read() ([]Record, error) {
 			l.log.Warnw("Dropping event due to rendering error.", "error", err)
 			l.metrics.logDropped(err)
 			incrementMetric(dropReasons, err)
+			continue
+		}
+		if l.filter != nil && !l.filter.match(record) {
 			continue
 		}
 		records = append(records, *record)
