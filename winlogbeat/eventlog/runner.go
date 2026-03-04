@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"runtime"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -46,6 +47,10 @@ func Run(
 	publisher Publisher,
 	log *logp.Logger,
 ) error {
+	// Pin the runner goroutine so Win32 Event Log calls execute on one OS thread.
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	reporter.UpdateStatus(status.Starting, fmt.Sprintf("Starting to read from %s", api.Channel()))
 	// setup closing the API if either the run function is signaled asynchronously
 	// to shut down or when returning after io.EOF
