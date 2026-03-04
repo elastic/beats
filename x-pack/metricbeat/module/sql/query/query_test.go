@@ -18,10 +18,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/sql/query/cursor"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -147,7 +147,7 @@ func withFakeDBClientFactory(t *testing.T, db dbClient) {
 	t.Helper()
 
 	original := newDBClient
-	newDBClient = func(_ string, _ string, _ *logp.Logger) (dbClient, error) {
+	newDBClient = func(_, _ string, _ *logp.Logger) (dbClient, error) {
 		return db, nil
 	}
 	t.Cleanup(func() {
@@ -720,13 +720,13 @@ func TestNew_ConfigValidationErrors(t *testing.T) {
 		{
 			name: "cursor with fetch from all databases",
 			overrides: map[string]interface{}{
-				"sql_query":                 "SELECT id FROM t WHERE id > :cursor",
-				"sql_response_format":       "table",
-				"fetch_from_all_databases":  true,
-				"cursor.enabled":            true,
-				"cursor.column":             "id",
-				"cursor.type":               "integer",
-				"cursor.default":            "0",
+				"sql_query":                "SELECT id FROM t WHERE id > :cursor",
+				"sql_response_format":      "table",
+				"fetch_from_all_databases": true,
+				"cursor.enabled":           true,
+				"cursor.column":            "id",
+				"cursor.type":              "integer",
+				"cursor.default":           "0",
 			},
 			wantErr: "cursor is not supported with fetch_from_all_databases",
 		},

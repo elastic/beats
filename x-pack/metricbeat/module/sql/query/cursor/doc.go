@@ -205,7 +205,7 @@
 //   - Single cursor column (no composite cursors)
 //   - String, UUID, and ULID columns are not supported as cursor types (Phase 3)
 //   - MySQL backslash-escaped strings (for example, 'it\'s :cursor') may cause
-//     :cursor inside the literal to be misdetected; standard SQL '' escaping is handled
+//     :cursor inside the literal to be misdetected; standard SQL ” escaping is handled
 //   - ORDER BY must match the cursor column and the configured direction
 //   - The cursor column must be included in the SELECT clause
 //   - All matching rows are loaded into memory; use LIMIT (500-5000 recommended)

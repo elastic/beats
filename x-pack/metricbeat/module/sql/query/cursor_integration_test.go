@@ -2270,7 +2270,6 @@ func TestCursorRegistrySharing(t *testing.T) {
 	if closer, ok := ms2.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
-
 }
 
 // ============================================================================

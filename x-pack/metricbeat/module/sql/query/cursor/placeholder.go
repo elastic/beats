@@ -95,9 +95,9 @@ const (
 // findPlaceholderPositions returns the byte offsets of every :cursor
 // placeholder that appears in executable SQL. The scanner skips content
 // inside:
-//   - Single-quoted strings ('...'), with '' escape handling
+//   - Single-quoted strings ('...'), with ” escape handling
 //   - Double-quoted identifiers ("..."), with "" escape handling
-//   - Backtick-quoted identifiers (`...`), with `` escape handling
+//   - Backtick-quoted identifiers (`...`), with “ escape handling
 //   - Line comments (-- ...)
 //   - Block comments (/* ... */)
 //
@@ -107,7 +107,7 @@ const (
 // a real placeholder. This is acceptable because operator-written queries
 // rarely use backslash escapes, and MySQL's NO_BACKSLASH_ESCAPES mode
 // disables them entirely. The standard SQL escape (doubled quotes:
-// 'it''s :cursor') is handled correctly.
+// 'it”s :cursor') is handled correctly.
 func findPlaceholderPositions(query string) []int {
 	positions := make([]int, 0, 1)
 	n := len(query)
