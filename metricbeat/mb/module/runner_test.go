@@ -24,6 +24,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -49,7 +50,11 @@ func TestRunner(t *testing.T) {
 	}
 
 	// Create a new Wrapper based on the configuration.
+<<<<<<< HEAD
 	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), module.WithMetricSetInfo())
+=======
+	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+>>>>>>> 8ed67e48c (Fix beat receiver 30s metrics (#49236))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +82,11 @@ func TestCPUDiagnostics(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create a new Wrapper based on the configuration.
+<<<<<<< HEAD
 	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), module.WithMetricSetInfo())
+=======
+	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+>>>>>>> 8ed67e48c (Fix beat receiver 30s metrics (#49236))
 	if err != nil {
 		t.Fatal(err)
 	}
