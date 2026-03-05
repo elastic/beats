@@ -58,7 +58,7 @@ func (s *store) Has(key string) (bool, error) {
 	defer s.mx.Unlock()
 
 	var v interface{}
-	err := s.get(key, v)
+	err := s.get(key, &v)
 	if err != nil {
 		if errors.Is(err, ErrKeyUnknown) {
 			return false, nil
