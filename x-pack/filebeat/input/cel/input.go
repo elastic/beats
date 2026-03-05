@@ -92,7 +92,8 @@ func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 }
 
 type input struct {
-	time func() time.Time
+	time           func() time.Time
+	tracerProvider *sdktrace.TracerProvider // if nil, created from env vars
 }
 
 // now is time.Now with a modifiable time source.
@@ -179,11 +180,15 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	metrics, reg := newInputMetrics(env.MetricsRegistry, env.Logger)
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
-	otelTracerProvider, err := otel.NewTracerProvider(ctx, getResourceAttributes(env, cfg), i.Name())
-	if err != nil {
-		return err
+	otelTracerProvider := i.tracerProvider
+	if otelTracerProvider == nil {
+		var err error
+		otelTracerProvider, err = otel.NewTracerProvider(ctx, getResourceAttributes(env, cfg), i.Name())
+		if err != nil {
+			return err
+		}
+		defer otelTracerProvider.Shutdown(ctx)
 	}
-	defer otelTracerProvider.Shutdown(ctx)
 	otelTracer := otelTracerProvider.Tracer(importPath)
 
 	if cfg.Resource.Tracer != nil {
