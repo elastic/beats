@@ -328,19 +328,20 @@ func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) 
 		win.EvtHandle(bookmark), // Bookmark - for resuming from a specific event
 		flags)
 
-	switch err { //nolint:errorlint // This is an errno or nil.
-	case nil:
+	if err == nil {
 		return h, nil
-	case win.ERROR_NOT_FOUND, win.ERROR_EVT_QUERY_RESULT_STALE, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION:
+	}
+	if errors.Is(err, win.ERROR_NOT_FOUND) ||
+		errors.Is(err, win.ERROR_EVT_QUERY_RESULT_STALE) ||
+		errors.Is(err, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION) {
 		// The bookmarked event was not found, we retry the subscription from the start.
 		incrementMetric(readErrors, err)
 		// Clear persisted checkpoint fields before restarting at oldest so stale
 		// state does not produce synthetic gap checks on the next records.
 		l.resetLastRead()
 		return win.Subscribe(0, signalEvent, channelPath, l.query, 0, win.EvtSubscribeStartAtOldestRecord)
-	default:
-		return 0, err
 	}
+	return 0, err
 }
 
 func (l *winEventLog) Read() ([]Record, error) {

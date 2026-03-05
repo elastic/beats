@@ -25,13 +25,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sys/windows"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestEventIterator(t *testing.T) {
-	logp.TestingSetup()
-
 	writer, tearDown := createLog(t)
 	defer tearDown()
 
@@ -167,9 +163,6 @@ func TestEventIterator(t *testing.T) {
 	// Note: As of 2020-03 Windows 2019 no longer exhibits this behavior.
 	// Instead EvtNext simply returns fewer handles that the requested size.
 	t.Run("rpc_error", func(t *testing.T) {
-		log := openLog(t, winlogbeatTestLogName)
-		defer log.Close()
-
 		// Mock the behavior to simplify testing since it's not reproducible
 		// on all Windows versions.
 		mockEvtNext := func(resultSet EvtHandle, eventArraySize uint32, eventArray *EvtHandle, timeout uint32, flags uint32, numReturned *uint32) (err error) {
@@ -182,6 +175,9 @@ func TestEventIterator(t *testing.T) {
 		// If you create the iterator with only a subscription handle then
 		// no recovery is possible without data loss.
 		t.Run("no_recovery", func(t *testing.T) {
+			log := openLog(t, winlogbeatTestLogName)
+			defer log.Close()
+
 			itr, err := NewEventIterator(WithSubscription(log))
 			if err != nil {
 				t.Fatal(err)
@@ -266,6 +262,9 @@ func TestEventIterator(t *testing.T) {
 		})
 
 		t.Run("invalid_operation_no_handles", func(t *testing.T) {
+			log := openLog(t, winlogbeatTestLogName)
+			defer log.Close()
+
 			itr, err := NewEventIterator(WithSubscription(log), WithBatchSize(10))
 			if err != nil {
 				t.Fatal(err)

@@ -173,6 +173,7 @@ func testWindowsEventLog(t *testing.T, includeXML bool) {
 	const messageSize = 256 // Originally 31800, such a large value resulted in an empty eventlog under Win10.
 	const totalEvents = 1000
 	for i := 0; i < totalEvents; i++ {
+		// #nosec G115 -- i is bounded by totalEvents and event ID is constrained to [1,1000].
 		safeWriteEvent(t, writer, uint32(i%1000)+1, strconv.Itoa(i)+" "+randomSentence(messageSize))
 	}
 
@@ -190,7 +191,7 @@ func testWindowsEventLog(t *testing.T, includeXML bool) {
 			require.NoError(t, err)
 
 			r := records[0]
-			require.NotEmpty(t, r.Message, "message field is empty: errors:%v\nrecord:%#v", r.Event.RenderErr, r)
+			require.NotEmpty(t, r.Message, "message field is empty: errors:%v\nrecord:%#v", r.RenderErr, r)
 		}
 	})
 

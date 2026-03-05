@@ -79,10 +79,11 @@ func WithSubscription(subscription EvtHandle) EventIteratorOption {
 func WithBatchSize(size int) EventIteratorOption {
 	return func(itr *EventIterator) {
 		if size > 0 {
+			if size > int(evtNextMaxHandles) {
+				itr.batchSize = evtNextMaxHandles
+				return
+			}
 			itr.batchSize = uint32(size)
-		}
-		if size > evtNextMaxHandles {
-			itr.batchSize = evtNextMaxHandles
 		}
 	}
 }
@@ -152,18 +153,18 @@ func (itr *EventIterator) moreHandles() bool {
 		var numReturned uint32
 
 		nextErr := itr.evtNext(itr.subscription, batchSize, &itr.handles[0], 0, 0, &numReturned)
-		switch nextErr { //nolint:errorlint // Bad linter! This is always errno or nil.
-		case nil:
+		switch {
+		case nextErr == nil:
 			itr.lastErr = nil
 			itr.active = itr.handles[:numReturned]
-		case windows.ERROR_NO_MORE_ITEMS:
-		case windows.ERROR_INVALID_OPERATION:
+		case errors.Is(nextErr, windows.ERROR_NO_MORE_ITEMS):
+		case errors.Is(nextErr, windows.ERROR_INVALID_OPERATION):
 			// ERROR_INVALID_OPERATION can be returned during polling with zero handles.
 			if numReturned == 0 {
 				break
 			}
 			fallthrough
-		case windows.RPC_S_INVALID_BOUND:
+		case errors.Is(nextErr, windows.RPC_S_INVALID_BOUND):
 			// Attempt automated recovery if we have a factory.
 			if itr.subscriptionFactory != nil {
 				itr.log.Warnw("EvtNext failed, recreating subscription.",
@@ -179,7 +180,7 @@ func (itr *EventIterator) moreHandles() bool {
 				}
 
 				// Reduce batch size only for RPC_S_INVALID_BOUND and try again.
-				if nextErr == windows.RPC_S_INVALID_BOUND {
+				if errors.Is(nextErr, windows.RPC_S_INVALID_BOUND) {
 					batchSize = batchSize / 2
 				}
 				continue

@@ -99,8 +99,8 @@ func openLog(t testing.TB, log string) EvtHandle {
 	t.Helper()
 	var (
 		err   error
-		path               = log
-		flags EvtQueryFlag = EvtQueryReverseDirection
+		path  = log
+		flags = EvtQueryReverseDirection
 	)
 
 	if info, err := os.Stat(log); err == nil && info.Mode().IsRegular() {
