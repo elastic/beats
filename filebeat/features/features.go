@@ -44,6 +44,12 @@ func initFromEnv(envName string) {
 	isESEnabled = len(esTypesEnabled) > 0
 }
 
+// Reload re-reads the AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES
+// environment variable and updates the feature state. This is used in tests.
+func Reload() {
+	initFromEnv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES")
+}
+
 // IsElasticsearchStateStoreEnabled returns true if feature is enabled for agentless
 func IsElasticsearchStateStoreEnabled() bool {
 	return isESEnabled
