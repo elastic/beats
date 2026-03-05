@@ -213,7 +213,7 @@ func (l *logstashExporter) handleBatchResult(
 }
 
 func (l *logstashExporter) reportConnectivityStatus() {
-	// if not able to connect to all of the configured hosts - report degraded health
+	// Report degraded satus if we are not able to connect to all of the configured hosts.
 	connected := false
 	workers := l.getWorkers()
 	if len(workers) == 0 {
