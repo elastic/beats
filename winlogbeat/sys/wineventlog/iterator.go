@@ -181,6 +181,10 @@ func (itr *EventIterator) moreHandles() bool {
 
 				// Reduce batch size only for RPC_S_INVALID_BOUND and try again.
 				if errors.Is(nextErr, windows.RPC_S_INVALID_BOUND) {
+					if batchSize <= 1 {
+						itr.lastErr = fmt.Errorf("failed in EvtNext after exhausting batch-size recovery: %w", nextErr)
+						return false
+					}
 					batchSize = batchSize / 2
 				}
 				continue
