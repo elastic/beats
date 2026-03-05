@@ -24,7 +24,7 @@
 //
 // The package is organized into the following components:
 //
-//   - [Config]: User-facing configuration (column, optional type, default) with validation
+//   - [Config]: User-facing configuration (column, optional type, default, optional state_id) with validation
 //   - [Value]: Type-safe cursor value with serialization and comparison support
 //   - [Store]: Persistence layer backed by libbeat/statestore with memlog backend
 //   - [Manager]: Lifecycle coordinator that ties configuration, storage, and query execution together
@@ -77,8 +77,10 @@
 // appear in the key):
 //
 //   - Input type ("sql") — fixed namespace, never changes
-//   - Full database URI/DSN — not normalized; includes host, port, database
-//     name, credentials, and connection parameters
+//   - State identity — one of: (a) full database URI/DSN when cursor.state_id
+//     is unset (not normalized; includes host, port, database name, credentials,
+//     and connection parameters), or (b) cursor.state_id when set (a stable
+//     operator-provided identity)
 //   - Full query string — not normalized; exact byte match, so whitespace
 //     or capitalization changes produce a different key
 //   - Cursor column name
@@ -87,16 +89,18 @@
 // Any change to these components produces a different key, which resets the
 // cursor to its configured default value. Examples of changes that reset:
 //
-//   - Changing the database password or username in the DSN
-//   - Adding connection parameters (e.g., ?sslmode=require)
+//   - Changing the database password or username in the DSN (when state_id is unset)
+//   - Adding connection parameters (e.g., ?sslmode=require) (when state_id is unset)
 //   - Reformatting the SQL query (whitespace, capitalization)
 //   - Renaming the cursor column
 //   - Switching direction from "asc" to "desc"
+//   - Changing cursor.state_id
 //
 // Examples of changes that do NOT reset the cursor:
 //
 //   - Changing cursor.default (only used on first run)
 //   - Changing period or timeout (runtime settings, not part of the key)
+//   - Changing DSN credentials/parameters when cursor.state_id is set and unchanged
 //
 // The full URI is used (rather than just host:port) so that two databases
 // on the same server produce distinct state keys. This is essential for
@@ -106,10 +110,11 @@
 // Known tradeoff: including the full DSN means that password rotation,
 // username changes, or adding connection parameters will reset the cursor.
 // This is a safe failure mode — it causes re-ingestion (duplicates), never
-// data loss. There is currently no built-in way to avoid cursor resets on
-// credential changes. Because the state key is a hash of the full DSN,
-// simply backing up and restoring the state directory does not help — the
-// new DSN produces a different hash, so the restored state is never looked up.
+// data loss. To avoid cursor resets on credential changes, configure
+// cursor.state_id as a stable logical source identifier. When state_id is
+// unset and DSN changes, backing up and restoring the state directory does not
+// help — the new DSN produces a different hash, so the restored state is never
+// looked up.
 //
 // # Error Philosophy
 //
@@ -173,6 +178,7 @@
 //	      column: id
 //	      type: integer
 //	      default: "0"
+//	      # state_id: payments-prod
 //
 // The :cursor placeholder is replaced at startup with the driver-specific
 // syntax. At each collection cycle:

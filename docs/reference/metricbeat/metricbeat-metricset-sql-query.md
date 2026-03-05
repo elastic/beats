@@ -60,6 +60,7 @@ To enable cursor-based fetching, add a `cursor` configuration block to your metr
 | `cursor.enabled` | No | Set to `true` to enable cursor-based fetching. Default: `false` |
 | `cursor.column` | Yes (when enabled) | The column name to track for cursor state. Must be present in query results. |
 | `cursor.type` | No | Optional cursor type. If omitted, it is inferred from `cursor.default` and refined from result rows. Allowed values: `integer`, `timestamp`, `date`, `float`, `decimal` |
+| `cursor.state_id` | No | Optional stable state identity. When set, cursor state keys use this value instead of DSN, allowing continuity across DSN credential/parameter changes. Use a unique value per logical source. |
 | `cursor.default` | Yes (when enabled) | Initial cursor value used on first run (before any state is persisted) |
 | `cursor.direction` | No | Scan direction: `asc` (default, tracks max value) or `desc` (tracks min value) |
 
@@ -236,7 +237,9 @@ Cursor state is persisted to disk using Metricbeat's statestore at:
 
 The state persists across Metricbeat restarts, allowing incremental fetching to continue
 from where it left off. State is keyed by a hash of:
-- Full database URI/DSN (includes database name)
+- State identity:
+  - Full database URI/DSN (default behavior)
+  - `cursor.state_id` when configured
 - Query string
 - Cursor column name
 - Cursor direction (`asc` or `desc`)
@@ -247,6 +250,21 @@ different databases on the same server.
 **Important:** Changing any of these components (DSN, query, cursor column, or direction) produces a
 different state key, which effectively resets the cursor to its `default` value. This is by design —
 if you modify the query, the old cursor position might no longer be valid for the new query.
+
+### Cursor reset scenarios
+
+The cursor falls back to `cursor.default` when:
+- Any state-key component changes: state identity (DSN by default or `cursor.state_id`), query text, `cursor.column`, or `cursor.direction`
+- Persisted state is invalid (for example: unsupported state version, corrupted value, unsupported stored type, or state-load failure)
+- `cursor.type` is explicitly configured and does not match the persisted state type
+
+The cursor does **not** reset when only these settings change:
+- `cursor.default` (used only when state is missing/invalid)
+- `period` or `timeout` (runtime scheduling/timeout settings)
+- DSN credentials/parameters when `cursor.state_id` is set and unchanged
+
+When `cursor.type` is omitted (auto mode), a valid persisted state type is reused on restart.
+If no valid state exists, type is inferred from `cursor.default`.
 
 ### Choosing comparison operators for queries
 
@@ -303,6 +321,9 @@ If your driver doesn't, use an explicit cast: `WHERE price > CAST(:cursor AS DEC
 ### Limitations
 
 - Only one `:cursor` placeholder is allowed per query
+- Placeholder detection skips common quoted strings, quoted identifiers, and SQL comments.
+  Limitation: MySQL backslash-escaped strings (for example, `'it\\'s :cursor'`) can still
+  mis-detect `:cursor` inside the literal
 - The cursor column **must** be included in the SELECT clause. If omitted, the cursor will not
   advance and an error will be logged on the first fetch
 - NULL cursor values are skipped (only non-NULL values contribute to cursor progression)

@@ -801,6 +801,31 @@ func TestNew_CursorTypeOptional(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestNew_CursorStateIDOptional(t *testing.T) {
+	cfg := testMetricSetConfig("SELECT id FROM t WHERE id > :cursor ORDER BY id ASC")
+	cfg["cursor.enabled"] = true
+	cfg["cursor.column"] = "id"
+	cfg["cursor.type"] = "integer"
+	cfg["cursor.default"] = "0"
+	cfg["cursor.state_id"] = "payments-prod"
+
+	err := instantiateMetricSetWithConfig(t, cfg)
+	require.NoError(t, err)
+}
+
+func TestNew_CursorStateIDBlankIsRejected(t *testing.T) {
+	cfg := testMetricSetConfig("SELECT id FROM t WHERE id > :cursor ORDER BY id ASC")
+	cfg["cursor.enabled"] = true
+	cfg["cursor.column"] = "id"
+	cfg["cursor.type"] = "integer"
+	cfg["cursor.default"] = "0"
+	cfg["cursor.state_id"] = "   "
+
+	err := instantiateMetricSetWithConfig(t, cfg)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "cursor.state_id cannot be blank")
+}
+
 func TestInferTypeFromMetricsAndDriverHelpers(t *testing.T) {
 	typed := inferTypeFromMetrics(mapstr.M{
 		"i":    int64(1),

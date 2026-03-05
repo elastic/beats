@@ -190,10 +190,12 @@ func (m *MetricSet) initCursor(base mb.BaseMetricSet) error {
 	}
 
 	// Create cursor manager.
-	// We use the full URI (not just Host) for state key generation because
-	// Host often strips the database name (for example, "localhost:5432" for both
-	// postgres://...localhost:5432/db_a and db_b). The URI is hashed via
-	// xxhash so there is no secret leakage risk in the stored key.
+	// By default we use the full URI (not just Host) for state key generation
+	// because Host often strips the database name (for example, "localhost:5432"
+	// for both postgres://...localhost:5432/db_a and db_b).
+	// If cursor.state_id is configured, it is used as a stable identity instead.
+	// The resulting identity is hashed via xxhash so there is no secret leakage
+	// risk in the stored key.
 	mgr, err := cursor.NewManager(
 		m.Config.Cursor,
 		store,

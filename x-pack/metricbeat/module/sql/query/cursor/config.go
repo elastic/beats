@@ -56,6 +56,7 @@ type Config struct {
 	Type      string `config:"type"`      // Optional. "integer", "timestamp", "date", "float", or "decimal"
 	Default   string `config:"default"`   // Initial cursor value as string
 	Direction string `config:"direction"` // "asc" (default) or "desc"
+	StateID   string `config:"state_id"`  // Optional stable identity for state keying across DSN changes
 }
 
 // Validate checks the configuration for errors.
@@ -68,6 +69,13 @@ func (c *Config) Validate() error {
 
 	if c.Column == "" {
 		return errors.New("cursor.column is required when cursor is enabled")
+	}
+
+	if c.StateID != "" {
+		c.StateID = strings.TrimSpace(c.StateID)
+		if c.StateID == "" {
+			return errors.New("cursor.state_id cannot be blank when set")
+		}
 	}
 
 	if c.Type != "" && !isValidCursorType(c.Type) {

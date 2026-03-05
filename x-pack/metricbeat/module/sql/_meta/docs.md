@@ -61,6 +61,9 @@ Use `sql_queries` or `sql_query` depending on the use-case.
     `cursor.type`
     :   Optional cursor type. If omitted, it is inferred from `cursor.default` and refined from result rows. Allowed values: `integer`, `timestamp`, `date`, `float`, `decimal`.
 
+    `cursor.state_id`
+    :   Optional stable state identity. When set, cursor state keys use this value instead of DSN, allowing continuity across DSN credential/parameter changes. Use a unique value per logical source.
+
     `cursor.default`
     :   Initial cursor value used on first run (before any state is persisted).
 
@@ -68,6 +71,7 @@ Use `sql_queries` or `sql_query` depending on the use-case.
     :   Scan direction: `asc` (default, tracks max value) or `desc` (tracks min value).
 
     Cursor is not compatible with `sql_queries` (multiple queries) or `fetch_from_all_databases`. Each cursor-based fetch is protected by the module's `timeout` setting (which defaults to `period`) to prevent hung queries from blocking indefinitely. See the [query metricset documentation](/reference/metricbeat/metricbeat-metricset-sql-query.md) for full details.
+    Cursor reset summary: state resets to `cursor.default` when state identity (DSN by default or `cursor.state_id`), query, column, or direction changes, when persisted state is invalid, or when an explicit `cursor.type` mismatches persisted state. Changing only `cursor.default`, `period`, or `timeout` does not reset state. With `cursor.state_id` set, DSN credential/parameter changes do not reset state.
 
 
 ## Example [_example_4]

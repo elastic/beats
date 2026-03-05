@@ -110,11 +110,11 @@ func (s *Store) Close() error {
 //
 // Components that trigger cursor reset:
 //   - inputType: "sql" (for namespacing) - hardcoded, never changes
-//   - dsn: Full database URI/DSN (NOT normalized)
-//   - Changing host (localhost → 127.0.0.1) resets cursor
-//   - Changing password in DSN resets cursor
-//   - Adding connection params (?sslmode=require) resets cursor
-//   - Includes database name for isolation (prod_db vs test_db on same server)
+//   - stateIdentity — one of: (a) full database URI/DSN (NOT normalized) when
+//     cursor.state_id is unset, or (b) cursor.state_id when set (stable across
+//     DSN changes). For DSN-based identity: changing host, password, or connection
+//     params resets cursor; includes database name for isolation (prod_db vs
+//     test_db on same server). Changing cursor.state_id also resets cursor.
 //   - query: Full query string (NOT normalized - exact byte match)
 //   - Adding/removing whitespace resets cursor
 //   - Changing SQL capitalization (SELECT → select) resets cursor
@@ -133,13 +133,15 @@ func (s *Store) Close() error {
 //     SQL parsing keeps implementation simple and reliable.
 //   - Isolation: Different databases on same server (e.g., prod_db vs test_db)
 //     must have separate cursor states. Including full DSN ensures this.
+//   - Operability: Optional cursor.state_id allows stable cursor continuity
+//     across credential/DSN changes when operators explicitly opt in.
 //   - Direction safety: A cursor value tracked as a maximum (asc) is semantically
 //     incompatible with minimum tracking (desc). Changing direction must reset.
 //
 // The combined string is hashed via xxhash, so no secrets appear in the stored key.
 // Each part is length-prefixed to avoid ambiguity when parts contain the delimiter.
-func GenerateStateKey(inputType, dsn, query, cursorColumn, direction string) string {
-	keyParts := []string{inputType, dsn, query, cursorColumn, direction}
+func GenerateStateKey(inputType, stateIdentity, query, cursorColumn, direction string) string {
+	keyParts := []string{inputType, stateIdentity, query, cursorColumn, direction}
 
 	var b strings.Builder
 	for _, p := range keyParts {

@@ -99,3 +99,84 @@ func TestManagerAutoType_RefineFromRowsAndReloadFromState(t *testing.T) {
 	require.True(t, ok)
 	assert.Equal(t, "20.5", arg2)
 }
+
+func TestManagerStateID_PreservesStateAcrossDSNChanges(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping manager test in short mode")
+	}
+
+	tmpDir := t.TempDir()
+	beatPaths := &paths.Path{
+		Home:   tmpDir,
+		Config: tmpDir,
+		Data:   tmpDir,
+		Logs:   tmpDir,
+	}
+	logger := logp.NewNopLogger()
+
+	cfg := Config{
+		Enabled: true,
+		Column:  "id",
+		Type:    CursorTypeInteger,
+		Default: "0",
+		StateID: "payments-prod",
+	}
+	query := "SELECT id FROM t WHERE id > :cursor ORDER BY id"
+
+	store1, _ := newTestStore(t, beatPaths, logger)
+	mgr1, err := NewManager(cfg, store1, "postgres://user:oldpass@localhost:5432/prod", query, logger)
+	require.NoError(t, err)
+
+	err = mgr1.UpdateFromResults([]mapstr.M{
+		{"id": int64(150)},
+	})
+	require.NoError(t, err)
+	require.NoError(t, mgr1.Close())
+
+	store2, _ := newTestStore(t, beatPaths, logger)
+	mgr2, err := NewManager(cfg, store2, "postgres://user:newpass@localhost:5432/prod", query, logger)
+	require.NoError(t, err)
+	defer mgr2.Close()
+
+	assert.Equal(t, "150", mgr2.CursorValueString(), "state_id should keep cursor continuity across DSN changes")
+}
+
+func TestManagerWithoutStateID_ResetsOnDSNChanges(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping manager test in short mode")
+	}
+
+	tmpDir := t.TempDir()
+	beatPaths := &paths.Path{
+		Home:   tmpDir,
+		Config: tmpDir,
+		Data:   tmpDir,
+		Logs:   tmpDir,
+	}
+	logger := logp.NewNopLogger()
+
+	cfg := Config{
+		Enabled: true,
+		Column:  "id",
+		Type:    CursorTypeInteger,
+		Default: "0",
+	}
+	query := "SELECT id FROM t WHERE id > :cursor ORDER BY id"
+
+	store1, _ := newTestStore(t, beatPaths, logger)
+	mgr1, err := NewManager(cfg, store1, "postgres://user:oldpass@localhost:5432/prod", query, logger)
+	require.NoError(t, err)
+
+	err = mgr1.UpdateFromResults([]mapstr.M{
+		{"id": int64(150)},
+	})
+	require.NoError(t, err)
+	require.NoError(t, mgr1.Close())
+
+	store2, _ := newTestStore(t, beatPaths, logger)
+	mgr2, err := NewManager(cfg, store2, "postgres://user:newpass@localhost:5432/prod", query, logger)
+	require.NoError(t, err)
+	defer mgr2.Close()
+
+	assert.Equal(t, "0", mgr2.CursorValueString(), "without state_id, DSN change should create a new state key")
+}

@@ -32,6 +32,7 @@ func TestConfigValidate(t *testing.T) {
 				Column:  "id",
 				Type:    CursorTypeInteger,
 				Default: "0",
+				StateID: "payments-prod",
 			},
 			wantErr: false,
 		},
@@ -97,6 +98,18 @@ func TestConfigValidate(t *testing.T) {
 			},
 			wantErr: true,
 			errMsg:  "cursor.default is required",
+		},
+		{
+			name: "blank state_id",
+			config: Config{
+				Enabled: true,
+				Column:  "id",
+				Type:    CursorTypeInteger,
+				Default: "0",
+				StateID: "   ",
+			},
+			wantErr: true,
+			errMsg:  "cursor.state_id cannot be blank",
 		},
 		{
 			name: "invalid integer default",

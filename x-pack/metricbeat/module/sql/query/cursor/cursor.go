@@ -34,7 +34,7 @@ type Manager struct {
 // Parameters:
 //   - cfg: Cursor configuration from metricbeat.yml
 //   - store: State persistence store (memlog-backed)
-//   - dsn: Full database URI/DSN for state key generation (hashed, not stored in cleartext)
+//   - dsn: Full database URI/DSN used for state key generation unless cfg.StateID is set
 //   - query: Original SQL query (before placeholder translation)
 //   - logger: Logger instance for this cursor
 //
@@ -48,10 +48,16 @@ func NewManager(cfg Config, store *Store, dsn, query string, logger *logp.Logger
 		return nil, err
 	}
 
+	stateIdentity := dsn
+	if cfg.StateID != "" {
+		// Prefix with namespace to reduce accidental collisions with DSN-shaped values.
+		stateIdentity = "state-id:" + cfg.StateID
+	}
+
 	m := &Manager{
 		config:   cfg,
 		store:    store,
-		stateKey: GenerateStateKey("sql", dsn, query, cfg.Column, cfg.Direction),
+		stateKey: GenerateStateKey("sql", stateIdentity, query, cfg.Column, cfg.Direction),
 		// Explicit type from config is authoritative and cannot be auto-adjusted.
 		typeLocked: cfg.Type != "",
 		logger:     logger,
