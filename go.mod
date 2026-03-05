@@ -266,10 +266,7 @@ require (
 	cloud.google.com/go/iam v1.5.2 // indirect
 	cloud.google.com/go/longrunning v0.6.7 // indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
-<<<<<<< HEAD
-=======
 	filippo.io/edwards25519 v1.1.1 // indirect
->>>>>>> 4213367d8 (metricbeat: update transient dependency filippo.io/edwards25519 (#49070))
 	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.3 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.11.2 // indirect
