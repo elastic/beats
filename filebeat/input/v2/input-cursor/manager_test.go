@@ -33,6 +33,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/features"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
@@ -106,6 +107,47 @@ func TestManager_Init(t *testing.T) {
 			time.Sleep(1 * time.Millisecond)
 		}
 	})
+}
+
+func TestManager_InitDefersStoreForES(t *testing.T) {
+	// Verify that ES-backed inputs defer store creation from Init() to Create().
+	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "test")
+	features.ReinitForTest()
+	t.Cleanup(func() { features.ReinitForTest() }) // restore after test
+
+	data := map[string]state{
+		"test::mykey": {Cursor: "value1"},
+	}
+	stateStore := createSampleStore(t, data)
+
+	var grp unison.TaskGroup
+	defer grp.Stop() //nolint:errcheck // We don't need the error from grp.Stop()
+
+	manager := &InputManager{
+		Logger:              logptest.NewTestingLogger(t, "test"),
+		StateStore:          stateStore,
+		Type:                "test",
+		DefaultCleanTimeout: 30 * time.Minute,
+		Configure: func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error) {
+			return sourceList("mykey"), &fakeTestInput{}, nil
+		},
+	}
+
+	// Init() should not create a store for ES-backed inputs.
+	err := manager.Init(&grp)
+	require.NoError(t, err)
+	assert.Nil(t, manager.store, "store should be nil after Init() for ES-backed inputs")
+
+	// Create() should create the store with the inputID.
+	_, err = manager.Create(conf.MustNewConfigFrom(map[string]interface{}{
+		"id": "my-input-id",
+	}))
+	require.NoError(t, err)
+	assert.NotNil(t, manager.store, "store should be created after Create()")
+
+	snap := storeMemorySnapshot(manager.store)
+	assert.Contains(t, snap, "test::mykey")
+	assert.Equal(t, "value1", snap["test::mykey"].Cursor)
 }
 
 func TestManager_Create(t *testing.T) {
@@ -404,7 +446,7 @@ func TestManager_InputsRun(t *testing.T) {
 		var ids []int
 		pipeline := pubtest.ConstClient(&pubtest.FakeClient{
 			PublishFunc: func(event beat.Event) {
-				id := event.Fields["n"].(int)
+				id, _ := event.Fields["n"].(int)
 				ids = append(ids, id)
 			},
 		})
