@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Fix CrowdStrike streaming session refresh scheduling to avoid tight refresh loops.
+component: filebeat
+issue: https://github.com/elastic/beats/issues/49158
