@@ -6,7 +6,7 @@ applies_to:
   serverless: beta
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See auditbeat/scripts/mage/docs.go
 
 # System process dataset [auditbeat-dataset-system-process]
 

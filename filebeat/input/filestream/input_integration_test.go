@@ -623,16 +623,16 @@ func TestFilestreamTruncatedFileOpen(t *testing.T) {
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
-	env.mustTruncateFile(testlogName, 0)
+	env.mustTruncateFile(testlogName, 5)
 	time.Sleep(5 * time.Millisecond)
 
 	truncatedTestLines := []byte("truncated first line\n")
-	env.mustWriteToFile(testlogName, truncatedTestLines)
+	env.mustAppendToFile(testlogName, truncatedTestLines)
 	env.waitUntilEventCount(4)
 
 	cancelInput()
 	env.waitUntilInputStops()
-	env.requireOffsetInRegistry(testlogName, id, len(truncatedTestLines))
+	env.requireOffsetInRegistry(testlogName, id, 5+len(truncatedTestLines))
 }
 
 // test_truncated_file_closed from test_harvester.py
@@ -708,14 +708,14 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 
 	// remove symlink
 	env.mustRemoveFile(symlinkName)
-	env.mustTruncateFile(testlogName, 0)
+	env.mustTruncateFile(testlogName, 5)
 	env.waitUntilOffsetInRegistry(testlogName, id, 0, 10*time.Second)
 
 	moreLines := []byte("forth line\nfifth line\n")
-	env.mustWriteToFile(testlogName, moreLines)
+	env.mustAppendToFile(testlogName, moreLines)
 
 	env.waitUntilEventCount(5)
-	env.requireOffsetInRegistry(testlogName, id, len(moreLines))
+	env.requireOffsetInRegistry(testlogName, id, 5+len(moreLines))
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -780,7 +780,7 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
-	env.mustTruncateFile(testlogName, 0)
+	env.mustTruncateFile(testlogName, 5)
 
 	env.waitUntilOffsetInRegistry(testlogName, id, 0, 10*time.Second)
 
@@ -821,7 +821,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	// so it can interfere with the truncation of the file
 	env.mustAppendToFile(testlogName, []byte("third line\n"))
 
-	env.mustTruncateFile(testlogName, 0)
+	env.mustTruncateFile(testlogName, 5)
 
 	env.waitUntilOffsetInRegistry(testlogName, id, 0, 10*time.Second)
 
@@ -831,10 +831,10 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	env.pipeline.invertBlocking()
 
 	truncatedTestLines := []byte("truncated line\n")
-	env.mustWriteToFile(testlogName, truncatedTestLines)
+	env.mustAppendToFile(testlogName, truncatedTestLines)
 
 	env.waitUntilEventCount(3)
-	env.waitUntilOffsetInRegistry(testlogName, id, len(truncatedTestLines), 10*time.Second)
+	env.waitUntilOffsetInRegistry(testlogName, id, 5+len(truncatedTestLines), 10*time.Second)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -1005,16 +1005,16 @@ func TestFilestreamTruncate(t *testing.T) {
 
 	// remove symlink
 	env.mustRemoveFile(symlinkName)
-	env.mustTruncateFile(testlogName, 0)
+	env.mustTruncateFile(testlogName, 5)
 	env.waitUntilOffsetInRegistry(testlogName, id, 0, 10*time.Second)
 
 	// recreate symlink
 	env.mustSymlink(testlogName, symlinkName)
 
 	moreLines := []byte("forth line\nfifth line\n")
-	env.mustWriteToFile(testlogName, moreLines)
+	env.mustAppendToFile(testlogName, moreLines)
 
-	env.waitUntilOffsetInRegistry(testlogName, id, len(moreLines), 10*time.Second)
+	env.waitUntilOffsetInRegistry(testlogName, id, 5+len(moreLines), 10*time.Second)
 
 	cancelInput()
 	env.waitUntilInputStops()

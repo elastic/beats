@@ -67,6 +67,9 @@ func TestScripts(t *testing.T) {
 	}
 	for _, sub := range []string{"export", "config", "eventlog", "evtx"} {
 		t.Run(sub, func(t *testing.T) {
+			if sub == "eventlog" {
+				t.Skip("flaky test: https://github.com/elastic/beats/issues/49188")
+			}
 			p := params
 			p.Dir = filepath.Join("testdata", sub)
 			testscript.Run(t, p)

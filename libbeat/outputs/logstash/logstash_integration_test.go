@@ -44,6 +44,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -199,7 +200,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 		t.Fatal("init index management:", err)
 	}
 
-	grp, err := plugin(im, info, outputs.NewNilObserver(), config)
+	grp, err := plugin(im, info, outputs.NewNilObserver(), config, paths.New())
 	if err != nil {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}
