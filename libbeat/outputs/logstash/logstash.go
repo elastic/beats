@@ -21,11 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	conf "github.com/elastic/elastic-agent-libs/config"
-<<<<<<< HEAD
-=======
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
->>>>>>> 979f9b4a0 (fix(diskqueue): use per-beat paths instead of global paths (#48834))
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -47,23 +43,7 @@ func makeLogstash(
 	cfg *conf.C,
 	beatPaths *paths.Path,
 ) (outputs.Group, error) {
-<<<<<<< HEAD
 	lsConfig, err := readConfig(cfg, beat)
-=======
-	log := beat.Logger.Named("logstash")
-	return MakeLogstashClients(beat.Version, log, observer, cfg, beat.IndexPrefix, beatPaths)
-}
-
-func MakeLogstashClients(
-	beatVersion string,
-	logger *logp.Logger,
-	observer outputs.Observer,
-	rawCfg *conf.C,
-	beatIndexPrefix string,
-	beatPaths *paths.Path,
-) (outputs.Group, error) {
-	config, err := readConfig(rawCfg, beatIndexPrefix)
->>>>>>> 979f9b4a0 (fix(diskqueue): use per-beat paths instead of global paths (#48834))
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -107,9 +87,5 @@ func MakeLogstashClients(
 		clients[i] = client
 	}
 
-<<<<<<< HEAD
-	return outputs.SuccessNet(lsConfig.Queue, lsConfig.LoadBalance, lsConfig.BulkMaxSize, lsConfig.MaxRetries, nil, beat.Logger, clients)
-=======
-	return outputs.SuccessNet(config.Queue, config.LoadBalance, config.BulkMaxSize, config.MaxRetries, nil, logger, beatPaths, clients)
->>>>>>> 979f9b4a0 (fix(diskqueue): use per-beat paths instead of global paths (#48834))
+	return outputs.SuccessNet(lsConfig.Queue, lsConfig.LoadBalance, lsConfig.BulkMaxSize, lsConfig.MaxRetries, nil, beat.Logger, beatPaths, clients)
 }
