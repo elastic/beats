@@ -16,6 +16,19 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/hash"
 )
 
+const maxArtifactSize = 1 << 30
+
+type countingWriter struct {
+	w io.Writer
+	n int64
+}
+
+func (cw *countingWriter) Write(p []byte) (int, error) {
+	written, err := cw.w.Write(p)
+	cw.n += int64(written)
+	return written, err
+}
+
 // Download downloads the osquery distro package
 // writes the content into a given filepath
 // returns the sha256 hash
@@ -61,6 +74,16 @@ func DownloadWithClient(ctx context.Context, cli *http.Client, url, fp string) (
 	}
 	defer out.Close()
 
+	countingOut := &countingWriter{w: out}
+	limitedBody := io.LimitReader(res.Body, maxArtifactSize+1)
+
 	// Calculate hash and write file
-	return hash.Calculate(res.Body, out)
+	hashout, err = hash.Calculate(limitedBody, countingOut)
+	if err != nil {
+		return "", err
+	}
+	if countingOut.n > maxArtifactSize {
+		return "", fmt.Errorf("artifact exceeds maximum size of %d bytes", maxArtifactSize)
+	}
+	return hashout, nil
 }

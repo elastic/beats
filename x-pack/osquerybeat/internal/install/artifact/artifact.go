@@ -31,13 +31,12 @@ import (
 
 const (
 	releasesDirName      = "releases"
-	activeReleaseFile    = "active_release"
 	releaseMetadataFile  = "install.json"
 	stagingDirNamePrefix = "staging-"
 )
 
 type Result struct {
-	BinPath string
+	BinDir  string
 	Version string
 }
 
@@ -52,7 +51,7 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 	if !cfg.Enabled() {
 		return Result{}, errors.New("custom osquery artifact is not enabled")
 	}
-	if err := cfg.Validate(); err != nil {
+	if err := cfg.NormalizeAndValidate(); err != nil {
 		return Result{}, err
 	}
 	if installDir == "" {
@@ -64,7 +63,6 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 
 	releaseDir := filepath.Join(installDir, releasesDirName, cfg.SHA256)
 	if res, ok := tryReuseInstalled(releaseDir, cfg, log); ok {
-		_ = writeActiveReleaseFile(installDir, releaseDir)
 		return res, nil
 	}
 
@@ -95,11 +93,11 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 		return Result{}, err
 	}
 
-	binPath, err := locateBinPath(extractedDir, runtime.GOOS)
+	binDir, err := locateBinDir(extractedDir, runtime.GOOS)
 	if err != nil {
 		return Result{}, err
 	}
-	version, err := install.VerifyOsqueryBinary(runtime.GOOS, binPath, log)
+	version, err := install.VerifyOsqueryBinary(runtime.GOOS, binDir, log)
 	if err != nil {
 		return Result{}, err
 	}
@@ -109,7 +107,6 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 	}
 	if _, statErr := os.Stat(releaseDir); statErr == nil {
 		if res, ok := tryReuseInstalled(releaseDir, cfg, log); ok {
-			_ = writeActiveReleaseFile(installDir, releaseDir)
 			return res, nil
 		}
 		_ = os.RemoveAll(releaseDir)
@@ -118,7 +115,7 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 		return Result{}, err
 	}
 
-	relBinPath, err := filepath.Rel(extractedDir, binPath)
+	relBinDir, err := filepath.Rel(extractedDir, binDir)
 	if err != nil {
 		return Result{}, err
 	}
@@ -132,24 +129,14 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 	if err := writeMetadata(filepath.Join(releaseDir, releaseMetadataFile), meta); err != nil {
 		return Result{}, err
 	}
-	if err := writeActiveReleaseFile(installDir, releaseDir); err != nil {
-		return Result{}, err
-	}
 	if err := cleanupOldReleases(installDir, releaseDir); err != nil {
 		return Result{}, err
 	}
 
 	return Result{
-		BinPath: filepath.Join(releaseDir, relBinPath),
+		BinDir:  filepath.Join(releaseDir, relBinDir),
 		Version: version,
 	}, nil
-}
-
-func ResolveInstallDir(dataPath, cfgInstallDir string) string {
-	if strings.TrimSpace(cfgInstallDir) != "" {
-		return cfgInstallDir
-	}
-	return filepath.Join(dataPath, "osquery-install")
 }
 
 // RemoveInstalled removes previously managed custom osquery artifact state.
@@ -159,11 +146,6 @@ func RemoveInstalled(installDir string) error {
 	releasesDir := filepath.Join(installDir, releasesDirName)
 	if err := os.RemoveAll(releasesDir); err != nil {
 		return fmt.Errorf("failed removing releases directory %s: %w", releasesDir, err)
-	}
-
-	activeReleasePath := filepath.Join(installDir, activeReleaseFile)
-	if err := os.Remove(activeReleasePath); err != nil && !errors.Is(err, os.ErrNotExist) {
-		return fmt.Errorf("failed removing active release marker %s: %w", activeReleasePath, err)
 	}
 	return nil
 }
@@ -179,15 +161,15 @@ func tryReuseInstalled(releaseDir string, cfg config.InstallConfig, log *logp.Lo
 		return Result{}, false
 	}
 
-	binPath, err := locateBinPath(releaseDir, runtime.GOOS)
+	binDir, err := locateBinDir(releaseDir, runtime.GOOS)
 	if err != nil {
 		return Result{}, false
 	}
-	version, err := install.VerifyOsqueryBinary(runtime.GOOS, binPath, log)
+	version, err := install.VerifyOsqueryBinary(runtime.GOOS, binDir, log)
 	if err != nil {
 		return Result{}, false
 	}
-	return Result{BinPath: binPath, Version: version}, true
+	return Result{BinDir: binDir, Version: version}, true
 }
 
 func readMetadata(fp string) (metadata, error) {
@@ -209,15 +191,6 @@ func writeMetadata(fp string, m metadata) error {
 	}
 	tmp := fp + ".tmp"
 	if err := os.WriteFile(tmp, b, 0640); err != nil {
-		return err
-	}
-	return os.Rename(tmp, fp)
-}
-
-func writeActiveReleaseFile(installDir, releaseDir string) error {
-	fp := filepath.Join(installDir, activeReleaseFile)
-	tmp := fp + ".tmp"
-	if err := os.WriteFile(tmp, []byte(releaseDir), 0640); err != nil {
 		return err
 	}
 	return os.Rename(tmp, fp)
@@ -277,7 +250,7 @@ func extractArtifact(artifactFile, artifactURL, destinationDir string) error {
 	}
 }
 
-func locateBinPath(root, goos string) (string, error) {
+func locateBinDir(root, goos string) (string, error) {
 	var candidates []string
 	err := filepath.WalkDir(root, func(path string, d fs.DirEntry, walkErr error) error {
 		if walkErr != nil {

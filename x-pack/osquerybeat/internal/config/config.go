@@ -72,7 +72,6 @@ type Config struct {
 type InstallConfig struct {
 	ArtifactURL      string            `config:"artifact_url"`
 	SHA256           string            `config:"sha256"`
-	InstallDir       string            `config:"install_dir"`
 	AllowInsecureURL bool              `config:"allow_insecure_url"`
 	SSL              *tlscommon.Config `config:"ssl"`
 }
@@ -81,17 +80,12 @@ func (c InstallConfig) Enabled() bool {
 	return strings.TrimSpace(c.ArtifactURL) != ""
 }
 
-func (c *InstallConfig) Validate() error {
+func (c *InstallConfig) NormalizeAndValidate() error {
 	c.ArtifactURL = strings.TrimSpace(c.ArtifactURL)
 	c.SHA256 = strings.ToLower(strings.TrimSpace(c.SHA256))
-	c.InstallDir = strings.TrimSpace(c.InstallDir)
 
 	if !c.Enabled() {
 		return nil
-	}
-
-	if c.InstallDir != "" {
-		return fmt.Errorf("osquery.elastic_options.install.install_dir is not supported; custom osquery install path is fixed to bundled osquery directory")
 	}
 
 	if c.SHA256 == "" {

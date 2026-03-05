@@ -6,7 +6,7 @@ package config
 
 import "testing"
 
-func TestInstallConfigValidate(t *testing.T) {
+func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 	tests := []struct {
 		name    string
 		cfg     InstallConfig
@@ -40,15 +40,6 @@ func TestInstallConfigValidate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "reject custom install_dir",
-			cfg: InstallConfig{
-				ArtifactURL: "https://example.com/osquery.tar.gz",
-				SHA256:      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-				InstallDir:  "/tmp/custom",
-			},
-			wantErr: true,
-		},
-		{
 			name: "allow insecure URL override",
 			cfg: InstallConfig{
 				ArtifactURL:      "http://example.com/osquery.tar.gz",
@@ -60,7 +51,7 @@ func TestInstallConfigValidate(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			err := tc.cfg.Validate()
+			err := tc.cfg.NormalizeAndValidate()
 			if tc.wantErr && err == nil {
 				t.Fatalf("expected error")
 			}

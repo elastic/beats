@@ -66,20 +66,12 @@ func TestRemoveInstalled(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	activeMarker := filepath.Join(installDir, activeReleaseFile)
-	if err := os.WriteFile(activeMarker, []byte("dummy"), 0640); err != nil {
-		t.Fatal(err)
-	}
-
 	if err := RemoveInstalled(installDir); err != nil {
 		t.Fatalf("remove installed failed: %v", err)
 	}
 
 	if _, err := os.Stat(releasesDir); !os.IsNotExist(err) {
 		t.Fatalf("releases dir should be removed, got err: %v", err)
-	}
-	if _, err := os.Stat(activeMarker); !os.IsNotExist(err) {
-		t.Fatalf("active marker should be removed, got err: %v", err)
 	}
 }
 
@@ -115,20 +107,61 @@ func TestExtractArtifactUnsupportedFormat(t *testing.T) {
 	}
 }
 
-func TestLocateBinPathMissingBinary(t *testing.T) {
+func TestLocateBinDirMissingBinary(t *testing.T) {
 	root := t.TempDir()
 	err := os.WriteFile(filepath.Join(root, "README.txt"), []byte("no binary"), 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = locateBinPath(root, "linux")
+	_, err = locateBinDir(root, "linux")
 	if err == nil {
-		t.Fatal("expected locateBinPath error")
+		t.Fatal("expected locateBinDir error")
 	}
 	if !strings.Contains(err.Error(), "failed to locate osquery binary") {
 		t.Fatalf("unexpected error: %v", err)
 	}
+}
+
+func TestLocateBinDirDarwin(t *testing.T) {
+	t.Run("direct app structure", func(t *testing.T) {
+		root := t.TempDir()
+		binFile := filepath.Join(root, "osquery.app", "Contents", "MacOS", "osqueryd")
+		if err := os.MkdirAll(filepath.Dir(binFile), 0750); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(binFile, []byte("#!/bin/sh\n"), 0755); err != nil {
+			t.Fatal(err)
+		}
+
+		got, err := locateBinDir(root, "darwin")
+		if err != nil {
+			t.Fatalf("locateBinDir failed: %v", err)
+		}
+		if got != root {
+			t.Fatalf("expected root dir %s, got %s", root, got)
+		}
+	})
+
+	t.Run("prefixed app structure", func(t *testing.T) {
+		root := t.TempDir()
+		expectedDir := filepath.Join(root, "prefix")
+		binFile := filepath.Join(expectedDir, "osquery.app", "Contents", "MacOS", "osqueryd")
+		if err := os.MkdirAll(filepath.Dir(binFile), 0750); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(binFile, []byte("#!/bin/sh\n"), 0755); err != nil {
+			t.Fatal(err)
+		}
+
+		got, err := locateBinDir(root, "darwin")
+		if err != nil {
+			t.Fatalf("locateBinDir failed: %v", err)
+		}
+		if got != expectedDir {
+			t.Fatalf("expected prefixed dir %s, got %s", expectedDir, got)
+		}
+	})
 }
 
 func TestEnsureReuseInstalledByChecksum(t *testing.T) {
@@ -168,8 +201,8 @@ func TestEnsureReuseInstalledByChecksum(t *testing.T) {
 	if requests != 1 {
 		t.Fatalf("expected one download request, got %d", requests)
 	}
-	if first.BinPath != second.BinPath {
-		t.Fatalf("expected bin path reuse, first=%s second=%s", first.BinPath, second.BinPath)
+	if first.BinDir != second.BinDir {
+		t.Fatalf("expected bin dir reuse, first=%s second=%s", first.BinDir, second.BinDir)
 	}
 	if first.Version != second.Version || first.Version != version {
 		t.Fatalf("unexpected version reuse, first=%s second=%s", first.Version, second.Version)
@@ -230,8 +263,8 @@ func TestEnsureChecksumUpdateCleansOldRelease(t *testing.T) {
 	if entries[0].Name() != sha2 {
 		t.Fatalf("expected active release dir %s, got %s", sha2, entries[0].Name())
 	}
-	if strings.Contains(res2.BinPath, sha1) {
-		t.Fatalf("new bin path should not point to old release: %s", res2.BinPath)
+	if strings.Contains(res2.BinDir, sha1) {
+		t.Fatalf("new bin dir should not point to old release: %s", res2.BinDir)
 	}
 }
 

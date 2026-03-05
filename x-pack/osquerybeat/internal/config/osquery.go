@@ -11,7 +11,7 @@ import (
 // ElasticOptions contains Beat-specific options that are not part of
 // osquery's native config schema.
 type ElasticOptions struct {
-	Install              *InstallConfig `config:"install" json:"-"`
+	Install *InstallConfig `config:"install" json:"-"`
 }
 
 type Query struct {

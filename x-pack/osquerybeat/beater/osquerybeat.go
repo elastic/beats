@@ -96,7 +96,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 	installCfg := config.GetOsqueryInstallConfig(c.Inputs)
-	if err := installCfg.Validate(); err != nil {
+	if err := installCfg.NormalizeAndValidate(); err != nil {
 		return nil, fmt.Errorf("invalid osquery.elastic_options.install configuration: %w", err)
 	}
 
@@ -108,8 +108,6 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		pub:                  pub.New(b, log),
 		osquerydFactory:      osqd.New,
 		executablePath:       os.Executable,
-		osqueryVersion:       distro.OsquerydVersion(),
-		osquerySource:        "bundled",
 	}
 
 	return bt, nil
@@ -190,8 +188,8 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		osqd.WithConfigPlugin(configPluginName),
 		osqd.WithLoggerPlugin(loggerPluginName),
 	}
-	if osqueryRuntime.BinPath != "" {
-		opts = append(opts, osqd.WithBinaryPath(osqueryRuntime.BinPath))
+	if osqueryRuntime.BinDir != "" {
+		opts = append(opts, osqd.WithBinaryPath(osqueryRuntime.BinDir))
 	}
 
 	// Create osqueryd runner using factory
@@ -499,7 +497,7 @@ func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
 }
 
 type osqueryRuntimeSelection struct {
-	BinPath string
+	BinDir  string
 	Version string
 	Source  string
 }
@@ -540,7 +538,7 @@ func (bt *osquerybeat) resolveOsqueryRuntime(ctx context.Context) (osqueryRuntim
 	}
 
 	return osqueryRuntimeSelection{
-		BinPath: installed.BinPath,
+		BinDir:  installed.BinDir,
 		Version: installed.Version,
 		Source:  "custom_artifact",
 	}, nil
