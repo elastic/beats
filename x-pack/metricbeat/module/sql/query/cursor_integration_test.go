@@ -522,7 +522,7 @@ func testDescendingIntegerCursor(t *testing.T, driver, dsn string) {
 	ms3 := newMetricSetWithPaths(t, cfg, testPaths)
 	events3, errs3 := fetchEvents(t, ms3)
 	require.Empty(t, errs3)
-	require.Len(t, events3, 0, "Third descending fetch should return 0 events")
+	require.Empty(t, events3, "Third descending fetch should return 0 events")
 
 	if closer, ok := ms3.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
@@ -580,7 +580,7 @@ func testCompoundWhereCursor(t *testing.T, driver, dsn string) {
 	ms3 := newMetricSetWithPaths(t, cfg, testPaths)
 	events3, errs3 := fetchEvents(t, ms3)
 	require.Empty(t, errs3)
-	require.Len(t, events3, 0, "Third fetch with compound WHERE should return 0 events")
+	require.Empty(t, events3, "Third fetch with compound WHERE should return 0 events")
 
 	if closer, ok := ms3.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
@@ -642,7 +642,7 @@ func TestCursorStatePersistence(t *testing.T) {
 	ms2 := newMetricSetWithPaths(t, cfg, testPaths)
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2)
-	require.Len(t, events2, 0, "Should get 0 rows after cursor loaded from state")
+	require.Empty(t, events2, "Should get 0 rows after cursor loaded from state")
 
 	if closer, ok := ms2.(mb.Closer); ok {
 		require.NoError(t, closer.Close())

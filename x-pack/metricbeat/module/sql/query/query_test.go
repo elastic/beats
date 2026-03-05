@@ -170,8 +170,20 @@ func instantiateMetricSetWithConfig(t *testing.T, cfg map[string]interface{}) er
 
 	c, err := conf.NewConfigFrom(cfg)
 	require.NoError(t, err)
-	_, _, err = mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
-	return err
+	_, metricsets, err := mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
+	if err != nil {
+		return err
+	}
+
+	for _, ms := range metricsets {
+		closer, ok := ms.(mb.Closer)
+		if !ok {
+			continue
+		}
+		require.NoError(t, closer.Close())
+	}
+
+	return nil
 }
 
 func TestFetch_NonCursorPath_ReportsEvents(t *testing.T) {
@@ -253,7 +265,7 @@ func TestFetch_CursorPath_ZeroRowsLeavesCursorUnchanged(t *testing.T) {
 	err := ms.Fetch(context.Background(), reporter)
 	require.NoError(t, err)
 	assert.Equal(t, "42", ms.cursorManager.CursorValueString())
-	assert.Len(t, reporter.GetEvents(), 0)
+	assert.Empty(t, reporter.GetEvents())
 }
 
 func TestFetch_CursorPath_QueryErrorPropagates(t *testing.T) {
@@ -308,7 +320,7 @@ func TestFetch_CursorPath_SkipsWhenPreviousFetchInProgress(t *testing.T) {
 
 	err := ms.Fetch(context.Background(), &mbtest.CapturingReporterV2{})
 	require.NoError(t, err)
-	assert.Len(t, fakeDB.withParamQueries, 0, "DB should not be called when TryLock fails")
+	assert.Empty(t, fakeDB.withParamQueries, "DB should not be called when TryLock fails")
 }
 
 func TestFetch_NonCursorPath_DBOpenError(t *testing.T) {
@@ -852,7 +864,7 @@ func TestInferTypeFromMetricsAndDriverHelpers(t *testing.T) {
 	assert.NotContains(t, typed, "n")
 
 	assert.NotEmpty(t, queryDBNames("mssql"))
-	assert.Equal(t, "", queryDBNames("postgres"))
+	assert.Empty(t, queryDBNames("postgres"))
 	assert.Equal(t, "USE [mydb];", dbSelector("sqlserver", "mydb"))
 	assert.Equal(t, "", dbSelector("postgres", "mydb"))
 }

@@ -68,7 +68,7 @@ func TestGetCursorRegistryReturnsSamePointer(t *testing.T) {
 		"GetCursorRegistry must return the same pointer when data path is unchanged")
 
 	// Call again on the first module - still the same pointer (cached).
-	reg1again, err := mod1.(Module).GetCursorRegistry()
+	reg1again, err := sqlMod1.GetCursorRegistry()
 	require.NoError(t, err)
 	assert.Same(t, reg1, reg1again,
 		"Repeated calls on the same module must return cached registry")
@@ -87,20 +87,23 @@ func TestGetCursorRegistryPathChange(t *testing.T) {
 	mod, err := factory(mb.BaseModule{})
 	require.NoError(t, err)
 
+	sqlMod, ok := mod.(Module)
+	require.True(t, ok, "mod should implement sql.Module")
+
 	// First path
 	paths.Paths.Data = tmpDir1
-	reg1, err := mod.(Module).GetCursorRegistry()
+	reg1, err := sqlMod.GetCursorRegistry()
 	require.NoError(t, err)
 	require.NotNil(t, reg1)
 
 	// Same path - cached
-	reg1again, err := mod.(Module).GetCursorRegistry()
+	reg1again, err := sqlMod.GetCursorRegistry()
 	require.NoError(t, err)
 	assert.Same(t, reg1, reg1again)
 
 	// Change path - new registry expected
 	paths.Paths.Data = tmpDir2
-	reg2, err := mod.(Module).GetCursorRegistry()
+	reg2, err := sqlMod.GetCursorRegistry()
 	require.NoError(t, err)
 	require.NotNil(t, reg2)
 	assert.NotSame(t, reg1, reg2,
@@ -108,7 +111,7 @@ func TestGetCursorRegistryPathChange(t *testing.T) {
 
 	// Revert to first path - yet another new registry (previous one is not cached)
 	paths.Paths.Data = tmpDir1
-	reg3, err := mod.(Module).GetCursorRegistry()
+	reg3, err := sqlMod.GetCursorRegistry()
 	require.NoError(t, err)
 	require.NotNil(t, reg3)
 	assert.NotSame(t, reg1, reg3,
