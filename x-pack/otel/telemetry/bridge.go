@@ -8,13 +8,13 @@ import (
 	"context"
 	"sync"
 
+	logreport "github.com/elastic/beats/v7/libbeat/monitoring/report/log"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/noop"
-
-	logreport "github.com/elastic/beats/v7/libbeat/monitoring/report/log"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"go.uber.org/zap"
 )
 
 const scopeName = "github.com/elastic/beats/v7/x-pack/otel/telemetry"
@@ -23,6 +23,7 @@ const scopeName = "github.com/elastic/beats/v7/x-pack/otel/telemetry"
 // and bridges them into OTel async instruments. Instruments are auto-created
 // from FlatSnapshot/StructSnapshot keys — no hardcoded metric mappings.
 type RegistryBridge struct {
+	logger         *zap.Logger
 	meter          metric.Meter
 	statsRegistry  *monitoring.Registry
 	inputsRegistry *monitoring.Registry
@@ -39,6 +40,7 @@ type RegistryBridge struct {
 	// Per-input instruments keyed by metric field name.
 	inputIntGauges   map[string]metric.Int64ObservableGauge
 	inputIntCounters map[string]metric.Int64ObservableCounter
+	inputFloatGauges map[string]metric.Float64ObservableGauge
 
 	// Pending keys discovered during callback that need instrument creation.
 	// These are processed by an async goroutine since the OTel SDK pipeline
@@ -46,6 +48,7 @@ type RegistryBridge struct {
 	pendingStatsInts   []string
 	pendingStatsFloats []string
 	pendingInputInts   []string
+	pendingInputFloats []string
 }
 
 // NewRegistryBridge creates a RegistryBridge that discovers all current metrics
@@ -56,7 +59,13 @@ func NewRegistryBridge(settings component.TelemetrySettings, statsRegistry, inpu
 		mp = noop.NewMeterProvider()
 	}
 
+	logger := settings.Logger
+	if logger == nil {
+		logger = zap.NewNop()
+	}
+
 	b := &RegistryBridge{
+		logger:           logger,
 		meter:            mp.Meter(scopeName),
 		statsRegistry:    statsRegistry,
 		inputsRegistry:   inputsRegistry,
@@ -65,11 +74,11 @@ func NewRegistryBridge(settings component.TelemetrySettings, statsRegistry, inpu
 		floatGauges:      make(map[string]metric.Float64ObservableGauge),
 		inputIntGauges:   make(map[string]metric.Int64ObservableGauge),
 		inputIntCounters: make(map[string]metric.Int64ObservableCounter),
+		inputFloatGauges: make(map[string]metric.Float64ObservableGauge),
 	}
 
-	// Discover initial stats metrics. Only Ints and Floats are bridged —
-	// OTel instruments are numeric, so Bools, Strings, and StringSlices
-	// from the snapshot are skipped.
+	// Discover initial stats metrics. Only ints and floats are bridged, because
+	// OTel instruments are only numeric, all other types are skipped.
 	if statsRegistry != nil {
 		snap := monitoring.CollectFlatSnapshot(statsRegistry, monitoring.Full, false)
 		for key := range snap.Ints {
@@ -88,15 +97,19 @@ func NewRegistryBridge(settings component.TelemetrySettings, statsRegistry, inpu
 	if inputsRegistry != nil {
 		snapshot := monitoring.CollectStructSnapshot(inputsRegistry, monitoring.Full, false)
 		for _, entry := range snapshot {
+			// Each input sub-registry is collected as a map[string]interface{}.
+			// Skip any unexpected non-map entries.
 			data, ok := entry.(map[string]interface{})
 			if !ok {
 				continue
 			}
 			for field, v := range data {
-				if field == "id" || field == "input" {
-					continue
-				}
-				if isNumeric(v) {
+				switch v.(type) {
+				case float64:
+					if err := b.ensureInputFloat(field); err != nil {
+						return nil, err
+					}
+				case int64, uint64, int:
 					if err := b.ensureInputInt(field); err != nil {
 						return nil, err
 					}
@@ -189,6 +202,21 @@ func (b *RegistryBridge) ensureInputInt(field string) error {
 	return nil
 }
 
+// ensureInputFloat creates a per-input float gauge instrument for the given
+// field name. All float metrics in beats are gauges.
+// Must NOT be called from within an OTel callback.
+func (b *RegistryBridge) ensureInputFloat(field string) error {
+	if _, ok := b.inputFloatGauges[field]; ok {
+		return nil
+	}
+	inst, err := b.meter.Float64ObservableGauge(field)
+	if err != nil {
+		return err
+	}
+	b.inputFloatGauges[field] = inst
+	return nil
+}
+
 // registerCallback registers a single OTel async callback that covers all
 // currently known instruments.
 func (b *RegistryBridge) registerCallback() error {
@@ -214,7 +242,7 @@ func (b *RegistryBridge) registerCallback() error {
 func (b *RegistryBridge) allInstruments() []metric.Observable {
 	out := make([]metric.Observable, 0,
 		len(b.intGauges)+len(b.intCounters)+len(b.floatGauges)+
-			len(b.inputIntGauges)+len(b.inputIntCounters))
+			len(b.inputIntGauges)+len(b.inputIntCounters)+len(b.inputFloatGauges))
 	for _, inst := range b.intGauges {
 		out = append(out, inst)
 	}
@@ -228,6 +256,9 @@ func (b *RegistryBridge) allInstruments() []metric.Observable {
 		out = append(out, inst)
 	}
 	for _, inst := range b.inputIntCounters {
+		out = append(out, inst)
+	}
+	for _, inst := range b.inputFloatGauges {
 		out = append(out, inst)
 	}
 	return out
@@ -244,15 +275,18 @@ func (b *RegistryBridge) callback(_ context.Context, obs metric.Observer) error 
 	b.collectInputs(obs)
 
 	b.mu.Lock()
-	hasPending := len(b.pendingStatsInts) > 0 || len(b.pendingStatsFloats) > 0 || len(b.pendingInputInts) > 0
-	var statsInts, statsFloats, inputInts []string
+	hasPending := len(b.pendingStatsInts) > 0 || len(b.pendingStatsFloats) > 0 ||
+		len(b.pendingInputInts) > 0 || len(b.pendingInputFloats) > 0
+	var statsInts, statsFloats, inputInts, inputFloats []string
 	if hasPending {
 		statsInts = b.pendingStatsInts
 		statsFloats = b.pendingStatsFloats
 		inputInts = b.pendingInputInts
+		inputFloats = b.pendingInputFloats
 		b.pendingStatsInts = nil
 		b.pendingStatsFloats = nil
 		b.pendingInputInts = nil
+		b.pendingInputFloats = nil
 	}
 	b.mu.Unlock()
 
@@ -260,7 +294,7 @@ func (b *RegistryBridge) callback(_ context.Context, obs metric.Observer) error 
 		b.reRegWg.Add(1)
 		go func() {
 			defer b.reRegWg.Done()
-			b.createAndReRegister(statsInts, statsFloats, inputInts)
+			b.createAndReRegister(statsInts, statsFloats, inputInts, inputFloats)
 		}()
 	}
 	return nil
@@ -269,15 +303,29 @@ func (b *RegistryBridge) callback(_ context.Context, obs metric.Observer) error 
 // createAndReRegister creates instruments for pending keys and re-registers
 // the callback with the full instrument set. Runs outside the OTel callback
 // so the pipeline lock is not held.
-func (b *RegistryBridge) createAndReRegister(statsInts, statsFloats, inputInts []string) {
+func (b *RegistryBridge) createAndReRegister(statsInts, statsFloats, inputInts, inputFloats []string) {
+	// These errors should not occur in practice — the OTel SDK only fails
+	// instrument creation or callback registration if the meter provider is
+	// already shut down. Log for debuggability just in case.
 	for _, key := range statsInts {
-		b.ensureStatsInt(key) //nolint:errcheck // best-effort
+		if err := b.ensureStatsInt(key); err != nil {
+			b.logger.Warn("failed to create stats int instrument", zap.String("key", key), zap.Error(err))
+		}
 	}
 	for _, key := range statsFloats {
-		b.ensureStatsFloat(key) //nolint:errcheck
+		if err := b.ensureStatsFloat(key); err != nil {
+			b.logger.Warn("failed to create stats float instrument", zap.String("key", key), zap.Error(err))
+		}
 	}
 	for _, field := range inputInts {
-		b.ensureInputInt(field) //nolint:errcheck
+		if err := b.ensureInputInt(field); err != nil {
+			b.logger.Warn("failed to create input int instrument", zap.String("field", field), zap.Error(err))
+		}
+	}
+	for _, field := range inputFloats {
+		if err := b.ensureInputFloat(field); err != nil {
+			b.logger.Warn("failed to create input float instrument", zap.String("field", field), zap.Error(err))
+		}
 	}
 
 	// Unregister old callback and register new one with full instrument set.
@@ -296,7 +344,9 @@ func (b *RegistryBridge) createAndReRegister(statsInts, statsFloats, inputInts [
 	} else {
 		reg, err = b.meter.RegisterCallback(b.callback, instruments...)
 	}
+	// Should not happen in practice — see comment above.
 	if err != nil {
+		b.logger.Error("failed to re-register OTel callback", zap.Error(err))
 		return
 	}
 	b.mu.Lock()
@@ -344,6 +394,8 @@ func (b *RegistryBridge) collectInputs(obs metric.Observer) {
 	}
 	snapshot := monitoring.CollectStructSnapshot(b.inputsRegistry, monitoring.Full, false)
 	for _, entry := range snapshot {
+		// Each input sub-registry is collected as a map[string]interface{}.
+		// Skip any unexpected non-map entries defensively.
 		data, ok := entry.(map[string]interface{})
 		if !ok {
 			continue
@@ -361,14 +413,21 @@ func (b *RegistryBridge) collectInputs(obs metric.Observer) {
 		))
 
 		for field, v := range data {
-			if field == "id" || field == "input" {
+			if fval, ok := v.(float64); ok {
+				if inst, found := b.inputFloatGauges[field]; found {
+					obs.ObserveFloat64(inst, fval, attrs)
+					continue
+				}
+				b.mu.Lock()
+				b.pendingInputFloats = append(b.pendingInputFloats, field)
+				b.mu.Unlock()
 				continue
 			}
+
 			val, ok := toInt64Value(v)
 			if !ok {
 				continue
 			}
-
 			if inst, found := b.inputIntGauges[field]; found {
 				obs.ObserveInt64(inst, val, attrs)
 				continue
@@ -377,22 +436,10 @@ func (b *RegistryBridge) collectInputs(obs metric.Observer) {
 				obs.ObserveInt64(inst, val, attrs)
 				continue
 			}
-			// New per-input field — queue for async instrument creation.
 			b.mu.Lock()
 			b.pendingInputInts = append(b.pendingInputInts, field)
 			b.mu.Unlock()
 		}
-	}
-}
-
-// isNumeric returns true if v is a numeric type that can be represented as an
-// OTel int64 value.
-func isNumeric(v interface{}) bool {
-	switch v.(type) {
-	case int64, uint64, int, float64:
-		return true
-	default:
-		return false
 	}
 }
 
