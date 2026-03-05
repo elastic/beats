@@ -20,9 +20,17 @@ import (
 // writes the content into a given filepath
 // returns the sha256 hash
 func Download(ctx context.Context, url, fp string) (hashout string, err error) {
-	log.Printf("Download %s to %s", url, fp)
-
 	cli := http.Client{}
+	return DownloadWithClient(ctx, &cli, url, fp)
+}
+
+// DownloadWithClient downloads the osquery distro package using the provided client.
+// Writes the content into a given filepath and returns the sha256 hash.
+func DownloadWithClient(ctx context.Context, cli *http.Client, url, fp string) (hashout string, err error) {
+	log.Printf("Download %s to %s", url, fp)
+	if cli == nil {
+		cli = &http.Client{}
+	}
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {

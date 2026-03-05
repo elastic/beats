@@ -5,6 +5,22 @@
 osquerybeat:
 #  inputs:
 #    - type: osquery
+#      osquery:
+#        elastic_options:
+#          install:
+#            # Optional custom osquery artifact URL. If unset, bundled osquery is used.
+#            artifact_url: "https://example.org/osquery-5.19.0.linux_x86_64.tar.gz"
+#            # Required when artifact_url is set.
+#            sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+#            # Allow non-HTTPS artifact URLs (not recommended).
+#            #allow_insecure_url: false
+#            # Optional TLS settings for HTTPS artifact download.
+#            #ssl.verification_mode: full
+#            #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+#            #ssl.certificate: "/etc/pki/client/cert.pem"
+#            #ssl.key: "/etc/pki/client/cert.key"
+#            # NOTE: custom osquery is installed in the bundled osquery directory.
+#            # NOTE: if custom artifact install/validation fails, osquerybeat startup fails.
 #      streams:
 #        - id: "CFDE1EAA-0C6C-4D19-9EEC-45802B2A8C01"
 #          query: "select * from processes"

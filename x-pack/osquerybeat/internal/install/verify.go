@@ -5,10 +5,15 @@
 package install
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
+	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -37,14 +42,10 @@ func VerifyWithExecutableDirectory(log *logp.Logger) error {
 // Verify verifies installation in the given executable directory
 func Verify(goos, dir string, log *logp.Logger) error {
 	log.Infof("Install verification for %s", dir)
-	// Verify osqueryd or osqueryd.exe exists
-	osqFile := osqd.QsquerydPathForPlatform(goos, dir)
-	osqExists, err := fileExistsLogged(log, osqFile)
+	// Verify osqueryd or osqueryd.exe exists and is a valid osquery binary.
+	_, err := VerifyOsqueryBinary(goos, dir, log)
 	if err != nil {
 		return err
-	}
-	if !osqExists {
-		return fmt.Errorf("%w: %v", os.ErrNotExist, osqFile)
 	}
 
 	// Verify extension file exists
@@ -62,6 +63,53 @@ func Verify(goos, dir string, log *logp.Logger) error {
 		return fmt.Errorf("%w: %v", os.ErrNotExist, extFileName)
 	}
 	return nil
+}
+
+var osqueryVersionPattern = regexp.MustCompile(`(?i)osqueryd version ([0-9A-Za-z.\-+_]+)`)
+
+func VerifyOsqueryBinary(goos, dir string, log *logp.Logger) (string, error) {
+	osqFile := osqd.QsquerydPathForPlatform(goos, dir)
+	osqExists, err := fileExistsLogged(log, osqFile)
+	if err != nil {
+		return "", err
+	}
+	if !osqExists {
+		return "", fmt.Errorf("%w: %v", os.ErrNotExist, osqFile)
+	}
+
+	if goos != "windows" {
+		info, err := os.Stat(osqFile)
+		if err != nil {
+			return "", err
+		}
+		if info.Mode()&0111 == 0 {
+			return "", fmt.Errorf("osquery binary is not executable: %s", osqFile)
+		}
+	}
+
+	// Execute validation only for current runtime OS.
+	if goos != runtime.GOOS {
+		return "", nil
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	//nolint:gosec // expected local executable path
+	cmd := exec.CommandContext(ctx, osqFile, "--version")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("failed to execute osquery binary %s --version: %w", osqFile, err)
+	}
+	s := strings.TrimSpace(string(out))
+	if s == "" {
+		return "", fmt.Errorf("empty output from osquery binary %s --version", osqFile)
+	}
+	matches := osqueryVersionPattern.FindStringSubmatch(s)
+	if len(matches) != 2 {
+		return "", fmt.Errorf("unexpected osquery version output from %s: %q", osqFile, s)
+	}
+	return matches[1], nil
 }
 
 func fileExistsLogged(log *logp.Logger, fp string) (bool, error) {

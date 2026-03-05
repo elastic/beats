@@ -8,6 +8,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
 	"sync"
 	"time"
 
@@ -25,6 +28,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install"
+	installartifact "github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install/artifact"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
@@ -61,6 +66,11 @@ const (
 type osquerybeat struct {
 	b      *beat.Beat
 	config config.Config
+	// osquery install settings are sourced from inputs[0].osquery.elastic_options.install.
+	osqueryInstallConfig config.InstallConfig
+	// runtime-selected osquery metadata.
+	osqueryVersion string
+	osquerySource  string
 
 	pub *pub.Publisher
 
@@ -74,6 +84,7 @@ type osquerybeat struct {
 	watcher *Watcher
 
 	osquerydFactory osqd.RunnerFactory
+	executablePath  func() (string, error)
 }
 
 // New creates an instance of osquerybeat.
@@ -84,13 +95,21 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
+	installCfg := config.GetOsqueryInstallConfig(c.Inputs)
+	if err := installCfg.Validate(); err != nil {
+		return nil, fmt.Errorf("invalid osquery.elastic_options.install configuration: %w", err)
+	}
 
 	bt := &osquerybeat{
-		b:               b,
-		config:          c,
-		log:             log,
-		pub:             pub.New(b, log),
-		osquerydFactory: osqd.New,
+		b:                    b,
+		config:               c,
+		osqueryInstallConfig: installCfg,
+		log:                  log,
+		pub:                  pub.New(b, log),
+		osquerydFactory:      osqd.New,
+		executablePath:       os.Executable,
+		osqueryVersion:       distro.OsquerydVersion(),
+		osquerySource:        "bundled",
 	}
 
 	return bt, nil
@@ -156,13 +175,29 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 	defer cleanupFn()
 
-	// Create osqueryd runner using factory
-	osq, err := bt.osquerydFactory(
-		socketPath,
+	osqueryRuntime, err := bt.resolveOsqueryRuntime(ctx)
+	if err != nil {
+		b.Manager.UpdateStatus(status.Failed, "Failed to resolve osquery runtime: "+err.Error())
+		return err
+	}
+	bt.osqueryVersion = osqueryRuntime.Version
+	bt.osquerySource = osqueryRuntime.Source
+	bt.log.Infof("using osquery runtime source=%s version=%s", bt.osquerySource, bt.osqueryVersion)
+
+	opts := []osqd.Option{
 		osqd.WithLogger(bt.log),
 		osqd.WithConfigRefresh(configurationRefreshIntervalSecs),
 		osqd.WithConfigPlugin(configPluginName),
 		osqd.WithLoggerPlugin(loggerPluginName),
+	}
+	if osqueryRuntime.BinPath != "" {
+		opts = append(opts, osqd.WithBinaryPath(osqueryRuntime.BinPath))
+	}
+
+	// Create osqueryd runner using factory
+	osq, err := bt.osquerydFactory(
+		socketPath,
+		opts...,
 	)
 
 	if err != nil {
@@ -457,9 +492,58 @@ func queryResultMeta(typ, action string, res QueryResult) map[string]interface{}
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
 	if b.Manager != nil {
 		b.Manager.SetPayload(map[string]interface{}{
-			"osquery_version": distro.OsquerydVersion(),
+			"osquery_version": bt.osqueryVersion,
+			"osquery_source":  bt.osquerySource,
 		})
 	}
+}
+
+type osqueryRuntimeSelection struct {
+	BinPath string
+	Version string
+	Source  string
+}
+
+func (bt *osquerybeat) resolveOsqueryRuntime(ctx context.Context) (osqueryRuntimeSelection, error) {
+	execPathFn := bt.executablePath
+	if execPathFn == nil {
+		execPathFn = os.Executable
+	}
+	exePath, err := execPathFn()
+	if err != nil {
+		return osqueryRuntimeSelection{}, err
+	}
+	bundledDir := filepath.Dir(exePath)
+
+	bundledVersion, err := install.VerifyOsqueryBinary(runtime.GOOS, bundledDir, bt.log)
+	if err != nil {
+		bt.log.Warnf("failed to validate bundled osquery binary, fallback to distro version metadata: %v", err)
+		bundledVersion = distro.OsquerydVersion()
+	}
+	result := osqueryRuntimeSelection{
+		Version: bundledVersion,
+		Source:  "bundled",
+	}
+
+	installDir := bundledDir
+	installCfg := bt.osqueryInstallConfig
+	if !installCfg.Enabled() {
+		if err := installartifact.RemoveInstalled(installDir); err != nil {
+			bt.log.Warnf("failed to cleanup previous custom osquery install, continue with bundled osquery: %v", err)
+		}
+		return result, nil
+	}
+
+	installed, err := installartifact.Ensure(ctx, installCfg, installDir, bt.log)
+	if err != nil {
+		return osqueryRuntimeSelection{}, err
+	}
+
+	return osqueryRuntimeSelection{
+		BinPath: installed.BinPath,
+		Version: installed.Version,
+		Source:  "custom_artifact",
+	}, nil
 }
 
 // Stop stops osquerybeat.

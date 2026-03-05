@@ -8,9 +8,13 @@
 package config
 
 import (
+	"encoding/hex"
 	"fmt"
+	"net/url"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // Default index name for ad-hoc queries, since the dataset is defined at the stream level, for example:
@@ -65,6 +69,54 @@ type Config struct {
 	Inputs []InputConfig `config:"inputs"`
 }
 
+type InstallConfig struct {
+	ArtifactURL      string            `config:"artifact_url"`
+	SHA256           string            `config:"sha256"`
+	InstallDir       string            `config:"install_dir"`
+	AllowInsecureURL bool              `config:"allow_insecure_url"`
+	SSL              *tlscommon.Config `config:"ssl"`
+}
+
+func (c InstallConfig) Enabled() bool {
+	return strings.TrimSpace(c.ArtifactURL) != ""
+}
+
+func (c *InstallConfig) Validate() error {
+	c.ArtifactURL = strings.TrimSpace(c.ArtifactURL)
+	c.SHA256 = strings.ToLower(strings.TrimSpace(c.SHA256))
+	c.InstallDir = strings.TrimSpace(c.InstallDir)
+
+	if !c.Enabled() {
+		return nil
+	}
+
+	if c.InstallDir != "" {
+		return fmt.Errorf("osquery.elastic_options.install.install_dir is not supported; custom osquery install path is fixed to bundled osquery directory")
+	}
+
+	if c.SHA256 == "" {
+		return fmt.Errorf("osquery.elastic_options.install.sha256 is required when osquery.elastic_options.install.artifact_url is set")
+	}
+
+	hashBytes, err := hex.DecodeString(c.SHA256)
+	if err != nil || len(hashBytes) != 32 {
+		return fmt.Errorf("osquery.elastic_options.install.sha256 must be a valid SHA256 hex string")
+	}
+
+	u, err := url.Parse(c.ArtifactURL)
+	if err != nil {
+		return fmt.Errorf("invalid osquery.elastic_options.install.artifact_url: %w", err)
+	}
+	if u.Scheme == "" || u.Host == "" {
+		return fmt.Errorf("osquery.elastic_options.install.artifact_url must be an absolute URL")
+	}
+	if !c.AllowInsecureURL && strings.ToLower(u.Scheme) != "https" {
+		return fmt.Errorf("osquery.elastic_options.install.artifact_url must use https unless osquery.elastic_options.install.allow_insecure_url is true")
+	}
+
+	return nil
+}
+
 var DefaultConfig = Config{}
 
 func Datastream(namespace string) string {
@@ -83,4 +135,15 @@ func GetOsqueryOptions(inputs []InputConfig) map[string]interface{} {
 		return nil
 	}
 	return inputs[0].Osquery.Options
+}
+
+// GetOsqueryInstallConfig returns custom osquery install settings from the first input if available.
+func GetOsqueryInstallConfig(inputs []InputConfig) InstallConfig {
+	if len(inputs) == 0 {
+		return InstallConfig{}
+	}
+	if inputs[0].Osquery == nil || inputs[0].Osquery.ElasticOptions == nil || inputs[0].Osquery.ElasticOptions.Install == nil {
+		return InstallConfig{}
+	}
+	return *inputs[0].Osquery.ElasticOptions.Install
 }
