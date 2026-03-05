@@ -43,6 +43,9 @@ func (e *elasticStorage) Start(ctx context.Context, host component.Host) error {
 }
 
 func (e *elasticStorage) Shutdown(ctx context.Context) error {
+	if e.client == nil {
+		return nil
+	}
 	return e.client.Close()
 }
 
@@ -51,5 +54,8 @@ func (e *elasticStorage) Access(name string) (backend.Store, error) {
 }
 
 func (e *elasticStorage) Close() error {
+	if e.client == nil {
+		return nil
+	}
 	return e.client.Close()
 }
