@@ -935,19 +935,19 @@ service:
 
 				m = m.Flatten()
 
-				assert.Equal(ct, float64(numTestEvents), m["libbeat.pipeline.events.published"], "expected total events published to pipeline to match")
+				assert.Equal(ct, float64(numTestEvents), m["libbeat.pipeline.events.published"], "expected total events published to pipeline to match") //nolint:testifylint // it's a test
 
 				// For non-retryable errors like 400, events are dropped by the exporter
 				if tt.requestLevelFailure && tt.requestStatusCode == "400" {
-					assert.Equal(ct, float64(0), m["libbeat.output.events.acked"], "expected no events to be acked (400 errors drop events)")
+					assert.Equal(ct, float64(0), m["libbeat.output.events.acked"], "expected no events to be acked (400 errors drop events)") //nolint:testifylint // it's a test
 				} else {
 					// For retryable errors or successful cases, events are eventually acked
 					// Currently, otelconsumer either ACKs or fails the entire batch and has no visibility into individual event failures within the exporter.
 					// From otelconsumer's perspective, the whole batch is considered successful as long as ConsumeLogs returns no error.
 					// events.total can be larger than the acknowledged event count because it includes retrys.
 					assert.GreaterOrEqual(ct, m["libbeat.output.events.total"], float64(numTestEvents), "expected total events sent to output include all events")
-					assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.acked"], "expected total events acked to match")
-					assert.Equal(ct, float64(0), m["libbeat.output.events.dropped"], "expected total events dropped to match")
+					assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.acked"], "expected total events acked to match") //nolint:testifylint // it's a test
+					assert.Equal(ct, float64(0), m["libbeat.output.events.dropped"], "expected total events dropped to match")         //nolint:testifylint // it's a test
 				}
 			}, 10*time.Second, 100*time.Millisecond, "expected output stats to be available in monitoring endpoint")
 		})
