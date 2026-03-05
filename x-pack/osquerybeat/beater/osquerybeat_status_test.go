@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 )
 
@@ -300,4 +301,37 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 	lastEvent := mgr.events[len(mgr.events)-1]
 	assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on manager start failure")
 	assert.Contains(t, lastEvent.Message, "Failed to start manager")
+}
+
+// TestOsquerybeatStatusReporting_RuntimeResolutionFailure tests status reporting
+// when custom osquery runtime resolution fails before osqueryd runner creation.
+func TestOsquerybeatStatusReporting_RuntimeResolutionFailure(t *testing.T) {
+	mgr := &testManager{}
+	b := &beat.Beat{
+		Manager:    mgr,
+		Registry:   reload.NewRegistry(),
+		Monitoring: beat.NewMonitoring(),
+	}
+
+	cfg := agentconfig.NewConfig()
+	beater, err := New(b, cfg)
+	require.NoError(t, err)
+
+	ob, ok := beater.(*osquerybeat)
+	require.True(t, ok)
+	ob.osqueryInstallConfig = config.InstallConfig{
+		ArtifactURL: "https://example.org/osquery.tar.gz",
+		SHA256:      "bad",
+	}
+
+	err = beater.Run(b)
+	require.Error(t, err)
+
+	mgr.mx.Lock()
+	defer mgr.mx.Unlock()
+
+	require.GreaterOrEqual(t, len(mgr.events), 1, "should have at least one status event")
+	lastEvent := mgr.events[len(mgr.events)-1]
+	assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on runtime resolution failure")
+	assert.Contains(t, lastEvent.Message, "Failed to resolve osquery runtime")
 }
