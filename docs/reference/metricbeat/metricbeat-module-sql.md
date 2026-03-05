@@ -1013,6 +1013,7 @@ metricbeat.modules:
   #  enabled: true
   #  column: id
   #  type: integer
+  #  #state_id: payments-prod  # optional: stable identity across DSN changes
   #  default: "0"
   #  #direction: asc
 
