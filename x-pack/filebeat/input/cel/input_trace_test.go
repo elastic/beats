@@ -50,12 +50,11 @@ func TestTraceSpans_SingleExecution(t *testing.T) {
 		t.Fatalf("unpacking config: %v", err)
 	}
 
-	// Use a timeout long enough for one execution to complete but
-	// shorter than the interval so only one period runs. The first
-	// periodic call is immediate; afterwards periodically waits for
-	// the interval, during which the timeout fires.
+	// Cancel as soon as the first periodic run trace is complete.
+	// The timeout is only a safety guard for regressions.
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+	cancelWhenTraceEnds(ctx, cancel, sr, "cel.periodic.run")
 
 	v2Ctx := v2.Context{
 		Logger:          logp.NewLogger("cel_trace_test"),
@@ -142,6 +141,9 @@ func TestTraceSpans_WantMore(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+	// Cancel as soon as the periodic run trace is complete.
+	// The timeout is only a safety guard for regressions.
+	cancelWhenTraceEnds(ctx, cancel, sr, "cel.periodic.run")
 
 	v2Ctx := v2.Context{
 		Logger:          logp.NewLogger("cel_trace_test"),
@@ -267,6 +269,26 @@ func (p *traceTestPublisher) Publish(_ beat.Event, _ interface{}) error {
 	p.mu.Unlock()
 	p.done(n)
 	return nil
+}
+
+func cancelWhenTraceEnds(ctx context.Context, cancel context.CancelFunc, sr *tracetest.SpanRecorder, rootSpanName string) {
+	go func() {
+		ticker := time.NewTicker(5 * time.Millisecond)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				for _, s := range sr.Ended() {
+					if s.Name() == rootSpanName {
+						cancel()
+						return
+					}
+				}
+			}
+		}
+	}()
 }
 
 func findSpan(spans []sdktrace.ReadOnlySpan, name string) sdktrace.ReadOnlySpan {
