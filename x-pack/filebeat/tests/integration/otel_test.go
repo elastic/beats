@@ -35,6 +35,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
+	"github.com/elastic/beats/v7/filebeat/features"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
@@ -1797,7 +1798,6 @@ func TestFilebeatOTelHTTPJSONInputWithElasticStateStore(t *testing.T) {
 	// Enable ES state store for httpjson and cel input types.
 	// Reload must be called to apply the change since the features package
 	// reads the env var only once at init() time.
-	t.Cleanup(features.Reload)
 	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "httpjson,cel")
 	features.ReinitForTest()
 
