@@ -25,9 +25,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"slices"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -102,7 +105,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		return &mock, nil
 	}
 
-	reader, err := New(logger, ctx, nil, nil, nil, journalfield.IncludeMatches{}, []int{}, SeekHead, "", 0, "", false, factory)
+	reader, err := New(logger, ctx, nil, nil, nil, journalfield.IncludeMatches{}, []int{}, SeekHead, "", 0, "", false, "", factory)
 	if err != nil {
 		t.Fatalf("cannot instantiate journalctl reader: %s", err)
 	}
@@ -178,6 +181,7 @@ func TestNewUsesMergeFlag(t *testing.T) {
 		0,
 		"",
 		true,
+		"",
 		f)
 
 	if err != nil {
@@ -190,5 +194,126 @@ func TestNewUsesMergeFlag(t *testing.T) {
 
 	if !slices.Contains(r.args, "--merge") {
 		t.Fatalf("did not find '--merge' in the arguments to journalctl. Args: %s", r.args)
+	}
+}
+
+// fakeJournalctl writes a tiny shell script that prints a fake journalctl
+// version line and returns the path to that script.
+func fakeJournalctl(t *testing.T, version int) string {
+	t.Helper()
+	dir := t.TempDir()
+	path := filepath.Join(dir, "journalctl")
+	content := fmt.Sprintf("#!/bin/sh\necho 'systemd %d (%d-test)'\n", version, version)
+	if err := os.WriteFile(path, []byte(content), 0755); err != nil {
+		t.Fatalf("cannot write fake journalctl script: %s", err)
+	}
+	return path
+}
+
+func TestMaybeAddBootAll(t *testing.T) {
+	baseArgs := []string{"--no-tail"}
+
+	tests := []struct {
+		name        string
+		version     int
+		invalidPath bool
+		wantBootAll bool
+	}{
+		{name: "v239 (RHEL8) does not get --boot all", version: 239, wantBootAll: false},
+		{name: "v241 does not get --boot all", version: 241, wantBootAll: false},
+		{name: "v242 gets --boot all", version: 242, wantBootAll: true},
+		{name: "v250 gets --boot all", version: 250, wantBootAll: true},
+		{name: "invalid binary path falls back safely", invalidPath: true, wantBootAll: false},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			var path string
+			if tc.invalidPath {
+				path = "/nonexistent/journalctl"
+			} else {
+				path = fakeJournalctl(t, tc.version)
+			}
+
+			got := maybeAddBootAll(path, append([]string{}, baseArgs...))
+
+			hasBootAll := slices.Contains(got, "--boot") && slices.Contains(got, "all")
+			if hasBootAll != tc.wantBootAll {
+				t.Errorf("version %d: wantBootAll=%v but args=%v", tc.version, tc.wantBootAll, got)
+			}
+			// Base args must always be present
+			for _, a := range baseArgs {
+				if !slices.Contains(got, a) {
+					t.Errorf("base arg %q missing from result %v", a, got)
+				}
+			}
+		})
+	}
+}
+
+func TestHandleSeekAndCursor(t *testing.T) {
+	oldPath := fakeJournalctl(t, 239)
+	newPath := fakeJournalctl(t, 242)
+
+	tests := []struct {
+		name        string
+		mode        SeekMode
+		cursor      string
+		jctlPath    string
+		wantBootAll bool
+		wantArgs    []string
+		wantAbsent  []string
+	}{
+		{
+			name:        "SeekHead old version: no --boot all",
+			mode:        SeekHead, jctlPath: oldPath,
+			wantBootAll: false, wantArgs: []string{"--no-tail"},
+		},
+		{
+			name:        "SeekHead new version: has --boot all",
+			mode:        SeekHead, jctlPath: newPath,
+			wantBootAll: true, wantArgs: []string{"--no-tail", "--boot", "all"},
+		},
+		{
+			name:        "SeekTail never adds --boot all regardless of version",
+			mode:        SeekTail, jctlPath: newPath,
+			wantBootAll: false, wantArgs: []string{"--since", "now"},
+		},
+		{
+			name:        "SeekSince old version: no --boot all",
+			mode:        SeekSince, jctlPath: oldPath,
+			wantBootAll: false, wantArgs: []string{"--since"},
+		},
+		{
+			name:        "SeekSince new version: has --boot all",
+			mode:        SeekSince, jctlPath: newPath,
+			wantBootAll: true, wantArgs: []string{"--since", "--boot", "all"},
+		},
+		{
+			name:        "cursor old version: no --boot all",
+			cursor:      "some-cursor", jctlPath: oldPath,
+			wantBootAll: false, wantArgs: []string{"--after-cursor", "some-cursor"},
+		},
+		{
+			name:        "cursor new version: has --boot all",
+			cursor:      "some-cursor", jctlPath: newPath,
+			wantBootAll: true, wantArgs: []string{"--after-cursor", "some-cursor", "--boot", "all"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := handleSeekAndCursor(tc.mode, -5*time.Minute, tc.cursor, tc.jctlPath)
+
+			hasBootAll := slices.Contains(got, "--boot") && slices.Contains(got, "all")
+			if hasBootAll != tc.wantBootAll {
+				t.Errorf("wantBootAll=%v but args=%v", tc.wantBootAll, got)
+			}
+			for _, want := range tc.wantArgs {
+				if !slices.Contains(got, want) {
+					t.Errorf("expected %q in args %v", want, got)
+				}
+			}
+		})
 	}
 }

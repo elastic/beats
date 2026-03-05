@@ -24,7 +24,9 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
@@ -109,26 +111,46 @@ type Reader struct {
 	backoff backoff.Backoff
 }
 
+// maybeAddBootAll appends "--boot", "all" to args only when the running
+// journalctl version is >= 242 (the version that introduced the "all" keyword
+// for --boot). On any error or unknown version the flag is omitted, which is
+// safe because older journalctl versions do not need it.
+func maybeAddBootAll(journalctlPath string, args []string) []string {
+	out, err := exec.Command(journalctlPath, "--version").Output()
+	if err != nil {
+		return args
+	}
+	// first line: "systemd 239 (239-82.el8_10.2)+PAM ..."
+	firstLine := strings.SplitN(string(out), "\n", 2)[0]
+	fields := strings.Fields(firstLine)
+	if len(fields) < 2 {
+		return args
+	}
+	ver, err := strconv.Atoi(fields[1])
+	if err != nil || ver < 242 {
+		return args
+	}
+	return append(args, "--boot", "all")
+}
+
 // handleSeekAndCursor returns the correct arguments for seek and cursor.
 // If there is a cursor, only the cursor is used, seek is ignored.
-// If there is no cursor, then seek is used
-// The bool parameter indicates whether there might be messages from
-// the previous boots
-func handleSeekAndCursor(mode SeekMode, since time.Duration, cursor string) []string {
+// If there is no cursor, then seek is used.
+// --boot all is only added when the journalctl version supports it (>= 242).
+func handleSeekAndCursor(mode SeekMode, since time.Duration, cursor string, journalctlPath string) []string {
 	if cursor != "" {
-		return []string{"--after-cursor", cursor, "--boot", "all"}
+		return maybeAddBootAll(journalctlPath, []string{"--after-cursor", cursor})
 	}
 
 	switch mode {
 	case SeekSince:
-		return []string{
+		return maybeAddBootAll(journalctlPath, []string{
 			"--since", time.Now().Add(since).Format(sinceTimeFormat),
-			"--boot", "all",
-		}
+		})
 	case SeekTail:
 		return []string{"--since", "now"}
 	case SeekHead:
-		return []string{"--no-tail", "--boot", "all"}
+		return maybeAddBootAll(journalctlPath, []string{"--no-tail"})
 	default:
 		// That should never happen
 		return []string{}
@@ -171,6 +193,7 @@ func New(
 	since time.Duration,
 	file string,
 	merge bool,
+	journalctlPath string,
 	newJctl JctlFactory,
 ) (*Reader, error) {
 
@@ -217,7 +240,7 @@ func New(
 		args = append(args, "--facility", fmt.Sprintf("%d", facility))
 	}
 
-	extraArgs := handleSeekAndCursor(mode, since, cursor)
+	extraArgs := handleSeekAndCursor(mode, since, cursor, journalctlPath)
 
 	r := Reader{
 		logger:      logger,
