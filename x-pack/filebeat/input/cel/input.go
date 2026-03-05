@@ -240,6 +240,15 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	} else {
 		state = cfg.State
 	}
+	if len(cfg.SecretState) > 0 {
+		state["secret"] = cfg.SecretState
+	}
+	if cfg.Redact == nil {
+		cfg.Redact = &redact{}
+	}
+	if !slices.Contains(cfg.Redact.Fields, "secret") {
+		cfg.Redact.Fields = append(cfg.Redact.Fields, "secret")
+	}
 	if cursor != nil {
 		state["cursor"] = cursor
 	}
