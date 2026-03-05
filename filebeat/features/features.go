@@ -44,9 +44,9 @@ func initFromEnv(envName string) {
 	isESEnabled = len(esTypesEnabled) > 0
 }
 
-// Reload re-reads the AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES
-// environment variable and updates the feature state. This is used in tests.
-func Reload() {
+// ReinitForTest reinitializes the feature flags from the current environment.
+// This is intended for use in tests only.
+func ReinitForTest() {
 	initFromEnv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES")
 }
 

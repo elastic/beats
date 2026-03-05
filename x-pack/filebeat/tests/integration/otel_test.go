@@ -35,7 +35,6 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
-	"github.com/elastic/beats/v7/filebeat/features"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
@@ -369,6 +368,26 @@ service:
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 }
 
+type multiReceiverConfig struct {
+	Index          int
+	PathHome       string
+	InputFile      string
+	MonitoringPort int
+}
+
+func renderOtelConfig(tb testing.TB, cfgTemplate string, data any) string {
+	tb.Helper()
+	var buf bytes.Buffer
+	require.NoError(tb, template.Must(template.New("config").Parse(cfgTemplate)).Execute(&buf, data))
+	cfg := buf.String()
+	tb.Cleanup(func() {
+		if tb.Failed() {
+			tb.Logf("OTel config:\n%s", cfg)
+		}
+	})
+	return cfg
+}
+
 func writeEventsToFile(t *testing.T, file *os.File, startLine, numEvents int) {
 	t.Helper()
 	for i := startLine; i < startLine+numEvents; i++ {
@@ -425,19 +444,13 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 	logFilePath := filepath.Join(tmpdir, "log.log")
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 
-	type receiverConfig struct {
-		MonitoringPort int
-		InputFile      string
-		PathHome       string
-	}
-
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	otelConfig := struct {
 		Index     string
-		Receivers []receiverConfig
+		Receivers []multiReceiverConfig
 	}{
 		Index: "logs-integration-" + namespace,
-		Receivers: []receiverConfig{
+		Receivers: []multiReceiverConfig{
 			{
 				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
 				InputFile:      logFilePath,
@@ -451,7 +464,7 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 		},
 	}
 
-	cfg := `receivers:
+	cfg := renderOtelConfig(t, `receivers:
 {{range $i, $receiver := .Receivers}}
   filebeatreceiver/{{$i}}:
     filebeat:
@@ -505,21 +518,11 @@ service:
       level: DEBUG
     metrics:
       level: none
-`
-	var configBuffer bytes.Buffer
-	require.NoError(t,
-		template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, otelConfig))
-	configContents := configBuffer.Bytes()
-
-	t.Cleanup(func() {
-		if t.Failed() {
-			t.Logf("Config contents:\n%s", configContents)
-		}
-	})
+`, otelConfig)
 
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 
-	oteltestcol.New(t, configBuffer.String())
+	oteltestcol.New(t, cfg)
 
 	es := integration.GetESClient(t, "http")
 
@@ -1723,6 +1726,71 @@ service:
 	})
 }
 
+func TestDiskQueuePerReceiverPaths(t *testing.T) {
+	tmpdir := t.TempDir()
+	logFilePath := filepath.Join(tmpdir, "input.log")
+	writeEventsToLogFile(t, logFilePath, 5)
+
+	receivers := []multiReceiverConfig{
+		{Index: 0, PathHome: filepath.Join(tmpdir, "receiver-a")},
+		{Index: 1, PathHome: filepath.Join(tmpdir, "receiver-b")},
+	}
+
+	cfg := renderOtelConfig(t, `receivers:
+{{range .Receivers}}
+  filebeatreceiver/{{.Index}}:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-diskqueue-{{.Index}}
+          enabled: true
+          paths:
+            - {{$.InputFile}}
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    path.home: {{.PathHome}}
+    queue.disk:
+      max_size: 100MB
+{{end}}
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+{{range .Receivers}}
+        - filebeatreceiver/{{.Index}}
+{{end}}
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`, struct {
+		Receivers []multiReceiverConfig
+		InputFile string
+	}{Receivers: receivers, InputFile: logFilePath})
+
+	oteltestcol.New(t, cfg)
+
+	for _, r := range receivers {
+		diskqueueDir := filepath.Join(r.PathHome, "data", "diskqueue")
+		require.EventuallyWithT(t, func(ct *assert.CollectT) {
+			assert.FileExists(ct, filepath.Join(diskqueueDir, "state.dat"),
+				"receiver %d: expected diskqueue state.dat under %s", r.Index, diskqueueDir)
+		}, 30*time.Second, 500*time.Millisecond)
+	}
+
+	// Verify the two receivers have distinct diskqueue directories.
+	assert.NotEqual(t,
+		filepath.Join(receivers[0].PathHome, "data", "diskqueue"),
+		filepath.Join(receivers[1].PathHome, "data", "diskqueue"),
+		"receivers must have different diskqueue paths")
+}
+
 func TestFilebeatOTelHTTPJSONInputWithElasticStateStore(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
@@ -1731,7 +1799,7 @@ func TestFilebeatOTelHTTPJSONInputWithElasticStateStore(t *testing.T) {
 	// reads the env var only once at init() time.
 	t.Cleanup(features.Reload)
 	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "httpjson,cel")
-	features.Reload()
+	features.ReinitForTest()
 
 	// Mock HTTP server for httpjson input: tracks request count and returns
 	// a JSON response with a published timestamp that the cursor tracks.
@@ -1919,25 +1987,15 @@ func BenchmarkFilebeatOTelCollector(b *testing.B) {
 		b.StopTimer()
 		tmpDir := b.TempDir()
 
-		type receiverConfig struct {
-			Index    int
-			PathHome string
-		}
-
-		configData := struct {
-			Receivers []receiverConfig
-		}{
-			Receivers: make([]receiverConfig, numReceivers),
-		}
-
+		receivers := make([]multiReceiverConfig, numReceivers)
 		for i := range numReceivers {
-			configData.Receivers[i] = receiverConfig{
+			receivers[i] = multiReceiverConfig{
 				Index:    i + 1,
 				PathHome: filepath.Join(tmpDir, strconv.Itoa(i+1)),
 			}
 		}
 
-		cfgTemplate := `receivers:
+		cfg := renderOtelConfig(b, `receivers:
 {{range .Receivers}}
   filebeatreceiver/{{.Index}}:
     filebeat:
@@ -1965,14 +2023,11 @@ service:
       level: DEBUG
     metrics:
       level: none
-`
-
-		var configBuffer bytes.Buffer
-		require.NoError(b, template.Must(template.New("config").Parse(cfgTemplate)).Execute(&configBuffer, configData))
+`, struct{ Receivers []multiReceiverConfig }{Receivers: receivers})
 
 		b.StartTimer()
 
-		col := oteltestcol.New(b, configBuffer.String())
+		col := oteltestcol.New(b, cfg)
 		require.NotNil(b, col)
 		require.Eventually(b, func() bool {
 			return col.ObservedLogs().
