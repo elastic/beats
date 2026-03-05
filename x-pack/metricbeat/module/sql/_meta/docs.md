@@ -59,7 +59,7 @@ Use `sql_queries` or `sql_query` depending on the use-case.
     :   The column name to track for cursor state. Must be present in query results.
 
     `cursor.type`
-    :   Data type of the cursor column: `integer`, `timestamp`, `date`, `float`, or `decimal`.
+    :   Optional cursor type. If omitted, it is inferred from `cursor.default` and refined from result rows. Allowed values: `integer`, `timestamp`, `date`, `float`, `decimal`.
 
     `cursor.default`
     :   Initial cursor value used on first run (before any state is persisted).

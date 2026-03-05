@@ -24,7 +24,7 @@
 //
 // The package is organized into the following components:
 //
-//   - [Config]: User-facing configuration (column, type, default) with validation
+//   - [Config]: User-facing configuration (column, optional type, default) with validation
 //   - [Value]: Type-safe cursor value with serialization and comparison support
 //   - [Store]: Persistence layer backed by libbeat/statestore with memlog backend
 //   - [Manager]: Lifecycle coordinator that ties configuration, storage, and query execution together
@@ -43,6 +43,10 @@
 //   - "decimal": For DECIMAL/NUMERIC columns. Uses shopspring/decimal for exact
 //     arbitrary-precision arithmetic. No data loss at boundaries. Best for financial
 //     data and exact numeric columns.
+//
+// cursor.type is optional. When omitted, the manager infers an initial type from
+// cursor.default and can refine it from returned row values in auto mode. When
+// cursor.type is explicitly configured, that type is authoritative.
 //
 // # Scan Direction
 //
@@ -117,7 +121,7 @@
 //   - NULL cursor values, missing columns, and parse errors are logged and skipped per-row
 //   - "Column not found" and "all values NULL" are reported with distinct error messages
 //   - The cursor value is only updated if at least one valid value was found
-//   - Float cursors reject NaN and Inf values at both config validation and DB result parsing
+//   - Float cursors reject NaN and Inf values during default parsing/inference and DB result parsing
 //
 // NULL cursor values are never used to advance state. If your WHERE clause
 // explicitly includes NULL rows (for example, "updated_at > :cursor OR updated_at IS NULL"),

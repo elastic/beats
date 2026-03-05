@@ -23,6 +23,7 @@ type Manager struct {
 	store       *Store
 	stateKey    string
 	cursorValue *Value
+	typeLocked  bool
 	mu          sync.Mutex
 	logger      *logp.Logger
 }
@@ -51,7 +52,9 @@ func NewManager(cfg Config, store *Store, dsn, query string, logger *logp.Logger
 		config:   cfg,
 		store:    store,
 		stateKey: GenerateStateKey("sql", dsn, query, cfg.Column, cfg.Direction),
-		logger:   logger,
+		// Explicit type from config is authoritative and cannot be auto-adjusted.
+		typeLocked: cfg.Type != "",
+		logger:     logger,
 	}
 
 	if err := m.loadState(); err != nil {
@@ -91,6 +94,12 @@ func (m *Manager) loadState() error {
 		return m.initDefault()
 	}
 
+	// In auto mode (cursor.type omitted), state becomes authoritative once loaded.
+	if m.config.Type == "" {
+		m.config.Type = state.CursorType
+		m.typeLocked = true
+	}
+
 	// Parse the stored value
 	val, err := ParseValue(state.CursorValue, state.CursorType)
 	if err != nil {
@@ -99,7 +108,7 @@ func (m *Manager) loadState() error {
 	}
 
 	m.cursorValue = val
-	m.logger.Infof("Cursor loaded: value=%s", val.Raw)
+	m.logger.Infof("Cursor loaded: type=%s value=%s", state.CursorType, val.Raw)
 	return nil
 }
 
@@ -115,10 +124,16 @@ func (m *Manager) isStateValid(state *State) bool {
 			state.Version, StateVersion)
 		return false
 	}
-	if state.CursorType != m.config.Type {
-		m.logger.Warnf("Cursor type mismatch (state=%s, config=%s), using default",
-			state.CursorType, m.config.Type)
+	if !isValidCursorType(state.CursorType) {
+		m.logger.Warnf("Unsupported cursor type in state=%s, using default", state.CursorType)
 		return false
+	}
+	if state.CursorType != m.config.Type {
+		if m.config.Type != "" {
+			m.logger.Warnf("Cursor type mismatch (state=%s, config=%s), using default",
+				state.CursorType, m.config.Type)
+			return false
+		}
 	}
 	return true
 }
@@ -126,6 +141,15 @@ func (m *Manager) isStateValid(state *State) bool {
 // initDefault initializes the cursor with the default value from config.
 // Caller must hold m.mu.
 func (m *Manager) initDefault() error {
+	if m.config.Type == "" {
+		inferredType, err := InferTypeFromDefaultValue(m.config.Default)
+		if err != nil {
+			return fmt.Errorf("failed to infer cursor type from default value %q: %w", m.config.Default, err)
+		}
+		m.config.Type = inferredType
+		m.logger.Infof("Cursor type inferred from default value: %s", inferredType)
+	}
+
 	defaultVal, err := ParseValue(m.config.Default, m.config.Type)
 	if err != nil {
 		return fmt.Errorf("invalid default cursor value: %w", err)
@@ -187,6 +211,18 @@ func (m *Manager) UpdateFromResults(rows []mapstr.M) error {
 	var processed int
 	var foundCount int
 
+	// In auto mode, infer the best type from the returned rows before parsing.
+	if !m.typeLocked {
+		inferredType, err := inferTypeFromRows(rows, columnLower)
+		if err != nil {
+			m.logger.Debugf("Could not infer cursor type from result rows, using current type=%s: %v",
+				m.config.Type, err)
+		} else if inferredType != "" && inferredType != m.config.Type {
+			m.logger.Infof("Cursor type inferred from query results: %s", inferredType)
+			m.config.Type = inferredType
+		}
+	}
+
 	for idx, row := range rows {
 		// Find the cursor column (case-insensitive)
 		var rawVal interface{}
@@ -213,6 +249,28 @@ func (m *Manager) UpdateFromResults(rows []mapstr.M) error {
 		}
 
 		val, err := FromDatabaseValue(rawVal, m.config.Type)
+		if err != nil && !m.typeLocked {
+			inferredType, inferErr := InferTypeFromDatabaseValue(rawVal)
+			if inferErr == nil && inferredType != "" && inferredType != m.config.Type {
+				fallbackVal, fallbackErr := FromDatabaseValue(rawVal, inferredType)
+				if fallbackErr == nil {
+					if bestValue != nil && bestValue.Type != inferredType {
+						convertedBest, convErr := ParseValue(bestValue.Raw, inferredType)
+						if convErr != nil {
+							m.logger.Errorf("Failed to convert existing cursor candidate from %s to %s in row %d: %v",
+								bestValue.Type, inferredType, idx+1, convErr)
+							continue
+						}
+						bestValue = convertedBest
+					}
+					m.logger.Infof("Cursor type adjusted from %s to %s based on row %d",
+						m.config.Type, inferredType, idx+1)
+					m.config.Type = inferredType
+					val = fallbackVal
+					err = nil
+				}
+			}
+		}
 		if err != nil {
 			m.logger.Errorf("Failed to parse cursor value in row %d: %v", idx+1, err)
 			continue
@@ -296,4 +354,81 @@ func (m *Manager) GetStateKey() string {
 // GetColumn returns the cursor column name.
 func (m *Manager) GetColumn() string {
 	return m.config.Column
+}
+
+func inferTypeFromRows(rows []mapstr.M, columnLower string) (string, error) {
+	inferredType := ""
+	for _, row := range rows {
+		var (
+			rawVal interface{}
+			found  bool
+		)
+
+		for key, val := range row {
+			if strings.ToLower(key) == columnLower {
+				rawVal = val
+				found = true
+				break
+			}
+		}
+		if !found || rawVal == nil {
+			continue
+		}
+
+		rowType, err := InferTypeFromDatabaseValue(rawVal)
+		if err != nil {
+			continue
+		}
+
+		mergedType, err := mergeInferredTypes(inferredType, rowType)
+		if err != nil {
+			return "", err
+		}
+		inferredType = mergedType
+	}
+
+	if inferredType == "" {
+		return "", errors.New("no inferable cursor values found in rows")
+	}
+	return inferredType, nil
+}
+
+func mergeInferredTypes(current, candidate string) (string, error) {
+	if current == "" {
+		return candidate, nil
+	}
+	if current == candidate {
+		return current, nil
+	}
+
+	// date + timestamp should converge to timestamp.
+	if (current == CursorTypeDate && candidate == CursorTypeTimestamp) ||
+		(current == CursorTypeTimestamp && candidate == CursorTypeDate) {
+		return CursorTypeTimestamp, nil
+	}
+
+	if isNumericCursorType(current) && isNumericCursorType(candidate) {
+		return mergeNumericTypes(current, candidate), nil
+	}
+
+	return "", fmt.Errorf("conflicting inferred cursor types: %s vs %s", current, candidate)
+}
+
+func mergeNumericTypes(a, b string) string {
+	if a == CursorTypeDecimal || b == CursorTypeDecimal {
+		return CursorTypeDecimal
+	}
+	if a == CursorTypeFloat || b == CursorTypeFloat {
+		return CursorTypeFloat
+	}
+	return CursorTypeInteger
+}
+
+func isNumericCursorType(t string) bool {
+	switch t {
+	case CursorTypeInteger, CursorTypeFloat, CursorTypeDecimal:
+		return true
+	default:
+		return false
+	}
 }

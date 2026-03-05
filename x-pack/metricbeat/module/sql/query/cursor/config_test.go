@@ -78,15 +78,14 @@ func TestConfigValidate(t *testing.T) {
 			errMsg:  "cursor.type must be",
 		},
 		{
-			name: "empty type",
+			name: "empty type - infer later",
 			config: Config{
 				Enabled: true,
 				Column:  "id",
 				Type:    "",
 				Default: "0",
 			},
-			wantErr: true,
-			errMsg:  "cursor.type must be",
+			wantErr: false,
 		},
 		{
 			name: "missing default",

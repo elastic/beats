@@ -59,7 +59,7 @@ To enable cursor-based fetching, add a `cursor` configuration block to your metr
 |--------|----------|-------------|
 | `cursor.enabled` | No | Set to `true` to enable cursor-based fetching. Default: `false` |
 | `cursor.column` | Yes (when enabled) | The column name to track for cursor state. Must be present in query results. |
-| `cursor.type` | Yes (when enabled) | Data type of the cursor column: `integer`, `timestamp`, `date`, `float`, or `decimal` |
+| `cursor.type` | No | Optional cursor type. If omitted, it is inferred from `cursor.default` and refined from result rows. Allowed values: `integer`, `timestamp`, `date`, `float`, `decimal` |
 | `cursor.default` | Yes (when enabled) | Initial cursor value used on first run (before any state is persisted) |
 | `cursor.direction` | No | Scan direction: `asc` (default, tracks max value) or `desc` (tracks min value) |
 

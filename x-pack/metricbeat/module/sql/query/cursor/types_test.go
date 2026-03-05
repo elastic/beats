@@ -1088,3 +1088,65 @@ func TestFromDatabaseValue_Timestamp_ByteFormats(t *testing.T) {
 		})
 	}
 }
+
+func TestInferTypeFromDefaultValue(t *testing.T) {
+	tests := []struct {
+		name     string
+		raw      string
+		wantType string
+		wantErr  bool
+	}{
+		{name: "integer", raw: "0", wantType: CursorTypeInteger},
+		{name: "timestamp", raw: "2024-01-01T00:00:00Z", wantType: CursorTypeTimestamp},
+		{name: "date", raw: "2024-01-01", wantType: CursorTypeDate},
+		{name: "float", raw: "12.34", wantType: CursorTypeFloat},
+		{name: "invalid", raw: "not-a-value", wantErr: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := InferTypeFromDefaultValue(tt.raw)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.wantType, got)
+		})
+	}
+}
+
+func TestInferTypeFromDatabaseValue(t *testing.T) {
+	tests := []struct {
+		name     string
+		dbVal    interface{}
+		wantType string
+		wantErr  bool
+	}{
+		{name: "int64", dbVal: int64(42), wantType: CursorTypeInteger},
+		{name: "float64", dbVal: 3.14, wantType: CursorTypeFloat},
+		{name: "timestamp", dbVal: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC), wantType: CursorTypeTimestamp},
+		{name: "date-bytes", dbVal: []byte("2024-06-15"), wantType: CursorTypeDate},
+		{name: "decimal-bytes", dbVal: []byte("123.45"), wantType: CursorTypeDecimal},
+		{name: "integer-string", dbVal: "123", wantType: CursorTypeInteger},
+		{name: "invalid", dbVal: struct{}{}, wantErr: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := InferTypeFromDatabaseValue(tt.dbVal)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.wantType, got)
+		})
+	}
+}
+
+func TestFromDatabaseValue_Integer_RejectsFractionalFloat(t *testing.T) {
+	_, err := FromDatabaseValue(float64(12.5), CursorTypeInteger)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "fractional part")
+}

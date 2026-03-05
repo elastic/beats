@@ -53,14 +53,14 @@ var supportedCursorTypes = []string{
 type Config struct {
 	Enabled   bool   `config:"enabled"`
 	Column    string `config:"column"`
-	Type      string `config:"type"`      // "integer", "timestamp", "date", "float", or "decimal"
+	Type      string `config:"type"`      // Optional. "integer", "timestamp", "date", "float", or "decimal"
 	Default   string `config:"default"`   // Initial cursor value as string
 	Direction string `config:"direction"` // "asc" (default) or "desc"
 }
 
 // Validate checks the configuration for errors.
 // If cursor is disabled, no validation is performed.
-// If cursor is enabled, all fields are required and must be valid.
+// If cursor is enabled, column/default are required and type is optional.
 func (c *Config) Validate() error {
 	if !c.Enabled {
 		return nil
@@ -70,7 +70,7 @@ func (c *Config) Validate() error {
 		return errors.New("cursor.column is required when cursor is enabled")
 	}
 
-	if !isValidCursorType(c.Type) {
+	if c.Type != "" && !isValidCursorType(c.Type) {
 		return fmt.Errorf("cursor.type must be one of [%s], got %q",
 			strings.Join(supportedCursorTypes, ", "), c.Type)
 	}
@@ -79,9 +79,12 @@ func (c *Config) Validate() error {
 		return errors.New("cursor.default is required when cursor is enabled")
 	}
 
-	// Validate default value is parseable as the declared type
-	if _, err := ParseValue(c.Default, c.Type); err != nil {
-		return fmt.Errorf("cursor.default is invalid for type %q: %w", c.Type, err)
+	// Validate default value when type is explicitly configured.
+	// If type is omitted, it will be inferred at runtime.
+	if c.Type != "" {
+		if _, err := ParseValue(c.Default, c.Type); err != nil {
+			return fmt.Errorf("cursor.default is invalid for type %q: %w", c.Type, err)
+		}
 	}
 
 	// Validate direction (defaults to "asc" if empty)

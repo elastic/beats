@@ -790,6 +790,17 @@ func TestNew_DefaultsResponseFormatWhenEmpty(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestNew_CursorTypeOptional(t *testing.T) {
+	cfg := testMetricSetConfig("SELECT id FROM t WHERE id > :cursor ORDER BY id ASC")
+	cfg["cursor.enabled"] = true
+	cfg["cursor.column"] = "id"
+	cfg["cursor.default"] = "0"
+	delete(cfg, "cursor.type")
+
+	err := instantiateMetricSetWithConfig(t, cfg)
+	require.NoError(t, err)
+}
+
 func TestInferTypeFromMetricsAndDriverHelpers(t *testing.T) {
 	typed := inferTypeFromMetrics(mapstr.M{
 		"i":    int64(1),

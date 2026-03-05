@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -75,6 +76,104 @@ func ParseValue(raw, valueType string) (*Value, error) {
 	}
 
 	return v, nil
+}
+
+// InferTypeFromDefaultValue infers a cursor type from cursor.default when
+// cursor.type is omitted from configuration.
+func InferTypeFromDefaultValue(raw string) (string, error) {
+	return inferTypeFromString(raw, false)
+}
+
+// InferTypeFromDatabaseValue infers a cursor type from a database row value.
+func InferTypeFromDatabaseValue(dbVal interface{}) (string, error) {
+	if dbVal == nil {
+		return "", errors.New("column value is NULL")
+	}
+
+	switch v := dbVal.(type) {
+	case int, int32, int64, uint, uint32, uint64:
+		return CursorTypeInteger, nil
+	case float32:
+		if math.IsNaN(float64(v)) {
+			return "", errors.New("value is NaN")
+		}
+		if math.IsInf(float64(v), 0) {
+			return "", fmt.Errorf("value is infinite: %f", v)
+		}
+		return CursorTypeFloat, nil
+	case float64:
+		if math.IsNaN(v) {
+			return "", errors.New("value is NaN")
+		}
+		if math.IsInf(v, 0) {
+			return "", fmt.Errorf("value is infinite: %f", v)
+		}
+		return CursorTypeFloat, nil
+	case time.Time:
+		return CursorTypeTimestamp, nil
+	case *time.Time:
+		if v == nil {
+			return "", errors.New("column value is NULL")
+		}
+		return CursorTypeTimestamp, nil
+	case []byte:
+		return inferTypeFromString(string(v), true)
+	case string:
+		return inferTypeFromString(v, true)
+	default:
+		return "", fmt.Errorf("cannot infer cursor type from value type %T", dbVal)
+	}
+}
+
+func inferTypeFromString(raw string, preferDecimal bool) (string, error) {
+	s := strings.TrimSpace(raw)
+	if s == "" {
+		return "", errors.New("value is empty")
+	}
+
+	if isDateOnlyString(s) {
+		return CursorTypeDate, nil
+	}
+
+	if _, err := parseTimestampString(s); err == nil {
+		return CursorTypeTimestamp, nil
+	}
+
+	if _, err := strconv.ParseInt(s, 10, 64); err == nil {
+		return CursorTypeInteger, nil
+	}
+
+	if preferDecimal && strings.ContainsAny(s, ".eE") {
+		if _, err := decimal.NewFromString(s); err == nil {
+			return CursorTypeDecimal, nil
+		}
+	}
+
+	if f, err := strconv.ParseFloat(s, 64); err == nil {
+		if math.IsNaN(f) {
+			return "", errors.New("value is NaN")
+		}
+		if math.IsInf(f, 0) {
+			return "", fmt.Errorf("value is infinite: %f", f)
+		}
+		return CursorTypeFloat, nil
+	}
+
+	if preferDecimal {
+		if _, err := decimal.NewFromString(s); err == nil {
+			return CursorTypeDecimal, nil
+		}
+	}
+
+	return "", fmt.Errorf("cannot infer cursor type from value %q", raw)
+}
+
+func isDateOnlyString(s string) bool {
+	if len(s) != len("2006-01-02") {
+		return false
+	}
+	_, err := time.Parse("2006-01-02", s)
+	return err == nil
 }
 
 // FromDatabaseValue creates a Value from a database result.
@@ -216,10 +315,16 @@ func parseIntegerFromDB(dbVal interface{}) (*Value, error) {
 		if v > float32(math.MaxInt64) || v < float32(math.MinInt64) {
 			return nil, fmt.Errorf("float32 overflow: %f exceeds int64 range", v)
 		}
+		if float32(int64(v)) != v {
+			return nil, fmt.Errorf("float32 value has fractional part: %f", v)
+		}
 		intVal = int64(v)
 	case float64:
 		if v > float64(math.MaxInt64) || v < float64(math.MinInt64) {
 			return nil, fmt.Errorf("float64 overflow: %f exceeds int64 range", v)
+		}
+		if float64(int64(v)) != v {
+			return nil, fmt.Errorf("float64 value has fractional part: %f", v)
 		}
 		intVal = int64(v)
 	case []byte:
