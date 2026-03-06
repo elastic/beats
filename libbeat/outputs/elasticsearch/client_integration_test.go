@@ -45,6 +45,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestClientPublishEvent(t *testing.T) {
@@ -410,7 +411,7 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 	info := beat.Info{Beat: "libbeat", Logger: logger}
 	// disable ILM if using specified index name
 	im, _ := idxmgmt.DefaultSupport(info, conf.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))
-	output, err := makeES(im, info, stats, config)
+	output, err := makeES(im, info, stats, config, paths.New())
 	if err != nil {
 		t.Fatal(err)
 	}

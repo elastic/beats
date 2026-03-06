@@ -6,7 +6,7 @@ applies_to:
   serverless: ga
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Azure compute_vm_scaleset metricset [metricbeat-metricset-azure-compute_vm_scaleset]
 
