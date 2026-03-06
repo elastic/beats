@@ -223,7 +223,7 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 
 		runner.Start()
 		runner.Stop()
-		assert.Equal(t, statusReporter.status, status.Stopped, "runner status after Stop returns with no errors should be Stopped")
+		assert.Equal(t, status.Stopped, statusReporter.status, "runner status after Stop returns with no errors should be Stopped")
 	})
 
 	t.Run("fail if input type is unknown to loader", func(t *testing.T) {
