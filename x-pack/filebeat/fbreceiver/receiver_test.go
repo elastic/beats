@@ -384,7 +384,7 @@ func TestReceiverStatus(t *testing.T) {
 								"type":    "benchmark",
 								"enabled": true,
 								"message": "test",
-								"count":   1,
+								"eps":     1,
 								"status":  test.benchmarkStatus,
 							},
 						},
