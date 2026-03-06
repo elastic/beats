@@ -77,7 +77,7 @@ func testUnblockAfterInit(t *testing.T) {
 
 			startedAt := time.Now()
 			assert.True(t, WaitOnError(b, errors.New("bad bad")))
-			assert.True(t, time.Now().Sub(startedAt) >= init)
+			assert.GreaterOrEqual(t, time.Now().Sub(startedAt), init)
 		})
 	}
 }

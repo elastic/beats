@@ -7,6 +7,7 @@ package httplog
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -258,6 +259,8 @@ func TestResolvePathInLogsFor(t *testing.T) {
 		path         string
 		wantResolved string
 		wantOK       bool
+
+		goos string
 	}{
 		{
 			name:         "bare_filename",
@@ -310,9 +313,43 @@ func TestResolvePathInLogsFor(t *testing.T) {
 			wantResolved: root,
 			wantOK:       true,
 		},
+
+		// Windows-specific path forms that exercise isRooted and
+		// filepath.IsAbs independently. On Unix these forms have
+		// different semantics (backslash is a literal character, drive
+		// letters don't exist) so they are only meaningful on Windows.
+		//
+		// UNC (\\server\share\foo) and device (\\.\C:\foo) paths are
+		// not tested here because resolving a non-existent UNC or
+		// device path produces network/device errors that
+		// resolveSymlinks does not handle, causing the test to fail
+		// with an unexpected error rather than testing path
+		// classification.
+		{
+			// Backslash-rooted: the counterpart of the forward-slash
+			// absolute_outside case. filepath.IsAbs returns false
+			// (no drive letter), but isRooted must catch the leading \.
+			name:         "backslash_rooted_outside",
+			path:         `\var\log\other.log`,
+			wantResolved: `\var\log\other.log`,
+			wantOK:       false,
+			goos:         "windows",
+		},
+		{
+			// Fully qualified DOS path outside root.
+			// filepath.IsAbs returns true so isRooted is never reached.
+			name:         "fully_qualified_dos_outside",
+			path:         filepath.VolumeName(root) + `\other\path\file.log`,
+			wantResolved: filepath.VolumeName(root) + `\other\path\file.log`,
+			wantOK:       false,
+			goos:         "windows",
+		},
 	}
 
 	for _, tt := range tests {
+		if tt.goos != "" && runtime.GOOS != tt.goos {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			resolved, ok, err := ResolvePathInLogsFor(input, tt.path)
 			if err != nil {

@@ -654,10 +654,51 @@ func TestStateRegistryBehaviorDifferences(t *testing.T) {
 	})
 }
 
+func TestStatesStoreForRouting(t *testing.T) {
+	logger := logp.NewLogger("states-store-routing-test")
+
+	t.Run("lexicographical ordering passes aws-s3 to StoreFor", func(t *testing.T) {
+		store := &trackingInputStore{
+			testInputStore: testInputStore{
+				registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
+			},
+		}
+
+		_, err := newStateRegistry(logger, store, "", true, 10)
+		require.NoError(t, err)
+
+		require.Equal(t, inputName, store.lastStoreForType, "StoreFor should be called with input name when lexicographical ordering is enabled")
+	})
+
+	t.Run("non-lexicographical ordering passes empty string to StoreFor", func(t *testing.T) {
+		store := &trackingInputStore{
+			testInputStore: testInputStore{
+				registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
+			},
+		}
+
+		_, err := newStateRegistry(logger, store, "", false, 0)
+		require.NoError(t, err)
+
+		require.Equal(t, "", store.lastStoreForType, "StoreFor should be called with empty string when lexicographical ordering is disabled")
+	})
+}
+
 var _ statestore.States = (*testInputStore)(nil)
 
 type testInputStore struct {
 	registry *statestore.Registry
+}
+
+// trackingInputStore wraps testInputStore to track StoreFor calls
+type trackingInputStore struct {
+	testInputStore
+	lastStoreForType string
+}
+
+func (s *trackingInputStore) StoreFor(typ string) (*statestore.Store, error) {
+	s.lastStoreForType = typ
+	return s.testInputStore.StoreFor(typ)
 }
 
 func openTestStatestore() statestore.States {
