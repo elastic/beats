@@ -21,5 +21,7 @@ jobs:
       setup-commands: |
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
         make mage
+      additional-instructions: |
+        If you do make a pull request, please add the label "ai" to it.
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
