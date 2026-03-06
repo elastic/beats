@@ -7,6 +7,7 @@ package telemetry
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 
 	logreport "github.com/elastic/beats/v7/libbeat/monitoring/report/log"
@@ -26,8 +27,10 @@ const scopeName = "github.com/elastic/beats/v7/x-pack/otel/telemetry"
 type RegistryBridge struct {
 	logger         *zap.Logger
 	meter          metric.Meter
+	receiverID     string
 	statsRegistry  *monitoring.Registry
 	inputsRegistry *monitoring.Registry
+	statsAttrs     metric.MeasurementOption
 
 	mu           sync.Mutex
 	registration metric.Registration
@@ -54,7 +57,9 @@ type RegistryBridge struct {
 
 // NewRegistryBridge creates a RegistryBridge that discovers all current metrics
 // from the given registries and registers a single OTel async callback.
-func NewRegistryBridge(settings component.TelemetrySettings, statsRegistry, inputsRegistry *monitoring.Registry) (*RegistryBridge, error) {
+// The receiverID is used as a "receiver" attribute on all observations so that
+// multiple receivers (e.g., filebeat + metricbeat) don't collide.
+func NewRegistryBridge(settings component.TelemetrySettings, receiverID string, statsRegistry, inputsRegistry *monitoring.Registry) (*RegistryBridge, error) {
 	mp := settings.MeterProvider
 	if mp == nil {
 		mp = noop.NewMeterProvider()
@@ -68,8 +73,10 @@ func NewRegistryBridge(settings component.TelemetrySettings, statsRegistry, inpu
 	b := &RegistryBridge{
 		logger:           logger,
 		meter:            mp.Meter(scopeName),
+		receiverID:       receiverID,
 		statsRegistry:    statsRegistry,
 		inputsRegistry:   inputsRegistry,
+		statsAttrs:       metric.WithAttributeSet(attribute.NewSet(attribute.String("receiver", receiverID))),
 		intGauges:        make(map[string]metric.Int64ObservableGauge),
 		intCounters:      make(map[string]metric.Int64ObservableCounter),
 		floatGauges:      make(map[string]metric.Float64ObservableGauge),
@@ -156,9 +163,13 @@ func (b *RegistryBridge) Shutdown() {
 }
 
 // ensureStatsInt creates an int instrument for the given stats key if one does
-// not already exist. Gauge vs counter is determined by isGauge.
+// not already exist. System-level metrics are skipped. Gauge vs counter is
+// determined by isGauge.
 // Must NOT be called from within an OTel callback (pipeline lock deadlock).
 func (b *RegistryBridge) ensureStatsInt(key string) error {
+	if isSystemMetric(key) {
+		return nil
+	}
 	if _, ok := b.intGauges[key]; ok {
 		return nil
 	}
@@ -182,9 +193,12 @@ func (b *RegistryBridge) ensureStatsInt(key string) error {
 }
 
 // ensureStatsFloat creates a float gauge instrument for the given stats key.
-// All float metrics in beats are gauges.
+// System-level metrics are skipped. All float metrics in beats are gauges.
 // Must NOT be called from within an OTel callback.
 func (b *RegistryBridge) ensureStatsFloat(key string) error {
+	if isSystemMetric(key) {
+		return nil
+	}
 	if _, ok := b.floatGauges[key]; ok {
 		return nil
 	}
@@ -376,12 +390,15 @@ func (b *RegistryBridge) collectStats(obs metric.Observer) {
 	snap := monitoring.CollectFlatSnapshot(b.statsRegistry, monitoring.Full, false)
 
 	for key, value := range snap.Ints {
+		if isSystemMetric(key) {
+			continue
+		}
 		if inst, ok := b.intGauges[key]; ok {
-			obs.ObserveInt64(inst, value)
+			obs.ObserveInt64(inst, value, b.statsAttrs)
 			continue
 		}
 		if inst, ok := b.intCounters[key]; ok {
-			obs.ObserveInt64(inst, value)
+			obs.ObserveInt64(inst, value, b.statsAttrs)
 			continue
 		}
 		// New key discovered — queue for async instrument creation.
@@ -391,8 +408,11 @@ func (b *RegistryBridge) collectStats(obs metric.Observer) {
 	}
 
 	for key, value := range snap.Floats {
+		if isSystemMetric(key) {
+			continue
+		}
 		if inst, ok := b.floatGauges[key]; ok {
-			obs.ObserveFloat64(inst, value)
+			obs.ObserveFloat64(inst, value, b.statsAttrs)
 			continue
 		}
 		b.mu.Lock()
@@ -422,6 +442,7 @@ func (b *RegistryBridge) collectInputs(obs metric.Observer) {
 		}
 
 		attrs := metric.WithAttributeSet(attribute.NewSet(
+			attribute.String("receiver", b.receiverID),
 			attribute.String("input_id", inputID),
 			attribute.String("input_type", inputType),
 		))
@@ -472,6 +493,32 @@ func toInt64Value(v interface{}) (int64, bool) {
 	default:
 		return 0, false
 	}
+}
+
+// systemMetricPrefixes lists key prefixes for metrics that describe the host
+// or process rather than receiver-specific work. These are excluded from the
+// per-receiver bridge to avoid identical values being reported by every
+// receiver in the same process.
+var systemMetricPrefixes = []string{
+	"beat.memstats.",
+	"beat.cpu.",
+	"beat.handles.",
+	"beat.runtime.",
+	"beat.cgroup.",
+	"beat.info.uptime.ms",
+	"system.",
+}
+
+// isSystemMetric returns true for metrics that describe the host or process
+// (memory, CPU, load, handles, goroutines, cgroup, uptime). These are the same
+// regardless of which receiver reports them.
+func isSystemMetric(key string) bool {
+	for _, prefix := range systemMetricPrefixes {
+		if strings.HasPrefix(key, prefix) {
+			return true
+		}
+	}
+	return false
 }
 
 // isGauge returns true when the given metric key represents a gauge value.

@@ -24,7 +24,7 @@ func newTestBridge(t *testing.T, reader *metric.ManualReader, statsReg, inputsRe
 	provider := metric.NewMeterProvider(metric.WithReader(reader))
 	settings := componenttest.NewNopTelemetrySettings()
 	settings.MeterProvider = provider
-	b, err := NewRegistryBridge(settings, statsReg, inputsReg)
+	b, err := NewRegistryBridge(settings, "testbeat", statsReg, inputsReg)
 	require.NoError(t, err)
 	return b
 }
@@ -156,7 +156,7 @@ func TestBridgeStaticMetrics(t *testing.T) {
 	monitoring.NewUint(outputReg, "read.bytes").Set(5000)
 	monitoring.NewUint(outputReg, "read.errors").Set(0)
 
-	// Beat process metrics
+	// Beat process metrics (system-level — should be excluded from bridge)
 	beatReg := statsReg.GetOrCreateRegistry("beat")
 	monitoring.NewUint(beatReg, "memstats.memory_alloc").Set(1024000)
 	monitoring.NewUint(beatReg, "memstats.rss").Set(2048000)
@@ -166,7 +166,7 @@ func TestBridgeStaticMetrics(t *testing.T) {
 	monitoring.NewUint(beatReg, "runtime.goroutines").Set(25)
 	monitoring.NewUint(beatReg, "info.uptime.ms").Set(60000)
 
-	// System metrics
+	// System metrics (system-level — should be excluded from bridge)
 	systemReg := statsReg.GetOrCreateRegistry("system")
 	monitoring.NewFloat(systemReg, "load.1").Set(1.5)
 	monitoring.NewFloat(systemReg, "load.5").Set(2.0)
@@ -223,22 +223,17 @@ func TestBridgeStaticMetrics(t *testing.T) {
 	// Verify output gauge
 	assert.Equal(t, int64(10), getGaugeInt64Value(findMetricByName(rm, "output.events.active")))
 
-	// Verify beat process gauges
-	assert.Equal(t, int64(1024000), getGaugeInt64Value(findMetricByName(rm, "beat.memstats.memory_alloc")))
-	assert.Equal(t, int64(2048000), getGaugeInt64Value(findMetricByName(rm, "beat.memstats.rss")))
-	assert.Equal(t, int64(512000), getGaugeInt64Value(findMetricByName(rm, "beat.memstats.gc_next")))
-	assert.Equal(t, int64(5000), getGaugeInt64Value(findMetricByName(rm, "beat.cpu.total.ticks")))
-	assert.Equal(t, int64(15), getGaugeInt64Value(findMetricByName(rm, "beat.handles.open")))
-	assert.Equal(t, int64(25), getGaugeInt64Value(findMetricByName(rm, "beat.runtime.goroutines")))
-	assert.Equal(t, int64(60000), getGaugeInt64Value(findMetricByName(rm, "beat.info.uptime.ms")))
-
-	// Verify system load gauges
-	assert.InDelta(t, 1.5, getGaugeFloat64Value(findMetricByName(rm, "system.load.1")), 0.001)
-	assert.InDelta(t, 2.0, getGaugeFloat64Value(findMetricByName(rm, "system.load.5")), 0.001)
-	assert.InDelta(t, 1.8, getGaugeFloat64Value(findMetricByName(rm, "system.load.15")), 0.001)
-	assert.InDelta(t, 0.375, getGaugeFloat64Value(findMetricByName(rm, "system.load.norm.1")), 0.001)
-	assert.InDelta(t, 0.5, getGaugeFloat64Value(findMetricByName(rm, "system.load.norm.5")), 0.001)
-	assert.InDelta(t, 0.45, getGaugeFloat64Value(findMetricByName(rm, "system.load.norm.15")), 0.001)
+	// System-level metrics should be excluded from per-receiver bridge.
+	assert.Nil(t, findMetricByName(rm, "beat.memstats.memory_alloc"), "system metric beat.memstats.* should be excluded")
+	assert.Nil(t, findMetricByName(rm, "beat.memstats.rss"), "system metric beat.memstats.* should be excluded")
+	assert.Nil(t, findMetricByName(rm, "beat.cpu.total.ticks"), "system metric beat.cpu.* should be excluded")
+	assert.Nil(t, findMetricByName(rm, "beat.handles.open"), "system metric beat.handles.* should be excluded")
+	assert.Nil(t, findMetricByName(rm, "beat.runtime.goroutines"), "system metric beat.runtime.* should be excluded")
+	assert.Nil(t, findMetricByName(rm, "beat.info.uptime.ms"), "system metric beat.info.uptime.ms should be excluded")
+	assert.Nil(t, findMetricByName(rm, "system.load.1"), "system metric system.* should be excluded")
+	assert.Nil(t, findMetricByName(rm, "system.load.5"), "system metric system.* should be excluded")
+	assert.Nil(t, findMetricByName(rm, "system.load.15"), "system metric system.* should be excluded")
+	assert.Nil(t, findMetricByName(rm, "system.load.norm.1"), "system metric system.* should be excluded")
 
 	bridge.Shutdown()
 }
@@ -536,25 +531,25 @@ func TestBridgeDynamicStatsFloatDiscovery(t *testing.T) {
 	reader := metric.NewManualReader()
 
 	statsReg := monitoring.NewRegistry()
-	systemReg := statsReg.GetOrCreateRegistry("system")
-	monitoring.NewFloat(systemReg, "load.1").Set(1.0)
+	queueReg := statsReg.GetOrCreateRegistry("pipeline.queue")
+	monitoring.NewFloat(queueReg, "filled.pct").Set(0.25)
 
 	bridge := newTestBridge(t, reader, statsReg, nil)
 
-	// First collection — load.1 exists.
+	// First collection — filled.pct exists.
 	rm := collectMetrics(t, reader)
-	assert.InDelta(t, 1.0, getGaugeFloat64Value(findMetricByName(rm, "system.load.1")), 0.001)
+	assert.InDelta(t, 0.25, getGaugeFloat64Value(findMetricByName(rm, "pipeline.queue.filled.pct")), 0.001)
 
 	// Add a new float metric after construction.
-	monitoring.NewFloat(systemReg, "load.5").Set(2.5)
+	monitoring.NewFloat(queueReg, "utilization.pct").Set(0.75)
 
-	// Second collection — discovers load.5, queues it.
+	// Second collection — discovers utilization.pct, queues it.
 	_ = collectMetrics(t, reader)
 	bridge.reRegWg.Wait()
 
-	// Third collection — load.5 now registered.
+	// Third collection — utilization.pct now registered.
 	rm = collectMetrics(t, reader)
-	assert.InDelta(t, 2.5, getGaugeFloat64Value(findMetricByName(rm, "system.load.5")), 0.001)
+	assert.InDelta(t, 0.75, getGaugeFloat64Value(findMetricByName(rm, "pipeline.queue.utilization.pct")), 0.001)
 
 	bridge.Shutdown()
 }
@@ -667,7 +662,7 @@ func TestBridgeNilMeterProvider(t *testing.T) {
 	settings.MeterProvider = nil
 	settings.Logger = nil
 
-	b, err := NewRegistryBridge(settings, nil, nil)
+	b, err := NewRegistryBridge(settings, "testbeat", nil, nil)
 	require.NoError(t, err)
 	require.NotNil(t, b)
 	b.Shutdown()
@@ -699,5 +694,51 @@ func TestBridgeInputIntGaugeObservation(t *testing.T) {
 	// Re-read via a fresh snapshot — the registry should reflect the update.
 	// Actually, just set a new value on the existing metric.
 	// Since monitoring.NewUint returns the var, let's create a fresh test.
+	bridge.Shutdown()
+}
+
+func TestBridgeReceiverAttribute(t *testing.T) {
+	reader := metric.NewManualReader()
+
+	statsReg := monitoring.NewRegistry()
+	pipelineReg := statsReg.GetOrCreateRegistry("pipeline")
+	monitoring.NewUint(pipelineReg, "clients").Set(3)
+
+	inputsReg := monitoring.NewRegistry()
+	input1 := inputsReg.GetOrCreateRegistry("input-1")
+	monitoring.NewString(input1, "id").Set("stream-1")
+	monitoring.NewString(input1, "input").Set("filestream")
+	monitoring.NewUint(input1, "events_processed_total").Set(42)
+
+	provider := metric.NewMeterProvider(metric.WithReader(reader))
+	settings := componenttest.NewNopTelemetrySettings()
+	settings.MeterProvider = provider
+	bridge, err := NewRegistryBridge(settings, "myreceiver", statsReg, inputsReg)
+	require.NoError(t, err)
+
+	rm := collectMetrics(t, reader)
+
+	// Stats metric should have receiver attribute.
+	clients := findMetricByName(rm, "pipeline.clients")
+	require.NotNil(t, clients)
+	gaugeDPs := getGaugeInt64DataPoints(clients)
+	require.Len(t, gaugeDPs, 1)
+	recvVal, ok := gaugeDPs[0].Attributes.Value(attribute.Key("receiver"))
+	require.True(t, ok, "stats metric should have 'receiver' attribute")
+	assert.Equal(t, "myreceiver", recvVal.AsString())
+
+	// Per-input metric should also have receiver attribute.
+	eventsProcessed := findMetricByName(rm, "events_processed_total")
+	require.NotNil(t, eventsProcessed)
+	sumDPs := getSumInt64DataPoints(eventsProcessed)
+	require.Len(t, sumDPs, 1)
+	recvVal, ok = sumDPs[0].Attributes.Value(attribute.Key("receiver"))
+	require.True(t, ok, "input metric should have 'receiver' attribute")
+	assert.Equal(t, "myreceiver", recvVal.AsString())
+	// Input metric should also retain input_id and input_type.
+	inputIDVal, ok := sumDPs[0].Attributes.Value(attribute.Key("input_id"))
+	require.True(t, ok)
+	assert.Equal(t, "stream-1", inputIDVal.AsString())
+
 	bridge.Shutdown()
 }

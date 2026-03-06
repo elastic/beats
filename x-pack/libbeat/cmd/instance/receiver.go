@@ -39,7 +39,7 @@ type BeatReceiver struct {
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
-func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator, ts component.TelemetrySettings) (BeatReceiver, error) {
+func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator, receiverID component.ID, ts component.TelemetrySettings) (BeatReceiver, error) {
 	beatConfig, err := b.BeatConfig()
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error getting beat config: %w", err)
@@ -93,7 +93,7 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		return BeatReceiver{}, fmt.Errorf("error getting %s creator:%w", b.Info.Beat, err)
 	}
 
-	bridge, err := oteltelemetry.NewRegistryBridge(ts, b.Monitoring.StatsRegistry(), b.Monitoring.InputsRegistry())
+	bridge, err := oteltelemetry.NewRegistryBridge(ts, receiverID.String(), b.Monitoring.StatsRegistry(), b.Monitoring.InputsRegistry())
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error creating registry bridge: %w", err)
 	}
