@@ -1,0 +1,70 @@
+Vagrant.configure("2") do |config|
+  config.vm.boot_timeout = 600
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = 4096
+    vb.cpus = 4
+  end
+
+  config.vm.provider "libvirt" do |lv|
+    lv.memory = 4096
+    lv.cpus = 4
+  end
+
+  targets = {
+    "239" => {
+      box: "generic/rocky8",
+      expected_major: "239",
+      hostname: "sd239-rocky8"
+    },
+    "240" => {
+      box: "generic/ubuntu1904",
+      expected_major: "240",
+      hostname: "sd240-ubuntu1904"
+    },
+    "241" => {
+      box: "generic/debian10",
+      expected_major: "241",
+      hostname: "sd241-debian10"
+    },
+    "250" => {
+      box: "generic/fedora36",
+      expected_major: "250",
+      hostname: "sd250-fedora36"
+    }
+  }
+
+  targets.each do |version, cfg|
+    config.vm.define version do |vm|
+      vm.vm.box = cfg[:box]
+      vm.vm.hostname = cfg[:hostname]
+
+      vm.vm.provision "file", source: "journald.conf", destination: "/tmp/journald.conf"
+
+      vm.vm.provision "shell", privileged: true, inline: <<-SHELL
+        set -euo pipefail
+        install -m 0644 /tmp/journald.conf /etc/systemd/journald.conf
+        systemctl restart systemd-journald
+      SHELL
+
+      vm.vm.provision "shell", privileged: true, inline: <<-SHELL
+        set -euo pipefail
+
+        if ! command -v systemctl >/dev/null 2>&1; then
+          echo "systemctl not found in #{cfg[:hostname]}" >&2
+          exit 1
+        fi
+
+        actual="$(systemctl --version | awk 'NR==1{print $2}')"
+        major="${actual%%.*}"
+
+        echo "[#{cfg[:hostname]}] expected systemd #{cfg[:expected_major]}, got ${actual}"
+
+        if [ "${major}" != "#{cfg[:expected_major]}" ]; then
+          echo "[#{cfg[:hostname]}] ERROR: expected major #{cfg[:expected_major]}, got ${actual}" >&2
+          exit 1
+        fi
+      SHELL
+    end
+  end
+end
