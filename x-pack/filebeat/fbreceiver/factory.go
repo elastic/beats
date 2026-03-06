@@ -24,10 +24,6 @@ const (
 	Name = "filebeatreceiver"
 )
 
-func createDefaultConfig() component.Config {
-	return &Config{}
-}
-
 func createReceiver(ctx context.Context, set receiver.Settings, baseCfg component.Config, consumer consumer.Logs) (receiver.Logs, error) {
 	cfg, ok := baseCfg.(*Config)
 	if !ok {
@@ -53,9 +49,24 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 	return &filebeatReceiver{BeatReceiver: br}, nil
 }
 
-func NewFactory() receiver.Factory {
+// NewFactory creates a new receiver Factory.  home should be the path
+// that contains the "module" directory so modules can be found and
+// loaded.  data should point to the directory where state information
+// will be kept.  Both can be overridden by passing in path information
+// in the configuration file when the receiver in instantiated.  This
+// just provides defaults.
+func NewFactory(home, data string) receiver.Factory {
 	return receiver.NewFactory(
 		component.MustNewType(Name),
-		createDefaultConfig,
+		func() component.Config {
+			return &Config{
+				Beatconfig: map[string]any{
+					"path": map[string]any{
+						"home": home,
+						"data": data,
+					},
+				},
+			}
+		},
 		receiver.WithLogs(createReceiver, component.StabilityLevelAlpha))
 }

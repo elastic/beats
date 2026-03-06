@@ -19,12 +19,12 @@ func TestValidate(t *testing.T) {
 		"Empty config": {
 			c:           &Config{Beatconfig: map[string]interface{}{}},
 			hasError:    true,
-			errorString: "Configuration is required",
+			errorString: "configuration is required",
 		},
 		"No metricbeat section": {
 			c:           &Config{Beatconfig: map[string]interface{}{"other": map[string]interface{}{}}},
 			hasError:    true,
-			errorString: "Configuration key 'metricbeat' is required",
+			errorString: "configuration key 'metricbeat' is required",
 		},
 		"Valid config": {
 			c:           &Config{Beatconfig: map[string]interface{}{"metricbeat": map[string]interface{}{}}},

@@ -46,7 +46,7 @@ func New(tb testing.TB, configYAML string) *Collector {
 
 	configDir := tb.TempDir()
 	configFile := filepath.Join(configDir, "otel.yaml")
-	err := os.WriteFile(configFile, []byte(configYAML), 0644)
+	err := os.WriteFile(configFile, []byte(configYAML), 0o644)
 	require.NoError(tb, err)
 
 	if err != nil {
@@ -101,8 +101,8 @@ func (c *Collector) Shutdown() {
 
 func getComponent() (otelcol.Factories, error) {
 	receivers, err := otelcol.MakeFactoryMap(
-		fbreceiver.NewFactory(),
-		mbreceiver.NewFactory(),
+		fbreceiver.NewFactory("", ""),
+		mbreceiver.NewFactory("", ""),
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
@@ -138,7 +138,6 @@ func getComponent() (otelcol.Factories, error) {
 		Extensions: extensions,
 		Telemetry:  otelconftelemetry.NewFactory(),
 	}, nil
-
 }
 
 func newCollectorSettings(filename string, core zapcore.Core) otelcol.CollectorSettings {
