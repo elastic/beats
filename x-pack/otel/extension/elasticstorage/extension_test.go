@@ -193,6 +193,7 @@ func TestStore_SetID(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 	require.NoError(t, conn.Connect(ctx))
+	t.Cleanup(func() { _ = conn.Close() })
 
 	s, err := openStore(conn, "original")
 	require.NoError(t, err)

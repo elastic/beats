@@ -1798,6 +1798,7 @@ func TestFilebeatOTelHTTPJSONInputWithElasticStateStore(t *testing.T) {
 	// Enable ES state store for httpjson and cel input types.
 	// Reload must be called to apply the change since the features package
 	// reads the env var only once at init() time.
+	t.Cleanup(func() { features.ReinitForTest() }) // restore after test. We call cleanup before setting env because cleanups are called in last added first called order.
 	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "httpjson,cel")
 	features.ReinitForTest()
 
