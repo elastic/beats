@@ -38,13 +38,14 @@ func TestJWTConfig(t *testing.T) {
 		wantErr error
 		config  JWTBearerFlow
 	}{
-		"auth disabled I":        {config: JWTBearerFlow{}, wantErr: nil},
-		"auth disabled II":       {config: JWTBearerFlow{Enabled: pointer(false)}, wantErr: nil},
-		"url missing":            {config: JWTBearerFlow{Enabled: pointer(true), URL: ""}, wantErr: errors.New("url must be provided")},
-		"clientID missing":       {config: JWTBearerFlow{Enabled: pointer(true), URL: "https://salesforce.com", ClientID: ""}, wantErr: errors.New("client.id must be provided")},
-		"clientUsername missing": {config: JWTBearerFlow{Enabled: pointer(true), URL: "https://salesforce.com", ClientID: "xyz", ClientUsername: ""}, wantErr: errors.New("client.username must be provided")},
-		"clientKeyPath missing":  {config: JWTBearerFlow{Enabled: pointer(true), URL: "https://salesforce.com", ClientID: "xyz", ClientUsername: "abc", ClientKeyPath: ""}, wantErr: errors.New("client.key_path must be provided")},
-		"all present":            {config: JWTBearerFlow{Enabled: pointer(true), URL: "https://salesforce.com", ClientID: "xyz", ClientUsername: "abc", ClientKeyPath: "def"}, wantErr: nil},
+		"auth disabled I":            {config: JWTBearerFlow{}, wantErr: nil},
+		"auth disabled II":           {config: JWTBearerFlow{Enabled: pointer(false)}, wantErr: nil},
+		"url missing":                {config: JWTBearerFlow{Enabled: pointer(true), URL: ""}, wantErr: errors.New("url must be provided")},
+		"clientID missing":           {config: JWTBearerFlow{Enabled: pointer(true), URL: "https://salesforce.com", ClientID: ""}, wantErr: errors.New("client.id must be provided")},
+		"clientUsername missing":     {config: JWTBearerFlow{Enabled: pointer(true), URL: "https://salesforce.com", ClientID: "xyz", ClientUsername: ""}, wantErr: errors.New("client.username must be provided")},
+		"clientKeyPath missing":      {config: JWTBearerFlow{Enabled: pointer(true), URL: "https://salesforce.com", ClientID: "xyz", ClientUsername: "abc", ClientKeyPath: ""}, wantErr: errors.New("client.key_path must be provided")},
+		"all present":                {config: JWTBearerFlow{Enabled: pointer(true), URL: "https://salesforce.com", ClientID: "xyz", ClientUsername: "abc", ClientKeyPath: "def"}, wantErr: nil},
+		"all present with token_url": {config: JWTBearerFlow{Enabled: pointer(true), URL: "https://login.salesforce.com", TokenURL: "https://mydomain.my.salesforce.com/services/oauth2/token", ClientID: "xyz", ClientUsername: "abc", ClientKeyPath: "def"}, wantErr: nil},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
