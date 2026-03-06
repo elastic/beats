@@ -499,6 +499,66 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 	return true
 }
 
+func hasInputMetricsFromUnixSocket(t *testing.T, socketPath string, inputID string) error {
+	// skip windows for now
+	if runtime.GOOS == "windows" {
+		return nil
+	}
+
+	client := http.Client{
+		Transport: &http.Transport{
+			DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+				return (&net.Dialer{}).DialContext(ctx, "unix", socketPath)
+			},
+		},
+	}
+	defer client.CloseIdleConnections()
+
+	inputsURL, err := url.JoinPath("http://unix", "inputs")
+	if err != nil {
+		return fmt.Errorf("JoinPath failed: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, inputsURL, nil)
+	if err != nil {
+		return fmt.Errorf("error creating request: %w", err)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("client.Get failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("io.ReadAll of body failed: %w", err)
+	}
+
+	if len(body) <= 0 {
+		return errors.New("body too short")
+	}
+
+	var inputs []map[string]any
+	if err := json.Unmarshal(body, &inputs); err != nil {
+		return fmt.Errorf("json unmarshal of body failed: %w (body=%q)", err, body)
+	}
+
+	if len(inputs) <= 0 {
+		return errors.New("json array didn't have any entries")
+	}
+
+	for _, input := range inputs {
+		id, _ := input["id"].(string)
+		if id != inputID {
+			continue
+		}
+		return nil
+	}
+
+	return fmt.Errorf("input %q not found in /inputs payload", inputID)
+}
+
 type logGenerator struct {
 	t           *testing.T
 	tmpDir      string
@@ -565,22 +625,20 @@ func TestConsumeContract(t *testing.T) {
 
 	tmpDir := t.TempDir()
 	monitorSocket := genSocketPath(t)
-	const logsPerTest = 100
+	const (
+		logsPerTest       = 100
+		filestreamInputID = "filestream-test"
+	)
 
 	gen := newLogGenerator(t, tmpDir)
 	gen.waitReady = func() {
-		var lastError strings.Builder
-		require.Eventuallyf(t, func() bool {
-			if !getFromSocket(t, &lastError, monitorSocket, "stats") {
-				return false
-			}
-			return getFromSocket(t, &lastError, monitorSocket, "inputs")
-		}, 30*time.Second, 100*time.Millisecond, "receiver monitoring endpoints are not ready, last error: %s", &lastError)
+		require.EventuallyWithT(t, func(c *assert.CollectT) {
+			err := hasInputMetricsFromUnixSocket(t, monitorSocket, filestreamInputID)
+			assert.NoError(c, err, "receiver input metrics are not ready")
+		}, 30*time.Second, 100*time.Millisecond)
 	}
 
 	t.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
-	// Disable AWS IMDS lookups to keep this contract test startup deterministic.
-	t.Setenv("AWS_EC2_METADATA_DISABLED", "true")
 
 	cfg := &Config{
 		Beatconfig: map[string]any{
@@ -590,7 +648,7 @@ func TestConsumeContract(t *testing.T) {
 				"inputs": []map[string]any{
 					{
 						"type":    "filestream",
-						"id":      "filestream-test",
+						"id":      filestreamInputID,
 						"enabled": true,
 						"paths": []string{
 							filepath.Join(tmpDir, "input.log"),
