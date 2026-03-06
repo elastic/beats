@@ -72,10 +72,7 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 			b.API, err = api.NewWithDefaultRoutes(
 				b.Info.Logger.Named("metrics.http"),
 				b.Config.HTTP,
-				b.Monitoring.InfoRegistry(),
-				b.Monitoring.StateRegistry(),
-				b.Monitoring.StatsRegistry(),
-				b.Monitoring.InputsRegistry())
+				b.Monitoring)
 			if err != nil {
 				return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 			}
@@ -145,7 +142,9 @@ func (br *BeatReceiver) Start(host component.Host) error {
 	}
 
 	if br.beat.Config.MetricLogging == nil || br.beat.Config.MetricLogging.Enabled() {
-		r, err := log.MakeReporter(br.beat.Info, br.beat.Config.MetricLogging, br.beat.Monitoring.InfoRegistry(), br.beat.Monitoring.StateRegistry(), br.beat.Monitoring.StateRegistry(), br.beat.Monitoring.InfoRegistry())
+		r, err := log.MakeReporter(br.beat.Info,
+			br.beat.Config.MetricLogging,
+			br.beat.Monitoring)
 		if err != nil {
 			return fmt.Errorf("error creating metric reporter: %w", err)
 		}
@@ -162,7 +161,6 @@ func (br *BeatReceiver) Start(host component.Host) error {
 				br.Logger.Errorf("error closing beat receiver publisher: %v", err)
 			}
 		}
-
 	})
 
 	if err := br.beater.Run(&br.beat.Beat); err != nil {

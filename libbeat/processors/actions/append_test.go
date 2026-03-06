@@ -288,6 +288,59 @@ func Test_appendProcessor_Run(t *testing.T) {
 			},
 		},
 		{
+			description: "append values when target field is []string",
+			args: args{
+				event: &beat.Event{
+					Meta: mapstr.M{},
+					Fields: mapstr.M{
+						"tags": []string{"forwarded", "another-tag-from-the-tags-field"},
+					},
+				},
+			},
+			fields: fields{
+				logger: log,
+				config: appendProcessorConfig{
+					TargetField: "tags",
+					Values:      []interface{}{"foo_bar"},
+				},
+			},
+			wantErr: false,
+			want: &beat.Event{
+				Meta: mapstr.M{},
+				Fields: mapstr.M{
+					"tags": []interface{}{"forwarded", "another-tag-from-the-tags-field", "foo_bar"},
+				},
+			},
+		},
+		{
+			description: "append values when source field is []string and remove duplicates",
+			args: args{
+				event: &beat.Event{
+					Meta: mapstr.M{},
+					Fields: mapstr.M{
+						"target": []interface{}{"one"},
+						"field":  []string{"two", "two"},
+					},
+				},
+			},
+			fields: fields{
+				logger: log,
+				config: appendProcessorConfig{
+					Fields:         []string{"field"},
+					TargetField:    "target",
+					AllowDuplicate: false,
+				},
+			},
+			wantErr: false,
+			want: &beat.Event{
+				Meta: mapstr.M{},
+				Fields: mapstr.M{
+					"target": []interface{}{"one", "two"},
+					"field":  []string{"two", "two"},
+				},
+			},
+		},
+		{
 			description: "test for nested field",
 			fields: fields{
 				logger: log,
@@ -446,30 +499,18 @@ func Test_removeDuplicates(t *testing.T) {
 			},
 			wantCleanArr: []interface{}{1, 2, 3, 4, 5},
 		},
+		{
+			description: "clean up non-comparable values without panic",
+			args: args{
+				dirtyArr: []interface{}{[]string{"a", "b"}, []string{"a", "b"}, "test"},
+			},
+			wantCleanArr: []interface{}{[]string{"a", "b"}, "test"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			gotCleanArr := removeDuplicates(tt.args.dirtyArr)
-			isError := false
-			temp := make(map[interface{}]bool, 0)
-			for _, val := range gotCleanArr {
-				temp[val] = true
-			}
-
-			if len(temp) != len(tt.wantCleanArr) {
-				isError = true
-			}
-
-			if !isError {
-				for _, val := range tt.wantCleanArr {
-					if _, ok := temp[val]; !ok {
-						isError = true
-						break
-					}
-				}
-			}
-
-			if isError {
+			if !reflect.DeepEqual(gotCleanArr, tt.wantCleanArr) {
 				t.Errorf("removeDuplicates() = %v, want %v", gotCleanArr, tt.wantCleanArr)
 			}
 		})
