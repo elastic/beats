@@ -42,10 +42,16 @@ func VerifyWithExecutableDirectory(log *logp.Logger) error {
 // Verify verifies installation in the given executable directory
 func Verify(goos, dir string, log *logp.Logger) error {
 	log.Infof("Install verification for %s", dir)
-	// Verify osqueryd or osqueryd.exe exists and is a valid osquery binary.
-	_, err := VerifyOsqueryBinary(goos, dir, log)
+	// Verify osqueryd or osqueryd.exe exists.
+	// Keep Verify focused on install layout checks (file presence), while
+	// VerifyOsqueryBinary is used where runtime execution/validation is required.
+	osqFile := osqd.OsquerydPathForPlatform(goos, dir)
+	osqExists, err := fileExistsLogged(log, osqFile)
 	if err != nil {
 		return err
+	}
+	if !osqExists {
+		return fmt.Errorf("%w: %v", os.ErrNotExist, osqFile)
 	}
 
 	// Verify extension file exists

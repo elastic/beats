@@ -382,6 +382,22 @@ func buildTarGzArtifact(t *testing.T, version string, includeExtension bool) []b
 	binPath := "osqueryd"
 	if runtime.GOOS == "darwin" {
 		binPath = filepath.Join("osquery.app", "Contents", "MacOS", "osqueryd")
+		// The tar extractor creates files directly and expects parent directories
+		// to already exist, so add explicit dir headers for Darwin app bundles.
+		for _, dir := range []string{
+			"osquery.app",
+			filepath.Join("osquery.app", "Contents"),
+			filepath.Join("osquery.app", "Contents", "MacOS"),
+		} {
+			dirHdr := &tar.Header{
+				Name:     dir,
+				Mode:     0755,
+				Typeflag: tar.TypeDir,
+			}
+			if err := tw.WriteHeader(dirHdr); err != nil {
+				t.Fatalf("write tar dir header failed: %v", err)
+			}
+		}
 	}
 	script := "#!/bin/sh\necho \"osqueryd version " + version + "\"\n"
 	hdr := &tar.Header{
