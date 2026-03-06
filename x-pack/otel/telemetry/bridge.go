@@ -7,16 +7,18 @@ package telemetry
 import (
 	"context"
 	"fmt"
+	"math"
 	"strings"
 	"sync"
 
-	logreport "github.com/elastic/beats/v7/libbeat/monitoring/report/log"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/noop"
 	"go.uber.org/zap"
+
+	logreport "github.com/elastic/beats/v7/libbeat/monitoring/report/log"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const scopeName = "github.com/elastic/beats/v7/x-pack/otel/telemetry"
@@ -157,7 +159,7 @@ func (b *RegistryBridge) Shutdown() {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	if b.registration != nil {
-		b.registration.Unregister()
+		_ = b.registration.Unregister()
 		b.registration = nil
 	}
 }
@@ -364,7 +366,7 @@ func (b *RegistryBridge) createAndReRegister(statsInts, statsFloats, inputInts, 
 	// Unregister old callback and register new one with full instrument set.
 	b.mu.Lock()
 	if b.registration != nil {
-		b.registration.Unregister()
+		_ = b.registration.Unregister()
 		b.registration = nil
 	}
 	b.mu.Unlock()
@@ -485,7 +487,10 @@ func toInt64Value(v interface{}) (int64, bool) {
 	case int64:
 		return n, true
 	case uint64:
-		return int64(n), true
+		if n > math.MaxInt64 {
+			return math.MaxInt64, true
+		}
+		return int64(n), true // #nosec G115 — clamped above
 	case int:
 		return int64(n), true
 	case float64:
