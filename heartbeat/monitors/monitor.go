@@ -276,14 +276,17 @@ func (m *Monitor) Stop() {
 	m.updateStatus(status.Stopped, "")
 }
 
-// Stop stops the monitor without freeing it in global dedup
-// needed by dedup itself to avoid a reentrant lock.
+// Update invokes the plugin's optional Update method wrapping it with
+// the corresponding status reporting
 func (m *Monitor) Update(config *conf.C) error {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
 
 	m.updateStatus(status.Configuring, "updating runner config")
-	m.plugin.Update(config)
+	if err := m.plugin.Update(config); err != nil {
+		m.updateStatus(status.Degraded, "failed to update runner config")
+		return err
+	}
 	m.updateStatus(status.Running, "runner updated")
 
 	return nil

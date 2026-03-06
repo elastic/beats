@@ -36,7 +36,7 @@ import (
 	"github.com/gohugoio/hashstructure"
 )
 
-// RunnerList implements a reloadable.List of Runners
+// HBRunnerList implements a reloadable.List of Runners
 type HBRunnerList struct {
 	runners  map[uint64]cfgfile.Runner
 	mutex    sync.RWMutex
@@ -69,8 +69,8 @@ func (r *HBRunnerList) Runners() []cfgfile.Runner {
 	defer r.mutex.Unlock()
 
 	runners := make([]cfgfile.Runner, 0, len(r.runners))
-	for _, r := range r.runners {
-		runners = append(runners, r)
+	for _, runner := range r.runners {
+		runners = append(runners, runner)
 	}
 	return runners
 }
@@ -122,7 +122,7 @@ func (r *HBRunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	wg := sync.WaitGroup{}
 
 	// Update existing runners. This should come before other cycles, if there're
-	// any errors updating, we resort to normal stop/star cycle
+	// any errors updating, we resort to normal stop/start cycle
 	for hash, cfg := range updateList {
 		runner := r.runners[hash]
 		r.logger.Debugf("Runner updating: %s", runner)
@@ -257,7 +257,7 @@ func (r *HBRunnerList) HashConfig(c *config.C) (uint64, error) {
 
 	hash, err := hbfactory.GetHashFunc(c)
 	if err != nil {
-		r.logger.Error("error looking for plugin, using default hash: %w", err)
+		r.logger.Errorf("error looking for plugin, using default hash: %v", err)
 		return DefaultHashConfig(c)
 	}
 

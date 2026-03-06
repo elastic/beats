@@ -38,7 +38,7 @@ import (
 type HashConfigFunc func(cfg *conf.C) (uint64, error)
 
 type PluginMake func(string, *conf.C) (p Plugin, err error)
-type PluginUpdate func(string, *conf.C) (p Plugin, err error)
+type PluginUpdate func(*conf.C) (err error)
 
 // PluginFactory represents an uninstantiated plug in instance generated from a monitor config. Invoking the Make function creates a plug-in instance.
 type PluginFactory struct {
@@ -53,7 +53,7 @@ type PluginFactory struct {
 type Plugin struct {
 	Jobs      []jobs.Job
 	DoClose   func() error
-	DoUpdate  func(*conf.C) error
+	DoUpdate  PluginUpdate
 	Endpoints int
 }
 
