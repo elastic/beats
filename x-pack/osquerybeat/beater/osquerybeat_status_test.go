@@ -87,6 +87,28 @@ func (m *testManager) UnregisterAction(management.Action)  {}
 func (m *testManager) RegisterDiagnosticHook(string, string, string, string, management.DiagnosticHook) {
 }
 
+func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquerybeat, *beat.Beat, *testManager) {
+	t.Helper()
+
+	mgr := &testManager{}
+	b := &beat.Beat{
+		Manager:    mgr,
+		Registry:   reload.NewRegistry(),
+		Monitoring: beat.NewMonitoring(),
+	}
+
+	cfg := agentconfig.NewConfig()
+	beater, err := New(b, cfg)
+	require.NoError(t, err)
+
+	ob, ok := beater.(*osquerybeat)
+	require.True(t, ok)
+	for _, override := range overrides {
+		override(ob)
+	}
+	return ob, b, mgr
+}
+
 // TestOsquerybeatStatusReporting_Lifecycle tests the full lifecycle status reporting
 // when osqueryd is available and runs successfully.
 func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
@@ -306,25 +328,19 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 // TestOsquerybeatStatusReporting_RuntimeResolutionFailure tests status reporting
 // when custom osquery runtime resolution fails before osqueryd runner creation.
 func TestOsquerybeatStatusReporting_RuntimeResolutionFailure(t *testing.T) {
-	mgr := &testManager{}
-	b := &beat.Beat{
-		Manager:    mgr,
-		Registry:   reload.NewRegistry(),
-		Monitoring: beat.NewMonitoring(),
-	}
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		platformCfg := &config.InstallArtifactConfig{
+			ArtifactURL: "https://example.org/osquery.tar.gz",
+			SHA256:      "bad",
+		}
+		ob.osqueryInstallConfig = config.InstallConfig{
+			Linux:   platformCfg,
+			Darwin:  platformCfg,
+			Windows: platformCfg,
+		}
+	})
 
-	cfg := agentconfig.NewConfig()
-	beater, err := New(b, cfg)
-	require.NoError(t, err)
-
-	ob, ok := beater.(*osquerybeat)
-	require.True(t, ok)
-	ob.osqueryInstallConfig = config.InstallConfig{
-		ArtifactURL: "https://example.org/osquery.tar.gz",
-		SHA256:      "bad",
-	}
-
-	err = beater.Run(b)
+	err := ob.Run(b)
 	require.Error(t, err)
 
 	mgr.mx.Lock()

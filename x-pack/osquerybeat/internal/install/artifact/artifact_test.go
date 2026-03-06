@@ -17,11 +17,31 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+func testInstallConfig(url, sha string) config.InstallConfig {
+	cfg := config.InstallConfig{
+		AllowInsecureURL: true,
+	}
+	platformCfg := &config.InstallArtifactConfig{
+		ArtifactURL: url,
+		SHA256:      sha,
+	}
+	switch runtime.GOOS {
+	case "linux":
+		cfg.Linux = platformCfg
+	case "darwin":
+		cfg.Darwin = platformCfg
+	case "windows":
+		cfg.Windows = platformCfg
+	}
+	return cfg
+}
 
 func TestCleanupOldReleases(t *testing.T) {
 	installDir := t.TempDir()
@@ -82,11 +102,7 @@ func TestEnsureChecksumMismatch(t *testing.T) {
 	}))
 	defer server.Close()
 
-	cfg := config.InstallConfig{
-		ArtifactURL:      server.URL + "/osquery.tar.gz",
-		SHA256:           strings.Repeat("a", 64),
-		AllowInsecureURL: true,
-	}
+	cfg := testInstallConfig(server.URL+"/osquery.tar.gz", strings.Repeat("a", 64))
 
 	_, err := Ensure(context.Background(), cfg, t.TempDir(), log)
 	if err == nil {
@@ -171,7 +187,7 @@ func TestEnsureReuseInstalledByChecksum(t *testing.T) {
 
 	log := logp.NewLogger("artifact_test")
 	version := "5.19.0"
-	artifactBytes := buildTarGzArtifact(t, version)
+	artifactBytes := buildTarGzArtifact(t, version, true)
 	sum := sha256.Sum256(artifactBytes)
 	sha := hex.EncodeToString(sum[:])
 
@@ -182,11 +198,7 @@ func TestEnsureReuseInstalledByChecksum(t *testing.T) {
 	}))
 	defer server.Close()
 
-	cfg := config.InstallConfig{
-		ArtifactURL:      server.URL + "/osquery.tar.gz",
-		SHA256:           sha,
-		AllowInsecureURL: true,
-	}
+	cfg := testInstallConfig(server.URL+"/osquery.tar.gz", sha)
 
 	installDir := t.TempDir()
 	first, err := Ensure(context.Background(), cfg, installDir, log)
@@ -215,8 +227,8 @@ func TestEnsureChecksumUpdateCleansOldRelease(t *testing.T) {
 	}
 
 	log := logp.NewLogger("artifact_test")
-	artifactV1 := buildTarGzArtifact(t, "5.19.0")
-	artifactV2 := buildTarGzArtifact(t, "5.20.0")
+	artifactV1 := buildTarGzArtifact(t, "5.19.0", true)
+	artifactV2 := buildTarGzArtifact(t, "5.20.0", true)
 
 	sum1 := sha256.Sum256(artifactV1)
 	sha1 := hex.EncodeToString(sum1[:])
@@ -233,16 +245,8 @@ func TestEnsureChecksumUpdateCleansOldRelease(t *testing.T) {
 	defer server.Close()
 
 	installDir := t.TempDir()
-	cfg1 := config.InstallConfig{
-		ArtifactURL:      server.URL + "/v1/osquery.tar.gz",
-		SHA256:           sha1,
-		AllowInsecureURL: true,
-	}
-	cfg2 := config.InstallConfig{
-		ArtifactURL:      server.URL + "/v2/osquery.tar.gz",
-		SHA256:           sha2,
-		AllowInsecureURL: true,
-	}
+	cfg1 := testInstallConfig(server.URL+"/v1/osquery.tar.gz", sha1)
+	cfg2 := testInstallConfig(server.URL+"/v2/osquery.tar.gz", sha2)
 
 	if _, err := Ensure(context.Background(), cfg1, installDir, log); err != nil {
 		t.Fatalf("first ensure failed: %v", err)
@@ -268,7 +272,107 @@ func TestEnsureChecksumUpdateCleansOldRelease(t *testing.T) {
 	}
 }
 
-func buildTarGzArtifact(t *testing.T, version string) []byte {
+func TestEnsureConcurrentCallsUseSingleInstallFlow(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("test uses shell-script osqueryd fixture")
+	}
+
+	log := logp.NewLogger("artifact_test")
+	version := "5.19.0"
+	artifactBytes := buildTarGzArtifact(t, version, true)
+	sum := sha256.Sum256(artifactBytes)
+	sha := hex.EncodeToString(sum[:])
+
+	var (
+		requests int
+		mu       sync.Mutex
+	)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		requests++
+		mu.Unlock()
+		_, _ = w.Write(artifactBytes)
+	}))
+	defer server.Close()
+
+	cfg := testInstallConfig(server.URL+"/osquery.tar.gz", sha)
+	installDir := t.TempDir()
+
+	var wg sync.WaitGroup
+	errCh := make(chan error, 2)
+	results := make(chan Result, 2)
+
+	wg.Add(2)
+	for i := 0; i < 2; i++ {
+		go func() {
+			defer wg.Done()
+			res, err := Ensure(context.Background(), cfg, installDir, log)
+			if err != nil {
+				errCh <- err
+				return
+			}
+			results <- res
+		}()
+	}
+	wg.Wait()
+	close(errCh)
+	close(results)
+
+	for err := range errCh {
+		if err != nil {
+			t.Fatalf("ensure failed: %v", err)
+		}
+	}
+
+	got := make([]Result, 0, 2)
+	for res := range results {
+		got = append(got, res)
+	}
+	if len(got) != 2 {
+		t.Fatalf("expected 2 successful results, got %d", len(got))
+	}
+	if got[0].BinDir != got[1].BinDir {
+		t.Fatalf("expected same bin dir, got %s and %s", got[0].BinDir, got[1].BinDir)
+	}
+	if got[0].Version != version || got[1].Version != version {
+		t.Fatalf("unexpected versions: %s and %s", got[0].Version, got[1].Version)
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+	if requests != 1 {
+		t.Fatalf("expected a single download request, got %d", requests)
+	}
+}
+
+func TestEnsureMissingExtensionFails(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("test uses shell-script osqueryd fixture")
+	}
+
+	log := logp.NewLogger("artifact_test")
+	version := "5.19.0"
+	artifactBytes := buildTarGzArtifact(t, version, false)
+	sum := sha256.Sum256(artifactBytes)
+	sha := hex.EncodeToString(sum[:])
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write(artifactBytes)
+	}))
+	defer server.Close()
+
+	cfg := testInstallConfig(server.URL+"/osquery.tar.gz", sha)
+
+	_, err := Ensure(context.Background(), cfg, t.TempDir(), log)
+	if err == nil {
+		t.Fatal("expected missing extension error")
+	}
+	if !strings.Contains(err.Error(), "osquery-extension.ext") {
+		t.Fatalf("expected extension filename in error, got: %v", err)
+	}
+}
+
+func buildTarGzArtifact(t *testing.T, version string, includeExtension bool) []byte {
 	t.Helper()
 
 	var buf bytes.Buffer
@@ -287,6 +391,22 @@ func buildTarGzArtifact(t *testing.T, version string) []byte {
 	}
 	if _, err := tw.Write([]byte(script)); err != nil {
 		t.Fatalf("write tar body failed: %v", err)
+	}
+
+	if includeExtension {
+		extPath := "osquery-extension.ext"
+		extContent := []byte("extension")
+		extHdr := &tar.Header{
+			Name: extPath,
+			Mode: 0644,
+			Size: int64(len(extContent)),
+		}
+		if err := tw.WriteHeader(extHdr); err != nil {
+			t.Fatalf("write extension tar header failed: %v", err)
+		}
+		if _, err := tw.Write(extContent); err != nil {
+			t.Fatalf("write extension tar body failed: %v", err)
+		}
 	}
 	if err := tw.Close(); err != nil {
 		t.Fatalf("close tar writer failed: %v", err)

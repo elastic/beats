@@ -525,7 +525,7 @@ func (bt *osquerybeat) resolveOsqueryRuntime(ctx context.Context) (osqueryRuntim
 
 	installDir := bundledDir
 	installCfg := bt.osqueryInstallConfig
-	if !installCfg.Enabled() {
+	if !installCfg.EnabledForPlatform(runtime.GOOS) {
 		if err := installartifact.RemoveInstalled(installDir); err != nil {
 			bt.log.Warnf("failed to cleanup previous custom osquery install, continue with bundled osquery: %v", err)
 		}

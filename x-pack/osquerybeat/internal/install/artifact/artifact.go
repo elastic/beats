@@ -18,6 +18,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gofrs/flock"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fetch"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install"
@@ -33,6 +35,9 @@ const (
 	releasesDirName      = "releases"
 	releaseMetadataFile  = "install.json"
 	stagingDirNamePrefix = "staging-"
+	installLockFileName  = ".custom-artifact-install.lock"
+	installLockRetry     = 250 * time.Millisecond
+	httpClientTimeout    = 30 * time.Minute
 )
 
 type Result struct {
@@ -48,11 +53,12 @@ type metadata struct {
 }
 
 func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, log *logp.Logger) (Result, error) {
-	if !cfg.Enabled() {
-		return Result{}, errors.New("custom osquery artifact is not enabled")
-	}
 	if err := cfg.NormalizeAndValidate(); err != nil {
 		return Result{}, err
+	}
+	selected, enabled := cfg.SelectedForPlatform(runtime.GOOS)
+	if !enabled {
+		return Result{}, fmt.Errorf("custom osquery artifact is not enabled for platform %s", runtime.GOOS)
 	}
 	if installDir == "" {
 		return Result{}, errors.New("install directory is required")
@@ -60,9 +66,14 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 	if err := os.MkdirAll(installDir, 0750); err != nil {
 		return Result{}, err
 	}
+	unlock, err := acquireInstallLock(ctx, installDir)
+	if err != nil {
+		return Result{}, err
+	}
+	defer unlock()
 
-	releaseDir := filepath.Join(installDir, releasesDirName, cfg.SHA256)
-	if res, ok := tryReuseInstalled(releaseDir, cfg, log); ok {
+	releaseDir := filepath.Join(installDir, releasesDirName, selected.SHA256)
+	if res, ok := tryReuseInstalled(releaseDir, selected, log); ok {
 		return res, nil
 	}
 
@@ -73,23 +84,23 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 	defer os.RemoveAll(stageDir)
 
 	artifactFile := filepath.Join(stageDir, "artifact")
-	httpClient, err := buildHTTPClient(cfg, log)
+	httpClient, err := buildHTTPClient(cfg, runtime.GOOS, log)
 	if err != nil {
 		return Result{}, err
 	}
-	hashOut, err := fetch.DownloadWithClient(ctx, httpClient, cfg.ArtifactURL, artifactFile)
+	hashOut, err := fetch.DownloadWithClient(ctx, httpClient, selected.ArtifactURL, artifactFile)
 	if err != nil {
 		return Result{}, err
 	}
-	if !strings.EqualFold(hashOut, cfg.SHA256) {
-		return Result{}, fmt.Errorf("artifact sha256 mismatch: expected %s, got %s", cfg.SHA256, hashOut)
+	if !strings.EqualFold(hashOut, selected.SHA256) {
+		return Result{}, fmt.Errorf("artifact sha256 mismatch: expected %s, got %s", selected.SHA256, hashOut)
 	}
 
 	extractedDir := filepath.Join(stageDir, "extract")
 	if err := os.MkdirAll(extractedDir, 0750); err != nil {
 		return Result{}, err
 	}
-	if err := extractArtifact(artifactFile, cfg.ArtifactURL, extractedDir); err != nil {
+	if err := extractArtifact(artifactFile, selected.ArtifactURL, extractedDir); err != nil {
 		return Result{}, err
 	}
 
@@ -101,17 +112,7 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 	if err != nil {
 		return Result{}, err
 	}
-
-	if err := os.MkdirAll(filepath.Dir(releaseDir), 0750); err != nil {
-		return Result{}, err
-	}
-	if _, statErr := os.Stat(releaseDir); statErr == nil {
-		if res, ok := tryReuseInstalled(releaseDir, cfg, log); ok {
-			return res, nil
-		}
-		_ = os.RemoveAll(releaseDir)
-	}
-	if err := os.Rename(extractedDir, releaseDir); err != nil {
+	if err := verifyExtensionFile(runtime.GOOS, binDir); err != nil {
 		return Result{}, err
 	}
 
@@ -120,9 +121,22 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 		return Result{}, err
 	}
 
+	if err := os.MkdirAll(filepath.Dir(releaseDir), 0750); err != nil {
+		return Result{}, err
+	}
+	if _, statErr := os.Stat(releaseDir); statErr == nil {
+		if res, ok := tryReuseInstalled(releaseDir, selected, log); ok {
+			return res, nil
+		}
+		_ = os.RemoveAll(releaseDir)
+	}
+	if err := os.Rename(extractedDir, releaseDir); err != nil {
+		return Result{}, err
+	}
+
 	meta := metadata{
-		ArtifactURL: cfg.ArtifactURL,
-		SHA256:      strings.ToLower(cfg.SHA256),
+		ArtifactURL: selected.ArtifactURL,
+		SHA256:      strings.ToLower(selected.SHA256),
 		Version:     version,
 		InstalledAt: time.Now().UTC(),
 	}
@@ -150,7 +164,7 @@ func RemoveInstalled(installDir string) error {
 	return nil
 }
 
-func tryReuseInstalled(releaseDir string, cfg config.InstallConfig, log *logp.Logger) (Result, bool) {
+func tryReuseInstalled(releaseDir string, cfg config.InstallArtifactConfig, log *logp.Logger) (Result, bool) {
 	metaPath := filepath.Join(releaseDir, releaseMetadataFile)
 	meta, err := readMetadata(metaPath)
 	if err != nil {
@@ -167,6 +181,9 @@ func tryReuseInstalled(releaseDir string, cfg config.InstallConfig, log *logp.Lo
 	}
 	version, err := install.VerifyOsqueryBinary(runtime.GOOS, binDir, log)
 	if err != nil {
+		return Result{}, false
+	}
+	if err := verifyExtensionFile(runtime.GOOS, binDir); err != nil {
 		return Result{}, false
 	}
 	return Result{BinDir: binDir, Version: version}, true
@@ -196,20 +213,61 @@ func writeMetadata(fp string, m metadata) error {
 	return os.Rename(tmp, fp)
 }
 
-func buildHTTPClient(cfg config.InstallConfig, log *logp.Logger) (*http.Client, error) {
-	client := &http.Client{}
-	if cfg.SSL == nil {
+func buildHTTPClient(cfg config.InstallConfig, goos string, log *logp.Logger) (*http.Client, error) {
+	client := &http.Client{
+		Timeout: httpClientTimeout,
+	}
+	sslConfig := cfg.SSLForPlatform(goos)
+	if sslConfig == nil {
 		return client, nil
 	}
 
 	transport := http.DefaultTransport.(*http.Transport).Clone()
-	sslCfg, err := tlscommon.LoadTLSConfig(cfg.SSL, log)
+	sslCfg, err := tlscommon.LoadTLSConfig(sslConfig, log)
 	if err != nil {
-		return nil, fmt.Errorf("failed loading osquery.elastic_options.install.ssl config: %w", err)
+		return nil, fmt.Errorf("failed loading osquery.elastic_options.install.%s.ssl config: %w", goos, err)
 	}
 	transport.TLSClientConfig = sslCfg.ToConfig()
 	client.Transport = transport
 	return client, nil
+}
+
+func verifyExtensionFile(goos, binDir string) error {
+	extFileName := "osquery-extension.ext"
+	if goos == "windows" {
+		extFileName = "osquery-extension.exe"
+	}
+	extFilePath := filepath.Join(binDir, extFileName)
+	if _, err := os.Stat(extFilePath); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("%w: %v", os.ErrNotExist, extFileName)
+		}
+		return err
+	}
+	return nil
+}
+
+func acquireInstallLock(ctx context.Context, installDir string) (func(), error) {
+	lockPath := filepath.Join(installDir, installLockFileName)
+	lock := flock.New(lockPath)
+
+	for {
+		locked, err := lock.TryLock()
+		if err != nil {
+			return nil, fmt.Errorf("failed acquiring custom artifact install lock %s: %w", lockPath, err)
+		}
+		if locked {
+			return func() {
+				_ = lock.Unlock()
+			}, nil
+		}
+
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("context cancelled while waiting for custom artifact install lock %s: %w", lockPath, ctx.Err())
+		case <-time.After(installLockRetry):
+		}
+	}
 }
 
 func cleanupOldReleases(installDir, currentReleaseDir string) error {

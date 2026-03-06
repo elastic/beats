@@ -68,7 +68,7 @@ func Verify(goos, dir string, log *logp.Logger) error {
 var osqueryVersionPattern = regexp.MustCompile(`(?i)osqueryd version ([0-9A-Za-z.\-+_]+)`)
 
 func VerifyOsqueryBinary(goos, dir string, log *logp.Logger) (string, error) {
-	osqFile := osqd.QsquerydPathForPlatform(goos, dir)
+	osqFile := osqd.OsquerydPathForPlatform(goos, dir)
 	osqExists, err := fileExistsLogged(log, osqFile)
 	if err != nil {
 		return "", err

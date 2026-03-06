@@ -12,11 +12,13 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/hash"
 )
 
 const maxArtifactSize = 1 << 30
+const defaultHTTPClientTimeout = 30 * time.Minute
 
 type countingWriter struct {
 	w io.Writer
@@ -33,7 +35,9 @@ func (cw *countingWriter) Write(p []byte) (int, error) {
 // writes the content into a given filepath
 // returns the sha256 hash
 func Download(ctx context.Context, url, fp string) (hashout string, err error) {
-	cli := http.Client{}
+	cli := http.Client{
+		Timeout: defaultHTTPClientTimeout,
+	}
 	return DownloadWithClient(ctx, &cli, url, fp)
 }
 
@@ -42,7 +46,9 @@ func Download(ctx context.Context, url, fp string) (hashout string, err error) {
 func DownloadWithClient(ctx context.Context, cli *http.Client, url, fp string) (hashout string, err error) {
 	log.Printf("Download %s to %s", url, fp)
 	if cli == nil {
-		cli = &http.Client{}
+		cli = &http.Client{
+			Timeout: defaultHTTPClientTimeout,
+		}
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)

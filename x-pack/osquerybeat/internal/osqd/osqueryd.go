@@ -560,11 +560,11 @@ func (q *OSQueryD) isVerbose() bool {
 }
 
 func osquerydPath(dir string) string {
-	return QsquerydPathForPlatform(runtime.GOOS, dir)
+	return OsquerydPathForPlatform(runtime.GOOS, dir)
 }
 
-// QsquerydPathForPlatform returns the full path to osqueryd binary for platform
-func QsquerydPathForPlatform(platform, dir string) string {
+// OsquerydPathForPlatform returns the full path to osqueryd binary for platform
+func OsquerydPathForPlatform(platform, dir string) string {
 	if platform == "darwin" {
 		return filepath.Join(dir, osqueryDarwinAppBundlePath, osquerydFilename(platform))
 
