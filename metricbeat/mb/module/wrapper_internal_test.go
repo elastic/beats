@@ -26,7 +26,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -34,8 +34,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
-const mockModuleName = "MockModule"
-const mockMetricSetName = "MockMetricSet"
+const (
+	mockModuleName    = "MockModule"
+	mockMetricSetName = "MockMetricSet"
+)
 
 // mockReportingFetcher
 type mockReportingFetcher struct {
@@ -70,7 +72,8 @@ func (mr *mockReporter) StartFetchTimer() {
 
 func (mr *mockReporter) V2() mb.PushReporterV2 {
 	args := mr.Called()
-	return args.Get(0).(mb.PushReporterV2)
+	v, _ := args.Get(0).(mb.PushReporterV2)
+	return v
 }
 
 // mockPushReporterV2
@@ -90,7 +93,8 @@ func (mpr *mockPushReporterV2) Error(err error) bool {
 
 func (mpr *mockPushReporterV2) Done() <-chan struct{} {
 	args := mpr.Called()
-	return args.Get(0).(<-chan struct{})
+	v, _ := args.Get(0).(<-chan struct{})
+	return v
 }
 
 // mockStatusReporterV2
@@ -103,7 +107,6 @@ func (m *mockStatusReporter) UpdateStatus(status status.Status, msg string) {
 }
 
 func TestWrapperHandleFetchErrorSync(t *testing.T) {
-
 	fetchError := errors.New("fetch has gone all wrong")
 
 	t.Run("ReportingMetricSetV2Error", func(t *testing.T) {
@@ -279,7 +282,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 				// Setup mock StatusReporter
 				msr := new(mockStatusReporter)
 
-				//Setup mock reporter (ensure proper handling of intermediate calls, no functional value here)
+				// Setup mock reporter (ensure proper handling of intermediate calls, no functional value here)
 				mr := new(mockReporter)
 				mr.On("StartFetchTimer").Return()
 				mr.On("V2").Return(mpr)
@@ -302,7 +305,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 				})
 				require.NoError(t, err)
 
-				monitoring := beat.NewMonitoring()
+				monitoring := beatmonitoring.NewMonitoring()
 
 				aModule, metricSets, err := mb.NewModule(tc.config, r, logptest.NewTestingLogger(t, ""))
 				require.NoError(t, err)
@@ -509,7 +512,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 				// Setup mock StatusReporter
 				msr := new(mockStatusReporter)
 
-				//Setup mock reporter (ensure proper handling of intermediate calls, no functional value here)
+				// Setup mock reporter (ensure proper handling of intermediate calls, no functional value here)
 				mr := new(mockReporter)
 				mr.On("StartFetchTimer").Return()
 				mr.On("V2").Return(mpr)
@@ -532,7 +535,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 				})
 				require.NoError(t, err)
 
-				monitoring := beat.NewMonitoring()
+				monitoring := beatmonitoring.NewMonitoring()
 
 				aModule, metricSets, err := mb.NewModule(tc.config, r, logptest.NewTestingLogger(t, ""))
 				require.NoError(t, err)
