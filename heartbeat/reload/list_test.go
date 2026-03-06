@@ -453,7 +453,6 @@ func TestUpdateConfigs(t *testing.T) {
 		createConfig(1),
 	})
 
-	// nothing changed
 	require.NoError(t, err)
 	assert.Equal(t, state, list.copyRunnerList())
 
@@ -461,5 +460,47 @@ func TestUpdateConfigs(t *testing.T) {
 		hbrunner, ok := runner.(*updatableRunner)
 		require.True(t, ok)
 		assert.True(t, hbrunner.updated)
+	}
+}
+
+func TestUpdateConfigsError(t *testing.T) {
+	factory := &hbrunnerFactory{CreateRunner: func(pc beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
+		config := struct {
+			ID int64 `config:"id"`
+		}{}
+		err := c.Unpack(&config)
+		if err != nil {
+			return nil, err
+		}
+
+		return &updatableRunner{
+			OnUpdate: func(c *conf.C) error { return fmt.Errorf("test update config error") },
+		}, nil
+	}}
+	logger := logptest.NewTestingLogger(t, "")
+
+	list := NewHBRunnerList("", factory, nil, logger)
+
+	err := list.Reload([]*rl.ConfigWithMeta{
+		createConfig(1),
+	})
+	require.NoError(t, err)
+
+	state := list.copyRunnerList()
+	assert.Len(t, state, 1)
+
+	err = list.Reload([]*rl.ConfigWithMeta{
+		createConfig(1),
+	})
+
+	// nothing changed
+	require.NoError(t, err)
+	assert.Len(t, list.copyRunnerList(), 1)
+	assert.NotEqual(t, state, list.copyRunnerList())
+
+	for _, runner := range list.copyRunnerList() {
+		hbrunner, ok := runner.(*updatableRunner)
+		require.True(t, ok)
+		assert.False(t, hbrunner.updated)
 	}
 }
