@@ -1,4 +1,4 @@
-FROM golang:1.25.4-bookworm
+FROM golang:1.25.8-bookworm
 
 RUN \
     apt-get update \
