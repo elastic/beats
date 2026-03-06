@@ -264,11 +264,13 @@ func TestStopAll(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Len(t, list.copyRunnerList(), 3)
+
+	runners := list.Runners()
 	list.Stop()
 	assert.Empty(t, list.copyRunnerList())
 
-	for _, r := range list.runners {
-		assert.False(t, r.(*runner).stopped) //nolint:errcheck //false positive
+	for _, r := range runners {
+		assert.True(t, r.(*runner).stopped)
 	}
 }
 
