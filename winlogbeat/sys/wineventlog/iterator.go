@@ -25,6 +25,8 @@ import (
 	"sync"
 
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -42,6 +44,7 @@ type EventIterator struct {
 	lastErr             error                        // Last error returned by EvtNext.
 	active              []EvtHandle                  // Slice of the handles array containing the valid unread handles.
 	mutex               sync.Mutex                   // Mutex to enable parallel iteration.
+	log                 *logp.Logger
 
 	// For testing purposes to be able to mock EvtNext.
 	evtNext func(resultSet EvtHandle, eventArraySize uint32, eventArray *EvtHandle, timeout uint32, flags uint32, numReturned *uint32) (err error)
@@ -76,10 +79,11 @@ func WithSubscription(subscription EvtHandle) EventIteratorOption {
 func WithBatchSize(size int) EventIteratorOption {
 	return func(itr *EventIterator) {
 		if size > 0 {
+			if size > int(evtNextMaxHandles) {
+				itr.batchSize = evtNextMaxHandles
+				return
+			}
 			itr.batchSize = uint32(size)
-		}
-		if size > evtNextMaxHandles {
-			itr.batchSize = evtNextMaxHandles
 		}
 	}
 }
@@ -90,6 +94,7 @@ func NewEventIterator(opts ...EventIteratorOption) (*EventIterator, error) {
 	itr := &EventIterator{
 		batchSize: evtNextDefaultHandles,
 		evtNext:   _EvtNext,
+		log:       logp.NewLogger("wineventlog.iterator"),
 	}
 
 	for _, opt := range opts {
@@ -147,30 +152,47 @@ func (itr *EventIterator) moreHandles() bool {
 	for batchSize > 0 {
 		var numReturned uint32
 
-		err := itr.evtNext(itr.subscription, batchSize, &itr.handles[0], 0, 0, &numReturned)
-		switch err { //nolint:errorlint // Bad linter! This is always errno or nil.
-		case nil:
+		nextErr := itr.evtNext(itr.subscription, batchSize, &itr.handles[0], 0, 0, &numReturned)
+		switch {
+		case nextErr == nil:
 			itr.lastErr = nil
 			itr.active = itr.handles[:numReturned]
-		case windows.ERROR_NO_MORE_ITEMS, windows.ERROR_INVALID_OPERATION:
-		case windows.RPC_S_INVALID_BOUND:
+		case errors.Is(nextErr, windows.ERROR_NO_MORE_ITEMS):
+		case errors.Is(nextErr, windows.ERROR_INVALID_OPERATION):
+			// ERROR_INVALID_OPERATION can be returned during polling with zero handles.
+			if numReturned == 0 {
+				break
+			}
+			fallthrough
+		case errors.Is(nextErr, windows.RPC_S_INVALID_BOUND):
 			// Attempt automated recovery if we have a factory.
 			if itr.subscriptionFactory != nil {
+				itr.log.Warnw("EvtNext failed, recreating subscription.",
+					"error", nextErr,
+					"batch_size", batchSize,
+					"num_returned", numReturned)
 				itr.subscription.Close()
+				var err error
 				itr.subscription, err = itr.subscriptionFactory()
 				if err != nil {
-					itr.lastErr = fmt.Errorf("failed in EvtNext while trying to recover from RPC_S_INVALID_BOUND error: %w", err)
+					itr.lastErr = fmt.Errorf("failed in EvtNext while trying to recover: %w", err)
 					return false
 				}
 
-				// Reduce batch size and try again.
-				batchSize = batchSize / 2
+				// Reduce batch size only for RPC_S_INVALID_BOUND and try again.
+				if errors.Is(nextErr, windows.RPC_S_INVALID_BOUND) {
+					if batchSize <= 1 {
+						itr.lastErr = fmt.Errorf("failed in EvtNext after exhausting batch-size recovery: %w", nextErr)
+						return false
+					}
+					batchSize = batchSize / 2
+				}
 				continue
 			} else {
-				itr.lastErr = fmt.Errorf("failed in EvtNext (try reducing the batch size or providing a subscription factory for automatic recovery): %w", err)
+				itr.lastErr = fmt.Errorf("failed in EvtNext (try reducing the batch size or providing a subscription factory for automatic recovery): %w", nextErr)
 			}
 		default:
-			itr.lastErr = err
+			itr.lastErr = nextErr
 		}
 
 		break
