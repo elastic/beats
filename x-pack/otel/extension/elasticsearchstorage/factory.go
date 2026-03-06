@@ -2,13 +2,13 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package elasticstorage
+package elasticsearchstorage
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/otel/extension/elasticstorage/internal/metadata"
+	"github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage/internal/metadata"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/extension"

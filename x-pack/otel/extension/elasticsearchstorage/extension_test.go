@@ -4,7 +4,7 @@
 
 //go:build integration
 
-package elasticstorage
+package elasticsearchstorage
 
 import (
 	"context"
