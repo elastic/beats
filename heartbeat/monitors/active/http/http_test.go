@@ -32,6 +32,7 @@ import (
 	"os"
 	"path"
 	"reflect"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -620,7 +621,7 @@ func TestConnRefusedJob(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryStateChecks(0, 1),
-			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, fmt.Sprintf("%s:%d", ip, port)),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, net.JoinHostPort(ip, strconv.Itoa(int(port)))),
 			urlChecks(url),
 		)),
 		event.Fields,
@@ -642,7 +643,7 @@ func TestUnreachableJob(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryStateChecks(0, 1),
-			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, fmt.Sprintf("%s:%d", ip, port)),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, net.JoinHostPort(ip, strconv.Itoa(int(port)))),
 			urlChecks(url),
 		)),
 		event.Fields,
