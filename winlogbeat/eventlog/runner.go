@@ -135,9 +135,9 @@ runLoop:
 		for cancelCtx.Err() == nil {
 			reporter.UpdateStatus(status.Running, fmt.Sprintf("Reading from %s", api.Channel()))
 			records, readErr := api.Read()
-<<<<<<< HEAD
-=======
 
+			// Publish any records in this batch before handling readErr (e.g. EOF).
+			// This preserves final-batch publish semantics when stream ends cleanly.
 			if len(records) > 0 {
 				if err := publisher.Publish(records); err != nil {
 					reporter.UpdateStatus(status.Failed, fmt.Sprintf("Publisher error: %v", err))
@@ -145,7 +145,6 @@ runLoop:
 				}
 			}
 
->>>>>>> ecff92b36 ([winlog] move filtering to Go, harden recovery, and remove query builder (#49257))
 			if readErr != nil {
 				// io.EOF signals a clean end of stream (e.g. no_more_events: stop).
 				if errors.Is(readErr, io.EOF) {
@@ -153,12 +152,6 @@ runLoop:
 					break runLoop
 				}
 
-				if errors.Is(readErr, io.EOF) {
-					log.Debugw("end of Winlog event stream reached", "error", readErr)
-					break runLoop
-				}
-
-				//nolint:nilerr // only log error if we are not shutting down
 				if cancelCtx.Err() != nil {
 					break runLoop
 				}
