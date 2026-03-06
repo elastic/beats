@@ -69,34 +69,34 @@ func TestGlobManager(t *testing.T) {
 	assert.False(t, manager.Enabled("config2-alt"))
 	assert.False(t, manager.Enabled("config3"))
 
-	assert.Equal(t, len(manager.ListEnabled()), 2)
-	assert.Equal(t, len(manager.ListDisabled()), 2)
+	assert.Len(t, manager.ListEnabled(), 2)
+	assert.Len(t, manager.ListDisabled(), 2)
 
 	// Test disable
 	if err = manager.Disable("config2"); err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, len(manager.ListEnabled()), 1)
-	assert.Equal(t, len(manager.ListDisabled()), 3)
+	assert.Len(t, manager.ListEnabled(), 1)
+	assert.Len(t, manager.ListDisabled(), 3)
 
 	enabled := manager.ListEnabled()
-	assert.Equal(t, enabled[0].Name, "config1")
-	assert.Equal(t, enabled[0].Enabled, true)
+	assert.Equal(t, "config1", enabled[0].Name)
+	assert.True(t, enabled[0].Enabled)
 
 	// Test enable
 	if err = manager.Enable("config3"); err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, len(manager.ListEnabled()), 2)
-	assert.Equal(t, len(manager.ListDisabled()), 2)
+	assert.Len(t, manager.ListEnabled(), 2)
+	assert.Len(t, manager.ListDisabled(), 2)
 
 	disabled := manager.ListDisabled()
-	assert.Equal(t, disabled[0].Name, "config2")
-	assert.Equal(t, disabled[0].Enabled, false)
-	assert.Equal(t, disabled[1].Name, "config2-alt")
-	assert.Equal(t, disabled[1].Enabled, false)
+	assert.Equal(t, "config2", disabled[0].Name)
+	assert.False(t, disabled[0].Enabled)
+	assert.Equal(t, "config2-alt", disabled[1].Name)
+	assert.False(t, disabled[1].Enabled)
 
 	// Check correct files layout:
 	files, err := filepath.Glob(dir + "/*")
@@ -104,12 +104,12 @@ func TestGlobManager(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, files, []string{
+	assert.Equal(t, []string{
 		filepath.Join(dir, "config1.yml"),
 		filepath.Join(dir, "config2-alt.yml.disabled"),
 		filepath.Join(dir, "config2.yml.disabled"),
 		filepath.Join(dir, "config3.yml"),
-	})
+	}, files)
 }
 
 func TestCfgFileSorting(t *testing.T) {
