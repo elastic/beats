@@ -16,6 +16,30 @@ import (
 
 const IPSecTunnelsQuery = "<show><vpn><tunnel></tunnel></vpn></show>"
 
+func tunnelFlowQuery(tunnelID int) string {
+	return fmt.Sprintf("<show><running><tunnel><flow><tunnel-id>%d</tunnel-id></flow></tunnel></running></show>", tunnelID)
+}
+
+func getTunnelState(m *MetricSet, tunnelID int) (string, error) {
+	query := tunnelFlowQuery(tunnelID)
+	output, err := m.client.Op(query, panw.Vsys, nil, nil)
+	if err != nil {
+		return "", fmt.Errorf("error querying tunnel flow for tunnel %d: %w", tunnelID, err)
+	}
+
+	var response TunnelFlowResponse
+	err = xml.Unmarshal(output, &response)
+	if err != nil {
+		return "", fmt.Errorf("error unmarshaling tunnel flow response for tunnel %d: %w", tunnelID, err)
+	}
+
+	if len(response.Result.IPSec.Entries) > 0 {
+		return response.Result.IPSec.Entries[0].State, nil
+	}
+
+	return "", nil
+}
+
 func getIPSecTunnelEvents(m *MetricSet) ([]mb.Event, error) {
 
 	var response TunnelsResponse
@@ -30,6 +54,16 @@ func getIPSecTunnelEvents(m *MetricSet) ([]mb.Event, error) {
 	if err != nil {
 		m.logger.Error("Error: %s", err)
 		return nil, fmt.Errorf("error unmarshaling IPSec tunnels response: %w", err)
+	}
+
+	// Fetch state for each tunnel via individual flow queries
+	for i, entry := range response.Result.Entries {
+		state, err := getTunnelState(m, entry.ID)
+		if err != nil {
+			m.logger.Warnf("Failed to get state for tunnel %d: %s", entry.ID, err)
+			continue
+		}
+		response.Result.Entries[i].State = state
 	}
 
 	events := formatIPSecTunnelEvents(m, response.Result.Entries)

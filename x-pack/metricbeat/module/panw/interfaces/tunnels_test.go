@@ -6,6 +6,7 @@ package interfaces
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,13 +17,29 @@ import (
 )
 
 type mockPanwClient struct {
-	response []byte
-	err      error
+	opFunc func(req string) ([]byte, error)
 }
 
 func (m *mockPanwClient) Op(req any, vsys string, extras, ans any) ([]byte, error) {
-	return m.response, m.err
+	return m.opFunc(req.(string))
 }
+
+func flowResponseXML(state string) string {
+	return fmt.Sprintf(`<response status="success"><result>
+  <dp>dp0</dp>
+  <IPSec>
+    <entry>
+      <state>%s</state>
+    </entry>
+  </IPSec>
+</result></response>`, state)
+}
+
+const emptyFlowResponseXML = `<response status="success"><result>
+  <dp>dp0</dp>
+  <IPSec>
+  </IPSec>
+</result></response>`
 
 const tunnelXMLNoState = `<response status="success"><result>
   <ntun>1</ntun>
@@ -72,7 +89,6 @@ const tunnelXMLWithState = `<response status="success"><result>
       <id>8</id>
       <TSi_proto>0</TSi_proto>
       <name>tl_NY01502_009953200587246_CA03028945</name>
-      <state>active</state>
     </entry>
   </entries>
 </result></response>`
@@ -99,7 +115,6 @@ const tunnelXMLMultipleEntries = `<response status="success"><result>
       <id>1</id>
       <TSi_proto>0</TSi_proto>
       <name>tl_LA03601_001122334455667_TX04037856</name>
-      <state>active</state>
     </entry>
     <entry>
       <gw>gw_SF02701_009988776655443_OR05048967</gw>
@@ -140,7 +155,6 @@ const tunnelXMLMultipleEntries = `<response status="success"><result>
       <id>3</id>
       <TSi_proto>6</TSi_proto>
       <name>tl_CH04801_005566778899001_MI06059078</name>
-      <state>init</state>
     </entry>
     <entry>
       <gw>gw_SE05901_003344556677889_WA07060189</gw>
@@ -161,7 +175,6 @@ const tunnelXMLMultipleEntries = `<response status="success"><result>
       <id>4</id>
       <TSi_proto>17</TSi_proto>
       <name>tl_SE05901_003344556677889_WA07060189</name>
-      <state>down</state>
     </entry>
   </entries>
 </result></response>`
@@ -194,7 +207,6 @@ const tunnelXMLWithExtraFields = `<response status="success"><result>
       <id>7</id>
       <TSi_proto>0</TSi_proto>
       <name>tl_BOS03701_002233445566778_PHX08071290</name>
-      <state>active</state>
       <peerip>203.0.113.45</peerip>
       <localip>198.51.100.12</localip>
       <outer-if>ae2.200</outer-if>
@@ -222,7 +234,6 @@ const tunnelXMLWithExtraFields = `<response status="success"><result>
       <id>9</id>
       <TSi_proto>0</TSi_proto>
       <name>tl_ATL04801_003344556677889_DEN09082301</name>
-      <state>init</state>
       <peerip>192.0.2.78</peerip>
       <localip>198.51.100.99</localip>
       <outer-if>ae3.300</outer-if>
@@ -256,7 +267,6 @@ const tunnelXMLWithMonitor = `<response status="success"><result>
       <id>12</id>
       <TSi_proto>0</TSi_proto>
       <name>tl_SEA05901_004455667788990_PDX10093412</name>
-      <state>active</state>
       <pkt-decap>198892459</pkt-decap>
       <remote-spi>A1B2C3D4</remote-spi>
       <enable-gre-encap>False</enable-gre-encap>
@@ -349,7 +359,13 @@ func newTestMetricSet(client panw.PanwClient) *MetricSet {
 
 func TestGetIPSecTunnelEvents_WithState(t *testing.T) {
 	client := &mockPanwClient{
-		response: []byte(tunnelXMLWithState),
+		opFunc: func(req string) ([]byte, error) {
+			if req == IPSecTunnelsQuery {
+				return []byte(tunnelXMLWithState), nil
+			}
+			// Flow query for tunnel 8
+			return []byte(flowResponseXML("active")), nil
+		},
 	}
 	m := newTestMetricSet(client)
 
@@ -370,7 +386,13 @@ func TestGetIPSecTunnelEvents_WithState(t *testing.T) {
 
 func TestGetIPSecTunnelEvents_NoState(t *testing.T) {
 	client := &mockPanwClient{
-		response: []byte(tunnelXMLNoState),
+		opFunc: func(req string) ([]byte, error) {
+			if req == IPSecTunnelsQuery {
+				return []byte(tunnelXMLNoState), nil
+			}
+			// Flow query returns no IPSec entries for this tunnel
+			return []byte(emptyFlowResponseXML), nil
+		},
 	}
 	m := newTestMetricSet(client)
 
@@ -381,12 +403,29 @@ func TestGetIPSecTunnelEvents_NoState(t *testing.T) {
 	event := events[0]
 	assert.Equal(t, 5, event.MetricSetFields["ipsec_tunnel.id"])
 	assert.Equal(t, "tl_DC02401_008842100459123_WS02019834", event.MetricSetFields["ipsec_tunnel.name"])
-	assert.Equal(t, "", event.MetricSetFields["ipsec_tunnel.state"], "State should be empty when not in XML")
+	assert.Equal(t, "", event.MetricSetFields["ipsec_tunnel.state"], "State should be empty when flow query returns no entries")
 }
 
 func TestGetIPSecTunnelEvents_MultipleEntries(t *testing.T) {
+	stateByTunnelID := map[int]string{
+		1: "active",
+		// tunnel 2: no state (empty flow response)
+		3: "init",
+		4: "down",
+	}
 	client := &mockPanwClient{
-		response: []byte(tunnelXMLMultipleEntries),
+		opFunc: func(req string) ([]byte, error) {
+			if req == IPSecTunnelsQuery {
+				return []byte(tunnelXMLMultipleEntries), nil
+			}
+			// Match flow queries by tunnel ID
+			for id, state := range stateByTunnelID {
+				if req == tunnelFlowQuery(id) {
+					return []byte(flowResponseXML(state)), nil
+				}
+			}
+			return []byte(emptyFlowResponseXML), nil
+		},
 	}
 	m := newTestMetricSet(client)
 
@@ -398,7 +437,7 @@ func TestGetIPSecTunnelEvents_MultipleEntries(t *testing.T) {
 	assert.Equal(t, 1, events[0].MetricSetFields["ipsec_tunnel.id"])
 	assert.Equal(t, "active", events[0].MetricSetFields["ipsec_tunnel.state"])
 
-	// Entry 2: no state field
+	// Entry 2: no state (empty flow response)
 	assert.Equal(t, 2, events[1].MetricSetFields["ipsec_tunnel.id"])
 	assert.Equal(t, "", events[1].MetricSetFields["ipsec_tunnel.state"])
 
@@ -413,7 +452,9 @@ func TestGetIPSecTunnelEvents_MultipleEntries(t *testing.T) {
 
 func TestGetIPSecTunnelEvents_EmptyEntries(t *testing.T) {
 	client := &mockPanwClient{
-		response: []byte(tunnelXMLEmptyEntries),
+		opFunc: func(req string) ([]byte, error) {
+			return []byte(tunnelXMLEmptyEntries), nil
+		},
 	}
 	m := newTestMetricSet(client)
 
@@ -424,7 +465,9 @@ func TestGetIPSecTunnelEvents_EmptyEntries(t *testing.T) {
 
 func TestGetIPSecTunnelEvents_ClientError(t *testing.T) {
 	client := &mockPanwClient{
-		err: errors.New("connection refused"),
+		opFunc: func(req string) ([]byte, error) {
+			return nil, errors.New("connection refused")
+		},
 	}
 	m := newTestMetricSet(client)
 
@@ -436,7 +479,9 @@ func TestGetIPSecTunnelEvents_ClientError(t *testing.T) {
 
 func TestGetIPSecTunnelEvents_InvalidXML(t *testing.T) {
 	client := &mockPanwClient{
-		response: []byte("<invalid><xml>"),
+		opFunc: func(req string) ([]byte, error) {
+			return []byte("<invalid><xml>"), nil
+		},
 	}
 	m := newTestMetricSet(client)
 
@@ -448,7 +493,18 @@ func TestGetIPSecTunnelEvents_InvalidXML(t *testing.T) {
 
 func TestGetIPSecTunnelEvents_WithExtraFields(t *testing.T) {
 	client := &mockPanwClient{
-		response: []byte(tunnelXMLWithExtraFields),
+		opFunc: func(req string) ([]byte, error) {
+			if req == IPSecTunnelsQuery {
+				return []byte(tunnelXMLWithExtraFields), nil
+			}
+			if req == tunnelFlowQuery(7) {
+				return []byte(flowResponseXML("active")), nil
+			}
+			if req == tunnelFlowQuery(9) {
+				return []byte(flowResponseXML("init")), nil
+			}
+			return []byte(emptyFlowResponseXML), nil
+		},
 	}
 	m := newTestMetricSet(client)
 
@@ -473,7 +529,13 @@ func TestGetIPSecTunnelEvents_WithExtraFields(t *testing.T) {
 
 func TestGetIPSecTunnelEvents_WithMonitor(t *testing.T) {
 	client := &mockPanwClient{
-		response: []byte(tunnelXMLWithMonitor),
+		opFunc: func(req string) ([]byte, error) {
+			if req == IPSecTunnelsQuery {
+				return []byte(tunnelXMLWithMonitor), nil
+			}
+			// Flow query for tunnel 12
+			return []byte(flowResponseXML("active")), nil
+		},
 	}
 	m := newTestMetricSet(client)
 
@@ -491,4 +553,26 @@ func TestGetIPSecTunnelEvents_WithMonitor(t *testing.T) {
 	assert.Equal(t, "SHA256", event.MetricSetFields["ipsec_tunnel.hash"])
 	assert.Equal(t, 7200, event.MetricSetFields["ipsec_tunnel.life.sec"])
 	assert.Equal(t, 512, event.MetricSetFields["ipsec_tunnel.kb"])
+}
+
+func TestGetIPSecTunnelEvents_FlowQueryError(t *testing.T) {
+	client := &mockPanwClient{
+		opFunc: func(req string) ([]byte, error) {
+			if req == IPSecTunnelsQuery {
+				return []byte(tunnelXMLWithState), nil
+			}
+			// Flow query fails
+			return nil, errors.New("timeout")
+		},
+	}
+	m := newTestMetricSet(client)
+
+	events, err := getIPSecTunnelEvents(m)
+	require.NoError(t, err)
+	require.Len(t, events, 1)
+
+	// State should be empty since flow query failed
+	event := events[0]
+	assert.Equal(t, 8, event.MetricSetFields["ipsec_tunnel.id"])
+	assert.Equal(t, "", event.MetricSetFields["ipsec_tunnel.state"])
 }
