@@ -6,6 +6,7 @@ package telemetry
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	logreport "github.com/elastic/beats/v7/libbeat/monitoring/report/log"
@@ -91,6 +92,12 @@ func NewRegistryBridge(settings component.TelemetrySettings, statsRegistry, inpu
 				return nil, err
 			}
 		}
+		logger.Info("registry bridge discovered initial stats metrics",
+			zap.Int("int_keys", len(snap.Ints)),
+			zap.Int("float_keys", len(snap.Floats)),
+		)
+	} else {
+		logger.Info("registry bridge: stats registry is nil")
 	}
 
 	// Discover initial per-input metrics.
@@ -117,6 +124,18 @@ func NewRegistryBridge(settings component.TelemetrySettings, statsRegistry, inpu
 			}
 		}
 	}
+
+	instruments := b.allInstruments()
+	logger.Info("registry bridge registering callback",
+		zap.Int("total_instruments", len(instruments)),
+		zap.Int("int_gauges", len(b.intGauges)),
+		zap.Int("int_counters", len(b.intCounters)),
+		zap.Int("float_gauges", len(b.floatGauges)),
+		zap.Int("input_int_gauges", len(b.inputIntGauges)),
+		zap.Int("input_int_counters", len(b.inputIntCounters)),
+		zap.Int("input_float_gauges", len(b.inputFloatGauges)),
+		zap.String("meter_provider_type", fmt.Sprintf("%T", mp)),
+	)
 
 	if err := b.registerCallback(); err != nil {
 		return nil, err
@@ -218,17 +237,17 @@ func (b *RegistryBridge) ensureInputFloat(field string) error {
 }
 
 // registerCallback registers a single OTel async callback that covers all
-// currently known instruments.
+// currently known instruments. At least one instrument must exist for the
+// OTel SDK to actually invoke the callback — RegisterCallback with zero
+// instruments returns a noop registration.
 func (b *RegistryBridge) registerCallback() error {
 	instruments := b.allInstruments()
 
-	var reg metric.Registration
-	var err error
 	if len(instruments) == 0 {
-		reg, err = b.meter.RegisterCallback(b.callback)
-	} else {
-		reg, err = b.meter.RegisterCallback(b.callback, instruments...)
+		b.logger.Warn("registry bridge has zero instruments; OTel callback will not fire until metrics are discovered")
 	}
+
+	reg, err := b.meter.RegisterCallback(b.callback, instruments...)
 	if err != nil {
 		return err
 	}
@@ -337,18 +356,13 @@ func (b *RegistryBridge) createAndReRegister(statsInts, statsFloats, inputInts, 
 	b.mu.Unlock()
 
 	instruments := b.allInstruments()
-	var reg metric.Registration
-	var err error
-	if len(instruments) == 0 {
-		reg, err = b.meter.RegisterCallback(b.callback)
-	} else {
-		reg, err = b.meter.RegisterCallback(b.callback, instruments...)
-	}
+	reg, err := b.meter.RegisterCallback(b.callback, instruments...)
 	// Should not happen in practice — see comment above.
 	if err != nil {
 		b.logger.Error("failed to re-register OTel callback", zap.Error(err))
 		return
 	}
+	b.logger.Info("registry bridge re-registered callback", zap.Int("instruments", len(instruments)))
 	b.mu.Lock()
 	b.registration = reg
 	b.mu.Unlock()
