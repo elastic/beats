@@ -32,7 +32,7 @@ var (
 	// understood as referencing the most recent version starting with "1".
 	// truncatedKafkaVersions stores a lookup of the abbreviations we accept.
 
-	//Ref for version mapping - https://kafka.apache.org/downloads
+	// Ref for version mapping - https://kafka.apache.org/downloads
 	truncatedKafkaVersions = map[string]sarama.KafkaVersion{
 		"0.8.2": sarama.V0_8_2_2,
 		"0.8":   sarama.V0_8_2_2,
@@ -69,6 +69,12 @@ var (
 		"3.4": sarama.V3_4_0_0,
 		"3.5": sarama.V3_5_1_0,
 		"3.6": sarama.V3_6_0_0,
+		"3.7": sarama.V3_7_0_0,
+		"3.8": sarama.V3_8_0_0,
+		"3.9": sarama.V3_9_0_0,
+
+		"4.0": sarama.V4_0_0_0,
+		"4.1": sarama.V4_1_0_0,
 	}
 )
 
