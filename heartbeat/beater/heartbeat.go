@@ -285,7 +285,6 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		return nil
 	})
 
-	// inputs := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher, b.Info.Logger)
 	inputs := hbrunner.NewHBRunnerList(management.DebugK, bt.monitorFactory, b.Publisher, b.Info.Logger)
 	b.Registry.MustRegisterInput(inputs)
 }
