@@ -54,11 +54,7 @@ func ExampleWrapper() {
 		return
 	}
 	// Create a new Wrapper based on the configuration.
-<<<<<<< HEAD
-	m, err := module.NewWrapper(config, mb.Registry, logger, beat.NewMonitoring(), module.WithMetricSetInfo())
-=======
-	m, err := module.NewWrapper(config, mb.Registry, logger, beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
->>>>>>> 8ed67e48c (Fix beat receiver 30s metrics (#49236))
+	m, err := module.NewWrapper(config, mb.Registry, logger, beatmonitoring.NewMonitoring(), module.WithMetricSetInfo())
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
@@ -142,11 +138,7 @@ func ExampleRunner() {
 	}
 
 	// Create a new Wrapper based on the configuration.
-<<<<<<< HEAD
-	m, err := module.NewWrapper(config, mb.Registry, logp.NewNopLogger(), beat.NewMonitoring(), module.WithMetricSetInfo())
-=======
-	m, err := module.NewWrapper(config, mb.Registry, logp.NewNopLogger(), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
->>>>>>> 8ed67e48c (Fix beat receiver 30s metrics (#49236))
+	m, err := module.NewWrapper(config, mb.Registry, logp.NewNopLogger(), beatmonitoring.NewMonitoring(), module.WithMetricSetInfo())
 	if err != nil {
 		return
 	}

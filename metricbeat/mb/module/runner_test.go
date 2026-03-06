@@ -50,11 +50,7 @@ func TestRunner(t *testing.T) {
 	}
 
 	// Create a new Wrapper based on the configuration.
-<<<<<<< HEAD
-	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), module.WithMetricSetInfo())
-=======
-	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
->>>>>>> 8ed67e48c (Fix beat receiver 30s metrics (#49236))
+	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), module.WithMetricSetInfo())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,11 +78,7 @@ func TestCPUDiagnostics(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create a new Wrapper based on the configuration.
-<<<<<<< HEAD
-	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), module.WithMetricSetInfo())
-=======
-	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
->>>>>>> 8ed67e48c (Fix beat receiver 30s metrics (#49236))
+	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), module.WithMetricSetInfo())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -129,7 +121,6 @@ func TestCPUDiagnostics(t *testing.T) {
 	} else {
 		require.Empty(t, diags)
 	}
-
 }
 
 // newPubClientFactory returns a new ChanClient and a function that returns

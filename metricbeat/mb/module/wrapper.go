@@ -89,13 +89,8 @@ type stats struct {
 }
 
 // NewWrapper creates a new module and its associated metricsets based on the given configuration.
-<<<<<<< HEAD
-func NewWrapper(config *conf.C, r *mb.Register, logger *logp.Logger, monitoring beat.Monitoring, options ...Option) (*Wrapper, error) {
+func NewWrapper(config *conf.C, r *mb.Register, logger *logp.Logger, monitoring beatmonitoring.Monitoring, options ...Option) (*Wrapper, error) {
 	module, metricSets, err := mb.NewModule(config, r, logger)
-=======
-func NewWrapper(config *conf.C, r *mb.Register, logger *logp.Logger, monitoring beatmonitoring.Monitoring, p *paths.Path, options ...Option) (*Wrapper, error) {
-	module, metricSets, err := mb.NewModule(config, r, p, logger)
->>>>>>> 8ed67e48c (Fix beat receiver 30s metrics (#49236))
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +121,6 @@ func createWrapper(module mb.Module, metricSets []mb.MetricSet, monitoring beatm
 	}
 
 	err := module.UnpackConfig(&streamHealthSettings)
-
 	if err != nil {
 		return nil, fmt.Errorf("unpacking raw config: %w", err)
 	}
