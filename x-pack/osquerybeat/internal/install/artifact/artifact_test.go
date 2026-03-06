@@ -380,6 +380,9 @@ func buildTarGzArtifact(t *testing.T, version string, includeExtension bool) []b
 	tw := tar.NewWriter(gzw)
 
 	binPath := "osqueryd"
+	if runtime.GOOS == "darwin" {
+		binPath = filepath.Join("osquery.app", "Contents", "MacOS", "osqueryd")
+	}
 	script := "#!/bin/sh\necho \"osqueryd version " + version + "\"\n"
 	hdr := &tar.Header{
 		Name: binPath,

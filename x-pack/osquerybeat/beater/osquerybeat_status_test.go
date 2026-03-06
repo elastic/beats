@@ -94,7 +94,7 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 	b := &beat.Beat{
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
-		Monitoring: beat.NewMonitoring(),
+		Monitoring: beatmonitoring.NewMonitoring(),
 	}
 
 	cfg := agentconfig.NewConfig()

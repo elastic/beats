@@ -8,10 +8,25 @@ osquerybeat:
 #      osquery:
 #        elastic_options:
 #          install:
-#            # Optional custom osquery artifact URL. If unset, bundled osquery is used.
-#            artifact_url: "https://example.org/osquery-5.19.0.linux_x86_64.tar.gz"
-#            # Required when artifact_url is set.
-#            sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+#            # Optional per-platform custom osquery artifacts.
+#            # If the current platform is unset, bundled osquery is used.
+#            linux:
+#              artifact_url: "https://example.org/osquery-5.19.0.linux_x86_64.tar.gz"
+#              sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+#              # Optional platform override for allow_insecure_url.
+#              #allow_insecure_url: false
+#              # Optional platform override for SSL settings.
+#              #ssl.verification_mode: full
+#            darwin:
+#              artifact_url: "https://example.org/osquery-5.19.0.darwin.pkg"
+#              sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+#              #allow_insecure_url: false
+#              #ssl.verification_mode: full
+#            windows:
+#              artifact_url: "https://example.org/osquery-5.19.0.windows.msi"
+#              sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+#              #allow_insecure_url: false
+#              #ssl.verification_mode: full
 #            # Allow non-HTTPS artifact URLs (not recommended).
 #            #allow_insecure_url: false
 #            # Optional TLS settings for HTTPS artifact download.
