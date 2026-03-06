@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Adds a missing dependency for Synthetics on wolfi docker image
+summary: Fix a bug that could report an invalid number of active "otelconsumer" events
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
@@ -28,7 +28,7 @@ summary: Adds a missing dependency for Synthetics on wolfi docker image
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: heartbeat
+component: elastic-agent
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs

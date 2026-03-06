@@ -63,7 +63,7 @@ func TestInvalidConfiguration(t *testing.T) {
 			var config Config
 			c := c.MustNewConfigFrom(test.config)
 			err := c.Unpack(&config)
-			require.NotNil(t, err)
+			require.Error(t, err)
 			require.Contains(t, err.Error(), test.expectedError.Error())
 		})
 	}
@@ -100,7 +100,7 @@ func TestValidConfiguration(t *testing.T) {
 			var config Config
 			c := c.MustNewConfigFrom(test.config)
 			err := c.Unpack(&config)
-			require.Nil(t, err)
+			require.NoError(t, err)
 		})
 	}
 }

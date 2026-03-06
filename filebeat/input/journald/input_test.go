@@ -195,7 +195,7 @@ func TestCompareGoSystemdWithJournalctl(t *testing.T) {
 		events[i].Timestamp = goldEvent.Timestamp
 	}
 
-	require.EqualValues(t, goldenEvents, events, "events do not match reference")
+	require.Equal(t, goldenEvents, events, "events do not match reference")
 }
 
 func TestMatchers(t *testing.T) {

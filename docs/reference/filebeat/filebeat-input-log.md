@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-log.html
 applies_to:
   stack: deprecated 7.16.0, removed 9.0.0
-  serverless: ga
+  serverless: removed
 ---
 
 # Log input [filebeat-input-log]

@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
@@ -45,7 +46,7 @@ type otelConsumer struct {
 	isReceiverTest bool // whether we are running in receivertest context
 }
 
-func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
+func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C, beatPaths *paths.Path) (outputs.Group, error) {
 	ocConfig := defaultConfig()
 	if err := cfg.Unpack(&ocConfig); err != nil {
 		return outputs.Fail(err)
@@ -65,7 +66,7 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		})
 	}
 
-	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, clients...)
+	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, beatPaths, clients...)
 }
 
 // Close is a noop for otelconsumer
@@ -85,6 +86,9 @@ func (out *otelConsumer) Publish(ctx context.Context, batch publisher.Batch) err
 
 func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch) error {
 	st := out.observer
+	events := batch.Events()
+	st.NewBatch(len(events))
+
 	pLogs := plog.NewLogs()
 	resourceLogs := pLogs.ResourceLogs().AppendEmpty()
 	sourceLogs := resourceLogs.ScopeLogs().AppendEmpty()
@@ -97,7 +101,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	// destination, as long as the exporter allows it.
 	// For example, the elasticsearchexporter has an encoding specifically for this.
 	// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/35444.
-	events := batch.Events()
 	for _, event := range events {
 		logRecord := logRecords.AppendEmpty()
 
@@ -192,7 +195,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	}
 
 	batch.ACK()
-	st.NewBatch(len(events))
 	st.AckedEvents(len(events))
 	return nil
 }

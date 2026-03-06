@@ -275,7 +275,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
 	err = periodically(ctx, cfg.Interval, func() error {
-		log.Info("process periodic request")
+		log.Debug("process periodic request")
 		var (
 			budget    = *cfg.MaxExecutions
 			waitUntil time.Time
