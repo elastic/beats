@@ -147,6 +147,8 @@
         "tier_preference": "data_content",
         "creation_date": 1731657995821,
         "version": "8505000",
+        "mode": "time_series",
+        "codec": "default",
         "hidden": true,
         "shards": {
           "total": 1,
