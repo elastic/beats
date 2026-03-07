@@ -19,6 +19,7 @@ package beat
 
 import (
 	"github.com/elastic/beats/v7/libbeat/api"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
@@ -60,7 +61,7 @@ type Beat struct {
 	Info      Info     // beat metadata.
 	Publisher Pipeline // Publisher pipeline
 
-	Monitoring Monitoring
+	Monitoring beatmonitoring.Monitoring
 
 	InSetupCmd bool // this is set to true when the `setup` command is called
 
