@@ -149,7 +149,6 @@ func (st *openState) Close() {
 }
 
 func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
-	defer putRespChan(req.resp)
 	// If we were given an encoder callback for incoming events, apply it before
 	// sending the entry to the queue.
 	if st.encoder != nil {
@@ -157,18 +156,26 @@ func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 	}
 	select {
 	case st.events <- req:
-		return st.handlePendingResponse(req.resp)
+		id, ok := st.handlePendingResponse(req.resp)
+		// We can only recycle the channel if we have definitely consumed the
+		// response. If the queue is closing and ownership is ambiguous, avoid
+		// pooling to prevent a stale send into a reused channel.
+		if ok {
+			putRespChan(req.resp)
+		}
+		return id, ok
 	case <-st.done:
+		putRespChan(req.resp)
 		st.events = nil
 		return 0, false
 	case <-st.queueClosing:
+		putRespChan(req.resp)
 		st.events = nil
 		return 0, false
 	}
 }
 
 func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
-	defer putRespChan(req.resp)
 	// If we were given an encoder callback for incoming events, apply it before
 	// sending the entry to the queue.
 	if st.encoder != nil {
@@ -176,11 +183,17 @@ func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 	}
 	select {
 	case st.events <- req:
-		return st.handlePendingResponse(req.resp)
+		id, ok := st.handlePendingResponse(req.resp)
+		if ok {
+			putRespChan(req.resp)
+		}
+		return id, ok
 	case <-st.done:
+		putRespChan(req.resp)
 		st.events = nil
 		return 0, false
 	default:
+		putRespChan(req.resp)
 		st.log.Debugf("Dropping event, queue is blocked")
 		return 0, false
 	}
