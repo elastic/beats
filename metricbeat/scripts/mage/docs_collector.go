@@ -28,9 +28,9 @@ import (
 	"text/template"
 
 	"github.com/magefile/mage/sh"
+	"go.yaml.in/yaml/v2"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"go.yaml.in/yaml/v2"
 
 	"github.com/elastic/beats/v7/dev-tools/mage"
 )

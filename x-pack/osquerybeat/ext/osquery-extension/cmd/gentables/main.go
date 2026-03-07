@@ -524,7 +524,7 @@ type readmeEntry struct {
 	Linux       string
 	Darwin      string
 	Windows     string
-	DocPath      string
+	DocPath     string
 }
 
 type readmeTemplateData struct {

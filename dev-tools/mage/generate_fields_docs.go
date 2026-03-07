@@ -30,9 +30,9 @@ import (
 	"strings"
 	"time"
 
+	"go.yaml.in/yaml/v2"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"go.yaml.in/yaml/v2"
 )
 
 // fieldsYAMLSection represents a top-level section in fields.yml.
