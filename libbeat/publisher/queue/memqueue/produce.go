@@ -31,7 +31,7 @@ var respChanPool = sync.Pool{
 }
 
 func getRespChan() chan queue.EntryID {
-	return respChanPool.Get().(chan queue.EntryID) //nolint:errcheck // pool always returns the correct type
+	return respChanPool.Get().(chan queue.EntryID)
 }
 
 func putRespChan(ch chan queue.EntryID) {
