@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Fix user-facing typos in runtime errors and reference configuration docs.
+component: libbeat
+pr: https://github.com/elastic/beats/pull/49205
