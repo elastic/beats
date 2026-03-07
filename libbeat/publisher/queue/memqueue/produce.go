@@ -31,7 +31,10 @@ var respChanPool = sync.Pool{
 }
 
 func getRespChan() chan queue.EntryID {
-	return respChanPool.Get().(chan queue.EntryID)
+	if ch, ok := respChanPool.Get().(chan queue.EntryID); ok {
+		return ch
+	}
+	return make(chan queue.EntryID, 1)
 }
 
 func putRespChan(ch chan queue.EntryID) {
