@@ -185,16 +185,12 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Retry()
 		}
 
-<<<<<<< HEAD
-		return fmt.Errorf("failed to send batch events to otel collector: %w", err)
-=======
 		// Queue full errors are expected backpressure signals, not true errors.
 		// Skip logging to avoid log spam since we already track this via metrics.
 		if !errors.Is(err, exporterhelper.ErrQueueIsFull) {
 			out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
 		}
-		return nil
->>>>>>> 5ab40e641 (fix: suppress queue full error logs to prevent log spam (#48807))
+		return fmt.Errorf("failed to send batch events to otel collector: %w", err)
 	}
 
 	batch.ACK()
