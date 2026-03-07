@@ -65,7 +65,7 @@ func TestReadInputError(t *testing.T) {
 	r := strings.NewReader("")
 
 	result, err := input(r, &buf, "Question?")
-	assert.Equal(t, "", result)
+	assert.Empty(t, result)
 	assert.EqualError(t, err, "error reading user input")
 	assert.Equal(t, "Question? ", buf.String())
 }
