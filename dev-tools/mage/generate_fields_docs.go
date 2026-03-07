@@ -32,7 +32,7 @@ import (
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 )
 
 // fieldsYAMLSection represents a top-level section in fields.yml.

@@ -28,7 +28,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	conf "github.com/elastic/elastic-agent-libs/config"
