@@ -18,9 +18,30 @@
 package memqueue
 
 import (
+	"sync"
+
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+var respChanPool = sync.Pool{
+	New: func() interface{} {
+		return make(chan queue.EntryID, 1)
+	},
+}
+
+func getRespChan() chan queue.EntryID {
+	return respChanPool.Get().(chan queue.EntryID) //nolint:errcheck // pool always returns the correct type
+}
+
+func putRespChan(ch chan queue.EntryID) {
+	// Drain any stale response before returning to the pool.
+	select {
+	case <-ch:
+	default:
+	}
+	respChanPool.Put(ch)
+}
 
 type forgetfulProducer struct {
 	broker    *broker
@@ -73,10 +94,9 @@ func newProducer(b *broker, cb ackHandler, encoder queue.Encoder) queue.Producer
 }
 
 func (p *forgetfulProducer) makePushRequest(event queue.Entry) pushRequest {
-	resp := make(chan queue.EntryID, 1)
 	return pushRequest{
 		event: event,
-		resp:  resp}
+		resp:  getRespChan()}
 }
 
 func (p *forgetfulProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
@@ -92,14 +112,13 @@ func (p *forgetfulProducer) Close() {
 }
 
 func (p *ackProducer) makePushRequest(event queue.Entry) pushRequest {
-	resp := make(chan queue.EntryID, 1)
 	return pushRequest{
 		event:    event,
 		producer: p,
 		// We add 1 to the id so the default lastACK of 0 is a
 		// valid initial state and 1 is the first real id.
 		producerID: producerID(p.producedCount + 1),
-		resp:       resp}
+		resp:       getRespChan()}
 }
 
 func (p *ackProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
@@ -127,6 +146,7 @@ func (st *openState) Close() {
 }
 
 func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
+	defer putRespChan(req.resp)
 	// If we were given an encoder callback for incoming events, apply it before
 	// sending the entry to the queue.
 	if st.encoder != nil {
@@ -145,6 +165,7 @@ func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 }
 
 func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
+	defer putRespChan(req.resp)
 	// If we were given an encoder callback for incoming events, apply it before
 	// sending the entry to the queue.
 	if st.encoder != nil {
