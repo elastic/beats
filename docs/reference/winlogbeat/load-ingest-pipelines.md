@@ -33,7 +33,7 @@ Make sure the user specified in `winlogbeat.yml` is [authorized to set up Winlog
 
 ## Manually install pipelines [winlogbeat-load-pipeline-manual]
 
-On a machine that has Winlogbeat installed export the the pipelines to disk. This can be done with the `export` command with `pipelines` option specified.  For example, the following command exports the ingest pipelines:
+On a machine that has Winlogbeat installed export the pipelines to disk. This can be done with the `export` command with `pipelines` option specified.  For example, the following command exports the ingest pipelines:
 
 ```sh
 PS> .\winlogbeat.exe export pipelines --es.version=7.16.0
