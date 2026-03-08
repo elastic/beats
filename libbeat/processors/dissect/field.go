@@ -24,7 +24,6 @@ import (
 )
 
 type field interface {
-	MarkGreedy()
 	IsGreedy() bool
 	Ordinal() int
 	Length() int
@@ -71,10 +70,6 @@ var dataTypeNames = map[string]dataType{
 
 func (f baseField) IsGreedy() bool {
 	return f.greedy
-}
-
-func (f baseField) MarkGreedy() {
-	f.greedy = true
 }
 
 func (f baseField) Ordinal() int {
