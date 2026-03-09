@@ -30,7 +30,7 @@ type queryResultPublisher interface {
 }
 
 type scheduledResponsePublisher interface {
-	PublishScheduledResponse(scheduleID, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64)
+	PublishScheduledResponse(scheduleID, packID, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64)
 }
 
 type scheduledQueryPublisher interface {

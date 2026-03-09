@@ -40,6 +40,9 @@ type Query struct {
 }
 
 type Pack struct {
+	// PackID is the policy-defined pack identifier; used in result/response documents for correlation.
+	// If empty, the pack map key (pack name) is used when publishing.
+	PackID    string           `config:"pack_id,omitempty" json:"pack_id,omitempty"`
 	Discovery []string         `config:"discovery" json:"discovery,omitempty"`
 	Platform  string           `config:"platform" json:"platform,omitempty"`
 	Version   string           `config:"version" json:"version,omitempty"`

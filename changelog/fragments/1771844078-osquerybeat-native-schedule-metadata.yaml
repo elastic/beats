@@ -28,6 +28,9 @@ description: |
   Scheduled query outputs also use `schedule_id` for correlation, while live
   action query outputs continue to use `action_id`.
 
+  Scheduled response documents include `pack_id` for pack queries when present
+  in the configuration.
+
   Native scheduler option defaults remain available through `osquery.options`
   (`schedule_splay_percent` and `schedule_max_drift`).
 

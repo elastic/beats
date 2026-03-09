@@ -497,3 +497,58 @@ func TestSet_ScheduleMetadataIncludesSpaceID(t *testing.T) {
 		t.Error(diff)
 	}
 }
+
+func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+	cfgp := NewConfigPlugin(logger)
+
+	const (
+		packName   = "my-pack"
+		packID     = "pack-uuid-123"
+		queryName  = "uptime_query"
+		querySQL   = "select * from uptime"
+		queryPeriod = 60
+	)
+
+	inputs := []config.InputConfig{
+		{
+			Name: "osquery-manager-1",
+			Type: "osquery",
+			Datastream: config.DatastreamConfig{
+				Namespace: "default",
+			},
+			Osquery: &config.OsqueryConfig{
+				Packs: map[string]config.Pack{
+					packName: {
+						PackID: packID,
+						Queries: map[string]config.Query{
+							queryName: {
+								Query:    querySQL,
+								Interval: queryPeriod,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	if err := cfgp.Set(inputs); err != nil {
+		t.Fatal(err)
+	}
+
+	_, err := cfgp.GenerateConfig(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	packQueryName := getPackQueryName(packName, queryName)
+	qi, ok := cfgp.LookupQueryInfo(packQueryName)
+	if !ok {
+		t.Fatalf("failed to resolve query info for %s", packQueryName)
+	}
+
+	if diff := cmp.Diff(packID, qi.PackID); diff != "" {
+		t.Error(diff)
+	}
+}

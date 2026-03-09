@@ -152,7 +152,7 @@ func (p *Publisher) PublishActionResult(req map[string]interface{}, res map[stri
 // PublishScheduledResponse publishes a synthetic response document for a scheduled query run (no action).
 // Includes schedule_execution_count;
 // native uses 1 + (run_time - start_date) / interval).
-func (p *Publisher) PublishScheduledResponse(scheduleID, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
+func (p *Publisher) PublishScheduledResponse(scheduleID, packID, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -174,6 +174,9 @@ func (p *Publisher) PublishScheduledResponse(scheduleID, spaceID, responseID str
 				"count": resultCount,
 			},
 		},
+	}
+	if packID != "" {
+		fields["pack_id"] = packID
 	}
 	if spaceID != "" {
 		fields["space_id"] = spaceID

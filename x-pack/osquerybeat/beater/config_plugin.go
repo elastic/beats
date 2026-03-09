@@ -42,6 +42,8 @@ type QueryInfo struct {
 	SpaceID string
 	// Interval is the schedule interval in seconds for native schedules; used to compute schedule_execution_count
 	Interval int
+	// PackID is the policy-defined pack identifier for pack queries; empty for top-level schedule queries.
+	PackID string
 }
 
 type queryInfoMap map[string]QueryInfo
@@ -217,7 +219,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 	}
 
 	// Common code to register query with lookup maps, enforce snapshot and increment queries count
-	registerQuery := func(name, ns string, qi config.Query) (config.Query, error) {
+	registerQuery := func(name, ns string, qi config.Query, packID string) (config.Query, error) {
 		var ecsm ecs.Mapping
 		ecsm, err = flattenECSMapping(qi.ECSMapping)
 		if err != nil {
@@ -231,6 +233,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			StartDate:  qi.StartDate,
 			SpaceID:    qi.SpaceID,
 			Interval:   qi.Interval,
+			PackID:     packID,
 		}
 		namespaces[name] = ns
 		queriesCount++
@@ -245,7 +248,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	// Iterate osquery configuration's scheduled queries, add flattened ECS mappings to lookup map
 	for name, qi := range osqueryConfig.Schedule {
-		qi, err = registerQuery(name, p.namespace, qi)
+		qi, err = registerQuery(name, p.namespace, qi, "")
 		if err != nil {
 			return err
 		}
@@ -254,8 +257,12 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	// Iterate osquery configuration's packs queries, add flattened ECS mappings to lookup map
 	for packName, pack := range osqueryConfig.Packs {
+		packID := pack.PackID
+		if packID == "" {
+			packID = packName
+		}
 		for name, qi := range pack.Queries {
-			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi)
+			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID)
 			if err != nil {
 				return err
 			}
@@ -280,7 +287,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 				ECSMapping: stream.ECSMapping,
 			}
 
-			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi)
+			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi, input.Name)
 			if err != nil {
 				return err
 			}

@@ -27,7 +27,7 @@ func (m *mockBeatPublisher) Publish(index, idValue, idFieldKey, responseID, spac
 func (m *mockBeatPublisher) PublishActionResult(req map[string]interface{}, res map[string]interface{}) {
 }
 
-func (m *mockBeatPublisher) PublishScheduledResponse(scheduleID, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
+func (m *mockBeatPublisher) PublishScheduledResponse(scheduleID, packID, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
 }
 
 func (m *mockBeatPublisher) Configure(inputs []config.InputConfig) error {
