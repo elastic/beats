@@ -133,12 +133,12 @@ func TestBuildMemberOfFilter(t *testing.T) {
 		{
 			name:     "single group",
 			groupDNs: []string{"cn=Admin Users,ou=Groups,dc=example,dc=com"},
-			want:     "(memberOf=cn=Admin Users,ou=Groups,dc=example,dc=com)",
+			want:     "(memberOf:1.2.840.113556.1.4.1941:=cn=Admin Users,ou=Groups,dc=example,dc=com)",
 		},
 		{
 			name:     "multiple groups",
 			groupDNs: []string{"cn=Admins,dc=example,dc=com", "cn=Users,dc=example,dc=com"},
-			want:     "(|(memberOf=cn=Admins,dc=example,dc=com)(memberOf=cn=Users,dc=example,dc=com))",
+			want:     "(|(memberOf:1.2.840.113556.1.4.1941:=cn=Admins,dc=example,dc=com)(memberOf:1.2.840.113556.1.4.1941:=cn=Users,dc=example,dc=com))",
 		},
 	}
 
@@ -243,5 +243,33 @@ func Test(t *testing.T) {
 			t.Errorf("failed to marshal users for logging: %v", err)
 		}
 		t.Logf("user: %s", b)
+	})
+
+	t.Run("empty_groups", func(t *testing.T) {
+		groups, err := GetEmptyGroups(url, user, pass, base, time.Time{}, nil, 0, nil, nil)
+		if err != nil {
+			t.Fatalf("unexpected error from GetEmptyGroups: %v", err)
+		}
+
+		for _, g := range groups {
+			if g.Group == nil {
+				t.Errorf("expected Group to be set for entry %q", g.ID)
+			}
+			if g.User != nil {
+				t.Errorf("expected User to be nil for entry %q", g.ID)
+			}
+			if g.ID == "" {
+				t.Error("expected non-empty ID")
+			}
+		}
+
+		if !*logResponses {
+			return
+		}
+		b, err := json.MarshalIndent(groups, "", "\t")
+		if err != nil {
+			t.Errorf("failed to marshal groups for logging: %v", err)
+		}
+		t.Logf("empty groups: %s", b)
 	})
 }

@@ -13,7 +13,7 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -145,7 +145,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		})
 	}
 
-	b.Monitoring = beat.NewMonitoring()
+	b.Monitoring = beatmonitoring.NewMonitoring()
 
 	b.SetKeystore(store)
 	b.Beat.Keystore = store
@@ -290,7 +290,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 // setLogger configures a logp logger and sets it on b.Info.Logger
 func setLogger(b *instance.Beat, receiverConfig map[string]any, core zapcore.Core) error {
-
 	var err error
 	logpConfig := logp.Config{}
 	logpConfig.AddCaller = true

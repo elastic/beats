@@ -25,7 +25,7 @@ func resolveValue(input any) (value reflect.Value, ok bool) {
 }
 
 // ToBool converts an input value to a boolean.
-func ToBool(input any) (result bool, ok bool) {
+func ToBool(input any) (result, ok bool) {
 	v, ok := resolveValue(input)
 	if !ok {
 		return false, false

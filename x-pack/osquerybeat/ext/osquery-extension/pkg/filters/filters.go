@@ -27,33 +27,25 @@ type Filter struct {
 
 // equals checks if the value of the field is equal to the expression
 func (f Filter) equals(entry any) bool {
-	field, kind, err := GetValueByOsqueryTag(entry, f.ColumnName)
+	value, err := GetValueByOsqueryTag(entry, f.ColumnName)
 	if err != nil {
 		return false
 	}
-	switch kind {
+	switch value.Kind() {
 	case reflect.String:
-		fieldString, ok := field.(string)
-		if !ok {
-			return false
-		}
-		return f.Expression == fieldString
+		return f.Expression == value.String()
 	case reflect.Bool:
 		expressionBool, ok := ToBool(f.Expression)
 		if !ok {
 			return false
 		}
-		fieldBool, ok := ToBool(field)
-		if !ok {
-			return false
-		}
-		return expressionBool == fieldBool
+		return expressionBool == value.Bool()
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		expressionInt, ok := ToInt64(f.Expression)
 		if !ok {
 			return false
 		}
-		fieldInt, ok := ToInt64(field)
+		fieldInt, ok := ToInt64(value.Interface())
 		if !ok {
 			return false
 		}
@@ -63,7 +55,7 @@ func (f Filter) equals(entry any) bool {
 		if !ok {
 			return false
 		}
-		fieldFloat, ok := ToFloat64(field)
+		fieldFloat, ok := ToFloat64(value.Interface())
 		if !ok {
 			return false
 		}
@@ -75,12 +67,12 @@ func (f Filter) equals(entry any) bool {
 
 // lessThan checks if the value of the field is less than the expression
 func (f Filter) lessThan(entry any) bool {
-	field, kind, err := GetValueByOsqueryTag(entry, f.ColumnName)
+	value, err := GetValueByOsqueryTag(entry, f.ColumnName)
 	if err != nil {
 		return false
 	}
 
-	switch kind {
+	switch value.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		expressionInt, ok := ToInt64(f.Expression)
 		if !ok {
@@ -88,7 +80,7 @@ func (f Filter) lessThan(entry any) bool {
 		}
 		// Even though the field is an int, it may not cast to an int64, so we need to convert it
 		// to be safe
-		fieldInt, ok := ToInt64(field)
+		fieldInt, ok := ToInt64(value.Interface())
 		if !ok {
 			return false
 		}
@@ -98,21 +90,17 @@ func (f Filter) lessThan(entry any) bool {
 		if !ok {
 			return false
 		}
-		fieldFloat, ok := ToFloat64(field)
+		fieldFloat, ok := ToFloat64(value.Interface())
 		if !ok {
 			return false
 		}
 		return fieldFloat < expressionFloat
 	case reflect.Bool:
-		fieldBool, ok := field.(bool)
-		if !ok {
-			return false
-		}
 		expressionBool, ok := ToBool(f.Expression)
 		if !ok {
 			return false
 		}
-		return !fieldBool && expressionBool
+		return !value.Bool() && expressionBool
 	default:
 		return false
 	}
@@ -120,11 +108,11 @@ func (f Filter) lessThan(entry any) bool {
 
 // greaterThan checks if the value of the field is greater than the expression
 func (f Filter) greaterThan(entry any) bool {
-	field, kind, err := GetValueByOsqueryTag(entry, f.ColumnName)
+	value, err := GetValueByOsqueryTag(entry, f.ColumnName)
 	if err != nil {
 		return false
 	}
-	switch kind {
+	switch value.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		expressionInt, ok := ToInt64(f.Expression)
 		if !ok {
@@ -132,7 +120,7 @@ func (f Filter) greaterThan(entry any) bool {
 		}
 		// Even though the field is an int, it may not cast to an int64, so we need to convert it
 		// to be safe
-		fieldInt, ok := ToInt64(field)
+		fieldInt, ok := ToInt64(value.Interface())
 		if !ok {
 			return false
 		}
@@ -142,21 +130,17 @@ func (f Filter) greaterThan(entry any) bool {
 		if !ok {
 			return false
 		}
-		fieldFloat, ok := ToFloat64(field)
+		fieldFloat, ok := ToFloat64(value.Interface())
 		if !ok {
 			return false
 		}
 		return fieldFloat > expressionFloat
 	case reflect.Bool:
-		fieldBool, ok := field.(bool)
-		if !ok {
-			return false
-		}
 		expressionBool, ok := ToBool(f.Expression)
 		if !ok {
 			return false
 		}
-		return fieldBool && !expressionBool
+		return value.Bool() && !expressionBool
 	default:
 		return false
 	}
@@ -164,21 +148,17 @@ func (f Filter) greaterThan(entry any) bool {
 
 // like checks if the value of the field is like the expression
 func (f Filter) like(entry any) bool {
-	field, kind, err := GetValueByOsqueryTag(entry, f.ColumnName)
+	value, err := GetValueByOsqueryTag(entry, f.ColumnName)
 	if err != nil {
 		return false
 	}
-	if kind != reflect.String {
+	if value.Kind() != reflect.String {
 		return false
 	}
 	pattern := strings.ReplaceAll(f.Expression, "%", ".*")
 	pattern = strings.ReplaceAll(pattern, "_", ".")
 	pattern = "^" + pattern + "$"
-	fieldString, ok := field.(string)
-	if !ok {
-		return false
-	}
-	matched, err := regexp.MatchString(pattern, fieldString)
+	matched, err := regexp.MatchString(pattern, value.String())
 	if err != nil || !matched {
 		return false
 	}
@@ -187,21 +167,17 @@ func (f Filter) like(entry any) bool {
 
 // glob checks if the value of the field is a glob pattern
 func (f Filter) glob(entry any) bool {
-	field, kind, err := GetValueByOsqueryTag(entry, f.ColumnName)
+	value, err := GetValueByOsqueryTag(entry, f.ColumnName)
 	if err != nil {
 		return false
 	}
-	if kind != reflect.String {
+	if value.Kind() != reflect.String {
 		return false
 	}
 	pattern := strings.ReplaceAll(f.Expression, "*", ".*")
 	pattern = strings.ReplaceAll(pattern, "?", ".")
 	pattern = "^" + pattern + "$"
-	fieldString, ok := field.(string)
-	if !ok {
-		return false
-	}
-	matched, err := regexp.MatchString(pattern, fieldString)
+	matched, err := regexp.MatchString(pattern, value.String())
 	if err != nil || !matched {
 		return false
 	}
@@ -261,7 +237,7 @@ func GetConstraintFilters(queryContext table.QueryContext) []Filter {
 }
 
 // GetValueByTag gets the value of a field by its tag
-func GetValueByOsqueryTag(s any, tagValue string) (any, reflect.Kind, error) {
+func GetValueByOsqueryTag(s any, tagValue string) (reflect.Value, error) {
 	// Get the Value of the struct
 	v := reflect.ValueOf(s)
 
@@ -272,7 +248,7 @@ func GetValueByOsqueryTag(s any, tagValue string) (any, reflect.Kind, error) {
 
 	// Make sure we're dealing with a struct
 	if v.Kind() != reflect.Struct {
-		return nil, reflect.Invalid, fmt.Errorf("not a struct")
+		return reflect.Value{}, fmt.Errorf("not a struct")
 	}
 
 	// Get the Type of the struct
@@ -304,9 +280,9 @@ func GetValueByOsqueryTag(s any, tagValue string) (any, reflect.Kind, error) {
 
 			// Only recurse if it's a struct
 			if fieldValue.Kind() == reflect.Struct {
-				value, kind, err := GetValueByOsqueryTag(fieldValue.Interface(), tagValue)
+				value, err := GetValueByOsqueryTag(fieldValue.Interface(), tagValue)
 				if err == nil {
-					return value, kind, nil
+					return value, nil
 				}
 				continue // Skip the rest of the loop for this field
 			}
@@ -317,10 +293,10 @@ func GetValueByOsqueryTag(s any, tagValue string) (any, reflect.Kind, error) {
 			// Found it! Get the Value of this field from the struct instance
 			fieldValue := v.Field(i)
 			// Return the value as a generic interface{}
-			return fieldValue.Interface(), fieldValue.Kind(), nil
+			return fieldValue, nil
 		}
 	}
 
 	// No field found with that tag
-	return nil, reflect.Invalid, fmt.Errorf("no field found with that tag")
+	return reflect.Value{}, fmt.Errorf("no field found with that tag")
 }

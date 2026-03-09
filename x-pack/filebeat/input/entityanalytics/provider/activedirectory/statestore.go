@@ -17,6 +17,7 @@ import (
 var (
 	usersBucket   = []byte("users")
 	devicesBucket = []byte("devices")
+	groupsBucket  = []byte("groups")
 	stateBucket   = []byte("state")
 
 	whenChangedKey = []byte("when_changed")
@@ -55,6 +56,7 @@ type stateStore struct {
 	lastUpdate time.Time
 	users      map[string]*User
 	devices    map[string]*User
+	groups     map[string]*User
 }
 
 // newStateStore creates a new instance of stateStore. It will open a new write
@@ -71,6 +73,7 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 	s := stateStore{
 		users:   make(map[string]*User),
 		devices: make(map[string]*User),
+		groups:  make(map[string]*User),
 		tx:      tx,
 	}
 
@@ -104,7 +107,7 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 		var d User
 		err = json.Unmarshal(value, &d)
 		if err != nil {
-			return fmt.Errorf("unable to unmarshal user from state: %w", err)
+			return fmt.Errorf("unable to unmarshal device from state: %w", err)
 		}
 		s.devices[d.ID] = &d
 
@@ -112,6 +115,19 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 	})
 	if err != nil && !errIsItemNotFound(err) {
 		return nil, fmt.Errorf("unable to get devices from state: %w", err)
+	}
+	err = s.tx.ForEach(groupsBucket, func(key, value []byte) error {
+		var g User
+		err = json.Unmarshal(value, &g)
+		if err != nil {
+			return fmt.Errorf("unable to unmarshal group from state: %w", err)
+		}
+		s.groups[g.ID] = &g
+
+		return nil
+	})
+	if err != nil && !errIsItemNotFound(err) {
+		return nil, fmt.Errorf("unable to get groups from state: %w", err)
 	}
 
 	return &s, nil
@@ -145,6 +161,20 @@ func (s *stateStore) storeDevice(d activedirectory.Entry) *User {
 		s.devices[d.ID] = &sd
 	}
 	return &sd
+}
+
+// storeGroup stores an empty group. If the group does not exist in the store,
+// then it will be marked as discovered. Otherwise, it will be marked as modified.
+func (s *stateStore) storeGroup(g activedirectory.Entry) *User {
+	sg := User{Entry: g}
+	if existing, ok := s.groups[g.ID]; ok {
+		sg.State = Modified
+		*existing = sg
+	} else {
+		sg.State = Discovered
+		s.groups[g.ID] = &sg
+	}
+	return &sg
 }
 
 // close will close out the stateStore. If commit is true, the staged values on the
@@ -212,6 +242,19 @@ func (s *stateStore) close(commit bool) (err error) {
 		err = s.tx.Set(devicesBucket, []byte(key), value)
 		if err != nil {
 			return fmt.Errorf("unable to save device %q to state: %w", key, err)
+		}
+	}
+	for key, value := range s.groups {
+		if value.State == Deleted {
+			err = s.tx.Delete(groupsBucket, []byte(key))
+			if err != nil {
+				return fmt.Errorf("unable to delete group %q from state: %w", key, err)
+			}
+			continue
+		}
+		err = s.tx.Set(groupsBucket, []byte(key), value)
+		if err != nil {
+			return fmt.Errorf("unable to save group %q to state: %w", key, err)
 		}
 	}
 
