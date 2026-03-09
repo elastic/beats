@@ -86,7 +86,7 @@ func newClientSecretAuthorizer(config Config, logger *logp.Logger) (autorest.Aut
 		return nil, fmt.Errorf("failed to create client secret credential: %w", err)
 	}
 
-	logger.Debugf("Client secret authorizer created for tenant: %s, client: %s", config.TenantId, config.ClientId)
+	logger.Debug("Client secret authorizer created")
 
 	return &tokenCredentialAuthorizer{
 		credential: credential,
