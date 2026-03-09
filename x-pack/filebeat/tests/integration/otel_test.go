@@ -1804,12 +1804,9 @@ func TestFilebeatOTelHTTPJSONInputWithElasticStateStore(t *testing.T) {
 
 	// Mock HTTP server for httpjson input: tracks request count and returns
 	// a JSON response with a published timestamp that the cursor tracks.
-	var mu sync.Mutex
-	var requestCount int
+	var requestCount atomic.Int64
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		mu.Lock()
-		requestCount++
-		mu.Unlock()
+		requestCount.Add(1)
 
 		published := parseParams(t, r.RequestURI)
 		w.Header().Set("Content-Type", "application/json")
@@ -1950,18 +1947,14 @@ service:
 
 	// Wait for at least 2 polling cycles to ensure cursor is persisted to ES
 	require.Eventually(t, func() bool {
-		mu.Lock()
-		defer mu.Unlock()
-		return requestCount >= 2
+		return requestCount.Load() >= 2
 	}, 60*time.Second, 1*time.Second, "expected at least 2 httpjson poll cycles before restart")
 
 	// Shut down first collector
 	collector.Shutdown()
 
 	// Verify data continues to arrive after restart
-	mu.Lock()
-	requestCountBeforeRestart := requestCount
-	mu.Unlock()
+	requestCountBeforeRestart := requestCount.Load()
 
 	// Start second collector with the same config
 	collector2 := oteltestcol.New(t, configStr)
@@ -1975,9 +1968,7 @@ service:
 		"expected store to read 1 key after restart, proving cursor was restored from ES")
 
 	require.Eventually(t, func() bool {
-		mu.Lock()
-		defer mu.Unlock()
-		return requestCount > requestCountBeforeRestart
+		return requestCount.Load() > requestCountBeforeRestart
 	}, 60*time.Second, 1*time.Second, "expected httpjson to continue polling after restart")
 }
 
