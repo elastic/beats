@@ -47,7 +47,7 @@ func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
 			// is connected to. Might not be a problem since a user who doesn't have any custom lifecycle config has nothing to export?
 			clientHandler, err := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version), b.Info, b.Paths, b.Config.LifecycleConfig)
 			if err != nil {
-				fatalf("Error creating file handler: %s", err)
+				fatalf("error creating file handler: %s", err)
 			}
 			idxManager := b.IdxSupporter.Manager(clientHandler, idxmgmt.BeatsAssets(b.Fields))
 			if err := idxManager.Setup(idxmgmt.LoadModeDisabled, idxmgmt.LoadModeForce); err != nil {
