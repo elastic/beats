@@ -27,7 +27,6 @@ import (
 // uniqueIndex returns a unique index name scoped to the test to avoid
 // collisions between parallel test runs against the same Elasticsearch cluster.
 func uniqueIndex(t *testing.T) string {
-	t.Helper()
 	safe := strings.NewReplacer("/", "-", " ", "-")
 	return "test-elasticstorage-" + safe.Replace(strings.ToLower(t.Name()))
 }
