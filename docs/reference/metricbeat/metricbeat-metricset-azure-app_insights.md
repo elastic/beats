@@ -51,12 +51,16 @@ Set `auth_type: "client_secret"` and provide the following options:
 
 All three of `tenant_id`, `client_id`, and `client_secret` are required when `auth_type` is `client_secret`.
 
+**Required permissions:** The service principal must be assigned a role that grants read access to Application Insights data. The minimum built-in role is **Monitoring Reader**, assigned at the Application Insights resource scope. Other roles that include the required permissions are **Monitoring Contributor**, **Contributor**, and **Owner**. For more details, see [Azure built-in roles for Monitor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/monitor).
+
 #### API key authentication
 
 Set `auth_type: "api_key"` (or omit `auth_type`, as it defaults to `api_key`) and provide:
 
 `api_key`
 :   (*string*) The API key which will be generated, more on the steps here [https://dev.applicationinsights.io/documentation/Authorization/API-key-and-App-ID](https://dev.applicationinsights.io/documentation/Authorization/API-key-and-App-ID).
+
+**Required permissions:** The API key must be created with the **Read telemetry** permission enabled in the Azure portal (under the API Access blade of the Application Insights resource).
 
 
 ### App insights metric configurations [_app_insights_metric_configurations]
