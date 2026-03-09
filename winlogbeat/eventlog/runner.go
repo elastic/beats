@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"runtime"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -46,6 +47,10 @@ func Run(
 	publisher Publisher,
 	log *logp.Logger,
 ) error {
+	// Pin the runner goroutine so Win32 Event Log calls execute on one OS thread.
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	reporter.UpdateStatus(status.Starting, fmt.Sprintf("Starting to read from %s", api.Channel()))
 	// setup closing the API if either the run function is signaled asynchronously
 	// to shut down or when returning after io.EOF
@@ -77,35 +82,35 @@ func Run(
 			}
 			return true
 		}
-		if IsRecoverable(err, api.IsFile()) {
-			reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to open %s: %v", api.Channel(), err))
-			if isChannelNotFound(err) {
-				logChannelNotFoundOpenRetry(err)
-			} else {
-				log.Errorw("encountered recoverable error when opening Windows Event Log", "error", err)
-			}
-			return true
+		if !IsRecoverable(err, api.IsFile()) {
+			return false
 		}
-		return false
+		reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to open %s: %v", api.Channel(), err))
+		if isChannelNotFound(err) {
+			logChannelNotFoundOpenRetry(err)
+		} else {
+			log.Errorw("encountered recoverable error when opening Windows Event Log", "error", err)
+		}
+		return true
 	})
 
 	readErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
-		var mustRetry bool
 		if mustIgnoreError(err, api) {
 			log.Warnw("ignoring read error", "error", err, "channel", api.Channel())
-			mustRetry = true
-		}
-		if IsRecoverable(err, api.IsFile()) {
-			reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to read from %s: %v", api.Channel(), err))
-			log.Errorw("encountered recoverable error when reading from Windows Event Log", "error", err)
-			mustRetry = true
-		}
-		if mustRetry {
 			if resetErr := api.Reset(); resetErr != nil {
 				log.Errorw("error resetting Windows Event Log handle", "error", resetErr)
 			}
+			return true
 		}
-		return mustRetry
+		if !IsRecoverable(err, api.IsFile()) {
+			return false
+		}
+		reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to read from %s: %v", api.Channel(), err))
+		log.Errorw("encountered recoverable error when reading from Windows Event Log", "error", err)
+		if resetErr := api.Reset(); resetErr != nil {
+			log.Errorw("error resetting Windows Event Log handle", "error", resetErr)
+		}
+		return true
 	})
 
 runLoop:
@@ -130,26 +135,26 @@ runLoop:
 			reporter.UpdateStatus(status.Running, fmt.Sprintf("Reading from %s", api.Channel()))
 			records, readErr := api.Read()
 
-			// io.EOF signals a clean end of stream (e.g. no_more_events: stop).
-			// Publish any records returned in the same batch before exiting.
-			if errors.Is(readErr, io.EOF) {
-				if len(records) > 0 {
-					if err := publisher.Publish(records); err != nil {
-						reporter.UpdateStatus(status.Failed, fmt.Sprintf("Publisher error: %v", err))
-						return err
-					}
+			if len(records) > 0 {
+				if err := publisher.Publish(records); err != nil {
+					reporter.UpdateStatus(status.Failed, fmt.Sprintf("Publisher error: %v", err))
+					return err
 				}
-				log.Debugw("end of Winlog event stream reached", "error", readErr)
-				break runLoop
 			}
 
 			if readErr != nil {
-				if readErrHandler.backoff(cancelCtx, readErr) {
-					continue runLoop
+				// io.EOF signals a clean end of stream (e.g. no_more_events: stop).
+				if errors.Is(readErr, io.EOF) {
+					log.Debugw("end of Winlog event stream reached", "error", readErr)
+					break runLoop
 				}
 
 				if cancelCtx.Err() != nil {
 					break runLoop
+				}
+
+				if readErrHandler.backoff(cancelCtx, readErr) {
+					continue runLoop
 				}
 
 				reporter.UpdateStatus(status.Failed, fmt.Sprintf("Failed to read from %s: %v", api.Channel(), readErr))
@@ -161,11 +166,6 @@ runLoop:
 			if len(records) == 0 {
 				_ = timed.Wait(cancelCtx, time.Second)
 				continue
-			}
-
-			if err := publisher.Publish(records); err != nil {
-				reporter.UpdateStatus(status.Failed, fmt.Sprintf("Publisher error: %v", err))
-				return err
 			}
 		}
 	}

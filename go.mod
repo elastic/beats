@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.24.13
+go 1.25.8
 
 require (
 	cloud.google.com/go/bigquery v1.69.0
@@ -101,7 +101,7 @@ require (
 	github.com/magefile/mage v1.15.0
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/miekg/dns v1.1.69
-	github.com/osquery/osquery-go v0.0.0-20231108163517-e3cde127e724
+	github.com/osquery/osquery-go v0.0.0-20260226222546-0cc22f415e57
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
@@ -188,7 +188,7 @@ require (
 	github.com/go-resty/resty/v2 v2.17.1
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.0
-	github.com/google/cel-go v0.25.0
+	github.com/google/cel-go v0.26.1
 	github.com/googleapis/gax-go/v2 v2.15.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
