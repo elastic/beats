@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// these types apply to phyiscal interfaces
+//nolint:misspell // these types apply to phyiscal interfaces
 var interfaceTypes = map[int]string{
 	0:  "Ethernet interface",
 	1:  "Aggregate Ethernet (AE) interface",
@@ -52,7 +52,7 @@ func formatIFInterfaceEvents(m *MetricSet, input InterfaceResult) []mb.Event {
 	events := make([]mb.Event, 0, len(input.HW.Entries)+len(input.Ifnet.Entries))
 	timestamp := time.Now().UTC()
 
-	// First process the phyiscal interfaces
+	//nolint:misspell // First process the phyiscal interfaces
 	for _, entry := range input.HW.Entries {
 		iftype, ok := interfaceTypes[entry.Type]
 
