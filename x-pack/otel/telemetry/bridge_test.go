@@ -6,6 +6,8 @@ package telemetry
 
 import (
 	"context"
+	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -740,5 +742,58 @@ func TestBridgeReceiverAttribute(t *testing.T) {
 	require.True(t, ok)
 	assert.Equal(t, "stream-1", inputIDVal.AsString())
 
+	bridge.Shutdown()
+}
+
+// TestBridgeConcurrentMapAccess verifies that concurrent instrument creation
+// (simulating createAndReRegister) and map reads (simulating callback collection)
+// don't race. This test is only meaningful with -race.
+//
+// We test with allInstruments (which reads the same maps as collectStats/
+// collectInputs) rather than going through ManualReader.Collect, because the
+// synchronous ManualReader holds SDK-internal locks that conflict with
+// instrument creation — a deadlock specific to ManualReader that doesn't
+// occur with the production PeriodicReader.
+func TestBridgeConcurrentMapAccess(t *testing.T) {
+	reader := metric.NewManualReader()
+
+	statsReg := monitoring.NewRegistry()
+	pipelineReg := statsReg.GetOrCreateRegistry("pipeline")
+	monitoring.NewUint(pipelineReg, "clients").Set(1)
+
+	inputsReg := monitoring.NewRegistry()
+	input1 := inputsReg.GetOrCreateRegistry("input-1")
+	monitoring.NewString(input1, "id").Set("stream-1")
+	monitoring.NewString(input1, "input").Set("filestream")
+	monitoring.NewUint(input1, "events_processed_total").Set(10)
+
+	bridge := newTestBridge(t, reader, statsReg, inputsReg)
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	// Writer goroutine: simulates createAndReRegister adding instruments.
+	// Caller must hold b.mu (write lock) per ensure* contract.
+	go func() {
+		defer wg.Done()
+		for i := 0; i < 100; i++ {
+			bridge.mu.Lock()
+			_ = bridge.ensureStatsInt(fmt.Sprintf("pipeline.dynamic_%d", i))
+			_ = bridge.ensureStatsFloat(fmt.Sprintf("pipeline.pct_%d", i))
+			_ = bridge.ensureInputInt(fmt.Sprintf("input_counter_%d", i))
+			_ = bridge.ensureInputFloat(fmt.Sprintf("input_gauge_%d", i))
+			bridge.mu.Unlock()
+		}
+	}()
+
+	// Reader goroutine: simulates callback reading instrument maps.
+	go func() {
+		defer wg.Done()
+		for i := 0; i < 100; i++ {
+			_ = bridge.allInstruments()
+		}
+	}()
+
+	wg.Wait()
 	bridge.Shutdown()
 }
