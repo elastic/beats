@@ -1366,7 +1366,7 @@ service:
 	// wait for 8888 port to be free (an indication that previous collector has exited)
 	require.Eventually(t,
 		func() bool {
-			ln, err := net.Listen("tcp", "localhost:8888")
+			ln, err := net.Listen("tcp", "localhost:8888") //nolint:noctx // it's okay for testing purposes
 			if err != nil {
 				return false
 			}
@@ -1551,7 +1551,7 @@ func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {
 			),
 		)
 
-		l, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", serverPort))
+		l, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", serverPort)) //nolint:noctx // it's okay for testing purposes
 		require.NoError(t, err)
 		mockServer.Listener = l
 		mockServer.Start()
