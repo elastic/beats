@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -21,7 +20,6 @@ import (
 type store struct {
 	client *eslegclient.Connection
 	index  string
-	mx     sync.Mutex
 }
 
 type queryResult struct {
@@ -54,9 +52,6 @@ func (s *store) Close() error {
 }
 
 func (s *store) Has(key string) (bool, error) {
-	s.mx.Lock()
-	defer s.mx.Unlock()
-
 	var v interface{}
 	err := s.get(key, &v)
 	if err != nil {
@@ -69,9 +64,6 @@ func (s *store) Has(key string) (bool, error) {
 }
 
 func (s *store) Get(key string, to interface{}) error {
-	s.mx.Lock()
-	defer s.mx.Unlock()
-
 	return s.get(key, to)
 }
 
@@ -99,9 +91,6 @@ func (s *store) get(key string, to interface{}) error {
 }
 
 func (s *store) Set(key string, value interface{}) error {
-	s.mx.Lock()
-	defer s.mx.Unlock()
-
 	doc := renderRequest(value)
 	_, _, err := s.client.Request("PUT", fmt.Sprintf("/%s/%s/%s", s.index, docType, url.QueryEscape(key)), "", nil, doc)
 	if err != nil {
@@ -111,9 +100,6 @@ func (s *store) Set(key string, value interface{}) error {
 }
 
 func (s *store) Remove(key string) error {
-	s.mx.Lock()
-	defer s.mx.Unlock()
-
 	_, _, err := s.client.Delete(s.index, docType, url.QueryEscape(key), nil)
 	if err != nil {
 		return err
@@ -137,9 +123,6 @@ type searchResult struct {
 }
 
 func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error {
-	s.mx.Lock()
-	defer s.mx.Unlock()
-
 	status, result, err := s.client.SearchURIWithBody(s.index, "", nil, map[string]any{
 		"query": map[string]any{
 			"match_all": map[string]any{},
@@ -183,14 +166,12 @@ func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error 
 }
 
 func (s *store) SetID(id string) {
-	s.mx.Lock()
-	defer s.mx.Unlock()
-
 	if id == "" {
 		return
 	}
 	s.index = renderIndexName(id)
 }
+
 func renderIndexName(name string) string {
 	return "agentless-state-" + name
 }
