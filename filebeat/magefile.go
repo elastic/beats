@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
@@ -202,6 +203,16 @@ func GoIntegTest(ctx context.Context) error {
 // GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
+
+	// We pre-cache go module dependencies before running the unit tests with
+	// GODEBUG=fips140=only.  Otherwise, the command that runs the unit tests
+	// will try to download the dependencies and could fail because the TLS
+	// negotiation with the Go module proxy could use a non-FIPS compliant
+	// key exchange protocol, e.g. X25519.
+	if err := sh.RunV(mg.GoCmd(), "mod", "download"); err != nil {
+		return err
+	}
+
 	return devtools.GoIntegTestFromHost(ctx, devtools.FIPSOnlyGoTestIntegrationFromHostArgs(ctx))
 }
 
