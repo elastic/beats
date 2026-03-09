@@ -13,7 +13,7 @@ kind: enhancement
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Add optional token_url support for JWT Bearer Flow in Salesforce input.
+summary: Add optional `token_url` support for JWT Bearer Flow in Salesforce input.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
