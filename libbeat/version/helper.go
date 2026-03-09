@@ -18,32 +18,16 @@
 package version
 
 import (
-	"runtime/debug"
-	"sync"
 	"sync/atomic"
 	"time"
 )
 
 var (
 	packageVersion atomic.Value
-	vcsRevision    = "unknown"
-	vcsTime        time.Time
+	buildTime      = "unknown"
+	commit         = "unknown"
 	qualifier      = ""
-	vcsOnce        sync.Once
 )
-
-func readInfo() {
-	if info, ok := debug.ReadBuildInfo(); ok {
-		for _, setting := range info.Settings {
-			switch setting.Key {
-			case "vcs.time":
-				vcsTime, _ = time.Parse(time.RFC3339, setting.Value)
-			case "vcs.revision":
-				vcsRevision = setting.Value
-			}
-		}
-	}
-}
 
 // GetDefaultVersion returns the current version.
 // If running in stand-alone mode, it's the libbeat version. If running in
@@ -66,14 +50,16 @@ func GetDefaultVersion() string {
 // BuildTime exposes the compile-time build time information.
 // It will represent the zero time instant if parsing fails.
 func BuildTime() time.Time {
-	vcsOnce.Do(readInfo)
-	return vcsTime
+	t, err := time.Parse(time.RFC3339, buildTime)
+	if err != nil {
+		return time.Time{}
+	}
+	return t
 }
 
 // Commit exposes the compile-time commit hash.
 func Commit() string {
-	vcsOnce.Do(readInfo)
-	return vcsRevision
+	return commit
 }
 
 // SetPackageVersion sets the package version, overriding the defaultBeatVersion.
