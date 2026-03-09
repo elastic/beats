@@ -325,8 +325,9 @@ func (b *RegistryBridge) callback(_ context.Context, obs metric.Observer) error 
 	b.collectInputs(obs)
 
 	b.mu.Lock()
-	hasPending := len(b.pendingStatsInts) > 0 || len(b.pendingStatsFloats) > 0 ||
-		len(b.pendingInputInts) > 0 || len(b.pendingInputFloats) > 0
+	hasPending := !b.closed &&
+		(len(b.pendingStatsInts) > 0 || len(b.pendingStatsFloats) > 0 ||
+			len(b.pendingInputInts) > 0 || len(b.pendingInputFloats) > 0)
 	var statsInts, statsFloats, inputInts, inputFloats []string
 	if hasPending {
 		statsInts = b.pendingStatsInts
@@ -337,11 +338,13 @@ func (b *RegistryBridge) callback(_ context.Context, obs metric.Observer) error 
 		b.pendingStatsFloats = nil
 		b.pendingInputInts = nil
 		b.pendingInputFloats = nil
+		// Add inside the lock so Shutdown's Wait() cannot return before
+		// this goroutine is tracked.
+		b.reRegWg.Add(1)
 	}
 	b.mu.Unlock()
 
 	if hasPending {
-		b.reRegWg.Add(1)
 		go func() {
 			defer b.reRegWg.Done()
 			b.createAndReRegister(statsInts, statsFloats, inputInts, inputFloats)
