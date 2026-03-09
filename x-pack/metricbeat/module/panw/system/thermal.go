@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const thermalQuery = "<show><system><environmentals><thermal></thermal></environmentals></system></show>" //nolint:misspell
+const thermalQuery = "<show><system><environmentals><thermal></thermal></environmentals></system></show>" //nolint:misspell // environmentals is the PAN-OS API endpoint name
 
 func getThermalEvents(m *MetricSet) ([]mb.Event, error) {
 	var response ThermalResponse

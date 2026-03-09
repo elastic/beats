@@ -14,7 +14,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const fansQuery = "<show><system><environmentals><fans></fans></environmentals></system></show>" //nolint:misspell
+const fansQuery = "<show><system><environmentals><fans></fans></environmentals></system></show>" //nolint:misspell // environmentals is the PAN-OS API endpoint name
 
 func getFanEvents(m *MetricSet) ([]mb.Event, error) {
 
