@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
@@ -154,6 +155,16 @@ type: test
 	})
 }
 
+type mockStatusReporter struct {
+	status status.Status
+	desc   string
+}
+
+func (sr *mockStatusReporter) UpdateStatus(st status.Status, desc string) {
+	sr.status = st
+	sr.desc = desc
+}
+
 func TestRunnerFactory_CreateAndRun(t *testing.T) {
 	t.Run("runner can correctly start and stop inputs", func(t *testing.T) {
 		log := logptest.NewTestingLogger(t, "")
@@ -184,6 +195,36 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		runner.Stop()
 		wg.Wait()
 		assert.Equal(t, 1, countRun)
+	})
+
+	t.Run("runner with status reports stopped status after terminating", func(t *testing.T) {
+		log := logptest.NewTestingLogger(t, "")
+		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(&inputest.MockInput{
+			OnRun: func(ctx v2.Context, _ beat.PipelineConnector) error {
+				<-ctx.Cancelation.Done()
+				return nil
+			},
+		}))
+		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
+		factory := RunnerFactory(
+			log,
+			beat.Info{Logger: log},
+			monitoring.NewRegistry(),
+			loader.Loader)
+
+		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
+			"type": "test",
+		}))
+		require.NoError(t, err)
+
+		statusReporter := &mockStatusReporter{}
+		runnerWithStatus, ok := runner.(status.WithStatusReporter)
+		require.True(t, ok, "runner should allow a status reporter")
+		runnerWithStatus.SetStatusReporter(statusReporter)
+
+		runner.Start()
+		runner.Stop()
+		assert.Equal(t, status.Stopped, statusReporter.status, "runner status after Stop returns with no errors should be Stopped")
 	})
 
 	t.Run("fail if input type is unknown to loader", func(t *testing.T) {

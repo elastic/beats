@@ -182,8 +182,7 @@ func CheckReceivers(params CheckReceiversParams) {
 			require.NotNil(ct, host.Evt, "expected not nil, got nil")
 
 			if params.Status != nil {
-				assert.Equal(t, params.Status.Status(), params.Status.Status(), host.Evt.Status(),
-					"expected status to be %v, got %v", params.Status.Status(), host.Evt.Status())
+				assert.Equal(t, params.Status.Status(), host.Evt.Status())
 				assert.Equal(t, params.Status.Err(), host.Evt.Err())
 				assert.Equal(t, params.Status.Attributes().AsRaw(), host.Evt.Attributes().AsRaw())
 			}
@@ -244,6 +243,7 @@ type hook struct {
 
 type mockDiagExtension struct {
 	component.Component
+	mu    sync.Mutex
 	hooks map[string][]hook
 }
 
@@ -254,6 +254,8 @@ func (m *mockHost) GetExtensions() map[component.ID]component.Component {
 }
 
 func (m *mockDiagExtension) RegisterDiagnosticHook(name string, description string, filename string, contentType string, fn func() []byte) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	m.hooks[name] = append(m.hooks[name], hook{
 		description: description,
 		filename:    filename,
@@ -262,21 +264,29 @@ func (m *mockDiagExtension) RegisterDiagnosticHook(name string, description stri
 	})
 }
 
+func (m *mockDiagExtension) getHooks(name string) ([]hook, bool) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	h, ok := m.hooks[name]
+	return h, ok
+}
+
 func TestReceiverHook(t *testing.T, config component.Config, factory receiver.Factory, set receiver.Settings, expectedHooks int) {
-	logs, err := factory.CreateLogs(context.Background(), set, config, consumertest.NewNop())
+	logs, err := factory.CreateLogs(t.Context(), set, config, consumertest.NewNop())
 	diagExt := &mockDiagExtension{
 		hooks: make(map[string][]hook),
 	}
 	require.NoError(t, err)
 	require.NotNil(t, logs)
-	require.NoError(t, logs.Start(context.Background(), &mockHost{diagExt: diagExt}))
+	require.NoError(t, logs.Start(t.Context(), &mockHost{diagExt: diagExt}))
 
 	defer func() {
-		require.NoError(t, logs.Shutdown(context.Background()))
+		require.NoError(t, logs.Shutdown(t.Context()))
 	}()
 
 	assert.EventuallyWithT(t, func(c *assert.CollectT) {
-		assert.Contains(c, diagExt.hooks, set.ID.String())
-		assert.Len(c, diagExt.hooks[set.ID.String()], expectedHooks)
+		hooks, ok := diagExt.getHooks(set.ID.String())
+		assert.True(c, ok, "expected hooks to contain key %s", set.ID.String())
+		assert.Len(c, hooks, expectedHooks)
 	}, 5*time.Second, 100*time.Millisecond, "expected hook to be registered")
 }
