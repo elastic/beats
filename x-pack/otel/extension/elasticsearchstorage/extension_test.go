@@ -47,9 +47,7 @@ func newTestStore(t *testing.T, storeName string) *store {
 	}, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-	require.NoError(t, conn.Connect(ctx))
+	require.NoError(t, conn.Connect(t.Context()))
 	t.Cleanup(func() { _ = conn.Close() })
 
 	s, err := openStore(conn, storeName)
