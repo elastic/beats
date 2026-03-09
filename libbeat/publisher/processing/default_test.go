@@ -56,7 +56,7 @@ func TestGenerateProcessorList(t *testing.T) {
 	processors, err := processors.New(plugins, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	// make sure the processor init got the config formatted in a way it expected
-	require.Equal(t, 4, len(processors.List))
+	require.Len(t, processors.List, 4)
 
 	require.NoError(t, processors.Close())
 }
