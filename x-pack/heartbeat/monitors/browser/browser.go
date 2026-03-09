@@ -11,7 +11,6 @@ import (
 	"syscall"
 
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/gohugoio/hashstructure"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -19,21 +18,7 @@ import (
 )
 
 func init() {
-	plugin.RegisterWithHashFunc("browser", browserHashConfig, create, "synthetic", "synthetics/synthetic")
-}
-
-func browserHashConfig(cfg *config.C) (uint64, error) {
-	if cfg == nil {
-		return 0, fmt.Errorf("nil config")
-	}
-
-	var config map[string]interface{}
-	if err := cfg.Unpack(&config); err != nil {
-		return 0, err
-	}
-	// For now, we only support reload for params
-	delete(config, "params")
-	return hashstructure.Hash(config, nil)
+	plugin.RegisterWithHashFunc("browser", hashConfig, create, "synthetic", "synthetics/synthetic")
 }
 
 func create(name string, cfg *config.C) (p plugin.Plugin, err error) {
