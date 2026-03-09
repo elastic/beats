@@ -14,7 +14,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const fansQuery = "<show><system><environmentals><fans></fans></environmentals></system></show>"
+const fansQuery = "<show><system><environmentals><fans></fans></environmentals></system></show>" //nolint:misspell
 
 func getFanEvents(m *MetricSet) ([]mb.Event, error) {
 

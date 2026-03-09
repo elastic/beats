@@ -14,7 +14,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const powerQuery = "<show><system><environmentals><power></power></environmentals></system></show>"
+const powerQuery = "<show><system><environmentals><power></power></environmentals></system></show>" //nolint:misspell
 
 // getPowerEvents retrieves power-related events from a PAN-OS device.
 func getPowerEvents(m *MetricSet) ([]mb.Event, error) {

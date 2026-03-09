@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const thermalQuery = "<show><system><environmentals><thermal></thermal></environmentals></system></show>"
+const thermalQuery = "<show><system><environmentals><thermal></thermal></environmentals></system></show>" //nolint:misspell
 
 func getThermalEvents(m *MetricSet) ([]mb.Event, error) {
 	var response ThermalResponse
