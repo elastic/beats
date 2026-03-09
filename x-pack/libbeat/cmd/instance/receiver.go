@@ -31,11 +31,12 @@ import (
 
 // BaseReceiver holds common configurations for beatreceivers.
 type BeatReceiver struct {
-	beat     *instance.Beat
-	beater   beat.Beater
-	reporter *log.Reporter
-	Logger   *logp.Logger
-	bridge   *oteltelemetry.RegistryBridge
+	beat                *instance.Beat
+	beater              beat.Beater
+	reporter            *log.Reporter
+	Logger              *logp.Logger
+	bridge              *oteltelemetry.RegistryBridge
+	releaseSystemBridge func()
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -98,11 +99,17 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		return BeatReceiver{}, fmt.Errorf("error creating registry bridge: %w", err)
 	}
 
+	releaseSystem, err := oteltelemetry.AcquireSystemBridge(ts)
+	if err != nil {
+		return BeatReceiver{}, fmt.Errorf("error acquiring system bridge: %w", err)
+	}
+
 	return BeatReceiver{
-		beat:   b,
-		beater: beater,
-		Logger: b.Info.Logger,
-		bridge: bridge,
+		beat:                b,
+		beater:              beater,
+		Logger:              b.Info.Logger,
+		bridge:              bridge,
+		releaseSystemBridge: releaseSystem,
 	}, nil
 }
 
@@ -172,6 +179,9 @@ func (br *BeatReceiver) Start(host component.Host) error {
 func (br *BeatReceiver) Shutdown() error {
 	if br.bridge != nil {
 		br.bridge.Shutdown()
+	}
+	if br.releaseSystemBridge != nil {
+		br.releaseSystemBridge()
 	}
 	br.beater.Stop()
 
