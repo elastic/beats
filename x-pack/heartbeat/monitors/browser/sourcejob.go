@@ -97,9 +97,17 @@ func (sj *SourceJob) Close() error {
 	return nil
 }
 
+// Update updates selective job fields in-place for running monitors
 func (sj *SourceJob) Update(c *config.C) error {
+	// Update bypasses plugin factory, so the config comes as-is from
+	// agent management. We need to unnest here or move the logic to the factory itself
+	unnested, err := stdfields.UnnestStream(c)
+	if err != nil {
+		return err
+	}
+
 	var cfg Config
-	err := c.Unpack(&cfg)
+	err = unnested.Unpack(&cfg)
 	if err != nil {
 		return fmt.Errorf("error unpacking browser config for update: %w", err)
 	}
@@ -186,7 +194,7 @@ func (sj *SourceJob) jobs() []jobs.Job {
 
 	if isScript {
 		src := sj.browserCfg.Source.Inline.Script
-		j = synthexec.InlineJourneyJob(ctx, src, sj.Params(), sFields, sj.extraArgs(sFields.Origin != "")...)
+		j = synthexec.InlineJourneyJob(ctx, src, sj.Params, sFields, sj.extraArgs(sFields.Origin != "")...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := sj.Fetch()
@@ -194,7 +202,7 @@ func (sj *SourceJob) jobs() []jobs.Job {
 				return nil, fmt.Errorf("could not fetch for browser source job: %w", err)
 			}
 
-			sj, err := synthexec.ProjectJob(ctx, sj.Workdir(), sj.Params(), sj.FilterJourneys(), sFields, sj.extraArgs(sFields.Origin != "")...)
+			sj, err := synthexec.ProjectJob(ctx, sj.Workdir(), sj.Params, sj.FilterJourneys(), sFields, sj.extraArgs(sFields.Origin != "")...)
 			if err != nil {
 				return nil, err
 			}

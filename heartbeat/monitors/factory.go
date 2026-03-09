@@ -124,12 +124,12 @@ func (NoopRunner) Update(c *conf.C) error {
 }
 
 func (f *RunnerFactory) GetHashFunc(c *conf.C) (plugin.HashConfigFunc, error) {
-	c, err := stdfields.UnnestStream(c)
+	unnested, err := stdfields.UnnestStream(c)
 	if err != nil {
 		return nil, err
 	}
 
-	sf, err := stdfields.ConfigToStdMonitorFields(c)
+	sf, err := stdfields.ConfigToStdMonitorFields(unnested)
 	if err != nil {
 		return nil, fmt.Errorf("could not load stdfields in factory: %w", err)
 	}
