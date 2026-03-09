@@ -12,13 +12,14 @@ import (
 	"os"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	jumpliststypes "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/jumplists"
 )
 
-// parseCustomJumplistFile parses a custom jump list file into a Jumplist object.
-// It returns a Jumplist object and an error if the file cannot be read or parsed.
+// parseCustomJumplistFile parses a custom jump list file into a jumplist object.
+// It returns a jumplist object and an error if the file cannot be read or parsed.
 // Custom jumplists are comprised of some metadata and a collection of Lnk objects.
 // The lnk objects have to be carved out of the file and there may be multiple of them per file
-func parseCustomJumplistFile(filePath string, userProfile *UserProfile, log *logger.Logger) (*Jumplist, error) {
+func parseCustomJumplistFile(filePath string, userProfile *UserProfile, log *logger.Logger) (*jumplist, error) {
 	// Read the file into a byte slice
 	fileBytes, err := os.ReadFile(filePath)
 	if err != nil {
@@ -34,20 +35,19 @@ func parseCustomJumplistFile(filePath string, userProfile *UserProfile, log *log
 	}
 
 	// Look up the application id and create the metadata
-	jumpListMeta := &JumplistMeta{
-		UserProfile:   userProfile,
+	jumpListMeta := &jumplistMeta{
+		UserProfile:   &jumpliststypes.UserProfile{Username: userProfile.Username, Sid: userProfile.Sid},
 		ApplicationID: getAppIdFromFileName(filePath),
-		JumplistType:  JumplistTypeCustom,
-		Path:          filePath,
+		JumplistMeta:  &jumpliststypes.JumplistMeta{JumplistType: string(jumplistTypeCustom), SourceFilePath: filePath},
 	}
-	entries := make([]*JumplistEntry, 0, len(lnks))
+	entries := make([]*jumplistEntry, 0, len(lnks))
 	for _, lnk := range lnks {
-		entries = append(entries, &JumplistEntry{Lnk: lnk})
+		entries = append(entries, &jumplistEntry{Lnk: lnk})
 	}
 
 	// Combine the metadata and the entries into a Jumplist object
-	customJumplist := &Jumplist{
-		JumplistMeta: jumpListMeta,
+	customJumplist := &jumplist{
+		jumplistMeta: jumpListMeta,
 		entries:      entries,
 	}
 	return customJumplist, nil

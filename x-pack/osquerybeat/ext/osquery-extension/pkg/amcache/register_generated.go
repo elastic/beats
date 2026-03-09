@@ -11,6 +11,7 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
@@ -27,7 +28,7 @@ import (
 func init() {
 	state := tables.GetAmcacheState()
 
-	elasticamcacheapplication.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elasticamcacheapplication.Result, error) {
+	elasticamcacheapplication.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elasticamcacheapplication.Result, error) {
 		t := tables.GetAmcacheTableByName(tables.TableNameApplication)
 		entries, err := state.GetCachedEntries(*t, filters.GetConstraintFilters(queryContext), log)
 		if err != nil {
@@ -36,7 +37,7 @@ func init() {
 		return entriesToApplicationResults(entries)
 	})
 
-	elasticamcacheapplicationfile.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elasticamcacheapplicationfile.Result, error) {
+	elasticamcacheapplicationfile.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elasticamcacheapplicationfile.Result, error) {
 		t := tables.GetAmcacheTableByName(tables.TableNameApplicationFile)
 		entries, err := state.GetCachedEntries(*t, filters.GetConstraintFilters(queryContext), log)
 		if err != nil {
@@ -45,7 +46,7 @@ func init() {
 		return entriesToApplicationFileResults(entries)
 	})
 
-	elasticamcacheapplicationshortcut.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elasticamcacheapplicationshortcut.Result, error) {
+	elasticamcacheapplicationshortcut.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elasticamcacheapplicationshortcut.Result, error) {
 		t := tables.GetAmcacheTableByName(tables.TableNameApplicationShortcut)
 		entries, err := state.GetCachedEntries(*t, filters.GetConstraintFilters(queryContext), log)
 		if err != nil {
@@ -54,7 +55,7 @@ func init() {
 		return entriesToApplicationShortcutResults(entries)
 	})
 
-	elasticamcachedriverbinary.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elasticamcachedriverbinary.Result, error) {
+	elasticamcachedriverbinary.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elasticamcachedriverbinary.Result, error) {
 		t := tables.GetAmcacheTableByName(tables.TableNameDriverBinary)
 		entries, err := state.GetCachedEntries(*t, filters.GetConstraintFilters(queryContext), log)
 		if err != nil {
@@ -63,7 +64,7 @@ func init() {
 		return entriesToDriverBinaryResults(entries)
 	})
 
-	elasticamcachedevicepnp.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elasticamcachedevicepnp.Result, error) {
+	elasticamcachedevicepnp.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elasticamcachedevicepnp.Result, error) {
 		t := tables.GetAmcacheTableByName(tables.TableNameDevicePnp)
 		entries, err := state.GetCachedEntries(*t, filters.GetConstraintFilters(queryContext), log)
 		if err != nil {
@@ -72,7 +73,7 @@ func init() {
 		return entriesToDevicePnpResults(entries)
 	})
 
-	elasticamcachedriverpackage.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elasticamcachedriverpackage.Result, error) {
+	elasticamcachedriverpackage.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elasticamcachedriverpackage.Result, error) {
 		t := tables.GetAmcacheTableByName(tables.TableNameDriverPackage)
 		entries, err := state.GetCachedEntries(*t, filters.GetConstraintFilters(queryContext), log)
 		if err != nil {
