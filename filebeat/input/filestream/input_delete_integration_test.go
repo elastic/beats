@@ -159,7 +159,7 @@ func TestFilestreamDeleteFile(t *testing.T) {
 			v2Ctx := v2.Context{
 				ID:          t.Name(),
 				Cancelation: t.Context(),
-				Logger:      env.logger,
+				Logger:      env.testLogger.Logger,
 			}
 
 			err := f.deleteFile(v2Ctx, v2Ctx.Logger, cur, logFile)
@@ -228,7 +228,7 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 		v2Ctx := v2.Context{
 			ID:          t.Name(),
 			Cancelation: ctx,
-			Logger:      env.logger,
+			Logger:      env.testLogger.Logger,
 		}
 
 		wg := sync.WaitGroup{}
@@ -236,7 +236,7 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 		var deleteErr error
 		go func() {
 			defer wg.Done()
-			deleteErr = f.deleteFile(v2Ctx, env.logger, cur, logFile)
+			deleteErr = f.deleteFile(v2Ctx, env.testLogger.Logger, cur, logFile)
 		}()
 
 		cancel()
@@ -253,7 +253,7 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 		v2Ctx := v2.Context{
 			ID:          t.Name(),
 			Cancelation: t.Context(),
-			Logger:      env.logger,
+			Logger:      env.testLogger.Logger,
 		}
 
 		count := atomic.Int32{}
@@ -270,7 +270,7 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			defer deleteDone.Store(true)
-			deleteErr = f.deleteFile(v2Ctx, env.logger, cur, logFile)
+			deleteErr = f.deleteFile(v2Ctx, env.testLogger.Logger, cur, logFile)
 		}()
 
 		tickChan <- time.Now()
@@ -309,7 +309,7 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 		v2Ctx := v2.Context{
 			ID:          t.Name(),
 			Cancelation: t.Context(),
-			Logger:      env.logger,
+			Logger:      env.testLogger.Logger,
 		}
 
 		count := atomic.Int32{}
@@ -328,7 +328,7 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 		var gotErr error
 		go func() {
 			defer wg.Done()
-			gotErr = f.deleteFile(v2Ctx, env.logger, cur, logFile)
+			gotErr = f.deleteFile(v2Ctx, env.testLogger.Logger, cur, logFile)
 		}()
 
 		// Run the retry loop
@@ -348,7 +348,7 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 		v2Ctx := v2.Context{
 			ID:          t.Name(),
 			Cancelation: t.Context(),
-			Logger:      env.logger,
+			Logger:      env.testLogger.Logger,
 		}
 
 		count := atomic.Int32{}
@@ -366,7 +366,7 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			defer deleteDone.Store(true)
-			gotErr = f.deleteFile(v2Ctx, env.logger, cur, logFile)
+			gotErr = f.deleteFile(v2Ctx, env.testLogger.Logger, cur, logFile)
 		}()
 
 		for i := range 9 {
@@ -467,7 +467,7 @@ func TestFilestreamDeleteFileReturnsError(t *testing.T) {
 		v2Ctx := v2.Context{
 			ID:          t.Name(),
 			Cancelation: t.Context(),
-			Logger:      env.logger,
+			Logger:      env.testLogger.Logger,
 		}
 
 		fs := fileSource{
@@ -557,13 +557,13 @@ func TestFilestreamWaitGracePeriod(t *testing.T) {
 			v2Ctx := v2.Context{
 				ID:          t.Name(),
 				Cancelation: t.Context(),
-				Logger:      env.logger,
+				Logger:      env.testLogger.Logger,
 			}
 
 			start := time.Now()
 			got, err := waitGracePeriod(
 				v2Ctx,
-				env.logger,
+				env.testLogger.Logger,
 				cur,
 				logFile,
 				tc.gracePeriod,
@@ -606,14 +606,14 @@ func TestFilestreamWaitGracePeriodContextCancelled(t *testing.T) {
 	v2Ctx := v2.Context{
 		ID:          t.Name(),
 		Cancelation: ctx,
-		Logger:      env.logger,
+		Logger:      env.testLogger.Logger,
 	}
 
 	cancel()
 	start := time.Now()
 	got, err := waitGracePeriod(
 		v2Ctx,
-		env.logger,
+		env.testLogger.Logger,
 		cur,
 		logFile,
 		gracePeriod,
@@ -647,7 +647,7 @@ func TestFilestreamWaitGracePeriodStatError(t *testing.T) {
 	v2Ctx := v2.Context{
 		ID:          t.Name(),
 		Cancelation: t.Context(),
-		Logger:      env.logger,
+		Logger:      env.testLogger.Logger,
 	}
 
 	statErr := errors.New("Oops")
@@ -673,7 +673,7 @@ func TestFilestreamWaitGracePeriodStatError(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			canDelete, err := waitGracePeriod(
 				v2Ctx,
-				env.logger,
+				env.testLogger.Logger,
 				cur,
 				logFile,
 				tc.gracePeriod,

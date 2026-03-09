@@ -8,14 +8,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"runtime"
 	"strings"
 	"time"
-
-	"go.uber.org/multierr"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -52,11 +51,6 @@ func Build() error {
 	return devtools.Build(args)
 }
 
-// BuildOTel builds the Beat binary with OTel sub command
-func BuildOTel() error {
-	return devtools.BuildOTel()
-}
-
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
@@ -65,7 +59,7 @@ func GolangCrossBuild() error {
 	if isWindows32bitRunner() {
 		args.LDFlags = append(args.LDFlags, "-w")
 	}
-	return multierr.Combine(
+	return errors.Join(
 		devtools.GolangCrossBuild(args),
 		devtools.TestLinuxForCentosGLIBC(),
 	)
@@ -123,7 +117,6 @@ func BuildSystemTestBinary() error {
 	args := []string{
 		"test", "-c",
 		"-o", binArgs.Name + ".test",
-		"-tags", "otelbeat",
 	}
 
 	// On Windows 7 32-bit we run out of memory if we enable coverage and DWARF
@@ -248,9 +241,8 @@ func GoIntegTest(ctx context.Context) error {
 	}
 
 	if !devtools.IsInIntegTestEnv() {
-		// build integration test binary with otel sub command
-		devtools.BuildSystemTestOTelBinary()
-		args := devtools.DefaultGoTestIntegrationFromHostArgs()
+		devtools.BuildSystemTestBinary()
+		args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 		// ES_USER must be admin in order for the Go Integration tests to function because they require
 		// indices:data/read/search
 		args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
@@ -275,7 +267,12 @@ func GoIntegTest(ctx context.Context) error {
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
 // Use MODULE=module to run only tests for `module`.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
-	os.Setenv("GODEBUG", "fips140=only")
+	// We also set GODEBUG=tlsmlkem=0 to disable the X25519MLKEM768 TLS key
+	// exchange mechanism; without this setting and with the GODEBUG=fips140=only
+	// setting, we get errors in tests like so:
+	// Failed to connect: crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
+	// Note that we are only disabling this TLS key exchange mechanism in tests!
+	os.Setenv("GODEBUG", "fips140=only,tlsmlkem=0")
 	return GoIntegTest(ctx)
 }
 

@@ -1,9 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-activemq-queue.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # ActiveMQ queue metricset [metricbeat-metricset-activemq-queue]
 

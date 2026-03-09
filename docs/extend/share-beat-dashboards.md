@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/share-beat-dashboards.html
+applies_to:
+  stack: ga
 ---
 
 # Sharing Your Beat Dashboards [share-beat-dashboards]

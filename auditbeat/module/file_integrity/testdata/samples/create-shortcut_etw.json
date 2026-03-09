@@ -1,0 +1,110 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "attributes_modified"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "change"
+        ]
+      },
+      "file": {
+        "accessed": "2025-09-01T10:58:26.4086961Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-09-01T10:58:26.4077142Z",
+        "ctime": "2025-09-01T10:58:26.4077142Z",
+        "drive_letter": "C",
+        "extension": "lnk",
+        "inode": "9007199255686566",
+        "mtime": "2025-09-01T10:58:26.4086961Z",
+        "name": "MyShortcut.lnk",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwcreate-shortcut3447453728\\001\\MyShortcut.lnk",
+        "size": 1307,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      },
+      "process": {
+        "pid": 30272,
+        "user": {
+          "domain": "tp",
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-09-01T10:58:26.409584Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 1999800,
+    "Period": 0,
+    "DisableTimeSeries": false
+  },
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "created"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "creation"
+        ]
+      },
+      "file": {
+        "accessed": "2025-09-01T10:58:26.4086961Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-09-01T10:58:26.4077142Z",
+        "ctime": "2025-09-01T10:58:26.4077142Z",
+        "drive_letter": "C",
+        "extension": "lnk",
+        "inode": "9007199255686566",
+        "mtime": "2025-09-01T10:58:26.4086961Z",
+        "name": "MyShortcut.lnk",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwcreate-shortcut3447453728\\001\\MyShortcut.lnk",
+        "size": 1307,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      },
+      "process": {
+        "pid": 30272,
+        "user": {
+          "domain": "tp",
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-09-01T10:58:26.4097441Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 0,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]

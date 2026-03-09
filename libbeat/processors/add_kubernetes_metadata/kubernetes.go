@@ -376,6 +376,9 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (k *kubernetesAnnotator) Close() error {
+	// ensure there are no goroutines leaking
+	// after the processor has been closed
+	k.initOnce.Do(func() {})
 	if k.watcher != nil {
 		k.watcher.Stop()
 	}

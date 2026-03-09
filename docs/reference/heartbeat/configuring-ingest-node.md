@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/configuring-ingest-node.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Parse data using an ingest pipeline [configuring-ingest-node]

@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/publishing-ls-fails-connection-reset-by-peer.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Publishing to Logstash fails with "connection reset by peer" message [publishing-ls-fails-connection-reset-by-peer]

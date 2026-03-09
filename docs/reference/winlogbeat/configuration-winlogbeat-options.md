@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/configuration-winlogbeat-options.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Configure Winlogbeat [configuration-winlogbeat-options]
@@ -36,8 +37,8 @@ winlogbeat.registry_file: C:/Program Files/Winlogbeat-Data/.winlogbeat.yml
 ```
 
 The default location varies:
-* {applies_to}`stack: ga 9.1` `C:/Program Files/Winlogbeat-Data/.winlogbeat.yml`
-* {applies_to}`stack: ga 9.0` `C:/ProgramData/winlogbeat/.winlogbeat.yml`
+* {applies_to}`stack: ga 9.1+` `C:/Program Files/Winlogbeat-Data/.winlogbeat.yml`
+* {applies_to}`stack: ga =9.0` `C:/ProgramData/winlogbeat/.winlogbeat.yml`
 
 ::::{note}
 The forward slashes (/) in the path are automatically changed to backslashes (\) for Windows compatibility. You can use either forward or backslashes. Forward slashes are easier to work with in YAML because there is no need to escape them.
@@ -254,6 +255,8 @@ Microsoft-Windows-Eventlog
 
 Provide a custom XML query. This option is mutually exclusive with the `name`, `event_id`, `ignore_older`, `level`, and `provider` options. These options should be included in the XML query directly. Furthermore, an `id` must be provided. Custom XML queries provide more flexibility and advanced options than the simpler query options in Winlogbeat. **This option is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer).**
 
+Query filters provided through custom XML queries are not always reliable across all Windows versions and forwarding scenarios. If possible, prefer non-custom queries so Winlogbeat can subscribe unfiltered and apply filtering in code.
+
 Here is a configuration which will collect DHCP server events from multiple channels:
 
 ```yaml
@@ -304,7 +307,7 @@ Example:
 ```yaml
 winlogbeat.event_logs:
   - name: Application
-  - name: System 
+  - name: System
   - name: Sysmon
     ignore_missing_channel: false
 ```

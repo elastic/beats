@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-dataset-system-process.html
 applies_to:
   stack: beta
+  serverless: beta
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See auditbeat/scripts/mage/docs.go
 
 # System process dataset [auditbeat-dataset-system-process]
 

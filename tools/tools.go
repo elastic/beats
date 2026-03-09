@@ -29,8 +29,6 @@ import (
 	_ "golang.org/x/tools/cmd/stringer"
 	_ "gotest.tools/gotestsum/cmd"
 
-	_ "github.com/mitchellh/gox"
-
 	_ "go.elastic.co/go-licence-detector"
 
 	_ "github.com/elastic/go-licenser"

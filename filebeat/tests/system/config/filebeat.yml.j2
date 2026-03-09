@@ -6,6 +6,7 @@ filebeat.{{input_config | default("inputs")}}:
 {% endif %}
 {% if inputs %}
 - type: {{type | default("log") }}
+  id: test-id
   allow_deprecated_use: true
   input_type: {{input_type_deprecated }}
   # Paths that should be crawled and fetched
@@ -143,3 +144,6 @@ filebeat.autodiscover:
 {% endif %}
 
 {% include './tests/system/config/libbeat.yml.j2' %}
+
+features:
+  log_input_run_as_filestream.enabled: ${RUN_AS_FILESTREAM:false}

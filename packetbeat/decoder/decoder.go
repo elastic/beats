@@ -86,7 +86,7 @@ func New(f *flows.Flows, datalink layers.LinkType, icmp4 icmp.ICMPv4Processor, i
 		flows:     f,
 		decoders:  make(map[gopacket.LayerType]gopacket.DecodingLayer),
 		icmp4Proc: icmp4, icmp6Proc: icmp6, tcpProc: tcp, udpProc: udp,
-		fragments:          fragmentCache{collected: make(map[uint16]fragments)},
+		fragments:          fragmentCache{collected: make(map[fragmentKey]fragments), lastPurge: time.Now()},
 		allowMismatchedEth: allowMismatchedEth,
 		logger:             logp.NewLogger("decoder"),
 	}
@@ -200,17 +200,27 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 			} else {
 				now := time.Now()
 				const offsetMask = 1<<13 - 1 // https://datatracker.ietf.org/doc/html/rfc791#section-3.1
+				key := fragmentKey{
+					proto: ipv4.Protocol,
+					id:    ipv4.Id,
+				}
+				if src := ipv4.SrcIP.To4(); src != nil {
+					copy(key.src[:], src)
+				}
+				if dst := ipv4.DstIP.To4(); dst != nil {
+					copy(key.dst[:], dst)
+				}
 				f := fragment{
 					id:     ipv4.Id,
 					offset: int(ipv4.FragOffset&offsetMask) * 8,
 					data:   append(data[:0:0], data...), // Ensure that we are not aliasing data.
 					more:   ipv4.Flags&layers.IPv4MoreFragments != 0,
-					expire: now.Add(time.Duration(ipv4.TTL) * time.Second),
+					expire: now.Add(fragmentHold),
 				}
 				var more bool
-				data, more, err = d.fragments.add(now, f)
+				data, more, err = d.fragments.add(now, key, f)
 				if err != nil {
-					d.logger.Warnf("%v src=%s dst=%s", err, ipv4.SrcIP, ipv4.DstIP)
+					d.logger.Debugf("%v src=%s dst=%s", err, ipv4.SrcIP, ipv4.DstIP)
 					return
 				}
 				if more {
@@ -260,17 +270,27 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 
 // fragmentCache is a TTL aware cache of IPv4 fragments to reassemble.
 type fragmentCache struct {
-	// oldest is the expiry time of the oldest fragment.
-	oldest time.Time
+	// lastPurge is the last time we attempted to purge expired fragments
+	lastPurge time.Time
 
 	// collected is the collections of fragments keyed on their
 	// IPv4 packet ID field.
-	collected map[uint16]fragments
+	collected map[fragmentKey]fragments
 }
 
-// maxReassemble is the maximum size that a collection of fragmented
-// packets will be reassembled to.
-const maxReassemble = 1e5
+type fragmentKey struct {
+	src   [4]byte
+	dst   [4]byte
+	proto layers.IPProtocol
+	id    uint16
+}
+
+const (
+	ipMaxLength        = 65535
+	fragmentHold       = time.Second
+	fragmentMaxPerFlow = 64
+	fragmentMaxSets    = 512
+)
 
 // add adds a new fragment to the cache. The value of now is used to expire fragments
 // and collections of fragments. If the fragment completes a set of fragments for
@@ -279,21 +299,32 @@ const maxReassemble = 1e5
 // fragments ID set, more is returned true. Expiries and oversize reassemblies are
 // signaled via the returned error.
 // The cache is purged of expired collections before add returns.
-func (c *fragmentCache) add(now time.Time, f fragment) (data []byte, more bool, err error) {
-	defer c.purge(now)
+func (c *fragmentCache) add(now time.Time, k fragmentKey, f fragment) (data []byte, more bool, err error) {
+	c.maybePurge(now)
 
-	collected, ok := c.collected[f.id]
-	if ok && !collected.expire.IsZero() && now.After(collected.expire) {
-		delete(c.collected, f.id)
-		return nil, false, fmt.Errorf("fragments expired before reassembly ID=%d", f.id)
-	}
-	if c.oldest.After(f.expire) {
-		c.oldest = f.expire
-	}
-	if collected.expire.IsZero() || collected.expire.After(f.expire) {
+	collected, ok := c.collected[k]
+	if !ok {
 		collected.expire = f.expire
 	}
+
+	// If this is a new tuple and we are at our limit of tuples, bail
+	if len(c.collected)+1 >= fragmentMaxSets {
+		delete(c.collected, k)
+		return nil, false, fmt.Errorf("too many active fragment sets")
+	}
+	// If this tuple already has all fragments, bail
+	if len(collected.fragments)+1 >= fragmentMaxPerFlow {
+		delete(c.collected, k)
+		return nil, false, fmt.Errorf("fragment limit exceeded for flow ID=%d", f.id)
+	}
+	// If the datagram would exceed the max, bail
+	if collected.bytes+len(f.data) >= ipMaxLength {
+		delete(c.collected, k)
+		return nil, false, fmt.Errorf("fragment bytes limit exceeded for flow ID=%d", f.id)
+	}
+
 	collected.fragments = append(collected.fragments, f)
+	collected.bytes += len(f.data)
 
 	// Check whether we have all the fragments we need to do a reassembly.
 	// Do the least amount of work possible
@@ -318,17 +349,14 @@ func (c *fragmentCache) add(now time.Time, f fragment) (data []byte, more bool, 
 		}
 	}
 	if more {
-		c.collected[f.id] = collected
+		c.collected[k] = collected
 		return nil, true, nil
 	}
 
 	// Drop the fragments and do the reassembly.
-	delete(c.collected, f.id)
+	delete(c.collected, k)
 	data = collected.fragments[0].data
 	for _, f := range collected.fragments[1:] {
-		if len(data)+len(f.data) > maxReassemble {
-			return nil, false, fmt.Errorf("packet reconstruction would exceed limit ID=%d", f.id)
-		}
 		data = append(data, f.data...)
 	}
 	return data, false, nil
@@ -336,18 +364,17 @@ func (c *fragmentCache) add(now time.Time, f fragment) (data []byte, more bool, 
 
 // purge performs a cache expiry purge, removing all collected fragments
 // that expired before now.
-func (c *fragmentCache) purge(now time.Time) {
-	if c.oldest.After(now) {
+func (c *fragmentCache) maybePurge(now time.Time) {
+	delta := now.Sub(c.lastPurge)
+	if delta < fragmentHold {
 		return
 	}
-	c.oldest = now
+	c.lastPurge = now
+
 	for id, coll := range c.collected {
 		if now.After(coll.expire) {
 			delete(c.collected, id)
 			continue
-		}
-		if c.oldest.After(coll.expire) {
-			c.oldest = coll.expire
 		}
 	}
 }
@@ -357,6 +384,7 @@ type fragments struct {
 	expire    time.Time
 	fragments []fragment
 	haveFinal bool
+	bytes     int
 }
 
 // fragment is an IPv4 packet fragment.
@@ -453,7 +481,7 @@ func (d *Decoder) onICMPv6(packet *protos.Packet) {
 		d.icmpV6TypeCode.Set(flow, uint64(d.icmp6.TypeCode))
 	}
 
-	if d.icmp6Proc != nil {
+	if d.icmp6Proc != nil && len(d.icmp6.Payload) >= 4 {
 		// google/gopacket treats the first four bytes
 		// after the typo, code and checksum as part of
 		// the payload. So drop those bytes.

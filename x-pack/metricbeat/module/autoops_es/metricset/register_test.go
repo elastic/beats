@@ -26,13 +26,27 @@ import (
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
+func writeCloudConnectedResource(w http.ResponseWriter, id string, supported bool, minimumStackVersion string, validLicenses []string) error {
+	return json.NewEncoder(w).Encode(cloudConnectedResource{
+		ID: id,
+		Services: cloudConnectedServices{
+			AutoOps: cloudConnectedService{
+				Support: cloudConnectedServiceSupport{
+					Supported:           supported,
+					MinimumStackVersion: minimumStackVersion,
+					ValidLicenseTypes:   validLicenses,
+				},
+			},
+		},
+	})
+}
+
 func TestRegisterCloudConnectedCluster(t *testing.T) {
-	v := version.MustNew("8.0.0")
 	clusterInfo := &utils.ClusterInfo{
 		ClusterID:   "test-cluster-id",
 		ClusterName: "test-cluster-name",
 		Version: utils.ClusterInfoVersion{
-			Number: v,
+			Number: version.MustNew("8.0.0"),
 		},
 	}
 	lic := &license{
@@ -90,18 +104,83 @@ func TestRegisterCloudConnectedCluster(t *testing.T) {
 
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
-				_, err = w.Write([]byte(`{"id": "registered-cluster-id"}`))
-				assert.NoError(t, err)
+				assert.NoError(t, writeCloudConnectedResource(w, "registered-cluster-id", true, "123.4.5", []string{}))
 			},
 			expectError:   false,
 			expectedResID: "registered-cluster-id",
+		},
+		{
+			name:   "success with 201 created",
+			apiKey: "test-api-key-201",
+			serverHandler: func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, http.MethodPost, r.Method)
+				assert.Equal(t, "/api/v1/cloud-connected/clusters", r.URL.Path)
+				assert.Equal(t, "ApiKey test-api-key-201", r.Header.Get("Authorization"))
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				assert.NoError(t, writeCloudConnectedResource(w, "created-cluster-id", true, "123.4.5", []string{"unchecked"}))
+			},
+			expectError:   false,
+			expectedResID: "created-cluster-id",
+		},
+		{
+			name:   "success but unsupported because of minimum stack version",
+			apiKey: "test-api-key-201",
+			serverHandler: func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, http.MethodPost, r.Method)
+				assert.Equal(t, "/api/v1/cloud-connected/clusters", r.URL.Path)
+				assert.Equal(t, "ApiKey test-api-key-201", r.Header.Get("Authorization"))
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				assert.NoError(t, writeCloudConnectedResource(w, "unsupported-version", false, "9.0.0", []string{lic.Type}))
+			},
+			expectError: true,
+		},
+		{
+			name:   "success but unsupported because of license type",
+			apiKey: "test-api-key-201",
+			serverHandler: func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, http.MethodPost, r.Method)
+				assert.Equal(t, "/api/v1/cloud-connected/clusters", r.URL.Path)
+				assert.Equal(t, "ApiKey test-api-key-201", r.Header.Get("Authorization"))
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				assert.NoError(t, writeCloudConnectedResource(w, "unsupported-license", false, "9.0.0", []string{"enterprise"}))
+			},
+			expectError: true,
+		},
+		{
+			name:   "success but unsupported for unknown reason with malformed version",
+			apiKey: "test-api-key-201",
+			serverHandler: func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, http.MethodPost, r.Method)
+				assert.Equal(t, "/api/v1/cloud-connected/clusters", r.URL.Path)
+				assert.Equal(t, "ApiKey test-api-key-201", r.Header.Get("Authorization"))
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				assert.NoError(t, writeCloudConnectedResource(w, "unsupported-cluster-id", false, "xyz", []string{lic.Type}))
+			},
+			expectError: true,
+		},
+		{
+			name:   "success but unsupported for unknown reason",
+			apiKey: "test-api-key-201",
+			serverHandler: func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, http.MethodPost, r.Method)
+				assert.Equal(t, "/api/v1/cloud-connected/clusters", r.URL.Path)
+				assert.Equal(t, "ApiKey test-api-key-201", r.Header.Get("Authorization"))
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				assert.NoError(t, writeCloudConnectedResource(w, "unsupported-cluster-id", false, "7.17.0", []string{lic.Type}))
+			},
+			expectError: true,
 		},
 		{
 			name:   "api error",
 			apiKey: "test-api-key",
 			serverHandler: func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
-				_, err := w.Write([]byte(`{"error": "internal server error"}`))
+				_, err := w.Write([]byte(`{"errors":[{"code":"service_unavailable","message":"internal server error"}]`))
 				assert.NoError(t, err)
 			},
 			expectError: true,
@@ -124,21 +203,6 @@ func TestRegisterCloudConnectedCluster(t *testing.T) {
 			expectError:   true,
 		},
 		{
-			name:   "success with 201 created",
-			apiKey: "test-api-key-201",
-			serverHandler: func(w http.ResponseWriter, r *http.Request) {
-				assert.Equal(t, http.MethodPost, r.Method)
-				assert.Equal(t, "/api/v1/cloud-connected/clusters", r.URL.Path)
-				assert.Equal(t, "ApiKey test-api-key-201", r.Header.Get("Authorization"))
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusCreated)
-				_, err := w.Write([]byte(`{"id": "created-cluster-id"}`))
-				assert.NoError(t, err)
-			},
-			expectError:   false,
-			expectedResID: "created-cluster-id",
-		},
-		{
 			name:   "api error 401 unauthorized",
 			apiKey: "test-api-key-unauth",
 			serverHandler: func(w http.ResponseWriter, r *http.Request) {
@@ -150,7 +214,7 @@ func TestRegisterCloudConnectedCluster(t *testing.T) {
 			expectError: true,
 		},
 		{
-			name:   "success but missing id in response",
+			name:   "'success' but missing id in response",
 			apiKey: "test-api-key-no-id-resp",
 			serverHandler: func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
@@ -158,8 +222,7 @@ func TestRegisterCloudConnectedCluster(t *testing.T) {
 				_, err := w.Write([]byte(`{"message": "Request processed, but no specific resource ID generated"}`))
 				assert.NoError(t, err)
 			},
-			expectError:   false,
-			expectedResID: "",
+			expectError: true,
 		},
 		{
 			name:   "empty api key",
@@ -175,11 +238,9 @@ func TestRegisterCloudConnectedCluster(t *testing.T) {
 		},
 	}
 
-	t.Cleanup(utils.ClearResourceID)
-
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			utils.ClearResourceID()
+			t.Cleanup(utils.ClearResourceID)
 
 			var server *httptest.Server
 
@@ -199,6 +260,7 @@ func TestRegisterCloudConnectedCluster(t *testing.T) {
 				assert.Empty(t, utils.GetResourceID(), "Resource ID should not be set on error")
 			} else {
 				assert.NoError(t, err)
+				assert.NotEmpty(t, utils.GetResourceID(), "Resource ID should not be empty")
 				assert.Equal(t, tc.expectedResID, utils.GetResourceID(), "Resource ID mismatch")
 			}
 		})
@@ -206,7 +268,31 @@ func TestRegisterCloudConnectedCluster(t *testing.T) {
 }
 
 func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
+	t.Cleanup(utils.ClearResourceID)
+	t.Cleanup(func() {
+		checkedCloudConnectedMode = false
+	})
+
 	checkedCloudConnectedMode = true // do NOT lookup anything
+
+	noDisplayName := &clusterSettingsResponse{}
+
+	clusterSettings := func(persistent string, transient string) *clusterSettingsResponse {
+		persistentSettings := clusterSettingsDisplayName{}
+		transientSettings := clusterSettingsDisplayName{}
+
+		// even if they're blank, that matches expected behavior
+		persistentSettings.Cluster.Metadata.DisplayName = persistent
+		transientSettings.Cluster.Metadata.DisplayName = transient
+
+		return &clusterSettingsResponse{
+			Persistent: persistentSettings,
+			Transient:  transientSettings,
+		}
+	}
+
+	explicitlyBlankDisplayName := clusterSettings("", "")
+
 	clusterInfoForVersion := func(v string) *utils.ClusterInfo {
 		return &utils.ClusterInfo{
 			ClusterName: "my-cluster",
@@ -227,12 +313,14 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 	}
 
 	testCases := []struct {
-		name                  string
-		clusterInfoStatusCode int
-		clusterInfo           *utils.ClusterInfo
-		licenseStatusCode     int
-		license               *licenseWrapper
-		expectError           bool
+		name                      string
+		clusterInfoStatusCode     int
+		clusterInfo               *utils.ClusterInfo
+		clusterSettingsStatusCode int
+		clusterSettings           *clusterSettingsResponse
+		licenseStatusCode         int
+		license                   *licenseWrapper
+		expectError               bool
 	}{
 		{
 			name:        "client error no ES",
@@ -249,89 +337,182 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 			expectError:           true,
 		},
 		{
-			name:                  "failed license request",
-			clusterInfoStatusCode: 200,
-			clusterInfo:           clusterInfoForVersion("8.0.0"),
-			licenseStatusCode:     500,
-			expectError:           true,
+			name:                      "failed license request",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("8.0.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           noDisplayName,
+			licenseStatusCode:         500,
+			expectError:               true,
 		},
 		{
-			name:                  "failed license request (7.x)",
-			clusterInfoStatusCode: 200,
-			clusterInfo:           clusterInfoForVersion("7.17.0"),
-			licenseStatusCode:     500,
-			expectError:           true,
+			name:                      "failed license request (7.x)",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("7.17.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           noDisplayName,
+			licenseStatusCode:         500,
+			expectError:               true,
 		},
 		{
-			name:                  "inactive license",
-			clusterInfoStatusCode: 200,
-			clusterInfo:           clusterInfoForVersion("8.0.0"),
-			licenseStatusCode:     200,
-			license:               licenseForType("enterprise", "inactive"),
-			expectError:           true,
+			name:                      "inactive license",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("8.0.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           noDisplayName,
+			licenseStatusCode:         200,
+			license:                   licenseForType("enterprise", "inactive"),
+			expectError:               true,
 		},
 		{
-			name:                  "inactive license (7.x)",
-			clusterInfoStatusCode: 200,
-			clusterInfo:           clusterInfoForVersion("7.17.0"),
-			licenseStatusCode:     200,
-			license:               licenseForType("enterprise", "inactive"),
-			expectError:           true,
+			name:                      "inactive license (7.x)",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("7.17.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           noDisplayName,
+			licenseStatusCode:         200,
+			license:                   licenseForType("enterprise", "inactive"),
+			expectError:               true,
 		},
 		{
-			name:                  "unsupported license",
-			clusterInfoStatusCode: 200,
-			clusterInfo:           clusterInfoForVersion("8.0.0"),
-			licenseStatusCode:     200,
-			license:               licenseForType("basic", "active"),
-			expectError:           true,
+			name:                      "success for basic license",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("8.0.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           noDisplayName,
+			licenseStatusCode:         200,
+			license:                   licenseForType("basic", "active"),
+			expectError:               false,
 		},
 		{
-			name:                  "unsupported license (7.x)",
-			clusterInfoStatusCode: 200,
-			clusterInfo:           clusterInfoForVersion("7.17.0"),
-			licenseStatusCode:     200,
-			license:               licenseForType("basic", "active"),
-			expectError:           true,
+			name:                      "success for basic license (7.x)",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("7.17.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           noDisplayName,
+			licenseStatusCode:         200,
+			license:                   licenseForType("basic", "active"),
+			expectError:               false,
 		},
 		{
-			name:                  "success for enterprise",
-			clusterInfoStatusCode: 200,
-			clusterInfo:           clusterInfoForVersion("8.0.0"),
-			licenseStatusCode:     200,
-			license:               licenseForType("enterprise", "active"),
-			expectError:           false,
+			name:                      "success for platinum license",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("8.0.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           noDisplayName,
+			licenseStatusCode:         200,
+			license:                   licenseForType("basic", "active"),
+			expectError:               false,
 		},
 		{
-			name:                  "success for trial",
-			clusterInfoStatusCode: 200,
-			clusterInfo:           clusterInfoForVersion("8.0.0"),
-			licenseStatusCode:     200,
-			license:               licenseForType("trial", "active"),
-			expectError:           false,
+			name:                      "success for platinum license (7.x)",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("7.17.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           noDisplayName,
+			licenseStatusCode:         200,
+			license:                   licenseForType("basic", "active"),
+			expectError:               false,
 		},
 		{
-			name:                  "success for enterprise (7.x)",
-			clusterInfoStatusCode: 200,
-			clusterInfo:           clusterInfoForVersion("7.17.0"),
-			licenseStatusCode:     200,
-			license:               licenseForType("enterprise", "active"),
-			expectError:           false,
+			name:                      "success for enterprise",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("8.0.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           explicitlyBlankDisplayName,
+			licenseStatusCode:         200,
+			license:                   licenseForType("enterprise", "active"),
+			expectError:               false,
 		},
 		{
-			name:                  "success for trial (7.x)",
-			clusterInfoStatusCode: 200,
-			clusterInfo:           clusterInfoForVersion("7.17.0"),
-			licenseStatusCode:     200,
-			license:               licenseForType("trial", "active"),
-			expectError:           false,
+			name:                      "success for trial",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("8.0.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           noDisplayName,
+			licenseStatusCode:         200,
+			license:                   licenseForType("trial", "active"),
+			expectError:               false,
+		},
+		{
+			name:                      "success for enterprise (7.x)",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("7.17.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           explicitlyBlankDisplayName,
+			licenseStatusCode:         200,
+			license:                   licenseForType("enterprise", "active"),
+			expectError:               false,
+		},
+		{
+			name:                      "success for trial (7.x)",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("7.17.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           noDisplayName,
+			licenseStatusCode:         200,
+			license:                   licenseForType("trial", "active"),
+			expectError:               false,
+		},
+		{
+			name:                      "success with custom persistent display name",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("9.0.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           clusterSettings("custom-persistent", ""),
+			licenseStatusCode:         200,
+			license:                   licenseForType("trial", "active"),
+			expectError:               false,
+		},
+		{
+			name:                      "success with custom transient display name",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("9.1.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           clusterSettings("", "custom-transient"),
+			licenseStatusCode:         200,
+			license:                   licenseForType("trial", "active"),
+			expectError:               false,
+		},
+		{
+			name:                      "success with custom persistent and transient display name",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("9.2.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           clusterSettings("custom-persistent", "custom-transient"),
+			licenseStatusCode:         200,
+			license:                   licenseForType("trial", "active"),
+			expectError:               false,
+		},
+		{
+			name:                      "success with blank persistent and transient display name",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("9.2.0"),
+			clusterSettingsStatusCode: 200,
+			clusterSettings:           clusterSettings("", ""),
+			licenseStatusCode:         200,
+			license:                   licenseForType("trial", "active"),
+			expectError:               false,
+		},
+		{
+			name:                      "success with display name failure (4xx)",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("9.0.0"),
+			clusterSettingsStatusCode: 401, // fail to get settings because of auth error
+			licenseStatusCode:         200,
+			license:                   licenseForType("trial", "active"),
+			expectError:               false,
+		},
+		{
+			name:                      "success with display name failure (5xx)",
+			clusterInfoStatusCode:     200,
+			clusterInfo:               clusterInfoForVersion("9.0.0"),
+			clusterSettingsStatusCode: 500, // unknown server error
+			licenseStatusCode:         200,
+			license:                   licenseForType("trial", "active"),
+			expectError:               false,
 		},
 	}
-
-	t.Cleanup(utils.ClearResourceID)
-	t.Cleanup(func() {
-		checkedCloudConnectedMode = false
-	})
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -349,6 +530,20 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 						w.Header().Set("Content-Type", "application/json")
 						if tc.clusterInfo != nil {
 							fmt.Fprintf(w, `{"cluster_name": "%s", "cluster_uuid": "%s", "version": { "number": "%s" }}`, tc.clusterInfo.ClusterName, tc.clusterInfo.ClusterID, tc.clusterInfo.Version.Number)
+						}
+					case clusterSettingsPath: // Cluster Settings
+						w.WriteHeader(tc.clusterSettingsStatusCode)
+						w.Header().Set("Content-Type", "application/json")
+
+						if tc.clusterSettings != nil {
+							if tc.clusterSettings == noDisplayName {
+								// write empty object that behaves like if these values are truly unset
+								_, err := w.Write([]byte(`{}`))
+								assert.NoError(t, err)
+							} else {
+								err := json.NewEncoder(w).Encode(tc.clusterSettings)
+								assert.NoError(t, err)
+							}
 						}
 					case licensePath: // License for non-7.x versions
 						if tc.clusterInfo == nil || tc.clusterInfo.Version.Number.Major == 7 {
@@ -384,7 +579,9 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 			ccmServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				defer r.Body.Close()
 
-				if _, err := io.ReadAll(r.Body); err != nil {
+				var cloudConnectedCluster cloudConnectedCluster
+
+				if err := json.NewDecoder(r.Body).Decode(&cloudConnectedCluster); err != nil {
 					http.Error(w, "cannot read body", http.StatusInternalServerError)
 					return
 				}
@@ -393,10 +590,26 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 				assert.Equal(t, "/api/v1/cloud-connected/clusters", r.URL.Path)
 				assert.Equal(t, "ApiKey test-api-key", r.Header.Get("Authorization"))
 
+				expectedName := "my-cluster" // default unless overridden by settings
+
+				if tc.clusterSettings != nil {
+					if tc.clusterSettings.Transient.Cluster.Metadata.DisplayName != "" {
+						expectedName = tc.clusterSettings.Transient.Cluster.Metadata.DisplayName
+					} else if tc.clusterSettings.Persistent.Cluster.Metadata.DisplayName != "" {
+						expectedName = tc.clusterSettings.Persistent.Cluster.Metadata.DisplayName
+					}
+				}
+
+				assert.Equal(t, expectedName, cloudConnectedCluster.Cluster.Name)
+				assert.Equal(t, "id123", cloudConnectedCluster.Cluster.ID)
+				assert.Equal(t, tc.clusterInfo.Version.Number.String(), cloudConnectedCluster.Cluster.Version)
+				assert.Equal(t, "id456", cloudConnectedCluster.License.UID)
+				assert.Equal(t, tc.license.License.Type, cloudConnectedCluster.License.Type)
+
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
 
-				_, err := w.Write([]byte(`{"id": "registered-cluster-id"}`))
+				_, err := w.Write([]byte(`{"id": "registered-cluster-id", "services": {"auto_ops": {"support": {"supported": true}}}}`))
 				assert.NoError(t, err)
 			}))
 

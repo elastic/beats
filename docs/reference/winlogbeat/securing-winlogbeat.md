@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/securing-winlogbeat.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Secure Winlogbeat [securing-winlogbeat]

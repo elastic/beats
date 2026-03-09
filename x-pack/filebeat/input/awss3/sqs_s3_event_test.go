@@ -282,6 +282,30 @@ func TestSqsProcessor_getS3Notifications(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, 0, len(events))
 	})
+
+	t.Run("s3:TestEvent messages are skipped", func(t *testing.T) {
+		testEventMsg := `{
+			"Service":"Amazon S3",
+			"Event":"s3:TestEvent",
+			"Time":"2014-10-13T15:57:02.089Z",
+			"Bucket":"amzn-s3-demo-bucket",
+			"RequestId":"5582815E1AEA5ADF",
+			"HostId":"8cLeGAmw098X5cv4Zkwcmo8vvZa3eH3eKxsPzbB9wrR+YstdA6Knx4Ip8EXAMPLE"
+		}`
+		events, err := p.getS3Notifications(testEventMsg)
+		require.NoError(t, err)
+		assert.Equal(t, 0, len(events), "Test events should be skipped and return no events")
+	})
+
+	t.Run("s3:TestEvent messages via SNS are skipped", func(t *testing.T) {
+		testEventViaSNS := `{
+			"TopicArn":"arn:aws:sns:us-east-1:123456789012:test-topic",
+			"Message":"{\"Service\":\"Amazon S3\",\"Event\":\"s3:TestEvent\",\"Time\":\"2014-10-13T15:57:02.089Z\",\"Bucket\":\"amzn-s3-demo-bucket\",\"RequestId\":\"5582815E1AEA5ADF\",\"HostId\":\"8cLeGAmw098X5cv4Zkwcmo8vvZa3eH3eKxsPzbB9wrR+YstdA6Knx4Ip8EXAMPLE\"}"
+		}`
+		events, err := p.getS3Notifications(testEventViaSNS)
+		require.NoError(t, err)
+		assert.Equal(t, 0, len(events), "Test events via SNS should be skipped and return no events")
+	})
 }
 
 func TestNonRecoverableError(t *testing.T) {

@@ -1,9 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-cef.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Decode CEF processor fields fields [exported-fields-cef]
 
@@ -932,7 +935,7 @@ Collection of key-value pairs carried in the CEF extension field.
 
 
 **`cef.extensions.sourceHostName`**
-:   Identifies the source that an event refers to in an IP network. The format should be a fully qualified domain name (FQDN) associated with the source node, when a mode is available. Examples: 'host' or 'host.domain.com'.
+:   Identifies the source that an event refers to in an IP network. The format should be a fully qualified domain name (FQDN) associated with the source node, when a mode is available. Examples: 'host' or 'host.example.com'.
 
     type: keyword
 

@@ -239,7 +239,10 @@ func newField(id int, rawKey string, previous delimiter) (field, error) {
 		return newSkipField(id), nil
 	}
 
-	key, dataType, ordinal, length, greedy := extractKeyParts(rawKey)
+	key, dataType, ordinal, length, greedy, err := extractKeyParts(rawKey)
+	if err != nil {
+		return nil, err
+	}
 
 	// rawKey will have | as suffix when data type is missing
 	if strings.HasSuffix(rawKey, dataTypeIndicator) {
@@ -331,8 +334,13 @@ func newNormalField(id int, key string, dataType string, ordinal int, length int
 	}
 }
 
-func extractKeyParts(rawKey string) (key string, dataType string, ordinal int, length int, greedy bool) {
+func extractKeyParts(rawKey string) (key string, dataType string, ordinal int, length int, greedy bool, err error) {
 	m := suffixRE.FindAllStringSubmatch(rawKey, -1)
+
+	// check if we have at least one match otherwise the field is invalid.
+	if len(m) == 0 {
+		return "", "", 0, 0, false, errInvalidFieldName
+	}
 
 	if m[0][3] != "" {
 		ordinal, _ = strconv.Atoi(m[0][3])
@@ -348,5 +356,5 @@ func extractKeyParts(rawKey string) (key string, dataType string, ordinal int, l
 
 	dataType = m[0][8]
 
-	return m[0][1], dataType, ordinal, length, greedy
+	return m[0][1], dataType, ordinal, length, greedy, nil
 }

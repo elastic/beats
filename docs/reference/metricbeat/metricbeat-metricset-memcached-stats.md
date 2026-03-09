@@ -1,9 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-memcached-stats.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Memcached stats metricset [metricbeat-metricset-memcached-stats]
 

@@ -24,6 +24,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -35,6 +36,8 @@ import (
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
+
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
 // test_close_renamed from test_harvester.py
@@ -327,7 +330,7 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 	env.waitUntilInputStops()
 
 	messages := env.getOutputMessages()
-	require.Equal(t, messages[0], "#Software: Microsoft Exchange Server")
+	require.Equal(t, "#Software: Microsoft Exchange Server", messages[0])
 }
 
 // test_boms from test_harvester.py
@@ -620,16 +623,16 @@ func TestFilestreamTruncatedFileOpen(t *testing.T) {
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
-	env.mustTruncateFile(testlogName, 0)
+	env.mustTruncateFile(testlogName, 5)
 	time.Sleep(5 * time.Millisecond)
 
 	truncatedTestLines := []byte("truncated first line\n")
-	env.mustWriteToFile(testlogName, truncatedTestLines)
+	env.mustAppendToFile(testlogName, truncatedTestLines)
 	env.waitUntilEventCount(4)
 
 	cancelInput()
 	env.waitUntilInputStops()
-	env.requireOffsetInRegistry(testlogName, id, len(truncatedTestLines))
+	env.requireOffsetInRegistry(testlogName, id, 5+len(truncatedTestLines))
 }
 
 // test_truncated_file_closed from test_harvester.py
@@ -705,14 +708,14 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 
 	// remove symlink
 	env.mustRemoveFile(symlinkName)
-	env.mustTruncateFile(testlogName, 0)
+	env.mustTruncateFile(testlogName, 5)
 	env.waitUntilOffsetInRegistry(testlogName, id, 0, 10*time.Second)
 
 	moreLines := []byte("forth line\nfifth line\n")
-	env.mustWriteToFile(testlogName, moreLines)
+	env.mustAppendToFile(testlogName, moreLines)
 
 	env.waitUntilEventCount(5)
-	env.requireOffsetInRegistry(testlogName, id, len(moreLines))
+	env.requireOffsetInRegistry(testlogName, id, 5+len(moreLines))
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -777,7 +780,7 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
-	env.mustTruncateFile(testlogName, 0)
+	env.mustTruncateFile(testlogName, 5)
 
 	env.waitUntilOffsetInRegistry(testlogName, id, 0, 10*time.Second)
 
@@ -818,7 +821,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	// so it can interfere with the truncation of the file
 	env.mustAppendToFile(testlogName, []byte("third line\n"))
 
-	env.mustTruncateFile(testlogName, 0)
+	env.mustTruncateFile(testlogName, 5)
 
 	env.waitUntilOffsetInRegistry(testlogName, id, 0, 10*time.Second)
 
@@ -828,10 +831,10 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	env.pipeline.invertBlocking()
 
 	truncatedTestLines := []byte("truncated line\n")
-	env.mustWriteToFile(testlogName, truncatedTestLines)
+	env.mustAppendToFile(testlogName, truncatedTestLines)
 
 	env.waitUntilEventCount(3)
-	env.waitUntilOffsetInRegistry(testlogName, id, len(truncatedTestLines), 10*time.Second)
+	env.waitUntilOffsetInRegistry(testlogName, id, 5+len(truncatedTestLines), 10*time.Second)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -1002,16 +1005,16 @@ func TestFilestreamTruncate(t *testing.T) {
 
 	// remove symlink
 	env.mustRemoveFile(symlinkName)
-	env.mustTruncateFile(testlogName, 0)
+	env.mustTruncateFile(testlogName, 5)
 	env.waitUntilOffsetInRegistry(testlogName, id, 0, 10*time.Second)
 
 	// recreate symlink
 	env.mustSymlink(testlogName, symlinkName)
 
 	moreLines := []byte("forth line\nfifth line\n")
-	env.mustWriteToFile(testlogName, moreLines)
+	env.mustAppendToFile(testlogName, moreLines)
 
-	env.waitUntilOffsetInRegistry(testlogName, id, len(moreLines), 10*time.Second)
+	env.waitUntilOffsetInRegistry(testlogName, id, 5+len(moreLines), 10*time.Second)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -1160,4 +1163,96 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 
 	cancelInput()
 	env.waitUntilInputStops()
+}
+
+func TestDataAddedAfterCloseInactive(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	logFilePath := filepath.Join(env.t.TempDir(), "log.log")
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("log file path: %s", logFilePath)
+		}
+	})
+
+	// Escape windows path separator
+	logFilePathStr := strings.ReplaceAll(logFilePath, `\`, `\\`)
+
+	integration.WriteLogFile(t, logFilePath, 50, false)
+
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	// The duration used to configure the input need to obey
+	// the following restrictions:
+	//  - Backoff needs to be longer than the prospector and close check
+	//    interval, as well as the inactive timeout so we can have a
+	//    a harvester failing to start because there is one blocked on
+	//    its backoff.
+	//  - Close check interval needs to be smaller than the prospector
+	//    check interval
+	//  - Inactive timeout needs to me as small as possible so the reader
+	//    context is closed due to inactivity while the reader is waiting
+	//    on its backoff.
+	inp := env.mustCreateInput(map[string]any{
+		"id": id,
+		"paths": []string{
+			logFilePath,
+		},
+		"prospector.scanner.check_interval":    "2s",
+		"close.on_state_change.check_interval": "1s",
+		"close.on_state_change.inactive":       "1s",
+		"backoff.init":                         "3s",
+		"backoff.max":                          "3s",
+	})
+
+	env.startInput(t.Context(), id, inp)
+	// File has been fully read
+	env.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePathStr),
+		1*time.Second)
+
+	// File is inactive, the reader context will be cancelled
+	env.WaitLogsContains(
+		fmt.Sprintf("'%s' is inactive", logFilePathStr),
+		5*time.Second,
+		"missing 'file is inactive' logs")
+
+	// Add more data to the file while the reader is blocked
+	// on its backoff and its context has been cancelled.
+	integration.WriteLogFile(t, logFilePath, 5, true)
+
+	// Ensure the FileWatcher detected the new data and sent a write event
+	env.WaitLogsContains(
+		fmt.Sprintf("File %s has been updated", logFilePathStr),
+		3*time.Second)
+
+	// Ensure the write event did not start a new harvester
+	env.WaitLogsContains("Harvester already running", 2*time.Second)
+
+	// Wait for the harvester to close
+	env.WaitLogsContains("Stopped harvester for file", 2*time.Second)
+
+	// Wait for a new scan from the fileWatcher
+	env.WaitLogsContains("Start next scan", 2*time.Second)
+
+	// Ensure it got notified when the harvester closed and the offset
+	// is correct
+	env.WaitLogsContains(
+		"Updating previous state because harvester was closed.",
+		1*time.Second)
+
+	// Ensure the fileWatcher sent an write event
+	env.WaitLogsContains(
+		fmt.Sprintf("File %s has been updated", logFilePathStr),
+		1*time.Second)
+
+	// Wait for a new harvester to start
+	env.WaitLogsContains("Starting harvester for file", 1*time.Second)
+
+	// Wait for EOF to be reached
+	env.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePathStr),
+		2*time.Second)
+
+	// Ensure all events have been ingested
+	env.waitUntilEventCount(55)
 }

@@ -1,9 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-kafka.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See filebeat/scripts/mage/docs.go
 
 # Kafka module [filebeat-module-kafka]
 

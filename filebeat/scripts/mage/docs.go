@@ -18,26 +18,123 @@
 package mage
 
 import (
-	"github.com/magefile/mage/sh"
+	"fmt"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
-// CollectDocs executes the Filebeat docs_collector script to collect/generate
-// documentation from each module.
+// CollectDocs collects and generates documentation from each filebeat module.
+// Replaces filebeat/scripts/docs_collector.py.
 func CollectDocs() error {
-	ve, err := devtools.PythonVirtualenv(false)
+	ossModules, err := filepath.Glob(devtools.OSSBeatDir("module", "*"))
+	if err != nil {
+		return fmt.Errorf("failed to glob OSS modules: %w", err)
+	}
+	xpackModules, err := filepath.Glob(devtools.XPackBeatDir("module", "*"))
+	if err != nil {
+		return fmt.Errorf("failed to glob x-pack modules: %w", err)
+	}
+
+	allModules := make([]string, 0, len(ossModules)+len(xpackModules))
+	allModules = append(allModules, ossModules...)
+	allModules = append(allModules, xpackModules...)
+	sort.Strings(allModules)
+
+	docsDir, err := devtools.DocsDir()
 	if err != nil {
 		return err
 	}
+	outputDir := filepath.Join(docsDir, "reference", "filebeat")
 
-	python, err := devtools.LookVirtualenvPath(ve, "python")
-	if err != nil {
-		return err
+	type moduleInfo struct {
+		title     string
+		appliesTo string
+	}
+	modulesList := make(map[string]moduleInfo)
+
+	for _, modPath := range allModules {
+		modName := filepath.Base(modPath)
+		moduleDoc := filepath.Join(modPath, "_meta", "docs.md")
+
+		if _, err := os.Stat(moduleDoc); os.IsNotExist(err) {
+			continue
+		}
+
+		fieldsPath := filepath.Join(modPath, "_meta", "fields.yml")
+		title, appliesTo, err := devtools.LoadModuleMeta(fieldsPath)
+		if err != nil {
+			return fmt.Errorf("module %s: %w", modName, err)
+		}
+
+		docContent, err := os.ReadFile(moduleDoc)
+		if err != nil {
+			return fmt.Errorf("failed to read %s: %w", moduleDoc, err)
+		}
+
+		var b strings.Builder
+
+		fmt.Fprintf(&b, "---\nmapped_pages:\n  - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-%s.html\n", modName)
+		if appliesTo != "" {
+			fmt.Fprintf(&b, "applies_to:\n  stack: %s\n  serverless: %s\n",
+				appliesTo, devtools.GetServerlessLifecycleFromString(appliesTo))
+		}
+		fmt.Fprint(&b, "---\n\n")
+		fmt.Fprint(&b, "% This file is generated! See filebeat/scripts/mage/docs.go\n\n")
+		fmt.Fprintf(&b, "# %s module [filebeat-module-%s]\n\n", title, modName)
+		b.Write(docContent)
+		fmt.Fprintf(&b, "\n## Fields [_fields]\n\nFor a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-%s.md) section.\n", modName)
+
+		outPath := filepath.Join(outputDir, fmt.Sprintf("filebeat-module-%s.md", modName))
+		if err := os.WriteFile(outPath, []byte(b.String()), 0o644); err != nil {
+			return fmt.Errorf("failed to write %s: %w", outPath, err)
+		}
+
+		modulesList[modName] = moduleInfo{title: title, appliesTo: appliesTo}
 	}
 
-	// TODO: Port this script to Go.
-	return sh.Run(python,
-		devtools.OSSBeatDir("scripts/docs_collector.py"),
-		"--beat", devtools.BeatName)
+	var listB strings.Builder
+	listB.WriteString(`---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
+applies_to:
+  stack: ga
+  serverless: ga
+---
+
+# Modules [filebeat-modules]
+
+This section contains an [overview](/reference/filebeat/filebeat-modules-overview.md) of the Filebeat modules feature as well as details about each of the currently supported modules.
+
+Filebeat modules require Elasticsearch 5.2 or later.
+
+::::{note}
+While {{filebeat}} modules are still supported, we recommend {{agent}} integrations over {{filebeat}} modules. Integrations provide a streamlined way to connect data from a variety of vendors to the {{stack}}. Refer to the [full list of integrations](https://www.elastic.co/integrations/data-integrations). For more information, please refer to the [{{beats}} vs {{agent}} comparison documentation](docs-content://reference/fleet/index.md).
+::::
+
+
+* [*Modules overview*](/reference/filebeat/filebeat-modules-overview.md)
+`)
+
+	sortedModules := make([]string, 0, len(modulesList))
+	for name := range modulesList {
+		sortedModules = append(sortedModules, name)
+	}
+	sort.Strings(sortedModules)
+
+	for _, m := range sortedModules {
+		info := modulesList[m]
+		fmt.Fprintf(&listB, "* [*%s module*](/reference/filebeat/filebeat-module-%s.md)", info.title, m)
+		if info.appliesTo != "" && info.appliesTo != "ga" {
+			fmt.Fprintf(&listB, " {applies_to}`stack: %s`", info.appliesTo)
+		}
+		listB.WriteString("\n")
+	}
+	listB.WriteString("\n")
+
+	listPath := filepath.Join(outputDir, "filebeat-modules.md")
+	return os.WriteFile(listPath, []byte(listB.String()), 0o644)
 }

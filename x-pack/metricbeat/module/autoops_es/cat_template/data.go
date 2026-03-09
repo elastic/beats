@@ -67,6 +67,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 
 	if err != nil {
 		events.LogAndSendErrorEvent(err, info, r, CatTemplateMetricSet, CatTemplatePath, transactionId)
+		return nil
 	}
 
 	return nil

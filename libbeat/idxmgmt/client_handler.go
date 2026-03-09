@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/template"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
@@ -59,12 +60,12 @@ func NewClientHandler(ilm lifecycle.ClientHandler, template template.Loader) Cli
 
 // NewESClientHandler returns a new ESLoader instance,
 // initialized with an ilm and template client handler based on the passed in client.
-func NewESClientHandler(client ESClient, info beat.Info, cfg lifecycle.RawConfig) (ClientHandler, error) {
+func NewESClientHandler(client ESClient, info beat.Info, beatPaths *paths.Path, cfg lifecycle.RawConfig) (ClientHandler, error) {
 	esHandler, err := lifecycle.NewESClientHandler(client, info, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("error creating ES handler: %w", err)
 	}
-	loader, err := template.NewESLoader(client, esHandler, info.Logger)
+	loader, err := template.NewESLoader(client, esHandler, info.Logger, beatPaths)
 	if err != nil {
 		return nil, fmt.Errorf("error creating ES loader: %w", err)
 	}
@@ -73,10 +74,10 @@ func NewESClientHandler(client ESClient, info beat.Info, cfg lifecycle.RawConfig
 
 // NewFileClientHandler returns a new ESLoader instance,
 // initialized with an ilm and template client handler based on the passed in client.
-func NewFileClientHandler(client FileClient, info beat.Info, cfg lifecycle.RawConfig) (ClientHandler, error) {
+func NewFileClientHandler(client FileClient, info beat.Info, beatPaths *paths.Path, cfg lifecycle.RawConfig) (ClientHandler, error) {
 	mgmt, err := lifecycle.NewFileClientHandler(client, info, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("error creating client handler: %w", err)
 	}
-	return NewClientHandler(mgmt, template.NewFileLoader(client, mgmt.Mode() == lifecycle.DSL, info.Logger)), nil
+	return NewClientHandler(mgmt, template.NewFileLoader(client, mgmt.Mode() == lifecycle.DSL, info.Logger, beatPaths)), nil
 }

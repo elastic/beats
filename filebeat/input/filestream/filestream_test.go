@@ -72,8 +72,8 @@ func TestLogFileTimedClosing(t *testing.T) {
 
 	for _, tc := range testCases {
 		fs := filestream{
-			readerConfig:     readerConfig{BufferSize: 512},
-			gzipExperimental: true}
+			readerConfig: readerConfig{BufferSize: 512},
+			compression:  CompressionAuto}
 		f, err := fs.newFile(tc.createFile(t))
 		require.NoError(t, err,
 			"could not create file for reading")
@@ -151,8 +151,8 @@ func TestLogFileTruncated(t *testing.T) {
 			osFile := tc.createFile(t)
 
 			fs := filestream{
-				readerConfig:     readerConfig{BufferSize: 512},
-				gzipExperimental: true}
+				readerConfig: readerConfig{BufferSize: 512},
+				compression:  CompressionAuto}
 
 			f, err := fs.newFile(osFile)
 			require.NoError(t, err, "could not create file for reading")
@@ -166,7 +166,7 @@ func TestLogFileTruncated(t *testing.T) {
 
 			buf := make([]byte, 32)
 			_, err = reader.Read(buf)
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 
 			err = tc.truncateFn(t, f)
 			require.NoError(t, err, "error while truncating file")

@@ -63,7 +63,7 @@ type StoreUpdater interface {
 	// TakeOver takes over states from other inputs. This allows a Filestream
 	// input to take over states from the Log input or other Filestream
 	// inputs with different IDs.
-	TakeOver(func(v Value) (string, any))
+	TakeOver(func(v TakeOverState) (string, any))
 }
 
 // Value contains the cursor metadata.

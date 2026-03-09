@@ -20,8 +20,10 @@ package auditd
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -29,7 +31,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -629,13 +630,13 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	normalizeEventFields(auditEvent, out.RootFields)
 
 	// User set for related.user
-	var userSet common.StringSet
+	var userSet map[string]struct{}
 	if config.ResolveIDs {
-		userSet = make(common.StringSet)
+		userSet = make(map[string]struct{})
 	}
 
 	// Copy user.*/group.* fields from event
-	setECSEntity := func(key string, ent aucoalesce.ECSEntityData, root mapstr.M, set common.StringSet) {
+	setECSEntity := func(key string, ent aucoalesce.ECSEntityData, root mapstr.M, set map[string]struct{}) {
 		if ent.ID == "" && ent.Name == "" {
 			return
 		}
@@ -652,7 +653,7 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 		if ent.Name != "" {
 			_, _ = root.Put(nameField, ent.Name)
 			if set != nil {
-				set.Add(ent.Name)
+				set[ent.Name] = struct{}{}
 			}
 		} else {
 			_ = root.Delete(nameField)
@@ -665,10 +666,9 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	setECSEntity("user.changes", auditEvent.ECS.User.Changes, out.RootFields, userSet)
 	setECSEntity("group", auditEvent.ECS.Group, out.RootFields, nil)
 
-	if userSet != nil {
-		if userSet.Count() != 0 {
-			_, _ = out.RootFields.Put("related.user", userSet.ToSlice())
-		}
+	if len(userSet) != 0 {
+		relatedUser := slices.Compact(slices.Sorted(maps.Keys(userSet)))
+		_, _ = out.RootFields.Put("related.user", relatedUser)
 	}
 	getStringField := func(key string, m mapstr.M) (str string) {
 		if asIf, _ := m.GetValue(key); asIf != nil {

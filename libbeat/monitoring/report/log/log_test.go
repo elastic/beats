@@ -21,13 +21,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -63,7 +60,7 @@ var (
 // Smoke test.
 func TestStartStop(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-	r, err := MakeReporter(beat.Info{Logger: logger}, conf.NewConfig())
+	r, err := MakeReporter(beat.Info{Logger: logger}, conf.NewConfig(), beatmonitoring.NewGlobalMonitoring())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,19 +71,17 @@ func TestMakeDeltaSnapshot(t *testing.T) {
 	delta := makeDeltaSnapshot(prevSnap, curSnap)
 	assert.EqualValues(t, 10, delta.Ints["count"])
 	assert.EqualValues(t, 1, delta.Ints["new"])
-	assert.EqualValues(t, 1.2, delta.Floats["system.load.1"])
-	assert.EqualValues(t, 2, delta.Floats["float_counter"])
+	assert.InDelta(t, 1.2, delta.Floats["system.load.1"], 0.001)
+	assert.InDelta(t, 2, delta.Floats["float_counter"], 0.001)
 	assert.EqualValues(t, 5, delta.Ints["active_gauge"])
-	assert.EqualValues(t, 4.1, delta.Floats["foo.histogram.p99"])
+	assert.InDelta(t, 4.1, delta.Floats["foo.histogram.p99"], 0.001)
 	assert.NotContains(t, delta.Ints, "gone")
 }
 
 func TestReporterLog(t *testing.T) {
-	observed, zapLogs := observer.New(zapcore.DebugLevel)
-	logger, err := logp.ConfigureWithCoreLocal(logp.Config{}, observed)
-	require.NoError(t, err)
+	logger, zapLogs := logptest.NewTestingLoggerWithObserver(t, "")
 
-	reporter := reporter{config: defaultConfig(), logger: logger.Named("monitoring")}
+	reporter := Reporter{config: defaultConfig(), logger: logger.Named("monitoring")}
 
 	reporter.logSnapshot(map[string]monitoring.FlatSnapshot{})
 	logs := zapLogs.TakeAll()
@@ -96,7 +91,7 @@ func TestReporterLog(t *testing.T) {
 
 	reporter.logSnapshot(
 		map[string]monitoring.FlatSnapshot{
-			"metrics": monitoring.FlatSnapshot{
+			"metrics": {
 				Bools: map[string]bool{
 					"running": true,
 				},
@@ -119,11 +114,11 @@ func TestReporterLog(t *testing.T) {
 	}
 }
 
-func assertMapHas(t *testing.T, m map[string]interface{}, key string, expectedValue interface{}) {
+func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any) {
 	t.Helper()
 	v, err := mapstr.M(m).GetValue(key)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.EqualValues(t, expectedValue, v)
+	assert.EqualValues(t, expectedValue, v) //nolint:testifylint // we don't care if types are different
 }

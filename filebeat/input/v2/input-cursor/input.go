@@ -143,10 +143,10 @@ func (inp *managedInput) Run(
 				Name:            ctx.Name,
 				Agent:           ctx.Agent,
 				Cancelation:     ctx.Cancelation,
-				StatusReporter:  ctx.StatusReporter,
 				MetricsRegistry: reg,
 				Logger:          log,
 			}
+			inpCtx = inpCtx.WithStatusReporter(ctx)
 
 			if err = inp.runSource(inpCtx, inp.manager.store, source, pc); err != nil {
 				cancel()
@@ -224,6 +224,7 @@ func newInputACKHandler(log *logp.Logger) beat.EventListener {
 		if n == 0 {
 			return
 		}
+		//nolint:errcheck // We know it will always work
 		private[last].(*updateOp).Execute(n)
 	})
 }

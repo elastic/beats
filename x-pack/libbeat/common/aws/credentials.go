@@ -52,6 +52,10 @@ type ConfigAWS struct {
 	// AssumeRoleExpiryWindow will allow the credentials to trigger refreshing prior to the credentials
 	// actually expiring. If expiry_window is less than or equal to zero, the setting is ignored.
 	AssumeRoleExpiryWindow time.Duration `config:"assume_role.expiry_window"`
+
+	// UseCloudConnectors indicates whether the cloud connectors flow is used.
+	// If this is true, the InitializeAWSConfig should initialize the AWS cloud connector role chaining flow.
+	UseCloudConnectors bool `config:"use_cloud_connectors"`
 }
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
@@ -66,8 +70,17 @@ func InitializeAWSConfig(beatsConfig ConfigAWS, logger *logp.Logger) (awssdk.Con
 	}
 
 	// Assume IAM role if iam_role config parameter is given
-	if beatsConfig.RoleArn != "" {
+	if beatsConfig.RoleArn != "" && !beatsConfig.UseCloudConnectors {
 		addAssumeRoleProviderToAwsConfig(beatsConfig, &awsConfig, logger)
+	}
+
+	// If cloud connectors method is selected from config, initialize the role chaining.
+	if beatsConfig.UseCloudConnectors {
+		cloudConnectorsConfig, err := parseCloudConnectorsConfigFromEnv()
+		if err != nil {
+			return awsConfig, err
+		}
+		addCloudConnectorsCredentials(beatsConfig, cloudConnectorsConfig, &awsConfig, logger)
 	}
 
 	var proxy func(*http.Request) (*url.URL, error)
@@ -142,7 +155,11 @@ func getConfigSharedCredentialProfile(beatsConfig ConfigAWS, logger *logp.Logger
 		return cfg, fmt.Errorf("awsConfig.LoadDefaultConfig failed with shared credential profile given: [%w]", err)
 	}
 
-	logger.Debug("Using shared credential profile for AWS credential")
+	if beatsConfig.ProfileName != "" || beatsConfig.SharedCredentialFile != "" {
+		logger.Debug("Using shared credential profile for AWS credential")
+	} else {
+		logger.Debug("Using default config for AWS")
+	}
 	return cfg, nil
 }
 

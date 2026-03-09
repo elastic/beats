@@ -19,12 +19,9 @@ package actions
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
-
-	"errors"
-
-	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 
@@ -110,7 +107,7 @@ func (f *dropFields) Run(event *beat.Event) (*beat.Event, error) {
 		}
 	}
 
-	return event, multierr.Combine(errs...)
+	return event, errors.Join(errs...)
 }
 
 func (f *dropFields) deleteField(event *beat.Event, field string, errs *[]error) {

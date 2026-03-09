@@ -64,6 +64,9 @@ func TestFetchEventContents(t *testing.T) {
 			"count": 3,
 			"names": []string{"VM Network", "DVS0-DVUplinks-8", "DC0_DVPG0"},
 		},
+		"resourcepool": mapstr.M{
+			"id": "resgroup-27",
+		},
 	}
 
 	assert.Exactly(t, testEvent, event)

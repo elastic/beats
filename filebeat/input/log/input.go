@@ -37,12 +37,17 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
+
+// The Log input does not define an init function, nor registers itself
+// because the 'logv2' input already does it using 'log' as the input Name.
+// 'logv2' is a "proxy input" that can run either the Log input of Filestream
+// input depending on configuration and feature flag.
 
 const (
 	recursiveGlobDepth      = 8
@@ -59,13 +64,6 @@ var (
 
 	errDeprecated = errors.New("Log input is deprecated. Use Filestream input instead. Follow our migration guide https://www.elastic.co/guide/en/beats/filebeat/current/migrate-to-filestream.html")
 )
-
-func init() {
-	err := input.Register("log", NewInput)
-	if err != nil {
-		panic(err)
-	}
-}
 
 // Input contains the input and its config
 type Input struct {
@@ -87,7 +85,7 @@ type Input struct {
 // AllowDeprecatedUse returns true if the configuration allows using the deprecated log input
 func AllowDeprecatedUse(cfg *conf.C) bool {
 	allow, _ := cfg.Bool(allowDeprecatedUseField, -1)
-	return allow || fleetmode.Enabled() || fileset.CheckIfModuleInput(cfg)
+	return allow || management.UnderAgent() || fileset.CheckIfModuleInput(cfg)
 }
 
 // NewInput instantiates a new Log

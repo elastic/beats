@@ -24,8 +24,8 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -119,6 +119,7 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 		Zip: map[string]string{
 			"386":   "x86",
 			"amd64": "x86_64",
+			"arm64": "arm64",
 		},
 	},
 	"darwin": map[PackageType]map[string]string{
@@ -427,7 +428,7 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 			}
 
 			f.Source = filepath.Join(s.packageDir, filepath.Base(f.Target))
-			if err = ioutil.WriteFile(CreateDir(f.Source), []byte(content), 0644); err != nil {
+			if err = os.WriteFile(CreateDir(f.Source), []byte(content), 0644); err != nil {
 				panic(fmt.Errorf("failed to write file containing content for target=%v: %w", target, err))
 			}
 		case f.Template != "":
@@ -457,7 +458,7 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 // ImageName computes the image name from the spec. A template for the image
 // name can be configured by adding image_name to extra_vars.
 func (s PackageSpec) ImageName() (string, error) {
-	if name, _ := s.ExtraVars["image_name"]; name != "" {
+	if name := s.ExtraVars["image_name"]; name != "" {
 		imageName, err := s.Expand(name)
 		if err != nil {
 			return "", fmt.Errorf("failed to expand image_name: %w", err)
@@ -570,7 +571,7 @@ func PackageZip(spec PackageSpec) error {
 	spec.OutputFile = Zip.AddFileExtension(spec.OutputFile)
 
 	// Write the zip file.
-	if err := ioutil.WriteFile(CreateDir(spec.OutputFile), buf.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(CreateDir(spec.OutputFile), buf.Bytes(), 0644); err != nil {
 		return fmt.Errorf("failed to write zip file: %w", err)
 	}
 
@@ -633,7 +634,7 @@ func PackageTarGz(spec PackageSpec) error {
 			continue
 		}
 
-		tmpdir, err := ioutil.TempDir("", "TmpSymlinkDropPath")
+		tmpdir, err := os.MkdirTemp("", "TmpSymlinkDropPath")
 		if err != nil {
 			return err
 		}
@@ -690,14 +691,6 @@ func PackageTarGz(spec PackageSpec) error {
 	return nil
 }
 
-func replaceFileArch(filename string, pkgFile PackageFile, arch string) (string, PackageFile) {
-	filename = strings.ReplaceAll(filename, "universal", arch)
-	pkgFile.Source = strings.ReplaceAll(pkgFile.Source, "universal", arch)
-	pkgFile.Target = strings.ReplaceAll(pkgFile.Target, "universal", arch)
-
-	return filename, pkgFile
-}
-
 // PackageDeb packages a deb file. This requires Docker to execute FPM.
 func PackageDeb(spec PackageSpec) error {
 	return runFPM(spec, Deb)
@@ -718,7 +711,7 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 	}
 
 	if err := HaveDocker(); err != nil {
-		return fmt.Errorf("packaging %v files requires docker: %v", fpmPackageType, err)
+		return fmt.Errorf("packaging %v files requires docker: %w", fpmPackageType, err)
 	}
 
 	// Build a tar file as the input to FPM.
@@ -788,7 +781,7 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 		args = append(args, "--vendor", spec.Vendor)
 	}
 	if spec.License != "" {
-		args = append(args, "--license", strings.Replace(spec.License, " ", "-", -1))
+		args = append(args, "--license", strings.ReplaceAll(spec.License, " ", "-"))
 	}
 	if spec.Description != "" {
 		args = append(args, "--description", spec.Description)
@@ -960,8 +953,17 @@ func addFileToTar(ar *tar.Writer, baseDir string, pkgFile PackageFile) error {
 			header.Name += string(filepath.Separator)
 		}
 
+		// Check header.Mode overflow outside of Verbose so we don't mask
+		// an error
+		var headerMode uint32
+		if header.Mode > math.MaxUint32 {
+			return fmt.Errorf("header.Mode [%o] exceeds uint32 capacity for file [%s]", header.Mode, header.Name)
+		} else {
+			//nolint:gosec // overflow is checked above
+			headerMode = uint32(header.Mode)
+		}
 		if mg.Verbose() {
-			log.Println("Adding", os.FileMode(header.Mode), header.Name)
+			log.Println("Adding", os.FileMode(headerMode), header.Name)
 		}
 
 		if err := ar.WriteHeader(header); err != nil {
@@ -1024,9 +1026,19 @@ func addSymlinkToTar(tmpdir string, ar *tar.Writer, baseDir string, pkgFile Pack
 		header.Linkname = pkgFile.Source
 		header.Typeflag = tar.TypeSymlink
 
-		if mg.Verbose() {
-			log.Println("Adding", os.FileMode(header.Mode), header.Name)
+		// Check header.Mode overflow outside of Verbose so we don't mask
+		// an error
+		var headerMode uint32
+		if header.Mode > math.MaxUint32 {
+			return fmt.Errorf("header.Mode [%o] exceeds int capacity for file [%s]", header.Mode, header.Name)
+		} else {
+			//nolint:gosec // overflow is checked above
+			headerMode = uint32(header.Mode)
 		}
+		if mg.Verbose() {
+			log.Println("Adding", os.FileMode(headerMode), header.Name)
+		}
+
 		if err := ar.WriteHeader(header); err != nil {
 			return err
 		}
@@ -1038,7 +1050,7 @@ func addSymlinkToTar(tmpdir string, ar *tar.Writer, baseDir string, pkgFile Pack
 // PackageDocker packages the Beat into a docker image.
 func PackageDocker(spec PackageSpec) error {
 	if err := HaveDocker(); err != nil {
-		return fmt.Errorf("docker daemon required to build images: %s", err)
+		return fmt.Errorf("docker daemon required to build images: %w", err)
 	}
 
 	b, err := newDockerBuilder(spec)

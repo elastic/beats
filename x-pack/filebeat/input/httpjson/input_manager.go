@@ -5,7 +5,7 @@
 package httpjson
 
 import (
-	"go.uber.org/multierr"
+	"errors"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/unison"
@@ -42,7 +42,7 @@ func NewInputManager(log *logp.Logger, store statestore.States) InputManager {
 
 // Init initializes both wrapped input managers.
 func (m InputManager) Init(grp unison.Group) error {
-	return multierr.Append(
+	return errors.Join(
 		m.stateless.Init(grp),
 		m.cursor.Init(grp),
 	)

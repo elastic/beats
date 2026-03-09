@@ -18,6 +18,8 @@
 package meta
 
 import (
+	"maps"
+	"slices"
 	"sync"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -64,4 +66,12 @@ func (m *Map) Remove(id uint64) {
 	defer m.mutex.Unlock()
 
 	delete(m.meta, id)
+}
+
+// Keys returns all stored meta IDs
+func (m *Map) Keys() []uint64 {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+
+	return slices.Collect(maps.Keys(m.meta))
 }

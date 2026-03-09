@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/new-protocol.html
+applies_to:
+  stack: ga
 ---
 
 # Adding a New Protocol to Packetbeat [new-protocol]

@@ -1,12 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-azure-app_state.html
-
 applies_to:
   stack: beta
+  serverless: beta
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Azure app_state metricset [metricbeat-metricset-azure-app_state]
 

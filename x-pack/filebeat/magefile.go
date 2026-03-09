@@ -43,14 +43,9 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
-// BuildOTel builds the Beat binary with OTel sub command
-func BuildOTel() error {
-	return devtools.BuildOTel()
-}
-
 // BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
 func BuildSystemTestBinary() error {
-	return devtools.BuildSystemTestOTelBinary()
+	return devtools.BuildSystemTestBinary()
 }
 
 // GolangCrossBuild builds the Beat binary inside of the golang-builder.
@@ -173,9 +168,8 @@ func IntegTest() {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
-	// build integration test binary with otel sub command
-	devtools.BuildSystemTestOTelBinary()
-	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	devtools.BuildSystemTestBinary()
+	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 	// ES_USER must be admin in order for the Go Integration tests to function because they require
 	// indices:data/read/search
 	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
@@ -185,9 +179,8 @@ func GoIntegTest(ctx context.Context) error {
 
 // GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
-	// build integration test binary with otel sub command
-	devtools.BuildSystemTestOTelBinary()
-	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	devtools.BuildSystemTestBinary()
+	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 	// ES_USER must be admin in order for the Go Integration tests to function because they require
 	// indices:data/read/search
 	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]

@@ -12,6 +12,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -34,6 +35,7 @@ var testCases = []struct {
 	expected       []string
 	expectedFile   string
 	expectedNoFile string
+	wantErr        error
 
 	skipReason string
 }{
@@ -338,7 +340,7 @@ var testCases = []struct {
 					"value": `[[index .last_response.body "@timestamp"]]`,
 				},
 			},
-			"request.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"request.tracer.filename": "httpjson/logs/http-request-trace-*.ndjson",
 		},
 		handler: dateCursorHandler(),
 		expected: []string{
@@ -346,7 +348,7 @@ var testCases = []struct {
 			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 		},
-		expectedFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
+		expectedFile: filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
 	},
 	{
 		name: "tracer_filename_sanitization_enabled",
@@ -380,7 +382,7 @@ var testCases = []struct {
 				},
 			},
 			"request.tracer.enabled":  true,
-			"request.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"request.tracer.filename": "httpjson/logs/http-request-trace-*.ndjson",
 		},
 		handler: dateCursorHandler(),
 		expected: []string{
@@ -388,7 +390,7 @@ var testCases = []struct {
 			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 		},
-		expectedFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
+		expectedFile: filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
 	},
 	{
 		name: "tracer_filename_sanitization_disabled",
@@ -422,7 +424,7 @@ var testCases = []struct {
 				},
 			},
 			"request.tracer.enabled":  false,
-			"request.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"request.tracer.filename": "httpjson/logs/http-request-trace-*.ndjson",
 		},
 		handler: dateCursorHandler(),
 		expected: []string{
@@ -430,7 +432,19 @@ var testCases = []struct {
 			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 		},
-		expectedNoFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi*"),
+		expectedNoFile: filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi*"),
+	},
+	{
+		name:        "tracer_escaping_logs",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {},
+		baseConfig: map[string]interface{}{
+			"interval":                1,
+			"request.method":          http.MethodGet,
+			"request.url":             "https://example.com/",
+			"request.tracer.enabled":  true,
+			"request.tracer.filename": "/var/log/http-request-trace-*.ndjson",
+		},
+		wantErr: fmt.Errorf(`request tracer path must be within %q path accessing 'request'`, inputName),
 	},
 	{
 		name: "pagination",
@@ -589,6 +603,69 @@ var testCases = []struct {
 		},
 		handler:  oauth2Handler,
 		expected: []string{`{"hello": "world"}`},
+	},
+	{
+		name: "aws auth",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":                   1,
+			"request.method":             http.MethodGet,
+			"auth.aws.access_key_id":     "AKIAIOSFODNN7EXAMPLE",
+			"auth.aws.secret_access_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+			"auth.aws.default_region":    "us-east-1",
+			"auth.aws.service_name":      "guardduty",
+		},
+		handler:  awsAuthHandler("AKIAIOSFODNN7EXAMPLE", defaultHandler(http.MethodGet, "", "")),
+		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
+	{
+		name: "file_auth_default_header",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			dir := t.TempDir()
+			secret := "file-secret"
+			path := filepath.Join(dir, "auth_token")
+			if err := os.WriteFile(path, []byte(secret+"\n"), 0o600); err != nil {
+				t.Fatalf("failed to write auth token: %v", err)
+			}
+			config["auth.file.path"] = path
+			config["auth.file.prefix"] = "Bearer "
+			config["auth.file.refresh_interval"] = "100ms"
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+		},
+		handler:  tokenAuthHandler("Bearer file-secret", "", defaultHandler(http.MethodGet, "", "")),
+		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
+	{
+		name: "file_auth_custom_header",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			dir := t.TempDir()
+			tokenPath := filepath.Join(dir, "api_token")
+			if err := os.WriteFile(tokenPath, []byte("secret-api-token\n"), 0o600); err != nil {
+				t.Fatalf("failed to write token file: %v", err)
+			}
+			config["auth.file.path"] = tokenPath
+			config["auth.file.header"] = "X-API-Key"
+			config["auth.file.prefix"] = "ApiToken "
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+		},
+		handler:  tokenAuthHandler("ApiToken secret-api-token", "X-API-Key", defaultHandler(http.MethodGet, "", "")),
+		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 	},
 	{
 		name: "request_transforms_can_access_state_from_previous_transforms",
@@ -1445,11 +1522,29 @@ func TestInput(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.baseConfig)
 
 			conf := defaultConfig()
-			assert.NoError(t, cfg.Unpack(&conf))
+			err := cfg.Unpack(&conf)
+			if err != nil {
+				if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+					t.Fatalf("unexpected error unpacking config: %v", err)
+				}
+				return
+			}
 
 			var tempDir string
 			if conf.Request.Tracer != nil {
-				tempDir = t.TempDir()
+				err := os.MkdirAll("httpjson", 0o700)
+				if err != nil {
+					t.Fatalf("failed to create root logging destination: %v", err)
+				}
+				tempDir, err = os.MkdirTemp("httpjson", "logs-*")
+				if err != nil {
+					t.Fatalf("failed to create logging destination: %v", err)
+				}
+				tempDir, err = filepath.Abs(tempDir)
+				if err != nil {
+					t.Fatalf("failed to get absolute path for logging destination: %v", err)
+				}
+				defer os.RemoveAll("httpjson")
 				conf.Request.Tracer.Filename = filepath.Join(tempDir, conf.Request.Tracer.Filename)
 			}
 
@@ -1697,6 +1792,38 @@ func defaultHandler(expectedMethod, expectedBody, msg string) http.HandlerFunc {
 		}
 
 		_, _ = w.Write([]byte(msg))
+	}
+}
+
+func awsAuthHandler(expectedTokenID string, handle http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if !strings.HasPrefix(authHeader, fmt.Sprintf("AWS4-HMAC-SHA256 Credential=%s/", expectedTokenID)) {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
+			return
+		}
+
+		amzDate := r.Header.Get("X-Amz-Date")
+		if amzDate == "" {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
+			return
+		}
+
+		handle(w, r)
+	}
+}
+
+func tokenAuthHandler(expectedValue, headerName string, handle http.HandlerFunc) http.HandlerFunc {
+	if headerName == "" {
+		headerName = "Authorization"
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		value := r.Header.Get(headerName)
+		if value != expectedValue {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusUnauthorized)
+			return
+		}
+		handle(w, r)
 	}
 }
 

@@ -1,0 +1,32 @@
+[!windows] skip 'requires Windows'
+
+write-event 'event_id test case' --id=10
+write-event 'event_id test case' --id=50
+write-event 'event_id test case' --id=100
+write-event 'event_id test case' --id=150
+write-event 'event_id test case' --id=175
+write-event 'event_id test case' --id=200
+wait-for-event-log 6
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 4
+check-event-field output 0 winlog.event_id '50'
+check-event-field output 1 winlog.event_id '100'
+check-event-field output 2 winlog.event_id '175'
+check-event-field output 3 winlog.event_id '200'
+
+-- winlogbeat.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    no_more_events: stop
+    event_id: '50, 100-200, -150'
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false

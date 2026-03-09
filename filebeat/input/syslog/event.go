@@ -43,7 +43,7 @@ var month = map[string]time.Month{
 	"Dec": time.December,
 }
 
-var monthIndexed = []time.Month{
+var monthIndexed = [...]time.Month{
 	0,
 	time.January,
 	time.February,
@@ -117,7 +117,7 @@ func (s *event) SetTimeZone(b []byte) {
 	}
 
 	// +00 +00:00 or +0000
-	// Use second value directly and don't use unecessary time.Duration.
+	// Use second value directly and don't use unnecessary time.Duration.
 	// Time.FixedZone accepts number of seconds.
 	var h, m int
 	switch len(b[1:]) {
@@ -137,7 +137,10 @@ func (s *event) SetTimeZone(b []byte) {
 
 // SetMonthNumeric sets the month with a number.
 func (s *event) SetMonthNumeric(b []byte) {
-	s.month = monthIndexed[bytesToInt(skipLeadZero(b))]
+	month := bytesToInt(skipLeadZero(b))
+	if month < len(monthIndexed) {
+		s.month = monthIndexed[month]
+	}
 }
 
 // SetMonth sets the month.
@@ -211,12 +214,8 @@ func (s *event) Year() int {
 
 // SetMessage sets the message.
 func (s *event) SetMessage(b []byte) {
-	// remove BOM
-	if b[0] == 0xef && b[1] == 0xbb && b[2] == 0xbf {
-		s.message = string(b[3:])
-	} else {
-		s.message = string(b)
-	}
+	// Trim BOM: https://unicode.org/faq/utf_bom#bom5
+	s.message = string(bytes.TrimPrefix(b, []byte("\ufeff")))
 }
 
 // Message returns the message.
@@ -262,7 +261,7 @@ func (s *event) SetHostname(b []byte) {
 
 // Hostname returns the hostname.
 func (s *event) Hostname() string {
-	return string(s.hostname)
+	return s.hostname
 }
 
 // SetProgram sets the programs as a byte slice.

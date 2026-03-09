@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
@@ -43,9 +44,14 @@ func makeTestInfo(version string) beat.Info {
 }
 
 func getModuleForTesting(t *testing.T, module, fileset string) *Fileset {
+	beatPaths := paths.New()
+	beatPaths.Home = t.TempDir()
+	err := beatPaths.InitPaths(beatPaths)
+	require.NoError(t, err)
+
 	modulesPath, err := filepath.Abs("../module")
 	require.NoError(t, err)
-	fs, err := New(modulesPath, fileset, module, &FilesetConfig{}, logptest.NewTestingLogger(t, ""))
+	fs, err := New(modulesPath, fileset, module, &FilesetConfig{}, logptest.NewTestingLogger(t, ""), beatPaths)
 	require.NoError(t, err)
 
 	return fs
@@ -97,13 +103,18 @@ func TestEvaluateVarsNginx(t *testing.T) {
 }
 
 func TestEvaluateVarsNginxOverride(t *testing.T) {
+	beatPaths := paths.New()
+	beatPaths.Home = t.TempDir()
+	err := beatPaths.InitPaths(beatPaths)
+	require.NoError(t, err)
+
 	modulesPath, err := filepath.Abs("../module")
 	require.NoError(t, err)
 	fs, err := New(modulesPath, "access", "nginx", &FilesetConfig{
 		Var: map[string]interface{}{
 			"pipeline": "no_plugins",
 		},
-	}, logptest.NewTestingLogger(t, ""))
+	}, logptest.NewTestingLogger(t, ""), beatPaths)
 	require.NoError(t, err)
 
 	fs.manifest, err = fs.readManifest()
@@ -238,11 +249,16 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 		},
 	}
 
+	beatPaths := paths.New()
+	beatPaths.Home = t.TempDir()
+	err = beatPaths.InitPaths(beatPaths)
+	require.NoError(t, err)
+
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			fs, err := New(modulesPath, "access", "nginx", &FilesetConfig{
 				Input: test.input,
-			}, logptest.NewTestingLogger(t, ""))
+			}, logptest.NewTestingLogger(t, ""), beatPaths)
 			require.NoError(t, err)
 
 			require.NoError(t, fs.Read(makeTestInfo("5.2.0")))

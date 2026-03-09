@@ -2,7 +2,6 @@ This is the storage metricset of the module azure.
 
 This metricset allows users to retrieve all metrics from specified storage accounts.
 
-
 ## Metricset-specific configuration notes [_metricset_specific_configuration_notes_11]
 
 `refresh_list_interval`
@@ -10,7 +9,6 @@ This metricset allows users to retrieve all metrics from specified storage accou
 
 `resources`
 :   This will contain all options for identifying resources and configuring the desired metrics
-
 
 ### Config options to identify resources [_config_options_to_identify_resources_11]
 
@@ -31,8 +29,57 @@ resources:
       service_type: ["queue", "file"]
 ```
 
-it will filter the metric values to be returned by specific metric namespaces. The supported metrics and namespaces can be found here [https://docs.microsoft.com/en-us/azure/azure-monitor/platform/metrics-supported#microsoftstoragestorageaccounts](https://docs.microsoft.com/en-us/azure/azure-monitor/platform/metrics-supported#microsoftstoragestorageaccounts). The service type values allowed are `blob`, `table`, `queue`, `file` based on the namespaces  `Microsoft.Storage/storageAccounts/blobServices`,`Microsoft.Storage/storageAccounts/tableServices`,`Microsoft.Storage/storageAccounts/fileServices`,`Microsoft.Storage/storageAccounts/queueServices`. If no service_type is specified all values are applied.
+It will filter the metric values to be returned by specific metric namespaces. The supported metrics and namespaces can be found here [https://docs.microsoft.com/en-us/azure/azure-monitor/platform/metrics-supported#microsoftstoragestorageaccounts](https://docs.microsoft.com/en-us/azure/azure-monitor/platform/metrics-supported#microsoftstoragestorageaccounts). The service type values allowed are `blob`, `table`, `queue`, `file` based on the namespaces  `Microsoft.Storage/storageAccounts/blobServices`,`Microsoft.Storage/storageAccounts/tableServices`,`Microsoft.Storage/storageAccounts/fileServices`,`Microsoft.Storage/storageAccounts/queueServices`. If no service_type is specified all values are applied.
 
 Also, if the `resources` option is not specified, then all the storage accounts from the entire subscription will be selected. The primary aggregation value will be retrieved for all the metrics contained in the namespaces. The aggregation options are `avg`, `sum`, `min`, `max`, `total`, `count`.
 
 A default non configurable timegrain of 5 min is set so users are advised to configure an interval of 300s or  a multiply of it.
+
+`default_timegrain`:
+:   (*string*) Sets the default time grain to use when collecting storage account metrics. Defaults to PT5M.
+
+To collect storage account metrics with a PT1M time grain, we recommend using one of the following configurations:
+
+```yaml
+# (1) With `period: 60s` and `default_timegrain: "PT1M"`, the metricset 
+# collects 1 data point every 60s.
+- module: azure
+  metricsets:
+  - storage
+  enabled: true
+  period: 60s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  refresh_list_interval: 3600s # 1h
+  enable_batch_api: true
+  default_timegrain: "PT1M"
+```
+
+```yaml
+# (2) With `period: 300s` and `default_timegrain: "PT1M"`, the metricset
+# collects 5 data points every 300s (5 minutes) — one for each minute, 
+# but all data points arrive after 5 minutes
+- module: azure
+  metricsets:
+  - storage
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  refresh_list_interval: 3600s # 1h
+  enable_batch_api: true
+  default_timegrain: "PT1M"
+```
+
+These two configurations trade off scalability and freshness. Configuration (1) prioritizes freshness over scalability, while configuration (2) prioritizes scalability over freshness.
+
+Suggested changes:
+
+- `enable_batch_api: true`: Retrieves metric values for multiple Azure resources in one API call, supporting more storage accounts.
+- `refresh_list_interval: 3600s`: Looks for new storage accounts every 60 minutes instead of 10 minutes, helping to avoid or reduce gaps when monitoring many storage accounts.
+
+Note: By setting the collection `period: 1m`, the metricset only has 60s to collect all metric values instead of 300s, so it can handle fewer storage accounts. Keep in mind that the storage accounts metricset collects metrics for five different namespaces (storage account, blob, file, queue, and table).

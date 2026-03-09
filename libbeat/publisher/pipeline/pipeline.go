@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Pipeline implementation providint all beats publisher functionality.
@@ -66,7 +67,14 @@ type Pipeline struct {
 	// specified time when it is closed for pending events to be acknowledged.
 	waitCloseTimeout time.Duration
 
+	// forceCloseQueue causes us to force close the queue after the waitCloseTimeout
+	// elapses.
+	forceCloseQueue bool
+
 	processors processing.Supporter
+
+	// paths contains the paths configuration for processor initialization.
+	paths *paths.Path
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -80,6 +88,9 @@ type Settings struct {
 	Processors processing.Supporter
 
 	InputQueueSize int
+
+	// Paths contains the paths configuration used for processor initialization.
+	Paths *paths.Path
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -94,6 +105,12 @@ const (
 	// to ACK any outstanding events. This is independent of Clients asking for
 	// ACK and/or WaitClose. Clients can still optionally configure WaitClose themselves.
 	WaitOnPipelineClose
+
+	// WaitOnPipelineCloseThenForce is identical to WaitOnPipelineClose, but it also force closes
+	// the queue after the timeout, dropping in-flight data and unprocessed acknowledgements.
+	// This is useful when we know terminating the process won't free the memory for us, such as
+	// when running in an otel receiver.
+	WaitOnPipelineCloseThenForce
 )
 
 // OutputReloader interface, that can be queried from an active publisher pipeline.
@@ -125,10 +142,17 @@ func New(
 		observer:         nilObserver,
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
+		paths:            settings.Paths,
 	}
-	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
-		p.waitCloseTimeout = settings.WaitClose
+	switch settings.WaitCloseMode {
+	case WaitOnPipelineClose, WaitOnPipelineCloseThenForce:
+		if settings.WaitClose > 0 {
+			p.waitCloseTimeout = settings.WaitClose
+		}
+	default:
 	}
+
+	p.forceCloseQueue = settings.WaitCloseMode == WaitOnPipelineCloseThenForce
 
 	if monitors.Metrics != nil {
 		p.observer = newMetricsObserver(monitors.Metrics)
@@ -141,7 +165,7 @@ func New(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config())
+	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), settings.Paths)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +190,7 @@ func (p *Pipeline) Close() error {
 	log.Debug("close pipeline")
 
 	// Note: active clients are not closed / disconnected.
-	p.outputController.WaitClose(p.waitCloseTimeout)
+	p.outputController.WaitClose(p.waitCloseTimeout, p.forceCloseQueue)
 
 	p.observer.cleanup()
 	return nil
@@ -266,7 +290,7 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 	if p.processors == nil {
 		return nil, nil
 	}
-	return p.processors.Create(cfg, noPublish)
+	return p.processors.Create(cfg, noPublish, p.paths)
 }
 
 // OutputReloader returns a reloadable object for the output section of this pipeline
@@ -278,7 +302,7 @@ func (p *Pipeline) OutputReloader() OutputReloader {
 // This helper exists to frontload config parsing errors: if there is an
 // error in the queue config, we want it to show up as fatal during
 // initialization, even if the queue itself isn't created until later.
-func queueFactoryForUserConfig(queueType string, userConfig *conf.C) (queue.QueueFactory, error) {
+func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *paths.Path) (queue.QueueFactory, error) {
 	switch queueType {
 	case memqueue.QueueType:
 		settings, err := memqueue.SettingsForUserConfig(userConfig)
@@ -291,7 +315,7 @@ func queueFactoryForUserConfig(queueType string, userConfig *conf.C) (queue.Queu
 		if err != nil {
 			return nil, err
 		}
-		return diskqueue.FactoryForSettings(settings), nil
+		return diskqueue.FactoryForSettings(settings, paths), nil
 	default:
 		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
 	}

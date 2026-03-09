@@ -19,9 +19,8 @@
 package syslog
 
 import (
+	"errors"
 	"io"
-
-	"go.uber.org/multierr"
 )
 
 const rfc5424_start int = 1
@@ -38,7 +37,7 @@ type machineState struct {
 
 // ParseRFC5424 parses an RFC 5424-formatted syslog message.
 func parseRFC5424(data string) (message, error) {
-	var errs error
+	var errs []error
 	var p, cs, tok int
 
 	pe := len(data)
@@ -121,7 +120,7 @@ func parseRFC5424(data string) (message, error) {
 		goto tr0
 	tr0:
 
-		errs = multierr.Append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
+		errs = append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
 		p--
 
 		goto st0
@@ -158,7 +157,7 @@ func parseRFC5424(data string) (message, error) {
 	tr4:
 
 		if err := m.setPriority(data[tok:p]); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		goto st4
@@ -197,7 +196,7 @@ func parseRFC5424(data string) (message, error) {
 	tr7:
 
 		if err := m.setVersion(data[tok:p]); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		goto st6
@@ -225,7 +224,7 @@ func parseRFC5424(data string) (message, error) {
 	tr32:
 
 		if err := m.setTimestampRFC3339(data[tok:p]); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		goto st8
@@ -526,14 +525,14 @@ func parseRFC5424(data string) (message, error) {
 	tr9:
 
 		if err := m.setPriority(data[tok:p]); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		goto st23
 	tr6:
 
 		if err := m.setPriority(data[tok:p]); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		tok = p
@@ -645,7 +644,7 @@ func parseRFC5424(data string) (message, error) {
 
 			case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23:
 
-				errs = multierr.Append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
+				errs = append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
 				p--
 
 			case 27:
@@ -666,7 +665,7 @@ func parseRFC5424(data string) (message, error) {
 		}
 	}
 
-	return m, errs
+	return m, errors.Join(errs...)
 }
 
 const check_start int = 1

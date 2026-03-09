@@ -26,16 +26,16 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sync"
+	"sync/atomic"
 	"time"
 
-	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/go-concert/unison"
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	commonfile "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -48,8 +48,10 @@ const (
 
 var (
 	errFileTooSmall = errors.New("file size is too small for ingestion")
+	errFileEmpty    = errors.New("file is empty")
 )
 
+// fileWatcherConfig is the prospector.scanner configuration
 type fileWatcherConfig struct {
 	// Interval is the time between two scans.
 	Interval time.Duration `config:"check_interval"`
@@ -66,43 +68,53 @@ type fileWatcherConfig struct {
 // fileWatcher gets the list of files from a FSWatcher and creates events by
 // comparing the files between its last two runs.
 type fileWatcher struct {
-	cfg     fileWatcherConfig
-	prev    map[string]loginp.FileDescriptor
-	scanner loginp.FSScanner
-	log     *logp.Logger
-	events  chan loginp.FSEvent
+	cfg              fileWatcherConfig
+	prev             map[string]loginp.FileDescriptor
+	scanner          loginp.FSScanner
+	log              *logp.Logger
+	events           chan loginp.FSEvent
+	notifyChan       chan loginp.HarvesterStatus
+	fileIdentifier   fileIdentifier
+	sourceIdentifier *loginp.SourceIdentifier
+
+	// closedHarvesters is a map of harvester ID to the current
+	// offset of the file
+	closedHarvesters map[string]int64
+	// closedHarvestersMutex controls access to closedHarvesters
+	closedHarvestersMutex sync.Mutex
 }
 
-func newFileWatcher(logger *logp.Logger, paths []string, ns *conf.Namespace, gzipAllowed bool, sendNotChanged bool) (loginp.FSWatcher, error) {
-	var config *conf.C
-	if ns == nil {
-		config = conf.NewConfig()
-	} else {
-		config = ns.Config()
-	}
+// Ensure fileWatcher implements loginp.FSWatcher
+var _ loginp.FSWatcher = &fileWatcher{}
 
-	return newScannerWatcher(logger, paths, config, gzipAllowed, sendNotChanged)
-}
-
-func newScannerWatcher(logger *logp.Logger, paths []string, c *conf.C, gzipAllowed bool, sendNotChanged bool) (loginp.FSWatcher, error) {
-	config := defaultFileWatcherConfig()
-	err := c.Unpack(&config)
-	if err != nil {
-		return nil, err
-	}
+func newFileWatcher(
+	logger *logp.Logger,
+	paths []string,
+	config fileWatcherConfig,
+	compression string,
+	sendNotChanged bool,
+	fi fileIdentifier,
+	srci *loginp.SourceIdentifier,
+) (*fileWatcher, error) {
 
 	config.SendNotChanged = sendNotChanged
-	scanner, err := newFileScanner(logger, paths, config.Scanner, gzipAllowed)
+	scanner, err := newFileScanner(logger, paths, config.Scanner, compression)
 	if err != nil {
 		return nil, err
 	}
 
 	return &fileWatcher{
-		log:     logger.Named(watcherDebugKey),
-		cfg:     config,
-		prev:    make(map[string]loginp.FileDescriptor, 0),
-		scanner: scanner,
-		events:  make(chan loginp.FSEvent),
+		log:              logger.Named(watcherDebugKey),
+		cfg:              config,
+		prev:             make(map[string]loginp.FileDescriptor, 0),
+		scanner:          scanner,
+		events:           make(chan loginp.FSEvent),
+		closedHarvesters: map[string]int64{},
+		// notifyChan is a buffered channel to prevent the harvester from
+		// blocking while waiting for the fileWatcher to read from the channel
+		notifyChan:       make(chan loginp.HarvesterStatus, 5), // magic number
+		fileIdentifier:   fi,
+		sourceIdentifier: srci,
 	}, nil
 }
 
@@ -115,17 +127,46 @@ func defaultFileWatcherConfig() fileWatcherConfig {
 	}
 }
 
+func (w *fileWatcher) NotifyChan() chan loginp.HarvesterStatus {
+	return w.notifyChan
+}
+
 func (w *fileWatcher) Run(ctx unison.Canceler) {
 	defer close(w.events)
 
 	// run initial scan before starting regular
 	w.watch(ctx)
 
-	_ = timed.Periodic(ctx, w.cfg.Interval, func() error {
-		w.watch(ctx)
+	// Read from notifyChan in a separate goroutine becase
+	// there are cases when w.watch can take minutes or even
+	// hours, so we do not want to block the harvesters
+	go func() {
+		for {
+			select {
+			case evt := <-w.notifyChan:
+				w.processNotification(evt)
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
 
-		return nil
-	})
+	tick := time.Tick(w.cfg.Interval)
+	for {
+		select {
+		case <-tick:
+			w.watch(ctx)
+		case <-ctx.Done():
+			return
+		}
+	}
+}
+
+func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
+	w.log.Debugf("Harvester Closed notification received. ID: %s, Size: %d", evt.ID, evt.Size)
+	w.closedHarvestersMutex.Lock()
+	w.closedHarvesters[evt.ID] = evt.Size
+	w.closedHarvestersMutex.Unlock()
 }
 
 func (w *fileWatcher) watch(ctx unison.Canceler) {
@@ -144,6 +185,10 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	newFilesByID := make(map[string]*loginp.FileDescriptor)
 
 	for path, fd := range paths {
+		// srcID is the file identity, it is the same value used to identify
+		// the harvester and as registry key for the file's state
+		srcID := w.getFileIdentity(fd)
+
 		// if the scanner found a new path or an existing path
 		// with a different file, it is a new file
 		prevDesc, ok := w.prev[path]
@@ -154,31 +199,61 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 			continue
 		}
 
+		// If we got notifications about harvesters being closed, update
+		// the state accordingly.
+		//
+		// This is used to prevent a sort of race condition:
+		// When the reader/harvester reaches EOF, it blocks on a backoff,
+		// if during this time [logFile.shouldBeClosed] is called, marks the
+		// file as inactive and closes the reader context, once the backoff
+		// time expires the reader and harvester are closed without ingesting
+		// any more data.
+		//
+		// If the [fileWatcher] sends a write event while the harvester was blocked
+		// no new harvester is started because one is already running, however the
+		// [fileWatcher] updates its internal state and won't send write events until
+		// more data is added to the file.
+		//
+		// This can cause some lines to be missed because the harvester closed
+		// and the write event was lost.
+		//
+		// To prevent this from happening we get notified the offset of the file
+		// (data ingested) when the harvester closes. If we have this data we
+		// update our state to the same as the harvester, therefore starting
+		// a new harvester if needed.
+		w.closedHarvestersMutex.Lock()
+		if size, harvesterClosed := w.closedHarvesters[srcID]; harvesterClosed {
+			w.log.Debugf("Updating previous state because harvester was closed. '%s': %d", srcID, size)
+			prevDesc.SetBytesIngested(size)
+		}
+		w.closedHarvestersMutex.Unlock()
+
 		var e loginp.FSEvent
 		switch {
-
 		// the new size is smaller, the file was truncated
 		case prevDesc.Info.Size() > fd.Info.Size():
-			e = truncateEvent(path, fd)
+			e = truncateEvent(path, fd, srcID)
 			truncatedCount++
 
 		// the size is the same, timestamps are different, the file was touched
 		case prevDesc.Info.Size() == fd.Info.Size() && prevDesc.Info.ModTime() != fd.Info.ModTime():
 			if w.cfg.ResendOnModTime {
-				e = truncateEvent(path, fd)
+				e = truncateEvent(path, fd, srcID)
 				truncatedCount++
 			}
 
-		// the new size is larger, something was written
-		case prevDesc.Info.Size() < fd.Info.Size():
-			e = writeEvent(path, fd)
+		// the new size is larger, something was written.
+		// If a harvester for this file was closed recently,
+		// we use its state instead of the one we have cached.
+		case prevDesc.SizeOrBytesIngested() < fd.Info.Size():
+			e = writeEvent(path, fd, srcID)
 			writtenCount++
 
 		default:
 			// For the delete feature we need to run the harvester for
 			// files that have not changed until they're deleted.
 			if w.cfg.SendNotChanged {
-				e = notChangedEvent(path, fd)
+				e = notChangedEvent(path, fd, srcID)
 			}
 		}
 
@@ -193,6 +268,10 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 
 		// delete from previous state to mark that we've seen the existing file again
 		delete(w.prev, path)
+		// Delete used state from closedHarvesters
+		w.closedHarvestersMutex.Lock()
+		delete(w.closedHarvesters, srcID)
+		w.closedHarvestersMutex.Unlock()
 	}
 
 	// remaining files in the prev map are the ones that are missing
@@ -201,15 +280,20 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		var e loginp.FSEvent
 
 		id := remainingDesc.FileID()
+		srcID := w.getFileIdentity(remainingDesc)
 		if newDesc, renamed := newFilesByID[id]; renamed {
-			e = renamedEvent(remainingPath, newDesc.Filename, *newDesc)
+			e = renamedEvent(remainingPath, newDesc.Filename, *newDesc, srcID)
 			delete(newFilesByName, newDesc.Filename)
 			delete(newFilesByID, id)
 			renamedCount++
 		} else {
-			e = deleteEvent(remainingPath, remainingDesc)
+			e = deleteEvent(remainingPath, remainingDesc, srcID)
 			removedCount++
+			w.closedHarvestersMutex.Lock()
+			delete(w.closedHarvesters, srcID)
+			w.closedHarvestersMutex.Unlock()
 		}
+
 		select {
 		case <-ctx.Done():
 			return
@@ -219,16 +303,10 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 
 	// remaining files in newFiles are newly created files
 	for path, fd := range newFilesByName {
-		// no need to react on empty new files
-		if fd.Info.Size() == 0 {
-			w.log.Debugf("file %q has no content yet, skipping", fd.Filename)
-			delete(paths, path)
-			continue
-		}
 		select {
 		case <-ctx.Done():
 			return
-		case w.events <- createEvent(path, *fd):
+		case w.events <- createEvent(path, *fd, w.getFileIdentity(*fd)):
 			createdCount++
 		}
 	}
@@ -245,28 +323,36 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.prev = paths
 }
 
-func createEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: path, Descriptor: fd}
+// getFileIdentity mimics the same algorithm used by the harvester to generate
+// the file identity to any given file.
+// See 'startHarvester' on internal/input-logfile/harvester.go.
+func (w *fileWatcher) getFileIdentity(d loginp.FileDescriptor) string {
+	src := w.fileIdentifier.GetSource(loginp.FSEvent{Descriptor: d})
+	return w.sourceIdentifier.ID(src)
 }
 
-func writeEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpWrite, OldPath: path, NewPath: path, Descriptor: fd}
+func createEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
-func truncateEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpTruncate, OldPath: path, NewPath: path, Descriptor: fd}
+func writeEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpWrite, OldPath: path, NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
-func renamedEvent(oldPath, path string, fd loginp.FileDescriptor) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpRename, OldPath: oldPath, NewPath: path, Descriptor: fd}
+func truncateEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpTruncate, OldPath: path, NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
-func deleteEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpDelete, OldPath: path, NewPath: "", Descriptor: fd}
+func renamedEvent(oldPath, path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpRename, OldPath: oldPath, NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
-func notChangedEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpNotChanged, OldPath: path, NewPath: path, Descriptor: fd}
+func deleteEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpDelete, OldPath: path, NewPath: "", Descriptor: fd, SrcID: srcID}
+}
+
+func notChangedEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpNotChanged, OldPath: path, NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
 func (w *fileWatcher) Event() loginp.FSEvent {
@@ -306,21 +392,22 @@ func defaultFileScannerConfig() fileScannerConfig {
 // fileScanner looks for files which match the patterns in paths.
 // It is able to exclude files and symlinks.
 type fileScanner struct {
-	paths       []string
-	cfg         fileScannerConfig
-	log         *logp.Logger
-	hasher      hash.Hash
-	readBuffer  []byte
-	gzipAllowed bool
+	smallFilesWarned atomic.Bool
+	paths            []string
+	cfg              fileScannerConfig
+	log              *logp.Logger
+	hasher           hash.Hash
+	readBuffer       []byte
+	compression      string
 }
 
-func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, gzipAllowed bool) (*fileScanner, error) {
+func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
 	s := fileScanner{
 		paths:       paths,
 		cfg:         config,
 		log:         logger.Named(scannerDebugKey),
 		hasher:      sha256.New(),
-		gzipAllowed: gzipAllowed,
+		compression: compression,
 	}
 
 	if s.cfg.Fingerprint.Enabled {
@@ -390,7 +477,6 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 	// used to filter out duplicate matches
 	uniqueFiles := map[string]struct{}{}
 
-	tooSmallFiles := 0
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
 		if err != nil {
@@ -407,13 +493,22 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 
 			it, err := s.getIngestTarget(filename)
 			if err != nil {
-				s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
+				if !errors.Is(err, errFileEmpty) {
+					s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
+				}
 				continue
 			}
 
 			fd, err := s.toFileDescriptor(&it)
 			if errors.Is(err, errFileTooSmall) {
-				tooSmallFiles++
+				if s.smallFilesWarned.CompareAndSwap(false, true) {
+					s.log.Warnf("ingestion from some files will be delayed, files need to be at "+
+						"least %d in size for ingestion to start. To change this "+
+						"behaviour set 'prospector.scanner.fingerprint.length' and "+
+						"'prospector.scanner.fingerprint.offset'. "+
+						"Enable debug logging to see all file names of delayed files.",
+						s.cfg.Fingerprint.Offset+s.cfg.Fingerprint.Length)
+				}
 				s.log.Debugf("cannot start ingesting from file %q: %s", filename, err)
 				continue
 			}
@@ -430,22 +525,6 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 			uniqueIDs[fileID] = fd.Filename
 			fdByName[filename] = fd
 		}
-	}
-
-	if tooSmallFiles > 0 {
-		prefix := "%d files are "
-		if tooSmallFiles == 1 {
-			prefix = "%d file is "
-		}
-		s.log.Warnf(
-			prefix+"too small to be ingested, files need to be at "+
-				"least %d in size for ingestion to start. To change this "+
-				"behaviour set 'prospector.scanner.fingerprint.length' and "+
-				"'prospector.scanner.fingerprint.offset'. "+
-				"Enable debug logging to see all file names.",
-			tooSmallFiles,
-			s.cfg.Fingerprint.Offset+s.cfg.Fingerprint.Length,
-		)
 	}
 
 	return fdByName
@@ -474,13 +553,19 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 	if err != nil {
 		return it, fmt.Errorf("failed to lstat %q: %w", it.filename, err)
 	}
-	it.info = commonfile.ExtendFileInfo(info)
-
-	if it.info.IsDir() {
+	if info.IsDir() {
 		return it, fmt.Errorf("file %q is a directory", it.filename)
 	}
 
-	it.symlink = it.info.Mode()&os.ModeSymlink > 0
+	symlink := info.Mode()&os.ModeSymlink > 0
+
+	// we don't need to process empty files
+	if !symlink && info.Size() == 0 {
+		return it, errFileEmpty
+	}
+
+	it.info = commonfile.ExtendFileInfo(info)
+	it.symlink = symlink
 
 	if it.symlink {
 		if !s.cfg.Symlinks {
@@ -492,8 +577,12 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 		if err != nil {
 			return it, fmt.Errorf("failed to stat the symlink %q: %w", it.filename, err)
 		}
-		it.info = commonfile.ExtendFileInfo(info)
+		// we don't need to process empty files
+		if info.Size() == 0 {
+			return it, errFileEmpty
+		}
 
+		it.info = commonfile.ExtendFileInfo(info)
 		it.originalFilename, err = filepath.EvalSymlinks(it.filename)
 		if err != nil {
 			s.log.Debugf("finding path to original file has failed %s: %+v", it.filename, err)
@@ -513,10 +602,8 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 }
 
 func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescriptor, err error) {
-
 	fd.Filename = it.filename
 	fd.Info = it.info
-	var osFile *os.File
 	var file File
 
 	if !s.cfg.Fingerprint.Enabled {
@@ -524,13 +611,41 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	}
 	minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
 
-	osFile, err = os.Open(it.originalFilename)
-	if err != nil {
-		return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
-	}
-	defer osFile.Close()
+	// opener is used to open the file only once
+	opener := struct {
+		Open func() (*os.File, error)
+		f    *os.File
+	}{}
+	opener.Open = func() (*os.File, error) {
+		if opener.f != nil {
+			return opener.f, nil
+		}
 
-	if s.gzipAllowed {
+		opener.f, err = os.Open(it.originalFilename)
+		if err != nil {
+			return nil, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+
+		}
+		return opener.f, err
+	}
+
+	defer func() {
+		if opener.f != nil {
+			opener.f.Close()
+		}
+	}()
+
+	switch s.compression {
+	case CompressionNone:
+		// fd.GZIP stays false
+	case CompressionGZIP:
+		fd.GZIP = true
+	case CompressionAuto:
+		osFile, err := opener.Open()
+		if err != nil {
+			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+		}
+
 		fd.GZIP, err = IsGZIP(osFile)
 		if err != nil {
 			return fd, fmt.Errorf("failed to check if %q is gzip: %w",
@@ -541,6 +656,11 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	// Check there is enough data
 	var dataSize int64
 	if fd.GZIP {
+		osFile, err := opener.Open()
+		if err != nil {
+			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+		}
+
 		// Check if there is enough *decompressed* data for fingerprint
 		file, err = newGzipSeekerReader(osFile, int(minSize))
 		if err != nil {
@@ -568,6 +688,10 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		}
 
 		// there is enough data wrap it on File
+		osFile, err := opener.Open()
+		if err != nil {
+			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+		}
 		file = newPlainFile(osFile)
 	}
 

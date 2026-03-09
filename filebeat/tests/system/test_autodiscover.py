@@ -5,6 +5,12 @@ import unittest
 
 from beat.beat import INTEGRATION_TESTS
 from contextlib import contextmanager
+from filebeat import log_as_filestream, remove_filestream_fields
+
+
+stopping_msg = "Stopping runner: input"
+if log_as_filestream():
+    stopping_msg = "Stopping runner: filestream"
 
 
 class TestAutodiscover(filebeat.BaseTest):
@@ -29,6 +35,7 @@ class TestAutodiscover(filebeat.BaseTest):
                                 equals.docker.container.name: {container.name}
                             config:
                               - type: log
+                                id: log-input-id-${{data.docker.container.name}}.log
                                 allow_deprecated_use: true
                                 paths:
                                   - %s/${{data.docker.container.name}}.log
@@ -40,7 +47,7 @@ class TestAutodiscover(filebeat.BaseTest):
             proc = self.start_beat()
             self._test(container)
 
-        self.wait_until(lambda: self.log_contains('Stopping runner: input'))
+        self.wait_until(lambda: self.log_contains(stopping_msg))
         proc.check_kill_and_wait()
 
     @unittest.skipIf(not INTEGRATION_TESTS or
@@ -59,6 +66,7 @@ class TestAutodiscover(filebeat.BaseTest):
                         'hints.enabled': 'true',
                         'hints.default_config': '''
                           type: log
+                          id: log-input-id-${data.container.name}
                           allow_deprecated_use: true
                           paths:
                             - %s/${data.container.name}.log
@@ -69,7 +77,7 @@ class TestAutodiscover(filebeat.BaseTest):
             proc = self.start_beat()
             self._test(container)
 
-        self.wait_until(lambda: self.log_contains('Stopping runner: input'))
+        self.wait_until(lambda: self.log_contains(stopping_msg))
         proc.check_kill_and_wait()
 
     def _test(self, container):
@@ -90,9 +98,13 @@ class TestAutodiscover(filebeat.BaseTest):
             name="wait for test container",
             err_msg="the test container is not running yet")
 
-        self.wait_until(lambda: self.log_contains('Starting runner: input'),
+        start_msg = "Starting runner: input"
+        if log_as_filestream():
+            start_msg = "Starting runner: filestream"
+
+        self.wait_until(lambda: self.log_contains(start_msg),
                         name="wait for input to start",
-                        err_msg="did not find 'Starting runner: input' in the logs")
+                        err_msg="did not find '{}' in the logs".format(start_msg))
         self.wait_until(lambda: self.output_has(lines=1))
 
         output = self.read_output_json()
@@ -102,7 +114,8 @@ class TestAutodiscover(filebeat.BaseTest):
         assert output[0]['container']['name'] == container.name
         assert output[0]['docker']['container']['labels'] == container.labels
         assert 'name' in output[0]['container']
-
+        if log_as_filestream():
+            remove_filestream_fields(output)
         self.assert_fields_are_documented(output[0])
 
     @contextmanager

@@ -127,7 +127,7 @@ func fetchGoPackages(module string) ([]string, error) {
 
 // testTagsFromEnv gets a list of comma-separated tags from the TEST_TAGS
 // environment variables, e.g: TEST_TAGS=aws,azure.
-// If the FIPS env var is set to true, the requirefips and ms_tls13kdf tags are injected.
+// If the FIPS env var is set to true, the requirefips tag is injected.
 func testTagsFromEnv() []string {
 	testTags := strings.Trim(os.Getenv("TEST_TAGS"), ", ")
 	var tags []string
@@ -135,7 +135,7 @@ func testTagsFromEnv() []string {
 		tags = strings.Split(testTags, ",")
 	}
 	if FIPSBuild {
-		tags = append(tags, "requirefips", "ms_tls13kdf")
+		tags = append(tags, "requirefips")
 	}
 	return tags
 }
@@ -148,7 +148,13 @@ func DefaultGoTestUnitArgs() GoTestArgs { return makeGoTestArgs("Unit") }
 // fips140=only unit tests.
 func DefaultGoFIPSOnlyTestArgs() GoTestArgs {
 	args := makeGoTestArgs("Unit-FIPS-only")
-	args.Env["GODEBUG"] = "fips140=only"
+
+	// We also set GODEBUG=tlsmlkem=0 to disable the X25519MLKEM768 TLS key
+	// exchange mechanism; without this setting and with the GODEBUG=fips140=only
+	// setting, we get errors in tests like so:
+	// Failed to connect: crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
+	// Note that we are only disabling this TLS key exchange mechanism in tests!
+	args.Env["GODEBUG"] = "fips140=only,tlsmlkem=0"
 	return args
 }
 
@@ -164,15 +170,18 @@ func DefaultGoWindowsTestIntegrationArgs() GoTestArgs {
 
 // DefaultGoTestIntegrationArgs returns a default set of arguments for running
 // all integration tests. We tag integration test files with 'integration'.
-func DefaultGoTestIntegrationArgs() GoTestArgs {
+func DefaultGoTestIntegrationArgs(ctx context.Context) GoTestArgs {
 	args := makeGoTestArgs("Integration")
 	args.Tags = append(args.Tags, "integration")
 
-	synth := exec.Command("npx", "@elastic/synthetics", "-h")
+	cmdCtx, cmdCancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cmdCancel()
+
+	synth := exec.CommandContext(cmdCtx, "npx", "@elastic/synthetics", "-h")
 	if synth.Run() == nil {
 		// Run an empty journey to ensure playwright can be loaded
 		// catches situations like missing playwright deps
-		cmd := exec.Command("sh", "-c", "echo 'step(\"t\", () => { })' | elastic-synthetics --inline")
+		cmd := exec.CommandContext(cmdCtx, "sh", "-c", "echo 'step(\"t\", () => { })' | elastic-synthetics --inline")
 		var out strings.Builder
 		cmd.Stdout = &out
 		cmd.Stderr = &out
@@ -195,8 +204,8 @@ func DefaultGoTestIntegrationArgs() GoTestArgs {
 
 // DefaultGoTestIntegrationFromHostArgs returns a default set of arguments for running
 // all integration tests from the host system (outside the docker network).
-func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
-	args := DefaultGoTestIntegrationArgs()
+func DefaultGoTestIntegrationFromHostArgs(ctx context.Context) GoTestArgs {
+	args := DefaultGoTestIntegrationArgs(ctx)
 	args.Env = WithGoIntegTestHostEnv(args.Env)
 	return args
 }
@@ -204,11 +213,17 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 // FIPSOnlyGoTestIngrationFromHostArgs returns a default set of arguments for running
 // all integration tests from the host system (outside the docker network) along
 // with the GODEBUG=fips140=only arg set.
-func FIPSOnlyGoTestIntegrationFromHostArgs() GoTestArgs {
-	args := DefaultGoTestIntegrationArgs()
+func FIPSOnlyGoTestIntegrationFromHostArgs(ctx context.Context) GoTestArgs {
+	args := DefaultGoTestIntegrationArgs(ctx)
 	args.Tags = append(args.Tags, "requirefips")
 	args.Env = WithGoIntegTestHostEnv(args.Env)
-	args.Env["GODEBUG"] = "fips140=only"
+
+	// We also set GODEBUG=tlsmlkem=0 to disable the X25519MLKEM768 TLS key
+	// exchange mechanism; without this setting and with the GODEBUG=fips140=only
+	// setting, we get errors in tests like so:
+	// Failed to connect: crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
+	// Note that we are only disabling this TLS key exchange mechanism in tests!
+	args.Env["GODEBUG"] = "fips140=only,tlsmlkem=0"
 	return args
 }
 
@@ -498,13 +513,6 @@ func makeCommand(ctx context.Context, env map[string]string, cmd string, args ..
 // BuildSystemTestBinary runs BuildSystemTestGoBinary with default values.
 func BuildSystemTestBinary() error {
 	return BuildSystemTestGoBinary(DefaultTestBinaryArgs())
-}
-
-// BuildSystemTestOTelBinary builds beat binary that includes otel.
-func BuildSystemTestOTelBinary() error {
-	args := DefaultTestBinaryArgs()
-	args.ExtraFlags = []string{"-tags", "otelbeat"}
-	return BuildSystemTestGoBinary(args)
 }
 
 // BuildSystemTestGoBinary build a binary for testing that is instrumented for

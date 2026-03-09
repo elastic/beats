@@ -1,0 +1,59 @@
+# REQUIRED
+# Kind can be one of:
+# - breaking-change: a change to previously-documented behavior
+# - deprecation: functionality that is being removed in a later release
+# - bug-fix: fixes a problem in a previous version
+# - enhancement: extends functionality but does not break or fix existing behavior
+# - feature: new functionality
+# - known-issue: problems that we are aware of in a given version
+# - security: impacts on the security of a product or a user’s deployment.
+# - upgrade: important information for someone upgrading from a prior version
+# - other: does not fit into any of the other categories
+kind: enhancement
+
+# REQUIRED for all kinds
+# Change summary; a 80ish characters long description of the change.
+summary: Add Redis 6.0/7.0 info fields and deprecate used_memory_lua
+
+# REQUIRED for breaking-change, deprecation, known-issue
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
+description: |
+  Updates the Redis info metricset to support fields from Redis 6.0 and 7.0:
+
+  Redis 7.0 memory fields:
+  - Added memory.vm.eval, vm.functions, vm.total (VM memory not counted in used_memory)
+  - Added memory.used.scripts, used.scripts_eval, used.functions (script memory overhead)
+  - Added memory.total_system (total system memory)
+  - Added server.number_of_cached_scripts, number_of_functions, number_of_libraries
+
+  Redis 6.0 fields:
+  - Added stats.tracking.total_keys, total_items, total_prefixes (client-side caching stats)
+
+  Other changes:
+  - Marked used_memory_lua as deprecated (replaced by vm.eval in Redis 7.0)
+  - Made used_memory_lua and used_memory_dataset optional for older Redis compatibility
+
+# REQUIRED for breaking-change, deprecation, known-issue
+# impact:
+
+# REQUIRED for breaking-change, deprecation, known-issue
+# action:
+
+# REQUIRED for all kinds
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: "metricbeat"
+
+# AUTOMATED
+# OPTIONAL to manually add other PR URLs
+# PR URL: A link the PR that added the changeset.
+# If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
+# NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
+# Please provide it if you are adding a fragment for a different PR.
+pr: https://github.com/elastic/beats/pull/48246
+
+# AUTOMATED
+# OPTIONAL to manually add other issue URLs
+# Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
+# If not present is automatically filled by the tooling with the issue linked to the PR number.
+# issue: https://github.com/owner/repo/1234

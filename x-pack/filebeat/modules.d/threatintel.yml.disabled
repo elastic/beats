@@ -1,5 +1,5 @@
 # Module: threatintel
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-threatintel.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-threatintel.html
 
 - module: threatintel
   abuseurl:
@@ -10,6 +10,9 @@
 
     # The URL used for Threat Intel API calls.
     var.url: https://urlhaus-api.abuse.ch/v1/urls/recent/
+
+    # The Auth Key used for Threat Intel API calls.
+    var.api_token: API_TOKEN
 
     # The interval to poll the API for updates.
     var.interval: 10m
@@ -23,6 +26,9 @@
     # The URL used for Threat Intel API calls.
     var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
 
+    # The Auth Key used for Threat Intel API calls.
+    var.api_token: API_TOKEN
+
     # The interval to poll the API for updates.
     var.interval: 10m
 
@@ -34,6 +40,9 @@
 
     # The URL used for Threat Intel API calls.
     var.url: https://mb-api.abuse.ch/api/v1/
+
+    # The Auth Key used for Threat Intel API calls.
+    var.api_token: API_TOKEN
 
     # The interval to poll the API for updates.
     var.interval: 10m

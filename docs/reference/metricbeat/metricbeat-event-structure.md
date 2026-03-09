@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-event-structure.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Event structure [metricbeat-event-structure]
@@ -22,7 +23,7 @@ Every event sent by Metricbeat has the same basic structure. It contains the fol
 :   Name of the module that the data is from
 
 **`event.dataset`**
-:   Name of the module that the data is from
+:   Name of the source dataset in the format `<module>.<metricset>`
 
 For example:
 
@@ -37,7 +38,7 @@ For example:
    },
   "event": {
     "dataset": "system.process",
-    "module": process
+    "module": "system"
   },
   .
   .

@@ -1,13 +1,13 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/{{getBeatName}}-metricset-{{.Mod.Base}}-{{.Metricset.Title}}.html
-{{if and .Metricset.Applies_to (ne .Metricset.Applies_to "ga")}}
-applies_to:
+{{if .Metricset.Applies_to }}applies_to:
   stack: {{ .Metricset.Applies_to }}
+  serverless: {{ serverlessLifecycle .Metricset.Applies_to }}
 {{end -}}
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # {{.Mod.Title}} {{.Metricset.Title}} metricset [{{getBeatName}}-metricset-{{.Mod.Base}}-{{.Metricset.Title}}]
 

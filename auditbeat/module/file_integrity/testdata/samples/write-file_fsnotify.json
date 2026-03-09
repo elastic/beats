@@ -1,0 +1,94 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "updated"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "change"
+        ]
+      },
+      "file": {
+        "accessed": "2025-08-11T09:50:25.761968Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-08-11T09:50:17.9131583Z",
+        "ctime": "2025-08-11T09:50:17.9131583Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "inode": "10977524092185276",
+        "mtime": "2025-08-11T09:50:25.761968Z",
+        "name": "mainfile.txt",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesfsnotifywrite-file1895707128\\001\\mainfile.txt",
+        "size": 0,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-08-11T09:50:25.7626526Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 507300,
+    "Period": 0,
+    "DisableTimeSeries": false
+  },
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "updated"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "change"
+        ]
+      },
+      "file": {
+        "accessed": "2025-08-11T09:50:25.7626526Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-08-11T09:50:17.9131583Z",
+        "ctime": "2025-08-11T09:50:17.9131583Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "inode": "10977524092185276",
+        "mtime": "2025-08-11T09:50:25.7626526Z",
+        "name": "mainfile.txt",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesfsnotifywrite-file1895707128\\001\\mainfile.txt",
+        "size": 14,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-08-11T09:50:25.7631599Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 525600,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]

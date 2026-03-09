@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/madvdontneed-rss.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # High RSS memory usage due to MADV settings [madvdontneed-rss]

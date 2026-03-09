@@ -1,9 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-docker.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Docker fields [exported-fields-docker]
 
@@ -611,7 +614,7 @@ Incoming network stats per second.
 **`docker.network.in.bytes`**
 :   Incoming bytes per seconds.
 
-    type: long
+    type: double
 
     format: bytes
 
@@ -619,19 +622,19 @@ Incoming network stats per second.
 **`docker.network.in.dropped`**
 :   Dropped incoming packets per second.
 
-    type: scaled_float
+    type: double
 
 
 **`docker.network.in.errors`**
 :   Errors on incoming packets per second.
 
-    type: long
+    type: double
 
 
 **`docker.network.in.packets`**
 :   Incoming packets per second.
 
-    type: long
+    type: double
 
 
 ## out [_out]
@@ -641,7 +644,7 @@ Outgoing network stats per second.
 **`docker.network.out.bytes`**
 :   Outgoing bytes per second.
 
-    type: long
+    type: double
 
     format: bytes
 
@@ -649,19 +652,19 @@ Outgoing network stats per second.
 **`docker.network.out.dropped`**
 :   Dropped outgoing packets per second.
 
-    type: scaled_float
+    type: double
 
 
 **`docker.network.out.errors`**
 :   Errors on outgoing packets per second.
 
-    type: long
+    type: double
 
 
 **`docker.network.out.packets`**
 :   Outgoing packets per second.
 
-    type: long
+    type: double
 
 
 ## inbound [_inbound]

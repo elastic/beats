@@ -1,9 +1,13 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-{{.Base}}.html
+{{if .Applies_to}}applies_to:
+  stack: {{ .Applies_to }}
+  serverless: {{ serverlessLifecycle .Applies_to }}
+{{end -}}
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # {{.Title}} module [metricbeat-module-{{.Base}}]
 

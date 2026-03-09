@@ -102,7 +102,7 @@ func TestCustomDelimiter(t *testing.T) {
 			for scanner.Scan() {
 				elements = append(elements, scanner.Text())
 			}
-			assert.EqualValues(t, test.expected, elements)
+			assert.Equal(t, test.expected, elements)
 		})
 	}
 }
@@ -174,7 +174,7 @@ func TestOctetCounting(t *testing.T) {
 			for scanner.Scan() {
 				elements = append(elements, scanner.Text())
 			}
-			assert.EqualValues(t, test.expected, elements)
+			assert.Equal(t, test.expected, elements)
 		})
 	}
 }

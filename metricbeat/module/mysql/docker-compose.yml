@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   mysql:
     image: docker.elastic.co/integrations-ci/beats-mysql:${MYSQL_VARIANT:-mysql}-${MYSQL_VERSION:-8.0}-1

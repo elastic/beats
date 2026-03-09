@@ -18,11 +18,11 @@
         
     -   **Map Resources to Client**: Maps the retrieved resources to the client's resource list.
         
-    -   **Collect Metric Definitions**: For each resource, calls the provided mapping function (`mapMetrics`) to collect metric definitions. Refer to the **mapMetrics Function**.
+    -   **Collect Metric Definitions**: For each resource, calls the provided mapping function (`concurrentMapMetrics`) to collect metric definitions concurrently. Refer to the **concurrentMapMetrics Function**.
         
     -   **Close Channels**: Once all goroutines complete, it closes the `MetricDefinitionsChan` and `ErrorChan` channels. This signals that all metric definitions of all resources in the configuration are collected.
         
-2.  **mapMetrics Function**:
+2.  **concurrentMapMetrics Function**:
     
     -   **Start Goroutine**: Starts a new goroutine for each resource to collect its metric definitions.
         
@@ -39,6 +39,8 @@
     -   **Retrieve Metric Definitions**: Retrieves metric definitions from Azure Monitor for the specified resource.
         
     -   **Filter Supported Metrics**: Validates and filters the metric names and aggregations based on the supported metrics.
+        
+    -   **Handle Timegrain**: If a `timegrain` is not specified by the user, it uses the first available timegrain reported by the Azure API.
         
     -   **Map Dimensions**: Maps dimensions to the metrics as specified in the resource configuration.
         

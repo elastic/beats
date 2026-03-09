@@ -44,6 +44,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -199,7 +200,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 		t.Fatal("init index management:", err)
 	}
 
-	grp, err := plugin(im, info, outputs.NewNilObserver(), config)
+	grp, err := plugin(im, info, outputs.NewNilObserver(), config, paths.New())
 	if err != nil {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}
@@ -415,7 +416,7 @@ func testSendMultipleBatchesViaLogstash(
 
 	for _, batch := range batches {
 		ok := ls.BulkPublish(batch)
-		assert.Equal(t, true, ok)
+		assert.True(t, ok)
 	}
 
 	// wait for logstash event flush + elasticsearch
@@ -476,7 +477,7 @@ func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string,
 	}
 
 	// validate
-	assert.Equal(t, len(lsResp), len(esResp))
+	assert.Len(t, esResp, len(lsResp))
 	if len(lsResp) != 1 {
 		t.Fatalf("wrong number of results: %d", len(lsResp))
 	}
@@ -532,7 +533,7 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 
 	// validate
 	if len(lsResp) != len(esResp) {
-		assert.Equal(t, len(lsResp), len(esResp))
+		assert.Len(t, esResp, len(lsResp))
 		t.Fatalf("wrong number of results: es=%d, ls=%d",
 			len(esResp), len(lsResp))
 	}

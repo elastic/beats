@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -79,7 +80,6 @@ func TestMetricProcessorDeleteTemplate(t *testing.T) {
 	processor.RemoveTemplate(temp)
 	out := processor.templates.Search([]string{"a", "b", "c"})
 	assert.Nil(t, out)
-
 }
 
 func TestMetricProcessorProcess(t *testing.T) {
@@ -107,4 +107,126 @@ func TestMetricProcessorProcess(t *testing.T) {
 
 	assert.NotNil(t, event["stats"])
 	assert.Equal(t, event["stats"], float64(42))
+}
+
+func TestTemplateApply(t *testing.T) {
+	tests := []struct {
+		name          string
+		tmpl          template
+		parts         []string
+		wantMetric    string
+		wantTagsCount int
+	}{
+		{
+			name: "metric shorter than template",
+			tmpl: template{
+				Delimiter: ".",
+				Parts:     []string{"", "host", "region", "service", "metric"},
+			},
+			parts:         []string{"server1", "us-east"},
+			wantMetric:    "",
+			wantTagsCount: 1,
+		},
+		{
+			name: "single part metric",
+			tmpl: template{
+				Delimiter: ".",
+				Parts:     []string{"", "host", "region", "service", "metric"},
+			},
+			parts:         []string{"server1"},
+			wantMetric:    "",
+			wantTagsCount: 0,
+		},
+		{
+			name: "empty metric parts",
+			tmpl: template{
+				Delimiter: ".",
+				Parts:     []string{"", "host", "region", "service", "metric"},
+			},
+			parts:         []string{},
+			wantMetric:    "",
+			wantTagsCount: 0,
+		},
+		{
+			name: "nil metric parts",
+			tmpl: template{
+				Delimiter: ".",
+				Parts:     []string{"", "host", "region", "service", "metric"},
+			},
+			parts:         nil,
+			wantMetric:    "",
+			wantTagsCount: 0,
+		},
+		{
+			name: "metric star captures remaining from current index",
+			tmpl: template{
+				Delimiter: "_",
+				Parts:     []string{"", "host", "metric*"},
+			},
+			parts:         []string{"server1", "cpu", "idle", "percent"},
+			wantMetric:    "idle_percent",
+			wantTagsCount: 1,
+		},
+		{
+			name: "empty template parts",
+			tmpl: template{
+				Delimiter: ".",
+				Parts:     []string{},
+			},
+			parts:         []string{"server1", "us-east"},
+			wantMetric:    "",
+			wantTagsCount: 0,
+		},
+		{
+			name: "template with predefined tags",
+			tmpl: template{
+				Delimiter: ".",
+				Parts:     []string{"metric"},
+				Tags:      map[string]string{"env": "prod", "dc": "us-east"},
+			},
+			parts:         []string{"cpu"},
+			wantMetric:    "cpu",
+			wantTagsCount: 2,
+		},
+		{
+			name: "duplicate tag keys in template are combined",
+			tmpl: template{
+				Delimiter: "_",
+				Parts:     []string{"host", "host", "metric"},
+			},
+			parts:         []string{"server1", "server2", "cpu"},
+			wantMetric:    "cpu",
+			wantTagsCount: 1,
+		},
+		{
+			name: "all parts are metric",
+			tmpl: template{
+				Delimiter: ".",
+				Parts:     []string{"metric", "metric", "metric"},
+			},
+			parts:         []string{"cpu", "idle", "percent"},
+			wantMetric:    "cpu.idle.percent",
+			wantTagsCount: 0,
+		},
+		{
+			name: "metric star at beginning",
+			tmpl: template{
+				Delimiter: "_",
+				Parts:     []string{"metric*"},
+			},
+			parts:         []string{"cpu", "idle", "percent"},
+			wantMetric:    "cpu_idle_percent",
+			wantTagsCount: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			require.NotPanics(t, func() {
+				metric, tags := tt.tmpl.Apply(tt.parts)
+				assert.Equal(t, tt.wantMetric, metric)
+				assert.Len(t, tags, tt.wantTagsCount)
+			})
+		})
+	}
 }

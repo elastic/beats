@@ -1,12 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-ceph-mgr_osd_tree.html
-
 applies_to:
   stack: beta
+  serverless: beta
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Ceph mgr_osd_tree metricset [metricbeat-metricset-ceph-mgr_osd_tree]
 

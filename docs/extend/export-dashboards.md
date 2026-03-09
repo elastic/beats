@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/export-dashboards.html
+applies_to:
+  stack: ga
 ---
 
 # Exporting New and Modified Beat Dashboards [export-dashboards]

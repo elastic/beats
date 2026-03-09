@@ -1,0 +1,25 @@
+[!windows] skip 'requires Windows'
+
+write-event 'Unknown event ID' --id=1111
+wait-for-event-log 1
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 1
+check-event-field output 0 winlog.event_id '1111'
+check-event-field output 0 event.code '1111'
+check-event-field-exists output 0 error.message
+
+-- winlogbeat.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    no_more_events: stop
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false

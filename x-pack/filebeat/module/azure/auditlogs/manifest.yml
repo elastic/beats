@@ -18,7 +18,7 @@ var:
   - name: migrate_checkpoint
     default: yes
   - name: processor_version
-    default: "v1"
+    default: "v2"
   - name: processor_update_interval
     default: "10s"
   - name: processor_start_position

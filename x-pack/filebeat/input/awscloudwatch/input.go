@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package awscloudwatch
 
 import (
@@ -95,9 +97,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	log := inputContext.Logger
 
 	// setup status reporter
-	in.status = statusreporterhelper.New(inputContext.StatusReporter, log, "CloudWatch")
-
-	defer in.status.UpdateStatus(status.Stopped, "")
+	in.status = statusreporterhelper.New(inputContext, log, "CloudWatch")
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
 	handler, err := newStateHandler(log, in.config, in.store)
@@ -154,6 +154,8 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	log.Debugf("Config scan_frequency = %s", cwPoller.config.ScanFrequency)
 	log.Debugf("Config api_sleep = %s", cwPoller.config.APISleep)
 	cwPoller.receive(ctx, logGroupIDs, time.Now)
+	in.status.UpdateStatus(status.Stopped, "Input execution ended")
+
 	return nil
 }
 

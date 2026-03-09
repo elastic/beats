@@ -73,33 +73,35 @@ type StatusError struct {
 type templateBuilder struct {
 	log          *logp.Logger
 	isServerless bool
+	beatPaths    *paths.Path
 }
 
 // NewESLoader creates a new template loader for ES
-func NewESLoader(client ESClient, lifecycleClient lifecycle.ClientHandler, logger *logp.Logger) (*ESLoader, error) {
+func NewESLoader(client ESClient, lifecycleClient lifecycle.ClientHandler, logger *logp.Logger, beatPaths *paths.Path) (*ESLoader, error) {
 	if client == nil {
 		return nil, errors.New("can not load template without active Elasticsearch client")
 	}
-	return &ESLoader{client: client, lifecycleClient: lifecycleClient,
-		builder: newTemplateBuilder(client.IsServerless(), logger), log: logger.Named("template_loader")}, nil
+	return &ESLoader{
+		client: client, lifecycleClient: lifecycleClient,
+		builder: newTemplateBuilder(client.IsServerless(), logger, beatPaths), log: logger.Named("template_loader"),
+	}, nil
 }
 
 // NewFileLoader creates a new template loader for the given file.
-func NewFileLoader(c FileClient, isServerless bool, logger *logp.Logger) *FileLoader {
+func NewFileLoader(c FileClient, isServerless bool, logger *logp.Logger, beatPaths *paths.Path) *FileLoader {
 	// other components of the file loader will fail if both ILM and DSL are set,
 	// so at this point it's fairly safe to just pass cfg.DSL.Enabled
-	return &FileLoader{client: c, builder: newTemplateBuilder(isServerless, logger), log: logger.Named("file_template_loader")}
+	return &FileLoader{client: c, builder: newTemplateBuilder(isServerless, logger, beatPaths), log: logger.Named("file_template_loader")}
 }
 
-func newTemplateBuilder(serverlessMode bool, logger *logp.Logger) *templateBuilder {
-	return &templateBuilder{log: logger.Named("template"), isServerless: serverlessMode}
+func newTemplateBuilder(serverlessMode bool, logger *logp.Logger, beatPaths *paths.Path) *templateBuilder {
+	return &templateBuilder{log: logger.Named("template"), isServerless: serverlessMode, beatPaths: beatPaths}
 }
 
 // Load checks if the index mapping template should be loaded.
 // In case the template is not already loaded or overwriting is enabled, the
 // template is built and written to index.
 func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error {
-
 	// build template from config
 	tmpl, err := l.builder.template(config, info, l.client.GetVersion(), migration)
 	if err != nil || tmpl == nil {
@@ -179,7 +181,7 @@ func (l *ESLoader) loadTemplate(templateName string, template map[string]interfa
 	if err != nil {
 		return fmt.Errorf("couldn't load template: %w. Response body: %s", err, body)
 	}
-	if status > http.StatusMultipleChoices { //http status 300
+	if status > http.StatusMultipleChoices { // http status 300
 		return fmt.Errorf("couldn't load json. Status: %v", status)
 	}
 	return nil
@@ -226,13 +228,13 @@ func (l *ESLoader) checkExistsTemplate(name string) (bool, error) {
 
 // Load reads the template from the config, creates the template body and prints it to the configured file.
 func (l *FileLoader) Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error {
-	//build template from config
+	// build template from config
 	tmpl, err := l.builder.template(config, info, l.client.GetVersion(), migration)
 	if err != nil || tmpl == nil {
 		return err
 	}
 
-	//create body to print
+	// create body to print
 	body, err := l.builder.buildBody(tmpl, config, fields)
 	if err != nil {
 		return err
@@ -276,7 +278,7 @@ func (b *templateBuilder) buildBody(tmpl *Template, config TemplateConfig, field
 }
 
 func (b *templateBuilder) buildBodyFromJSON(config TemplateConfig) (mapstr.M, error) {
-	jsonPath := paths.Resolve(paths.Config, config.JSON.Path)
+	jsonPath := b.beatPaths.Resolve(paths.Config, config.JSON.Path)
 	if _, err := os.Stat(jsonPath); err != nil {
 		return nil, fmt.Errorf("error checking json file %s for template: %w", jsonPath, err)
 	}
@@ -284,7 +286,6 @@ func (b *templateBuilder) buildBodyFromJSON(config TemplateConfig) (mapstr.M, er
 	content, err := os.ReadFile(jsonPath)
 	if err != nil {
 		return nil, fmt.Errorf("error reading file %s for template: %w", jsonPath, err)
-
 	}
 	var body map[string]interface{}
 	err = json.Unmarshal(content, &body)
@@ -296,7 +297,7 @@ func (b *templateBuilder) buildBodyFromJSON(config TemplateConfig) (mapstr.M, er
 
 func (b *templateBuilder) buildBodyFromFile(tmpl *Template, config TemplateConfig) (mapstr.M, error) {
 	b.log.Debugf("Load fields.yml from file: %s", config.Fields)
-	fieldsPath := paths.Resolve(paths.Config, config.Fields)
+	fieldsPath := b.beatPaths.Resolve(paths.Config, config.Fields)
 	body, err := tmpl.LoadFile(fieldsPath)
 	if err != nil {
 		return nil, fmt.Errorf("error creating template from file %s: %w", fieldsPath, err)

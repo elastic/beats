@@ -1,9 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-beat.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Beat fields [exported-fields-beat]
 
@@ -745,6 +748,30 @@ Beat module
 :   type: alias
 
     alias to: beat.stats.apm_server.sampling.tail.storage.value_log_size
+
+
+**`beats_stats.apm-server.sampling.tail.storage.storage_limit`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.storage.storage_limit
+
+
+**`beats_stats.apm-server.sampling.tail.storage.disk_used`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.storage.disk_used
+
+
+**`beats_stats.apm-server.sampling.tail.storage.disk_total`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.storage.disk_total
+
+
+**`beats_stats.apm-server.sampling.tail.storage.disk_usage_threshold_pct`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.storage.disk_usage_threshold_pct
 
 
 **`beats_stats.apm-server.sampling.transactions_dropped`**
@@ -2029,6 +2056,22 @@ Beat stats
 
 **`beat.stats.apm_server.sampling.tail.storage.value_log_size`**
 :   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.storage.storage_limit`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.storage.disk_used`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.storage.disk_total`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.storage.disk_usage_threshold_pct`**
+:   type: float
 
 
 **`beat.stats.apm_server.sampling.transactions_dropped`**

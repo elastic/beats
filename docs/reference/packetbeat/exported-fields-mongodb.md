@@ -1,9 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-mongodb.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # MongoDb fields [exported-fields-mongodb]
 

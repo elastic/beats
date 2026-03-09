@@ -19,6 +19,8 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
+	"net"
+	"strconv"
 
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
@@ -90,9 +92,7 @@ func NewIndexers(configs PluginConfig, metaGen metadata.MetaGen) *Indexers {
 func (i *Indexers) GetIndexes(pod *kubernetes.Pod) []string {
 	var indexes []string
 	for _, indexer := range i.indexers {
-		for _, i := range indexer.GetIndexes(pod) {
-			indexes = append(indexes, i)
-		}
+		indexes = append(indexes, indexer.GetIndexes(pod)...)
 	}
 	return indexes
 }
@@ -101,20 +101,14 @@ func (i *Indexers) GetIndexes(pod *kubernetes.Pod) []string {
 func (i *Indexers) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	var metadata []MetadataIndex
 	for _, indexer := range i.indexers {
-		for _, m := range indexer.GetMetadata(pod) {
-			metadata = append(metadata, m)
-		}
+		metadata = append(metadata, indexer.GetMetadata(pod)...)
 	}
 	return metadata
 }
 
 // Empty returns true if indexers list is empty
 func (i *Indexers) Empty() bool {
-	if len(i.indexers) == 0 {
-		return true
-	}
-
-	return false
+	return len(i.indexers) == 0
 }
 
 // PodNameIndexer implements default indexer based on pod name
@@ -255,7 +249,7 @@ func (h *IPPortIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 			if port.ContainerPort != 0 {
 
 				m = append(m, MetadataIndex{
-					Index: fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort),
+					Index: net.JoinHostPort(pod.Status.PodIP, strconv.Itoa(int(port.ContainerPort))),
 					Data: h.metaGen.Generate(
 						pod,
 						metadata.WithFields("container.name", container.Name),
@@ -287,7 +281,7 @@ func (h *IPPortIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 
 		for _, port := range ports {
 			if port.ContainerPort != 0 {
-				hostPorts = append(hostPorts, fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort))
+				hostPorts = append(hostPorts, net.JoinHostPort(pod.Status.PodIP, strconv.Itoa(int(port.ContainerPort))))
 			}
 		}
 	}

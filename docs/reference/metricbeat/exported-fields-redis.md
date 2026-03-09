@@ -1,9 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-redis.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Redis fields [exported-fields-redis]
 
@@ -112,7 +115,31 @@ Redis memory stats.
 
 
 **`redis.info.memory.used.lua`**
-:   Used memory by the Lua engine.
+:   Memory used by the Lua engine. Deprecated in Redis 7.0; use vm.eval instead.
+
+    type: long
+
+    format: bytes
+
+
+**`redis.info.memory.used.scripts`**
+:   Combined memory overhead from EVAL scripts and Functions (part of used_memory). Added in Redis 7.0.
+
+    type: long
+
+    format: bytes
+
+
+**`redis.info.memory.used.scripts_eval`**
+:   Memory overhead from EVAL scripts (part of used_memory). Added in Redis 7.0.
+
+    type: long
+
+    format: bytes
+
+
+**`redis.info.memory.used.functions`**
+:   Memory overhead from Functions (part of used_memory). Added in Redis 7.0.
 
     type: long
 
@@ -120,7 +147,43 @@ Redis memory stats.
 
 
 **`redis.info.memory.used.dataset`**
-:   The size in bytes of the dataset
+:   The size in bytes of the dataset (used_memory minus used_memory_overhead). Added in Redis 4.0.
+
+    type: long
+
+    format: bytes
+
+
+## vm [_vm]
+
+Redis 7.0+ VM memory stats. VM memory is NOT part of used_memory.
+
+**`redis.info.memory.vm.eval`**
+:   Number of bytes used by the script VM engines for EVAL framework. Replaces used_memory_lua.
+
+    type: long
+
+    format: bytes
+
+
+**`redis.info.memory.vm.functions`**
+:   Number of bytes used by the script VM engines for Functions framework.
+
+    type: long
+
+    format: bytes
+
+
+**`redis.info.memory.vm.total`**
+:   Total VM memory (vm.eval + vm.functions).
+
+    type: long
+
+    format: bytes
+
+
+**`redis.info.memory.total_system`**
+:   Total amount in bytes of memory available to Redis.
 
     type: long
 
@@ -597,6 +660,24 @@ Server info
     type: keyword
 
 
+**`redis.info.server.number_of_cached_scripts`**
+:   Number of EVAL scripts cached by the server. Added in Redis 7.0.
+
+    type: long
+
+
+**`redis.info.server.number_of_functions`**
+:   Number of Functions loaded. Added in Redis 7.0.
+
+    type: long
+
+
+**`redis.info.server.number_of_libraries`**
+:   Number of Function libraries loaded. Added in Redis 7.0.
+
+    type: long
+
+
 ## stats [_stats]
 
 Redis stats.
@@ -745,6 +826,28 @@ Redis stats.
     type: long
 
 
+## tracking [_tracking]
+
+Redis client-side caching tracking stats. Added in Redis 6.0.
+
+**`redis.info.stats.tracking.total_keys`**
+:   Number of keys being tracked by the server.
+
+    type: long
+
+
+**`redis.info.stats.tracking.total_items`**
+:   Number of items (sum of clients per tracked key).
+
+    type: long
+
+
+**`redis.info.stats.tracking.total_prefixes`**
+:   Number of tracked prefixes in the server's prefix table (broadcast mode only).
+
+    type: long
+
+
 **`redis.info.slowlog.count`**
 :   Count of slow operations
 
@@ -842,6 +945,14 @@ Redis command statistics
 
 
 **`redis.keyspace.expires`**
-:       type: long
+:   Number of keys with an expiry set.
+
+    type: long
+
+
+**`redis.keyspace.subexpiry`**
+:   Number of sub-keys with an expiry set (0 when not reported).
+
+    type: long
 
 
