@@ -725,7 +725,7 @@ Actual memory used and free.
 
 
 **`system.memory.actual.free`**
-:   Actual free memory in bytes. It is calculated based on the OS. On Linux this value will be MemAvailable from /proc/meminfo,  or calculated from free memory plus caches and buffers if /proc/meminfo is not available. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal to `system.memory.free`.
+:   Actual free memory in bytes. It is calculated based on the OS. On Linux this value will be MemAvailable from /proc/meminfo, or calculated from free memory plus caches and buffers if /proc/meminfo is not available. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal to `system.memory.free`.
 
     type: long
 
@@ -778,7 +778,7 @@ This group contains statistics related to the swap memory usage on the system.
 
 ## zswap [_zswap]
 
-zswap compressed swap cache metrics. Available on Linux when zswap is enabled.
+Metrics for the zswap compressed swap cache. Available on Linux when zswap is enabled.
 
 **`system.memory.zswap.compressed`**
 :   Current compressed size of data stored in zswap.
@@ -1331,7 +1331,7 @@ cgroupv2 stats
 
 
 **`system.process.cgroup.cpu.cfs.weight`**
-:   CPU weight for the cgroup (cgroupv2). Used by the CFS scheduler to determine the share of CPU time available to the cgroup. Range is 1 to 10000, default 100.
+:   CPU weight for the cgroup (cgroupv2). Used by the CFS scheduler to determine the share of CPU time available to the cgroup. Valid values range from 1 to 10000. The default value is 100.
 
     type: long
 

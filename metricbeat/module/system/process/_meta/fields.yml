@@ -270,7 +270,8 @@
               description: >
                 CPU weight for the cgroup (cgroupv2). Used by the CFS
                 scheduler to determine the share of CPU time available
-                to the cgroup. Range is 1 to 10000, default 100.
+                to the cgroup. Valid values range from 1 to 10000. The
+                default value is 100.
 
             - name: rt.period.us
               type: long
