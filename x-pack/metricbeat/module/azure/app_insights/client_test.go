@@ -52,7 +52,7 @@ func TestClient(t *testing.T) {
 		client.Service = m
 		results, err := client.GetMetricValues()
 		assert.NoError(t, err)
-		assert.Equal(t, len(*results.Value), 2)
+		assert.Len(t, *results.Value, 2)
 		m.AssertExpectations(t)
 	})
 }
@@ -64,7 +64,16 @@ func TestConfigValidate(t *testing.T) {
 		wantErr string
 	}{
 		{
-			name: "valid config with API key",
+			name: "valid config with API key (explicit auth_type)",
+			config: Config{
+				ApplicationId: "app-id",
+				AuthType:      "api_key",
+				ApiKey:        "test-api-key",
+			},
+			wantErr: "",
+		},
+		{
+			name: "valid config with API key (default auth_type)",
 			config: Config{
 				ApplicationId: "app-id",
 				ApiKey:        "test-api-key",
@@ -72,9 +81,10 @@ func TestConfigValidate(t *testing.T) {
 			wantErr: "",
 		},
 		{
-			name: "valid config with OAuth2",
+			name: "valid config with client secret",
 			config: Config{
 				ApplicationId: "app-id",
+				AuthType:      "client_secret",
 				TenantId:      "tenant-id",
 				ClientId:      "client-id",
 				ClientSecret:  "client-secret",
@@ -82,49 +92,69 @@ func TestConfigValidate(t *testing.T) {
 			wantErr: "",
 		},
 		{
-			name: "invalid config with no auth",
+			name: "invalid config - api_key auth_type without api_key",
+			config: Config{
+				ApplicationId: "app-id",
+				AuthType:      "api_key",
+			},
+			wantErr: "api_key is required when auth_type is api_key",
+		},
+		{
+			name: "invalid config - default auth_type without api_key",
 			config: Config{
 				ApplicationId: "app-id",
 			},
-			wantErr: "no MSI/MSEntra authentication configuration or api_key was provided",
+			wantErr: "api_key is required when auth_type is api_key",
 		},
 		{
-			name: "invalid config with partial OAuth2 - missing tenant_id",
+			name: "invalid config - client_secret missing tenant_id",
 			config: Config{
 				ApplicationId: "app-id",
+				AuthType:      "client_secret",
 				ClientId:      "client-id",
 				ClientSecret:  "client-secret",
 			},
-			wantErr: "incomplete MSI/MSEntra authentication configuration",
+			wantErr: "tenant_id is required when auth_type is client_secret",
 		},
 		{
-			name: "invalid config with partial OAuth2 - missing client_id",
+			name: "invalid config - client_secret missing client_id",
 			config: Config{
 				ApplicationId: "app-id",
+				AuthType:      "client_secret",
 				TenantId:      "tenant-id",
 				ClientSecret:  "client-secret",
 			},
-			wantErr: "incomplete MSI/MSEntra authentication configuration",
+			wantErr: "client_id is required when auth_type is client_secret",
 		},
 		{
-			name: "invalid config with partial OAuth2 - missing client_secret",
+			name: "invalid config - client_secret missing client_secret",
 			config: Config{
 				ApplicationId: "app-id",
+				AuthType:      "client_secret",
 				TenantId:      "tenant-id",
 				ClientId:      "client-id",
 			},
-			wantErr: "incomplete MSI/MSEntra authentication configuration",
+			wantErr: "client_secret is required when auth_type is client_secret",
 		},
 		{
-			name: "valid config with OAuth2 and active_directory_endpoint",
+			name: "valid config with client secret and active_directory_endpoint",
 			config: Config{
 				ApplicationId:           "app-id",
+				AuthType:                "client_secret",
 				TenantId:                "tenant-id",
 				ClientId:                "client-id",
 				ClientSecret:            "client-secret",
 				ActiveDirectoryEndpoint: "https://login.microsoftonline.us/",
 			},
 			wantErr: "",
+		},
+		{
+			name: "invalid config - unknown auth_type",
+			config: Config{
+				ApplicationId: "app-id",
+				AuthType:      "invalid",
+			},
+			wantErr: "unknown auth_type: invalid",
 		},
 	}
 

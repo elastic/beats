@@ -38,9 +38,10 @@ func (m *mockTokenCredential) GetToken(_ context.Context, _ policy.TokenRequestO
 func TestGetAuthorizer(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 
-	t.Run("returns API key authorizer when only api_key is set", func(t *testing.T) {
+	t.Run("returns API key authorizer when auth_type is api_key", func(t *testing.T) {
 		cfg := Config{
 			ApplicationId: "app-id",
+			AuthType:      AuthTypeAPIKey,
 			ApiKey:        "my-api-key",
 		}
 
@@ -52,9 +53,10 @@ func TestGetAuthorizer(t *testing.T) {
 		assert.False(t, isTokenAuth, "expected API key authorizer, got tokenCredentialAuthorizer")
 	})
 
-	t.Run("returns OAuth2 authorizer when OAuth2 credentials are set", func(t *testing.T) {
+	t.Run("returns client secret authorizer when auth_type is client_secret", func(t *testing.T) {
 		cfg := Config{
 			ApplicationId: "app-id",
+			AuthType:      AuthTypeClientSecret,
 			TenantId:      "tenant-id",
 			ClientId:      "client-id",
 			ClientSecret:  "client-secret",
@@ -68,36 +70,20 @@ func TestGetAuthorizer(t *testing.T) {
 		assert.True(t, isTokenAuth, "expected tokenCredentialAuthorizer")
 		assert.Equal(t, []string{appInsightsScope}, tokenAuth.scopes)
 	})
-
-	t.Run("OAuth2 takes priority when both are set", func(t *testing.T) {
-		cfg := Config{
-			ApplicationId: "app-id",
-			ApiKey:        "my-api-key",
-			TenantId:      "tenant-id",
-			ClientId:      "client-id",
-			ClientSecret:  "client-secret",
-		}
-
-		auth, err := getAuthorizer(cfg, logger)
-		require.NoError(t, err)
-		require.NotNil(t, auth)
-
-		_, isTokenAuth := auth.(*tokenCredentialAuthorizer)
-		assert.True(t, isTokenAuth, "expected OAuth2 authorizer to take priority")
-	})
 }
 
-func TestNewOAuth2Authorizer(t *testing.T) {
+func TestNewClientSecretAuthorizer(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 
 	t.Run("returns tokenCredentialAuthorizer with correct scopes", func(t *testing.T) {
 		cfg := Config{
+			AuthType:     AuthTypeClientSecret,
 			TenantId:     "tenant-id",
 			ClientId:     "client-id",
 			ClientSecret: "client-secret",
 		}
 
-		auth, err := newOAuth2Authorizer(cfg, logger)
+		auth, err := newClientSecretAuthorizer(cfg, logger)
 		require.NoError(t, err)
 		require.NotNil(t, auth)
 
@@ -109,13 +95,14 @@ func TestNewOAuth2Authorizer(t *testing.T) {
 
 	t.Run("accepts custom active_directory_endpoint", func(t *testing.T) {
 		cfg := Config{
+			AuthType:                AuthTypeClientSecret,
 			TenantId:                "tenant-id",
 			ClientId:                "client-id",
 			ClientSecret:            "client-secret",
 			ActiveDirectoryEndpoint: "https://login.microsoftonline.us/",
 		}
 
-		auth, err := newOAuth2Authorizer(cfg, logger)
+		auth, err := newClientSecretAuthorizer(cfg, logger)
 		require.NoError(t, err)
 		require.NotNil(t, auth)
 

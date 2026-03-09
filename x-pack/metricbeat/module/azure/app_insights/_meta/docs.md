@@ -16,7 +16,14 @@ This metricset allows users to retrieve application insights metrics from specif
 
 ### Authentication [_authentication]
 
-Two authentication methods are supported: **OAuth2 (Microsoft Entra ID)** and **API key**. If both are provided, OAuth2 takes priority.
+Two authentication methods are supported: **Client secret (Microsoft Entra ID)** and **API key**. The method is selected using the `auth_type` option.
+
+`auth_type`
+:   (*string*) The authentication method to use. Valid values: `api_key` (default), `client_secret`.
+
+#### Client secret authentication
+
+Set `auth_type: "client_secret"` and provide the following options:
 
 `tenant_id`
 :   (*string*) The tenant ID of the Microsoft Entra ID (Azure Active Directory) instance. More on service principal authentication can be found here [https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal).
@@ -30,7 +37,11 @@ Two authentication methods are supported: **OAuth2 (Microsoft Entra ID)** and **
 `active_directory_endpoint`
 :   (*string*) Optional. The Active Directory authority host URL. Use this to override the default endpoint, for example when connecting to Azure Government or Azure China clouds.
 
-All three of `tenant_id`, `client_id`, and `client_secret` must be provided together.
+All three of `tenant_id`, `client_id`, and `client_secret` are required when `auth_type` is `client_secret`.
+
+#### API key authentication
+
+Set `auth_type: "api_key"` (or omit `auth_type`, as it defaults to `api_key`) and provide:
 
 `api_key`
 :   (*string*) The API key which will be generated, more on the steps here [https://dev.applicationinsights.io/documentation/Authorization/API-key-and-App-ID](https://dev.applicationinsights.io/documentation/Authorization/API-key-and-App-ID).

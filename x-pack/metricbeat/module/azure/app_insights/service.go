@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	// appInsightsScope is the OAuth2 scope for Azure Application Insights API.
+	// appInsightsScope is the scope for Azure Application Insights API used with client secret authentication.
 	appInsightsScope = "https://api.applicationinsights.io/.default"
 )
 
@@ -51,24 +51,22 @@ func NewService(config Config, logger *logp.Logger) (*AppInsightsService, error)
 	return service, nil
 }
 
-// getAuthorizer returns the appropriate authorizer based on the config.
-// If OAuth2 credentials are provided, it uses OAuth2 authentication.
-// Otherwise, it falls back to API key authentication.
+// getAuthorizer returns the appropriate authorizer based on the config's auth_type.
 func getAuthorizer(config Config, logger *logp.Logger) (autorest.Authorizer, error) {
-	// OAuth2 has higher priority than API key
-	if config.TenantId != "" && config.ClientId != "" && config.ClientSecret != "" {
-		logger.Debug("Using OAuth2 authentication for App Insights")
-		return newOAuth2Authorizer(config, logger)
+	switch config.AuthType {
+	case AuthTypeClientSecret:
+		logger.Debug("Using client secret authentication for App Insights")
+		return newClientSecretAuthorizer(config, logger)
+	default:
+		logger.Debug("Using API key authentication for App Insights")
+		return autorest.NewAPIKeyAuthorizerWithHeaders(map[string]interface{}{
+			"x-api-key": config.ApiKey,
+		}), nil
 	}
-
-	logger.Debug("Using API key authentication for App Insights")
-	return autorest.NewAPIKeyAuthorizerWithHeaders(map[string]interface{}{
-		"x-api-key": config.ApiKey,
-	}), nil
 }
 
-// newOAuth2Authorizer creates an OAuth2 authorizer using azidentity client credentials.
-func newOAuth2Authorizer(config Config, logger *logp.Logger) (autorest.Authorizer, error) {
+// newClientSecretAuthorizer creates an authorizer using azidentity client secret credentials.
+func newClientSecretAuthorizer(config Config, logger *logp.Logger) (autorest.Authorizer, error) {
 	clientOptions := policy.ClientOptions{}
 	if config.ActiveDirectoryEndpoint != "" {
 		clientOptions.Cloud = cloud.Configuration{
@@ -88,7 +86,7 @@ func newOAuth2Authorizer(config Config, logger *logp.Logger) (autorest.Authorize
 		return nil, fmt.Errorf("failed to create client secret credential: %w", err)
 	}
 
-	logger.Debugf("OAuth2 authorizer created for tenant: %s, client: %s", config.TenantId, config.ClientId)
+	logger.Debugf("Client secret authorizer created for tenant: %s, client: %s", config.TenantId, config.ClientId)
 
 	return &tokenCredentialAuthorizer{
 		credential: credential,

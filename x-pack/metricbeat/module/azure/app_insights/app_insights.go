@@ -16,7 +16,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-const metricsetName = "app_insights"
+const (
+	metricsetName = "app_insights"
+
+	// AuthTypeAPIKey uses API key authentication (default for backwards compatibility).
+	AuthTypeAPIKey string = "api_key"
+	// AuthTypeClientSecret uses client secret credentials (Microsoft Entra ID).
+	AuthTypeClientSecret string = "client_secret"
+)
 
 // Config options
 type Config struct {
@@ -25,30 +32,53 @@ type Config struct {
 	Metrics       []Metric      `config:"metrics" validate:"required"`
 	Namespace     string        `config:"namespace"`
 
-	// API Key authentication
+	// AuthType specifies the authentication method.
+	// Valid values: api_key (default), client_secret.
+	AuthType string `config:"auth_type"`
+
+	// API key authentication
 	ApiKey string `config:"api_key"`
 
-	// OAuth2 authentication
+	// Client secret authentication (Microsoft Entra ID)
 	TenantId                string `config:"tenant_id"`
 	ClientId                string `config:"client_id"`
 	ClientSecret            string `config:"client_secret"`
 	ActiveDirectoryEndpoint string `config:"active_directory_endpoint"`
 }
 
-// Validate checks that at least one authentication method is configured.
+// Validate checks that the authentication configuration is complete.
 func (c *Config) Validate() error {
-	hasOAuth2 := c.TenantId != "" && c.ClientId != "" && c.ClientSecret != ""
-	hasPartialOAuth2 := (c.TenantId != "" || c.ClientId != "" || c.ClientSecret != "") && !hasOAuth2
-	hasAPIKey := c.ApiKey != ""
-
-	if hasPartialOAuth2 {
-		return fmt.Errorf("incomplete MSI/MSEntra authentication configuration: tenant_id, client_id, and client_secret must all be provided")
+	if c.AuthType == "" {
+		c.AuthType = AuthTypeAPIKey
 	}
 
-	if !hasOAuth2 && !hasAPIKey {
-		return fmt.Errorf("no MSI/MSEntra authentication configuration or api_key was provided")
+	switch c.AuthType {
+	case AuthTypeAPIKey:
+		return c.validateAPIKeyAuth()
+	case AuthTypeClientSecret:
+		return c.validateClientSecretAuth()
+	default:
+		return fmt.Errorf("unknown auth_type: %s (valid values: %s, %s)", c.AuthType, AuthTypeAPIKey, AuthTypeClientSecret)
 	}
+}
 
+func (c *Config) validateAPIKeyAuth() error {
+	if c.ApiKey == "" {
+		return fmt.Errorf("api_key is required when auth_type is %s", AuthTypeAPIKey)
+	}
+	return nil
+}
+
+func (c *Config) validateClientSecretAuth() error {
+	if c.TenantId == "" {
+		return fmt.Errorf("tenant_id is required when auth_type is %s", AuthTypeClientSecret)
+	}
+	if c.ClientId == "" {
+		return fmt.Errorf("client_id is required when auth_type is %s", AuthTypeClientSecret)
+	}
+	if c.ClientSecret == "" {
+		return fmt.Errorf("client_secret is required when auth_type is %s", AuthTypeClientSecret)
+	}
 	return nil
 }
 
