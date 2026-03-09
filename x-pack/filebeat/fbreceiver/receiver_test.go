@@ -1,6 +1,7 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
+// This file was contributed to by generative AI
 
 package fbreceiver
 
@@ -21,6 +22,7 @@ import (
 	"strings"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -497,12 +499,73 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 	return true
 }
 
+func hasInputMetricsFromUnixSocket(t *testing.T, socketPath string, inputID string) error {
+	// skip windows for now
+	if runtime.GOOS == "windows" {
+		return nil
+	}
+
+	client := http.Client{
+		Transport: &http.Transport{
+			DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+				return (&net.Dialer{}).DialContext(ctx, "unix", socketPath)
+			},
+		},
+	}
+	defer client.CloseIdleConnections()
+
+	inputsURL, err := url.JoinPath("http://unix", "inputs")
+	if err != nil {
+		return fmt.Errorf("JoinPath failed: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, inputsURL, nil)
+	if err != nil {
+		return fmt.Errorf("error creating request: %w", err)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("client.Get failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("io.ReadAll of body failed: %w", err)
+	}
+
+	if len(body) <= 0 {
+		return errors.New("body too short")
+	}
+
+	var inputs []map[string]any
+	if err := json.Unmarshal(body, &inputs); err != nil {
+		return fmt.Errorf("json unmarshal of body failed: %w (body=%q)", err, body)
+	}
+
+	if len(inputs) <= 0 {
+		return errors.New("json array didn't have any entries")
+	}
+
+	for _, input := range inputs {
+		id, _ := input["id"].(string)
+		if id != inputID {
+			continue
+		}
+		return nil
+	}
+
+	return fmt.Errorf("input %q not found in /inputs payload", inputID)
+}
+
 type logGenerator struct {
 	t           *testing.T
 	tmpDir      string
 	f           *os.File
 	sequenceNum int64
 	currentFile string
+	waitReady   func()
 }
 
 func newLogGenerator(t *testing.T, tmpDir string) *logGenerator {
@@ -524,6 +587,9 @@ func (g *logGenerator) Start() {
 	g.f = f
 	g.currentFile = filePath
 	atomic.StoreInt64(&g.sequenceNum, 0)
+	if g.waitReady != nil {
+		g.waitReady()
+	}
 }
 
 func (g *logGenerator) Stop() {
@@ -558,20 +624,31 @@ func TestConsumeContract(t *testing.T) {
 	defer oteltest.VerifyNoLeaks(t)
 
 	tmpDir := t.TempDir()
-	const logsPerTest = 100
+	monitorSocket := genSocketPath(t)
+	const (
+		logsPerTest       = 100
+		filestreamInputID = "filestream-test"
+	)
 
 	gen := newLogGenerator(t, tmpDir)
+	gen.waitReady = func() {
+		require.EventuallyWithT(t, func(c *assert.CollectT) {
+			err := hasInputMetricsFromUnixSocket(t, monitorSocket, filestreamInputID)
+			assert.NoError(c, err, "receiver input metrics are not ready")
+		}, 30*time.Second, 100*time.Millisecond)
+	}
 
 	t.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
 
 	cfg := &Config{
 		Beatconfig: map[string]any{
 			"queue.mem.flush.timeout": "0s",
+			"processors":              []map[string]any{},
 			"filebeat": map[string]any{
 				"inputs": []map[string]any{
 					{
 						"type":    "filestream",
-						"id":      "filestream-test",
+						"id":      filestreamInputID,
 						"enabled": true,
 						"paths": []string{
 							filepath.Join(tmpDir, "input.log"),
@@ -593,6 +670,8 @@ func TestConsumeContract(t *testing.T) {
 					},
 				},
 			},
+			"http.enabled": true,
+			"http.host":    hostFromSocket(monitorSocket),
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
