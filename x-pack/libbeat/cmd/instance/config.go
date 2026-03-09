@@ -10,9 +10,9 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 )
 
-// ConvertPaths converts any dot-separated keys (e.g. "path.home",
+// DeDotKeys converts any dot-separated keys (e.g. "path.home",
 // "management.otel.enabled") into nested submaps.
-func ConvertPaths(conf *confmap.Conf) error {
+func DeDotKeys(conf *confmap.Conf) error {
 	nested := map[string]any{}
 	for key, val := range conf.ToStringMap() {
 		if !strings.Contains(key, ".") {

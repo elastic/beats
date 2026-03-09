@@ -20,7 +20,7 @@ type Config struct {
 
 // Unmarshal implements confmap.Unmarshaler for custom unmarshaling logic.
 func (c *Config) Unmarshal(conf *confmap.Conf) error {
-	if err := xpInstance.ConvertPaths(conf); err != nil {
+	if err := xpInstance.DeDotKeys(conf); err != nil {
 		return fmt.Errorf("error converting paths: %w", err)
 	}
 	if err := conf.Unmarshal(c); err != nil {
