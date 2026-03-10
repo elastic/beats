@@ -139,6 +139,7 @@ func (f *RunnerFactory) GetHashFunc(c *conf.C) (plugin.HashConfigFunc, error) {
 		return nil, fmt.Errorf("monitor type %v does not exist, valid types are %v", sf.Type, f.pluginsReg.MonitorNames())
 	}
 
+	f.logger.Debugf("returning plugin custom hash function")
 	return pluginFactory.HashConfig, nil
 }
 

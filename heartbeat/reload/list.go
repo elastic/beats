@@ -117,7 +117,7 @@ func (r *HBRunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		}
 	}
 
-	r.logger.Debugf("Start list: %d, Stop list: %d", len(startList), len(stopList))
+	r.logger.Debugf("Start list: %d, Stop list: %d, Update list: %d", len(startList), len(stopList), len(updateList))
 
 	wg := sync.WaitGroup{}
 
@@ -252,6 +252,7 @@ func (r *HBRunnerList) Has(hash uint64) bool {
 func (r *HBRunnerList) HashConfig(c *config.C) (uint64, error) {
 	hbfactory, ok := r.factory.(monitors.HBRunnerFactory)
 	if !ok {
+		r.logger.Infof("plugin factory does not implement HBRunnerFactory, defaulting to config hash")
 		return DefaultHashConfig(c)
 	}
 
@@ -262,6 +263,7 @@ func (r *HBRunnerList) HashConfig(c *config.C) (uint64, error) {
 	}
 
 	if hash != nil {
+		r.logger.Infof("found plugin hash function, deferring")
 		return hash(c)
 	}
 
