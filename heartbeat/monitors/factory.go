@@ -124,12 +124,12 @@ func (NoopRunner) Update(c *conf.C) error {
 }
 
 func (f *RunnerFactory) GetHashFunc(c *conf.C) (plugin.HashConfigFunc, error) {
-	unnested, err := stdfields.UnnestStream(c)
-	if err != nil {
-		return nil, err
-	}
+	// unnested, err := stdfields.UnnestStream(c)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	sf, err := stdfields.ConfigToStdMonitorFields(unnested)
+	sf, err := stdfields.ConfigToStdMonitorFields(c)
 	if err != nil {
 		return nil, fmt.Errorf("could not load stdfields in factory: %w", err)
 	}
@@ -145,10 +145,10 @@ func (f *RunnerFactory) GetHashFunc(c *conf.C) (plugin.HashConfigFunc, error) {
 
 // Create makes a new Runner for a new monitor with the given Config.
 func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, error) {
-	c, err := stdfields.UnnestStream(c)
-	if err != nil {
-		return nil, err
-	}
+	// c, err := stdfields.UnnestStream(c)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	if !c.Enabled() {
 		return NoopRunner{}, nil

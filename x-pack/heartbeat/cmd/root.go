@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 
 	heartbeatCmd "github.com/elastic/beats/v7/heartbeat/cmd"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
@@ -30,7 +31,18 @@ func heartbeatCfg(rawIn *proto.UnitExpectedConfig, _ *client.AgentInfo) ([]*relo
 	if err != nil {
 		return nil, fmt.Errorf("error creating reloader config: %w", err)
 	}
-	return configList, nil
+
+	unnestedList := []*reload.ConfigWithMeta{}
+	for _, cfg := range configList {
+		unnested, err := stdfields.UnnestStream(cfg.Config)
+		if err != nil {
+			unnestedList = append(unnestedList, cfg)
+		} else {
+			unnestedList = append(unnestedList, &reload.ConfigWithMeta{Config: unnested})
+		}
+	}
+
+	return unnestedList, nil
 }
 
 // TransformRawIn removes unwanted fields to keep consistent hashing on reload()

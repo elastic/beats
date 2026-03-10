@@ -101,13 +101,13 @@ func (sj *SourceJob) Close() error {
 func (sj *SourceJob) Update(c *config.C) error {
 	// Update bypasses plugin factory, so the config comes as-is from
 	// agent management. We need to unnest here or move the logic to the factory itself
-	unnested, err := stdfields.UnnestStream(c)
-	if err != nil {
-		return err
-	}
+	// unnested, err := stdfields.UnnestStream(c)
+	// if err != nil {
+	// 	return err
+	// }
 
 	var cfg Config
-	err = unnested.Unpack(&cfg)
+	err := c.Unpack(&cfg)
 	if err != nil {
 		return fmt.Errorf("error unpacking browser config for update: %w", err)
 	}
