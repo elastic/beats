@@ -196,6 +196,7 @@ func TestJournaldInputReadsMessagesFromAllBoots(t *testing.T) {
 		"../../filebeat.test",
 	)
 
+	t.Log("Reading boot entries.")
 	boots, listBootsRaw := listBoots(t)
 	if len(boots) <= 1 {
 		t.Fatalf("expected more than one boot in journalctl --list-boots output, got %d. Output:\n%s", len(boots), listBootsRaw)
@@ -204,8 +205,12 @@ func TestJournaldInputReadsMessagesFromAllBoots(t *testing.T) {
 	oldestBoot := boots[0]
 	secondOldestBoot := boots[1]
 
+	t.Log("Counting boot entries: ", oldestBoot.Offset, oldestBoot.BootID)
 	oldestBootEntries := countBootEntries(t, oldestBoot.Offset)
+
+	t.Log("Counting second old boot entries: ", secondOldestBoot.Offset, secondOldestBoot.BootID)
 	secondOldestBootEntries := countBootEntries(t, secondOldestBoot.Offset)
+
 	expectedMessages := oldestBootEntries + secondOldestBootEntries
 	if expectedMessages < 1 {
 		t.Fatalf(
@@ -243,7 +248,7 @@ func TestJournaldInputReadsMessagesFromAllBoots(t *testing.T) {
 }
 
 func listBoots(t *testing.T) (boots []bootInfo, raw string) {
-	cmd := exec.Command("journalctl", "--list-boots", "--no-pager")
+	cmd := exec.Command("journalctl", "--list-boots", "--no-pager", "--quiet")
 	output, err := cmd.CombinedOutput()
 	raw = string(output)
 	if err != nil {
