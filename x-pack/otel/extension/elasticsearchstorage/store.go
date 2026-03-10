@@ -23,7 +23,6 @@ type store struct {
 }
 
 type queryResult struct {
-	Found  bool `json:"found"`
 	Source struct {
 		Value json.RawMessage `json:"v"`
 	} `json:"_source"`
