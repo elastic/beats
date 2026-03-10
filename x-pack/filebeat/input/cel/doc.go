@@ -14,6 +14,7 @@ Each export captures metrics for that interval only; counters reset between expo
 
 Metrics export is disabled by default. Enable export to a OTLP/gRPC endpoint by setting environment variables:
 
+  - OTEL_METRICS_EXPORTER: Required. Set to "otlp".
   - OTEL_EXPORTER_OTLP_ENDPOINT: Required. The OTLP endpoint URL.
   - OTEL_EXPORTER_OTLP_HEADERS: Required if endpoint is authenticated.
   - OTEL_RESOURCE_ATTRIBUTES: Optional but recommended
