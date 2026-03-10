@@ -7,6 +7,7 @@ package interfaces
 import (
 	"encoding/xml"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -14,7 +15,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const IPSecTunnelsQuery = "<show><vpn><tunnel></tunnel></vpn></show>"
+const (
+	IPSecTunnelsQuery               = "<show><vpn><tunnel></tunnel></vpn></show>"
+	maxConcurrentTunnelStateQueries = 5
+)
 
 func tunnelFlowQuery(tunnelID int) string {
 	return fmt.Sprintf("<show><running><tunnel><flow><tunnel-id>%d</tunnel-id></flow></tunnel></running></show>", tunnelID)
@@ -32,6 +36,9 @@ func getTunnelState(m *MetricSet, tunnelID int) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error unmarshaling tunnel flow response for tunnel %d: %w", tunnelID, err)
 	}
+	if response.Status != "success" {
+		return "", fmt.Errorf("tunnel flow query for tunnel %d returned status %q", tunnelID, response.Status)
+	}
 
 	if len(response.Result.IPSec.Entries) > 0 {
 		return response.Result.IPSec.Entries[0].State, nil
@@ -41,7 +48,6 @@ func getTunnelState(m *MetricSet, tunnelID int) (string, error) {
 }
 
 func getIPSecTunnelEvents(m *MetricSet) ([]mb.Event, error) {
-
 	var response TunnelsResponse
 
 	output, err := m.client.Op(IPSecTunnelsQuery, panw.Vsys, nil, nil)
@@ -55,21 +61,62 @@ func getIPSecTunnelEvents(m *MetricSet) ([]mb.Event, error) {
 		m.logger.Error("Error: %s", err)
 		return nil, fmt.Errorf("error unmarshaling IPSec tunnels response: %w", err)
 	}
+	if response.Status != "success" {
+		return nil, fmt.Errorf("IPSec tunnels query returned status %q", response.Status)
+	}
 
-	// Fetch state for each tunnel via individual flow queries
+	type stateResult struct {
+		index int
+		id    int
+		state string
+		err   error
+	}
+
+	jobs := make(chan int)
+	results := make(chan stateResult, len(response.Result.Entries))
+
+	workers := maxConcurrentTunnelStateQueries
+	if workers > len(response.Result.Entries) {
+		workers = len(response.Result.Entries)
+	}
+
+	var wg sync.WaitGroup
+	for w := 0; w < workers; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for i := range jobs {
+				entry := response.Result.Entries[i]
+				state, err := getTunnelState(m, entry.ID)
+				results <- stateResult{index: i, id: entry.ID, state: state, err: err}
+			}
+		}()
+	}
+
 	for i, entry := range response.Result.Entries {
-		state, err := getTunnelState(m, entry.ID)
-		if err != nil {
-			m.logger.Warnf("Failed to get state for tunnel %d: %s", entry.ID, err)
+		if entry.State != "" {
 			continue
 		}
-		response.Result.Entries[i].State = state
+		jobs <- i
+	}
+	close(jobs)
+
+	wg.Wait()
+	close(results)
+
+	for result := range results {
+		if result.err != nil {
+			m.logger.Warnf("Failed to get state for tunnel %d: %s", result.id, result.err)
+			continue
+		}
+		if result.state != "" {
+			response.Result.Entries[result.index].State = result.state
+		}
 	}
 
 	events := formatIPSecTunnelEvents(m, response.Result.Entries)
 
 	return events, nil
-
 }
 
 func formatIPSecTunnelEvents(m *MetricSet, entries []TunnelsEntry) []mb.Event {
@@ -111,5 +158,4 @@ func formatIPSecTunnelEvents(m *MetricSet, entries []TunnelsEntry) []mb.Event {
 	}
 
 	return events
-
 }
