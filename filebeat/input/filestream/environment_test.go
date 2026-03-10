@@ -36,6 +36,7 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
@@ -53,7 +54,7 @@ type inputTestingEnvironment struct {
 	workingDir string
 	stateStore statestore.States
 	pipeline   *mockPipelineConnector
-	monitoring beat.Monitoring
+	monitoring beatmonitoring.Monitoring
 
 	pluginInitOnce sync.Once
 	plugin         v2.Plugin
@@ -81,7 +82,7 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 		workingDir: t.TempDir(),
 		stateStore: openTestStatestore(),
 		pipeline:   &mockPipelineConnector{},
-		monitoring: beat.NewMonitoring(),
+		monitoring: beatmonitoring.NewMonitoring(),
 	}
 }
 

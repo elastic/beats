@@ -44,6 +44,12 @@ func initFromEnv(envName string) {
 	isESEnabled = len(esTypesEnabled) > 0
 }
 
+// ReinitForTest reinitializes the feature flags from the current environment.
+// This is intended for use in tests only.
+func ReinitForTest() {
+	initFromEnv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES")
+}
+
 // IsElasticsearchStateStoreEnabled returns true if feature is enabled for agentless
 func IsElasticsearchStateStoreEnabled() bool {
 	return isESEnabled
