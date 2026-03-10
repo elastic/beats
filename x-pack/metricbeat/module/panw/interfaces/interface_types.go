@@ -252,8 +252,8 @@ type TunnelsEntry struct {
 // Tunnel flow response types (for querying individual tunnel state via
 // <show><running><tunnel><flow><tunnel-id>ID</tunnel-id></flow></tunnel></running></show>)
 type TunnelFlowResponse struct {
-	Status string            `xml:"status,attr"`
-	Result TunnelFlowResult  `xml:"result"`
+	Status string           `xml:"status,attr"`
+	Result TunnelFlowResult `xml:"result"`
 }
 
 type TunnelFlowResult struct {
