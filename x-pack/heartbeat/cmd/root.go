@@ -39,6 +39,10 @@ func TransformRawIn(rawIn *proto.UnitExpectedConfig) []map[string]interface{} {
 
 	for _, p := range rawInput {
 		delete(p, "policy")
+		// revision gets incremented even if no actual change to the monitor policy
+		// happened, changing the config hash. This is particularly impactful if using
+		// global parameters
+		delete(p, "revision")
 	}
 
 	return rawInput
