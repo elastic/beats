@@ -27,6 +27,7 @@ import (
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/receiver"
 )
 
 // BaseReceiver holds common configurations for beatreceivers.
@@ -40,7 +41,9 @@ type BeatReceiver struct {
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
-func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator, receiverID component.ID, ts component.TelemetrySettings) (BeatReceiver, error) {
+func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator, set receiver.Settings) (BeatReceiver, error) {
+	receiverID := set.ID
+	ts := set.TelemetrySettings
 	beatConfig, err := b.BeatConfig()
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error getting beat config: %w", err)
