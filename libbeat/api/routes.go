@@ -23,6 +23,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -32,18 +33,17 @@ import (
 type LookupFunc func(string) *monitoring.Registry
 
 // NewWithDefaultRoutes creates a new server with default API routes.
-func NewWithDefaultRoutes(log *logp.Logger, config *config.C,
-	info, state, stats, inputs *monitoring.Registry) (*Server, error) {
+func NewWithDefaultRoutes(log *logp.Logger, config *config.C, mon beatmonitoring.Monitoring) (*Server, error) {
 	api, err := New(log, config)
 	if err != nil {
 		return nil, err
 	}
 
 	err = errors.Join(
-		api.AttachHandler("/", makeRootAPIHandler(makeAPIHandler(info))),
-		api.AttachHandler("/state", makeAPIHandler(state)),
-		api.AttachHandler("/stats", makeAPIHandler(stats)),
-		api.AttachHandler("/dataset", makeAPIHandler(inputs)),
+		api.AttachHandler("/", makeRootAPIHandler(makeAPIHandler(mon.InfoRegistry()))),
+		api.AttachHandler("/state", makeAPIHandler(mon.StateRegistry())),
+		api.AttachHandler("/stats", makeAPIHandler(mon.StatsRegistry())),
+		api.AttachHandler("/dataset", makeAPIHandler(mon.InputsRegistry())),
 	)
 	if err != nil {
 		return nil, err

@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	elasticjumplists "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/jumplists/elastic_jumplists"
 )
 
 func TestCustomJumplists(t *testing.T) {
@@ -68,10 +69,16 @@ func TestCustomJumplists(t *testing.T) {
 			}
 			assert.NoError(t, err, "expected no error when parsing custom jumplist")
 			assert.NotNil(t, jumplist, "expected non-nil jumplist when parsing custom jumplist")
-			rows := jumplist.ToRows()
+			rows := jumplist.toRows()
 			assert.Equal(t, test.expectedRows, len(rows), "expected %d rows in the jumplist", test.expectedRows)
 		})
 	}
+}
+
+func TestGeneratedColumns(t *testing.T) {
+	columns := elasticjumplists.Columns()
+	assert.NotNil(t, columns, "expected non-nil columns")
+	assert.Greater(t, len(columns), 0, "expected at least 1 column")
 }
 
 func TestLnk(t *testing.T) {
@@ -131,8 +138,7 @@ type MockClient struct {
 	t *testing.T
 }
 
-func (m *MockClient) Query(sql string) (*osquerygen.ExtensionResponse, error) {
-	_ = sql
+func (m *MockClient) Query(string) (*osquerygen.ExtensionResponse, error) {
 	profileDir := m.t.TempDir()
 	recentDir := filepath.Join(profileDir, "AppData", "Roaming", "Microsoft", "Windows", "Recent")
 	assert.NoError(m.t, os.MkdirAll(recentDir, 0o755))
@@ -143,6 +149,12 @@ func (m *MockClient) Query(sql string) (*osquerygen.ExtensionResponse, error) {
 	assert.NoError(m.t, err, "expected no error when reading custom jumplist test file")
 	assert.NoError(m.t, os.WriteFile(filepath.Join(customJumplistDir, "590aee7bdd69b59b.customDestinations-ms"), bytes, 0o644))
 
+	automaticJumplistDir := filepath.Join(recentDir, "AutomaticDestinations")
+	assert.NoError(m.t, os.MkdirAll(automaticJumplistDir, 0o755))
+	bytes, err = os.ReadFile("./testdata/automatic/4db07e3587413f4d.automaticDestinations-ms")
+	assert.NoError(m.t, err, "expected no error when reading automatic jumplist test file")
+	assert.NoError(m.t, os.WriteFile(filepath.Join(automaticJumplistDir, "4db07e3587413f4d.automaticDestinations-ms"), bytes, 0o644))
+
 	return &osquerygen.ExtensionResponse{
 		Response: []map[string]string{
 			{
@@ -152,6 +164,95 @@ func (m *MockClient) Query(sql string) (*osquerygen.ExtensionResponse, error) {
 			},
 		},
 	}, nil
+}
+
+func TestAutomaticJumpList(t *testing.T) {
+	type testCase struct {
+		name        string
+		filePath    string
+		expectError bool
+	}
+	tests := []testCase{
+		{
+			name:        "test_olecfb_2",
+			filePath:    "./testdata/automatic/5f7b5f1e01b83767.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_3",
+			filePath:    "./testdata/automatic/6cbc8013911ed22e.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_4",
+			filePath:    "./testdata/automatic/7e4dca80246863e3.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_5",
+			filePath:    "./testdata/automatic/9b9cdc69c1c24e2b.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_7",
+			filePath:    "./testdata/automatic/47c6675663a92f2a.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_8",
+			filePath:    "./testdata/automatic/607c8cee3ce959c.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_11",
+			filePath:    "./testdata/automatic/befe8a0a7d3eeb43.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_12",
+			filePath:    "./testdata/automatic/ccba5a5986c77e43.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_15",
+			filePath:    "./testdata/automatic/db9172b310c92fa6.automaticDestinations-ms",
+			expectError: false,
+		},
+		{
+			name:        "test_olecfb_16",
+			filePath:    "./testdata/automatic/f01b4d95cf55d32a.automaticDestinations-ms",
+			expectError: false,
+		},
+	}
+	log := logger.New(os.Stdout, true)
+	for _, test := range tests {
+		automaticJumpList, err := parseAutomaticJumpListFile(test.filePath, &UserProfile{Username: "test", Sid: "test"}, log)
+		if err != nil {
+			t.Fatalf("%s %s parseAutomaticJumpListFile() returned error: %v", test.filePath, test.name, err)
+		}
+		if test.expectError {
+			assert.Error(t, err, "expected error when parsing Automatic Jump List")
+			assert.Nil(t, automaticJumpList, "expected nil Automatic Jump List when parsing Automatic Jump List")
+			return
+		}
+		assert.NoError(t, err, "expected no error when parsing Automatic Jump List")
+		assert.NotNil(t, automaticJumpList, "expected non-nil Automatic Jump List when parsing Automatic Jump List")
+		rows := automaticJumpList.toRows()
+		assert.Greater(t, len(rows), 0, "expected at least 1 row in the Automatic Jump List")
+
+		// If an automatic jumplist has only one row, it could mean that the jumplist is empty.
+		// or it could mean that the jumplist has only one entry.  If the jumplist is empty,
+		// both the DestListEntry and the Lnk will be nil.  If the jumplist has only one entry,
+		// the DestListEntry will be non-nil and the Lnk will be non-nil.
+		if len(rows) == 1 && rows[0].DestListEntry == nil {
+			assert.Nil(t, rows[0].Lnk, "expected nil LNK when parsing Automatic Jump List")
+		} else {
+			for _, row := range rows {
+				assert.NotNil(t, row.Lnk, "expected non-nil LNK when parsing Automatic Jump List")
+				assert.NotNil(t, row.DestListEntry, "expected non-nil DestListEntry when parsing Automatic Jump List")
+			}
+		}
+	}
 }
 
 func TestGetUserProfiles(t *testing.T) {
@@ -168,7 +269,7 @@ func TestGetJumplists(t *testing.T) {
 	for _, userProfile := range userProfiles {
 		jumplists := userProfile.getJumplists(log)
 		for _, jumplist := range jumplists {
-			log.Infof("found jumplist: %s, username: %s, sid: %s", jumplist.Path, userProfile.Username, userProfile.Sid)
+			log.Infof("found jumplist: %s, username: %s, sid: %s", jumplist.SourceFilePath, userProfile.Username, userProfile.Sid)
 		}
 	}
 }
