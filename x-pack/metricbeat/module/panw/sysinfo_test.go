@@ -121,6 +121,7 @@ func TestMakeRootFieldsEmptyHostname(t *testing.T) {
 	rootFields := MakeRootFields(hostIP, hostname)
 
 	assert.Equal(t, hostIP, rootFields["observer.ip"])
-	assert.Equal(t, "", rootFields["observer.hostname"])
 	assert.Equal(t, hostIP, rootFields["host.ip"])
+	_, exists := rootFields["observer.hostname"]
+	assert.False(t, exists)
 }
