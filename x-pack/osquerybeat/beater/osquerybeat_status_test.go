@@ -329,7 +329,7 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 // when custom osquery runtime resolution fails before osqueryd runner creation.
 func TestOsquerybeatStatusReporting_RuntimeResolutionFailure(t *testing.T) {
 	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
-		platformCfg := &config.InstallArtifactConfig{
+		platformCfg := &config.InstallPlatformConfig{
 			ArtifactURL: "https://example.org/osquery.tar.gz",
 			SHA256:      "bad",
 		}

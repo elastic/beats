@@ -70,11 +70,20 @@ type Config struct {
 }
 
 type InstallConfig struct {
-	Linux            *InstallArtifactConfig `config:"linux"`
-	Darwin           *InstallArtifactConfig `config:"darwin"`
-	Windows          *InstallArtifactConfig `config:"windows"`
+	Linux            *InstallPlatformConfig `config:"linux"`
+	Darwin           *InstallPlatformConfig `config:"darwin"`
+	Windows          *InstallPlatformConfig `config:"windows"`
 	AllowInsecureURL bool                   `config:"allow_insecure_url"`
 	SSL              *tlscommon.Config      `config:"ssl"`
+}
+
+type InstallPlatformConfig struct {
+	ArtifactURL      string                 `config:"artifact_url"`
+	SHA256           string                 `config:"sha256"`
+	AllowInsecureURL *bool                  `config:"allow_insecure_url"`
+	SSL              *tlscommon.Config      `config:"ssl"`
+	AMD64            *InstallArtifactConfig `config:"amd64"`
+	ARM64            *InstallArtifactConfig `config:"arm64"`
 }
 
 type InstallArtifactConfig struct {
@@ -85,18 +94,20 @@ type InstallArtifactConfig struct {
 }
 
 func (c InstallConfig) Enabled() bool {
-	return c.EnabledForPlatform("linux") || c.EnabledForPlatform("darwin") || c.EnabledForPlatform("windows")
+	return c.EnabledForPlatform("linux", "amd64") ||
+		c.EnabledForPlatform("linux", "arm64") ||
+		c.EnabledForPlatform("darwin", "amd64") ||
+		c.EnabledForPlatform("darwin", "arm64") ||
+		c.EnabledForPlatform("windows", "amd64") ||
+		c.EnabledForPlatform("windows", "arm64")
 }
 
-func (c InstallConfig) EnabledForPlatform(goos string) bool {
-	platformCfg := c.PlatformConfig(goos)
-	if platformCfg == nil {
-		return false
-	}
-	return strings.TrimSpace(platformCfg.ArtifactURL) != ""
+func (c InstallConfig) EnabledForPlatform(goos, goarch string) bool {
+	_, enabled := c.SelectedForPlatform(goos, goarch)
+	return enabled
 }
 
-func (c InstallConfig) PlatformConfig(goos string) *InstallArtifactConfig {
+func (c InstallConfig) PlatformConfig(goos string) *InstallPlatformConfig {
 	switch goos {
 	case "linux":
 		return c.Linux
@@ -109,34 +120,76 @@ func (c InstallConfig) PlatformConfig(goos string) *InstallArtifactConfig {
 	}
 }
 
-func (c InstallConfig) SelectedForPlatform(goos string) (InstallArtifactConfig, bool) {
+func (c InstallConfig) SelectedForPlatform(goos, goarch string) (InstallArtifactConfig, bool) {
 	platformCfg := c.PlatformConfig(goos)
-	if platformCfg == nil || strings.TrimSpace(platformCfg.ArtifactURL) == "" {
+	if platformCfg == nil {
 		return InstallArtifactConfig{}, false
 	}
-	return *platformCfg, true
+	if archCfg := platformCfg.ArchConfig(goarch); archCfg != nil && strings.TrimSpace(archCfg.ArtifactURL) != "" {
+		return *archCfg, true
+	}
+	if strings.TrimSpace(platformCfg.ArtifactURL) == "" {
+		return InstallArtifactConfig{}, false
+	}
+	return platformCfg.PlatformArtifactConfig(), true
 }
 
-func (c InstallConfig) AllowInsecureURLForPlatform(goos string) bool {
+func (c InstallConfig) AllowInsecureURLForPlatform(goos, goarch string) bool {
 	platformCfg := c.PlatformConfig(goos)
-	if platformCfg != nil && platformCfg.AllowInsecureURL != nil {
-		return *platformCfg.AllowInsecureURL
+	if platformCfg != nil {
+		if archCfg := platformCfg.ArchConfig(goarch); archCfg != nil && archCfg.AllowInsecureURL != nil {
+			return *archCfg.AllowInsecureURL
+		}
+		if platformCfg.AllowInsecureURL != nil {
+			return *platformCfg.AllowInsecureURL
+		}
 	}
 	return c.AllowInsecureURL
 }
 
-func (c InstallConfig) SSLForPlatform(goos string) *tlscommon.Config {
+func (c InstallConfig) SSLForPlatform(goos, goarch string) *tlscommon.Config {
 	platformCfg := c.PlatformConfig(goos)
-	if platformCfg != nil && platformCfg.SSL != nil {
-		return platformCfg.SSL
+	if platformCfg != nil {
+		if archCfg := platformCfg.ArchConfig(goarch); archCfg != nil && archCfg.SSL != nil {
+			return archCfg.SSL
+		}
+		if platformCfg.SSL != nil {
+			return platformCfg.SSL
+		}
 	}
 	return c.SSL
+}
+
+func (c *InstallPlatformConfig) ArchConfig(goarch string) *InstallArtifactConfig {
+	if c == nil {
+		return nil
+	}
+	switch goarch {
+	case "amd64":
+		return c.AMD64
+	case "arm64":
+		return c.ARM64
+	default:
+		return nil
+	}
+}
+
+func (c *InstallPlatformConfig) PlatformArtifactConfig() InstallArtifactConfig {
+	if c == nil {
+		return InstallArtifactConfig{}
+	}
+	return InstallArtifactConfig{
+		ArtifactURL:      c.ArtifactURL,
+		SHA256:           c.SHA256,
+		AllowInsecureURL: c.AllowInsecureURL,
+		SSL:              c.SSL,
+	}
 }
 
 func (c *InstallConfig) NormalizeAndValidate() error {
 	platforms := []struct {
 		name string
-		cfg  *InstallArtifactConfig
+		cfg  *InstallPlatformConfig
 	}{
 		{name: "linux", cfg: c.Linux},
 		{name: "darwin", cfg: c.Darwin},
@@ -147,36 +200,74 @@ func (c *InstallConfig) NormalizeAndValidate() error {
 		if platform.cfg == nil {
 			continue
 		}
+		if err := normalizeAndValidateArtifactConfig(
+			&InstallArtifactConfig{
+				ArtifactURL:      platform.cfg.ArtifactURL,
+				SHA256:           platform.cfg.SHA256,
+				AllowInsecureURL: platform.cfg.AllowInsecureURL,
+				SSL:              platform.cfg.SSL,
+			},
+			fmt.Sprintf("osquery.elastic_options.install.%s", platform.name),
+			c.AllowInsecureURLForPlatform(platform.name, ""),
+		); err != nil {
+			return err
+		}
 		platform.cfg.ArtifactURL = strings.TrimSpace(platform.cfg.ArtifactURL)
 		platform.cfg.SHA256 = strings.ToLower(strings.TrimSpace(platform.cfg.SHA256))
 
-		if platform.cfg.ArtifactURL == "" && platform.cfg.SHA256 == "" {
-			continue
+		arches := []struct {
+			name string
+			cfg  *InstallArtifactConfig
+		}{
+			{name: "amd64", cfg: platform.cfg.AMD64},
+			{name: "arm64", cfg: platform.cfg.ARM64},
 		}
-		if platform.cfg.ArtifactURL == "" {
-			return fmt.Errorf("osquery.elastic_options.install.%s.artifact_url is required when sha256 is set", platform.name)
-		}
-		if platform.cfg.SHA256 == "" {
-			return fmt.Errorf("osquery.elastic_options.install.%s.sha256 is required when artifact_url is set", platform.name)
-		}
-
-		hashBytes, err := hex.DecodeString(platform.cfg.SHA256)
-		if err != nil || len(hashBytes) != 32 {
-			return fmt.Errorf("osquery.elastic_options.install.%s.sha256 must be a valid SHA256 hex string", platform.name)
-		}
-
-		u, err := url.Parse(platform.cfg.ArtifactURL)
-		if err != nil {
-			return fmt.Errorf("invalid osquery.elastic_options.install.%s.artifact_url: %w", platform.name, err)
-		}
-		if u.Scheme == "" || u.Host == "" {
-			return fmt.Errorf("osquery.elastic_options.install.%s.artifact_url must be an absolute URL", platform.name)
-		}
-		if !c.AllowInsecureURLForPlatform(platform.name) && strings.ToLower(u.Scheme) != "https" {
-			return fmt.Errorf("osquery.elastic_options.install.%s.artifact_url must use https unless osquery.elastic_options.install.allow_insecure_url is true", platform.name)
+		for _, arch := range arches {
+			if arch.cfg == nil {
+				continue
+			}
+			if err := normalizeAndValidateArtifactConfig(
+				arch.cfg,
+				fmt.Sprintf("osquery.elastic_options.install.%s.%s", platform.name, arch.name),
+				c.AllowInsecureURLForPlatform(platform.name, arch.name),
+			); err != nil {
+				return err
+			}
 		}
 	}
 
+	return nil
+}
+
+func normalizeAndValidateArtifactConfig(cfg *InstallArtifactConfig, configPath string, allowInsecure bool) error {
+	cfg.ArtifactURL = strings.TrimSpace(cfg.ArtifactURL)
+	cfg.SHA256 = strings.ToLower(strings.TrimSpace(cfg.SHA256))
+
+	if cfg.ArtifactURL == "" && cfg.SHA256 == "" {
+		return nil
+	}
+	if cfg.ArtifactURL == "" {
+		return fmt.Errorf("%s.artifact_url is required when sha256 is set", configPath)
+	}
+	if cfg.SHA256 == "" {
+		return fmt.Errorf("%s.sha256 is required when artifact_url is set", configPath)
+	}
+
+	hashBytes, err := hex.DecodeString(cfg.SHA256)
+	if err != nil || len(hashBytes) != 32 {
+		return fmt.Errorf("%s.sha256 must be a valid SHA256 hex string", configPath)
+	}
+
+	u, err := url.Parse(cfg.ArtifactURL)
+	if err != nil {
+		return fmt.Errorf("invalid %s.artifact_url: %w", configPath, err)
+	}
+	if u.Scheme == "" || u.Host == "" {
+		return fmt.Errorf("%s.artifact_url must be an absolute URL", configPath)
+	}
+	if !allowInsecure && strings.ToLower(u.Scheme) != "https" {
+		return fmt.Errorf("%s.artifact_url must use https unless osquery.elastic_options.install.allow_insecure_url is true", configPath)
+	}
 	return nil
 }
 

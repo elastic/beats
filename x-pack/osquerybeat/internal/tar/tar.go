@@ -15,6 +15,15 @@ import (
 	"strings"
 )
 
+func pathInDir(path, dir string) bool {
+	cleanPath := filepath.Clean(path)
+	cleanDir := filepath.Clean(dir)
+	if cleanPath == cleanDir {
+		return true
+	}
+	return strings.HasPrefix(cleanPath, cleanDir+string(os.PathSeparator))
+}
+
 func shouldExtract(name string, files ...string) bool {
 	if files == nil {
 		return true
@@ -65,7 +74,7 @@ func Extract(r io.Reader, destinationDir string, files ...string) error {
 
 		//nolint:gosec // file path is checked below
 		path := filepath.Join(destinationDir, header.Name)
-		if !strings.HasPrefix(path, filepath.Clean(destinationDir)) {
+		if !pathInDir(path, destinationDir) {
 			return fmt.Errorf("illegal file path in tar: %v", header.Name)
 		}
 
@@ -75,6 +84,9 @@ func Extract(r io.Reader, destinationDir string, files ...string) error {
 				return err
 			}
 		case tar.TypeReg:
+			if err = os.MkdirAll(filepath.Dir(path), 0750); err != nil {
+				return err
+			}
 			writer, err := os.Create(path)
 			if err != nil {
 				return err
@@ -82,14 +94,38 @@ func Extract(r io.Reader, destinationDir string, files ...string) error {
 
 			//nolint:gosec // used during build only, check sums are validated beforehand, the size of distro is predicatable
 			if _, err = io.Copy(writer, tarReader); err != nil {
+				_ = writer.Close()
 				return err
 			}
 
 			if err = os.Chmod(path, os.FileMode(header.Mode)); err != nil {
+				_ = writer.Close()
 				return err
 			}
 
 			if err = writer.Close(); err != nil {
+				return err
+			}
+		case tar.TypeSymlink:
+			if err = os.MkdirAll(filepath.Dir(path), 0750); err != nil {
+				return err
+			}
+			resolvedTarget := filepath.Join(filepath.Dir(path), header.Linkname)
+			if !pathInDir(resolvedTarget, destinationDir) {
+				return fmt.Errorf("illegal symlink target in tar: %v -> %v", header.Name, header.Linkname)
+			}
+			if err = os.Symlink(header.Linkname, path); err != nil {
+				return err
+			}
+		case tar.TypeLink:
+			if err = os.MkdirAll(filepath.Dir(path), 0750); err != nil {
+				return err
+			}
+			targetPath := filepath.Join(destinationDir, header.Linkname)
+			if !pathInDir(targetPath, destinationDir) {
+				return fmt.Errorf("illegal hardlink target in tar: %v -> %v", header.Name, header.Linkname)
+			}
+			if err = os.Link(targetPath, path); err != nil {
 				return err
 			}
 		default:

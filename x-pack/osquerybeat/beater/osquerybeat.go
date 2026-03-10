@@ -191,6 +191,9 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	if osqueryRuntime.BinDir != "" {
 		opts = append(opts, osqd.WithBinaryPath(osqueryRuntime.BinDir))
 	}
+	if osqueryRuntime.ExtensionPath != "" {
+		opts = append(opts, osqd.WithExtensionPath(osqueryRuntime.ExtensionPath))
+	}
 
 	// Create osqueryd runner using factory
 	osq, err := bt.osquerydFactory(
@@ -497,9 +500,10 @@ func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
 }
 
 type osqueryRuntimeSelection struct {
-	BinDir  string
-	Version string
-	Source  string
+	BinDir        string
+	ExtensionPath string
+	Version       string
+	Source        string
 }
 
 func (bt *osquerybeat) resolveOsqueryRuntime(ctx context.Context) (osqueryRuntimeSelection, error) {
@@ -525,7 +529,7 @@ func (bt *osquerybeat) resolveOsqueryRuntime(ctx context.Context) (osqueryRuntim
 
 	installDir := bundledDir
 	installCfg := bt.osqueryInstallConfig
-	if !installCfg.EnabledForPlatform(runtime.GOOS) {
+	if !installCfg.EnabledForPlatform(runtime.GOOS, runtime.GOARCH) {
 		if err := installartifact.RemoveInstalled(installDir); err != nil {
 			bt.log.Warnf("failed to cleanup previous custom osquery install, continue with bundled osquery: %v", err)
 		}
@@ -536,11 +540,16 @@ func (bt *osquerybeat) resolveOsqueryRuntime(ctx context.Context) (osqueryRuntim
 	if err != nil {
 		return osqueryRuntimeSelection{}, err
 	}
+	bundledExtPath := osqd.OsqueryExtensionPathForPlatform(runtime.GOOS, bundledDir)
+	if _, err := os.Stat(bundledExtPath); err != nil {
+		return osqueryRuntimeSelection{}, fmt.Errorf("bundled osquery extension is required for custom runtime: %w", err)
+	}
 
 	return osqueryRuntimeSelection{
-		BinDir:  installed.BinDir,
-		Version: installed.Version,
-		Source:  "custom_artifact",
+		BinDir:        installed.BinDir,
+		ExtensionPath: bundledExtPath,
+		Version:       installed.Version,
+		Source:        "custom_artifact",
 	}, nil
 }
 

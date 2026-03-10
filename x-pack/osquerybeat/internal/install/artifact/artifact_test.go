@@ -11,6 +11,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -28,7 +29,7 @@ func testInstallConfig(url, sha string) config.InstallConfig {
 	cfg := config.InstallConfig{
 		AllowInsecureURL: true,
 	}
-	platformCfg := &config.InstallArtifactConfig{
+	platformCfg := &config.InstallPlatformConfig{
 		ArtifactURL: url,
 		SHA256:      sha,
 	}
@@ -123,6 +124,20 @@ func TestExtractArtifactUnsupportedFormat(t *testing.T) {
 	}
 }
 
+func TestExtractArtifactFromSignedURLPath(t *testing.T) {
+	artifactBytes := buildTarGzArtifact(t, "5.19.0", true)
+	artifactFile := filepath.Join(t.TempDir(), "artifact.tar.gz")
+	if err := os.WriteFile(artifactFile, artifactBytes, 0600); err != nil {
+		t.Fatalf("write artifact failed: %v", err)
+	}
+
+	destDir := t.TempDir()
+	err := extractArtifact(artifactFile, "https://example.org/osquery.tar.gz?X-Amz-Signature=test", destDir)
+	if err != nil {
+		t.Fatalf("expected extraction success from signed URL, got: %v", err)
+	}
+}
+
 func TestLocateBinDirMissingBinary(t *testing.T) {
 	root := t.TempDir()
 	err := os.WriteFile(filepath.Join(root, "README.txt"), []byte("no binary"), 0600)
@@ -178,6 +193,41 @@ func TestLocateBinDirDarwin(t *testing.T) {
 			t.Fatalf("expected prefixed dir %s, got %s", expectedDir, got)
 		}
 	})
+}
+
+func TestLocateBinDirIgnoresSymlinkEscapingRoot(t *testing.T) {
+	root := t.TempDir()
+
+	// Valid extracted binary location.
+	localBin := filepath.Join(root, "opt", "osquery", "bin", "osqueryd")
+	if err := os.MkdirAll(filepath.Dir(localBin), 0750); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(localBin, []byte("#!/bin/sh\n"), 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	// Escaping symlink path that should be ignored.
+	external := filepath.Join(t.TempDir(), "osqueryd-external")
+	if err := os.WriteFile(external, []byte("#!/bin/sh\n"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	symlinkPath := filepath.Join(root, "usr", "bin", "osqueryd")
+	if err := os.MkdirAll(filepath.Dir(symlinkPath), 0750); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(external, symlinkPath); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := locateBinDir(root, "linux")
+	if err != nil {
+		t.Fatalf("locateBinDir failed: %v", err)
+	}
+	expected := filepath.Dir(localBin)
+	if got != expected {
+		t.Fatalf("expected local binary dir %s, got %s", expected, got)
+	}
 }
 
 func TestEnsureReuseInstalledByChecksum(t *testing.T) {
@@ -345,7 +395,7 @@ func TestEnsureConcurrentCallsUseSingleInstallFlow(t *testing.T) {
 	}
 }
 
-func TestEnsureMissingExtensionFails(t *testing.T) {
+func TestEnsureWithoutExtensionInArtifactSucceeds(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("test uses shell-script osqueryd fixture")
 	}
@@ -363,12 +413,43 @@ func TestEnsureMissingExtensionFails(t *testing.T) {
 
 	cfg := testInstallConfig(server.URL+"/osquery.tar.gz", sha)
 
-	_, err := Ensure(context.Background(), cfg, t.TempDir(), log)
-	if err == nil {
-		t.Fatal("expected missing extension error")
+	res, err := Ensure(context.Background(), cfg, t.TempDir(), log)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
-	if !strings.Contains(err.Error(), "osquery-extension.ext") {
-		t.Fatalf("expected extension filename in error, got: %v", err)
+	if res.Version != version {
+		t.Fatalf("expected version %s, got %s", version, res.Version)
+	}
+}
+
+func TestEnsurePersistsMinimalRuntimePayload(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("test uses shell-script osqueryd fixture")
+	}
+
+	log := logp.NewLogger("artifact_test")
+	version := "5.19.0"
+	artifactBytes := buildTarGzArtifactWithExtra(t, version, "docs/README.txt", []byte("extra"))
+	sum := sha256.Sum256(artifactBytes)
+	sha := hex.EncodeToString(sum[:])
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write(artifactBytes)
+	}))
+	defer server.Close()
+
+	cfg := testInstallConfig(server.URL+"/osquery.tar.gz", sha)
+	installDir := t.TempDir()
+
+	res, err := Ensure(context.Background(), cfg, installDir, log)
+	if err != nil {
+		t.Fatalf("ensure failed: %v", err)
+	}
+	if res.BinDir != filepath.Join(installDir, releasesDirName, sha) {
+		t.Fatalf("unexpected bin dir: %s", res.BinDir)
+	}
+	if _, err := os.Stat(filepath.Join(res.BinDir, "docs", "README.txt")); !os.IsNotExist(err) {
+		t.Fatalf("unexpected extra extracted file persisted, err=%v", err)
 	}
 }
 
@@ -434,4 +515,56 @@ func buildTarGzArtifact(t *testing.T, version string, includeExtension bool) []b
 		t.Fatalf("close gzip writer failed: %v", err)
 	}
 	return buf.Bytes()
+}
+
+func buildTarGzArtifactWithExtra(t *testing.T, version, extraPath string, extraContent []byte) []byte {
+	t.Helper()
+	base := buildTarGzArtifact(t, version, false)
+
+	reader, err := gzip.NewReader(bytes.NewReader(base))
+	if err != nil {
+		t.Fatalf("open gzip reader failed: %v", err)
+	}
+	defer reader.Close()
+	tr := tar.NewReader(reader)
+
+	var out bytes.Buffer
+	gzw := gzip.NewWriter(&out)
+	tw := tar.NewWriter(gzw)
+
+	for {
+		hdr, err := tr.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			t.Fatalf("read tar entry failed: %v", err)
+		}
+		copiedHdr := *hdr
+		if err := tw.WriteHeader(&copiedHdr); err != nil {
+			t.Fatalf("write tar header failed: %v", err)
+		}
+		if _, err := io.Copy(tw, tr); err != nil {
+			t.Fatalf("copy tar entry failed: %v", err)
+		}
+	}
+
+	extraHdr := &tar.Header{
+		Name: extraPath,
+		Mode: 0644,
+		Size: int64(len(extraContent)),
+	}
+	if err := tw.WriteHeader(extraHdr); err != nil {
+		t.Fatalf("write extra tar header failed: %v", err)
+	}
+	if _, err := tw.Write(extraContent); err != nil {
+		t.Fatalf("write extra tar body failed: %v", err)
+	}
+	if err := tw.Close(); err != nil {
+		t.Fatalf("close tar writer failed: %v", err)
+	}
+	if err := gzw.Close(); err != nil {
+		t.Fatalf("close gzip writer failed: %v", err)
+	}
+	return out.Bytes()
 }

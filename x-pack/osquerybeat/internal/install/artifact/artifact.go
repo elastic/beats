@@ -23,10 +23,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fetch"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/msiutil"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pkgutil"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/tar"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/zip"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install/artifactformat"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install/bundled"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -56,9 +54,9 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 	if err := cfg.NormalizeAndValidate(); err != nil {
 		return Result{}, err
 	}
-	selected, enabled := cfg.SelectedForPlatform(runtime.GOOS)
+	selected, enabled := cfg.SelectedForPlatform(runtime.GOOS, runtime.GOARCH)
 	if !enabled {
-		return Result{}, fmt.Errorf("custom osquery artifact is not enabled for platform %s", runtime.GOOS)
+		return Result{}, fmt.Errorf("custom osquery artifact is not enabled for platform %s/%s", runtime.GOOS, runtime.GOARCH)
 	}
 	if installDir == "" {
 		return Result{}, errors.New("install directory is required")
@@ -84,7 +82,7 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 	defer os.RemoveAll(stageDir)
 
 	artifactFile := filepath.Join(stageDir, "artifact")
-	httpClient, err := buildHTTPClient(cfg, runtime.GOOS, log)
+	httpClient, err := buildHTTPClient(cfg, runtime.GOOS, runtime.GOARCH, log)
 	if err != nil {
 		return Result{}, err
 	}
@@ -112,14 +110,6 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 	if err != nil {
 		return Result{}, err
 	}
-	if err := verifyExtensionFile(runtime.GOOS, binDir); err != nil {
-		return Result{}, err
-	}
-
-	relBinDir, err := filepath.Rel(extractedDir, binDir)
-	if err != nil {
-		return Result{}, err
-	}
 
 	if err := os.MkdirAll(filepath.Dir(releaseDir), 0750); err != nil {
 		return Result{}, err
@@ -130,7 +120,11 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 		}
 		_ = os.RemoveAll(releaseDir)
 	}
-	if err := os.Rename(extractedDir, releaseDir); err != nil {
+	plan, err := bundled.BuildRuntimePlan(extractedDir, binDir, runtime.GOOS, releaseDir)
+	if err != nil {
+		return Result{}, err
+	}
+	if err := bundled.InstallFromTemp(extractedDir, releaseDir, plan, bundled.CopyPath); err != nil {
 		return Result{}, err
 	}
 
@@ -148,7 +142,7 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 	}
 
 	return Result{
-		BinDir:  filepath.Join(releaseDir, relBinDir),
+		BinDir:  releaseDir,
 		Version: version,
 	}, nil
 }
@@ -183,9 +177,6 @@ func tryReuseInstalled(releaseDir string, cfg config.InstallArtifactConfig, log 
 	if err != nil {
 		return Result{}, false
 	}
-	if err := verifyExtensionFile(runtime.GOOS, binDir); err != nil {
-		return Result{}, false
-	}
 	return Result{BinDir: binDir, Version: version}, true
 }
 
@@ -213,11 +204,11 @@ func writeMetadata(fp string, m metadata) error {
 	return os.Rename(tmp, fp)
 }
 
-func buildHTTPClient(cfg config.InstallConfig, goos string, log *logp.Logger) (*http.Client, error) {
+func buildHTTPClient(cfg config.InstallConfig, goos, goarch string, log *logp.Logger) (*http.Client, error) {
 	client := &http.Client{
 		Timeout: httpClientTimeout,
 	}
-	sslConfig := cfg.SSLForPlatform(goos)
+	sslConfig := cfg.SSLForPlatform(goos, goarch)
 	if sslConfig == nil {
 		return client, nil
 	}
@@ -230,21 +221,6 @@ func buildHTTPClient(cfg config.InstallConfig, goos string, log *logp.Logger) (*
 	transport.TLSClientConfig = sslCfg.ToConfig()
 	client.Transport = transport
 	return client, nil
-}
-
-func verifyExtensionFile(goos, binDir string) error {
-	extFileName := "osquery-extension.ext"
-	if goos == "windows" {
-		extFileName = "osquery-extension.exe"
-	}
-	extFilePath := filepath.Join(binDir, extFileName)
-	if _, err := os.Stat(extFilePath); err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return fmt.Errorf("%w: %v", os.ErrNotExist, extFileName)
-		}
-		return err
-	}
-	return nil
 }
 
 func acquireInstallLock(ctx context.Context, installDir string) (func(), error) {
@@ -293,19 +269,11 @@ func cleanupOldReleases(installDir, currentReleaseDir string) error {
 }
 
 func extractArtifact(artifactFile, artifactURL, destinationDir string) error {
-	lower := strings.ToLower(artifactURL)
-	switch {
-	case strings.HasSuffix(lower, ".tar.gz"), strings.HasSuffix(lower, ".tgz"):
-		return tar.ExtractFile(artifactFile, destinationDir)
-	case strings.HasSuffix(lower, ".zip"):
-		return zip.UnzipFile(artifactFile, destinationDir)
-	case strings.HasSuffix(lower, ".pkg"):
-		return pkgutil.Expand(artifactFile, destinationDir)
-	case strings.HasSuffix(lower, ".msi"):
-		return msiutil.Expand(artifactFile, destinationDir)
-	default:
-		return fmt.Errorf("unsupported artifact format for %q", artifactURL)
+	format, err := artifactformat.Detect(artifactURL)
+	if err != nil {
+		return err
 	}
+	return bundled.ExtractToTemp(format, artifactFile, destinationDir, nil)
 }
 
 func locateBinDir(root, goos string) (string, error) {
@@ -349,7 +317,11 @@ func locateBinDir(root, goos string) (string, error) {
 			return nil
 		}
 
-		candidates = append(candidates, filepath.Dir(path))
+		resolvedBinPath, err := resolveBinPathWithinRoot(root, path)
+		if err != nil {
+			return nil
+		}
+		candidates = append(candidates, filepath.Dir(resolvedBinPath))
 		return nil
 	})
 	if err != nil {
@@ -363,3 +335,25 @@ func locateBinDir(root, goos string) (string, error) {
 	})
 	return candidates[0], nil
 }
+
+func resolveBinPathWithinRoot(root, binPath string) (string, error) {
+	resolved := binPath
+	if fileInfo, err := os.Lstat(binPath); err == nil && (fileInfo.Mode()&os.ModeSymlink) != 0 {
+		evaluated, err := filepath.EvalSymlinks(binPath)
+		if err != nil {
+			return "", err
+		}
+		resolved = evaluated
+	}
+
+	rel, err := filepath.Rel(root, resolved)
+	if err != nil {
+		return "", err
+	}
+	rel = filepath.Clean(rel)
+	if rel == ".." || strings.HasPrefix(rel, ".."+string(os.PathSeparator)) {
+		return "", fmt.Errorf("resolved osquery binary path escapes extracted root: %s", resolved)
+	}
+	return resolved, nil
+}
+

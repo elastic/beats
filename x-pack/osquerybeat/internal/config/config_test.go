@@ -25,7 +25,7 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 		{
 			name: "artifact requires checksum",
 			cfg: InstallConfig{
-				Linux: &InstallArtifactConfig{
+				Linux: &InstallPlatformConfig{
 					ArtifactURL: "https://example.com/osquery.tar.gz",
 				},
 			},
@@ -34,7 +34,7 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 		{
 			name: "invalid checksum",
 			cfg: InstallConfig{
-				Linux: &InstallArtifactConfig{
+				Linux: &InstallPlatformConfig{
 					ArtifactURL: "https://example.com/osquery.tar.gz",
 					SHA256:      "abc",
 				},
@@ -44,7 +44,7 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 		{
 			name: "reject non https by default",
 			cfg: InstallConfig{
-				Linux: &InstallArtifactConfig{
+				Linux: &InstallPlatformConfig{
 					ArtifactURL: "http://example.com/osquery.tar.gz",
 					SHA256:      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				},
@@ -54,7 +54,7 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 		{
 			name: "allow insecure URL override",
 			cfg: InstallConfig{
-				Linux: &InstallArtifactConfig{
+				Linux: &InstallPlatformConfig{
 					ArtifactURL: "http://example.com/osquery.tar.gz",
 					SHA256:      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				},
@@ -64,7 +64,7 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 		{
 			name: "allow insecure URL override per-platform",
 			cfg: InstallConfig{
-				Linux: &InstallArtifactConfig{
+				Linux: &InstallPlatformConfig{
 					ArtifactURL:      "http://example.com/osquery.tar.gz",
 					SHA256:           "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					AllowInsecureURL: boolPtr(true),
@@ -74,7 +74,7 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 		{
 			name: "deny insecure URL override per-platform",
 			cfg: InstallConfig{
-				Linux: &InstallArtifactConfig{
+				Linux: &InstallPlatformConfig{
 					ArtifactURL:      "http://example.com/osquery.tar.gz",
 					SHA256:           "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					AllowInsecureURL: boolPtr(false),
@@ -86,15 +86,15 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 		{
 			name: "multiple platforms valid",
 			cfg: InstallConfig{
-				Linux: &InstallArtifactConfig{
+				Linux: &InstallPlatformConfig{
 					ArtifactURL: "https://example.com/osquery-linux.tar.gz",
 					SHA256:      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				},
-				Darwin: &InstallArtifactConfig{
+				Darwin: &InstallPlatformConfig{
 					ArtifactURL: "https://example.com/osquery-darwin.pkg",
 					SHA256:      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
 				},
-				Windows: &InstallArtifactConfig{
+				Windows: &InstallPlatformConfig{
 					ArtifactURL: "https://example.com/osquery-windows.msi",
 					SHA256:      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
 				},
@@ -103,7 +103,7 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 		{
 			name: "sha requires artifact url",
 			cfg: InstallConfig{
-				Linux: &InstallArtifactConfig{
+				Linux: &InstallPlatformConfig{
 					SHA256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				},
 			},
@@ -112,7 +112,7 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 		{
 			name: "normalizes sha to lowercase",
 			cfg: InstallConfig{
-				Linux: &InstallArtifactConfig{
+				Linux: &InstallPlatformConfig{
 					ArtifactURL: "https://example.com/osquery.tar.gz",
 					SHA256:      "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 				},
@@ -140,11 +140,11 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 
 func TestInstallConfigPlatformSelection(t *testing.T) {
 	cfg := InstallConfig{
-		Linux: &InstallArtifactConfig{
+		Linux: &InstallPlatformConfig{
 			ArtifactURL: "https://example.org/osquery-linux.tar.gz",
 			SHA256:      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 		},
-		Darwin: &InstallArtifactConfig{
+		Darwin: &InstallPlatformConfig{
 			ArtifactURL: "https://example.org/osquery-darwin.pkg",
 			SHA256:      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
 		},
@@ -153,14 +153,14 @@ func TestInstallConfigPlatformSelection(t *testing.T) {
 	if !cfg.Enabled() {
 		t.Fatal("expected config to be enabled")
 	}
-	if !cfg.EnabledForPlatform("linux") {
+	if !cfg.EnabledForPlatform("linux", "amd64") {
 		t.Fatal("expected linux to be enabled")
 	}
-	if cfg.EnabledForPlatform("windows") {
+	if cfg.EnabledForPlatform("windows", "amd64") {
 		t.Fatal("expected windows to be disabled")
 	}
 
-	selected, ok := cfg.SelectedForPlatform("darwin")
+	selected, ok := cfg.SelectedForPlatform("darwin", "arm64")
 	if !ok {
 		t.Fatal("expected darwin selection")
 	}
@@ -168,8 +168,37 @@ func TestInstallConfigPlatformSelection(t *testing.T) {
 		t.Fatalf("unexpected selected darwin artifact url: %s", selected.ArtifactURL)
 	}
 
-	if _, ok := cfg.SelectedForPlatform("windows"); ok {
+	if _, ok := cfg.SelectedForPlatform("windows", "amd64"); ok {
 		t.Fatal("expected no windows selection")
+	}
+}
+
+func TestInstallConfigArchSelection(t *testing.T) {
+	cfg := InstallConfig{
+		Linux: &InstallPlatformConfig{
+			ArtifactURL: "https://example.org/osquery-linux-platform.tar.gz",
+			SHA256:      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			AMD64: &InstallArtifactConfig{
+				ArtifactURL: "https://example.org/osquery-linux-amd64.tar.gz",
+				SHA256:      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+			},
+		},
+	}
+
+	amd64, ok := cfg.SelectedForPlatform("linux", "amd64")
+	if !ok {
+		t.Fatal("expected linux amd64 selection")
+	}
+	if amd64.ArtifactURL != "https://example.org/osquery-linux-amd64.tar.gz" {
+		t.Fatalf("unexpected amd64 artifact url: %s", amd64.ArtifactURL)
+	}
+
+	arm64, ok := cfg.SelectedForPlatform("linux", "arm64")
+	if !ok {
+		t.Fatal("expected linux arm64 fallback to platform selection")
+	}
+	if arm64.ArtifactURL != "https://example.org/osquery-linux-platform.tar.gz" {
+		t.Fatalf("unexpected arm64 fallback artifact url: %s", arm64.ArtifactURL)
 	}
 }
 
@@ -179,7 +208,7 @@ func TestInstallConfigPlatformOverrides(t *testing.T) {
 	cfg := InstallConfig{
 		AllowInsecureURL: false,
 		SSL:              globalSSL,
-		Linux: &InstallArtifactConfig{
+		Linux: &InstallPlatformConfig{
 			ArtifactURL:      "https://example.org/osquery-linux.tar.gz",
 			SHA256:           "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			AllowInsecureURL: boolPtr(true),
@@ -187,17 +216,64 @@ func TestInstallConfigPlatformOverrides(t *testing.T) {
 		},
 	}
 
-	if !cfg.AllowInsecureURLForPlatform("linux") {
+	if !cfg.AllowInsecureURLForPlatform("linux", "amd64") {
 		t.Fatal("expected linux allow_insecure_url override to be true")
 	}
-	if cfg.AllowInsecureURLForPlatform("windows") {
+	if cfg.AllowInsecureURLForPlatform("windows", "amd64") {
 		t.Fatal("expected windows allow_insecure_url to use top-level false")
 	}
-	if cfg.SSLForPlatform("linux") != linuxSSL {
+	if cfg.SSLForPlatform("linux", "amd64") != linuxSSL {
 		t.Fatal("expected linux ssl override to be used")
 	}
-	if cfg.SSLForPlatform("windows") != globalSSL {
+	if cfg.SSLForPlatform("windows", "amd64") != globalSSL {
 		t.Fatal("expected windows ssl to use top-level config")
+	}
+}
+
+func TestInstallConfigOverridePrecedence(t *testing.T) {
+	globalSSL := &tlscommon.Config{}
+	platformSSL := &tlscommon.Config{}
+	archSSL := &tlscommon.Config{}
+
+	cfg := InstallConfig{
+		AllowInsecureURL: true,
+		SSL:              globalSSL,
+		Linux: &InstallPlatformConfig{
+			ArtifactURL:      "https://example.org/osquery-linux.tar.gz",
+			SHA256:           "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			AllowInsecureURL: boolPtr(false),
+			SSL:              platformSSL,
+			AMD64: &InstallArtifactConfig{
+				ArtifactURL:      "https://example.org/osquery-linux-amd64.tar.gz",
+				SHA256:           "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+				AllowInsecureURL: boolPtr(true),
+				SSL:              archSSL,
+			},
+		},
+	}
+
+	// Arch override takes precedence over platform/global.
+	if !cfg.AllowInsecureURLForPlatform("linux", "amd64") {
+		t.Fatal("expected arch allow_insecure_url override to be used")
+	}
+	if cfg.SSLForPlatform("linux", "amd64") != archSSL {
+		t.Fatal("expected arch ssl override to be used")
+	}
+
+	// Platform override takes precedence over global when arch override is unset.
+	if cfg.AllowInsecureURLForPlatform("linux", "arm64") {
+		t.Fatal("expected platform allow_insecure_url override to be used")
+	}
+	if cfg.SSLForPlatform("linux", "arm64") != platformSSL {
+		t.Fatal("expected platform ssl override to be used")
+	}
+
+	// Global values are used for other platforms.
+	if !cfg.AllowInsecureURLForPlatform("windows", "amd64") {
+		t.Fatal("expected global allow_insecure_url to be used")
+	}
+	if cfg.SSLForPlatform("windows", "amd64") != globalSSL {
+		t.Fatal("expected global ssl to be used")
 	}
 }
 
@@ -211,7 +287,7 @@ func TestGetOsqueryInstallConfig(t *testing.T) {
 
 	t.Run("returns first input osquery install", func(t *testing.T) {
 		installCfg := &InstallConfig{
-			Linux: &InstallArtifactConfig{
+			Linux: &InstallPlatformConfig{
 				ArtifactURL: "https://example.org/osquery-linux.tar.gz",
 				SHA256:      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			},
@@ -226,7 +302,7 @@ func TestGetOsqueryInstallConfig(t *testing.T) {
 			},
 		}
 		cfg := GetOsqueryInstallConfig(inputs)
-		selected, ok := cfg.SelectedForPlatform("linux")
+		selected, ok := cfg.SelectedForPlatform("linux", "amd64")
 		if !ok {
 			t.Fatalf("expected linux config")
 		}

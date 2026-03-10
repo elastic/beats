@@ -54,7 +54,7 @@ func TestResolveOsqueryRuntime_OtherPlatformConfigFallsBackToBundled(t *testing.
 		},
 	}
 
-	platformCfg := &config.InstallArtifactConfig{
+	platformCfg := &config.InstallPlatformConfig{
 		ArtifactURL: "https://example.org/osquery-custom.tar.gz",
 		SHA256:      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 	}

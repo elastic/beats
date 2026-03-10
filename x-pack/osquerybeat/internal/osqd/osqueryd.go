@@ -59,6 +59,7 @@ type RunnerFactory func(socketPath string, opts ...Option) (Runner, error)
 type OSQueryD struct {
 	socketPath string
 	binPath    string
+	extPath    string
 	dataPath   string
 	certsPath  string
 	lensesPath string
@@ -83,6 +84,12 @@ func WithExtensionsTimeout(to int) Option {
 func WithBinaryPath(binPath string) Option {
 	return func(q *OSQueryD) {
 		q.binPath = binPath
+	}
+}
+
+func WithExtensionPath(extPath string) Option {
+	return func(q *OSQueryD) {
+		q.extPath = extPath
 	}
 }
 
@@ -298,7 +305,10 @@ func (q *OSQueryD) prepare() (func(), error) {
 	}
 
 	// Prepare autoload osquery-extension
-	extensionPath := osqueryExtensionPath(q.binPath)
+	extensionPath := q.extPath
+	if extensionPath == "" {
+		extensionPath = osqueryExtensionPath(q.binPath)
+	}
 	if _, err := os.Stat(extensionPath); err != nil {
 		if os.IsNotExist(err) {
 			return nil, fmt.Errorf("extension path does not exist: %s, %w", extensionPath, err)
@@ -581,6 +591,18 @@ func osquerydFilename(platform string) string {
 
 func osqueryExtensionPath(dir string) string {
 	return filepath.Join(dir, extensionName)
+}
+
+// OsqueryExtensionPathForPlatform returns the full path to osquery extension binary for platform.
+func OsqueryExtensionPathForPlatform(platform, dir string) string {
+	return filepath.Join(dir, osqueryExtensionFilename(platform))
+}
+
+func osqueryExtensionFilename(platform string) string {
+	if platform == "windows" {
+		return "osquery-extension.exe"
+	}
+	return "osquery-extension.ext"
 }
 
 func (q *OSQueryD) resolveDataPath(filename string) string {
