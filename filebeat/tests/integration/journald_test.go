@@ -208,8 +208,16 @@ func TestJournaldInputReadsMessagesFromAllBoots(t *testing.T) {
 	t.Log("Counting boot entries: ", oldestBoot.Offset, oldestBoot.BootID)
 	oldestBootEntries := countBootEntries(t, oldestBoot.Offset)
 
+	if oldestBootEntries > 50_000 {
+		t.Skipf("Too many entries in the first boot %d > 50_000", oldestBootEntries)
+	}
+
 	t.Log("Counting second old boot entries: ", secondOldestBoot.Offset, secondOldestBoot.BootID)
 	secondOldestBootEntries := countBootEntries(t, secondOldestBoot.Offset)
+
+	if oldestBootEntries > 50_000 {
+		t.Skipf("Too many entries in the second boot %d > 50_000", secondOldestBootEntries)
+	}
 
 	expectedMessages := oldestBootEntries + secondOldestBootEntries
 	if expectedMessages < 1 {
@@ -225,7 +233,7 @@ func TestJournaldInputReadsMessagesFromAllBoots(t *testing.T) {
 	filebeat.Start()
 	filebeat.WaitLogsContains("journalctl started", 10*time.Second, "journalctl did not start")
 
-	waitForAtLeastPublishedEvents(t, filebeat, expectedMessages, 2*time.Minute)
+	waitForAtLeastPublishedEvents(t, filebeat, expectedMessages, 10*time.Minute)
 
 	events := integration.GetEventsFromFileOutput[journaldAllBootsEvent](filebeat, expectedMessages, false)
 	bootIDs := distinctBootIDs(events)
@@ -308,19 +316,31 @@ func countBootEntries(t *testing.T, bootOffset string) int {
 }
 
 func waitForAtLeastPublishedEvents(t *testing.T, b *integration.BeatProc, min int, timeout time.Duration) {
-	t.Helper()
-
 	if min < 1 {
 		t.Fatalf("minimum number of events to wait for must be at least 1, got %d", min)
 	}
 
+	// The size limit breaks it for real-world usage or machines with large messages
 	outputGlob := filepath.Join(b.TempDir(), "output-*.ndjson")
-	if got := b.CountFileLines(outputGlob); got >= min {
+	const progressStep = 20_000
+	nextProgressLog := progressStep
+
+	logProgress := func(got int) {
+		for got >= nextProgressLog {
+			t.Logf("published events found: >=%d (current=%d) %.2f%% from total", nextProgressLog, got, float64(got)/float64(min))
+			nextProgressLog += progressStep
+		}
+	}
+
+	got := b.CountFileLines(outputGlob)
+	if got >= min {
 		return
 	}
+	logProgress(got)
 
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		got := b.CountFileLines(outputGlob)
+		logProgress(got)
 		assert.GreaterOrEqualf(collect, got, min, "expected at least %d events, got %d", min, got)
 	}, timeout, 200*time.Millisecond)
 }

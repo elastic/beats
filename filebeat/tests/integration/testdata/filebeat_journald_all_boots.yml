@@ -12,6 +12,7 @@ output:
     path: ${path.home}
     filename: "output"
     rotate_on_startup: false
+    rotate_every_kb: 100000
 
 logging:
   level: debug
