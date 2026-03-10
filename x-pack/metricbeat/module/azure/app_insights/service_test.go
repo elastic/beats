@@ -73,8 +73,6 @@ func TestGetAuthorizer(t *testing.T) {
 }
 
 func TestNewClientSecretAuthorizer(t *testing.T) {
-	logger := logptest.NewTestingLogger(t, "")
-
 	t.Run("returns tokenCredentialAuthorizer with correct scopes", func(t *testing.T) {
 		cfg := Config{
 			AuthType:     AuthTypeClientSecret,
@@ -83,7 +81,7 @@ func TestNewClientSecretAuthorizer(t *testing.T) {
 			ClientSecret: "client-secret",
 		}
 
-		auth, err := newClientSecretAuthorizer(cfg, logger)
+		auth, err := newClientSecretAuthorizer(cfg)
 		require.NoError(t, err)
 		require.NotNil(t, auth)
 
@@ -102,7 +100,7 @@ func TestNewClientSecretAuthorizer(t *testing.T) {
 			ActiveDirectoryEndpoint: "https://login.microsoftonline.us/",
 		}
 
-		auth, err := newClientSecretAuthorizer(cfg, logger)
+		auth, err := newClientSecretAuthorizer(cfg)
 		require.NoError(t, err)
 		require.NotNil(t, auth)
 

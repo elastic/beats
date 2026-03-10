@@ -56,7 +56,7 @@ func getAuthorizer(config Config, logger *logp.Logger) (autorest.Authorizer, err
 	switch config.AuthType {
 	case AuthTypeClientSecret:
 		logger.Debug("Using client secret authentication for App Insights")
-		return newClientSecretAuthorizer(config, logger)
+		return newClientSecretAuthorizer(config)
 	default:
 		logger.Debug("Using API key authentication for App Insights")
 		return autorest.NewAPIKeyAuthorizerWithHeaders(map[string]interface{}{
@@ -66,7 +66,7 @@ func getAuthorizer(config Config, logger *logp.Logger) (autorest.Authorizer, err
 }
 
 // newClientSecretAuthorizer creates an authorizer using azidentity client secret credentials.
-func newClientSecretAuthorizer(config Config, logger *logp.Logger) (autorest.Authorizer, error) {
+func newClientSecretAuthorizer(config Config) (autorest.Authorizer, error) {
 	clientOptions := policy.ClientOptions{}
 	if config.ActiveDirectoryEndpoint != "" {
 		clientOptions.Cloud = cloud.Configuration{
@@ -109,12 +109,7 @@ func (a *tokenCredentialAuthorizer) WithAuthorization() autorest.PrepareDecorato
 				return r, err
 			}
 
-			ctx := r.Context()
-			if ctx == nil {
-				ctx = context.Background()
-			}
-
-			token, err := a.credential.GetToken(ctx, policy.TokenRequestOptions{
+			token, err := a.credential.GetToken(r.Context(), policy.TokenRequestOptions{
 				Scopes: a.scopes,
 			})
 			if err != nil {
