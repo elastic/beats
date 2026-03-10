@@ -43,6 +43,16 @@ func shouldExtract(name string, files ...string) bool {
 }
 
 func ExtractFile(fp string, destinationDir string, files ...string) error {
+	return extractFile(fp, destinationDir, false, files...)
+}
+
+// ExtractFileSkipEscaping is like ExtractFile but silently skips symlink and
+// hardlink entries whose targets escape the destination directory.
+func ExtractFileSkipEscaping(fp string, destinationDir string, files ...string) error {
+	return extractFile(fp, destinationDir, true, files...)
+}
+
+func extractFile(fp string, destinationDir string, skipEscaping bool, files ...string) error {
 	f, err := os.Open(fp)
 	if err != nil {
 		return err
@@ -53,10 +63,23 @@ func ExtractFile(fp string, destinationDir string, files ...string) error {
 		return err
 	}
 
-	return Extract(zr, destinationDir, files...)
+	return extract(zr, destinationDir, skipEscaping, files...)
 }
 
+// Extract extracts entries from a tar reader, rejecting any entries whose
+// paths or link targets escape the destination directory.
 func Extract(r io.Reader, destinationDir string, files ...string) error {
+	return extract(r, destinationDir, false, files...)
+}
+
+// ExtractSkipEscaping extracts entries from a tar reader, silently skipping
+// symlink and hardlink entries whose targets escape the destination directory.
+// Regular file path traversal attempts still cause a hard error.
+func ExtractSkipEscaping(r io.Reader, destinationDir string, files ...string) error {
+	return extract(r, destinationDir, true, files...)
+}
+
+func extract(r io.Reader, destinationDir string, skipEscaping bool, files ...string) error {
 	tarReader := tar.NewReader(r)
 
 	for {
@@ -110,8 +133,14 @@ func Extract(r io.Reader, destinationDir string, files ...string) error {
 			if err = os.MkdirAll(filepath.Dir(path), 0750); err != nil {
 				return err
 			}
-			resolvedTarget := filepath.Join(filepath.Dir(path), header.Linkname)
+			resolvedTarget := header.Linkname
+			if !filepath.IsAbs(header.Linkname) {
+				resolvedTarget = filepath.Join(filepath.Dir(path), header.Linkname)
+			}
 			if !pathInDir(resolvedTarget, destinationDir) {
+				if skipEscaping {
+					continue
+				}
 				return fmt.Errorf("illegal symlink target in tar: %v -> %v", header.Name, header.Linkname)
 			}
 			if err = os.Symlink(header.Linkname, path); err != nil {
@@ -123,6 +152,9 @@ func Extract(r io.Reader, destinationDir string, files ...string) error {
 			}
 			targetPath := filepath.Join(destinationDir, header.Linkname)
 			if !pathInDir(targetPath, destinationDir) {
+				if skipEscaping {
+					continue
+				}
 				return fmt.Errorf("illegal hardlink target in tar: %v -> %v", header.Name, header.Linkname)
 			}
 			if err = os.Link(targetPath, path); err != nil {

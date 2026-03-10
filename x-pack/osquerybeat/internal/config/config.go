@@ -121,6 +121,7 @@ func (c InstallConfig) PlatformConfig(goos string) *InstallPlatformConfig {
 }
 
 func (c InstallConfig) SelectedForPlatform(goos, goarch string) (InstallArtifactConfig, bool) {
+	// PlatformConfig may return nil; ArchConfig is safe to call on nil receiver.
 	if archCfg := c.PlatformConfig(goos).ArchConfig(goarch); hasArtifactConfig(archCfg) {
 		return *archCfg, true
 	}

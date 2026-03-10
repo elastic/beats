@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -85,6 +86,111 @@ func TestExtractRejectsSymlinkEscapingDestination(t *testing.T) {
 	err := Extract(bytes.NewReader(b.Bytes()), dir)
 	if err == nil {
 		t.Fatal("expected error for escaping symlink target")
+	}
+}
+
+func TestExtractSkipEscapingSkipsAbsoluteSymlinks(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("creating symlinks may require elevated privileges on windows")
+	}
+
+	var b bytes.Buffer
+	tw := tar.NewWriter(&b)
+	t.Cleanup(func() { _ = tw.Close() })
+
+	requireWriteHeader(t, tw, &tar.Header{Name: "opt/", Typeflag: tar.TypeDir, Mode: 0755})
+	requireWriteHeader(t, tw, &tar.Header{Name: "opt/osquery/", Typeflag: tar.TypeDir, Mode: 0755})
+	requireWriteHeader(t, tw, &tar.Header{Name: "opt/osquery/bin/", Typeflag: tar.TypeDir, Mode: 0755})
+
+	content := []byte("osqueryd-binary")
+	requireWriteHeader(t, tw, &tar.Header{
+		Name:     "opt/osquery/bin/osqueryd",
+		Typeflag: tar.TypeReg,
+		Mode:     0755,
+		Size:     int64(len(content)),
+	})
+	if _, err := tw.Write(content); err != nil {
+		t.Fatalf("failed to write file content: %v", err)
+	}
+
+	requireWriteHeader(t, tw, &tar.Header{Name: "usr/", Typeflag: tar.TypeDir, Mode: 0755})
+	requireWriteHeader(t, tw, &tar.Header{Name: "usr/bin/", Typeflag: tar.TypeDir, Mode: 0755})
+	requireWriteHeader(t, tw, &tar.Header{
+		Name:     "usr/bin/osqueryd",
+		Typeflag: tar.TypeSymlink,
+		Linkname: "/opt/osquery/bin/osqueryd",
+		Mode:     0755,
+	})
+
+	if err := tw.Close(); err != nil {
+		t.Fatalf("failed to close tar writer: %v", err)
+	}
+
+	t.Run("Extract hard-fails on absolute escaping symlink", func(t *testing.T) {
+		dir := t.TempDir()
+		err := Extract(bytes.NewReader(b.Bytes()), dir)
+		if err == nil {
+			t.Fatal("expected error from Extract for escaping symlink")
+		}
+		if !strings.Contains(err.Error(), "illegal symlink target") {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("ExtractSkipEscaping skips absolute symlink and extracts regular file", func(t *testing.T) {
+		dir := t.TempDir()
+		if err := ExtractSkipEscaping(bytes.NewReader(b.Bytes()), dir); err != nil {
+			t.Fatalf("ExtractSkipEscaping failed: %v", err)
+		}
+
+		binPath := filepath.Join(dir, "opt", "osquery", "bin", "osqueryd")
+		if _, err := os.Stat(binPath); err != nil {
+			t.Fatalf("expected regular binary to be extracted: %v", err)
+		}
+
+		symlinkPath := filepath.Join(dir, "usr", "bin", "osqueryd")
+		if _, err := os.Lstat(symlinkPath); !os.IsNotExist(err) {
+			t.Fatalf("expected escaping symlink to be skipped, got err=%v", err)
+		}
+	})
+}
+
+func TestExtractSkipEscapingKeepsValidSymlinks(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("creating symlinks may require elevated privileges on windows")
+	}
+
+	var b bytes.Buffer
+	tw := tar.NewWriter(&b)
+	t.Cleanup(func() { _ = tw.Close() })
+
+	requireWriteHeader(t, tw, &tar.Header{Name: "bin/", Typeflag: tar.TypeDir, Mode: 0755})
+	content := []byte("osqueryd")
+	requireWriteHeader(t, tw, &tar.Header{
+		Name: "bin/osqueryd", Typeflag: tar.TypeReg, Mode: 0755, Size: int64(len(content)),
+	})
+	if _, err := tw.Write(content); err != nil {
+		t.Fatal(err)
+	}
+	requireWriteHeader(t, tw, &tar.Header{
+		Name: "bin/osqueryi", Typeflag: tar.TypeSymlink, Linkname: "osqueryd", Mode: 0755,
+	})
+	if err := tw.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	dir := t.TempDir()
+	if err := ExtractSkipEscaping(bytes.NewReader(b.Bytes()), dir); err != nil {
+		t.Fatalf("ExtractSkipEscaping failed: %v", err)
+	}
+
+	linkPath := filepath.Join(dir, "bin", "osqueryi")
+	info, err := os.Lstat(linkPath)
+	if err != nil {
+		t.Fatalf("expected valid symlink to be extracted: %v", err)
+	}
+	if info.Mode()&os.ModeSymlink == 0 {
+		t.Fatalf("expected %s to be a symlink", linkPath)
 	}
 }
 

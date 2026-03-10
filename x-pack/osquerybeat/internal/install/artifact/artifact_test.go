@@ -51,6 +51,7 @@ func testInstallConfig(url, sha string) config.InstallConfig {
 }
 
 func TestCleanupOldReleases(t *testing.T) {
+	log := logp.NewLogger("artifact_test")
 	installDir := t.TempDir()
 	releasesDir := filepath.Join(installDir, releasesDirName)
 	if err := os.MkdirAll(releasesDir, 0750); err != nil {
@@ -66,9 +67,7 @@ func TestCleanupOldReleases(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := cleanupOldReleases(installDir, current); err != nil {
-		t.Fatalf("cleanup failed: %v", err)
-	}
+	cleanupOldReleases(installDir, current, log)
 
 	if _, err := os.Stat(current); err != nil {
 		t.Fatalf("current release should remain: %v", err)
@@ -79,11 +78,10 @@ func TestCleanupOldReleases(t *testing.T) {
 }
 
 func TestCleanupOldReleasesMissingDirectory(t *testing.T) {
+	log := logp.NewLogger("artifact_test")
 	installDir := t.TempDir()
 	current := filepath.Join(installDir, releasesDirName, "new")
-	if err := cleanupOldReleases(installDir, current); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	cleanupOldReleases(installDir, current, log)
 }
 
 func TestRemoveInstalled(t *testing.T) {
@@ -456,6 +454,129 @@ func TestEnsurePersistsMinimalRuntimePayload(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(res.BinDir, "docs", "README.txt")); !os.IsNotExist(err) {
 		t.Fatalf("unexpected extra extracted file persisted, err=%v", err)
+	}
+}
+
+func TestLocateBinDirDarwinIgnoresSymlinkEscapingRoot(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("creating symlinks may require elevated privileges on windows")
+	}
+
+	root := t.TempDir()
+
+	// Valid extracted binary in the app bundle.
+	binFile := filepath.Join(root, "osquery.app", "Contents", "MacOS", "osqueryd")
+	if err := os.MkdirAll(filepath.Dir(binFile), 0750); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(binFile, []byte("#!/bin/sh\n"), 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	// Escaping symlink at the same app bundle pattern under a different prefix.
+	external := filepath.Join(t.TempDir(), "osqueryd-external")
+	if err := os.WriteFile(external, []byte("#!/bin/sh\n"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	escapingBin := filepath.Join(root, "evil", "osquery.app", "Contents", "MacOS", "osqueryd")
+	if err := os.MkdirAll(filepath.Dir(escapingBin), 0750); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(external, escapingBin); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := locateBinDir(root, "darwin")
+	if err != nil {
+		t.Fatalf("locateBinDir failed: %v", err)
+	}
+	if got != root {
+		t.Fatalf("expected root dir %s (valid app bundle), got %s", root, got)
+	}
+}
+
+func TestEnsureConcurrentCallsWithDifferentSHAs(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("test uses shell-script osqueryd fixture")
+	}
+
+	log := logp.NewLogger("artifact_test")
+	artifactV1 := buildTarGzArtifact(t, "5.19.0", true)
+	artifactV2 := buildTarGzArtifact(t, "5.20.0", true)
+
+	sum1 := sha256.Sum256(artifactV1)
+	sha1 := hex.EncodeToString(sum1[:])
+	sum2 := sha256.Sum256(artifactV2)
+	sha2 := hex.EncodeToString(sum2[:])
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "v1") {
+			_, _ = w.Write(artifactV1)
+			return
+		}
+		_, _ = w.Write(artifactV2)
+	}))
+	defer server.Close()
+
+	cfg1 := testInstallConfig(server.URL+"/v1/osquery.tar.gz", sha1)
+	cfg2 := testInstallConfig(server.URL+"/v2/osquery.tar.gz", sha2)
+
+	installDir := t.TempDir()
+
+	var wg sync.WaitGroup
+	results := make(chan Result, 2)
+	errs := make(chan error, 2)
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		res, err := Ensure(context.Background(), cfg1, installDir, log)
+		if err != nil {
+			errs <- err
+			return
+		}
+		results <- res
+	}()
+	go func() {
+		defer wg.Done()
+		res, err := Ensure(context.Background(), cfg2, installDir, log)
+		if err != nil {
+			errs <- err
+			return
+		}
+		results <- res
+	}()
+	wg.Wait()
+	close(results)
+	close(errs)
+
+	for err := range errs {
+		t.Fatalf("ensure failed: %v", err)
+	}
+
+	got := make([]Result, 0, 2)
+	for res := range results {
+		got = append(got, res)
+	}
+	if len(got) != 2 {
+		t.Fatalf("expected 2 results, got %d", len(got))
+	}
+
+	// The last writer wins; exactly one release directory should remain.
+	releasesDir := filepath.Join(installDir, releasesDirName)
+	entries, err := os.ReadDir(releasesDir)
+	if err != nil {
+		t.Fatalf("failed reading releases dir: %v", err)
+	}
+	if len(entries) != 1 {
+		t.Fatalf("expected exactly one active release dir, got %d", len(entries))
+	}
+}
+
+func TestRemoveInstalledWhenNoReleasesExist(t *testing.T) {
+	installDir := t.TempDir()
+	if err := RemoveInstalled(installDir); err != nil {
+		t.Fatalf("RemoveInstalled should be idempotent, got: %v", err)
 	}
 }
 

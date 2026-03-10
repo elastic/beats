@@ -71,6 +71,10 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 	defer unlock()
 
 	releaseDir := filepath.Join(installDir, releasesDirName, selected.SHA256)
+
+	// Retry cleanup of stale releases that may have failed on a previous run.
+	cleanupOldReleases(installDir, releaseDir, log)
+
 	if res, ok := tryReuseInstalled(releaseDir, selected, log); ok {
 		return res, nil
 	}
@@ -137,9 +141,7 @@ func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, lo
 	if err := writeMetadata(filepath.Join(releaseDir, releaseMetadataFile), meta); err != nil {
 		return Result{}, err
 	}
-	if err := cleanupOldReleases(installDir, releaseDir); err != nil {
-		return Result{}, err
-	}
+	cleanupOldReleases(installDir, releaseDir, log)
 
 	return Result{
 		BinDir:  releaseDir,
@@ -216,7 +218,7 @@ func buildHTTPClient(cfg config.InstallConfig, goos, goarch string, log *logp.Lo
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	sslCfg, err := tlscommon.LoadTLSConfig(sslConfig, log)
 	if err != nil {
-		return nil, fmt.Errorf("failed loading osquery.elastic_options.install.%s.ssl config: %w", goos, err)
+		return nil, fmt.Errorf("failed loading osquery.elastic_options.install ssl config for %s/%s: %w", goos, goarch, err)
 	}
 	transport.TLSClientConfig = sslCfg.ToConfig()
 	client.Transport = transport
@@ -246,14 +248,18 @@ func acquireInstallLock(ctx context.Context, installDir string) (func(), error) 
 	}
 }
 
-func cleanupOldReleases(installDir, currentReleaseDir string) error {
+// cleanupOldReleases removes stale release directories on a best-effort basis.
+// Failures are logged as warnings so that a partially locked directory (e.g.
+// on Windows) does not prevent a successful install. The next Ensure call
+// retries any previously failed cleanups.
+func cleanupOldReleases(installDir, currentReleaseDir string, log *logp.Logger) {
 	releasesDir := filepath.Join(installDir, releasesDirName)
 	entries, err := os.ReadDir(releasesDir)
 	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return nil
+		if !errors.Is(err, os.ErrNotExist) {
+			log.Warnf("failed to list releases directory for cleanup: %v", err)
 		}
-		return err
+		return
 	}
 
 	for _, entry := range entries {
@@ -262,10 +268,9 @@ func cleanupOldReleases(installDir, currentReleaseDir string) error {
 			continue
 		}
 		if err := os.RemoveAll(entryPath); err != nil {
-			return fmt.Errorf("failed to remove previous osquery release %s: %w", entryPath, err)
+			log.Warnf("failed to remove stale osquery release %s, will retry on next run: %v", entryPath, err)
 		}
 	}
-	return nil
 }
 
 func extractArtifact(artifactFile, artifactURL, destinationDir string) error {
@@ -273,7 +278,11 @@ func extractArtifact(artifactFile, artifactURL, destinationDir string) error {
 	if err != nil {
 		return err
 	}
-	return bundled.ExtractToTemp(format, artifactFile, destinationDir, nil)
+	// Use skip-escaping extraction for custom artifacts. Official osquery
+	// tarballs may contain absolute symlinks (e.g. usr/bin/osqueryd ->
+	// /opt/osquery/bin/osqueryd) that are harmless to skip; locateBinDir +
+	// resolveBinPathWithinRoot provide a second layer of defence.
+	return artifactformat.ExtractAllSkipEscaping(format, artifactFile, destinationDir)
 }
 
 func locateBinDir(root, goos string) (string, error) {
@@ -306,6 +315,9 @@ func locateBinDir(root, goos string) (string, error) {
 		if goos == "darwin" {
 			darwinSuffix := filepath.Clean(filepath.Join("osquery.app", "Contents", "MacOS", "osqueryd"))
 			if strings.HasSuffix(cleanRel, darwinSuffix) {
+				if _, err := resolveBinPathWithinRoot(root, path); err != nil {
+					return nil
+				}
 				prefix := strings.TrimSuffix(cleanRel, darwinSuffix)
 				prefix = strings.TrimSuffix(prefix, string(os.PathSeparator))
 				if prefix == "" || prefix == "." {

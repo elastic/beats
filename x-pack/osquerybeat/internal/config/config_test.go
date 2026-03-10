@@ -206,21 +206,58 @@ func TestInstallConfigArchSelection(t *testing.T) {
 				ArtifactURL: "https://example.org/osquery-linux-amd64.tar.gz",
 				SHA256:      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
 			},
+			ARM64: &InstallArtifactConfig{
+				ArtifactURL: "https://example.org/osquery-linux-arm64.tar.gz",
+				SHA256:      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+			},
 		},
 	}
 
-	amd64, ok := cfg.SelectedForPlatform("linux", "amd64")
-	if !ok {
-		t.Fatal("expected linux amd64 selection")
-	}
-	if amd64.ArtifactURL != "https://example.org/osquery-linux-amd64.tar.gz" {
-		t.Fatalf("unexpected amd64 artifact url: %s", amd64.ArtifactURL)
-	}
+	t.Run("amd64 returns arch-specific URL", func(t *testing.T) {
+		selected, ok := cfg.SelectedForPlatform("linux", "amd64")
+		if !ok {
+			t.Fatal("expected linux amd64 selection")
+		}
+		if selected.ArtifactURL != cfg.Linux.AMD64.ArtifactURL {
+			t.Fatalf("expected amd64 URL, got %s", selected.ArtifactURL)
+		}
+	})
 
-	arm64, ok := cfg.SelectedForPlatform("linux", "arm64")
-	if ok {
-		t.Fatalf("expected no linux arm64 selection, got %s", arm64.ArtifactURL)
-	}
+	t.Run("arm64 returns arch-specific URL", func(t *testing.T) {
+		selected, ok := cfg.SelectedForPlatform("linux", "arm64")
+		if !ok {
+			t.Fatal("expected linux arm64 selection")
+		}
+		if selected.ArtifactURL != cfg.Linux.ARM64.ArtifactURL {
+			t.Fatalf("expected arm64 URL, got %s", selected.ArtifactURL)
+		}
+	})
+
+	t.Run("only amd64 configured returns false for arm64", func(t *testing.T) {
+		amd64Only := InstallConfig{
+			Linux: &InstallPlatformConfig{
+				AMD64: &InstallArtifactConfig{
+					ArtifactURL: "https://example.org/osquery-linux-amd64.tar.gz",
+					SHA256:      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+				},
+			},
+		}
+		if _, ok := amd64Only.SelectedForPlatform("linux", "arm64"); ok {
+			t.Fatal("expected no arm64 selection when only amd64 is configured")
+		}
+	})
+
+	t.Run("unsupported arch returns false", func(t *testing.T) {
+		if _, ok := cfg.SelectedForPlatform("linux", "386"); ok {
+			t.Fatal("expected no selection for unsupported arch")
+		}
+	})
+
+	t.Run("unsupported platform returns false", func(t *testing.T) {
+		if _, ok := cfg.SelectedForPlatform("freebsd", "amd64"); ok {
+			t.Fatal("expected no selection for unsupported platform")
+		}
+	})
 }
 
 func TestInstallConfigPlatformOverrides(t *testing.T) {
@@ -294,6 +331,25 @@ func TestInstallConfigOverridePrecedence(t *testing.T) {
 	}
 	if cfg.SSLForPlatform("windows", "amd64") != globalSSL {
 		t.Fatal("expected global ssl to be used")
+	}
+}
+
+func TestInstallConfigEmptyPlatformNotEnabled(t *testing.T) {
+	cfg := InstallConfig{
+		Linux: &InstallPlatformConfig{},
+	}
+
+	if err := cfg.NormalizeAndValidate(); err != nil {
+		t.Fatalf("empty platform config should validate without error: %v", err)
+	}
+	if cfg.Enabled() {
+		t.Fatal("expected config to be disabled when platform has no arch configs")
+	}
+	if cfg.EnabledForPlatform("linux", "amd64") {
+		t.Fatal("expected linux/amd64 to be disabled")
+	}
+	if _, ok := cfg.SelectedForPlatform("linux", "amd64"); ok {
+		t.Fatal("expected no selection for empty platform config")
 	}
 }
 

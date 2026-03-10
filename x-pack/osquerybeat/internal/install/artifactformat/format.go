@@ -59,3 +59,22 @@ func ExtractAll(format Format, artifactFile, destinationDir string) error {
 		return fmt.Errorf("unsupported artifact format %q", format)
 	}
 }
+
+// ExtractAllSkipEscaping is like ExtractAll but silently skips symlink/hardlink
+// entries whose targets escape the destination directory. This is used for
+// runtime custom artifact extraction where official tarballs may contain
+// absolute symlinks (e.g. usr/bin/osqueryd -> /opt/osquery/bin/osqueryd).
+func ExtractAllSkipEscaping(format Format, artifactFile, destinationDir string) error {
+	switch format {
+	case TarGz:
+		return tar.ExtractFileSkipEscaping(artifactFile, destinationDir)
+	case Zip:
+		return zip.UnzipFile(artifactFile, destinationDir)
+	case Pkg:
+		return pkgutil.Expand(artifactFile, destinationDir)
+	case Msi:
+		return msiutil.Expand(artifactFile, destinationDir)
+	default:
+		return fmt.Errorf("unsupported artifact format %q", format)
+	}
+}
