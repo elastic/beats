@@ -12,7 +12,7 @@ Use the following settings to configure internal collection when you are not usi
 
 You specify these settings in the X-Pack monitoring section of the `filebeat.yml` config file.
 
-The following example shows the expected structure for `monitoring` settings:
+This example shows the expected structure for `monitoring` settings:
 
 ```yaml
 monitoring:
@@ -30,7 +30,7 @@ Refer to [Use internal collection to send monitoring data](/reference/filebeat/m
 
 ## `monitoring.enabled` [_monitoring_enabled]
 
-The `monitoring.enabled` config is a boolean setting to enable or disable {{monitoring}}. If set to `true`, monitoring is enabled.
+The `monitoring.enabled` config is a boolean setting that controls whether {{monitoring}} is enabled. If set to `true`, monitoring is enabled.
 
 The default value is `false`.
 
