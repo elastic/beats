@@ -1,3 +1,29 @@
+JOURNALD_CONF_PATH = File.expand_path("journald.conf", File.dirname(__FILE__))
+
+unless File.exist?(JOURNALD_CONF_PATH)
+  raise "journald.conf not found at #{JOURNALD_CONF_PATH}"
+end
+
+HOST_TIMEZONE = begin
+  tz = ENV.fetch("HOST_TIMEZONE", "").strip
+
+  if tz.empty? && File.exist?("/etc/timezone")
+    tz = File.read("/etc/timezone").strip
+  end
+
+  if tz.empty? && File.exist?("/etc/localtime")
+    begin
+      localtime_path = File.realpath("/etc/localtime")
+      match = localtime_path.match(%r{/usr/share/zoneinfo/(.+)$})
+      tz = match[1] if match
+    rescue StandardError
+      tz = ""
+    end
+  end
+
+  tz.empty? ? "UTC" : tz
+end
+
 Vagrant.configure("2") do |config|
   config.vm.boot_timeout = 600
 
@@ -27,6 +53,11 @@ Vagrant.configure("2") do |config|
       expected_major: "241",
       hostname: "sd241-debian10"
     },
+    "242" => {
+      box: "generic/ubuntu1910",
+      expected_major: "242",
+      hostname: "sd242-ubuntu1910"
+    },
     "250" => {
       box: "generic/fedora36",
       expected_major: "250",
@@ -39,7 +70,24 @@ Vagrant.configure("2") do |config|
       vm.vm.box = cfg[:box]
       vm.vm.hostname = cfg[:hostname]
 
-      vm.vm.provision "file", source: "journald.conf", destination: "/tmp/journald.conf"
+      vm.vm.provision "shell", privileged: true, run: "always", inline: <<-SHELL
+        set -euo pipefail
+        host_tz="#{HOST_TIMEZONE}"
+
+        if [ ! -f "/usr/share/zoneinfo/${host_tz}" ]; then
+          echo "host timezone ${host_tz} not found in guest; keeping current timezone" >&2
+          exit 0
+        fi
+
+        ln -snf "/usr/share/zoneinfo/${host_tz}" /etc/localtime
+        printf '%s\n' "${host_tz}" > /etc/timezone || true
+
+        if command -v timedatectl >/dev/null 2>&1; then
+          timedatectl set-timezone "${host_tz}" || true
+        fi
+      SHELL
+
+      vm.vm.provision "file", source: JOURNALD_CONF_PATH, destination: "/tmp/journald.conf"
 
       vm.vm.provision "shell", privileged: true, inline: <<-SHELL
         set -euo pipefail
