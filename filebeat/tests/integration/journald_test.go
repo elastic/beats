@@ -22,16 +22,15 @@
 package integration
 
 import (
-	"bufio"
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"io"
 	"math/rand/v2"
 	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"syscall"
 	"testing"
@@ -282,41 +281,22 @@ func listBoots(t *testing.T) (boots []bootInfo, raw string) {
 }
 
 func countBootEntries(t *testing.T, bootOffset string) int {
-	cmd := exec.Command("journalctl", "-b", bootOffset, "--output=json", "--no-pager", "--quiet")
-	stdout, err := cmd.StdoutPipe()
+	cmd := exec.Command(
+		"bash",
+		"-c",
+		`set -o pipefail; journalctl -b "$1" --output=json --no-pager --quiet | wc -l`,
+		"countBootEntries",
+		bootOffset,
+	)
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		t.Fatalf("could not get journalctl stdout pipe for boot %q: %s", bootOffset, err)
+		t.Fatalf("journalctl | wc -l failed for boot %q: %s. output=%q", bootOffset, err, strings.TrimSpace(string(output)))
 	}
-	stderr, err := cmd.StderrPipe()
+
+	countStr := strings.TrimSpace(string(output))
+	count, err := strconv.Atoi(countStr)
 	if err != nil {
-		t.Fatalf("could not get journalctl stderr pipe for boot %q: %s", bootOffset, err)
-	}
-
-	if err := cmd.Start(); err != nil {
-		t.Fatalf("could not start journalctl for boot %q: %s", bootOffset, err)
-	}
-
-	scanner := bufio.NewScanner(stdout)
-	// Journal entries can be larger than Scanner's default 64KiB token limit.
-	scanner.Buffer(make([]byte, 0, 64*1024), 8*1024*1024)
-
-	count := 0
-	for scanner.Scan() {
-		if strings.TrimSpace(scanner.Text()) == "" {
-			continue
-		}
-		count++
-	}
-	if err := scanner.Err(); err != nil {
-		t.Fatalf("could not scan journalctl output for boot %q: %s", bootOffset, err)
-	}
-
-	stderrData, err := io.ReadAll(stderr)
-	if err != nil {
-		t.Fatalf("could not read journalctl stderr for boot %q: %s", bootOffset, err)
-	}
-	if err := cmd.Wait(); err != nil {
-		t.Fatalf("journalctl command failed for boot %q: %s. stderr=%q", bootOffset, err, strings.TrimSpace(string(stderrData)))
+		t.Fatalf("could not parse wc -l output for boot %q: output=%q error=%s", bootOffset, countStr, err)
 	}
 
 	return count
