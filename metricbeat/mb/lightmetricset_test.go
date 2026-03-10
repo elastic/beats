@@ -26,6 +26,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestLightMetricSetRegistration(t *testing.T) {
@@ -136,6 +137,7 @@ func baseModule(t *testing.T, r *Register, module, metricSet string) BaseMetricS
 		name:         "bar",
 		module:       &baseModule,
 		registration: origRegistration,
+		paths:        paths.New(),
 	}
 	return bm
 }
