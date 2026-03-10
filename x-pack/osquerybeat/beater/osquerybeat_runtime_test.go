@@ -55,8 +55,14 @@ func TestResolveOsqueryRuntime_OtherPlatformConfigFallsBackToBundled(t *testing.
 	}
 
 	platformCfg := &config.InstallPlatformConfig{
-		ArtifactURL: "https://example.org/osquery-custom.tar.gz",
-		SHA256:      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		AMD64: &config.InstallArtifactConfig{
+			ArtifactURL: "https://example.org/osquery-custom.tar.gz",
+			SHA256:      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		},
+		ARM64: &config.InstallArtifactConfig{
+			ArtifactURL: "https://example.org/osquery-custom.tar.gz",
+			SHA256:      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		},
 	}
 	switch runtime.GOOS {
 	case "linux":

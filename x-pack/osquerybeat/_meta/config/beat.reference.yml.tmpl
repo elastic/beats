@@ -17,11 +17,7 @@ osquerybeat:
 #              arm64:
 #                artifact_url: "https://example.org/osquery-5.19.0.linux_aarch64.tar.gz"
 #                sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-#              # Optional platform-level fallback if arch-specific config is unset.
-#              #artifact_url: "https://example.org/osquery-5.19.0.linux.tar.gz"
-#              #sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-#              # Optional platform override defaults (overridden by amd64/arm64 when set).
-#              #allow_insecure_url: false
+#              # Optional platform-level SSL fallback (used if amd64/arm64 ssl is unset).
 #              #ssl.verification_mode: full
 #            darwin:
 #              amd64:

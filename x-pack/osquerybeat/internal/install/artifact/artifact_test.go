@@ -30,8 +30,14 @@ func testInstallConfig(url, sha string) config.InstallConfig {
 		AllowInsecureURL: true,
 	}
 	platformCfg := &config.InstallPlatformConfig{
-		ArtifactURL: url,
-		SHA256:      sha,
+		AMD64: &config.InstallArtifactConfig{
+			ArtifactURL: url,
+			SHA256:      sha,
+		},
+		ARM64: &config.InstallArtifactConfig{
+			ArtifactURL: url,
+			SHA256:      sha,
+		},
 	}
 	switch runtime.GOOS {
 	case "linux":

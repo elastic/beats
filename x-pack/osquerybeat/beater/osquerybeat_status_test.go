@@ -330,8 +330,14 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 func TestOsquerybeatStatusReporting_RuntimeResolutionFailure(t *testing.T) {
 	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
 		platformCfg := &config.InstallPlatformConfig{
-			ArtifactURL: "https://example.org/osquery.tar.gz",
-			SHA256:      "bad",
+			AMD64: &config.InstallArtifactConfig{
+				ArtifactURL: "https://example.org/osquery.tar.gz",
+				SHA256:      "bad",
+			},
+			ARM64: &config.InstallArtifactConfig{
+				ArtifactURL: "https://example.org/osquery.tar.gz",
+				SHA256:      "bad",
+			},
 		}
 		ob.osqueryInstallConfig = config.InstallConfig{
 			Linux:   platformCfg,
