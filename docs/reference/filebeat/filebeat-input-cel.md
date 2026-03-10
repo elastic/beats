@@ -1005,7 +1005,7 @@ Specifies the AWS region that will be used in the v4 signing process. This is op
 ### `otel.trace` [_otel_trace]
 
 ```{applies_to}
-stack: ga 9.3.1
+stack: 9.4.0
 ```
 
 OpenTelemetry tracing is activated using OTel-standard environment variables. You can use input settings to override the default span attribute redaction behavior.
