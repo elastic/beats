@@ -73,11 +73,11 @@ var gauges = map[string]bool{
 	"system.load.norm.15":                  true,
 }
 
-// isGauge returns true when the given metric key name represents a gauge value.
+// IsGauge returns true when the given metric key name represents a gauge value.
 // Any metric name suffixed in '_gauge' or containing '.histogram.' is
 // treated as a gauge. Other metrics can specifically be marked as gauges
 // through the list maintained in this package.
-func isGauge(key string) bool {
+func IsGauge(key string) bool {
 	if strings.HasSuffix(key, "_gauge") || strings.Contains(key, ".histogram.") {
 		return true
 	}
@@ -219,7 +219,7 @@ func makeDeltaSnapshot(prev, cur monitoring.FlatSnapshot) monitoring.FlatSnapsho
 	}
 
 	for k, i := range cur.Ints {
-		if isGauge(k) {
+		if IsGauge(k) {
 			delta.Ints[k] = i
 		} else {
 			if p := prev.Ints[k]; p != i {
@@ -229,7 +229,7 @@ func makeDeltaSnapshot(prev, cur monitoring.FlatSnapshot) monitoring.FlatSnapsho
 	}
 
 	for k, f := range cur.Floats {
-		if isGauge(k) {
+		if IsGauge(k) {
 			delta.Floats[k] = f
 		} else if p := prev.Floats[k]; p != f {
 			delta.Floats[k] = f - p
