@@ -37,6 +37,7 @@ type RegistryBridge struct {
 	mu           sync.RWMutex
 	registration metric.Registration
 	reRegWg      sync.WaitGroup
+	reRegMu      sync.Mutex // serializes createAndReRegister goroutines
 	closed       bool
 
 	// Stats instruments keyed by registry key path.
@@ -268,12 +269,16 @@ func (b *RegistryBridge) ensureInputFloat(field string) error {
 // registerCallback registers a single OTel async callback that covers all
 // currently known instruments. At least one instrument must exist for the
 // OTel SDK to actually invoke the callback — RegisterCallback with zero
-// instruments returns a noop registration.
+// instruments returns a noop registration that never fires. Since dynamic
+// metric discovery relies on the callback running, zero instruments at
+// startup means no metrics will ever be bridged. In practice this never
+// happens because SetupMetricsOptions and the pipeline register metrics
+// before the bridge is created.
 func (b *RegistryBridge) registerCallback() error {
 	instruments := b.allInstruments()
 
 	if len(instruments) == 0 {
-		b.logger.Warn("registry bridge has zero instruments; OTel callback will not fire until metrics are discovered")
+		return fmt.Errorf("registry bridge has zero instruments; dynamic metric discovery requires at least one instrument at startup")
 	}
 
 	reg, err := b.meter.RegisterCallback(b.callback, instruments...)
@@ -355,8 +360,12 @@ func (b *RegistryBridge) callback(_ context.Context, obs metric.Observer) error 
 
 // createAndReRegister creates instruments for pending keys and re-registers
 // the callback with the full instrument set. Runs outside the OTel callback
-// so the pipeline lock is not held.
+// so the pipeline lock is not held. Serialized by reRegMu so that
+// overlapping goroutines cannot leak OTel registrations.
 func (b *RegistryBridge) createAndReRegister(statsInts, statsFloats, inputInts, inputFloats []string) {
+	b.reRegMu.Lock()
+	defer b.reRegMu.Unlock()
+
 	// Batch-create all pending instruments and unregister the old callback
 	// under a single write lock, reducing lock/unlock cycles.
 	b.mu.Lock()

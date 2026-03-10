@@ -362,16 +362,13 @@ func TestBridgeZeroValues(t *testing.T) {
 }
 
 func TestBridgeNilRegistries(t *testing.T) {
-	reader := metric.NewManualReader()
+	provider := metric.NewMeterProvider(metric.WithReader(metric.NewManualReader()))
+	settings := componenttest.NewNopTelemetrySettings()
+	settings.MeterProvider = provider
 
-	// Both nil registries should not panic
-	bridge := newTestBridge(t, reader, nil, nil)
-
-	// Collection should succeed without panicking
-	rm := collectMetrics(t, reader)
-	assert.NotNil(t, rm)
-
-	bridge.Shutdown()
+	// Both nil registries produce zero instruments, which is an error.
+	_, err := NewRegistryBridge(settings, "testbeat", nil, nil)
+	require.Error(t, err)
 }
 
 func TestBridgeShutdownUnregisters(t *testing.T) {
@@ -479,7 +476,11 @@ func TestBridgeGaugeSuffixDetection(t *testing.T) {
 
 func TestBridgeDoubleShutdown(t *testing.T) {
 	reader := metric.NewManualReader()
-	bridge := newTestBridge(t, reader, nil, nil)
+
+	statsReg := monitoring.NewRegistry()
+	monitoring.NewUint(statsReg.GetOrCreateRegistry("pipeline"), "clients").Set(1)
+
+	bridge := newTestBridge(t, reader, statsReg, nil)
 
 	// Double shutdown should be safe.
 	bridge.Shutdown()
@@ -664,7 +665,10 @@ func TestBridgeNilMeterProvider(t *testing.T) {
 	settings.MeterProvider = nil
 	settings.Logger = nil
 
-	b, err := NewRegistryBridge(settings, "testbeat", nil, nil)
+	statsReg := monitoring.NewRegistry()
+	monitoring.NewUint(statsReg.GetOrCreateRegistry("pipeline"), "clients").Set(1)
+
+	b, err := NewRegistryBridge(settings, "testbeat", statsReg, nil)
 	require.NoError(t, err)
 	require.NotNil(t, b)
 	b.Shutdown()
