@@ -171,5 +171,5 @@ func TestEffectiveEventRendering(t *testing.T) {
 	outputEvent, err := processor.Run(&beat.Event{})
 	require.NoError(t, err)
 
-	assert.Equal(t, "{\"target\":\"2025-04-08T12:00:00.000000042Z\"}", outputEvent.Fields.String(), "Date is not rendered as expected")
+	assert.JSONEq(t, "{\"target\":\"2025-04-08T12:00:00.000000042Z\"}", outputEvent.Fields.String(), "Date is not rendered as expected")
 }

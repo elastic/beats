@@ -7,25 +7,16 @@
 package tables
 
 import (
-	"context"
 	"fmt"
 	"math"
 	"reflect"
 	"strings"
 	"time"
 
-	"github.com/osquery/osquery-go/plugin/table"
 	"www.velocidex.com/golang/regparser"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
-
-// GlobalState is an interface that defines methods for accessing global Amcache state.
-type GlobalStateInterface interface {
-	GetCachedEntries(amcacheTable AmcacheTable, filters []filters.Filter, log *logger.Logger) ([]Entry, error)
-}
 
 type Entry interface {
 	// PostProcess is called after the entry is populated from the registry key.
@@ -106,44 +97,6 @@ func GetAmcacheTableByName(name TableName) *AmcacheTable {
 		}
 	}
 	return nil
-}
-
-func (t AmcacheTable) Columns() []table.ColumnDefinition {
-	entry := t.newEntry()
-	columns, err := encoding.GenerateColumnDefinitions(entry)
-	if err != nil {
-		// This should never happen
-		panic(fmt.Sprintf("Warning: failed to generate column definitions for %s: %v", t.Name, err))
-	}
-	return columns
-}
-
-func (t AmcacheTable) GenerateFunc(state GlobalStateInterface, log *logger.Logger) table.GenerateFunc {
-	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		filters := filters.GetConstraintFilters(queryContext)
-		entries, err := state.GetCachedEntries(t, filters, log)
-		if err != nil {
-			return nil, err
-		}
-		marshalled, err := marshalEntries(entries)
-		if err != nil {
-			return nil, err
-		}
-		return marshalled, nil
-	}
-}
-
-// marshalEntries takes a slice of Entry interfaces and marshals each to a map[string]string.
-func marshalEntries(entries []Entry) ([]map[string]string, error) {
-	marshalled := make([]map[string]string, 0, len(entries))
-	for _, entry := range entries {
-		mapped, err := encoding.MarshalToMap(entry)
-		if err != nil {
-			return nil, err
-		}
-		marshalled = append(marshalled, mapped)
-	}
-	return marshalled, nil
 }
 
 // fillInEntryFromKey populates the fields of an Entry from a registry key.

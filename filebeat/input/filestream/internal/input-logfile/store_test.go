@@ -73,8 +73,8 @@ func TestStore_OpenClose(t *testing.T) {
 	t.Run("load from empty", func(t *testing.T) {
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
-		require.Equal(t, 0, len(storeMemorySnapshot(store)))
-		require.Equal(t, 0, len(storeInSyncSnapshot(store)))
+		require.Empty(t, storeMemorySnapshot(store))
+		require.Empty(t, storeInSyncSnapshot(store))
 	})
 
 	t.Run("already available state is loaded", func(t *testing.T) {
@@ -256,9 +256,9 @@ func TestStore_ResetCursor(t *testing.T) {
 		res := store.Get("test::key")
 		require.Equal(t, uint(0), res.version)
 		require.Equal(t, uint(0), res.lockedVersion)
-		require.Equal(t, nil, res.cursor)
-		require.Equal(t, nil, res.pendingCursorValue)
-		require.Equal(t, nil, res.pendingUpdate)
+		require.Nil(t, res.cursor)
+		require.Nil(t, res.pendingCursorValue)
+		require.Nil(t, res.pendingUpdate)
 
 		store.resetCursor("test::key", cur{Offset: 10})
 
@@ -286,8 +286,8 @@ func TestStore_ResetCursor(t *testing.T) {
 		require.Equal(t, uint(0), res.version)
 		require.Equal(t, uint(0), res.lockedVersion)
 		require.Equal(t, map[string]interface{}{"offset": int64(6)}, res.cursor)
-		require.Equal(t, nil, res.pendingCursorValue)
-		require.Equal(t, nil, res.pendingUpdate)
+		require.Nil(t, res.pendingCursorValue)
+		require.Nil(t, res.pendingUpdate)
 
 		store.resetCursor("test::key", cur{Offset: 0})
 
@@ -331,13 +331,13 @@ func TestStore_ResetCursor(t *testing.T) {
 		require.Equal(t, uint(0), res.lockedVersion)
 		require.Equal(t, uint(0), res.activeCursorOperations)
 		require.Equal(t, map[string]interface{}{"offset": int64(0)}, res.cursor)
-		require.Equal(t, nil, res.pendingCursorValue)
-		require.Equal(t, nil, res.pendingUpdate)
+		require.Nil(t, res.pendingCursorValue)
+		require.Nil(t, res.pendingUpdate)
 	})
 }
 
 type testMeta struct {
-	IdentifierName string
+	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
 }
 
 func TestSourceStore_UpdateIdentifiers(t *testing.T) {
@@ -383,12 +383,12 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 			"test::key2": { // Unchanged
 				Updated: s.ephemeralStore.table["test::key2"].internalState.Updated,
 				TTL:     0 * time.Second,
-				Meta:    map[string]interface{}{"identifiername": "method"},
+				Meta:    map[string]interface{}{"identifier_name": "method"},
 			},
 			"test::key1::updated": { // Updated resource
 				Updated: s.ephemeralStore.table["test::key1::updated"].internalState.Updated,
 				TTL:     60 * time.Second,
-				Meta:    map[string]interface{}{"identifiername": "something"},
+				Meta:    map[string]interface{}{"identifier_name": "something"},
 			},
 		}
 		s.ephemeralStore.mu.Unlock()
@@ -416,19 +416,12 @@ func TestSourceStoreTakeOver(t *testing.T) {
 		store:                 s,
 	}
 
-	store.TakeOver(func(v Value) (string, any) {
-		r, ok := v.(*resource)
-		if !ok {
-			t.Fatalf("expecting v of type '*input_logfile.resource', got '%T' instead", v)
+	store.TakeOver(func(v TakeOverState) (string, any) {
+		m := testMeta{
+			IdentifierName: v.IdentifierName,
 		}
 
-		var m testMeta
-		err := v.UnpackCursorMeta(&m)
-		if err != nil {
-			t.Fatalf("cannot unpack meta: %v", err)
-		}
-
-		newID := strings.ReplaceAll(r.key, "previous-id", "current-id")
+		newID := strings.ReplaceAll(v.Key, "previous-id", "current-id")
 
 		return newID, m
 	})
@@ -443,12 +436,12 @@ func TestSourceStoreTakeOver(t *testing.T) {
 	want := map[string]state{
 		"filestream::another-input::key2": { // Unchanged
 			TTL:  60 * time.Second,
-			Meta: map[string]interface{}{"identifiername": "test-file-identity"},
+			Meta: map[string]interface{}{"identifier_name": "test-file-identity"},
 		},
 		"filestream::current-id::key1": { // Updated resource
 			Updated: s.ephemeralStore.table["filestream::current-id::key1"].internalState.Updated,
 			TTL:     60 * time.Second,
-			Meta:    map[string]interface{}{"identifiername": "test-file-identity"},
+			Meta:    map[string]interface{}{"identifier_name": "test-file-identity"},
 		},
 	}
 	s.ephemeralStore.mu.Unlock()

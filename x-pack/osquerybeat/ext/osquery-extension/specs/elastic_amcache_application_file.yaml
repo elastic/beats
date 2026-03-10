@@ -1,0 +1,99 @@
+type: table
+name: elastic_amcache_application_file
+description: Windows Amcache inventory application file entries (Root\InventoryApplicationFile)
+platforms:
+  - windows
+group: amcache
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache
+
+columns:
+  - name: timestamp
+    type: BIGINT
+    description: Last write time as Unix timestamp
+    go_type: time.Time
+    format: unix
+  - name: date_time
+    type: TEXT
+    description: Last write time in RFC3339
+    go_type: time.Time
+    format: rfc3339
+    timezone: UTC
+  - name: program_id
+    type: TEXT
+    description: Program identifier
+  - name: file_id
+    type: TEXT
+    description: File identifier
+  - name: lower_case_long_path
+    type: TEXT
+    description: Lowercase long path
+  - name: name
+    type: TEXT
+    description: File name
+  - name: original_file_name
+    type: TEXT
+    description: Original file name
+  - name: publisher
+    type: TEXT
+    description: Publisher
+  - name: version
+    type: TEXT
+    description: Version
+  - name: bin_file_version
+    type: TEXT
+    description: Binary file version
+  - name: binary_type
+    type: TEXT
+    description: Binary type
+  - name: product_name
+    type: TEXT
+    description: Product name
+  - name: product_version
+    type: TEXT
+    description: Product version
+  - name: link_date
+    type: TEXT
+    description: Link date
+    go_type: time.Time
+  - name: bin_product_version
+    type: TEXT
+    description: Binary product version
+  - name: size
+    type: BIGINT
+    description: File size
+  - name: language
+    type: BIGINT
+    description: Language ID
+  - name: usn
+    type: BIGINT
+    description: Update sequence number
+  - name: appx_package_full_name
+    type: TEXT
+    description: AppX package full name
+  - name: is_os_component
+    type: TEXT
+    description: Is OS component flag
+  - name: appx_package_relative_id
+    type: TEXT
+    description: AppX package relative ID
+  - name: sha1
+    type: TEXT
+    description: SHA1 hash
+
+documentation:
+  description: |
+    Application file inventory from Windows Amcache.
+    Queries Root\InventoryApplicationFile from the Amcache.hve registry hive.
+  examples:
+    - title: List all amcache application files
+      query: |
+        SELECT * FROM elastic_amcache_application_file;
+    - title: Find files by product name
+      query: |
+        SELECT program_id, name, product_name, lower_case_long_path FROM elastic_amcache_application_file WHERE product_name != '';
+  notes:
+    - "Windows only. Requires Amcache.hve."
+  related_tables:
+    - elastic_amcache_application
+    - elastic_amcache_applications_view

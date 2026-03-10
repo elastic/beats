@@ -348,6 +348,12 @@ func handleContainerInput(cfg, newCfg *config.C, parsers *[]any) error {
 			return fmt.Errorf("cannot read 'stream' as string: %w", err)
 		}
 		stream = value
+
+		if value != "all" {
+			if err := newCfg.SetString("take_over.stream", -1, stream); err != nil {
+				return fmt.Errorf("cannot set 'take_over.stream': %w", err)
+			}
+		}
 	}
 
 	format := "auto"

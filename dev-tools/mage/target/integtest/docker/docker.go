@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package docker defines helper targets for using docker-compose for integration testing.
+// Package docker defines helper targets for using docker compose for integration testing.
 package docker
 
 import (
@@ -28,28 +28,28 @@ import (
 
 type Docker mg.Namespace
 
-// ComposeBuild builds the docker-compose containers.
+// ComposeBuild builds the docker compose containers.
 func (Docker) ComposeBuild() error {
 	return devtools.BuildIntegTestContainers()
 }
 
-// ComposeUp starts the docker-compose containers, waits until they are healthy, and puts them in the background.
+// ComposeUp starts the docker compose containers, waits until they are healthy, and puts them in the background.
 func (Docker) ComposeUp() error {
 	return devtools.StartIntegTestContainers()
 }
 
-// ComposeDown stops the docker-compose containers started by composeUp.
+// ComposeDown stops the docker compose containers started by composeUp.
 func (Docker) ComposeDown() error {
 	return devtools.StopIntegTestContainers()
 }
 
-// ComposeProject prints the project name to use with docker-compose -p.
-// Containers started by composeUp run under this docker-compose project.
+// ComposeProject prints the project name to use with docker compose -p.
+// Containers started by composeUp run under this docker compose project.
 func (Docker) ComposeProject() {
 	fmt.Println(devtools.DockerComposeProjectName())
 }
 
-// ComposeEnvFile generates an environment variable file to use with docker-compose --env-file.
+// ComposeEnvFile generates an environment variable file to use with docker compose --env-file.
 func (Docker) ComposeEnvFile() error {
 	envFile, err := devtools.WriteDockerComposeEnvFile()
 	if err != nil {

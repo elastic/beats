@@ -1,0 +1,104 @@
+type: shared_types
+group: jumplists
+
+# Shared embedded types that can be reused across multiple tables
+# Reference these types in your table specs using the `shared_types` field
+#
+# Example usage in a table spec:
+#   shared_types:
+#     - ApplicationID
+#     - UserProfile
+#
+# Required fields:
+#   group: shared types are scoped to this group
+
+types:
+  # Application identification - used by jumplists, shell bags, etc.
+  - name: ApplicationID
+    description: Application identification metadata
+    pointer: true
+    columns:
+      - name: application_id
+        type: TEXT
+        description: The application ID (hash of the application path)
+      - name: application_name
+        type: TEXT
+        description: The resolved application name from known IDs
+
+  # User profile information - used across many Windows forensic tables
+  - name: UserProfile
+    description: Windows user profile information
+    pointer: true
+    columns:
+      - name: username
+        type: TEXT
+        description: The username
+      - name: domain
+        type: TEXT
+        description: The domain or computer name
+      - name: sid
+        type: TEXT
+        description: The Windows Security Identifier (SID)
+
+  # Common timestamp fields
+  - name: FileTimestamps
+    description: Standard file timestamp fields
+    pointer: false
+    columns:
+      - name: created_time
+        type: BIGINT
+        description: File creation timestamp
+        go_type: time.Time
+        format: unix
+        timezone: UTC
+      - name: modified_time
+        type: BIGINT
+        description: File modification timestamp
+        go_type: time.Time
+        format: unix
+        timezone: UTC
+      - name: accessed_time
+        type: BIGINT
+        description: File last access timestamp
+        go_type: time.Time
+        format: unix
+        timezone: UTC
+
+  # LNK file metadata - used by jumplists, recent files, etc.
+  - name: LnkMetadata
+    description: Windows LNK (shortcut) file metadata
+    pointer: true
+    columns:
+      - name: local_path
+        type: TEXT
+        description: Target local path
+      - name: file_size
+        type: INTEGER
+        description: Target file size in bytes
+      - name: hot_key
+        type: TEXT
+        description: Assigned hotkey combination
+      - name: command_line_arguments
+        type: TEXT
+        description: Command line arguments for the target
+      - name: icon_location
+        type: TEXT
+        description: Path to the icon file
+      - name: volume_serial_number
+        type: TEXT
+        description: Volume serial number (format XXXX-XXXX)
+      - name: volume_label
+        type: TEXT
+        description: Volume label
+
+  # Jump list specific metadata
+  - name: JumplistMeta
+    description: Jump list specific metadata
+    pointer: true
+    columns:
+      - name: jumplist_type
+        type: TEXT
+        description: Type of jumplist (custom or automatic)
+      - name: source_file_path
+        type: TEXT
+        description: Path to the jumplist file

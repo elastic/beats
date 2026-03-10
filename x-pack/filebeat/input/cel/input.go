@@ -56,6 +56,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
@@ -176,7 +177,15 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 	if cfg.Resource.Tracer != nil {
 		id := sanitizeFileName(env.IDWithoutName)
-		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
+		path := strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+		}
+		cfg.Resource.Tracer.Filename = resolved
 	}
 
 	client, trace, otelMetrics, err := newClient(ctx, cfg, log, reg, env)
@@ -230,6 +239,15 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		state = make(map[string]interface{})
 	} else {
 		state = cfg.State
+	}
+	if len(cfg.SecretState) > 0 {
+		state["secret"] = cfg.SecretState
+	}
+	if cfg.Redact == nil {
+		cfg.Redact = &redact{}
+	}
+	if !slices.Contains(cfg.Redact.Fields, "secret") {
+		cfg.Redact.Fields = append(cfg.Redact.Fields, "secret")
 	}
 	if cursor != nil {
 		state["cursor"] = cursor
@@ -614,7 +632,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			metricsRecorder.AddPublishDuration(ctx, time.Since(pubStart))
 			// Advance the cursor to the final state if there was no error during
 			// publications. This is needed to transition to the next set of events.
-			if !hadPublicationError {
+			if !hadPublicationError && !isDegraded {
 				goodCursor = cursor
 				metricsRecorder.AddProgramSuccessExecution(ctx)
 			}

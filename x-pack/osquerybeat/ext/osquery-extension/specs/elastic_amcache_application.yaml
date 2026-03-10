@@ -1,0 +1,107 @@
+type: table
+name: elastic_amcache_application
+description: Windows Amcache inventory application entries (Root\InventoryApplication)
+platforms:
+  - windows
+group: amcache
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache
+
+columns:
+  - name: timestamp
+    type: BIGINT
+    description: Last write time as Unix timestamp
+    go_type: time.Time
+    format: unix
+  - name: date_time
+    type: TEXT
+    description: Last write time in RFC3339
+    go_type: time.Time
+    format: rfc3339
+    timezone: UTC
+  - name: program_id
+    type: TEXT
+    description: Program identifier
+  - name: program_instance_id
+    type: TEXT
+    description: Program instance identifier
+  - name: name
+    type: TEXT
+    description: Application name
+  - name: version
+    type: TEXT
+    description: Version string
+  - name: publisher
+    type: TEXT
+    description: Publisher name
+  - name: language
+    type: BIGINT
+    description: Language ID
+  - name: install_date
+    type: TEXT
+    description: Install date
+    go_type: time.Time
+  - name: source
+    type: TEXT
+    description: Source
+  - name: root_dir_path
+    type: TEXT
+    description: Root directory path
+  - name: hidden_arp
+    type: BIGINT
+    description: Hidden ARP flag
+  - name: uninstall_string
+    type: TEXT
+    description: Uninstall command string
+  - name: registry_key_path
+    type: TEXT
+    description: Registry key path
+  - name: store_app_type
+    type: TEXT
+    description: Store app type
+  - name: inbox_modern_app
+    type: TEXT
+    description: Inbox modern app flag
+  - name: manifest_path
+    type: TEXT
+    description: Manifest path
+  - name: package_full_name
+    type: TEXT
+    description: Package full name
+  - name: msi_package_code
+    type: TEXT
+    description: MSI package code
+  - name: msi_product_code
+    type: TEXT
+    description: MSI product code
+  - name: msi_install_date
+    type: TEXT
+    description: MSI install date
+    go_type: time.Time
+  - name: bundle_manifest_path
+    type: TEXT
+    description: Bundle manifest path
+  - name: user_sid
+    type: TEXT
+    description: User SID
+  - name: sha1
+    type: TEXT
+    description: SHA1 hash (last 40 chars of program_id)
+
+documentation:
+  description: |
+    Application inventory from Windows Amcache (Application Compatibility Cache).
+    Queries Root\InventoryApplication from the Amcache.hve registry hive.
+  examples:
+    - title: List all amcache applications
+      query: |
+        SELECT * FROM elastic_amcache_application;
+    - title: Find application by name
+      query: |
+        SELECT program_id, name, publisher, version FROM elastic_amcache_application WHERE name LIKE '%Chrome%';
+  notes:
+    - "Windows only. Requires Amcache.hve (e.g. from C:\\Windows\\appcompat\\Programs\\Amcache.hve)."
+  related_tables:
+    - elastic_amcache_application_file
+    - elastic_amcache_application_shortcut
+    - elastic_amcache_applications_view
