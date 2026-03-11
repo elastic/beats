@@ -35,6 +35,8 @@ Two authentication methods are supported: **Client secret (Microsoft Entra ID)**
 
 #### Client secret authentication
 
+{applies_to}`stack: ga 8.19.13` {applies_to}`stack: ga 9.2.7` {applies_to}`stack: ga 9.3.2`
+
 Set `auth_type: "client_secret"` and provide the following options:
 
 `tenant_id`
