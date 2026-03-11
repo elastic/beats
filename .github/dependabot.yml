@@ -149,6 +149,7 @@ updates:
     open-pull-requests-limit: 5
 
   - package-ecosystem: pre-commit
+    directory: "/"
     schedule:
       interval: 'weekly'
       day: 'sunday'
