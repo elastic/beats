@@ -152,8 +152,9 @@ func runCmd(
 		cmd.Args = append(cmd.Args, "--match", filterJourneys.Match)
 	}
 
-	if len(params()) > 0 {
-		paramsBytes, _ := json.Marshal(params())
+	p := params()
+	if len(p) > 0 {
+		paramsBytes, _ := json.Marshal(p)
 		cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
 	}
 

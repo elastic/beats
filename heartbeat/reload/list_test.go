@@ -269,8 +269,10 @@ func TestStopAll(t *testing.T) {
 	list.Stop()
 	assert.Empty(t, list.copyRunnerList())
 
-	for _, r := range runners {
-		assert.True(t, r.(*runner).stopped)
+	for _, rr := range runners {
+		r, ok := rr.(*runner)
+		assert.True(t, ok)
+		assert.True(t, r.stopped)
 	}
 }
 
@@ -423,13 +425,13 @@ func (r *hbrunnerFactory) Create(x beat.PipelineConnector, c *conf.C) (cfgfile.R
 	return runner, err
 }
 
-func (f *hbrunnerFactory) CheckConfig(_ *conf.C) error {
+func (r *hbrunnerFactory) CheckConfig(_ *conf.C) error {
 	return nil
 }
 
-func (f *hbrunnerFactory) GetHashFunc(c *conf.C) (plugin.HashConfigFunc, error) {
-	if f.hashFunc != nil {
-		return f.hashFunc, nil
+func (r *hbrunnerFactory) GetHashFunc(c *conf.C) (plugin.HashConfigFunc, error) {
+	if r.hashFunc != nil {
+		return r.hashFunc, nil
 	}
 
 	return nil, nil
