@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -40,6 +41,7 @@ func makeLogstash(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *conf.C,
+	beatPaths *paths.Path,
 ) (outputs.Group, error) {
 	lsConfig, err := readConfig(cfg, beat)
 	if err != nil {
@@ -85,5 +87,5 @@ func makeLogstash(
 		clients[i] = client
 	}
 
-	return outputs.SuccessNet(lsConfig.Queue, lsConfig.LoadBalance, lsConfig.BulkMaxSize, lsConfig.MaxRetries, nil, beat.Logger, clients)
+	return outputs.SuccessNet(lsConfig.Queue, lsConfig.LoadBalance, lsConfig.BulkMaxSize, lsConfig.MaxRetries, nil, beat.Logger, beatPaths, clients)
 }

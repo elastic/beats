@@ -102,7 +102,7 @@ SYSTEM_MEMORY = {
                        "actual.used.pct"]
 }
 SYSTEM_MEMORY[metricbeat.P_LINUX] = SYSTEM_MEMORY[metricbeat.P_DEF] + \
-    ["cached", "hugepages", "page_stats"]
+    ["cached", "hugepages", "page_stats", "zswap"]
 
 SYSTEM_MEMORY_FIELDS_LINUX = ["swap", "actual.free", "free", "total", "cached", "used.bytes", "used.pct", "actual.used.bytes",
                               "actual.used.pct"]
@@ -351,6 +351,8 @@ class Test(metricbeat.BaseTest):
         if re.match("(?i)linux", sys.platform) and not "page_stats" in memory:
             # Ensure presence of page_stats only in Linux
             memory["page_stats"] = None
+        if re.match("(?i)linux", sys.platform) and not "zswap" in memory:
+            memory["zswap"] = None
 
         self.assert_fields_for_platform(SYSTEM_MEMORY, memory)
 
