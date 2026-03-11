@@ -189,14 +189,22 @@ type journaldAllBootsEvent struct {
 	} `json:"journald"`
 }
 
+// TestJournaldInputReadsMessagesFromAllBoots is meant to be run manually in
+// VMs with small journals to validate we can read messages from all boots.
+// In machines with large journals, the test will be auto skipped to prevent
+// it from timing out or hanging.
+// See filebeat/input/journald/README.md for information about how to run
+// VMs with different versions of Systemd/Journald
+// Always run this test with -v to know if/where the test is taking time.
 func TestJournaldInputReadsMessagesFromAllBoots(t *testing.T) {
+	t.Skip("This test is meant to be run manually while developing.")
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
 		"../../filebeat.test",
 	)
 
-	t.Log("Reading boot entries.")
+	t.Log("Reading boot entries, this should be quick")
 	boots, listBootsRaw := listBoots(t)
 	if len(boots) <= 1 {
 		t.Fatalf("expected more than one boot in journalctl --list-boots output, got %d. Output:\n%s", len(boots), listBootsRaw)
@@ -205,14 +213,16 @@ func TestJournaldInputReadsMessagesFromAllBoots(t *testing.T) {
 	oldestBoot := boots[0]
 	secondOldestBoot := boots[1]
 
-	t.Log("Counting boot entries: ", oldestBoot.Offset, oldestBoot.BootID)
+	t.Log("Counting boot entries from oldest boot, this can take several seconds.")
+	t.Logf("Boot offset %s, boot ID %s", oldestBoot.Offset, oldestBoot.BootID)
 	oldestBootEntries := countBootEntries(t, oldestBoot.Offset)
 
 	if oldestBootEntries > 50_000 {
 		t.Skipf("Too many entries in the first boot %d > 50_000", oldestBootEntries)
 	}
 
-	t.Log("Counting second old boot entries: ", secondOldestBoot.Offset, secondOldestBoot.BootID)
+	t.Log("Counting boot entries from second oldest boot, this can take several seconds.")
+	t.Logf("Boot offset %s, boot ID %s", secondOldestBoot.Offset, secondOldestBoot.BootID)
 	secondOldestBootEntries := countBootEntries(t, secondOldestBoot.Offset)
 
 	if oldestBootEntries > 50_000 {
