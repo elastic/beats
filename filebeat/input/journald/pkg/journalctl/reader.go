@@ -115,21 +115,30 @@ type Reader struct {
 // journalctl version is >= 242 (the version that introduced the "all" keyword
 // for --boot). On any error or unknown version the flag is omitted, which is
 // safe because older journalctl versions do not need it.
-func maybeAddBootAll(journalctlPath string, args []string) []string {
-	out, err := exec.Command(journalctlPath, "--version").Output()
+func maybeAddBootAll(logger *logp.Logger, journalctlPath string, args []string) []string {
+	out, err := exec.Command(journalctlPath, "--version").CombinedOutput()
 	if err != nil {
+		logger.Warnf("cannot read journalctl version: %s. Omitting '--boot all'", err)
 		return args
 	}
+
 	// first line: "systemd 239 (239-82.el8_10.2)+PAM ..."
 	firstLine := strings.SplitN(string(out), "\n", 2)[0]
 	fields := strings.Fields(firstLine)
 	if len(fields) < 2 {
+		logger.Warnf("journalctl version invalid format: %q. Omitting '--boot all'", string(out))
 		return args
 	}
+
 	ver, err := strconv.Atoi(fields[1])
-	if err != nil || ver < 242 {
+	if err != nil {
+		logger.Warnf("cannot convert journalctl version to int: %s. Omitting '--boot all'", err)
+	}
+	if ver < 242 {
+		logger.Debugf("journalctl version: %v", ver)
 		return args
 	}
+
 	return append(args, "--boot", "all")
 }
 
@@ -137,20 +146,20 @@ func maybeAddBootAll(journalctlPath string, args []string) []string {
 // If there is a cursor, only the cursor is used, seek is ignored.
 // If there is no cursor, then seek is used.
 // --boot all is only added when the journalctl version supports it (>= 242).
-func handleSeekAndCursor(mode SeekMode, since time.Duration, cursor string, journalctlPath string) []string {
+func handleSeekAndCursor(logger *logp.Logger, mode SeekMode, since time.Duration, cursor string, journalctlPath string) []string {
 	if cursor != "" {
-		return maybeAddBootAll(journalctlPath, []string{"--after-cursor", cursor})
+		return maybeAddBootAll(logger, journalctlPath, []string{"--after-cursor", cursor})
 	}
 
 	switch mode {
 	case SeekSince:
-		return maybeAddBootAll(journalctlPath, []string{
+		return maybeAddBootAll(logger, journalctlPath, []string{
 			"--since", time.Now().Add(since).Format(sinceTimeFormat),
 		})
 	case SeekTail:
 		return []string{"--since", "now"}
 	case SeekHead:
-		return maybeAddBootAll(journalctlPath, []string{"--no-tail"})
+		return maybeAddBootAll(logger, journalctlPath, []string{"--no-tail"})
 	default:
 		// That should never happen
 		return []string{}
@@ -240,7 +249,7 @@ func New(
 		args = append(args, "--facility", fmt.Sprintf("%d", facility))
 	}
 
-	extraArgs := handleSeekAndCursor(mode, since, cursor, journalctlPath)
+	extraArgs := handleSeekAndCursor(logger, mode, since, cursor, journalctlPath)
 
 	r := Reader{
 		logger:      logger,

@@ -235,7 +235,7 @@ func TestMaybeAddBootAll(t *testing.T) {
 				path = fakeJournalctl(t, tc.version)
 			}
 
-			got := maybeAddBootAll(path, append([]string{}, baseArgs...))
+			got := maybeAddBootAll(logp.NewNopLogger(), path, append([]string{}, baseArgs...))
 
 			hasBootAll := slices.Contains(got, "--boot") && slices.Contains(got, "all")
 			if hasBootAll != tc.wantBootAll {
@@ -265,45 +265,45 @@ func TestHandleSeekAndCursor(t *testing.T) {
 		wantAbsent  []string
 	}{
 		{
-			name:        "SeekHead old version: no --boot all",
-			mode:        SeekHead, jctlPath: oldPath,
+			name: "SeekHead old version: no --boot all",
+			mode: SeekHead, jctlPath: oldPath,
 			wantBootAll: false, wantArgs: []string{"--no-tail"},
 		},
 		{
-			name:        "SeekHead new version: has --boot all",
-			mode:        SeekHead, jctlPath: newPath,
+			name: "SeekHead new version: has --boot all",
+			mode: SeekHead, jctlPath: newPath,
 			wantBootAll: true, wantArgs: []string{"--no-tail", "--boot", "all"},
 		},
 		{
-			name:        "SeekTail never adds --boot all regardless of version",
-			mode:        SeekTail, jctlPath: newPath,
+			name: "SeekTail never adds --boot all regardless of version",
+			mode: SeekTail, jctlPath: newPath,
 			wantBootAll: false, wantArgs: []string{"--since", "now"},
 		},
 		{
-			name:        "SeekSince old version: no --boot all",
-			mode:        SeekSince, jctlPath: oldPath,
+			name: "SeekSince old version: no --boot all",
+			mode: SeekSince, jctlPath: oldPath,
 			wantBootAll: false, wantArgs: []string{"--since"},
 		},
 		{
-			name:        "SeekSince new version: has --boot all",
-			mode:        SeekSince, jctlPath: newPath,
+			name: "SeekSince new version: has --boot all",
+			mode: SeekSince, jctlPath: newPath,
 			wantBootAll: true, wantArgs: []string{"--since", "--boot", "all"},
 		},
 		{
-			name:        "cursor old version: no --boot all",
-			cursor:      "some-cursor", jctlPath: oldPath,
+			name:   "cursor old version: no --boot all",
+			cursor: "some-cursor", jctlPath: oldPath,
 			wantBootAll: false, wantArgs: []string{"--after-cursor", "some-cursor"},
 		},
 		{
-			name:        "cursor new version: has --boot all",
-			cursor:      "some-cursor", jctlPath: newPath,
+			name:   "cursor new version: has --boot all",
+			cursor: "some-cursor", jctlPath: newPath,
 			wantBootAll: true, wantArgs: []string{"--after-cursor", "some-cursor", "--boot", "all"},
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := handleSeekAndCursor(tc.mode, -5*time.Minute, tc.cursor, tc.jctlPath)
+			got := handleSeekAndCursor(logp.NewNopLogger(), tc.mode, -5*time.Minute, tc.cursor, tc.jctlPath)
 
 			hasBootAll := slices.Contains(got, "--boot") && slices.Contains(got, "all")
 			if hasBootAll != tc.wantBootAll {
