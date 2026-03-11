@@ -152,10 +152,12 @@ func runCmd(
 		cmd.Args = append(cmd.Args, "--match", filterJourneys.Match)
 	}
 
-	p := params()
-	if len(p) > 0 {
-		paramsBytes, _ := json.Marshal(p)
-		cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
+	if params != nil {
+		p := params()
+		if len(p) > 0 {
+			paramsBytes, _ := json.Marshal(p)
+			cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
+		}
 	}
 
 	// We need to pass both files in here otherwise we get a broken pipe, even
