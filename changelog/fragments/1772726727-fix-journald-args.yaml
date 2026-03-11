@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Fix journald input for systemd versions < 242 by not using the '--boot all' flag.
+summary: Fix journald input for journald versions < 242 by not using the '--boot all' flag.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
