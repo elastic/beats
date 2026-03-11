@@ -62,7 +62,7 @@ func TestSaramaUpdate(t *testing.T) {
 	// If any of these versions are considered valid by our parsing code,
 	// it means someone updated sarama without updating the parsing code
 	// for the new version. Gently remind them.
-	flagVersions := []Version{"3.7.0", "3.8.0"}
+	flagVersions := []Version{"4.2.0", "4.3.0"}
 	for _, v := range flagVersions {
 		if _, ok := v.Get(); ok {
 			t.Fatalf(
