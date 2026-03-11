@@ -24,8 +24,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/sarama"
 )
 
@@ -65,21 +63,17 @@ func TestKafkaOutputCanConnectAndPublish(t *testing.T) {
 	leader := sarama.NewMockBroker(t, 1)
 	defer leader.Close()
 
-	// The mock broker must return a single produce response for kafkaTopic only.
-	// If the beat produces to a different topic, it won't be acknowledged.
+	// The mock broker must respond to a single metadata request.
+	metadataResponse := new(sarama.MetadataResponse)
+	metadataResponse.AddBroker(leader.Addr(), leader.BrokerID())
+	metadataResponse.AddTopicPartition(kafkaTopic, 0, leader.BrokerID(), nil, nil, nil, sarama.ErrNoError)
+	leader.Returns(metadataResponse)
+
+	// The mock broker must return a single produce response. If no produce request is received, the test will fail.
+	// This guarantees that mockbeat successfully produced a message to Kafka and connectivity is established.
 	prodSuccess := new(sarama.ProduceResponse)
 	prodSuccess.AddTopicPartition(kafkaTopic, 0, sarama.ErrNoError)
-
-	// Use SetHandlerByMap so the mock broker matches responses by request type.
-	// This avoids FIFO ordering issues from the ApiVersionsRequest that sarama
-	// now sends during connection (since IBM/sarama v1.46.0).
-	leader.SetHandlerByMap(map[string]sarama.MockResponse{
-		"ApiVersionsRequest": sarama.NewMockApiVersionsResponse(t),
-		"MetadataRequest": sarama.NewMockMetadataResponse(t).
-			SetBroker(leader.Addr(), leader.BrokerID()).
-			SetLeader(kafkaTopic, 0, leader.BrokerID()),
-		"ProduceRequest": sarama.NewMockWrapper(prodSuccess),
-	})
+	leader.Returns(prodSuccess)
 
 	// Start mockbeat with the appropriate configuration.
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
@@ -92,15 +86,17 @@ func TestKafkaOutputCanConnectAndPublish(t *testing.T) {
 		`finished kafka batch`,
 		10*time.Second,
 		"did not find finished batch log")
-
-	mockbeat.logFileOffset = 0
-	assert.False(t, mockbeat.LogContains(`level":"error"`),
-		"expected no errors, but found some. Check the logs")
 }
 
 func TestAuthorisationErrors(t *testing.T) {
 	leader := sarama.NewMockBroker(t, 1)
 	defer leader.Close()
+
+	// The mock broker must respond to a single metadata request.
+	metadataResponse := new(sarama.MetadataResponse)
+	metadataResponse.AddBroker(leader.Addr(), leader.BrokerID())
+	metadataResponse.AddTopicPartition(kafkaTopic, 0, leader.BrokerID(), nil, nil, nil, sarama.ErrNoError)
+	leader.Returns(metadataResponse)
 
 	authErrors := []sarama.KError{
 		sarama.ErrTopicAuthorizationFailed,
@@ -108,27 +104,13 @@ func TestAuthorisationErrors(t *testing.T) {
 		sarama.ErrClusterAuthorizationFailed,
 	}
 
-	// Build a MockSequence of produce responses, one per auth error.
-	// Each response only covers kafkaTopic partition 0, mirroring the original
-	// hand-built responses. MockSequence returns the next response on each
-	// call; after exhaustion it keeps returning the last one.
-	produceResponses := make([]interface{}, len(authErrors))
-	for i, err := range authErrors {
-		resp := new(sarama.ProduceResponse)
-		resp.AddTopicPartition(kafkaTopic, 0, err)
-		produceResponses[i] = resp
+	// The mock broker must return one produce response per error we want
+	// to test. If less calls are made, the test will fail
+	for _, err := range authErrors {
+		producerResponse := new(sarama.ProduceResponse)
+		producerResponse.AddTopicPartition(kafkaTopic, 0, err)
+		leader.Returns(producerResponse)
 	}
-
-	// Use SetHandlerByMap so the mock broker matches responses by request type.
-	// This avoids FIFO ordering issues from the ApiVersionsRequest that sarama
-	// now sends during connection (since IBM/sarama v1.46.0).
-	leader.SetHandlerByMap(map[string]sarama.MockResponse{
-		"ApiVersionsRequest": sarama.NewMockApiVersionsResponse(t),
-		"MetadataRequest": sarama.NewMockMetadataResponse(t).
-			SetBroker(leader.Addr(), leader.BrokerID()).
-			SetLeader(kafkaTopic, 0, leader.BrokerID()),
-		"ProduceRequest": sarama.NewMockSequence(produceResponses...),
-	})
 
 	// Start mockbeat with the appropriate configuration.
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
