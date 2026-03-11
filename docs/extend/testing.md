@@ -69,6 +69,10 @@ A note about tags: the `--data` flag is a custom flag added by Metricbeat and Pa
 
 The system tests are defined in the `tests/system` (for legacy Python test) and on `tests/integration` (for Go tests) directory. They require a testing binary to be available and the python environment to be set up.
 
+::::{note}
+Winlogbeat does not use Python system tests. Its system tests are plain Go tests located in `winlogbeat/tests/testscript/` and require Windows to run.
+::::
+
 To create the testing binary run `mage buildSystemTestBinary`. This will create the test binary in the beat directory. To set up the Python testing environment run `mage pythonVirtualEnv` which will create a virtual environment with all test dependencies and print its location. To activate it, the instructions depend on your operating system. See the [virtualenv documentation](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#activating-a-virtual-environment).
 
 To run the system and integration tests use the `mage pythonIntegTest` target, which will start the required services using [docker compose](https://docs.docker.com/compose/) and run all integration tests. The default credentials for Elasticsearch and Kibana are `user: admin`, `password: testing`. Similar to Go integration tests, the individual steps can be done manually to allow selecting which tests should be run:
