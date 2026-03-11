@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 	"github.com/elastic/elastic-agent-libs/config"
+
 	"github.com/gohugoio/hashstructure"
 )
 
@@ -62,6 +63,8 @@ func (c *Config) Validate() error {
 	return nil
 }
 
+// hashConfig generates a unit config hash, excluding params
+// field which can be dynamically updated
 func hashConfig(cfg *config.C) (uint64, error) {
 	if cfg == nil {
 		return 0, fmt.Errorf("nil config")
@@ -71,7 +74,8 @@ func hashConfig(cfg *config.C) (uint64, error) {
 	if err := cfg.Unpack(&config); err != nil {
 		return 0, err
 	}
-	// For now, we only support reload forparams
+
+	// For now, we only support reload for params
 	delete(config, "params")
 	return hashstructure.Hash(config, nil)
 }

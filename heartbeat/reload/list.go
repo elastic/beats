@@ -276,9 +276,6 @@ func DefaultHashConfig(c *config.C) (uint64, error) {
 		return 0, err
 	}
 
-	// poke if the runner factory can find a dedicated config hasher
-	// for the input type
-
 	return hashstructure.Hash(config, nil)
 }
 

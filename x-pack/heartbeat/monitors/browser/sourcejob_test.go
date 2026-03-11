@@ -72,7 +72,7 @@ func TestValidInline(t *testing.T) {
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	require.Equal(t, script, s.browserCfg.Source.Inline.Script)
-	require.Equal(t, "", s.Workdir())
+	require.Empty(t, s.Workdir())
 	require.Equal(t, testParams, s.Params())
 
 	e = s.Close()
@@ -376,7 +376,7 @@ func TestSourceDecoding(t *testing.T) {
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	require.Equal(t, script, s.browserCfg.Source.Inline.Script)
-	require.Equal(t, "", s.Workdir())
+	require.Empty(t, s.Workdir())
 
 	e = s.Close()
 	require.NoError(t, e)
@@ -400,7 +400,7 @@ func TestDisabledSourceDecoding(t *testing.T) {
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	require.Equal(t, encoded, s.browserCfg.Source.Inline.Script)
-	require.Equal(t, "", s.Workdir())
+	require.Empty(t, s.Workdir())
 
 	e = s.Close()
 	require.NoError(t, e)
@@ -431,7 +431,7 @@ func TestUpdateParams(t *testing.T) {
 
 	// Check params are updated when reevaluated
 	testParams["key3"] = "value3"
-	s.Update(conf.MustNewConfigFrom(mapstr.M{
+	e = s.Update(conf.MustNewConfigFrom(mapstr.M{
 		"name":   "My Name",
 		"id":     "myId",
 		"params": testParams,
@@ -442,6 +442,7 @@ func TestUpdateParams(t *testing.T) {
 		},
 		"timeout": timeout,
 	}))
+	require.NoError(t, e)
 	require.Equal(t, testParams, s.Params())
 
 	e = s.Close()

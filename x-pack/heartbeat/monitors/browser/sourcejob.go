@@ -99,13 +99,6 @@ func (sj *SourceJob) Close() error {
 
 // Update updates selective job fields in-place for running monitors
 func (sj *SourceJob) Update(c *config.C) error {
-	// Update bypasses plugin factory, so the config comes as-is from
-	// agent management. We need to unnest here or move the logic to the factory itself
-	// unnested, err := stdfields.UnnestStream(c)
-	// if err != nil {
-	// 	return err
-	// }
-
 	var cfg Config
 	err := c.Unpack(&cfg)
 	if err != nil {

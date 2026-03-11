@@ -127,13 +127,12 @@ func runCmd(
 	ctx context.Context,
 	cmd *SynthCmd,
 	stdinStr *string,
-	getParams func() map[string]interface{},
+	params func() map[string]interface{},
 	filterJourneys FilterJourneyConfig,
 ) (mpx *ExecMultiplexer, err error) {
 	// Attach sysproc attrs to ensure subprocesses are properly killed
 	platformCmdMutate(cmd)
 
-	params := getParams()
 	mpx = NewExecMultiplexer()
 	// Setup a pipe for JSON structured output
 	jsonReader, jsonWriter, err := os.Pipe()
@@ -153,8 +152,8 @@ func runCmd(
 		cmd.Args = append(cmd.Args, "--match", filterJourneys.Match)
 	}
 
-	if len(params) > 0 {
-		paramsBytes, _ := json.Marshal(params)
+	if len(params()) > 0 {
+		paramsBytes, _ := json.Marshal(params())
 		cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
 	}
 
