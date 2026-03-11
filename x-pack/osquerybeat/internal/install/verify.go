@@ -101,7 +101,6 @@ func VerifyOsqueryBinary(goos, dir string, log *logp.Logger) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	//nolint:gosec // expected local executable path
 	cmd := exec.CommandContext(ctx, osqFile, "--version")
 	out, err := cmd.CombinedOutput()
 	if err != nil {

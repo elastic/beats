@@ -153,7 +153,7 @@ func FindFirstPathByBase(root, base string, dirOnly bool) (string, bool) {
 	var candidates []string
 	_ = filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			return nil
+			return nil //nolint:nilerr // best-effort search, skip inaccessible entries
 		}
 		if filepath.Base(path) != base {
 			return nil
@@ -180,7 +180,7 @@ func FindLensesDir(root string) (string, bool) {
 	var candidates []string
 	_ = filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
 		if err != nil || !d.IsDir() {
-			return nil
+			return nil //nolint:nilerr // best-effort search, skip inaccessible entries
 		}
 		if filepath.Base(path) != "lenses" {
 			return nil

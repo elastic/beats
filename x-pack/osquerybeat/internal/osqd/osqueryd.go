@@ -184,7 +184,8 @@ func (q *OSQueryD) Check(ctx context.Context) error {
 	}
 
 	//nolint:gosec // works as expected
-	cmd := exec.Command(
+	cmd := exec.CommandContext(
+		ctx,
 		osquerydPath(q.binPath),
 		"--S",
 		"--version",
@@ -206,7 +207,7 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	}
 	defer cleanup()
 
-	cmd := q.createCommand(flags)
+	cmd := q.createCommand(ctx, flags)
 
 	q.log.Debugf("start osqueryd process: args: %v", cmd.Args)
 
@@ -559,9 +560,9 @@ func getEnabledDisabledTables(userFlags Flags) (enabled, disabled []string) {
 	return normalize(enabledTables), normalize(disabledTables)
 }
 
-func (q *OSQueryD) createCommand(userFlags Flags) *exec.Cmd {
+func (q *OSQueryD) createCommand(ctx context.Context, userFlags Flags) *exec.Cmd {
 	//nolint:gosec // works as expected
-	return exec.Command(
+	return exec.CommandContext(ctx,
 		osquerydPath(q.binPath), q.args(userFlags)...)
 }
 

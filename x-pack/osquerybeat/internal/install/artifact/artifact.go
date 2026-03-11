@@ -215,7 +215,11 @@ func buildHTTPClient(cfg config.InstallConfig, goos, goarch string, log *logp.Lo
 		return client, nil
 	}
 
-	transport := http.DefaultTransport.(*http.Transport).Clone()
+	defaultTransport, ok := http.DefaultTransport.(*http.Transport)
+	if !ok || defaultTransport == nil {
+		defaultTransport = &http.Transport{}
+	}
+	transport := defaultTransport.Clone()
 	sslCfg, err := tlscommon.LoadTLSConfig(sslConfig, log)
 	if err != nil {
 		return nil, fmt.Errorf("failed loading osquery.elastic_options.install ssl config for %s/%s: %w", goos, goarch, err)
@@ -316,7 +320,7 @@ func locateBinDir(root, goos string) (string, error) {
 			darwinSuffix := filepath.Clean(filepath.Join("osquery.app", "Contents", "MacOS", "osqueryd"))
 			if strings.HasSuffix(cleanRel, darwinSuffix) {
 				if _, err := resolveBinPathWithinRoot(root, path); err != nil {
-					return nil
+					return nil //nolint:nilerr // skip unresolvable entries, continue searching
 				}
 				prefix := strings.TrimSuffix(cleanRel, darwinSuffix)
 				prefix = strings.TrimSuffix(prefix, string(os.PathSeparator))
@@ -331,7 +335,7 @@ func locateBinDir(root, goos string) (string, error) {
 
 		resolvedBinPath, err := resolveBinPathWithinRoot(root, path)
 		if err != nil {
-			return nil
+			return nil //nolint:nilerr // skip unresolvable entries, continue searching
 		}
 		candidates = append(candidates, filepath.Dir(resolvedBinPath))
 		return nil
@@ -368,4 +372,3 @@ func resolveBinPathWithinRoot(root, binPath string) (string, error) {
 	}
 	return resolved, nil
 }
-

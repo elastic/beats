@@ -103,7 +103,7 @@ func extract(r io.Reader, destinationDir string, skipEscaping bool, files ...str
 
 		switch header.Typeflag {
 		case tar.TypeDir:
-			if err = os.MkdirAll(path, os.FileMode(header.Mode)); err != nil {
+			if err = os.MkdirAll(path, os.FileMode(header.Mode)&os.ModePerm); err != nil { //nolint:gosec // mode clamped to permission bits
 				return err
 			}
 		case tar.TypeReg:
@@ -121,7 +121,7 @@ func extract(r io.Reader, destinationDir string, skipEscaping bool, files ...str
 				return err
 			}
 
-			if err = os.Chmod(path, os.FileMode(header.Mode)); err != nil {
+			if err = os.Chmod(path, os.FileMode(header.Mode)&os.ModePerm); err != nil { //nolint:gosec // mode clamped to permission bits
 				_ = writer.Close()
 				return err
 			}
@@ -135,7 +135,7 @@ func extract(r io.Reader, destinationDir string, skipEscaping bool, files ...str
 			}
 			resolvedTarget := header.Linkname
 			if !filepath.IsAbs(header.Linkname) {
-				resolvedTarget = filepath.Join(filepath.Dir(path), header.Linkname)
+				resolvedTarget = filepath.Join(filepath.Dir(path), header.Linkname) //nolint:gosec // validated by pathInDir below
 			}
 			if !pathInDir(resolvedTarget, destinationDir) {
 				if skipEscaping {

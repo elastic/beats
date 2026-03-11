@@ -671,7 +671,8 @@ func buildTarGzArtifactWithExtra(t *testing.T, version, extraPath string, extraC
 		if err := tw.WriteHeader(&copiedHdr); err != nil {
 			t.Fatalf("write tar header failed: %v", err)
 		}
-		if _, err := io.Copy(tw, tr); err != nil {
+		const maxTarEntrySize = 10 << 20 // 10 MiB
+		if _, err := io.CopyN(tw, tr, maxTarEntrySize); err != nil && err != io.EOF {
 			t.Fatalf("copy tar entry failed: %v", err)
 		}
 	}
