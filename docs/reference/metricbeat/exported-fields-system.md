@@ -725,7 +725,7 @@ Actual memory used and free.
 
 
 **`system.memory.actual.free`**
-:   Actual free memory in bytes. It is calculated based on the OS. On Linux this value will be MemAvailable from /proc/meminfo,  or calculated from free memory plus caches and buffers if /proc/meminfo is not available. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal to `system.memory.free`.
+:   Actual free memory in bytes. It is calculated based on the OS. On Linux this value will be MemAvailable from /proc/meminfo, or calculated from free memory plus caches and buffers if /proc/meminfo is not available. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal to `system.memory.free`.
 
     type: long
 
@@ -774,6 +774,98 @@ This group contains statistics related to the swap memory usage on the system.
     type: scaled_float
 
     format: percent
+
+
+## zswap [_zswap]
+
+Metrics for the zswap compressed swap cache. Available on Linux when zswap is enabled.
+
+**`system.memory.zswap.compressed`**
+:   Current compressed size of data stored in zswap.
+
+    type: long
+
+    format: bytes
+
+
+**`system.memory.zswap.uncompressed`**
+:   Original uncompressed size of data stored in zswap.
+
+    type: long
+
+    format: bytes
+
+
+## debug [_debug]
+
+Detailed zswap statistics from /sys/kernel/debug/zswap. Requires debugfs to be mounted and accessible.
+
+**`system.memory.zswap.debug.decompress_fail`**
+:   Number of load or writeback attempts that failed due to decompression failure.
+
+    type: long
+
+
+**`system.memory.zswap.debug.pool_limit_hit`**
+:   Number of times the zswap pool limit was hit, as configured by the zswap.max_pool_percent kernel parameter.
+
+    type: long
+
+
+**`system.memory.zswap.debug.pool_total_size`**
+:   Total size of the zswap pool in bytes.
+
+    type: long
+
+    format: bytes
+
+
+**`system.memory.zswap.debug.reject_alloc_fail`**
+:   Number of store attempts that failed because the underlying allocator could not get memory.
+
+    type: long
+
+
+**`system.memory.zswap.debug.reject_compress_fail`**
+:   Number of store attempts that failed due to compression algorithm failure.
+
+    type: long
+
+
+**`system.memory.zswap.debug.reject_compress_poor`**
+:   Number of store attempts rejected because the compressed page was too big for the allocator to optimally store.
+
+    type: long
+
+
+**`system.memory.zswap.debug.reject_kmemcache_fail`**
+:   Number of store attempts that failed because the entry metadata could not be allocated (rare).
+
+    type: long
+
+
+**`system.memory.zswap.debug.reject_reclaim_fail`**
+:   Number of store attempts that failed due to a reclaim failure after pool limit was reached.
+
+    type: long
+
+
+**`system.memory.zswap.debug.stored_incompressible_pages`**
+:   Number of incompressible pages currently stored in zswap.
+
+    type: long
+
+
+**`system.memory.zswap.debug.stored_pages`**
+:   Number of pages currently stored in zswap.
+
+    type: long
+
+
+**`system.memory.zswap.debug.written_back_pages`**
+:   Number of pages written back from zswap to swap when pool limit was reached.
+
+    type: long
 
 
 ## network [_network]
@@ -1234,6 +1326,12 @@ cgroupv2 stats
 
 **`system.process.cgroup.cpu.cfs.shares`**
 :   An integer value that specifies a relative share of CPU time available to the tasks in a cgroup. The value specified in the cpu.shares file must be 2 or higher.
+
+    type: long
+
+
+**`system.process.cgroup.cpu.cfs.weight`**
+:   CPU weight for the cgroup (cgroupv2). Used by the CFS scheduler to determine the share of CPU time available to the cgroup. Valid values range from 1 to 10000. The default value is 100.
 
     type: long
 
