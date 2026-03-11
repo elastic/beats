@@ -80,6 +80,26 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 			return &journalctl{}, fmt.Errorf("cannot get stderr pipe: %w", err)
 		}
 
+		processCmdLine := strings.Join(append([]string{journalctlPath}, args...), " ")
+
+		logger.Infow(
+			"Journalctl command. Paths relative to chroot (if set)",
+			"process.command_line", processCmdLine,
+			"process.chroot", chroot,
+		)
+
+		// Start the process before trying to read from the pipes
+		// See: https://pkg.go.dev/os/exec#example-Cmd.StdoutPipe
+		if err := cmd.Start(); err != nil {
+			return &journalctl{}, fmt.Errorf("cannot start journalctl: %w. Chroot: %s", err, chroot)
+		}
+
+		jctl.logger = jctl.logger.With(
+			"process.pid", cmd.Process.Pid,
+		)
+
+		jctl.logger.Info("journalctl started")
+
 		// This gorroutune reads the stderr from the journalctl process, if the
 		// process exits for any reason, then its stderr is closed, this goroutine
 		// gets an EOF error and exits
@@ -147,26 +167,6 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 				}
 			}
 		}()
-
-		processCmdLine := strings.Join(append([]string{journalctlPath}, args...), " ")
-
-		logger.Infow(
-			"Journalctl command. Paths relative to chroot (if set)",
-			"process.command_line", processCmdLine,
-			"process.chroot", chroot,
-		)
-
-		if err := cmd.Start(); err != nil {
-			return &journalctl{}, fmt.Errorf("cannot start journalctl: %w. Chroot: %s", err, chroot)
-		}
-
-		logger.Infow(
-			"journalctl started",
-			"process.pid", cmd.Process.Pid,
-		)
-		jctl.logger = jctl.logger.With(
-			"process.pid", cmd.Process.Pid,
-		)
 
 		// Whenever the journalctl process exits, the `Wait` call returns,
 		// if there was an error it is logged and this goroutine exits.

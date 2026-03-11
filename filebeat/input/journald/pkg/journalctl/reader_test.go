@@ -60,6 +60,7 @@ func TestEventWithNonStringData(t *testing.T) {
 				NextFunc: func(canceler input.Canceler) ([]byte, error) {
 					return rawEvent, nil
 				},
+				KillFunc: func() error { return nil },
 			}
 			r := Reader{
 				logger: logp.L(),
@@ -85,6 +86,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		NextFunc: func(canceler input.Canceler) ([]byte, error) {
 			return jdEvent, errors.New("journalctl exited with code 42")
 		},
+		KillFunc: func() error { return nil },
 	}
 
 	versionMock := JctlMock{
@@ -92,6 +94,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 			ret := "systemd 259 (259.3-1-arch)\n+PAM +AUDIT -SELINUX +APPARMOR"
 			return []byte(ret), nil
 		},
+		KillFunc: func() error { return nil },
 	}
 
 	factoryCalls := atomic.Uint32{}
@@ -205,6 +208,7 @@ func TestNewUsesMergeFlag(t *testing.T) {
 				ret := "systemd 259 (259.3-1-arch)\n+PAM +AUDIT -SELINUX +APPARMOR"
 				return []byte(ret), nil
 			},
+			KillFunc: func() error { return nil },
 		}, nil
 	}
 	r, err := New(
