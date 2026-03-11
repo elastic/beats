@@ -12,7 +12,6 @@ import (
 	"net/http"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
@@ -67,20 +66,11 @@ func getAuthorizer(config Config, logger *logp.Logger) (autorest.Authorizer, err
 
 // newClientSecretAuthorizer creates an authorizer using azidentity client secret credentials.
 func newClientSecretAuthorizer(config Config) (autorest.Authorizer, error) {
-	clientOptions := policy.ClientOptions{}
-	if config.ActiveDirectoryEndpoint != "" {
-		clientOptions.Cloud = cloud.Configuration{
-			ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
-		}
-	}
-
 	credential, err := azidentity.NewClientSecretCredential(
 		config.TenantId,
 		config.ClientId,
 		config.ClientSecret,
-		&azidentity.ClientSecretCredentialOptions{
-			ClientOptions: clientOptions,
-		},
+		nil,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create client secret credential: %w", err)

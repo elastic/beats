@@ -270,7 +270,6 @@ metricbeat.modules:
   client_id: '${AZURE_CLIENT_ID:""}'
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
-  #active_directory_endpoint: ''
   #api_key: ''
   metrics:
     - id: ["requests/count", "requests/duration"]

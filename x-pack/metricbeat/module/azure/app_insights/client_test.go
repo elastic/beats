@@ -137,18 +137,6 @@ func TestConfigValidate(t *testing.T) {
 			wantErr: "client_secret is required when auth_type is client_secret",
 		},
 		{
-			name: "valid config with client secret and active_directory_endpoint",
-			config: Config{
-				ApplicationId:           "app-id",
-				AuthType:                "client_secret",
-				TenantId:                "tenant-id",
-				ClientId:                "client-id",
-				ClientSecret:            "client-secret",
-				ActiveDirectoryEndpoint: "https://login.microsoftonline.us/",
-			},
-			wantErr: "",
-		},
-		{
 			name: "invalid config - unknown auth_type",
 			config: Config{
 				ApplicationId: "app-id",

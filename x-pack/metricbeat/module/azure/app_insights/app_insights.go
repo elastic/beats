@@ -40,10 +40,9 @@ type Config struct {
 	ApiKey string `config:"api_key"`
 
 	// Client secret authentication (Microsoft Entra ID)
-	TenantId                string `config:"tenant_id"`
-	ClientId                string `config:"client_id"`
-	ClientSecret            string `config:"client_secret"`
-	ActiveDirectoryEndpoint string `config:"active_directory_endpoint"`
+	TenantId     string `config:"tenant_id"`
+	ClientId     string `config:"client_id"`
+	ClientSecret string `config:"client_secret"`
 }
 
 // Validate checks that the authentication configuration is complete.

@@ -91,23 +91,6 @@ func TestNewClientSecretAuthorizer(t *testing.T) {
 		assert.NotNil(t, tokenAuth.credential)
 	})
 
-	t.Run("accepts custom active_directory_endpoint", func(t *testing.T) {
-		cfg := Config{
-			AuthType:                AuthTypeClientSecret,
-			TenantId:                "tenant-id",
-			ClientId:                "client-id",
-			ClientSecret:            "client-secret",
-			ActiveDirectoryEndpoint: "https://login.microsoftonline.us/",
-		}
-
-		auth, err := newClientSecretAuthorizer(cfg)
-		require.NoError(t, err)
-		require.NotNil(t, auth)
-
-		tokenAuth, ok := auth.(*tokenCredentialAuthorizer)
-		require.True(t, ok, "expected *tokenCredentialAuthorizer")
-		assert.NotNil(t, tokenAuth.credential)
-	})
 }
 
 func TestTokenCredentialAuthorizer_WithAuthorization(t *testing.T) {
