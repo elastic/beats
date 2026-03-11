@@ -56,8 +56,6 @@ type Monitor struct {
 	configuredJobs []*configuredJob
 	enabled        bool
 	state          int
-	// endpoints is a count of endpoints this monitor measures.
-	// endpoints int
 	// internalsMtx is used to synchronize access to critical
 	// internal datastructures
 	internalsMtx sync.Mutex

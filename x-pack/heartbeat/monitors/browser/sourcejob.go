@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"math"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -27,6 +28,7 @@ type SourceJob struct {
 	browserCfg *Config
 	ctx        context.Context
 	cancel     context.CancelFunc
+	mtx        sync.Mutex
 }
 
 func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
@@ -39,6 +41,7 @@ func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
 		browserCfg: DefaultConfig(),
 		ctx:        ctx,
 		cancel:     cancel,
+		mtx:        sync.Mutex{},
 	}
 	err := rawCfg.Unpack(s.browserCfg)
 	if err != nil {
@@ -69,6 +72,9 @@ func (sj *SourceJob) Workdir() string {
 }
 
 func (sj *SourceJob) Params() map[string]interface{} {
+	sj.mtx.Lock()
+	defer sj.mtx.Unlock()
+
 	return sj.browserCfg.Params
 }
 
@@ -105,6 +111,8 @@ func (sj *SourceJob) Update(c *config.C) error {
 		return fmt.Errorf("error unpacking browser config for update: %w", err)
 	}
 
+	sj.mtx.Lock()
+	defer sj.mtx.Unlock()
 	// Selectively update fields
 	sj.browserCfg.Params = cfg.Params
 
