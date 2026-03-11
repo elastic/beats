@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.24.13
+go 1.25.8
 
 require (
 	cloud.google.com/go/bigquery v1.69.0
@@ -173,7 +173,7 @@ require (
 	github.com/elastic/ebpfevents v0.8.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.2
 	github.com/elastic/elastic-agent-libs v0.33.3
-	github.com/elastic/elastic-agent-system-metrics v0.14.1
+	github.com/elastic/elastic-agent-system-metrics v0.14.3
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.3.0
@@ -188,7 +188,7 @@ require (
 	github.com/go-resty/resty/v2 v2.17.1
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.0
-	github.com/google/cel-go v0.25.0
+	github.com/google/cel-go v0.26.1
 	github.com/googleapis/gax-go/v2 v2.15.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674

@@ -31,7 +31,7 @@ import (
 )
 
 func GetTestUdpServer(host string, port int) (server.Server, error) {
-	addr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(host, strconv.Itoa(port)))
+	addr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(host, strconv.Itoa(int(port))))
 
 	if err != nil {
 		return nil, err
@@ -78,7 +78,8 @@ func TestUdpServer(t *testing.T) {
 }
 
 func writeToServer(t *testing.T, message, host string, port int) {
-	conn, err := net.Dial("udp", net.JoinHostPort(host, strconv.Itoa(port)))
+	servAddr := net.JoinHostPort(host, strconv.Itoa(int(port)))
+	conn, err := net.Dial("udp", servAddr)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()

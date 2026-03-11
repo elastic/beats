@@ -1370,6 +1370,14 @@ index
 :   type: keyword
 
 
+**`elasticsearch.index.mode`**
+:   type: keyword
+
+
+**`elasticsearch.index.codec`**
+:   type: keyword
+
+
 **`elasticsearch.index.name`**
 :   Index name.
 
