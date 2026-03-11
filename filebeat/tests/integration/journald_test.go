@@ -336,25 +336,14 @@ func waitForAtLeastPublishedEvents(t *testing.T, b *integration.BeatProc, min in
 
 	// The size limit breaks it for real-world usage or machines with large messages
 	outputGlob := filepath.Join(b.TempDir(), "output-*.ndjson")
-	const progressStep = 20_000
-	nextProgressLog := progressStep
-
-	logProgress := func(got int) {
-		for got >= nextProgressLog {
-			t.Logf("published events found: >=%d (current=%d) %.2f%% from total", nextProgressLog, got, float64(got)/float64(min))
-			nextProgressLog += progressStep
-		}
-	}
 
 	got := b.CountFileLines(outputGlob)
 	if got >= min {
 		return
 	}
-	logProgress(got)
 
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		got := b.CountFileLines(outputGlob)
-		logProgress(got)
 		assert.GreaterOrEqualf(collect, got, min, "expected at least %d events, got %d", min, got)
 	}, timeout, 200*time.Millisecond)
 }
