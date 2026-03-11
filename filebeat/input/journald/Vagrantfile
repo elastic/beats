@@ -26,6 +26,7 @@ end
 
 Vagrant.configure("2") do |config|
   config.vm.boot_timeout = 600
+  config.vm.synced_folder "../", "/vagrant"
 
   config.vm.provider "virtualbox" do |vb|
     vb.memory = 4096
@@ -69,6 +70,32 @@ Vagrant.configure("2") do |config|
     config.vm.define version do |vm|
       vm.vm.box = cfg[:box]
       vm.vm.hostname = cfg[:hostname]
+
+      vm.vm.provision "shell", privileged: true, inline: <<-SHELL
+        set -euo pipefail
+
+        if command -v git >/dev/null 2>&1; then
+          git --version
+          exit 0
+        fi
+
+        if command -v dnf >/dev/null 2>&1; then
+          dnf -y install git
+        elif command -v yum >/dev/null 2>&1; then
+          yum -y install git
+        elif command -v apt-get >/dev/null 2>&1; then
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -y
+          apt-get install -y git
+        elif command -v zypper >/dev/null 2>&1; then
+          zypper --non-interactive install git
+        else
+          echo "could not install git: unsupported package manager" >&2
+          exit 1
+        fi
+
+        git --version
+      SHELL
 
       vm.vm.provision "shell", privileged: true, run: "always", inline: <<-SHELL
         set -euo pipefail
