@@ -125,7 +125,8 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	}
 
 	// We need to assert the reader correctly handled the "crash" from journalctl
-	// so we look for the log messages, there should be exactly 3:
+	// so we look for the log messages, there should be exactly 4:
+	//  - Error reading journalctl version
 	//  - First journalctl start
 	//  - an error with the exit code 42
 	//  - the second journalctl start
@@ -135,24 +136,27 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	//  - starting new mock journalclt ID: 2
 
 	logs := observedLogs.TakeAll()
-	if len(logs) != 3 {
-		t.Fatalf("expecting 3 log lines from 'input.journald.reader.journalctl-runner', got %d", len(logs))
+	if len(logs) != 4 {
+		for _, l := range logs {
+			t.Log(l.Message)
+		}
+		t.Fatalf("expecting 4 log lines from 'input.journald.reader.journalctl-runner', got %d", len(logs))
 	}
 
-	if logs[0].Message != "starting new mock journalclt ID: 1" {
+	if logs[1].Message != "starting new mock journalclt ID: 1" {
 		t.Fatalf("first log message must be the mock starting wit ID 1, got '%s' instead", logs[0].Message)
 	}
 
-	if logs[1].Message != "reader error: 'journalctl exited with code 42', restarting..." {
+	if logs[2].Message != "reader error: 'journalctl exited with code 42', restarting..." {
 		t.Fatalf("second log message must reader error with journalctl exit code 42, got '%s' instead", logs[1].Message)
 	}
 
-	if logs[2].Message != "starting new mock journalclt ID: 2" {
+	if logs[3].Message != "starting new mock journalclt ID: 2" {
 		t.Fatalf("third log message must be the mock starting wit ID 2, got '%s' instead", logs[2].Message)
 	}
 
 	// Call Next a couple more times to ensure we can read past the error
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		entry, err := reader.Next(ctx)
 		if err != nil {
 			t.Fatalf("did not expect an error when calling Next 'after journalctl restart': %s", err)
