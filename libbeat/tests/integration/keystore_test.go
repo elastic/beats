@@ -149,8 +149,8 @@ func TestExportConfigWithKeystore(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	keystorePath := filepath.Join(mockbeat.TempDir(), "test.keystore")
 
-	key := "asecret"
-	secret := "asecretvalue"
+	key := "output.console.bulk_max_size"
+	secret := "42"
 
 	keystoreCfg := fmt.Sprintf(`
 mockbeat:
@@ -162,7 +162,7 @@ queue.mem:
 logging:
   level: debug
 output.console:
-  code.json:
+  codec.json:
     pretty: true
 keystore:
   path: %s
