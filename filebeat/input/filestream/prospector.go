@@ -356,7 +356,8 @@ func (p *fileProspector) onFSEvent(
 	log = log.With("source_file", event.SrcID)
 
 	// For growing_fingerprint, handle prefix matching and migration
-	if p.identifier.Name() == growingFingerprintName {
+	if p.identifier.Name() == growingFingerprintName &&
+		len(event.Descriptor.Fingerprint) < 1000*2 {
 		src = p.handleGrowingFingerprintLookup(log, event, src, updater)
 	}
 
