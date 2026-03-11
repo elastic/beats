@@ -102,8 +102,8 @@ func (c *Collector) Shutdown() {
 
 func getComponent() (otelcol.Factories, error) {
 	receivers, err := otelcol.MakeFactoryMap(
-		fbreceiver.NewFactory("", ""),
-		mbreceiver.NewFactory("", ""),
+		fbreceiver.NewFactory(fbreceiver.Settings{}),
+		mbreceiver.NewFactory(mbreceiver.Settings{}),
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error

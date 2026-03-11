@@ -61,7 +61,7 @@ func TestLeak(t *testing.T) {
 		},
 	}
 
-	factory := NewFactory(t.TempDir(), "")
+	factory := NewFactory(Settings{Home: t.TempDir()})
 
 	t.Run("healthy consumer", func(t *testing.T) {
 		defer oteltest.VerifyNoLeaks(t)
