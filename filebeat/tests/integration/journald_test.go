@@ -26,6 +26,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand/v2"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
@@ -197,7 +198,10 @@ type journaldAllBootsEvent struct {
 // VMs with different versions of Systemd/Journald
 // Always run this test with -v to know if/where the test is taking time.
 func TestJournaldInputReadsMessagesFromAllBoots(t *testing.T) {
-	t.Skip("This test is meant to be run manually while developing.")
+	if os.Getenv("JOURNALD_MANUAL_TEST") == "" {
+		t.Skip("This test is meant to be run manually while developing.")
+	}
+
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
