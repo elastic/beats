@@ -2,6 +2,103 @@
 
 The Journald input reads journal entries by calling `journalctl`.
 
+## Testing with the Vagrant VM matrix
+
+Use `filebeat/input/journald/Vagrantfile` to validate behavior across multiple
+`systemd`/`journalctl` versions. The VMs are defined by version key:
+
+- `239` (`generic/rocky8`)
+- `240` (`generic/ubuntu1904`)
+- `241` (`generic/debian10`)
+- `242` (`generic/ubuntu1910`)
+- `250` (`generic/fedora36`)
+
+During provisioning, each VM:
+
+- installs `filebeat/input/journald/journald.conf` as `/etc/systemd/journald.conf`
+- restarts `systemd-journald`
+- syncs timezone with the host
+- verifies the expected `systemd` major version
+
+### Bring up and access VMs
+
+From the repository root:
+
+```
+cd filebeat/input/journald
+vagrant up # Start all VMs
+vagrant up 239 # Start a single VM
+vagrant status # List all VMs and their status
+vagrant ssh 239 # To access the VM
+```
+
+### Run Vagrant from any folder (stable state path)
+
+If you want to run `vagrant` commands from any directory and always target this
+VM set, export these variables in your shell:
+
+```
+export VAGRANT_CWD="/path/to/beats/filebeat/input/journald"
+export VAGRANT_VAGRANTFILE="Vagrantfile"
+```
+
+What this does:
+
+- `VAGRANT_CWD`: forces Vagrant to use `filebeat/input/journald` as project root
+- `VAGRANT_VAGRANTFILE`: forces the Vagrantfile name used in that project
+
+After exporting, these commands are equivalent no matter where you run them:
+
+```
+vagrant status
+vagrant up 239
+vagrant ssh 239
+```
+
+Inside a VM, verify versions and available boots:
+
+```
+systemctl --version
+journalctl --version
+journalctl --list-boots --no-pager
+```
+
+If you need extra boots in the journal:
+
+- from inside the VM: `sudo reboot`
+- from the host: `vagrant reload <vm-version>`
+
+### `journalctl --boot all` support by version
+
+- `v239`, `v240`, `v241`: do not support `--boot all`
+- `v242`: introduced `--boot all`
+
+## Running the all-boots integration test manually
+
+`TestJournaldInputReadsMessagesFromAllBoots` in
+`filebeat/tests/integration/journald_test.go` is a manual development test for
+cross-boot ingestion.
+
+The test is intentionally skipped by default (`t.Skip(...)`), so remove that
+line locally before running it.
+
+From inside a VM (repo is usually mounted at `/vagrant`, but you might
+have to copy/clone it some VMs):
+
+```
+cd /vagrant/filebeat
+mage buildSystemTestBinary
+go test -count=1 -tags integration ./tests/integration -run TestJournaldInputReadsMessagesFromAllBoots -v
+```
+
+The test:
+
+- requires more than one boot from `journalctl --list-boots`
+- counts entries in the two oldest boots via `journalctl ... | wc -l`
+- waits for at least that many published events
+- asserts at least two distinct `journald.host.boot_id` values in the
+  published events
+
 ## Adding entries to the journal
 ### Using `systemd-cat`
 The easiest way to add entries to the journal is to use `systemd-cat`:
