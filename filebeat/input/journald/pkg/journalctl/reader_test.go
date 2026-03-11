@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build linux
 
 package journalctl
@@ -85,8 +87,19 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		},
 	}
 
+	versionMock := JctlMock{
+		NextFunc: func(canceler input.Canceler) ([]byte, error) {
+			ret := "systemd 259 (259.3-1-arch)\n+PAM +AUDIT -SELINUX +APPARMOR"
+			return []byte(ret), nil
+		},
+	}
+
 	factoryCalls := atomic.Uint32{}
 	factory := func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
+		if slices.Contains(args, "--version") {
+			return &versionMock, nil
+		}
+
 		factoryCalls.Add(1)
 		// Add a log to make debugging easier and better mimic the behaviour of the real factory/journalctl
 		logger.Debugf("starting new mock journalclt ID: %d", factoryCalls.Load())
@@ -105,13 +118,29 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		return &mock, nil
 	}
 
-	reader, err := New(logger, ctx, nil, nil, nil, journalfield.IncludeMatches{}, []int{}, SeekHead, "", 0, "", false, "", factory)
+	reader, err := New(
+		logger,
+		ctx,
+		nil,
+		nil,
+		nil,
+		journalfield.IncludeMatches{},
+		[]int{},
+		SeekHead,
+		"",
+		0,
+		"",
+		false,
+		factory)
 	if err != nil {
 		t.Fatalf("cannot instantiate journalctl reader: %s", err)
 	}
 
 	isEntryEmpty := func(entry JournalEntry) bool {
-		return len(entry.Fields) == 0 && entry.Cursor == "" && entry.MonotonicTimestamp == 0 && entry.RealtimeTimestamp == 0
+		return len(entry.Fields) == 0 &&
+			entry.Cursor == "" &&
+			entry.MonotonicTimestamp == 0 &&
+			entry.RealtimeTimestamp == 0
 	}
 
 	// In the first call the mock will return an error, simulating journalctl crashing
@@ -137,10 +166,11 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 
 	logs := observedLogs.TakeAll()
 	if len(logs) != 4 {
+		t.Errorf("expecting 4 log lines from 'input.journald.reader.journalctl-runner', got %d", len(logs))
 		for _, l := range logs {
 			t.Log(l.Message)
 		}
-		t.Fatalf("expecting 4 log lines from 'input.journald.reader.journalctl-runner', got %d", len(logs))
+		t.FailNow()
 	}
 
 	if logs[1].Message != "starting new mock journalclt ID: 1" {
@@ -170,7 +200,12 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 
 func TestNewUsesMergeFlag(t *testing.T) {
 	f := func(_ input.Canceler, _ *logp.Logger, s ...string) (Jctl, error) {
-		return nil, nil
+		return &JctlMock{
+			NextFunc: func(canceler input.Canceler) ([]byte, error) {
+				ret := "systemd 259 (259.3-1-arch)\n+PAM +AUDIT -SELINUX +APPARMOR"
+				return []byte(ret), nil
+			},
+		}, nil
 	}
 	r, err := New(
 		logp.NewNopLogger(),
@@ -185,7 +220,6 @@ func TestNewUsesMergeFlag(t *testing.T) {
 		0,
 		"",
 		true,
-		"",
 		f)
 
 	if err != nil {
@@ -214,9 +248,7 @@ func fakeJournalctl(t *testing.T, version int) string {
 	return path
 }
 
-func TestMaybeAddBootAll(t *testing.T) {
-	baseArgs := []string{"--no-tail"}
-
+func TestJournalctlSupportsBootAll(t *testing.T) {
 	tests := []struct {
 		name        string
 		version     int
@@ -239,75 +271,63 @@ func TestMaybeAddBootAll(t *testing.T) {
 				path = fakeJournalctl(t, tc.version)
 			}
 
-			got := maybeAddBootAll(logp.NewNopLogger(), path, append([]string{}, baseArgs...))
-
-			hasBootAll := slices.Contains(got, "--boot") && slices.Contains(got, "all")
-			if hasBootAll != tc.wantBootAll {
-				t.Errorf("version %d: wantBootAll=%v but args=%v", tc.version, tc.wantBootAll, got)
-			}
-			// Base args must always be present
-			for _, a := range baseArgs {
-				if !slices.Contains(got, a) {
-					t.Errorf("base arg %q missing from result %v", a, got)
-				}
+			got := journalctlSupportsBootAll(logp.NewNopLogger(), NewFactory("", path))
+			if got != tc.wantBootAll {
+				t.Errorf("version %d: wantBootAll=%v but got=%v", tc.version, tc.wantBootAll, got)
 			}
 		})
 	}
 }
 
 func TestHandleSeekAndCursor(t *testing.T) {
-	oldPath := fakeJournalctl(t, 239)
-	newPath := fakeJournalctl(t, 242)
-
 	tests := []struct {
 		name        string
 		mode        SeekMode
 		cursor      string
-		jctlPath    string
+		supports    bool
 		wantBootAll bool
 		wantArgs    []string
-		wantAbsent  []string
 	}{
 		{
-			name: "SeekHead old version: no --boot all",
-			mode: SeekHead, jctlPath: oldPath,
+			name: "SeekHead without --boot all support",
+			mode: SeekHead, supports: false,
 			wantBootAll: false, wantArgs: []string{"--no-tail"},
 		},
 		{
-			name: "SeekHead new version: has --boot all",
-			mode: SeekHead, jctlPath: newPath,
+			name: "SeekHead with --boot all support",
+			mode: SeekHead, supports: true,
 			wantBootAll: true, wantArgs: []string{"--no-tail", "--boot", "all"},
 		},
 		{
-			name: "SeekTail never adds --boot all regardless of version",
-			mode: SeekTail, jctlPath: newPath,
+			name: "SeekTail never adds --boot all regardless of support",
+			mode: SeekTail, supports: true,
 			wantBootAll: false, wantArgs: []string{"--since", "now"},
 		},
 		{
-			name: "SeekSince old version: no --boot all",
-			mode: SeekSince, jctlPath: oldPath,
+			name: "SeekSince without --boot all support",
+			mode: SeekSince, supports: false,
 			wantBootAll: false, wantArgs: []string{"--since"},
 		},
 		{
-			name: "SeekSince new version: has --boot all",
-			mode: SeekSince, jctlPath: newPath,
+			name: "SeekSince with --boot all support",
+			mode: SeekSince, supports: true,
 			wantBootAll: true, wantArgs: []string{"--since", "--boot", "all"},
 		},
 		{
-			name:   "cursor old version: no --boot all",
-			cursor: "some-cursor", jctlPath: oldPath,
+			name:   "cursor without --boot all support",
+			cursor: "some-cursor", supports: false,
 			wantBootAll: false, wantArgs: []string{"--after-cursor", "some-cursor"},
 		},
 		{
-			name:   "cursor new version: has --boot all",
-			cursor: "some-cursor", jctlPath: newPath,
+			name:   "cursor with --boot all support",
+			cursor: "some-cursor", supports: true,
 			wantBootAll: true, wantArgs: []string{"--after-cursor", "some-cursor", "--boot", "all"},
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := handleSeekAndCursor(logp.NewNopLogger(), tc.mode, -5*time.Minute, tc.cursor, tc.jctlPath)
+			got := handleSeekAndCursor(tc.mode, -5*time.Minute, tc.cursor, tc.supports)
 
 			hasBootAll := slices.Contains(got, "--boot") && slices.Contains(got, "all")
 			if hasBootAll != tc.wantBootAll {

@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build linux
 
 package journald
@@ -174,7 +176,6 @@ func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 		inp.Since,
 		src.Name(),
 		inp.Merge,
-		inp.JournalctlPath,
 		journalctl.NewFactory(inp.Chroot, inp.JournalctlPath),
 	)
 	if err != nil {
@@ -211,7 +212,6 @@ func (inp *journald) Run(
 		inp.Since,
 		src.Name(),
 		inp.Merge,
-		inp.JournalctlPath,
 		journalctl.NewFactory(inp.Chroot, inp.JournalctlPath),
 	)
 	if err != nil {

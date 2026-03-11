@@ -15,16 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build linux
 
 package journalctl
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 	"time"
@@ -108,58 +110,73 @@ type Reader struct {
 	jctl        Jctl
 	jctlFactory JctlFactory
 
+	// supportsBootAll indicates whether the running journalctl supports
+	// `--boot all` (introduced in systemd/journalctl v242).
+	supportsBootAll bool
+
 	backoff backoff.Backoff
 }
 
-// maybeAddBootAll appends "--boot", "all" to args only when the running
-// journalctl version is >= 242 (the version that introduced the "all" keyword
-// for --boot). On any error or unknown version the flag is omitted, which is
-// safe because older journalctl versions do not need it.
-func maybeAddBootAll(logger *logp.Logger, journalctlPath string, args []string) []string {
-	out, err := exec.Command(journalctlPath, "--version").CombinedOutput()
-	if err != nil {
-		logger.Warnf("cannot read journalctl version: %s. Omitting '--boot all'", err)
-		return args
-	}
-
-	// first line: "systemd 239 (239-82.el8_10.2)+PAM ..."
-	firstLine := strings.SplitN(string(out), "\n", 2)[0]
-	fields := strings.Fields(firstLine)
-	if len(fields) < 2 {
-		logger.Warnf("journalctl version invalid format: %q. Omitting '--boot all'", string(out))
-		return args
-	}
-
-	ver, err := strconv.Atoi(fields[1])
-	if err != nil {
-		logger.Warnf("cannot convert journalctl version to int: %s. Omitting '--boot all'", err)
-	}
-	if ver < 242 {
-		logger.Debugf("journalctl version: %v", ver)
+// maybeAddBootAll appends "--boot", "all" to args only when boot-all is
+// supported by the running journalctl.
+func maybeAddBootAll(args []string, supportsBootAll bool) []string {
+	if !supportsBootAll {
 		return args
 	}
 
 	return append(args, "--boot", "all")
 }
 
+// journalctlSupportsBootAll reports whether `--boot all` should be used.
+// On any detection failure, it safely falls back to false.
+func journalctlSupportsBootAll(logger *logp.Logger, factory JctlFactory) bool {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	defer cancel()
+	jctl, err := factory(ctx, logger, "--version")
+	if err != nil {
+		logger.Warnf("cannot call journalctl to get its version: %s. Omitting '--boot all'", err)
+		return false
+	}
+
+	defer jctl.Kill()
+
+	out, err := jctl.Next(ctx)
+	// first line: "systemd 239 (239-82.el8_10.2)"
+	firstLine := strings.SplitN(string(out), "\n", 2)[0]
+	fields := strings.Fields(firstLine)
+	if len(fields) < 2 {
+		logger.Warnf("journalctl version invalid format: %q", strings.TrimSpace(string(out)))
+		return false
+	}
+
+	version, err := strconv.Atoi(fields[1])
+	if err != nil {
+		logger.Warnf("cannot convert journalctl version to int: %s", err)
+		return false
+	}
+
+	logger.Debugf("journalctl version: %d", version)
+	return version >= 242
+}
+
 // handleSeekAndCursor returns the correct arguments for seek and cursor.
 // If there is a cursor, only the cursor is used, seek is ignored.
 // If there is no cursor, then seek is used.
 // --boot all is only added when the journalctl version supports it (>= 242).
-func handleSeekAndCursor(logger *logp.Logger, mode SeekMode, since time.Duration, cursor string, journalctlPath string) []string {
+func handleSeekAndCursor(mode SeekMode, since time.Duration, cursor string, supportsBootAll bool) []string {
 	if cursor != "" {
-		return maybeAddBootAll(logger, journalctlPath, []string{"--after-cursor", cursor})
+		return maybeAddBootAll([]string{"--after-cursor", cursor}, supportsBootAll)
 	}
 
 	switch mode {
 	case SeekSince:
-		return maybeAddBootAll(logger, journalctlPath, []string{
+		return maybeAddBootAll([]string{
 			"--since", time.Now().Add(since).Format(sinceTimeFormat),
-		})
+		}, supportsBootAll)
 	case SeekTail:
 		return []string{"--since", "now"}
 	case SeekHead:
-		return maybeAddBootAll(logger, journalctlPath, []string{"--no-tail"})
+		return maybeAddBootAll([]string{"--no-tail"}, supportsBootAll)
 	default:
 		// That should never happen
 		return []string{}
@@ -202,7 +219,6 @@ func New(
 	since time.Duration,
 	file string,
 	merge bool,
-	journalctlPath string,
 	newJctl JctlFactory,
 ) (*Reader, error) {
 
@@ -249,17 +265,19 @@ func New(
 		args = append(args, "--facility", fmt.Sprintf("%d", facility))
 	}
 
-	extraArgs := handleSeekAndCursor(logger, mode, since, cursor, journalctlPath)
+	supportsBootAll := journalctlSupportsBootAll(logger, newJctl)
+	extraArgs := handleSeekAndCursor(mode, since, cursor, supportsBootAll)
 
 	r := Reader{
-		logger:      logger,
-		jctlLogger:  logger.Named("journalctl-runner"),
-		args:        args,
-		extraArgs:   extraArgs,
-		cursor:      cursor,
-		canceler:    canceler,
-		jctlFactory: newJctl,
-		backoff:     backoff.NewExpBackoff(canceler.Done(), 100*time.Millisecond, 2*time.Second),
+		logger:          logger,
+		jctlLogger:      logger.Named("journalctl-runner"),
+		args:            args,
+		extraArgs:       extraArgs,
+		cursor:          cursor,
+		canceler:        canceler,
+		jctlFactory:     newJctl,
+		supportsBootAll: supportsBootAll,
+		backoff:         backoff.NewExpBackoff(canceler.Done(), 100*time.Millisecond, 2*time.Second),
 	}
 
 	if err := r.newJctl(extraArgs...); err != nil {
@@ -338,7 +356,7 @@ func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
 		// We have a cursor, set it instead of the other options that select
 		// where in the journal to start reading because they are incompatible
 		// with setting the cursor.
-		extraArgs = []string{"--after-cursor", r.cursor}
+		extraArgs = maybeAddBootAll([]string{"--after-cursor", r.cursor}, r.supportsBootAll)
 	}
 
 	if err := r.newJctl(extraArgs...); err != nil {
