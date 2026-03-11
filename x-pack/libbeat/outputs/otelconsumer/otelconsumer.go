@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
@@ -45,7 +46,7 @@ type otelConsumer struct {
 	log          *logp.Logger
 }
 
-func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
+func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C, beatPaths *paths.Path) (outputs.Group, error) {
 	ocConfig := defaultConfig()
 	if err := cfg.Unpack(&ocConfig); err != nil {
 		return outputs.Fail(err)
@@ -62,7 +63,7 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		})
 	}
 
-	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, clients...)
+	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, beatPaths, clients...)
 }
 
 // Close is a noop for otelconsumer
