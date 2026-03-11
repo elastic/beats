@@ -23,6 +23,21 @@ func (c *Config) Unmarshal(conf *confmap.Conf) error {
 	if err := xpInstance.DeDotKeys(conf); err != nil {
 		return fmt.Errorf("error converting paths: %w", err)
 	}
+
+	// Deep-merge factory defaults into the user-supplied conf so that
+	// partial overrides (e.g. only path.home) preserve sibling defaults
+	// (e.g. path.data). We merge defaults first, then re-apply the
+	// original user values on top so user settings always win.
+	if len(c.Beatconfig) > 0 {
+		userMap := conf.ToStringMap()
+		if err := conf.Merge(confmap.NewFromStringMap(c.Beatconfig)); err != nil {
+			return fmt.Errorf("error merging defaults: %w", err)
+		}
+		if err := conf.Merge(confmap.NewFromStringMap(userMap)); err != nil {
+			return fmt.Errorf("error re-applying user config: %w", err)
+		}
+	}
+
 	if err := conf.Unmarshal(c); err != nil {
 		return fmt.Errorf("error unmarshalling conf: %w", err)
 	}
