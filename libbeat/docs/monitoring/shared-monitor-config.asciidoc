@@ -39,8 +39,8 @@ Refer to <<monitoring-internal-collection>> for usage examples.
 
 ==== `monitoring.enabled`
 
-The `monitoring.enabled` config is a boolean setting to enable or disable {monitoring}.
-If set to `true`, monitoring is enabled.
+The `monitoring.enabled` config is a boolean setting that controls whether {monitoring} 
+is enabled. If set to `true`, monitoring is enabled.
 
 The default value is `false`.
 
