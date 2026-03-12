@@ -138,9 +138,13 @@ func journalctlSupportsBootAll(logger *logp.Logger, factory JctlFactory) bool {
 		return false
 	}
 
-	defer jctl.Kill()
+	defer jctl.Kill() //nolint:errcheck // there is nothing we can do with this error
 
 	out, err := jctl.Next(ctx)
+	if err != nil {
+		logger.Warnf("cannot read journalctl output: %s", err)
+		return false
+	}
 	// first line: "systemd 239 (239-82.el8_10.2)"
 	firstLine := strings.SplitN(string(out), "\n", 2)[0]
 	fields := strings.Fields(firstLine)

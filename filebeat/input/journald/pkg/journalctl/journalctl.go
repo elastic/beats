@@ -55,6 +55,7 @@ type journalctl struct {
 // The returned type is an interface to allow mocking for testing
 func NewFactory(chroot, journalctlPath string) JctlFactory {
 	return func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
+		//nolint:noctx // we use the canceller to correctly stop the process
 		cmd := exec.Command(journalctlPath, args...)
 
 		if chroot != "" {

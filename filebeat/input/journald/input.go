@@ -380,7 +380,7 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 	m := reader.Message{
 		Ts:      time.UnixMicro(int64(data.RealtimeTimestamp)),
 		Content: content,
-		Bytes:   len(content),
+		Bytes:   len(content), //nolint:gosec // messages are not large enough to cause overflow
 		Fields:  fields,
 		Private: checkpoint{
 			Version:            cursorVersion,

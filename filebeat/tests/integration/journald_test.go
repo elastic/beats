@@ -22,6 +22,7 @@
 package integration
 
 import (
+	"context"
 	_ "embed"
 	"encoding/json"
 	"fmt"
@@ -271,7 +272,9 @@ func TestJournaldInputReadsMessagesFromAllBoots(t *testing.T) {
 }
 
 func listBoots(t *testing.T) (boots []bootInfo, raw string) {
-	cmd := exec.Command("journalctl", "--list-boots", "--no-pager", "--quiet")
+	ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "journalctl", "--list-boots", "--no-pager", "--quiet")
 	output, err := cmd.CombinedOutput()
 	raw = string(output)
 	if err != nil {
@@ -309,7 +312,11 @@ func listBoots(t *testing.T) (boots []bootInfo, raw string) {
 }
 
 func countBootEntries(t *testing.T, bootOffset string) int {
-	cmd := exec.Command(
+	ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(
+		ctx,
 		"bash",
 		"-c",
 		`set -o pipefail; journalctl -b "$1" --output=json --no-pager --quiet | wc -l`,
