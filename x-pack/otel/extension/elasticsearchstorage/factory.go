@@ -8,14 +8,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage/internal/metadata"
-
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/extension"
 )
 
 func NewFactory() extension.Factory {
-	return extension.NewFactory(metadata.Type, createDefaultConfig, newExtension, component.StabilityLevelDevelopment)
+	return extension.NewFactory(component.MustNewType("elasticsearch_storage"), createDefaultConfig, newExtension, component.StabilityLevelDevelopment)
 }
 
 func newExtension(ctx context.Context, set extension.Settings, cfg component.Config) (extension.Extension, error) {
