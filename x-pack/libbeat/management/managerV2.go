@@ -216,7 +216,7 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 		units:              make(map[unitKey]*agentUnit),
 		status:             status.Running,
 		message:            "Healthy",
-		stopChan:           make(chan struct{}, 1),
+		stopChan:           make(chan struct{}),
 		changeDebounce:     time.Second,
 		// forceReloadDebounce is greater than changeDebounce because it is only
 		// used when an input has not reached its finished state, this means some events
@@ -349,7 +349,9 @@ func (cm *BeatV2Manager) Start() error {
 
 // Stop stops the current Manager and close the connection to Elastic Agent.
 func (cm *BeatV2Manager) Stop() {
-	cm.stopChan <- struct{}{}
+	cm.stopOnce.Do(func() {
+		close(cm.stopChan)
+	})
 }
 
 // WaitForStop blocks until the manager has fully stopped, or timeout elapses.
@@ -542,8 +544,6 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 			if !errors.Is(err, context.Canceled) {
 				cm.logger.Errorf("elastic-agent-client error: %s", err)
 			}
-		case <-cm.stopChan:
-			return
 		}
 	}
 }
