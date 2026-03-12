@@ -28,18 +28,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-type fieldUsageResponse struct {
-	Shards map[string]interface{} `json:"_shards"`
-	// Remaining keys are index names mapped to their shard-level field usage stats.
-}
-
 type indexFieldUsage struct {
 	Shards []shardFieldUsage `json:"shards"`
 }
 
 type shardFieldUsage struct {
-	TrackingID             string       `json:"tracking_id"`
-	TrackingStartedAtMillis int64       `json:"tracking_started_at_millis"`
+	TrackingID              string       `json:"tracking_id"`
+	TrackingStartedAtMillis int64        `json:"tracking_started_at_millis"`
 	Routing                shardRouting `json:"routing"`
 	Stats                  shardStats   `json:"stats"`
 }
