@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beat
+package beatmonitoring
 
 import "github.com/elastic/elastic-agent-libs/monitoring"
 
