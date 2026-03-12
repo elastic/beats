@@ -1870,10 +1870,10 @@ func TestFilebeatOTelHTTPJSONInputWithElasticStateStore(t *testing.T) {
               value: '[[.last_event.published]]'
     queue.mem.flush.timeout: 0s
     setup.template.enabled: false
-    storage: elastic_storage
+    storage: elasticsearch_storage
     path.home: {{ .PathHome }}
 extensions:
-  elastic_storage:
+  elasticsearch_storage:
     hosts:
       - {{ .ESURL }}
     username: {{ .Username }}
@@ -1892,7 +1892,7 @@ exporters:
         flush_timeout: 1s
 service:
   extensions:
-    - elastic_storage
+    - elasticsearch_storage
   pipelines:
     logs:
       receivers:
