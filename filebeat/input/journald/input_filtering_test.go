@@ -245,8 +245,8 @@ func TestInputSeek(t *testing.T) {
 			},
 			// This cursor points to the previous last entry in the journal.
 			// You can test the cursor by running:
-			// journalctl --file ./input/journald/testdata/input-multiline-parser.journal --after-cursor="s=d8f1178aff25461086c05164837c41d5;i=7;b=056b231eb95d4c80b8a9f54dffff1dea;m=d47e3539b;t=5d163b3ad079e;x=1195c4b85b8135fb"
-			cursor:           `{"cursor":{"position":"s=d8f1178aff25461086c05164837c41d5;i=7;b=056b231eb95d4c80b8a9f54dffff1dea;m=d47e3539b;t=5d163b3ad079e;x=1195c4b85b8135fb","version":1}}`,
+			// journalctl --file ./input/journald/testdata/input-multiline-parser.journal --after-cursor="s=8383f73c60554a0a8b4bf35c7760c3fc;i=7;b=537d392f028b4dd4b9b1995a4c78cfb6;m=d47e3539b;t=5d163b3ad079e;x=1195c4b85b8135fb"
+			cursor:           `{"cursor":{"position":"s=8383f73c60554a0a8b4bf35c7760c3fc;i=7;b=537d392f028b4dd4b9b1995a4c78cfb6;m=d47e3539b;t=5d163b3ad079e;x=1195c4b85b8135fb","version":1}}`,
 			expectedMessages: allMessages[7:],
 		},
 	}
