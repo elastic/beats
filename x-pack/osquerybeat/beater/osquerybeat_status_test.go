@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -92,7 +93,7 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	b := &beat.Beat{
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
-		Monitoring: beat.NewMonitoring(),
+		Monitoring: beatmonitoring.NewMonitoring(),
 	}
 
 	cfg := agentconfig.NewConfig()
@@ -196,7 +197,7 @@ func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 	b := &beat.Beat{
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
-		Monitoring: beat.NewMonitoring(),
+		Monitoring: beatmonitoring.NewMonitoring(),
 	}
 
 	cfg := agentconfig.NewConfig()
@@ -233,7 +234,7 @@ func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 	b := &beat.Beat{
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
-		Monitoring: beat.NewMonitoring(),
+		Monitoring: beatmonitoring.NewMonitoring(),
 	}
 
 	cfg := agentconfig.NewConfig()
@@ -270,7 +271,7 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 	b := &beat.Beat{
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
-		Monitoring: beat.NewMonitoring(),
+		Monitoring: beatmonitoring.NewMonitoring(),
 	}
 
 	cfg := agentconfig.NewConfig()
