@@ -25,7 +25,6 @@ import (
 func init() {
 	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "field_stats", New,
 		mb.WithHostParser(elasticsearch.HostParser),
-		mb.DefaultMetricSet(),
 	)
 }
 
