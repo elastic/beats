@@ -22,18 +22,6 @@ During provisioning, each VM:
 
 ### Bring up and access VMs
 
-From the repository root:
-
-```
-cd filebeat/input/journald
-vagrant up # Start all VMs
-vagrant up 239 # Start a single VM
-vagrant status # List all VMs and their status
-vagrant ssh 239 # To access the VM
-```
-
-### Run Vagrant from any folder (stable state path)
-
 If you want to run `vagrant` commands from any directory and always target this
 VM set, export these variables in your shell:
 
@@ -51,8 +39,8 @@ After exporting, these commands are equivalent no matter where you run them:
 
 ```
 vagrant status
-vagrant up 239
-vagrant ssh 239
+vagrant up 239 # or any other VM
+vagrant ssh 239 # or any other VM
 ```
 
 Inside a VM, verify versions and available boots:
@@ -77,10 +65,13 @@ If you need extra boots in the journal:
 
 `TestJournaldInputReadsMessagesFromAllBoots` in
 `filebeat/tests/integration/journald_test.go` is a manual development test for
-cross-boot ingestion.
+multiple-boot ingestion. The test tries to read **ALL** journal
+messages, to ensure it does not hang on machines with too many
+messages, it first checks how many messages are in the two first
+boots, if the messages exceed `50 000`, the test is skipped.
 
-The test is intentionally skipped by default (`t.Skip(...)`), so remove that
-line locally before running it.
+The test is intentionally skipped by default, set
+`JOURNALD_MANUAL_TEST=1` for the test to run.
 
 From inside a VM (repo is usually mounted at `/vagrant`, but you might
 have to copy/clone it some VMs):

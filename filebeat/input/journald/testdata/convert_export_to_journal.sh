@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# This script converts all .export files into gziped journal files.
+# It requires /usr/lib/systemd/systemd-journal-remote to exist.
+
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"

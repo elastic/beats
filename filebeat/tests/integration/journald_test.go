@@ -193,7 +193,7 @@ type journaldAllBootsEvent struct {
 // TestJournaldInputReadsMessagesFromAllBoots is meant to be run manually in
 // VMs with small journals to validate we can read messages from all boots.
 // In machines with large journals, the test will be auto skipped to prevent
-// it from timing out or hanging.
+// it from timeout or hanging.
 // See filebeat/input/journald/README.md for information about how to run
 // VMs with different versions of Systemd/Journald
 // Always run this test with -v to know if/where the test is taking time.
@@ -234,9 +234,10 @@ func TestJournaldInputReadsMessagesFromAllBoots(t *testing.T) {
 	}
 
 	expectedMessages := oldestBootEntries + secondOldestBootEntries
-	if expectedMessages < 1 {
+	if expectedMessages < 2 {
 		t.Fatalf(
-			"expected at least one journal entry from oldest two boots, got 0 (oldest=%d second_oldest=%d)",
+			"expected at least two journal entries from oldest two boots, got %d (oldest=%d second_oldest=%d)",
+			expectedMessages,
 			oldestBootEntries,
 			secondOldestBootEntries,
 		)
@@ -247,7 +248,7 @@ func TestJournaldInputReadsMessagesFromAllBoots(t *testing.T) {
 	filebeat.Start()
 	filebeat.WaitLogsContains("journalctl started", 10*time.Second, "journalctl did not start")
 
-	waitForAtLeastPublishedEvents(t, filebeat, expectedMessages, 10*time.Minute)
+	waitForAtLeastPublishedEvents(t, filebeat, expectedMessages, 2*time.Minute)
 
 	events := integration.GetEventsFromFileOutput[journaldAllBootsEvent](filebeat, expectedMessages, false)
 	bootIDs := distinctBootIDs(events)
@@ -334,7 +335,6 @@ func waitForAtLeastPublishedEvents(t *testing.T, b *integration.BeatProc, min in
 		t.Fatalf("minimum number of events to wait for must be at least 1, got %d", min)
 	}
 
-	// The size limit breaks it for real-world usage or machines with large messages
 	outputGlob := filepath.Join(b.TempDir(), "output-*.ndjson")
 
 	got := b.CountFileLines(outputGlob)
@@ -345,7 +345,7 @@ func waitForAtLeastPublishedEvents(t *testing.T, b *integration.BeatProc, min in
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		got := b.CountFileLines(outputGlob)
 		assert.GreaterOrEqualf(collect, got, min, "expected at least %d events, got %d", min, got)
-	}, timeout, 200*time.Millisecond)
+	}, timeout, 2*time.Second)
 }
 
 func distinctBootIDs(events []journaldAllBootsEvent) map[string]struct{} {

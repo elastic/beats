@@ -242,7 +242,6 @@ func TestNewUsesMergeFlag(t *testing.T) {
 // fakeJournalctl writes a tiny shell script that prints a fake journalctl
 // version line and returns the path to that script.
 func fakeJournalctl(t *testing.T, version int) string {
-	t.Helper()
 	dir := t.TempDir()
 	path := filepath.Join(dir, "journalctl")
 	content := fmt.Sprintf("#!/bin/sh\necho 'systemd %d (%d-test)'\n", version, version)
