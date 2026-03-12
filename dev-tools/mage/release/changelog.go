@@ -20,7 +20,6 @@ package release
 import (
 	"fmt"
 	"os/exec"
-	"strings"
 )
 
 // PrepareChangelog generates changelog using the Python beats-changelog package

@@ -20,7 +20,6 @@ package release
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -65,36 +64,36 @@ func UpdateDocs(newVersion string) error {
 	files := map[string][]replacementRule{
 		"libbeat/docs/version.asciidoc": {
 			{
-				pattern: regexp.MustCompile(`:stack-version:\s*\d+\.\d+\.\d+`),
+				pattern:     regexp.MustCompile(`:stack-version:\s*\d+\.\d+\.\d+`),
 				replacement: fmt.Sprintf(":stack-version: %s", newVersion),
 			},
 			{
-				pattern: regexp.MustCompile(`:doc-branch:\s*\d+\.\d+`),
+				pattern:     regexp.MustCompile(`:doc-branch:\s*\d+\.\d+`),
 				replacement: fmt.Sprintf(":doc-branch: %s", majorMinor),
 			},
 		},
 		"deploy/kubernetes/metricbeat-kubernetes.yaml": {
 			{
-				pattern: regexp.MustCompile(`docker\.elastic\.co/beats/metricbeat:\d+\.\d+\.\d+`),
+				pattern:     regexp.MustCompile(`docker\.elastic\.co/beats/metricbeat:\d+\.\d+\.\d+`),
 				replacement: fmt.Sprintf("docker.elastic.co/beats/metricbeat:%s", newVersion),
 			},
 		},
 		"deploy/kubernetes/filebeat-kubernetes.yaml": {
 			{
-				pattern: regexp.MustCompile(`docker\.elastic\.co/beats/filebeat:\d+\.\d+\.\d+`),
+				pattern:     regexp.MustCompile(`docker\.elastic\.co/beats/filebeat:\d+\.\d+\.\d+`),
 				replacement: fmt.Sprintf("docker.elastic.co/beats/filebeat:%s", newVersion),
 			},
 		},
 		"deploy/kubernetes/auditbeat-kubernetes.yaml": {
 			{
-				pattern: regexp.MustCompile(`docker\.elastic\.co/beats/auditbeat:\d+\.\d+\.\d+`),
+				pattern:     regexp.MustCompile(`docker\.elastic\.co/beats/auditbeat:\d+\.\d+\.\d+`),
 				replacement: fmt.Sprintf("docker.elastic.co/beats/auditbeat:%s", newVersion),
 			},
 		},
 		"README.md": {
 			{
 				// Update branch references like /7.x/ -> /7.9/
-				pattern: regexp.MustCompile(`/\d+\.x/`),
+				pattern:     regexp.MustCompile(`/\d+\.x/`),
 				replacement: fmt.Sprintf("/%s/", majorMinor),
 			},
 		},

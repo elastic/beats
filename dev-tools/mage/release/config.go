@@ -35,9 +35,9 @@ type ReleaseConfig struct {
 	ReleaseBranch string
 
 	// GitHub configuration
-	ProjectOwner    string
-	ProjectRepo     string
-	GitHubToken     string
+	ProjectOwner     string
+	ProjectRepo      string
+	GitHubToken      string
 	ProjectReviewers []string
 
 	// Git author information
@@ -54,17 +54,17 @@ type ReleaseConfig struct {
 // LoadConfigFromEnv loads release configuration from environment variables
 func LoadConfigFromEnv() (*ReleaseConfig, error) {
 	cfg := &ReleaseConfig{
-		CurrentRelease: os.Getenv("CURRENT_RELEASE"),
-		LatestRelease:  os.Getenv("LATEST_RELEASE"),
-		NextRelease:    os.Getenv("NEXT_RELEASE"),
-		BaseBranch:     getEnvOrDefault("BASE_BRANCH", "main"),
-		ReleaseBranch:  os.Getenv("RELEASE_BRANCH"),
-		ProjectOwner:   getEnvOrDefault("PROJECT_OWNER", "elastic"),
-		ProjectRepo:    getEnvOrDefault("PROJECT_REPO", "beats"),
-		GitHubToken:    os.Getenv("GITHUB_TOKEN"),
-		GitAuthorName:  getEnvOrDefault("GIT_AUTHOR_NAME", "github-actions[bot]"),
-		GitAuthorEmail: getEnvOrDefault("GIT_AUTHOR_EMAIL", "github-actions[bot]@users.noreply.github.com"),
-		DryRun:         getEnvOrDefault("DRY_RUN", "false") == "true",
+		CurrentRelease:    os.Getenv("CURRENT_RELEASE"),
+		LatestRelease:     os.Getenv("LATEST_RELEASE"),
+		NextRelease:       os.Getenv("NEXT_RELEASE"),
+		BaseBranch:        getEnvOrDefault("BASE_BRANCH", "main"),
+		ReleaseBranch:     os.Getenv("RELEASE_BRANCH"),
+		ProjectOwner:      getEnvOrDefault("PROJECT_OWNER", "elastic"),
+		ProjectRepo:       getEnvOrDefault("PROJECT_REPO", "beats"),
+		GitHubToken:       os.Getenv("GITHUB_TOKEN"),
+		GitAuthorName:     getEnvOrDefault("GIT_AUTHOR_NAME", "github-actions[bot]"),
+		GitAuthorEmail:    getEnvOrDefault("GIT_AUTHOR_EMAIL", "github-actions[bot]@users.noreply.github.com"),
+		DryRun:            getEnvOrDefault("DRY_RUN", "false") == "true",
 		ChangelogToCommit: getEnvOrDefault("CHANGELOG_TO_COMMIT", "HEAD"),
 	}
 

@@ -109,10 +109,10 @@ func (gh *GitHubClient) AddLabels(owner, repo string, number int, labels []strin
 
 // PRConfig holds configuration for a single PR in a multi-PR workflow
 type PRConfig struct {
-	BranchName  string
-	Title       string
-	Body        string
-	Labels      []string
+	BranchName string
+	Title      string
+	Body       string
+	Labels     []string
 }
 
 // CreateMultiplePRs creates multiple PRs in sequence
