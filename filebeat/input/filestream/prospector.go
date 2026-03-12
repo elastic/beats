@@ -83,6 +83,7 @@ type fileProspector struct {
 	takeOver              loginp.TakeOverConfig
 	filestreamIdentifiers map[string]fileIdentifier
 	logIdentifiers        map[string]file.StateIdentifier
+	maxEncodedFingerprintLen int
 }
 
 func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v loginp.TakeOverState) string {
@@ -357,7 +358,7 @@ func (p *fileProspector) onFSEvent(
 
 	// For growing_fingerprint, handle prefix matching and migration
 	if p.identifier.Name() == growingFingerprintName &&
-		len(event.Descriptor.Fingerprint) < 1000*2 {
+		len(event.Descriptor.Fingerprint) < p.maxEncodedFingerprintLen {
 		src = p.handleGrowingFingerprintLookup(log, event, src, updater)
 	}
 
