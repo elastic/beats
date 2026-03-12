@@ -12,7 +12,7 @@ applies_to:
 
 The Kafka output sends events to Apache Kafka.
 
-To use this output, edit the Auditbeat configuration file to disable the {{es}} output by commenting it out, and enable the Kafka output by uncommenting the Kafka section.
+To use this output, edit the Auditbeat configuration file to deactivate the {{es}} output by commenting it out, and enable the Kafka output by uncommenting the Kafka section.
 
 :::{admonition} Kafka timestamps and beats
 * Kafka 3.6+ introduces stricter timestamp validation with the introduction of two new broker/topic-level properties: [log.message.timestamp.before.max.ms](https://docs.confluent.io/platform/current/installation/configuration/topic-configs.html#message-timestamp-before-max-ms) and 
