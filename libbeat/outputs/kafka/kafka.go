@@ -50,7 +50,7 @@ func makeKafka(
 
 	log.Debug("initialize kafka output")
 
-	kConfig, err := readConfig(cfg)
+	kConfig, err := ReadConfig(cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
