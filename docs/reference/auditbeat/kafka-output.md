@@ -77,7 +77,7 @@ The list of Kafka broker addresses from where to fetch the cluster metadata. The
 
 Kafka protocol version that Auditbeat will request when connecting. Defaults to 2.1.0. When using Kafka 4.0 and newer, the version must be set to at least `"2.1.0"`
 
-Valid values are all kafka releases in between `0.8.2.0` and `2.6.0`.
+Valid values are all kafka releases in between `0.8.2.0` and `4.1.0`.
 
 The protocol version controls the Kafka client features available to Auditbeat; it does not prevent Auditbeat from connecting to Kafka versions newer than the protocol version.
 
