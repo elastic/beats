@@ -123,16 +123,18 @@ func newProspector(
 	}
 
 	fileprospector := fileProspector{
-		filewatcher:           filewatcher,
-		identifier:            identifier,
-		ignoreOlder:           config.IgnoreOlder,
-		ignoreInactiveSince:   config.IgnoreInactive,
-		cleanRemoved:          config.CleanRemoved,
-		stateChangeCloser:     config.Close.OnStateChange,
-		logger:                logger.Named("prospector"),
-		takeOver:              config.TakeOver,
-		filestreamIdentifiers: filestreamFileIdentifiers(logger, config.Reader.Parsers.Suffix),
-		logIdentifiers:        logFileIdentifiers(logger),
+		filewatcher:              filewatcher,
+		identifier:               identifier,
+		ignoreOlder:              config.IgnoreOlder,
+		ignoreInactiveSince:      config.IgnoreInactive,
+		cleanRemoved:             config.CleanRemoved,
+		stateChangeCloser:        config.Close.OnStateChange,
+		logger:                   logger.Named("prospector"),
+		takeOver:                 config.TakeOver,
+		filestreamIdentifiers:    filestreamFileIdentifiers(logger, config.Reader.Parsers.Suffix),
+		logIdentifiers:           logFileIdentifiers(logger),
+		// *2 because hex encoding doubles the byte length. Update if the fingerprint encoding changes.
+		maxEncodedFingerprintLen: int(config.FileWatcher.Scanner.Fingerprint.MaxLength) * 2,
 	}
 	if config.Rotation == nil {
 		return &fileprospector, nil

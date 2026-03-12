@@ -702,6 +702,14 @@ func (m *mockFileWatcher) NotifyChan() chan loginp.HarvesterStatus {
 
 type mockMetadataUpdater struct {
 	table map[string]interface{}
+
+	FindCursorMetaCalled  int
+	ResetCursorCalled     int
+	UpdateMetadataCalled  int
+	RemoveCalled          int
+	IterateOnPrefixCalled int
+	KeyExistsCalled       int
+	UpdateKeyCalled       int
 }
 
 func newMockMetadataUpdater() *mockMetadataUpdater {
@@ -730,6 +738,7 @@ func (mu *mockMetadataUpdater) checkOffset(id string, offset int64) bool {
 }
 
 func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) error {
+	mu.FindCursorMetaCalled++
 	meta, ok := mu.table[s.Name()]
 	if !ok {
 		return fmt.Errorf("no such id [%q]", s.Name())
@@ -738,21 +747,25 @@ func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) er
 }
 
 func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur interface{}) error {
+	mu.ResetCursorCalled++
 	mu.table[s.Name()] = cur
 	return nil
 }
 
 func (mu *mockMetadataUpdater) UpdateMetadata(s loginp.Source, v interface{}) error {
+	mu.UpdateMetadataCalled++
 	mu.table[s.Name()] = v
 	return nil
 }
 
 func (mu *mockMetadataUpdater) Remove(s loginp.Source) error {
+	mu.RemoveCalled++
 	delete(mu.table, s.Name())
 	return nil
 }
 
 func (mu *mockMetadataUpdater) IterateOnPrefix(fn func(key string, meta interface{}) bool) {
+	mu.IterateOnPrefixCalled++
 	for key, meta := range mu.table {
 		if !fn(key, meta) {
 			return
@@ -761,11 +774,13 @@ func (mu *mockMetadataUpdater) IterateOnPrefix(fn func(key string, meta interfac
 }
 
 func (mu *mockMetadataUpdater) KeyExists(s loginp.Source) bool {
+	mu.KeyExistsCalled++
 	_, ok := mu.table[s.Name()]
 	return ok
 }
 
 func (mu *mockMetadataUpdater) UpdateKey(oldKey, newKey string, meta interface{}) error {
+	mu.UpdateKeyCalled++
 	if _, ok := mu.table[oldKey]; !ok {
 		return fmt.Errorf("old key %s not found", oldKey)
 	}
@@ -1460,6 +1475,74 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 		// have attempted migration via the slow path. Since UpdateKey will fail
 		// (key format doesn't match the mock's simple table), src is returned.
 		assert.Equal(t, src.Name(), result.Name())
+	})
+}
+
+// TestOnFSEvent_GrowingFingerprintMaxLen verifies that maxEncodedFingerprintLen
+// controls whether handleGrowingFingerprintLookup is called inside onFSEvent.
+func TestOnFSEvent_GrowingFingerprintMaxLen(t *testing.T) {
+	const (
+		currentPath    = "/var/log/app.log"
+		oldFingerprint = "aabb"
+		newFingerprint = "aabbccdd"
+		inputID        = "my-input"
+	)
+
+	oldKey := "filestream::" + inputID + "::growing_fingerprint::" + oldFingerprint
+	newKey := "filestream::" + inputID + "::growing_fingerprint::" + newFingerprint
+
+	identifier, err := newGrowingFingerprintIdentifier(nil, nil)
+	require.NoError(t, err)
+
+	event := loginp.FSEvent{
+		Op:      loginp.OpWrite,
+		NewPath: currentPath,
+		Descriptor: loginp.FileDescriptor{
+			Fingerprint: newFingerprint,
+		},
+	}
+	src := identifier.GetSource(event)
+
+	t.Run("below max: fingerprint grew, migration happens", func(t *testing.T) {
+		store := newMockMetadataUpdater()
+		store.table[oldKey] = fileMeta{
+			Source:         currentPath,
+			IdentifierName: growingFingerprintName,
+		}
+
+		p := &fileProspector{
+			logger:                   logp.L(),
+			identifier:               identifier,
+			maxEncodedFingerprintLen: len(newFingerprint) + 1,
+		}
+
+		hg := newTestHarvesterGroup()
+		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
+
+		assert.False(t, store.has(oldKey), "old key should have been removed by migration")
+		assert.True(t, store.has(newKey), "new key should exist after migration")
+		assert.Len(t, store.table, 1, "it should have exactly one entry")
+	})
+
+	t.Run("at max: fingerprint reached max, no migration", func(t *testing.T) {
+		store := newMockMetadataUpdater()
+		store.table[oldKey] = fileMeta{
+			Source:         currentPath,
+			IdentifierName: growingFingerprintName,
+		}
+
+		p := &fileProspector{
+			logger:                   logp.L(),
+			identifier:               identifier,
+			maxEncodedFingerprintLen: len(newFingerprint),
+		}
+
+		hg := newTestHarvesterGroup()
+		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
+
+		assert.True(t, store.has(oldKey), "old key should still be present — migration must not run")
+		assert.Len(t, store.table, 1, "it should have exactly one entry")
+		assert.Equal(t, store.IterateOnPrefixCalled, 0, "IterateOnPrefix should not have been called")
 	})
 }
 
