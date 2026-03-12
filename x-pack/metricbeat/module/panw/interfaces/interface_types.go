@@ -229,6 +229,7 @@ type TunnelsResult struct {
 
 type TunnelsEntry struct {
 	ID        int    `xml:"id"`
+	State     string `xml:"state"`
 	Name      string `xml:"name"`
 	GW        string `xml:"gw"`
 	TSiIP     string `xml:"TSi_ip"`
@@ -246,4 +247,23 @@ type TunnelsEntry struct {
 	Hash      string `xml:"hash"`
 	Life      int    `xml:"life"`
 	KB        int    `xml:"kb"`
+}
+
+// Tunnel flow response types (for querying individual tunnel state via
+// <show><running><tunnel><flow><tunnel-id>ID</tunnel-id></flow></tunnel></running></show>)
+type TunnelFlowResponse struct {
+	Status string           `xml:"status,attr"`
+	Result TunnelFlowResult `xml:"result"`
+}
+
+type TunnelFlowResult struct {
+	IPSec TunnelFlowIPSec `xml:"IPSec"`
+}
+
+type TunnelFlowIPSec struct {
+	Entries []TunnelFlowEntry `xml:"entry"`
+}
+
+type TunnelFlowEntry struct {
+	State string `xml:"state"`
 }
