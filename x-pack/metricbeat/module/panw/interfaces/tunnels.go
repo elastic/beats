@@ -69,7 +69,7 @@ func formatIPSecTunnelEvents(m *MetricSet, entries []TunnelsEntry) []mb.Event {
 				"ipsec_tunnel.life.sec":   entry.Life,
 				"ipsec_tunnel.kb":         entry.KB,
 			},
-			RootFields: panw.MakeRootFields(m.config.HostIp),
+			RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 		}
 
 		events = append(events, event)

@@ -71,7 +71,7 @@ func formatCertificateEvents(m *MetricSet, input string) ([]mb.Event, error) {
 				"certificate.db_name":             certificate.DBName,
 				"certificate.db_status":           certificate.DBStatus,
 			},
-			RootFields: panw.MakeRootFields(m.config.HostIp),
+			RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 		}
 
 		events = append(events, event)
