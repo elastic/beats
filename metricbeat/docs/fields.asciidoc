@@ -7658,6 +7658,15 @@ alias to: beat.stats.apm_server.sampling.tail.storage.value_log_size
 
 --
 
+*`beats_stats.apm-server.sampling.tail.storage.storage_limit`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.storage.storage_limit
+
+--
+
 *`beats_stats.apm-server.sampling.transactions_dropped`*::
 +
 --
@@ -9809,6 +9818,13 @@ type: long
 --
 
 *`beat.stats.apm_server.sampling.tail.storage.value_log_size`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.storage.storage_limit`*::
 +
 --
 type: long
