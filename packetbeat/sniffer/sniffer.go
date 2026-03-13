@@ -315,12 +315,19 @@ func (s *sniffer) sniffStatic(ctx context.Context, device string) error {
 // the same link type.
 func (s *sniffer) sniffDynamic(ctx context.Context, defaultRoute <-chan string, refresh chan<- struct{}) error {
 	var (
-		last layers.LinkType
-		dec  *decoder.Decoder
+		last    layers.LinkType
+		dec     *decoder.Decoder
+		cleanup func()
 	)
+	defer func() {
+		if cleanup != nil {
+			cleanup()
+		}
+	}()
+
 	for device := range defaultRoute {
 		var err error
-		last, dec, err = s.sniffOneDynamic(ctx, device, last, dec, refresh)
+		last, dec, cleanup, err = s.sniffOneDynamic(ctx, device, last, dec, cleanup, refresh)
 		if err != nil {
 			return err
 		}
@@ -332,28 +339,35 @@ func (s *sniffer) sniffDynamic(ctx context.Context, defaultRoute <-chan string, 
 // If the link type associated with the device differs from the last link
 // type or dec is nil, a new decoder is returned. The link type associated
 // with the device is returned.
-func (s *sniffer) sniffOneDynamic(ctx context.Context, device string, last layers.LinkType, dec *decoder.Decoder, refresh chan<- struct{}) (layers.LinkType, *decoder.Decoder, error) {
+func (s *sniffer) sniffOneDynamic(ctx context.Context, device string, last layers.LinkType, dec *decoder.Decoder, cleanup func(), refresh chan<- struct{}) (layers.LinkType, *decoder.Decoder, func(), error) {
 	handle, err := s.open(device)
 	if err != nil {
-		return last, dec, fmt.Errorf("failed to start sniffer: %w", err)
+		return last, dec, cleanup, fmt.Errorf("failed to start sniffer: %w", err)
 	}
 	defer handle.Close()
 
-	linkType := handle.LinkType()
-	if dec == nil || linkType != last {
-		s.log.Infof("changing link type: %d -> %d", last, linkType)
-		var cleanup func()
-		dec, cleanup, err = s.decoders(linkType, device, s.idx)
-		if err != nil {
-			return linkType, dec, err
-		}
-		if cleanup != nil {
-			defer cleanup()
-		}
+	linkType, dec, cleanup, err := s.ensureDecoder(handle.LinkType(), device, last, dec, cleanup)
+	if err != nil {
+		return linkType, dec, cleanup, err
 	}
 
 	err = s.sniffHandle(ctx, handle, dec, refresh)
-	return linkType, dec, err
+	return linkType, dec, cleanup, err
+}
+
+func (s *sniffer) ensureDecoder(linkType layers.LinkType, device string, last layers.LinkType, dec *decoder.Decoder, cleanup func()) (layers.LinkType, *decoder.Decoder, func(), error) {
+	if dec == nil || linkType != last {
+		s.log.Infof("changing link type: %d -> %d", last, linkType)
+		newDec, newCleanup, err := s.decoders(linkType, device, s.idx)
+		if err != nil {
+			return linkType, dec, cleanup, err
+		}
+		if cleanup != nil {
+			cleanup()
+		}
+		return linkType, newDec, newCleanup, nil
+	}
+	return linkType, dec, cleanup, nil
 }
 
 // sniff performs the sniffing work and writing dump files if requested.
