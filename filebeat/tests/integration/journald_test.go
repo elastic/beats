@@ -230,7 +230,7 @@ func TestJournaldInputReadsMessagesFromAllBoots(t *testing.T) {
 	t.Logf("Boot offset %s, boot ID %s", secondOldestBoot.Offset, secondOldestBoot.BootID)
 	secondOldestBootEntries := countBootEntries(t, secondOldestBoot.Offset)
 
-	if oldestBootEntries > 50_000 {
+	if secondOldestBootEntries > 50_000 {
 		t.Skipf("Too many entries in the second boot %d > 50_000", secondOldestBootEntries)
 	}
 
@@ -388,7 +388,7 @@ func sortedBootIDsSample(bootIDs map[string]struct{}, max int) []string {
 }
 
 func generateJournaldLogs(t *testing.T, syslogID string, lines, size int) {
-	cmd := exec.Command("systemd-cat", "-t", syslogID)
+	cmd := exec.CommandContext(t.Context(), "systemd-cat", "-t", syslogID)
 	w, err := cmd.StdinPipe()
 	if err != nil {
 		t.Errorf("cannot get stdin pipe from systemd-cat: %s", err)
