@@ -37,8 +37,8 @@ output.console:
     pretty: true
 `
 	tests := map[string]struct {
-		shell       string
-		expected    string
+		shell        string
+		expected     string
 		expectStdErr bool
 	}{
 		"bash completion": {shell: "bash", expected: "bash completion for mockbeat"},
