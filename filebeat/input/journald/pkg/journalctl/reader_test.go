@@ -274,7 +274,8 @@ func TestJournalctlSupportsBootAll(t *testing.T) {
 				path = fakeJournalctl(t, tc.version)
 			}
 
-			got := journalctlSupportsBootAll(logp.NewNopLogger(), NewFactory("", path))
+			logger := logptest.NewFileLogger(t, filepath.Join("..", "..", "..", "..", "build"))
+			got := journalctlSupportsBootAll(logger.Logger, NewFactory("", path))
 			if got != tc.wantBootAll {
 				t.Errorf("version %d: wantBootAll=%v but got=%v", tc.version, tc.wantBootAll, got)
 			}
