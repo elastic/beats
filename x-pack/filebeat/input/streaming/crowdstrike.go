@@ -16,6 +16,7 @@ import (
 	"strconv"
 	"time"
 
+	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -35,9 +36,10 @@ type falconHoseStream struct {
 
 	status status.StatusReporter
 
-	creds       *clientcredentials.Config
-	discoverURL string
-	plainClient *http.Client
+	creds         *clientcredentials.Config
+	authTransport *rateLimitTransport
+	discoverURL   string
+	plainClient   *http.Client
 
 	time func() time.Time
 }
@@ -131,6 +133,24 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 	u.RawQuery = query.Encode()
 	s.discoverURL = u.String()
 
+	// Build the auth transport before zeroing timeouts for the streaming
+	// client. The oauth2 token endpoint needs normal request timeouts.
+	authClient, err := cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation(), httpcommon.WithLogger(log))
+	if err != nil {
+		stat.UpdateStatus(status.Failed, "failed to configure auth client: "+err.Error())
+		return nil, err
+	}
+	if now == nil {
+		now = time.Now
+	}
+	s.authTransport = &rateLimitTransport{
+		base:     authClient.Transport,
+		maxRetry: 3,
+		wait:     60 * time.Second,
+		log:      log,
+		now:      now,
+	}
+
 	cfg.Transport.Timeout = 0
 	cfg.Transport.IdleConnTimeout = 0
 	s.plainClient, err = cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation(), httpcommon.WithLogger(log))
@@ -153,6 +173,7 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 		state["cursor"] = s.cursor
 	}
 
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, &http.Client{Transport: s.authTransport})
 	cli := s.creds.Client(ctx)
 	// Normally we would not bother with this, but since connections
 	// are in keep-alive in normal operation, let's clean up.
@@ -188,6 +209,10 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 				s.log.Warnw("no retry configured: using linear back-off")
 				waitTime = min(time.Duration(attempt)*time.Second, 30*time.Second)
 			}
+			var rle *rateLimitError
+			if errors.As(err, &rle) && rle.wait > waitTime {
+				waitTime = rle.wait
+			}
 
 			s.status.UpdateStatus(status.Degraded, err.Error())
 			s.log.Warnw("session warning", "error", err, "attempt", attempt, "wait", waitTime.String())
@@ -222,9 +247,23 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode == http.StatusTooManyRequests {
+		var buf bytes.Buffer
+		_, _ = io.Copy(&buf, resp.Body)
+		wait := parseRetryAfter(resp.Header.Get("Retry-After"), 60*time.Second, s.now())
+		s.log.Warnw("rate limited by discover endpoint",
+			"status_code", resp.StatusCode,
+			"body", buf.String(),
+			"retry_after", wait,
+		)
+		return state, &rateLimitError{
+			wait: wait,
+			err:  fmt.Errorf("rate limited by discover endpoint: %s", resp.Status),
+		}
+	}
 	if resp.StatusCode != http.StatusOK {
 		var buf bytes.Buffer
-		io.Copy(&buf, resp.Body)
+		_, _ = io.Copy(&buf, resp.Body)
 		s.log.Errorw("unsuccessful request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
 		return state, fmt.Errorf("unsuccessful request: %s: %s", resp.Status, &buf)
 	}
@@ -325,7 +364,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 
 		if resp.StatusCode != http.StatusOK {
 			var buf bytes.Buffer
-			io.Copy(&buf, resp.Body)
+			_, _ = io.Copy(&buf, resp.Body)
 			s.log.Errorw("unsuccessful firehose request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
 			return state, fmt.Errorf("unsuccessful firehose request: %s: %s", resp.Status, &buf)
 		}
@@ -366,6 +405,16 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	}
 	return state, nil
 }
+
+// rateLimitError carries a retry-after duration from a 429 response so
+// the session-level retry loop can use it as a minimum wait.
+type rateLimitError struct {
+	wait time.Duration
+	err  error
+}
+
+func (e *rateLimitError) Error() string { return e.err.Error() }
+func (e *rateLimitError) Unwrap() error { return e.err }
 
 // hardError is an input-terminating error.
 type hardError struct {
