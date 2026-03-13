@@ -37,19 +37,24 @@ output.console:
     pretty: true
 `
 	tests := map[string]struct {
-		shell    string
-		expected string
+		shell       string
+		expected    string
+		expectStdErr bool
 	}{
 		"bash completion": {shell: "bash", expected: "bash completion for mockbeat"},
 		"zsh completion":  {shell: "zsh", expected: "zsh completion for mockbeat"},
-		"awesomeshell":    {shell: "awesomeshell", expected: "Unknown shell awesomeshell"},
+		"awesomeshell":    {shell: "awesomeshell", expected: "Unknown shell awesomeshell", expectStdErr: true},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", "completion", tc.shell)
 			mockbeat.WriteConfigFile(cfg)
 			mockbeat.Start()
-			mockbeat.WaitStdOutContains(tc.expected, 10*time.Second)
+			if tc.expectStdErr {
+				mockbeat.WaitStdErrContains(tc.expected, 10*time.Second)
+			} else {
+				mockbeat.WaitStdOutContains(tc.expected, 10*time.Second)
+			}
 		})
 	}
 }
