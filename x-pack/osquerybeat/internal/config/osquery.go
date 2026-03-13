@@ -8,6 +8,12 @@ import (
 	"encoding/json"
 )
 
+// ElasticOptions contains Beat-specific options that are not part of
+// osquery's native config schema.
+type ElasticOptions struct {
+	Install *InstallConfig `config:"install" json:"-"`
+}
+
 type Query struct {
 	Query       string `config:"query" json:"query"`
 	Interval    int    `config:"interval" json:"interval"`
@@ -65,6 +71,7 @@ type Events struct {
 
 type OsqueryConfig struct {
 	Options               map[string]interface{} `config:"options" json:"options,omitempty"`
+	ElasticOptions        *ElasticOptions        `config:"elastic_options" json:"-"`
 	Schedule              map[string]Query       `config:"schedule" json:"schedule,omitempty"`
 	Packs                 map[string]Pack        `config:"packs" json:"packs,omitempty"`
 	Filepaths             map[string][]string    `config:"file_paths" json:"file_paths,omitempty"`
