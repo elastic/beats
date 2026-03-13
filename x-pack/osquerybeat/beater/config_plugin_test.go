@@ -31,11 +31,11 @@ func renderFullConfigJSON(inputs []config.InputConfig) (string, error) {
 		for _, stream := range input.Streams {
 			snapshot := true
 			query := config.Query{
-				Query:    stream.Query,
-				Interval: stream.Interval,
-				Platform: stream.Platform,
-				Version:  stream.Version,
-				Snapshot: &snapshot, // enforce snapshot for all queries
+				Query:          stream.Query,
+				NativeSchedule: config.NativeSchedule{Interval: stream.Interval},
+				Platform:       stream.Platform,
+				Version:        stream.Version,
+				Snapshot:       &snapshot, // enforce snapshot for all queries
 			}
 			pack.Queries[stream.ID] = query
 		}
@@ -242,6 +242,7 @@ func TestSet(t *testing.T) {
 
 	const noQueriesConfig = `{
     "options": {
+        "schedule_max_drift": 60,
         "schedule_splay_percent": 10
     }
 }`
