@@ -57,6 +57,7 @@ To fetch all files from a predefined level of subdirectories, use this pattern: 
 
 You can configure Filebeat to use the following inputs:
 
+* [Akamai](/reference/filebeat/filebeat-input-akamai.md)
 * [AWS CloudWatch](/reference/filebeat/filebeat-input-aws-cloudwatch.md)
 * [AWS S3](/reference/filebeat/filebeat-input-aws-s3.md)
 * [Azure Event Hub](/reference/filebeat/filebeat-input-azure-eventhub.md)
