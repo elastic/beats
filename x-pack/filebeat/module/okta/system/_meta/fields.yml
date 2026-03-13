@@ -297,7 +297,7 @@
         - name: os
           type: keyword
           description: >
-            The OS of the system from where the suspicious activity occured.
+            The OS of the system from where the suspicious activity occurred.
 
         - name: timestamp
           type: date
