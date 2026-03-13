@@ -203,7 +203,7 @@ func newBaseMetricSets(r *Register, m Module, p *paths.Path, logger *logp.Logger
 			if m.Config().ID != "" {
 				logger = logger.With("id", m.Config().ID)
 			}
-			metricsets = append(metricsets, BaseMetricSet{
+			metricsets = append(metricsets, BaseMetricSet{ //nolint:exhaustruct // hostData and registration are set after construction
 				id:      msID,
 				name:    name,
 				module:  m,
