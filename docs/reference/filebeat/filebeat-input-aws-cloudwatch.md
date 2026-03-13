@@ -16,6 +16,10 @@ A log group is a group of log streams that share the same retention, monitoring,
 
 A log stream is a sequence of log events that share the same source. Each separate source of logs in CloudWatch Logs makes up a separate log stream.
 
+:::{important}
+This input uses the AWS `FilterLogEvents` API, which is only supported for log groups that use the **Standard** log class. Log groups that use the **Infrequent Access** log class are not supported. For more information about CloudWatch Logs log classes, refer to the [AWS documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatch_Logs_Log_Classes.html).
+:::
+
 ```yaml
 filebeat.inputs:
 - type: aws-cloudwatch
@@ -49,6 +53,10 @@ Note: `region_name` is required when log_group_name is given.
 The prefix for a group of log group names. See `include_linked_accounts_for_prefix_mode` option for linked source accounts behavior.
 
 Note: `region_name` is required when `log_group_name_prefix` is given. `log_group_name` and `log_group_name_prefix` cannot be given at the same time. The number of workers that will process the log groups under this prefix is set through the `number_of_workers` config.
+
+:::{note}
+When you use `log_group_name_prefix`, all matching log groups are included regardless of their log class. If any matching log groups use the Infrequent Access log class, API errors occur because the `FilterLogEvents` API is not supported for that log class. Make sure all log groups that match the prefix use the Standard log class.
+:::
 
 
 ### `include_linked_accounts_for_prefix_mode` [_include_linked_accounts_for_prefix_mode]
