@@ -106,11 +106,16 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 		}
 
 		if features.IsElasticsearchStateStoreEnabled() {
-			// The notifier is a concurrency-safe pub/sub broadcaster shared between
-			// the es.Registry (subscriber) and all filebeatStore wrappers (publishers).
-			// Multiple Notify() calls are idempotent, so sharing across wrappers is safe.
-			shared.notifier = es.NewNotifier()
-			shared.esRegistry = statestore.NewRegistry(es.New(ctx, logger, shared.notifier))
+			switch cfg.ESStorageExtension {
+			case nil:
+				// The notifier is a concurrency-safe pub/sub broadcaster shared between
+				// the es.Registry (subscriber) and all filebeatStore wrappers (publishers).
+				// Multiple Notify() calls are idempotent, so sharing across wrappers is safe.
+				shared.notifier = es.NewNotifier()
+				shared.esRegistry = statestore.NewRegistry(es.New(ctx, logger, shared.notifier))
+			default:
+				shared.esRegistry = statestore.NewRegistry(cfg.ESStorageExtension)
+			}
 		}
 
 		globalStores[key] = shared
