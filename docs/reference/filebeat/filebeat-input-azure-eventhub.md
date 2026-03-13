@@ -15,6 +15,71 @@ State such as leases on partitions and checkpoints in the event stream are share
 
 Enable internal logs tracing for this input by setting the environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true`. When enabled, this input will log additional information to the logs. Additional information includes partition ownership, blob lease information, and other internal state.
 
+## Processor versions [_processor_versions]
+
+The `azure-eventhub` input supports two processor versions:
+
+- **Processor v1** — The legacy processor, based on the [Azure Event Hubs Go SDK v3](https://github.com/Azure/azure-event-hubs-go) (Event Processor Host). Deprecated since 9.3.0 and planned for removal in 9.4.0. Only supports `connection_string` authentication.
+- **Processor v2** — The default processor since 9.3.0, based on the modern [Azure SDK for Go](https://github.com/Azure/azure-sdk-for-go). Designed as a drop-in replacement for v1. Supports `connection_string`, `client_secret`, and `managed_identity` authentication.
+
+Use the [`processor_version`](#_processor_version) setting to select which processor to use.
+
+## Migrating from processor v1 to v2 [_migrating_from_processor_v1_to_v2]
+
+Processor v2 is a drop-in replacement for v1. In most cases, existing v1 configurations work with v2 without any changes. This section describes what happens during the migration and the adjustments you may need to make.
+
+:::{important}
+Processor v1 is deprecated since 9.3.0 and is planned for removal in 9.4.0. Users should migrate to v2 before upgrading to 9.4.0.
+:::
+
+### Checkpoint migration [_checkpoint_migration]
+
+When switching from v1 to v2, the input automatically migrates checkpoint data so that event processing resumes from where v1 left off. No events are reprocessed.
+
+This behavior is controlled by the [`migrate_checkpoint`](#_migrate_checkpoint) setting, which defaults to `true`. On startup, the input reads the v1 checkpoint blobs from the storage container and writes them in the v2 format. If v2 checkpoints already exist for a partition, the migration is skipped for that partition.
+
+You can verify the migration by checking the Filebeat logs for messages like:
+
+```
+migrating checkpoint v1 information to v2
+migrated checkpoint v1 information to v2
+```
+
+### Configuration adjustments [_configuration_adjustments]
+
+**No changes required for basic setups.** If your v1 configuration uses `connection_string` authentication with `storage_account_key`, v2 auto-constructs a `storage_account_connection_string` from the storage account name and key. Your existing configuration continues to work as-is.
+
+However, you should plan to make the following adjustments:
+
+| v1 setting | v2 replacement | Notes |
+| --- | --- | --- |
+| `storage_account_key` | `storage_account_connection_string` | v2 prefers a full connection string. The key still works (auto-constructed) but is deprecated for v2. |
+| `resource_manager_endpoint` | `authority_host` | For sovereign clouds (China, Government, etc.). |
+
+### New capabilities in v2 [_new_capabilities_in_v2]
+
+Processor v2 introduces several new features not available in v1:
+
+- **Additional authentication methods**: `client_secret` and `managed_identity` auth types.
+- **WebSocket transport**: Set `transport: "websocket"` to connect through HTTP proxies or when port 5671 (AMQP) is blocked.
+- **Tunable batching**: Configure `partition_receive_timeout` and `partition_receive_count` to control how events are batched.
+- **Partition claiming interval**: Configure `processor_update_interval` to control how often the processor attempts to claim partitions.
+
+### Pinning to v1 temporarily [_pinning_to_v1_temporarily]
+
+To continue using v1 while planning the migration, explicitly set `processor_version: "v1"` in your configuration:
+
+```yaml
+filebeat.inputs:
+- type: azure-eventhub
+  processor_version: "v1"
+  # ... rest of your configuration
+```
+
+:::{warning}
+Processor v1 is planned for removal in 9.4.0. This is only a temporary measure to give you time to validate v2 in your environment.
+:::
+
 ## Example configurations
 
 ### Connection string authentication (processor v1)
@@ -261,7 +326,23 @@ The name of the storage account. Required.
 
 ### `storage_account_key` [_storage_account_key]
 
-The storage account key, this key will be used to authorize access to data in your storage account, option is required.
+The storage account key. Used to authorize access to data in your storage account.
+
+:::{note}
+This option is used by processor v1 only. Processor v2 prefers [`storage_account_connection_string`](#_storage_account_connection_string). When using processor v2 with `storage_account_key`, the input auto-constructs a connection string from the storage account name and key for backward compatibility — but you should migrate to `storage_account_connection_string`.
+:::
+
+### `storage_account_connection_string` [_storage_account_connection_string]
+
+```{applies_to}
+stack: ga 8.15.1
+```
+
+The connection string for the storage account. Required when using processor v2 with `connection_string` authentication.
+
+Format: `DefaultEndpointsProtocol=https;AccountName=<name>;AccountKey=<key>;EndpointSuffix=core.windows.net`
+
+When using `client_secret` or `managed_identity` authentication, this option is not required — the storage account uses the same credentials as the Event Hub.
 
 ### `storage_account_container` [_storage_account_container]
 
@@ -270,6 +351,72 @@ Optional, the name of the storage account container you would like to store the 
 ### `resource_manager_endpoint` [_resource_manager_endpoint]
 
 Optional, by default we are using the azure public environment, to override, users can provide a specific resource manager endpoint in order to use a different azure environment. Ex: [https://management.chinacloudapi.cn/](https://management.chinacloudapi.cn/) for azure ChinaCloud [https://management.microsoftazure.de/](https://management.microsoftazure.de/) for azure GermanCloud [https://management.azure.com/](https://management.azure.com/) for azure PublicCloud [https://management.usgovcloudapi.net/](https://management.usgovcloudapi.net/) for azure USGovernmentCloud Users can also use this in case of a Hybrid Cloud model, where one may define their own endpoints.
+
+:::{note}
+This option is used by processor v1 only. Processor v2 uses [`authority_host`](#_authority_host) instead for sovereign cloud environments.
+:::
+
+### `processor_version` [_processor_version]
+
+```{applies_to}
+stack: ga 8.15.1
+```
+
+Controls which processor version to use. Valid values are `v1` and `v2`. Default was `v1` in 8.15.1–9.2.x; changed to `v2` in 9.3.0.
+
+Processor v1 is deprecated and planned for removal in 9.4.0. Refer to [Migrating from processor v1 to v2](#_migrating_from_processor_v1_to_v2) for details.
+
+### `migrate_checkpoint` [_migrate_checkpoint]
+
+```{applies_to}
+stack: ga 8.15.1
+```
+
+Controls whether the input should migrate checkpoint information from v1 to v2 format on startup. Default is `true`. Processor v2 only.
+
+When enabled, the input reads existing v1 checkpoint blobs and writes them in the v2 format so that event processing resumes from where v1 left off. If v2 checkpoints already exist for a partition, the migration is skipped for that partition.
+
+### `processor_update_interval` [_processor_update_interval]
+
+```{applies_to}
+stack: ga 8.15.1
+```
+
+Controls how often the processor attempts to claim partitions. Default is `10s`. Processor v2 only.
+
+### `processor_start_position` [_processor_start_position]
+
+```{applies_to}
+stack: ga 8.15.1
+```
+
+Controls the start position for all partitions when no checkpoint exists. Valid values are `earliest` and `latest`. Default is `earliest`. Processor v2 only.
+
+### `partition_receive_timeout` [_partition_receive_timeout]
+
+```{applies_to}
+stack: ga 8.15.1
+```
+
+Controls the maximum time to wait for events per batch. Works together with [`partition_receive_count`](#_partition_receive_count) — the partition client waits up to `partition_receive_timeout` or for at least `partition_receive_count` events, then returns the events it has received. Default is `5s`. Processor v2 only.
+
+### `partition_receive_count` [_partition_receive_count]
+
+```{applies_to}
+stack: ga 8.15.1
+```
+
+Controls the maximum number of events per batch. Works together with [`partition_receive_timeout`](#_partition_receive_timeout) — the partition client waits up to `partition_receive_timeout` or for at least `partition_receive_count` events, then returns the events it has received. Default is `100`. Processor v2 only.
+
+### `transport` [_transport]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Controls the transport type for the Event Hub connection. Valid values are `amqp` (default) and `websocket`. Processor v2 only.
+
+Use `websocket` when connecting through HTTP proxies or when port 5671 (AMQP) is blocked.
 
 ## Metrics [_metrics_3]
 
