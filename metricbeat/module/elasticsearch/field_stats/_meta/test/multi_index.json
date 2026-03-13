@@ -1,0 +1,115 @@
+{
+    "_shards": {
+        "total": 4,
+        "successful": 4,
+        "failed": 0
+    },
+    "my-index-000001": {
+        "shards": [
+            {
+                "tracking_id": "A_LkEJn8TYWkWJn0Fq-xhA",
+                "tracking_started_at_millis": 1710000000000,
+                "routing": {
+                    "state": "STARTED",
+                    "primary": true,
+                    "node": "node-1",
+                    "relocating_node": null
+                },
+                "stats": {
+                    "all_fields": {
+                        "any": 100,
+                        "inverted_index": {
+                            "terms": 50,
+                            "postings": 40,
+                            "proximity": 10,
+                            "positions": 8,
+                            "term_frequencies": 30,
+                            "offsets": 5,
+                            "payloads": 0
+                        },
+                        "stored_fields": 60,
+                        "doc_values": 45,
+                        "points": 20,
+                        "norms": 15,
+                        "term_vectors": 0,
+                        "knn_vectors": 0
+                    },
+                    "fields": {
+                        "message": {
+                            "any": 100,
+                            "inverted_index": {
+                                "terms": 50,
+                                "postings": 40,
+                                "proximity": 10,
+                                "positions": 8,
+                                "term_frequencies": 30,
+                                "offsets": 5,
+                                "payloads": 0
+                            },
+                            "stored_fields": 60,
+                            "doc_values": 0,
+                            "points": 0,
+                            "norms": 15,
+                            "term_vectors": 0,
+                            "knn_vectors": 0
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    "my-index-000002": {
+        "shards": [
+            {
+                "tracking_id": "B_MnFKo9UZXlXKp1Gr-yiB",
+                "tracking_started_at_millis": 1710000100000,
+                "routing": {
+                    "state": "STARTED",
+                    "primary": true,
+                    "node": "node-2",
+                    "relocating_node": null
+                },
+                "stats": {
+                    "all_fields": {
+                        "any": 200,
+                        "inverted_index": {
+                            "terms": 100,
+                            "postings": 80,
+                            "proximity": 20,
+                            "positions": 16,
+                            "term_frequencies": 60,
+                            "offsets": 10,
+                            "payloads": 0
+                        },
+                        "stored_fields": 120,
+                        "doc_values": 90,
+                        "points": 40,
+                        "norms": 30,
+                        "term_vectors": 5,
+                        "knn_vectors": 0
+                    },
+                    "fields": {
+                        "status": {
+                            "any": 200,
+                            "inverted_index": {
+                                "terms": 100,
+                                "postings": 80,
+                                "proximity": 20,
+                                "positions": 16,
+                                "term_frequencies": 60,
+                                "offsets": 10,
+                                "payloads": 0
+                            },
+                            "stored_fields": 120,
+                            "doc_values": 90,
+                            "points": 40,
+                            "norms": 30,
+                            "term_vectors": 5,
+                            "knn_vectors": 0
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}

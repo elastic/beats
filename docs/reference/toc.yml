@@ -926,6 +926,7 @@ toc:
               - file: metricbeat/metricbeat-metricset-elasticsearch-ccr.md
               - file: metricbeat/metricbeat-metricset-elasticsearch-cluster_stats.md
               - file: metricbeat/metricbeat-metricset-elasticsearch-enrich.md
+              - file: metricbeat/metricbeat-metricset-elasticsearch-field_stats.md
               - file: metricbeat/metricbeat-metricset-elasticsearch-index.md
               - file: metricbeat/metricbeat-metricset-elasticsearch-index_recovery.md
               - file: metricbeat/metricbeat-metricset-elasticsearch-index_summary.md
