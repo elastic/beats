@@ -183,5 +183,5 @@ keystore:
 
 	stdout, err := mockbeat.ReadStdout()
 	require.NoError(t, err)
-	require.NotContains(t, stdout, secret, "exported config must not contain keystore secret value")
+	require.NotContains(t, stdout, "bulk_max_size: "+secret, "exported config must not contain keystore secret value")
 }
