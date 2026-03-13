@@ -10,6 +10,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"slices"
 	"strings"
 	"sync"
@@ -692,4 +693,440 @@ func dump(r io.ReadCloser) []byte {
 	var buf bytes.Buffer
 	io.Copy(&buf, r)
 	return buf.Bytes()
+}
+
+func TestMux(t *testing.T) {
+	ok := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+	t.Run("exact_match", func(t *testing.T) {
+		m := &mux{exact: make(map[string]http.Handler)}
+		m.add("/foo", ok)
+		if m.match("/foo") == nil {
+			t.Error("expected handler for /foo")
+		}
+		if m.match("/foo/bar") != nil {
+			t.Error("unexpected handler for /foo/bar")
+		}
+	})
+	t.Run("prefix_match", func(t *testing.T) {
+		m := &mux{exact: make(map[string]http.Handler)}
+		m.add("/a/", ok)
+		if m.match("/a/") == nil {
+			t.Error("expected handler for /a/")
+		}
+		if m.match("/a/b") == nil {
+			t.Error("expected handler for /a/b")
+		}
+		if m.match("/b/") != nil {
+			t.Error("unexpected handler for /b/")
+		}
+	})
+	t.Run("longest_prefix_wins", func(t *testing.T) {
+		m := &mux{exact: make(map[string]http.Handler)}
+		short := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		})
+		long := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.WriteHeader(http.StatusAccepted)
+		})
+		m.add("/a/", short)
+		m.add("/a/b/", long)
+		rec := newRecorder()
+		m.ServeHTTP(rec, httptest.NewRequest("GET", "/a/b/c", nil))
+		if rec.Code != http.StatusAccepted {
+			t.Errorf("got status %d, want %d", rec.Code, http.StatusAccepted)
+		}
+	})
+	t.Run("exact_beats_prefix", func(t *testing.T) {
+		m := &mux{exact: make(map[string]http.Handler)}
+		prefix := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		})
+		exact := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.WriteHeader(http.StatusAccepted)
+		})
+		m.add("/a/", prefix)
+		m.add("/a/b", exact)
+		rec := newRecorder()
+		m.ServeHTTP(rec, httptest.NewRequest("GET", "/a/b", nil))
+		if rec.Code != http.StatusAccepted {
+			t.Errorf("got status %d, want %d", rec.Code, http.StatusAccepted)
+		}
+	})
+	t.Run("remove_exact", func(t *testing.T) {
+		m := &mux{exact: make(map[string]http.Handler)}
+		m.add("/foo", ok)
+		m.add("/bar", ok)
+		empty := m.remove("/foo")
+		if empty {
+			t.Error("mux should not be empty")
+		}
+		if m.match("/foo") != nil {
+			t.Error("handler should be removed")
+		}
+		empty = m.remove("/bar")
+		if !empty {
+			t.Error("mux should be empty")
+		}
+	})
+	t.Run("remove_prefix", func(t *testing.T) {
+		m := &mux{exact: make(map[string]http.Handler)}
+		m.add("/a/", ok)
+		m.add("/b/", ok)
+		empty := m.remove("/a/")
+		if empty {
+			t.Error("mux should not be empty")
+		}
+		if m.match("/a/x") != nil {
+			t.Error("handler should be removed")
+		}
+		empty = m.remove("/b/")
+		if !empty {
+			t.Error("mux should be empty")
+		}
+	})
+	t.Run("not_found", func(t *testing.T) {
+		m := &mux{exact: make(map[string]http.Handler)}
+		m.add("/foo", ok)
+		rec := newRecorder()
+		m.ServeHTTP(rec, httptest.NewRequest("GET", "/bar", nil))
+		if rec.Code != http.StatusNotFound {
+			t.Errorf("got status %d, want %d", rec.Code, http.StatusNotFound)
+		}
+	})
+}
+
+func newRecorder() *httptest.ResponseRecorder {
+	return httptest.NewRecorder()
+}
+
+func TestJoinerDeregisterKeepsServer(t *testing.T) {
+	servers := pool{servers: make(map[string]*server)}
+	var pub publisher
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+
+	ctxA, cancelA := newCtx("test", "input-a")
+	ctxB, cancelB := newCtx("test", "input-b")
+
+	cfgA := &httpEndpoint{
+		addr: "127.0.0.1:9021",
+		config: config{
+			ResponseCode:  http.StatusOK,
+			ResponseBody:  `{"message": "success"}`,
+			ListenAddress: "127.0.0.1",
+			ListenPort:    "9021",
+			URL:           "/a/",
+			Prefix:        "json",
+			ContentType:   "application/json",
+		},
+	}
+	cfgB := &httpEndpoint{
+		addr: "127.0.0.1:9021",
+		config: config{
+			ResponseCode:  http.StatusOK,
+			ResponseBody:  `{"message": "success"}`,
+			ListenAddress: "127.0.0.1",
+			ListenPort:    "9021",
+			URL:           "/b/",
+			Prefix:        "json",
+			ContentType:   "application/json",
+		},
+	}
+
+	var wg sync.WaitGroup
+	errA := make(chan error, 1)
+	errB := make(chan error, 1)
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		errA <- servers.serve(ctxA, cfgA, pub.Publish, metrics)
+	}()
+	go func() {
+		defer wg.Done()
+		errB <- servers.serve(ctxB, cfgB, pub.Publish, metrics)
+	}()
+	time.Sleep(500 * time.Millisecond)
+
+	// Stop B (joiner). A's server should stay alive.
+	cancelB()
+	select {
+	case err := <-errB:
+		if err != nil {
+			t.Errorf("joiner returned unexpected error: %v", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("joiner did not return in time")
+	}
+
+	// A's endpoint should still work.
+	resp, err := doRequest("", "http://127.0.0.1:9021/a/", "application/json", strings.NewReader(`{"x":1}`))
+	if err != nil {
+		t.Fatalf("request to remaining endpoint failed: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("got status %d, want %d", resp.StatusCode, http.StatusOK)
+	}
+
+	// B's endpoint should be gone (404).
+	resp, err = doRequest("", "http://127.0.0.1:9021/b/", "application/json", strings.NewReader(`{"x":2}`))
+	if err != nil {
+		t.Fatalf("request to removed endpoint failed: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusNotFound {
+		t.Errorf("got status %d, want %d for removed endpoint", resp.StatusCode, http.StatusNotFound)
+	}
+
+	// Stop A (last input). Server should shut down.
+	cancelA()
+	select {
+	case err := <-errA:
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			t.Errorf("creator returned unexpected error: %v", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("creator did not return in time")
+	}
+	wg.Wait()
+}
+
+func TestCreatorDeregisterKeepsServer(t *testing.T) {
+	servers := pool{servers: make(map[string]*server)}
+	var pub publisher
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+
+	ctxA, cancelA := newCtx("test", "input-a")
+	ctxB, cancelB := newCtx("test", "input-b")
+
+	cfgA := &httpEndpoint{
+		addr: "127.0.0.1:9022",
+		config: config{
+			ResponseCode:  http.StatusOK,
+			ResponseBody:  `{"message": "success"}`,
+			ListenAddress: "127.0.0.1",
+			ListenPort:    "9022",
+			URL:           "/a/",
+			Prefix:        "json",
+			ContentType:   "application/json",
+		},
+	}
+	cfgB := &httpEndpoint{
+		addr: "127.0.0.1:9022",
+		config: config{
+			ResponseCode:  http.StatusOK,
+			ResponseBody:  `{"message": "success"}`,
+			ListenAddress: "127.0.0.1",
+			ListenPort:    "9022",
+			URL:           "/b/",
+			Prefix:        "json",
+			ContentType:   "application/json",
+		},
+	}
+
+	var wg sync.WaitGroup
+	errA := make(chan error, 1)
+	errB := make(chan error, 1)
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		errA <- servers.serve(ctxA, cfgA, pub.Publish, metrics)
+	}()
+	go func() {
+		defer wg.Done()
+		errB <- servers.serve(ctxB, cfgB, pub.Publish, metrics)
+	}()
+	time.Sleep(500 * time.Millisecond)
+
+	// Stop A (creator). B's server should stay alive.
+	cancelA()
+	select {
+	case err := <-errA:
+		if err != nil {
+			t.Errorf("creator returned unexpected error: %v", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("creator did not return in time")
+	}
+
+	// B's endpoint should still work.
+	resp, err := doRequest("", "http://127.0.0.1:9022/b/", "application/json", strings.NewReader(`{"x":1}`))
+	if err != nil {
+		t.Fatalf("request to remaining endpoint failed: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("got status %d, want %d", resp.StatusCode, http.StatusOK)
+	}
+
+	// A's endpoint should be gone (404).
+	resp, err = doRequest("", "http://127.0.0.1:9022/a/", "application/json", strings.NewReader(`{"x":2}`))
+	if err != nil {
+		t.Fatalf("request to removed endpoint failed: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusNotFound {
+		t.Errorf("got status %d, want %d for removed endpoint", resp.StatusCode, http.StatusNotFound)
+	}
+
+	// Stop B (last input). Server should shut down.
+	cancelB()
+	select {
+	case err := <-errB:
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			t.Errorf("last input returned unexpected error: %v", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("last input did not return in time")
+	}
+	wg.Wait()
+}
+
+func TestPatternReregistration(t *testing.T) {
+	servers := pool{servers: make(map[string]*server)}
+	var pub publisher
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+
+	cfg := &httpEndpoint{
+		addr: "127.0.0.1:9023",
+		config: config{
+			ResponseCode:  http.StatusOK,
+			ResponseBody:  `{"message": "success"}`,
+			ListenAddress: "127.0.0.1",
+			ListenPort:    "9023",
+			URL:           "/a/",
+			Prefix:        "json",
+			ContentType:   "application/json",
+		},
+	}
+
+	// First registration.
+	ctx1, cancel1 := newCtx("test", "input-1")
+	var wg sync.WaitGroup
+	err1 := make(chan error, 1)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err1 <- servers.serve(ctx1, cfg, pub.Publish, metrics)
+	}()
+	time.Sleep(500 * time.Millisecond)
+
+	resp, err := doRequest("", "http://127.0.0.1:9023/a/", "application/json", strings.NewReader(`{"x":1}`))
+	if err != nil {
+		t.Fatalf("first registration request failed: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("got status %d, want %d", resp.StatusCode, http.StatusOK)
+	}
+
+	// Deregister (also shuts down server since it's the only input).
+	cancel1()
+	select {
+	case err := <-err1:
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			t.Errorf("first registration returned unexpected error: %v", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("first registration did not return in time")
+	}
+	wg.Wait()
+
+	// Re-register same pattern on a new server.
+	ctx2, cancel2 := newCtx("test", "input-2")
+	err2 := make(chan error, 1)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err2 <- servers.serve(ctx2, cfg, pub.Publish, metrics)
+	}()
+	time.Sleep(500 * time.Millisecond)
+
+	resp, err = doRequest("", "http://127.0.0.1:9023/a/", "application/json", strings.NewReader(`{"x":2}`))
+	if err != nil {
+		t.Fatalf("re-registration request failed: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("got status %d, want %d after re-registration", resp.StatusCode, http.StatusOK)
+	}
+
+	cancel2()
+	select {
+	case err := <-err2:
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			t.Errorf("re-registration returned unexpected error: %v", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("re-registration did not return in time")
+	}
+	wg.Wait()
+}
+
+func TestSimultaneousShutdown(t *testing.T) {
+	servers := pool{servers: make(map[string]*server)}
+	var pub publisher
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+
+	ctxA, cancelA := newCtx("test", "input-a")
+	ctxB, cancelB := newCtx("test", "input-b")
+
+	cfgA := &httpEndpoint{
+		addr: "127.0.0.1:9024",
+		config: config{
+			ResponseCode:  http.StatusOK,
+			ResponseBody:  `{"message": "success"}`,
+			ListenAddress: "127.0.0.1",
+			ListenPort:    "9024",
+			URL:           "/a/",
+			Prefix:        "json",
+			ContentType:   "application/json",
+		},
+	}
+	cfgB := &httpEndpoint{
+		addr: "127.0.0.1:9024",
+		config: config{
+			ResponseCode:  http.StatusOK,
+			ResponseBody:  `{"message": "success"}`,
+			ListenAddress: "127.0.0.1",
+			ListenPort:    "9024",
+			URL:           "/b/",
+			Prefix:        "json",
+			ContentType:   "application/json",
+		},
+	}
+
+	var wg sync.WaitGroup
+	errA := make(chan error, 1)
+	errB := make(chan error, 1)
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		errA <- servers.serve(ctxA, cfgA, pub.Publish, metrics)
+	}()
+	go func() {
+		defer wg.Done()
+		errB <- servers.serve(ctxB, cfgB, pub.Publish, metrics)
+	}()
+	time.Sleep(500 * time.Millisecond)
+
+	// Cancel both at once.
+	cancelA()
+	cancelB()
+
+	for _, ch := range []chan error{errA, errB} {
+		select {
+		case err := <-ch:
+			if err != nil && !errors.Is(err, http.ErrServerClosed) {
+				t.Errorf("unexpected error: %v", err)
+			}
+		case <-time.After(5 * time.Second):
+			t.Fatal("input did not return in time")
+		}
+	}
+	wg.Wait()
 }

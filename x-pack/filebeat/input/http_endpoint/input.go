@@ -22,6 +22,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -43,7 +44,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 const (
@@ -157,28 +157,33 @@ func sanitizeFileName(name string) string {
 // servers is the package-level server pool.
 var servers = pool{servers: make(map[string]*server)}
 
-// pool is a concurrence-safe pool of http servers.
+// pool is a concurrent-safe pool of HTTP servers.
+//
+// Lock ordering: pool.mu must be acquired before [mux].mu (the
+// read-write lock inside each [server]'s mux). Registration,
+// deregistration, and listener-goroutine cleanup all acquire pool.mu
+// first; mux.ServeHTTP acquires only mux.mu (read lock) and never
+// pool.mu.
 type pool struct {
 	mu sync.Mutex
 	// servers is the server pool keyed on their address/port.
 	servers map[string]*server
 }
 
-// serve runs an http server configured with the provided end-point and
-// publishing to pub. The server will run until either the context is
-// cancelled or the context of another end-point sharing the same address
-// has had its context cancelled. If an end-point is re-registered with
-// the same address and mux pattern, serve will return an error.
+// serve registers a handler for the given endpoint on a shared HTTP server,
+// blocking until the input's context is cancelled or the server dies. Each
+// input monitors its own context and deregisters cleanly when stopped; the
+// server lives as long as at least one input is registered.
 func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metrics *inputMetrics) error {
 	log := ctx.Logger.With("address", e.addr)
-	pattern := e.config.URL
 
-	u, err := url.Parse(pattern)
+	u, err := url.Parse(e.config.URL)
 	if err != nil {
 		ctx.UpdateStatus(status.Failed, "configured URL is invalid: "+err.Error())
 		return err
 	}
-	metrics.route.Set(u.Path)
+	pattern := u.Path
+	metrics.route.Set(pattern)
 	metrics.isTLS.Set(e.tlsConfig != nil)
 
 	var prg *program
@@ -190,12 +195,20 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 		}
 	}
 
+	// Derive a per-input handler context from the input's cancellation.
+	// This context is cancelled during deregistration so in-flight ACK
+	// waits abort before the pipeline client is closed.
+	handlerCtx, handlerCancel := context.WithCancel(
+		v2.GoContextFromCanceler(ctx.Cancelation),
+	)
+
 	p.mu.Lock()
 	s, ok := p.servers[e.addr]
 	if ok {
 		err = checkTLSConsistency(e.addr, s.tls, e.config.TLS)
 		if err != nil {
 			p.mu.Unlock()
+			handlerCancel()
 			ctx.UpdateStatus(status.Failed, err.Error())
 			return err
 		}
@@ -206,54 +219,89 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 			s.setErr(err)
 			s.cancel()
 			p.mu.Unlock()
+			handlerCancel()
 			ctx.UpdateStatus(status.Failed, err.Error())
 			return err
 		}
 		log.Infof("Adding %s end point to server on %s", pattern, e.addr)
-		s.mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx, log, metrics))
+		s.mux.add(pattern, newHandler(handlerCtx, e.config, prg, pub, ctx, log, metrics))
 		s.idOf[pattern] = ctx.ID
+		s.handlerCancel[pattern] = handlerCancel
 		p.mu.Unlock()
-		<-s.ctx.Done()
-		return s.getErr()
-	}
+	} else {
+		m := &mux{exact: make(map[string]http.Handler)}
+		srv := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: m, ReadHeaderTimeout: 5 * time.Second}
+		s = &server{
+			idOf:          map[string]string{pattern: ctx.ID},
+			handlerCancel: map[string]context.CancelFunc{pattern: handlerCancel},
+			tls:           e.config.TLS,
+			mux:           m,
+			srv:           srv,
+			done:          make(chan struct{}),
+		}
+		s.ctx, s.cancel = context.WithCancel(context.Background())
+		m.add(pattern, newHandler(handlerCtx, e.config, prg, pub, ctx, log, metrics))
+		p.servers[e.addr] = s
+		p.mu.Unlock()
 
-	mux := http.NewServeMux()
-	srv := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux, ReadHeaderTimeout: 5 * time.Second}
-	s = &server{
-		idOf: map[string]string{pattern: ctx.ID},
-		tls:  e.config.TLS,
-		mux:  mux,
-		srv:  srv,
+		if e.tlsConfig != nil {
+			log.Infof("Starting HTTPS server on %s with %s end point", srv.Addr, pattern)
+		} else {
+			log.Infof("Starting HTTP server on %s with %s end point", srv.Addr, pattern)
+		}
+		go func() {
+			var listenErr error
+			if e.tlsConfig != nil {
+				listenErr = listenAndServeTLS(s.srv, "", "", metrics)
+			} else {
+				listenErr = listenAndServe(s.srv, metrics)
+			}
+			s.setErr(listenErr)
+			p.mu.Lock()
+			delete(p.servers, e.addr)
+			p.mu.Unlock()
+			s.cancel()
+			close(s.done)
+		}()
 	}
-	s.ctx, s.cancel = ctxtool.WithFunc(ctx.Cancelation, func() { srv.Close() })
-	mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx, log, metrics))
-	p.servers[e.addr] = s
-	p.mu.Unlock()
 
 	ctx.UpdateStatus(status.Running, "")
-	if e.tlsConfig != nil {
-		log.Infof("Starting HTTPS server on %s with %s end point", srv.Addr, pattern)
-		// The certificate is already loaded so we do not need
-		// to pass the cert file and key file parameters.
-		err = listenAndServeTLS(s.srv, "", "", metrics)
-	} else {
-		log.Infof("Starting HTTP server on %s with %s end point", srv.Addr, pattern)
-		err = listenAndServe(s.srv, metrics)
-	}
-	switch err {
-	case nil:
-		// This will never happen.
-	case http.ErrServerClosed:
+
+	select {
+	case <-ctx.Cancelation.Done():
 		ctx.UpdateStatus(status.Stopping, "")
-	default:
-		ctx.UpdateStatus(status.Failed, "server exited unexpectedly: "+err.Error())
+	case <-s.ctx.Done():
+		// Server died (listen error or last input on another goroutine
+		// closed it). Wait for the listener goroutine to finish so
+		// s.err is set before we read it.
+		<-s.done
+		err := s.getErr()
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			ctx.UpdateStatus(status.Failed, "server exited unexpectedly: "+err.Error())
+		} else {
+			ctx.UpdateStatus(status.Stopping, "")
+		}
+		return err
 	}
+
+	// This input was stopped. Deregister under pool lock.
 	p.mu.Lock()
-	delete(p.servers, e.addr)
+	s.handlerCancel[pattern]()
+	delete(s.handlerCancel, pattern)
+	empty := s.mux.remove(pattern)
+	delete(s.idOf, pattern)
 	p.mu.Unlock()
-	s.setErr(err)
-	s.cancel()
-	return err
+
+	if empty {
+		// Tell the listener to stop. Don't delete from the pool here:
+		// the listener goroutine removes the pool entry after the port
+		// is released, preventing a concurrent creator from getting
+		// "address already in use".
+		s.srv.Close()
+		<-s.done
+		return s.getErr()
+	}
+	return nil
 }
 
 func listenAndServeTLS(srv *http.Server, certFile, keyFile string, metrics *inputMetrics) error {
@@ -326,20 +374,30 @@ func renderTLSConfig(tls *tlscommon.ServerConfig) string {
 	return m.String()
 }
 
-// server is a collection of http end-points sharing the same underlying
-// http.Server.
+// server is a collection of HTTP end-points sharing the same underlying
+// http.Server. The server's lifetime is independent of any single input:
+// it runs until the last input deregisters or the listener returns an error.
 type server struct {
-	// idOf is a map of mux pattern
-	// to input IDs for the server.
+	// idOf maps mux pattern to input ID.
 	idOf map[string]string
+	// handlerCancel maps mux pattern to a function that cancels
+	// that handler's context, aborting in-flight ACK waits.
+	handlerCancel map[string]context.CancelFunc
 
 	tls *tlscommon.ServerConfig
 
-	mux *http.ServeMux
+	mux *mux
 	srv *http.Server
 
+	// ctx is cancelled when the server is shutting down (listener
+	// returned or last input triggered close). It is independent
+	// of any input's context.
 	ctx    context.Context
-	cancel func()
+	cancel context.CancelFunc
+
+	// done is closed by the listener goroutine after listenAndServe
+	// returns. Waiters use it to ensure s.err is set before reading.
+	done chan struct{}
 
 	mu  sync.Mutex
 	err error
@@ -355,6 +413,100 @@ func (s *server) getErr() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.err
+}
+
+// mux is a concurrent-safe HTTP request multiplexer that supports dynamic
+// handler registration and removal. It implements the path-matching subset
+// of [http.ServeMux] (as of Go 1.21, before the method and wildcard
+// extensions in Go 1.22):
+//
+//   - A pattern without a trailing "/" is an exact match.
+//     "/webhooks" matches only the request path "/webhooks".
+//
+//   - A pattern ending in "/" is a prefix match. The handler receives
+//     any request whose path starts with the pattern.
+//     "/events/" matches "/events/", "/events/auth0", "/events/a/b", etc.
+//
+//   - When multiple prefix patterns match a request, the longest one wins.
+//     Given "/a/" and "/a/b/", a request for "/a/b/c" matches "/a/b/".
+//
+//   - An exact match always takes priority over a prefix match.
+//     Given "/a/b" (exact) and "/a/" (prefix), a request for "/a/b"
+//     matches the exact pattern.
+//
+//   - If no pattern matches, the request gets a 404.
+//
+// Unlike [http.ServeMux], mux does not support host-specific patterns,
+// method routing, or Go 1.22 wildcard segments. Handlers can be removed
+// at runtime via remove; this is the reason it exists instead of
+// using [http.ServeMux] directly.
+type mux struct {
+	mu     sync.RWMutex
+	exact  map[string]http.Handler
+	prefix []prefixEntry // sorted longest-first
+}
+
+type prefixEntry struct {
+	pattern string
+	handler http.Handler
+}
+
+// add registers a handler for pattern. It is the caller's responsibility
+// to check for duplicates before calling add.
+func (m *mux) add(pattern string, handler http.Handler) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if strings.HasSuffix(pattern, "/") {
+		m.prefix = append(m.prefix, prefixEntry{pattern: pattern, handler: handler})
+		sort.Slice(m.prefix, func(i, j int) bool {
+			return len(m.prefix[i].pattern) > len(m.prefix[j].pattern)
+		})
+	} else {
+		m.exact[pattern] = handler
+	}
+}
+
+// remove deregisters the handler for pattern. It returns true if the mux
+// has no remaining handlers.
+func (m *mux) remove(pattern string) bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if strings.HasSuffix(pattern, "/") {
+		for i, e := range m.prefix {
+			if e.pattern == pattern {
+				m.prefix = append(m.prefix[:i], m.prefix[i+1:]...)
+				break
+			}
+		}
+	} else {
+		delete(m.exact, pattern)
+	}
+	return len(m.exact) == 0 && len(m.prefix) == 0
+}
+
+func (m *mux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	m.mu.RLock()
+	h := m.match(r.URL.Path)
+	m.mu.RUnlock()
+	if h == nil {
+		http.NotFound(w, r)
+		return
+	}
+	h.ServeHTTP(w, r)
+}
+
+// match returns the best handler for path. Caller must hold at least a
+// read lock on m.mu.
+func (m *mux) match(path string) http.Handler {
+	if h, ok := m.exact[path]; ok {
+		return h
+	}
+	for _, e := range m.prefix {
+		if strings.HasPrefix(path, e.pattern) {
+			return e.handler
+		}
+	}
+	return nil
 }
 
 func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event), stat status.StatusReporter, log *logp.Logger, metrics *inputMetrics) http.Handler {
