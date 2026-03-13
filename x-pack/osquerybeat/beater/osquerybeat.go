@@ -461,14 +461,16 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	// Schedule execution count from start_date + interval (same across agents)
 	scheduleExecutionCount := nativeScheduleExecutionCount(qi.StartDate, qi.Interval, res.UnixTime)
 
-	var (
-		hits      []map[string]interface{}
-		totalHits int
-	)
+	var totalHits int
 
 	responseID := uuid.Must(uuid.NewV4()).String()
 	runTime := time.Unix(res.UnixTime, 0)
 	plannedScheduleTime := nativePlannedScheduleTime(qi.StartDate, qi.Interval, res.UnixTime)
+	publishResolved := func(resultType, action string, hits []map[string]interface{}) {
+		totalHits += len(hits)
+		meta := queryResultMeta(resultType, action, res, scheduleExecutionCount, plannedScheduleTime)
+		bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, meta, hits, qi.ECSMapping, nil)
+	}
 
 	if res.Action == "snapshot" {
 		snapshot, err := cli.ResolveResult(ctx, qi.Query, res.Hits)
@@ -476,10 +478,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 			bt.log.Errorf("failed to resolve snapshot query result types: %s", res.Name)
 			return
 		}
-		hits = append(hits, snapshot...)
-		totalHits = len(hits)
-		meta := queryResultMeta("snapshot", "", res, scheduleExecutionCount, plannedScheduleTime)
-		bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, meta, hits, qi.ECSMapping, nil)
+		publishResolved("snapshot", "", snapshot)
 	} else {
 		if len(res.DiffResults.Added) > 0 {
 			added, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Added)
@@ -487,9 +486,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 				bt.log.Errorf(`failed to resolve diff query "added" result types: %s`, res.Name)
 				return
 			}
-			hits = append(hits, added...)
-			meta := queryResultMeta("diff", "added", res, scheduleExecutionCount, plannedScheduleTime)
-			bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, meta, hits, qi.ECSMapping, nil)
+			publishResolved("diff", "added", added)
 		}
 		if len(res.DiffResults.Removed) > 0 {
 			removed, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Removed)
@@ -497,11 +494,8 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 				bt.log.Errorf(`failed to resolve diff query "removed" result types: %s`, res.Name)
 				return
 			}
-			hits = append(hits, removed...)
-			meta := queryResultMeta("diff", "removed", res, scheduleExecutionCount, plannedScheduleTime)
-			bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, meta, hits, qi.ECSMapping, nil)
+			publishResolved("diff", "removed", removed)
 		}
-		totalHits = len(hits)
 	}
 
 	bt.pub.PublishScheduledResponse(scheduleID, qi.PackID, qi.SpaceID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
