@@ -74,11 +74,11 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 		var err error
 		jctl.stdout, err = cmd.StdoutPipe()
 		if err != nil {
-			return &journalctl{}, fmt.Errorf("cannot get stdout pipe: %w", err)
+			return nil, fmt.Errorf("cannot get stdout pipe: %w", err)
 		}
 		jctl.stderr, err = cmd.StderrPipe()
 		if err != nil {
-			return &journalctl{}, fmt.Errorf("cannot get stderr pipe: %w", err)
+			return nil, fmt.Errorf("cannot get stderr pipe: %w", err)
 		}
 
 		processCmdLine := strings.Join(append([]string{journalctlPath}, args...), " ")
@@ -92,7 +92,7 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 		// Start the process before trying to read from the pipes
 		// See: https://pkg.go.dev/os/exec#example-Cmd.StdoutPipe
 		if err := cmd.Start(); err != nil {
-			return &journalctl{}, fmt.Errorf("cannot start journalctl: %w. Chroot: %s", err, chroot)
+			return nil, fmt.Errorf("cannot start journalctl: %w. Chroot: %s", err, chroot)
 		}
 
 		jctl.logger = jctl.logger.With(
