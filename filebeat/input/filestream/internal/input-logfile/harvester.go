@@ -163,6 +163,8 @@ func (hg *defaultHarvesterGroup) SetObserver(c chan HarvesterStatus) {
 // be started. Start does not block.
 func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 	sourceName := hg.identifier.ID(src)
+
+	// TODO(AndersonQ): do we need it? it's 1k for the growing fingerprint
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 
 	fn := startHarvester(ctx, hg, src, false, hg.metrics, hg.inputID)
@@ -306,7 +308,7 @@ func startHarvester(
 			ctx.Logger.Debugf("Harvester '%s' closed with offset: %d", srcID, st.Offset)
 		}()
 
-		ctx.Logger.Debug("Starting harvester for file")
+		ctx.Logger.Debug("Starting harvester for file. offset %v", resource.cursor)
 		err = hg.harvester.Run(ctx, src, cursor, publisher, metrics)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			hg.readers.remove(srcID)

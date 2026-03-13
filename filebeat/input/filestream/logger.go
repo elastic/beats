@@ -27,9 +27,20 @@ func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent, src loginp.Sourc
 		"operation", event.Op.String(),
 		"source_name", src.Name(),
 	)
-	if event.Descriptor.Fingerprint != "" {
-		log = log.With("fingerprint", event.Descriptor.Fingerprint)
-	}
+	// if event.Descriptor.Fingerprint != "" {
+	// 	fp := event.Descriptor.Fingerprint
+	// 	isGrowingFP := false
+	// 	if fs, ok := src.(fileSource); ok {
+	// 		isGrowingFP = fs.identifierGenerator == growingFingerprintName
+	// 	}
+	// 	if isGrowingFP {
+	// 		hash := sha256.Sum256([]byte(fp))
+	// 		hashedFP := hex.EncodeToString(hash[:])
+	// 		log.Debugf("growing fingerprint %s hashed to %s", fp, hashedFP)
+	// 		fp = hashedFP
+	// 	}
+	// 	log = log.With("fingerprint", fp)
+	// }
 	if event.Descriptor.Info != nil {
 		osID := event.Descriptor.Info.GetOSState().Identifier()
 		if osID != "" {
