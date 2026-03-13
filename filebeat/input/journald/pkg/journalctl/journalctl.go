@@ -193,10 +193,15 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 	}
 }
 
-// Kill Terminates the journalctl process using a SIGKILL.
+// Kill terminates the journalctl process by sending SIGKILL, then it
+// blocks until all background goroutines (stdout/stderr readers and
+// the process-wait goroutine) have exited.
 func (j *journalctl) Kill() error {
 	j.logger.Debug("sending SIGKILL to journalctl")
-	return j.cmd.Process.Kill()
+	err := j.cmd.Process.Kill()
+	j.logger.Debug("waiting for reader goroutines to finish")
+	j.waitDone.Wait()
+	return err
 }
 
 // Next returns the next journal entry (as JSON). If `finished` is true, then
