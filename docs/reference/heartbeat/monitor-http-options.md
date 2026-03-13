@@ -182,7 +182,7 @@ Example configuration: This monitor examines the response body for the strings `
       - saved
 ```
 
-Under `check.response.body`, specify these options: **`positive`**:: This option has the same behavior as given a list of regular expressions under `check.response.body`. **`negative`**:: A list of regular expressions to match the the body output negatively. Return match failed if single expression matches. HTTP response bodies of up to 100MiB are supported.
+Under `check.response.body`, specify these options: **`positive`**:: This option has the same behavior as given a list of regular expressions under `check.response.body`. **`negative`**:: A list of regular expressions to match the body output negatively. Return match failed if single expression matches. HTTP response bodies of up to 100MiB are supported.
 
 Example configuration: This monitor examines the response body for the strings *foo* or *Foo*
 

@@ -469,7 +469,7 @@ Process metrics.
 
 
 **`system.diskio.io.time`**
-:   The total number of of milliseconds spent doing I/Os.
+:   The total number of milliseconds spent doing I/Os.
 
     type: long
 
