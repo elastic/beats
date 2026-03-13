@@ -165,7 +165,7 @@ hosts: localhost
 topic: foo`)
 		logger := logptest.NewTestingLogger(t, "")
 
-		cfg, err := ReadConfig(c)
+		cfg, err := readConfig(c)
 		if err != nil {
 			t.Fatalf("Can not create test configuration: %v", err)
 		}
@@ -185,7 +185,7 @@ hosts: localhost
 topic: foo`)
 		logger := logptest.NewTestingLogger(t, "")
 
-		cfg, err := ReadConfig(c)
+		cfg, err := readConfig(c)
 		if err != nil {
 			t.Fatalf("Can not create test configuration: %v", err)
 		}
