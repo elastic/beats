@@ -14,14 +14,14 @@ Review important information about the  8.19.13 release.
 
 **All**
 
-* Update elastic-agent-system-metrics to v0.14.0. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
-* Update elastic-agent-libs to v0.32.2. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
+* Update elastic-agent-system-metrics to v0.14.0. https://github.com/elastic/beats/pull/48816[#48816] 
+* Update elastic-agent-libs to v0.32.2. https://github.com/elastic/beats/pull/48857[#48857] 
 * Update OpenTelemetry SDK to version v1.40.0. https://github.com/elastic/beats/pull/49126[#49126] 
 
 
 **Osquerybeat**
 
-* Update osquery-go dependency to v0.0.0-20260226222546-0cc22f415e57. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
+* Update osquery-go dependency to v0.0.0-20260226222546-0cc22f415e57. https://github.com/elastic/beats/pull/49280[#49280] 
 
 
 
@@ -40,14 +40,14 @@ The 8.19.13 release adds the following new and notable features.
 
 **Elastic agent**
 
-* Fix a bug that could report stopped inputs as still running. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
+* Fix a bug that could report stopped inputs as still running. https://github.com/elastic/beats/pull/49285[#49285] 
 
 
 **Metricbeat**
 
-* Add zswap compressed swap cache metrics to system memory metricset. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
-* Addition of Elasticsearch index mode and codec settings in Metricbeat index stats module. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
-* Add cgroupv2 CPU metrics to system.process dataset. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
+* Add zswap compressed swap cache metrics to system memory metricset. https://github.com/elastic/beats/pull/49098[#49098] 
+* Addition of Elasticsearch index mode and codec settings in Metricbeat index stats module. https://github.com/elastic/beats/pull/49237[#49237] 
+* Add cgroupv2 CPU metrics to system.process dataset. https://github.com/elastic/beats/pull/49098[#49098] 
 
 
 [discrete]
@@ -59,21 +59,21 @@ The 8.19.13 release adds the following new and notable features.
 
 **Filebeat**
 
-* Add optional token_url support for JWT Bearer Flow in Salesforce input. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/43963[#43963]
-* Empty files are excluded from processing in filestream as early as possible. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
+* Add optional token_url support for JWT Bearer Flow in Salesforce input. https://github.com/elastic/beats/pull/43933[#43933] https://github.com/elastic/beats/issues/43963[#43963]
+* Empty files are excluded from processing in filestream as early as possible. https://github.com/elastic/beats/pull/49196[#49196] 
 
 
 **Metricbeat**
 
-* Report memory pressure stall information (PSI) for cgroup v2. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
-* Add swap field to system.process.memory metric set in metricbeat. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
-* Add a config to improve wildcard handling to report actual object names. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
+* Report memory pressure stall information (PSI) for cgroup v2. https://github.com/elastic/beats/pull/48054[#48054] 
+* Add swap field to system.process.memory metric set in metricbeat. https://github.com/elastic/beats/pull/48334[#48334] 
+* Add a config to improve wildcard handling to report actual object names. https://github.com/elastic/beats/pull/48644[#48644] 
 
 
 **Packetbeat**
 
 * Improves resiliency of the AMQP parser against invalid or corrupt data frames. https://github.com/elastic/beats/pull/48033[#48033] 
-* Bump bundled Windows Npcap OEM installer to v1.87. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
+* Bump bundled Windows Npcap OEM installer to v1.87. https://github.com/elastic/beats/pull/49167[#49167] 
 
 
 
@@ -87,19 +87,21 @@ The 8.19.13 release adds the following new and notable features.
 
 **All**
 
-* Improve append processor behavior when merging values and removing duplicates. https://github.com/elastic/beats/pull/49021[#49021] https://github.com/elastic/beats/issues/49020[#49020]
+* Improve append processor behavior when merging values and removing duplicates. https://github.com/elastic/beats/pull/49021[#49021] 
 
 
 **Filebeat**
 
-* Fix AD entity analytics to resolve nested group membership and escape DN filter values. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
-* Fix handling of Crowdstrike streaming input state in retryable errors. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
-* Demote missing user/device state lookup to debug log in Azure entity analytics provider. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49360[#49360] https://github.com/elastic/beats/issues/49210[#49210]
-* Fix CrowdStrike streaming session refresh scheduling to avoid tight refresh loops. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/49158[#49158]
+* Fix Kubernetes secret variable resolution in Filebeat autodiscover hints. https://github.com/elastic/beats/pull/48787[#48787] 
+* Fix AD entity analytics to resolve nested group membership and escape DN filter values. https://github.com/elastic/beats/pull/48815[#48815] 
+* Fix handling of Crowdstrike streaming input state in retryable errors. https://github.com/elastic/beats/pull/49077[#49077] 
+* Fix memory leak when harvester_limit is set. https://github.com/elastic/beats/pull/49114[#49114] 
+* Demote missing user/device state lookup to debug log in Azure entity analytics provider. https://github.com/elastic/beats/pull/49127[#49127] 
+* Fix CrowdStrike streaming session refresh scheduling to avoid tight refresh loops. https://github.com/elastic/beats/pull/49175[#49175] https://github.com/elastic/beats/issues/49158[#49158]
 
 
 **Winlogbeat**
 
-* Restore suppression of repeated channel-not-found open errors in winlogbeat eventlog runner. https://github.com/elastic/beats/pull/46336[#46336] https://github.com/elastic/beats/pull/49365[#49365] https://github.com/elastic/beats/pull/49425[#49425] https://github.com/elastic/beats/pull/49307[#49307] https://github.com/elastic/beats/pull/49430[#49430] https://github.com/elastic/beats/pull/49431[#49431] https://github.com/elastic/beats/pull/49442[#49442] https://github.com/elastic/beats/issues/48979[#48979]
+* Restore suppression of repeated channel-not-found open errors in winlogbeat eventlog runner. https://github.com/elastic/beats/pull/48999[#48999] https://github.com/elastic/beats/issues/48979[#48979]
 
 // end 8.19.13 relnotes
