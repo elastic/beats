@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
@@ -199,8 +200,10 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 func (j *journalctl) Kill() error {
 	j.logger.Debug("sending SIGKILL to journalctl")
 	err := j.cmd.Process.Kill()
-	j.logger.Debug("waiting for reader goroutines to finish")
 	j.waitDone.Wait()
+	if errors.Is(err, os.ErrProcessDone) {
+		return nil
+	}
 	return err
 }
 
