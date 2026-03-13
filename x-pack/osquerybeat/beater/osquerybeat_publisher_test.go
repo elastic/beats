@@ -21,7 +21,7 @@ type mockBeatPublisher struct {
 var _ osquerybeatPublisher = (*mockBeatPublisher)(nil)
 var _ scheduledQueryPublisher = (*mockBeatPublisher)(nil)
 
-func (m *mockBeatPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (m *mockBeatPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 }
 
 func (m *mockBeatPublisher) PublishActionResult(req map[string]interface{}, res map[string]interface{}) {

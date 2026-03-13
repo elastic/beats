@@ -64,7 +64,7 @@ func TestHitToEvent(t *testing.T) {
 
 	for i := 0; i < maxMask; i++ {
 		p := genParams(i)
-		ev := hitToEvent(p.index, p.eventType, p.idValue, p.idFieldKey, p.responseID, "", p.meta, p.hit, p.ecsm, p.reqData)
+		ev := hitToEvent(p.index, p.eventType, p.idValue, p.idFieldKey, p.responseID, "", "", p.meta, p.hit, p.ecsm, p.reqData)
 
 		if p.index != "" {
 			diff := cmp.Diff(p.index, ev.Meta[events.FieldMetaRawIndex])
@@ -208,6 +208,7 @@ func TestHitToEvent_SpaceID(t *testing.T) {
 		"schedule_id",
 		uuid.Must(uuid.NewV4()).String(),
 		spaceID,
+		"",
 		nil,
 		map[string]interface{}{"foo": "bar"},
 		nil,
@@ -215,6 +216,27 @@ func TestHitToEvent_SpaceID(t *testing.T) {
 	)
 
 	if diff := cmp.Diff(spaceID, ev.Fields["space_id"]); diff != "" {
+		t.Error(diff)
+	}
+}
+
+func TestHitToEvent_PackID(t *testing.T) {
+	packID := "pack-xyz"
+	ev := hitToEvent(
+		"logs-osquery_manager.result-default",
+		"osquery_manager",
+		"sched-123",
+		"schedule_id",
+		uuid.Must(uuid.NewV4()).String(),
+		"",
+		packID,
+		nil,
+		map[string]interface{}{"foo": "bar"},
+		nil,
+		nil,
+	)
+
+	if diff := cmp.Diff(packID, ev.Fields["pack_id"]); diff != "" {
 		t.Error(diff)
 	}
 }
