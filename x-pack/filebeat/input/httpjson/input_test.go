@@ -6,6 +6,7 @@ package httpjson
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -23,6 +24,7 @@ import (
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -36,8 +38,8 @@ var testCases = []struct {
 	expectedFile   string
 	expectedNoFile string
 	wantErr        error
-
-	skipReason string
+	skipReason     string
+	isStringArray  bool
 }{
 	{
 		name:        "simple_GET_request",
@@ -59,6 +61,16 @@ var testCases = []struct {
 		},
 		handler:  defaultHandler(http.MethodGet, "", ""),
 		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
+	{
+		name:        "simple_GET_request_returns_an_array_of_strings_no_events",
+		setupServer: newTestServer(httptest.NewServer),
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+		},
+		handler:  defaultHandler(http.MethodGet, "", `["123", "456"]`),
+		expected: nil,
 	},
 	{
 		name:        "request_honors_rate_limit",
@@ -1081,6 +1093,115 @@ var testCases = []struct {
 		},
 	},
 	{
+		name: "replace_with_clause_with_values_from_string_array",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/":
+					fmt.Fprintln(w, `{"text":["1", "2"]}`)
+				case "/2212/1":
+					fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+				case "/2212/2":
+					fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+				}
+			})
+			server := httptest.NewServer(r)
+			config["request.url"] = server.URL
+			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.text[:]"
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.method": http.MethodGet,
+						"replace":        "$.text[:]",
+						"replace_with":   "$.exportId,2212",
+					},
+				},
+			},
+		},
+		expected: []string{
+			`{"hello":{"world":"moon"}}`,
+			`{"space":{"cake":"pumpkin"}}`,
+		},
+	},
+	{
+		name: "replace_clause_with_string_from_string_array",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/":
+					fmt.Fprintln(w, `["1", "2"]`)
+				case "/2212/1":
+					fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+				case "/2212/2":
+					fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+				}
+			})
+			server := httptest.NewServer(r)
+			config["request.url"] = server.URL
+			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$[:]"
+			t.Cleanup(server.Close)
+		},
+
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.method": http.MethodGet,
+						"replace":        "$[:]",
+						"replace_with":   "$.exportId,2212",
+					},
+				},
+			},
+		},
+		expected: []string{
+			`{"hello":{"world":"moon"}}`,
+			`{"space":{"cake":"pumpkin"}}`,
+		},
+	},
+	{
+		name: "replace_clause_with_int_from_int_array",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/":
+					fmt.Fprintln(w, `[1, 2]`)
+				case "/2212/1":
+					fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+				case "/2212/2":
+					fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+				}
+			})
+			server := httptest.NewServer(r)
+			config["request.url"] = server.URL
+			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$[:]"
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.method": http.MethodGet,
+						"replace":        "$[:]",
+						"replace_with":   "$.exportId,2212",
+					},
+				},
+			},
+		},
+		expected: []string{
+			`{"hello":{"world":"moon"}}`,
+			`{"space":{"cake":"pumpkin"}}`,
+		},
+	},
+	{
 		name: "replace_with_clause_with_hardcoded_value_(no_dot_prefix)",
 		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -1434,9 +1555,14 @@ var testCases = []struct {
   </item>
 </order>
 `
-				io.ReadAll(r.Body)
+				_, err := io.ReadAll(r.Body)
 				r.Body.Close()
-				w.Write([]byte(text))
+				if err == nil {
+					_, err = w.Write([]byte(text))
+				}
+				if err != nil {
+					t.Errorf("error reading response %s", err.Error())
+				}
 			})
 			server := httptest.NewServer(r)
 			config["request.url"] = server.URL
@@ -1509,7 +1635,7 @@ var testCases = []struct {
 }
 
 func TestInput(t *testing.T) {
-	logp.TestingSetup()
+	logptest.NewTestingLogger(t, "")
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
@@ -1574,7 +1700,10 @@ func TestInput(t *testing.T) {
 					t.Errorf("unexpected event: %v", got)
 				}
 				cancel()
-				assert.NoError(t, g.Wait())
+				err := g.Wait()
+				if err != nil && !errors.Is(err, context.Canceled) {
+					assert.NoError(t, err)
+				}
 				return
 			}
 
@@ -1589,7 +1718,13 @@ func TestInput(t *testing.T) {
 				case got := <-chanClient.Channel:
 					val, err := got.Fields.GetValue("message")
 					assert.NoError(t, err)
-					assert.JSONEq(t, test.expected[receivedCount], val.(string))
+					valStr, ok := val.(string)
+					assert.True(t, ok, "message field should be a string")
+					if test.isStringArray {
+						assert.Equal(t, valStr, test.expected[receivedCount]) //nolint:errcheck,nolintlint // too strict for test
+					} else {
+						assert.JSONEq(t, test.expected[receivedCount], valStr) //nolint:errcheck,nolintlint // too strict for test
+					}
 					receivedCount += 1
 					if receivedCount == len(test.expected) {
 						cancel()
@@ -1597,9 +1732,13 @@ func TestInput(t *testing.T) {
 					}
 				}
 			}
+			assert.Equal(t, len(test.expected), receivedCount, "number of events received must match expected list size")
 			if test.expectedFile != "" {
 				if _, err := os.Stat(filepath.Join(tempDir, test.expectedFile)); err == nil {
-					assert.NoError(t, g.Wait())
+					err := g.Wait()
+					if err != nil && !errors.Is(err, context.Canceled) {
+						assert.NoError(t, err)
+					}
 				} else {
 					t.Errorf("Expected log filename not found")
 				}
@@ -1613,7 +1752,10 @@ func TestInput(t *testing.T) {
 					t.Errorf("unexpected files found: %v", paths)
 				}
 			}
-			assert.NoError(t, g.Wait())
+			err = g.Wait()
+			if err != nil && !errors.Is(err, context.Canceled) {
+				assert.NoError(t, err)
+			}
 		})
 	}
 }

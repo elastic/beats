@@ -61,15 +61,26 @@ func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Log
 
 	switch tresp := resp.body.(type) {
 	case []interface{}:
+		values := []string{}
 		for _, v := range tresp {
 			m, ok := v.(map[string]interface{})
 			if !ok {
-				msg := fmt.Sprintf("events must be JSON objects, but got %T: skipping", v)
-				log.Debug(msg)
-				stat.UpdateStatus(status.Degraded, msg)
+				if s, ok := v.(string); ok {
+					values = append(values, s)
+				} else {
+					msg := fmt.Sprintf("events must be JSON objects, but got %T: skipping", v)
+					log.Debug(msg)
+					stat.UpdateStatus(status.Degraded, msg)
+				}
 				continue
 			}
 			convertAndAppend(m)
+		}
+
+		if len(values) > 0 && (len(values) != len(tresp)) {
+			msg := fmt.Sprintf("events must be JSON objects or a string array but got strings mixed with json objects %v", values)
+			log.Debug(msg)
+			stat.UpdateStatus(status.Degraded, msg)
 		}
 	case map[string]interface{}:
 		convertAndAppend(tresp)
@@ -243,8 +254,8 @@ func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transfo
 				}
 
 				if err := rp.split.run(ctx, trCtx, tr, h); err != nil {
-					switch err { //nolint:errorlint // run never returns a wrapped error.
-					case errEmptyField:
+					switch err { //nolint:errorlint,nolintlint // run never returns a wrapped error
+					case errEmptyField: //nolint:errorlint,nolintlint // run never returns a wrapped error
 						// nothing else to send for this page
 						rp.log.Debug("split operation finished")
 					case errEmptyRootField:
