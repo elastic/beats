@@ -48,11 +48,13 @@ type Manager interface {
 	// Stop when this method is called, the manager will stop receiving new actions, no more action
 	// will be propagated to the handlers and will not try to configure any reloadable parts.
 	// When the manager is stop the callback will be called to signal that the system can terminate.
+	// If the wait parameter is true, Stop will wait for the stop callback to finish and all Manager
+	// goroutines to terminate before returning.
 	//
 	// Calls to 'CheckRawConfig()' or 'SetPayload()' will be ignored after calling stop.
 	//
 	// Note: Stop will not call 'UnregisterAction()' automatically.
-	Stop()
+	Stop(wait bool)
 
 	// AgentInfo returns the information of the agent to which the manager is connected.
 	AgentInfo() AgentInfo
@@ -143,7 +145,7 @@ func (n *FallbackManager) SetStopCallback(f func()) {
 	n.lock.Unlock()
 }
 
-func (n *FallbackManager) Stop() {
+func (n *FallbackManager) Stop(wait bool) {
 	n.lock.Lock()
 	defer n.lock.Unlock()
 	if n.stopFunc != nil {
@@ -151,9 +153,11 @@ func (n *FallbackManager) Stop() {
 		// because different Beats can have different requirements
 		// for their stop function, it's better to make sure it will
 		// only be called once.
-		n.stopOnce.Do(func() {
-			n.stopFunc()
-		})
+		if wait {
+			n.stopOnce.Do(n.stopFunc)
+		} else {
+			go n.stopOnce.Do(n.stopFunc)
+		}
 	}
 }
 

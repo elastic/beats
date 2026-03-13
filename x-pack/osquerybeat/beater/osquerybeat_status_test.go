@@ -75,7 +75,7 @@ func (m *testManager) Start() error {
 	m.started = true
 	return m.startErr
 }
-func (m *testManager) Stop()                               { m.stopped = true }
+func (m *testManager) Stop(_ bool)                         { m.stopped = true }
 func (m *testManager) SetPayload(map[string]any)           {}
 func (m *testManager) Enabled() bool                       { return true }
 func (m *testManager) AgentInfo() management.AgentInfo     { return management.AgentInfo{} }
