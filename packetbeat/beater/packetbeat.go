@@ -222,7 +222,7 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 
 	defer func() {
 		runner.Stop()
-		b.Manager.Stop()
+		b.Manager.Stop(true)
 	}()
 
 	for {

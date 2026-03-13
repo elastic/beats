@@ -1257,7 +1257,7 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 					files, b.Info.Beat)
 
 				b.shouldReexec = true
-				b.Manager.Stop()
+				b.Manager.Stop(false)
 
 				// we're done, finish the goroutine just for the sake of it
 				return

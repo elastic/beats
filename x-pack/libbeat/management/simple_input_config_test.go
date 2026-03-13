@@ -153,7 +153,7 @@ func TestSimpleInputConfig(t *testing.T) {
 	if err := m.Start(); err != nil {
 		t.Fatalf("could not start ManagerV2: %s", err)
 	}
-	defer m.Stop()
+	defer m.Stop(true)
 
 	require.Eventually(t, func() bool {
 		return stateReached.Load()

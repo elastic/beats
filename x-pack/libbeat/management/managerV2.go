@@ -85,7 +85,7 @@ type BeatV2Manager struct {
 	stopOnOutputReload bool
 	stopOnEmptyUnits   bool
 	stopMut            sync.Mutex
-	beatStop           sync.Once
+	stopWaitGroup      sync.WaitGroup
 
 	// sync channel for shutting down the manager after we get a stop from
 	// either the agent or the beat
@@ -296,7 +296,11 @@ func (cm *BeatV2Manager) Start() error {
 	ctx, canceller := context.WithCancel(ctx)
 	cm.errCanceller = canceller
 
-	go cm.watchErrChan(ctx)
+	cm.stopWaitGroup.Add(1)
+	go func() {
+		defer cm.stopWaitGroup.Done()
+		cm.watchErrChan(ctx)
+	}()
 	cm.client.RegisterDiagnosticHook(
 		"beat-rendered-config",
 		"the rendered config used by the beat",
@@ -304,13 +308,26 @@ func (cm *BeatV2Manager) Start() error {
 		"application/yaml",
 		cm.handleDebugYaml)
 
-	go cm.unitListen()
+	cm.stopWaitGroup.Add(1)
+	go func() {
+		defer cm.stopWaitGroup.Done()
+		cm.unitListen()
+	}()
 	cm.isRunning = true
 	return nil
 }
 
 // Stop stops the current Manager and close the connection to Elastic Agent.
-func (cm *BeatV2Manager) Stop() {
+// If wait is true, it waits for the manager's goroutines to terminate before returning.
+func (cm *BeatV2Manager) Stop(wait bool) {
+	cm.stop()
+	if wait {
+		cm.stopWaitGroup.Wait()
+	}
+}
+
+// stop asynchronously signals the manager goroutine to shut down.
+func (cm *BeatV2Manager) stop() {
 	cm.stopOnce.Do(func() {
 		close(cm.stopChan)
 	})
@@ -555,7 +572,7 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.mx.Unlock()
 
 			if len(cm.units) == 0 && cm.stopOnEmptyUnits {
-				cm.stopBeat()
+				cm.Stop(false)
 			}
 
 			cm.reload(units)
@@ -571,16 +588,14 @@ func (cm *BeatV2Manager) stopBeat() {
 	if !cm.isRunning {
 		return
 	}
+	cm.isRunning = false
 	cm.logger.Debugf("Stopping beat")
 	cm.UpdateStatus(status.Stopping, "Stopping")
 
-	cm.isRunning = false
 	cm.stopMut.Lock()
 	defer cm.stopMut.Unlock()
 	if cm.stopFunc != nil {
-		// I'm not 100% sure the once here is needed,
-		// but various beats tend to handle this in a not-quite-safe way
-		cm.beatStop.Do(cm.stopFunc)
+		cm.stopFunc()
 	}
 	cm.client.Stop()
 	cm.UpdateStatus(status.Stopped, "Stopped")
@@ -820,7 +835,7 @@ func (cm *BeatV2Manager) reloadOutput(unit *agentUnit) (bool, error) {
 	if cm.stopOnOutputReload && cm.lastOutputCfg != nil {
 		cm.logger.Info("beat is restarting because output changed")
 		_ = unit.UpdateState(status.Stopping, "Restarting", nil)
-		cm.stopBeat()
+		cm.Stop(false)
 		return true, nil
 	}
 

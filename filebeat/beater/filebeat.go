@@ -537,7 +537,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// --once flag because it makes Filebeat exit early.
 	// So if --once is passed, we don't call b.Manager.Stop().
 	if !*once {
-		b.Manager.Stop()
+		b.Manager.Stop(true)
 	}
 
 	return nil

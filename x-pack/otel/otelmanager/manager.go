@@ -49,9 +49,14 @@ func (n *OtelManager) SetStopCallback(fn func()) {
 	n.stopFn = fn
 }
 
-func (n *OtelManager) Stop() {
+func (n *OtelManager) Stop(wait bool) {
 	if n.stopFn != nil {
-		n.stopOnce.Do(n.stopFn)
+		// Run the stop callback synchronously if wait is true, otherwise in its own goroutine.
+		if wait {
+			n.stopOnce.Do(n.stopFn)
+		} else {
+			go n.stopOnce.Do(n.stopFn)
+		}
 	}
 }
 
