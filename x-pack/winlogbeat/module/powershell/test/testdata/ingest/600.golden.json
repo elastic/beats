@@ -2,18 +2,22 @@
   {
     "@timestamp": "2020-05-13T13:21:43.1831809Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Provider Lifecycle",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "600",
-      "ingested": "2025-01-15T10:02:22.120659443Z",
+      "ingested": "2025-10-29T18:18:28.977234460Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 35,
-      "type": "info"
+      "type": [
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant",
@@ -65,18 +69,22 @@
   {
     "@timestamp": "2020-05-13T13:25:04.6564269Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Provider Lifecycle",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "600",
-      "ingested": "2025-01-15T10:02:22.120717968Z",
+      "ingested": "2025-10-29T18:18:28.977256919Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 1,
-      "type": "info"
+      "type": [
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant",
@@ -125,18 +133,22 @@
   {
     "@timestamp": "2020-06-04T07:25:04.8574302Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Provider Lifecycle",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "600",
-      "ingested": "2025-01-15T10:02:22.120732760Z",
+      "ingested": "2025-10-29T18:18:28.977261627Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 8,
-      "type": "info"
+      "type": [
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant",

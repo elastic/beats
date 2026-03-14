@@ -76,6 +76,32 @@ steps:
     key: "x-pack-winlogbeat-mandatory-tests"
 
     steps:
+      # Linux is required to execute ingest pipeline tests with dockerized Elasticsearch.
+      - label: ":ubuntu: x-pack/winlogbeat: Ubuntu x86_64 Unit Tests"
+        key: "mandatory-linux-unit-tests"
+        command: |
+          cd x-pack/winlogbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/winlogbeat/build/*.xml"
+          - "x-pack/winlogbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/winlogbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/winlogbeat: Ubuntu x86_64 Unit Tests"
+
       - label: ":windows: x-pack/winlogbeat Win 2019 Unit Tests"
         key: "mandatory-win-2019-unit-tests"
         command: |
