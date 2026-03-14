@@ -49,7 +49,7 @@ type header struct {
 	Value string `config:"value"`
 }
 
-type kafkaConfig struct {
+type KafkaConfig struct {
 	Hosts              []string                  `config:"hosts"               validate:"required"`
 	TLS                *tlscommon.Config         `config:"ssl"`
 	Kerberos           *kerberos.Config          `config:"kerberos"`
@@ -113,8 +113,8 @@ var compressionModes = map[string]sarama.CompressionCodec{
 	"zstd":   sarama.CompressionZSTD,
 }
 
-func defaultConfig() kafkaConfig {
-	return kafkaConfig{
+func defaultConfig() KafkaConfig {
+	return KafkaConfig{
 		Hosts:              nil,
 		TLS:                nil,
 		Kerberos:           nil,
@@ -149,7 +149,7 @@ func defaultConfig() kafkaConfig {
 	}
 }
 
-func readConfig(cfg *config.C) (*kafkaConfig, error) {
+func ReadConfig(cfg *config.C) (*KafkaConfig, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, err
@@ -157,7 +157,7 @@ func readConfig(cfg *config.C) (*kafkaConfig, error) {
 	return &c, nil
 }
 
-func (c *kafkaConfig) Validate() error {
+func (c *KafkaConfig) Validate() error {
 	if len(c.Hosts) == 0 {
 		return errors.New("no hosts configured")
 	}
@@ -201,13 +201,17 @@ func (c *kafkaConfig) Validate() error {
 	return nil
 }
 
-func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, error) {
+func newSaramaConfig(log *logp.Logger, config *KafkaConfig) (*sarama.Config, error) {
 	partitioner, err := makePartitioner(log, config.Partition)
 	if err != nil {
 		return nil, err
 	}
 
 	k := sarama.NewConfig()
+	// If ApiVersionsRequest is set, then the client can negotiate down the
+	// version, making Version be a ceiling rather than a strict pinning.
+	// See https://github.com/IBM/sarama/releases/tag/v1.46.0 for details.
+	k.ApiVersionsRequest = false
 
 	// configure network level properties
 	timeout := config.Timeout

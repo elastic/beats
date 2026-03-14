@@ -46,6 +46,7 @@ https://github.com/elastic/beats/compare/v8.19.11\...v8.19.12[View commits]
 
 **Metricbeat**
 
+* Added `mode` and `codec` fields to the `elasticsearch.index` metricset.
 * Enforce configurable size limits on incoming requests for `remote_write` metricset (`max_compressed_body_bytes`, `max_decoded_body_bytes`). https://github.com/elastic/beats/pull/48218[#48218]
 
 **Osquerybeat**
