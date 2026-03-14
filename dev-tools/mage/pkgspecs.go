@@ -24,7 +24,7 @@ import (
 	"log"
 	"path/filepath"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 )
 
 const packageSpecFile = "dev-tools/packaging/packages.yml"
