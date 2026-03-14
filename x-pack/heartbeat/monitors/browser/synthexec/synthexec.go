@@ -93,6 +93,7 @@ func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, field
 func startCmdJob(ctx context.Context, newCmd func() *SynthCmd, stdinStr *string, params mapstr.M, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		senr := newStreamEnricher(sFields)
+		logp.L().Info("synthexec: startCmdJob - before runCmd")
 		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
 		if err != nil {
 			err := senr.enrich(event, &SynthEvent{
@@ -101,6 +102,7 @@ func startCmdJob(ctx context.Context, newCmd func() *SynthCmd, stdinStr *string,
 			})
 			return nil, err
 		}
+		logp.L().Info("synthexec: startCmdJob - after runCmd")
 		// We don't just return the readResultsJob, otherwise we'd just send an empty event, execute it right away
 		// then it'll keep executing itself until we're truly done
 		return readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)(event)
@@ -112,6 +114,7 @@ func startCmdJob(ctx context.Context, newCmd func() *SynthCmd, stdinStr *string,
 func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich enricher) jobs.Job {
 	return func(event *beat.Event) (conts []jobs.Job, err error) {
 		se := <-synthEvents
+		logp.L().Infof("new event processed: %v", se)
 		err = enrich(event, se)
 		if se != nil {
 			return []jobs.Job{readResultsJob(ctx, synthEvents, enrich)}, err
@@ -229,6 +232,7 @@ func runCmd(
 	// This use of channels for results is awkward, but required for the thread locking below
 	cmdStarted := make(chan error)
 	cmdDone := make(chan error)
+	cmdCleanUp := make(chan struct{})
 	go func() {
 		// We must idle this thread and ensure it is not killed while the external program is running
 		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
@@ -255,6 +259,8 @@ func runCmd(
 	go func() {
 		<-ctx.Done()
 
+		logp.L().Info("job context has timed out or has been canceled")
+
 		// ProcessState can be null if it hasn't reported back yet
 		if cmd.ProcessState != nil && cmd.ProcessState.Exited() {
 			return
@@ -264,13 +270,26 @@ func runCmd(
 		if err != nil {
 			logp.L().Warn("could not kill synthetics process: %s", err)
 		}
+
+		// TODO: Maybe here is the best spot?
+		cmdError := ECSErrToSynthError(ecserr.NewCmdSkippedStatusErr(ctx.Err().Error()))
+		mpx.writeSynthEvent(&SynthEvent{
+			Type:                 CmdStatus,
+			Error:                cmdError,
+			TimestampEpochMicros: float64(time.Now().UnixMicro()),
+		})
+		logp.L().Info("skipped event emitted")
+		cmdCleanUp <- struct{}{}
 	}()
 
 	// Close mpx after the process is done and all events have been sent / consumed
 	go func() {
+		logp.L().Info("synthexec: Goroutine waiting for command completion (<-cmdDone)...")
 		err := <-cmdDone
+		logp.L().Infof("synthexec: Command completion signaled via cmdDone. Error from cmd.Wait(): %v", err)
+
 		_ = jsonWriter.Close()
-		logp.L().Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
+		logp.L().Infof("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
 
 		var cmdError *SynthError = nil
 		if err != nil {
@@ -286,6 +305,8 @@ func runCmd(
 			}
 		}
 
+		logp.L().Infof("Command has completed(%d): %s, error: %s", cmd.ProcessState.ExitCode(), cmd, cmdError)
+
 		mpx.writeSynthEvent(&SynthEvent{
 			Type:                 CmdStatus,
 			Error:                cmdError,
@@ -293,8 +314,10 @@ func runCmd(
 		})
 
 		wg.Wait()
-		mpx.Close()
 		cancel()
+		<-cmdCleanUp // Wait for the cleanup to finish before closing the multiplexer
+
+		mpx.Close()
 	}()
 
 	return mpx, nil

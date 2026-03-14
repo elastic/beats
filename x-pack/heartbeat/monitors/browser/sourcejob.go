@@ -32,6 +32,7 @@ type SourceJob struct {
 func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
 	// Global browser context to cancel all jobs
 	// on close
+	// TODO: provide the parent context to propagate the cancellation
 	ctx, cancel := context.WithCancel(context.Background())
 
 	s := &SourceJob{
@@ -87,6 +88,8 @@ func (sj *SourceJob) StdFields() stdfields.StdMonitorFields {
 }
 
 func (sj *SourceJob) Close() error {
+	logp.L().Info("closing SourceJob")
+
 	if sj.browserCfg.Source.ActiveMemo != nil {
 		sj.browserCfg.Source.ActiveMemo.Close()
 	}

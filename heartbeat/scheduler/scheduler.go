@@ -171,6 +171,7 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 		return nil, ErrAlreadyStopped
 	}
 
+	// TODO: propagate this context to the sourcejob
 	jobCtx, jobCtxCancel := context.WithCancel(s.ctx)
 
 	// lastRanAt stores the last runAt the task was invoked
@@ -209,6 +210,7 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 		s.stats.activeJobs.Dec()
 
 		if s.runOnce {
+			logp.L().Infof("Job '%s' completed in runOnce mode, stopping scheduler", id)
 			s.runOnceWg.Done()
 		} else {
 			// Schedule the next run
@@ -231,6 +233,7 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 
 	return func() {
 		debugf("Remove scheduler job '%v'", id)
+		// TODO: can I handle the signal here?
 		jobCtxCancel()
 	}, nil
 }
