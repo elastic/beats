@@ -114,6 +114,7 @@ steps:
         - .buildkite/x-pack/pipeline.xpack.filebeat.yml
         # Shared x-pack dependencies
         - x-pack/libbeat/**
+        - x-pack/otel/**
         # Shared OSS dependencies
         - .go-version
         - go.mod
@@ -222,6 +223,7 @@ steps:
         - .buildkite/x-pack/pipeline.xpack.metricbeat.yml
         # Shared x-pack dependencies
         - x-pack/libbeat/**
+        - x-pack/otel/**
         # Shared OSS dependencies
         - .go-version
         - go.mod

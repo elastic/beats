@@ -60,7 +60,7 @@ func TestConfigAcceptValidKerberos(t *testing.T) {
 			if err := c.SetString("hosts", 0, "localhost"); err != nil {
 				t.Fatalf("could not set 'hosts' on config: %s", err)
 			}
-			cfg, err := readConfig(c)
+			cfg, err := ReadConfig(c)
 			if err != nil {
 				t.Fatalf("Can not create test configuration: %v", err)
 			}
