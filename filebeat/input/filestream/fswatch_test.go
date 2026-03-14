@@ -448,12 +448,15 @@ func TestFileScanner(t *testing.T) {
 	exclSymlinkBasename := "excl_symlink.log"
 	travelerSymlinkBasename := "portal.log"
 	undersizedGlob := "undersized-*.txt"
+	emptyGlob := "empty-*.txt"
 
 	normalFilename := filepath.Join(dir, normalBasename)
 	undersizedFilename := filepath.Join(dir, undersizedBasename)
 	undersized1Filename := filepath.Join(dir, "undersized-1.txt")
 	undersized2Filename := filepath.Join(dir, "undersized-2.txt")
 	undersized3Filename := filepath.Join(dir, "undersized-3.txt")
+	empty1Filename := filepath.Join(dir, "empty-1.txt")
+	empty2Filename := filepath.Join(dir, "empty-2.txt")
 	normalGZIPFilename := filepath.Join(dir, normalGZIPBasename)
 	undersizedGZIPFilename := filepath.Join(dir, undersizedGZIPBasename)
 	excludedFilename := filepath.Join(dir, excludedBasename)
@@ -472,6 +475,8 @@ func TestFileScanner(t *testing.T) {
 		undersized1Filename:      strings.Repeat("1", 42),
 		undersized2Filename:      strings.Repeat("2", 42),
 		undersized3Filename:      strings.Repeat("3", 42),
+		empty1Filename:           "",
+		empty2Filename:           "",
 		excludedIncludedFilename: strings.Repeat("perhaps something to see here", normalRepeat),
 		travelerFilename:         strings.Repeat("folks, I think I got lost", normalRepeat),
 	}
@@ -977,6 +982,33 @@ scanner:
 			}
 
 			assert.Equalf(t, el.count, found, "the amount of log lines %q does not match", el.msg)
+		}
+	})
+
+	t.Run("does not issue warnings for empty files", func(t *testing.T) {
+		cfgStr := `
+scanner:
+  fingerprint:
+    enabled: true
+    offset: 0
+    length: 1024
+`
+		logger, buffer := logp.NewInMemoryLocal("test-logger", zapcore.EncoderConfig{})
+
+		paths := []string{filepath.Join(dir, emptyGlob)}
+		s := createScannerWithConfig(t, logger, paths, cfgStr, CompressionNone)
+		files := s.GetFiles()
+		require.Empty(t, files)
+		files = s.GetFiles()
+		require.Empty(t, files)
+		files = s.GetFiles()
+		require.Empty(t, files)
+
+		logs := parseLogs(buffer.String())
+		for _, log := range logs {
+			assert.NotEqual(t, "warn", log.level, "empty files should not trigger warnings")
+			assert.NotContains(t, log.message, "cannot start ingesting from file", "empty files should be ignored silently")
+			assert.NotContains(t, log.message, "ingestion from some files will be delayed", "empty files should not contribute to delayed warnings")
 		}
 	})
 

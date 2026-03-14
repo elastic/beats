@@ -500,6 +500,9 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 			}
 
 			fd, err := s.toFileDescriptor(&it)
+			if errors.Is(err, errFileEmpty) {
+				continue
+			}
 			if errors.Is(err, errFileTooSmall) {
 				if s.smallFilesWarned.CompareAndSwap(false, true) {
 					s.log.Warnf("ingestion from some files will be delayed, files need to be at "+
@@ -681,6 +684,9 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		}
 	} else {
 		dataSize = it.info.Size()
+		if dataSize == 0 {
+			return fd, errFileEmpty
+		}
 		if dataSize < minSize {
 			return fd, fmt.Errorf(
 				"filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w",
