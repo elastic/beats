@@ -265,6 +265,14 @@
                 available to the tasks in a cgroup. The value specified in the
                 cpu.shares file must be 2 or higher.
 
+            - name: cfs.weight
+              type: long
+              description: >
+                CPU weight for the cgroup (cgroupv2). Used by the CFS
+                scheduler to determine the share of CPU time available
+                to the cgroup. Valid values range from 1 to 10000. The
+                default value is 100.
+
             - name: rt.period.us
               type: long
               description: >

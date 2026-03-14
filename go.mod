@@ -108,7 +108,7 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.67.4
 	github.com/prometheus/procfs v0.17.0
-	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
+	github.com/rcrowley/go-metrics v0.0.0-20250401214520-65e299d6c5c9
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
 	github.com/shopspring/decimal v1.4.0 // indirect
@@ -174,14 +174,14 @@ require (
 	github.com/elastic/ebpfevents v0.8.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.2
 	github.com/elastic/elastic-agent-libs v0.33.3
-	github.com/elastic/elastic-agent-system-metrics v0.14.1
+	github.com/elastic/elastic-agent-system-metrics v0.14.3
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20251207194532-c5aadd4a4e06
 	github.com/elastic/mito v1.22.1
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
-	github.com/elastic/sarama v1.19.1-0.20251224062803-313637a62841
+	github.com/elastic/sarama v1.19.1-0.20260310070522-abae92ca1603
 	github.com/elastic/tk-btf v0.2.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/go-ldap/ldap/v3 v3.4.6
@@ -195,12 +195,12 @@ require (
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/icholy/digest v0.1.22
-	github.com/klauspost/compress v1.18.3
+	github.com/klauspost/compress v1.18.4
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
 	github.com/microsoft/go-mssqldb v1.9.5
 	github.com/microsoft/wmi v0.38.3
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.145.0
-	github.com/pierrec/lz4/v4 v4.1.23
+	github.com/pierrec/lz4/v4 v4.1.25
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/prometheus v0.309.1
 	github.com/shirou/gopsutil/v4 v4.25.12
