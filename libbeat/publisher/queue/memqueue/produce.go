@@ -18,9 +18,33 @@
 package memqueue
 
 import (
+	"sync"
+
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+var respChanPool = sync.Pool{
+	New: func() interface{} {
+		return make(chan queue.EntryID, 1)
+	},
+}
+
+func getRespChan() chan queue.EntryID {
+	if ch, ok := respChanPool.Get().(chan queue.EntryID); ok {
+		return ch
+	}
+	return make(chan queue.EntryID, 1)
+}
+
+func putRespChan(ch chan queue.EntryID) {
+	// Drain any stale response before returning to the pool.
+	select {
+	case <-ch:
+	default:
+	}
+	respChanPool.Put(ch)
+}
 
 type forgetfulProducer struct {
 	broker    *broker
@@ -73,10 +97,9 @@ func newProducer(b *broker, cb ackHandler, encoder queue.Encoder) queue.Producer
 }
 
 func (p *forgetfulProducer) makePushRequest(event queue.Entry) pushRequest {
-	resp := make(chan queue.EntryID, 1)
 	return pushRequest{
 		event: event,
-		resp:  resp}
+		resp:  getRespChan()}
 }
 
 func (p *forgetfulProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
@@ -92,14 +115,13 @@ func (p *forgetfulProducer) Close() {
 }
 
 func (p *ackProducer) makePushRequest(event queue.Entry) pushRequest {
-	resp := make(chan queue.EntryID, 1)
 	return pushRequest{
 		event:    event,
 		producer: p,
 		// We add 1 to the id so the default lastACK of 0 is a
 		// valid initial state and 1 is the first real id.
 		producerID: producerID(p.producedCount + 1),
-		resp:       resp}
+		resp:       getRespChan()}
 }
 
 func (p *ackProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
@@ -134,11 +156,20 @@ func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 	}
 	select {
 	case st.events <- req:
-		return st.handlePendingResponse(req.resp)
+		id, ok := st.handlePendingResponse(req.resp)
+		// We can only recycle the channel if we have definitely consumed the
+		// response. If the queue is closing and ownership is ambiguous, avoid
+		// pooling to prevent a stale send into a reused channel.
+		if ok {
+			putRespChan(req.resp)
+		}
+		return id, ok
 	case <-st.done:
+		putRespChan(req.resp)
 		st.events = nil
 		return 0, false
 	case <-st.queueClosing:
+		putRespChan(req.resp)
 		st.events = nil
 		return 0, false
 	}
@@ -152,11 +183,17 @@ func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 	}
 	select {
 	case st.events <- req:
-		return st.handlePendingResponse(req.resp)
+		id, ok := st.handlePendingResponse(req.resp)
+		if ok {
+			putRespChan(req.resp)
+		}
+		return id, ok
 	case <-st.done:
+		putRespChan(req.resp)
 		st.events = nil
 		return 0, false
 	default:
+		putRespChan(req.resp)
 		st.log.Debugf("Dropping event, queue is blocked")
 		return 0, false
 	}
