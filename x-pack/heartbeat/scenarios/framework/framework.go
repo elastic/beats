@@ -5,6 +5,7 @@
 package framework
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"os"
@@ -302,7 +303,8 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 			PipelineClientFactory: func(pipeline beat.Pipeline) (beat.Client, error) {
 				return pipeline.Connect()
 			},
-			BeatRunFrom: location,
+			BeatRunFrom:     location,
+			MonitorsContext: context.Background(),
 		}),
 		sched,
 		sched.Stop
