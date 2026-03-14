@@ -8,14 +8,18 @@ permissions:
   actions: read
   contents: read
   issues: write
-  pull-requests: read
+  pull-requests: write # required by gh-aw compiler for add-comment (github/gh-aw#16673)
 
 jobs:
   run:
+    if: >-
+      github.event.workflow_run.conclusion == 'failure' &&
+      toJSON(github.event.workflow_run.pull_requests) != '[]'
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-pr-actions-detective.lock.yml@v0
     with:
       setup-commands: |
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+        export GOTOOLCHAIN=auto
         make mage
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

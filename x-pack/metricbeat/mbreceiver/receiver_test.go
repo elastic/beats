@@ -78,7 +78,7 @@ func TestNewReceiver(t *testing.T) {
 				Name:    "r1",
 				Beat:    "metricbeat",
 				Config:  &config,
-				Factory: NewFactory(),
+				Factory: NewFactory(Settings{Home: t.TempDir()}),
 			},
 		},
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
@@ -174,7 +174,7 @@ func TestMultipleReceivers(t *testing.T) {
 		},
 	}
 
-	factory := NewFactory()
+	factory := NewFactory(Settings{Home: t.TempDir()})
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
 		T: t,
 		Receivers: []oteltest.ReceiverConfig{
@@ -247,8 +247,8 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 	}
 	client := http.Client{
 		Transport: &http.Transport{
-			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-				return net.Dial("unix", socketPath)
+			DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+				return (&net.Dialer{}).DialContext(ctx, "unix", socketPath)
 			},
 		},
 	}
@@ -347,7 +347,7 @@ func BenchmarkFactory(b *testing.B) {
 		zapcore.Lock(zapcore.AddSync(&zapLogs)),
 		zapcore.InfoLevel)
 
-	factory := NewFactory()
+	factory := NewFactory(Settings{Home: tmpDir})
 
 	receiverSettings := receiver.Settings{}
 	receiverSettings.Logger = zap.New(core)
@@ -421,7 +421,7 @@ func TestReceiverStatus(t *testing.T) {
 						Name:    "r1",
 						Beat:    "metricbeat",
 						Config:  &config,
-						Factory: NewFactory(),
+						Factory: NewFactory(Settings{Home: t.TempDir()}),
 					},
 				},
 				Status: test.status,
@@ -457,5 +457,5 @@ func TestReceiverHook(t *testing.T) {
 
 	// For metricbeatreceiver, we expect 2 hooks to be registered:
 	// 	one for beat metrics and one for input metrics.
-	oteltest.TestReceiverHook(t, &cfg, NewFactory(), receiverSettings, 2)
+	oteltest.TestReceiverHook(t, &cfg, NewFactory(Settings{Home: t.TempDir()}), receiverSettings, 2)
 }
