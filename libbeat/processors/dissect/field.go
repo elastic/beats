@@ -24,7 +24,6 @@ import (
 )
 
 type field interface {
-	MarkGreedy()
 	IsGreedy() bool
 	Ordinal() int
 	Length() int
@@ -71,10 +70,6 @@ var dataTypeNames = map[string]dataType{
 
 func (f baseField) IsGreedy() bool {
 	return f.greedy
-}
-
-func (f baseField) MarkGreedy() {
-	f.greedy = true
 }
 
 func (f baseField) Ordinal() int {
@@ -335,26 +330,26 @@ func newNormalField(id int, key string, dataType string, ordinal int, length int
 }
 
 func extractKeyParts(rawKey string) (key string, dataType string, ordinal int, length int, greedy bool, err error) {
-	m := suffixRE.FindAllStringSubmatch(rawKey, -1)
+	m := suffixRE.FindStringSubmatch(rawKey)
 
 	// check if we have at least one match otherwise the field is invalid.
 	if len(m) == 0 {
 		return "", "", 0, 0, false, errInvalidFieldName
 	}
 
-	if m[0][3] != "" {
-		ordinal, _ = strconv.Atoi(m[0][3])
+	if m[3] != "" {
+		ordinal, _ = strconv.Atoi(m[3])
 	}
 
-	if m[0][5] != "" {
-		length, _ = strconv.Atoi(m[0][5])
+	if m[5] != "" {
+		length, _ = strconv.Atoi(m[5])
 	}
 
-	if strings.EqualFold(greedySuffix, m[0][6]) {
+	if strings.EqualFold(greedySuffix, m[6]) {
 		greedy = true
 	}
 
-	dataType = m[0][8]
+	dataType = m[8]
 
-	return m[0][1], dataType, ordinal, length, greedy, nil
+	return m[1], dataType, ordinal, length, greedy, nil
 }
