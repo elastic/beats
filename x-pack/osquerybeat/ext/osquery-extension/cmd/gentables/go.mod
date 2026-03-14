@@ -1,11 +1,11 @@
 module github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/cmd/gentables
 
-go 1.21
+go 1.25.0
 
 require (
 	github.com/pingcap/parser v0.0.0-20200623164729-3a18f1e5dceb
 	go.yaml.in/yaml/v3 v3.0.4
-	golang.org/x/text v0.3.1-0.20180807135948-17ff2d5776d2
+	golang.org/x/text v0.35.0
 )
 
 require (
@@ -17,7 +17,10 @@ require (
 	go.uber.org/tools v0.0.0-20190618225709-2cfd321de3ee // indirect
 	go.uber.org/zap v1.12.0 // indirect
 	golang.org/x/lint v0.0.0-20190930215403-16217165b5de // indirect
-	golang.org/x/tools v0.0.0-20191029190741-b9c20aec41a5 // indirect
+	golang.org/x/mod v0.33.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/tools v0.42.0 // indirect
+	golang.org/x/tools/go/expect v0.1.1-deprecated // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	honnef.co/go/tools v0.0.1-2019.2.3 // indirect
 )
