@@ -209,6 +209,22 @@ func TestUTF16ToUTF8(t *testing.T) {
 	assert.Equal(t, []byte(input), outputBuf.Bytes())
 }
 
+func TestUTF16ToUTF8OddLength(t *testing.T) {
+	tests := [][]byte{
+		{0x00},
+		{0x01, 0x00, 0x02},
+		{0x01, 0x00, 0x02, 0x00, 0x03},
+	}
+
+	for _, input := range tests {
+		outputBuf := &bytes.Buffer{}
+		err := UTF16ToUTF8Bytes(input, outputBuf)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "even length")
+		assert.Equal(t, 0, outputBuf.Len())
+	}
+}
+
 func TestUTF16BytesToStringTrimNullTerm(t *testing.T) {
 	input := "abc"
 	utf16Bytes := append(StringToUTF16Bytes(input), []byte{0, 0, 0, 0, 0, 0}...)
