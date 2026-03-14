@@ -527,3 +527,34 @@ func (r *eofWithNonZeroNumberOfBytesReader) Read(d []byte) (int, error) {
 func TestReadWithNonZeroNumberOfBytesAndEOF(t *testing.T) {
 	testReadLines(t, [][]byte{[]byte("Hello world!\n")}, true)
 }
+
+type eofWithNonZeroNumberOfBytesNoEOLReader struct {
+	data  []byte
+	reads int
+}
+
+func (r *eofWithNonZeroNumberOfBytesNoEOLReader) Read(d []byte) (int, error) {
+	r.reads++
+	switch r.reads {
+	case 1:
+		n := copy(d, r.data)
+		return n, io.EOF
+	default:
+		return 0, errors.New("unexpected second read")
+	}
+}
+
+func TestReadWithNonZeroNumberOfBytesAndEOFNoEOLCollectOnEOF(t *testing.T) {
+	data := []byte("Hello world!")
+	in := &eofWithNonZeroNumberOfBytesNoEOLReader{data: data}
+	codec, _ := encoding.Plain(in)
+
+	reader, err := NewLineReader(ioutil.NopCloser(in), Config{codec, len(data), LineFeed, unlimited, true}, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	b, n, err := reader.Next()
+	require.ErrorIs(t, err, io.EOF)
+	require.Equal(t, len(data), n)
+	require.Equal(t, data, b)
+	require.Equal(t, 1, in.reads)
+}
