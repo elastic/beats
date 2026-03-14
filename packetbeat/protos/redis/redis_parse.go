@@ -19,6 +19,7 @@ package redis
 
 import (
 	"bytes"
+	"errors"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -350,7 +351,7 @@ func (p *parser) parseString(buf *streambuf.Buffer) (common.NetString, bool, boo
 
 	content, err := buf.CollectWithSuffix(int(length), []byte("\r\n"))
 	if err != nil {
-		if err != streambuf.ErrNoMoreBytes {
+		if !errors.Is(err, streambuf.ErrNoMoreBytes) {
 			return common.NetString{}, false, false
 		}
 		return common.NetString{}, true, false
