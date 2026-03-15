@@ -11,17 +11,9 @@ permissions:
   pull-requests: write
 
 jobs:
-  debug_association:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Debug association
-        run: |
-          echo "author_association=${{ github.event.issue.author_association }}"
-          echo "actor=${{ github.actor }}"
-
   run:
-    if: >-
-      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
+    # Access control is enforced by the upstream reusable workflow pre_activation
+    # check (required roles: admin, maintainer, write).
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-issue-triage.lock.yml@v0
     with:
       setup-commands: |
