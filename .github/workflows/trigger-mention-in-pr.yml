@@ -13,6 +13,15 @@ permissions:
   pull-requests: write
 
 jobs:
+  debug_association:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug association
+        run: |
+          echo "author_association=${{ github.event.issue.author_association }}"
+          echo "comment_author_association=${{ github.event.comment.author_association }}"
+          echo "actor=${{ github.actor }}"
+
   run:
     if: >-
       (startsWith(github.event.comment.body, '/ai') || contains(github.event.comment.body, '@claude')) &&
