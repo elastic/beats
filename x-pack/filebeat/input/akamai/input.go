@@ -252,7 +252,8 @@ func (p *siemPoller) poll(ctx context.Context) error {
 		}
 
 		if eventCount == 0 {
-			p.log.Debug("no events received, poll cycle complete")
+			p.cursor.CaughtUp = true
+			p.log.Debug("no events received, chain drained")
 			break
 		}
 
@@ -542,12 +543,6 @@ func (p *siemPoller) processPage(ctx context.Context, body io.ReadCloser) (int, 
 
 			batch := make([]beat.Event, 0, batchSize)
 			for raw := range eventCh {
-				select {
-				case <-ctx.Done():
-					return
-				default:
-				}
-
 				batch = append(batch, createBeatEvent(raw))
 				if len(batch) >= batchSize {
 					p.client.PublishAll(batch)
@@ -569,12 +564,15 @@ func (p *siemPoller) processPage(ctx context.Context, body io.ReadCloser) (int, 
 
 	totalPublished := int(publishCount.Load())
 
-	if totalPublished > 0 {
+	if streamErr == nil && totalPublished > 0 && totalPublished == eventCount {
 		fullCursor := cursor{
-			ChainFrom:        p.cursor.ChainFrom,
-			ChainTo:          p.cursor.ChainTo,
-			LastOffset:       pageCtx.Offset,
-			OffsetObtainedAt: time.Now(),
+			ChainFrom:  p.cursor.ChainFrom,
+			ChainTo:    p.cursor.ChainTo,
+			CaughtUp:   eventCount < p.cfg.EventLimit,
+			LastOffset: pageCtx.Offset,
+		}
+		if pageCtx.Offset != "" {
+			fullCursor.OffsetObtainedAt = time.Now()
 		}
 		p.acks.Add(totalPublished, func() {
 			if err := p.cursorStore.Save(fullCursor); err != nil {
