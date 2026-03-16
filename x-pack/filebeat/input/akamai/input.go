@@ -564,7 +564,7 @@ func (p *siemPoller) processPage(ctx context.Context, body io.ReadCloser) (int, 
 
 	totalPublished := int(publishCount.Load())
 
-	if streamErr == nil && totalPublished > 0 && totalPublished == eventCount {
+	if streamErr == nil {
 		fullCursor := cursor{
 			ChainFrom:  p.cursor.ChainFrom,
 			ChainTo:    p.cursor.ChainTo,
@@ -574,14 +574,22 @@ func (p *siemPoller) processPage(ctx context.Context, body io.ReadCloser) (int, 
 		if pageCtx.Offset != "" {
 			fullCursor.OffsetObtainedAt = time.Now()
 		}
-		p.acks.Add(totalPublished, func() {
+
+		if eventCount == 0 && p.cursorStore != nil {
 			if err := p.cursorStore.Save(fullCursor); err != nil {
 				p.log.Errorf("failed to persist cursor: %v", err)
 				p.env.UpdateStatus(status.Degraded, fmt.Sprintf("cursor persistence failure: %s", err.Error()))
-			} else {
-				p.env.UpdateStatus(status.Running, "")
 			}
-		})
+		} else if totalPublished == eventCount && totalPublished > 0 {
+			p.acks.Add(totalPublished, func() {
+				if err := p.cursorStore.Save(fullCursor); err != nil {
+					p.log.Errorf("failed to persist cursor: %v", err)
+					p.env.UpdateStatus(status.Degraded, fmt.Sprintf("cursor persistence failure: %s", err.Error()))
+				} else {
+					p.env.UpdateStatus(status.Running, "")
+				}
+			})
+		}
 	}
 
 	if p.metrics != nil {

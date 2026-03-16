@@ -329,7 +329,7 @@ func TestInput(t *testing.T) {
 				{body: ""},
 			},
 			wantOffset:          "",
-			wantCaughtUp:        false,
+			wantCaughtUp:        true,
 			wantPublishedEvents: 0,
 			verifyReqs: func(t *testing.T, reqs []url.Values) {
 				require.Len(t, reqs, 1)
