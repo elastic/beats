@@ -56,7 +56,8 @@ type config struct {
 	EventLimit int `config:"event_limit"`
 
 	// NumberOfWorkers is the number of concurrent workers for processing events.
-	NumberOfWorkers int `config:"number_of_workers"`
+	// Internal only — not exposed to users. Default: 1.
+	NumberOfWorkers int
 
 	// BatchSize is the number of events accumulated per worker before calling
 	// PublishAll. Default is 1 (single-event publish).

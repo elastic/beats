@@ -109,8 +109,10 @@ func (in *akamaiInput) Run(
 		env.UpdateStatus(status.Failed, "failed to connect to pipeline: "+err.Error())
 		return err
 	}
-	defer client.Close()
-	defer acks.Close()
+	defer func() {
+		client.Close()
+		acks.Close()
+	}()
 
 	poller := &siemPoller{
 		cfg:         cfg,

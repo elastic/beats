@@ -22,7 +22,7 @@ This input supports:
 * Chain-based cursor checkpointing with overlap to prevent data gaps
 * Proactive offset age tracking with configurable TTL
 * Automatic recovery when offsets expire or request timestamps become invalid
-* Streaming NDJSON pipeline with batch publishing (`PublishAll`) and configurable workers
+* Streaming NDJSON pipeline with batch publishing (`PublishAll`)
 * Decoupled cursor persistence — cursor is committed atomically via ACK callback, never at publish time
 * Zero-copy event passthrough (field extraction deferred to ingest pipeline)
 * Rate limiting and retry with configurable backoff
@@ -48,7 +48,6 @@ filebeat.inputs:
   max_recovery_attempts: 3
 
   # Batch publishing tuning (defaults below are optimal for most workloads)
-  # number_of_workers: 1
   # batch_size: 1000
   # stream_buffer_size: 4
 
@@ -107,33 +106,27 @@ The lookback duration used for the first request when no cursor exists (time-bas
 The maximum number of events requested per API page. Must be between `1` and `600000`. Default: `10000`.
 
 
-### `number_of_workers` [_number_of_workers_akamai]
-
-The number of concurrent worker goroutines used to batch and publish events from a single fetched page. Each worker accumulates events into batches of `batch_size` and publishes them via `PublishAll`. For most workloads, a single worker delivers the highest throughput because the per-event work is minimal (string copy and `beat.Event` construction). Increase workers only if profiling shows the output is the bottleneck (for example, with Elasticsearch or Kafka outputs). Must be greater than `0`. Default: `1`.
-
-
 ### `batch_size` [_batch_size_akamai]
 
-The number of events each worker accumulates into a batch before calling `PublishAll`. Larger batches reduce pipeline lock acquisitions (one lock per batch instead of one per event) but increase per-worker memory usage. Values between `1000` and `2000` are optimal for most workloads. Must be greater than `0`. Default: `1000`.
+The number of events accumulated into a batch before calling `PublishAll`. Larger batches reduce pipeline lock acquisitions (one lock per batch instead of one per event) but increase memory usage. Values between `1000` and `2000` are optimal for most workloads. Must be greater than `0`. Default: `1000`.
 
 
 ### `stream_buffer_size` [_stream_buffer_size_akamai]
 
-The capacity of the bounded channel used in the streaming event pipeline. Events are streamed line-by-line from the API response body through this channel to worker goroutines. Higher values allow more buffering between the stream reader and batch workers; lower values reduce memory usage and keep backpressure responsive. Default: `number_of_workers * 4`.
+The capacity of the bounded channel used in the streaming event pipeline. Events are streamed line-by-line from the API response body through this channel to the batch worker. Higher values allow more buffering between the stream reader and the batch worker; lower values reduce memory usage and keep backpressure responsive. Default: `4`.
 
 
 ### Performance tuning [_performance_tuning_akamai]
 
 ::::{note}
-The default configuration (`number_of_workers: 1`, `batch_size: 1000`) delivers the highest sustained throughput for this input. Benchmarking with the Akamai SIEM API at `event_limit: 60000` showed:
+The input uses a single worker internally with a default `batch_size` of `1000`, which delivers the highest sustained throughput for most workloads. Benchmarking with the Akamai SIEM API at `event_limit: 60000` showed:
 
-* **1 worker / batch_size 1000** — ~11,000 events/sec, 95% of pages under 5s, lowest memory (~103 MB RSS)
-* **10 workers / batch_size 2000** — ~9,600 events/sec, 84% of pages under 5s, moderate memory (~168 MB RSS)
-* **20 workers / batch_size 2000** — ~8,300 events/sec, 75% of pages under 5s, higher memory (~217 MB RSS)
+* **batch_size 1000** — ~11,000 events/sec, 95% of pages under 5s, lowest memory (~103 MB RSS)
+* **batch_size 2000** — similar throughput with marginally higher memory
 
-A single worker avoids goroutine scheduling overhead, cache thrashing, and queue contention from concurrent `PublishAll` calls. Adding workers only helps when the **output** introduces latency (for example, Elasticsearch or Kafka). For file or console outputs, 1 worker is optimal.
+A single worker avoids goroutine scheduling overhead, cache thrashing, and queue contention from concurrent `PublishAll` calls.
 
-When tuning, the general relationship is: `lock_acquisitions_per_page = event_limit / batch_size`. With `event_limit: 60000` and `batch_size: 1000`, there are 60 lock acquisitions per page — already negligible. Increasing `batch_size` beyond 2000 adds memory overhead without measurable throughput benefit. Increasing workers beyond 1 reduces throughput for this input because the per-event work (string copy + `beat.Event` construction) is too small to benefit from concurrency.
+When tuning `batch_size`, the general relationship is: `lock_acquisitions_per_page = event_limit / batch_size`. With `event_limit: 60000` and `batch_size: 1000`, there are 60 lock acquisitions per page — already negligible. Increasing `batch_size` beyond 2000 adds memory overhead without measurable throughput benefit.
 ::::
 
 

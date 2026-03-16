@@ -95,16 +95,6 @@ func TestConfigValidation(t *testing.T) {
 			wantErr: "initial_interval cannot exceed 12h",
 		},
 		{
-			name: "invalid number_of_workers",
-			config: map[string]interface{}{
-				"resource":          map[string]interface{}{"url": "https://test.luna.akamaiapis.net"},
-				"config_ids":        "12345",
-				"auth":              edgeGridAuth,
-				"number_of_workers": 0,
-			},
-			wantErr: "number_of_workers must be greater than 0",
-		},
-		{
 			name: "negative offset_ttl",
 			config: map[string]interface{}{
 				"resource":   map[string]interface{}{"url": "https://test.luna.akamaiapis.net"},
