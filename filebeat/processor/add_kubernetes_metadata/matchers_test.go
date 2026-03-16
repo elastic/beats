@@ -164,6 +164,32 @@ func TestLogsPathMatcher_InvalidVarLogPodIDFormat(t *testing.T) {
 	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
 }
 
+func TestLogsPathMatcher_InvalidVarLogPodIDFormat_LogsPodUIDError(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	source := fmt.Sprintf("/var/log/pods/%s/container/0.log", puid)
+
+	testConfig := conf.NewConfig()
+	testConfig.SetString("logs_path", -1, cfgLogsPath)
+	testConfig.SetString("resource_type", -1, cfgResourceType)
+
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
+	logMatcher, err := newLogsPathMatcher(*testConfig, logger)
+	assert.NoError(t, err)
+
+	input := mapstr.M{
+		"log": mapstr.M{
+			"file": mapstr.M{
+				"path": source,
+			},
+		},
+	}
+	output := logMatcher.MetadataIndex(input)
+
+	assert.Equal(t, "", output)
+	assert.Len(t, observedLogs.FilterMessageSnippet("Error extracting pod UID - source value does not contain matcher's logs_path").TakeAll(), 1)
+}
+
 func TestLogsPathMatcher_ValidVarLogPod(t *testing.T) {
 	cfgLogsPath := "/var/log/pods/"
 	cfgResourceType := "pod"
