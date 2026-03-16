@@ -18,6 +18,7 @@
 package kafka
 
 import (
+	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -390,12 +391,20 @@ type defaultNet struct{}
 
 // LookupIP looks up a host using the local resolver
 func (m *defaultNet) LookupIP(addr string) ([]net.IP, error) {
-	return net.LookupIP(addr)
+	addrs, err := net.DefaultResolver.LookupIPAddr(context.Background(), addr)
+	if err != nil {
+		return nil, err
+	}
+	ips := make([]net.IP, len(addrs))
+	for i := range addrs {
+		ips[i] = addrs[i].IP
+	}
+	return ips, nil
 }
 
 // LookupAddr returns the list of hosts resolving to an specific address
 func (m *defaultNet) LookupAddr(address string) ([]string, error) {
-	return net.LookupAddr(address)
+	return net.DefaultResolver.LookupAddr(context.Background(), address)
 }
 
 // LocalIPAddrs return the list of IP addresses configured in local network interfaces
