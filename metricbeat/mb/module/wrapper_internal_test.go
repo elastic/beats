@@ -270,6 +270,50 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 					}
 				},
 			},
+			{
+				name: "optional = true: status never becomes DEGRADED regardless of errors",
+				config: newConfig(t, map[string]interface{}{
+					"module":     mockModuleName,
+					"metricsets": []string{mockMetricSetName},
+					"period":     "100ms",
+					"hosts":      []string{"testhost"},
+					"optional":   true,
+				}),
+				setup: func(t *testing.T, fetcher *mockReportingFetcher, pushReporter *mockPushReporterV2, statusReporter *mockStatusReporter) {
+					fetcher.On("Fetch", pushReporter).Return(fetchError).Times(5)
+					pushReporter.On("Error", fetchError).Return(true).Times(5)
+				},
+				iterations: 5,
+				assertIteration: func(t *testing.T, i int, msWrapper *metricSetWrapper, fetcher *mockReportingFetcher, pushReporter *mockPushReporterV2, statusReporter *mockStatusReporter) {
+					t.Logf("Assertion after iteration %d", i)
+					assert.Truef(t, statusReporter.AssertNotCalled(t, "UpdateStatus", status.Degraded, mock.AnythingOfType("string")), "optional stream should not be degraded at iteration %d", i)
+					assert.Equal(t, uint64(i+1), msWrapper.stats.consecutiveFailures.Get(), "consecutive failures should be tracked even for optional metricsets")
+				},
+			},
+			{
+				name: "optional = true: status returns to Running after recovery",
+				config: newConfig(t, map[string]interface{}{
+					"module":     mockModuleName,
+					"metricsets": []string{mockMetricSetName},
+					"period":     "100ms",
+					"hosts":      []string{"testhost"},
+					"optional":   true,
+				}),
+				setup: func(t *testing.T, fetcher *mockReportingFetcher, pushReporter *mockPushReporterV2, statusReporter *mockStatusReporter) {
+					fetcher.On("Fetch", pushReporter).Return(fetchError).Times(3)
+					fetcher.On("Fetch", pushReporter).Return(nil).Once()
+					pushReporter.On("Error", fetchError).Return(true).Times(3)
+					statusReporter.On("UpdateStatus", status.Running, mock.AnythingOfType("string")).Once()
+				},
+				iterations: 4,
+				assertIteration: func(t *testing.T, i int, msWrapper *metricSetWrapper, fetcher *mockReportingFetcher, pushReporter *mockPushReporterV2, statusReporter *mockStatusReporter) {
+					t.Logf("Assertion after iteration %d", i)
+					assert.Truef(t, statusReporter.AssertNotCalled(t, "UpdateStatus", status.Degraded, mock.AnythingOfType("string")), "optional stream should never be degraded at iteration %d", i)
+					if i == 3 {
+						assert.Truef(t, statusReporter.AssertCalled(t, "UpdateStatus", status.Running, mock.AnythingOfType("string")), "stream should be running after recovery at iteration %d", i)
+					}
+				},
+			},
 		}
 
 		for _, tc := range testcases {

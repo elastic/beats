@@ -77,6 +77,7 @@ type metricSetWrapper struct {
 
 	periodic         bool // Set to true if this metricset is a periodic fetcher
 	failureThreshold uint // threshold of consecutive errors needed to set the stream as degraded
+	optional         bool // When true, fetch failures do not degrade agent health
 }
 
 // stats bundles common metricset stats.
@@ -119,6 +120,7 @@ func createWrapper(module mb.Module, metricSets []mb.MetricSet, monitoring beatm
 
 	var streamHealthSettings struct {
 		FailureThreshold *uint `config:"failure_threshold"`
+		Optional         *bool `config:"optional"`
 	}
 
 	err := module.UnpackConfig(&streamHealthSettings)
@@ -131,12 +133,18 @@ func createWrapper(module mb.Module, metricSets []mb.MetricSet, monitoring beatm
 		failureThreshold = *streamHealthSettings.FailureThreshold
 	}
 
+	optional := false
+	if streamHealthSettings.Optional != nil {
+		optional = *streamHealthSettings.Optional
+	}
+
 	for i, metricSet := range metricSets {
 		wrapper.metricSets[i] = &metricSetWrapper{
 			MetricSet:        metricSet,
 			module:           wrapper,
 			stats:            getMetricSetStats(monitoring, wrapper.Name(), metricSet.Name()),
 			failureThreshold: failureThreshold,
+			optional:         optional,
 		}
 	}
 	return wrapper, nil
@@ -324,7 +332,7 @@ func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporte
 	default:
 		reporter.Error(err)
 		msw.stats.consecutiveFailures.Inc()
-		if msw.failureThreshold > 0 && msw.stats.consecutiveFailures != nil && uint(msw.stats.consecutiveFailures.Get()) >= msw.failureThreshold {
+		if !msw.optional && msw.failureThreshold > 0 && msw.stats.consecutiveFailures != nil && uint(msw.stats.consecutiveFailures.Get()) >= msw.failureThreshold {
 			// mark it as degraded for any other issue encountered
 			msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.Name(), err))
 		}
