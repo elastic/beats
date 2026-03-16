@@ -35,8 +35,8 @@ type indexFieldUsage struct {
 type shardFieldUsage struct {
 	TrackingID              string       `json:"tracking_id"`
 	TrackingStartedAtMillis int64        `json:"tracking_started_at_millis"`
-	Routing                shardRouting `json:"routing"`
-	Stats                  shardStats   `json:"stats"`
+	Routing                 shardRouting `json:"routing"`
+	Stats                   shardStats   `json:"stats"`
 }
 
 type shardRouting struct {
@@ -63,13 +63,13 @@ type fieldUsage struct {
 }
 
 type invertedIndex struct {
-	Terms          int `json:"terms"`
-	Postings       int `json:"postings"`
-	Proximity      int `json:"proximity"`
-	Positions      int `json:"positions"`
+	Terms           int `json:"terms"`
+	Postings        int `json:"postings"`
+	Proximity       int `json:"proximity"`
+	Positions       int `json:"positions"`
 	TermFrequencies int `json:"term_frequencies"`
-	Offsets        int `json:"offsets"`
-	Payloads       int `json:"payloads"`
+	Offsets         int `json:"offsets"`
+	Payloads        int `json:"payloads"`
 }
 
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
@@ -108,7 +108,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 				event.MetricSetFields = mapstr.M{
 					"name": fieldName,
 					"shard": mapstr.M{
-						"tracking_id":               shard.TrackingID,
+						"tracking_id":                shard.TrackingID,
 						"tracking_started_at_millis": shard.TrackingStartedAtMillis,
 						"routing": mapstr.M{
 							"state":   shard.Routing.State,
