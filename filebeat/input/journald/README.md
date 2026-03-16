@@ -27,7 +27,7 @@ VM set, export these variables in your shell:
 
 ```
 export VAGRANT_CWD="/path/to/beats/filebeat/input/journald"
-export VAGRANT_VAGRANTFILE="Vagrantfile"
+export VAGRANT_VAGRANTFILE="$VAGRANT_CWD/Vagrantfile"
 ```
 
 What this does:
