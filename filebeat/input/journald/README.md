@@ -77,7 +77,8 @@ From inside a VM (repo is usually mounted at `/vagrant`, but you might
 have to copy/clone it some VMs):
 
 ```
-cd /vagrant/filebeat
+cp -r /vagrant ./beats # Filebeat won't run correctly on the mounted volume
+cd ./beats/filebeat
 mage buildSystemTestBinary
 go test -count=1 -tags integration ./tests/integration -run TestJournaldInputReadsMessagesFromAllBoots -v
 ```
