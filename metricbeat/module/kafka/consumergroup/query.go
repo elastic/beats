@@ -103,6 +103,7 @@ func fetchGroupInfo(
 		}(group, queryTopics, topics)
 	}
 
+	var emitted, offsetErrors int
 	for waiting > 0 {
 		ret := <-results
 		waiting--
@@ -117,7 +118,8 @@ func fetchGroupInfo(
 			for partition, info := range partitions {
 				partitionOffset, err := getPartitionOffsetFromTheLeader(b, topic, partition)
 				if err != nil {
-					logger.Errorf("failed to fetch offset for (topic, partition): ('%v', %v)", topic, partition)
+					logger.Errorf("failed to fetch offset for (topic=%v, partition=%v): %v", topic, partition, err)
+					offsetErrors++
 					continue
 				}
 				consumerLag := partitionOffset - info.Offset
@@ -143,12 +145,17 @@ func fetchGroupInfo(
 					}
 				}
 				emit(event)
+				emitted++
 			}
 		}
 
 	}
 
 	close(results)
+
+	if offsetErrors > 0 {
+		logger.Warnf("consumergroup fetch: emitted %d events, failed to fetch partition offsets for %d partitions", emitted, offsetErrors)
+	}
 
 	return err
 }

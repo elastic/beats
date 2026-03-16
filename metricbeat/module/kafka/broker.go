@@ -109,7 +109,9 @@ func NewBroker(host string, logger *logp.Logger, settings BrokerSettings) *Broke
 // Close the broker connection
 func (b *Broker) Close() error {
 	closeBroker(b.broker)
-	b.client.Close()
+	if err := b.client.Close(); err != nil {
+		b.logger.Warnf("error closing cluster client: %v", err)
+	}
 	return nil
 }
 
