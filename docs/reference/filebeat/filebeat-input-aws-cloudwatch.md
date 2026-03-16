@@ -10,7 +10,7 @@ applies_to:
 # AWS CloudWatch input [filebeat-input-aws-cloudwatch]
 
 
-`aws-cloudwatch` input can be used to retrieve all logs from all log streams in a specific log group. `filterLogEvents` AWS API is used to list log events from the specified log group. Amazon CloudWatch Logs can be used to store log files from Amazon Elastic Compute Cloud(EC2), AWS CloudTrail, Route53, and other sources.
+The `aws-cloudwatch` input can be used to retrieve all logs from all log streams in a specific log group. The `FilterLogEvents` AWS API is used to list log events from the specified log group. Amazon CloudWatch Logs can be used to store log files from Amazon Elastic Compute Cloud(EC2), AWS CloudTrail, Route53, and other sources.
 
 A log group is a group of log streams that share the same retention, monitoring, and access control settings. You can define log groups and specify which streams to put into each group. There is no limit on the number of log streams that can belong to one log group.
 
@@ -53,10 +53,6 @@ Note: `region_name` is required when log_group_name is given.
 The prefix for a group of log group names. See `include_linked_accounts_for_prefix_mode` option for linked source accounts behavior.
 
 Note: `region_name` is required when `log_group_name_prefix` is given. `log_group_name` and `log_group_name_prefix` cannot be given at the same time. The number of workers that will process the log groups under this prefix is set through the `number_of_workers` config.
-
-:::{note}
-When you use `log_group_name_prefix`, all matching log groups are included regardless of their log class. If any matching log groups use the Infrequent Access log class, API errors occur because the `FilterLogEvents` API is not supported for that log class. Make sure all log groups that match the prefix use the Standard log class.
-:::
 
 
 ### `include_linked_accounts_for_prefix_mode` [_include_linked_accounts_for_prefix_mode]
