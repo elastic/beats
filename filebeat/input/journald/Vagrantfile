@@ -4,6 +4,14 @@ unless File.exist?(JOURNALD_CONF_PATH)
   raise "journald.conf not found at #{JOURNALD_CONF_PATH}"
 end
 
+GO_VERSION_PATH = File.expand_path("../../../.go-version", File.dirname(__FILE__))
+
+unless File.exist?(GO_VERSION_PATH)
+  raise ".go-version not found at #{GO_VERSION_PATH}"
+end
+
+GO_VERSION = File.read(GO_VERSION_PATH).strip
+
 HOST_TIMEZONE = begin
   tz = ENV.fetch("HOST_TIMEZONE", "").strip
 
@@ -26,7 +34,7 @@ end
 
 Vagrant.configure("2") do |config|
   config.vm.boot_timeout = 600
-  config.vm.synced_folder "../", "/vagrant"
+  config.vm.synced_folder "../../../", "/vagrant"
 
   config.vm.provider "virtualbox" do |vb|
     vb.memory = 4096
@@ -95,6 +103,58 @@ Vagrant.configure("2") do |config|
         fi
 
         git --version
+      SHELL
+
+      vm.vm.provision "shell", privileged: true, inline: <<-SHELL
+        set -euo pipefail
+
+        GO_VERSION="#{GO_VERSION}"
+
+        if command -v /usr/local/go/bin/go >/dev/null 2>&1; then
+          installed="$(/usr/local/go/bin/go version | awk '{print $3}' | sed 's/^go//')"
+          if [ "${installed}" = "${GO_VERSION}" ]; then
+            echo "Go ${GO_VERSION} already installed"
+            exit 0
+          fi
+          echo "Go ${installed} found, upgrading to ${GO_VERSION}"
+          rm -rf /usr/local/go
+        fi
+
+        arch="$(uname -m)"
+        case "${arch}" in
+          x86_64)  goarch="amd64" ;;
+          aarch64) goarch="arm64" ;;
+          *)       echo "unsupported architecture: ${arch}" >&2; exit 1 ;;
+        esac
+
+        tarball="go${GO_VERSION}.linux-${goarch}.tar.gz"
+        url="https://go.dev/dl/${tarball}"
+
+        echo "Downloading ${url}"
+        curl -fsSL -o "/tmp/${tarball}" "${url}"
+        tar -C /usr/local -xzf "/tmp/${tarball}"
+        rm -f "/tmp/${tarball}"
+
+        # Make Go available system-wide
+        cat > /etc/profile.d/golang.sh <<'EOF'
+export PATH="/usr/local/go/bin:${HOME}/go/bin:${PATH}"
+EOF
+
+        /usr/local/go/bin/go version
+      SHELL
+
+      vm.vm.provision "shell", privileged: false, inline: <<-SHELL
+        set -euo pipefail
+        export PATH="/usr/local/go/bin:${HOME}/go/bin:${PATH}"
+
+        if command -v mage >/dev/null 2>&1; then
+          echo "mage already installed: $(mage --version)"
+          exit 0
+        fi
+
+        echo "Installing mage"
+        go install github.com/magefile/mage@latest
+        mage --version
       SHELL
 
       vm.vm.provision "shell", privileged: true, run: "always", inline: <<-SHELL
