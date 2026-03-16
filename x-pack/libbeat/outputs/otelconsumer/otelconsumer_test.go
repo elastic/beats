@@ -178,16 +178,12 @@ func TestPublish(t *testing.T) {
 		dynamicAttributeKey := "elasticsearch.ingest_pipeline"
 		gotValue, ok := attributes.Get(dynamicAttributeKey)
 		require.True(t, ok, "dynamic pipeline attribute was not set")
-<<<<<<< HEAD
-		assert.Equal(t, "error_pipeline", gotValue.AsString())
-=======
 		assert.EqualValues(t, "error_pipeline", gotValue.AsString())
 
 		dynamicAttributeKey = "elastic.mapping.mode"
 		gotValue, ok = scopeAttributes.Get(dynamicAttributeKey)
 		require.True(t, ok, "elastic mapping mode was not set")
 		assert.EqualValues(t, "bodymap", gotValue.AsString())
->>>>>>> 35594e1b4 ([beatreceiver]Add elastic.mapping.mode attribute in otelconsumer (#48494))
 	})
 
 	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {
