@@ -1727,7 +1727,7 @@ type: object
 *`dhcpv4.option.subnet_mask`*::
 +
 --
-The subnet mask that the client should use on the currnet
+The subnet mask that the client should use on the current
 network.
 
 
