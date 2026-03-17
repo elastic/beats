@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 )
 
@@ -99,6 +100,28 @@ func (m *testManager) RegisterDiagnosticHook(name, _ string, _ string, _ string,
 		m.diagHook = make(map[string]management.DiagnosticHook)
 	}
 	m.diagHook[name] = hook
+}
+
+func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquerybeat, *beat.Beat, *testManager) {
+	t.Helper()
+
+	mgr := &testManager{}
+	b := &beat.Beat{
+		Manager:    mgr,
+		Registry:   reload.NewRegistry(),
+		Monitoring: beatmonitoring.NewMonitoring(),
+	}
+
+	cfg := agentconfig.NewConfig()
+	beater, err := New(b, cfg)
+	require.NoError(t, err)
+
+	ob, ok := beater.(*osquerybeat)
+	require.True(t, ok)
+	for _, override := range overrides {
+		override(ob)
+	}
+	return ob, b, mgr
 }
 
 // TestOsquerybeatStatusReporting_Lifecycle tests the full lifecycle status reporting
@@ -368,4 +391,37 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 	p0, ok := profiles[0].(map[string]interface{})
 	require.True(t, ok)
 	assert.Equal(t, "select * from users limit 1", p0["query"])
+}
+
+// TestOsquerybeatStatusReporting_RuntimeResolutionFailure tests status reporting
+// when custom osquery runtime resolution fails before osqueryd runner creation.
+func TestOsquerybeatStatusReporting_RuntimeResolutionFailure(t *testing.T) {
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		platformCfg := &config.InstallPlatformConfig{
+			AMD64: &config.InstallArtifactConfig{
+				ArtifactURL: "https://example.org/osquery.tar.gz",
+				SHA256:      "bad",
+			},
+			ARM64: &config.InstallArtifactConfig{
+				ArtifactURL: "https://example.org/osquery.tar.gz",
+				SHA256:      "bad",
+			},
+		}
+		ob.osqueryInstallConfig = config.InstallConfig{
+			Linux:   platformCfg,
+			Darwin:  platformCfg,
+			Windows: platformCfg,
+		}
+	})
+
+	err := ob.Run(b)
+	require.Error(t, err)
+
+	mgr.mx.Lock()
+	defer mgr.mx.Unlock()
+
+	require.GreaterOrEqual(t, len(mgr.events), 1, "should have at least one status event")
+	lastEvent := mgr.events[len(mgr.events)-1]
+	assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on runtime resolution failure")
+	assert.Contains(t, lastEvent.Message, "Failed to resolve osquery runtime")
 }
