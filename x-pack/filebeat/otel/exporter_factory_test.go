@@ -150,6 +150,7 @@ func TestGetExporterFromEnvironment(t *testing.T) {
 		metricsExporter string
 		protocol        string
 		endpoint        string
+		metricsEndpoint string
 		eType           string
 		isNil           bool
 	}{
@@ -164,6 +165,8 @@ func TestGetExporterFromEnvironment(t *testing.T) {
 		{name: "none empty exporter", metricsExporter: "", eType: "none", protocol: "", endpoint: "", isNil: true},
 		{name: "none otlp but no other environment set", metricsExporter: "otlp", eType: "none", protocol: "", endpoint: "", isNil: true},
 		{name: "otlp with endpoint set", metricsExporter: "otlp", eType: "grpc", protocol: "", endpoint: "set"},
+		{name: "otlp with metrics endpoint set", metricsExporter: "otlp", eType: "grpc", protocol: "", endpoint: "", metricsEndpoint: "set"},
+		{name: "otlp with metrics endpoint takes precedence", metricsExporter: "otlp", eType: "http", protocol: "http/protobuf", endpoint: "set", metricsEndpoint: "set"},
 		{name: "metrics exporter falls through to grpc", metricsExporter: "anything", eType: "none", protocol: "", endpoint: "set", isNil: true},
 		{name: "grpc default", metricsExporter: "otlp", eType: "grpc", protocol: "", endpoint: "set"},
 		{name: "grpc explicit", metricsExporter: "otlp", eType: "grpc", protocol: "grpc", endpoint: "set"},
@@ -179,6 +182,9 @@ func TestGetExporterFromEnvironment(t *testing.T) {
 			}
 			if tc.endpoint != "" {
 				t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", tc.endpoint)
+			}
+			if tc.metricsEndpoint != "" {
+				t.Setenv("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", tc.metricsEndpoint)
 			}
 			if tc.protocol != "" {
 				t.Setenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL", tc.protocol)

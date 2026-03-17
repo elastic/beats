@@ -199,7 +199,11 @@ func GetExporterTypeFromEnv() ExporterType {
 	case "console":
 		return console
 	case "otlp":
-		if os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT") == "" {
+		endpoint := os.Getenv("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT")
+		if endpoint == "" {
+			endpoint = os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
+		}
+		if endpoint == "" {
 			return None
 		}
 
