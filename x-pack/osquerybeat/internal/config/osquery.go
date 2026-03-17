@@ -26,6 +26,10 @@ type Query struct {
 	// A boolean to determine if "removed" actions should be logged, default true
 	// This is the same as osquery behavior
 	Removed *bool `config:"removed,omitempty" json:"removed,omitempty"`
+
+	// Optional internal flag to emit per-query profiling for this scheduled query.
+	// This is consumed by osquerybeat and not rendered into osqueryd configuration.
+	Profile *bool `config:"profile,omitempty" json:"-"`
 }
 
 type Pack struct {
