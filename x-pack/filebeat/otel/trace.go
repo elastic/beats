@@ -297,7 +297,7 @@ func envBoolFirstFound(keys ...string) (val, found bool, err error) {
 		}
 		b, err := strconv.ParseBool(strings.TrimSpace(raw))
 		if err != nil {
-			return false, true, fmt.Errorf("%s must be boolean: %w", k, err)
+			return false, false, fmt.Errorf("%s must be boolean: %w", k, err)
 		}
 		return b, true, nil
 	}
