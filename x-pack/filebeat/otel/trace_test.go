@@ -67,7 +67,7 @@ func TestNewExporterCfgFromEnv_ExporterIsFirstAvaialble(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if cfg.Exporter != "console" {
-		t.Fatalf("expected default exporter to be 'none', got %s", cfg.Exporter)
+		t.Fatalf("expected the exporter to be 'console', got %s", cfg.Exporter)
 	}
 }
 
