@@ -40,6 +40,9 @@ var (
 
 	// ErrModuleDisabled indicates a disabled module has been tried to instantiate.
 	ErrModuleDisabled = errors.New("disabled module")
+
+	// ErrPathsRequired indicates that paths were nil when creating a module.
+	ErrPathsRequired = errors.New("paths must not be nil when creating a module")
 )
 
 // NewModule builds a new Module and its associated MetricSets based on the
@@ -50,6 +53,9 @@ var (
 func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger) (Module, []MetricSet, error) {
 	if !config.Enabled() {
 		return nil, nil, ErrModuleDisabled
+	}
+	if p == nil {
+		return nil, nil, ErrPathsRequired
 	}
 
 	bm, err := newBaseModuleFromConfig(config, logger)

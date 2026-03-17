@@ -330,7 +330,7 @@ func (b *BaseMetricSet) Registration() MetricSetRegistration {
 }
 
 // GetPath returns the paths associated with this MetricSet.
-// Panics if paths were not set during construction via NewModule.
+// Paths must be set during construction via NewModule.
 func (b *BaseMetricSet) GetPath() *paths.Path {
 	return b.paths
 }
