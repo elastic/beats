@@ -18,6 +18,7 @@
 package icmp
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/url"
@@ -43,6 +44,7 @@ func init() {
 
 func create(
 	name string,
+	_ context.Context,
 	commonConfig *conf.C,
 ) (p plugin.Plugin, err error) {
 	loop, err := getStdLoop()
