@@ -153,12 +153,12 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 	return nil
 }
 
-func (p *Publisher) Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
 	for _, hit := range hits {
-		event := hitToEvent(index, p.b.Info.Name, actionID, responseID, meta, hit, ecsm, reqData)
+		event := hitToEvent(index, p.b.Info.Name, idValue, idFieldKey, responseID, spaceID, packID, meta, hit, ecsm, reqData)
 		p.client.Publish(event)
 	}
 	p.log.Infof("%d events sent to index %s", len(hits), index)
@@ -192,13 +192,54 @@ func (p *Publisher) PublishActionResult(req map[string]interface{}, res map[stri
 	}
 
 	fields := actionResultToEvent(req, res)
-	event := beat.Event{
-		Timestamp: time.Now(),
-		Fields:    fields,
-	}
 
 	p.log.Debugf("Action response event is sent, fields: %#v", fields)
 
+	p.publishActionResponseEvent(fields, time.Now())
+}
+
+// PublishScheduledResponse publishes a synthetic response document for a scheduled query run (no action).
+// Includes schedule_execution_count;
+// native uses 1 + (run_time - start_date) / interval).
+func (p *Publisher) PublishScheduledResponse(scheduleID, packID, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
+	p.mx.Lock()
+	defer p.mx.Unlock()
+
+	if p.actionResponsesClient == nil {
+		p.log.Debug("Action responses stream is not configured. Scheduled response is dropped.")
+		return
+	}
+
+	fields := map[string]interface{}{
+		"schedule_id":              scheduleID,
+		"response_id":              responseID,
+		"action_input_type":        "osquery_scheduled",
+		"started_at":               startedAt.Format(time.RFC3339Nano),
+		"completed_at":             completedAt.Format(time.RFC3339Nano),
+		"planned_schedule_time":    plannedScheduleTime.Format(time.RFC3339Nano),
+		"schedule_execution_count": scheduleExecutionCount,
+		"action_response": map[string]interface{}{
+			"osquery": map[string]interface{}{
+				"count": resultCount,
+			},
+		},
+	}
+	if packID != "" {
+		fields["pack_id"] = packID
+	}
+	if spaceID != "" {
+		fields["space_id"] = spaceID
+	}
+
+	p.log.Debugf("Scheduled response event sent, schedule_id=%s, schedule_execution_count=%d", scheduleID, scheduleExecutionCount)
+	p.publishActionResponseEvent(fields, completedAt)
+}
+
+func (p *Publisher) publishActionResponseEvent(fields map[string]interface{}, timestamp time.Time) {
+	event := beat.Event{
+		Timestamp: timestamp,
+		Fields:    fields,
+	}
 	p.actionResponsesClient.Publish(event)
 }
 
@@ -322,7 +363,7 @@ func (p *Publisher) processorsForInputConfig(inCfg config.InputConfig, defaultDa
 	return procs, nil
 }
 
-func hitToEvent(index, eventType, actionID, responseID string, meta, hit map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) beat.Event {
+func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, packID string, meta, hit map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) beat.Event {
 	var fields mapstr.M
 
 	if len(ecsm) > 0 {
@@ -346,7 +387,9 @@ func hitToEvent(index, eventType, actionID, responseID string, meta, hit map[str
 	fields["event"] = evf
 
 	fields["type"] = eventType
-	fields["action_id"] = actionID
+	if idFieldKey != "" {
+		fields[idFieldKey] = idValue
+	}
 	fields["osquery"] = hit
 	if meta != nil {
 		fields["osquery_meta"] = meta
@@ -363,6 +406,12 @@ func hitToEvent(index, eventType, actionID, responseID string, meta, hit map[str
 
 	if responseID != "" {
 		event.Fields["response_id"] = responseID
+	}
+	if spaceID != "" {
+		event.Fields["space_id"] = spaceID
+	}
+	if packID != "" {
+		event.Fields["pack_id"] = packID
 	}
 	if index != "" {
 		event.Meta = mapstr.M{events.FieldMetaRawIndex: index}

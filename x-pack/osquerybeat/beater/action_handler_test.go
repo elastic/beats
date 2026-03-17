@@ -32,7 +32,8 @@ func (e *mockExecutor) Query(ctx context.Context, sql string, to time.Duration) 
 
 type mockPublisher struct {
 	index      string
-	actionID   string
+	idValue    string
+	idFieldKey string
 	responseID string
 	meta       map[string]interface{}
 	hits       []map[string]interface{}
@@ -41,9 +42,10 @@ type mockPublisher struct {
 	profile    map[string]interface{}
 }
 
-func (p *mockPublisher) Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	p.index = index
-	p.actionID = actionID
+	p.idValue = idValue
+	p.idFieldKey = idFieldKey
 	p.responseID = responseID
 	p.meta = meta
 	p.hits = hits
@@ -73,7 +75,7 @@ func TestActionHandlerExecute(t *testing.T) {
 	tests := []struct {
 		Name          string
 		QueryExecutor queryExecutor
-		Publisher     publisher
+		Publisher     actionQueryPublisher
 
 		Request map[string]interface{}
 		Err     error
@@ -140,7 +142,11 @@ func TestActionHandlerExecute(t *testing.T) {
 						t.Error(diff)
 					}
 
-					diff = cmp.Diff(actionID, tc.Publisher.(*mockPublisher).actionID)
+					diff = cmp.Diff(actionID, tc.Publisher.(*mockPublisher).idValue)
+					if diff != "" {
+						t.Error(diff)
+					}
+					diff = cmp.Diff("action_id", tc.Publisher.(*mockPublisher).idFieldKey)
 					if diff != "" {
 						t.Error(diff)
 					}
@@ -163,7 +169,6 @@ func TestActionHandlerExecute(t *testing.T) {
 					t.Fatal("Unexpected error, got none in the result")
 				}
 			}
-			_ = res
 		})
 	}
 }

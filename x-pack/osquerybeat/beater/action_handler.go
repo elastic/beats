@@ -25,9 +25,27 @@ type actionResultPublisher interface {
 	PublishActionResult(req map[string]interface{}, res map[string]interface{})
 }
 
-type publisher interface {
-	Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
+type queryResultPublisher interface {
+	Publish(index, idValue, idFieldKey, responseID, spaceID, packID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
+}
+
+type scheduledResponsePublisher interface {
+	PublishScheduledResponse(scheduleID, packID, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64)
+}
+
+type queryProfilePublisher interface {
 	PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{})
+}
+
+type scheduledQueryPublisher interface {
+	queryResultPublisher
+	scheduledResponsePublisher
+	queryProfilePublisher
+}
+
+type actionQueryPublisher interface {
+	queryResultPublisher
+	queryProfilePublisher
 }
 
 type queryExecutor interface {
@@ -41,7 +59,7 @@ type namespaceProvider interface {
 type actionHandler struct {
 	log       *logp.Logger
 	inputType string
-	publisher publisher
+	publisher actionQueryPublisher
 	queryExec queryExecutor
 	np        namespaceProvider
 }
@@ -135,7 +153,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	a.log.Debugf("Completed query in: %v", duration)
 
-	a.publisher.Publish(index, ac.ID, responseID, nil, hits, ac.ECSMapping, req["data"])
+	a.publisher.Publish(index, ac.ID, "action_id", responseID, "", "", nil, hits, ac.ECSMapping, req["data"])
 
 	return len(hits), nil
 }
