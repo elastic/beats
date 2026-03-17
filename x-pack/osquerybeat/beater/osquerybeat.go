@@ -87,7 +87,6 @@ type osquerybeat struct {
 
 	diagMx        sync.RWMutex
 	diagQueryExec queryExecutor
-	diagQueryText func(name string) (string, bool)
 
 	// parent process watcher
 	watcher *Watcher
@@ -324,7 +323,7 @@ func (bt *osquerybeat) registerDiagnosticHooks(b *beat.Beat) {
 			defer cancel()
 			bt.diagMx.RLock()
 			defer bt.diagMx.RUnlock()
-			return bt.qp.scheduledProfilesDiagnosticsWithResolver(ctx, bt.diagQueryExec, bt.diagQueryText)
+			return bt.qp.scheduledProfilesDiagnostics(ctx, bt.diagQueryExec)
 		},
 	)
 }
@@ -339,18 +338,6 @@ func (bt *osquerybeat) getDiagnosticsQueryExecutor() queryExecutor {
 	bt.diagMx.RLock()
 	defer bt.diagMx.RUnlock()
 	return bt.diagQueryExec
-}
-
-func (bt *osquerybeat) setDiagnosticsQueryResolver(fn func(name string) (string, bool)) {
-	bt.diagMx.Lock()
-	defer bt.diagMx.Unlock()
-	bt.diagQueryText = fn
-}
-
-func (bt *osquerybeat) getDiagnosticsQueryResolver() func(name string) (string, bool) {
-	bt.diagMx.RLock()
-	defer bt.diagMx.RUnlock()
-	return bt.diagQueryText
 }
 
 func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
@@ -408,16 +395,8 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 			return err
 		}
 		bt.setDiagnosticsQueryExecutor(cli)
-		bt.setDiagnosticsQueryResolver(func(name string) (string, bool) {
-			qi, ok := configPlugin.LookupQueryInfo(name)
-			if !ok {
-				return "", false
-			}
-			return qi.Query, true
-		})
 		defer cli.Close()
 		defer bt.setDiagnosticsQueryExecutor(nil)
-		defer bt.setDiagnosticsQueryResolver(nil)
 
 		// Start osqueryd health monitoring after connection is established
 		g.Go(func() error {

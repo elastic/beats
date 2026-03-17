@@ -351,6 +351,7 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 		rows: []map[string]interface{}{
 			{
 				"name":              "pack_test_query",
+				"query":             "select * from users limit 1",
 				"executions":        int64(3),
 				"last_executed":     int64(1730000000),
 				"output_size":       int64(900),
@@ -364,12 +365,6 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 				"last_memory":       int64(6000),
 			},
 		},
-	})
-	ob.setDiagnosticsQueryResolver(func(name string) (string, bool) {
-		if name == "pack_test_query" {
-			return "select * from users limit 1", true
-		}
-		return "", false
 	})
 
 	ob.registerDiagnosticHooks(b)
@@ -385,7 +380,7 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 	require.True(t, ok)
 	assert.Equal(t, float64(1), count)
 
-	profiles, ok := payload["profiles"].([]interface{})
+	profiles, ok := payload["osquery_schedule"].([]interface{})
 	require.True(t, ok)
 	require.Len(t, profiles, 1)
 
