@@ -286,7 +286,7 @@ func envDurationMillis(key string) time.Duration {
 	if n < 0 {
 		return 0
 	}
-	return time.Duration(n) * time.Millisecond
+	return n * time.Millisecond
 }
 
 func envBoolFirstFound(keys ...string) (val, found bool, err error) {
