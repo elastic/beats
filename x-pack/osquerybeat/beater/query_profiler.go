@@ -20,7 +20,6 @@ SELECT
   name,
   query,
   executions,
-  last_executed,
   output_size,
   last_wall_time_ms,
   last_user_time,
@@ -41,7 +40,6 @@ type runtimeSnapshot struct {
 	residentSize int64
 	userTimeMS   int64
 	systemTimeMS int64
-	fds          int64
 }
 
 type queryProfiler struct {
@@ -68,7 +66,6 @@ func (p *queryProfiler) profileScheduledQuery(ctx context.Context, qe queryExecu
 	row := rows[0]
 	queryText := toString(row["query"])
 	executions := toInt64(row["executions"])
-	lastExecuted := toInt64(row["last_executed"])
 	outputSizeTotal := toInt64(row["output_size"])
 
 	wallMS := toInt64(row["last_wall_time_ms"])
@@ -78,18 +75,16 @@ func (p *queryProfiler) profileScheduledQuery(ctx context.Context, qe queryExecu
 
 	cpuMS := userMS + systemMS
 	profile := map[string]interface{}{
-		"source":         "scheduled",
-		"query_name":     queryName,
-		"utilization":    utilizationFromMillis(cpuMS, wallMS),
-		"duration":       wallMS,
-		"memory":         lastMemory,
-		"user_time":      userMS,
-		"system_time":    systemMS,
-		"cpu_time":       cpuMS,
+		"source":                 "scheduled",
+		"query_name":             queryName,
+		"utilization":            utilizationFromMillis(cpuMS, wallMS),
+		"duration":               wallMS,
+		"memory":                 lastMemory,
+		"user_time":              userMS,
+		"system_time":            systemMS,
+		"cpu_time":               cpuMS,
 		"output_size_cumulative": outputSizeTotal,
-		"executions":     executions,
-		"last_executed":  lastExecuted,
-		"profile_source": "osquery_schedule",
+		"executions":             executions,
 	}
 	if queryText != "" {
 		profile["query"] = queryText
@@ -148,8 +143,7 @@ SELECT
   p.pid,
   p.resident_size,
   p.user_time,
-  p.system_time,
-  (SELECT count(*) FROM process_open_files WHERE pid = p.pid) AS fds
+  p.system_time
 FROM processes p
 JOIN osquery_info o ON p.pid = o.pid
 LIMIT 1`, 5*time.Second)
@@ -164,11 +158,10 @@ LIMIT 1`, 5*time.Second)
 	snap.residentSize = toInt64(row["resident_size"])
 	snap.userTimeMS = toInt64(row["user_time"])
 	snap.systemTimeMS = toInt64(row["system_time"])
-	snap.fds = toInt64(row["fds"])
 	return snap, nil
 }
 
-func buildLiveQueryProfile(query string, before, after runtimeSnapshot, duration time.Duration, hitCount int, queryErr error) map[string]interface{} {
+func buildLiveQueryProfile(query string, before, after runtimeSnapshot, duration time.Duration, queryErr error) map[string]interface{} {
 	userDelta := after.userTimeMS - before.userTimeMS
 	if userDelta < 0 {
 		userDelta = 0
@@ -191,14 +184,12 @@ func buildLiveQueryProfile(query string, before, after runtimeSnapshot, duration
 	return map[string]interface{}{
 		"source":      "live",
 		"query":       query,
-		"rows":        hitCount,
 		"utilization": utilizationFromMillis(cpuMS, wallMS),
 		"duration":    wallMS,
 		"memory":      after.residentSize,
 		"user_time":   userDelta,
 		"system_time": systemDelta,
 		"cpu_time":    cpuMS,
-		"fds":         after.fds,
 		"exit":        exitCode,
 	}
 }

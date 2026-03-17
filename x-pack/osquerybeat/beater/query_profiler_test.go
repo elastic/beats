@@ -77,19 +77,16 @@ func TestUtilizationFromMillis(t *testing.T) {
 }
 
 func TestBuildLiveQueryProfile(t *testing.T) {
-	before := runtimeSnapshot{pid: 1, residentSize: 1000, userTimeMS: 10, systemTimeMS: 5, fds: 10}
-	after := runtimeSnapshot{pid: 1, residentSize: 2000, userTimeMS: 20, systemTimeMS: 15, fds: 12}
+	before := runtimeSnapshot{pid: 1, residentSize: 1000, userTimeMS: 10, systemTimeMS: 5}
+	after := runtimeSnapshot{pid: 1, residentSize: 2000, userTimeMS: 20, systemTimeMS: 15}
 	duration := 100 * time.Millisecond
 
-	profile := buildLiveQueryProfile("SELECT 1", before, after, duration, 5, nil)
+	profile := buildLiveQueryProfile("SELECT 1", before, after, duration, nil)
 	if profile["source"] != "live" {
 		t.Errorf("source = %v, want live", profile["source"])
 	}
 	if profile["query"] != "SELECT 1" {
 		t.Errorf("query = %v, want SELECT 1", profile["query"])
-	}
-	if profile["rows"] != 5 {
-		t.Errorf("rows = %v, want 5", profile["rows"])
 	}
 	if profile["exit"].(int64) != 0 {
 		t.Errorf("exit = %v, want 0", profile["exit"])
@@ -97,11 +94,8 @@ func TestBuildLiveQueryProfile(t *testing.T) {
 	if profile["memory"] != int64(2000) {
 		t.Errorf("memory = %v, want 2000", profile["memory"])
 	}
-	if profile["fds"] != int64(12) {
-		t.Errorf("fds = %v, want 12", profile["fds"])
-	}
 
-	profileErr := buildLiveQueryProfile("SELECT 1", before, after, duration, 0, context.DeadlineExceeded)
+	profileErr := buildLiveQueryProfile("SELECT 1", before, after, duration, context.DeadlineExceeded)
 	if profileErr["exit"].(int64) != 1 {
 		t.Errorf("exit on error = %v, want 1", profileErr["exit"])
 	}

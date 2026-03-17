@@ -139,7 +139,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 		if snapErr != nil {
 			a.log.Debugf("failed to collect post-query profile snapshot: %v", snapErr)
 		} else {
-			profile := buildLiveQueryProfile(ac.Query, before, after, duration, len(hits), err)
+			profile := buildLiveQueryProfile(ac.Query, before, after, duration, err)
 			a.publisher.PublishQueryProfile(config.QueryProfileDatastream(a.namespace()), "", ac.ID, responseID, profile, req["data"])
 		}
 	} else if ac.Profile && !beforeReady {
