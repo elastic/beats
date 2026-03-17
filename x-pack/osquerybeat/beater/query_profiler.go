@@ -13,6 +13,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const osqueryScheduleProfileQueryPrefix = `
@@ -68,12 +70,14 @@ type scheduleTotals struct {
 }
 
 type queryProfiler struct {
+	log           *logp.Logger
 	mx            sync.Mutex
 	scheduleState map[string]scheduleTotals
 }
 
-func newQueryProfiler() *queryProfiler {
+func newQueryProfiler(log *logp.Logger) *queryProfiler {
 	return &queryProfiler{
+		log:           log,
 		scheduleState: make(map[string]scheduleTotals),
 	}
 }
@@ -181,11 +185,17 @@ func (p *queryProfiler) scheduledProfilesDiagnostics(ctx context.Context, qe que
 
 func (p *queryProfiler) scheduledProfilesDiagnosticsWithResolver(ctx context.Context, qe queryExecutor, resolveQuery func(name string) (string, bool)) []byte {
 	if qe == nil {
+		if p.log != nil {
+			p.log.Warnw("Failed to collect scheduled query profiles for Agent diagnostics.", "error", "osquery client is not connected")
+		}
 		return diagnosticsErrorJSON("osquery client is not connected")
 	}
 
 	rows, err := qe.Query(ctx, osqueryScheduleProfilesDiagnosticsQuery, 10*time.Second)
 	if err != nil {
+		if p.log != nil {
+			p.log.Warnw("Failed to collect scheduled query profiles for Agent diagnostics.", "error", err)
+		}
 		return diagnosticsErrorJSON(fmt.Sprintf("failed to query osquery_schedule: %v", err))
 	}
 
@@ -209,6 +219,9 @@ func (p *queryProfiler) scheduledProfilesDiagnosticsWithResolver(ctx context.Con
 
 	data, err := json.MarshalIndent(payload, "", "  ")
 	if err != nil {
+		if p.log != nil {
+			p.log.Warnw("Failed to collect scheduled query profiles for Agent diagnostics.", "error", err)
+		}
 		return diagnosticsErrorJSON(err.Error())
 	}
 	return data

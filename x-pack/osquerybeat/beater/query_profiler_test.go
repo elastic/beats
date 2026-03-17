@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"testing"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestToInt64(t *testing.T) {
@@ -158,7 +160,7 @@ func TestDiagnosticsErrorJSON(t *testing.T) {
 }
 
 func TestNewQueryProfiler(t *testing.T) {
-	p := newQueryProfiler()
+	p := newQueryProfiler(logp.NewLogger("test"))
 	if p == nil {
 		t.Fatal("newQueryProfiler() returned nil")
 	}
@@ -192,7 +194,7 @@ func TestProfileScheduledQuery_FirstRun(t *testing.T) {
 			},
 		},
 	}
-	p := newQueryProfiler()
+	p := newQueryProfiler(logp.NewLogger("test"))
 	profile, err := p.profileScheduledQuery(ctx, qe, "q1")
 	if err != nil {
 		t.Fatal(err)
@@ -211,7 +213,7 @@ func TestProfileScheduledQuery_FirstRun(t *testing.T) {
 func TestProfileScheduledQuery_ExecutionReset(t *testing.T) {
 	ctx := context.Background()
 	// Simulate osquery restart: first call with high counts, second with low counts.
-	p := newQueryProfiler()
+	p := newQueryProfiler(logp.NewLogger("test"))
 	qeFirst := &mockProfileQueryExecutor{
 		rows: []map[string]interface{}{
 			{
@@ -266,7 +268,7 @@ func TestProfileScheduledQuery_ExecutionReset(t *testing.T) {
 
 func TestScheduledProfilesDiagnosticsWithResolver_NilExecutor(t *testing.T) {
 	ctx := context.Background()
-	p := newQueryProfiler()
+	p := newQueryProfiler(logp.NewLogger("test"))
 	data := p.scheduledProfilesDiagnosticsWithResolver(ctx, nil, nil)
 	var m map[string]interface{}
 	if err := json.Unmarshal(data, &m); err != nil {

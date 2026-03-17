@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -344,7 +345,7 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{Manager: mgr}
 	ob := &osquerybeat{
-		qp: newQueryProfiler(),
+		qp: newQueryProfiler(logp.NewLogger("test")),
 	}
 	ob.setDiagnosticsQueryExecutor(&diagnosticsQueryExecutor{
 		rows: []map[string]interface{}{

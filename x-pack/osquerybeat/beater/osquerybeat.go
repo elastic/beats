@@ -115,7 +115,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		osqueryInstallConfig: installCfg,
 		log:                  log,
 		pub:                  pub.New(b, log),
-		qp:                   newQueryProfiler(),
+		qp:                   newQueryProfiler(log),
 		osquerydFactory:      osqd.New,
 		executablePath:       os.Executable,
 	}
