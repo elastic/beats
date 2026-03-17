@@ -139,7 +139,7 @@ func (d *eventDecoder) reset() {
 
 // Buffer prepares the read buffer to hold the next event of n bytes.
 func (d *eventDecoder) Buffer(n int) []byte {
-	if cap(d.buf) > n {
+	if cap(d.buf) >= n {
 		d.buf = d.buf[:n]
 	} else {
 		d.buf = make([]byte, n)
