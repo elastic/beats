@@ -132,7 +132,7 @@ func maybeAddBootAll(args []string, supportsBootAll bool) []string {
 func journalctlSupportsBootAll(logger *logp.Logger, factory JctlFactory) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancel()
-	jctl, err := factory(ctx, logger, "--version")
+	jctl, err := factory(ctx, logger, "journalctl", "--version")
 	if err != nil {
 		logger.Warnf("cannot call journalctl to get its version: %s. Omitting '--boot all'", err)
 		return false

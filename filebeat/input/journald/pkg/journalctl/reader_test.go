@@ -96,15 +96,10 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	}
 
 	factoryCalls := atomic.Uint32{}
-<<<<<<< HEAD
 	factory := func(canceller input.Canceler, logger *logp.Logger, binary string, args ...string) (Jctl, error) {
-=======
-	factory := func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
 		if slices.Contains(args, "--version") {
 			return &versionMock, nil
 		}
-
->>>>>>> f6662a962 (Fix journald input for journalctl versions < 242 by omitting `--boot all` (#49445))
 		factoryCalls.Add(1)
 		// Add a log to make debugging easier and better mimic the behaviour of the real factory/journalctl
 		logger.Debugf("starting new mock journalclt ID: %d", factoryCalls.Load())
@@ -204,11 +199,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 }
 
 func TestNewUsesMergeFlag(t *testing.T) {
-<<<<<<< HEAD
 	f := func(_ input.Canceler, _ *logp.Logger, _ string, s ...string) (Jctl, error) {
-		return nil, nil
-=======
-	f := func(_ input.Canceler, _ *logp.Logger, s ...string) (Jctl, error) {
 		return &JctlMock{
 			NextFunc: func(canceler input.Canceler) ([]byte, error) {
 				ret := "systemd 259 (259.3-1-arch)\n+PAM +AUDIT -SELINUX +APPARMOR"
@@ -216,7 +207,6 @@ func TestNewUsesMergeFlag(t *testing.T) {
 			},
 			KillFunc: func() error { return nil },
 		}, nil
->>>>>>> f6662a962 (Fix journald input for journalctl versions < 242 by omitting `--boot all` (#49445))
 	}
 	r, err := New(
 		logp.NewNopLogger(),
@@ -282,7 +272,10 @@ func TestJournalctlSupportsBootAll(t *testing.T) {
 			}
 
 			logger := logptest.NewFileLogger(t, filepath.Join("..", "..", "..", "..", "build"))
-			got := journalctlSupportsBootAll(logger.Logger, NewFactory("", path))
+			factory := func(canceller input.Canceler, logger *logp.Logger, _ string, args ...string) (Jctl, error) {
+				return Factory(canceller, logger, path, args...)
+			}
+			got := journalctlSupportsBootAll(logger.Logger, factory)
 			if got != tc.wantBootAll {
 				t.Errorf("version %d: wantBootAll=%v but got=%v", tc.version, tc.wantBootAll, got)
 			}
