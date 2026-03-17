@@ -126,6 +126,26 @@ func TestLogsPathMatcher_InvalidSource4(t *testing.T) {
 	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
 }
 
+func TestLogsPathMatcher_NonStringLogPath(t *testing.T) {
+	testConfig := conf.NewConfig()
+
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
+	logMatcher, err := newLogsPathMatcher(*testConfig, logger)
+	assert.NoError(t, err)
+
+	input := mapstr.M{
+		"log": mapstr.M{
+			"file": mapstr.M{
+				"path": 42,
+			},
+		},
+	}
+	output := logMatcher.MetadataIndex(input)
+
+	assert.Equal(t, "", output)
+	assert.Len(t, observedLogs.FilterMessageSnippet("log.file.path is not a string: int").TakeAll(), 1)
+}
+
 func TestLogsPathMatcher_InvalidVarLogPodSource(t *testing.T) {
 	cfgLogsPath := "/var/log/pods/"
 	cfgResourceType := "pod"
