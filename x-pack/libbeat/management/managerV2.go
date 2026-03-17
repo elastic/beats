@@ -296,11 +296,10 @@ func (cm *BeatV2Manager) Start() error {
 	ctx, canceller := context.WithCancel(ctx)
 	cm.errCanceller = canceller
 
-	cm.stopWaitGroup.Add(1)
-	go func() {
-		defer cm.stopWaitGroup.Done()
+	cm.stopWaitGroup.Go(func() {
 		cm.watchErrChan(ctx)
-	}()
+	})
+	cm.stopWaitGroup.Go(cm.unitListen)
 	cm.client.RegisterDiagnosticHook(
 		"beat-rendered-config",
 		"the rendered config used by the beat",
@@ -308,11 +307,6 @@ func (cm *BeatV2Manager) Start() error {
 		"application/yaml",
 		cm.handleDebugYaml)
 
-	cm.stopWaitGroup.Add(1)
-	go func() {
-		defer cm.stopWaitGroup.Done()
-		cm.unitListen()
-	}()
 	cm.isRunning = true
 	return nil
 }
@@ -519,19 +513,14 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.stopBeat()
 			return
 		case sig := <-sigc:
-			// we can't duplicate the same logic used by stopChan here.
-			// A beat will also watch for sigint and shut down, if we call the stopFunc
-			// callback, either the V2 client or the beat will get a panic,
-			// as the stopFunc sent by the beats is usually unsafe.
 			switch sig {
 			case syscall.SIGINT, syscall.SIGTERM:
 				cm.logger.Debug("Received sigterm/sigint, stopping")
 			case syscall.SIGHUP:
 				cm.logger.Debug("Received sighup, stopping")
 			}
-			cm.isRunning = false
 			cm.UpdateStatus(status.Stopping, "Stopping")
-			return
+			cm.stop()
 		case change := <-cm.client.UnitChanges():
 			cm.logger.Infof(
 				"BeatV2Manager.unitListen UnitChanged.ID(%s), UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",

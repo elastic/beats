@@ -196,7 +196,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	if err := b.Manager.Start(); err != nil {
 		return err
 	}
-	defer b.Manager.Stop(false)
 
 	if bt.config.Autodiscover != nil {
 		bt.autodiscover, err = bt.makeAutodiscover(b)

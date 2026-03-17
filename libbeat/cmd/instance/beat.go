@@ -511,27 +511,28 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		}
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctxDashboards, cancelDashboards := context.WithCancel(context.Background())
 
-	// stopBeat must be idempotent since it will be called both from a signal and by the manager.
-	// Since publisher.Close is not safe to be called more than once this is necessary.
-	var once sync.Once
-	stopBeat := func() {
-		once.Do(func() {
-			b.Instrumentation.Tracer().Close()
-			// If the publisher has a Close() method, call it before stopping the beater.
-			if c, ok := b.Publisher.(io.Closer); ok {
-				c.Close()
-			}
-			beater.Stop()
+	// On Stop, the manager will trigger the callback to shut down the
+	// publisher pipeline and then notify the beater.
+	var stopOnce sync.Once
+	b.Manager.SetStopCallback(
+		func() {
+			stopOnce.Do(func() {
+				b.Instrumentation.Tracer().Close()
+				// If the publisher has a Close() method, call it before stopping the beater.
+				if c, ok := b.Publisher.(io.Closer); ok {
+					c.Close()
+				}
+				beater.Stop()
+			})
 		})
-	}
-	svc.HandleSignals(stopBeat, cancel)
 
-	// Allow the manager to stop a currently running beats out of bound.
-	b.Manager.SetStopCallback(stopBeat)
+	// Besides a manager-initiated shutdown from Agent config state,
+	// we stop the manager explicitly on SIGINT / SIGHUP / etc.
+	svc.HandleSignals(func() { b.Manager.Stop(false) }, cancelDashboards)
 
-	err = b.loadDashboards(ctx, false)
+	err = b.loadDashboards(ctxDashboards, false)
 	if err != nil {
 		return err
 	}
