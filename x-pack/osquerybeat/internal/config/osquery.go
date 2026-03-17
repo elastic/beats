@@ -11,7 +11,28 @@ import (
 // ElasticOptions contains Beat-specific options that are not part of
 // osquery's native config schema.
 type ElasticOptions struct {
-	Install *InstallConfig `config:"install" json:"-"`
+	Install             *InstallConfig             `config:"install" json:"-"`
+	QueryProfileStorage *QueryProfileStorageConfig `config:"query_profile_storage" json:"-"`
+}
+
+// QueryProfileStorageConfig controls local storage of live query profiles.
+type QueryProfileStorageConfig struct {
+	Enabled     *bool `config:"enabled" json:"-"`
+	MaxProfiles int   `config:"max_profiles" json:"-"`
+}
+
+func (c QueryProfileStorageConfig) EnabledOrDefault() bool {
+	if c.Enabled == nil {
+		return true
+	}
+	return *c.Enabled
+}
+
+func (c QueryProfileStorageConfig) MaxProfilesOrDefault() int {
+	if c.MaxProfiles <= 0 {
+		return DefaultQueryProfileMaxProfiles
+	}
+	return c.MaxProfiles
 }
 
 type Query struct {

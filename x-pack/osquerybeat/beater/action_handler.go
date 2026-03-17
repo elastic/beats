@@ -37,6 +37,10 @@ type queryProfilePublisher interface {
 	PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{})
 }
 
+type liveProfileRecorder interface {
+	RecordLiveProfile(query string, profile map[string]interface{})
+}
+
 type scheduledQueryPublisher interface {
 	queryResultPublisher
 	scheduledResponsePublisher
@@ -62,6 +66,7 @@ type actionHandler struct {
 	publisher actionQueryPublisher
 	queryExec queryExecutor
 	np        namespaceProvider
+	profiles  liveProfileRecorder
 }
 
 func (a *actionHandler) Name() string {
@@ -119,7 +124,8 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	var before runtimeSnapshot
 	beforeReady := false
-	if ac.Profile {
+	shouldCollect := ac.Profile || a.profiles != nil
+	if shouldCollect {
 		snapshot, err := collectRuntimeSnapshot(ctx, a.queryExec)
 		if err != nil {
 			a.log.Debugf("failed to collect pre-query profile snapshot: %v", err)
@@ -134,16 +140,25 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 	hits, err := a.queryExec.Query(ctx, ac.Query, ac.Timeout)
 	duration := time.Since(start)
 
-	if ac.Profile && beforeReady {
+	if shouldCollect && beforeReady {
 		after, snapErr := collectRuntimeSnapshot(ctx, a.queryExec)
 		if snapErr != nil {
 			a.log.Debugf("failed to collect post-query profile snapshot: %v", snapErr)
 		} else {
 			profile := buildLiveQueryProfile(ac.Query, before, after, duration, err)
-			a.publisher.PublishQueryProfile(config.QueryProfileDatastream(a.namespace()), "", ac.ID, responseID, profile, req["data"])
+			if a.profiles != nil {
+				a.profiles.RecordLiveProfile(ac.Query, profile)
+			}
+			if ac.Profile {
+				a.publisher.PublishQueryProfile(config.QueryProfileDatastream(a.namespace()), "", ac.ID, responseID, profile, req["data"])
+			}
 		}
-	} else if ac.Profile && !beforeReady {
-		a.log.Debug("profile requested but skipped: pre-query snapshot was not collected")
+	} else if shouldCollect && !beforeReady {
+		if ac.Profile {
+			a.log.Debug("profile requested but skipped: pre-query snapshot was not collected")
+		} else {
+			a.log.Debug("profile storage skipped: pre-query snapshot was not collected")
+		}
 	}
 
 	if err != nil {

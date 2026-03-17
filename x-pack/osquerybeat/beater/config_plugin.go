@@ -43,7 +43,7 @@ type QueryInfo struct {
 	// Interval is the schedule interval in seconds for native schedules; used to compute schedule_execution_count
 	Interval int
 	// PackID is the policy-defined pack identifier for pack queries; empty for top-level schedule queries.
-	PackID string
+	PackID  string
 	Profile bool // whether to collect and publish profile for this query
 }
 

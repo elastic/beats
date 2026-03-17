@@ -6,6 +6,7 @@ package beater
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -22,6 +23,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/proc"
@@ -76,8 +78,9 @@ type osquerybeat struct {
 	osqueryVersion string
 	osquerySource  string
 
-	pub osquerybeatPublisher
-	qp  *queryProfiler
+	pub          osquerybeatPublisher
+	qp           *queryProfiler
+	liveProfiles *liveProfileStore
 
 	log *logp.Logger
 
@@ -126,6 +129,17 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		qp:                   newQueryProfiler(log),
 		osquerydFactory:      osqd.New,
 		executablePath:       os.Executable,
+	}
+
+	profileCfg := config.GetQueryProfileStorageConfig(c.Inputs)
+	if profileCfg.EnabledOrDefault() {
+		profileDir := b.Paths.Resolve(paths.Data, filepath.Join("osquerybeat", "live_query_profiles"))
+		store, err := newLiveProfileStore(log, profileDir, profileCfg.MaxProfilesOrDefault())
+		if err != nil {
+			log.Warnw("failed to initialize live query profile storage", "error", err)
+		} else {
+			bt.liveProfiles = store
+		}
 	}
 
 	return bt, nil
@@ -330,9 +344,37 @@ func (bt *osquerybeat) registerDiagnosticHooks(b *beat.Beat) {
 		func() []byte {
 			ctx, cancel := context.WithTimeout(context.Background(), scheduledQueryProfilesDiagTimeout)
 			defer cancel()
+
+			payload := map[string]interface{}{
+				"generated_at": time.Now().UTC().Format(time.RFC3339Nano),
+			}
+
 			bt.diagMx.RLock()
-			defer bt.diagMx.RUnlock()
-			return bt.qp.scheduledProfilesDiagnostics(ctx, bt.diagQueryExec)
+			scheduledPayload, err := bt.qp.scheduledProfilesDiagnosticsPayload(ctx, bt.diagQueryExec)
+			bt.diagMx.RUnlock()
+			if err != nil {
+				payload["error"] = err.Error()
+			} else {
+				for key, value := range scheduledPayload {
+					payload[key] = value
+				}
+			}
+
+			liveProfiles := []map[string]interface{}{}
+			if bt.liveProfiles != nil {
+				liveProfiles = bt.liveProfiles.List()
+			}
+			payload["live_query_profiles"] = liveProfiles
+			payload["live_query_profiles_count"] = len(liveProfiles)
+
+			data, err := json.MarshalIndent(payload, "", "  ")
+			if err != nil {
+				if bt.log != nil {
+					bt.log.Warnw("Failed to collect query profiles diagnostics.", "error", err)
+				}
+				return diagnosticsErrorJSON(err.Error())
+			}
+			return data
 		},
 	)
 }
@@ -685,6 +727,7 @@ func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client, 
 		publisher: bt.pub,
 		queryExec: cli,
 		np:        configPlugin,
+		profiles:  bt.liveProfiles,
 	}
 	rah.Attach(ah)
 	b.Manager.RegisterAction(rah)

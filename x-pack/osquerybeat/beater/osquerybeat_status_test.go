@@ -387,6 +387,14 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 	p0, ok := profiles[0].(map[string]interface{})
 	require.True(t, ok)
 	assert.Equal(t, "select * from users limit 1", p0["query"])
+
+	liveCount, ok := payload["live_query_profiles_count"].(float64)
+	require.True(t, ok)
+	assert.Equal(t, float64(0), liveCount)
+
+	liveProfiles, ok := payload["live_query_profiles"].([]interface{})
+	require.True(t, ok)
+	assert.Len(t, liveProfiles, 0)
 }
 
 // TestOsquerybeatStatusReporting_RuntimeResolutionFailure tests status reporting

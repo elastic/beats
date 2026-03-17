@@ -538,10 +538,10 @@ func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
 	cfgp := NewConfigPlugin(logger)
 
 	const (
-		packName   = "my-pack"
-		packID     = "pack-uuid-123"
-		queryName  = "uptime_query"
-		querySQL   = "select * from uptime"
+		packName    = "my-pack"
+		packID      = "pack-uuid-123"
+		queryName   = "uptime_query"
+		querySQL    = "select * from uptime"
 		queryPeriod = 60
 	)
 

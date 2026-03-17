@@ -26,11 +26,12 @@ import (
 //   query: select * from usb_devices
 
 const (
-	DefaultNamespace              = "default"
-	DefaultDataset                = "osquery_manager.result"
-	DefaultType                   = "logs"
-	DefaultActionResponsesDataset = "osquery_manager.action.responses"
-	DefaultQueryProfileDataset    = "osquery_manager.query_profile"
+	DefaultNamespace               = "default"
+	DefaultDataset                 = "osquery_manager.result"
+	DefaultType                    = "logs"
+	DefaultActionResponsesDataset  = "osquery_manager.action.responses"
+	DefaultQueryProfileDataset     = "osquery_manager.query_profile"
+	DefaultQueryProfileMaxProfiles = 64
 )
 
 var datastreamPrefix = fmt.Sprintf("%s-%s-", DefaultType, DefaultDataset)
@@ -279,4 +280,15 @@ func GetOsqueryInstallConfig(inputs []InputConfig) InstallConfig {
 		return InstallConfig{}
 	}
 	return *inputs[0].Osquery.ElasticOptions.Install
+}
+
+// GetQueryProfileStorageConfig returns live query profile storage settings from the first input if available.
+func GetQueryProfileStorageConfig(inputs []InputConfig) QueryProfileStorageConfig {
+	if len(inputs) == 0 {
+		return QueryProfileStorageConfig{}
+	}
+	if inputs[0].Osquery == nil || inputs[0].Osquery.ElasticOptions == nil || inputs[0].Osquery.ElasticOptions.QueryProfileStorage == nil {
+		return QueryProfileStorageConfig{}
+	}
+	return *inputs[0].Osquery.ElasticOptions.QueryProfileStorage
 }

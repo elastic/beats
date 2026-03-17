@@ -94,27 +94,15 @@ func (p *queryProfiler) profileScheduledQuery(ctx context.Context, qe queryExecu
 }
 
 func (p *queryProfiler) scheduledProfilesDiagnostics(ctx context.Context, qe queryExecutor) []byte {
-	if qe == nil {
-		if p.log != nil {
-			p.log.Warnw("Failed to collect scheduled query profiles for Agent diagnostics.", "error", "osquery client is not connected")
-		}
-		return diagnosticsErrorJSON("osquery client is not connected")
-	}
-
-	rows, err := qe.Query(ctx, osqueryScheduleProfilesDiagnosticsQuery, 10*time.Second)
+	payload, err := p.scheduledProfilesDiagnosticsPayload(ctx, qe)
 	if err != nil {
 		if p.log != nil {
 			p.log.Warnw("Failed to collect scheduled query profiles for Agent diagnostics.", "error", err)
 		}
-		return diagnosticsErrorJSON(fmt.Sprintf("failed to query osquery_schedule: %v", err))
+		return diagnosticsErrorJSON(err.Error())
 	}
 
-	payload := map[string]interface{}{
-		"generated_at":     time.Now().UTC().Format(time.RFC3339Nano),
-		"osquery_schedule": rows,
-		"count":            len(rows),
-	}
-
+	payload["generated_at"] = time.Now().UTC().Format(time.RFC3339Nano)
 	data, err := json.MarshalIndent(payload, "", "  ")
 	if err != nil {
 		if p.log != nil {
@@ -123,6 +111,22 @@ func (p *queryProfiler) scheduledProfilesDiagnostics(ctx context.Context, qe que
 		return diagnosticsErrorJSON(err.Error())
 	}
 	return data
+}
+
+func (p *queryProfiler) scheduledProfilesDiagnosticsPayload(ctx context.Context, qe queryExecutor) (map[string]interface{}, error) {
+	if qe == nil {
+		return nil, fmt.Errorf("osquery client is not connected")
+	}
+
+	rows, err := qe.Query(ctx, osqueryScheduleProfilesDiagnosticsQuery, 10*time.Second)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query osquery_schedule: %w", err)
+	}
+
+	return map[string]interface{}{
+		"osquery_schedule": rows,
+		"count":            len(rows),
+	}, nil
 }
 
 func diagnosticsErrorJSON(message string) []byte {
