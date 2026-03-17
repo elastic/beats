@@ -60,6 +60,9 @@ type ConfigPlugin struct {
 	// we could be sending data into the datastream with namespace that we don't have permissions meanwhile
 	namespaces map[string]string
 
+	// Optional per-query profiling flag.
+	queryProfiles map[string]bool
+
 	// Osquery configuration
 	osqueryConfig *config.OsqueryConfig
 
@@ -73,8 +76,9 @@ type ConfigPlugin struct {
 
 func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
 	p := &ConfigPlugin{
-		log:          log.With("ctx", "config"),
-		queryInfoMap: make(queryInfoMap),
+		log:           log.With("ctx", "config"),
+		queryInfoMap:  make(queryInfoMap),
+		queryProfiles: make(map[string]bool),
 	}
 
 	return p
@@ -106,6 +110,12 @@ func (p *ConfigPlugin) LookupNamespace(name string) (ns string, ok bool) {
 	defer p.mx.RUnlock()
 	ns, ok = p.namespaces[name]
 	return ns, ok
+}
+
+func (p *ConfigPlugin) LookupQueryProfile(name string) bool {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	return p.queryProfiles[name]
 }
 
 func (p *ConfigPlugin) GetNamespace() string {
@@ -173,6 +183,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 	osqueryConfig := &config.OsqueryConfig{}
 	newQueryInfoMap := make(map[string]QueryInfo)
 	namespaces := make(map[string]string)
+	queryProfiles := make(map[string]bool)
 
 	// Set the members if no errors
 	defer func() {
@@ -182,6 +193,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		p.osqueryConfig = osqueryConfig
 		p.newQueryInfoMap = newQueryInfoMap
 		p.namespaces = namespaces
+		p.queryProfiles = queryProfiles
 		p.queriesCount = queriesCount
 	}()
 
@@ -215,6 +227,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			ECSMapping: ecsm,
 		}
 		namespaces[name] = ns
+		queryProfiles[name] = qi.Profile != nil && *qi.Profile
 		queriesCount++
 
 		// Force snapshot by default
@@ -260,6 +273,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 				Platform:   stream.Platform,
 				Version:    stream.Version,
 				ECSMapping: stream.ECSMapping,
+				Profile:    stream.Profile,
 			}
 
 			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi)
