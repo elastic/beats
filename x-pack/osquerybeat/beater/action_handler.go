@@ -27,6 +27,7 @@ type actionResultPublisher interface {
 
 type publisher interface {
 	Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
+	PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{})
 }
 
 type queryExecutor interface {
@@ -75,15 +76,16 @@ func (a *actionHandler) execute(ctx context.Context, req map[string]interface{})
 		return 0, fmt.Errorf("%w: %w", err, ErrQueryExecution)
 	}
 
-	var namespace string
-	if a.np != nil {
-		namespace = a.np.GetNamespace()
-	}
-	if namespace == "" {
-		namespace = config.DefaultNamespace
-	}
+	return a.executeQuery(ctx, config.Datastream(a.namespace()), ac, "", req)
+}
 
-	return a.executeQuery(ctx, config.Datastream(namespace), ac, "", req)
+func (a *actionHandler) namespace() string {
+	if a.np != nil {
+		if ns := a.np.GetNamespace(); ns != "" {
+			return ns
+		}
+	}
+	return config.DefaultNamespace
 }
 
 func (a *actionHandler) executeQuery(ctx context.Context, index string, ac action.Action, responseID string, req map[string]interface{}) (int, error) {
@@ -97,16 +99,41 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	a.log.Debugf("Execute query: %s", ac.Query)
 
+	var before runtimeSnapshot
+	beforeReady := false
+	if ac.Profile {
+		snapshot, err := collectRuntimeSnapshot(ctx, a.queryExec)
+		if err != nil {
+			a.log.Debugf("failed to collect pre-query profile snapshot: %v", err)
+		} else {
+			before = snapshot
+			beforeReady = true
+		}
+	}
+
 	start := time.Now()
 
 	hits, err := a.queryExec.Query(ctx, ac.Query, ac.Timeout)
+	duration := time.Since(start)
+
+	if ac.Profile {
+		after, snapErr := collectRuntimeSnapshot(ctx, a.queryExec)
+		if snapErr != nil {
+			a.log.Debugf("failed to collect post-query profile snapshot: %v", snapErr)
+		} else if !beforeReady {
+			a.log.Debug("profile requested but skipped: pre-query snapshot was not collected")
+		} else {
+			profile := buildLiveQueryProfile(ac.Query, before, after, duration, len(hits), err)
+			a.publisher.PublishQueryProfile(config.QueryProfileDatastream(a.namespace()), "", ac.ID, responseID, profile, req["data"])
+		}
+	}
 
 	if err != nil {
 		a.log.Errorf("Failed to execute query, err: %v", err)
 		return 0, err
 	}
 
-	a.log.Debugf("Completed query in: %v", time.Since(start))
+	a.log.Debugf("Completed query in: %v", duration)
 
 	a.publisher.Publish(index, ac.ID, responseID, nil, hits, ac.ECSMapping, req["data"])
 

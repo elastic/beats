@@ -6,6 +6,7 @@ package beater
 
 import (
 	"context"
+	"encoding/json"
 	"sync"
 	"testing"
 	"time"
@@ -63,7 +64,17 @@ type testManager struct {
 	started  bool
 	stopped  bool
 	startErr error
+	diagHook map[string]management.DiagnosticHook
 	mx       sync.Mutex
+}
+
+type diagnosticsQueryExecutor struct {
+	rows []map[string]interface{}
+	err  error
+}
+
+func (e *diagnosticsQueryExecutor) Query(context.Context, string, time.Duration) ([]map[string]interface{}, error) {
+	return e.rows, e.err
 }
 
 func (m *testManager) UpdateStatus(s status.Status, msg string) {
@@ -83,7 +94,11 @@ func (m *testManager) SetStopCallback(func())              {}
 func (m *testManager) CheckRawConfig(*agentconfig.C) error { return nil }
 func (m *testManager) RegisterAction(management.Action)    {}
 func (m *testManager) UnregisterAction(management.Action)  {}
-func (m *testManager) RegisterDiagnosticHook(string, string, string, string, management.DiagnosticHook) {
+func (m *testManager) RegisterDiagnosticHook(name, _ string, _ string, _ string, hook management.DiagnosticHook) {
+	if m.diagHook == nil {
+		m.diagHook = make(map[string]management.DiagnosticHook)
+	}
+	m.diagHook[name] = hook
 }
 
 // TestOsquerybeatStatusReporting_Lifecycle tests the full lifecycle status reporting
@@ -300,4 +315,57 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 	lastEvent := mgr.events[len(mgr.events)-1]
 	assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on manager start failure")
 	assert.Contains(t, lastEvent.Message, "Failed to start manager")
+}
+
+func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
+	mgr := &testManager{}
+	b := &beat.Beat{Manager: mgr}
+	ob := &osquerybeat{
+		qp: newQueryProfiler(),
+	}
+	ob.setDiagnosticsQueryExecutor(&diagnosticsQueryExecutor{
+		rows: []map[string]interface{}{
+			{
+				"name":              "pack_test_query",
+				"executions":        int64(3),
+				"last_executed":     int64(1730000000),
+				"output_size":       int64(900),
+				"wall_time_ms":      int64(120),
+				"last_wall_time_ms": int64(40),
+				"user_time":         int64(30),
+				"last_user_time":    int64(10),
+				"system_time":       int64(6),
+				"last_system_time":  int64(2),
+				"average_memory":    int64(5000),
+				"last_memory":       int64(6000),
+			},
+		},
+	})
+	ob.setDiagnosticsQueryResolver(func(name string) (string, bool) {
+		if name == "pack_test_query" {
+			return "select * from users limit 1", true
+		}
+		return "", false
+	})
+
+	ob.registerDiagnosticHooks(b)
+
+	hook, ok := mgr.diagHook["scheduled_query_profiles"]
+	require.True(t, ok, "expected scheduled profiles diagnostics hook")
+
+	var payload map[string]interface{}
+	err := json.Unmarshal(hook(), &payload)
+	require.NoError(t, err)
+
+	count, ok := payload["count"].(float64)
+	require.True(t, ok)
+	assert.Equal(t, float64(1), count)
+
+	profiles, ok := payload["profiles"].([]interface{})
+	require.True(t, ok)
+	require.Len(t, profiles, 1)
+
+	p0, ok := profiles[0].(map[string]interface{})
+	require.True(t, ok)
+	assert.Equal(t, "select * from users limit 1", p0["query"])
 }

@@ -38,6 +38,7 @@ type mockPublisher struct {
 	hits       []map[string]interface{}
 	ecsm       ecs.Mapping
 	reqData    interface{}
+	profile    map[string]interface{}
 }
 
 func (p *mockPublisher) Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
@@ -48,6 +49,10 @@ func (p *mockPublisher) Publish(index, actionID, responseID string, meta map[str
 	p.hits = hits
 	p.ecsm = ecsm
 	p.reqData = reqData
+}
+
+func (p *mockPublisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{}) {
+	p.profile = profile
 }
 
 func TestActionHandlerExecute(t *testing.T) {

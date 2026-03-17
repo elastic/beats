@@ -55,6 +55,10 @@ const (
 	extManagerServerName = "osqextman"
 	configPluginName     = "osq_config"
 	loggerPluginName     = "osq_logger"
+
+	// scheduledQueryProfilesDiagTimeout is the timeout for the scheduled_query_profiles diagnostic hook.
+	// Large schedules may need a longer timeout; increase if the diagnostic returns incomplete data.
+	scheduledQueryProfilesDiagTimeout = 20 * time.Second
 )
 
 // osquerybeat configuration.
@@ -63,12 +67,17 @@ type osquerybeat struct {
 	config config.Config
 
 	pub *pub.Publisher
+	qp  *queryProfiler
 
 	log *logp.Logger
 
 	// Beat lifecycle context, cancelled on Stop
 	cancel context.CancelFunc
 	mx     sync.Mutex
+
+	diagMx        sync.RWMutex
+	diagQueryExec queryExecutor
+	diagQueryText func(name string) (string, bool)
 
 	// parent process watcher
 	watcher *Watcher
@@ -90,6 +99,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		config:          c,
 		log:             log,
 		pub:             pub.New(b, log),
+		qp:              newQueryProfiler(),
 		osquerydFactory: osqd.New,
 	}
 
@@ -205,6 +215,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 
 	// Ensure that all the hooks and actions are ready before starting the Manager
 	// to receive configuration.
+	bt.registerDiagnosticHooks(b)
 	if err := b.Manager.Start(); err != nil {
 		b.Manager.UpdateStatus(status.Failed, "Failed to start manager: "+err.Error())
 		return err
@@ -262,6 +273,50 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	return err
 }
 
+func (bt *osquerybeat) registerDiagnosticHooks(b *beat.Beat) {
+	if b == nil || b.Manager == nil {
+		return
+	}
+
+	b.Manager.RegisterDiagnosticHook(
+		"scheduled_query_profiles",
+		"Recent scheduled query profiles collected from osquery_schedule.",
+		"scheduled_query_profiles.json",
+		"application/json",
+		func() []byte {
+			ctx, cancel := context.WithTimeout(context.Background(), scheduledQueryProfilesDiagTimeout)
+			defer cancel()
+			bt.diagMx.RLock()
+			defer bt.diagMx.RUnlock()
+			return bt.qp.scheduledProfilesDiagnosticsWithResolver(ctx, bt.diagQueryExec, bt.diagQueryText)
+		},
+	)
+}
+
+func (bt *osquerybeat) setDiagnosticsQueryExecutor(qe queryExecutor) {
+	bt.diagMx.Lock()
+	defer bt.diagMx.Unlock()
+	bt.diagQueryExec = qe
+}
+
+func (bt *osquerybeat) getDiagnosticsQueryExecutor() queryExecutor {
+	bt.diagMx.RLock()
+	defer bt.diagMx.RUnlock()
+	return bt.diagQueryExec
+}
+
+func (bt *osquerybeat) setDiagnosticsQueryResolver(fn func(name string) (string, bool)) {
+	bt.diagMx.Lock()
+	defer bt.diagMx.Unlock()
+	bt.diagQueryText = fn
+}
+
+func (bt *osquerybeat) getDiagnosticsQueryResolver() func(name string) (string, bool) {
+	bt.diagMx.RLock()
+	defer bt.diagMx.RUnlock()
+	return bt.diagQueryText
+}
+
 func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
 	socketPath := osq.SocketPath()
 
@@ -316,7 +371,17 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		if err != nil {
 			return err
 		}
+		bt.setDiagnosticsQueryExecutor(cli)
+		bt.setDiagnosticsQueryResolver(func(name string) (string, bool) {
+			qi, ok := configPlugin.LookupQueryInfo(name)
+			if !ok {
+				return "", false
+			}
+			return qi.Query, true
+		})
 		defer cli.Close()
+		defer bt.setDiagnosticsQueryExecutor(nil)
+		defer bt.setDiagnosticsQueryResolver(nil)
 
 		// Start osqueryd health monitoring after connection is established
 		g.Go(func() error {
@@ -357,7 +422,6 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		} else {
 			bt.log.Errorf("runOsquery exited with error: %v", err)
 		}
-		bt.log.Errorf("runOsquery exited with error: %v", err)
 	} else {
 		bt.log.Debugf("runOsquery exited")
 	}
@@ -434,6 +498,15 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 			}
 			meta := queryResultMeta("diff", "removed", res)
 			bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, removed, qi.ECSMapping, nil)
+		}
+	}
+
+	if configPlugin.LookupQueryProfile(res.Name) {
+		profile, err := bt.qp.profileScheduledQuery(ctx, cli, res.Name)
+		if err != nil {
+			bt.log.Debugf("failed to collect scheduled query profile for %s: %v", res.Name, err)
+		} else {
+			bt.pub.PublishQueryProfile(config.QueryProfileDatastream(ns), res.Name, "", responseID, profile, nil)
 		}
 	}
 
