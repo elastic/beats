@@ -15,8 +15,9 @@ import (
 
 // unitState is the current state of a unit
 type unitState struct {
-	state status.Status
-	msg   string
+	state    status.Status
+	msg      string
+	suppressHealthDegradation bool // when true, this stream's degraded/failed states do not affect the unit's aggregate health
 }
 
 type clientUnit interface {
@@ -101,9 +102,20 @@ func getStreamStates(expected client.Expected) (map[string]unitState, []string) 
 	streamIDs := make([]string, len(expectedCfg.Streams))
 
 	for idx, stream := range expectedCfg.Streams {
+		// Check if stream is marked as suppressHealthDegradation in its source config.
+		// Optional streams still collect data and report per-stream status,
+		// but their degraded/failed states do not drag the overall unit health down.
+		suppressHealth := false
+		if src := stream.GetSource(); src != nil {
+			if v, ok := src.GetFields()["suppress_health_degradation"]; ok {
+				suppressHealth = v.GetBoolValue()
+			}
+		}
+
 		streamState := unitState{
-			state: status.Unknown,
-			msg:   "",
+			state:    status.Unknown,
+			msg:      "",
+			suppressHealthDegradation: suppressHealth,
 		}
 
 		if id := stream.GetId(); id != "" {
@@ -216,10 +228,16 @@ func (u *agentUnit) calcState() (status.Status, string) {
 		return u.inputLevelState.state, u.inputLevelState.msg
 	}
 
-	// inputLevelState state is marked as running, check the stream states
+	// inputLevelState state is marked as running, check the stream states.
+	// Streams marked as suppressHealthDegradation are excluded from the aggregate health
+	// calculation — they still report per-stream status but do not cause
+	// the unit to be reported as degraded or failed.
 	reportedStatus := status.Running
 	reportedMsg := "Healthy"
 	for _, streamState := range u.streamStates {
+		if streamState.suppressHealthDegradation {
+			continue
+		}
 		switch streamState.state {
 		case status.Degraded:
 			if reportedStatus != status.Degraded {
@@ -307,8 +325,9 @@ func (u *agentUnit) updateStateForStream(streamID string, state status.Status, m
 	}
 
 	u.streamStates[streamID] = unitState{
-		state: state,
-		msg:   msg,
+		state:    state,
+		msg:      msg,
+		suppressHealthDegradation: u.streamStates[streamID].suppressHealthDegradation,
 	}
 
 	state, msg = u.calcState()
@@ -347,8 +366,16 @@ func (u *agentUnit) update(cu *client.Unit) {
 
 	newStreamStates, newStreamIDs := getStreamStates(cu.Expected())
 
+	suppressionChanged := false
 	for key, state := range newStreamStates {
-		if _, exists := u.streamStates[key]; exists {
+		if existing, exists := u.streamStates[key]; exists {
+			// Preserve current health state but update the suppressHealthDegradation flag
+			// in case the stream config changed.
+			if existing.suppressHealthDegradation != state.suppressHealthDegradation {
+				suppressionChanged = true
+			}
+			existing.suppressHealthDegradation = state.suppressHealthDegradation
+			u.streamStates[key] = existing
 			continue
 		}
 
@@ -371,6 +398,21 @@ func (u *agentUnit) update(cu *client.Unit) {
 				break
 			}
 		}
+	}
+
+	// If any stream's suppression flag changed, recompute and publish the
+	// aggregate unit health so that a flip from suppress=false→true (or
+	// vice versa) takes effect immediately.
+	if suppressionChanged {
+		state, msg := u.calcState()
+		streamsPayload := make(map[string]interface{}, len(u.streamStates))
+		for id, streamState := range u.streamStates {
+			streamsPayload[id] = map[string]interface{}{
+				"status": getUnitState(streamState.state).String(),
+				"error":  streamState.msg,
+			}
+		}
+		_ = u.clientUnit.UpdateState(getUnitState(state), msg, map[string]interface{}{"streams": streamsPayload})
 	}
 }
 
