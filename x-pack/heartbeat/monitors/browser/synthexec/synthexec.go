@@ -70,7 +70,7 @@ func projectCommandFactory(projectPath string, args ...string) (func() *SynthCmd
 		// See https://github.com/tj/commander.js/blob/master/docs/options-taking-varying-arguments.md
 		// Note, we don't use the -- approach because it's cleaner to always know we can add new options
 		// to the end.
-		cmd := exec.Command(bin, append([]string{projectPath}, args...)...) //nolint:noctx
+		cmd := exec.Command(bin, append([]string{projectPath}, args...)...) //nolint:noctx // cmd context is already handled out of band
 		cmd.Dir = npmRoot
 		return &SynthCmd{cmd}
 	}
