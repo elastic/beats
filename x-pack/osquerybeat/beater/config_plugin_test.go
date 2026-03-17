@@ -425,7 +425,6 @@ func TestSet(t *testing.T) {
 func TestSetScheduledQueryProfileFlag(t *testing.T) {
 	logger := logp.NewLogger("config_test")
 	cfgp := NewConfigPlugin(logger)
-	profileEnabled := true
 
 	inputs := []config.InputConfig{
 		{
@@ -439,7 +438,7 @@ func TestSetScheduledQueryProfileFlag(t *testing.T) {
 					"scheduled_users": {
 						Query:    "select * from users limit 1",
 						Interval: 60,
-						Profile:  &profileEnabled,
+						Profile:  true,
 					},
 				},
 			},

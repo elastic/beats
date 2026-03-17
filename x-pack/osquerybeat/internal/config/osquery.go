@@ -35,7 +35,7 @@ type Query struct {
 
 	// Optional internal flag to emit per-query profiling for this scheduled query.
 	// This is consumed by osquerybeat and not rendered into osqueryd configuration.
-	Profile *bool `config:"profile,omitempty" json:"-"`
+	Profile bool `config:"profile" json:"-"`
 }
 
 type Pack struct {

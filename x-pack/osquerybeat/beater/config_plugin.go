@@ -33,6 +33,7 @@ var (
 type QueryInfo struct {
 	Query      string
 	ECSMapping ecs.Mapping
+	Profile    bool // whether to collect and publish profile for this query
 }
 
 type queryInfoMap map[string]QueryInfo
@@ -60,9 +61,6 @@ type ConfigPlugin struct {
 	// we could be sending data into the datastream with namespace that we don't have permissions meanwhile
 	namespaces map[string]string
 
-	// Optional per-query profiling flag.
-	queryProfiles map[string]bool
-
 	// Osquery configuration
 	osqueryConfig *config.OsqueryConfig
 
@@ -76,9 +74,8 @@ type ConfigPlugin struct {
 
 func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
 	p := &ConfigPlugin{
-		log:           log.With("ctx", "config"),
-		queryInfoMap:  make(queryInfoMap),
-		queryProfiles: make(map[string]bool),
+		log:          log.With("ctx", "config"),
+		queryInfoMap: make(queryInfoMap),
 	}
 
 	return p
@@ -115,7 +112,16 @@ func (p *ConfigPlugin) LookupNamespace(name string) (ns string, ok bool) {
 func (p *ConfigPlugin) LookupQueryProfile(name string) bool {
 	p.mx.RLock()
 	defer p.mx.RUnlock()
-	return p.queryProfiles[name]
+	// Prefer pending config (newQueryInfoMap) so profile flag is up to date immediately after Set().
+	if p.newQueryInfoMap != nil {
+		if qi, ok := p.newQueryInfoMap[name]; ok {
+			return qi.Profile
+		}
+	}
+	if qi, ok := p.queryInfoMap[name]; ok {
+		return qi.Profile
+	}
+	return false
 }
 
 func (p *ConfigPlugin) GetNamespace() string {
@@ -183,7 +189,6 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 	osqueryConfig := &config.OsqueryConfig{}
 	newQueryInfoMap := make(map[string]QueryInfo)
 	namespaces := make(map[string]string)
-	queryProfiles := make(map[string]bool)
 
 	// Set the members if no errors
 	defer func() {
@@ -193,7 +198,6 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		p.osqueryConfig = osqueryConfig
 		p.newQueryInfoMap = newQueryInfoMap
 		p.namespaces = namespaces
-		p.queryProfiles = queryProfiles
 		p.queriesCount = queriesCount
 	}()
 
@@ -225,9 +229,9 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		newQueryInfoMap[name] = QueryInfo{
 			Query:      qi.Query,
 			ECSMapping: ecsm,
+			Profile:    qi.Profile,
 		}
 		namespaces[name] = ns
-		queryProfiles[name] = qi.Profile != nil && *qi.Profile
 		queriesCount++
 
 		// Force snapshot by default

@@ -44,7 +44,7 @@ type StreamConfig struct {
 	Version    string                 `config:"version"`     // only run on osquery versions greater than or equal-to this version string
 	ECSMapping map[string]interface{} `config:"ecs_mapping"` // ECS mapping definition where the key is the source field in osquery result and the value is the destination fields in ECS
 	// Profile enables per-query profiling for this stream (scheduled query metrics). Requires an input stream with dataset osquery_manager.query_profile to publish events.
-	Profile *bool `config:"profile,omitempty" json:"profile,omitempty"`
+	Profile bool `config:"profile" json:"profile,omitempty"`
 }
 
 type DatastreamConfig struct {
