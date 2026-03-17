@@ -79,7 +79,7 @@ func AutodiscoverBuilder(
 		return nil, err
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil, nil)
 	if err != nil {
 		return nil, err
 	}

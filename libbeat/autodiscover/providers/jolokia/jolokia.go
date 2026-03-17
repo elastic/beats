@@ -86,7 +86,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(fmt.Errorf("no configs defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, nil, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, nil, nil, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}

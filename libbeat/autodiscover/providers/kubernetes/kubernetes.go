@@ -125,7 +125,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, k8sKeystoreProvider)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, k8sKeystoreProvider, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}
