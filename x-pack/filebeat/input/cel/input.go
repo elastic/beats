@@ -187,7 +187,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		if err != nil {
 			return err
 		}
-		defer otelTracerProvider.Shutdown(ctx)
+		defer func() {
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			if err := otelTracerProvider.Shutdown(shutdownCtx); err != nil {
+				log.Warnw("failed to shutdown tracer provider", "error", err)
+			}
+		}()
 	}
 	otelTracer := otelTracerProvider.Tracer(importPath)
 
