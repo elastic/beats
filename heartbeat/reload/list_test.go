@@ -32,7 +32,6 @@ import (
 	rl "github.com/elastic/beats/v7/libbeat/common/reload"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/elastic-agent-libs/config"
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -73,11 +72,11 @@ func (r *runner) Diagnostics() []diagnostics.DiagnosticSetup {
 }
 
 type runnerFactory struct {
-	CreateRunner func(beat.PipelineConnector, *conf.C) (cfgfile.Runner, error)
+	CreateRunner func(beat.PipelineConnector, *config.C) (cfgfile.Runner, error)
 	runners      []cfgfile.Runner
 }
 
-func (r *runnerFactory) Create(x beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
+func (r *runnerFactory) Create(x beat.PipelineConnector, c *config.C) (cfgfile.Runner, error) {
 	config := struct {
 		ID int64 `config:"id"`
 	}{}
@@ -106,7 +105,7 @@ func (r *runnerFactory) Create(x beat.PipelineConnector, c *conf.C) (cfgfile.Run
 	return runner, err
 }
 
-func (r *runnerFactory) CheckConfig(_ *conf.C) error {
+func (r *runnerFactory) CheckConfig(_ *config.C) error {
 	return nil
 }
 
@@ -314,7 +313,7 @@ func TestCreateRunnerAddsDynamicMeta(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 
 			factory := &runnerFactory{
-				CreateRunner: func(p beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
+				CreateRunner: func(p beat.PipelineConnector, cfg *config.C) (cfgfile.Runner, error) {
 					return &runner{
 						OnStart: func() {
 							c, _ := p.Connect()
@@ -324,28 +323,28 @@ func TestCreateRunnerAddsDynamicMeta(t *testing.T) {
 				},
 			}
 
-			var config beat.ClientConfig
+			var c beat.ClientConfig
 			pipeline := &pubtest.FakeConnector{
 				ConnectFunc: func(cfg beat.ClientConfig) (beat.Client, error) {
-					config = cfg
+					c = cfg
 					return &pubtest.FakeClient{}, nil
 				},
 			}
 
 			runner, _ := createRunner(factory, pipeline, &rl.ConfigWithMeta{
-				Config: conf.NewConfig(),
+				Config: config.NewConfig(),
 				Meta:   test.meta,
 			})
 			runner.Start()
 			runner.Stop()
 
-			assert.Equal(t, test.meta, config.Processing.DynamicFields)
+			assert.Equal(t, test.meta, c.Processing.DynamicFields)
 		})
 	}
 }
 
 func createConfig(id int64) *rl.ConfigWithMeta {
-	c := conf.NewConfig()
+	c := config.NewConfig()
 	_ = c.SetInt("id", -1, id)
 	return &rl.ConfigWithMeta{
 		Config: c,
@@ -391,12 +390,12 @@ func (r *updatableRunner) Update(c *config.C) (err error) {
 var _ UpdatableRunner = &updatableRunner{}
 
 type hbrunnerFactory struct {
-	CreateRunner func(beat.PipelineConnector, *conf.C) (cfgfile.Runner, error)
+	CreateRunner func(beat.PipelineConnector, *config.C) (cfgfile.Runner, error)
 	runners      []cfgfile.Runner
 	hashFunc     plugin.HashConfigFunc
 }
 
-func (r *hbrunnerFactory) Create(x beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
+func (r *hbrunnerFactory) Create(x beat.PipelineConnector, c *config.C) (cfgfile.Runner, error) {
 	config := struct {
 		ID int64 `config:"id"`
 	}{}
@@ -425,11 +424,11 @@ func (r *hbrunnerFactory) Create(x beat.PipelineConnector, c *conf.C) (cfgfile.R
 	return runner, err
 }
 
-func (r *hbrunnerFactory) CheckConfig(_ *conf.C) error {
+func (r *hbrunnerFactory) CheckConfig(_ *config.C) error {
 	return nil
 }
 
-func (r *hbrunnerFactory) GetHashFunc(c *conf.C) (plugin.HashConfigFunc, error) {
+func (r *hbrunnerFactory) GetHashFunc(c *config.C) (plugin.HashConfigFunc, error) {
 	if r.hashFunc != nil {
 		return r.hashFunc, nil
 	}
@@ -468,17 +467,17 @@ func TestUpdateConfigs(t *testing.T) {
 }
 
 func TestUpdateConfigsError(t *testing.T) {
-	factory := &hbrunnerFactory{CreateRunner: func(pc beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
-		config := struct {
+	factory := &hbrunnerFactory{CreateRunner: func(pc beat.PipelineConnector, c *config.C) (cfgfile.Runner, error) {
+		cfg := struct {
 			ID int64 `config:"id"`
 		}{}
-		err := c.Unpack(&config)
+		err := c.Unpack(&cfg)
 		if err != nil {
 			return nil, err
 		}
 
 		return &updatableRunner{
-			OnUpdate: func(c *conf.C) error { return fmt.Errorf("test update config error") },
+			OnUpdate: func(c *config.C) error { return fmt.Errorf("test update config error") },
 		}, nil
 	}}
 	logger := logptest.NewTestingLogger(t, "")

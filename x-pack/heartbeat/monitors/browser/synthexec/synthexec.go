@@ -70,7 +70,7 @@ func projectCommandFactory(projectPath string, args ...string) (func() *SynthCmd
 		// See https://github.com/tj/commander.js/blob/master/docs/options-taking-varying-arguments.md
 		// Note, we don't use the -- approach because it's cleaner to always know we can add new options
 		// to the end.
-		cmd := exec.Command(bin, append([]string{projectPath}, args...)...)
+		cmd := exec.Command(bin, append([]string{projectPath}, args...)...) //nolint:noctx
 		cmd.Dir = npmRoot
 		return &SynthCmd{cmd}
 	}
@@ -81,7 +81,7 @@ func projectCommandFactory(projectPath string, args ...string) (func() *SynthCmd
 // InlineJourneyJob returns a job that runs the given source as a single journey.
 func InlineJourneyJob(ctx context.Context, script string, params func() map[string]interface{}, fields stdfields.StdMonitorFields, extraArgs ...string) jobs.Job {
 	newCmd := func() *SynthCmd {
-		return &SynthCmd{exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)} //nolint:gosec // we are safely building a command here, users can add args at their own risk
+		return &SynthCmd{exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)} //nolint:gosec,noctx // we are safely building a command here, users can add args at their own risk
 	}
 
 	return startCmdJob(ctx, newCmd, &script, params, FilterJourneyConfig{}, fields)
