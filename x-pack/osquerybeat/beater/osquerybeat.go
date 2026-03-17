@@ -8,6 +8,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
 	"sync"
 	"time"
 
@@ -25,6 +28,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install"
+	installartifact "github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install/artifact"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
@@ -61,8 +66,13 @@ const (
 type osquerybeat struct {
 	b      *beat.Beat
 	config config.Config
+	// osquery install settings are sourced from inputs[0].osquery.elastic_options.install.
+	osqueryInstallConfig config.InstallConfig
+	// runtime-selected osquery metadata.
+	osqueryVersion string
+	osquerySource  string
 
-	pub *pub.Publisher
+	pub osquerybeatPublisher
 
 	log *logp.Logger
 
@@ -74,7 +84,17 @@ type osquerybeat struct {
 	watcher *Watcher
 
 	osquerydFactory osqd.RunnerFactory
+	executablePath  func() (string, error)
 }
+
+type osquerybeatPublisher interface {
+	scheduledQueryPublisher
+	actionResultPublisher
+	Configure(inputs []config.InputConfig) error
+	Close()
+}
+
+var _ osquerybeatPublisher = (*pub.Publisher)(nil)
 
 // New creates an instance of osquerybeat.
 func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
@@ -84,13 +104,19 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
+	installCfg := config.GetOsqueryInstallConfig(c.Inputs)
+	if err := installCfg.NormalizeAndValidate(); err != nil {
+		return nil, fmt.Errorf("invalid osquery.elastic_options.install configuration: %w", err)
+	}
 
 	bt := &osquerybeat{
-		b:               b,
-		config:          c,
-		log:             log,
-		pub:             pub.New(b, log),
-		osquerydFactory: osqd.New,
+		b:                    b,
+		config:               c,
+		osqueryInstallConfig: installCfg,
+		log:                  log,
+		pub:                  pub.New(b, log),
+		osquerydFactory:      osqd.New,
+		executablePath:       os.Executable,
 	}
 
 	return bt, nil
@@ -156,13 +182,32 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 	defer cleanupFn()
 
-	// Create osqueryd runner using factory
-	osq, err := bt.osquerydFactory(
-		socketPath,
+	osqueryRuntime, err := bt.resolveOsqueryRuntime(ctx)
+	if err != nil {
+		b.Manager.UpdateStatus(status.Failed, "Failed to resolve osquery runtime: "+err.Error())
+		return err
+	}
+	bt.osqueryVersion = osqueryRuntime.Version
+	bt.osquerySource = osqueryRuntime.Source
+	bt.log.Infof("using osquery runtime source=%s version=%s", bt.osquerySource, bt.osqueryVersion)
+
+	opts := []osqd.Option{
 		osqd.WithLogger(bt.log),
 		osqd.WithConfigRefresh(configurationRefreshIntervalSecs),
 		osqd.WithConfigPlugin(configPluginName),
 		osqd.WithLoggerPlugin(loggerPluginName),
+	}
+	if osqueryRuntime.BinDir != "" {
+		opts = append(opts, osqd.WithBinaryPath(osqueryRuntime.BinDir))
+	}
+	if osqueryRuntime.ExtensionPath != "" {
+		opts = append(opts, osqd.WithExtensionPath(osqueryRuntime.ExtensionPath))
+	}
+
+	// Create osqueryd runner using factory
+	osq, err := bt.osquerydFactory(
+		socketPath,
+		opts...,
 	)
 
 	if err != nil {
@@ -391,6 +436,44 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 	return g.Wait()
 }
 
+// nativeScheduleExecutionCount returns the 1-based execution count for a native (interval) schedule,
+// computed from start_date and interval so it is deterministic across agents.
+// Returns 0 if startDate is empty, interval <= 0, or runTime is before startDate.
+func nativeScheduleExecutionCount(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) int64 {
+	if startDateRFC3339 == "" || intervalSecs <= 0 {
+		return 0
+	}
+	startTime, err := time.Parse(time.RFC3339, startDateRFC3339)
+	if err != nil {
+		return 0
+	}
+
+	startUnix := startTime.Unix()
+	if runTimeUnix < startUnix {
+		return 0
+	}
+
+	elapsedSeconds := runTimeUnix - startUnix
+	return 1 + (elapsedSeconds / int64(intervalSecs))
+}
+
+// nativePlannedScheduleTime returns the intended schedule slot for a native interval schedule.
+// Falls back to runTimeUnix when schedule metadata is missing or invalid.
+func nativePlannedScheduleTime(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) time.Time {
+	runTime := time.Unix(runTimeUnix, 0).UTC()
+	executionCount := nativeScheduleExecutionCount(startDateRFC3339, intervalSecs, runTimeUnix)
+	if executionCount <= 0 {
+		return runTime
+	}
+
+	startTime, err := time.Parse(time.RFC3339, startDateRFC3339)
+	if err != nil {
+		return runTime
+	}
+
+	return startTime.UTC().Add(time.Duration(executionCount-1) * time.Duration(intervalSecs) * time.Second)
+}
+
 func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res QueryResult) {
 	ns, ok := configPlugin.LookupNamespace(res.Name)
 	if !ok {
@@ -406,7 +489,24 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 		return
 	}
 
+	// Use policy schedule_id when set, otherwise query name.
+	scheduleID := qi.ScheduleID
+	if scheduleID == "" {
+		scheduleID = res.Name
+	}
+	// Schedule execution count from start_date + interval (same across agents)
+	scheduleExecutionCount := nativeScheduleExecutionCount(qi.StartDate, qi.Interval, res.UnixTime)
+
+	var totalHits int
+
 	responseID := uuid.Must(uuid.NewV4()).String()
+	runTime := time.Unix(res.UnixTime, 0)
+	plannedScheduleTime := nativePlannedScheduleTime(qi.StartDate, qi.Interval, res.UnixTime)
+	publishResolved := func(resultType, action string, hits []map[string]interface{}) {
+		totalHits += len(hits)
+		meta := queryResultMeta(resultType, action, res, scheduleExecutionCount, plannedScheduleTime)
+		bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, qi.PackID, meta, hits, qi.ECSMapping, nil)
+	}
 
 	if res.Action == "snapshot" {
 		snapshot, err := cli.ResolveResult(ctx, qi.Query, res.Hits)
@@ -414,8 +514,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 			bt.log.Errorf("failed to resolve snapshot query result types: %s", res.Name)
 			return
 		}
-		meta := queryResultMeta("snapshot", "", res)
-		bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, snapshot, qi.ECSMapping, nil)
+		publishResolved("snapshot", "", snapshot)
 	} else {
 		if len(res.DiffResults.Added) > 0 {
 			added, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Added)
@@ -423,8 +522,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 				bt.log.Errorf(`failed to resolve diff query "added" result types: %s`, res.Name)
 				return
 			}
-			meta := queryResultMeta("diff", "added", res)
-			bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, added, qi.ECSMapping, nil)
+			publishResolved("diff", "added", added)
 		}
 		if len(res.DiffResults.Removed) > 0 {
 			removed, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Removed)
@@ -432,20 +530,22 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 				bt.log.Errorf(`failed to resolve diff query "removed" result types: %s`, res.Name)
 				return
 			}
-			meta := queryResultMeta("diff", "removed", res)
-			bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, removed, qi.ECSMapping, nil)
+			publishResolved("diff", "removed", removed)
 		}
 	}
 
+	bt.pub.PublishScheduledResponse(scheduleID, qi.PackID, qi.SpaceID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
 }
 
-func queryResultMeta(typ, action string, res QueryResult) map[string]interface{} {
+func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64, plannedScheduleTime time.Time) map[string]interface{} {
 	m := map[string]interface{}{
-		"type":          typ,
-		"calendar_type": res.CalendarTime,
-		"unix_time":     res.UnixTime,
-		"epoch":         res.Epoch,
-		"counter":       res.Counter,
+		"type":                     typ,
+		"calendar_type":            res.CalendarTime,
+		"unix_time":                res.UnixTime,
+		"planned_schedule_time":    plannedScheduleTime.Format(time.RFC3339Nano),
+		"epoch":                    res.Epoch,
+		"counter":                  res.Counter,
+		"schedule_execution_count": scheduleExecutionCount,
 	}
 
 	if action != "" {
@@ -457,9 +557,64 @@ func queryResultMeta(typ, action string, res QueryResult) map[string]interface{}
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
 	if b.Manager != nil {
 		b.Manager.SetPayload(map[string]interface{}{
-			"osquery_version": distro.OsquerydVersion(),
+			"osquery_version": bt.osqueryVersion,
+			"osquery_source":  bt.osquerySource,
 		})
 	}
+}
+
+type osqueryRuntimeSelection struct {
+	BinDir        string
+	ExtensionPath string
+	Version       string
+	Source        string
+}
+
+func (bt *osquerybeat) resolveOsqueryRuntime(ctx context.Context) (osqueryRuntimeSelection, error) {
+	execPathFn := bt.executablePath
+	if execPathFn == nil {
+		execPathFn = os.Executable
+	}
+	exePath, err := execPathFn()
+	if err != nil {
+		return osqueryRuntimeSelection{}, err
+	}
+	bundledDir := filepath.Dir(exePath)
+
+	bundledVersion, err := install.VerifyOsqueryBinary(runtime.GOOS, bundledDir, bt.log)
+	if err != nil {
+		bt.log.Warnf("failed to validate bundled osquery binary, fallback to distro version metadata: %v", err)
+		bundledVersion = distro.OsquerydVersion()
+	}
+	result := osqueryRuntimeSelection{
+		Version: bundledVersion,
+		Source:  "bundled",
+	}
+
+	installDir := bundledDir
+	installCfg := bt.osqueryInstallConfig
+	if !installCfg.EnabledForPlatform(runtime.GOOS, runtime.GOARCH) {
+		if err := installartifact.RemoveInstalled(installDir); err != nil {
+			bt.log.Warnf("failed to cleanup previous custom osquery install, continue with bundled osquery: %v", err)
+		}
+		return result, nil
+	}
+
+	installed, err := installartifact.Ensure(ctx, installCfg, installDir, bt.log)
+	if err != nil {
+		return osqueryRuntimeSelection{}, err
+	}
+	bundledExtPath := osqd.OsqueryExtensionPathForPlatform(runtime.GOOS, bundledDir)
+	if _, err := os.Stat(bundledExtPath); err != nil {
+		return osqueryRuntimeSelection{}, fmt.Errorf("bundled osquery extension is required for custom runtime: %w", err)
+	}
+
+	return osqueryRuntimeSelection{
+		BinDir:        installed.BinDir,
+		ExtensionPath: bundledExtPath,
+		Version:       installed.Version,
+		Source:        "custom_artifact",
+	}, nil
 }
 
 // Stop stops osquerybeat.
