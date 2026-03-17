@@ -2085,20 +2085,27 @@ processors:
             env: "test"
 exporters:
   debug:
+    verbosity: detailed
 `
 	col := oteltestcol.New(t, cfg)
 	require.NotNil(t, col)
 
 	require.Eventually(t, func() bool {
+		// Verify the first test message was enriched by finding the output from Debug exporter.
 		return col.ObservedLogs().
-			FilterMessageSnippet("Publish event").
-			FilterMessageSnippet(`"message": "first test message"`).Len() == 1
-	}, 30*time.Second, 100*time.Millisecond, "Expected log with first test message not found")
+			FilterMessageSnippet("Body: Map({").
+			FilterMessageSnippet(`"message":"first test message"`).
+			FilterMessageSnippet(`"fields":{"env":"test"}`).
+			Len() == 1
+	}, 30*time.Second, 100*time.Millisecond, "Expected exactly one log with first test message")
 	require.Eventually(t, func() bool {
+		// Verify the second test message was enriched by finding the output from Debug exporter.
 		return col.ObservedLogs().
-			FilterMessageSnippet("Publish event").
-			FilterMessageSnippet(`"message": "second test message"`).Len() == 1
-	}, 30*time.Second, 100*time.Millisecond, "Expected log with second test message not found")
+			FilterMessageSnippet("Body: Map({").
+			FilterMessageSnippet(`"message":"second test message"`).
+			FilterMessageSnippet(`"fields":{"env":"test"}`).
+			Len() == 1
+	}, 30*time.Second, 100*time.Millisecond, "Expected exactly one log with second test message")
 
 	processorInstanceCount := col.ObservedLogs().FilterMessageSnippet("Configured Beat processor").Len()
 	assert.Equal(t, 1, processorInstanceCount, "expected beat processor to be configured once (shared instance), but got %d", processorInstanceCount)
