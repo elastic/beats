@@ -2028,3 +2028,78 @@ service:
 		col.Shutdown()
 	}
 }
+
+// TestBeatProcessorSharedAcrossPipelines verifies that when the same beat
+// processor component ID is referenced by multiple OTel pipelines, only a
+// single underlying beatProcessor instance is created. This avoids duplicate
+// initialisation of expensive Beat sub-processors (add_cloud_metadata,
+// add_kubernetes_metadata, etc.).
+//
+// The test configures a full OTel Collector with two log pipelines that both
+// reference the same "beat" processor, then asserts that the "Configured Beat
+// processor" log message appears exactly once — proving a single shared instance.
+func TestBeatProcessorSharedAcrossPipelines(t *testing.T) {
+	cfg := `service:
+  pipelines:
+    logs/1:
+      receivers:
+        - filebeatreceiver/1
+      processors:
+        - beat
+      exporters:
+        - debug
+    logs/2:
+      receivers:
+        - filebeatreceiver/2
+      processors:
+        - beat
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: debug
+    metrics:
+      level: none
+receivers:
+  filebeatreceiver/1:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          message: "first test message"
+          count: 1
+    queue.mem.flush.timeout: 0s
+  filebeatreceiver/2:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          message: "second test message"
+          count: 1
+    queue.mem.flush.timeout: 0s
+processors:
+  beat:
+    processors:
+      - add_fields:
+          fields:
+            env: "test"
+exporters:
+  debug:
+`
+	col := oteltestcol.New(t, cfg)
+	require.NotNil(t, col)
+
+	require.Eventually(t, func() bool {
+		return col.ObservedLogs().
+			FilterMessageSnippet("Publish event").
+			FilterMessageSnippet(`"message": "first test message"`).Len() == 1
+	}, 30*time.Second, 100*time.Millisecond, "Expected log with first test message not found")
+	require.Eventually(t, func() bool {
+		return col.ObservedLogs().
+			FilterMessageSnippet("Publish event").
+			FilterMessageSnippet(`"message": "second test message"`).Len() == 1
+	}, 30*time.Second, 100*time.Millisecond, "Expected log with second test message not found")
+
+	processorInstanceCount := col.ObservedLogs().FilterMessageSnippet("Configured Beat processor").Len()
+	assert.Equal(t, 1, processorInstanceCount, "expected beat processor to be configured once (shared instance), but got %d", processorInstanceCount)
+}
