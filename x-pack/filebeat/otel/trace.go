@@ -131,6 +131,7 @@ type ExporterCfg struct {
 // - OTEL_EXPORTER_OTLP_TRACES_HEADERS  / OTEL_EXPORTER_OTLP_HEADERS  (e.g. "Authorization=Bearer abc123,X-Client-Version=1.2.3")
 // - OTEL_EXPORTER_OTLP_TRACES_TIMEOUT  / OTEL_EXPORTER_OTLP_TIMEOUT  (in ms)
 // - OTEL_EXPORTER_OTLP_TRACES_INSECURE / OTEL_EXPORTER_OTLP_INSECURE (values: true|false, default: true if http scheme used, otherwise false)
+// Matching the spec, the OTLP endpoint value gets "/v1/traces" appended to it if it's not from the signal-specific variable and not using grpc.
 func newExporterCfgFromEnv(inputName string) (*ExporterCfg, error) {
 	cfg := ExporterCfg{}
 
@@ -179,21 +180,23 @@ func newExporterCfgFromEnv(inputName string) (*ExporterCfg, error) {
 	}
 
 	cfg.EndpointURL = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"))
+	signalSpecificEndpoint := true
 	if cfg.EndpointURL == "" {
 		cfg.EndpointURL = strings.TrimSpace(os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))
+		signalSpecificEndpoint = false
 	}
 	if cfg.EndpointURL != "" {
 		u, err := urlParsePossiblySchemaless(cfg.EndpointURL)
 		if err != nil {
 			return nil, fmt.Errorf("can't parse OLTP endpoint URL: %w", err)
 		}
-		if u.Path == "" {
-			// Add default path if none is present.
-			// In other implementations only OTEL_EXPORTER_OTLP_ENDPOINT values get the
-			// path added and OTEL_EXPORTER_OTLP_TRACES_ENDPOINT is expected to be
-			// complete, but here we'll do the same thing for both. Any path, including
-			// root ('/') will avoid using the default.
-			u.Path = "/v1/traces"
+		if cfg.Protocol != "grpc" {
+			if u.Path == "" {
+				u.Path = "/"
+			}
+			if !signalSpecificEndpoint {
+				u.Path = strings.TrimRight(u.Path, "/") + "/v1/traces"
+			}
 		}
 		if u.Scheme == "" {
 			// Add default schema if none is present.

@@ -112,7 +112,7 @@ func TestNewExporterCfgFromEnv_PrefersTraceSpecificOTLPVars(t *testing.T) {
 	t.Setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "5000")
 	t.Setenv("OTEL_EXPORTER_OTLP_INSECURE", "true")
 	t.Setenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL", "grpc")
-	t.Setenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", "http://otlp-receiver4.example.com:4317")
+	t.Setenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", "http://otlp-receiver4.example.com:4317/v1/traces")
 	t.Setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "Authorization=Bearer abc124,X-Client-Version=1.2.4")
 	t.Setenv("OTEL_EXPORTER_OTLP_TRACES_TIMEOUT", "4000")
 	t.Setenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE", "false")
@@ -135,13 +135,14 @@ func TestNewExporterCfgFromEnv_PrefersTraceSpecificOTLPVars(t *testing.T) {
 }
 
 func TestNewExporterCfgFromEnv_EndpointURLDefaultSchemeAndPath(t *testing.T) {
+	t.Setenv("OTEL_EXPORTER_OTLP_PROTOCOL", "http/protobuf")
 	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "otlp-receiver.example.com:4317")
 	got, err := newExporterCfgFromEnv("cel")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if !strings.HasPrefix(got.EndpointURL, "https://") {
-		t.Fatalf("expected default schema of https to be added, got EndpointURL %s", got.EndpointURL)
+		t.Fatalf("expected default scheme of https to be added, got EndpointURL %s", got.EndpointURL)
 	}
 	if !strings.HasSuffix(got.EndpointURL, "/v1/traces") {
 		t.Fatalf("expected default path of /v1/traces to be added, got EndpointURL %s", got.EndpointURL)
@@ -149,16 +150,29 @@ func TestNewExporterCfgFromEnv_EndpointURLDefaultSchemeAndPath(t *testing.T) {
 }
 
 func TestNewExporterCfgFromEnv_TracesEndpointURLDefaultSchemeAndPath(t *testing.T) {
+	t.Setenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL", "http/protobuf")
 	t.Setenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", "otlp-receiver.example.com:4317")
 	got, err := newExporterCfgFromEnv("cel")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if !strings.HasPrefix(got.EndpointURL, "https://") {
-		t.Fatalf("expected default schema of https to be added, got EndpointURL %s", got.EndpointURL)
+		t.Fatalf("expected default scheme of https to be added, got EndpointURL %s", got.EndpointURL)
 	}
-	if !strings.HasSuffix(got.EndpointURL, "/v1/traces") {
-		t.Fatalf("expected default path of /v1/traces to be added, got EndpointURL %s", got.EndpointURL)
+	if got.EndpointURL != "https://otlp-receiver.example.com:4317/" {
+		t.Fatalf("expected signal-specific HTTP endpoint with empty path to default to root path, got EndpointURL %s", got.EndpointURL)
+	}
+}
+
+func TestNewExporterCfgFromEnv_EndpointURLAppendsPathWithoutDoubleSlash(t *testing.T) {
+	t.Setenv("OTEL_EXPORTER_OTLP_PROTOCOL", "http/protobuf")
+	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "https://otlp-receiver.example.com:4317/")
+	got, err := newExporterCfgFromEnv("cel")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.EndpointURL != "https://otlp-receiver.example.com:4317/v1/traces" {
+		t.Fatalf("expected base HTTP endpoint to append /v1/traces without a double slash, got EndpointURL %s", got.EndpointURL)
 	}
 }
 

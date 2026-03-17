@@ -132,7 +132,7 @@ Setting OTEL_TRACES_EXPORTER="otlp" will activate export. Alternatively, a
 Further configuration can be done as in the following example:
 
 	OTEL_EXPORTER_OTLP_TRACES_PROTOCOL="grpc"
-	OTEL_EXPORTER_OTLP_TRACES_ENDPOINT="http://otlp-receiver.example.com:4317"
+	OTEL_EXPORTER_OTLP_TRACES_ENDPOINT="http://otlp-receiver.example.com:4317/v1/traces"
 	OTEL_EXPORTER_OTLP_TRACES_HEADERS="Authorization=Bearer abc123"
 	OTEL_EXPORTER_OTLP_TRACES_TIMEOUT="5000"
 	OTEL_EXPORTER_OTLP_TRACES_INSECURE="false"
