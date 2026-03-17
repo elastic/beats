@@ -140,6 +140,12 @@ func (f *RunnerFactory) GetHashFunc(c *conf.C) (plugin.HashConfigFunc, error) {
 
 // Create makes a new Runner for a new monitor with the given Config.
 func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, error) {
+	// Only for backwards-compatible monitors.d loading
+	c, err := stdfields.UnnestStream(c)
+	if err != nil {
+		return nil, err
+	}
+
 	if !c.Enabled() {
 		return NoopRunner{}, nil
 	}
