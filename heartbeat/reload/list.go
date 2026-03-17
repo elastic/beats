@@ -32,8 +32,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/gohugoio/hashstructure"
+)
+
+var (
+	// configScans measures how many times the config dir was scanned for
+	// changes, configReloads measures how many times there were changes that
+	// triggered an actual reload.
+	moduleStarts  = monitoring.NewInt(nil, "heartbeat.config.module.starts")
+	moduleStops   = monitoring.NewInt(nil, "heartbeat.config.module.stops")
+	moduleRunning = monitoring.NewInt(nil, "heartbeat.config.module.running") // Number of modules in the runner list (not necessarily in the running state).
 )
 
 // HBRunnerList implements a reloadable.List of Runners
@@ -150,7 +160,7 @@ func (r *HBRunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 			runner.Stop()
 			r.logger.Debugf("Runner: '%s' has stopped", runner)
 		}(runner)
-		// moduleStops.Add(1)
+		moduleStops.Add(1)
 	}
 
 	// Wait for all runners to stop before starting new ones
@@ -189,7 +199,7 @@ func (r *HBRunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		}
 
 		runner.Start()
-		// moduleStarts.Add(1)
+		moduleStarts.Add(1)
 		if config.DiagCallback != nil {
 			if diag, ok := runner.(diagnostics.DiagnosticReporter); ok {
 				r.logger.Debugf("Runner '%s' has diagnostics, attempting to register", runner)
@@ -206,7 +216,7 @@ func (r *HBRunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	// number of modules in the running state may differ because modules can
 	// stop on their own (i.e. on errors) and also when this stops a module
 	// above it is done asynchronously.
-	// moduleRunning.Set(int64(len(r.runners)))
+	moduleRunning.Set(int64(len(r.runners)))
 
 	return errors.Join(errs...)
 }
@@ -252,19 +262,19 @@ func (r *HBRunnerList) Has(hash uint64) bool {
 func (r *HBRunnerList) HashConfig(c *config.C) (uint64, error) {
 	hbfactory, ok := r.factory.(monitors.HBRunnerFactory)
 	if !ok {
-		r.logger.Infof("plugin factory does not implement HBRunnerFactory, defaulting to config hash")
+		r.logger.Debugf("plugin factory does not implement HBRunnerFactory, defaulting to config hash")
 		return DefaultHashConfig(c)
 	}
 
-	hash, err := hbfactory.GetHashFunc(c)
+	hashFunc, err := hbfactory.GetHashFunc(c)
 	if err != nil {
-		r.logger.Errorf("error looking for plugin, using default hash: %v", err)
+		r.logger.Warnf("error looking for plugin, using default hash: %v", err)
 		return DefaultHashConfig(c)
 	}
 
-	if hash != nil {
-		r.logger.Infof("found plugin hash function, deferring")
-		return hash(c)
+	if hashFunc != nil {
+		r.logger.Debugf("found plugin hash function, deferring")
+		return hashFunc(c)
 	}
 
 	return DefaultHashConfig(c)

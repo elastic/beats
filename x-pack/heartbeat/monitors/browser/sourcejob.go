@@ -113,7 +113,7 @@ func (sj *SourceJob) Update(c *config.C) error {
 
 	sj.mtx.Lock()
 	defer sj.mtx.Unlock()
-	// Selectively update fields
+	// Update fields that don't require a restart
 	sj.browserCfg.Params = cfg.Params
 
 	return nil
