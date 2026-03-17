@@ -116,16 +116,16 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 	hits, err := a.queryExec.Query(ctx, ac.Query, ac.Timeout)
 	duration := time.Since(start)
 
-	if ac.Profile {
+	if ac.Profile && beforeReady {
 		after, snapErr := collectRuntimeSnapshot(ctx, a.queryExec)
 		if snapErr != nil {
 			a.log.Debugf("failed to collect post-query profile snapshot: %v", snapErr)
-		} else if !beforeReady {
-			a.log.Debug("profile requested but skipped: pre-query snapshot was not collected")
 		} else {
 			profile := buildLiveQueryProfile(ac.Query, before, after, duration, len(hits), err)
 			a.publisher.PublishQueryProfile(config.QueryProfileDatastream(a.namespace()), "", ac.ID, responseID, profile, req["data"])
 		}
+	} else if ac.Profile && !beforeReady {
+		a.log.Debug("profile requested but skipped: pre-query snapshot was not collected")
 	}
 
 	if err != nil {
