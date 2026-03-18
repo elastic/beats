@@ -255,7 +255,6 @@ require (
 	go.opentelemetry.io/collector/pipeline v1.53.0
 	go.opentelemetry.io/collector/processor v1.53.0
 	go.opentelemetry.io/collector/processor/processorhelper v0.147.0
-	go.opentelemetry.io/collector/processor/processortest v0.147.0
 	go.opentelemetry.io/collector/receiver/receivertest v0.147.0
 	go.opentelemetry.io/collector/service v0.147.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.65.0
@@ -491,6 +490,7 @@ require (
 	go.opentelemetry.io/collector/pdata/testdata v0.147.0 // indirect
 	go.opentelemetry.io/collector/pdata/xpdata v0.147.0 // indirect
 	go.opentelemetry.io/collector/pipeline/xpipeline v0.147.0 // indirect
+	go.opentelemetry.io/collector/processor/processortest v0.147.0 // indirect
 	go.opentelemetry.io/collector/processor/xprocessor v0.147.0 // indirect
 	go.opentelemetry.io/collector/receiver/xreceiver v0.147.0 // indirect
 	go.opentelemetry.io/collector/service/hostcapabilities v0.147.0 // indirect
