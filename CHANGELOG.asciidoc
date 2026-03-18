@@ -60,7 +60,7 @@ https://github.com/elastic/beats/compare/v8.19.12\...v8.19.13[View commits]
 
 [discrete]
 [[bug-fixes-8.19.13]]
-=== Bug fixes
+==== Bug fixes
 
 **All**
 
