@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/elastic-agent-autodiscover/utils"
@@ -55,6 +56,7 @@ func AutodiscoverBuilder(
 	c *conf.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	path *paths.Path,
 ) (autodiscover.Provider, error) {
 	logger.Warn(cfgwarn.Experimental("The nomad autodiscover provider is experimental."))
 
@@ -79,7 +81,7 @@ func AutodiscoverBuilder(
 		return nil, err
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil, path)
 	if err != nil {
 		return nil, err
 	}

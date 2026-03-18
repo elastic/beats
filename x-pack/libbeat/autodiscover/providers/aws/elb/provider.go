@@ -8,6 +8,7 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -44,6 +45,7 @@ func AutodiscoverBuilder(
 	c *conf.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	path *paths.Path,
 ) (autodiscover.Provider, error) {
 	logger.Warn(cfgwarn.Deprecate("", "aws_elb autodiscover is now deprecated and will be removed in a future release."))
 

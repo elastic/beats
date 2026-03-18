@@ -10,6 +10,7 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -45,6 +46,7 @@ func AutodiscoverBuilder(
 	c *conf.C,
 	keystore keystore.Keystore,
 	log *logp.Logger,
+	path *paths.Path,
 ) (autodiscover.Provider, error) {
 	log.Warn(cfgwarn.Experimental("aws_ec2 autodiscover is experimental"))
 

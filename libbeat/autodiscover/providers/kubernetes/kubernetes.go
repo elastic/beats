@@ -29,6 +29,7 @@ import (
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -96,6 +97,7 @@ func AutodiscoverBuilder(
 	c *config.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	path *paths.Path,
 ) (autodiscover.Provider, error) {
 	logger = logger.Named("kubernetes")
 
@@ -125,7 +127,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, k8sKeystoreProvider, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, k8sKeystoreProvider, path)
 	if err != nil {
 		return nil, errWrap(err)
 	}

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -36,7 +37,7 @@ type Provider interface {
 }
 
 // ProviderBuilder creates a new provider based on the given config and returns it
-type ProviderBuilder func(string, bus.Bus, uuid.UUID, *config.C, keystore.Keystore, *logp.Logger) (Provider, error)
+type ProviderBuilder func(string, bus.Bus, uuid.UUID, *config.C, keystore.Keystore, *logp.Logger, *paths.Path) (Provider, error)
 
 // AddProvider registers a new ProviderBuilder
 func (r *registry) AddProvider(name string, provider ProviderBuilder) error {
@@ -71,7 +72,7 @@ func (r *registry) GetProvider(name string) ProviderBuilder {
 }
 
 // BuildProvider reads provider configuration and instantiate one
-func (r *registry) BuildProvider(beatName string, bus bus.Bus, c *config.C, keystore keystore.Keystore) (Provider, error) {
+func (r *registry) BuildProvider(beatName string, bus bus.Bus, c *config.C, keystore keystore.Keystore, path *paths.Path) (Provider, error) {
 	var config ProviderConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -88,5 +89,5 @@ func (r *registry) BuildProvider(beatName string, bus bus.Bus, c *config.C, keys
 		return nil, err
 	}
 
-	return builder(beatName, bus, uuid, c, keystore, r.logger)
+	return builder(beatName, bus, uuid, c, keystore, r.logger, path)
 }

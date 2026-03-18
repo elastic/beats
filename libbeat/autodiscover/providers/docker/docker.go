@@ -25,6 +25,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -70,6 +71,7 @@ func AutodiscoverBuilder(
 	c *config.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	path *paths.Path,
 ) (autodiscover.Provider, error) {
 	logger = logger.Named("docker")
 
@@ -96,7 +98,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(fmt.Errorf("no configs or hints defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil, path)
 	if err != nil {
 		return nil, errWrap(err)
 	}
