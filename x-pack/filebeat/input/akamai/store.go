@@ -29,8 +29,9 @@ func newCursorStore(states statestore.States, key string, log *logp.Logger) (*cu
 
 func (cs *cursorStore) Load() (cursor, error) {
 	var cur cursor
-	if err := cs.store.Get(cs.key, &cur); err != nil { //nolint:nilerr // missing key on first run is expected, not a failure
+	if err := cs.store.Get(cs.key, &cur); err != nil {
 		cs.log.Debugw("no persisted cursor found, starting fresh", "key", cs.key)
+		//nolint:nilerr // missing key on first run is expected, not a failure
 		return cursor{}, nil
 	}
 	cs.log.Infow("loaded persisted cursor",
