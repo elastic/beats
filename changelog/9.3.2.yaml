@@ -1,0 +1,611 @@
+version: 9.3.2
+entries:
+    - kind: other
+      summary: Update Go to 1.25.8
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1760385532
+      file:
+        name: 1760385532-bump-golang-1.25.8.yaml
+        checksum: c92269154e9433fdc7be35a0c73aaadc86b35650
+    - kind: enhancement
+      summary: Add optional token_url support for JWT Bearer Flow in Salesforce input.
+      description: |
+        The Salesforce input now supports a separate `token_url` configuration for JWT Bearer Flow
+        authentication. This allows users with custom Salesforce domains or restrictions on default
+        endpoints (login.salesforce.com/test.salesforce.com) to specify a different token endpoint
+        URL while keeping the audience URL separate. If token_url is not provided, the existing
+        behavior of using the audience URL as the token endpoint is maintained.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/43963
+      impact: ""
+      action: ""
+      timestamp: 1765138168
+      file:
+        name: 1765138168-salesforce-jwt-custom-endpoint.yaml
+        checksum: 852c51ca823af9b56f2eb075fb60b67826f7e678
+    - kind: enhancement
+      summary: Improves resiliency of the AMQP parser against invalid or corrupt data frames
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48033
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1766326804
+      file:
+        name: 1766326804-Improve-amqp-parser.yaml
+        checksum: 1cb08cac80f5b62ba17ec16285c292e5576d43e8
+    - kind: enhancement
+      summary: add swap field to system.process.memory metric set in metricbeat
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1767864511
+      file:
+        name: 1767864511-add-swap-field-to-system.process.memory-metric-set-in-metricbeats.yaml
+        checksum: 10f95df2eac3b18ea5c4e16a19e7d69b35565064
+    - kind: enhancement
+      summary: tbs-monitoring
+      description: Add new TBS metrics to monitor mappings
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1769485799
+      file:
+        name: 1769485799-tbs-monitoring.yaml
+        checksum: d8012fa373e4d3031ef0f53dfd719104957def53
+    - kind: bug-fix
+      summary: Improve in-flight byte accounting in the HTTP Endpoint input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/48456
+      impact: ""
+      action: ""
+      timestamp: 1769579610
+      file:
+        name: 1769579610-48456-http_endpoint.yaml
+        checksum: d707f97b3eacecd21b007972de2419347b49f9cf
+    - kind: enhancement
+      summary: Add a config to improve wildcard handling to report actual object names
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1770024962
+      file:
+        name: 1770024962-perfmon-objects.yaml
+        checksum: 7176522356c75df1f891fec8b28eb76eeef434fe
+    - kind: bug-fix
+      summary: Honor non-fingerprint file_identity defaults in filestream
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1770044793
+      file:
+        name: 1770044793-filebeat-honor-non-fingerprint-file_identity-defaults.yaml
+        checksum: bd5bd59aebd8f135d3ebf4e282376ea23cb05880
+    - kind: unknown
+      summary: Fix Kubernetes secret variable resolution in Filebeat autodiscover hints
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1770757201
+      file:
+        name: 1770757201-filebeat-hints-kubernetes-secret-resolver.yaml
+        checksum: 33bffd4d97c6542a586e9a5e9ff8d5c3563afdc0
+    - kind: security
+      summary: Update elastic-agent-system-metrics to v0.14.0.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1770852460
+      file:
+        name: 1770852460-bump-elastic-agent-system-metrics-to-v0.14.0.yaml
+        checksum: ea469df844556c1f779e1dd9566392a3ef755443
+    - kind: security
+      summary: Update elastic-agent-autodiscover to v0.10.2.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1770853396
+      file:
+        name: 1770853396-bump-elastic-agent-autodiscover-to-v0.10.2.yaml
+        checksum: 6a8a92fcf7d510c121e8eb8e3674f0852a8189c5
+    - kind: security
+      summary: Update elastic-agent-libs to v0.32.2.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1771014600
+      file:
+        name: 1771014600-bump-elastic-agent-libs-to-v0.32.2.yaml
+        checksum: 1a471f3e234418d355b039eec340315b8d034132
+    - kind: enhancement
+      summary: Read Kibana status response body on 503 so monitoring captures the reason for outage.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1771393230
+      file:
+        name: 1771393230-metricbeat-kibana-read-503-body.yaml
+        checksum: 35a25fa8d2795c2306294a492ae8104d2557bbcd
+    - kind: bug-fix
+      summary: Restore suppression of repeated channel-not-found open errors in winlogbeat eventlog runner
+      description: |
+        Reintroduces channel-not-found retry log suppression that was lost during the eventlog runner refactor.
+        The first channel-not-found open error is logged at WARN, subsequent retries are logged at DEBUG, and
+        the suppression state is reset after a successful open. This prevents repeated WARN/ERROR log noise
+        when a configured channel is missing.
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/48979
+      impact: ""
+      action: ""
+      timestamp: 1771519200
+      file:
+        name: 1771519200-winlogbeat-channel-not-found-log-suppression.yaml
+        checksum: 6a498c9d4dc303bd9f434875dad113e997c948f2
+    - kind: security
+      summary: Update transient dependency filippo.io/edwards25519 to v1.1.1
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49070
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1771951628
+      file:
+        name: 1771951628-Update-transient-dependency-filippo.io-edwards25519.yaml
+        checksum: ccef261ba7fae017bd9dee18f69e22b83cb87d67
+    - kind: bug-fix
+      summary: Fix handling of Crowdstrike streaming input state in retryable errors.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1771967614
+      file:
+        name: 1771967614-49076-streaming.yaml
+        checksum: e2e863b9ea2edc6110ddd57dc0af804fbd266b05
+    - kind: bug-fix
+      summary: Fix incremental group updates in Active Directory entity analytics provider.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1771981300
+      file:
+        name: 1771981300-49053-entityanalytics_ad.yaml
+        checksum: 3d6e680d36d7396d80f63f0a6e8beebe775ddcf2
+    - kind: feature
+      summary: Add zswap compressed swap cache metrics to system memory metricset
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1772011445
+      file:
+        name: 1772011445-zswap-metrics.yaml
+        checksum: e300baaff49da937c1210bc6b6a88dda87c24b7d
+    - kind: unknown
+      summary: fix memory leak when harvester_limit is set
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1772031306
+      file:
+        name: 1772031306-harvester-fix.yaml
+        checksum: 85e20096ebdefe63d6fcbc26fb907e70ac9d6ce9
+    - kind: bug-fix
+      summary: Improve append processor behavior when merging values and removing duplicates
+      description: |
+        The append processor now appends values more consistently, avoiding nested
+        entries in the target field. Duplicate removal is also more reliable, reducing
+        processing errors and keeping output stable.
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49021
+      issue:
+        - https://github.com/elastic/beats/issues/49020
+      impact: ""
+      action: ""
+      timestamp: 1772040326
+      file:
+        name: 1772040326-append-processor-slice-normalization.yaml
+        checksum: e73119aad9a3fa035a6aa36e2d634b88a258b387
+    - kind: security
+      summary: update OpenTelemetry SDK to version v1.40.0
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49126
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1772099013
+      file:
+        name: 1772099013-update-OpenTelemetry-SDK-to-version-v1.40.0.yaml
+        checksum: e7a0d6f90b6e326d543114e39880d2cd65093570
+    - kind: bug-fix
+      summary: Demote missing user/device state lookup to debug log in Azure entity analytics provider.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1772100585
+      file:
+        name: 1772100585-36447-invalid-error-ea-azure.yaml
+        checksum: 81b3697a7caa2e42c0b1284b76fd3e257395f80b
+    - kind: enhancement
+      summary: Bump bundled Windows Npcap OEM installer to v1.87.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1772188176
+      file:
+        name: 1772188176-bump-npcap-1.87.yaml
+        checksum: 4ae2af21a3258e2a42f3e4cdf01a94746b3fcb67
+    - kind: bug-fix
+      summary: Fix CrowdStrike streaming session refresh scheduling to avoid tight refresh loops.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/49158
+      impact: ""
+      action: ""
+      timestamp: 1772204793
+      file:
+        name: 1772204793-crowdstrike-streaming-refresh-spin.yaml
+        checksum: 6aafd30c793bfe9e90bb5428da5eed3c76547630
+    - kind: enhancement
+      summary: Empty files are excluded from processing in filestream as early as possible.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1772466645
+      file:
+        name: 1772466645-ignore-empty-files.yaml
+        checksum: 91f382c60dbfd98d61778414496e55abcd8f5be1
+    - kind: enhancement
+      summary: Move winlog filtering to Go-side evaluation and harden recovery paths.
+      description: |
+        Winlogbeat and Filebeat winlog input now subscribe with unfiltered queries for non-custom configurations
+        and apply ignore_older, provider, event_id, and level filtering in code. This avoids unreliable Windows
+        query-filter behavior in affected environments while preserving custom xml_query passthrough. The change
+        also improves read/iterator recovery behavior, keeps final-batch publish semantics on EOF, and adds a
+        retry circuit-breaker for persistent render failures without partial events.
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1772629661
+      file:
+        name: 1772629661-winlog-filtering-and-recovery-hardening.yaml
+        checksum: 5a30c976b9bd375b3a876b5c3829bcb3862e5b92
+    - kind: feature
+      summary: Addition of Elasticsearch index mode and codec settings in Metricbeat index stats module.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1772635870
+      file:
+        name: 1772635870-es-index-mode-&-codec-in-metricbeat.yaml
+        checksum: b5044d09434c12df996352d46dd4bb56d7bbf378
+    - kind: feature
+      summary: Add cgroupv2 CPU metrics to system.process dataset
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1772636540
+      file:
+        name: 1772636540-zswap-metrics.yaml
+        checksum: e7310ec3a2c6b46deaacf6138025f731564a9993
+    - kind: security
+      summary: Update osquery-go dependency to v0.0.0-20260226222546-0cc22f415e57.
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1772638556
+      file:
+        name: 1772638556-update-osquery-go-dependency.yaml
+        checksum: 0bf5222cddefa191ff22c960f9edc17f1d016d3e
+    - kind: bug-fix
+      summary: fix reporting of beatreceiver 30s metrics
+      description: ""
+      component: beatreceiver
+      pr:
+        - https://github.com/elastic/beats/pull/49236
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1772638667
+      file:
+        name: 1772638667-fix-beat-receiver-30s-metrics.yaml
+        checksum: b69f2c8ae047774683342c300c025c73c324762c
+    - kind: feature
+      summary: Fix a bug that could report stopped inputs as still running
+      description: ""
+      component: elastic-agent
+      pr:
+        - https://github.com/elastic/beats/pull/49476
+        - https://github.com/elastic/beats/pull/48880
+        - https://github.com/elastic/beats/pull/49521
+        - https://github.com/elastic/beats/pull/49326
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/2418
+        - https://github.com/elastic/beats/issues/47511
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1772665071
+      file:
+        name: 1772665071-filebeat-input-report-stopped.yaml
+        checksum: 0da853639b00e4293a5fa56d3b76e23e94d7ad15
+    - kind: bug-fix
+      summary: kafka client will avoid having more than a single metadata request to each broker in-flight at any given time
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49307
+      issue:
+        - https://github.com/elastic/beats/issues/49210
+      impact: ""
+      action: ""
+      timestamp: 1773045970
+      file:
+        name: 1773045970-kafka-Metadata.SingleFlight-is-set.yaml
+        checksum: 69f8676e40409630a0bcddecab04edf1508a4ac7
